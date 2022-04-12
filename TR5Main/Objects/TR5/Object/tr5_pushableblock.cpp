@@ -21,14 +21,14 @@ int DoPushPull = 0;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 {
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(x, y, z,&roomNumber);
 	if (floor->Box == NO_BOX)
 		return;
 	g_Level.Boxes[floor->Box].flags &= (~BLOCKED);
 	short height = g_Level.Boxes[floor->Box].height;
 	short baseRoomNumber = roomNumber;
 	
-	floor = GetFloor(x + 1024, y, z, &roomNumber);
+	floor = GetFloor(x + 1024, y, z,&roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -36,7 +36,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x - 1024, y, z, &roomNumber);
+	floor = GetFloor(x - 1024, y, z,&roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -44,7 +44,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z + 1024, &roomNumber);
+	floor = GetFloor(x, y, z + 1024,&roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -52,7 +52,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z - 1024, &roomNumber);
+	floor = GetFloor(x, y, z - 1024,&roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -133,12 +133,12 @@ void PushableBlockControl(short itemNumber)
 	// do sound effects, it works for now
 	if (DoPushPull > 0)
 	{
-		SoundEffect(pushable->loopSound, &item->pos, 2);
+		SoundEffect(pushable->loopSound,&item->pos, 2);
 	}
 	else if (DoPushPull < 0)
 	{
 		DoPushPull = 0;
-		SoundEffect(pushable->stopSound, &item->pos, 2);
+		SoundEffect(pushable->stopSound,&item->pos, 2);
 	}
 
 	// control block falling
@@ -164,7 +164,7 @@ void PushableBlockControl(short itemNumber)
 			if (item->fallspeed >= 96)
 				FloorShake(item);
 			item->fallspeed = 0;
-			SoundEffect(pushable->fallSound, &item->pos, 2);
+			SoundEffect(pushable->fallSound,&item->pos, 2);
 
 			MoveStackY(itemNumber, relY);
 			AddBridgeStack(itemNumber);
@@ -242,7 +242,7 @@ void PushableBlockControl(short itemNumber)
 					item->pos.xPos = item->pos.xPos & 0xFFFFFE00 | 0x200;
 					item->pos.zPos = item->pos.zPos & 0xFFFFFE00 | 0x200;
 					MoveStackXZ(itemNumber);
-					//SoundEffect(pushable->stopSound, &item->pos, 2);
+					//SoundEffect(pushable->stopSound,&item->pos, 2);
 					DoPushPull = 0;
 					LaraItem->goalAnimState = LS_IDLE;
 
@@ -370,7 +370,7 @@ void PushableBlockCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos - 256, item->pos.zPos,&roomNumber);
 	PUSHABLE_INFO* pushable = item->data;
 
 	int blockHeight = GetStackHeight(item);
@@ -539,7 +539,7 @@ void PushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
 bool TestBlockMovable(ITEM_INFO* item, int blokhite)
 {
 	short roomNumber = item->roomNumber;
-	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
 
 	if (floor->IsWall(floor->SectorPlane(item->pos.xPos, item->pos.zPos)))
 		return false;
@@ -605,7 +605,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant)
 	int oldZ = item->pos.zPos;
 	item->pos.xPos = x;
 	item->pos.zPos = z;
-	GetCollidedObjects(item, 256, true, &CollidedItems[0], nullptr, 1);
+	GetCollidedObjects(item, 256, true,&CollidedItems[0], nullptr, 1);
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
@@ -685,7 +685,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	int oldZ = item->pos.zPos;
 	item->pos.xPos = x;
 	item->pos.zPos = z;
-	GetCollidedObjects(item, 256, 1, &CollidedItems[0], 0, 1);
+	GetCollidedObjects(item, 256, 1,&CollidedItems[0], 0, 1);
 	item->pos.xPos = oldX;
 	item->pos.zPos = oldZ;
 
@@ -748,7 +748,7 @@ bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant)
 	oldZ = LaraItem->pos.zPos;
 	LaraItem->pos.xPos = x;
 	LaraItem->pos.zPos = z;
-	GetCollidedObjects(LaraItem, 256, 1, &CollidedItems[0], 0, 1);
+	GetCollidedObjects(LaraItem, 256, 1,&CollidedItems[0], 0, 1);
 	LaraItem->pos.xPos = oldX;
 	LaraItem->pos.zPos = oldZ;
 
@@ -783,7 +783,7 @@ void MoveStackXZ(short itemNum)
 	auto item = &g_Level.Items[itemNum];
 
 	short newRoomNumber = item->roomNumber;
-	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&newRoomNumber);
 	if (newRoomNumber != item->roomNumber)
 		ItemNewRoom(itemNum, newRoomNumber);
 
@@ -797,7 +797,7 @@ void MoveStackXZ(short itemNum)
 		stackItem->pos.zPos = item->pos.zPos;
 
 		newRoomNumber = stackItem->roomNumber;
-		GetFloor(stackItem->pos.xPos, stackItem->pos.yPos, stackItem->pos.zPos, &newRoomNumber);
+		GetFloor(stackItem->pos.xPos, stackItem->pos.yPos, stackItem->pos.zPos,&newRoomNumber);
 		if (newRoomNumber != stackItem->roomNumber)
 			ItemNewRoom(stackIndex, newRoomNumber);
 	}
@@ -808,7 +808,7 @@ void MoveStackY(short itemNum, int y)
 	auto item = &g_Level.Items[itemNum];
 
 	short newRoomNumber = item->roomNumber;
-	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&newRoomNumber);
 	if (newRoomNumber != item->roomNumber)
 		ItemNewRoom(itemNum, newRoomNumber);
 
@@ -820,7 +820,7 @@ void MoveStackY(short itemNum, int y)
 		item->pos.yPos += y;
 
 		short newRoomNumber = item->roomNumber;
-		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &newRoomNumber);
+		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&newRoomNumber);
 		if (newRoomNumber != item->roomNumber)
 			ItemNewRoom(stackIndex, newRoomNumber);
 	}

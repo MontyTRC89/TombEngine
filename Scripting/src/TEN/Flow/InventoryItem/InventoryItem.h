@@ -22,6 +22,10 @@ namespace sol {
 
 struct InventoryItem
 {
+	InventoryItem(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
+
+	static void Register(sol::table& lua);
+
 	std::string name{};
 	InventoryObjectTypes slot{ INV_OBJECT_PISTOLS };
 	short yOffset{ 0 };
@@ -30,11 +34,6 @@ struct InventoryItem
 	RotationFlags rotationFlags{ RotationFlags::INV_ROT_X };
 	int meshBits{ 0 };
 	ItemOptions action{ ItemOptions::OPT_USE };
-
-	InventoryItem() = default;
-	InventoryItem(std::string const & a_name, ItemEnumPair a_slot, short a_yOffset, float a_scale, Rotation const & a_rot, RotationFlags a_rotationFlags, int a_meshBits, ItemOptions a_actions);
-
-	static void Register(sol::table& lua);
 
 	void SetAction(ItemOptions a_action);
 	void SetSlot(ItemEnumPair a_slot);

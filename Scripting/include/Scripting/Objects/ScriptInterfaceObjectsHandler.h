@@ -17,9 +17,12 @@ class ScriptInterfaceObjectsHandler {
 public:
 	virtual ~ScriptInterfaceObjectsHandler() = default;
 
+	[[nodiscard]] virtual short GetIndexByName(std::string const& name) const = 0;
 	virtual bool AddName(std::string const& key, VarMapVal val) = 0;
+	virtual bool NotifyKilled(ITEM_INFO *) = 0;
 	virtual void FreeEntities() = 0;
 	virtual void AssignLara() = 0;
 };
 
 extern ScriptInterfaceObjectsHandler* g_GameScriptEntities;
+

@@ -843,7 +843,7 @@ void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(item);
+	TestVolumes(Lara.itemNumber);
 }
 
 void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
@@ -947,7 +947,7 @@ void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(item);
+	TestVolumes(Lara.itemNumber);
 }
 
 void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
@@ -1009,7 +1009,7 @@ void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(item);
+	TestVolumes(Lara.itemNumber);
 }
 
 void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)

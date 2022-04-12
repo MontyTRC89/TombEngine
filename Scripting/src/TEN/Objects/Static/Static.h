@@ -15,8 +15,9 @@ class Static : public NamedBase<Static, MESH_INFO &>
 {
 public:
 	using IdentifierType = std::reference_wrapper<MESH_INFO>;
-	Static(MESH_INFO & id, bool temporary);
-	~Static();
+	Static(MESH_INFO & id);
+	~Static() = default;
+
 	Static& operator=(Static const& other) = delete;
 	Static(Static const& other) = delete;
 
@@ -35,5 +36,4 @@ public:
 
 private:
 	MESH_INFO & m_mesh;
-	bool m_temporary;
 };

@@ -286,7 +286,7 @@ void CentaurControl(short itemNum)
 
 	if (item->status == ITEM_DEACTIVATED)
 	{
-		SoundEffect(171, &item->pos, NULL);
+		SoundEffect(SFX_TR1_ATLANTEAN_EXPLODE, &item->pos, NULL);
 		ExplodingDeath(itemNum, 0xffffffff, FLYER_PART_DAMAGE);
 		KillItem(itemNum);
 		item->status = ITEM_DEACTIVATED;

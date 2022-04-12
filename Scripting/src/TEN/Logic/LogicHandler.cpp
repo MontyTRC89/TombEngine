@@ -3,23 +3,13 @@
 
 #if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
-#include "Game/items.h"
-#include "Game/control/box.h"
-#include "Game/Lara/lara.h"
 #include "Game/savegame.h"
-#include "Game/control/lot.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/effects/effects.h"
-#include "Game/pickup/pickup.h"
-#include "Game/gui.h"
 #include "ReservedScriptNames.h"
-#include "Game/camera.h"
-#include <Renderer/Renderer11Enums.h>
 #include "Game/effects/lightning.h"
 #include "ScriptUtil.h"
+#include "Objects/Moveable/Moveable.h"
 
 using namespace TEN::Effects::Lightning;
 
@@ -31,23 +21,78 @@ Functions and callbacks for level-specific logic scripts.
 
 #endif
 
-LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : LuaHandler{ lua }
+void SetVariable(sol::table tab, sol::object key, sol::object value)
+{
+#if TEN_OPTIONAL_LUA
+	switch (value.get_type())
+	{
+	case sol::type::lua_nil:
+	case sol::type::boolean:
+	case sol::type::number:
+	case sol::type::string:
+	case sol::type::table:
+		switch (key.get_type())
+		{
+		case sol::type::number:
+		case sol::type::string:
+			tab.raw_set(key, value);
+			break;
+		default:
+			ScriptAssert(false, "Unsupported key type used for special table. Valid types are string and number.", ErrorMode::Terminate);
+			break;
+		}
+		break;
+	default:
+		key.push();
+		size_t strLen;
+		const char* str = luaL_tolstring(tab.lua_state(), -1, &strLen);
+		if (str)
+		{
+			ScriptAssert(false, "Variable " + std::string{ str } + " has an unsupported type.", ErrorMode::Terminate);
+			lua_pop(tab.lua_state(), 1);
+		}
+		else
+		{
+			ScriptAssert(false, "Variable has an unsupported type.", ErrorMode::Terminate);
+		}
+		key.pop();
+		break;
+	}
+#endif
+}
+
+sol::object GetVariable(sol::table tab, sol::object key)
+{
+#if TEN_OPTIONAL_LUA
+	return tab.raw_get<sol::object>(key);
+#endif
+}
+
+LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
 #if TEN_OPTIONAL_LUA
 	ResetLevelTables();
 
-	MakeSpecialTable(m_lua, ScriptReserved_GameVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_globals);
-	m_lua->new_enum<GAME_OBJECT_ID>("Object", {
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
+	m_handler.GetState()->new_enum<GAME_OBJECT_ID>("Object", {
 		{"LARA", ID_LARA}
 		});
 #endif
 }
 
+void LogicHandler::ResetGameTables() 
+{
+#if TEN_OPTIONAL_LUA
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
+#endif
+}
+
+
 void LogicHandler::ResetLevelTables()
 {
 #if TEN_OPTIONAL_LUA
-	MakeSpecialTable(m_lua, ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
-	MakeSpecialTable(m_lua, ScriptReserved_LevelVars, &LuaVariables::GetVariable, &LuaVariables::SetVariable, &m_locals);
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelFuncs, &LogicHandler::GetLevelFunc, &LogicHandler::SetLevelFunc, this);
+	MakeSpecialTable(m_handler.GetState(), ScriptReserved_LevelVars, &GetVariable, &SetVariable);
 #endif
 }
 
@@ -75,10 +120,6 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 		m_levelFuncs.insert_or_assign(luaName, value.as<sol::protected_function>());
 		break;
 	default:
-		//todo When we save the game, do we save the functions or just the names?
-		//todo It may be better just to save the names so that we can load the callbacks
-		//todo from the level script each time (vital if the builder updates their
-		//todo scripts after release -- squidshire, 31/08/2021
 		std::string error{ "Could not assign LevelFuncs." };
 		error += luaName + "; it must be a function (or nil).";
 		return ScriptAssert(false, error);
@@ -93,14 +134,13 @@ void LogicHandler::FreeLevelScripts()
 {
 #if TEN_OPTIONAL_LUA
 	m_levelFuncs.clear();
-	m_locals = LuaVariables{};
 	ResetLevelTables();
 	m_onStart = sol::nil;
 	m_onLoad = sol::nil;
 	m_onControlPhase = sol::nil;
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
-	m_lua->collect_garbage();
+	m_handler.GetState()->collect_garbage();
 #endif
 }
 
@@ -142,43 +182,170 @@ void AddOneSecret()
 #endif
 }
 
-
-void LogicHandler::SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals)
+void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 {
 #if TEN_OPTIONAL_LUA
-	m_locals.variables.clear();
-	for (const auto& it : locals)
+	ResetGameTables();
+	ResetLevelTables();
+
+	std::unordered_map<uint32_t, sol::table> solTables;
+
+	for(std::size_t i = 0; i < vars.size(); ++i)
 	{
-		m_locals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		if (std::holds_alternative<IndexTable>(vars[i]))
+		{
+			solTables.try_emplace(i, *m_handler.GetState(), sol::create);
+			auto indexTab = std::get<IndexTable>(vars[i]);
+			for (auto& [first, second] : indexTab)
+			{
+				// if we're wanting to reference a table, make sure that table exists
+				// create it if need be
+				if (std::holds_alternative<IndexTable>(vars[second]))
+				{
+					solTables.try_emplace(second, *m_handler.GetState(), sol::create);
+					solTables[i][vars[first]] = solTables[second];
+				}
+				else
+				{
+					solTables[i][vars[first]] = vars[second];
+				}
+			}
+		}
 	}
-	m_globals.variables.clear();
-	for (const auto& it : globals)
+	
+	auto rootTable = solTables[0];
+
+	sol::table levelVars = rootTable[ScriptReserved_LevelVars];
+	for (auto& [first, second] : levelVars)
 	{
-		m_globals.variables.insert(std::pair<std::string, sol::object>(it.first, sol::object(m_lua->lua_state(), sol::in_place, it.second)));
+		(*m_handler.GetState())[ScriptReserved_LevelVars][first] = second;
+	}
+
+	sol::table gameVars = rootTable[ScriptReserved_GameVars];
+	for (auto& [first, second] : gameVars)
+	{
+		(*m_handler.GetState())[ScriptReserved_GameVars][first] = second;
 	}
 #endif
 }
 
-void LogicHandler::GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const
+void LogicHandler::GetVariables(std::vector<SavedVar> & vars)
 {
 #if TEN_OPTIONAL_LUA
-	for (const auto& it : m_locals.variables)
+	sol::table tab{ *m_handler.GetState(), sol::create };
+	tab[ScriptReserved_LevelVars] = (*m_handler.GetState())[ScriptReserved_LevelVars];
+	tab[ScriptReserved_GameVars] = (*m_handler.GetState())[ScriptReserved_GameVars];
+
+	std::unordered_map<void const*, uint32_t> varsMap;
+	std::unordered_map<double, uint32_t> numMap;
+	std::unordered_map<bool, uint32_t> boolMap;
+	size_t nVars = 0;
+	auto handleNum = [&](double num)
 	{
-		locals.insert(std::pair<std::string, VarSaveType>(it.first, it.second.as<VarSaveType>()));
-	}
-	for (const auto& it : m_globals.variables)
+		auto [first, second] = numMap.insert(std::pair<double, uint32_t>(num, nVars));
+
+		// true if the var was inserted
+		if (second)
+		{
+			vars.push_back(num);
+			++nVars;
+		}
+
+		return first->second;
+	};
+
+	auto handleBool = [&](bool num)
 	{
-		globals.insert(std::pair<std::string, VarSaveType>(it.first, it.second.as<VarSaveType>()));
-	}
+		auto [first, second] = boolMap.insert(std::pair<bool, uint32_t>(num, nVars));
+
+		// true if the var was inserted
+		if (second)
+		{
+			vars.push_back(num);
+			++nVars;
+		}
+
+		return first->second;
+	};
+
+	auto handleStr = [&](sol::object const& obj)
+	{
+		auto str = obj.as<sol::string_view>();
+		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(str.data(), nVars));
+
+		// true if the string was inserted
+		if (second)
+		{
+			vars.push_back(std::string{ str.data() });
+			++nVars;
+		}
+
+		return first->second;
+	};
+
+	std::function<uint32_t(sol::table const &)> populate = [&](sol::table const & obj) 
+	{
+		auto [first, second] = varsMap.insert(std::pair<void const*, uint32_t>(obj.pointer(), nVars));
+
+		// true if the table was inserted
+		if(second)
+		{
+			++nVars;
+			auto id = first->second;
+
+			vars.push_back(IndexTable{});
+			for (auto& [first, second] : obj)
+			{
+				uint32_t keyIndex = 0;
+				
+				// Strings and numbers can be keys AND values
+				switch (first.get_type())
+				{
+				case sol::type::string:
+					keyIndex = handleStr(first);
+					break;
+				case sol::type::number:
+					keyIndex = handleNum(first.as<double>());
+					break;
+				default:
+					ScriptAssert(false, "Tried saving an unsupported type as a key");
+				}
+
+				uint32_t valIndex = 0;
+				switch (second.get_type())
+				{
+				case sol::type::table:
+					valIndex = populate(second.as<sol::table>());
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				case sol::type::string:
+					valIndex = handleStr(second);
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				case sol::type::number:
+					valIndex = handleNum(second.as<double>());
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				case sol::type::boolean:
+					valIndex = handleBool(second.as<bool>());
+					std::get<IndexTable>(vars[id]).push_back(std::make_pair(keyIndex, valIndex));
+					break;
+				default:
+					ScriptAssert(false, "Tried saving an unsupported type as a value");
+				}
+			}
+		}
+		return first->second;
+	};
+	populate(tab);
 #endif
 }
-
 
 template <typename R, char const * S, typename mapType>
 std::unique_ptr<R> GetByName(std::string const & type, std::string const & name, mapType const & map)
 {
 #if TEN_OPTIONAL_LUA
-	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ERROR_MODE::TERMINATE);
+	ScriptAssert(map.find(name) != map.end(), std::string{ type + " name not found: " + name }, ErrorMode::Terminate);
 	return std::make_unique<R>(map.at(name), false);
 #endif
 }
@@ -187,62 +354,37 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 @section specialobjects
 */
 
-/*** An @{ItemInfo} representing Lara herself.
+/*** A @{Objects.Moveable} representing Lara herself.
 @table Lara
 */
 void LogicHandler::ResetVariables()
 {
 #if TEN_OPTIONAL_LUA
-	(*m_lua)["Lara"] = NULL;
-#endif
-}
-
-
-
-sol::object LuaVariables::GetVariable(sol::table tab, std::string key)
-{
-#if TEN_OPTIONAL_LUA
-	if (variables.find(key) == variables.end())
-		return sol::lua_nil;
-
-	return variables[key];
-#else
-	return sol::nil;
-#endif
-}
-
-void LuaVariables::SetVariable(sol::table tab, std::string key, sol::object value)
-{
-#if TEN_OPTIONAL_LUA
-	switch (value.get_type())
-	{
-	case sol::type::lua_nil:
-		variables.erase(key);
-		break;
-	case sol::type::boolean:
-	case sol::type::number:
-	case sol::type::string:
-		variables[key] = value;
-		break;
-	default:
-		ScriptAssert(false, "Variable " + key + " has an unsupported type.", ERROR_MODE::TERMINATE);
-		break;
-	}
+	(*m_handler.GetState())["Lara"] = NULL;
 #endif
 }
 
 void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 {
 #if TEN_OPTIONAL_LUA
-	ExecuteScript(luaFilename);
+	m_handler.ExecuteScript(luaFilename);
 #endif
 }
 
-void LogicHandler::ExecuteFunction(std::string const & name)
+void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer)
 {
 #if TEN_OPTIONAL_LUA
-	sol::protected_function func = (*m_lua)["LevelFuncs"][name.c_str()];
-	auto r = func();
+	sol::protected_function_result r;
+	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][name.c_str()];
+	if (std::holds_alternative<short>(triggerer))
+	{
+		r = func(std::make_unique<Moveable>(std::get<short>(triggerer), true));
+	}
+	else
+	{
+		r = func();
+	}
+
 	if (!r.valid())
 	{
 		sol::error err = r;
@@ -258,7 +400,7 @@ static void doCallback(sol::protected_function const & func, std::optional<float
 	if (!r.valid())
 	{
 		sol::error err = r;
-		ScriptAssert(false, err.what(), ERROR_MODE::TERMINATE);
+		ScriptAssert(false, err.what(), ErrorMode::Terminate);
 	}
 }
 #endif
@@ -268,6 +410,7 @@ void LogicHandler::OnStart()
 #if TEN_OPTIONAL_LUA
 	if (m_onStart.valid())
 		doCallback(m_onStart);
+
 #endif
 }
 
@@ -378,7 +521,7 @@ void LogicHandler::InitCallbacks()
 #if TEN_OPTIONAL_LUA
 	auto assignCB = [this](sol::protected_function& func, std::string const & luaFunc) {
 		std::string fullName = "LevelFuncs." + luaFunc;
-		func = (*m_lua)["LevelFuncs"][luaFunc];
+		func = (*m_handler.GetState())["LevelFuncs"][luaFunc];
 		std::string err{ "Level's script does not define callback " + fullName};
 		if (!ScriptAssert(func.valid(), err)) {
 			ScriptWarn("Defaulting to no " + fullName + " behaviour.");

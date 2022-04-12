@@ -12,6 +12,7 @@
 #include "Position/Position.h"
 #include "Rotation/Rotation.h"
 #include "Specific/trmath.h"
+#include "Objects/ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 
 /***
@@ -23,66 +24,55 @@ pickups, and Lara herself.
 @pragma nostrip
 */
 
-constexpr auto LUA_CLASS_NAME{ "Moveable" };
+constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 
 static auto index_error = index_error_maker(Moveable, LUA_CLASS_NAME);
 static auto newindex_error = newindex_error_maker(Moveable, LUA_CLASS_NAME);
 
-Moveable::Moveable(short num, bool temp, bool init) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ init }, m_temporary{ temp }
-{};
+
+Moveable::Moveable(short num, bool alreadyInitialised) : m_item{ &g_Level.Items[num] }, m_num{ num }, m_initialised{ alreadyInitialised }
+{
+	if (alreadyInitialised)
+	{
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
+	}
+};
 
 Moveable::Moveable(Moveable&& other) noexcept : 
-	m_item { std::exchange(other.m_item, nullptr) },
+	m_item{ std::exchange(other.m_item, nullptr) },
 	m_num{ std::exchange(other.m_num, NO_ITEM) },
-	m_initialised{ std::exchange(other.m_initialised, false) },
-	m_temporary{ std::exchange(other.m_temporary, false) }
-{};
+	m_initialised{ std::exchange(other.m_initialised, false) }
+{
+	if (GetValid())
+	{
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, &other);
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
+	}
+};
 
-// todo.. how to check if item is killed outside of script?
+
 Moveable::~Moveable()
 {
-	// todo.. see if there's a better default state than -1
-	if (m_temporary && (m_num > NO_ITEM))
-	{
-		s_callbackRemoveName(m_item->luaName);
-		KillItem(m_num);
+	if (m_num > NO_ITEM) {
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 	}
 }
 
 
-/*** If you create items with this you NEED to give a position, room, 
-and object number, and then call InitialiseItem before it will work.
-	@function Moveable.New
-*/
-
-/*** Like above, but the returned variable controls the 
-lifetime of the object (it will be destroyed when the variable goes
-out of scope).
-	@function Moveable.NewTemporary
-*/
-template <bool temp> std::unique_ptr<Moveable> CreateEmpty()
-{
-	short num = CreateItem();	
-	ITEM_INFO * item = &g_Level.Items[num];
-	auto ptr = std::make_unique<Moveable>(num, temp, false);
-	return ptr;
-}
-
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
-most can just be set to zero (see usage). See also the overload which
-takes no arguments.
+most can just be set to zero (see usage).
 	@function Moveable.New
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Position position position in level
-	@tparam Rotation rotation rotation about x, y, and z axes
+	@tparam Rotation rotation rotation about x, y, and z axes (default Rotation.new(0, 0, 0))
 	@tparam int room room ID item is in
-	@tparam int animNumber anim number
-	@tparam int frameNumber frame number
-	@tparam int hp HP of item
-	@tparam int OCB ocb of item
-	@tparam table AIBits table with AI bits
+	@tparam int animNumber anim number (default 0)
+	@tparam int frameNumber frame number (default 0)
+	@tparam int hp HP of item (default 10)
+	@tparam int OCB ocb of item (default 0)
+	@tparam table AIBits table with AI bits (default {0,0,0,0,0,0})
 	@return reference to new Moveable object
 	@usage 
 	local item = Moveable.New(
@@ -93,64 +83,62 @@ takes no arguments.
 		0, -- room
 		0, -- animNumber
 		0, -- frameNumber
-		0, -- HP
+		10, -- HP
 		0, -- OCB
 		{0,0,0,0,0,0} -- aiBits
 		)
 	*/
 
-/*** Like the above, but the returned variable controls the 
-lifetime of the object (it will be destroyed when the variable goes
-out of scope).
-	@function Moveable.NewTemporary
-	@param see_above same as above function
-*/
+#define USE_IF_HAVE(Type, ifThere, ifNotThere) \
+std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere
 
-template <bool temp> static std::unique_ptr<Moveable> Create(
+static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string const & name,
 	Position const & pos,
-	Rotation const & rot,
+	TypeOrNil<Rotation> const & rot,
 	short room,
-	int animNumber,
-	int frameNumber,
-	short hp,
-	short ocb,
-	aiBitsType const & aiBits
+	TypeOrNil<int> animNumber,
+	TypeOrNil<int> frameNumber,
+	TypeOrNil<short> hp,
+	TypeOrNil<short> ocb,
+	TypeOrNil<aiBitsType> const & aiBits
 )
 {
 	short num = CreateItem();
-	auto ptr = std::make_unique<Moveable>(num, temp, false);
+	auto ptr = std::make_unique<Moveable>(num, false);
 
-	ITEM_INFO* item = &g_Level.Items[num];
-	ptr->SetPos(pos);
-	ptr->SetRot(rot);
-	ptr->SetRoom(room);
-	ptr->SetObjectID(objID);
-	ptr->Init();
+	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
+	{
 
-	ptr->SetName(name);
-	ptr->SetAnimNumber(animNumber);
-	ptr->SetFrameNumber(frameNumber);
-	ptr->SetHP(hp);
-	ptr->SetOCB(ocb);
-	ptr->SetAIBits(aiBits);
+		ITEM_INFO* item = &g_Level.Items[num];
+		ptr->SetPos(pos);
+		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
+		ptr->SetRoom(room);
+		ptr->SetObjectID(objID);
+		ptr->Init();
 
+		ptr->SetAnimNumber(USE_IF_HAVE(int, animNumber, 0));
+		ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
+		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
+		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+		item->carriedItem = NO_ITEM;
+
+		// call this when resetting name too?
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
+		// add to name map too?
+	}
 	return ptr;
 }
 
 void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
-		ScriptReserved_new, sol::overload(Create<false>, CreateEmpty<false>),
-		ScriptReserved_newTemporary, sol::overload(Create<true>, CreateEmpty<true>),
+		ScriptReserved_new, Create,
+		ScriptReserved_newTemporary, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
-
-/// Initialise an item.
-// Use this if you called new with no arguments
-// @function Moveable.Init
-		ScriptReserved_Init, &Moveable::Init,
 
 /// Enable the item
 // @function Moveable:EnableItem
@@ -164,7 +152,7 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 		ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
-/// (int) status of object.
+/// Get the status of object.
 // possible values:
 // 0 - not active
 // 1 - active
@@ -173,6 +161,40 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
 		ScriptReserved_GetStatus, &Moveable::GetStatus,
+		
+/// Set the name of the function to be called when the moveable is shot by Lara
+// Note that this will be triggered twice when shot with both pistols at once. 
+// @function Moveable:SetOnHit
+// @tparam string name of callback function to be called
+		ScriptReserved_SetOnHit, &Moveable::SetOnHit,
+
+/// Get the name of the function called when this moveable is shot
+// @function Moveable:GetOnHit
+// @treturn string name of the function
+		ScriptReserved_GetOnHit, &Moveable::GetOnHit,
+
+/// Set the name of the function called when Lara collides with this moveable
+// @function Moveable:SetOnCollided
+// @tparam string name of callback function to be called
+		ScriptReserved_SetOnCollided, &Moveable::SetOnCollided,
+
+/// Get the name of the function called when Lara collides with this moveable
+// @function Moveable:GetOnCollided
+// @treturn string name of the function
+		ScriptReserved_GetOnCollided, &Moveable::GetOnCollided,
+
+/// Set the name of the function to be called when the moveable is destroyed/killed
+// @function Moveable:SetOnKilled
+// @tparam string callback name of function to be called
+// @usage
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled("baddyKilled")
+		ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
+
+/// Get the name of the function called when this moveable is killed
+// @function Moveable:GetOnKilled
+// @treturn string name of the function
+		ScriptReserved_GetOnKilled, &Moveable::GetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
@@ -313,7 +335,7 @@ void Moveable::Register(sol::table & parent)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
 // @function GetName
-// @treturn name the moveable's name
+// @treturn string the moveable's name
 	ScriptReserved_GetName, &Moveable::GetName,
 
 /// Set the moveable's name (its unique string identifier)
@@ -321,7 +343,17 @@ void Moveable::Register(sol::table & parent)
 // It cannot be blank and cannot share a name with any existing object.
 // @function SetName
 // @tparam name string the new moveable's name
-	ScriptReserved_SetName, &Moveable::SetName);
+// @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
+	ScriptReserved_SetName, &Moveable::SetName, 
+
+/// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
+// @function GetValid
+// @treturn valid bool true if the object is still not destroyed
+	ScriptReserved_GetValid, &Moveable::GetValid,
+
+/// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
+// @function Destroy
+	ScriptReserved_Destroy, &Moveable::Destroy);
 }
 
 
@@ -347,40 +379,76 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 	return m_item->objectNumber;
 }
 
-void Moveable::SetObjectID(GAME_OBJECT_ID item) 
+void Moveable::SetObjectID(GAME_OBJECT_ID id) 
 {
-	m_item->objectNumber = item;
+	m_item->objectNumber = id;
 }
 
+
+void Moveable::SetOnHit(std::string const & cbName)
+{
+	m_item->luaCallbackOnHitName = cbName;
+}
+
+void Moveable::SetOnKilled(std::string const & cbName)
+{
+	m_item->luaCallbackOnKilledName = cbName;
+}
+
+void Moveable::SetOnCollided(std::string const & cbName)
+{
+	m_item->luaCallbackOnCollidedName = cbName;
+}
+
+std::string Moveable::GetOnHit() const
+{
+	return m_item->luaCallbackOnHitName;
+}
+
+std::string Moveable::GetOnKilled() const
+{
+	return m_item->luaCallbackOnKilledName;
+}
+
+std::string Moveable::GetOnCollided() const
+{
+	return m_item->luaCallbackOnCollidedName;
+}
 
 std::string Moveable::GetName() const
 {
 	return m_item->luaName;
 }
 
-void Moveable::SetName(std::string const & id) 
+bool Moveable::SetName(std::string const & id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
 	{
-		return;
+		return false;
 	}
 
 	if (s_callbackSetName(id, m_num))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_item->luaName);
-		m_item->luaName = id;
+		if (id != m_item->luaName)
+		{
+			s_callbackRemoveName(m_item->luaName);
+			m_item->luaName = id;
+		}
 	}
 	else
 	{
 		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", id);
 		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
+
+		return false;
 	}
+	return true;
 }
 
 Position Moveable::GetPos() const
 {
-	return Position(	m_item->pos	);
+	return Position(m_item->pos	);
 }
 
 void Moveable::SetPos(Position const& pos)
@@ -394,9 +462,11 @@ void Moveable::SetPos(Position const& pos)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Moveable::GetRot() const
 {
-	return Rotation(	int(TO_DEGREES(m_item->pos.xRot)) % 360,
-						int(TO_DEGREES(m_item->pos.yRot)) % 360,
-						int(TO_DEGREES(m_item->pos.zRot)) % 360);
+	return {
+		static_cast<int>(TO_DEGREES(m_item->pos.xRot)) % 360,
+		static_cast<int>(TO_DEGREES(m_item->pos.yRot)) % 360,
+		static_cast<int>(TO_DEGREES(m_item->pos.zRot)) % 360
+	};
 }
 
 void Moveable::SetRot(Rotation const& rot)
@@ -608,4 +678,28 @@ void Moveable::MakeInvisible()
 		}
 	}
 }
+
+void Moveable::Invalidate()
+{
+	m_item = nullptr;
+	m_num = NO_ITEM;
+	m_initialised = false;
+}
+
+bool Moveable::GetValid() const
+{
+	return m_item != nullptr;
+}
+
+void Moveable::Destroy()
+{
+	if (m_num > NO_ITEM) {
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
+		s_callbackRemoveName(m_item->luaName);
+		KillItem(m_num);
+	}
+
+	Invalidate();
+}
+
 #endif

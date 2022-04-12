@@ -39,12 +39,14 @@ with a call to @{ShowString}, or this function will have no effect.
 */
 	table_strings.set_function(ScriptReserved_HideString, [this](DisplayString const& s) {ShowString(s, 0.0f); });
 
-	DisplayString::Register(m_lua);
+	DisplayString::Register(table_strings);
 	DisplayString::SetCallbacks(
 		[this](auto && ... param) {return SetDisplayString(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) {return ScheduleRemoveDisplayString(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) {return GetDisplayString(std::forward<decltype(param)>(param)...); }
 		);
+	
+	MakeReadOnlyTable(table_strings, ScriptReserved_DisplayStringOption, kDisplayStringOptionNames);
 #endif
 }
 

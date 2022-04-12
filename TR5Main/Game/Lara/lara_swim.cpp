@@ -263,7 +263,7 @@ void UpdateSubsuitAngles()
 
 	if (Subsuit.Vel[0] != 0 || Subsuit.Vel[1] != 0)
 	{
-		SoundEffect(SFX_TR5_LARA_UNDERWATER_ENGINE, &LaraItem->pos, (((Subsuit.Vel[0] + Subsuit.Vel[1]) * 4) & 0x1F00) + 10);
+		SoundEffect(945, &LaraItem->pos, (((Subsuit.Vel[0] + Subsuit.Vel[1]) * 4) & 0x1F00) + 10);
 	}
 }
 

@@ -13,6 +13,7 @@ void Position::Register(sol::table & parent)
 	parent.new_usertype<Position>("Position",
 		sol::constructors<Position(int, int, int)>(),
 		sol::meta_function::to_string, &Position::ToString,
+		sol::meta_function::addition, &AddPositions,
 
 		/// (int) x coordinate
 		//@mem x
@@ -36,18 +37,12 @@ void Position::Register(sol::table & parent)
 @return A Position object.
 @function Position.new
 */
-Position::Position(int aX, int aY, int aZ)
+Position::Position(int aX, int aY, int aZ) : x{aX}, y{aY}, z{aZ}
 {
-	x = aX;
-	y = aY;
-	z = aZ;
 }
 
-Position::Position(PHD_3DPOS const& pos)
+Position::Position(PHD_3DPOS const& pos) : x{pos.xPos}, y{pos.yPos}, z{pos.zPos}
 {
-	x = pos.xPos;
-	y = pos.yPos;
-	z = pos.zPos;
 }
 
 void Position::StoreInPHDPos(PHD_3DPOS& pos) const
@@ -56,6 +51,14 @@ void Position::StoreInPHDPos(PHD_3DPOS& pos) const
 	pos.yPos = y;
 	pos.zPos = z;
 }
+
+void Position::StoreInGameVector(GAME_VECTOR& pos) const
+{
+	pos.x = x;
+	pos.y = y;
+	pos.z = z;
+}
+
 
 /***
 @tparam Position position this position
@@ -66,4 +69,10 @@ std::string Position::ToString() const
 {
 	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
 }
+
+Position AddPositions(Position const & one, Position const & two)
+{
+	return Position { one.x + two.x, one.y + two.y, one.z + two.z };
+}
+
 
