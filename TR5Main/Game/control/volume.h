@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/control/volumetriggerer.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11.h"
@@ -52,8 +53,8 @@ namespace TEN::Control::Volumes
 {
 	extern int CurrentCollidedVolume;
 
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType);
-	void TestVolumes(ITEM_INFO* item);
+	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType, VolumeTriggerer triggerer);
+	void TestVolumes(short itemNum);
 	void TestVolumes(short roomNumber, MESH_INFO* mesh);
 	void TestVolumes(CAMERA_INFO* camera);
 }

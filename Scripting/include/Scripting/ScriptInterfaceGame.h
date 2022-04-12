@@ -3,6 +3,7 @@
 #include <functional>
 #include "room.h"
 #include "Specific/level.h"
+#include "Game/control/volumetriggerer.h"
 
 typedef DWORD D3DCOLOR;
 using VarMapVal = std::variant< short,
@@ -15,6 +16,10 @@ using VarMapVal = std::variant< short,
 using CallbackDrawString = std::function<void(std::string const&, D3DCOLOR, int, int, int)>;
 
 using VarSaveType = std::variant<bool, double, std::string>;
+
+using IndexTable = std::vector<std::pair<uint32_t, uint32_t>>;
+
+using SavedVar = std::variant<bool, std::string, double, IndexTable>;
 
 class ScriptInterfaceGame {
 public:
@@ -30,10 +35,10 @@ public:
 
 	virtual void FreeLevelScripts() = 0;
 	virtual void ExecuteScriptFile(std::string const& luaFileName) = 0;
-	virtual void ExecuteFunction(std::string const& luaFileName) = 0;
+	virtual void ExecuteFunction(std::string const& luaFuncName, TEN::Control::Volumes::VolumeTriggerer) = 0;
 
-	virtual void SetVariables(std::map<std::string, VarSaveType> const & locals, std::map<std::string, VarSaveType> const & globals) = 0;
-	virtual void GetVariables(std::map<std::string, VarSaveType>& locals, std::map<std::string, VarSaveType>& globals) const = 0;
+	virtual void GetVariables(std::vector<SavedVar> & vars) = 0;
+	virtual void SetVariables(std::vector<SavedVar> const& vars) = 0;
 };
 
 extern ScriptInterfaceGame* g_GameScript;

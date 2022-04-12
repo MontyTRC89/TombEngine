@@ -23,6 +23,9 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
+#include "Scripting/ScriptInterfaceGame.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+
 using namespace TEN::Entities::Generic;
 
 WEAPON_INFO Weapons[NUM_WEAPONS] =
@@ -769,7 +772,7 @@ void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int dama
 				if (target->objectNumber == ID_ROMAN_GOD1 ||
 					target->objectNumber == ID_ROMAN_GOD2)
 				{
-					SoundEffect(SFX_TR5_SWORD_GOD_HITMET, &target->pos, 0);
+					SoundEffect(958, &target->pos, 0);
 				}
 
 				break;
@@ -790,6 +793,11 @@ void HitTarget(ITEM_INFO* lara, ITEM_INFO* target, GAME_VECTOR* hitPos, int dama
 			else
 				target->hitPoints = 0;
 		}
+	}
+	if (!target->luaCallbackOnHitName.empty())
+	{
+		short index = g_GameScriptEntities->GetIndexByName(target->luaName);
+		g_GameScript->ExecuteFunction(target->luaCallbackOnHitName, index);
 	}
 }
 

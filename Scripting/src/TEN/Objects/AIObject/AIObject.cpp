@@ -17,15 +17,8 @@ AI object
 static auto index_error = index_error_maker(AIObject, ScriptReserved_AIObject);
 static auto newindex_error = newindex_error_maker(AIObject, ScriptReserved_AIObject);
 
-AIObject::AIObject(AI_OBJECT & ref, bool temp) : m_aiObject{ref}, m_temporary{ temp }
+AIObject::AIObject(AI_OBJECT & ref) : m_aiObject{ref}
 {};
-
-AIObject::~AIObject() {
-	if (m_temporary)
-	{
-		s_callbackRemoveName(m_aiObject.luaName);
-	}
-}
 
 void AIObject::Register(sol::table & parent)
 {

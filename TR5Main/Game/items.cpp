@@ -5,8 +5,10 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Scripting/ScriptInterfaceGame.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Floordata;
 
@@ -20,7 +22,7 @@ void ClearItem(short itemNum)
 	item->startPos = item->pos;
 }
 
-void KillItem(short itemNum)
+void KillItem(short const itemNum)
 {
 	if (InItemControlLoop)
 	{
@@ -41,8 +43,7 @@ void KillItem(short itemNum)
 		}
 		else
 		{
-			short linknum;
-			for (linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextActive)
+			for (short linknum = NextItemActive; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextActive)
 			{
 				if (g_Level.Items[linknum].nextActive == itemNum)
 				{
@@ -60,8 +61,7 @@ void KillItem(short itemNum)
 			}
 			else
 			{
-				short linknum;
-				for (linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
+				for (short linknum = g_Level.Rooms[item->roomNumber].itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 				{
 					if (g_Level.Items[linknum].nextItem == itemNum)
 					{
@@ -86,6 +86,12 @@ void KillItem(short itemNum)
 		else
 		{
 			item->flags |= IFLAG_KILLED;
+		}
+
+		g_GameScriptEntities->NotifyKilled(item);
+		if (!item->luaCallbackOnKilledName.empty())
+		{
+			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNum);
 		}
 	}
 }
@@ -310,15 +316,16 @@ void RemoveDrawnItem(short itemNum)
 	}
 }
 
-void RemoveActiveItem(short itemNum) 
+void RemoveActiveItem(short const itemNum) 
 {
-	if (g_Level.Items[itemNum].active)
+	auto & item = g_Level.Items[itemNum];
+	if (item.active)
 	{
-		g_Level.Items[itemNum].active = false;
+		item.active = false;
 
 		if (NextItemActive == itemNum)
 		{
-			NextItemActive = g_Level.Items[itemNum].nextActive;
+			NextItemActive = item.nextActive;
 		}
 		else
 		{
@@ -326,10 +333,15 @@ void RemoveActiveItem(short itemNum)
 			{
 				if (g_Level.Items[linknum].nextActive == itemNum)
 				{
-					g_Level.Items[linknum].nextActive = g_Level.Items[itemNum].nextActive;
+					g_Level.Items[linknum].nextActive = item.nextActive;
 					break;
 				}
 			}
+		}
+		g_GameScriptEntities->NotifyKilled(&item);
+		if (!item.luaCallbackOnKilledName.empty())
+		{
+			g_GameScript->ExecuteFunction(item.luaCallbackOnKilledName, itemNum);
 		}
 	}
 }

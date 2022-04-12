@@ -18,15 +18,8 @@ Mesh info
 static auto index_error = index_error_maker(Static, ScriptReserved_Static);
 static auto newindex_error = newindex_error_maker(Static, ScriptReserved_Static);
 
-Static::Static(MESH_INFO & ref, bool temp) : m_mesh{ref}, m_temporary{ temp }
+Static::Static(MESH_INFO & ref) : m_mesh{ref}
 {};
-
-Static::~Static() {
-	if (m_temporary)
-	{
-		s_callbackRemoveName(m_mesh.luaName);
-	}
-}
 
 void Static::Register(sol::table & parent)
 {
@@ -104,9 +97,11 @@ void Static::SetPos(Position const& pos)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 Rotation Static::GetRot() const
 {
-	return Rotation(	int(TO_DEGREES(m_mesh.pos.xRot)) % 360,
-						int(TO_DEGREES(m_mesh.pos.yRot)) % 360,
-						int(TO_DEGREES(m_mesh.pos.zRot)) % 360);
+	return {
+		static_cast<int>(TO_DEGREES(m_mesh.pos.xRot)) % 360,
+		static_cast<int>(TO_DEGREES(m_mesh.pos.yRot)) % 360,
+		static_cast<int>(TO_DEGREES(m_mesh.pos.zRot)) % 360
+	};
 }
 
 void Static::SetRot(Rotation const& rot)
@@ -121,22 +116,22 @@ std::string Static::GetName() const
 	return m_mesh.luaName;
 }
 
-void Static::SetName(std::string const & id) 
+void Static::SetName(std::string const & name) 
 {
-	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
+	if (!ScriptAssert(!name.empty(), "Name cannot be blank. Not setting name."))
 	{
 		return;
 	}
 
-	if (s_callbackSetName(id, m_mesh))
+	if (s_callbackSetName(name, m_mesh))
 	{
 		// remove the old name if we have one
 		s_callbackRemoveName(m_mesh.luaName);
-		m_mesh.luaName = id;
+		m_mesh.luaName = name;
 	}
 	else
 	{
-		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", id);
+		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", name);
 		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
 	}
 }

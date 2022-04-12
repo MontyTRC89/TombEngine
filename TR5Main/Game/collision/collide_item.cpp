@@ -14,6 +14,7 @@
 #include "Specific/trmath.h"
 #include "Specific/prng.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/ScriptInterfaceGame.h"
 
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;
@@ -1729,7 +1730,7 @@ void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c)
 		item->status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void ObjectCollision(short const itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
@@ -1737,6 +1738,11 @@ void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (TestCollision(item, l))
 		{
+			if (!item->luaCallbackOnCollidedName.empty())
+			{
+				g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedName, itemNumber);
+			}
+
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, l, coll, false, true);
 		}

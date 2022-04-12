@@ -29,40 +29,42 @@
 
 
 
-<h2>Script Files</h2>
+<h2>1 Modules</h2>
 <ul class="nowrap">
-  <li><a href="script files/Pre-game.html">Pre-game scripts</a></li>
-  <li><a href="script files/Level-specific.html">Level-specific scripts</a></li>
+  <li><a href="1 modules/Flow.html">Flow</a></li>
+  <li><a href="1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="1 modules/Logic.html">Logic</a></li>
+  <li><a href="1 modules/Misc.html">Misc</a></li>
+  <li><a href="1 modules/Objects.html">Objects</a></li>
+  <li><a href="1 modules/Strings.html">Strings</a></li>
 </ul>
-<h2>Enums</h2>
+<h2>2 Classes</h2>
 <ul class="nowrap">
-  <li><a href="enums/InvItem.html">InvItem</a></li>
-  <li><a href="enums/ObjID.html">ObjID</a></li>
+  <li><a href="2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
 </ul>
-<h2>Entity classes</h2>
+<h2>3 Primitive Classes</h2>
 <ul class="nowrap">
-  <li><a href="entity classes/AIObject.html">AIObject</a></li>
-  <li><a href="entity classes/CameraInfo.html">CameraInfo</a></li>
-  <li><a href="entity classes/ItemInfo.html">ItemInfo</a></li>
-  <li><a href="entity classes/MeshInfo.html">MeshInfo</a></li>
-  <li><a href="entity classes/SinkInfo.html">SinkInfo</a></li>
-  <li><a href="entity classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
+  <li><a href="3 primitive classes/Color.html">Color</a></li>
+  <li><a href="3 primitive classes/Position.html">Position</a></li>
+  <li><a href="3 primitive classes/Rotation.html">Rotation</a></li>
 </ul>
-<h2>Pre-game script classes</h2>
+<h2>4 Enums</h2>
 <ul class="nowrap">
-  <li><a href="pre-game script classes/AudioTrack.html">AudioTrack</a></li>
-  <li><a href="pre-game script classes/InventoryObject.html">InventoryObject</a></li>
-  <li><a href="pre-game script classes/Level.html">Level</a></li>
-  <li><a href="pre-game script classes/Mirror.html">Mirror</a></li>
-  <li><a href="pre-game script classes/Settings.html">Settings</a></li>
-  <li><a href="pre-game script classes/SkyLayer.html">SkyLayer</a></li>
-</ul>
-<h2>Misc classes</h2>
-<ul class="nowrap">
-  <li><a href="misc classes/Color.html">Color</a></li>
-  <li><a href="misc classes/DisplayString.html">DisplayString</a></li>
-  <li><a href="misc classes/Position.html">Position</a></li>
-  <li><a href="misc classes/Rotation.html">Rotation</a></li>
+  <li><a href="4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
 </ul>
 
 </div>
@@ -72,99 +74,116 @@
 
   <h2>TombEngine scripting interface</h2>
 
-<h2>Script Files</h2>
+<h2>1 Modules</h2>
 <table class="module_list">
 	<tr>
-		<td class="name"  ><a href="script files/Pre-game.html">Pre-game</a></td>
+		<td class="name"  ><a href="1 modules/Flow.html">Flow</a></td>
+		<td class="summary">Functions for use in Flow.lua, settings.lua and strings.lua</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Inventory.html">Inventory</a></td>
+		<td class="summary">Inventory manipulation</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Logic.html">Logic</a></td>
+		<td class="summary">Functions and callbacks for level-specific logic scripts.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Misc.html">Misc</a></td>
 		<td class="summary">Scripts that will be run on game startup.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="script files/Level-specific.html">Level-specific</a></td>
-		<td class="summary">Functions and callbacks for level-specific logic scripts.</td>
+		<td class="name"  ><a href="1 modules/Objects.html">Objects</a></td>
+		<td class="summary">Scripts that will be run on game startup.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="1 modules/Strings.html">Strings</a></td>
+		<td class="summary">Scripts that will be run on game startup.</td>
 	</tr>
 </table>
-<h2>Enums</h2>
+<h2>2 Classes</h2>
 <table class="module_list">
 	<tr>
-		<td class="name"  ><a href="enums/InvItem.html">InvItem</a></td>
-		<td class="summary">Constants for items that can be used with GetInvItem and SetInvItem.</td>
+		<td class="name"  ><a href="2 classes/Flow.Animations.html">Flow.Animations</a></td>
+		<td class="summary">New custom animations which Lara can perform.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="enums/ObjID.html">ObjID</a></td>
-		<td class="summary">Constants for object IDs.</td>
-	</tr>
-</table>
-<h2>Entity classes</h2>
-<table class="module_list">
-	<tr>
-		<td class="name"  ><a href="entity classes/AIObject.html">AIObject</a></td>
-		<td class="summary">AI object</td>
+		<td class="name"  ><a href="2 classes/Flow.Fog.html">Flow.Fog</a></td>
+		<td class="summary">Fog</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="entity classes/CameraInfo.html">CameraInfo</a></td>
-		<td class="summary">Camera info</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="entity classes/ItemInfo.html">ItemInfo</a></td>
-		<td class="summary">Represents any object inside the game world.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="entity classes/MeshInfo.html">MeshInfo</a></td>
-		<td class="summary">Mesh info</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="entity classes/SinkInfo.html">SinkInfo</a></td>
-		<td class="summary">Sink info</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="entity classes/SoundSourceInfo.html">SoundSourceInfo</a></td>
-		<td class="summary">Sound source info</td>
-	</tr>
-</table>
-<h2>Pre-game script classes</h2>
-<table class="module_list">
-	<tr>
-		<td class="name"  ><a href="pre-game script classes/AudioTrack.html">AudioTrack</a></td>
-		<td class="summary">Metadata about audio tracks (music and ambience).</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="pre-game script classes/InventoryObject.html">InventoryObject</a></td>
+		<td class="name"  ><a href="2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></td>
 		<td class="summary">Represents the properties of an object as it appears in the inventory.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="pre-game script classes/Level.html">Level</a></td>
+		<td class="name"  ><a href="2 classes/Flow.Level.html">Flow.Level</a></td>
 		<td class="summary">Stores level metadata.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="pre-game script classes/Mirror.html">Mirror</a></td>
+		<td class="name"  ><a href="2 classes/Flow.Mirror.html">Flow.Mirror</a></td>
 		<td class="summary">A mirror effect.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="pre-game script classes/Settings.html">Settings</a></td>
+		<td class="name"  ><a href="2 classes/Flow.Settings.html">Flow.Settings</a></td>
 		<td class="summary">Settings that will be run on game startup.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="pre-game script classes/SkyLayer.html">SkyLayer</a></td>
+		<td class="name"  ><a href="2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></td>
 		<td class="summary">Describes a layer of moving clouds.</td>
 	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.AIObject.html">Objects.AIObject</a></td>
+		<td class="summary">AI object</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Camera.html">Objects.Camera</a></td>
+		<td class="summary">Basic cameras that can point at Lara or at a CAMERA_TARGET.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Moveable.html">Objects.Moveable</a></td>
+		<td class="summary">Represents any object inside the game world.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Sink.html">Objects.Sink</a></td>
+		<td class="summary">Sink</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.SoundSource.html">Objects.SoundSource</a></td>
+		<td class="summary">Sound source</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Objects.Static.html">Objects.Static</a></td>
+		<td class="summary">Mesh info</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="2 classes/Strings.DisplayString.html">Strings.DisplayString</a></td>
+		<td class="summary">A string appearing on the screen.</td>
+	</tr>
 </table>
-<h2>Misc classes</h2>
+<h2>3 Primitive Classes</h2>
 <table class="module_list">
 	<tr>
-		<td class="name"  ><a href="misc classes/Color.html">Color</a></td>
+		<td class="name"  ><a href="3 primitive classes/Color.html">Color</a></td>
 		<td class="summary">An RGBA or RGB color.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="misc classes/DisplayString.html">DisplayString</a></td>
-		<td class="summary">A string appearing on the screen.</td>
-	</tr>
-	<tr>
-		<td class="name"  ><a href="misc classes/Position.html">Position</a></td>
+		<td class="name"  ><a href="3 primitive classes/Position.html">Position</a></td>
 		<td class="summary">Represents a position in the game world.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="misc classes/Rotation.html">Rotation</a></td>
+		<td class="name"  ><a href="3 primitive classes/Rotation.html">Rotation</a></td>
 		<td class="summary">Represents a rotation.</td>
+	</tr>
+</table>
+<h2>4 Enums</h2>
+<table class="module_list">
+	<tr>
+		<td class="name"  ><a href="4 enums/Flow.InvID.html">Flow.InvID</a></td>
+		<td class="summary">Constants for items that can be used with GetItem and SetItem.</td>
+	</tr>
+	<tr>
+		<td class="name"  ><a href="4 enums/Objects.ObjID.html">Objects.ObjID</a></td>
+		<td class="summary">Constants for object IDs.</td>
 	</tr>
 </table>
 
@@ -172,7 +191,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-30 18:45:10 </i>
+<i style="float:right;">Last updated 2022-04-10 00:37:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

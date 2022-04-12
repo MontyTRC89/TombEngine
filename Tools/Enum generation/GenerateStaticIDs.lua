@@ -1,6 +1,6 @@
 local generateenum = require("generateenum")
 
-local enumName = "StaticID"
+local enumName = "Objects.StaticID"
 local enumIncludes = [==[
 #include <unordered_map>
 #include <string>

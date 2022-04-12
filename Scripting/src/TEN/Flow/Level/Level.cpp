@@ -44,16 +44,16 @@ void Level::Register(sol::table & parent)
 //@mem ambientTrack
 		"ambientTrack", &Level::AmbientTrack,
 
-/// (@{SkyLayer}) Primary sky layer  
+/// (@{Flow.SkyLayer}) Primary sky layer  
 //@mem layer1
 		"layer1", &Level::Layer1,
 
-/// (@{SkyLayer}) Secondary sky layer
+/// (@{Flow.SkyLayer}) Secondary sky layer
 // __(not yet implemented)__
 //@mem layer2
 		"layer2", &Level::Layer2,
 
-/// (@{Fog}) omni fog RGB color and distance.
+/// (@{Flow.Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
 // If not provided, distance fog will be black.
 //
@@ -111,7 +111,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 //@mem rumble
 		"rumble", &Level::Rumble,
 
-/// (@{Mirror}) Location and size of the level's mirror, if present.
+/// (@{Flow.Mirror}) Location and size of the level's mirror, if present.
 //
 // __(not yet implemented)__
 //@mem mirror
@@ -135,7 +135,7 @@ __(not yet implemented)__
 */
 		"unlimitedAir", &Level::UnlimitedAir,
 
-/// (table of @{InventoryObject}s) table of inventory object overrides
+/// (table of @{Flow.InventoryItem}s) table of inventory object overrides
 //@mem objects
 		"objects", &Level::InventoryObjects
 		);

@@ -32,53 +32,53 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Members">Members</a></li>
 <li><a href="#Functions">Functions</a></li>
 </ul>
 
 
-<h2>Misc classes</h2>
+<h2>2 Classes</h2>
 <ul class="nowrap">
-  <li><a href="../misc classes/Color.html">Color</a></li>
-  <li><strong>DisplayString</strong></li>
-  <li><a href="../misc classes/Position.html">Position</a></li>
-  <li><a href="../misc classes/Rotation.html">Rotation</a></li>
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><strong>Strings.DisplayString</strong></li>
 </ul>
-<h2>Script Files</h2>
+<h2>1 Modules</h2>
 <ul class="nowrap">
-  <li><a href="../script files/Pre-game.html">Pre-game scripts</a></li>
-  <li><a href="../script files/Level-specific.html">Level-specific scripts</a></li>
+  <li><a href="../1 modules/Flow.html">Flow</a></li>
+  <li><a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="../1 modules/Logic.html">Logic</a></li>
+  <li><a href="../1 modules/Misc.html">Misc</a></li>
+  <li><a href="../1 modules/Objects.html">Objects</a></li>
+  <li><a href="../1 modules/Strings.html">Strings</a></li>
 </ul>
-<h2>Enums</h2>
+<h2>3 Primitive Classes</h2>
 <ul class="nowrap">
-  <li><a href="../enums/InvItem.html">InvItem</a></li>
-  <li><a href="../enums/ObjID.html">ObjID</a></li>
+  <li><a href="../3 primitive classes/Color.html">Color</a></li>
+  <li><a href="../3 primitive classes/Position.html">Position</a></li>
+  <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
 </ul>
-<h2>Entity classes</h2>
+<h2>4 Enums</h2>
 <ul class="nowrap">
-  <li><a href="../entity classes/AIObject.html">AIObject</a></li>
-  <li><a href="../entity classes/CameraInfo.html">CameraInfo</a></li>
-  <li><a href="../entity classes/ItemInfo.html">ItemInfo</a></li>
-  <li><a href="../entity classes/MeshInfo.html">MeshInfo</a></li>
-  <li><a href="../entity classes/SinkInfo.html">SinkInfo</a></li>
-  <li><a href="../entity classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
-</ul>
-<h2>Pre-game script classes</h2>
-<ul class="nowrap">
-  <li><a href="../pre-game script classes/Animations.html">Animations</a></li>
-  <li><a href="../pre-game script classes/AudioTrack.html">AudioTrack</a></li>
-  <li><a href="../pre-game script classes/InventoryObject.html">InventoryObject</a></li>
-  <li><a href="../pre-game script classes/Level.html">Level</a></li>
-  <li><a href="../pre-game script classes/Mirror.html">Mirror</a></li>
-  <li><a href="../pre-game script classes/Settings.html">Settings</a></li>
-  <li><a href="../pre-game script classes/SkyLayer.html">SkyLayer</a></li>
+  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>DisplayString</code></h1>
+<h1>Class <code>Strings.DisplayString</code></h1>
 <p>A string appearing on the screen.</p>
 <p>Can be used for subtitles and "2001, somewhere in Egypt"-style messages.</p>
 
@@ -86,21 +86,10 @@
 and y values specifying the number of pixels from the top of the window.</p>
 
 <p>Since different players will have different resolutions, you should work in terms of percentages where possible,
-and use <a href="../script files/Level-specific.html#ScreenToPercent">ScreenToPercent</a> and <a href="../script files/Level-specific.html#PercentToScreen">PercentToScreen</a>
+and use <a href="../1 modules/Misc.html#ScreenToPercent">ScreenToPercent</a> and <a href="../1 modules/Misc.html#PercentToScreen">PercentToScreen</a>
 when you need to use screen-space coordinates.</p>
 
 
-<h2><a href="#Members">Members</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#col">col</a></td>
-	<td class="summary">(<a href="../misc classes/Color.html#">Color</a>) RBG color</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#key">key</a></td>
-	<td class="summary">(string) String key to use.</td>
-	</tr>
-</table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
@@ -108,11 +97,23 @@ when you need to use screen-space coordinates.</p>
 	<td class="summary">Create a DisplayString.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#DisplayString:SetPos">DisplayString:SetPos(x, y)</a></td>
+	<td class="name" ><a href="#GetColor">GetColor()</a></td>
+	<td class="summary">Get the display string's color</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetColor">SetColor(color)</a></td>
+	<td class="summary">Set the display string's color</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetKey">SetKey(string)</a></td>
+	<td class="summary">Set the string key to use.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#DisplayString:SetPosition">DisplayString:SetPosition(x, y)</a></td>
 	<td class="summary">Set the position of the string.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#DisplayString:GetPos">DisplayString:GetPos()</a></td>
+	<td class="name" ><a href="#DisplayString:GetPosition">DisplayString:GetPosition()</a></td>
 	<td class="summary">Get the position of the string.</td>
 	</tr>
 </table>
@@ -121,40 +122,6 @@ when you need to use screen-space coordinates.</p>
 <br/>
 
 
-    <h2 class="section-header "><a name="Members"></a>Members</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "col"></a>
-    <strong>col</strong>
-    </dt>
-    <dd>
-    (<a href="../misc classes/Color.html#">Color</a>) RBG color
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "key"></a>
-    <strong>key</strong>
-    </dt>
-    <dd>
-    (string) String key to use.  If <code>translated</code> is true when <a href="../misc classes/DisplayString.html#DisplayString.new">DisplayString.new</a>
- is called, this will be the string key for the translation that will be displayed.
- If false or omitted, this will be the string that's displayed.
-
-
-
-
-
-
-
-</dd>
-</dl>
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
@@ -164,7 +131,7 @@ when you need to use screen-space coordinates.</p>
     </dt>
     <dd>
     Create a DisplayString.
-For use in <a href="../script files/Level-specific.html#ShowString">ShowString</a> and <a href="../script files/Level-specific.html#HideString">HideString</a>.
+For use in <a href="../1 modules/Strings.html#ShowString">ShowString</a> and <a href="../1 modules/Strings.html#HideString">HideString</a>.
 
 
     <h3>Parameters:</h3>
@@ -188,8 +155,8 @@ For use in <a href="../script files/Level-specific.html#ShowString">ShowString</
         <li><span class="parameter">flags</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
          a table of display options. Can be empty or omitted. The possible values and their effects are...</p>
-<pre><code>DisplayStringOption.CENTER -- see x and y parameters
-DisplayStringOption.SHADOW -- will give the text a small shadow
+<pre><code>TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
+TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
 </code></pre>
 <p><strong>Default: empty</strong>
         </li>
@@ -212,8 +179,72 @@ strings.lua. <strong>Default: false</strong>.
 
 </dd>
     <dt>
-    <a name = "DisplayString:SetPos"></a>
-    <strong>DisplayString:SetPos(x, y)</strong>
+    <a name = "GetColor"></a>
+    <strong>GetColor()</strong>
+    </dt>
+    <dd>
+    Get the display string's color
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Color</span></span>
+        a copy of the display string's color
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetColor"></a>
+    <strong>SetColor(color)</strong>
+    </dt>
+    <dd>
+    Set the display string's color
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">color</span>
+            <span class="types"><span class="type">Color</span></span>
+         the new color of the display string
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetKey"></a>
+    <strong>SetKey(string)</strong>
+    </dt>
+    <dd>
+    Set the string key to use.  If <code>translated</code> is true when <a href="../2 classes/Strings.DisplayString.html#DisplayString.new">DisplayString.new</a>
+ is called, this will be the string key for the translation that will be displayed.
+ If false or omitted, this will be the string that's displayed.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">string</span>
+            <span class="types"><span class="type">String</span></span>
+         the new key for the display string
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "DisplayString:SetPosition"></a>
+    <strong>DisplayString:SetPosition(x, y)</strong>
     </dt>
     <dd>
     Set the position of the string.
@@ -238,8 +269,8 @@ strings.lua. <strong>Default: false</strong>.
 
 </dd>
     <dt>
-    <a name = "DisplayString:GetPos"></a>
-    <strong>DisplayString:GetPos()</strong>
+    <a name = "DisplayString:GetPosition"></a>
+    <strong>DisplayString:GetPosition()</strong>
     </dt>
     <dd>
     Get the position of the string.
@@ -268,7 +299,7 @@ strings.lua. <strong>Default: false</strong>.
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-01-15 12:32:01 </i>
+<i style="float:right;">Last updated 2022-04-10 00:37:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
