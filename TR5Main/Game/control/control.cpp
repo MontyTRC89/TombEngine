@@ -9,6 +9,7 @@
 #include "Game/items.h"
 #include "Game/control/flipeffect.h"
 #include "Game/gui.h"
+#include "Game/control/volume.h"
 #include "Game/control/lot.h"
 #include "Game/health.h"
 #include "Game/savegame.h"
@@ -280,6 +281,8 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			{
 				if (Objects[item->objectNumber].control)
 					Objects[item->objectNumber].control(itemNum);
+
+				TEN::Control::Volumes::TestVolumes(itemNum);
 
 				if (item->afterDeath > 0 && item->afterDeath < 128 && !(Wibble & 3))
 					item->afterDeath++;
@@ -843,7 +846,7 @@ int ExplodeItemNode(ITEM_INFO *item, int Node, int NoXZVel, int bits)
 		auto num = bits;
 		if (item->objectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 		{
-			SoundEffect(SFX_TR5_SMASH_METAL, &item->pos, 0);
+			SoundEffect(1093, &item->pos, 0);
 		}
 		else if (num == 256)
 		{

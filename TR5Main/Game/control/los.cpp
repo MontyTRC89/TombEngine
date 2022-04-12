@@ -9,9 +9,12 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
+#include "Scripting/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
+
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 int NumberLosRooms;
 short LosRooms[20];
@@ -207,6 +210,11 @@ int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firi
 									if (!Objects[item->objectNumber].undead)
 									{
 										item->hitPoints -= Weapons[Lara.gunType].damage;
+									}
+									if (!item->luaCallbackOnHitName.empty())
+									{
+										short index = g_GameScriptEntities->GetIndexByName(item->luaName);
+										g_GameScript->ExecuteFunction(item->luaCallbackOnHitName, index);
 									}
 								}
 							}

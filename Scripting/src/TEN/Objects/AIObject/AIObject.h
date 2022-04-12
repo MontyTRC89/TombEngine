@@ -13,8 +13,8 @@ class AIObject : public NamedBase<AIObject, AI_OBJECT&>
 public:
 
 	using IdentifierType = std::reference_wrapper<AI_OBJECT>;
-	AIObject(AI_OBJECT& ref, bool temp);
-	~AIObject();
+	AIObject(AI_OBJECT& ref);
+	~AIObject() = default;
 
 	AIObject& operator=(AIObject const& other) = delete;
 	AIObject(AIObject const& other) = delete;
@@ -38,6 +38,5 @@ public:
 
 private:
 	AI_OBJECT & m_aiObject;
-	bool m_temporary;
 };
 

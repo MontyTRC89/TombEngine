@@ -1,18 +1,23 @@
 #pragma once
 #include "frameworkandsol.h"
+#include "ScriptAssert.h"
 
 class LuaHandler {
 protected:
 	sol::state*	m_lua;
-	~LuaHandler() = default;
 
 public:
 	LuaHandler(sol::state* lua);
 	LuaHandler(LuaHandler const &) = delete;
 	LuaHandler& operator=(LuaHandler const &) = delete;
+	~LuaHandler() = default;
 
 	void ExecuteScript(const std::string & luaFilename);
 	void ExecuteString(const std::string & command);
+
+	sol::state* GetState() {
+		return m_lua;
+	};
 
 	template <typename T>void MakeReadOnlyTable(sol::table & parent, std::string const& tableName, T const& container)
 	{
@@ -21,12 +26,16 @@ public:
 		m_lua->set(mt, sol::as_table(container));
 
 		auto mtmt = tableName + "MetaMeta";
-		m_lua->create_named_table(mtmt);
+		auto mtmtTable = m_lua->create_named_table(mtmt);
 
-		// TODO Make these not raise exceptions by default but just do ScriptAsserts -- squidshire, 29/08/2021
-		// Make the metatable's metatable's __index throw an error so that trying to use a variable
-		// that doesn't exist just errors.
-		m_lua->safe_script(mtmt + ".__index = function(t, key) error('" + tableName +" has no member \"' .. tostring(key) .. '\"')  end");
+		// Make the metatable's metatable's __index fail an assert so that trying to use a variable
+		// that doesn't exist will generate a warning or error.
+		auto lam = [tableName](sol::table tab, std::string const& key)
+		{
+			ScriptAssertF(false, tableName + " has no member \"" + key +"\"");
+		};
+
+		mtmtTable[sol::meta_method::index] = lam;
 		m_lua->safe_script("setmetatable(" + mt + ", " + mtmt + ")");
 
 		// Make the metatable's __index refer to itself so that requests

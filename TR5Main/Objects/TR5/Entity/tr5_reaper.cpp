@@ -34,9 +34,9 @@ void ReaperControl(short itemNumber)
 			creature->enemy = LaraItem;
 
 		AI_INFO info;
-		CreatureAIInfo(item, &info);
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		CreatureAIInfo(item,&info);
+		GetCreatureMood(item,&info, TIMID);
+		CreatureMood(item,&info, TIMID);
 
 		short angle = CreatureTurn(item, ANGLE(2));
 

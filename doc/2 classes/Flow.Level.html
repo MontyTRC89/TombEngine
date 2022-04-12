@@ -37,47 +37,49 @@
 </ul>
 
 
-<h2>Pre-game script classes</h2>
+<h2>2 Classes</h2>
 <ul class="nowrap">
-  <li><a href="../pre-game script classes/AudioTrack.html">AudioTrack</a></li>
-  <li><a href="../pre-game script classes/InventoryObject.html">InventoryObject</a></li>
-  <li><strong>Level</strong></li>
-  <li><a href="../pre-game script classes/Mirror.html">Mirror</a></li>
-  <li><a href="../pre-game script classes/Settings.html">Settings</a></li>
-  <li><a href="../pre-game script classes/SkyLayer.html">SkyLayer</a></li>
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><strong>Flow.Level</strong></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
 </ul>
-<h2>Script Files</h2>
+<h2>1 Modules</h2>
 <ul class="nowrap">
-  <li><a href="../script files/Pre-game.html">Pre-game scripts</a></li>
-  <li><a href="../script files/Level-specific.html">Level-specific scripts</a></li>
+  <li><a href="../1 modules/Flow.html">Flow</a></li>
+  <li><a href="../1 modules/Inventory.html">Inventory</a></li>
+  <li><a href="../1 modules/Logic.html">Logic</a></li>
+  <li><a href="../1 modules/Misc.html">Misc</a></li>
+  <li><a href="../1 modules/Objects.html">Objects</a></li>
+  <li><a href="../1 modules/Strings.html">Strings</a></li>
 </ul>
-<h2>Enums</h2>
+<h2>3 Primitive Classes</h2>
 <ul class="nowrap">
-  <li><a href="../enums/InvItem.html">InvItem</a></li>
-  <li><a href="../enums/ObjID.html">ObjID</a></li>
+  <li><a href="../3 primitive classes/Color.html">Color</a></li>
+  <li><a href="../3 primitive classes/Position.html">Position</a></li>
+  <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
 </ul>
-<h2>Entity classes</h2>
+<h2>4 Enums</h2>
 <ul class="nowrap">
-  <li><a href="../entity classes/AIObject.html">AIObject</a></li>
-  <li><a href="../entity classes/CameraInfo.html">CameraInfo</a></li>
-  <li><a href="../entity classes/ItemInfo.html">ItemInfo</a></li>
-  <li><a href="../entity classes/MeshInfo.html">MeshInfo</a></li>
-  <li><a href="../entity classes/SinkInfo.html">SinkInfo</a></li>
-  <li><a href="../entity classes/SoundSourceInfo.html">SoundSourceInfo</a></li>
-</ul>
-<h2>Misc classes</h2>
-<ul class="nowrap">
-  <li><a href="../misc classes/Color.html">Color</a></li>
-  <li><a href="../misc classes/DisplayString.html">DisplayString</a></li>
-  <li><a href="../misc classes/Position.html">Position</a></li>
-  <li><a href="../misc classes/Rotation.html">Rotation</a></li>
+  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>Level</code></h1>
+<h1>Class <code>Flow.Level</code></h1>
 <p>Stores level metadata.</p>
 <p>These are things things which aren't present in the compiled level file itself.</p>
 
@@ -106,16 +108,16 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#layer1">layer1</a></td>
-	<td class="summary">(<a href="../pre-game script classes/SkyLayer.html#">SkyLayer</a>) Primary sky layer</td>
+	<td class="summary">(<a href="../2 classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Primary sky layer</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#layer2">layer2</a></td>
-	<td class="summary">(<a href="../pre-game script classes/SkyLayer.html#">SkyLayer</a>) Secondary sky layer
+	<td class="summary">(<a href="../2 classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Secondary sky layer
  <strong>(not yet implemented)</strong></td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#fog">fog</a></td>
-	<td class="summary">(<a href="../misc classes/Color.html#">Color</a>) distance fog RGB color.</td>
+	<td class="summary">(<a href="../2 classes/Flow.Fog.html#">Flow.Fog</a>) omni fog RGB color and distance.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#horizon">horizon</a></td>
@@ -134,6 +136,10 @@
 	<td class="summary">(WeatherType) Choose weather effect.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#weatherStrength">weatherStrength</a></td>
+	<td class="summary">(float) Choose weather strength.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#laraType">laraType</a></td>
 	<td class="summary">(LaraType) Must be one of the LaraType values.</td>
 	</tr>
@@ -143,11 +149,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#mirror">mirror</a></td>
-	<td class="summary">(<a href="../pre-game script classes/Mirror.html#">Mirror</a>) Location and size of the level's mirror, if present.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#UVRotate">UVRotate</a></td>
-	<td class="summary">(byte) Default speed of "UVRotate" animated textures.</td>
+	<td class="summary">(<a href="../2 classes/Flow.Mirror.html#">Flow.Mirror</a>) Location and size of the level's mirror, if present.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#farView">farView</a></td>
@@ -159,7 +161,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#objects">objects</a></td>
-	<td class="summary">(table of <a href="../pre-game script classes/InventoryObject.html#">InventoryObject</a>s) table of inventory object overrides</td>
+	<td class="summary">(table of <a href="../2 classes/Flow.InventoryItem.html#">Flow.InventoryItem</a>s) table of inventory object overrides</td>
 	</tr>
 </table>
 <h2><a href="#Functions">Functions</a></h2>
@@ -257,7 +259,7 @@
     <strong>layer1</strong>
     </dt>
     <dd>
-    (<a href="../pre-game script classes/SkyLayer.html#">SkyLayer</a>) Primary sky layer
+    (<a href="../2 classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Primary sky layer
 
 
 
@@ -271,7 +273,7 @@
     <strong>layer2</strong>
     </dt>
     <dd>
-    (<a href="../pre-game script classes/SkyLayer.html#">SkyLayer</a>) Secondary sky layer
+    (<a href="../2 classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Secondary sky layer
  <strong>(not yet implemented)</strong>
 
 
@@ -286,7 +288,7 @@
     <strong>fog</strong>
     </dt>
     <dd>
-    (<a href="../misc classes/Color.html#">Color</a>) distance fog RGB color.
+    (<a href="../2 classes/Flow.Fog.html#">Flow.Fog</a>) omni fog RGB color and distance.
  As seen in TR4's Desert Railroad.
  If not provided, distance fog will be black.</p>
 
@@ -336,9 +338,7 @@
     </dt>
     <dd>
     (bool) Enable flickering lightning in the sky.
- Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.</p>
-
-<p> <strong>(thunder sounds not yet implemented)</strong>
+ Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
 
 
 
@@ -353,9 +353,22 @@
     </dt>
     <dd>
     (WeatherType) Choose weather effect.
- Must be one of the values <code>WeatherType.NORMAL</code>, <code>WeatherType.RAIN</code>, or <code>WeatherType.SNOW</code>.</p>
+ Must be one of the values <code>WeatherType.None</code>, <code>WeatherType.Rain</code>, or <code>WeatherType.Snow</code>.
 
-<p> <strong>(not yet implemented)</strong>
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "weatherStrength"></a>
+    <strong>weatherStrength</strong>
+    </dt>
+    <dd>
+    (float) Choose weather strength.
+ Must be value between <code>0.1</code> and <code>1.0</code>.
 
 
 
@@ -372,15 +385,15 @@
     (LaraType) Must be one of the LaraType values.
 These are:</p>
 
-<pre><code>NORMAL
-YOUNG
-BUNHEAD
-CATSUIT
-DIVESUIT
-INVISIBLE
+<pre><code>Normal
+Young
+Bunhead
+Catsuit
+Divesuit
+Invisible
 </code></pre>
 
-<p>e.g. <code>myLevel.laraType = LaraType.DIVESUIT</code></p>
+<p>e.g. <code>myLevel.laraType = LaraType.Divesuit</code></p>
 
 <p> <strong>(not yet fully implemented)</strong>
 
@@ -411,33 +424,9 @@ INVISIBLE
     <strong>mirror</strong>
     </dt>
     <dd>
-    (<a href="../pre-game script classes/Mirror.html#">Mirror</a>) Location and size of the level's mirror, if present. </p>
+    (<a href="../2 classes/Flow.Mirror.html#">Flow.Mirror</a>) Location and size of the level's mirror, if present. </p>
 
 <p> <strong>(not yet implemented)</strong>
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "UVRotate"></a>
-    <strong>UVRotate</strong>
-    </dt>
-    <dd>
-    (byte) Default speed of "UVRotate" animated textures. </p>
-
-<p>Must be in the range [-64, 64].</p>
-
-<p>A level texture can be set in Tomb Editor to use "UVRotate" animation.
-This gives the effect of the texture looping downwards or upwards in place.
-Positive values will cause the texture to loop downwards, and negative values
-will cause an upwards loop. The higher a positive number or the lower a negative
-number, the faster the scroll will be.</p>
-
-<p><strong>(not yet implemented)</strong>
 
 
 
@@ -487,7 +476,7 @@ Must be in the range [1, 127], and equal to or less than the value passed to Set
     <strong>objects</strong>
     </dt>
     <dd>
-    (table of <a href="../pre-game script classes/InventoryObject.html#">InventoryObject</a>s) table of inventory object overrides
+    (table of <a href="../2 classes/Flow.InventoryItem.html#">Flow.InventoryItem</a>s) table of inventory object overrides
 
 
 
@@ -526,7 +515,7 @@ Must be in the range [1, 127], and equal to or less than the value passed to Set
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2021-08-30 18:45:10 </i>
+<i style="float:right;">Last updated 2022-04-10 00:37:11 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
