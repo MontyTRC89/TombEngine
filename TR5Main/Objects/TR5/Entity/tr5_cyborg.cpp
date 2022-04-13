@@ -112,8 +112,8 @@ void CyborgControl(short itemNumber)
 		int x = item->Pose.Position.x;
 		int z = item->Pose.Position.z;
 
-		int dx = 808 * phd_sin(item->Pose.Orientation.y);
-		int dz = 808 * phd_cos(item->Pose.Orientation.y);
+		int dx = 808 * sin(item->Orientation.y);
+		int dz = 808 * cos(item->Orientation.y);
 
 		x += dx;
 		z += dz;
@@ -236,7 +236,7 @@ void CyborgControl(short itemNumber)
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -359,7 +359,7 @@ void CyborgControl(short itemNumber)
 				break;
 
 			case CYBORG_STATE_WALK:
-				creature->MaxTurn = ANGLE(5.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(5.0f);
 				creature->LOT.IsJumping = false;
 
 				if (Targetable(item, &AI) &&
@@ -403,7 +403,7 @@ void CyborgControl(short itemNumber)
 				break;
 
 			case CYBORG_STATE_RUN:
-				creature->MaxTurn = ANGLE(10.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(10.0f);
 				creature->LOT.IsJumping = false;
 
 				if (Targetable(item, &AI) &&
@@ -454,7 +454,7 @@ void CyborgControl(short itemNumber)
 				break;
 
 			case CYBORG_STATE_MONKEY:
-				creature->MaxTurn = ANGLE(5.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(5.0f);
 				creature->LOT.IsMonkeying = true;
 				creature->LOT.IsJumping = true;
 				
@@ -480,15 +480,15 @@ void CyborgControl(short itemNumber)
 				if (AI.ahead)
 					joint1 = AI.xAngle;
 
-				if (abs(AI.angle) >= ANGLE(2.0f))
+				if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(2.0f);
+						item->Orientation.y += EulerAngle::DegToRad(2.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(2.0f);
+						item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 
 				if (Targetable(item, &AI) &&
 					(AI.distance < pow(SECTOR(4), 2) ||
@@ -508,15 +508,15 @@ void CyborgControl(short itemNumber)
 
 				creature->MaxTurn = 0;
 
-				if (abs(AI.angle) >= ANGLE(2.0f))
+				if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(2.0f);
+						item->Orientation.y += EulerAngle::DegToRad(2.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(2.0f);
+						item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&

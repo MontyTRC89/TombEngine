@@ -38,7 +38,7 @@ namespace TEN::Entities::TR4
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
 			wraith->Pose.Position = item->Pose.Position;
-			wraith->Pose.Orientation.z = 0;
+			wraith->Orientation.z = 0;
 			wraith->Pose.Position.x = 0;
 			wraith->Pose.Position.y = 0;
 			wraith->r = 0;
@@ -81,15 +81,15 @@ namespace TEN::Entities::TR4
 		}
 
 		dy = y - item->Pose.Position.y - dy - CLICK(0.5f);
-		short angleH = phd_atan(z, x) - item->Pose.Orientation.y;
+		short angleH = atan2(z, x) - item->Orientation.y;
 
 		short angleV = 0;
 		if (abs(x) <= abs(z))
-			angleV = phd_atan(abs(x) + (abs(z) / 2), dy);
+			angleV = atan2(abs(x) + (abs(z) / 2), dy);
 		else
-			angleV = phd_atan(abs(z) + (abs(x) / 2), dy);
+			angleV = atan2(abs(z) + (abs(x) / 2), dy);
 
-		angleV -= item->Pose.Orientation.x;
+		angleV -= item->Orientation.x;
 
 		int velocity = 8 * (WraithVelocity / item->Animation.Velocity);
 
@@ -102,7 +102,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[2] += velocity;
-					item->Pose.Orientation.y += item->ItemFlags[2];
+					item->Orientation.y += item->ItemFlags[2];
 				}
 			}
 			else if (item->ItemFlags[2] >= 0)
@@ -110,11 +110,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[2] -= velocity;
-				item->Pose.Orientation.y += item->ItemFlags[2];
+				item->Orientation.y += item->ItemFlags[2];
 			}
 		}
 		else
-			item->Pose.Orientation.y += angleH;
+			item->Orientation.y += angleH;
 
 		if (abs(angleV) >= item->ItemFlags[3] || angleV > 0 != item->ItemFlags[3] > 0)
 		{
@@ -125,7 +125,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[3] += velocity;
-					item->Pose.Orientation.x += item->ItemFlags[3];
+					item->Orientation.x += item->ItemFlags[3];
 				}
 			}
 			else if (item->ItemFlags[3] >= 0)
@@ -133,11 +133,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[3] -= velocity;
-				item->Pose.Orientation.x += item->ItemFlags[3];
+				item->Orientation.x += item->ItemFlags[3];
 			}
 		}
 		else
-			item->Pose.Orientation.x += angleV;
+			item->Orientation.x += angleV;
 
 		auto probe = GetCollision(item);
 
@@ -145,9 +145,9 @@ namespace TEN::Entities::TR4
 		if (probe.Position.Floor < item->Pose.Position.y || probe.Position.Ceiling > item->Pose.Position.y)
 			hitWall = true;
 
-		item->Pose.Position.x += item->Animation.Velocity * phd_sin(item->Pose.Orientation.y);
-		item->Pose.Position.y += item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
-		item->Pose.Position.z += item->Animation.Velocity * phd_cos(item->Pose.Orientation.y);
+		item->Pose.Position.x += item->Animation.Velocity * sin(item->Orientation.y);
+		item->Pose.Position.y += item->Animation.Velocity * sin(item->Orientation.x);
+		item->Pose.Position.z += item->Animation.Velocity * cos(item->Orientation.y);
 
 		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 		if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)
@@ -287,10 +287,10 @@ namespace TEN::Entities::TR4
 			probe.Position.Ceiling > item->Pose.Position.y)
 		{
 			if (!hitWall)
-				WraithWallsEffect(oldX, oldY, oldZ, item->Pose.Orientation.y + -ANGLE(180.0f), item->ObjectNumber);
+				WraithWallsEffect(oldX, oldY, oldZ, item->Orientation.y + EulerAngle::DegToRad(-180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
-			WraithWallsEffect(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Pose.Orientation.y, item->ObjectNumber);
+			WraithWallsEffect(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Orientation.y, item->ObjectNumber);
 
 		// Update WRAITH nodes
 		auto* creature = (WraithInfo*)item->Data;
@@ -298,21 +298,21 @@ namespace TEN::Entities::TR4
 		int j = 0;
 		for (int i = WRAITH_COUNT - 1; i > 0; i--)
 		{
-			creature[i - 1].Pose.Position.x += (creature[i - 1].Pose.Orientation.x / 16);
-			creature[i - 1].Pose.Position.y += (creature[i - 1].Pose.Orientation.y / 16);
-			creature[i - 1].Pose.Position.z += (creature[i - 1].Pose.Orientation.z / 16);
+			creature[i - 1].Pose.Position.x += (creature[i - 1].Orientation.x / 16);
+			creature[i - 1].Pose.Position.y += (creature[i - 1].Orientation.y / 16);
+			creature[i - 1].Pose.Position.z += (creature[i - 1].Orientation.z / 16);
 
-			creature[i - 1].Pose.Orientation.x -= (creature[i - 1].Pose.Orientation.x / 16);
-			creature[i - 1].Pose.Orientation.y -= (creature[i - 1].Pose.Orientation.y / 16);
-			creature[i - 1].Pose.Orientation.z -= (creature[i - 1].Pose.Orientation.z / 16);
+			creature[i - 1].Orientation.x -= (creature[i - 1].Orientation.x / 16);
+			creature[i - 1].Orientation.y -= (creature[i - 1].Orientation.y / 16);
+			creature[i - 1].Orientation.z -= (creature[i - 1].Orientation.z / 16);
 
 			creature[i].Pose.Position.x = creature[i - 1].Pose.Position.x;
 			creature[i].Pose.Position.y = creature[i - 1].Pose.Position.y;
 			creature[i].Pose.Position.z = creature[i - 1].Pose.Position.z;
 
-			creature[i].Pose.Orientation.x = creature[i - 1].Pose.Orientation.x;
-			creature[i].Pose.Orientation.y = creature[i - 1].Pose.Orientation.y;
-			creature[i].Pose.Orientation.z = creature[i - 1].Pose.Orientation.z;
+			creature[i].Orientation.x = creature[i - 1].Orientation.x;
+			creature[i].Orientation.y = creature[i - 1].Orientation.y;
+			creature[i].Orientation.z = creature[i - 1].Orientation.z;
 
 			if (item->ObjectNumber == ID_WRAITH1)
 			{
@@ -340,27 +340,27 @@ namespace TEN::Entities::TR4
 		creature[0].Pose.Position.y = item->Pose.Position.y;
 		creature[0].Pose.Position.z = item->Pose.Position.z;
 
-		creature[0].Pose.Orientation.x = 4 * (item->Pose.Position.x - oldX);
-		creature[0].Pose.Orientation.y = 4 * (item->Pose.Position.y - oldY);
-		creature[0].Pose.Orientation.z = 4 * (item->Pose.Position.z - oldZ);
+		creature[0].Orientation.x = 4 * (item->Pose.Position.x - oldX);
+		creature[0].Orientation.y = 4 * (item->Pose.Position.y - oldY);
+		creature[0].Orientation.z = 4 * (item->Pose.Position.z - oldZ);
 
 		// Standard WRAITH drawing code
 		DrawWraith(
 			item->Pose.Position.x,
 			item->Pose.Position.y,
 			item->Pose.Position.z,
-			creature[0].Pose.Orientation.x,
-			creature[0].Pose.Orientation.y,
-			creature[0].Pose.Orientation.z,
+			creature[0].Orientation.x,
+			creature[0].Orientation.y,
+			creature[0].Orientation.z,
 			item->ObjectNumber);
 
 		DrawWraith(
 			(oldX + item->Pose.Position.x) / 2,
 			(oldY + item->Pose.Position.y) / 2,
 			(oldZ + item->Pose.Position.z) / 2,
-			creature[0].Pose.Orientation.x,
-			creature[0].Pose.Orientation.y,
-			creature[0].Pose.Orientation.z,
+			creature[0].Orientation.x,
+			creature[0].Orientation.y,
+			creature[0].Orientation.z,
 			item->ObjectNumber);
 
 		// Lighting for WRAITH
@@ -394,9 +394,9 @@ namespace TEN::Entities::TR4
 		item->Pose.Position.y -= 384;
 
 		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, 0, 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(45.0f), 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(90.0f), 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, ANGLE(135.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngle::DegToRad(45.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngle::DegToRad(90.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngle::DegToRad(135.0f), 0);
 
 		item->Pose.Position.y += 384;
 	}
@@ -512,11 +512,11 @@ namespace TEN::Entities::TR4
 			spark->x = (GetRandomControl() & 0x1F) + x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			short rot = yRot + GetRandomControl() - ANGLE(90);
+			short rot = yRot + GetRandomControl() - EulerAngle::DegToRad(90);
 			short velocity = ((GetRandomControl() & 0x3FF) + 1024);
-			spark->xVel = velocity * phd_sin(rot);
+			spark->xVel = velocity * sin(rot);
 			spark->yVel = (GetRandomControl() & 0x7F) - 64;
-			spark->zVel = velocity * phd_cos(rot);
+			spark->zVel = velocity * cos(rot);
 			spark->friction = 4;
 			spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
 			spark->maxYvel = 0;

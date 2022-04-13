@@ -57,7 +57,7 @@ void RatControl(short itemNumber)
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, ANGLE(6.0f));
+		angle = CreatureTurn(item, EulerAngle::DegToRad(6.0f));
 
 		switch (item->Animation.ActiveState)
 		{
@@ -89,7 +89,7 @@ void RatControl(short itemNumber)
 			break;
 
 		case 1:
-			info->MaxTurn = ANGLE(6.0f);
+			info->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 			if (info->Mood == MoodType::Bored || info->Mood == MoodType::Stalk)
 			{

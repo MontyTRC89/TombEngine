@@ -174,8 +174,8 @@ void ControlFish(short itemNumber)
 	int x = fish->x;
 	int z = fish->z;
 	
-	x -= fish->speed * phd_sin(fish->angle * 16) / 2;
-	z += fish->speed * phd_cos(fish->angle * 16) / 2;
+	x -= fish->speed * sin(fish->angle * 16) / 2;
+	z += fish->speed * cos(fish->angle * 16) / 2;
 	
 	if (pirahnaAttack == 0)
 	{
@@ -367,8 +367,8 @@ void ControlFish(short itemNumber)
 		fish->swim += (fish->speed / 16) + (fish->speed / 32);
 		fish->swim &= 63;
 
-		x = fish->x - fish->speed * phd_sin(fish->angle * 16) / 2;
-		z = fish->z + fish->speed * phd_cos(fish->angle * 16) / 2;
+		x = fish->x - fish->speed * sin(fish->angle * 16) / 2;
+		z = fish->z + fish->speed * cos(fish->angle * 16) / 2;
 
 		if (z < -32000)
 			z = -32000;

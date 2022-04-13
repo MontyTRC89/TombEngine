@@ -194,7 +194,7 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 
 			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
 
-			short angles[2];
+			float angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
 				pos3.y - pos1.y,
 				pos3.z - pos1.z,
@@ -214,7 +214,7 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 
 			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
 
-			short angles[2];
+			float angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
 				pos3.y - pos1.y,
 				pos3.z - pos1.z,
@@ -267,7 +267,7 @@ void HarpyControl(short itemNumber)
 			{
 				if (state == 1)
 				{
-					item->Pose.Orientation.x = 0;
+					item->Orientation.x = 0;
 					item->Pose.Position.y = item->Floor;
 				}
 				else
@@ -277,7 +277,7 @@ void HarpyControl(short itemNumber)
 					item->Animation.ActiveState = 9;
 					item->Animation.Velocity = 0;
 					item->Animation.Airborne = true;
-					item->Pose.Orientation.x = 0;
+					item->Orientation.x = 0;
 				}
 
 				CreatureTilt(item, 0);
@@ -301,7 +301,7 @@ void HarpyControl(short itemNumber)
 			item->Animation.Airborne = false;
 		}
 
-		item->Pose.Orientation.x = 0;
+		item->Orientation.x = 0;
 	}
 	else
 	{
@@ -339,7 +339,7 @@ void HarpyControl(short itemNumber)
 		CreatureAIInfo(item, &AI);
 
 		if (creature->Enemy != LaraItem)
-			phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
+			atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
@@ -359,7 +359,7 @@ void HarpyControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case STATE_HARPY_STOP:
-			creature->MaxTurn = ANGLE(7.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 			creature->Flags = 0;
 
 			if (creature->Enemy)
@@ -403,7 +403,7 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(7.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 			creature->Flags = 0;
 
 			if (item->Animation.RequiredState)
@@ -475,7 +475,7 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case 4:
-			creature->MaxTurn = ANGLE(2.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->Animation.TargetState = STATE_HARPY_ATTACK;
@@ -486,7 +486,7 @@ void HarpyControl(short itemNumber)
 
 		case STATE_HARPY_ATTACK:
 			item->Animation.TargetState = 2;
-			creature->MaxTurn = ANGLE(2.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
 			if (item->TouchBits & 0x14 ||
 				creature->Enemy && creature->Enemy != LaraItem &&
@@ -519,7 +519,7 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case STATE_HARPY_POISON_ATTACK:
-			creature->MaxTurn = ANGLE(2.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
 			if (creature->Flags == 0 &&
 				(item->TouchBits & 0x300000 ||

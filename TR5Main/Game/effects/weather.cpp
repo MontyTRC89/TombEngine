@@ -185,8 +185,8 @@ namespace Environment
 
 		WindAngle = (WindAngle + ((WindDAngle - WindAngle) >> 3)) & 0x1FFE;
 
-		WindX = WindCurrent * phd_sin(WindAngle << 3);
-		WindZ = WindCurrent * phd_cos(WindAngle << 3);
+		WindX = WindCurrent * sin(WindAngle << 3);
+		WindZ = WindCurrent * cos(WindAngle << 3);
 	}
 
 	void EnvironmentController::UpdateFlash(GameScriptLevel* level)
@@ -398,10 +398,10 @@ namespace Environment
 
 				auto distance = level->Weather == WeatherType::Snow ? COLLISION_CHECK_DISTANCE : COLLISION_CHECK_DISTANCE / 2;
 				auto radius = GenerateInt(0, distance);
-				short angle = GenerateInt(ANGLE(0), ANGLE(180));
+				short angle = 0;// GenerateInt(EulerAngle::DegToRad(0), EulerAngle::DegToRad(180));
 
-				auto xPos = Camera.pos.x + ((int)(phd_cos(angle) * radius));
-				auto zPos = Camera.pos.z + ((int)(phd_sin(angle) * radius));
+				auto xPos = Camera.pos.x + ((int)(cos(angle) * radius));
+				auto zPos = Camera.pos.z + ((int)(sin(angle) * radius));
 				auto yPos = Camera.pos.y - (WALL_SIZE * 4 + GenerateInt() & (WALL_SIZE * 4 - 1));
 				
 				auto outsideRoom = IsRoomOutside(xPos, yPos, zPos);

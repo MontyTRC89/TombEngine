@@ -72,7 +72,7 @@ void Tr5DogControl(short itemNumber)
 		{
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			phd_atan(dz, dx);
+			atan2(dz, dx);
 			distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -185,7 +185,7 @@ void Tr5DogControl(short itemNumber)
 				}
 
 				creature->Flags = 0;
-				creature->MaxTurn = ANGLE(1.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(1.0f);
 
 				if (random < 256)
 				{
@@ -219,7 +219,7 @@ void Tr5DogControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 
 			if (item->AIBits & PATROL1)
 			{
@@ -237,7 +237,7 @@ void Tr5DogControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 			if (creature->Mood == MoodType::Escape)
 			{
@@ -260,7 +260,7 @@ void Tr5DogControl(short itemNumber)
 			break;
 
 		case 5:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 
 			if (creature->Mood != MoodType::Bored)
 			{

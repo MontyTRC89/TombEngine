@@ -48,9 +48,9 @@ namespace TEN::Entities::Effects
 		0, 0, 
 		0, 0, 
 		0, 0, 
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 	};
 
 	bool FlameEmitterFlags[8];
@@ -211,8 +211,8 @@ namespace TEN::Entities::Effects
 
 				if (item->TriggerFlags == 2)
 				{
-					item->Pose.Position.x += phd_sin(item->Pose.Orientation.y - ANGLE(180));
-					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180));
+					item->Pose.Position.x += sin(item->Orientation.y - EulerAngle::DegToRad(180));
+					item->Pose.Position.z += cos(item->Orientation.y - EulerAngle::DegToRad(180));
 
 					short roomNumber = item->RoomNumber;
 					FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -362,9 +362,9 @@ namespace TEN::Entities::Effects
 			item->ItemFlags[0] = (GetRandomControl() & 0x3F) + 90;
 			item->ItemFlags[2] = 256;
 
-			if (((-item->TriggerFlags) & 7) == 7)
+			/*if (((-item->TriggerFlags) & 7) == 7)
 			{
-				switch (item->Pose.Orientation.y)
+				switch (item->Orientation.y)
 				{
 				case 0:
 					item->Pose.Position.z += 512;
@@ -382,7 +382,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.x -= 512;
 					break;
 				}
-			}
+			}*/
 		}
 	}
 
@@ -394,7 +394,7 @@ namespace TEN::Entities::Effects
 
 		if (item->TriggerFlags != 123)
 		{
-			switch (item->Pose.Orientation.y)
+			/*switch (item->Orientation.y)
 			{
 			case 0:
 				if (item->TriggerFlags == 2)
@@ -423,7 +423,7 @@ namespace TEN::Entities::Effects
 				else
 					item->Pose.Position.x -= 256;
 				break;
-			}
+			}*/
 		}
 	}
 
@@ -472,9 +472,9 @@ namespace TEN::Entities::Effects
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * phd_sin(item->Pose.Orientation.y + ANGLE(180));
+						dest.x = item->Pose.Position.x + 2048 * sin(item->Orientation.y + EulerAngle::DegToRad(180));
 						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * phd_cos(item->Pose.Orientation.y + ANGLE(180));
+						dest.z = item->Pose.Position.z + 2048 * cos(item->Orientation.y + EulerAngle::DegToRad(180));
 
 						if (GetRandomControl() & 3)
 						{
@@ -686,8 +686,8 @@ namespace TEN::Entities::Effects
 
 			}
 
-			short oldYrot = item->Pose.Orientation.y;
-			item->Pose.Orientation.y = l->Pose.Orientation.y;
+			short oldYrot = item->Orientation.y;
+			item->Orientation.y = l->Orientation.y;
 
 			if (TestLaraPosition(&FireBounds, item, l))
 			{
@@ -709,7 +709,7 @@ namespace TEN::Entities::Effects
 				Lara.InteractedItem = itemNumber;
 			}
 
-			item->Pose.Orientation.y = oldYrot;
+			item->Orientation.y = oldYrot;
 		}
 
 		if (Lara.InteractedItem == itemNumber

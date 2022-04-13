@@ -14,8 +14,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-#define MUTANT_NEED_TURN ANGLE(45.0f)
-#define MUTANT_TURN ANGLE(3.0f)
+#define MUTANT_NEED_TURN EulerAngle::DegToRad(45.0f)
+#define MUTANT_TURN EulerAngle::DegToRad(3.0f)
 #define MUTANT_ATTACK_RANGE pow(2600, 2)
 #define MUTANT_CLOSE_RANGE pow(2250, 2)
 #define MUTANT_ATTACK_1_CHANCE 11000
@@ -80,7 +80,7 @@ void GiantMutantControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
+		angle = (short)atan2(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Orientation.y;
 
 		if (item->TouchBits)
 		{
@@ -145,7 +145,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 16 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Pose.Orientation.y += ANGLE(14.0f);
+				item->Orientation.y += EulerAngle::DegToRad(14.0f);
 			}
 
 			if (angle < MUTANT_NEED_TURN)
@@ -159,7 +159,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 13 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Pose.Orientation.y -= ANGLE(9.0f);
+				item->Orientation.y -= EulerAngle::DegToRad(9.0f);
 			}
 
 			if (angle > -MUTANT_NEED_TURN)
@@ -203,8 +203,8 @@ void GiantMutantControl(short itemNumber)
 				LaraItem->Pose.Position.x = item->Pose.Position.x;
 				LaraItem->Pose.Position.y = item->Pose.Position.y;
 				LaraItem->Pose.Position.z = item->Pose.Position.z;
-				LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-				LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
+				LaraItem->Orientation.y = item->Orientation.y;
+				LaraItem->Orientation.x = LaraItem->Orientation.z = 0;
 				LaraItem->Animation.Airborne = false;
 				LaraItem->HitPoints = -1;
 				Lara.Air = -1;

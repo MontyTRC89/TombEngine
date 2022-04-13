@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
 	{
 		if (creature->Enemy == nullptr)
 		{
-			headAngle = item->Pose.Orientation.y;
+			headAngle = item->Orientation.y;
 			return;
 		}
 
@@ -150,7 +150,7 @@ namespace TEN::Entities::TR4
 
 		int x = enemy->Pose.Position.x - pos.x;
 		int z = enemy->Pose.Position.z - pos.z;
-		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
+		headAngle = (short)(atan2(z, x) - item->Orientation.y) / 2;
 	}
 
 	static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
@@ -161,7 +161,7 @@ namespace TEN::Entities::TR4
 		auto end = Vector3Int(0, -128, 288);
 		GetJointAbsPosition(item, &end, 9);
 
-		short angles[2];
+		float angles[2];
 		phd_GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z, angles);
 
 		target->Position.x = end.x;
@@ -174,7 +174,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemFront(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
+		short angle = short(TO_DEGREES(item->Orientation.y));
 		switch (angle)
 		{
 		case C_NORTH:
@@ -197,7 +197,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemBack(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
+		short angle = short(TO_DEGREES(item->Orientation.y));
 		switch (angle)
 		{
 		case C_NORTH:

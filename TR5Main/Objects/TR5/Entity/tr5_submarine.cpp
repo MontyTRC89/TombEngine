@@ -152,9 +152,9 @@ static void SubmarineAttack(ITEM_INFO* item)
 
 		InitialiseItem(itemNumber);
 
-		torpedoItem->Pose.Orientation.x = 0;
-		torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
-		torpedoItem->Pose.Orientation.z = 0;
+		torpedoItem->Orientation.x = 0;
+		torpedoItem->Orientation.y = item->Orientation.y;
+		torpedoItem->Orientation.z = 0;
 		torpedoItem->Animation.Velocity = 0;
 		torpedoItem->Animation.VerticalVelocity = 0;
 		torpedoItem->ItemFlags[0] = -1;
@@ -208,7 +208,7 @@ void SubmarineControl(short itemNumber)
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-		laraInfo.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+		laraInfo.angle = atan2(dz, dx) - item->Orientation.y;
 		laraInfo.distance = pow(dx, 2) + pow(dz, 2);
 		laraInfo.ahead = true;
 	}
@@ -232,9 +232,9 @@ void SubmarineControl(short itemNumber)
 	else
 		item->ItemFlags[0] = 0;
 
-	creature->MaxTurn = ANGLE(2.0f);
+	creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
-	short joint = AI.xAngle - ANGLE(45.0f);
+	short joint = AI.xAngle - EulerAngle::DegToRad(45.0f);
 
 	if (creature->Flags < item->TriggerFlags)
 		creature->Flags++;
@@ -245,8 +245,8 @@ void SubmarineControl(short itemNumber)
 	if (Targetable(item, &laraInfo))
 	{
 		if (creature->Flags >= item->TriggerFlags &&
-			laraInfo.angle > -ANGLE(90.0f) &&
-			laraInfo.angle < ANGLE(90.0f))
+			laraInfo.angle > EulerAngle::DegToRad(-90.0f) &&
+			laraInfo.angle < EulerAngle::DegToRad(90.0f))
 		{
 			SubmarineAttack(item);
 			creature->Flags = 0;
@@ -263,15 +263,15 @@ void SubmarineControl(short itemNumber)
 		if (AI.distance < pow(SECTOR(1), 2))
 		{
 			creature->MaxTurn = 0;
-			if (abs(laraInfo.angle) >= ANGLE(2.0f))
+			if (abs(laraInfo.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (laraInfo.angle >= 0)
-					item->Pose.Orientation.y += ANGLE(2.0f);
+					item->Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(2.0f);
+					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.y += laraInfo.angle;
+				item->Orientation.y += laraInfo.angle;
 		}
 	}
 	else
@@ -369,12 +369,12 @@ void ChaffFlareControl(short itemNumber)
 	
 	if (item->Animation.VerticalVelocity)
 	{
-		item->Pose.Orientation.x += ANGLE(3.0f);
-		item->Pose.Orientation.z += ANGLE(5.0f);
+		item->Orientation.x += EulerAngle::DegToRad(3.0f);
+		item->Orientation.z += EulerAngle::DegToRad(5.0f);
 	}
 
-	int dx = item->Animation.Velocity * phd_sin(item->Pose.Orientation.y);
-	int dz = item->Animation.Velocity * phd_cos(item->Pose.Orientation.y);
+	int dx = item->Animation.Velocity * sin(item->Orientation.y);
+	int dz = item->Animation.Velocity * cos(item->Orientation.y);
 
 	item->Pose.Position.x += dx;
 	item->Pose.Position.z += dz;
@@ -473,7 +473,7 @@ void TorpedoControl(short itemNumber)
 		}
 	}
 
-	short angles[2];
+	float angles[2];
 	phd_GetVectorAngles(pos.x - item->Pose.Position.x, pos.y - item->Pose.Position.y, pos.z - item->Pose.Position.z, angles);
 
 	if (item->Animation.Velocity >= 48)
@@ -488,11 +488,11 @@ void TorpedoControl(short itemNumber)
 
 	if (item->ItemFlags[1] - 1 < 60)
 	{
-		short dry = angles[0] - item->Pose.Orientation.y;
+		short dry = angles[0] - item->Orientation.y;
 		if (abs(dry) > 0x8000)
 			dry = -dry;
 
-		short drx = angles[1] - item->Pose.Orientation.x;
+		short drx = angles[1] - item->Orientation.x;
 		if (abs(drx) > 0x8000)
 			drx = -drx;
 
@@ -515,21 +515,21 @@ void TorpedoControl(short itemNumber)
 		else
 			dry = 512;
 
-		item->Pose.Orientation.y += dry;
-		item->Pose.Orientation.x += drx;
+		item->Orientation.y += dry;
+		item->Orientation.x += drx;
 	}
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	item->Pose.Orientation.z += 16 * item->Animation.Velocity;
+	item->Orientation.z += 16 * item->Animation.Velocity;
 
-	int c = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
+	int c = item->Animation.Velocity * cos(item->Orientation.x);
 
-	item->Pose.Position.x += c * phd_sin(item->Pose.Orientation.y);
-	item->Pose.Position.y += item->Animation.Velocity * phd_sin(-item->Pose.Orientation.x);
-	item->Pose.Position.z += c * phd_cos(item->Pose.Orientation.y);
+	item->Pose.Position.x += c * sin(item->Orientation.y);
+	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Orientation.x);
+	item->Pose.Position.z += c * cos(item->Orientation.y);
 
 	auto probe = GetCollision(item);
 

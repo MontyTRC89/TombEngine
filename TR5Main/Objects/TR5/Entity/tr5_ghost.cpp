@@ -47,15 +47,15 @@ void InvisibleGhostControl(short itemNumber)
 	CreatureAIInfo(item, &AI);
 
 	angle = CreatureTurn(item, creature->MaxTurn);
-	if (abs(AI.angle) >= ANGLE(3.0f))
+	if (abs(AI.angle) >= EulerAngle::DegToRad(3.0f))
 	{
 		if (AI.angle > 0)
-			item->Pose.Orientation.y += ANGLE(3.0f);
+			item->Orientation.y += EulerAngle::DegToRad(3.0f);
 		else
-			item->Pose.Orientation.y -= ANGLE(3.0f);
+			item->Orientation.y -= EulerAngle::DegToRad(3.0f);
 	}
 	else
-		item->Pose.Orientation.y += AI.angle;
+		item->Orientation.y += AI.angle;
 
 	if (AI.ahead)
 	{
@@ -84,7 +84,7 @@ void InvisibleGhostControl(short itemNumber)
 		item->TouchBits & 0x9470 &&
 		item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
 	{
-		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Orientation.y, DoBloodSplat);
 		creature->Flags = 1;
 
 		LaraItem->HitPoints -= 400;

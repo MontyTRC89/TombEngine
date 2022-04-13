@@ -154,16 +154,16 @@ void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
-	if (item->Pose.Orientation.x < -ANGLE(2.0f) ||
-		item->Pose.Orientation.x > ANGLE(2.0f))
+	if (item->Orientation.x < EulerAngle::DegToRad(-2.0f) ||
+		item->Orientation.x > EulerAngle::DegToRad(2.0f))
 	{
-		if (item->Pose.Orientation.x >= 0)
-			item->Pose.Orientation.x -= ANGLE(2.0f);
+		if (item->Orientation.x >= 0)
+			item->Orientation.x -= EulerAngle::DegToRad(2.0f);
 		else
-			item->Pose.Orientation.x += ANGLE(2.0f);
+			item->Orientation.x += EulerAngle::DegToRad(2.0f);
 	}
 	else
-		item->Pose.Orientation.x = 0;
+		item->Orientation.x = 0;
 }
 
 // State:		LS_WATER_DEATH (44)

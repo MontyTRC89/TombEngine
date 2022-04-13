@@ -29,8 +29,8 @@ void ShootAtLara(FX_INFO *fx)
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
 
 	int distance = sqrt(pow(x, 2) + pow(z, 2));
-	fx->pos.Orientation.x = -phd_atan(distance, y);
-	fx->pos.Orientation.y = phd_atan(z, x);
+	fx->pos.Orientation.x = -atan2(distance, y);
+	fx->pos.Orientation.y = atan2(z, x);
 
 	// Random scatter (only a little bit else it's too hard to avoid).
 	fx->pos.Orientation.x += (GetRandomControl() - 0x4000) / 0x40;
@@ -46,13 +46,13 @@ void ControlMissile(short fxNumber)
 		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
 			fx->pos.Orientation.x > -0x3000);
 	{
-		fx->pos.Orientation.x -= ANGLE(1.0f);
+		fx->pos.Orientation.x -= EulerAngle::DegToRad(1.0f);
 	}
 
-	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
-	int velocity = fx->speed * phd_cos(fx->pos.Orientation.x);
-	fx->pos.Position.z += velocity * phd_cos(fx->pos.Orientation.y);
-	fx->pos.Position.x += velocity * phd_sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
+	int velocity = fx->speed * cos(fx->pos.Orientation.x);
+	fx->pos.Position.z += velocity * cos(fx->pos.Orientation.y);
+	fx->pos.Position.x += velocity * sin(fx->pos.Orientation.y);
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
@@ -108,7 +108,7 @@ void ControlMissile(short fxNumber)
 
 		LaraItem->HitStatus = 1;
 
-		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
+		fx->pos.Orientation.y = LaraItem->Orientation.y;
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}
@@ -138,8 +138,8 @@ void ControlNatlaGun(short fxNumber)
 	/* If first frame, then start another explosion at next position */
 	if (fx->frameNumber == -1)
 	{
-		int z = fx->pos.Position.z + fx->speed * phd_cos(fx->pos.Orientation.y);
-		int x = fx->pos.Position.x + fx->speed * phd_sin(fx->pos.Orientation.y);
+		int z = fx->pos.Position.z + fx->speed * cos(fx->pos.Orientation.y);
+		int x = fx->pos.Position.x + fx->speed * sin(fx->pos.Orientation.y);
 		int y = fx->pos.Position.y;
 
 		auto probe = GetCollision(x, y, z, fx->roomNumber);

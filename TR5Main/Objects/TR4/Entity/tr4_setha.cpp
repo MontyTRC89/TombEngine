@@ -41,8 +41,8 @@ void SethaControl(short itemNumber)
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	int dx = 870 * phd_sin(item->Pose.Orientation.y);
-	int dz = 870 * phd_cos(item->Pose.Orientation.y);
+	int dx = 870 * sin(item->Orientation.y);
+	int dz = 870 * cos(item->Orientation.y);
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -154,8 +154,8 @@ void SethaControl(short itemNumber)
 						}
 					}
 					else if (info.distance < SQUARE(4096)
-						&& info.angle < ANGLE(45)
-						&& info.angle > -ANGLE(45)
+						&& info.angle < EulerAngle::DegToRad(45)
+						&& info.angle > EulerAngle::DegToRad(-45)
 						&& height4 != NO_HEIGHT
 						&& height4 >= item->Pose.Position.y - 256
 						&& Targetable(item, &info))
@@ -190,7 +190,7 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 2u:
-			creature->MaxTurn = ANGLE(7);
+			creature->MaxTurn = EulerAngle::DegToRad(7);
 			if (info.bite 
 				&& info.distance < SQUARE(4096) 
 				|| canJump 
@@ -205,7 +205,7 @@ void SethaControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = ANGLE(11);
+			creature->MaxTurn = EulerAngle::DegToRad(11);
 			if (info.bite 
 				&& info.distance < SQUARE(4096)
 				|| canJump 
@@ -287,20 +287,20 @@ void SethaControl(short itemNumber)
 		case 8:
 			creature->MaxTurn = 0;
 			
-			if (abs(info.angle) >= ANGLE(3))
+			if (abs(info.angle) >= EulerAngle::DegToRad(3))
 			{
 				if (info.angle >= 0)
 				{
-					item->Pose.Orientation.y += ANGLE(3);
+					item->Orientation.y += EulerAngle::DegToRad(3);
 				}
 				else
 				{
-					item->Pose.Orientation.y -= ANGLE(3);
+					item->Orientation.y -= EulerAngle::DegToRad(3);
 				}
 			}
 			else
 			{
-				item->Pose.Orientation.y += info.angle;
+				item->Orientation.y += info.angle;
 			}
 
 			if (!creature->Flags)
@@ -341,21 +341,21 @@ void SethaControl(short itemNumber)
 		
 			creature->MaxTurn = 0;
 
-			if (abs(info.angle) >= ANGLE(3))
+			if (abs(info.angle) >= EulerAngle::DegToRad(3))
 			{
 				if (info.angle >= 0)
 				{
-					item->Pose.Orientation.y += ANGLE(3);
+					item->Orientation.y += EulerAngle::DegToRad(3);
 				}
 				else
 				{
-					item->Pose.Orientation.y -= ANGLE(3);
+					item->Orientation.y -= EulerAngle::DegToRad(3);
 				}
 				SethaAttack(itemNumber);
 			}
 			else
 			{
-				item->Pose.Orientation.y += info.angle;
+				item->Orientation.y += info.angle;
 				SethaAttack(itemNumber);
 			}
 
@@ -369,20 +369,20 @@ void SethaControl(short itemNumber)
 				creature->MaxTurn = 0;
 				creature->Target.y = LaraItem->Pose.Position.y;
 
-				if (abs(info.angle) >= ANGLE(3))
+				if (abs(info.angle) >= EulerAngle::DegToRad(3))
 				{
 					if (info.angle >= 0)
 					{
-						item->Pose.Orientation.y += ANGLE(3);
+						item->Orientation.y += EulerAngle::DegToRad(3);
 					}
 					else
 					{
-						item->Pose.Orientation.y -= ANGLE(3);
+						item->Orientation.y -= EulerAngle::DegToRad(3);
 					}
 				}
 				else
 				{
-					item->Pose.Orientation.y += info.angle;
+					item->Orientation.y += info.angle;
 				}
 			}
 
@@ -546,7 +546,7 @@ void SethaThrowAttack(PHD_3DPOS* pos, short roomNumber, short mesh)
 		fx->pos.Orientation.y = pos->Orientation.y;
 		fx->pos.Orientation.z = 0;
 		fx->roomNumber = roomNumber;
-		fx->counter = 2 * GetRandomControl() + -ANGLE(180);
+		fx->counter = 2 * GetRandomControl() + EulerAngle::DegToRad(-180);
 		fx->flag1 = mesh;
 		fx->objectNumber = ID_BODY_PART;
 		fx->speed = (GetRandomControl() & 0x1F) - (mesh != 1 ? 0 : 64) + 96;
@@ -574,7 +574,7 @@ void SethaAttack(int itemNumber)
 
 	int i, size;
 	Vector3Int pos;
-	short angles[2];
+	float angles[2];
 	PHD_3DPOS attackPos;
 
 	switch (item->Animation.ActiveState)

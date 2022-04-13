@@ -1,5 +1,6 @@
 #pragma once
 #include "Objects/objectslist.h"
+#include "Specific/EulerAngle.h"
 #include "Specific/trmath.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
@@ -1064,7 +1065,7 @@ struct ArmInfo
 	int FrameNumber;
 	int FrameBase;
 	bool Locked;
-	Vector3Shrt Rotation;
+	EulerAngle Rotation;
 	short FlashGun;
 };
 
@@ -1190,13 +1191,13 @@ struct TightropeControlData
 
 struct SubsuitControlData
 {
-	short XRot;
-	short DXRot;
+	float XRot;
+	float DXRot;
 	int Velocity[2];
 	int VerticalVelocity;
 
 	// TODO: These appear to be unused.
-	short XRotVel;
+	float XRotVel;
 	unsigned short HitCount;
 };
 
@@ -1208,8 +1209,8 @@ struct MinecartControlData
 
 struct LaraControlData
 {
-	short MoveAngle;
-	short TurnRate;
+	float MoveAngle;
+	float TurnRate;
 	int CalculatedJumpVelocity;
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;
@@ -1242,15 +1243,15 @@ struct LaraInfo
 	FlareData Flare;
 	bool LitTorch;
 
-	Vector3Shrt ExtraHeadRot;
-	Vector3Shrt ExtraTorsoRot;
+	EulerAngle ExtraHeadRot;
+	EulerAngle ExtraTorsoRot;
 	Vector3Int ExtraVelocity;
 	short WaterCurrentActive;
 	Vector3Int WaterCurrentPull;
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	short TargetArmAngles[2];
+	float TargetArmAngles[2];
 	ITEM_INFO* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
@@ -1267,7 +1268,7 @@ struct LaraInfo
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
-	Vector3Shrt TargetOrientation;
+	EulerAngle TargetOrientation;
 	int WaterSurfaceDist;
 	PHD_3DPOS NextCornerPos;
 

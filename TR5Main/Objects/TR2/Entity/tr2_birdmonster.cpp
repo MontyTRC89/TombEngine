@@ -93,7 +93,7 @@ void BirdMonsterControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(4.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->Animation.TargetState = 5;

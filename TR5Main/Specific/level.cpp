@@ -120,7 +120,7 @@ void LoadItems()
 			item->Pose.Position.x = ReadInt32();
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
-			item->Pose.Orientation.y = ReadInt16();
+			item->Orientation.y = ReadInt16();
 			item->Shade = ReadInt16();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();

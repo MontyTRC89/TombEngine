@@ -117,10 +117,10 @@ void GuideControl(short itemNumber)
 	int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+	laraAI.angle = atan2(dz, dx) - item->Orientation.y;
 
 	laraAI.ahead = true;
-	if (laraAI.angle <= -ANGLE(90.0f) || laraAI.angle >= ANGLE(90.0f))
+	if (laraAI.angle <= EulerAngle::DegToRad(-90.0f) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
 		laraAI.ahead = false;
 
 	int distance = 0;
@@ -136,9 +136,9 @@ void GuideControl(short itemNumber)
 	short rot2 = 0;
 
 	if (dx <= dz)
-		laraAI.xAngle = phd_atan(dz + (dx / 2), dy);
+		laraAI.xAngle = atan2(dz + (dx / 2), dy);
 	else
-		laraAI.xAngle = phd_atan(dx + (dz / 2), dy);
+		laraAI.xAngle = atan2(dx + (dz / 2), dy);
 
 	ITEM_INFO* foundEnemy = NULL;
 
@@ -329,7 +329,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_WALK:
-		creature->MaxTurn = ANGLE(7.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 		creature->LOT.IsJumping = false;
 
 		if (laraAI.ahead)
@@ -397,7 +397,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_RUN:
-		creature->MaxTurn = ANGLE(11.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(11.0f);
 		tilt = angle / 2;
 
 		if (AI.ahead)
@@ -528,7 +528,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
-			item->Pose.Orientation.y -= 399;
+			item->Orientation.y -= 399;
 
 		break;
 
@@ -542,15 +542,15 @@ void GuideControl(short itemNumber)
 			joint1 = AI.xAngle / 2;
 		}
 
-		if (abs(AI.angle) >= ANGLE(7.0f))
+		if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
 		{
 			if (AI.angle < 0)
-				item->Pose.Orientation.y += ANGLE(7.0f);
+				item->Orientation.y += EulerAngle::DegToRad(7.0f);
 			else
-				item->Pose.Orientation.y -= ANGLE(7.0f);
+				item->Orientation.y -= EulerAngle::DegToRad(7.0f);
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Orientation.y += AI.angle;
 
 		if (!creature->Flags)
 		{
@@ -592,7 +592,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
-			item->Pose.Orientation.y += 399;
+			item->Orientation.y += 399;
 
 		break;
 
@@ -600,11 +600,11 @@ void GuideControl(short itemNumber)
 	case 43:
 		if (enemy)
 		{
-			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
-			if (deltaAngle < -ANGLE(2.0f))
-				item->Pose.Orientation.y -= ANGLE(2.0f);
-			else if (deltaAngle > ANGLE(2.0f))
-				item->Pose.Orientation.y = ANGLE(2.0f);
+			short deltaAngle = enemy->Orientation.y - item->Orientation.y;
+			if (deltaAngle < EulerAngle::DegToRad(-2.0f))
+				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+			else if (deltaAngle > EulerAngle::DegToRad(2.0f))
+				item->Orientation.y = EulerAngle::DegToRad(2.0f);
 		}
 
 		if (item->Animation.RequiredState == 43)
@@ -635,9 +635,9 @@ void GuideControl(short itemNumber)
 			item->Pose.Position.x = enemy->Pose.Position.x;
 			item->Pose.Position.y = enemy->Pose.Position.y;
 			item->Pose.Position.z = enemy->Pose.Position.z;
-			item->Pose.Orientation.x = enemy->Pose.Orientation.x;
-			item->Pose.Orientation.y = enemy->Pose.Orientation.y;
-			item->Pose.Orientation.z = enemy->Pose.Orientation.z;
+			item->Orientation.x = enemy->Orientation.x;
+			item->Orientation.y = enemy->Orientation.y;
+			item->Orientation.z = enemy->Orientation.z;
 		}
 		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
 		{
@@ -691,7 +691,7 @@ void GuideControl(short itemNumber)
 			{
 				TestTriggers(item, true);
 
-				item->Pose.Orientation.y = enemy->Pose.Orientation.y;
+				item->Orientation.y = enemy->Orientation.y;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
@@ -700,13 +700,13 @@ void GuideControl(short itemNumber)
 			}
 			else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
 			{
-				if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))
+				if (enemy->Orientation.y - item->Orientation.y <= EulerAngle::DegToRad(2.0f))
 				{
-					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < -ANGLE(2.0f))
-						item->Pose.Orientation.y -= ANGLE(2.0f);
+					if (enemy->Orientation.y - item->Orientation.y < EulerAngle::DegToRad(-2.0f))
+						item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += ANGLE(2.0f);
+					item->Orientation.y += EulerAngle::DegToRad(2.0f);
 			}
 		}
 
@@ -735,19 +735,19 @@ void GuideControl(short itemNumber)
 				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose, 0);
 			}
 		}
-		else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))
+		else if (enemy->Orientation.y - item->Orientation.y <= EulerAngle::DegToRad(2.0f))
 		{
-			if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < -ANGLE(2.0f))
-				item->Pose.Orientation.y -= ANGLE(2.0f);
+			if (enemy->Orientation.y - item->Orientation.y < EulerAngle::DegToRad(-2.0f))
+				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 		}
 		else
-			item->Pose.Orientation.y += ANGLE(2.0f);
+			item->Orientation.y += EulerAngle::DegToRad(2.0f);
 
 		break;
 
 	case 40:
 		creature->LOT.IsJumping;
-		creature->MaxTurn = ANGLE(7.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 		if (laraAI.ahead)
 		{
@@ -791,7 +791,7 @@ void GuideControl(short itemNumber)
 	case 41:
 	case 42:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(10.0f));
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Orientation.y - item->Orientation.y, EulerAngle::DegToRad(10.0f));
 
 	default:
 		break;

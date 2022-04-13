@@ -8,6 +8,7 @@
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Renderer/Renderer11.h"
 #include "Scripting/GameFlowScript.h"
 #include "Specific/setup.h"
@@ -25,17 +26,14 @@ void InitialiseHair()
 		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 		Hairs[h][0].initialized = true;
-		Hairs[h][0].pos.Orientation.y = 0;
-		Hairs[h][0].pos.Orientation.x = -0x4000;
+		Hairs[h][0].Orientation.y = 0;
+		Hairs[h][0].Orientation.x = EulerAngle::DegToRad(-90.0f);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
 			Hairs[h][i].initialized = true;
-			Hairs[h][i].pos.Position.x = *(bone + 1);
-			Hairs[h][i].pos.Position.y = *(bone + 2);
-			Hairs[h][i].pos.Position.z = *(bone + 3);
-			Hairs[h][i].pos.Orientation.x = -0x4000;
-			Hairs[h][i].pos.Orientation.y = Hairs[h][i].pos.Orientation.z = 0;
+			Hairs[h][i].Pose.Position = Vector3Int(*(bone + 1), *(bone + 2), *(bone + 3));
+			Hairs[h][i].Orientation = EulerAngle(EulerAngle::DegToRad(-90.0f), 0, 0);
 
 			Hairs[h][i].hvel.x = Hairs[h][i].hvel.y = Hairs[h][i].hvel.z = 0;
 		}
@@ -49,73 +47,74 @@ void HairControl(ITEM_INFO* item, bool young)
 		HairControl(item, 1, 0);
 }
 
-void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
+void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 {
-	SPHERE sphere[HAIR_SPHERE];
-	OBJECT_INFO* object = &Objects[ID_LARA];
-	ANIM_FRAME* frame;
-	int spaz;
+	auto* lara = GetLaraInfo(item);
+	auto* object = &Objects[ID_LARA];
+
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young;
 
-	LaraInfo*& lara = item->Data;
-
+	ANIM_FRAME* frame;
 	if (framePtr == NULL)
 	{
 		if (lara->HitDirection >= 0)
 		{
+			int spasm;
 			switch (lara->HitDirection)
 			{
 			case NORTH:
 				if (lara->Control.IsLow)
-					spaz = 294;
+					spasm = 294;
 				else
-					spaz = 125;
+					spasm = 125;
 				break;
 
 			case SOUTH:
 				if (lara->Control.IsLow)
-					spaz = 293;
+					spasm = 293;
 				else
-					spaz = 126;
+					spasm = 126;
 				break;
 
 			case EAST:
 				if (lara->Control.IsLow)
-					spaz = 295;
+					spasm = 295;
 				else
-					spaz = 127;
+					spasm = 127;
 				break;
 
 			default:
 				if (lara->Control.IsLow)
-					spaz = 296;
+					spasm = 296;
 				else
-					spaz = 128;
+					spasm = 128;
 				break;
 			}
 
-			frame = &g_Level.Frames[g_Level.Anims[spaz].framePtr + lara->HitFrame];
+			frame = &g_Level.Frames[g_Level.Anims[spasm].framePtr + lara->HitFrame];
 		}
 		else
 			frame = GetBestFrame(item);
 	}
 	else
-	{
 		frame = framePtr;
-	}
+
+	SPHERE sphere[HAIR_SPHERE];
 
 	// Get Lara's spheres in absolute coords, for head, torso, hips and upper arms
-	MESH* mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HIPS]];
-	Vector3Int pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
+	auto* mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HIPS]];
+	auto pos = Vector3Int((int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z);
 	GetLaraJointPosition(&pos, LM_HIPS);
+
 	sphere[0].x = pos.x;
 	sphere[0].y = pos.y;
 	sphere[0].z = pos.z;
 	sphere[0].r = (int)mesh->sphere.Radius;
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_TORSO]];
-	pos = { (int)mesh->sphere.Center.x - 10, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z + 25 }; // Repositioning sphere - from tomb5 
+	pos = Vector3Int((int)mesh->sphere.Center.x - 10, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z + 25); // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_TORSO);
+
 	sphere[1].x = pos.x;
 	sphere[1].y = pos.y;
 	sphere[1].z = pos.z;
@@ -124,7 +123,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 		sphere[1].r = sphere[1].r - ((sphere[1].r >> 2) + (sphere[1].r >> 3));
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_HEAD]];
-	pos = { (int)mesh->sphere.Center.x - 2, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z }; // Repositioning sphere - from tomb5 
+	pos = Vector3Int((int)mesh->sphere.Center.x - 2, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z); // Repositioning sphere - from tomb5 
 	GetLaraJointPosition(&pos, LM_HEAD);
 	sphere[2].x = pos.x;
 	sphere[2].y = pos.y;
@@ -132,7 +131,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	sphere[2].r = (int)mesh->sphere.Radius;
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_RINARM]];
-	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
+	pos = Vector3Int((int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z);
 	GetLaraJointPosition(&pos, LM_RINARM);
 	sphere[3].x = pos.x;
 	sphere[3].y = pos.y;
@@ -140,7 +139,7 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	sphere[3].r = (int)(4.0f * mesh->sphere.Radius / 3.0f); // Resizing sphere - from tomb5 
 
 	mesh = &g_Level.Meshes[lara->MeshPtrs[LM_LINARM]];
-	pos = { (int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z };
+	pos = Vector3Int((int)mesh->sphere.Center.x, (int)mesh->sphere.Center.y, (int)mesh->sphere.Center.z);
 	GetLaraJointPosition(&pos, LM_LINARM);
 	sphere[4].x = pos.x;
 	sphere[4].y = pos.y;
@@ -163,68 +162,54 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 	Matrix world;
 	g_Renderer.getBoneMatrix(lara->ItemNumber, LM_HEAD, &world);
 
-	if (ponytail)
-	{
+	if (braid)
 		world = Matrix::CreateTranslation(44, -48, -50) * world;
-	}
 	else if (youngLara)
-	{
 		world = Matrix::CreateTranslation(-52, -48, -50) * world;
-	}
 	else
-	{
 		world = Matrix::CreateTranslation(-4, -4, -48) * world;
-	}
 
-	pos.x = world.Translation().x; 
-	pos.y = world.Translation().y; 
-	pos.z = world.Translation().z;
+	pos = Vector3Int(world.Translation().x, world.Translation().y, world.Translation().z);
 
 	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
-	if (Hairs[ponytail][0].initialized)
+	if (Hairs[braid][0].initialized)
 	{
-		Hairs[ponytail][0].initialized = false;
-		Hairs[ponytail][0].pos.Position.x = pos.x;
-		Hairs[ponytail][0].pos.Position.y = pos.y;
-		Hairs[ponytail][0].pos.Position.z = pos.z;
+		Hairs[braid][0].initialized = false;
+		Hairs[braid][0].Pose.Position = pos;
 
 		for (int i = 0; i < HAIR_SEGMENTS; i++, bone += 4)
 		{
-			world = Matrix::CreateTranslation(Hairs[ponytail][i].pos.Position.x, Hairs[ponytail][i].pos.Position.y, Hairs[ponytail][i].pos.Position.z);		
-			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.Orientation.y), TO_RAD(Hairs[ponytail][i].pos.Orientation.x), 0) * world;			
+			world = Matrix::CreateTranslation(Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z);		
+			world = Matrix::CreateFromYawPitchRoll(Hairs[braid][i].Orientation.y, Hairs[braid][i].Orientation.x, 0) * world;			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
-			Hairs[ponytail][i + 1].initialized = false;
-			Hairs[ponytail][i + 1].pos.Position.x = world.Translation().x;
-			Hairs[ponytail][i + 1].pos.Position.y = world.Translation().y;
-			Hairs[ponytail][i + 1].pos.Position.z = world.Translation().z;
+			Hairs[braid][i + 1].initialized = false;
+			Hairs[braid][i + 1].Pose.Position = Vector3Int(world.Translation().x, world.Translation().y, world.Translation().z);
 		}
 	}
 	else
 	{
-		Hairs[ponytail][0].pos.Position.x = pos.x;
-		Hairs[ponytail][0].pos.Position.y = pos.y;
-		Hairs[ponytail][0].pos.Position.z = pos.z;
+		Hairs[braid][0].Pose.Position = pos;
 
 		short roomNumber = item->RoomNumber;
 		int x = item->Pose.Position.x + (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
 		int y = item->Pose.Position.y + (frame->boundingBox.Y1 + frame->boundingBox.Y2) / 2;
 		int z = item->Pose.Position.z + (frame->boundingBox.Z1 + frame->boundingBox.Z2) / 2;
-		int wh = GetWaterHeight(x, y, z, roomNumber);
+		int waterHeight = GetWaterHeight(x, y, z, roomNumber);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
-			Hairs[ponytail][0].hvel.x = Hairs[ponytail][i].pos.Position.x;
-			Hairs[ponytail][0].hvel.y = Hairs[ponytail][i].pos.Position.y;
-			Hairs[ponytail][0].hvel.z = Hairs[ponytail][i].pos.Position.z;
+			Hairs[braid][0].hvel.x = Hairs[braid][i].Pose.Position.x;
+			Hairs[braid][0].hvel.y = Hairs[braid][i].Pose.Position.y;
+			Hairs[braid][0].hvel.z = Hairs[braid][i].Pose.Position.z;
 
-			auto floor = GetFloor(Hairs[ponytail][i].pos.Position.x, Hairs[ponytail][i].pos.Position.y, Hairs[ponytail][i].pos.Position.z, &roomNumber);
-			int height = GetFloorHeight(floor, Hairs[ponytail][i].pos.Position.x, Hairs[ponytail][i].pos.Position.y, Hairs[ponytail][i].pos.Position.z);
+			FLOOR_INFO* floor = GetFloor(Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z, &roomNumber);
+			int height = GetFloorHeight(floor, Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z);
 
-			Hairs[ponytail][i].pos.Position.x += Hairs[ponytail][i].hvel.x * 3 / 4;
-			Hairs[ponytail][i].pos.Position.y += Hairs[ponytail][i].hvel.y * 3 / 4;
-			Hairs[ponytail][i].pos.Position.z += Hairs[ponytail][i].hvel.z * 3 / 4;
+			Hairs[braid][i].Pose.Position.x += Hairs[braid][i].hvel.x * 3 / 4;
+			Hairs[braid][i].Pose.Position.y += Hairs[braid][i].hvel.y * 3 / 4;
+			Hairs[braid][i].Pose.Position.z += Hairs[braid][i].hvel.z * 3 / 4;
 
 			// TR3 UPV uses a hack which forces Lara water status to dry. 
 			// Therefore, we can't directly use water status value to determine hair mode.
@@ -232,72 +217,70 @@ void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
 
 			if (dryMode)
 			{
-				if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WIND)
+				if (TestEnvironment(ENV_FLAG_WIND, roomNumber))
 				{
-					Hairs[ponytail][i].pos.Position.x += Weather.Wind().x * 2.0f;
-					Hairs[ponytail][i].pos.Position.z += Weather.Wind().z * 2.0f;
+					Hairs[braid][i].Pose.Position.x += Weather.Wind().x * 2.0f;
+					Hairs[braid][i].Pose.Position.z += Weather.Wind().z * 2.0f;
 				}
 
-				Hairs[ponytail][i].pos.Position.y += 10;
+				Hairs[braid][i].Pose.Position.y += 10;
 
-				if (wh != NO_HEIGHT && Hairs[ponytail][i].pos.Position.y > wh)
+				if (waterHeight != NO_HEIGHT && Hairs[braid][i].Pose.Position.y > waterHeight)
+					Hairs[braid][i].Pose.Position.y = waterHeight;
+				else if (Hairs[braid][i].Pose.Position.y > height)
 				{
-					Hairs[ponytail][i].pos.Position.y = wh;
-				}
-				else if (Hairs[ponytail][i].pos.Position.y > height)
-				{
-					Hairs[ponytail][i].pos.Position.x = Hairs[ponytail][0].hvel.x;
-					Hairs[ponytail][i].pos.Position.z = Hairs[ponytail][0].hvel.z;
+					Hairs[braid][i].Pose.Position.x = Hairs[braid][0].hvel.x;
+					Hairs[braid][i].Pose.Position.z = Hairs[braid][0].hvel.z;
 				}
 			}
 			else
 			{
-				if (Hairs[ponytail][i].pos.Position.y < wh)
-					Hairs[ponytail][i].pos.Position.y = wh;
-				else if (Hairs[ponytail][i].pos.Position.y > height)
-					Hairs[ponytail][i].pos.Position.y = height;
+				if (Hairs[braid][i].Pose.Position.y < waterHeight)
+					Hairs[braid][i].Pose.Position.y = waterHeight;
+				else if (Hairs[braid][i].Pose.Position.y > height)
+					Hairs[braid][i].Pose.Position.y = height;
 			}
 
 			for (int j = 0; j < HAIR_SPHERE; j++)
 			{
-				int x = Hairs[ponytail][i].pos.Position.x - sphere[j].x;
-				int y = Hairs[ponytail][i].pos.Position.y - sphere[j].y;
-				int z = Hairs[ponytail][i].pos.Position.z - sphere[j].z;
+				int x = Hairs[braid][i].Pose.Position.x - sphere[j].x;
+				int y = Hairs[braid][i].Pose.Position.y - sphere[j].y;
+				int z = Hairs[braid][i].Pose.Position.z - sphere[j].z;
 
-				int distance = SQUARE(x) + SQUARE(y) + SQUARE(z);
+				int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 
-				if (distance < SQUARE(sphere[j].r))
+				if (distance < pow(sphere[j].r, 2))
 				{
 					distance = sqrt(distance);
 
 					if (distance == 0)
 						distance = 1;
 
-					Hairs[ponytail][i].pos.Position.x = sphere[j].x + x * sphere[j].r / distance;
-					Hairs[ponytail][i].pos.Position.y = sphere[j].y + y * sphere[j].r / distance;
-					Hairs[ponytail][i].pos.Position.z = sphere[j].z + z * sphere[j].r / distance;
+					Hairs[braid][i].Pose.Position.x = sphere[j].x + x * sphere[j].r / distance;
+					Hairs[braid][i].Pose.Position.y = sphere[j].y + y * sphere[j].r / distance;
+					Hairs[braid][i].Pose.Position.z = sphere[j].z + z * sphere[j].r / distance;
 				}
 			}
 
-			int distance = sqrt(SQUARE(Hairs[ponytail][i].pos.Position.z - Hairs[ponytail][i - 1].pos.Position.z) + SQUARE(Hairs[ponytail][i].pos.Position.x - Hairs[ponytail][i - 1].pos.Position.x));
-			Hairs[ponytail][i - 1].pos.Orientation.y = phd_atan((Hairs[ponytail][i].pos.Position.z - Hairs[ponytail][i - 1].pos.Position.z), (Hairs[ponytail][i].pos.Position.x - Hairs[ponytail][i - 1].pos.Position.x));
-			Hairs[ponytail][i - 1].pos.Orientation.x = -phd_atan(distance, Hairs[ponytail][i].pos.Position.y - Hairs[ponytail][i - 1].pos.Position.y);
+			int distance = sqrt(pow(Hairs[braid][i].Pose.Position.z - Hairs[braid][i - 1].Pose.Position.z, 2) + pow(Hairs[braid][i].Pose.Position.x - Hairs[braid][i - 1].Pose.Position.x, 2));
+			Hairs[braid][i - 1].Orientation.y = atan2((Hairs[braid][i].Pose.Position.z - Hairs[braid][i - 1].Pose.Position.z), (Hairs[braid][i].Pose.Position.x - Hairs[braid][i - 1].Pose.Position.x));
+			Hairs[braid][i - 1].Orientation.x = -atan2(distance, Hairs[braid][i].Pose.Position.y - Hairs[braid][i - 1].Pose.Position.y);
 
-			world = Matrix::CreateTranslation(Hairs[ponytail][i - 1].pos.Position.x, Hairs[ponytail][i - 1].pos.Position.y, Hairs[ponytail][i - 1].pos.Position.z);
-			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i - 1].pos.Orientation.y), TO_RAD(Hairs[ponytail][i - 1].pos.Orientation.x), 0) * world;
+			world = Matrix::CreateTranslation(Hairs[braid][i - 1].Pose.Position.x, Hairs[braid][i - 1].Pose.Position.y, Hairs[braid][i - 1].Pose.Position.z);
+			world = Matrix::CreateFromYawPitchRoll(Hairs[braid][i - 1].Orientation.y, Hairs[braid][i - 1].Orientation.x, 0) * world;
 
 			if (i == HAIR_SEGMENTS)
 				world = Matrix::CreateTranslation(*(bone - 3), *(bone - 2), *(bone - 1)) * world;
 			else
 				world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
-			Hairs[ponytail][i].pos.Position.x = world.Translation().x;
-			Hairs[ponytail][i].pos.Position.y = world.Translation().y;
-			Hairs[ponytail][i].pos.Position.z = world.Translation().z;
+			Hairs[braid][i].Pose.Position = Vector3Int(world.Translation().x, world.Translation().y, world.Translation().z);
 
-			Hairs[ponytail][i].hvel.x = Hairs[ponytail][i].pos.Position.x - Hairs[ponytail][0].hvel.x;
-			Hairs[ponytail][i].hvel.y = Hairs[ponytail][i].pos.Position.y - Hairs[ponytail][0].hvel.y;
-			Hairs[ponytail][i].hvel.z = Hairs[ponytail][i].pos.Position.z - Hairs[ponytail][0].hvel.z;
+			Hairs[braid][i].hvel = Vector3Int(
+				Hairs[braid][i].Pose.Position.x - Hairs[braid][0].hvel.x,
+				Hairs[braid][i].Pose.Position.y - Hairs[braid][0].hvel.y,
+				Hairs[braid][i].Pose.Position.z - Hairs[braid][0].hvel.z
+			);
 		}
 	}
 }

@@ -87,7 +87,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 
 				if (!fragment->active)
 				{
-					Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
+					Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(yRot, 0, 0);
 
 					Vector3 pos1 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 0]]];
 					Vector3 pos2 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 1]]];

@@ -124,7 +124,7 @@ namespace TEN::Entities::TR4
 			fx->pos.Orientation.z = 0;
 
 			fx->roomNumber = roomNumber;
-			fx->counter = 2 * GetRandomControl() + -ANGLE(180.0f);
+			fx->counter = 2 * GetRandomControl() + EulerAngle::DegToRad(-180.0f);
 			fx->flag1 = flags;
 			fx->speed = (GetRandomControl() & 0x1F) + 96;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -148,7 +148,7 @@ namespace TEN::Entities::TR4
 				Vector3Int pos2 = { -900, 96, 0 };
 				GetJointAbsPosition(item, &pos2, 16);
 
-				short angles[2];
+				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 				PHD_3DPOS pos;
@@ -176,7 +176,7 @@ namespace TEN::Entities::TR4
 				Vector3Int pos2 = { -900, 96, 0 };
 				GetJointAbsPosition(item, &pos2, 16);
 
-				short angles[2];
+				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 				PHD_3DPOS pos;
@@ -214,7 +214,7 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos2, 17);
 				}
 
-				short angles[2];
+				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 				PHD_3DPOS pos;
@@ -251,9 +251,9 @@ namespace TEN::Entities::TR4
 				spark->x = (GetRandomControl() & 0x1F) + x - 16;
 				spark->y = (GetRandomControl() & 0x1F) + y - 16;
 				spark->z = (GetRandomControl() & 0x1F) + z - 16;
-				spark->xVel = (byte)(GetRandomControl() + 256) * phd_sin(angle);
+				spark->xVel = (byte)(GetRandomControl() + 256) * sin(angle);
 				spark->yVel = -32 - (GetRandomControl() & 0x3F);
-				spark->zVel = (byte)(GetRandomControl() + 256) * phd_cos(angle);
+				spark->zVel = (byte)(GetRandomControl() + 256) * cos(angle);
 				spark->friction = 9;
 
 				if (GetRandomControl() & 1)
@@ -380,11 +380,11 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Orientation.y;
 				laraAI.xAngle = 0;
 
 				laraAI.ahead = true;
-				if (laraAI.angle <= -ANGLE(90.0f) || laraAI.angle >= ANGLE(90.0f))
+				if (laraAI.angle <= EulerAngle::DegToRad(-90.0f) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
 					laraAI.ahead = false;
 
 				dx = abs(dx);
@@ -392,9 +392,9 @@ namespace TEN::Entities::TR4
 				dz = abs(dz);
 
 				if (dx <= dz)
-					laraAI.xAngle = phd_atan(dz + (dx >> 1), dy);
+					laraAI.xAngle = atan2(dz + (dx >> 1), dy);
 				else
-					laraAI.xAngle = phd_atan(dx + (dz >> 1), dy);
+					laraAI.xAngle = atan2(dx + (dz >> 1), dy);
 			}
 
 			GetCreatureMood(item, &AI, VIOLENT);
@@ -481,7 +481,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_WALK:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (AI.distance < pow(SECTOR(2), 2))
 				{
@@ -518,7 +518,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_RUN:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (AI.distance < pow(SECTOR(2), 2))
 				{
@@ -555,12 +555,12 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
 				{
-					if (AI.angle >= ANGLE(7.0f))
-						item->Pose.Orientation.y += ANGLE(7.0f);
-					else if (AI.angle <= -ANGLE(7))
-						item->Pose.Orientation.y += -ANGLE(7.0f);
+					if (AI.angle >= EulerAngle::DegToRad(7.0f))
+						item->Orientation.y += EulerAngle::DegToRad(7.0f);
+					else if (AI.angle <= EulerAngle::DegToRad(-7))
+						item->Orientation.y += EulerAngle::DegToRad(-7.0f);
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -582,7 +582,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_FLY:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (Targetable(item, &AI))
 					item->Animation.TargetState = STATE_DEMIGOD_IDLE_FLY;
@@ -590,14 +590,14 @@ namespace TEN::Entities::TR4
 				break;
 
 			case STATE_DEMIGOD_CIRCLE_AIM:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 				if (!Targetable(item, &AI) && AI.distance < pow(SECTOR(5), 2))
 					item->Animation.TargetState = STATE_DEMIGOD_CIRCLE_ATTACK;
 
 				break;
 
 			case STATE_DEMIGOD_CIRCLE_ATTACK:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				DoDemigodEffects(itemNumber);
 
@@ -619,12 +619,12 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
 				{
-					if (AI.angle >= ANGLE(7.0f))
-						item->Pose.Orientation.y += ANGLE(7.0f);
-					else if (AI.angle <= -ANGLE(7.0f))
-						item->Pose.Orientation.y += -ANGLE(7.0f);
+					if (AI.angle >= EulerAngle::DegToRad(7.0f))
+						item->Orientation.y += EulerAngle::DegToRad(7.0f);
+					else if (AI.angle <= EulerAngle::DegToRad(-7.0f))
+						item->Orientation.y += EulerAngle::DegToRad(-7.0f);
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -645,12 +645,12 @@ namespace TEN::Entities::TR4
 				joint2 = joint0;
 				joint0 = 0;
 
-				if (AI.angle >= ANGLE(7.0f))
-					item->Pose.Orientation.y += ANGLE(7.0f);
-				else if (AI.angle <= -ANGLE(7.0f))
-					item->Pose.Orientation.y += -ANGLE(7.0f);
+				if (AI.angle >= EulerAngle::DegToRad(7.0f))
+					item->Orientation.y += EulerAngle::DegToRad(7.0f);
+				else if (AI.angle <= EulerAngle::DegToRad(-7.0f))
+					item->Orientation.y += EulerAngle::DegToRad(-7.0f);
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&

@@ -75,7 +75,7 @@ namespace TEN {
 					s.width = 8;
 					s.room = pos->roomNumber;
 					s.pos = Vector3(pos->x, pos->y, pos->z);
-					float ang = TO_RAD(angle);
+					float ang = angle;
 					Vector3 v = Vector3(sin(ang + GenerateFloat(-PI / 2, PI / 2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI / 2, PI / 2)));
 					v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
 					v.Normalize(v);

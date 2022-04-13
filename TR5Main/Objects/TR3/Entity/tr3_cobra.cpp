@@ -62,7 +62,7 @@ void CobraControl(short itemNumber)
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 
-		AI.angle += ANGLE(16.8f);
+		AI.angle += EulerAngle::DegToRad(16.8f);
 
 		GetCreatureMood(item, &AI, 1);
 		CreatureMood(item, &AI, 1);
@@ -74,12 +74,12 @@ void CobraControl(short itemNumber)
 		if (AI.ahead)
 			head = AI.angle;
 
-		if (abs(AI.angle) < ANGLE(10.0f))
-			item->Pose.Orientation.y += AI.angle;
+		if (abs(AI.angle) < EulerAngle::DegToRad(10.0f))
+			item->Orientation.y += AI.angle;
 		else if (AI.angle < 0)
-			item->Pose.Orientation.y -= ANGLE(10.0f);
+			item->Orientation.y -= EulerAngle::DegToRad(10.0f);
 		else
-			item->Pose.Orientation.y += ANGLE(10.0f);
+			item->Orientation.y += EulerAngle::DegToRad(10.0f);
 
 		switch (item->Animation.ActiveState)
 		{

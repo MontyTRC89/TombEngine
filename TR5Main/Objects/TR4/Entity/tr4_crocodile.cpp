@@ -15,9 +15,9 @@
 
 static BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
 
-#define CROC_STATE_WALK_ANGLE ANGLE(3.0f)
-#define CROC_SWIM_ANGLE ANGLE(3.0f)
-#define CROC_STATE_RUN_ANGLE ANGLE(5.0f)
+#define CROC_STATE_WALK_ANGLE EulerAngle::DegToRad(3.0f)
+#define CROC_SWIM_ANGLE EulerAngle::DegToRad(3.0f)
+#define CROC_STATE_RUN_ANGLE EulerAngle::DegToRad(5.0f)
 #define CROC_SWIM_SPEED 16;
 #define CROC_DAMAGE 120;
 

@@ -91,7 +91,7 @@ void InitialiseGenSlot4(short itemNumber)
 	LOBYTE(v6) = (item->pos.Position.x + (v5 << 11 >> 14)) >> 9;
 	BYTE1(v6) = v7 >> 9;
 
-	item->itemFlags[1] = item->pos.Position.x + 2560 * phd_sin(item->pos.Orientation.y) >> W2V_SHIFT;
+	item->itemFlags[1] = item->pos.Position.x + 2560 * sin(item->pos.Orientation.y) >> W2V_SHIFT;
 	item->itemFlags[3] = 0;
 	item->triggerFlags = 0;*/
 }

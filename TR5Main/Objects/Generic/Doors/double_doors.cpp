@@ -28,9 +28,9 @@ namespace TEN::Entities::Doors
 		-384, 384, 
 		0, 0, 
 		-1024, 512, 
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
 	};
 
 	void DoubleDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
@@ -46,7 +46,7 @@ namespace TEN::Entities::Doors
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+			doorItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 
 			if (TestLaraPosition(&DoubleDoorBounds, doorItem, laraItem))
 			{
@@ -64,7 +64,7 @@ namespace TEN::Entities::Doors
 				else
 					laraInfo->InteractedItem = itemNumber;
 
-				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+				doorItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 			}
 			else
 			{
@@ -75,7 +75,7 @@ namespace TEN::Entities::Doors
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+				doorItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 			}
 		}
 	}

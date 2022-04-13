@@ -27,7 +27,7 @@
 #define RECOVER_CHANCE 0x100
 #define BIFF_AVOID_TURN 1536
 #define FEELER_DISTANCE CLICK(2)
-#define FEELER_ANGLE ANGLE(45.0f)
+#define FEELER_ANGLE EulerAngle::DegToRad(45.0f)
 
 #ifdef CREATURE_AI_PRIORITY_OPTIMIZATION
 constexpr int HIGH_PRIO_RANGE = 8;
@@ -156,7 +156,7 @@ short AIGuard(CreatureInfo* creature)
 	if (creature->HeadRight)
 		return 0;
 
-	return -ANGLE(90.0f);
+	return EulerAngle::DegToRad(-90.0f);
 }
 
 void AlertNearbyGuards(ITEM_INFO* item) 
@@ -216,9 +216,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	LaraItem->Pose.Position.x = item->Pose.Position.x;
 	LaraItem->Pose.Position.y = item->Pose.Position.y;
 	LaraItem->Pose.Position.z = item->Pose.Position.z;
-	LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-	LaraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-	LaraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+	LaraItem->Orientation.y = item->Orientation.y;
+	LaraItem->Orientation.x = item->Orientation.x;
+	LaraItem->Orientation.z = item->Orientation.z;
 	LaraItem->Animation.Velocity = 0;
 	LaraItem->Animation.VerticalVelocity = 0;
 	LaraItem->Animation.Airborne = false;
@@ -237,14 +237,14 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	Camera.pos.roomNumber = LaraItem->RoomNumber; 
 	Camera.type = CameraType::Chase;
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(170.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 
 	// TODO: exist in TR5 but just commented in case.
 	/*
-	ForcedFixedCamera.x = item->pos.Position.x + (phd_sin(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
+	ForcedFixedCamera.x = item->pos.Position.x + (sin(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
 	ForcedFixedCamera.y = item->pos.Position.y - WALL_SIZE;
-	ForcedFixedCamera.z = item->pos.Position.z + (phd_cos(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
+	ForcedFixedCamera.z = item->pos.Position.z + (cos(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
 	ForcedFixedCamera.roomNumber = item->roomNumber;
 	UseForcedFixedCamera = true;
 	*/
@@ -263,7 +263,7 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 	Vector3Int pos = { bite->x, bite->y, bite->z };
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
-	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Orientation.y, item->RoomNumber);
 }
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)
@@ -289,10 +289,10 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 		if (y > height)
 			item->Pose.Position.y = height;
 
-		if (item->Pose.Orientation.x > ANGLE(2.0f))
-			item->Pose.Orientation.x -= ANGLE(2.0f);
-		else if (item->Pose.Orientation.x > 0)
-			item->Pose.Orientation.x = 0;
+		if (item->Orientation.x > EulerAngle::DegToRad(2.0f))
+			item->Orientation.x -= EulerAngle::DegToRad(2.0f);
+		else if (item->Orientation.x > 0)
+			item->Orientation.x = 0;
 	}
 }
 
@@ -300,7 +300,7 @@ void CreatureFloat(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	item->HitPoints = NOT_TARGETABLE;
-	item->Pose.Orientation.x = 0;
+	item->Orientation.x = 0;
 
 	int waterLevel = GetWaterHeight(item);
 
@@ -340,35 +340,35 @@ void CreatureJoint(ITEM_INFO* item, short joint, short required)
 	auto* creature = GetCreatureInfo(item);
 
 	short change = required - creature->JointRotation[joint];
-	if (change > ANGLE(3.0f))
-		change = ANGLE(3.0f);
-	else if (change < -ANGLE(3.0f))
-		change = -ANGLE(3.0f);
+	if (change > EulerAngle::DegToRad(3.0f))
+		change = EulerAngle::DegToRad(3.0f);
+	else if (change < EulerAngle::DegToRad(-3.0f))
+		change = EulerAngle::DegToRad(-3.0f);
 
 	creature->JointRotation[joint] += change;
 
-	if (creature->JointRotation[joint] > ANGLE(70.0f))
-		creature->JointRotation[joint] = ANGLE(70.0f);
-	else if (creature->JointRotation[joint] < -ANGLE(70.0f))
-		creature->JointRotation[joint] = -ANGLE(70.0f);
+	if (creature->JointRotation[joint] > EulerAngle::DegToRad(70.0f))
+		creature->JointRotation[joint] = EulerAngle::DegToRad(70.0f);
+	else if (creature->JointRotation[joint] < EulerAngle::DegToRad(-70.0f))
+		creature->JointRotation[joint] = EulerAngle::DegToRad(-70.0f);
 }
 
 void CreatureTilt(ITEM_INFO* item, short angle) 
 {
-	angle = (angle << 2) - item->Pose.Orientation.z;
+	angle = (angle << 2) - item->Orientation.z;
 
-	if (angle < -ANGLE(3.0f))
-		angle = -ANGLE(3.0f);
-	else if (angle > ANGLE(3.0f))
-		angle = ANGLE(3.0f);
+	if (angle < EulerAngle::DegToRad(-3.0f))
+		angle = EulerAngle::DegToRad(-3.0f);
+	else if (angle > EulerAngle::DegToRad(3.0f))
+		angle = EulerAngle::DegToRad(3.0f);
 
-	short theAngle = -ANGLE(3.0f);
+	short theAngle = EulerAngle::DegToRad(-3.0f);
 
-	short absRot = abs(item->Pose.Orientation.z);
-	if (absRot < ANGLE(15.0f) || absRot > ANGLE(30.0f))
+	short absRot = abs(item->Orientation.z);
+	if (absRot < EulerAngle::DegToRad(15.0f) || absRot > EulerAngle::DegToRad(30.0f))
 		angle >>= 1;
 	
-	item->Pose.Orientation.z += angle;
+	item->Orientation.z += angle;
 }
 
 short CreatureTurn(ITEM_INFO* item, short maxTurn)
@@ -381,7 +381,7 @@ short CreatureTurn(ITEM_INFO* item, short maxTurn)
 
 	int x = creature->Target.x - item->Pose.Position.x;
 	int z = creature->Target.z - item->Pose.Position.z;
-	angle = phd_atan(z, x) - item->Pose.Orientation.y;
+	angle = atan2(z, x) - item->Orientation.y;
 	int range = item->Animation.Velocity * (16384 / maxTurn);
 	int distance = pow(x, 2) + pow(z, 2);
 
@@ -393,7 +393,7 @@ short CreatureTurn(ITEM_INFO* item, short maxTurn)
 	else if (angle < -maxTurn)
 		angle = -maxTurn;
 
-	item->Pose.Orientation.y += angle;
+	item->Orientation.y += angle;
 
 	return angle;
 }
@@ -516,7 +516,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				shiftX = radius - xPos;
 			else if (!shiftZ && BadFloor(x - radius, y, z - radius, height, nextHeight, roomNumber, LOT))
 			{
-				if (item->Pose.Orientation.y > -ANGLE(135.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
+				if (item->Orientation.y > EulerAngle::DegToRad(-135.0f) && item->Orientation.y < EulerAngle::DegToRad(45.0f))
 					shiftZ = radius - zPos;
 				else
 					shiftX = radius - xPos;
@@ -528,7 +528,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				shiftX = SECTOR(1) - radius - xPos;
 			else if (!shiftZ && BadFloor(x + radius, y, z - radius, height, nextHeight, roomNumber, LOT))
 			{
-				if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(135.0f))
+				if (item->Orientation.y > EulerAngle::DegToRad(-45.0f) && item->Orientation.y < EulerAngle::DegToRad(135.0f))
 					shiftZ = radius - zPos;
 				else
 					shiftX = SECTOR(1) - radius - xPos;
@@ -546,7 +546,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				shiftX = radius - xPos;
 			else if (!shiftZ && BadFloor(x - radius, y, z + radius, height, nextHeight, roomNumber, LOT))
 			{
-				if (item->Pose.Orientation.y > -ANGLE(45.0f) && item->Pose.Orientation.y < ANGLE(135.0f))
+				if (item->Orientation.y > EulerAngle::DegToRad(-45.0f) && item->Orientation.y < EulerAngle::DegToRad(135.0f))
 					shiftX = radius - xPos;
 				else
 					shiftZ = SECTOR(1) - radius - zPos;
@@ -558,7 +558,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				shiftX = SECTOR(1) - radius - xPos;
 			else if (!shiftZ && BadFloor(x + radius, y, z + radius, height, nextHeight, roomNumber, LOT))
 			{
-				if (item->Pose.Orientation.y > -ANGLE(135.0f) && item->Pose.Orientation.y < ANGLE(45.0f))
+				if (item->Orientation.y > EulerAngle::DegToRad(-135.0f) && item->Orientation.y < EulerAngle::DegToRad(45.0f))
 					shiftX = SECTOR(1) - radius - xPos;
 				else
 					shiftZ = SECTOR(1) - radius - zPos;
@@ -582,7 +582,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (shiftX || shiftZ)
 	{
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-		item->Pose.Orientation.y += angle;
+		item->Orientation.y += angle;
 
 		if (tilt)
 			CreatureTilt(item, (tilt * 2));
@@ -597,11 +597,11 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	if (biffAngle)
 	{
 		if (abs(biffAngle) < BIFF_AVOID_TURN)
-			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
+			item->Orientation.y -= BIFF_AVOID_TURN;
 		else if (biffAngle > 0)
-			item->Pose.Orientation.y -= BIFF_AVOID_TURN;
+			item->Orientation.y -= BIFF_AVOID_TURN;
 		else
-			item->Pose.Orientation.y += BIFF_AVOID_TURN;
+			item->Orientation.y += BIFF_AVOID_TURN;
 
 		return true;
 	}
@@ -664,18 +664,18 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, y, item->Pose.Position.z);
  
-		angle = (item->Animation.Velocity) ? phd_atan(item->Animation.Velocity, -dy) : 0;
-		if (angle < -ANGLE(20.0f))
-			angle = -ANGLE(20.0f);
-		else if (angle > ANGLE(20.0f))
-			angle = ANGLE(20.0f);
+		angle = (item->Animation.Velocity) ? atan2(item->Animation.Velocity, -dy) : 0;
+		if (angle < EulerAngle::DegToRad(-20.0f))
+			angle = EulerAngle::DegToRad(-20.0f);
+		else if (angle > EulerAngle::DegToRad(20.0f))
+			angle = EulerAngle::DegToRad(20.0f);
 
-		if (angle < item->Pose.Orientation.x - ANGLE(1.0f))
-			item->Pose.Orientation.x -= ANGLE(1.0f);
-		else if (angle > item->Pose.Orientation.x + ANGLE(1.0f))
-			item->Pose.Orientation.x += ANGLE(1.0f);
+		if (angle < item->Orientation.x - EulerAngle::DegToRad(1.0f))
+			item->Orientation.x -= EulerAngle::DegToRad(1.0f);
+		else if (angle > item->Orientation.x + EulerAngle::DegToRad(1.0f))
+			item->Orientation.x += EulerAngle::DegToRad(1.0f);
 		else
-			item->Pose.Orientation.x = angle;
+			item->Orientation.x = angle;
 	}
 	else if (LOT->IsJumping)
 	{
@@ -730,7 +730,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		else if (item->Pose.Position.y < item->Floor)
 			item->Pose.Position.y = item->Floor;
 
-		item->Pose.Orientation.x = 0;
+		item->Orientation.x = 0;
 	}
 
 	/*roomNumber = item->roomNumber;
@@ -825,7 +825,7 @@ int CreatureCreature(short itemNumber)
 				distance = xDistance + (zDistance >> 1);
 
 			if (distance < radius + Objects[linked->ObjectNumber].radius)
-				return phd_atan(linked->Pose.Position.z - z, linked->Pose.Position.x - x) - item->Pose.Orientation.y;
+				return atan2(linked->Pose.Position.z - z, linked->Pose.Position.x - x) - item->Orientation.y;
 		}
 
 		link = linked->NextItem;
@@ -1077,7 +1077,7 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 	if (x > xRange || x < -xRange || z > zRange || z < -zRange)
 		return false;
 
-	int enemyQuad = (enemy->Pose.Orientation.y / ANGLE(90.0f)) + 2;
+	int enemyQuad = (enemy->Orientation.y / EulerAngle::DegToRad(90.0f)) + 2;
 	
 	int boxQuad;
 	if (z > 0)
@@ -1152,12 +1152,12 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 		if (xBlock < newXblock)
 		{
 			item->Pose.Position.x = (newXblock * SECTOR(1)) - shift;
-			item->Pose.Orientation.y = ANGLE(90.0f);
+			item->Orientation.y = EulerAngle::DegToRad(90.0f);
 		}
 		else
 		{
 			item->Pose.Position.x = (xBlock * SECTOR(1)) + shift;
-			item->Pose.Orientation.y = -ANGLE(90.0f);
+			item->Orientation.y = EulerAngle::DegToRad(-90.0f);
 		}
 	}
 	else if (xBlock == newXblock)
@@ -1165,12 +1165,12 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 		if (zBlock < newZblock)
 		{
 			item->Pose.Position.z = (newZblock * SECTOR(1)) - shift;
-			item->Pose.Orientation.y = 0;
+			item->Orientation.y = 0;
 		}
 		else
 		{
 			item->Pose.Position.z = (zBlock * SECTOR(1)) + shift;
-			item->Pose.Orientation.y = -ANGLE(180.0f);
+			item->Orientation.y = EulerAngle::DegToRad(-180.0f);
 		}
 	}
 
@@ -1304,7 +1304,7 @@ void FindAITarget(CreatureInfo* creature, short objectNumber)
 	{
 		if (targetItem->ObjectNumber == objectNumber && targetItem->RoomNumber != NO_ROOM)
 		{
-			if (SameZone(creature, targetItem) && targetItem->Pose.Orientation.y == item->ItemFlags[3])
+			if (SameZone(creature, targetItem) && targetItem->Orientation.y == item->ItemFlags[3])
 			{
 				creature->Enemy = targetItem;
 				break;
@@ -1357,15 +1357,15 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 			aiItem->Pose.Position.x = foundObject->x;
 			aiItem->Pose.Position.y = foundObject->y;
 			aiItem->Pose.Position.z = foundObject->z;
-			aiItem->Pose.Orientation.y = foundObject->yRot;
+			aiItem->Orientation.y = foundObject->yRot;
 			aiItem->Flags = foundObject->flags;
 			aiItem->TriggerFlags = foundObject->triggerFlags;
 			aiItem->BoxNumber = foundObject->boxNumber;
 
 			if (!(creature->AITarget->Flags & 32))
 			{
-				creature->AITarget->Pose.Position.x += phd_sin(creature->AITarget->Pose.Orientation.y) * 256;
-				creature->AITarget->Pose.Position.z += phd_cos(creature->AITarget->Pose.Orientation.y) * 256;
+				creature->AITarget->Pose.Position.x += sin(creature->AITarget->Orientation.y) * 256;
+				creature->AITarget->Pose.Position.z += cos(creature->AITarget->Orientation.y) * 256;
 			}
 		}
 	}
@@ -1422,17 +1422,17 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 
 	if (enemy == LaraItem)
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * sin(item->Orientation.y);
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * cos(item->Orientation.y);
 	}
 	else
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_sin(enemy->Pose.Orientation.y) - item->Pose.Position.x - object->pivotLength * phd_sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * phd_cos(enemy->Pose.Orientation.y) - item->Pose.Position.z - object->pivotLength * phd_cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * sin(enemy->Orientation.y) - item->Pose.Position.x - object->pivotLength * sin(item->Orientation.y);
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * cos(enemy->Orientation.y) - item->Pose.Position.z - object->pivotLength * cos(item->Orientation.y);
 	}
 
 	vector.y = item->Pose.Position.y - enemy->Pose.Position.y;
-	short angle = phd_atan(vector.z, vector.x);
+	short angle = atan2(vector.z, vector.x);
 
 	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
 		AI->distance = INT_MAX;
@@ -1444,8 +1444,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 			AI->distance = INT_MAX;
 	}
 
-	AI->angle = angle - item->Pose.Orientation.y;
-	AI->enemyFacing = ANGLE(180.0f) + angle - enemy->Pose.Orientation.y;
+	AI->angle = angle - item->Orientation.y;
+	AI->enemyFacing = EulerAngle::DegToRad(180.0f) + angle - enemy->Orientation.y;
 
 	vector.x = abs(vector.x);
 	vector.z = abs(vector.z);
@@ -1455,9 +1455,9 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 		vector.y -= STEPUP_HEIGHT;
 
 	if (vector.x > vector.z)
-		AI->xAngle = phd_atan(vector.x + (vector.z >> 1), vector.y);
+		AI->xAngle = atan2(vector.x + (vector.z >> 1), vector.y);
 	else
-		AI->xAngle = phd_atan(vector.z + (vector.x >> 1), vector.y);
+		AI->xAngle = atan2(vector.z + (vector.x >> 1), vector.y);
 
 	AI->ahead = (AI->angle > -FRONT_ARC && AI->angle < FRONT_ARC);
 	AI->bite = (AI->ahead && enemy->HitPoints > 0 && abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(2));
@@ -1969,8 +1969,8 @@ void AdjustStopperFlag(ITEM_INFO* item, int direction, bool set)
 	FLOOR_INFO* floor = GetSector(room, x - room->x, z - room->z);
 	floor->Stopper = set;
 
-	x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
-	z = item->Pose.Position.z + SECTOR(1) * phd_cos(direction);
+	x = item->Pose.Position.x + SECTOR(1) * sin(direction);
+	z = item->Pose.Position.z + SECTOR(1) * cos(direction);
 	room = &g_Level.Rooms[GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).RoomNumber];
 
 	floor = GetSector(room, x - room->x, z - room->z);

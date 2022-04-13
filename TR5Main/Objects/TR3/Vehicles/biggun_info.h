@@ -2,10 +2,10 @@
 
 struct BigGunInfo
 {
-	Vector3Shrt Rotation;
-	short BarrelZRotation;
-	short StartYRot;
-	long GunRotYAdd;
+	EulerAngle Orientation;
+	float BarrelZRotation;
+	float StartYRot;
+	float GunRotYAdd;
 
 	unsigned int FireCount;
 	bool BarrelRotating;

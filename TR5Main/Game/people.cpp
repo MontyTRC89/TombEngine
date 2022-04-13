@@ -22,7 +22,7 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation,
 
 	if (AI->distance <= pow(MAX_VISIBILITY_DISTANCE, 2) && Targetable(item, AI))
 	{
-		int distance = phd_sin(AI->enemyFacing) * enemy->Animation.Velocity * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
+		int distance = sin(AI->enemyFacing) * enemy->Animation.Velocity * pow(MAX_VISIBILITY_DISTANCE, 2) / 300;
 		distance = pow(distance, 2) + AI->distance;
 		if (distance <= pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
@@ -67,7 +67,7 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation,
 
 				Vector3Int pos = { 0, 0, 0 };
 				GetJointAbsPosition(enemy, &pos, random);
-				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.y, enemy->RoomNumber);
+				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Orientation.y, enemy->RoomNumber);
 			}
 		}
 	}
@@ -95,7 +95,7 @@ short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	Vector3Int pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
-	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Orientation.y, LaraItem->RoomNumber);
 	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
 
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
@@ -143,7 +143,7 @@ bool TargetVisible(ITEM_INFO* item, AI_INFO* AI)
 	if (enemy != NULL)
 	{
 		short angle = AI->angle - creature->JointRotation[2];
-		if (enemy->HitPoints != 0 && angle > -ANGLE(45.0f) && angle < ANGLE(45.0f) && AI->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
+		if (enemy->HitPoints != 0 && angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(45.0f) && AI->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
 			GameVector start;
 			start.x = item->Pose.Position.x;

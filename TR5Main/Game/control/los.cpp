@@ -130,8 +130,8 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
 					}
 
-					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
-					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Orientation.y, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Orientation.y, 3, 0);
 				}
 				else
 				{
@@ -147,7 +147,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 							ShatterImpactData.impactDirection = direction;
 							ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 							ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
-							TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+							TriggerRicochetSpark(&target, LaraItem->Orientation.y, 3, 0);
 							/*}
 							else
 							{
@@ -160,8 +160,8 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 								}
 								else
 								{
-									angle = phd_atan(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
-									if (angle > -ANGLE(90) && angle < ANGLE(90))
+									angle = atan2(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
+									if (angle > EulerAngle::DegToRad(-90) && angle < EulerAngle::DegToRad(90))
 									{
 										item->HitPoints = 0;
 										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
@@ -180,7 +180,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 								{
 									// TR5
 									if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+										TriggerRicochetSpark(&target, LaraItem->Orientation.y, 3, 0);
 								}
 							}
 							else
@@ -190,11 +190,11 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 								else
 								{
 									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
-										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
+										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Orientation.y, item->RoomNumber);
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
-										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, -5);
+										TriggerRicochetSpark(&target, LaraItem->Orientation.y, 3, -5);
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+										TriggerRicochetSpark(&target, LaraItem->Orientation.y, 3, 0);
 									
 									item->HitStatus = true;
 									if (!Objects[item->ObjectNumber].undead)
@@ -251,7 +251,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 							}
 						}
 
-						TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+						TriggerRicochetSpark(&target, LaraItem->Orientation.y, 3, 0);
 					}
 				}
 			}
@@ -278,7 +278,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 			target.z -= target.z - src->z >> 5;
 
 			if (firing && !result)
-				TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 8, 0);
+				TriggerRicochetSpark(&target, LaraItem->Orientation.y, 8, 0);
 		}
 	}
 
@@ -344,7 +344,7 @@ int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO*
 			pos.Position.x = item->Pose.Position.x;
 			pos.Position.y = item->Pose.Position.y;
 			pos.Position.z = item->Pose.Position.z;
-			pos.Orientation.y = item->Pose.Orientation.y;
+			pos.Orientation.y = item->Orientation.y;
 
 			if (DoRayBox(start, end, box, &pos, vec, linknum))
 				end->roomNumber = LosRooms[r];
@@ -527,7 +527,7 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* 
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 
-		ShatterItem.yRot = item->Pose.Orientation.y;
+		ShatterItem.yRot = item->Orientation.y;
 		ShatterItem.meshIndex = meshIndex;
 		ShatterItem.sphere.x = CreatureSpheres[sp].x;
 		ShatterItem.sphere.y = CreatureSpheres[sp].y;

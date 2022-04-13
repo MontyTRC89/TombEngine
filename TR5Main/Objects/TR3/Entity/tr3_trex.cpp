@@ -33,9 +33,9 @@ void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 	laraItem->Pose.Position.x = tRexItem->Pose.Position.x;
 	laraItem->Pose.Position.y = tRexItem->Pose.Position.y;
 	laraItem->Pose.Position.z = tRexItem->Pose.Position.z;
-	laraItem->Pose.Orientation.x = 0;
-	laraItem->Pose.Orientation.y = tRexItem->Pose.Orientation.y;
-	laraItem->Pose.Orientation.z = 0;
+	laraItem->Orientation.x = 0;
+	laraItem->Orientation.y = tRexItem->Orientation.y;
+	laraItem->Orientation.z = 0;
 	laraItem->Animation.Airborne = false;
 
 	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
@@ -49,8 +49,8 @@ void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 	Lara.Control.Weapon.GunType = LaraWeaponType::None;
 
 	Camera.flags = 1;
-	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(170.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 }
 
 void TRexControl(short itemNumber)
@@ -110,7 +110,7 @@ void TRexControl(short itemNumber)
 			break;
 
 		case 2:
-			info->MaxTurn = ANGLE(2.0f);
+			info->MaxTurn = EulerAngle::DegToRad(2.0f);
 
 			if (info->Mood != MoodType::Bored || !info->Flags)
 				item->Animation.TargetState = 1;
@@ -123,7 +123,7 @@ void TRexControl(short itemNumber)
 			break;
 
 		case 3:
-			info->MaxTurn = ANGLE(4.0f);
+			info->MaxTurn = EulerAngle::DegToRad(4.0f);
 
 			if (AI.distance < pow(SECTOR(5), 2) && AI.bite)
 				item->Animation.TargetState = 1;

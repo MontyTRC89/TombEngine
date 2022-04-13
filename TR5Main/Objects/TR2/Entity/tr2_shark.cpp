@@ -59,7 +59,7 @@ void SharkControl(short itemNumber)
 			break;
 
 		case 1:
-			info->MaxTurn = ANGLE(0.5f);
+			info->MaxTurn = EulerAngle::DegToRad(0.5f);
 
 			if (info->Mood == MoodType::Bored)
 				break;
@@ -71,7 +71,7 @@ void SharkControl(short itemNumber)
 			break;
 
 		case 2:
-			info->MaxTurn = ANGLE(2.0f);
+			info->MaxTurn = EulerAngle::DegToRad(2.0f);
 			info->Flags = 0;
 
 			if (info->Mood == MoodType::Bored)

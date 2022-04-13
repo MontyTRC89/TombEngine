@@ -115,7 +115,7 @@ void TroopsControl(short itemNumber)
 					angle = 0;
 
 					item->Pose.Position = creature->Enemy->Pose.Position;
-					item->Pose.Orientation = creature->Enemy->Pose.Orientation;
+					item->Orientation = creature->Enemy->Orientation;
 
 					creature->Enemy->TriggerFlags = 99;
 				}
@@ -192,7 +192,7 @@ void TroopsControl(short itemNumber)
 			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			distance = pow(dx, 2) + pow(dz, 2);
-			rot = phd_atan(dz, dx) - item->Pose.Orientation.y;
+			rot = atan2(dz, dx) - item->Orientation.y;
 		}
 
 		if (!creature->HurtByLara && creature->Enemy == LaraItem)
@@ -219,15 +219,15 @@ void TroopsControl(short itemNumber)
 
 			if (item->Animation.AnimNumber == object->animIndex + 17)
 			{
-				if (abs(AI.angle) >= ANGLE(10.0f))
+				if (abs(AI.angle) >= EulerAngle::DegToRad(10.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(10.0f);
+						item->Orientation.y += EulerAngle::DegToRad(10.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(10.0f);
+						item->Orientation.y -= EulerAngle::DegToRad(10.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 			}
 
 			if (item->AIBits & GUARD)
@@ -284,7 +284,7 @@ void TroopsControl(short itemNumber)
 			break;
 
 		case TROOP_STATE_WALK:
-			creature->MaxTurn = ANGLE(5.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(5.0f);
 			creature->Flags = 0;
 			joint2 = rot;
 
@@ -320,7 +320,7 @@ void TroopsControl(short itemNumber)
 			break;
 
 		case TROOP_STATE_RUN:
-			creature->MaxTurn = ANGLE(10.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(10.0f);
 			tilt = angle / 2;
 
 			if (AI.ahead)

@@ -365,7 +365,7 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	MoveItem(item, item->Pose.Orientation.y, item->Animation.Velocity, lateral);
+	MoveItem(item, item->Orientation.y, item->Animation.Velocity, lateral);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
@@ -415,12 +415,12 @@ bool TestLastFrame(ITEM_INFO* item, int animNumber)
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	float sinY = sin(item->Orientation.y);
+	float cosY = cos(item->Orientation.y);
 
-	item->Pose.Position.x += round(c * x + s * z);
+	item->Pose.Position.x += (int)round(cosY * x + sinY * z);
 	item->Pose.Position.y += y;
-	item->Pose.Position.z += round(-s * x + c * z);
+	item->Pose.Position.z += (int)round(-sinY * x + cosY * z);
 }
 
 void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)

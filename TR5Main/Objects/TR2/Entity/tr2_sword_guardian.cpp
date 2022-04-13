@@ -141,7 +141,7 @@ void SwordGuardianControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(9.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(9.0f);
 
 			if (AI.ahead)
 				head = AI.angle;
@@ -197,7 +197,7 @@ void SwordGuardianControl(short itemNumber)
 			break;
 
 		case 8:
-			creature->MaxTurn = ANGLE(7.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 			SwordGuardianFly(item);
 
 			if (AI.ahead)

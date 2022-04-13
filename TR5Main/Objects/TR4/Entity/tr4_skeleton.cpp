@@ -54,9 +54,9 @@ namespace TEN::Entities::TR4
 			spark->x = fx->pos.Position.x;
 			spark->y = fx->pos.Position.y;
 			spark->z = fx->pos.Position.z;
-			spark->xVel = phd_sin(fx->pos.Orientation.y) * 4096;
+			spark->xVel = sin(fx->pos.Orientation.y) * 4096;
 			spark->yVel = 0;
-			spark->zVel = phd_cos(fx->pos.Orientation.y) * 4096;
+			spark->zVel = cos(fx->pos.Orientation.y) * 4096;
 			spark->transType = TransTypeEnum::COLADD;
 			spark->friction = 68;
 			spark->flags = 26;
@@ -141,8 +141,8 @@ namespace TEN::Entities::TR4
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
 
-		int dx = 870 * phd_sin(item->Pose.Orientation.y);
-		int dz = 870 * phd_cos(item->Pose.Orientation.y);
+		int dx = 870 * sin(item->Orientation.y);
+		int dz = 870 * cos(item->Orientation.y);
 
 		x += dx;
 		z += dz;
@@ -194,17 +194,17 @@ namespace TEN::Entities::TR4
 			item->Animation.ActiveState != SKELETON_STATE_HURT_BY_SHOTGUN_2 &&
 			item->Animation.ActiveState != 25)
 		{
-			if (AI.angle >= ANGLE(67.5f) || AI.angle <= -ANGLE(67.5f))
+			if (AI.angle >= EulerAngle::DegToRad(67.5f) || AI.angle <= EulerAngle::DegToRad(-67.5f))
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_2;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
-				item->Pose.Orientation.y += AI.angle + -32768;
+				item->Orientation.y += AI.angle + -32768;
 			}
 			else
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_1;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 17;
-				item->Pose.Orientation.y += AI.angle;
+				item->Orientation.y += AI.angle;
 			}
 
 			item->HitPoints = 25;
@@ -223,7 +223,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -249,23 +249,23 @@ namespace TEN::Entities::TR4
 
 			creature->Enemy = tempEnemy;
 
-			if (item != Lara.TargetEntity || laraAI.distance <= 870 || angle <= -ANGLE(56.25f) || angle >= ANGLE(56.25f))
+			if (item != Lara.TargetEntity || laraAI.distance <= 870 || angle <= EulerAngle::DegToRad(-56.25f) || angle >= EulerAngle::DegToRad(56.25f))
 			{
 				jumpLeft = false;
 				jumpRight = false;
 			}
 			else
 			{
-				dx = 870 * phd_sin(item->Pose.Orientation.y + ANGLE(45.0f));
-				dz = 870 * phd_cos(item->Pose.Orientation.y + ANGLE(45.0f));
+				dx = 870 * sin(item->Orientation.y + EulerAngle::DegToRad(45.0f));
+				dz = 870 * cos(item->Orientation.y + EulerAngle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * phd_sin(item->Pose.Orientation.y + ANGLE(78.75f));
-				dz = 870 * phd_cos(item->Pose.Orientation.y + ANGLE(78.75f));
+				dx = 870 * sin(item->Orientation.y + EulerAngle::DegToRad(78.75f));
+				dz = 870 * cos(item->Orientation.y + EulerAngle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -282,16 +282,16 @@ namespace TEN::Entities::TR4
 						jumpRight = false;
 				}
 
-				dx = 870 * phd_sin(item->Pose.Orientation.y - ANGLE(45.0f));
-				dz = 870 * phd_cos(item->Pose.Orientation.y - ANGLE(45.0f));
+				dx = 870 * sin(item->Orientation.y - EulerAngle::DegToRad(45.0f));
+				dz = 870 * cos(item->Orientation.y - EulerAngle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * phd_sin(item->Pose.Orientation.y - ANGLE(78.75f));
-				dz = 870 * phd_cos(item->Pose.Orientation.y - ANGLE(78.75f));
+				dx = 870 * sin(item->Orientation.y - EulerAngle::DegToRad(78.75f));
+				dz = 870 * cos(item->Orientation.y - EulerAngle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -314,7 +314,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 2:
-				creature->MaxTurn = (creature->Mood != MoodType::Escape) ? ANGLE(2.0f) : 0;
+				creature->MaxTurn = (creature->Mood != MoodType::Escape) ? EulerAngle::DegToRad(2.0f) : 0;
 				creature->LOT.IsJumping = false;
 				creature->Flags = 0;
 
@@ -481,7 +481,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 16:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 				creature->LOT.IsJumping = false;
 
 				if (item->AIBits & GUARD || canJump1sector || canJump2sectors)
@@ -531,12 +531,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(6.0f);
+						item->Orientation.y += EulerAngle::DegToRad(6.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(6.0f);
+						item->Orientation.y -= EulerAngle::DegToRad(6.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 
 				if (!creature->Flags)
 				{
@@ -563,12 +563,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(6.0f);
+						item->Orientation.y += EulerAngle::DegToRad(6.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(6.0f);
+						item->Orientation.y -= EulerAngle::DegToRad(6.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
@@ -600,7 +600,7 @@ namespace TEN::Entities::TR4
 					{
 						if (item->TouchBits & 0x18000)
 						{
-							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+							CreatureEffect2(item, &SkeletonBite, 10, item->Orientation.y, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 							creature->Flags = 1;
 

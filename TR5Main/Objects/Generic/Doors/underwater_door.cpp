@@ -28,9 +28,9 @@ namespace TEN::Entities::Doors
 		-256, 256, 
 		-1024, 0, 
 		-1024, 0, 
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f),
-		-ANGLE(80.0f), ANGLE(80.0f)
+		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
+		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
+		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f)
 	};
 
 	void UnderwaterDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
@@ -45,7 +45,7 @@ namespace TEN::Entities::Doors
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
+			laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 
 			if (TestLaraPosition(&UnderwaterDoorBounds, doorItem, laraItem))
 			{
@@ -67,7 +67,7 @@ namespace TEN::Entities::Doors
 				else
 					laraInfo->InteractedItem = itemNumber;
 
-				laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
+				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 			}
 			else
 			{
@@ -77,7 +77,7 @@ namespace TEN::Entities::Doors
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Pose.Orientation.y ^= ANGLE(180.0f);
+				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 			}
 		}
 		else if (doorItem->Status == ITEM_ACTIVE)

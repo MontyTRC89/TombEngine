@@ -1,4 +1,5 @@
 #pragma once
+#include "Specific/EulerAngle.h"
 #include "Specific/phd_global.h"
 #include "Specific/trmath.h"
 
@@ -70,7 +71,7 @@ struct CollisionSetup
 	CollisionProbeMode Mode;	// Probe rotation mode
 	int   Radius;				// Collision bounds horizontal size
 	int   Height;				// Collision bounds vertical size
-	short ForwardAngle;			// Forward angle direction
+	float ForwardAngle;			// Forward angle direction
 
 	int LowerFloorBound;		// Borderline floor step-up height 
 	int UpperFloorBound;		// Borderline floor step-down height
@@ -108,7 +109,7 @@ struct CollisionInfo
 	CollisionType CollisionType;
 	Vector2 FloorTilt;				// x = x, y = z
 	Vector2 CeilingTilt;			// x = x, y = z
-	short NearestLedgeAngle;
+	float NearestLedgeAngle;
 	float NearestLedgeDistance;
 
 	bool HitStatic;
@@ -116,18 +117,18 @@ struct CollisionInfo
 
 	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
 	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
-	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90.0f)); }
-	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f)); }
+	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && fmod(NearestLedgeAngle, EulerAngle::DegToRad(90.0f)); }
+	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && fmod(NearestLedgeAngle, EulerAngle::DegToRad(90.0f)); }
 };
 
-CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int height = 0, int side = 0);
+CollisionResult GetCollision(ITEM_INFO* item, float angle, int distance, int height = 0, int side = 0);
 CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ITEM_INFO* item);
 
 void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom = false);
-int   GetQuadrant(short angle);
+int   GetQuadrant(float angle);
 short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);
 
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
@@ -145,15 +146,15 @@ int GetWaterHeight(ITEM_INFO* item);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ITEM_INFO* item, CollisionInfo* coll);
-void MoveItem(ITEM_INFO* item, short angle, int x, int z = 0);
+void MoveItem(ITEM_INFO* item, float angle, int x, int z = 0);
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll);
 
 void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
 
-short GetSurfaceAspectAngle(float xTilt, float zTilt);
-short GetSurfaceSteepnessAngle(float xTilt, float zTilt);
+float GetSurfaceAspectAngle(float xTilt, float zTilt);
+float GetSurfaceSteepnessAngle(float xTilt, float zTilt);
 
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);

@@ -20,9 +20,9 @@ static OBJECT_COLLISION_BOUNDS PushableBlockBounds =
 	0, 0,
 	-64, 0,
 	0, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 };
 
 int DoPushPull = 0;
@@ -130,7 +130,7 @@ void PushableBlockControl(short itemNumber)
 
 	Vector3Int pos = { 0, 0, 0 };
 
-	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
+	short quadrant = (unsigned short)(LaraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
 
 	int x, z;
 	int blockHeight = GetStackHeight(item);
@@ -405,7 +405,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			return;
 		}
 
-		short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
+		short quadrant = (unsigned short)(LaraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
 
 		bool quadrantDisabled = false;
 		switch (quadrant)
@@ -471,12 +471,12 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
 		PushableBlockBounds.boundingBox.Z2 = 0;
 
-		short rot = pushableItem->Pose.Orientation.y;
-		pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + ANGLE(45.0f)) & 0xC000;
+		short rot = pushableItem->Orientation.y;
+		//pushableItem->Orientation.y = (laraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) & 0xC000;
 
 		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
 		{
-			unsigned short quadrant = (unsigned short)((pushableItem->Pose.Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
+			unsigned short quadrant = (unsigned short)((pushableItem->Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
 			if (quadrant & 1)
 				PushableBlockPos.z = bounds->X1 - 35;
 			else
@@ -486,9 +486,9 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			{					
 				// For now don't use auto-align function because it can collide with climb up moves of Lara
 
-				laraItem->Pose.Orientation.x = pushableItem->Pose.Orientation.x;
-				laraItem->Pose.Orientation.y = pushableItem->Pose.Orientation.y;
-				laraItem->Pose.Orientation.z = pushableItem->Pose.Orientation.z;
+				laraItem->Orientation.x = pushableItem->Orientation.x;
+				laraItem->Orientation.y = pushableItem->Orientation.y;
+				laraItem->Orientation.z = pushableItem->Orientation.z;
 
 				laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -497,7 +497,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->NextCornerPos.Position.x = itemNumber;
-				pushableItem->Pose.Orientation.y = rot;
+				pushableItem->Orientation.y = rot;
 			}
 			else
 			{
@@ -510,12 +510,12 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					laraInfo->NextCornerPos.Position.x = itemNumber;
-					pushableItem->Pose.Orientation.y = rot;
+					pushableItem->Orientation.y = rot;
 				}
 				else
 				{
 					laraInfo->InteractedItem = itemNumber;
-					pushableItem->Pose.Orientation.y = rot;
+					pushableItem->Orientation.y = rot;
 				}
 			}
 		}
@@ -527,7 +527,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 				laraInfo->Control.HandStatus = HandStatus::Free;
 			}
 
-			pushableItem->Pose.Orientation.y = rot;
+			pushableItem->Orientation.y = rot;
 		}
 	}
 }

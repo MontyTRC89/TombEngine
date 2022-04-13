@@ -165,13 +165,13 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 	{
 		auto* fx = &EffectList[effectNumber];
 
-		Vector3Int pos1 = { bite->x, bite->y, bite->z };
+		auto pos1 = Vector3Int(bite->x, bite->y, bite->z);
 		GetJointAbsPosition(item, &pos1, bite->meshNum);
 
-		Vector3Int pos2 = { bite->x, bite->y / 2, bite->z };
+		auto pos2 = Vector3Int(bite->x, bite->y / 2, bite->z);
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
-		short angles[2];
+		float angles[2];
 		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
 		fx->pos.Position.x = pos1.x;
@@ -195,19 +195,19 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 		for (int i = 0; i < 2; i++)
 		{
 			speed = (GetRandomControl() % (speed * 4)) + 32;
-			velocity = speed * phd_cos(fx->pos.Orientation.x);
+			velocity = speed * cos(fx->pos.Orientation.x);
 
-			xv = velocity * phd_sin(fx->pos.Orientation.y);
-			yv = -speed * phd_sin(fx->pos.Orientation.x);
-			zv = velocity * phd_cos(fx->pos.Orientation.y);
+			xv = velocity * sin(fx->pos.Orientation.y);
+			yv = -speed * sin(fx->pos.Orientation.x);
+			zv = velocity * cos(fx->pos.Orientation.y);
 
 			TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -1);
 		}
 
-		velocity = (speed * 2) * phd_cos(fx->pos.Orientation.x);
-		zv = velocity * phd_cos(fx->pos.Orientation.y);
-		xv = velocity * phd_sin(fx->pos.Orientation.y);
-		yv = -(speed * 2) * phd_sin(fx->pos.Orientation.x);
+		velocity = (speed * 2) * cos(fx->pos.Orientation.x);
+		zv = velocity * cos(fx->pos.Orientation.y);
+		xv = velocity * sin(fx->pos.Orientation.y);
+		yv = -(speed * 2) * sin(fx->pos.Orientation.x);
 
 		TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -2);
 	}
@@ -302,7 +302,7 @@ void FlameThrowerControl(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y; 
+			laraAI.angle = atan2(dz, dz) - item->Orientation.y; 
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			
 			AI.xAngle -= 0x800;
@@ -382,7 +382,7 @@ void FlameThrowerControl(short itemNumber)
 
 		case 2:
 			creature->Flags = 0;
-			creature->MaxTurn = ANGLE(5.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(5.0f);
 			head = laraAI.angle;
 
 			if (item->AIBits & GUARD)

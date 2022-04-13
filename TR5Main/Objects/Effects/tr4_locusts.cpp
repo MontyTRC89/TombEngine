@@ -30,7 +30,7 @@ namespace TEN::Entities::TR4
 	void SpawnLocust(ITEM_INFO* item)
 	{
 		Vector3Int start, end;
-		short angles[2];
+		float angles[2];
 
 	   short locustNumber = CreateLocust();
 		if (locustNumber != NO_ITEM)
@@ -43,7 +43,7 @@ namespace TEN::Entities::TR4
 				end.x = item->Pose.Position.x;
 				end.y = item->Pose.Position.y;
 				end.z = item->Pose.Position.z;
-				angles[0] = item->Pose.Orientation.y - ANGLE(180.0f);
+				angles[0] = item->Orientation.y - EulerAngle::DegToRad(180.0f);
 				angles[1] = 0;
 			}
 			// Mutant.
@@ -82,16 +82,16 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Pose.Orientation.y > 0)
+		if (item->Orientation.y > 0)
 		{
-			if (item->Pose.Orientation.y == ANGLE(90.0f))
+			if (item->Orientation.y == EulerAngle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
 		}
-		else if (item->Pose.Orientation.y < 0)
+		else if (item->Orientation.y < 0)
 		{
-			if (item->Pose.Orientation.y == -ANGLE(180.0f))
+			if (item->Orientation.y == EulerAngle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(2);
-			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
+			else if (item->Orientation.y == EulerAngle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(2);
 		}
 		else
@@ -116,7 +116,7 @@ namespace TEN::Entities::TR4
 
 	void UpdateLocusts(void)
 	{
-		short angles[2];
+		float angles[2];
 
 		for (int i = 0; i < MAX_LOCUSTS; i++)
 		{
@@ -176,12 +176,12 @@ namespace TEN::Entities::TR4
 					int random = locust->randomRotation * 128;
 					resultYrot = angles[0] - locust->pos.Orientation.y;
 
-					if (abs(resultYrot) > ANGLE(180.0f))
+					if (abs(resultYrot) > EulerAngle::DegToRad(180.0f))
 						resultYrot = locust->pos.Orientation.y - angles[0];
 
 					resultXrot = angles[1] - locust->pos.Orientation.x;
 
-					if (abs(resultXrot) > ANGLE(180.0f))
+					if (abs(resultXrot) > EulerAngle::DegToRad(180.0f))
 						resultXrot = locust->pos.Orientation.x - angles[0];
 
 					shiftYrot = resultYrot / 8;
@@ -197,9 +197,9 @@ namespace TEN::Entities::TR4
 					locust->pos.Orientation.x += shiftXrot;
 				}
 
-				locust->pos.Position.x += locust->randomRotation * phd_cos(locust->pos.Orientation.x) * phd_sin(locust->pos.Orientation.y);
-				locust->pos.Position.y += locust->randomRotation * phd_sin(-locust->pos.Orientation.x);
-				locust->pos.Position.z += locust->randomRotation * phd_cos(locust->pos.Orientation.x) * phd_cos(locust->pos.Orientation.y);
+				locust->pos.Position.x += locust->randomRotation * cos(locust->pos.Orientation.x) * sin(locust->pos.Orientation.y);
+				locust->pos.Position.y += locust->randomRotation * sin(-locust->pos.Orientation.x);
+				locust->pos.Position.z += locust->randomRotation * cos(locust->pos.Orientation.x) * cos(locust->pos.Orientation.y);
 				if (ItemNearTarget(&locust->pos, LaraItem, CLICK(1) / 2))
 				{
 					TriggerBlood(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 2 * GetRandomControl(), 2);

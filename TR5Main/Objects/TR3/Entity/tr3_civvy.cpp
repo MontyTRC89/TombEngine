@@ -40,8 +40,8 @@ enum CivvyAnim
 
 };
 
-#define CIVVY_WALK_TURN ANGLE(5)
-#define CIVVY_RUN_TURN ANGLE(6)
+#define CIVVY_WALK_TURN EulerAngle::DegToRad(5)
+#define CIVVY_RUN_TURN EulerAngle::DegToRad(6)
 #define CIVVY_HIT_DAMAGE 40
 #define CIVVY_SWIPE_DAMAGE 50
 #define CIVVY_ATTACK0_RANGE pow(SECTOR(3), 2)
@@ -122,7 +122,7 @@ void CivvyControl(short itemNumber)
 		{
 			int laraDz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			int laraDx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			laraAiInfo.angle = phd_atan(laraDz, laraDx) - item->Pose.Orientation.y;
+			laraAiInfo.angle = atan2(laraDz, laraDx) - item->Orientation.y;
 			laraAiInfo.distance = pow(laraDx, 2) + pow(laraDz, 2);
 		}
 

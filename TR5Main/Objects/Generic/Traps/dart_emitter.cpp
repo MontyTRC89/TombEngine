@@ -18,7 +18,7 @@ namespace TEN::Entities::Traps
 			LaraItem->HitPoints -= 25;
 			LaraItem->HitStatus = true;
 			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
-			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Orientation.y, LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}
 		else
@@ -26,11 +26,11 @@ namespace TEN::Entities::Traps
 			int oldX = item->Pose.Position.x;
 			int oldZ = item->Pose.Position.z - 1000;
 
-			int velocity = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
+			int velocity = item->Animation.Velocity * cos(item->Orientation.x);
 
-			item->Pose.Position.x += velocity * phd_sin(item->Pose.Orientation.y);
-			item->Pose.Position.y -= item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
-			item->Pose.Position.z += velocity * phd_cos(item->Pose.Orientation.y);
+			item->Pose.Position.x += velocity * sin(item->Orientation.y);
+			item->Pose.Position.y -= item->Animation.Velocity * sin(item->Orientation.x);
+			item->Pose.Position.z += velocity * cos(item->Orientation.y);
 
 			short roomNumber = item->RoomNumber;
 			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -78,24 +78,24 @@ namespace TEN::Entities::Traps
 			int x = 0;
 			int z = 0;
 
-			switch (item->Pose.Orientation.y)
+			/*switch (item->Orientation.y)
 			{
 			case 0:
 				z = WALL_SIZE / 2;
 				break;
 
-			case 0x4000:
+			case EulerAngle::DegToRad(90.0f):
 				x = WALL_SIZE / 2;
 				break;
 
-			case -0x8000:
+			case EulerAngle::DegToRad(-180.0f):
 				z = -WALL_SIZE / 2;
 				break;
 
-			case -0x4000:
+			case EulerAngle::DegToRad(-90.0f):
 				x = -WALL_SIZE / 2;
 				break;
-			}
+			}*/
 
 			dartItem->Pose.Position.x = x + item->Pose.Position.x;
 			dartItem->Pose.Position.y = item->Pose.Position.y - WALL_SIZE / 2;
@@ -103,8 +103,8 @@ namespace TEN::Entities::Traps
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->Pose.Orientation.x = 0;
-			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180);
+			dartItem->Orientation.x = 0;
+			dartItem->Orientation.y = item->Orientation.y + EulerAngle::DegToRad(-180);
 			dartItem->Animation.Velocity = 256;
 
 			int xf = 0;

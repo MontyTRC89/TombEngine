@@ -204,8 +204,8 @@ namespace TEN
 				s = {};
 				s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
 
-				float xVel = std::sin(TO_RAD(angle)) * velocity;
-				float zVel = std::cos(TO_RAD(angle)) * velocity;
+				float xVel = sin(angle) * velocity;
+				float zVel = cos(angle) * velocity;
 
 				s.velocity = Vector3(xVel, GenerateFloat(-1, 4), zVel);
 				s.sourceColor = Vector4(1, 1, 1, 1);
@@ -246,8 +246,8 @@ namespace TEN
 				s = {};
 				s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
 
-				float xVel = std::sin(TO_RAD(angle)) * GenerateFloat(8, 12);
-				float zVel = std::cos(TO_RAD(angle)) * GenerateFloat(8, 12);
+				float xVel = sin(angle) * GenerateFloat(8, 12);
+				float zVel = cos(angle) * GenerateFloat(8, 12);
 				
 				s.velocity = Vector3(xVel, 0, zVel);
 				s.sourceColor = Vector4(1, 1, 1, 0.7f);

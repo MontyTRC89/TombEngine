@@ -26,8 +26,8 @@ namespace TEN::Entities::TR4
 		-256, 256,
 		-64, 100,
 		-200, -460,
-		ANGLE(-10.0f), ANGLE(10.0f),
-		ANGLE(-30.0f), ANGLE(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
 		0, 0
 	};
 
@@ -145,7 +145,7 @@ namespace TEN::Entities::TR4
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int ang = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				int ang = atan2(dz, dx) - item->Orientation.y;
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -173,27 +173,27 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + SAS_ANIM_WALK_TO_STAND)
 				{
-					if (abs(AI.angle) >= ANGLE(10.0f))
+					if (abs(AI.angle) >= EulerAngle::DegToRad(10.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(10.0f);
+							item->Orientation.y += EulerAngle::DegToRad(10.0f);
 						else
-							item->Pose.Orientation.y -= ANGLE(10.0f);
+							item->Orientation.y -= EulerAngle::DegToRad(10.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Orientation.y += AI.angle;
 				}
 				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
-					if (abs(AI.angle) >= ANGLE(2.0f))
+					if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(2.0f);
+							item->Orientation.y += EulerAngle::DegToRad(2.0f);
 						else
-							item->Pose.Orientation.y -= ANGLE(2.0f);
+							item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Orientation.y += AI.angle;
 				}
 
 				if (item->AIBits & GUARD)
@@ -293,7 +293,7 @@ namespace TEN::Entities::TR4
 
 			case SAS_STATE_WALK:
 				joint2 = angle;
-				creature->MaxTurn = ANGLE(5.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(5.0f);
 				creature->Flags = 0;
 
 				if (item->AIBits & PATROL1)
@@ -344,7 +344,7 @@ namespace TEN::Entities::TR4
 
 			case SAS_STATE_RUN:
 				tilt = angle / 2;
-				creature->MaxTurn = ANGLE(10.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(10.0f);
 
 				if (AI.ahead)
 					joint2 = AI.angle;
@@ -447,7 +447,7 @@ namespace TEN::Entities::TR4
 
 					if (AI.distance > pow(SECTOR(3), 2))
 					{
-						angle2 = sqrt(AI.distance) + AI.xAngle - ANGLE(5.6f);
+						angle2 = sqrt(AI.distance) + AI.xAngle - EulerAngle::DegToRad(5.6f);
 						joint1 = angle2;
 					}
 				}
@@ -585,9 +585,9 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(itemNumber);
 
-			grenadeItem->Pose.Orientation.x = angle1 + item->Pose.Orientation.x;
-			grenadeItem->Pose.Orientation.y = angle2 + item->Pose.Orientation.y;
-			grenadeItem->Pose.Orientation.z = 0;
+			grenadeItem->Orientation.x = angle1 + item->Orientation.x;
+			grenadeItem->Orientation.y = angle2 + item->Orientation.y;
+			grenadeItem->Orientation.z = 0;
 
 			if (GetRandomControl() & 3)
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
@@ -596,9 +596,9 @@ namespace TEN::Entities::TR4
 
 			grenadeItem->ItemFlags[2] = 1;
 			grenadeItem->Animation.Velocity = 128;
-			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-			grenadeItem->Animation.VerticalVelocity = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
-			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
+			grenadeItem->Animation.ActiveState = grenadeItem->Orientation.x;
+			grenadeItem->Animation.VerticalVelocity = -128 * sin(grenadeItem->Orientation.x);
+			grenadeItem->Animation.TargetState = grenadeItem->Orientation.y;
 			grenadeItem->Animation.RequiredState = 0;
 			grenadeItem->HitPoints = 120;
 
@@ -663,9 +663,9 @@ namespace TEN::Entities::TR4
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					int x = laraItem->Pose.Position.x - 512 * phd_sin(laraItem->Pose.Orientation.y);
+					int x = laraItem->Pose.Position.x - 512 * sin(laraItem->Orientation.y);
 					int y = laraItem->Pose.Position.y;
-					int z = laraItem->Pose.Position.z - 512 * phd_cos(laraItem->Pose.Orientation.y);
+					int z = laraItem->Pose.Position.z - 512 * cos(laraItem->Orientation.y);
 
 					TestTriggers(x, y, z, laraItem->RoomNumber, true);
 
@@ -685,7 +685,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+					laraItem->Orientation.y = item->Orientation.y;
 					ResetLaraFlex(laraItem);
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Busy;

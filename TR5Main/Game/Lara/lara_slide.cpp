@@ -24,7 +24,7 @@ void lara_as_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -92,7 +92,7 @@ void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.Airborne = false;
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -132,8 +132,8 @@ void lara_as_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	Camera.targetElevation = -ANGLE(45.0f);
-	Camera.targetAngle = ANGLE(135.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(135.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -146,7 +146,7 @@ void lara_as_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TestLaraSlide(item, coll))
 	{
-		/*short direction = GetLaraSlideDirection(item, coll) + ANGLE(180.0f);
+		/*short direction = GetLaraSlideDirection(item, coll) + EulerAngle::DegToRad(180.0f);
 
 		if (g_GameFlow->Animations.HasSlideExtended)
 		{
@@ -197,7 +197,7 @@ void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.Airborne = false;
-	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+	lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(180.0f);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;

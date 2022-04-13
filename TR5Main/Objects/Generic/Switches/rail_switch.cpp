@@ -18,9 +18,9 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		0, 0,
 		-768, -512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 	};
 
 	Vector3Int RailSwitchPos2 = { 0, 0, 550 }; 
@@ -30,9 +30,9 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		0, 0,
 		512, 768,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 	};
 
 	void RailSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
@@ -55,7 +55,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 
 				if (TestLaraPosition(&RailSwitchBounds2, switchItem, laraItem))
 				{
@@ -73,7 +73,7 @@ namespace TEN::Entities::Switches
 					lara->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 
 				if (flag)
 				{

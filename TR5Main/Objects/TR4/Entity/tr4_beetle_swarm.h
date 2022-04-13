@@ -1,9 +1,11 @@
 #pragma once
 #include <items.h>
+#include "Specific/EulerAngle.h"
 
 struct BeetleData
 {
 	PHD_3DPOS Pose;
+	EulerAngle Orientation;
 	short RoomNumber;
 	int Velocity;
 	int VerticalVelocity;

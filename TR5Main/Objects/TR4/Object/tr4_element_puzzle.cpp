@@ -24,9 +24,9 @@ namespace TEN::Entities::TR4
         0, 0, 
         -64, 0, 
         0, 0,
-        -ANGLE(10.0f), ANGLE(10.0f),
-        -ANGLE(30.0f), ANGLE(30.0f),
-        -ANGLE(10.0f), ANGLE(10.0f)
+        EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+        EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+        EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
     };
 
     void ElementPuzzleControl(short itemNumber)
@@ -186,8 +186,8 @@ namespace TEN::Entities::TR4
             ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
             ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-            short oldRot = puzzleItem->Pose.Orientation.y;
-            puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+            short oldRot = puzzleItem->Orientation.y;
+            puzzleItem->Orientation.y = laraItem->Orientation.y;
 
             if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
             {
@@ -205,7 +205,7 @@ namespace TEN::Entities::TR4
                         puzzleItem->MeshBits = 48;
                         TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
                         puzzleItem->ItemFlags[0] = 1;
-                        puzzleItem->Pose.Orientation.y = oldRot;
+                        puzzleItem->Orientation.y = oldRot;
                         return;
                     }
 
@@ -214,7 +214,7 @@ namespace TEN::Entities::TR4
                         puzzleItem->MeshBits = 3;
                         laraInfo->Inventory.Pickups[1]--;
                         puzzleItem->ItemFlags[0] = 1;
-                        puzzleItem->Pose.Orientation.y = oldRot;
+                        puzzleItem->Orientation.y = oldRot;
                         return;
                     }
 
@@ -225,7 +225,7 @@ namespace TEN::Entities::TR4
                 }
             }
 
-            puzzleItem->Pose.Orientation.y = oldRot;
+            puzzleItem->Orientation.y = oldRot;
         }
         else
         {
@@ -264,8 +264,8 @@ namespace TEN::Entities::TR4
                 ElementPuzzleBounds.boundingBox.Z1 = box->Z1 - 200;
                 ElementPuzzleBounds.boundingBox.Z2 = box->Z2 + 200;
 
-                short oldRot = puzzleItem->Pose.Orientation.y;
-                puzzleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+                short oldRot = puzzleItem->Orientation.y;
+                puzzleItem->Orientation.y = laraItem->Orientation.y;
 
                 if (TestLaraPosition(&ElementPuzzleBounds, puzzleItem, laraItem))
                 {
@@ -277,7 +277,7 @@ namespace TEN::Entities::TR4
                     puzzleItem->ItemFlags[0] = 2;
                 }
 
-                puzzleItem->Pose.Orientation.y = oldRot;
+                puzzleItem->Orientation.y = oldRot;
             }
         }
     }

@@ -81,7 +81,7 @@ void LagoonWitchControl(short itemNumber)
 		CreatureAIInfo(item, &AI);
 
 		//if (creature->enemy != LaraItem)
-		//	phd_atan(lara_item->pos.z_pos - item->pos.z_pos, lara_item->pos.x_pos - item->pos.x_pos);
+		//	atan2(lara_item->pos.z_pos - item->pos.z_pos, lara_item->pos.x_pos - item->pos.x_pos);
 
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
@@ -100,7 +100,7 @@ void LagoonWitchControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case WITCH_STATE_SWIM:
-			creature->MaxTurn = ANGLE(4.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
 
 			if (AI.distance < pow(SECTOR(1), 2))
 				item->Animation.TargetState = WITCH_STATE_IDLE;
@@ -108,7 +108,7 @@ void LagoonWitchControl(short itemNumber)
 			break;
 
 		case WITCH_STATE_IDLE:
-			creature->MaxTurn = ANGLE(2.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 			creature->Flags = 0;
 
 			if (AI.distance < pow(CLICK(3), 2))
@@ -121,13 +121,13 @@ void LagoonWitchControl(short itemNumber)
 			break;
 
 		case WITCH_STATE_ATTACK:
-			creature->MaxTurn = ANGLE(2.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
 			if (!creature->Flags &&
 				item->TouchBits & 0x3C3C0 &&
 				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
 			{
-				CreatureEffect2(item, &LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+				CreatureEffect2(item, &LagoonWitchBite, 10, item->Orientation.y, DoBloodSplat);
 				creature->Flags = WITCH_STATE_SWIM;
 
 				LaraItem->HitPoints -= 100;

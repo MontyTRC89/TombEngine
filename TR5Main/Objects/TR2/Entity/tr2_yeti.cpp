@@ -154,7 +154,7 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 3:
-			info->MaxTurn = ANGLE(4.0f);
+			info->MaxTurn = EulerAngle::DegToRad(4.0f);
 
 			if (AI.ahead)
 				head = AI.angle;
@@ -187,7 +187,7 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 1:
-			info->MaxTurn = ANGLE(6.0f);
+			info->MaxTurn = EulerAngle::DegToRad(6.0f);
 			tilt = angle / 4;
 			info->Flags = 0;
 
@@ -223,7 +223,7 @@ void YetiControl(short itemNumber)
 			break;
 
 		case 5:
-			info->MaxTurn = ANGLE(4.0f);
+			info->MaxTurn = EulerAngle::DegToRad(4.0f);
 
 			if (AI.ahead)
 				torso = AI.angle;

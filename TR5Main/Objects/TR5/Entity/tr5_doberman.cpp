@@ -58,7 +58,7 @@ void DobermanControl(short itemNumber)
 			switch (item->Animation.ActiveState)
 			{
 			case 1:
-				creature->MaxTurn = ANGLE(3.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 
 				if (creature->Mood != MoodType::Bored)
 					item->Animation.TargetState = 2;
@@ -88,7 +88,7 @@ void DobermanControl(short itemNumber)
 
 			case 2:
 				tilt = angle;
-				creature->MaxTurn = ANGLE(6.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -157,7 +157,7 @@ void DobermanControl(short itemNumber)
 				break;
 
 			case 7:
-				creature->MaxTurn = ANGLE(0.5f);
+				creature->MaxTurn = EulerAngle::DegToRad(0.5f);
 
 				if (creature->Flags != 1 &&
 					AI.ahead &&
@@ -197,7 +197,7 @@ void DobermanControl(short itemNumber)
 				break;
 
 			case 9:
-				creature->MaxTurn = ANGLE(6.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 				if (creature->Flags != 3 && item->TouchBits & 0x122000)
 				{

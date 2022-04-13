@@ -27,9 +27,9 @@ namespace TEN::Entities::Switches
 		512, 896,
 		0, 0,
 		-512, 0,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 	};
 
 	Vector3Int TurnSwitchPos = { 650, 0, 138 }; 
@@ -39,9 +39,9 @@ namespace TEN::Entities::Switches
 		512, 896,
 		0, 0,
 		0, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 	};
 
 	Vector3Int TurnSwitchPosA = { 650, 0, -138 };
@@ -70,8 +70,8 @@ namespace TEN::Entities::Switches
 					switchItem->Animation.AnimNumber = Objects[switchItem->ObjectNumber].animIndex + 4;
 					switchItem->Animation.FrameNumber = g_Level.Anims[switchItem->Animation.AnimNumber].frameBase;
 					switchItem->ItemFlags[0] = TURN_SWITCH_ANTICLOCKWISE;
-					ForcedFixedCamera.x = switchItem->Pose.Position.x - 1024 * phd_sin(switchItem->Pose.Orientation.y);
-					ForcedFixedCamera.z = switchItem->Pose.Position.z - 1024 * phd_cos(switchItem->Pose.Orientation.y);
+					ForcedFixedCamera.x = switchItem->Pose.Position.x - 1024 * sin(switchItem->Orientation.y);
+					ForcedFixedCamera.z = switchItem->Pose.Position.z - 1024 * cos(switchItem->Orientation.y);
 
 					doSwitch = -1;
 				}
@@ -80,7 +80,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 				if (TestLaraPosition(&TurnSwitchBoundsC, switchItem, laraItem))
 				{
 					if (MoveLaraPosition(&TurnSwitchPos, switchItem, laraItem))
@@ -88,8 +88,8 @@ namespace TEN::Entities::Switches
 						laraItem->Animation.AnimNumber = LA_TURNSWITCH_GRAB_CLOCKWISE;
 						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 						switchItem->ItemFlags[0] = TURN_SWITCH_CLOCKWISE;
-						ForcedFixedCamera.x = switchItem->Pose.Position.x + 1024 * phd_sin(switchItem->Pose.Orientation.y);
-						ForcedFixedCamera.z = switchItem->Pose.Position.z + 1024 * phd_cos(switchItem->Pose.Orientation.y);
+						ForcedFixedCamera.x = switchItem->Pose.Position.x + 1024 * sin(switchItem->Orientation.y);
+						ForcedFixedCamera.z = switchItem->Pose.Position.z + 1024 * cos(switchItem->Orientation.y);
 						doSwitch = 1;
 					}
 					else
@@ -101,7 +101,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Pose.Orientation.y ^= (short)ANGLE(180.0f);
+				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
 			}
 		}
 
@@ -164,7 +164,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.AnimNumber == Objects[switchItem->ObjectNumber].animIndex + 2)
 			{
-				switchItem->Pose.Orientation.y += ANGLE(90.0f);
+				switchItem->Orientation.y += EulerAngle::DegToRad(90.0f);
 				if (TrInput & IN_ACTION)
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_START;
@@ -192,7 +192,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.AnimNumber == Objects[ID_TURN_SWITCH].animIndex + 6)
 			{
-				switchItem->Pose.Orientation.y -= ANGLE(90.0f);
+				switchItem->Orientation.y -= EulerAngle::DegToRad(90.0f);
 				if (TrInput & IN_ACTION)
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START;

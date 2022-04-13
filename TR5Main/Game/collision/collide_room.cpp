@@ -26,39 +26,39 @@ void ShiftItem(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Shift.z = 0;
 }
 
-void MoveItem(ITEM_INFO* item, short angle, int x, int z)
+void MoveItem(ITEM_INFO* item, float angle, int x, int z)
 {
 	if (!x && !z)
 		return;
 
 	if (x != 0)
 	{
-		float s = phd_sin(angle);
-		float c = phd_cos(angle);
+		float sinAngle = sin(angle);
+		float cosAngle = cos(angle);
 
-		item->Pose.Position.x += round(x * s);
-		item->Pose.Position.z += round(x * c);
+		item->Pose.Position.x += round(x * sinAngle);
+		item->Pose.Position.z += round(x * cosAngle);
 	}
 
 	if (z != 0)
 	{
-		float s = phd_sin(angle + ANGLE(90.0f));
-		float c = phd_cos(angle + ANGLE(90.0f));
+		float sinAngle = sin(angle + EulerAngle::DegToRad(90.0f));
+		float cosAngle = cos(angle + EulerAngle::DegToRad(90.0f));
 
-		item->Pose.Position.x += round(z * s);
-		item->Pose.Position.z += round(z * c);
+		item->Pose.Position.x += round(z * sinAngle);
+		item->Pose.Position.z += round(z * cosAngle);
 	}
 }
 
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
 	if (snapYRot)
-		item->Pose.Orientation.y = coll->NearestLedgeAngle;
+		item->Orientation.y = coll->NearestLedgeAngle;
 
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.z = 0;
-	item->Pose.Position.x += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Orientation.x = 0;
+	item->Orientation.z = 0;
+	item->Pose.Position.x += round(sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Position.z += round(cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier)
@@ -71,18 +71,18 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float of
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.y = angle2;
-	item->Pose.Orientation.z = 0;
-	item->Pose.Position.x += round(phd_sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(phd_cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Orientation.x = 0;
+	item->Orientation.y = angle2;
+	item->Orientation.z = 0;
+	item->Pose.Position.x += round(sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Position.z += round(cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
 void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll)
 {
 	SnapItemToLedge(item, coll);
 
-	int direction = (unsigned short)(item->Pose.Orientation.y + ANGLE(45.0f)) / ANGLE(90.0f);
+	int direction = (unsigned short)(item->Orientation.y + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
 
 	switch (direction)
 	{
@@ -115,14 +115,14 @@ int FindGridShift(int x, int z)
 // Overload of GetCollisionResult which can be used to probe collision parameters
 // from a given item.
 
-CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int height, int side)
+CollisionResult GetCollision(ITEM_INFO* item, float angle, int distance, int height, int side)
 {
-	float s = phd_sin(angle);
-	float c = phd_cos(angle);
+	float sinAngle = sin(angle);
+	float cosAngle = cos(angle);
 
-	auto x = item->Pose.Position.x + (distance * s) + (side * c);
+	auto x = item->Pose.Position.x + (distance * sinAngle) + (side * cosAngle);
 	auto y = item->Pose.Position.y + height;
-	auto z = item->Pose.Position.z + (distance * c) + (-side * s);
+	auto z = item->Pose.Position.z + (distance * cosAngle) + (-side * sinAngle);
 
 	return GetCollision(x, y, z, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
 }
@@ -244,7 +244,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 	switch (coll->Setup.Mode == CollisionProbeMode::Quadrants ? quadrant : -1)
 	{
 	case 0:
-		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xfront =  sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront =  coll->Setup.Radius;
 		xleft  = -coll->Setup.Radius;
 		zleft  =  coll->Setup.Radius;
@@ -254,7 +254,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 
 	case 1:
 		xfront =  coll->Setup.Radius;
-		zfront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront =  cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xleft  =  coll->Setup.Radius;
 		zleft  =  coll->Setup.Radius;
 		xright =  coll->Setup.Radius;
@@ -262,7 +262,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 		break;
 
 	case 2:
-		xfront =  phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xfront =  sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = -coll->Setup.Radius;
 		xleft  =  coll->Setup.Radius;
 		zleft  = -coll->Setup.Radius;
@@ -272,7 +272,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 
 	case 3:
 		xfront = -coll->Setup.Radius;
-		zfront =  phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront =  cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xleft  = -coll->Setup.Radius;
 		zleft  = -coll->Setup.Radius;
 		xright = -coll->Setup.Radius;
@@ -281,12 +281,12 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 
 	default: 
 		// No valid quadrant, return true probe offsets from object rotation.
-		xfront = phd_sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		zfront = phd_cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		zleft  = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle - ANGLE(90)) * coll->Setup.Radius;
-		xright = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_sin(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
-		zright = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + phd_cos(coll->Setup.ForwardAngle + ANGLE(90)) * coll->Setup.Radius;
+		xfront = sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		zfront = cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
+		xleft  = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + sin(coll->Setup.ForwardAngle - EulerAngle::DegToRad(90)) * coll->Setup.Radius;
+		zleft  = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + cos(coll->Setup.ForwardAngle - EulerAngle::DegToRad(90)) * coll->Setup.Radius;
+		xright = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + sin(coll->Setup.ForwardAngle + EulerAngle::DegToRad(90)) * coll->Setup.Radius;
+		zright = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + cos(coll->Setup.ForwardAngle + EulerAngle::DegToRad(90)) * coll->Setup.Radius;
 		break;
 	}
 
@@ -715,7 +715,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
 			// HACK: Force slight push-out to the left side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->Animation.Velocity);
+			MoveItem(item, coll->Setup.ForwardAngle + EulerAngle::DegToRad(8), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -738,7 +738,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 
 		if (coll->DiagonalStepAtLeft())
 		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / EulerAngle::DegToRad(90); // different from quadrant!
 			quarter %= 2;
 
 			if (coll->MiddleLeft.HasFlippedDiagonalSplit())
@@ -767,7 +767,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
 			// HACK: Force slight push-out to the right side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->Animation.Velocity);
+			MoveItem(item, coll->Setup.ForwardAngle - EulerAngle::DegToRad(8), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -790,7 +790,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 
 		if (coll->DiagonalStepAtRight())
 		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / ANGLE(90); // different from quadrant!
+			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / EulerAngle::DegToRad(90); // different from quadrant!
 			quarter %= 2;
 
 			if (coll->MiddleRight.HasFlippedDiagonalSplit())
@@ -834,8 +834,8 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short 
 	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
 
 	auto ratioXZ = radiusZ / radiusX;
-	auto frontX = phd_sin(item->Pose.Orientation.y) * radiusZ;
-	auto frontZ = phd_cos(item->Pose.Orientation.y) * radiusZ;
+	auto frontX = sin(item->Orientation.y) * radiusZ;
+	auto frontZ = cos(item->Orientation.y) * radiusZ;
 	auto leftX  = -frontZ * ratioXZ;
 	auto leftZ  =  frontX * ratioXZ;
 	auto rightX =  frontZ * ratioXZ;
@@ -854,13 +854,13 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short 
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Pose.Orientation.x = ANGLE(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
-	item->Pose.Orientation.z = ANGLE(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
+	item->Orientation.x = EulerAngle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
+	item->Orientation.z = EulerAngle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
 }
 
-int GetQuadrant(short angle)
+int GetQuadrant(float angle)
 {
-	return (unsigned short)(angle + ANGLE(45.0f)) / ANGLE(90.0f);
+	return (angle + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
@@ -870,8 +870,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 {
 	// Get item bounds and current rotation
 	auto bounds = GetBoundsAccurate(item);
-	auto c = phd_cos(coll->Setup.ForwardAngle);
-	auto s = phd_sin(coll->Setup.ForwardAngle);
+	auto c = cos(coll->Setup.ForwardAngle);
+	auto s = sin(coll->Setup.ForwardAngle);
 
 	// Origin test position should be slightly in front of origin, because otherwise
 	// misfire may occur near block corners for split angles.
@@ -902,7 +902,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 		Ray   originRay;
 		Plane closestPlane[3] = { };
 		float closestDistance[3] = { FLT_MAX, FLT_MAX, FLT_MAX };
-		short result[3] = { };
+		float result[3] = { };
 
 		// If bridge was hit on the first pass, stop checking
 		if (h == 1 && hitBridge)
@@ -920,8 +920,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 			// Determine if probe must be shifted (if left or right probe)
 			if (p > 0)
 			{
-				auto s2 = phd_sin(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
-				auto c2 = phd_cos(coll->Setup.ForwardAngle + (p == 1 ? ANGLE(90.0f) : -ANGLE(90.0f)));
+				auto s2 = sin(coll->Setup.ForwardAngle + (p == 1 ? EulerAngle::DegToRad(90.0f) : EulerAngle::DegToRad(-90.0f)));
+				auto c2 = cos(coll->Setup.ForwardAngle + (p == 1 ? EulerAngle::DegToRad(90.0f) : EulerAngle::DegToRad(-90.0f)));
 
 				// Slightly extend width beyond coll radius to hit adjacent blocks for sure
 				eX += s2 * (coll->Setup.Radius * 2);
@@ -971,7 +971,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 			auto cY = height + 1;
 
 			// Calculate ray
-			auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
+			auto mxR = Matrix::CreateFromYawPitchRoll(coll->Setup.ForwardAngle, 0, 0);
 			auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 			auto ray = Ray(Vector3(eX, cY, eZ), direction);
 
@@ -1013,7 +1013,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 						closestPlane[p] = plane[i];
 						closestDistance[p] = distance;
 						auto normal = closestPlane[p].Normal();
-						result[p] = FROM_RAD(atan2(normal.x, normal.z));
+						result[p] = atan2(normal.x, normal.z);
 						hitBridge = true;
 					}
 				}
@@ -1067,18 +1067,18 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 
 						// Store according rotation.
 						// For block edges (cases 0-3), return ordinary normal values.
-						// For split angle (case 4), return axis perpendicular to split angle (hence + ANGLE(90.0f)) and dependent on
+						// For split angle (case 4), return axis perpendicular to split angle (hence + EulerAngle::DegToRad(90.0f)) and dependent on
 						// origin sector plane, which determines the direction of edge normal.
 
 						if (i == 4)
 						{
 							auto usedSectorPlane = useCeilingLedge ? block->SectorPlaneCeiling(eX, eZ) : block->SectorPlane(eX, eZ);
-							result[p] = FROM_RAD(splitAngle) + ANGLE(usedSectorPlane * 180.0f) + ANGLE(90.0f);
+							result[p] = splitAngle + EulerAngle::DegToRad(usedSectorPlane * 180.0f) + EulerAngle::DegToRad(90.0f);
 						}
 						else
 						{
 							auto normal = closestPlane[p].Normal();
-							result[p] = FROM_RAD(atan2(normal.x, normal.z)) + ANGLE(180.0f);
+							result[p] = atan2(normal.x, normal.z) + EulerAngle::DegToRad(180.0f);
 						}
 					}
 				}
@@ -1089,7 +1089,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 		// angle occurence. This approach is needed to filter out false detections
 		// on the near-zero thickness edges of diagonal geometry which probes tend to tunnel through.
 
-		std::set<short> angles;
+		std::set<float> angles;
 		for (int p = 0; p < 3; p++)
 		{
 			// Prioritize ledge angle which was twice recognized
@@ -1411,15 +1411,15 @@ int GetWaterHeight(ITEM_INFO* item)
 	return GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
 
-short GetSurfaceSteepnessAngle(float xTilt, float zTilt)
+float GetSurfaceSteepnessAngle(float xTilt, float zTilt)
 {
-	short stepAngleIncrement = ANGLE(45.0f) / 4;
-	return (short)sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
+	float stepAngleIncrement = EulerAngle::DegToRad(45.0f) / 4;
+	return sqrt(pow(xTilt * stepAngleIncrement, 2) + pow(zTilt * stepAngleIncrement, 2));
 }
 
-short GetSurfaceAspectAngle(float xTilt, float zTilt)
+float GetSurfaceAspectAngle(float xTilt, float zTilt)
 {
-	return (short)phd_atan(-zTilt, -xTilt);
+	return atan2(-zTilt, -xTilt);
 }
 
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)

@@ -147,12 +147,12 @@ namespace TEN::Entities::Generic
 
 	void phd_GetMatrixAngles(int* matrix, short* angle)
 	{
-		angle[0] = phd_atan(sqrt(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
+		angle[0] = atan2(sqrt(SQUARE(matrix[M22]) + SQUARE(matrix[M02])), matrix[M12]);
 		if (matrix[M12] >= 0 && angle[0] > 0 || matrix[M12] < 0 && angle[0] < 0)
 			angle[0] = -angle[0];
 
-		angle[1] = phd_atan(matrix[M22], matrix[M02]);
-		angle[2] = phd_atan(matrix[M00] * phd_cos(angle[1]) - matrix[M20] * phd_sin(angle[1]), matrix[M21] * phd_sin(angle[1]) - matrix[M01] * phd_cos(angle[1]));
+		angle[1] = atan2(matrix[M22], matrix[M02]);
+		angle[2] = atan2(matrix[M00] * cos(angle[1]) - matrix[M20] * sin(angle[1]), matrix[M21] * sin(angle[1]) - matrix[M01] * cos(angle[1]));
 	}
 
 	void RopeControl(short itemNumber)
@@ -188,7 +188,7 @@ namespace TEN::Entities::Generic
 				rope,
 				laraItem->Pose.Position.x,
 				laraItem->Pose.Position.y + frame->Y1 + 512,
-				laraItem->Pose.Position.z + frame->Z2 * phd_cos(laraItem->Pose.Orientation.y),
+				laraItem->Pose.Position.z + frame->Z2 * cos(laraItem->Orientation.y),
 				laraItem->Animation.ActiveState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)
@@ -213,7 +213,7 @@ namespace TEN::Entities::Generic
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->Control.Rope.Ptr = ropeItem->TriggerFlags;
 				laraInfo->Control.Rope.Segment = segment;
-				laraInfo->Control.Rope.Y = laraItem->Pose.Orientation.y;
+				laraInfo->Control.Rope.Y = laraItem->Orientation.y;
 
 				DelAlignLaraToRope(laraItem);
 
@@ -221,7 +221,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.velocity.y = 0;
 				CurrentPendulum.velocity.z = 0;
 
-				ApplyVelocityToRope(segment, laraItem->Pose.Orientation.y, 16 * laraItem->Animation.Velocity);
+				ApplyVelocityToRope(segment, laraItem->Orientation.y, 16 * laraItem->Animation.Velocity);
 			}
 		}
 	}
@@ -444,7 +444,7 @@ namespace TEN::Entities::Generic
 
 	void ApplyVelocityToRope(int node, short angle, short n)
 	{
-		SetPendulumVelocity(n * phd_sin(angle) * 4096, 0, n * phd_cos(angle) * 4096);
+		SetPendulumVelocity(n * sin(angle) * 4096, 0, n * cos(angle) * 4096);
 	}
 
 	void SetPendulumVelocity(int x, int y, int z)
@@ -529,7 +529,7 @@ namespace TEN::Entities::Generic
 
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Pose.Orientation.x > 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX < -100)
+			if (item->Orientation.x > 0 && item->Orientation.x - Lara.Control.Rope.LastX < -100)
 			{
 				Lara.Control.Rope.ArcFront = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 0;
@@ -560,7 +560,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if (item->Pose.Orientation.x < 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX > 100)
+			if (item->Orientation.x < 0 && item->Orientation.x - Lara.Control.Rope.LastX > 100)
 			{
 				Lara.Control.Rope.ArcBack = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 1;
@@ -590,16 +590,16 @@ namespace TEN::Entities::Generic
 			}
 		}
 
-		Lara.Control.Rope.LastX = item->Pose.Orientation.x;
+		Lara.Control.Rope.LastX = item->Orientation.x;
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Pose.Orientation.x > Lara.Control.Rope.MaxXForward)
-				Lara.Control.Rope.MaxXForward = item->Pose.Orientation.x;
+			if (item->Orientation.x > Lara.Control.Rope.MaxXForward)
+				Lara.Control.Rope.MaxXForward = item->Orientation.x;
 		}
 		else
 		{
-			if (item->Pose.Orientation.x < -Lara.Control.Rope.MaxXBackward)
-				Lara.Control.Rope.MaxXBackward = abs(item->Pose.Orientation.x);
+			if (item->Orientation.x < -Lara.Control.Rope.MaxXBackward)
+				Lara.Control.Rope.MaxXBackward = abs(item->Orientation.x);
 		}
 	}
 
@@ -607,10 +607,10 @@ namespace TEN::Entities::Generic
 	{
 		if (Lara.Control.Rope.Ptr != -1)
 		{
-			if (item->Pose.Orientation.x >= 0)
+			if (item->Orientation.x >= 0)
 			{
 				item->Animation.VerticalVelocity = -112;
-				item->Animation.Velocity = item->Pose.Orientation.x / 128;
+				item->Animation.Velocity = item->Orientation.x / 128;
 			}
 			else
 			{
@@ -618,7 +618,7 @@ namespace TEN::Entities::Generic
 				item->Animation.VerticalVelocity = -20;
 			}
 
-			item->Pose.Orientation.x = 0;
+			item->Orientation.x = 0;
 			item->Animation.Airborne = true;
 
 			Lara.Control.HandStatus = HandStatus::Free;
@@ -640,7 +640,7 @@ namespace TEN::Entities::Generic
 	void FallFromRope(ITEM_INFO* item)
 	{
 		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
-		item->Pose.Orientation.x = 0;
+		item->Orientation.x = 0;
 		item->Pose.Position.y += 320;
 
 		item->Animation.AnimNumber = LA_FALL_START;
@@ -661,7 +661,7 @@ namespace TEN::Entities::Generic
 			FallFromRope(item);
 		else
 		{
-			Camera.targetAngle = ANGLE(30.0f);
+			Camera.targetAngle = EulerAngle::DegToRad(30.0f);
 
 			if (Lara.Control.Rope.Count)
 			{
@@ -718,7 +718,7 @@ namespace TEN::Entities::Generic
 		vec.z = 0;
 
 		frame = (ANIM_FRAME*)GetBestFrame(item);
-		ropeY = Lara.Control.Rope.Y - ANGLE(90);
+		ropeY = Lara.Control.Rope.Y - EulerAngle::DegToRad(90);
 		rope = &Ropes[Lara.Control.Rope.Ptr];
 
 		GetRopePos(rope, (Lara.Control.Rope.Segment - 1 << 7) + frame->offsetY, &pos.x, &pos.y, &pos.z);
@@ -747,12 +747,12 @@ namespace TEN::Entities::Generic
 		diff2.y = diff.y;
 		diff2.z = diff.z;
 
-		ScaleVector(&vec3, 16384 * phd_cos(ropeY), &vec3);
+		ScaleVector(&vec3, 16384 * cos(ropeY), &vec3);
 		ScaleVector(&diff2, DotProduct(&diff2, &vec2), &diff2);
-		ScaleVector(&diff2, 4096 - 16384 * phd_cos(ropeY), &diff2);
+		ScaleVector(&diff2, 4096 - 16384 * cos(ropeY), &diff2);
 
 		CrossProduct(&diff, &vec2, &vec4);
-		ScaleVector(&vec4, 16384 * phd_sin(ropeY), &vec4);
+		ScaleVector(&vec4, 16384 * sin(ropeY), &vec4);
 		diff2.x += vec3.x;
 		diff2.y += vec3.y;
 		diff2.z += vec3.z;
@@ -792,9 +792,9 @@ namespace TEN::Entities::Generic
 		item->Pose.Position.z = rope->position.z + (rope->meshSegment[Lara.Control.Rope.Segment].z >> FP_SHIFT);
 
 		Matrix rotMatrix = Matrix::CreateFromYawPitchRoll(
-			TO_RAD(angle[1]),
-			TO_RAD(angle[0]),
-			TO_RAD(angle[2])
+			angle[1],
+			angle[0],
+			angle[2]
 		);
 
 		rotMatrix = rotMatrix.Transpose();
@@ -803,8 +803,8 @@ namespace TEN::Entities::Generic
 		item->Pose.Position.y += -112 * rotMatrix.m[1][2];
 		item->Pose.Position.z += -112 * rotMatrix.m[2][2];
 
-		item->Pose.Orientation.x = angle[0];
-		item->Pose.Orientation.y = angle[1];
-		item->Pose.Orientation.z = angle[2];
+		item->Orientation.x = angle[0];
+		item->Orientation.y = angle[1];
+		item->Orientation.z = angle[2];
 	}
 }

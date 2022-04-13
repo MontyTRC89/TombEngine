@@ -129,7 +129,7 @@ void MummyControl(short itemNumber)
 						}
 
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Pose.Orientation.y += AI.angle;
+						item->Orientation.y += AI.angle;
 					}
 				}
 				else
@@ -137,7 +137,7 @@ void MummyControl(short itemNumber)
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_COLLAPSE_START;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.ActiveState = MUMMY_STATE_COLLAPSE;
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 					creature->MaxTurn = 0;
 				}
 			}
@@ -194,7 +194,7 @@ void MummyControl(short itemNumber)
 			}
 			else
 			{
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (AI.distance >= pow(SECTOR(3), 2))
 				{
@@ -208,7 +208,7 @@ void MummyControl(short itemNumber)
 			break;
 
 		case MUMMY_STATE_WALK_ARMS_UP:
-			creature->MaxTurn = ANGLE(7.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 			creature->Flags = 0;
 
 			if (AI.distance < pow(SECTOR(0.5f), 2))
@@ -257,15 +257,15 @@ void MummyControl(short itemNumber)
 		case MUMMY_STATE_HIT:
 			creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= ANGLE(7.0f))
+			if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += ANGLE(7.0f);
+					item->Orientation.y += EulerAngle::DegToRad(7.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(7.0f);
+					item->Orientation.y -= EulerAngle::DegToRad(7.0f);
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Orientation.y += AI.angle;
 
 			if (!creature->Flags)
 			{

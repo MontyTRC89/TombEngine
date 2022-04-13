@@ -17,7 +17,7 @@ OBJECT_COLLISION_BOUNDS DeathSlideBounds =
 	-100, 100,
 	256, 512,
 	0, 0,
-	-ANGLE(25.0f), ANGLE(25.0f),
+	EulerAngle::DegToRad(-25.0f), EulerAngle::DegToRad(25.0f),
 	0, 0
 };
 
@@ -106,8 +106,8 @@ void ControlDeathSlide(short itemNumber)
 		if (zipLineItem->Animation.VerticalVelocity < 100)
 			zipLineItem->Animation.VerticalVelocity += 5;
 
-		float c = phd_cos(zipLineItem->Pose.Orientation.y);
-		float s = phd_sin(zipLineItem->Pose.Orientation.y);
+		float c = cos(zipLineItem->Orientation.y);
+		float s = sin(zipLineItem->Orientation.y);
 
 		zipLineItem->Pose.Position.z += zipLineItem->Animation.VerticalVelocity * c;
 		zipLineItem->Pose.Position.x += zipLineItem->Animation.VerticalVelocity * s;

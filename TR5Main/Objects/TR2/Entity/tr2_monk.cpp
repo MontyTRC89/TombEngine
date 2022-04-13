@@ -120,7 +120,7 @@ void MonkControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 
 			if (creature->Mood == MoodType::Bored)
 			{
@@ -148,11 +148,11 @@ void MonkControl(short itemNumber)
 
 		case 3:
 			tilt = angle / 4;
-			creature->MaxTurn = ANGLE(4.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
 			creature->Flags &= 0x0FFF;
 
 			if (MonksAttackLara)
-				creature->MaxTurn += ANGLE(1.0f);
+				creature->MaxTurn += EulerAngle::DegToRad(1.0f);
 
 			if (creature->Mood == MoodType::Bored)
 				item->Animation.TargetState = 1;

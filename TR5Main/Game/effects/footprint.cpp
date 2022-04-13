@@ -163,9 +163,9 @@ namespace Footprints {
 
 		// Calculate footprint tilts
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
-		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180));
-		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180));
-		auto yRot = TO_RAD(item->Pose.Orientation.y);
+		auto c = cos(item->Orientation.y + EulerAngle::DegToRad(180.0f));
+		auto s = sin(item->Orientation.y + EulerAngle::DegToRad(180.0f));
+		auto yRot = item->Orientation.y;
 		auto xRot = plane.x * s + plane.y * c;
 		auto zRot = plane.y * s - plane.x * c;
 

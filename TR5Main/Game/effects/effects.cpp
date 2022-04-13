@@ -443,7 +443,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
+	if (dx >= EulerAngle::DegToRad(-90.0f) && dx <= EulerAngle::DegToRad(90.0f) && dz >= EulerAngle::DegToRad(-90.0f) && dz <= EulerAngle::DegToRad(90.0f))
 	{
 		auto* spark = &Sparks[GetFreeSpark()];
 
@@ -856,11 +856,11 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 		sptr->xVel = (GetRandomControl() & 0xFF) - 128;
 		sptr->zVel = (GetRandomControl() & 0xFF) - 128;
 
-		if (item->Pose.Orientation.y == 0)
+		if (item->Orientation.y == 0)
 			sptr->zVel = -(size - (size >> 2));
-		else if (item->Pose.Orientation.y == ANGLE(90.0f))
+		else if (item->Orientation.y == EulerAngle::DegToRad(90.0f))
 			sptr->xVel = -(size - (size >> 2));
-		else if (item->Pose.Orientation.y == -ANGLE(180.0f))
+		else if (item->Orientation.y == EulerAngle::DegToRad(-180.0f))
 			sptr->zVel = size - (size >> 2);
 		else
 			sptr->xVel = size - (size >> 2);
@@ -1139,10 +1139,10 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int x = item->Pose.Position.x - phd_sin(item->Pose.Orientation.y + ANGLE(180.0f)) * CLICK(2) + phd_sin(item->Pose.Orientation.y - ANGLE(90.0f)) * CLICK(1);
-	int z = item->Pose.Position.z - phd_cos(item->Pose.Orientation.y + ANGLE(180.0f)) * CLICK(2) + phd_cos(item->Pose.Orientation.y - ANGLE(90.0f)) * CLICK(1);
+	int x = item->Pose.Position.x - sin(item->Orientation.y + EulerAngle::DegToRad(180.0f)) * CLICK(2) + sin(item->Orientation.y - EulerAngle::DegToRad(90.0f)) * CLICK(1);
+	int z = item->Pose.Position.z - cos(item->Orientation.y + EulerAngle::DegToRad(180.0f)) * CLICK(2) + cos(item->Orientation.y - EulerAngle::DegToRad(90.0f)) * CLICK(1);
 
-	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Pose.Orientation.y + ANGLE(180.0f));
+	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Orientation.y + EulerAngle::DegToRad(180.0f));
 	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose, 0);
 }
 
@@ -1170,9 +1170,9 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
 		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
-		spark->x = dl * phd_sin(ang1) + (GetRandomControl() & 0xF) + x - 8;
+		spark->x = dl * sin(ang1) + (GetRandomControl() & 0xF) + x - 8;
 		spark->y = (GetRandomControl() & 0xF) + y - 8;
-		spark->z = dl * phd_cos(ang1) + (GetRandomControl() & 0xF) + z - 8;
+		spark->z = dl * cos(ang1) + (GetRandomControl() & 0xF) + z - 8;
 		spark->xVel = 0;
 		spark->zVel = 0;
 		spark->friction = 0;
@@ -1204,11 +1204,11 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 1;
 	dl = GetRandomControl() % 1408 + 64;
-	spark->x = dl * phd_sin(ang1) + (GetRandomControl() & 0x1F) + x - 16;
+	spark->x = dl * sin(ang1) + (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->xVel = 0;
 	spark->zVel = 0;
-	spark->z = dl * phd_cos(ang1) + (GetRandomControl() & 0x1F) + z - 16;
+	spark->z = dl * cos(ang1) + (GetRandomControl() & 0x1F) + z - 16;
 	spark->friction = 0;
 	spark->flags = 10;
 	spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) + 128;

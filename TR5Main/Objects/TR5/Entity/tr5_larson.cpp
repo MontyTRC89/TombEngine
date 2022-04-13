@@ -43,13 +43,13 @@ void InitialiseLarson(short itemNum)
 		return;
 
 	item->ItemFlags[3] = item->TriggerFlags;
-	short rotY = item->Pose.Orientation.y;
+	short rotY = item->Orientation.y;
 
-	if (rotY > ANGLE(22.5f) && rotY < 28672)
+	if (rotY > EulerAngle::DegToRad(22.5f) && rotY < 28672)
 	{
 		item->Pose.Position.x += STEPUP_HEIGHT;
 	}
-	else if (rotY < -ANGLE(22.5f) && rotY > -28672)
+	else if (rotY < EulerAngle::DegToRad(-22.5f) && rotY > -28672)
 	{
 		item->Pose.Position.x -= STEPUP_HEIGHT;
 	}
@@ -183,16 +183,16 @@ void LarsonControl(short itemNumber)
 				{
 					creature->MaxTurn = 0;
 					item->Animation.TargetState = STATE_TR5_LARSON_STOP;
-					if (abs(info.angle) >= ANGLE(2))
+					if (abs(info.angle) >= EulerAngle::DegToRad(2))
 					{
 						if (info.angle > 0)
-							item->Pose.Orientation.y += ANGLE(2);
+							item->Orientation.y += EulerAngle::DegToRad(2);
 						else
-							item->Pose.Orientation.y -= ANGLE(2);
+							item->Orientation.y -= EulerAngle::DegToRad(2);
 					}
 					else
 					{
-						item->Pose.Orientation.y += info.angle;
+						item->Orientation.y += info.angle;
 					}
 				}
 				else
@@ -216,7 +216,7 @@ void LarsonControl(short itemNumber)
 			if (info.ahead)
 				joint2 = info.angle;
 			
-			creature->MaxTurn = ANGLE(7);
+			creature->MaxTurn = EulerAngle::DegToRad(7);
 			if (creature->Mood == MoodType::Bored && GetRandomControl() < 96)
 			{
 				item->Animation.RequiredState = STATE_TR5_LARSON_IDLE;
@@ -244,7 +244,7 @@ void LarsonControl(short itemNumber)
 		case STATE_TR5_LARSON_RUN:
 			if (info.ahead)
 				joint2 = info.angle;
-			creature->MaxTurn = ANGLE(11);
+			creature->MaxTurn = EulerAngle::DegToRad(11);
 			tilt = angle / 2;
 
 			if (creature->ReachedGoal)
@@ -284,16 +284,16 @@ void LarsonControl(short itemNumber)
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->MaxTurn = 0;
-			if (abs(info.angle) >= ANGLE(2))
+			if (abs(info.angle) >= EulerAngle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Pose.Orientation.y += ANGLE(2);
+					item->Orientation.y += EulerAngle::DegToRad(2);
 				else
-					item->Pose.Orientation.y -= ANGLE(2);
+					item->Orientation.y -= EulerAngle::DegToRad(2);
 			}
 			else
 			{
-				item->Pose.Orientation.y += info.angle;
+				item->Orientation.y += info.angle;
 			}
 
 			if (Targetable(item, &info))
@@ -328,16 +328,16 @@ void LarsonControl(short itemNumber)
 			if (info.ahead)
 				joint1 = info.xAngle;
 			creature->MaxTurn = 0;
-			if (abs(info.angle) >= ANGLE(2))
+			if (abs(info.angle) >= EulerAngle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Pose.Orientation.y += ANGLE(2);
+					item->Orientation.y += EulerAngle::DegToRad(2);
 				else
-					item->Pose.Orientation.y -= ANGLE(2);
+					item->Orientation.y -= EulerAngle::DegToRad(2);
 			}
 			else
 			{
-				item->Pose.Orientation.y += info.angle;
+				item->Orientation.y += info.angle;
 			}
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{

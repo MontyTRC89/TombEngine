@@ -61,7 +61,7 @@ enum TonyAnim
 
 static BOSS_STRUCT BossData;
 
-#define TONY_TURN ANGLE(2.0f)
+#define TONY_TURN EulerAngle::DegToRad(2.0f)
 #define TONY_HITS 1	// Tony Harder To Kill, was 100 (6 shotgun shots)
 #define MAX_TONY_TRIGGER_RANGE 0x4000
 
@@ -259,7 +259,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.yRot = item->Pose.Orientation.y;
+		flame.yRot = item->Orientation.y;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPL;
 		break;
@@ -274,7 +274,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.yRot = item->Pose.Orientation.y;
+		flame.yRot = item->Orientation.y;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPR;
 		break;
@@ -289,7 +289,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = (GetRandomControl() & 7) + 10;
 		flame.speed = 160;
-		flame.yRot = item->Pose.Orientation.y;
+		flame.yRot = item->Orientation.y;
 		flame.room_number = roomNumber;
 		flame.type = T_ZAPP;
 		break;
@@ -387,8 +387,8 @@ void ControlTonyFireBall(short fxNumber)
 			fx->fallspeed = CLICK(2);
 
 		fx->pos.Position.y += fx->fallspeed / 2;
-		fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
-		fx->pos.Position.x += fx->speed * phd_sin(fx->pos.Orientation.y);
+		fx->pos.Position.z += fx->speed * cos(fx->pos.Orientation.y);
+		fx->pos.Position.x += fx->speed * sin(fx->pos.Orientation.y);
 
 		if (Wibble & 4)
 			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((oldX - fx->pos.Position.x) * 8), (short)((oldY - fx->pos.Position.y) * 8), (short)((oldZ - fx->pos.Position.z) * 4));
@@ -664,7 +664,7 @@ void TonyControl(short itemNumber)
 				torsoY = AI.angle;
 
 				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 28)
-					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Pose.Orientation.y, 0);
+					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Orientation.y, 0);
 
 				break;
 

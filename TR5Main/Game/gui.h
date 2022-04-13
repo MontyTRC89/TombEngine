@@ -387,9 +387,9 @@ struct InventoryObject
 	short object_number;
 	short yoff;
 	float scale1;
-	short yrot;
-	short xrot;
-	short zrot;
+	float yrot;
+	float xrot;
+	float zrot;
 	unsigned __int64 opts;
 	const char* objname;
 	unsigned long meshbits;

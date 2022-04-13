@@ -685,7 +685,7 @@ namespace TEN::Renderer
 		void getItemAbsBonePosition(int itemNumber, Vector3* pos, int joint);
 		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void getBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
-		void drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
+		void drawObjectOn2DPosition(short x, short y, short objectNum, float rotX, float rotY, float rotZ,
 		                            float scale1);
 
 		RendererMesh* GetMesh(int meshIndex);

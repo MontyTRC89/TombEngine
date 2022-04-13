@@ -207,15 +207,15 @@ namespace TEN::Entities::Generic
 		int oldZ = item->Pose.Position.z;
 
 		if (item->Animation.VerticalVelocity)
-			item->Pose.Orientation.z += ANGLE(5);
+			item->Orientation.z += EulerAngle::DegToRad(5);
 		else if (!item->Animation.Velocity)
 		{
-			item->Pose.Orientation.x = 0;
-			item->Pose.Orientation.z = 0;
+			item->Orientation.x = 0;
+			item->Orientation.z = 0;
 		}
 
-		int xv = item->Animation.Velocity * phd_sin(item->Pose.Orientation.y);
-		int zv = item->Animation.Velocity * phd_cos(item->Pose.Orientation.y);
+		int xv = item->Animation.Velocity * sin(item->Orientation.y);
+		int zv = item->Animation.Velocity * cos(item->Orientation.y);
 
 		item->Pose.Position.x += xv;
 		item->Pose.Position.z += zv;
@@ -308,7 +308,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			short rot = torchItem->Pose.Orientation.y;
+			short rot = torchItem->Orientation.y;
 
 			switch (torchItem->ObjectNumber)
 			{
@@ -340,7 +340,7 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			torchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			torchItem->Orientation.y = laraItem->Orientation.y;
 
 			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{
@@ -360,7 +360,7 @@ namespace TEN::Entities::Generic
 				laraInfo->InteractedItem = itemNumber;
 			}
 
-			torchItem->Pose.Orientation.y = rot;
+			torchItem->Orientation.y = rot;
 		}
 		if (laraItem->Animation.ActiveState == LS_MISC_CONTROL &&
 			laraInfo->InteractedItem == itemNumber &&

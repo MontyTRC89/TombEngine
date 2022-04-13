@@ -37,7 +37,7 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		short angles[2];
+		float angles[2];
 		phd_GetVectorAngles(
 			LaraItem->Pose.Position.x - fx->pos.Position.x,
 			LaraItem->Pose.Position.y - fx->pos.Position.y - 256,
@@ -99,11 +99,11 @@ void MissileControl(short itemNumber)
 	int y = fx->pos.Position.y;
 	int z = fx->pos.Position.z;
 
-	int c = fx->speed * phd_cos(fx->pos.Orientation.x);
+	int c = fx->speed * cos(fx->pos.Orientation.x);
 
-	fx->pos.Position.x += c * phd_sin(fx->pos.Orientation.y);
-	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
-	fx->pos.Position.z += c * phd_cos(fx->pos.Orientation.y);
+	fx->pos.Position.x += c * sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
+	fx->pos.Position.z += c * cos(fx->pos.Orientation.y);
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 	
@@ -161,7 +161,7 @@ void MissileControl(short itemNumber)
 					// IMP hit effect
 					ExplodeFX(fx, 0, 32);
 					LaraItem->HitPoints -= 50;
-					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Orientation.y, LaraItem->RoomNumber);
 					SoundEffect(SFX_TR5_IMP_STONEHIT, &fx->pos, 0);
 					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
 				}

@@ -20,9 +20,9 @@ namespace TEN::Entities::TR5
 		-256, 256,
 		0, 0,
 		-512, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 	};
 
 	auto CrowDovePos = Vector3Int(0, 0, -400);
@@ -51,8 +51,8 @@ namespace TEN::Entities::TR5
 		}
 		else
 		{
-			int oldYrot = switchItem->Pose.Orientation.y;
-			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			int oldYrot = switchItem->Orientation.y;
+			switchItem->Orientation.y = laraItem->Orientation.y;
 			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))
@@ -68,7 +68,7 @@ namespace TEN::Entities::TR5
 					switchItem->ItemFlags[0] = 0;
 
 					switchItem->Status = ITEM_ACTIVE;
-					switchItem->Pose.Orientation.y = oldYrot;
+					switchItem->Orientation.y = oldYrot;
 					ResetLaraFlex(laraItem);
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
@@ -77,7 +77,7 @@ namespace TEN::Entities::TR5
 				else
 					laraInfo->InteractedItem = itemNumber;
 				
-				switchItem->Pose.Orientation.y = oldYrot;
+				switchItem->Orientation.y = oldYrot;
 			}
 			else
 			{
@@ -87,7 +87,7 @@ namespace TEN::Entities::TR5
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				switchItem->Pose.Orientation.y = oldYrot;
+				switchItem->Orientation.y = oldYrot;
 			}
 		}
 	}
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR5
 			AnimateItem(item);
 
 			if (item->Animation.ActiveState == SWITCH_OFF)
-				item->Pose.Orientation.y += ANGLE(90.0f);
+				item->Orientation.y += EulerAngle::DegToRad(90.0f);
 		}
 	}
 }

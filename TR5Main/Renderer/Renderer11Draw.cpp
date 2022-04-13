@@ -46,7 +46,7 @@ namespace TEN::Renderer
 		m_pickupRotation += 45 * 360 / 30;
 	}
 
-	void Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
+	void Renderer11::drawObjectOn2DPosition(short x, short y, short objectNum, float rotX, float rotY, float rotZ,
 											float scale1)
 	{
 		Matrix translation;
@@ -128,7 +128,7 @@ namespace TEN::Renderer
 
 			// Finish the world matrix
 			translation = Matrix::CreateTranslation(pos.x, pos.y, pos.z + 1024.0f);
-			rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rotY), TO_RAD(rotX), TO_RAD(rotZ));
+			rotation = Matrix::CreateFromYawPitchRoll(rotY, rotX, rotZ);
 			scale = Matrix::CreateScale(scale1);
 
 			world = scale * rotation;
@@ -299,8 +299,8 @@ namespace TEN::Renderer
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
 			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
-				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.y, hairs->Pose.Orientation.x, 0) *
+				Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
 			matrices[i + 1] = world;
 		}
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
@@ -387,8 +387,8 @@ namespace TEN::Renderer
 
 				Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
 															   gunshell->pos.Position.z);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.Orientation.y), TO_RAD(gunshell->pos.Orientation.x),
-																 TO_RAD(gunshell->pos.Orientation.z));
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(gunshell->pos.Orientation.y, gunshell->pos.Orientation.x,
+																 gunshell->pos.Orientation.z);
 				Matrix world = rotation * translation;
 
 				m_stItem.World = world;
@@ -1082,7 +1082,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawExamines()
 	{
-		static short xrot = 0, yrot = 0, zrot = 0;
+		static float xrot = 0, yrot = 0, zrot = 0;
 		static float scaler = 1.2f;
 		float saved_scale;
 		short inv_item = g_Gui.GetRings((int)RingTypes::Inventory)->current_object_list[g_Gui.GetRings(
@@ -1090,16 +1090,16 @@ namespace TEN::Renderer
 		InventoryObject* obj = &inventry_objects_list[inv_item];
 
 		if (TrInput & IN_LEFT)
-			yrot += ANGLE(3);
+			yrot += EulerAngle::DegToRad(3);
 
 		if (TrInput & IN_RIGHT)
-			yrot -= ANGLE(3);
+			yrot -= EulerAngle::DegToRad(3);
 
 		if (TrInput & IN_FORWARD)
-			xrot += ANGLE(3);
+			xrot += EulerAngle::DegToRad(3);
 
 		if (TrInput & IN_BACK)
-			xrot -= ANGLE(3);
+			xrot -= EulerAngle::DegToRad(3);
 
 		if (TrInput & IN_SPRINT)
 			scaler += 0.03f;
@@ -1533,8 +1533,8 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 					Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->Pose.Orientation.y), TO_RAD(rat->Pose.Orientation.x),
-																	 TO_RAD(rat->Pose.Orientation.z));
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->Orientation.y, rat->Orientation.x,
+																	 rat->Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
@@ -1591,7 +1591,7 @@ namespace TEN::Renderer
 					{
 						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
 						Matrix rotation = Matrix::CreateFromYawPitchRoll(
-							TO_RAD(bat->Pose.Orientation.y), TO_RAD(bat->Pose.Orientation.x), TO_RAD(bat->Pose.Orientation.z));
+							bat->Orientation.y, bat->Orientation.x, bat->Orientation.z);
 						Matrix world = rotation * translation;
 
 						m_stItem.World = world;
@@ -1634,8 +1634,8 @@ namespace TEN::Renderer
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
 						Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Pose.Orientation.y), TO_RAD(beetle->Pose.Orientation.x),
-																	 TO_RAD(beetle->Pose.Orientation.z));
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->Orientation.y, beetle->Orientation.x,
+																	 beetle->Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
@@ -2093,18 +2093,19 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
-				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
-				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
-				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
-								  LaraItem->BoxNumber);
+				//PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				//PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
+				//PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
+				//				  LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
-				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
-								  r->z + r->zSize * SECTOR(1));
-				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
-				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
-				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
+				PrintDebugMessage("Lara Orient Ang: %f %f %f", EulerAngle::RadToDeg(LaraItem->Orientation.x), EulerAngle::RadToDeg(LaraItem->Orientation.y), EulerAngle::RadToDeg(LaraItem->Orientation.z));
+				PrintDebugMessage("Lara Orient Rad: %f %f %f", LaraItem->Orientation.x, LaraItem->Orientation.y, LaraItem->Orientation.z);
+				//PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
+				//PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
+				//				  r->z + r->zSize * SECTOR(1));
+				//PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
+				//PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
+				//PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
@@ -2971,12 +2972,12 @@ namespace TEN::Renderer
 			nativeItem->Pose.Position.y,
 			nativeItem->Pose.Position.z);
 
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Pose.Orientation.x)));
+		float speed = (-96 * cos(nativeItem->Orientation.x));
 
 		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * phd_sin(TO_RAD(nativeItem->Pose.Orientation.y)),
-			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
-			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
+			nativeItem->Pose.Position.x + speed * sin(nativeItem->Orientation.y),
+			nativeItem->Pose.Position.y + 96 * sin(nativeItem->Orientation.x),
+			nativeItem->Pose.Position.z + speed * cos(nativeItem->Orientation.y));
 
 		addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}
@@ -2993,16 +2994,16 @@ namespace TEN::Renderer
 			switch (j)
 			{
 			case 0:
-				rotation = Matrix::CreateRotationY(TO_RAD(-1092));
+				rotation = Matrix::CreateRotationY(-1092);
 				break;
 			case 1:
-				rotation = Matrix::CreateRotationY(TO_RAD(1092));
+				rotation = Matrix::CreateRotationY(1092);
 				break;
 			case 2:
-				rotation = Matrix::CreateRotationZ(TO_RAD(-1092));
+				rotation = Matrix::CreateRotationZ(-1092);
 				break;
 			case 3:
-				rotation = Matrix::CreateRotationZ(TO_RAD(1092));
+				rotation = Matrix::CreateRotationZ(1092);
 				break;
 			default:
 				rotation = Matrix::Identity;
@@ -3045,8 +3046,8 @@ namespace TEN::Renderer
 				if (!m_staticObjects[msh->staticNumber])
 					continue;
 
-				Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.Orientation.y), TO_RAD(msh->pos.Orientation.x),
-															   TO_RAD(msh->pos.Orientation.z)) * Matrix::CreateTranslation(
+				Matrix world = (Matrix::CreateFromYawPitchRoll(msh->pos.Orientation.y, msh->pos.Orientation.x,
+															   msh->pos.Orientation.z) * Matrix::CreateTranslation(
 					msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z));
 				m_stStatic.World = world;
 				m_stStatic.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);

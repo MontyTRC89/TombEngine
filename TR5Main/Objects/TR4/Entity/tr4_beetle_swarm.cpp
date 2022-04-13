@@ -26,17 +26,17 @@ namespace TEN::Entities::TR4
 
 		if (!item->ItemFlags[1])
 		{
-			if (item->Pose.Orientation.y <= ANGLE(22.5f) || item->Pose.Orientation.y >= ANGLE(157.5f))
+			if (item->Orientation.y <= EulerAngle::DegToRad(22.5f) || item->Orientation.y >= EulerAngle::DegToRad(157.5f))
 			{
-				if (!(item->Pose.Orientation.y >= -ANGLE(22.5f) || item->Pose.Orientation.y <= -ANGLE(157.5f)))
+				if (!(item->Orientation.y >= EulerAngle::DegToRad(-22.5f) || item->Orientation.y <= EulerAngle::DegToRad(-157.5f)))
 					item->Pose.Position.x += CLICK(2);
 			}
 			else
 				item->Pose.Position.x -= CLICK(2);
 
-			if (item->Pose.Orientation.y <= -ANGLE(45.0f) || item->Pose.Orientation.y >= ANGLE(45.0f))
+			if (item->Orientation.y <= EulerAngle::DegToRad(-45.0f) || item->Orientation.y >= EulerAngle::DegToRad(45.0f))
 			{
-				if (item->Pose.Orientation.y < -ANGLE(112.5f) || item->Pose.Orientation.y > ANGLE(112.5f))
+				if (item->Orientation.y < EulerAngle::DegToRad(-112.5f) || item->Orientation.y > EulerAngle::DegToRad(112.5f))
 					item->Pose.Position.z += CLICK(2);
 			}
 			else
@@ -71,17 +71,17 @@ namespace TEN::Entities::TR4
 
 					if (item->ItemFlags[0])
 					{
-						beetle->Pose.Orientation.y = 2 * GetRandomControl();
+						beetle->Orientation.y = 2 * GetRandomControl();
 						beetle->VerticalVelocity= -16 - (GetRandomControl() & 0x1F);
 					}
 					else
 					{
-						beetle->Pose.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - ANGLE(45.0f);
+						beetle->Orientation.y = item->Orientation.y + (GetRandomControl() & 0x3FFF) - EulerAngle::DegToRad(45.0f);
 						beetle->VerticalVelocity = 0;
 					}
 
-					beetle->Pose.Orientation.x = 0;
-					beetle->Pose.Orientation.z = 0;
+					beetle->Orientation.x = 0;
+					beetle->Orientation.z = 0;
 					beetle->On = true;
 					beetle->Flags = 0;
 					beetle->Velocity = (GetRandomControl() & 0x1F) + 1;
@@ -140,9 +140,9 @@ namespace TEN::Entities::TR4
 				int oldy = beetle->Pose.Position.y;
 				int oldz = beetle->Pose.Position.z;
 
-				beetle->Pose.Position.x += beetle->Velocity * phd_sin(beetle->Pose.Orientation.y);
+				beetle->Pose.Position.x += beetle->Velocity * sin(beetle->Orientation.y);
 				beetle->Pose.Position.y += beetle->VerticalVelocity;
-				beetle->Pose.Position.z += beetle->Velocity * phd_cos(beetle->Pose.Orientation.y);
+				beetle->Pose.Position.z += beetle->Velocity * cos(beetle->Orientation.y);
 
 				beetle->VerticalVelocity += GRAVITY;
 
@@ -150,7 +150,7 @@ namespace TEN::Entities::TR4
 				int dy = LaraItem->Pose.Position.y - beetle->Pose.Position.y;
 				int dz = LaraItem->Pose.Position.z - beetle->Pose.Position.z;
 
-				short angle = phd_atan(dz, dx) - beetle->Pose.Orientation.y;
+				short angle = atan2(dz, dx) - beetle->Orientation.y;
 
 				if (abs(dx) < 85 &&
 					abs(dy) < 85 &&
@@ -165,9 +165,9 @@ namespace TEN::Entities::TR4
 					if (abs(dx) + abs(dz) <= SECTOR(1))
 					{
 						if (beetle->Velocity & 1)
-							beetle->Pose.Orientation.y += ANGLE(2.8f);
+							beetle->Orientation.y += EulerAngle::DegToRad(2.8f);
 						else
-							beetle->Pose.Orientation.y -= ANGLE(2.8f);
+							beetle->Orientation.y -= EulerAngle::DegToRad(2.8f);
 
 						beetle->Velocity = 48 - Lara.LitTorch * 64 - (abs(angle) / 128);
 						if (beetle->Velocity < -16)
@@ -178,15 +178,15 @@ namespace TEN::Entities::TR4
 						if (beetle->Velocity < (i & 0x1F) + 24)
 							beetle->Velocity++;
 						
-						if (abs(angle) >= ANGLE(22.5f))
+						if (abs(angle) >= EulerAngle::DegToRad(22.5f))
 						{
 							if (angle >= 0)
-								beetle->Pose.Orientation.y += ANGLE(5.6f);
+								beetle->Orientation.y += EulerAngle::DegToRad(5.6f);
 							else
-								beetle->Pose.Orientation.y -= ANGLE(5.6f);
+								beetle->Orientation.y -= EulerAngle::DegToRad(5.6f);
 						}
 						else
-							beetle->Pose.Orientation.y += 8 * (Wibble - i);
+							beetle->Orientation.y += 8 * (Wibble - i);
 					}
 				}
 
@@ -196,15 +196,15 @@ namespace TEN::Entities::TR4
 				{
 					// Beetle has hit a wall a high step.
 					if (angle <= 0)
-						beetle->Pose.Orientation.y -= ANGLE(90.0f);
+						beetle->Orientation.y -= EulerAngle::DegToRad(90.0f);
 					else
-						beetle->Pose.Orientation.y += ANGLE(90.0f);
+						beetle->Orientation.y += EulerAngle::DegToRad(90.0f);
 
 					beetle->Pose.Position.x = oldx;
 					beetle->Pose.Position.y = oldy;
 					beetle->Pose.Position.z = oldz;
-					beetle->Pose.Orientation.x = 0;
-					beetle->Pose.Orientation.z = 0;
+					beetle->Orientation.x = 0;
+					beetle->Orientation.z = 0;
 					beetle->VerticalVelocity = 0;
 				}
 				else
@@ -213,8 +213,8 @@ namespace TEN::Entities::TR4
 					if (beetle->Pose.Position.y > height)
 					{
 						beetle->Pose.Position.y = height;
-						beetle->Pose.Orientation.x = 0;
-						beetle->Pose.Orientation.z = 0;
+						beetle->Orientation.x = 0;
+						beetle->Orientation.z = 0;
 						beetle->VerticalVelocity = 0;
 						beetle->Flags = 1;
 					}
@@ -226,7 +226,7 @@ namespace TEN::Entities::TR4
 					NextBeetle = 0;
 				}
 				else
-					beetle->Pose.Orientation.x = -64 * beetle->VerticalVelocity;
+					beetle->Orientation.x = -64 * beetle->VerticalVelocity;
 			}
 		}
 	}

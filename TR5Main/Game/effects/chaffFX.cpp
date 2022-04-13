@@ -2,6 +2,7 @@
 #include "Game/effects/chaffFX.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/bubble.h"
 #include "Game/effects/smoke.h"
@@ -41,31 +42,33 @@ void TriggerChaffEffects(int flareAge)
 	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Animation.Velocity, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
 }
 
-void TriggerChaffEffects(ITEM_INFO* Item,int age)
+void TriggerChaffEffects(ITEM_INFO* item, int age)
 {
 	Matrix world
 		= Matrix::CreateTranslation(-6, 6, 32)
-		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Pose.Orientation.y), TO_RAD(Item->Pose.Orientation.x), TO_RAD(Item->Pose.Orientation.z));
+		* Matrix::CreateFromYawPitchRoll(item->Orientation.y, item->Orientation.x, item->Orientation.z);
 
-	Vector3Int pos;
-	pos.x = Item->Pose.Position.x + world.Translation().x;
-	pos.y = Item->Pose.Position.y + world.Translation().y;
-	pos.z = Item->Pose.Position.z + world.Translation().z;
+	auto pos = Vector3Int(
+		item->Pose.Position.x + world.Translation().x,
+		item->Pose.Position.y + world.Translation().y,
+		item->Pose.Position.z + world.Translation().z
+	);
 
 	world
 		= Matrix::CreateTranslation(-6, 6, 32)
 		* Matrix::CreateTranslation((GetRandomDraw() & 127) - 64, (GetRandomDraw() & 127) - 64, (GetRandomDraw() & 511) + 512)
-		* Matrix::CreateFromYawPitchRoll(TO_RAD(Item->Pose.Orientation.y), TO_RAD(Item->Pose.Orientation.x), TO_RAD(Item->Pose.Orientation.z));
+		* Matrix::CreateFromYawPitchRoll(item->Orientation.y, item->Orientation.x, item->Orientation.z);
 
-	Vector3Int vel;
-	vel.x = world.Translation().x;
-	vel.y = world.Translation().y;
-	vel.z = world.Translation().z;
+	Vector3Int vel = Vector3Int(
+		world.Translation().x,
+		world.Translation().y,
+		world.Translation().z
+	);
 
-	TriggerChaffEffects(Item, &pos, &vel, Item->Animation.Velocity, (bool)(g_Level.Rooms[Item->RoomNumber].flags & ENV_FLAG_WATER),age);
+	TriggerChaffEffects(item, &pos, &vel, item->Animation.Velocity, TestEnvironment(ENV_FLAG_WATER, item->RoomNumber), age);
 }
 
-void TriggerChaffEffects(ITEM_INFO* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater,int age)
+void TriggerChaffEffects(ITEM_INFO* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater, int age)
 {
 	int numSparks = (int)GenerateFloat(2, 5);
 	for (int i = 0; i < numSparks; i++)

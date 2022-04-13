@@ -143,7 +143,7 @@ void WorkerFlamethrower(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(5.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(5.0f);
 
 			if (AI.ahead)
 			{
@@ -171,7 +171,7 @@ void WorkerFlamethrower(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = ANGLE(10.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(10.0f);
 
 			if (AI.ahead)
 			{

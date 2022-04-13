@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
+class EulerAngle;
 struct ITEM_INFO;
 struct CollisionInfo;
 struct LaraInfo;
@@ -13,20 +14,20 @@ struct VaultTestResult;
 
 void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll);
-void ApproachLaraTargetOrientation(ITEM_INFO* item, Vector3Shrt targetOrient, float rate = 1.0f);
+void ApproachLaraTargetOrientation(ITEM_INFO* item, EulerAngle targetOrient, float rate = 1.0f);
 void EaseOutLaraHeight(ITEM_INFO* item, int height);
-void DoLaraLean(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate);
+void DoLaraLean(ITEM_INFO* item, CollisionInfo* coll, float maxAngle, float rate);
 void DoLaraStep(ITEM_INFO* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ITEM_INFO* item, CollisionInfo* coll);
 void DoLaraCrawlToHangSnap(ITEM_INFO* item, CollisionInfo* coll);
-void DoLaraCrawlFlex(ITEM_INFO* item, CollisionInfo* coll, short maxAngle, short rate);
+void DoLaraCrawlFlex(ITEM_INFO* item, CollisionInfo* coll, float maxAngle, float rate);
 void DoLaraTightropeBalance(ITEM_INFO* item);
 void DoLaraTightropeLean(ITEM_INFO* item);
 void DoLaraTightropeBalanceRegen(ITEM_INFO* item);
 void DoLaraFallDamage(ITEM_INFO* item);
 
 LaraInfo*& GetLaraInfo(ITEM_INFO* item);
-short GetLaraSlideDirection(ITEM_INFO* item, CollisionInfo* coll);
+float GetLaraSlideDirection(ITEM_INFO* item, CollisionInfo* coll);
 
 void ModulateLaraSlideVelocity(ITEM_INFO* item, CollisionInfo* coll);
 void UpdateLaraSubsuitAngles(ITEM_INFO* item);

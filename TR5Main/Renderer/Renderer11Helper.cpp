@@ -60,7 +60,7 @@ namespace TEN::Renderer
 			for (auto fx : room->EffectsToDraw)
 			{
 				Matrix translation = Matrix::CreateTranslation(fx->Effect->pos.Position.x, fx->Effect->pos.Position.y, fx->Effect->pos.Position.z);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(fx->Effect->pos.Orientation.y), TO_RAD(fx->Effect->pos.Orientation.x), TO_RAD(fx->Effect->pos.Orientation.z));
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(fx->Effect->pos.Orientation.y, fx->Effect->pos.Orientation.x, fx->Effect->pos.Orientation.z);
 				fx->World = rotation * translation;
 			}
 		}
@@ -208,27 +208,27 @@ namespace TEN::Renderer
 					[&j, &currentBone](QuadInfo& quad)
 				{
 					if (j == 3 || j == 4)
-						currentBone->ExtraRotation.x = TO_RAD(quad.RearRot);
+						currentBone->ExtraRotation.x = quad.RearRot;
 					else if (j == 6 || j == 7)
-						currentBone->ExtraRotation.x = TO_RAD(quad.FrontRot);
+						currentBone->ExtraRotation.x = quad.FrontRot;
 				},
 				[&j, &currentBone](JeepInfo& jeep)
 				{
 					switch(j)
 					{
 					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
+						currentBone->ExtraRotation.x = jeep.rot1;
 						break;
 					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
+						currentBone->ExtraRotation.x = jeep.rot2;
 
 						break;
 					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
+						currentBone->ExtraRotation.x = jeep.rot3;
 
 						break;
 					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
+						currentBone->ExtraRotation.x = jeep.rot4;
 
 						break;
 					}
@@ -239,21 +239,21 @@ namespace TEN::Renderer
 				{
 					case 2:
 					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
+						currentBone->ExtraRotation.x = bike.wheelRight;
 						break;
 					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
+						currentBone->ExtraRotation.x = bike.wheelLeft;
 				}
 				},
 				[&j, &currentBone](RubberBoatInfo& boat)
 				{
 				if (j == 2)
-					currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
+					currentBone->ExtraRotation.z = boat.PropellerRotation;
 				},
 				[&j, &currentBone](UPVInfo& upv)
 				{
 				if (j == 3)
-					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
+					currentBone->ExtraRotation.z = upv.FanRot;
 				},
 				[&j, &currentBone](BigGunInfo& biggun)
 				{
@@ -264,19 +264,19 @@ namespace TEN::Renderer
 				{
 				if (currentBone->ExtraRotationFlags & ROT_Y)
 				{
-					currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
+					currentBone->ExtraRotation.y = creature.JointRotation[lastJoint];
 					lastJoint++;
 				}
 
 				if (currentBone->ExtraRotationFlags & ROT_X)
 				{
-					currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
+					currentBone->ExtraRotation.x = creature.JointRotation[lastJoint];
 					lastJoint++;
 				}
 
 				if (currentBone->ExtraRotationFlags & ROT_Z)
 				{
-					currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
+					currentBone->ExtraRotation.z = creature.JointRotation[lastJoint];
 					lastJoint++;
 				}
 				}
@@ -709,7 +709,7 @@ namespace TEN::Renderer
 		else
 			world = Matrix::Identity * local;
 
-		world = Matrix::CreateFromYawPitchRoll(TO_RAD(nativeItem->Pose.Orientation.y), TO_RAD(nativeItem->Pose.Orientation.x), TO_RAD(nativeItem->Pose.Orientation.z)) * world;
+		world = Matrix::CreateFromYawPitchRoll(nativeItem->Orientation.y, nativeItem->Orientation.x, nativeItem->Orientation.z) * world;
 
 		short objNum = nativeItem->ObjectNumber;
 		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;

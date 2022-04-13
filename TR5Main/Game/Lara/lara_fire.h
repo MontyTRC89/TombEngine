@@ -15,9 +15,9 @@ constexpr auto MAX_TARGETS = 8;
 
 struct WeaponInfo
 {
-	short LockAngles[4];
-	short LeftAngles[4];
-	short RightAngles[4];
+	float LockAngles[4];
+	float LeftAngles[4];
+	float RightAngles[4];
 	int AimSpeed;
 	short ShotAccuracy;
 	int GunHeight;
@@ -53,7 +53,7 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem);
 GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LaraWeaponType weaponType);
 void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm);
 void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int damage, int flag);
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, float* angles);
 void FindTargetPoint(ITEM_INFO* laraItem, GameVector* target);
 void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo);
 bool CheckForHoldingState(LaraState state);

@@ -31,19 +31,19 @@ void FlareControl(short itemNumber)
 
 	if (flareItem->Animation.VerticalVelocity)
 	{
-		flareItem->Pose.Orientation.x += ANGLE(3.0f);
-		flareItem->Pose.Orientation.z += ANGLE(5.0f);
+		flareItem->Orientation.x += EulerAngle::DegToRad(3.0f);
+		flareItem->Orientation.z += EulerAngle::DegToRad(5.0f);
 	}
 	else
 	{
-		flareItem->Pose.Orientation.x = 0;
-		flareItem->Pose.Orientation.z = 0;
+		flareItem->Orientation.x = 0;
+		flareItem->Orientation.z = 0;
 	}
 
 	auto oldPos = flareItem->Pose.Position;
 
-	int xVel = flareItem->Animation.Velocity * phd_sin(flareItem->Pose.Orientation.y);
-	int zVel = flareItem->Animation.Velocity * phd_cos(flareItem->Pose.Orientation.y);
+	int xVel = flareItem->Animation.Velocity * sin(flareItem->Orientation.y);
+	int zVel = flareItem->Animation.Velocity * cos(flareItem->Orientation.y);
 
 	flareItem->Pose.Position.x += xVel;
 	flareItem->Pose.Position.z += zVel;
@@ -88,8 +88,8 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::Free;
-	lara->LeftArm.Rotation = Vector3Shrt();
-	lara->RightArm.Rotation = Vector3Shrt();
+	lara->LeftArm.Rotation.Zero;
+	lara->RightArm.Rotation.Zero;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
 	lara->TargetEntity = NULL;
@@ -308,25 +308,25 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		if (floorHeight < pos.y || collided)
 		{
 			flag = true;
-			flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y + ANGLE(180.0f);
-			flareItem->Pose.Position.x = laraItem->Pose.Position.x + 320 * phd_sin(flareItem->Pose.Orientation.y);
-			flareItem->Pose.Position.z = laraItem->Pose.Position.z + 320 * phd_cos(flareItem->Pose.Orientation.y);
+			flareItem->Orientation.y = laraItem->Orientation.y + EulerAngle::DegToRad(180.0f);
+			flareItem->Pose.Position.x = laraItem->Pose.Position.x + 320 * sin(flareItem->Orientation.y);
+			flareItem->Pose.Position.z = laraItem->Pose.Position.z + 320 * cos(flareItem->Orientation.y);
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 		else
 		{
 			if (thrown)
-				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+				flareItem->Orientation.y = laraItem->Orientation.y;
 			else
-				flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y - ANGLE(45.0f);
+				flareItem->Orientation.y = laraItem->Orientation.y - EulerAngle::DegToRad(45.0f);
 
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 
 		InitialiseItem(itemNumber);
 
-		flareItem->Pose.Orientation.x = 0;
-		flareItem->Pose.Orientation.z = 0;
+		flareItem->Orientation.x = 0;
+		flareItem->Orientation.z = 0;
 		flareItem->Shade = -1;
 
 		if (thrown)

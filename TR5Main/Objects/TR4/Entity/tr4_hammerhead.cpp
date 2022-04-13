@@ -58,7 +58,7 @@ void HammerheadControl(short itemNumber)
 			CreatureAIInfo(item, &AI);
 
 			if (creature->Enemy != LaraItem)
-				phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
+				atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
@@ -73,7 +73,7 @@ void HammerheadControl(short itemNumber)
 				break;
 
 			case HAMMERHEAD_STATE_SWIM_SLOW:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (AI.distance <= pow(SECTOR(1), 2))
 				{

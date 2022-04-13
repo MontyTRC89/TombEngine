@@ -102,7 +102,7 @@ void LionControl(short itemNumber)
 				break;
 
 			case 2:
-				creature->MaxTurn = ANGLE(2.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -118,7 +118,7 @@ void LionControl(short itemNumber)
 				break;
 
 			case 3:
-				creature->MaxTurn = ANGLE(5.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(5.0f);
 				tilt = angle;
 
 				if (creature->Mood != MoodType::Bored)
@@ -144,7 +144,7 @@ void LionControl(short itemNumber)
 			case 4:
 				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
-					CreatureEffect2(item, &LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &LionBite1, 10, item->Orientation.y, DoBloodSplat);
 					item->Animation.RequiredState = 1;
 
 					LaraItem->HitPoints -= 200;
@@ -154,11 +154,11 @@ void LionControl(short itemNumber)
 				break;
 
 			case 7:
-				creature->MaxTurn = ANGLE(1.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(1.0f);
 
 				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
-					CreatureEffect2(item, &LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &LionBite2, 10, item->Orientation.y, DoBloodSplat);
 					item->Animation.RequiredState = 1;
 
 					LaraItem->HitPoints -= 60;

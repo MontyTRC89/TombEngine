@@ -149,7 +149,7 @@ namespace TEN::Renderer
 				addSpriteBillboard(&m_sprites[spark->def],
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
-								   TO_RAD(spark->rotAng), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
+								   spark->rotAng, spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
 								   BLENDMODE_ADDITIVE, view);
 			}
 		}
@@ -168,7 +168,7 @@ namespace TEN::Renderer
 					if (spark->on)
 						addSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
 																   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
-																   TO_RAD(spark->rotAng), 
+																   spark->rotAng, 
 																   spark->scalar,
 																   { spark->size * (float)fire->size, spark->size * (float)fire->size }, BLENDMODE_ADDITIVE, view);
 				}
@@ -263,7 +263,7 @@ namespace TEN::Renderer
 					addSpriteBillboard(&m_sprites[spark->def],
 									   pos,
 									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
-									   TO_RAD(spark->rotAng), spark->scalar, 
+									   spark->rotAng, spark->scalar, 
 									   {spark->size, spark->size},
 						BLENDMODE_ADDITIVE, view);
 				} 
@@ -275,7 +275,7 @@ namespace TEN::Renderer
 					addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
 						pos, 
 						Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
-						TO_RAD(spark->rotAng), 
+						spark->rotAng, 
 						spark->scalar, 
 						Vector2(4, spark->size), BLENDMODE_ADDITIVE, v, view);
 				}
@@ -418,7 +418,7 @@ namespace TEN::Renderer
 				byte color = shockwave->life * 8;
 
 				int dl = shockwave->outerRad - shockwave->innerRad;
-				Matrix rotationMatrix = Matrix::CreateRotationX(TO_RAD(shockwave->xRot));
+				Matrix rotationMatrix = Matrix::CreateRotationX(shockwave->xRot);
 				Vector3 pos = Vector3(shockwave->x, shockwave->y, shockwave->z);
 
 				// Inner circle
@@ -483,7 +483,7 @@ namespace TEN::Renderer
 				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
-								   TO_RAD(blood->rotAng), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
+								   blood->rotAng, 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
 								   BLENDMODE_ADDITIVE, view);
 			}
 		}
@@ -552,7 +552,7 @@ namespace TEN::Renderer
 
 		short length = 0;
 		short zOffset = 0;
-		short rotationX = 0;
+		float rotationX = 0;
 
 		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
@@ -566,26 +566,26 @@ namespace TEN::Renderer
 			case LaraWeaponType::Revolver:
 				length = 192;
 				zOffset = 68;
-				rotationX = -14560;
+				rotationX = EulerAngle::DegToRad(-80.0f);
 				break;
 
 			case LaraWeaponType::Uzi:
 				length = 190;
 				zOffset = 50;
-				rotationX = -14560;
+				rotationX = EulerAngle::DegToRad(-80.0f);
 				break;
 
 			case LaraWeaponType::HK:
 				length = 300;
 				zOffset = 92;
-				rotationX = -14560;
+				rotationX = EulerAngle::DegToRad(-80.0f);
 				break;
 
 			default:
 			case LaraWeaponType::Pistol:
 				length = 180;
 				zOffset = 40;
-				rotationX = -16830;
+				rotationX = EulerAngle::DegToRad(92.5f);
 				break;
 			}
 
@@ -600,7 +600,7 @@ namespace TEN::Renderer
 				if (flashBucket.Vertices.size() != 0) 
 				{
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
-					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
+					Matrix rotation2 = Matrix::CreateRotationX(rotationX);
 
 					if (Lara.LeftArm.FlashGun)
 					{
@@ -698,8 +698,8 @@ namespace TEN::Renderer
 						if (flashBucket.Vertices.size() != 0)
 						{
 							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
-							Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+							Matrix rotationX = Matrix::CreateRotationX(EulerAngle::DegToRad(270.0f));
+							Matrix rotationZ = Matrix::CreateRotationZ(2 * GetRandomControl());
 
 							Matrix world = item->AnimationTransforms[joint] * item->World;
 							world = rotationX * world;
@@ -1295,7 +1295,7 @@ namespace TEN::Renderer
 
 		if (!fragment->active)
 		{
-			Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
+			Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(yRot), 0, 0);
 			RendererVertex vtx0 = meshVertices.at(renderBucket.Indices[i]);
 			RendererVertex vtx1 = meshVertices.at(renderBucket.Indices[i + 1]);
 			RendererVertex vtx2 = meshVertices.at(renderBucket.Indices[i + 2]);

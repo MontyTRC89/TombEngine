@@ -248,7 +248,7 @@ namespace TEN::Effects::Lightning
 
 				for (int j = 0; j < 32; j++)
 				{
-					short angle = -phd_atan(vbuffer);
+					short angle = -atan2(vbuffer);
 					float sinAngle = FloatSinCosTable[angle + 0x4000];
 					width = max(width, 0);
 
@@ -258,7 +258,7 @@ namespace TEN::Effects::Lightning
 				v46 = (float*)&v125;
 				do
 				{
-					v47 = -j_phd_atan((signed __int64)(v46[7] - *(v46 - 1)), (signed __int64)(v46[8] - *v46));
+					v47 = -j_atan2((signed __int64)(v46[7] - *(v46 - 1)), (signed __int64)(v46[8] - *v46));
 					v48 = FloatSinCosTable[(unsigned __int16)(v47 + 0x4000)];
 					v49 = v88;
 					if (v88 <= 0.0)

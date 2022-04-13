@@ -37,9 +37,9 @@ OBJECT_COLLISION_BOUNDS PickUpBounds =
 	-256, 256,
 	-200, 200,
 	-256, 256,
-	-ANGLE(10.0f), ANGLE(10.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
 	0, 0,
-	-ANGLE(2.0f), ANGLE(2.0f)
+	EulerAngle::DegToRad(-2.0f), EulerAngle::DegToRad(2.0f)
 };
 
 static Vector3Int HiddenPickUpPosition(0, 0, -690);
@@ -48,8 +48,8 @@ OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 	-256, 256,
 	-100, 100,
 	-800, -256,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -59,8 +59,8 @@ OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 	-256, 256,
 	-100, 100,
 	200, 512,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -70,8 +70,8 @@ OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 	-512, 0,
 	-100, 100,
 	0, 512,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -81,8 +81,8 @@ OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 	-256, 256,
 	-640, 640,
 	-511, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -92,9 +92,9 @@ OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 	-512, 512,
 	-512, 512,
 	-512, 512,
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f)
+	EulerAngle::DegToRad(-45.0f),  EulerAngle::DegToRad(45.0f),
+	EulerAngle::DegToRad(-45.0f),  EulerAngle::DegToRad(45.0f),
+	EulerAngle::DegToRad(-45.0f),  EulerAngle::DegToRad(45.0f)
 };
 
 static Vector3Int SOPos(0, 0, 0);
@@ -103,9 +103,9 @@ OBJECT_COLLISION_BOUNDS SOBounds =
 	0, 0,
 	0, 0,
 	0, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 };
 
 short SearchCollectFrames[4] = { 180, 100, 153, 83 };
@@ -117,9 +117,9 @@ OBJECT_COLLISION_BOUNDS MSBounds =
 	0, 0,
 	0, 0,
 	0, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 };
 
 int NumRPickups;
@@ -204,9 +204,9 @@ void DoPickup(ITEM_INFO* laraItem)
 	short pickupItemNumber = getThisItemPlease;
 	auto* pickupItem = &g_Level.Items[pickupItemNumber];
 
-	short oldXrot = pickupItem->Pose.Orientation.x;
-	short oldYrot = pickupItem->Pose.Orientation.y;
-	short oldZrot = pickupItem->Pose.Orientation.z;
+	short oldXrot = pickupItem->Orientation.x;
+	short oldYrot = pickupItem->Orientation.y;
+	short oldZrot = pickupItem->Orientation.z;
 
 	if (pickupItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
 	{
@@ -215,9 +215,9 @@ void DoPickup(ITEM_INFO* laraItem)
 		lara->LitTorch = (pickupItem->ItemFlags[3] & 1);
 
 		KillItem(pickupItemNumber);
-		pickupItem->Pose.Orientation.x = oldXrot;
-		pickupItem->Pose.Orientation.y = oldYrot;
-		pickupItem->Pose.Orientation.z = oldZrot;
+		pickupItem->Orientation.x = oldXrot;
+		pickupItem->Orientation.y = oldYrot;
+		pickupItem->Orientation.z = oldZrot;
 		getThisItemPlease = NO_ITEM;
 		return;
 	}
@@ -233,9 +233,9 @@ void DoPickup(ITEM_INFO* laraItem)
 			DrawFlareMeshes(laraItem);
 			KillItem(pickupItemNumber);
 
-			pickupItem->Pose.Orientation.x = oldXrot;
-			pickupItem->Pose.Orientation.y = oldYrot;
-			pickupItem->Pose.Orientation.z = oldZrot;
+			pickupItem->Orientation.x = oldXrot;
+			pickupItem->Orientation.y = oldYrot;
+			pickupItem->Orientation.z = oldZrot;
 			getThisItemPlease = NO_ITEM;
 			return;
 		}
@@ -265,9 +265,9 @@ void DoPickup(ITEM_INFO* laraItem)
 				pickupItem->Status = ITEM_INVISIBLE;
 			}
 
-			pickupItem->Pose.Orientation.x = oldXrot;
-			pickupItem->Pose.Orientation.y = oldYrot;
-			pickupItem->Pose.Orientation.z = oldZrot;
+			pickupItem->Orientation.x = oldXrot;
+			pickupItem->Orientation.y = oldYrot;
+			pickupItem->Orientation.z = oldZrot;
 			getThisItemPlease = NO_ITEM;
 			return;
 		}
@@ -298,9 +298,9 @@ void DoPickup(ITEM_INFO* laraItem)
 					pickupItem->Status = ITEM_INVISIBLE;
 				}
 
-				pickupItem->Pose.Orientation.x = oldXrot;
-				pickupItem->Pose.Orientation.y = oldYrot;
-				pickupItem->Pose.Orientation.z = oldZrot;
+				pickupItem->Orientation.x = oldXrot;
+				pickupItem->Orientation.y = oldYrot;
+				pickupItem->Orientation.z = oldZrot;
 				KillItem(pickupItemNumber);
 				getThisItemPlease = NO_ITEM;
 				return;
@@ -315,9 +315,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	short oldXrot = item->Pose.Orientation.x;
-	short oldYrot = item->Pose.Orientation.y;
-	short oldZrot = item->Pose.Orientation.z;
+	short oldXrot = item->Orientation.x;
+	short oldYrot = item->Orientation.y;
+	short oldZrot = item->Orientation.z;
 
 	if (item->Status == ITEM_INVISIBLE)
 		return;
@@ -331,15 +331,15 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		return;
 
-	item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-	item->Pose.Orientation.z = 0;
+	item->Orientation.y = laraItem->Orientation.y;
+	item->Orientation.z = 0;
 
 	if (lara->Control.WaterStatus != WaterStatus::Dry &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Underwater)
 		{
-			item->Pose.Orientation.x = -ANGLE(25.0f);
+			item->Orientation.x = EulerAngle::DegToRad(-25.0f);
 
 			if (TrInput & IN_ACTION && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
@@ -386,16 +386,16 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 					}
 				}
 
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->Orientation.x = oldXrot;
+				item->Orientation.y = oldYrot;
+				item->Orientation.z = oldZrot;
 				return;
 			}
 		}
 
-		item->Pose.Orientation.x = oldXrot;
-		item->Pose.Orientation.y = oldYrot;
-		item->Pose.Orientation.z = oldZrot;
+		item->Orientation.x = oldXrot;
+		item->Orientation.y = oldYrot;
+		item->Orientation.z = oldZrot;
 		return;
 	}
 	
@@ -412,16 +412,16 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			{
 				if (laraItem->Animation.ActiveState != LS_PICKUP && laraItem->Animation.ActiveState != LS_HOLE)
 				{
-					item->Pose.Orientation.x = oldXrot;
-					item->Pose.Orientation.y = oldYrot;
-					item->Pose.Orientation.z = oldZrot;
+					item->Orientation.x = oldXrot;
+					item->Orientation.y = oldYrot;
+					item->Orientation.z = oldZrot;
 					return;
 				}
 				else
 				{
-					item->Pose.Orientation.x = oldXrot;
-					item->Pose.Orientation.y = oldYrot;
-					item->Pose.Orientation.z = oldZrot;
+					item->Orientation.x = oldXrot;
+					item->Orientation.y = oldYrot;
+					item->Orientation.z = oldZrot;
 					return;
 				}
 			}
@@ -429,16 +429,16 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 
 		if (lara->InteractedItem != itemNumber)
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->Orientation.x = oldXrot;
+			item->Orientation.y = oldYrot;
+			item->Orientation.z = oldZrot;
 			return;
 		}
 	}
 	
 	bool flag = false;
 	BOUNDING_BOX* plinth = NULL;
-	item->Pose.Orientation.x = 0;
+	item->Orientation.x = 0;
 	switch (triggerFlags)
 	{
 	case 1: // Pickup from wall hole
@@ -453,9 +453,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				}
 			}
 
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->Orientation.x = oldXrot;
+			item->Orientation.y = oldYrot;
+			item->Orientation.z = oldZrot;
 			return;
 		}
 		else if (MoveLaraPosition(&HiddenPickUpPosition, item, laraItem))
@@ -470,14 +470,14 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		break;
 
 	case 2: // Pickup with crowbar
-		item->Pose.Orientation.y = oldYrot;
+		item->Orientation.y = oldYrot;
 		if (lara->Control.IsLow || !TestLaraPosition(&CrowbarPickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
 			{
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->Orientation.x = oldXrot;
+				item->Orientation.y = oldYrot;
+				item->Orientation.z = oldZrot;
 				return;
 			}
 
@@ -487,9 +487,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				Lara.Control.HandStatus = HandStatus::Free;
 			}
 
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->Orientation.x = oldXrot;
+			item->Orientation.y = oldYrot;
+			item->Orientation.z = oldZrot;
 			return;
 		}
 		if (!lara->Control.IsMoving)
@@ -499,17 +499,17 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->Orientation.x = oldXrot;
+				item->Orientation.y = oldYrot;
+				item->Orientation.z = oldZrot;
 				return;
 			}
 
 			if (g_Gui.GetInventoryItemChosen() != ID_CROWBAR_ITEM)
 			{
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->Orientation.x = oldXrot;
+				item->Orientation.y = oldYrot;
+				item->Orientation.z = oldZrot;
 				return;
 			}
 
@@ -537,9 +537,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 
 		if (!plinth)
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->Orientation.x = oldXrot;
+			item->Orientation.y = oldYrot;
+			item->Orientation.z = oldZrot;
 			return;
 		}
 
@@ -579,9 +579,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 
 		if (!lara->Control.IsMoving)
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->Orientation.x = oldXrot;
+			item->Orientation.y = oldYrot;
+			item->Orientation.z = oldZrot;
 			return;
 		}
 		
@@ -591,19 +591,19 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			Lara.Control.HandStatus = HandStatus::Free;
 		}
 		
-		item->Pose.Orientation.x = oldXrot;
-		item->Pose.Orientation.y = oldYrot;
-		item->Pose.Orientation.z = oldZrot;
+		item->Orientation.x = oldXrot;
+		item->Orientation.y = oldYrot;
+		item->Orientation.z = oldZrot;
 		return;
 
 	case 9: // Pickup object and conver it to crowbar (like submarine level)
-		item->Pose.Orientation.y = oldYrot;
+		item->Orientation.y = oldYrot;
 
 		if (!TestLaraPosition(&JobyCrowPickUpBounds, item, laraItem))
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->Orientation.x = oldXrot;
+			item->Orientation.y = oldYrot;
+			item->Orientation.z = oldZrot;
 			return;
 		}
 
@@ -625,9 +625,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		{
 			if (!lara->Control.IsMoving)
 			{
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->Orientation.x = oldXrot;
+				item->Orientation.y = oldYrot;
+				item->Orientation.z = oldZrot;
 				return;
 			}
 			
@@ -637,9 +637,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				Lara.Control.HandStatus = HandStatus::Free;
 			}
 
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->Orientation.x = oldXrot;
+			item->Orientation.y = oldYrot;
+			item->Orientation.z = oldZrot;
 			return;
 		}
 
@@ -726,9 +726,9 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Busy;
 	}
 
-	item->Pose.Orientation.x = oldXrot;
-	item->Pose.Orientation.y = oldYrot;
-	item->Pose.Orientation.z = oldZrot;
+	item->Orientation.x = oldXrot;
+	item->Orientation.y = oldYrot;
+	item->Orientation.z = oldZrot;
 }
 
 void RegeneratePickups()

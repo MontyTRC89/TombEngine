@@ -16,9 +16,9 @@ BITE_INFO ApeBite = { 0, -19, 75, 15 };
 
 #define TOUCH (0xFF00)
 
-#define RUN_TURN ANGLE(5.0f)
+#define RUN_TURN EulerAngle::DegToRad(5.0f)
 
-#define DISPLAY_ANGLE ANGLE(45.0f)
+#define DISPLAY_ANGLE EulerAngle::DegToRad(45.0f)
 
 #define ATTACK_RANGE pow(430, 2)
 #define PANIC_RANGE  pow(SECTOR(2), 2)
@@ -68,12 +68,12 @@ void ApeVault(short itemNumber, short angle)
 
 	if (creature->Flags & APE_FLAG_TURN_LEFT)
 	{
-		item->Pose.Orientation.y -= ANGLE(90.0f);
+		item->Orientation.y -= EulerAngle::DegToRad(90.0f);
 		creature->Flags -= APE_FLAG_TURN_LEFT;
 	}
 	else if (item->Flags & APE_FLAG_TURN_RIGHT)
 	{
-		item->Pose.Orientation.y += ANGLE(90.0f);
+		item->Orientation.y += EulerAngle::DegToRad(90.0f);
 		creature->Flags -= APE_FLAG_TURN_RIGHT;
 	}
 
@@ -96,12 +96,12 @@ void ApeVault(short itemNumber, short angle)
 		if (yy < yFloor)
 		{
 			item->Pose.Position.x = (yFloor * SECTOR(1)) - SHIFT;
-			item->Pose.Orientation.y = ANGLE(90.0f);
+			item->Orientation.y = EulerAngle::DegToRad(90.0f);
 		}
 		else
 		{
 			item->Pose.Position.x = (yy * SECTOR(1)) + SHIFT;
-			item->Pose.Orientation.y = -ANGLE(90.0f);
+			item->Orientation.y = EulerAngle::DegToRad(-90.0f);
 		}
 	}
 	else if (yy == yFloor)
@@ -109,12 +109,12 @@ void ApeVault(short itemNumber, short angle)
 		if (xx < xFloor)
 		{
 			item->Pose.Position.z = (xFloor * SECTOR(1)) - SHIFT;
-			item->Pose.Orientation.y = 0;
+			item->Orientation.y = 0;
 		}
 		else
 		{
 			item->Pose.Position.z = (xx * SECTOR(1)) + SHIFT;
-			item->Pose.Orientation.y = -ANGLE(180.0f);
+			item->Orientation.y = EulerAngle::DegToRad(-180.0f);
 		}
 	}
 	else
@@ -179,12 +179,12 @@ void ApeControl(short itemNumber)
 		case APE_STATE_IDLE:
 			if (creatureInfo->Flags & APE_FLAG_TURN_LEFT)
 			{
-				item->Pose.Orientation.y -= ANGLE(90);
+				item->Orientation.y -= EulerAngle::DegToRad(90);
 				creatureInfo->Flags -= APE_FLAG_TURN_LEFT;
 			}
 			else if (item->Flags & APE_FLAG_TURN_RIGHT)
 			{
-				item->Pose.Orientation.y += ANGLE(90);
+				item->Orientation.y += EulerAngle::DegToRad(90);
 				creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 			}
 
@@ -257,7 +257,7 @@ void ApeControl(short itemNumber)
 		case APE_STATE_RUN_LEFT:
 			if (!(creatureInfo->Flags & APE_FLAG_TURN_RIGHT))
 			{
-				item->Pose.Orientation.y -= ANGLE(90);
+				item->Orientation.y -= EulerAngle::DegToRad(90);
 				creatureInfo->Flags |= APE_FLAG_TURN_RIGHT;
 			}
 
@@ -267,7 +267,7 @@ void ApeControl(short itemNumber)
 		case APE_STATE_RUN_RIGHT:
 			if (!(creatureInfo->Flags & APE_FLAG_TURN_LEFT))
 			{
-				item->Pose.Orientation.y += ANGLE(90);
+				item->Orientation.y += EulerAngle::DegToRad(90);
 				creatureInfo->Flags |= APE_FLAG_TURN_LEFT;
 			}
 

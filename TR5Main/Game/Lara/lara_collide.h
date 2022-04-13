@@ -21,12 +21,12 @@ bool LaraDeflectEdgeMonkey(ITEM_INFO* item, CollisionInfo* coll);
 void LaraCollideStop(ITEM_INFO* item, CollisionInfo* coll);
 void LaraCollideStopCrawl(ITEM_INFO* item, CollisionInfo* coll);
 void LaraCollideStopMonkey(ITEM_INFO* item, CollisionInfo* coll);
-void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, short angle);
+void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, float angle);
 void LaraResetGravityStatus(ITEM_INFO* item, CollisionInfo* coll);
 void LaraSnapToHeight(ITEM_INFO* item, CollisionInfo* coll);
 void GetLaraDeadlyBounds();
 
-void LaraJumpCollision(ITEM_INFO* item, CollisionInfo* coll, short moveAngle);
+void LaraJumpCollision(ITEM_INFO* item, CollisionInfo* coll, float moveAngle);
 void LaraSurfaceCollision(ITEM_INFO* item, CollisionInfo* coll);
 void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll);
 
@@ -35,4 +35,4 @@ void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraHitCeiling(CollisionInfo* coll);
 void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll);
 
-bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int distance, int height = 0, int side = 0);
+bool TestLaraObjectCollision(ITEM_INFO* item, float angle, int distance, int height = 0, int side = 0);

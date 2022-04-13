@@ -66,8 +66,8 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 					int factor = 3 * (bounds->X2 - bounds->X1) / 8;
 					short angle = 2 * GetRandomControl();
 
-					spark->x = ((bounds->X1 + bounds->X2) / 2) + (GetRandomControl() % factor) * phd_sin(angle);
-					spark->z = ((bounds->Z1 + bounds->Z2) / 2) + (GetRandomControl() % factor) * phd_cos(angle);
+					spark->x = ((bounds->X1 + bounds->X2) / 2) + (GetRandomControl() % factor) * sin(angle);
+					spark->z = ((bounds->Z1 + bounds->Z2) / 2) + (GetRandomControl() % factor) * cos(angle);
 
 					if (intensity >= 0)
 						spark->y = bounds->Y2;
@@ -92,8 +92,8 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 						else
 							spark->z = bounds->Z1;
 
-						spark->x = ((bounds->X1 + bounds->X2) / 2) + (GetRandomControl() % factor) * phd_cos(angle);
-						spark->y += (GetRandomControl() % factor) * phd_sin(angle);
+						spark->x = ((bounds->X1 + bounds->X2) / 2) + (GetRandomControl() % factor) * cos(angle);
+						spark->y += (GetRandomControl() % factor) * sin(angle);
 						spark->xVel = 0;
 						spark->zVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
 					}
@@ -104,8 +104,8 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 						else
 							spark->x = bounds->X1;
 
-						spark->y += (GetRandomControl() % factor) * phd_sin(angle);
-						spark->z = ((bounds->Z1 + bounds->Z2) / 2) + (GetRandomControl() % factor) * phd_cos(angle);
+						spark->y += (GetRandomControl() % factor) * sin(angle);
+						spark->z = ((bounds->Z1 + bounds->Z2) / 2) + (GetRandomControl() % factor) * cos(angle);
 						spark->zVel = 0;
 						spark->xVel = 16 * intensity * ((GetRandomControl() & 0x1F) + 224);
 					}
@@ -173,9 +173,9 @@ void VentilatorControl(short itemNumber)
 
 	if (item->ObjectNumber != ID_PROPELLER_V) // TODO: check this ID
 	{
-		if (item->Pose.Orientation.y != -ANGLE(180.0f))
+		if (item->Orientation.y != EulerAngle::DegToRad(-180.0f))
 		{
-			if (item->Pose.Orientation.y == -ANGLE(90.0f))
+			if (item->Orientation.y == EulerAngle::DegToRad(-90.0f))
 			{
 				effectBounds.X1 = item->Pose.Position.x - bounds->Z2;
 				effectBounds.X2 = item->Pose.Position.x - bounds->Z1;
@@ -186,7 +186,7 @@ void VentilatorControl(short itemNumber)
 			}
 			else
 			{
-				if (item->Pose.Orientation.y != ANGLE(90.0f))
+				if (item->Orientation.y != EulerAngle::DegToRad(90.0f))
 				{
 					effectBounds.X1 = item->Pose.Position.x + bounds->X1;
 					effectBounds.X2 = item->Pose.Position.x + bounds->X2;
@@ -214,8 +214,8 @@ void VentilatorControl(short itemNumber)
 			zChange = 0;
 		}
 
-		VentilatorEffect(&effectBounds, 2, item->Pose.Orientation.y, speed);
-		VentilatorEffect(&effectBounds, -2, item->Pose.Orientation.y, speed);
+		VentilatorEffect(&effectBounds, 2, item->Orientation.y, speed);
+		VentilatorEffect(&effectBounds, -2, item->Orientation.y, speed);
 
 		if (LaraItem->Pose.Position.y >= effectBounds.Y1 && LaraItem->Pose.Position.y <= effectBounds.Y2)
 		{

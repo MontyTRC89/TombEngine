@@ -74,7 +74,7 @@ void BarracudaControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(2.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
 			if (creature->Mood == MoodType::Bored)
 				break;
@@ -86,7 +86,7 @@ void BarracudaControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = ANGLE(4.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
 			creature->Flags = 0;
 
 			if (creature->Mood == MoodType::Bored)

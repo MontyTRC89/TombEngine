@@ -20,8 +20,8 @@ BITE_INFO BearBite = { 0, 96, 335, 14 };
 #define REAR_RANGE pow(SECTOR(2), 2)
 #define ATTACK_RANGE pow(SECTOR(1), 2)
 #define PAT_RANGE pow(600, 2)
-#define RUN_TURN ANGLE(5.0f)
-#define WALK_TURN ANGLE(2.0f)
+#define RUN_TURN EulerAngle::DegToRad(5.0f)
+#define WALK_TURN EulerAngle::DegToRad(2.0f)
 #define EAT_RANGE pow(CLICK(3), 2)
 #define CHARGE_DAMAGE 3
 #define SLAM_DAMAGE 200
@@ -61,7 +61,7 @@ void BearControl(short itemNumber)
 
 	if (item->HitPoints <= 0)
 	{
-		angle = CreatureTurn(item, ANGLE(1.0f));
+		angle = CreatureTurn(item, EulerAngle::DegToRad(1.0f));
 
 		switch (item->Animation.ActiveState)
 		{

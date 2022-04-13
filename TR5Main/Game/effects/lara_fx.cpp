@@ -92,8 +92,8 @@ namespace TEN::Effects::Lara
 				return;
 		}
 
-		float z = std::sin(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
-		float x = std::cos(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
+		float x = cos(item->Orientation.y) * -64.0f;
+		float z = sin(item->Orientation.y) * -64.0f;
 		auto offset = Vector3Int(0, -4, 64);
 
 		GetLaraJointPosition(&offset, LM_HEAD);
@@ -103,6 +103,6 @@ namespace TEN::Effects::Lara
 			(GetRandomControl() & 7) - 4);
 
 		GetLaraJointPosition(&seed, LM_HEAD);
-		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Pose.Orientation.y);
+		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Orientation.y);
 	}
 }

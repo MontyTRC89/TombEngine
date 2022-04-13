@@ -29,10 +29,10 @@ using namespace TEN::Math::Random;
 #define MOTORBIKE_SLIP 100
 #define MOTORBIKE_FRICTION 0x180
 /*movement stuff*/
-#define MIN_MOMENTUM_TURN ANGLE(4.0f)
-#define MAX_MOMENTUM_TURN ANGLE(1.5f)
-#define MOTORBIKE_MAX_MOM_TURN ANGLE(150.0f)
-#define MOTORBIKE_DEFAULT_HTURN ANGLE(1.5f)
+#define MIN_MOMENTUM_TURN EulerAngle::DegToRad(4.0f)
+#define MAX_MOMENTUM_TURN EulerAngle::DegToRad(1.5f)
+#define MOTORBIKE_MAX_MOM_TURN EulerAngle::DegToRad(150.0f)
+#define MOTORBIKE_DEFAULT_HTURN EulerAngle::DegToRad(1.5f)
 #define MOTORBIKE_ACCEL_1 0x4000
 #define MOTORBIKE_ACCEL_2 0x7000
 #define MOTORBIKE_ACCEL_MAX 0xC000 //with the boost
@@ -40,8 +40,8 @@ using namespace TEN::Math::Random;
 #define MOTORBIKE_BIG_SLOWDOWN 0x3000
 #define MOTORBIKE_SLOWDOWN1 0x440
 #define MOTORBIKE_SLOWDOWN2 0x600
-#define MOTORBIKE_HTURN ANGLE(0.5f)
-#define MOTORBIKE_MAX_HTURN ANGLE(5.0f)
+#define MOTORBIKE_HTURN EulerAngle::DegToRad(0.5f)
+#define MOTORBIKE_MAX_HTURN EulerAngle::DegToRad(5.0f)
 #define MOTORBIKE_PITCH_SLOWDOWN 0x8000
 #define MOTORBIKE_PITCH_MAX 0xA000
 #define MOTORBIKE_BACKING_VEL 0x800
@@ -139,7 +139,7 @@ void InitialiseMotorbike(short itemNumber)
     motorbike->velocity = 0;
     motorbike->bikeTurn = 0;
     motorbike->pitch = 0;
-    motorbike->momentumAngle = item->Pose.Orientation.y;
+    motorbike->momentumAngle = item->Orientation.y;
     motorbike->wallShiftRotation = 0;
     motorbike->extraRotation = 0;
     motorbike->flags = NULL;
@@ -151,10 +151,10 @@ void InitialiseMotorbike(short itemNumber)
 
 static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
 {
-    pos->y = item->Pose.Position.y - dz * phd_sin(item->Pose.Orientation.x) + dx * phd_sin(item->Pose.Orientation.z);
+    pos->y = item->Pose.Position.y - dz * sin(item->Orientation.x) + dx * sin(item->Orientation.z);
 
-    float c = phd_cos(item->Pose.Orientation.y);
-    float s = phd_sin(item->Pose.Orientation.y);
+    float c = cos(item->Orientation.y);
+    float s = sin(item->Orientation.y);
 
     pos->z = item->Pose.Position.z + dz * c - dx * s;
     pos->x = item->Pose.Position.x + dz * s + dx * c;
@@ -317,18 +317,18 @@ static BOOL GetOnMotorBike(short itemNumber)
     if (height < -32000)
         return false;
 
-    angle = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x) - item->Pose.Orientation.y;
-    tempangle = angle - item->Pose.Orientation.y;
-    if (angle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
+    angle = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x) - item->Orientation.y;
+    tempangle = angle - item->Orientation.y;
+    if (angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
     {
         // left
-        if (tempangle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
+        if (tempangle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
             return false;
     }
     else
     {
         // right
-        if (tempangle > ANGLE(225.0f) && tempangle < ANGLE(315.0f))
+        if (tempangle > EulerAngle::DegToRad(225.0f) && tempangle < EulerAngle::DegToRad(315.0f))
             return false;
     }
     return true;
@@ -367,8 +367,8 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* co
 
             Lara.Control.HandStatus = HandStatus::Free;
 
-            short angle = phd_atan(item->Pose.Position.z - laraitem->Pose.Position.z, item->Pose.Position.x - laraitem->Pose.Position.x) - item->Pose.Orientation.y;
-            if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
+            short angle = atan2(item->Pose.Position.z - laraitem->Pose.Position.z, item->Pose.Position.x - laraitem->Pose.Position.x) - item->Orientation.y;
+            if (angle <= EulerAngle::DegToRad(-45.0f) || angle >= EulerAngle::DegToRad(135.0f))
             {
                 if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
                 {
@@ -388,7 +388,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* co
             laraitem->Pose.Position.x = item->Pose.Position.x;
             laraitem->Pose.Position.y = item->Pose.Position.y;
             laraitem->Pose.Position.z = item->Pose.Position.z;
-            laraitem->Pose.Orientation.y = item->Pose.Orientation.y;
+            laraitem->Orientation.y = item->Orientation.y;
             ResetLaraFlex(laraitem);
             Lara.HitDirection = -1;
             AnimateItem(laraitem);
@@ -441,9 +441,9 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     sptr->x = x + (GetRandomControl() & 0xF) - 8;
     sptr->y = y + (GetRandomControl() & 0xF) - 8;
     sptr->z = z + (GetRandomControl() & 0xF) - 8;
-    sptr->xVel = speed * phd_sin(angle) / 4;
+    sptr->xVel = speed * sin(angle) / 4;
     sptr->yVel = (GetRandomControl() & 7) - 8;
-    sptr->zVel = speed * phd_cos(angle) / 4;
+    sptr->zVel = speed * cos(angle) / 4;
     sptr->friction = 4;
 
     if (GetRandomControl() & 1)
@@ -488,7 +488,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
         speed = item->Animation.Velocity;
         if (speed > 32 && speed < 64)
         {
-            TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - ANGLE(180), 64 - speed, TRUE);
+            TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Orientation.y - EulerAngle::DegToRad(180), 64 - speed, TRUE);
             return;
         }
 
@@ -504,7 +504,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
             speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * ExhaustStart) * 64;
         }
 
-        TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - ANGLE(180), speed, FALSE);
+        TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Orientation.y - EulerAngle::DegToRad(180), speed, FALSE);
     }
 }
 
@@ -520,7 +520,7 @@ static void MotorBikeExplode(ITEM_INFO* item)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
 	}
-    auto pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z, 0, item->Pose.Orientation.y, 0);
+    auto pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z, 0, item->Orientation.y, 0);
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 	ExplodingDeath(Lara.Vehicle, -2, 256);
 	ExplodingDeath(Lara.ItemNumber, -2, 258); // enable blood
@@ -542,15 +542,15 @@ static int MotorBikeCheckGetOff(void)
 		item = &g_Level.Items[Lara.Vehicle];
 		if (LaraItem->Animation.ActiveState == BIKE_EXIT && LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd)
 		{
-			LaraItem->Pose.Orientation.y -= 0x4000;
+			LaraItem->Orientation.y -= 0x4000;
 			LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 			LaraItem->Animation.TargetState = LS_IDLE;
 			LaraItem->Animation.ActiveState = LS_IDLE;
-			LaraItem->Pose.Position.x -= 2 * phd_sin(item->Pose.Orientation.y);
-			LaraItem->Pose.Position.z -= 2 * phd_cos(item->Pose.Orientation.y);
-			LaraItem->Pose.Orientation.x = 0;
-			LaraItem->Pose.Orientation.z = 0;
+			LaraItem->Pose.Position.x -= 2 * sin(item->Orientation.y);
+			LaraItem->Pose.Position.z -= 2 * cos(item->Orientation.y);
+			LaraItem->Orientation.x = 0;
+			LaraItem->Orientation.z = 0;
 			Lara.Vehicle = NO_ITEM;
 			Lara.Control.HandStatus = HandStatus::Free;
 			Lara.SprintEnergy = 120;
@@ -624,8 +624,8 @@ static int GetMotorbikeCollisionAnim(ITEM_INFO* item, Vector3Int* pos)
 
     if (pos->x || pos->z)
     {
-        float c = phd_cos(item->Pose.Orientation.y);
-        float s = phd_sin(item->Pose.Orientation.y);
+        float c = cos(item->Orientation.y);
+        float s = sin(item->Orientation.y);
         int front = pos->z * c + pos->x * s;
         int side = -pos->z * s + pos->x * c;
 
@@ -681,7 +681,7 @@ void MotorbikeBaddieCollision(ITEM_INFO* bike)
                             {
                                 if (LaraItem->HitPoints > 0)
                                 {
-                                    DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - (STEP_SIZE * 2), LaraItem->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 5);
+                                    DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - (STEP_SIZE * 2), LaraItem->Pose.Position.z, GetRandomControl() & 3, LaraItem->Orientation.y, LaraItem->RoomNumber, 5);
                                     LaraItem->HitPoints -= 8;
                                 }
                             }
@@ -690,7 +690,7 @@ void MotorbikeBaddieCollision(ITEM_INFO* bike)
                         {
                             if (TestBoundsCollide(item, bike, BIKE_FRONT))
                             {
-                                DoLotsOfBlood(bike->Pose.Position.x, bike->Pose.Position.y, bike->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 3);
+                                DoLotsOfBlood(bike->Pose.Position.x, bike->Pose.Position.y, bike->Pose.Position.z, GetRandomControl() & 3, LaraItem->Orientation.y, LaraItem->RoomNumber, 3);
                                 item->HitPoints = 0;
                             }
                         }
@@ -747,8 +747,8 @@ static int MotorBikeDynamics(ITEM_INFO* item)
         else
             motorbike->bikeTurn = 0;
 
-        item->Pose.Orientation.y += motorbike->bikeTurn + motorbike->extraRotation;
-        motorbike->momentumAngle += ((item->Pose.Orientation.y - motorbike->momentumAngle) / 32);
+        item->Orientation.y += motorbike->bikeTurn + motorbike->extraRotation;
+        motorbike->momentumAngle += ((item->Orientation.y - motorbike->momentumAngle) / 32);
     }
     else
     {
@@ -764,8 +764,8 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             motorbike->bikeTurn += 182;
         }
 
-        item->Pose.Orientation.y += motorbike->bikeTurn + motorbike->extraRotation;
-        rot = item->Pose.Orientation.y - motorbike->momentumAngle;
+        item->Orientation.y += motorbike->bikeTurn + motorbike->extraRotation;
+        rot = item->Orientation.y - motorbike->momentumAngle;
         momentum = MIN_MOMENTUM_TURN - ((2 * motorbike->velocity) / SECTOR(1));
 
         if (!(TrInput & IN_ACCELERATE) && motorbike->velocity > 0)
@@ -776,7 +776,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             if (rot < -MOTORBIKE_MAX_MOM_TURN)
             {
                 rot = -MOTORBIKE_MAX_MOM_TURN;
-                motorbike->momentumAngle = item->Pose.Orientation.y - rot;
+                motorbike->momentumAngle = item->Orientation.y - rot;
             }
             else
             {
@@ -788,7 +788,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             if (rot > MOTORBIKE_MAX_MOM_TURN)
             {
                 rot = MOTORBIKE_MAX_MOM_TURN;
-                motorbike->momentumAngle = item->Pose.Orientation.y - rot;
+                motorbike->momentumAngle = item->Orientation.y - rot;
             }
             else
             {
@@ -797,7 +797,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
         }
         else
         {
-            motorbike->momentumAngle = item->Pose.Orientation.y;
+            motorbike->momentumAngle = item->Orientation.y;
         }
     }
 
@@ -805,19 +805,19 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room_number);
     height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
     if (item->Pose.Position.y >= height)
-        speed = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
+        speed = item->Animation.Velocity * cos(item->Orientation.x);
     else
         speed = item->Animation.Velocity;
 
-    item->Pose.Position.z += speed * phd_cos(motorbike->momentumAngle);
-    item->Pose.Position.x += speed * phd_sin(motorbike->momentumAngle);
+    item->Pose.Position.z += speed * cos(motorbike->momentumAngle);
+    item->Pose.Position.x += speed * sin(motorbike->momentumAngle);
 
     if (item->Pose.Position.y >= height)
     {
-        short anglex = MOTORBIKE_SLIP * phd_sin(item->Pose.Orientation.x);
+        short anglex = MOTORBIKE_SLIP * sin(item->Orientation.x);
         if (abs(anglex) > 16)
         {
-            short anglex2 = MOTORBIKE_SLIP * phd_sin(item->Pose.Orientation.x);
+            short anglex2 = MOTORBIKE_SLIP * sin(item->Orientation.x);
             if (anglex < 0)
                 anglex2 = -anglex;
             if (anglex2 > 24)
@@ -826,18 +826,18 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             motorbike->velocity -= anglex;
         }
 
-        short anglez = MOTORBIKE_SLIP * phd_sin(item->Pose.Orientation.z);
+        short anglez = MOTORBIKE_SLIP * sin(item->Orientation.z);
         if (abs(anglez) > 32)
         {
             short ang, angabs;
             NoGetOff = true;
             if (anglez >= 0)
-                ang = item->Pose.Orientation.y + 0x4000;
+                ang = item->Orientation.y + 0x4000;
             else
-                ang = item->Pose.Orientation.y - 0x4000;
+                ang = item->Orientation.y - 0x4000;
             angabs = abs(anglez) - 24;
-            item->Pose.Position.x += angabs * phd_sin(ang);
-            item->Pose.Position.z += angabs * phd_cos(ang);
+            item->Pose.Position.x += angabs * sin(ang);
+            item->Pose.Position.z += angabs * cos(ang);
         }
     }
 
@@ -922,7 +922,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
     collide = GetMotorbikeCollisionAnim(item, &moved);
     if (collide)
     {
-        newspeed = ((item->Pose.Position.z - oldpos.z) * phd_cos(motorbike->momentumAngle) + (item->Pose.Position.x - oldpos.x) * phd_sin(motorbike->momentumAngle)) * 256;
+        newspeed = ((item->Pose.Position.z - oldpos.z) * cos(motorbike->momentumAngle) + (item->Pose.Position.x - oldpos.x) * sin(motorbike->momentumAngle)) * 256;
         if (&g_Level.Items[Lara.Vehicle] == item && motorbike->velocity >= MOTORBIKE_ACCEL && newspeed < (motorbike->velocity - 10))
         {
             LaraItem->HitPoints -= ((motorbike->velocity - newspeed) / 128);
@@ -944,10 +944,10 @@ static int MotorBikeDynamics(ITEM_INFO* item)
 static BOOL MotorbikeCanGetOff(void)
 {
     auto item = &g_Level.Items[Lara.Vehicle];
-    auto angle = item->Pose.Orientation.y + 0x4000;
-    auto x = item->Pose.Position.x + BIKE_RADIUS * phd_sin(angle);
+    auto angle = item->Orientation.y + 0x4000;
+    auto x = item->Pose.Position.x + BIKE_RADIUS * sin(angle);
     auto y = item->Pose.Position.y;
-    auto z = item->Pose.Position.z + BIKE_RADIUS * phd_cos(angle);
+    auto z = item->Pose.Position.z + BIKE_RADIUS * cos(angle);
 
 	auto collResult = GetCollision(x, y, z, item->RoomNumber);
 
@@ -1223,7 +1223,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn -= MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn -= (ANGLE(1) - MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn -= (EulerAngle::DegToRad(1) - MOTORBIKE_HTURN * motorbike->velocity) / 16384;
 
                 if (motorbike->bikeTurn < -MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = -MOTORBIKE_MAX_HTURN;
@@ -1233,7 +1233,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn += MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn += (ANGLE(1) + MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn += (EulerAngle::DegToRad(1) + MOTORBIKE_HTURN * motorbike->velocity) / 16384;
 
                 if (motorbike->bikeTurn > MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = MOTORBIKE_MAX_HTURN;
@@ -1304,7 +1304,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
             }
 
             // apply friction according to turn
-            motorbike->velocity -= (abs(item->Pose.Orientation.y - motorbike->momentumAngle) / 64);
+            motorbike->velocity -= (abs(item->Orientation.y - motorbike->momentumAngle) / 64);
         }
         else if (motorbike->velocity > MOTORBIKE_FRICTION)
         {
@@ -1461,28 +1461,28 @@ int MotorbikeControl(void)
     {
         if (r1 >= ((hfl + hfr) / 2))
         {
-            xrot = phd_atan(1000, hfm - r1);
-            zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+            xrot = atan2(1000, hfm - r1);
+            zrot = atan2(BIKE_SIDE, r2 - fl.y);
         }
         else
         {
-            xrot = phd_atan(BIKE_FRONT, hfm - item->Pose.Position.y);
-            zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+            xrot = atan2(BIKE_FRONT, hfm - item->Pose.Position.y);
+            zrot = atan2(BIKE_SIDE, r2 - fl.y);
         }
     }
     else if (r1 >= ((hfl + hfr) / 2))
     {
-        xrot = phd_atan(BIKE_FRONT, item->Pose.Position.y - r1);
-        zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+        xrot = atan2(BIKE_FRONT, item->Pose.Position.y - r1);
+        zrot = atan2(BIKE_SIDE, r2 - fl.y);
     }
     else
     {
-        xrot = phd_atan(125, newy - item->Pose.Position.y);
-        zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+        xrot = atan2(125, newy - item->Pose.Position.y);
+        zrot = atan2(BIKE_SIDE, r2 - fl.y);
     }
 
-    item->Pose.Orientation.x += ((xrot - item->Pose.Orientation.x) / 4);
-    item->Pose.Orientation.z += ((zrot - item->Pose.Orientation.z) / 4);
+    item->Orientation.x += ((xrot - item->Orientation.x) / 4);
+    item->Orientation.z += ((zrot - item->Orientation.z) / 4);
 
     if (motorbike->flags >= 0)
     {
@@ -1495,9 +1495,9 @@ int MotorbikeControl(void)
         LaraItem->Pose.Position.x = item->Pose.Position.x;
         LaraItem->Pose.Position.y = item->Pose.Position.y;
         LaraItem->Pose.Position.z = item->Pose.Position.z;
-        LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-        LaraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-        LaraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+        LaraItem->Orientation.y = item->Orientation.y;
+        LaraItem->Orientation.x = item->Orientation.x;
+        LaraItem->Orientation.z = item->Orientation.z;
 
         AnimateMotorbike(item, collide, dead);
         AnimateItem(LaraItem);
@@ -1541,6 +1541,6 @@ void DrawMotorbikeEffect(ITEM_INFO* item)
     // TODO: speedometer
     //MOTORBIKE_INFO* motorbike = GetMotorbikeInfo(item);
     //if (Lara.Vehicle != NO_ITEM)
-        //DrawMotorBikeSpeedoMeter(phd_winwidth - 64, phd_winheight - 16, motorbike->velocity, ANGLE(180), ANGLE(270), 32); // angle are 2D angle...
+        //DrawMotorBikeSpeedoMeter(phd_winwidth - 64, phd_winheight - 16, motorbike->velocity, EulerAngle::DegToRad(180), EulerAngle::DegToRad(270), 32); // angle are 2D angle...
     DrawMotorBikeSmoke(item);
 }

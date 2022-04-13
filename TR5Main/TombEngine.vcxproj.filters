@@ -321,6 +321,7 @@
     <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Game\Lara\lara_overhang.cpp" />
+    <ClCompile Include="Specific\EulerAngle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
@@ -722,6 +723,7 @@
     <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Specific\EulerAngle.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />

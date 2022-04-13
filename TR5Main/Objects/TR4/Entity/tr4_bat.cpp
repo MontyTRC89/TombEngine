@@ -15,7 +15,7 @@ namespace TEN::Entities::TR4
 {
 	static BITE_INFO BatBite = { 0, 16, 45, 4 };
 
-	#define BAT_ANGLE ANGLE(20.0f)
+	#define BAT_ANGLE EulerAngle::DegToRad(20.0f)
 
 	constexpr auto BAT_ATTACK_RANGE = SQUARE(CLICK(1));
 	constexpr auto BAT_TARGETING_RANGE = SQUARE(SECTOR(5));

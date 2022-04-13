@@ -6,6 +6,7 @@
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
 #include "Specific/phd_global.h"
+#include "Specific/EulerAngle.h"
 
 enum GAME_OBJECT_ID : short;
 
@@ -79,6 +80,7 @@ struct ITEM_INFO
 	EntityAnimationData Animation;
 	PHD_3DPOS Pose;
 	PHD_3DPOS StartPose;
+	EulerAngle Orientation;
 	int Floor;
 
 	int HitPoints;

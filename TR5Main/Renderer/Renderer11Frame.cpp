@@ -67,9 +67,7 @@ namespace TEN::Renderer
 
 			newItem->ItemNumber = itemNum;
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
-															   TO_RAD(item->Pose.Orientation.x),
-															   TO_RAD(item->Pose.Orientation.z));
+			newItem->Rotation = Matrix::CreateFromYawPitchRoll(item->Orientation.y, item->Orientation.x, item->Orientation.z);
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 

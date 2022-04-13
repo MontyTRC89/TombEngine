@@ -38,9 +38,9 @@ void ControlBodyPart(short fxNumber)
 			fx->fallspeed += 2;
 	}
 
-	fx->pos.Position.x += fx->speed * phd_sin(fx->pos.Orientation.y);
+	fx->pos.Position.x += fx->speed * sin(fx->pos.Orientation.y);
 	fx->pos.Position.y += fx->fallspeed;
-	fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
+	fx->pos.Position.z += fx->speed * cos(fx->pos.Orientation.y);
 
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
@@ -84,7 +84,7 @@ void ControlBodyPart(short fxNumber)
 			}
 			else
 			{
-				fx->pos.Orientation.y += -ANGLE(180);
+				fx->pos.Orientation.y += EulerAngle::DegToRad(-180);
 				fx->pos.Position.x = x;
 				fx->pos.Position.z = z;
 			}

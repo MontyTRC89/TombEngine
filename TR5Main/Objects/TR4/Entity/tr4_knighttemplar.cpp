@@ -70,7 +70,7 @@ void KnightTemplarControl(short itemNumber)
 
 	int a = 0;
 	if (creature->Enemy != LaraItem)
-		a = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
+		a = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
 
 	GetCreatureMood(item, &AI, VIOLENT);
 	CreatureMood(item, &AI, VIOLENT);
@@ -91,7 +91,7 @@ void KnightTemplarControl(short itemNumber)
 	{
 	case 1:
 		item->Animation.TargetState = 2;
-		creature->MaxTurn = ANGLE(2.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 		creature->Flags = 0;
 
 		if (AI.distance > pow(682, 2))
@@ -109,7 +109,7 @@ void KnightTemplarControl(short itemNumber)
 		break;
 
 	case 2:
-		creature->MaxTurn = ANGLE(7.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 		if (Lara.TargetEntity == item || AI.distance <= pow(682, 2))
 			item->Animation.TargetState = 1;
@@ -121,15 +121,15 @@ void KnightTemplarControl(short itemNumber)
 	case 5:
 		creature->MaxTurn = 0;
 
-		if (abs(AI.angle) >= ANGLE(1.0f))
+		if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += ANGLE(1.0f);
+				item->Orientation.y += EulerAngle::DegToRad(1.0f);
 			else
-				item->Pose.Orientation.y -= ANGLE(1.0f);
+				item->Orientation.y -= EulerAngle::DegToRad(1.0f);
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Orientation.y += AI.angle;
 
 		frameNumber = item->Animation.FrameNumber;
 		frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -187,15 +187,15 @@ void KnightTemplarControl(short itemNumber)
 	case 6:
 		creature->MaxTurn = 0;
 
-		if (abs(AI.angle) >= ANGLE(1.0f))
+		if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += ANGLE(1.0f);
+				item->Orientation.y += EulerAngle::DegToRad(1.0f);
 			else
-				item->Pose.Orientation.y -= ANGLE(1.0f);
+				item->Orientation.y -= EulerAngle::DegToRad(1.0f);
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Orientation.y += AI.angle;
 
 		if (item->HitStatus)
 		{

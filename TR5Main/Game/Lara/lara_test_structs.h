@@ -2,7 +2,7 @@
 
 struct MoveTestSetup
 {
-	short Angle;
+	float Angle;
 	int	LowerFloorBound;
 	int UpperFloorBound;
 	bool CheckSlopeDown = true;
@@ -12,7 +12,7 @@ struct MoveTestSetup
 
 struct MonkeyMoveTestSetup
 {
-	short Angle;
+	float Angle;
 	int LowerCeilingBound;
 	int UpperCeilingBound;
 };
@@ -58,7 +58,7 @@ struct CrawlVaultTestResult
 
 struct JumpTestSetup
 {
-	short Angle;
+	float Angle;
 	int Distance = CLICK(0.85f);
 	bool CheckWadeStatus = true;
 };

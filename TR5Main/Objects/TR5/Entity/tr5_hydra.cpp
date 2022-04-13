@@ -53,7 +53,7 @@ void InitialiseHydra(short itemNumber)
 	if (item->TriggerFlags == 2)
 		item->Pose.Position.z -= CLICK(1.5f);
 
-	item->Pose.Orientation.y = ANGLE(90.0f);
+	item->Orientation.y = EulerAngle::DegToRad(90.0f);
 	item->Pose.Position.x -= CLICK(1);
 }
 
@@ -193,20 +193,20 @@ void HydraControl(short itemNumber)
 			item->Animation.ActiveState != 10 &&
 			item->Animation.ActiveState != HYDRA_STATE_DEATH)
 		{
-			if (abs(AI.angle) >= ANGLE(1.0f))
+			if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.y += ANGLE(1.0f);
+					item->Orientation.y += EulerAngle::DegToRad(1.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(1.0f);
+					item->Orientation.y -= EulerAngle::DegToRad(1.0f);
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Orientation.y += AI.angle;
 
 			if (item->TriggerFlags == 1)
-				tilt = -ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(2.8f);
 		}
 
 		if (item->Animation.ActiveState != 12)
@@ -219,19 +219,19 @@ void HydraControl(short itemNumber)
 		joint0 = -joint1;
 
 		int distance, damage, frame;
-		short angles[2];
+		float angles[2];
 		short roomNumber;
 
 		switch (item->Animation.ActiveState)
 		{
 		case HYDRA_STATE_STOP:
-			creature->MaxTurn = ANGLE(1.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(1.0f);
 			creature->Flags = 0;
 
 			if (item->TriggerFlags == 1)
-				tilt = -ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(2.8f);
 
 			if (AI.distance >= pow(CLICK(7), 2) && GetRandomControl() & 0x1F)
 			{
@@ -258,7 +258,7 @@ void HydraControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x400)
 				{
-					CreatureEffect2(item, &HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10, item->Orientation.y, DoBloodSplat);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 120;
@@ -277,7 +277,7 @@ void HydraControl(short itemNumber)
 					{
 						item->HitPoints -= damage;
 						item->Animation.TargetState = HYDRA_STATE_HURT;
-						CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &HydraBite, 10 * damage, item->Orientation.y, DoBloodSplat);
 					}
 				}
 			}
@@ -302,14 +302,14 @@ void HydraControl(short itemNumber)
 				{
 					item->HitPoints -= damage;
 					item->Animation.TargetState = 4;
-					CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10 * damage, item->Orientation.y, DoBloodSplat);
 				}
 			}
 
 			if (item->TriggerFlags == 1)
-				tilt = -ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(2.8f);
 
 			if (!(GlobalCounter & 3))
 			{
@@ -344,13 +344,13 @@ void HydraControl(short itemNumber)
 			break;
 
 		case 6:
-			creature->MaxTurn = ANGLE(1.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(1.0f);
 			creature->Flags = 0;
 
 			if (item->TriggerFlags == 1)
-				tilt = -ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = ANGLE(2.8f);
+				tilt = EulerAngle::DegToRad(2.8f);
 
 			if (AI.distance >= pow(CLICK(3), 2))
 			{

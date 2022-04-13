@@ -39,7 +39,7 @@ void ControlSpikyCeiling(short itemNumber)
 		LaraItem->HitPoints -= 20;
 		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Pose.Position.x, item->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
+		DoLotsOfBlood(LaraItem->Pose.Position.x, item->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item->Orientation.y, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
 		SoundEffect(56, &item->Pose, 0);

@@ -17,7 +17,7 @@ void PulseLightControl(short itemNumber)
 	{
 		item->ItemFlags[0] -= 1024;
 
-		long pulse = 256 * phd_sin(item->ItemFlags[0] + 4 * (item->Pose.Position.y & 0x3FFF));
+		long pulse = 256 * sin(item->ItemFlags[0] + 4 * (item->Pose.Position.y & 0x3FFF));
 		pulse = abs(pulse);
 		if (pulse > 255)
 			pulse = 255;
@@ -43,9 +43,9 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, shor
 	start.roomNumber = room;
 
 	GameVector end;
-	end.x = x + 16384 * phd_sin(16 * angle);
+	end.x = x + 16384 * sin(16 * angle);
 	end.y = y;
-	end.z = z + 16384 * phd_cos(16 * angle);
+	end.z = z + 16384 * cos(16 * angle);
 
 	if (!LOS(&start, &end))
 		TriggerDynamicLight(end.x, end.y, end.z, falloff, r, g, b);
@@ -57,7 +57,7 @@ void StrobeLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->Pose.Orientation.y += ANGLE(16.0f);
+		item->Orientation.y += EulerAngle::DegToRad(16.0f);
 
 		byte r = 8 * (item->TriggerFlags & 0x1F);
 		byte g = (item->TriggerFlags / 4) & 0xF8;
@@ -68,14 +68,14 @@ void StrobeLightControl(short itemNumber)
 			item->Pose.Position.y - 512,
 			item->Pose.Position.z,
 			r, g, b,
-			((item->Pose.Orientation.y + 22528) / 16) & 0xFFF,
+			((/*item->Orientation.y*/ + 22528) / 16) & 0xFFF,
 			item->RoomNumber,
 			12);
 
 		TriggerDynamicLight(
-			item->Pose.Position.x + 256 * phd_sin(item->Pose.Orientation.y + 22528),
+			item->Pose.Position.x + 256 * sin(item->Orientation.y + 22528),
 			item->Pose.Position.y - 768,
-			item->Pose.Position.z + 256 * phd_cos(item->Pose.Orientation.y + 22528),
+			item->Pose.Position.z + 256 * cos(item->Orientation.y + 22528),
 			8,
 			r, g, b);
 	}

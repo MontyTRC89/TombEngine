@@ -23,9 +23,9 @@ OBJECT_COLLISION_BOUNDS TightRopeBounds =
 	-256, 256,
 	0, 0,
 	-256, 256,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 };
 
 OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
@@ -33,9 +33,9 @@ OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
 	-640, 640,
 	704, 832,
 	-96, 96,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 };
 
 void ControlAnimatingSlots(short itemNumber)
@@ -106,10 +106,10 @@ void ControlWaterfall(short itemNumber)
 		if (!(Wibble & 0xC))
 		{
 			TriggerWaterfallMist(
-				item->Pose.Position.x + 68 * phd_sin(item->Pose.Orientation.y),
+				item->Pose.Position.x + 68 * sin(item->Orientation.y),
 				item->Pose.Position.y,
-				item->Pose.Position.z + 68 * phd_cos(item->Pose.Orientation.y),
-				item->Pose.Orientation.y >> 4);
+				item->Pose.Position.z + 68 * cos(item->Orientation.y),
+				item->Orientation.y / 16);
 		}
 
 		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose, 0);
@@ -133,7 +133,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.CanDismount)
 		{
-			if (tightropeItem->Pose.Orientation.y == laraItem->Pose.Orientation.y)
+			if (tightropeItem->Orientation.y == laraItem->Orientation.y)
 			{
 				if (abs(tightropeItem->Pose.Position.x - laraItem->Pose.Position.x) + abs(tightropeItem->Pose.Position.z - laraItem->Pose.Position.z) < 640)
 					laraInfo->Control.Tightrope.CanDismount = true;
@@ -145,7 +145,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.Off)
 		{
-			if (item->Pose.Orientation.y == laraItem->Pose.Orientation.y)
+			if (item->Orientation.y == laraItem->Orientation.y)
 			{
 				if (abs(item->Pose.Position.x - laraItem->Pose.Position.x) + abs(item->Pose.Position.z - laraItem->Pose.Position.z) < 640)
 					laraInfo->tightRopeOff = true;
@@ -155,7 +155,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 	}
 	else
 	{
-		tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
+		tightropeItem->Orientation.y += EulerAngle::DegToRad(-180.0f);
 
 		if (TestLaraPosition(&TightRopeBounds, tightropeItem, laraItem))
 		{
@@ -180,14 +180,14 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 			else
 				laraInfo->InteractedItem = itemNumber;
 
-			tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
+			tightropeItem->Orientation.y += EulerAngle::DegToRad(-180.0f);
 		}
 		else
 		{
 			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				laraInfo->Control.IsMoving = false;
 
-			tightropeItem->Pose.Orientation.y += -ANGLE(180.0f);
+			tightropeItem->Orientation.y += EulerAngle::DegToRad(-180.0f);
 		}
 	}
 }
@@ -205,9 +205,9 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 		int test2 = 0;
 		if (!test1)
 		{
-			barItem->Pose.Orientation.y += -ANGLE(180.0f);
+			barItem->Orientation.y += EulerAngle::DegToRad(-180.0f);
 			test2 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
-			barItem->Pose.Orientation.y += -ANGLE(180);
+			barItem->Orientation.y += EulerAngle::DegToRad(-180);
 		}
 
 		if (test1 || test2)
@@ -221,9 +221,9 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			ResetLaraFlex(barItem);
 
 			if (test1)
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;
+				laraItem->Orientation.y = barItem->Orientation.y;
 			else
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + -ANGLE(180.0f);
+				laraItem->Orientation.y = barItem->Orientation.y + EulerAngle::DegToRad(-180.0f);
 
 			Vector3Int pos1 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos1, LM_LHAND);
@@ -231,9 +231,9 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			Vector3Int pos2 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos2, LM_RHAND);
 		
-			if (laraItem->Pose.Orientation.y & 0x4000)
+			/*if (laraItem->Orientation.y & 0x4000)
 				laraItem->Pose.Position.x += barItem->Pose.Position.x - ((pos1.x + pos2.x) >> 1);
-			else
+			else*/
 				laraItem->Pose.Position.z += barItem->Pose.Position.z - ((pos1.z + pos2.z) / 2);
 			laraItem->Pose.Position.y += barItem->Pose.Position.y - ((pos1.y + pos2.y) / 2);
 
@@ -265,7 +265,7 @@ void CutsceneRopeControl(short itemNumber)
 	int dz = (pos2.z - pos1.z) * (pos2.z - pos1.z);
 
 	ropeItem->ItemFlags[1] = ((sqrt(dx + dy + dz) * 2) + sqrt(dx + dy + dz)) * 2;
-	ropeItem->Pose.Orientation.x = -4869;
+	ropeItem->Orientation.x = -4869;
 }
 
 void HybridCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll) 
@@ -285,16 +285,16 @@ void InitialiseTightrope(short itemNumber)
 {
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 
-	if (tightropeItem->Pose.Orientation.y > 0)
+	if (tightropeItem->Orientation.y > 0)
 	{
-		if (tightropeItem->Pose.Orientation.y == ANGLE(90.0f))
+		if (tightropeItem->Orientation.y == EulerAngle::DegToRad(90.0f))
 			tightropeItem->Pose.Position.x -= 256;
 	}
-	else if (tightropeItem->Pose.Orientation.y)
+	else if (tightropeItem->Orientation.y)
 	{
-		if (tightropeItem->Pose.Orientation.y == -ANGLE(180.0f))
+		if (tightropeItem->Orientation.y == EulerAngle::DegToRad(-180.0f))
 			tightropeItem->Pose.Position.z += CLICK(1);
-		else if (tightropeItem->Pose.Orientation.y == -ANGLE(90.0f))
+		else if (tightropeItem->Orientation.y == EulerAngle::DegToRad(-90.0f))
 			tightropeItem->Pose.Position.x += CLICK(1);
 	}
 	else

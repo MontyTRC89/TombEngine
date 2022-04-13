@@ -42,10 +42,10 @@ void KnifeControl(short fxNumber)
 	else
 		fx->counter--;
 
-	int speed = fx->speed * phd_cos(fx->pos.Orientation.x);
-	fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
-	fx->pos.Position.x += speed * phd_sin(fx->pos.Orientation.y);
-	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
+	int speed = fx->speed * cos(fx->pos.Orientation.x);
+	fx->pos.Position.z += speed * cos(fx->pos.Orientation.y);
+	fx->pos.Position.x += speed * sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
@@ -59,14 +59,14 @@ void KnifeControl(short fxNumber)
 	if (probe.RoomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	fx->pos.Orientation.z += ANGLE(30.0f);
+	fx->pos.Orientation.z += EulerAngle::DegToRad(30.0f);
 
 	if (ItemNearLara(&fx->pos, 200))
 	{
 		LaraItem->HitPoints -= 50;
 		LaraItem->HitStatus = true;
 
-		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
+		fx->pos.Orientation.y = LaraItem->Orientation.y;
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 
@@ -137,7 +137,7 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 
 			if (AI.ahead)
 				head = AI.angle;
@@ -165,7 +165,7 @@ void KnifeThrowerControl(short itemNumber)
 
 		case 3:
 			tilt = angle / 3;
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 			if (AI.ahead)
 				head = AI.angle;

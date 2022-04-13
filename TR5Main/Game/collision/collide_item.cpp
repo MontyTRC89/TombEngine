@@ -34,11 +34,11 @@ void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* laraItem, CollisionI
 			int collidedBits = TestCollision(item, laraItem);
 			if (collidedBits)
 			{
-				short oldRot = item->Pose.Orientation.y;
+				short oldRot = item->Orientation.y;
 
-				item->Pose.Orientation.y = 0;
+				item->Orientation.y = 0;
 				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-				item->Pose.Orientation.y = oldRot;
+				item->Orientation.y = oldRot;
 
 				int deadlyBits = *((int*)&item->ItemFlags[0]);
 				auto* sphere = &CreatureSpheres[0];
@@ -121,8 +121,8 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 				if (collidingItem->Pose.Position.y > mesh->pos.Position.y + staticMesh->collisionBox.Y2)
 					continue;
 
-				float s = phd_sin(mesh->pos.Orientation.y);
-				float c = phd_cos(mesh->pos.Orientation.y);
+				float s = sin(mesh->pos.Orientation.y);
+				float c = cos(mesh->pos.Orientation.y);
 				float rx = (collidingItem->Pose.Position.x - mesh->pos.Position.x) * c - s * (collidingItem->Pose.Position.z - mesh->pos.Position.z);
 				float rz = (collidingItem->Pose.Position.z - mesh->pos.Position.z) * c + s * (collidingItem->Pose.Position.x - mesh->pos.Position.x);
 
@@ -191,8 +191,8 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 						collidingItem->Pose.Position.y + radius + CLICK(0.5f) >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
 						collidingItem->Pose.Position.y - radius - CLICK(0.5f) <= item->Pose.Position.y + framePtr->boundingBox.Y2)
 					{
-						float s = phd_sin(item->Pose.Orientation.y);
-						float c = phd_cos(item->Pose.Orientation.y);
+						float s = sin(item->Orientation.y);
+						float c = cos(item->Orientation.y);
 
 						int rx = dx * c - s * dz;
 						int rz = dz * c + s * dx;
@@ -238,8 +238,8 @@ bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* laraItem, Collisi
 	if (item->Pose.Position.y + GlobalCollisionBounds.Y1 >= framePtr->boundingBox.Y2)
 		return false;
 
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	float s = sin(item->Orientation.y);
+	float c = cos(item->Orientation.y);
 
 	int dx = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int dz = laraItem->Pose.Position.z - item->Pose.Position.z;
@@ -263,15 +263,15 @@ void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
 
 	for (int i = 0; i < 3; i++)
 	{
-		auto s = (i != 1) ? phd_sin(coll->Setup.ForwardAngle + ANGLE((i * 90) - 90)) : 0;
-		auto c = (i != 1) ? phd_cos(coll->Setup.ForwardAngle + ANGLE((i * 90) - 90)) : 0;
+		auto s = (i != 1) ? sin(coll->Setup.ForwardAngle + EulerAngle::DegToRad((i * 90) - 90)) : 0;
+		auto c = (i != 1) ? cos(coll->Setup.ForwardAngle + EulerAngle::DegToRad((i * 90) - 90)) : 0;
 
 		auto x = item->Pose.Position.x + (s * (coll->Setup.Radius));
 		auto y = item->Pose.Position.y - height - STEP_SIZE;
 		auto z = item->Pose.Position.z + (c * (coll->Setup.Radius));
 
 		auto origin = Vector3(x, y, z);
-		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
+		auto mxR = Matrix::CreateFromYawPitchRoll(coll->Setup.ForwardAngle, 0, 0);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
 		// g_Renderer.addDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
@@ -330,9 +330,9 @@ void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
 
 bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* laraItem)
 {
-	short xRotRel = laraItem->Pose.Orientation.x - item->Pose.Orientation.x;
-	short yRotRel = laraItem->Pose.Orientation.y - item->Pose.Orientation.y;
-	short zRotRel = laraItem->Pose.Orientation.z - item->Pose.Orientation.z;
+	float xRotRel = laraItem->Orientation.x - item->Orientation.x;
+	float yRotRel = laraItem->Orientation.y - item->Orientation.y;
+	float zRotRel = laraItem->Orientation.z - item->Orientation.z;
 
 	if (xRotRel < bounds->rotX1)
 		return false;
@@ -352,16 +352,12 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INF
 	if (zRotRel > bounds->rotZ2)
 		return false;
 
-	int x = laraItem->Pose.Position.x - item->Pose.Position.x;
-	int y = laraItem->Pose.Position.y - item->Pose.Position.y;
-	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
-
-	Vector3 pos = Vector3(x, y, z);
+	auto differenceVector = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
+		item->Orientation.y,
+		item->Orientation.x,
+		item->Orientation.z
 	);
 
 	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
@@ -371,11 +367,11 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INF
 	// of the object we are test against.
 	matrix = matrix.Transpose();
 
-	pos = Vector3::Transform(pos, matrix);
+	differenceVector = Vector3::Transform(differenceVector, matrix);
 
-	if (pos.x < bounds->boundingBox.X1 || pos.x > bounds->boundingBox.X2 ||
-		pos.y < bounds->boundingBox.Y1 || pos.y > bounds->boundingBox.Y2 ||
-		pos.z < bounds->boundingBox.Z1 || pos.z > bounds->boundingBox.Z2)
+	if (differenceVector.x < bounds->boundingBox.X1 || differenceVector.x > bounds->boundingBox.X2 ||
+		differenceVector.y < bounds->boundingBox.Y1 || differenceVector.y > bounds->boundingBox.Y2 ||
+		differenceVector.z < bounds->boundingBox.Z1 || differenceVector.z > bounds->boundingBox.Z2)
 		return false;
 
 	return true;
@@ -383,14 +379,12 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INF
 
 void AlignLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 {
-	laraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-	laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-	laraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+	laraItem->Orientation = item->Orientation;
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
+		item->Orientation.y,
+		item->Orientation.x,
+		item->Orientation.z
 	);
 
 	Vector3 pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
@@ -405,16 +399,16 @@ bool MoveLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	PHD_3DPOS dest;
-	dest.Orientation.x = item->Pose.Orientation.x;
-	dest.Orientation.y = item->Pose.Orientation.y;
-	dest.Orientation.z = item->Pose.Orientation.z;
+	dest.Orientation.x = item->Orientation.x;
+	dest.Orientation.y = item->Orientation.y;
+	dest.Orientation.z = item->Orientation.z;
 
 	Vector3 pos = Vector3(vec->x, vec->y, vec->z);
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
+		item->Orientation.y,
+		item->Orientation.x,
+		item->Orientation.z
 	);
 
 	pos = Vector3::Transform(pos, matrix);
@@ -424,7 +418,7 @@ bool MoveLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 	dest.Position.z = item->Pose.Position.z + pos.z;
 
 	if (item->ObjectNumber != ID_FLARE_ITEM && item->ObjectNumber != ID_BURNING_TORCH_ITEM)
-		return Move3DPosTo3DPos(&laraItem->Pose, &dest, LARA_VELOCITY, ANGLE(2.0f));
+		return Move3DPosTo3DPos(&laraItem->Pose, &dest, LARA_VELOCITY, EulerAngle::DegToRad(2.0f));
 
 	int height = GetCollision(dest.Position.x, dest.Position.y, dest.Position.z, laraItem->RoomNumber).Position.Floor;
 	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
@@ -437,7 +431,7 @@ bool MoveLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 		if (distance < CLICK(0.5f))
 			return true;
 
-		return Move3DPosTo3DPos(&laraItem->Pose, &dest, LARA_VELOCITY, ANGLE(2.0f));
+		return Move3DPosTo3DPos(&laraItem->Pose, &dest, LARA_VELOCITY, EulerAngle::DegToRad(2.0f));
 	}
 
 	if (lara->Control.IsMoving)
@@ -507,23 +501,13 @@ bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 
 bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angleAdd)
 {
-	int x = dest->Position.x - src->Position.x;
-	int y = dest->Position.y - src->Position.y;
-	int z = dest->Position.z - src->Position.z;
-	int distance = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+	auto differenceVector = (dest->Position - src->Position);
+	float distance = Vector3::Distance(dest->Position.ToVector3(), src->Position.ToVector3());
 
 	if (velocity < distance)
-	{
-		src->Position.x += x * velocity / distance;
-		src->Position.y += y * velocity / distance;
-		src->Position.z += z * velocity / distance;
-	}
+		src->Position += differenceVector * (velocity / distance);
 	else
-	{
-		src->Position.x = dest->Position.x;
-		src->Position.y = dest->Position.y;
-		src->Position.z = dest->Position.z;
-	}
+		src->Position = dest->Position;
 
 	if (!Lara.Control.IsMoving)
 	{
@@ -604,8 +588,8 @@ bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius)
 	if (item->Pose.Position.y + bounds->Y1 >= laraItem->Pose.Position.y + laraBounds->Y2)
 		return false;
 
-	auto c = phd_cos(item->Pose.Orientation.y);
-	auto s = phd_sin(item->Pose.Orientation.y);
+	auto c = cos(item->Orientation.y);
+	auto s = sin(item->Orientation.y);
 	int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
 	int dx = c * x - s * z;
@@ -639,8 +623,8 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 	float c, s;
 	int x, z, dx, dz;
 
-	c = phd_cos(mesh->pos.Orientation.y);
-	s = phd_sin(mesh->pos.Orientation.y);
+	c = cos(mesh->pos.Orientation.y);
+	s = sin(mesh->pos.Orientation.y);
 	x = item->Pose.Position.x - mesh->pos.Position.x;
 	z = item->Pose.Position.z - mesh->pos.Position.z;
 	dx = c * x - s * z;
@@ -660,8 +644,8 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush) // previously ItemPushLara
 {
 	// Get item's rotation
-	auto s = phd_sin(item->Pose.Orientation.y);
-	auto c = phd_cos(item->Pose.Orientation.y);
+	auto s = sin(item->Orientation.y);
+	auto c = cos(item->Orientation.y);
 
 	// Get vector from item to Lara
 	int dx = item2->Pose.Position.x - item->Pose.Position.x;
@@ -725,7 +709,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 		dx -= c * rx + s * rz;
 		dz -= c * rz - s * rx;
 
-		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / 16384;
+		lara->HitDirection = (item2->Orientation.y - atan2(dz, dz) - EulerAngle::DegToRad(135.0f)) / 16384;
 
 		if (!lara->HitFrame && !lara->SpasmEffectCount)
 		{
@@ -747,7 +731,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
 	auto facing = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item2->Pose.Position.z - coll->Setup.OldPosition.z, item2->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = atan2(item2->Pose.Position.z - coll->Setup.OldPosition.z, item2->Pose.Position.x - coll->Setup.OldPosition.x);
 
 	GetCollisionInfo(coll, item2);
 
@@ -781,8 +765,8 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // pr
 {
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
-	auto c = phd_cos(mesh->pos.Orientation.y);
-	auto s = phd_sin(mesh->pos.Orientation.y);
+	auto c = cos(mesh->pos.Orientation.y);
+	auto s = sin(mesh->pos.Orientation.y);
 	
 	auto dx = item->Pose.Position.x - mesh->pos.Position.x;
 	auto dz = item->Pose.Position.z - mesh->pos.Position.z;
@@ -820,7 +804,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // pr
 	coll->Setup.LowerCeilingBound = 0;
 
 	auto oldFacing = coll->Setup.ForwardAngle;
-	coll->Setup.ForwardAngle = phd_atan(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
+	coll->Setup.ForwardAngle = atan2(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);
 
 	GetCollisionInfo(coll, item);
 
@@ -948,7 +932,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, Collis
 	for (int i = 0; i < 4; i++)
 	{
 		// Calculate ray direction
-		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y), TO_RAD(item->Pose.Orientation.x + (ANGLE(90 * i))), 0);
+		auto mxR = Matrix::CreateFromYawPitchRoll(item->Orientation.y, item->Orientation.x + (EulerAngle::DegToRad(90.0f * i)), 0);
 		auto mxT = Matrix::CreateTranslation(Vector3::UnitY);
 		auto direction = (mxT * mxR).Translation();
 
@@ -1013,8 +997,8 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, Collis
 
 	// Determine identity rotation/distance
 	auto distance = Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - Vector3(pos.Position.x, pos.Position.y, pos.Position.z);
-	auto c = phd_cos(pos.Orientation.y);
-	auto s = phd_sin(pos.Orientation.y);
+	auto c = cos(pos.Orientation.y);
+	auto s = sin(pos.Orientation.y);
 
 	// Rotate item to collision bounds identity
 	auto x = round(distance.x * c - distance.z * s) + pos.Position.x;
@@ -1162,8 +1146,8 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, Collis
 
 	// Determine final shifts rotation/distance
 	distance = Vector3(x + coll->Shift.x, y, z + coll->Shift.z) - Vector3(pos.Position.x, pos.Position.y, pos.Position.z);
-	c = phd_cos(-pos.Orientation.y);
-	s = phd_sin(-pos.Orientation.y);
+	c = cos(-pos.Orientation.y);
+	s = sin(-pos.Orientation.y);
 
 	// Calculate final shifts rotation/distance
 	coll->Shift.x = (round(distance.x * c - distance.z * s) + pos.Position.x) - item->Pose.Position.x;
@@ -1194,7 +1178,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 		if (collResult.Position.FloorSlope && oldCollResult.Position.Floor < collResult.Position.Floor)
 		{
-			yAngle = (long)((unsigned short)item->Pose.Orientation.y);
+			yAngle = (long)((unsigned short)item->Orientation.y);
 			if (collResult.FloorTilt.x < 0)
 			{
 				if (yAngle >= 0x8000)
@@ -1242,12 +1226,12 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))) && xs)	// X crossed boundary?
 			{
 				if (xv <= 0)	// Hit angle = 0xc000.
-					item->Pose.Orientation.y = 0x4000 + (0xc000 - item->Pose.Orientation.y);
+					item->Orientation.y = 0x4000 + (0xc000 - item->Orientation.y);
 				else			// Hit angle = 0x4000.
-					item->Pose.Orientation.y = 0xc000 + (0x4000 - item->Pose.Orientation.y);
+					item->Orientation.y = 0xc000 + (0x4000 - item->Orientation.y);
 			}
 			else		// Z crossed boundary.
-				item->Pose.Orientation.y = 0x8000 - item->Pose.Orientation.y;
+				item->Orientation.y = 0x8000 - item->Orientation.y;
 
 			item->Animation.Velocity /= 2;
 
@@ -1264,9 +1248,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 			if (collResult.FloorTilt.x < 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))	// Hit angle = 0x4000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x8000)
+				if (((unsigned short)item->Orientation.y) > 0x8000)
 				{
-					item->Pose.Orientation.y = 0x4000 + (0xc000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Orientation.y = 0x4000 + (0xc000 - (unsigned short)item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1275,17 +1259,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity -= collResult.FloorTilt.x * 2;
-						if ((unsigned short)item->Pose.Orientation.y > 0x4000 && (unsigned short)item->Pose.Orientation.y < 0xc000)
+						if ((unsigned short)item->Orientation.y > 0x4000 && (unsigned short)item->Orientation.y < 0xc000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x4000)
-								item->Pose.Orientation.y = 0x4000;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y < 0x4000)
+								item->Orientation.y = 0x4000;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y < 0x4000)
+						else if ((unsigned short)item->Orientation.y < 0x4000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x4000)
-								item->Pose.Orientation.y = 0x4000;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y > 0x4000)
+								item->Orientation.y = 0x4000;
 						}
 					}
 
@@ -1297,9 +1281,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			}
 			else if (collResult.FloorTilt.x > 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))	// Hit angle = 0xc000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) < 0x8000)
+				if (((unsigned short)item->Orientation.y) < 0x8000)
 				{
-					item->Pose.Orientation.y = 0xc000 + (0x4000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Orientation.y = 0xc000 + (0x4000 - (unsigned short)item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1308,17 +1292,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += collResult.FloorTilt.x * 2;
-						if ((unsigned short)item->Pose.Orientation.y > 0xc000 || (unsigned short)item->Pose.Orientation.y < 0x4000)
+						if ((unsigned short)item->Orientation.y > 0xc000 || (unsigned short)item->Orientation.y < 0x4000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0xc000)
-								item->Pose.Orientation.y = 0xc000;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y < 0xc000)
+								item->Orientation.y = 0xc000;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y < 0xc000)
+						else if ((unsigned short)item->Orientation.y < 0xc000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xc000)
-								item->Pose.Orientation.y = 0xc000;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y > 0xc000)
+								item->Orientation.y = 0xc000;
 						}
 					}
 
@@ -1330,9 +1314,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			}
 			else if (collResult.FloorTilt.y < 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))	// Hit angle = 0
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x4000 && ((unsigned short)item->Pose.Orientation.y) < 0xc000)
+				if (((unsigned short)item->Orientation.y) > 0x4000 && ((unsigned short)item->Orientation.y) < 0xc000)
 				{
-					item->Pose.Orientation.y = (0x8000 - item->Pose.Orientation.y - 1);
+					item->Orientation.y = (0x8000 - item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1342,17 +1326,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					{
 						item->Animation.Velocity -= collResult.FloorTilt.y * 2;
 
-						if ((unsigned short)item->Pose.Orientation.y < 0x8000)
+						if ((unsigned short)item->Orientation.y < 0x8000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xf000)
-								item->Pose.Orientation.y = 0;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y > 0xf000)
+								item->Orientation.y = 0;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y >= 0x8000)
+						else if ((unsigned short)item->Orientation.y >= 0x8000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x1000)
-								item->Pose.Orientation.y = 0;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y < 0x1000)
+								item->Orientation.y = 0;
 						}
 					}
 
@@ -1364,9 +1348,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			}
 			else if (collResult.FloorTilt.y > 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))	// Hit angle = 0x8000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0xc000 || ((unsigned short)item->Pose.Orientation.y) < 0x4000)
+				if (((unsigned short)item->Orientation.y) > 0xc000 || ((unsigned short)item->Orientation.y) < 0x4000)
 				{
-					item->Pose.Orientation.y = (0x8000 - item->Pose.Orientation.y - 1);
+					item->Orientation.y = (0x8000 - item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1376,17 +1360,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					{
 						item->Animation.Velocity += collResult.FloorTilt.y * 2;
 
-						if ((unsigned short)item->Pose.Orientation.y > 0x8000)
+						if ((unsigned short)item->Orientation.y > 0x8000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x8000)
-								item->Pose.Orientation.y = 0x8000;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y < 0x8000)
+								item->Orientation.y = 0x8000;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y < 0x8000)
+						else if ((unsigned short)item->Orientation.y < 0x8000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x8000)
-								item->Pose.Orientation.y = 0x8000;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y > 0x8000)
+								item->Orientation.y = 0x8000;
 						}
 					}
 
@@ -1398,9 +1382,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			}
 			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0x2000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x6000 && ((unsigned short)item->Pose.Orientation.y) < 0xe000)
+				if (((unsigned short)item->Orientation.y) > 0x6000 && ((unsigned short)item->Orientation.y) < 0xe000)
 				{
-					item->Pose.Orientation.y = 0x2000 + (0xa000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Orientation.y = 0x2000 + (0xa000 - (unsigned short)item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1409,17 +1393,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += (-collResult.FloorTilt.x) + (-collResult.FloorTilt.y);
-						if ((unsigned short)item->Pose.Orientation.y > 0x2000 && (unsigned short)item->Pose.Orientation.y < 0xa000)
+						if ((unsigned short)item->Orientation.y > 0x2000 && (unsigned short)item->Orientation.y < 0xa000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x2000)
-								item->Pose.Orientation.y = 0x2000;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y < 0x2000)
+								item->Orientation.y = 0x2000;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0x2000)
+						else if ((unsigned short)item->Orientation.y != 0x2000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x2000)
-								item->Pose.Orientation.y = 0x2000;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y > 0x2000)
+								item->Orientation.y = 0x2000;
 						}
 					}
 
@@ -1431,9 +1415,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			}
 			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y > 0)	// Hit angle = 0x6000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0xa000 || ((unsigned short)item->Pose.Orientation.y) < 0x2000)
+				if (((unsigned short)item->Orientation.y) > 0xa000 || ((unsigned short)item->Orientation.y) < 0x2000)
 				{
-					item->Pose.Orientation.y = 0x6000 + (0xe000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Orientation.y = 0x6000 + (0xe000 - (unsigned short)item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1442,17 +1426,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += (-collResult.FloorTilt.x) + collResult.FloorTilt.y;
-						if ((unsigned short)item->Pose.Orientation.y < 0xe000 && (unsigned short)item->Pose.Orientation.y > 0x6000)
+						if ((unsigned short)item->Orientation.y < 0xe000 && (unsigned short)item->Orientation.y > 0x6000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x6000)
-								item->Pose.Orientation.y = 0x6000;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y < 0x6000)
+								item->Orientation.y = 0x6000;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0x6000)
+						else if ((unsigned short)item->Orientation.y != 0x6000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x6000)
-								item->Pose.Orientation.y = 0x6000;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y > 0x6000)
+								item->Orientation.y = 0x6000;
 						}
 					}
 
@@ -1464,9 +1448,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			}
 			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y > 0)	// Hit angle = 0xa000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0xe000 || ((unsigned short)item->Pose.Orientation.y) < 0x6000)
+				if (((unsigned short)item->Orientation.y) > 0xe000 || ((unsigned short)item->Orientation.y) < 0x6000)
 				{
-					item->Pose.Orientation.y = 0xa000 + (0x2000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Orientation.y = 0xa000 + (0x2000 - (unsigned short)item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1475,17 +1459,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += collResult.FloorTilt.x + collResult.FloorTilt.y;
-						if ((unsigned short)item->Pose.Orientation.y < 0x2000 || (unsigned short)item->Pose.Orientation.y > 0xa000)
+						if ((unsigned short)item->Orientation.y < 0x2000 || (unsigned short)item->Orientation.y > 0xa000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0xa000)
-								item->Pose.Orientation.y = 0xa000;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y < 0xa000)
+								item->Orientation.y = 0xa000;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0xa000)
+						else if ((unsigned short)item->Orientation.y != 0xa000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xa000)
-								item->Pose.Orientation.y = 0xa000;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y > 0xa000)
+								item->Orientation.y = 0xa000;
 						}
 					}
 
@@ -1497,9 +1481,9 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			}
 			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0xe000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x2000 && ((unsigned short)item->Pose.Orientation.y) < 0xa000)
+				if (((unsigned short)item->Orientation.y) > 0x2000 && ((unsigned short)item->Orientation.y) < 0xa000)
 				{
-					item->Pose.Orientation.y = 0xe000 + (0x6000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Orientation.y = 0xe000 + (0x6000 - (unsigned short)item->Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
 						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
 				}
@@ -1508,17 +1492,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += collResult.FloorTilt.x + (-collResult.FloorTilt.y);
-						if ((unsigned short)item->Pose.Orientation.y < 0x6000 || (unsigned short)item->Pose.Orientation.y > 0xe000)
+						if ((unsigned short)item->Orientation.y < 0x6000 || (unsigned short)item->Orientation.y > 0xe000)
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0xe000)
-								item->Pose.Orientation.y = 0xe000;
+							item->Orientation.y -= 4096;
+							if ((unsigned short)item->Orientation.y < 0xe000)
+								item->Orientation.y = 0xe000;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0xe000)
+						else if ((unsigned short)item->Orientation.y != 0xe000)
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xe000)
-								item->Pose.Orientation.y = 0xe000;
+							item->Orientation.y += 4096;
+							if ((unsigned short)item->Orientation.y > 0xe000)
+								item->Orientation.y = 0xe000;
 						}
 					}
 
@@ -1557,7 +1541,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->ObjectNumber == ID_GRENADE)
 					{
 						item->Animation.RequiredState = 1;
-						item->Pose.Orientation.x = 0;
+						item->Orientation.x = 0;
 						item->Animation.Velocity--;
 					}
 					else
@@ -1606,7 +1590,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						if (item->ObjectNumber == ID_GRENADE)
 						{
 							item->Animation.RequiredState = 1;
-							item->Pose.Orientation.x = 0;
+							item->Orientation.x = 0;
 							item->Animation.Velocity--;
 						}
 						else
@@ -1635,13 +1619,13 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))))	// X crossed boundary?
 					{
 						if (xv <= 0)	// Hit angle = 0xc000.
-							item->Pose.Orientation.y = 0x4000 + (0xc000 - item->Pose.Orientation.y);
+							item->Orientation.y = 0x4000 + (0xc000 - item->Orientation.y);
 						else			// Hit angle = 0x4000.
-							item->Pose.Orientation.y = 0xc000 + (0x4000 - item->Pose.Orientation.y);
+							item->Orientation.y = 0xc000 + (0x4000 - item->Orientation.y);
 					}
 					else		// Z crossed boundary.
 					{
-						item->Pose.Orientation.y = 0x8000 - item->Pose.Orientation.y;
+						item->Orientation.y = 0x8000 - item->Orientation.y;
 					}
 
 					if (item->ObjectNumber == ID_GRENADE)
@@ -1768,8 +1752,8 @@ void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 				{
 					int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 					int z = laraItem->Pose.Position.z - item->Pose.Position.z;
-					float s = phd_sin(item->Pose.Orientation.y);
-					float c = phd_cos(item->Pose.Orientation.y);
+					float s = sin(item->Orientation.y);
+					float c = cos(item->Orientation.y);
 
 					auto* frame = GetBestFrame(item);
 					int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
@@ -1777,7 +1761,7 @@ void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 
 					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 					{
-						int angle = (laraItem->Pose.Orientation.y - phd_atan(z - c * rx - s * rz, x - c * rx + s * rz) - ANGLE(135.0f)) / ANGLE(90.0f);
+						int angle = (laraItem->Orientation.y - atan2(z - c * rx - s * rz, x - c * rx + s * rz) - EulerAngle::DegToRad(135.0f)) / EulerAngle::DegToRad(90.0f);
 						Lara.HitDirection = (short)angle;
 						// TODO: check if a second Lara.hitFrame++; is required there !
 						

@@ -44,8 +44,8 @@ static void ShootHarpoon(ITEM_INFO* item, int x, int y, int z, short velocity, s
 
 		InitialiseItem(harpoonItemNumber);
 
-		harpoonItem->Pose.Orientation.x = 0;
-		harpoonItem->Pose.Orientation.y = yRot;
+		harpoonItem->Orientation.x = 0;
+		harpoonItem->Orientation.y = yRot;
 		harpoonItem->Animation.Velocity = 150;
 
 		AddActiveItem(harpoonItemNumber);
@@ -59,7 +59,7 @@ void ScubaHarpoonControl(short itemNumber)
 
 	if (item->TouchBits)
 	{
-		DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+		DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Orientation.y, LaraItem->RoomNumber);
 		KillItem(itemNumber);
 
 		LaraItem->HitPoints -= 50;
@@ -70,10 +70,10 @@ void ScubaHarpoonControl(short itemNumber)
 		int ox = item->Pose.Position.x;
 		int oz = item->Pose.Position.z;
 
-		int velocity = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
-		item->Pose.Position.z += velocity * phd_cos(item->Pose.Orientation.y);
-		item->Pose.Position.x += velocity * phd_sin(item->Pose.Orientation.y);
-		item->Pose.Position.y += -item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
+		int velocity = item->Animation.Velocity * cos(item->Orientation.x);
+		item->Pose.Position.z += velocity * cos(item->Orientation.y);
+		item->Pose.Position.x += velocity * sin(item->Orientation.y);
+		item->Pose.Position.y += -item->Animation.Velocity * sin(item->Orientation.x);
 
 		auto probe = GetCollision(item);
 
@@ -142,10 +142,10 @@ void ScubaControl(short itemNumber)
 				creature->Target.z = LaraItem->Pose.Position.z;
 			}
 
-			if (AI.angle < -ANGLE(45.0f) || AI.angle > ANGLE(45.0f))
+			if (AI.angle < EulerAngle::DegToRad(-45.0f) || AI.angle > EulerAngle::DegToRad(45.0f))
 				shoot = false;
 		}
-		else if (AI.angle > -ANGLE(45.0f) && AI.angle < ANGLE(45.0f))
+		else if (AI.angle > EulerAngle::DegToRad(-45.0f) && AI.angle < EulerAngle::DegToRad(45.0f))
 		{
 			start.x = item->Pose.Position.x;
 			start.y = item->Pose.Position.y;
@@ -167,7 +167,7 @@ void ScubaControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 			if (shoot)
 				neck = -AI.angle;
 
@@ -202,7 +202,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Orientation.y, item->RoomNumber);
 				creature->Flags = 1;
 			}
 
@@ -210,7 +210,7 @@ void ScubaControl(short itemNumber)
 
 
 		case 2:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 
 			if (shoot)
 				head = AI.angle;
@@ -243,7 +243,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Orientation.y, item->RoomNumber);
 				creature->Flags = 1;
 			}
 

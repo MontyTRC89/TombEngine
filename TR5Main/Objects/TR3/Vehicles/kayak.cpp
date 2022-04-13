@@ -177,8 +177,8 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 	if (WakePts[kayak->CurrentStartWake][rotate].life)
 		return;
 
-	float s = phd_sin(kayakItem->Pose.Orientation.y);
-	float c = phd_cos(kayakItem->Pose.Orientation.y);
+	float s = sin(kayakItem->Orientation.y);
+	float c = cos(kayakItem->Orientation.y);
 
 	int x = kayakItem->Pose.Position.x + zOffset * s + xOffset * c;
 	int z = kayakItem->Pose.Position.z + zOffset * c - xOffset * s;
@@ -193,34 +193,34 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 		{
 			if (!rotate)
 			{
-				angle1 = kayakItem->Pose.Orientation.y - ANGLE(10.0f);
-				angle2 = kayakItem->Pose.Orientation.y - ANGLE(30.0f);
+				angle1 = kayakItem->Orientation.y - EulerAngle::DegToRad(10.0f);
+				angle2 = kayakItem->Orientation.y - EulerAngle::DegToRad(30.0f);
 			}
 			else
 			{
-				angle1 = kayakItem->Pose.Orientation.y + ANGLE(10.0f);
-				angle2 = kayakItem->Pose.Orientation.y + ANGLE(30.0f);
+				angle1 = kayakItem->Orientation.y + EulerAngle::DegToRad(10.0f);
+				angle2 = kayakItem->Orientation.y + EulerAngle::DegToRad(30.0f);
 			}
 		}
 		else
 		{
 			if (!rotate)
 			{
-				angle1 = kayakItem->Pose.Orientation.y - ANGLE(170.0f);
-				angle2 = kayakItem->Pose.Orientation.y - ANGLE(150.0f);
+				angle1 = kayakItem->Orientation.y - EulerAngle::DegToRad(170.0f);
+				angle2 = kayakItem->Orientation.y - EulerAngle::DegToRad(150.0f);
 			}
 			else
 			{
-				angle1 = kayakItem->Pose.Orientation.y + ANGLE(170.0f);
-				angle2 = kayakItem->Pose.Orientation.y + ANGLE(150.0f);
+				angle1 = kayakItem->Orientation.y + EulerAngle::DegToRad(170.0f);
+				angle2 = kayakItem->Orientation.y + EulerAngle::DegToRad(150.0f);
 			}
 		}
 
 		int xv[2], zv[2];
-		xv[0] = WAKE_VELOCITY * phd_sin(angle1);
-		zv[0] = WAKE_VELOCITY * phd_cos(angle1);
-		xv[1] = (WAKE_VELOCITY + 2) * phd_sin(angle2);
-		zv[1] = (WAKE_VELOCITY + 2) * phd_cos(angle2);
+		xv[0] = WAKE_VELOCITY * sin(angle1);
+		zv[0] = WAKE_VELOCITY * cos(angle1);
+		xv[1] = (WAKE_VELOCITY + 2) * sin(angle2);
+		zv[1] = (WAKE_VELOCITY + 2) * cos(angle2);
 
 		WakePts[kayak->CurrentStartWake][rotate].y = kayakItem->Pose.Position.y + KAYAK_DRAW_SHIFT;
 		WakePts[kayak->CurrentStartWake][rotate].life = 0x40;
@@ -243,8 +243,8 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 
 void KayakDoRipple(ITEM_INFO* kayakItem, int xOffset, int zOffset)
 {
-	float s = phd_sin(kayakItem->Pose.Orientation.y);
-	float c = phd_cos(kayakItem->Pose.Orientation.y);
+	float s = sin(kayakItem->Orientation.y);
+	float c = cos(kayakItem->Orientation.y);
 
 	int x = kayakItem->Pose.Position.x + zOffset * s + xOffset * c;
 	int z = kayakItem->Pose.Position.z + zOffset * c - xOffset * s;
@@ -253,7 +253,7 @@ void KayakDoRipple(ITEM_INFO* kayakItem, int xOffset, int zOffset)
 	int waterHeight = GetWaterHeight(x, kayakItem->Pose.Position.y, z, probedRoomNum);
 
 	if (waterHeight != NO_HEIGHT)
-		SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
+		SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,kayakItem->Orientation.y);
 }
 
 void KayakUpdateWakeFX()
@@ -293,20 +293,20 @@ KayakMountType KayakGetMountType(ITEM_INFO* laraItem, short itemNumber)
 	auto probe = GetCollision(kayakItem);
 	if (probe.Position.Floor > -32000)
 	{
-		short angle = phd_atan(kayakItem->Pose.Position.z - laraItem->Pose.Position.z, kayakItem->Pose.Position.x - laraItem->Pose.Position.x);
-		angle -= kayakItem->Pose.Orientation.y;
+		short angle = atan2(kayakItem->Pose.Position.z - laraItem->Pose.Position.z, kayakItem->Pose.Position.x - laraItem->Pose.Position.x);
+		angle -= kayakItem->Orientation.y;
 
-		int deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-		if (angle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
+		int deltaAngle = laraItem->Orientation.y - kayakItem->Orientation.y;
+		if (angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
 		{
-			deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-			if (deltaAngle > ANGLE(45.0f) && deltaAngle < ANGLE(135.0f))
+			deltaAngle = laraItem->Orientation.y - kayakItem->Orientation.y;
+			if (deltaAngle > EulerAngle::DegToRad(45.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
 				return KayakMountType::Left;
 		}
 		else
 		{
-			deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-			if (deltaAngle > ANGLE(225.0f) && deltaAngle < ANGLE(315.0f))
+			deltaAngle = laraItem->Orientation.y - kayakItem->Orientation.y;
+			if (deltaAngle > EulerAngle::DegToRad(225.0f) && deltaAngle < EulerAngle::DegToRad(315.0f))
 				return KayakMountType::Right;
 		}
 	}
@@ -321,8 +321,8 @@ int KayakGetCollisionAnim(ITEM_INFO* kayakItem, int xDiff, int zDiff)
 
 	if ((xDiff) || (zDiff))
 	{
-		float s = phd_sin(kayakItem->Pose.Orientation.y);
-		float c = phd_cos(kayakItem->Pose.Orientation.y);
+		float s = sin(kayakItem->Orientation.y);
+		float c = cos(kayakItem->Orientation.y);
 
 		int front = zDiff * c + xDiff * s;
 		int side = -zDiff * s + xDiff * c;
@@ -418,14 +418,14 @@ void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		int sinkval = lara->WaterCurrentActive - 1;
 		
 		auto target = Vector3Int(g_Level.Sinks[sinkval].x, g_Level.Sinks[sinkval].y, g_Level.Sinks[sinkval].z);
-		int angle = (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - ANGLE(90.0f))) / 16) & 4095;
+		int angle = 0;// (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - EulerAngle::DegToRad(90.0f))) / 16) & 4095;
 
 		int dx = target.x - laraItem->Pose.Position.x;
 		int dz = target.z - laraItem->Pose.Position.z;
 
 		int velocity = g_Level.Sinks[sinkval].strength;
-		dx = phd_sin(angle * 16) * velocity * 1024;
-		dz = phd_cos(angle * 16) * velocity * 1024;
+		dx = sin(angle * 16) * velocity * 1024;
+		dz = cos(angle * 16) * velocity * 1024;
 
 		lara->WaterCurrentPull.x += (dx - lara->WaterCurrentPull.x) / 16;
 		lara->WaterCurrentPull.z += (dz - lara->WaterCurrentPull.z) / 16;
@@ -440,7 +440,7 @@ void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 int KayakTestHeight(ITEM_INFO* kayakItem, int x, int z, Vector3Int* pos)
 {
 	Matrix world =
-		Matrix::CreateFromYawPitchRoll(TO_RAD(kayakItem->Pose.Orientation.y), TO_RAD(kayakItem->Pose.Orientation.x), TO_RAD(kayakItem->Pose.Orientation.z)) *
+		Matrix::CreateFromYawPitchRoll(kayakItem->Orientation.y, kayakItem->Orientation.x, kayakItem->Orientation.z) *
 		Matrix::CreateTranslation(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z);
 
 	Vector3 vec = Vector3(x, 0, z);
@@ -610,9 +610,9 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	int leftHeight = KayakTestHeight(kayakItem, -KAYAK_X, KAYAK_Z, &leftPos);
 	int rightHeight = KayakTestHeight(kayakItem, KAYAK_X, KAYAK_Z, &rightPos);
 
-	kayakItem->Pose.Orientation.y += kayak->TurnRate / (USHRT_MAX + 1);
-	kayakItem->Pose.Position.x += kayakItem->Animation.Velocity * phd_sin(kayakItem->Pose.Orientation.y);
-	kayakItem->Pose.Position.z += kayakItem->Animation.Velocity * phd_cos(kayakItem->Pose.Orientation.y);
+	kayakItem->Orientation.y += kayak->TurnRate / (USHRT_MAX + 1);
+	kayakItem->Pose.Position.x += kayakItem->Animation.Velocity * sin(kayakItem->Orientation.y);
+	kayakItem->Pose.Position.z += kayakItem->Animation.Velocity * cos(kayakItem->Orientation.y);
 
 	KayakDoCurrent(laraItem,kayakItem);
 
@@ -623,11 +623,11 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	kayakItem->Animation.VerticalVelocity = KayakDoDynamics(kayak->WaterHeight, kayakItem->Animation.VerticalVelocity, &kayakItem->Pose.Position.y);
 
 	int height2 = (leftPos.y + rightPos.y) / 2;
-	int x = phd_atan(1024, kayakItem->Pose.Position.y - frontPos.y);
-	int z = phd_atan(KAYAK_X, height2 - leftPos.y);
+	int x = atan2(1024, kayakItem->Pose.Position.y - frontPos.y);
+	int z = atan2(KAYAK_X, height2 - leftPos.y);
 
-	kayakItem->Pose.Orientation.x = x;
-	kayakItem->Pose.Orientation.z = z;
+	kayakItem->Orientation.x = x;
+	kayakItem->Orientation.z = z;
 
 	int xOld = kayakItem->Pose.Position.x;
 	int zOld = kayakItem->Pose.Position.z;
@@ -659,7 +659,7 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	if ((height2 = KayakTestHeight(kayakItem, 0, CLICK(4), &pos)) < (oldPos[0].y - KAYAK_COLLIDE))
 		rot += KayakDoShift(kayakItem, &pos, &oldPos[0]);
 
-	kayakItem->Pose.Orientation.y += rot;
+	kayakItem->Orientation.y += rot;
 
 	auto probe = GetCollision(kayakItem);
 	int probedRoomNum = probe.RoomNumber;
@@ -702,7 +702,7 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	{
 		int newVelocity;
 
-		newVelocity = (kayakItem->Pose.Position.z - oldPos[8].z) * phd_cos(kayakItem->Pose.Orientation.y) + (kayakItem->Pose.Position.x - oldPos[8].x) * phd_sin(kayakItem->Pose.Orientation.y);
+		newVelocity = (kayakItem->Pose.Position.z - oldPos[8].z) * cos(kayakItem->Orientation.y) + (kayakItem->Pose.Position.x - oldPos[8].x) * sin(kayakItem->Orientation.y);
 		newVelocity *= 256;
 
 		if (slip)
@@ -1058,9 +1058,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			laraItem->Pose.Position.x = vec.x;
 			laraItem->Pose.Position.y = vec.y;
 			laraItem->Pose.Position.z = vec.z;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - ANGLE(90.0f);
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Orientation.x = 0;
+			laraItem->Orientation.y = kayakItem->Orientation.y - EulerAngle::DegToRad(90.0f);
+			laraItem->Orientation.z = 0;
 			laraItem->Animation.Velocity = 40;
 			laraItem->Animation.VerticalVelocity = -50;
 			laraItem->Animation.Airborne = true;
@@ -1082,9 +1082,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			laraItem->Pose.Position.x = vec.x;
 			laraItem->Pose.Position.y = vec.y;
 			laraItem->Pose.Position.z = vec.z;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + ANGLE(90.0f);
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Orientation.x = 0;
+			laraItem->Orientation.y = kayakItem->Orientation.y + EulerAngle::DegToRad(90.0f);
+			laraItem->Orientation.z = 0;
 			laraItem->Animation.Velocity = 40;
 			laraItem->Animation.VerticalVelocity = -50;
 			laraItem->Animation.Airborne = true;
@@ -1166,7 +1166,7 @@ void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 					{
 						if (TestBoundsCollide(item, kayakItem, KAYAK_TO_ENTITY_RADIUS))
 						{
-							DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - STEP_SIZE, laraItem->Pose.Position.z, kayakItem->Animation.Velocity, kayakItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
+							DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - STEP_SIZE, laraItem->Pose.Position.z, kayakItem->Animation.Velocity, kayakItem->Orientation.y, laraItem->RoomNumber, 3);
 							laraItem->HitPoints -= 5;
 						}
 					}
@@ -1231,9 +1231,9 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		laraItem->Pose.Position.x = kayakItem->Pose.Position.x;
 		laraItem->Pose.Position.y = kayakItem->Pose.Position.y;
 		laraItem->Pose.Position.z = kayakItem->Pose.Position.z;
-		laraItem->Pose.Orientation.x = 0;
-		laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = 0;
+		laraItem->Orientation.x = 0;
+		laraItem->Orientation.y = kayakItem->Orientation.y;
+		laraItem->Orientation.z = 0;
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
 		laraItem->Animation.Airborne = false;
@@ -1305,16 +1305,16 @@ bool KayakControl(ITEM_INFO* laraItem)
 		laraItem->Pose.Position.x = kayakItem->Pose.Position.x;
 		laraItem->Pose.Position.y = kayakItem->Pose.Position.y;
 		laraItem->Pose.Position.z = kayakItem->Pose.Position.z;
-		laraItem->Pose.Orientation.x = kayakItem->Pose.Orientation.x;
-		laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = kayakItem->Pose.Orientation.z / 2;
+		laraItem->Orientation.x = kayakItem->Orientation.x;
+		laraItem->Orientation.y = kayakItem->Orientation.y;
+		laraItem->Orientation.z = kayakItem->Orientation.z / 2;
 
 		AnimateItem(laraItem);
 
 		kayakItem->Animation.AnimNumber = Objects[ID_KAYAK].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
 		kayakItem->Animation.FrameNumber = g_Level.Anims[kayakItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
-		Camera.targetElevation = -ANGLE(30.0f);
+		Camera.targetElevation = EulerAngle::DegToRad(-30.0f);
 		Camera.targetDistance = CLICK(8);
 	}
 

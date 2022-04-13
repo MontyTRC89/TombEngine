@@ -26,15 +26,15 @@ bool TestLaraValidHangPosition(ITEM_INFO* item, CollisionInfo* coll);
 CornerType TestLaraHangCorner(ITEM_INFO* item, CollisionInfo* coll, float testAngle);
 CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, CollisionInfo* coll, float angle, bool outer);
 bool TestHangSwingIn(ITEM_INFO* item, CollisionInfo* coll);
-bool TestLaraHangSideways(ITEM_INFO* item, CollisionInfo* coll, short angle);
+bool TestLaraHangSideways(ITEM_INFO* item, CollisionInfo* coll, float angle);
 
 bool TestLaraWall(ITEM_INFO* item, int distance, int height, int side = 0);
-bool TestLaraFacingCorner(ITEM_INFO* item, short angle, int distance);
-bool LaraPositionOnLOS(ITEM_INFO* item, short angle, int distance);
-int LaraFloorFront(ITEM_INFO* item, short angle, int distance);
-int LaraCeilingFront(ITEM_INFO* item, short angle, int distance, int height);
-CollisionResult LaraCollisionFront(ITEM_INFO* item, short angle, int distance);
-CollisionResult LaraCeilingCollisionFront(ITEM_INFO* item, short angle, int distance, int height);
+bool TestLaraFacingCorner(ITEM_INFO* item, float angle, int distance);
+bool LaraPositionOnLOS(ITEM_INFO* item, float angle, int distance);
+int LaraFloorFront(ITEM_INFO* item, float angle, int distance);
+int LaraCeilingFront(ITEM_INFO* item, float angle, int distance, int height);
+CollisionResult LaraCollisionFront(ITEM_INFO* item, float angle, int distance);
+CollisionResult LaraCeilingCollisionFront(ITEM_INFO* item, float angle, int distance, int height);
 
 bool TestLaraWaterStepOut(ITEM_INFO* item, CollisionInfo* coll);
 bool TestLaraWaterClimbOut(ITEM_INFO* item, CollisionInfo* coll);

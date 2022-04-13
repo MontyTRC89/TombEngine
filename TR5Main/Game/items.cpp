@@ -326,8 +326,8 @@ void InitialiseItem(short itemNumber)
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 
-	item->Pose.Orientation.z = 0;
-	item->Pose.Orientation.x = 0;
+	item->Orientation.z = 0;
+	item->Orientation.x = 0;
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Velocity = 0;
@@ -476,8 +476,8 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
 void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset, int zOffset)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	float s = sin(item->Orientation.y);
+	float c = cos(item->Orientation.y);
 
 	int x = item->Pose.Position.x + roundf(c * xOffset + s * zOffset);
 	int y = height + item->Pose.Position.y;

@@ -39,7 +39,7 @@ void ReaperControl(short itemNumber)
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
 
-		short angle = CreatureTurn(item, ANGLE(2.0f));
+		short angle = CreatureTurn(item, EulerAngle::DegToRad(2.0f));
 
 		if (item->Animation.ActiveState == 2 &&
 			!(GetRandomControl() & 0x3F))
@@ -59,7 +59,7 @@ void ReaperControl(short itemNumber)
 			}
 		}
 
-		item->Pose.Orientation.x = -ANGLE(67.5f);
+		item->Orientation.x = EulerAngle::DegToRad(-67.5f);
 		CreatureAnimation(itemNumber, angle, 0);
 		CreatureUnderwater(item, SECTOR(1));
 	}

@@ -147,7 +147,7 @@ void SilencerControl(short itemNumber)
 			if (AI.ahead)
 				head = AI.angle;
 
-			info->MaxTurn = ANGLE(5.0f);
+			info->MaxTurn = EulerAngle::DegToRad(5.0f);
 			info->Flags = 0;
 			tilt = angle / 4;
 
@@ -238,7 +238,7 @@ void SilencerControl(short itemNumber)
 			break;
 
 		case 9:
-			info->MaxTurn = ANGLE(5.0f);
+			info->MaxTurn = EulerAngle::DegToRad(5.0f);
 
 			if (AI.ahead)
 			{

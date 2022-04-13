@@ -289,8 +289,8 @@ void InitialiseRomanStatue(short itemNumber)
 	item->Animation.ActiveState = 13;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Pose.Position.x += 486 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f));
-	item->Pose.Position.z += 486 * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
+	item->Pose.Position.x += 486 * sin(item->Orientation.y + EulerAngle::DegToRad(90.0f));
+	item->Pose.Position.z += 486 * cos(item->Orientation.y + EulerAngle::DegToRad(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(RomanStatueInfo));
 }
@@ -379,7 +379,7 @@ void RomanStatueControl(short itemNumber)
 			joint2 = AI.angle;
 
 			if (creature->Mood == MoodType::Attack)
-				creature->MaxTurn = ANGLE(2.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 			else
 			{
 				creature->MaxTurn = 0;
@@ -393,7 +393,7 @@ void RomanStatueControl(short itemNumber)
 			{
 				joint2 = AIGuard((CreatureInfo*)creature);
 			}
-			else if (AI.angle > ANGLE(112.5f) || AI.angle < -ANGLE(112.5f))
+			else if (AI.angle > EulerAngle::DegToRad(112.5f) || AI.angle < EulerAngle::DegToRad(-112.5f))
 				item->Animation.TargetState = STATUE_STATE_TURN_180;
 			else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 			{
@@ -560,15 +560,15 @@ void RomanStatueControl(short itemNumber)
 		case STATUE_STATE_ATTACK_4:                                  
 			creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= ANGLE(2.0f))
+			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += ANGLE(2.0f);
+					item->Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(2.0f);
+					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Orientation.y += AI.angle;
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
@@ -605,7 +605,7 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (item->TouchBits & 0xC000)
 					{
-						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &RomanStatueBite, 20, item->Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 
@@ -653,19 +653,19 @@ void RomanStatueControl(short itemNumber)
 			joint2 = AI.angle;
 
 			if (creature->Mood == MoodType::Attack)
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 			else
 			{
 				creature->MaxTurn = 0;
-				if (abs(AI.angle) >= ANGLE(2.0f))
+				if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 				{
 					if (AI.angle > 0)
-						item->Pose.Orientation.y += ANGLE(2.0f);
+						item->Orientation.y += EulerAngle::DegToRad(2.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(2.0f);
+						item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 			}
 
 			if (AI.distance < pow(SECTOR(1), 2))
@@ -701,12 +701,12 @@ void RomanStatueControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle > 0)
-				item->Pose.Orientation.y -= ANGLE(2.0f);
+				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 			else
-				item->Pose.Orientation.y += ANGLE(2.0f);
+				item->Orientation.y += EulerAngle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.y += -ANGLE(180.0f);
+				item->Orientation.y += EulerAngle::DegToRad(-180.0f);
 		
 			break;
 
@@ -731,7 +731,7 @@ void RomanStatueControl(short itemNumber)
 				pos2 = { -48, 48, 450 };
 				GetJointAbsPosition(item, &pos2, 14);
 
-				short angles[2];
+				float angles[2];
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
 				PHD_3DPOS attackPos;

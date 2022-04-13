@@ -1,5 +1,6 @@
 #pragma once
 #include "Game/items.h"
+#include "Specific/EulerAngle.h"
 
 constexpr auto NUM_BATS = 64;
 
@@ -7,6 +8,7 @@ struct BatData
 {
 	bool On;
 	PHD_3DPOS Pose;
+	EulerAngle Orientation;
 	short RoomNumber;
 
 	short Velocity;

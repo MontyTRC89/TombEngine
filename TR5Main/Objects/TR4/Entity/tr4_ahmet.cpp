@@ -44,10 +44,10 @@ namespace TEN::Entities::TR4
 		AHMET_ANIM_DEATH_ANIM = 10
 	};
 
-	#define AHMET_WALK_ANGLE ANGLE(5.0f)
-	#define AHMET_RUN_ANGLE ANGLE(8.0f)
-	#define AHMET_VIEW_ANGLE ANGLE(45.0f)
-	#define AHMET_ENEMY_ANGLE ANGLE(90.0f)
+	#define AHMET_WALK_ANGLE EulerAngle::DegToRad(5.0f)
+	#define AHMET_RUN_ANGLE EulerAngle::DegToRad(8.0f)
+	#define AHMET_VIEW_ANGLE EulerAngle::DegToRad(45.0f)
+	#define AHMET_ENEMY_ANGLE EulerAngle::DegToRad(90.0f)
 	#define AHMET_AWARE_DISTANCE pow(SECTOR(1), 2)
 	#define AHMET_IDLE_RANGE pow(SECTOR(1.25f), 2)
 	#define AHMET_RUN_RANGE pow(SECTOR(2.5f), 2)
@@ -155,8 +155,8 @@ namespace TEN::Entities::TR4
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int angle = phd_atan(dx, dz);
-				laraAI.angle = angle - item->Pose.Orientation.y;
+				int angle = atan2(dx, dz);
+				laraAI.angle = angle - item->Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -255,12 +255,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 910)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(5.0f);
+						item->Orientation.y += EulerAngle::DegToRad(5.0f);
 					else
-						item->Pose.Orientation.y -= ANGLE(5.0f);
+						item->Orientation.y -= EulerAngle::DegToRad(5.0f);
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Orientation.y += AI.angle;
 
 				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
 				{
@@ -286,15 +286,15 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START)
 				{
-					if (abs(AI.angle) >= ANGLE(5.0f))
+					if (abs(AI.angle) >= EulerAngle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(5.0f);
+							item->Orientation.y += EulerAngle::DegToRad(5.0f);
 						else
-							item->Pose.Orientation.y -= ANGLE(5.0f);
+							item->Orientation.y -= EulerAngle::DegToRad(5.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Orientation.y += AI.angle;
 				}
 				else
 				{
@@ -319,15 +319,15 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START))
 				{
-					if (abs(AI.angle) >= ANGLE(5.0f))
+					if (abs(AI.angle) >= EulerAngle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(5.0f);
+							item->Orientation.y += EulerAngle::DegToRad(5.0f);
 						else
-							item->Pose.Orientation.y -= ANGLE(5.0f);
+							item->Orientation.y -= EulerAngle::DegToRad(5.0f);
 					}
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Orientation.y += AI.angle;
 				}
 				else
 				{

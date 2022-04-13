@@ -15,8 +15,8 @@ void ControlSpikyWall(short itemNumber)
 	// Move wall.
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
-		int x = item->Pose.Position.x + phd_sin(item->Pose.Orientation.y);
-		int z = item->Pose.Position.z + phd_cos(item->Pose.Orientation.y);
+		int x = item->Pose.Position.x + sin(item->Orientation.y);
+		int z = item->Pose.Position.z + cos(item->Orientation.y);
 		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 
 		if (probe.Position.Floor != item->Pose.Position.y)
@@ -41,7 +41,7 @@ void ControlSpikyWall(short itemNumber)
 		LaraItem->HitPoints -= 15;
 		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
+		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Orientation.y, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
 		SoundEffect(56, &item->Pose, 0);

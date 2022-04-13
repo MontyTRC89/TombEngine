@@ -57,7 +57,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Animation.ActiveState == 8)
 					{
-						item->Pose.Orientation.x = 0;
+						item->Orientation.x = 0;
 						item->Pose.Position.y = item->Floor;
 					}
 					else
@@ -67,7 +67,7 @@ namespace TEN::Entities::TR4
 						item->Animation.ActiveState = 6;
 						item->Animation.Velocity = 0;
 						item->Animation.Airborne = true;
-						item->Pose.Orientation.x = 0;
+						item->Orientation.x = 0;
 					}
 				}
 				else if (item->Pose.Position.y >= item->Floor)
@@ -79,7 +79,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			item->Pose.Orientation.x = 0;
+			item->Orientation.x = 0;
 		}
 		else
 		{
@@ -106,7 +106,7 @@ namespace TEN::Entities::TR4
 			{
 			case 1:
 				item->Pose.Position.y = item->Floor;
-				creature->MaxTurn = ANGLE(1.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(1.0f);
 
 				if (item->HitStatus ||
 					item->AIBits == MODIFY ||
@@ -119,7 +119,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 3:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
@@ -132,7 +132,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 4u:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (AI.ahead)
 				{
@@ -177,7 +177,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 9u:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;

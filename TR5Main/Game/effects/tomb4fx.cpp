@@ -675,8 +675,8 @@ void TriggerBlood(int x, int y, int z, int unk, int num)
 		blood->z = (GetRandomControl() & 0x1F) + z - 16;
 		int a = (unk == -1 ? GetRandomControl() : (GetRandomControl() & 0x1F) + unk - 16) & 0xFFF;
 		int b = GetRandomControl() & 0xF;
-		blood->zVel = b * phd_cos(a << 4) * 32;
-		blood->xVel = -b * phd_sin(a << 4) * 32;
+		blood->zVel = b * cos(a << 4) * 32;
+		blood->xVel = -b * sin(a << 4) * 32;
 		blood->friction = 4;
 		blood->yVel = -((GetRandomControl() & 0xFF) + 128);
 		blood->rotAng = GetRandomControl() & 0xFFF;
@@ -866,19 +866,19 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 		{
 			gshell->dirXrot = Lara.LeftArm.Rotation.y
 				+ Lara.ExtraTorsoRot.y
-				+ LaraItem->Pose.Orientation.y
+				+ LaraItem->Orientation.y
 				- (GetRandomControl() & 0xFFF)
 				+ 10240;
 			gshell->pos.Orientation.y += Lara.LeftArm.Rotation.y 
 				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Pose.Orientation.y;
+				+ LaraItem->Orientation.y;
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
 		else
 		{
 			gshell->dirXrot = Lara.LeftArm.Rotation.y 
-				+ LaraItem->Pose.Orientation.y 
+				+ LaraItem->Orientation.y 
 				- (GetRandomControl() & 0xFFF) 
 				+ 18432;
 		}
@@ -886,7 +886,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	else
 	{
 		gshell->dirXrot = Lara.LeftArm.Rotation.y 
-			+ LaraItem->Pose.Orientation.y 
+			+ LaraItem->Orientation.y 
 			+ (GetRandomControl() & 0xFFF) 
 			- 18432;
 	}
@@ -936,13 +936,13 @@ void UpdateGunShells()
 				gs->fallspeed += 6;
 			}
 
-			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * ANGLE(1);
-			gs->pos.Orientation.y += gs->speed * ANGLE(1);
-			gs->pos.Orientation.z += ANGLE(23);
+			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * EulerAngle::DegToRad(1);
+			gs->pos.Orientation.y += gs->speed * EulerAngle::DegToRad(1);
+			gs->pos.Orientation.z += EulerAngle::DegToRad(23);
 
-			gs->pos.Position.x += gs->speed * phd_sin(gs->dirXrot);
+			gs->pos.Position.x += gs->speed * sin(gs->dirXrot);
 			gs->pos.Position.y += gs->fallspeed;
-			gs->pos.Position.z += gs->speed * phd_cos(gs->dirXrot);
+			gs->pos.Position.z += gs->speed * cos(gs->dirXrot);
 
 			FLOOR_INFO* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
 			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
@@ -985,7 +985,7 @@ void UpdateGunShells()
 					}
 					else
 					{
-						gs->dirXrot += -ANGLE(180);
+						gs->dirXrot += EulerAngle::DegToRad(-180);
 						gs->pos.Position.x = oldX;
 						gs->pos.Position.z = oldZ;
 					}
@@ -1022,9 +1022,9 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->scalar = 1;
 		spark->transType = TransTypeEnum::COLADD;	
 		int random = GetRandomControl() & 0xFFF;
-		spark->xVel = -phd_sin(random << 4) * 128;
+		spark->xVel = -sin(random << 4) * 128;
 		spark->yVel = -GenerateInt(128, 256);
-		spark->zVel = phd_cos(random << 4) * 128;
+		spark->zVel = cos(random << 4) * 128;
 		spark->friction = 5;
 		spark->flags = SP_NONE;
 		spark->x = x + (spark->xVel >> 3);
@@ -1211,9 +1211,9 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
+		item->Orientation.y,
+		item->Orientation.x,
+		item->Orientation.z
 	);
 
 	int bit = 1;
@@ -1380,19 +1380,19 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 
 		int speed = (GetRandomControl() & 0xF) + vel;
-		spark->xVel = speed * 16 * phd_sin(rot);
+		spark->xVel = speed * 16 * sin(rot);
 		spark->yVel = -512 - (GetRandomControl() & 0x1FF);
-		spark->zVel = speed * 16 * phd_cos(rot);
+		spark->zVel = speed * 16 * cos(rot);
 
 		short angle;
 		if (GetRandomControl() & 1)
-			angle = rot + ANGLE(90);
+			angle = rot + EulerAngle::DegToRad(90);
 		else
-			angle = rot - ANGLE(90);
+			angle = rot - EulerAngle::DegToRad(90);
 
 		int shift = (GetRandomControl() & 0x1FF) - 256;
-		x += shift * phd_sin(angle);
-		z += shift * phd_cos(angle);
+		x += shift * sin(angle);
+		z += shift * cos(angle);
 
 		spark->x = (GetRandomControl() & 0x1F) + x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1449,7 +1449,7 @@ void UpdateShockwaves()
 						}
 						else
 						{
-							short angle = phd_atan(dz, dx);
+							short angle = atan2(dz, dx);
 							TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
 								sw->y,
 								LaraItem->Pose.Position.z,
@@ -1665,9 +1665,9 @@ void TriggerSmallSplash(int x, int y, int z, int number)
 
 		int angle = GetRandomControl() << 3;
 
-		sptr->xVel = -phd_sin(angle) * 512;
+		sptr->xVel = -sin(angle) * 512;
 		sptr->yVel = -640 - (GetRandomControl() & 0xFF);
-		sptr->zVel = phd_cos(angle) * 512;
+		sptr->zVel = cos(angle) * 512;
 
 		sptr->friction = 5;
 		sptr->flags = 0;

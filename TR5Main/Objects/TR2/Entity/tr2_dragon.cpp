@@ -23,9 +23,9 @@ BITE_INFO DragonMouthBite = { 35, 171, 1168, 12 };
 #define DRAGON_TOUCH_DAMAGE 10
 #define DRAGON_LIVE_TIME (30 * 11)
 #define DRAGON_ALMOST_LIVE 100
-#define DRAGON_STATE_WALK_TURN ANGLE(2.0f)
-#define DRAGON_NEED_TURN ANGLE(1.0f)
-#define DRAGON_TURN_TURN ANGLE(1.0f)
+#define DRAGON_STATE_WALK_TURN EulerAngle::DegToRad(2.0f)
+#define DRAGON_NEED_TURN EulerAngle::DegToRad(1.0f)
+#define DRAGON_TURN_TURN EulerAngle::DegToRad(1.0f)
 #define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
 #define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
 #define DRAGON_FLAME_SPEED 200
@@ -102,9 +102,9 @@ static void createExplosion(ITEM_INFO* item)
 		explosionItem->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 		explosionItem->Pose.Position.z = item->Pose.Position.z;
 		explosionItem->RoomNumber = item->RoomNumber;
-		explosionItem->Pose.Orientation.y = 0;
-		explosionItem->Pose.Orientation.x = 0;
-		explosionItem->Pose.Orientation.z = 0;
+		explosionItem->Orientation.y = 0;
+		explosionItem->Orientation.x = 0;
+		explosionItem->Orientation.z = 0;
 		explosionItem->Animation.Velocity = 0;
 		explosionItem->Animation.VerticalVelocity = 0;
 
@@ -127,8 +127,8 @@ static void createDragonBone(short frontNumber)
 
 		dragonBack->ObjectNumber = ID_DRAGON_BONE_BACK;
 		dragonBack->Pose = item->Pose;
-		dragonBack->Pose.Orientation.x = 0;
-		dragonBack->Pose.Orientation.z = 0;
+		dragonBack->Orientation.x = 0;
+		dragonBack->Orientation.z = 0;
 		dragonBack->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneBack);
@@ -137,8 +137,8 @@ static void createDragonBone(short frontNumber)
 
 		dragonFront->ObjectNumber = ID_DRAGON_BONE_FRONT;
 		dragonFront->Pose = item->Pose;
-		dragonFront->Pose.Orientation.x = 0;
-		dragonFront->Pose.Orientation.z = 0;
+		dragonFront->Orientation.x = 0;
+		dragonFront->Orientation.z = 0;
 		dragonFront->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneFront);
@@ -160,8 +160,8 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		int rx = laraItem->Pose.Position.x - item->Pose.Position.x;
 		int rz = laraItem->Pose.Position.z - item->Pose.Position.z;
-		float s = phd_sin(item->Pose.Orientation.y);
-		float c = phd_cos(item->Pose.Orientation.y);
+		float s = sin(item->Orientation.y);
+		float c = cos(item->Orientation.y);
 
 		int sideShift = rx * s + rz * c;
 		if (sideShift > DRAGON_LCOL&& sideShift < DRAGON_RCOL)
@@ -170,7 +170,7 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
 				return;
 
-			int angle = laraItem->Pose.Orientation.y - item->Pose.Orientation.y;
+			int angle = laraItem->Orientation.y - item->Orientation.y;
 
 			int anim = item->Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
 			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -183,8 +183,8 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				shift > (DRAGON_CLOSE - 350) &&
 				sideShift > -350 &&
 				sideShift < 350 &&
-				angle > (ANGLE(45.0f) - ANGLE(30.0f)) &&
-				angle < (ANGLE(45.0f) + ANGLE(30.0f)))
+				angle > (EulerAngle::DegToRad(45.0f) - EulerAngle::DegToRad(30.0f)) &&
+				angle < (EulerAngle::DegToRad(45.0f) + EulerAngle::DegToRad(30.0f)))
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -311,7 +311,7 @@ void DragonControl(short backItemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case DRAGON_STATE_IDLE:
-			item->Pose.Orientation.y -= angle;
+			item->Orientation.y -= angle;
 
 			if (!ahead)
 			{
@@ -392,19 +392,19 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_TURN_LEFT:
-			item->Pose.Orientation.y += -(ANGLE(1.0f) - angle);
+			item->Orientation.y += -(EulerAngle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_TURN_RIGHT:
-			item->Pose.Orientation.y += (ANGLE(1.0f) - angle);
+			item->Orientation.y += (EulerAngle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_AIM_1:
-			item->Pose.Orientation.y -= angle;
+			item->Orientation.y -= angle;
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -423,7 +423,7 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_FIRE_1:
-			item->Pose.Orientation.y -= angle;
+			item->Orientation.y -= angle;
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -452,9 +452,9 @@ void DragonControl(short backItemNumber)
 	back->Pose.Position.x = item->Pose.Position.x;
 	back->Pose.Position.y = item->Pose.Position.y;
 	back->Pose.Position.z = item->Pose.Position.z;
-	back->Pose.Orientation.x = item->Pose.Orientation.x;
-	back->Pose.Orientation.y = item->Pose.Orientation.y;
-	back->Pose.Orientation.z = item->Pose.Orientation.z;
+	back->Orientation.x = item->Orientation.x;
+	back->Orientation.y = item->Orientation.y;
+	back->Orientation.z = item->Orientation.z;
 
 	if (back->RoomNumber != item->RoomNumber)
 		ItemNewRoom(backItemNumber, item->RoomNumber);
@@ -477,7 +477,7 @@ void InitialiseBartoli(short itemNumber)
 		back->Pose.Position.x = item->Pose.Position.x;
 		back->Pose.Position.y = item->Pose.Position.y;
 		back->Pose.Position.z = item->Pose.Position.z;
-		back->Pose.Orientation.y = item->Pose.Orientation.y;
+		back->Orientation.y = item->Orientation.y;
 		back->RoomNumber = item->RoomNumber;
 		back->Status = ITEM_INVISIBLE;
 		back->Shade = -1;
@@ -493,7 +493,7 @@ void InitialiseBartoli(short itemNumber)
 		front->Pose.Position.x = item->Pose.Position.x;
 		front->Pose.Position.y = item->Pose.Position.y;
 		front->Pose.Position.z = item->Pose.Position.z;
-		front->Pose.Orientation.y = item->Pose.Orientation.y;
+		front->Orientation.y = item->Orientation.y;
 		front->RoomNumber = item->RoomNumber;
 		front->Status = ITEM_INVISIBLE;
 		front->Shade = -1;

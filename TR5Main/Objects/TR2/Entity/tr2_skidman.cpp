@@ -35,8 +35,8 @@ enum SkidooManAnim
 	SMAN_ANIM_DEATH = 10
 };
 
-#define SMAN_MIN_TURN (ANGLE(2.0f))
-#define SMAN_TARGET_ANGLE ANGLE(15.0f)
+#define SMAN_MIN_TURN (EulerAngle::DegToRad(2.0f))
+#define SMAN_TARGET_ANGLE EulerAngle::DegToRad(15.0f)
 #define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
 
 BITE_INFO SkidooBiteLeft = { 240, -190, 540, 0 };
@@ -54,7 +54,7 @@ void InitialiseSkidooMan(short itemNumber)
 		skidooItem->Pose.Position.x = riderItem->Pose.Position.x;
 		skidooItem->Pose.Position.y = riderItem->Pose.Position.y;
 		skidooItem->Pose.Position.z = riderItem->Pose.Position.z;
-		skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.y;
+		skidooItem->Orientation.y = riderItem->Orientation.y;
 		skidooItem->RoomNumber = riderItem->RoomNumber;
 		skidooItem->Flags = ITEM_INVISIBLE;
 		skidooItem->Shade = -1;
@@ -126,7 +126,7 @@ void SkidooManControl(short riderItemNumber)
 			riderItem->Pose.Position.x = item->Pose.Position.x;
 			riderItem->Pose.Position.y = item->Pose.Position.y;
 			riderItem->Pose.Position.z = item->Pose.Position.z;
-			riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
+			riderItem->Orientation.y = item->Orientation.y;
 			riderItem->RoomNumber = item->RoomNumber;
 
 			riderItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
@@ -151,7 +151,7 @@ void SkidooManControl(short riderItemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, ANGLE(3.0f));
+		angle = CreatureTurn(item, EulerAngle::DegToRad(3.0f));
 
 		switch (item->Animation.ActiveState)
 		{
@@ -232,7 +232,7 @@ void SkidooManControl(short riderItemNumber)
 		riderItem->Pose.Position.x = item->Pose.Position.x;
 		riderItem->Pose.Position.y = item->Pose.Position.y;
 		riderItem->Pose.Position.z = item->Pose.Position.z;
-		riderItem->Pose.Orientation.y = item->Pose.Orientation.y;
+		riderItem->Orientation.y = item->Orientation.y;
 
 		if (item->RoomNumber != riderItem->RoomNumber)
 			ItemNewRoom(riderItemNumber, item->RoomNumber);

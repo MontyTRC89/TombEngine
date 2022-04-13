@@ -34,9 +34,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
 	// No weapons
 	{
-		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
-		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
-		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
+		{ EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f) },
+		{ EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f) },
+		{ EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f) },
 		0,
 		0,
 		0,
@@ -51,11 +51,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Pistols
 	{
-		{ -ANGLE(60.0f),  ANGLE(60.0f),  -ANGLE(60.0f), ANGLE(60.0f) },
-		{ -ANGLE(170.0f), ANGLE(60.0f),  -ANGLE(80.0f), ANGLE(80.0f) },
-		{ -ANGLE(60.0f),  ANGLE(170.0f), -ANGLE(80.0f), ANGLE(80.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-60.0f),  EulerAngle::DegToRad(60.0f),  EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f) },
+		{ EulerAngle::DegToRad(-170.0f), EulerAngle::DegToRad(60.0f),  EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f) },
+		{ EulerAngle::DegToRad(-60.0f),  EulerAngle::DegToRad(170.0f), EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		650,
 		SECTOR(8),
 		1,
@@ -68,11 +68,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Revolver
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(60.0f), ANGLE(60.0f) },
-		{ -ANGLE(10.0f), ANGLE(10.0f), -ANGLE(80.0f), ANGLE(80.0f) },
-		{  ANGLE(0.0f),   ANGLE(0.0f),   ANGLE(0.0f),  ANGLE(0.0f) },
-		ANGLE(10.0f),
-		ANGLE(4.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f) },
+		{ EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f), EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f) },
+		{  EulerAngle::DegToRad(0.0f),   EulerAngle::DegToRad(0.0f),   EulerAngle::DegToRad(0.0f),  EulerAngle::DegToRad(0.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(4.0f),
 		650,
 		SECTOR(8),
 		21,
@@ -85,11 +85,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Uzis
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(60.0f), ANGLE(60.0f) },
-		{ -ANGLE(170.0f), ANGLE(60.0f),  -ANGLE(80.0f), ANGLE(80.0f) },
-		{ -ANGLE(60.0f),  ANGLE(170.0f), -ANGLE(80.0f), ANGLE(80.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f) },
+		{ EulerAngle::DegToRad(-170.0f), EulerAngle::DegToRad(60.0f),  EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f) },
+		{ EulerAngle::DegToRad(-60.0f),  EulerAngle::DegToRad(170.0f), EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		650,
 		SECTOR(8),
 		1,
@@ -102,10 +102,10 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Shotgun
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		ANGLE(10.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		EulerAngle::DegToRad(10.0f),
 		0,
 		500,
 		SECTOR(8),
@@ -119,11 +119,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// HK
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		ANGLE(10.0f),
-		ANGLE(4.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(4.0f),
 		500,
 		SECTOR(12),
 		4,
@@ -136,11 +136,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Crossbow
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		500,
 		SECTOR(8),
 		5,
@@ -153,9 +153,9 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Flare
 	{
-		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
-		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
-		{ ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f), ANGLE(0.0f) },
+		{ EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f) },
+		{ EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f) },
+		{ EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f), EulerAngle::DegToRad(0.0f) },
 		0,
 		0,
 		0,
@@ -170,11 +170,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Flare 2
 	{
-		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		400,
 		SECTOR(8),
 		3,
@@ -187,11 +187,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Grenade launcher
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		500,
 		SECTOR(8),
 		20,
@@ -204,11 +204,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Harpoon gun
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		{ -ANGLE(20.0f), ANGLE(20.0f), -ANGLE(75.0f), ANGLE(75.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(75.0f), ANGLE(75.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		{ EulerAngle::DegToRad(-20.0f), EulerAngle::DegToRad(20.0f), EulerAngle::DegToRad(-75.0f), EulerAngle::DegToRad(75.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-75.0f), EulerAngle::DegToRad(75.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		500,
 		SECTOR(8),
 		6,
@@ -221,11 +221,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Rocket launcher
 	{
-		{ -ANGLE(60.0f), ANGLE(60.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		{ -ANGLE(80.0f), ANGLE(80.0f), -ANGLE(65.0f), ANGLE(65.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-60.0f), EulerAngle::DegToRad(60.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		{ EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f), EulerAngle::DegToRad(-65.0f), EulerAngle::DegToRad(65.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		500,
 		SECTOR(8),
 		30,
@@ -238,11 +238,11 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 
 	// Snowmobile
 	{
-		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		{ -ANGLE(30.0f), ANGLE(30.0f), -ANGLE(55.0f), ANGLE(55.0f) },
-		ANGLE(10.0f),
-		ANGLE(8.0f),
+		{ EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		{ EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f), EulerAngle::DegToRad(-55.0f), EulerAngle::DegToRad(55.0f) },
+		EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(8.0f),
 		400,
 		SECTOR(8),
 		3,
@@ -337,8 +337,8 @@ void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	short x = 0;
-	short y = 0;
+	float x = 0;
+	float y = 0;
 
 	// Have target lock; get XY angles for arms.
 	if (arm->Locked)
@@ -350,7 +350,7 @@ void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 	int speed = weaponInfo->AimSpeed;
 
 	// Rotate arms on y axis toward target.
-	short rotY = arm->Rotation.y;
+	float rotY = arm->Rotation.y;
 	if (rotY >= (y - speed) && rotY <= (y + speed))
 		rotY = y;
 	else if (rotY < y)
@@ -360,7 +360,7 @@ void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 	arm->Rotation.y = rotY;
 
 	// Rotate arms on x axis toward target.
-	short rotX = arm->Rotation.x;
+	float rotX = arm->Rotation.x;
 	if (rotX >= (x - speed) && rotX <= (x + speed))
 		rotX = x;
 	else if (rotX < x)
@@ -671,8 +671,8 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
-	lara->LeftArm.Rotation = Vector3Shrt();
-	lara->RightArm.Rotation = Vector3Shrt();
+	lara->LeftArm.Rotation.Zero;
+	lara->RightArm.Rotation.Zero;
 	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
@@ -782,20 +782,20 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int d
 				{
 					// Baddy2 gun hitting sword
 					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &target->Pose, 0);
-					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(hitPos, laraItem->Orientation.y, 3, 0);
 					return;
 				}
 				else
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Pose.Orientation.y, target->RoomNumber);
+					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Orientation.y, target->RoomNumber);
 
 				break;
 
 			case HIT_RICOCHET:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(hitPos, laraItem->Orientation.y, 3, 0);
 				break;
 
 			case HIT_SMOKE:
-				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
+				TriggerRicochetSpark(hitPos, laraItem->Orientation.y, 3, -5);
 
 				if (target->ObjectNumber == ID_ROMAN_GOD1 ||
 					target->ObjectNumber == ID_ROMAN_GOD2)
@@ -823,7 +823,7 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int d
 	}
 }
 
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, float* angles)
 {
 	auto* lara = GetLaraInfo(src);
 
@@ -840,19 +840,22 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 
 	auto pos = Vector3Int(src->Pose.Position.x, muzzleOffset.y, src->Pose.Position.z);
 
-	auto rotation = Vector3Shrt(
+	// TODO
+	auto rotation = EulerAngle(
 		angles[1] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536,
 		angles[0] + (GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536,
-		0);
+		0
+	);
 
 	// Calculate ray from rotation angles
-	float x =  sin(TO_RAD(rotation.y)) * cos(TO_RAD(rotation.x));
-	float y = -sin(TO_RAD(rotation.x));
-	float z =  cos(TO_RAD(rotation.y)) * cos(TO_RAD(rotation.x));
-	auto direction = Vector3(x, y, z);
+	auto direction = Vector3(
+		sin(rotation.y) * cos(rotation.x),
+		-sin(rotation.x),
+		cos(rotation.y) * cos(rotation.x)
+	);
 	direction.Normalize();
 
-	auto source = Vector3(pos.x, pos.y, pos.z);
+	auto source = pos.ToVector3();
 	auto destination = source + direction * weapon->TargetDist;
 	auto ray = Ray(source, direction);
 
@@ -919,7 +922,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 		{
 			z = target->pos.Position.z - lara_item->pos.Position.z;
 			x = target->pos.Position.x - lara_item->pos.Position.x;
-			angle = 0x8000 + phd_atan(z, x) - target->pos.Orientation.y;
+			angle = 0x8000 + atan2(z, x) - target->pos.Orientation.y;
 
 			if ((target->ActiveState > 1 && target->ActiveState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
@@ -952,8 +955,8 @@ void FindTargetPoint(ITEM_INFO* item, GameVector* target)
 	int y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
 	int z = (int)(bounds->Z1 + bounds->Z2) / 2;
 
-	float c = phd_cos(item->Pose.Orientation.y);
-	float s = phd_sin(item->Pose.Orientation.y);
+	float c = cos(item->Orientation.y);
+	float s = sin(item->Orientation.y);
 
 	target->x = item->Pose.Position.x + c * x + s * z;
 	target->y = item->Pose.Position.y + y;
@@ -974,7 +977,7 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 		return;
 	}
 
-	short angles[2];
+	float angles[2];
 
 	auto muzzleOffset = Vector3Int();
 	GetLaraJointPosition(&muzzleOffset, LM_RHAND);
@@ -983,14 +986,15 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 		laraItem->Pose.Position.x,
 		muzzleOffset.y,
 		laraItem->Pose.Position.z,
-		laraItem->RoomNumber);
+		laraItem->RoomNumber
+	);
 	
 	auto targetPoint = GameVector();
 	FindTargetPoint(lara->TargetEntity, &targetPoint);
 	phd_GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z, angles);
 
-	angles[0] -= laraItem->Pose.Orientation.y;
-	angles[1] -= laraItem->Pose.Orientation.x;
+	angles[0] -= laraItem->Orientation.y;
+	angles[1] -= laraItem->Orientation.x;
 
 	if (LOS(&src, &targetPoint))
 	{
@@ -1078,16 +1082,16 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 						FindTargetPoint(item, &target);
 						if (LOS(&src, &target))
 						{
-							short angle[2];
+							float angle[2];
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
-							angle[0] -= laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y;
-							angle[1] -= laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x;
+							angle[0] -= laraItem->Orientation.y + lara->ExtraTorsoRot.y;
+							angle[1] -= laraItem->Orientation.x + lara->ExtraTorsoRot.x;
 
 							if (angle[0] >= weaponInfo->LockAngles[0] && angle[0] <= weaponInfo->LockAngles[1] && angle[1] >= weaponInfo->LockAngles[2] && angle[1] <= weaponInfo->LockAngles[3])
 							{
 								TargetList[targets] = item;
 								++targets;
-								if (abs(angle[0]) < bestYrot + ANGLE(15.0f) && distance < bestDistance)
+								if (abs(angle[0]) < bestYrot + EulerAngle::DegToRad(15.0f) && distance < bestDistance)
 								{
 									bestDistance = distance;
 									bestYrot = abs(angle[0]);

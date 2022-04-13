@@ -14,7 +14,7 @@ int GetOffset(short angle, int x, int z)
 {
 	const auto point = GetSectorPoint(x, z);
 	auto vector = Vector2(point.x, point.y);
-	const auto matrix = Matrix::CreateRotationZ(TO_RAD(angle));
+	const auto matrix = Matrix::CreateRotationZ(angle);
 	Vector2::Transform(vector, matrix, vector);
 	return -vector.x;
 }

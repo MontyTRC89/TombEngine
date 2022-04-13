@@ -10,6 +10,7 @@
 #include <array>
 #include <d3d11.h>
 #include <SimpleMath.h>
+#include <corecrt_math_defines.h>
 #include <sol.hpp>
 #include "Game/debug/debug.h"
 #include <algorithm>

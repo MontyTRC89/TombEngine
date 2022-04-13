@@ -121,7 +121,7 @@ namespace TEN::Entities::TR4
 				int deltaAngle = AI.angle - creature->JointRotation[0];
 
 				AI.ahead = true;
-				if (deltaAngle <= -ANGLE(90.0f) || deltaAngle >= ANGLE(90.0f))
+				if (deltaAngle <= EulerAngle::DegToRad(-90.0f) || deltaAngle >= EulerAngle::DegToRad(90.0f))
 					AI.ahead = false;
 
 				if (Targetable(item, &AI))
@@ -134,7 +134,7 @@ namespace TEN::Entities::TR4
 							{
 								// Throw fire
 								SentryGunThrowFire(item);
-								c = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
+								c = sin((GlobalCounter & 0x1F) * 2048) * 4096;
 							}
 							else
 							{
@@ -152,13 +152,13 @@ namespace TEN::Entities::TR4
 						}
 
 						deltaAngle = c + AI.angle - creature->JointRotation[0];
-						if (deltaAngle <= ANGLE(10.0f))
+						if (deltaAngle <= EulerAngle::DegToRad(10.0f))
 						{
-							if (deltaAngle < -ANGLE(10.0f))
-								deltaAngle = -ANGLE(10.0f);
+							if (deltaAngle < EulerAngle::DegToRad(-10.0f))
+								deltaAngle = EulerAngle::DegToRad(-10.0f);
 						}
 						else
-							deltaAngle = ANGLE(10.0f);
+							deltaAngle = EulerAngle::DegToRad(10.0f);
 
 						creature->JointRotation[0] += deltaAngle;
 
@@ -174,8 +174,8 @@ namespace TEN::Entities::TR4
 				creature->JointRotation[3] += item->ItemFlags[2];
 				creature->JointRotation[2] += item->ItemFlags[1];
 
-				if (creature->JointRotation[2] > ANGLE(90.0f) ||
-					creature->JointRotation[2] < -ANGLE(90.0f))
+				if (creature->JointRotation[2] > EulerAngle::DegToRad(90.0f) ||
+					creature->JointRotation[2] < EulerAngle::DegToRad(-90.0f))
 				{
 					item->ItemFlags[1] = -item->ItemFlags[1];
 				}
@@ -184,8 +184,8 @@ namespace TEN::Entities::TR4
 			{
 				// Stuck sentry gun 
 				CreatureJoint(item, 0, (GetRandomControl() & 0x7FF) - 1024);
-				CreatureJoint(item, 1, ANGLE(45.0f));
-				CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45.0f));
+				CreatureJoint(item, 1, EulerAngle::DegToRad(45.0f));
+				CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - EulerAngle::DegToRad(45.0f));
 			}
 		}
 		else

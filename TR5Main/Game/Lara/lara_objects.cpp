@@ -34,8 +34,8 @@ void lara_as_pickup(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = -ANGLE(130.0f);
-	Camera.targetElevation = -ANGLE(15.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(-130.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
 	Camera.targetDistance = SECTOR(1);
 
 	if (TestLastFrame(item))
@@ -51,8 +51,8 @@ void lara_as_pickup_flare(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = ANGLE(130.0f);
-	Camera.targetElevation = -ANGLE(15.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(130.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
 	Camera.targetDistance = SECTOR(1);
 
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
@@ -72,8 +72,8 @@ void lara_as_switch_on(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = ANGLE(80.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(80.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 	Camera.targetDistance = SECTOR(1);
 	Camera.speed = 6;
 }
@@ -87,8 +87,8 @@ void lara_as_switch_off(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = ANGLE(80.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(80.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 	Camera.targetDistance = SECTOR(1);
 	Camera.speed = 6;
 }
@@ -101,14 +101,14 @@ void lara_col_turn_switch(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_CONTINUE)
 		{
-			item->Pose.Orientation.y -= ANGLE(90.0f);
+			item->Orientation.y -= EulerAngle::DegToRad(90.0f);
 			item->Animation.AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 
 		if (item->Animation.AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_CONTINUE)
 		{
-			item->Pose.Orientation.y += ANGLE(90.0f);
+			item->Orientation.y += EulerAngle::DegToRad(90.0f);
 			item->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_END;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
@@ -128,8 +128,8 @@ void lara_as_use_key(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = -ANGLE(80.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(-80.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 	Camera.targetDistance = SECTOR(1);
 }
 
@@ -142,8 +142,8 @@ void lara_as_use_puzzle(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = -ANGLE(80.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(-80.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 	Camera.targetDistance = SECTOR(1);
 
 	if (TestLastFrame(item) && item->ItemFlags[0])
@@ -167,8 +167,8 @@ void lara_as_pushable_push(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = ANGLE(35.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(35.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.laraNode = LM_TORSO;
 }
@@ -182,8 +182,8 @@ void lara_as_pushable_pull(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = ANGLE(35.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(35.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.laraNode = LM_TORSO;
 }
@@ -194,7 +194,7 @@ void lara_as_pushable_grab(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = ANGLE(75.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(75.0f);
 
 	if (!(TrInput & IN_ACTION))
 		item->Animation.TargetState = LS_IDLE;
@@ -281,7 +281,7 @@ void lara_as_horizontal_bar_leap(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 	{
 		int distance;
-		if (item->Pose.Orientation.y == barItem->Pose.Orientation.y)
+		if (item->Orientation.y == barItem->Orientation.y)
 			distance = (barItem->TriggerFlags / 100) - 2;
 		else
 			distance = (barItem->TriggerFlags % 100) - 2;
@@ -293,9 +293,9 @@ void lara_as_horizontal_bar_leap(ITEM_INFO* item, CollisionInfo* coll)
 	if (TestLastFrame(item))
 	{
 		SetAnimation(item, LA_REACH);
-		item->Pose.Position.x += 700 * phd_sin(item->Pose.Orientation.y);
+		item->Pose.Position.x += 700 * sin(item->Orientation.y);
 		item->Pose.Position.y -= 361;
-		item->Pose.Position.z += 700 * phd_cos(item->Pose.Orientation.y);
+		item->Pose.Position.z += 700 * cos(item->Orientation.y);
 	}
 }
 
@@ -344,7 +344,7 @@ void lara_as_tightrope_dismount(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.AnimNumber == LA_TIGHTROPE_END &&
 		TestLastFrame(item))
 	{
-		item->Pose.Orientation.z = 0;
+		item->Orientation.z = 0;
 		lara->ExtraTorsoRot.z = 0;
 	}
 }
@@ -397,9 +397,9 @@ void lara_as_tightrope_fall(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		// HACK: Set position command can't move Lara laterally?
 		if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_LEFT)
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
+			MoveItem(item, coll->Setup.ForwardAngle - EulerAngle::DegToRad(90.0f), CLICK(1));
 		else if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
+			MoveItem(item, coll->Setup.ForwardAngle + EulerAngle::DegToRad(90.0f), CLICK(1));
 
 		item->Animation.VerticalVelocity = 10;
 	}
@@ -554,7 +554,7 @@ void lara_as_rope_turn_clockwise(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_LEFT)
-			lara->Control.Rope.Y += ANGLE(1.4f);
+			lara->Control.Rope.Y += EulerAngle::DegToRad(1.4f);
 		else
 			item->Animation.TargetState = LS_ROPE_IDLE;
 	}
@@ -571,7 +571,7 @@ void lara_as_rope_turn_counter_clockwise(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		if (TrInput & IN_RIGHT)
-			lara->Control.Rope.Y -= ANGLE(1.4f);
+			lara->Control.Rope.Y -= EulerAngle::DegToRad(1.4f);
 		else
 			item->Animation.TargetState = LS_ROPE_IDLE;
 	}
@@ -646,7 +646,7 @@ void lara_col_rope_swing(ITEM_INFO* item, CollisionInfo* coll)
 
 			ApplyVelocityToRope(
 				lara->Control.Rope.Segment - 2,
-				item->Pose.Orientation.y + (lara->Control.Rope.Direction ? 0 : ANGLE(180.0f)),
+				item->Orientation.y + (lara->Control.Rope.Direction ? 0 : EulerAngle::DegToRad(180.0f)),
 				velocity >> 5);
 		}
 
@@ -680,7 +680,7 @@ void lara_col_rope_swing(ITEM_INFO* item, CollisionInfo* coll)
 			JumpOffRope(item);
 	}
 	else if (item->Animation.FrameNumber == g_Level.Anims[LA_ROPE_IDLE_TO_SWING].frameBase + 15)
-		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Pose.Orientation.y, 128);
+		ApplyVelocityToRope(lara->Control.Rope.Segment, item->Orientation.y, 128);
 }
 
 // State:	LS_ROPE_UP (112)
@@ -693,7 +693,7 @@ void lara_as_rope_up(ITEM_INFO* item, CollisionInfo* coll)
 		FallFromRope(item);
 	else
 	{
-		Camera.targetAngle = ANGLE(30.0f);
+		Camera.targetAngle = EulerAngle::DegToRad(30.0f);
 
 		if (g_Level.Anims[item->Animation.AnimNumber].frameEnd == item->Animation.FrameNumber)
 		{
@@ -798,8 +798,8 @@ void lara_as_pole_idle(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_FREEFALL;
 
 		// TODO: This shouldn't be required, but the set position command doesn't move Lara correctly.
-		item->Pose.Position.x -= phd_sin(item->Pose.Orientation.y) * 64;
-		item->Pose.Position.z -= phd_cos(item->Pose.Orientation.y) * 64;
+		item->Pose.Position.x -= sin(item->Orientation.y) * 64;
+		item->Pose.Position.z -= cos(item->Orientation.y) * 64;
 	}
 }
 
@@ -809,7 +809,7 @@ void lara_col_pole_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -938,7 +938,7 @@ void lara_col_pole_down(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
@@ -1086,7 +1086,7 @@ void lara_as_zip_line(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	Camera.targetAngle = ANGLE(70.0f);
+	Camera.targetAngle = EulerAngle::DegToRad(70.0f);
 
 	if (!(TrInput & IN_ACTION))
 	{
@@ -1096,6 +1096,6 @@ void lara_as_zip_line(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.Velocity = 100;
 		item->Animation.VerticalVelocity = 40;
 		item->Animation.Airborne = true;
-		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		lara->Control.MoveAngle = item->Orientation.y;
 	}
 }

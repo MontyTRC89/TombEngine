@@ -16,9 +16,9 @@ namespace TEN::Entities::Switches
 		-128, 128,
 		-256, 256,
 		384, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
 	};
 
 	Vector3Int JumpSwitchPos = { 0, -208, 256 };  

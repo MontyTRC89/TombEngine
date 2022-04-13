@@ -38,7 +38,7 @@ void lara_as_hang(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
 }
 
 // State:		LS_HANG (10)
@@ -55,7 +55,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 		{
-			if (TestLaraHangSideways(item, coll, -ANGLE(90.0f)))
+			if (TestLaraHangSideways(item, coll, EulerAngle::DegToRad(-90.0f)))
 			{
 				item->Animation.TargetState = LS_SHIMMY_LEFT;
 				return;
@@ -92,7 +92,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 
 		if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 		{
-			if (TestLaraHangSideways(item, coll, ANGLE(90.0f)))
+			if (TestLaraHangSideways(item, coll, EulerAngle::DegToRad(90.0f)))
 			{
 				item->Animation.TargetState = LS_SHIMMY_RIGHT;
 				return;
@@ -128,7 +128,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 		}
 	}
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Orientation.y;
 
 	TestLaraHang(item, coll);
 
@@ -205,7 +205,7 @@ void lara_as_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
 
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
 		item->Animation.TargetState = LS_HANG;
@@ -217,11 +217,11 @@ void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
 }
 
 // State:		LS_SHIMMY_RIGHT (31)
@@ -232,7 +232,7 @@ void lara_as_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(45.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
 
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
 		item->Animation.TargetState = LS_HANG;
@@ -244,10 +244,10 @@ void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+	lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
 }
 
 // State:		LS_SHIMMY_OUTER_LEFT (107), LS_SHIMMY_OUTER_RIGHT (108), LS_SHIMMY_INNER_LEFT (109), LS_SHIMMY_INNER_RIGHT (110),
@@ -255,7 +255,7 @@ void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_shimmy_corner(ITEM_INFO* item, CollisionInfo* coll)
 {
 	Camera.targetAngle = 0;
-	Camera.targetElevation = -ANGLE(33.0f);
+	Camera.targetElevation = EulerAngle::DegToRad(-33.0f);
 	Camera.laraNode = LM_TORSO;
 
 	SetLaraCornerAnimation(item, coll, TestLastFrame(item));

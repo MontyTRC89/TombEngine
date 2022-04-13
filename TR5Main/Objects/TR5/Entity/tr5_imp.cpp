@@ -77,7 +77,7 @@ static void ImpThrowStones(ITEM_INFO* item)
 	int dy = pos1.y - pos2.y;
 	int dz = pos1.z - pos2.z;
 
-	short angles[2];
+	float angles[2];
 	phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 	
 	int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
@@ -142,7 +142,7 @@ void ImpControl(short itemNumber)
 			if (creature->Enemy == LaraItem)
 				angle2 = AI.angle;
 			else
-				angle2 = phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
+				angle2 = atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Orientation.y;
 
 			int d1 = item->Pose.Position.y - LaraItem->Pose.Position.y + CLICK(1.5f);
 
@@ -158,7 +158,7 @@ void ImpControl(short itemNumber)
 
 			int d2 = sqrt(AI.distance);
 
-			AI.xAngle = phd_atan(d2, d1);
+			AI.xAngle = atan2(d2, d1);
 
 			GetCreatureMood(item, &AI, VIOLENT);
 
@@ -181,7 +181,7 @@ void ImpControl(short itemNumber)
 			switch (item->Animation.ActiveState)
 			{
 			case IMP_STATE_WALK:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 				if (AI.distance <= pow(SECTOR(2), 2))
 				{
 					if (AI.distance < pow(SECTOR(2), 2))
@@ -221,7 +221,7 @@ void ImpControl(short itemNumber)
 				break;
 
 			case IMP_STATE_RUN:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 
 				if (AI.distance >= pow(SECTOR(0.5f), 2))
 				{
@@ -240,7 +240,7 @@ void ImpControl(short itemNumber)
 				if (creature->Flags == 0 &&
 					item->TouchBits & 0x280)
 				{
-					CreatureEffect2(item, &ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &ImpBite, 10, item->Orientation.y, DoBloodSplat);
 
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
@@ -249,7 +249,7 @@ void ImpControl(short itemNumber)
 				break;
 
 			case IMP_STATE_SCARED:
-				creature->MaxTurn = ANGLE(7.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 				break;
 
 			case IMP_STATE_START_CLIMB:
@@ -284,15 +284,15 @@ void ImpControl(short itemNumber)
 		if (creature->MaxTurn == -1)
 		{
 			creature->MaxTurn = 0;
-			if (abs(angle2) >= ANGLE(2.0f))
+			if (abs(angle2) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Pose.Orientation.y += ANGLE(2.0f);
+					item->Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.y -= ANGLE(2.0f);
+					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Pose.Orientation.y += angle2;
+				item->Orientation.y += angle2;
 		}
 
 		CreatureTilt(item, 0);

@@ -42,7 +42,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int soundPlayed = false;
-	short angleLeft[2], angleRight[2];
+	float angleLeft[2], angleRight[2];
 
 	if (laraItem->MeshBits)
 	{
@@ -112,7 +112,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			{
 				if (weaponType != LaraWeaponType::Revolver)
 				{
-					angleRight[0] = lara->RightArm.Rotation.y + laraItem->Pose.Orientation.y;
+					angleRight[0] = lara->RightArm.Rotation.y + laraItem->Orientation.y;
 					angleRight[1] = lara->RightArm.Rotation.x;
 
 					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleRight) != FireWeaponType::NoAmmo)
@@ -199,7 +199,7 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				angleLeft[0] = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
+				angleLeft[0] = lara->LeftArm.Rotation.y + laraItem->Orientation.y;
 				angleLeft[1] = lara->LeftArm.Rotation.x;
 
 				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleLeft) != FireWeaponType::NoAmmo)
@@ -333,8 +333,8 @@ void ReadyPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Rotation = Vector3Shrt();
-	lara->RightArm.Rotation = Vector3Shrt();
+	lara->LeftArm.Rotation.Zero;
+	lara->RightArm.Rotation.Zero;
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->TargetEntity = nullptr;

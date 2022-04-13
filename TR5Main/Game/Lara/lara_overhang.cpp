@@ -86,14 +86,14 @@ short FindBridge(int tiltGrade, short orient, Vector3Int& pos, int* returnHeight
 		if (bridgeItem->ObjectNumber != bridgeSlot)
 			continue;
 
-		short orientDelta = (short)(bridgeItem->Pose.Orientation.y - orient);
+		short orientDelta = (short)(bridgeItem->Orientation.y - orient);
 
 		bool orientCheck = false;
-		if (orientDelta == ANGLE(90.0f))
+		if (orientDelta == EulerAngle::DegToRad(90.0f))
 			orientCheck = true;
 		else if (bridgeItem->ObjectNumber == ID_BRIDGE_FLAT)
 			orientCheck = true;
-		else if ((bridgeItem->ObjectNumber == ID_BRIDGE_TILT1 || bridgeItem->ObjectNumber == ID_BRIDGE_TILT2) && abs(orientDelta) == ANGLE(90.0f))
+		else if ((bridgeItem->ObjectNumber == ID_BRIDGE_TILT1 || bridgeItem->ObjectNumber == ID_BRIDGE_TILT2) && abs(orientDelta) == EulerAngle::DegToRad(90.0f))
 			orientCheck = true;
 
 		if (!orientCheck)
@@ -128,11 +128,11 @@ short OrientDelta(short orient1, short orient2)
 {
 	int deltaOrient = orient1 - orient2;
 
-	if (deltaOrient > ANGLE(180.0f))
-		deltaOrient -= ANGLE(360.0f);
+	if (deltaOrient > EulerAngle::DegToRad(180.0f))
+		deltaOrient -= EulerAngle::DegToRad(360.0f);
 
-	if (deltaOrient < -ANGLE(180.0f))
-		deltaOrient += ANGLE(360.0f);
+	if (deltaOrient < EulerAngle::DegToRad(-180.0f))
+		deltaOrient += EulerAngle::DegToRad(360.0f);
 
 	return short(deltaOrient);
 }
@@ -186,11 +186,11 @@ void AlignToEdge(ITEM_INFO* item, short edgeDist)
 		edgeDist = WALL_MASK;
 
 	// Align to closest cardinal facing.
-	item->Pose.Orientation.y += ANGLE(45.0f);
-	item->Pose.Orientation.y &= ANGLE(270.0f);
+	item->Orientation.y += EulerAngle::DegToRad(45.0f);
+	//item->Orientation.y &= EulerAngle::DegToRad(270.0f);
 
 	// Align to faced edge.
-	switch (item->Pose.Orientation.y)
+	/*switch (item->Orientation.y)
 	{
 	case FACING_NORTH:
 		item->Pose.Position.z &= ~WALL_MASK;
@@ -211,7 +211,7 @@ void AlignToEdge(ITEM_INFO* item, short edgeDist)
 		item->Pose.Position.x &= ~WALL_MASK;
 		item->Pose.Position.x += edgeDist + 1;
 		break;
-	}
+	}*/
 }
 
 // Correct position after grabbing slope.
@@ -219,10 +219,10 @@ bool AlignToGrab(ITEM_INFO* item)
 {
 	bool legLeft = false;
 
-	item->Pose.Orientation.y += ANGLE(45.0f);
-	item->Pose.Orientation.y &= ANGLE(270.0f);
+	item->Orientation.y += EulerAngle::DegToRad(45.0f);
+	//item->Orientation.y &= EulerAngle::DegToRad(270.0f);
 
-	switch (item->Pose.Orientation.y)
+	/*switch (item->Orientation.y)
 	{
 	case FACING_NORTH:
 		if (((item->Pose.Position.z + (int)CLICK(0.5f)) & ~WALL_MASK) == (item->Pose.Position.z & ~WALL_MASK))
@@ -255,7 +255,7 @@ bool AlignToGrab(ITEM_INFO* item)
 		item->Pose.Position.x = (item->Pose.Position.x & ~CLICK(1)) + HORIZONTAL_ALIGN_NORTHEAST;
 		legLeft = (item->Pose.Position.x & CLICK(1)) ? false : true;
 		break;
-	}
+	}*/
 
 	return legLeft;
 }
@@ -263,7 +263,7 @@ bool AlignToGrab(ITEM_INFO* item)
 SlopeData GetSlopeData(ITEM_INFO* item)
 {
 	SlopeData slopeData;
-	switch (GetQuadrant(item->Pose.Orientation.y))
+	switch (GetQuadrant(item->Orientation.y))
 	{
 	case NORTH:
 		slopeData.Offset.z = CLICK(1);
@@ -276,21 +276,21 @@ SlopeData GetSlopeData(ITEM_INFO* item)
 		slopeData.Offset.x = CLICK(1);
 		slopeData.Goal.x = -4;
 		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::East;
-		slopeData.GoalOrient = ANGLE(90.0f);
+		slopeData.GoalOrient = EulerAngle::DegToRad(90.0f);
 		break;
 
 	case SOUTH:
 		slopeData.Offset.z = -CLICK(1);
 		slopeData.Goal.y = 4;
 		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::South;
-		slopeData.GoalOrient = ANGLE(180.0f);
+		slopeData.GoalOrient = EulerAngle::DegToRad(180.0f);
 		break;
 
 	case WEST:
 		slopeData.Offset.x = -CLICK(1);
 		slopeData.Goal.x = 4;
 		slopeData.ClimbOrient = (short)CLIMB_DIRECTION::West;
-		slopeData.GoalOrient = ANGLE(270.0f);
+		slopeData.GoalOrient = EulerAngle::DegToRad(270.0f);
 		break;
 	}
 
@@ -356,7 +356,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 
 		// Test for slope to overhead ladder transition (convex).
 		if (GetClimbFlags(probeUp.BottomBlock) & slopeData.ClimbOrient &&
-			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, CLICK(3), CLICK(4)))
+			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Orientation.y, CLICK(3), CLICK(4)))
 		{
 			if (GetCollision(probeUp.Block, up.x, up.y, up.z).Position.Ceiling - item->Pose.Position.y <= (SECTOR(1.5f) - 80))  // Check if a wall is actually there.
 			{
@@ -373,7 +373,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 			int height; // Height variable for bridge ceiling functions.
 
 			// Test for upwards slope to climb.
-			short bridge = FindBridge(4, item->Pose.Orientation.y, up, &height, -CLICK(2.5f), -CLICK(1.5f));
+			short bridge = FindBridge(4, item->Orientation.y, up, &height, -CLICK(2.5f), -CLICK(1.5f));
 			if (yDelta >= -CLICK(1.25f) && yDelta <= -CLICK(0.75f) && (SlopeCheck(probeUp.CeilingTilt, slopeData.Goal) || bridge >= 0))
 			{
 				// Do one more check for wall/ceiling step 2 * offX / Z further to avoid lara sinking her head in wall/step.
@@ -404,7 +404,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	else if (TrInput & IN_BACK)
 	{
 		if ((GetClimbFlags(GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).BottomBlock) & slopeData.ClimbOrient) &&
-			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(1)))
+			InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Orientation.y, 0, CLICK(1)))
 		{
 			AlignToEdge(item, BACKWARD_ALIGNMENT);
 			SetAnimation(item, LA_OVERHANG_SLOPE_LADDER_CONCAVE); // Slope to underlying ladder transition (concave).
@@ -438,16 +438,16 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 	else
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 
 	Camera.flags = 1;
 
 	if (Camera.type != CameraType::Chase)
 		return;
 
-	Camera.targetElevation = -ANGLE(16.75f);
+	Camera.targetElevation = EulerAngle::DegToRad(-16.75f);
 	Camera.targetDistance = SECTOR(1.75f);
 	Camera.speed = 15;
 }
@@ -457,16 +457,16 @@ void lara_as_slopefall(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Airborne = true;
 
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 	else
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 
 	Camera.flags = 1;
 
 	if (Camera.type != CameraType::Chase)
 		return;
 
-	Camera.targetElevation = -ANGLE(16.75f);
+	Camera.targetElevation = EulerAngle::DegToRad(-16.75f);
 	Camera.targetDistance = SECTOR(1.75f);
 	Camera.speed = 15;
 }
@@ -509,13 +509,13 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 			{
 				shimmy.x -= slopeData.Offset.z / 2;
 				shimmy.z += slopeData.Offset.x / 2;
-				direction = -ANGLE(90.0f);
+				direction = EulerAngle::DegToRad(-90.0f);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
 				shimmy.x += slopeData.Offset.z / 2;
 				shimmy.z -= slopeData.Offset.x / 2;
-				direction = ANGLE(90.0f);
+				direction = EulerAngle::DegToRad(90.0f);
 			}
 
 			auto probeShimmy = GetCollision(shimmy.x, shimmy.y, shimmy.z, item->RoomNumber);
@@ -537,9 +537,9 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 	else
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -594,9 +594,9 @@ void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 	else
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -609,22 +609,22 @@ void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
-		lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
-		Camera.targetAngle = -ANGLE(22.5f);
+		lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
+		Camera.targetAngle = EulerAngle::DegToRad(-22.5f);
 	}
 	else
 	{
-		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
-		Camera.targetAngle = ANGLE(22.5f);
+		lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
+		Camera.targetAngle = EulerAngle::DegToRad(22.5f);
 	}
 }
 
 void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 	else
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 
 	Camera.flags = 1;
 
@@ -653,9 +653,9 @@ void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 void lara_as_slopeclimbdown(ITEM_INFO* item, CollisionInfo* coll)
 {
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 	else
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 
 	Camera.flags = 1;
 
@@ -700,7 +700,7 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			Camera.targetDistance = distance;
 			Camera.targetElevation = int(SECTOR(3) * frac);
-			Camera.targetAngle = int(-ANGLE(180.0f) * frac);
+			Camera.targetAngle = int(EulerAngle::DegToRad(-180.0f) * frac);
 			Camera.targetspeed = 15;
 		}
 		else
@@ -715,15 +715,15 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 	else// if (item->animNumber == LA_OVERHANG_MONKEY_SLOPE_CONCAVE)
 	{
 		//Camera.flags = 1;
-		Camera.targetElevation = -ANGLE(11.25f);
+		Camera.targetElevation = EulerAngle::DegToRad(-11.25f);
 		Camera.targetDistance = CLICK(6.5f);
 		Camera.speed = 15;
 	}
 
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 	else
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 }
 
 void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
@@ -735,7 +735,7 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		Camera.flags = 1;
 		Camera.targetDistance = CLICK(6.5f);
-		Camera.targetElevation = ANGLE(11.25f);
+		Camera.targetElevation = EulerAngle::DegToRad(11.25f);
 		Camera.targetspeed = 15;
 	}
 	// Rotating camera effect during concave slope to monkey transition.
@@ -753,13 +753,13 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 		if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			
-			Camera.targetAngle = (short)(-ANGLE(90.0f) * frac);
+			Camera.targetAngle = (short)(EulerAngle::DegToRad(-90.0f) * frac);
 			Camera.targetDistance = SECTOR(1.75f) - int(CLICK(2) * frac);
 			Camera.targetspeed = 15;
 		}
 		else
 		{
-			Camera.targetAngle = ANGLE(90.0f);
+			Camera.targetAngle = EulerAngle::DegToRad(90.0f);
 			Camera.targetDistance = SECTOR(1.25f);
 			Camera.targetspeed = 15;
 		}
@@ -767,15 +767,15 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 	else
 	{
 		Camera.targetDistance = CLICK(6.5f);
-		Camera.targetElevation = -ANGLE(11.25f);
+		Camera.targetElevation = EulerAngle::DegToRad(-11.25f);
 		Camera.targetspeed = 15;
 	}
 
 
 	if (GlobalCounter % 2)
-		item->Pose.Orientation.x++;
+		item->Orientation.x++;
 	else
-		item->Pose.Orientation.x--;
+		item->Orientation.x--;
 }
 
 void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
@@ -808,7 +808,7 @@ void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	GetLaraInfo(item)->NextCornerPos.Orientation.z = 0;
-	item->Pose.Orientation.x = 0;
+	item->Orientation.x = 0;
 }
 
 // ----------------------------------------
@@ -885,7 +885,7 @@ void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
 			bool disableGrab = true;
 			if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 			{
-				if (abs(OrientDelta(item->Pose.Orientation.y, slopeData.GoalOrient)) < ANGLE(33.75f))
+				if (abs(OrientDelta(item->Orientation.y, slopeData.GoalOrient)) < EulerAngle::DegToRad(33.75f))
 					disableGrab = false;
 			}
 
@@ -918,8 +918,8 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 			if (probeNow.BottomBlock->Flags.Monkeyswing && ceilDist >= -CLICK(4) && ceilDist <= -CLICK(3))
 			{
-				short facing = item->Pose.Orientation.y + ANGLE(45.0f);
-				facing &= ANGLE(270.0f);
+				short facing = item->Orientation.y + EulerAngle::DegToRad(45.0f);
+				//facing &= EulerAngle::DegToRad(270.0f);
 
 				int height;
 				short bridge = FindBridge(4, facing, now, &height, -CLICK(4), -CLICK(3)); 
@@ -938,8 +938,8 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 			if (probeDown.BottomBlock->Flags.Monkeyswing && ceilDist >= 0 && ceilDist <= CLICK(1))
 			{
-				short facing = item->Pose.Orientation.y + ANGLE(45.0f);
-				facing &= ANGLE(270.0f);
+				short facing = item->Orientation.y + EulerAngle::DegToRad(45.0f);
+				//facing &= EulerAngle::DegToRad(270.0f);
 
 				int height;
 				short bridge = FindBridge(4, facing, down, &height, -CLICK(0.5f), -CLICK(0.25f)); 
@@ -994,8 +994,8 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 			if (probeDown.BottomBlock->Flags.Monkeyswing && ceilDist >= 0 && ceilDist <= CLICK(1))
 			{
-				short facing = item->Pose.Orientation.y + ANGLE(45.0f);
-				facing &= ANGLE(270.0f);
+				short facing = item->Orientation.y + EulerAngle::DegToRad(45.0f);
+				//facing &= EulerAngle::DegToRad(270.0f);
 
 				int height;
 				short bridge = FindBridge(4, facing, down, &height, -CLICK(0.5f), -CLICK(0.25f));
@@ -1056,7 +1056,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 		if (probeNow.BottomBlock->Flags.Monkeyswing && ceilDist <= CLICK(3.5f))
 		{
-			short facing = item->Pose.Orientation.y + ANGLE(45.0f);
+			short facing = item->Orientation.y + EulerAngle::DegToRad(45.0f);
 			facing &= 0xC000;
 
 			int height;
@@ -1079,8 +1079,8 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 		if (probeNow.BottomBlock->Flags.Monkeyswing &&
 			((item->Animation.AnimNumber == LA_REACH_TO_MONKEY && GetFrameNumber(item, 0) >= 54) || item->Animation.AnimNumber == LA_MONKEY_IDLE))
 		{
-			if (abs(OrientDelta(slopeData.GoalOrient, item->Pose.Orientation.y)) <= ANGLE(30.0f) &&
-				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Pose.Orientation.y, 0, CLICK(0.5f)))
+			if (abs(OrientDelta(slopeData.GoalOrient, item->Orientation.y)) <= EulerAngle::DegToRad(30.0f) &&
+				InStrip(item->Pose.Position.x, item->Pose.Position.z, item->Orientation.y, 0, CLICK(0.5f)))
 			{
 				if (probeDown.BottomBlock->Flags.Monkeyswing)
 				{
@@ -1098,7 +1098,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 						//PerformFlipeffect(NULL, 51, 1, 2); // Disable the UP key command for 2 sec // HACK!!!
 					}
 
-					bridge = FindBridge(4, slopeData.GoalOrient + ANGLE(180.0f), down, &height, -CLICK(5), -CLICK(4));
+					bridge = FindBridge(4, slopeData.GoalOrient + EulerAngle::DegToRad(180.0f), down, &height, -CLICK(5), -CLICK(4));
 					if ((SlopeInvCheck(probeDown.CeilingTilt, slopeData.Goal) && yDiff > -CLICK(1) && yDiff < 0) || bridge >= 0)
 					{
 						AlignToEdge(item, SLOPE_ALIGNMENT);
@@ -1117,7 +1117,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 			int y = item->Pose.Position.y - coll->Setup.Height;
 			auto probe = GetCollision(down.x, item->Pose.Position.y - coll->Setup.Height, down.z, item->RoomNumber);
 
-			if (probe.BottomBlock->Flags.ClimbPossible(GetClimbDirection(item->Pose.Orientation.y + ANGLE(180.0f))) &&
+			if (probe.BottomBlock->Flags.ClimbPossible(GetClimbDirection(item->Orientation.y + EulerAngle::DegToRad(180.0f))) &&
 				probe.Position.Floor >= (item->Pose.Position.y - CLICK(1)) &&
 				probe.Position.Ceiling <= (y - CLICK(1)))
 			{

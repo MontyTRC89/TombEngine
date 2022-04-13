@@ -24,10 +24,10 @@ struct CAMERA_INFO
 	int numberFrames; // size=0, offset=52
 	int bounce; // size=0, offset=56
 	int targetDistance; // size=0, offset=64
-	short targetAngle; // size=0, offset=68
-	short targetElevation; // size=0, offset=70
-	short actualElevation; // size=0, offset=72
-	short actualAngle; // size=0, offset=74
+	float targetAngle; // size=0, offset=68
+	float targetElevation; // size=0, offset=70
+	float actualElevation; // size=0, offset=72
+	float actualAngle; // size=0, offset=74
 	short laraNode; // size=0, offset=76
 	short box; // size=0, offset=78
 	short number; // size=0, offset=80
@@ -62,8 +62,8 @@ extern int BinocularRange;
 extern int BinocularOn;
 extern CameraType BinocularOldCamera;
 extern bool LaserSight;
-extern int PhdPerspective;
-extern short CurrentFOV;
+extern float PhdPerspective;
+extern float CurrentFOV;
 
 extern bool ScreenFadedOut;
 extern bool ScreenFading;
@@ -75,8 +75,8 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
-void LookAt(CAMERA_INFO* cam, short roll);
-void AlterFOV(int value);
+void LookAt(CAMERA_INFO* cam, float roll);
+void AlterFOV(float value);
 void InitialiseCamera();
 void MoveCamera(GameVector* ideal, int speed);
 void ChaseCamera(ITEM_INFO* item);
@@ -85,7 +85,7 @@ void CombatCamera(ITEM_INFO* item);
 bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst);
 void FixedCamera(ITEM_INFO* item);
 void LookCamera(ITEM_INFO* item);
-void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);
+void BounceCamera(ITEM_INFO* item, int bounce, int maxDistance);
 void BinocularCamera(ITEM_INFO* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
@@ -93,8 +93,8 @@ void LookLeftRight(ITEM_INFO* item);
 void LookUpDown(ITEM_INFO* item);
 void ResetLook(ITEM_INFO* item);
 void RumbleScreen();
-bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
-void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
 void ItemsCollideCamera();
 
 void SetScreenFadeOut(float speed);

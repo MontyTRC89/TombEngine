@@ -229,7 +229,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 					{
 						BinocularRange = 0;
 						LaserSight = false;
-						AlterFOV(ANGLE(80));
+						AlterFOV(EulerAngle::DegToRad(80));
 						LaraItem->MeshBits = 0xFFFFFFFF;
 						Lara.Inventory.IsBusy = false;
 						Camera.type = BinocularOldCamera;
@@ -761,7 +761,7 @@ bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
-		ShatterItem.yRot = item->Pose.Orientation.y;
+		ShatterItem.yRot = item->Orientation.y;
 		ShatterItem.bit = 1 << node;
 		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;
 		ShatterItem.sphere.x = CreatureSpheres[node].x;

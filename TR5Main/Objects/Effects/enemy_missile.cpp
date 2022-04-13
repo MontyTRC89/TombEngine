@@ -132,7 +132,7 @@ namespace TEN::Entities::Effects
 	{
 		auto* fx = &EffectList[fxNum];
 
-		short angles[2];
+		float angles[2];
 		phd_GetVectorAngles(
 			LaraItem->Pose.Position.x - fx->pos.Position.x,
 			LaraItem->Pose.Position.y - fx->pos.Position.y - CLICK(1),
@@ -144,7 +144,7 @@ namespace TEN::Entities::Effects
 
 		if (fx->flag1 == 1)
 		{
-			maxRotation = ANGLE(2.8f);
+			maxRotation = EulerAngle::DegToRad(2.8f);
 			maxVelocity = CLICK(1);
 		}
 		else
@@ -154,10 +154,10 @@ namespace TEN::Entities::Effects
 				if (fx->counter)
 					fx->counter--;
 
-				maxRotation = ANGLE(1.4f);
+				maxRotation = EulerAngle::DegToRad(1.4f);
 			}
 			else
-				maxRotation = ANGLE(4.5f);
+				maxRotation = EulerAngle::DegToRad(4.5f);
 
 			maxVelocity = CLICK(0.75f);
 		}
@@ -203,10 +203,10 @@ namespace TEN::Entities::Effects
 		int oldY = fx->pos.Position.y;
 		int oldZ = fx->pos.Position.z;
 
-		int speed = (fx->speed * phd_cos(fx->pos.Orientation.x));
-		fx->pos.Position.x += (speed * phd_sin(fx->pos.Orientation.y));
-		fx->pos.Position.y += -((fx->speed * phd_sin(fx->pos.Orientation.x))) + fx->fallspeed;
-		fx->pos.Position.z += (speed * phd_cos(fx->pos.Orientation.y));
+		int speed = (fx->speed * cos(fx->pos.Orientation.x));
+		fx->pos.Position.x += (speed * sin(fx->pos.Orientation.y));
+		fx->pos.Position.y += -((fx->speed * sin(fx->pos.Orientation.x))) + fx->fallspeed;
+		fx->pos.Position.z += (speed * cos(fx->pos.Orientation.y));
 
 		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 

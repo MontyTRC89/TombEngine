@@ -128,12 +128,12 @@ void WildBoarControl(short itemNumber)
 		case 2:
 			if (AI.distance >= SECTOR(4096))
 			{
-				creature->MaxTurn = ANGLE(6.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 				item->Flags = 0;
 			}
 			else
 			{
-				creature->MaxTurn = ANGLE(3.0f);
+				creature->MaxTurn = EulerAngle::DegToRad(3.0f);
 				joint0 = -AI.distance;
 				joint2 = -AI.distance;
 			}
@@ -148,7 +148,7 @@ void WildBoarControl(short itemNumber)
 					creature->Enemy->HitStatus = true;
 				}
 
-				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
+				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Orientation.y, DoBloodSplat);
 				item->Flags = 1;
 			}
 

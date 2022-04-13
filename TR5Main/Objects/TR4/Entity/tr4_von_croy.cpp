@@ -94,8 +94,8 @@ void VonCroyControl(short itemNumber)
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
 
-	int dx = 808 * phd_sin(item->Pose.Orientation.y);
-	int dz = 808 * phd_cos(item->Pose.Orientation.y);
+	int dx = 808 * sin(item->Orientation.y);
+	int dz = 808 * cos(item->Orientation.y);
 
 	x += dx;
 	z += dz;
@@ -230,13 +230,13 @@ void VonCroyControl(short itemNumber)
 	{
 		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+		laraAI.angle = atan2(dz, dx) - item->Orientation.y;
 
 		laraAI.ahead = true;
-		if (laraAI.angle <= -ANGLE(90) || laraAI.angle >= ANGLE(90.0f))
+		if (laraAI.angle <= EulerAngle::DegToRad(-90) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
 			laraAI.ahead = false;
 
-		laraAI.enemyFacing = laraAI.angle - LaraItem->Pose.Position.x + -ANGLE(180.0f);
+		laraAI.enemyFacing = laraAI.angle - LaraItem->Pose.Position.x + EulerAngle::DegToRad(-180.0f);
 
 		int distance = 0;
 		if (dz > SECTOR(31.25f) || dz < -SECTOR(31.25f) || dx > SECTOR(31.25f) || dx < -SECTOR(31.25f))
@@ -251,12 +251,12 @@ void VonCroyControl(short itemNumber)
 		short rot2 = 0;
 
 		if (dx <= dz)
-			laraAI.xAngle = phd_atan(dz + (dx / 2), dy);
+			laraAI.xAngle = atan2(dz + (dx / 2), dy);
 		else
-			laraAI.xAngle = phd_atan(dx + (dz / 2), dy);
+			laraAI.xAngle = atan2(dx + (dz / 2), dy);
 	}
 
-	if (abs(laraAI.angle) < ANGLE(33.75f) && laraAI.distance < pow(1024, 2))
+	if (abs(laraAI.angle) < EulerAngle::DegToRad(33.75f) && laraAI.distance < pow(1024, 2))
 		laraAI.bite = true;
 	else
 		laraAI.bite = false;
@@ -385,7 +385,7 @@ void VonCroyControl(short itemNumber)
 		break;
 
 	case VON_CROY_STATE_WALK:
-		creature->MaxTurn = ANGLE(7.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 		creature->LOT.IsMonkeying = false;
 		creature->LOT.IsJumping = false;
 		creature->Flags = 0;
@@ -477,7 +477,7 @@ void VonCroyControl(short itemNumber)
 			break;
 		}
 
-		creature->MaxTurn = ANGLE(11.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(11.0f);
 		tilt = abs(angle) / 2;
 
 		if (AI.distance < pow(SECTOR(2), 2) || Lara.Location < creature->LocationAI)
@@ -535,7 +535,7 @@ void VonCroyControl(short itemNumber)
 		break;
 
 	case VON_CROY_STATE_MONKEY:
-		creature->MaxTurn = ANGLE(6.0f);
+		creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 		creature->LOT.IsMonkeying = true;
 		creature->LOT.IsJumping = true;
 
@@ -620,7 +620,7 @@ void VonCroyControl(short itemNumber)
 
 	case VON_CROY_STATE_KNIFE_ATTACK_HIGH:
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+		ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(6.0f));
 
 		if (AI.ahead) 
 		{
@@ -656,9 +656,9 @@ void VonCroyControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (item->ItemFlags[2] == 0)
-			ClampRotation(&item->Pose, laraAI.angle, ANGLE(2.8f));
+			ClampRotation(&item->Pose, laraAI.angle, EulerAngle::DegToRad(2.8f));
 		else
-			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
+			ClampRotation(&item->Pose, enemy->Orientation.y - item->Orientation.y, EulerAngle::DegToRad(2.8f));
 		
 		break;
 
@@ -693,7 +693,7 @@ void VonCroyControl(short itemNumber)
 		}
 
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+		ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(6.0f));
 
 		if ((enemy == NULL || enemy->Flags != 0) ||
 			item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
@@ -737,7 +737,7 @@ void VonCroyControl(short itemNumber)
 
 	case 32:
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle / 2, ANGLE(6.0f));
+		ClampRotation(&item->Pose, AI.angle / 2, EulerAngle::DegToRad(6.0f));
 
 		if (AI.ahead) 
 		{
@@ -794,7 +794,7 @@ void VonCroyControl(short itemNumber)
 	case 36:
 	case 37:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y-item->Pose.Orientation.y, 512);
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Orientation.y-item->Orientation.y, 512);
 		break;
 	}
 

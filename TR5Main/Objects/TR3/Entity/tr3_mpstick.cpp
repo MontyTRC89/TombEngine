@@ -132,7 +132,7 @@ void MPStickControl(short itemNumber)
 		{
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+			laraAI.angle = atan2(dz, dx) - item->Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -215,7 +215,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_WALK:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 			creature->Flags = 0;
 			head = laraAI.angle;
 
@@ -246,7 +246,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_RUN:
-			creature->MaxTurn = ANGLE(7.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
 			tilt = angle / 2;
 
 			if (AI.ahead)
@@ -271,7 +271,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_AIM0:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 			creature->Flags = 0;
 
 			if (AI.ahead)
@@ -288,7 +288,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_AIM1:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 			creature->Flags = 0;
 
 			if (AI.ahead)
@@ -305,7 +305,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_AIM2:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 			creature->Flags = 0;
 
 			if (AI.ahead)
@@ -322,7 +322,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_PUNCH0:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 			if (AI.ahead)
 			{
@@ -363,7 +363,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_PUNCH1:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 			if (AI.ahead)
 			{
@@ -407,7 +407,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_PUNCH2:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 			if (AI.ahead)
 			{
@@ -448,7 +448,7 @@ void MPStickControl(short itemNumber)
 			break;
 
 		case MPSTICK_STATE_KICK:
-			creature->MaxTurn = ANGLE(6.0f);
+			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
 
 			if (AI.ahead)
 				torsoY = AI.angle;
