@@ -68,12 +68,12 @@ void ApeVault(short itemNumber, short angle)
 
 	if (creature->Flags & APE_FLAG_TURN_LEFT)
 	{
-		item->Orientation.y -= EulerAngle::DegToRad(90.0f);
+		item->Orientation.SetY(item->Orientation.GetY() - EulerAngle::DegToRad(90.0f));
 		creature->Flags -= APE_FLAG_TURN_LEFT;
 	}
 	else if (item->Flags & APE_FLAG_TURN_RIGHT)
 	{
-		item->Orientation.y += EulerAngle::DegToRad(90.0f);
+		item->Orientation.SetY(item->Orientation.GetY() + EulerAngle::DegToRad(90.0f));
 		creature->Flags -= APE_FLAG_TURN_RIGHT;
 	}
 
@@ -96,12 +96,12 @@ void ApeVault(short itemNumber, short angle)
 		if (yy < yFloor)
 		{
 			item->Pose.Position.x = (yFloor * SECTOR(1)) - SHIFT;
-			item->Orientation.y = EulerAngle::DegToRad(90.0f);
+			item->Orientation.SetY(EulerAngle::DegToRad(90.0f));
 		}
 		else
 		{
 			item->Pose.Position.x = (yy * SECTOR(1)) + SHIFT;
-			item->Orientation.y = EulerAngle::DegToRad(-90.0f);
+			item->Orientation.SetY( EulerAngle::DegToRad(-90.0f));
 		}
 	}
 	else if (yy == yFloor)
@@ -114,7 +114,7 @@ void ApeVault(short itemNumber, short angle)
 		else
 		{
 			item->Pose.Position.z = (xx * SECTOR(1)) + SHIFT;
-			item->Orientation.y = EulerAngle::DegToRad(-180.0f);
+			item->Orientation.SetY(EulerAngle::DegToRad(-180.0f));
 		}
 	}
 	else
@@ -144,8 +144,8 @@ void ApeControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creatureInfo = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
+	float head = 0;
+	float angle = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -179,12 +179,12 @@ void ApeControl(short itemNumber)
 		case APE_STATE_IDLE:
 			if (creatureInfo->Flags & APE_FLAG_TURN_LEFT)
 			{
-				item->Orientation.y -= EulerAngle::DegToRad(90);
+				item->Orientation.y -= EulerAngle::DegToRad(90.0f);
 				creatureInfo->Flags -= APE_FLAG_TURN_LEFT;
 			}
 			else if (item->Flags & APE_FLAG_TURN_RIGHT)
 			{
-				item->Orientation.y += EulerAngle::DegToRad(90);
+				item->Orientation.y += EulerAngle::DegToRad(90.0f);
 				creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 			}
 

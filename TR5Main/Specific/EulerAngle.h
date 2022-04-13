@@ -4,31 +4,7 @@
 
 class EulerAngle : public Vector3
 {
-private:
-	// TODO: Due to clamping requirements, the components must be made private?
-	//using Vector3::x;
-	//using Vector3::y;
-	//using Vector3::z;
-
-	EulerAngle(Vector3 orient);
-
 public:
-	EulerAngle();
-	EulerAngle(float xRadians, float yRadians, float zRadians);
-
-	EulerAngle operator ==(const EulerAngle orient);
-	EulerAngle operator !=(const EulerAngle orient);
-	EulerAngle operator +(const EulerAngle orient);
-	EulerAngle operator -(const EulerAngle orient);
-	EulerAngle operator *(const EulerAngle orient);
-	EulerAngle operator *(const float value);
-	EulerAngle operator /(const float value);
-	EulerAngle& operator +=(const EulerAngle orient);
-	EulerAngle& operator -=(const EulerAngle orient);
-	EulerAngle& operator *=(const EulerAngle orient);
-	EulerAngle& operator *=(const float value);
-	EulerAngle& operator /=(const float value);
-
 	EulerAngle Get();
 	float GetX();
 	float GetY();
@@ -46,109 +22,36 @@ public:
 
 	static float Clamp(float radians);
 	static EulerAngle Interpolate(EulerAngle startOrient, EulerAngle targetOrient, float rate);
+	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
 	static float ShortestAngle(float radiansFrom, float radiansTo);
 	static float DegToRad(float degrees);
 	static float RadToDeg(float radians);
 	static float ShrtToRad(short shortForm);
+
+	bool operator ==(const EulerAngle orient);
+	bool operator !=(const EulerAngle orient);
+	EulerAngle operator +(const EulerAngle orient);
+	EulerAngle operator -(const EulerAngle orient);
+	EulerAngle operator *(const EulerAngle orient);
+	EulerAngle operator *(const float value);
+	EulerAngle operator /(const float value);
+	EulerAngle& operator +=(const EulerAngle orient);
+	EulerAngle& operator -=(const EulerAngle orient);
+	EulerAngle& operator *=(const EulerAngle orient);
+	EulerAngle& operator *=(const float value);
+	EulerAngle& operator /=(const float value);
+
+	EulerAngle();
+	EulerAngle(float xRadians, float yRadians, float zRadians);
+
+private:
+	EulerAngle(Vector3 orient);
+
+	// TODO: Due to clamping requirements, the components must be made private?
+	//using Vector3::x;
+	//using Vector3::y;
+	//using Vector3::z;
 };
-
-inline EulerAngle::EulerAngle(Vector3 orient) :
-	Vector3(orient)
-{
-}
-
-inline EulerAngle::EulerAngle()
-{
-}
-
-inline EulerAngle::EulerAngle(float xRadians, float yRadians, float zRadians) :
-	Vector3(xRadians, yRadians, zRadians)
-{
-}
-
-inline EulerAngle EulerAngle::operator ==(const EulerAngle orient)
-{
-	auto copy = orient;
-	copy.Clamp();
-	return *this == copy;
-}
-
-inline EulerAngle EulerAngle::operator !=(const EulerAngle orient)
-{
-	auto copy = orient;
-	copy.Clamp();
-	return *this != copy;
-}
-
-inline EulerAngle& EulerAngle::operator +=(const EulerAngle orient)
-{
-	*this += orient;
-	this->Clamp();
-	return *this;
-}
-
-inline EulerAngle EulerAngle::operator +(const EulerAngle orient)
-{
-	auto newOrient = *this + orient;
-	newOrient.Clamp();
-	return newOrient;
-}
-
-inline EulerAngle EulerAngle::operator -(const EulerAngle orient)
-{
-	auto newOrient = *this + orient;
-	newOrient.Clamp();
-	return newOrient;
-}
-
-inline EulerAngle EulerAngle::operator *(const EulerAngle orient)
-{
-	auto newOrient = *this * orient;
-	newOrient.Clamp();
-	return newOrient;
-}
-
-inline EulerAngle EulerAngle::operator *(const float value)
-{
-	auto newOrient = *this * value;
-	newOrient.Clamp();
-	return newOrient;
-}
-
-inline EulerAngle EulerAngle::operator /(const float value)
-{
-	auto newOrient = *this / value;
-	newOrient.Clamp();
-	return newOrient;
-}
-
-inline EulerAngle& EulerAngle::operator -=(const EulerAngle orient)
-{
-	*this -= orient;
-	this->Clamp();
-	return *this;
-}
-
-inline EulerAngle& EulerAngle::operator *=(const EulerAngle orient)
-{
-	*this *= orient;
-	this->Clamp();
-	return *this;
-}
-
-inline EulerAngle& EulerAngle::operator *=(const float value)
-{
-	*this *= value;
-	this->Clamp();
-	return *this;
-}
-
-inline EulerAngle& EulerAngle::operator /=(const float value)
-{
-	*this /= value;
-	this->Clamp();
-	return *this;
-}
 
 inline EulerAngle EulerAngle::Get()
 {
@@ -212,7 +115,7 @@ inline EulerAngle EulerAngle::Interpolate(EulerAngle targetOrient, float rate = 
 	startOrient.Clamp();
 	targetOrient.Clamp();
 
-	auto difference = EulerAngle(targetOrient - startOrient);
+	auto difference = ShortestAngle(*this, targetOrient);
 	difference.Clamp();
 	difference *= rate;
 	return (startOrient + difference);
@@ -247,6 +150,15 @@ inline EulerAngle EulerAngle::Interpolate(EulerAngle startOrient, EulerAngle tar
 	return (startOrient + difference);
 }
 
+inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo)
+{
+	//float from = Clamp(radiansFrom);
+	//float to = Clamp(radiansTo);
+	auto difference = orientTo - orientFrom;
+	difference.Clamp();
+	return difference;
+}
+
 inline float EulerAngle::ShortestAngle(float radiansFrom, float radiansTo)
 {
 	//float from = Clamp(radiansFrom);
@@ -269,4 +181,108 @@ inline float EulerAngle::RadToDeg(float radians)
 inline float EulerAngle::ShrtToRad(short shortForm)
 {
 	return Clamp(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
+}
+
+inline bool EulerAngle::operator ==(const EulerAngle orient)
+{
+	return (this->x == orient.x && this->y == orient.y && this->z == orient.z);
+}
+
+inline bool EulerAngle::operator !=(const EulerAngle orient)
+{
+	return (this->x != orient.x || this->y != orient.y || this->z != orient.z);
+}
+
+inline EulerAngle EulerAngle::operator +(const EulerAngle orient)
+{
+	auto newOrient = EulerAngle(x + orient.x, y + orient.y, z + orient.z);
+	newOrient.Clamp();
+	return newOrient;
+}
+
+inline EulerAngle EulerAngle::operator -(const EulerAngle orient)
+{
+	auto newOrient = EulerAngle(x - orient.x, y - orient.y, z - orient.z);
+	newOrient.Clamp();
+	return newOrient;
+}
+
+inline EulerAngle EulerAngle::operator *(const EulerAngle orient)
+{
+	auto newOrient = EulerAngle(x * orient.x, y * orient.y, z * orient.z);
+	newOrient.Clamp();
+	return newOrient;
+}
+
+inline EulerAngle EulerAngle::operator *(const float value)
+{
+	auto newOrient = EulerAngle(x * value, y * value, z * value);
+	newOrient.Clamp();
+	return newOrient;
+}
+
+inline EulerAngle EulerAngle::operator /(const float value)
+{
+	auto newOrient = EulerAngle(x / value, y / value, z / value);
+	newOrient.Clamp();
+	return newOrient;
+}
+
+inline EulerAngle& EulerAngle::operator +=(const EulerAngle orient)
+{
+	this->x += orient.x;
+	this->y += orient.y;
+	this->z += orient.z;
+	this->Clamp();
+	return *this;
+}
+
+inline EulerAngle& EulerAngle::operator -=(const EulerAngle orient)
+{
+	this->x -= orient.x;
+	this->y -= orient.y;
+	this->z -= orient.z;
+	this->Clamp();
+	return *this;
+}
+
+inline EulerAngle& EulerAngle::operator *=(const EulerAngle orient)
+{
+	this->x *= orient.x;
+	this->y *= orient.y;
+	this->z *= orient.z;
+	this->Clamp();
+	return *this;
+}
+
+inline EulerAngle& EulerAngle::operator *=(const float value)
+{
+	this->x *= value;
+	this->y *= value;
+	this->z *= value;
+	this->Clamp();
+	return *this;
+}
+
+inline EulerAngle& EulerAngle::operator /=(const float value)
+{
+	this->x /= value;
+	this->y /= value;
+	this->z /= value;
+	this->Clamp();
+	return *this;
+}
+
+inline EulerAngle::EulerAngle()
+{
+}
+
+inline EulerAngle::EulerAngle(float xRadians, float yRadians, float zRadians) :
+	Vector3(xRadians, yRadians, zRadians)
+{
+}
+
+inline EulerAngle::EulerAngle(Vector3 orient) :
+	Vector3(orient)
+{
 }

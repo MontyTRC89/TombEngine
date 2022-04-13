@@ -79,8 +79,8 @@ struct CreatureInfo
 {
 	short ItemNumber;
 
-	short MaxTurn;
-	short JointRotation[4];
+	float MaxTurn;
+	float JointRotation[4];
 	bool HeadLeft;
 	bool HeadRight;
 

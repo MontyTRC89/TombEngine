@@ -67,7 +67,7 @@ bool TestValidLedge(ITEM_INFO* item, CollisionInfo* coll, bool ignoreHeadroom, b
 		return false;
 
 	// Determine allowed slope difference for a given collision radius
-	auto slopeDelta = ((float)STEPUP_HEIGHT / (float)SECTOR(1)) * (coll->Setup.Radius * 2);
+	float slopeDelta = ((float)STEPUP_HEIGHT / (float)SECTOR(1)) * (coll->Setup.Radius * 2);
 
 	// Discard if there is a slope beyond tolerance delta
 	if (abs(left - right) >= slopeDelta)

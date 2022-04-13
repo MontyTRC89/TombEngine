@@ -353,31 +353,31 @@ void CreatureJoint(ITEM_INFO* item, short joint, short required)
 		creature->JointRotation[joint] = EulerAngle::DegToRad(-70.0f);
 }
 
-void CreatureTilt(ITEM_INFO* item, short angle) 
+void CreatureTilt(ITEM_INFO* item, float angle)
 {
-	angle = (angle << 2) - item->Orientation.z;
+	angle = (angle * 4) - item->Orientation.z;
 
 	if (angle < EulerAngle::DegToRad(-3.0f))
 		angle = EulerAngle::DegToRad(-3.0f);
 	else if (angle > EulerAngle::DegToRad(3.0f))
 		angle = EulerAngle::DegToRad(3.0f);
 
-	short theAngle = EulerAngle::DegToRad(-3.0f);
+	float theAngle = EulerAngle::DegToRad(-3.0f);
 
-	short absRot = abs(item->Orientation.z);
+	float absRot = abs(item->Orientation.z);
 	if (absRot < EulerAngle::DegToRad(15.0f) || absRot > EulerAngle::DegToRad(30.0f))
-		angle >>= 1;
+		angle /= 2;
 	
 	item->Orientation.z += angle;
 }
 
-short CreatureTurn(ITEM_INFO* item, short maxTurn)
+short CreatureTurn(ITEM_INFO* item, float maxTurn)
 {
 	if (!item->Data || maxTurn == 0)
 		return 0;
 
 	auto* creature = GetCreatureInfo(item);
-	short angle = 0;
+	float angle = 0;
 
 	int x = creature->Target.x - item->Pose.Position.x;
 	int z = creature->Target.z - item->Pose.Position.z;
@@ -386,7 +386,7 @@ short CreatureTurn(ITEM_INFO* item, short maxTurn)
 	int distance = pow(x, 2) + pow(z, 2);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
-		maxTurn >>= 1;
+		maxTurn /= 2;
 
 	if (angle > maxTurn)
 		angle = maxTurn;
@@ -398,7 +398,7 @@ short CreatureTurn(ITEM_INFO* item, short maxTurn)
 	return angle;
 }
 
-int CreatureAnimation(short itemNumber, short angle, short tilt)
+int CreatureAnimation(short itemNumber, float angle, float tilt)
 {
 	int xPos, zPos, ceiling, shiftX, shiftZ;
 	short top;
@@ -588,7 +588,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			CreatureTilt(item, (tilt * 2));
 	}
 
-	short biffAngle;
+	float biffAngle;
 	if (item->ObjectNumber != ID_TYRANNOSAUR && item->Animation.Velocity && item->HitPoints > 0)
 		biffAngle = CreatureCreature(itemNumber);
 	else

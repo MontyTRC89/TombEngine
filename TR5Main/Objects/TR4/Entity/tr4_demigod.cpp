@@ -404,17 +404,17 @@ namespace TEN::Entities::TR4
 
 			if (laraAI.ahead)
 			{
-				joint0 = laraAI.angle >> 1;
+				joint0 = laraAI.angle / 2;
 				joint1 = -laraAI.xAngle;
-				joint2 = laraAI.angle >> 1;
-				joint3 = laraAI.angle >> 1;
+				joint2 = laraAI.angle / 2;
+				joint3 = laraAI.angle / 2;
 			}
 			else if (AI.ahead)
 			{
-				joint0 = AI.angle >> 1;
+				joint0 = AI.angle / 2;
 				joint1 = -AI.xAngle;
-				joint2 = AI.angle >> 1;
-				joint3 = AI.angle >> 1;
+				joint2 = AI.angle / 2;
+				joint3 = AI.angle / 2;
 			}
 
 			switch (item->Animation.ActiveState)

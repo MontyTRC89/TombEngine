@@ -853,19 +853,19 @@ void LookCamera(ITEM_INFO* item)
 	auto pos3 = Vector3Int(0, 0, CLICK(8));
 	GetLaraJointPosition(&pos3, LM_HEAD);
 
-	int dx = (pos2.x - pos.x) >> 3;
-	int dy = (pos2.y - pos.y) >> 3;
-	int dz = (pos2.z - pos.z) >> 3;
+	int dx = (pos2.x - pos.x) / 8;
+	int dy = (pos2.y - pos.y) / 8;
+	int dz = (pos2.z - pos.z) / 8;
 	int x = pos.x;
 	int y = pos.y;
 	int z = pos.z;
 
-	int roomNum;
+	int roomNumber;
 	probe.RoomNumber = item->RoomNumber;
 	int i = 0;
 	for (i = 0; i < 8; i++)
 	{
-		roomNum = probe.RoomNumber;
+		roomNumber = probe.RoomNumber;
 		probe = GetCollision(x, y + CLICK(1), z, probe.RoomNumber);
 		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		{
@@ -896,22 +896,16 @@ void LookCamera(ITEM_INFO* item)
 		z -= dz;
 	}
 
-	GameVector ideal = { x, y, z };
-	ideal.roomNumber = roomNum;
+	 auto ideal = GameVector(x, y, z, roomNumber);
 
 	if (OldCam.pos.Orientation.x == lara->ExtraHeadRot.x &&
 		OldCam.pos.Orientation.y == lara->ExtraHeadRot.y &&
-		OldCam.pos.Position.x == item->Pose.Position.x &&
-		OldCam.pos.Position.y == item->Pose.Position.y &&
-		OldCam.pos.Position.z == item->Pose.Position.z &&
+		OldCam.pos.Position == item->Pose.Position &&
 		OldCam.ActiveState == item->Animation.ActiveState &&
 		OldCam.TargetState == item->Animation.TargetState &&
 		Camera.oldType == CameraType::Look)
 	{
-		ideal.x = LookCamPosition.x;
-		ideal.y = LookCamPosition.y;
-		ideal.z = LookCamPosition.z;
-		ideal.roomNumber = LookCamPosition.roomNumber;
+		ideal = LookCamPosition;
 		pos3.x = LookCamTarget.x;
 		pos3.y = LookCamTarget.y;
 		pos3.z = LookCamTarget.z;
@@ -920,15 +914,10 @@ void LookCamera(ITEM_INFO* item)
 	{
 		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
 		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
-		OldCam.pos.Position.x = item->Pose.Position.x;
-		OldCam.pos.Position.y = item->Pose.Position.y;
-		OldCam.pos.Position.z = item->Pose.Position.z;
+		OldCam.pos.Position = item->Pose.Position;
 		OldCam.ActiveState = item->Animation.ActiveState;
 		OldCam.TargetState = item->Animation.TargetState;
-		LookCamPosition.x = ideal.x;
-		LookCamPosition.y = ideal.y;
-		LookCamPosition.z = ideal.z;
-		LookCamPosition.roomNumber = ideal.roomNumber;
+		LookCamPosition = ideal;
 		LookCamTarget.x = pos3.x;
 		LookCamTarget.y = pos3.y;
 		LookCamTarget.z = pos3.z;
@@ -961,9 +950,9 @@ void LookCamera(ITEM_INFO* item)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.target.x += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
-			Camera.target.y += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
-			Camera.target.z += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
+			Camera.target.x += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2);
+			Camera.target.y += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2);
+			Camera.target.z += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2);
 			Camera.bounce += 5;
 		}
 		else
@@ -1494,12 +1483,7 @@ void CalculateCamera()
 		Camera.type == CameraType::Combat)
 	{
 		if (Camera.type == CameraType::Combat)
-		{
-			LastTarget.x = Camera.target.x;
-			LastTarget.y = Camera.target.y;
-			LastTarget.z = Camera.target.z;
-			LastTarget.roomNumber = Camera.target.roomNumber;
-		}
+			LastTarget = Camera.target;
 
 		Camera.target.roomNumber = item->RoomNumber;
 
@@ -1522,10 +1506,7 @@ void CalculateCamera()
 	}
 	else
 	{
-		LastTarget.x = Camera.target.x;
-		LastTarget.y = Camera.target.y;
-		LastTarget.z = Camera.target.z;
-		LastTarget.roomNumber = Camera.target.roomNumber;
+		LastTarget = Camera.target;
 
 		Camera.target.roomNumber = item->RoomNumber;
 		Camera.target.y = y;
@@ -2046,7 +2027,6 @@ void UpdateFadeScreenAndCinematicBars()
 				ScreenFadedOut = true;
 				ScreenFading = false;
 			}
-
 		}
 	}
 	else if (ScreenFadeEnd < ScreenFadeCurrent)

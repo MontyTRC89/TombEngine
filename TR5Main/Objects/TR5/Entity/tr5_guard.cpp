@@ -686,9 +686,9 @@ void GuardControl(short itemNumber)
 			}
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
-				if ((AI.angle & 0x8000) == 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
-				else
+				//if ((AI.angle & 0x8000) == 0)
+				//	item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				//else
 					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else

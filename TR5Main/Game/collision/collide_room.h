@@ -129,7 +129,7 @@ CollisionResult GetCollision(ITEM_INFO* item);
 void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom = false);
 int   GetQuadrant(float angle);
-short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);
+float GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);
 
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
@@ -151,7 +151,7 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplie
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll);
 
-void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
+void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, float xOffset = 0, float zOffset = 0);
 
 float GetSurfaceAspectAngle(float xTilt, float zTilt);
 float GetSurfaceSteepnessAngle(float xTilt, float zTilt);

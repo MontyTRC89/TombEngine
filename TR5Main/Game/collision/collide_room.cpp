@@ -18,12 +18,8 @@ using namespace TEN::Renderer;
 
 void ShiftItem(ITEM_INFO* item, CollisionInfo* coll)
 {
-	item->Pose.Position.x += coll->Shift.x;
-	item->Pose.Position.y += coll->Shift.y;
-	item->Pose.Position.z += coll->Shift.z;
-	coll->Shift.x = 0;
-	coll->Shift.y = 0;
-	coll->Shift.z = 0;
+	item->Pose.Position += coll->Shift;
+	coll->Shift = Vector3Int();
 }
 
 void MoveItem(ITEM_INFO* item, float angle, int x, int z)
@@ -36,8 +32,8 @@ void MoveItem(ITEM_INFO* item, float angle, int x, int z)
 		float sinAngle = sin(angle);
 		float cosAngle = cos(angle);
 
-		item->Pose.Position.x += round(x * sinAngle);
-		item->Pose.Position.z += round(x * cosAngle);
+		item->Pose.Position.x += (int)round(x * sinAngle);
+		item->Pose.Position.z += (int)round(x * cosAngle);
 	}
 
 	if (z != 0)
@@ -45,8 +41,8 @@ void MoveItem(ITEM_INFO* item, float angle, int x, int z)
 		float sinAngle = sin(angle + EulerAngle::DegToRad(90.0f));
 		float cosAngle = cos(angle + EulerAngle::DegToRad(90.0f));
 
-		item->Pose.Position.x += round(z * sinAngle);
-		item->Pose.Position.z += round(z * cosAngle);
+		item->Pose.Position.x += (int)round(z * sinAngle);
+		item->Pose.Position.z += (int)round(z * cosAngle);
 	}
 }
 
@@ -57,13 +53,13 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplie
 
 	item->Orientation.x = 0;
 	item->Orientation.z = 0;
-	item->Pose.Position.x += round(sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Position.x += (int)round(sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Position.z += (int)round(cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier)
 {
-	short backup = coll->Setup.ForwardAngle;
+	float backup = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = angle;
 
 	float distance;
@@ -71,11 +67,9 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float of
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Orientation.x = 0;
-	item->Orientation.y = angle2;
-	item->Orientation.z = 0;
-	item->Pose.Position.x += round(sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Orientation = EulerAngle(0, angle2, 0);
+	item->Pose.Position.x += (int)round(sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	item->Pose.Position.z += (int)round(cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
 void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll)
@@ -120,9 +114,9 @@ CollisionResult GetCollision(ITEM_INFO* item, float angle, int distance, int hei
 	float sinAngle = sin(angle);
 	float cosAngle = cos(angle);
 
-	auto x = item->Pose.Position.x + (distance * sinAngle) + (side * cosAngle);
-	auto y = item->Pose.Position.y + height;
-	auto z = item->Pose.Position.z + (distance * cosAngle) + (-side * sinAngle);
+	int x = (int)round(item->Pose.Position.x + (distance * sinAngle) + (side * cosAngle));
+	int y = (int)round(item->Pose.Position.y + height);
+	int z = (int)round(item->Pose.Position.z + (distance * cosAngle) + (-side * sinAngle));
 
 	return GetCollision(x, y, z, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
 }
@@ -219,9 +213,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 
 	// Reset collision parameters.
 	coll->CollisionType = CT_NONE;
-	coll->Shift.x = 0;
-	coll->Shift.y = 0;
-	coll->Shift.z = 0;
+	coll->Shift = Vector3Int();
 
 	// Offset base probe position by provided offset, if any.
 	int xPos = item->Pose.Position.x + offset.x;
@@ -815,7 +807,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
 // Dont need to set a value in radiusDivisor if you dont need it (radiusDivisor is set to 1 by default).
 // Warning: dont set it to 0 !!!!
-void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short xOffset, short zOffset)
+void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, float xOffset, float zOffset)
 {
 	if (!radiusDivisor)
 	{
@@ -866,18 +858,18 @@ int GetQuadrant(float angle)
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
 
-short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance)
+float GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance)
 {
 	// Get item bounds and current rotation
-	auto bounds = GetBoundsAccurate(item);
-	auto c = cos(coll->Setup.ForwardAngle);
-	auto s = sin(coll->Setup.ForwardAngle);
+	auto* bounds = GetBoundsAccurate(item);
+	float sinForwardAngle = sin(coll->Setup.ForwardAngle);
+	float cosForwardAngle = cos(coll->Setup.ForwardAngle);
 
 	// Origin test position should be slightly in front of origin, because otherwise
 	// misfire may occur near block corners for split angles.
 	auto frontalOffset = coll->Setup.Radius * 0.3f;
-	auto x = item->Pose.Position.x + frontalOffset * s;
-	auto z = item->Pose.Position.z + frontalOffset * c;
+	auto x = item->Pose.Position.x + frontalOffset * sinForwardAngle;
+	auto z = item->Pose.Position.z + frontalOffset * cosForwardAngle;
 
 	// Determine two Y points to test (lower and higher).
 	// 1/10 headroom crop is needed to avoid possible issues with tight diagonal headrooms.
@@ -887,7 +879,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 
 	// Prepare test data
 	float finalDistance[2] = { FLT_MAX, FLT_MAX };
-	short finalResult[2] = { 0 };
+	float finalResult[2] = { 0 };
 	bool  hitBridge = false;
 
 	// Do a two-pass surface test for all possible planes in a block.
@@ -896,7 +888,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 	for (int h = 0; h < 2; h++)
 	{
 		// Use either bottom or top Y point to test
-		auto y = yPoints[h];
+		int y = yPoints[h];
 
 		// Prepare test data
 		Ray   originRay;
@@ -920,8 +912,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 			// Determine if probe must be shifted (if left or right probe)
 			if (p > 0)
 			{
-				auto s2 = sin(coll->Setup.ForwardAngle + (p == 1 ? EulerAngle::DegToRad(90.0f) : EulerAngle::DegToRad(-90.0f)));
-				auto c2 = cos(coll->Setup.ForwardAngle + (p == 1 ? EulerAngle::DegToRad(90.0f) : EulerAngle::DegToRad(-90.0f)));
+				float s2 = sin(coll->Setup.ForwardAngle + (p == 1 ? EulerAngle::DegToRad(90.0f) : EulerAngle::DegToRad(-90.0f)));
+				float c2 = cos(coll->Setup.ForwardAngle + (p == 1 ? EulerAngle::DegToRad(90.0f) : EulerAngle::DegToRad(-90.0f)));
 
 				// Slightly extend width beyond coll radius to hit adjacent blocks for sure
 				eX += s2 * (coll->Setup.Radius * 2);
@@ -934,8 +926,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 			// Determine front floor probe offset.
 			// It is needed to identify if there is bridge or ceiling split in front.
 			auto frontFloorProbeOffset = coll->Setup.Radius * 1.5f;
-			auto ffpX = eX + frontFloorProbeOffset * s;
-			auto ffpZ = eZ + frontFloorProbeOffset * c;
+			auto ffpX = eX + frontFloorProbeOffset * sinForwardAngle;
+			auto ffpZ = eZ + frontFloorProbeOffset * cosForwardAngle;
 
 			// Get front floor block
 			auto room = GetRoom(item->Location, ffpX, y, ffpZ).roomNumber;
@@ -956,8 +948,8 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 			// Determine floor probe offset.
 			// This must be slightly in front of own coll radius so no bridge misfires occur.
 			auto floorProbeOffset = coll->Setup.Radius * 0.3f;
-			auto fpX = eX + floorProbeOffset * s;
-			auto fpZ = eZ + floorProbeOffset * c;
+			auto fpX = eX + floorProbeOffset * sinForwardAngle;
+			auto fpZ = eZ + floorProbeOffset * cosForwardAngle;
 
 			// Debug probe point
 			// g_Renderer.addDebugSphere(Vector3(fpX, y, fpZ), 16, Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
@@ -1118,7 +1110,7 @@ short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance
 		}
 
 		// Store first result in case all 3 results are different (no priority) or prioritized result if long-distance misfire occured
-		if (finalDistance[h] == FLT_MAX || finalDistance[h] > WALL_SIZE / 2)
+		if (finalDistance[h] == FLT_MAX || finalDistance[h] > SECTOR(0.5f))
 		{
 			finalDistance[h] = closestDistance[0];
 			finalResult[h] = result[0];

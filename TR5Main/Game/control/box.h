@@ -70,9 +70,9 @@ struct AI_INFO
 	int distance;
 	int ahead;
 	int bite;
-	short angle;
-	short xAngle;
-	short enemyFacing;
+	float angle;
+	float xAngle;
+	float enemyFacing;
 };
 
 struct BOX_INFO
@@ -203,8 +203,8 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 void CreatureUnderwater(ITEM_INFO* item, int depth);
 void CreatureFloat(short itemNumber);
 void CreatureJoint(ITEM_INFO* item, short joint, short required);
-void CreatureTilt(ITEM_INFO* item, short angle);
-short CreatureTurn(ITEM_INFO* item, short maxTurn);
+void CreatureTilt(ITEM_INFO* item, float angle);
+short CreatureTurn(ITEM_INFO* item, float maxTurn);
 void CreatureDie(short itemNumber, int explode);
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 int CreatureCreature(short itemNumber);
@@ -218,6 +218,6 @@ void InitialiseCreature(short itemNumber);
 int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber);
 void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI);
 TARGET_TYPE CalculateTarget(Vector3Int* target, ITEM_INFO* item, LOTInfo* LOT);
-int CreatureAnimation(short itemNumber, short angle, short tilt);
+int CreatureAnimation(short itemNumber, float angle, float tilt);
 void AdjustStopperFlag(ITEM_INFO* item, int direction, bool set);
 void InitialiseItemBoxData();
