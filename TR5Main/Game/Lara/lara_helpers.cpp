@@ -137,19 +137,17 @@ void ApproachLaraTargetOrientation(ITEM_INFO* item, EulerAngle targetOrient, flo
 		return;
 	}
 
-	rate = abs(rate);
-
-	// TODO: Cut-off not working anymore.
+	// TODO: Cut-off not working anymore. Also change the rate.
 	if (abs(EulerAngle::RadToDeg(EulerAngle::ShortestAngle(item->Orientation.x, targetOrient.x)) > EulerAngle::DegToRad(0.1f)) ||
 		abs(EulerAngle::RadToDeg(EulerAngle::ShortestAngle(item->Orientation.y, targetOrient.y)) > EulerAngle::DegToRad(0.1f)) ||
 		abs(EulerAngle::RadToDeg(EulerAngle::ShortestAngle(item->Orientation.z, targetOrient.z)) > EulerAngle::DegToRad(0.1f)))
 	{
-		item->Orientation += EulerAngle::ShortestAngle(item->Orientation, targetOrient) / rate;
+		item->Orientation.Interpolate(targetOrient, 0.4f);
+
+		//item->Orientation += EulerAngle::ShortestAngle(item->Orientation, targetOrient) / rate;
 	}
 	else
-		item->Orientation = targetOrient;
-	
-	//item->Orientation.Interpolate(targetOrient, rate);
+		item->Orientation.Interpolate(targetOrient);
 }
 
 // TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.

@@ -17,16 +17,19 @@ public:
 	void SetZ(float radians);
 
 	void Clamp();
-	EulerAngle Interpolate(EulerAngle targetOrient, float rate);
+	void Interpolate(EulerAngle targetOrient, float rate);
 	Vector3 ToVector3();
 
+	static EulerAngle Clamp(EulerAngle orient);
 	static float Clamp(float radians);
 	static EulerAngle Interpolate(EulerAngle startOrient, EulerAngle targetOrient, float rate);
 	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
 	static float ShortestAngle(float radiansFrom, float radiansTo);
+
 	static float DegToRad(float degrees);
 	static float RadToDeg(float radians);
 	static float ShrtToRad(short shortForm);
+	static short RadToShrt(float radians);
 
 	bool operator ==(const EulerAngle orient);
 	bool operator !=(const EulerAngle orient);
@@ -73,7 +76,7 @@ inline float EulerAngle::GetZ()
 	return z;
 }
 
-inline void EulerAngle::Set(EulerAngle orient = Vector3::Zero)
+inline void EulerAngle::Set(EulerAngle orient)
 {
 	*this = orient;
 	this->Clamp();
@@ -109,8 +112,10 @@ inline void EulerAngle::Clamp()
 	this->z = Clamp(z);
 }
 
-inline EulerAngle EulerAngle::Interpolate(EulerAngle targetOrient, float rate = 1.0f)
+inline void EulerAngle::Interpolate(EulerAngle targetOrient, float rate = 1.0f)
 {
+	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
+
 	auto startOrient = *this;
 	startOrient.Clamp();
 	targetOrient.Clamp();
@@ -118,7 +123,7 @@ inline EulerAngle EulerAngle::Interpolate(EulerAngle targetOrient, float rate = 
 	auto difference = ShortestAngle(*this, targetOrient);
 	difference.Clamp();
 	difference *= rate;
-	return (startOrient + difference);
+	*this = (startOrient + difference);
 }
 
 inline Vector3 EulerAngle::ToVector3()
@@ -126,21 +131,25 @@ inline Vector3 EulerAngle::ToVector3()
 	return Vector3(x, y, z);
 }
 
+inline EulerAngle EulerAngle::Clamp(EulerAngle orient)
+{
+	return Clamp(orient);
+}
+
 inline float EulerAngle::Clamp(float radians)
 {
 	return atan2(sin(radians), cos(radians));
 
 	// Alternative method:
-	/*if (radians > 0)
-		radians = fmod(radians + M_PI, M_PI * 2) - M_PI;
-	else
-		radians = fmod(radians - M_PI, M_PI * 2) + M_PI;
-
-	return radians;*/
+	/*return (radians > 0) ?
+		fmod(radians + M_PI, M_PI * 2) - M_PI :
+		fmod(radians - M_PI, M_PI * 2) + M_PI;*/
 }
 
 inline EulerAngle EulerAngle::Interpolate(EulerAngle startOrient, EulerAngle targetOrient, float rate = 1.0f)
 {
+	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
+
 	startOrient.Clamp();
 	targetOrient.Clamp();
 
@@ -152,17 +161,11 @@ inline EulerAngle EulerAngle::Interpolate(EulerAngle startOrient, EulerAngle tar
 
 inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo)
 {
-	//float from = Clamp(radiansFrom);
-	//float to = Clamp(radiansTo);
-	auto difference = orientTo - orientFrom;
-	difference.Clamp();
-	return difference;
+	return Clamp(orientTo - orientFrom);
 }
 
 inline float EulerAngle::ShortestAngle(float radiansFrom, float radiansTo)
 {
-	//float from = Clamp(radiansFrom);
-	//float to = Clamp(radiansTo);
 	return Clamp(radiansTo - radiansFrom);
 }
 
@@ -183,49 +186,48 @@ inline float EulerAngle::ShrtToRad(short shortForm)
 	return Clamp(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
 }
 
+inline short EulerAngle::RadToShrt(float radians)
+{
+	return 0; // TODO
+}
+
 inline bool EulerAngle::operator ==(const EulerAngle orient)
 {
-	return (this->x == orient.x && this->y == orient.y && this->z == orient.z);
+	auto orient1 = Clamp(*this);
+	auto orient2 = Clamp(orient);
+	return (orient1.x == orient2.x && orient1.y == orient2.y && orient1.z == orient2.z);
 }
 
 inline bool EulerAngle::operator !=(const EulerAngle orient)
 {
-	return (this->x != orient.x || this->y != orient.y || this->z != orient.z);
+	auto orient1 = Clamp(*this);
+	auto orient2 = Clamp(orient);
+	return (orient1.x != orient2.x || orient1.y != orient2.y || orient1.z != orient2.z);
 }
 
 inline EulerAngle EulerAngle::operator +(const EulerAngle orient)
 {
-	auto newOrient = EulerAngle(x + orient.x, y + orient.y, z + orient.z);
-	newOrient.Clamp();
-	return newOrient;
+	return Clamp(EulerAngle(x + orient.x, y + orient.y, z + orient.z));
 }
 
 inline EulerAngle EulerAngle::operator -(const EulerAngle orient)
 {
-	auto newOrient = EulerAngle(x - orient.x, y - orient.y, z - orient.z);
-	newOrient.Clamp();
-	return newOrient;
+	return Clamp(EulerAngle(x - orient.x, y - orient.y, z - orient.z));
 }
 
 inline EulerAngle EulerAngle::operator *(const EulerAngle orient)
 {
-	auto newOrient = EulerAngle(x * orient.x, y * orient.y, z * orient.z);
-	newOrient.Clamp();
-	return newOrient;
+	return Clamp(EulerAngle(x * orient.x, y * orient.y, z * orient.z));
 }
 
 inline EulerAngle EulerAngle::operator *(const float value)
 {
-	auto newOrient = EulerAngle(x * value, y * value, z * value);
-	newOrient.Clamp();
-	return newOrient;
+	return Clamp(EulerAngle(x * value, y * value, z * value));
 }
 
 inline EulerAngle EulerAngle::operator /(const float value)
 {
-	auto newOrient = EulerAngle(x / value, y / value, z / value);
-	newOrient.Clamp();
-	return newOrient;
+	return Clamp(EulerAngle(x / value, y / value, z / value));
 }
 
 inline EulerAngle& EulerAngle::operator +=(const EulerAngle orient)
