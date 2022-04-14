@@ -771,43 +771,6 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!rate)
-	{
-		TENLog(std::string("ResetLaraFlex() attempted division by zero."), LogLevel::Warning);
-		return;
-	}
-
-	rate = abs(rate);
-
-	// Reset head.
-	if (abs(lara->ExtraHeadRot.x) > EulerAngle::DegToRad(0.1f))
-		lara->ExtraHeadRot.x += lara->ExtraHeadRot.x / -rate;
-	else
-		lara->ExtraHeadRot.x = 0;
-
-	if (abs(lara->ExtraHeadRot.y) > EulerAngle::DegToRad(0.1f))
-		lara->ExtraHeadRot.y += lara->ExtraHeadRot.y / -rate;
-	else
-		lara->ExtraHeadRot.y = 0;
-
-	if (abs(lara->ExtraHeadRot.z) > EulerAngle::DegToRad(0.1f))
-		lara->ExtraHeadRot.z += lara->ExtraHeadRot.z / -rate;
-	else
-		lara->ExtraHeadRot.z = 0;
-
-	// Reset torso.
-	if (abs(lara->ExtraTorsoRot.x) > EulerAngle::DegToRad(0.1f))
-		lara->ExtraTorsoRot.x += lara->ExtraTorsoRot.x / -rate;
-	else
-		lara->ExtraTorsoRot.x = 0;
-
-	if (abs(lara->ExtraTorsoRot.y) > EulerAngle::DegToRad(0.1f))
-		lara->ExtraTorsoRot.y += lara->ExtraTorsoRot.y / -rate;
-	else
-		lara->ExtraTorsoRot.y = 0;
-
-	if (abs(lara->ExtraTorsoRot.z) > EulerAngle::DegToRad(0.1f))
-		lara->ExtraTorsoRot.z += lara->ExtraTorsoRot.z / -rate;
-	else
-		lara->ExtraTorsoRot.z = 0;
+	lara->ExtraHeadRot.Interpolate(EulerAngle(), 0.1f, EulerAngle::DegToRad(0.1f));
+	lara->ExtraTorsoRot.Interpolate(EulerAngle(), 0.1f, EulerAngle::DegToRad(0.1f));
 }

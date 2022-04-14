@@ -1684,29 +1684,14 @@ void ResetLook(ITEM_INFO* item)
 
 	if (Camera.type != CameraType::Look)
 	{
-		if (abs(lara->ExtraHeadRot.x) > EulerAngle::DegToRad(0.1f))
-			lara->ExtraHeadRot.x += lara->ExtraHeadRot.x / -8;
-		else
-			lara->ExtraHeadRot.x = 0;
-
-		if (abs(lara->ExtraHeadRot.y) > EulerAngle::DegToRad(0.1f))
-			lara->ExtraHeadRot.y += lara->ExtraHeadRot.y / -8;
-		else
-			lara->ExtraHeadRot.y = 0;
-
-		if (abs(lara->ExtraHeadRot.z) > EulerAngle::DegToRad(0.1f))
-			lara->ExtraHeadRot.z += lara->ExtraHeadRot.z / -8;
-		else
-			lara->ExtraHeadRot.z = 0;
+		lara->ExtraHeadRot.Interpolate(EulerAngle(), 0.1f, EulerAngle::DegToRad(0.1f));
 
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked &&
 			!lara->RightArm.Locked &&
 			lara->Vehicle == NO_ITEM)
 		{
-			lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
-			lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
-			lara->ExtraTorsoRot.z = lara->ExtraHeadRot.z;
+			lara->ExtraTorsoRot = lara->ExtraHeadRot;
 		}
 		else
 		{
