@@ -17,18 +17,22 @@ public:
 	void SetZ(float radians);
 
 	void Clamp();
-	void Interpolate(EulerAngle targetOrient, float rate);
+	void Interpolate(EulerAngle targetOrient, float rate, float threshold);
 	Vector3 ToVector3();
 
 	static EulerAngle Clamp(EulerAngle orient);
 	static float Clamp(float radians);
-	static EulerAngle Interpolate(EulerAngle startOrient, EulerAngle targetOrient, float rate);
+	static EulerAngle Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate, float threshold);
+	static float Interpolate(float radiansFrom, float radiansTo, float rate, float threshold);
 	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
 	static float ShortestAngle(float radiansFrom, float radiansTo);
 
 	static float DegToRad(float degrees);
 	static float RadToDeg(float radians);
+
+	// Temporary legacy short form support for particularly cryptic code.
 	static float ShrtToRad(short shortForm);
+	static short DegToShrt(float degrees);
 	static short RadToShrt(float radians);
 
 	bool operator ==(const EulerAngle orient);
@@ -112,18 +116,9 @@ inline void EulerAngle::Clamp()
 	this->z = Clamp(z);
 }
 
-inline void EulerAngle::Interpolate(EulerAngle targetOrient, float rate = 1.0f)
+inline void EulerAngle::Interpolate(EulerAngle targetOrient, float rate = 1.0f, float threshold = 0)
 {
-	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
-
-	auto startOrient = *this;
-	startOrient.Clamp();
-	targetOrient.Clamp();
-
-	auto difference = ShortestAngle(*this, targetOrient);
-	difference.Clamp();
-	difference *= rate;
-	*this = (startOrient + difference);
+	*this = Interpolate(*this, targetOrient, rate, threshold);
 }
 
 inline Vector3 EulerAngle::ToVector3()
@@ -133,7 +128,8 @@ inline Vector3 EulerAngle::ToVector3()
 
 inline EulerAngle EulerAngle::Clamp(EulerAngle orient)
 {
-	return Clamp(orient);
+	orient.Clamp();
+	return orient;
 }
 
 inline float EulerAngle::Clamp(float radians)
@@ -146,22 +142,28 @@ inline float EulerAngle::Clamp(float radians)
 		fmod(radians - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline EulerAngle EulerAngle::Interpolate(EulerAngle startOrient, EulerAngle targetOrient, float rate = 1.0f)
+inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float threshold = 0)
+{
+	orientFrom.SetX(Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, threshold));
+	orientFrom.SetY(Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, threshold));
+	orientFrom.SetZ(Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, threshold));
+	return orientFrom;
+}
+
+inline float EulerAngle::Interpolate(float radiansFrom, float radiansTo, float rate = 1.0f, float threshold = 0)
 {
 	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
-
-	startOrient.Clamp();
-	targetOrient.Clamp();
-
-	auto difference = EulerAngle(targetOrient - startOrient);
-	difference.Clamp();
-	difference *= rate;
-	return (startOrient + difference);
+	
+	float difference = ShortestAngle(radiansFrom, radiansTo);
+	if (abs(difference) > threshold)
+		return Clamp(radiansFrom + (difference * rate));
+	else
+		return Clamp(radiansTo);
 }
 
 inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo)
 {
-	return Clamp(orientTo - orientFrom);
+	return (orientTo - orientFrom);
 }
 
 inline float EulerAngle::ShortestAngle(float radiansFrom, float radiansTo)
@@ -186,9 +188,14 @@ inline float EulerAngle::ShrtToRad(short shortForm)
 	return Clamp(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
 }
 
+inline short EulerAngle::DegToShrt(float degrees)
+{
+	return (degrees * ((USHRT_MAX + 1) / 360.0f));
+}
+
 inline short EulerAngle::RadToShrt(float radians)
 {
-	return 0; // TODO
+	return ((radians / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
 }
 
 inline bool EulerAngle::operator ==(const EulerAngle orient)

@@ -129,25 +129,7 @@ bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll)
 
 void ApproachLaraTargetOrientation(ITEM_INFO* item, EulerAngle targetOrient, float rate)
 {
-	auto* lara = GetLaraInfo(item);
-
-	if (!rate)
-	{
-		TENLog(std::string("ApproachLaraTargetOrientation() attempted division by zero."), LogLevel::Warning);
-		return;
-	}
-
-	// TODO: Cut-off not working anymore. Also change the rate.
-	if (abs(EulerAngle::RadToDeg(EulerAngle::ShortestAngle(item->Orientation.x, targetOrient.x)) > EulerAngle::DegToRad(0.1f)) ||
-		abs(EulerAngle::RadToDeg(EulerAngle::ShortestAngle(item->Orientation.y, targetOrient.y)) > EulerAngle::DegToRad(0.1f)) ||
-		abs(EulerAngle::RadToDeg(EulerAngle::ShortestAngle(item->Orientation.z, targetOrient.z)) > EulerAngle::DegToRad(0.1f)))
-	{
-		item->Orientation.Interpolate(targetOrient, 0.4f);
-
-		//item->Orientation += EulerAngle::ShortestAngle(item->Orientation, targetOrient) / rate;
-	}
-	else
-		item->Orientation.Interpolate(targetOrient);
+	item->Orientation.Interpolate(targetOrient, rate, EulerAngle::DegToRad(0.1f));
 }
 
 // TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.

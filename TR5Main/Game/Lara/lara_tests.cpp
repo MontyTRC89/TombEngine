@@ -1022,10 +1022,11 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, CollisionInfo* coll) // NEW functio
 	else if (facing >= EulerAngle::DegToRad(-125.0f) && facing <= EulerAngle::DegToRad(-55.0f))
 		facing = EulerAngle::DegToRad(-90.0f);
 
-	/*if (facing & 0x3FFF)
+	if (EulerAngle::RadToShrt(facing) & 0x3FFF)
 		return false;
 
-	switch (facing / EulerAngle::DegToRad(90.0f))
+	// TODO: Resolve short form angle.
+	switch ((unsigned short)EulerAngle::RadToShrt(facing / EulerAngle::DegToRad(90.0f)))
 	{
 	case NORTH:
 		item->Pose.Position.z = (item->Pose.Position.z | (SECTOR(1) - 1)) - LARA_RADIUS - 1;
@@ -1042,7 +1043,7 @@ bool TestLaraLadderClimbOut(ITEM_INFO* item, CollisionInfo* coll) // NEW functio
 	case WEST:
 		item->Pose.Position.x = (item->Pose.Position.x & -SECTOR(1)) + LARA_RADIUS + 1;
 		break;
-	}*/
+	}
 
 	SetAnimation(item, LA_ONWATER_IDLE);
 	item->Animation.TargetState = LS_LADDER_IDLE;
