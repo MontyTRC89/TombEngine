@@ -2,9 +2,9 @@
 
 struct SpeedBoatInfo
 {
-	int TurnRate;
-	short LeanAngle;
-	short ExtraRotation;
+	float TurnRate;
+	float LeanAngle;
+	float ExtraRotation;
 
 	int LeftVerticalVelocity;
 	int RightVerticalVelocity;

@@ -2,10 +2,10 @@
 
 struct MinecartInfo 
 {
-	short TurnRot;
-	int TurnX;
-	int TurnZ;
-	short TurnLen;
+	float TurnRot;
+	float TurnX;
+	float TurnZ;
+	int TurnLen;
 
 	int Velocity;
 	int VerticalVelocity;

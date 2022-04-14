@@ -3,9 +3,9 @@
 struct UPVInfo
 {
 	int Velocity;
-	int Rot;
-	int XRot;
-	short FanRot;
+	float Rot;
+	float XRot;
+	float FanRot;
 	unsigned int HarpoonTimer;
 	bool HarpoonLeft;
 

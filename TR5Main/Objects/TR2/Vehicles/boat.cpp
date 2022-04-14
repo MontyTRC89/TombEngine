@@ -36,7 +36,7 @@
 #define BOAT_RADIUS			500
 #define BOAT_SNOW			500
 #define BOAT_MAX_HEIGHT		CLICK(1)
-#define DISMOUNT_DISTANCE		SECTOR(1)
+#define DISMOUNT_DISTANCE	SECTOR(1)
 #define BOAT_WAKE			700
 #define BOAT_SOUND_CEILING	SECTOR(5)
 #define BOAT_TIP			(BOAT_FRONT + 250)
@@ -220,12 +220,8 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 		{
 			if (deltaAngle > EulerAngle::DegToRad(-135.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
 			{
-				if (laraItem->Pose.Position.x == sBoatItem->Pose.Position.x &&
-					laraItem->Pose.Position.y == sBoatItem->Pose.Position.y &&
-					laraItem->Pose.Position.z == sBoatItem->Pose.Position.z)
-				{
+				if (laraItem->Pose.Position == sBoatItem->Pose.Position)
 					mountType = BoatMountType::StartPosition;
-				}
 				else
 					mountType = BoatMountType::Jump;
 			}
@@ -237,7 +233,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 
 bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 {
-	short angle;
+	float angle;
 	if (direction < 0)
 		angle = sBoatItem->Orientation.y - EulerAngle::DegToRad(90.0f);
 	else
@@ -565,7 +561,7 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	SpeedBoatDoBoatShift(sBoatItem, itemNumber);
 
 	Vector3Int fl, fr, br, bl, f;
-	short rotation = 0;
+	float rotation = 0;
 	auto heightBackLeft = SpeedBoatTestWaterHeight(sBoatItem, -BOAT_FRONT, -BOAT_SIDE, &bl);
 	if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
 		rotation = SpeedBoatDoShift(sBoatItem, &bl, &backLeftOld);
@@ -991,8 +987,8 @@ void SpeedBoatControl(short itemNumber)
 	else
 		probe.Position.Floor /= 2;
 
-	short xRot = atan2(BOAT_FRONT, sBoatItem->Pose.Position.y - probe.Position.Floor);
-	short zRot = atan2(BOAT_SIDE, probe.Position.Floor - frontLeft.y);
+	float xRot = atan2(BOAT_FRONT, sBoatItem->Pose.Position.y - probe.Position.Floor);
+	float zRot = atan2(BOAT_SIDE, probe.Position.Floor - frontLeft.y);
 
 	sBoatItem->Orientation.x += ((xRot - sBoatItem->Orientation.x) / 2);
 	sBoatItem->Orientation.z += ((zRot - sBoatItem->Orientation.z) / 2);

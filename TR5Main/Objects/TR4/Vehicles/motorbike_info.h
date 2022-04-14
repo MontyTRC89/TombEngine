@@ -5,10 +5,10 @@ struct MotorbikeInfo {
 	int velocity;
 	int revs;
 	int engineRevs;
-	short momentumAngle;
-	short extraRotation;
-	short wallShiftRotation;
-	int bikeTurn;
+	float momentumAngle;
+	float extraRotation;
+	float wallShiftRotation;
+	float bikeTurn;
 	int pitch;
 	short flags;
 	short lightPower;

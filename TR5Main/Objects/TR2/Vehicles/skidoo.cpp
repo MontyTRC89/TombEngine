@@ -148,7 +148,7 @@ int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo
 		return mountType = 0;
 	}
 
-	short deltaAngle = skidooItem->Orientation.y - laraItem->Orientation.y;
+	float deltaAngle = skidooItem->Orientation.y - laraItem->Orientation.y;
 	if (deltaAngle > EulerAngle::DegToRad(45.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
 		mountType = 1;
 	else if (deltaAngle > EulerAngle::DegToRad(-135.0f) && deltaAngle < EulerAngle::DegToRad(-45.0f))
@@ -169,7 +169,7 @@ int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo
 
 bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction)
 {
-	short angle;
+	float angle;
 	if (direction == SKIDOO_STATE_DISMOUNT_LEFT)
 		angle = skidooItem->Orientation.y + EulerAngle::DegToRad(90.0f);
 	else
@@ -539,8 +539,8 @@ bool SkidooControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	skidooItem->Animation.VerticalVelocity = DoSkidooDynamics(height, skidooItem->Animation.VerticalVelocity, (int*)&skidooItem->Pose.Position.y);
 
 	height = (frontLeft.y + frontRight.y) / 2;
-	short xRot = atan2(SKIDOO_FRONT, skidooItem->Pose.Position.y - height);
-	short zRot = atan2(SKIDOO_SIDE, height - frontLeft.y);
+	float xRot = atan2(SKIDOO_FRONT, skidooItem->Pose.Position.y - height);
+	float zRot = atan2(SKIDOO_SIDE, height - frontLeft.y);
 
 	skidooItem->Orientation.x += ((xRot - skidooItem->Orientation.x) / 2);
 	skidooItem->Orientation.z += ((zRot - skidooItem->Orientation.z) / 2);
@@ -845,11 +845,11 @@ int TestSkidooHeight(ITEM_INFO* skidooItem, int zOffset, int xOffset, Vector3Int
 {
 	pos->y = skidooItem->Pose.Position.y - zOffset * sin(skidooItem->Orientation.x) + xOffset * sin(skidooItem->Orientation.z);
 
-	float s = sin(skidooItem->Orientation.y);
-	float c = cos(skidooItem->Orientation.y);
+	float sinY = sin(skidooItem->Orientation.y);
+	float cosY = cos(skidooItem->Orientation.y);
 
-	pos->x = skidooItem->Pose.Position.x + zOffset * s + xOffset * c;
-	pos->z = skidooItem->Pose.Position.z + zOffset * c - xOffset * s;
+	pos->x = skidooItem->Pose.Position.x + zOffset * sinY + xOffset * cosY;
+	pos->z = skidooItem->Pose.Position.z + zOffset * cosY - xOffset * sinY;
 	
 	auto probe = GetCollision(pos->x, pos->y, pos->z, skidooItem->RoomNumber);
 	if (probe.Position.Ceiling > pos->y ||
@@ -985,7 +985,7 @@ int SkidooDynamics(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 	if (frontRightOld.y > heightFrontRightOld)
 		frontRightOld.y = heightFrontRightOld;
 
-	short rotation;
+	float rotation;
 
 	if (skidooItem->Pose.Position.y > (skidooItem->Floor - CLICK(1)))
 	{

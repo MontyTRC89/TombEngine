@@ -3,7 +3,7 @@
 
 struct KayakInfo 
 {
-	int TurnRate;
+	float TurnRate;
 
 	int Velocity;
 	int FrontVerticalVelocity;

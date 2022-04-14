@@ -2,10 +2,10 @@
 
 struct RubberBoatInfo
 {
-	int TurnRate;
-	short LeanAngle;
-	short PropellerRotation;
-	short ExtraRotation;
+	float TurnRate;
+	float LeanAngle;
+	float PropellerRotation;
+	float ExtraRotation;
 
 	int LeftVerticalVelocity;
 	int RightVerticalVelocity;

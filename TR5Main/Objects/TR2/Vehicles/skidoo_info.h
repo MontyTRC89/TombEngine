@@ -2,9 +2,9 @@
 
 struct SkidooInfo 
 {
-	short TurnRate;
-	short MomentumAngle;
-	short ExtraRotation;
+	float TurnRate;
+	float MomentumAngle;
+	float ExtraRotation;
 
 	int LeftVerticalVelocity;
 	int RightVerticalVelocity;

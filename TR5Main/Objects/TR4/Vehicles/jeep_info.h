@@ -1,17 +1,17 @@
 #pragma once
 struct JeepInfo {
-	short rot1;
-	short rot2;
-	short rot3;
-	short rot4;
+	float rot1;
+	float rot2;
+	float rot3;
+	float rot4;
 	int velocity;
 	int revs;
 	short engineRevs;
 	short trackMesh;
 	int jeepTurn;
 	int fallSpeed;
-	short momentumAngle;
-	short extraRotation;
+	float momentumAngle;
+	float extraRotation;
 	short unknown0;
 	int pitch;
 	short flags;
