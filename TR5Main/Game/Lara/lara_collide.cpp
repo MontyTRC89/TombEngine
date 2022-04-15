@@ -28,9 +28,9 @@ bool LaraDeflectEdge(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 
+		item->Animation.Velocity = 0;
 		item->Animation.TargetState = LS_IDLE;
 		item->Animation.Airborne = false;
-		item->Animation.Velocity = 0;
 		return true;
 	}
 

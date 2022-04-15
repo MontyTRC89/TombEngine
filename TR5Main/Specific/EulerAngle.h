@@ -169,8 +169,7 @@ inline float EulerAngle::DegToRad(float degrees)
 inline float EulerAngle::RadToDeg(float radians)
 {
 	float degrees = Clamp(radians) * (180.0f / M_PI);
-	degrees += (degrees < 0) ? 360.0f : 0;
-	return degrees;
+	return fmod(degrees + 360.0f, 360.0f);
 }
 
 inline float EulerAngle::ShrtToRad(short shortForm)

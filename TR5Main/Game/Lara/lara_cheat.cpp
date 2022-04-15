@@ -17,9 +17,9 @@ void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD)
-		item->Orientation.x -= EulerAngle::DegToRad(3.0f);
+		item->Orientation.SetX(item->Orientation.GetX() - EulerAngle::DegToRad(3.0f));
 	else if (TrInput & IN_BACK)
-		item->Orientation.x += EulerAngle::DegToRad(3.0f);
+		item->Orientation.SetX(item->Orientation.GetX() + EulerAngle::DegToRad(3.0f));
 
 	if (TrInput & IN_LEFT)
 	{
@@ -75,7 +75,7 @@ void LaraCheatyBits(ITEM_INFO* item)
 					SetAnimation(item, LA_DOZY);
 					item->Animation.VerticalVelocity = 30;
 					item->Animation.Airborne = false;
-					item->Orientation.x = EulerAngle::DegToRad(30.0f);
+					item->Orientation.SetX(EulerAngle::DegToRad(30.0f));
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					ResetLaraFlex(item);

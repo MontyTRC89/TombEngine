@@ -195,7 +195,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 	if (distance > 200)
 		return mountType;
 
-	short deltaAngle = sBoatItem->Orientation.y - laraItem->Orientation.y;
+	float deltaAngle = EulerAngle::ShortestAngle(sBoatItem->Orientation.y, laraItem->Orientation.y);
 	if (lara->Control.WaterStatus == WaterStatus::TreadWater || lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (!(TrInput & IN_ACTION) || laraItem->Animation.Airborne || sBoatItem->Animation.Velocity)

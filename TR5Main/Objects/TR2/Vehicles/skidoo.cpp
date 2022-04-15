@@ -148,7 +148,7 @@ int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo
 		return mountType = 0;
 	}
 
-	float deltaAngle = skidooItem->Orientation.y - laraItem->Orientation.y;
+	float deltaAngle = EulerAngle::ShortestAngle(skidooItem->Orientation.y, laraItem->Orientation.y);
 	if (deltaAngle > EulerAngle::DegToRad(45.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
 		mountType = 1;
 	else if (deltaAngle > EulerAngle::DegToRad(-135.0f) && deltaAngle < EulerAngle::DegToRad(-45.0f))
@@ -432,7 +432,7 @@ void SkidooExplode(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 
 	PHD_3DPOS pos;
 	pos.Position.x = skidooItem->Pose.Position.x,
-	pos.Position.y = skidooItem->Pose.Position.y - 128,
+	pos.Position.y = skidooItem->Pose.Position.y - CLICK(0.5f),
 	pos.Position.z = skidooItem->Pose.Position.z,
 	pos.Orientation.x = 0,
 	pos.Orientation.y = skidooItem->Orientation.y,

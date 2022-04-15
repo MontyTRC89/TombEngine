@@ -235,7 +235,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 	// If unconstrained mode is specified, don't use quadrant.
 	switch (coll->Setup.Mode == CollisionProbeMode::Quadrants ? quadrant : -1)
 	{
-	case 0:
+	case NORTH:
 		xfront =  sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront =  coll->Setup.Radius;
 		xleft  = -coll->Setup.Radius;
@@ -244,7 +244,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 		zright =  coll->Setup.Radius;
 		break;
 
-	case 1:
+	case EAST:
 		xfront =  coll->Setup.Radius;
 		zfront =  cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xleft  =  coll->Setup.Radius;
@@ -253,7 +253,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 		zright = -coll->Setup.Radius;
 		break;
 
-	case 2:
+	case SOUTH:
 		xfront =  sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = -coll->Setup.Radius;
 		xleft  =  coll->Setup.Radius;
@@ -262,7 +262,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 		zright = -coll->Setup.Radius;
 		break;
 
-	case 3:
+	case WEST:
 		xfront = -coll->Setup.Radius;
 		zfront =  cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		xleft  = -coll->Setup.Radius;
@@ -852,7 +852,7 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, float 
 
 int GetQuadrant(float angle)
 {
-	return (angle + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
+	return (int)round(EulerAngle::RadToDeg(angle) / 90.0f) % 4;
 }
 
 // Determines vertical surfaces and gets nearest ledge angle.
