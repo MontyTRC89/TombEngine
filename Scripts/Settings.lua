@@ -23,5 +23,5 @@ anims.hasMonkeyAutoJump = false;
 anims.hasCrawlspaceDive = true;
 anims.hasCrawlExtended = true;
 anims.hasCrouchRoll = true;
-anims.hasOverhangClimb = true;
+anims.hasOverhangClimb = false;
 SetAnimations(anims);
