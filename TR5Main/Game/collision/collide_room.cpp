@@ -275,10 +275,10 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 		// No valid quadrant, return true probe offsets from object rotation.
 		xfront = sin(coll->Setup.ForwardAngle) * coll->Setup.Radius;
 		zfront = cos(coll->Setup.ForwardAngle) * coll->Setup.Radius;
-		xleft  = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + sin(coll->Setup.ForwardAngle - EulerAngle::DegToRad(90)) * coll->Setup.Radius;
-		zleft  = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + cos(coll->Setup.ForwardAngle - EulerAngle::DegToRad(90)) * coll->Setup.Radius;
-		xright = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + sin(coll->Setup.ForwardAngle + EulerAngle::DegToRad(90)) * coll->Setup.Radius;
-		zright = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + cos(coll->Setup.ForwardAngle + EulerAngle::DegToRad(90)) * coll->Setup.Radius;
+		xleft  = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + sin(coll->Setup.ForwardAngle - EulerAngle::DegToRad(90.0f)) * coll->Setup.Radius;
+		zleft  = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + cos(coll->Setup.ForwardAngle - EulerAngle::DegToRad(90.0f)) * coll->Setup.Radius;
+		xright = (xfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + sin(coll->Setup.ForwardAngle + EulerAngle::DegToRad(90.0f)) * coll->Setup.Radius;
+		zright = (zfront * (coll->Setup.Mode == CollisionProbeMode::FreeForward ? 0.5f : 1.0f)) + cos(coll->Setup.ForwardAngle + EulerAngle::DegToRad(90.0f)) * coll->Setup.Radius;
 		break;
 	}
 
@@ -730,7 +730,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 
 		if (coll->DiagonalStepAtLeft())
 		{
-			int quarter = (unsigned short)(coll->Setup.ForwardAngle) / EulerAngle::DegToRad(90); // different from quadrant!
+			int quarter = (unsigned short)(EulerAngle::RadToShrt(coll->Setup.ForwardAngle)) / EulerAngle::DegToShrt(90.0f); // different from quadrant!
 			quarter %= 2;
 
 			if (coll->MiddleLeft.HasFlippedDiagonalSplit())

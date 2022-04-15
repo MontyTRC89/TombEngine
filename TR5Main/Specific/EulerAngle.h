@@ -20,7 +20,7 @@ public:
 	static EulerAngle Clamp(EulerAngle orient);
 	static float Clamp(float radians);
 
-	void Interpolate(EulerAngle targetOrient, float rate, float threshold);
+	void Interpolate(EulerAngle orientTo, float rate, float threshold);
 	static EulerAngle Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate, float threshold);
 	static float Interpolate(float radiansFrom, float radiansTo, float rate, float threshold);
 
@@ -85,9 +85,7 @@ inline void EulerAngle::Set(EulerAngle orient)
 
 inline void EulerAngle::Set(float xRadians, float yRadians, float zRadians)
 {
-	this->SetX(xRadians);
-	this->SetY(yRadians);
-	this->SetZ(zRadians);
+	this->Set(EulerAngle(xRadians, yRadians, zRadians));
 }
 
 inline void EulerAngle::SetX(float radians = 0)
@@ -128,9 +126,9 @@ inline float EulerAngle::Clamp(float radians)
 		fmod(radians - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline void EulerAngle::Interpolate(EulerAngle targetOrient, float rate = 1.0f, float threshold = 0)
+inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float threshold = 0)
 {
-	*this = Interpolate(*this, targetOrient, rate, threshold);
+	*this = Interpolate(*this, orientTo, rate, threshold);
 }
 
 inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float threshold = 0)
