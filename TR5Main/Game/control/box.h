@@ -155,7 +155,7 @@ struct EntityStoringInfo
 	}
 };
 
-#define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
+#define CreatureEffectFunction short(int x, int y, int z, short speed, float yRot, short roomNumber)
 
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
 constexpr auto BOX_LAST = (1 << 15); // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
@@ -188,23 +188,23 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent);
 void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent);
 void FindAITargetObject(CreatureInfo* creature, short objectNumber);
 void GetAITarget(CreatureInfo* creature);
-int CreatureVault(short itemNumber, short angle, int vault, int shift);
+int CreatureVault(short itemNumber, float angle, int vault, int shift);
 void DropEntityPickups(ITEM_INFO* item);
-bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleDif, int angleAdd);
-void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angleAdd);
+bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, float angleDif, float angleAdd);
+void CreatureYRot2(PHD_3DPOS* srcPos, float angle, float angleAdd);
 bool SameZone(CreatureInfo* creature, ITEM_INFO* target);
 void FindAITargetObject(CreatureInfo* creature, short objNum);
 short AIGuard(CreatureInfo* creature);
 void AlertNearbyGuards(ITEM_INFO* item);
 void AlertAllGuards(short itemNumber);
 void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState);
-short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func);
+short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, float angle, std::function<CreatureEffectFunction> func);
 short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ITEM_INFO* item, int depth);
 void CreatureFloat(short itemNumber);
 void CreatureJoint(ITEM_INFO* item, short joint, short required);
 void CreatureTilt(ITEM_INFO* item, float angle);
-short CreatureTurn(ITEM_INFO* item, float maxTurn);
+float CreatureTurn(ITEM_INFO* item, float maxTurn);
 void CreatureDie(short itemNumber, int explode);
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 int CreatureCreature(short itemNumber);

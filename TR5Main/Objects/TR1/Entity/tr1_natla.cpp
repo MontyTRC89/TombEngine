@@ -46,10 +46,10 @@ void NatlaControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
-	short tilt = 0;
-	short facing = 0;
+	float head = 0;
+	float angle = 0;
+	float tilt = 0;
+	float facing = 0;
 	short gun = creature->JointRotation[0] * 7 / 8;
 
 	int shoot;

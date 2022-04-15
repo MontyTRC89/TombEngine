@@ -40,9 +40,9 @@ ITEM_INFO* FindReference(ITEM_INFO* item, short objectNumber)
 	return (itemNumber == NO_ITEM ? NULL : &g_Level.Items[itemNumber]);
 }
 
-static short GetWeaponDamage(LaraWeaponType weaponType)
+static int GetWeaponDamage(LaraWeaponType weaponType)
 {
-	return short(Weapons[(int)weaponType].Damage) * 25;
+	return int(Weapons[(int)weaponType].Damage) * 25;
 }
 
 void DoppelgangerControl(short itemNumber)
@@ -80,9 +80,7 @@ void DoppelgangerControl(short itemNumber)
 		// Animate bacon Lara, mirroring Lara's position.
 		item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
 		item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
-		item->Pose.Position.x = pos.x;
-		item->Pose.Position.y = pos.y;
-		item->Pose.Position.z = pos.z;
+		item->Pose.Position = pos;
 		item->Orientation.x = LaraItem->Orientation.x;
 		item->Orientation.y = LaraItem->Orientation.y - EulerAngle::DegToRad(180.0f);
 		item->Orientation.z = LaraItem->Orientation.z;
@@ -93,9 +91,9 @@ void DoppelgangerControl(short itemNumber)
 			!LaraItem->Animation.Airborne)
 		{
 			SetAnimation(item, LA_JUMP_WALL_SMASH_START);
+			item->Animation.Airborne = true;
 			item->Animation.Velocity = 0;
 			item->Animation.VerticalVelocity = 0;
-			item->Animation.Airborne = true;
 			item->Data = -1;
 			item->Pose.Position.y += 50;
 		}
@@ -112,8 +110,8 @@ void DoppelgangerControl(short itemNumber)
 			item->Pose.Position.y = item->Floor;
 			TestTriggers(item, true);
 
-			item->Animation.VerticalVelocity = 0;
 			item->Animation.Airborne = false;
+			item->Animation.VerticalVelocity = 0;
 			item->Animation.TargetState = LS_DEATH;
 			item->Animation.RequiredState = LS_DEATH;
 		}

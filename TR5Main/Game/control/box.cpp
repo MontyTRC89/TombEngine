@@ -57,7 +57,7 @@ void DropEntityPickups(ITEM_INFO* item)
 	}
 }
 
-bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short angleDif, int angleAdd)
+bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, float angleDif, float angleAdd)
 {
 	auto differenceVector = target->Position - origin->Position;
 	float distance = Vector3::Distance(origin->Position.ToVector3(), target->Position.ToVector3());
@@ -86,7 +86,7 @@ bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, short
 	return false;
 }
 
-void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angleAdd) 
+void CreatureYRot2(PHD_3DPOS* srcPos, float angle, float angleAdd)
 {
 	if (angleAdd < angle)
 	{
@@ -250,9 +250,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	*/
 }
 
-short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, float angle, std::function<CreatureEffectFunction> func)
 {
-	Vector3Int pos = { bite->x, bite->y, bite->z };
+	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
 	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
@@ -260,7 +260,7 @@ short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angl
 
 short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
 {
-	Vector3Int pos = { bite->x, bite->y, bite->z };
+	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Orientation.y, item->RoomNumber);
@@ -371,7 +371,7 @@ void CreatureTilt(ITEM_INFO* item, float angle)
 	item->Orientation.z += angle;
 }
 
-short CreatureTurn(ITEM_INFO* item, float maxTurn)
+float CreatureTurn(ITEM_INFO* item, float maxTurn)
 {
 	if (!item->Data || maxTurn == 0)
 		return 0;
@@ -382,7 +382,7 @@ short CreatureTurn(ITEM_INFO* item, float maxTurn)
 	int x = creature->Target.x - item->Pose.Position.x;
 	int z = creature->Target.z - item->Pose.Position.z;
 	angle = atan2(z, x) - item->Orientation.y;
-	int range = item->Animation.Velocity * (16384 / maxTurn);
+	int range = item->Animation.Velocity * (EulerAngle::DegToRad(90.0f) / maxTurn);
 	int distance = pow(x, 2) + pow(z, 2);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
@@ -1100,7 +1100,7 @@ int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
 	return true;
 }
 
-int CreatureVault(short itemNumber, short angle, int vault, int shift)
+int CreatureVault(short itemNumber, float angle, int vault, int shift)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);

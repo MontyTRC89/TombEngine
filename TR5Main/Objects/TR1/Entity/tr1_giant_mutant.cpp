@@ -57,8 +57,8 @@ void GiantMutantControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
+	float head = 0;
+	float angle = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -80,7 +80,7 @@ void GiantMutantControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = (short)atan2(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Orientation.y;
+		angle = atan2(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Orientation.y;
 
 		if (item->TouchBits)
 		{

@@ -119,8 +119,8 @@ void BigRatControl(short itemNumber)
 	auto* creature = GetCreatureInfo(item);
 	auto* objectInfo = &Objects[item->ObjectNumber];
 
-	short head = 0;
-	short angle = 0;
+	float head = 0;
+	float angle = 0;
 	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 
 	if (item->HitPoints <= 0)

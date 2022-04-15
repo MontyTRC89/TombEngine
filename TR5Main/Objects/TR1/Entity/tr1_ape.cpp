@@ -61,7 +61,7 @@ enum ApeFlags
 	APE_FLAG_TURN_RIGHT = 4
 };
 
-void ApeVault(short itemNumber, short angle)
+void ApeVault(short itemNumber, float angle)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);

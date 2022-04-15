@@ -49,7 +49,7 @@ void ControlCentaurBomb(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	bool aboveWater = false;
-	Vector3Int oldPos = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+	auto oldPos = item->Pose.Position;
 
 	item->Orientation.z += EulerAngle::DegToRad(35.0f);
 	if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
@@ -182,8 +182,8 @@ void CentaurControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	short head = 0;
-	short angle = 0;
+	float head = 0;
+	float angle = 0;
 
 	if (item->HitPoints <= 0)
 	{
