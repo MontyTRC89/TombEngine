@@ -95,9 +95,8 @@ void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	}
 }
 
-bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara, bool useBox)
 {
-	short numRooms;
 	short numItems = 0, numMeshes = 0;
 
 	// Collect all the rooms where to check
@@ -106,45 +105,6 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 	for (auto i : roomsArray)
 	{
 		auto room = &g_Level.Rooms[i];
-
-		if (collidedMeshes)
-		{
-			for (int j = 0; j < room->mesh.size(); j++)
-			{
-				MESH_INFO* mesh = &room->mesh[j];
-				STATIC_INFO* staticMesh = &StaticObjects[mesh->staticNumber];
-
-				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
-					continue;
-
-				if (collidingItem->pos.yPos + radius + CLICK(0.5f) < mesh->pos.yPos + staticMesh->collisionBox.Y1)
-					continue;
-
-				if (collidingItem->pos.yPos > mesh->pos.yPos + staticMesh->collisionBox.Y2)
-					continue;
-
-				auto s = phd_sin(mesh->pos.yRot);
-				auto c = phd_cos(mesh->pos.yRot);
-				auto rx = (collidingItem->pos.xPos - mesh->pos.xPos) * c - s * (collidingItem->pos.zPos - mesh->pos.zPos);
-				auto rz = (collidingItem->pos.zPos - mesh->pos.zPos) * c + s * (collidingItem->pos.xPos - mesh->pos.xPos);
-
-				if (radius + rx + CLICK(0.5f) < staticMesh->collisionBox.X1 || rx - radius - CLICK(0.5f) > staticMesh->collisionBox.X2)
-					continue;
-
-				if (radius + rz + CLICK(0.5f) < staticMesh->collisionBox.Z1 || rz - radius - CLICK(0.5f) > staticMesh->collisionBox.Z2)
-					continue;
-
-				collidedMeshes[numMeshes++] = mesh;
-
-				if (!radius)
-				{
-					collidedItems[0] = NULL;
-					return true;
-				}
-			}
-
-			collidedMeshes[numMeshes] = NULL;
-		}
 
 		if (collidedItems)
 		{
@@ -187,38 +147,67 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 
 					ANIM_FRAME* framePtr = GetBestFrame(item);
 
-					if (dx >= -2048 && dx <= 2048 &&
-						dy >= -2048 && dy <= 2048 &&
-						dz >= -2048 && dz <= 2048 &&
-						collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 &&
-						collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2)
+					if (useBox)
 					{
-						float s = phd_sin(item->pos.yRot);
-						float c = phd_cos(item->pos.yRot);
-
-						int rx = dx * c - s * dz;
-						int rz = dz * c + s * dx;
-
-						if (item->objectNumber == ID_TURN_SWITCH)
+						if (dx >= -2048 && dx <= 2048 &&
+							dy >= -2048 && dy <= 2048 &&
+							dz >= -2048 && dz <= 2048)
 						{
-							framePtr->boundingBox.X1 = -256;
-							framePtr->boundingBox.X2 = 256;
-							framePtr->boundingBox.Z1 = -256;
-							framePtr->boundingBox.Z1 = 256;
-						}
 
-						if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
-						{
-							if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
+							if (item->objectNumber == ID_TURN_SWITCH)
+							{
+								framePtr->boundingBox.X1 = -256;
+								framePtr->boundingBox.X2 = 256;
+								framePtr->boundingBox.Z1 = -256;
+								framePtr->boundingBox.Z1 = 256;
+							}
+
+							ANIM_FRAME* framePtrOriginal = GetBestFrame(collidingItem);
+							auto box1 = framePtrOriginal->boundingBox + collidingItem->pos;
+							auto box2 = framePtr->boundingBox + item->pos;
+							if(	box1.X1 < box2.X2 && box2.X1 < box1.X2 &&
+								box1.Y1 < box2.Y2 && box2.Y1 < box1.Y2 &&
+								box1.Z1 < box2.Z2 && box2.Z1 < box1.Z2)
 							{
 								collidedItems[numItems++] = item;
+							}
+						}
 
-								if (!radius)
-									return true;
+					}
+					else
+					{
+						if (dx >= -2048 && dx <= 2048 &&
+							dy >= -2048 && dy <= 2048 &&
+							dz >= -2048 && dz <= 2048 &&
+							collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 &&
+							collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2)
+						{
+							float s = phd_sin(item->pos.yRot);
+							float c = phd_cos(item->pos.yRot);
+
+							int rx = dx * c - s * dz;
+							int rz = dz * c + s * dx;
+
+							if (item->objectNumber == ID_TURN_SWITCH)
+							{
+								framePtr->boundingBox.X1 = -256;
+								framePtr->boundingBox.X2 = 256;
+								framePtr->boundingBox.Z1 = -256;
+								framePtr->boundingBox.Z1 = 256;
+							}
+
+							if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
+							{
+								if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
+								{
+									collidedItems[numItems++] = item;
+
+									if (!radius)
+										return true;
+								}
 							}
 						}
 					}
-
 					itemNumber = item->nextItem;
 
 				} while (itemNumber != NO_ITEM);
@@ -1738,11 +1727,6 @@ void ObjectCollision(short const itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
 		if (TestCollision(item, l))
 		{
-			if (!item->luaCallbackOnCollidedName.empty())
-			{
-				g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedName, itemNumber);
-			}
-
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, l, coll, false, true);
 		}
