@@ -342,9 +342,9 @@ struct MenuOption
 struct ObjectList
 {
 	short invitem;
-	unsigned short xrot;
-	unsigned short yrot;
-	unsigned short zrot;
+	float xrot;
+	float yrot;
+	float zrot;
 	unsigned short bright;
 };
 
@@ -361,9 +361,9 @@ struct AmmoList
 {
 	short	   		invitem;
 	short	 		amount;
-	unsigned short	xrot;
-	unsigned short	yrot;
-	unsigned short	zrot;
+	float	xrot;
+	float	yrot;
+	float	zrot;
 };
 
 struct SettingsData
@@ -453,7 +453,7 @@ private:
 	void InsertObjectIntoList(int num);
 	void InsertObjectIntoList_v2(int num);
 	void UseCurrentItem();
-	void SpinBack(unsigned short* angle);
+	void SpinBack(float* angle);
 	void UpdateWeaponStatus();
 	void DoStatisticsMode();
 	void DoExamineMode();
@@ -476,7 +476,7 @@ private:
 	char useItem;
 	char seperate_type_flag;
 	char combine_type_flag;
-	int compassNeedleAngle;
+	float compassNeedleAngle;
 	InventoryRing pcring1;
 	InventoryRing pcring2;
 	InventoryRing* rings[2];

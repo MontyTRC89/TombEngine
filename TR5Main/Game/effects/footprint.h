@@ -4,9 +4,12 @@
 
 struct ITEM_INFO;
 
-namespace TEN{
-namespace Effects {
-namespace Footprints {
+namespace TEN
+{
+namespace Effects
+{
+namespace Footprints
+{
 
 	constexpr size_t MAX_FOOTPRINTS = 20;
 	constexpr auto FOOTPRINT_SIZE = 64.0f;

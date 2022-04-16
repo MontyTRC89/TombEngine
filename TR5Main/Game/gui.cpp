@@ -1849,8 +1849,8 @@ void GuiController::ConstructCombineObjectList()
 
 void GuiController::InitializeInventory()
 {
-	compassNeedleAngle = 4096;
-	AlterFOV(14560);
+	compassNeedleAngle = EulerAngle::DegToRad(22.5f);
+	AlterFOV(EulerAngle::DegToRad(80.0f));
 	Lara.Inventory.IsBusy = 0;
 	inventoryItemChosen = NO_ITEM;
 	ClearInputVariables(0);
@@ -2622,53 +2622,17 @@ void GuiController::UpdateWeaponStatus()
 	}
 }
 
-void GuiController::SpinBack(unsigned short* angle)
+void GuiController::SpinBack(float* angle)
 {
-	unsigned short val;
-	unsigned short val2;
-
-	val = *angle;
-
-	if (val)
-	{
-		if (val <= 32768)
-		{
-			val2 = val;
-
-			if (val2 < EulerAngle::DegToRad(5))
-				val = EulerAngle::DegToRad(5);
-			else if (val2 > EulerAngle::DegToRad(90))
-				val2 = EulerAngle::DegToRad(90);
-
-			val -= (val2 >> 3);
-
-			if (val > 32768)
-				val = 0;
-		}
-		else
-		{
-			val2 = -val;
-
-			if (val2 < EulerAngle::DegToRad(5))
-				val = EulerAngle::DegToRad(5);
-			else if (val2 > EulerAngle::DegToRad(90))
-				val2 = EulerAngle::DegToRad(90);
-
-			val += (val2 >> 3);
-
-			if (val < EulerAngle::DegToRad(180))
-				val = 0;
-		}
-
-		*angle = val;
-	}
+	if (*angle)
+		*angle = EulerAngle::Interpolate(*angle, 0, 0.25f / 2, EulerAngle::DegToRad(0.1f));
 }
 
 void GuiController::DrawAmmoSelector()
 {
 	int n;
 	int xpos;
-	unsigned short xrot, yrot, zrot;
+	float xrot, yrot, zrot;
 	InventoryObject* objme;
 	char invTextBuffer[256];
 	int x, y;
@@ -2751,7 +2715,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 	int objmeup;
 	int nummeup;
 	short ymeup;
-	unsigned short xrot, yrot, zrot;
+	float xrot, yrot, zrot;
 	int activenum;
 	int count;
 
@@ -3185,8 +3149,8 @@ int GuiController::CallInventory(bool reset_mode)
 
 		OBJLIST_SPACING = phd_centerx >> 1;
 
-		if (compassNeedleAngle != 1024)
-			compassNeedleAngle -= 32;
+		if (compassNeedleAngle != EulerAngle::RadToDeg(5.6f))
+			compassNeedleAngle -= EulerAngle::RadToDeg(0.18f);
 
 		SetDebounce = true;
 		S_UpdateInput();
@@ -3279,9 +3243,9 @@ void GuiController::DoExamineMode()
 void GuiController::DrawCompass()
 {
 	return;
-	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, EulerAngle::DegToRad(90), 0, EulerAngle::DegToRad(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
-	short compass_speed = sin(compassNeedleAngle - LaraItem->Orientation.y);
-	short compass_angle = (LaraItem->Orientation.y + compass_speed) - EulerAngle::DegToRad(180);
+	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, EulerAngle::DegToRad(90.0f), 0, EulerAngle::DegToRad(180.0f), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
+	float compass_speed = sin(compassNeedleAngle - LaraItem->Orientation.y);
+	float compass_angle = (LaraItem->Orientation.y + compass_speed) - EulerAngle::DegToRad(180.0f);
 	Matrix::CreateRotationY(compass_angle);
 }
 
