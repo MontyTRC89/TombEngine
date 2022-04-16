@@ -142,22 +142,16 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				Vector3Int pos1 = { -544, 96, 0 };
+				auto pos1 = Vector3Int(-544, 96, 0);
 				GetJointAbsPosition(item, &pos1, 16);
 
-				Vector3Int pos2 = { -900, 96, 0 };
+				auto pos2 = Vector3Int(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
 				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				PHD_3DPOS pos;
-				pos.Position.x = pos1.x;
-				pos.Position.y = pos1.y;
-				pos.Position.z = pos1.z;
-				pos.Orientation.x = angles[1];
-				pos.Orientation.y = angles[0];
-				pos.Orientation.z = 0;
+				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
@@ -170,22 +164,16 @@ namespace TEN::Entities::TR4
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				Vector3Int pos1 = { -544, 96, 0 };
+				auto pos1 = Vector3Int(-544, 96, 0);
 				GetJointAbsPosition(item, &pos1, 16);
 
-				Vector3Int pos2 = { -900, 96, 0 };
+				auto pos2 = Vector3Int(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
 				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				PHD_3DPOS pos;
-				pos.Position.x = pos1.x;
-				pos.Position.y = pos1.y;
-				pos.Position.z = pos1.z;
-				pos.Orientation.x = angles[1];
-				pos.Orientation.y = angles[0];
-				pos.Orientation.z = 0;
+				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
@@ -200,8 +188,8 @@ namespace TEN::Entities::TR4
 
 			if (frameNumber >= 8 && frameNumber <= 64)
 			{
-				Vector3Int pos1 = { 0, 0, 192 };
-				Vector3Int pos2 = { 0, 0, 384 };
+				 auto pos1 = Vector3Int(0, 0, 192);
+				 auto pos2 = Vector3Int(0, 0, 384);
 
 				if (GlobalCounter & 1)
 				{
@@ -217,13 +205,7 @@ namespace TEN::Entities::TR4
 				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				PHD_3DPOS pos;
-				pos.Position.x = pos1.x;
-				pos.Position.y = pos1.y;
-				pos.Position.z = pos1.z;
-				pos.Orientation.x = angles[1];
-				pos.Orientation.y = angles[0];
-				pos.Orientation.z = 0;
+				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 
 				TriggerDemigodMissile(&pos, item->RoomNumber, 4);
 			}
@@ -232,8 +214,8 @@ namespace TEN::Entities::TR4
 
 	void TriggerHammerSmoke(int x, int y, int z, int something)
 	{
-		int angle = 2 * GetRandomControl();
-		int deltaAngle = 0x10000 / something;
+		float angle = 2 * GetRandomControl();
+		float deltaAngle = 0x10000 / something;
 
 		if (something > 0)
 		{
@@ -328,12 +310,12 @@ namespace TEN::Entities::TR4
 
 		auto* creature = GetCreatureInfo(item);
 
-		short tilt = 0;
-		short angle = 0;
-		short joint0 = 0;
-		short joint1 = 0;
-		short joint2 = 0;
-		short joint3 = 0;
+		float tilt = 0;
+		float angle = 0;
+		float joint0 = 0;
+		float joint1 = 0;
+		float joint2 = 0;
+		float joint3 = 0;
 
 		if (item->HitPoints <= 0)
 		{

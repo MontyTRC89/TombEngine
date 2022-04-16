@@ -18,13 +18,13 @@ BITE_INFO SpiderBite = { 0, 0, 41, 1 };
 
 static void S_SpiderBite(ITEM_INFO* item)
 {
-	Vector3Int pos = { SpiderBite.x, SpiderBite.y, SpiderBite.z };
+	auto pos = Vector3Int(SpiderBite.x, SpiderBite.y, SpiderBite.z);
 	GetJointAbsPosition(item, &pos, SpiderBite.meshNum);
 
 	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Pose.Position.y, item->RoomNumber);
 }
 
-static void SpiderLeap(short itemNumber, ITEM_INFO* item, short angle)
+static void SpiderLeap(short itemNumber, ITEM_INFO* item, float angle)
 {
 	GameVector vec;
 	vec.x = item->Pose.Position.x;
@@ -58,7 +58,7 @@ void SmallSpiderControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
+	float angle = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -158,7 +158,7 @@ void BigSpiderControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
+	float angle = 0;
 
 	AI_INFO AI;
 	if (item->HitPoints <= 0)

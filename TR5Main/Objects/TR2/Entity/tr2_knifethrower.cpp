@@ -76,7 +76,7 @@ void KnifeControl(short fxNumber)
 	}
 }
 
-static short ThrowKnife(int x, int y, int z, short velocity, short yRot, short roomNumber)
+static short ThrowKnife(int x, int y, int z, int velocity, float yRot, short roomNumber)
 {
 	short fxNumber = 0;
 	// TODO: add fx parameters
@@ -88,10 +88,10 @@ void KnifeThrowerControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short torso = 0;
-	short head = 0;
-	short tilt = 0;
+	float angle = 0;
+	float torso = 0;
+	float head = 0;
+	float tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{

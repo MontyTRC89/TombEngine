@@ -28,7 +28,7 @@ enum ScubaDiverAnim
 
 };
 
-static void ShootHarpoon(ITEM_INFO* item, int x, int y, int z, short velocity, short yRot, short roomNumber)
+static void ShootHarpoon(ITEM_INFO* item, int x, int y, int z, int velocity, float yRot, short roomNumber)
 {
 	short harpoonItemNumber = CreateItem();
 	if (harpoonItemNumber != NO_ITEM)
@@ -94,9 +94,9 @@ void ScubaControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short head = 0;
-	short neck = 0;
+	float angle = 0;
+	float head = 0;
+	float neck = 0;
 
 	int waterHeight;
 	if (item->HitPoints <= 0)

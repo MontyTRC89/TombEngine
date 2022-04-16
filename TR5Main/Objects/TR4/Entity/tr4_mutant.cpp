@@ -136,7 +136,7 @@ namespace TEN::Entities::TR4
 			return false;
 	}
 
-	static void RotateHeadToTarget(ITEM_INFO* item, CreatureInfo* creature, int joint, short& headAngle)
+	static void RotateHeadToTarget(ITEM_INFO* item, CreatureInfo* creature, int joint, float& headAngle)
 	{
 		if (creature->Enemy == nullptr)
 		{
@@ -145,12 +145,12 @@ namespace TEN::Entities::TR4
 		}
 
 		auto* enemy = creature->Enemy;
-		Vector3Int pos = { 0, 0, 0 };
+		auto pos = Vector3Int();
 		GetJointAbsPosition(item, &pos, joint);
 
 		int x = enemy->Pose.Position.x - pos.x;
 		int z = enemy->Pose.Position.z - pos.z;
-		headAngle = (short)(atan2(z, x) - item->Orientation.y) / 2;
+		headAngle = (atan2(z, x) - item->Orientation.y) / 2;
 	}
 
 	static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
@@ -164,9 +164,7 @@ namespace TEN::Entities::TR4
 		float angles[2];
 		phd_GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z, angles);
 
-		target->Position.x = end.x;
-		target->Position.y = end.y;
-		target->Position.z = end.z;
+		target->Position = end;
 		target->Orientation.x = angles[1];
 		target->Orientation.y = angles[0];
 		target->Orientation.z = 0;
@@ -174,8 +172,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemFront(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Orientation.y));
-		switch (angle)
+		switch ((int)EulerAngle::RadToDeg(item->Orientation.GetY()))
 		{
 		case C_NORTH:
 			item->Pose.Position.z += distance;
@@ -197,8 +194,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemBack(ITEM_INFO* item, int distance)
 	{
-		short angle = short(TO_DEGREES(item->Orientation.y));
-		switch (angle)
+		switch ((int)EulerAngle::RadToDeg(item->Orientation.GetY()))
 		{
 		case C_NORTH:
 			item->Pose.Position.z -= distance;
@@ -248,8 +244,8 @@ namespace TEN::Entities::TR4
 
 		OBJECT_BONES mutantJoint;
 		int frameNumber;
-		short angle = 0;
-		short headY = 0;
+		float angle = 0;
+		float headY = 0;
 
 		if (item->AIBits & ALL_AIOBJ)
 			GetAITarget(creature);

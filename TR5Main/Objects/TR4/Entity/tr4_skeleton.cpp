@@ -129,12 +129,12 @@ namespace TEN::Entities::TR4
 		bool jumpRight = false;
 
 		int distance = 0;
-		short tilt = 0;
-		short angle = 0;
-		short joint1 = 0;
-		short joint2 = 0;
-		short joint3 = 0;
-		short rot = 0;
+		float tilt = 0;
+		float angle = 0;
+		float joint1 = 0;
+		float joint2 = 0;
+		float joint3 = 0;
+		float rot = 0;
 
 		// Can skeleton jump? Check for a distance of 1 and 2 sectors.
 		int x = item->Pose.Position.x;

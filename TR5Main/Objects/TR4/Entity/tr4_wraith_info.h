@@ -4,7 +4,7 @@
 struct WraithInfo
 {
 	PHD_3DPOS Pose;
-	EulerAngle Orientation;
+	EulerAngle Orientation; // temp
 
 	unsigned char r;
 	unsigned char g;

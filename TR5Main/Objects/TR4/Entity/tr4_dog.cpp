@@ -64,10 +64,10 @@ namespace TEN::Entities::TR4
 		auto* creature = GetCreatureInfo(item);
 		auto* object = &Objects[item->ObjectNumber];
 
-		short angle = 0;
-		short joint2 = 0;
-		short joint1 = 0;
-		short joint0 = 0;
+		float angle = 0;
+		float joint2 = 0;
+		float joint1 = 0;
+		float joint0 = 0;
 
 		if (item->HitPoints <= 0)
 		{

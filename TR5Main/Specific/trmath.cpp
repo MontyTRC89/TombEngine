@@ -9,12 +9,12 @@ using namespace TEN::Math::Random;
 
 float FROM_DEGREES(float angle)//
 {
-	return angle * (PI / 180.0f);
+	return angle * (M_PI / 180.0f);
 }
 
 float TO_DEGREES(float angle)//
 {
-	return angle * (PI / 180.0f);
+	return angle * (M_PI / 180.0f);
 }
 
 const float lerp(float v0, float v1, float t)

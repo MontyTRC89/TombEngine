@@ -56,11 +56,11 @@ void MPStickControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
-	short tilt = 0;
-	short torsoX = 0;
-	short torsoY = 0;
+	float head = 0;
+	float angle = 0;
+	float tilt = 0;
+	float torsoX = 0;
+	float torsoY = 0;
 
 	if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 	{

@@ -61,8 +61,8 @@ void TRexControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* info = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
+	float head = 0;
+	float angle = 0;
 
 	if (item->HitPoints <= 0)
 	{

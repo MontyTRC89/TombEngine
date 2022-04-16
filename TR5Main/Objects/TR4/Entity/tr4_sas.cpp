@@ -15,6 +15,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_item.h"
+#include "Game/misc.h"
 
 namespace TEN::Entities::TR4
 {
@@ -105,14 +106,14 @@ namespace TEN::Entities::TR4
 			return;
 
 		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = (CreatureInfo*)item->Data;
+		auto* creature = GetCreatureInfo(item);
 		auto* enemy = creature->Enemy;
 
-		short tilt = 0;
-		short angle = 0;
-		short joint0 = 0;
-		short joint1 = 0;
-		short joint2 = 0;
+		float tilt = 0;
+		float angle = 0;
+		float joint0 = 0;
+		float joint1 = 0;
+		float joint2 = 0;
 
 		// Handle SAS firing.
 		if (creature->FiredWeapon)
@@ -135,7 +136,7 @@ namespace TEN::Entities::TR4
 			CreatureAIInfo(item, &AI);
 
 			int distance = 0;
-			int angle = 0;
+			float angle = 0;
 			if (creature->Enemy == LaraItem)
 			{
 				angle = AI.angle;
@@ -161,8 +162,8 @@ namespace TEN::Entities::TR4
 			if (item->HitStatus)
 				AlertAllGuards(itemNumber);
 
-			int angle1 = 0;
-			int angle2 = 0;
+			float angle1 = 0;
+			float angle2 = 0;
 
 			switch (item->Animation.ActiveState)
 			{

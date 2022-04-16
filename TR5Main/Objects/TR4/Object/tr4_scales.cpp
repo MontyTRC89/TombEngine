@@ -89,7 +89,7 @@ void ScalesControl(short itemNumber)
 
 void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TestBoundsCollide(item, laraItem, LARA_RADIUS))
 	{
@@ -116,8 +116,8 @@ void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		}
 		else
 		{
-			short rotY = item->Orientation.y;
-			item->Orientation.y = (short)(laraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) & 0xC000;
+			float rotY = item->Orientation.y;
+			item->Orientation.y = EulerAngle::ShrtToRad((EulerAngle::RadToShrt(laraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) & EulerAngle::DegToShrt(270.0f)));
 
 			ScalesBounds.boundingBox.X1 = -1408;
 			ScalesBounds.boundingBox.X2 = -640;

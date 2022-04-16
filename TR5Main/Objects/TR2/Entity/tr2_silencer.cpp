@@ -32,11 +32,11 @@ void SilencerControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* info = GetCreatureInfo(item);
 
-	short angle = 0;
-	short torsoX = 0;
-	short torsoY = 0;
-	short head = 0;
-	short tilt = 0;
+	float angle = 0;
+	float torsoX = 0;
+	float torsoY = 0;
+	float head = 0;
+	float tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{

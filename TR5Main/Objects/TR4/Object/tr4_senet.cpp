@@ -459,7 +459,7 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 
 void ControlGodHead(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{

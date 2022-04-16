@@ -34,12 +34,12 @@ void WorkerMachineGunControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short tilt = 0;
-	short angle = 0;
-	short headX = 0;
-	short headY = 0;
-	short torsoX = 0;
-	short torsoY = 0;
+	float tilt = 0;
+	float angle = 0;
+	float headX = 0;
+	float headY = 0;
+	float torsoX = 0;
+	float torsoY = 0;
 
 	if (item->HitPoints <= 0)
 	{

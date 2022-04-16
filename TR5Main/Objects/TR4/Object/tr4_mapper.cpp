@@ -30,7 +30,7 @@ namespace TEN::Entities::TR4
 
             item->MeshBits |= 2;
 
-            Vector3Int pos = { 0, 0, 0 };
+            auto pos = Vector3Int();
             GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
 
             byte color = (GetRandomControl() & 0x1F) + 192;

@@ -269,17 +269,17 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 void CreatureUnderwater(ITEM_INFO* item, int depth)
 {
 	int waterLevel = depth;
-	int wh = 0;
+	int waterHeight = 0;
 
 	if (depth < 0)
 	{
-		wh = abs(depth);
+		waterHeight = abs(depth);
 		waterLevel = 0;
 	}
 	else
-		wh = GetWaterHeight(item);
+		waterHeight = GetWaterHeight(item);
 
-	int y = wh + waterLevel;
+	int y = waterHeight + waterLevel;
 
 	if (item->Pose.Position.y < y)
 	{
@@ -289,10 +289,10 @@ void CreatureUnderwater(ITEM_INFO* item, int depth)
 		if (y > height)
 			item->Pose.Position.y = height;
 
-		if (item->Orientation.x > EulerAngle::DegToRad(2.0f))
-			item->Orientation.x -= EulerAngle::DegToRad(2.0f);
-		else if (item->Orientation.x > 0)
-			item->Orientation.x = 0;
+		if (item->Orientation.GetX() > EulerAngle::DegToRad(2.0f))
+			item->Orientation.SetX(item->Orientation.GetX() - EulerAngle::DegToRad(2.0f));
+		else if (item->Orientation.GetX() > 0)
+			item->Orientation.SetX();
 	}
 }
 
@@ -332,20 +332,20 @@ void CreatureFloat(short itemNumber)
 	}
 }
 
-void CreatureJoint(ITEM_INFO* item, short joint, short required) 
+void CreatureJoint(ITEM_INFO* item, short joint, float required) 
 {
 	if (!item->Data)
 		return;
 
 	auto* creature = GetCreatureInfo(item);
 
-	short change = required - creature->JointRotation[joint];
+	float change = EulerAngle::Clamp(required - creature->JointRotation[joint]);
 	if (change > EulerAngle::DegToRad(3.0f))
 		change = EulerAngle::DegToRad(3.0f);
 	else if (change < EulerAngle::DegToRad(-3.0f))
 		change = EulerAngle::DegToRad(-3.0f);
 
-	creature->JointRotation[joint] += change;
+	creature->JointRotation[joint] = EulerAngle::Clamp(creature->JointRotation[joint] + change);
 
 	if (creature->JointRotation[joint] > EulerAngle::DegToRad(70.0f))
 		creature->JointRotation[joint] = EulerAngle::DegToRad(70.0f);
@@ -355,7 +355,7 @@ void CreatureJoint(ITEM_INFO* item, short joint, short required)
 
 void CreatureTilt(ITEM_INFO* item, float angle)
 {
-	angle = (angle * 4) - item->Orientation.z;
+	angle = EulerAngle::Clamp((angle * 4) - item->Orientation.GetZ());
 
 	if (angle < EulerAngle::DegToRad(-3.0f))
 		angle = EulerAngle::DegToRad(-3.0f);
@@ -364,11 +364,11 @@ void CreatureTilt(ITEM_INFO* item, float angle)
 
 	float theAngle = EulerAngle::DegToRad(-3.0f);
 
-	float absRot = abs(item->Orientation.z);
+	float absRot = abs(item->Orientation.GetZ());
 	if (absRot < EulerAngle::DegToRad(15.0f) || absRot > EulerAngle::DegToRad(30.0f))
 		angle /= 2;
 	
-	item->Orientation.z += angle;
+	item->Orientation.SetZ(item->Orientation.GetZ() + angle);
 }
 
 float CreatureTurn(ITEM_INFO* item, float maxTurn)

@@ -118,7 +118,10 @@ inline EulerAngle EulerAngle::Clamp(EulerAngle orient)
 
 inline float EulerAngle::Clamp(float radians)
 {
-	return atan2(sin(radians), cos(radians));
+	//if (radians < -M_PI || radians > M_PI)
+		return atan2(sin(radians), cos(radians));
+	//else
+	//	return radians;
 
 	// Alternative method:
 	/*return (radians > 0) ?

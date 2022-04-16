@@ -37,7 +37,7 @@ struct TonyFlame
 	Vector3Int pos;
 	int fallspeed;
 	int speed;
-	short yRot;
+	float yRot;
 	short room_number;
 	TonyFlameType type;
 };
@@ -242,7 +242,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	}
 }
 
-static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* laraPos, short roomNumber, short angle, int zdVelocity)
+static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* laraPos, short roomNumber, float angle, int zdVelocity)
 {
 	TonyFlame flame;
 	memset(&flame, 0, sizeof(TonyFlame));
@@ -532,11 +532,11 @@ void TonyControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short tilt = 0;
-	short head = 0;
-	short torsoX = 0;
-	short torsoY = 0;
+	float angle = 0;
+	float tilt = 0;
+	float head = 0;
+	float torsoX = 0;
+	float torsoY = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -731,9 +731,9 @@ void TonyControl(short itemNumber)
 		}
 	}
 
-	CreatureJoint(item, 0, torsoY >> 1);
+	CreatureJoint(item, 0, torsoY / 2);
 	CreatureJoint(item, 1, torsoX);
-	CreatureJoint(item, 2, torsoY >> 1);
+	CreatureJoint(item, 2, torsoY / 2);
 	CreatureAnimation(itemNumber, angle, 0);
 }
 

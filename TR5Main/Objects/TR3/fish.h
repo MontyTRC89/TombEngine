@@ -2,23 +2,21 @@
 
 struct FishInfo
 {
-	short x;
-	short y;
-	short z;
-	int	angle;
-	short destY;
-	short angAdd;
-	unsigned char speed;
-	unsigned char acc;
-	unsigned char swim;
+	Vector3Int Offset;
+	float Angle;
+	short DestY;
+	float AngleAdd;
+	unsigned int Velocity;
+	unsigned int Acceleration;
+	unsigned int Swim;
 };
 
 struct FishLeaderInfo
 {
-	short angle;
-	unsigned char speed;
-	unsigned char on;
-	short angleTime;
-	short speedTime;
-	short xRange, yRange, zRange;
+	float Angle;
+	unsigned int Velocity;
+	bool On;
+	short AngleTime;
+	short VelocityTime;
+	Vector3Int Range;
 };

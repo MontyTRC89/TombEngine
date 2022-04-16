@@ -18,7 +18,7 @@ int CarcassItem = NO_ITEM;
 #define Z 2
 #define XYZ	3
 #define MAX_FISH 8
-#define OCB_FISH_LETAL 0x1000
+#define OCB_FISH_LETHAL 0x1000
 #define OCB_FISH_EAT_CARCASS 0x2000
 
 FishLeaderInfo LeaderInfo[MAX_FISH];
@@ -35,40 +35,36 @@ unsigned char FishRanges[1][3] =
 
 void SetupShoal(int shoalNumber)
 {
-	LeaderInfo[shoalNumber].xRange = (FishRanges[shoalNumber][0] + 2) << 8;
-	LeaderInfo[shoalNumber].zRange = (FishRanges[shoalNumber][1] + 2) << 8;
-	LeaderInfo[shoalNumber].yRange = (FishRanges[shoalNumber][2]) << 8;
+	LeaderInfo[shoalNumber].Range.x = (FishRanges[shoalNumber][0] + 2) << 8;
+	LeaderInfo[shoalNumber].Range.z = (FishRanges[shoalNumber][1] + 2) << 8;
+	LeaderInfo[shoalNumber].Range.y = (FishRanges[shoalNumber][2]) << 8;
 }
 
 void SetupFish(int leader, ITEM_INFO* item)
 {
-	int fishXRange = LeaderInfo[leader].xRange;
-	int fishYRange = LeaderInfo[leader].yRange;
-	int fishZRange = LeaderInfo[leader].zRange;
+	auto range = LeaderInfo[leader].Range;
 
-	Fishes[leader].x = 0;
-	Fishes[leader].y = 0;
-	Fishes[leader].z = 0;
-	Fishes[leader].angle = 0;
-	Fishes[leader].speed = (GetRandomControl() & 63) + 8;
-	Fishes[leader].swim = GetRandomControl() & 63;
+	Fishes[leader].Offset = Vector3Int();
+	Fishes[leader].Angle = 0;
+	Fishes[leader].Velocity = (GetRandomControl() & 63) + 8;
+	Fishes[leader].Swim = GetRandomControl() & 63;
 
 	for (int i = 0; i < 24; i++)
 	{
-		Fishes[MAX_FISH + (leader * 24) + i].x = (GetRandomControl() % (fishXRange * 2)) - fishXRange;
-		Fishes[MAX_FISH + (leader * 24) + i].y = (GetRandomControl() % fishYRange);
-		Fishes[MAX_FISH + (leader * 24) + i].destY = (GetRandomControl() % fishYRange);
-		Fishes[MAX_FISH + (leader * 24) + i].z = (GetRandomControl() % (fishZRange * 2)) - fishZRange;
-		Fishes[MAX_FISH + (leader * 24) + i].angle = GetRandomControl() & 4095;
-		Fishes[MAX_FISH + (leader * 24) + i].speed = (GetRandomControl() & 31) + 32;
-		Fishes[MAX_FISH + (leader * 24) + i].swim = GetRandomControl() & 63;
+		Fishes[MAX_FISH + (leader * 24) + i].Offset.x = (GetRandomControl() % (range.x * 2)) - range.z;
+		Fishes[MAX_FISH + (leader * 24) + i].Offset.y = (GetRandomControl() % range.y);
+		Fishes[MAX_FISH + (leader * 24) + i].DestY = (GetRandomControl() % range.y);
+		Fishes[MAX_FISH + (leader * 24) + i].Offset.z = (GetRandomControl() % (range.z * 2)) - range.z;
+		Fishes[MAX_FISH + (leader * 24) + i].Angle = GetRandomControl() & 4095;
+		Fishes[MAX_FISH + (leader * 24) + i].Velocity = (GetRandomControl() & 31) + 32;
+		Fishes[MAX_FISH + (leader * 24) + i].Swim = GetRandomControl() & 63;
 	}
 
-	LeaderInfo[leader].on = 1;
-	LeaderInfo[leader].angle = 0;
-	LeaderInfo[leader].speed = (GetRandomControl() & 127) + 32;
-	LeaderInfo[leader].angleTime = 0;
-	LeaderInfo[leader].speedTime = 0;
+	LeaderInfo[leader].On = true;
+	LeaderInfo[leader].Angle = 0;
+	LeaderInfo[leader].Velocity = (GetRandomControl() & 127) + 32;
+	LeaderInfo[leader].AngleTime = 0;
+	LeaderInfo[leader].VelocityTime = 0;
 }
 
 void ControlFish(short itemNumber)
@@ -80,22 +76,22 @@ void ControlFish(short itemNumber)
 		return;
 
 	int pirahnaAttack = 0;
-	int angle = 0;
+	float angle = 0;
 
 	int leader = item->HitPoints;
-	if (!LeaderInfo[leader].on)
+	if (!LeaderInfo[leader].On)
 		SetupFish(leader, item);
 
-	if (item->TriggerFlags & OCB_FISH_LETAL)  
+	if (item->TriggerFlags & OCB_FISH_LETHAL)  
 	{
 		if ((item->TriggerFlags == OCB_FISH_EAT_CARCASS) == 0)
-			pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
+			pirahnaAttack = LaraItem->RoomNumber == item->RoomNumber;
 		else
 		{
 			if (CarcassItem != -1)
 				pirahnaAttack = 2;
 			else
-				pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
+				pirahnaAttack = LaraItem->RoomNumber == item->RoomNumber;
 		}
 	}
 	else
@@ -113,159 +109,159 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->Pose.Position.x, fish->z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z) + 0x4000)) / 16) & 4095;
-		LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
+		LeaderInfo[leader].Angle = fish->Angle = EulerAngle::ShrtToRad(((-(mGetAngle(fish->Offset.x + item->Pose.Position.x, fish->Offset.z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095); // TODO
+		LeaderInfo[leader].Velocity = (GetRandomControl() & 63) + 192;
 	}
 
-	int deltaAngle = fish->angle - LeaderInfo[leader].angle;
+	float deltaAngle = EulerAngle::ShortestAngle(fish->Angle, LeaderInfo[leader].Angle);
 
-	if (deltaAngle > 2048)
-		deltaAngle -= 4096;
-	else if (deltaAngle < -2048)
-		deltaAngle += 4096;
+	if (deltaAngle > EulerAngle::DegToRad(11.35f))
+		deltaAngle -= EulerAngle::DegToRad(22.5f);
+	else if (deltaAngle < EulerAngle::DegToRad(-11.35f))
+		deltaAngle += EulerAngle::DegToRad(22.5f);
 
-	if (deltaAngle > 128)
+	if (deltaAngle > EulerAngle::DegToRad(0.7f))
 	{
-		fish->angAdd -= 4;
-		if (fish->angAdd < -120)
-			fish->angAdd = -120;
+		fish->AngleAdd -= EulerAngle::DegToRad(0.02f);
+		if (fish->AngleAdd < EulerAngle::DegToRad(-0.7f))
+			fish->AngleAdd = EulerAngle::DegToRad(-0.7f);
 	}
-	else if (deltaAngle < -128)
+	else if (deltaAngle < -EulerAngle::DegToRad(-0.7f))
 	{
-		fish->angAdd += 4;
-		if (fish->angAdd > 120)
-			fish->angAdd = 120;
+		fish->AngleAdd += EulerAngle::DegToRad(0.02f);
+		if (fish->AngleAdd > EulerAngle::DegToRad(0.7f))
+			fish->AngleAdd = EulerAngle::DegToRad(0.7f);
 	}
 	else
 	{
-		fish->angAdd -= fish->angAdd / 4;
-		if (abs(fish->angAdd) < 4)
-			fish->angAdd = 0;
+		fish->AngleAdd -= fish->AngleAdd / 4;
+		if (abs(fish->AngleAdd) < EulerAngle::DegToRad(0.02f))
+			fish->AngleAdd = 0;
 	}
 
-	fish->angle += fish->angAdd;
+	fish->Angle += fish->AngleAdd;
 
-	if (deltaAngle > 1024)
-		fish->angle += fish->angAdd / 4;
-	fish->angle &= 4095;
+	if (deltaAngle > EulerAngle::DegToRad(5.6f))
+		fish->Angle += fish->AngleAdd / 4;
+	fish->Angle = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(fish->Angle) & 4095); // TODO
 
-	deltaAngle = fish->speed - LeaderInfo[leader].speed;
+	deltaAngle = fish->Velocity - LeaderInfo[leader].Velocity;
 
-	if (deltaAngle < -4)
+	if (deltaAngle < EulerAngle::DegToRad(-0.02f))
 	{
-		deltaAngle = fish->speed + (GetRandomControl() & 3) + 1;
+		deltaAngle = fish->Velocity + (GetRandomControl() & 3) + 1;
 		if (deltaAngle < 0)
 			deltaAngle = 0;
 
-		fish->speed = deltaAngle;
+		fish->Velocity = deltaAngle;
 	}
-	else if (deltaAngle > 4)
+	else if (deltaAngle > EulerAngle::DegToRad(0.02f))
 	{
-		deltaAngle = fish->speed - (GetRandomControl() & 3) - 1;
-		if (deltaAngle > 255)
-			deltaAngle = 255;
+		deltaAngle = fish->Velocity - (GetRandomControl() & 3) - 1;
+		if (deltaAngle > EulerAngle::DegToRad(1.4f))
+			deltaAngle = EulerAngle::DegToRad(1.4f);
 
-		fish->speed = deltaAngle;
+		fish->Velocity = deltaAngle;
 	}
 
-	fish->swim += fish->speed / 16;
-	fish->swim &= 63;
+	fish->Swim += fish->Velocity / 16;
+	fish->Swim &= 63;
 
-	int x = fish->x;
-	int z = fish->z;
+	int x = fish->Offset.x;
+	int z = fish->Offset.z;
 	
-	x -= fish->speed * sin(fish->angle * 16) / 2;
-	z += fish->speed * cos(fish->angle * 16) / 2;
+	x -= fish->Velocity * sin(fish->Angle * 16) / 2;
+	z += fish->Velocity * cos(fish->Angle * 16) / 2;
 	
 	if (pirahnaAttack == 0)
 	{
-		int fishXRange = LeaderInfo[leader].xRange;
-		int fishZRange = LeaderInfo[leader].zRange;
+		int fishXRange = LeaderInfo[leader].Range.x;
+		int fishZRange = LeaderInfo[leader].Range.z;
 
 		if (z < -fishZRange)
 		{
 			z = -fishZRange;
 
-			if (fish->angle < 2048)
-				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+			if (fish->Angle < EulerAngle::DegToRad(11.25f))
+				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
-			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
-			LeaderInfo[leader].speedTime = 0;
+			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
+			LeaderInfo[leader].VelocityTime = 0;
 		}
 		else if (z > fishZRange)
 		{
 			z = fishZRange;
 
-			if (fish->angle > 3072)
-				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+			if (fish->Angle > EulerAngle::DegToRad(16.9f))
+				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
-			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
-			LeaderInfo[leader].speedTime = 0;
+			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
+			LeaderInfo[leader].VelocityTime = 0;
 		}
 
 		if (x < -fishXRange)
 		{
 			x = -fishXRange;
 
-			if (fish->angle < 1024)
-				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+			if (fish->Angle < EulerAngle::DegToRad(5.6f))
+				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
-			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
-			LeaderInfo[leader].speedTime = 0;
+			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
+			LeaderInfo[leader].VelocityTime = 0;
 		}
 		else if (x > fishXRange)
 		{
 			x = fishXRange;
 
-			if (fish->angle < 3072)
-				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
+			if (fish->Angle < EulerAngle::DegToRad(16.9f))
+				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
+				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
-			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
-			LeaderInfo[leader].speedTime = 0;
+			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
+			LeaderInfo[leader].VelocityTime = 0;
 		}
 
 		if ((GetRandomControl() & 15) == 0)
-			LeaderInfo[leader].angleTime = 0;
+			LeaderInfo[leader].AngleTime = 0;
 
-		if (LeaderInfo[leader].angleTime)
-			LeaderInfo[leader].angleTime--;
+		if (LeaderInfo[leader].AngleTime)
+			LeaderInfo[leader].AngleTime--;
 		else
 		{
-			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
-			int angAdd = ((GetRandomControl() & 63) + 16) - 8 - 32;
+			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
+			float AngleAdd = ((GetRandomControl() & 63) + 16) - 8 - 32;
 
 			if ((GetRandomControl() & 3) == 0)
-				LeaderInfo[leader].angle += angAdd * 32;
+				LeaderInfo[leader].Angle += AngleAdd * 32;
 			else
-				LeaderInfo[leader].angle += angAdd;
+				LeaderInfo[leader].Angle += AngleAdd;
 
-			LeaderInfo[leader].angle &= 4095;
+			LeaderInfo[leader].Angle = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(LeaderInfo[leader].Angle) & 4095);
 		}
 
-		if (LeaderInfo[leader].speedTime)
-			LeaderInfo[leader].speedTime--;
+		if (LeaderInfo[leader].VelocityTime)
+			LeaderInfo[leader].VelocityTime--;
 		else
 		{
-			LeaderInfo[leader].speedTime = (GetRandomControl() & 31) + 32;
+			LeaderInfo[leader].VelocityTime = (GetRandomControl() & 31) + 32;
 
 			if ((GetRandomControl() & 7) == 0)
-				LeaderInfo[leader].speed = (GetRandomControl() & 127) + 128;
+				LeaderInfo[leader].Velocity = (GetRandomControl() & 127) + 128;
 			else if ((GetRandomControl() & 3) == 0)
-				LeaderInfo[leader].speed += (GetRandomControl() & 127) + 32;
-			else if (LeaderInfo[leader].speed > 140)
-				LeaderInfo[leader].speed -= (GetRandomControl() & 31) + 48;
+				LeaderInfo[leader].Velocity += (GetRandomControl() & 127) + 32;
+			else if (LeaderInfo[leader].Velocity > 140)
+				LeaderInfo[leader].Velocity -= (GetRandomControl() & 31) + 48;
 			else
 			{
-				LeaderInfo[leader].speedTime = (GetRandomControl() & 3) + 4;
-				LeaderInfo[leader].speed += (GetRandomControl() & 31) - 15;
+				LeaderInfo[leader].VelocityTime = (GetRandomControl() & 3) + 4;
+				LeaderInfo[leader].Velocity += (GetRandomControl() & 31) - 15;
 			}
 		}
 
@@ -274,25 +270,23 @@ void ControlFish(short itemNumber)
 	int ftx = x;
 	int ftz = z;
 
-	fish->x = x;
-	fish->z = z;
+	fish->Offset.x = x;
+	fish->Offset.z = z;
 
 	fish = (FishInfo*)&Fishes[MAX_FISH + (leader * 24)];
 
 	for (int i = 0; i < 24; i++)
 	{
-		if (item->Flags & OCB_FISH_LETAL)
+		if (item->Flags & OCB_FISH_LETHAL)
 		{
 			PHD_3DPOS pos;
-			pos.Position.x = item->Pose.Position.x + fish->x;
-			pos.Position.y = item->Pose.Position.y + fish->y;
-			pos.Position.z = item->Pose.Position.z + fish->z;
+			pos.Position = item->Pose.Position + fish->Offset;
 
 			if (FishNearLara(&pos, 256, (pirahnaAttack < 2) ? LaraItem : enemy))
 			{
 				if (PirahnaHitWait == 0)
 				{
-					DoBloodSplat(item->Pose.Position.x + fish->x, item->Pose.Position.y + fish->y, item->Pose.Position.z + fish->z, 0, 0, (pirahnaAttack < 2) ? LaraItem->RoomNumber : enemy->RoomNumber);
+					DoBloodSplat(item->Pose.Position.x + fish->Offset.x, item->Pose.Position.y + fish->Offset.y, item->Pose.Position.z + fish->Offset.z, 0, 0, (pirahnaAttack < 2) ? LaraItem->RoomNumber : enemy->RoomNumber);
 					PirahnaHitWait = 8;
 				}
 
@@ -301,100 +295,100 @@ void ControlFish(short itemNumber)
 			}
 		}
 
-		angle = ((-(mGetAngle(fish->x, fish->z, ftx, ftz) + 0x4000)) / 16) & 4095;
-		int dx = fish->x - ftx + ((24 - i) * 128);
-		int dz = fish->z - ftz - ((24 - i) * 128);
+		angle = EulerAngle::ShrtToRad(((-(mGetAngle(fish->Offset.x, fish->Offset.z, ftx, ftz) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095);
+		int dx = fish->Offset.x - ftx + ((24 - i) * CLICK(0.5f));
+		int dz = fish->Offset.z - ftz - ((24 - i) * CLICK(0.5f));
 
 		dx *= dx;
 		dz *= dz;
 
-		deltaAngle = fish->angle - angle;
+		deltaAngle = fish->Angle - angle;
 
-		if (deltaAngle > 2048)
-			deltaAngle -= 4096;
-		else if (deltaAngle < -2048)
-			deltaAngle += 4096;
+		if (deltaAngle > EulerAngle::DegToRad(11.25f))
+			deltaAngle -= EulerAngle::DegToRad(22.5f);
+		else if (deltaAngle < EulerAngle::DegToRad(-11.25f))
+			deltaAngle += EulerAngle::DegToRad(22.5f);
 
-		if (deltaAngle > 128)
+		if (deltaAngle > EulerAngle::DegToRad(0.7f))
 		{
-			fish->angAdd -= 4;
-			if (fish->angAdd < -92 - (i / 2))
-				fish->angAdd = -92 - (i / 2);
+			fish->AngleAdd -= EulerAngle::DegToRad(0.02f);
+			if (fish->AngleAdd < EulerAngle::ShrtToRad(-92 - (i / 2))) // TODO
+				fish->AngleAdd = EulerAngle::ShrtToRad(-92 - (i / 2));
 		}
-		else if (deltaAngle < -128)
+		else if (deltaAngle < EulerAngle::DegToRad(-0.7f))
 		{
-			fish->angAdd += 4;
-			if (fish->angAdd > 92 + (i / 2))
-				fish->angAdd = 92 + (i / 2);
+			fish->AngleAdd += EulerAngle::DegToRad(0.02f);
+			if (fish->AngleAdd > EulerAngle::ShrtToRad(92 + (i / 2))) // TODO
+				fish->AngleAdd = EulerAngle::ShrtToRad(92 + (i / 2));
 		}
 		else
 		{
-			fish->angAdd -= fish->angAdd / 4;
-			if (abs(fish->angAdd) < 4)
-				fish->angAdd = 0;
+			fish->AngleAdd -= fish->AngleAdd / 4;
+			if (abs(fish->AngleAdd) < EulerAngle::DegToRad(0.02f))
+				fish->AngleAdd = 0;
 		}
 
-		fish->angle += fish->angAdd;
+		fish->Angle += fish->AngleAdd;
 
-		if (deltaAngle > 1024)
-			fish->angle += fish->angAdd / 4;
-		fish->angle &= 4095;
+		if (deltaAngle > EulerAngle::DegToRad(5.6f))
+			fish->Angle += fish->AngleAdd / 4;
+		fish->Angle = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(fish->Angle) & 4095);
 
 		if ((dx + dz) < (0x100000 + ((i * 128) * (i * 128))))
 		{
-			if (fish->speed > 32 + (i * 2))
-				fish->speed -= fish->speed / 32;
+			if (fish->Velocity > 32 + (i * 2))
+				fish->Velocity -= fish->Velocity / 32;
 		}
 		else
 		{
-			if (fish->speed < 160 + (i / 2))
-				fish->speed += (GetRandomControl() & 3) + 1 + (i / 2);
+			if (fish->Velocity < 160 + (i / 2))
+				fish->Velocity += (GetRandomControl() & 3) + 1 + (i / 2);
 
-			if (fish->speed > 160 + (i / 2) - (i * 4))
-				fish->speed = 160 + (i / 2) - (i * 4);
+			if (fish->Velocity > 160 + (i / 2) - (i * 4))
+				fish->Velocity = 160 + (i / 2) - (i * 4);
 		}
 
 		if (GetRandomControl() & 1)
-			fish->speed -= GetRandomControl() & 1;
+			fish->Velocity -= GetRandomControl() & 1;
 		else
-			fish->speed += GetRandomControl() & 1;
+			fish->Velocity += GetRandomControl() & 1;
 
-		if (fish->speed < 32)
-			fish->speed = 32;
-		else if (fish->speed > 200)
-			fish->speed = 200;
+		if (fish->Velocity < 32)
+			fish->Velocity = 32;
+		else if (fish->Velocity > 200)
+			fish->Velocity = 200;
 
-		fish->swim += (fish->speed / 16) + (fish->speed / 32);
-		fish->swim &= 63;
+		fish->Swim += (fish->Velocity / 16) + (fish->Velocity / 32);
+		fish->Swim &= 63;
 
-		x = fish->x - fish->speed * sin(fish->angle * 16) / 2;
-		z = fish->z + fish->speed * cos(fish->angle * 16) / 2;
+		x = fish->Offset.x - fish->Velocity * sin(fish->Angle * 16) / 2;
+		z = fish->Offset.z + fish->Velocity * cos(fish->Angle * 16) / 2;
 
-		if (z < -32000)
-			z = -32000;
-		else if (z > 32000)
-			z = 32000;
-		if (x < -32000)
-			x = -32000;
-		else if (x > 32000)
-			x = 32000;
+		if (z < -SECTOR(31.25f))
+			z = -SECTOR(31.25f);
+		else if (z > SECTOR(31.25f))
+			z = SECTOR(31.25f);
+		if (x < -SECTOR(31.25f))
+			x = -SECTOR(31.25f);
+		else if (x > SECTOR(31.25f))
+			x = SECTOR(31.25f);
 
-		fish->x = x;
-		fish->z = z;
+		fish->Offset.x = x;
+		fish->Offset.z = z;
 
 		if (pirahnaAttack == 0)
 		{
-			if (abs(fish->y - fish->destY) < 16)
-				fish->destY = GetRandomControl() % LeaderInfo[leader].yRange;
+			if (abs(fish->Offset.y - fish->DestY) < 16)
+				fish->DestY = GetRandomControl() % LeaderInfo[leader].Range.y;
 		}
 		else
 		{
 			int y = enemy->Pose.Position.y - item->Pose.Position.y;
-			if (abs(fish->y - fish->destY) < 16)
-				fish->destY = y + (GetRandomControl() & 255); 
+			if (abs(fish->Offset.y - fish->DestY) < 16)
+				fish->DestY = y + (GetRandomControl() & 255); 
 		}
 
-		fish->y += (fish->destY - fish->y) / 16;
+		fish->Offset.y += (fish->DestY - fish->Offset.y) / 16;
 		fish++;
 	}
 }
@@ -405,8 +399,12 @@ bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item)
 	int y = abs(pos->Position.y - item->Pose.Position.y);
 	int z = pos->Position.z - item->Pose.Position.z;
 
-	if (x < -distance || x > distance || z < -distance || z > distance || y < -SECTOR(3) || y > SECTOR(3))
+	if (x < -distance || x > distance ||
+		y < -SECTOR(3) || y > SECTOR(3) ||
+		z < -distance || z > distance)
+	{
 		return false;
+	}
 
 	if ((pow(x, 2) + pow(z, 2)) > pow(distance, 2))
 		return false;

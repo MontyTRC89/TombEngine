@@ -309,11 +309,11 @@ namespace TEN::Entities::TR4
 		auto* enemyItem = creature->Enemy;
 		auto* object = &Objects[ID_GOON1];
 
-		short tilt = 0;
-		short angle = 0;
-		short joint1 = 0;
-		short joint2 = 0;
-		short joint3 = 0;
+		float tilt = 0;
+		float angle = 0;
+		float joint1 = 0;
+		float joint2 = 0;
+		float joint3 = 0;
 
 		// TODO: better add a second control routine for goon 2 instead of mixing them?
 		short objectNumber = (Objects[ID_GOON2].loaded ? ID_GOON2 : ID_GOON1);

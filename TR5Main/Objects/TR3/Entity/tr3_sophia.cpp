@@ -64,7 +64,7 @@ enum SophiaAnim
 #define LONDONBOSS_FINAL_HEIGHT -11776
 #define BIGZAP_TIMER 600
 
-static void TriggerLaserBolt(Vector3Int* pos, ITEM_INFO* item, long type, short yAngle)
+static void TriggerLaserBolt(Vector3Int* pos, ITEM_INFO* item, long type, float yAngle)
 {
 	
 }
@@ -74,7 +74,7 @@ static void TriggerPlasmaBallFlame(short fxNumber, long type, long xv, long yv, 
 	
 }
 
-static void TriggerPlasmaBall(ITEM_INFO* item, long type, Vector3Int* pos1, short roomNumber, short angle)
+static void TriggerPlasmaBall(ITEM_INFO* item, long type, Vector3Int* pos1, short roomNumber, float angle)
 {
 	
 }

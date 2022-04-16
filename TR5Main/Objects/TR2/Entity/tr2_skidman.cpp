@@ -115,7 +115,7 @@ void SkidooManControl(short riderItemNumber)
 	}
 
 	auto* creatureInfo = GetCreatureInfo(item);
-	short angle = 0;
+	float angle = 0;
 	int damage;
 
 	AI_INFO AI;

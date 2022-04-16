@@ -1040,7 +1040,7 @@ void SetupRipple(int x, int y, int z, float size, char flags, unsigned int sprit
 			else
 				ripple->life = (rand() & 16) + 48;
 
-			ripple->worldPos = { (float)x,(float)y,(float)z };
+			ripple->worldPos = Vector3((float)x,(float)y,(float)z);
 			ripple->currentColor = Vector4(0, 0, 0, 0);
 			ripple->rotation = rotation;
 
@@ -1069,25 +1069,25 @@ void SetupRipple(int x, int y, int z, float size, char flags, unsigned int sprit
 			}
 
 			if (flags & RIPPLE_FLAG_RAND_ROT)
-				ripple->rotation += GenerateFloat(-PI, PI);
+				ripple->rotation += GenerateFloat(-M_PI, M_PI);
 
 			break;
 		}
 	}
 }
 
-short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
+short DoBloodSplat(int x, int y, int z, int speed, float yRot, short roomNumber)
 {
 	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-		TriggerUnderwaterBlood(x, y, z, a4);
+		TriggerUnderwaterBlood(x, y, z, speed);
 	else
-		TriggerBlood(x, y, z, a5 >> 4, a4);
+		TriggerBlood(x, y, z, EulerAngle::RadToShrt(yRot * 16), speed); // TODO: Convert short form rotation.
 
 	return 0;
 }
 
-void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count)
+void DoLotsOfBlood(int x, int y, int z, int speed, float direction, short roomNumber, int count)
 {
 	for (int i = 0; i < count; i++)
 	{
@@ -1106,10 +1106,11 @@ void TriggerLaraBlood()
 	{
 		if (node & LaraItem->TouchBits)
 		{
-			Vector3Int vec;
-			vec.x = (GetRandomControl() & 31) - 16;
-			vec.y = (GetRandomControl() & 31) - 16;
-			vec.z = (GetRandomControl() & 31) - 16;
+			auto vec = Vector3Int(
+				(GetRandomControl() & 31) - 16,
+				(GetRandomControl() & 31) - 16,
+				(GetRandomControl() & 31) - 16
+			);
 
 			GetLaraJointPosition(&vec, (LARA_MESHES)i);
 			DoBloodSplat(vec.x, vec.y, vec.z, (GetRandomControl() & 7) + 8, 2 * GetRandomControl(), LaraItem->RoomNumber);

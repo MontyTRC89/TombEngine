@@ -144,6 +144,10 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
+		float xRot = 0;
+		float angle = 0;
+		float tilt = 0;
+
 		// Try to find the horse
 		if (item->ItemFlags[0] == NO_ITEM)
 		{
@@ -168,8 +172,6 @@ namespace TEN::Entities::TR4
 		if (item->ItemFlags[0] != 0)
 			horseItem = &g_Level.Items[item->ItemFlags[0]];
 
-		int xRot;
-
 		if (horseItem != NULL)
 		{
 			int x = horseItem->Pose.Position.x + 341 * sin(horseItem->Orientation.y);
@@ -187,8 +189,6 @@ namespace TEN::Entities::TR4
 
 			xRot = atan2(682, height2 - height1);
 		}
-
-		short angle;
 
 		if (item->HitPoints <= 0)
 		{
@@ -245,8 +245,6 @@ namespace TEN::Entities::TR4
 				laraAI.angle = atan2(deltaZ, deltaX) - item->Orientation.y;
 				laraAI.distance = pow(deltaX, 2) + pow(deltaZ, 2);
 			}
-
-			short tilt = 0;
 
 			if (item->HitStatus &&
 				laraAI.angle < EulerAngle::DegToRad(67.5f) &&

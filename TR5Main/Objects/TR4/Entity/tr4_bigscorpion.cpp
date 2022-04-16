@@ -65,14 +65,14 @@ void ScorpionControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short head = 0;
-	short neck = 0;
-	short tilt = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
-	short joint3 = 0;
+	float angle = 0;
+	float head = 0;
+	float neck = 0;
+	float tilt = 0;
+	float joint0 = 0;
+	float joint1 = 0;
+	float joint2 = 0;
+	float joint3 = 0;
 
 	int x = item->Pose.Position.x + 682 * sin(item->Orientation.y);
 	int z = item->Pose.Position.z + 682 * cos(item->Orientation.y);
@@ -90,7 +90,7 @@ void ScorpionControl(short itemNumber)
 	if (abs(item->Pose.Position.y - height2) > CLICK(2))
 		height2 = item->Pose.Position.y;
 
-	short angle1 = atan2(1344, height2 - height1);
+	float angle1 = atan2(1344, height2 - height1);
 
 	x = item->Pose.Position.x - 682 * sin(item->Orientation.y);
 	z = item->Pose.Position.z + 682 * cos(item->Orientation.y);
@@ -108,7 +108,7 @@ void ScorpionControl(short itemNumber)
 	if (abs(item->Pose.Position.y - height4) > CLICK(2))
 		height4 = item->Pose.Position.y;
 
-	short angle2 = atan2(1344, height4 - height3);
+	float angle2 = atan2(1344, height4 - height3);
 
 	if (item->HitPoints <= 0)
 	{

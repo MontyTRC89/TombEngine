@@ -159,15 +159,15 @@ void ShivaControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* shiva = GetCreatureInfo(item);
 
-	Vector3Int pos = { 0, 0, 256 };
+	auto pos = Vector3Int(0, 0, 256);
 	int laraAlive = LaraItem->HitPoints > 0;
 
-	short headX = 0;
-	short headY = 0;
-	short torsoX = 0;
-	short torsoY = 0;
-	short angle = 0;
-	short tilt = 0;
+	float headX = 0;
+	float headY = 0;
+	float torsoX = 0;
+	float torsoY = 0;
+	float angle = 0;
+	float tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{

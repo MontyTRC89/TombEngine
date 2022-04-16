@@ -62,11 +62,11 @@ void GuideControl(short itemNumber)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
-	short angle = 0;
-	short tilt = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
+	float angle = 0;
+	float tilt = 0;
+	float joint0 = 0;
+	float joint1 = 0;
+	float joint2 = 0;
 
 	// Ignite torch
 	if (item->ItemFlags[1] == 2)
@@ -133,7 +133,7 @@ void GuideControl(short itemNumber)
 	dz = abs(dz);
 
 	int dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
-	short rot2 = 0;
+	float rot2 = 0;
 
 	if (dx <= dz)
 		laraAI.xAngle = atan2(dz + (dx / 2), dy);

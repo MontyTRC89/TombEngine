@@ -76,7 +76,7 @@ static void CreateBartoliLight(short ItemIndex, int type)
 		TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, (GetRandomControl() & 20) + 25, (GetRandomControl() & 30) + 200, (GetRandomControl() & 25) + 50, (GetRandomControl() & 20) + 0);
 }
 
-static short DragonFire(int x, int y, int z, short speed, short yRot, short roomNumber)
+static short DragonFire(int x, int y, int z, int speed, float yRot, short roomNumber)
 {
 	short fxNumber = NO_ITEM;
 	// TODO:: set correct fx parameters
@@ -240,8 +240,8 @@ void DragonControl(short backItemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
+	float head = 0;
+	float angle = 0;
 
 	bool ahead;
 

@@ -118,7 +118,7 @@ namespace TEN::Entities::TR4
 
 				item->Pose.Position.y += CLICK(2);
 
-				int deltaAngle = AI.angle - creature->JointRotation[0];
+				float deltaAngle = EulerAngle::ShortestAngle(AI.angle, creature->JointRotation[0]);
 
 				AI.ahead = true;
 				if (deltaAngle <= EulerAngle::DegToRad(-90.0f) || deltaAngle >= EulerAngle::DegToRad(90.0f))

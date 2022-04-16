@@ -53,7 +53,7 @@ void EagleControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
+	float angle = 0;
 
 	if (item->HitPoints <= 0)
 	{

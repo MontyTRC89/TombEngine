@@ -65,8 +65,8 @@ namespace TEN::Entities::TR4
 
 		ITEM_INFO* target;
 		CreatureInfo* slots;
-		int distance, bestdistance;
-		short angle;
+		int distance, bestDistance;
+		float angle;
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);

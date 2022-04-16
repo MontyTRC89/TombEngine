@@ -58,9 +58,9 @@ void TribemanAxeControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
-	short tilt = 0;
+	float head = 0;
+	float angle = 0;
+	float tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -266,9 +266,9 @@ void TribemanAxeControl(short itemNumber)
 			{
 				if (creature->Enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512 &&
+					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
+						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2) &&
 						creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 						creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 					{
@@ -286,8 +286,8 @@ void TribemanAxeControl(short itemNumber)
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, head >> 1);
-	CreatureJoint(item, 1, head >> 1);
+	CreatureJoint(item, 0, head / 2);
+	CreatureJoint(item, 1, head / 2);
 
 	CreatureAnimation(itemNumber, angle, 0);
 }
@@ -301,24 +301,24 @@ static void TribesmanShotDart(ITEM_INFO* item)
 		dartItem->ObjectNumber = ID_DARTS;
 		dartItem->RoomNumber = item->RoomNumber;
 
-		Vector3Int pos1;
-		pos1.x = TribesmanDartBite2.x;
-		pos1.y = TribesmanDartBite2.y;
-		pos1.z = TribesmanDartBite2.z;
+		auto pos1 = Vector3Int(
+			TribesmanDartBite2.x,
+			TribesmanDartBite2.y,
+			TribesmanDartBite2.z
+		);
 		GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
 
-		Vector3Int pos2;
-		pos2.x = TribesmanDartBite2.x;
-		pos2.y = TribesmanDartBite2.y;
-		pos2.z = TribesmanDartBite2.z * 2;
+		auto pos2 = Vector3Int(
+			TribesmanDartBite2.x,
+			TribesmanDartBite2.y,
+			TribesmanDartBite2.z
+		);
 		GetJointAbsPosition(item, &pos2, TribesmanDartBite2.meshNum);
 
 		float angles[2];
 		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-		dartItem->Pose.Position.x = pos1.x;
-		dartItem->Pose.Position.y = pos1.y;
-		dartItem->Pose.Position.z = pos1.z;
+		dartItem->Pose.Position = pos1;
 
 		InitialiseItem(dartItemNumber);
 
@@ -349,12 +349,12 @@ void TribemanDartsControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short tilt = 0;
-	short headX = 0;
-	short headY = 0;
-	short torsoX = 0;
-	short torsoY = 0;
+	float angle = 0;
+	float tilt = 0;
+	float headX = 0;
+	float headY = 0;
+	float torsoX = 0;
+	float torsoY = 0;
 
 	if (item->HitPoints <= 0)
 	{

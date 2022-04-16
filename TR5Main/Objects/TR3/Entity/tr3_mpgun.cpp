@@ -57,15 +57,15 @@ void MPGunControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short head = 0;
-	short angle = 0;
-	short tilt = 0;
-	short torsoX = 0;
-	short torsoY = 0;
+	float head = 0;
+	float angle = 0;
+	float tilt = 0;
+	float torsoX = 0;
+	float torsoY = 0;
 
 	if (creature->FiredWeapon)
 	{
-		Vector3Int pos = { MPGunBite.x, MPGunBite.y, MPGunBite.z };
+		auto pos = Vector3Int(MPGunBite.x, MPGunBite.y, MPGunBite.z);
 		GetJointAbsPosition(item, &pos, MPGunBite.meshNum);
 
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (creature->FiredWeapon * 2) + 4, 24, 16, 4);

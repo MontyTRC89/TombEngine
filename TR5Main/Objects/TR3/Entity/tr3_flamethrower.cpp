@@ -158,7 +158,7 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 	spark->dSize = size / 2;
 }
 
-static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
+static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, int speed)
 {
 	short effectNumber = CreateNewEffect(item->RoomNumber);
 	if (effectNumber != NO_ITEM)
@@ -223,11 +223,11 @@ void FlameThrowerControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short torsoX = 0;
-	short torsoY = 0;
-	short angle = 0;
-	short tilt = 0;
-	short head = 0;
+	float torsoX = 0;
+	float torsoY = 0;
+	float angle = 0;
+	float tilt = 0;
+	float head = 0;
 
 	Vector3Int pos = { FlamethrowerBite.x, FlamethrowerBite.y, FlamethrowerBite.z };
 	GetJointAbsPosition(item, &pos, FlamethrowerBite.meshNum);

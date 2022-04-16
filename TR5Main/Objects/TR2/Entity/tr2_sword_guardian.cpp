@@ -41,9 +41,9 @@ void SwordGuardianControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short head = 0;
-	short torso = 0;
+	float angle = 0;
+	float head = 0;
+	float torso = 0;
 
 	bool laraAlive = LaraItem->HitPoints > 0;
 

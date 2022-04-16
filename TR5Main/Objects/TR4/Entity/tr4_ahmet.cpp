@@ -114,8 +114,8 @@ namespace TEN::Entities::TR4
 
 		auto* creature = GetCreatureInfo(item);
 
-		short angle = 0;
-		short headY = 0;
+		float angle = 0;
+		float headY = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -155,7 +155,7 @@ namespace TEN::Entities::TR4
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int angle = atan2(dx, dz);
+				float angle = atan2(dx, dz);
 				laraAI.angle = angle - item->Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}

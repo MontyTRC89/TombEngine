@@ -82,12 +82,12 @@ void VonCroyControl(short itemNumber)
 	auto* creature = GetCreatureInfo(item);
 	auto* obj = &Objects[item->ObjectNumber];
 
-	short angle = 0;
-	short tilt = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
-	short joint3 = 0;
+	float angle = 0;
+	float tilt = 0;
+	float joint0 = 0;
+	float joint1 = 0;
+	float joint2 = 0;
+	float joint3 = 0;
 
 	// Check whether Von Croy can jump 1 or 2 blocks.
 
@@ -248,7 +248,7 @@ void VonCroyControl(short itemNumber)
 		dz = abs(dz);
 
 		int dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
-		short rot2 = 0;
+		float rot2 = 0;
 
 		if (dx <= dz)
 			laraAI.xAngle = atan2(dz + (dx / 2), dy);
@@ -287,7 +287,7 @@ void VonCroyControl(short itemNumber)
 		return;
 	}*/
 
-	short rot = 0;
+	float rot = 0;
 	bool flags;
 
 	TENLog("State:" + std::to_string(item->Animation.ActiveState), LogLevel::Info);

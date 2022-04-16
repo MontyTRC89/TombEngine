@@ -155,7 +155,7 @@ struct EntityStoringInfo
 	}
 };
 
-#define CreatureEffectFunction short(int x, int y, int z, short speed, float yRot, short roomNumber)
+#define CreatureEffectFunction short(int x, int y, int z, int speed, float yRot, short roomNumber)
 
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
 constexpr auto BOX_LAST = (1 << 15); // unpassable by large enemies (T-Rex, Centaur, etc), always set behind doors
@@ -202,7 +202,7 @@ short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, float angl
 short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func);
 void CreatureUnderwater(ITEM_INFO* item, int depth);
 void CreatureFloat(short itemNumber);
-void CreatureJoint(ITEM_INFO* item, short joint, short required);
+void CreatureJoint(ITEM_INFO* item, short joint, float required);
 void CreatureTilt(ITEM_INFO* item, float angle);
 float CreatureTurn(ITEM_INFO* item, float maxTurn);
 void CreatureDie(short itemNumber, int explode);

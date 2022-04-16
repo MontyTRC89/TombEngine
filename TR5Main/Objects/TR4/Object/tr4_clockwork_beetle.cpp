@@ -97,8 +97,8 @@ void ClockworkBeetleControl(short itemNumber)
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
-				int atan = atan2(z, x);
-				short rot = atan - beetle->Orientation.y;
+				float atan = atan2(z, x);
+				float rot = atan - beetle->Orientation.y;
 
 				if (abs(rot) > EulerAngle::DegToRad(180.0f))
 					rot = beetle->Orientation.y - atan;
@@ -135,7 +135,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 			if (x <= -8 || z <= -8 || x >= 8 || z >= 8)
 			{
-				int atan = atan2(z, x);
+				float atan = atan2(z, x);
 				beetle->Orientation.y = atan;
 
 				if (pow(x, 2) + pow(z, 2) >= 0x19000)
@@ -210,7 +210,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 		case 2:
 		{
-			int rotation = beetle->ItemFlags[1] - beetle->Orientation.y;
+			float rotation = EulerAngle::ShortestAngle(beetle->ItemFlags[1], beetle->Orientation.y);
 
 			if (abs(rotation) > EulerAngle::DegToRad(180.0f))
 				rotation = beetle->Orientation.y - beetle->ItemFlags[1];

@@ -24,7 +24,7 @@ void JeanYvesControl(short itemNumber)
 
 	if (item->TriggerFlags >= Lara.HighestLocation)
 	{
-		short state = 0;
+		int state = 0;
 
 		if (GetRandomControl() & 3)
 			state = (GetRandomControl() & 1) + 1;

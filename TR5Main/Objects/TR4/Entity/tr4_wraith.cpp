@@ -81,9 +81,9 @@ namespace TEN::Entities::TR4
 		}
 
 		dy = y - item->Pose.Position.y - dy - CLICK(0.5f);
-		short angleH = atan2(z, x) - item->Orientation.y;
+		float angleH = atan2(z, x) - item->Orientation.y;
 
-		short angleV = 0;
+		float angleV = 0;
 		if (abs(x) <= abs(z))
 			angleV = atan2(abs(x) + (abs(z) / 2), dy);
 		else

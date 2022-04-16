@@ -114,7 +114,7 @@ void EnemyJeepControl(short itemNumber)
 			height2 = y;
 		}
 
-		short zRot = atan2(1364, height2 - height1);
+		float zRot = atan2(1364, height2 - height1);
 
 		int height3 = GetCollision(x + dx, y, z + dz, item->RoomNumber).Position.Floor;
 		if (abs(y - height3) > CLICK(3))
@@ -124,7 +124,7 @@ void EnemyJeepControl(short itemNumber)
 		if (abs(y - height4) > CLICK(3))
 			height4 = y;
 
-		short xRot = atan2(1364, height4 - height3);
+		float xRot = atan2(1364, height4 - height3);
 
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);

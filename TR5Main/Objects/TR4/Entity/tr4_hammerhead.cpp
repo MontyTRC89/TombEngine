@@ -63,7 +63,7 @@ void HammerheadControl(short itemNumber)
 			GetCreatureMood(item, &AI, VIOLENT);
 			CreatureMood(item, &AI, VIOLENT);
 
-			short angle = CreatureTurn(item, creature->MaxTurn);
+			float angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{

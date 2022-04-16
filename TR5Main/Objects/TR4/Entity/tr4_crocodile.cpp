@@ -116,8 +116,8 @@ void CrocodileControl(short itemNumber)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
-	short angle = 0;
-	short boneAngle = 0;
+	float angle = 0;
+	float boneAngle = 0;
 
 	AI_INFO AI;
 

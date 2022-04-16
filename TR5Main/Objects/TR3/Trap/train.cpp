@@ -21,13 +21,14 @@
 
 long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 {
-	float s = sin(item->Orientation.y);
-	float c = cos(item->Orientation.y);
+	float sinY = sin(item->Orientation.y);
+	float cosY = cos(item->Orientation.y);
 
-	Vector3Int pos;
-	pos.x = round(item->Pose.Position.x + z * s + x * c);
-	pos.y = round(item->Pose.Position.y - z * sin(item->Orientation.x) + x * sin(item->Orientation.z));
-	pos.z = round(item->Pose.Position.z + z * c - x * s);
+	auto pos = Vector3Int(
+		(int)round(item->Pose.Position.x + z * sinY + x * cosY),
+		(int)round(item->Pose.Position.y - z * sin(item->Orientation.x) + x * sin(item->Orientation.z)),
+		(int)round(item->Pose.Position.z + z * cosY - x * sinY)
+	);
 
 	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 
@@ -45,11 +46,11 @@ void TrainControl(short itemNumber)
 	if (item->ItemFlags[0] == 0)
 		item->ItemFlags[0] = item->ItemFlags[1] = TRAIN_VEL;
 
-	float s = sin(item->Orientation.y);
-	float c = cos(item->Orientation.y);
+	float sinY = sin(item->Orientation.y);
+	float cosY = cos(item->Orientation.y);
 
-	item->Pose.Position.x += item->ItemFlags[1] * s;
-	item->Pose.Position.z += item->ItemFlags[1] * c;
+	item->Pose.Position.x += item->ItemFlags[1] * sinY;
+	item->Pose.Position.z += item->ItemFlags[1] * cosY;
 
 	short roomNumber;
 	long rh = TrainTestHeight(item, 0, SECTOR(5), &roomNumber);
@@ -70,7 +71,7 @@ void TrainControl(short itemNumber)
 
 	item->Orientation.x = -(rh - floorHeight) * 2;
 
-	TriggerDynamicLight(item->Pose.Position.x + SECTOR(3) * s, item->Pose.Position.y, item->Pose.Position.z + SECTOR(3) * c, 16, 31, 31, 31);
+	TriggerDynamicLight(item->Pose.Position.x + SECTOR(3) * sinY, item->Pose.Position.y, item->Pose.Position.z + SECTOR(3) * cosY, 16, 31, 31, 31);
 
 	if (item->ItemFlags[1] != TRAIN_VEL)
 	{
@@ -80,8 +81,8 @@ void TrainControl(short itemNumber)
 
 		if (!UseForcedFixedCamera)
 		{
-			ForcedFixedCamera.x = item->Pose.Position.x + SECTOR(8) * s;
-			ForcedFixedCamera.z = item->Pose.Position.z + SECTOR(8) * c;
+			ForcedFixedCamera.x = item->Pose.Position.x + SECTOR(8) * sinY;
+			ForcedFixedCamera.z = item->Pose.Position.z + SECTOR(8) * cosY;
 
 			ForcedFixedCamera.y = GetCollision(ForcedFixedCamera.x, item->Pose.Position.y - CLICK(2), ForcedFixedCamera.z, item->RoomNumber).Position.Floor;
 

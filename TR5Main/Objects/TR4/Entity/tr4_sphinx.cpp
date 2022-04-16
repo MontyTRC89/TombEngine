@@ -108,7 +108,7 @@ void SphinxControl(short itemNumber)
 	GetCreatureMood(item, &AI, VIOLENT);
 	CreatureMood(item, &AI, VIOLENT);
 
-	short angle = CreatureTurn(item, creature->MaxTurn);
+	float angle = CreatureTurn(item, creature->MaxTurn);
 
 	int dx = abs(item->ItemFlags[2] - (short)item->Pose.Position.x);
 	int dz = abs(item->ItemFlags[3] - (short)item->Pose.Position.z);

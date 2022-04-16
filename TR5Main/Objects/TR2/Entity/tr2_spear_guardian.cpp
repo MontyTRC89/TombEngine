@@ -71,10 +71,10 @@ void SpearGuardianControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short head = 0;
-	short neck = 0;
-	short tilt = 0;
+	float angle = 0;
+	float head = 0;
+	float neck = 0;
+	float tilt = 0;
 
 	bool laraAlive = LaraItem->HitPoints > 0;
 

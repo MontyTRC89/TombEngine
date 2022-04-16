@@ -25,7 +25,7 @@ enum ShotgunWorkerAnim
 
 };
 
-static void ShotLaraWithShotgun(ITEM_INFO* item, AI_INFO* info, BITE_INFO* bite, short angleY, int damage)
+static void ShotLaraWithShotgun(ITEM_INFO* item, AI_INFO* info, BITE_INFO* bite, float angleY, int damage)
 {
 	ShotLara(item, info, bite, angleY, damage);
 	ShotLara(item, info, bite, angleY, damage);
@@ -35,12 +35,12 @@ static void ShotLaraWithShotgun(ITEM_INFO* item, AI_INFO* info, BITE_INFO* bite,
 	ShotLara(item, info, bite, angleY, damage);
 }
 
-void InitialiseWorkerShotgun(short itemNum)
+void InitialiseWorkerShotgun(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 	item->Animation.FrameNumber = anim->frameBase;
@@ -55,12 +55,12 @@ void WorkerShotgunControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short angle = 0;
-	short headX = 0;
-	short headY = 0;
-	short torsoX = 0;
-	short torsoY = 0;
-	short tilt = 0;
+	float angle = 0;
+	float headX = 0;
+	float headY = 0;
+	float torsoX = 0;
+	float torsoY = 0;
+	float tilt = 0;
 
 	if (item->HitPoints <= 0)
 	{

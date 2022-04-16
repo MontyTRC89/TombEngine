@@ -50,11 +50,11 @@ void KnightTemplarControl(short itemNumber)
 		}
 	}
 
-	short tilt = 0;
-	short angle = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
+	float tilt = 0;
+	float angle = 0;
+	float joint0 = 0;
+	float joint1 = 0;
+	float joint2 = 0;
 
 	// Knight is immortal.
 	if (item->HitPoints < object->HitPoints)
@@ -68,7 +68,7 @@ void KnightTemplarControl(short itemNumber)
 	AI_INFO AI;
 	CreatureAIInfo(item, &AI);
 
-	int a = 0;
+	float a = 0;
 	if (creature->Enemy != LaraItem)
 		a = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
 

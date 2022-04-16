@@ -223,9 +223,9 @@ void BaboonControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short headY = 0;
-	short tilt = 0;
-	short angle = 0;
+	float headY = 0;
+	float tilt = 0;
+	float angle = 0;
 
 	if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
 	{
