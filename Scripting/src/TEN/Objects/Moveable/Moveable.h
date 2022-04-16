@@ -82,6 +82,7 @@ public:
 
 	void Init();
 
+	friend bool operator==(Moveable const&, Moveable const&);
 private:
 	ITEM_INFO* m_item;
 	short m_num;
