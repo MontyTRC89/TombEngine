@@ -333,3 +333,5 @@ struct BOUNDING_BOX
 	short Z1;
 	short Z2;
 };
+
+BOUNDING_BOX operator+(BOUNDING_BOX const& box, PHD_3DPOS const& vec);
