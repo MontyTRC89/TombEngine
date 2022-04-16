@@ -364,7 +364,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 			break;
 		}
 
-		angle = mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, minecart->TurnX, minecart->TurnZ) & 0x3fff;
+		angle = EulerAngle::RadToShrt(mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, minecart->TurnX, minecart->TurnZ)) & 0x3fff;
 
 		if (rotation < 4)
 		{

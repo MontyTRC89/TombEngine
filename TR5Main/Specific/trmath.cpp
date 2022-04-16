@@ -41,9 +41,9 @@ const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleD
 	return result;
 }
 
-int mGetAngle(int x1, int y1, int x2, int y2)
+float mGetAngle(int x1, int y1, int x2, int y2)
 {
-	return (65536 - (short)atan2(x2 - x1, y2 - y1)) % 65536;
+	return atan2(x2 - x1, y2 - y1);
 }
 
 void phd_GetVectorAngles(int x, int y, int z, float* angles)

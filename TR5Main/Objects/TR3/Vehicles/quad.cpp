@@ -198,7 +198,7 @@ static void QuadbikeExplode(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 static int CanQuadbikeGetOff(int direction)
 {
 	auto* item = &g_Level.Items[Lara.Vehicle];
-	short angle;
+	float angle;
 
 	if (direction < 0)
 		angle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
@@ -311,12 +311,12 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo
 		return false;
 	else
 	{
-		short angle = atan2(quadItem->Pose.Position.z - laraItem->Pose.Position.z, quadItem->Pose.Position.x - laraItem->Pose.Position.x);
-		angle -= quadItem->Orientation.y;
+		float angle = atan2(quadItem->Pose.Position.z - laraItem->Pose.Position.z, quadItem->Pose.Position.x - laraItem->Pose.Position.x);
+		angle = EulerAngle::Clamp(angle - quadItem->Orientation.y);
 
 		if ((angle > EulerAngle::DegToRad(-45.0f)) && (angle < EulerAngle::DegToRad(135.0f)))
 		{
-			short tempAngle = laraItem->Orientation.y - quadItem->Orientation.y;
+			float tempAngle = EulerAngle::Clamp(laraItem->Orientation.y - quadItem->Orientation.y);
 			if (tempAngle > EulerAngle::DegToRad(45.0f) && tempAngle < EulerAngle::DegToRad(135.0f))
 				return true;
 			else
@@ -324,7 +324,7 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo
 		}
 		else
 		{
-			short tempAngle = laraItem->Orientation.y - quadItem->Orientation.y;
+			float tempAngle = EulerAngle::Clamp(laraItem->Orientation.y - quadItem->Orientation.y);
 			if (tempAngle > EulerAngle::DegToRad(225.0f) && tempAngle < EulerAngle::DegToRad(315.0f))
 				return true;
 			else
@@ -627,11 +627,11 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 
 		quadItem->Orientation.y += quad->TurnRate + quad->ExtraRotation;
 
-		short momentum = MIN_MOMENTUM_TURN - (((((MIN_MOMENTUM_TURN - MAX_MOMENTUM_TURN) * 256) / MAX_VELOCITY) * quad->Velocity) / 256);
+		float momentum = MIN_MOMENTUM_TURN - (((((MIN_MOMENTUM_TURN - MAX_MOMENTUM_TURN) * 256) / MAX_VELOCITY) * quad->Velocity) / 256);
 		if (!(TrInput & QUAD_IN_ACCELERATE) && quad->Velocity > 0)
 			momentum += momentum / 4;
 
-		short rot = quadItem->Orientation.y - quad->MomentumAngle;
+		float rot = quadItem->Orientation.y - quad->MomentumAngle;
 		if (rot < -MAX_MOMENTUM_TURN)
 		{
 			if (rot < -QUAD_MAX_MOM_TURN)
@@ -693,8 +693,8 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 	if (!(quadItem->Flags & ONESHOT))
 		QuadEntityCollision(laraItem, quadItem);
 
-	short rot = 0;
-	short rotAdd = 0;
+	float rot = 0;
+	float rotAdd = 0;
 
 	Vector3Int fl;
 	int heightFrontLeft = TestQuadHeight(quadItem, QUAD_FRONT, -QUAD_SIDE, &fl);
@@ -1195,7 +1195,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 
 		lara->Control.HandStatus = HandStatus::Busy;
 
-		short angle = atan2(quadItem->Pose.Position.z - laraItem->Pose.Position.z, quadItem->Pose.Position.x - laraItem->Pose.Position.x);
+		float angle = atan2(quadItem->Pose.Position.z - laraItem->Pose.Position.z, quadItem->Pose.Position.x - laraItem->Pose.Position.x);
 		angle -= quadItem->Orientation.y;
 
 		if (angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
@@ -1210,9 +1210,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 		}
 
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		laraItem->Pose.Position.x = quadItem->Pose.Position.x;
-		laraItem->Pose.Position.y = quadItem->Pose.Position.y;
-		laraItem->Pose.Position.z = quadItem->Pose.Position.z;
+		laraItem->Pose.Position = quadItem->Pose.Position;
 		laraItem->Orientation.y = quadItem->Orientation.y;
 		ResetLaraFlex(laraItem);
 		lara->HitDirection = -1;
@@ -1226,7 +1224,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 		ObjectCollision(itemNumber, laraItem, coll);
 }
 
-static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
+static void TriggerQuadExhaustSmoke(int x, int y, int z, float angle, int speed, int moving)
 {
 	auto* spark = &Sparks[GetFreeSpark()];
 
@@ -1356,7 +1354,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 
 	quadItem->Floor = probe.Position.Floor;
 
-	short rotAdd = quad->Velocity / 4;
+	float rotAdd = quad->Velocity / 4;
 	quad->RearRot -= rotAdd;
 	quad->RearRot -= (quad->Revs / 8);
 	quad->FrontRot -= rotAdd;
@@ -1366,8 +1364,8 @@ bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	quadItem->Animation.VerticalVelocity = DoQuadDynamics(probe.Position.Floor, quadItem->Animation.VerticalVelocity, (int*)&quadItem->Pose.Position.y);
 
 	probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
-	short xRot = atan2(QUAD_FRONT, quadItem->Pose.Position.y - probe.Position.Floor);
-	short zRot = atan2(QUAD_SIDE, probe.Position.Floor - frontLeft.y);
+	float xRot = atan2(QUAD_FRONT, quadItem->Pose.Position.y - probe.Position.Floor);
+	float zRot = atan2(QUAD_SIDE, probe.Position.Floor - frontLeft.y);
 
 	quadItem->Orientation.x += ((xRot - quadItem->Orientation.x) / 2);
 	quadItem->Orientation.z += ((zRot - quadItem->Orientation.z) / 2);
@@ -1411,7 +1409,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		Vector3Int pos;
 		int speed = 0;
-		short angle = 0;
+		float angle = 0;
 
 		for (int i = 0; i < 2; i++)
 		{

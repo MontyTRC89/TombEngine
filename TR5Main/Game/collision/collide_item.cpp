@@ -34,7 +34,7 @@ void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* laraItem, CollisionI
 			int collidedBits = TestCollision(item, laraItem);
 			if (collidedBits)
 			{
-				short oldRot = item->Orientation.y;
+				float oldRot = item->Orientation.y;
 
 				item->Orientation.y = 0;
 				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -121,10 +121,10 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 				if (collidingItem->Pose.Position.y > mesh->pos.Position.y + staticMesh->collisionBox.Y2)
 					continue;
 
-				float s = sin(mesh->pos.Orientation.y);
-				float c = cos(mesh->pos.Orientation.y);
-				float rx = (collidingItem->Pose.Position.x - mesh->pos.Position.x) * c - s * (collidingItem->Pose.Position.z - mesh->pos.Position.z);
-				float rz = (collidingItem->Pose.Position.z - mesh->pos.Position.z) * c + s * (collidingItem->Pose.Position.x - mesh->pos.Position.x);
+				float sinY = sin(mesh->pos.Orientation.y);
+				float cosY = cos(mesh->pos.Orientation.y);
+				float rx = (collidingItem->Pose.Position.x - mesh->pos.Position.x) * cosY - sinY * (collidingItem->Pose.Position.z - mesh->pos.Position.z);
+				float rz = (collidingItem->Pose.Position.z - mesh->pos.Position.z) * cosY + sinY * (collidingItem->Pose.Position.x - mesh->pos.Position.x);
 
 				if (radius + rx + CLICK(0.5f) < staticMesh->collisionBox.X1 || rx - radius - CLICK(0.5f) > staticMesh->collisionBox.X2)
 					continue;
@@ -191,11 +191,11 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 						collidingItem->Pose.Position.y + radius + CLICK(0.5f) >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
 						collidingItem->Pose.Position.y - radius - CLICK(0.5f) <= item->Pose.Position.y + framePtr->boundingBox.Y2)
 					{
-						float s = sin(item->Orientation.y);
-						float c = cos(item->Orientation.y);
+						float sinY = sin(item->Orientation.y);
+						float cosY = cos(item->Orientation.y);
 
-						int rx = dx * c - s * dz;
-						int rz = dz * c + s * dx;
+						int rx = dx * cosY - sinY * dz;
+						int rz = dz * cosY + sinY * dx;
 
 						if (item->ObjectNumber == ID_TURN_SWITCH)
 						{
@@ -238,14 +238,14 @@ bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* laraItem, Collisi
 	if (item->Pose.Position.y + GlobalCollisionBounds.Y1 >= framePtr->boundingBox.Y2)
 		return false;
 
-	float s = sin(item->Orientation.y);
-	float c = cos(item->Orientation.y);
+	float sinY = sin(item->Orientation.y);
+	float cosY = cos(item->Orientation.y);
 
 	int dx = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int dz = laraItem->Pose.Position.z - item->Pose.Position.z;
 
-	int x = c * dx - s * dz;
-	int z = c * dz + s * dx;
+	int x = cosY * dx - sinY * dz;
+	int z = cosY * dz + sinY * dx;
 
 	if (x < GlobalCollisionBounds.X1 - coll->Setup.Radius ||
 		x > GlobalCollisionBounds.X2 + coll->Setup.Radius ||
@@ -499,7 +499,7 @@ bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius)
 	return false;
 }
 
-bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angleAdd)
+bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, float angleAdd)
 {
 	auto differenceVector = (dest->Position - src->Position);
 	float distance = Vector3::Distance(dest->Position.ToVector3(), src->Position.ToVector3());
@@ -513,7 +513,7 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angle
 	{
 		if (Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
-			int angle = mGetAngle(dest->Position.x, dest->Position.z, src->Position.x, src->Position.z);
+			float angle = mGetAngle(dest->Position.x, dest->Position.z, src->Position.x, src->Position.z);
 			int direction = (GetQuadrant(angle) - GetQuadrant(dest->Orientation.y)) & 3;
 
 			switch (direction)
@@ -545,7 +545,7 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angle
 		Lara.Control.Count.PositionAdjust = 0;
 	}
 
-	short deltaAngle = dest->Orientation.x - src->Orientation.x;
+	float deltaAngle = dest->Orientation.x - src->Orientation.x;
 	if (deltaAngle > angleAdd)
 		src->Orientation.x += angleAdd;
 	else if (deltaAngle < -angleAdd)
@@ -588,12 +588,12 @@ bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius)
 	if (item->Pose.Position.y + bounds->Y1 >= laraItem->Pose.Position.y + laraBounds->Y2)
 		return false;
 
-	auto c = cos(item->Orientation.y);
-	auto s = sin(item->Orientation.y);
+	float sinY = sin(item->Orientation.y);
+	float cosY = cos(item->Orientation.y);
 	int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
-	int dx = c * x - s * z;
-	int dz = c * z + s * x;
+	int dx = cosY * x - sinY * z;
+	int dz = cosY * z + sinY * x;
 
 	if (dx >= bounds->X1 - radius &&
 		dx <= radius + bounds->X2 &&
@@ -620,15 +620,12 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 	if (mesh->pos.Position.y + bounds.Y1 >= item->Pose.Position.y + frame->boundingBox.Y2)
 		return false;
 
-	float c, s;
-	int x, z, dx, dz;
-
-	c = cos(mesh->pos.Orientation.y);
-	s = sin(mesh->pos.Orientation.y);
-	x = item->Pose.Position.x - mesh->pos.Position.x;
-	z = item->Pose.Position.z - mesh->pos.Position.z;
-	dx = c * x - s * z;
-	dz = c * z + s * x;
+	float cosY = cos(mesh->pos.Orientation.y);
+	float sinY = sin(mesh->pos.Orientation.y);
+	int x = item->Pose.Position.x - mesh->pos.Position.x;
+	int z = item->Pose.Position.z - mesh->pos.Position.z;
+	int dx = cosY * x - sinY * z;
+	int dz = cosY * z + sinY * x;
 
 	if (dx <= radius + bounds.X2 &&
 		dx >= bounds.X1 - radius &&
@@ -644,16 +641,16 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush) // previously ItemPushLara
 {
 	// Get item's rotation
-	auto s = sin(item->Orientation.y);
-	auto c = cos(item->Orientation.y);
+	float sinY = sin(item->Orientation.y);
+	float cosY = cos(item->Orientation.y);
 
 	// Get vector from item to Lara
 	int dx = item2->Pose.Position.x - item->Pose.Position.x;
 	int dz = item2->Pose.Position.z - item->Pose.Position.z;
 
 	// Rotate Lara vector into item frame
-	int rx = c * dx - s * dz;
-	int rz = c * dz + s * dx;
+	int rx = cosY * dx - sinY * dz;
+	int rz = cosY * dz + sinY * dx;
 
 	BOUNDING_BOX* bounds;
 	if (bigPush & 2)
@@ -696,8 +693,8 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 	else
 		rz -= bottom;
 
-	item2->Pose.Position.x = item->Pose.Position.x + c * rx + s * rz;
-	item2->Pose.Position.z = item->Pose.Position.z + c * rz - s * rx;
+	item2->Pose.Position.x = item->Pose.Position.x + cosY * rx + sinY * rz;
+	item2->Pose.Position.z = item->Pose.Position.z + cosY * rz - sinY * rx;
 
 	auto* lara = item2->Data.is<LaraInfo*>() ? (LaraInfo*&)item2->Data : nullptr;
 
@@ -706,8 +703,8 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 		rx = (bounds->X1 + bounds->X2) / 2;
 		rz = (bounds->Z1 + bounds->Z2) / 2;
 
-		dx -= c * rx + s * rz;
-		dz -= c * rz - s * rx;
+		dx -= cosY * rx + sinY * rz;
+		dz -= cosY * rz - sinY * rx;
 
 		lara->HitDirection = (item2->Orientation.y - atan2(dz, dz) - EulerAngle::DegToRad(135.0f)) / 16384;
 
@@ -730,7 +727,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.UpperCeilingBound = MAX_HEIGHT;
 
-	auto facing = coll->Setup.ForwardAngle;
+	float facing = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = atan2(item2->Pose.Position.z - coll->Setup.OldPosition.z, item2->Pose.Position.x - coll->Setup.OldPosition.x);
 
 	GetCollisionInfo(coll, item2);
@@ -739,9 +736,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition.x = item2->Pose.Position.x;
-		coll->Setup.OldPosition.y = item2->Pose.Position.y;
-		coll->Setup.OldPosition.z = item2->Pose.Position.z;
+		coll->Setup.OldPosition = item2->Pose.Position;
 
 		// Commented because causes Lara to jump out of the water if she touches an object on the surface. re: "kayak bug"
 		// UpdateItemRoom(item2, -10);
@@ -765,13 +760,13 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // pr
 {
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
-	auto c = cos(mesh->pos.Orientation.y);
-	auto s = sin(mesh->pos.Orientation.y);
+	float cosY = cos(mesh->pos.Orientation.y);
+	float sinY = sin(mesh->pos.Orientation.y);
 	
 	auto dx = item->Pose.Position.x - mesh->pos.Position.x;
 	auto dz = item->Pose.Position.z - mesh->pos.Position.z;
-	auto rx = c * dx - s * dz;
-	auto rz = c * dz + s * dx;
+	auto rx = cosY * dx - sinY * dz;
+	auto rz = cosY * dz + sinY * dx;
 	auto minX = bounds.X1 - coll->Setup.Radius;
 	auto maxX = bounds.X2 + coll->Setup.Radius;
 	auto minZ = bounds.Z1 - coll->Setup.Radius;
@@ -796,8 +791,8 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // pr
 	else
 		rz -= bottom;
 
-	item->Pose.Position.x = mesh->pos.Position.x + c * rx + s * rz;
-	item->Pose.Position.z = mesh->pos.Position.z + c * rz - s * rx;
+	item->Pose.Position.x = mesh->pos.Position.x + cosY * rx + sinY * rz;
+	item->Pose.Position.z = mesh->pos.Position.z + cosY * rz - sinY * rx;
 
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -812,9 +807,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // pr
 
 	if (coll->CollisionType == CT_NONE)
 	{
-		coll->Setup.OldPosition.x = item->Pose.Position.x;
-		coll->Setup.OldPosition.y = item->Pose.Position.y;
-		coll->Setup.OldPosition.z = item->Pose.Position.z;
+		coll->Setup.OldPosition = item->Pose.Position;
 
 		UpdateItemRoom(item, -10);
 	}

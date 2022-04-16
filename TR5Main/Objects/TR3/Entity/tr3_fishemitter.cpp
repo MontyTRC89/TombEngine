@@ -109,7 +109,7 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].Angle = fish->Angle = EulerAngle::ShrtToRad(((-(mGetAngle(fish->Offset.x + item->Pose.Position.x, fish->Offset.z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095); // TODO
+		LeaderInfo[leader].Angle = fish->Angle = EulerAngle::ShrtToRad(((-(EulerAngle::RadToShrt(mGetAngle(fish->Offset.x + item->Pose.Position.x, fish->Offset.z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z)) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095); // TODO
 		LeaderInfo[leader].Velocity = (GetRandomControl() & 63) + 192;
 	}
 
@@ -295,7 +295,7 @@ void ControlFish(short itemNumber)
 			}
 		}
 
-		angle = EulerAngle::ShrtToRad(((-(mGetAngle(fish->Offset.x, fish->Offset.z, ftx, ftz) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095);
+		angle = EulerAngle::ShrtToRad(((-(EulerAngle::RadToShrt(mGetAngle(fish->Offset.x, fish->Offset.z, ftx, ftz)) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095);
 		int dx = fish->Offset.x - ftx + ((24 - i) * CLICK(0.5f));
 		int dz = fish->Offset.z - ftz - ((24 - i) * CLICK(0.5f));
 

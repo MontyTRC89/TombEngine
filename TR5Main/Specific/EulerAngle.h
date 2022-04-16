@@ -88,17 +88,17 @@ inline void EulerAngle::Set(float xRadians, float yRadians, float zRadians)
 	this->Set(EulerAngle(xRadians, yRadians, zRadians));
 }
 
-inline void EulerAngle::SetX(float radians = 0)
+inline void EulerAngle::SetX(float radians = 0.0f)
 {
 	this->x = Clamp(radians);
 }
 
-inline void EulerAngle::SetY(float radians = 0)
+inline void EulerAngle::SetY(float radians = 0.0f)
 {
 	this->y = Clamp(radians);
 }
 
-inline void EulerAngle::SetZ(float radians = 0)
+inline void EulerAngle::SetZ(float radians = 0.0f)
 {
 	this->z = Clamp(radians);
 }
@@ -129,12 +129,12 @@ inline float EulerAngle::Clamp(float radians)
 		fmod(radians - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float threshold = 0)
+inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float threshold = 0.0f)
 {
 	*this = Interpolate(*this, orientTo, rate, threshold);
 }
 
-inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float threshold = 0)
+inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float threshold = 0.0f)
 {
 	return EulerAngle(
 		Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, threshold),
@@ -143,7 +143,7 @@ inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orie
 	);
 }
 
-inline float EulerAngle::Interpolate(float radiansFrom, float radiansTo, float rate = 1.0f, float threshold = 0)
+inline float EulerAngle::Interpolate(float radiansFrom, float radiansTo, float rate = 1.0f, float threshold = 0.0f)
 {
 	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
 	
