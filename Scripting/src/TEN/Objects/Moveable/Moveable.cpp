@@ -58,6 +58,10 @@ Moveable::~Moveable()
 	}
 }
 
+bool operator==(Moveable const& first, Moveable const& second)
+{
+	return first.m_item == second.m_item;
+}
 
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
@@ -139,6 +143,7 @@ void Moveable::Register(sol::table & parent)
 		ScriptReserved_newTemporary, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 /// Enable the item
 // @function Moveable:EnableItem
