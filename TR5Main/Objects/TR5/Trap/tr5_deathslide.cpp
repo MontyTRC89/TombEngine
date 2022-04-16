@@ -106,11 +106,11 @@ void ControlDeathSlide(short itemNumber)
 		if (zipLineItem->Animation.VerticalVelocity < 100)
 			zipLineItem->Animation.VerticalVelocity += 5;
 
-		float c = cos(zipLineItem->Orientation.y);
-		float s = sin(zipLineItem->Orientation.y);
+		float sinY = sin(zipLineItem->Orientation.y);
+		float cosY = cos(zipLineItem->Orientation.y);
 
-		zipLineItem->Pose.Position.z += zipLineItem->Animation.VerticalVelocity * c;
-		zipLineItem->Pose.Position.x += zipLineItem->Animation.VerticalVelocity * s;
+		zipLineItem->Pose.Position.z += zipLineItem->Animation.VerticalVelocity * cosY;
+		zipLineItem->Pose.Position.x += zipLineItem->Animation.VerticalVelocity * sinY;
 		zipLineItem->Pose.Position.y += zipLineItem->Animation.VerticalVelocity / 4;
 
 		short roomNumber = zipLineItem->RoomNumber;
@@ -125,9 +125,9 @@ void ControlDeathSlide(short itemNumber)
 			LaraItem->Pose.Position.z = zipLineItem->Pose.Position.z;
 		}
 
-		int x = zipLineItem->Pose.Position.x + 1024 * s;
+		int x = zipLineItem->Pose.Position.x + 1024 * sinY;
 		int y = zipLineItem->Pose.Position.y + 64;
-		int z = zipLineItem->Pose.Position.z + 1024 * c;
+		int z = zipLineItem->Pose.Position.z + 1024 * cosY;
 
 		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
 

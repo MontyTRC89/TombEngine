@@ -33,7 +33,7 @@ void PulseLightControl(short itemNumber)
 	}
 }
 
-void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, short room, int falloff)
+void TriggerAlertLight(int x, int y, int z, int r, int g, int b, float angle, short room, int falloff)
 {
 	GameVector start;
 	start.x = x;
@@ -43,9 +43,9 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, int angle, shor
 	start.roomNumber = room;
 
 	GameVector end;
-	end.x = x + 16384 * sin(16 * angle);
+	end.x = x + SECTOR(16) * sin(angle * 16);
 	end.y = y;
-	end.z = z + 16384 * cos(16 * angle);
+	end.z = z + SECTOR(16) * cos(angle * 16);
 
 	if (!LOS(&start, &end))
 		TriggerDynamicLight(end.x, end.y, end.z, falloff, r, g, b);
@@ -189,7 +189,7 @@ void BlinkingLightControl(short itemNumber)
 			item->MeshBits = 1;
 		else
 		{
-			Vector3Int pos = { 0, 0, 0 };
+			auto pos = Vector3Int();
 			GetJointAbsPosition(item, &pos, 0);
 
 			TriggerDynamicLight(

@@ -8,7 +8,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 
-static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int speed)
+static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, float rot, int speed)
 {
 	int x, y, z;
 
@@ -24,7 +24,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 	else
 	{
 		y = (bounds->Y1 + bounds->Y2) / 2;
-		if (rot & 0x7FFF)
+		if (EulerAngle::RadToShrt(rot) & 0x7FFF) // TODO
 		{
 			if (intensity >= 0)
 				z = bounds->Z2;
@@ -64,7 +64,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 				if (abs(intensity) == 1)
 				{
 					int factor = 3 * (bounds->X2 - bounds->X1) / 8;
-					short angle = 2 * GetRandomControl();
+					float angle = 2 * GetRandomControl();
 
 					spark->x = ((bounds->X1 + bounds->X2) / 2) + (GetRandomControl() % factor) * sin(angle);
 					spark->z = ((bounds->Z1 + bounds->Z2) / 2) + (GetRandomControl() % factor) * cos(angle);
@@ -85,7 +85,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 
 					spark->y = (bounds->Y1 + bounds->Y2) / 2;
 
-					if (rot & 0x7FFF)
+					if (EulerAngle::RadToShrt(rot) & 0x7FFF)
 					{
 						if (intensity >= 0)
 							spark->z = bounds->Z2;

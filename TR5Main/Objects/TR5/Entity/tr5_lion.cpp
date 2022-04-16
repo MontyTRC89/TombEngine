@@ -31,10 +31,10 @@ void LionControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	short angle = 0;
-	short tilt = 0;
-	short joint0 = 0;
-	short joint1 = 0;
+	float angle = 0;
+	float tilt = 0;
+	float joint0 = 0;
+	float joint1 = 0;
 
 	if (CreatureActive(itemNumber))
 	{

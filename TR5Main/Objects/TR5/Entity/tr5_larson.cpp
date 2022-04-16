@@ -28,11 +28,11 @@ BITE_INFO LarsonGun = { -55, 200, 5, 14 };
 BITE_INFO PierreGun1 = { 60, 200, 0, 11 };
 BITE_INFO PierreGun2 = { -57, 200, 0, 14 };
 
-void InitialiseLarson(short itemNum)
+void InitialiseLarson(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -43,24 +43,16 @@ void InitialiseLarson(short itemNum)
 		return;
 
 	item->ItemFlags[3] = item->TriggerFlags;
-	short rotY = item->Orientation.y;
+	float rotY = item->Orientation.y;
 
-	if (rotY > EulerAngle::DegToRad(22.5f) && rotY < 28672)
-	{
+	if (rotY > EulerAngle::DegToRad(22.5f) && rotY < EulerAngle::DegToRad(157.5f))
 		item->Pose.Position.x += STEPUP_HEIGHT;
-	}
-	else if (rotY < EulerAngle::DegToRad(-22.5f) && rotY > -28672)
-	{
+	else if (rotY < EulerAngle::DegToRad(-22.5f) && rotY > EulerAngle::DegToRad(-157.5f))
 		item->Pose.Position.x -= STEPUP_HEIGHT;
-	}
-	else if (rotY < -20480 || rotY > 20480)
-	{
+	else if (rotY < EulerAngle::DegToRad(-112.5f) || rotY > EulerAngle::DegToRad(112.5f))
 		item->Pose.Position.z -= STEPUP_HEIGHT;
-	}
-	else if (rotY > -8192 || rotY < 8192)
-	{
+	else if (rotY > EulerAngle::DegToRad(-45.0f) || rotY < EulerAngle::DegToRad(45.0f))
 		item->Pose.Position.z += STEPUP_HEIGHT;
-	}
 }
 
 void LarsonControl(short itemNumber)
@@ -68,11 +60,11 @@ void LarsonControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 	
-	short tilt = 0;
-	short angle = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
+	float tilt = 0;
+	float angle = 0;
+	float joint0 = 0;
+	float joint1 = 0;
+	float joint2 = 0;
 	
 	auto* item = &g_Level.Items[itemNumber];
 	CreatureInfo* creature = (CreatureInfo*)item->Data;

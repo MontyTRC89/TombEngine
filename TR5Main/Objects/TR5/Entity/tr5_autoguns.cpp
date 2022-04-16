@@ -72,7 +72,7 @@ void AutoGunsControl(short itemNumber)
 
 			float angles[2];
 
-			int los = LOS(&pos1, &pos2);
+			bool los = LOS(&pos1, &pos2);
 
 			// FIXME:
 			if (los)
@@ -86,10 +86,11 @@ void AutoGunsControl(short itemNumber)
 				angles[1] = item->ItemFlags[1];
 			}
 
-			short angle1, angle2;
+			float angle1, angle2;
 
-			InterpolateAngle(angles[0], item->ItemFlags, &angle1, 4);
-			InterpolateAngle(angles[1], &item->ItemFlags[1], &angle2, 4);
+			// TODO: Short to float
+			//InterpolateAngle(angles[0], item->ItemFlags, &angle1, 4);
+			//InterpolateAngle(angles[1], &item->ItemFlags[1], &angle2, 4);
 
 			data[0] = item->ItemFlags[0];
 			data[1] = item->ItemFlags[1];

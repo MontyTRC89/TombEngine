@@ -73,7 +73,7 @@ namespace TEN::Entities::TR4
 		int x;
 		int z;
 
-		short angle = item->TriggerFlags & 7;
+		auto angle = item->TriggerFlags & 7; // TODO: Short to float conversion.
 
 		if (item->TriggerFlags & 8)
 		{

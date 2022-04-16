@@ -298,9 +298,9 @@ void RaptorControl(short itemNumber)
 			{
 				if (!(creature->Flags & 1) && creature->Enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512)
+					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
+						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
 					{
 						creature->Enemy->HitPoints -= 25;
 						creature->Enemy->HitStatus = 1;

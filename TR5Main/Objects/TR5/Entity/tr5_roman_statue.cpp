@@ -179,7 +179,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 	spark->flags = SP_NONE;
 }
 
-static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
+static void TriggerRomanStatueAttackEffect1(short itemNumber, int factor)
 {
 	auto* spark = &Sparks[GetFreeSpark()];
 
@@ -210,7 +210,7 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->friction = 4;
 	spark->zVel = (byte)GetRandomControl() - 128;
 	spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_DEF | SP_SCALE; // 4762;
-	spark->fxObj = itemNum;
+	spark->fxObj = itemNumber;
 	spark->nodeNumber = 6;
 	spark->rotAng = GetRandomControl() & 0xFFF;
 	spark->rotAdd = (GetRandomControl() & 0x3F) - 32;
@@ -300,10 +300,10 @@ void RomanStatueControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	short angle = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
+	float angle = 0;
+	float joint0 = 0;
+	float joint1 = 0;
+	float joint2 = 0;
 	
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);

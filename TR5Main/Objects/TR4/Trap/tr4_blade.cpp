@@ -21,23 +21,15 @@ namespace TEN::Entities::TR4
 		{
 			if (TestBoundsCollide(bladeItem, laraItem, coll->Setup.Radius))
 			{
-				int oldX = laraItem->Pose.Position.x;
-				int oldY = laraItem->Pose.Position.y;
-				int oldZ = laraItem->Pose.Position.z;
-
-				int dx = 0;
-				int dy = 0;
-				int dz = 0;
+				auto oldPos = laraItem->Pose.Position;
 
 				if (ItemPushItem(bladeItem, laraItem, coll, 1, 1))
 				{
 					laraItem->HitPoints -= bladeItem->ItemFlags[3];
 
-					dx = oldX - laraItem->Pose.Position.x;
-					dy = oldY - laraItem->Pose.Position.y;
-					dz = oldZ - laraItem->Pose.Position.z;
-
-					if ((dx || dy || dz) && TriggerActive(bladeItem))
+					auto dPos = oldPos - laraItem->Pose.Position;
+ 
+					if ((dPos.x || dPos.y || dPos.z) && TriggerActive(bladeItem))
 					{
 						DoBloodSplat(
 							(GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
@@ -50,11 +42,7 @@ namespace TEN::Entities::TR4
 					}
 
 					if (!coll->Setup.EnableObjectPush)
-					{
-						laraItem->Pose.Position.x += dx;
-						laraItem->Pose.Position.y += dy;
-						laraItem->Pose.Position.z += dz;
-					}
+						laraItem->Pose.Position += dPos;
 				}
 			}
 		}

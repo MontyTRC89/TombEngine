@@ -66,7 +66,7 @@ void InitialiseLara(int restore)
 	LaraItem->HitPoints = LARA_HEALTH_MAX;
 	Lara.Control.HandStatus = HandStatus::Free;
 
-	LaraWeaponType weapon = LaraWeaponType::None;
+	auto weapon = LaraWeaponType::None;
 
 	if (Objects[ID_HK_ITEM].loaded)
 		weapon = LaraWeaponType::HK;
@@ -152,8 +152,8 @@ void InitialiseLaraAnims(ITEM_INFO* item)
 	}
 }
 
-void InitialiseLaraLoad(short itemNum)
+void InitialiseLaraLoad(short itemNumber)
 {
-	Lara.ItemNumber = itemNum;
-	LaraItem = &g_Level.Items[itemNum];
+	Lara.ItemNumber = itemNumber;
+	LaraItem = &g_Level.Items[itemNumber];
 }

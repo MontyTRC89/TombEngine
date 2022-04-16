@@ -9,7 +9,7 @@ void PushableBlockControl(short itemNumber);
 void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 bool TestBlockMovable(ITEM_INFO* item, int blockHeight);
 bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant);
-bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant);
+bool TestBlockPull(ITEM_INFO* item, int blockHeight, int quadrant);
 void MoveStackXZ(short itemNumber);
 void MoveStackY(short itemNumber, int y);
 void RemoveBridgeStack(short itemNumber);

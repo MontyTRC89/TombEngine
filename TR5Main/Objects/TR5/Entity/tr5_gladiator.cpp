@@ -50,11 +50,11 @@ void ControlGladiator(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 
-	short tilt = 0;
-	short angle = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
+	float tilt = 0;
+	float angle = 0;
+	float joint0 = 0;
+	float joint1 = 0;
+	float joint2 = 0;
 
 	if (item->HitPoints <= 0)
 	{
@@ -77,7 +77,7 @@ void ControlGladiator(short itemNumber)
 		CreatureAIInfo(item, &AI);
 
 		int unknown = true;
-		short rot;
+		float rot;
 		int distance;
 
 		if (creature->Enemy == LaraItem)

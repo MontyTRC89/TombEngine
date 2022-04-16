@@ -35,10 +35,10 @@ void Tr5DogControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	short angle = 0;
-	short joint2 = 0;
-	short joint1 = 0;
-	short joint0 = 0;
+	float angle = 0;
+	float joint2 = 0;
+	float joint1 = 0;
+	float joint0 = 0;
 
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);

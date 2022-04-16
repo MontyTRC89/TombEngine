@@ -79,16 +79,12 @@ namespace TEN::Entities::TR4
 							GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->Pose.Position.y;
 							GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->Pose.Position.z;
 
-							int oldX = LaraItem->Pose.Position.x;
-							int oldY = LaraItem->Pose.Position.y;
-							int oldZ = LaraItem->Pose.Position.z;
+							auto oldPos = LaraItem->Pose.Position;
 
 							if (ItemPushItem(item, laraItem, coll, flags & 1, 2))
 							{
 								if ((flags & 1) &&
-									(oldX != LaraItem->Pose.Position.x ||
-									oldY != LaraItem->Pose.Position.y ||
-									oldZ != LaraItem->Pose.Position.z) &&
+									oldPos != LaraItem->Pose.Position &&
 									TriggerActive(item))
 								{
 									DoBloodSplat((GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
@@ -107,7 +103,8 @@ namespace TEN::Entities::TR4
 						j++;
 						flags /= 2;
 
-					} while (result);
+					}
+					while (result);
 				}
 			}
 		}

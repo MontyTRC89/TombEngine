@@ -27,8 +27,8 @@ struct LaserHeadStruct
 	bool LOS[2];
 	byte byte1;
 	byte byte2;
-	short xRot;
-	short yRot;
+	float xRot;
+	float yRot;
 };
 
 LaserHeadStruct LaserHeadData;
@@ -154,7 +154,7 @@ void InitialiseLaserHead(short itemNumber)
 		}
 	}
 
-	short rotation = 0;
+	float rotation = 0;
 	for (int j = 0; j < 8; j++)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
@@ -323,8 +323,8 @@ void LaserHeadControl(short itemNumber)
 
 					if (item->ItemFlags[3]-- <= 0 || condition)
 					{
-						short xRot = (GetRandomControl() / 4) - 4096;
-						short yRot;
+						float xRot = (GetRandomControl() / 4) - 4096;
+						float yRot;
 						if (condition)
 							yRot = item->Orientation.y + (GetRandomControl() & 0x3FFF) + EulerAngle::DegToRad(135.0f);
 						else
@@ -365,10 +365,10 @@ void LaserHeadControl(short itemNumber)
 
 				if (JustLoaded)
 				{
-					int c = 8192 * cos(item->Orientation.x + 3328);
+					int c = SECTOR(8) * cos(item->Orientation.x + EulerAngle::DegToRad(18.3f));
 					
 					dest.x = LaserHeadData.target.x = src.x + c * sin(item->Orientation.y);
-					dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * sin(3328 - item->Orientation.x);
+					dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * sin(EulerAngle::DegToRad(18.3f) - item->Orientation.x);
 					dest.z = LaserHeadData.target.z = src.z + c * cos(item->Orientation.y);
 				}
 				else

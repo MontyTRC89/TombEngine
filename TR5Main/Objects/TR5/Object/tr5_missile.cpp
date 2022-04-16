@@ -40,7 +40,7 @@ void MissileControl(short itemNumber)
 		float angles[2];
 		phd_GetVectorAngles(
 			LaraItem->Pose.Position.x - fx->pos.Position.x,
-			LaraItem->Pose.Position.y - fx->pos.Position.y - 256,
+			LaraItem->Pose.Position.y - fx->pos.Position.y - CLICK(1),
 			LaraItem->Pose.Position.z - fx->pos.Position.z,
 			angles);
 
@@ -60,12 +60,12 @@ void MissileControl(short itemNumber)
 				fx->speed++;
 
 			int dy = angles[0] - fx->pos.Orientation.y;
-			if (abs(dy) > 0x8000)
+			if (abs(dy) > EulerAngle::DegToRad(180.0f))
 				dy = -dy;
 			dy /= 8;
 
 			int dx = angles[1] - fx->pos.Orientation.x;
-			if (abs(dx) > 0x8000)
+			if (abs(dx) > EulerAngle::DegToRad(180.0f))
 				dx = -dx;
 			dx /= 8;
 

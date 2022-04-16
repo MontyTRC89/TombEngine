@@ -39,7 +39,7 @@ void ReaperControl(short itemNumber)
 		GetCreatureMood(item, &AI, TIMID);
 		CreatureMood(item, &AI, TIMID);
 
-		short angle = CreatureTurn(item, EulerAngle::DegToRad(2.0f));
+		float angle = CreatureTurn(item, EulerAngle::DegToRad(2.0f));
 
 		if (item->Animation.ActiveState == 2 &&
 			!(GetRandomControl() & 0x3F))

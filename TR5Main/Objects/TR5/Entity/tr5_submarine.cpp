@@ -196,7 +196,7 @@ void SubmarineControl(short itemNumber)
 	GetCreatureMood(item, &AI, VIOLENT);
 	CreatureMood(item, &AI, VIOLENT);
 
-	short angle = CreatureTurn(item, creature->MaxTurn);
+	float angle = CreatureTurn(item, creature->MaxTurn);
 
 	if (creature->Enemy == LaraItem)
 	{
@@ -234,7 +234,7 @@ void SubmarineControl(short itemNumber)
 
 	creature->MaxTurn = EulerAngle::DegToRad(2.0f);
 
-	short joint = AI.xAngle - EulerAngle::DegToRad(45.0f);
+	float joint = AI.xAngle - EulerAngle::DegToRad(45.0f);
 
 	if (creature->Flags < item->TriggerFlags)
 		creature->Flags++;
@@ -488,32 +488,32 @@ void TorpedoControl(short itemNumber)
 
 	if (item->ItemFlags[1] - 1 < 60)
 	{
-		short dry = angles[0] - item->Orientation.y;
-		if (abs(dry) > 0x8000)
+		float dry = angles[0] - item->Orientation.y;
+		if (abs(dry) > EulerAngle::DegToRad(180.0f))
 			dry = -dry;
 
-		short drx = angles[1] - item->Orientation.x;
-		if (abs(drx) > 0x8000)
+		float drx = angles[1] - item->Orientation.x;
+		if (abs(drx) > EulerAngle::DegToRad(180.0f))
 			drx = -drx;
 
 		drx /= 8;
 		dry /= 8;
 
-		if (drx <= 512)
+		if (drx <= EulerAngle::DegToRad(2.8f))
 		{
-			if (drx < -512)
-				drx = -512;
+			if (drx < EulerAngle::DegToRad(-2.8f))
+				drx = EulerAngle::DegToRad(-2.8f);
 		}
 		else
-			drx = 512;
+			drx = EulerAngle::DegToRad(2.8f);
 
-		if (dry <= 512)
+		if (dry <= EulerAngle::DegToRad(2.8f))
 		{
-			if (dry < -512)
-				dry = -512;
+			if (dry < EulerAngle::DegToRad(-2.8f))
+				dry = EulerAngle::DegToRad(-2.8f);
 		}
 		else
-			dry = 512;
+			dry = EulerAngle::DegToRad(2.8f);
 
 		item->Orientation.y += dry;
 		item->Orientation.x += drx;
@@ -523,7 +523,7 @@ void TorpedoControl(short itemNumber)
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	item->Orientation.z += 16 * item->Animation.Velocity;
+	item->Orientation.z += EulerAngle::DegToRad(0.09f) * item->Animation.Velocity;
 
 	int c = item->Animation.Velocity * cos(item->Orientation.x);
 
@@ -558,13 +558,10 @@ void TorpedoControl(short itemNumber)
 			if (probe.RoomNumber != item->RoomNumber)
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
-			Vector3Int pos1 = { 0, 0, -64 };
+			auto pos1 = Vector3Int(0, 0, -64);
 			GetJointAbsPosition(item, &pos1, 0);
 
-			Vector3Int pos2;
-			pos2.x = 0;
-			pos2.y = 0;
-			pos2.z = -64 << ((GlobalCounter & 1) + 2);
+			auto  pos2 = Vector3Int(0, 0, -64 << ((GlobalCounter & 1) + 2));
 			GetJointAbsPosition(item, &pos2, 0);
 
 			TriggerTorpedoBubbles(&pos1, &pos2, 1);

@@ -51,7 +51,7 @@ namespace TEN::Entities::TR5
 		}
 		else
 		{
-			int oldYrot = switchItem->Orientation.y;
+			float oldYrot = switchItem->Orientation.y;
 			switchItem->Orientation.y = laraItem->Orientation.y;
 			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
 			{

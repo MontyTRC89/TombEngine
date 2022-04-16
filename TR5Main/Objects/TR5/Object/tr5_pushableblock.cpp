@@ -37,7 +37,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	short height = g_Level.Boxes[floor->Box].height;
 	short baseRoomNumber = roomNumber;
 	
-	floor = GetFloor(x + 1024, y, z, &roomNumber);
+	floor = GetFloor(x + SECTOR(1), y, z, &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -45,7 +45,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x - 1024, y, z, &roomNumber);
+	floor = GetFloor(x - SECTOR(1), y, z, &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -53,7 +53,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z + 1024, &roomNumber);
+	floor = GetFloor(x, y, z + SECTOR(1), &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -61,7 +61,7 @@ void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber)
 	}
 
 	roomNumber = baseRoomNumber;
-	floor = GetFloor(x, y, z - 1024, &roomNumber);
+	floor = GetFloor(x, y, z - SECTOR(1), &roomNumber);
 	if (floor->Box != NO_BOX)
 	{
 		if (g_Level.Boxes[floor->Box].height == height && (g_Level.Boxes[floor->Box].flags & BLOCKABLE) && (g_Level.Boxes[floor->Box].flags & BLOCKED))
@@ -405,7 +405,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			return;
 		}
 
-		short quadrant = (unsigned short)(LaraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
+		int quadrant = GetQuadrant(LaraItem->Orientation.y);
 
 		bool quadrantDisabled = false;
 		switch (quadrant)
@@ -471,12 +471,12 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 		PushableBlockBounds.boundingBox.Z1 = bounds->Z1 - 200;
 		PushableBlockBounds.boundingBox.Z2 = 0;
 
-		short rot = pushableItem->Orientation.y;
+		float rot = pushableItem->Orientation.y;
 		//pushableItem->Orientation.y = (laraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) & 0xC000;
 
 		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
 		{
-			unsigned short quadrant = (unsigned short)((pushableItem->Orientation.y / 0x4000) + ((rot + 0x2000) / 0x4000));
+			unsigned short quadrant = GetQuadrant(pushableItem->Orientation.y);
 			if (quadrant & 1)
 				PushableBlockPos.z = bounds->X1 - 35;
 			else
@@ -643,7 +643,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant)
 	return true;
 }
 
-bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant)
+bool TestBlockPull(ITEM_INFO* item, int blockHeight, int quadrant)
 {
 	int xadd = 0;
 	int zadd = 0;

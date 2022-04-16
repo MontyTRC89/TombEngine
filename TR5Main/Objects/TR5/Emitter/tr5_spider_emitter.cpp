@@ -138,22 +138,18 @@ void UpdateSpiders()
 
 			if (spider->On)
 			{
-				int x = spider->Pose.Position.x;
-				int y = spider->Pose.Position.y;
-				int z = spider->Pose.Position.z;
+				auto oldPos = spider->Pose.Position;
 
 				spider->Pose.Position.x += spider->Velocity * sin(spider->Orientation.y);
 				spider->Pose.Position.y += spider->VerticalVelocity;
 				spider->Pose.Position.z += spider->Velocity * cos(spider->Orientation.y);
 				spider->VerticalVelocity += GRAVITY;
 
-				int dx = LaraItem->Pose.Position.x - spider->Pose.Position.x;
-				int dy = LaraItem->Pose.Position.y - spider->Pose.Position.y;
-				int dz = LaraItem->Pose.Position.z - spider->Pose.Position.z;
+				auto dPos = LaraItem->Pose.Position - spider->Pose.Position;
 
-				short angle = atan2(dz, dx) - spider->Orientation.y;
+				float angle = atan2(dPos.z, dPos.x) - spider->Orientation.y;
 
-				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
+				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
@@ -162,7 +158,7 @@ void UpdateSpiders()
 
 				if (spider->Flags)
 				{
-					if (abs(dx) + abs(dz) <= CLICK(3))
+					if (abs(dPos.x) + abs(dPos.z) <= CLICK(3))
 					{
 						if (spider->Velocity & 1)
 							spider->Orientation.y += EulerAngle::DegToRad(2.8f);
@@ -214,9 +210,8 @@ void UpdateSpiders()
 					}
 					else
 					{
-						spider->Pose.Position.x = x;
-						spider->Pose.Position.y = y - 8;
-						spider->Pose.Position.z = z;
+						spider->Pose.Position = oldPos;
+						spider->Pose.Position.y -= 8;
 						spider->Orientation.x = EulerAngle::DegToRad(78.75f);
 						spider->VerticalVelocity = 0;
 
@@ -231,9 +226,7 @@ void UpdateSpiders()
 					else
 						spider->Orientation.y += EulerAngle::DegToRad(90.0f);
 
-					spider->Pose.Position.x = x;
-					spider->Pose.Position.y = y;
-					spider->Pose.Position.z = z;
+					spider->Pose.Position = oldPos;
 					spider->VerticalVelocity = 0;
 				}
 

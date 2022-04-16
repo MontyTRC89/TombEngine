@@ -60,14 +60,12 @@ void LittleRatsControl(short itemNumber)
 			{
 				auto* rat = &Rats[ratNumber];
 
-				rat->Pose.Position.x = item->Pose.Position.x;
-				rat->Pose.Position.y = item->Pose.Position.y;
-				rat->Pose.Position.z = item->Pose.Position.z;
+				rat->Pose.Position = item->Pose.Position;
 				rat->RoomNumber = item->RoomNumber;
 
 				if (item->ItemFlags[0])
 				{
-					rat->Orientation.y = 2 * GetRandomControl();
+					rat->Orientation.y = 2 * GetRandomControl(); // TODO: Short to float conversion.
 					rat->VerticalVelocity = -16 - (GetRandomControl() & 31);
 				}
 				else
@@ -79,8 +77,8 @@ void LittleRatsControl(short itemNumber)
 				rat->Orientation.x = 0;
 				rat->Orientation.z = 0;
 				rat->On = true;
-				rat->Flags = GetRandomControl() & 30;
 				rat->Velocity = (GetRandomControl() & 31) + 1;
+				rat->Flags = GetRandomControl() & 30;
 			}
 		}
 	}
@@ -137,9 +135,7 @@ void UpdateRats()
 
 			if (rat->On)
 			{
-				int oldX = rat->Pose.Position.x;
-				int oldY = rat->Pose.Position.y;
-				int oldZ = rat->Pose.Position.z;
+				auto oldPos = rat->Pose.Position;
 
 				rat->Pose.Position.x += rat->Velocity * sin(rat->Orientation.y);
 				rat->Pose.Position.y += rat->VerticalVelocity;
@@ -147,17 +143,15 @@ void UpdateRats()
 
 				rat->VerticalVelocity += GRAVITY;
 
-				int dx = LaraItem->Pose.Position.x - rat->Pose.Position.x;
-				int dy = LaraItem->Pose.Position.y - rat->Pose.Position.y;
-				int dz = LaraItem->Pose.Position.z - rat->Pose.Position.z;
+				auto dPos = LaraItem->Pose.Position - rat->Pose.Position;
 
-				short angle;
+				float angle;
 				if (rat->Flags >= 170)
-					angle = rat->Orientation.y - (short)atan2(dz, dx);
+					angle = rat->Orientation.y - atan2(dPos.z, dPos.x);
 				else
-					angle = (short)atan2(dz, dx) - rat->Orientation.y;
+					angle = atan2(dPos.z, dPos.x) - rat->Orientation.y;
 
-				if (abs(dx) < 85 && abs(dy) < 85 && abs(dz) < 85)
+				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{
 					LaraItem->HitPoints--;
 					LaraItem->HitStatus = true;
@@ -167,7 +161,7 @@ void UpdateRats()
 				if (rat->Flags & 1)
 				{
 					// if rat is very near
-					if (abs(dz) + abs(dx) <= SECTOR(1))
+					if (abs(dPos.z) + abs(dPos.x) <= SECTOR(1))
 					{
 						if (rat->Velocity & 1)
 							rat->Orientation.y += EulerAngle::DegToRad(2.8f);
@@ -214,9 +208,7 @@ void UpdateRats()
 						rat->Orientation.y += EulerAngle::DegToRad(90.0f);
 
 					// reset rat to old Poseition and disable fall
-					rat->Pose.Position.x = oldX;
-					rat->Pose.Position.y = oldY;
-					rat->Pose.Position.z = oldZ;
+					rat->Pose.Position = oldPos;
 					rat->VerticalVelocity = 0;
 				}
 				else
@@ -248,9 +240,8 @@ void UpdateRats()
 					{
 						// if block is higher than rat Poseition then run vertically
 						rat->Orientation.x = EulerAngle::DegToRad(78.75f);
-						rat->Pose.Position.x = oldX;
-						rat->Pose.Position.y = oldY - 24;
-						rat->Pose.Position.z = oldZ;
+						rat->Pose.Position = oldPos;
+						rat->Pose.Position.y -= 24;
 						rat->VerticalVelocity = 0;
 					}
 				}

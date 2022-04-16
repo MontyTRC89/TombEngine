@@ -13,15 +13,15 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int dx = sin(item->Orientation.y + EulerAngle::DegToRad(90.0f)) * 512;
-		int dz = cos(item->Orientation.y + EulerAngle::DegToRad(90.0f)) * 512;
+		int dx = sin(item->Orientation.y + EulerAngle::DegToRad(90.0f)) * SECTOR(0.5f);
+		int dz = cos(item->Orientation.y + EulerAngle::DegToRad(90.0f)) * SECTOR(0.5f);
 
 		item->Pose.Position.x += dx;
 		item->Pose.Position.z += dz;
 
-		item->ItemFlags[0] = item->Pose.Position.x / 256;
-		item->ItemFlags[1] = (item->Pose.Position.y - 4608) / 256;
-		item->ItemFlags[2] = item->Pose.Position.z / 256;
+		item->ItemFlags[0] = item->Pose.Position.x / CLICK(1);
+		item->ItemFlags[1] = (item->Pose.Position.y - 4608) / CLICK(1);
+		item->ItemFlags[2] = item->Pose.Position.z / CLICK(1);
 		item->ItemFlags[3] = 50;
 	}
 

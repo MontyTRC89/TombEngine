@@ -35,9 +35,9 @@ void DobermanControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{
-		short angle = 0;
-		short tilt = 0;
-		short joint = 0;
+		float angle = 0;
+		float tilt = 0;
+		float joint = 0;
 		
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
