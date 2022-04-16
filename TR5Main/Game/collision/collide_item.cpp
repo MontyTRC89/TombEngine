@@ -147,13 +147,12 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 
 					ANIM_FRAME* framePtr = GetBestFrame(item);
 
-					if (useBox)
+					if (dx >= -2048 && dx <= 2048 &&
+						dy >= -2048 && dy <= 2048 &&
+						dz >= -2048 && dz <= 2048)
 					{
-						if (dx >= -2048 && dx <= 2048 &&
-							dy >= -2048 && dy <= 2048 &&
-							dz >= -2048 && dz <= 2048)
+						if (useBox)
 						{
-
 							if (item->objectNumber == ID_TURN_SWITCH)
 							{
 								framePtr->boundingBox.X1 = -256;
@@ -165,45 +164,42 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 							ANIM_FRAME* framePtrOriginal = GetBestFrame(collidingItem);
 							auto box1 = framePtrOriginal->boundingBox + collidingItem->pos;
 							auto box2 = framePtr->boundingBox + item->pos;
-							if(	box1.X1 < box2.X2 && box2.X1 < box1.X2 &&
+							if (box1.X1 < box2.X2 && box2.X1 < box1.X2 &&
 								box1.Y1 < box2.Y2 && box2.Y1 < box1.Y2 &&
 								box1.Z1 < box2.Z2 && box2.Z1 < box1.Z2)
 							{
 								collidedItems[numItems++] = item;
 							}
+
 						}
-
-					}
-					else
-					{
-						if (dx >= -2048 && dx <= 2048 &&
-							dy >= -2048 && dy <= 2048 &&
-							dz >= -2048 && dz <= 2048 &&
-							collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 &&
-							collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2)
+						else
 						{
-							float s = phd_sin(item->pos.yRot);
-							float c = phd_cos(item->pos.yRot);
-
-							int rx = dx * c - s * dz;
-							int rz = dz * c + s * dx;
-
-							if (item->objectNumber == ID_TURN_SWITCH)
+							if (collidingItem->pos.yPos + radius + 128 >= item->pos.yPos + framePtr->boundingBox.Y1 &&
+								collidingItem->pos.yPos - radius - 128 <= item->pos.yPos + framePtr->boundingBox.Y2)
 							{
-								framePtr->boundingBox.X1 = -256;
-								framePtr->boundingBox.X2 = 256;
-								framePtr->boundingBox.Z1 = -256;
-								framePtr->boundingBox.Z1 = 256;
-							}
+								float s = phd_sin(item->pos.yRot);
+								float c = phd_cos(item->pos.yRot);
 
-							if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
-							{
-								if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
+								int rx = dx * c - s * dz;
+								int rz = dz * c + s * dx;
+
+								if (item->objectNumber == ID_TURN_SWITCH)
 								{
-									collidedItems[numItems++] = item;
+									framePtr->boundingBox.X1 = -256;
+									framePtr->boundingBox.X2 = 256;
+									framePtr->boundingBox.Z1 = -256;
+									framePtr->boundingBox.Z1 = 256;
+								}
 
-									if (!radius)
-										return true;
+								if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
+								{
+									if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
+									{
+										collidedItems[numItems++] = item;
+
+										if (!radius)
+											return true;
+									}
 								}
 							}
 						}

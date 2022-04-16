@@ -89,6 +89,7 @@ void KillItem(short const itemNum)
 		}
 
 		g_GameScriptEntities->NotifyKilled(item);
+		g_GameScriptEntities->TryRemoveColliding(itemNum, true);
 		if (!item->luaCallbackOnKilledName.empty())
 		{
 			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNum);
