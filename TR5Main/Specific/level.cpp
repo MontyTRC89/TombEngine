@@ -133,6 +133,7 @@ void LoadItems()
 			item->luaName = std::string(buffer, buffer + numBytes);
 
 			g_GameScriptEntities->AddName(item->luaName, i);
+			g_GameScriptEntities->TryAddColliding(i);
 
 			memcpy(&item->startPos, &item->pos, sizeof(PHD_3DPOS));
 		}
@@ -1015,7 +1016,7 @@ unsigned CALLBACK LoadLevel(void* data)
 {
 	char* filename = (char*)data;
 
-	TENLog("Loading level flie: " + std::string(filename), LogLevel::Info);
+	TENLog("Loading level file: " + std::string(filename), LogLevel::Info);
 
 	LevelDataPtr = NULL;
 	LevelFilePtr = NULL;
