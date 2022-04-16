@@ -371,6 +371,20 @@ void LogicHandler::ExecuteScriptFile(const std::string & luaFilename)
 #endif
 }
 
+void LogicHandler::ExecuteFunction(std::string const& luaFuncName, short idOne, short idTwo) 
+{
+#if TEN_OPTIONAL_LUA
+	sol::protected_function_result r;
+	sol::protected_function func = (*m_handler.GetState())["LevelFuncs"][luaFuncName.c_str()];
+	r = func(std::make_unique<Moveable>(idOne), std::make_unique<Moveable>(idTwo));
+	if (!r.valid())
+	{
+		sol::error err = r;
+		ScriptAssertF(false, "Could not execute function {}: {}", luaFuncName, err.what());
+	}
+#endif
+}
+
 void LogicHandler::ExecuteFunction(std::string const& name, TEN::Control::Volumes::VolumeTriggerer triggerer)
 {
 #if TEN_OPTIONAL_LUA
