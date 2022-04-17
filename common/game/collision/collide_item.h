@@ -4,7 +4,7 @@
 
 struct ITEM_INFO;
 struct COLL_INFO;
-struct FLOOR_INFO;
+class FLOOR_INFO;
 struct MESH_INFO;
 
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;

@@ -178,15 +178,15 @@ void Moveable::Register(sol::table & parent)
 // @treturn string name of the function
 		ScriptReserved_GetOnHit, &Moveable::GetOnHit,
 
-/// Set the name of the function called when Lara collides with this moveable
-// @function Moveable:SetOnCollided
+/// Set the name of the function called when this moveable collides with another moveable
+// @function Moveable:SetOnCollidedWithObject
 // @tparam string name of callback function to be called
-		ScriptReserved_SetOnCollided, &Moveable::SetOnCollided,
+		ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
-/// Get the name of the function called when Lara collides with this moveable
-// @function Moveable:GetOnCollided
+/// Get the name of the function called when this moveable collides with another moveable
+// @function Moveable:GetOnCollidedWithObject
 // @treturn string name of the function
-		ScriptReserved_GetOnCollided, &Moveable::GetOnCollided,
+		ScriptReserved_GetOnCollidedWithObject, &Moveable::GetOnCollidedWithObject,
 
 /// Set the name of the function to be called when the moveable is destroyed/killed
 // @function Moveable:SetOnKilled
@@ -400,9 +400,9 @@ void Moveable::SetOnKilled(std::string const & cbName)
 	m_item->luaCallbackOnKilledName = cbName;
 }
 
-void Moveable::SetOnCollided(std::string const & cbName)
+void Moveable::SetOnCollidedWithObject(std::string const & cbName)
 {
-	m_item->luaCallbackOnCollidedName = cbName;
+	m_item->luaCallbackOnCollidedWithObjectName = cbName;
 
 	if(cbName.empty())
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
@@ -420,9 +420,9 @@ std::string Moveable::GetOnKilled() const
 	return m_item->luaCallbackOnKilledName;
 }
 
-std::string Moveable::GetOnCollided() const
+std::string Moveable::GetOnCollidedWithObject() const
 {
-	return m_item->luaCallbackOnCollidedName;
+	return m_item->luaCallbackOnCollidedWithObjectName;
 }
 
 std::string Moveable::GetName() const
