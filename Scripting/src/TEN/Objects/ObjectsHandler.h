@@ -17,14 +17,37 @@ public:
 	bool AddMoveableToMap(ITEM_INFO* key, Moveable* mov);
 	bool RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov);
 
+	bool TryAddColliding(short id) override
+	{
+		ITEM_INFO* item = &g_Level.Items[id];
+		if(!item->luaCallbackOnCollidedName.empty() && item->collidable && (item->status != ITEM_INVISIBLE))
+			return m_collidingItems.insert(id).second;
+
+		return false;
+	}
+
+	bool TryRemoveColliding(short id, bool force = false) override
+	{
+		ITEM_INFO* item = &g_Level.Items[id];
+		if(!force && !item->luaCallbackOnCollidedName.empty() && item->collidable && (item->status != ITEM_INVISIBLE))
+			return false;
+
+		return m_collidingItemsToRemove.insert(id).second;
+	}
+
+	void TestCollidingObjects() override;
+
 private:
 	LuaHandler m_handler;
 	// A map between moveables and the engine entities they represent. This is needed
 	// so that something that is killed by the engine can notify all corresponding
 	// Lua variables which can then become invalid.
-	std::unordered_map<ITEM_INFO *, std::unordered_set<Moveable*>>		m_moveables{};
-	std::unordered_map<std::string, VarMapVal>					m_nameMap{};
-	std::unordered_map<std::string, short>	 					m_itemsMapName{};
+	std::unordered_map<ITEM_INFO *, std::unordered_set<Moveable*>>	m_moveables{};
+	std::unordered_map<std::string, VarMapVal>						m_nameMap{};
+	std::unordered_map<std::string, short>	 						m_itemsMapName{};
+	// A set of items that are visible, collidable, and have Lua OnCollide callbacks.
+	std::unordered_set<short>		 								m_collidingItems{};
+	std::unordered_set<short>		 								m_collidingItemsToRemove{};
 	sol::table m_table_objects;
 
 

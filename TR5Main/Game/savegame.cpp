@@ -27,6 +27,7 @@
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Scripting/ScriptInterfaceLevel.h"
 #include "Scripting/ScriptInterfaceGame.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -1112,6 +1113,8 @@ bool SaveGame::Load(int slot)
 
 		if (obj->floor != nullptr)
 			UpdateBridgeItem(itemNumber);
+
+		g_GameScriptEntities->TryAddColliding(i);
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)

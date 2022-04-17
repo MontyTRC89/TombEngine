@@ -53,11 +53,15 @@ Moveable::Moveable(Moveable&& other) noexcept :
 
 Moveable::~Moveable()
 {
-	if (m_num > NO_ITEM) {
+	if (m_num > NO_ITEM && g_GameScriptEntities) {
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 	}
 }
 
+bool operator==(Moveable const& first, Moveable const& second)
+{
+	return first.m_item == second.m_item;
+}
 
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
@@ -139,6 +143,7 @@ void Moveable::Register(sol::table & parent)
 		ScriptReserved_newTemporary, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 /// Enable the item
 // @function Moveable:EnableItem
@@ -398,6 +403,11 @@ void Moveable::SetOnKilled(std::string const & cbName)
 void Moveable::SetOnCollided(std::string const & cbName)
 {
 	m_item->luaCallbackOnCollidedName = cbName;
+
+	if(cbName.empty())
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+	else
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 }
 
 std::string Moveable::GetOnHit() const
@@ -639,6 +649,9 @@ void Moveable::EnableItem()
 			AddActiveItem(m_num);
 			m_item->status = ITEM_ACTIVE;
 		}
+
+		// Try add colliding in case the item went from invisible -> activated
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
 }
 
@@ -662,6 +675,8 @@ void Moveable::DisableItem()
 			RemoveActiveItem(m_num);
 			m_item->status = ITEM_DEACTIVATED;
 		}
+		// Try add colliding in case the item went from invisible -> deactivated
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
 }
 
@@ -677,6 +692,7 @@ void Moveable::MakeInvisible()
 			DisableBaddieAI(m_num);
 		}
 	}
+	dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
 }
 
 void Moveable::Invalidate()
@@ -695,6 +711,7 @@ void Moveable::Destroy()
 {
 	if (m_num > NO_ITEM) {
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num, true);
 		s_callbackRemoveName(m_item->luaName);
 		KillItem(m_num);
 	}
