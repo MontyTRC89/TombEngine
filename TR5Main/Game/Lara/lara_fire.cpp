@@ -671,8 +671,8 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
-	lara->LeftArm.Rotation.Zero;
-	lara->RightArm.Rotation.Zero;
+	lara->LeftArm.Rotation = EulerAngle();
+	lara->RightArm.Rotation = EulerAngle();
 	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;

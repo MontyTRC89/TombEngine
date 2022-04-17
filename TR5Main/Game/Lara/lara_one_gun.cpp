@@ -260,8 +260,8 @@ void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Rotation.Zero;
-	lara->RightArm.Rotation.Zero;
+	lara->LeftArm.Rotation = EulerAngle();
+	lara->RightArm.Rotation = EulerAngle();
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;
@@ -1711,7 +1711,7 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		lara->ExtraTorsoRot = lara->LeftArm.Rotation;
 
 		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			lara->ExtraHeadRot.Zero;
+			lara->ExtraHeadRot = EulerAngle();
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)

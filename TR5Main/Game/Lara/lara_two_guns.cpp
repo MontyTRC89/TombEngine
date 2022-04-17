@@ -330,8 +330,8 @@ void ReadyPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Rotation.Zero;
-	lara->RightArm.Rotation.Zero;
+	lara->LeftArm.Rotation = EulerAngle();
+	lara->RightArm.Rotation = EulerAngle();
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->TargetEntity = nullptr;
@@ -391,7 +391,7 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	}
 	else if (frameLeft == 0)
 	{
-		lara->LeftArm.Rotation.Zero;
+		lara->LeftArm.Rotation = EulerAngle();
 		frameLeft = p->RecoilAnim - 1;
 	}
 	else if (frameLeft > p->Draw1Anim && (frameLeft < p->RecoilAnim))
@@ -426,7 +426,7 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	}
 	else if (frameRight == 0)
 	{
-		lara->RightArm.Rotation.Zero;
+		lara->RightArm.Rotation = EulerAngle();
 		frameRight = p->RecoilAnim - 1;
 	}
 	else if (frameRight > p->Draw1Anim && (frameRight < p->RecoilAnim))

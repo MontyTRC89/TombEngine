@@ -1,13 +1,20 @@
 #pragma once
 
 // TODO: Move to EulerAngle.h and EulerAngle.cpp.
-class EulerAngle : public Vector3
+class EulerAngle
 {
 public:
-	Vector3 ToVector3();
+	float x;
+	float y;
+	float z;
+
+	EulerAngle();
+	EulerAngle(float xRadians, float yRadians, float zRadians);
+
 	float GetX();
 	float GetY();
 	float GetZ();
+	Vector3 ToVector3();
 
 	void Set(EulerAngle orient);
 	void Set(float xRadians, float yRadians, float zRadians);
@@ -26,7 +33,7 @@ public:
 	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
 	static float ShortestAngle(float radiansFrom, float radiansTo);
 
-	static float AngleBetweenTwoPoints(Vector3 pointFrom, Vector3 pointTo);
+	static float AngleBetweenTwoPoints(Vector3 point0, Vector3 point1);
 
 	static float DeltaHeading(Vector3 origin, Vector3 target, float heading);
 
@@ -49,21 +56,21 @@ public:
 	EulerAngle& operator *=(float value);
 	EulerAngle& operator /=(float value);
 
-	EulerAngle();
-	EulerAngle(float xRadians, float yRadians, float zRadians);
-
 private:
-	EulerAngle(Vector3 orient);
-
-	// TODO: Due to clamping requirements, the components must be made private?
-	//using Vector3::x;
-	//using Vector3::y;
-	//using Vector3::z;
+	// TODO: Due to clamping requirements, the components should be private?
+	/*float x;
+	float y;
+	float z;*/
 };
 
-inline Vector3 EulerAngle::ToVector3()
+inline EulerAngle::EulerAngle()
 {
-	return Vector3(this->GetX(), this->GetY(), this->GetZ());
+	this->Set(0, 0, 0);
+}
+
+inline EulerAngle::EulerAngle(float xRadians, float yRadians, float zRadians)
+{
+	this->Set(xRadians, yRadians, zRadians);
 }
 
 inline float EulerAngle::GetX()
@@ -81,6 +88,11 @@ inline float EulerAngle::GetZ()
 	return z;
 }
 
+inline Vector3 EulerAngle::ToVector3()
+{
+	return Vector3(this->GetX(), this->GetY(), this->GetZ());
+}
+
 inline void EulerAngle::Set(EulerAngle orient)
 {
 	*this = Clamp(orient);
@@ -88,7 +100,9 @@ inline void EulerAngle::Set(EulerAngle orient)
 
 inline void EulerAngle::Set(float xRadians, float yRadians, float zRadians)
 {
-	this->Set(EulerAngle(xRadians, yRadians, zRadians));
+	this->SetX(xRadians);
+	this->SetY(yRadians);
+	this->SetZ(zRadians);
 }
 
 inline void EulerAngle::SetX(float radians = 0.0f)
@@ -274,20 +288,6 @@ inline EulerAngle& EulerAngle::operator /=(float value)
 	return *this;
 }
 
-inline EulerAngle::EulerAngle()
-{
-}
-
-inline EulerAngle::EulerAngle(float xRadians, float yRadians, float zRadians) :
-	Vector3(xRadians, yRadians, zRadians)
-{
-}
-
-inline EulerAngle::EulerAngle(Vector3 orient) :
-	Vector3(orient)
-{
-}
-
 // ---------
 
 struct Vector2Int
@@ -416,19 +416,19 @@ public:
 	PoseData()
 	{
 		this->Position = Vector3Int();
-		this->Orientation.Zero;
+		this->Orientation.Set(EulerAngle());
 	}
 
 	PoseData(Vector3Int pos)
 	{
 		this->Position = pos;
-		this->Orientation.Zero;
+		this->Orientation.Set(EulerAngle());
 	}
 
 	PoseData(int xPos, int yPos, int zPos)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
-		this->Orientation.Zero;
+		this->Orientation.Set(EulerAngle());
 	}
 
 	PoseData(EulerAngle orient)
