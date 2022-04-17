@@ -57,13 +57,13 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		Vector3Int pos;
 
 		if (SmokeWeapon == LaraWeaponType::HK)
-			pos = { 0, 228, 96 };
+			pos = Vector3Int(0, 228, 96);
 		else if (SmokeWeapon == LaraWeaponType::Shotgun)
-			pos = { 0, 228, 0 };
+			pos = Vector3Int(0, 228, 0);
 		else if (SmokeWeapon == LaraWeaponType::GrenadeLauncher)
-			pos = { 0, 180, 80 };
+			pos = Vector3Int(0, 180, 80);
 		else if (SmokeWeapon == LaraWeaponType::RocketLauncher)
-			pos = { 0, 84, 72 };
+			pos = Vector3Int(0, 84, 72);
 
 		GetLaraJointPosition(&pos, LM_RHAND);
 
@@ -275,7 +275,7 @@ void FireShotgun(ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	short angles[2];
+	float angles[2];
 	angles[1] = lara->LeftArm.Rotation.x;
 	angles[0] = lara->LeftArm.Rotation.y + laraItem->Orientation.y;
 
@@ -292,8 +292,8 @@ void FireShotgun(ITEM_INFO* laraItem)
 	for (int i = 0; i < 6; i++)
 	{
 		// TODO
-		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
-		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
+		loopAngles[0] = angles[0] + value * (GetRandomControl() - EulerAngle::DegToRad(90.0f)) / EulerAngle::DegToRad(360.0f);
+		loopAngles[1] = angles[1] + value * (GetRandomControl() - EulerAngle::DegToRad(90.0f)) / EulerAngle::DegToRad(360.0f);
 
 		if (FireWeapon(LaraWeaponType::Shotgun, lara->TargetEntity, laraItem, loopAngles) != FireWeaponType::NoAmmo)
 			fired = true;
@@ -301,12 +301,12 @@ void FireShotgun(ITEM_INFO* laraItem)
 
 	if (fired)
 	{
-		Vector3Int pos = { 0, 228, 32 };
+		auto pos = Vector3Int(0, 228, 32);
 		GetLaraJointPosition(&pos, LM_RHAND);
 
-		Vector3Int pos2 = { pos.x, pos.y, pos.z };
+		auto pos2 = pos;
 
-		pos = { 0, 1508, 32 };
+		pos = Vector3Int(0, 1508, 32);
 		GetLaraJointPosition(&pos, LM_RHAND);
 
 		SmokeCountL = 32;
@@ -445,35 +445,24 @@ void FireHarpoon(ITEM_INFO* laraItem)
 		item->ObjectNumber = ID_HARPOON;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		Vector3Int jointPos = { -2, 373, 77 };
+		auto jointPos = Vector3Int(-2, 373, 77);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 		if (floorHeight >= jointPos.y)
-		{
-			item->Pose.Position.x = jointPos.x;
-			item->Pose.Position.y = jointPos.y;
-			item->Pose.Position.z = jointPos.z;
-		}
+			item->Pose.Position = jointPos;
 		else
 		{
-			item->Pose.Position.x = laraItem->Pose.Position.x;
-			item->Pose.Position.y = jointPos.y;
-			item->Pose.Position.z = laraItem->Pose.Position.z;
+			item->Pose.Position = Vector3Int(laraItem->Pose.Position.x, jointPos.y, laraItem->Pose.Position.z);
 			item->RoomNumber = laraItem->RoomNumber;
 		}
 
 		InitialiseItem(itemNumber);
 
-		item->Orientation.x = lara->LeftArm.Rotation.x + laraItem->Orientation.x;
-		item->Orientation.y = lara->LeftArm.Rotation.y + laraItem->Orientation.y;
-		item->Orientation.z = 0;
+		item->Orientation = lara->LeftArm.Rotation + laraItem->Orientation;
 
 		if (!lara->LeftArm.Locked)
-		{
-			item->Orientation.x += lara->ExtraTorsoRot.x;
-			item->Orientation.y += lara->ExtraTorsoRot.y;
-		}
+			item->Orientation += lara->ExtraTorsoRot;
 
 		item->Orientation.z = 0;
 		item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Orientation.x);
@@ -492,9 +481,7 @@ void HarpoonBoltControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
-	int oldX = item->Pose.Position.x;
-	int oldY = item->Pose.Position.y;
-	int oldZ = item->Pose.Position.z;
+	auto oldPos = item->Pose.Position;
 	short roomNumber = item->RoomNumber;
 	bool aboveWater = false;
 
@@ -509,9 +496,9 @@ void HarpoonBoltControl(short itemNumber)
 			if (item->Orientation.x < EulerAngle::DegToRad(-90.0f))
 				item->Orientation.x = EulerAngle::DegToRad(-90.0f);
 
-			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Orientation.x);
-			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Orientation.x);
 			aboveWater = true;
+			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Orientation.x);
+			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Orientation.x);
 		}
 		else
 		{
@@ -520,15 +507,15 @@ void HarpoonBoltControl(short itemNumber)
 				CreateBubble((Vector3Int*)&item->Pose, item->RoomNumber, 0, 0, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0); // CHECK
 			
 			TriggerRocketSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 64);
-			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Orientation.x) / 2;
-			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Orientation.x) / 2;
 			aboveWater = false;
+			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Orientation.x) / 2;
+			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Orientation.x) / 2;
 		}
 
 		// Update bolt's position
-		item->Pose.Position.x += item->Animation.Velocity * cos(item->Orientation.x) * sin(item->Orientation.y);
-		item->Pose.Position.y += item->Animation.Velocity * sin(-item->Orientation.x);
-		item->Pose.Position.z += item->Animation.Velocity * cos(item->Orientation.x) * cos(item->Orientation.y);
+		item->Pose.Position.x += (int)round(item->Animation.Velocity * cos(item->Orientation.x) * sin(item->Orientation.y));
+		item->Pose.Position.y += (int)round(item->Animation.Velocity * sin(-item->Orientation.x));
+		item->Pose.Position.z += (int)round(item->Animation.Velocity * cos(item->Orientation.x) * cos(item->Orientation.y));
 	}
 	else
 	{
@@ -659,7 +646,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 		item->ObjectNumber = ID_GRENADE;
 		item->RoomNumber = laraItem->RoomNumber;
 
-		Vector3Int jointPos = { 0, 276, 80 };
+		auto jointPos = Vector3Int(0, 276, 80);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		item->Pose.Position.x = x = jointPos.x;
@@ -675,7 +662,7 @@ void FireGrenade(ITEM_INFO* laraItem)
 			item->RoomNumber = laraItem->RoomNumber;
 		}
 
-		jointPos = { 0, 1204, 5 };
+		jointPos = Vector3Int(0, 1204, 5);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		SmokeCountL = 32;
@@ -689,16 +676,12 @@ void FireGrenade(ITEM_INFO* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Orientation.x = laraItem->Orientation.x + lara->LeftArm.Rotation.x;
-		item->Orientation.y = laraItem->Orientation.y + lara->LeftArm.Rotation.y;
-		item->Orientation.z = 0;
+		item->Orientation = laraItem->Orientation + lara->LeftArm.Rotation;
 
 		if (!lara->LeftArm.Locked)
-		{
-			item->Orientation.x += lara->ExtraTorsoRot.z;
-			item->Orientation.y += lara->ExtraTorsoRot.y;
-		}
+			item->Orientation += lara->ExtraTorsoRot;
 
+		item->Orientation.z = 0;
 		item->Animation.Velocity = GRENADE_VELOCITY;
 		item->Animation.VerticalVelocity = -CLICK(2) * sin(item->Orientation.x);
 		item->Animation.ActiveState = item->Orientation.x;
@@ -797,13 +780,7 @@ void GrenadeControl(short itemNumber)
 	}
 	   
 	// Store old position for later
-	int oldX = item->Pose.Position.x;
-	int oldY = item->Pose.Position.y;
-	int oldZ = item->Pose.Position.z;
-
-	int xv;
-	int yv;
-	int zv;
+	auto oldPos = item->Pose.Position;
 
 	item->Shade = 0xC210;
 
@@ -861,9 +838,9 @@ void GrenadeControl(short itemNumber)
 	}
 
 	// Update grenade position
-	xv = item->Animation.Velocity * sin(item->Animation.TargetState);
-	yv = item->Animation.VerticalVelocity;
-	zv = item->Animation.Velocity * cos(item->Animation.TargetState);
+	int xv = item->Animation.Velocity * sin(item->Animation.TargetState);
+	int yv = item->Animation.VerticalVelocity;
+	int zv = item->Animation.Velocity * cos(item->Animation.TargetState);
 
 	item->Pose.Position.x += xv;
 	item->Pose.Position.y += yv;
@@ -885,7 +862,7 @@ void GrenadeControl(short itemNumber)
 		short sYrot = item->Orientation.y;
 		item->Orientation.y = item->Animation.TargetState;
 
-		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, yv, zv);
+		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xv, yv, zv);
 
 		item->Animation.TargetState = item->Orientation.y;
 		item->Orientation.y = sYrot;
@@ -1078,9 +1055,9 @@ void GrenadeControl(short itemNumber)
 			item->Pose.Position.y -= 128;
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
 			for (int x = 0; x < 2; x++)
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
@@ -1121,7 +1098,7 @@ void FireRocket(ITEM_INFO* laraItem)
 		if (!ammos.hasInfinite())
 			(ammos)--;
 
-		Vector3Int jointPos = { 0, 180, 72 };
+		auto jointPos = Vector3Int(0, 180, 72);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		int x, y, z;
@@ -1129,7 +1106,7 @@ void FireRocket(ITEM_INFO* laraItem)
 		item->Pose.Position.y = y = jointPos.y;
 		item->Pose.Position.z = z = jointPos.z;
 
-		jointPos = { 0, 2004, 72 };
+		jointPos = Vector3Int(0, 2004, 72);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
 		SmokeCountL = 32;
@@ -1146,16 +1123,12 @@ void FireRocket(ITEM_INFO* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Orientation.x = laraItem->Orientation.x + lara->LeftArm.Rotation.x;
-		item->Orientation.y = laraItem->Orientation.y + lara->LeftArm.Rotation.y;
-		item->Orientation.z = 0;
+		item->Orientation = laraItem->Orientation + lara->LeftArm.Rotation;
 
 		if (!lara->LeftArm.Locked)
-		{
-			item->Orientation.x += lara->ExtraTorsoRot.z;
-			item->Orientation.y += lara->ExtraTorsoRot.y;
-		}
+			item->Orientation += lara->ExtraTorsoRot;
 
+		item->Orientation.z = 0;
 		item->Animation.Velocity = 512 >> 5;
 		item->ItemFlags[0] = 0;
 
@@ -1173,10 +1146,8 @@ void RocketControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	// Save old position for later
+	auto oldPos = item->Pose.Position;
 	short oldRoom = item->RoomNumber;
-	int oldX = item->Pose.Position.x;
-	int oldY = item->Pose.Position.y;
-	int oldZ = item->Pose.Position.z;
 
 	// Update speed and rotation and check if above water or underwater
 	bool abovewater = false;
@@ -1242,9 +1213,7 @@ void RocketControl(short itemNumber)
 	if (probe.Position.Floor < item->Pose.Position.y ||
 		probe.Position.Ceiling > item->Pose.Position.y)
 	{
-		item->Pose.Position.x = oldX;
-		item->Pose.Position.y = oldY;
-		item->Pose.Position.z = oldZ;
+		item->Pose.Position = oldPos;
 		explode = true;
 	}
 
@@ -1359,9 +1328,9 @@ void RocketControl(short itemNumber)
 		{
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 			item->Pose.Position.y += 128;
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
 			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
@@ -1396,10 +1365,8 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 		if (pos)
 		{
+			item->Pose.Position = pos->Position;
 			item->RoomNumber = laraItem->RoomNumber;
-			item->Pose.Position.x = pos->Position.x;
-			item->Pose.Position.y = pos->Position.y;
-			item->Pose.Position.z = pos->Position.z;
 
 			InitialiseItem(itemNumber);
 
@@ -1410,18 +1377,14 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 		else
 		{
 
-			Vector3Int jointPos = { 0, 228, 32 };
+			auto jointPos = Vector3Int(0, 228, 32);
 			GetLaraJointPosition(&jointPos, LM_RHAND);
 
 			item->RoomNumber = laraItem->RoomNumber;
 
 			int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 			if (floorHeight >= jointPos.y)
-			{
-				item->Pose.Position.x = jointPos.x;
-				item->Pose.Position.y = jointPos.y;
-				item->Pose.Position.z = jointPos.z;
-			}
+				item->Pose.Position = jointPos;
 			else
 			{
 				item->Pose.Position.x = laraItem->Pose.Position.x;
@@ -1432,18 +1395,14 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 
 			InitialiseItem(itemNumber);
 
-			item->Orientation.x = lara->LeftArm.Rotation.x + laraItem->Orientation.x;
+			item->Orientation = lara->LeftArm.Rotation + laraItem->Orientation;
 			item->Orientation.z = 0;
-			item->Orientation.y = lara->LeftArm.Rotation.y + laraItem->Orientation.y;
 
 			if (!lara->LeftArm.Locked)
-			{
-				item->Orientation.x += lara->ExtraTorsoRot.z;
-				item->Orientation.y += lara->ExtraTorsoRot.y;
-			}
+				item->Orientation += lara->ExtraTorsoRot;
 		}
 
-		item->Animation.Velocity = 512;
+		item->Animation.Velocity = CLICK(2);
 
 		AddActiveItem(itemNumber);
 
@@ -1477,9 +1436,7 @@ void CrossbowBoltControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
-	int oldX = item->Pose.Position.x;
-	int oldY = item->Pose.Position.y;
-	int oldZ = item->Pose.Position.z;
+	auto oldPos = item->Pose.Position;
 
 	bool aboveWater = false;
 	bool explode = false;
@@ -1487,7 +1444,7 @@ void CrossbowBoltControl(short itemNumber)
 	// Update speed and check if above water
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{
-		Vector3Int bubblePos = { item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z };
+		auto bubblePos = item->Pose.Position;
 
 		if (item->Animation.Velocity > 64)
 			item->Animation.Velocity -= (item->Animation.Velocity >> 4);
@@ -1501,9 +1458,9 @@ void CrossbowBoltControl(short itemNumber)
 		aboveWater = true;
 
 	// Update bolt's position
-	item->Pose.Position.x += item->Animation.Velocity * cos(item->Orientation.x) * sin(item->Orientation.y);
-	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Orientation.x);
-	item->Pose.Position.z += item->Animation.Velocity * cos(item->Orientation.x) * cos(item->Orientation.y);
+	item->Pose.Position.x += (int)round(item->Animation.Velocity * cos(item->Orientation.x) * sin(item->Orientation.y));
+	item->Pose.Position.y += (int)round(item->Animation.Velocity * sin(-item->Orientation.x));
+	item->Pose.Position.z += (int)round(item->Animation.Velocity * cos(item->Orientation.x) * cos(item->Orientation.y));
 
 	auto probe = GetCollision(item);
 
@@ -1512,9 +1469,7 @@ void CrossbowBoltControl(short itemNumber)
 		probe.Position.Ceiling > item->Pose.Position.y)
 	{
 		// I have hit a solid wall, this is the end for the bolt
-		item->Pose.Position.x = oldX;
-		item->Pose.Position.y = oldY;
-		item->Pose.Position.z = oldZ;
+		item->Pose.Position = oldPos;
 
 		// If ammos are normal, then just shatter the bolt and quit
 		if (item->ItemFlags[0] != (int)CrossbowBoltType::Explosive)
@@ -1673,10 +1628,10 @@ void CrossbowBoltControl(short itemNumber)
 		{
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 			item->Pose.Position.y += 128;
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
 
 			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
@@ -1755,11 +1710,10 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (lara->LeftArm.Locked)
 	{
-		lara->ExtraTorsoRot.z = lara->LeftArm.Rotation.x;
-		lara->ExtraTorsoRot.y = lara->LeftArm.Rotation.y;
+		lara->ExtraTorsoRot = lara->LeftArm.Rotation;
 
 		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			lara->ExtraHeadRot = { 0, 0, 0 };
+			lara->ExtraHeadRot.Zero;
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)

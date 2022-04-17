@@ -1093,9 +1093,9 @@ void lara_as_zip_line(ITEM_INFO* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_JUMP_FORWARD;
 		AnimateLara(item);
 
+		item->Animation.Airborne = true;
 		item->Animation.Velocity = 100;
 		item->Animation.VerticalVelocity = 40;
-		item->Animation.Airborne = true;
 		lara->Control.MoveAngle = item->Orientation.y;
 	}
 }

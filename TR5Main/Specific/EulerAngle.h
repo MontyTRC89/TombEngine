@@ -20,9 +20,9 @@ public:
 	static EulerAngle Clamp(EulerAngle orient);
 	static float Clamp(float radians);
 
-	void Interpolate(EulerAngle orientTo, float rate, float threshold);
-	static EulerAngle Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate, float threshold);
-	static float Interpolate(float radiansFrom, float radiansTo, float rate, float threshold);
+	void Interpolate(EulerAngle orientTo, float rate, float radianThreshold);
+	static EulerAngle Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate, float radianThreshold);
+	static float Interpolate(float radiansFrom, float radiansTo, float rate, float radianThreshold);
 
 	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
 	static float ShortestAngle(float radiansFrom, float radiansTo);
@@ -133,26 +133,26 @@ inline float EulerAngle::Clamp(float radians)
 		fmod(radians - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float threshold = 0.0f)
+inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float radianThreshold = 0.0f)
 {
-	*this = Interpolate(*this, orientTo, rate, threshold);
+	*this = Interpolate(*this, orientTo, rate, radianThreshold);
 }
 
-inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float threshold = 0.0f)
+inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float radianThreshold = 0.0f)
 {
 	return EulerAngle(
-		Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, threshold),
-		Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, threshold),
-		Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, threshold)
+		Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, radianThreshold),
+		Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, radianThreshold),
+		Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, radianThreshold)
 	);
 }
 
-inline float EulerAngle::Interpolate(float radiansFrom, float radiansTo, float rate = 1.0f, float threshold = 0.0f)
+inline float EulerAngle::Interpolate(float radiansFrom, float radiansTo, float rate = 1.0f, float radianThreshold = 0.0f)
 {
 	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
 	
 	float difference = ShortestAngle(radiansFrom, radiansTo);
-	if (abs(difference) > threshold)
+	if (abs(difference) > radianThreshold)
 		return Clamp(radiansFrom + (difference * rate));
 	else
 		return Clamp(radiansTo);
