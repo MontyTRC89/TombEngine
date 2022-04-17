@@ -34,7 +34,7 @@ std::vector<SoundTrackInfo> SoundTracks;
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
 
-void SetVolumeMusic(int vol) 
+void SetVolumeMusic(int vol)
 {
 	GlobalMusicVolume = vol;
 
@@ -54,7 +54,7 @@ void SetVolumeFX(int vol)
 	GlobalFXVolume = vol;
 }
 
-bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
+bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
 {
 	if (index >= SOUND_MAX_SAMPLES)
 	{
@@ -98,7 +98,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	memcpy(uncompBuffer, "RIFF\0\0\0\0WAVEfmt \20\0\0\0", 20);
 	memcpy(uncompBuffer + 36, "data\0\0\0\0", 8);
 
-	WAVEFORMATEX *wf = (WAVEFORMATEX*)(uncompBuffer + 20);
+	WAVEFORMATEX* wf = (WAVEFORMATEX*)(uncompBuffer + 20);
 
 	wf->wFormatTag = 3;
 	wf->nChannels = info.chans;
@@ -115,7 +115,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	int cleanLength = info.length;
 	for (int i = 4; i < info.length; i += 4)
 	{
-		float *currentSample = reinterpret_cast<float*>(uncompBuffer + finalLength - i);
+		float* currentSample = reinterpret_cast<float*>(uncompBuffer + finalLength - i);
 		if (*currentSample > SOUND_32BIT_SILENCE_LEVEL || *currentSample < -SOUND_32BIT_SILENCE_LEVEL)
 		{
 			int alignment = i % wf->nBlockAlign;
@@ -184,14 +184,14 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	// Set & randomize volume (if needed)
 	float gain = (static_cast<float>(sampleInfo->Volume) / UCHAR_MAX) * gainMultiplier;
 	if ((sampleInfo->Flags & SOUND_FLAG_RND_GAIN))
-		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX))* SOUND_MAX_GAIN_CHANGE;
+		gain -= (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) * SOUND_MAX_GAIN_CHANGE;
 
 	// Set and randomize pitch and additionally multiply by provided value (for vehicles etc)
 	float pitch = (1.0f + static_cast<float>(sampleInfo->Pitch) / 127.0f) * pitchMultiplier;
 
 	// Randomize pitch (if needed)
 	if ((sampleInfo->Flags & SOUND_FLAG_RND_PITCH))
-		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f)* SOUND_MAX_PITCH_CHANGE * 2.0f;
+		pitch += ((static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX)) - 0.5f) * SOUND_MAX_PITCH_CHANGE * 2.0f;
 
 	// Calculate sound radius and distance to sound
 	float radius = (float)(sampleInfo->Radius) * SECTOR(1);
@@ -216,12 +216,12 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 
 	case SOUND_PLAYTYPE::Wait:
 		if (existingChannel != -1) // Don't play until stopped
-			return 0; 
+			return 0;
 		break;
 
 	case SOUND_PLAYTYPE::Restart:
 		if (existingChannel != -1) // Stop existing and continue
-			Sound_FreeSlot(existingChannel, SOUND_XFADETIME_CUTSOUND); 
+			Sound_FreeSlot(existingChannel, SOUND_XFADETIME_CUTSOUND);
 		break;
 
 	case SOUND_PLAYTYPE::Looped:
@@ -338,7 +338,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 
 	if (channelActive)
 		BASS_ChannelSlideAttribute(BASS_Soundtrack[(int)mode].Channel, BASS_ATTRIB_VOL, -1.0f, crossfadeTime);
-	
+
 	auto fullTrackName = TRACKS_PATH + track + ".ogg";
 	if (!std::filesystem::exists(fullTrackName))
 	{
@@ -374,7 +374,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 	// Think everybody are fed up with same start-up sounds of Caves ambience...
 
 	if (crossfade)
-	{		
+	{
 		// Crossfade...
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, 0.0f);
 		BASS_ChannelSlideAttribute(stream, BASS_ATTRIB_VOL, masterVolume, crossfadeTime);
@@ -426,7 +426,7 @@ void PlaySoundTrack(int index, short mask)
 		}
 		return;
 	}
-	
+
 	// Check and modify soundtrack map mask, if needed.
 	// If existing mask is unmodified (same activation mask setup), track won't play.
 
@@ -523,7 +523,7 @@ int Sound_GetFreeSlot()
 // We use origin position as a reference, because in original TRs it's not possible to clearly
 // identify what's the source of the producing effect.
 
-int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
+int Sound_EffectIsPlaying(int effectID, PHD_3DPOS* position)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
@@ -556,7 +556,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 // Gets the distance to the source.
 
-float Sound_DistanceToListener(PHD_3DPOS *position)
+float Sound_DistanceToListener(PHD_3DPOS* position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
 	return Sound_DistanceToListener(Vector3(position->xPos, position->yPos, position->zPos));
@@ -597,7 +597,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 // Update sound position in a level.
 
-bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
+bool Sound_UpdateEffectPosition(int index, PHD_3DPOS* position, bool force)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
@@ -695,7 +695,7 @@ void Sound_UpdateScene()
 	Vector3 at = Vector3(Camera.target.x, Camera.target.y, Camera.target.z) -
 		Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z);
 	at.Normalize();
-	auto mikePos = BASS_3DVECTOR( Camera.mikePos.x,		// Pos
+	auto mikePos = BASS_3DVECTOR(Camera.mikePos.x,		// Pos
 		Camera.mikePos.y,
 		Camera.mikePos.z);
 	auto laraVel = BASS_3DVECTOR(Lara.currentXvel,		// Vel
@@ -704,9 +704,9 @@ void Sound_UpdateScene()
 	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);			// At
 	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);		// Up
 	BASS_Set3DPosition(&mikePos,
-					   &laraVel,
-					   &atVec,
-					   &upVec);
+		&laraVel,
+		&atVec,
+		&upVec);
 	BASS_Apply3D();
 }
 
@@ -726,7 +726,7 @@ void Sound_Init()
 
 	// Set 3D world parameters.
 	// Rolloff is lessened since we have own attenuation implementation.
-	BASS_Set3DFactors(SOUND_BASS_UNITS, 1.5f, 0.5f);	
+	BASS_Set3DFactors(SOUND_BASS_UNITS, 1.5f, 0.5f);
 	BASS_SetConfig(BASS_CONFIG_3DALGORITHM, BASS_3DALG_FULL);
 
 	// Set minimum latency and 2 threads for updating.
@@ -751,7 +751,7 @@ void Sound_Init()
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
 	// Attach reverb effect to 3D channel
- 	BASS_FXHandler[(int)SOUND_FILTER::Reverb] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_FREEVERB, 0);
+	BASS_FXHandler[(int)SOUND_FILTER::Reverb] = BASS_ChannelSetFX(BASS_3D_Mixdown, BASS_FX_BFX_FREEVERB, 0);
 	BASS_FXSetParameters(BASS_FXHandler[(int)SOUND_FILTER::Reverb], &BASS_ReverbTypes[(int)REVERB_TYPE::Outside]);
 
 	if (Sound_CheckBASSError("Attaching environmental FX", true))
@@ -800,7 +800,7 @@ void SayNo()
 
 void PlaySecretTrack()
 {
-	// Secret soundtrack should be always last one on a list.	
+	// Secret soundtrack should be always last one on a list.
 	PlaySoundTrack(SoundTracks.back().Name, SOUNDTRACK_PLAYTYPE::OneShot);
 }
 
