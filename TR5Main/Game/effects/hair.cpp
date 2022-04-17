@@ -26,14 +26,14 @@ void InitialiseHair()
 		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
 		Hairs[h][0].initialized = true;
-		Hairs[h][0].Orientation.y = 0;
-		Hairs[h][0].Orientation.x = EulerAngle::DegToRad(-90.0f);
+		Hairs[h][0].Pose.Orientation.y = 0;
+		Hairs[h][0].Pose.Orientation.x = EulerAngle::DegToRad(-90.0f);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
 			Hairs[h][i].initialized = true;
 			Hairs[h][i].Pose.Position = Vector3Int(*(bone + 1), *(bone + 2), *(bone + 3));
-			Hairs[h][i].Orientation = EulerAngle(EulerAngle::DegToRad(-90.0f), 0, 0);
+			Hairs[h][i].Pose.Orientation = EulerAngle(EulerAngle::DegToRad(-90.0f), 0, 0);
 
 			Hairs[h][i].hvel.x = Hairs[h][i].hvel.y = Hairs[h][i].hvel.z = 0;
 		}
@@ -181,7 +181,7 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 		for (int i = 0; i < HAIR_SEGMENTS; i++, bone += 4)
 		{
 			world = Matrix::CreateTranslation(Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z);		
-			world = Matrix::CreateFromYawPitchRoll(Hairs[braid][i].Orientation.y, Hairs[braid][i].Orientation.x, 0) * world;			
+			world = Matrix::CreateFromYawPitchRoll(Hairs[braid][i].Pose.Orientation.y, Hairs[braid][i].Pose.Orientation.x, 0) * world;			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
 			Hairs[braid][i + 1].initialized = false;
@@ -263,11 +263,11 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 			}
 
 			int distance = sqrt(pow(Hairs[braid][i].Pose.Position.z - Hairs[braid][i - 1].Pose.Position.z, 2) + pow(Hairs[braid][i].Pose.Position.x - Hairs[braid][i - 1].Pose.Position.x, 2));
-			Hairs[braid][i - 1].Orientation.y = atan2((Hairs[braid][i].Pose.Position.z - Hairs[braid][i - 1].Pose.Position.z), (Hairs[braid][i].Pose.Position.x - Hairs[braid][i - 1].Pose.Position.x));
-			Hairs[braid][i - 1].Orientation.x = -atan2(distance, Hairs[braid][i].Pose.Position.y - Hairs[braid][i - 1].Pose.Position.y);
+			Hairs[braid][i - 1].Pose.Orientation.y = atan2((Hairs[braid][i].Pose.Position.z - Hairs[braid][i - 1].Pose.Position.z), (Hairs[braid][i].Pose.Position.x - Hairs[braid][i - 1].Pose.Position.x));
+			Hairs[braid][i - 1].Pose.Orientation.x = -atan2(distance, Hairs[braid][i].Pose.Position.y - Hairs[braid][i - 1].Pose.Position.y);
 
 			world = Matrix::CreateTranslation(Hairs[braid][i - 1].Pose.Position.x, Hairs[braid][i - 1].Pose.Position.y, Hairs[braid][i - 1].Pose.Position.z);
-			world = Matrix::CreateFromYawPitchRoll(Hairs[braid][i - 1].Orientation.y, Hairs[braid][i - 1].Orientation.x, 0) * world;
+			world = Matrix::CreateFromYawPitchRoll(Hairs[braid][i - 1].Pose.Orientation.y, Hairs[braid][i - 1].Pose.Orientation.x, 0) * world;
 
 			if (i == HAIR_SEGMENTS)
 				world = Matrix::CreateTranslation(*(bone - 3), *(bone - 2), *(bone - 1)) * world;

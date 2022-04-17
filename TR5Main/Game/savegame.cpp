@@ -453,9 +453,9 @@ bool SaveGame::Save(int slot)
 			(int32_t)itemToSerialize.Pose.Position.x,
 			(int32_t)itemToSerialize.Pose.Position.y,
 			(int32_t)itemToSerialize.Pose.Position.z,
-			(int32_t)itemToSerialize.Orientation.x,
-			(int32_t)itemToSerialize.Orientation.y,
-			(int32_t)itemToSerialize.Orientation.z);
+			(int32_t)itemToSerialize.Pose.Orientation.x,
+			(int32_t)itemToSerialize.Pose.Orientation.y,
+			(int32_t)itemToSerialize.Pose.Orientation.z);
 
 		Save::ItemBuilder serializedItem{ fbb };
 

@@ -8,7 +8,6 @@ struct SpiderData
 {
 	byte On;
 	PoseData Pose;
-	EulerAngle Orientation;
 	short RoomNumber;
 
 	short Velocity;

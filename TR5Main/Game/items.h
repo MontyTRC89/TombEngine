@@ -80,7 +80,6 @@ struct ITEM_INFO
 	EntityAnimationData Animation;
 	PoseData Pose;
 	PoseData StartPose;
-	EulerAngle Orientation;
 	int Floor;
 
 	int HitPoints;

@@ -5,7 +5,6 @@
 struct BeetleData
 {
 	PoseData Pose;
-	EulerAngle Orientation;
 	short RoomNumber;
 	int Velocity;
 	int VerticalVelocity;

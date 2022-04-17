@@ -4,7 +4,6 @@
 struct WraithInfo
 {
 	PoseData Pose;
-	EulerAngle Orientation; // temp
 
 	unsigned char r;
 	unsigned char g;

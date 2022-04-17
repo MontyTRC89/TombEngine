@@ -159,7 +159,7 @@ void InitialiseLaserHead(short itemNumber)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE && g_Level.Items[i].Orientation.y == rotation)
+			if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE && g_Level.Items[i].Pose.Orientation.y == rotation)
 			{
 				info->Tentacles[j] = i;
 				break;

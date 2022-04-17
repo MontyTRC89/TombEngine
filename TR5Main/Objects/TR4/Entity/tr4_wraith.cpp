@@ -298,21 +298,16 @@ namespace TEN::Entities::TR4
 		int j = 0;
 		for (int i = WRAITH_COUNT - 1; i > 0; i--)
 		{
-			creature[i - 1].Pose.Position.x += (creature[i - 1].Orientation.x / 16);
-			creature[i - 1].Pose.Position.y += (creature[i - 1].Orientation.y / 16);
-			creature[i - 1].Pose.Position.z += (creature[i - 1].Orientation.z / 16);
+			// TODO: Conversion required?
+			creature[i - 1].Pose.Position.x += (creature[i - 1].Pose.Orientation.x / 16);
+			creature[i - 1].Pose.Position.y += (creature[i - 1].Pose.Orientation.y / 16);
+			creature[i - 1].Pose.Position.z += (creature[i - 1].Pose.Orientation.z / 16);
 
-			creature[i - 1].Orientation.x -= (creature[i - 1].Orientation.x / 16);
-			creature[i - 1].Orientation.y -= (creature[i - 1].Orientation.y / 16);
-			creature[i - 1].Orientation.z -= (creature[i - 1].Orientation.z / 16);
+			creature[i - 1].Pose.Orientation.x -= (creature[i - 1].Pose.Orientation.x / 16);
+			creature[i - 1].Pose.Orientation.y -= (creature[i - 1].Pose.Orientation.y / 16);
+			creature[i - 1].Pose.Orientation.z -= (creature[i - 1].Pose.Orientation.z / 16);
 
-			creature[i].Pose.Position.x = creature[i - 1].Pose.Position.x;
-			creature[i].Pose.Position.y = creature[i - 1].Pose.Position.y;
-			creature[i].Pose.Position.z = creature[i - 1].Pose.Position.z;
-
-			creature[i].Orientation.x = creature[i - 1].Orientation.x;
-			creature[i].Orientation.y = creature[i - 1].Orientation.y;
-			creature[i].Orientation.z = creature[i - 1].Orientation.z;
+			creature[i].Pose = creature[i - 1].Pose;
 
 			if (item->ObjectNumber == ID_WRAITH1)
 			{
@@ -336,31 +331,29 @@ namespace TEN::Entities::TR4
 			j++;
 		}
 
-		creature[0].Pose.Position.x = item->Pose.Position.x;
-		creature[0].Pose.Position.y = item->Pose.Position.y;
-		creature[0].Pose.Position.z = item->Pose.Position.z;
+		creature[0].Pose.Position = item->Pose.Position;
 
-		creature[0].Orientation.x = 4 * (item->Pose.Position.x - oldX);
-		creature[0].Orientation.y = 4 * (item->Pose.Position.y - oldY);
-		creature[0].Orientation.z = 4 * (item->Pose.Position.z - oldZ);
+		creature[0].Pose.Orientation.x = 4 * (item->Pose.Position.x - oldX);
+		creature[0].Pose.Orientation.y = 4 * (item->Pose.Position.y - oldY);
+		creature[0].Pose.Orientation.z = 4 * (item->Pose.Position.z - oldZ);
 
 		// Standard WRAITH drawing code
 		DrawWraith(
 			item->Pose.Position.x,
 			item->Pose.Position.y,
 			item->Pose.Position.z,
-			creature[0].Orientation.x,
-			creature[0].Orientation.y,
-			creature[0].Orientation.z,
+			creature[0].Pose.Orientation.x,
+			creature[0].Pose.Orientation.y,
+			creature[0].Pose.Orientation.z,
 			item->ObjectNumber);
 
 		DrawWraith(
 			(oldX + item->Pose.Position.x) / 2,
 			(oldY + item->Pose.Position.y) / 2,
 			(oldZ + item->Pose.Position.z) / 2,
-			creature[0].Orientation.x,
-			creature[0].Orientation.y,
-			creature[0].Orientation.z,
+			creature[0].Pose.Orientation.x,
+			creature[0].Pose.Orientation.y,
+			creature[0].Pose.Orientation.z,
 			item->ObjectNumber);
 
 		// Lighting for WRAITH
@@ -460,7 +453,7 @@ namespace TEN::Entities::TR4
 		spark->size = size;
 	}
 
-	void WraithWallsEffect(int x, int y, int z, short yRot, short objectNumber)
+	void WraithWallsEffect(int x, int y, int z, float yRot, short objectNumber)
 	{
 		byte sR, sG, sB, dR, dG, dB;
 		short color;

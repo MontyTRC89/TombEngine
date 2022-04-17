@@ -13,7 +13,6 @@ struct ITEM_INFO;
 struct HAIR_STRUCT
 {
 	PoseData Pose;
-	EulerAngle Orientation; // temp
 	Vector3Int hvel;
 	Vector3Int unknown;
 

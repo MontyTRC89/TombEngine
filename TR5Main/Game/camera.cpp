@@ -783,10 +783,8 @@ void LookCamera(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	float headXRot = lara->ExtraHeadRot.x;
-	float headYRot = lara->ExtraHeadRot.y;
-	float torsoXRot = lara->ExtraTorsoRot.x;
-	float torsoYRot = lara->ExtraTorsoRot.y;
+	auto oldHeadRot = lara->ExtraHeadRot;
+	auto oldTorsoRot = lara->ExtraTorsoRot;
 
 	lara->ExtraTorsoRot.x = 0;
 	lara->ExtraTorsoRot.y = 0;
@@ -937,12 +935,12 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.pos.x += (ideal.x - Camera.pos.x) >> 2;
-		Camera.pos.y += (ideal.y - Camera.pos.y) >> 2;
-		Camera.pos.z += (ideal.z - Camera.pos.z) >> 2;
-		Camera.target.x += (pos3.x - Camera.target.x) >> 2;
-		Camera.target.y += (pos3.y - Camera.target.y) >> 2;
-		Camera.target.z += (pos3.z - Camera.target.z) >> 2;
+		Camera.pos.x += (ideal.x - Camera.pos.x) / 4;
+		Camera.pos.y += (ideal.y - Camera.pos.y) / 4;
+		Camera.pos.z += (ideal.z - Camera.pos.z) / 4;
+		Camera.target.x += (pos3.x - Camera.target.x) / 4;
+		Camera.target.y += (pos3.y - Camera.target.y) / 4;
+		Camera.target.z += (pos3.z - Camera.target.z) / 4;
 		Camera.target.roomNumber = item->RoomNumber;
 	}
 
@@ -1039,10 +1037,8 @@ void LookCamera(ITEM_INFO* item)
 
 	Camera.oldType = Camera.type;
 
-	lara->ExtraHeadRot.x = headXRot;
-	lara->ExtraHeadRot.y = headYRot;
-	lara->ExtraTorsoRot.x = torsoXRot;
-	lara->ExtraTorsoRot.y = torsoYRot;
+	lara->ExtraHeadRot = oldHeadRot;
+	lara->ExtraTorsoRot = oldTorsoRot;
 }
 
 void BounceCamera(ITEM_INFO* item, int bounce, int maxDistance)
@@ -1139,9 +1135,9 @@ void BinocularCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		Camera.target.x += (tx - Camera.target.x) >> 2;
-		Camera.target.y += (ty - Camera.target.y) >> 2;
-		Camera.target.z += (tz - Camera.target.z) >> 2;
+		Camera.target.x += (tx - Camera.target.x) / 4;
+		Camera.target.y += (ty - Camera.target.y) / 4;
+		Camera.target.z += (tz - Camera.target.z) / 4;
 		Camera.target.roomNumber = item->RoomNumber;
 	}
 
@@ -1150,9 +1146,9 @@ void BinocularCamera(ITEM_INFO* item)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
 			Camera.bounce += 5;
 		}
 		else
@@ -1364,7 +1360,7 @@ void ConfirmCameraTargetPos()
 	else
 	{
 		Camera.target.x = LaraItem->Pose.Position.x;
-		Camera.target.y = (Camera.target.y + pos.y) >> 1;
+		Camera.target.y = (Camera.target.y + pos.y) / 2;
 		Camera.target.z = LaraItem->Pose.Position.z;
 	}
 
@@ -1494,7 +1490,7 @@ void CalculateCamera()
 		}
 		else
 		{
-			Camera.target.y += (y - Camera.target.y) >> 2;
+			Camera.target.y += (y - Camera.target.y) / 4;
 			Camera.speed = Camera.type != CameraType::Look ? 8 : 4;
 		}
 
@@ -1553,11 +1549,11 @@ void CalculateCamera()
 			{
 				if (TargetSnaps <= 8)
 				{
-					x = LastTarget.x + ((x - LastTarget.x) >> 2);
+					x = LastTarget.x + ((x - LastTarget.x) / 4);
 					Camera.target.x = x;
-					y = LastTarget.y + ((y - LastTarget.y) >> 2);
+					y = LastTarget.y + ((y - LastTarget.y) / 4);
 					Camera.target.y = y;
-					z = LastTarget.z + ((z - LastTarget.z) >> 2);
+					z = LastTarget.z + ((z - LastTarget.z) / 4);
 					Camera.target.z = z;
 				}
 				else

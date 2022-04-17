@@ -8,7 +8,6 @@ struct BatData
 {
 	bool On;
 	PoseData Pose;
-	EulerAngle Orientation;
 	short RoomNumber;
 
 	short Velocity;
