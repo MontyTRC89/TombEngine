@@ -127,22 +127,28 @@ void ObjectsHandler::TestCollidingObjects()
 	for (const auto idOne : m_collidingItems)
 	{
 		auto item = &g_Level.Items[idOne];
-		GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0, true);
-		size_t i = 0;
-		while (CollidedItems[i])
+		if (!item->luaCallbackOnCollidedWithObjectName.empty())
 		{
-			short idTwo = GetIndexByName(CollidedItems[i]->luaName);
-			g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedWithObjectName, idOne, idTwo);
-			++i;
+			//test against other moveables
+			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0, true);
+			size_t i = 0;
+			while (CollidedItems[i])
+			{
+				short idTwo = GetIndexByName(CollidedItems[i]->luaName);
+				g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedWithObjectName, idOne, idTwo);
+				++i;
+			}
 		}
 
-		if(TestItemRoomCollisionAABB(item))
+		if (!item->luaCallbackOnCollidedWithRoomName.empty())
 		{
-			//stub
+			//test against room geometry
+			if (TestItemRoomCollisionAABB(item))
+			{
+				g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedWithRoomName, idOne);
+			}
 		}
-
 	}
-
 }
 
 //todo document "Lara" obj
