@@ -74,7 +74,7 @@ void FlareControl(short itemNum)
 
 	if (DoFlareLight((PHD_VECTOR*)&flareItem->pos, age))
 	{
-		TriggerChaffEffects(flareItem,age);
+		TriggerChaffEffects(flareItem, age);
 		/* Hardcoded code */
 
 		age |= 0x8000;
@@ -401,7 +401,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 	if (age < 4)
 	{
 		falloff = 12 + ((1 - (age / 4.0f)) * 16);
-		
+
 		r = FlareMainColor.x * 255;
 		g = FlareMainColor.y * 255;
 		b = FlareMainColor.z * 255;
@@ -422,7 +422,7 @@ int DoFlareLight(PHD_VECTOR* pos, int age)
 
 		return (random < 0.4f);
 	}
-	else 
+	else
 	{
 		auto multiplier = GenerateFloat(0.05f, 0.8f);
 		falloff = 12 * (1.0f - ((age - (FLARE_AGE - 90)) / (FLARE_AGE - (FLARE_AGE - 90))));

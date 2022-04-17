@@ -453,7 +453,7 @@ static void TonyBossDie(short itemNum)
 	item = &g_Level.Items[itemNum];
 	item->collidable = false;
 	item->hitPoints = -16384;
-	
+
 	KillItem(itemNum);
 	DisableBaddieAI(itemNum);
 
@@ -475,11 +475,11 @@ void InitialiseTony(short itemNum)
 static bool TonyIsDying()
 {
 	return	BossData.ExplodeCount == 01 ||
-			BossData.ExplodeCount == 15 ||
-			BossData.ExplodeCount == 25 ||
-			BossData.ExplodeCount == 35 ||
-			BossData.ExplodeCount == 45 ||
-			BossData.ExplodeCount == 55;
+		BossData.ExplodeCount == 15 ||
+		BossData.ExplodeCount == 25 ||
+		BossData.ExplodeCount == 35 ||
+		BossData.ExplodeCount == 45 ||
+		BossData.ExplodeCount == 55;
 }
 
 static void ExplodeTonyBoss(ITEM_INFO* item)
@@ -576,84 +576,84 @@ void TonyControl(short itemNum)
 
 		switch (item->currentAnimState)
 		{
-			case TONYBOSS_WAIT:
-				tonyboss->maximumTurn = 0;
-				if (item->goalAnimState != TONYBOSS_RISE && item->itemFlags[3])
-					item->goalAnimState = TONYBOSS_RISE;
-				break;
+		case TONYBOSS_WAIT:
+			tonyboss->maximumTurn = 0;
+			if (item->goalAnimState != TONYBOSS_RISE && item->itemFlags[3])
+				item->goalAnimState = TONYBOSS_RISE;
+			break;
 
-			case TONYBOSS_RISE:
-				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) > 16)
-					tonyboss->maximumTurn = TONYBOSS_TURN;
-				else
-					tonyboss->maximumTurn = 0;
-				break;
-
-			case TONYBOSS_FLOAT:
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+		case TONYBOSS_RISE:
+			if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) > 16)
 				tonyboss->maximumTurn = TONYBOSS_TURN;
-
-				if (!BossData.ExplodeCount)
-				{
-					if (item->goalAnimState != TONYBOSS_BIGBOOM && item->itemFlags[3] != 2)
-					{
-						item->goalAnimState = TONYBOSS_BIGBOOM;
-						tonyboss->maximumTurn = 0;
-					}
-
-					if (item->goalAnimState != TONYBOSS_ROCKZAPP && item->itemFlags[3] == 2)
-					{
-						if (!(Wibble & 255) && item->itemFlags[0] == 0)
-						{
-							item->goalAnimState = TONYBOSS_ROCKZAPP;
-							item->itemFlags[0] = 1;
-						}
-					}
-
-					if (item->goalAnimState != TONYBOSS_ZAPP && item->goalAnimState != TONYBOSS_ROCKZAPP && item->itemFlags[3] == 2)
-					{
-						if (!(Wibble & 255) && item->itemFlags[0] == 1)
-						{
-							item->goalAnimState = TONYBOSS_ZAPP;
-							item->itemFlags[0] = 0;
-						}
-					}
-				}
-				break;
-
-			case TONYBOSS_ROCKZAPP:
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+			else
 				tonyboss->maximumTurn = 0;
+			break;
 
-				if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 40)
+		case TONYBOSS_FLOAT:
+			torso_y = info.angle;
+			torso_x = info.xAngle;
+			tonyboss->maximumTurn = TONYBOSS_TURN;
+
+			if (!BossData.ExplodeCount)
+			{
+				if (item->goalAnimState != TONYBOSS_BIGBOOM && item->itemFlags[3] != 2)
 				{
-					TriggerFireBall(item, T_ROCKZAPPL, NULL, item->roomNumber, 0, 0);
-					TriggerFireBall(item, T_ROCKZAPPR, NULL, item->roomNumber, 0, 0);
+					item->goalAnimState = TONYBOSS_BIGBOOM;
+					tonyboss->maximumTurn = 0;
 				}
-				break;
 
-			case TONYBOSS_ZAPP:
-				torso_y = info.angle;
-				torso_x = info.xAngle;
-				tonyboss->maximumTurn = TONYBOSS_TURN / 2;
-
-				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 28)
-					TriggerFireBall(item, T_ZAPP, NULL, item->roomNumber, item->pos.yRot, 0);
-				break;
-
-			case TONYBOSS_BIGBOOM:
-				tonyboss->maximumTurn = 0;
-				if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 56)
+				if (item->goalAnimState != TONYBOSS_ROCKZAPP && item->itemFlags[3] == 2)
 				{
-					item->itemFlags[3] = 2;
-					BossData.DrawExplode = true;
+					if (!(Wibble & 255) && item->itemFlags[0] == 0)
+					{
+						item->goalAnimState = TONYBOSS_ROCKZAPP;
+						item->itemFlags[0] = 1;
+					}
 				}
-				break;
 
-			default:
-				break;
+				if (item->goalAnimState != TONYBOSS_ZAPP && item->goalAnimState != TONYBOSS_ROCKZAPP && item->itemFlags[3] == 2)
+				{
+					if (!(Wibble & 255) && item->itemFlags[0] == 1)
+					{
+						item->goalAnimState = TONYBOSS_ZAPP;
+						item->itemFlags[0] = 0;
+					}
+				}
+			}
+			break;
+
+		case TONYBOSS_ROCKZAPP:
+			torso_y = info.angle;
+			torso_x = info.xAngle;
+			tonyboss->maximumTurn = 0;
+
+			if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase == 40)
+			{
+				TriggerFireBall(item, T_ROCKZAPPL, NULL, item->roomNumber, 0, 0);
+				TriggerFireBall(item, T_ROCKZAPPR, NULL, item->roomNumber, 0, 0);
+			}
+			break;
+
+		case TONYBOSS_ZAPP:
+			torso_y = info.angle;
+			torso_x = info.xAngle;
+			tonyboss->maximumTurn = TONYBOSS_TURN / 2;
+
+			if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 28)
+				TriggerFireBall(item, T_ZAPP, NULL, item->roomNumber, item->pos.yRot, 0);
+			break;
+
+		case TONYBOSS_BIGBOOM:
+			tonyboss->maximumTurn = 0;
+			if ((item->frameNumber - g_Level.Anims[item->animNumber].frameBase) == 56)
+			{
+				item->itemFlags[3] = 2;
+				BossData.DrawExplode = true;
+			}
+			break;
+
+		default:
+			break;
 		}
 	}
 
