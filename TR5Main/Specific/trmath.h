@@ -28,15 +28,15 @@ constexpr auto OFFSET_RADIUS = [](auto x) { return round(x * M_SQRT2 + 4); };
 float FROM_DEGREES(float angle);
 float TO_DEGREES(float angle);
 
-BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
+BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box);
 
 const float lerp(float v0, float v1, float t);
 const Vector3 getRandomVector();
 const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees);
 float mGetAngle(int x1, int y1, int x2, int y2);
 void phd_GetVectorAngles(int x, int y, int z, float* angles);
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
-int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
+void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
+int phd_Distance(PoseData* first, PoseData* second);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 

@@ -141,8 +141,8 @@ namespace TEN::Entities::TR4
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
 
-		int dx = 870 * sin(item->Orientation.y);
-		int dz = 870 * cos(item->Orientation.y);
+		int dx = 870 * sin(item->Pose.Orientation.y);
+		int dz = 870 * cos(item->Pose.Orientation.y);
 
 		x += dx;
 		z += dz;
@@ -198,13 +198,13 @@ namespace TEN::Entities::TR4
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_2;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
-				item->Orientation.y += AI.angle + -32768;
+				item->Pose.Orientation.y += AI.angle + -32768;
 			}
 			else
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_1;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 17;
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			}
 
 			item->HitPoints = 25;
@@ -223,7 +223,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = atan2(dz, dx) - item->Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -256,16 +256,16 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = 870 * sin(item->Orientation.y + EulerAngle::DegToRad(45.0f));
-				dz = 870 * cos(item->Orientation.y + EulerAngle::DegToRad(45.0f));
+				dx = 870 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(45.0f));
+				dz = 870 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * sin(item->Orientation.y + EulerAngle::DegToRad(78.75f));
-				dz = 870 * cos(item->Orientation.y + EulerAngle::DegToRad(78.75f));
+				dx = 870 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(78.75f));
+				dz = 870 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -282,16 +282,16 @@ namespace TEN::Entities::TR4
 						jumpRight = false;
 				}
 
-				dx = 870 * sin(item->Orientation.y - EulerAngle::DegToRad(45.0f));
-				dz = 870 * cos(item->Orientation.y - EulerAngle::DegToRad(45.0f));
+				dx = 870 * sin(item->Pose.Orientation.y - EulerAngle::DegToRad(45.0f));
+				dz = 870 * cos(item->Pose.Orientation.y - EulerAngle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * sin(item->Orientation.y - EulerAngle::DegToRad(78.75f));
-				dz = 870 * cos(item->Orientation.y - EulerAngle::DegToRad(78.75f));
+				dx = 870 * sin(item->Pose.Orientation.y - EulerAngle::DegToRad(78.75f));
+				dz = 870 * cos(item->Pose.Orientation.y - EulerAngle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -531,12 +531,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Orientation.y += EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(6.0f);
 					else
-						item->Orientation.y -= EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y -= EulerAngle::DegToRad(6.0f);
 				}
 				else
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (!creature->Flags)
 				{
@@ -563,12 +563,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Orientation.y += EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(6.0f);
 					else
-						item->Orientation.y -= EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y -= EulerAngle::DegToRad(6.0f);
 				}
 				else
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];
@@ -600,7 +600,7 @@ namespace TEN::Entities::TR4
 					{
 						if (item->TouchBits & 0x18000)
 						{
-							CreatureEffect2(item, &SkeletonBite, 10, item->Orientation.y, DoBloodSplat);
+							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 							creature->Flags = 1;
 

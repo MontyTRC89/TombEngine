@@ -42,8 +42,8 @@ void InitialiseChef(short itemNumber)
 	item->Animation.TargetState = CHEF_STATE_COOKING;
 	item->Animation.ActiveState = CHEF_STATE_COOKING;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Pose.Position.x += 192 * sin(item->Orientation.y);
-	item->Pose.Position.z += 192 * cos(item->Orientation.y);
+	item->Pose.Position.x += 192 * sin(item->Pose.Orientation.y);
+	item->Pose.Position.z += 192 * cos(item->Pose.Orientation.y);
 }
 
 void ControlChef(short itemNumber)
@@ -90,7 +90,7 @@ void ControlChef(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			aiLaraInfo.angle = atan2(dz, dx) - item->Orientation.y;
+			aiLaraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 			aiLaraInfo.ahead = true;
 
 			if (aiLaraInfo.angle <= EulerAngle::DegToRad(-90.0f) || aiLaraInfo.angle >= EulerAngle::DegToRad(90.0f))
@@ -134,11 +134,11 @@ void ControlChef(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle > 0)
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Orientation.y += EulerAngle::DegToRad(-180.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
 
 			break;
 
@@ -148,12 +148,12 @@ void ControlChef(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (AI.angle > 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (!creature->Flags)
 			{
@@ -161,7 +161,7 @@ void ControlChef(short itemNumber)
 				{
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 					{
-						CreatureEffect2(item, &ChefBite, 20, item->Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 

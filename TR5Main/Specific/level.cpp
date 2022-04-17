@@ -22,7 +22,6 @@
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 
-
 using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
@@ -120,7 +119,7 @@ void LoadItems()
 			item->Pose.Position.x = ReadInt32();
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
-			item->Orientation.y = EulerAngle::ShrtToRad(ReadInt16()); // TODO
+			item->Pose.Orientation.y = EulerAngle::ShrtToRad(ReadInt16()); // TODO
 			item->Shade = ReadInt16();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
@@ -132,7 +131,7 @@ void LoadItems()
 
 			g_GameScript->AddName(item->LuaName, i);
 
-			memcpy(&item->StartPose, &item->Pose, sizeof(PHD_3DPOS));
+			memcpy(&item->StartPose, &item->Pose, sizeof(PoseData));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)

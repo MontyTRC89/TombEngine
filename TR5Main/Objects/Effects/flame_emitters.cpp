@@ -211,8 +211,8 @@ namespace TEN::Entities::Effects
 
 				if (item->TriggerFlags == 2)
 				{
-					item->Pose.Position.x += sin(item->Orientation.y - EulerAngle::DegToRad(180));
-					item->Pose.Position.z += cos(item->Orientation.y - EulerAngle::DegToRad(180));
+					item->Pose.Position.x += sin(item->Pose.Orientation.y - EulerAngle::DegToRad(180));
+					item->Pose.Position.z += cos(item->Pose.Orientation.y - EulerAngle::DegToRad(180));
 
 					short roomNumber = item->RoomNumber;
 					FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -364,7 +364,7 @@ namespace TEN::Entities::Effects
 
 			/*if (((-item->TriggerFlags) & 7) == 7)
 			{
-				switch (item->Orientation.y)
+				switch (item->Pose.Orientation.y)
 				{
 				case 0:
 					item->Pose.Position.z += 512;
@@ -394,7 +394,7 @@ namespace TEN::Entities::Effects
 
 		if (item->TriggerFlags != 123)
 		{
-			/*switch (item->Orientation.y)
+			/*switch (item->Pose.Orientation.y)
 			{
 			case 0:
 				if (item->TriggerFlags == 2)
@@ -472,9 +472,9 @@ namespace TEN::Entities::Effects
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * sin(item->Orientation.y + EulerAngle::DegToRad(180));
+						dest.x = item->Pose.Position.x + 2048 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(180));
 						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * cos(item->Orientation.y + EulerAngle::DegToRad(180));
+						dest.z = item->Pose.Position.z + 2048 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(180));
 
 						if (GetRandomControl() & 3)
 						{
@@ -613,7 +613,7 @@ namespace TEN::Entities::Effects
 
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
-				PHD_3DPOS pos;
+				PoseData pos;
 				pos.Position.x = item->Pose.Position.x;
 				pos.Position.y = item->Pose.Position.y;
 				pos.Position.z = item->Pose.Position.z;
@@ -686,8 +686,8 @@ namespace TEN::Entities::Effects
 
 			}
 
-			short oldYrot = item->Orientation.y;
-			item->Orientation.y = l->Orientation.y;
+			short oldYrot = item->Pose.Orientation.y;
+			item->Pose.Orientation.y = l->Pose.Orientation.y;
 
 			if (TestLaraPosition(&FireBounds, item, l))
 			{
@@ -709,7 +709,7 @@ namespace TEN::Entities::Effects
 				Lara.InteractedItem = itemNumber;
 			}
 
-			item->Orientation.y = oldYrot;
+			item->Pose.Orientation.y = oldYrot;
 		}
 
 		if (Lara.InteractedItem == itemNumber

@@ -11,16 +11,16 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 	if (item->TriggerFlags == 111)
 	{
-		if (item->Orientation.y > 0)
+		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->Orientation.y == EulerAngle::DegToRad(90.0f))
+			if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
 		}
-		else if (item->Orientation.y)
+		else if (item->Pose.Orientation.y)
 		{
-			if (item->Orientation.y == EulerAngle::DegToRad(-180.0f))
+			if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(2);
-			else if (item->Orientation.y == EulerAngle::DegToRad(-90.0f))
+			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(2);
 		}
 		else
@@ -32,18 +32,18 @@ void InitialiseSmokeEmitter(short itemNumber)
 	{
 		item->ItemFlags[0] = item->TriggerFlags / 16;
 
-		if (item->Orientation.y > 0)
+		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->Orientation.y == EulerAngle::DegToRad(90.0f))
+			if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(1);
 		}
 		else
 		{
-			if (item->Orientation.y == 0)
+			if (item->Pose.Orientation.y == 0)
 				item->Pose.Position.z += CLICK(1);
-			else if (item->Orientation.y == EulerAngle::DegToRad(-180.0f))
+			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(1);
-			else if (item->Orientation.y == EulerAngle::DegToRad(-90.0f))
+			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(1);
 		}
 

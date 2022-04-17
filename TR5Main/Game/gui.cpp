@@ -3244,8 +3244,8 @@ void GuiController::DrawCompass()
 {
 	return;
 	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, EulerAngle::DegToRad(90.0f), 0, EulerAngle::DegToRad(180.0f), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
-	float compass_speed = sin(compassNeedleAngle - LaraItem->Orientation.y);
-	float compass_angle = (LaraItem->Orientation.y + compass_speed) - EulerAngle::DegToRad(180.0f);
+	float compass_speed = sin(compassNeedleAngle - LaraItem->Pose.Orientation.y);
+	float compass_angle = (LaraItem->Pose.Orientation.y + compass_speed) - EulerAngle::DegToRad(180.0f);
 	Matrix::CreateRotationY(compass_angle);
 }
 

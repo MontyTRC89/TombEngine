@@ -38,7 +38,7 @@ namespace TEN::Entities::TR4
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
 			wraith->Pose.Position = item->Pose.Position;
-			wraith->Orientation.z = 0;
+			wraith->Pose.Orientation.z = 0;
 			wraith->Pose.Position.x = 0;
 			wraith->Pose.Position.y = 0;
 			wraith->r = 0;
@@ -81,7 +81,7 @@ namespace TEN::Entities::TR4
 		}
 
 		dy = y - item->Pose.Position.y - dy - CLICK(0.5f);
-		float angleH = atan2(z, x) - item->Orientation.y;
+		float angleH = atan2(z, x) - item->Pose.Orientation.y;
 
 		float angleV = 0;
 		if (abs(x) <= abs(z))
@@ -89,7 +89,7 @@ namespace TEN::Entities::TR4
 		else
 			angleV = atan2(abs(z) + (abs(x) / 2), dy);
 
-		angleV -= item->Orientation.x;
+		angleV -= item->Pose.Orientation.x;
 
 		int velocity = 8 * (WraithVelocity / item->Animation.Velocity);
 
@@ -102,7 +102,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[2] += velocity;
-					item->Orientation.y += item->ItemFlags[2];
+					item->Pose.Orientation.y += item->ItemFlags[2];
 				}
 			}
 			else if (item->ItemFlags[2] >= 0)
@@ -110,11 +110,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[2] -= velocity;
-				item->Orientation.y += item->ItemFlags[2];
+				item->Pose.Orientation.y += item->ItemFlags[2];
 			}
 		}
 		else
-			item->Orientation.y += angleH;
+			item->Pose.Orientation.y += angleH;
 
 		if (abs(angleV) >= item->ItemFlags[3] || angleV > 0 != item->ItemFlags[3] > 0)
 		{
@@ -125,7 +125,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[3] += velocity;
-					item->Orientation.x += item->ItemFlags[3];
+					item->Pose.Orientation.x += item->ItemFlags[3];
 				}
 			}
 			else if (item->ItemFlags[3] >= 0)
@@ -133,11 +133,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[3] -= velocity;
-				item->Orientation.x += item->ItemFlags[3];
+				item->Pose.Orientation.x += item->ItemFlags[3];
 			}
 		}
 		else
-			item->Orientation.x += angleV;
+			item->Pose.Orientation.x += angleV;
 
 		auto probe = GetCollision(item);
 
@@ -145,9 +145,9 @@ namespace TEN::Entities::TR4
 		if (probe.Position.Floor < item->Pose.Position.y || probe.Position.Ceiling > item->Pose.Position.y)
 			hitWall = true;
 
-		item->Pose.Position.x += item->Animation.Velocity * sin(item->Orientation.y);
-		item->Pose.Position.y += item->Animation.Velocity * sin(item->Orientation.x);
-		item->Pose.Position.z += item->Animation.Velocity * cos(item->Orientation.y);
+		item->Pose.Position.x += item->Animation.Velocity * sin(item->Pose.Orientation.y);
+		item->Pose.Position.y += item->Animation.Velocity * sin(item->Pose.Orientation.x);
+		item->Pose.Position.z += item->Animation.Velocity * cos(item->Pose.Orientation.y);
 
 		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 		if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)
@@ -287,10 +287,10 @@ namespace TEN::Entities::TR4
 			probe.Position.Ceiling > item->Pose.Position.y)
 		{
 			if (!hitWall)
-				WraithWallsEffect(oldX, oldY, oldZ, item->Orientation.y + EulerAngle::DegToRad(-180.0f), item->ObjectNumber);
+				WraithWallsEffect(oldX, oldY, oldZ, item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
-			WraithWallsEffect(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Orientation.y, item->ObjectNumber);
+			WraithWallsEffect(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Pose.Orientation.y, item->ObjectNumber);
 
 		// Update WRAITH nodes
 		auto* creature = (WraithInfo*)item->Data;

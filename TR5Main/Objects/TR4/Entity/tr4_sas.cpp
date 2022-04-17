@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int ang = atan2(dz, dx) - item->Orientation.y;
+				int ang = atan2(dz, dx) - item->Pose.Orientation.y;
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -177,24 +177,24 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= EulerAngle::DegToRad(10.0f))
 					{
 						if (AI.angle >= 0)
-							item->Orientation.y += EulerAngle::DegToRad(10.0f);
+							item->Pose.Orientation.y += EulerAngle::DegToRad(10.0f);
 						else
-							item->Orientation.y -= EulerAngle::DegToRad(10.0f);
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(10.0f);
 					}
 					else
-						item->Orientation.y += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
 					if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 					{
 						if (AI.angle >= 0)
-							item->Orientation.y += EulerAngle::DegToRad(2.0f);
+							item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 						else
-							item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 					}
 					else
-						item->Orientation.y += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (item->AIBits & GUARD)
@@ -586,9 +586,9 @@ namespace TEN::Entities::TR4
 
 			InitialiseItem(itemNumber);
 
-			grenadeItem->Orientation.x = angle1 + item->Orientation.x;
-			grenadeItem->Orientation.y = angle2 + item->Orientation.y;
-			grenadeItem->Orientation.z = 0;
+			grenadeItem->Pose.Orientation.x = angle1 + item->Pose.Orientation.x;
+			grenadeItem->Pose.Orientation.y = angle2 + item->Pose.Orientation.y;
+			grenadeItem->Pose.Orientation.z = 0;
 
 			if (GetRandomControl() & 3)
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Normal;
@@ -597,9 +597,9 @@ namespace TEN::Entities::TR4
 
 			grenadeItem->ItemFlags[2] = 1;
 			grenadeItem->Animation.Velocity = 128;
-			grenadeItem->Animation.ActiveState = grenadeItem->Orientation.x;
-			grenadeItem->Animation.VerticalVelocity = -128 * sin(grenadeItem->Orientation.x);
-			grenadeItem->Animation.TargetState = grenadeItem->Orientation.y;
+			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
+			grenadeItem->Animation.VerticalVelocity = -128 * sin(grenadeItem->Pose.Orientation.x);
+			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
 			grenadeItem->Animation.RequiredState = 0;
 			grenadeItem->HitPoints = 120;
 
@@ -664,9 +664,9 @@ namespace TEN::Entities::TR4
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					int x = laraItem->Pose.Position.x - 512 * sin(laraItem->Orientation.y);
+					int x = laraItem->Pose.Position.x - 512 * sin(laraItem->Pose.Orientation.y);
 					int y = laraItem->Pose.Position.y;
-					int z = laraItem->Pose.Position.z - 512 * cos(laraItem->Orientation.y);
+					int z = laraItem->Pose.Position.z - 512 * cos(laraItem->Pose.Orientation.y);
 
 					TestTriggers(x, y, z, laraItem->RoomNumber, true);
 
@@ -686,7 +686,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Orientation.y = item->Orientation.y;
+					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 					ResetLaraFlex(laraItem);
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Busy;

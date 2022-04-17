@@ -43,7 +43,7 @@ namespace TEN::Entities::TR4
 				end.x = item->Pose.Position.x;
 				end.y = item->Pose.Position.y;
 				end.z = item->Pose.Position.z;
-				angles[0] = item->Orientation.y - EulerAngle::DegToRad(180.0f);
+				angles[0] = item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f);
 				angles[1] = 0;
 			}
 			// Mutant.
@@ -82,16 +82,16 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Orientation.y > 0)
+		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->Orientation.y == EulerAngle::DegToRad(90.0f))
+			if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
 		}
-		else if (item->Orientation.y < 0)
+		else if (item->Pose.Orientation.y < 0)
 		{
-			if (item->Orientation.y == EulerAngle::DegToRad(-180.0f))
+			if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(2);
-			else if (item->Orientation.y == EulerAngle::DegToRad(-90.0f))
+			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(2);
 		}
 		else

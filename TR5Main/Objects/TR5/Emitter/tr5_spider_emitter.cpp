@@ -61,7 +61,7 @@ void InitialiseSpiders(short itemNumber)
 
 	short flags = item->TriggerFlags / -24;
 
-	item->Orientation.x = EulerAngle::DegToRad(45.0f);
+	item->Pose.Orientation.x = EulerAngle::DegToRad(45.0f);
 	item->ItemFlags[1] = flags & 2;
 	item->ItemFlags[2] = flags & 4;
 	item->ItemFlags[0] = flags & 1;
@@ -73,14 +73,14 @@ void InitialiseSpiders(short itemNumber)
 		return;
 	}
 
-	if (item->Orientation.y > EulerAngle::DegToRad(-157.5f) && item->Orientation.y < EulerAngle::DegToRad(-22.5f))
+	if (item->Pose.Orientation.y > EulerAngle::DegToRad(-157.5f) && item->Pose.Orientation.y < EulerAngle::DegToRad(-22.5f))
 		item->Pose.Position.x += CLICK(2);
-	else if (item->Orientation.y > EulerAngle::DegToRad(22.5f) && item->Orientation.y < EulerAngle::DegToRad(157.5f))
+	else if (item->Pose.Orientation.y > EulerAngle::DegToRad(22.5f) && item->Pose.Orientation.y < EulerAngle::DegToRad(157.5f))
 		item->Pose.Position.x -= CLICK(2);
 
-	if (item->Orientation.y > EulerAngle::DegToRad(-45.0f) && item->Orientation.y < EulerAngle::DegToRad(45.0f))
+	if (item->Pose.Orientation.y > EulerAngle::DegToRad(-45.0f) && item->Pose.Orientation.y < EulerAngle::DegToRad(45.0f))
 		item->Pose.Position.z -= CLICK(2);
-	else if (item->Orientation.y < EulerAngle::DegToRad(-112.5f) || item->Orientation.y > EulerAngle::DegToRad(112.5f))
+	else if (item->Pose.Orientation.y < EulerAngle::DegToRad(-112.5f) || item->Pose.Orientation.y > EulerAngle::DegToRad(112.5f))
 		item->Pose.Position.z += CLICK(2);
 
 	ClearSpiders();
@@ -109,17 +109,17 @@ void SpidersEmitterControl(short itemNumber)
 
 				if (item->ItemFlags[0])
 				{
-					spider->Orientation.y = 2 * GetRandomControl();
+					spider->Pose.Orientation.y = 2 * GetRandomControl();
 					spider->VerticalVelocity = -16 - (GetRandomControl() & 0x1F);
 				}
 				else
 				{
-					spider->Orientation.y = item->Orientation.y + (GetRandomControl() & 0x3FFF) - EulerAngle::DegToRad(45.0f);
+					spider->Pose.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - EulerAngle::DegToRad(45.0f);
 					spider->VerticalVelocity = 0;
 				}
 
-				spider->Orientation.x = 0;
-				spider->Orientation.z = 0;
+				spider->Pose.Orientation.x = 0;
+				spider->Pose.Orientation.z = 0;
 				spider->On = true;
 				spider->Flags = 0;
 				spider->Velocity = (GetRandomControl() & 0x1F) + 1;
@@ -140,20 +140,20 @@ void UpdateSpiders()
 			{
 				auto oldPos = spider->Pose.Position;
 
-				spider->Pose.Position.x += spider->Velocity * sin(spider->Orientation.y);
+				spider->Pose.Position.x += spider->Velocity * sin(spider->Pose.Orientation.y);
 				spider->Pose.Position.y += spider->VerticalVelocity;
-				spider->Pose.Position.z += spider->Velocity * cos(spider->Orientation.y);
+				spider->Pose.Position.z += spider->Velocity * cos(spider->Pose.Orientation.y);
 				spider->VerticalVelocity += GRAVITY;
 
 				auto dPos = LaraItem->Pose.Position - spider->Pose.Position;
 
-				float angle = atan2(dPos.z, dPos.x) - spider->Orientation.y;
+				float angle = atan2(dPos.z, dPos.x) - spider->Pose.Orientation.y;
 
 				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
-					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Orientation.y, 1);
+					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Pose.Orientation.y, 1);
 				}
 
 				if (spider->Flags)
@@ -161,9 +161,9 @@ void UpdateSpiders()
 					if (abs(dPos.x) + abs(dPos.z) <= CLICK(3))
 					{
 						if (spider->Velocity & 1)
-							spider->Orientation.y += EulerAngle::DegToRad(2.8f);
+							spider->Pose.Orientation.y += EulerAngle::DegToRad(2.8f);
 						else
-							spider->Orientation.y -= EulerAngle::DegToRad(2.8f);
+							spider->Pose.Orientation.y -= EulerAngle::DegToRad(2.8f);
 
 						spider->Velocity = 48 - (abs(angle) / EulerAngle::DegToRad(5.6f));
 					}
@@ -175,12 +175,12 @@ void UpdateSpiders()
 						if (abs(angle) >= EulerAngle::DegToRad(11.25f))
 						{
 							if (angle >= 0)
-								spider->Orientation.y += EulerAngle::DegToRad(5.6f);
+								spider->Pose.Orientation.y += EulerAngle::DegToRad(5.6f);
 							else
-								spider->Orientation.y -= EulerAngle::DegToRad(5.6f);
+								spider->Pose.Orientation.y -= EulerAngle::DegToRad(5.6f);
 						}
 						else
-							spider->Orientation.y += 8 * (Wibble - i);
+							spider->Pose.Orientation.y += 8 * (Wibble - i);
 					}
 				}
 
@@ -199,7 +199,7 @@ void UpdateSpiders()
 								NextSpider = 0;
 							}
 							else
-								spider->Orientation.x = -128 * spider->VerticalVelocity;
+								spider->Pose.Orientation.x = -128 * spider->VerticalVelocity;
 						}
 						else
 						{
@@ -212,19 +212,19 @@ void UpdateSpiders()
 					{
 						spider->Pose.Position = oldPos;
 						spider->Pose.Position.y -= 8;
-						spider->Orientation.x = EulerAngle::DegToRad(78.75f);
+						spider->Pose.Orientation.x = EulerAngle::DegToRad(78.75f);
 						spider->VerticalVelocity = 0;
 
 						if (!(GetRandomControl() & 0x1F))
-							spider->Orientation.y += EulerAngle::DegToRad(-180.0f);
+							spider->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
 					}
 				}
 				else
 				{
 					if (angle <= 0)
-						spider->Orientation.y -= EulerAngle::DegToRad(90.0f);
+						spider->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
 					else
-						spider->Orientation.y += EulerAngle::DegToRad(90.0f);
+						spider->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
 
 					spider->Pose.Position = oldPos;
 					spider->VerticalVelocity = 0;
@@ -233,7 +233,7 @@ void UpdateSpiders()
 				if (spider->Pose.Position.y < g_Level.Rooms[spider->RoomNumber].maxceiling + 50)
 				{
 					spider->Pose.Position.y = g_Level.Rooms[spider->RoomNumber].maxceiling + 50;
-					spider->Orientation.y += EulerAngle::DegToRad(-180.0f);
+					spider->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
 					spider->VerticalVelocity = 1;
 				}
 

@@ -221,7 +221,7 @@ static void TriggerRomanStatueAttackEffect1(short itemNumber, int factor)
 	spark->sSize = (spark->size = factor * ((GetRandomControl() & 0x1F) + 64)) / 16;
 }
 
-static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
+static void RomanStatueAttack(PoseData* pos, short roomNumber, short count)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 
@@ -289,8 +289,8 @@ void InitialiseRomanStatue(short itemNumber)
 	item->Animation.ActiveState = 13;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Pose.Position.x += 486 * sin(item->Orientation.y + EulerAngle::DegToRad(90.0f));
-	item->Pose.Position.z += 486 * cos(item->Orientation.y + EulerAngle::DegToRad(90.0f));
+	item->Pose.Position.x += 486 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
+	item->Pose.Position.z += 486 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(RomanStatueInfo));
 }
@@ -563,12 +563,12 @@ void RomanStatueControl(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
@@ -590,7 +590,7 @@ void RomanStatueControl(short itemNumber)
 							if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 							{
 								ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
+								SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh, 0);
 
 								mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->Stopper = false;
@@ -605,7 +605,7 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (item->TouchBits & 0xC000)
 					{
-						CreatureEffect2(item, &RomanStatueBite, 20, item->Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 
@@ -626,10 +626,10 @@ void RomanStatueControl(short itemNumber)
 						if (item->ItemFlags[0])
 							item->ItemFlags[0]--;
 						
-						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
+						TriggerShockwave((PoseData*)&pos1, 16, 160, 96, 0, 64, 128, 48, 0, 1);
 						TriggerRomanStatueShockwaveAttackSparks(pos1.x, pos1.y, pos1.z, 128, 64, 0, 128);
 						pos1.y -= 64;
-						TriggerShockwave((PHD_3DPOS*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
+						TriggerShockwave((PoseData*)&pos1, 16, 160, 64, 0, 64, 128, 48, 0, 1);
 					}
 
 					deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -660,12 +660,12 @@ void RomanStatueControl(short itemNumber)
 				if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 				{
 					if (AI.angle > 0)
-						item->Orientation.y += EulerAngle::DegToRad(2.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 					else
-						item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+						item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 				}
 				else
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 			}
 
 			if (AI.distance < pow(SECTOR(1), 2))
@@ -701,12 +701,12 @@ void RomanStatueControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle > 0)
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Orientation.y += EulerAngle::DegToRad(-180.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
 		
 			break;
 
@@ -734,7 +734,7 @@ void RomanStatueControl(short itemNumber)
 				float angles[2];
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
-				PHD_3DPOS attackPos;
+				PoseData attackPos;
 				attackPos.Position.x = pos2.x;
 				attackPos.Position.y = pos2.y;
 				attackPos.Position.z = pos2.z;

@@ -55,7 +55,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
 
 				if (TestLaraPosition(&RailSwitchBounds2, switchItem, laraItem))
 				{
@@ -73,7 +73,7 @@ namespace TEN::Entities::Switches
 					lara->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
 
 				if (flag)
 				{

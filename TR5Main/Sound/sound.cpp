@@ -134,7 +134,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMultiplier, float gainMultiplier)
+long SoundEffect(int effectID, PoseData* position, int envFlags, float pitchMultiplier, float gainMultiplier)
 {
 	if (effectID >= g_Level.SoundMap.size())
 		return 0;
@@ -524,7 +524,7 @@ int Sound_GetFreeSlot()
 // We use origin position as a reference, because in original TRs it's not possible to clearly
 // identify what's the source of the producing effect.
 
-int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
+int Sound_EffectIsPlaying(int effectID, PoseData *position)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
 	{
@@ -557,7 +557,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 // Gets the distance to the source.
 
-float Sound_DistanceToListener(PHD_3DPOS *position)
+float Sound_DistanceToListener(PoseData *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
 	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
@@ -598,7 +598,7 @@ void Sound_FreeSlot(int index, unsigned int fadeout)
 
 // Update sound position in a level.
 
-bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
+bool Sound_UpdateEffectPosition(int index, PoseData *position, bool force)
 {
 	if (index > SOUND_MAX_CHANNELS || index < 0)
 		return false;
@@ -837,6 +837,6 @@ void PlaySoundSources()
 		else if (FlipStats[group] && (sound->flags & 128) == 0)
 			continue;
 
-		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x, 0);
+		SoundEffect(sound->soundId, (PoseData*)&sound->x, 0);
 	}
 }

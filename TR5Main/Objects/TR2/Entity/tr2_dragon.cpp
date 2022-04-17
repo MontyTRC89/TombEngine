@@ -102,9 +102,9 @@ static void createExplosion(ITEM_INFO* item)
 		explosionItem->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 		explosionItem->Pose.Position.z = item->Pose.Position.z;
 		explosionItem->RoomNumber = item->RoomNumber;
-		explosionItem->Orientation.y = 0;
-		explosionItem->Orientation.x = 0;
-		explosionItem->Orientation.z = 0;
+		explosionItem->Pose.Orientation.y = 0;
+		explosionItem->Pose.Orientation.x = 0;
+		explosionItem->Pose.Orientation.z = 0;
 		explosionItem->Animation.Velocity = 0;
 		explosionItem->Animation.VerticalVelocity = 0;
 
@@ -127,8 +127,8 @@ static void createDragonBone(short frontNumber)
 
 		dragonBack->ObjectNumber = ID_DRAGON_BONE_BACK;
 		dragonBack->Pose = item->Pose;
-		dragonBack->Orientation.x = 0;
-		dragonBack->Orientation.z = 0;
+		dragonBack->Pose.Orientation.x = 0;
+		dragonBack->Pose.Orientation.z = 0;
 		dragonBack->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneBack);
@@ -137,8 +137,8 @@ static void createDragonBone(short frontNumber)
 
 		dragonFront->ObjectNumber = ID_DRAGON_BONE_FRONT;
 		dragonFront->Pose = item->Pose;
-		dragonFront->Orientation.x = 0;
-		dragonFront->Orientation.z = 0;
+		dragonFront->Pose.Orientation.x = 0;
+		dragonFront->Pose.Orientation.z = 0;
 		dragonFront->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneFront);
@@ -160,8 +160,8 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		int rx = laraItem->Pose.Position.x - item->Pose.Position.x;
 		int rz = laraItem->Pose.Position.z - item->Pose.Position.z;
-		float s = sin(item->Orientation.y);
-		float c = cos(item->Orientation.y);
+		float s = sin(item->Pose.Orientation.y);
+		float c = cos(item->Pose.Orientation.y);
 
 		int sideShift = rx * s + rz * c;
 		if (sideShift > DRAGON_LCOL&& sideShift < DRAGON_RCOL)
@@ -170,7 +170,7 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
 				return;
 
-			int angle = laraItem->Orientation.y - item->Orientation.y;
+			int angle = laraItem->Pose.Orientation.y - item->Pose.Orientation.y;
 
 			int anim = item->Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
 			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -311,7 +311,7 @@ void DragonControl(short backItemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case DRAGON_STATE_IDLE:
-			item->Orientation.y -= angle;
+			item->Pose.Orientation.y -= angle;
 
 			if (!ahead)
 			{
@@ -392,19 +392,19 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_TURN_LEFT:
-			item->Orientation.y += -(EulerAngle::DegToRad(1.0f) - angle);
+			item->Pose.Orientation.y += -(EulerAngle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_TURN_RIGHT:
-			item->Orientation.y += (EulerAngle::DegToRad(1.0f) - angle);
+			item->Pose.Orientation.y += (EulerAngle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_AIM_1:
-			item->Orientation.y -= angle;
+			item->Pose.Orientation.y -= angle;
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -423,7 +423,7 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_FIRE_1:
-			item->Orientation.y -= angle;
+			item->Pose.Orientation.y -= angle;
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -452,9 +452,9 @@ void DragonControl(short backItemNumber)
 	back->Pose.Position.x = item->Pose.Position.x;
 	back->Pose.Position.y = item->Pose.Position.y;
 	back->Pose.Position.z = item->Pose.Position.z;
-	back->Orientation.x = item->Orientation.x;
-	back->Orientation.y = item->Orientation.y;
-	back->Orientation.z = item->Orientation.z;
+	back->Pose.Orientation.x = item->Pose.Orientation.x;
+	back->Pose.Orientation.y = item->Pose.Orientation.y;
+	back->Pose.Orientation.z = item->Pose.Orientation.z;
 
 	if (back->RoomNumber != item->RoomNumber)
 		ItemNewRoom(backItemNumber, item->RoomNumber);
@@ -477,7 +477,7 @@ void InitialiseBartoli(short itemNumber)
 		back->Pose.Position.x = item->Pose.Position.x;
 		back->Pose.Position.y = item->Pose.Position.y;
 		back->Pose.Position.z = item->Pose.Position.z;
-		back->Orientation.y = item->Orientation.y;
+		back->Pose.Orientation.y = item->Pose.Orientation.y;
 		back->RoomNumber = item->RoomNumber;
 		back->Status = ITEM_INVISIBLE;
 		back->Shade = -1;
@@ -493,7 +493,7 @@ void InitialiseBartoli(short itemNumber)
 		front->Pose.Position.x = item->Pose.Position.x;
 		front->Pose.Position.y = item->Pose.Position.y;
 		front->Pose.Position.z = item->Pose.Position.z;
-		front->Orientation.y = item->Orientation.y;
+		front->Pose.Orientation.y = item->Pose.Orientation.y;
 		front->RoomNumber = item->RoomNumber;
 		front->Status = ITEM_INVISIBLE;
 		front->Shade = -1;

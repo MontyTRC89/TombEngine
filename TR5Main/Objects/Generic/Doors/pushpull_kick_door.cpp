@@ -61,7 +61,7 @@ namespace TEN::Entities::Doors
 
 			if (laraItem->RoomNumber == doorItem->RoomNumber)
 			{
-				doorItem->Orientation.y += EulerAngle::DegToRad(180.0f);
+				doorItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
 				pull = true;
 			}
 
@@ -125,7 +125,7 @@ namespace TEN::Entities::Doors
 			}
 
 			if (pull)
-				doorItem->Orientation.y += EulerAngle::DegToRad(180.0f);
+				doorItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
 		}
 		else if (doorItem->Animation.ActiveState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
 			DoorCollision(itemNumber, laraItem, coll);

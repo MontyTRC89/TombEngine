@@ -36,7 +36,7 @@ static void PlayAudioTrack(std::string const & trackName, sol::optional<bool> lo
 
 static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
 {
-	PHD_3DPOS pos;
+	PoseData pos;
 
 	pos.Position.x = p.x;
 	pos.Position.y = p.y;
@@ -80,7 +80,7 @@ static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, Gam
 
 static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
 {
-	PHD_3DPOS p;
+	PoseData p;
 	p.Position.x = pos.x;
 	p.Position.y = pos.y;
 	p.Position.z = pos.z;

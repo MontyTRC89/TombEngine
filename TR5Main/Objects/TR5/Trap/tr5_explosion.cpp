@@ -77,7 +77,7 @@ void ExplosionControl(short itemNumber)
 			for (int i = 0; i < item->ItemFlags[2]; ++i)
 				TriggerExplosionSparks(item->Pose.Position.x + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.y + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], item->Pose.Position.z + (GetRandomControl() % 128 - 64) * item->ItemFlags[2], 2, 0, i, item->RoomNumber);
 			
-			PHD_3DPOS pos;
+			PoseData pos;
 			pos.Position.x = item->Pose.Position.x;
 			pos.Position.y = item->Pose.Position.y - 128;
 			pos.Position.z = item->Pose.Position.z;

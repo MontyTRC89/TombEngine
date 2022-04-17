@@ -116,8 +116,8 @@ void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		}
 		else
 		{
-			float rotY = item->Orientation.y;
-			item->Orientation.y = EulerAngle::ShrtToRad((EulerAngle::RadToShrt(laraItem->Orientation.y + EulerAngle::DegToRad(45.0f)) & EulerAngle::DegToShrt(270.0f)));
+			float rotY = item->Pose.Orientation.y;
+			item->Pose.Orientation.y = EulerAngle::ShrtToRad((EulerAngle::RadToShrt(laraItem->Pose.Orientation.y + EulerAngle::DegToRad(45.0f)) & EulerAngle::DegToShrt(270.0f)));
 
 			ScalesBounds.boundingBox.X1 = -1408;
 			ScalesBounds.boundingBox.X2 = -640;
@@ -128,12 +128,12 @@ void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			{
 				laraItem->Animation.AnimNumber = LA_WATERSKIN_POUR_HIGH;
 				laraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Orientation.y = rotY;
+				item->Pose.Orientation.y = rotY;
 			}
 			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
 			{
 				SoundEffect(SFX_TR4_POUR, &laraItem->Pose, 0);
-				item->Orientation.y = rotY;
+				item->Pose.Orientation.y = rotY;
 			}
 			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 			{
@@ -143,18 +143,18 @@ void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				if (laraItem->ItemFlags[3] < item->TriggerFlags)
 				{
 					item->Animation.TargetState = 4;
-					item->Orientation.y = rotY;
+					item->Pose.Orientation.y = rotY;
 				}
 				else if (laraItem->ItemFlags[3] == item->TriggerFlags)
 				{
 					item->Animation.TargetState = 2;
-					item->Orientation.y = rotY;
+					item->Pose.Orientation.y = rotY;
 				}
 				else
 					item->Animation.TargetState = 3;
 			}
 			else
-				item->Orientation.y = rotY;
+				item->Pose.Orientation.y = rotY;
 		}
 	}
 	

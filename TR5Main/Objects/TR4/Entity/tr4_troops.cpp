@@ -115,7 +115,7 @@ void TroopsControl(short itemNumber)
 					angle = 0;
 
 					item->Pose.Position = creature->Enemy->Pose.Position;
-					item->Orientation = creature->Enemy->Orientation;
+					item->Pose.Orientation = creature->Enemy->Pose.Orientation;
 
 					creature->Enemy->TriggerFlags = 99;
 				}
@@ -192,7 +192,7 @@ void TroopsControl(short itemNumber)
 			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			distance = pow(dx, 2) + pow(dz, 2);
-			rot = atan2(dz, dx) - item->Orientation.y;
+			rot = atan2(dz, dx) - item->Pose.Orientation.y;
 		}
 
 		if (!creature->HurtByLara && creature->Enemy == LaraItem)
@@ -222,12 +222,12 @@ void TroopsControl(short itemNumber)
 				if (abs(AI.angle) >= EulerAngle::DegToRad(10.0f))
 				{
 					if (AI.angle >= 0)
-						item->Orientation.y += EulerAngle::DegToRad(10.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(10.0f);
 					else
-						item->Orientation.y -= EulerAngle::DegToRad(10.0f);
+						item->Pose.Orientation.y -= EulerAngle::DegToRad(10.0f);
 				}
 				else
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 			}
 
 			if (item->AIBits & GUARD)

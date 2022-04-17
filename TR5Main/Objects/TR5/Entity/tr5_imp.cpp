@@ -142,7 +142,7 @@ void ImpControl(short itemNumber)
 			if (creature->Enemy == LaraItem)
 				angle2 = AI.angle;
 			else
-				angle2 = atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Orientation.y;
+				angle2 = atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
 			int d1 = item->Pose.Position.y - LaraItem->Pose.Position.y + CLICK(1.5f);
 
@@ -240,7 +240,7 @@ void ImpControl(short itemNumber)
 				if (creature->Flags == 0 &&
 					item->TouchBits & 0x280)
 				{
-					CreatureEffect2(item, &ImpBite, 10, item->Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
@@ -287,12 +287,12 @@ void ImpControl(short itemNumber)
 			if (abs(angle2) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += angle2;
+				item->Pose.Orientation.y += angle2;
 		}
 
 		CreatureTilt(item, 0);

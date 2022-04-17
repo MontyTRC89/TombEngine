@@ -90,7 +90,7 @@ void ControlGladiator(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			rot = atan2(dz, dx) - item->Orientation.y;
+			rot = atan2(dz, dx) - item->Pose.Orientation.y;
 			if (rot <= EulerAngle::DegToRad(-90.0f) || rot >= EulerAngle::DegToRad(90.0f))
 				unknown = false;
 
@@ -298,12 +298,12 @@ void ControlGladiator(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
@@ -340,7 +340,7 @@ void ControlGladiator(short itemNumber)
 				{
 					if (item->TouchBits & 0x6000)
 					{
-						CreatureEffect2(item, &GladiatorBite, 10, item->Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 

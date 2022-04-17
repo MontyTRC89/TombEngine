@@ -236,12 +236,12 @@ void LaserHeadControl(short itemNumber)
 
 			if (!(GlobalCounter & 7))
 			{
-				item->ItemFlags[3] = item->Orientation.y + (GetRandomControl() & 0x3FFF) - 4096;
+				item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - 4096;
 				item->TriggerFlags = (GetRandomControl() & 0x1000) - 2048;
 			}
 
-			//InterpolateAngle(item->ItemFlags[3], &item->Orientation.y, 0, 2);
-			//InterpolateAngle(item->TriggerFlags, &item->Orientation.x, 0, 2);
+			//InterpolateAngle(item->ItemFlags[3], &item->Pose.Orientation.y, 0, 2);
+			//InterpolateAngle(item->TriggerFlags, &item->Pose.Orientation.x, 0, 2);
 
 			// Final death
 			item->Animation.Velocity++;
@@ -326,7 +326,7 @@ void LaserHeadControl(short itemNumber)
 						float xRot = (GetRandomControl() / 4) - 4096;
 						float yRot;
 						if (condition)
-							yRot = item->Orientation.y + (GetRandomControl() & 0x3FFF) + EulerAngle::DegToRad(135.0f);
+							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + EulerAngle::DegToRad(135.0f);
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
@@ -365,11 +365,11 @@ void LaserHeadControl(short itemNumber)
 
 				if (JustLoaded)
 				{
-					int c = SECTOR(8) * cos(item->Orientation.x + EulerAngle::DegToRad(18.3f));
+					int c = SECTOR(8) * cos(item->Pose.Orientation.x + EulerAngle::DegToRad(18.3f));
 					
-					dest.x = LaserHeadData.target.x = src.x + c * sin(item->Orientation.y);
-					dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * sin(EulerAngle::DegToRad(18.3f) - item->Orientation.x);
-					dest.z = LaserHeadData.target.z = src.z + c * cos(item->Orientation.y);
+					dest.x = LaserHeadData.target.x = src.x + c * sin(item->Pose.Orientation.y);
+					dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * sin(EulerAngle::DegToRad(18.3f) - item->Pose.Orientation.x);
+					dest.z = LaserHeadData.target.z = src.z + c * cos(item->Pose.Orientation.y);
 				}
 				else
 				{
@@ -382,8 +382,8 @@ void LaserHeadControl(short itemNumber)
 			float angles[2];
 			float outAngle;
 			phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
-			//InterpolateAngle(angles[0], &item->Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
-			//InterpolateAngle(angles[1] + 3328, &item->Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
+			//InterpolateAngle(angles[0], &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
+			//InterpolateAngle(angles[1] + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
 
 			if (item->ItemFlags[0] == 1)
 			{
@@ -461,9 +461,9 @@ void LaserHeadControl(short itemNumber)
 								GetJointAbsPosition(item, (Vector3Int*)& src, GuardianMeshes[i]);
 
 								int c = 8192 * cos(angles[1]);
-								dest.x = src.x + c * sin(item->Orientation.y);
+								dest.x = src.x + c * sin(item->Pose.Orientation.y);
 								dest.y = src.y + 8192 * sin(-angles[1]);
-								dest.z = src.z + c * cos(item->Orientation.y);
+								dest.z = src.z + c * cos(item->Pose.Orientation.y);
 
 								if (item->ItemFlags[3] != 90 &&
 									LaserHeadData.fireArcs[i] != NULL)
@@ -665,8 +665,8 @@ void LaserHeadControl(short itemNumber)
 
 			item->Animation.Velocity = 3;
 			item->ItemFlags[0] = 3;
-			item->ItemFlags[3] = item->Orientation.y + (GetRandomControl() & 0x1000) - 2048;
-			item->TriggerFlags = item->Orientation.x + (GetRandomControl() & 0x1000) - 2048;
+			item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x1000) - 2048;
+			item->TriggerFlags = item->Pose.Orientation.x + (GetRandomControl() & 0x1000) - 2048;
 		}
 	}
 }

@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
             {
                 auto pos = Vector3Int();
                 GetJointAbsPosition(item, &pos, 0);
-                SoundEffect(65, (PHD_3DPOS*)&pos, 0);
+                SoundEffect(65, (PoseData*)&pos, 0);
 
                 if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
                     item->Flags &= 0xC1;

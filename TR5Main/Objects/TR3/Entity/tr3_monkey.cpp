@@ -118,7 +118,7 @@ void MonkeyControl(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			laraAI.angle = atan2(dz, dz) - item->Orientation.y;
+			laraAI.angle = atan2(dz, dz) - item->Pose.Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -332,11 +332,11 @@ void MonkeyControl(short itemNumber)
 				creature->MaxTurn = 0;
 
 				if (abs(AI.angle) < EulerAngle::DegToRad(7.0f))
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 				else if (AI.angle < 0)
-					item->Orientation.y -= EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
 				else
-					item->Orientation.y += EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 			}
 
 			break;
@@ -398,11 +398,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < EulerAngle::DegToRad(7.0f))
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			else if (AI.angle < 0)
-				item->Orientation.y -= EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 
 			if (enemy == LaraItem)
 			{
@@ -444,11 +444,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < EulerAngle::DegToRad(7.0f))
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			else if (AI.angle < 0)
-				item->Orientation.y -= EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 
 			if (enemy == LaraItem)
 			{
@@ -490,11 +490,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < EulerAngle::DegToRad(7.0f))
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			else if (AI.angle < 0)
-				item->Orientation.y -= EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 
 			if (enemy == LaraItem)
 			{

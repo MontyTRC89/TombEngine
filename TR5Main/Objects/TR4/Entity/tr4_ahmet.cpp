@@ -156,7 +156,7 @@ namespace TEN::Entities::TR4
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				float angle = atan2(dx, dz);
-				laraAI.angle = angle - item->Orientation.y;
+				laraAI.angle = angle - item->Pose.Orientation.y;
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -255,12 +255,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 910)
 				{
 					if (AI.angle >= 0)
-						item->Orientation.y += EulerAngle::DegToRad(5.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(5.0f);
 					else
-						item->Orientation.y -= EulerAngle::DegToRad(5.0f);
+						item->Pose.Orientation.y -= EulerAngle::DegToRad(5.0f);
 				}
 				else
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
 				{
@@ -289,12 +289,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= EulerAngle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Orientation.y += EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y += EulerAngle::DegToRad(5.0f);
 						else
-							item->Orientation.y -= EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(5.0f);
 					}
 					else
-						item->Orientation.y += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else
 				{
@@ -322,12 +322,12 @@ namespace TEN::Entities::TR4
 					if (abs(AI.angle) >= EulerAngle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Orientation.y += EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y += EulerAngle::DegToRad(5.0f);
 						else
-							item->Orientation.y -= EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(5.0f);
 					}
 					else
-						item->Orientation.y += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 				else
 				{

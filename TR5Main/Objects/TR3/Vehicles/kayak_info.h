@@ -12,7 +12,7 @@ struct KayakInfo
 
 	unsigned int LeftRightCount;
 	int WaterHeight;
-	PHD_3DPOS OldPos;
+	PoseData OldPos;
 	bool Turn;
 	bool Forward;
 	bool TrueWater;

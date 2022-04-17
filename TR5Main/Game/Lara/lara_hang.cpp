@@ -128,7 +128,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 		}
 	}
 
-	lara->Control.MoveAngle = item->Orientation.y;
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
 
 	TestLaraHang(item, coll);
 
@@ -217,11 +217,11 @@ void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
 }
 
 // State:		LS_SHIMMY_RIGHT (31)
@@ -244,10 +244,10 @@ void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
 	TestLaraHang(item, coll);
-	lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
+	lara->Control.MoveAngle = item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
 }
 
 // State:		LS_SHIMMY_OUTER_LEFT (107), LS_SHIMMY_OUTER_RIGHT (108), LS_SHIMMY_INNER_LEFT (109), LS_SHIMMY_INNER_RIGHT (110),

@@ -94,8 +94,8 @@ void VonCroyControl(short itemNumber)
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
 
-	int dx = 808 * sin(item->Orientation.y);
-	int dz = 808 * cos(item->Orientation.y);
+	int dx = 808 * sin(item->Pose.Orientation.y);
+	int dz = 808 * cos(item->Pose.Orientation.y);
 
 	x += dx;
 	z += dz;
@@ -230,7 +230,7 @@ void VonCroyControl(short itemNumber)
 	{
 		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		laraAI.angle = atan2(dz, dx) - item->Orientation.y;
+		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 
 		laraAI.ahead = true;
 		if (laraAI.angle <= EulerAngle::DegToRad(-90) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
@@ -658,7 +658,7 @@ void VonCroyControl(short itemNumber)
 		if (item->ItemFlags[2] == 0)
 			ClampRotation(&item->Pose, laraAI.angle, EulerAngle::DegToRad(2.8f));
 		else
-			ClampRotation(&item->Pose, enemy->Orientation.y - item->Orientation.y, EulerAngle::DegToRad(2.8f));
+			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, EulerAngle::DegToRad(2.8f));
 		
 		break;
 
@@ -794,7 +794,7 @@ void VonCroyControl(short itemNumber)
 	case 36:
 	case 37:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Orientation.y-item->Orientation.y, 512);
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y-item->Pose.Orientation.y, 512);
 		break;
 	}
 

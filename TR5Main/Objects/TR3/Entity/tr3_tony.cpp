@@ -259,7 +259,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.yRot = item->Orientation.y;
+		flame.yRot = item->Pose.Orientation.y;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPL;
 		break;
@@ -274,7 +274,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.yRot = item->Orientation.y;
+		flame.yRot = item->Pose.Orientation.y;
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPR;
 		break;
@@ -289,7 +289,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = (GetRandomControl() & 7) + 10;
 		flame.speed = 160;
-		flame.yRot = item->Orientation.y;
+		flame.yRot = item->Pose.Orientation.y;
 		flame.room_number = roomNumber;
 		flame.type = T_ZAPP;
 		break;
@@ -664,7 +664,7 @@ void TonyControl(short itemNumber)
 				torsoY = AI.angle;
 
 				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 28)
-					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Orientation.y, 0);
+					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Pose.Orientation.y, 0);
 
 				break;
 

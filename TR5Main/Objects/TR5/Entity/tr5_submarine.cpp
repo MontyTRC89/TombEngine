@@ -152,9 +152,9 @@ static void SubmarineAttack(ITEM_INFO* item)
 
 		InitialiseItem(itemNumber);
 
-		torpedoItem->Orientation.x = 0;
-		torpedoItem->Orientation.y = item->Orientation.y;
-		torpedoItem->Orientation.z = 0;
+		torpedoItem->Pose.Orientation.x = 0;
+		torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
+		torpedoItem->Pose.Orientation.z = 0;
 		torpedoItem->Animation.Velocity = 0;
 		torpedoItem->Animation.VerticalVelocity = 0;
 		torpedoItem->ItemFlags[0] = -1;
@@ -208,7 +208,7 @@ void SubmarineControl(short itemNumber)
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-		laraInfo.angle = atan2(dz, dx) - item->Orientation.y;
+		laraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 		laraInfo.distance = pow(dx, 2) + pow(dz, 2);
 		laraInfo.ahead = true;
 	}
@@ -266,12 +266,12 @@ void SubmarineControl(short itemNumber)
 			if (abs(laraInfo.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (laraInfo.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += laraInfo.angle;
+				item->Pose.Orientation.y += laraInfo.angle;
 		}
 	}
 	else
@@ -369,12 +369,12 @@ void ChaffFlareControl(short itemNumber)
 	
 	if (item->Animation.VerticalVelocity)
 	{
-		item->Orientation.x += EulerAngle::DegToRad(3.0f);
-		item->Orientation.z += EulerAngle::DegToRad(5.0f);
+		item->Pose.Orientation.x += EulerAngle::DegToRad(3.0f);
+		item->Pose.Orientation.z += EulerAngle::DegToRad(5.0f);
 	}
 
-	int dx = item->Animation.Velocity * sin(item->Orientation.y);
-	int dz = item->Animation.Velocity * cos(item->Orientation.y);
+	int dx = item->Animation.Velocity * sin(item->Pose.Orientation.y);
+	int dz = item->Animation.Velocity * cos(item->Pose.Orientation.y);
 
 	item->Pose.Position.x += dx;
 	item->Pose.Position.z += dz;
@@ -488,11 +488,11 @@ void TorpedoControl(short itemNumber)
 
 	if (item->ItemFlags[1] - 1 < 60)
 	{
-		float dry = angles[0] - item->Orientation.y;
+		float dry = angles[0] - item->Pose.Orientation.y;
 		if (abs(dry) > EulerAngle::DegToRad(180.0f))
 			dry = -dry;
 
-		float drx = angles[1] - item->Orientation.x;
+		float drx = angles[1] - item->Pose.Orientation.x;
 		if (abs(drx) > EulerAngle::DegToRad(180.0f))
 			drx = -drx;
 
@@ -515,21 +515,21 @@ void TorpedoControl(short itemNumber)
 		else
 			dry = EulerAngle::DegToRad(2.8f);
 
-		item->Orientation.y += dry;
-		item->Orientation.x += drx;
+		item->Pose.Orientation.y += dry;
+		item->Pose.Orientation.x += drx;
 	}
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	item->Orientation.z += EulerAngle::DegToRad(0.09f) * item->Animation.Velocity;
+	item->Pose.Orientation.z += EulerAngle::DegToRad(0.09f) * item->Animation.Velocity;
 
-	int c = item->Animation.Velocity * cos(item->Orientation.x);
+	int c = item->Animation.Velocity * cos(item->Pose.Orientation.x);
 
-	item->Pose.Position.x += c * sin(item->Orientation.y);
-	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Orientation.x);
-	item->Pose.Position.z += c * cos(item->Orientation.y);
+	item->Pose.Position.x += c * sin(item->Pose.Orientation.y);
+	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.x);
+	item->Pose.Position.z += c * cos(item->Pose.Orientation.y);
 
 	auto probe = GetCollision(item);
 

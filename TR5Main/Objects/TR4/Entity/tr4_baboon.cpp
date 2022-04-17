@@ -72,7 +72,7 @@ constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 #define BABOON_JUMP_TOUCHBITS 280
 #define BABOON_TOUCHBITS 0x1800
 
-static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
+static void TriggerBaboonShockwave(PoseData pos, short xRot)
 {
 	short shockwaveID = GetFreeShockwave();
 	if (shockwaveID != NO_ITEM)
@@ -95,7 +95,7 @@ static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
 
 void BaboonDieEffect(ITEM_INFO* item)
 {
-	PHD_3DPOS pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z);
+	PoseData pos = PoseData(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z);
 
 	// trigger shockwave effect
 	TriggerBaboonShockwave(pos, EulerAngle::DegToRad(0.0f));
@@ -255,7 +255,7 @@ void BaboonControl(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			laraAI.angle = atan2(dx, dz) - item->Orientation.y;
+			laraAI.angle = atan2(dx, dz) - item->Pose.Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
 			if (creature->Enemy == nullptr || creature->Enemy == LaraItem)
@@ -282,7 +282,7 @@ void BaboonControl(short itemNumber)
 				item->Pose.Position.x = creature->Enemy->Pose.Position.x;
 				item->Pose.Position.y = creature->Enemy->Pose.Position.y;
 				item->Pose.Position.z = creature->Enemy->Pose.Position.z;
-				item->Orientation.y = creature->Enemy->Orientation.y;
+				item->Pose.Orientation.y = creature->Enemy->Pose.Orientation.y;
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SWITCH_ANIM;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.TargetState = BABOON_ACTIVATE_SWITCH;
@@ -469,7 +469,7 @@ void BaboonControl(short itemNumber)
 				pos.boxNumber = 0;
 				pos.roomNumber = NO_ROOM;
 
-				//switch (item->Orientation.y)
+				//switch (item->Pose.Orientation.y)
 				//{
 				//case -0x4000: // WEST (OK)
 				//	pos.x = item->Pose.Position.x - SECTOR(1);
@@ -514,12 +514,12 @@ void BaboonControl(short itemNumber)
 			if (abs(AI.angle) >= BABOON_ATTACK_ANGLE)
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += BABOON_ATTACK_ANGLE;
+					item->Pose.Orientation.y += BABOON_ATTACK_ANGLE;
 				else
-					item->Orientation.y -= BABOON_ATTACK_ANGLE;
+					item->Pose.Orientation.y -= BABOON_ATTACK_ANGLE;
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (creature->Flags == 0 &&
 				(item->TouchBits & BABOON_TOUCHBITS ||

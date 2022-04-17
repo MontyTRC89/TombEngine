@@ -75,11 +75,11 @@ void CobraControl(short itemNumber)
 			head = AI.angle;
 
 		if (abs(AI.angle) < EulerAngle::DegToRad(10.0f))
-			item->Orientation.y += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 		else if (AI.angle < 0)
-			item->Orientation.y -= EulerAngle::DegToRad(10.0f);
+			item->Pose.Orientation.y -= EulerAngle::DegToRad(10.0f);
 		else
-			item->Orientation.y += EulerAngle::DegToRad(10.0f);
+			item->Pose.Orientation.y += EulerAngle::DegToRad(10.0f);
 
 		switch (item->Animation.ActiveState)
 		{

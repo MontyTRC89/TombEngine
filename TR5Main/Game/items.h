@@ -78,8 +78,8 @@ struct ITEM_INFO
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS Pose;
-	PHD_3DPOS StartPose;
+	PoseData Pose;
+	PoseData StartPose;
 	EulerAngle Orientation;
 	int Floor;
 

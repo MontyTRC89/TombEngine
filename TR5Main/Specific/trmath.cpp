@@ -58,12 +58,12 @@ void phd_GetVectorAngles(int x, int y, int z, float* angles)
 	angles[1] = -atan2(y, vector.z);
 }
 
-int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
+int phd_Distance(PoseData* first, PoseData* second)
 {
 	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
 }
 
-void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
+void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	auto world = Matrix::CreateFromYawPitchRoll(
 		pos->Orientation.y,
@@ -100,7 +100,7 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
-BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
+BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
 {
 	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
 	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);

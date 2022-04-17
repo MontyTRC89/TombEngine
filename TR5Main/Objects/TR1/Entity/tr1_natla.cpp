@@ -77,7 +77,7 @@ void NatlaControl(short itemNumber)
 
 		if (facing)
 		{
-			item->Orientation.y += facing;
+			item->Pose.Orientation.y += facing;
 			facing = 0;
 		}
 
@@ -198,7 +198,7 @@ void NatlaControl(short itemNumber)
 		if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
 			CreatureMood(item, &AI, TIMID);
 
-		item->Orientation.y -= facing;
+		item->Pose.Orientation.y -= facing;
 		angle = CreatureTurn(item, NATLA_FLY_TURN);
 
 		if (item->Animation.ActiveState == NATLA_STATE_FLY)
@@ -210,11 +210,11 @@ void NatlaControl(short itemNumber)
 			else
 				facing += AI.angle;
 
-			item->Orientation.y += facing;
+			item->Pose.Orientation.y += facing;
 		}
 		else
 		{
-			item->Orientation.y += facing - angle;
+			item->Pose.Orientation.y += facing - angle;
 			facing = 0;
 		}
 
@@ -290,7 +290,7 @@ void NatlaControl(short itemNumber)
 	timer++;
 	creature->Flags = (creature->Flags & NATLA_FLYMODE) + timer;
 
-	item->Orientation.y -= facing;
+	item->Pose.Orientation.y -= facing;
 	CreatureAnimation(itemNumber, angle, tilt);
-	item->Orientation.y += facing;
+	item->Pose.Orientation.y += facing;
 }

@@ -101,7 +101,7 @@ void InitialiseSpeedBoat(short itemNumber)
 
 void DoBoatWakeEffect(ITEM_INFO* sBoatItem)
 {
-	SetupRipple(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.y, sBoatItem->Pose.Position.z, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, sBoatItem->Orientation.y);
+	SetupRipple(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.y, sBoatItem->Pose.Position.z, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, sBoatItem->Pose.Orientation.y);
 	TEN::Effects::TriggerSpeedboatFoam(sBoatItem);
 
 	// OLD WAKE EFFECT
@@ -191,11 +191,11 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 	if (!TestCollision(sBoatItem, laraItem))
 		return mountType;
 
-	int distance = (laraItem->Pose.Position.z - sBoatItem->Pose.Position.z) * cos(-sBoatItem->Orientation.y) - (laraItem->Pose.Position.x - sBoatItem->Pose.Position.x) * sin(-sBoatItem->Orientation.y);
+	int distance = (laraItem->Pose.Position.z - sBoatItem->Pose.Position.z) * cos(-sBoatItem->Pose.Orientation.y) - (laraItem->Pose.Position.x - sBoatItem->Pose.Position.x) * sin(-sBoatItem->Pose.Orientation.y);
 	if (distance > 200)
 		return mountType;
 
-	float deltaAngle = EulerAngle::ShortestAngle(sBoatItem->Orientation.y, laraItem->Orientation.y);
+	float deltaAngle = EulerAngle::ShortestAngle(sBoatItem->Pose.Orientation.y, laraItem->Pose.Orientation.y);
 	if (lara->Control.WaterStatus == WaterStatus::TreadWater || lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (!(TrInput & IN_ACTION) || laraItem->Animation.Airborne || sBoatItem->Animation.Velocity)
@@ -235,9 +235,9 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 {
 	float angle;
 	if (direction < 0)
-		angle = sBoatItem->Orientation.y - EulerAngle::DegToRad(90.0f);
+		angle = sBoatItem->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
 	else
-		angle = sBoatItem->Orientation.y + EulerAngle::DegToRad(90.0f);
+		angle = sBoatItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
 
 	int x = sBoatItem->Pose.Position.x + DISMOUNT_DISTANCE * sin(angle);
 	int y = sBoatItem->Pose.Position.y;
@@ -271,21 +271,21 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 		TestLastFrame(laraItem, laraItem->Animation.AnimNumber))
 	{
 		if (laraItem->Animation.ActiveState == SBOAT_STATE_DISMOUNT_LEFT)
-			laraItem->Orientation.y -= EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
 		else if(laraItem->Animation.ActiveState == SBOAT_STATE_DISMOUNT_RIGHT)
-			laraItem->Orientation.y += EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
 
 		SetAnimation(laraItem, LA_JUMP_FORWARD);
 		laraItem->Animation.Velocity = 40;
 		laraItem->Animation.VerticalVelocity = -50;
 		laraItem->Animation.Airborne = true;
-		laraItem->Orientation.x = 0;
-		laraItem->Orientation.z = 0;
+		laraItem->Pose.Orientation.x = 0;
+		laraItem->Pose.Orientation.z = 0;
 		lara->Vehicle = NO_ITEM;
 
-		int x = laraItem->Pose.Position.x + 360 * sin(laraItem->Orientation.y);
+		int x = laraItem->Pose.Position.x + 360 * sin(laraItem->Pose.Orientation.y);
 		int y = laraItem->Pose.Position.y - 90;
-		int z = laraItem->Pose.Position.z + 360 * cos(laraItem->Orientation.y);
+		int z = laraItem->Pose.Position.z + 360 * cos(laraItem->Pose.Orientation.y);
 		auto probe = GetCollision(x, y, z, laraItem->RoomNumber);
 
 		if (probe.Position.Floor >= (y - CLICK(1)))
@@ -305,11 +305,11 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 
 int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, Vector3Int* pos)
 {
-	float sinY = sin(sBoatItem->Orientation.y);
-	float cosY = cos(sBoatItem->Orientation.y);
+	float sinY = sin(sBoatItem->Pose.Orientation.y);
+	float cosY = cos(sBoatItem->Pose.Orientation.y);
 
 	pos->x = sBoatItem->Pose.Position.x + zOffset * sinY + xOffset * cosY;
-	pos->y = sBoatItem->Pose.Position.y - zOffset * sin(sBoatItem->Orientation.x) + xOffset * sin(sBoatItem->Orientation.z);
+	pos->y = sBoatItem->Pose.Position.y - zOffset * sin(sBoatItem->Pose.Orientation.x) + xOffset * sin(sBoatItem->Pose.Orientation.z);
 	pos->z = sBoatItem->Pose.Position.z + zOffset * cosY - xOffset * sinY;
 
 	auto probe = GetCollision(pos->x, pos->y, pos->z, sBoatItem->RoomNumber);
@@ -457,8 +457,8 @@ int GetSpeedBoatHitAnim(ITEM_INFO* sBoatItem, Vector3Int* moved)
 
 	if (moved->x || moved->z)
 	{
-		float s = sin(sBoatItem->Orientation.y);
-		float c = cos(sBoatItem->Orientation.y);
+		float s = sin(sBoatItem->Pose.Orientation.y);
+		float c = cos(sBoatItem->Pose.Orientation.y);
 		
 		int front = moved->z * c + moved->x * s;
 		int side = -moved->z * s + moved->x * c;
@@ -514,7 +514,7 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	auto* sBoatItem = &g_Level.Items[itemNumber];
 	auto* sBoat = (SpeedBoatInfo*)sBoatItem->Data;
 
-	sBoatItem->Orientation.z -= sBoat->LeanAngle;
+	sBoatItem->Pose.Orientation.z -= sBoat->LeanAngle;
 
 	Vector3Int old, frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 	int heightFrontLeftOld = SpeedBoatTestWaterHeight(sBoatItem, BOAT_FRONT, -BOAT_SIDE, &frontLeftOld);
@@ -538,23 +538,23 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	if (frontOld.y > heightFrontOld)
 		frontOld.y = heightFrontOld;
 
-	sBoatItem->Orientation.y += sBoat->TurnRate + sBoat->ExtraRotation;
+	sBoatItem->Pose.Orientation.y += sBoat->TurnRate + sBoat->ExtraRotation;
 	sBoat->LeanAngle = sBoat->TurnRate * 6;
 
-	sBoatItem->Pose.Position.x += sBoatItem->Animation.Velocity * sin(sBoatItem->Orientation.y);
-	sBoatItem->Pose.Position.z += sBoatItem->Animation.Velocity * cos(sBoatItem->Orientation.y);
+	sBoatItem->Pose.Position.x += sBoatItem->Animation.Velocity * sin(sBoatItem->Pose.Orientation.y);
+	sBoatItem->Pose.Position.z += sBoatItem->Animation.Velocity * cos(sBoatItem->Pose.Orientation.y);
 	
-	int slip = BOAT_SIDE_SLIP * sin(sBoatItem->Orientation.z);
-	if (!slip && sBoatItem->Orientation.z)
-		slip = (sBoatItem->Orientation.z > 0) ? 1 : -1;
-	sBoatItem->Pose.Position.x += slip * sin(sBoatItem->Orientation.y);
-	sBoatItem->Pose.Position.z -= slip * cos(sBoatItem->Orientation.y);
+	int slip = BOAT_SIDE_SLIP * sin(sBoatItem->Pose.Orientation.z);
+	if (!slip && sBoatItem->Pose.Orientation.z)
+		slip = (sBoatItem->Pose.Orientation.z > 0) ? 1 : -1;
+	sBoatItem->Pose.Position.x += slip * sin(sBoatItem->Pose.Orientation.y);
+	sBoatItem->Pose.Position.z -= slip * cos(sBoatItem->Pose.Orientation.y);
 	
-	slip = BOAT_SLIP * sin(sBoatItem->Orientation.x);
-	if (!slip && sBoatItem->Orientation.x)
-		slip = (sBoatItem->Orientation.x > 0) ? 1 : -1;
-	sBoatItem->Pose.Position.x -= slip * sin(sBoatItem->Orientation.y);
-	sBoatItem->Pose.Position.z -= slip * cos(sBoatItem->Orientation.y);
+	slip = BOAT_SLIP * sin(sBoatItem->Pose.Orientation.x);
+	if (!slip && sBoatItem->Pose.Orientation.x)
+		slip = (sBoatItem->Pose.Orientation.x > 0) ? 1 : -1;
+	sBoatItem->Pose.Position.x -= slip * sin(sBoatItem->Pose.Orientation.y);
+	sBoatItem->Pose.Position.z -= slip * cos(sBoatItem->Pose.Orientation.y);
 	
 	auto moved = Vector3Int(sBoatItem->Pose.Position.x, 0, sBoatItem->Pose.Position.z);
 
@@ -602,7 +602,7 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	int newVelocity = 0;
 	if (slip || collide)
 	{
-		newVelocity = (sBoatItem->Pose.Position.z - old.z) * cos(sBoatItem->Orientation.y) + (sBoatItem->Pose.Position.x - old.x) * sin(sBoatItem->Orientation.y);
+		newVelocity = (sBoatItem->Pose.Position.z - old.z) * cos(sBoatItem->Pose.Orientation.y) + (sBoatItem->Pose.Position.x - old.x) * sin(sBoatItem->Pose.Orientation.y);
 
 		if (lara->Vehicle == itemNumber && sBoatItem->Animation.Velocity > BOAT_MAX_VELOCITY + BOAT_ACCELERATION && newVelocity < sBoatItem->Animation.Velocity - 10)
 		{
@@ -768,9 +768,9 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 			{
 				if (sBoatItem->Animation.Velocity == 0)
 				{
-					if (TrInput & SBOAT_IN_RIGHT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Orientation.y + EulerAngle::DegToRad(90.0f)))
+					if (TrInput & SBOAT_IN_RIGHT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f)))
 						laraItem->Animation.TargetState = SBOAT_STATE_DISMOUNT_RIGHT;
-					else if (TrInput & SBOAT_IN_LEFT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Orientation.y - EulerAngle::DegToRad(90.0f)))
+					else if (TrInput & SBOAT_IN_LEFT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Pose.Orientation.y - EulerAngle::DegToRad(90.0f)))
 						laraItem->Animation.TargetState = SBOAT_STATE_DISMOUNT_LEFT;
 				}
 			}
@@ -882,9 +882,9 @@ void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 	laraItem->Pose.Position.x = sBoatItem->Pose.Position.x;
 	laraItem->Pose.Position.y = sBoatItem->Pose.Position.y - 5;
 	laraItem->Pose.Position.z = sBoatItem->Pose.Position.z;
-	laraItem->Orientation.x = 0;
-	laraItem->Orientation.y = sBoatItem->Orientation.y;
-	laraItem->Orientation.z = 0;
+	laraItem->Pose.Orientation.x = 0;
+	laraItem->Pose.Orientation.y = sBoatItem->Pose.Orientation.y;
+	laraItem->Pose.Orientation.z = 0;
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
@@ -990,13 +990,13 @@ void SpeedBoatControl(short itemNumber)
 	float xRot = atan2(BOAT_FRONT, sBoatItem->Pose.Position.y - probe.Position.Floor);
 	float zRot = atan2(BOAT_SIDE, probe.Position.Floor - frontLeft.y);
 
-	sBoatItem->Orientation.x += ((xRot - sBoatItem->Orientation.x) / 2);
-	sBoatItem->Orientation.z += ((zRot - sBoatItem->Orientation.z) / 2);
+	sBoatItem->Pose.Orientation.x += ((xRot - sBoatItem->Pose.Orientation.x) / 2);
+	sBoatItem->Pose.Orientation.z += ((zRot - sBoatItem->Pose.Orientation.z) / 2);
  
-	if (!xRot && abs(sBoatItem->Orientation.x) < 4)
-		sBoatItem->Orientation.x = 0;
-	if (!zRot && abs(sBoatItem->Orientation.z) < 4)
-		sBoatItem->Orientation.z = 0;
+	if (!xRot && abs(sBoatItem->Pose.Orientation.x) < 4)
+		sBoatItem->Pose.Orientation.x = 0;
+	if (!zRot && abs(sBoatItem->Pose.Orientation.z) < 4)
+		sBoatItem->Pose.Orientation.z = 0;
 
 	if (lara->Vehicle == itemNumber)
 	{
@@ -1011,10 +1011,10 @@ void SpeedBoatControl(short itemNumber)
 		laraItem->Pose.Position.x = sBoatItem->Pose.Position.x;
 		laraItem->Pose.Position.y = sBoatItem->Pose.Position.y;
 		laraItem->Pose.Position.z = sBoatItem->Pose.Position.z;
-		laraItem->Orientation.x = sBoatItem->Orientation.x;
-		laraItem->Orientation.y = sBoatItem->Orientation.y;
-		laraItem->Orientation.z = sBoatItem->Orientation.z;
-		sBoatItem->Orientation.z += sBoat->LeanAngle;
+		laraItem->Pose.Orientation.x = sBoatItem->Pose.Orientation.x;
+		laraItem->Pose.Orientation.y = sBoatItem->Pose.Orientation.y;
+		laraItem->Pose.Orientation.z = sBoatItem->Pose.Orientation.z;
+		sBoatItem->Pose.Orientation.z += sBoat->LeanAngle;
 
 		AnimateItem(laraItem);
 
@@ -1032,7 +1032,7 @@ void SpeedBoatControl(short itemNumber)
 		if (probe.RoomNumber != sBoatItem->RoomNumber)
 			ItemNewRoom(itemNumber, probe.RoomNumber);
 
-		sBoatItem->Orientation.z += sBoat->LeanAngle;
+		sBoatItem->Pose.Orientation.z += sBoat->LeanAngle;
 	}
 
 	auto pitch = sBoatItem->Animation.Velocity;

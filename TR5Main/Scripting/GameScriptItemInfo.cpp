@@ -282,7 +282,7 @@ void GameScriptItemInfo::Init()
 	if (!ScriptAssertF(cond, err, m_item->LuaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
-		PHD_3DPOS center = GetRoomCenter(m_item->RoomNumber);
+		PoseData center = GetRoomCenter(m_item->RoomNumber);
 		// reset position but not rotation
 		m_item->Pose.Position.x = center.Position.x;
 		m_item->Pose.Position.y = center.Position.y;
@@ -340,16 +340,16 @@ void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 GameScriptRotation GameScriptItemInfo::GetRot() const
 {
-	return GameScriptRotation(	int(TO_DEGREES(m_item->Orientation.x)) % 360,
-								int(TO_DEGREES(m_item->Orientation.y)) % 360,
-								int(TO_DEGREES(m_item->Orientation.z)) % 360);
+	return GameScriptRotation(	int(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
+								int(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
+								int(TO_DEGREES(m_item->Pose.Orientation.z)) % 360);
 }
 
 void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 {
-	m_item->Orientation.x = FROM_DEGREES(rot.x);
-	m_item->Orientation.y = FROM_DEGREES(rot.y);
-	m_item->Orientation.z = FROM_DEGREES(rot.z);
+	m_item->Pose.Orientation.x = FROM_DEGREES(rot.x);
+	m_item->Pose.Orientation.y = FROM_DEGREES(rot.y);
+	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
 }
 
 short GameScriptItemInfo::GetHP() const

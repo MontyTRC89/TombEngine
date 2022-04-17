@@ -199,7 +199,7 @@ void lara_col_climb_right(ITEM_INFO* item, CollisionInfo* coll)
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
+		lara->Control.MoveAngle = item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
@@ -222,7 +222,7 @@ void lara_col_climb_left(ITEM_INFO* item, CollisionInfo* coll)
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
+		lara->Control.MoveAngle = item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
@@ -358,12 +358,12 @@ void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_LEFT;
-		lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
+		lara->Control.MoveAngle = item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
 	}
 	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_RIGHT;
-		lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
+		lara->Control.MoveAngle = item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
 	}
 	else if (TrInput & IN_JUMP)
 	{
@@ -371,7 +371,7 @@ void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			lara->Control.HandStatus = HandStatus::Free;
-			lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(180.0f);
+			lara->Control.MoveAngle = item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f);
 		}
 	}
 
@@ -386,7 +386,7 @@ void lara_as_climb_stepoff_left(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.targetAngle = EulerAngle::DegToRad(-60.0f);
 	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
 
-	item->Orientation.y -= EulerAngle::DegToRad(90.0f);
+	item->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
 }
 
 void lara_as_climb_stepoff_right(ITEM_INFO* item, CollisionInfo* coll)
@@ -396,7 +396,7 @@ void lara_as_climb_stepoff_right(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.targetAngle = EulerAngle::DegToRad(60.0f);
 	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
 
-	item->Orientation.y += EulerAngle::DegToRad(90.0f);
+	item->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
 }
 
 // --------
@@ -453,7 +453,7 @@ int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int heig
 	int xFront = 0;
 	int zFront = 0;
 
-	switch (GetQuadrant(item->Orientation.y))
+	switch (GetQuadrant(item->Pose.Orientation.y))
 	{
 	case NORTH:
 		x = item->Pose.Position.x + right;
@@ -529,8 +529,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, CollisionInfo* coll, int result, int 
 	if (TrInput & IN_LEFT)
 	{
 		short troomnumber = item->RoomNumber;
-		int dx = int(sin(item->Orientation.y - EulerAngle::DegToRad(90.0f)) * 10);
-		int dz = int(cos(item->Orientation.y - EulerAngle::DegToRad(90.0f)) * 10);
+		int dx = int(sin(item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f)) * 10);
+		int dz = int(cos(item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f)) * 10);
 		int height = GetFloorHeight(GetFloor(item->Pose.Position.x + dx, item->Pose.Position.y, item->Pose.Position.z + dz, &troomnumber),
 			item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - item->Pose.Position.y;
 		if (height < CLICK(1.5f)) // LADDER dismounts (left/right)
@@ -542,8 +542,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, CollisionInfo* coll, int result, int 
 	else if (TrInput & IN_RIGHT)
 	{
 		short troomnumber = item->RoomNumber;
-		int dx = int(sin(item->Orientation.y + EulerAngle::DegToRad(90.0f)) * 10);
-		int dz = int(cos(item->Orientation.y + EulerAngle::DegToRad(90.0f)) * 10);
+		int dx = int(sin(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f)) * 10);
+		int dz = int(cos(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f)) * 10);
 		int height = GetFloorHeight(GetFloor(item->Pose.Position.x + dx, item->Pose.Position.y, item->Pose.Position.z + dz, &troomnumber),
 			item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - item->Pose.Position.y;
 
@@ -601,7 +601,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 	auto oldPos = item->Pose;
 	auto oldRot = lara->Control.MoveAngle;
 
-	short angle = GetQuadrant(item->Orientation.y);
+	short angle = GetQuadrant(item->Pose.Orientation.y);
 	int x, z;
 
 	if (angle && angle != SOUTH)
@@ -622,7 +622,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.y = item->Orientation.y = lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90);
+		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + EulerAngle::DegToRad(90);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -663,7 +663,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.y = item->Orientation.y = lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
+			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
 
 			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 			item->ItemFlags[3] = result;
@@ -690,7 +690,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 	auto oldPos = item->Pose;
 	auto oldRot = lara->Control.MoveAngle;
 
-	short angle = GetQuadrant(item->Orientation.y);
+	short angle = GetQuadrant(item->Pose.Orientation.y);
 	int x, z;
 
 	if (angle && angle != SOUTH)
@@ -711,7 +711,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.y = item->Orientation.y = lara->Control.MoveAngle = item->Orientation.y - EulerAngle::DegToRad(90.0f);
+		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
@@ -751,7 +751,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.y = item->Orientation.y = lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(90.0f);
+			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
 
 			item->ItemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 			result = item->ItemFlags[3] != 0;
@@ -878,7 +878,7 @@ int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* l
 	int xFront = 0;
 	int zFront = 0;
 
-	switch (GetQuadrant(item->Orientation.y))
+	switch (GetQuadrant(item->Pose.Orientation.y))
 	{
 	case NORTH:
 		x = item->Pose.Position.x + right;

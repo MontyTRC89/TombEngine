@@ -5,7 +5,7 @@
 struct LOCUST_INFO
 {
     bool on;
-    PHD_3DPOS pos;
+    PoseData pos;
     ITEM_INFO* target;
     short roomNumber;
     short randomRotation;

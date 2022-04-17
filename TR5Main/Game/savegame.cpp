@@ -597,9 +597,9 @@ bool SaveGame::Save(int slot)
 		batInfo.add_x(bat->Pose.Position.x);
 		batInfo.add_y(bat->Pose.Position.y);
 		batInfo.add_z(bat->Pose.Position.z);
-		batInfo.add_x_rot(bat->Orientation.x);
-		batInfo.add_y_rot(bat->Orientation.y);
-		batInfo.add_z_rot(bat->Orientation.z);
+		batInfo.add_x_rot(bat->Pose.Orientation.x);
+		batInfo.add_y_rot(bat->Pose.Orientation.y);
+		batInfo.add_z_rot(bat->Pose.Orientation.z);
 
 		bats.push_back(batInfo.Finish());
 	}
@@ -618,9 +618,9 @@ bool SaveGame::Save(int slot)
 		spiderInfo.add_x(spider->Pose.Position.x);
 		spiderInfo.add_y(spider->Pose.Position.y);
 		spiderInfo.add_z(spider->Pose.Position.z);
-		spiderInfo.add_x_rot(spider->Orientation.x);
-		spiderInfo.add_y_rot(spider->Orientation.y);
-		spiderInfo.add_z_rot(spider->Orientation.z);
+		spiderInfo.add_x_rot(spider->Pose.Orientation.x);
+		spiderInfo.add_y_rot(spider->Pose.Orientation.y);
+		spiderInfo.add_z_rot(spider->Pose.Orientation.z);
 
 		spiders.push_back(spiderInfo.Finish());
 	}
@@ -639,9 +639,9 @@ bool SaveGame::Save(int slot)
 		ratInfo.add_x(rat->Pose.Position.x);
 		ratInfo.add_y(rat->Pose.Position.y);
 		ratInfo.add_z(rat->Pose.Position.z);
-		ratInfo.add_x_rot(rat->Orientation.x);
-		ratInfo.add_y_rot(rat->Orientation.y);
-		ratInfo.add_z_rot(rat->Orientation.z);
+		ratInfo.add_x_rot(rat->Pose.Orientation.x);
+		ratInfo.add_y_rot(rat->Pose.Orientation.y);
+		ratInfo.add_z_rot(rat->Pose.Orientation.z);
 
 		rats.push_back(ratInfo.Finish());
 	}
@@ -660,9 +660,9 @@ bool SaveGame::Save(int slot)
 		scarabInfo.add_x(beetle->Pose.Position.x);
 		scarabInfo.add_y(beetle->Pose.Position.y);
 		scarabInfo.add_z(beetle->Pose.Position.z);
-		scarabInfo.add_x_rot(beetle->Orientation.x);
-		scarabInfo.add_y_rot(beetle->Orientation.y);
-		scarabInfo.add_z_rot(beetle->Orientation.z);
+		scarabInfo.add_x_rot(beetle->Pose.Orientation.x);
+		scarabInfo.add_y_rot(beetle->Pose.Orientation.y);
+		scarabInfo.add_z_rot(beetle->Pose.Orientation.z);
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -937,9 +937,9 @@ bool SaveGame::Load(int slot)
 		item->Pose.Position.x = savedItem->position()->x_pos();
 		item->Pose.Position.y = savedItem->position()->y_pos();
 		item->Pose.Position.z = savedItem->position()->z_pos();
-		item->Orientation.x = savedItem->position()->x_rot();
-		item->Orientation.y = savedItem->position()->y_rot();
-		item->Orientation.z = savedItem->position()->z_rot();
+		item->Pose.Orientation.x = savedItem->position()->x_rot();
+		item->Pose.Orientation.y = savedItem->position()->y_rot();
+		item->Pose.Orientation.z = savedItem->position()->z_rot();
 
 		short roomNumber = savedItem->room_number();
 
@@ -953,9 +953,9 @@ bool SaveGame::Load(int slot)
 			item->Pose.Position.x = savedItem->position()->x_pos();
 			item->Pose.Position.y = savedItem->position()->y_pos();
 			item->Pose.Position.z = savedItem->position()->z_pos();
-			item->Orientation.x = savedItem->position()->x_rot();
-			item->Orientation.y = savedItem->position()->y_rot();
-			item->Orientation.z = savedItem->position()->z_rot();
+			item->Pose.Orientation.x = savedItem->position()->x_rot();
+			item->Pose.Orientation.y = savedItem->position()->y_rot();
+			item->Pose.Orientation.z = savedItem->position()->z_rot();
 		}
 
 		item->Animation.Velocity = savedItem->velocity();
@@ -1094,9 +1094,9 @@ bool SaveGame::Load(int slot)
 		bat->Pose.Position.x = batInfo->x();
 		bat->Pose.Position.y = batInfo->y();
 		bat->Pose.Position.z = batInfo->z();
-		bat->Orientation.x = batInfo->x_rot();
-		bat->Orientation.y = batInfo->y_rot();
-		bat->Orientation.z = batInfo->z_rot();
+		bat->Pose.Orientation.x = batInfo->x_rot();
+		bat->Pose.Orientation.y = batInfo->y_rot();
+		bat->Pose.Orientation.z = batInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->rats()->size(); i++)
@@ -1110,9 +1110,9 @@ bool SaveGame::Load(int slot)
 		rat->Pose.Position.x = ratInfo->x();
 		rat->Pose.Position.y = ratInfo->y();
 		rat->Pose.Position.z = ratInfo->z();
-		rat->Orientation.x = ratInfo->x_rot();
-		rat->Orientation.y = ratInfo->y_rot();
-		rat->Orientation.z = ratInfo->z_rot();
+		rat->Pose.Orientation.x = ratInfo->x_rot();
+		rat->Pose.Orientation.y = ratInfo->y_rot();
+		rat->Pose.Orientation.z = ratInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->spiders()->size(); i++)
@@ -1126,9 +1126,9 @@ bool SaveGame::Load(int slot)
 		spider->Pose.Position.x = spiderInfo->x();
 		spider->Pose.Position.y = spiderInfo->y();
 		spider->Pose.Position.z = spiderInfo->z();
-		spider->Orientation.x = spiderInfo->x_rot();
-		spider->Orientation.y = spiderInfo->y_rot();
-		spider->Orientation.z = spiderInfo->z_rot();
+		spider->Pose.Orientation.x = spiderInfo->x_rot();
+		spider->Pose.Orientation.y = spiderInfo->y_rot();
+		spider->Pose.Orientation.z = spiderInfo->z_rot();
 	}
 
 	for (int i = 0; i < s->scarabs()->size(); i++)
@@ -1142,9 +1142,9 @@ bool SaveGame::Load(int slot)
 		Beetle->Pose.Position.x = beetleInfo->x();
 		Beetle->Pose.Position.y = beetleInfo->y();
 		Beetle->Pose.Position.z = beetleInfo->z();
-		Beetle->Orientation.x = beetleInfo->x_rot();
-		Beetle->Orientation.y = beetleInfo->y_rot();
-		Beetle->Orientation.z = beetleInfo->z_rot();
+		Beetle->Pose.Orientation.x = beetleInfo->x_rot();
+		Beetle->Pose.Orientation.y = beetleInfo->y_rot();
+		Beetle->Pose.Orientation.z = beetleInfo->z_rot();
 	}
 
 	JustLoaded = 1;	
@@ -1293,7 +1293,7 @@ bool SaveGame::Load(int slot)
 	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
-	Lara.NextCornerPos = PHD_3DPOS(
+	Lara.NextCornerPos = PoseData(
 		s->lara()->next_corner_position()->x(),
 		s->lara()->next_corner_position()->y(),
 		s->lara()->next_corner_position()->z(),

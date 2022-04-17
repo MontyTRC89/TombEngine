@@ -150,7 +150,7 @@ void MPGunControl(short itemNumber)
 		{
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			laraAI.angle = atan2(dz, dx) - item->Orientation.y; 
+			laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y; 
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -159,9 +159,9 @@ void MPGunControl(short itemNumber)
 
 		angle = CreatureTurn(item, creature->MaxTurn);
 
-		int x = item->Pose.Position.x + SECTOR(1) * sin(item->Orientation.y + laraAI.angle);
+		int x = item->Pose.Position.x + SECTOR(1) * sin(item->Pose.Orientation.y + laraAI.angle);
 		int y = item->Pose.Position.y;
-		int z = item->Pose.Position.z + SECTOR(1) * cos(item->Orientation.y + laraAI.angle);
+		int z = item->Pose.Position.z + SECTOR(1) * cos(item->Pose.Orientation.y + laraAI.angle);
 		
 		int height = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 		bool cover = (item->Pose.Position.y > (height + CLICK(3)) && item->Pose.Position.y < (height + CLICK(4.5f)) && laraAI.distance > pow(SECTOR(1), 2));
@@ -190,11 +190,11 @@ void MPGunControl(short itemNumber)
 				item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 28)
 			{
 				if (abs(AI.angle) < EulerAngle::DegToRad(10.0f))
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 				else if (AI.angle < 0)
-					item->Orientation.y -= EulerAngle::DegToRad(10.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(10.0f);
 				else
-					item->Orientation.y += EulerAngle::DegToRad(10.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(10.0f);
 			}
 
 			if (item->AIBits & GUARD)

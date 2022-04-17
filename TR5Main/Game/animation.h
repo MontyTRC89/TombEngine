@@ -1,7 +1,7 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-struct PHD_3DPOS;
+class PoseData;
 struct Vector3Int;
 struct ITEM_INFO;
 
@@ -91,6 +91,6 @@ BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);
 void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex);
 void GetJointAbsPosition(ITEM_INFO* item, Vector3Int* vec, int joint);
 
-void ClampRotation(PHD_3DPOS* pos, short angle, short rotation); 
+void ClampRotation(PoseData* pos, short angle, short rotation); 
 
 void DrawAnimatingItem(ITEM_INFO* item);

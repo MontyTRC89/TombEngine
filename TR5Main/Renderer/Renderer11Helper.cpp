@@ -709,7 +709,7 @@ namespace TEN::Renderer
 		else
 			world = Matrix::Identity * local;
 
-		world = Matrix::CreateFromYawPitchRoll(nativeItem->Orientation.y, nativeItem->Orientation.x, nativeItem->Orientation.z) * world;
+		world = Matrix::CreateFromYawPitchRoll(nativeItem->Pose.Orientation.y, nativeItem->Pose.Orientation.x, nativeItem->Pose.Orientation.z) * world;
 
 		short objNum = nativeItem->ObjectNumber;
 		if (objNum == ID_LARA) objNum = ID_LARA_SKIN;

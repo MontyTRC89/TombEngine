@@ -39,7 +39,7 @@ enum HarpyAnim
 
 };
 
-static void TriggerHarpyMissile(PHD_3DPOS* pos, short roomNumber, int count)
+static void TriggerHarpyMissile(PoseData* pos, short roomNumber, int count)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
@@ -192,7 +192,7 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 			auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
 			GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
-			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
+			auto pos = PoseData(pos1.x, pos1.y, pos1.z);
 
 			float angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
@@ -212,7 +212,7 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 			auto pos3 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y * 2, HarpyAttack2.z);
 			GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
-			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
+			auto pos = PoseData(pos1.x, pos1.y, pos1.z);
 
 			float angles[2];
 			phd_GetVectorAngles(pos3.x - pos1.x,
@@ -267,7 +267,7 @@ void HarpyControl(short itemNumber)
 			{
 				if (state == 1)
 				{
-					item->Orientation.x = 0;
+					item->Pose.Orientation.x = 0;
 					item->Pose.Position.y = item->Floor;
 				}
 				else
@@ -277,7 +277,7 @@ void HarpyControl(short itemNumber)
 					item->Animation.ActiveState = 9;
 					item->Animation.Velocity = 0;
 					item->Animation.Airborne = true;
-					item->Orientation.x = 0;
+					item->Pose.Orientation.x = 0;
 				}
 
 				CreatureTilt(item, 0);
@@ -301,7 +301,7 @@ void HarpyControl(short itemNumber)
 			item->Animation.Airborne = false;
 		}
 
-		item->Orientation.x = 0;
+		item->Pose.Orientation.x = 0;
 	}
 	else
 	{

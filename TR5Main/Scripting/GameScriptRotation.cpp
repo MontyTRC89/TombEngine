@@ -44,14 +44,14 @@ GameScriptRotation::GameScriptRotation(int aX, int aY, int aZ)
 	z = aZ;
 }
 
-void GameScriptRotation::StoreInPHDPos(PHD_3DPOS& pos) const
+void GameScriptRotation::StoreInPHDPos(PoseData& pos) const
 {
 	pos.Orientation.x = x;
 	pos.Orientation.y = y;
 	pos.Orientation.z = z;
 }
 
-GameScriptRotation::GameScriptRotation(PHD_3DPOS const & pos)
+GameScriptRotation::GameScriptRotation(PoseData const & pos)
 {
 	x = pos.Orientation.x;
 	y = pos.Orientation.y;

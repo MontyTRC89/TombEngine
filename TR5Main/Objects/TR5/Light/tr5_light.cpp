@@ -57,7 +57,7 @@ void StrobeLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		item->Orientation.y += EulerAngle::DegToRad(16.0f);
+		item->Pose.Orientation.y += EulerAngle::DegToRad(16.0f);
 
 		byte r = 8 * (item->TriggerFlags & 0x1F);
 		byte g = (item->TriggerFlags / 4) & 0xF8;
@@ -68,14 +68,14 @@ void StrobeLightControl(short itemNumber)
 			item->Pose.Position.y - 512,
 			item->Pose.Position.z,
 			r, g, b,
-			((/*item->Orientation.y*/ + 22528) / 16) & 0xFFF,
+			((/*item->Pose.Orientation.y*/ + 22528) / 16) & 0xFFF,
 			item->RoomNumber,
 			12);
 
 		TriggerDynamicLight(
-			item->Pose.Position.x + 256 * sin(item->Orientation.y + 22528),
+			item->Pose.Position.x + 256 * sin(item->Pose.Orientation.y + 22528),
 			item->Pose.Position.y - 768,
-			item->Pose.Position.z + 256 * cos(item->Orientation.y + 22528),
+			item->Pose.Position.z + 256 * cos(item->Pose.Orientation.y + 22528),
 			8,
 			r, g, b);
 	}

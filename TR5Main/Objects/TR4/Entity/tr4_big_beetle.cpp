@@ -57,7 +57,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Animation.ActiveState == 8)
 					{
-						item->Orientation.x = 0;
+						item->Pose.Orientation.x = 0;
 						item->Pose.Position.y = item->Floor;
 					}
 					else
@@ -67,7 +67,7 @@ namespace TEN::Entities::TR4
 						item->Animation.ActiveState = 6;
 						item->Animation.Velocity = 0;
 						item->Animation.Airborne = true;
-						item->Orientation.x = 0;
+						item->Pose.Orientation.x = 0;
 					}
 				}
 				else if (item->Pose.Position.y >= item->Floor)
@@ -79,7 +79,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			item->Orientation.x = 0;
+			item->Pose.Orientation.x = 0;
 		}
 		else
 		{

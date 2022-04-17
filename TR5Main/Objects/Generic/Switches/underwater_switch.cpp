@@ -119,7 +119,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
 
 				if (TestLaraPosition(&CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
 				{
@@ -129,7 +129,7 @@ namespace TEN::Entities::Switches
 						lara->InteractedItem = itemNumber;
 				}
 
-				laraItem->Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
 			}
 
 			if (flag)
@@ -143,9 +143,9 @@ namespace TEN::Entities::Switches
 
 				AddActiveItem(itemNumber);
 
-				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * sin(switchItem->Orientation.y + EulerAngle::DegToRad(90.0f));
+				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * sin(switchItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
 				ForcedFixedCamera.y = switchItem->Pose.Position.y - SECTOR(1);
-				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * cos(switchItem->Orientation.y + EulerAngle::DegToRad(90.0f));
+				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * cos(switchItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
 				ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
 			}
 		}

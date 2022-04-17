@@ -41,8 +41,8 @@ void SethaControl(short itemNumber)
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	int dx = 870 * sin(item->Orientation.y);
-	int dz = 870 * cos(item->Orientation.y);
+	int dx = 870 * sin(item->Pose.Orientation.y);
+	int dz = 870 * cos(item->Pose.Orientation.y);
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
@@ -291,16 +291,16 @@ void SethaControl(short itemNumber)
 			{
 				if (info.angle >= 0)
 				{
-					item->Orientation.y += EulerAngle::DegToRad(3);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(3);
 				}
 				else
 				{
-					item->Orientation.y -= EulerAngle::DegToRad(3);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(3);
 				}
 			}
 			else
 			{
-				item->Orientation.y += info.angle;
+				item->Pose.Orientation.y += info.angle;
 			}
 
 			if (!creature->Flags)
@@ -345,17 +345,17 @@ void SethaControl(short itemNumber)
 			{
 				if (info.angle >= 0)
 				{
-					item->Orientation.y += EulerAngle::DegToRad(3);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(3);
 				}
 				else
 				{
-					item->Orientation.y -= EulerAngle::DegToRad(3);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(3);
 				}
 				SethaAttack(itemNumber);
 			}
 			else
 			{
-				item->Orientation.y += info.angle;
+				item->Pose.Orientation.y += info.angle;
 				SethaAttack(itemNumber);
 			}
 
@@ -373,16 +373,16 @@ void SethaControl(short itemNumber)
 				{
 					if (info.angle >= 0)
 					{
-						item->Orientation.y += EulerAngle::DegToRad(3);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(3);
 					}
 					else
 					{
-						item->Orientation.y -= EulerAngle::DegToRad(3);
+						item->Pose.Orientation.y -= EulerAngle::DegToRad(3);
 					}
 				}
 				else
 				{
-					item->Orientation.y += info.angle;
+					item->Pose.Orientation.y += info.angle;
 				}
 			}
 
@@ -532,7 +532,7 @@ void TriggerSethaSparks2(short itemNumber, char node, int size)
 	}
 }
 
-void SethaThrowAttack(PHD_3DPOS* pos, short roomNumber, short mesh)
+void SethaThrowAttack(PoseData* pos, short roomNumber, short mesh)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != -1)
@@ -575,7 +575,7 @@ void SethaAttack(int itemNumber)
 	int i, size;
 	Vector3Int pos;
 	float angles[2];
-	PHD_3DPOS attackPos;
+	PoseData attackPos;
 
 	switch (item->Animation.ActiveState)
 	{

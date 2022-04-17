@@ -49,10 +49,10 @@ void MoveItem(ITEM_INFO* item, float angle, int x, int z)
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
 	if (snapYRot)
-		item->Orientation.y = coll->NearestLedgeAngle;
+		item->Pose.Orientation.y = coll->NearestLedgeAngle;
 
-	item->Orientation.x = 0;
-	item->Orientation.z = 0;
+	item->Pose.Orientation.x = 0;
+	item->Pose.Orientation.z = 0;
 	item->Pose.Position.x += (int)round(sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 	item->Pose.Position.z += (int)round(cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 }
@@ -67,7 +67,7 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float of
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Orientation = EulerAngle(0, angle2, 0);
+	item->Pose.Orientation = EulerAngle(0, angle2, 0);
 	item->Pose.Position.x += (int)round(sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 	item->Pose.Position.z += (int)round(cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 }
@@ -76,7 +76,7 @@ void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll)
 {
 	SnapItemToLedge(item, coll);
 
-	int direction = (unsigned short)(item->Orientation.y + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
+	int direction = (unsigned short)(item->Pose.Orientation.y + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
 
 	switch (direction)
 	{
@@ -826,8 +826,8 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, float 
 	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
 
 	auto ratioXZ = radiusZ / radiusX;
-	auto frontX = sin(item->Orientation.y) * radiusZ;
-	auto frontZ = cos(item->Orientation.y) * radiusZ;
+	auto frontX = sin(item->Pose.Orientation.y) * radiusZ;
+	auto frontZ = cos(item->Pose.Orientation.y) * radiusZ;
 	auto leftX  = -frontZ * ratioXZ;
 	auto leftZ  =  frontX * ratioXZ;
 	auto rightX =  frontZ * ratioXZ;
@@ -846,8 +846,8 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, float 
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Orientation.x = EulerAngle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
-	item->Orientation.z = EulerAngle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
+	item->Pose.Orientation.x = EulerAngle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
+	item->Pose.Orientation.z = EulerAngle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
 }
 
 int GetQuadrant(float angle)

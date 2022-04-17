@@ -122,7 +122,7 @@ void CivvyControl(short itemNumber)
 		{
 			int laraDz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			int laraDx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			laraAiInfo.angle = atan2(laraDz, laraDx) - item->Orientation.y;
+			laraAiInfo.angle = atan2(laraDz, laraDx) - item->Pose.Orientation.y;
 			laraAiInfo.distance = pow(laraDx, 2) + pow(laraDz, 2);
 		}
 

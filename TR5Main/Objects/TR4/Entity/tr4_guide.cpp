@@ -117,7 +117,7 @@ void GuideControl(short itemNumber)
 	int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	laraAI.angle = atan2(dz, dx) - item->Orientation.y;
+	laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 
 	laraAI.ahead = true;
 	if (laraAI.angle <= EulerAngle::DegToRad(-90.0f) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
@@ -528,7 +528,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
-			item->Orientation.y -= 399;
+			item->Pose.Orientation.y -= 399;
 
 		break;
 
@@ -545,12 +545,12 @@ void GuideControl(short itemNumber)
 		if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
 		{
 			if (AI.angle < 0)
-				item->Orientation.y += EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 			else
-				item->Orientation.y -= EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
 		}
 		else
-			item->Orientation.y += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 
 		if (!creature->Flags)
 		{
@@ -592,7 +592,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
-			item->Orientation.y += 399;
+			item->Pose.Orientation.y += 399;
 
 		break;
 
@@ -600,11 +600,11 @@ void GuideControl(short itemNumber)
 	case 43:
 		if (enemy)
 		{
-			short deltaAngle = enemy->Orientation.y - item->Orientation.y;
+			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
 			if (deltaAngle < EulerAngle::DegToRad(-2.0f))
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			else if (deltaAngle > EulerAngle::DegToRad(2.0f))
-				item->Orientation.y = EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y = EulerAngle::DegToRad(2.0f);
 		}
 
 		if (item->Animation.RequiredState == 43)
@@ -635,9 +635,9 @@ void GuideControl(short itemNumber)
 			item->Pose.Position.x = enemy->Pose.Position.x;
 			item->Pose.Position.y = enemy->Pose.Position.y;
 			item->Pose.Position.z = enemy->Pose.Position.z;
-			item->Orientation.x = enemy->Orientation.x;
-			item->Orientation.y = enemy->Orientation.y;
-			item->Orientation.z = enemy->Orientation.z;
+			item->Pose.Orientation.x = enemy->Pose.Orientation.x;
+			item->Pose.Orientation.y = enemy->Pose.Orientation.y;
+			item->Pose.Orientation.z = enemy->Pose.Orientation.z;
 		}
 		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
 		{
@@ -691,7 +691,7 @@ void GuideControl(short itemNumber)
 			{
 				TestTriggers(item, true);
 
-				item->Orientation.y = enemy->Orientation.y;
+				item->Pose.Orientation.y = enemy->Pose.Orientation.y;
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
@@ -700,13 +700,13 @@ void GuideControl(short itemNumber)
 			}
 			else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
 			{
-				if (enemy->Orientation.y - item->Orientation.y <= EulerAngle::DegToRad(2.0f))
+				if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= EulerAngle::DegToRad(2.0f))
 				{
-					if (enemy->Orientation.y - item->Orientation.y < EulerAngle::DegToRad(-2.0f))
-						item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < EulerAngle::DegToRad(-2.0f))
+						item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 				}
 				else
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 			}
 		}
 
@@ -735,13 +735,13 @@ void GuideControl(short itemNumber)
 				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose, 0);
 			}
 		}
-		else if (enemy->Orientation.y - item->Orientation.y <= EulerAngle::DegToRad(2.0f))
+		else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= EulerAngle::DegToRad(2.0f))
 		{
-			if (enemy->Orientation.y - item->Orientation.y < EulerAngle::DegToRad(-2.0f))
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+			if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < EulerAngle::DegToRad(-2.0f))
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 		}
 		else
-			item->Orientation.y += EulerAngle::DegToRad(2.0f);
+			item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 
 		break;
 
@@ -791,7 +791,7 @@ void GuideControl(short itemNumber)
 	case 41:
 	case 42:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Orientation.y - item->Orientation.y, EulerAngle::DegToRad(10.0f));
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, EulerAngle::DegToRad(10.0f));
 
 	default:
 		break;

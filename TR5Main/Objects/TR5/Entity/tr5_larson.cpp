@@ -43,7 +43,7 @@ void InitialiseLarson(short itemNumber)
 		return;
 
 	item->ItemFlags[3] = item->TriggerFlags;
-	float rotY = item->Orientation.y;
+	float rotY = item->Pose.Orientation.y;
 
 	if (rotY > EulerAngle::DegToRad(22.5f) && rotY < EulerAngle::DegToRad(157.5f))
 		item->Pose.Position.x += STEPUP_HEIGHT;
@@ -178,13 +178,13 @@ void LarsonControl(short itemNumber)
 					if (abs(info.angle) >= EulerAngle::DegToRad(2))
 					{
 						if (info.angle > 0)
-							item->Orientation.y += EulerAngle::DegToRad(2);
+							item->Pose.Orientation.y += EulerAngle::DegToRad(2);
 						else
-							item->Orientation.y -= EulerAngle::DegToRad(2);
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(2);
 					}
 					else
 					{
-						item->Orientation.y += info.angle;
+						item->Pose.Orientation.y += info.angle;
 					}
 				}
 				else
@@ -279,13 +279,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= EulerAngle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Orientation.y += EulerAngle::DegToRad(2);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2);
 			}
 			else
 			{
-				item->Orientation.y += info.angle;
+				item->Pose.Orientation.y += info.angle;
 			}
 
 			if (Targetable(item, &info))
@@ -323,13 +323,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= EulerAngle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Orientation.y += EulerAngle::DegToRad(2);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2);
 			}
 			else
 			{
-				item->Orientation.y += info.angle;
+				item->Pose.Orientation.y += info.angle;
 			}
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{

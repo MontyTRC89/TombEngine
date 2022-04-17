@@ -31,7 +31,7 @@ namespace TEN {
 					//TriggerExplosionSparks(&sparkPos, room); @TODO
 				}
 				if (triggerShockwave) {
-					PHD_3DPOS shockPos;
+					PoseData shockPos;
 					shockPos.Position.x = pos.x;
 					shockPos.Position.y = pos.y;
 					shockPos.Position.z = pos.z;

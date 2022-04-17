@@ -53,11 +53,11 @@ void InitialiseHydra(short itemNumber)
 	if (item->TriggerFlags == 2)
 		item->Pose.Position.z -= CLICK(1.5f);
 
-	item->Orientation.y = EulerAngle::DegToRad(90.0f);
+	item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
 	item->Pose.Position.x -= CLICK(1);
 }
 
-static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
+static void HydraBubblesAttack(PoseData* pos, short roomNumber, int count)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != NO_ITEM)
@@ -196,12 +196,12 @@ void HydraControl(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
 			{
 				if (AI.angle > 0)
-					item->Orientation.y += EulerAngle::DegToRad(1.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(1.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(1.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(1.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->TriggerFlags == 1)
 				tilt = EulerAngle::DegToRad(-2.8f);
@@ -258,7 +258,7 @@ void HydraControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x400)
 				{
-					CreatureEffect2(item, &HydraBite, 10, item->Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 120;
@@ -277,7 +277,7 @@ void HydraControl(short itemNumber)
 					{
 						item->HitPoints -= damage;
 						item->Animation.TargetState = HYDRA_STATE_HURT;
-						CreatureEffect2(item, &HydraBite, 10 * damage, item->Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 					}
 				}
 			}
@@ -302,7 +302,7 @@ void HydraControl(short itemNumber)
 				{
 					item->HitPoints -= damage;
 					item->Animation.TargetState = 4;
-					CreatureEffect2(item, &HydraBite, 10 * damage, item->Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 				}
 			}
 
@@ -333,7 +333,7 @@ void HydraControl(short itemNumber)
 
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
-				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
+				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 

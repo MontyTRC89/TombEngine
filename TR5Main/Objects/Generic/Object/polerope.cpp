@@ -41,8 +41,8 @@ namespace TEN::Entities::Generic
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE || laraInfo->Control.IsMoving &&
 			laraInfo->InteractedItem == itemNumber)
 		{
-			short rot = poleItem->Orientation.y;
-			poleItem->Orientation.y = laraItem->Orientation.y;
+			short rot = poleItem->Pose.Orientation.y;
+			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
 			if (TestLaraPosition(&PoleBounds, poleItem, laraItem))
 			{
@@ -57,7 +57,7 @@ namespace TEN::Entities::Generic
 				else
 					laraInfo->InteractedItem = itemNumber;
 
-				poleItem->Orientation.y = rot;
+				poleItem->Pose.Orientation.y = rot;
 			}
 			else
 			{
@@ -67,7 +67,7 @@ namespace TEN::Entities::Generic
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				poleItem->Orientation.y = rot;
+				poleItem->Pose.Orientation.y = rot;
 			}
 		}
 		else if (TrInput & IN_ACTION && isLara &&
@@ -82,8 +82,8 @@ namespace TEN::Entities::Generic
 			{
 				if (TestCollision(poleItem, laraItem))
 				{
-					short rot = poleItem->Orientation.y;
-					poleItem->Orientation.y = laraItem->Orientation.y;
+					short rot = poleItem->Pose.Orientation.y;
+					poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
 						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
@@ -103,7 +103,7 @@ namespace TEN::Entities::Generic
 					laraItem->Animation.VerticalVelocity = 0;
 					laraItem->Animation.Airborne = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
-					poleItem->Orientation.y = rot;
+					poleItem->Pose.Orientation.y = rot;
 				}
 			}
 		}

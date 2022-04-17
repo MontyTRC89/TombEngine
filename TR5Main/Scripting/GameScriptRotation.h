@@ -5,7 +5,7 @@
 namespace sol {
 	class state;
 }
-struct PHD_3DPOS;
+class PoseData;
 
 class GameScriptRotation {
 public:
@@ -15,11 +15,11 @@ public:
 
 	GameScriptRotation() = default;
 	GameScriptRotation(int x, int y, int z);
-	GameScriptRotation(PHD_3DPOS const& pos);
+	GameScriptRotation(PoseData const& pos);
 
 	std::string ToString() const;
 
-	void StoreInPHDPos(PHD_3DPOS& pos) const;
+	void StoreInPHDPos(PoseData& pos) const;
 
 	static void Register(sol::state*);
 };

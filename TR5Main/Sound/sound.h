@@ -109,7 +109,7 @@ struct SoundTrackInfo
 extern std::map<std::string, int> SoundTrackMap;
 extern std::vector<SoundTrackInfo> SoundTracks;
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
+long SoundEffect(int effectID, PoseData* position, int envFlags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
@@ -139,9 +139,9 @@ void  Sound_UpdateScene();
 void  Sound_FreeSample(int index);
 int   Sound_GetFreeSlot();
 void  Sound_FreeSlot(int index, unsigned int fadeout = 0);
-int   Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position);
-float Sound_DistanceToListener(PHD_3DPOS *position);
+int   Sound_EffectIsPlaying(int effectID, PoseData *position);
+float Sound_DistanceToListener(PoseData *position);
 float Sound_DistanceToListener(Vector3 position);
 float Sound_Attenuate(float gain, float distance, float radius);
-bool  Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force = false);
+bool  Sound_UpdateEffectPosition(int index, PoseData *position, bool force = false);
 bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain);

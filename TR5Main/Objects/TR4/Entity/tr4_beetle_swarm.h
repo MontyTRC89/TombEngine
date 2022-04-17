@@ -4,7 +4,7 @@
 
 struct BeetleData
 {
-	PHD_3DPOS Pose;
+	PoseData Pose;
 	EulerAngle Orientation;
 	short RoomNumber;
 	int Velocity;

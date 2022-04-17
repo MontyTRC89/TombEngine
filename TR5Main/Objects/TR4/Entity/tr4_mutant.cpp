@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 		C_WEST_NORTH = 315
 	};
 
-	void TriggerCrocgodMissile(PHD_3DPOS* src, short roomNumber, short counter)
+	void TriggerCrocgodMissile(PoseData* src, short roomNumber, short counter)
 	{
 		short fxNumber = NO_ITEM;
 
@@ -103,7 +103,7 @@ namespace TEN::Entities::TR4
 		sptr->dSize = size / 4;
 	}
 
-	static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotation, short roomNumber, int timer)
+	static void ShootFireball(PoseData* src, MissileRotationType rotation, short roomNumber, int timer)
 	{
 		switch (rotation)
 		{
@@ -140,7 +140,7 @@ namespace TEN::Entities::TR4
 	{
 		if (creature->Enemy == nullptr)
 		{
-			headAngle = item->Orientation.y;
+			headAngle = item->Pose.Orientation.y;
 			return;
 		}
 
@@ -150,10 +150,10 @@ namespace TEN::Entities::TR4
 
 		int x = enemy->Pose.Position.x - pos.x;
 		int z = enemy->Pose.Position.z - pos.z;
-		headAngle = (atan2(z, x) - item->Orientation.y) / 2;
+		headAngle = (atan2(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
-	static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
+	static void GetTargetPosition(ITEM_INFO* item, PoseData* target)
 	{
 		auto start = Vector3Int(0, -96, 144);
 		GetJointAbsPosition(item, &start, 9);
@@ -172,7 +172,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemFront(ITEM_INFO* item, int distance)
 	{
-		switch ((int)EulerAngle::RadToDeg(item->Orientation.GetY()))
+		switch ((int)EulerAngle::RadToDeg(item->Pose.Orientation.GetY()))
 		{
 		case C_NORTH:
 			item->Pose.Position.z += distance;
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemBack(ITEM_INFO* item, int distance)
 	{
-		switch ((int)EulerAngle::RadToDeg(item->Orientation.GetY()))
+		switch ((int)EulerAngle::RadToDeg(item->Pose.Orientation.GetY()))
 		{
 		case C_NORTH:
 			item->Pose.Position.z -= distance;
@@ -284,7 +284,7 @@ namespace TEN::Entities::TR4
 			frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 			if (frameNumber >= 94 && frameNumber <= 96)
 			{
-				PHD_3DPOS src;
+				PoseData src;
 				GetTargetPosition(item, &src);
 
 				if (frameNumber == 94)
@@ -313,7 +313,7 @@ namespace TEN::Entities::TR4
 		case MUTANT_STATE_LOCUST_2:
 			if (ShootFrame(item))
 			{
-				PHD_3DPOS src;
+				PoseData src;
 				GetTargetPosition(item, &src);
 				ShootFireball(&src, MissileRotationType::Front, item->RoomNumber, 1);
 			}

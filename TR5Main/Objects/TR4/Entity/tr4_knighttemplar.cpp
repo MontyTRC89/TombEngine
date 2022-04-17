@@ -124,12 +124,12 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Orientation.y += EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(1.0f);
 			else
-				item->Orientation.y -= EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(1.0f);
 		}
 		else
-			item->Orientation.y += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 
 		frameNumber = item->Animation.FrameNumber;
 		frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -190,12 +190,12 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Orientation.y += EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(1.0f);
 			else
-				item->Orientation.y -= EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(1.0f);
 		}
 		else
-			item->Orientation.y += AI.angle;
+			item->Pose.Orientation.y += AI.angle;
 
 		if (item->HitStatus)
 		{

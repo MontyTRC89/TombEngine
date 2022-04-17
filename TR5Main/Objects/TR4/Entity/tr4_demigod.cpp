@@ -103,7 +103,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void TriggerDemigodMissile(PHD_3DPOS* pos, short roomNumber, int flags)
+	void TriggerDemigodMissile(PoseData* pos, short roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -151,7 +151,7 @@ namespace TEN::Entities::TR4
 				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
+				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
@@ -173,7 +173,7 @@ namespace TEN::Entities::TR4
 				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
+				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
@@ -205,7 +205,7 @@ namespace TEN::Entities::TR4
 				float angles[2];
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
+				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
 
 				TriggerDemigodMissile(&pos, item->RoomNumber, 4);
 			}
@@ -362,7 +362,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = atan2(dz, dx) - item->Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 				laraAI.xAngle = 0;
 
 				laraAI.ahead = true;
@@ -538,11 +538,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= EulerAngle::DegToRad(7.0f))
-						item->Orientation.y += EulerAngle::DegToRad(7.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 					else if (AI.angle <= EulerAngle::DegToRad(-7))
-						item->Orientation.y += EulerAngle::DegToRad(-7.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(-7.0f);
 					else
-						item->Orientation.y += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -602,11 +602,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= EulerAngle::DegToRad(7.0f))
-						item->Orientation.y += EulerAngle::DegToRad(7.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 					else if (AI.angle <= EulerAngle::DegToRad(-7.0f))
-						item->Orientation.y += EulerAngle::DegToRad(-7.0f);
+						item->Pose.Orientation.y += EulerAngle::DegToRad(-7.0f);
 					else
-						item->Orientation.y += AI.angle;
+						item->Pose.Orientation.y += AI.angle;
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -628,11 +628,11 @@ namespace TEN::Entities::TR4
 				joint0 = 0;
 
 				if (AI.angle >= EulerAngle::DegToRad(7.0f))
-					item->Orientation.y += EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
 				else if (AI.angle <= EulerAngle::DegToRad(-7.0f))
-					item->Orientation.y += EulerAngle::DegToRad(-7.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(-7.0f);
 				else
-					item->Orientation.y += AI.angle;
+					item->Pose.Orientation.y += AI.angle;
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&
@@ -661,7 +661,7 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - 128;
 
-					TriggerShockwave((PHD_3DPOS*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
+					TriggerShockwave((PoseData*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					Camera.bounce = -128;

@@ -80,7 +80,7 @@ void GiantMutantControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = atan2(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Orientation.y;
+		angle = atan2(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
 		if (item->TouchBits)
 		{
@@ -145,7 +145,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 16 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Orientation.y += EulerAngle::DegToRad(14.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(14.0f);
 			}
 
 			if (angle < MUTANT_NEED_TURN)
@@ -159,7 +159,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 13 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Orientation.y -= EulerAngle::DegToRad(9.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(9.0f);
 			}
 
 			if (angle > -MUTANT_NEED_TURN)
@@ -203,8 +203,8 @@ void GiantMutantControl(short itemNumber)
 				LaraItem->Pose.Position.x = item->Pose.Position.x;
 				LaraItem->Pose.Position.y = item->Pose.Position.y;
 				LaraItem->Pose.Position.z = item->Pose.Position.z;
-				LaraItem->Orientation.y = item->Orientation.y;
-				LaraItem->Orientation.x = LaraItem->Orientation.z = 0;
+				LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+				LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
 				LaraItem->Animation.Airborne = false;
 				LaraItem->HitPoints = -1;
 				Lara.Air = -1;

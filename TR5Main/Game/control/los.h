@@ -12,4 +12,4 @@ int zLOS(GameVector* start, GameVector* end);
 bool ClipTarget(GameVector* start, GameVector* target);
 bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firing);
 int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject = GAME_OBJECT_ID::ID_NO_OBJECT);
-bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, Vector3Int* hitPos, short closesItemNumber);
+bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PoseData* itemOrStaticPos, Vector3Int* hitPos, short closesItemNumber);

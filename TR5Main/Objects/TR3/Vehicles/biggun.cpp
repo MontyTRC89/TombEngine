@@ -66,7 +66,7 @@ void BigGunInitialise(short itemNumber)
 
 	bigGun->Orientation.x = BGUN_DISMOUNT_FRAME;
 	bigGun->Orientation.z = 0;
-	bigGun->StartYRot = bigGunItem->Orientation.y;
+	bigGun->StartYRot = bigGunItem->Pose.Orientation.y;
 	bigGun->GunRotYAdd = 0;
 	bigGun->FireCount = 0;
 	bigGun->Flags = 0;
@@ -92,7 +92,7 @@ static bool BigGunTestMount(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 	int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 		return false;
 
-	float deltaAngle = EulerAngle::Clamp(laraItem->Orientation.y - bigGunItem->Orientation.y);
+	float deltaAngle = EulerAngle::Clamp(laraItem->Pose.Orientation.y - bigGunItem->Pose.Orientation.y);
 	if (deltaAngle > EulerAngle::DegToRad(35.0f) || deltaAngle < EulerAngle::DegToRad(-35.0f))
 		return false;
 
@@ -118,9 +118,9 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 
 		InitialiseItem(itemNumber);
 
-		projectileItem->Orientation.x = -((bigGun->Orientation.x - 32) * EulerAngle::DegToRad(1.0f));
-		projectileItem->Orientation.y = bigGunItem->Orientation.y;
-		projectileItem->Orientation.z = 0;
+		projectileItem->Pose.Orientation.x = -((bigGun->Orientation.x - 32) * EulerAngle::DegToRad(1.0f));
+		projectileItem->Pose.Orientation.y = bigGunItem->Pose.Orientation.y;
+		projectileItem->Pose.Orientation.z = 0;
 		projectileItem->Animation.Velocity = 16;
 		projectileItem->ItemFlags[0] = BGUN_FLAG_UP_DOWN;
 
@@ -288,8 +288,8 @@ bool BigGunControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	
 	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
 
-	bigGunItem->Orientation.y = bigGun->StartYRot + bigGun->Orientation.z;
-	laraItem->Orientation.y = bigGunItem->Orientation.y;
+	bigGunItem->Pose.Orientation.y = bigGun->StartYRot + bigGun->Orientation.z;
+	laraItem->Pose.Orientation.y = bigGunItem->Pose.Orientation.y;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 

@@ -52,15 +52,15 @@ namespace TEN::Entities::TR4
 		if (item->TriggerFlags & 8)
 		{
 			angle = item->TriggerFlags & 7;
-			item->Orientation.x = rotations[angle];
-			item->Orientation.y = EulerAngle::DegToRad(90.0f);
+			item->Pose.Orientation.x = rotations[angle];
+			item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
 			item->Pose.Position.z -= SPxzoffs[angle];
 		}
 		else
 		{
 			angle = item->TriggerFlags & 7;
 			item->Pose.Position.x += SPxzoffs[angle];
-			item->Orientation.z = rotations[angle];
+			item->Pose.Orientation.z = rotations[angle];
 		}
 
 		item->ItemFlags[0] = 1024;
@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 			bool hit = false;
 
 			if (item->ItemFlags[0] == 1024)	// Just started.
-				SoundEffect(SFX_TR4_TEETH_SPIKES, (PHD_3DPOS*)&item->Pose, 0);
+				SoundEffect(SFX_TR4_TEETH_SPIKES, (PoseData*)&item->Pose, 0);
 
 			item->Status = ITEM_ACTIVE;
 

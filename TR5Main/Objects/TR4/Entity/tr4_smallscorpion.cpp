@@ -138,12 +138,12 @@ void SmallScorpionControl(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(6.0f))
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(6.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(6.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(6.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(6.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			
 			if (!creature->Flags)
 			{
@@ -160,12 +160,12 @@ void SmallScorpionControl(short itemNumber)
 						BITE_INFO* biteInfo;
 						if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 						{
-							rotation = item->Orientation.y + EulerAngle::DegToRad(-180.0f);
+							rotation = item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f);
 							biteInfo = &SmallScorpionBiteInfo1;
 						}
 						else
 						{
-							rotation = item->Orientation.y + EulerAngle::DegToRad(-180.0f);
+							rotation = item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f);
 							biteInfo = &SmallScorpionBiteInfo2;
 						}
 

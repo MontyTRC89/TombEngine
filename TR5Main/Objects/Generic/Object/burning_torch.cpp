@@ -177,7 +177,7 @@ namespace TEN::Entities::Generic
 			if (!(Wibble & 7))
 				TriggerTorchFlame(LaraItem - g_Level.Items.data(), 0);
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (PoseData*)&pos, 0);
 		}
 	}
 
@@ -207,15 +207,15 @@ namespace TEN::Entities::Generic
 		int oldZ = item->Pose.Position.z;
 
 		if (item->Animation.VerticalVelocity)
-			item->Orientation.z += EulerAngle::DegToRad(5);
+			item->Pose.Orientation.z += EulerAngle::DegToRad(5);
 		else if (!item->Animation.Velocity)
 		{
-			item->Orientation.x = 0;
-			item->Orientation.z = 0;
+			item->Pose.Orientation.x = 0;
+			item->Pose.Orientation.z = 0;
 		}
 
-		int xv = item->Animation.Velocity * sin(item->Orientation.y);
-		int zv = item->Animation.Velocity * cos(item->Orientation.y);
+		int xv = item->Animation.Velocity * sin(item->Pose.Orientation.y);
+		int zv = item->Animation.Velocity * cos(item->Pose.Orientation.y);
 
 		item->Pose.Position.x += xv;
 		item->Pose.Position.z += zv;
@@ -308,7 +308,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			short rot = torchItem->Orientation.y;
+			short rot = torchItem->Pose.Orientation.y;
 
 			switch (torchItem->ObjectNumber)
 			{
@@ -340,7 +340,7 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			torchItem->Orientation.y = laraItem->Orientation.y;
+			torchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
 			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{
@@ -360,7 +360,7 @@ namespace TEN::Entities::Generic
 				laraInfo->InteractedItem = itemNumber;
 			}
 
-			torchItem->Orientation.y = rot;
+			torchItem->Pose.Orientation.y = rot;
 		}
 		if (laraItem->Animation.ActiveState == LS_MISC_CONTROL &&
 			laraInfo->InteractedItem == itemNumber &&

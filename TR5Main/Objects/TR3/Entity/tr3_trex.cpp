@@ -33,9 +33,9 @@ void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 	laraItem->Pose.Position.x = tRexItem->Pose.Position.x;
 	laraItem->Pose.Position.y = tRexItem->Pose.Position.y;
 	laraItem->Pose.Position.z = tRexItem->Pose.Position.z;
-	laraItem->Orientation.x = 0;
-	laraItem->Orientation.y = tRexItem->Orientation.y;
-	laraItem->Orientation.z = 0;
+	laraItem->Pose.Orientation.x = 0;
+	laraItem->Pose.Orientation.y = tRexItem->Pose.Orientation.y;
+	laraItem->Pose.Orientation.z = 0;
 	laraItem->Animation.Airborne = false;
 
 	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;

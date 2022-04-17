@@ -866,19 +866,19 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 		{
 			gshell->dirXrot = Lara.LeftArm.Rotation.y
 				+ Lara.ExtraTorsoRot.y
-				+ LaraItem->Orientation.y
+				+ LaraItem->Pose.Orientation.y
 				- (GetRandomControl() & 0xFFF)
 				+ 10240;
 			gshell->pos.Orientation.y += Lara.LeftArm.Rotation.y 
 				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Orientation.y;
+				+ LaraItem->Pose.Orientation.y;
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
 		else
 		{
 			gshell->dirXrot = Lara.LeftArm.Rotation.y 
-				+ LaraItem->Orientation.y 
+				+ LaraItem->Pose.Orientation.y 
 				- (GetRandomControl() & 0xFFF) 
 				+ 18432;
 		}
@@ -886,7 +886,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	else
 	{
 		gshell->dirXrot = Lara.LeftArm.Rotation.y 
-			+ LaraItem->Orientation.y 
+			+ LaraItem->Pose.Orientation.y 
 			+ (GetRandomControl() & 0xFFF) 
 			- 18432;
 	}
@@ -1211,9 +1211,9 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		item->Orientation.y,
-		item->Orientation.x,
-		item->Orientation.z
+		item->Pose.Orientation.y,
+		item->Pose.Orientation.x,
+		item->Pose.Orientation.z
 	);
 
 	int bit = 1;
@@ -1333,7 +1333,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags)
+void TriggerShockwave(PoseData* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;

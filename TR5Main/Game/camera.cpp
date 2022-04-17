@@ -37,8 +37,8 @@ struct OLD_CAMERA
 	float actualElevation;
 	float targetElevation;
 	float actualAngle;
-	PHD_3DPOS pos;
-	PHD_3DPOS pos2;
+	PoseData pos;
+	PoseData pos2;
 	Vector3Int target;
 };
 
@@ -146,9 +146,9 @@ void MoveCamera(GameVector* ideal, int speed)
 		BinocularOn++;
 	}
 
-	if (OldCam.pos.Orientation.x != LaraItem->Orientation.x ||
-		OldCam.pos.Orientation.y != LaraItem->Orientation.y ||
-		OldCam.pos.Orientation.z != LaraItem->Orientation.z ||
+	if (OldCam.pos.Orientation.x != LaraItem->Pose.Orientation.x ||
+		OldCam.pos.Orientation.y != LaraItem->Pose.Orientation.y ||
+		OldCam.pos.Orientation.z != LaraItem->Pose.Orientation.z ||
 		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
 		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
 		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
@@ -168,9 +168,9 @@ void MoveCamera(GameVector* ideal, int speed)
 		Camera.oldType != Camera.type ||
 		BinocularOn < 0)
 	{
-		OldCam.pos.Orientation.x = LaraItem->Orientation.x;
-		OldCam.pos.Orientation.y = LaraItem->Orientation.y;
-		OldCam.pos.Orientation.z = LaraItem->Orientation.z;
+		OldCam.pos.Orientation.x = LaraItem->Pose.Orientation.x;
+		OldCam.pos.Orientation.y = LaraItem->Pose.Orientation.y;
+		OldCam.pos.Orientation.z = LaraItem->Pose.Orientation.z;
 		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
 		OldCam.pos2.Orientation.y = Lara.ExtraHeadRot.y;
 		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
@@ -322,7 +322,7 @@ void ChaseCamera(ITEM_INFO* item)
 	if (!Camera.targetElevation)
 		Camera.targetElevation = EulerAngle::DegToRad(-10.0f);
 
-	Camera.targetElevation += item->Orientation.x;
+	Camera.targetElevation += item->Pose.Orientation.x;
 	UpdateCameraElevation();
 
 	// Clamp x rotation.
@@ -449,7 +449,7 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + atan2(pos.z, pos.x);
 	}
 	else
-		Camera.actualAngle = LaraItem->Orientation.y + Camera.targetAngle;
+		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
@@ -464,12 +464,12 @@ void CombatCamera(ITEM_INFO* item)
 	if (lara->TargetEntity)
 	{
 		Camera.targetAngle = lara->TargetArmAngles[0];
-		Camera.targetElevation = lara->TargetArmAngles[1] + item->Orientation.x;
+		Camera.targetElevation = lara->TargetArmAngles[1] + item->Pose.Orientation.x;
 	}
 	else
 	{
 		Camera.targetAngle = lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Orientation.x - EulerAngle::DegToRad(15.0f);
+		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.x - EulerAngle::DegToRad(15.0f);
 	}
 
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
@@ -1024,7 +1024,7 @@ void LookCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
 		Camera.mikePos.x = item->Pose.Position.x;
 		Camera.mikePos.y = item->Pose.Position.y;
 		Camera.mikePos.z = item->Pose.Position.z;
@@ -1126,9 +1126,9 @@ void BinocularCamera(ITEM_INFO* item)
 
 	int l = SECTOR(20.25f) * cos(headXRot);
 
-	int tx = x + l * sin(item->Orientation.y + headYRot);
+	int tx = x + l * sin(item->Pose.Orientation.y + headYRot);
 	int ty = y - SECTOR(20.25f) * sin(headXRot);
-	int tz = z + l * cos(item->Orientation.y + headYRot);
+	int tz = z + l * cos(item->Pose.Orientation.y + headYRot);
 
 	if (Camera.oldType == CameraType::Fixed)
 	{
@@ -1167,7 +1167,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
 		Camera.mikePos.x = item->Pose.Position.x;
 		Camera.mikePos.y = item->Pose.Position.y;
 		Camera.mikePos.z = item->Pose.Position.z;
@@ -1447,7 +1447,7 @@ void CalculateCamera()
 			auto dx = Camera.item->Pose.Position.x - item->Pose.Position.x;
 			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
 			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
-			float angle = atan2(dz, dx) - item->Orientation.y;
+			float angle = atan2(dz, dx) - item->Pose.Orientation.y;
 			float tilt = atan2(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->Pose.Position.y);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle /= 2;
@@ -1529,8 +1529,8 @@ void CalculateCamera()
 		else
 		{
 			auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->Pose.Position.x + shift * sin(item->Orientation.y);
-			z = item->Pose.Position.z + shift * cos(item->Orientation.y);
+			x = item->Pose.Position.x + shift * sin(item->Pose.Orientation.y);
+			z = item->Pose.Position.z + shift * cos(item->Pose.Orientation.y);
 
 			Camera.target.x = x;
 			Camera.target.z = z;
@@ -1705,14 +1705,14 @@ void ResetLook(ITEM_INFO* item)
 	}
 }
 
-bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius)
 {
 	auto dxBox = TO_DX_BBOX(*pos, bounds);
 	auto sphere = BoundingSphere(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), radius);
 	return sphere.Intersects(dxBox);
 }
 
-void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
+void ItemPushCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
 	int dz = Camera.pos.z - pos->Position.z;

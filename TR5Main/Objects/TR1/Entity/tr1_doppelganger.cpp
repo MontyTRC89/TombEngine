@@ -81,9 +81,9 @@ void DoppelgangerControl(short itemNumber)
 		item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
 		item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
 		item->Pose.Position = pos;
-		item->Orientation.x = LaraItem->Orientation.x;
-		item->Orientation.y = LaraItem->Orientation.y - EulerAngle::DegToRad(180.0f);
-		item->Orientation.z = LaraItem->Orientation.z;
+		item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
+		item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - EulerAngle::DegToRad(180.0f);
+		item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
 		ItemNewRoom(itemNumber, LaraItem->RoomNumber);
 
 		// Compare floor heights.

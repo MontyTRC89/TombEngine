@@ -51,7 +51,7 @@ void GrenadeControl(short itemNumber);
 //void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void FireRocket(ITEM_INFO* laraItem);
 void RocketControl(short itemNumber);
-void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos);
+void FireCrossbow(ITEM_INFO* laraItem, PoseData* pos);
 void CrossbowBoltControl(short itemNumber);
 void FireCrossBowFromLaserSight(ITEM_INFO* laraItem, GameVector* src, GameVector* target);
 

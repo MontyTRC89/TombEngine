@@ -12,7 +12,7 @@ struct ITEM_INFO;
 
 struct HAIR_STRUCT
 {
-	PHD_3DPOS Pose;
+	PoseData Pose;
 	EulerAngle Orientation; // temp
 	Vector3Int hvel;
 	Vector3Int unknown;

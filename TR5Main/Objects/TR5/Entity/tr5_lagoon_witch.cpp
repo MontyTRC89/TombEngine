@@ -127,7 +127,7 @@ void LagoonWitchControl(short itemNumber)
 				item->TouchBits & 0x3C3C0 &&
 				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
 			{
-				CreatureEffect2(item, &LagoonWitchBite, 10, item->Orientation.y, DoBloodSplat);
+				CreatureEffect2(item, &LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 				creature->Flags = WITCH_STATE_SWIM;
 
 				LaraItem->HitPoints -= 100;

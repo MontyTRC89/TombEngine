@@ -51,16 +51,16 @@ void ControlCentaurBomb(short itemNumber)
 	bool aboveWater = false;
 	auto oldPos = item->Pose.Position;
 
-	item->Orientation.z += EulerAngle::DegToRad(35.0f);
+	item->Pose.Orientation.z += EulerAngle::DegToRad(35.0f);
 	if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		item->Orientation.x -= EulerAngle::DegToRad(1.0f);
-		if (item->Orientation.x < EulerAngle::DegToRad(-90.0f))
-			item->Orientation.x = EulerAngle::DegToRad(-90.0f);
+		item->Pose.Orientation.x -= EulerAngle::DegToRad(1.0f);
+		if (item->Pose.Orientation.x < EulerAngle::DegToRad(-90.0f))
+			item->Pose.Orientation.x = EulerAngle::DegToRad(-90.0f);
 
 		aboveWater = true;
-		item->Animation.Velocity = BOMB_SPEED * cos(item->Orientation.x);
-		item->Animation.VerticalVelocity = -BOMB_SPEED * sin(item->Orientation.x);
+		item->Animation.Velocity = BOMB_SPEED * cos(item->Pose.Orientation.x);
+		item->Animation.VerticalVelocity = -BOMB_SPEED * sin(item->Pose.Orientation.x);
 	}
 	else
 	{
@@ -69,19 +69,19 @@ void ControlCentaurBomb(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Orientation.z += ((item->Animation.Velocity / 4) + 7) * EulerAngle::DegToRad(1.0f);
+			item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * EulerAngle::DegToRad(1.0f);
 
 			if (item->Animation.RequiredState)
-				item->Orientation.y += ((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f);
 			else
-				item->Orientation.x += ((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f);
 
 		}
 	}
 
-	item->Pose.Position.x += item->Animation.Velocity * cos(item->Orientation.x) * sin(item->Orientation.y);
-	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Orientation.x);
-	item->Pose.Position.z += item->Animation.Velocity * cos(item->Orientation.x) * cos(item->Orientation.y);
+	item->Pose.Position.x += item->Animation.Velocity * cos(item->Pose.Orientation.x) * sin(item->Pose.Orientation.y);
+	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.x);
+	item->Pose.Position.z += item->Animation.Velocity * cos(item->Pose.Orientation.x) * cos(item->Pose.Orientation.y);
 
 	auto probe = GetCollision(item);
 
@@ -162,12 +162,12 @@ static void RocketGun(ITEM_INFO* centaurItem)
 		projectileItem->Pose.Position.z = pos.z;
 		InitialiseItem(itemNumber);
 
-		projectileItem->Orientation.x = 0;
-		projectileItem->Orientation.y = centaurItem->Orientation.y;
-		projectileItem->Orientation.z = 0;
+		projectileItem->Pose.Orientation.x = 0;
+		projectileItem->Pose.Orientation.y = centaurItem->Pose.Orientation.y;
+		projectileItem->Pose.Orientation.z = 0;
 
-		projectileItem->Animation.Velocity = BOMB_SPEED * cos(projectileItem->Orientation.x);
-		projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * cos(projectileItem->Orientation.x);
+		projectileItem->Animation.Velocity = BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);
+		projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);
 		projectileItem->ItemFlags[0] = 1;
 
 		AddActiveItem(itemNumber);

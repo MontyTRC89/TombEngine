@@ -44,14 +44,14 @@ GameScriptPosition::GameScriptPosition(int aX, int aY, int aZ)
 	z = aZ;
 }
 
-GameScriptPosition::GameScriptPosition(PHD_3DPOS const& pos)
+GameScriptPosition::GameScriptPosition(PoseData const& pos)
 {
 	x = pos.Position.x;
 	y = pos.Position.y;
 	z = pos.Position.z;
 }
 
-void GameScriptPosition::StoreInPHDPos(PHD_3DPOS& pos) const
+void GameScriptPosition::StoreInPHDPos(PoseData& pos) const
 {
 	pos.Position.x = x;
 	pos.Position.y = y;

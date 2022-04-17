@@ -1533,8 +1533,8 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 					Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->Orientation.y, rat->Orientation.x,
-																	 rat->Orientation.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(rat->Pose.Orientation.y, rat->Pose.Orientation.x,
+																	 rat->Pose.Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
@@ -1591,7 +1591,7 @@ namespace TEN::Renderer
 					{
 						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
 						Matrix rotation = Matrix::CreateFromYawPitchRoll(
-							bat->Orientation.y, bat->Orientation.x, bat->Orientation.z);
+							bat->Pose.Orientation.y, bat->Pose.Orientation.x, bat->Pose.Orientation.z);
 						Matrix world = rotation * translation;
 
 						m_stItem.World = world;
@@ -1634,8 +1634,8 @@ namespace TEN::Renderer
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
 						Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->Orientation.y, beetle->Orientation.x,
-																	 beetle->Orientation.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(beetle->Pose.Orientation.y, beetle->Pose.Orientation.x,
+																	 beetle->Pose.Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
@@ -2098,8 +2098,8 @@ namespace TEN::Renderer
 				//PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
 				//				  LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Lara Orient Ang: %f %f %f", EulerAngle::RadToDeg(LaraItem->Orientation.x), EulerAngle::RadToDeg(LaraItem->Orientation.y), EulerAngle::RadToDeg(LaraItem->Orientation.z));
-				PrintDebugMessage("Lara Orient Rad: %f %f %f", LaraItem->Orientation.x, LaraItem->Orientation.y, LaraItem->Orientation.z);
+				PrintDebugMessage("Lara Orient Ang: %f %f %f", EulerAngle::RadToDeg(LaraItem->Pose.Orientation.x), EulerAngle::RadToDeg(LaraItem->Pose.Orientation.y), EulerAngle::RadToDeg(LaraItem->Pose.Orientation.z));
+				PrintDebugMessage("Lara Orient Rad: %f %f %f", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				//PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				//PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
 				//				  r->z + r->zSize * SECTOR(1));
@@ -2972,12 +2972,12 @@ namespace TEN::Renderer
 			nativeItem->Pose.Position.y,
 			nativeItem->Pose.Position.z);
 
-		float speed = (-96 * cos(nativeItem->Orientation.x));
+		float speed = (-96 * cos(nativeItem->Pose.Orientation.x));
 
 		Vector3 end = Vector3(
-			nativeItem->Pose.Position.x + speed * sin(nativeItem->Orientation.y),
-			nativeItem->Pose.Position.y + 96 * sin(nativeItem->Orientation.x),
-			nativeItem->Pose.Position.z + speed * cos(nativeItem->Orientation.y));
+			nativeItem->Pose.Position.x + speed * sin(nativeItem->Pose.Orientation.y),
+			nativeItem->Pose.Position.y + 96 * sin(nativeItem->Pose.Orientation.x),
+			nativeItem->Pose.Position.z + speed * cos(nativeItem->Pose.Orientation.y));
 
 		addLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}

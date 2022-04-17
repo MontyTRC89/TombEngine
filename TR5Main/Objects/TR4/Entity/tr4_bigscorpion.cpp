@@ -74,16 +74,16 @@ void ScorpionControl(short itemNumber)
 	float joint2 = 0;
 	float joint3 = 0;
 
-	int x = item->Pose.Position.x + 682 * sin(item->Orientation.y);
-	int z = item->Pose.Position.z + 682 * cos(item->Orientation.y);
+	int x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.y);
+	int z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.y);
 
 	auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 	int height1 = probe.Position.Floor;
 	if (abs(item->Pose.Position.y - height1) > CLICK(2))
 		probe.Position.Floor = item->Pose.Position.y;
 
-	x = item->Pose.Position.x - 682 * sin(item->Orientation.y);
-	z = item->Pose.Position.z - 682 * cos(item->Orientation.y);
+	x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.y);
+	z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.y);
 
 	probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 	int height2 = probe.Position.Floor;
@@ -92,16 +92,16 @@ void ScorpionControl(short itemNumber)
 
 	float angle1 = atan2(1344, height2 - height1);
 
-	x = item->Pose.Position.x - 682 * sin(item->Orientation.y);
-	z = item->Pose.Position.z + 682 * cos(item->Orientation.y);
+	x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.y);
+	z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.y);
 
 	probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 	int height3 = probe.Position.Floor;
 	if (abs(item->Pose.Position.y - height3) > CLICK(2))
 		height3 = item->Pose.Position.y;
 
-	x = item->Pose.Position.x + 682 * sin(item->Orientation.y);
-	z = item->Pose.Position.z - 682 * cos(item->Orientation.y);
+	x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.y);
+	z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.y);
 
 	probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 	int height4 = probe.Position.Floor;
@@ -267,12 +267,12 @@ void ScorpionControl(short itemNumber)
 			if (abs(info.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (info.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += info.angle;
+				item->Pose.Orientation.y += info.angle;
 
 			if (creature->Flags)
 				break;
@@ -295,7 +295,7 @@ void ScorpionControl(short itemNumber)
 					item,
 					&BigScorpionBite1,
 					10,
-					item->Orientation.y - EulerAngle::DegToRad(180.0f),
+					item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f),
 					DoBloodSplat);
 			}
 			else if (item->TouchBits & 0x1B00100)
@@ -311,7 +311,7 @@ void ScorpionControl(short itemNumber)
 						item,
 						&BigScorpionBite1,
 						10,
-						item->Orientation.y - EulerAngle::DegToRad(180.0f),
+						item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
 				else
@@ -320,7 +320,7 @@ void ScorpionControl(short itemNumber)
 						item,
 						&BigScorpionBite2,
 						10,
-						item->Orientation.y - EulerAngle::DegToRad(180.0f),
+						item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
 
@@ -357,24 +357,24 @@ void ScorpionControl(short itemNumber)
 		}
 	}
 
-	if ((angle1 - item->Orientation.x) < EulerAngle::DegToRad(1.4f))
-		item->Orientation.x = EulerAngle::DegToRad(1.4f);
+	if ((angle1 - item->Pose.Orientation.x) < EulerAngle::DegToRad(1.4f))
+		item->Pose.Orientation.x = EulerAngle::DegToRad(1.4f);
 	else
 	{
-		if (angle1 <= item->Orientation.x)
-			item->Orientation.x -= EulerAngle::DegToRad(1.4f);
+		if (angle1 <= item->Pose.Orientation.x)
+			item->Pose.Orientation.x -= EulerAngle::DegToRad(1.4f);
 		else
-			item->Orientation.x += EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.x += EulerAngle::DegToRad(1.4f);
 	}
 
-	if ((angle2 - item->Orientation.z) < EulerAngle::DegToRad(1.4f))
-		item->Orientation.z = EulerAngle::DegToRad(1.4f);
+	if ((angle2 - item->Pose.Orientation.z) < EulerAngle::DegToRad(1.4f))
+		item->Pose.Orientation.z = EulerAngle::DegToRad(1.4f);
 	else
 	{
-		if (angle2 <= item->Orientation.z)
-			item->Orientation.z -= EulerAngle::DegToRad(1.4f);
+		if (angle2 <= item->Pose.Orientation.z)
+			item->Pose.Orientation.z -= EulerAngle::DegToRad(1.4f);
 		else
-			item->Orientation.z += EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.z += EulerAngle::DegToRad(1.4f);
 	}
 
 	if (!CutSeqNum)

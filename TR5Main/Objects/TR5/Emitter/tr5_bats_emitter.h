@@ -7,7 +7,7 @@ constexpr auto NUM_BATS = 64;
 struct BatData
 {
 	bool On;
-	PHD_3DPOS Pose;
+	PoseData Pose;
 	EulerAngle Orientation;
 	short RoomNumber;
 

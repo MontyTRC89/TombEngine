@@ -1,6 +1,5 @@
 #pragma once
 
-
 #define NUM_CONTROLS			16
 
 #define DIK_ESCAPE          0x01

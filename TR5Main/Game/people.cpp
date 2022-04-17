@@ -67,7 +67,7 @@ bool ShotLara(ITEM_INFO* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation,
 
 				Vector3Int pos = { 0, 0, 0 };
 				GetJointAbsPosition(enemy, &pos, random);
-				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Orientation.y, enemy->RoomNumber);
+				DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 4, enemy->Pose.Orientation.y, enemy->RoomNumber);
 			}
 		}
 	}
@@ -85,7 +85,7 @@ short GunMiss(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	pos.z = LaraItem->Pose.Position.z + ((GetRandomControl() - 0x4000) << 9) / 0x7FFF;
 	pos.roomNumber = LaraItem->RoomNumber;
 
-	Richochet((PHD_3DPOS*)&pos);
+	Richochet((PoseData*)&pos);
 
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
@@ -95,7 +95,7 @@ short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	Vector3Int pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
-	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Orientation.y, LaraItem->RoomNumber);
+	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
 
 	return GunShot(x, y, z, velocity, yRot, roomNumber);

@@ -5,7 +5,7 @@
 struct BaboonRespawnStruct
 {
 	int ID;
-	PHD_3DPOS Pos;
+	PoseData Pos;
 	unsigned int Count;
 	unsigned int MaxCount;  // Used to limit the number of respawns.
 };

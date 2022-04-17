@@ -188,7 +188,7 @@ namespace TEN::Entities::Generic
 				rope,
 				laraItem->Pose.Position.x,
 				laraItem->Pose.Position.y + frame->Y1 + 512,
-				laraItem->Pose.Position.z + frame->Z2 * cos(laraItem->Orientation.y),
+				laraItem->Pose.Position.z + frame->Z2 * cos(laraItem->Pose.Orientation.y),
 				laraItem->Animation.ActiveState == LS_REACH ? 128 : 320);
 
 			if (segment >= 0)
@@ -213,7 +213,7 @@ namespace TEN::Entities::Generic
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->Control.Rope.Ptr = ropeItem->TriggerFlags;
 				laraInfo->Control.Rope.Segment = segment;
-				laraInfo->Control.Rope.Y = laraItem->Orientation.y;
+				laraInfo->Control.Rope.Y = laraItem->Pose.Orientation.y;
 
 				DelAlignLaraToRope(laraItem);
 
@@ -221,7 +221,7 @@ namespace TEN::Entities::Generic
 				CurrentPendulum.velocity.y = 0;
 				CurrentPendulum.velocity.z = 0;
 
-				ApplyVelocityToRope(segment, laraItem->Orientation.y, 16 * laraItem->Animation.Velocity);
+				ApplyVelocityToRope(segment, laraItem->Pose.Orientation.y, 16 * laraItem->Animation.Velocity);
 			}
 		}
 	}
@@ -529,7 +529,7 @@ namespace TEN::Entities::Generic
 
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Orientation.x > 0 && item->Orientation.x - Lara.Control.Rope.LastX < -100)
+			if (item->Pose.Orientation.x > 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX < -100)
 			{
 				Lara.Control.Rope.ArcFront = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 0;
@@ -560,7 +560,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if (item->Orientation.x < 0 && item->Orientation.x - Lara.Control.Rope.LastX > 100)
+			if (item->Pose.Orientation.x < 0 && item->Pose.Orientation.x - Lara.Control.Rope.LastX > 100)
 			{
 				Lara.Control.Rope.ArcBack = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 1;
@@ -590,16 +590,16 @@ namespace TEN::Entities::Generic
 			}
 		}
 
-		Lara.Control.Rope.LastX = item->Orientation.x;
+		Lara.Control.Rope.LastX = item->Pose.Orientation.x;
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Orientation.x > Lara.Control.Rope.MaxXForward)
-				Lara.Control.Rope.MaxXForward = item->Orientation.x;
+			if (item->Pose.Orientation.x > Lara.Control.Rope.MaxXForward)
+				Lara.Control.Rope.MaxXForward = item->Pose.Orientation.x;
 		}
 		else
 		{
-			if (item->Orientation.x < -Lara.Control.Rope.MaxXBackward)
-				Lara.Control.Rope.MaxXBackward = abs(item->Orientation.x);
+			if (item->Pose.Orientation.x < -Lara.Control.Rope.MaxXBackward)
+				Lara.Control.Rope.MaxXBackward = abs(item->Pose.Orientation.x);
 		}
 	}
 
@@ -607,10 +607,10 @@ namespace TEN::Entities::Generic
 	{
 		if (Lara.Control.Rope.Ptr != -1)
 		{
-			if (item->Orientation.x >= 0)
+			if (item->Pose.Orientation.x >= 0)
 			{
 				item->Animation.VerticalVelocity = -112;
-				item->Animation.Velocity = item->Orientation.x / 128;
+				item->Animation.Velocity = item->Pose.Orientation.x / 128;
 			}
 			else
 			{
@@ -618,7 +618,7 @@ namespace TEN::Entities::Generic
 				item->Animation.VerticalVelocity = -20;
 			}
 
-			item->Orientation.x = 0;
+			item->Pose.Orientation.x = 0;
 			item->Animation.Airborne = true;
 
 			Lara.Control.HandStatus = HandStatus::Free;
@@ -640,7 +640,7 @@ namespace TEN::Entities::Generic
 	void FallFromRope(ITEM_INFO* item)
 	{
 		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
-		item->Orientation.x = 0;
+		item->Pose.Orientation.x = 0;
 		item->Pose.Position.y += 320;
 
 		item->Animation.AnimNumber = LA_FALL_START;
@@ -803,8 +803,8 @@ namespace TEN::Entities::Generic
 		item->Pose.Position.y += -112 * rotMatrix.m[1][2];
 		item->Pose.Position.z += -112 * rotMatrix.m[2][2];
 
-		item->Orientation.x = angle[0];
-		item->Orientation.y = angle[1];
-		item->Orientation.z = angle[2];
+		item->Pose.Orientation.x = angle[0];
+		item->Pose.Orientation.y = angle[1];
+		item->Pose.Orientation.z = angle[2];
 	}
 }

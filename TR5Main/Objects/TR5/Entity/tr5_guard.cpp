@@ -174,8 +174,8 @@ void InitialiseGuard(short itemNum)
 		case 9:
 			item->Animation.AnimNumber = anim + 59;
 			item->Animation.TargetState = GUARD_STATE_USE_COMPUTER;
-			item->Pose.Position.x -= CLICK(2) * sin(item->Orientation.y);
-			item->Pose.Position.z -= CLICK(2) * cos(item->Orientation.y);
+			item->Pose.Position.x -= CLICK(2) * sin(item->Pose.Orientation.y);
+			item->Pose.Position.z -= CLICK(2) * cos(item->Pose.Orientation.y);
 			break;
 
 		case 8:
@@ -204,9 +204,9 @@ void InitialiseSniper(short itemNumber)
 	item->Animation.TargetState = SNIPER_STATE_IDLE;
 	item->Animation.ActiveState = SNIPER_STATE_IDLE;
 
-	item->Pose.Position.x += SECTOR(1) * sin(item->Orientation.y + EulerAngle::DegToRad(90.0f));
+	item->Pose.Position.x += SECTOR(1) * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
 	item->Pose.Position.y += CLICK(2);
-	item->Pose.Position.z += SECTOR(1) * cos(item->Orientation.y + EulerAngle::DegToRad(90.0f));
+	item->Pose.Position.z += SECTOR(1) * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
 }
 
 void InitialiseGuardLaser(short itemNumber)
@@ -247,8 +247,8 @@ void GuardControl(short itemNumber)
 
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
-	int dx = 870 * sin(item->Orientation.y);
-	int dz = 870 * cos(item->Orientation.y);
+	int dx = 870 * sin(item->Pose.Orientation.y);
+	int dz = 870 * cos(item->Pose.Orientation.y);
 
 	x += dx;
 	z += dz;
@@ -309,7 +309,7 @@ void GuardControl(short itemNumber)
 	{
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		laraAI.angle = atan2(dz, dx) - item->Orientation.y;
+		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 		laraAI.distance = pow(dx, 2) + pow(dz, 2);
 	}
 	
@@ -322,13 +322,13 @@ void GuardControl(short itemNumber)
 			{
 				item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH2;
 				item->Animation.ActiveState = GUARD_STATE_DEATH_2;
-				item->Orientation.y += laraAI.angle + EulerAngle::DegToRad(-180.0f);
+				item->Pose.Orientation.y += laraAI.angle + EulerAngle::DegToRad(-180.0f);
 			}
 			else
 			{
 				item->Animation.AnimNumber = animIndex + ANIMATION_GUARD_DEATH1;
 				item->Animation.ActiveState = GUARD_STATE_DEATH_1;
-				item->Orientation.y += laraAI.angle;
+				item->Pose.Orientation.y += laraAI.angle;
 			}
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -503,12 +503,12 @@ void GuardControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle >= 0)
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Orientation.y += EulerAngle::DegToRad(-180.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
 
 			break;
 
@@ -522,12 +522,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (item->Animation.ActiveState == GUARD_STATE_FIRE_FAST)
 			{
@@ -573,12 +573,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (!Targetable(item, &AI))
 				item->Animation.TargetState = GUARD_STATE_IDLE;
@@ -687,12 +687,12 @@ void GuardControl(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				//if ((AI.angle & 0x8000) == 0)
-				//	item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				//	item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				//else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			
 			break;
 
@@ -742,7 +742,7 @@ void GuardControl(short itemNumber)
 				currentItem->MeshBits = -3;
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Orientation.y -= EulerAngle::DegToRad(90.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
 			
 			break;
 
@@ -805,7 +805,7 @@ void GuardControl(short itemNumber)
 			{
 				currentItem->MeshBits = 0x1FFF;
 				item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
-				item->Orientation.y = currentItem->Orientation.y;
+				item->Pose.Orientation.y = currentItem->Pose.Orientation.y;
 				item->Pose.Position.z = currentItem->Pose.Position.z + CLICK(0.5f);
 				item->SwapMeshFlags = 1024;
 			}
@@ -1112,8 +1112,8 @@ void Mafia2Control(short itemNumber)
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	int dx = 870 * sin(item->Orientation.y);
-	int dz = 870 * cos(item->Orientation.y);
+	int dx = 870 * sin(item->Pose.Orientation.y);
+	int dz = 870 * cos(item->Pose.Orientation.y);
 
 	x += dx;
 	z += dz;
@@ -1179,7 +1179,7 @@ void Mafia2Control(short itemNumber)
 		{
 			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			laraAI.angle = atan2(dz, dx) - item->Orientation.y;
+			laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 
@@ -1275,15 +1275,15 @@ void Mafia2Control(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle >= 0)
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
 				item->SwapMeshFlags != 9216)
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-					item->Orientation.y += EulerAngle::DegToRad(-180.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
 			}
 			else
 				item->SwapMeshFlags = 128;
@@ -1301,12 +1301,12 @@ void Mafia2Control(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			
 			if (!creature->Flags)
 			{
@@ -1329,12 +1329,12 @@ void Mafia2Control(short itemNumber)
 			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 				else
-					item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			}
 			else
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 
 			if (Targetable(item, &AI))
 				item->Animation.TargetState = MAFIA2_STATE_FIRE;
@@ -1415,9 +1415,9 @@ void Mafia2Control(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle >= 0)
-				item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 			else
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
 				item->SwapMeshFlags == 9216)
@@ -1440,13 +1440,13 @@ void Mafia2Control(short itemNumber)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 16;
 				item->Animation.ActiveState = MAFIA2_STATE_DEATH_2;
-				item->Orientation.y += AI.angle - EulerAngle::DegToRad(18.0f);
+				item->Pose.Orientation.y += AI.angle - EulerAngle::DegToRad(18.0f);
 			}
 			else
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
 				item->Animation.ActiveState = MAFIA2_STATE_DEATH_1;
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			}
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;

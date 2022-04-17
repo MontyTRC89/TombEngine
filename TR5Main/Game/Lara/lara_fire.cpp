@@ -782,20 +782,20 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int d
 				{
 					// Baddy2 gun hitting sword
 					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &target->Pose, 0);
-					TriggerRicochetSpark(hitPos, laraItem->Orientation.y, 3, 0);
+					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
 					return;
 				}
 				else
-					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Orientation.y, target->RoomNumber);
+					DoBloodSplat(hitPos->x, hitPos->y, hitPos->z, (GetRandomControl() & 3) + 3, target->Pose.Orientation.y, target->RoomNumber);
 
 				break;
 
 			case HIT_RICOCHET:
-				TriggerRicochetSpark(hitPos, laraItem->Orientation.y, 3, 0);
+				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
 				break;
 
 			case HIT_SMOKE:
-				TriggerRicochetSpark(hitPos, laraItem->Orientation.y, 3, -5);
+				TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, -5);
 
 				if (target->ObjectNumber == ID_ROMAN_GOD1 ||
 					target->ObjectNumber == ID_ROMAN_GOD2)
@@ -955,8 +955,8 @@ void FindTargetPoint(ITEM_INFO* item, GameVector* target)
 	int y = (int) bounds->Y1 + (bounds->Y2 - bounds->Y1) / 3;
 	int z = (int)(bounds->Z1 + bounds->Z2) / 2;
 
-	float c = cos(item->Orientation.y);
-	float s = sin(item->Orientation.y);
+	float c = cos(item->Pose.Orientation.y);
+	float s = sin(item->Pose.Orientation.y);
 
 	target->x = item->Pose.Position.x + c * x + s * z;
 	target->y = item->Pose.Position.y + y;
@@ -993,8 +993,8 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	FindTargetPoint(lara->TargetEntity, &targetPoint);
 	phd_GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z, angles);
 
-	angles[0] -= laraItem->Orientation.y;
-	angles[1] -= laraItem->Orientation.x;
+	angles[0] -= laraItem->Pose.Orientation.y;
+	angles[1] -= laraItem->Pose.Orientation.x;
 
 	if (LOS(&src, &targetPoint))
 	{
@@ -1084,8 +1084,8 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 						{
 							float angle[2];
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
-							angle[0] -= laraItem->Orientation.y + lara->ExtraTorsoRot.y;
-							angle[1] -= laraItem->Orientation.x + lara->ExtraTorsoRot.x;
+							angle[0] -= laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y;
+							angle[1] -= laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x;
 
 							if (angle[0] >= weaponInfo->LockAngles[0] && angle[0] <= weaponInfo->LockAngles[1] && angle[1] >= weaponInfo->LockAngles[2] && angle[1] <= weaponInfo->LockAngles[3])
 							{

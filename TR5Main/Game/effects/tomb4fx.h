@@ -64,7 +64,7 @@ struct SHOCKWAVE_STRUCT
 
 struct GUNSHELL_STRUCT
 {
-	PHD_3DPOS pos;
+	PoseData pos;
 	short fallspeed;
 	short roomNumber;
 	short speed;
@@ -233,7 +233,7 @@ constexpr auto EXPLODE_NORMAL = 256;
 int ExplodingDeath(short itemNumber, int meshBits, short flags); // EXPLODE_ flags
 
 int GetFreeShockwave();
-void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
+void TriggerShockwave(PoseData* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

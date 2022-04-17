@@ -322,8 +322,8 @@ static void TribesmanShotDart(ITEM_INFO* item)
 
 		InitialiseItem(dartItemNumber);
 
-		dartItem->Orientation.x = angles[1];
-		dartItem->Orientation.y = angles[0];
+		dartItem->Pose.Orientation.x = angles[1];
+		dartItem->Pose.Orientation.y = angles[0];
 		dartItem->Animation.Velocity = CLICK(1);
 
 		AddActiveItem(dartItemNumber);
@@ -544,11 +544,11 @@ void TribemanDartsControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < EulerAngle::DegToRad(2.0f))
-				item->Orientation.y += AI.angle;
+				item->Pose.Orientation.y += AI.angle;
 			else if (AI.angle < 0)
-				item->Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
 			else
-				item->Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 			{
