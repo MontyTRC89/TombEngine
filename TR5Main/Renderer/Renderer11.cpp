@@ -41,6 +41,13 @@ namespace TEN::Renderer
 		m_spritesTextures.clear();
 		m_animatedTextures.clear();
 		m_animatedTextureSets.clear();
+
+		for (auto& item : m_items)
+		{
+			item.PreviousRoomNumber = NO_ROOM;
+			item.CurrentRoomNumber = NO_ROOM;
+			item.ItemNumber = NO_ITEM;
+		}
 	}
 
 	void Renderer11::ClearSceneItems()

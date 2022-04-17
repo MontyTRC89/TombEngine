@@ -342,6 +342,7 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t ai_bits = 0;
   int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
+  std::string lua_name{};
 };
 
 struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -382,7 +383,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_AI_BITS = 64,
     VT_SWAP_MESH_FLAGS = 66,
     VT_DATA_TYPE = 68,
-    VT_DATA = 70
+    VT_DATA = 70,
+    VT_LUA_NAME = 72
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -553,6 +555,9 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Minecart *data_as_Minecart() const {
     return data_type() == TEN::Save::ItemData::Minecart ? static_cast<const TEN::Save::Minecart *>(data()) : nullptr;
   }
+  const flatbuffers::String *lua_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_NAME);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_FLOOR) &&
@@ -591,6 +596,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
            VerifyOffset(verifier, VT_DATA) &&
            VerifyItemData(verifier, data(), data_type()) &&
+           VerifyOffset(verifier, VT_LUA_NAME) &&
+           verifier.VerifyString(lua_name()) &&
            verifier.EndTable();
   }
   ItemT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -792,6 +799,9 @@ struct ItemBuilder {
   void add_data(flatbuffers::Offset<void> data) {
     fbb_.AddOffset(Item::VT_DATA, data);
   }
+  void add_lua_name(flatbuffers::Offset<flatbuffers::String> lua_name) {
+    fbb_.AddOffset(Item::VT_LUA_NAME, lua_name);
+  }
   explicit ItemBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -838,8 +848,10 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t ai_bits = 0,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
-    flatbuffers::Offset<void> data = 0) {
+    flatbuffers::Offset<void> data = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_name = 0) {
   ItemBuilder builder_(_fbb);
+  builder_.add_lua_name(lua_name);
   builder_.add_data(data);
   builder_.add_swap_mesh_flags(swap_mesh_flags);
   builder_.add_ai_bits(ai_bits);
@@ -917,8 +929,10 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t ai_bits = 0,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
-    flatbuffers::Offset<void> data = 0) {
+    flatbuffers::Offset<void> data = 0,
+    const char *lua_name = nullptr) {
   auto item_flags__ = item_flags ? _fbb.CreateVector<int32_t>(*item_flags) : 0;
+  auto lua_name__ = lua_name ? _fbb.CreateString(lua_name) : 0;
   return TEN::Save::CreateItem(
       _fbb,
       floor,
@@ -954,7 +968,8 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       ai_bits,
       swap_mesh_flags,
       data_type,
-      data);
+      data,
+      lua_name__);
 }
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -5403,6 +5418,7 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = swap_mesh_flags(); _o->swap_mesh_flags = _e; }
   { auto _e = data_type(); _o->data.type = _e; }
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
+  { auto _e = lua_name(); if (_e) _o->lua_name = _e->str(); }
 }
 
 inline flatbuffers::Offset<Item> Item::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ItemT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5447,6 +5463,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _swap_mesh_flags = _o->swap_mesh_flags;
   auto _data_type = _o->data.type;
   auto _data = _o->data.Pack(_fbb);
+  auto _lua_name = _o->lua_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_name);
   return TEN::Save::CreateItem(
       _fbb,
       _floor,
@@ -5482,7 +5499,8 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _ai_bits,
       _swap_mesh_flags,
       _data_type,
-      _data);
+      _data,
+      _lua_name);
 }
 
 inline WeaponInfoT *WeaponInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
