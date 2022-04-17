@@ -23,11 +23,13 @@ namespace TEN::Renderer
 
 	Renderer11::~Renderer11()
 	{
-		freeRendererData();
+		FreeRendererData();
 	}
 
-	void Renderer11::freeRendererData()
+	void Renderer11::FreeRendererData()
 	{
+		shadowLight = nullptr;
+
 		ClearSceneItems();
 
 		m_meshPointersToMesh.clear();
@@ -76,19 +78,19 @@ namespace TEN::Renderer
 		return nf;
 	}
 
-	void Renderer11::updateProgress(float value)
+	void Renderer11::UpdateProgress(float value)
 	{
-		m_progress = value;
+		RenderLoadingScreen(value);
 	}
 
-	void Renderer11::renderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumer)
+	void Renderer11::RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumer)
 	{
 		for (int i = 0; i < 6; i++)
 		{
 			auto renderView = RenderView(pos, RenderTargetCube::forwardVectors[i], RenderTargetCube::upVectors[i],
 			                             dest.resolution, dest.resolution, Camera.pos.roomNumber, 10, 20480,
 			                             90 * RADIAN);
-			renderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
+			RenderSimpleScene(dest.RenderTargetView[i].Get(), dest.DepthStencilView[i].Get(), renderView);
 			m_context->ClearState();
 		}
 	}
@@ -211,7 +213,7 @@ namespace TEN::Renderer
 		IndexBufferBorder = IndexBuffer(m_device, barBorderIndices.size(), barBorderIndices.data());
 	}
 
-	float Renderer11::calculateFrameRate()
+	float Renderer11::CalculateFrameRate()
 	{
 		static int last_time = clock();
 		static int count = 0;
@@ -234,34 +236,34 @@ namespace TEN::Renderer
 		return fps;
 	}
 
-	void Renderer11::BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateType samplerType)
+	void Renderer11::BindTexture(TEXTURE_REGISTERS registerType, TextureBase* texture, SAMPLER_STATES samplerType)
 	{
-		m_context->PSSetShaderResources(registerType, 1, texture->ShaderResourceView.GetAddressOf());
+		m_context->PSSetShaderResources(static_cast<UINT>(registerType), 1, texture->ShaderResourceView.GetAddressOf());
 
 		ID3D11SamplerState* samplerState = nullptr;
 		switch (samplerType)
 		{
-		case AnisotropicClamp:
+		case SAMPLER_ANISOTROPIC_CLAMP:
 			samplerState = m_states->AnisotropicClamp();
 			break;
 
-		case AnisotropicWrap:
+		case SAMPLER_ANISOTROPIC_WRAP:
 			samplerState = m_states->AnisotropicWrap();
 			break;
 
-		case LinearClamp:
+		case SAMPLER_LINEAR_CLAMP:
 			samplerState = m_states->LinearClamp();
 			break;
 
-		case LinearWrap:
+		case SAMPLER_LINEAR_WRAP:
 			samplerState = m_states->LinearWrap();
 			break;
 
-		case PointWrap:
+		case SAMPLER_POINT_WRAP:
 			samplerState = m_states->PointWrap();
 			break;
 
-		case ShadowMap:
+		case SAMPLER_SHADOW_MAP:
 			samplerState = m_shadowSampler.Get();
 			break;
 
@@ -270,5 +272,193 @@ namespace TEN::Renderer
 		}
 
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
+	}
+
+	void Renderer11::BindRenderTargetAsTexture(TEXTURE_REGISTERS registerType, RenderTarget2D* target, SAMPLER_STATES samplerType)
+	{
+		m_context->PSSetShaderResources(static_cast<UINT>(registerType), 1, target->ShaderResourceView.GetAddressOf());
+
+		ID3D11SamplerState* samplerState = nullptr;
+		switch (samplerType)
+		{
+		case SAMPLER_ANISOTROPIC_CLAMP:
+			samplerState = m_states->AnisotropicClamp();
+			break;
+
+		case SAMPLER_ANISOTROPIC_WRAP:
+			samplerState = m_states->AnisotropicWrap();
+			break;
+
+		case SAMPLER_LINEAR_CLAMP:
+			samplerState = m_states->LinearClamp();
+			break;
+
+		case SAMPLER_LINEAR_WRAP:
+			samplerState = m_states->LinearWrap();
+			break;
+
+		case SAMPLER_POINT_WRAP:
+			samplerState = m_states->PointWrap();
+			break;
+
+		case SAMPLER_SHADOW_MAP:
+			samplerState = m_shadowSampler.Get();
+			break;
+
+		default:
+			return;
+		}
+
+		m_context->PSSetSamplers(registerType, 1, &samplerState);
+	}
+
+	void Renderer11::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
+	{
+		m_context->VSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
+	}
+
+	void Renderer11::BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
+	{
+		m_context->PSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
+	}
+
+	void Renderer11::SetBlendMode(BLEND_MODES blendMode, bool force)
+	{
+		if (blendMode != lastBlendMode || force)
+		{
+			switch (blendMode)
+			{
+			case BLENDMODE_ALPHABLEND:
+				m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
+				break;
+
+			case BLENDMODE_ALPHATEST:
+				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				break;
+
+			case BLENDMODE_OPAQUE:
+				m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
+				break;
+
+			case BLENDMODE_SUBTRACTIVE:
+				m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
+				break;
+
+			case BLENDMODE_ADDITIVE:
+				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
+				break;
+
+			case BLENDMODE_SCREEN:
+				m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
+				break;
+
+			case BLENDMODE_LIGHTEN:
+				m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
+				break;
+
+			case BLENDMODE_EXCLUDE:
+				m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
+				break;
+
+			}
+
+			lastBlendMode = blendMode;
+		}
+
+		switch (blendMode)
+		{
+		case BLENDMODE_OPAQUE:
+		case BLENDMODE_ALPHATEST:
+			SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
+			break;
+
+		default:
+			SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+			break;
+
+		}
+	}
+
+	void Renderer11::SetDepthState(DEPTH_STATES depthState, bool force)
+	{
+		if (depthState != lastDepthState || force)
+		{
+			switch (depthState)
+			{
+			case DEPTH_STATE_READ_ONLY_ZBUFFER:
+				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
+				break;
+
+			case DEPTH_STATE_WRITE_ZBUFFER:
+				m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
+				break;
+
+			case DEPTH_STATE_NONE:
+				m_context->OMSetDepthStencilState(m_states->DepthNone(), 0xFFFFFFFF);
+				break;
+
+			}
+
+			lastDepthState = depthState;
+		}
+	}
+
+	void Renderer11::SetCullMode(CULL_MODES cullMode, bool force)
+	{
+		if (cullMode != lastCullMode || force)
+		{
+			switch (cullMode)
+			{
+			case CULL_MODE_NONE:
+				m_context->RSSetState(m_cullNoneRasterizerState.Get());
+				break;
+
+			case CULL_MODE_CCW:
+				m_context->RSSetState(m_cullCounterClockwiseRasterizerState.Get());
+				break;
+
+			case CULL_MODE_CW:
+				m_context->RSSetState(m_cullClockwiseRasterizerState.Get());
+				break;
+
+			}
+
+			lastCullMode = cullMode;
+		}
+	}
+
+	void Renderer11::SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force)
+	{
+		if (m_stAlphaTest.AlphaTest != static_cast<int>(mode) ||
+			m_stAlphaTest.AlphaThreshold != threshold ||
+			force)
+		{
+			m_stAlphaTest.AlphaTest = static_cast<int>(mode);
+			m_stAlphaTest.AlphaThreshold = threshold;
+			m_cbAlphaTest.updateData(m_stAlphaTest, m_context.Get());
+			BindConstantBufferPS(CB_ALPHA_TEST, m_cbAlphaTest.get());
+		}
+	}
+
+	void Renderer11::SetScissor(RendererRectangle s)
+	{
+		D3D11_RECT rects;
+		rects.left = s.left;
+		rects.top = ScreenHeight - s.top;
+		rects.right = s.right;
+		rects.bottom = ScreenHeight - s.bottom;
+
+		m_context->RSSetScissorRects(1, &rects);
+	}
+
+	void Renderer11::ResetScissor()
+	{
+		D3D11_RECT rects[1];
+		rects[0].left = 0;
+		rects[0].right = ScreenWidth;
+		rects[0].top = 0;
+		rects[0].bottom = ScreenHeight;
+
+		m_context->RSSetScissorRects(1, rects);
 	}
 }

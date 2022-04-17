@@ -2,6 +2,7 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./VertexInput.hlsli"
+#include "./AlphaTestBuffer.hlsli"
 
 cbuffer ItemBuffer : register(b1) 
 {
@@ -20,7 +21,6 @@ cbuffer LightsBuffer : register(b2)
 
 cbuffer MiscBuffer : register(b3)
 {
-	int AlphaTest;
 	int Caustics;
 };
 
@@ -34,6 +34,13 @@ struct PixelShaderInput
 	float3 ReflectionVector : TEXCOORD1;
 	float3x3 TBN : TBN;
 	float Fog : FOG;
+	float4 PositionCopy : TEXCOORD2;
+};
+
+struct PixelShaderOutput
+{
+	float4 Color: SV_Target0;
+	float4 Depth: SV_Target1;
 };
 
 Texture2D Texture : register(t0);
@@ -57,7 +64,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.UV = input.UV;
 	output.WorldPosition = WorldPosition;
 	output.ReflectionVector = ReflectionVector;
-
+	
 	float3 Tangent = mul(float4(input.Tangent, 0), world).xyz;
 	float3 Bitangent = mul(float4(input.Bitangent, 0), world).xyz;
 	float3x3 TBN = float3x3(Tangent, Bitangent, Normal);
@@ -96,16 +103,18 @@ PixelShaderInput VS(VertexShaderInput input)
 	else
 		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
 	
+	output.PositionCopy = output.Position;
+
 	return output;
 }
 
-float4 PS(PixelShaderInput input) : SV_TARGET
+PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
-	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.5f) 
-	{
-		discard;
-	}
+	PixelShaderOutput output;
+
+	output.Color = Texture.Sample(Sampler, input.UV);
+	
+	DoAlphaTest(output.Color);
 
 	float3 colorMul = input.Color.xyz;
 
@@ -133,12 +142,16 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		}
 	}
 
-	output.xyz *= colorMul.xyz;
-	output.xyz *= lighting.xyz;
+	output.Color.xyz *= colorMul.xyz;
+	output.Color.xyz *= lighting.xyz;
+
+	output.Depth = output.Color.w > 0.0f ?
+		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
+		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	if (FogMaxDistance != 0)
 	{
-		output.xyz = lerp(output.xyz, FogColor, input.Fog);
+		output.Color.xyz = lerp(output.Color.xyz, FogColor, input.Fog);
 	}
 
 	return output;

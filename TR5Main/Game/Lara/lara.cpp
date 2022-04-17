@@ -1218,5 +1218,5 @@ void AnimateLara(ITEM_INFO* item)
 		MoveItem(item, info->moveAngle, item->speed, lateral);
 
 	// Update matrices
-	g_Renderer.updateLaraAnimations(true);
+	g_Renderer.UpdateLaraAnimations(true);
 }

@@ -463,7 +463,7 @@ int GuiController::GetLastInventoryItem()
 
 void GuiController::DrawInventory()
 {
-	g_Renderer.renderInventory();
+	g_Renderer.RenderInventory();
 }
 
 void GuiController::ClearInputVariables(bool flag)
@@ -747,16 +747,14 @@ void GuiController::FillDisplayOptions()
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 
 	// Get current display mode
-	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
-	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
-	CurrentSettings.videoMode = 0;
-	for (int i = 0; i < adapter->DisplayModes.size(); i++)
+	CurrentSettings.selectedScreenResolution = 0;
+	for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 	{
-		RendererDisplayMode* mode = &adapter->DisplayModes[i];
-		if (mode->Width == CurrentSettings.conf.Width && mode->Height == CurrentSettings.conf.Height &&
-			mode->RefreshRate == CurrentSettings.conf.RefreshRate)
+		auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
+		if (screenResolution.x == CurrentSettings.conf.Width 
+			&& screenResolution.y == CurrentSettings.conf.Height)
 		{
-			CurrentSettings.videoMode = i;
+			CurrentSettings.selectedScreenResolution = i;
 			break;
 		}
 	}
@@ -764,9 +762,6 @@ void GuiController::FillDisplayOptions()
 
 void GuiController::HandleDisplaySettingsInput(bool pause)
 {
-	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
-	RendererVideoAdapter* adapter = &(*adapters)[CurrentSettings.conf.Adapter];
-
 	SetDebounce = true;
 	S_UpdateInput();
 	SetDebounce = false;
@@ -787,8 +782,8 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		{
 		case 0:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			if (CurrentSettings.videoMode > 0)
-				CurrentSettings.videoMode--;
+			if (CurrentSettings.selectedScreenResolution > 0)
+				CurrentSettings.selectedScreenResolution--;
 			break;
 
 		case 1:
@@ -819,8 +814,8 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		{
 		case 0:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
-			if (CurrentSettings.videoMode < adapter->DisplayModes.size() - 1)
-				CurrentSettings.videoMode++;
+			if (CurrentSettings.selectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
+				CurrentSettings.selectedScreenResolution++;
 			break;
 
 		case 1:
@@ -872,17 +867,16 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		if (selected_option == 5)
 		{
 			// Save the configuration
-			RendererDisplayMode* mode = &adapter->DisplayModes[CurrentSettings.videoMode];
-			CurrentSettings.conf.Width = mode->Width;
-			CurrentSettings.conf.Height = mode->Height;
-			CurrentSettings.conf.RefreshRate = mode->RefreshRate;
+			auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.selectedScreenResolution];
+			CurrentSettings.conf.Width = screenResolution.x;
+			CurrentSettings.conf.Height = screenResolution.y;
 
 			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
 			SaveConfiguration();
 
 			// Reset screen and go back
-			g_Renderer.changeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height,
-				CurrentSettings.conf.RefreshRate, CurrentSettings.conf.Windowed);
+			g_Renderer.ChangeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height, 
+				CurrentSettings.conf.Windowed);
 
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
 			selected_option = pause ? 1 : 0;
@@ -951,12 +945,12 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 			if (pause)
 			{
-				g_Renderer.renderInventory();
+				g_Renderer.RenderInventory();
 				Camera.numberFrames = g_Renderer.SyncRenderer();
 			}
 			else
 			{
-				g_Renderer.renderTitle();
+				g_Renderer.RenderTitle();
 				Camera.numberFrames = g_Renderer.SyncRenderer();
 				int nframes = Camera.numberFrames;
 				ControlPhase(nframes, 0);
@@ -2263,7 +2257,7 @@ void GuiController::HandleInventoryMenu()
 
 	if (rings[(int)RingTypes::Ammo]->ringactive)
 	{
-		g_Renderer.drawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
+		g_Renderer.DrawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
 
 		if (rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
@@ -2455,12 +2449,12 @@ void GuiController::HandleInventoryMenu()
 			{
 				if (i == current_selected_option)
 				{
-					g_Renderer.drawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
+					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
 					ypos += font_height;
 				}
 				else
 				{
-					g_Renderer.drawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
 					ypos += font_height;
 				}
 			}
@@ -2725,16 +2719,16 @@ void GuiController::DrawAmmoSelector()
 					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 
 				if (ammo_selector_fade_val)
-					g_Renderer.drawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+					g_Renderer.DrawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 
 				
 				if (n == *current_ammo_type)
-					g_Renderer.drawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
+					g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
 				else
-					g_Renderer.drawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
+					g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
 			}
 			else
-				g_Renderer.drawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
+				g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
 
 			xpos += OBJLIST_SPACING;
 		}
@@ -3031,7 +3025,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				else
 					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
 
-				g_Renderer.drawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+				g_Renderer.DrawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3089,7 +3083,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 			y2 = 430;//combine 
 			short obj = ConvertInventoryItemToObject(rings[ringnum]->current_object_list[n].invitem);
 			float scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
-			g_Renderer.drawObjectOn2DPosition(x, ringnum == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
+			g_Renderer.DrawObjectOn2DPosition(x, ringnum == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
 
 			if (++n >= rings[ringnum]->numobjectsinlist)
 				n = 0;
@@ -3281,7 +3275,7 @@ void GuiController::DoExamineMode()
 void GuiController::DrawCompass()
 {
 	return;
-	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
+	g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
 	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->pos.yRot);
 	short compass_angle = (LaraItem->pos.yRot + compass_speed) - ANGLE(180);
 	Matrix::CreateRotationY(compass_angle);

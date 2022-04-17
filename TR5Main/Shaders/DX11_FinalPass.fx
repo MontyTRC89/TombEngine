@@ -1,3 +1,5 @@
+#include "./VertexInput.hlsli"
+
 cbuffer PostProcessBuffer : register(b7)
 {
 	float CinematicBarsHeight;
@@ -5,8 +7,6 @@ cbuffer PostProcessBuffer : register(b7)
 	int ViewportWidth;
 	int ViewportHeight;
 };
-
-#include "./VertexInput.hlsli"
 
 struct PixelShaderInput
 {
