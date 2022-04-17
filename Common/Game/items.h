@@ -88,7 +88,8 @@ struct ITEM_INFO
 	std::string luaName;
 	std::string luaCallbackOnKilledName;
 	std::string luaCallbackOnHitName;
-	std::string luaCallbackOnCollidedName;
+	std::string luaCallbackOnCollidedWithObjectName;
+	std::string luaCallbackOnCollidedWithRoomName;
 };
 
 // used by fx->shade !

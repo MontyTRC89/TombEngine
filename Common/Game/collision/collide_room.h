@@ -4,7 +4,7 @@
 
 struct ITEM_INFO;
 struct COLL_INFO;
-struct FLOOR_INFO;
+class FLOOR_INFO;
 struct MESH_INFO;
 
 constexpr auto NO_BAD_POS = (-NO_HEIGHT); // used by coll->Setup.BadHeightDown
@@ -118,6 +118,8 @@ struct COLL_INFO
 	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && (NearestLedgeAngle % ANGLE(90)); }
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90)); }
 };
+
+[[nodiscard]] bool TestItemRoomCollisionAABB(ITEM_INFO* item);
 
 COLL_RESULT GetCollisionResult(ITEM_INFO* item, short angle, int dist, int height);
 COLL_RESULT GetCollisionResult(FLOOR_INFO* floor, int x, int y, int z);
