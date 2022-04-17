@@ -711,7 +711,6 @@ void Moveable::Destroy()
 {
 	if (m_num > NO_ITEM) {
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num, true);
 		s_callbackRemoveName(m_item->luaName);
 		KillItem(m_num);
 	}
