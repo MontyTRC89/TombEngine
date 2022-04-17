@@ -108,6 +108,35 @@ int FindGridShift(int x, int z)
 		return ((WALL_SIZE + 1) - (x & (WALL_SIZE - 1)));
 }
 
+// Test if the axis-aligned bounding box collides with geometry at all.
+
+bool TestItemRoomCollisionAABB(ITEM_INFO* item)
+{
+	ANIM_FRAME* framePtr = GetBestFrame(item);
+	auto box = framePtr->boundingBox + item->pos;
+	short maxY = std::min(box.Y1, box.Y2);
+	short minY = std::max(box.Y1, box.Y2);
+
+	auto test = [item](short x, short y, short z, bool floor)
+	{
+		COLL_POSITION pos = GetCollisionResult(x, y, z, item->roomNumber).Position;
+		if (floor) return y > pos.Floor;
+		return y < pos.Ceiling;
+	};
+
+	bool collided = 
+			test(box.X1, minY, box.Z1, true)
+		||	test(box.X2, minY, box.Z1, true)
+		||	test(box.X1, minY, box.Z2, true)
+		||	test(box.X2, minY, box.Z2, true)
+		||	test(box.X1, maxY, box.Z1, false)
+		||	test(box.X2, maxY, box.Z1, false)
+		||	test(box.X1, maxY, box.Z2, false)
+		||	test(box.X2, maxY, box.Z2, false);
+
+	return collided;
+}
+
 // Overload of GetCollisionResult which can be used to probe collision parameters
 // from a given item.
 

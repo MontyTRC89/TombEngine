@@ -20,7 +20,8 @@ public:
 	bool TryAddColliding(short id) override
 	{
 		ITEM_INFO* item = &g_Level.Items[id];
-		if(!item->luaCallbackOnCollidedName.empty() && item->collidable && (item->status != ITEM_INVISIBLE))
+		bool hasName = !(item->luaCallbackOnCollidedWithObjectName.empty() && item->luaCallbackOnCollidedWithRoomName.empty());
+		if(hasName && item->collidable && (item->status != ITEM_INVISIBLE))
 			return m_collidingItems.insert(id).second;
 
 		return false;
@@ -29,7 +30,8 @@ public:
 	bool TryRemoveColliding(short id, bool force = false) override
 	{
 		ITEM_INFO* item = &g_Level.Items[id];
-		if(!force && !item->luaCallbackOnCollidedName.empty() && item->collidable && (item->status != ITEM_INVISIBLE))
+		bool hasName = !(item->luaCallbackOnCollidedWithObjectName.empty() && item->luaCallbackOnCollidedWithRoomName.empty());
+		if(!force && hasName && item->collidable && (item->status != ITEM_INVISIBLE))
 			return false;
 
 		return m_collidingItemsToRemove.insert(id).second;

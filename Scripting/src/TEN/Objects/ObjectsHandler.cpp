@@ -2,6 +2,8 @@
 #include "ObjectsHandler.h"
 
 #include <collision/collide_item.h>
+#include <collision/collide_room.h>
+#include <control/control.h>
 
 #include "ScriptInterfaceGame.h"
 
@@ -133,10 +135,17 @@ void ObjectsHandler::TestCollidingObjects()
 		while (CollidedItems[i])
 		{
 			short idTwo = GetIndexByName(CollidedItems[i]->luaName);
-			g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedName, idOne, idTwo);
+			g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedWithObjectName, idOne, idTwo);
 			++i;
 		}
+
+		if(TestItemRoomCollisionAABB(item))
+		{
+			//stub
+		}
+
 	}
+
 }
 
 //todo document "Lara" obj

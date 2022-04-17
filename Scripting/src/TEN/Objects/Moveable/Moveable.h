@@ -75,8 +75,10 @@ public:
 	void SetOnHit(std::string const &);
 	[[nodiscard]] std::string GetOnKilled() const;
 	void SetOnKilled(std::string const &);
-	[[nodiscard]] std::string GetOnCollided() const;
-	void SetOnCollided(std::string const &);
+	[[nodiscard]] std::string GetOnCollidedWithObject() const;
+	void SetOnCollidedWithObject(std::string const &);
+	[[nodiscard]] std::string GetOnCollidedWithRoom() const;
+	void SetOnCollidedWithRoom(std::string const &);
 
 	[[nodiscard]] short GetStatus() const;
 
