@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Specific/input.h"
+#include "Specific/trmath.h"
 
 #define REGKEY_ROOT				"Software\\TombEngine\\TombEngine"
 
@@ -52,8 +53,6 @@
 struct GameConfiguration {
 	int Width;
 	int Height;
-	int RefreshRate;
-	int Adapter;
 	bool Windowed;
 	bool EnableSound;
 	bool AutoTarget;
@@ -78,10 +77,11 @@ struct GameConfiguration {
 	int JoyRoll;
 	int JoyWalk;
 	int shadowMapSize = 1024;
+	std::vector<VectorInt2> SupportedScreenResolutions;
+	std::string AdapterName;
 };
 
-void LoadResolutionsInCombobox(HWND handle, int index);
-void LoadAdaptersInCombobox(HWND handle);
+void LoadResolutionsInCombobox(HWND handle);
 void LoadSoundDevicesInCombobox(HWND handle);
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam);
 int SetupDialog();
