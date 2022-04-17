@@ -330,6 +330,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0)
 		{
+			g_GameScriptEntities->TestCollidingObjects();
 			// Control Lara
 			InItemControlLoop = true;
 			LaraControl(LaraItem, &LaraCollision);

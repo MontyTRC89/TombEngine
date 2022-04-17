@@ -53,6 +53,8 @@ public:
 	void								ExecuteScriptFile(const std::string& luaFilename) override;
 	void								ExecuteFunction(std::string const & name, TEN::Control::Volumes::VolumeTriggerer) override;
 
+	void								ExecuteFunction(std::string const& luaFuncName, short idOne, short idTwo) override;
+
 	void								GetVariables(std::vector<SavedVar>& vars) override;
 	void								ResetVariables();
 

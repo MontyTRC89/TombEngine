@@ -22,6 +22,10 @@ public:
 	virtual bool NotifyKilled(ITEM_INFO *) = 0;
 	virtual void FreeEntities() = 0;
 	virtual void AssignLara() = 0;
+
+	virtual bool TryAddColliding(short id) = 0;
+	virtual bool TryRemoveColliding(short id, bool force = false) = 0;
+	virtual void TestCollidingObjects() = 0;
 };
 
 extern ScriptInterfaceObjectsHandler* g_GameScriptEntities;
