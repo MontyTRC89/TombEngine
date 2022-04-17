@@ -370,7 +370,7 @@ struct SettingsData
 {
 	bool waitingForkey = false; // Waiting for a key to be pressed when configuring controls
 	bool ignoreInput = false;   // Ignore input unless all keys were released
-	int videoMode;
+	int selectedScreenResolution;
 	GameConfiguration conf;
 };
 

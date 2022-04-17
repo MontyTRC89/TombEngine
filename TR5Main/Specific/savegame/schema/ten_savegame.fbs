@@ -39,6 +39,7 @@ table Item {
 	ai_bits: int32;
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
+	lua_name: string;
 }
 
 table WeaponInfo {

@@ -15,22 +15,19 @@ using std::vector;
 
 GameConfiguration g_Configuration;
 
-void LoadResolutionsInCombobox(HWND handle, int index)
+void LoadResolutionsInCombobox(HWND handle)
 {
 	HWND cbHandle = GetDlgItem(handle, IDC_RESOLUTION);
 
 	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
 
-	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
-	RendererVideoAdapter* adapter = &(*adapters)[index];
-
-	for (int i = 0; i < adapter->DisplayModes.size(); i++)
+	for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 	{
-		RendererDisplayMode* mode = &(adapter->DisplayModes)[i];
+		auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
 
 		char* str = (char*)malloc(255);
 		ZeroMemory(str, 255);
-		sprintf(str, "%d x %d (%d Hz)", mode->Width, mode->Height, mode->RefreshRate);
+		sprintf(str, "%d x %d", screenResolution.x, screenResolution.y);
 
 		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)(str));
 
@@ -39,23 +36,6 @@ void LoadResolutionsInCombobox(HWND handle, int index)
 
 	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
 	SendMessageA(cbHandle, CB_SETMINVISIBLE, 20, 0);
-}
-
-void LoadAdaptersInCombobox(HWND handle)
-{
-	HWND cbHandle = GetDlgItem(handle, IDC_GFXADAPTER);
-
-	SendMessageA(cbHandle, CB_RESETCONTENT, 0, 0);
-
-	vector<RendererVideoAdapter>* adapters = g_Renderer.getAdapters();
-	for (int i = 0; i < adapters->size(); i++)
-	{
-		RendererVideoAdapter* adapter = &(*adapters)[i];
-		SendMessageA(cbHandle, CB_ADDSTRING, i, (LPARAM)adapter->Name.c_str());
-	}
-
-	SendMessageA(cbHandle, CB_SETCURSEL, 0, 0);
-	LoadResolutionsInCombobox(handle, 0);
 }
 
 void LoadSoundDevicesInCombobox(HWND handle)
@@ -80,8 +60,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	HWND ctlHandle;
 
-	RendererVideoAdapter* adapter;
-	RendererDisplayMode* mode;
+	VectorInt2 mode;
 	int selectedAdapter;
 	int selectedMode;
 
@@ -103,7 +82,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		SendMessageA(GetDlgItem(handle, IDC_CAUSTICS), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_CAUSTICS));
 		SendMessageA(GetDlgItem(handle, IDC_VOLUMETRIC_FOG), WM_SETTEXT, 0, (LPARAM)g_GameFlow->GetString(STRING_VOLUMETRIC_FOG));
 
-		LoadAdaptersInCombobox(handle);
+		LoadResolutionsInCombobox(handle);
 		LoadSoundDevicesInCombobox(handle);
 
 		// Set some default values
@@ -141,13 +120,10 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
-				g_Configuration.Adapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
 				selectedMode = (SendDlgItemMessage(handle, IDC_RESOLUTION, CB_GETCURSEL, 0, 0));
-				adapter = &(*g_Renderer.getAdapters())[g_Configuration.Adapter];
-				mode = &(adapter->DisplayModes[selectedMode]);
-				g_Configuration.Width = mode->Width;
-				g_Configuration.Height = mode->Height;
-				g_Configuration.RefreshRate = mode->RefreshRate;
+				mode = g_Configuration.SupportedScreenResolutions[selectedMode];
+				g_Configuration.Width = mode.x;
+				g_Configuration.Height = mode.y;
 				g_Configuration.SoundDevice = (SendDlgItemMessage(handle, IDC_SNDADAPTER, CB_GETCURSEL, 0, 0)) + 1;
 
 				// Save the configuration
@@ -164,20 +140,6 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			return 0;
 		}
 
-		// Comboboxes
-		if (HIWORD(wParam) == CBN_SELCHANGE)
-		{
-			switch (LOWORD(wParam))
-			{
-			case IDC_GFXADAPTER:
-				selectedAdapter = (SendDlgItemMessage(handle, IDC_GFXADAPTER, CB_GETCURSEL, 0, 0));
-				LoadResolutionsInCombobox(handle, selectedAdapter);
-				break;
-			}
-
-			return 0;
-		}
-
 		break;
 
 	default:
@@ -189,12 +151,11 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int SetupDialog()
 {
-	// FIXME
-	/*HRSRC res = FindResource(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
+	HRSRC res = FindResource(nullptr, MAKEINTRESOURCE(IDD_SETUP), RT_DIALOG);
 
 	ShowCursor(true);
-	int result = DialogBoxParamA(g_DllHandle, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
-	ShowCursor(false);*/
+	int result = DialogBoxParamA(nullptr, MAKEINTRESOURCE(IDD_SETUP), 0, (DLGPROC)DialogProc, 0);
+	ShowCursor(false);
 
 	return true;
 }
@@ -208,12 +169,6 @@ bool SaveConfiguration()
 		// Create the new key
 		if (RegCreateKeyA(HKEY_CURRENT_USER, REGKEY_ROOT, &rootKey) != ERROR_SUCCESS)
 			return false;
-	}
-
-	if (SetDWORDRegKey(rootKey, REGKEY_ADAPTER, g_Configuration.Adapter) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
 	}
 
 	if (SetDWORDRegKey(rootKey, REGKEY_SCREEN_WIDTH, g_Configuration.Width) != ERROR_SUCCESS)
@@ -288,11 +243,6 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if(SetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, g_Configuration.RefreshRate) != ERROR_SUCCESS){
-		RegCloseKey(rootKey);
-		return false;
-	}
-
 	if(SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.shadowMapSize) != ERROR_SUCCESS){
 		RegCloseKey(rootKey);
 		return false;
@@ -324,9 +274,10 @@ void InitDefaultConfiguration()
 	// Include default device into the list
 	BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, true);
 
+	auto currentScreenResolution = GetScreenResolution();
+
 	g_Configuration.AutoTarget = true;
 	g_Configuration.SoundDevice = 1;
-	g_Configuration.Adapter = 0;
 	g_Configuration.EnableAudioSpecialEffects = true;
 	g_Configuration.EnableCaustics = true;
 	g_Configuration.EnableShadows = true;
@@ -334,9 +285,11 @@ void InitDefaultConfiguration()
 	g_Configuration.EnableVolumetricFog = true;
 	g_Configuration.MusicVolume = 100;
 	g_Configuration.SfxVolume = 100;
-	g_Configuration.Width = 1366;
-	g_Configuration.Height = 768;
+	g_Configuration.Width = currentScreenResolution.x;
+	g_Configuration.Height = currentScreenResolution.y;
 	g_Configuration.shadowMapSize = 512;
+	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
+	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
 }
 
 bool LoadConfiguration()
@@ -350,13 +303,6 @@ bool LoadConfiguration()
 	}
 
 	// Load configuration keys
-	DWORD adapter = 0;
-	if (GetDWORDRegKey(rootKey, REGKEY_ADAPTER, &adapter, 0) != ERROR_SUCCESS)
-	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
 	DWORD screenWidth = 0;
 	if (GetDWORDRegKey(rootKey, REGKEY_SCREEN_WIDTH, &screenWidth, 0) != ERROR_SUCCESS)
 	{
@@ -366,10 +312,6 @@ bool LoadConfiguration()
 
 	DWORD screenHeight = 0;
 	if (GetDWORDRegKey(rootKey, REGKEY_SCREEN_HEIGHT, &screenHeight, 0) != ERROR_SUCCESS)
-		return false;
-
-	DWORD refreshRate = 0;
-	if (GetDWORDRegKey(rootKey, REGKEY_REFRESH_RATE, &refreshRate, 0) != ERROR_SUCCESS)
 		return false;
 
 	bool windowed = false;
@@ -462,7 +404,6 @@ bool LoadConfiguration()
 	g_Configuration.Width = screenWidth;
 	g_Configuration.Height = screenHeight;
 	g_Configuration.Windowed = windowed;
-	g_Configuration.Adapter = adapter;
 	g_Configuration.EnableShadows = shadows;
 	g_Configuration.EnableCaustics = caustics;
 	g_Configuration.EnableVolumetricFog = volumetricFog;
@@ -470,7 +411,6 @@ bool LoadConfiguration()
 	g_Configuration.EnableAudioSpecialEffects = enableSoundSpecialEffects;
 	g_Configuration.MusicVolume = musicVolume;
 	g_Configuration.SfxVolume = sfxVolume;
-	g_Configuration.RefreshRate = refreshRate;
 	g_Configuration.SoundDevice = soundDevice;
 	g_Configuration.shadowMapSize = 512;
 	// Set legacy variables

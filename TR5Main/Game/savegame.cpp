@@ -27,7 +27,6 @@
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Scripting/ScriptInterfaceLevel.h"
 #include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -355,9 +354,12 @@ bool SaveGame::Save(int slot)
 
 	auto laraOffset = lara.Finish();
 
+	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
 		OBJECT_INFO* obj = &Objects[itemToSerialize.objectNumber];
+
+		auto luaNameOffset = fbb.CreateString(itemToSerialize.luaName);
 
 		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
@@ -462,8 +464,15 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data(data);
 		}
 
+		if (currentItemIndex >= g_Level.NumItems)
+		{
+			serializedItem.add_lua_name(luaNameOffset);
+		}
+
 		auto serializedItemOffset = serializedItem.Finish();
 		serializedItems.push_back(serializedItemOffset);
+
+		currentItemIndex++;
 	}
 
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
@@ -928,6 +937,8 @@ bool SaveGame::Load(int slot)
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	// Items
+	InitialiseItemArray(NUM_ITEMS);
+
 	for (int i = 0; i < s->items()->size(); i++)
 	{
 		const Save::Item* savedItem = s->items()->Get(i);
@@ -949,7 +960,14 @@ bool SaveGame::Load(int slot)
 		}
 
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		item->objectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
+
 		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		
+		if (savedItem->lua_name() != nullptr)
+		{
+			item->luaName = savedItem->lua_name()->str();
+		}
 
 		if (!dynamicItem)
 		{
@@ -1000,11 +1018,14 @@ bool SaveGame::Load(int slot)
 		// Do the correct way for assigning new room number
 		if (item->objectNumber == ID_LARA)
 		{
-			LaraItem->location.roomNumber = roomNumber;
-			LaraItem->location.yNumber = item->pos.yPos;
-			item->roomNumber = roomNumber;
+			LaraItem->data = nullptr;
+
 			Lara.itemNumber = i;
 			LaraItem = item;
+			LaraItem->location.roomNumber = roomNumber;
+			LaraItem->location.yNumber = item->pos.yPos;
+			LaraItem->data = &Lara;
+
 			UpdateItemRoom(item, -LARA_HEIGHT / 2);
 		}
 		else
@@ -1113,8 +1134,6 @@ bool SaveGame::Load(int slot)
 
 		if (obj->floor != nullptr)
 			UpdateBridgeItem(itemNumber);
-
-		g_GameScriptEntities->TryAddColliding(i);
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)

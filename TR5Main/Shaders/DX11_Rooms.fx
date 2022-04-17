@@ -2,8 +2,9 @@
 #include "./VertexInput.hlsli"
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
+#include "./AlphaTestBuffer.hlsli"
 
-cbuffer LightsBuffer : register(b1)
+cbuffer LightsBuffer : register(b2)
 {
 	ShaderLight Lights[MAX_LIGHTS];
 	int NumLights;
@@ -12,7 +13,6 @@ cbuffer LightsBuffer : register(b1)
 
 cbuffer MiscBuffer : register(b3)
 {
-	int AlphaTest;
 	int Caustics;
 };
 
@@ -48,11 +48,12 @@ struct PixelShaderInput
 	float4 Position: SV_POSITION;
 	float3 WorldPosition: POSITION0;
 	float3 Normal: NORMAL;
-	float2 UV: TEXCOORD;
+	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
 	float4 LightPosition: POSITION1;
 	float3x3 TBN : TBN;
 	float Fog : FOG;
+	float4 PositionCopy : TEXCOORD1;
 };
 
 Texture2D Texture : register(t0);
@@ -72,6 +73,12 @@ float hash(float3 n)
 	float z = n.z;
 	return float((frac(sin(x)) * 7385.6093) + (frac(cos(y)) * 1934.9663) - (frac(sin(z)) * 8349.2791));
 }
+
+struct PixelShaderOutput
+{
+	float4 Color: SV_Target0;
+	float4 Depth: SV_Target1;
+};
 
 PixelShaderInput VS(VertexShaderInput input)
 {
@@ -113,7 +120,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Position = screenPos;
 	output.Normal = input.Normal;
 	output.Color = col;
-	
+	output.PositionCopy = screenPos;
+
 #ifdef ANIMATED
 	int frame = (Frame / 2) % numAnimFrames;
 	switch (input.PolyIndex) {
@@ -155,12 +163,13 @@ float2 texOffset(int u, int v) {
 	return float2(u * 1.0f / SHADOW_MAP_SIZE, v * 1.0f / SHADOW_MAP_SIZE);
 }
 
-float4 PS(PixelShaderInput input) : SV_TARGET
+PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
-	float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest && output.w < 0.5f) {
-		discard;
-	}
+	PixelShaderOutput output;
+
+	output.Color = Texture.Sample(Sampler, input.UV);
+	
+	DoAlphaTest(output.Color);
 
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	Normal = Normal * 2 - 1;
@@ -244,11 +253,14 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 		lighting += float4((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz, 0.0f) * attenuation * 2.0f;
 	}
 	
-	output.xyz = output.xyz * lighting;
+	output.Color.xyz = output.Color.xyz * lighting;
+
+	output.Depth = output.Color.w > 0.0f ?
+		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
+		float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	if (FogMaxDistance != 0)
-		output.xyz = lerp(output.xyz, FogColor, input.Fog);
+		output.Color.xyz = lerp(output.Color.xyz, FogColor, input.Fog);
 
 	return output;
 }
-
