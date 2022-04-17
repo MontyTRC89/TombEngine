@@ -244,7 +244,7 @@ void DrawFlare(ITEM_INFO* laraItem)
 		{
 			if (armFrame == 72)
 			{
-				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->pos, TestLaraWater(laraItem));
+				SoundEffect(SFX_FLARE_IGNITE_LAND, &laraItem->pos, TestLaraWater(laraItem));
 				laraInfo->flareAge = 1;
 			}
 
