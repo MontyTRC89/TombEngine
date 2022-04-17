@@ -1,12 +1,6 @@
 #include "frameworkandsol.h"
 #include "ObjectsHandler.h"
 
-#include <collision/collide_item.h>
-#include <collision/collide_room.h>
-#include <control/control.h>
-
-#include "ScriptInterfaceGame.h"
-
 #if TEN_OPTIONAL_LUA
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
@@ -14,6 +8,9 @@
 #include "Camera/Camera.h"
 #include "Sink/Sink.h"
 #include "SoundSource/SoundSource.h"
+#include "collision/collide_item.h"
+#include "collision/collide_room.h"
+#include "ScriptInterfaceGame.h"
 
 /***
 Scripts that will be run on game startup.
