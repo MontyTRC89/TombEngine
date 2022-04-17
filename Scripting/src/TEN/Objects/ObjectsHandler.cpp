@@ -1,6 +1,10 @@
 #include "frameworkandsol.h"
 #include "ObjectsHandler.h"
 
+#include <collision/collide_item.h>
+
+#include "ScriptInterfaceGame.h"
+
 #if TEN_OPTIONAL_LUA
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
@@ -112,6 +116,30 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 #endif
 }
 
+void ObjectsHandler::TestCollidingObjects()
+{
+	// remove any items which can't collide
+	for (const auto id : m_collidingItemsToRemove)
+	{
+		m_collidingItems.erase(id);
+	}
+	m_collidingItemsToRemove.clear();
+
+	for (const auto idOne : m_collidingItems)
+	{
+		auto item = &g_Level.Items[idOne];
+		GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0, true);
+		size_t i = 0;
+		while (CollidedItems[i])
+		{
+			short idTwo = GetIndexByName(CollidedItems[i]->luaName);
+			g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedName, idOne, idTwo);
+			++i;
+		}
+	}
+}
+
+//todo document "Lara" obj
 void ObjectsHandler::AssignLara()
 {
 #if TEN_OPTIONAL_LUA

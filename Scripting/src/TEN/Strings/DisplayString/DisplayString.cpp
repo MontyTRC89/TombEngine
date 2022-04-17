@@ -44,16 +44,16 @@ For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}
 @tparam int x x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
 @tparam int y y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
 @tparam Color color the color of the text
+@tparam bool translated if false or omitted, the str argument will be printed.
+If true, the str argument will be the key of a translated string specified in
+strings.lua. __Default: false__.
 @tparam table flags a table of display options. Can be empty or omitted. The possible values and their effects are...
 	TEN.Strings.DisplayStringOption.CENTER -- see x and y parameters
 	TEN.Strings.DisplayStringOption.SHADOW -- will give the text a small shadow
 __Default: empty__
-@tparam bool translated if false or omitted, the str argument will be printed.
-If true, the str argument will be the key of a translated string specified in
-strings.lua. __Default: false__.
 @return A new DisplayString object.
 */
-static std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, ScriptColor col, TypeOrNil<sol::table> flags, TypeOrNil<bool> maybeTranslated)
+static std::unique_ptr<DisplayString> CreateString(std::string const & key, int x, int y, ScriptColor col, TypeOrNil<bool> maybeTranslated, TypeOrNil<sol::table> flags)
 {
 	auto ptr = std::make_unique<DisplayString>();
 	auto id = ptr->GetID();

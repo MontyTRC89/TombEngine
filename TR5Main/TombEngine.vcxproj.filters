@@ -299,6 +299,7 @@
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
     <ClCompile Include="framework.cpp" />
+    <ClCompile Include="Specific\phd_global.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\control\box.h" />
