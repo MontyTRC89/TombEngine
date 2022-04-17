@@ -188,6 +188,16 @@ void Moveable::Register(sol::table & parent)
 // @treturn string name of the function
 		ScriptReserved_GetOnCollidedWithObject, &Moveable::GetOnCollidedWithObject,
 
+/// Set the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
+// @function Moveable:SetOnCollidedWithRoom
+// @tparam string name of callback function to be called
+		ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
+
+/// Get the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
+// @function Moveable:GetOnCollidedWithRoom
+// @treturn string name of the function
+		ScriptReserved_GetOnCollidedWithRoom, &Moveable::GetOnCollidedWithRoom,
+
 /// Set the name of the function to be called when the moveable is destroyed/killed
 // @function Moveable:SetOnKilled
 // @tparam string callback name of function to be called
@@ -410,6 +420,16 @@ void Moveable::SetOnCollidedWithObject(std::string const & cbName)
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 }
 
+void Moveable::SetOnCollidedWithRoom(std::string const & cbName)
+{
+	m_item->luaCallbackOnCollidedWithRoomName = cbName;
+
+	if(cbName.empty())
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+	else
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+}
+
 std::string Moveable::GetOnHit() const
 {
 	return m_item->luaCallbackOnHitName;
@@ -423,6 +443,11 @@ std::string Moveable::GetOnKilled() const
 std::string Moveable::GetOnCollidedWithObject() const
 {
 	return m_item->luaCallbackOnCollidedWithObjectName;
+}
+
+std::string Moveable::GetOnCollidedWithRoom() const
+{
+	return m_item->luaCallbackOnCollidedWithRoomName;
 }
 
 std::string Moveable::GetName() const
