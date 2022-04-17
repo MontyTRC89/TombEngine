@@ -189,7 +189,14 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\Structures\RendererBone.h" />
+    <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
+    <ClInclude Include="Renderer\Structures\RendererLight.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
@@ -451,6 +458,19 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
+    <ClInclude Include="Scripting\AudioTracks.h" />
+    <ClInclude Include="Scripting\GameScriptLevel.h" />
+    <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
+    <ClInclude Include="Scripting\GameScriptMirror.h" />
+    <ClInclude Include="Scripting\GameScriptNamedBase.h" />
+    <ClInclude Include="Scripting\GameScriptPosition.h" />
+    <ClInclude Include="Scripting\GameScriptRotation.h" />
+    <ClInclude Include="Scripting\GameScriptSettings.h" />
+    <ClInclude Include="Scripting\GameScriptSinkInfo.h" />
+    <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
+    <ClInclude Include="Scripting\GameScriptSoundSourceInfo.h" />
+    <ClInclude Include="Scripting\InventorySlots.h" />
+    <ClInclude Include="Scripting\ItemEnumPair.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -769,7 +789,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
-    <ClCompile Include="Renderer\RenderPipelineState\RenderPipelineState.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp" />
@@ -834,6 +853,7 @@ CALL gen.bat</Command>
     <None Include="packages.config" />
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
+    <None Include="Shaders\AlphaTestBuffer.hlsli" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

@@ -40,14 +40,14 @@ void DrawHealthBarOverlay(int value)
 		else
 			color2 = 0xA00000;
 
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
+		g_Renderer.DrawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
 	}
 }
 
 void DrawHealthBar(float value)
 {
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
+		g_Renderer.DrawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
 }
 
 void UpdateHealthBar(ITEM_INFO* item, int flash)
@@ -134,7 +134,7 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 void DrawAirBar(float value)
 {
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
+		g_Renderer.DrawBar(value, ::g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
 }
 
 void UpdateAirBar(ITEM_INFO* item, int flash)
@@ -170,7 +170,7 @@ void UpdateAirBar(ITEM_INFO* item, int flash)
 void DrawSprintBar(float value)
 {
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
+		g_Renderer.DrawBar(value, ::g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
 }
 
 void UpdateSprintBar()

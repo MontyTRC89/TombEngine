@@ -186,7 +186,7 @@ void AnimateItem(ITEM_INFO* item)
 
 	// Update matrices
 	short itemNumber = item - g_Level.Items.data();
-	g_Renderer.updateItemAnimations(itemNumber, true);
+	g_Renderer.UpdateItemAnimations(itemNumber, true);
 }
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
@@ -359,7 +359,7 @@ void GetLaraJointPosition(PHD_VECTOR* pos, int LM_enum)
 		LM_enum = LM_HEAD;
 
 	Vector3 p = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer.getLaraAbsBonePosition(&p, LM_enum);
+	g_Renderer.GetLaraAbsBonePosition(&p, LM_enum);
 
 	pos->x = p.x;
 	pos->y = p.y;
