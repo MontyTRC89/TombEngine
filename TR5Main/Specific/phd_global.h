@@ -246,46 +246,31 @@ inline EulerAngle EulerAngle::operator /(float value)
 
 inline EulerAngle& EulerAngle::operator +=(EulerAngle orient)
 {
-	this->SetX(this->GetX() + orient.GetX());
-	this->SetY(this->GetY() + orient.GetY());
-	this->SetZ(this->GetZ() + orient.GetZ());
-	this->Clamp();
+	this->Set(*this + orient);
 	return *this;
 }
 
 inline EulerAngle& EulerAngle::operator -=(EulerAngle orient)
 {
-	this->SetX(this->GetX() - orient.GetX());
-	this->SetY(this->GetY() - orient.GetY());
-	this->SetZ(this->GetZ() - orient.GetZ());
-	this->Clamp();
+	this->Set(*this + orient);
 	return *this;
 }
 
 inline EulerAngle& EulerAngle::operator *=(EulerAngle orient)
 {
-	this->SetX(this->GetX() * orient.GetX());
-	this->SetY(this->GetY() * orient.GetY());
-	this->SetZ(this->GetZ() * orient.GetZ());
-	this->Clamp();
+	this->Set(*this * orient);
 	return *this;
 }
 
 inline EulerAngle& EulerAngle::operator *=(float value)
 {
-	this->SetX(this->GetX() * value);
-	this->SetY(this->GetY() * value);
-	this->SetZ(this->GetZ() * value);
-	this->Clamp();
+	this->Set(*this * value);
 	return *this;
 }
 
 inline EulerAngle& EulerAngle::operator /=(float value)
 {
-	this->SetX(this->GetX() / value);
-	this->SetY(this->GetY() / value);
-	this->SetZ(this->GetZ() / value);
-	this->Clamp();
+	this->Set(*this / value);
 	return *this;
 }
 
@@ -367,48 +352,38 @@ struct Vector3Int
 		return Vector3Int((int)round(x * value), (int)round(y * value), (int)round(z * value));
 	}
 
-	Vector3Int operator /(Vector3Int pos)
+	Vector3Int operator /(float value)
 	{
-		return Vector3Int((int)round(x / pos.x), (int)round(y / pos.y), (int)round(z / pos.z));
+		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
 	}
 
 	Vector3Int& operator +=(const Vector3Int pos)
 	{
-		this->x += pos.x;
-		this->y += pos.y;
-		this->z += pos.z;
+		*this = *this + pos;
 		return *this;
 	}
 
 	Vector3Int& operator -=(Vector3Int pos)
 	{
-		this->x -= pos.x;
-		this->y -= pos.y;
-		this->z -= pos.z;
+		*this = *this - pos;
 		return *this;
 	}
 
 	Vector3Int& operator *=(Vector3Int pos)
 	{
-		this->x *= pos.x;
-		this->y *= pos.y;
-		this->z *= pos.z;
+		*this = *this * pos;
 		return *this;
 	}
 	
 	Vector3Int& operator *=(float value)
 	{
-		this->x = (int)round(x * value);
-		this->y = (int)round(y * value);
-		this->z = (int)round(z * value);
+		*this = *this * value;
 		return *this;
 	}
 
 	Vector3Int& operator /=(float value)
 	{
-		this->x = (int)round(x / value);
-		this->y = (int)round(y / value);
-		this->z = (int)round(z / value);
+		*this = *this / value;
 		return *this;
 	}
 	
