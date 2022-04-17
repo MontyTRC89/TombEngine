@@ -4,8 +4,9 @@ struct PixelShaderInput
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
 };
-Texture2D Texture : register(t0);
-SamplerState Sampler : register(s0);
+
+Texture2D Texture : register(t5);
+SamplerState Sampler : register(s5);
 
 half4 PSColored(PixelShaderInput input) : SV_TARGET
 {

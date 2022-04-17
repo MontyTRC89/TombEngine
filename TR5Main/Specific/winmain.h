@@ -8,6 +8,8 @@
     "language='*'\"")
 
 #include <process.h>
+#include <vector>
+#include "Specific/trmath.h"
 
 struct WINAPP
 {
@@ -38,3 +40,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 void WinClose();
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void CALLBACK HandleWmCommand(unsigned short wParam);
+VectorInt2 GetScreenResolution();
+std::vector<VectorInt2> GetAllSupportedScreenResolutions();

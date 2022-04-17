@@ -57,8 +57,8 @@ bool TestValidLedge(ITEM_INFO* item, COLL_INFO* coll, bool ignoreHeadroom, bool 
 	if (frontLeft.Position.Ceiling > (item->pos.yPos - coll->Setup.Height) || frontRight.Position.Ceiling > (item->pos.yPos - coll->Setup.Height))
 		return false;
 
-	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xl, left, item->pos.zPos + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
-	//g_Renderer.addDebugSphere(Vector3(item->pos.xPos + xr, right, item->pos.zPos + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	//g_Renderer.AddDebugSphere(Vector3(item->pos.xPos + xl, left, item->pos.zPos + zl), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	//g_Renderer.AddDebugSphere(Vector3(item->pos.xPos + xr, right, item->pos.zPos + zr), 64, Vector4::One, RENDERER_DEBUG_PAGE::LOGIC_STATS);
 	
 	// Determine ledge probe embed offset.
 	// We use 0.2f radius extents here for two purposes. First - we can't guarantee that shifts weren't already applied
@@ -1866,7 +1866,7 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offs
 
 		auto sphere = BoundingSphere(laraBox.Center + Vector3(0, (laraBox.Extents.y + poleProbeCollRadius + offset) * (up ? -1 : 1), 0), poleProbeCollRadius);
 
-		//g_Renderer.addDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 		int i = 0;
 		while (CollidedItems[i] != NULL)
@@ -1880,7 +1880,7 @@ bool TestLaraPoleCollision(ITEM_INFO* item, COLL_INFO* coll, bool up, float offs
 			auto poleBox = TO_DX_BBOX(obj->pos, GetBoundsAccurate(obj));
 			poleBox.Extents = poleBox.Extents + Vector3(coll->Setup.Radius, 0, coll->Setup.Radius);
 
-			//g_Renderer.addDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+			//g_Renderer.AddDebugBox(poleBox, Vector4(0, 0, 1, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 			if (poleBox.Intersects(sphere))
 			{

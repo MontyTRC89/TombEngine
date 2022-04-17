@@ -145,7 +145,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
-		if (CurrentLevel != 0 && !g_Renderer.isFading())
+		if (CurrentLevel != 0)
 		{
 			if (TrInput & IN_SAVE && LaraItem->hitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
@@ -337,7 +337,7 @@ GAME_STATUS ControlPhase(int numFrames, int demoMode)
 			InItemControlLoop = false;
 			KillMoveItems();
 
-			g_Renderer.updateLaraAnimations(true);
+			g_Renderer.UpdateLaraAnimations(true);
 
 			if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
 			{
@@ -435,7 +435,7 @@ unsigned CALLBACK GameMain(void *)
 		}
 
 		// Do a fixed time title image
-		g_Renderer.renderTitleImage();
+		g_Renderer.RenderTitleImage();
 
 		// Execute the LUA gameflow and play the game
 		g_GameFlow->DoFlow();
@@ -485,7 +485,7 @@ GAME_STATUS DoTitle(int index, std::string const & ambient)
 			g_GameScript->InitCallbacks();
 			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
-				g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+				g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 			});
 		}
 
@@ -527,7 +527,7 @@ GAME_STATUS DoTitle(int index, std::string const & ambient)
 
 		while (status == InventoryResult::None)
 		{
-			g_Renderer.renderTitle();
+			g_Renderer.RenderTitle();
 
 			SetDebounce = true;
 			S_UpdateInput();
@@ -600,7 +600,7 @@ GAME_STATUS DoLevel(int index, std::string const & ambient, bool loadFromSavegam
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
-			g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+			g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 		});
 	}
 
@@ -659,7 +659,7 @@ GAME_STATUS DoLevel(int index, std::string const & ambient, bool loadFromSavegam
 	int nframes = 2;
 
 	// First control phase
-	g_Renderer.resetAnimations();
+	g_Renderer.ResetAnimations();
 	GAME_STATUS result = ControlPhase(nframes, 0);
 
 	// Fade in screen

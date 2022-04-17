@@ -39,13 +39,13 @@ namespace TEN::Control::Volumes
 			{
 			case VOLUME_BOX:
 				if (roomNumber == Camera.pos.roomNumber)
-					g_Renderer.addDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+					g_Renderer.AddDebugBox(volume->box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->box.Intersects(bbox);
 				break;
 
 			case VOLUME_SPHERE:
 				if (roomNumber == Camera.pos.roomNumber)
-					g_Renderer.addDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+					g_Renderer.AddDebugSphere(volume->sphere.Center, volume->sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->sphere.Intersects(bbox);
 				break;
 			}
@@ -107,7 +107,7 @@ namespace TEN::Control::Volumes
 		auto bbox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 
 #ifdef _DEBUG
-		g_Renderer.addDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		g_Renderer.AddDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 #endif
 
 		if (item->objectNumber == ID_LARA)

@@ -262,7 +262,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll)
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0, 0);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
-		// g_Renderer.addDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
 		for (auto i : GetRoomList(item->roomNumber))
 		{
@@ -879,7 +879,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE);
 
 	// Draw static bounds
-	g_Renderer.addDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Calculate horizontal item coll bounds according to radius
 	BOUNDING_BOX collBox;
@@ -906,7 +906,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_I
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Draw item coll bounds
-	g_Renderer.addDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Decompose static bounds into top/bottom plane vertices
 	Vector3 corners[8];

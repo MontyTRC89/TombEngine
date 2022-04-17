@@ -130,6 +130,7 @@ struct LEVEL
 	std::vector<short> SoundMap;
 	std::vector<SampleInfo> SoundDetails;
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences;
+	std::vector<std::string> LuaFunctionNames;
 	int NumItems;
 	int NumSpritesSequences;
 };
