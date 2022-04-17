@@ -121,7 +121,7 @@ namespace TEN::Renderer
 
 						Vector3 c = (pos1 + pos2) / 2.0f;
 
-						addSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 							c,
 							Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
 							(PI / 2),
@@ -144,7 +144,7 @@ namespace TEN::Renderer
 
 			if (spark->on) 
 			{
-				addSpriteBillboard(&m_sprites[spark->def],
+				AddSpriteBillboard(&m_sprites[spark->def],
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
 								   TO_RAD(spark->rotAng), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
@@ -164,7 +164,7 @@ namespace TEN::Renderer
 				{
 					FIRE_SPARKS* spark = &FireSparks[i];
 					if (spark->on)
-						addSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
+						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
 																   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
 																   TO_RAD(spark->rotAng), 
 																   spark->scalar,
@@ -258,7 +258,7 @@ namespace TEN::Renderer
 						}
 					}
 
-					addSpriteBillboard(&m_sprites[spark->def],
+					AddSpriteBillboard(&m_sprites[spark->def],
 									   pos,
 									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
 									   TO_RAD(spark->rotAng), spark->scalar, 
@@ -270,7 +270,7 @@ namespace TEN::Renderer
 					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
 					Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
 					v.Normalize();
-					addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
+					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
 						pos, 
 						Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
 						TO_RAD(spark->rotAng), 
@@ -353,7 +353,7 @@ namespace TEN::Renderer
 			BUBBLE_STRUCT* bubble = &Bubbles[i];
 			if (bubble->active)
 			{
-				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum],
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + bubble->spriteNum],
 					Vector3(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z),
 					bubble->color,
 					bubble->rotation,
@@ -370,7 +370,7 @@ namespace TEN::Renderer
 
 			if (drip->on) 
 			{
-				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
+				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
 					Vector3(drip->x, drip->y, drip->z),
 					Vector4(drip->r / 255.0f, drip->g / 255.0f, drip->b / 255.0f, 1.0f),
 					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, 24.0f), BLENDMODE_ADDITIVE, -Vector3::UnitY, view);
@@ -389,11 +389,11 @@ namespace TEN::Renderer
 				float y = ripple->worldPos.y;
 				if (ripple->isBillboard) 
 				{
-					addSpriteBillboard(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, { ripple->size, ripple->size }, BLENDMODE_ADDITIVE, view);
+					AddSpriteBillboard(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, { ripple->size, ripple->size }, BLENDMODE_ADDITIVE, view);
 				} 
 				else 
 				{
-					addSpriteBillboardConstrainedLookAt(&m_sprites[ripple->SpriteID], 
+					AddSpriteBillboardConstrainedLookAt(&m_sprites[ripple->SpriteID], 
 						ripple->worldPos, 
 						ripple->currentColor, 
 						ripple->rotation, 
@@ -478,7 +478,7 @@ namespace TEN::Renderer
 
 			if (blood->on) 
 			{
-				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
 								   TO_RAD(blood->rotAng), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
@@ -497,7 +497,7 @@ namespace TEN::Renderer
 			switch (p.Type)
 			{
 			case WeatherType::Snow:
-				addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
 					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(p.Size),
@@ -507,7 +507,7 @@ namespace TEN::Renderer
 			case WeatherType::Rain:
 				Vector3 v;
 				p.Velocity.Normalize(v);
-				addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
+				AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
 					p.Position,
 					Vector4(0.8f, 1.0f, 1.0f, p.Transparency()),
 					0.0f, 1.0f, Vector2(TEN::Effects::Drip::DRIP_WIDTH, p.Size), BLENDMODE_ADDITIVE, -v, view);
@@ -544,16 +544,13 @@ namespace TEN::Renderer
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
 		short length = 0;
 		short zOffset = 0;
 		short rotationX = 0;
 
-		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+		SetBlendMode(BLENDMODE_ADDITIVE);
+
+		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 		if (Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_SHOTGUN && Lara.gunType != WEAPON_CROSSBOW) 
 		{
@@ -626,8 +623,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
 
 		return true;
 	}
@@ -656,12 +652,9 @@ namespace TEN::Renderer
 				m_cbLights.updateData(m_stLights, m_context.Get());
 				m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
-				m_stMisc.AlphaTest = true;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-				m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-				m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+				SetBlendMode(BLENDMODE_ADDITIVE);
+				
+				SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 				BITE_INFO* bites[2] = {
 					&EnemyBites[obj->biteOffset],
@@ -703,18 +696,17 @@ namespace TEN::Renderer
 			}
 		}
 
-		m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-		m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+		SetBlendMode(BLENDMODE_OPAQUE);
 
 	}
 
-	Texture2D Renderer11::createDefaultNormalTexture() 
+	Texture2D Renderer11::CreateDefaultNormalTexture() 
 	{
 		vector<byte> data = {128,128,255,1};
 		return Texture2D(m_device.Get(),1,1,data.data());
 	}
 
-	void Renderer11::drawFootprints(RenderView& view) 
+	void Renderer11::DrawFootprints(RenderView& view) 
 	{
 		for (auto i = footprints.begin(); i != footprints.end(); i++) 
 		{
@@ -730,8 +722,6 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawUnderwaterDust(RenderView& view) 
 	{
-		return;
-
 		if (m_firstUnderwaterDustParticles) {
 			for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
 				m_underwaterDustParticles[i].Reset = true;
@@ -752,7 +742,7 @@ namespace TEN::Renderer
 				if (!IsRoomUnderwater(roomNumber))
 					continue;
 
-				if (!isInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
+				if (!IsInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
 				{
 					dust->Reset = true;
 					continue;
@@ -765,7 +755,15 @@ namespace TEN::Renderer
 			dust->Life++;
 			byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
 
-			addSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], Vector3(dust->X, dust->Y, dust->Z), Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 0.0f, 1.0f, { 12, 12 }, BLENDMODE_ADDITIVE,view);
+			AddSpriteBillboard(
+				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], 
+				Vector3(dust->X, dust->Y, dust->Z),
+				Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
+				0.0f,
+				1.0f, 
+				{ 24, 24 },
+				BLENDMODE_ADDITIVE,
+				view);
 
 			if (dust->Life >= 32)
 				dust->Reset = true;
@@ -779,7 +777,8 @@ namespace TEN::Renderer
 	void Renderer11::DrawSprites(RenderView& view)
 	{
 		const int numSpritesToDraw = view.spritesToDraw.size();
-		int currentBlendMode = -1;
+		
+		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
 
 		for (auto& spr : view.spritesToDraw) 
 		{
@@ -814,7 +813,7 @@ namespace TEN::Renderer
 				spriteMatrix = Matrix::Identity;
 			}
 
-			if (isSortingRequired(spr.BlendMode))
+			if (DoesBlendModeRequireSorting(spr.BlendMode))
 			{
 				// Collect sprites
 				int distance = (spr.pos - Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z)).Length();
@@ -831,27 +830,23 @@ namespace TEN::Renderer
 			else
 			{
 				// Draw sprites immediately
-				if (spr.BlendMode != currentBlendMode)
-				{
-					currentBlendMode = spr.BlendMode;
-					setBlendMode(spr.BlendMode);
-				}
+				SetBlendMode(spr.BlendMode);
 
-				BindTexture(TextureRegister::MainTexture, spr.Sprite->Texture, SamplerStateType::LinearClamp);
+				BindTexture(TEXTURE_COLOR_MAP, spr.Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
 				Matrix scale = Matrix::CreateScale((spr.Width) * spr.Scale, (spr.Height) * spr.Scale, spr.Scale);
-				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) {
+				
+				if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD) 
+				{
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
-
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -861,22 +856,23 @@ namespace TEN::Renderer
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = true;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
 					m_context->Draw(4, 0);
 
 				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) {
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) 
+				{
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -886,22 +882,22 @@ namespace TEN::Renderer
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = true;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
 					m_context->Draw(4, 0);
 
 				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT) {
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
+				{
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -911,22 +907,22 @@ namespace TEN::Renderer
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = true;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
 					m_context->Draw(4, 0);
 
 				}
-				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) {
+				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) 
+				{
 					UINT stride = sizeof(RendererVertex);
 					UINT offset = 0;
-					m_context->RSSetState(m_states->CullNone());
-					m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+					SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+					SetCullMode(CULL_MODE_NONE);
 
 					m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 					m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-					m_stMisc.AlphaTest = true;
-					m_cbMisc.updateData(m_stMisc, m_context.Get());
-					m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 					m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 					m_context->IASetInputLayout(m_inputLayout.Get());
@@ -967,10 +963,12 @@ namespace TEN::Renderer
 					v3.UV.x = spr.Sprite->UV[3].x;
 					v3.UV.y = spr.Sprite->UV[3].y;
 					v3.Color = spr.color;
+					
 					m_stSprite.color = spr.color;
 					m_stSprite.isBillboard = false;
 					m_cbSprite.updateData(m_stSprite, m_context.Get());
-					m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
 					m_primitiveBatch->Begin();
 					m_primitiveBatch->DrawTriangle(v0, v1, v3);
 					m_primitiveBatch->DrawTriangle(v1, v2, v3);
@@ -979,32 +977,19 @@ namespace TEN::Renderer
 				m_numDrawCalls++;
 			}
 		}
-		//m_context->RSSetState(m_states->CullCounterClockwise());
-		//m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
 
 	}
 
 	void Renderer11::DrawSpritesTransparent(RendererTransparentFaceInfo* info, RenderView& view)
-	{
-		setBlendMode(info->blendMode);
-
-		BindTexture(TextureRegister::MainTexture, info->sprite->Sprite->Texture, SamplerStateType::LinearClamp);
-
+	{	
 		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0; 
-		m_context->RSSetState(m_states->CullNone());
-		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
+		UINT offset = 0;
 
 		m_context->VSSetShader(m_vsSprites.Get(), NULL, 0);
 		m_context->PSSetShader(m_psSprites.Get(), NULL, 0);
 
-		m_stMisc.AlphaTest = true;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
-
-		//VertexBuffer vertexBuffer = VertexBuffer(m_device.Get(), m_transparentFacesVertices.size(), m_transparentFacesVertices.data());
 		m_transparentFacesVertexBuffer.Update(m_context.Get(), m_transparentFacesVertices, 0, m_transparentFacesVertices.size());
-
+		  
 		m_context->IASetVertexBuffers(0, 1, m_transparentFacesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
@@ -1013,7 +998,15 @@ namespace TEN::Renderer
 		m_stSprite.color = Vector4::One;
 		m_stSprite.isBillboard = false;
 		m_cbSprite.updateData(m_stSprite, m_context.Get());
-		m_context->VSSetConstantBuffers(4, 1, m_cbSprite.get());
+		BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
+
+		SetBlendMode(info->blendMode);
+		SetDepthState(DEPTH_STATE_READ_ONLY_ZBUFFER);
+		SetCullMode(CULL_MODE_NONE);
+		SetAlphaTest(ALPHA_TEST_NONE, 0);
+
+		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
+
 		m_context->Draw(m_transparentFacesVertices.size(), 0);
 
 		m_numDrawCalls++;
@@ -1046,9 +1039,14 @@ namespace TEN::Renderer
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
 
-		m_stMisc.AlphaTest = !transparent;
-		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+		if (transparent)
+		{
+			SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+		}
+		else
+		{
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+		}
 
 		RendererMesh* mesh = effect->Mesh;
 
@@ -1111,16 +1109,22 @@ namespace TEN::Renderer
 
 				if (!deb->isStatic) 
 				{
-					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
+					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				} 
 				else 
 				{
-					BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SamplerStateType::LinearClamp);
+					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				}
 
-				m_stMisc.AlphaTest = !transparent;
-				m_cbMisc.updateData(m_stMisc, m_context.Get());
-				m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+				if (transparent)
+				{
+					SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
+				}
+				else
+				{
+					SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+				}
+
 				m_stStatic.World = world;
 				m_stStatic.Color = Vector4::One;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
@@ -1144,7 +1148,7 @@ namespace TEN::Renderer
 				vtx2.Normal = deb->mesh.Normals[2];
 				vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
 
-				m_context->RSSetState(m_states->CullNone());
+				SetCullMode(CULL_MODE_NONE);
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
 				m_numDrawCalls++;
 				m_primitiveBatch->End();
@@ -1152,7 +1156,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::drawSmokeParticles(RenderView& view)
+	void Renderer11::DrawSmokeParticles(RenderView& view)
 	{
 		using TEN::Effects::Smoke::SmokeParticles;
 		using TEN::Effects::Smoke::SmokeParticle;
@@ -1161,11 +1165,11 @@ namespace TEN::Renderer
 		{
 			SmokeParticle& s = SmokeParticles[i];
 			if (!s.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, { s.size, s.size }, BLENDMODE_ALPHABLEND, view);
+			AddSpriteBillboard(&m_sprites[Objects[ID_SMOKE_SPRITES].meshIndex + s.sprite], s.position, s.color, s.rotation, 1.0f, { s.size, s.size }, BLENDMODE_ALPHABLEND, view);
 		}
 	}
 
-	void Renderer11::drawSparkParticles(RenderView& view)
+	void Renderer11::DrawSparkParticles(RenderView& view)
 	{
 		using TEN::Effects::Spark::SparkParticle;
 		using TEN::Effects::Spark::SparkParticles;
@@ -1178,11 +1182,11 @@ namespace TEN::Renderer
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v, view);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 
-	void Renderer11::drawDripParticles(RenderView& view)
+	void Renderer11::DrawDripParticles(RenderView& view)
 	{
 		using TEN::Effects::Drip::DripParticle;
 		using TEN::Effects::Drip::dripParticles;
@@ -1194,11 +1198,11 @@ namespace TEN::Renderer
 			if (!d.active) continue;
 			Vector3 v;
 			d.velocity.Normalize(v);
-			addSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, view);
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DRIP_SPRITE].meshIndex], d.pos, d.color, 0, 1, { DRIP_WIDTH, d.height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 
-	void Renderer11::drawExplosionParticles(RenderView& view)
+	void Renderer11::DrawExplosionParticles(RenderView& view)
 	{
 		using TEN::Effects::Explosion::explosionParticles;
 		using TEN::Effects::Explosion::ExplosionParticle;
@@ -1207,64 +1211,18 @@ namespace TEN::Renderer
 		{
 			ExplosionParticle& e = explosionParticles[i];
 			if (!e.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE,view);
+			AddSpriteBillboard(&m_sprites[Objects[ID_EXPLOSION_SPRITES].meshIndex + e.sprite], e.pos, e.tint, e.rotation, 1.0f, { e.size, e.size }, BLENDMODE_ADDITIVE,view);
 		}
 	}
 
-	void Renderer11::drawSimpleParticles(RenderView& view)
+	void Renderer11::DrawSimpleParticles(RenderView& view)
 	{
 		using namespace TEN::Effects;
 
 		for(SimpleParticle& s : simpleParticles)
 		{
 			if(!s.active) continue;
-			addSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);
-		}
-	}
-
-	void Renderer11::setBlendMode(BLEND_MODES blendMode)
-	{
-		switch (blendMode)
-		{
-		case BLENDMODE_ALPHABLEND:
-			m_context->OMSetBlendState(m_states->NonPremultiplied(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-			break;
-		case BLENDMODE_ALPHATEST:
-			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_OPAQUE:
-			m_context->OMSetBlendState(m_states->Opaque(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthDefault(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_SUBTRACTIVE:
-			m_context->OMSetBlendState(m_subtractiveBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_ADDITIVE:
-			m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_SCREEN:
-			m_context->OMSetBlendState(m_screenBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_LIGHTEN:
-			m_context->OMSetBlendState(m_lightenBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
-		case BLENDMODE_EXCLUDE:
-			m_context->OMSetBlendState(m_excludeBlendState.Get(), NULL, 0xFFFFFFFF);
-			m_context->OMSetDepthStencilState(m_states->DepthRead(), 0xFFFFFFFF);
-
-			break;
+			AddSpriteBillboard(&m_sprites[Objects[s.sequence].meshIndex + s.sprite], s.worldPosition, Vector4(1, 1, 1, 1), 0, 1.0f, { s.size, s.size / 2 }, BLENDMODE_ALPHABLEND,view);
 		}
 	}
 

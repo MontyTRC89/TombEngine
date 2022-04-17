@@ -231,7 +231,6 @@
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
-    <ClCompile Include="Renderer\RenderPipelineState\RenderPipelineState.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp" />
@@ -589,6 +588,19 @@
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
     <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
+    <ClInclude Include="Scripting\AudioTracks.h" />
+    <ClInclude Include="Scripting\GameScriptLevel.h" />
+    <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
+    <ClInclude Include="Scripting\GameScriptMirror.h" />
+    <ClInclude Include="Scripting\GameScriptNamedBase.h" />
+    <ClInclude Include="Scripting\GameScriptPosition.h" />
+    <ClInclude Include="Scripting\GameScriptRotation.h" />
+    <ClInclude Include="Scripting\GameScriptSettings.h" />
+    <ClInclude Include="Scripting\GameScriptSinkInfo.h" />
+    <ClInclude Include="Scripting\GameScriptSkyLayer.h" />
+    <ClInclude Include="Scripting\GameScriptSoundSourceInfo.h" />
+    <ClInclude Include="Scripting\InventorySlots.h" />
+    <ClInclude Include="Scripting\ItemEnumPair.h" />
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
@@ -672,6 +684,13 @@
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Renderer\Structures\RendererBone.h" />
+    <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
+    <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
+    <ClInclude Include="Renderer\Structures\RendererLight.h" />
+    <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
@@ -707,5 +726,6 @@
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
     <None Include="Shaders\ShaderLight.hlsli" />
+    <None Include="Shaders\AlphaTestBuffer.hlsli" />
   </ItemGroup>
 </Project>

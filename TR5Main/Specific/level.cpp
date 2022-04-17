@@ -12,7 +12,6 @@
 #include "Game/control/lot.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
@@ -23,7 +22,6 @@
 #include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-
 
 using TEN::Renderer::g_Renderer;
 using std::vector;
@@ -851,7 +849,7 @@ void FreeLevel()
 			g_Level.Zones[j][i].clear();
 		}
 	}
-	g_Renderer.freeRendererData();
+	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 }
@@ -1026,17 +1024,50 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 	return true;
 }
 
-unsigned CALLBACK LoadLevel(void* data)
+void ThreadLoadLevel(int levelNumber)
 {
-	char* filename = (char*)data;
+	/*BeginThread(&LoadLevel, (void*)filename, FileThread);
+
+	while (FileThread.ThreadActive)
+	{
+		g_Renderer.RenderLoadingScreen()
+		if (LoadBarState)
+		{
+			if (bGotMonoScreen == true && lscnt < 2)
+			{
+				DrawLoadingScreen();
+
+				lscnt++;
+			}
+
+			flag = S_DrawLoadBar();
+		}
+	}
+
+	while (!S_DrawLoadBar());*/
+}
+
+unsigned int _stdcall LoadLevel(void* data)
+{
+	const int levelIndex = reinterpret_cast<int>(data);
+
+	char filename[80];
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(levelIndex);
+	strcpy_s(filename, level->FileName.c_str());
 
 	TENLog("Loading level file: " + std::string(filename), LogLevel::Info);
 
-	LevelDataPtr = NULL;
-	LevelFilePtr = NULL;
-	char* baseLevelDataPtr = NULL;
+	LevelDataPtr = nullptr;
+	LevelFilePtr = nullptr;
+	char* baseLevelDataPtr = nullptr;
 
-	g_Renderer.updateProgress(0);
+	wchar_t loadscreenFileName[80];
+	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(), 80);
+	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
+	g_Renderer.SetLoadingScreen(loadScreenFile);
+
+	SetScreenFadeIn(FADE_SCREEN_SPEED);
+	g_Renderer.UpdateProgress(0);
 
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
@@ -1064,21 +1095,21 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadTextures();
 
-		g_Renderer.updateProgress(20);
+		g_Renderer.UpdateProgress(20);
 
 		ReadInt8(); // TODO: Remove!
 		ReadInt8(); // TODO: Remove!
 
 		LoadRooms();
-		g_Renderer.updateProgress(40);
+		g_Renderer.UpdateProgress(40);
 
 		LoadObjects();
-		g_Renderer.updateProgress(50);
+		g_Renderer.UpdateProgress(50);
 
 		LoadSprites();
 		LoadCameras();
 		LoadSoundSources();
-		g_Renderer.updateProgress(60);
+		g_Renderer.UpdateProgress(60);
 
 		LoadBoxes();
 
@@ -1086,7 +1117,7 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadAnimatedTextures();
 		LoadTextureInfos();
-		g_Renderer.updateProgress(70);
+		g_Renderer.UpdateProgress(70);
 
 		LoadItems();
 		LoadAIObjects();
@@ -1094,7 +1125,7 @@ unsigned CALLBACK LoadLevel(void* data)
 		LoadLuaFunctionNames();
 
 		LoadSamples();
-		g_Renderer.updateProgress(80);
+		g_Renderer.UpdateProgress(80);
 
 		free(baseLevelDataPtr);
 		LevelDataPtr = NULL;
@@ -1105,12 +1136,10 @@ unsigned CALLBACK LoadLevel(void* data)
 		return false;
 	}
 
-	g_Renderer.updateProgress(90);
+	g_Renderer.UpdateProgress(90);
 	g_Renderer.PrepareDataForTheRenderer();
 	
 	// Initialise the game
-	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
-
 	InitialiseGameFlags();
 	InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
 	GetCarriedItems();
@@ -1118,9 +1147,11 @@ unsigned CALLBACK LoadLevel(void* data)
 	Lara.Vehicle = -1;
 	g_GameScriptEntities->AssignLara();
 
+	SetScreenFadeOut(FADE_SCREEN_SPEED);
+	g_Renderer.UpdateProgress(100);
+
 	// Level loaded
 	IsLevelLoading = false;
-	g_Renderer.updateProgress(100);
 
 	_endthreadex(1);
 
@@ -1206,23 +1237,22 @@ int LoadLevelFile(int levelIndex)
 	 
 	StopAllSounds();
 	FreeSamples();
+
 	if (!g_FirstLevel)
+	{
 		FreeLevel();
+	}
 	g_FirstLevel = false;
-	
-	char filename[80];
-	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(levelIndex);
-	strcpy_s(filename, level->FileName.c_str());
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;
-	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
-
-	// This function loops until progress is 100%. Not very thread safe, but behaviour should be predictable.
-	wchar_t loadscreenFileName[80];
-	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(),80);
-	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
-	g_Renderer.renderLoadingScreen(loadScreenFile);
+	hLoadLevel = _beginthreadex(
+		nullptr,
+		0, 
+		LoadLevel, 
+		reinterpret_cast<void*>(levelIndex), 
+		0, 
+		&ThreadId);
 
 	while (IsLevelLoading);
 

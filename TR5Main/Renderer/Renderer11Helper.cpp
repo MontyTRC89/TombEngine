@@ -39,7 +39,7 @@ namespace TEN::Renderer
 		return (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER);
 	}
 
-	bool Renderer11::isInRoom(int x, int y, int z, short roomNumber)
+	bool Renderer11::IsInRoom(int x, int y, int z, short roomNumber)
 	{
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
@@ -48,7 +48,7 @@ namespace TEN::Renderer
 				z >= r->z && z <= r->z + r->zSize * 1024.0f);
 	}
 
-	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::getAdapters()
+	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::GetAdapters()
 {
 		return &m_adapters;
 	}
@@ -175,7 +175,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::updateItemAnimations(int itemNumber, bool force)
+	void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
 	{
 		RendererItem* itemToDraw = &m_items[itemNumber];
 		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
@@ -299,7 +299,7 @@ namespace TEN::Renderer
 				if (nativeItem->objectNumber == ID_LARA)
 					continue;
 
-				updateItemAnimations(itemToDraw->ItemNumber, false);
+				UpdateItemAnimations(itemToDraw->ItemNumber, false);
 			}
 		}
 	}
@@ -371,253 +371,13 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer11::isFullsScreen() {
+	bool Renderer11::IsFullsScreen() {
 		return (!Windowed);
-	}
-	bool Renderer11::isFading()
-	{
-		return false;
-		return (m_fadeStatus != RENDERER_FADE_STATUS::NO_FADE);
 	}
 
 	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov)
 	{
 		gameCamera = RenderView(cam, roll, fov, 32, 102400, g_Configuration.Width, g_Configuration.Height);
-	}
-
-	void Renderer11::EnumerateVideoModes()
-{
-		HRESULT res;
-
-		IDXGIFactory *dxgiFactory = NULL;
-		Utils::throwIfFailed(CreateDXGIFactory(__uuidof(IDXGIFactory), (void **)&dxgiFactory));
-
-		IDXGIAdapter *dxgiAdapter = NULL;
-
-		for (int i = 0; dxgiFactory->EnumAdapters(i, &dxgiAdapter) != DXGI_ERROR_NOT_FOUND; i++)
-		{
-			DXGI_ADAPTER_DESC adapterDesc;
-			UINT stringLength;
-			char videoCardDescription[128];
-
-			dxgiAdapter->GetDesc(&adapterDesc);
-			int error = wcstombs_s(&stringLength, videoCardDescription, 128, adapterDesc.Description, 128);
-
-			RendererVideoAdapter adapter;
-
-			adapter.Index = i;
-			adapter.Name = videoCardDescription;
-
-			TENLog("Adapter " + std::to_string(i), LogLevel::Info);
-			TENLog("Device Name: " + adapter.Name, LogLevel::Info);
-
-			ComPtr<IDXGIOutput> output;
-			if(FAILED(dxgiAdapter->EnumOutputs(0, output.GetAddressOf())))
-				continue;
-
-			UINT numModes = 0;
-			std::vector<DXGI_MODE_DESC> displayModes;
-			DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-			// Get the number of elements
-			Utils::throwIfFailed(output->GetDisplayModeList(format, 0, &numModes, NULL));
-
-			// Get the list
-			displayModes.resize(numModes);
-			Utils::throwIfFailed(output->GetDisplayModeList(format, 0, &numModes, displayModes.data()));
-
-			for (int j = 0; j < numModes; j++)
-			{
-				DXGI_MODE_DESC *mode = &displayModes[j];
-
-				RendererDisplayMode newMode;
-
-				// discard lower resolutions
-				if (mode->Width < 1024 || mode->Height < 768)
-					continue;
-
-				newMode.Width = mode->Width;
-				newMode.Height = mode->Height;
-				newMode.RefreshRate = mode->RefreshRate.Numerator / mode->RefreshRate.Denominator;
-
-				bool found = false;
-				for (int k = 0; k < adapter.DisplayModes.size(); k++)
-				{
-					RendererDisplayMode *currentMode = &adapter.DisplayModes[k];
-					if (currentMode->Width == newMode.Width && currentMode->Height == newMode.Height &&
-						currentMode->RefreshRate == newMode.RefreshRate)
-					{
-						found = true;
-						break;
-					}
-				}
-				if (found)
-					continue;
-
-				adapter.DisplayModes.push_back(newMode);
-			}
-
-			m_adapters.push_back(adapter);
-
-		}
-
-		dxgiFactory->Release();
-	}
-
-	void Renderer11::GetVisibleObjects(int from, int to, RenderView& renderView, bool onlyRooms)
-	{
-		// Avoid allocations, 1024 should be fine
-		RendererRoomNode nodes[512];
-		int nextNode = 0;
-
-		// Avoid reallocations, 1024 should be fine
-		RendererRoomNode *stack[512];
-		int stackDepth = 0;
-
-		RendererRoomNode *node = &nodes[nextNode++];
-		node->To = to;
-		node->From = -1;
-
-		// Push
-		stack[stackDepth++] = node;
-
-		while (stackDepth > 0)
-		{
-			// Pop
-			node = stack[--stackDepth];
-
-			if (m_rooms[node->To].Visited)
-				continue;
-
-			ROOM_INFO *room = &g_Level.Rooms[node->To];
-
-			Vector3 roomCentre = Vector3(room->x + room->xSize * WALL_SIZE / 2.0f,
-										 (room->minfloor + room->maxceiling) / 2.0f,
-										 room->z + room->zSize * WALL_SIZE / 2.0f);
-			Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-			m_rooms[node->To].Distance = (roomCentre - laraPosition).Length();
-			m_rooms[node->To].Visited = true;
-			renderView.roomsToDraw.push_back(&m_rooms[node->To]);
-			g_Level.Rooms[node->To].boundActive = true;
-
-			if (!onlyRooms)
-			{
-				CollectLightsForRoom(node->To, renderView);
-				CollectItems(node->To, renderView);
-				CollectStatics(node->To, renderView);
-				CollectEffects(node->To, renderView);
-			}
-
-			Vector4 clipPort;
-
-			for (int i = 0; i < room->doors.size(); i++)
-			{
-				short adjoiningRoom = room->doors[i].room;
-
-				if (node->From != adjoiningRoom && CheckPortal(node->To, &room->doors[i], renderView.camera.ViewProjection))
-				{
-					RendererRoomNode *childNode = &nodes[nextNode++];
-					childNode->From = node->To;
-					childNode->To = adjoiningRoom;
-
-					// Push
-					stack[stackDepth++] = childNode;
-				}
-			}
-		}
-	}
-
-	bool Renderer11::CheckPortal(short roomIndex, ROOM_DOOR* portal, const Matrix& viewProjection)
-	{
-		ROOM_INFO *room = &g_Level.Rooms[roomIndex];
-
-		Vector3 n = portal->normal;
-		Vector3 v = Vector3(
-			Camera.pos.x - (room->x + portal->vertices[0].x),
-			Camera.pos.y - (room->y + portal->vertices[0].y),
-			Camera.pos.z - (room->z + portal->vertices[0].z));
-
-		// Test camera and normal positions and decide if process door or not
-		if (n.Dot(v) <= 0.0f)
-			return false;
-
-		int zClip = 0;
-		Vector4 p[4];
-		Vector4 clipPort{ FLT_MAX ,FLT_MAX ,FLT_MIN,FLT_MIN };
-
-		// Project all portal's corners in screen space
-		for (int i = 0; i < 4; i++)
-		{
-			Vector4 tmp = Vector4(portal->vertices[i].x + room->x, portal->vertices[i].y + room->y, portal->vertices[i].z + room->z, 1.0f);
-
-			// Project corner on screen
-			Vector4::Transform(tmp, viewProjection, p[i]);
-
-			if (p[i].w > 0.0f)
-			{
-				// The corner is in front of camera
-				p[i].x *= (1.0f / p[i].w);
-				p[i].y *= (1.0f / p[i].w);
-				p[i].z *= (1.0f / p[i].w);
-
-				clipPort.x = std::min(clipPort.x, p[i].x);
-				clipPort.y = std::min(clipPort.y, p[i].y);
-				clipPort.z = std::max(clipPort.z, p[i].x);
-				clipPort.w = std::max(clipPort.w, p[i].y);
-			}
-			else
-				// The corner is behind camera
-				zClip++;
-		}
-
-		// If all points are behind camera then door is not visible
-		if (zClip == 4)
-			return false;
-
-		// If door crosses camera plane...
-		if (zClip > 0)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				Vector4 a = p[i];
-				Vector4 b = p[(i + 1) % 4];
-
-				if ((a.w > 0.0f) ^ (b.w > 0.0f))
-				{
-
-					if (a.x < 0.0f && b.x < 0.0f)
-						clipPort.x = -1.0f;
-					else if (a.x > 0.0f && b.x > 0.0f)
-						clipPort.z = 1.0f;
-					else
-					{
-						clipPort.x = -1.0f;
-						clipPort.z = 1.0f;
-					}
-
-					if (a.y < 0.0f && b.y < 0.0f)
-						clipPort.y = -1.0f;
-					else if (a.y > 0.0f && b.y > 0.0f)
-						clipPort.w = 1.0f;
-					else
-					{
-						clipPort.y = -1.0f;
-						clipPort.w = 1.0f;
-					}
-				}
-			}
-		}
-		Vector4 vp = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
-		clipPort.x = std::max(clipPort.x, vp.x);
-		clipPort.y = std::max(clipPort.y, vp.y);
-		clipPort.z = std::min(clipPort.z, vp.z);
-		clipPort.w = std::min(clipPort.w, vp.w);
-
-		if (clipPort.x > vp.z || clipPort.y > vp.w || clipPort.z < vp.x || clipPort.w < vp.y)
-			return false;
-
-		return true;
 	}
 
 	bool Renderer11::SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius)
@@ -629,9 +389,9 @@ namespace TEN::Renderer
 		return box.Intersects(sphere);
 	}
 
-	void Renderer11::getLaraBonePosition(Vector3 *pos, int bone) {}
+	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone) {}
 
-	void Renderer11::flipRooms(short roomNumber1, short roomNumber2)
+	void Renderer11::FlipRooms(short roomNumber1, short roomNumber2)
 	{
 		std::swap(m_rooms[roomNumber1], m_rooms[roomNumber2]);
 
@@ -644,14 +404,14 @@ namespace TEN::Renderer
 		return m_meshes[meshIndex];
 	}
 
-	void Renderer11::getLaraAbsBonePosition(Vector3 *pos, int joint)
+	void Renderer11::GetLaraAbsBonePosition(Vector3 *pos, int joint)
 	{
 		Matrix world = m_moveableObjects[ID_LARA]->AnimationTransforms[joint];
 		world = world * m_LaraWorldMatrix;
 		*pos = Vector3::Transform(*pos, world);
 	}
 
-	void Renderer11::getItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
+	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
 		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
@@ -664,9 +424,9 @@ namespace TEN::Renderer
 		if (!rendererItem->DoneAnimations)
 		{
 			if (itemNumber == Lara.itemNumber)
-				updateLaraAnimations(false);
+				UpdateLaraAnimations(false);
 			else
-				updateItemAnimations(itemNumber, false);
+				UpdateItemAnimations(itemNumber, false);
 		}
 
 		Matrix world = rendererItem->AnimationTransforms[joint] * rendererItem->World;
@@ -686,9 +446,9 @@ namespace TEN::Renderer
 		if (!itemToDraw->DoneAnimations)
 		{
 			if (itemNumber == Lara.itemNumber)
-				updateLaraAnimations(false);
+				UpdateLaraAnimations(false);
 			else
-				updateItemAnimations(itemNumber, false);
+				UpdateItemAnimations(itemNumber, false);
 		}
 
 		Matrix world;
@@ -719,13 +479,13 @@ namespace TEN::Renderer
 			// Spheres debug
 			// auto v1 = Vector3(spheres[i].Center.x - spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
 			// auto v2 = Vector3(spheres[i].Center.x + spheres[i].Radius, spheres[i].Center.y, spheres[i].Center.z);
-			// addLine3D(v1, v2, Vector4::One);
+			// AddLine3D(v1, v2, Vector4::One);
 		}
 
 		return moveable.ObjectMeshes.size();
 	}
 
-	void Renderer11::getBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
+	void Renderer11::GetBoneMatrix(short itemNumber, int joint, Matrix *outMatrix)
 	{
 		if (itemNumber == Lara.itemNumber)
 		{
@@ -734,7 +494,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			updateItemAnimations(itemNumber, true);
+			UpdateItemAnimations(itemNumber, true);
 			
 			RendererItem* rendererItem = &m_items[itemNumber];
 			ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
@@ -742,5 +502,40 @@ namespace TEN::Renderer
 			RendererObject& obj = *m_moveableObjects[nativeItem->objectNumber];
 			*outMatrix = obj.AnimationTransforms[joint] * rendererItem->World;
 		}
+	}
+
+	Vector4 Renderer11::GetPortalRect(Vector4 v, Vector4 vp) 
+	{
+		Vector4 sp = (v * Vector4(0.5f, 0.5f, 0.5f, 0.5f) 
+			+ Vector4(0.5f, 0.5f, 0.5f, 0.5f)) 
+			* Vector4(vp.z, vp.w, vp.z, vp.w);
+
+		Vector4 s(sp.x + vp.x, sp.y + vp.y, sp.z + vp.x, sp.w + vp.y);
+
+		// expand
+		s.x -= 2;
+		s.y -= 2;
+		s.z += 2;
+		s.w += 2;
+
+		// clamp
+		s.x = std::max(s.x, vp.x);
+		s.y = std::max(s.y, vp.y);
+		s.z = std::min(s.z, vp.x + vp.z);
+		s.w = std::min(s.w, vp.y + vp.w);
+
+		// convert from bounds to x,y,w,h
+		s.z -= s.x;
+		s.w -= s.y;
+
+		// Use the viewport rect if one of the dimensions is the same size
+		// as the viewport. This may fix clipping bugs while still allowing
+		// impossible geometry tricks.
+		if (s.z - s.x >= vp.z - vp.x || s.w - s.y >= vp.w - vp.y) 
+		{
+			return vp;
+		}
+
+		return s;
 	}
 }
