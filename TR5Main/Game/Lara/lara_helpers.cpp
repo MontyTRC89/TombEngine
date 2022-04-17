@@ -55,13 +55,13 @@ void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll)
 
 	// Reset lean.
 	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
-		ResetLaraLean(item, 6.0f);
+		ResetLaraLean(item, 0.12f);
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
 		(!item->Animation.Velocity || (item->Animation.Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
-		ResetLaraFlex(item, 12.0f);
+		ResetLaraFlex(item, 0.12f);
 	}
 
 	// Reset turn rate.
@@ -125,11 +125,6 @@ bool HandleLaraVehicle(ITEM_INFO* item, CollisionInfo* coll)
 	}
 
 	return false;
-}
-
-void ApproachLaraTargetOrientation(ITEM_INFO* item, EulerAngle targetOrient, float rate)
-{
-	item->Orientation.Interpolate(targetOrient, rate, EulerAngle::DegToRad(0.1f));
 }
 
 // TODO: This approach may cause undesirable artefacts where an object pushes Lara rapidly up/down a slope or a platform rapidly ascends/descends.
@@ -423,9 +418,9 @@ void UpdateLaraSubsuitAngles(ITEM_INFO* item)
 	lara->Control.Subsuit.Velocity[1] += abs(lara->Control.Subsuit.XRot / 8);
 
 	if (lara->Control.TurnRate > 0)
-		lara->Control.Subsuit.Velocity[0] += 2 * abs(lara->Control.TurnRate);
+		lara->Control.Subsuit.Velocity[0] += abs(lara->Control.TurnRate) * 2;
 	else if (lara->Control.TurnRate < 0)
-		lara->Control.Subsuit.Velocity[1] += 2 * abs(lara->Control.TurnRate);
+		lara->Control.Subsuit.Velocity[1] += abs(lara->Control.TurnRate) * 2;
 
 	if (lara->Control.Subsuit.Velocity[0] > SECTOR(1.5f))
 		lara->Control.Subsuit.Velocity[0] = SECTOR(1.5f);
@@ -592,8 +587,8 @@ void SetLaraFallAnimation(ITEM_INFO* item)
 void SetLaraFallBackAnimation(ITEM_INFO* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
-	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = true;
+	item->Animation.VerticalVelocity = 0;
 }
 
 void SetLaraMonkeyFallAnimation(ITEM_INFO* item)
@@ -610,9 +605,9 @@ void SetLaraMonkeyRelease(ITEM_INFO* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->Animation.Airborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
-	item->Animation.Airborne = true;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -708,9 +703,9 @@ void SetLaraCornerAnimation(ITEM_INFO* item, CollisionInfo* coll, bool flip)
 		SetAnimation(item, LA_FALL_START);
 		item->Pose.Position.y += CLICK(1);
 		item->Orientation.y += lara->NextCornerPos.Orientation.y / 2;
+		item->Animation.Airborne = true;
 		item->Animation.Velocity = 2;
 		item->Animation.VerticalVelocity = 1;
-		item->Animation.Airborne = true;
 		lara->Control.HandStatus = HandStatus::Free;
 		return;
 	}
@@ -722,10 +717,9 @@ void SetLaraCornerAnimation(ITEM_INFO* item, CollisionInfo* coll, bool flip)
 		else
 			SetAnimation(item, LA_HANG_IDLE);
 
-		coll->Setup.OldPosition.x = item->Pose.Position.x = lara->NextCornerPos.Position.x;
-		coll->Setup.OldPosition.y = item->Pose.Position.y = lara->NextCornerPos.Position.y;
-		coll->Setup.OldPosition.z = item->Pose.Position.z = lara->NextCornerPos.Position.z;
+		item->Pose.Position = lara->NextCornerPos.Position;
 		item->Orientation.y = lara->NextCornerPos.Orientation.y;
+		coll->Setup.OldPosition = lara->NextCornerPos.Position;
 	}
 }
 
@@ -742,29 +736,11 @@ void SetLaraSwimDiveAnimation(ITEM_INFO* item)
 
 void ResetLaraLean(ITEM_INFO* item, float rate, bool resetRoll, bool resetPitch)
 {
-	if (!rate)
-	{
-		TENLog(std::string("ResetLaraLean() attempted division by zero!"), LogLevel::Warning);
-		return;
-	}
-
-	rate = abs(rate);
-
 	if (resetPitch)
-	{
-		if (abs(item->Orientation.x) > EulerAngle::DegToRad(0.1f))
-			item->Orientation.x += item->Orientation.x / -rate;
-		else
-			item->Orientation.x = 0;
-	}
+		item->Orientation.SetX(EulerAngle::Interpolate(item->Orientation.GetX(), 0, rate, EulerAngle::DegToRad(0.1f)));
 
 	if (resetRoll)
-	{
-		if (abs(item->Orientation.z) > EulerAngle::DegToRad(0.1f))
-			item->Orientation.z += item->Orientation.z / -rate;
-		else
-			item->Orientation.z = 0;
-	}
+		item->Orientation.SetZ(EulerAngle::Interpolate(item->Orientation.GetZ(), 0, rate, EulerAngle::DegToRad(0.1f)));
 }
 
 void ResetLaraFlex(ITEM_INFO* item, float rate)

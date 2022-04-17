@@ -318,9 +318,9 @@ void LaraCollideStopMonkey(ITEM_INFO* item, CollisionInfo* coll)
 
 void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, float angle)
 {
-	/*if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
+	if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 	{
-		switch (angle)
+		switch (EulerAngle::RadToShrt(angle)) // TODO
 		{
 		case NORTH:
 			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x390;
@@ -343,7 +343,7 @@ void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, float angle)
 
 	if (item->Animation.ActiveState == LS_SHIMMY_LEFT)
 	{
-		switch (angle)
+		switch (EulerAngle::RadToShrt(angle))
 		{
 		case NORTH:
 			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0x70;
@@ -362,7 +362,7 @@ void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, float angle)
 			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0x70;
 			return;
 		}
-	}*/
+	}
 }
 
 void LaraResetGravityStatus(ITEM_INFO* item, CollisionInfo* coll)
@@ -448,13 +448,13 @@ void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Orientation.x < EulerAngle::DegToRad(-90.0f) ||
 		item->Orientation.x > EulerAngle::DegToRad(90.0f))
 	{
-		lara->Control.MoveAngle = item->Orientation.y + EulerAngle::DegToRad(180.0f);
-		coll->Setup.ForwardAngle = item->Orientation.y - EulerAngle::DegToRad(180.0f);
+		lara->Control.MoveAngle = EulerAngle::Clamp(item->Orientation.GetY() + EulerAngle::DegToRad(180.0f));
+		coll->Setup.ForwardAngle = EulerAngle::Clamp(item->Orientation.GetY() - EulerAngle::DegToRad(180.0f));
 	}
 	else
 	{
-		lara->Control.MoveAngle = item->Orientation.y;
-		coll->Setup.ForwardAngle = item->Orientation.y;
+		lara->Control.MoveAngle = item->Orientation.GetY();
+		coll->Setup.ForwardAngle = item->Orientation.GetY();
 	}
 
 	int height = LARA_HEIGHT * sin(item->Orientation.x);
@@ -470,11 +470,11 @@ void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll)
 	GetCollisionInfo(coll, item, Vector3Int(0, height / 2, 0));
 
 	auto c1 = *coll;
-	c1.Setup.ForwardAngle += EulerAngle::DegToRad(45.0f);
+	c1.Setup.ForwardAngle = EulerAngle::Clamp(c1.Setup.ForwardAngle + EulerAngle::DegToRad(45.0f));
 	GetCollisionInfo(&c1, item, Vector3Int(0, height / 2, 0));
 
 	auto c2 = *coll;
-	c2.Setup.ForwardAngle -= EulerAngle::DegToRad(45.0f);
+	c2.Setup.ForwardAngle = EulerAngle::Clamp(c2.Setup.ForwardAngle - EulerAngle::DegToRad(45.0f));
 	GetCollisionInfo(&c2, item, Vector3Int(0, height / 2, 0));
 
 	ShiftItem(item, coll);
@@ -493,9 +493,9 @@ void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll)
 				else if (item->Orientation.x < EulerAngle::DegToRad(-5.0f))
 					item->Orientation.x -= EulerAngle::DegToRad(0.5f);
 				else if (item->Orientation.x > 0)
-					item->Orientation.x += 45;
+					item->Orientation.x += EulerAngle::DegToRad(0.25f);
 				else if (item->Orientation.x < 0)
-					item->Orientation.x -= 45;
+					item->Orientation.x -= EulerAngle::DegToRad(0.25);
 				else
 				{
 					item->Animation.VerticalVelocity = 0;
@@ -584,7 +584,7 @@ void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		auto* sink = &g_Level.Sinks[lara->WaterCurrentActive - 1];
 
-		short angle = mGetAngle(sink->x, sink->z, item->Pose.Position.x, item->Pose.Position.z);
+		float angle = atan2(item->Pose.Position.x - sink->x, item->Pose.Position.z - sink->z);
 		lara->WaterCurrentPull.x += (sink->strength * SECTOR(1) * sin(angle - EulerAngle::DegToRad(90.0f)) - lara->WaterCurrentPull.x) / 16;
 		lara->WaterCurrentPull.z += (sink->strength * SECTOR(1) * cos(angle - EulerAngle::DegToRad(90.0f)) - lara->WaterCurrentPull.z) / 16;
 
@@ -616,8 +616,8 @@ void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll)
 			return;
 	}
 
-	item->Pose.Position.x += lara->WaterCurrentPull.x / 256;
-	item->Pose.Position.z += lara->WaterCurrentPull.z / 256;
+	item->Pose.Position.x += lara->WaterCurrentPull.x / CLICK(1);
+	item->Pose.Position.z += lara->WaterCurrentPull.z / CLICK(1);
 	lara->WaterCurrentActive = 0;
 
 	coll->Setup.ForwardAngle = atan2(item->Pose.Position.z - coll->Setup.OldPosition.z, item->Pose.Position.x - coll->Setup.OldPosition.x);

@@ -27,6 +27,10 @@ public:
 	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
 	static float ShortestAngle(float radiansFrom, float radiansTo);
 
+	static float AngleBetweenTwoPoints(Vector3 pointFrom, Vector3 pointTo);
+
+	static float DeltaHeading(Vector3 origin, Vector3 target, float heading);
+
 	static float DegToRad(float degrees);
 	static float RadToDeg(float radians);
 	static float ShrtToRad(short shortForm); // Temporary legacy short form support for particularly cryptic code.
@@ -162,6 +166,18 @@ inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientFrom, EulerAngle or
 inline float EulerAngle::ShortestAngle(float radiansFrom, float radiansTo)
 {
 	return Clamp(radiansTo - radiansFrom);
+}
+
+inline float EulerAngle::AngleBetweenTwoPoints(Vector3 point0, Vector3 point1)
+{
+	auto difference = point0 - point1;
+	return atan2(difference.x, difference.z);
+}
+
+inline float EulerAngle::DeltaHeading(Vector3 origin, Vector3 target, float heading)
+{
+	auto difference = AngleBetweenTwoPoints(origin, target);
+	return Clamp(ShortestAngle(heading, difference + DegToRad(90.0f)));
 }
 
 inline float EulerAngle::DegToRad(float degrees)
