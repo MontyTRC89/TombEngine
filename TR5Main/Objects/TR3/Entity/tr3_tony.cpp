@@ -53,7 +53,7 @@ enum TONY_STATE
 
 static BOSS_STRUCT BossData;
 #define TONYBOSS_TURN ANGLE(2.0f)
-#define TONYBOSS_HITS 1 //Tony Harder To Kill, was 100 (6 shotgun shots)
+#define TONYBOSS_HITS 100 //Tony Harder To Kill, was 100 (6 shotgun shots)
 #define MAX_TONY_TRIGGER_RANGE 0x4000
 
 static void TriggerTonyEffect(const TONY_FLAME flame)
