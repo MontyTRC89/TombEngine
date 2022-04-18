@@ -6,7 +6,7 @@
 namespace sol {
 	class state;
 }
-class Position;
+class Vec3;
 
 class SoundSource : public NamedBase<SoundSource, SOUND_SOURCE_INFO &>
 {
@@ -19,8 +19,8 @@ public:
 	SoundSource(SoundSource const& other) = delete;
 
 	static void Register(sol::table &);
-	Position GetPos() const;
-	void SetPos(Position const& pos);
+	Vec3 GetPos() const;
+	void SetPos(Vec3 const& pos);
 
 	int GetSoundID() const;
 	void SetSoundID(int soundID);

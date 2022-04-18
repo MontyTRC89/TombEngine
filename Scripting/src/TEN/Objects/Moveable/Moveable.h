@@ -6,7 +6,7 @@ namespace sol {
 	class state;
 	template <typename T> struct as_table_t;
 }
-class Position;
+class Vec3;
 class Rotation;
 struct ITEM_INFO;
 enum GAME_OBJECT_ID : short;
@@ -38,8 +38,8 @@ public:
 
 	void Destroy();
 
-	[[nodiscard]] Position GetPos() const;
-	void SetPos(Position const& pos);
+	[[nodiscard]] Vec3 GetPos() const;
+	void SetPos(Vec3 const& pos);
 
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(Rotation const& rot);

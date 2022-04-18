@@ -4,7 +4,7 @@
 #if TEN_OPTIONAL_LUA
 #include "Objects/AIObject/AIObject.h"
 #include "ScriptAssert.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
@@ -28,12 +28,12 @@ void AIObject::Register(sol::table & parent)
 
 		/// Get the object's position
 		// @function GetPosition
-		// @treturn Position a copy of the object's position
+		// @treturn Vec3 a copy of the object's position
 		ScriptReserved_GetPosition, &AIObject::GetPos,
 
 		/// Set the object's position
 		// @function SetPosition
-		// @tparam Position position the new position of the object 
+		// @tparam Vec3 position the new position of the object 
 		ScriptReserved_SetPosition, &AIObject::SetPos,
 
 		/// Get the object's Y-axis rotation
@@ -89,12 +89,12 @@ void AIObject::Register(sol::table & parent)
 		);
 }
 
-Position AIObject::GetPos() const
+Vec3 AIObject::GetPos() const
 {
-	return Position{ m_aiObject.x, m_aiObject.y, m_aiObject.z };
+	return Vec3{ m_aiObject.x, m_aiObject.y, m_aiObject.z };
 }
 
-void AIObject::SetPos(Position const& pos)
+void AIObject::SetPos(Vec3 const& pos)
 {
 	m_aiObject.x = pos.x;
 	m_aiObject.y = pos.y;

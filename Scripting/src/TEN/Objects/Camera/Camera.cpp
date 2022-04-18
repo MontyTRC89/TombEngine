@@ -3,7 +3,7 @@
 #if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Objects/Camera/Camera.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 #include "Specific/level.h"
@@ -29,12 +29,12 @@ void Camera::Register(sol::table & parent)
 
 		/// Get the camera's position
 		// @function GetPosition
-		// @treturn Position a copy of the camera's position
+		// @treturn Vec3 a copy of the camera's position
 		ScriptReserved_GetPosition, &Camera::GetPos,
 
 		/// Set the camera's position
 		// @function SetPosition
-		// @tparam Position position the new position of the camera 
+		// @tparam Vec3 position the new position of the camera 
 		ScriptReserved_SetPosition, &Camera::SetPos,
 
 		/// Get the camera's unique string identifier
@@ -60,12 +60,12 @@ void Camera::Register(sol::table & parent)
 		);
 }
 
-Position Camera::GetPos() const
+Vec3 Camera::GetPos() const
 {
-	return Position{ m_camera.x, m_camera.y, m_camera.z };
+	return Vec3{ m_camera.x, m_camera.y, m_camera.z };
 }
 
-void Camera::SetPos(Position const& pos)
+void Camera::SetPos(Vec3 const& pos)
 {
 	m_camera.x = pos.x;
 	m_camera.y = pos.y;

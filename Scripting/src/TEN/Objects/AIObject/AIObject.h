@@ -6,7 +6,7 @@
 namespace sol {
 	class state;
 }
-class Position;
+class Vec3;
 
 class AIObject : public NamedBase<AIObject, AI_OBJECT&>
 {
@@ -21,8 +21,8 @@ public:
 
 	static void Register(sol::table & parent);
 
-	Position GetPos() const;
-	void SetPos(Position const& pos);
+	Vec3 GetPos() const;
+	void SetPos(Vec3 const& pos);
 
 	short GetRoom() const;
 	void SetRoom(short Room);
