@@ -74,6 +74,7 @@
     <ClInclude Include="src\TEN\Settings\Settings.h" />
     <ClInclude Include="src\TEN\Strings\DisplayString\DisplayString.h" />
     <ClInclude Include="src\TEN\Strings\StringsHandler.h" />
+    <ClInclude Include="src\TEN\Vec3\Vec3.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="frameworkandsol.cpp">
@@ -104,13 +105,13 @@
     <ClCompile Include="src\TEN\Objects\Sink\Sink.cpp" />
     <ClCompile Include="src\TEN\Objects\SoundSource\SoundSource.cpp" />
     <ClCompile Include="src\TEN\Objects\Static\Static.cpp" />
-    <ClCompile Include="src\TEN\Position\Position.cpp" />
     <ClCompile Include="src\TEN\Rotation\Rotation.cpp" />
     <ClCompile Include="src\TEN\Strings\DisplayString\DisplayString.cpp" />
     <ClCompile Include="src\TEN\Strings\StringsHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <ClCompile Include="src\TEN\Vec3\Vec3.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
