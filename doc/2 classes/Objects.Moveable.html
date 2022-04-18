@@ -65,8 +65,8 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li><a href="../3 primitive classes/Color.html">Color</a></li>
-  <li><a href="../3 primitive classes/Position.html">Position</a></li>
   <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li><a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
 <h2>4 Enums</h2>
 <ul class="nowrap">
@@ -117,12 +117,20 @@ associated getters and setters.</td>
 	<td class="summary">Get the name of the function called when this moveable is shot</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetOnCollided">Moveable:SetOnCollided(name)</a></td>
-	<td class="summary">Set the name of the function called when Lara collides with this moveable</td>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(name)</a></td>
+	<td class="summary">Set the name of the function called when this moveable collides with another moveable</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetOnCollided">Moveable:GetOnCollided()</a></td>
-	<td class="summary">Get the name of the function called when Lara collides with this moveable</td>
+	<td class="name" ><a href="#Moveable:GetOnCollidedWithObject">Moveable:GetOnCollidedWithObject()</a></td>
+	<td class="summary">Get the name of the function called when this moveable collides with another moveable</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(name)</a></td>
+	<td class="summary">Set the name of the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetOnCollidedWithRoom">Moveable:GetOnCollidedWithRoom()</a></td>
+	<td class="summary">Get the name of the function called when this moveable collides with room geometry (e.g.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
@@ -267,7 +275,7 @@ most can just be set to zero (see usage).
          Lua name of the item
         </li>
         <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Position</span></span>
+            <span class="types"><span class="type">Vec3</span></span>
          position in level
         </li>
         <li><span class="parameter">rotation</span>
@@ -313,7 +321,7 @@ most can just be set to zero (see usage).
         <pre class="example"><span class="keyword">local</span> item = Moveable.New(
 	TEN.ObjID.PISTOLS_ITEM, <span class="comment">-- object id
 </span>	<span class="string">"test"</span>, <span class="comment">-- name
-</span>	Position.new(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>),
+</span>	Vec3.new(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>),
 	Rotation.new(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),
 	<span class="number">0</span>, <span class="comment">-- room
 </span>	<span class="number">0</span>, <span class="comment">-- animNumber
@@ -435,11 +443,11 @@ most can just be set to zero (see usage).
 
 </dd>
     <dt>
-    <a name = "Moveable:SetOnCollided"></a>
-    <strong>Moveable:SetOnCollided(name)</strong>
+    <a name = "Moveable:SetOnCollidedWithObject"></a>
+    <strong>Moveable:SetOnCollidedWithObject(name)</strong>
     </dt>
     <dd>
-    Set the name of the function called when Lara collides with this moveable
+    Set the name of the function called when this moveable collides with another moveable
 
 
     <h3>Parameters:</h3>
@@ -456,11 +464,52 @@ most can just be set to zero (see usage).
 
 </dd>
     <dt>
-    <a name = "Moveable:GetOnCollided"></a>
-    <strong>Moveable:GetOnCollided()</strong>
+    <a name = "Moveable:GetOnCollidedWithObject"></a>
+    <strong>Moveable:GetOnCollidedWithObject()</strong>
     </dt>
     <dd>
-    Get the name of the function called when Lara collides with this moveable
+    Get the name of the function called when this moveable collides with another moveable
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+        name of the function
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnCollidedWithRoom"></a>
+    <strong>Moveable:SetOnCollidedWithRoom(name)</strong>
+    </dt>
+    <dd>
+    Set the name of the function called when this moveable collides with room geometry (e.g.  a wall or floor)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         of callback function to be called
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetOnCollidedWithRoom"></a>
+    <strong>Moveable:GetOnCollidedWithRoom()</strong>
+    </dt>
+    <dd>
+    Get the name of the function called when this moveable collides with room geometry (e.g.  a wall or floor)
 
 
 
@@ -897,7 +946,7 @@ sas:SetPosition(destinationPosition)</pre>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Position</span></span>
+           <span class="types"><span class="type">Vec3</span></span>
         a copy of the moveable's position
     </ol>
 
@@ -919,7 +968,7 @@ sas:SetPosition(destinationPosition)</pre>
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">position</span>
-            <span class="types"><span class="type">Position</span></span>
+            <span class="types"><span class="type">Vec3</span></span>
          the new position of the moveable
         </li>
     </ul>
@@ -1062,7 +1111,7 @@ sas:SetPosition(destinationPosition)</pre>
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-04-10 00:37:11 </i>
+<i style="float:right;">Last updated 2022-04-18 17:50:55 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
