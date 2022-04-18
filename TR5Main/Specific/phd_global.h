@@ -360,7 +360,7 @@ struct Vector3Int
 		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
 	}
 
-	Vector3Int& operator +=(const Vector3Int vector)
+	Vector3Int& operator +=(Vector3Int vector)
 	{
 		*this = *this + vector;
 		return *this;
@@ -410,9 +410,8 @@ struct Vector3Int
 	}
 };
 
-class PoseData
+struct PoseData
 {
-public:
 	Vector3Int Position;
 	EulerAngle Orientation;
 

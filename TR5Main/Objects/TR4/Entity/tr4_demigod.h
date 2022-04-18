@@ -1,6 +1,6 @@
 #pragma once
 
-class PoseData;
+struct PoseData;
 
 namespace TEN::Entities::TR4
 {

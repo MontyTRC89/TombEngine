@@ -1,7 +1,7 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-class PoseData;
+struct PoseData;
 struct Vector3Int;
 struct ITEM_INFO;
 

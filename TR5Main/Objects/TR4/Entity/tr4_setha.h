@@ -1,6 +1,6 @@
 #pragma once
 
-class PoseData;
+struct PoseData;
 
 void InitialiseSetha(short itemNumber);
 void SethaControl(short itemNumber);

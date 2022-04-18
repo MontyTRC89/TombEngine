@@ -5,7 +5,7 @@
 namespace sol {
 	class state;
 }
-class PoseData;
+struct PoseData;
 
 class GameScriptRotation {
 public:
