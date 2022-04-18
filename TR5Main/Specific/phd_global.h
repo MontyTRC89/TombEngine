@@ -4,43 +4,49 @@
 class EulerAngle
 {
 public:
-	// Components (TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make them private?)
+	// TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make components private?
+	// Euler components in radians
 	float x;
 	float y;
 	float z;
 
 	// Constructors
 	EulerAngle();
-	EulerAngle(float xRadians, float yRadians, float zRadians);
+	EulerAngle(float xAngle, float yAngle, float zAngle);
 
 	// Getters
 	float   GetX();
 	float   GetY();
 	float   GetZ();
-	Vector3 ToVector3();
 
 	// Setters
 	void Set(EulerAngle orient);
-	void Set(float xRadians, float yRadians, float zRadians);
-	void SetX(float radians);
-	void SetY(float radians);
-	void SetZ(float radians);
+	void Set(float xAngle, float yAngle, float zAngle);
+	void SetX(float angle);
+	void SetY(float angle);
+	void SetZ(float angle);
 
 	// Utilities
+	bool Compare(EulerAngle orient, float epsilon);
+	static bool Compare(EulerAngle orient0, EulerAngle orient1, float epsilon);
+	static bool Compare(float angle0, float angle1, float epsilon);
+
 	void Clamp();
 	static EulerAngle Clamp(EulerAngle orient);
-	static float Clamp(float radians);
+	static float Clamp(float angle);
 
-	void Interpolate(EulerAngle orientTo, float rate, float radianThreshold);
-	static EulerAngle Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate, float radianThreshold);
-	static float Interpolate(float radiansFrom, float radiansTo, float rate, float radianThreshold);
+	void Interpolate(EulerAngle orientTo, float rate, float epsilon);
+	static EulerAngle Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate, float epsilon);
+	static float Interpolate(float angleFrom, float angleTo, float rate, float epsilon);
 
+	EulerAngle ShortestAngle(EulerAngle orientTo);
 	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
-	static float ShortestAngle(float radiansFrom, float radiansTo);
+	static float ShortestAngle(float angleFrom, float angleTo);
 
 	static float AngleBetweenTwoPoints(Vector3 point0, Vector3 point1);
-
 	static float DeltaHeading(Vector3 origin, Vector3 target, float heading);
+
+	Vector3 ToVector3();
 
 	// Converters
 	static float DegToRad(float degrees);
@@ -71,9 +77,9 @@ inline EulerAngle::EulerAngle()
 	this->Set(0, 0, 0);
 }
 
-inline EulerAngle::EulerAngle(float xRadians, float yRadians, float zRadians)
+inline EulerAngle::EulerAngle(float xAngle, float yAngle, float zAngle)
 {
-	this->Set(xRadians, yRadians, zRadians);
+	this->Set(xAngle, yAngle, zAngle);
 }
 
 inline float EulerAngle::GetX()
@@ -91,36 +97,53 @@ inline float EulerAngle::GetZ()
 	return z;
 }
 
-inline Vector3 EulerAngle::ToVector3()
-{
-	return Vector3(this->GetX(), this->GetY(), this->GetZ());
-}
-
 inline void EulerAngle::Set(EulerAngle orient)
 {
 	*this = Clamp(orient);
 }
 
-inline void EulerAngle::Set(float xRadians, float yRadians, float zRadians)
+inline void EulerAngle::Set(float xAngle, float yAngle, float zAngle)
 {
-	this->SetX(xRadians);
-	this->SetY(yRadians);
-	this->SetZ(zRadians);
+	this->SetX(xAngle);
+	this->SetY(yAngle);
+	this->SetZ(zAngle);
 }
 
-inline void EulerAngle::SetX(float radians = 0.0f)
+inline void EulerAngle::SetX(float angle = 0.0f)
 {
-	this->x = Clamp(radians);
+	this->x = Clamp(angle);
 }
 
-inline void EulerAngle::SetY(float radians = 0.0f)
+inline void EulerAngle::SetY(float angle = 0.0f)
 {
-	this->y = Clamp(radians);
+	this->y = Clamp(angle);
 }
 
-inline void EulerAngle::SetZ(float radians = 0.0f)
+inline void EulerAngle::SetZ(float angle = 0.0f)
 {
-	this->z = Clamp(radians);
+	this->z = Clamp(angle);
+}
+
+inline bool EulerAngle::Compare(EulerAngle orient, float epsilon = 0.0f)
+{
+	return Compare(*this, orient, epsilon);
+}
+
+inline bool EulerAngle::Compare(EulerAngle orient0, EulerAngle orient1, float epsilon = 0.0f)
+{
+	return (Compare(orient0.x, orient1.x, epsilon) && Compare(orient0.y, orient1.y, epsilon) && Compare(orient0.z, orient1.z, epsilon));
+}
+
+inline bool EulerAngle::Compare(float angle0, float angle1, float epsilon = 0.0f)
+{
+	angle0 = Clamp(angle0);
+	angle1 = Clamp(angle1);
+
+	float difference = ShortestAngle(angle0, angle1);
+	if (abs(difference) > epsilon)
+		return false;
+	else
+		return true;
 }
 
 inline void EulerAngle::Clamp()
@@ -136,42 +159,47 @@ inline EulerAngle EulerAngle::Clamp(EulerAngle orient)
 	return orient;
 }
 
-inline float EulerAngle::Clamp(float radians)
+inline float EulerAngle::Clamp(float angle)
 {
-	//if (radians < -M_PI || radians > M_PI)
-	return atan2(sin(radians), cos(radians));
+	//if (angle < -M_PI || angle > M_PI)
+	return atan2(sin(angle), cos(angle));
 	//else
-	//	return radians;
+	//	return angle;
 
 	// Alternative method:
-	/*return (radians > 0) ?
-		fmod(radians + M_PI, M_PI * 2) - M_PI :
-		fmod(radians - M_PI, M_PI * 2) + M_PI;*/
+	/*return (angle > 0) ?
+		fmod(angle + M_PI, M_PI * 2) - M_PI :
+		fmod(angle - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float radianThreshold = 0.0f)
+inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float epsilon = 0.0f)
 {
-	*this = Interpolate(*this, orientTo, rate, radianThreshold);
+	*this = Interpolate(*this, orientTo, rate, epsilon);
 }
 
-inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float radianThreshold = 0.0f)
+inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float epsilon = 0.0f)
 {
 	return EulerAngle(
-		Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, radianThreshold),
-		Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, radianThreshold),
-		Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, radianThreshold)
+		Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, epsilon),
+		Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, epsilon),
+		Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, epsilon)
 	);
 }
 
-inline float EulerAngle::Interpolate(float radiansFrom, float radiansTo, float rate = 1.0f, float radianThreshold = 0.0f)
+inline float EulerAngle::Interpolate(float angleFrom, float angleTo, float rate = 1.0f, float epsilon = 0.0f)
 {
 	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
 
-	float difference = ShortestAngle(radiansFrom, radiansTo);
-	if (abs(difference) > radianThreshold)
-		return Clamp(radiansFrom + (difference * rate));
+	float difference = ShortestAngle(angleFrom, angleTo);
+	if (abs(difference) > epsilon)
+		return Clamp(angleFrom + (difference * rate));
 	else
-		return Clamp(radiansTo);
+		return Clamp(angleTo);
+}
+
+inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientTo)
+{
+	return (orientTo - *this);
 }
 
 inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo)
@@ -179,9 +207,9 @@ inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientFrom, EulerAngle or
 	return (orientTo - orientFrom);
 }
 
-inline float EulerAngle::ShortestAngle(float radiansFrom, float radiansTo)
+inline float EulerAngle::ShortestAngle(float angleFrom, float angleTo)
 {
-	return Clamp(radiansTo - radiansFrom);
+	return Clamp(angleTo - angleFrom);
 }
 
 inline float EulerAngle::AngleBetweenTwoPoints(Vector3 point0, Vector3 point1)
@@ -194,6 +222,11 @@ inline float EulerAngle::DeltaHeading(Vector3 origin, Vector3 target, float head
 {
 	auto difference = AngleBetweenTwoPoints(origin, target);
 	return ShortestAngle(heading, difference + DegToRad(90.0f));
+}
+
+inline Vector3 EulerAngle::ToVector3()
+{
+	return Vector3(this->GetX(), this->GetY(), this->GetZ());
 }
 
 inline float EulerAngle::DegToRad(float degrees)
