@@ -37,10 +37,8 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < WRAITH_COUNT; i++)
 		{
-			wraith->Pose.Position = item->Pose.Position;
-			wraith->Pose.Orientation.z = 0;
-			wraith->Pose.Position.x = 0;
-			wraith->Pose.Position.y = 0;
+			wraith->Position = Vector3Int(0, 0, item->Pose.Position.z);
+			wraith->Velocity.z = 0;
 			wraith->r = 0;
 			wraith->g = 0;
 			wraith->b = 0;
@@ -298,16 +296,11 @@ namespace TEN::Entities::TR4
 		int j = 0;
 		for (int i = WRAITH_COUNT - 1; i > 0; i--)
 		{
-			// TODO: Conversion required?
-			creature[i - 1].Pose.Position.x += (creature[i - 1].Pose.Orientation.x / 16);
-			creature[i - 1].Pose.Position.y += (creature[i - 1].Pose.Orientation.y / 16);
-			creature[i - 1].Pose.Position.z += (creature[i - 1].Pose.Orientation.z / 16);
+			creature[i - 1].Position += (creature[i - 1].Velocity / 16);
+			creature[i - 1].Velocity -= (creature[i - 1].Velocity / 16);
 
-			creature[i - 1].Pose.Orientation.x -= (creature[i - 1].Pose.Orientation.x / 16);
-			creature[i - 1].Pose.Orientation.y -= (creature[i - 1].Pose.Orientation.y / 16);
-			creature[i - 1].Pose.Orientation.z -= (creature[i - 1].Pose.Orientation.z / 16);
-
-			creature[i].Pose = creature[i - 1].Pose;
+			creature[i].Position = creature[i - 1].Position;
+			creature[i].Velocity = creature[i - 1].Velocity;
 
 			if (item->ObjectNumber == ID_WRAITH1)
 			{
@@ -331,29 +324,29 @@ namespace TEN::Entities::TR4
 			j++;
 		}
 
-		creature[0].Pose.Position = item->Pose.Position;
+		creature[0].Position = item->Pose.Position;
 
-		creature[0].Pose.Orientation.x = 4 * (item->Pose.Position.x - oldX);
-		creature[0].Pose.Orientation.y = 4 * (item->Pose.Position.y - oldY);
-		creature[0].Pose.Orientation.z = 4 * (item->Pose.Position.z - oldZ);
+		creature[0].Velocity.x = 4 * (item->Pose.Position.x - oldX);
+		creature[0].Velocity.y = 4 * (item->Pose.Position.y - oldY);
+		creature[0].Velocity.z = 4 * (item->Pose.Position.z - oldZ);
 
 		// Standard WRAITH drawing code
 		DrawWraith(
 			item->Pose.Position.x,
 			item->Pose.Position.y,
 			item->Pose.Position.z,
-			creature[0].Pose.Orientation.x,
-			creature[0].Pose.Orientation.y,
-			creature[0].Pose.Orientation.z,
+			creature[0].Velocity.x,
+			creature[0].Velocity.y,
+			creature[0].Velocity.z,
 			item->ObjectNumber);
 
 		DrawWraith(
 			(oldX + item->Pose.Position.x) / 2,
 			(oldY + item->Pose.Position.y) / 2,
 			(oldZ + item->Pose.Position.z) / 2,
-			creature[0].Pose.Orientation.x,
-			creature[0].Pose.Orientation.y,
-			creature[0].Pose.Orientation.z,
+			creature[0].Velocity.x,
+			creature[0].Velocity.y,
+			creature[0].Velocity.z,
 			item->ObjectNumber);
 
 		// Lighting for WRAITH
@@ -372,9 +365,9 @@ namespace TEN::Entities::TR4
 		}
 
 		TriggerDynamicLight(
-			creature[0].Pose.Position.x,
-			creature[0].Pose.Position.y,
-			creature[0].Pose.Position.z,
+			creature[0].Position.x,
+			creature[0].Position.y,
+			creature[0].Position.z,
 			16,
 			r, g, b);
 	}

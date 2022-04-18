@@ -3014,8 +3014,8 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < 7; i++)
 			{
-				Vector3 p1 = Vector3(info[i].Pose.Position.x, info[i].Pose.Position.y, info[i].Pose.Position.z);
-				Vector3 p2 = Vector3(info[i + 1].Pose.Position.x, info[i + 1].Pose.Position.y, info[i + 1].Pose.Position.z);
+				Vector3 p1 = Vector3(info[i].Position.x, info[i].Position.y, info[i].Position.z);
+				Vector3 p2 = Vector3(info[i + 1].Position.x, info[i + 1].Position.y, info[i + 1].Position.z);
 
 				addLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}
