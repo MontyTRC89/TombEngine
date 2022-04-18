@@ -72,11 +72,7 @@ LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lu
 {
 #if TEN_OPTIONAL_LUA
 	ResetLevelTables();
-
-	MakeSpecialTable(m_handler.GetState(), ScriptReserved_GameVars, &GetVariable, &SetVariable);
-	m_handler.GetState()->new_enum<GAME_OBJECT_ID>("Object", {
-		{"LARA", ID_LARA}
-		});
+	ResetGameTables();
 #endif
 }
 
@@ -360,7 +356,7 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 void LogicHandler::ResetVariables()
 {
 #if TEN_OPTIONAL_LUA
-	(*m_handler.GetState())["Lara"] = NULL;
+	(*m_handler.GetState())["Lara"] = nullptr;
 #endif
 }
 

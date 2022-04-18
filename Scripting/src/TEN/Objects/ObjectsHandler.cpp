@@ -151,7 +151,6 @@ void ObjectsHandler::TestCollidingObjects()
 	}
 }
 
-//todo document "Lara" obj
 void ObjectsHandler::AssignLara()
 {
 #if TEN_OPTIONAL_LUA
