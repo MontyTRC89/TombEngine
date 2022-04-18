@@ -6,7 +6,7 @@
 #include "Flow/InventoryItem/InventoryItem.h"
 #include "InventorySlots.h"
 #include "Game/gui.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 /***
@@ -110,7 +110,7 @@ Specify which translations in the strings table correspond to which languages.
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
-	Position::Register(parent);
+	Vec3::Register(parent);
 	Level::Register(table_flow);
 	SkyLayer::Register(table_flow);
 	Mirror::Register(table_flow);

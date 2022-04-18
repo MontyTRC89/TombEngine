@@ -9,7 +9,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Game/control/lot.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "Rotation/Rotation.h"
 #include "Specific/trmath.h"
 #include "Objects/ObjectsHandler.h"
@@ -69,7 +69,7 @@ most can just be set to zero (see usage).
 	@function Moveable.New
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
-	@tparam Position position position in level
+	@tparam Vec3 position position in level
 	@tparam Rotation rotation rotation about x, y, and z axes (default Rotation.new(0, 0, 0))
 	@tparam int room room ID item is in
 	@tparam int animNumber anim number (default 0)
@@ -82,7 +82,7 @@ most can just be set to zero (see usage).
 	local item = Moveable.New(
 		TEN.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Position.new(18907, 0, 21201),
+		Vec3.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
 		0, -- room
 		0, -- animNumber
@@ -99,7 +99,7 @@ std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
 	std::string const & name,
-	Position const & pos,
+	Vec3 const & pos,
 	TypeOrNil<Rotation> const & rot,
 	short room,
 	TypeOrNil<int> animNumber,
@@ -325,7 +325,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Get the object's position
 // @function Moveable:GetPosition
-// @treturn Position a copy of the moveable's position
+// @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
 /// Set the moveable's position
@@ -333,7 +333,7 @@ void Moveable::Register(sol::table & parent)
 // (e.g. a BADDY1, which uses it for pathfinding), then you *must* use this in conjunction
 // with @{Moveable:SetRoom}. Otherwise, said moveable will not behave correctly.
 // @function Moveable:SetPosition
-// @tparam Position position the new position of the moveable 
+// @tparam Vec3 position the new position of the moveable 
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
 /// Get the moveable's rotation
@@ -481,12 +481,12 @@ bool Moveable::SetName(std::string const & id)
 	return true;
 }
 
-Position Moveable::GetPos() const
+Vec3 Moveable::GetPos() const
 {
-	return Position(m_item->pos	);
+	return Vec3(m_item->pos	);
 }
 
-void Moveable::SetPos(Position const& pos)
+void Moveable::SetPos(Vec3 const& pos)
 {
 	pos.StoreInPHDPos(m_item->pos);
 }

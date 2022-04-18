@@ -4,7 +4,7 @@
 #if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Sink.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
@@ -28,12 +28,12 @@ void Sink::Register(sol::table& parent)
 
 		/// Get the sink's position
 		// @function GetPosition
-		// @treturn Position a copy of the sink's position
+		// @treturn Vec3 a copy of the sink's position
 		ScriptReserved_GetPosition, &Sink::GetPos,
 
 		/// Set the sink's position
 		// @function SetPosition
-		// @tparam Position position the new position of the sink 
+		// @tparam Vec3 position the new position of the sink 
 		ScriptReserved_SetPosition, &Sink::SetPos,
 
 		/// Get the sink's unique string identifier
@@ -60,12 +60,12 @@ void Sink::Register(sol::table& parent)
 		);
 }
 
-Position Sink::GetPos() const
+Vec3 Sink::GetPos() const
 {
-	return Position{ m_sink.x, m_sink.y, m_sink.z };
+	return Vec3{ m_sink.x, m_sink.y, m_sink.z };
 }
 
-void Sink::SetPos(Position const& pos)
+void Sink::SetPos(Vec3 const& pos)
 {
 	m_sink.x = pos.x;
 	m_sink.y = pos.y;
