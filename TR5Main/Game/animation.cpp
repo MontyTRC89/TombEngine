@@ -585,15 +585,15 @@ void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex)
 	pos->z = pos2.z;
 }
 
-void ClampRotation(PoseData* pos, short angle, short rotation)
+void ClampRotation(PoseData* pose, float angle, float rotation)
 {
 	if (angle <= rotation)
 	{
 		if (angle >= -rotation)
-			pos->Orientation.y += angle;
+			pose->Orientation.SetY(pose->Orientation.GetY() + angle);
 		else
-			pos->Orientation.y -= rotation;
+			pose->Orientation.SetY(pose->Orientation.GetY() - angle);
 	}
 	else
-		pos->Orientation.y += rotation;
+		pose->Orientation.SetY(pose->Orientation.GetY() - angle);
 }

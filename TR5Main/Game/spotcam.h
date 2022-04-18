@@ -21,8 +21,8 @@ struct SPOTCAM
 	int tz;
 	unsigned char sequence;
 	unsigned char camera;
-	short fov;
-	short roll;
+	float fov;
+	float roll;
 	short timer;
 	short speed;
 	short flags;

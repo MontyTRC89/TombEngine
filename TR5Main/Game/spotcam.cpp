@@ -21,7 +21,7 @@ int SpotcamLoopCnt;
 int CameraFade;
 Vector3Int LaraFixedPosition;
 int InitialCameraRoom;
-int LastFOV;
+float LastFOV;
 Vector3Int InitialCameraPosition;
 Vector3Int InitialCameraTarget;
 int CurrentSplinePosition;
@@ -389,8 +389,8 @@ void CalculateSpotCameras()
 	cty = Spline(CurrentSplinePosition, &CameraYtarget[1], spline_cnt);
 	ctz = Spline(CurrentSplinePosition, &CameraZtarget[1], spline_cnt);
 	cspeed = Spline(CurrentSplinePosition, &CameraSpeed[1], spline_cnt);
-	croll = Spline(CurrentSplinePosition, &CameraRoll[1], spline_cnt);
-	cfov = Spline(CurrentSplinePosition, &CameraFOV[1], spline_cnt);
+	croll = Spline(CurrentSplinePosition, &CameraRoll[1], spline_cnt); // TODO
+	cfov = Spline(CurrentSplinePosition, &CameraFOV[1], spline_cnt); // TODO
 
 	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN) &&
 		CameraFade != CurrentSplineCamera)

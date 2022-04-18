@@ -202,9 +202,7 @@ namespace TEN::Entities::Generic
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int oldX = item->Pose.Position.x;
-		int oldY = item->Pose.Position.y;
-		int oldZ = item->Pose.Position.z;
+		auto oldPos = item->Pose.Position;
 
 		if (item->Animation.VerticalVelocity)
 			item->Pose.Orientation.z += EulerAngle::DegToRad(5);
@@ -233,7 +231,7 @@ namespace TEN::Entities::Generic
 
 		item->Pose.Position.y += item->Animation.VerticalVelocity;
 
-		DoProjectileDynamics(itemNumber, oldX, oldY, oldZ, xv, item->Animation.VerticalVelocity, zv);
+		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xv, item->Animation.VerticalVelocity, zv);
 
 		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, 0))
 		{
@@ -308,7 +306,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			short rot = torchItem->Pose.Orientation.y;
+			float rot = torchItem->Pose.Orientation.y;
 
 			switch (torchItem->ObjectNumber)
 			{

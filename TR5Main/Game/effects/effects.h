@@ -110,7 +110,7 @@ struct SPARKS
 	short yVel;
 	short zVel;
 	short gravity;
-	short rotAng;
+	float rotAng;
 	unsigned short flags; // SP_enum
 	float sSize;
 	float dSize;
@@ -118,7 +118,7 @@ struct SPARKS
 	unsigned char friction;
 	unsigned char scalar;
 	unsigned char def;
-	signed char rotAdd;
+	float rotAdd;
 	signed char maxYvel;
 	bool on;
 	byte sR;

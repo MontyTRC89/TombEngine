@@ -31,7 +31,7 @@ static bool TryModifyingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, int 
 	if (-1 == arrayPos)
 		return false;
 
-	ConsumablePickupInfo info = kConsumables[arrayPos];
+	auto info = kConsumables[arrayPos];
 
 	if (lara.Inventory.*(info.Count) != -1)
 	{
@@ -59,7 +59,7 @@ std::optional<int> GetConsumableCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 	if (-1 == arrayPos)
 		return std::nullopt;
 
-	ConsumablePickupInfo info = kConsumables[arrayPos];
+	auto info = kConsumables[arrayPos];
 
 	return lara.Inventory.*(info.Count);
 }

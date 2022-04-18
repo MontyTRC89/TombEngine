@@ -40,13 +40,13 @@ struct LOTInfo
 	int Head;
 	int Tail;
 
-	int SearchNumber;
-	int BlockMask;
+	int   SearchNumber;
+	int   BlockMask;
 	short Step;
 	short Drop;
 	short ZoneCount;
-	int TargetBox;
-	int RequiredBox;
+	int   TargetBox;
+	int   RequiredBox;
 	short Fly;
 
 	bool CanJump;
@@ -56,7 +56,7 @@ struct LOTInfo
 	bool IsAmphibious;
 
 	Vector3Int Target;
-	ZoneType Zone;
+	ZoneType   Zone;
 };
 
 enum class MoodType 
@@ -79,10 +79,10 @@ struct CreatureInfo
 {
 	short ItemNumber;
 
-	float MaxTurn;
+	float  MaxTurn;
 	float JointRotation[4];
-	bool HeadLeft;
-	bool HeadRight;
+	bool   HeadLeft;
+	bool   HeadRight;
 
 	bool Patrol;			// Unused?
 	bool Alerted;

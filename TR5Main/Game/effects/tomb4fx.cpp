@@ -301,7 +301,8 @@ void UpdateFireSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
+				spark->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF);
+
 			float alpha = fmin(1, fmax(0, 1 - (spark->life / (float)spark->sLife)));
 			int sprite = lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex+ (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
 			spark->def = sprite;
@@ -418,7 +419,7 @@ void UpdateSmoke()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
+				spark->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF);
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
@@ -727,7 +728,7 @@ void UpdateBlood()
 				blood->shade = blood->sShade + ((blood->dShade - blood->sShade) * (((blood->sLife - blood->life) << 16) / blood->colFadeSpeed) >> 16);
 			}
 			
-			blood->rotAng = (blood->rotAng + blood->rotAdd) & 0xFFF;
+			blood->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(blood->rotAng + blood->rotAdd) & 0xFFF); // TODO
 			blood->yVel += blood->gravity;
 						
 			if (blood->friction & 0xF)
@@ -1333,7 +1334,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(PoseData* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags)
+void TriggerShockwave(PoseData* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, float angle, short flags)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;

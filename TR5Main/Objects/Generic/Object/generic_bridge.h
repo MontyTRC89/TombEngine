@@ -7,7 +7,7 @@
 using namespace TEN::Floordata;
 
 void InitialiseBridge(short itemNumber);
-int GetOffset(short angle, int x, int z);
+int GetOffset(float angle, int x, int z);
 
 template <int tilt>
 std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)

@@ -733,7 +733,7 @@ namespace TEN::Renderer
 	{
 		for (auto i = footprints.begin(); i != footprints.end(); i++) 
 		{
-			FOOTPRINT_STRUCT& footprint = *i;
+			FootprintData& footprint = *i;
 			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)

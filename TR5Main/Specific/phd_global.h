@@ -4,24 +4,29 @@
 class EulerAngle
 {
 public:
+	// Components (TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make them private?)
 	float x;
 	float y;
 	float z;
 
+	// Constructors
 	EulerAngle();
 	EulerAngle(float xRadians, float yRadians, float zRadians);
 
-	float GetX();
-	float GetY();
-	float GetZ();
+	// Getters
+	float   GetX();
+	float   GetY();
+	float   GetZ();
 	Vector3 ToVector3();
 
+	// Setters
 	void Set(EulerAngle orient);
 	void Set(float xRadians, float yRadians, float zRadians);
 	void SetX(float radians);
 	void SetY(float radians);
 	void SetZ(float radians);
 
+	// Utilities
 	void Clamp();
 	static EulerAngle Clamp(EulerAngle orient);
 	static float Clamp(float radians);
@@ -37,30 +42,28 @@ public:
 
 	static float DeltaHeading(Vector3 origin, Vector3 target, float heading);
 
+	// Converters
 	static float DegToRad(float degrees);
 	static float RadToDeg(float radians);
 	static float ShrtToRad(short shortForm); // Temporary legacy short form support for particularly cryptic code.
 	static short DegToShrt(float degrees);
 	static short RadToShrt(float radians);
 
+	// Operators
 	bool operator ==(EulerAngle orient);
 	bool operator !=(EulerAngle orient);
+
 	EulerAngle operator +(EulerAngle orient);
 	EulerAngle operator -(EulerAngle orient);
 	EulerAngle operator *(EulerAngle orient);
 	EulerAngle operator *(float value);
 	EulerAngle operator /(float value);
+
 	EulerAngle& operator +=(EulerAngle orient);
 	EulerAngle& operator -=(EulerAngle orient);
 	EulerAngle& operator *=(EulerAngle orient);
 	EulerAngle& operator *=(float value);
 	EulerAngle& operator /=(float value);
-
-private:
-	// TODO: Due to clamping requirements, the components should be private?
-	/*float x;
-	float y;
-	float z;*/
 };
 
 inline EulerAngle::EulerAngle()
@@ -314,37 +317,37 @@ struct Vector3Int
 	int y;
 	int z;
 	
-	bool operator ==(Vector3Int pos)
+	bool operator ==(Vector3Int vector)
 	{
-		return (x == pos.x && y == pos.y && z == pos.z);
+		return (x == vector.x && y == vector.y && z == vector.z);
 	}
 	
-	bool operator !=(Vector3Int pos)
+	bool operator !=(Vector3Int vector)
 	{
-		return (x != pos.x || y != pos.y || z != pos.z);
+		return (x != vector.x || y != vector.y || z != vector.z);
 	}
 
-	Vector3Int operator =(Vector3Int pos)
+	Vector3Int operator =(Vector3Int vector)
 	{
-		this->x = pos.x;
-		this->y = pos.y;
-		this->z = pos.z;
+		this->x = vector.x;
+		this->y = vector.y;
+		this->z = vector.z;
 		return *this;
 	}
 
-	Vector3Int operator +(Vector3Int pos)
+	Vector3Int operator +(Vector3Int vector)
 	{
-		return Vector3Int(x + pos.x, y + pos.y, z + pos.z);
+		return Vector3Int(x + vector.x, y + vector.y, z + vector.z);
 	}
 
-	Vector3Int operator -(Vector3Int pos)
+	Vector3Int operator -(Vector3Int vector)
 	{
-		return Vector3Int(x - pos.x, y - pos.y, z - pos.z);
+		return Vector3Int(x - vector.x, y - vector.y, z - vector.z);
 	}
 
-	Vector3Int operator *(Vector3Int pos)
+	Vector3Int operator *(Vector3Int vector)
 	{
-		return Vector3Int(x * pos.x, y * pos.y, z * pos.z);
+		return Vector3Int(x * vector.x, y * vector.y, z * vector.z);
 	}
 	
 	Vector3Int operator *(float value)
@@ -357,21 +360,21 @@ struct Vector3Int
 		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
 	}
 
-	Vector3Int& operator +=(const Vector3Int pos)
+	Vector3Int& operator +=(const Vector3Int vector)
 	{
-		*this = *this + pos;
+		*this = *this + vector;
 		return *this;
 	}
 
-	Vector3Int& operator -=(Vector3Int pos)
+	Vector3Int& operator -=(Vector3Int vector)
 	{
-		*this = *this - pos;
+		*this = *this - vector;
 		return *this;
 	}
 
-	Vector3Int& operator *=(Vector3Int pos)
+	Vector3Int& operator *=(Vector3Int vector)
 	{
-		*this = *this * pos;
+		*this = *this * vector;
 		return *this;
 	}
 	

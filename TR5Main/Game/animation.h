@@ -91,6 +91,6 @@ BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);
 void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex);
 void GetJointAbsPosition(ITEM_INFO* item, Vector3Int* vec, int joint);
 
-void ClampRotation(PoseData* pos, short angle, short rotation); 
+void ClampRotation(PoseData* pose, float angle, float rotation);
 
 void DrawAnimatingItem(ITEM_INFO* item);

@@ -10,7 +10,7 @@ void InitialiseBridge(short itemNumber)
 	UpdateBridgeItem(itemNumber);
 }
 
-int GetOffset(short angle, int x, int z)
+int GetOffset(float angle, int x, int z)
 {
 	const auto point = GetSectorPoint(x, z);
 	auto vector = Vector2(point.x, point.y);

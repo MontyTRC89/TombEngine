@@ -40,7 +40,7 @@ static bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount
 	if (-1 == arrayPos)
 		return false;
 
-	AmmoPickupInfo info = kAmmo[arrayPos];
+	auto info = kAmmo[arrayPos];
 
 	auto currentAmmo = lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType];
 	if (!currentAmmo.hasInfinite())
@@ -70,7 +70,7 @@ std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 	if (-1 == arrayPos)
 		return std::nullopt;
 
-	AmmoPickupInfo info = kAmmo[arrayPos];
+	auto info = kAmmo[arrayPos];
 
 	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].hasInfinite())
 		return lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].getCount();

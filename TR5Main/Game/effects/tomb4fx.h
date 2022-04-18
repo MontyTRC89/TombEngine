@@ -15,7 +15,7 @@ struct SMOKE_SPARKS
 	short yVel;
 	short zVel;
 	short gravity;
-	short rotAng;
+	float rotAng;
 	short flags;
 	byte sSize;
 	byte dSize;
@@ -23,7 +23,7 @@ struct SMOKE_SPARKS
 	byte friction;
 	byte scalar;
 	byte def;
-	signed char rotAdd;
+	float rotAdd;
 	signed char maxYvel;
 	byte on;
 	byte sShade;
@@ -52,7 +52,7 @@ struct SHOCKWAVE_STRUCT
 	int z;
 	short innerRad;
 	short outerRad;
-	short xRot;
+	float xRot;
 	short flags;
 	unsigned char r;
 	unsigned char g;
@@ -69,7 +69,7 @@ struct GUNSHELL_STRUCT
 	short roomNumber;
 	short speed;
 	short counter;
-	short dirXrot;
+	float dirXrot;
 	short objectNumber;
 };
 
@@ -109,7 +109,7 @@ struct FIRE_SPARKS
 	short yVel;
 	short zVel;
 	short gravity;
-	short rotAng;
+	float rotAng;
 	short flags;
 	unsigned char sSize;
 	unsigned char dSize;
@@ -117,7 +117,7 @@ struct FIRE_SPARKS
 	unsigned char friction;
 	unsigned char scalar;
 	unsigned char def;
-	signed char rotAdd;
+	float rotAdd;
 	signed char maxYvel;
 	unsigned char on;
 	unsigned char sR;
@@ -144,12 +144,12 @@ struct BLOOD_STRUCT
 	short yVel;
 	short zVel;
 	short gravity;
-	short rotAng;
+	float rotAng;
 	unsigned char sSize;
 	unsigned char dSize;
 	unsigned char size;
 	unsigned char friction;
-	byte rotAdd;
+	float rotAdd;
 	unsigned char on;
 	unsigned char sShade;
 	unsigned char dShade;
@@ -233,7 +233,7 @@ constexpr auto EXPLODE_NORMAL = 256;
 int ExplodingDeath(short itemNumber, int meshBits, short flags); // EXPLODE_ flags
 
 int GetFreeShockwave();
-void TriggerShockwave(PoseData* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
+void TriggerShockwave(PoseData* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, float angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);

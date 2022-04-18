@@ -224,7 +224,7 @@ void UpdateSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
+				spark->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF); // TODO
 
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)

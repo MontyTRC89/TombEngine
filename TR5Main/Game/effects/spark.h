@@ -3,15 +3,19 @@
 #include <SimpleMath.h>
 #include "Specific/phd_global.h"
 
-namespace TEN {
-	namespace Effects {
-		namespace Spark {
-			struct SparkParticle {
-				DirectX::SimpleMath::Vector3 pos;
-				DirectX::SimpleMath::Vector3 velocity;
-				DirectX::SimpleMath::Vector4 sourceColor;
-				DirectX::SimpleMath::Vector4 destinationColor;
-				DirectX::SimpleMath::Vector4 color;
+namespace TEN
+{
+	namespace Effects
+	{
+		namespace Spark
+		{
+			struct SparkParticle
+			{
+				Vector3 pos;
+				Vector3 velocity;
+				Vector4 sourceColor;
+				Vector4 destinationColor;
+				Vector4 color;
 				int room;
 				float gravity;
 				float friction;
@@ -25,8 +29,8 @@ namespace TEN {
 			extern std::array<SparkParticle,64> SparkParticles;
 			void UpdateSparkParticles();
 			SparkParticle& getFreeSparkParticle();
-			void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int room);
-			void TriggerRicochetSpark(GameVector* pos, short angle, int num);
+			void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* velocity, CVECTOR* color, int room);
+			void TriggerRicochetSpark(GameVector* pos, float angle, int num);
 		}
 	}
 }

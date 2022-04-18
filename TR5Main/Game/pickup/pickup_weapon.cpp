@@ -46,7 +46,7 @@ static bool TryModifyWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID, int ammoAmo
 	if (-1 == arrayPos)
 		return false;
 
-	WeaponPickupInfo info = kWeapons[arrayPos];
+	auto info = kWeapons[arrayPos];
 
 	// Set the SelectedAmmo type to WeaponAmmoType::Ammo1 (0) if adding the weapon for the first time.
 	// Note that this refers to the index of the weapon's ammo array, and not the weapon's actual ammunition count.
@@ -77,6 +77,6 @@ std::optional<bool> HasWeapon(LaraInfo& lara, GAME_OBJECT_ID objectID)
 	if (-1 == arrPos)
 		return std::nullopt;
 
-	WeaponPickupInfo info = kWeapons[arrPos];
+	auto info = kWeapons[arrPos];
 	return lara.Weapons[(int)info.LaraWeaponType].Present;
 }
