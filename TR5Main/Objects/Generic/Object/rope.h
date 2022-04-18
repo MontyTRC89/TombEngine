@@ -42,7 +42,7 @@ namespace TEN::Entities::Generic
 	int DotProduct(Vector3Int* u, Vector3Int* v);
 	void ScaleVector(Vector3Int* src, int c, Vector3Int* dest);
 	void CrossProduct(Vector3Int* u, Vector3Int* v, Vector3Int* dest);
-	void phd_GetMatrixAngles(int* array, short* angle);
+	void phd_GetMatrixAngles(int* array, float* angle);
 	void RopeControl(short itemNumber);
 	void RopeCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll);
 	void RopeDynamics(ROPE_STRUCT* rope);

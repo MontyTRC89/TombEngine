@@ -1159,15 +1159,15 @@ struct RopeControlData
 {
 	byte Segment;
 	byte Direction;
-	short ArcFront;
-	short ArcBack;
-	short LastX;
-	short MaxXForward;
-	short MaxXBackward;
+	float ArcFront;
+	float ArcBack;
+	float LastX;
+	float MaxXForward;
+	float MaxXBackward;
 	int DFrame;
 	int Frame;
-	unsigned short FrameRate;
-	unsigned short Y;
+	unsigned int FrameRate;
+	float Y;
 	int Ptr;
 	int Offset;
 	int DownVel;
