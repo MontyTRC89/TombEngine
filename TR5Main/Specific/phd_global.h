@@ -23,90 +23,80 @@ struct Vector3Int
 	int x;
 	int y;
 	int z;
-	
-	bool operator ==(Vector3Int pos)
+
+	bool operator ==(Vector3Int vector)
 	{
-		return (x == pos.x && y == pos.y && z == pos.z);
-	}
-	
-	bool operator !=(Vector3Int pos)
-	{
-		return (x != pos.x || y != pos.y || z != pos.z);
+		return (x == vector.x && y == vector.y && z == vector.z);
 	}
 
-	Vector3Int operator =(Vector3Int pos)
+	bool operator !=(Vector3Int vector)
 	{
-		this->x = pos.x;
-		this->y = pos.y;
-		this->z = pos.z;
+		return (x != vector.x || y != vector.y || z != vector.z);
+	}
+
+	Vector3Int operator =(Vector3Int vector)
+	{
+		this->x = vector.x;
+		this->y = vector.y;
+		this->z = vector.z;
 		return *this;
 	}
 
-	Vector3Int operator +(Vector3Int pos)
+	Vector3Int operator +(Vector3Int vector)
 	{
-		return Vector3Int(x + pos.x, y + pos.y, z + pos.z);
+		return Vector3Int(x + vector.x, y + vector.y, z + vector.z);
 	}
 
-	Vector3Int operator -(Vector3Int pos)
+	Vector3Int operator -(Vector3Int vector)
 	{
-		return Vector3Int(x - pos.x, y - pos.y, z - pos.z);
+		return Vector3Int(x - vector.x, y - vector.y, z - vector.z);
 	}
 
-	Vector3Int operator *(Vector3Int pos)
+	Vector3Int operator *(Vector3Int vector)
 	{
-		return Vector3Int(x * pos.x, y * pos.y, z * pos.z);
+		return Vector3Int(x * vector.x, y * vector.y, z * vector.z);
 	}
-	
+
 	Vector3Int operator *(float value)
 	{
 		return Vector3Int((int)round(x * value), (int)round(y * value), (int)round(z * value));
 	}
 
-	Vector3Int operator /(Vector3Int pos)
+	Vector3Int operator /(float value)
 	{
-		return Vector3Int((int)round(x / pos.x), (int)round(y / pos.y), (int)round(z / pos.z));
+		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
 	}
 
-	Vector3Int& operator +=(const Vector3Int pos)
+	Vector3Int& operator +=(const Vector3Int vector)
 	{
-		this->x += pos.x;
-		this->y += pos.y;
-		this->z += pos.z;
+		*this = *this + vector;
 		return *this;
 	}
 
-	Vector3Int& operator -=(Vector3Int pos)
+	Vector3Int& operator -=(Vector3Int vector)
 	{
-		this->x -= pos.x;
-		this->y -= pos.y;
-		this->z -= pos.z;
+		*this = *this - vector;
 		return *this;
 	}
 
-	Vector3Int& operator *=(Vector3Int pos)
+	Vector3Int& operator *=(Vector3Int vector)
 	{
-		this->x *= pos.x;
-		this->y *= pos.y;
-		this->z *= pos.z;
+		*this = *this * vector;
 		return *this;
 	}
-	
+
 	Vector3Int& operator *=(float value)
 	{
-		this->x = (int)round(x * value);
-		this->y = (int)round(y * value);
-		this->z = (int)round(z * value);
+		*this = *this * value;
 		return *this;
 	}
 
 	Vector3Int& operator /=(float value)
 	{
-		this->x = (int)round(x / value);
-		this->y = (int)round(y / value);
-		this->z = (int)round(z / value);
+		*this = *this / value;
 		return *this;
 	}
-	
+
 	Vector3Int()
 	{
 		this->x = 0;
@@ -133,77 +123,76 @@ struct Vector3Shrt
 	short y;
 	short z;
 
-	bool operator ==(Vector3Shrt orient)
+	bool operator ==(Vector3Shrt vector)
 	{
-		return (x == orient.x && y == orient.y && z == orient.z);
+		return (x == vector.x && y == vector.y && z == vector.z);
 	}
 
-	bool operator !=(Vector3Shrt orient)
+	bool operator !=(Vector3Shrt vector)
 	{
-		return (x != orient.x || y != orient.y || z != orient.z);
+		return (x != vector.x || y != vector.y || z != vector.z);
 	}
 
-	Vector3Shrt operator =(Vector3Shrt orient)
+	Vector3Shrt operator =(Vector3Shrt vector)
 	{
-		this->x = orient.x;
-		this->y = orient.y;
-		this->z = orient.z;
+		this->x = vector.x;
+		this->y = vector.y;
+		this->z = vector.z;
 		return *this;
 	}
 
-	Vector3Shrt operator +(Vector3Shrt orient)
+	Vector3Shrt operator +(Vector3Shrt vector)
 	{
-		return Vector3Shrt(x + orient.x, y + orient.y, z + orient.z);
+		return Vector3Shrt(x + vector.x, y + vector.y, z + vector.z);
 	}
 
-	Vector3Shrt operator -(Vector3Shrt orient)
+	Vector3Shrt operator -(Vector3Shrt vector)
 	{
-		return Vector3Shrt(x - orient.x, y - orient.y, z - orient.z);
+		return Vector3Shrt(x - vector.x, y - vector.y, z - vector.z);
 	}
 
-	Vector3Shrt operator *(Vector3Shrt orient)
+	Vector3Shrt operator *(Vector3Shrt vector)
 	{
-		return Vector3Shrt(x * orient.x, y * orient.y, z * orient.z);
+		return Vector3Shrt(x * vector.x, y * vector.y, z * vector.z);
 	}
 
 	Vector3Shrt operator *(float value)
 	{
-		return Vector3Shrt(x * value, y * value, z * value);
-	}
-	Vector3Shrt operator /(Vector3Shrt orient)
-	{
-		return Vector3Shrt((short)round(x / orient.x), (short)round(y / orient.y), (short)round(z / orient.z));
+		return Vector3Shrt((short)round(x * value), (short)round(y * value), (short)round(z * value));
 	}
 
-	Vector3Shrt& operator +=(Vector3Shrt orient)
+	Vector3Shrt operator /(float value)
 	{
-		this->x += orient.x;
-		this->y += orient.y;
-		this->z += orient.z;
+		return Vector3Shrt((short)round(x / value), (short)round(y / value), (short)round(z / value));
+	}
+
+	Vector3Shrt& operator +=(const Vector3Shrt vector)
+	{
+		*this = *this + vector;
 		return *this;
 	}
 
-	Vector3Shrt& operator -=(Vector3Shrt orient)
+	Vector3Shrt& operator -=(Vector3Shrt vector)
 	{
-		this->x -= orient.x;
-		this->y -= orient.y;
-		this->z -= orient.z;
+		*this = *this - vector;
+		return *this;
+	}
+
+	Vector3Shrt& operator *=(Vector3Shrt vector)
+	{
+		*this = *this * vector;
 		return *this;
 	}
 
 	Vector3Shrt& operator *=(float value)
 	{
-		this->x = (short)round(x * value);
-		this->y = (short)round(y * value);
-		this->z = (short)round(z * value);
+		*this = *this * value;
 		return *this;
 	}
 
 	Vector3Shrt& operator /=(float value)
 	{
-		this->x = (short)round(x / value);
-		this->y = (short)round(y / value);
-		this->z = (short)round(z / value);
+		*this = *this / value;
 		return *this;
 	}
 
@@ -238,30 +227,40 @@ struct PHD_3DPOS
 		this->Orientation = Vector3Shrt();
 	}
 
+	PHD_3DPOS(Vector3Int pos)
+	{
+		this->Position = pos;
+		this->Orientation = Vector3Shrt();
+	}
+
 	PHD_3DPOS(int xPos, int yPos, int zPos)
 	{
-		this->Position.x = xPos;
-		this->Position.y = yPos;
-		this->Position.z = zPos;
+		this->Position = Vector3Int(xPos, yPos, zPos);
 		this->Orientation = Vector3Shrt();
+	}
+
+	PHD_3DPOS(Vector3Shrt orient)
+	{
+		this->Position = Vector3Int();
+		this->Orientation = orient;
 	}
 
 	PHD_3DPOS(short xOrient, short yOrient, short zOrient)
 	{
 		this->Position = Vector3Int();
-		this->Orientation.x = xOrient;
-		this->Orientation.y = yOrient;
-		this->Orientation.z = zOrient;
+		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
+	}
+
+	PHD_3DPOS(Vector3Int pos, Vector3Shrt orient)
+	{
+		this->Position = pos;
+		this->Orientation = orient;
 	}
 
 	PHD_3DPOS(int xPos, int yPos, int zPos, short xOrient, short yOrient, short zOrient)
 	{
-		this->Position.x = xPos;
-		this->Position.y = yPos;
-		this->Position.z = zPos;
-		this->Orientation.x = xOrient;
-		this->Orientation.y = yOrient;
-		this->Orientation.z = zOrient;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
 	}
 };
 
