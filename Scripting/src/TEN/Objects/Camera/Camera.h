@@ -6,7 +6,7 @@
 namespace sol {
 	class state;
 }
-class Position;
+class Vec3;
 
 class Camera : public NamedBase<Camera, LEVEL_CAMERA_INFO &>
 {
@@ -19,8 +19,8 @@ public:
 	Camera(Camera const& other) = delete;
 
 	static void Register(sol::table &);
-	Position GetPos() const;
-	void SetPos(Position const& pos);
+	Vec3 GetPos() const;
+	void SetPos(Vec3 const& pos);
 
 	short GetRoom() const;
 	void SetRoom(short room);

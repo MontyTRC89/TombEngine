@@ -3,7 +3,7 @@
 #if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "SoundSource.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
@@ -27,12 +27,12 @@ void SoundSource::Register(sol::table & parent)
 		
 		/// Get the sound source's position
 		// @function GetPosition
-		// @treturn Position a copy of the sound source's position
+		// @treturn Vec3 a copy of the sound source's position
 		ScriptReserved_GetPosition, &SoundSource::GetPos,
 
 		/// Set the sound source's position
 		// @function SetPosition
-		// @tparam Position position the new position of the sound source 
+		// @tparam Vec3 position the new position of the sound source 
 		ScriptReserved_SetPosition, &SoundSource::SetPos,
 
 		/// Get the sound source's unique string identifier
@@ -58,12 +58,12 @@ void SoundSource::Register(sol::table & parent)
 	);
 }
 
-Position SoundSource::GetPos() const
+Vec3 SoundSource::GetPos() const
 {
-	return Position{ m_soundSource.x, m_soundSource.y, m_soundSource.z };
+	return Vec3{ m_soundSource.x, m_soundSource.y, m_soundSource.z };
 }
 
-void SoundSource::SetPos(Position const& pos)
+void SoundSource::SetPos(Vec3 const& pos)
 {
 	m_soundSource.x = pos.x;
 	m_soundSource.y = pos.y;

@@ -3,7 +3,7 @@
 #if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Static.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "Rotation/Rotation.h"
 #include "Color/Color.h"
 #include "ScriptUtil.h"
@@ -29,12 +29,12 @@ void Static::Register(sol::table & parent)
 
 		/// Get the static's position
 		// @function GetPosition
-		// @treturn Position a copy of the static's position
+		// @treturn Vec3 a copy of the static's position
 		ScriptReserved_GetPosition, &Static::GetPos,
 
 		/// Set the static's position
 		// @function SetPosition
-		// @tparam Position position the new position of the static 
+		// @tparam Vec3 position the new position of the static 
 		ScriptReserved_SetPosition, &Static::SetPos,
 
 		/// Get the static's rotation
@@ -79,12 +79,12 @@ void Static::Register(sol::table & parent)
 		ScriptReserved_SetColor, &Static::SetColor);
 }
 
-Position Static::GetPos() const
+Vec3 Static::GetPos() const
 {
-	return Position{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
+	return Vec3{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
 }
 
-void Static::SetPos(Position const& pos)
+void Static::SetPos(Vec3 const& pos)
 {
 	m_mesh.pos.xPos = pos.x;
 	m_mesh.pos.yPos = pos.y;

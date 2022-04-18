@@ -1,7 +1,7 @@
 #include "frameworkandsol.h"
 #include "ReservedScriptNames.h"
 #include "Sound\sound.h"
-#include "Position/Position.h"
+#include "Vec3/Vec3.h"
 #include "Color/Color.h"
 #include "Game\effects\lightning.h"
 #include "effects\tomb4fx.h"
@@ -19,7 +19,7 @@ Scripts that will be run on game startup.
 using namespace TEN::Effects::Lightning;
 
 namespace Misc {
-	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Position pos1, Position pos2)
+	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
 	{
 		GAME_VECTOR vec1, vec2;
 		pos1.StoreInGameVector(vec1);
@@ -28,12 +28,12 @@ namespace Misc {
 		return LOS(&vec1, &vec2);
 	}
 
-	static int FindRoomNumber(Position pos)
+	static int FindRoomNumber(Vec3 pos)
 	{
 		return 0;
 	}
 
-	static void AddLightningArc(Position src, Position dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
+	static void AddLightningArc(Vec3 src, Vec3 dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
 	{
 		PHD_VECTOR p1;
 		p1.x = src.x;
@@ -48,7 +48,7 @@ namespace Misc {
 		TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
 	}
 
-	static void AddShockwave(Position pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
+	static void AddShockwave(Vec3 pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
 	{
 		PHD_3DPOS p;
 		p.xPos = pos.x;
@@ -58,17 +58,17 @@ namespace Misc {
 		TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 	}
 
-	static void AddDynamicLight(Position pos, ScriptColor color, int radius, int lifetime)
+	static void AddDynamicLight(Vec3 pos, ScriptColor color, int radius, int lifetime)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
 	}
 
-	static void AddBlood(Position pos, int num)
+	static void AddBlood(Vec3 pos, int num)
 	{
 		TriggerBlood(pos.x, pos.y, pos.z, -1, num);
 	}
 
-	static void AddFireFlame(Position pos, int size)
+	static void AddFireFlame(Vec3 pos, int size)
 	{
 		AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
 	}
@@ -84,7 +84,7 @@ namespace Misc {
 		PlaySoundTrack(trackName, mode);
 	}
 
-	static void PlaySoundEffect(int id, Position p, int flags)
+	static void PlaySoundEffect(int id, Vec3 p, int flags)
 	{
 		PHD_3DPOS pos;
 
@@ -108,13 +108,13 @@ namespace Misc {
 		PlaySoundTrack(trackName, SOUNDTRACK_PLAYTYPE::BGM);
 	}
 
-	static int CalculateDistance(Position const& pos1, Position const& pos2)
+	static int CalculateDistance(Vec3 const& pos1, Vec3 const& pos2)
 	{
 		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
 		return static_cast<int>(round(result));
 	}
 
-	static int CalculateHorizontalDistance(Position const& pos1, Position const& pos2)
+	static int CalculateHorizontalDistance(Vec3 const& pos1, Vec3 const& pos2)
 	{
 		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.z - pos2.z));
 		return static_cast<int>(round(result));
@@ -158,16 +158,16 @@ namespace Misc {
 	
 		///Calculate the distance between two positions.
 		//@function CalculateDistance
-		//@tparam Position posA first position
-		//@tparam Position posB second position
+		//@tparam Vec3 posA first position
+		//@tparam Vec3 posB second position
 		//@treturn int the direct distance from one position to the other
 		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 
 		
 		///Calculate the horizontal distance between two positions.
 		//@function CalculateHorizontalDistance
-		//@tparam Position posA first position
-		//@tparam Position posB second position
+		//@tparam Vec3 posA first position
+		//@tparam Vec3 posB second position
 		//@treturn int the direct distance on the XZ plane from one position to the other
 		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
 
@@ -194,11 +194,11 @@ namespace Misc {
 		//eyes of the creatures would be.
 		//@function HasLineOfSight
 		//@tparam float room1 ID of the room where the first position is
-		//@tparam Position pos1 first position
-		//@tparam Position pos2 second position
+		//@tparam Vec3 pos1 first position
+		//@tparam Vec3 pos2 second position
 		//@treturn bool is there a direct line of sight between the two positions?
 		//@usage
-		//local flamePlinthPos = flamePlinth:GetPosition() + Position(0, flamePlinthHeight, 0);
+		//local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
 		//print(Misc.HasLineOfSight(enemyHead:GetRoom(), enemyHead:GetPosition(), flamePlinthPos))
 		table_misc.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
 

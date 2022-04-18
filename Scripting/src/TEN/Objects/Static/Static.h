@@ -7,7 +7,7 @@ namespace sol {
 	class state;
 }
 
-class Position;
+class Vec3;
 class Rotation;
 class ScriptColor;
 
@@ -25,8 +25,8 @@ public:
 	Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 
-	Position GetPos() const;
-	void SetPos(Position const & pos);
+	Vec3 GetPos() const;
+	void SetPos(Vec3 const & pos);
 	std::string GetName() const;
 	void SetName(std::string const & name);
 	int GetSlot() const;
