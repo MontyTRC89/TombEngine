@@ -1,10 +1,10 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 namespace TEN::Entities::Switches
 {
 	void InitialisePulleySwitch(short itemNumber);
-	void PulleySwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void PulleySwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 }

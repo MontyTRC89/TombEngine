@@ -7,33 +7,35 @@
 
 namespace TEN::Entities::TR4
 {
-	void FourBladesControl(short itemNum)
+	void FourBladesControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (!TriggerActive(item))
 		{
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			*((int*)&item->itemFlags[0]) = 0;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			*((int*)&item->ItemFlags[0]) = 0;
 		}
 		else
 		{
-			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
-			if (frameNumber <= 5 || frameNumber >= 58 || frameNumber >= 8 && frameNumber <= 54)
+			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			if (frameNumber <= 5 ||
+				frameNumber >= 58 ||
+				frameNumber >= 8 && frameNumber <= 54)
 			{
-				*((int*)&item->itemFlags[0]) = 0;
+				*((int*)&item->ItemFlags[0]) = 0;
 			}
 			else
 			{
 				if (frameNumber >= 6 && frameNumber <= 7)
 				{
-					item->itemFlags[3] = 20;
-					*((int*)&item->itemFlags[0]) = 30;
+					item->ItemFlags[3] = 20;
+					*((int*)&item->ItemFlags[0]) = 30;
 				}
 				else if (frameNumber >= 55 && frameNumber <= 57)
 				{
-					item->itemFlags[3] = 200;
-					*((int*)&item->itemFlags[0]) = 30;
+					item->ItemFlags[3] = 200;
+					*((int*)&item->ItemFlags[0]) = 30;
 				}
 			}
 

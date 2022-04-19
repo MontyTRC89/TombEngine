@@ -23,7 +23,7 @@
 #include "Objects/TR3/tr3_objects.h"
 #include "Objects/TR4/tr4_objects.h"
 #include "Objects/TR5/tr5_objects.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
 
@@ -187,8 +187,8 @@ void ObjectObjects()
 	obj = &Objects[ID_TIGHT_ROPE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseTightRope;
-		obj->collision = TightRopeCollision;
+		obj->initialise = InitialiseTightrope;
+		obj->collision = TightropeCollision;
 		obj->drawRoutine = nullptr;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
@@ -197,7 +197,7 @@ void ObjectObjects()
 	obj = &Objects[ID_PARALLEL_BARS];
 	if (obj->loaded)
 	{
-		obj->collision = ParallelBarsCollision;
+		obj->collision = HorizontalBarCollision;
 	}
 
 	obj = &Objects[ID_EARTHQUAKE];
@@ -276,7 +276,7 @@ void TrapObjects()
 	{
 		obj->control = KillAllCurrentItems;
 		obj->drawRoutine = nullptr;
-		obj->hitPoints = 0;
+		obj->HitPoints = 0;
 		obj->saveFlags = true;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -381,7 +381,7 @@ void InitialiseSpecialEffects()
 	NextBubble = 0;
 	NextDrip = 0;
 	NextBlood = 0;
-	TEN::Entities::TR4::ClearScarabs();
+	TEN::Entities::TR4::ClearBeetleSwarm();
 }
 
 void CustomObjects()
@@ -409,7 +409,7 @@ void InitialiseObjects()
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowSize = NO_SHADOW;
-		obj->hitPoints = -16384;
+		obj->HitPoints = -16384;
 		obj->hitEffect = HIT_NONE;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;

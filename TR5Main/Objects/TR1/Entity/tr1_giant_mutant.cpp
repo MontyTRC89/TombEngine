@@ -9,214 +9,243 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-enum abortion_anims {
-	ABORT_EMPTY, ABORT_STOP, ABORT_TURNL, ABORT_TURNR, ABORT_ATTACK1, ABORT_ATTACK2,
-	ABORT_ATTACK3, ABORT_FORWARD, ABORT_SET, ABORT_FALL, ABORT_DEATH, ABORT_KILL
+#define MUTANT_NEED_TURN ANGLE(45.0f)
+#define MUTANT_TURN ANGLE(3.0f)
+#define MUTANT_ATTACK_RANGE pow(2600, 2)
+#define MUTANT_CLOSE_RANGE pow(2250, 2)
+#define MUTANT_ATTACK_1_CHANCE 11000
+#define MUTANT_ATTACK_2_CHANCE 22000
+#define MUTANT_TLEFT 0x7ff0
+#define MUTANT_TRIGHT 0x3ff8000
+#define MUTANT_TOUCH (MUTANT_TLEFT | MUTANT_TRIGHT)
+#define MUTANT_PART_DAMAGE 250
+#define MUTANT_ATTACK_DAMAGE 500
+#define MUTANT_TOUCH_DAMAGE 5
+
+enum GiantMutantState
+{
+	MUTANT_STATE_NONE = 0,
+	MUTANT_STATE_IDLE = 1,
+	MUTANT_STATE_TURN_LEFT = 2,
+	MUTANT_STATE_TURN_RIGHT = 3,
+	MUTANT_STATE_ATTACK_1 = 4,
+	MUTANT_STATE_ATTACK_2 = 5,
+	MUTANT_STATE_ATTACK_3 = 6,
+	MUTANT_STATE_FORWARD = 7,
+	MUTANT_STATE_SET = 8,
+	MUTANT_STATE_FALL = 9,
+	MUTANT_STATE_DEATH = 10,
+	MUTANT_STATE_KILL = 11
 };
 
-#define ABORT_NEED_TURN ANGLE(90)
-#define ABORT_TURN ANGLE(6)
-#define ABORT_ATTACK_RANGE SQUARE(2600)
-#define ABORT_CLOSE_RANGE SQUARE(2250)
-#define ABORT_ATTACK1_CHANCE 11000
-#define ABORT_ATTACK2_CHANCE 22000
-#define ABORT_TLEFT 0x7ff0
-#define ABORT_TRIGHT 0x3ff8000
-#define ABORT_TOUCH	(ABORT_TLEFT|ABORT_TRIGHT)
-#define ABORT_PART_DAMAGE 250
-#define ABORT_ATTACK_DAMAGE 500
-#define ABORT_TOUCH_DAMAGE 0
-#define ABORT_DIE_ANIM 13
-
-void AbortionControl(short itemNum)
+// TODO
+enum GianMutantAnim
 {
-	if (!CreatureActive(itemNum))
+	MUTANT_ANIM_DEATH = 13,
+};
+
+void GiantMutantControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CREATURE_INFO* abort;
-	AI_INFO info;
-	FLOOR_INFO* floor;
-	short head, angle;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	abort = (CREATURE_INFO*)item->data;
-	head = angle = 0;
+	short head = 0;
+	short angle = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->currentAnimState != ABORT_DEATH)
+		if (item->Animation.ActiveState != MUTANT_STATE_DEATH)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + ABORT_DIE_ANIM;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = ABORT_DEATH;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_DEATH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = MUTANT_STATE_DEATH;
 		}
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (info.ahead)
-			head = info.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = (short)phd_atan(abort->target.z - item->pos.zPos, abort->target.x - item->pos.xPos) - item->pos.yRot;
+		angle = (short)phd_atan(creature->Target.z - item->Pose.Position.z, creature->Target.x - item->Pose.Position.x) - item->Pose.Orientation.y;
 
-		if (item->touchBits)
+		if (item->TouchBits)
 		{
-			LaraItem->hitPoints -= ABORT_TOUCH_DAMAGE;
-			LaraItem->hitStatus = true;
+			LaraItem->HitPoints -= MUTANT_TOUCH_DAMAGE;
+			LaraItem->HitStatus = true;
 		}
 
-		switch (item->currentAnimState)
+		switch (item->Animation.ActiveState)
 		{
-		case ABORT_SET:
-			item->goalAnimState = ABORT_FALL;
-			item->gravityStatus = true;
+		case MUTANT_STATE_SET:
+			item->Animation.TargetState = MUTANT_STATE_FALL;
+			item->Animation.Airborne = true;
 			break;
 
-		case ABORT_STOP:
-			if (LaraItem->hitPoints <= 0)
+		case MUTANT_STATE_IDLE:
+			if (LaraItem->HitPoints <= 0)
 				break;
 
-			abort->flags = 0;
-			if (angle > ABORT_NEED_TURN)
-				item->goalAnimState = ABORT_TURNR;
-			else if (angle < -ABORT_NEED_TURN)
-				item->goalAnimState = ABORT_TURNL;
-			else if (info.distance < ABORT_ATTACK_RANGE)
+			creature->Flags = 0;
+
+			if (angle > MUTANT_NEED_TURN)
+				item->Animation.TargetState = MUTANT_STATE_TURN_RIGHT;
+			else if (angle < -MUTANT_NEED_TURN)
+				item->Animation.TargetState = MUTANT_STATE_TURN_LEFT;
+			else if (AI.distance < MUTANT_ATTACK_RANGE)
 			{
-				if (LaraItem->hitPoints <= ABORT_ATTACK_DAMAGE)
+				if (LaraItem->HitPoints <= MUTANT_ATTACK_DAMAGE)
 				{
-					if (info.distance < ABORT_CLOSE_RANGE)
-						item->goalAnimState = ABORT_ATTACK3;
+					if (AI.distance < MUTANT_CLOSE_RANGE)
+						item->Animation.TargetState = MUTANT_STATE_ATTACK_3;
 					else
-						item->goalAnimState = ABORT_FORWARD;
+						item->Animation.TargetState = MUTANT_STATE_FORWARD;
 				}
 				else if (GetRandomControl() < 0x4000)
-					item->goalAnimState = ABORT_ATTACK1;
+					item->Animation.TargetState = MUTANT_STATE_ATTACK_1;
 				else
-					item->goalAnimState = ABORT_ATTACK2;
+					item->Animation.TargetState = MUTANT_STATE_ATTACK_2;
 			}
 			else
-				item->goalAnimState = ABORT_FORWARD;
+				item->Animation.TargetState = MUTANT_STATE_FORWARD;
+
 			break;
 
-		case ABORT_FORWARD:
-			if (angle < -ABORT_TURN)
-				item->goalAnimState -= ABORT_TURN;
-			else if (angle > ABORT_TURN)
-				item->goalAnimState += ABORT_TURN;
+		case MUTANT_STATE_FORWARD:
+			if (angle < -MUTANT_TURN)
+				item->Animation.TargetState -= MUTANT_TURN;
+			else if (angle > MUTANT_TURN)
+				item->Animation.TargetState += MUTANT_TURN;
 			else
-				item->goalAnimState += angle;
+				item->Animation.TargetState += angle;
 
-			if (angle > ABORT_NEED_TURN || angle < -ABORT_NEED_TURN)
-				item->goalAnimState = ABORT_STOP;
-			else if (info.distance < ABORT_ATTACK_RANGE)
-				item->goalAnimState = ABORT_STOP;
+			if (angle > MUTANT_NEED_TURN || angle < -MUTANT_NEED_TURN)
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
+			else if (AI.distance < MUTANT_ATTACK_RANGE)
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
+
 			break;
 
-		case ABORT_TURNR:
-			if (!abort->flags)
-				abort->flags = item->frameNumber;
-			else if (item->frameNumber - abort->flags > 16 && item->frameNumber - abort->flags < 23)
-				item->pos.yRot += ANGLE(14);
-
-			if (angle < ABORT_NEED_TURN)
-				item->goalAnimState = ABORT_STOP;
-			break;
-
-		case ABORT_TURNL:
-			if (!abort->flags)
-				abort->flags = item->frameNumber;
-			else if (item->frameNumber - abort->flags > 13 && item->frameNumber - abort->flags < 23)
-				item->pos.yRot -= ANGLE(9);
-
-			if (angle > -ABORT_NEED_TURN)
-				item->goalAnimState = ABORT_STOP;
-			break;
-
-		case ABORT_ATTACK1:
-			if (!abort->flags && (item->touchBits & ABORT_TRIGHT))
+		case MUTANT_STATE_TURN_RIGHT:
+			if (!creature->Flags)
+				creature->Flags = item->Animation.FrameNumber;
+			else if (item->Animation.FrameNumber - creature->Flags > 16 &&
+				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				LaraItem->hitPoints -= ABORT_ATTACK_DAMAGE;
-				LaraItem->hitStatus = true;
-				abort->flags = 1;
+				item->Pose.Orientation.y += ANGLE(14.0f);
 			}
+
+			if (angle < MUTANT_NEED_TURN)
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
+
 			break;
 
-		case ABORT_ATTACK2:
-			if (!abort->flags && (item->touchBits & ABORT_TOUCH))
+		case MUTANT_STATE_TURN_LEFT:
+			if (!creature->Flags)
+				creature->Flags = item->Animation.FrameNumber;
+			else if (item->Animation.FrameNumber - creature->Flags > 13 &&
+				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				LaraItem->hitPoints -= ABORT_ATTACK_DAMAGE;
-				LaraItem->hitStatus = true;
-				abort->flags = 1;
+				item->Pose.Orientation.y -= ANGLE(9.0f);
 			}
+
+			if (angle > -MUTANT_NEED_TURN)
+				item->Animation.TargetState = MUTANT_STATE_IDLE;
+
 			break;
 
-		case ABORT_ATTACK3:
-			if (item->touchBits & ABORT_TRIGHT || LaraItem->hitPoints <= 0)
+		case MUTANT_STATE_ATTACK_1:
+			if (!creature->Flags && item->TouchBits & MUTANT_TRIGHT)
 			{
-				item->goalAnimState = ABORT_KILL;
+				creature->Flags = 1;
 
-				LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 6;
-				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->currentAnimState = LaraItem->goalAnimState = 46;
-				LaraItem->roomNumber = item->roomNumber;
-				LaraItem->pos.xPos = item->pos.xPos;
-				LaraItem->pos.yPos = item->pos.yPos;
-				LaraItem->pos.zPos = item->pos.zPos;
-				LaraItem->pos.yRot = item->pos.yRot;
-				LaraItem->pos.xRot = LaraItem->pos.zRot = 0;
-				LaraItem->gravityStatus = false;
-				LaraItem->hitPoints = -1;
-				Lara.air = -1;
-				Lara.gunStatus = LG_HANDS_BUSY;
-				Lara.gunType = WEAPON_NONE;
+				LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
+				LaraItem->HitStatus = true;
+			}
 
+			break;
+
+		case MUTANT_STATE_ATTACK_2:
+			if (!creature->Flags && item->TouchBits & MUTANT_TOUCH)
+			{
+				creature->Flags = 1;
+
+				LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
+				LaraItem->HitStatus = true;
+			}
+
+			break;
+
+		case MUTANT_STATE_ATTACK_3:
+			if (item->TouchBits & MUTANT_TRIGHT || LaraItem->HitPoints <= 0)
+			{
+				item->Animation.TargetState = MUTANT_STATE_KILL;
 				Camera.targetDistance = SECTOR(2);
-				Camera.flags = CF_CHASE_OBJECT;
+				Camera.flags = CF_FOLLOW_CENTER;
+
+				LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
+				LaraItem->RoomNumber = item->RoomNumber;
+				LaraItem->Pose.Position.x = item->Pose.Position.x;
+				LaraItem->Pose.Position.y = item->Pose.Position.y;
+				LaraItem->Pose.Position.z = item->Pose.Position.z;
+				LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+				LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
+				LaraItem->Animation.Airborne = false;
+				LaraItem->HitPoints = -1;
+				Lara.Air = -1;
+				Lara.Control.HandStatus = HandStatus::Busy;
+				Lara.Control.Weapon.GunType = LaraWeaponType::None;
 			}
+
 			break;
 
-		case ABORT_KILL:
-			Camera.targetDistance = SECTOR(5);
-			Camera.flags = CF_CHASE_OBJECT;
+		case MUTANT_STATE_KILL:
+			Camera.targetDistance = SECTOR(2);
+			Camera.flags = CF_FOLLOW_CENTER;
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, head);
 
-	if (item->currentAnimState == ABORT_FALL)
+	if (item->Animation.ActiveState == MUTANT_STATE_FALL)
 	{
 		AnimateItem(item);
 
-		if (item->pos.yPos > item->floor)
+		if (item->Pose.Position.y > item->Floor)
 		{
-			item->goalAnimState = ABORT_STOP;
-			item->gravityStatus = false;
-			item->pos.yPos = item->floor;
+			item->Animation.TargetState = MUTANT_STATE_IDLE;
+			item->Animation.Airborne = false;
+			item->Pose.Position.y = item->Floor;
 			Camera.bounce = 500;
 		}
 	}
 	else
-		CreatureAnimation(itemNum, 0, 0);
+		CreatureAnimation(itemNumber, 0, 0);
 
-	if (item->status == ITEM_DEACTIVATED)
+	if (item->Status == ITEM_DEACTIVATED)
 	{
-		SoundEffect(423, &item->pos, NULL);
-		ExplodingDeath(225, 0xfffffff, ABORT_PART_DAMAGE);
-
+		SoundEffect(171, &item->Pose, NULL);
+		ExplodingDeath(itemNumber, UINT_MAX, MUTANT_PART_DAMAGE);
+		
 		TestTriggers(item, true);
 
-		KillItem(itemNum);
-		item->status = ITEM_DEACTIVATED;
+		KillItem(itemNumber);
+		item->Status = ITEM_DEACTIVATED;
 	}
 }

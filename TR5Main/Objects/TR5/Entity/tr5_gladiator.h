@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseGladiator(short itemNum);
+void InitialiseGladiator(short itemNumber);
 void ControlGladiator(short itemNumber);

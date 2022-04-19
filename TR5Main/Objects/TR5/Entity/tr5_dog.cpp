@@ -9,23 +9,25 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 
 static BYTE DogAnims[] = { 20, 21, 22, 20 };
 static BITE_INFO DogBite = { 0, 0, 100, 3 };
 
-void InitialiseTr5Dog(short itemNum)
+void InitialiseTr5Dog(short itemNumber)
 {
-    ITEM_INFO* item;
+	auto* item = &g_Level.Items[itemNumber];
 
-    item = &g_Level.Items[itemNum];
-    item->currentAnimState = 1;
-    item->animNumber = Objects[item->objectNumber].animIndex + 8;
-    if (!item->triggerFlags)
-    {
-        item->animNumber = Objects[item->objectNumber].animIndex + 1;
-        // TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
-    }
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
+	item->Animation.ActiveState = 1;
+
+	if (!item->TriggerFlags)
+	{
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+		// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
+	}
+
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
 void Tr5DogControl(short itemNumber)
@@ -38,160 +40,161 @@ void Tr5DogControl(short itemNumber)
 	short joint1 = 0;
 	short joint0 = 0;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+	auto* object = &Objects[item->ObjectNumber];
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->animNumber == obj->animIndex + 1)
+		if (item->Animation.AnimNumber == object->animIndex + 1)
+			item->HitPoints = object->HitPoints;
+		else if (item->Animation.ActiveState != 11)
 		{
-			item->hitPoints = obj->hitPoints;
-		}
-		else if (item->currentAnimState != 11)
-		{
-			item->animNumber = obj->animIndex + DogAnims[GetRandomControl() & 3];
-			item->currentAnimState = 11;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->Animation.AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 11;
 		}
 	}
 	else
 	{
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(creature);
 		else
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
-		AI_INFO info;
-		CreatureAIInfo(item,&info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
 		int distance;
-		if (creature->enemy == LaraItem)
-		{
-			distance = info.distance;
-		}
+		if (creature->Enemy == LaraItem)
+			distance = AI.distance;
 		else
 		{
-			int dx = LaraItem->pos.xPos - item->pos.xPos;
-			int dz = LaraItem->pos.zPos - item->pos.zPos;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			phd_atan(dz, dx);
-			distance = SQUARE(dx) + SQUARE(dz);
+			distance = pow(dx, 2) + pow(dz, 2);
 		}
 
-		if (info.ahead)
+		if (AI.ahead)
 		{
-			joint2 = info.xAngle; // Maybe swapped
-			joint1 = info.angle;
+			joint2 = AI.xAngle; // Maybe swapped
+			joint1 = AI.angle;
 		}
 
-		GetCreatureMood(item,&info, VIOLENT);
-		CreatureMood(item,&info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		if (!creature->mood)
-			creature->maximumTurn /= 2;
+		if (creature->Mood == MoodType::Bored)
+			creature->MaxTurn /= 2;
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 		joint0 = 4 * angle;
 
-
-		if (creature->hurtByLara || distance < SQUARE(3072) && !(item->aiBits & MODIFY))
+		if (creature->HurtByLara || distance < pow(SECTOR(3), 2) && !(item->AIBits & MODIFY))
 		{
 			AlertAllGuards(itemNumber);
-			item->aiBits &= ~MODIFY;
+			item->AIBits &= ~MODIFY;
 		}
 
 		short random = GetRandomControl();
-		int frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+		int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-		switch (item->currentAnimState)
+		switch (item->Animation.ActiveState)
 		{
 		case 0:
 		case 8:
 			joint1 = 0;
 			joint2 = 0;
-			if (creature->mood && (item->aiBits) != MODIFY)
-			{
-				item->goalAnimState = 1;
-			}
+
+			if (creature->Mood != MoodType::Bored && item->AIBits != MODIFY)
+				item->Animation.TargetState = 1;
 			else
 			{
-				creature->flags++;
-				creature->maximumTurn = 0;
-				if (creature->flags > 300 && random < 128)
-					item->goalAnimState = 1;
+				creature->MaxTurn = 0;
+				creature->Flags++;
+
+				if (creature->Flags > 300 && random < 128)
+					item->Animation.TargetState = 1;
 			}
+
 			break;
 
 		case 1:
 		case 9:
-			if (item->currentAnimState == 9 && item->requiredAnimState)
+			if (item->Animation.ActiveState == 9 && item->Animation.RequiredState)
 			{
-				item->goalAnimState = item->requiredAnimState;
+				item->Animation.TargetState = item->Animation.RequiredState;
 				break;
 			}
 
-			creature->maximumTurn = 0;
-			if (item->aiBits & GUARD)
+			creature->MaxTurn = 0;
+
+			if (item->AIBits & GUARD)
 			{
 				joint1 = AIGuard(creature);
+
 				if (GetRandomControl())
 					break;
-				if (item->currentAnimState == 1)
+
+				if (item->Animation.ActiveState == 1)
 				{
-					item->goalAnimState = 9;
+					item->Animation.TargetState = 9;
 					break;
 				}
 			}
 			else
 			{
-				if (item->currentAnimState == 9 && random < 128)
+				if (item->Animation.ActiveState == 9 && random < 128)
 				{
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 					break;
 				}
 
-				if (item->aiBits & PATROL1)
+				if (item->AIBits & PATROL1)
 				{
-					if (item->currentAnimState == 1)
-						item->goalAnimState = 2;
+					if (item->Animation.ActiveState == 1)
+						item->Animation.TargetState = 2;
 					else
-						item->goalAnimState = 1;
+						item->Animation.TargetState = 1;
+
 					break;
 				}
 
-				if (creature->mood == ESCAPE_MOOD)
+				if (creature->Mood == MoodType::Escape)
 				{
-					if (Lara.target == item || !info.ahead || item->hitStatus)
+					if (Lara.TargetEntity == item || !AI.ahead || item->HitStatus)
 					{
-						item->requiredAnimState = 3;
-						item->goalAnimState = 9;
+						item->Animation.RequiredState = 3;
+						item->Animation.TargetState = 9;
 					}
 					else
-					{
-						item->goalAnimState = 1;
-					}
+						item->Animation.TargetState = 1;
+					
 					break;
 				}
 
-				if (creature->mood)
+				if (creature->Mood != MoodType::Bored)
 				{
-					item->requiredAnimState = 3;
-					if (item->currentAnimState == 1)
-						item->goalAnimState = 9;
+					item->Animation.RequiredState = 3;
+
+					if (item->Animation.ActiveState == 1)
+						item->Animation.TargetState = 9;
+
 					break;
 				}
 
-				creature->flags = 0;
-				creature->maximumTurn = ANGLE(1);
+				creature->Flags = 0;
+				creature->MaxTurn = ANGLE(1.0f);
 
 				if (random < 256)
 				{
-					if (item->aiBits & MODIFY)
+					if (item->AIBits & MODIFY)
 					{
-						if (item->currentAnimState == 1)
+						if (item->Animation.ActiveState == 1)
 						{
-							item->goalAnimState = 8;
-							creature->flags = 0;
+							item->Animation.TargetState = 8;
+							creature->Flags = 0;
 							break;
 						}
 					}
@@ -200,94 +203,94 @@ void Tr5DogControl(short itemNumber)
 				if (random >= 4096)
 				{
 					if (!(random & 0x1F))
-						item->goalAnimState = 7;
+						item->Animation.TargetState = 7;
+
 					break;
 				}
 
-				if (item->currentAnimState == 1)
+				if (item->Animation.ActiveState == 1)
 				{
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 					break;
 				}
 			}
-			item->goalAnimState = 1;
+
+			item->Animation.TargetState = 1;
 			break;
 
 		case 2:
-			creature->maximumTurn = ANGLE(3);
-			if (item->aiBits & PATROL1)
+			creature->MaxTurn = ANGLE(3.0f);
+
+			if (item->AIBits & PATROL1)
 			{
-				item->goalAnimState = 2;
+				item->Animation.TargetState = 2;
 				break;
 			}
 
-			if (!creature->mood && random < 256)
+			if (creature->Mood == MoodType::Bored && random < 256)
 			{
-				item->goalAnimState = 1;
+				item->Animation.TargetState = 1;
 				break;
 			}
-			item->goalAnimState = 5;
+
+			item->Animation.TargetState = 5;
 			break;
 
 		case 3:
-			creature->maximumTurn = ANGLE(6);
-			if (creature->mood == ESCAPE_MOOD)
+			creature->MaxTurn = ANGLE(6.0f);
+
+			if (creature->Mood == MoodType::Escape)
 			{
-				if (Lara.target != item && info.ahead)
-					item->goalAnimState = 9;
+				if (Lara.TargetEntity != item && AI.ahead)
+					item->Animation.TargetState = 9;
 			}
-			else if (creature->mood)
+			else if (creature->Mood != MoodType::Bored)
 			{
-				if (info.bite && info.distance < SQUARE(1024))
+				if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+					item->Animation.TargetState = 6;
+				else if (AI.distance < pow(SECTOR(1.5f), 2))
 				{
-					item->goalAnimState = 6;
-				}
-				else if (info.distance < SQUARE(1536))
-				{
-					item->requiredAnimState = 5;
-					item->goalAnimState = 9;
+					item->Animation.RequiredState = 5;
+					item->Animation.TargetState = 9;
 				}
 			}
 			else
-			{
-				item->goalAnimState = 9;
-			}
+				item->Animation.TargetState = 9;
+			
 			break;
 
 		case 5:
-			creature->maximumTurn = ANGLE(3);
-			if (creature->mood)
+			creature->MaxTurn = ANGLE(3.0f);
+
+			if (creature->Mood != MoodType::Bored)
 			{
-				if (creature->mood == ESCAPE_MOOD)
+				if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = 3;
+				else if (AI.bite && AI.distance < pow(341, 2))
 				{
-					item->goalAnimState = 3;
+					item->Animation.TargetState = 12;
+					item->Animation.RequiredState = 5;
 				}
-				else if (info.bite && info.distance < SQUARE(341))
-				{
-					item->goalAnimState = 12;
-					item->requiredAnimState = 5;
-				}
-				else if (info.distance > SQUARE(1536) || item->hitStatus)
-				{
-					item->goalAnimState = 3;
-				}
+				else if (AI.distance > pow(SECTOR(1.5f), 2) || item->HitStatus)
+					item->Animation.TargetState = 3;
 			}
 			else
-			{
-				item->goalAnimState = 9;
-			}
+				item->Animation.TargetState = 9;
+			
 			break;
+
 		case 6:
-			if (info.bite
-				&& item->touchBits & 0x6648
-				&& frame >= 4
-				&& frame <= 14)
+			if (AI.bite &&
+				item->TouchBits & 0x6648 &&
+				frame >= 4 &&
+				frame <= 14)
 			{
-				CreatureEffect2(item,&DogBite, 2, -1, DoBloodSplat);
-				LaraItem->hitPoints -= 20;
-				LaraItem->hitStatus = true;
+				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+				LaraItem->HitPoints -= 20;
+				LaraItem->HitStatus = true;
 			}
-			item->goalAnimState = 3;
+
+			item->Animation.TargetState = 3;
 			break;
 
 		case 7:
@@ -296,18 +299,17 @@ void Tr5DogControl(short itemNumber)
 			break;
 
 		case 12:
-			if (info.bite
-				&& item->touchBits & 0x48
-				&& (frame >= 9
-					&& frame <= 12
-					|| frame >= 22
-					&& frame <= 25))
+			if (AI.bite && item->TouchBits & 0x48 &&
+				(frame >= 9 && frame <= 12 ||
+					frame >= 22 && frame <= 25))
 			{
-				CreatureEffect2(item,&DogBite, 2, -1, DoBloodSplat);
-				LaraItem->hitPoints -= 10;
-				LaraItem->hitStatus = true;
+				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
+				LaraItem->HitPoints -= 10;
+				LaraItem->HitStatus = true;
 			}
+
 			break;
+
 		default:
 			break;
 		}

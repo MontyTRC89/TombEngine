@@ -1,3 +1,3 @@
 #pragma once
 
-void BirdMonsterControl(short itemNum);
+void BirdMonsterControl(short itemNumber);

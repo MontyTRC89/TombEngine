@@ -1,17 +1,24 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-struct KAYAK_INFO 
+struct KayakInfo 
 {
-	int Vel;
-	int Rot;
-	int FallSpeedF;
-	int FallSpeedL;
-	int FallSpeedR;
-	int Water;
+	int TurnRate;
+
+	int Velocity;
+	int FrontVerticalVelocity;
+	int LeftVerticalVelocity;
+	int RightVerticalVelocity;
+
+	unsigned int LeftRightCount;
+	int WaterHeight;
 	PHD_3DPOS OldPos;
-	char Turn;
-	char Forward;
-	char TrueWater;
+	bool Turn;
+	bool Forward;
+	bool TrueWater;
+
+	int CurrentStartWake;
+	int WakeShade;
+
 	char Flags;
 };

@@ -8,22 +8,32 @@
 
 auto SilencerIsEquipped(LaraInfo& lara)
 {
-	return lara.Weapons[WEAPON_UZI].HasSilencer
-		|| lara.Weapons[WEAPON_PISTOLS].HasSilencer
-		|| lara.Weapons[WEAPON_SHOTGUN].HasSilencer
-		|| lara.Weapons[WEAPON_REVOLVER].HasSilencer
-		|| lara.Weapons[WEAPON_CROSSBOW].HasSilencer
-		|| lara.Weapons[WEAPON_HK].HasSilencer;
+	if (lara.Weapons[(int)LaraWeaponType::Uzi].HasSilencer ||
+		lara.Weapons[(int)LaraWeaponType::Pistol].HasSilencer ||
+		lara.Weapons[(int)LaraWeaponType::Shotgun].HasSilencer ||
+		lara.Weapons[(int)LaraWeaponType::Revolver].HasSilencer ||
+		lara.Weapons[(int)LaraWeaponType::Crossbow].HasSilencer ||
+		lara.Weapons[(int)LaraWeaponType::HK].HasSilencer)
+	{
+		return true;
+	}
+
+	return false;
 };
 
 auto LaserSightIsEquipped(LaraInfo& lara)
 {
-	return lara.Weapons[WEAPON_REVOLVER].HasLasersight
-		|| lara.Weapons[WEAPON_CROSSBOW].HasLasersight
-		|| lara.Weapons[WEAPON_HK].HasLasersight;
+	if (lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight ||
+		lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight ||
+		lara.Weapons[(int)LaraWeaponType::HK].HasLasersight)
+	{
+		return true;
+	}
+
+	return false;
 };
 
-static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID obj, bool add)
+static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID objectID, bool add)
 {
 	// If adding, replace the small/large waterskin with one of the requested
 	// capacity. If removing, only remove the waterskin if it contains the given
@@ -31,146 +41,177 @@ static bool TryModifyMiscCount(LaraInfo & lara, GAME_OBJECT_ID obj, bool add)
 	auto modifyWaterSkinAmount = [&](byte& currentFlag, byte newFlag)
 	{
 		if (add)
-		{
 			currentFlag = newFlag;
-		}
 		else
 		{
 			if (currentFlag == newFlag)
-			{
 				currentFlag = 0;
-			}
 		}
 	};
 
 	auto modifyBeetleCount = [&](int bit)
 	{
 		if (add)
-		{
-			lara.hasBeetleThings |= 1 << bit;
-		}
+			lara.Inventory.BeetleComponents |= 1 << bit;
 		else
-		{
-			lara.hasBeetleThings &= ~(1 << bit);
-		}
+			lara.Inventory.BeetleComponents &= ~(1 << bit);
 	};
-	switch (obj) {
+
+	switch (objectID)
+	{
 	case ID_SILENCER_ITEM:
-		lara.Silencer = add && !SilencerIsEquipped(lara);
+		lara.Inventory.HasSilencer = add && !SilencerIsEquipped(lara);
 		break;
+
 	case ID_LASERSIGHT_ITEM:
-		lara.Lasersight = add && !LaserSightIsEquipped(lara);
+		lara.Inventory.HasLasersight = add && !LaserSightIsEquipped(lara);
 		break;
 
 	case ID_BINOCULARS_ITEM:
-		lara.Binoculars = add;
+		lara.Inventory.HasBinoculars = add;
 		break;
+
 	case ID_CROWBAR_ITEM:
-		lara.Crowbar = add;
+		lara.Inventory.HasCrowbar = add;
 		break;
+
 	case ID_DIARY_ITEM:
-		lara.Diary.Present = add;
+		lara.Inventory.Diary.Present = add;
 		break;
+
 	case ID_WATERSKIN1_EMPTY:
-		modifyWaterSkinAmount(lara.small_waterskin, 1);
+		modifyWaterSkinAmount(lara.Inventory.SmallWaterskin, 1);
 		break;
+
 	case ID_WATERSKIN1_1:
-		modifyWaterSkinAmount(lara.small_waterskin, 2);
+		modifyWaterSkinAmount(lara.Inventory.SmallWaterskin, 2);
 		break;
+
 	case ID_WATERSKIN1_2:
-		modifyWaterSkinAmount(lara.small_waterskin, 3);
+		modifyWaterSkinAmount(lara.Inventory.SmallWaterskin, 3);
 		break;
+
 	case ID_WATERSKIN1_3:
-		modifyWaterSkinAmount(lara.small_waterskin, 4);
+		modifyWaterSkinAmount(lara.Inventory.SmallWaterskin, 4);
 		break;
+
 	case ID_WATERSKIN2_EMPTY:
-		modifyWaterSkinAmount(lara.big_waterskin, 1);
+		modifyWaterSkinAmount(lara.Inventory.BigWaterskin, 1);
 		break;
+
 	case ID_WATERSKIN2_1:
-		modifyWaterSkinAmount(lara.big_waterskin, 2);
+		modifyWaterSkinAmount(lara.Inventory.BigWaterskin, 2);
 		break;
+
 	case ID_WATERSKIN2_2:
-		modifyWaterSkinAmount(lara.big_waterskin, 3);
+		modifyWaterSkinAmount(lara.Inventory.BigWaterskin, 3);
 		break;
+
 	case ID_WATERSKIN2_3:
-		modifyWaterSkinAmount(lara.big_waterskin, 4);
+		modifyWaterSkinAmount(lara.Inventory.BigWaterskin, 4);
 		break;
+
 	case ID_WATERSKIN2_4:
-		modifyWaterSkinAmount(lara.big_waterskin, 5);
+		modifyWaterSkinAmount(lara.Inventory.BigWaterskin, 5);
 		break;
+
 	case ID_WATERSKIN2_5:
-		modifyWaterSkinAmount(lara.big_waterskin, 6);
+		modifyWaterSkinAmount(lara.Inventory.BigWaterskin, 6);
 		break;
+
 	case ID_CLOCKWORK_BEETLE:
 		modifyBeetleCount(0);
 		break;
+
 	case ID_CLOCKWORK_BEETLE_COMBO1:
 		modifyBeetleCount(1);
 		break;
+
 	case ID_CLOCKWORK_BEETLE_COMBO2:
 		modifyBeetleCount(2);
 		break;
+
 	default:
 		return false;
 	}
+
 	return true;
 }
 
-bool TryAddMiscItem(LaraInfo & lara, GAME_OBJECT_ID obj)
+bool TryAddMiscItem(LaraInfo & lara, GAME_OBJECT_ID objectID)
 {
-	return TryModifyMiscCount(lara, obj, true);
+	return TryModifyMiscCount(lara, objectID, true);
 }
 
-bool TryRemoveMiscItem(LaraInfo & lara, GAME_OBJECT_ID obj)
+bool TryRemoveMiscItem(LaraInfo & lara, GAME_OBJECT_ID objectID)
 {
-	return TryModifyMiscCount(lara, obj, false);
+	return TryModifyMiscCount(lara, objectID, false);
 }
 
-std::optional<bool> HasMiscItem(LaraInfo& lara, GAME_OBJECT_ID obj)
+std::optional<bool> HasMiscItem(LaraInfo& lara, GAME_OBJECT_ID objectID)
 {	
 	auto HasBeetle = [&](int bit)
 	{
-		return lara.hasBeetleThings &= 1 << bit;
+		return lara.Inventory.BeetleComponents &= 1 << bit;
 	};
 
-	switch (obj) {
+	switch (objectID)
+	{
 		//TODO does Lara "HAVE" a silencer if it's combined but not in her inventory?
 	case ID_SILENCER_ITEM:
-		return lara.Silencer || SilencerIsEquipped(lara);
+		return lara.Inventory.HasSilencer || SilencerIsEquipped(lara);
+
 	case ID_LASERSIGHT_ITEM:
-		return lara.Lasersight || LaserSightIsEquipped(lara);
+		return lara.Inventory.HasLasersight || LaserSightIsEquipped(lara);
+
 	case ID_BINOCULARS_ITEM:
-		return lara.Binoculars;
+		return lara.Inventory.HasBinoculars;
+
 	case ID_CROWBAR_ITEM:
-		return lara.Crowbar;
+		return lara.Inventory.HasCrowbar;
+
 	case ID_DIARY_ITEM:
-		return lara.Diary.Present;
+		return lara.Inventory.Diary.Present;
+
 	case ID_WATERSKIN1_EMPTY:
-		return lara.small_waterskin == 1;
+		return lara.Inventory.SmallWaterskin == 1;
+
 	case ID_WATERSKIN1_1:
-		return lara.small_waterskin == 2;
+		return lara.Inventory.SmallWaterskin == 2;
+
 	case ID_WATERSKIN1_2:
-		return lara.small_waterskin == 3;
+		return lara.Inventory.SmallWaterskin == 3;
+
 	case ID_WATERSKIN1_3:
-		return lara.small_waterskin == 4;
+		return lara.Inventory.SmallWaterskin == 4;
+
 	case ID_WATERSKIN2_EMPTY:
-		return lara.big_waterskin == 1;
+		return lara.Inventory.BigWaterskin == 1;
+
 	case ID_WATERSKIN2_1:
-		return lara.big_waterskin == 2;
+		return lara.Inventory.BigWaterskin == 2;
+
 	case ID_WATERSKIN2_2:
-		return lara.big_waterskin == 3;
+		return lara.Inventory.BigWaterskin == 3;
+
 	case ID_WATERSKIN2_3:
-		return lara.big_waterskin == 4;
+		return lara.Inventory.BigWaterskin == 4;
+
 	case ID_WATERSKIN2_4:
-		return lara.big_waterskin == 5;
+		return lara.Inventory.BigWaterskin == 5;
+
 	case ID_WATERSKIN2_5:
-		return lara.big_waterskin == 6;
+		return lara.Inventory.BigWaterskin == 6;
+
 	case ID_CLOCKWORK_BEETLE:
 		return HasBeetle(0);
+
 	case ID_CLOCKWORK_BEETLE_COMBO1:
 		return HasBeetle(1);
+
 	case ID_CLOCKWORK_BEETLE_COMBO2:
 		return HasBeetle(2);
+
 	default:
 		return std::nullopt;
 	}

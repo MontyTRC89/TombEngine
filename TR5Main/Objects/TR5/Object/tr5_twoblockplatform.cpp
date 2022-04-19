@@ -14,34 +14,32 @@ using namespace TEN::Floordata;
 
 void InitialiseTwoBlocksPlatform(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	item->itemFlags[0] = item->pos.yPos;
-	item->itemFlags[1] = 1;
+	item->ItemFlags[0] = item->Pose.Position.y;
+	item->ItemFlags[1] = 1;
 	UpdateBridgeItem(itemNumber);
 }
 
 void TwoBlocksPlatformControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
-		if (item->triggerFlags)
+		if (item->TriggerFlags)
 		{
-			if (item->pos.yPos > (item->itemFlags[0] - 16 * (int) (item->triggerFlags & 0xFFFFFFF0)))
-			{
-				item->pos.yPos -= item->triggerFlags & 0xF;
-			}
+			if (item->Pose.Position.y > (item->ItemFlags[0] - 16 * (int) (item->TriggerFlags & 0xFFFFFFF0)))
+				item->Pose.Position.y -= item->TriggerFlags & 0xF;
 
-			short roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-			item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			auto probe = GetCollision(item);
 
-			if (roomNumber != item->roomNumber)
+			item->Floor = probe.Position.Floor;
+
+			if (probe.RoomNumber != item->RoomNumber)
 			{
 				UpdateBridgeItem(itemNumber, true);
-				ItemNewRoom(itemNumber, roomNumber);
+				ItemNewRoom(itemNumber, probe.RoomNumber);
 				UpdateBridgeItem(itemNumber);
 			}
 		}
@@ -49,45 +47,39 @@ void TwoBlocksPlatformControl(short itemNumber)
 		{
 			bool onObject = false;
 
-			int height = LaraItem->pos.yPos + 1;
-			if (GetBridgeItemIntersect(itemNumber, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, false).has_value())
+			int height = LaraItem->Pose.Position.y + 1;
+			if (GetBridgeItemIntersect(itemNumber, LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, false).has_value())
 			{
-				if (LaraItem->pos.yPos <= item->pos.yPos + 32)
+				if (LaraItem->Pose.Position.y <= item->Pose.Position.y + 32)
 				{
-					if (item->pos.yPos < height)
-					{
+					if (item->Pose.Position.y < height)
 						onObject = true;
-					}
 				}
 			}
 
-			if (onObject && LaraItem->animNumber != LA_HOP_BACK_CONTINUE)
-				item->itemFlags[1] = 1;
+			if (onObject && LaraItem->Animation.AnimNumber != LA_HOP_BACK_CONTINUE)
+				item->ItemFlags[1] = 1;
 			else
-				item->itemFlags[1] = -1;
+				item->ItemFlags[1] = -1;
 
-			if (item->itemFlags[1] < 0)
+			if (item->ItemFlags[1] < 0)
 			{
-				if (item->pos.yPos <= item->itemFlags[0])
-				{
-					item->itemFlags[1] = 1;
-				}
+				if (item->Pose.Position.y <= item->ItemFlags[0])
+					item->ItemFlags[1] = 1;
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
-					item->pos.yPos -= 4;
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose, 0);
+					item->Pose.Position.y -= 4;
 				}
 			}
-			else if (item->itemFlags[1] > 0)
+			else if (item->ItemFlags[1] > 0)
 			{
-				if (item->pos.yPos >= item->itemFlags[0] + 128)
-				{
-					item->itemFlags[1] = -1;
-				}
+				if (item->Pose.Position.y >= item->ItemFlags[0] + 128)
+					item->ItemFlags[1] = -1;
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->pos, 0);
-					item->pos.yPos += 4;
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose, 0);
+					item->Pose.Position.y += 4;
 				}
 			}
 		}
@@ -96,9 +88,9 @@ void TwoBlocksPlatformControl(short itemNumber)
 
 std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (!item->meshBits)
+	if (!item->MeshBits)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -106,9 +98,9 @@ std::optional<int> TwoBlocksPlatformFloor(short itemNumber, int x, int y, int z)
 
 std::optional<int> TwoBlocksPlatformCeiling(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (!item->meshBits)
+	if (!item->MeshBits)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);
