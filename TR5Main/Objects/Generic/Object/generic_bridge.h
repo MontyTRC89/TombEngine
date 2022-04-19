@@ -12,27 +12,28 @@ int GetOffset(short angle, int x, int z);
 template <int tilt>
 std::optional<int> BridgeFloor(short itemNumber, int x, int y, int z)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, false);
 
 	if (bboxHeight.has_value() && tilt != 0)
 	{
-		const auto height = item->pos.yPos + tilt * (GetOffset(item->pos.yRot, x, z) / 4 + SECTOR(1) / 8);
+		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
 		return std::optional{ height };
 	}
+
 	return bboxHeight;
 }
 
 template <int tilt>
 std::optional<int> BridgeCeiling(short itemNumber, int x, int y, int z)
 {
-	auto item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 	auto bboxHeight = GetBridgeItemIntersect(itemNumber, x, y, z, true);
 
 	if (bboxHeight.has_value() && tilt != 0)
 	{
-		const auto height = item->pos.yPos + tilt * (GetOffset(item->pos.yRot, x, z) / 4 + SECTOR(1) / 8);
-		return std::optional{ height + SECTOR(1) / 16 }; // To be customized with Lua
+		const auto height = item->Pose.Position.y + tilt * (GetOffset(item->Pose.Orientation.y, x, z) / 4 + SECTOR(1) / 8);
+		return std::optional{ height + CLICK(1) }; // To be customized with Lua
 	}
 	return bboxHeight;
 }

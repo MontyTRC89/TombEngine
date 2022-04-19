@@ -10,14 +10,14 @@ table Item {
     touch_bits: int32;
     mesh_bits: int32;
     object_id: int32;
-    current_anim_state: int32;
-    goal_anim_state: int32;
-    required_anim_state: int32;
+    active_state: int32;
+    target_state: int32;
+    required_state: int32;
     anim_number: int32;
     frame_number: int32;
     room_number: int32;
-    speed: int32;
-    fall_speed: int32;
+    velocity: int32;
+    vertical_velocity: int32;
     hit_points: int32;
     box_number: int32;
     timer: int32;
@@ -25,39 +25,29 @@ table Item {
     trigger_flags: int32;
     carried_item: int32;
     after_death: int32;
-    fired_weapon: int32;
     item_flags: [int32];
 	position: Position;
 	triggered: bool;
 	active: bool;
 	status: int32;
-	gravity_status: bool;
+	airborne: bool;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;
-	poisoned: bool;
 	ai_bits: int32;
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
 }
 
-table WeaponInfo {
-	object_number: uint32;
-	anim_number: uint32;
-	frame_number: uint32;
-	current_anim_state: uint32;
-	goal_anim_state: uint32;
+table AmmoInfo {
+	count: int32;
+	is_infinite: bool;
 }
 
 table HolsterInfo {
 	left_holster: int32;
 	right_holster: int32;
 	back_holster: int32;
-}
-
-table AmmoInfo {
-	count: int32;
-	is_infinite: bool;
 }
 
 table CarriedWeaponInfo {
@@ -68,120 +58,45 @@ table CarriedWeaponInfo {
 	has_silencer: bool;
 }
 
-table LaraArmInfo {
-	frame_base: int32;
-	frame_number: int32;
+table WeaponInfo {
+	object_number: uint32;
+	anim_number: uint32;
+	frame_number: uint32;
+	active_state: uint32;
+	target_state: uint32;
+}
+
+table ArmInfo {
 	anim_number: int32;
-	lock: bool;
-	x_rot: int32;
-	y_rot: int32;
-	z_rot: int32;
+	frame_number: int32;
+	frame_base: int32;
+	locked: bool;
+	rotation: Vector3;
 	flash_gun: int32;
 }
 
-table LaraTightropeInfo {
-	balance: float;
-	time_on_tightrope: int32;
-	can_go_off: bool;
-	tightrope_item: int32;
+table FlareData {
+	life: uint32;
+	frame: int32;
+	control_left: bool;
 }
 
-table Lara {
-	item_number: int32;
-	gun_status: int32;
-	gun_type: int32;
-	request_gun_type: int32;
-	last_gun_type: int32;
-	hit_points: int32;
-	speed: int32;
-	fall_speed: int32;
-	calc_fall_speed: int32;
-	water_status: int32;
-	climb_status: int32;
-	pose_count: int32;
-	jump_count: int32;
-	jump_queued: bool;
-	hit_frame: int32;
-	hit_direction: int32;
-	sprint_timer: int32;
-	air: int32;
-	dive_count: int32;
-	death_count: int32;
-	current_active: int32;
-	current_x_vel: int32;
-	current_y_vel: int32;
-	current_z_vel: int32;
-	spaz_effect_count: int32;
-	flare_age: int32;
-	burn_count: int32;
-	weapon_item: int32;
-	holster_info: HolsterInfo;
-	flare_frame: int32;
-	poisoned: int32;
-	wet: [bool];
-	flare_control_left: int32;
-	look: bool;
-	burn: bool;
-	keep_crouched: bool;
-	is_moving: bool;
-	can_monkey_swing: bool;
-	burn_blue: int32;
-	burn_smoke: bool;
-	is_ducked: bool;
-	has_fired: bool;
-	busy: bool;
+table LaraInventoryData {
+	is_busy: bool;
 	old_busy: bool;
-	uncontrollable: bool;
-	lit_torch: bool;
-	is_climbing: bool;
-	fired: bool;
-	water_surface_dist: int32;
-	last_position: Vector3;
-	next_corner_position: Vector3;
-	next_corner_rotation: Vector3;
-	mesh_ptrs: [int32];
-	target_angles: [int32];
-	turn_rate: int32;
-	move_angle: int32;
-	head_x_rot: int32;
-	head_y_rot: int32;
-	head_z_rot: int32;
-	torso_x_rot: int32;
-	torso_y_rot: int32;
-	torso_z_rot: int32;
-	left_arm: LaraArmInfo;
-	right_arm: LaraArmInfo;
-	rope_segment: int32;
-	rope_direction: int32;
-	rope_arc_front: int32;
-	rope_arc_back: int32;
-	rope_last_x: int32;
-	rope_max_x_forward: int32;
-	rope_max_x_backward: int32;
-	rope_dframe: int32;
-	rope_frame: int32;
-	rope_framerate: int32;
-	rope_y: int32;
-	rope_ptr: int32;
-	interacted_item: int32;
-	rope_offset: int32;
-	rope_down_vel: int32;
-	rope_flag: int32;
-	rope_count: int32;
-	move_count: int32;
-	location: int32;
-	highest_location: int32;
-	location_pad: int32;
-	tightrope: LaraTightropeInfo;
 	beetle_life: int32;
-	has_beetle_things: int32;
+	beetle_components: int32;
 	small_waterskin: int32;
 	big_waterskin: int32;
-	vehicle: int32;
-	extra_anim: int32;
-	mine_l: bool;
-	mine_r: bool;
-	weapons: [CarriedWeaponInfo];
+	has_binoculars: bool;
+	has_crowbar: bool;
+	has_torch: bool;
+	has_lasersight: bool;
+	has_silencer: bool;
+	total_small_medipacks: int32;
+	total_large_medipacks: int32;
+	total_flares: int32;
+	total_secrets: uint32;
 	puzzles: [int32];
 	keys: [int32];
 	pickups: [int32];
@@ -190,16 +105,132 @@ table Lara {
 	keys_combo: [int32];
 	pickups_combo: [int32];
 	examines_combo: [int32];
-	secrets: int32;
-	lasersight: bool;
-	crowbar: bool;
-	torch: bool;
-	silencer: bool;
-	binoculars: bool;
-	num_large_medipacks: int32;
-	num_small_medipacks: int32;
-	num_flares: int32;
-	target_item_number: int32;
+}
+
+table LaraCountData {
+	run_jump: uint32;
+	position_adjust: uint32;
+	pose: uint32;
+	death: uint32;
+	no_cheat: uint32;
+}
+
+table WeaponControlData {
+	weapon_item: int32;
+	has_fired: bool;
+	fired: bool;
+	uzi_left: bool;
+	uzi_right: bool;
+	gun_type: int32;
+	request_gun_type: int32;
+	last_gun_type: int32;
+	holster_info: HolsterInfo;
+}
+
+table RopeControlData {
+	segment: int32;
+	direction: int32;
+	arc_front: int32;
+	arc_back: int32;
+	last_x: int32;
+	max_x_forward: int32;
+	max_x_backward: int32;
+	dframe: int32;
+	frame: int32;
+	frame_rate: int32;
+	y: int32;
+	ptr: int32;
+	offset: int32;
+	down_vel: int32;
+	flag: int32;
+	count: int32;
+}
+
+table TightropeControlData {
+	balance: float;
+	time_on_tightrope: uint32;
+	can_dismount: bool;
+	tightrope_item: int32;
+}
+
+table SubsuitControlData {
+	x_rot: int32;
+	d_x_rot: int32;
+	velocity: [int32];
+	vertical_velocity: int32;
+	x_rot_vel: int32;
+	hit_count: uint32;
+}
+
+table MinecartControlData {
+	left: bool;
+	right: bool;
+}
+
+table LaraControlData {
+	move_angle: int32;
+	turn_rate: int32;
+	calculated_jump_velocity: int32;
+	jump_direction: int32;
+	hand_status: int32;
+	water_status: int32;
+	count: LaraCountData;
+	can_look: bool;
+	is_moving: bool;
+	keep_low: bool;
+	is_low: bool;
+	can_climb_ladder: bool;
+	is_climbing_ladder: bool;
+	can_monkey_swing: bool;
+	run_jump_queued: bool;
+	locked: bool;
+	weapon: WeaponControlData;
+	rope: RopeControlData;
+	tightrope: TightropeControlData;
+	subsuit: SubsuitControlData;
+	minecart: MinecartControlData;
+}
+
+table Lara {
+	item_number: int32;
+	control: LaraControlData;
+	inventory: LaraInventoryData;
+	weapons: [CarriedWeaponInfo];
+	flare: FlareData;
+	lit_torch: bool;
+	extra_head_rot: Vector3;
+	extra_torso_rot: Vector3;
+	extra_velocity: Vector3;
+	water_current_active: int32;
+	water_current_pull: Vector3;
+	left_arm: ArmInfo;
+	right_arm: ArmInfo;
+	target_arm_angles: [int32];
+	target_entity_number: int32;
+	air: int32;
+	sprint_energy: int32;
+	poison_potency: int32;
+	vehicle: int32;
+	extra_anim: int32;
+	hit_frame: int32;
+	hit_direction: int32;
+	spasm_effect_count: uint32;
+	projected_floor_height: int32;
+	target_facing_angle: int32;
+	water_surface_dist: int32;
+	interacted_item: int32;
+	next_corner_position: Vector3;
+	next_corner_rotation: Vector3;
+	burn_type: int32;
+	burn_count: uint32;
+	burn: bool;
+	burn_blue: int32;
+	burn_smoke: bool;
+	wet: [bool];
+	mesh_ptrs: [int32];
+	location: int32;
+	highest_location: int32;
+	location_pad: int32;
 }
 
 table FixedCamera {

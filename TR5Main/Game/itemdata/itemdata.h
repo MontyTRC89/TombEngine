@@ -26,7 +26,8 @@ template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++2
 
 struct ITEM_INFO;
 
-class ITEM_DATA {
+class ITEM_DATA
+{
 	std::variant<std::nullptr_t,
 		char,
 		short,
@@ -43,23 +44,23 @@ class ITEM_DATA {
 		long double,
 		std::array<short, 4>,
 		ITEM_INFO*,
-		CREATURE_INFO,
-		LASER_HEAD_INFO,
-		QUAD_INFO,
-		BIGGUNINFO,
-		MOTORBIKE_INFO,
-		JEEP_INFO,
+		CreatureInfo,
+		LaserHeadInfo,
+		QuadInfo,
+		BigGunInfo,
+		MotorbikeInfo,
+		JeepInfo,
 		LaraInfo*,
-		KAYAK_INFO,
+		KayakInfo,
 		DOOR_DATA,
-		SKIDOO_INFO,
-		SUB_INFO,
-		BOAT_INFO,
-		GAME_VECTOR,
-		WRAITH_INFO,
-		RUBBER_BOAT_INFO,
-		PUSHABLE_INFO,
-		CART_INFO
+		SkidooInfo,
+		UPVInfo,
+		SpeedBoatInfo,
+		GameVector,
+		WraithInfo,
+		RubberBoatInfo,
+		PushableInfo,
+		MinecartInfo
 	> data;
 	public:
 	ITEM_DATA();
@@ -67,65 +68,81 @@ class ITEM_DATA {
 	template<typename D>
 	ITEM_DATA(D&& type) : data(std::move(type)) {}
 
-
 	// conversion operators to keep original syntax!
 	// TODO: should be removed later and
 	template<typename T>
-	operator T* () {
-		if(std::holds_alternative<T>(data)) {
+	operator T* ()
+	{
+		if (std::holds_alternative<T>(data))
+		{
 			auto& ref = std::get<T>(data);
 			return &ref;
 		}
+
 		throw std::runtime_error("ITEM_DATA does not hold the requested type!\n The code set the ITEM_DATA to a different type than the type that was attempted to read");
 	}
 
 	template<typename T>
-	operator T& () {
-		if(std::holds_alternative<T>(data)) {
+	operator T& ()
+	{
+		if (std::holds_alternative<T>(data))
+		{
 			auto& ref = std::get<T>(data);
 			return ref;
 		}
+
 		throw std::runtime_error("ITEM_DATA does not hold the requested type!\n The code set the ITEM_DATA to a different type than the type that was attempted to read");
 	}
+
 	/* Uncommented, we want to store pointers to global data, too (LaraInfo for example)
 	template<typename T>
-	ITEM_DATA& operator=(T* newData) {
+	ITEM_DATA& operator=(T* newData)
+	{
 		data = *newData;
 		return *this;
 	}
 	*/
-	ITEM_DATA& operator=(std::nullptr_t null) {
+
+	ITEM_DATA& operator=(std::nullptr_t null)
+	{
 		data = nullptr;
 		return *this;
 	}
 
 	template<typename T>
-	ITEM_DATA& operator=(T& newData) {
+	ITEM_DATA& operator=(T& newData)
+	{
 		data = newData;
 		return *this;
 	}
 
 	template<typename T>
-	ITEM_DATA& operator=(T&& newData) {
+	ITEM_DATA& operator=(T&& newData)
+	{
 		data = std::move(newData);
 		return *this;
 	}
 
-	operator bool() const {
+	operator bool() const
+	{
 		return !std::holds_alternative<std::nullptr_t>(data);
 	}
 
 	template<typename ... Funcs>
-	void apply(Funcs&&... funcs) {
+	void apply(Funcs&&... funcs)
+	{
 		std::visit(
-		visitor{
-			[](auto const&) {},
-			std::forward<Funcs>(funcs)... 
-		},
+		visitor
+			{
+				[](auto const&) {},
+				std::forward<Funcs>(funcs)...
+			},
 		data);
 	}
+
 	template<typename T>
-	bool is() const {
+	bool is() const
+	{
 		return std::holds_alternative<T>(data);
 	}
 };

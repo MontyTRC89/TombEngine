@@ -11,8 +11,9 @@
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/collision/sphere.h"
-#include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_struct.h"
 #include "Specific/trmath.h"
 #include "Game/misc.h"
 #include "Objects/Generic/Doors/double_doors.h"
@@ -20,61 +21,61 @@
 
 namespace TEN::Entities::Doors
 {
-	PHD_VECTOR DoubleDoorPos(0, 0, 220);
+	Vector3Int DoubleDoorPos(0, 0, 220);
 
 	OBJECT_COLLISION_BOUNDS DoubleDoorBounds =
 	{
 		-384, 384, 
 		0, 0, 
 		-1024, 512, 
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10),
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f),
 	};
 
-	void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void DoubleDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* doorItem = &g_Level.Items[itemNumber];
 
-		if (TrInput & IN_ACTION
-			&& l->currentAnimState == LS_IDLE
-			&& l->animNumber == LA_STAND_IDLE
-			&& !(item->status && item->gravityStatus)
-			&& !(l->hitStatus)
-			&& !Lara.gunStatus
-			|| Lara.isMoving && Lara.interactedItem == itemNum)
+		if (TrInput & IN_ACTION &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+			!laraItem->HitStatus &&
+			!(doorItem->Status && doorItem->Animation.Airborne) &&
+			laraInfo->Control.HandStatus == HandStatus::Free ||
+			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			item->pos.yRot ^= ANGLE(180);
-			if (TestLaraPosition(&DoubleDoorBounds, item, l))
+			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+
+			if (TestLaraPosition(&DoubleDoorBounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(&DoubleDoorPos, item, l))
+				if (MoveLaraPosition(&DoubleDoorPos, doorItem, laraItem))
 				{
-					SetAnimation(l, LA_DOUBLEDOOR_OPEN_PUSH);
+					SetAnimation(laraItem, LA_DOUBLEDOOR_OPEN_PUSH);
 
-					AddActiveItem(itemNum);
+					AddActiveItem(itemNumber);
 
-					item->status = ITEM_ACTIVE;
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
+					ResetLaraFlex(laraItem);
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Busy;
+					doorItem->Status = ITEM_ACTIVE;
 				}
 				else
-				{
-					Lara.interactedItem = itemNum;
-				}
-				item->pos.yRot ^= ANGLE(180);
+					laraInfo->InteractedItem = itemNumber;
+
+				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.interactedItem == itemNum)
+				if (laraInfo->Control.IsMoving &&
+					laraInfo->InteractedItem == itemNumber)
 				{
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
-				item->pos.yRot ^= ANGLE(180);
+
+				doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
 			}
 		}
 	}

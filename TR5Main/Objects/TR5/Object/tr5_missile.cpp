@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "tr5_missile.h"
 #include "Game/items.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
@@ -19,35 +20,33 @@ int DebrisFlags;
 
 void MissileControl(short itemNumber)
 {
-	FX_INFO* fx = &EffectList[itemNumber];
+	auto* fx = &EffectList[itemNumber];
 	if (fx->flag1 == 2)
 	{
-		fx->pos.zRot += 16 * fx->speed;
+		fx->pos.Orientation.z += 16 * fx->speed;
 
 		if (fx->speed > 64)
 			fx->speed -= 4;
 
-		if (fx->pos.xRot > -12288)
+		if (fx->pos.Orientation.x > -12288)
 		{
 			if (fx->fallspeed < 512)
 				fx->fallspeed += 36;
-			fx->pos.xRot -= fx->fallspeed;
+			fx->pos.Orientation.x -= fx->fallspeed;
 		}
 	}
 	else
 	{
 		short angles[2];
 		phd_GetVectorAngles(
-			LaraItem->pos.xPos - fx->pos.xPos,
-			LaraItem->pos.yPos - fx->pos.yPos - 256,
-			LaraItem->pos.zPos - fx->pos.zPos,
+			LaraItem->Pose.Position.x - fx->pos.Position.x,
+			LaraItem->Pose.Position.y - fx->pos.Position.y - 256,
+			LaraItem->Pose.Position.z - fx->pos.Position.z,
 			angles);
 
 		int dh;
 		if (fx->flag1)
-		{
 			dh = fx->flag1 != 1 ? 768 : 384;
-		}
 		else
 		{
 			if (fx->counter)
@@ -60,12 +59,12 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			int dy = angles[0] - fx->pos.yRot;
+			int dy = angles[0] - fx->pos.Orientation.y;
 			if (abs(dy) > 0x8000)
 				dy = -dy;
 			dy /= 8;
 
-			int dx = angles[1] - fx->pos.xRot;
+			int dx = angles[1] - fx->pos.Orientation.x;
 			if (abs(dx) > 0x8000)
 				dx = -dx;
 			dx /= 8;
@@ -76,9 +75,7 @@ void MissileControl(short itemNumber)
 					dy = -dh;
 			}
 			else
-			{
 				dy = dh;
-			}
 			
 			if (dx <= dh)
 			{
@@ -86,55 +83,50 @@ void MissileControl(short itemNumber)
 					dx = -dh;
 			}
 			else
-			{
 				dx = dh;
-			}
 
-			fx->pos.yRot += dy;
-			fx->pos.xRot += dx;
+			fx->pos.Orientation.y += dy;
+			fx->pos.Orientation.x += dx;
 		}
 		
-		fx->pos.zRot += 16 * fx->speed;
+		fx->pos.Orientation.z += 16 * fx->speed;
 
 		if (!fx->flag1)
-			fx->pos.zRot += 16 * fx->speed;
+			fx->pos.Orientation.z += 16 * fx->speed;
 	}
 
-	int x = fx->pos.xPos;
-	int y = fx->pos.yPos;
-	int z = fx->pos.zPos;
+	int x = fx->pos.Position.x;
+	int y = fx->pos.Position.y;
+	int z = fx->pos.Position.z;
 
-	int c = fx->speed * phd_cos(fx->pos.xRot);
+	int c = fx->speed * phd_cos(fx->pos.Orientation.x);
 
-	fx->pos.xPos += c * phd_sin(fx->pos.yRot);
-	fx->pos.yPos += fx->speed * phd_sin(-fx->pos.xRot);
-	fx->pos.zPos += c * phd_cos(fx->pos.yRot);
+	fx->pos.Position.x += c * phd_sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
+	fx->pos.Position.z += c * phd_cos(fx->pos.Orientation.y);
 
-	short roomNumber = fx->roomNumber;
-	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos,&roomNumber);
-	int fh = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-	int ch = GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 	
-	if (fx->pos.yPos >= fh || fx->pos.yPos <= ch)
+	if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
 	{
-		fx->pos.xPos = x;
-		fx->pos.yPos = y;
-		fx->pos.zPos = z;
+		fx->pos.Position.x = x;
+		fx->pos.Position.y = y;
+		fx->pos.Position.z = z;
 
 		if (fx->flag1)
 		{
 			if (fx->flag1 == 1)
 			{
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
-				fx->pos.yPos -= 64;
+				fx->pos.Position.y -= 64;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
-				fx->pos.yPos -= 128;
+				fx->pos.Position.y -= 128;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 64, 128, 0, 24, 0, 1);
 			}
 			else if (fx->flag1 == 2)
 			{
 				ExplodeFX(fx, 0, 32);
-				SoundEffect(251,&fx->pos, 0);
+				SoundEffect(251, &fx->pos, 0);
 			}
 		}
 		else
@@ -147,7 +139,7 @@ void MissileControl(short itemNumber)
 	}
 	else if (ItemNearLara((PHD_3DPOS*)fx, 200))
 	{
-		LaraItem->hitStatus = true;
+		LaraItem->HitStatus = true;
 		
 		if (fx->flag1)
 		{
@@ -155,11 +147,11 @@ void MissileControl(short itemNumber)
 			{
 				// ROMAN_GOD hit effect
 				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
-				fx->pos.yPos -= 64;
+				fx->pos.Position.y -= 64;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
-				fx->pos.yPos -= 128;
+				fx->pos.Position.y -= 128;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
-				LaraItem->hitPoints -= 200;			
+				LaraItem->HitPoints -= 200;			
 				KillEffect(itemNumber);
 			}
 			else
@@ -168,10 +160,10 @@ void MissileControl(short itemNumber)
 				{
 					// IMP hit effect
 					ExplodeFX(fx, 0, 32);
-					LaraItem->hitPoints -= 50;
-					DoBloodSplat(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, (GetRandomControl() & 3) + 2, LaraItem->pos.yRot, LaraItem->roomNumber);
-					SoundEffect(944,&fx->pos, 0);
-					SoundEffect(SFX_TR4_LARA_INJURY,&LaraItem->pos, 0);
+					LaraItem->HitPoints -= 50;
+					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+					SoundEffect(SFX_TR5_IMP_STONEHIT, &fx->pos, 0);
+					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
 				}
 				
 				KillEffect(itemNumber);
@@ -182,8 +174,8 @@ void MissileControl(short itemNumber)
 			// HYDRA hit effect
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
 			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
-			if (LaraItem->hitPoints >= 500)
-				LaraItem->hitPoints -= 300;
+			if (LaraItem->HitPoints >= 500)
+				LaraItem->HitPoints -= 300;
 			else
 				LaraBurn(LaraItem);
 			KillEffect(itemNumber);
@@ -191,28 +183,23 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		if (roomNumber != fx->roomNumber)
-			EffectNewRoom(itemNumber, roomNumber);
+		if (probe.RoomNumber != fx->roomNumber)
+			EffectNewRoom(itemNumber, probe.RoomNumber);
 
 		if (GlobalCounter & 1)
 		{
-			PHD_VECTOR pos;
-			pos.x = x;
-			pos.y = y;
-			pos.z = z;
+			Vector3Int pos = { x, y, z };
 
-			int xv = x - fx->pos.xPos;
-			int yv = y - fx->pos.yPos;
-			int zv = z - fx->pos.zPos;
+			int xv = x - fx->pos.Position.x;
+			int yv = y - fx->pos.Position.y;
+			int zv = z - fx->pos.Position.z;
 
 			if (fx->flag1 == 1)
-			{
 				TriggerRomanStatueMissileSparks(&pos, itemNumber);
-			}
 			else
 			{
 				TriggerHydraMissileSparks(&pos, 4 * xv, 4 * yv, 4 * zv);
-				TriggerHydraMissileSparks((PHD_VECTOR*)&fx, 4 * xv, 4 * yv, 4 * zv);
+				TriggerHydraMissileSparks((Vector3Int*)&fx, 4 * xv, 4 * yv, 4 * zv);
 			}
 		}
 	}
@@ -220,11 +207,11 @@ void MissileControl(short itemNumber)
 
 void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 {
-	ShatterItem.yRot = fx->pos.yRot;
+	ShatterItem.yRot = fx->pos.Orientation.y;
 	ShatterItem.meshIndex = fx->frameNumber;
-	ShatterItem.sphere.x = fx->pos.xPos;
-	ShatterItem.sphere.y = fx->pos.yPos;
-	ShatterItem.sphere.z = fx->pos.zPos;
+	ShatterItem.sphere.x = fx->pos.Position.x;
+	ShatterItem.sphere.y = fx->pos.Position.y;
+	ShatterItem.sphere.z = fx->pos.Position.z;
 	ShatterItem.bit = 0;
 	ShatterItem.flags = fx->flag2 & 0x1400;
 
@@ -235,4 +222,3 @@ void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 
 	DebrisFlags = 0;
 }
-

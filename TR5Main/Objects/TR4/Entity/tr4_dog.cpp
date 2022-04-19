@@ -8,46 +8,51 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 
 namespace TEN::Entities::TR4
 {
-	enum DOG_STATES
-	{
-		STATE_DOG_NONE = 0,
-		STATE_DOG_STOP = 1,
-		STATE_DOG_WALK = 2,
-		STATE_DOG_RUN = 3,
-		STATE_DOG_STALK = 5,
-		STATE_DOG_JUMP_ATTACK = 6,
-		STATE_DOG_HOWL = 7,
-		STATE_DOG_SLEEP = 8,
-		STATE_DOG_CROUCH = 9,
-		STATE_DOG_DEATH = 11,
-		STATE_DOG_CROUCH_ATTACK = 12
-	};
+	BYTE DogAnims[] = { 20, 21, 22, 20 };
+	BITE_INFO DogBite = { 0, 0, 100, 3 };
 
 	constexpr auto DOG_CROUCH_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
 
-	BYTE DogAnims[] = { 20, 21, 22, 20 };
-	BITE_INFO DogBite = { 0, 0, 100, 3 };
-
-	void InitialiseTr4Dog(short itemNum)
+	enum DogState
 	{
-		ITEM_INFO* item;
+		DOG_STATE_NONE = 0,
+		DOG_STATE_STOP = 1,
+		DOG_STATE_WALK = 2,
+		DOG_STATE_RUN = 3,
+		DOG_STATE_STALK = 5,
+		DOG_STATE_JUMP_ATTACK = 6,
+		DOG_STATE_HOWL = 7,
+		DOG_STATE_SLEEP = 8,
+		DOG_STATE_CROUCH = 9,
+		DOG_STATE_DEATH = 11,
+		DOG_STATE_CROUCH_ATTACK = 12
+	};
 
-		item = &g_Level.Items[itemNum];
-		item->currentAnimState = STATE_DOG_STOP;
-		item->animNumber = Objects[item->objectNumber].animIndex + 8;
+	// TODO
+	enum DogAnim
+	{
+
+	};
+
+	void InitialiseTr4Dog(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+		item->Animation.ActiveState = DOG_STATE_STOP;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
 
 		// OCB 1 makes the dog sitting down until fired
-		if (item->triggerFlags)
+		if (item->TriggerFlags)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 1;
-			item->status -= ITEM_INVISIBLE;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+			item->Status -= ITEM_INVISIBLE;
 		}
 
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void Tr4DogControl(short itemNumber)
@@ -55,164 +60,166 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+		auto* object = &Objects[item->ObjectNumber];
+
 		short angle = 0;
 		short joint2 = 0;
 		short joint1 = 0;
 		short joint0 = 0;
 
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
-
-		if (item->hitPoints <= 0)
+		if (item->HitPoints <= 0)
 		{
-			if (item->animNumber == obj->animIndex + 1)
+			if (item->Animation.AnimNumber == object->animIndex + 1)
+				item->HitPoints = object->HitPoints;
+			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
 			{
-				item->hitPoints = obj->hitPoints;
-			}
-			else if (item->currentAnimState != STATE_DOG_DEATH)
-			{
-				item->animNumber = obj->animIndex + DogAnims[GetRandomControl() & 3];
-				item->currentAnimState = STATE_DOG_DEATH;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->Animation.AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
+				item->Animation.ActiveState = DOG_STATE_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 		else
 		{
-			if (item->aiBits)
+			if (item->AIBits)
 				GetAITarget(creature);
 			else
-				creature->enemy = LaraItem;
+				creature->Enemy = LaraItem;
 
-			AI_INFO info;
-			CreatureAIInfo(item, &info);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
 			int distance;
-			if (creature->enemy == LaraItem)
-			{
-				distance = info.distance;
-			}
+			if (creature->Enemy == LaraItem)
+				distance = AI.distance;
 			else
 			{
-				int dx = LaraItem->pos.xPos - item->pos.xPos;
-				int dz = LaraItem->pos.zPos - item->pos.zPos;
+				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				phd_atan(dz, dx);
-				distance = SQUARE(dx) + SQUARE(dz);
+				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				joint2 = info.xAngle; // Maybe swapped
-				joint1 = info.angle;
+				joint2 = AI.xAngle; // Maybe swapped
+				joint1 = AI.angle;
 			}
 
-			GetCreatureMood(item, &info, VIOLENT);
-			CreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
-			if (creature->mood == BORED_MOOD)
-				creature->maximumTurn /= 2;
+			if (creature->Mood == MoodType::Bored)
+				creature->MaxTurn /= 2;
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 			joint0 = 4 * angle;
 
-			if (creature->hurtByLara || distance < SQUARE(3072) && !(item->aiBits & MODIFY))
+			if (creature->HurtByLara || distance < pow(SECTOR(3), 2) && !(item->AIBits & MODIFY))
 			{
 				AlertAllGuards(itemNumber);
-				item->aiBits &= ~MODIFY;
+				item->AIBits &= ~MODIFY;
 			}
 
 			short random = GetRandomControl();
-			int frame = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-			switch (item->currentAnimState)
+			switch (item->Animation.ActiveState)
 			{
-			case STATE_DOG_NONE:
-			case STATE_DOG_SLEEP:
+			case DOG_STATE_NONE:
+			case DOG_STATE_SLEEP:
 				joint1 = 0;
 				joint2 = 0;
-				if (creature->mood && (item->aiBits) != MODIFY)
-				{
-					item->goalAnimState = STATE_DOG_STOP;
-				}
+
+				if (creature->Mood != MoodType::Bored && item->AIBits != MODIFY)
+					item->Animation.TargetState = DOG_STATE_STOP;
 				else
 				{
-					creature->flags++;
-					creature->maximumTurn = 0;
-					if (creature->flags > 300 && random < 128)
-						item->goalAnimState = STATE_DOG_STOP;
+					creature->Flags++;
+					creature->MaxTurn = 0;
+
+					if (creature->Flags > 300 && random < 128)
+						item->Animation.TargetState = DOG_STATE_STOP;
 				}
+
 				break;
 
-			case STATE_DOG_STOP:
-			case STATE_DOG_CROUCH:
-				if (item->currentAnimState == STATE_DOG_CROUCH && item->requiredAnimState)
+			case DOG_STATE_STOP:
+			case DOG_STATE_CROUCH:
+				creature->MaxTurn = 0;
+
+				if (item->Animation.ActiveState == DOG_STATE_CROUCH && item->Animation.RequiredState)
 				{
-					item->goalAnimState = item->requiredAnimState;
+					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
 				}
 
-				creature->maximumTurn = 0;
-				if (item->aiBits & GUARD)
+				if (item->AIBits & GUARD)
 				{
 					joint1 = AIGuard(creature);
+
 					if (GetRandomControl())
 						break;
-					if (item->currentAnimState == STATE_DOG_STOP)
+
+					if (item->Animation.ActiveState == DOG_STATE_STOP)
 					{
-						item->goalAnimState = STATE_DOG_CROUCH;
+						item->Animation.TargetState = DOG_STATE_CROUCH;
 						break;
 					}
 				}
 				else
 				{
-					if (item->currentAnimState == STATE_DOG_CROUCH && random < 128)
+					if (item->Animation.ActiveState == DOG_STATE_CROUCH && random < 128)
 					{
-						item->goalAnimState = STATE_DOG_STOP;
+						item->Animation.TargetState = DOG_STATE_STOP;
 						break;
 					}
 
-					if (item->aiBits & PATROL1)
+					if (item->AIBits & PATROL1)
 					{
-						if (item->currentAnimState == STATE_DOG_STOP)
-							item->goalAnimState = STATE_DOG_WALK;
+						if (item->Animation.ActiveState == DOG_STATE_STOP)
+							item->Animation.TargetState = DOG_STATE_WALK;
 						else
-							item->goalAnimState = STATE_DOG_STOP;
+							item->Animation.TargetState = DOG_STATE_STOP;
+
 						break;
 					}
 
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.target == item || !info.ahead || item->hitStatus)
+						if (Lara.TargetEntity == item || !AI.ahead || item->HitStatus)
 						{
-							item->requiredAnimState = STATE_DOG_RUN;
-							item->goalAnimState = STATE_DOG_CROUCH;
+							item->Animation.RequiredState = DOG_STATE_RUN;
+							item->Animation.TargetState = DOG_STATE_CROUCH;
 						}
 						else
-						{
-							item->goalAnimState = STATE_DOG_STOP;
-						}
+							item->Animation.TargetState = DOG_STATE_STOP;
+
 						break;
 					}
 
-					if (creature->mood != BORED_MOOD)
+					if (creature->Mood != MoodType::Bored)
 					{
-						item->requiredAnimState = STATE_DOG_RUN;
-						if (item->currentAnimState == STATE_DOG_STOP)
-							item->goalAnimState = STATE_DOG_CROUCH;
+						item->Animation.RequiredState = DOG_STATE_RUN;
+
+						if (item->Animation.ActiveState == DOG_STATE_STOP)
+							item->Animation.TargetState = DOG_STATE_CROUCH;
+
 						break;
 					}
 
-					creature->flags = 0;
-					creature->maximumTurn = ANGLE(1);
+					creature->Flags = 0;
+					creature->MaxTurn = ANGLE(1.0f);
 
 					if (random < 256)
 					{
-						if (item->aiBits & MODIFY)
+						if (item->AIBits & MODIFY)
 						{
-							if (item->currentAnimState == STATE_DOG_STOP)
+							if (item->Animation.ActiveState == DOG_STATE_STOP)
 							{
-								item->goalAnimState = STATE_DOG_SLEEP;
-								creature->flags = 0;
+								item->Animation.TargetState = DOG_STATE_SLEEP;
+								creature->Flags = 0;
 								break;
 							}
 						}
@@ -221,114 +228,116 @@ namespace TEN::Entities::TR4
 					if (random >= 4096)
 					{
 						if (!(random & 0x1F))
-							item->goalAnimState = STATE_DOG_HOWL;
+							item->Animation.TargetState = DOG_STATE_HOWL;
+
 						break;
 					}
 
-					if (item->currentAnimState == STATE_DOG_STOP)
+					if (item->Animation.ActiveState == DOG_STATE_STOP)
 					{
-						item->goalAnimState = STATE_DOG_WALK;
+						item->Animation.TargetState = DOG_STATE_WALK;
 						break;
 					}
 				}
-				item->goalAnimState = STATE_DOG_STOP;
+
+				item->Animation.TargetState = DOG_STATE_STOP;
 				break;
 
-			case STATE_DOG_WALK:
-				creature->maximumTurn = ANGLE(3);
-				if (item->aiBits & PATROL1)
+			case DOG_STATE_WALK:
+				creature->MaxTurn = ANGLE(3.0f);
+
+				if (item->AIBits & PATROL1)
 				{
-					item->goalAnimState = STATE_DOG_WALK;
+					item->Animation.TargetState = DOG_STATE_WALK;
 					break;
 				}
 
-				if (!creature->mood && random < 256)
+				if (creature->Mood == MoodType::Bored && random < 256)
 				{
-					item->goalAnimState = STATE_DOG_STOP;
+					item->Animation.TargetState = DOG_STATE_STOP;
 					break;
 				}
-				item->goalAnimState = STATE_DOG_STALK;
+
+				item->Animation.TargetState = DOG_STATE_STALK;
 				break;
 
-			case STATE_DOG_RUN:
-				creature->maximumTurn = ANGLE(6);
-				if (creature->mood == ESCAPE_MOOD)
+			case DOG_STATE_RUN:
+				creature->MaxTurn = ANGLE(6.0f);
+
+				if (creature->Mood == MoodType::Escape)
 				{
-					if (Lara.target != item && info.ahead)
-						item->goalAnimState = STATE_DOG_CROUCH;
+					if (Lara.TargetEntity != item && AI.ahead)
+						item->Animation.TargetState = DOG_STATE_CROUCH;
 				}
-				else if (creature->mood)
+				else if (creature->Mood != MoodType::Bored)
 				{
-					if (info.bite && info.distance < SQUARE(1024))
+					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
+					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
-						item->goalAnimState = STATE_DOG_JUMP_ATTACK;
-					}
-					else if (info.distance < SQUARE(1536))
-					{
-						item->requiredAnimState = STATE_DOG_STALK;
-						item->goalAnimState = STATE_DOG_CROUCH;
+						item->Animation.RequiredState = DOG_STATE_STALK;
+						item->Animation.TargetState = DOG_STATE_CROUCH;
 					}
 				}
 				else
-				{
-					item->goalAnimState = STATE_DOG_CROUCH;
-				}
+					item->Animation.TargetState = DOG_STATE_CROUCH;
+
 				break;
 
-			case STATE_DOG_STALK:
-				creature->maximumTurn = ANGLE(3);
-				if (creature->mood)
+			case DOG_STATE_STALK:
+				creature->MaxTurn = ANGLE(3.0f);
+
+				if (creature->Mood != MoodType::Bored)
 				{
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->Mood == MoodType::Escape)
+						item->Animation.TargetState = DOG_STATE_RUN;
+					else if (AI.bite && AI.distance < pow(341, 2))
 					{
-						item->goalAnimState = STATE_DOG_RUN;
+						item->Animation.TargetState = DOG_STATE_CROUCH_ATTACK;
+						item->Animation.RequiredState = DOG_STATE_STALK;
 					}
-					else if (info.bite && info.distance < SQUARE(341))
-					{
-						item->goalAnimState = STATE_DOG_CROUCH_ATTACK;
-						item->requiredAnimState = STATE_DOG_STALK;
-					}
-					else if (info.distance > SQUARE(1536) || item->hitStatus)
-					{
-						item->goalAnimState = STATE_DOG_RUN;
-					}
+					else if (AI.distance > pow(SECTOR(1.5f), 2) || item->HitStatus)
+						item->Animation.TargetState = DOG_STATE_RUN;
 				}
 				else
-				{
-					item->goalAnimState = STATE_DOG_CROUCH;
-				}
+					item->Animation.TargetState = DOG_STATE_CROUCH;
+
 				break;
 
-			case STATE_DOG_JUMP_ATTACK:
-				if (info.bite
-					&& item->touchBits & 0x6648
-					&& frame >= 4
-					&& frame <= 14)
+			case DOG_STATE_JUMP_ATTACK:
+				if (AI.bite &&
+					item->TouchBits & 0x6648 &&
+					frame >= 4 &&
+					frame <= 14)
 				{
 					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-					LaraItem->hitPoints -= DOG_JUMP_ATTACK_DAMAGE;
-					LaraItem->hitStatus = true;
+
+					LaraItem->HitPoints -= DOG_JUMP_ATTACK_DAMAGE;
+					LaraItem->HitStatus = true;
 				}
-				item->goalAnimState = STATE_DOG_RUN;
+
+				item->Animation.TargetState = DOG_STATE_RUN;
 				break;
 
-			case STATE_DOG_HOWL:
+			case DOG_STATE_HOWL:
 				joint1 = 0;
 				joint2 = 0;
 				break;
 
-			case STATE_DOG_CROUCH_ATTACK:
-				if (info.bite
-					&& item->touchBits & 0x48
-					&& (frame >= 9
-						&& frame <= 12
-						|| frame >= 22
-						&& frame <= 25))
+			case DOG_STATE_CROUCH_ATTACK:
+				if (AI.bite &&
+					item->TouchBits & 0x48 &&
+					(frame >= 9 &&
+						frame <= 12 ||
+						frame >= 22 &&
+						frame <= 25))
 				{
 					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-					LaraItem->hitPoints -= DOG_CROUCH_ATTACK_DAMAGE;
-					LaraItem->hitStatus = true;
+
+					LaraItem->HitPoints -= DOG_CROUCH_ATTACK_DAMAGE;
+					LaraItem->HitStatus = true;
 				}
+
 				break;
 
 			default:

@@ -1,22 +1,21 @@
 #pragma once
+
 struct ITEM_INFO;
-struct COLL_INFO;
-
-
+struct CollisionInfo;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
-void InitialisePushableBlock(short itemNum);
+void InitialisePushableBlock(short itemNumber);
 void PushableBlockControl(short itemNumber);
-void PushableBlockCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
-bool TestBlockMovable(ITEM_INFO* item, int blokhite);
-bool TestBlockPush(ITEM_INFO* item, int blockhite, unsigned short quadrant);
-bool TestBlockPull(ITEM_INFO* item, int blockhite, short quadrant);
-void MoveStackXZ(short itemNum);
-void MoveStackY(short itemNum, int y);
-void RemoveBridgeStack(short itemNum);
-void AddBridgeStack(short itemNum);
-void RemoveFromStack(short itemNum);
-int FindStack(short itemNum);
+void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+bool TestBlockMovable(ITEM_INFO* item, int blockHeight);
+bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant);
+bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant);
+void MoveStackXZ(short itemNumber);
+void MoveStackY(short itemNumber, int y);
+void RemoveBridgeStack(short itemNumber);
+void AddBridgeStack(short itemNumber);
+void RemoveFromStack(short itemNumber);
+int FindStack(short itemNumber);
 int GetStackHeight(ITEM_INFO* item);
 bool CheckStackLimit(ITEM_INFO* item);
 void PushLoop(ITEM_INFO* item);

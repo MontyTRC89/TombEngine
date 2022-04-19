@@ -1,3 +1,3 @@
 #pragma once
 
-void SilencerControl(short itemNum);
+void SilencerControl(short itemNumber);

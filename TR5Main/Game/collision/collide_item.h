@@ -3,7 +3,7 @@
 #include "Specific/trmath.h"
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 struct FLOOR_INFO;
 struct MESH_INFO;
 
@@ -25,32 +25,32 @@ struct OBJECT_COLLISION_BOUNDS
 	short rotZ2;
 };
 
-void GenericSphereBoxCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int flag2);
-bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* lara, COLL_INFO* coll);
-void TestForObjectOnLedge(ITEM_INFO* item, COLL_INFO* coll);
+bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* laraItem, CollisionInfo* coll);
+void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll);
 
-bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* l);
-void AlignLaraPosition(PHD_VECTOR* vec, ITEM_INFO* item, ITEM_INFO* l);
-bool MoveLaraPosition(PHD_VECTOR* pos, ITEM_INFO* item, ITEM_INFO* l);
+bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* laraItem);
+void AlignLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem);
+bool MoveLaraPosition(Vector3Int* pos, ITEM_INFO* item, ITEM_INFO* laraItem);
 
 bool ItemNearLara(PHD_3DPOS* pos, int radius);
 bool ItemNearTarget(PHD_3DPOS* src, ITEM_INFO* target, int radius);
 
-bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angAdd);
+bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angleAdd);
 
-bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* l, int radius);
+bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius);
 bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius);
-bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* l, COLL_INFO* coll, bool spazon, char bigpush);
-bool ItemPushStatic(ITEM_INFO* l, MESH_INFO* mesh, COLL_INFO* coll);
+bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* laraItem, CollisionInfo* coll, bool spasmEnabled, char bigPush);
+bool ItemPushStatic(ITEM_INFO* laraItem, MESH_INFO* mesh, CollisionInfo* coll);
 
-bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, COLL_INFO* coll);
-void CollideSolidStatics(ITEM_INFO* item, COLL_INFO* coll);
+bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PHD_3DPOS pos, CollisionInfo* coll);
+void CollideSolidStatics(ITEM_INFO* item, CollisionInfo* coll);
 
-void AIPickupCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
-void ObjectCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
-void CreatureCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
-void TrapCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* c);
+void AIPickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+void ObjectCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+void TrapCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
-void DoObjectCollision(ITEM_INFO* item, COLL_INFO* coll);
+void DoObjectCollision(ITEM_INFO* item, CollisionInfo* coll);

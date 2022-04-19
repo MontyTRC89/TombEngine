@@ -2,6 +2,7 @@
 #include "Objects/Generic/Switches/fullblock_switch.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/setup.h"
 #include "Game/collision/collide_item.h"
@@ -16,94 +17,92 @@ namespace TEN::Entities::Switches
 		-384, 384,
 		0, 256,
 		0, 512,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	PHD_VECTOR FullBlockSwitchPos = { 0, 0, 0 };
+	Vector3Int FullBlockSwitchPos = { 0, 0, 0 };
 
 	byte SequenceUsed[6];
 	byte SequenceResults[3][3][3];
 	byte Sequences[3];
 	byte CurrentSequence;
 
-	void FullBlockSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void FullBlockSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if ((!(TrInput & IN_ACTION)
-			|| item->status
-			|| item->flags & 0x100
-			|| CurrentSequence >= 3
-			|| Lara.gunStatus
-			|| l->currentAnimState != LS_IDLE
-			|| l->animNumber != LA_STAND_IDLE)
-			&& (!Lara.isMoving || Lara.interactedItem !=itemNum))
+		if ((!(TrInput & IN_ACTION) ||
+			laraItem->Animation.ActiveState != LS_IDLE ||
+			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
+			laraInfo->Control.HandStatus != HandStatus::Free ||
+			switchItem->Status ||
+			switchItem->Flags & 0x100 ||
+			CurrentSequence >= 3) &&
+			(!laraInfo->Control.IsMoving || laraInfo->InteractedItem !=itemNumber))
 		{
-			ObjectCollision(itemNum, l, coll);
+			ObjectCollision(itemNumber, laraItem, coll);
 			return;
 		}
 
-		if (TestLaraPosition(&FullBlockSwitchBounds, item, l))
+		if (TestLaraPosition(&FullBlockSwitchBounds, switchItem, laraItem))
 		{
-			if (MoveLaraPosition(&FullBlockSwitchPos, item, l))
+			if (MoveLaraPosition(&FullBlockSwitchPos, switchItem, laraItem))
 			{
-				if (item->currentAnimState == 1)
+				if (switchItem->Animation.ActiveState == 1)
 				{
-					l->currentAnimState = LS_SWITCH_DOWN;
-					l->animNumber = LA_BUTTON_GIANT_PUSH;
-					item->goalAnimState = 0;
+					laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
+					laraItem->Animation.AnimNumber = LA_BUTTON_GIANT_PUSH;
+					switchItem->Animation.TargetState = 0;
 				}
-				l->goalAnimState = LS_IDLE;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				item->status = ITEM_ACTIVE;
 
-				AddActiveItem(itemNum);
-				AnimateItem(item);
+				laraItem->Animation.TargetState = LS_IDLE;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				switchItem->Status = ITEM_ACTIVE;
 
-				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-				Lara.gunStatus = LG_HANDS_BUSY;
+				AddActiveItem(itemNumber);
+				AnimateItem(switchItem);
+
+				ResetLaraFlex(laraItem);
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Busy;
 			}
 			else
-			{
-				Lara.interactedItem = itemNum;
-			}
+				laraInfo->InteractedItem = itemNumber;
 		}
-		else if (Lara.isMoving && Lara.interactedItem == itemNum)
+		else if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			Lara.isMoving = false;
-			Lara.gunStatus = LG_HANDS_FREE;
+			laraInfo->Control.IsMoving = false;
+			laraInfo->Control.HandStatus = HandStatus::Free;
 		}
 	}
 
 	void FullBlockSwitchControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ITEM_INFO* switchItem = &g_Level.Items[itemNumber];
 
-		if (item->animNumber != Objects[item->objectNumber].animIndex + 2
-			|| CurrentSequence >= 3
-			|| item->itemFlags[0])
+		if (switchItem->Animation.AnimNumber != Objects[switchItem->ObjectNumber].animIndex + 2 ||
+			CurrentSequence >= 3 ||
+			switchItem->ItemFlags[0])
 		{
 			if (CurrentSequence >= 4)
 			{
-				item->itemFlags[0] = 0;
-				item->goalAnimState = SWITCH_ON;
-				item->status = ITEM_NOT_ACTIVE;
+				switchItem->ItemFlags[0] = 0;
+				switchItem->Animation.TargetState = SWITCH_ON;
+				switchItem->Status = ITEM_NOT_ACTIVE;
+
 				if (++CurrentSequence >= 7)
 					CurrentSequence = 0;
 			}
 		}
 		else
 		{
-			item->itemFlags[0] = 1;
-			Sequences[CurrentSequence++] = item->triggerFlags;
+			switchItem->ItemFlags[0] = 1;
+			Sequences[CurrentSequence++] = switchItem->TriggerFlags;
 		}
 
-		AnimateItem(item);
+		AnimateItem(switchItem);
 	}
 }

@@ -7,25 +7,25 @@
 
 namespace TEN::Entities::TR4
 {
-	void BirdBladeControl(short itemNum)
+	void BirdBladeControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
-		item->itemFlags[3] = 100;
+		item->ItemFlags[3] = 100;
 
 		if (!TriggerActive(item))
 		{
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			*((int*)&item->itemFlags[0]) = 0;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			*((int*)&item->ItemFlags[0]) = 0;
 		}
 		else
 		{
-			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			if (frameNumber <= 14 || frameNumber >= 31)
-				*((int*)&item->itemFlags[0]) = 0;
+				*((int*)&item->ItemFlags[0]) = 0;
 			else
-				*((int*)&item->itemFlags[0]) = 6;
+				*((int*)&item->ItemFlags[0]) = 6;
 
 			AnimateItem(item);
 		}

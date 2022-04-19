@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseSwordGuardian(short itemNum);
-void SwordGuardianControl(short itemNum);
+void InitialiseSwordGuardian(short itemNumber);
+void SwordGuardianControl(short itemNumber);
