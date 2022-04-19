@@ -6,7 +6,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
-#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Specific/setup.h"
@@ -23,7 +22,6 @@
 #include "Renderer/RendererSprites.h"
 #include "Game/effects/lightning.h"
 #include "Game/items.h"
-#include "Game/misc.h"
 
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
@@ -77,9 +75,9 @@ namespace TEN::Renderer
 
 				for (int j = 0; j < 6; j++)
 				{
-					LightningPos[j].x -= LaraItem->Pose.Position.x;
-					LightningPos[j].y -= LaraItem->Pose.Position.y;
-					LightningPos[j].z -= LaraItem->Pose.Position.z;
+					LightningPos[j].x -= LaraItem->pos.xPos;
+					LightningPos[j].y -= LaraItem->pos.yPos;
+					LightningPos[j].z -= LaraItem->pos.zPos;
 				}
 
 				CalcLightningSpline(&LightningPos[0], LightningBuffer, arc);
@@ -90,15 +88,15 @@ namespace TEN::Renderer
 
 					for (int s = 0; s < 3 * arc->segments - 1; s++)
 					{
-						int ix = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz = LaraItem->Pose.Position.z + interpolatedPos[2];
+						int ix = LaraItem->pos.xPos + interpolatedPos[0];
+						int iy = LaraItem->pos.yPos + interpolatedPos[1];
+						int iz = LaraItem->pos.zPos + interpolatedPos[2];
 
 						interpolatedPos += 4;
 
-						int ix2 = LaraItem->Pose.Position.x + interpolatedPos[0];
-						int iy2 = LaraItem->Pose.Position.y + interpolatedPos[1];
-						int iz2 = LaraItem->Pose.Position.z + interpolatedPos[2];
+						int ix2 = LaraItem->pos.xPos + interpolatedPos[0];
+						int iy2 = LaraItem->pos.yPos + interpolatedPos[1];
+						int iz2 = LaraItem->pos.zPos + interpolatedPos[2];
 
 						byte r, g, b;
 
@@ -178,7 +176,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawSparks(RenderView& view) 
 	{
-		Vector3Int nodePos;
+		PHD_VECTOR nodePos;
 
 		for (int i = 0; i < MAX_NODE; i++)
 			NodeOffsets[i].gotIt = false;
@@ -196,9 +194,9 @@ namespace TEN::Renderer
 					{
 						FX_INFO* fx = &EffectList[spark->fxObj];
 
-						pos.x += fx->pos.Position.x;
-						pos.y += fx->pos.Position.y;
-						pos.z += fx->pos.Position.z;
+						pos.x += fx->pos.xPos;
+						pos.y += fx->pos.yPos;
+						pos.z += fx->pos.zPos;
 
 						if ((spark->sLife - spark->life) > (rand() & 7) + 4) 
 						{
@@ -254,9 +252,9 @@ namespace TEN::Renderer
 						} 
 						else 
 						{
-							pos.x += item->Pose.Position.x;
-							pos.y += item->Pose.Position.y;
-							pos.z += item->Pose.Position.z;
+							pos.x += item->pos.xPos;
+							pos.y += item->pos.yPos;
+							pos.z += item->pos.zPos;
 						}
 					}
 
@@ -520,7 +518,7 @@ namespace TEN::Renderer
 
 	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
-		if (!Lara.RightArm.FlashGun && !Lara.LeftArm.FlashGun)
+		if (!Lara.rightArm.flash_gun && !Lara.leftArm.flash_gun)
 			return true;
 
 		if (BinocularRange > 0)
@@ -534,8 +532,8 @@ namespace TEN::Renderer
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
 		OBJECT_INFO* obj = &Objects[0];
-		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
-		RendererItem* item = &m_items[Lara.ItemNumber];
+		RendererRoom const & room = m_rooms[LaraItem->roomNumber];
+		RendererItem* item = &m_items[Lara.itemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -557,32 +555,27 @@ namespace TEN::Renderer
 		m_context->OMSetBlendState(m_states->Additive(), NULL, 0xFFFFFFFF);
 		m_context->OMSetDepthStencilState(m_states->DepthRead(), 0);
 
-		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
-			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
-			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
+		if (Lara.gunType != WEAPON_FLARE && Lara.gunType != WEAPON_SHOTGUN && Lara.gunType != WEAPON_CROSSBOW) 
 		{
-			switch (Lara.Control.Weapon.GunType)
+			switch (Lara.gunType) 
 			{
-			case LaraWeaponType::Revolver:
+			case WEAPON_REVOLVER:
 				length = 192;
 				zOffset = 68;
 				rotationX = -14560;
 				break;
-
-			case LaraWeaponType::Uzi:
+			case WEAPON_UZI:
 				length = 190;
 				zOffset = 50;
 				rotationX = -14560;
 				break;
-
-			case LaraWeaponType::HK:
+			case WEAPON_HK:
 				length = 300;
 				zOffset = 92;
 				rotationX = -14560;
 				break;
-
 			default:
-			case LaraWeaponType::Pistol:
+			case WEAPON_PISTOLS:
 				length = 180;
 				zOffset = 40;
 				rotationX = -16830;
@@ -602,7 +595,7 @@ namespace TEN::Renderer
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
-					if (Lara.LeftArm.FlashGun)
+					if (Lara.leftArm.flash_gun) 
 					{
 						world = laraObj.AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
 						world = offset * world;
@@ -616,7 +609,7 @@ namespace TEN::Renderer
 						m_numDrawCalls++;
 					}
 
-					if (Lara.RightArm.FlashGun)
+					if (Lara.rightArm.flash_gun) 
 					{
 						world = laraObj.AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
 						world = offset * world;
@@ -647,19 +640,11 @@ namespace TEN::Renderer
 			{
 				// Does the item need gunflash?
 				ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-				OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
-
-				if (obj->biteOffset == -1)
+				OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+				if (obj->biteOffset == -1 || !nativeItem->firedWeapon)
 					continue;
 
-				if (nativeItem->Data.is<CreatureInfo>())
-				{
-					auto* creature = GetCreatureInfo(nativeItem);
-					if (!creature->FiredWeapon)
-						continue;
-				}
-
-				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
+				RendererRoom const& room = m_rooms[nativeItem->roomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
 				m_stItem.AmbientLight = room.AmbientLight;
@@ -757,9 +742,9 @@ namespace TEN::Renderer
 			RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
 
 			if (dust->Reset) {
-				dust->X = LaraItem->Pose.Position.x + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Y = LaraItem->Pose.Position.y + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Z = LaraItem->Pose.Position.z + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->X = LaraItem->pos.xPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->Y = LaraItem->pos.yPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
+				dust->Z = LaraItem->pos.zPos + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
 
 				// Check if water room
 				short roomNumber = Camera.pos.roomNumber;
@@ -1048,7 +1033,7 @@ namespace TEN::Renderer
 		//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
 		m_stItem.World = effect->World;
-		m_stItem.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
+		m_stItem.Position = Vector4(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos, 1.0f);
 		m_stItem.AmbientLight = room.AmbientLight;
 		Matrix matrices[1] = { Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));

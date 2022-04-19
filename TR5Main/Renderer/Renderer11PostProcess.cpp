@@ -9,8 +9,7 @@ namespace TEN::Renderer
 		m_fadeFactor = 0.0f;
 	}
 
-	void Renderer11::fadeOut()
-	{
+	void Renderer11::fadeOut() {
 		m_fadeStatus = RENDERER_FADE_STATUS::FADE_OUT;
 		m_fadeFactor = 1.0f;
 	}

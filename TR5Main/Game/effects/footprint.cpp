@@ -17,13 +17,13 @@ namespace Footprints {
 
 	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, Vector3& outFootprintPosition) 
 	{
-		int x = item.Pose.Position.x;
-		int y = item.Pose.Position.y;
-		int z = item.Pose.Position.z;
-		short roomNumber = item.RoomNumber;
+		int x = item.pos.xPos;
+		int y = item.pos.yPos;
+		int z = item.pos.zPos;
+		short roomNumber = item.roomNumber;
 
 		auto floor = GetFloor(x, y, z, &roomNumber);
-		auto pos = Vector3Int(0, FOOT_HEIGHT_OFFSET, 0);
+		auto pos = PHD_VECTOR(0, FOOT_HEIGHT_OFFSET, 0);
 
 		GetLaraJointPosition(&pos, mesh);
 		int height = GetFloorHeight(floor, pos.x, pos.y - STEP_SIZE, pos.z);
@@ -51,7 +51,7 @@ namespace Footprints {
 		footPos.x += (GetRandomControl() & 10) - 5;
 		footPos.z += (GetRandomControl() & 10) - 5;
 
-		auto result = GetCollision(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->RoomNumber);
+		auto result = GetCollisionResult(footPos.x, footPos.y - STEP_SIZE, footPos.z, item->roomNumber);
 		auto floor = result.BottomBlock;
 
 		// Don't process material if foot has hit bridge object
@@ -153,7 +153,7 @@ namespace Footprints {
 
 		// HACK: must be here until reference wad2 is revised
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
-			SoundEffect(fx, &item->Pose, 0);
+			SoundEffect(fx, &item->pos, 0);
 
 		if (floor->Material != FLOOR_MATERIAL::Sand &&
 			floor->Material != FLOOR_MATERIAL::Snow &&
@@ -163,9 +163,9 @@ namespace Footprints {
 
 		// Calculate footprint tilts
 		auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
-		auto c = phd_cos(item->Pose.Orientation.y + ANGLE(180));
-		auto s = phd_sin(item->Pose.Orientation.y + ANGLE(180));
-		auto yRot = TO_RAD(item->Pose.Orientation.y);
+		auto c = phd_cos(item->pos.yRot + ANGLE(180));
+		auto s = phd_sin(item->pos.yRot + ANGLE(180));
+		auto yRot = TO_RAD(item->pos.yRot);
 		auto xRot = plane.x * s + plane.y * c;
 		auto zRot = plane.y * s - plane.x * c;
 
@@ -185,15 +185,15 @@ namespace Footprints {
 		p3 += Vector3(footPos.x, footPos.y, footPos.z);
 
 		// Get blocks for every footprint corner
-		auto c0 = GetCollision(p0.x, footPos.y - STEP_SIZE, p0.z, item->RoomNumber);
-		auto c1 = GetCollision(p1.x, footPos.y - STEP_SIZE, p1.z, item->RoomNumber);
-		auto c2 = GetCollision(p2.x, footPos.y - STEP_SIZE, p2.z, item->RoomNumber);
-		auto c3 = GetCollision(p3.x, footPos.y - STEP_SIZE, p3.z, item->RoomNumber);
+		auto c0 = GetCollisionResult(p0.x, footPos.y - STEP_SIZE, p0.z, item->roomNumber);
+		auto c1 = GetCollisionResult(p1.x, footPos.y - STEP_SIZE, p1.z, item->roomNumber);
+		auto c2 = GetCollisionResult(p2.x, footPos.y - STEP_SIZE, p2.z, item->roomNumber);
+		auto c3 = GetCollisionResult(p3.x, footPos.y - STEP_SIZE, p3.z, item->roomNumber);
 
 		// Don't process footprint placement if all foot corners aren't on the same tilt level
-		if ((c0.FloorTilt.x != c1.FloorTilt.x) || (c1.FloorTilt.x != c2.FloorTilt.x) || (c2.FloorTilt.x != c3.FloorTilt.x))
+		if ((c0.TiltX != c1.TiltX) || (c1.TiltX != c2.TiltX) || (c2.TiltX != c3.TiltX))
 			return;
-		if ((c0.FloorTilt.y != c1.FloorTilt.y) || (c1.FloorTilt.y != c2.FloorTilt.y) || (c2.FloorTilt.y != c3.FloorTilt.y))
+		if ((c0.TiltZ != c1.TiltZ) || (c1.TiltZ != c2.TiltZ) || (c2.TiltZ != c3.TiltZ))
 			return;
 
 		// Don't process footprint placement if all foot corners aren't on the same height

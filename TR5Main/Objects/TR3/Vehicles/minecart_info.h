@@ -1,19 +1,16 @@
 #pragma once
 
-struct MinecartInfo 
+struct CART_INFO 
 {
-	short TurnRot;
+	int Speed;
+	int MidPos;
+	int FrontPos;
 	int TurnX;
 	int TurnZ;
 	short TurnLen;
-
-	int Velocity;
-	int VerticalVelocity;
-	int Gradient;
-	unsigned int StopDelay;
-
-	int FloorHeightMiddle;
-	int FloorHeightFront;
-
+	short TurnRot;
+	short YVel;
+	short Gradient;
 	char Flags;
+	char StopDelay;
 };

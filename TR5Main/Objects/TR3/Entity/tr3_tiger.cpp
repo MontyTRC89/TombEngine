@@ -7,155 +7,136 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO TigerBite = { 19, -13, 3, 26 };
+BITE_INFO tigerBite = { 19, -13, 3, 26 };
 
-// TODO
-enum TigerState
+void TigerControl(short itemNum)
 {
-
-};
-
-// TODO
-enum TigerAnim
-{
-
-};
-
-void TigerControl(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
-
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short head = 0;
 	short angle = 0;
 	short tilt = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 9)
+		if (item->currentAnimState != 9)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 9;
+			item->animNumber = Objects[item->objectNumber].animIndex + 11;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 9;
 		}
 	}
 	else
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
 
-		if (AI.ahead)
-			head = AI.angle;
+		if (info.ahead)
+			head = info.angle;
 
-		GetCreatureMood(item, &AI, 1);
+		GetCreatureMood(item, &info, 1);
 
-		if (info->Alerted && AI.zoneNumber != AI.enemyZone)
-			info->Mood = MoodType::Escape;
+		if (creature->alerted && info.zoneNumber != info.enemyZone)
+			creature->mood = ESCAPE_MOOD;
 
-		CreatureMood(item, &AI, 1);
+		CreatureMood(item, &info, 1);
 
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			info->MaxTurn = 0;
-			info->Flags = 0;
+			creature->maximumTurn = 0;
+			creature->flags = 0;
 
-			if (info->Mood == MoodType::Escape)
+			if (creature->mood == ESCAPE_MOOD)
 			{
-				if (Lara.TargetEntity != item && AI.ahead)
-					item->Animation.TargetState = 1;
+				if (Lara.target != item && info.ahead)
+					item->goalAnimState = 1;
 				else
-					item->Animation.TargetState = 3;
+					item->goalAnimState = 3;
 			}
-			else if (info->Mood == MoodType::Bored)
+			else if (creature->mood == BORED_MOOD)
 			{
 				short random = GetRandomControl();
 				if (random < 0x60)
-					item->Animation.TargetState = 5;
+					item->goalAnimState = 5;
 				else if (random < 0x460);
-
-				item->Animation.TargetState = 2;
+				item->goalAnimState = 2;
 			}
-			else if (AI.bite && AI.distance < pow(340, 2))
-				item->Animation.TargetState = 6;
-			else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+			else if (info.bite && info.distance < SQUARE(340))
+				item->goalAnimState = 6;
+			else if (info.bite && info.distance < SQUARE(1024))
 			{
-				info->MaxTurn = ANGLE(3.0f);
-				item->Animation.TargetState = 8;
+				creature->maximumTurn = ANGLE(3);
+				item->goalAnimState = 8;
 			}
-			else if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (info->Mood != MoodType::Attack && GetRandomControl() < 0x60)
-				item->Animation.TargetState = 5;
+			else if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else if (creature->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
+				item->goalAnimState = 5;
 			else
-				item->Animation.TargetState = 3;
-
+				item->goalAnimState = 3;
 			break;
 
 		case 2:
-			info->MaxTurn = ANGLE(3.0f);
+			creature->maximumTurn = ANGLE(3);
 
-			if (info->Mood == MoodType::Escape || info->Mood == MoodType::Attack)
-				item->Animation.TargetState = 3;
+			if (creature->mood == ESCAPE_MOOD || creature->mood == ATTACK_MOOD)
+				item->goalAnimState = 3;
 			else if (GetRandomControl() < 0x60)
 			{
-				item->Animation.TargetState = 1;
-				item->Animation.RequiredState = 5;
+				item->goalAnimState = 1;
+				item->requiredAnimState = 5;
 			}
-
 			break;
 
 		case 3:
-			info->MaxTurn = ANGLE(6.0f);
+			creature->maximumTurn = ANGLE(6);
 
-			if (info->Mood == MoodType::Bored)
-				item->Animation.TargetState = 1;
-			else if (info->Flags && AI.ahead)
-				item->Animation.TargetState = 1;
-			else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
+			if (creature->mood == BORED_MOOD)
+				item->goalAnimState = 1;
+			else if (creature->flags && info.ahead)
+				item->goalAnimState = 1;
+			else if (info.bite && info.distance < SQUARE(1536))
 			{
-				if (LaraItem->Animation.Velocity == 0)
-					item->Animation.TargetState = 1;
+				if (LaraItem->speed == 0)
+					item->goalAnimState = 1;
 				else
-					item->Animation.TargetState = 7;
+					item->goalAnimState = 7;
 			}
-			else if (info->Mood != MoodType::Attack && GetRandomControl() < 0x60)
+			else if (creature->mood != ATTACK_MOOD && GetRandomControl() < 0x60)
 			{
-				item->Animation.RequiredState = 5;
-				item->Animation.TargetState = 1;
+				item->requiredAnimState = 5;
+				item->goalAnimState = 1;
 			}
-			else if (info->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead)
-				item->Animation.TargetState = 1;
+			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead)
+				item->goalAnimState = 1;
 
-			info->Flags = 0;
+			creature->flags = 0;
 			break;
 
 		case 6:
 		case 7:
 		case 8:
-			if (!info->Flags && item->TouchBits & 0x7FDC000)
+			if (!creature->flags && (item->touchBits & 0x7FDC000))
 			{
-				CreatureEffect(item, &TigerBite, DoBloodSplat);
-				info->Flags = 1;
-
-				LaraItem->HitStatus = true;
-				LaraItem->HitPoints -= 90;
+				LaraItem->hitStatus = true;
+				LaraItem->hitPoints -= 90;
+				CreatureEffect(item, &tigerBite, DoBloodSplat);
+				creature->flags = 1;
 			}
-
 			break;
 		}
 	}
 
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNumber, angle, tilt);
+	CreatureAnimation(itemNum, angle, tilt);
 }

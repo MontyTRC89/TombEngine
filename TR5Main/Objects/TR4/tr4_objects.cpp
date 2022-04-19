@@ -3,7 +3,7 @@
 #include "Game/pickup/pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
-#include "tr4_goon.h" // OK
+#include "tr4_baddy.h" // OK
 #include "tr4_bat.h" // OK
 #include "tr4_bigscorpion.h" // OK
 #include "tr4_crocodile.h" // OK
@@ -13,7 +13,7 @@
 #include "tr4_horseman.h" // OFF
 #include "tr4_jeanyves.h" // OK
 #include "tr4_knighttemplar.h" // OK
-#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
+#include "Objects/TR4/Entity/tr4_littlebeetle.h"
 #include "tr4_mummy.h" // OK
 #include "tr4_sas.h" // OK
 #include "tr4_sentrygun.h" // OK
@@ -78,7 +78,7 @@
 
 using namespace TEN::Entities::TR4;
 
-static void StartEntity(OBJECT_INFO* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
@@ -87,7 +87,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = SmallScorpionControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 8;
+		obj->hitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
 		obj->radius = 128;
@@ -106,7 +106,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = ScorpionControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 80;
+		obj->hitPoints = 80;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 512;
@@ -125,7 +125,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = HammerheadControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 8;
+		obj->hitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
 		obj->radius = 128;
@@ -145,7 +145,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = WildBoarControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 40;
+		obj->hitPoints = 40;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -169,7 +169,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->control = Tr4DogControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 18;
+		obj->hitPoints = 18;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 256;
@@ -189,7 +189,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = BatControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 5;
+		obj->hitPoints = 5;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 10;
 		obj->radius = 102;
@@ -208,7 +208,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = AhmetControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 80;
+		obj->hitPoints = 80;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 300;
 		obj->radius = 341;
@@ -222,14 +222,14 @@ static void StartEntity(OBJECT_INFO* obj)
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_GOON1];
+	obj = &Objects[ID_BADDY1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGoon;
-		obj->control = GoonControl;
+		obj->initialise = InitialiseBaddy;
+		obj->control = BaddyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 25;
+		obj->hitPoints = 25;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -238,7 +238,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_GOON1;
+		obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
 		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
@@ -247,14 +247,14 @@ static void StartEntity(OBJECT_INFO* obj)
 		//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_GOON2];
+	obj = &Objects[ID_BADDY2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGoon;
-		obj->control = GoonControl;
+		obj->initialise = InitialiseBaddy;
+		obj->control = BaddyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 25;
+		obj->hitPoints = 25;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -263,7 +263,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_GOON2;
+		obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
 		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
@@ -279,7 +279,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = SasControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 40;
+		obj->hitPoints = 40;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -303,7 +303,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = MummyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 15;
+		obj->hitPoints = 15;
 		obj->hitEffect = HIT_SMOKE;
 		obj->radius = 170;
 		obj->intelligent = true;
@@ -325,7 +325,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->initialise = TEN::Entities::TR4::InitialiseSkeleton;
 		obj->control = TEN::Entities::TR4::SkeletonControl;
 		obj->collision = CreatureCollision;
-		obj->HitPoints = 15;
+		obj->hitPoints = 15;
 		obj->hitEffect = HIT_SMOKE;
 		obj->shadowSize = 128;
 		obj->pivotLength = 50;
@@ -347,7 +347,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = KnightTemplarControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 15;
+		obj->hitPoints = 15;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 50;
 		obj->radius = 128;
@@ -369,7 +369,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = BigBeetleControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 30;
+		obj->hitPoints = 30;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 204;
@@ -389,7 +389,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = SethaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 500;
+		obj->hitPoints = 500;
 		obj->hitEffect = HIT_NONE;
 		obj->pivotLength = 50;
 		obj->radius = 341;
@@ -409,7 +409,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = DemigodControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 200;
+		obj->hitPoints = 200;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 341;
@@ -432,7 +432,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = DemigodControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 200;
+		obj->hitPoints = 200;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 341;
@@ -453,7 +453,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = DemigodControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 200;
+		obj->hitPoints = 200;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 341;
@@ -486,7 +486,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = TroopsControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 40;
+		obj->hitPoints = 40;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -508,7 +508,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->undead = true;
-		obj->HitPoints = 30;
+		obj->hitPoints = 30;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
 		obj->radius = 204;
@@ -532,7 +532,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = HarpyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 60;
+		obj->hitPoints = 60;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 50;
 		obj->radius = 409;
@@ -550,7 +550,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = GuideControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = NOT_TARGETABLE;
+		obj->hitPoints = NOT_TARGETABLE;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 0;
 		obj->radius = 128;
@@ -571,7 +571,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = CrocodileControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 36;
+		obj->hitPoints = 36;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 300;
 		obj->radius = 409;
@@ -595,7 +595,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = SphinxControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 1000;
+		obj->hitPoints = 1000;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 500;
 		obj->radius = 512;
@@ -623,7 +623,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = HorsemanControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 25;
+		obj->hitPoints = 25;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 500;
 		obj->radius = 409;
@@ -643,7 +643,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = BaboonControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 30;
+		obj->hitPoints = 30;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 256;
@@ -662,7 +662,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = BaboonControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 30;
+		obj->hitPoints = 30;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 256;
@@ -684,7 +684,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = BaboonControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 30;
+		obj->hitPoints = 30;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 256;
@@ -706,7 +706,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = TEN::Entities::TR4::CrocgodControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = NOT_TARGETABLE;
+		obj->hitPoints = NOT_TARGETABLE;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 50;
 		obj->radius = 128;
@@ -767,8 +767,8 @@ static void StartEntity(OBJECT_INFO* obj)
 	obj = &Objects[ID_LITTLE_BEETLE];
 	if (obj->loaded)
 	{
-		obj->initialise = TEN::Entities::TR4::InitialiseBeetleSwarm;
-		obj->control = TEN::Entities::TR4::BeetleSwarmControl;
+		obj->initialise = TEN::Entities::TR4::InitialiseScarabs;
+		obj->control = TEN::Entities::TR4::ScarabsControl;
 		obj->drawRoutine = NULL;
 		obj->saveFlags = true;
 		obj->zoneType = ZONE_BASIC;
@@ -813,7 +813,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->pivotLength = 500;
 		obj->shadowSize = 128;
 		obj->radius = 512;
-		obj->HitPoints = 40;
+		obj->hitPoints = 40;
 		obj->zoneType = ZONE_BASIC;
 
 		g_Level.Bones[obj->boneIndex + 4 * 8] |= ROT_X;
@@ -830,7 +830,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->pivotLength = 0;
 		obj->shadowSize = 128;
-		obj->HitPoints = 15;
+		obj->hitPoints = 15;
 		obj->explodableMeshbits = 0x200000;
 		obj->intelligent = true;
 		obj->saveAnim = true;
@@ -882,16 +882,16 @@ static void StartObject(OBJECT_INFO* obj)
 	obj = &Objects[ID_WHEEL_OF_FORTUNE];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGameSticks;
-		obj->control = GameSticksControl;
-		obj->collision = GameSticksCollision;
+		obj->initialise = InitialiseGameStix;
+		obj->control = GameStixControl;
+		obj->collision = GameStixCollision;
 		g_Level.Bones[obj->boneIndex] |= 0x10;
 		g_Level.Bones[obj->boneIndex + 4] |= 0x10;
 		g_Level.Bones[obj->boneIndex + 8] |= 0x10;
 		g_Level.Bones[obj->boneIndex + 12] |= 0x10;
 		obj->saveAnim = 1;
 		obj->saveFlags = 1;
-		obj->HitPoints = 1;
+		obj->hitPoints = 1;
 	}
 
 	obj = &Objects[ID_ENEMY_PIECE];
@@ -1159,7 +1159,7 @@ static void StartTrap(OBJECT_INFO* obj)
 		obj->collision = CreatureCollision;
 		obj->hitEffect = HIT_SMOKE;
 		obj->shadowSize = 128;
-		obj->HitPoints = 1000;
+		obj->hitPoints = 1000;
 		obj->pivotLength = 50;
 		obj->radius = 128;
 		obj->intelligent = true;
@@ -1214,7 +1214,7 @@ static void StartSwitch(OBJECT_INFO* obj)
 static OBJECT_INFO* objToInit;
 void InitialiseTR4Objects()
 {
-	StartEntity(objToInit);
+	StartBaddy(objToInit);
 	StartObject(objToInit);
 	StartSwitch(objToInit);
 	StartTrap(objToInit);
@@ -1223,5 +1223,5 @@ void InitialiseTR4Objects()
 
 void AllocTR4Objects()
 {
-	ZeroMemory(TEN::Entities::TR4::BeetleSwarm, TEN::Entities::TR4::NUM_BEETLES * sizeof(BeetleData));
+	ZeroMemory(TEN::Entities::TR4::Scarabs, TEN::Entities::TR4::NUM_SCARABS * sizeof(SCARAB_STRUCT));
 }

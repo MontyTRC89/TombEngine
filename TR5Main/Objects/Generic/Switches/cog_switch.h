@@ -1,7 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
 namespace TEN::Entities::Switches
 {
@@ -9,5 +9,5 @@ namespace TEN::Entities::Switches
 	constexpr auto COG_DOOR_SPEED = 12;
 
 	void CogSwitchControl(short itemNumber);
-	void CogSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+	void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 }

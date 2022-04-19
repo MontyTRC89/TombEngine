@@ -6,25 +6,24 @@
 #include "Game/effects/debris.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/animation.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
+#include "Game/animation.h"
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
-BITE_INFO KnightTemplarBite = { 0, 0, 0, 11 };
+BITE_INFO knightTemplarBite = { 0, 0, 0, 11 };
 
 void InitialiseKnightTemplar(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
-	item->Animation.AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
-	item->Animation.TargetState = 1;
-	item->Animation.ActiveState = 1;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->MeshBits &= 0xF7FF;
+	item->animNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
+	item->goalAnimState = 1;
+	item->currentAnimState = 1;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->meshBits &= 0xF7FF;
 }
 
 void KnightTemplarControl(short itemNumber)
@@ -32,23 +31,28 @@ void KnightTemplarControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-	auto* object = &Objects[item->ObjectNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	if (item->Animation.AnimNumber == object->animIndex ||
-		item->Animation.AnimNumber - object->animIndex == 1 ||
-		item->Animation.AnimNumber - object->animIndex == 11 ||
-		item->Animation.AnimNumber - object->animIndex == 12)
+	if (item->animNumber == obj->animIndex ||
+		item->animNumber - obj->animIndex == 1 ||
+		item->animNumber - obj->animIndex == 11 ||
+		item->animNumber - obj->animIndex == 12)
 	{
 		if (GetRandomControl() & 1)
 		{
-			Vector3Int pos = { 0, 48, 448 };
-			GetJointAbsPosition(item, &pos, 10);
+			PHD_VECTOR pos;
 
+			pos.x = 0;
+			pos.y = 48;
+			pos.z = 448;
+
+			GetJointAbsPosition(item, &pos, 10);
 			TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
 		}
 	}
+
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short tilt = 0;
 	short angle = 0;
@@ -56,163 +60,199 @@ void KnightTemplarControl(short itemNumber)
 	short joint1 = 0;
 	short joint2 = 0;
 
-	// Knight is immortal.
-	if (item->HitPoints < object->HitPoints)
-		item->HitPoints = object->HitPoints;
+	// Knight is immortal
+	if (item->hitPoints < obj->hitPoints)
+		item->hitPoints = obj->hitPoints;
 
-	if (item->AIBits)
+	if (item->aiBits)
 		GetAITarget(creature);
-	else if (creature->HurtByLara)
-		creature->Enemy = LaraItem;
+	else if (creature->hurtByLara)
+		creature->enemy = LaraItem;
 
-	AI_INFO AI;
-	CreatureAIInfo(item, &AI);
+	AI_INFO info;
+	AI_INFO laraInfo;
+
+	CreatureAIInfo(item, &info);
 
 	int a = 0;
-	if (creature->Enemy != LaraItem)
-		a = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
+	if (creature->enemy != LaraItem)
+		a = phd_atan(item->pos.zPos - LaraItem->pos.zPos, item->pos.xPos - LaraItem->pos.xPos);
 
-	GetCreatureMood(item, &AI, VIOLENT);
-	CreatureMood(item, &AI, VIOLENT);
+	GetCreatureMood(item, &info, VIOLENT);
+	CreatureMood(item, &info, VIOLENT);
 
-	angle = CreatureTurn(item, creature->MaxTurn);
+	angle = CreatureTurn(item, creature->maximumTurn);
 
-	if (AI.ahead)
+	if (info.ahead)
 	{
-		joint0 = AI.angle / 2;
-		joint1 = AI.xAngle;
-		joint2 = AI.angle / 2;
+		joint0 = info.angle / 2;
+		joint2 = info.angle / 2;
+		joint1 = info.xAngle;
 	}
 
 	int frameBase = 0;
 	int frameNumber = 0;
 
-	switch (item->Animation.ActiveState)
+	switch (item->currentAnimState)
 	{
 	case 1:
-		item->Animation.TargetState = 2;
-		creature->MaxTurn = ANGLE(2.0f);
-		creature->Flags = 0;
+		creature->flags = 0;
+		creature->maximumTurn = ANGLE(2);
 
-		if (AI.distance > pow(682, 2))
+		item->goalAnimState = 2;
+
+		if (info.distance > SQUARE(682))
 		{
-			if (Lara.TargetEntity == item)
-				item->Animation.TargetState = 6;
+			if (Lara.target == item)
+				item->goalAnimState = 6;
 		}
 		else if (GetRandomControl() & 1)
-			item->Animation.TargetState = 4;
+		{
+			item->goalAnimState = 4;
+		}
 		else if (GetRandomControl() & 1)
-			item->Animation.TargetState = 3;
+		{
+			item->goalAnimState = 3;
+		}
 		else
-			item->Animation.TargetState = 5;
+		{
+			item->goalAnimState = 5;
+		}
 
 		break;
 
 	case 2:
-		creature->MaxTurn = ANGLE(7.0f);
+		creature->maximumTurn = ANGLE(7);
 
-		if (Lara.TargetEntity == item || AI.distance <= pow(682, 2))
-			item->Animation.TargetState = 1;
+		if (Lara.target == item || info.distance <= SQUARE(682))
+		{
+			item->goalAnimState = 1;
+		}
 
 		break;
 
 	case 3:
 	case 4:
 	case 5:
-		creature->MaxTurn = 0;
+		creature->maximumTurn = 0;
 
-		if (abs(AI.angle) >= ANGLE(1.0f))
+		if (abs(info.angle) >= ANGLE(1))
 		{
-			if (AI.angle >= 0)
-				item->Pose.Orientation.y += ANGLE(1.0f);
+			if (info.angle >= 0)
+			{
+				item->pos.yRot += ANGLE(1);
+			}
 			else
-				item->Pose.Orientation.y -= ANGLE(1.0f);
+			{
+				item->pos.yRot -= ANGLE(1);
+			}
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+		{
+			item->pos.yRot += info.angle;
+		}
 
-		frameNumber = item->Animation.FrameNumber;
-		frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		frameNumber = item->frameNumber;
+		frameBase = g_Level.Anims[item->animNumber].frameBase;
 
 		if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
 		{
-			auto pos = Vector3Int();
+			PHD_VECTOR pos;
+			pos.x = 0;
+			pos.y = 0;
+			pos.z = 0;
+
 			GetJointAbsPosition(item, &pos, 11);
 
-			auto* room = &g_Level.Rooms[item->RoomNumber];
+			ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
+
 			FLOOR_INFO* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];
 
 			if (currentFloor->Stopper)
 			{
 				for (int i = 0; i < room->mesh.size(); i++)
 				{
-					auto* mesh = &room->mesh[i];
+					MESH_INFO* mesh = &room->mesh[i];
 
-					if (floor(pos.x) == floor(mesh->pos.Position.x) &&
-						floor(pos.z) == floor(mesh->pos.Position.z) &&
+					if (floor(pos.x) == floor(mesh->pos.xPos) &&
+						floor(pos.z) == floor(mesh->pos.zPos) &&
 						StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
-						ShatterObject(NULL, mesh, -64, LaraItem->RoomNumber, 0);
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+						ShatterObject(NULL, mesh, -64, LaraItem->roomNumber, 0);
+						SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						currentFloor->Stopper = false;
 
-						TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
+						TestTriggers(pos.x, pos.y, pos.z, item->roomNumber, true);
 					}
 
 					mesh++;
 				}
 			}
 
-			if (!creature->Flags)
+			if (!creature->flags)
 			{
-				if (item->TouchBits & 0xC00)
+				if (item->touchBits & 0xC00)
 				{
+					LaraItem->hitPoints -= 120;
+					LaraItem->hitStatus = true;
+
 					CreatureEffect2(
 						item,
-						&KnightTemplarBite,
+						&knightTemplarBite,
 						20,
 						-1,
 						DoBloodSplat);
 
-					creature->Flags = 1;
-
-					LaraItem->HitPoints -= 120;
-					LaraItem->HitStatus = true;
+					creature->flags = 1;
 				}
 			}
 		}
 
 	case 6:
-		creature->MaxTurn = 0;
+		creature->maximumTurn = 0;
 
-		if (abs(AI.angle) >= ANGLE(1.0f))
+		if (abs(info.angle) >= ANGLE(1))
 		{
-			if (AI.angle >= 0)
-				item->Pose.Orientation.y += ANGLE(1.0f);
+			if (info.angle >= 0)
+			{
+				item->pos.yRot += ANGLE(1);
+			}
 			else
-				item->Pose.Orientation.y -= ANGLE(1.0f);
+			{
+				item->pos.yRot -= ANGLE(1);
+			}
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+		{
+			item->pos.yRot += info.angle;
+		}
 
-		if (item->HitStatus)
+		if (item->hitStatus)
 		{
 			if (GetRandomControl() & 1)
-				item->Animation.TargetState = 7;
+			{
+				item->goalAnimState = 7;
+			}
 			else
-				item->Animation.TargetState = 8;
+			{
+				item->goalAnimState = 8;
+			}
 		}
-		else if (AI.distance <= pow(682, 2) || Lara.TargetEntity != item)
-			item->Animation.TargetState = 1;
+		else if (info.distance <= SQUARE(682) || Lara.target != item)
+		{
+			item->goalAnimState = 1;
+		}
 		else
-			item->Animation.TargetState = 6;
-		
+		{
+			item->goalAnimState = 6;
+		}
 		break;
 
 	default:
 		break;
+
 	}
 
 	CreatureTilt(item, tilt);

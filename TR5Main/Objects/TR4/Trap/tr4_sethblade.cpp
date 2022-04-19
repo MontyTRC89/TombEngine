@@ -8,58 +8,62 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSethBlade(short itemNumber)
+	void InitialiseSethBlade(short itemNum)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-		item->Animation.TargetState = 2;
-		item->Animation.ActiveState = 2;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->ItemFlags[2] = abs(item->TriggerFlags);
+		item->animNumber = Objects[item->objectNumber].animIndex + 1;
+		item->goalAnimState = 2;
+		item->currentAnimState = 2;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		item->itemFlags[2] = abs(item->triggerFlags);
 	}
 
-	void SethBladeControl(short itemNumber)
+	void SethBladeControl(short itemNum)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		*((int*)&item->ItemFlags) = 0;
+		*((int*)&item->itemFlags) = 0;
 
 		if (TriggerActive(item))
 		{
-			if (item->Animation.ActiveState == 2)
+			if (item->currentAnimState == 2)
 			{
-				if (item->ItemFlags[2] > 1)
-					item->ItemFlags[2]--;
-				else if (item->ItemFlags[2] == 1)
+				if (item->itemFlags[2] > 1)
 				{
-					item->Animation.TargetState = 1;
-					item->ItemFlags[2] = 0;
+					item->itemFlags[2]--;
 				}
-				else if (item->ItemFlags[2] == 0)
+				else if (item->itemFlags[2] == 1)
 				{
-					if (item->TriggerFlags > 0)
-						item->ItemFlags[2] = item->TriggerFlags;
+					item->goalAnimState = 1;
+					item->itemFlags[2] = 0;
+				}
+				else if (item->itemFlags[2] == 0)
+				{
+					if (item->triggerFlags > 0)
+					{
+						item->itemFlags[2] = item->triggerFlags;
+					}
 				}
 			}
 			else
 			{
-				int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
 				if (frameNumber >= 0 && frameNumber <= 6)
 				{
-					*((int*)&item->ItemFlags) = -1;
-					item->ItemFlags[3] = 1000;
+					*((int*)&item->itemFlags) = -1;
+					item->itemFlags[3] = 1000;
 				}
 				else if (frameNumber >= 7 && frameNumber <= 15)
 				{
-					*((int*)&item->ItemFlags) = 448;
-					item->ItemFlags[3] = 1000;
+					*((int*)&item->itemFlags) = 448;
+					item->itemFlags[3] = 1000;
 				}
 				else
 				{
-					*((int*)&item->ItemFlags) = 0;
-					item->ItemFlags[3] = 1000;
+					*((int*)&item->itemFlags) = 0;
+					item->itemFlags[3] = 1000;
 				}
 			}
 

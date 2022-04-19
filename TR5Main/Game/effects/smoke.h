@@ -4,16 +4,10 @@
 #include <array>
 
 struct ITEM_INFO;
-enum class LaraWeaponType;
-
-namespace TEN
-{
-	namespace Effects
-	{
-		namespace Smoke
-		{
-			struct SmokeParticle
-			{
+namespace TEN{
+	namespace Effects {
+		namespace Smoke {
+			struct SmokeParticle {
 				DirectX::SimpleMath::Vector4 sourceColor;
 				DirectX::SimpleMath::Vector4 destinationColor;
 				DirectX::SimpleMath::Vector4 color;
@@ -40,11 +34,12 @@ namespace TEN
 
 			void UpdateSmokeParticles();
 			void DisableSmokeParticles();
-			void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int life, int room);
-			void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, LaraWeaponType weaponType, byte count);
-			void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int velocity, int moving);
+			void TriggerFlareSmoke(const DirectX::SimpleMath::Vector3& pos, DirectX::SimpleMath::Vector3& direction, int age, int room);
+			void TriggerGunSmokeParticles(int x, int y, int z, int xv, int yv, int zv, byte initial, int weaponType, byte count);
+			void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving);
 			void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 			void TriggerBreathSmoke(long x, long y, long z, short angle);
 		}
 	}
+
 }

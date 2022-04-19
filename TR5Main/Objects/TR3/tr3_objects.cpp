@@ -33,7 +33,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-static void StartEntity(OBJECT_INFO* obj)
+static void StartBaddy(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];
 	if (obj->loaded)
@@ -43,7 +43,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = TonyControl;
 		obj->drawRoutine = S_DrawTonyBoss;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 100;
+		obj->hitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
 		obj->radius = 102;
@@ -63,7 +63,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = TigerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 24;
+		obj->hitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 340;
@@ -82,7 +82,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = CobraControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 8;
+		obj->hitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -102,7 +102,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = RaptorControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 100;
+		obj->hitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->pivotLength = 600;
@@ -124,7 +124,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = TribemanAxeControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 28;
+		obj->hitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -144,7 +144,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = TribemanDartsControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
-		obj->HitPoints = 28;
+		obj->hitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -161,9 +161,9 @@ static void StartEntity(OBJECT_INFO* obj)
 	obj = &Objects[ID_TYRANNOSAUR];
 	if (obj->loaded)
 	{
-		obj->control = TRexControl;
+		obj->control = TyrannosaurControl;
 		obj->collision = CreatureCollision;
-		obj->HitPoints = 800;
+		obj->hitPoints = 800;
 		obj->hitEffect = HIT_BLOOD;
 		obj->shadowSize = 64;
 		obj->pivotLength = 1800;
@@ -184,7 +184,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = ScubaControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 20;
+		obj->hitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 340;
 		obj->intelligent = true;
@@ -208,13 +208,13 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->savePosition = true;
 	}
 
-	obj = &Objects[ID_FLAMETHROWER_GOON];
+	obj = &Objects[ID_FLAMETHROWER_BADDY];
 	if (obj->loaded)
 	{
 		obj->control = FlameThrowerControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 36;
+		obj->hitPoints = 36;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -236,7 +236,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 8;
+		obj->hitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -257,7 +257,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = MPGunControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 28;
+		obj->hitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -280,7 +280,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = MPStickControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 28;
+		obj->hitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -304,7 +304,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = ShivaControl;
 		//obj->drawRoutine = DrawStatue;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 100;
+		obj->hitPoints = 100;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
 		obj->radius = 256;
@@ -326,7 +326,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->drawRoutine = S_DrawLondonBoss;
 		obj->shadowSize = 0;
 		obj->pivotLength = 50;
-		obj->HitPoints = 300;
+		obj->hitPoints = 300;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -346,7 +346,7 @@ static void StartEntity(OBJECT_INFO* obj)
 		obj->control = CivvyControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->HitPoints = 15;
+		obj->hitPoints = 15;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		obj->intelligent = true;
@@ -444,9 +444,9 @@ static void StartVehicles(OBJECT_INFO* obj)
 	obj = &Objects[ID_UPV];
 	if (obj->loaded)
 	{
-		obj->initialise = UPVInitialise;
-		obj->control = UPVEffects;
-		obj->collision = UPVCollision;
+		obj->initialise = SubInitialise;
+		obj->control = SubEffects;
+		obj->collision = SubCollision;
 	//	obj->drawRoutine = SubDraw;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
@@ -465,7 +465,7 @@ static void StartProjectiles(OBJECT_INFO* obj)
 static OBJECT_INFO* objToInit;
 void InitialiseTR3Objects()
 {
-	StartEntity(objToInit);
+	StartBaddy(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartVehicles(objToInit);

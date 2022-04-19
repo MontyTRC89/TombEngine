@@ -11,14 +11,12 @@
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-enum SeekOrigin
-{
+enum SeekOrigin {
 	BEGIN,
 	CURRENT
 };
 
-class BaseStream
-{
+class BaseStream {
 public:
 	virtual bool Read(char* buffer, int length) = 0;
 	virtual bool Write(char const * buffer, int length) = 0;
@@ -70,8 +68,7 @@ public:
 	bool WriteString(char const * str);
 };
 
-class MemoryStream : public BaseStream
-{
+class MemoryStream : public BaseStream {
 private:
 	char* m_startBuffer;
 	char* m_buffer;
@@ -97,8 +94,7 @@ public:
 	bool Close();
 };
 
-class FileStream : public BaseStream
-{
+class FileStream : public BaseStream {
 private:
 	std::fstream m_stream;
 

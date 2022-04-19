@@ -46,16 +46,16 @@ GameScriptRotation::GameScriptRotation(int aX, int aY, int aZ)
 
 void GameScriptRotation::StoreInPHDPos(PHD_3DPOS& pos) const
 {
-	pos.Orientation.x = x;
-	pos.Orientation.y = y;
-	pos.Orientation.z = z;
+	pos.xRot = x;
+	pos.yRot = y;
+	pos.zRot = z;
 }
 
 GameScriptRotation::GameScriptRotation(PHD_3DPOS const & pos)
 {
-	x = pos.Orientation.x;
-	y = pos.Orientation.y;
-	z = pos.Orientation.z;
+	x = pos.xRot;
+	y = pos.yRot;
+	z = pos.zRot;
 }
 
 /***

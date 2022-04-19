@@ -5,11 +5,11 @@
 
 constexpr auto NO_LOS_ITEM = INT_MAX;
 
-bool LOSAndReturnTarget(GameVector* start, GameVector* target, int push);
-bool LOS(GameVector* start, GameVector* end);
-int xLOS(GameVector* start, GameVector* end);
-int zLOS(GameVector* start, GameVector* end);
-bool ClipTarget(GameVector* start, GameVector* target);
-bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firing);
-int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject = GAME_OBJECT_ID::ID_NO_OBJECT);
-bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, Vector3Int* hitPos, short closesItemNumber);
+bool LOSAndReturnTarget(GAME_VECTOR* start, GAME_VECTOR* target, int push);
+bool LOS(GAME_VECTOR* start, GAME_VECTOR* end);
+int xLOS(GAME_VECTOR* start, GAME_VECTOR* end);
+int zLOS(GAME_VECTOR* start, GAME_VECTOR* end);
+int ClipTarget(GAME_VECTOR* start, GAME_VECTOR* target);
+int GetTargetOnLOS(GAME_VECTOR* src, GAME_VECTOR* dest, int DrawTarget, int firing);
+int ObjectOnLOS2(GAME_VECTOR* start, GAME_VECTOR* end, PHD_VECTOR* vec, MESH_INFO** mesh, GAME_OBJECT_ID priorityObject = GAME_OBJECT_ID::ID_NO_OBJECT);
+int DoRayBox(GAME_VECTOR* start, GAME_VECTOR* end, BOUNDING_BOX* box, PHD_3DPOS* itemOrStaticPos, PHD_VECTOR* hitPos, short closesItemNumber);

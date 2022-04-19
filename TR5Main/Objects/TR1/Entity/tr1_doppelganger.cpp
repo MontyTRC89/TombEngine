@@ -2,7 +2,6 @@
 #include "Objects/TR1/Entity/tr1_doppelganger.h"
 
 #include "Game/animation.h"
-#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -10,112 +9,127 @@
 #include "Game/misc.h"
 #include "Specific/level.h"
 
-// TODO:
-// - Bacon Lara cannot be targeted.
-// - Bacon Lara cannot move like Lara.
+// TODO: Evil lara is not targetable and cant move like lara.
 
-// Original:
-void InitialiseDoppelganger(short itemNumber)
+// get weapon damage to damage lara instead. (*25)
+static short GetWeaponDamage(int weaponType)
 {
-	ClearItem(itemNumber);
+	return short(Weapons[weaponType].damage) * 25;
 }
 
-ITEM_INFO* FindReference(ITEM_INFO* item, short objectNumber)
+ITEM_INFO* findReference(ITEM_INFO* item, short objectNum)
 {
+	int itemNum;
 	bool found = false;
-	int itemNumber;
+
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		auto* currentItem = &g_Level.Items[i];
-		if (currentItem->ObjectNumber == objectNumber && currentItem->RoomNumber == item->RoomNumber)
+		ITEM_INFO* itemz = &g_Level.Items[i];
+		if (itemz->objectNumber == objectNum && itemz->roomNumber == item->roomNumber)
 		{
-			itemNumber = i;
+			itemNum = i;
 			found = true;
 		}
 	}
-
 	if (!found)
-		itemNumber = NO_ITEM;
+		itemNum = NO_ITEM;
 
-	return (itemNumber == NO_ITEM ? NULL : &g_Level.Items[itemNumber]);
+	return (itemNum == NO_ITEM ? NULL : &g_Level.Items[itemNum]);
 }
 
-static short GetWeaponDamage(LaraWeaponType weaponType)
+// original:
+void InitialiseDoppelganger(short itemNum)
 {
-	return short(Weapons[(int)weaponType].Damage) * 25;
+	ClearItem(itemNum);
 }
 
-void DoppelgangerControl(short itemNumber)
+void DoppelgangerControl(short itemNum)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item;
+	ITEM_INFO* ref;
+	FLOOR_INFO* floor;
+	int h, lh;
+	int x, y, z;
+	short room_num;
 
-	if (item->HitPoints < 1000)
-	{
-		item->HitPoints = 1000;
-		LaraItem->HitPoints -= GetWeaponDamage(Lara.Control.Weapon.GunType);
+	item = &g_Level.Items[itemNum];
+
+
+	if (item->hitPoints < 1000)                   			// If Evil Lara being Injured
+	{                                                       // then take the hits off Lara instead...
+		LaraItem->hitPoints -= GetWeaponDamage(Lara.gunType);
+		item->hitPoints = 1000;
 	}
 
-	auto* reference = FindReference(item, ID_BACON_REFERENCE);
+	ref = findReference(item, ID_BACON_REFERENCE); // find reference point
 
-	if (item->Data == NULL)
+	if (item->data == NULL)
 	{
-		Vector3Int pos;
-		if (reference == nullptr)
+		if (ref == nullptr) // if no reference found, she doesn't move
 		{
-			pos.x = item->Pose.Position.x;
-			pos.y = LaraItem->Pose.Position.y;
-			pos.z = item->Pose.Position.z;
+			x = item->pos.xPos;
+			y = LaraItem->pos.yPos;
+			z = item->pos.zPos;
 		}
 		else
 		{
-			pos.x = 2 * reference->Pose.Position.x - LaraItem->Pose.Position.x;
-			pos.y = LaraItem->Pose.Position.y;
-			pos.z = 2 * reference->Pose.Position.z - LaraItem->Pose.Position.z;
+			x = 2 * ref->pos.xPos - LaraItem->pos.xPos;
+			y = LaraItem->pos.yPos;
+			z = 2 * ref->pos.zPos - LaraItem->pos.zPos;
 		}
+		// get bacon height
+		room_num = item->roomNumber;
+		floor = GetFloor(x, y, z, &room_num);
+		h = GetFloorHeight(floor, x, y, z);
+		item->floor = h;
+		// get lara height
+		room_num = LaraItem->roomNumber;
+		floor = GetFloor(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, &room_num);
+		lh = GetFloorHeight(floor, LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		// animate bacon
+		item->frameNumber = LaraItem->frameNumber;
+		item->animNumber = LaraItem->animNumber;
+		// move bacon
+		item->pos.xPos = x;
+		item->pos.yPos = y;
+		item->pos.zPos = z;
+		item->pos.xRot = LaraItem->pos.xRot;
+		item->pos.yRot = LaraItem->pos.yRot - ANGLE(180); // make sure she's facing Lara
+		item->pos.zRot = LaraItem->pos.zRot;
 
-		// Get floor heights for comparison.
-		item->Floor = GetCollision(item).Position.Floor;
-		int laraFloorHeight = GetCollision(LaraItem).Position.Floor;
+		ItemNewRoom(itemNum, LaraItem->roomNumber);				// Follow Laras Room
 
-		// Animate bacon Lara, mirroring Lara's position.
-		item->Animation.FrameNumber = LaraItem->Animation.FrameNumber;
-		item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
-		item->Pose.Position.x = pos.x;
-		item->Pose.Position.y = pos.y;
-		item->Pose.Position.z = pos.z;
-		item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
-		item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - ANGLE(180.0f);
-		item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
-		ItemNewRoom(itemNumber, LaraItem->RoomNumber);
-
-		// Compare floor heights.
-		if (item->Floor >= laraFloorHeight + SECTOR(1) + 1 &&	// Add 1 to avoid bacon Lara dying when exiting water.
-			!LaraItem->Animation.Airborne)
+		if (h >= lh + WALL_SIZE + 1 && !LaraItem->gravityStatus) // added +1 to avoid bacon dying when exiting water rooms
 		{
 			SetAnimation(item, LA_JUMP_WALL_SMASH_START);
-			item->Animation.Velocity = 0;
-			item->Animation.VerticalVelocity = 0;
-			item->Animation.Airborne = true;
-			item->Data = -1;
-			item->Pose.Position.y += 50;
+			item->gravityStatus = true;
+			item->fallspeed = 0;
+			item->speed = 0;
+			item->data = -1;
+			item->pos.yPos += 50;
 		}
 	}
 	
-	if (item->Data)
+	if (item->data)
 	{
 		AnimateItem(item);
-		TestTriggers(item, true);
-
-		item->Floor = GetCollision(item).Position.Floor;
-		if (item->Pose.Position.y >= item->Floor)
+		room_num = item->roomNumber;
+		x = item->pos.xPos;
+		y = item->pos.yPos;
+		z = item->pos.zPos;
+		floor = GetFloor(x, y, z, &room_num);
+		h = GetFloorHeight(floor, x, y, z);
+		item->floor = h;
+		TestTriggers(x, y, z, item->roomNumber, true);
+		if (item->pos.yPos >= h)
 		{
-			item->Pose.Position.y = item->Floor;
-			TestTriggers(item, true);
+			item->floor = item->pos.yPos = h;
+			TestTriggers(x, h, z, item->roomNumber, true);
 
-			item->Animation.VerticalVelocity = 0;
-			item->Animation.Airborne = false;
-			item->Animation.TargetState = LS_DEATH;
-			item->Animation.RequiredState = LS_DEATH;
+			item->gravityStatus = false;
+			item->fallspeed = 0;
+			item->goalAnimState = LS_DEATH;
+			item->requiredAnimState = LS_DEATH;
 		}
 	}
 }

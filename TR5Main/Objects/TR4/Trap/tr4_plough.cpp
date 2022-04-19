@@ -7,18 +7,20 @@
 
 namespace TEN::Entities::TR4
 {
-	void PloughControl(short itemNumber)
+	void PloughControl(short itemNum)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		item->ItemFlags[3] = 50;
+		item->itemFlags[3] = 50;
 
 		if (TriggerActive(item))
 		{
-			*((int*)&item->ItemFlags) = 0x3F000;
+			*((int*)&item->itemFlags) = 0x3F000;
 			AnimateItem(item);
 		}
 		else
-			*((int*)&item->ItemFlags) = 0;
+		{
+			*((int*)&item->itemFlags) = 0;
+		}
 	}
 }

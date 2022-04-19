@@ -3,23 +3,22 @@
 
 constexpr auto NUM_BATS = 64;
 
-struct BatData
+struct BAT_STRUCT
 {
-	bool On;
-	PHD_3DPOS Pose;
-	short RoomNumber;
-
-	short Velocity;
-	short Counter;
-	short LaraTarget;
-	byte XTarget;
-	byte ZTarget;
-
-	byte Flags;
+	PHD_3DPOS pos; // size=20, offset=0
+	short roomNumber; // size=0, offset=20
+	short speed; // size=0, offset=22
+	short counter; // size=0, offset=24
+	short laraTarget; // size=0, offset=26
+	byte xTarget; // size=0, offset=28
+	byte zTarget; // size=0, offset=29
+	byte on; // size=0, offset=30
+	byte flags; // size=0, offset=31
 };
 
 extern int NextBat;
-extern BatData Bats[NUM_BATS];
+extern BAT_STRUCT Bats[NUM_BATS];
+
 
 short GetNextBat();
 void InitialiseLittleBats(short itemNumber);

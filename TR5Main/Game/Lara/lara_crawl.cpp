@@ -17,7 +17,7 @@
 #include "Scripting/GameFlowScript.h"
 
 // -----------------------------
-// CROUCH & CRAWL
+// CRAWL & CROUCH
 // Control & Collision Functions
 // -----------------------------
 
@@ -27,108 +27,106 @@
 
 // State:		LS_CROUCH_IDLE (71)
 // Collision:	lara_col_crouch_idle()
-void lara_as_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
 	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
 	// wade depth where Lara couldn't crouch at all, and if the player forced her into the crouched state by
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.10.21
 
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
+	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->goalAnimState == LS_PICKUP)
 		return;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown(item);
+		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+		info->turnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+		info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			g_GameFlow->Animations.HasCrouchRoll)
+			info->gunStatus == LG_HANDS_FREE &&
+			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->Animation.TargetState = LS_CROUCH_ROLL;
+			item->goalAnimState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->Animation.TargetState = LS_CRAWL_IDLE;
+			item->goalAnimState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->Animation.TargetState = LS_CROUCH_TURN_LEFT;
+			item->goalAnimState = LS_CROUCH_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->Animation.TargetState = LS_CROUCH_TURN_RIGHT;
+			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CROUCH_IDLE;
+		item->goalAnimState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_IDLE;
+	item->goalAnimState = LS_IDLE;
 }
 
 // State:		LS_CROUCH_IDLE (71)
 // Control:		lara_as_crouch_idle()
-void lara_col_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crouch_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
-	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	lara->ExtraTorsoRot = Vector3Shrt();
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockFloorSlopeDown = true;
+	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
 	{
-		SetLaraFallAnimation(item);
-		lara->Control.HandStatus = HandStatus::Free;
+		SetLaraFallState(item);
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideAnimation(item, coll);
 		return;
-	}
 
 	ShiftItem(item, coll);
 	
-	if (TestLaraStep(item, coll))
+	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -137,76 +135,73 @@ void lara_col_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_CROUCH_ROLL (72)
 // Collision:	lara_as_crouch_roll()
-void lara_as_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	lara->Control.CanLook = false;
+	info->look = false;
+	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_CROUCH_ROLL_TURN_MAX)
-			lara->Control.TurnRate = -LARA_CROUCH_ROLL_TURN_MAX;
+		info->turnRate -= LARA_TURN_RATE;
+		if (info->turnRate < -LARA_CROUCH_ROLL_TURN_MAX)
+			info->turnRate = -LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_CROUCH_ROLL_TURN_MAX)
-			lara->Control.TurnRate = LARA_CROUCH_ROLL_TURN_MAX;
+		info->turnRate += LARA_TURN_RATE;
+		if (info->turnRate > LARA_CROUCH_ROLL_TURN_MAX)
+			info->turnRate = LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
-	item->Animation.TargetState = LS_CROUCH_IDLE;
+	item->goalAnimState = LS_CROUCH_IDLE;
 }
 
 // State:		LS_CROUCH_ROLL (72)
 // Control:		lara_as_crouch_roll()
-void lara_col_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crouch_roll(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
-	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
+	item->gravityStatus = 0;
+	item->fallspeed = 0;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
-	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeUp = true;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.ForwardAngle = item->pos.yRot;
+	coll->Setup.BadCeilingHeight = 0;
+	coll->Setup.SlopesAreWalls = true;
 	GetCollisionInfo(coll, item);
 
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
-	// she becomes Airborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
+	// she becomes airborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
 	if (LaraDeflectEdgeCrawl(item, coll))
 	{
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->pos.xPos = coll->Setup.OldPosition.x;
+		item->pos.yPos = coll->Setup.OldPosition.y;
+		item->pos.zPos = coll->Setup.OldPosition.z;
 	}
 
 	if (TestLaraFall(item, coll))
 	{
-		SetLaraFallAnimation(item);
-		lara->Control.HandStatus = HandStatus::Free;
-		item->Animation.Velocity /= 3;				// Truncate speed to prevent flying off.
+		SetLaraFallState(item);
+		info->gunStatus = LG_HANDS_FREE;
+		item->speed /= 3;				// Truncate speed to prevent flying off.
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideAnimation(item, coll);
 		return;
-	}
 
 	ShiftItem(item, coll);
 
@@ -216,7 +211,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TestLaraStep(item, coll))
+	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -225,112 +220,112 @@ void lara_col_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_CROUCH_TURN_LEFT (105)
 // Collision:	lara_col_crouch_turn_left()
-void lara_as_crouch_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	coll->Setup.EnableSpaz = false;
+	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown(item);
+		LookUpDown();
 
-	lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+	info->turnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			g_GameFlow->Animations.HasCrouchRoll)
+			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->Animation.TargetState = LS_CROUCH_ROLL;
+			item->goalAnimState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->Animation.TargetState = LS_CRAWL_IDLE;
+			item->goalAnimState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->Animation.TargetState = LS_CROUCH_TURN_LEFT;
+			item->goalAnimState = LS_CROUCH_TURN_LEFT;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CROUCH_IDLE;
+		item->goalAnimState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_IDLE;
+	item->goalAnimState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_LEFT (105)
 // Control:		lara_as_crouch_turn_left()
-void lara_col_crouch_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crouch_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_crouch_idle(item, coll);
 }
 
 // State:		LS_CROUCH_TURN_RIGHT (106)
 // Collision:	lara_col_crouch_turn_right()
-void lara_as_crouch_turn_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	coll->Setup.EnableSpaz = false;
+	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown(item);
+		LookUpDown();
 
-	lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+	info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
-			g_GameFlow->Animations.HasCrouchRoll)
+			g_GameFlow->Animations.CrouchRoll)
 		{
-			item->Animation.TargetState = LS_CROUCH_ROLL;
+			item->goalAnimState = LS_CROUCH_ROLL;
 			return;
 		}
 
 		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
 		{
-			item->Animation.TargetState = LS_CRAWL_IDLE;
+			item->goalAnimState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->Animation.TargetState = LS_CROUCH_TURN_RIGHT;
+			item->goalAnimState = LS_CROUCH_TURN_RIGHT;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CROUCH_IDLE;
+		item->goalAnimState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_IDLE;
+	item->goalAnimState = LS_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (106)
 // Control:		lara_as_crouch_turn_right()
-void lara_col_crouch_turn_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crouch_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_crouch_idle(item, coll);
 }
@@ -341,59 +336,58 @@ void lara_col_crouch_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_CRAWL_IDLE (80)
 // Collision:	lara_col_crawl_idle()
-void lara_as_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	lara->Control.HandStatus = HandStatus::Busy;
+	info->gunStatus = LG_HANDS_BUSY;
+	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(24.0f);
 
 	// TODO: Dispatch pickups from within states.
-	if (item->Animation.TargetState == LS_PICKUP)
+	if (item->goalAnimState == LS_PICKUP)
 		return;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
 	if (TrInput & IN_LOOK)
-		LookUpDown(item);
+		LookUpDown();
 
 	if (TrInput & IN_LEFT)
-		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+		info->turnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+		info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
+		// TODO: Flare not working.
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
-			!IsStandingWeapon(lara->Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
+			!IsStandingWeapon(info->gunType) &&
+			item->animNumber != LA_CROUCH_TO_CRAWL_START)) // Hack.
 		{
-			item->Animation.TargetState = LS_CROUCH_IDLE;
-			lara->Control.HandStatus = HandStatus::Free;
+			item->goalAnimState = LS_CROUCH_IDLE;
+			info->gunStatus = LG_HANDS_FREE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD)
 		{
-			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
-
-			if (TrInput & (IN_ACTION | IN_JUMP) && crawlVaultResult.Success &&
-				g_GameFlow->Animations.HasCrawlExtended)
+			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlVault(item, coll) &&
+				g_GameFlow->Animations.CrawlExtended)
 			{
-				item->Animation.TargetState = crawlVaultResult.TargetState;
-				ResetLaraFlex(item);
+				DoLaraCrawlVault(item, coll);
 				return;
 			}
 			else if (TestLaraCrawlForward(item, coll)) [[likely]]
 			{
-				item->Animation.TargetState = LS_CRAWL_FORWARD;
+				item->goalAnimState = LS_CRAWL_FORWARD;
 				return;
 			}
 		}
@@ -401,74 +395,72 @@ void lara_as_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			if (TrInput & (IN_ACTION | IN_JUMP) && TestLaraCrawlToHang(item, coll))
 			{
-				item->Animation.TargetState = LS_CRAWL_TO_HANG;
+				item->goalAnimState = LS_CRAWL_TO_HANG;
 				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
 			else if (TestLaraCrawlBack(item, coll)) [[likely]]
 			{
-				item->Animation.TargetState = LS_CRAWL_BACK;
+				item->goalAnimState = LS_CRAWL_BACK;
 				return;
 			}
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
+			item->goalAnimState = LS_CRAWL_TURN_LEFT;
 			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->Animation.TargetState = LS_CRAWL_TURN_RIGHT;
+			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_CROUCH_IDLE;
-	lara->Control.HandStatus = HandStatus::Free;
+	item->goalAnimState = LS_CROUCH_IDLE;
+	info->gunStatus = LG_HANDS_FREE;
 }
 
 // State:		LS_CRAWL_IDLE (80)
 // Control:		lara_as_crawl_idle()
-void lara_col_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crawl_idle(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
-	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	lara->ExtraTorsoRot.x = 0;
-	lara->ExtraTorsoRot.y = 0;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = LARA_RADIUS_CRAWL;
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	item->fallspeed = 0;
+	item->gravityStatus = false;
+	coll->Setup.ForwardAngle = info->moveAngle;
+	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
-	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockFloorSlopeDown = true;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.SlopesArePits = true;
 	GetCollisionInfo(coll, item);
 
 	if (TestLaraFall(item, coll))
 	{
-		SetLaraFallAnimation(item);
+		SetLaraFallState(item);
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideAnimation(item, coll);
 		return;
-	}
 
 	ShiftItem(item, coll);
 	
-	if (TestLaraStep(item, coll))
+	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -477,82 +469,82 @@ void lara_col_crawl_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_CRAWL_FORWARD (81)
 // Collision:	lara_col_crawl_forward()
-void lara_as_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	lara->Control.HandStatus = HandStatus::Busy;
+	info->gunStatus = LG_HANDS_BUSY;
+	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->Animation.TargetState = LS_CRAWL_IDLE;
+			item->goalAnimState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD)
 		{
-			item->Animation.TargetState = LS_CRAWL_FORWARD;
+			item->goalAnimState = LS_CRAWL_FORWARD;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_CRAWL_IDLE;
+	item->goalAnimState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_FORWARD (81)
 // Control:		lara_as_crawl_forward()
-void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crawl_forward(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
-	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	lara->ExtraTorsoRot.x = 0;
-	lara->ExtraTorsoRot.y = 0;
-	coll->Setup.Radius = LARA_RADIUS_CRAWL;
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot;
+	info->torsoXrot = 0;
+	info->torsoYrot = 0;
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down full steps.
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);	// TODO: Stepping approach is different from walk/run. Resolve this someday. @Sezz 2021.10.31
-	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
-	coll->Setup.BlockFloorSlopeDown = true;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockDeathFloorDown = true;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);		// TODO: Stepping approach is different from walk/run because crawl step anims do not submerge Lara. Resolve this someday. @Sezz 2021.10.31
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.DeathFlagIsPit = true;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -560,19 +552,17 @@ void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 	
 	if (TestLaraFall(item, coll))
 	{
-		SetLaraFallAnimation(item);
+		SetLaraFallState(item);
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 	
 	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideAnimation(item, coll);
 		return;
-	}
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -581,75 +571,75 @@ void lara_col_crawl_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_CRAWL_BACK (86)
 // Collision:	lara_col_crawl_back()
-void lara_as_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	lara->Control.CanLook = false;
-	lara->Control.HandStatus = HandStatus::Busy;
+	info->look = false;
+	info->gunStatus = LG_HANDS_BUSY;
+	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		info->turnRate -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate < -LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		info->turnRate += LARA_CRAWL_MOVE_TURN_RATE;
+		if (info->turnRate > LARA_CRAWL_MOVE_TURN_MAX)
+			info->turnRate = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_BACK)
 		{
-			item->Animation.TargetState = LS_CRAWL_BACK;
+			item->goalAnimState = LS_CRAWL_BACK;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_CRAWL_IDLE;
+	item->goalAnimState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_BACK (86)
 // Control:		lara_as_crawl_back()
-void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crawl_back(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
-	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
-	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
-	coll->Setup.Radius = LARA_RADIUS_CRAWL;
+	info->keepCrouched = TestLaraKeepCrouched(item, coll);
+	info->isDucked = true;
+	info->moveAngle = item->pos.yRot + ANGLE(180.0f);
+	item->gravityStatus = false;
+	item->fallspeed = 0;
+	coll->Setup.Radius = LARA_RAD_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;	// Offset of 1 is required or Lara will crawl up/down full steps.
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
-	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
-	coll->Setup.BlockFloorSlopeDown = true;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockDeathFloorDown = true;
-	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.BadHeightDown = STEP_SIZE - 1;		// Offset of 1 is required or Lara will crawl up/down steps.
+	coll->Setup.BadHeightUp = -(STEP_SIZE - 1);
+	coll->Setup.BadCeilingHeight = LARA_HEIGHT_CRAWL;
+	coll->Setup.SlopesArePits = true;
+	coll->Setup.SlopesAreWalls = true;
+	coll->Setup.DeathFlagIsPit = true;
+	coll->Setup.ForwardAngle = info->moveAngle;
 	GetCollisionInfo(coll, item, true);
 
 	if (LaraDeflectEdgeCrawl(item, coll))
@@ -657,19 +647,17 @@ void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (TestLaraFall(item, coll))
 	{
-		SetLaraFallAnimation(item);
+		SetLaraFallState(item);
+		info->gunStatus = LG_HANDS_FREE;
 		return;
 	}
 
 	if (TestLaraSlide(item, coll))
-	{
-		SetLaraSlideAnimation(item, coll);
 		return;
-	}
 
 	ShiftItem(item, coll);
 
-	if (TestLaraStep(item, coll))
+	if (TestLaraStep(coll))
 	{
 		DoLaraStep(item, coll);
 		return;
@@ -678,152 +666,160 @@ void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_CRAWL_TURN_LEFT (84)
 // Collision:	lara_col_crawl_turn_left()
-void lara_as_crawl_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	lara->Control.HandStatus = HandStatus::Busy;
+	info->gunStatus = LG_HANDS_BUSY;
+	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
-	lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+	info->turnRate = -LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->Animation.TargetState = LS_CRAWL_IDLE;
+			item->goalAnimState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
-			item->Animation.TargetState = LS_CRAWL_FORWARD;
+			item->goalAnimState = LS_CRAWL_FORWARD;
 			return;
 		}
 
 		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
-			item->Animation.TargetState = LS_CRAWL_BACK;
+			item->goalAnimState = LS_CRAWL_BACK;
 			return;
 		}
 
 		if (TrInput & IN_LEFT)
 		{
-			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
+			item->goalAnimState = LS_CRAWL_TURN_LEFT;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_CRAWL_IDLE;
+	item->goalAnimState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_LEFT (84)
 // Control:		lara_as_crawl_turn_left()
-void lara_col_crawl_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crawl_turn_left(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_crawl_idle(item, coll);
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
 // Collision:	lara_col_crawl_turn_right()
-void lara_as_crawl_turn_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	lara->Control.HandStatus = HandStatus::Busy;
+	info->gunStatus = LG_HANDS_BUSY;
+	coll->Setup.EnableSpaz = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(24.0f);
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->Animation.TargetState = LS_DEATH;
+		item->goalAnimState = LS_DEATH;
 		return;
 	}
 
-	lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+	info->turnRate = LARA_CRAWL_TURN_MAX;
 
-	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if ((TrInput & IN_DUCK || info->keepCrouched) &&
+		info->waterStatus != LW_WADE)
 	{
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll))
 		{
-			item->Animation.TargetState = LS_CRAWL_IDLE;
+			item->goalAnimState = LS_CRAWL_IDLE;
 			return;
 		}
 
 		if (TrInput & IN_FORWARD && TestLaraCrawlForward(item, coll))
 		{
-			item->Animation.TargetState = LS_CRAWL_FORWARD;
+			item->goalAnimState = LS_CRAWL_FORWARD;
 			return;
 		}
 
 		if (TrInput & IN_BACK && TestLaraCrawlBack(item, coll))
 		{
-			item->Animation.TargetState = LS_CRAWL_BACK;
+			item->goalAnimState = LS_CRAWL_BACK;
 			return;
 		}
 
 		if (TrInput & IN_RIGHT)
 		{
-			item->Animation.TargetState = LS_CRAWL_TURN_RIGHT;
+			item->goalAnimState = LS_CRAWL_TURN_RIGHT;
 			return;
 		}
 
-		item->Animation.TargetState = LS_CRAWL_IDLE;
+		item->goalAnimState = LS_CRAWL_IDLE;
 		return;
 	}
 
-	item->Animation.TargetState = LS_CRAWL_IDLE;
+	item->goalAnimState = LS_CRAWL_IDLE;
 }
 
 // State:		LS_CRAWL_TURN_RIGHT (85)
 // Control:		lara_as_crawl_turn_right()
-void lara_col_crawl_turn_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crawl_turn_right(ITEM_INFO* item, COLL_INFO* coll)
 {
 	lara_col_crawl_idle(item, coll);
 }
 
-void lara_col_crawl_to_hang(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_crawl_to_hang(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableObjectPush = false;
 	Camera.targetAngle = 0;
-	Camera.targetDistance = SECTOR(1);
+	Camera.targetElevation = -ANGLE(45.0f);
 
-	if (item->Animation.AnimNumber == LA_CRAWL_TO_HANG_END)
+	if (item->animNumber == LA_CRAWL_TO_HANG_END)
 	{
-		lara->Control.MoveAngle = item->Pose.Orientation.y;
+		info->moveAngle = item->pos.yRot;
 		coll->Setup.Height = LARA_HEIGHT_STRETCH;
-		coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-		coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+		coll->Setup.BadHeightDown = NO_BAD_POS;
+		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
+		coll->Setup.BadCeilingHeight = BAD_JUMP_CEILING;
+		coll->Setup.ForwardAngle = info->moveAngle;
 
-		MoveItem(item, item->Pose.Orientation.y, -CLICK(1));
+		MoveItem(item, item->pos.yRot, -STEP_SIZE);
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
-		SetAnimation(item, LA_REACH_TO_HANG, 12);
+
+		// TODO: When refactoring monkey swing, get rid of this.
+		if (TestHangSwingIn(item, coll))
+		{
+			SetAnimation(item, LA_JUMP_UP_TO_MONKEYSWING);
+			ResetLaraFlex(item);
+		}
+		else
+			SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 		GetCollisionInfo(coll, item);
-		lara->Control.HandStatus = HandStatus::Busy;
-		item->Pose.Position.y += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
-		item->Animation.Airborne = true;
-		item->Animation.Velocity = 2;
-		item->Animation.VerticalVelocity = 1;
+		info->gunStatus = LG_HANDS_BUSY;
+		item->pos.yPos += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
+		item->gravityStatus = true;
+		item->speed = 2;
+		item->fallspeed = 1;
 	}
 }

@@ -11,8 +11,8 @@ struct ITEM_INFO;
 struct HAIR_STRUCT
 {
 	PHD_3DPOS pos;
-	Vector3Int hvel;
-	Vector3Int unknown;
+	PHD_VECTOR hvel;
+	PHD_VECTOR unknown;
 
 	bool initialized = false;
 };

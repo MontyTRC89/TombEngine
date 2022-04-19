@@ -1,14 +1,16 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
-// -----------------------------
-// SLIDE
-// Control & Collision Functions
-// -----------------------------
-
-void lara_as_slide_forward(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_slide_forward(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_slide_back(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_slide_back(ITEM_INFO* item, CollisionInfo* coll);
+/*Tests and others*/
+void lara_slide_slope(ITEM_INFO* item, COLL_INFO* coll);
+void LaraSlideEdgeJump(ITEM_INFO* item, COLL_INFO* coll);
+/*end tests and others*/
+/*-*/
+/*Lara state code*/
+void lara_as_slide(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_slide(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_slideback(ITEM_INFO* item, COLL_INFO* coll);
+void lara_col_slideback(ITEM_INFO* item, COLL_INFO* coll);
+/*end Lara state code*/

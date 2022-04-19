@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseCyborg(short itemNumber);
-void CyborgControl(short itemNumber);
+void InitialiseHitman(short itemNum);
+void HitmanControl(short itemNumber);

@@ -1,13 +1,11 @@
 #pragma once
 
-struct UPVInfo
+struct SUB_INFO
 {
-	int Velocity;
+	int Vel;
 	int Rot;
-	int XRot;
+	int RotX;
 	short FanRot;
-	unsigned int HarpoonTimer;
-	bool HarpoonLeft;
-
 	char Flags;
+	char WeaponTimer;
 };

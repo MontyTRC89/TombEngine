@@ -1,7 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
 namespace TEN::Entities::Doors
 {

@@ -9,5 +9,5 @@ namespace TEN::Entities::TR4
 	void TriggerDemigodMissile(PHD_3DPOS* pos, short roomNumber, int flags);
 	void DoDemigodEffects(short itemNumber);
 	void TriggerHammerSmoke(int x, int y, int z, int something);
-	void TriggerDemigodMissileFlame(short fxNumber, short xVelocity, short yVelocity, short zVelocity);
+	void TriggerDemigodMissileFlame(short fxNum, short xVel, short yVel, short zVel);
 }

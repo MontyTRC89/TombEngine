@@ -1,3 +1,3 @@
 #pragma once
 
-void ApeControl(short itemNumber);
+void ApeControl(short itemNum);

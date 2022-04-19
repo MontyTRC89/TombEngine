@@ -104,7 +104,7 @@ void InitPickupItem(OBJECT_INFO* obj, function<InitFunction> func, int objectNum
 		if (objectNumber == ID_FLARE_ITEM)
 		{
 			obj->pivotLength = 256;
-			obj->HitPoints = 256; // time
+			obj->hitPoints = 256; // time
 		}
 
 		obj->saveFlags = true;

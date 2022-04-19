@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Game/effects/lara_fx.h"
 
-#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -16,41 +15,41 @@ namespace TEN::Effects::Lara
 {
 	void LaraBurn(ITEM_INFO* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto lara = (LaraInfo*&)item->data;
 
-		if (!lara->Burn && !lara->BurnSmoke)
+		if (!lara->burn && !lara->burnSmoke)
 		{
-			short fxNum = CreateNewEffect(item->RoomNumber);
+			short fxNum = CreateNewEffect(item->roomNumber);
 			if (fxNum != NO_ITEM)
 			{
 				EffectList[fxNum].objectNumber = ID_FLAME;
-				lara->Burn = true;
+				lara->burn = true;
 			}
 		}
 	}
 
 	void LavaBurn(ITEM_INFO* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto lara = (LaraInfo*&)item->data;
 
-		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+		if (item->hitPoints >= 0 && lara->waterStatus != LW_FLYCHEAT)
 		{
-			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
-			if (item->Floor == GetFloorHeight(floor, item->Pose.Position.x, 32000, item->Pose.Position.z))
+			short roomNumber = item->roomNumber;
+			FLOOR_INFO* floor = GetFloor(item->pos.xPos, 32000, item->pos.zPos, &roomNumber);
+			if (item->floor == GetFloorHeight(floor, item->pos.xPos, 32000, item->pos.zPos))
 			{
 				//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
 				//				KayakLaraRapidsDrown();
 				//			else
 				//			{
-				item->HitPoints = -1;
-				item->HitStatus = true;
+				item->hitPoints = -1;
+				item->hitStatus = true;
 				LaraBurn(item);
 				//			}
 			}
@@ -59,31 +58,31 @@ namespace TEN::Effects::Lara
 
 	void LaraBreath(ITEM_INFO* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto lara = (LaraInfo*&)item->data;
 
-		if (lara->Control.WaterStatus == WaterStatus::Underwater || item->HitPoints <= 0)
+		if (lara->waterStatus == LARA_WATER_STATUS::LW_UNDERWATER || item->hitPoints <= 0)
 			return;
 
-		if (!TestEnvironment(ENV_FLAG_COLD, item))
+		if (!(g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_COLD))
 			return;
 
-		switch (item->Animation.AnimNumber)
+		switch (item->animNumber)
 		{
 		case LA_STAND_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
+			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_STAND_IDLE, 30))
 				return;
 			break;
 
 		case LA_CROUCH_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
+			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_CROUCH_IDLE, 30))
 				return;
 			break;
 
 		case LA_CRAWL_IDLE:
-			if (item->Animation.FrameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
+			if (item->frameNumber < GetFrameNumber((short)ID_LARA, LA_CRAWL_IDLE, 30))
 				return;
 			break;
 
@@ -92,17 +91,17 @@ namespace TEN::Effects::Lara
 				return;
 		}
 
-		float z = std::sin(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
-		float x = std::cos(TO_RAD(item->Pose.Orientation.y)) * -64.0f;
-		auto offset = Vector3Int(0, -4, 64);
+		float z = std::sin(TO_RAD(item->pos.yRot)) * -64.0f;
+		float x = std::cos(TO_RAD(item->pos.yRot)) * -64.0f;
+		auto offset = PHD_VECTOR(0, -4, 64);
 
 		GetLaraJointPosition(&offset, LM_HEAD);
 
-		auto seed = Vector3Int((GetRandomControl() & 7) - 4,
+		auto seed = PHD_VECTOR((GetRandomControl() & 7) - 4,
 			(GetRandomControl() & 7) - 8,
 			(GetRandomControl() & 7) - 4);
 
 		GetLaraJointPosition(&seed, LM_HEAD);
-		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->Pose.Orientation.y);
+		TriggerBreathSmoke(offset.x, offset.y, offset.z, item->pos.yRot);
 	}
 }

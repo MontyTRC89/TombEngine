@@ -30,149 +30,101 @@
 
 using namespace TEN::Entities::Generic;
 
-// TODO: Adjust these bounds when crawl surface alignment is implemented. @Sezz 2021.11.04
-static Vector3Int PickUpPosition(0, 0, -100);
+static PHD_VECTOR PickUpPosition(0, 0, -100);
 OBJECT_COLLISION_BOUNDS PickUpBounds = 
-{
-	-256, 256,
-	-200, 200,
-	-256, 256,
-	-ANGLE(10.0f), ANGLE(10.0f),
-	0, 0,
-	-ANGLE(2.0f), ANGLE(2.0f)
-};
+{ -256, 256, -200, 200, -256, 256, -ANGLE(10.0f), ANGLE(10.0f), 0, 0, -ANGLE(2.0f), ANGLE(2.0f) }; // TODO: Adjust these bounds when crawl surface alignment is implemented. @Sezz 2021.11.04
 
-static Vector3Int HiddenPickUpPosition(0, 0, -690);
+static PHD_VECTOR HiddenPickUpPosition(0, 0, -690);
 OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
-{
-	-256, 256,
-	-100, 100,
-	-800, -256,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
-};
+{ -256, 256, -100, 100, -800, -256, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
-static Vector3Int CrowbarPickUpPosition(0, 0, 215);
+static PHD_VECTOR CrowbarPickUpPosition(0, 0, 215);
 OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
-{
-	-256, 256,
-	-100, 100,
-	200, 512,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
-};
+{ -256, 256, -100, 100, 200, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
-static Vector3Int JobyCrowPickUpPosition(-224, 0, 240);
+static PHD_VECTOR JobyCrowPickUpPosition(-224, 0, 240);
 OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
-{
-	-512, 0,
-	-100, 100,
-	0, 512,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
-};
+{ -512, 0, -100, 100, 0, 512, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
-static Vector3Int PlinthPickUpPosition(0, 0, -460);
+static PHD_VECTOR PlinthPickUpPosition(0, 0, -460);
 OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
-{
-	-256, 256,
-	-640, 640,
-	-511, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
-};
+{ -256, 256, -640, 640, -511, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
-static Vector3Int PickUpPositionUW(0, -200, -350);
+static PHD_VECTOR PickUpPositionUW(0, -200, -350);
 OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
-{
-	-512, 512,
-	-512, 512,
-	-512, 512,
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f),
-	ANGLE(-45.0f),  ANGLE(45.0f)
-};
+{ -512, 512, -512, 512, -512, 512, ANGLE(-45),  ANGLE(45), ANGLE(-45),  ANGLE(45), ANGLE(-45),  ANGLE(45) };
 
-static Vector3Int SOPos(0, 0, 0);
+static PHD_VECTOR SOPos(0, 0, 0);
 OBJECT_COLLISION_BOUNDS SOBounds =
-{
-	0, 0,
-	0, 0,
-	0, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
-};
+{ 0, 0, 0, 0, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 short SearchCollectFrames[4] = { 180, 100, 153, 83 };
 short SearchAnims[4] = { LA_LOOT_CABINET, LA_LOOT_DRAWER, LA_LOOT_SHELF, LA_LOOT_CHEST };
 short SearchOffsets[4] = { 160, 96, 160, 112 };
 
 OBJECT_COLLISION_BOUNDS MSBounds =
-{
-	0, 0,
-	0, 0,
-	0, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	ANGLE(-10.0f), ANGLE(10.0f)
-};
+{ 0, 0, 0, 0, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
 int NumRPickups;
 short RPickups[16];
 short getThisItemPlease = NO_ITEM;
-Vector3Int OldPickupPos;
+PHD_VECTOR OldPickupPos;
 
-void PickedUpObject(GAME_OBJECT_ID objectID, int count)
+void PickedUpObject(GAME_OBJECT_ID objID, int count)
 {
 	// see if the items fit into one of these easy groups
-	if (!TryAddingWeapon(Lara, objectID, count) &&
-		!TryAddingAmmo(Lara, objectID, count) &&
-		!TryAddingKeyItem(Lara, objectID, count) &&
-		!TryAddingConsumable(Lara, objectID, count) &&
-		!TryAddMiscItem(Lara, objectID))
+	if (!TryAddWeapon(Lara, objID, count)
+		&& !TryAddAmmo(Lara, objID, count)
+		&& !TryAddKeyItem(Lara, objID, count)
+		&& !TryAddConsumable(Lara, objID, count)
+		&& !TryAddMiscItem(Lara, objID))
 	{
 		// item isn't any of the above; do nothing
 	}
 }
 
-int GetInventoryCount(GAME_OBJECT_ID objectID)
+int GetInventoryCount(GAME_OBJECT_ID objID)
 {
-	auto boolResult = HasWeapon(Lara, objectID);
+	auto boolResult = HasWeapon(Lara, objID);
 	if (boolResult.has_value())
+	{
 		return int{ boolResult.value() };
+	}
 
-	auto intResult = GetAmmoCount(Lara, objectID);
+	auto intResult = GetAmmoCount(Lara, objID);
 	if (intResult.has_value())
+	{
 		return intResult.value();
+	}
 
-	intResult = GetKeyItemCount(Lara, objectID);
+	intResult = GetKeyItemCount(Lara, objID);
 	if (intResult.has_value())
+	{
 		return intResult.value();
+	}
 
-	intResult = GetConsumableCount(Lara, objectID);
+	intResult = GetConsumableCount(Lara, objID);
 	if (intResult.has_value())
+	{
 		return intResult.value();
+	}
 
-	boolResult = HasMiscItem(Lara, objectID);
+	boolResult = HasMiscItem(Lara, objID);
 	if (boolResult.has_value())
+	{
 		return int{ boolResult.value() };
-
+	}
 	return 0;
 }
 
-void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, int count)
+void RemoveObjectFromInventory(GAME_OBJECT_ID objID, int count)
 {
 	// see if the items fit into one of these easy groups
-	if (!TryRemovingWeapon(Lara, objectID, count) && 
-		!TryRemovingAmmo(Lara, objectID, count) && 
-		!TryRemovingKeyItem(Lara, objectID, count) && 
-		!TryRemovingConsumable(Lara, objectID, count) && 
-		!TryRemoveMiscItem(Lara, objectID))
+	if (!TryRemoveWeapon(Lara, objID, count) && 
+		!TryRemoveAmmo(Lara, objID, count) && 
+		!TryRemoveKeyItem(Lara, objID, count) && 
+		!TryRemoveConsumable(Lara, objID, count) && 
+		!TryRemoveMiscItem(Lara, objID))
 		{
 			// item isn't any of the above; do nothing
 		}
@@ -180,128 +132,125 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, int count)
 
 void CollectCarriedItems(ITEM_INFO* item) 
 {
-	short pickupNumber = item->CarriedItem;
+	short pickupNumber = item->carriedItem;
 	while (pickupNumber != NO_ITEM)
 	{
-		auto* pickupItem = &g_Level.Items[pickupNumber];
+		ITEM_INFO* pickup = &g_Level.Items[pickupNumber];
 
-		AddDisplayPickup(pickupItem->ObjectNumber);
+		AddDisplayPickup(pickup->objectNumber);
 		KillItem(pickupNumber);
 
-		pickupNumber = pickupItem->CarriedItem;
+		pickupNumber = pickup->carriedItem;
 	}
-
-	item->CarriedItem = NO_ITEM;
+	item->carriedItem = NO_ITEM;
 }
 
-void DoPickup(ITEM_INFO* laraItem)
+void DoPickup(ITEM_INFO* character)
 {
 	if (getThisItemPlease == NO_ITEM)
 		return;
 
-	auto* lara = GetLaraInfo(laraItem);
+	auto lara = (LaraInfo*&)character->data;
 
-	short pickupItemNumber = getThisItemPlease;
-	auto* pickupItem = &g_Level.Items[pickupItemNumber];
+	short pickupitem = getThisItemPlease;
+	ITEM_INFO* item = &g_Level.Items[pickupitem];
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
-	short oldXrot = pickupItem->Pose.Orientation.x;
-	short oldYrot = pickupItem->Pose.Orientation.y;
-	short oldZrot = pickupItem->Pose.Orientation.z;
-
-	if (pickupItem->ObjectNumber == ID_BURNING_TORCH_ITEM)
+	if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 	{
 		AddDisplayPickup(ID_BURNING_TORCH_ITEM);
 		GetFlameTorch();
-		lara->LitTorch = (pickupItem->ItemFlags[3] & 1);
+		lara->litTorch = (item->itemFlags[3] & 1);
 
-		KillItem(pickupItemNumber);
-		pickupItem->Pose.Orientation.x = oldXrot;
-		pickupItem->Pose.Orientation.y = oldYrot;
-		pickupItem->Pose.Orientation.z = oldZrot;
+		KillItem(pickupitem);
+		item->pos.xRot = oldXrot;
+		item->pos.yRot = oldYrot;
+		item->pos.zRot = oldZrot;
 		getThisItemPlease = NO_ITEM;
 		return;
 	}
-	else if (pickupItem->ObjectNumber == ID_FLARE_ITEM)
+	else if (item->objectNumber == ID_FLARE_ITEM)
 	{
-		if (laraItem->Animation.ActiveState == LA_UNDERWATER_PICKUP_FLARE)
+		if (character->currentAnimState == LA_UNDERWATER_PICKUP_FLARE)
 		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
-			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
-			lara->Control.HandStatus = HandStatus::Special;
-			lara->Flare.Life = (int)(pickupItem->Data) & 0x7FFF;
-			DrawFlareMeshes(laraItem);
-			KillItem(pickupItemNumber);
+			lara->requestGunType = WEAPON_FLARE;
+			lara->gunType = WEAPON_FLARE;
+			InitialiseNewWeapon(character);
+			lara->gunStatus = LG_SPECIAL;
+			lara->flareAge = (int)(item->data) & 0x7FFF;
+			DrawFlareMeshes(character);
+			KillItem(pickupitem);
 
-			pickupItem->Pose.Orientation.x = oldXrot;
-			pickupItem->Pose.Orientation.y = oldYrot;
-			pickupItem->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			getThisItemPlease = NO_ITEM;
 			return;
 		}
-		else if (laraItem->Animation.ActiveState == LS_PICKUP_FLARE)
+		else if (character->currentAnimState == LS_PICKUP_FLARE)
 		{
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
-			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
-			InitialiseNewWeapon(laraItem);
-			lara->Control.HandStatus = HandStatus::Special;
-			lara->Flare.Life = (int)(pickupItem->Data) & 0x7FFF;
-			KillItem(pickupItemNumber);
+			lara->requestGunType = WEAPON_FLARE;
+			lara->gunType = WEAPON_FLARE;
+			InitialiseNewWeapon(character);
+			lara->gunStatus = LG_SPECIAL;
+			lara->flareAge = (short)(item->data) & 0x7FFF;
+			KillItem(pickupitem);
 			getThisItemPlease = NO_ITEM;
 			return;
 		}
 	}
 	else
 	{
-		if (laraItem->Animation.AnimNumber == LA_UNDERWATER_PICKUP) //dirty but what can I do, it uses the same state
+		if (character->animNumber == LA_UNDERWATER_PICKUP) //dirty but what can I do, it uses the same state
 		{
-			AddDisplayPickup(pickupItem->ObjectNumber);
-			if (!(pickupItem->TriggerFlags & 0xC0))
-				KillItem(pickupItemNumber);
+			AddDisplayPickup(item->objectNumber);
+			if (!(item->triggerFlags & 0xC0))
+			{
+				KillItem(pickupitem);
+			}
 			else
 			{
-				pickupItem->ItemFlags[3] = 1;
-				pickupItem->Flags |= 0x20;
-				pickupItem->Status = ITEM_INVISIBLE;
+				item->itemFlags[3] = 1;
+				item->flags |= 0x20;
+				item->status = ITEM_INVISIBLE;
 			}
-
-			pickupItem->Pose.Orientation.x = oldXrot;
-			pickupItem->Pose.Orientation.y = oldYrot;
-			pickupItem->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			getThisItemPlease = NO_ITEM;
 			return;
 		}
 		else
 		{
-			if (laraItem->Animation.AnimNumber == LA_CROWBAR_PRY_WALL_SLOW)
+			if (character->animNumber == LA_CROWBAR_PRY_WALL_SLOW)
 			{
 				AddDisplayPickup(ID_CROWBAR_ITEM);
-				Lara.Inventory.HasCrowbar = true;
-				KillItem(pickupItemNumber);
+				Lara.Crowbar = true;
+				KillItem(pickupitem);
 			}
-			else if (laraItem->Animation.ActiveState == LS_PICKUP || laraItem->Animation.ActiveState == LS_PICKUP_FROM_CHEST || laraItem->Animation.ActiveState == LS_HOLE)
+			else if (character->currentAnimState == LS_PICKUP || character->currentAnimState == LS_PICKUP_FROM_CHEST || character->currentAnimState == LS_HOLE)
 			{
-				AddDisplayPickup(pickupItem->ObjectNumber);
-				if (pickupItem->TriggerFlags & 0x100)
+				AddDisplayPickup(item->objectNumber);
+				if (item->triggerFlags & 0x100)
 				{
 					for (int i = 0; i < g_Level.NumItems; i++)
 					{
-						if (g_Level.Items[i].ObjectNumber == pickupItem->ObjectNumber)
+						if (g_Level.Items[i].objectNumber == item->objectNumber)
 							KillItem(i);
 					}
 				}
-
-				if (pickupItem->TriggerFlags & 0xC0)
+				if (item->triggerFlags & 0xC0)
 				{
-					pickupItem->ItemFlags[3] = 1;
-					pickupItem->Flags |= 0x20;
-					pickupItem->Status = ITEM_INVISIBLE;
+					item->itemFlags[3] = 1;
+					item->flags |= 0x20;
+					item->status = ITEM_INVISIBLE;
 				}
-
-				pickupItem->Pose.Orientation.x = oldXrot;
-				pickupItem->Pose.Orientation.y = oldYrot;
-				pickupItem->Pose.Orientation.z = oldZrot;
-				KillItem(pickupItemNumber);
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
+				KillItem(pickupitem);
 				getThisItemPlease = NO_ITEM;
 				return;
 			}
@@ -311,222 +260,219 @@ void DoPickup(ITEM_INFO* laraItem)
 	getThisItemPlease = NO_ITEM;
 }
 
-void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void PickupCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	short oldXrot = item->pos.xRot;
+	short oldYrot = item->pos.yRot;
+	short oldZrot = item->pos.zRot;
 
-	short oldXrot = item->Pose.Orientation.x;
-	short oldYrot = item->Pose.Orientation.y;
-	short oldZrot = item->Pose.Orientation.z;
-
-	if (item->Status == ITEM_INVISIBLE)
+	if (item->status == ITEM_INVISIBLE)
 		return;
 
-	short triggerFlags = item->TriggerFlags & 0x3F;
+	short triggerFlags = item->triggerFlags & 0x3F;
 	if (triggerFlags == 5 || triggerFlags == 10)
 		return;
 
-	auto lara = GetLaraInfo(laraItem);
+	auto lara = (LaraInfo*&)l->data;
 
-	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+	if (item->objectNumber == ID_FLARE_ITEM && lara->gunType == WEAPON_FLARE)
 		return;
 
-	item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-	item->Pose.Orientation.z = 0;
+	item->pos.yRot = l->pos.yRot;
+	item->pos.zRot = 0;
 
-	if (lara->Control.WaterStatus != WaterStatus::Dry &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
+	if (lara->waterStatus && lara->waterStatus != LW_WADE)
 	{
-		if (lara->Control.WaterStatus == WaterStatus::Underwater)
+		if (lara->waterStatus == LW_UNDERWATER)
 		{
-			item->Pose.Orientation.x = -ANGLE(25.0f);
+			item->pos.xRot = -ANGLE(25);
 
 			if (TrInput & IN_ACTION && 
-				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
-				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && 
-				lara->Control.HandStatus == HandStatus::Free &&
-				TestLaraPosition(&PickUpBoundsUW, item, laraItem) || lara->Control.IsMoving && lara->InteractedItem == itemNumber)
+				item->objectNumber != ID_BURNING_TORCH_ITEM && 
+				l->currentAnimState == LS_UNDERWATER_STOP && 
+				!lara->gunStatus && 
+				TestLaraPosition(&PickUpBoundsUW, item, l) || lara->isMoving && lara->interactedItem == itemNum)
 			{
-				if (TestLaraPosition(&PickUpBoundsUW, item, laraItem))
+				if (TestLaraPosition(&PickUpBoundsUW, item, l))
 				{
-					if (MoveLaraPosition(&PickUpPositionUW, item, laraItem))
+					if (MoveLaraPosition(&PickUpPositionUW, item, l))
 					{
-						if (item->ObjectNumber == ID_FLARE_ITEM)
+						if (item->objectNumber == ID_FLARE_ITEM)
 						{
-							getThisItemPlease = itemNumber;
-							laraItem->Animation.AnimNumber = LA_UNDERWATER_PICKUP_FLARE;
-							laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
-							laraItem->Animation.VerticalVelocity = 0;
+							getThisItemPlease = itemNum;
+							l->animNumber = LA_UNDERWATER_PICKUP_FLARE;
+							l->currentAnimState = LS_PICKUP_FLARE;
+							l->fallspeed = 0;
 						}
 						else
 						{
-							getThisItemPlease = itemNumber;
-							laraItem->Animation.AnimNumber = LA_UNDERWATER_PICKUP;
-							laraItem->Animation.ActiveState = LS_PICKUP;
+							getThisItemPlease = itemNum;
+							l->animNumber = LA_UNDERWATER_PICKUP;
+							l->currentAnimState = LS_PICKUP;
 						}
-
-						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-						lara->Control.IsMoving = false;
-						lara->Control.HandStatus = HandStatus::Busy;
+						l->goalAnimState = LS_UNDERWATER_STOP;
+						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						lara->isMoving = false;
+						lara->gunStatus = LG_HANDS_BUSY;
 					}
-
-					lara->InteractedItem = itemNumber;
+					lara->interactedItem = itemNum;
 				}
 				else
 				{
-					if (lara->Control.IsMoving)
+					if (lara->isMoving)
 					{
-						if (lara->InteractedItem == itemNumber)
+						if (lara->interactedItem == itemNum)
 						{
-							getThisItemPlease = itemNumber;
-							Lara.Control.IsMoving = false;
-							Lara.Control.HandStatus = HandStatus::Free;
+							getThisItemPlease = itemNum;
+							Lara.isMoving = false;
+							Lara.gunStatus = LG_HANDS_FREE;
 						}
 					}
 				}
 
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
 				return;
 			}
 		}
 
-		item->Pose.Orientation.x = oldXrot;
-		item->Pose.Orientation.y = oldYrot;
-		item->Pose.Orientation.z = oldZrot;
+		item->pos.xRot = oldXrot;
+		item->pos.yRot = oldYrot;
+		item->pos.zRot = oldZrot;
 		return;
 	}
 	
 	if (!(TrInput & IN_ACTION) && 
 		(g_Gui.GetInventoryItemChosen() == NO_ITEM || triggerFlags != 2) || 
 		BinocularRange ||
-		(laraItem->Animation.ActiveState != LS_IDLE || laraItem->Animation.AnimNumber != LA_STAND_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
-		(laraItem->Animation.ActiveState != LS_CROUCH_IDLE || laraItem->Animation.AnimNumber != LA_CROUCH_IDLE || lara->Control.HandStatus != HandStatus::Free) &&
-		(laraItem->Animation.ActiveState != LS_CRAWL_IDLE || laraItem->Animation.AnimNumber != LA_CRAWL_IDLE))
+		(l->currentAnimState != LS_IDLE || l->animNumber != LA_STAND_IDLE || lara->gunStatus) &&
+		(l->currentAnimState != LS_CROUCH_IDLE || l->animNumber != LA_CROUCH_IDLE || lara->gunStatus) &&
+		(l->currentAnimState != LS_CRAWL_IDLE || l->animNumber != LA_CRAWL_IDLE))
 	{
-		if (!lara->Control.IsMoving)
+		if (!lara->isMoving)
 		{
-			if (lara->InteractedItem == itemNumber)
+			if (lara->interactedItem == itemNum)
 			{
-				if (laraItem->Animation.ActiveState != LS_PICKUP && laraItem->Animation.ActiveState != LS_HOLE)
+				if (l->currentAnimState != LS_PICKUP && l->currentAnimState != LS_HOLE)
 				{
-					item->Pose.Orientation.x = oldXrot;
-					item->Pose.Orientation.y = oldYrot;
-					item->Pose.Orientation.z = oldZrot;
-					return;
+					{
+						item->pos.xRot = oldXrot;
+						item->pos.yRot = oldYrot;
+						item->pos.zRot = oldZrot;
+						return;
+					}
 				}
 				else
 				{
-					item->Pose.Orientation.x = oldXrot;
-					item->Pose.Orientation.y = oldYrot;
-					item->Pose.Orientation.z = oldZrot;
+					item->pos.xRot = oldXrot;
+					item->pos.yRot = oldYrot;
+					item->pos.zRot = oldZrot;
 					return;
 				}
 			}
 		}
 
-		if (lara->InteractedItem != itemNumber)
+		if (lara->interactedItem != itemNum)
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			return;
 		}
 	}
 	
-	bool flag = false;
+	int flag = 0;
 	BOUNDING_BOX* plinth = NULL;
-	item->Pose.Orientation.x = 0;
+	item->pos.xRot = 0;
 	switch (triggerFlags)
 	{
 	case 1: // Pickup from wall hole
-		if (lara->Control.IsLow || !TestLaraPosition(&HiddenPickUpBounds, item, laraItem))
+		if (lara->isDucked || !TestLaraPosition(&HiddenPickUpBounds, item, l))
 		{
-			if (lara->Control.IsMoving)
+			if (lara->isMoving)
 			{
-				if (lara->InteractedItem == itemNumber)
+				if (lara->interactedItem == itemNum)
 				{
-					Lara.Control.IsMoving = false;
-					Lara.Control.HandStatus = HandStatus::Free;
+					Lara.isMoving = false;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
 			}
 
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			return;
 		}
-		else if (MoveLaraPosition(&HiddenPickUpPosition, item, laraItem))
+		else if (MoveLaraPosition(&HiddenPickUpPosition, item, l))
 		{
-			getThisItemPlease = itemNumber;
-			laraItem->Animation.AnimNumber = LA_HOLESWITCH_ACTIVATE;
-			laraItem->Animation.ActiveState = LS_HOLE;
-			flag = true;
+			getThisItemPlease = itemNum;
+			l->animNumber = LA_HOLESWITCH_ACTIVATE;
+			l->currentAnimState = LS_HOLE;
+			flag = 1;
 		}
-
-		lara->InteractedItem = itemNumber;
+		lara->interactedItem = itemNum;
 		break;
 
 	case 2: // Pickup with crowbar
-		item->Pose.Orientation.y = oldYrot;
-		if (lara->Control.IsLow || !TestLaraPosition(&CrowbarPickUpBounds, item, laraItem))
+		item->pos.yRot = oldYrot;
+		if (lara->isDucked || !TestLaraPosition(&CrowbarPickUpBounds, item, l))
 		{
-			if (!lara->Control.IsMoving)
+			if (!lara->isMoving)
 			{
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
 				return;
 			}
 
-			if (lara->InteractedItem == itemNumber)
+			if (lara->interactedItem == itemNum)
 			{
-				Lara.Control.IsMoving = false;
-				Lara.Control.HandStatus = HandStatus::Free;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			return;
 		}
-		if (!lara->Control.IsMoving)
+		if (!lara->isMoving)
 		{
 			if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
 			{
 				if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
 				return;
 			}
 
 			if (g_Gui.GetInventoryItemChosen() != ID_CROWBAR_ITEM)
 			{
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
 				return;
 			}
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 		}
-		if (MoveLaraPosition(&CrowbarPickUpPosition, item, laraItem))
+		if (MoveLaraPosition(&CrowbarPickUpPosition, item, l))
 		{
-			getThisItemPlease = itemNumber;
-			laraItem->Animation.AnimNumber = LA_CROWBAR_PRY_WALL_FAST;
-			laraItem->Animation.ActiveState = LS_PICKUP;
-			item->Status = ITEM_ACTIVE;
-			AddActiveItem(itemNumber);
+			getThisItemPlease = itemNum;
+			l->animNumber = LA_CROWBAR_PRY_WALL_FAST;
+			l->currentAnimState = LS_PICKUP;
+			item->status = ITEM_ACTIVE;
+			AddActiveItem(itemNum);
 			AnimateItem(item);
-			flag = true;
+			flag = 1;
 		}
 
-		lara->InteractedItem = itemNumber;
+		lara->interactedItem = itemNum;
 		break;
 
 	case 3:
@@ -534,273 +480,261 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	case 7:
 	case 8:
 		plinth = FindPlinth(item);
-
 		if (!plinth)
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			return;
 		}
 
 		PlinthPickUpBounds.boundingBox.X1 = plinth->X1;
 		PlinthPickUpBounds.boundingBox.X2 = plinth->X2;
-		PlinthPickUpBounds.boundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
+		PlinthPickUpBounds.boundingBox.Y2 = l->pos.yPos - item->pos.yPos + 100;
 		PlinthPickUpBounds.boundingBox.Z2 = plinth->Z2 + 320;
 		PlinthPickUpPosition.z = -200 - plinth->Z2;
 
-		if (TestLaraPosition(&PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
+		if (TestLaraPosition(&PlinthPickUpBounds, item, l) && !lara->isDucked)
 		{
-			if (item->Pose.Position.y == laraItem->Pose.Position.y)
+			if (item->pos.yPos == l->pos.yPos)
 				PlinthPickUpPosition.y = 0;
 			else
-				PlinthPickUpPosition.y = laraItem->Pose.Position.y - item->Pose.Position.y;
-			if (MoveLaraPosition(&PlinthPickUpPosition, item, laraItem))
+				PlinthPickUpPosition.y = l->pos.yPos - item->pos.yPos;
+			if (MoveLaraPosition(&PlinthPickUpPosition, item, l))
 			{
 				if (triggerFlags == 3 || triggerFlags == 7)
 				{
-					getThisItemPlease = itemNumber;
-					laraItem->Animation.AnimNumber = LA_PICKUP_PEDESTAL_HIGH;
-					laraItem->Animation.ActiveState = LS_PICKUP;
+					getThisItemPlease = itemNum;
+					l->animNumber = LA_PICKUP_PEDESTAL_HIGH;
+					l->currentAnimState = LS_PICKUP;
 				}
 				else
 				{
-					getThisItemPlease = itemNumber;
-					laraItem->Animation.AnimNumber = LA_PICKUP_PEDESTAL_LOW;
-					laraItem->Animation.ActiveState = LS_PICKUP;
+					getThisItemPlease = itemNum;
+					l->animNumber = LA_PICKUP_PEDESTAL_LOW;
+					l->currentAnimState = LS_PICKUP;
 				}
-
-				flag = true;
+				flag = 1;
 			}
-
-			lara->InteractedItem = itemNumber;
+			lara->interactedItem = itemNum;
 			break;
 		}
 
-		if (!lara->Control.IsMoving)
+		if (!lara->isMoving)
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			return;
 		}
 		
-		if (lara->InteractedItem == itemNumber)
+		if (lara->interactedItem == itemNum)
 		{
-			Lara.Control.IsMoving = false;
-			Lara.Control.HandStatus = HandStatus::Free;
+			Lara.isMoving = false;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 		
-		item->Pose.Orientation.x = oldXrot;
-		item->Pose.Orientation.y = oldYrot;
-		item->Pose.Orientation.z = oldZrot;
+		item->pos.xRot = oldXrot;
+		item->pos.yRot = oldYrot;
+		item->pos.zRot = oldZrot;
 		return;
 
 	case 9: // Pickup object and conver it to crowbar (like submarine level)
-		item->Pose.Orientation.y = oldYrot;
-
-		if (!TestLaraPosition(&JobyCrowPickUpBounds, item, laraItem))
+		item->pos.yRot = oldYrot;
+		if (!TestLaraPosition(&JobyCrowPickUpBounds, item, l))
 		{
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			return;
 		}
-
-		if (MoveLaraPosition(&JobyCrowPickUpPosition, item, laraItem))
+		if (MoveLaraPosition(&JobyCrowPickUpPosition, item, l))
 		{
-			getThisItemPlease = itemNumber;
-			laraItem->Animation.AnimNumber = LA_CROWBAR_PRY_WALL_SLOW;
-			laraItem->Animation.ActiveState = LS_PICKUP;
-			item->Status = ITEM_ACTIVE;
-			AddActiveItem(itemNumber);
-			flag = true;
+			getThisItemPlease = itemNum;
+			l->animNumber = LA_CROWBAR_PRY_WALL_SLOW;
+			l->currentAnimState = LS_PICKUP;
+			item->status = ITEM_ACTIVE;
+			AddActiveItem(itemNum);
+			flag = 1;
 		}
-
-		lara->InteractedItem = itemNumber;
+		lara->interactedItem = itemNum;
 		break;
 
 	default:
-		if (!TestLaraPosition(&PickUpBounds, item, laraItem))
+		if (!TestLaraPosition(&PickUpBounds, item, l))
 		{
-			if (!lara->Control.IsMoving)
+			if (!lara->isMoving)
 			{
-				item->Pose.Orientation.x = oldXrot;
-				item->Pose.Orientation.y = oldYrot;
-				item->Pose.Orientation.z = oldZrot;
+				item->pos.xRot = oldXrot;
+				item->pos.yRot = oldYrot;
+				item->pos.zRot = oldZrot;
 				return;
 			}
 			
-			if (lara->InteractedItem == itemNumber)
+			if (lara->interactedItem == itemNum)
 			{
-				Lara.Control.IsMoving = false;
-				Lara.Control.HandStatus = HandStatus::Free;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 
-			item->Pose.Orientation.x = oldXrot;
-			item->Pose.Orientation.y = oldYrot;
-			item->Pose.Orientation.z = oldZrot;
+			item->pos.xRot = oldXrot;
+			item->pos.yRot = oldYrot;
+			item->pos.zRot = oldZrot;
 			return;
 		}
 
-		PickUpPosition.y = laraItem->Pose.Position.y - item->Pose.Position.y;
+		PickUpPosition.y = l->pos.yPos - item->pos.yPos;
 
-		if (laraItem->Animation.ActiveState == LS_CROUCH_IDLE)
+		if (l->currentAnimState == LS_CROUCH_IDLE)
 		{
-			if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
+			if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 				break;
-
-			AlignLaraPosition(&PickUpPosition, item, laraItem);
-
-			if (item->ObjectNumber == ID_FLARE_ITEM)
+			AlignLaraPosition(&PickUpPosition, item, l);
+			if (item->objectNumber == ID_FLARE_ITEM)
 			{
-				getThisItemPlease = itemNumber;
-				laraItem->Animation.AnimNumber = LA_CROUCH_PICKUP_FLARE;
-				laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
-				lara->InteractedItem = itemNumber;
-				flag = true;
+				getThisItemPlease = itemNum;
+				l->animNumber = LA_CROUCH_PICKUP_FLARE;
+				l->currentAnimState = LS_PICKUP_FLARE;
+				flag = 1;
+				lara->interactedItem = itemNum;
 				break;
 			}
-
-			getThisItemPlease = itemNumber;
-			laraItem->Animation.TargetState = LS_PICKUP;
+			getThisItemPlease = itemNum;
+			l->goalAnimState = LS_PICKUP;
 		}
 		else
 		{
-			if (laraItem->Animation.ActiveState == LS_CRAWL_IDLE)
+			if (l->currentAnimState == LS_CRAWL_IDLE)
 			{
-				if (item->ObjectNumber == ID_BURNING_TORCH_ITEM)
+				if (item->objectNumber == ID_BURNING_TORCH_ITEM)
 					break;
 
-				AlignLaraPosition(&PickUpPosition, item, laraItem);
+				AlignLaraPosition(&PickUpPosition, item, l);
 
-				if (item->ObjectNumber == ID_FLARE_ITEM)
+				if (item->objectNumber == ID_FLARE_ITEM)
 				{
-					laraItem->Animation.TargetState = LS_CROUCH_IDLE;
-					lara->InteractedItem = itemNumber;
+					l->goalAnimState = LS_CROUCH_IDLE;
+					lara->interactedItem = itemNum;
 				}
 				else
 				{
-					getThisItemPlease = itemNumber;
-					laraItem->Animation.TargetState = LS_PICKUP;
+					getThisItemPlease = itemNum;
+					l->goalAnimState = LS_PICKUP;
 				}
-
 				break;
 			}
 			else
 			{
-				if (!MoveLaraPosition(&PickUpPosition, item, laraItem))
+				if (!MoveLaraPosition(&PickUpPosition, item, l))
 				{
-					lara->InteractedItem = itemNumber;
+					lara->interactedItem = itemNum;
 					break;
 				}
 
-				getThisItemPlease = itemNumber;
+				getThisItemPlease = itemNum;
 
-				if (item->ObjectNumber == ID_FLARE_ITEM)
+				if (item->objectNumber == ID_FLARE_ITEM)
 				{
-					laraItem->Animation.AnimNumber = LA_PICKUP;
-					laraItem->Animation.ActiveState = LS_PICKUP_FLARE;
-					lara->InteractedItem = itemNumber;
-					flag = true;
+					l->animNumber = LA_PICKUP;
+					l->currentAnimState = LS_PICKUP_FLARE;
+					flag = 1;
+					lara->interactedItem = itemNum;
 					break;
 				}
 				else
 				{
 					// HACK: because of MoveLaraPosition(), we can't properly dispatch. Must be fixed later.
-					laraItem->Animation.AnimNumber = LA_PICKUP;
-					laraItem->Animation.ActiveState = LS_PICKUP;
+					l->animNumber = LA_PICKUP;
+					l->currentAnimState = LS_PICKUP;
 				}
 			}
 		}
-
-		lara->InteractedItem = itemNumber;
-		flag = true;
+		flag = 1;
+		lara->interactedItem = itemNum;
 	}
 
 	if (flag)
 	{
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		ResetLaraFlex(laraItem);
-		lara->Control.IsMoving = false;
-		lara->Control.HandStatus = HandStatus::Busy;
+		ResetLaraFlex(l);
+		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+		lara->isMoving = false;
+		lara->gunStatus = LG_HANDS_BUSY;
 	}
 
-	item->Pose.Orientation.x = oldXrot;
-	item->Pose.Orientation.y = oldYrot;
-	item->Pose.Orientation.z = oldZrot;
+	item->pos.xRot = oldXrot;
+	item->pos.yRot = oldYrot;
+	item->pos.zRot = oldZrot;
 }
 
 void RegeneratePickups()
 {
 	for (int i = 0; i < NumRPickups; i++)
 	{
-		auto* item = &g_Level.Items[RPickups[i]];
+		ITEM_INFO* item = &g_Level.Items[RPickups[i]];
 
-		if (item->Status == ITEM_INVISIBLE)
+		if (item->status == ITEM_INVISIBLE)
 		{
 			short ammo = 0;
-			if (item->ObjectNumber == ID_CROSSBOW_AMMO1_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_CROSSBOW_AMMO2_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2];
-			else if (item->ObjectNumber == ID_CROSSBOW_AMMO3_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3];
-			else if(item->ObjectNumber == ID_GRENADE_AMMO1_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_GRENADE_AMMO2_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2];
-			else if (item->ObjectNumber == ID_GRENADE_AMMO3_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3];
-			else if (item->ObjectNumber == ID_HK_AMMO_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_UZI_AMMO_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_HARPOON_AMMO_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_ROCKET_LAUNCHER_AMMO_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_REVOLVER_AMMO_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_SHOTGUN_AMMO1_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_SHOTGUN_AMMO1_ITEM)
-				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2];
+			if (item->objectNumber == ID_CROSSBOW_AMMO1_ITEM)
+				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_CROSSBOW_AMMO2_ITEM)
+				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2];
+			else if (item->objectNumber == ID_CROSSBOW_AMMO3_ITEM)
+				ammo = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3];
+			else if(item->objectNumber == ID_GRENADE_AMMO1_ITEM)
+				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_GRENADE_AMMO2_ITEM)
+				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2];
+			else if (item->objectNumber == ID_GRENADE_AMMO3_ITEM)
+				ammo = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3];
+			else if (item->objectNumber == ID_HK_AMMO_ITEM)
+				ammo = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_UZI_AMMO_ITEM)
+				ammo = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_HARPOON_AMMO_ITEM)
+				ammo = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_ROCKET_LAUNCHER_AMMO_ITEM)
+				ammo = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_REVOLVER_AMMO_ITEM)
+				ammo = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_SHOTGUN_AMMO1_ITEM)
+				ammo = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1];
+			else if (item->objectNumber == ID_SHOTGUN_AMMO1_ITEM)
+				ammo = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2];
 
 			if (ammo == 0)
-				item->Status = ITEM_NOT_ACTIVE;
+			{
+				item->status = ITEM_NOT_ACTIVE;
+			}
 		}
 	}
 }
 
-void PickupControl(short itemNumber)
+void PickupControl(short itemNum)
 {
-	auto* item = &g_Level.Items[itemNumber];
-
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 	short roomNumber;
-	short triggerFlags = item->TriggerFlags & 0x3F;
-
+	short triggerFlags = item->triggerFlags & 0x3F;
 	switch (triggerFlags)
 	{
 	case 5:
-		item->Animation.VerticalVelocity += 6;
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		item->fallspeed += 6;
+		item->pos.yPos += item->fallspeed;
 		
-		roomNumber = item->RoomNumber;
-		GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		roomNumber = item->roomNumber;
+		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
 
-		if (item->Pose.Position.y > item->ItemFlags[0])
+		if (item->pos.yPos > item->itemFlags[0])
 		{
-			item->Pose.Position.y = item->ItemFlags[0];
-			if (item->Animation.VerticalVelocity <= 64)
-				item->TriggerFlags &= 0xC0;
+			item->pos.yPos = item->itemFlags[0];
+			if (item->fallspeed <= 64)
+				item->triggerFlags &= 0xC0;
 			else
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 2;
+				item->fallspeed = -item->fallspeed >> 2;
 		}
 
-		if (item->RoomNumber != roomNumber)
-			ItemNewRoom(itemNumber, roomNumber);
-
+		if (item->roomNumber != roomNumber)
+			ItemNewRoom(itemNum, roomNumber);
 		break;
 
 	case 2:
@@ -814,30 +748,29 @@ void PickupControl(short itemNumber)
 	case 11:
 		//sub_401014(itemNum);
 		break;
+
 	}
 }
 
 BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
 {
-	auto* room = &g_Level.Rooms[item->RoomNumber];
+	ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 	
 	int found = -1;
 	for (int i = 0; i < room->mesh.size(); i++)
 	{
-		auto* mesh = &room->mesh[i];
-
+		MESH_INFO* mesh = &room->mesh[i];
 		if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
 		{
-			if (item->Pose.Position.x == mesh->pos.Position.x && item->Pose.Position.z == mesh->pos.Position.z)
+			if (item->pos.xPos == mesh->pos.xPos && item->pos.zPos == mesh->pos.zPos)
 			{
-				auto* frame = (BOUNDING_BOX*)GetBestFrame(item);
-				auto* staticInfo = &StaticObjects[mesh->staticNumber];
-
-				if (frame->X1 <= staticInfo->collisionBox.X2 &&
-					frame->X2 >= staticInfo->collisionBox.X1 &&
-					frame->Z1 <= staticInfo->collisionBox.Z2 &&
-					frame->Z2 >= staticInfo->collisionBox.Z1 &&
-					(staticInfo->collisionBox.X1 || staticInfo->collisionBox.X2))
+				BOUNDING_BOX* frame = (BOUNDING_BOX*)GetBestFrame(item);
+				STATIC_INFO* s = &StaticObjects[mesh->staticNumber];
+				if (frame->X1 <= s->collisionBox.X2 
+					&& frame->X2 >= s->collisionBox.X1 
+					&& frame->Z1 <= s->collisionBox.Z2 
+					&& frame->Z2 >= s->collisionBox.Z1 
+					&& (s->collisionBox.X1 || s->collisionBox.X2))
 				{
 					found = mesh->staticNumber;
 					break;
@@ -853,16 +786,16 @@ BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
 		return NULL;
 
 	short itemNumber = room->itemNumber;
-	for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].nextItem)
 	{
-		auto* currentItem = &g_Level.Items[itemNumber];
-		auto* object = &Objects[currentItem->ObjectNumber];
+		ITEM_INFO* current = &g_Level.Items[itemNumber];
+		OBJECT_INFO* obj = &Objects[current->objectNumber];
 
-		if (!object->isPickup &&
-			item->Pose.Position.x == currentItem->Pose.Position.x &&
-			item->Pose.Position.y <= currentItem->Pose.Position.y &&
-			item->Pose.Position.z == currentItem->Pose.Position.z &&
-			(currentItem->ObjectNumber != ID_HIGH_OBJECT1 || currentItem->ItemFlags[0] == 5))
+		if (!obj->isPickup
+			&& item->pos.xPos == current->pos.xPos
+			&& item->pos.yPos <= current->pos.yPos
+			&& item->pos.zPos == current->pos.zPos
+			&& (current->objectNumber != ID_HIGH_OBJECT1 || current->itemFlags[0] == 5))
 		{
 			break;
 		}
@@ -876,93 +809,100 @@ BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
 
 void InitialisePickup(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	auto* bounds = GetBoundsAccurate(item);
-
-	short triggerFlags = item->TriggerFlags & 0x3F;
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
+	short triggerFlags = item->triggerFlags & 0x3F;
 	if (triggerFlags == 5)
 	{
-		item->ItemFlags[0] = item->Pose.Position.y - bounds->Y2;
-		item->Status = ITEM_INVISIBLE;
+		item->itemFlags[0] = item->pos.yPos - bounds->Y2;
+		item->status = ITEM_INVISIBLE;
 	}
 	else
 	{
 		if (triggerFlags == 0 || triggerFlags == 3 || triggerFlags == 4 || triggerFlags == 7 || triggerFlags == 8 || triggerFlags == 11)
-			item->Pose.Position.y -= bounds->Y2;
+			item->pos.yPos -= bounds->Y2;
 		
-		if ((item->TriggerFlags & 0x80) != 0)
+		if ((item->triggerFlags & 0x80) != 0)
 		{
 			RPickups[NumRPickups] = itemNumber;
 			NumRPickups++;
 		}
 		
-		if (item->TriggerFlags & 0x100)
-			item->MeshBits = 0;
+		if (item->triggerFlags & 0x100)
+			item->meshBits = 0;
 		
-		if (item->Status == ITEM_INVISIBLE)
-			item->Flags |= 0x20;
+		if (item->status == ITEM_INVISIBLE)
+			item->flags |= 0x20;
 	}
 }
 
 void InitialiseSearchObject(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
-	{
-		item->SwapMeshFlags = -1;
-		item->MeshBits = 7;
-	}
-	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
-		item->MeshBits = 2;
-	else if (item->ObjectNumber == ID_SEARCH_OBJECT4)
-	{
-		item->ItemFlags[1] = -1;
-		item->MeshBits = 9;
-		
-		for (short itemNumber2 = 0; itemNumber2 < g_Level.NumItems; ++itemNumber2)
-		{
-			auto* item2 = &g_Level.Items[itemNumber2];
+	ITEM_INFO* item, *item2;
+	short itemNumber2;
 
-			if (item2->ObjectNumber == ID_EXPLOSION)
+	item = &g_Level.Items[itemNumber];
+	if (item->objectNumber == ID_SEARCH_OBJECT1)
+	{
+		item->swapMeshFlags = -1;
+		item->meshBits = 7;
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT2)
+	{
+		item->meshBits = 2;
+	}
+	else if (item->objectNumber == ID_SEARCH_OBJECT4)
+	{
+		item->itemFlags[1] = -1;
+		item->meshBits = 9;
+		
+		for (itemNumber2 = 0; itemNumber2 < g_Level.NumItems; ++itemNumber2)
+		{
+			item2 = &g_Level.Items[itemNumber2];
+
+			if (item2->objectNumber == ID_EXPLOSION)
 			{
-				if (item->Pose.Position.x == item2->Pose.Position.x && item->Pose.Position.y == item2->Pose.Position.y && item->Pose.Position.z == item2->Pose.Position.z)
+				if (item->pos.xPos == item2->pos.xPos && item->pos.yPos == item2->pos.yPos && item->pos.zPos == item2->pos.zPos)
 				{
-					item->ItemFlags[1] = itemNumber2;
+					item->itemFlags[1] = itemNumber2;
 					break;
 				}
 			}
-			else if (Objects[item2->ObjectNumber].isPickup &&
-				item->Pose.Position.x == item2->Pose.Position.x &&
-				item->Pose.Position.y == item2->Pose.Position.y &&
-				item->Pose.Position.z == item2->Pose.Position.z)
+			else if (Objects[item2->objectNumber].isPickup
+				&&  item->pos.xPos == item2->pos.xPos
+				&&  item->pos.yPos == item2->pos.yPos
+				&&  item->pos.zPos == item2->pos.zPos)
 			{
-				item->ItemFlags[1] = itemNumber2;
+				item->itemFlags[1] = itemNumber2;
 				break;
 			}
 
 		}
-
 		AddActiveItem(itemNumber);
-		item->Flags |= IFLAG_ACTIVATION_MASK;
-		item->Status = ITEM_ACTIVE;
+		item->flags |= IFLAG_ACTIVATION_MASK;
+		item->status = ITEM_ACTIVE;
 	}
 }
 
-void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
+void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, COLL_INFO* laracoll)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1) / 2;
+	ITEM_INFO* item;
+	int objNumber;
+	BOUNDING_BOX* bounds;
 
-	if (TrInput & IN_ACTION &&
-		laraitem->Animation.ActiveState == LS_IDLE &&
-		laraitem->Animation.AnimNumber == LA_STAND_IDLE &&
-		Lara.Control.HandStatus == HandStatus::Free &&
-		(item->Status == ITEM_NOT_ACTIVE &&
-			item->ObjectNumber != ID_SEARCH_OBJECT4 || !item->ItemFlags[0]) ||
-		Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
+	item = &g_Level.Items[itemNumber];
+	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
+
+	if (TrInput & IN_ACTION
+		&& laraitem->currentAnimState == LS_IDLE
+		&& laraitem->animNumber == LA_STAND_IDLE 
+		&& Lara.gunStatus == LG_HANDS_FREE 
+		&& (item->status == ITEM_NOT_ACTIVE 
+			&& item->objectNumber != ID_SEARCH_OBJECT4 || !item->itemFlags[0])
+		|| Lara.isMoving && Lara.interactedItem == itemNumber)
 	{
-		auto* bounds = GetBoundsAccurate(item);
-		if (item->ObjectNumber != ID_SEARCH_OBJECT1)
+		bounds = GetBoundsAccurate(item);
+		if (item->objectNumber != ID_SEARCH_OBJECT1)
 		{
 			SOBounds.boundingBox.X1 = bounds->X1 - 128;
 			SOBounds.boundingBox.X2 = bounds->X2 + 128;
@@ -972,169 +912,176 @@ void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo*
 			SOBounds.boundingBox.X1 = bounds->X1 + 64;
 			SOBounds.boundingBox.X2 = bounds->X2 - 64;
 		}
-
 		SOBounds.boundingBox.Z1 = bounds->Z1 - 200;
 		SOBounds.boundingBox.Z2 = bounds->Z2 + 200;
-		SOPos.z = bounds->Z1 - SearchOffsets[objectNumber];
+		SOPos.z = bounds->Z1 - SearchOffsets[objNumber];
 
 		if (TestLaraPosition(&SOBounds, item, laraitem))
 		{
 			if (MoveLaraPosition(&SOPos, item, laraitem))
 			{
-				laraitem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraitem->Animation.AnimNumber = SearchAnims[objectNumber];
-				laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+				laraitem->currentAnimState = LS_MISC_CONTROL;
+				laraitem->animNumber = SearchAnims[objNumber];
+				laraitem->frameNumber = g_Level.Anims[laraitem->animNumber].frameBase;
+				Lara.isMoving = false;
 				ResetLaraFlex(laraitem);
-				Lara.Control.IsMoving = false;
-				Lara.Control.HandStatus = HandStatus::Busy;
+				Lara.gunStatus = LG_HANDS_BUSY;
 
-				if (item->ObjectNumber == ID_SEARCH_OBJECT4)
-					item->ItemFlags[0] = 1;
+				if (item->objectNumber == ID_SEARCH_OBJECT4)
+				{
+					item->itemFlags[0] = 1;
+				}
 				else
 				{
 					AddActiveItem(itemNumber);
-					item->Status = ITEM_ACTIVE;
+					item->status = ITEM_ACTIVE;
 				}
 
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->animNumber = Objects[item->objectNumber].animIndex + 1;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				AnimateItem(item);
 			}
 			else
-				Lara.InteractedItem = itemNumber;
+			{
+				Lara.interactedItem = itemNumber;
+			}
 		}
-		else if (Lara.Control.IsMoving && Lara.InteractedItem ==  itemNumber)
+		else if (Lara.isMoving && Lara.interactedItem ==  itemNumber)
 		{
-			Lara.Control.IsMoving = false;
-			Lara.Control.HandStatus = HandStatus::Free;
+			Lara.isMoving = false;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
-	else if (laraitem->Animation.ActiveState != LS_MISC_CONTROL)
-		ObjectCollision(itemNumber, laraitem, coll);
+	else if (laraitem->currentAnimState != LS_MISC_CONTROL)
+	{
+		ObjectCollision(itemNumber, laraitem, laracoll);
+	}
 }
 
 void SearchObjectControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1) / 2;
+	ITEM_INFO* item, *item2;
+	int objNumber;
+	int frameNumber;
 
-	if (item->ObjectNumber != ID_SEARCH_OBJECT4 || item->ItemFlags[0] == 1)
+	item = &g_Level.Items[itemNumber];
+	objNumber = (item->objectNumber - ID_SEARCH_OBJECT1) / 2;
+
+	if (item->objectNumber != ID_SEARCH_OBJECT4 || item->itemFlags[0] == 1)
 		AnimateItem(item);
 
-	ITEM_INFO* item2;
-
-	int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
+	frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+	if (item->objectNumber == ID_SEARCH_OBJECT1)
 	{
 		if (frameNumber > 0)
 		{
-			item->SwapMeshFlags = 0;
-			item->MeshBits = -1;
+			item->swapMeshFlags = 0;
+			item->meshBits = -1;
 		}
 		else
 		{
-			item->SwapMeshFlags = -1;
-			item->MeshBits = 7;
+			item->swapMeshFlags = -1;
+			item->meshBits = 7;
 		}
 	}
-	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
+	else if (item->objectNumber == ID_SEARCH_OBJECT2)
 	{
 		if (frameNumber == 18)
-			item->MeshBits = 1;
+			item->meshBits = 1;
 		else if (frameNumber == 172)
-			item->MeshBits = 2;
+			item->meshBits = 2;
 	}
-	else if (item->ObjectNumber == ID_SEARCH_OBJECT4)
+	else if (item->objectNumber == ID_SEARCH_OBJECT4)
 	{
-		item->MeshBits = FlipStats[0] != 0 ? 48 : 9;
+		item->meshBits = FlipStats[0] != 0 ? 48 : 9;
 
 		if (frameNumber >= 45 && frameNumber <= 131)
-			item->MeshBits |= FlipStats[0] != 0 ? 4 : 2;
+			item->meshBits |= FlipStats[0] != 0 ? 4 : 2;
 			
-		if (item->ItemFlags[1] != -1)
+		if (item->itemFlags[1] != -1)
 		{
-			item2 = &g_Level.Items[item->ItemFlags[1]];
-			if (Objects[item2->ObjectNumber].isPickup)
+			item2 = &g_Level.Items[item->itemFlags[1]];
+			if (Objects[item2->objectNumber].isPickup)
 			{
 				if (FlipStats[0])
-					item2->Status = ITEM_NOT_ACTIVE;
+					item2->status = ITEM_NOT_ACTIVE;
 				else
-					item2->Status = ITEM_INVISIBLE;
+					item2->status = ITEM_INVISIBLE;
 			}
 		}
 	}
 
-	if (frameNumber == SearchCollectFrames[objectNumber])
+	if (frameNumber == SearchCollectFrames[objNumber])
 	{
-		if (item->ObjectNumber == ID_SEARCH_OBJECT4)
+		if (item->objectNumber == ID_SEARCH_OBJECT4)
 		{
-			if (item->ItemFlags[1] != -1)
+			if (item->itemFlags[1] != -1)
 			{
-				item2 = &g_Level.Items[item->ItemFlags[1]];
-
-				if (Objects[item2->ObjectNumber].isPickup)
+				item2 = &g_Level.Items[item->itemFlags[1]];
+				if (Objects[item2->objectNumber].isPickup)
 				{
-					AddDisplayPickup(item2->ObjectNumber);
-					KillItem(item->ItemFlags[1]);
+					AddDisplayPickup(item2->objectNumber);
+					KillItem(item->itemFlags[1]);
 				}
 				else
 				{
-					AddActiveItem(item->ItemFlags[1]);
-					item2->Flags |= IFLAG_ACTIVATION_MASK;
-					item2->Status = ITEM_ACTIVE;
-					LaraItem->HitPoints = 640;
+					AddActiveItem(item->itemFlags[1]);
+					item2->flags |= IFLAG_ACTIVATION_MASK;
+					item2->status = ITEM_ACTIVE;
+					LaraItem->hitPoints = 640;
 				}
-
-				item->ItemFlags[1] = -1;
+				item->itemFlags[1] = -1;
 			}
 		}
 		else
+		{
 			CollectCarriedItems(item);
+		}
 	}
 
 	
-	if (item->Status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
 	{
-		if (item->ObjectNumber == ID_SEARCH_OBJECT4)
+		if (item->objectNumber == ID_SEARCH_OBJECT4)
 		{
-			item->ItemFlags[0] = 0;
-			item->Status = ITEM_ACTIVE;
+			item->itemFlags[0] = 0;
+			item->status = ITEM_ACTIVE;
 		}
 		else
 		{
 			RemoveActiveItem(itemNumber);
-			item->Status = ITEM_NOT_ACTIVE;
+			item->status = ITEM_NOT_ACTIVE;
 		}
 	}
 }
 
-bool UseSpecialItem(ITEM_INFO* item)
+int UseSpecialItem(ITEM_INFO* item)
 {
 	int flag = 0;
 	int use = g_Gui.GetInventoryItemChosen();
 
-	if (item->Animation.AnimNumber == LA_STAND_IDLE && Lara.Control.HandStatus == HandStatus::Free && use != NO_ITEM)
+	if (item->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE && use != NO_ITEM)
 	{
 		if ((use >= ID_WATERSKIN1_EMPTY) && (use <= ID_WATERSKIN2_5))
 		{
-			item->ItemFlags[2] = ID_LARA_WATER_MESH;
+			item->itemFlags[2] = ID_LARA_WATER_MESH;
 			flag = 1;
 		}
 		else if (use == ID_CLOCKWORK_BEETLE)
 		{
 			flag = 4;
-			item->Animation.AnimNumber = LA_MECHANICAL_BEETLE_USE;
+			item->animNumber = LA_MECHANICAL_BEETLE_USE;
 			UseClockworkBeetle(1);
 		}
 
 		if (flag == 1)
 		{
-			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->Pose.Position.y > Lara.WaterSurfaceDist))
+			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->pos.yPos > Lara.waterSurfaceDist))
 			{
 				if (use < ID_WATERSKIN1_3)
-					Lara.Inventory.SmallWaterskin = 4;
+					Lara.small_waterskin = 4;
 				else
-					Lara.Inventory.BigWaterskin = 6;
+					Lara.big_waterskin = 6;
 
 				flag = 1;
 			}
@@ -1142,38 +1089,38 @@ bool UseSpecialItem(ITEM_INFO* item)
 			{
 				if (use <= ID_WATERSKIN1_3)
 				{
-					item->ItemFlags[3] = Lara.Inventory.SmallWaterskin - 1;
-					Lara.Inventory.SmallWaterskin = 1;
+					item->itemFlags[3] = Lara.small_waterskin - 1;
+					Lara.small_waterskin = 1;
 				}
 				else
 				{
-					item->ItemFlags[3] = Lara.Inventory.BigWaterskin - 1;
-					Lara.Inventory.BigWaterskin = 1;
+					item->itemFlags[3] = Lara.big_waterskin - 1;
+					Lara.big_waterskin = 1;
 				}
 
 				flag = 2;
 			}
 			else
-				return false;
+				return 0;
 		}
 
 		if (flag)
 		{
 			if (flag == 1)
-				item->Animation.AnimNumber = LA_WATERSKIN_FILL;
+				item->animNumber = LA_WATERSKIN_FILL;
 			else if (flag == 2)
-				item->Animation.AnimNumber = LA_WATERSKIN_POUR_LOW;
+				item->animNumber = LA_WATERSKIN_POUR_LOW;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = LS_MISC_CONTROL;
-			item->Animation.ActiveState = LS_MISC_CONTROL;
-			Lara.Control.HandStatus = HandStatus::Busy;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->goalAnimState = LS_MISC_CONTROL;
+			item->currentAnimState = LS_MISC_CONTROL;
+			Lara.gunStatus = LG_HANDS_BUSY;
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 
-			return true;
+			return 1;
 		}
 	}
 
-	return false;
+	return 0;
 }

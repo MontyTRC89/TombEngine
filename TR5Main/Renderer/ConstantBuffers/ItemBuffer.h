@@ -7,3 +7,4 @@ struct alignas(16) CItemBuffer
 	Vector4 Position;
 	Vector4 AmbientLight;
 };
+

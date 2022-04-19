@@ -11,33 +11,36 @@
 
 void InitialiseKillerStatue(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = 1;
+	item->animNumber = Objects[item->objectNumber].animIndex + 3;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->currentAnimState = 1;
 }
 
 void KillerStatueControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item;
+	int x, y, z;
+	short d;
 
-	if (TriggerActive(item) && item->Animation.ActiveState == 1)
-		item->Animation.TargetState = 2;
+	item = &g_Level.Items[itemNumber];
+
+	if (TriggerActive(item) && item->currentAnimState == 1)
+		item->goalAnimState = 2;
 	else
-		item->Animation.TargetState = 1;
+		item->goalAnimState = 1;
 
-	if (item->TouchBits & 0x80 && item->Animation.ActiveState == 2)
+	if ((item->touchBits & 0x80) && item->currentAnimState == 2)
 	{
-		LaraItem->HitStatus = 1;
-		LaraItem->HitPoints -= 20;
+		LaraItem->hitStatus = 1;
+		LaraItem->hitPoints -= 20;
 
-		int x = LaraItem->Pose.Position.x + (GetRandomControl() - SECTOR(16)) / CLICK(1);
-		int z = LaraItem->Pose.Position.z + (GetRandomControl() - SECTOR(16)) / CLICK(1);
-		int y = LaraItem->Pose.Position.y - GetRandomControl() / 44;
-		int d = (GetRandomControl() - SECTOR(16)) / 8 + LaraItem->Pose.Orientation.y;
-
-		DoBloodSplat(x, y, z, LaraItem->Animation.Velocity, d, LaraItem->RoomNumber);
+		int x = LaraItem->pos.xPos + (GetRandomControl() - 16384) / 256;
+		int z = LaraItem->pos.zPos + (GetRandomControl() - 16384) / 256;
+		int y = LaraItem->pos.yPos - GetRandomControl() / 44;
+		int d = (GetRandomControl() - 16384) / 8 + LaraItem->pos.yRot;
+		DoBloodSplat(x, y, z, LaraItem->speed, d, LaraItem->roomNumber);
 	}
 
 	AnimateItem(item);

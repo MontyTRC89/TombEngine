@@ -1,3 +1,3 @@
 #pragma once
 
-void BearControl(short itemNumber);
+void BearControl(short itemNum);

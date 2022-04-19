@@ -29,13 +29,13 @@ int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
 	return vector.x < 0 ? 0 : 1;
 }
 
-Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const
+std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const
 {
-	auto plane = floor ? FloorCollision.Planes[SectorPlane(x, z)] : CeilingCollision.Planes[SectorPlane(x, z)];
+	auto plane = FloorCollision.Planes[SectorPlane(x, z)];
 	auto tiltX = (int)-(plane.x * WALL_SIZE / STEP_SIZE);
 	auto tiltZ = (int)-(plane.y * WALL_SIZE / STEP_SIZE);
 
-	return Vector2(tiltX, tiltZ);
+	return std::make_pair(tiltX, tiltZ);
 }
 
 bool FLOOR_INFO::FloorIsSplit() const
@@ -93,7 +93,7 @@ std::optional<int> FLOOR_INFO::RoomBelow(int x, int y, int z) const
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto itemHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
+		const auto itemHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
 		if (itemHeight && *itemHeight >= y && *itemHeight <= floorHeight && *itemHeight >= ceilingHeight)
 			return std::nullopt;
 	}
@@ -120,7 +120,7 @@ std::optional<int> FLOOR_INFO::RoomAbove(int x, int y, int z) const
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto itemHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
+		const auto itemHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
 		if (itemHeight && *itemHeight <= y && *itemHeight <= floorHeight && *itemHeight >= ceilingHeight)
 			return std::nullopt;
 	}
@@ -149,7 +149,7 @@ int FLOOR_INFO::FloorHeight(int x, int y, int z) const
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto itemHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
+		const auto itemHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
 		if (itemHeight && *itemHeight >= y && *itemHeight < height && *itemHeight >= ceilingHeight)
 			height = *itemHeight;
 	}
@@ -162,8 +162,8 @@ int FLOOR_INFO::BridgeFloorHeight(int x, int y, int z) const
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		const auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
+		const auto floorHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
+		const auto ceilingHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
 		if (floorHeight && ceilingHeight && y > *floorHeight && y <= *ceilingHeight)
 			return *floorHeight;
 	}
@@ -187,7 +187,7 @@ int FLOOR_INFO::CeilingHeight(int x, int y, int z) const
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto itemHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
+		const auto itemHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
 		if (itemHeight && *itemHeight <= y && *itemHeight > height && *itemHeight <= floorHeight)
 			height = *itemHeight;
 	}
@@ -200,8 +200,8 @@ int FLOOR_INFO::BridgeCeilingHeight(int x, int y, int z) const
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		const auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
+		const auto floorHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
+		const auto ceilingHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
 		if (floorHeight && ceilingHeight && y >= *floorHeight && y < *ceilingHeight)
 			return *ceilingHeight;
 	}
@@ -244,8 +244,8 @@ short FLOOR_INFO::InsideBridge(int x, int y, int z, bool floorBorder, bool ceili
 	for (const auto itemNumber : BridgeItem)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		const auto floorHeight = Objects[item.ObjectNumber].floor(itemNumber, x, y, z);
-		const auto ceilingHeight = Objects[item.ObjectNumber].ceiling(itemNumber, x, y, z);
+		const auto floorHeight = Objects[item.objectNumber].floor(itemNumber, x, y, z);
+		const auto ceilingHeight = Objects[item.objectNumber].ceiling(itemNumber, x, y, z);
 		if (floorHeight && ceilingHeight && (y > *floorHeight && y < *ceilingHeight || floorBorder && y == *floorHeight || ceilingBorder && y == *ceilingHeight))
 			return itemNumber;
 	}
@@ -265,20 +265,20 @@ void FLOOR_INFO::RemoveItem(short itemNumber)
 
 namespace TEN::Floordata
 {
-	Vector2Int GetSectorPoint(int x, int z)
+	VectorInt2 GetSectorPoint(int x, int z)
 	{
 		const auto xPoint = x % SECTOR(1) - SECTOR(1) / 2;
 		const auto yPoint = z % SECTOR(1) - SECTOR(1) / 2;
 
-		return Vector2Int{xPoint, yPoint};
+		return VectorInt2{xPoint, yPoint};
 	}
 
-	Vector2Int GetRoomPosition(int roomNumber, int x, int z)
+	VectorInt2 GetRoomPosition(int roomNumber, int x, int z)
 	{
 		const auto& room = g_Level.Rooms[roomNumber];
 		const auto zRoom = (z - room.z) / SECTOR(1);
 		const auto xRoom = (x - room.x) / SECTOR(1);
-		auto pos = Vector2Int{xRoom, zRoom};
+		auto pos = VectorInt2{xRoom, zRoom};
 
 		if (pos.x < 0)
 		{
@@ -301,7 +301,7 @@ namespace TEN::Floordata
 		return pos;
 	}
 
-	FLOOR_INFO& GetFloor(int roomNumber, const Vector2Int& pos)
+	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2& pos)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 		return room.floor[room.zSize * pos.x + pos.y];
@@ -430,15 +430,21 @@ namespace TEN::Floordata
 			floor = &GetTopFloor(location.roomNumber, x, z);
 
 			if (!floor->IsWall(x, z))
+			{
 				y = floor->FloorHeight(x, z);
+			}
 			else
 			{
 				floor = &GetBottomFloor(location.roomNumber, x, z);
 
 				if (!floor->IsWall(x, z))
+				{
 					y = floor->CeilingHeight(x, z);
+				}
 				else
+				{
 					return std::nullopt;
+				}
 			}
 		}
 
@@ -480,15 +486,21 @@ namespace TEN::Floordata
 			floor = &GetBottomFloor(location.roomNumber, x, z);
 
 			if (!floor->IsWall(x, z))
+			{
 				y = floor->CeilingHeight(x, z);
+			}
 			else
 			{
 				floor = &GetTopFloor(location.roomNumber, x, z);
 
 				if (!floor->IsWall(x, z))
+				{
 					y = floor->FloorHeight(x, z);
+				}
 				else
+				{
 					return std::nullopt;
+				}
 			}
 		}
 
@@ -660,13 +672,13 @@ namespace TEN::Floordata
 	void AddBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		x += item.Pose.Position.x;
-		z += item.Pose.Position.z;
+		x += item.pos.xPos;
+		z += item.pos.zPos;
 
-		auto floor = &GetFloorSide(item.RoomNumber, x, z);
+		auto floor = &GetFloorSide(item.roomNumber, x, z);
 		floor->AddItem(itemNumber);
 
-		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
+		const auto floorBorder = Objects[item.objectNumber].floorBorder(itemNumber);
 		while (floorBorder <= floor->CeilingHeight(x, z))
 		{
 			const auto roomAbove = floor->RoomAbove(x, z);
@@ -677,7 +689,7 @@ namespace TEN::Floordata
 			floor->AddItem(itemNumber);
 		}
 
-		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
+		const auto ceilingBorder = Objects[item.objectNumber].ceilingBorder(itemNumber);
 		while (ceilingBorder >= floor->FloorHeight(x, z))
 		{
 			const auto roomBelow = floor->RoomBelow(x, z);
@@ -692,13 +704,13 @@ namespace TEN::Floordata
 	void RemoveBridge(short itemNumber, int x, int z)
 	{
 		const auto& item = g_Level.Items[itemNumber];
-		x += item.Pose.Position.x;
-		z += item.Pose.Position.z;
+		x += item.pos.xPos;
+		z += item.pos.zPos;
 
-		auto floor = &GetFloorSide(item.RoomNumber, x, z);
+		auto floor = &GetFloorSide(item.roomNumber, x, z);
 		floor->RemoveItem(itemNumber);
 
-		const auto floorBorder = Objects[item.ObjectNumber].floorBorder(itemNumber);
+		const auto floorBorder = Objects[item.objectNumber].floorBorder(itemNumber);
 		while (floorBorder <= floor->CeilingHeight(x, z))
 		{
 			const auto roomAbove = floor->RoomAbove(x, z);
@@ -709,7 +721,7 @@ namespace TEN::Floordata
 			floor->RemoveItem(itemNumber);
 		}
 
-		const auto ceilingBorder = Objects[item.ObjectNumber].ceilingBorder(itemNumber);
+		const auto ceilingBorder = Objects[item.objectNumber].ceilingBorder(itemNumber);
 		while (ceilingBorder >= floor->FloorHeight(x, z))
 		{
 			const auto roomBelow = floor->RoomBelow(x, z);
@@ -732,13 +744,13 @@ namespace TEN::Floordata
 		auto item = &g_Level.Items[itemNumber];
 
 		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = TO_DX_BBOX(item->Pose, bounds);
+		auto dxBounds = TO_DX_BBOX(item->pos, bounds);
 
 		Vector3 pos = Vector3(x, y + (bottom ? 4 : -4), z); // Introduce slight vertical margin just in case
 
 		static float distance;
 		if (dxBounds.Intersects(pos, (bottom ? -Vector3::UnitY : Vector3::UnitY), distance))
-			return std::optional{ item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1) };
+			return std::optional{ item->pos.yPos + (bottom ? bounds->Y2 : bounds->Y1) };
 		else
 			return std::nullopt;
 	}
@@ -750,7 +762,7 @@ namespace TEN::Floordata
 		auto item = &g_Level.Items[itemNumber];
 
 		auto bounds = GetBoundsAccurate(item);
-		return item->Pose.Position.y + (bottom ? bounds->Y2 : bounds->Y1);
+		return item->pos.yPos + (bottom ? bounds->Y2 : bounds->Y1);
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
@@ -760,18 +772,18 @@ namespace TEN::Floordata
 		auto item = &g_Level.Items[itemNumber];
 
 		// Force removal if object was killed
-		if (item->Flags & IFLAG_KILLED)
+		if (item->flags & IFLAG_KILLED)
 			forceRemoval = true;
 
 		// Get real OBB bounds of a bridge in world space
 		auto bounds = GetBoundsAccurate(item);
-		auto dxBounds = TO_DX_BBOX(item->Pose, bounds);
+		auto dxBounds = TO_DX_BBOX(item->pos, bounds);
 
 		// Get corners of a projected OBB
 		Vector3 corners[8];
 		dxBounds.GetCorners(corners); //corners[0], corners[1], corners[4] corners[5]
 
-		auto room = &g_Level.Rooms[item->RoomNumber];
+		auto room = &g_Level.Rooms[item->roomNumber];
 
 		// Get min/max of a projected AABB
 		auto minX = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room->x) / SECTOR(1));
@@ -785,8 +797,8 @@ namespace TEN::Floordata
 			{
 				auto pX = room->x + (x * WALL_SIZE) + (WALL_SIZE / 2);
 				auto pZ = room->z + (z * WALL_SIZE) + (WALL_SIZE / 2);
-				auto offX = pX - item->Pose.Position.x;
-				auto offZ = pZ - item->Pose.Position.z;
+				auto offX = pX - item->pos.xPos;
+				auto offZ = pZ - item->pos.zPos;
 
 				// Clean previous bridge state
 				RemoveBridge(itemNumber, offX, offZ);

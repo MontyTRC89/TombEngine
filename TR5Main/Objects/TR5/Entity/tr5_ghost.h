@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseInvisibleGhost(short itemNumber);
+void InitialiseInvisibleGhost(short itemNum);
 void InvisibleGhostControl(short itemNumber);

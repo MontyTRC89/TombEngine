@@ -1580,19 +1580,19 @@ void GuiController::ConstructObjectList()
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
 	{
-		if (Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
+		if (Lara.Weapons[WEAPON_PISTOLS].Present)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS);
 		else if (AmountPistolsAmmo)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
 
-		if (Lara.Weapons[(int)LaraWeaponType::Uzi].Present)
+		if (Lara.Weapons[WEAPON_UZI].Present)
 			InsertObjectIntoList(INV_OBJECT_UZIS);
 		else if (AmountUziAmmo)
 			InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
 
-		if (Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
+		if (Lara.Weapons[WEAPON_REVOLVER].Present)
 		{
-			if (Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
+			if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
 				InsertObjectIntoList(INV_OBJECT_REVOLVER_LASER);
 			else
 				InsertObjectIntoList(INV_OBJECT_REVOLVER);
@@ -1600,11 +1600,11 @@ void GuiController::ConstructObjectList()
 		else if (AmountRevolverAmmo)
 			InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
 
-		if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
+		if (Lara.Weapons[WEAPON_SHOTGUN].Present)
 		{
 			InsertObjectIntoList(INV_OBJECT_SHOTGUN);
 
-			if (Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo2)
+			if (Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo == WEAPON_AMMO2)
 				CurrentShotGunAmmoType = 1;
 		}
 		else
@@ -1616,9 +1616,9 @@ void GuiController::ConstructObjectList()
 				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
-		if (Lara.Weapons[(int)LaraWeaponType::HK].Present)
+		if (Lara.Weapons[WEAPON_HK].Present)
 		{
-			if (Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer)
+			if (Lara.Weapons[WEAPON_HK].HasSilencer)
 				InsertObjectIntoList(INV_OBJECT_HK_SILENCER);
 			else
 				InsertObjectIntoList(INV_OBJECT_HK);
@@ -1626,17 +1626,17 @@ void GuiController::ConstructObjectList()
 		else if (AmountHKAmmo1)
 			InsertObjectIntoList(INV_OBJECT_HK_AMMO);
 
-		if (Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
+		if (Lara.Weapons[WEAPON_CROSSBOW].Present)
 		{
-				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
+				if (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW_LASER);
 				else
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW);
 
-				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
+				if (Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo == WEAPON_AMMO2)
 					CurrentCrossBowAmmoType = 1;
 
-				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo3)
+				if (Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo == WEAPON_AMMO3)
 					CurrentCrossBowAmmoType = 2;
 		}
 		else
@@ -1651,14 +1651,14 @@ void GuiController::ConstructObjectList()
 				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO3);
 		}
 
-		if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+		if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
 		{
 			InsertObjectIntoList(INV_OBJECT_GRENADE_LAUNCHER);
 
-			if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo == WEAPON_AMMO2)
 				CurrentGrenadeGunAmmoType = 1;
 
-			if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo3)
+			if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo == WEAPON_AMMO3)
 				CurrentGrenadeGunAmmoType = 2;
 		}
 		else
@@ -1673,91 +1673,91 @@ void GuiController::ConstructObjectList()
 				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO3);
 		}
 
-		if (Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+		if (Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Present)
 			InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
 		else if (AmountRocketsAmmo)
 			InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
 
-		if (Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+		if (Lara.Weapons[WEAPON_HARPOON_GUN].Present)
 			InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
 		else if (AmountHarpoonAmmo)
 			InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
 
-		if (Lara.Inventory.HasLasersight)
+		if (Lara.Lasersight)
 			InsertObjectIntoList(INV_OBJECT_LASERSIGHT);
 
-		if (Lara.Inventory.HasSilencer)
+		if (Lara.Silencer)
 			InsertObjectIntoList(INV_OBJECT_SILENCER);
 
-		if (Lara.Inventory.HasBinoculars)
+		if (Lara.Binoculars)
 			InsertObjectIntoList(INV_OBJECT_BINOCULARS);
 
-		if (Lara.Inventory.TotalFlares)
+		if (Lara.NumFlares)
 			InsertObjectIntoList(INV_OBJECT_FLARES);
 	}
 
 	InsertObjectIntoList(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
 
-	if (Lara.Inventory.TotalSmallMedipacks)
+	if (Lara.NumSmallMedipacks)
 		InsertObjectIntoList(INV_OBJECT_SMALL_MEDIPACK);
 
-	if (Lara.Inventory.TotalLargeMedipacks)
+	if (Lara.NumLargeMedipacks)
 		InsertObjectIntoList(INV_OBJECT_LARGE_MEDIPACK);
 
-	if (Lara.Inventory.HasCrowbar)
+	if (Lara.Crowbar)
 		InsertObjectIntoList(INV_OBJECT_CROWBAR);
 
-	if (Lara.Inventory.BeetleComponents)
+	if (Lara.hasBeetleThings)
 	{
-		if (Lara.Inventory.BeetleComponents & 1)
+		if (Lara.hasBeetleThings & 1)
 			InsertObjectIntoList(INV_OBJECT_BEETLE);
 
-		if (Lara.Inventory.BeetleComponents & 2)
+		if (Lara.hasBeetleThings & 2)
 			InsertObjectIntoList(INV_OBJECT_BEETLE_PART1);
 
-		if (Lara.Inventory.BeetleComponents & 4)
+		if (Lara.hasBeetleThings & 4)
 			InsertObjectIntoList(INV_OBJECT_BEETLE_PART2);
 	}
 
-	if (Lara.Inventory.SmallWaterskin)
-		InsertObjectIntoList((Lara.Inventory.SmallWaterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
+	if (Lara.small_waterskin)
+		InsertObjectIntoList((Lara.small_waterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
 
-	if (Lara.Inventory.BigWaterskin)
-		InsertObjectIntoList((Lara.Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
+	if (Lara.big_waterskin)
+		InsertObjectIntoList((Lara.big_waterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLES; i++)
-		if (Lara.Inventory.Puzzles[i])
+		if (Lara.Puzzles[i])
 			InsertObjectIntoList(INV_OBJECT_PUZZLE1 + i);
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
-		if (Lara.Inventory.PuzzlesCombo[i])
+		if (Lara.PuzzlesCombo[i])
 			InsertObjectIntoList(INV_OBJECT_PUZZLE1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_KEYS; i++)
-		if (Lara.Inventory.Keys[i])
+		if (Lara.Keys[i])
 			InsertObjectIntoList(INV_OBJECT_KEY1 + i);
 
 	for (int i = 0; i < NUM_KEY_PIECES; i++)
-		if (Lara.Inventory.KeysCombo[i])
+		if (Lara.KeysCombo[i])
 			InsertObjectIntoList(INV_OBJECT_KEY1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_PICKUPS; i++)
-		if (Lara.Inventory.Pickups[i])
+		if (Lara.Pickups[i])
 			InsertObjectIntoList(INV_OBJECT_PICKUP1 + i);
 
 	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
-		if (Lara.Inventory.PickupsCombo[i])
+		if (Lara.PickupsCombo[i])
 			InsertObjectIntoList(INV_OBJECT_PICKUP1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_EXAMINES; i++)
-		if (Lara.Inventory.Examines[i])
+		if (Lara.Examines[i])
 			InsertObjectIntoList(INV_OBJECT_EXAMINE1 + i);
 
 	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
-		if (Lara.Inventory.ExaminesCombo[i])
+		if (Lara.ExaminesCombo[i])
 			InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
 
-	if (Lara.Inventory.Diary.Present)
+	if (Lara.Diary.Present)
 		InsertObjectIntoList(INV_OBJECT_DIARY);
 
 	if (g_GameFlow->EnableLoadSave)
@@ -1785,61 +1785,61 @@ void GuiController::ConstructCombineObjectList()
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young))
 	{
-		if (Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
+		if (Lara.Weapons[WEAPON_REVOLVER].Present)
 		{
-			if (Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
+			if (Lara.Weapons[WEAPON_REVOLVER].HasLasersight)
 				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER_LASER);
 			else
 				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER);
 		}
 
-		if (Lara.Weapons[(int)LaraWeaponType::HK].Present)
+		if (Lara.Weapons[WEAPON_HK].Present)
 			InsertObjectIntoList_v2(INV_OBJECT_HK);
 
-		if (Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
+		if (Lara.Weapons[WEAPON_CROSSBOW].Present)
 		{
-			if (Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
+			if (Lara.Weapons[WEAPON_CROSSBOW].HasLasersight)
 				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW_LASER);
 			else
 				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW);
 		}
 
-		if (Lara.Inventory.HasLasersight)
+		if (Lara.Lasersight)
 			InsertObjectIntoList_v2(INV_OBJECT_LASERSIGHT);
 
-		if (Lara.Inventory.HasSilencer)
+		if (Lara.Silencer)
 			InsertObjectIntoList_v2(INV_OBJECT_SILENCER);
 	}
 
-	if (Lara.Inventory.BeetleComponents)
+	if (Lara.hasBeetleThings)
 	{
-		if (Lara.Inventory.BeetleComponents & 2)
+		if (Lara.hasBeetleThings & 2)
 			InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART1);
 
-		if (Lara.Inventory.BeetleComponents & 4)
+		if (Lara.hasBeetleThings & 4)
 			InsertObjectIntoList_v2(INV_OBJECT_BEETLE_PART2);
 	}
 
-	if (Lara.Inventory.SmallWaterskin)
-		InsertObjectIntoList_v2(Lara.Inventory.SmallWaterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
+	if (Lara.small_waterskin)
+		InsertObjectIntoList_v2(Lara.small_waterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
 
-	if (Lara.Inventory.BigWaterskin)
-		InsertObjectIntoList_v2(Lara.Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
+	if (Lara.big_waterskin)
+		InsertObjectIntoList_v2(Lara.big_waterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
-		if (Lara.Inventory.PuzzlesCombo[i])
+		if (Lara.PuzzlesCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_KEY_PIECES; i++)
-		if (Lara.Inventory.KeysCombo[i])
+		if (Lara.KeysCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_KEY1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
-		if (Lara.Inventory.PickupsCombo[i])
+		if (Lara.PickupsCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
 
 	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
-		if (Lara.Inventory.ExaminesCombo[i])
+		if (Lara.ExaminesCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 
 	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
@@ -1851,33 +1851,33 @@ void GuiController::InitializeInventory()
 {
 	compassNeedleAngle = 4096;
 	AlterFOV(14560);
-	Lara.Inventory.IsBusy = 0;
+	Lara.busy = 0;
 	inventoryItemChosen = NO_ITEM;
 	ClearInputVariables(0);
 	useItem = 0;
 
-	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].hasInfinite())
+	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].hasInfinite())
 		AmountShotGunAmmo1 = -1;
 	else
-		AmountShotGunAmmo1 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].getCount() / 6;
+		AmountShotGunAmmo1 = Lara.Weapons[WEAPON_SHOTGUN].Ammo[0].getCount() / 6;
 
-	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].hasInfinite())
+	if (Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].hasInfinite())
 		AmountShotGunAmmo2 = -1;
 	else
-		AmountShotGunAmmo2 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].getCount() / 6;
+		AmountShotGunAmmo2 = Lara.Weapons[WEAPON_SHOTGUN].Ammo[1].getCount() / 6;
 
-	AmountHKAmmo1 = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountCrossBowAmmo1 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountCrossBowAmmo2 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-	AmountCrossBowAmmo3 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
-	AmountUziAmmo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountRevolverAmmo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountPistolsAmmo = Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountRocketsAmmo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountHarpoonAmmo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountGrenadeAmmo1 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountGrenadeAmmo2 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-	AmountGrenadeAmmo3 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
+	AmountHKAmmo1 = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].getCount();
+	AmountCrossBowAmmo1 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].getCount();
+	AmountCrossBowAmmo2 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].getCount();
+	AmountCrossBowAmmo3 = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].getCount();
+	AmountUziAmmo = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].getCount();
+	AmountRevolverAmmo = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].getCount();
+	AmountPistolsAmmo = Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_PISTOLS].Ammo[WEAPON_AMMO1].getCount();
+	AmountRocketsAmmo = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].hasInfinite() ? -1 : Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
+	AmountHarpoonAmmo = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].getCount();
+	AmountGrenadeAmmo1 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].hasInfinite()? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
+	AmountGrenadeAmmo2 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].getCount();
+	AmountGrenadeAmmo3 = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].hasInfinite() ? -1 : Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
 	ConstructObjectList();
 
 	if (enterInventory == NO_ITEM)
@@ -1998,36 +1998,36 @@ void GuiController::UseCurrentItem()
 	long OldBinocular;
 
 	OldBinocular = BinocularRange;
-	Lara.Inventory.OldBusy = false;
+	Lara.oldBusy = false;
 	BinocularRange = 0;
-	LaraItem->MeshBits = -1;
+	LaraItem->meshBits = -1;
 	invobject = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 	gmeobject = inventry_objects_list[invobject].object_number;
 
-	if (Lara.Control.WaterStatus == WaterStatus::Dry || Lara.Control.WaterStatus == WaterStatus::Wade)
+	if (Lara.waterStatus == LW_ABOVE_WATER || Lara.waterStatus == LW_WADE)
 	{
 		if (gmeobject == ID_PISTOLS_ITEM)
 		{
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+			Lara.requestGunType = WEAPON_PISTOLS;
 
-			if (Lara.Control.HandStatus != HandStatus::Free)
+			if (Lara.gunStatus != LG_HANDS_FREE)
 				return;
 
-			if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol)
-				Lara.Control.HandStatus = HandStatus::WeaponDraw;
+			if (Lara.gunType == WEAPON_PISTOLS)
+				Lara.gunStatus = LG_DRAW_GUNS;
 
 			return;
 		}
 
 		if (gmeobject == ID_UZI_ITEM)
 		{
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+			Lara.requestGunType = WEAPON_UZI;
 
-			if (Lara.Control.HandStatus != HandStatus::Free)
+			if (Lara.gunStatus != LG_HANDS_FREE)
 				return;
 
-			if (Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
-				Lara.Control.HandStatus = HandStatus::WeaponDraw;
+			if (Lara.gunType == WEAPON_UZI)
+				Lara.gunStatus = LG_DRAW_GUNS;
 
 			return;
 		}
@@ -2038,16 +2038,16 @@ void GuiController::UseCurrentItem()
 	{
 		if (gmeobject == ID_FLARE_INV_ITEM)
 		{
-			if (Lara.Control.HandStatus == HandStatus::Free)
+			if (Lara.gunStatus == LG_HANDS_FREE)
 			{
-				if (LaraItem->Animation.ActiveState != LS_CRAWL_IDLE &&
-					LaraItem->Animation.ActiveState != LS_CRAWL_FORWARD &&
-					LaraItem->Animation.ActiveState != LS_CRAWL_TURN_LEFT &&
-					LaraItem->Animation.ActiveState != LS_CRAWL_TURN_RIGHT &&
-					LaraItem->Animation.ActiveState != LS_CRAWL_BACK &&
-					LaraItem->Animation.ActiveState != LS_CRAWL_TO_HANG)
+				if (LaraItem->currentAnimState != LS_CRAWL_IDLE &&
+					LaraItem->currentAnimState != LS_CRAWL_FORWARD &&
+					LaraItem->currentAnimState != LS_CRAWL_TURN_LEFT &&
+					LaraItem->currentAnimState != LS_CRAWL_TURN_RIGHT &&
+					LaraItem->currentAnimState != LS_CRAWL_BACK &&
+					LaraItem->currentAnimState != LS_CRAWL_TO_HANG)
 				{
-					if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare)
+					if (Lara.gunType != WEAPON_FLARE)
 					{
 						TrInput = IN_FLARE;
 						LaraGun(LaraItem);
@@ -2066,16 +2066,16 @@ void GuiController::UseCurrentItem()
 		{
 		case INV_OBJECT_BINOCULARS:
 
-			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE)
-				|| (Lara.Control.IsLow && !(TrInput & IN_CROUCH)))
+			if (((LaraItem->currentAnimState == LS_IDLE && LaraItem->animNumber == LA_STAND_IDLE)
+				|| (Lara.isDucked && !(TrInput & IN_DUCK)))
 				&& !UseSpotCam
 				&& !TrackCameraInit)
 			{
-				Lara.Inventory.OldBusy = true;
+				Lara.oldBusy = true;
 				BinocularRange = 128;
 
-				if (Lara.Control.HandStatus != HandStatus::Free)
-					Lara.Control.HandStatus = HandStatus::WeaponUndraw;
+				if (Lara.gunStatus != LG_HANDS_FREE)
+					Lara.gunStatus = LG_UNDRAW_GUNS;
 			}
 
 			if (OldBinocular)
@@ -2087,22 +2087,22 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_SMALL_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
+			if ((LaraItem->hitPoints <= 0 || LaraItem->hitPoints >= 1000) && !Lara.poisoned)
 			{
 				SayNo();
 				return;
 			}
 
-			if (Lara.Inventory.TotalSmallMedipacks != 0)
+			if (Lara.NumSmallMedipacks != 0)
 			{
-				if (Lara.Inventory.TotalSmallMedipacks != -1)
-					Lara.Inventory.TotalSmallMedipacks--;
+				if (Lara.NumSmallMedipacks != -1)
+					Lara.NumSmallMedipacks--;
 
-				Lara.PoisonPotency = 0;
-				LaraItem->HitPoints += 500;
+				Lara.poisoned = 0;
+				LaraItem->hitPoints += 500;
 
-				if (LaraItem->HitPoints > 1000)
-					LaraItem->HitPoints = 1000;
+				if (LaraItem->hitPoints > 1000)
+					LaraItem->hitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;
@@ -2114,19 +2114,19 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_LARGE_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
+			if ((LaraItem->hitPoints <= 0 || LaraItem->hitPoints >= 1000) && !Lara.poisoned)
 			{
 				SayNo();
 				return;
 			}
 
-			if (Lara.Inventory.TotalLargeMedipacks != 0)
+			if (Lara.NumLargeMedipacks != 0)
 			{
-				if (Lara.Inventory.TotalLargeMedipacks != -1)
-					Lara.Inventory.TotalLargeMedipacks--;
+				if (Lara.NumLargeMedipacks != -1)
+					Lara.NumLargeMedipacks--;
 
-				Lara.PoisonPotency = 0;
-				LaraItem->HitPoints = 1000;
+				Lara.poisoned = 0;
+				LaraItem->hitPoints = 1000;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;
@@ -2144,21 +2144,21 @@ void GuiController::UseCurrentItem()
 		return;
 	}
 
-	if (Lara.Control.HandStatus == HandStatus::Busy)
+	if (Lara.gunStatus == LG_HANDS_BUSY)
 	{
 		SayNo();
 		return;
 	}
 
-	if (LaraItem->Animation.ActiveState == LS_CRAWL_IDLE ||
-		LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
-		LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
-		LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
-		LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
-		LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG ||
-		LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
-		LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
-		LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
+	if (LaraItem->currentAnimState == LS_CRAWL_IDLE ||
+		LaraItem->currentAnimState == LS_CRAWL_FORWARD ||
+		LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT ||
+		LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
+		LaraItem->currentAnimState == LS_CRAWL_BACK ||
+		LaraItem->currentAnimState == LS_CRAWL_TO_HANG ||
+		LaraItem->currentAnimState == LS_CROUCH_IDLE ||
+		LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
+		LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
 	{
 		SayNo();
 		return;
@@ -2166,86 +2166,86 @@ void GuiController::UseCurrentItem()
 
 	if (gmeobject == ID_SHOTGUN_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+		Lara.requestGunType = WEAPON_SHOTGUN;
 
-		if (Lara.Control.HandStatus != HandStatus::Free)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
-			Lara.Control.HandStatus = HandStatus::WeaponDraw;
+		if (Lara.gunType == WEAPON_SHOTGUN)
+			Lara.gunStatus = LG_DRAW_GUNS;
 
 		return;
 	}
 
 	if (gmeobject == ID_REVOLVER_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+		Lara.requestGunType = WEAPON_REVOLVER;
 
-		if (Lara.Control.HandStatus != HandStatus::Free)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
-			Lara.Control.HandStatus = HandStatus::WeaponDraw;
+		if (Lara.gunType == WEAPON_REVOLVER)
+			Lara.gunStatus = LG_DRAW_GUNS;
 
 		return;
 	}
 	else if (gmeobject == ID_HK_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+		Lara.requestGunType = WEAPON_HK;
 
-		if (Lara.Control.HandStatus != HandStatus::Free)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::HK)
-			Lara.Control.HandStatus = HandStatus::WeaponDraw;
+		if (Lara.gunType == WEAPON_HK)
+			Lara.gunStatus = LG_DRAW_GUNS;
 
 		return;
 	}
 	else if (gmeobject == ID_CROSSBOW_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
+		Lara.requestGunType = WEAPON_CROSSBOW;
 
-		if (Lara.Control.HandStatus != HandStatus::Free)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
-			Lara.Control.HandStatus = HandStatus::WeaponDraw;
+		if (Lara.gunType == WEAPON_CROSSBOW)
+			Lara.gunStatus = LG_DRAW_GUNS;
 
 		return;
 	}
 	else if (gmeobject == ID_GRENADE_GUN_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+		Lara.requestGunType = WEAPON_GRENADE_LAUNCHER;
 
-		if (Lara.Control.HandStatus != HandStatus::Free)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::GrenadeLauncher)
-			Lara.Control.HandStatus = HandStatus::WeaponDraw;
+		if (Lara.gunType == WEAPON_GRENADE_LAUNCHER)
+			Lara.gunStatus = LG_DRAW_GUNS;
 
 		return;
 	}
 	else if (gmeobject == ID_HARPOON_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+		Lara.requestGunType = WEAPON_HARPOON_GUN;
 
-		if (Lara.Control.HandStatus != HandStatus::Free)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::HarpoonGun)
-			Lara.Control.HandStatus = HandStatus::WeaponDraw;
+		if (Lara.gunType == WEAPON_HARPOON_GUN)
+			Lara.gunStatus = LG_DRAW_GUNS;
 
 		return;
 	}
 	else if (gmeobject == ID_ROCKET_LAUNCHER_ITEM)
 	{
-		Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+		Lara.requestGunType = WEAPON_ROCKET_LAUNCHER;
 
-		if (Lara.Control.HandStatus != HandStatus::Free)
+		if (Lara.gunStatus != LG_HANDS_FREE)
 			return;
 
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::RocketLauncher)
-			Lara.Control.HandStatus = HandStatus::WeaponDraw;
+		if (Lara.gunType == WEAPON_ROCKET_LAUNCHER)
+			Lara.gunStatus = LG_DRAW_GUNS;
 
 		return;
 	}
@@ -2564,7 +2564,7 @@ void GuiController::HandleInventoryMenu()
 
 				case MenuType::Diary:
 					invMode = InventoryMode::Diary;
-					Lara.Inventory.Diary.currentPage = 1;
+					Lara.Diary.currentPage = 1;
 					break;
 				}
 			}
@@ -2593,32 +2593,32 @@ void GuiController::HandleInventoryMenu()
 //this function is to UPDATE THE SELECTED AMMO OF WEPS THAT REQUIRE DOING SO, and only these..
 void GuiController::UpdateWeaponStatus()
 {
-	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
+	if (Lara.Weapons[WEAPON_SHOTGUN].Present)
 	{
 		if (CurrentShotGunAmmoType)
-			Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo2;
+			Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO2;
 		else
-			Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo1;
+			Lara.Weapons[WEAPON_SHOTGUN].SelectedAmmo = WEAPON_AMMO1;
 	}
 
-	if (Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
+	if (Lara.Weapons[WEAPON_CROSSBOW].Present)
 	{
-		Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo1;
+		Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO1;
 
 		if (CurrentCrossBowAmmoType == 1)
-			Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo2;
+			Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO2;
 		else if (CurrentCrossBowAmmoType == 2)
-			Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo3;
+			Lara.Weapons[WEAPON_CROSSBOW].SelectedAmmo = WEAPON_AMMO3;
 	}
 
-	if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+	if (Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Present)
 	{
-		Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo1;
+		Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO1;
 
 		if (CurrentGrenadeGunAmmoType == 1)
-			Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo2;
+			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO2;
 		else if (CurrentGrenadeGunAmmoType == 2)
-			Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo3;
+			Lara.Weapons[WEAPON_GRENADE_LAUNCHER].SelectedAmmo = WEAPON_AMMO3;
 	}
 }
 
@@ -2919,15 +2919,15 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				switch (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number)
 				{
 				case ID_BIGMEDI_ITEM:
-					nummeup = Lara.Inventory.TotalLargeMedipacks;
+					nummeup = Lara.NumLargeMedipacks;
 					break;
 
 				case ID_SMALLMEDI_ITEM:
-					nummeup = Lara.Inventory.TotalSmallMedipacks;
+					nummeup = Lara.NumSmallMedipacks;
 					break;
 
 				case ID_FLARE_INV_ITEM:
-					nummeup = Lara.Inventory.TotalFlares;
+					nummeup = Lara.NumFlares;
 					break;
 
 				default:
@@ -2937,69 +2937,69 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 						switch (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number)
 						{
 						case ID_SHOTGUN_AMMO1_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							count = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO1].getCount();
 							nummeup = count == -1 ? count : count / 6;
 							break;
 
 						case ID_SHOTGUN_AMMO2_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
+							count = Lara.Weapons[WEAPON_SHOTGUN].Ammo[WEAPON_AMMO2].getCount();
 							nummeup = count == -1 ? count : count / 6;
 							break;
 
 						case ID_HK_AMMO_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							nummeup = Lara.Weapons[WEAPON_HK].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_CROSSBOW_AMMO1_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							count = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO1].getCount();
 							nummeup = count;
 							break;
 
 						case ID_CROSSBOW_AMMO2_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
+							count = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO2].getCount();
 							nummeup = count;
 							break;
 
 						case ID_CROSSBOW_AMMO3_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
+							count = Lara.Weapons[WEAPON_CROSSBOW].Ammo[WEAPON_AMMO3].getCount();
 							nummeup = count;
 							break;
 
 						case ID_GRENADE_AMMO1_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							count = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
 							nummeup = count;
 							break;
 
 						case ID_GRENADE_AMMO2_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
+							count = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO2].getCount();
 							nummeup = count;
 							break;
 
 						case ID_GRENADE_AMMO3_ITEM:
-							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
+							count = Lara.Weapons[WEAPON_GRENADE_LAUNCHER].Ammo[WEAPON_AMMO3].getCount();
 							nummeup = count;
 							break;
 
 						case ID_ROCKET_LAUNCHER_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							nummeup = Lara.Weapons[WEAPON_ROCKET_LAUNCHER].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_HARPOON_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							nummeup = Lara.Weapons[WEAPON_HARPOON_GUN].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_REVOLVER_AMMO_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							nummeup = Lara.Weapons[WEAPON_REVOLVER].Ammo[WEAPON_AMMO1].getCount();
 							break;
 
 						case ID_UZI_AMMO_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							nummeup = Lara.Weapons[WEAPON_UZI].Ammo[WEAPON_AMMO1].getCount();
 							break;
 						}
 					}
 					else
 					{
-						nummeup = Lara.Inventory.Puzzles[inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number - ID_PUZZLE_ITEM1];
+						nummeup = Lara.Puzzles[inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number - ID_PUZZLE_ITEM1];
 
 						if (nummeup <= 1)
 							sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
@@ -3164,7 +3164,7 @@ int GuiController::CallInventory(bool reset_mode)
 {
 	int return_value;
 
-	Lara.Inventory.OldBusy = Lara.Inventory.IsBusy;
+	Lara.oldBusy = Lara.busy;
 
 	if (TrInput & IN_SELECT)
 		stop_killing_me_you_dumb_input_system = 1;
@@ -3245,7 +3245,7 @@ int GuiController::CallInventory(bool reset_mode)
 	if (useItem)
 		UseCurrentItem();
 
-	Lara.Inventory.IsBusy = Lara.Inventory.OldBusy;
+	Lara.busy = Lara.oldBusy;
 	invMode = InventoryMode::None;
 	ClearInputVariables(0);
 
@@ -3280,8 +3280,8 @@ void GuiController::DrawCompass()
 {
 	return;
 	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
-	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->Pose.Orientation.y);
-	short compass_angle = (LaraItem->Pose.Orientation.y + compass_speed) - ANGLE(180);
+	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->pos.yRot);
+	short compass_angle = (LaraItem->pos.yRot + compass_speed) - ANGLE(180);
 	Matrix::CreateRotationY(compass_angle);
 }
 
@@ -3289,15 +3289,15 @@ void GuiController::DoDiary()
 {
 	invMode = InventoryMode::Diary;
 
-	if (goRight && Lara.Inventory.Diary.currentPage < Lara.Inventory.Diary.numPages)
+	if (goRight && Lara.Diary.currentPage < Lara.Diary.numPages)
 	{
-		Lara.Inventory.Diary.currentPage++;
+		Lara.Diary.currentPage++;
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
-	if (goLeft && Lara.Inventory.Diary.currentPage > 1)
+	if (goLeft && Lara.Diary.currentPage > 1)
 	{
-		Lara.Inventory.Diary.currentPage--;
+		Lara.Diary.currentPage--;
 		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
 	}
 
@@ -3404,19 +3404,19 @@ void combine_revolver_lasersight(int flag)
 {
 	if (flag)
 	{
-		Lara.Inventory.HasLasersight = true;
-		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = 0;
+		Lara.Lasersight = 1;
+		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = 0;
 	}
 	else
 	{
-		Lara.Inventory.HasLasersight = false;
-		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = 1;
+		Lara.Lasersight = 0;
+		Lara.Weapons[WEAPON_REVOLVER].HasLasersight = 1;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
+	if (Lara.gunStatus && Lara.gunType == WEAPON_REVOLVER)
 	{
-		UndrawPistolMeshRight(LaraItem, LaraWeaponType::Revolver);
-		DrawPistolMeshes(LaraItem, LaraWeaponType::Revolver);
+		undraw_pistol_mesh_right(WEAPON_REVOLVER);
+		draw_pistol_meshes(WEAPON_REVOLVER);
 	}
 }
 
@@ -3424,19 +3424,19 @@ void combine_crossbow_lasersight(int flag)
 {
 	if (flag)
 	{
-		Lara.Inventory.HasLasersight = true;
-		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = 0;
+		Lara.Lasersight = 1;
+		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = 0;
 	}
 	else
 	{
-		Lara.Inventory.HasLasersight = false;
-		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = 1;
+		Lara.Lasersight = 0;
+		Lara.Weapons[WEAPON_CROSSBOW].HasLasersight = 1;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
+	if (Lara.gunStatus && Lara.gunType == WEAPON_CROSSBOW)
 	{
-		UndrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
-		DrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
+		undraw_shotgun_meshes(WEAPON_CROSSBOW);
+		draw_shotgun_meshes(WEAPON_CROSSBOW);
 	}
 }
 
@@ -3444,414 +3444,414 @@ void combine_HK_SILENCER(int flag)
 {
 	if (flag)
 	{
-		Lara.Inventory.HasSilencer = 1;
-		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = 0;
+		Lara.Silencer = 1;
+		Lara.Weapons[WEAPON_HK].HasSilencer = 0;
 
 	}
 	else
 	{
-		Lara.Inventory.HasSilencer = 0;
-		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = 1;
+		Lara.Silencer = 0;
+		Lara.Weapons[WEAPON_HK].HasSilencer = 1;
 	}
 }
 
 void combine_PuzzleItem1(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[0] = 0;
-	Lara.Inventory.PuzzlesCombo[1] = 0;
-	Lara.Inventory.Puzzles[0] = 1;
+	Lara.PuzzlesCombo[0] = 0;
+	Lara.PuzzlesCombo[1] = 0;
+	Lara.Puzzles[0] = 1;
 }
 
 void combine_PuzzleItem2(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[2] = 0;
-	Lara.Inventory.PuzzlesCombo[3] = 0;
-	Lara.Inventory.Puzzles[1] = 1;
+	Lara.PuzzlesCombo[2] = 0;
+	Lara.PuzzlesCombo[3] = 0;
+	Lara.Puzzles[1] = 1;
 }
 
 void combine_PuzzleItem3(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[4] = 0;
-	Lara.Inventory.PuzzlesCombo[5] = 0;
-	Lara.Inventory.Puzzles[2] = 1;
+	Lara.PuzzlesCombo[4] = 0;
+	Lara.PuzzlesCombo[5] = 0;
+	Lara.Puzzles[2] = 1;
 }
 
 void combine_PuzzleItem4(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[6] = 0;
-	Lara.Inventory.PuzzlesCombo[7] = 0;
-	Lara.Inventory.Puzzles[3] = 1;
+	Lara.PuzzlesCombo[6] = 0;
+	Lara.PuzzlesCombo[7] = 0;
+	Lara.Puzzles[3] = 1;
 }
 
 void combine_PuzzleItem5(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[8] = 0;
-	Lara.Inventory.PuzzlesCombo[9] = 0;
-	Lara.Inventory.Puzzles[4] = 1;
+	Lara.PuzzlesCombo[8] = 0;
+	Lara.PuzzlesCombo[9] = 0;
+	Lara.Puzzles[4] = 1;
 }
 
 void combine_PuzzleItem6(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[10] = 0;
-	Lara.Inventory.PuzzlesCombo[11] = 0;
-	Lara.Inventory.Puzzles[5] = 1;
+	Lara.PuzzlesCombo[10] = 0;
+	Lara.PuzzlesCombo[11] = 0;
+	Lara.Puzzles[5] = 1;
 }
 
 void combine_PuzzleItem7(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[12] = 0;
-	Lara.Inventory.PuzzlesCombo[13] = 0;
-	Lara.Inventory.Puzzles[6] = 1;
+	Lara.PuzzlesCombo[12] = 0;
+	Lara.PuzzlesCombo[13] = 0;
+	Lara.Puzzles[6] = 1;
 }
 
 void combine_PuzzleItem8(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[14] = 0;
-	Lara.Inventory.PuzzlesCombo[15] = 0;
-	Lara.Inventory.Puzzles[7] = 1;
+	Lara.PuzzlesCombo[14] = 0;
+	Lara.PuzzlesCombo[15] = 0;
+	Lara.Puzzles[7] = 1;
 }
 
 void combine_PuzzleItem9(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[16] = 0;
-	Lara.Inventory.PuzzlesCombo[17] = 0;
-	Lara.Inventory.Puzzles[8] = 1;
+	Lara.PuzzlesCombo[16] = 0;
+	Lara.PuzzlesCombo[17] = 0;
+	Lara.Puzzles[8] = 1;
 }
 
 void combine_PuzzleItem10(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[18] = 0;
-	Lara.Inventory.PuzzlesCombo[19] = 0;
-	Lara.Inventory.Puzzles[9] = 1;
+	Lara.PuzzlesCombo[18] = 0;
+	Lara.PuzzlesCombo[19] = 0;
+	Lara.Puzzles[9] = 1;
 }
 
 void combine_PuzzleItem11(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[20] = 0;
-	Lara.Inventory.PuzzlesCombo[21] = 0;
-	Lara.Inventory.Puzzles[10] = 1;
+	Lara.PuzzlesCombo[20] = 0;
+	Lara.PuzzlesCombo[21] = 0;
+	Lara.Puzzles[10] = 1;
 }
 
 void combine_PuzzleItem12(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[22] = 0;
-	Lara.Inventory.PuzzlesCombo[23] = 0;
-	Lara.Inventory.Puzzles[11] = 1;
+	Lara.PuzzlesCombo[22] = 0;
+	Lara.PuzzlesCombo[23] = 0;
+	Lara.Puzzles[11] = 1;
 }
 
 void combine_PuzzleItem13(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[24] = 0;
-	Lara.Inventory.PuzzlesCombo[25] = 0;
-	Lara.Inventory.Puzzles[12] = 1;
+	Lara.PuzzlesCombo[24] = 0;
+	Lara.PuzzlesCombo[25] = 0;
+	Lara.Puzzles[12] = 1;
 }
 
 void combine_PuzzleItem14(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[26] = 0;
-	Lara.Inventory.PuzzlesCombo[27] = 0;
-	Lara.Inventory.Puzzles[13] = 1;
+	Lara.PuzzlesCombo[26] = 0;
+	Lara.PuzzlesCombo[27] = 0;
+	Lara.Puzzles[13] = 1;
 }
 
 void combine_PuzzleItem15(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[28] = 0;
-	Lara.Inventory.PuzzlesCombo[29] = 0;
-	Lara.Inventory.Puzzles[14] = 1;
+	Lara.PuzzlesCombo[28] = 0;
+	Lara.PuzzlesCombo[29] = 0;
+	Lara.Puzzles[14] = 1;
 }
 
 void combine_PuzzleItem16(int flag)
 {
-	Lara.Inventory.PuzzlesCombo[30] = 0;
-	Lara.Inventory.PuzzlesCombo[31] = 0;
-	Lara.Inventory.Puzzles[15] = 1;
+	Lara.PuzzlesCombo[30] = 0;
+	Lara.PuzzlesCombo[31] = 0;
+	Lara.Puzzles[15] = 1;
 }
 
 void combine_KeyItem1(int flag)
 {
-	Lara.Inventory.Keys[0] = 1;
-	Lara.Inventory.KeysCombo[0] = 0;
-	Lara.Inventory.KeysCombo[1] = 0;
+	Lara.Keys[0] = 1;
+	Lara.KeysCombo[0] = 0;
+	Lara.KeysCombo[1] = 0;
 }
 
 void combine_KeyItem2(int flag)
 {
-	Lara.Inventory.Keys[1] = 1;
-	Lara.Inventory.KeysCombo[2] = 0;
-	Lara.Inventory.KeysCombo[3] = 0;
+	Lara.Keys[1] = 1;
+	Lara.KeysCombo[2] = 0;
+	Lara.KeysCombo[3] = 0;
 }
 
 void combine_KeyItem3(int flag)
 {
-	Lara.Inventory.Keys[2] = 1;
-	Lara.Inventory.KeysCombo[4] = 0;
-	Lara.Inventory.KeysCombo[5] = 0;
+	Lara.Keys[2] = 1;
+	Lara.KeysCombo[4] = 0;
+	Lara.KeysCombo[5] = 0;
 }
 
 void combine_KeyItem4(int flag)
 {
-	Lara.Inventory.Keys[3] = 1;
-	Lara.Inventory.KeysCombo[6] = 0;
-	Lara.Inventory.KeysCombo[7] = 0;
+	Lara.Keys[3] = 1;
+	Lara.KeysCombo[6] = 0;
+	Lara.KeysCombo[7] = 0;
 }
 
 void combine_KeyItem5(int flag)
 {
-	Lara.Inventory.Keys[4] = 1;
-	Lara.Inventory.KeysCombo[8] = 0;
-	Lara.Inventory.KeysCombo[9] = 0;
+	Lara.Keys[4] = 1;
+	Lara.KeysCombo[8] = 0;
+	Lara.KeysCombo[9] = 0;
 }
 
 void combine_KeyItem6(int flag)
 {
-	Lara.Inventory.Keys[5] = 1;
-	Lara.Inventory.KeysCombo[10] = 0;
-	Lara.Inventory.KeysCombo[11] = 0;
+	Lara.Keys[5] = 1;
+	Lara.KeysCombo[10] = 0;
+	Lara.KeysCombo[11] = 0;
 }
 
 void combine_KeyItem7(int flag)
 {
-	Lara.Inventory.Keys[6] = 1;
-	Lara.Inventory.KeysCombo[12] = 0;
-	Lara.Inventory.KeysCombo[13] = 0;
+	Lara.Keys[6] = 1;
+	Lara.KeysCombo[12] = 0;
+	Lara.KeysCombo[13] = 0;
 }
 
 void combine_KeyItem8(int flag)
 {
-	Lara.Inventory.Keys[7] = 1;
-	Lara.Inventory.KeysCombo[14] = 0;
-	Lara.Inventory.KeysCombo[15] = 0;
+	Lara.Keys[7] = 1;
+	Lara.KeysCombo[14] = 0;
+	Lara.KeysCombo[15] = 0;
 }
 
 void combine_KeyItem9(int flag)
 {
-	Lara.Inventory.Keys[8] = 1;
-	Lara.Inventory.KeysCombo[16] = 0;
-	Lara.Inventory.KeysCombo[17] = 0;
+	Lara.Keys[8] = 1;
+	Lara.KeysCombo[16] = 0;
+	Lara.KeysCombo[17] = 0;
 }
 
 void combine_KeyItem10(int flag)
 {
-	Lara.Inventory.Keys[9] = 1;
-	Lara.Inventory.KeysCombo[18] = 0;
-	Lara.Inventory.KeysCombo[19] = 0;
+	Lara.Keys[9] = 1;
+	Lara.KeysCombo[18] = 0;
+	Lara.KeysCombo[19] = 0;
 }
 
 void combine_KeyItem11(int flag)
 {
-	Lara.Inventory.Keys[10] = 1;
-	Lara.Inventory.KeysCombo[20] = 0;
-	Lara.Inventory.KeysCombo[21] = 0;
+	Lara.Keys[10] = 1;
+	Lara.KeysCombo[20] = 0;
+	Lara.KeysCombo[21] = 0;
 }
 
 void combine_KeyItem12(int flag)
 {
-	Lara.Inventory.Keys[11] = 1;
-	Lara.Inventory.KeysCombo[22] = 0;
-	Lara.Inventory.KeysCombo[23] = 0;
+	Lara.Keys[11] = 1;
+	Lara.KeysCombo[22] = 0;
+	Lara.KeysCombo[23] = 0;
 }
 
 void combine_KeyItem13(int flag)
 {
-	Lara.Inventory.Keys[12] = 1;
-	Lara.Inventory.KeysCombo[24] = 0;
-	Lara.Inventory.KeysCombo[25] = 0;
+	Lara.Keys[12] = 1;
+	Lara.KeysCombo[24] = 0;
+	Lara.KeysCombo[25] = 0;
 }
 
 void combine_KeyItem14(int flag)
 {
-	Lara.Inventory.Keys[13] = 1;
-	Lara.Inventory.KeysCombo[26] = 0;
-	Lara.Inventory.KeysCombo[27] = 0;
+	Lara.Keys[13] = 1;
+	Lara.KeysCombo[26] = 0;
+	Lara.KeysCombo[27] = 0;
 }
 
 void combine_KeyItem15(int flag)
 {
-	Lara.Inventory.Keys[14] = 1;
-	Lara.Inventory.KeysCombo[28] = 0;
-	Lara.Inventory.KeysCombo[29] = 0;
+	Lara.Keys[14] = 1;
+	Lara.KeysCombo[28] = 0;
+	Lara.KeysCombo[29] = 0;
 }
 
 void combine_KeyItem16(int flag)
 {
-	Lara.Inventory.Keys[15] = 1;
-	Lara.Inventory.KeysCombo[30] = 0;
-	Lara.Inventory.KeysCombo[31] = 0;
+	Lara.Keys[15] = 1;
+	Lara.KeysCombo[30] = 0;
+	Lara.KeysCombo[31] = 0;
 }
 
 void combine_PickupItem1(int flag)
 {
-	Lara.Inventory.Pickups[0] = 1;
-	Lara.Inventory.PickupsCombo[0] = 0;
-	Lara.Inventory.PickupsCombo[1] = 0;
+	Lara.Pickups[0] = 1;
+	Lara.PickupsCombo[0] = 0;
+	Lara.PickupsCombo[1] = 0;
 }
 
 void combine_PickupItem2(int flag)
 {
-	Lara.Inventory.Pickups[1] = 1;
-	Lara.Inventory.PickupsCombo[2] = 0;
-	Lara.Inventory.PickupsCombo[3] = 0;
+	Lara.Pickups[1] = 1;
+	Lara.PickupsCombo[2] = 0;
+	Lara.PickupsCombo[3] = 0;
 }
 
 void combine_PickupItem3(int flag)
 {
-	Lara.Inventory.Pickups[2] = 1;
-	Lara.Inventory.PickupsCombo[4] = 0;
-	Lara.Inventory.PickupsCombo[5] = 0;
+	Lara.Pickups[2] = 1;
+	Lara.PickupsCombo[4] = 0;
+	Lara.PickupsCombo[5] = 0;
 }
 
 void combine_PickupItem4(int flag)
 {
-	Lara.Inventory.Pickups[3] = 1;
-	Lara.Inventory.PickupsCombo[6] = 0;
-	Lara.Inventory.PickupsCombo[7] = 0;
+	Lara.Pickups[3] = 1;
+	Lara.PickupsCombo[6] = 0;
+	Lara.PickupsCombo[7] = 0;
 }
 
 void combine_PickupItem5(int flag)
 {
-	Lara.Inventory.Pickups[4] = 1;
-	Lara.Inventory.PickupsCombo[8] = 0;
-	Lara.Inventory.PickupsCombo[9] = 0;
+	Lara.Pickups[4] = 1;
+	Lara.PickupsCombo[8] = 0;
+	Lara.PickupsCombo[9] = 0;
 }
 
 void combine_PickupItem6(int flag)
 {
-	Lara.Inventory.Pickups[5] = 1;
-	Lara.Inventory.PickupsCombo[10] = 0;
-	Lara.Inventory.PickupsCombo[11] = 0;
+	Lara.Pickups[5] = 1;
+	Lara.PickupsCombo[10] = 0;
+	Lara.PickupsCombo[11] = 0;
 }
 
 void combine_PickupItem7(int flag)
 {
-	Lara.Inventory.Pickups[6] = 1;
-	Lara.Inventory.PickupsCombo[12] = 0;
-	Lara.Inventory.PickupsCombo[13] = 0;
+	Lara.Pickups[6] = 1;
+	Lara.PickupsCombo[12] = 0;
+	Lara.PickupsCombo[13] = 0;
 }
 
 void combine_PickupItem8(int flag)
 {
-	Lara.Inventory.Pickups[7] = 1;
-	Lara.Inventory.PickupsCombo[14] = 0;
-	Lara.Inventory.PickupsCombo[15] = 0;
+	Lara.Pickups[7] = 1;
+	Lara.PickupsCombo[14] = 0;
+	Lara.PickupsCombo[15] = 0;
 }
 
 void combine_PickupItem9(int flag)
 {
-	Lara.Inventory.Pickups[8] = 1;
-	Lara.Inventory.PickupsCombo[16] = 0;
-	Lara.Inventory.PickupsCombo[17] = 0;
+	Lara.Pickups[8] = 1;
+	Lara.PickupsCombo[16] = 0;
+	Lara.PickupsCombo[17] = 0;
 }
 
 void combine_PickupItem10(int flag)
 {
-	Lara.Inventory.Pickups[9] = 1;
-	Lara.Inventory.PickupsCombo[18] = 0;
-	Lara.Inventory.PickupsCombo[19] = 0;
+	Lara.Pickups[9] = 1;
+	Lara.PickupsCombo[18] = 0;
+	Lara.PickupsCombo[19] = 0;
 }
 
 void combine_PickupItem11(int flag)
 {
-	Lara.Inventory.Pickups[10] = 1;
-	Lara.Inventory.PickupsCombo[20] = 0;
-	Lara.Inventory.PickupsCombo[21] = 0;
+	Lara.Pickups[10] = 1;
+	Lara.PickupsCombo[20] = 0;
+	Lara.PickupsCombo[21] = 0;
 }
 
 void combine_PickupItem12(int flag)
 {
-	Lara.Inventory.Pickups[11] = 1;
-	Lara.Inventory.PickupsCombo[22] = 0;
-	Lara.Inventory.PickupsCombo[23] = 0;
+	Lara.Pickups[11] = 1;
+	Lara.PickupsCombo[22] = 0;
+	Lara.PickupsCombo[23] = 0;
 }
 
 void combine_PickupItem13(int flag)
 {
-	Lara.Inventory.Pickups[12] = 1;
-	Lara.Inventory.PickupsCombo[24] = 0;
-	Lara.Inventory.PickupsCombo[25] = 0;
+	Lara.Pickups[12] = 1;
+	Lara.PickupsCombo[24] = 0;
+	Lara.PickupsCombo[25] = 0;
 }
 
 void combine_PickupItem14(int flag)
 {
-	Lara.Inventory.Pickups[13] = 1;
-	Lara.Inventory.PickupsCombo[26] = 0;
-	Lara.Inventory.PickupsCombo[27] = 0;
+	Lara.Pickups[13] = 1;
+	Lara.PickupsCombo[26] = 0;
+	Lara.PickupsCombo[27] = 0;
 }
 
 void combine_PickupItem15(int flag)
 {
-	Lara.Inventory.Pickups[14] = 1;
-	Lara.Inventory.PickupsCombo[28] = 0;
-	Lara.Inventory.PickupsCombo[29] = 0;
+	Lara.Pickups[14] = 1;
+	Lara.PickupsCombo[28] = 0;
+	Lara.PickupsCombo[29] = 0;
 }
 
 void combine_PickupItem16(int flag)
 {
-	Lara.Inventory.Pickups[15] = 1;
-	Lara.Inventory.PickupsCombo[30] = 0;
-	Lara.Inventory.PickupsCombo[31] = 0;
+	Lara.Pickups[15] = 1;
+	Lara.PickupsCombo[30] = 0;
+	Lara.PickupsCombo[31] = 0;
 }
 
 void combine_Examine1(int flag)
 {
-	Lara.Inventory.Examines[0] = 1;
-	Lara.Inventory.ExaminesCombo[0] = 0;
-	Lara.Inventory.ExaminesCombo[1] = 0;
+	Lara.Examines[0] = 1;
+	Lara.ExaminesCombo[0] = 0;
+	Lara.ExaminesCombo[1] = 0;
 }
 
 void combine_Examine2(int flag)
 {
-	Lara.Inventory.Examines[1] = 1;
-	Lara.Inventory.ExaminesCombo[2] = 0;
-	Lara.Inventory.ExaminesCombo[3] = 0;
+	Lara.Examines[1] = 1;
+	Lara.ExaminesCombo[2] = 0;
+	Lara.ExaminesCombo[3] = 0;
 }
 
 void combine_Examine3(int flag)
 {
-	Lara.Inventory.Examines[2] = 1;
-	Lara.Inventory.ExaminesCombo[4] = 0;
-	Lara.Inventory.ExaminesCombo[5] = 0;
+	Lara.Examines[2] = 1;
+	Lara.ExaminesCombo[4] = 0;
+	Lara.ExaminesCombo[5] = 0;
 }
 
 void combine_Examine4(int flag)
 {
-	Lara.Inventory.Examines[3] = 1;
-	Lara.Inventory.ExaminesCombo[6] = 0;
-	Lara.Inventory.ExaminesCombo[7] = 0;
+	Lara.Examines[3] = 1;
+	Lara.ExaminesCombo[6] = 0;
+	Lara.ExaminesCombo[7] = 0;
 }
 
 void combine_Examine5(int flag)
 {
-	Lara.Inventory.Examines[4] = 1;
-	Lara.Inventory.ExaminesCombo[8] = 0;
-	Lara.Inventory.ExaminesCombo[9] = 0;
+	Lara.Examines[4] = 1;
+	Lara.ExaminesCombo[8] = 0;
+	Lara.ExaminesCombo[9] = 0;
 }
 
 void combine_Examine6(int flag)
 {
-	Lara.Inventory.Examines[5] = 1;
-	Lara.Inventory.ExaminesCombo[10] = 0;
-	Lara.Inventory.ExaminesCombo[11] = 0;
+	Lara.Examines[5] = 1;
+	Lara.ExaminesCombo[10] = 0;
+	Lara.ExaminesCombo[11] = 0;
 }
 
 void combine_Examine7(int flag)
 {
-	Lara.Inventory.Examines[6] = 1;
-	Lara.Inventory.ExaminesCombo[12] = 0;
-	Lara.Inventory.ExaminesCombo[13] = 0;
+	Lara.Examines[6] = 1;
+	Lara.ExaminesCombo[12] = 0;
+	Lara.ExaminesCombo[13] = 0;
 }
 
 void combine_Examine8(int flag)
 {
-	Lara.Inventory.Examines[7] = 1;
-	Lara.Inventory.ExaminesCombo[14] = 0;
-	Lara.Inventory.ExaminesCombo[15] = 0;
+	Lara.Examines[7] = 1;
+	Lara.ExaminesCombo[14] = 0;
+	Lara.ExaminesCombo[15] = 0;
 }
 
 void combine_ClockWorkBeetle(int flag)
 {
-	Lara.Inventory.BeetleComponents &= 2;//remove combo1
-	Lara.Inventory.BeetleComponents &= 4;//remove combo2
-	Lara.Inventory.BeetleComponents |= 1;//get beetle
+	Lara.hasBeetleThings &= 2;//remove combo1
+	Lara.hasBeetleThings &= 4;//remove combo2
+	Lara.hasBeetleThings |= 1;//get beetle
 }
 
 bool GuiController::PerformWaterskinCombine(int flag)
@@ -3859,14 +3859,14 @@ bool GuiController::PerformWaterskinCombine(int flag)
 	short small_liters, big_liters, small_capacity, big_capacity;
 	int i;
 
-	small_liters = Lara.Inventory.SmallWaterskin - 1;//how many liters in the small one?
-	big_liters = Lara.Inventory.BigWaterskin - 1;//how many liters in the big one?
+	small_liters = Lara.small_waterskin - 1;//how many liters in the small one?
+	big_liters = Lara.big_waterskin - 1;//how many liters in the big one?
 	small_capacity = 3 - small_liters;//how many more liters can we fit in the small one?
 	big_capacity = 5 - big_liters;//how many more liters can we fit in the big one?
 
 	if (flag)
 	{
-		if (Lara.Inventory.BigWaterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
+		if (Lara.big_waterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
 		{
 			i = big_liters;
 
@@ -3883,17 +3883,17 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			} while (i);
 
-			Lara.Inventory.SmallWaterskin = small_liters + 1;
-			Lara.Inventory.BigWaterskin = big_liters + 1;
+			Lara.small_waterskin = small_liters + 1;
+			Lara.big_waterskin = big_liters + 1;
 			combine_obj1 = (small_liters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
 			return 1;
 		}
 	}
 	else 
 	{
-		if (Lara.Inventory.SmallWaterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
+		if (Lara.small_waterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
 		{
-			i = Lara.Inventory.SmallWaterskin - 1;
+			i = Lara.small_waterskin - 1;
 
 			do
 			{
@@ -3908,8 +3908,8 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			} while (i);
 
-			Lara.Inventory.SmallWaterskin = small_liters + 1;
-			Lara.Inventory.BigWaterskin = big_liters + 1;
+			Lara.small_waterskin = small_liters + 1;
+			Lara.big_waterskin = big_liters + 1;
 			combine_obj1 = (big_liters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
 			return 1;
 		}

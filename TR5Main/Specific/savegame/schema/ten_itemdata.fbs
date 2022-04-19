@@ -19,25 +19,20 @@ table CreatureTarget {
 }
 
 table Creature {
-	maximum_turn: int32;
 	joint_rotation: [int32];
+	maximum_turn: int32;
+	flags: int32;
+	alerted: bool;
 	head_left: bool;
 	head_right: bool;
-	patrol: bool;
-	alerted: bool;
 	reached_goal: bool;
-	jump_ahead: bool;
-	monkey_swing_ahead: bool;
-	friendly: bool;
-	poisoned: bool;
 	hurt_by_lara: bool;
-	tosspad: int32;
-	location_ai: int32;
-	fired_weapon: int32;
+	patrol2: bool;
+	jump_ahead: bool;
+	monkey_ahead: bool;
 	mood: int32;
 	enemy: int32;
 	ai_target: CreatureTarget;
-	flags: int32;
 	can_jump: bool;
 	can_monkey: bool;
 	is_amphibious: bool;

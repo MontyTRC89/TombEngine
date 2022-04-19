@@ -8,27 +8,26 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
-#include "Game/misc.h"
 
 BITE_INFO DobermanBite = { 0, 0x1E, 0x8D, 0x14 };
 
-void InitialiseDoberman(short itemNumber)
+void InitialiseDoberman(short itemNum)
 {
-	auto* item = &g_Level.Items[itemNumber];
+    ITEM_INFO* item;
 
-	if (item->TriggerFlags)
-	{
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 6;
-		item->Animation.ActiveState = 5;
+    item = &g_Level.Items[itemNum];
+    if (item->triggerFlags)
+    {
+        item->currentAnimState = 5;
+        item->animNumber = Objects[item->objectNumber].animIndex + 6;
 		// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
-	}
-	else
-	{
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
-		item->Animation.ActiveState = 6;
-	}
-
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+    }
+    else
+    {
+        item->currentAnimState = 6;
+        item->animNumber = Objects[item->objectNumber].animIndex + 10;
+    }
+    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 }
 
 void DobermanControl(short itemNumber)
@@ -39,188 +38,186 @@ void DobermanControl(short itemNumber)
 		short tilt = 0;
 		short joint = 0;
 		
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 		
-		if (item->HitPoints > 0)
+		if (item->hitPoints > 0)
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO info;
+			CreatureAIInfo(item,&info);
 
-			if (AI.ahead)
-				joint = AI.angle;
+			if (info.ahead)
+				joint = info.angle;
 
-			GetCreatureMood(item, &AI, TIMID);
-			CreatureMood(item, &AI, TIMID);
+			GetCreatureMood(item,&info, TIMID);
+			CreatureMood(item,&info, TIMID);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			angle = CreatureTurn(item, creature->maximumTurn);
 		
-			switch (item->Animation.ActiveState)
+			int random;
+
+			switch (item->currentAnimState)
 			{
 			case 1:
-				creature->MaxTurn = ANGLE(3.0f);
-
-				if (creature->Mood != MoodType::Bored)
-					item->Animation.TargetState = 2;
+				creature->maximumTurn = ANGLE(3);
+				if (creature->mood)
+				{
+					item->goalAnimState = 2;
+				}
 				else
 				{
-					int random = GetRandomControl();
+					random = GetRandomControl();
 					if (random < 768)
 					{
-						item->Animation.RequiredState = 4;
-						item->Animation.TargetState = 3;
+						item->requiredAnimState = 4;
+						item->goalAnimState = 3;
 						break;
 					}
 					if (random < 1536)
 					{
-						item->Animation.RequiredState = 5;
-						item->Animation.TargetState = 3;
+						item->requiredAnimState = 5;
+						item->goalAnimState = 3;
 						break;
 					}
 					if (random < 2816)
 					{
-						item->Animation.TargetState = 3;
+						item->goalAnimState = 3;
 						break;
 					}
 				}
-
 				break;
 
 			case 2:
 				tilt = angle;
-				creature->MaxTurn = ANGLE(6.0f);
-
-				if (creature->Mood == MoodType::Bored)
+				creature->maximumTurn = ANGLE(6);
+				if (!creature->mood)
 				{
-					item->Animation.TargetState = 3;
+					item->goalAnimState = 3;
 					break;
 				}
-
-				if (AI.distance < pow(768, 2))
-					item->Animation.TargetState = 8;
-
+				if (info.distance < SQUARE(768))
+					item->goalAnimState = 8;
 				break;
 
 			case 3:
-				creature->MaxTurn = 0;
-				creature->Flags = 0;
-				if (creature->Mood != MoodType::Bored)
+				creature->maximumTurn = 0;
+				creature->flags = 0;
+				if (creature->mood)
 				{
-					if (creature->Mood != MoodType::Escape &&
-						AI.distance < pow(341, 2) &&
-						AI.ahead)
-					{
-						item->Animation.TargetState = 7;
-					}
+					if (creature->mood != ESCAPE_MOOD 
+						&& info.distance < SQUARE(341)
+						&& info.ahead)
+						item->goalAnimState = 7;
 					else
-						item->Animation.TargetState = 2;
+						item->goalAnimState = 2;
 				}
 				else
 				{
-					if (item->Animation.RequiredState)
-						item->Animation.TargetState = item->Animation.RequiredState;
+					if (item->requiredAnimState)
+					{
+						item->goalAnimState = item->requiredAnimState;
+					}
 					else
 					{
-						int random = GetRandomControl();
+						random = GetRandomControl();
 						if (random >= 768)
 						{
 							if (random >= 1536)
 							{
 								if (random < 9728)
-									item->Animation.TargetState = 1;
+									item->goalAnimState = 1;
 							}
 							else
-								item->Animation.TargetState = 5;
+							{
+								item->goalAnimState = 5;
+							}
 						}
 						else
-							item->Animation.TargetState = 4;
+						{
+							item->goalAnimState = 4;
+						}
 					}
 				}
 				break;
 
 			case 4:
-				if (creature->Mood != MoodType::Bored || GetRandomControl() < 1280)
-					item->Animation.TargetState = 3;
-				
+				if (creature->mood || GetRandomControl() < 1280)
+				{
+					item->goalAnimState = 3;
+				}
 				break;
 
 			case 5:
-				if (creature->Mood != MoodType::Bored || GetRandomControl() < 256)
-					item->Animation.TargetState = 3;
-				
+				if (creature->mood || GetRandomControl() < 256)
+				{
+					item->goalAnimState = 3;
+				}
 				break;
 
 			case 6:
-				if (creature->Mood != MoodType::Bored || GetRandomControl() < 512)
-					item->Animation.TargetState = 3;
-				
+				if (creature->mood || GetRandomControl() < 512)
+				{
+					item->goalAnimState = 3;
+				}
 				break;
 
 			case 7:
-				creature->MaxTurn = ANGLE(0.5f);
-
-				if (creature->Flags != 1 &&
-					AI.ahead &&
-					item->TouchBits & 0x122000)
+				creature->maximumTurn = ANGLE(1) / 2;
+				if (creature->flags != 1 
+					&& info.ahead 
+					&& item->touchBits & 0x122000)
 				{
-					CreatureEffect(item, &DobermanBite, DoBloodSplat);
-					LaraItem->HitPoints -= 30;
-					LaraItem->HitStatus = true;
-					creature->Flags = 1;
+					CreatureEffect(item,&DobermanBite, DoBloodSplat);
+					LaraItem->hitPoints -= 30;
+					LaraItem->hitStatus = true;
+					creature->flags = 1;
 				}
 
-				if (AI.distance <= pow(341, 2) || AI.distance >= pow(682, 2))
-					item->Animation.TargetState = 3;
+				if (info.distance <= SQUARE(341) || info.distance >= SQUARE(682))
+					item->goalAnimState = 3;
 				else
-					item->Animation.TargetState = 9;
-
+					item->goalAnimState = 9;
 				break;
 
 			case 8:
-				if (creature->Flags != 2 && item->TouchBits & 0x122000)
+				if (creature->flags != 2 && item->touchBits & 0x122000)
 				{
-					CreatureEffect(item, &DobermanBite, DoBloodSplat);
-					creature->Flags = 2;
-
-					LaraItem->HitPoints -= 80;
-					LaraItem->HitStatus = true;
+					CreatureEffect(item,&DobermanBite, DoBloodSplat);
+					LaraItem->hitPoints -= 80;
+					LaraItem->hitStatus = true;
+					creature->flags = 2;
 				}
-
-				if (AI.distance >= pow(341, 2))
+				if (info.distance >= SQUARE(341))
 				{
-					if (AI.distance < pow(682, 2))
-						item->Animation.TargetState = 9;
+					if (info.distance < SQUARE(682))
+						item->goalAnimState = 9;
 				}
 				else
-					item->Animation.TargetState = 7;
-				
-				break;
-
-			case 9:
-				creature->MaxTurn = ANGLE(6.0f);
-
-				if (creature->Flags != 3 && item->TouchBits & 0x122000)
 				{
-					CreatureEffect(item, &DobermanBite, DoBloodSplat);
-					creature->Flags = 3;
-
-					LaraItem->HitPoints -= 50;
-					LaraItem->HitStatus = true;
+					item->goalAnimState = 7;
 				}
-				if (AI.distance < pow(341, 2))
-					item->Animation.TargetState = 7;
-
 				break;
-
+			case 9:
+				creature->maximumTurn = ANGLE(6);
+				if (creature->flags != 3 && item->touchBits & 0x122000)
+				{
+					CreatureEffect(item,&DobermanBite, DoBloodSplat);
+					LaraItem->hitPoints -= 50;
+					LaraItem->hitStatus = true;
+					creature->flags = 3;
+				}
+				if (info.distance < SQUARE(341))
+					item->goalAnimState = 7;
+				break;
 			default:
 				break;
 			}
 		}
-		else if (item->Animation.ActiveState != 10)
+		else if (item->currentAnimState != 10)
 		{
-			item->Animation.AnimNumber = Objects[ID_DOG].animIndex + 13;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 10;
+			item->animNumber = Objects[ID_DOG].animIndex + 13;
+			item->currentAnimState = 10;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 
 		CreatureTilt(item, tilt);

@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSentryGun(short itemNumber);
-	void SentryGunControl(short itemNumber);
+	void InitialiseSentryGun(short itemNum);
+	void SentryGunControl(short itemNum);
 }

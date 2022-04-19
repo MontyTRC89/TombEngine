@@ -6,288 +6,269 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/people.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO WorkerDualGunBiteLeft = { -2, 275, 23, 6 };
-BITE_INFO WorkerDualGunBiteRight = { 2, 275, 23, 10 };
+BITE_INFO workerDualGunL = { -2, 275, 23, 6 };
+BITE_INFO workerDualGunR = { 2, 275, 23, 10 };
 
-// TODO
-enum WorkerDualGunState
+void WorkerDualGunControl(short itemNum)
 {
-
-};
-
-// TODO
-enum WorkerDualGunAnim
-{
-
-};
-
-void WorkerDualGunControl(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
+	ITEM_INFO* item;
+	CREATURE_INFO* dual;
+	AI_INFO info;
+	short angle, head_x, head_y, torso_x, torso_y, tilt;
 
-	short tilt = 0;
-	short angle = 0;
-	short headX = 0;
-	short headY = 0;
-	short torsoX = 0;
-	short torsoY = 0;
+	item = &g_Level.Items[itemNum];
+	dual = (CREATURE_INFO*)item->data;
+	angle = head_x = head_y = torso_x = torso_y = tilt = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 11)
+		if (item->currentAnimState != 11)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 32;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 11;
+			item->animNumber = Objects[item->objectNumber].animIndex + 32;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 11;
 		}
 	}
-	else if (LaraItem->HitPoints <= 0)
-		item->Animation.TargetState = 2;
+	else if (LaraItem->hitPoints <= 0)
+	{
+		item->goalAnimState = 2;
+	}
 	else
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		CreatureAIInfo(item, &info);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, creature->MaxTurn);
+		angle = CreatureTurn(item, dual->maximumTurn);
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
 		case 2:
-			creature->MaxTurn = 0;
+			dual->maximumTurn = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
+				head_y = info.angle;
+				head_x = info.xAngle;
 			}
 
-			if (creature->Mood == MoodType::Attack || LaraItem->HitPoints > 0)
+			if (dual->mood == ATTACK_MOOD || LaraItem->hitPoints > 0)
 			{
-				if (Targetable(item, &AI))
+				if (Targetable(item, &info))
 				{
-					if (AI.distance <= SECTOR(9246))
-						item->Animation.TargetState = 9;
+					if (info.distance <= 0x900000)
+						item->goalAnimState = 9;
 					else
-						item->Animation.TargetState = 3;
+						item->goalAnimState = 3;
 				}
 				else
 				{
-					switch (creature->Mood)
+					switch (dual->mood)
 					{
-					case MoodType::Attack:
-						if (AI.distance > SECTOR(409600) || !AI.ahead)
-							item->Animation.TargetState = 4;
+					case ATTACK_MOOD:
+						if (info.distance > 0x19000000 || !info.ahead)
+							item->goalAnimState = 4;
 						else
-							item->Animation.TargetState = 3;
-
+							item->goalAnimState = 3;
 						break;
-
-					case MoodType::Escape:
-						item->Animation.TargetState = 4;
+					case ESCAPE_MOOD:
+						item->goalAnimState = 4;
 						break;
-
-					case MoodType::Stalk:
-						item->Animation.TargetState = 3;
+					case STALK_MOOD:
+						item->goalAnimState = 3;
 						break;
 
 					default:
-						if (!AI.ahead)
-							item->Animation.TargetState = 3;
-
+						if (!info.ahead)
+							item->goalAnimState = 3;
 						break;
 					}
 				}
 			}
 			else
-				item->Animation.TargetState = 1;
-			
-			break;
-
-		case 3:
-			creature->MaxTurn = ANGLE(3.0f);
-
-			if (AI.ahead)
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
+				item->goalAnimState = 1;
+			}
+			break;
+		case 3:
+			dual->maximumTurn = ANGLE(3);
+
+			if (info.ahead)
+			{
+				head_y = info.angle;
+				head_x = info.xAngle;
 			}
 
-			if (Targetable(item, &AI))
+			if (Targetable(item, &info))
 			{
-				if (AI.distance < SECTOR(9246) || AI.zoneNumber != AI.enemyZone)
-					item->Animation.TargetState = 1;
+				if (info.distance < 0x900000 || info.zoneNumber != info.enemyZone)
+				{
+					item->goalAnimState = 1;
+				}
 				else
 				{
-					if (AI.angle >= 0)
-						item->Animation.TargetState = 6;
+					if (info.angle >= 0)
+						item->goalAnimState = 6;
 					else
-						item->Animation.TargetState = 5;
+						item->goalAnimState = 5;
 				}
 			}
 
-			if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 4;
-			else if (creature->Mood == MoodType::Attack || creature->Mood == MoodType::Stalk)
+			if (dual->mood == ESCAPE_MOOD)
 			{
-				if (AI.distance > SECTOR(409600) || !AI.ahead)
-					item->Animation.TargetState = 4;
+				item->goalAnimState = 4;
 			}
-			else if (LaraItem->HitPoints > 0)
+			else if (dual->mood == ATTACK_MOOD || dual->mood == STALK_MOOD)
 			{
-				if (AI.ahead)
-					item->Animation.TargetState = 1;
+				if (info.distance > 0x19000000 || !info.ahead)
+					item->goalAnimState = 4;
+			}
+			else if (LaraItem->hitPoints > 0)
+			{
+				if (info.ahead)
+					item->goalAnimState = 1;
 			}
 			else
-				item->Animation.TargetState = 2;
-			
+			{
+				item->goalAnimState = 2;
+			}
 			break;
-
 		case 4:
-			creature->MaxTurn = ANGLE(6.0f);
+			dual->maximumTurn = ANGLE(6);
+
+			if (info.ahead)
+			{
+				head_y = info.angle;
+				head_x = info.xAngle;
+			}
+
 			tilt = angle / 4;
 
-			if (AI.ahead)
+			if (Targetable(item, &info))
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
-			}
-
-			if (Targetable(item, &AI))
-			{
-				if (AI.zoneNumber == AI.enemyZone)
+				if (info.zoneNumber == info.enemyZone)
 				{
-					if (AI.angle >= 0)
-						item->Animation.TargetState = 6;
+					if (info.angle >= 0)
+						item->goalAnimState = 6;
 					else
-						item->Animation.TargetState = 5;
+						item->goalAnimState = 5;
 				}
 				else
-					item->Animation.TargetState = 3;
+				{
+					item->goalAnimState = 3;
+				}
 			}
-			else if (creature->Mood == MoodType::Attack)
+			else if (dual->mood == ATTACK_MOOD)
 			{
-				if (AI.ahead && AI.distance < SECTOR(409600))
-					item->Animation.TargetState = 3;
+				if (info.ahead && info.distance < 0x19000000)
+					item->goalAnimState = 3;
 			}
-			else if (LaraItem->HitPoints > 0)
-				item->Animation.TargetState = 1;
+			else if (LaraItem->hitPoints > 0)
+			{
+				item->goalAnimState = 1;
+			}
 			else
-				item->Animation.TargetState = 2;
-			
+			{
+				item->goalAnimState = 2;
+			}
 			break;
-
 		case 5:
-			creature->Flags = 0;
+			dual->flags = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (Targetable(item, &AI))
-				item->Animation.TargetState = 7;
+			if (Targetable(item, &info))
+				item->goalAnimState = 7;
 			else
-				item->Animation.TargetState = 3;
-
+				item->goalAnimState = 3;
 			break;
-
 		case 6:
-			creature->Flags = 0;
+			dual->flags = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (Targetable(item, &AI))
-				item->Animation.TargetState = 8;
+			if (Targetable(item, &info))
+				item->goalAnimState = 8;
 			else
-				item->Animation.TargetState = 3;
-
+				item->goalAnimState = 3;
 			break;
-
 		case 7:
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (!creature->Flags)
+			if (!dual->flags)
 			{
-				ShotLara(item, &AI, &WorkerDualGunBiteLeft, torsoY, 50);
-				creature->Flags = 1;
+				ShotLara(item, &info, &workerDualGunL, torso_y, 50);
+				dual->flags = 1;
 			}
-
 			break;
-
 		case 8:
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (!creature->Flags)
+			if (!dual->flags)
 			{
-				ShotLara(item, &AI, &WorkerDualGunBiteRight, torsoY, 50);
-				creature->Flags = 1;
+				ShotLara(item, &info, &workerDualGunR, torso_y, 50);
+				dual->flags = 1;
 			}
-
 			break;
-
 		case 9:
-			creature->Flags = 0;
+			dual->flags = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (Targetable(item, &AI))
-				item->Animation.TargetState = 10;
+			if (Targetable(item, &info))
+				item->goalAnimState = 10;
 			else
-				item->Animation.TargetState = 1;
-
+				item->goalAnimState = 1;
 			break;
-
 		case 10:
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (!creature->Flags)
+			if (!dual->flags)
 			{
-				ShotLara(item, &AI, &WorkerDualGunBiteLeft, torsoY, 50);
-				ShotLara(item, &AI, &WorkerDualGunBiteRight, torsoY, 50);
-				creature->Flags = 1;
+				ShotLara(item, &info, &workerDualGunL, torso_y, 50);
+				ShotLara(item, &info, &workerDualGunR, torso_y, 50);
+				dual->flags = 1;
 			}
-
 			break;
 		}
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, torsoY);
-	CreatureJoint(item, 1, torsoX);
-	CreatureJoint(item, 2, headY);
-	CreatureJoint(item, 3, headX);
-	CreatureAnimation(itemNumber, angle, tilt);
+	CreatureJoint(item, 0, torso_y);
+	CreatureJoint(item, 1, torso_x);
+	CreatureJoint(item, 2, head_y);
+	CreatureJoint(item, 3, head_x);
+	CreatureAnimation(itemNum, angle, tilt);
 }

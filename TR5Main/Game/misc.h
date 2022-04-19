@@ -17,5 +17,5 @@ enum LARA_MESH_MASK
 	LARA_LEGS_TORSO_HEAD_ARMS = (64 << 1)
 };
 
-CreatureInfo* GetCreatureInfo(ITEM_INFO* item);
-void TargetNearestEntity(ITEM_INFO* item, CreatureInfo* creature);
+CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item);
+void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature);

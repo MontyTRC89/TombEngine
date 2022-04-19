@@ -1,7 +1,7 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
 namespace TEN::Entities::Switches
 {
@@ -12,5 +12,5 @@ namespace TEN::Entities::Switches
 	};
 	
 	void SwitchControl(short itemNumber);
-	void SwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+	void SwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 }

@@ -109,7 +109,7 @@ struct SoundTrackInfo
 extern std::map<std::string, int> SoundTrackMap;
 extern std::vector<SoundTrackInfo> SoundTracks;
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
+long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();

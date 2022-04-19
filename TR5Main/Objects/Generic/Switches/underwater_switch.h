@@ -1,11 +1,11 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
 namespace TEN::Entities::Switches
 {
-	void UnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-	void CeilingUnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-	void WallUnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+	void UnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void CeilingUnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void WallUnderwaterSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
 }

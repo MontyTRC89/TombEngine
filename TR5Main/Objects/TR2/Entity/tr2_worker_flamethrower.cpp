@@ -9,36 +9,26 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/missile.h"
-#include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Specific/trmath.h"
 
-BITE_INFO WorkerFlamethrowerBite = { 0, 250, 32, 9 };
+BITE_INFO workerFlameThrower = { 0, 250, 32, 9 };
 
-// TODO
-enum WorkerFlamethrowerState
+static void Flame(DWORD x, int y, DWORD z, int speed, WORD yrot, WORD roomNumber)
 {
+	short fx_number;
+	short cam_rot;
+	FX_INFO* fx;
 
-};
-
-// TODO
-enum WorkerFlamethrowerAnim
-{
-
-};
-
-static void Flame(int x, int y, int z, int velocity, short yRot, short roomNumber)
-{
-	short fxNumber = CreateNewEffect(roomNumber);
-	if (fxNumber != NO_ITEM)
+	fx_number = CreateNewEffect(roomNumber);
+	if (fx_number != NO_ITEM)
 	{
-		auto* fx = &EffectList[fxNumber];
-
-		fx->pos.Position.x = x;
-		fx->pos.Position.y = y;
-		fx->pos.Position.z = z;
+		fx = &EffectList[fx_number];
+		fx->pos.xPos = x;
+		fx->pos.yPos = y;
+		fx->pos.zPos = z;
 		fx->roomNumber = roomNumber;
 		//TODO: complete fx parameters
 		fx->shade = 14 * 256;
@@ -47,206 +37,220 @@ static void Flame(int x, int y, int z, int velocity, short yRot, short roomNumbe
 	}
 }
 
-void InitialiseWorkerFlamethrower(short itemNumber)
+void InitialiseWorkerFlamethrower(short itemNum)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ANIM_STRUCT* anim;
+	ITEM_INFO* item;
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
+	item = &g_Level.Items[itemNum];
+	item->animNumber = Objects[item->objectNumber].animIndex + 12;
 
-	ClearItem(itemNumber);
+	ClearItem(itemNum);
 
-	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-	item->Animation.FrameNumber = anim->frameBase;
-	item->Animation.ActiveState = anim->ActiveState;
+	anim = &g_Level.Anims[item->animNumber];
+	item->frameNumber = anim->frameBase;
+	item->currentAnimState = anim->currentAnimState;
 }
 
-void WorkerFlamethrower(short itemNumber)
+void WorkerFlamethrower(short itemNum)
 {
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	Vector3Int pos;
+	ITEM_INFO* item;
+	CREATURE_INFO* flame;
+	AI_INFO info;
+	PHD_VECTOR pos;
+	short angle, head_y, head_x, torso_y, torso_x, tilt;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
+	item = &g_Level.Items[itemNum];
+	flame = (CREATURE_INFO*)item->data;
+	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
 
-	short tilt = 0;
-	short angle = 0;
-	short headX = 0;
-	short headY = 0;
-	short torsoX = 0;
-	short torsoY = 0;
+	pos.x = workerFlameThrower.x;
+	pos.y = workerFlameThrower.y;
+	pos.z = workerFlameThrower.z;
+	GetJointAbsPosition(item, &pos, workerFlameThrower.meshNum);
 
-	pos.x = WorkerFlamethrowerBite.x;
-	pos.y = WorkerFlamethrowerBite.y;
-	pos.z = WorkerFlamethrowerBite.z;
-	GetJointAbsPosition(item, &pos, WorkerFlamethrowerBite.meshNum);
-
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 7)
+		if (item->currentAnimState != 7)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 7;
+			item->animNumber = Objects[item->objectNumber].animIndex + 19;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 7;
 		}
 	}
 	else
 	{
-		if (item->Animation.ActiveState != 5 && item->Animation.ActiveState != 6)
+		if (item->currentAnimState != 5 && item->currentAnimState != 6)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-			AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
+			AddFire(pos.x, pos.y, pos.z, 0, item->roomNumber, 0);
 		}
 		else
+		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 14, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
+		}
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		CreatureAIInfo(item, &info);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+		angle = CreatureTurn(item, flame->maximumTurn);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
-
-		angle = CreatureTurn(item, creature->MaxTurn);
-
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			creature->MaxTurn = 0;
-			creature->Flags = 0;
+			flame->flags = 0;
+			flame->maximumTurn = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
+				head_y = info.angle;
+				head_x = info.xAngle;
 			}
 
-			if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 3;
-			else if (Targetable(item, &AI))
+			if (flame->mood == ESCAPE_MOOD)
 			{
-				if (AI.distance < pow(SECTOR(4), 2) || AI.zoneNumber != AI.enemyZone)
-					item->Animation.TargetState = 8;
-				else
-					item->Animation.TargetState = 2;
+				item->goalAnimState = 3;
 			}
-			else if (creature->Mood == MoodType::Attack || !AI.ahead)
+			else if (Targetable(item, &info))
 			{
-				if (AI.distance <= pow(SECTOR(2), 2))
-					item->Animation.TargetState = 2;
+				if (info.distance < SQUARE(WALL_SIZE * 4) || info.zoneNumber != info.enemyZone)
+					item->goalAnimState = 8;
 				else
-					item->Animation.TargetState = 3;
+					item->goalAnimState = 2;
+			}
+			else if (flame->mood == ATTACK_MOOD || !info.ahead)
+			{
+				if (info.distance <= SQUARE(WALL_SIZE * 2))
+					item->goalAnimState = 2;
+				else
+					item->goalAnimState = 3;
 			}
 			else
-				item->Animation.TargetState = 4;
-			
+			{
+				item->goalAnimState = 4;
+			}
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(5.0f);
+			flame->maximumTurn = ANGLE(5);
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
+				head_y = info.angle;
+				head_x = info.xAngle;
 			}
 
-			if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 3;
-			else if (Targetable(item, &AI))
+			if (flame->mood == ESCAPE_MOOD)
 			{
-				if (AI.distance < pow(SECTOR(4), 2) || AI.zoneNumber != AI.enemyZone)
-					item->Animation.TargetState = 1;
+				item->goalAnimState = 3;
+			}
+			else if (Targetable(item, &info))
+			{
+				if (info.distance < SQUARE(WALL_SIZE * 4) || info.zoneNumber != info.enemyZone)
+					item->goalAnimState = 1;
 				else
-					item->Animation.TargetState = 6;
+					item->goalAnimState = 6;
 			}
-			else if (creature->Mood == MoodType::Attack || !AI.ahead)
+			else if (flame->mood == ATTACK_MOOD || !info.ahead)
 			{
-				if (AI.distance > pow(SECTOR(2), 2))
-					item->Animation.TargetState = 3;
+				if (info.distance > SQUARE(WALL_SIZE * 2))
+					item->goalAnimState = 3;
 			}
 			else
-				item->Animation.TargetState = 4;
-			
+			{
+				item->goalAnimState = 4;
+			}
 			break;
 
 		case 3:
-			creature->MaxTurn = ANGLE(10.0f);
+			flame->maximumTurn = ANGLE(10);
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
+				head_y = info.angle;
+				head_x = info.xAngle;
 			}
 
-			if (creature->Mood != MoodType::Escape)
+			if (flame->mood != ESCAPE_MOOD)
 			{
-				if (Targetable(item, &AI))
-					item->Animation.TargetState = 2;
-				else if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
-					item->Animation.TargetState = 2;
+				if (Targetable(item, &info))
+				{
+					item->goalAnimState = 2;
+				}
+				else if (flame->mood == BORED_MOOD || flame->mood == STALK_MOOD)
+				{
+					item->goalAnimState = 2;
+				}
 			}
-
 			break;
 
 		case 4:
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
+				head_y = info.angle;
+				head_x = info.xAngle;
 			}
 
-			if (Targetable(item, &AI))
-				item->Animation.TargetState = 5;
+			if (Targetable(item, &info))
+			{
+				item->goalAnimState = 5;
+			}
 			else
 			{
-				if (creature->Mood == MoodType::Attack)
-					item->Animation.TargetState = 1;
-				else if (!AI.ahead)
-					item->Animation.TargetState = 1;
+				if (flame->mood == ATTACK_MOOD)
+				{
+					item->goalAnimState = 1;
+				}
+				else if (!info.ahead)
+				{
+					item->goalAnimState = 1;
+				}
 			}
-			
 			break;
 
 		case 5:
 		case 6:
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (item->Animation.TargetState != 1 &&
-				(creature->Mood == MoodType::Escape || AI.distance > pow(SECTOR(10), 2) || !Targetable(item, &AI)))
+			if (item->goalAnimState != 1 && (flame->mood == ESCAPE_MOOD || info.distance > SQUARE(WALL_SIZE * 10) || !Targetable(item, &info)))
 			{
-				item->Animation.TargetState = 1;
+				item->goalAnimState = 1;
 			}
-
 			break;
 
 		case 8:
 		case 9:
-			creature->Flags = 0;
+			flame->flags = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torso_y = info.angle;
+				torso_x = info.xAngle;
 			}
 
-			if (Targetable(item, &AI))
-				item->Animation.TargetState = (item->Animation.ActiveState == 8) ? 5 : 11;
+			if (Targetable(item, &info))
+			{
+				item->goalAnimState = (item->currentAnimState == 8) ? 5 : 11;
+			}
 			else
-				item->Animation.TargetState = 1;
-			
+			{
+				item->goalAnimState = 1;
+			}
 			break;
 		}
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, torsoY);
-	CreatureJoint(item, 1, torsoX);
-	CreatureJoint(item, 2, headY);
-	CreatureJoint(item, 3, headX);
-	CreatureAnimation(itemNumber, angle, tilt);
+	CreatureJoint(item, 0, torso_y);
+	CreatureJoint(item, 1, torso_x);
+	CreatureJoint(item, 2, head_y);
+	CreatureJoint(item, 3, head_x);
+	CreatureAnimation(itemNum, angle, tilt);
 }
