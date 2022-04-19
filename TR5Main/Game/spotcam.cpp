@@ -8,6 +8,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Specific/input.h"
 
 using namespace TEN::Renderer;
@@ -18,11 +19,11 @@ int SpotcamTimer;
 int SpotcamPaused;
 int SpotcamLoopCnt;
 int CameraFade;
-PHD_VECTOR LaraFixedPosition;
+Vector3Int LaraFixedPosition;
 int InitialCameraRoom;
 int LastFOV;
-PHD_VECTOR InitialCameraPosition;
-PHD_VECTOR InitialCameraTarget;
+Vector3Int InitialCameraPosition;
+Vector3Int InitialCameraTarget;
 int CurrentSplinePosition;
 int SplineToCamera;
 int FirstCamera;
@@ -81,9 +82,7 @@ void InitSpotCamSequences()
 			{
 				//Same sequence
 				if (SpotCam[n].sequence == s)
-				{
 					cc++;
-				}
 				else
 				{
 					//New sequence
@@ -105,11 +104,6 @@ void InitSpotCamSequences()
 
 void InitialiseSpotCam(short Sequence)
 {
-	SPOTCAM* s;
-	int cn;
-	int sp;
-	int i;
-
 	if (TrackCameraInit != 0 && LastSpotCamSequence == Sequence)
 	{
 		TrackCameraInit = 0;
@@ -121,16 +115,13 @@ void InitialiseSpotCam(short Sequence)
 
 	AlterFOV(16380);
 
-	LaraItem->meshBits = -1;
+	LaraItem->MeshBits = -1;
 
-	Lara.headYrot = 0;
-	Lara.headXrot = 0;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
+	ResetLaraFlex(LaraItem);
 
 	Camera.bounce = 0;
 
-	Lara.busy = 0;
+	Lara.Inventory.IsBusy = 0;
 
 	CameraFade = -1;
 	LastSpotCamSequence = Sequence;
@@ -138,10 +129,10 @@ void InitialiseSpotCam(short Sequence)
 	SpotcamTimer = 0;
 	SpotcamPaused = 0;
 	SpotcamLoopCnt = 0;
-	Lara.uncontrollable = false;
+	Lara.Control.Locked = false;
 
 	LastFOV = CurrentFOV;
-	LaraAir = Lara.air;
+	LaraAir = Lara.Air;
 
 	InitialCameraPosition.x = Camera.pos.x;
 	InitialCameraPosition.y = Camera.pos.y;
@@ -151,38 +142,36 @@ void InitialiseSpotCam(short Sequence)
 	InitialCameraTarget.y = Camera.target.y;
 	InitialCameraTarget.z = Camera.target.z;
 
-	LaraHealth = LaraItem->hitPoints;
+	LaraHealth = LaraItem->HitPoints;
 	InitialCameraRoom = Camera.pos.roomNumber;
 
-	LaraFixedPosition.x = LaraItem->pos.xPos;
-	LaraFixedPosition.y = LaraItem->pos.yPos;
-	LaraFixedPosition.z = LaraItem->pos.zPos;
+	LaraFixedPosition.x = LaraItem->Pose.Position.x;
+	LaraFixedPosition.y = LaraItem->Pose.Position.y;
+	LaraFixedPosition.z = LaraItem->Pose.Position.z;
 
 	CurrentSpotcamSequence = Sequence;
 	CurrentSplineCamera = 0;
 
-	for (i = 0; i < SpotCamRemap[Sequence]; i++)
-	{
+	for (int i = 0; i < SpotCamRemap[Sequence]; i++)
 		CurrentSplineCamera += CameraCnt[i];
-	}
 
 	CurrentSplinePosition = 0;
 	SplineToCamera = 0;
 
 	FirstCamera = CurrentSplineCamera;
 
-	s = &SpotCam[CurrentSplineCamera];
+	auto* spotcam = &SpotCam[CurrentSplineCamera];
 
 	LastCamera = CurrentSplineCamera + (CameraCnt[SpotCamRemap[Sequence]] - 1);
 	CurrentCameraCnt = CameraCnt[SpotCamRemap[Sequence]];
 
-	if ((s->flags & SCF_DISABLE_LARA_CONTROLS))
+	if ((spotcam->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
-		Lara.uncontrollable = true;
+		Lara.Control.Locked = true;
 		SetCinematicBars(SPOTCAM_CINEMATIC_BARS_HEIGHT, SPOTCAM_CINEMATIC_BARS_SPEED);
 	}
 
-	if (s->flags & SCF_TRACKING_CAM)
+	if (spotcam->flags & SCF_TRACKING_CAM)
 	{
 		CameraXposition[1] = SpotCam[FirstCamera].x;
 		CameraYposition[1] = SpotCam[FirstCamera].y;
@@ -198,19 +187,19 @@ void InitialiseSpotCam(short Sequence)
 
 		if (CurrentCameraCnt > 0)
 		{
-			s = &SpotCam[FirstCamera];
+			spotcam = &SpotCam[FirstCamera];
 
-			for (i = 0; i < CurrentCameraCnt; i++, s++)
+			for (int i = 0; i < CurrentCameraCnt; i++, spotcam++)
 			{
-				CameraXposition[i + 2] = s->x;
-				CameraYposition[i + 2] = s->y;
-				CameraZposition[i + 2] = s->z;
-				CameraXtarget[i + 2] = s->tx;
-				CameraYtarget[i + 2] = s->ty;
-				CameraZtarget[i + 2] = s->tz;
-				CameraRoll[i + 2] = s->roll;
-				CameraFOV[i + 2] = s->fov;
-				CameraSpeed[i + 2] = s->speed;
+				CameraXposition[i + 2] = spotcam->x;
+				CameraYposition[i + 2] = spotcam->y;
+				CameraZposition[i + 2] = spotcam->z;
+				CameraXtarget[i + 2] = spotcam->tx;
+				CameraYtarget[i + 2] = spotcam->ty;
+				CameraZtarget[i + 2] = spotcam->tz;
+				CameraRoll[i + 2] = spotcam->roll;
+				CameraFOV[i + 2] = spotcam->fov;
+				CameraSpeed[i + 2] = spotcam->speed;
 			}
 		}
 
@@ -228,8 +217,8 @@ void InitialiseSpotCam(short Sequence)
 	else
 	{
 		//loc_37AA8
-		sp = 0;
-		if ((s->flags & SCF_CUT_PAN))
+		int sp = 0;
+		if ((spotcam->flags & SCF_CUT_PAN))
 		{
 			CameraXposition[1] = SpotCam[CurrentSplineCamera].x;
 			CameraYposition[1] = SpotCam[CurrentSplineCamera].y;
@@ -243,13 +232,11 @@ void InitialiseSpotCam(short Sequence)
 
 			SplineFromCamera = 0;
 
-			cn = CurrentSplineCamera;
+			int cn = CurrentSplineCamera;
 			while (sp < 4)
 			{
 				if (LastCamera < CurrentSplineCamera)
-				{
 					cn = FirstCamera;
-				}
 
 				//loc_37B74
 				CameraXposition[sp + 2] = SpotCam[cn].x;
@@ -268,19 +255,13 @@ void InitialiseSpotCam(short Sequence)
 			CurrentSplineCamera++;
 
 			if (CurrentSplineCamera > LastCamera)
-			{
 				CurrentSplineCamera = FirstCamera;
-			}
 
-			if (s->flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
-			{
+			if (spotcam->flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
 				CheckTrigger = true;
-			}
 
-			if (s->flags & SCF_HIDE_LARA)
-			{
+			if (spotcam->flags & SCF_HIDE_LARA)
 				SpotcamDontDrawLara = true;
-			}
 			else
 			{
 				QuakeCam.spos.boxNumber = 0;
@@ -290,7 +271,7 @@ void InitialiseSpotCam(short Sequence)
 		}
 		else
 		{
-			cn = CurrentSplineCamera;
+			int cn = CurrentSplineCamera;
 
 			CameraXposition[1] = InitialCameraPosition.x;
 			CameraYposition[1] = InitialCameraPosition.y;
@@ -300,7 +281,7 @@ void InitialiseSpotCam(short Sequence)
 			CameraZtarget[1] = InitialCameraTarget.z;
 			CameraFOV[1] = CurrentFOV;
 			CameraRoll[1] = 0;
-			CameraSpeed[1] = s->speed;
+			CameraSpeed[1] = spotcam->speed;
 
 			CameraXposition[2] = InitialCameraPosition.x;
 			CameraYposition[2] = InitialCameraPosition.y;
@@ -310,7 +291,7 @@ void InitialiseSpotCam(short Sequence)
 			CameraZtarget[2] = InitialCameraTarget.z;
 			CameraFOV[2] = CurrentFOV;
 			CameraRoll[2] = 0;
-			CameraSpeed[2] = s->speed;
+			CameraSpeed[2] = spotcam->speed;
 
 			CameraXposition[3] = SpotCam[CurrentSplineCamera].x;
 			CameraYposition[3] = SpotCam[CurrentSplineCamera].y;
@@ -327,9 +308,7 @@ void InitialiseSpotCam(short Sequence)
 			cn++;
 
 			if (LastCamera < cn)
-			{
 				cn = FirstCamera;
-			}
 
 			CameraXposition[4] = SpotCam[cn].x;
 			CameraYposition[4] = SpotCam[cn].y;
@@ -345,10 +324,8 @@ void InitialiseSpotCam(short Sequence)
 		}
 	}
 
-	if (s->flags & SCF_HIDE_LARA)
-	{
+	if (spotcam->flags & SCF_HIDE_LARA)
 		SpotcamDontDrawLara = true;
-	}
 
 	QuakeCam.spos.boxNumber = 0;
 }
@@ -392,19 +369,17 @@ void CalculateSpotCameras()
 
 	CAMERA_INFO Backup;
 
-	if (Lara.uncontrollable)
+	if (Lara.Control.Locked)
 	{
-		LaraItem->hitPoints = LaraHealth;
-		Lara.air = LaraAir;
+		LaraItem->HitPoints = LaraHealth;
+		Lara.Air = LaraAir;
 	}
 
 	s = &SpotCam[FirstCamera];
 	spline_cnt = 4;
 
-	if ((s->flags & SCF_TRACKING_CAM))
-	{
+	if (s->flags & SCF_TRACKING_CAM)
 		spline_cnt = CurrentCameraCnt + 2;
-	}
 
 	//loc_37F64
 	cpx = Spline(CurrentSplinePosition, &CameraXposition[1], spline_cnt);
@@ -417,14 +392,14 @@ void CalculateSpotCameras()
 	croll = Spline(CurrentSplinePosition, &CameraRoll[1], spline_cnt);
 	cfov = Spline(CurrentSplinePosition, &CameraFOV[1], spline_cnt);
 
-	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN)
-		&& CameraFade != CurrentSplineCamera)
+	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_IN) &&
+		CameraFade != CurrentSplineCamera)
 	{
 		CameraFade = CurrentSplineCamera;
 	}
 
-	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT)
-		&& CameraFade != CurrentSplineCamera)
+	if ((SpotCam[CurrentSplineCamera].flags & SCF_SCREEN_FADE_OUT) &&
+		CameraFade != CurrentSplineCamera)
 	{
 		CameraFade = CurrentSplineCamera;
 	}
@@ -435,11 +410,11 @@ void CalculateSpotCameras()
 	cp = 0;
 	int temp = 0x2000;
 
-	if ((s->flags & SCF_TRACKING_CAM))
+	if (s->flags & SCF_TRACKING_CAM)
 	{
-		lx = LaraItem->pos.xPos;
-		ly = LaraItem->pos.yPos;
-		lz = LaraItem->pos.zPos;
+		lx = LaraItem->Pose.Position.x;
+		ly = LaraItem->Pose.Position.y;
+		lz = LaraItem->Pose.Position.z;
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -490,17 +465,13 @@ void CalculateSpotCameras()
 			CurrentSplinePosition = 0;
 	}
 	else if (!SpotcamTimer)
-	{
 		CurrentSplinePosition += cspeed;
-	}
 
 	if (!(TrInput & IN_LOOK))
-	{
 		SpotCamFirstLook = false;
-	}
 
-	if (s->flags & SCF_DISABLE_BREAKOUT
-		|| !(TrInput & IN_LOOK))
+	if (s->flags & SCF_DISABLE_BREAKOUT ||
+		!(TrInput & IN_LOOK))
 	{
 		Camera.pos.x = cpx;
 		Camera.pos.y = cpy;
@@ -508,9 +479,9 @@ void CalculateSpotCameras()
 
 		if ((s->flags & SCF_FOCUS_LARA_HEAD) || (s->flags & SCF_TRACKING_CAM))
 		{
-			Camera.target.x = LaraItem->pos.xPos;
-			Camera.target.y = LaraItem->pos.yPos;
-			Camera.target.z = LaraItem->pos.zPos;
+			Camera.target.x = LaraItem->Pose.Position.x;
+			Camera.target.y = LaraItem->Pose.Position.y;
+			Camera.target.z = LaraItem->Pose.Position.z;
 		}
 		else
 		{
@@ -526,9 +497,7 @@ void CalculateSpotCameras()
 			GetFloor(Camera.pos.x, Camera.pos.y, Camera.pos.z, &Camera.pos.roomNumber);
 		}
 		else
-		{
 			Camera.pos.roomNumber = outsideRoom;
-		}
 
 		AlterFOV(cfov);
 
@@ -556,8 +525,8 @@ void CalculateSpotCameras()
 
 		if (CheckTrigger)
 		{
-			CAMERA_TYPE oldType = Camera.type;
-			Camera.type = CAMERA_TYPE::HEAVY_CAMERA;
+			CameraType oldType = Camera.type;
+			Camera.type = CameraType::Heavy;
 			if (CurrentLevel != 0)
 			{
 				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
@@ -569,14 +538,13 @@ void CalculateSpotCameras()
 				TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 				TestVolumes(&Camera);
 			}
+
 			Camera.type = oldType;
 			CheckTrigger = false;
 		}
 
 		if (s->flags & SCF_TRACKING_CAM)
-		{
 			TrackCameraInit = true;
-		}
 		else if (CurrentSplinePosition > 0x10000 - cspeed)
 		{
 			if (SpotCam[CurrentSplineCamera].timer > 0 &&
@@ -586,12 +554,11 @@ void CalculateSpotCameras()
 					SpotcamTimer = SpotCam[CurrentSplineCamera].timer >> 3;
 			}
 			else if (SpotCam[CurrentSplineCamera].timer < 0)
-			{
 				SpotcamOverlay = 1; // Negative timer = sniper mode?
-			}
 
 			if (SpotCam[CurrentSplineCamera].flags & SCF_HIDE_LARA)
 				SpotcamDontDrawLara = true;
+
 			if (SpotCam[CurrentSplineCamera].flags & SCF_ACTIVATE_HEAVY_TRIGGERS)
 				CheckTrigger = true;
 
@@ -618,20 +585,14 @@ void CalculateSpotCameras()
 					QuakeCam.epos.z = SpotCam[CurrentSplineCamera + 1].z;
 
 					if (SpotCam[CurrentSplineCamera + 1].timer != -1)
-					{
 						QuakeCam.epos.roomNumber = SpotCam[CurrentSplineCamera + 1].timer << 3;
-					}
 					else
-					{
 						QuakeCam.epos.roomNumber = 0;
-					}
 
 					QuakeCam.epos.boxNumber = sqrt(((QuakeCam.spos.x - QuakeCam.epos.x) * (QuakeCam.spos.x - QuakeCam.epos.x)) + ((QuakeCam.spos.y - QuakeCam.epos.y) * (QuakeCam.spos.y - QuakeCam.epos.y) + ((QuakeCam.spos.z - QuakeCam.epos.z) * (QuakeCam.spos.z - QuakeCam.epos.z))));
 				}
 				else
-				{
 					QuakeCam.spos.boxNumber = 0;
-				}
 			}
 			*/
 
@@ -640,13 +601,9 @@ void CalculateSpotCameras()
 				CurrentSplinePosition = 0;
 
 				if (CurrentSplineCamera != FirstCamera)
-				{
 					cn = CurrentSplineCamera - 1;
-				}
 				else
-				{
 					cn = LastCamera;
-				}
 
 				sp = 1;
 
@@ -657,20 +614,19 @@ void CalculateSpotCameras()
 				}
 				else
 				{
-					if ((SpotCam[CurrentSplineCamera].flags & SCF_REENABLE_LARA_CONTROLS))
-					{
-						Lara.uncontrollable = false;
-					}
+					if (SpotCam[CurrentSplineCamera].flags & SCF_REENABLE_LARA_CONTROLS)
+						Lara.Control.Locked = false;
 
-					if ((SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS))
+					if (SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS)
 					{						
 						if (CurrentLevel)
 							SetCinematicBars(SPOTCAM_CINEMATIC_BARS_HEIGHT, SPOTCAM_CINEMATIC_BARS_SPEED);
-						Lara.uncontrollable = true;
+
+						Lara.Control.Locked = true;
 					}
 
 					int sp2 = 0;
-					if ((SpotCam[CurrentSplineCamera].flags & SCF_CUT_TO_CAM))
+					if (SpotCam[CurrentSplineCamera].flags & SCF_CUT_TO_CAM)
 					{
 						cn = (SpotCam[CurrentSplineCamera].timer & 0xF) + FirstCamera;
 
@@ -705,19 +661,15 @@ void CalculateSpotCameras()
 				{
 					while (sp < 4)
 					{
-						if ((s->flags & SCF_LOOP_SEQUENCE))
+						if (s->flags & SCF_LOOP_SEQUENCE)
 						{
 							if (LastCamera < cn)
-							{
 								cn = FirstCamera;
-							}
 						}
 						else
 						{
 							if (LastCamera < cn)
-							{
 								cn = LastCamera;
-							}
 						}
 
 						CameraXposition[sp + 1] = SpotCam[cn].x;
@@ -738,11 +690,9 @@ void CalculateSpotCameras()
 				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
-				{
 					return;
-				}
 
-				if ((s->flags & SCF_LOOP_SEQUENCE))
+				if (s->flags & SCF_LOOP_SEQUENCE)
 				{
 					CurrentSplineCamera = FirstCamera;
 					SpotcamLoopCnt++;
@@ -751,8 +701,8 @@ void CalculateSpotCameras()
 				{
 					if (CheckTrigger)
 					{
-						CAMERA_TYPE oldType = Camera.type;
-						Camera.type = CAMERA_TYPE::HEAVY_CAMERA;
+						CameraType oldType = Camera.type;
+						Camera.type = CameraType::Heavy;
 						if (CurrentLevel)
 						{
 							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
@@ -764,6 +714,7 @@ void CalculateSpotCameras()
 							TestTriggers(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber, true);
 							TestVolumes(&Camera);
 						}
+
 						Camera.type = oldType;
 						CheckTrigger = false;
 					}
@@ -771,10 +722,10 @@ void CalculateSpotCameras()
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
 					UseSpotCam = 0;
-					Lara.uncontrollable = false;
+					Lara.Control.Locked = false;
 					CheckTrigger = 0;
-					Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
-					Camera.type = CAMERA_TYPE::CHASE_CAMERA;
+					Camera.oldType = CameraType::Fixed;
+					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
 
 					if (s->flags & SCF_PAN_TO_LARA_CAM)
@@ -815,8 +766,8 @@ void CalculateSpotCameras()
 					CameraSpeed[2] = SpotCam[CurrentSplineCamera - 1].speed;
 
 					memcpy((char*)& Backup, (char*)& Camera, sizeof(CAMERA_INFO));
-					Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
-					Camera.type = CAMERA_TYPE::CHASE_CAMERA;
+					Camera.oldType = CameraType::Fixed;
+					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
 
 					int elevation = Camera.targetElevation;
@@ -876,7 +827,7 @@ void CalculateSpotCameras()
 	{
 		if (!SpotCamFirstLook)
 		{
-			Camera.oldType = CAMERA_TYPE::FIXED_CAMERA;
+			Camera.oldType = CameraType::Fixed;
 			SpotCamFirstLook = true;
 		}
 
@@ -886,7 +837,7 @@ void CalculateSpotCameras()
 	{
 		SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 		UseSpotCam = false;
-		Lara.uncontrollable = false;
+		Lara.Control.Locked = false;
 		Camera.speed = 1;
 		AlterFOV(LastFOV);
 		CalculateCamera();

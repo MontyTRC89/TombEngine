@@ -18,9 +18,7 @@ void InitTENLog()
 		logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, spdlog::sinks_init_list{file_sink, console_sink });
 	}
 	else
-	{
 		logger = std::make_shared<spdlog::logger>(std::string{ "multi_sink" }, file_sink);
-	}
 	
 	spdlog::initialize_logger(logger);
     logger->set_level(spdlog::level::info);
@@ -33,9 +31,7 @@ void TENLog(std::string_view str, LogLevel level, LogConfig config)
 	if constexpr (!DebugBuild)
 	{
 		if (LogConfig::Debug == config)
-		{
 			return;
-		}
 	}
 
 	auto logger = spdlog::get("multi_sink");
@@ -51,6 +47,7 @@ void TENLog(std::string_view str, LogLevel level, LogConfig config)
 		logger->info(str);
 		break;
 	}
+
 	logger->flush();
 }
 
@@ -58,4 +55,3 @@ void ShutdownTENLog()
 {
 	spdlog::shutdown();
 }
-

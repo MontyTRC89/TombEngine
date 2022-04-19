@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseLion(short itemNum);
-void LionControl(short itemNum);
+void InitialiseLion(short itemNumber);
+void LionControl(short itemNumber);

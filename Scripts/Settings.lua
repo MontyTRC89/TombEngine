@@ -1,7 +1,7 @@
--- TR5Main engine settings file
+-- TombEngine settings file
 -- Created by MontyTRC
--- Place in this LUA script all the engine settings for your game
--- WARNING: bad values could make your game unplayable, please follow with attention the reference guide
+-- Place all the engine settings for your game in this Lua script.
+-- WARNING: Bad values could make your game unplayable; please follow reference guide attentively.
 
 local settings = Settings.new();
 settings.screenWidth = 1920;
@@ -16,11 +16,12 @@ settings.errorMode = ErrorMode.WARN;
 SetSettings(settings);
 
 local anims = Animations.new();
-anims.crawlExtended = true;
-anims.crouchRoll = true;
-anims.crawlspaceSwandive = true;
-anims.monkeyTurn180 = true;
-anims.monkeyAutoJump = false;
-anims.oscillateHang = true;
-anims.pose = false;
+anims.hasPose = false;
+anims.hasSlideExtended = false;
+anims.hasSprintJump = true;
+anims.hasMonkeyAutoJump = false;
+anims.hasCrawlspaceDive = true;
+anims.hasCrawlExtended = true;
+anims.hasCrouchRoll = true;
+anims.hasOverhangClimb = false;
 SetAnimations(anims);

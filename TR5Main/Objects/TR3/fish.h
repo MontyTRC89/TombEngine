@@ -1,6 +1,6 @@
 #pragma once
 
-struct FISH_INFO
+struct FishInfo
 {
 	short x;
 	short y;
@@ -13,7 +13,7 @@ struct FISH_INFO
 	unsigned char swim;
 };
 
-struct FISH_LEADER_INFO
+struct FishLeaderInfo
 {
 	short angle;
 	unsigned char speed;

@@ -1,8 +1,11 @@
 #include "framework.h"
 #include "RenderTargetCube.h"
 #include "Utils.h"
+
 using TEN::Renderer::Utils::throwIfFailed;
-TEN::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) : resolution(resolution) {
+
+TEN::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int resolution, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) : resolution(resolution)
+{
 
 	D3D11_TEXTURE2D_DESC desc = {};
 	desc.Width = resolution;
@@ -24,11 +27,12 @@ TEN::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int reso
 	viewDesc.Format = desc.Format;
 	viewDesc.Texture2DArray.ArraySize = 1;
 	viewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-	for (int i = 0; i < 6; i++) {
+
+	for (int i = 0; i < 6; i++)
+	{
 		viewDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i, 1);
 		res = device->CreateRenderTargetView(Texture.Get(), &viewDesc, RenderTargetView[i].GetAddressOf());
 		throwIfFailed(res);
-
 	}
 
 	// Setup the description of the shader resource view.
@@ -63,7 +67,9 @@ TEN::Renderer::RenderTargetCube::RenderTargetCube(ID3D11Device* device, int reso
 	dsvDesc.Flags = 0;
 	dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
 	dsvDesc.Texture2DArray.ArraySize = 1;
-	for (int i = 0; i < 6; i++) {
+
+	for (int i = 0; i < 6; i++)
+	{
 		dsvDesc.Texture2DArray.FirstArraySlice = D3D11CalcSubresource(0, i, 1);
 		res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, DepthStencilView[i].GetAddressOf());
 		throwIfFailed(res);

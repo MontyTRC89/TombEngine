@@ -1,3 +1,3 @@
 #pragma once
 
-void TigerControl(short itemNum);
+void TigerControl(short itemNumber);

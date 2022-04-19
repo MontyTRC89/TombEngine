@@ -4,14 +4,13 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-void InitialiseLightingGuide(short itemNum)
+void InitialiseLightingGuide(short itemNumber)
 {
-    ITEM_INFO* item;
+	auto* item = &g_Level.Items[itemNumber];
 
-    item = &g_Level.Items[itemNum];
-    ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+	ClearItem(itemNumber);
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
 }

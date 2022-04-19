@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseImp(short itemNum);
+void InitialiseImp(short itemNumber);
 void ImpControl(short itemNumber);

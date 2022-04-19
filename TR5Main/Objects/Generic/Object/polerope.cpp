@@ -5,6 +5,7 @@
 #include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Specific/input.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/Lara/lara.h"
@@ -14,102 +15,106 @@
 
 namespace TEN::Entities::Generic
 {
-	PHD_VECTOR PolePos = { 0, 0, -208 };
-	PHD_VECTOR PolePosR = { 0, 0, 0 };
+	Vector3Int PolePos = { 0, 0, -208 };
+	Vector3Int PolePosR = { 0, 0, 0 };
 
 	OBJECT_COLLISION_BOUNDS PoleBounds = 
 	{
 		-256, 256, 
 		0, 0, 
 		-512, 512, 
-		-ANGLE(10), ANGLE(10), 
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	void PoleCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+	void PoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		auto item = &g_Level.Items[itemNumber];
-		auto isLara = (!item->data.is<LaraInfo*>());
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* poleItem = &g_Level.Items[itemNumber];
 
-		if (isLara &&
-			TrInput & IN_ACTION && 
-			!Lara.gunStatus && 
-			l->currentAnimState == LS_IDLE && 
-			l->animNumber == LA_STAND_IDLE || Lara.isMoving &&
-			Lara.interactedItem == itemNumber)
+		bool isLara = !poleItem->Data.is<LaraInfo*>();
+
+		if (TrInput & IN_ACTION && isLara &&
+			laraInfo->Control.HandStatus == HandStatus::Free &&
+			laraItem->Animation.ActiveState == LS_IDLE && 
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE || laraInfo->Control.IsMoving &&
+			laraInfo->InteractedItem == itemNumber)
 		{
-			short rot = item->pos.yRot;
-			item->pos.yRot = l->pos.yRot;
+			short rot = poleItem->Pose.Orientation.y;
+			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(&PoleBounds, item, l))
+			if (TestLaraPosition(&PoleBounds, poleItem, laraItem))
 			{
-				if (MoveLaraPosition(&PolePos, item, l))
+				if (MoveLaraPosition(&PolePos, poleItem, laraItem))
 				{
-					l->animNumber = LA_STAND_TO_POLE;
-					l->currentAnimState = LS_POLE_IDLE;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_BUSY;
+					laraItem->Animation.AnimNumber = LA_STAND_TO_POLE;
+					laraItem->Animation.ActiveState = LS_POLE_IDLE;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Busy;
 				}
 				else
-				{
-					Lara.interactedItem = itemNumber;
-				}
-				item->pos.yRot = rot;
+					laraInfo->InteractedItem = itemNumber;
+
+				poleItem->Pose.Orientation.y = rot;
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.interactedItem == itemNumber)
+				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
-				item->pos.yRot = rot;
+
+				poleItem->Pose.Orientation.y = rot;
 			}
 		}
-		else if (isLara && 
-				 TrInput & IN_ACTION &&
-			     !Lara.gunStatus && 
-				 l->gravityStatus && 
-				 l->fallspeed > Lara.gunStatus && 
-				 l->currentAnimState == LS_REACH || l->currentAnimState == LS_JUMP_UP)
+		else if (TrInput & IN_ACTION && isLara &&
+			     laraInfo->Control.HandStatus == HandStatus::Free && 
+				 laraItem->Animation.Airborne && 
+				 laraItem->Animation.VerticalVelocity > (int)laraInfo->Control.HandStatus &&	// ?????
+				 laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP)
 		{
-			if (TestBoundsCollide(item, l, 100) &&
-				TestLaraPoleCollision(l, coll, true, -STEP_SIZE) &&
-				TestLaraPoleCollision(l, coll, false))
+			if (TestBoundsCollide(poleItem, laraItem, 100) &&
+				TestLaraPoleCollision(laraItem, coll, true, -CLICK(1)) &&
+				TestLaraPoleCollision(laraItem, coll, false))
 			{
-				if (TestCollision(item, l))
+				if (TestCollision(poleItem, laraItem))
 				{
-					short rot = item->pos.yRot;
-					item->pos.yRot = l->pos.yRot;
-					if (l->currentAnimState == LS_REACH)
+					short rot = poleItem->Pose.Orientation.y;
+					poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
-						PolePosR.y = l->pos.yPos - item->pos.yPos + 10;
-						AlignLaraPosition(&PolePosR, item, l);
-						l->animNumber = LA_REACH_TO_POLE;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
+						AlignLaraPosition(&PolePosR, poleItem, laraItem);
+						laraItem->Animation.AnimNumber = LA_REACH_TO_POLE;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					}
 					else
 					{
-						PolePosR.y = l->pos.yPos - item->pos.yPos + 66;
-						AlignLaraPosition(&PolePosR, item, l);
-						l->animNumber = LA_JUMP_UP_TO_POLE;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
+						AlignLaraPosition(&PolePosR, poleItem, laraItem);
+						laraItem->Animation.AnimNumber = LA_JUMP_UP_TO_POLE;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					}
-					l->gravityStatus = false;
-					l->fallspeed = false;
-					l->currentAnimState = LS_POLE_IDLE;
-					Lara.gunStatus = LG_HANDS_BUSY;
-					item->pos.yRot = rot;
+
+					laraItem->Animation.ActiveState = LS_POLE_IDLE;
+					laraItem->Animation.VerticalVelocity = 0;
+					laraItem->Animation.Airborne = false;
+					laraInfo->Control.HandStatus = HandStatus::Busy;
+					poleItem->Pose.Orientation.y = rot;
 				}
 			}
 		}
 		else
 		{
-			if (!isLara || 
-				((l->currentAnimState < LS_POLE_IDLE || l->currentAnimState > LS_POLE_TURN_COUNTER_CLOCKWISE) && l->currentAnimState != LS_JUMP_BACK))
-				ObjectCollision(itemNumber, l, coll);
+			if (!isLara || ((laraItem->Animation.ActiveState < LS_POLE_IDLE ||
+				laraItem->Animation.ActiveState > LS_POLE_TURN_COUNTER_CLOCKWISE) &&
+					laraItem->Animation.ActiveState != LS_JUMP_BACK))
+			{
+				ObjectCollision(itemNumber, laraItem, coll);
+			}
 		}
 	}
 }
