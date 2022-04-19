@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseDoberman(short itemNum);
+void InitialiseDoberman(short itemNumber);
 void DobermanControl(short itemNumber);

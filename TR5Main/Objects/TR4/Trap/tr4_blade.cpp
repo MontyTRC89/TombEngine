@@ -10,48 +10,50 @@
 
 namespace TEN::Entities::TR4
 {
-	void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void BladeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* bladeItem = &g_Level.Items[itemNumber];
 
-		if (item->status == ITEM_INVISIBLE)
+		if (bladeItem->Status == ITEM_INVISIBLE)
 			return;
 
-		if (item->itemFlags[3])
+		if (bladeItem->ItemFlags[3])
 		{
-			if (TestBoundsCollide(item, l, coll->Setup.Radius))
+			if (TestBoundsCollide(bladeItem, laraItem, coll->Setup.Radius))
 			{
-				int oldX = LaraItem->pos.xPos;
-				int oldY = LaraItem->pos.yPos;
-				int oldZ = LaraItem->pos.zPos;
+				int oldX = laraItem->Pose.Position.x;
+				int oldY = laraItem->Pose.Position.y;
+				int oldZ = laraItem->Pose.Position.z;
 
 				int dx = 0;
 				int dy = 0;
 				int dz = 0;
 
-				if (ItemPushItem(item, l, coll, 1, 1))
+				if (ItemPushItem(bladeItem, laraItem, coll, 1, 1))
 				{
-					LaraItem->hitPoints -= item->itemFlags[3];
+					laraItem->HitPoints -= bladeItem->ItemFlags[3];
 
-					dx = oldX - LaraItem->pos.xPos;
-					dy = oldY - LaraItem->pos.yPos;
-					dz = oldZ - LaraItem->pos.zPos;
+					dx = oldX - laraItem->Pose.Position.x;
+					dy = oldY - laraItem->Pose.Position.y;
+					dz = oldZ - laraItem->Pose.Position.z;
 
-					if ((dx || dy || dz) && TriggerActive(item))
+					if ((dx || dy || dz) && TriggerActive(bladeItem))
 					{
-						DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32,
-							l->pos.yPos - (GetRandomControl() & 0x1FF) - 256,
-							(GetRandomControl() & 0x3F) + l->pos.zPos - 32,
-							(GetRandomControl() & 3) + (item->itemFlags[3] / 32) + 2,
+						DoBloodSplat(
+							(GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
+							laraItem->Pose.Position.y - (GetRandomControl() & 0x1FF) - 256,
+							(GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32,
+							(GetRandomControl() & 3) + (bladeItem->ItemFlags[3] / 32) + 2,
 							2 * GetRandomControl(),
-							l->roomNumber);
+							laraItem->RoomNumber
+						);
 					}
 
 					if (!coll->Setup.EnableObjectPush)
 					{
-						LaraItem->pos.xPos += dx;
-						LaraItem->pos.yPos += dy;
-						LaraItem->pos.zPos += dz;
+						laraItem->Pose.Position.x += dx;
+						laraItem->Pose.Position.y += dy;
+						laraItem->Pose.Position.z += dz;
 					}
 				}
 			}

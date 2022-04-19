@@ -12,54 +12,51 @@
 
 namespace TEN::Entities::TR4
 {
-    void CogControl(short itemNum)
+    void CogControl(short itemNumber)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNum];
+        auto* item = &g_Level.Items[itemNumber];
 
         if (TriggerActive(item))
         {
-            item->status = ITEM_ACTIVE;
+            item->Status = ITEM_ACTIVE;
             AnimateItem(item);
 
-            if (item->triggerFlags == 666)
+            if (item->TriggerFlags == 666)
             {
-                PHD_VECTOR pos;
+                Vector3Int pos;
                 GetJointAbsPosition(item, &pos, 0);
                 SoundEffect(65, (PHD_3DPOS*)&pos, 0);
 
-                if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-                    item->flags &= 0xC1;
+                if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+                    item->Flags &= 0xC1;
             }
         }
-        else if (item->triggerFlags == 2)
-        {
-            item->status |= ITEM_INVISIBLE;
-        }
+        else if (item->TriggerFlags == 2)
+            item->Status |= ITEM_INVISIBLE;
     }
 
-    void CogCollision(__int16 itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+    void CogCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
     {
-        ITEM_INFO* item = &g_Level.Items[itemNumber];
+        auto* cogItem = &g_Level.Items[itemNumber];
         
-        if (item->status != ITEM_INVISIBLE)
+        if (cogItem->Status != ITEM_INVISIBLE)
         {
-            if (TestBoundsCollide(item, l, coll->Setup.Radius))
+            if (TestBoundsCollide(cogItem, laraItem, coll->Setup.Radius))
             {
-                if (TriggerActive(item))
+                if (TriggerActive(cogItem))
                 {
                     DoBloodSplat(
-                        (GetRandomControl() & 0x3F) + l->pos.xPos - 32, 
-                        (GetRandomControl() & 0x1F) + item->pos.yPos - 16, 
-                        (GetRandomControl() & 0x3F) + l->pos.zPos - 32, 
+                        (GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32, 
+                        (GetRandomControl() & 0x1F) + cogItem->Pose.Position.y - 16, 
+                        (GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32, 
                         (GetRandomControl() & 3) + 2, 
                         2 * GetRandomControl(),
-                        l->roomNumber);
-                    LaraItem->hitPoints -= 10;
+                        laraItem->RoomNumber);
+
+                    laraItem->HitPoints -= 10;
                 }
                 else if (coll->Setup.EnableObjectPush)
-                {
-                    ItemPushItem(item, l, coll, 0, 0);
-                }
+                    ItemPushItem(cogItem, laraItem, coll, 0, 0);
             }
         }
     }

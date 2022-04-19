@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseWorkerShotgun(short itemNum);
-void WorkerShotgunControl(short itemNum);
+void InitialiseWorkerShotgun(short itemNumber);
+void WorkerShotgunControl(short itemNumber);

@@ -1,3 +1,3 @@
 #pragma once
 
-void RatControl(short itemNum);
+void RatControl(short itemNumber);

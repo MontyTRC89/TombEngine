@@ -4,48 +4,47 @@
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/items.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/animation.h"
 
 void ControlSpikyCeiling(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
+	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
 	{
-		int y = item->pos.yPos + ((item->itemFlags[0] == 1) ? 10 : 5);
+		int y = item->Pose.Position.y + ((item->ItemFlags[0] == 1) ? 10 : 5);
+		auto probe = GetCollision(item->Pose.Position.x, y, item->Pose.Position.z, item->RoomNumber);
 
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, y, item->pos.zPos, &roomNumber);
-
-		if (GetFloorHeight(floor, item->pos.xPos, y, item->pos.zPos) < y + 1024)
+		if (probe.Position.Floor < (y + SECTOR(1)))
 		{
-			item->status = ITEM_DEACTIVATED;
+			item->Status = ITEM_DEACTIVATED;
 			StopSoundEffect(147);
 		}
 		else
 		{
-			item->pos.yPos = y;
+			item->Pose.Position.y = y;
 
-			if (roomNumber != item->roomNumber)
-				ItemNewRoom(itemNumber, roomNumber);
+			if (probe.RoomNumber != item->RoomNumber)
+				ItemNewRoom(itemNumber, probe.RoomNumber);
 
-			SoundEffect(147, &item->pos, 0);
+			SoundEffect(147, &item->Pose, 0);
 		}
 	}
 
-	if (item->touchBits)
+	if (item->TouchBits)
 	{
-		LaraItem->hitPoints -= 20;
-		LaraItem->hitStatus = true;
+		LaraItem->HitPoints -= 20;
+		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->pos.xPos, item->pos.yPos + 768, LaraItem->pos.zPos, 4, item->pos.yRot, LaraItem->roomNumber, 3);
-		item->touchBits = 0;
+		DoLotsOfBlood(LaraItem->Pose.Position.x, item->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
+		item->TouchBits = 0;
 
-		SoundEffect(56, &item->pos, 0);
+		SoundEffect(56, &item->Pose, 0);
 	}
 
-	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED && item->itemFlags[0] == 1)
+	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED && item->ItemFlags[0] == 1)
 		AnimateItem(item);
 }

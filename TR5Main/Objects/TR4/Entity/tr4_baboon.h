@@ -4,26 +4,25 @@
 
 struct BaboonRespawnStruct
 {
-    int id;
-    PHD_3DPOS pos;
-    int count;
-    int max_count; // used to limit the number of respawn !
+	int ID;
+	PHD_3DPOS Pos;
+	unsigned int Count;
+	unsigned int MaxCount;  // Used to limit the number of respawns.
 };
 
 class BaboonRespawnClass
 {
 private:
-    std::vector<BaboonRespawnStruct> baboonRespawnArray;
+	std::vector<BaboonRespawnStruct> baboonRespawnArray;
 public:
-    void Free(void);
-    void Add(ITEM_INFO* item, int max_count);
-    void Remove(int id);
-    int GetBaboonFreePlace(void);
-    BaboonRespawnStruct* GetBaboonRespawn(int id);
-    int GetCount(int id);
-    int GetCountMax(int id);
+	void Free(void);
+	void Add(ITEM_INFO* item, unsigned int maxCount);
+	void Remove(int ID);
+	int GetBaboonFreePlace(void);
+	BaboonRespawnStruct* GetBaboonRespawn(int ID);
+	int GetCount(int ID);
+	int GetCountMax(int ID);
 };
-
 
 extern BaboonRespawnClass BaboonRespawn;
 
