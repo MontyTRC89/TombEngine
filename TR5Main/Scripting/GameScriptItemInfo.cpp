@@ -40,7 +40,7 @@ GameScriptItemInfo::~GameScriptItemInfo() {
 	// todo.. see if there's a better default state than -1
 	if (m_temporary && (m_num > NO_ITEM))
 	{
-		s_callbackRemoveName(m_item->LuaName);
+		s_callbackRemoveName(m_item->luaName);
 		KillItem(m_num);
 	}
 }
@@ -73,9 +73,9 @@ takes no arguments.
 	@tparam Position position position in level
 	@tparam Rotation rotation rotation about x, y, and z axes
 	@tparam int room room ID item is in
-	@tparam int ActiveState current animation state
-	@tparam int RequiredState required animation state
-	@tparam int TargetState goal animation state
+	@tparam int currentAnimState current animation state
+	@tparam int requiredAnimState required animation state
+	@tparam int goalAnimState goal animation state
 	@tparam int animNumber anim number
 	@tparam int frameNumber frame number
 	@tparam int hp HP of item
@@ -93,9 +93,9 @@ takes no arguments.
 		Position.new(18907, 0, 21201),
 		Rotation.new(0,0,0),
 		0, -- room
-		0, -- ActiveState
-		0, -- RequiredState
-		0, -- TargetState
+		0, -- currentAnimState
+		0, -- requiredAnimState
+		0, -- goalAnimState
 		0, -- animNumber
 		0, -- frameNumber
 		0, -- HP
@@ -121,9 +121,9 @@ template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 	GameScriptPosition pos,
 	GameScriptRotation rot,
 	short room,
-	int ActiveState,
-	int RequiredState,
-	int TargetState,
+	int currentAnimState,
+	int requiredAnimState,
+	int goalAnimState,
 	int animNumber,
 	int frameNumber,
 	short hp,
@@ -146,9 +146,9 @@ template <bool temp> static std::unique_ptr<GameScriptItemInfo> Create(
 	InitialiseItem(num);
 
 	ptr->SetName(name);
-	ptr->SetCurrentAnimState(ActiveState);
-	ptr->SetRequiredAnimState(RequiredState);
-	ptr->SetGoalAnimState(TargetState);
+	ptr->SetCurrentAnimState(currentAnimState);
+	ptr->SetRequiredAnimState(requiredAnimState);
+	ptr->SetGoalAnimState(goalAnimState);
 	ptr->SetAnimNumber(animNumber);
 	ptr->SetFrameNumber(frameNumber);
 	ptr->SetHP(hp);
@@ -191,17 +191,17 @@ void GameScriptItemInfo::Register(sol::state* state)
 
 The state number of the animation the object is currently doing.
 This corresponds to "state" number shown in the animation editor of WadTool.
-@mem ActiveState
+@mem currentAnimState
 */
-		"ActiveState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
+		"currentAnimState", sol::property(&GameScriptItemInfo::GetCurrentAnimState, &GameScriptItemInfo::SetCurrentAnimState),
 
 /// (int) State of required animation
-// @mem RequiredState
-		"RequiredState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
+// @mem requiredAnimState
+		"requiredAnimState", sol::property(&GameScriptItemInfo::GetRequiredAnimState, &GameScriptItemInfo::SetRequiredAnimState),
 
 /// (int) State of goal animation
-// @mem TargetState
-		"TargetState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
+// @mem goalAnimState
+		"goalAnimState", sol::property(&GameScriptItemInfo::GetGoalAnimState, &GameScriptItemInfo::SetGoalAnimState),
 
 /*** (int) animation number
 
@@ -277,16 +277,16 @@ the WadTool animation editor.
 
 void GameScriptItemInfo::Init()
 {
-	bool cond = IsPointInRoom(m_item->Pose, m_item->RoomNumber);
+	bool cond = IsPointInRoom(m_item->pos, m_item->roomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
-	if (!ScriptAssertF(cond, err, m_item->LuaName))
+	if (!ScriptAssertF(cond, err, m_item->luaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
-		PHD_3DPOS center = GetRoomCenter(m_item->RoomNumber);
+		PHD_3DPOS center = GetRoomCenter(m_item->roomNumber);
 		// reset position but not rotation
-		m_item->Pose.Position.x = center.Position.x;
-		m_item->Pose.Position.y = center.Position.y;
-		m_item->Pose.Position.z = center.Position.z;
+		m_item->pos.xPos = center.xPos;
+		m_item->pos.yPos = center.yPos;
+		m_item->pos.zPos = center.zPos;
 	}
 	InitialiseItem(m_num);
 	m_initialised = true;
@@ -294,18 +294,18 @@ void GameScriptItemInfo::Init()
 
 GAME_OBJECT_ID GameScriptItemInfo::GetObjectID() const
 {
-	return m_item->ObjectNumber;
+	return m_item->objectNumber;
 }
 
 void GameScriptItemInfo::SetObjectID(GAME_OBJECT_ID item) 
 {
-	m_item->ObjectNumber = item;
+	m_item->objectNumber = item;
 }
 
 
 std::string GameScriptItemInfo::GetName() const
 {
-	return m_item->LuaName;
+	return m_item->luaName;
 }
 
 void GameScriptItemInfo::SetName(std::string const & id) 
@@ -313,25 +313,25 @@ void GameScriptItemInfo::SetName(std::string const & id)
 	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 
 	// remove the old name if we have one
-	s_callbackRemoveName(m_item->LuaName);
+	s_callbackRemoveName(m_item->luaName);
 
 	// un-register any other objects using this name.
 	// maybe we should throw an error if another object
 	// already uses the name...
 	s_callbackRemoveName(id);
-	m_item->LuaName = id;
+	m_item->luaName = id;
 	// todo add error checking
 	s_callbackSetName(id, m_num);
 }
 
 GameScriptPosition GameScriptItemInfo::GetPos() const
 {
-	return GameScriptPosition(	m_item->Pose	);
+	return GameScriptPosition(	m_item->pos	);
 }
 
 void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
 {
-	pos.StoreInPHDPos(m_item->Pose);
+	pos.StoreInPHDPos(m_item->pos);
 }
 
 // This does not guarantee that the returned value will be identical
@@ -340,27 +340,27 @@ void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 GameScriptRotation GameScriptItemInfo::GetRot() const
 {
-	return GameScriptRotation(	int(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
-								int(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
-								int(TO_DEGREES(m_item->Pose.Orientation.z)) % 360);
+	return GameScriptRotation(	int(TO_DEGREES(m_item->pos.xRot)) % 360,
+								int(TO_DEGREES(m_item->pos.yRot)) % 360,
+								int(TO_DEGREES(m_item->pos.zRot)) % 360);
 }
 
 void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 {
-	m_item->Pose.Orientation.x = FROM_DEGREES(rot.x);
-	m_item->Pose.Orientation.y = FROM_DEGREES(rot.y);
-	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
+	m_item->pos.xRot = FROM_DEGREES(rot.x);
+	m_item->pos.yRot = FROM_DEGREES(rot.y);
+	m_item->pos.zRot = FROM_DEGREES(rot.z);
 }
 
 short GameScriptItemInfo::GetHP() const
 {
-	return(m_item->HitPoints);
+	return(m_item->hitPoints);
 }
 
 void GameScriptItemInfo::SetHP(short hp)
 {
-	if(Objects[m_item->ObjectNumber].intelligent &&
-		(hp < 0 || hp > Objects[m_item->ObjectNumber].HitPoints))
+	if(Objects[m_item->objectNumber].intelligent &&
+		(hp < 0 || hp > Objects[m_item->objectNumber].hitPoints))
 	{
 		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
 		if (hp < 0)
@@ -368,141 +368,146 @@ void GameScriptItemInfo::SetHP(short hp)
 			hp = 0;
 			ScriptWarn("Setting HP to 0.");
 		}
-		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
+		else if (hp > Objects[m_item->objectNumber].hitPoints)
 		{
-			hp = Objects[m_item->ObjectNumber].HitPoints;
+			hp = Objects[m_item->objectNumber].hitPoints;
 			ScriptWarn("Setting HP to default value (" + std::to_string(hp) + ")");
 		}
 	}
 
-	m_item->HitPoints = hp;
+	m_item->hitPoints = hp;
 }
 
 short GameScriptItemInfo::GetOCB() const
 {
-	return m_item->TriggerFlags;
+	return m_item->triggerFlags;
 }
 
 void GameScriptItemInfo::SetOCB(short ocb)
 {
-	m_item->TriggerFlags = ocb;
+	m_item->triggerFlags = ocb;
 }
 
 byte GameScriptItemInfo::GetAIBits() const
 {
-	return m_item->AIBits;
+	return m_item->aiBits;
 }
 
 void GameScriptItemInfo::SetAIBits(byte bits)
 {
-	m_item->AIBits = bits;
+	m_item->aiBits = bits;
 }
 
 sol::as_table_t<std::array<short, 8>> GameScriptItemInfo::GetItemFlags() const
 {	
 	std::array<short, 8> ret{};
-	memcpy(ret.data(), m_item->ItemFlags, sizeof(m_item->ItemFlags));
+	memcpy(ret.data(), m_item->itemFlags, sizeof(m_item->itemFlags));
 	return ret;
 }
 
 void GameScriptItemInfo::SetItemFlags(sol::as_table_t<std::array<short, 8>> const& arr)
 {	
-	memcpy(m_item->ItemFlags, arr.value().data(), sizeof(m_item->ItemFlags));
+	memcpy(m_item->itemFlags, arr.value().data(), sizeof(m_item->itemFlags));
 }
 
 int GameScriptItemInfo::GetCurrentAnimState() const
 {
-	return m_item->Animation.ActiveState;
+	return m_item->currentAnimState;
 }
 
 void GameScriptItemInfo::SetCurrentAnimState(int animState)
 {
-	m_item->Animation.ActiveState = animState;
+	m_item->currentAnimState = animState;
 }
 
 int GameScriptItemInfo::GetRequiredAnimState() const
 {
-	return m_item->Animation.RequiredState;
+	return m_item->requiredAnimState;
 }
 
 void GameScriptItemInfo::SetRequiredAnimState(short animState)
 {
-	m_item->Animation.RequiredState = animState;
+	m_item->requiredAnimState = animState;
 }
 
 int GameScriptItemInfo::GetGoalAnimState() const
 {
-	return m_item->Animation.TargetState;
+	return m_item->goalAnimState;
 }
 
 void GameScriptItemInfo::SetGoalAnimState(int state)
 {
-	m_item->Animation.TargetState = state;
+	m_item->goalAnimState = state;
 }
 
 int GameScriptItemInfo::GetAnimNumber() const
 {
-	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
+	return m_item->animNumber - Objects[m_item->objectNumber].animIndex;
 }
 
 void GameScriptItemInfo::SetAnimNumber(int animNumber)
 {
 	//TODO fixme: we need bounds checking with an error message once it's in the level file format
-	m_item->Animation.AnimNumber = animNumber +  Objects[m_item->ObjectNumber].animIndex;
+	m_item->animNumber = animNumber +  Objects[m_item->objectNumber].animIndex;
 }
 
 int GameScriptItemInfo::GetFrameNumber() const
 {
-	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	return m_item->frameNumber - g_Level.Anims[m_item->animNumber].frameBase;
 }
+
 
 void GameScriptItemInfo::SetFrameNumber(int frameNumber)
 {
-	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
-	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
+	auto const fBase = g_Level.Anims[m_item->animNumber].frameBase;
+	auto const fEnd = g_Level.Anims[m_item->animNumber].frameEnd;
 	auto frameCount = fEnd - fBase;
 	bool cond = (frameNumber < frameCount);
 	const char* err = "Invalid frame number {}; max frame count for anim {} is {}.";
-
-	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount))
-		m_item->Animation.FrameNumber = frameNumber + fBase;
+	if (ScriptAssertF(cond, err, frameNumber, m_item->animNumber, frameCount))
+	{
+		m_item->frameNumber = frameNumber + fBase;
+	}
 	else
+	{
 		ScriptWarn("Not setting frame number.");
+	}
 }
+
 
 short GameScriptItemInfo::GetStatus() const
 {
-	return m_item->Status;
+	return m_item->status;
 }
 
 void GameScriptItemInfo::SetStatus(short status)
 {
-	m_item->Status = status;
+	m_item->status = status;
 }
 
 bool GameScriptItemInfo::GetActive() const
 {
-	return m_item->Active;
+	return m_item->active;
 }
 
 void GameScriptItemInfo::SetActive(bool active)
 {
-	m_item->Active = active;
+	m_item->active = active;
 }
 
 bool GameScriptItemInfo::GetHitStatus() const
 {
-	return m_item->HitStatus;
+	return m_item->hitStatus;
 }
 
 void GameScriptItemInfo::SetHitStatus(bool hitStatus)
 {
-	m_item->HitStatus = hitStatus;
+	m_item->hitStatus = hitStatus;
 }
 
 short GameScriptItemInfo::GetRoom() const
 {
-	return m_item->RoomNumber;
+	return m_item->roomNumber;
 }
 
 void GameScriptItemInfo::SetRoom(short room)
@@ -516,62 +521,62 @@ void GameScriptItemInfo::SetRoom(short room)
 	}
 
 	if (!m_initialised)
-		m_item->RoomNumber = room;
+		m_item->roomNumber = room;
 	else
 		ItemNewRoom(m_num, room);
 }
 
 void GameScriptItemInfo::EnableItem()
 {
-	if (!m_item->Active)
+	if (!m_item->active)
 	{
-		if (Objects[m_item->ObjectNumber].intelligent)
+		if (Objects[m_item->objectNumber].intelligent)
 		{
-			if (m_item->Status == ITEM_DEACTIVATED)
+			if (m_item->status == ITEM_DEACTIVATED)
 			{
-				m_item->TouchBits = 0;
-				m_item->Status = ITEM_ACTIVE;
+				m_item->touchBits = 0;
+				m_item->status = ITEM_ACTIVE;
 				AddActiveItem(m_num);
 				EnableBaddieAI(m_num, 1);
 			}
-			else if (m_item->Status == ITEM_INVISIBLE)
+			else if (m_item->status == ITEM_INVISIBLE)
 			{
-				m_item->TouchBits = 0;
+				m_item->touchBits = 0;
 				if (EnableBaddieAI(m_num, 0))
-					m_item->Status = ITEM_ACTIVE;
+					m_item->status = ITEM_ACTIVE;
 				else
-					m_item->Status = ITEM_INVISIBLE;
+					m_item->status = ITEM_INVISIBLE;
 				AddActiveItem(m_num);
 			}
 		}
 		else
 		{
-			m_item->TouchBits = 0;
+			m_item->touchBits = 0;
 			AddActiveItem(m_num);
-			m_item->Status = ITEM_ACTIVE;
+			m_item->status = ITEM_ACTIVE;
 		}
 	}
 }
 
 void GameScriptItemInfo::DisableItem()
 {
-	if (m_item->Active)
+	if (m_item->active)
 	{
-		if (Objects[m_item->ObjectNumber].intelligent)
+		if (Objects[m_item->objectNumber].intelligent)
 		{
-			if (m_item->Status == ITEM_ACTIVE)
+			if (m_item->status == ITEM_ACTIVE)
 			{
-				m_item->TouchBits = 0;
-				m_item->Status = ITEM_DEACTIVATED;
+				m_item->touchBits = 0;
+				m_item->status = ITEM_DEACTIVATED;
 				RemoveActiveItem(m_num);
-				DisableEntityAI(m_num);
+				DisableBaddieAI(m_num);
 			}
 		}
 		else
 		{
-			m_item->TouchBits = 0;
+			m_item->touchBits = 0;
 			RemoveActiveItem(m_num);
-			m_item->Status = ITEM_DEACTIVATED;
+			m_item->status = ITEM_DEACTIVATED;
 		}
 	}
 }

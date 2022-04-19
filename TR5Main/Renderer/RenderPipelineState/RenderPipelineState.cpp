@@ -1,19 +1,14 @@
 #include "framework.h"
 #include "RenderPipelineState.h"
-
 #include "Utils.h"
-
-namespace TEN::Renderer
-{
+namespace TEN::Renderer {
 	using namespace Utils;
-
 	RenderPipelineState::RenderPipelineState(ID3D11Device* device, const ShaderCompileOptions& vertexShader, const ShaderCompileOptions& pixelShader, const BlendStateOptions& blendingOptions)
 	{
 		ComPtr<ID3D10Blob> blob;
 		this->vertexShader = compileVertexShader(device, vertexShader.fileName.c_str(), vertexShader.functionName.c_str(), vertexShader.profile.c_str(),nullptr, blob);
 		this->pixelShader = compilePixelShader(device, pixelShader.fileName.c_str(), pixelShader.functionName.c_str(), pixelShader.profile.c_str(), nullptr, blob);
 		D3D11_BLEND_DESC blndDesc = {};
-		
 		blndDesc.IndependentBlendEnable = blendingOptions.blendingEnabled;
 		blndDesc.AlphaToCoverageEnable = false;
 		blndDesc.RenderTarget[0].BlendEnable = blendingOptions.blendingEnabled;
@@ -26,3 +21,4 @@ namespace TEN::Renderer
 		device->CreateBlendState(&blndDesc, this->blendState.GetAddressOf());
 	}
 }
+

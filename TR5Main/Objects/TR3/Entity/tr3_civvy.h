@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseCivvy(short itemNumber);
-void CivvyControl(short itemNumber);
+void InitialiseCivvy(short item_number);
+void CivvyControl(short item_number);

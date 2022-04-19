@@ -1,8 +1,6 @@
 #pragma once
-
-struct LaserHeadInfo
-{
-	short BaseItem;
-	short Tentacles[8];
-	short PuzzleItem;
+struct LASER_HEAD_INFO {
+	short baseItem;
+	short tentacles[8];
+	short puzzleItem;
 };

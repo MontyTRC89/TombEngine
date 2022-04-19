@@ -15,25 +15,26 @@ using namespace TEN::Effects::Lightning;
 
 void InitialiseObelisk(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item;
+	ITEM_INFO* item2;
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-
+	item = &g_Level.Items[itemNumber];
+	item->animNumber = Objects[item->objectNumber].animIndex + 3;;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 	AddActiveItem(itemNumber);
-	item->Status = ITEM_ACTIVE;
+	item->status = ITEM_ACTIVE;
 
-	if (item->TriggerFlags == 2)
+	if (item->triggerFlags == 2)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			auto* currentItem = &g_Level.Items[i];
+			item2 = &g_Level.Items[i];
 
-			if (currentItem->ObjectNumber == ID_OBELISK)
-				item->ItemFlags[0]++;
+			if (item2->objectNumber == ID_OBELISK)
+				item->itemFlags[0]++;
 
-			if (currentItem->ObjectNumber == ID_ANIMATING3)
-				item->ItemFlags[2] = i;
+			if (item2->objectNumber == ID_ANIMATING3)
+				item->itemFlags[2] = i;
 		}
 	}
 
@@ -41,18 +42,17 @@ void InitialiseObelisk(short itemNumber)
 
 void ObeliskControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
-
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	short someNumber;
 	PHD_3DPOS pos;
 	PHD_3DPOS pos2;
 
 	if (TriggerActive(item))
 	{
-		if (item->ItemFlags[3] > 346)
+		if (item->itemFlags[3] > 346)
 			return;
 
-		item->ItemFlags[3]++;
+		item->itemFlags[3]++;
 
 		byte r = (GetRandomControl() & 0x1F) + 224;
 		byte g = r - (GetRandomControl() & 0x1F) - 32;
@@ -63,34 +63,34 @@ void ObeliskControl(short itemNumber)
 			someNumber = 8192;
 			if (GetRandomControl() & 1)
 			{
-				if (item->ItemFlags[3] < 256 
+				if (item->itemFlags[3] < 256 
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Pose, 0);
+					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->pos, 0);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
-				pos.Position.x = item->Pose.Position.x + (3456 * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f)));
-				pos.Position.y = item->Pose.Position.y - CLICK(1);
-				pos.Position.z = item->Pose.Position.z + (3456 * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f)));
+				pos.xPos = item->pos.xPos + (3456 * phd_sin(item->pos.yRot + ANGLE(90)));
+				pos.yPos = item->pos.yPos - 256;
+				pos.zPos = item->pos.zPos + (3456 * phd_cos(item->pos.yRot + ANGLE(90)));
 
-				pos2.Position.x = item->Pose.Position.x + (someNumber * phd_sin(item->Pose.Orientation.y + ANGLE(90.0f)));
-				pos2.Position.y = item->Pose.Position.y;
-				pos2.Position.x = item->Pose.Position.z + (someNumber * phd_cos(item->Pose.Orientation.z + ANGLE(90.0f)));
+				pos2.xPos = item->pos.xPos + (someNumber * phd_sin(item->pos.yRot + ANGLE(90)));
+				pos2.yPos = item->pos.yPos;
+				pos2.xPos = item->pos.zPos + (someNumber * phd_cos(item->pos.zRot + ANGLE(90)));
 
-				if (abs(pos.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos.Position.z - LaraItem->Pose.Position.z) < SECTOR(20) &&
-					abs(pos2.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos2.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos2.Position.z - LaraItem->Pose.Position.z) < SECTOR(20))
+				if (abs(pos.xPos - LaraItem->pos.xPos) < SECTOR(20)
+					&& abs(pos.yPos - LaraItem->pos.yPos) < SECTOR(20)
+					&& abs(pos.zPos - LaraItem->pos.zPos) < SECTOR(20)
+					&& abs(pos2.xPos - LaraItem->pos.xPos) < SECTOR(20)
+					&& abs(pos2.yPos - LaraItem->pos.yPos) < SECTOR(20)
+					&& abs(pos2.zPos - LaraItem->pos.zPos) < SECTOR(20))
 				{
 					if (!(GlobalCounter & 3))
 					{
 						TriggerLightning(
-							(Vector3Int*)&pos,
-							(Vector3Int*)&pos2,
+							(PHD_VECTOR*)&pos,
+							(PHD_VECTOR*)&pos2,
 							(GetRandomControl() & 0x1F) + 32,
 							r,
 							g,
@@ -101,52 +101,52 @@ void ObeliskControl(short itemNumber)
 							5);
 					}
 
-					TriggerLightningGlow(pos.Position.x, pos.Position.y, pos.Position.z, 48, r, g, b);
+					TriggerLightningGlow(pos.xPos, pos.yPos, pos.zPos, 48, r, g, b);
 				}
 			}
 		}
 
-		if (item->ItemFlags[3] >= 256 && item->TriggerFlags == 2)
+		if (item->itemFlags[3] >= 256 && item->triggerFlags == 2)
 		{
-			pos.Position.x = item->Pose.Position.x + SECTOR(8) * phd_sin(item->Pose.Orientation.y);
-			pos.Position.y = item->Pose.Position.y;
-			pos.Position.z = item->Pose.Position.z + SECTOR(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
+			pos.xPos = item->pos.xPos + 8192 * phd_sin(item->pos.yRot);
+			pos.yPos = item->pos.yPos;
+			pos.zPos = item->pos.zPos + 8192 * phd_cos(item->pos.yRot + ANGLE(90));
 
 			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos, 0);
 
 			if (GlobalCounter & 1)
 			{
-				pos2.Position.x = (GetRandomControl() & 0x3FF) + pos.Position.x - 512;
-				pos2.Position.y = (GetRandomControl() & 0x3FF) + pos.Position.y - 512;
-				pos2.Position.z = (GetRandomControl() & 0x3FF) + pos.Position.z - 512;
+				pos2.xPos = (GetRandomControl() & 0x3FF) + pos.xPos - 512;
+				pos2.yPos = (GetRandomControl() & 0x3FF) + pos.yPos - 512;
+				pos2.zPos = (GetRandomControl() & 0x3FF) + pos.zPos - 512;
 
-				if (abs(pos.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos.Position.z - LaraItem->Pose.Position.z) < SECTOR(20) &&
-					abs(pos2.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
-					abs(pos2.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
-					abs(pos2.Position.z - LaraItem->Pose.Position.z) < SECTOR(20))
+				if (abs(pos.xPos - LaraItem->pos.xPos) < SECTOR(20)
+					&& abs(pos.yPos - LaraItem->pos.yPos) < SECTOR(20)
+					&& abs(pos.zPos - LaraItem->pos.zPos) < SECTOR(20)
+					&& abs(pos2.xPos - LaraItem->pos.xPos) < SECTOR(20)
+					&& abs(pos2.yPos - LaraItem->pos.yPos) < SECTOR(20)
+					&& abs(pos2.zPos - LaraItem->pos.zPos) < SECTOR(20))
 				{
-					if (item->ItemFlags[2] != NO_ITEM)
+					if (item->itemFlags[2] != NO_ITEM)
 					{
-						auto* item2 = &g_Level.Items[item->ItemFlags[2]];
+						ITEM_INFO* item2 = &g_Level.Items[item->itemFlags[2]];
 						ExplodeItemNode(item2, 0, 0, 128);
-						KillItem(item->ItemFlags[2]);
+						KillItem(item->itemFlags[2]);
 
-						TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -2, 0, item2->RoomNumber);
-						TriggerExplosionSparks(pos.Position.x, pos.Position.y, pos.Position.z, 3, -1, 0, item2->RoomNumber);
+						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -2, 0, item2->roomNumber);
+						TriggerExplosionSparks(pos.xPos, pos.yPos, pos.zPos, 3, -1, 0, item2->roomNumber);
 
-						item->ItemFlags[2] = NO_ITEM;
+						item->itemFlags[2] = NO_ITEM;
 						item2 = FindItem(ID_PUZZLE_ITEM1_COMBO1);
-						item2->Status = ITEM_NOT_ACTIVE;
+						item2->status = ITEM_NOT_ACTIVE;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &item2->Pose, 0);
-						SoundEffect(SFX_TR4_EXPLOSION2, &item2->Pose, 0);
+						SoundEffect(SFX_TR4_EXPLOSION1, &item2->pos, 0);
+						SoundEffect(SFX_TR4_EXPLOSION2, &item2->pos, 0);
 					}
 
 					TriggerLightning(
-						(Vector3Int*)&pos,
-						(Vector3Int*)&pos2,
+						(PHD_VECTOR*)&pos,
+						(PHD_VECTOR*)&pos2,
 						(GetRandomControl() & 0xF) + 16,
 						r,
 						g,
@@ -163,58 +163,57 @@ void ObeliskControl(short itemNumber)
 	{	
 		AnimateItem(item);
 
-		auto* obj = &Objects[item->ObjectNumber];
+		OBJECT_INFO* obj = &Objects[item->objectNumber];
 		bool flag = false;
 
-		if (item->Animation.AnimNumber == obj->animIndex + 2)
+		if (item->animNumber == obj->animIndex + 2)
 		{
-			item->Pose.Orientation.y -= ANGLE(90.0f);
-
+			item->pos.yRot -= ANGLE(90);
 			if (TrInput & IN_ACTION)
 			{
-				item->Animation.AnimNumber = obj->animIndex + 1;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->animNumber = obj->animIndex + 1;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 			else
+			{
 				flag = true;
+			}
 		}
 
-		if (item->Animation.AnimNumber == obj->animIndex + 6)
+		if (item->animNumber == obj->animIndex + 6)
 		{
-			item->Pose.Orientation.y += ANGLE(90.0f);
-
+			item->pos.yRot += ANGLE(90);
 			if (!(TrInput & IN_ACTION))
 			{
-				item->Animation.AnimNumber = obj->animIndex + 3;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->animNumber = obj->animIndex + 3;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				flag = false;
 			}
 			else
 			{
-				item->Animation.AnimNumber = obj->animIndex + 5;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->animNumber = obj->animIndex + 5;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
 
 		if (flag)
 		{
-			item->Animation.AnimNumber = obj->animIndex + 3;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->animNumber = obj->animIndex + 3;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		}
 
-		if (item->TriggerFlags == 2)
+		if (item->triggerFlags == 2)
 		{
 			for (int i = 0; i < g_Level.Items.size(); i++)
 			{
-				auto* currentItem = &g_Level.Items[i];
+				ITEM_INFO* currentItem = &g_Level.Items[i];
 
-				if (currentItem->ObjectNumber == ID_PULLEY)
+				if (currentItem->objectNumber == ID_PULLEY)
 				{
-					currentItem->ItemFlags[1] =
-						(item->Pose.Orientation.y != -ANGLE(90.0f) ||
-							g_Level.Items[item->ItemFlags[0]].Pose.Orientation.y != ANGLE(90.0f) ||
-							g_Level.Items[item->ItemFlags[1]].Pose.Orientation.y != 0 ? 0 : 1) ^ 1;
-
+					currentItem->itemFlags[1] =
+						(item->pos.yRot != -ANGLE(90)
+							|| g_Level.Items[item->itemFlags[0]].pos.yRot != ANGLE(90)
+							|| g_Level.Items[item->itemFlags[1]].pos.yRot != 0 ? 0 : 1) ^ 1;
 					break;
 				}
 			}

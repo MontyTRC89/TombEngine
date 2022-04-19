@@ -3,7 +3,6 @@
 #include "Game/control/control.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
 #include "Game/pickup/pickup.h"
@@ -18,86 +17,90 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		0, 0,
 		-512, 512,
-		-ANGLE(10.0f), ANGLE(10.0f),
-		-ANGLE(30.0f), ANGLE(30.0f),
-		-ANGLE(10.0f), ANGLE(10.0f)
+		-ANGLE(10), ANGLE(10),
+		-ANGLE(30), ANGLE(30),
+		-ANGLE(10), ANGLE(10)
 	};
 
-	Vector3Int PulleyPos = { 0, 0, -148 }; 
+	PHD_VECTOR PulleyPos = { 0, 0, -148 }; 
 
 	void InitialisePulleySwitch(short itemNumber)
 	{
-		auto* switchItem = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		switchItem->ItemFlags[3] = switchItem->TriggerFlags;
-		switchItem->TriggerFlags = abs(switchItem->TriggerFlags);
+		item->itemFlags[3] = item->triggerFlags;
+		item->triggerFlags = abs(item->triggerFlags);
 
-		if (switchItem->Status == ITEM_INVISIBLE)
+		if (item->status == ITEM_INVISIBLE)
 		{
-			switchItem->ItemFlags[1] = 1;
-			switchItem->Status = ITEM_NOT_ACTIVE;
+			item->itemFlags[1] = 1;
+			item->status = ITEM_NOT_ACTIVE;
 		}
 	}
 
-	void PulleySwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void PulleySwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
-		auto* switchItem = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
-		if (TrInput & IN_ACTION &&
-			laraItem->Animation.ActiveState == LS_IDLE &&
-			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			laraItem->Animation.Airborne == false &&
-			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+		if ((TrInput & IN_ACTION)
+			&& Lara.gunStatus == LG_HANDS_FREE
+			&& l->currentAnimState == LS_IDLE
+			&& l->animNumber == LA_STAND_IDLE
+			&& l->gravityStatus == false
+			|| Lara.isMoving && Lara.interactedItem == itemNum)
 		{
-			short oldYrot = switchItem->Pose.Orientation.y;
-			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(&PulleyBounds, switchItem, laraItem))
+			short oldYrot = item->pos.yRot;
+			item->pos.yRot = l->pos.yRot;
+			if (TestLaraPosition(&PulleyBounds, item, l))
 			{
-				if (switchItem->ItemFlags[1])
+				if (item->itemFlags[1])
 				{
-					if (OldPickupPos.x != laraItem->Pose.Position.x || OldPickupPos.y != laraItem->Pose.Position.y || OldPickupPos.z != laraItem->Pose.Position.z)
+					if (OldPickupPos.x != l->pos.xPos || OldPickupPos.y != l->pos.yPos || OldPickupPos.z != l->pos.zPos)
 					{
-						OldPickupPos.x = laraItem->Pose.Position.x;
-						OldPickupPos.y = laraItem->Pose.Position.y;
-						OldPickupPos.z = laraItem->Pose.Position.z;
+						OldPickupPos.x = l->pos.xPos;
+						OldPickupPos.y = l->pos.yPos;
+						OldPickupPos.z = l->pos.zPos;
 						SayNo();
 					}
 				}
-				else if (MoveLaraPosition(&PulleyPos, switchItem, laraItem))
+				else if (MoveLaraPosition(&PulleyPos, item, l))
 				{
-					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
-					laraItem->Animation.ActiveState = LS_PULLEY;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+					l->animNumber = LA_PULLEY_GRAB;
+					l->currentAnimState = LS_PULLEY;
+					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
 
-					AddActiveItem(itemNumber);
+					AddActiveItem(itemNum);
 
-					switchItem->Pose.Orientation.y = oldYrot;
-					switchItem->Status = ITEM_ACTIVE;
+					item->pos.yRot = oldYrot;
+					item->status = ITEM_ACTIVE;
 
-					laraInfo->Control.IsMoving = false;
-					ResetLaraFlex(laraItem);
-					laraInfo->Control.HandStatus = HandStatus::Busy;
-					laraInfo->InteractedItem = itemNumber;
+					Lara.isMoving = false;
+					Lara.headYrot = 0;
+					Lara.headXrot = 0;
+					Lara.torsoYrot = 0;
+					Lara.torsoXrot = 0;
+					Lara.gunStatus = LG_HANDS_BUSY;
+					Lara.interactedItem = itemNum;
 				}
 				else
-					laraInfo->InteractedItem = itemNumber;
-				
-				switchItem->Pose.Orientation.y = oldYrot;
+				{
+					Lara.interactedItem = itemNum;
+				}
+				item->pos.yRot = oldYrot;
 			}
 			else
 			{
-				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+				if (Lara.isMoving && Lara.interactedItem == itemNum)
 				{
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Free;
+					Lara.isMoving = false;
+					Lara.gunStatus = LG_HANDS_FREE;
 				}
-
-				switchItem->Pose.Orientation.y = oldYrot;
+				item->pos.yRot = oldYrot;
 			}
 		}
-		else if (laraItem->Animation.ActiveState != LS_PULLEY)
-			ObjectCollision(itemNumber, laraItem, coll);
+		else if (l->currentAnimState != LS_PULLEY)
+		{
+			ObjectCollision(itemNum, l, coll);
+		}
 	}
 }

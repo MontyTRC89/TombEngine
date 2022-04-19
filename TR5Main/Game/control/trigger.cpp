@@ -9,7 +9,6 @@
 #include "Game/effects/lara_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
-#include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
@@ -29,27 +28,28 @@ int TriggerActive(ITEM_INFO* item)
 {
 	int flag;
 
-	flag = (~item->Flags & IFLAG_REVERSE) >> 14;
-	if ((item->Flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+	flag = (~item->flags & IFLAG_REVERSE) >> 14;
+	if ((item->flags & IFLAG_ACTIVATION_MASK) != IFLAG_ACTIVATION_MASK)
+	{
 		flag = !flag;
+	}
 	else
 	{
-		if (item->Timer)
+		if (item->timer)
 		{
-			if (item->Timer > 0)
+			if (item->timer > 0)
 			{
-				--item->Timer;
-				if (!item->Timer)
-					item->Timer = -1;
+				--item->timer;
+				if (!item->timer)
+					item->timer = -1;
 			}
-			else if (item->Timer < -1)
+			else if (item->timer < -1)
 			{
-				++item->Timer;
-				if (item->Timer == -1)
-					item->Timer = 0;
+				++item->timer;
+				if (item->timer == -1)
+					item->timer = 0;
 			}
-
-			if (item->Timer <= -1)
+			if (item->timer <= -1)
 				flag = !flag;
 		}
 	}
@@ -113,41 +113,40 @@ int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch)
 	return 0;
 }
 
-int SwitchTrigger(short itemNumber, short timer)
+int SwitchTrigger(short itemNum, short timer)
 {
-	auto* item = &g_Level.Items[itemNumber];
-
-	if (item->Status == ITEM_DEACTIVATED)
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	if (item->status == ITEM_DEACTIVATED)
 	{
-		if ((!item->Animation.ActiveState && item->ObjectNumber != ID_JUMP_SWITCH || item->Animation.ActiveState == 1 && item->ObjectNumber == ID_JUMP_SWITCH) && timer > 0)
+		if ((!item->currentAnimState && item->objectNumber != ID_JUMP_SWITCH || item->currentAnimState == 1 && item->objectNumber == ID_JUMP_SWITCH) && timer > 0)
 		{
-			item->Timer = timer;
-			item->Status = ITEM_ACTIVE;
+			item->timer = timer;
+			item->status = ITEM_ACTIVE;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->timer = 30 * timer;
 			return 1;
 		}
-		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
+		if (item->triggerFlags != 6 || item->currentAnimState)
 		{
-			RemoveActiveItem(itemNumber);
+			RemoveActiveItem(itemNum);
 
-			item->Status = ITEM_NOT_ACTIVE;
-			if (!item->ItemFlags[0] == 0)
-				item->Flags |= ONESHOT;
-			if (item->Animation.ActiveState != 1)
+			item->status = ITEM_NOT_ACTIVE;
+			if (!item->itemFlags[0] == 0)
+				item->flags |= ONESHOT;
+			if (item->currentAnimState != 1)
 				return 1;
-			if (item->TriggerFlags != 5 && item->TriggerFlags != 6)
+			if (item->triggerFlags != 5 && item->triggerFlags != 6)
 				return 1;
 		}
 		else
 		{
-			item->Status = ITEM_ACTIVE;
+			item->status = ITEM_ACTIVE;
 			return 1;
 		}
 	}
-	else if (item->Status)
+	else if (item->status)
 	{
-		return (item->Flags & ONESHOT) >> 8;
+		return (item->flags & ONESHOT) >> 8;
 	}
 	else
 	{
@@ -162,13 +161,13 @@ int KeyTrigger(short itemNum)
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 	int oldkey;
 
-	if ((item->Status != ITEM_ACTIVE || Lara.Control.HandStatus == HandStatus::Busy) && (!KeyTriggerActive || Lara.Control.HandStatus != HandStatus::Busy))
+	if ((item->status != ITEM_ACTIVE || Lara.gunStatus == LG_HANDS_BUSY) && (!KeyTriggerActive || Lara.gunStatus != LG_HANDS_BUSY))
 		return -1;
 
 	oldkey = KeyTriggerActive;
 
 	if (!oldkey)
-		item->Status = ITEM_DEACTIVATED;
+		item->status = ITEM_DEACTIVATED;
 
 	KeyTriggerActive = false;
 
@@ -179,10 +178,10 @@ int PickupTrigger(short itemNum)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	if (item->Flags & IFLAG_KILLED
-		|| (item->Status != ITEM_INVISIBLE
-			|| item->ItemFlags[3] != 1
-			|| item->TriggerFlags & 0x80))
+	if (item->flags & IFLAG_KILLED
+		|| (item->status != ITEM_INVISIBLE
+			|| item->itemFlags[3] != 1
+			|| item->triggerFlags & 0x80))
 	{
 		return 0;
 	}
@@ -212,13 +211,13 @@ void RefreshCamera(short type, short* data)
 			{
 				Camera.number = value;
 
-				if ((Camera.timer < 0) || (Camera.type == CameraType::Look) || (Camera.type == CameraType::Combat))
+				if ((Camera.timer < 0) || (Camera.type == CAMERA_TYPE::LOOK_CAMERA) || (Camera.type == CAMERA_TYPE::COMBAT_CAMERA))
 				{
 					Camera.timer = -1;
 					targetOk = 0;
 					break;
 				}
-				Camera.type = CameraType::Fixed;
+				Camera.type = CAMERA_TYPE::FIXED_CAMERA;
 				targetOk = 1;
 			}
 			else
@@ -226,7 +225,7 @@ void RefreshCamera(short type, short* data)
 			break;
 
 		case TO_TARGET:
-			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat)
+			if (Camera.type == CAMERA_TYPE::LOOK_CAMERA || Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
 				break;
 
 			Camera.item = &g_Level.Items[value];
@@ -235,7 +234,7 @@ void RefreshCamera(short type, short* data)
 	} while (!(trigger & END_BIT));
 
 	if (Camera.item)
-		if (!targetOk || (targetOk == 2 && Camera.item->LookedAt && Camera.item != Camera.lastItem))
+		if (!targetOk || (targetOk == 2 && Camera.item->lookedAt && Camera.item != Camera.lastItem))
 			Camera.item = NULL;
 
 	if (Camera.number == -1 && Camera.timer > 0)
@@ -244,7 +243,7 @@ void RefreshCamera(short type, short* data)
 
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 {
-	auto bottomBlock = GetCollision(x, y, z, floor->Room).BottomBlock; 
+	auto bottomBlock = GetCollisionResult(x, y, z, floor->Room).BottomBlock; 
 
 	if (bottomBlock->TriggerIndex == -1)
 		return nullptr;
@@ -254,9 +253,9 @@ short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 
 short* GetTriggerIndex(ITEM_INFO* item)
 {
-	auto roomNumber = item->RoomNumber;
-	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	auto roomNumber = item->roomNumber;
+	auto floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+	return GetTriggerIndex(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 }
 
 void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags)
@@ -281,7 +280,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 	short flags = *(data++);
 	short timer = flags & 0xFF;
 
-	if (Camera.type != CameraType::Heavy)
+	if (Camera.type != CAMERA_TYPE::HEAVY_CAMERA)
 		RefreshCamera(triggerType, data);
 
 	short value = 0;
@@ -324,61 +323,62 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			value = *(data++) & 0x3FF;
 
 			if (flags & ONESHOT)
-				g_Level.Items[value].ItemFlags[0] = 1;
+				g_Level.Items[value].itemFlags[0] = 1;
 
 			if (!SwitchTrigger(value, timer))
 				return;
 
-			objectNumber = g_Level.Items[value].ObjectNumber;
-			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].TriggerFlags == 5)
+			objectNumber = g_Level.Items[value].objectNumber;
+			if (objectNumber >= ID_SWITCH_TYPE1 && objectNumber <= ID_SWITCH_TYPE6 && g_Level.Items[value].triggerFlags == 5)
 				switchFlag = 1;
 
-			switchOff = (g_Level.Items[value].Animation.ActiveState == 1);
+			switchOff = (g_Level.Items[value].currentAnimState == 1);
 
 			break;
 
 		case TRIGGER_TYPES::MONKEY:
-			if (LaraItem->Animation.ActiveState >= LS_MONKEY_IDLE &&
-				(LaraItem->Animation.ActiveState <= LS_MONKEY_TURN_180 ||
-					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
-					LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
+			if (LaraItem->currentAnimState >= LS_MONKEYSWING_IDLE &&
+				(LaraItem->currentAnimState <= LS_MONKEYSWING_TURN_180 ||
+					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_LEFT ||
+					LaraItem->currentAnimState == LS_MONKEYSWING_TURN_RIGHT))
 				break;
 			return;
 
 		case TRIGGER_TYPES::TIGHTROPE_T:
-			if (LaraItem->Animation.ActiveState >= LS_TIGHTROPE_IDLE &&
-				LaraItem->Animation.ActiveState <= LS_TIGHTROPE_RECOVER_BALANCE &&
-				LaraItem->Animation.ActiveState != LS_DOVE_SWITCH)
+			if (LaraItem->currentAnimState >= LS_TIGHTROPE_IDLE &&
+				LaraItem->currentAnimState <= LS_TIGHTROPE_RECOVER_BALANCE &&
+				LaraItem->currentAnimState != LS_DOVESWITCH)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CRAWLDUCK_T:
-			if (LaraItem->Animation.ActiveState == LS_DOVE_SWITCH ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_IDLE ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
-				LaraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
-				LaraItem->Animation.ActiveState == LS_CROUCH_ROLL ||
-				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
-				LaraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT)
+			if (LaraItem->currentAnimState == LS_DOVESWITCH ||
+				LaraItem->currentAnimState == LS_CRAWL_IDLE ||
+				LaraItem->currentAnimState == LS_CRAWL_TURN_LEFT ||
+				LaraItem->currentAnimState == LS_CRAWL_TURN_RIGHT ||
+				LaraItem->currentAnimState == LS_CRAWL_BACK ||
+				LaraItem->currentAnimState == LS_CROUCH_IDLE ||
+				LaraItem->currentAnimState == LS_CROUCH_ROLL ||
+				LaraItem->currentAnimState == LS_CROUCH_TURN_LEFT ||
+				LaraItem->currentAnimState == LS_CROUCH_TURN_RIGHT)
 				break;
 			return;
 
 		case TRIGGER_TYPES::CLIMB_T:
-			if (LaraItem->Animation.ActiveState == LS_HANG ||
-				LaraItem->Animation.ActiveState == LS_LADDER_IDLE ||
-				LaraItem->Animation.ActiveState == LS_LADDER_UP ||
-				LaraItem->Animation.ActiveState == LS_LADDER_LEFT ||
-				LaraItem->Animation.ActiveState == LS_LADDER_STOP ||
-				LaraItem->Animation.ActiveState == LS_LADDER_RIGHT ||
-				LaraItem->Animation.ActiveState == LS_LADDER_DOWN)
+			if (LaraItem->currentAnimState == LS_HANG ||
+				LaraItem->currentAnimState == LS_LADDER_IDLE ||
+				LaraItem->currentAnimState == LS_LADDER_UP ||
+				LaraItem->currentAnimState == LS_LADDER_LEFT ||
+				LaraItem->currentAnimState == LS_LADDER_STOP ||
+				LaraItem->currentAnimState == LS_LADDER_RIGHT ||
+				LaraItem->currentAnimState == LS_LADDER_DOWN ||
+				LaraItem->currentAnimState == LS_MONKEYSWING_IDLE)
 				break;
 			return;
 
 		case TRIGGER_TYPES::PAD:
 		case TRIGGER_TYPES::ANTIPAD:
-			if (GetCollision(floor, x, y, z).Position.Floor == y)
+			if (GetCollisionResult(floor, x, y, z).Position.Floor == y)
 				break;
 			return;
 
@@ -396,7 +396,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			break;
 
 		case TRIGGER_TYPES::COMBAT:
-			if (Lara.Control.HandStatus == HandStatus::WeaponReady)
+			if (Lara.gunStatus == LG_READY)
 				break;
 			return;
 
@@ -432,30 +432,30 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 				(triggerType == TRIGGER_TYPES::ANTIPAD ||
 					triggerType == TRIGGER_TYPES::ANTITRIGGER ||
 					triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER) &&
-				item->Flags & ATONESHOT)
+				item->flags & ATONESHOT)
 				break;
 
-			if (triggerType == TRIGGER_TYPES::SWITCH && item->Flags & SWONESHOT)
+			if (triggerType == TRIGGER_TYPES::SWITCH && item->flags & SWONESHOT)
 				break;
 
 			if (triggerType != TRIGGER_TYPES::SWITCH
 				&& triggerType != TRIGGER_TYPES::ANTIPAD
 				&& triggerType != TRIGGER_TYPES::ANTITRIGGER
 				&& triggerType != TRIGGER_TYPES::HEAVYANTITRIGGER
-				&& (item->Flags & ONESHOT))
+				&& (item->flags & ONESHOT))
 				break;
 
 			if (triggerType != TRIGGER_TYPES::ANTIPAD 
 				&& triggerType != TRIGGER_TYPES::ANTITRIGGER 
 				&& triggerType != TRIGGER_TYPES::HEAVYANTITRIGGER)
 			{
-				if (item->ObjectNumber == ID_DART_EMITTER && item->Active)
+				if (item->objectNumber == ID_DART_EMITTER && item->active)
 					break;
 			}
 
-			item->Timer = timer;
+			item->timer = timer;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->timer = 30 * timer;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH ||
 				triggerType == TRIGGER_TYPES::HEAVYSWITCH)
@@ -463,20 +463,20 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 				if (heavyFlags >= 0)
 				{
 					if (switchFlag)
-						item->Flags |= (flags & CODE_BITS);
+						item->flags |= (flags & CODE_BITS);
 					else
-						item->Flags ^= (flags & CODE_BITS);
+						item->flags ^= (flags & CODE_BITS);
 
 					if (flags & ONESHOT)
-						item->Flags |= SWONESHOT;
+						item->flags |= SWONESHOT;
 				}
 				else
 				{
-					if (((flags ^ item->Flags) & CODE_BITS) == CODE_BITS)
+					if (((flags ^ item->flags) & CODE_BITS) == CODE_BITS)
 					{
-						item->Flags ^= (flags & CODE_BITS);
+						item->flags ^= (flags & CODE_BITS);
 						if (flags & ONESHOT)
-							item->Flags |= SWONESHOT;
+							item->flags |= SWONESHOT;
 					}
 				}
 			}
@@ -484,70 +484,70 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 				triggerType == TRIGGER_TYPES::ANTITRIGGER ||
 				triggerType == TRIGGER_TYPES::HEAVYANTITRIGGER)
 			{
-				if (item->ObjectNumber == ID_EARTHQUAKE)
+				if (item->objectNumber == ID_EARTHQUAKE)
 				{
-					item->ItemFlags[0] = 0;
-					item->ItemFlags[1] = 100;
+					item->itemFlags[0] = 0;
+					item->itemFlags[1] = 100;
 				}
 
-				item->Flags &= ~(CODE_BITS | REVERSE);
+				item->flags &= ~(CODE_BITS | REVERSE);
 
 				if (flags & ONESHOT)
-					item->Flags |= ATONESHOT;
+					item->flags |= ATONESHOT;
 
-				if (item->Active && Objects[item->ObjectNumber].intelligent)
+				if (item->active && Objects[item->objectNumber].intelligent)
 				{
-					item->HitPoints = NOT_TARGETABLE;
-					DisableEntityAI(value);
+					item->hitPoints = NOT_TARGETABLE;
+					DisableBaddieAI(value);
 					KillItem(value);
 				}
 			}
 			else if (flags & CODE_BITS)
 			{
-				item->Flags |= flags & CODE_BITS;
+				item->flags |= flags & CODE_BITS;
 			}
 
-			if ((item->Flags & CODE_BITS) == CODE_BITS)
+			if ((item->flags & CODE_BITS) == CODE_BITS)
 			{
-				item->Flags |= 0x20;
+				item->flags |= 0x20;
 
 				if (flags & ONESHOT)
-					item->Flags |= ONESHOT;
+					item->flags |= ONESHOT;
 
-				if (!(item->Active) && !(item->Flags & IFLAG_KILLED))
+				if (!(item->active) && !(item->flags & IFLAG_KILLED))
 				{
-					if (Objects[item->ObjectNumber].intelligent)
+					if (Objects[item->objectNumber].intelligent)
 					{
-						if (item->Status != ITEM_NOT_ACTIVE)
+						if (item->status != ITEM_NOT_ACTIVE)
 						{
-							if (item->Status == ITEM_INVISIBLE)
+							if (item->status == ITEM_INVISIBLE)
 							{
-								item->TouchBits = 0;
+								item->touchBits = 0;
 								if (EnableBaddieAI(value, 0))
 								{
-									item->Status = ITEM_ACTIVE;
+									item->status = ITEM_ACTIVE;
 									AddActiveItem(value);
 								}
 								else
 								{
-									item->Status = ITEM_INVISIBLE;
+									item->status = ITEM_INVISIBLE;
 									AddActiveItem(value);
 								}
 							}
 						}
 						else
 						{
-							item->TouchBits = 0;
-							item->Status = ITEM_ACTIVE;
+							item->touchBits = 0;
+							item->status = ITEM_ACTIVE;
 							AddActiveItem(value);
 							EnableBaddieAI(value, 1);
 						}
 					}
 					else
 					{
-						item->TouchBits = 0;
+						item->touchBits = 0;
 						AddActiveItem(value);
-						item->Status = ITEM_ACTIVE;
+						item->status = ITEM_ACTIVE;
 					}
 				}
 			}
@@ -564,7 +564,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 
 			Camera.number = value;
 
-			if (Camera.type == CameraType::Look || Camera.type == CameraType::Combat && !(g_Level.Cameras[value].flags & 3))
+			if (Camera.type == CAMERA_TYPE::LOOK_CAMERA || Camera.type == CAMERA_TYPE::COMBAT_CAMERA && !(g_Level.Cameras[value].flags & 3))
 				break;
 
 			if (triggerType == TRIGGER_TYPES::COMBAT)
@@ -576,7 +576,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
 				Camera.timer = (trigger & 0xFF) * 30;
-				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
+				Camera.type = heavy ? CAMERA_TYPE::HEAVY_CAMERA : CAMERA_TYPE::FIXED_CAMERA;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
 			}
@@ -624,7 +624,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 			break;
 
 		case TO_SINK:
-			Lara.WaterCurrentActive = value + 1;
+			Lara.currentActive = value + 1;
 			break;
 
 		case TO_FLIPMAP:
@@ -685,7 +685,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 
 	} while (!(trigger & END_BIT));
 
-	if (cameraItem && (Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
+	if (cameraItem && (Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
 		Camera.item = cameraItem;
 
 	if (flip != -1)
@@ -697,7 +697,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 
 void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
 {
-	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, heavy, heavyFlags);
+	TestTriggers(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber, heavy, heavyFlags);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
@@ -714,30 +714,26 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ITEM_INFO* item)
 {
-	ProcessSectorFlags(GetCollision(item).BottomBlock);
+	ProcessSectorFlags(GetCollisionResult(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber).BottomBlock);
 }
 
 void ProcessSectorFlags(int x, int y, int z, short roomNumber)
 {
-	ProcessSectorFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
+	ProcessSectorFlags(GetCollisionResult(x, y, z, roomNumber).BottomBlock);
 }
 
 void ProcessSectorFlags(FLOOR_INFO* floor)
 {
 	// Monkeyswing
-	Lara.Control.CanMonkeySwing = floor->Flags.Monkeyswing;
+	Lara.canMonkeySwing = floor->Flags.Monkeyswing;
 
 	// Burn Lara
-	if (floor->Flags.Death &&
-		(LaraItem->Pose.Position.y == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->Animation.ActiveState) ||
-			Lara.Control.WaterStatus != WaterStatus::Dry))
-	{
+	if (floor->Flags.Death && (LaraItem->pos.yPos == LaraItem->floor || Lara.waterStatus))
 		LavaBurn(LaraItem);
-	}
 
 	// Set climb status
-	if ((1 << (GetQuadrant(LaraItem->Pose.Orientation.y) + 8)) & GetClimbFlags(floor))
-		Lara.Control.CanClimbLadder = true;
+	if ((1 << (GetQuadrant(LaraItem->pos.yRot) + 8)) & GetClimbFlags(floor))
+		Lara.climbStatus = true;
 	else
-		Lara.Control.CanClimbLadder = false;
+		Lara.climbStatus = false;
 }

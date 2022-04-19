@@ -4,9 +4,9 @@
 #include "Game/control/control.h"
 
 void InitialiseTrapDoor(short itemNumber);
-void TrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
+void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll);
 void TrapDoorControl(short itemNumber);
 void CloseTrapDoor(short itemNumber);
 void OpenTrapDoor(short itemNumber);

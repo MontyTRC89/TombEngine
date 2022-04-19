@@ -1,5 +1,5 @@
 #pragma once
-struct JeepInfo {
+struct JEEP_INFO {
 	short rot1;
 	short rot2;
 	short rot3;

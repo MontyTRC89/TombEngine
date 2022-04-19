@@ -3,49 +3,49 @@
 #include "Specific/setup.h"
 #include "Renderer/Renderer11.h"
 
-enum class TriggerStatus
+enum TriggerStatus
 {
-	Outside,
-	Entering,
-	Inside,
-	Leaving,
+	TS_OUTSIDE = 0,
+	TS_ENTERING = 1,
+	TS_INSIDE = 2,
+	TS_LEAVING = 3
 };
 
-enum class TriggerVolumeType
+enum TriggerVolumeType
 {
-	Box,
-	Sphere,
-	Prism	// TODO: Unsupported as of now.
+	VOLUME_BOX = 0,
+	VOLUME_SPHERE = 1,
+	VOLUME_PRISM = 2 // Unsupported as of now
 };
 
 enum TriggerVolumeActivators
 {
-	Player = 1,
+	PLAYER = 1,
 	NPC = 2,
-	Movable = 4,
-	Static = 8,
-	Flyby = 16,
-	PhysicalObject = 32	// Future-proofing for Bullet.
+	MOVEABLES = 4,
+	STATICS = 8,
+	FLYBYS = 16,
+	PHYSICALOBJECTS = 32 // Future-proofness for Bullet
 };
 
-struct TriggerVolume
+struct TRIGGER_VOLUME
 {
-	TriggerVolumeType Type;
+	TriggerVolumeType type;
 
-	Vector3 Position;
-	Quaternion Rotation;
-	Vector3 Scale;	// x used as radius if type is TriggerVolumeType::Sphere.
+	Vector3 position;
+	Quaternion rotation;
+	Vector3 scale; // X used as radius if type is VOLUME_SPHERE
 
-	std::string OnEnter;
-	std::string OnInside;
-	std::string OnLeave;
+	std::string onEnter;
+	std::string onInside;
+	std::string onLeave;
 
-	int Activators;
-	bool OneShot;
+	int activators;
+	bool oneShot;
 
-	TriggerStatus Status;
-	BoundingOrientedBox Box;
-	BoundingSphere Sphere;
+	TriggerStatus status;
+	BoundingOrientedBox box;
+	BoundingSphere sphere;
 };
 
 namespace TEN::Control::Volumes

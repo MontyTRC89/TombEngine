@@ -38,12 +38,12 @@ static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
 {
 	PHD_3DPOS pos;
 
-	pos.Position.x = p.x;
-	pos.Position.y = p.y;
-	pos.Position.z = p.z;
-	pos.Orientation.x = 0;
-	pos.Orientation.y = 0;
-	pos.Orientation.z = 0;
+	pos.xPos = p.x;
+	pos.yPos = p.y;
+	pos.zPos = p.z;
+	pos.xRot = 0;
+	pos.yRot = 0;
+	pos.zRot = 0;
 
 	SoundEffect(id, &pos, flags);
 }
@@ -65,12 +65,12 @@ static int FindRoomNumber(GameScriptPosition pos)
 
 static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, GameScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
 {
-	Vector3Int p1;
+	PHD_VECTOR p1;
 	p1.x = src.x;
 	p1.y = src.y;
 	p1.z = src.z;
 
-	Vector3Int p2;
+	PHD_VECTOR p2;
 	p2.x = dest.x;
 	p2.y = dest.y;
 	p2.z = dest.z;
@@ -81,9 +81,9 @@ static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, Gam
 static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
 {
 	PHD_3DPOS p;
-	p.Position.x = pos.x;
-	p.Position.y = pos.y;
-	p.Position.z = pos.z;
+	p.xPos = pos.x;
+	p.yPos = pos.y;
+	p.zPos = pos.z;
 	
 	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 }
@@ -597,7 +597,7 @@ std::unique_ptr<R> GetByName(std::string const & type, std::string const & name,
 
 void GameScript::AssignItemsAndLara()
 {
-	m_lua->set("Lara", GameScriptItemInfo(Lara.ItemNumber, false));
+	m_lua->set("Lara", GameScriptItemInfo(Lara.itemNumber, false));
 }
 
 /*** Special objects

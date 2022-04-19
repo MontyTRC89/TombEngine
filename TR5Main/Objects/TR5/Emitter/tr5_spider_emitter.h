@@ -3,20 +3,18 @@
 
 constexpr auto NUM_SPIDERS = 64;
 
-struct SpiderData
+struct SPIDER_STRUCT
 {
-	byte On;
-	PHD_3DPOS Pose;
-	short RoomNumber;
-
-	short Velocity;
-	short VerticalVelocity;
-
-	byte Flags;
+	PHD_3DPOS pos; // size=20, offset=0
+	short roomNumber; // size=0, offset=20
+	short speed; // size=0, offset=22
+	short fallspeed; // size=0, offset=24
+	byte on; // size=0, offset=26
+	byte flags; // size=0, offset=27
 };
 
 extern int NextSpider;
-extern SpiderData Spiders[NUM_SPIDERS];
+extern SPIDER_STRUCT Spiders[NUM_SPIDERS];
 
 short GetNextSpider();
 void ClearSpiders();

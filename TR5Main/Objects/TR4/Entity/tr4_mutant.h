@@ -5,32 +5,27 @@
 
 namespace TEN::Entities::TR4 
 {
-    enum MutantState
+    enum STATES_CROCGOD
     {
-        MUTANT_STATE_NONE = 0,
-        MUTANT_STATE_APPEAR = 1,
-        MUTANT_STATE_IDLE = 2,
-        MUTANT_STATE_SHOOT = 3,
-        MUTANT_STATE_LOCUST_1 = 4,
-        MUTANT_STATE_LOCUST_2 = 5,
-    };
-
-    // TODO
-    enum MutantAnim
-    {
-        MUTANT_ANIM_APPEAR = 0
+        STATE_MUTANT_EMPTY,
+        STATE_MUTANT_APPEAR,
+        STATE_MUTANT_IDLE,
+        STATE_MUTANT_SHOOT,
+        STATE_MUTANT_LOCUST1,
+        STATE_MUTANT_LOCUST2,
     };
 
     enum class MissileRotationType
     {
-        Front,
-        Left,
-        Right
+        M_FRONT,
+        M_LEFT,
+        M_RIGHT
     };
 
-    #define MUTANT_SHOOT_RANGE pow(SECTOR(10), 2)
-    #define MUTANT_LOCUST_1_RANGE pow(SECTOR(15), 2)
-    #define MUTANT_LOCUST_2_RANGE pow(SECTOR(30), 2)
+    constexpr auto MUTANT_ANIM_APPEAR = 0;
+    constexpr auto MUTANT_SHOOT_RANGE = SQUARE(SECTOR(10));
+    constexpr auto MUTANT_LOCUST1_RANGE = SQUARE(SECTOR(15));
+    constexpr auto MUTANT_LOCUST2_RANGE = SQUARE(SECTOR(30));
 
 	void InitialiseCrocgod(short itemNumber);
 	void CrocgodControl(short itemNumber);

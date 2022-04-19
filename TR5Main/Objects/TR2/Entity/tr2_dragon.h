@@ -2,7 +2,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 
-void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-void DragonControl(short backNumber);
-void InitialiseBartoli(short itemNumber);
-void BartoliControl(short itemNumber);
+void DragonCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
+void DragonControl(short backNum);
+void InitialiseBartoli(short itemNum);
+void BartoliControl(short itemNum);

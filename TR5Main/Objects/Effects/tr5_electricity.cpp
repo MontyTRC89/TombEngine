@@ -63,7 +63,6 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 		spark->zVel = (GetRandomControl() & 0x1F) - 0x0F;
 		spark->y = (GetRandomControl() & 0x3F) - 0x1F;
 	}
-
 	spark->friction = 51;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
@@ -86,7 +85,10 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 
 void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 {
-	Vector3Int pos = { 0, 0, 0 };
+	PHD_VECTOR pos;
+	pos.x = 0;
+	pos.y = 0;
+	pos.z = 0;
 	GetJointAbsPosition(item, &pos, joint);
 
 	SPARKS* spark = &Sparks[GetFreeSpark()];
@@ -119,11 +121,11 @@ void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
 		TriggerFireFlame(pos.x, pos.y, pos.z, -1, 254);
 }
 
-static bool ElectricityWireCheckDeadlyBounds(Vector3Int* pos, short delta)
+static bool ElectricityWireCheckDeadlyBounds(PHD_VECTOR* pos, short delta)
 {
-	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1] &&
-		pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3] &&
-		pos->z + delta >= DeadlyBounds[4] && pos->z - delta <= DeadlyBounds[5])
+	if (pos->x + delta >= DeadlyBounds[0] && pos->x - delta <= DeadlyBounds[1]
+	&&  pos->y + delta >= DeadlyBounds[2] && pos->y - delta <= DeadlyBounds[3]
+	&&  pos->z + delta >= DeadlyBounds[4] && pos->z - delta <= DeadlyBounds[5])
 	{
 		return true;
 	}
@@ -133,28 +135,28 @@ static bool ElectricityWireCheckDeadlyBounds(Vector3Int* pos, short delta)
 
 void ElectricityWiresControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto item = &g_Level.Items[itemNumber];
 
 	AnimateItem(item);
 
 	if (!TriggerActive(item))
 		return;
 
-	SoundEffect(SFX_TR5_ELECTRIC_WIRES, &item->Pose, 0);
+	SoundEffect(1002, &item->pos, 0);
 
 	GetCollidedObjects(item, SECTOR(4), true, CollidedItems, nullptr, 0) && CollidedItems[0];
 
-	auto* object = &Objects[item->ObjectNumber];
+	auto obj = &Objects[item->objectNumber];
 
-	auto cableBox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+	auto cableBox = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 	auto cableBottomPlane = cableBox.Center.y + cableBox.Extents.y - CLICK(1);
 
 	int currentEndNode = 0;
 	int flashingNode = GlobalCounter % 3;
 
-	for (int i = 0; i < object->nmeshes; i++)
+	for (int i = 0; i < obj->nmeshes; i++)
 	{
-		auto pos = Vector3Int(0, 0, CLICK(1));
+		auto pos = PHD_VECTOR(0, 0, CLICK(1));
 		GetJointAbsPosition(item, &pos, i);
 
 		if (pos.y < cableBottomPlane)
@@ -183,23 +185,23 @@ void ElectricityWiresControl(short itemNumber)
 	int k = 0;
 	while (CollidedItems[k] != nullptr)
 	{
-		auto* collItem = CollidedItems[k];
-		auto* collObj = &Objects[collItem->ObjectNumber];
+		auto collItem = CollidedItems[k];
+		auto collObj = &Objects[collItem->objectNumber];
 
 		k++;
 
-		if (collItem->ObjectNumber != ID_LARA && !collObj->intelligent)
+		if (collItem->objectNumber != ID_LARA && !collObj->intelligent)
 			continue;
 
 		bool isWaterNearby = false;
-		auto npcBox = TO_DX_BBOX(collItem->Pose, GetBoundsAccurate(collItem));
+		auto npcBox = TO_DX_BBOX(collItem->pos, GetBoundsAccurate(collItem));
 
-		for (int i = 0; i < object->nmeshes; i++)
+		for (int i = 0; i < obj->nmeshes; i++)
 		{
-			auto pos = Vector3Int(0, 0, CLICK(1));
+			auto pos = PHD_VECTOR(0, 0, CLICK(1));
 			GetJointAbsPosition(item, &pos, i);
 
-			short roomNumber = item->RoomNumber;
+			short roomNumber = item->roomNumber;
 			auto floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 
 			bool waterTouch = false;
@@ -215,10 +217,10 @@ void ElectricityWiresControl(short itemNumber)
 
 			for (int j = 0; j < collObj->nmeshes; j++)
 			{
-				Vector3Int collPos = {};
+				PHD_VECTOR collPos = {};
 				GetJointAbsPosition(collItem, &collPos, j);
 
-				auto collJointRoom = GetCollision(collPos.x, collPos.y, collPos.z, collItem->RoomNumber).RoomNumber;
+				auto collJointRoom = GetCollisionResult(collPos.x, collPos.y, collPos.z, collItem->roomNumber).RoomNumber;
 
 				if (!isWaterNearby && waterTouch && roomNumber == collJointRoom)
 					isWaterNearby = true;
@@ -228,20 +230,20 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				if (collItem->Data.is<LaraInfo*>())
+				if (collItem->data.is<LaraInfo*>())
 				{
-					auto* lara = (LaraInfo*&)collItem->Data;
-					lara->BurnBlue = 1;
-					lara->BurnCount = 48;
+					auto lara = (LaraInfo*&)collItem->data;
+					lara->burnBlue = 1;
+					lara->burnCount = 48;
 
 					if (!isWaterNearby)
 						LaraBurn(collItem);
 				}
 
 				if (instantKill)
-					collItem->HitPoints = 0;
+					collItem->hitPoints = 0;
 				else
-					collItem->HitPoints -= 8;
+					collItem->hitPoints -= 8;
 
 				for (int j = 0; j < collObj->nmeshes; j++)
 				{
@@ -250,9 +252,9 @@ void ElectricityWiresControl(short itemNumber)
 				}
 
 				TriggerDynamicLight(
-					collItem->Pose.Position.x,
-					collItem->Pose.Position.y,
-					collItem->Pose.Position.z,
+					collItem->pos.xPos,
+					collItem->pos.yPos,
+					collItem->pos.zPos,
 					5,
 					0,
 					(GetRandomControl() & 0x3F) + 0x2F,

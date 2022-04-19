@@ -1,4 +1,4 @@
 #pragma once
 
-void ScubaHarpoonControl(short itemNumber);
+void ScubaHarpoonControl(short itemNum);
 void ScubaControl(short itemNumber);

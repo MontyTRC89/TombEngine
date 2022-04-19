@@ -8,35 +8,22 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Game/people.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO FlamethrowerBite = { 0, 340, 64, 7 };
+BITE_INFO flamerBite = { 0, 340, 64, 7 };
 
-// TODO
-enum FlamethrowerState
+static void TriggerPilotFlame(int itemnum)
 {
+	int dx = LaraItem->pos.xPos - g_Level.Items[itemnum].pos.xPos;
+	int dz = LaraItem->pos.zPos - g_Level.Items[itemnum].pos.zPos;
 
-};
-
-// TODO
-enum FlamethrowerAnim
-{
-
-};
-
-static void TriggerPilotFlame(int itemNumber)
-{
-	int dx = LaraItem->Pose.Position.x - g_Level.Items[itemNumber].Pose.Position.x;
-	int dz = LaraItem->Pose.Position.z - g_Level.Items[itemNumber].Pose.Position.z;
-
-	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 		return;
 
-	auto* spark = &Sparks[GetFreeSpark()];
+	SPARKS* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = 1;
 	spark->sR = 48 + (GetRandomControl() & 31);
@@ -62,7 +49,7 @@ static void TriggerPilotFlame(int itemNumber)
 	spark->zVel = (GetRandomControl() & 31) - 16;
 
 	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
-	spark->fxObj = itemNumber;
+	spark->fxObj = itemnum;
 	spark->nodeNumber = 0;
 	spark->friction = 4;
 	spark->gravity = -(GetRandomControl() & 3) - 2;
@@ -74,9 +61,9 @@ static void TriggerPilotFlame(int itemNumber)
 	spark->dSize = size;
 }
 
-static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxNumber)
+static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxnum)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	SPARKS* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = true;
 	spark->sR = 48 + (GetRandomControl() & 31);
@@ -116,11 +103,10 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 
 	if (GetRandomControl() & 1)
 	{
-		if (fxNumber >= 0)
+		if (fxnum >= 0)
 			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
 		else
 			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-
 		spark->rotAng = GetRandomControl() & 4095;
 		if (GetRandomControl() & 1)
 			spark->rotAdd = -(GetRandomControl() & 15) - 16;
@@ -129,22 +115,21 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 	}
 	else
 	{
-		if (fxNumber >= 0)
+		if (fxnum >= 0)
 			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
 		else
 			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 	}
 
-	spark->fxObj = fxNumber;
+	spark->fxObj = fxnum;
 	spark->gravity = 0;
 	spark->maxYvel = 0;
-
 	int size = (GetRandomControl() & 31) + 64;
 
 	if (xv || yv || zv)
 	{
 		spark->size = size / 32;
-		if (fxNumber == -2)
+		if (fxnum == -2)
 			spark->scalar = 2;
 		else
 			spark->scalar = 3;
@@ -160,56 +145,64 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 
 static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
 {
-	short effectNumber = CreateNewEffect(item->RoomNumber);
+	PHD_VECTOR pos1;
+	PHD_VECTOR pos2;
+	short angles[2];
+	int velocity;
+	int xv;
+	int yv;
+	int zv;
+
+	short effectNumber = CreateNewEffect(item->roomNumber);
 	if (effectNumber != NO_ITEM)
 	{
-		auto* fx = &EffectList[effectNumber];
+		FX_INFO* fx = &EffectList[effectNumber];
 
-		Vector3Int pos1 = { bite->x, bite->y, bite->z };
+		pos1.x = bite->x;
+		pos1.y = bite->y;
+		pos1.z = bite->z;
 		GetJointAbsPosition(item, &pos1, bite->meshNum);
 
-		Vector3Int pos2 = { bite->x, bite->y / 2, bite->z };
+		pos2.x = bite->x;
+		pos2.y = bite->y / 2;
+		pos2.z = bite->z;
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
-		short angles[2];
 		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-		fx->pos.Position.x = pos1.x;
-		fx->pos.Position.y = pos1.y;
-		fx->pos.Position.z = pos1.z;
+		fx->pos.xPos = pos1.x;
+		fx->pos.yPos = pos1.y;
+		fx->pos.zPos = pos1.z;
 
-		fx->roomNumber = item->RoomNumber;
+		fx->roomNumber = item->roomNumber;
 
-		fx->pos.Orientation.x = angles[1];
-		fx->pos.Orientation.z = 0;
-		fx->pos.Orientation.y = angles[0];
+		fx->pos.xRot = angles[1];
+		fx->pos.zRot = 0;
+		fx->pos.yRot = angles[0];
 		fx->speed = speed * 4;
 		fx->counter = 20;
 		fx->flag1 = 0;
 
 		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
 
-		int velocity;
-		int xv, yv, zv;
-		
 		for (int i = 0; i < 2; i++)
 		{
 			speed = (GetRandomControl() % (speed * 4)) + 32;
-			velocity = speed * phd_cos(fx->pos.Orientation.x);
+			velocity = speed * phd_cos(fx->pos.xRot);
 
-			xv = velocity * phd_sin(fx->pos.Orientation.y);
-			yv = -speed * phd_sin(fx->pos.Orientation.x);
-			zv = velocity * phd_cos(fx->pos.Orientation.y);
+			xv = velocity * phd_sin(fx->pos.yRot);
+			yv = -speed * phd_sin(fx->pos.xRot);
+			zv = velocity * phd_cos(fx->pos.yRot);
 
-			TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -1);
+			TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -1);
 		}
 
-		velocity = (speed * 2) * phd_cos(fx->pos.Orientation.x);
-		zv = velocity * phd_cos(fx->pos.Orientation.y);
-		xv = velocity * phd_sin(fx->pos.Orientation.y);
-		yv = -(speed * 2) * phd_sin(fx->pos.Orientation.x);
+		velocity = (speed * 2) * phd_cos(fx->pos.xRot);
+		zv = velocity * phd_cos(fx->pos.yRot);
+		xv = velocity * phd_sin(fx->pos.yRot);
+		yv = -(speed * 2) * phd_sin(fx->pos.xRot);
 
-		TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -2);
+		TriggerFlamethrowerFlame(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, xv * 32, yv * 32, zv * 32, -2);
 	}
 
 	return effectNumber;
@@ -220,20 +213,23 @@ void FlameThrowerControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-	short torsoX = 0;
-	short torsoY = 0;
 	short angle = 0;
 	short tilt = 0;
+	short torsoX = 0;
+	short torsoY = 0;
 	short head = 0;
 
-	Vector3Int pos = { FlamethrowerBite.x, FlamethrowerBite.y, FlamethrowerBite.z };
-	GetJointAbsPosition(item, &pos, FlamethrowerBite.meshNum);
+	PHD_VECTOR pos;
+	pos.x = flamerBite.x;
+	pos.y = flamerBite.y;
+	pos.z = flamerBite.z;
+	GetJointAbsPosition(item, &pos, flamerBite.meshNum);
 
 	int random = GetRandomControl();
-	if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)
+	if (item->currentAnimState != 6 && item->currentAnimState != 11)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3); 
 		TriggerPilotFlame(itemNumber);
@@ -241,284 +237,272 @@ void FlameThrowerControl(short itemNumber)
 	else
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random / 16) & 3), 24 - ((random / 64) & 3), random & 7);  
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 7)
+		if (item->currentAnimState != 7)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 7;
+			item->animNumber = Objects[item->objectNumber].animIndex + 19;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 7;
 		}
 	}
 	else
 	{
-		if (item->AIBits)
+		if (item->aiBits)
 			GetAITarget(creature);
-		else if (creature->HurtByLara)
-			creature->Enemy = LaraItem;
+		else if (creature->hurtByLara)
+			creature->enemy = LaraItem;
 		else
 		{
-			creature->Enemy = NULL;
+			creature->enemy = NULL;
 
+			int minDistance = 0x7FFFFFFF;
 			ITEM_INFO* target = NULL;
-			int minDistance = INT_MAX;
 
 			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				auto* currentCreature = ActiveCreatures[i];
-				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+				CREATURE_INFO* currentCreature = ActiveCreatures[i];
+				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 
-				target = &g_Level.Items[currentCreature->ItemNumber];
-				if (target->ObjectNumber == ID_LARA || target->HitPoints <= 0)
+				target = &g_Level.Items[currentCreature->itemNum];
+				if (target->objectNumber == ID_LARA || target->hitPoints <= 0)
 					continue;
 
-				int x = target->Pose.Position.x - item->Pose.Position.x;
-				int z = target->Pose.Position.z - item->Pose.Position.z;
+				int x = target->pos.xPos - item->pos.xPos;
+				int z = target->pos.zPos - item->pos.zPos;
 
-				int distance = pow(x, 2) + pow(z, 2);
+				int distance = SQUARE(x) + SQUARE(z);
+
 				if (distance < minDistance)
 				{
-					creature->Enemy = target;
+					creature->enemy = target;
 					minDistance = distance;
 				}
 			}
 		}
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		AI_INFO laraInfo;
 
-		AI_INFO laraAI;
-		if (creature->Enemy == LaraItem)
+		CreatureAIInfo(item, &info);
+
+		if (creature->enemy == LaraItem)
 		{
-			laraAI.angle = AI.angle;
-			laraAI.distance = AI.distance;
-
-			if (!creature->HurtByLara)
-				creature->Enemy = NULL;
+			laraInfo.angle = info.angle;
+			laraInfo.distance = info.distance;
+			if (!creature->hurtByLara)
+				creature->enemy = NULL;
 		}
 		else
 		{
-			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			int dx = LaraItem->pos.xPos - item->pos.xPos;
+			int dz = LaraItem->pos.zPos - item->pos.zPos;
 			
-			laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y; 
-			laraAI.distance = pow(dx, 2) + pow(dz, 2);
+			laraInfo.angle = phd_atan(dz, dz) - item->pos.yRot; 
+			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 			
-			AI.xAngle -= 0x800;
+			info.xAngle -= 0x800;
 		}
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, creature->MaxTurn);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
-		auto* realEnemy = creature->Enemy; 
+		ITEM_INFO* realEnemy = creature->enemy; 
 
-		if (item->HitStatus || laraAI.distance < pow(SECTOR(1), 2) || TargetVisible(item, &laraAI))
+		if (item->hitStatus || laraInfo.distance < SQUARE(1024) || TargetVisible(item, &laraInfo)) 
 		{
-			if (!creature->Alerted)
-				SoundEffect(300, &item->Pose, 0);
-
+			if (!creature->alerted)
+				SoundEffect(300, &item->pos, 0);
 			AlertAllGuards(itemNumber);
 		}
 		
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			creature->MaxTurn = 0;
-			creature->Flags = 0;
-			head = laraAI.angle;
+			head = laraInfo.angle;
 
-			if (item->AIBits & GUARD)
+			creature->flags = 0;
+			creature->maximumTurn = 0;
+
+			if (item->aiBits & GUARD)
 			{
 				head = AIGuard(creature);
-
 				if (!(GetRandomControl() & 0xFF))
-					item->Animation.TargetState = 4;
-
+					item->goalAnimState = 4;
 				break;
 			}
-			else if (item->AIBits & PATROL1)
-				item->Animation.TargetState = 2;
-			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 2;
-			else if (Targetable(item, &AI) && (realEnemy != LaraItem || creature->HurtByLara))
+			else if (item->aiBits & PATROL1)
+				item->goalAnimState = 2;
+			else if (creature->mood == ESCAPE_MOOD)
+				item->goalAnimState = 2;
+			else if (Targetable(item, &info) && (realEnemy != LaraItem || creature->hurtByLara))
 			{
-				if (AI.distance < pow(SECTOR(4), 2))
-					item->Animation.TargetState = 10;
+				if (info.distance < SQUARE(4096))
+					item->goalAnimState = 10;
 				else
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 			}
-			else if (creature->Mood == MoodType::Bored && AI.ahead && !(GetRandomControl() & 0xFF))
-				item->Animation.TargetState = 4;
-			else if (creature->Mood == MoodType::Attack || !(GetRandomControl() & 0xFF))
-				item->Animation.TargetState = 2;
+			else if (creature->mood == BORED_MOOD && info.ahead && !(GetRandomControl() & 0xFF))
+				item->goalAnimState = 4;
+			else if (creature->mood == ATTACK_MOOD || !(GetRandomControl() & 0xFF))
+				item->goalAnimState = 2;
 			
 			break;
 
 		case 4:
-			head = laraAI.angle;
+			head = laraInfo.angle;
 
-			if (item->AIBits & GUARD)
+			if (item->aiBits & GUARD)
 			{
 				head = AIGuard(creature);
 
 				if (!(GetRandomControl() & 0xFF))
-					item->Animation.TargetState = 1;
-
+					item->goalAnimState = 1;
 				break;
 			}
-			else if ((Targetable(item, &AI) &&
-				AI.distance < pow(SECTOR(4), 2) &&
-				(realEnemy != LaraItem || creature->HurtByLara) ||
-				creature->Mood != MoodType::Bored ||
+			else if ((Targetable(item, &info) && 
+				info.distance < SQUARE(4096) && 
+				(realEnemy != LaraItem || creature->hurtByLara) || 
+				creature->mood != BORED_MOOD || 
 				!(GetRandomControl() & 0xFF)))
-			{
-				item->Animation.TargetState = 1;
-			}
+				item->goalAnimState = 1;
 
 			break;
 
 		case 2:
-			creature->Flags = 0;
-			creature->MaxTurn = ANGLE(5.0f);
-			head = laraAI.angle;
+			head = laraInfo.angle;
 
-			if (item->AIBits & GUARD)
+			creature->flags = 0;
+			creature->maximumTurn = ANGLE(5);
+
+			if (item->aiBits & GUARD)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 1;
-				item->Animation.TargetState = 1;
+				item->animNumber = Objects[item->objectNumber].animIndex + 12;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->currentAnimState = 1;
+				item->goalAnimState = 1;
 			}
-			else if (item->AIBits & PATROL1)
-				item->Animation.TargetState = 2;
-			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 2;
-			else if (Targetable(item, &AI) && 
-				(realEnemy != LaraItem || creature->HurtByLara))
+			else if (item->aiBits & PATROL1)
+				item->goalAnimState = 2;
+			else if (creature->mood == ESCAPE_MOOD)
+				item->goalAnimState = 2;
+			else if (Targetable(item, &info) && 
+				(realEnemy != LaraItem || creature->hurtByLara))
 			{
-				if (AI.distance < pow(SECTOR(4), 2))
-					item->Animation.TargetState = 1;
+				if (info.distance < SQUARE(4096))
+					item->goalAnimState = 1;
 				else
-					item->Animation.TargetState = 9;
+					item->goalAnimState = 9;
 			}
-			else if (creature->Mood == MoodType::Bored && AI.ahead)
-				item->Animation.TargetState = 1;
+			else if (creature->mood == BORED_MOOD && info.ahead)
+				item->goalAnimState = 1;
 			else
-				item->Animation.TargetState = 2;
+				item->goalAnimState = 2;
 
 			break;
 
 		case 10:
-			creature->Flags = 0;
+			creature->flags = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torsoY = info.angle;
+				torsoX = info.xAngle;
 
-				if (Targetable(item, &AI) &&
-					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->HurtByLara))
-				{
-					item->Animation.TargetState = 11;
-				}
+				if (Targetable(item, &info) && 
+					info.distance < SQUARE(4096) && 
+					(realEnemy != LaraItem || creature->hurtByLara))
+					item->goalAnimState = 11;
 				else
-					item->Animation.TargetState = 1;
+					item->goalAnimState = 1;
 			}
-
 			break;
 
 		case 9:
-			creature->Flags = 0;
+			creature->flags = 0;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
+				torsoY = info.angle;
+				torsoX = info.xAngle;
 
-				if (Targetable(item, &AI) &&
-					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->HurtByLara))
-				{
-					item->Animation.TargetState = 6;
-				}
+				if (Targetable(item, &info) && 
+					info.distance < SQUARE(4096) && 
+					(realEnemy != LaraItem || creature->hurtByLara))
+					item->goalAnimState = 6;
 				else
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 			}
 
 			break;
 
 		case 11:
-			if (creature->Flags < 40)
-				creature->Flags += (creature->Flags / 4) + 1;
+			if (creature->flags < 40)
+				creature->flags += (creature->flags / 4) + 1;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
-
-				if (Targetable(item, &AI) &&
-					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->HurtByLara))
-				{
-					item->Animation.TargetState = 11;
-				}
+				torsoY = info.angle;
+				torsoX = info.xAngle;
+				if (Targetable(item, &info) && 
+					info.distance < SQUARE(4096) && 
+					(realEnemy != LaraItem || creature->hurtByLara))
+					item->goalAnimState = 11;
 				else
-					item->Animation.TargetState = 1;
+					item->goalAnimState = 1;
 			}
 			else
-				item->Animation.TargetState = 1;
+				item->goalAnimState = 1;
 
-			if (creature->Flags < 40)
-				TriggerFlameThrower(item, &FlamethrowerBite, creature->Flags);
+			if (creature->flags < 40)
+				TriggerFlameThrower(item, &flamerBite, creature->flags);
 			else
 			{
-				TriggerFlameThrower(item, &FlamethrowerBite, (GetRandomControl() & 31) + 12);
+				TriggerFlameThrower(item, &flamerBite, (GetRandomControl() & 31) + 12);
 				if (realEnemy)
 				{
 					/*code*/
 				}
 			}
 
-			SoundEffect(204, &item->Pose, 0);
+			SoundEffect(204, &item->pos, 0);
+
 			break;
 			
 		case 6:
-			if (creature->Flags < 40)
-				creature->Flags += (creature->Flags / 4) + 1;
+			if (creature->flags < 40)
+				creature->flags += (creature->flags / 4) + 1;
 
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				torsoX = AI.xAngle;
-				torsoY = AI.angle;
-
-				if (Targetable(item, &AI) &&
-					AI.distance < pow(SECTOR(4), 2) &&
-					(realEnemy != LaraItem || creature->HurtByLara))
-				{
-					item->Animation.TargetState = 6;
-				}
+				torsoY = info.angle;
+				torsoX = info.xAngle;
+				if (Targetable(item, &info) && 
+					info.distance < SQUARE(4096) && 
+					(realEnemy != LaraItem || creature->hurtByLara))
+					item->goalAnimState = 6;
 				else
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 			}
 			else
-				item->Animation.TargetState = 2;
+				item->goalAnimState = 2;
 
-			if (creature->Flags < 40)
-				TriggerFlameThrower(item, &FlamethrowerBite, creature->Flags);
+			if (creature->flags < 40)
+				TriggerFlameThrower(item, &flamerBite, creature->flags);
 			else
 			{
-				TriggerFlameThrower(item, &FlamethrowerBite, (GetRandomControl() & 31) + 12);
+				TriggerFlameThrower(item, &flamerBite, (GetRandomControl() & 31) + 12);
 				if (realEnemy)
 				{
 					/*code*/
 				}
 			}
 
-			SoundEffect(204, &item->Pose, 0);
+			SoundEffect(204, &item->pos, 0);
+
 			break;
 		}
 	}

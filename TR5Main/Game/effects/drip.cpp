@@ -3,9 +3,9 @@
 
 #include <d3d11.h>
 #include <SimpleMath.h>
-#include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
+#include "Game/control/control.h"
 #include "Game/room.h"
 #include "Specific/level.h"
 #include "Specific/prng.h"
@@ -15,10 +15,8 @@
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
 
-namespace TEN
-{
-namespace Effects
-{
+namespace TEN {
+namespace Effects {
 namespace Drip 
 {
 	using namespace DirectX::SimpleMath;
@@ -62,7 +60,9 @@ namespace Drip
 			int wh = GetWaterHeight(d.pos.x, d.pos.y, d.pos.z, d.room);
 
 			if (d.pos.y > floorheight) 
+			{
 				d.active = false;
+			}
 
 			if (d.pos.y > wh) 
 			{
@@ -82,7 +82,6 @@ namespace Drip
 			if (!dripParticles[i].active)
 				return dripParticles[i];
 		}
-
 		return dripParticles[0];
 	}
 

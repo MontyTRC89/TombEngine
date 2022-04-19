@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseDoppelganger(short itemNumber);
-void DoppelgangerControl(short itemNumber);
+void InitialiseDoppelganger(short itemNum);
+void DoppelgangerControl(short itemNum);

@@ -6,133 +6,110 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO CobraBite = { 0, 0, 0, 13 };
+BITE_INFO cobraBite = { 0, 0, 0, 13 };
 
-// TODO
-enum CobraState
+void InitialiseCobra(short itemNum)
 {
-
-};
-
-// TODO
-enum CobraAnim
-{
-
-};
-
-void InitialiseCobra(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	ClearItem(itemNumber);
-
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 45;
-	item->Animation.ActiveState = item->Animation.TargetState = 3;
-	item->ItemFlags[2] = item->HitStatus;
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ClearItem(itemNum);
+	item->animNumber = Objects[item->objectNumber].animIndex + 2;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase + 45;
+	item->currentAnimState = item->goalAnimState = 3;
+	item->itemFlags[2] = item->hitStatus;
 }
 
-void CobraControl(short itemNumber)
+void CobraControl(short itemNum)
 {
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
-
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short head = 0;
 	short angle = 0;
 	short tilt = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 4)
+		if (item->currentAnimState != 4)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 4;
+			item->animNumber = Objects[item->objectNumber].animIndex + 4;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 4;
 		}
 	}
 	else
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
 
-		AI.angle += ANGLE(16.8f);
+		info.angle += 0xC00;
 
-		GetCreatureMood(item, &AI, 1);
-		CreatureMood(item, &AI, 1);
+		GetCreatureMood(item, &info, 1);
+		CreatureMood(item, &info, 1);
 
-		info->Target.x = LaraItem->Pose.Position.x;
-		info->Target.z = LaraItem->Pose.Position.z;
-		angle = CreatureTurn(item, info->MaxTurn);
+		creature->target.x = LaraItem->pos.xPos;
+		creature->target.z = LaraItem->pos.zPos;
+		angle = CreatureTurn(item, creature->maximumTurn);
 
-		if (AI.ahead)
-			head = AI.angle;
+		if (info.ahead)
+			head = info.angle;
 
-		if (abs(AI.angle) < ANGLE(10.0f))
-			item->Pose.Orientation.y += AI.angle;
-		else if (AI.angle < 0)
-			item->Pose.Orientation.y -= ANGLE(10.0f);
+		if (abs(info.angle) < ANGLE(10))
+			item->pos.yRot += info.angle;
+		else if (info.angle < 0)
+			item->pos.yRot -= ANGLE(10);
 		else
-			item->Pose.Orientation.y += ANGLE(10.0f);
+			item->pos.yRot += ANGLE(10);
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			info->Flags = 0;
-
-			if (AI.distance > pow(SECTOR(2.5f), 2))
-				item->Animation.TargetState = 3;
-			else if (LaraItem->HitPoints > 0 &&
-				((AI.ahead && AI.distance < pow(SECTOR(1), 2)) || item->HitStatus || LaraItem->Animation.Velocity > 15))
-			{
-				item->Animation.TargetState = 2;
-			}
-
+			creature->flags = 0;
+			if (info.distance > SQUARE(2560))
+				item->goalAnimState = 3;
+			else if ((LaraItem->hitPoints > 0) && ((info.ahead && info.distance < SQUARE(1024)) || item->hitStatus || (LaraItem->speed > 15)))
+				item->goalAnimState = 2;
 			break;
 
 		case 3:
-			info->Flags = 0;
-
-			if (item->HitPoints != -16384)
+			creature->flags = 0;
+			if (item->hitPoints != -16384)
 			{
-				item->ItemFlags[2] = item->HitPoints;
-				item->HitPoints = -16384;
+				item->itemFlags[2] = item->hitPoints;
+				item->hitPoints = -16384;
 			}
-			if (AI.distance < pow(SECTOR(1.5f), 2) && LaraItem->HitPoints > 0)
+			if (info.distance < SQUARE(1536) && LaraItem->hitPoints > 0)
 			{
-				item->Animation.TargetState = 0;
-				item->HitPoints = item->ItemFlags[2];
+				item->goalAnimState = 0;
+				item->hitPoints = item->itemFlags[2];
 			}
-
 			break;
 
 		case 2:
-			if (info->Flags != 1 && item->TouchBits & 0x2000)
+			if (creature->flags != 1 && (item->touchBits & 0x2000))
 			{
-				CreatureEffect(item, &CobraBite, DoBloodSplat);
-				info->Flags = 1;
+				creature->flags = 1;
+				LaraItem->hitPoints -= 80;
+				LaraItem->hitStatus = true;
+				Lara.poisoned = 0x100;
 
-				LaraItem->HitPoints -= 80;
-				LaraItem->HitStatus = true;
-				Lara.PoisonPotency += 1;
+				CreatureEffect(item, &cobraBite, DoBloodSplat);
 			}
-
 			break;
 
 		case 0:
-			item->HitPoints = item->ItemFlags[2];
+			item->hitPoints = item->itemFlags[2];
 			break;
+
 		}
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, head / 2);
-	CreatureJoint(item, 1, head / 2);
-	CreatureAnimation(itemNumber, angle, tilt);
+	CreatureJoint(item, 0, head >> 1);
+	CreatureJoint(item, 1, head >> 1);
+	CreatureAnimation(itemNum, angle, tilt);
 }

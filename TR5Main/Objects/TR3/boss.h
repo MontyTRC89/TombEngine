@@ -3,7 +3,7 @@
 
 struct BOSS_STRUCT
 {
-	Vector3Int BeamTarget;
+	PHD_VECTOR BeamTarget;
 	bool DroppedIcon;
 	bool IsInvincible;
 	bool DrawExplode; // allow explosion geometry

@@ -3,47 +3,46 @@
 #include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
-#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
 
-void ControlSpikyWall(short itemNumber)
+void ControlSpikyWall(short itemNum)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	// Move wall.
-	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED)
+	/* Move wall */
+	if (TriggerActive(item) && item->status != ITEM_DEACTIVATED)
 	{
-		int x = item->Pose.Position.x + phd_sin(item->Pose.Orientation.y);
-		int z = item->Pose.Position.z + phd_cos(item->Pose.Orientation.y);
-		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
+		int x = item->pos.xPos + phd_sin(item->pos.yRot);
+		int z = item->pos.zPos + phd_cos(item->pos.yRot);
 
-		if (probe.Position.Floor != item->Pose.Position.y)
+		short roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+
+		if (GetFloorHeight(floor, x, item->pos.yPos, z) != item->pos.yPos)
 		{
-			item->Status = ITEM_DEACTIVATED;
+			item->status = ITEM_DEACTIVATED;
 			StopSoundEffect(SFX_TR4_ROLLING_BALL);
 		}
 		else
 		{
-			item->Pose.Position.x = x;
-			item->Pose.Position.z = z;
-
-			if (probe.RoomNumber != item->RoomNumber)
-				ItemNewRoom(itemNumber, probe.RoomNumber);
-
-			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose, 0);
+			item->pos.xPos = x;
+			item->pos.zPos = z;
+			if (roomNumber != item->roomNumber)
+				ItemNewRoom(itemNum, roomNumber);
+			SoundEffect(SFX_TR4_ROLLING_BALL, &item->pos, 0);
 		}
 	}
 
-	if (item->TouchBits)
+	if (item->touchBits)
 	{
-		LaraItem->HitPoints -= 15;
-		LaraItem->HitStatus = true;
+		LaraItem->hitPoints -= 15;
+		LaraItem->hitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
-		item->TouchBits = 0;
+		DoLotsOfBlood(LaraItem->pos.xPos, LaraItem->pos.yPos - 512, LaraItem->pos.zPos, 4, item->pos.yRot, LaraItem->roomNumber, 3);
+		item->touchBits = 0;
 
-		SoundEffect(56, &item->Pose, 0);
+		SoundEffect(56, &item->pos, 0);
 	}
 }

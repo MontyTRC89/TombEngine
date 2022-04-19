@@ -166,8 +166,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\footprint.h" />
     <ClInclude Include="Game\Lara\lara_helpers.h" />
     <ClInclude Include="Game\Lara\lara_jump.h" />
-    <ClInclude Include="Game\Lara\lara_overhang.h" />
-    <ClInclude Include="Game\Lara\lara_test_structs.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
@@ -407,7 +405,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR2\tr2_objects.h" />
     <ClInclude Include="Objects\TR3\tr3_objects.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_ahmet.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_goon.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_baddy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_bat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_bigscorpion.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_crocodile.h" />
@@ -417,7 +415,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR4\Entity\tr4_horseman.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_jeanyves.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_knighttemplar.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_beetle_swarm.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_littlebeetle.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mummy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sas.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sentrygun.h" />
@@ -436,7 +434,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Vehicles\minecart.h" />
     <ClInclude Include="Objects\TR4\Vehicles\motorbike.h" />
     <ClInclude Include="Objects\TR3\Vehicles\quad.h" />
-    <ClInclude Include="Objects\TR2\Vehicles\skidoo.h" />
+    <ClInclude Include="Objects\TR2\Vehicles\snowmobile.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv.h" />
     <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h" />
     <ClInclude Include="Renderer\Frustum.h" />
@@ -576,7 +574,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\Lara\lara_jump.cpp" />
     <ClCompile Include="Game\Lara\lara_monkey.cpp" />
     <ClCompile Include="Game\Lara\lara_objects.cpp" />
-    <ClCompile Include="Game\Lara\lara_overhang.cpp" />
     <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\effects\lightning.cpp" />
@@ -748,7 +745,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR2\Entity\tr2_monk.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mpgun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mpstick.cpp" />
-    <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
+    <ClCompile Include="Objects\TR2\Vehicles\snowmobile.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
@@ -770,7 +767,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_bigscorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_crocodile.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_harpy.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_beetle_swarm.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_littlebeetle.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_smallscorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sphinx.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp" />
@@ -838,7 +835,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Game\effects\tomb4fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_goon.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\quad.cpp" />

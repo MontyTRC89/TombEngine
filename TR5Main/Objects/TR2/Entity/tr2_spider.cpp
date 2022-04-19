@@ -10,232 +10,245 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO SpiderBite = { 0, 0, 41, 1 };
+BITE_INFO spiderBite = { 0, 0, 41, 1 };
 
 static void S_SpiderBite(ITEM_INFO* item)
 {
-	Vector3Int pos = { SpiderBite.x, SpiderBite.y, SpiderBite.z };
-	GetJointAbsPosition(item, &pos, SpiderBite.meshNum);
-
-	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Pose.Position.y, item->RoomNumber);
+	PHD_VECTOR pos;
+	pos.x = spiderBite.x;
+	pos.y = spiderBite.y;
+	pos.z = spiderBite.z;
+	GetJointAbsPosition(item, &pos, spiderBite.meshNum);
+	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->pos.yPos, item->roomNumber);
 }
 
-static void SpiderLeap(short itemNumber, ITEM_INFO* item, short angle)
+static void SpiderLeap(short itemNum, ITEM_INFO* item, short angle)
 {
-	GameVector vec;
-	vec.x = item->Pose.Position.x;
-	vec.y = item->Pose.Position.y;
-	vec.z = item->Pose.Position.z;
-	vec.roomNumber = item->RoomNumber;
+	GAME_VECTOR vec;
 
-	CreatureAnimation(itemNumber, angle, 0);
+	vec.x = item->pos.xPos;
+	vec.y = item->pos.yPos;
+	vec.z = item->pos.zPos;
+	vec.roomNumber = item->roomNumber;
 
-	if (item->Pose.Position.y > (vec.y - CLICK(1.5f)))
+	CreatureAnimation(itemNum, angle, 0);
+
+	if (item->pos.yPos > (vec.y - (STEP_SIZE * 3) / 2))
 		return;
 
-	item->Pose.Position.x = vec.x;
-	item->Pose.Position.y = vec.y;
-	item->Pose.Position.z = vec.z;
-	if (item->RoomNumber != vec.roomNumber)
-		ItemNewRoom(item->RoomNumber, vec.roomNumber);
+	item->pos.xPos = vec.x;
+	item->pos.yPos = vec.y;
+	item->pos.zPos = vec.z;
+	if (item->roomNumber != vec.roomNumber)
+		ItemNewRoom(item->roomNumber, vec.roomNumber);
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = 5;
+	item->animNumber = Objects[item->objectNumber].animIndex + 2;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->currentAnimState = 5;
 
-	CreatureAnimation(itemNumber, angle, 0);
+	CreatureAnimation(itemNum, angle, 0);
 }
 
-void SmallSpiderControl(short itemNumber)
+void SmallSpiderControl(short itemNum)
 {
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
+	ITEM_INFO* item;
+	CREATURE_INFO* spider;
+	AI_INFO info;
+	short angle;
 
-	short angle = 0;
+	item = &g_Level.Items[itemNum];
+	spider = (CREATURE_INFO*)item->data;
+	angle = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 7)
+		if (item->currentAnimState != 7)
 		{
-			ExplodingDeath(itemNumber, -1, 256);
-			DisableEntityAI(itemNumber);
-			item->Animation.ActiveState = 7;
-			KillItem(itemNumber);
+			ExplodingDeath(itemNum, -1, 256);
+			DisableBaddieAI(itemNum);
+			item->currentAnimState = 7;
+			KillItem(itemNum);
 		}
 	}
 	else
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		CreatureAIInfo(item, &info);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
+		angle = CreatureTurn(item, ANGLE(8));
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
-		angle = CreatureTurn(item, ANGLE(8.0f));
-
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			creature->Flags = 0;
+			spider->flags = 0;
 
-			if (creature->Mood == MoodType::Bored)
+			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100)
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 				else
 					break;
 			}
-			else if (AI.ahead && item->TouchBits)
-				item->Animation.TargetState = 4;
-			else if (creature->Mood == MoodType::Stalk)
-				item->Animation.TargetState = 2;
-			else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-				item->Animation.TargetState = 3;
-			
+			else if (info.ahead && item->touchBits)
+			{
+				item->goalAnimState = 4;
+			}
+			else if (spider->mood == STALK_MOOD)
+			{
+				item->goalAnimState = 2;
+			}
+			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			{
+				item->goalAnimState = 3;
+			}
 			break;
 
 		case 2:
-			if (creature->Mood == MoodType::Bored)
+			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x100)
-					item->Animation.TargetState = 1;
+					item->goalAnimState = 1;
 				else
 					break;
 			}
-			else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-				item->Animation.TargetState = 3;
-			
+			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			{
+				item->goalAnimState = 3;
+			}
 			break;
 
 		case 3:
-			creature->Flags = 0;
+			spider->flags = 0;
 
-			if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
-				item->Animation.TargetState = 2;
-			else if (AI.ahead && item->TouchBits)
-				item->Animation.TargetState = 1;
-			else if (AI.ahead && AI.distance < pow(SECTOR(0.2f), 2))
-				item->Animation.TargetState = 6;
-			else if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
-				item->Animation.TargetState = 5;
-
+			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
+				item->goalAnimState = 2;
+			else if (info.ahead && item->touchBits)
+				item->goalAnimState = 1;
+			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 5))
+				item->goalAnimState = 6;
+			else if (info.ahead && info.distance < SQUARE(WALL_SIZE / 2))
+				item->goalAnimState = 5;
 			break;
 
 		case 4:
 		case 5:
 		case 6:
-			if (!creature->Flags && item->TouchBits)
+			if (!spider->flags && item->touchBits)
 			{
 				S_SpiderBite(item);
-				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 25;
-				LaraItem->HitStatus = 1;
+				LaraItem->hitPoints -= 25;
+				LaraItem->hitStatus = 1;
+				spider->flags = 1;
 			}
-
 			break;
 		}
 	}
 
 
-	if (item->Animation.ActiveState == 5 || item->Animation.ActiveState == 4)
-		CreatureAnimation(itemNumber, angle, 0);
+	if (item->currentAnimState == 5 || item->currentAnimState == 4)
+		CreatureAnimation(itemNum, angle, 0);
 	else
-		SpiderLeap(itemNumber, item, angle);
+		SpiderLeap(itemNum, item, angle);
 }
 
-void BigSpiderControl(short itemNumber)
+void BigSpiderControl(short itemNum)
 {
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
+	ITEM_INFO* item;
+	CREATURE_INFO* spider;
+	AI_INFO info;
+	short angle;
 
-	short angle = 0;
+	item = &g_Level.Items[itemNum];
+	spider = (CREATURE_INFO*)item->data;
+	angle = 0;
 
-	AI_INFO AI;
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 7)
+		if (item->currentAnimState != 7)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 7;
+			item->animNumber = Objects[item->objectNumber].animIndex + 2;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 7;
 		}
 	}
 	else
 	{
-		CreatureAIInfo(item, &AI);
-		GetCreatureMood(item, &AI, TRUE);
-		CreatureMood(item, &AI, TRUE);
-		angle = CreatureTurn(item, ANGLE(4.0f));
+		CreatureAIInfo(item, &info);
+		GetCreatureMood(item, &info, TRUE);
+		CreatureMood(item, &info, TRUE);
+		angle = CreatureTurn(item, ANGLE(4));
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			creature->Flags = 0;
+			spider->flags = 0;
 
-			if (creature->Mood == MoodType::Bored)
+			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x200)
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 				else
 					break;
 			}
-			else if (AI.ahead && AI.distance < (pow(CLICK(3), 2) + 15))
-				item->Animation.TargetState = 4;
-			else if (creature->Mood == MoodType::Stalk)
-				item->Animation.TargetState = 2;
-			else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-				item->Animation.TargetState = 3;
-			
+			else if (info.ahead && info.distance < (SQUARE(STEP_SIZE * 3) + 15))
+			{
+				item->goalAnimState = 4;
+			}
+			else if (spider->mood == STALK_MOOD)
+			{
+				item->goalAnimState = 2;
+			}
+			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			{
+				item->goalAnimState = 3;
+			}
 			break;
 
 		case 2:
-			if (creature->Mood == MoodType::Bored)
+			if (spider->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 0x200)
-					item->Animation.TargetState = 1;
+					item->goalAnimState = 1;
 				else
 					break;
 			}
-			else if (creature->Mood == MoodType::Escape || creature->Mood == MoodType::Attack)
-				item->Animation.TargetState = 3;
-			
+			else if (spider->mood == ESCAPE_MOOD || spider->mood == ATTACK_MOOD)
+			{
+				item->goalAnimState = 3;
+			}
 			break;
 
 		case 3:
-			creature->Flags = 0;
+			spider->flags = 0;
 
-			if (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Stalk)
-				item->Animation.TargetState = 2;
-			else if (AI.ahead && item->TouchBits)
-				item->Animation.TargetState = 1;
-
+			if (spider->mood == BORED_MOOD || spider->mood == STALK_MOOD)
+				item->goalAnimState = 2;
+			else if (info.ahead && item->touchBits)
+				item->goalAnimState = 1;
 			break;
 
 		case 4:
 		case 5:
 		case 6:
-			if (!creature->Flags && item->TouchBits)
+			if (!spider->flags && item->touchBits)
 			{
 				S_SpiderBite(item);
-				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 100;
-				LaraItem->HitStatus = 1;
+				LaraItem->hitPoints -= 100;
+				LaraItem->hitStatus = 1;
+				spider->flags = 1;
 			}
-
 			break;
 		}
 	}
 
-	CreatureAnimation(itemNumber, angle, 0);
+	CreatureAnimation(itemNum, angle, 0);
 }

@@ -1,3 +1,3 @@
 #pragma once
 
-void InitialiseLightingGuide(short itemNumber);
+void InitialiseLightingGuide(short itemNum);

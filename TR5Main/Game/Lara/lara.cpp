@@ -9,7 +9,6 @@
 #include "Game/Lara/lara_crawl.h"
 #include "Game/Lara/lara_objects.h"
 #include "Game/Lara/lara_hang.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_slide.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_surface.h"
@@ -17,9 +16,17 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_climb.h"
-#include "Game/Lara/lara_collide.h"
-#include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_initialise.h"
+
+#include "Objects/TR2/Vehicles/snowmobile.h"
+#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/kayak.h"
+#include "Objects/TR3/Vehicles/minecart.h"
+#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/upv.h"
+#include "Objects/TR4/Vehicles/jeep.h"
+#include "Objects/TR4/Vehicles/motorbike.h"
+#include "Objects/Generic/Object/rope.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -37,13 +44,14 @@
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Effects::Lara;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Control::Volumes;
 using std::function;
 using TEN::Renderer::g_Renderer;
 
 LaraInfo Lara;
 ITEM_INFO* LaraItem;
-CollisionInfo LaraCollision = {};
+COLL_INFO LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
 function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] = 
@@ -51,95 +59,95 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_walk_forward,
 	lara_as_run_forward,
 	lara_as_idle,
-	lara_as_jump_forward,//33
+	lara_as_forwardjump,
 	lara_as_pose,//4
 	lara_as_run_back,//5
 	lara_as_turn_right_slow,//6
 	lara_as_turn_left_slow,//7
 	lara_as_death,//8
-	lara_as_freefall,//9
+	lara_as_fastfall,
 	lara_as_hang,
 	lara_as_reach,
 	lara_as_splat,
-	lara_as_underwater_idle,//13
-	lara_void_func,//14
-	lara_as_jump_prepare,//15
+	lara_as_tread,
+	lara_void_func,
+	lara_as_compress,//15
 	lara_as_walk_back,//16
-	lara_as_underwater_swim_forward,//17
-	lara_as_underwater_inertia,//18
+	lara_as_swim,//17
+	lara_as_glide,//18
 	lara_as_controlled_no_look,//19
 	lara_as_turn_right_fast,//20
 	lara_as_step_right,//21
 	lara_as_step_left,//22
 	lara_as_roll_back,
-	lara_as_slide_forward,//24
-	lara_as_jump_back,//25
-	lara_as_jump_right,//26
-	lara_as_jump_left,//27
-	lara_as_jump_up,//28
-	lara_as_fall_back,//29
-	lara_as_shimmy_left,//30
-	lara_as_shimmy_right,//31
-	lara_as_slide_back,//32
-	lara_as_surface_idle,//33
-	lara_as_surface_swim_forward,//34
-	lara_as_surface_dive,//35
-	lara_as_pushable_push,//36
-	lara_as_pushable_pull,//37
-	lara_as_pushable_grab,//38
+	lara_as_slide,//24
+	lara_as_backjump,//25
+	lara_as_rightjump,//26
+	lara_as_leftjump,//27
+	lara_as_upjump,//28
+	lara_as_fallback,//29
+	lara_as_hangleft,//30
+	lara_as_hangright,//31
+	lara_as_slideback,//32
+	lara_as_surftread,
+	lara_as_surfswim,
+	lara_as_dive,
+	lara_as_pushblock,//36
+	lara_as_pullblock,//37
+	lara_as_ppready,//38
 	lara_as_pickup,//39
-	lara_as_switch_on,//40
-	lara_as_switch_off,//41
-	lara_as_use_key,//42
-	lara_as_use_puzzle,//43
-	lara_as_underwater_death,//44
+	lara_as_switchon,//40
+	lara_as_switchoff,//41
+	lara_as_usekey,//42
+	lara_as_usepuzzle,//43
+	lara_as_uwdeath,//44
 	lara_as_roll_forward,//45
 	lara_as_special,//46
-	lara_as_surface_swim_back,//47
-	lara_as_surface_swim_left,//48
-	lara_as_surface_swim_right,//49
+	lara_as_surfback,//47
+	lara_as_surfleft,//48
+	lara_as_surfright,//49
 	lara_void_func,//50
 	lara_void_func,//51
-	lara_as_swan_dive,//52
-	lara_as_freefall_dive,//53
-	lara_as_handstand,//54
-	lara_as_surface_climb_out,//55
-	lara_as_climb_idle,//56
-	lara_as_climb_up,//57
-	lara_as_climb_left,//58
-	lara_as_climb_end,//59
-	lara_as_climb_right,//60
-	lara_as_climb_down,//61
-	lara_as_auto_jump,//62
-	lara_void_func,//63
-	lara_void_func,//64
+	lara_as_swandive,//52
+	lara_as_fastdive,//53
+	lara_as_gymnast,//54
+	lara_as_waterout,
+	lara_as_climbstnc,
+	lara_as_climbing,
+	lara_as_climbleft,
+	lara_as_climbend,
+	lara_as_climbright,
+	lara_as_climbdown,//
+	lara_void_func,
+	lara_void_func,
+	lara_void_func,
 	lara_as_wade_forward,//65
-	lara_as_underwater_roll_180,//66
-	lara_as_pickup_flare,//67
+	lara_as_waterroll,//66
+	lara_as_pickupflare,//67
 	lara_void_func,//68
 	lara_void_func,//69
-	lara_as_zip_line,//70
+	lara_as_deathslide,//70
 	lara_as_crouch_idle,//71
 	lara_as_crouch_roll,//72
-	lara_as_sprint,//73
-	lara_as_sprint_dive,//74
-	lara_as_monkey_idle,//75
-	lara_as_monkey_forward,//76
-	lara_as_monkey_shimmy_left,//77
-	lara_as_monkey_shimmy_right,//78
-	lara_as_monkey_turn_180,//79
+	lara_as_sprint,
+	lara_as_sprint_dive,
+	lara_as_monkey_idle,
+	lara_as_monkeyswing,
+	lara_as_monkeyl,
+	lara_as_monkeyr,
+	lara_as_monkey180,
 	lara_as_crawl_idle,//80
 	lara_as_crawl_forward,//81
-	lara_as_monkey_turn_left,//82
-	lara_as_monkey_turn_right,//83
+	lara_as_hangturnl,
+	lara_as_hangturnr,
 	lara_as_crawl_turn_left,//84
 	lara_as_crawl_turn_right,//85
 	lara_as_crawl_back,//86
 	lara_as_controlled_no_look,
 	lara_as_controlled_no_look,
 	lara_as_controlled,
-	lara_as_rope_turn_clockwise,
-	lara_as_rope_turn_counter_clockwise,
+	lara_as_ropel,
+	lara_as_roper,
 	lara_as_controlled,
 	lara_as_controlled,
 	lara_as_controlled,
@@ -155,33 +163,33 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_pulley,//104
 	lara_as_crouch_turn_left,//105
 	lara_as_crouch_turn_right,//106
-	lara_as_shimmy_corner,//107
-	lara_as_shimmy_corner,//108
-	lara_as_shimmy_corner,//109
-	lara_as_shimmy_corner,//110
-	lara_as_rope_idle,//111
-	lara_as_rope_up,//112
-	lara_as_rope_down,//113
-	lara_as_rope_idle,//114
-	lara_as_rope_idle,//115
+	lara_as_corner,//107
+	lara_as_corner,//108
+	lara_as_corner,//109
+	lara_as_corner,//110
+	lara_as_rope,//111
+	lara_as_climbrope,//112
+	lara_as_climbroped,//113
+	lara_as_rope,//114
+	lara_as_rope,//115
 	lara_void_func,
 	lara_as_controlled,
 	lara_as_swimcheat,
-	lara_as_tightrope_idle,//119
+	lara_as_trpose,//119
 	lara_as_controlled_no_look,//120
-	lara_as_tightrope_walk,//121
-	lara_as_tightrope_fall,//122
-	lara_as_tightrope_fall,//123
+	lara_as_trwalk,//121
+	lara_as_trfall,//122
+	lara_as_trfall,//123
 	lara_as_null,//124
 #ifdef NEW_TIGHTROPE
-	lara_as_tightrope_dismount,//125
+	lara_as_trexit,//125
 #else // !NEW_TIGHTROPE
 	lara_as_null,//125
 #endif
-	lara_as_switch_on,//126
+	lara_as_switchon,//126
 	lara_as_null,//127
-	lara_as_horizontal_bar_swing,//128
-	lara_as_horizontal_bar_leap,//129
+	lara_as_parallelbars,//128
+	lara_as_pbleapoff,//129
 	lara_as_null,//130
 	lara_as_controlled_no_look,//131
 	lara_as_controlled_no_look,//132
@@ -195,74 +203,58 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_null,//140
 	lara_as_null,//141
 	lara_as_null,//142
-	lara_as_slopeclimb,//143
-	lara_as_slopeclimbup,//144
-	lara_as_slopeclimbdown,//145
-	lara_as_controlled_no_look,//146
-	lara_as_null,//147
-	lara_as_null,//148
-	lara_as_slopefall,//149
-	lara_as_climb_stepoff_left,
-	lara_as_climb_stepoff_right,
+	lara_as_null,// 143 - Unused
+	lara_as_null,// 144 - Unused
+	lara_as_null,// 145 - Unused
+	lara_as_controlled_no_look,
+	lara_as_null,
+	lara_as_null,
+	lara_as_null,
+	lara_as_stepoff_left,
+	lara_as_stepoff_right,
 	lara_as_turn_left_fast,
 	lara_as_controlled,
 	lara_as_controlled,
-	lara_as_controlled,//155
-	lara_as_slopehang,
-	lara_as_slopeshimmy,
-	lara_as_sclimbstart,
-	lara_as_sclimbstop,
-	lara_as_sclimbend,
-	lara_as_null,//161
-	lara_as_null,//162
-	lara_as_monkey_back,//163
-	lara_as_vault,//164
-	lara_as_vault,//165
-	lara_as_vault,//166
-	lara_as_vault,//167
-	lara_as_vault,//168
-	lara_as_vault,//169
-	lara_as_idle,//170
+	lara_as_controlled
 };
 
-function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
-{
+function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] = {
 	lara_col_walk_forward,
 	lara_col_run_forward,
 	lara_col_idle,
-	lara_col_jump_forward,//3
+	lara_col_forwardjump,
 	lara_col_idle,//4
 	lara_col_run_back,
 	lara_col_turn_right_slow,
 	lara_col_turn_left_slow,
 	lara_col_death,
-	lara_col_freefall,//9
+	lara_col_fastfall,
 	lara_col_hang,
 	lara_col_reach,
 	lara_col_splat,
-	lara_col_underwater_idle,
+	lara_col_tread,
 	lara_col_land,
-	lara_col_jump_prepare,//15
+	lara_col_compress,
 	lara_col_walk_back,
-	lara_col_underwater_swim_forward,
-	lara_col_underwater_inertia,
-	lara_default_col,//19
+	lara_col_swim,
+	lara_col_glide,
+	lara_default_col,
 	lara_col_turn_right_fast,
 	lara_col_step_right,
 	lara_col_step_left,
 	lara_col_roll_back,
-	lara_col_slide_forward,//24
-	lara_col_jump_back,//25
-	lara_col_jump_right,//26
-	lara_col_jump_left,//27
-	lara_col_jump_up,//28
-	lara_col_fall_back,//29
-	lara_col_shimmy_left,
-	lara_col_shimmy_right,
-	lara_col_slide_back,//32
-	lara_col_surface_idle,//33
-	lara_col_surface_swim_forward,//34
-	lara_col_surface_dive,//35
+	lara_col_slide,
+	lara_col_backjump,
+	lara_col_rightjump,
+	lara_col_leftjump,
+	lara_col_upjump,
+	lara_col_fallback,
+	lara_col_hangleft,
+	lara_col_hangright,
+	lara_col_slideback,
+	lara_col_surftread,
+	lara_col_surfswim,
+	lara_col_dive,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -271,29 +263,29 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
-	lara_col_underwater_death,//44
-	lara_col_roll_forward,//45
-	lara_void_func,//46
-	lara_col_surface_swim_back,//47
-	lara_col_surface_swim_left,//48
-	lara_col_surface_swim_right,//49
+	lara_col_uwdeath,
+	lara_col_roll_forward,
+	lara_void_func,
+	lara_col_surfback,
+	lara_col_surfleft,
+	lara_col_surfright,
 	lara_void_func,
 	lara_void_func,
-	lara_col_swan_dive,//52
-	lara_col_freefall_dive,//53
+	lara_col_swandive,
+	lara_col_fastdive,
 	lara_default_col,
-	lara_default_col,//55
-	lara_col_climb_idle,
-	lara_col_climb_up,
-	lara_col_climb_left,
-	lara_col_climb_end,
-	lara_col_climb_right,
-	lara_col_climb_down,
-	lara_col_jump_prepare,//62
+	lara_default_col,
+	lara_col_climbstnc,
+	lara_col_climbing,
+	lara_col_climbleft,
+	lara_col_climbend,
+	lara_col_climbright,
+	lara_col_climbdown,
+	lara_void_func,
 	lara_void_func,
 	lara_void_func,
 	lara_col_wade_forward,
-	lara_col_underwater_roll_180,
+	lara_col_waterroll,
 	lara_default_col,
 	lara_void_func,
 	lara_void_func,
@@ -303,14 +295,14 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_sprint,
 	lara_col_sprint_dive,
 	lara_col_monkey_idle,
-	lara_col_monkey_forward,//76
-	lara_col_monkey_shimmy_left,//77
-	lara_col_monkey_shimmy_right,//78
-	lara_col_monkey_turn_180,//79
+	lara_col_monkeyswing,
+	lara_col_monkeyl,
+	lara_col_monkeyr,
+	lara_col_monkey180,
 	lara_col_crawl_idle,
 	lara_col_crawl_forward,
-	lara_col_monkey_turn_left,//81
-	lara_col_monkey_turn_right,//82
+	lara_col_hangturnlr,
+	lara_col_hangturnlr,
 	lara_col_crawl_turn_left,
 	lara_col_crawl_turn_right,
 	lara_col_crawl_back,
@@ -322,7 +314,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_void_func,
 	lara_void_func,
-	lara_col_turn_switch,
+	lara_col_turnswitch,
 	lara_void_func,
 	lara_void_func,
 	lara_default_col,
@@ -338,14 +330,14 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
-	lara_col_rope_idle,
+	lara_col_rope,
 	lara_void_func,
 	lara_void_func,
-	lara_col_rope_swing,
-	lara_col_rope_swing,
+	lara_col_ropefwd,
+	lara_col_ropefwd,
 	lara_void_func,
 	lara_void_func,
-	lara_col_underwater_swim_forward,
+	lara_col_swim,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
@@ -370,143 +362,133 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_col_slopeclimb,
-	lara_default_col,     // lara_col_slopeclimbup
-	lara_default_col,     // lara_col_slopeclimbdown
+	lara_void_func, // 143 - Unused
+	lara_void_func, // 144 - Unused
+	lara_void_func, // 145 - Unused
 	lara_void_func,
 	lara_void_func,
 	lara_void_func,
-	lara_default_col,     // lara_col_slopefall
+	lara_void_func,
 	lara_default_col,
 	lara_default_col,
 	lara_col_turn_left_fast,
 	lara_default_col,
 	lara_default_col,
-	lara_default_col,
-	lara_col_slopehang,	  // lara_col_slopehang
-	lara_col_slopeshimmy, // lara_col_slopeshimmy
-	lara_default_col,	  // lara_col_sclimbstart
-	lara_default_col,     // lara_col_sclimbstop
-	lara_default_col,	  // lara_col_sclimbend
-	lara_void_func,//161
-	lara_void_func,//162
-	lara_col_monkey_back,//163
-	lara_void_func,//164
-	lara_void_func,//165
-	lara_void_func,//166
-	lara_void_func,//167
-	lara_void_func,//168
-	lara_void_func,//169
-	lara_col_idle,//170
+	lara_default_col
 };
 
-void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
+void LaraControl(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	if (lara->Control.Weapon.HasFired)
+	if (info->hasFired)
 	{
 		AlertNearbyGuards(item);
-		lara->Control.Weapon.HasFired = false;
+		info->hasFired = false;
 	}
 
-	if (lara->PoisonPotency)
+	if (info->poisoned)
 	{
-		if (lara->PoisonPotency > LARA_POISON_POTENCY_MAX)
-			lara->PoisonPotency = LARA_POISON_POTENCY_MAX;
+		if (info->poisoned > 4096)
+			info->poisoned = 4096;
 
-		if (!(Wibble & 0xFF))
-			item->HitPoints -= lara->PoisonPotency;
+		if (info->poisoned >= 256 && !(Wibble & 0xFF))
+			item->hitPoints -= info->poisoned >> 8;
 	}
 
-	if (lara->Control.IsMoving)
+	if (info->isMoving)
 	{
-		if (lara->Control.Count.PositionAdjust > LARA_POSITION_ADJUST_MAX_TIME)
+		if (info->moveCount > 90)
 		{
-			lara->Control.IsMoving = false;
-			lara->Control.HandStatus = HandStatus::Free;
+			info->isMoving = false;
+			info->gunStatus = LG_HANDS_FREE;
 		}
 
-		++lara->Control.Count.PositionAdjust;
+		++info->moveCount;
 	}
 
-	if (!lara->Control.Locked)
-		lara->LocationPad = 128;
+	if (!info->uncontrollable)
+		info->locationPad = 128;
 
-	auto oldPos = item->Pose.Position;
+	int oldX = item->pos.xPos;
+	int oldY = item->pos.yPos;
+	int oldZ = item->pos.zPos;
 
-	if (lara->Control.HandStatus == HandStatus::Busy &&
-		item->Animation.AnimNumber == LA_STAND_IDLE &&
-		item->Animation.ActiveState == LS_IDLE &&
-		item->Animation.TargetState == LS_IDLE &&
-		!item->Animation.Airborne)
+	if (info->gunStatus == LG_HANDS_BUSY &&
+		item->currentAnimState == LS_IDLE &&
+		item->goalAnimState == LS_IDLE &&
+		item->animNumber == LA_STAND_IDLE &&
+		!item->gravityStatus)
 	{
-		lara->Control.HandStatus = HandStatus::Free;
+		info->gunStatus = LG_HANDS_FREE;
 	}
 
-	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
-		lara->SprintEnergy++;
+	if (item->currentAnimState != LS_SPRINT && info->sprintTimer < LARA_SPRINT_MAX)
+		info->sprintTimer++;
 
-	lara->Control.IsLow = false;
+	info->isDucked = false;
 
-	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
+	bool isWater = TestLaraWater(item);
+	bool isSwamp = TestLaraSwamp(item);
 
-	int waterDepth = GetWaterDepth(item);
-	int waterHeight = GetWaterHeight(item);
+	int waterDepth = GetWaterDepth(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
+	int waterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
 	int heightFromWater;
 	if (waterHeight != NO_HEIGHT)
-		heightFromWater = item->Pose.Position.y - waterHeight;
+		heightFromWater = item->pos.yPos - waterHeight;
 	else
 		heightFromWater = NO_HEIGHT;
-	lara->WaterSurfaceDist = -heightFromWater;
+	info->waterSurfaceDist = -heightFromWater;
 
-	if (lara->Vehicle == NO_ITEM)
+	if (info->Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
 
-	if (lara->Vehicle == NO_ITEM && lara->ExtraAnim == -1)
+	if (info->Vehicle == NO_ITEM && info->ExtraAnim == -1)
 	{
-		switch (lara->Control.WaterStatus)
+		switch (info->waterStatus)
 		{
-		case WaterStatus::Dry:
+		case LW_ABOVE_WATER:
 			if (heightFromWater == NO_HEIGHT || heightFromWater < WADE_DEPTH)
 				break;
 
 			Camera.targetElevation = -ANGLE(22.0f);
 
 			// Water is deep enough to swim; dispatch dive.
-			if (waterDepth >= SWIM_DEPTH && !isSwamp)
+			if (waterDepth >= SWIM_DEPTH &&
+				!isSwamp)
 			{
 				if (isWater)
 				{
-					item->Pose.Position.y += CLICK(0.5f) - 28;
-					item->Animation.Airborne = false;
-					lara->Control.WaterStatus = WaterStatus::Underwater;
-					lara->Air = LARA_AIR_MAX;
+					info->air = LARA_AIR_MAX;
+					info->waterStatus = LW_UNDERWATER;
+					item->gravityStatus = false;
+					item->pos.yPos += 100;
 
 					UpdateItemRoom(item, 0);
 					StopSoundEffect(SFX_TR4_LARA_FALL);
 
-					if (item->Animation.ActiveState == LS_SWAN_DIVE)
+					if (item->currentAnimState == LS_SWANDIVE_START)
 					{
-						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Pose.Orientation.x = -ANGLE(45.0f);
-						item->Animation.VerticalVelocity *= 2;
-						lara->Control.HandStatus = HandStatus::Free;
+						info->gunStatus = LG_HANDS_FREE;
+						item->pos.xRot = -ANGLE(45.0f);
+						item->goalAnimState = LS_DIVE;
+						AnimateLara(item);
+						item->fallspeed *= 2;
 					}
-					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
+					else if (item->currentAnimState == LS_SWANDIVE_END)
 					{
-						SetAnimation(item, LA_SWANDIVE_DIVE);
-						item->Pose.Orientation.x = -ANGLE(85.0f);
-						item->Animation.VerticalVelocity *= 2;
-						lara->Control.HandStatus = HandStatus::Free;
+						info->gunStatus = LG_HANDS_FREE;
+						item->pos.xRot = -ANGLE(85.0f);
+						item->goalAnimState = LS_DIVE;
+						AnimateLara(item);
+						item->fallspeed *= 2;
 					}
 					else
 					{
+						item->pos.xRot = -ANGLE(45.0f);
 						SetAnimation(item, LA_FREEFALL_DIVE);
-						item->Pose.Orientation.x = -ANGLE(45.0f);
-						item->Animation.VerticalVelocity = item->Animation.VerticalVelocity / 2 * 3;
+						item->fallspeed = 3 * item->fallspeed / 2;
 					}
 
 					ResetLaraFlex(item);
@@ -516,24 +498,25 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 			// Water is at wade depth; update water status and do special handling.
 			else if (heightFromWater >= WADE_DEPTH)
 			{
-				lara->Control.WaterStatus = WaterStatus::Wade;
+				info->waterStatus = LW_WADE;
 
 				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
-				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
-					item->Animation.Airborne && !isSwamp)
+				if (waterDepth > (SWIM_DEPTH - STEP_SIZE) &&
+					!isSwamp &&
+					item->gravityStatus)
 				{
-					item->Animation.TargetState = LS_IDLE;
 					Splash(item);
+					item->goalAnimState = LS_IDLE;
 				}
-				// Lara is grounded; don't splash again.
-				else if (!item->Animation.Airborne)
-					item->Animation.TargetState = LS_IDLE;
+				// Lara is grounded; block land-to-run.
+				else if (!item->gravityStatus)
+					item->goalAnimState = LS_IDLE;
 				else if (isSwamp)
 				{
-					if (item->Animation.ActiveState == LS_SWAN_DIVE ||
-						item->Animation.ActiveState == LS_FREEFALL_DIVE)
+					if (item->currentAnimState == LS_SWANDIVE_START ||
+						item->currentAnimState == LS_SWANDIVE_END)
 					{
-						item->Pose.Position.y = waterHeight + (SECTOR(1) - 24);
+						item->pos.yPos = waterHeight + (WALL_SIZE - 24);
 					}
 
 					SetAnimation(item, LA_WADE);
@@ -542,77 +525,86 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 
 			break;
 
-		case WaterStatus::Underwater:
+		case LW_UNDERWATER:
 			if (isWater ||
-				waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1) ||
-				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE ||
-				item->Animation.AnimNumber == LA_ONWATER_DIVE)
+				waterDepth == DEEP_WATER ||
+				abs(heightFromWater) >= STEP_SIZE ||
+				item->animNumber == LA_UNDERWATER_RESURFACE ||
+				item->animNumber == LA_ONWATER_DIVE)
 			{
 				if (!isWater)
 				{
-					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= CLICK(1))
+					if (waterDepth == DEEP_WATER || abs(heightFromWater) >= STEP_SIZE)
 					{
 						SetAnimation(item, LA_FALL_START);
-						ResetLaraLean(item);
+						item->speed = item->fallspeed / 4;
+						item->gravityStatus = true;
+						item->fallspeed = 0;
+						item->pos.zRot = 0;
+						item->pos.xRot = 0;
+						info->waterStatus = LW_ABOVE_WATER;
 						ResetLaraFlex(item);
-						item->Animation.Airborne = true;
-						item->Animation.Velocity = item->Animation.VerticalVelocity / 4;
-						item->Animation.VerticalVelocity = 0;
-						lara->Control.WaterStatus = WaterStatus::Dry;
 					}
 					else
 					{
 						SetAnimation(item, LA_UNDERWATER_RESURFACE);
-						ResetLaraLean(item);
+						item->pos.yPos = waterHeight;
+						item->fallspeed = 0;
+						item->pos.zRot = 0;
+						item->pos.xRot = 0;
+						info->waterStatus = LW_SURFACE;
+						info->diveCount = 11;
 						ResetLaraFlex(item);
-						item->Pose.Position.y = waterHeight;
-						item->Animation.VerticalVelocity = 0;
-						lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
-						SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, 2);
+						SoundEffect(SFX_TR4_LARA_BREATH, &item->pos, 2);
 					}
 				}
 			}
 			else
 			{
 				SetAnimation(item, LA_UNDERWATER_RESURFACE);
-				ResetLaraLean(item);
+				item->pos.yPos = waterHeight + 1;
+				item->fallspeed = 0;
+				item->pos.zRot = 0;
+				item->pos.xRot = 0;
+				info->waterStatus = LW_SURFACE;
+				info->diveCount = 11;
 				ResetLaraFlex(item);
-				item->Pose.Position.y = waterHeight + 1;
-				item->Animation.VerticalVelocity = 0;
-				lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 				UpdateItemRoom(item, 0);
-				SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &item->pos, 2);
 			}
-
 			break;
 
-		case WaterStatus::TreadWater:
+		case LW_SURFACE:
 			if (!isWater)
 			{
 				if (heightFromWater <= WADE_DEPTH)
 				{
 					SetAnimation(item, LA_FALL_START);
-					item->Animation.Airborne = true;
-					item->Animation.Velocity = item->Animation.VerticalVelocity / 4;
-					lara->Control.WaterStatus = WaterStatus::Dry;
+					item->speed = item->fallspeed / 4;
+					item->gravityStatus = true;
+					info->waterStatus = LW_ABOVE_WATER;
 				}
 				else
 				{
 					SetAnimation(item, LA_STAND_IDLE);
-					lara->Control.WaterStatus = WaterStatus::Wade;
+					item->goalAnimState = LS_WADE_FORWARD; // TODO: Check if really needed? -- Lwmte, 10.11.21
+					info->waterStatus = LW_WADE;
+
+					AnimateItem(item);
 				}
 
-				ResetLaraLean(item);
+				item->fallspeed = 0;
+				item->pos.zRot = 0;
+				item->pos.xRot = 0;
 				ResetLaraFlex(item);
-				item->Animation.VerticalVelocity = 0;
 			}
 
 			break;
 
-		case WaterStatus::Wade:
+		case LW_WADE:
 			Camera.targetElevation = -ANGLE(22.0f);
 
 			if (heightFromWater >= WADE_DEPTH)
@@ -620,173 +612,225 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 				if (heightFromWater > SWIM_DEPTH && !isSwamp)
 				{
 					SetAnimation(item, LA_ONWATER_IDLE);
-					ResetLaraLean(item);
+
+					info->waterStatus = LW_SURFACE;
+					item->pos.yPos += 1 - heightFromWater;
+					item->gravityStatus = false;
+					item->fallspeed = 0;
+					item->pos.zRot = 0;
+					item->pos.xRot = 0;
+					info->diveCount = 0;
 					ResetLaraFlex(item);
-					item->Pose.Position.y += 1 - heightFromWater;
-					item->Animation.Airborne = false;
-					item->Animation.VerticalVelocity = 0;
-					lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 					UpdateItemRoom(item, 0);
 				}
 			}
 			else
 			{
-				lara->Control.WaterStatus = WaterStatus::Dry;
+				info->waterStatus = LW_ABOVE_WATER;
 
-				if (item->Animation.ActiveState == LS_WADE_FORWARD)
-					item->Animation.TargetState = LS_RUN_FORWARD;
+				if (item->currentAnimState == LS_WADE_FORWARD)
+					item->goalAnimState = LS_RUN_FORWARD;
 			}
 
 			break;
 		}
 	}
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		item->HitPoints = -1;
+		item->hitPoints = -1;
 
-		if (lara->Control.Count.Death == 0)
+		if (info->deathCount == 0)
 			StopSoundTracks();
 
-		lara->Control.Count.Death++;
-		if ((item->Flags & 0x100))
+		info->deathCount++;
+		if ((item->flags & 0x100))
 		{
-			lara->Control.Count.Death++;
+			info->deathCount++;
+
 			return;
 		}
 	}
 
-	switch (lara->Control.WaterStatus)
+	switch (info->waterStatus)
 	{
-	case WaterStatus::Dry:
-	case WaterStatus::Wade:
-		if (isSwamp	&& lara->WaterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
+	case LW_ABOVE_WATER:
+	case LW_WADE:
+		if (isSwamp	&& info->waterSurfaceDist < -(LARA_HEIGHT + 8)) // TODO: Find best height. @Sezz 2021.11.10
 		{
-			if (item->HitPoints >= 0)
+			if (item->hitPoints >= 0)
 			{
-				lara->Air -= 6;
-				if (lara->Air < 0)
+				info->air -= 6;
+				if (info->air < 0)
 				{
-					lara->Air = -1;
-					item->HitPoints -= 10;
+					info->air = -1;
+					item->hitPoints -= 10;
 				}
 			}
 		}
-		else if (lara->Air < LARA_AIR_MAX && item->HitPoints >= 0)
+		else if (info->air < LARA_AIR_MAX && item->hitPoints >= 0)
 		{
-			if (lara->Vehicle == NO_ITEM)	// Only for UPV.
+			if (info->Vehicle == NO_ITEM) // only for the upv !!
 			{
-				lara->Air += 10;
-				if (lara->Air > LARA_AIR_MAX)
-					lara->Air = LARA_AIR_MAX;
+				info->air += 10;
+				if (info->air > LARA_AIR_MAX)
+					info->air = LARA_AIR_MAX;
 			}
 		}
 
 		LaraAboveWater(item, coll);
+
 		break;
 
-	case WaterStatus::Underwater:
-		if (item->HitPoints >= 0)
+	case LW_UNDERWATER:
+		if (item->hitPoints >= 0)
 		{
-			auto* level = g_GameFlow->GetLevel(CurrentLevel);
+			auto level = g_GameFlow->GetLevel(CurrentLevel);
 			if (level->LaraType != LaraType::Divesuit)
-				lara->Air--;
+				info->air--;
 
-			if (lara->Air < 0)
+			if (info->air < 0)
 			{
-			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && lara->anxiety < 251)
-			//		lara->anxiety += 4;
-				item->HitPoints -= 5;
-				lara->Air = -1;
+			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && info->anxiety < 251)
+			//		info->anxiety += 4;
+				info->air = -1;
+				item->hitPoints -= 5;
 			}
 		}
 
-		LaraUnderwater(item, coll);
+		LaraUnderWater(item, coll);
+
 		break;
 
-	case WaterStatus::TreadWater:
-		if (item->HitPoints >= 0)
+	case LW_SURFACE:
+		if (item->hitPoints >= 0)
 		{
-			lara->Air += 10;
-			if (lara->Air > LARA_AIR_MAX)
-				lara->Air = LARA_AIR_MAX;
+			info->air += 10;
+			if (info->air > LARA_AIR_MAX)
+				info->air = LARA_AIR_MAX;
 		}
 
-		LaraWaterSurface(item, coll);
+		LaraSurface(item, coll);
+
 		break;
 
-	case WaterStatus::FlyCheat:
+	case LW_FLYCHEAT:
 		LaraCheat(item, coll);
+
 		break;
 	}
 
 	Statistics.Game.Distance += sqrt(
-		pow(item->Pose.Position.x - oldPos.x, 2) +
-		pow(item->Pose.Position.y - oldPos.y, 2) +
-		pow(item->Pose.Position.z - oldPos.z, 2));
+		SQUARE(item->pos.xPos - oldX) +
+		SQUARE(item->pos.yPos - oldY) +
+		SQUARE(item->pos.zPos - oldZ));
 }
 
-void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
+void LaraAboveWater(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	coll->Setup.Mode = CollisionProbeMode::Quadrants;
-	// TODO: Move radius and height resets here when look feature is refactored. @Sezz 2022.03.29
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
+	coll->Setup.OldAnimState = item->currentAnimState;
+	coll->Setup.OldAnimNumber = item->animNumber;
+	coll->Setup.OldFrameNumber = item->frameNumber;
 
-	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
-
-	coll->Setup.BlockFloorSlopeUp = false;
-	coll->Setup.BlockFloorSlopeDown = false;
-	coll->Setup.BlockCeilingSlope = false;
-	coll->Setup.BlockDeathFloorDown = false;
-	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = true;
+	coll->Setup.EnableSpaz = true;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
-	coll->Setup.OldPosition = item->Pose.Position;
-	coll->Setup.OldState = item->Animation.ActiveState;
-	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
-	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
-
-	if (TrInput & IN_LOOK && lara->Control.CanLook &&
-		lara->ExtraAnim == NO_ITEM)
+	if (TrInput & IN_LOOK && info->look &&
+		info->ExtraAnim == NO_ITEM)
 	{
-		LookLeftRight(item);
+		LookLeftRight();
 	}
 	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 		ResetLook(item);
 
-	coll->Setup.Radius = LARA_RADIUS;
+	// TODO: Move radius and height default resets above look checks when
+	coll->Setup.Radius = LARA_RAD;
 	coll->Setup.Height = LARA_HEIGHT;
-	lara->Control.CanLook = true;
+	info->look = true;
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
-	if (HandleLaraVehicle(item, coll))
-		return;
+	if (info->Vehicle != NO_ITEM)
+	{
+		switch (g_Level.Items[info->Vehicle].objectNumber)
+		{
+		case ID_QUAD:
+			if (QuadBikeControl(item, coll))
+				return;
+			break;
+
+		case ID_JEEP:
+			if (JeepControl())
+				return;
+			break;
+
+		case ID_MOTORBIKE:
+			if (MotorbikeControl())
+				return;
+			break;
+
+		case ID_KAYAK:
+			if (KayakControl(item))
+				return;
+			break;
+
+		case ID_SNOWMOBILE:
+			if (SkidooControl(item, coll))
+				return;
+			break;
+
+		case ID_UPV:
+			if (SubControl(item, coll))
+				return;
+			break;
+
+		case ID_MINECART:
+			if (MineCartControl())
+				return;
+			break;
+
+		case ID_BIGGUN:
+			if (BigGunControl(item, coll))
+				return;
+			break;
+
+		default:
+			// Boats are processed like normal items in loop.
+			LaraGun(item);
+			return;
+		}
+	}
+
+	// Handle current Lara status.
+	lara_control_routines[item->currentAnimState](item, coll);
 
 	HandleLaraMovementParameters(item, coll);
 
-	// Handle current Lara status.
-	lara_control_routines[item->Animation.ActiveState](item, coll);
-
+	// Animate Lara.
 	AnimateLara(item);
 
-	if (lara->ExtraAnim == -1)
+	if (info->ExtraAnim == -1)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 
 		// Handle Lara collision.
-		if (lara->Vehicle == NO_ITEM)
-			lara_collision_routines[item->Animation.ActiveState](item, coll);
+		if (info->Vehicle == NO_ITEM)
+			lara_collision_routines[item->currentAnimState](item, coll);
 	}
 
-	lara->ExtraVelocity = Vector3Int();
-
-	//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
+	//if (info->gunType == WEAPON_CROSSBOW && !LaserSight)
 	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons.
@@ -801,172 +845,100 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	TestVolumes(item);
 }
 
-void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
+void LaraUnderWater(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	Camera.targetElevation = -ANGLE(22.0f);
+	coll->Setup.BadHeightDown = 32512;
+	coll->Setup.BadHeightUp = -400;
+	coll->Setup.BadCeilingHeight = 400;
 
-	coll->Setup.Mode = CollisionProbeMode::FreeForward;
-	coll->Setup.Radius = LARA_RADIUS;
-	coll->Setup.Height = LARA_HEIGHT_SURFACE;
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
 
-	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-	coll->Setup.UpperFloorBound = -CLICK(0.5f);
-	coll->Setup.LowerCeilingBound = LARA_RADIUS;
-	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.EnableObjectPush = true;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::QUADRANTS;
 
-	coll->Setup.BlockFloorSlopeUp = false;
-	coll->Setup.BlockFloorSlopeDown = false;
-	coll->Setup.BlockCeilingSlope = false;
-	coll->Setup.BlockDeathFloorDown = false;
-	coll->Setup.BlockMonkeySwingEdge = false;
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpasm = false;
-
-	coll->Setup.OldPosition = item->Pose.Position;
-
-	if (TrInput & IN_LOOK && lara->Control.CanLook)
-		LookLeftRight(item);
-	else
-		ResetLook(item);
-
-	lara->Control.CanLook = true;
-	lara->Control.Count.Pose = 0;
-
-	lara_control_routines[item->Animation.ActiveState](item, coll);
-
-	// Reset turn rate.
-	int sign = copysign(1, lara->Control.TurnRate);
-	if (abs(lara->Control.TurnRate) > ANGLE(2.0f))
-		lara->Control.TurnRate -= ANGLE(2.0f) * sign;
-	else if (abs(lara->Control.TurnRate) > ANGLE(0.5f))
-		lara->Control.TurnRate -= ANGLE(0.5f) * sign;
-	else
-		lara->Control.TurnRate = 0;
-	item->Pose.Orientation.y += lara->Control.TurnRate;
-
-	// Reset lean.
-	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
-		ResetLaraLean(item, 8.0f);
-
-	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
-		LaraWaterCurrent(item, coll);
-
-	AnimateLara(item);
-
-	item->Pose.Position.x += round(item->Animation.VerticalVelocity * phd_sin(lara->Control.MoveAngle) / 4);
-	item->Pose.Position.z += round(item->Animation.VerticalVelocity * phd_cos(lara->Control.MoveAngle) / 4);
-
-	DoObjectCollision(item, coll);
-
-	if (lara->Vehicle == NO_ITEM)
-		lara_collision_routines[item->Animation.ActiveState](item, coll);
-
-	lara->ExtraVelocity = Vector3Int();
-
-	UpdateItemRoom(item, LARA_RADIUS);
-
-	LaraGun(item);
-
-	ProcessSectorFlags(item);
-	TestTriggers(item, false);
-	TestVolumes(item);
-}
-
-void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	coll->Setup.Mode = CollisionProbeMode::Quadrants;
-	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;
+	coll->Setup.Radius = LARA_RAD_UNDERWATER;
 	coll->Setup.Height = LARA_HEIGHT;
 
-	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
-	coll->Setup.UpperFloorBound = -(LARA_RADIUS_UNDERWATER + (LARA_RADIUS_UNDERWATER / 3));
-	coll->Setup.LowerCeilingBound = LARA_RADIUS_UNDERWATER + (LARA_RADIUS_UNDERWATER / 3);
-	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
-
-	coll->Setup.BlockFloorSlopeUp = false;
-	coll->Setup.BlockFloorSlopeDown = false;
-	coll->Setup.BlockCeilingSlope = false;
-	coll->Setup.BlockDeathFloorDown = false;
-	coll->Setup.BlockMonkeySwingEdge = false;
-	coll->Setup.EnableObjectPush = true;
-	coll->Setup.EnableSpasm = false;
-
-	coll->Setup.OldPosition = item->Pose.Position;
-
-	if (TrInput & IN_LOOK && lara->Control.CanLook)
-		LookLeftRight(item);
+	if (TrInput & IN_LOOK && info->look)
+		LookLeftRight();
 	else
 		ResetLook(item);
 
-	lara->Control.CanLook = true;
-	lara->Control.Count.Pose = 0;
+	info->look = true;
+	info->poseCount = 0;
 
-	lara_control_routines[item->Animation.ActiveState](item, coll);
+	lara_control_routines[item->currentAnimState](item, coll);
 
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
 	if (level->LaraType == LaraType::Divesuit)
 	{
-		if (lara->Control.TurnRate < -ANGLE(0.5f))
-			lara->Control.TurnRate += ANGLE(0.5f);
-		else if (lara->Control.TurnRate > ANGLE(0.5f))
-			lara->Control.TurnRate -= ANGLE(0.5f);
+		if (info->turnRate < -ANGLE(0.5f))
+			info->turnRate += ANGLE(0.5f);
+		else if (info->turnRate > ANGLE(0.5f))
+			info->turnRate -= ANGLE(0.5f);
 		else
-			lara->Control.TurnRate = 0;
+			info->turnRate = 0;
 	}
-	else if (lara->Control.TurnRate < -ANGLE(2.0f))
-		lara->Control.TurnRate += ANGLE(2.0f);
-	else if (lara->Control.TurnRate > ANGLE(2.0f))
-		lara->Control.TurnRate -= ANGLE(2.0f);
+	else if (info->turnRate < -ANGLE(2.0f))
+		info->turnRate += ANGLE(2.0f);
+	else if (info->turnRate > ANGLE(2.0f))
+		info->turnRate -= ANGLE(2.0f);
 	else
-		lara->Control.TurnRate = 0;
-	item->Pose.Orientation.y += lara->Control.TurnRate;
+		info->turnRate = 0;
+
+	item->pos.yRot += info->turnRate;
 
 	if (level->LaraType == LaraType::Divesuit)
-		UpdateLaraSubsuitAngles(item);
+		UpdateSubsuitAngles();
 
-	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
-		ResetLaraLean(item, 8.0f, true, false);
+	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	{
+		if (abs(item->pos.zRot) > ANGLE(0.0f))
+			item->pos.zRot += item->pos.zRot / -8;
+	}
 
-	if (item->Pose.Orientation.x < -ANGLE(85.0f))
-		item->Pose.Orientation.x = -ANGLE(85.0f);
-	else if (item->Pose.Orientation.x > ANGLE(85.0f))
-		item->Pose.Orientation.x = ANGLE(85.0f);
+	if (item->pos.xRot < -ANGLE(85.0f))
+		item->pos.xRot = -ANGLE(85.0f);
+	else if (item->pos.xRot > ANGLE(85.0f))
+		item->pos.xRot = ANGLE(85.0f);
 
 	if (level->LaraType == LaraType::Divesuit)
 	{
-		if (item->Pose.Orientation.z > ANGLE(44.0f))
-			item->Pose.Orientation.z = ANGLE(44.0f);
-		else if (item->Pose.Orientation.z < -ANGLE(44.0f))
-			item->Pose.Orientation.z = -ANGLE(44.0f);
+		if (item->pos.zRot > ANGLE(44.0f))
+			item->pos.zRot = ANGLE(44.0f);
+		else if (item->pos.zRot < -ANGLE(44.0f))
+			item->pos.zRot = -ANGLE(44.0f);
 	}
 	else
 	{
-		if (item->Pose.Orientation.z > ANGLE(22.0f))
-			item->Pose.Orientation.z = ANGLE(22.0f);
-		else if (item->Pose.Orientation.z < -ANGLE(22.0f))
-			item->Pose.Orientation.z = -ANGLE(22.0f);
+		if (item->pos.zRot > ANGLE(22.0f))
+			item->pos.zRot = ANGLE(22.0f);
+		else if (item->pos.zRot < -ANGLE(22.0f))
+			item->pos.zRot = -ANGLE(22.0f);
 	}
 
-	if (lara->WaterCurrentActive && lara->Control.WaterStatus != WaterStatus::FlyCheat)
-		LaraWaterCurrent(item, coll);
+	if (info->currentActive && info->waterStatus != LW_FLYCHEAT)
+		LaraWaterCurrent(coll);
 
 	AnimateLara(item);
 
-	item->Pose.Position.x += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.y) / 4);
-	item->Pose.Position.y -= round(item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.x) / 4);
-	item->Pose.Position.z += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_cos(item->Pose.Orientation.y) / 4);
+	item->pos.xPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_sin(item->pos.yRot) / 4;
+	item->pos.yPos -= item->fallspeed * phd_sin(item->pos.xRot) / 4;
+	item->pos.zPos += phd_cos(item->pos.xRot) * item->fallspeed * phd_cos(item->pos.yRot) / 4;
 
 	DoObjectCollision(item, coll);
 
-	if (/*lara->ExtraAnim == -1 &&*/ lara->Vehicle == NO_ITEM)
-		lara_collision_routines[item->Animation.ActiveState](item, coll);
-
-	lara->ExtraVelocity = Vector3Int();
+	if (/*info->ExtraAnim == -1 &&*/ info->Vehicle == NO_ITEM)
+		lara_collision_routines[item->currentAnimState](item, coll);
 
 	UpdateItemRoom(item, 0);
 
@@ -977,32 +949,273 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	TestVolumes(item);
 }
 
-void LaraCheat(ITEM_INFO* item, CollisionInfo* coll)
+void LaraSurface(ITEM_INFO* item, COLL_INFO* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	LaraInfo*& info = item->data;
 
-	item->HitPoints = LARA_HEALTH_MAX;
-	LaraUnderwater(item, coll);
+	Camera.targetElevation = -ANGLE(22.0f);
+
+	coll->Setup.BadHeightDown = 32512;
+	coll->Setup.BadHeightUp = -128;
+	coll->Setup.BadCeilingHeight = 100;
+
+	coll->Setup.OldPosition.x = item->pos.xPos;
+	coll->Setup.OldPosition.y = item->pos.yPos;
+	coll->Setup.OldPosition.z = item->pos.zPos;
+
+	coll->Setup.SlopesAreWalls = false;
+	coll->Setup.SlopesArePits = false;
+	coll->Setup.DeathFlagIsPit = false;
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpaz = false;
+	coll->Setup.Mode = COLL_PROBE_MODE::FREE_FORWARD;
+
+	coll->Setup.Radius = LARA_RAD;
+	coll->Setup.Height = LARA_HEIGHT_SURFACE;
+
+	if (TrInput & IN_LOOK && info->look)
+		LookLeftRight();
+	else
+		ResetLook(item);
+
+	info->look = true;
+	info->poseCount = 0;
+
+	lara_control_routines[item->currentAnimState](item, coll);
+
+	if (!info->isMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
+	{
+		if (abs(item->pos.zRot) > ANGLE(0.0f))
+			item->pos.zRot += item->pos.zRot / -8;
+	}
+
+	if (info->currentActive && info->waterStatus != LW_FLYCHEAT)
+		LaraWaterCurrent(coll);
+
+	AnimateLara(item);
+
+	item->pos.xPos += item->fallspeed * phd_sin(info->moveAngle) / 4;
+	item->pos.zPos += item->fallspeed * phd_cos(info->moveAngle) / 4;
+
+	DoObjectCollision(item, coll);
+
+	if (info->Vehicle == NO_ITEM)
+		lara_collision_routines[item->currentAnimState](item, coll);
+
+	UpdateItemRoom(item, 100);
+
+	LaraGun(item);
+
+	ProcessSectorFlags(item);
+	TestTriggers(item, false);
+	TestVolumes(item);
+}
+
+void LaraCheat(ITEM_INFO* item, COLL_INFO* coll)
+{
+	LaraInfo*& info = item->data;
+
+	item->hitPoints = LARA_HEALTH_MAX;
+	LaraUnderWater(item, coll);
 
 	if (TrInput & IN_WALK && !(TrInput & IN_LOOK))
 	{
-		if (TestEnvironment(ENV_FLAG_WATER, item) || (lara->WaterSurfaceDist > 0 && lara->WaterSurfaceDist != NO_HEIGHT))
+		if (TestLaraWater(item) || (info->waterSurfaceDist > 0 && info->waterSurfaceDist != NO_HEIGHT))
 		{
+			info->waterStatus = LW_UNDERWATER;
 			SetAnimation(item, LA_UNDERWATER_IDLE);
 			ResetLaraFlex(item);
-			lara->Control.WaterStatus = WaterStatus::Underwater;
 		}
 		else
 		{
+			info->waterStatus = LW_ABOVE_WATER;
 			SetAnimation(item, LA_STAND_SOLID);
-			item->Pose.Orientation.x = 0;
-			item->Pose.Orientation.z = 0;
+			item->pos.zRot = 0;
+			item->pos.xRot = 0;
 			ResetLaraFlex(item);
-			lara->Control.WaterStatus = WaterStatus::Dry;
 		}
 
-		LaraInitialiseMeshes(item);
-		item->HitPoints = LARA_HEALTH_MAX;
-		lara->Control.HandStatus = HandStatus::Free;
+		info->gunStatus = LG_HANDS_FREE;
+		LaraInitialiseMeshes();
+		item->hitPoints = LARA_HEALTH_MAX;
 	}
+}
+
+void AnimateLara(ITEM_INFO* item)
+{
+	LaraInfo*& info = item->data;
+
+	item->frameNumber++;
+
+	ANIM_STRUCT* anim = &g_Level.Anims[item->animNumber];
+	if (anim->numberChanges > 0 && GetChange(item, anim))
+	{
+		anim = &g_Level.Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (item->frameNumber > anim->frameEnd)
+	{
+		if (anim->numberCommands > 0)
+		{
+			short* cmd = &g_Level.Commands[anim->commandIndex];
+			for (int i = anim->numberCommands; i > 0; i--)
+			{
+				switch (*(cmd++))
+				{
+				case COMMAND_MOVE_ORIGIN:
+					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					UpdateItemRoom(item, -LARA_HEIGHT / 2);
+					cmd += 3;
+					break;
+
+				case COMMAND_JUMP_VELOCITY:
+					item->fallspeed = *(cmd++);
+					item->speed = *(cmd++);
+					item->gravityStatus = true;
+					if (info->calcFallSpeed)
+					{
+						item->fallspeed = info->calcFallSpeed;
+						info->calcFallSpeed = 0;
+					}
+					break;
+
+				case COMMAND_ATTACK_READY:
+					if (info->gunStatus != LG_SPECIAL)
+						info->gunStatus = LG_HANDS_FREE;
+					break;
+
+				case COMMAND_SOUND_FX:
+				case COMMAND_EFFECT:
+					cmd += 2;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+
+		item->animNumber = anim->jumpAnimNum;
+		item->frameNumber = anim->jumpFrameNum;
+
+		anim = &g_Level.Anims[item->animNumber];
+		item->currentAnimState = anim->currentAnimState;
+	}
+
+	if (anim->numberCommands > 0)
+	{
+		short* cmd = &g_Level.Commands[anim->commandIndex];
+		int flags;
+		int effectID = 0;
+
+		for (int i = anim->numberCommands; i > 0; i--)
+		{
+			switch (*(cmd++))
+			{
+			case COMMAND_MOVE_ORIGIN:
+				cmd += 3;
+				break;
+
+			case COMMAND_JUMP_VELOCITY:
+				cmd += 2;
+				break;
+
+			case COMMAND_SOUND_FX:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				flags = cmd[1] & 0xC000;
+				if ( flags == (int)SOUND_PLAYCONDITION::LandAndWater ||
+					(flags == (int)SOUND_PLAYCONDITION::Land && (info->waterSurfaceDist >= 0 || info->waterSurfaceDist == NO_HEIGHT)) ||
+					(flags == (int)SOUND_PLAYCONDITION::Water && info->waterSurfaceDist < 0 && info->waterSurfaceDist != NO_HEIGHT && !TestLaraSwamp(item)))
+				{
+					SoundEffect(cmd[1] & 0x3FFF, &item->pos, 2);
+				}
+
+				cmd += 2;
+				break;
+
+			case COMMAND_EFFECT:
+				if (item->frameNumber != *cmd)
+				{
+					cmd += 2;
+					break;
+				}
+
+				effectID = cmd[1] & 0x3FFF;
+				DoFlipEffect(effectID, item);
+
+				cmd += 2;
+				break;
+
+			default:
+				break;
+
+			}
+		}
+	}
+
+	int lateral = anim->Xvelocity;
+	if (anim->Xacceleration)
+		lateral += anim->Xacceleration * (item->frameNumber - anim->frameBase);
+	lateral >>= 16;
+
+	if (item->gravityStatus)
+	{
+		if (TestLaraSwamp(item))
+		{
+			item->speed -= item->speed >> 3;
+			if (abs(item->speed) < 8)
+			{
+				item->speed = 0;
+				item->gravityStatus = false;
+			}
+			if (item->fallspeed > 128)
+				item->fallspeed /= 2;
+			item->fallspeed -= item->fallspeed / 4;
+			if (item->fallspeed < 4)
+				item->fallspeed = 4;
+			item->pos.yPos += item->fallspeed;
+		}
+		else
+		{
+			int velocity = (anim->velocity + anim->acceleration * (item->frameNumber - anim->frameBase - 1));
+			item->speed -= velocity >> 16;
+			item->speed += (velocity + anim->acceleration) >> 16;
+			item->fallspeed += (item->fallspeed >= 128 ? 1 : GRAVITY);
+			item->pos.yPos += item->fallspeed;
+		}
+	}
+	else
+	{
+		int velocity;
+
+		if (info->waterStatus == LW_WADE && TestLaraSwamp(item))
+		{
+			velocity = (anim->velocity >> 1);
+			if (anim->acceleration)
+				velocity += (anim->acceleration * (item->frameNumber - anim->frameBase)) >> 2;
+		}
+		else
+		{
+			velocity = anim->velocity;
+			if (anim->acceleration)
+				velocity += anim->acceleration * (item->frameNumber - anim->frameBase);
+		}
+
+		item->speed = velocity >> 16;
+	}
+
+	if (info->ropePtr != -1)
+		DelAlignLaraToRope(item);
+
+	if (!info->isMoving)
+		MoveItem(item, info->moveAngle, item->speed, lateral);
+
+	// Update matrices
+	g_Renderer.updateLaraAnimations(true);
 }

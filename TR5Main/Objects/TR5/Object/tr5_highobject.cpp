@@ -12,55 +12,55 @@ void InitialiseHighObject1(short itemNumber)
 	int y = 0;
 	int z = 0;
 
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		auto* currentItem = &g_Level.Items[i];
+		ITEM_INFO* currentItem = &g_Level.Items[i];
 
-		if (currentItem->ObjectNumber != ID_TRIGGER_TRIGGERER)
+		if (currentItem->objectNumber != ID_TRIGGER_TRIGGERER)
 		{
-			if (currentItem->ObjectNumber == ID_PUZZLE_ITEM4_COMBO2)
+			if (currentItem->objectNumber == ID_PUZZLE_ITEM4_COMBO2)
 			{
-				item->ItemFlags[3] |= (i * 256);
-				currentItem->Pose.Position.y = item->Pose.Position.y - 512;
+				item->itemFlags[3] |= (i * 256);
+				currentItem->pos.yPos = item->pos.yPos - 512;
 				continue;
 			}
 		}
 
-		if (currentItem->TriggerFlags == 111)
+		if (currentItem->triggerFlags == 111)
 		{
-			item->ItemFlags[3] |= i;
+			item->itemFlags[3] |= i;
 			continue;
 		}
 
-		if (currentItem->TriggerFlags != 112)
+		if (currentItem->triggerFlags != 112)
 		{
-			if (currentItem->ObjectNumber == ID_PUZZLE_ITEM4_COMBO2)
+			if (currentItem->objectNumber == ID_PUZZLE_ITEM4_COMBO2)
 			{
-				item->ItemFlags[3] |= (i * 256);
-				currentItem->Pose.Position.y = item->Pose.Position.y - 512;
+				item->itemFlags[3] |= (i * 256);
+				currentItem->pos.yPos = item->pos.yPos - 512;
 				continue;
 			}
 		}
 		else
 		{
-			x = currentItem->Pose.Position.x;
-			y = currentItem->Pose.Position.y;
-			z = currentItem->Pose.Position.z;
+			x = currentItem->pos.xPos;
+			y = currentItem->pos.yPos;
+			z = currentItem->pos.zPos;
 		}
 	}
 
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		auto* currentItem = &g_Level.Items[i];
+		ITEM_INFO* currentItem = &g_Level.Items[i];
 
-		if (currentItem->ObjectNumber == ID_PULLEY &&
-			currentItem->Pose.Position.x == x &&
-			currentItem->Pose.Position.y == y &&
-			currentItem->Pose.Position.z == z)
+		if (currentItem->objectNumber == ID_PULLEY
+			&& currentItem->pos.xPos == x
+			&& currentItem->pos.yPos == y
+			&& currentItem->pos.zPos == z)
 		{
-			item->ItemFlags[2] |= i;
+			item->itemFlags[2] |= i;
 			break;
 		}
 	}
@@ -68,142 +68,146 @@ void InitialiseHighObject1(short itemNumber)
 
 void ControlHighObject1(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 	{
-		if (item->ItemFlags[0] == 4)
+		if (item->itemFlags[0] == 4)
 		{
-			item->ItemFlags[1]--;
+			item->itemFlags[1]--;
 
-			if (!item->ItemFlags[1])
+			if (!item->itemFlags[1])
 			{
-				auto* targetItem = &g_Level.Items[item->ItemFlags[3] & 0xFF];
-				targetItem->Flags = (item->Flags & 0xC1FF) | 0x20;
-
-				item->ItemFlags[0] = 6;
-				item->ItemFlags[1] = 768;
+				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[3] & 0xFF];
+				targetItem->flags = (item->flags & 0xC1FF) | 0x20;
+				item->itemFlags[0] = 6;
+				item->itemFlags[1] = 768;
 				TestTriggers(item, true);
 			}
 
 			return;
 		}
 
-		if (item->ItemFlags[0] == 6)
+		if (item->itemFlags[0] == 6)
 		{
-			item->ItemFlags[1] -= 8;
+			item->itemFlags[1] -= 8;
 
-			if (item->ItemFlags[1] >= 0)
+			if (item->itemFlags[1] >= 0)
 			{
 				int flags = 0;
 
-				if (item->ItemFlags[1] >= 256)
+				if (item->itemFlags[1] >= 256)
 				{
-					if (item->ItemFlags[1] <= 512)
+					if (item->itemFlags[1] <= 512)
 						flags = 31;
 					else
-						flags = (768 - item->ItemFlags[1]) / 8;
+						flags = (768 - item->itemFlags[1]) / 8;
 				}
 				else
-					flags = item->ItemFlags[1] / 8;
+				{
+					flags = item->itemFlags[1] / 8;
+				}
 
-				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW,&item->pos, (flags * 256) | 8);
 
-				item->Pose.Position.y += 8;
+				item->pos.yPos += 8;
 
-				auto* targetItem = &g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF];
-				targetItem->Flags |= 0x20u;
-				targetItem->Pose.Position.y = item->Pose.Position.y - 560;
+				ITEM_INFO* targetItem = &g_Level.Items[(item->itemFlags[3] / 256) & 0xFF];
+				targetItem->flags |= 0x20u;
+				targetItem->pos.yPos = item->pos.yPos - 560;
 			}
 
-			if (item->ItemFlags[1] < -60)
+			if (item->itemFlags[1] < -60)
 			{
-				auto* targetItem = &g_Level.Items[item->ItemFlags[2] & 0xFF];
-				targetItem->ItemFlags[1] = 0;
-				targetItem->Flags |= 0x20u;
-
-				item->ItemFlags[0] = 0;
-				item->ItemFlags[1] = 0;
+				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[2] & 0xFF];
+				targetItem->itemFlags[1] = 0;
+				targetItem->flags |= 0x20u;
+				item->itemFlags[0] = 0;
+				item->itemFlags[1] = 0;
 
 				RemoveActiveItem(itemNumber);
 
-				item->Flags &= 0xC1FF;
-				item->Status = ITEM_NOT_ACTIVE;
+				item->flags &= 0xC1FF;
+				item->status = ITEM_NOT_ACTIVE;
+
 				return;
 			}
 		}
 	}
-	else if (item->ItemFlags[0] >= 3)
+	else if (item->itemFlags[0] >= 3)
 	{
-		if (item->ItemFlags[0] == 4)
+		if (item->itemFlags[0] == 4)
 		{
-			item->ItemFlags[0] = 5;
-			item->ItemFlags[1] = 0;
+			item->itemFlags[0] = 5;
+			item->itemFlags[1] = 0;
 		}
-		else if (item->ItemFlags[0] == 5 && !item->ItemFlags[1] &&
-			g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF].Flags < 0)
+		else if (item->itemFlags[0] == 5 && !item->itemFlags[1] && g_Level.Items[(item->itemFlags[3] / 256) & 0xFF].flags < 0)
 		{
 			DoFlipMap(3);
 			FlipMap[3] ^= 0x3E00u;
-			item->ItemFlags[1] = 1;
+			item->itemFlags[1] = 1;
 		}
 	}
 	else
 	{
-		if (item->ItemFlags[1] >= 256)
+		if (item->itemFlags[1] >= 256)
 		{
-			item->ItemFlags[1] = 0;
-			item->ItemFlags[0]++;
+			item->itemFlags[1] = 0;
+			item->itemFlags[0]++;
 
-			if (item->ItemFlags[0] == 3)
+			if (item->itemFlags[0] == 3)
 			{
-				item->ItemFlags[1] = 30 * item->TriggerFlags;
-				item->ItemFlags[0] = 4;
+				item->itemFlags[1] = 30 * item->triggerFlags;
+				item->itemFlags[0] = 4;
 
-				short targetItemNumber = item->ItemFlags[3] & 0xFF;
-				auto* targetItem = &g_Level.Items[targetItemNumber];
+				short targetItemNumber = item->itemFlags[3] & 0xFF;
+				ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
 
 				AddActiveItem(targetItemNumber);
 
-				targetItem->Flags |= 0x3E20u;
-				targetItem->Status = ITEM_ACTIVE;
+				targetItem->flags |= 0x3E20u;
+				targetItem->status = ITEM_ACTIVE;
 
-				targetItemNumber = item->ItemFlags[2] & 0xFF;
+				targetItemNumber = item->itemFlags[2] & 0xFF;
 				targetItem = &g_Level.Items[targetItemNumber];
 
-				targetItem->ItemFlags[1] = 1;
-				targetItem->Flags |= 0x20;
-				targetItem->Flags &= 0xC1FF;
+				targetItem->itemFlags[1] = 1;
+				targetItem->flags |= 0x20;
+				targetItem->flags &= 0xC1FF;
+
 				return;
 			}
 
 			RemoveActiveItem(itemNumber);
 
-			item->Flags &= 0xC1FF;
-			item->Status = ITEM_NOT_ACTIVE;
+			item->flags &= 0xC1FF;
+			item->status = ITEM_NOT_ACTIVE;
+
 			return;
 		}
 
 		int flags = 0;
 
-		if (item->ItemFlags[1] >= 31)
+		if (item->itemFlags[1] >= 31)
 		{
-			if (item->ItemFlags[1] <= 224)
+			if (item->itemFlags[1] <= 224)
 				flags = 31;
 			else
-				flags = 255 - item->ItemFlags[1];
+				flags = 255 - item->itemFlags[1];
 		}
 		else
-			flags = item->ItemFlags[1];
+		{
+			flags = item->itemFlags[1];
+		}
 
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW,&item->pos, (flags * 256) | 8);
 
-		item->ItemFlags[1] += 16;
-		item->Pose.Position.y -= 16;
+		item->itemFlags[1] += 16;
+		item->pos.yPos -= 16;
 
-		short targetItemNumber = (item->ItemFlags[3] / 256) & 0xFF;
-		auto* targetItem = &g_Level.Items[targetItemNumber];
-		targetItem->Flags |= 0x20;
-		targetItem->Pose.Position.y = item->Pose.Position.y - 560;
+		short targetItemNumber = (item->itemFlags[3] / 256) & 0xFF;
+		ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
+		targetItem->flags |= 0x20;
+		targetItem->pos.yPos = item->pos.yPos - 560;
 	}
 }

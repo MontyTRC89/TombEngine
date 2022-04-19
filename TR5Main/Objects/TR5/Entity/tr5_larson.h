@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseLarson(short itemNumber);
+void InitialiseLarson(short itemNum);
 void LarsonControl(short itemNumber);

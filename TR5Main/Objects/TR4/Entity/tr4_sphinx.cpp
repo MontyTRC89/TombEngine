@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "tr4_sphinx.h"
-#include "Game/collision/collide_room.h"
 #include "Game/effects/debris.h"
 #include "Game/items.h"
 #include "Game/control/box.h"
@@ -10,40 +9,32 @@
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/misc.h"
 
-enum SphinxState
-{
-	SPHINX_STATE_NONE,
-	SPHINX_STATE_SLEEPING,
-	SPHINX_STATE_ALERTED,
-	SPHINX_STATE_WAKING_UP,
-	SPHINX_STATE_WALK,
-	SPHINX_STATE_RUN,
-	SPHINX_STATE_WALK_BACK,
-	SPHINX_STATE_HIT,
-	SPHINX_STATE_SHAKING,
-	SPHINX_STATE_IDLE
+enum SPHIX_STATES {
+	SPHINX_EMPTY,
+	SPHINX_SLEEPING,
+	SPHINX_ALERTED,
+	SPHINX_WAKING_UP,
+	SPHINX_WALK,
+	SPHINX_RUN,
+	SPHINX_WALK_BACK,
+	SPHINX_HIT,
+	SPHINX_SHAKING,
+	SPHINX_STOP
 };
 
-// TODO
-enum SphinxAnim
-{
-
-};
-
-BITE_INFO SphinxBiteInfo = { 0, 0, 0, 6 };
+BITE_INFO sphinxBiteInfo = { 0, 0, 0, 6 };
 
 void InitialiseSphinx(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.TargetState = SPHINX_STATE_SLEEPING;
-	item->Animation.ActiveState = SPHINX_STATE_SLEEPING;
+	item->animNumber = Objects[item->objectNumber].animIndex + 1;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->goalAnimState = SPHINX_SLEEPING;
+	item->currentAnimState = SPHINX_SLEEPING;
 }
 
 void SphinxControl(short itemNumber)
@@ -51,184 +42,197 @@ void SphinxControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-	auto* object = &Objects[item->ObjectNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
-	int x = item->Pose.Position.x + 614 * phd_sin(item->Pose.Orientation.y);
-	int y = item->Pose.Position.y;
-	int z = item->Pose.Position.z + 614 * phd_cos(item->Pose.Orientation.y);
+	int x = item->pos.xPos + 614 * phd_sin(item->pos.yRot);
+	int y = item->pos.yPos;
+	int z = item->pos.zPos + 614 * phd_cos(item->pos.yRot);
 
-	auto probe = GetCollision(x, y, z, item->RoomNumber);
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	int height1 = GetFloorHeight(floor, x, y, z);
 
-	int height1 = probe.Position.Floor;
-
-	if (item->Animation.ActiveState == 5 && probe.Block->Stopper)
+	if (item->currentAnimState == 5 && floor->Stopper)
 	{
-		auto* room = &g_Level.Rooms[item->RoomNumber];
+		ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
 
 		for (int i = 0; i < room->mesh.size(); i++)
 		{
-			auto* mesh = &room->mesh[i];
+			MESH_INFO* mesh = &room->mesh[i];
 
-			if (((mesh->pos.Position.z / 1024) == (z / 1024)) && 
-				((mesh->pos.Position.x / 1024) == (x / 1024)) && 
+			if (((mesh->pos.zPos / 1024) == (z / 1024)) && 
+				((mesh->pos.xPos / 1024) == (x / 1024)) && 
 				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
-				ShatterObject(NULL, mesh, -64, item->RoomNumber, 0);
-				SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+				ShatterObject(NULL, mesh, -64, item->roomNumber, 0);
+				SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
 
 				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-				probe.Block = false;
+				floor->Stopper = false;
 
-				TestTriggers(x, y, z, item->RoomNumber, true);
+				TestTriggers(x, y, z, item->roomNumber, true);
 			}
 		}
 	}
 
-	x = item->Pose.Position.x - 614 * phd_sin(item->Pose.Orientation.y);
-	y = item->Pose.Position.y;
-	z = item->Pose.Position.z - 614 * phd_cos(item->Pose.Orientation.y);
+	x = item->pos.xPos - 614 * phd_sin(item->pos.yRot);
+	y = item->pos.yPos;
+	z = item->pos.zPos - 614 * phd_cos(item->pos.yRot);
 
-	int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+	roomNumber = item->roomNumber;
+
+	floor = GetFloor(x, y, z, &roomNumber);
+	int height2 = GetFloorHeight(floor, x, y, z);
 
 	phd_atan(1228, height2 - height1);
 
-	if (item->AIBits)
+	if (item->aiBits)
 		GetAITarget(creature);
 	else
-		creature->Enemy = LaraItem;
+		creature->enemy = LaraItem;
 
-	AI_INFO AI;
-	CreatureAIInfo(item, &AI);
+	AI_INFO info;
+	CreatureAIInfo(item, &info);
 
-	if (creature->Enemy != LaraItem)
-		phd_atan(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
+	if (creature->enemy != LaraItem)
+		phd_atan(LaraItem->pos.zPos - item->pos.zPos, LaraItem->pos.xPos - item->pos.xPos);
 
-	GetCreatureMood(item, &AI, VIOLENT);
-	CreatureMood(item, &AI, VIOLENT);
+	GetCreatureMood(item, &info, VIOLENT);
+	CreatureMood(item, &info, VIOLENT);
 
-	short angle = CreatureTurn(item, creature->MaxTurn);
+	short angle = CreatureTurn(item, creature->maximumTurn);
 
-	int dx = abs(item->ItemFlags[2] - (short)item->Pose.Position.x);
-	int dz = abs(item->ItemFlags[3] - (short)item->Pose.Position.z);
+	int dx = abs(item->itemFlags[2] - (short)item->pos.xPos);
+	int dz = abs(item->itemFlags[3] - (short)item->pos.zPos);
 
-	switch (item->Animation.ActiveState)
+	switch (item->currentAnimState)
 	{
-	case SPHINX_STATE_SLEEPING:
-		creature->MaxTurn = 0;
+	case SPHINX_SLEEPING:
+		creature->maximumTurn = 0;
 
-		if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
-			item->Animation.TargetState = SPHINX_STATE_WAKING_UP;
-
-		if (GetRandomControl() == 0)
-			item->Animation.TargetState = SPHINX_STATE_ALERTED;
-
-		break;
-
-	case SPHINX_STATE_ALERTED:
-		creature->MaxTurn = 0;
-
-		if (AI.distance < pow(SECTOR(1), 2) || item->TriggerFlags)
-			item->Animation.TargetState = SPHINX_STATE_WAKING_UP;
-
-		if (GetRandomControl() == 0)
-			item->Animation.TargetState = SPHINX_STATE_SLEEPING;
-
-		break;
-
-	case SPHINX_STATE_WALK:
-		creature->MaxTurn = ANGLE(3.0f);
-
-		if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= ANGLE(2.8f) || item->Animation.RequiredState == SPHINX_STATE_RUN)
-			item->Animation.TargetState = SPHINX_STATE_RUN;
-		else if (AI.distance < pow(SECTOR(2), 2) && item->Animation.TargetState != SPHINX_STATE_RUN)
+		if (info.distance < SQUARE(1024) || item->triggerFlags)
 		{
-			if (height2 <= (item->Pose.Position.y + CLICK(1)) &&
-				height2 >= (item->Pose.Position.y - CLICK(1)))
+			item->goalAnimState = SPHINX_WAKING_UP;
+		}
+
+		if (GetRandomControl() == 0)
+		{
+			item->goalAnimState = SPHINX_ALERTED;
+		}
+
+		break;
+
+	case SPHINX_ALERTED:
+		creature->maximumTurn = 0;
+
+		if (info.distance < SQUARE(1024) || item->triggerFlags)
+		{
+			item->goalAnimState = SPHINX_WAKING_UP;
+		}
+
+		if (GetRandomControl() == 0)
+		{
+			item->goalAnimState = SPHINX_SLEEPING;
+		}
+
+		break;
+
+	case SPHINX_WALK:
+		creature->maximumTurn = ANGLE(3);
+
+		if (info.distance > SQUARE(1024) && abs(info.angle) <= 512 || item->requiredAnimState == SPHINX_RUN)
+		{
+			item->goalAnimState = SPHINX_RUN;
+		}
+		else if (info.distance < SQUARE(2048) && item->goalAnimState != SPHINX_RUN)
+		{
+			if (height2 <= item->pos.yPos + 256 && height2 >= item->pos.yPos - 256)
 			{
-				item->Animation.TargetState = SPHINX_STATE_IDLE;
-				item->Animation.RequiredState = SPHINX_STATE_WALK_BACK;
+				item->goalAnimState = SPHINX_STOP;
+				item->requiredAnimState = SPHINX_WALK_BACK;
 			}
 		}
 
 		break;
 
-	case SPHINX_STATE_RUN:
-		creature->MaxTurn = 60;
+	case SPHINX_RUN:
+		creature->maximumTurn = 60;
 
-		if (creature->Flags == 0)
+		if (creature->flags == 0)
 		{
-			if (item->TouchBits & 0x40)
+			if (item->touchBits & 0x40)
 			{
 				CreatureEffect2(
 					item,
-					&SphinxBiteInfo,
+					&sphinxBiteInfo,
 					20,
 					-1,
 					DoBloodSplat);
 
-				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 200;
+				LaraItem->hitPoints -= 200;
+				creature->flags = 1;
 			}
 		}
 
-		if (dx >= 50 || dz >= 50 ||
-			item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex)
+		if (dx >= 50 || dz >= 50 || item->animNumber != Objects[item->objectNumber].animIndex)
 		{
-			if (AI.distance > pow(SECTOR(2), 2) && abs(AI.angle) > ANGLE(2.8f))
-				item->Animation.TargetState = SPHINX_STATE_IDLE;
+			if (info.distance > SQUARE(2048) && abs(info.angle) > 512)
+			{
+				item->goalAnimState = SPHINX_STOP;
+			}
 		}
 		else
 		{
-			item->Animation.TargetState = SPHINX_STATE_HIT;
-			item->Animation.RequiredState = SPHINX_STATE_WALK_BACK;
-			creature->MaxTurn = 0;
+			item->goalAnimState = SPHINX_HIT;
+			item->requiredAnimState = SPHINX_WALK_BACK;
+			creature->maximumTurn = 0;
 		}
 
 		break;
 
-	case SPHINX_STATE_WALK_BACK:
-		creature->MaxTurn = ANGLE(3.0f);
-
-		if (AI.distance > pow(SECTOR(2), 2) ||
-			height2 > (item->Pose.Position.y + CLICK(1)) ||
-			height2 < (item->Pose.Position.y - CLICK(1)))
+	case SPHINX_WALK_BACK:
+		creature->maximumTurn = ANGLE(3);
+		if (info.distance > SQUARE(2048) || height2 > item->pos.yPos + 256 || height2 < item->pos.yPos - 256)
 		{
-			item->Animation.TargetState = SPHINX_STATE_IDLE;
-			item->Animation.RequiredState = SPHINX_STATE_RUN;
+			item->goalAnimState = SPHINX_STOP;
+			item->requiredAnimState = SPHINX_RUN;
 		}
 
 		break;
 
-	case SPHINX_STATE_HIT:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+	case SPHINX_HIT:
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
 			TestTriggers(item, true);
 
-			if (item->TouchBits & 0x40)
+			if (item->touchBits & 0x40)
 			{
 				CreatureEffect2(
 					item,
-					&SphinxBiteInfo,
+					&sphinxBiteInfo,
 					50,
 					-1,
 					DoBloodSplat);
 
-				LaraItem->HitPoints = 0;
+				LaraItem->hitPoints = 0;
 			}
 		}
 
 		break;
 
-	case SPHINX_STATE_IDLE:
-		creature->Flags = 0;
+	case SPHINX_STOP:
+		creature->flags = 0;
 
-		if (item->Animation.RequiredState == SPHINX_STATE_WALK_BACK)
-			item->Animation.TargetState = SPHINX_STATE_WALK_BACK;
+		if (item->requiredAnimState == SPHINX_WALK_BACK)
+		{
+			item->goalAnimState = SPHINX_WALK_BACK;
+		}
 		else
-			item->Animation.TargetState = SPHINX_STATE_WALK;
+		{
+			item->goalAnimState = SPHINX_WALK;
+		}
 
 		break;
 
@@ -236,8 +240,8 @@ void SphinxControl(short itemNumber)
 		break;
 	}
 
-	item->ItemFlags[2] = (short)item->Pose.Position.x;
-	item->ItemFlags[3] = (short)item->Pose.Position.z;
+	item->itemFlags[2] = (short)item->pos.xPos;
+	item->itemFlags[3] = (short)item->pos.zPos;
 
 	CreatureAnimation(itemNumber, angle, 0);
 }

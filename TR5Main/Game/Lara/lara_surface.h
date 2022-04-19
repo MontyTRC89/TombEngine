@@ -1,23 +1,16 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
-// -----------------------------
-// WATER SURFACE TREAD
-// Control & Collision Functions
-// -----------------------------
-
-void lara_as_surface_dive(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_surface_dive(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_col_surface_idle(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_as_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_col_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_as_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_col_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_as_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_col_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_as_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll);
-void _cdecl lara_col_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_surface_climb_out(ITEM_INFO* item, CollisionInfo* coll);
+void _cdecl lara_col_surftread(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfright(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfleft(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfback(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_col_surfswim(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surftread(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfright(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfleft(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfback(ITEM_INFO* item, COLL_INFO* coll);
+void _cdecl lara_as_surfswim(ITEM_INFO* item, COLL_INFO* coll);
+void lara_as_waterout(ITEM_INFO* item, COLL_INFO* coll);

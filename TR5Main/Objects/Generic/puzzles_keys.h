@@ -1,13 +1,11 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
-
-// Puzzles
-void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-void PuzzleDoneCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-void PuzzleDone(ITEM_INFO* item, short itemNumber);
+struct COLL_INFO;
+/*puzzles*/
+void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+void PuzzleDone(ITEM_INFO* item, short itemNum);
 void DoPuzzle();
-
-// Keys
-void KeyHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+/*keys*/
+void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);

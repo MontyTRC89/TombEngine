@@ -704,25 +704,20 @@ flatbuffers::Offset<CreatureTarget> CreateCreatureTarget(flatbuffers::FlatBuffer
 
 struct CreatureT : public flatbuffers::NativeTable {
   typedef Creature TableType;
-  int32_t maximum_turn = 0;
   std::vector<int32_t> joint_rotation{};
+  int32_t maximum_turn = 0;
+  int32_t flags = 0;
+  bool alerted = false;
   bool head_left = false;
   bool head_right = false;
-  bool patrol = false;
-  bool alerted = false;
   bool reached_goal = false;
-  bool jump_ahead = false;
-  bool monkey_swing_ahead = false;
-  bool friendly = false;
-  bool poisoned = false;
   bool hurt_by_lara = false;
-  int32_t tosspad = 0;
-  int32_t location_ai = 0;
-  int32_t fired_weapon = 0;
+  bool patrol2 = false;
+  bool jump_ahead = false;
+  bool monkey_ahead = false;
   int32_t mood = 0;
   int32_t enemy = 0;
   std::unique_ptr<TEN::Save::CreatureTargetT> ai_target{};
-  int32_t flags = 0;
   bool can_jump = false;
   bool can_monkey = false;
   bool is_amphibious = false;
@@ -735,36 +730,37 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef CreatureBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_MAXIMUM_TURN = 4,
-    VT_JOINT_ROTATION = 6,
-    VT_HEAD_LEFT = 8,
-    VT_HEAD_RIGHT = 10,
-    VT_PATROL = 12,
-    VT_ALERTED = 14,
+    VT_JOINT_ROTATION = 4,
+    VT_MAXIMUM_TURN = 6,
+    VT_FLAGS = 8,
+    VT_ALERTED = 10,
+    VT_HEAD_LEFT = 12,
+    VT_HEAD_RIGHT = 14,
     VT_REACHED_GOAL = 16,
-    VT_JUMP_AHEAD = 18,
-    VT_MONKEY_SWING_AHEAD = 20,
-    VT_FRIENDLY = 22,
-    VT_POISONED = 24,
-    VT_HURT_BY_LARA = 26,
-    VT_TOSSPAD = 28,
-    VT_LOCATION_AI = 30,
-    VT_FIRED_WEAPON = 32,
-    VT_MOOD = 34,
-    VT_ENEMY = 36,
-    VT_AI_TARGET = 38,
-    VT_FLAGS = 40,
-    VT_CAN_JUMP = 42,
-    VT_CAN_MONKEY = 44,
-    VT_IS_AMPHIBIOUS = 46,
-    VT_IS_JUMPING = 48,
-    VT_IS_MONKEYING = 50
+    VT_HURT_BY_LARA = 18,
+    VT_PATROL2 = 20,
+    VT_JUMP_AHEAD = 22,
+    VT_MONKEY_AHEAD = 24,
+    VT_MOOD = 26,
+    VT_ENEMY = 28,
+    VT_AI_TARGET = 30,
+    VT_CAN_JUMP = 32,
+    VT_CAN_MONKEY = 34,
+    VT_IS_AMPHIBIOUS = 36,
+    VT_IS_JUMPING = 38,
+    VT_IS_MONKEYING = 40
   };
+  const flatbuffers::Vector<int32_t> *joint_rotation() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_JOINT_ROTATION);
+  }
   int32_t maximum_turn() const {
     return GetField<int32_t>(VT_MAXIMUM_TURN, 0);
   }
-  const flatbuffers::Vector<int32_t> *joint_rotation() const {
-    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_JOINT_ROTATION);
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
+  bool alerted() const {
+    return GetField<uint8_t>(VT_ALERTED, 0) != 0;
   }
   bool head_left() const {
     return GetField<uint8_t>(VT_HEAD_LEFT, 0) != 0;
@@ -772,38 +768,20 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool head_right() const {
     return GetField<uint8_t>(VT_HEAD_RIGHT, 0) != 0;
   }
-  bool patrol() const {
-    return GetField<uint8_t>(VT_PATROL, 0) != 0;
-  }
-  bool alerted() const {
-    return GetField<uint8_t>(VT_ALERTED, 0) != 0;
-  }
   bool reached_goal() const {
     return GetField<uint8_t>(VT_REACHED_GOAL, 0) != 0;
-  }
-  bool jump_ahead() const {
-    return GetField<uint8_t>(VT_JUMP_AHEAD, 0) != 0;
-  }
-  bool monkey_swing_ahead() const {
-    return GetField<uint8_t>(VT_MONKEY_SWING_AHEAD, 0) != 0;
-  }
-  bool friendly() const {
-    return GetField<uint8_t>(VT_FRIENDLY, 0) != 0;
-  }
-  bool poisoned() const {
-    return GetField<uint8_t>(VT_POISONED, 0) != 0;
   }
   bool hurt_by_lara() const {
     return GetField<uint8_t>(VT_HURT_BY_LARA, 0) != 0;
   }
-  int32_t tosspad() const {
-    return GetField<int32_t>(VT_TOSSPAD, 0);
+  bool patrol2() const {
+    return GetField<uint8_t>(VT_PATROL2, 0) != 0;
   }
-  int32_t location_ai() const {
-    return GetField<int32_t>(VT_LOCATION_AI, 0);
+  bool jump_ahead() const {
+    return GetField<uint8_t>(VT_JUMP_AHEAD, 0) != 0;
   }
-  int32_t fired_weapon() const {
-    return GetField<int32_t>(VT_FIRED_WEAPON, 0);
+  bool monkey_ahead() const {
+    return GetField<uint8_t>(VT_MONKEY_AHEAD, 0) != 0;
   }
   int32_t mood() const {
     return GetField<int32_t>(VT_MOOD, 0);
@@ -813,9 +791,6 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::CreatureTarget *ai_target() const {
     return GetPointer<const TEN::Save::CreatureTarget *>(VT_AI_TARGET);
-  }
-  int32_t flags() const {
-    return GetField<int32_t>(VT_FLAGS, 0);
   }
   bool can_jump() const {
     return GetField<uint8_t>(VT_CAN_JUMP, 0) != 0;
@@ -834,27 +809,22 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_MAXIMUM_TURN) &&
            VerifyOffset(verifier, VT_JOINT_ROTATION) &&
            verifier.VerifyVector(joint_rotation()) &&
+           VerifyField<int32_t>(verifier, VT_MAXIMUM_TURN) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
+           VerifyField<uint8_t>(verifier, VT_ALERTED) &&
            VerifyField<uint8_t>(verifier, VT_HEAD_LEFT) &&
            VerifyField<uint8_t>(verifier, VT_HEAD_RIGHT) &&
-           VerifyField<uint8_t>(verifier, VT_PATROL) &&
-           VerifyField<uint8_t>(verifier, VT_ALERTED) &&
            VerifyField<uint8_t>(verifier, VT_REACHED_GOAL) &&
-           VerifyField<uint8_t>(verifier, VT_JUMP_AHEAD) &&
-           VerifyField<uint8_t>(verifier, VT_MONKEY_SWING_AHEAD) &&
-           VerifyField<uint8_t>(verifier, VT_FRIENDLY) &&
-           VerifyField<uint8_t>(verifier, VT_POISONED) &&
            VerifyField<uint8_t>(verifier, VT_HURT_BY_LARA) &&
-           VerifyField<int32_t>(verifier, VT_TOSSPAD) &&
-           VerifyField<int32_t>(verifier, VT_LOCATION_AI) &&
-           VerifyField<int32_t>(verifier, VT_FIRED_WEAPON) &&
+           VerifyField<uint8_t>(verifier, VT_PATROL2) &&
+           VerifyField<uint8_t>(verifier, VT_JUMP_AHEAD) &&
+           VerifyField<uint8_t>(verifier, VT_MONKEY_AHEAD) &&
            VerifyField<int32_t>(verifier, VT_MOOD) &&
            VerifyField<int32_t>(verifier, VT_ENEMY) &&
            VerifyOffset(verifier, VT_AI_TARGET) &&
            verifier.VerifyTable(ai_target()) &&
-           VerifyField<int32_t>(verifier, VT_FLAGS) &&
            VerifyField<uint8_t>(verifier, VT_CAN_JUMP) &&
            VerifyField<uint8_t>(verifier, VT_CAN_MONKEY) &&
            VerifyField<uint8_t>(verifier, VT_IS_AMPHIBIOUS) &&
@@ -871,11 +841,17 @@ struct CreatureBuilder {
   typedef Creature Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_joint_rotation(flatbuffers::Offset<flatbuffers::Vector<int32_t>> joint_rotation) {
+    fbb_.AddOffset(Creature::VT_JOINT_ROTATION, joint_rotation);
+  }
   void add_maximum_turn(int32_t maximum_turn) {
     fbb_.AddElement<int32_t>(Creature::VT_MAXIMUM_TURN, maximum_turn, 0);
   }
-  void add_joint_rotation(flatbuffers::Offset<flatbuffers::Vector<int32_t>> joint_rotation) {
-    fbb_.AddOffset(Creature::VT_JOINT_ROTATION, joint_rotation);
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(Creature::VT_FLAGS, flags, 0);
+  }
+  void add_alerted(bool alerted) {
+    fbb_.AddElement<uint8_t>(Creature::VT_ALERTED, static_cast<uint8_t>(alerted), 0);
   }
   void add_head_left(bool head_left) {
     fbb_.AddElement<uint8_t>(Creature::VT_HEAD_LEFT, static_cast<uint8_t>(head_left), 0);
@@ -883,38 +859,20 @@ struct CreatureBuilder {
   void add_head_right(bool head_right) {
     fbb_.AddElement<uint8_t>(Creature::VT_HEAD_RIGHT, static_cast<uint8_t>(head_right), 0);
   }
-  void add_patrol(bool patrol) {
-    fbb_.AddElement<uint8_t>(Creature::VT_PATROL, static_cast<uint8_t>(patrol), 0);
-  }
-  void add_alerted(bool alerted) {
-    fbb_.AddElement<uint8_t>(Creature::VT_ALERTED, static_cast<uint8_t>(alerted), 0);
-  }
   void add_reached_goal(bool reached_goal) {
     fbb_.AddElement<uint8_t>(Creature::VT_REACHED_GOAL, static_cast<uint8_t>(reached_goal), 0);
-  }
-  void add_jump_ahead(bool jump_ahead) {
-    fbb_.AddElement<uint8_t>(Creature::VT_JUMP_AHEAD, static_cast<uint8_t>(jump_ahead), 0);
-  }
-  void add_monkey_swing_ahead(bool monkey_swing_ahead) {
-    fbb_.AddElement<uint8_t>(Creature::VT_MONKEY_SWING_AHEAD, static_cast<uint8_t>(monkey_swing_ahead), 0);
-  }
-  void add_friendly(bool friendly) {
-    fbb_.AddElement<uint8_t>(Creature::VT_FRIENDLY, static_cast<uint8_t>(friendly), 0);
-  }
-  void add_poisoned(bool poisoned) {
-    fbb_.AddElement<uint8_t>(Creature::VT_POISONED, static_cast<uint8_t>(poisoned), 0);
   }
   void add_hurt_by_lara(bool hurt_by_lara) {
     fbb_.AddElement<uint8_t>(Creature::VT_HURT_BY_LARA, static_cast<uint8_t>(hurt_by_lara), 0);
   }
-  void add_tosspad(int32_t tosspad) {
-    fbb_.AddElement<int32_t>(Creature::VT_TOSSPAD, tosspad, 0);
+  void add_patrol2(bool patrol2) {
+    fbb_.AddElement<uint8_t>(Creature::VT_PATROL2, static_cast<uint8_t>(patrol2), 0);
   }
-  void add_location_ai(int32_t location_ai) {
-    fbb_.AddElement<int32_t>(Creature::VT_LOCATION_AI, location_ai, 0);
+  void add_jump_ahead(bool jump_ahead) {
+    fbb_.AddElement<uint8_t>(Creature::VT_JUMP_AHEAD, static_cast<uint8_t>(jump_ahead), 0);
   }
-  void add_fired_weapon(int32_t fired_weapon) {
-    fbb_.AddElement<int32_t>(Creature::VT_FIRED_WEAPON, fired_weapon, 0);
+  void add_monkey_ahead(bool monkey_ahead) {
+    fbb_.AddElement<uint8_t>(Creature::VT_MONKEY_AHEAD, static_cast<uint8_t>(monkey_ahead), 0);
   }
   void add_mood(int32_t mood) {
     fbb_.AddElement<int32_t>(Creature::VT_MOOD, mood, 0);
@@ -924,9 +882,6 @@ struct CreatureBuilder {
   }
   void add_ai_target(flatbuffers::Offset<TEN::Save::CreatureTarget> ai_target) {
     fbb_.AddOffset(Creature::VT_AI_TARGET, ai_target);
-  }
-  void add_flags(int32_t flags) {
-    fbb_.AddElement<int32_t>(Creature::VT_FLAGS, flags, 0);
   }
   void add_can_jump(bool can_jump) {
     fbb_.AddElement<uint8_t>(Creature::VT_CAN_JUMP, static_cast<uint8_t>(can_jump), 0);
@@ -956,55 +911,45 @@ struct CreatureBuilder {
 
 inline flatbuffers::Offset<Creature> CreateCreature(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t maximum_turn = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> joint_rotation = 0,
+    int32_t maximum_turn = 0,
+    int32_t flags = 0,
+    bool alerted = false,
     bool head_left = false,
     bool head_right = false,
-    bool patrol = false,
-    bool alerted = false,
     bool reached_goal = false,
-    bool jump_ahead = false,
-    bool monkey_swing_ahead = false,
-    bool friendly = false,
-    bool poisoned = false,
     bool hurt_by_lara = false,
-    int32_t tosspad = 0,
-    int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    bool patrol2 = false,
+    bool jump_ahead = false,
+    bool monkey_ahead = false,
     int32_t mood = 0,
     int32_t enemy = 0,
     flatbuffers::Offset<TEN::Save::CreatureTarget> ai_target = 0,
-    int32_t flags = 0,
     bool can_jump = false,
     bool can_monkey = false,
     bool is_amphibious = false,
     bool is_jumping = false,
     bool is_monkeying = false) {
   CreatureBuilder builder_(_fbb);
-  builder_.add_flags(flags);
   builder_.add_ai_target(ai_target);
   builder_.add_enemy(enemy);
   builder_.add_mood(mood);
-  builder_.add_fired_weapon(fired_weapon);
-  builder_.add_location_ai(location_ai);
-  builder_.add_tosspad(tosspad);
-  builder_.add_joint_rotation(joint_rotation);
+  builder_.add_flags(flags);
   builder_.add_maximum_turn(maximum_turn);
+  builder_.add_joint_rotation(joint_rotation);
   builder_.add_is_monkeying(is_monkeying);
   builder_.add_is_jumping(is_jumping);
   builder_.add_is_amphibious(is_amphibious);
   builder_.add_can_monkey(can_monkey);
   builder_.add_can_jump(can_jump);
-  builder_.add_hurt_by_lara(hurt_by_lara);
-  builder_.add_poisoned(poisoned);
-  builder_.add_friendly(friendly);
-  builder_.add_monkey_swing_ahead(monkey_swing_ahead);
+  builder_.add_monkey_ahead(monkey_ahead);
   builder_.add_jump_ahead(jump_ahead);
+  builder_.add_patrol2(patrol2);
+  builder_.add_hurt_by_lara(hurt_by_lara);
   builder_.add_reached_goal(reached_goal);
-  builder_.add_alerted(alerted);
-  builder_.add_patrol(patrol);
   builder_.add_head_right(head_right);
   builder_.add_head_left(head_left);
+  builder_.add_alerted(alerted);
   return builder_.Finish();
 }
 
@@ -1015,25 +960,20 @@ struct Creature::Traits {
 
 inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t maximum_turn = 0,
     const std::vector<int32_t> *joint_rotation = nullptr,
+    int32_t maximum_turn = 0,
+    int32_t flags = 0,
+    bool alerted = false,
     bool head_left = false,
     bool head_right = false,
-    bool patrol = false,
-    bool alerted = false,
     bool reached_goal = false,
-    bool jump_ahead = false,
-    bool monkey_swing_ahead = false,
-    bool friendly = false,
-    bool poisoned = false,
     bool hurt_by_lara = false,
-    int32_t tosspad = 0,
-    int32_t location_ai = 0,
-    int32_t fired_weapon = 0,
+    bool patrol2 = false,
+    bool jump_ahead = false,
+    bool monkey_ahead = false,
     int32_t mood = 0,
     int32_t enemy = 0,
     flatbuffers::Offset<TEN::Save::CreatureTarget> ai_target = 0,
-    int32_t flags = 0,
     bool can_jump = false,
     bool can_monkey = false,
     bool is_amphibious = false,
@@ -1042,25 +982,20 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
   auto joint_rotation__ = joint_rotation ? _fbb.CreateVector<int32_t>(*joint_rotation) : 0;
   return TEN::Save::CreateCreature(
       _fbb,
-      maximum_turn,
       joint_rotation__,
+      maximum_turn,
+      flags,
+      alerted,
       head_left,
       head_right,
-      patrol,
-      alerted,
       reached_goal,
-      jump_ahead,
-      monkey_swing_ahead,
-      friendly,
-      poisoned,
       hurt_by_lara,
-      tosspad,
-      location_ai,
-      fired_weapon,
+      patrol2,
+      jump_ahead,
+      monkey_ahead,
       mood,
       enemy,
       ai_target,
-      flags,
       can_jump,
       can_monkey,
       is_amphibious,
@@ -2140,25 +2075,20 @@ inline CreatureT *Creature::UnPack(const flatbuffers::resolver_function_t *_reso
 inline void Creature::UnPackTo(CreatureT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
-  { auto _e = maximum_turn(); _o->maximum_turn = _e; }
   { auto _e = joint_rotation(); if (_e) { _o->joint_rotation.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->joint_rotation[_i] = _e->Get(_i); } } }
+  { auto _e = maximum_turn(); _o->maximum_turn = _e; }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = alerted(); _o->alerted = _e; }
   { auto _e = head_left(); _o->head_left = _e; }
   { auto _e = head_right(); _o->head_right = _e; }
-  { auto _e = patrol(); _o->patrol = _e; }
-  { auto _e = alerted(); _o->alerted = _e; }
   { auto _e = reached_goal(); _o->reached_goal = _e; }
-  { auto _e = jump_ahead(); _o->jump_ahead = _e; }
-  { auto _e = monkey_swing_ahead(); _o->monkey_swing_ahead = _e; }
-  { auto _e = friendly(); _o->friendly = _e; }
-  { auto _e = poisoned(); _o->poisoned = _e; }
   { auto _e = hurt_by_lara(); _o->hurt_by_lara = _e; }
-  { auto _e = tosspad(); _o->tosspad = _e; }
-  { auto _e = location_ai(); _o->location_ai = _e; }
-  { auto _e = fired_weapon(); _o->fired_weapon = _e; }
+  { auto _e = patrol2(); _o->patrol2 = _e; }
+  { auto _e = jump_ahead(); _o->jump_ahead = _e; }
+  { auto _e = monkey_ahead(); _o->monkey_ahead = _e; }
   { auto _e = mood(); _o->mood = _e; }
   { auto _e = enemy(); _o->enemy = _e; }
   { auto _e = ai_target(); if (_e) _o->ai_target = std::unique_ptr<TEN::Save::CreatureTargetT>(_e->UnPack(_resolver)); }
-  { auto _e = flags(); _o->flags = _e; }
   { auto _e = can_jump(); _o->can_jump = _e; }
   { auto _e = can_monkey(); _o->can_monkey = _e; }
   { auto _e = is_amphibious(); _o->is_amphibious = _e; }
@@ -2174,25 +2104,20 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const CreatureT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _maximum_turn = _o->maximum_turn;
   auto _joint_rotation = _fbb.CreateVector(_o->joint_rotation);
+  auto _maximum_turn = _o->maximum_turn;
+  auto _flags = _o->flags;
+  auto _alerted = _o->alerted;
   auto _head_left = _o->head_left;
   auto _head_right = _o->head_right;
-  auto _patrol = _o->patrol;
-  auto _alerted = _o->alerted;
   auto _reached_goal = _o->reached_goal;
-  auto _jump_ahead = _o->jump_ahead;
-  auto _monkey_swing_ahead = _o->monkey_swing_ahead;
-  auto _friendly = _o->friendly;
-  auto _poisoned = _o->poisoned;
   auto _hurt_by_lara = _o->hurt_by_lara;
-  auto _tosspad = _o->tosspad;
-  auto _location_ai = _o->location_ai;
-  auto _fired_weapon = _o->fired_weapon;
+  auto _patrol2 = _o->patrol2;
+  auto _jump_ahead = _o->jump_ahead;
+  auto _monkey_ahead = _o->monkey_ahead;
   auto _mood = _o->mood;
   auto _enemy = _o->enemy;
   auto _ai_target = _o->ai_target ? CreateCreatureTarget(_fbb, _o->ai_target.get(), _rehasher) : 0;
-  auto _flags = _o->flags;
   auto _can_jump = _o->can_jump;
   auto _can_monkey = _o->can_monkey;
   auto _is_amphibious = _o->is_amphibious;
@@ -2200,25 +2125,20 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
   auto _is_monkeying = _o->is_monkeying;
   return TEN::Save::CreateCreature(
       _fbb,
-      _maximum_turn,
       _joint_rotation,
+      _maximum_turn,
+      _flags,
+      _alerted,
       _head_left,
       _head_right,
-      _patrol,
-      _alerted,
       _reached_goal,
-      _jump_ahead,
-      _monkey_swing_ahead,
-      _friendly,
-      _poisoned,
       _hurt_by_lara,
-      _tosspad,
-      _location_ai,
-      _fired_weapon,
+      _patrol2,
+      _jump_ahead,
+      _monkey_ahead,
       _mood,
       _enemy,
       _ai_target,
-      _flags,
       _can_jump,
       _can_monkey,
       _is_amphibious,

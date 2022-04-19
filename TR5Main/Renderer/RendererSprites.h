@@ -2,8 +2,7 @@
 #include <SimpleMath.h>
 #include "Renderer/Renderer11Enums.h"
 
-namespace TEN::Renderer
-{
+namespace TEN::Renderer {
 	struct RenderView;
 	struct RendererSprite;
 
@@ -27,4 +26,6 @@ namespace TEN::Renderer
 	};
 	
 	using namespace DirectX::SimpleMath;
+	
+
 }

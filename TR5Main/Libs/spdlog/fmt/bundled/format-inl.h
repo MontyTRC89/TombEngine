@@ -1002,7 +1002,7 @@ bool check_divisibility_and_divide_by_pow5(uint32_t& n) FMT_NOEXCEPT {
     uint32_t threshold;
     int shift_amount;
   } infos[] = {{0xcccd, 16, 0x3333, 18}, {0xa429, 8, 0x0a, 20}};
-  constexpr auto* info = infos[N - 1];
+  constexpr auto info = infos[N - 1];
   n *= info.magic_number;
   const uint32_t comparison_mask = (1u << info.bits_for_comparison) - 1;
   bool result = (n & comparison_mask) <= info.threshold;
@@ -1018,7 +1018,7 @@ template <int N> uint32_t small_division_by_pow10(uint32_t n) FMT_NOEXCEPT {
     int shift_amount;
     uint32_t divisor_times_10;
   } infos[] = {{0xcccd, 19, 100}, {0xa3d8, 22, 1000}};
-  constexpr auto* info = infos[N - 1];
+  constexpr auto info = infos[N - 1];
   FMT_ASSERT(n <= info.divisor_times_10, "n is too large");
   return n * info.magic_number >> info.shift_amount;
 }

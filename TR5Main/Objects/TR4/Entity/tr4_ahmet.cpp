@@ -19,383 +19,383 @@ using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO AhmetBiteLeft = { 0, 0, 0, 16 };
-	BITE_INFO AhmetBiteRight = { 0, 0, 0, 22 };
-	BITE_INFO AhmetBiteJaw = { 0, 0, 0, 11 };
+    enum AHMET_STATE
+    {
+        STATE_AHMET_EMPTY,
+        STATE_AHMET_IDLE,
+        STATE_AHMET_WALK,
+        STATE_AHMET_RUN,
+        STATE_AHMET_STAND_DUALATK,
+        STATE_AHMET_JUMP_BITE,
+        STATE_AHMET_JUMP_DUALATK,
+        STATE_AHMET_DIE
+    };
 
-	enum AhmetState
-	{
-		AHMET_STATE_NONE,
-		AHMET_STATE_IDLE,
-		AHMET_STATE_WALK,
-		AHMET_STATE_RUN,
-		AHMET_STATE_STAND_DUALATK,
-		AHMET_STATE_JUMP_BITE,
-		AHMET_STATE_JUMP_DUALATK,
-		AHMET_STATE_DIE
-	};
+    constexpr auto AHMET_JUMP_ATK_ANIM = 4;
+    constexpr auto AHMET_START_JUMP_ANIM = 7;
+    constexpr auto AHMET_DIE_ANIM = 10;
 
-	enum AhmetAnim
-	{
-		AHMET_ANIM_JUMP_ATTACK = 4,
+    constexpr auto AHMET_WALK_ANGLE = 5 * ONE_DEGREE;
+    constexpr auto AHMET_RUN_ANGLE = 8 * ONE_DEGREE;
+    constexpr auto AHMET_VIEW_ANGLE = 45 * ONE_DEGREE;
+    constexpr auto AHMET_ENEMY_ANGLE = 90 * ONE_DEGREE;
+    constexpr auto AHMET_AWARE_DISTANCE = SQUARE(1024);
+    constexpr auto AHMET_IDLE_RANGE = SQUARE(1280);
+    constexpr auto AHMET_RUN_RANGE = SQUARE(2560);
+    constexpr auto AHMET_STAND_DUALATK_RANGE = SQUARE(682);
+    constexpr auto AHMET_RIGHT_TOUCH = 0xF00000;
+    constexpr auto AHMET_LEFT_TOUCH = 0x3C000;
+    constexpr auto AHMET_HAND_DAMAGE = 80;
+    constexpr auto AHMET_JAW_DAMAGE = 120;
 
-		AHMET_ANIM_JUMP_START = 7,
+    BITE_INFO ahmetBiteLeft = { 0, 0, 0, 16 };
+    BITE_INFO ahmetBiteRight = { 0, 0, 0, 22 };
+    BITE_INFO ahmetBiteJaw = { 0, 0, 0, 11 };
 
-		AHMET_ANIM_DEATH_ANIM = 10
-	};
+    static void AhmetHeavyTriggers(ITEM_INFO* item)
+    {
+        TestTriggers(item, true);
+    }
 
-	#define AHMET_WALK_ANGLE ANGLE(5.0f)
-	#define AHMET_RUN_ANGLE ANGLE(8.0f)
-	#define AHMET_VIEW_ANGLE ANGLE(45.0f)
-	#define AHMET_ENEMY_ANGLE ANGLE(90.0f)
-	#define AHMET_AWARE_DISTANCE pow(SECTOR(1), 2)
-	#define AHMET_IDLE_RANGE pow(SECTOR(1.25f), 2)
-	#define AHMET_RUN_RANGE pow(SECTOR(2.5f), 2)
-	#define AHMET_STAND_DUALATK_RANGE pow(682, 2)
-	#define AHMET_RIGHT_TOUCH 0xF00000
-	#define AHMET_LEFT_TOUCH 0x3C000
-	#define AHMET_HAND_DAMAGE 80
-	#define AHMET_JAW_DAMAGE 120
-
-	static void AhmetHeavyTriggers(ITEM_INFO* item)
-	{
-		TestTriggers(item, true);
-	}
-
-	static void TriggerAhmetDeathEffect(ITEM_INFO* item)
-	{
+    static void TriggerAhmetDeathEffect(ITEM_INFO* item)
+    {
 		// HACK: Using CreatureSpheres here in release mode results in total mess-up
 		// of LaraSpheres, which looks in game as ghost Lara fire silhouette.
 		// Later both CreatureSpheres and LaraSpheres globals should be eradicated.
 
 		static SPHERE spheres[MAX_SPHERES] = {};
 
-		if (!(Wibble & 7))
-		{
+        if (!(Wibble & 7))
+        {
 			int meshCount = GetSpheres(item, spheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-			auto sphere = &spheres[(Wibble / 8) & 1];
+            auto sphere = &spheres[(Wibble / 8) & 1];
 
-			for (int i = meshCount; i > 0; i--, sphere += 2)
-				TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);
-		}
+            for (int i = meshCount; i > 0; i--, sphere += 2)
+                TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);
+        }
 
-		// NOTE: fixed light below the ground with -STEP_L!
-		TriggerDynamicLight(item->Pose.Position.x, (item->Pose.Position.y - STEP_SIZE), item->Pose.Position.z, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
-		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, NULL);
-	}
+        // NOTE: fixed light below the ground with -STEP_L !
+        TriggerDynamicLight(item->pos.xPos, (item->pos.yPos - STEP_SIZE), item->pos.zPos, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
+        SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->pos, NULL);
+    }
 
-	void InitialiseAhmet(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
+    void InitialiseAhmet(short itemNumber)
+    {
+        ITEM_INFO* item;
+        item = &g_Level.Items[itemNumber];
 
-		InitialiseCreature(itemNumber);
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = AHMET_STATE_IDLE;
-		item->Animation.ActiveState = AHMET_STATE_IDLE;
-		item->ItemFlags[0] = item->Pose.Position.x / SECTOR(1);
-		item->ItemFlags[1] = item->Pose.Position.y * 4 / SECTOR(1);
-		item->ItemFlags[2] = item->Pose.Position.z / SECTOR(1);
-	}
+        InitialiseCreature(itemNumber);
+        item->animNumber = Objects[item->objectNumber].animIndex;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+        item->goalAnimState = STATE_AHMET_IDLE;
+        item->currentAnimState = STATE_AHMET_IDLE;
+        item->itemFlags[0] = item->pos.xPos / SECTOR(1);
+        item->itemFlags[1] = item->pos.yPos * 4 / SECTOR(1);
+        item->itemFlags[2] = item->pos.zPos / SECTOR(1);
+    }
 
-	void AhmetControl(short itemNumber)
-	{
-		if (!CreatureActive(itemNumber))
-			return;
+    void AhmetControl(short itemNumber)
+    {
+        if (!CreatureActive(itemNumber))
+            return;
 
-		AI_INFO laraAI, AI;
+        ITEM_INFO* item;
+        CREATURE_INFO* ahmet;
+        AI_INFO lara_info, info;
+        short angle, head_y;
 
-		auto* item = &g_Level.Items[itemNumber];
-		if (item->TriggerFlags == 1)
-		{
-			item->TriggerFlags = 0;
-			return;
-		}
+        item = &g_Level.Items[itemNumber];
+        if (item->triggerFlags == 1)
+        {
+            item->triggerFlags = 0;
+            return;
+        }
 
-		auto* creature = GetCreatureInfo(item);
+        ahmet = GetCreatureInfo(item);
+        angle = 0;
+        head_y = 0;
 
-		short angle = 0;
-		short headY = 0;
+        if (item->hitPoints <= 0)
+        {
+            if (item->currentAnimState == STATE_AHMET_DIE)
+            {
+                // dont clear it !
+                if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+                {
+                    item->collidable = false; // NOTE: not exist in the original game, avoid wreid collision with lara...
+                    item->frameNumber = (g_Level.Anims[item->animNumber].frameEnd - 1);
+                }
+            }
+            else
+            {
+                item->animNumber = Objects[item->objectNumber].animIndex + AHMET_DIE_ANIM;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+                item->currentAnimState = STATE_AHMET_DIE;
+                item->goalAnimState = STATE_AHMET_DIE;
+                Lara.interactedItem = itemNumber;
+            }
 
-		if (item->HitPoints <= 0)
-		{
-			if (item->Animation.ActiveState == AHMET_STATE_DIE)
-			{
-				// dont clear it !
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				{
-					item->Collidable = false; // NOTE: not exist in the original game, avoid wreid collision with lara...
-					item->Animation.FrameNumber = (g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1);
-				}
-			}
-			else
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + AHMET_ANIM_DEATH_ANIM;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = AHMET_STATE_DIE;
-				item->Animation.TargetState = AHMET_STATE_DIE;
-				Lara.InteractedItem = itemNumber;
-			}
+            TriggerAhmetDeathEffect(item);
+        }
+        else
+        {
+            if (item->aiBits & ALL_AIOBJ)
+                GetAITarget(ahmet);
 
-			TriggerAhmetDeathEffect(item);
-		}
-		else
-		{
-			if (item->AIBits & ALL_AIOBJ)
-				GetAITarget(creature);
+            CreatureAIInfo(item, &info);
 
-			CreatureAIInfo(item, &AI);
+            if (ahmet->enemy == LaraItem)
+            {
+                lara_info.angle = info.angle;
+                lara_info.distance = info.distance;
+            }
+            else
+            {
+                int dx, dz;
+                int ang;
+                dx = LaraItem->pos.xPos - item->pos.xPos;
+                dz = LaraItem->pos.zPos - item->pos.zPos;
+                ang = phd_atan(dx, dz);
+                lara_info.angle = ang - item->pos.yRot;
+                lara_info.distance = SQUARE(dx) + SQUARE(dz);
+            }
 
-			if (creature->Enemy == LaraItem)
-			{
-				laraAI.angle = AI.angle;
-				laraAI.distance = AI.distance;
-			}
-			else
-			{
-				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int angle = phd_atan(dx, dz);
-				laraAI.angle = angle - item->Pose.Orientation.y;
-				laraAI.distance = pow(dx, 2) + pow(dz, 2);
-			}
+            GetCreatureMood(item, &info, TRUE);
+            CreatureMood(item, &info, TRUE);
 
-			GetCreatureMood(item, &AI, TRUE);
-			CreatureMood(item, &AI, TRUE);
+            angle = CreatureTurn(item, ahmet->maximumTurn);
+            ahmet->enemy = LaraItem;
 
-			angle = CreatureTurn(item, creature->MaxTurn);
-			creature->Enemy = LaraItem;
+            if (lara_info.distance < AHMET_AWARE_DISTANCE
+                || item->hitStatus
+                || TargetVisible(item, &lara_info))
+                AlertAllGuards(itemNumber);
 
-			if (laraAI.distance < AHMET_AWARE_DISTANCE ||
-				item->HitStatus ||
-				TargetVisible(item, &laraAI))
-			{
-				AlertAllGuards(itemNumber);
-			}
+            if (info.ahead)
+                head_y = info.angle;
 
-			if (AI.ahead)
-				headY = AI.angle;
+            switch (item->currentAnimState)
+            {
+            case STATE_AHMET_IDLE:
+                ahmet->maximumTurn = 0;
+                ahmet->flags = 0;
 
-			switch (item->Animation.ActiveState)
-			{
-			case AHMET_STATE_IDLE:
-				creature->MaxTurn = 0;
-				creature->Flags = 0;
+                if (item->aiBits & GUARD)
+                {
+                    head_y = AIGuard(ahmet);
+                    item->goalAnimState = STATE_AHMET_IDLE;
+                }
+                else if (item->aiBits & PATROL1)
+                {
+                    item->goalAnimState = STATE_AHMET_WALK;
+                    head_y = 0;
+                }
+                else if (ahmet->mood == ATTACK_MOOD && ahmet->mood != ESCAPE_MOOD)
+                {
+                    if (info.bite && info.distance < AHMET_STAND_DUALATK_RANGE)
+                    {
+                        item->goalAnimState = STATE_AHMET_STAND_DUALATK;
+                    }
+                    else if ((info.angle >= AHMET_VIEW_ANGLE || info.angle <= -AHMET_VIEW_ANGLE) || info.distance >= AHMET_IDLE_RANGE)
+                    {
+                        if (item->requiredAnimState)
+                        {
+                            item->goalAnimState = item->requiredAnimState;
+                        }
+                        else
+                        {
+                            if (!info.ahead || info.distance >= AHMET_RUN_RANGE)
+                                item->goalAnimState = STATE_AHMET_RUN;
+                            else
+                                item->goalAnimState = STATE_AHMET_WALK;
+                        }
+                    }
+                    else if (GetRandomControl() & 1)
+                    {
+                        item->goalAnimState = STATE_AHMET_JUMP_BITE;
+                    }
+                    else
+                    {
+                        item->goalAnimState = STATE_AHMET_JUMP_DUALATK;
+                    }
+                }
+                else
+                {
+                    if (Lara.target == item || !info.ahead)
+                        item->goalAnimState = STATE_AHMET_RUN;
+                    else
+                        item->goalAnimState = STATE_AHMET_IDLE;
+                }
+                break;
 
-				if (item->AIBits & GUARD)
-				{
-					item->Animation.TargetState = AHMET_STATE_IDLE;
-					headY = AIGuard(creature);
-				}
-				else if (item->AIBits & PATROL1)
-				{
-					item->Animation.TargetState = AHMET_STATE_WALK;
-					headY = 0;
-				}
-				else if (creature->Mood == MoodType::Attack && creature->Mood != MoodType::Escape)
-				{
-					if (AI.bite && AI.distance < AHMET_STAND_DUALATK_RANGE)
-						item->Animation.TargetState = AHMET_STATE_STAND_DUALATK;
-					else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) || AI.distance >= AHMET_IDLE_RANGE)
-					{
-						if (item->Animation.RequiredState)
-							item->Animation.TargetState = item->Animation.RequiredState;
-						else
-						{
-							if (!AI.ahead || AI.distance >= AHMET_RUN_RANGE)
-								item->Animation.TargetState = AHMET_STATE_RUN;
-							else
-								item->Animation.TargetState = AHMET_STATE_WALK;
-						}
-					}
-					else if (GetRandomControl() & 1)
-						item->Animation.TargetState = AHMET_STATE_JUMP_BITE;
-					else
-						item->Animation.TargetState = AHMET_STATE_JUMP_DUALATK;
-				}
-				else
-				{
-					if (Lara.TargetEntity == item || !AI.ahead)
-						item->Animation.TargetState = AHMET_STATE_RUN;
-					else
-						item->Animation.TargetState = AHMET_STATE_IDLE;
-				}
+            case STATE_AHMET_WALK:
+                ahmet->maximumTurn = AHMET_WALK_ANGLE;
 
-				break;
+                if (item->aiBits & PATROL1)
+                {
+                    item->goalAnimState = STATE_AHMET_WALK;
+                    head_y = 0;
+                }
+                else if (info.bite && info.distance < AHMET_IDLE_RANGE)
+                {
+                    item->goalAnimState = STATE_AHMET_IDLE;
+                }
+                else if (ahmet->mood == ESCAPE_MOOD || info.distance > AHMET_RUN_RANGE || !info.ahead || (info.enemyFacing > -AHMET_ENEMY_ANGLE || info.enemyFacing < AHMET_ENEMY_ANGLE))
+                {
+                    item->goalAnimState = STATE_AHMET_RUN;
+                }
+                break;
 
-			case AHMET_STATE_WALK:
-				creature->MaxTurn = AHMET_WALK_ANGLE;
+            case STATE_AHMET_RUN:
+                ahmet->maximumTurn = AHMET_RUN_ANGLE;
+                ahmet->flags = 0;
 
-				if (item->AIBits & PATROL1)
-				{
-					item->Animation.TargetState = AHMET_STATE_WALK;
-					headY = 0;
-				}
-				else if (AI.bite && AI.distance < AHMET_IDLE_RANGE)
-					item->Animation.TargetState = AHMET_STATE_IDLE;
-				else if (creature->Mood == MoodType::Escape || AI.distance > AHMET_RUN_RANGE || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
-					item->Animation.TargetState = AHMET_STATE_RUN;
-				
-				break;
+                if (item->aiBits & GUARD || (ahmet->mood == BORED_MOOD || ahmet->mood == ESCAPE_MOOD) && (Lara.target == item && info.ahead) || (info.bite && info.distance < AHMET_IDLE_RANGE))
+                    item->goalAnimState = STATE_AHMET_IDLE;
+                else if (info.ahead && info.distance < AHMET_RUN_RANGE && (info.enemyFacing < -AHMET_ENEMY_ANGLE || info.enemyFacing > AHMET_ENEMY_ANGLE))
+                    item->goalAnimState = STATE_AHMET_WALK;
+                break;
 
-			case AHMET_STATE_RUN:
-				creature->MaxTurn = AHMET_RUN_ANGLE;
-				creature->Flags = 0;
+            case STATE_AHMET_STAND_DUALATK:
+                ahmet->maximumTurn = 0;
 
-				if (item->AIBits & GUARD || (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) && (Lara.TargetEntity == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
-					item->Animation.TargetState = AHMET_STATE_IDLE;
-				else if (AI.ahead && AI.distance < AHMET_RUN_RANGE && (AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
-					item->Animation.TargetState = AHMET_STATE_WALK;
+                if (abs(info.angle) >= 910)
+                {
+                    if (info.angle >= 0)
+                        item->pos.yRot += 910;
+                    else
+                        item->pos.yRot -= 910;
+                }
+                else
+                {
+                    item->pos.yRot += info.angle;
+                }
 
-				break;
+                if (!(ahmet->flags & 1) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 7) && (item->touchBits & AHMET_LEFT_TOUCH))
+                {
+                    LaraItem->hitStatus = true;
+                    LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
+                    CreatureEffect2(item, &ahmetBiteLeft, 10, -1, DoBloodSplat);
+                    ahmet->flags |= 1;
+                }
+                else if (!(ahmet->flags & 2) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 32) && (item->touchBits & AHMET_RIGHT_TOUCH))
+                {
+                    LaraItem->hitStatus = true;
+                    LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
+                    CreatureEffect2(item, &ahmetBiteRight, 10, -1, DoBloodSplat);
+                    ahmet->flags |= 2;
+                }
+                break;
 
-			case AHMET_STATE_STAND_DUALATK:
-				creature->MaxTurn = 0;
+            case STATE_AHMET_JUMP_BITE:
+                ahmet->maximumTurn = 0;
 
-				if (abs(AI.angle) >= 910)
-				{
-					if (AI.angle >= 0)
-						item->Pose.Orientation.y += ANGLE(5.0f);
-					else
-						item->Pose.Orientation.y -= ANGLE(5.0f);
-				}
-				else
-					item->Pose.Orientation.y += AI.angle;
+                if (item->animNumber == Objects[item->objectNumber].animIndex + AHMET_START_JUMP_ANIM)
+                {
+                    if (abs(info.angle) >= 910)
+                    {
+                        if (info.angle >= 0)
+                            item->pos.yRot += 910;
+                        else
+                            item->pos.yRot -= 910;
+                    }
+                    else
+                    {
+                        item->pos.yRot += info.angle;
+                    }
+                }
+                else
+                {
+                    if (!(ahmet->flags & 1) && item->animNumber == Objects[item->objectNumber].animIndex + AHMET_JUMP_ATK_ANIM)
+                    {
+                        if (item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 11) && (item->touchBits & AHMET_LEFT_TOUCH))
+                        {
+                            LaraItem->hitStatus = true;
+                            LaraItem->hitPoints -= AHMET_JAW_DAMAGE;
+                            CreatureEffect2(item, &ahmetBiteJaw, 10, -1, DoBloodSplat);
+                            ahmet->flags |= 1;
+                        }
+                    }
+                }
+                break;
 
-				if (!(creature->Flags & 1) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 7) && (item->TouchBits & AHMET_LEFT_TOUCH))
-				{
-					CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
-					creature->Flags |= 1;
+            case STATE_AHMET_JUMP_DUALATK:
+                ahmet->maximumTurn = 0;
 
-					LaraItem->HitStatus = true;
-					LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
-				}
-				else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) && (item->TouchBits & AHMET_RIGHT_TOUCH))
-				{
-					CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
-					creature->Flags |= 2;
+                if (item->animNumber == Objects[item->objectNumber].animIndex + AHMET_START_JUMP_ANIM)
+                {
+                    if (abs(info.angle) >= 910)
+                    {
+                        if (info.angle >= 0)
+                            item->pos.yRot += 910;
+                        else
+                            item->pos.yRot -= 910;
+                    }
+                    else
+                    {
+                        item->pos.yRot += info.angle;
+                    }
+                }
+                else
+                {
+                    if (!(ahmet->flags & 1) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 14) && (item->touchBits & AHMET_LEFT_TOUCH))
+                    {
+                        LaraItem->hitStatus = true;
+                        LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
+                        CreatureEffect2(item, &ahmetBiteLeft, 10, -1, DoBloodSplat);
+                        ahmet->flags |= 1;
+                    }
+                    else if (!(ahmet->flags & 2) && item->frameNumber > (g_Level.Anims[item->animNumber].frameBase + 22) && (item->touchBits & AHMET_RIGHT_TOUCH))
+                    {
+                        LaraItem->hitStatus = true;
+                        LaraItem->hitPoints -= AHMET_HAND_DAMAGE;
+                        CreatureEffect2(item, &ahmetBiteRight, 10, -1, DoBloodSplat);
+                        ahmet->flags |= 2;
+                    }
+                }
+                break;
+            }
+        }
 
-					LaraItem->HitStatus = true;
-					LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
-				}
+        CreatureTilt(item, 0);
+        CreatureJoint(item, 0, head_y);
+        AhmetHeavyTriggers(item);
+        CreatureAnimation(itemNumber, angle, 0);
+    }
 
-				break;
+    bool RespawnAhmet(short itemNumber)
+    {
+        ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-			case AHMET_STATE_JUMP_BITE:
-				creature->MaxTurn = 0;
-
-				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START)
-				{
-					if (abs(AI.angle) >= ANGLE(5.0f))
-					{
-						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(5.0f);
-						else
-							item->Pose.Orientation.y -= ANGLE(5.0f);
-					}
-					else
-						item->Pose.Orientation.y += AI.angle;
-				}
-				else
-				{
-					if (!(creature->Flags & 1) && item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_ATTACK)
-					{
-						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) &&
-							item->TouchBits & AHMET_LEFT_TOUCH)
-						{
-							CreatureEffect2(item, &AhmetBiteJaw, 10, -1, DoBloodSplat);
-							creature->Flags |= 1;
-
-							LaraItem->HitStatus = true;
-							LaraItem->HitPoints -= AHMET_JAW_DAMAGE;
-						}
-					}
-				}
-
-				break;
-
-			case AHMET_STATE_JUMP_DUALATK:
-				creature->MaxTurn = 0;
-
-				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START))
-				{
-					if (abs(AI.angle) >= ANGLE(5.0f))
-					{
-						if (AI.angle >= 0)
-							item->Pose.Orientation.y += ANGLE(5.0f);
-						else
-							item->Pose.Orientation.y -= ANGLE(5.0f);
-					}
-					else
-						item->Pose.Orientation.y += AI.angle;
-				}
-				else
-				{
-					if (!(creature->Flags & 1) &&
-						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 14) &&
-						item->TouchBits & AHMET_LEFT_TOUCH)
-					{
-						CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
-						creature->Flags |= 1;
-
-						LaraItem->HitStatus = true;
-						LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
-					}
-					else if (!(creature->Flags & 2) &&
-						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) &&
-						item->TouchBits & AHMET_RIGHT_TOUCH)
-					{
-						CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
-						creature->Flags |= 2;
-
-						LaraItem->HitStatus = true;
-						LaraItem->HitPoints -= AHMET_HAND_DAMAGE;
-					}
-				}
-
-				break;
-			}
-		}
-
-		CreatureTilt(item, 0);
-		CreatureJoint(item, 0, headY);
-		AhmetHeavyTriggers(item);
-		CreatureAnimation(itemNumber, angle, 0);
-	}
-
-	bool RespawnAhmet(short itemNumber)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		if (item->Animation.ActiveState != 7 || item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-			return false;
+        if (item->currentAnimState != 7 || item->frameNumber != g_Level.Anims[item->animNumber].frameEnd)
+            return false;
 
 		Weather.Flash(255, 64, 0, 0.03f);
 
-		item->Pose.Position.x = (item->ItemFlags[0] * SECTOR(1)) + CLICK(2);
-		item->Pose.Position.y = (item->ItemFlags[1] * CLICK(1));
-		item->Pose.Position.z = (item->ItemFlags[2] * SECTOR(1)) + CLICK(2);
+        item->pos.xPos = (item->itemFlags[0] * 1024) + 512;
+        item->pos.yPos = (item->itemFlags[1] * 256);
+        item->pos.zPos = (item->itemFlags[2] * 1024) + 512;
 
-		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-		if (item->RoomNumber != outsideRoom)
-			ItemNewRoom(itemNumber, outsideRoom);
+        auto outsideRoom = IsRoomOutside(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+        if (item->roomNumber != outsideRoom)
+            ItemNewRoom(itemNumber, outsideRoom);
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.TargetState = 1;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = 1;
-		item->HitPoints = Objects[item->ObjectNumber].HitPoints;
+        item->animNumber = Objects[item->objectNumber].animIndex;
+        item->goalAnimState = 1;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+        item->currentAnimState = 1;
+        item->hitPoints = Objects[item->objectNumber].hitPoints;
 
-		AddActiveItem(itemNumber);
+        AddActiveItem(itemNumber);
 
-		item->Flags &= 0xFE;
-		item->AfterDeath = 0;
-		item->Status = ITEM_ACTIVE;
-		item->Collidable = true;
+        item->flags &= 0xFE;
+        item->afterDeath = 0;
+        item->status = ITEM_ACTIVE;
+        item->collidable = true;
 
-		EnableBaddieAI(itemNumber, 1);
+        EnableBaddieAI(itemNumber, 1);
 
-		item->TriggerFlags = 1;
-		return true;
-	}
+        item->triggerFlags = 1;
+        return true;
+    }
 }

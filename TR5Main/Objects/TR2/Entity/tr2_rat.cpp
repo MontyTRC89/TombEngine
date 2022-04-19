@@ -7,126 +7,106 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO RatBite = { 0, 0, 57, 2 };
+BITE_INFO ratBite = { 0, 0, 57, 2 };
 
-// TODO
-enum RatState
+void RatControl(short itemNum)
 {
-
-};
-
-// TODO
-enum RatAnim
-{
-
-};
-
-void RatControl(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
-
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short head = 0;
 	short angle = 0;
 	short random = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 6)
+		if (item->currentAnimState != 6)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 6;
+			item->animNumber = Objects[item->objectNumber].animIndex + 9;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 6;
 		}
 	}
 	else
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
 
-		if (AI.ahead)
-			head = AI.angle;
+		if (info.ahead)
+			head = info.angle;
 
-		GetCreatureMood(item, &AI, TIMID);
-		CreatureMood(item, &AI, TIMID);
+		GetCreatureMood(item, &info, TIMID);
+		CreatureMood(item, &info, TIMID);
 
-		angle = CreatureTurn(item, ANGLE(6.0f));
+		angle = CreatureTurn(item, ANGLE(6));
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 4:
-			if (info->Mood == MoodType::Bored || info->Mood == MoodType::Stalk)
+			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
 				short random = (short)GetRandomControl();
 				if (random < 0x500)
-					item->Animation.RequiredState = 3;
+					item->requiredAnimState = 3;
 				else if (random > 0xA00)
-					item->Animation.RequiredState = 1;
+					item->requiredAnimState = 1;
 			}
-			else if (AI.distance < pow(340, 2))
-				item->Animation.RequiredState = 5;
+			else if (info.distance < SQUARE(340))
+				item->requiredAnimState = 5;
 			else
-				item->Animation.RequiredState = 1;
+				item->requiredAnimState = 1;
 
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = 2;
-
+			if (item->requiredAnimState)
+				item->goalAnimState = 2;
 			break;
 
 		case 2:
-			info->MaxTurn = 0;
+			creature->maximumTurn = 0;
 
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
 			break;
 
 		case 1:
-			info->MaxTurn = ANGLE(6.0f);
+			creature->maximumTurn = ANGLE(6);
 
-			if (info->Mood == MoodType::Bored || info->Mood == MoodType::Stalk)
+			if (creature->mood == BORED_MOOD || creature->mood == STALK_MOOD)
 			{
 				random = (short)GetRandomControl();
 				if (random < 0x500)
 				{
-					item->Animation.RequiredState = 3;
-					item->Animation.TargetState = 2;
+					item->requiredAnimState = 3;
+					item->goalAnimState = 2;
 				}
 				else if (random < 0xA00)
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 			}
-			else if (AI.ahead && AI.distance < pow(340, 2))
-				item->Animation.TargetState = 2;
-
+			else if (info.ahead && info.distance < SQUARE(340))
+				item->goalAnimState = 2;
 			break;
 
 		case 5:
-			if (!item->Animation.RequiredState && item->TouchBits & 0x7F)
+			if (!item->requiredAnimState && (item->touchBits & 0x7F))
 			{
-				CreatureEffect(item, &RatBite, DoBloodSplat);
-				item->Animation.RequiredState = 2;
-
-				LaraItem->HitPoints -= 20;
-				LaraItem->HitStatus = true;
+				CreatureEffect(item, &ratBite, DoBloodSplat);
+				LaraItem->hitPoints -= 20;
+				LaraItem->hitStatus = true;
+				item->requiredAnimState = 2;
 			}
-
 			break;
 
 		case 3:
 			if (GetRandomControl() < 0x500)
-				item->Animation.TargetState = 2;
-
+				item->goalAnimState = 2;
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNumber, angle, 0);
+	CreatureAnimation(itemNum, angle, 0);
 }
