@@ -364,7 +364,7 @@ void lara_col_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Pose.Orientation.SetZ(0);
+		item->Pose.Orientation.SetZ();
 
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
@@ -2334,7 +2334,7 @@ void lara_col_wade_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Pose.Orientation.SetZ(0);
+		item->Pose.Orientation.SetZ();
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
@@ -2473,7 +2473,7 @@ void lara_col_sprint(ITEM_INFO* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Pose.Orientation.SetZ(0);
+		item->Pose.Orientation.SetZ();
 
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)

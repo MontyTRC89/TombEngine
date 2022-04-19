@@ -15,9 +15,9 @@ public:
 	EulerAngle(float xAngle, float yAngle, float zAngle);
 
 	// Getters
-	float   GetX();
-	float   GetY();
-	float   GetZ();
+	float GetX();
+	float GetY();
+	float GetZ();
 
 	// Setters
 	void Set(EulerAngle orient);
@@ -74,7 +74,7 @@ public:
 
 inline EulerAngle::EulerAngle()
 {
-	this->Set(0, 0, 0);
+	this->Set(0.0f, 0.0f, 0.0f);
 }
 
 inline EulerAngle::EulerAngle(float xAngle, float yAngle, float zAngle)
@@ -136,14 +136,11 @@ inline bool EulerAngle::Compare(EulerAngle orient0, EulerAngle orient1, float ep
 
 inline bool EulerAngle::Compare(float angle0, float angle1, float epsilon = 0.0f)
 {
-	angle0 = Clamp(angle0);
-	angle1 = Clamp(angle1);
-
 	float difference = ShortestAngle(angle0, angle1);
-	if (abs(difference) > epsilon)
-		return false;
-	else
+	if (abs(difference) <= epsilon)
 		return true;
+	else
+		return false;
 }
 
 inline void EulerAngle::Clamp()
@@ -162,7 +159,7 @@ inline EulerAngle EulerAngle::Clamp(EulerAngle orient)
 inline float EulerAngle::Clamp(float angle)
 {
 	//if (angle < -M_PI || angle > M_PI)
-	return atan2(sin(angle), cos(angle));
+		return atan2(sin(angle), cos(angle));
 	//else
 	//	return angle;
 
@@ -190,9 +187,11 @@ inline float EulerAngle::Interpolate(float angleFrom, float angleTo, float rate 
 {
 	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
 
-	float difference = ShortestAngle(angleFrom, angleTo);
-	if (abs(difference) > epsilon)
+	if (!Compare(angleFrom, angleTo, epsilon))
+	{
+		float difference = ShortestAngle(angleFrom, angleTo);
 		return Clamp(angleFrom + (difference * rate));
+	}
 	else
 		return Clamp(angleTo);
 }

@@ -119,7 +119,7 @@ void lara_col_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f);
+	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.GetY() : EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -129,7 +129,7 @@ void lara_col_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 	LaraDeflectEdgeJump(item, coll);
 
 	// TODO: Why??
-	lara->Control.MoveAngle = (item->Animation.Velocity < 0) ? item->Pose.Orientation.y : lara->Control.MoveAngle;
+	lara->Control.MoveAngle = (item->Animation.Velocity < 0) ? item->Pose.Orientation.GetY() : lara->Control.MoveAngle;
 }
 
 // State:		LS_FREEFALL (9)
@@ -244,7 +244,7 @@ void lara_col_reach(ITEM_INFO* item, CollisionInfo* coll)
 	if (lara->Control.Rope.Ptr == -1)
 		item->Animation.Airborne = true;
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
 
 	// HACK: height is altered according to VerticalVelocity to fix "issues" with physically impossible
 	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
@@ -359,7 +359,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
 	switch (lara->Control.JumpDirection)
 	{
 	case JumpDirection::Back:
@@ -481,7 +481,7 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 // Control:		lara_as_jump_back()
 void lara_col_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f));
+	LaraJumpCollision(item, coll, item->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f));
 }
 
 // State:		LS_JUMP_RIGHT (26)
@@ -538,7 +538,7 @@ void lara_as_jump_right(ITEM_INFO* item, CollisionInfo* coll)
 // Control:		lara_as_jump_right()
 void lara_col_jump_right(ITEM_INFO* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
+	LaraJumpCollision(item, coll, item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
 }
 
 // State:		LS_JUMP_LEFT (27)
@@ -595,7 +595,7 @@ void lara_as_jump_left(ITEM_INFO* item, CollisionInfo* coll)
 // Control:		lara_as_jump_left()
 void lara_col_jump_left(ITEM_INFO* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f));
+	LaraJumpCollision(item, coll, item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
 }
 
 // State:		LS_JUMP_UP (28)
@@ -654,8 +654,8 @@ void lara_as_jump_up(ITEM_INFO* item, CollisionInfo* coll)
 	if (item->Animation.Velocity < 0)
 	{
 		// TODO: Holding BACK + LEFT/RIGHT results in Lara flexing more.
-		item->Pose.Orientation.x += std::min<short>(LARA_LEAN_RATE / 3, abs(EulerAngle::DegToRad(item->Animation.Velocity) - item->Pose.Orientation.x) / 3);
-		lara->ExtraHeadRot.y += (EulerAngle::DegToRad(10.0f) - item->Pose.Orientation.z) / 3;
+		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + std::min(LARA_LEAN_RATE / 3, abs(EulerAngle::DegToRad(item->Animation.Velocity) - item->Pose.Orientation.GetX()) / 3));
+		lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + (EulerAngle::DegToRad(10.0f) - item->Pose.Orientation.GetZ()) / 3);
 	}
 
 	item->Animation.TargetState = LS_JUMP_UP;
@@ -667,7 +667,7 @@ void lara_col_jump_up(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -843,7 +843,7 @@ void lara_col_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
 	auto* bounds = GetBoundsAccurate(item);
 	int realHeight = (bounds->Y2 - bounds->Y1) * 0.7f;
 
-	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
 	coll->Setup.Height = std::max<int>(realHeight, LARA_HEIGHT_CRAWL);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;

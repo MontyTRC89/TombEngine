@@ -55,13 +55,13 @@ void HandleLaraMovementParameters(ITEM_INFO* item, CollisionInfo* coll)
 
 	// Reset lean.
 	if (!lara->Control.IsMoving || (lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT))))
-		ResetLaraLean(item, 0.12f);
+		ResetLaraLean(item, 0.15f);
 
 	// Reset crawl flex.
 	if (!(TrInput & IN_LOOK) && coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM &&	// HACK
 		(!item->Animation.Velocity || (item->Animation.Velocity && !(TrInput & (IN_LEFT | IN_RIGHT)))))
 	{
-		ResetLaraFlex(item, 0.12f);
+		ResetLaraFlex(item, 0.15f);
 	}
 
 	// Reset turn rate.
