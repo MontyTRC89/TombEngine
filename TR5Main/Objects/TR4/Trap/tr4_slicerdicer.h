@@ -2,6 +2,6 @@
 
 namespace TEN::Entities::TR4
 {
-	void InitialiseSlicerDicer(short itemNum);
-	void SlicerDicerControl(short itemNum);
+	void InitialiseSlicerDicer(short itemNumber);
+	void SlicerDicerControl(short itemNumber);
 }

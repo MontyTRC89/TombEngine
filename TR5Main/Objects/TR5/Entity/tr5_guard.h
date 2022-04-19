@@ -1,13 +1,13 @@
 #pragma once
 
-void InitialiseGuard(short itemNum);
-void GuardControl(short itemNum);
+void InitialiseGuard(short itemNumber);
+void GuardControl(short itemNumber);
 
-void InitialiseSniper(short itemNum);
-void SniperControl(short itemNumber);
+void InitialiseSniper(short itemNumber);
+void SniperControl(short itemNumberber);
 
-void InitialiseGuardLaser(short itemNum);
-void ControlGuardLaser(short itemNumber);
+void InitialiseGuardLaser(short itemNumber);
+void ControlGuardLaser(short itemNumberber);
 
-void InitialiseMafia2(short itemNum);
-void Mafia2Control(short itemNum);
+void InitialiseMafia2(short itemNumber);
+void Mafia2Control(short itemNumber);

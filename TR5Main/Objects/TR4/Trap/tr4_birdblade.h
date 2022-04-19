@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::TR4
 {
-	void BirdBladeControl(short itemNum);
+	void BirdBladeControl(short itemNumber);
 }

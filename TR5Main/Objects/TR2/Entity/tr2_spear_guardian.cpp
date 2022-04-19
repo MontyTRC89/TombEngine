@@ -7,315 +7,346 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO spearLeftBite = { 0, 0, 920, 11 };
-BITE_INFO spearRightBite = { 0, 0, 920, 18 };
+BITE_INFO SpearBiteLeft = { 0, 0, 920, 11 };
+BITE_INFO SpearBiteRight = { 0, 0, 920, 18 };
 
-static void XianDamage(ITEM_INFO* item, CREATURE_INFO* xian, int damage)
+// TODO
+enum SpearGuardianState
 {
-	if (!(xian->flags & 1) && (item->touchBits & 0x40000))
+
+};
+
+// TODO
+enum SpearGuardianAnim
+{
+
+};
+
+static void XianDamage(ITEM_INFO* item, int damage)
+{
+	auto* creature = GetCreatureInfo(item);
+
+	if (!(creature->Flags & 1) && item->TouchBits & 0x40000)
 	{
-		LaraItem->hitPoints -= damage;
-		LaraItem->hitStatus = true;
-		CreatureEffect(item, &spearRightBite, DoBloodSplat);
-		xian->flags |= 1;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		LaraItem->HitPoints -= damage;
+		LaraItem->HitStatus = true;
+		CreatureEffect(item, &SpearBiteRight, DoBloodSplat);
+		creature->Flags |= 1;
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
 	}
 
-	if (!(xian->flags & 2) && (item->touchBits & 0x800))
+	if (!(creature->Flags & 2) && item->TouchBits & 0x800)
 	{
-		LaraItem->hitPoints -= damage;
-		LaraItem->hitStatus = true;
-		CreatureEffect(item, &spearLeftBite, DoBloodSplat);
-		xian->flags |= 2;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		LaraItem->HitPoints -= damage;
+		LaraItem->HitStatus = true;
+		CreatureEffect(item, &SpearBiteLeft, DoBloodSplat);
+		creature->Flags |= 2;
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
 	}
 }
 
-void InitialiseSpearGuardian(short itemNum)
+void InitialiseSpearGuardian(short itemNumber)
 {
-	ANIM_STRUCT* anim;
-	ITEM_INFO* item;
+	ClearItem(itemNumber);
 
-	ClearItem(itemNum);
+	auto* item = &g_Level.Items[itemNumber];
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 48;
 
-	item = &g_Level.Items[itemNum];
-	item->animNumber = Objects[item->objectNumber].animIndex + 48;
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	anim = &g_Level.Anims[item->animNumber];
-
-	item->frameNumber = anim->frameBase;
-	item->currentAnimState = anim->currentAnimState;
+	item->Animation.FrameNumber = anim->frameBase;
+	item->Animation.ActiveState = anim->ActiveState;
 }
 
-void SpearGuardianControl(short itemNum)
+void SpearGuardianControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CREATURE_INFO* xian;
-	short angle, head, neck, tilt;
-	int random, lara_alive;
-	AI_INFO info;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	xian = (CREATURE_INFO*)item->data;
-	head = neck = angle = tilt = 0;
-	lara_alive = (LaraItem->hitPoints > 0);
+	short angle = 0;
+	short head = 0;
+	short neck = 0;
+	short tilt = 0;
 
-	if (item->hitPoints <= 0)
+	bool laraAlive = LaraItem->HitPoints > 0;
+
+	if (item->HitPoints <= 0)
 	{
-		item->currentAnimState = 17;
-		item->meshBits /= 2;
+		item->Animation.ActiveState = 17;
+		item->MeshBits /= 2;
 
-		if (!item->meshBits)
+		if (!item->MeshBits)
 		{
 			SoundEffect(105, NULL, 0);
 			// TODO: exploding death
 		}
+
 		return;
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, xian->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (item->currentAnimState != 18)
-			item->meshBits = 0xFFFFFFFF;
+		if (item->Animation.ActiveState != 18)
+			item->MeshBits = 0xFFFFFFFF;
 
-		switch (item->currentAnimState)
+		switch (item->Animation.ActiveState)
 		{
 		case 18:
-			if (!xian->flags)
+			if (!creature->Flags)
 			{
-				item->meshBits = (item->meshBits << 1) + 1;
-				xian->flags = 3;
+				item->MeshBits = (item->MeshBits << 1) + 1;
+				creature->Flags = 3;
 			}
 			else
-				xian->flags--;
+				creature->Flags--;
+
 			break;
 
 		case 1:
-			if (info.ahead)
-				neck = info.angle;
+			creature->MaxTurn = 0;
 
-			xian->maximumTurn = 0;
+			if (AI.ahead)
+				neck = AI.angle;
 
-			if (xian->mood == BORED_MOOD)
+			if (creature->Mood == MoodType::Bored)
 			{
-				random = GetRandomControl();
+				int random = GetRandomControl();
 				if (random < 0x200)
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 				else if (random < 0x400)
-					item->goalAnimState = 3;
+					item->Animation.TargetState = 3;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 5;
+			else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				item->Animation.TargetState = 5;
 			else
-				item->goalAnimState = 3;
+				item->Animation.TargetState = 3;
+
 			break;
 
 		case 2:
-			if (info.ahead)
-				neck = info.angle;
+			creature->MaxTurn = 0;
 
-			xian->maximumTurn = 0;
+			if (AI.ahead)
+				neck = AI.angle;
 
-			if (xian->mood == ESCAPE_MOOD)
-				item->goalAnimState = 3;
-			else if (xian->mood == BORED_MOOD)
+			if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = 3;
+			else if (creature->Mood == MoodType::Bored)
 			{
-				random = GetRandomControl();
+				int random = GetRandomControl();
 				if (random < 0x200)
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 				else if (random < 0x400)
-					item->goalAnimState = 3;
+					item->Animation.TargetState = 3;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 13;
+			else if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				item->Animation.TargetState = 13;
 			else
-				item->goalAnimState = 3;
+				item->Animation.TargetState = 3;
+
 			break;
 
 		case 3:
-			if (info.ahead)
-				neck = info.angle;
+			creature->MaxTurn = ANGLE(3.0f);
 
-			xian->maximumTurn = ANGLE(3);
+			if (AI.ahead)
+				neck = AI.angle;
 
-			if (xian->mood == ESCAPE_MOOD)
-				item->goalAnimState = 4;
-			else if (xian->mood == BORED_MOOD)
+			if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = 4;
+			else if (creature->Mood == MoodType::Bored)
 			{
-				random = GetRandomControl();
+				int random = GetRandomControl();
 				if (random < 0x200)
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 				else if (random < 0x400)
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
+			else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 			{
-				if (info.distance < SQUARE(WALL_SIZE * 3 / 2))
-					item->goalAnimState = 7;
+				if (AI.distance < pow(SECTOR(1.5f), 2))
+					item->Animation.TargetState = 7;
 				else if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 9;
+					item->Animation.TargetState = 9;
 				else
-					item->goalAnimState = 11;
+					item->Animation.TargetState = 11;
 			}
-			else if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3))
-				item->goalAnimState = 4;
+			else if (!AI.ahead || AI.distance > pow(SECTOR(3), 2))
+				item->Animation.TargetState = 4;
+
 			break;
 
 		case 4:
-			if (info.ahead)
-				neck = info.angle;
+			creature->MaxTurn = ANGLE(5.0f);
 
-			xian->maximumTurn = ANGLE(5);
+			if (AI.ahead)
+				neck = AI.angle;
 
-			if (xian->mood == ESCAPE_MOOD)
+			if (creature->Mood == MoodType::Escape)
 				break;
-			else if (xian->mood == BORED_MOOD)
+			else if (creature->Mood == MoodType::Bored)
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 15;
+			else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				item->Animation.TargetState = 15;
+
 			break;
 
 		case 5:
-			if (info.ahead)
-				head = info.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
-			xian->flags = 0;
-			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->goalAnimState = 1;
+			creature->Flags = 0;
+			if (!AI.ahead || AI.distance > pow(SECTOR(1), 2))
+				item->Animation.TargetState = 1;
 			else
-				item->goalAnimState = 6;
+				item->Animation.TargetState = 6;
+
 			break;
 
 		case 7:
-			if (info.ahead)
-				head = info.angle;
+			creature->Flags = 0;
 
-			xian->flags = 0;
-			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 3 / 2))
-				item->goalAnimState = 3;
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2))
+				item->Animation.TargetState = 3;
 			else
-				item->goalAnimState = 8;
+				item->Animation.TargetState = 8;
+
 			break;
 
 		case 9:
-			if (info.ahead)
-				head = info.angle;
+			creature->Flags = 0;
 
-			xian->flags = 0;
-			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 3;
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
+				item->Animation.TargetState = 3;
 			else
-				item->goalAnimState = 8;
+				item->Animation.TargetState = 8;
+
 			break;
 
 		case 11:
-			if (info.ahead)
-				head = info.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
-			xian->flags = 0;
-			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 3;
+			creature->Flags = 0;
+			if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
+				item->Animation.TargetState = 3;
 			else
-				item->goalAnimState = 8;
+				item->Animation.TargetState = 8;
+
 			break;
 
 		case 13:
-			if (info.ahead)
-				head = info.angle;
+			creature->Flags = 0;
 
-			xian->flags = 0;
-			if (!info.ahead || info.distance > SQUARE(WALL_SIZE))
-				item->goalAnimState = 2;
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (!AI.ahead || AI.distance > pow(SECTOR(1), 2))
+				item->Animation.TargetState = 2;
 			else
-				item->goalAnimState = 14;
+				item->Animation.TargetState = 14;
+
 			break;
 
 		case 15:
-			if (info.ahead)
-				head = info.angle;
+			creature->Flags = 0;
 
-			xian->flags = 0;
-			if (!info.ahead || info.distance > SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 4;
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
+				item->Animation.TargetState = 4;
 			else
-				item->goalAnimState = 16;
+				item->Animation.TargetState = 16;
+
 			break;
 
 		case 6:
-			XianDamage(item, xian, 75);
+			XianDamage(item, 75);
 			break;
 
 		case 8:
 		case 10:
 		case 12:
-			if (info.ahead)
-				head = info.angle;
+			XianDamage(item, 75);
 
-			XianDamage(item, xian, 75);
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
+			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 			}
 			else
-				item->goalAnimState = 3;
+				item->Animation.TargetState = 3;
+
 			break;
 
 		case 14:
-			if (info.ahead)
-				head = info.angle;
+			XianDamage(item, 75);
 
-			XianDamage(item, xian, 75);
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
-				item->goalAnimState = 1;
+			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
+				item->Animation.TargetState = 1;
 			else
-				item->goalAnimState = 2;
+				item->Animation.TargetState = 2;
+
 			break;
 
 		case 16:
-			if (info.ahead)
-				head = info.angle;
+			XianDamage(item, 120);
 
-			XianDamage(item, xian, 120);
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (info.ahead && info.distance < SQUARE(WALL_SIZE))
+			if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
 			{
 				if (GetRandomControl() < 0x4000)
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 				else
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 			}
-			else if (info.ahead && info.distance < SQUARE(WALL_SIZE * 2))
-				item->goalAnimState = 3;
+			else if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+				item->Animation.TargetState = 3;
 			else
-				item->goalAnimState = 4;
+				item->Animation.TargetState = 4;
+
 			break;
 		}
 	}
 
-	if (lara_alive && LaraItem->hitPoints <= 0)
+	if (laraAlive && LaraItem->HitPoints <= 0)
 	{
 		CreatureKill(item, 49, 19, 2);
 		return;
@@ -324,5 +355,5 @@ void SpearGuardianControl(short itemNum)
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, head);
 	CreatureJoint(item, 1, neck);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureAnimation(itemNumber, angle, tilt);
 }

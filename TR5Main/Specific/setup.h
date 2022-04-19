@@ -3,7 +3,7 @@
 #include "Specific/phd_global.h"
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 enum ZoneType : char;
 
 constexpr auto UNIT_SHADOW = 256;
@@ -44,10 +44,10 @@ struct OBJECT_INFO
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ITEM_INFO* item)> drawRoutine;
 	std::function<void(ITEM_INFO* item)> drawRoutineExtra;
-	std::function<void(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll)> collision;
+	std::function<void(short item_num, ITEM_INFO* laraitem, CollisionInfo* coll)> collision;
 	ZoneType zoneType;
 	int animIndex; 
-	short hitPoints; 
+	short HitPoints; 
 	short pivotLength; 
 	short radius; 
 	short shadowSize; 

@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseShiva(short itemNum);
-void ShivaControl(short itemNum);
+void InitialiseShiva(short itemNumber);
+void ShivaControl(short itemNumber);

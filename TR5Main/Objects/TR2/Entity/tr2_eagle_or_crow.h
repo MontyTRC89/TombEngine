@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseEagle(short itemNum);
-void EagleControl(short itemNum);
+void InitialiseEagle(short itemNumber);
+void EagleControl(short itemNumber);

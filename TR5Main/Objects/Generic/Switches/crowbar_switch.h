@@ -1,9 +1,9 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 namespace TEN::Entities::Switches
 {
-	void CrowbarSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void CrowbarSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 }

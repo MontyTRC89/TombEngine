@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseBrownBeast(short itemNum);
+void InitialiseBrownBeast(short itemNumber);
 void ControlBrowsBeast(short itemNumber);
