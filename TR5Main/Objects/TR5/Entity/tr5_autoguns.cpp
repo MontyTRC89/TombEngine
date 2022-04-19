@@ -12,18 +12,19 @@
 
 void InitialiseAutoGuns(short itemNumber)
 {
-    auto* item = &g_Level.Items[itemNumber];
+    ITEM_INFO* item;
 
-    item->MeshBits = 1024;
+    item = &g_Level.Items[itemNumber];
+    item->meshBits = 1024;
     //5702 bytes!?
 	//item->data = game_malloc<uint8_t>(5702);
-	item->Data = std::array<short,4>();
+	item->data = std::array<short,4>();
 	
 }
 
-static void TriggerAutoGunSmoke(Vector3Int* pos, char shade)
+static void TriggerAutoGunSmoke(PHD_VECTOR* pos, char shade)
 {
-	auto* spark = &SmokeSparks[GetFreeSmokeSpark()];
+	SMOKE_SPARKS* spark = &SmokeSparks[GetFreeSmokeSpark()];
 
 	spark->on = 1;
 	spark->sShade = 0;
@@ -52,56 +53,62 @@ static void TriggerAutoGunSmoke(Vector3Int* pos, char shade)
 
 void AutoGunsControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
-		if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 		{
-			std::array<short, 4>& data = item->Data;
+			std::array<short, 4>& data = item->data;
 
-			item->MeshBits = 1664;
+			item->meshBits = 1664;
 
-			GameVector pos1 = { 0, 0, -64 };
-			GetJointAbsPosition(item, (Vector3Int*)&pos1, 8);
+			GAME_VECTOR pos1;
+			pos1.x = 0;
+			pos1.y = 0;
+			pos1.z = -64;
+			GetJointAbsPosition(item, (PHD_VECTOR*)&pos1, 8);
 
-			GameVector pos2 = { 0, 0, 0 };
-			GetLaraJointPosition((Vector3Int*)&pos2, 0);
+			GAME_VECTOR pos2;
+			pos2.x = 0;
+			pos2.y = 0;
+			pos2.z = 0;
+			GetLaraJointPosition((PHD_VECTOR*)&pos2, 0);
 
-			pos1.roomNumber = item->RoomNumber;
+			pos1.roomNumber = item->roomNumber;
 
 			short angles[2];
 
-			int los = LOS(&pos1, &pos2);
+			int los = LOS(&pos1,&pos2);
 
 			// FIXME:
 			if (los)
 			{
 				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-				angles[0] -= item->Pose.Orientation.y;
+				angles[0] -= item->pos.yRot;
 			}
 			else
 			{
-				angles[0] = item->ItemFlags[0];
-				angles[1] = item->ItemFlags[1];
+				angles[0] = item->itemFlags[0];
+				angles[1] = item->itemFlags[1];
 			}
 
 			short angle1, angle2;
 
-			InterpolateAngle(angles[0], item->ItemFlags, &angle1, 4);
-			InterpolateAngle(angles[1], &item->ItemFlags[1], &angle2, 4);
+			InterpolateAngle(angles[0], item->itemFlags,&angle1, 4);
+			InterpolateAngle(angles[1],&item->itemFlags[1],&angle2, 4);
 
-			data[0] = item->ItemFlags[0];
-			data[1] = item->ItemFlags[1];
-			data[2] += item->ItemFlags[2];
+			data[0] = item->itemFlags[0];
+			data[1] = item->itemFlags[1];
+			data[2] += item->itemFlags[2];
 
 			if (abs(angle1) < 1024 && abs(angle2) < 1024 && los)
 			{
-				SoundEffect(SFX_LARA_HK_FIRE, &item->Pose, 0xC00004);
+				SoundEffect(SFX_LARA_HK_FIRE,&item->pos, 0xC00004);
 
 				if (GlobalCounter & 1)
 				{
-					item->MeshBits |= 0x100;
+					item->meshBits |= 0x100;
 
 					TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 10, (GetRandomControl() & 0x1F) + 192, (GetRandomControl() & 0x1F) + 128, 0);
 
@@ -110,14 +117,14 @@ void AutoGunsControl(short itemNumber)
 						pos2.x = 0;
 						pos2.y = 0;
 						pos2.z = 0;
-						GetLaraJointPosition((Vector3Int*)& pos2, GetRandomControl() % 15);
+						GetLaraJointPosition((PHD_VECTOR*)& pos2, GetRandomControl() % 15);
 
-						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
-						LaraItem->HitPoints -= 20;
+						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->roomNumber);
+						LaraItem->hitPoints -= 20;
 					}
 					else
 					{
-						GameVector pos;
+						GAME_VECTOR pos;
 						pos.x = pos2.x;
 						pos.y = pos2.y;
 						pos.z = pos2.z;
@@ -143,31 +150,31 @@ void AutoGunsControl(short itemNumber)
 						pos.y += dy + GetRandomControl() - 128;
 						pos.z += dz + GetRandomControl() - 128;
 
-						if (!LOS(&pos1, &pos))
+						if (!LOS(&pos1,&pos))
 							TriggerRicochetSpark(&pos, 2 * GetRandomControl(), 3, 0);
 					}
 				}
 				else
 				{
-					item->MeshBits &= ~0x100;
+					item->meshBits &= ~0x100;
 				}
 
-				if (item->ItemFlags[2] < 1024)
-					item->ItemFlags[2] += 64;
+				if (item->itemFlags[2] < 1024)
+					item->itemFlags[2] += 64;
 			}
 			else
 			{
-				if (item->ItemFlags[2])
-					item->ItemFlags[2] -= 64;
-				item->MeshBits &= ~0x100;
+				if (item->itemFlags[2])
+					item->itemFlags[2] -= 64;
+				item->meshBits &= ~0x100;
 			}
 
-			if (item->ItemFlags[2])
-				TriggerAutoGunSmoke((Vector3Int*)&pos1, item->ItemFlags[2] / 16);
+			if (item->itemFlags[2])
+				TriggerAutoGunSmoke((PHD_VECTOR*)&pos1, item->itemFlags[2] / 16);
 		}
 		else
 		{
-			item->MeshBits = -1281;
+			item->meshBits = -1281;
 			AnimateItem(item);
 		}
 	}

@@ -2,9 +2,9 @@
 #include "tr4_enemy_jeep.h"
 #include "Game/items.h"
 #include "Specific/level.h"
-#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Specific/trmath.h"
+#include "Game/control/control.h"
 #include "Game/Lara/lara.h"
 #include "Game/control/lot.h"
 #include "Sound/sound.h"
@@ -14,7 +14,6 @@
 #include "Game/control/trigger.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Game/misc.h"
 
 void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 {
@@ -22,39 +21,45 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 
 	if (grenadeItemNumber != NO_ITEM)
 	{
-		auto* grenadeItem = &g_Level.Items[grenadeItemNumber];
+		ITEM_INFO* grenadeItem = &g_Level.Items[grenadeItemNumber];
 
-		grenadeItem->Shade = -15856;
-		grenadeItem->ObjectNumber = ID_GRENADE;
-		grenadeItem->RoomNumber = item->RoomNumber;
+		grenadeItem->shade = -15856;
+		grenadeItem->objectNumber = ID_GRENADE;
+		grenadeItem->roomNumber = item->roomNumber;
 
 		InitialiseItem(grenadeItemNumber);
 
-		grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
-		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180.0f);
-		grenadeItem->Pose.Orientation.z = 0;
+		grenadeItem->pos.xRot = item->pos.xRot;
+		grenadeItem->pos.yRot = item->pos.yRot + -ANGLE(180);
+		grenadeItem->pos.zRot = 0;
 
-		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* phd_sin(grenadeItem->Pose.Orientation.y);
-		grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
-		grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * phd_cos(grenadeItem->Pose.Orientation.y);
+		grenadeItem->pos.xPos = item->pos.xPos + 1024 * phd_sin(grenadeItem->pos.yRot);
+		grenadeItem->pos.yPos = item->pos.yPos - 768;
+		grenadeItem->pos.zPos = item->pos.xPos + 1024 * phd_cos(grenadeItem->pos.yRot);
 
 		SmokeCountL = 32;
-		SmokeWeapon = (LaraWeaponType)5; // TODO: 5 is the HK. Did the TEN enum get shuffled around? @Sezz 2022.03.09
+		SmokeWeapon = 5;
 
 		for (int i = 0; i < 5; i++)
-			TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, (LaraWeaponType)5, 32);
+		{
+			TriggerGunSmoke(item->pos.xPos, item->pos.yPos, item->pos.zPos, 0, 0, 0, 1, 5, 32);
+		}
 
 		if (GetRandomControl() & 3)
-			grenadeItem->ItemFlags[0] = 1;
+		{
+			grenadeItem->itemFlags[0] = 1;
+		}
 		else
-			grenadeItem->ItemFlags[0] = 2;
+		{
+			grenadeItem->itemFlags[0] = 2;
+		}
 
-		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-		grenadeItem->Animation.RequiredState = 0;
-		grenadeItem->Animation.Velocity = 32;
-		grenadeItem->Animation.VerticalVelocity = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
-		grenadeItem->HitPoints = 120;
+		grenadeItem->speed = 32;
+		grenadeItem->currentAnimState = grenadeItem->pos.xRot;
+		grenadeItem->fallspeed = -32 * phd_sin(grenadeItem->pos.xRot);
+		grenadeItem->goalAnimState = grenadeItem->pos.yRot;
+		grenadeItem->requiredAnimState = 0;
+		grenadeItem->hitPoints = 120;
 
 		AddActiveItem(grenadeItemNumber);
 	}
@@ -62,22 +67,22 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 
 void InitialiseEnemyJeep(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	item->ItemFlags[0] = -80;
+	item->itemFlags[0] = -80;
 
 	if (g_Level.NumItems > 0)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			auto* other = &g_Level.Items[i];
+			ITEM_INFO* other = &g_Level.Items[i];
 
-			if (other == item || other->TriggerFlags != item->TriggerFlags)
+			if (other == item || other->triggerFlags != item->triggerFlags)
 				continue;
 
-			item->ItemFlags[1] = i;
-			other->ItemFlags[0] = -80;
-			other->Pose.Position.y = item->Pose.Position.y - SECTOR(1);
+			item->itemFlags[1] = i;
+			other->itemFlags[0] = -80;
+			other->pos.yPos = item->pos.yPos - 1024;
 		}
 	}
 }
@@ -86,121 +91,134 @@ void EnemyJeepControl(short itemNumber)
 {
 	if (CreatureActive(itemNumber))
 	{
-		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-		int x = item->Pose.Position.x;
-		int y = item->Pose.Position.y;
-		int z = item->Pose.Position.z;
+		int x = item->pos.xPos;
+		int y = item->pos.yPos;
+		int z = item->pos.zPos;
 
-		int dx = 682 * phd_sin(item->Pose.Orientation.y);
-		int dz = 682 * phd_cos(item->Pose.Orientation.y);
+		int dx = 682 * phd_sin(item->pos.yRot);
+		int dz = 682 * phd_cos(item->pos.yRot);
 
-		int height1 = GetCollision(x - dz, y, z - dx, item->RoomNumber).Position.Floor;
-		if (abs(item->Pose.Position.y - height1) > CLICK(3))
+		short roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(x - dz, y, z - dx, &roomNumber);
+		int height1 = GetFloorHeight(floor, x - dz, y, z - dx);
+		if (abs(item->pos.yPos - height1) > 768)
 		{
-			item->Pose.Position.x += dz / 64;
-			item->Pose.Position.z += dx / 64;
-			item->Pose.Orientation.y += ANGLE(2.0f);
+			item->pos.yRot += ANGLE(2);
+			item->pos.xPos += (dz / 64);
+			item->pos.zPos += (dx / 64);
 			height1 = y;
 		}
 
-		int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
-		if (abs(item->Pose.Position.y - height2) > CLICK(3))
+		roomNumber = item->roomNumber;
+		floor = GetFloor(x + dz, y, z - dx, &roomNumber);
+		int height2 = GetFloorHeight(floor, x + dz, y, z - dx);
+		if (abs(item->pos.yPos - height2) > 768)
 		{
-			item->Pose.Orientation.y -= ANGLE(2.0f);
-			item->Pose.Position.x -= dz / 64;
-			item->Pose.Position.z += dx / 64;
+			item->pos.yRot -= ANGLE(2);
+			item->pos.xPos -= (dz / 64);
+			item->pos.zPos += (dx / 64);
 			height2 = y;
 		}
 
 		short zRot = phd_atan(1364, height2 - height1);
 
-		int height3 = GetCollision(x + dx, y, z + dz, item->RoomNumber).Position.Floor;
-		if (abs(y - height3) > CLICK(3))
+		roomNumber = item->roomNumber;
+		floor = GetFloor(x + dx, y, z + dz, &roomNumber);
+		int height3 = GetFloorHeight(floor, x + dx, y, z + dz);
+		if (abs(y - height3) > 768)
+		{
 			height3 = y;
+		}
 
-		int height4 = GetCollision(x - dx, y, z - dz, item->RoomNumber).Position.Floor;
-		if (abs(y - height4) > CLICK(3))
+		roomNumber = item->roomNumber;
+		floor = GetFloor(x - dx, y, z - dz, &roomNumber);
+		int height4 = GetFloorHeight(floor, x - dx, y, z - dz);
+		if (abs(y - height4) > 768)
+		{
 			height4 = y;
+		}
 
 		short xRot = phd_atan(1364, height4 - height3);
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
 
-		creature->Enemy = creature->AITarget;
-
-		auto* target = creature->AITarget;
-
-		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
-
+		creature->enemy = creature->aiTarget;
+		ITEM_INFO* target = creature->aiTarget;
+		short angle;
 		int distance;
-		if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
-			dz > SECTOR(31.25f) || dz < -SECTOR(31.25f))
 		{
-			distance = INT_MAX;
+			dx = LaraItem->pos.xPos - item->pos.xPos;
+			dz = LaraItem->pos.zPos - item->pos.zPos;
+			angle = phd_atan(dz, dx) - item->pos.yRot;
+			if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
+				distance = 0x7FFFFFFF;
+			else
+				distance = SQUARE(dx) + SQUARE(dz);
 		}
-		else
-			distance = pow(dx, 2) + pow(dz, 2);
 
-		Vector3Int pos;
+		PHD_VECTOR pos;
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 0:
 		case 2:
-			item->ItemFlags[0] -= 128;
-			item->MeshBits = -98305;
+			item->itemFlags[0] -= 128;
+			if (item->itemFlags[0] < 0)
+				item->itemFlags[0] = 0;
 
-			pos = Vector3Int(0, -144, -1024);
-			GetJointAbsPosition(item, &pos, 11);
-
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
-
-			if (item->ItemFlags[0] < 0)
-				item->ItemFlags[0] = 0;
+			item->meshBits = -98305;
 			
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (AI.distance > pow(SECTOR(1), 2) || Lara.Location >= item->ItemFlags[3])
-				item->Animation.TargetState = 1;
+			pos.x = 0;
+			pos.y = -144;
+			pos.z = -1024;
+			GetJointAbsPosition(item, &pos, 11);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+			
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else if (info.distance > SQUARE(1024) || Lara.location >= item->itemFlags[3])
+				item->goalAnimState = 1;
 
 			break;
 
 		case 1:
-			item->ItemFlags[0] += 37;
-			item->MeshBits = -147457;
-			creature->MaxTurn = item->ItemFlags[0] / 16;
+			creature->maximumTurn = item->itemFlags[0] / 16;
+			item->itemFlags[0] += 37;
+			if (item->itemFlags[0] > 8704)
+				item->itemFlags[0] = 8704;
 
-			if (item->ItemFlags[0] > 8704)
-				item->ItemFlags[0] = 8704;
+			item->meshBits = -147457;
 
-			if (AI.angle <= ANGLE(1.4f))
+			if (info.angle <= 256)
 			{
-				if (AI.angle < -ANGLE(1.4f))
-					item->Animation.TargetState = 3;
+				if (info.angle < -256)
+				{
+					item->goalAnimState = 3;
+				}
 			}
 			else
-				item->Animation.TargetState = 4;
+			{
+				item->goalAnimState = 4;
+			}
 
 			break;
 
 		case 3:
 		case 4:
-			item->Animation.TargetState = 1;
-			item->ItemFlags[0] += 18;
-
-			if (item->ItemFlags[0] > 8704)
-				item->ItemFlags[0] = 8704;
+			item->itemFlags[0] += 18;
+			if (item->itemFlags[0] > 8704)
+				item->itemFlags[0] = 8704;
+			item->goalAnimState = 1;
 
 			break;
 
 		case 5:
-			if (item->ItemFlags[0] < 1184)
-				item->ItemFlags[0] = 1184;
+			if (item->itemFlags[0] < 1184)
+				item->itemFlags[0] = 1184;
 
 			break;
 
@@ -208,94 +226,93 @@ void EnemyJeepControl(short itemNumber)
 			break;
 		}
 
-		if (height3 <= (item->Floor + CLICK(2)))
+		if (height3 <= item->floor + 512)
 		{
-			if (height4 > (item->Floor + CLICK(2)) && item->Animation.ActiveState != 5)
+			if (height4 > item->floor + 512 && item->currentAnimState != 5)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 5;
-				item->Animation.TargetState = 1;
-				item->ItemFlags[1] = 0;
+				item->itemFlags[1] = 0;
+				item->animNumber = Objects[item->objectNumber].animIndex + 8;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->currentAnimState = 5;
+				item->goalAnimState = 1;
 			}
 		}
 		else
 		{
-			creature->LOT.RequiredBox |= 8;
-
-			if (item->ItemFlags[1] > 0)
+			creature->LOT.requiredBox |= 8;
+			if (item->itemFlags[1] > 0)
 			{
-				item->ItemFlags[1] -= 8;
-				item->Pose.Position.y += item->ItemFlags[1] / 64;
-
-				if (item->ItemFlags[1] < 0)
-					creature->LOT.RequiredBox &= ~8;
+				item->itemFlags[1] -= 8;
+				if (item->itemFlags[1]<0)
+					creature->LOT.requiredBox &= ~8;
+				item->pos.yPos += item->itemFlags[1] / 64;
 			}
 			else
 			{
-				item->ItemFlags[1] = 2 * xRot;
-				creature->LOT.RequiredBox |= 8u;
+				item->itemFlags[1] = 2 * xRot;
+				creature->LOT.requiredBox |= 8u;
 			}
-
-			if (creature->LOT.RequiredBox & 8)
+			if (creature->LOT.requiredBox & 8)
 			{
-				item->Animation.TargetState = 1;
-				creature->MaxTurn = 0;
+				creature->maximumTurn = 0;
+				item->goalAnimState = 1;
 			}
 		}
 
-		if (AI.distance < pow(SECTOR(1.5f), 2) || item->ItemFlags[3] == -2)
-			creature->ReachedGoal = true;
+		if (info.distance < SQUARE(1536) || item->itemFlags[3] == -2)
+			creature->reachedGoal = true;
 
-		if (creature->ReachedGoal)
+		if (creature->reachedGoal)
 		{
-			TestTriggers(target->Pose.Position.x,target->Pose.Position.y,target->Pose.Position.z,target->RoomNumber, true);
+			TestTriggers(target->pos.xPos,target->pos.yPos,target->pos.zPos,target->roomNumber, true);
 
-			if (Lara.Location < item->ItemFlags[3] && item->Animation.ActiveState != 2 && item->Animation.TargetState != 2)
+			if (Lara.location < item->itemFlags[3] && item->currentAnimState != 2 && item->goalAnimState != 2)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.TargetState = 2;
-				item->Animation.ActiveState = 2;
+				item->animNumber = Objects[item->objectNumber].animIndex + 1;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				item->goalAnimState = 2;
+				item->currentAnimState = 2;
 
-				if (target->Flags & 4)
+				if (target->flags & 4)
 				{
-					item->Pose = target->Pose;
+					item->pos.xPos = target->pos.xPos;
+					item->pos.yPos = target->pos.yPos;
+					item->pos.zPos = target->pos.zPos;
+					item->pos.xRot = target->pos.xRot;
+					item->pos.yRot = target->pos.yRot;
+					item->pos.zRot = target->pos.zRot;
 
-					if (item->RoomNumber != target->RoomNumber)
-						ItemNewRoom(itemNumber, target->RoomNumber);
+					if (item->roomNumber != target->roomNumber)
+						ItemNewRoom(itemNumber, target->roomNumber);
 				}
 			}
 
-			if (distance > pow(SECTOR(2), 2) &&
-				distance < pow(SECTOR(10), 2) &&
-				!item->ItemFlags[2] &&
-				(angle < -ANGLE(112.5f) || angle > ANGLE(112.5f)))
+			if (distance > SQUARE(2048) && distance < SQUARE(10240) && !item->itemFlags[2] && (angle < -20480 || angle > 20480))
 			{
 				EnemyJeepLaunchGrenade(item);
-				item->ItemFlags[2] = 150;
+				item->itemFlags[2] = 150;
 			}
 
-			if (target->Flags == 62)
+			if (target->flags == 62)
 			{
-				item->Status = ITEM_INVISIBLE;
+				item->status = ITEM_INVISIBLE;
 				RemoveActiveItem(itemNumber);
-				DisableEntityAI(itemNumber);
+				DisableBaddieAI(itemNumber);
 			}
 
-			if (Lara.Location >= item->ItemFlags[3] || !(target->Flags & 4))
+			if (Lara.location >= item->itemFlags[3] || !(target->flags & 4))
 			{
-				creature->ReachedGoal = false;
-				item->ItemFlags[3]++;
+				creature->reachedGoal = false;
+				item->itemFlags[3]++;
 
-				creature->Enemy = nullptr;
+				creature->enemy = nullptr;
 				AI_OBJECT* aiObject = nullptr;
 
 				for (int i = 0; i < g_Level.AIObjects.size(); i++)
 				{ 
 					aiObject = &g_Level.AIObjects[i];
 
-					if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_ROOM)
+					if (g_Level.AIObjects[i].triggerFlags == item->itemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_ROOM)
 					{
 						aiObject = &g_Level.AIObjects[i];
 						break;
@@ -304,77 +321,78 @@ void EnemyJeepControl(short itemNumber)
 
 				if (aiObject != nullptr)
 				{
-					creature->Enemy = nullptr;
-					target->ObjectNumber = aiObject->objectNumber;
-					target->RoomNumber = aiObject->roomNumber;
-					target->Pose.Position.x = aiObject->x;
-					target->Pose.Position.y = aiObject->y;
-					target->Pose.Position.z = aiObject->z;
-					target->Pose.Orientation.y = aiObject->yRot;
-					target->Flags = aiObject->flags;
-					target->TriggerFlags = aiObject->triggerFlags;
-					target->BoxNumber = aiObject->boxNumber;
-
+					creature->enemy = nullptr;
+					target->objectNumber = aiObject->objectNumber;
+					target->roomNumber = aiObject->roomNumber;
+					target->pos.xPos = aiObject->x;
+					target->pos.yPos = aiObject->y;
+					target->pos.zPos = aiObject->z;
+					target->pos.yRot = aiObject->yRot;
+					target->flags = aiObject->flags;
+					target->triggerFlags = aiObject->triggerFlags;
+					target->boxNumber = aiObject->boxNumber;
 					if (!(aiObject->flags & 0x20))
 					{
-						target->Pose.Position.x += CLICK(1) * phd_sin(target->Pose.Orientation.y);
-						target->Pose.Position.z += CLICK(1) * phd_cos(target->Pose.Orientation.y);
+						target->pos.xPos += 256 * phd_sin(target->pos.yRot);
+						target->pos.zPos += 256 * phd_cos(target->pos.yRot);
 					}
 				}
 			}
 		}
 
-		item->ItemFlags[2]--;
-		if (item->ItemFlags[2] < 0)
-			item->ItemFlags[2] = 0;
+		item->itemFlags[2]--;
+		if (item->itemFlags[2] < 0)
+			item->itemFlags[2] = 0;
 
-		if (abs(xRot - item->Pose.Orientation.x) < ANGLE(1.4f))
-			item->Pose.Orientation.x = xRot;
-		else if (xRot < item->Pose.Orientation.x)
-			item->Pose.Orientation.x -= ANGLE(1.4f);
+		if (abs(xRot - item->pos.xRot) < 256)
+			item->pos.xRot = xRot;
+		else if (xRot < item->pos.xRot)
+			item->pos.xRot -= 256;
 		else 
-			item->Pose.Orientation.x += ANGLE(1.4f);
+			item->pos.xRot += 256;
 
-		if (abs(zRot - item->Pose.Orientation.z) < ANGLE(1.4f))
-			item->Pose.Orientation.z = zRot;
-		else if (zRot < item->Pose.Orientation.z)
-			item->Pose.Orientation.z -= ANGLE(1.4f);
+		if (abs(zRot - item->pos.zRot) < 256)
+			item->pos.zRot = zRot;
+		else if (zRot < item->pos.zRot)
+			item->pos.zRot -= 256;
 		else
-			item->Pose.Orientation.z += ANGLE(1.4f);
+			item->pos.zRot += 256;
 
-		item->ItemFlags[0] += -2 - xRot / 512;
-		if (item->ItemFlags[0] < 0)
-			item->ItemFlags[0] = 0;
+		item->itemFlags[0] += -2 - xRot / 512;
+		if (item->itemFlags[0] < 0)
+			item->itemFlags[0] = 0;
 
-		dx = item->ItemFlags[0] * phd_sin(-2 - xRot / 512);
-		dz = item->ItemFlags[0] * phd_cos(-2 - xRot / 512);
+		dx = item->itemFlags[0] * phd_sin(-2 - xRot / 512);
+		dz = item->itemFlags[0] * phd_cos(-2 - xRot / 512);
 
-		item->Pose.Position.x += dx / 64;
-		item->Pose.Position.z += dz / 64;
+		item->pos.xPos += dx / 64;
+		item->pos.zPos += dz / 64;
 
 		for (int i = 0; i < 4; i++)
-			creature->JointRotation[i] -= item->ItemFlags[0];
-
-		if (!creature->ReachedGoal)
-			ClampRotation(&item->Pose, AI.angle, item->ItemFlags[0] / 16);
-
-		creature->MaxTurn = 0;
-		AnimateItem(item);
-
-		auto probe = GetCollision(item);
-		item->Floor = probe.Position.Floor;
-		if (item->RoomNumber != probe.RoomNumber)
-			ItemNewRoom(itemNumber, probe.RoomNumber);
-
-		if (item->Pose.Position.y < item->Floor)
-			item->Animation.Airborne = true;
-		else
 		{
-			item->Pose.Position.y = item->Floor;
-			item->Animation.Airborne = false;
-			item->Animation.VerticalVelocity = 0;
+			creature->jointRotation[i] -= item->itemFlags[0];
 		}
 
-		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, (item->ItemFlags[0] * 1024) + 16777220);
+		if (!creature->reachedGoal)
+			ClampRotation(&item->pos, info.angle, item->itemFlags[0] / 16);
+
+		creature->maximumTurn = 0;
+		AnimateItem(item);
+
+		floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		if (item->roomNumber != roomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
+
+		if (item->pos.yPos < item->floor)
+			item->gravityStatus = true;
+		else
+		{
+			item->fallspeed = 0;
+			item->pos.yPos = item->floor;
+			item->gravityStatus = false;
+		}
+
+		SoundEffect(SFX_TR4_JEEP_MOVE, &item->pos, (item->itemFlags[0] * 1024) + 16777220);
 	}
 }

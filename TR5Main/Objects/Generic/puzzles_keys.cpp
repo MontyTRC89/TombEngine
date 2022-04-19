@@ -8,7 +8,6 @@
 #include "Game/gui.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Specific/input.h"
@@ -17,209 +16,195 @@
 
 using namespace TEN::Entities::Switches;
 
-short PuzzleItem;
-
-enum class PuzzleType
-{
-	Normal, 
-	Specfic, 
-	Cutscene, 
-	AnimAfter 
+enum PuzzleType {
+	PUZZLETYPE_NORMAL, 
+	PUZZLETYPE_SPECIFIC, 
+	PUZZLETYPE_CUTSCENE, 
+	PUZZLETYPE_ANIM_AFTER 
 };
 
+/*vars*/
+short puzzleItem;
+/*bounds*/
 OBJECT_COLLISION_BOUNDS PuzzleBounds =
-{
-	0, 0,
-	-256, 256,
-	0, 0,
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
-};
+{ 0, 0, -256, 256, 0, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
-static Vector3Int KeyHolePosition(0, 0, 312);
+static PHD_VECTOR KeyHolePosition(0, 0, 312);
 OBJECT_COLLISION_BOUNDS KeyHoleBounds =
-{
-	-256, 256,
-	0, 0,
-	0, 412,
-	-ANGLE(10.0f), ANGLE(10.0f),
-	-ANGLE(30.0f), ANGLE(30.0f),
-	-ANGLE(10.0f), ANGLE(10.0f)
-};
+{ -256, 256, 0, 0, 0, 412, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), ANGLE(-10), ANGLE(10) };
 
-// Puzzles
-void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+/*puzzles*/
+void PuzzleHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* receptableItem = &g_Level.Items[itemNumber];
-
-	auto puzzleType = PuzzleType::Normal;
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	int flag = PUZZLETYPE_NORMAL;
 	
-	if (receptableItem->TriggerFlags >= 0)
+	if (item->triggerFlags >= 0)
 	{
-		if (receptableItem->TriggerFlags <= 1024)
+		if (item->triggerFlags <= 1024)
 		{
-			if (receptableItem->TriggerFlags &&
-				receptableItem->TriggerFlags != 999 &&
-				receptableItem->TriggerFlags != 998)
-			{
-				puzzleType = PuzzleType::AnimAfter;
-			}
+			if (item->triggerFlags && item->triggerFlags != 999 && item->triggerFlags != 998)
+				flag = PUZZLETYPE_ANIM_AFTER;
 		}
 		else
-			puzzleType = PuzzleType::Cutscene;
+			flag = PUZZLETYPE_CUTSCENE;
 	}
 	else
-		puzzleType = PuzzleType::Specfic;
+		flag = PUZZLETYPE_SPECIFIC;
 
-	if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM) &&
-		laraItem->Animation.ActiveState == LS_IDLE &&
-		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-		laraInfo->Control.HandStatus == HandStatus::Free &&
-		!BinocularRange &&
-		GetKeyTrigger(&g_Level.Items[itemNumber])) ||
-		(laraInfo->Control.IsMoving &&
-			laraInfo->InteractedItem == itemNumber))
+	if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
+		&& !BinocularRange
+		&& !Lara.gunStatus
+		&& l->currentAnimState == LS_IDLE
+		&& l->animNumber == LA_STAND_IDLE
+		&& GetKeyTrigger(&g_Level.Items[itemNum])) 
+		|| (Lara.isMoving
+			&& Lara.interactedItem == itemNum))
 	{
-		short oldYrot = receptableItem->Pose.Orientation.y;
+		short oldYrot = item->pos.yRot;
+		BOUNDING_BOX* bounds = GetBoundsAccurate(item);
 
-		auto* bounds = GetBoundsAccurate(receptableItem);
-		PuzzleBounds.boundingBox.X1 = bounds->X1 - CLICK(1);
-		PuzzleBounds.boundingBox.X2 = bounds->X2 + CLICK(1);
-		PuzzleBounds.boundingBox.Z1 = bounds->Z1 - CLICK(1);;
-		PuzzleBounds.boundingBox.Z2 = bounds->Z2 + CLICK(1);;
+		PuzzleBounds.boundingBox.X1 = bounds->X1 - 256;
+		PuzzleBounds.boundingBox.X2 = bounds->X2 + 256;
+		PuzzleBounds.boundingBox.Z1 = bounds->Z1 - 256;
+		PuzzleBounds.boundingBox.Z2 = bounds->Z2 + 256;
 
-		if (TestLaraPosition(&PuzzleBounds, receptableItem, laraItem))
+		if (TestLaraPosition(&PuzzleBounds, item, l))
 		{
-			if (!laraInfo->Control.IsMoving)
+			PHD_VECTOR pos;
+			pos.x = 0;
+			pos.y = 0;
+			pos.z = 0;
+
+			if (!Lara.isMoving)
 			{
 				if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
 				{
-					if (g_Gui.IsObjectInInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
-						g_Gui.SetEnterInventory(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
+					if (g_Gui.IsObjectInInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)))
+						g_Gui.SetEnterInventory(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1));
 
-					receptableItem->Pose.Orientation.y = oldYrot;
+					item->pos.yRot = oldYrot;
 					return;
 				}
 
-				if (g_Gui.GetInventoryItemChosen() != receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
+				if (g_Gui.GetInventoryItemChosen() != item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1))
 				{
-					receptableItem->Pose.Orientation.y = oldYrot;
+					item->pos.yRot = oldYrot;
 					return;
 				}
 			}
 
-			if (puzzleType != PuzzleType::Cutscene)
+			pos.z = bounds->Z1 - 100;
+
+			if (flag != PUZZLETYPE_CUTSCENE)
 			{
-				Vector3Int pos = { 0, 0, bounds->Z1 - 100 };
-				if (!MoveLaraPosition(&pos, receptableItem, laraItem))
+				if (!MoveLaraPosition(&pos, item, l))
 				{
-					laraInfo->InteractedItem = itemNumber;
+					Lara.interactedItem = itemNum;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
-					receptableItem->Pose.Orientation.y = oldYrot;
+					item->pos.yRot = oldYrot;
 					return;
 				}
 			}
 
-			RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(receptableItem->ObjectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)), 1);
+			RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(item->objectNumber - (ID_PUZZLE_HOLE1 - ID_PUZZLE_ITEM1)), 1);
 
-			if (puzzleType == PuzzleType::Specfic)
+			if (flag == PUZZLETYPE_SPECIFIC)
 			{
-				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraItem->Animation.AnimNumber = -receptableItem->TriggerFlags;
-
-				if (laraItem->Animation.AnimNumber != LA_TRIDENT_SET)
-					PuzzleDone(receptableItem, itemNumber);
+				l->currentAnimState = LS_MISC_CONTROL;
+				l->animNumber = -item->triggerFlags;
+				if (l->animNumber != LA_TRIDENT_SET)
+					PuzzleDone(item, itemNum);
 			}
 			else
 			{
-				laraItem->Animation.AnimNumber = LA_USE_PUZZLE;
-				laraItem->Animation.ActiveState = LS_INSERT_PUZZLE;
-				receptableItem->ItemFlags[0] = 1;
+				l->animNumber = LA_USE_PUZZLE;
+				l->currentAnimState = LS_INSERT_PUZZLE;
+				item->itemFlags[0] = 1;
 			}
 
+			l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+			Lara.isMoving = false;
+			Lara.headYrot = 0;
+			Lara.headXrot = 0;
+			Lara.torsoYrot = 0;
+			Lara.torsoXrot = 0;
+			Lara.gunStatus = LG_HANDS_BUSY;
+			item->flags |= 0x20;
+			Lara.interactedItem = itemNum;
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
-			ResetLaraFlex(laraItem);
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraInfo->Control.IsMoving = false;
-			laraInfo->Control.HandStatus = HandStatus::Busy;
-			laraInfo->InteractedItem = itemNumber;
-			receptableItem->Pose.Orientation.y = oldYrot;
-			receptableItem->Flags |= 0x20;
+			item->pos.yRot = oldYrot;
 			return;
 		}
 
-		if (laraInfo->Control.IsMoving)
+		if (Lara.isMoving)
 		{
-			if (laraInfo->InteractedItem == itemNumber)
+			if (Lara.interactedItem == itemNum)
 			{
-				laraInfo->Control.IsMoving = false;
-				laraInfo->Control.HandStatus = HandStatus::Free;
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}
 
-		receptableItem->Pose.Orientation.y = oldYrot;
+		item->pos.yRot = oldYrot;
 	}
 	else
 	{
-		if (!laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber || laraInfo->InteractedItem != itemNumber)
+		if (!Lara.isMoving && Lara.interactedItem == itemNum || Lara.interactedItem != itemNum)
 		{
-			if (laraInfo->InteractedItem == itemNumber)
+			if (Lara.interactedItem == itemNum)
 			{
-				if (laraItem->Animation.ActiveState != LS_MISC_CONTROL)
+				if (l->currentAnimState != LS_MISC_CONTROL)
 				{
-					if (puzzleType != PuzzleType::Cutscene)
-						ObjectCollision(itemNumber, laraItem, coll);
-
+					if (flag != PUZZLETYPE_CUTSCENE)
+						ObjectCollision(itemNum, l, coll);
 					return;
 				}
 			}
-
-			if (laraItem->Animation.ActiveState == LS_MISC_CONTROL)
+			if (l->currentAnimState == LS_MISC_CONTROL)
 				return;
 
-			if (puzzleType != PuzzleType::Cutscene)
-				ObjectCollision(itemNumber, laraItem, coll);
-
+			if (flag != PUZZLETYPE_CUTSCENE)
+				ObjectCollision(itemNum, l, coll);
 			return;
 		}
 	}
 }
 
-void PuzzleDoneCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void PuzzleDoneCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	if ((g_Level.Items[itemNumber].TriggerFlags - 998) > 1)
-		ObjectCollision(itemNumber, laraItem, coll);
+	if (g_Level.Items[itemNum].triggerFlags - 998 > 1)
+	{
+		ObjectCollision(itemNum, l, coll);
+	}
 }
 
-void PuzzleDone(ITEM_INFO* item, short itemNumber)
+void PuzzleDone(ITEM_INFO* item, short itemNum)
 {
-	item->ObjectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
-	item->Animation.RequiredState = 0;
+	item->objectNumber += GAME_OBJECT_ID{ ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1 };
+	item->animNumber = Objects[item->objectNumber].animIndex;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->requiredAnimState = 0;
+	item->goalAnimState = g_Level.Anims[item->animNumber].currentAnimState;
+	item->currentAnimState = g_Level.Anims[item->animNumber].currentAnimState;
 
-	AddActiveItem(itemNumber);
+	AddActiveItem(itemNum);
 
-	item->Flags |= IFLAG_ACTIVATION_MASK;
-	item->Status = ITEM_ACTIVE;
+	item->flags |= IFLAG_ACTIVATION_MASK;
+	item->status = ITEM_ACTIVE;
 }
 
 void DoPuzzle()
 {
-	PuzzleItem = Lara.InteractedItem;
-	auto* item = &g_Level.Items[PuzzleItem];
-
+	puzzleItem = Lara.interactedItem;
+	ITEM_INFO* item = &g_Level.Items[puzzleItem];
 	int flag = 0;
 
-	if (item->TriggerFlags >= 0)
+	if (item->triggerFlags >= 0)
 	{
-		if (item->TriggerFlags <= 1024)
+		if (item->triggerFlags <= 1024)
 		{
-			if (item->TriggerFlags && item->TriggerFlags != 999 && item->TriggerFlags != 998)
+			if (item->triggerFlags && item->triggerFlags != 999 && item->triggerFlags != 998)
 				flag = 3;
 		}
 		else
@@ -228,108 +213,110 @@ void DoPuzzle()
 	else
 		flag = 1;
 
-	if (LaraItem->Animation.ActiveState == LS_INSERT_PUZZLE)
+	if (LaraItem->currentAnimState == LS_INSERT_PUZZLE)
 	{
-		if (item->ItemFlags[0])
+		if (item->itemFlags[0])
 		{
 			if (flag == 3)
-				LaraItem->ItemFlags[0] = item->TriggerFlags;
+				LaraItem->itemFlags[0] = item->triggerFlags;
 			else
 			{
-				LaraItem->ItemFlags[0] = 0;
-				PuzzleDone(item, PuzzleItem);
-				item->ItemFlags[0] = 0;
+				LaraItem->itemFlags[0] = 0;
+				PuzzleDone(item, puzzleItem);
+				item->itemFlags[0] = 0;
 			}
 		}
-		if (LaraItem->Animation.AnimNumber == LA_TRIDENT_SET)
-			PuzzleDone(item, PuzzleItem);
+		if (LaraItem->animNumber == LA_TRIDENT_SET)
+		{
+			PuzzleDone(item, puzzleItem);
+		}
 	}
 }
-
-// Keys
-void KeyHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+/*keys*/
+void KeyHoleCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* keyHoleItem = &g_Level.Items[itemNumber];
-
-	if (g_Level.Items[itemNumber].TriggerFlags == 1 &&
-		keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	if (g_Level.Items[itemNum].triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
 	{
-		if (keyHoleItem->ItemFlags[3])
+		if (item->itemFlags[3])
 		{
-			keyHoleItem->ItemFlags[3]--;
-			if (!keyHoleItem->ItemFlags[3])
-				keyHoleItem->MeshBits = 2;
+			item->itemFlags[3]--;
+			if (!item->itemFlags[3])
+				item->meshBits = 2;
 		}
 	}
 
-	if (!((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM) &&
-		!BinocularRange &&
-		laraItem->Animation.ActiveState == LS_IDLE &&
-		laraItem->Animation.AnimNumber == LA_STAND_IDLE) &&
-		laraInfo->Control.HandStatus == HandStatus::Free &&
-		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
+	if (!((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM)
+		&& !BinocularRange
+		&& !Lara.gunStatus
+		&& l->currentAnimState == LS_IDLE
+		&& l->animNumber == LA_STAND_IDLE)
+		&& (!Lara.isMoving || Lara.interactedItem != itemNum))
 	{
-		if (keyHoleItem->ObjectNumber < ID_KEY_HOLE6)
-			ObjectCollision(itemNumber, laraItem, coll);
+		if (item->objectNumber < ID_KEY_HOLE6)
+			ObjectCollision(itemNum, l, coll);
 	}
 	else
 	{
-		if (TestLaraPosition(&KeyHoleBounds, keyHoleItem, laraItem))
+		if (TestLaraPosition(&KeyHoleBounds, item, l))
 		{
-			if (!laraInfo->Control.IsMoving) //TROYE INVENTORY FIX ME
+			if (!Lara.isMoving)//TROYE INVENTORY FIX ME
 			{
-				if (keyHoleItem->Status != ITEM_NOT_ACTIVE)
+				if (item->status != ITEM_NOT_ACTIVE)
 					return;
 
 				if (g_Gui.GetInventoryItemChosen() == NO_ITEM)
 				{
-					if (g_Gui.IsObjectInInventory(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
-						g_Gui.SetEnterInventory(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
+					if (g_Gui.IsObjectInInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)))
+						g_Gui.SetEnterInventory(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1));
 
 					return;
 				}
 
-				if (g_Gui.GetInventoryItemChosen() != keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
+				if (g_Gui.GetInventoryItemChosen() != item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
 			}
 
-			if (MoveLaraPosition(&KeyHolePosition, keyHoleItem, laraItem))
+			if (MoveLaraPosition(&KeyHolePosition, item, l))
 			{
-				if (keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
-					laraItem->Animation.AnimNumber = LA_KEYCARD_USE;
+				if (item->objectNumber == ID_KEY_HOLE8)
+					l->animNumber = LA_KEYCARD_USE;
 				else
 				{
-					RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
-					laraItem->Animation.AnimNumber = LA_USE_KEY;
+					RemoveObjectFromInventory(static_cast<GAME_OBJECT_ID>(item->objectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1)), 1);
+					l->animNumber = LA_USE_KEY;
 				}
+				l->currentAnimState = LS_INSERT_KEY;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+				Lara.isMoving = false;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
+				item->flags |= 0x20;
+				item->status = ITEM_ACTIVE;
 
-				laraItem->Animation.ActiveState = LS_INSERT_KEY;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
-				laraInfo->Control.HandStatus = HandStatus::Busy;
-				keyHoleItem->Flags |= 0x20;
-				keyHoleItem->Status = ITEM_ACTIVE;
-
-				if (keyHoleItem->TriggerFlags == 1 && keyHoleItem->ObjectNumber == ID_KEY_HOLE8)
+				if (item->triggerFlags == 1 && item->objectNumber == ID_KEY_HOLE8)
 				{
-					keyHoleItem->ItemFlags[3] = 92;
+					item->itemFlags[3] = 92;
 					g_Gui.SetInventoryItemChosen(NO_ITEM);
 					return;
 				}
 			}
 			else
-				laraInfo->InteractedItem = itemNumber;
+			{
+				Lara.interactedItem = itemNum;
+			}
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			return;
 		}
 
-		if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+		if (Lara.isMoving && Lara.interactedItem == itemNum)
 		{
-			laraInfo->Control.IsMoving = false;
-			laraInfo->Control.HandStatus = HandStatus::Free;
+			Lara.isMoving = false;
+			Lara.gunStatus = LG_HANDS_FREE;
 		}
 	}
 

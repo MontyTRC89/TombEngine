@@ -7,8 +7,8 @@ constexpr auto SPOTCAM_CINEMATIC_BARS_SPEED = 1.0f / 256.0f;
 
 struct QUAKE_CAMERA
 {
-	GameVector spos;
-	GameVector epos;
+	GAME_VECTOR spos;
+	GAME_VECTOR epos;
 };
 
 struct SPOTCAM

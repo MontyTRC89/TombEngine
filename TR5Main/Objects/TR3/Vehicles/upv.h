@@ -2,7 +2,7 @@
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 
-void UPVInitialise(short itemNumber);
-void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-void UPVEffects(short itemNumber);
-bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll);
+void SubInitialise(short itemNum);
+void SubCollision(short itemNum, ITEM_INFO* laraItem, COLL_INFO* coll);
+void SubEffects(short itemNum);
+bool SubControl(ITEM_INFO* laraItem, COLL_INFO* coll);

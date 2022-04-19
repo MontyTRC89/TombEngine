@@ -3,91 +3,84 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Specific/setup.h"
 #include "Game/health.h"
 #include "Game/collision/collide_item.h"
 
-static Vector3Int SarcophagusPosition(0, 0, -300);
+static PHD_VECTOR SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
-{
-	-512, 512,
-	-100, 100,
-	-512, 0,
-	ANGLE(-10.0f), ANGLE(10.0f),
-	ANGLE(-30.0f), ANGLE(30.0f),
-	0, 0
-};
+{ -512, 512, -100, 100, -512, 0, ANGLE(-10), ANGLE(10), ANGLE(-30), ANGLE(30), 0, 0 };
 
-void InitialiseSarcophagus(short itemNumber)
+void InitialiseSarcophagus(short itemNum)
 {
 
 }
 
-void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void SarcophagusCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
-	auto* sarcItem = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
 	if (TrInput & IN_ACTION &&
-		laraItem->Animation.ActiveState == LS_IDLE &&
-		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-		laraInfo->Control.HandStatus == HandStatus::Free &&
-		sarcItem->Status != ITEM_ACTIVE ||
-		laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
+		item->status != ITEM_ACTIVE &&
+		l->currentAnimState == LS_IDLE &&
+		l->animNumber == LA_STAND_IDLE &&
+		Lara.gunStatus == LG_HANDS_FREE ||
+		Lara.isMoving && Lara.interactedItem == itemNum)
 	{
-		if (TestLaraPosition(&SarcophagusBounds, sarcItem, laraItem))
+		if (TestLaraPosition(&SarcophagusBounds, item, l))
 		{
-			if (MoveLaraPosition(&SarcophagusPosition, sarcItem, laraItem))
+			if (MoveLaraPosition(&SarcophagusPosition, item, l))
 			{
-				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
-				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				sarcItem->Flags |= IFLAG_ACTIVATION_MASK;
+				l->animNumber = LA_PICKUP_SARCOPHAGUS;
+				l->currentAnimState = LS_MISC_CONTROL;
+				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+				item->flags |= IFLAG_ACTIVATION_MASK;
 
-				AddActiveItem(itemNumber);
-				sarcItem->Status = ITEM_ACTIVE;
+				AddActiveItem(itemNum);
+				item->status = ITEM_ACTIVE;
 
-				laraInfo->Control.IsMoving = false;
-				ResetLaraFlex(laraItem);
-				laraInfo->Control.HandStatus = HandStatus::Busy;
+				Lara.isMoving = false;
+				Lara.headYrot = 0;
+				Lara.headXrot = 0;
+				Lara.torsoYrot = 0;
+				Lara.torsoXrot = 0;
+				Lara.gunStatus = LG_HANDS_BUSY;
 			}
 			else
-				laraInfo->InteractedItem = itemNumber;
-		}
-		else if (laraInfo->Control.IsMoving)
-		{
-			if (laraInfo->InteractedItem == itemNumber)
 			{
-				laraInfo->Control.IsMoving = false;
-				laraInfo->Control.HandStatus = HandStatus::Free;
+				Lara.interactedItem = itemNum;
+			}
+		}
+		else if (Lara.isMoving)
+		{
+			if (Lara.interactedItem == itemNum)
+			{
+				Lara.isMoving = false;
+				Lara.gunStatus = LG_HANDS_FREE;
 			}
 		}
 	}
-	else if (laraItem->Animation.AnimNumber != LA_PICKUP_SARCOPHAGUS ||
-		laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
+	else if (l->animNumber != LA_PICKUP_SARCOPHAGUS || l->frameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
-		ObjectCollision(itemNumber, laraItem, coll);
+		ObjectCollision(itemNum, l, coll);
 	}
 	else
 	{
-		short linkNumber;
-		for (linkNumber = g_Level.Items[g_Level.Rooms[sarcItem->RoomNumber].itemNumber].NextItem; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		short linknum;
+		for (linknum = g_Level.Items[g_Level.Rooms[item->roomNumber].itemNumber].nextItem; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
 		{
-			auto* currentItem = &g_Level.Items[linkNumber];
+			ITEM_INFO* currentItem = &g_Level.Items[linknum];
 
-			if (linkNumber != itemNumber &&
-				currentItem->Pose.Position.x == sarcItem->Pose.Position.x &&
-				currentItem->Pose.Position.z == sarcItem->Pose.Position.z)
+			if (linknum != itemNum && currentItem->pos.xPos == item->pos.xPos && currentItem->pos.zPos == item->pos.zPos)
 			{
-				if (Objects[currentItem->ObjectNumber].isPickup)
+				if (Objects[currentItem->objectNumber].isPickup)
 				{
-					PickedUpObject(static_cast<GAME_OBJECT_ID>(currentItem->ObjectNumber), 0);
-					currentItem->Status = ITEM_ACTIVE;
-					currentItem->ItemFlags[3] = 1;
-					AddDisplayPickup(currentItem->ObjectNumber);
+					PickedUpObject(static_cast<GAME_OBJECT_ID>(currentItem->objectNumber), 0);
+					currentItem->status = ITEM_ACTIVE;
+					currentItem->itemFlags[3] = 1;
+					AddDisplayPickup(currentItem->objectNumber);
 				}
 			}
 		}

@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "tr4_mapper.h"
 #include "Specific/level.h"
-#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -14,29 +13,34 @@ namespace TEN::Entities::TR4
 {
     void InitialiseMapper(short itemNumber)
     {
-        g_Level.Items[itemNumber].MeshBits = -3;
+        g_Level.Items[itemNumber].meshBits = -3;
     }
 
     void MapperControl(short itemNumber)
     {
-        auto* item = &g_Level.Items[itemNumber];
+        ITEM_INFO* item = &g_Level.Items[itemNumber];
 
         if (!TriggerActive(item))
             return;
 
-        if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase >= 200)
+        if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase >= 200)
         {
-            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->Pose, 0);
+            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->pos, 0);
 
-            item->MeshBits |= 2;
+            item->meshBits |= 2;
 
-            Vector3Int pos = { 0, 0, 0 };
+            PHD_VECTOR pos;
+            pos.x = 0;
+            pos.y = 0;
+            pos.z = 0;
             GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
 
             byte color = (GetRandomControl() & 0x1F) + 192;
             TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, color, color, 0);
 
-            int height = GetCollision(item).Position.Floor;
+            short roomNumber = item->roomNumber;
+            FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+            int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
             for (int i = 0; i < 2; i++)
             {

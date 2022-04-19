@@ -2,50 +2,51 @@
 #include "tr5_fallingceiling.h"
 #include "Game/items.h"
 #include "Specific/level.h"
-#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
 
 void FallingCeilingControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->Animation.ActiveState)
+	if (item->currentAnimState)
 	{
-		if (item->Animation.ActiveState == 1 && item->TouchBits)
+		if (item->currentAnimState == 1 && item->touchBits)
 		{
-			LaraItem->HitPoints -= 300;
-			LaraItem->HitStatus = true;
+			LaraItem->hitPoints -= 300;
+			LaraItem->hitStatus = true;
 		}
 	}
 	else
 	{
-		item->Animation.TargetState = 1;
-		item->Animation.Airborne = true;;
+		item->goalAnimState = 1;
+		item->gravityStatus = true;;
 	}
 
 	AnimateItem(item);
 
-	if (item->Status == ITEM_DEACTIVATED)
+	if (item->status == ITEM_DEACTIVATED)
+	{
 		RemoveActiveItem(itemNumber);
+	}
 	else
 	{
-		auto probe = GetCollision(item);
+		short roomNumber = item->roomNumber;
+		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
+		item->floor = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
 
-		item->Floor = probe.Position.Floor;
+		if (roomNumber != item->roomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
 
-		if (probe.RoomNumber != item->RoomNumber)
-			ItemNewRoom(itemNumber, probe.RoomNumber);
-
-		if (item->Animation.ActiveState == 1)
+		if (item->currentAnimState == 1)
 		{
-			if (item->Pose.Position.y >= item->Floor)
+			if (item->pos.yPos >= item->floor)
 			{
-				item->Pose.Position.y = item->Floor;
-				item->Animation.Airborne = false;
-				item->Animation.TargetState = 2;
-				item->Animation.VerticalVelocity = 0;
+				item->pos.yPos = item->floor;
+				item->gravityStatus = false;
+				item->goalAnimState = 2;
+				item->fallspeed = 0;
 			}
 		}
 	}

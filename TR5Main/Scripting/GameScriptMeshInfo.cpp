@@ -63,24 +63,24 @@ void GameScriptMeshInfo::Register(sol::state* state)
 
 GameScriptPosition GameScriptMeshInfo::GetPos() const
 {
-	return GameScriptPosition{ m_mesh.pos.Position.x, m_mesh.pos.Position.y, m_mesh.pos.Position.z };
+	return GameScriptPosition{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
 }
 
 void GameScriptMeshInfo::SetPos(GameScriptPosition const& pos)
 {
-	m_mesh.pos.Position.x = pos.x;
-	m_mesh.pos.Position.y = pos.y;
-	m_mesh.pos.Position.z = pos.z;
+	m_mesh.pos.xPos = pos.x;
+	m_mesh.pos.yPos = pos.y;
+	m_mesh.pos.zPos = pos.z;
 }
 
 int GameScriptMeshInfo::GetRot() const
 {
-	return m_mesh.pos.Orientation.y;
+	return m_mesh.pos.yRot;
 }
 
 void GameScriptMeshInfo::SetRot(int yRot)
 {
-	m_mesh.pos.Orientation.y = yRot;
+	m_mesh.pos.yRot = yRot;
 }
 
 std::string GameScriptMeshInfo::GetName() const
@@ -127,10 +127,10 @@ void GameScriptMeshInfo::SetColor(GameScriptColor const & col)
 
 int GameScriptMeshInfo::GetHP() const
 {
-	return m_mesh.HitPoints;
+	return m_mesh.hitPoints;
 }
 
 void GameScriptMeshInfo::SetHP(int hp)
 {
-	m_mesh.HitPoints = hp;
+	m_mesh.hitPoints = hp;
 }

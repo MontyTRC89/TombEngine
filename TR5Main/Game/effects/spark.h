@@ -25,8 +25,8 @@ namespace TEN {
 			extern std::array<SparkParticle,64> SparkParticles;
 			void UpdateSparkParticles();
 			SparkParticle& getFreeSparkParticle();
-			void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int room);
-			void TriggerRicochetSpark(GameVector* pos, short angle, int num);
+			void TriggerFlareSparkParticles(PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int room);
+			void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num);
 		}
 	}
 }

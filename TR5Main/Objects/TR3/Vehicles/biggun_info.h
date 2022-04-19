@@ -1,14 +1,11 @@
 #pragma once
 
-struct BigGunInfo
+struct BIGGUNINFO
 {
-	Vector3Shrt Rotation;
-	short BarrelZRotation;
-	short StartYRot;
-	long GunRotYAdd;
-
-	unsigned int FireCount;
-	bool BarrelRotating;
-
-	char Flags;
+	short xRot;
+	short yRot;
+	short startYRot;
+	char flags;
+	int fireCount;
+	short barrelZ;
 };

@@ -1,8 +1,8 @@
 #pragma once
-
 enum GAME_OBJECT_ID : short;
 struct LaraInfo;
 
-bool TryAddingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, int count);
-bool TryRemovingKeyItem(LaraInfo& lara, GAME_OBJECT_ID objectID, int count);
-std::optional<int> GetKeyItemCount(LaraInfo& lara, GAME_OBJECT_ID objectID);
+bool TryAddKeyItem(LaraInfo& lara, GAME_OBJECT_ID obj, int count);
+bool TryRemoveKeyItem(LaraInfo& lara, GAME_OBJECT_ID obj, int count);
+std::optional<int> GetKeyItemCount(LaraInfo& lara, GAME_OBJECT_ID obj);
+

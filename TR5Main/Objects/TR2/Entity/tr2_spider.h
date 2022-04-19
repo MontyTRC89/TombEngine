@@ -1,4 +1,4 @@
 #pragma once
 
-void SmallSpiderControl(short itemNumber);
-void BigSpiderControl(short itemNumber);
+void SmallSpiderControl(short itemNum);
+void BigSpiderControl(short itemNum);

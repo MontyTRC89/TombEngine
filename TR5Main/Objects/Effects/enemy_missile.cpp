@@ -2,7 +2,6 @@
 #include "Objects/Effects/enemy_missile.h"
 
 #include "Game/collision/collide_item.h"
-#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
@@ -21,15 +20,14 @@ namespace TEN::Entities::Effects
 {
 	void TriggerSethMissileFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
-		auto* fx = &EffectList[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
-		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
-		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
+		int dx = LaraItem->pos.xPos - fx->pos.xPos;
+		int dz = LaraItem->pos.zPos - fx->pos.zPos;
 
-		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-			dz >= -SECTOR(16) && dz <= SECTOR(16))
+		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			SPARKS* spark = &Sparks[GetFreeSpark()];
 
 			spark->on = 1;
 			spark->sR = 0;
@@ -51,21 +49,25 @@ namespace TEN::Entities::Effects
 			spark->friction = 68;
 			spark->flags = 602;
 			spark->rotAng = GetRandomControl() & 0xFFF;
-
 			if (GetRandomControl() & 1)
+			{
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+			}
 			else
+			{
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-			
+			}
 			spark->gravity = 0;
 			spark->maxYvel = 0;
 			spark->fxObj = fxNum;
-
 			if (fx->flag1 == 1)
+			{
 				spark->scalar = 3;
+			}
 			else
+			{
 				spark->scalar = 2;
-			
+			}
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 64;
 			spark->dSize = spark->size / 32;
 		}
@@ -73,14 +75,14 @@ namespace TEN::Entities::Effects
 
 	void TriggerHarpyFlameFlame(short fxNum, short xVel, short yVel, short zVel)
 	{
-		auto* fx = &EffectList[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
-		int dx = LaraItem->Pose.Position.x - fx->pos.Position.x;
-		int dz = LaraItem->Pose.Position.z - fx->pos.Position.z;
+		int dx = LaraItem->pos.xPos - fx->pos.xPos;
+		int dz = LaraItem->pos.zPos - fx->pos.zPos;
 
 		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			SPARKS* spark = &Sparks[GetFreeSpark()];
 
 			spark->on = 1;
 			spark->sR = 0;
@@ -101,12 +103,14 @@ namespace TEN::Entities::Effects
 			spark->friction = 68;
 			spark->flags = 602;
 			spark->rotAng = GetRandomControl() & 0xFFF;
-
 			if (GetRandomControl() & 1)
+			{
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+			}
 			else
+			{
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-
+			}
 			spark->gravity = 0;
 			spark->maxYvel = 0;
 			spark->fxObj = fxNum;
@@ -118,11 +122,11 @@ namespace TEN::Entities::Effects
 
 	void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 	{
-		ShatterItem.yRot = fx->pos.Orientation.y;
+		ShatterItem.yRot = fx->pos.yRot;
 		ShatterItem.meshIndex = fx->frameNumber;
-		ShatterItem.sphere.x = fx->pos.Position.x;
-		ShatterItem.sphere.y = fx->pos.Position.y;
-		ShatterItem.sphere.z = fx->pos.Position.z;
+		ShatterItem.sphere.x = fx->pos.xPos;
+		ShatterItem.sphere.y = fx->pos.yPos;
+		ShatterItem.sphere.z = fx->pos.zPos;
 		ShatterItem.bit = 0;
 		ShatterItem.flags = fx->flag2 & 0x400;
 		ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
@@ -130,50 +134,58 @@ namespace TEN::Entities::Effects
 
 	void ControlEnemyMissile(short fxNum)
 	{
-		auto* fx = &EffectList[fxNum];
+		FX_INFO* fx = &EffectList[fxNum];
 
 		short angles[2];
 		phd_GetVectorAngles(
-			LaraItem->Pose.Position.x - fx->pos.Position.x,
-			LaraItem->Pose.Position.y - fx->pos.Position.y - CLICK(1),
-			LaraItem->Pose.Position.z - fx->pos.Position.z,
+			LaraItem->pos.xPos - fx->pos.xPos,
+			LaraItem->pos.yPos - fx->pos.yPos - STEP_SIZE,
+			LaraItem->pos.zPos - fx->pos.zPos,
 			angles);
 
 		int maxRotation = 0;
-		int maxVelocity = 0;
+		int maxSpeed = 0;
 
 		if (fx->flag1 == 1)
 		{
-			maxRotation = ANGLE(2.8f);
-			maxVelocity = CLICK(1);
+			maxRotation = 512;
+			maxSpeed = 256;
 		}
 		else
 		{
 			if (fx->flag1 == 6)
 			{
 				if (fx->counter)
+				{
 					fx->counter--;
-
-				maxRotation = ANGLE(1.4f);
+				}
+				maxRotation = 256;
 			}
 			else
-				maxRotation = ANGLE(4.5f);
-
-			maxVelocity = CLICK(0.75f);
+			{
+				maxRotation = 768;
+			}
+			maxSpeed = 192;
 		}
 
-		if (fx->speed < maxVelocity)
+		if (fx->speed < maxSpeed)
 		{
 			if (fx->flag1 == 6)
+			{
 				fx->speed++;
+			}
 			else
+			{
 				fx->speed += 3;
+			}
 
-			int dy = angles[0] - fx->pos.Orientation.y;
+			int dy = angles[0] - fx->pos.yRot;
 			if (abs(dy) > 0x8000)
+			{
 				dy = -dy;
+			}
 
-			int dx = angles[1] - fx->pos.Orientation.x;
+			int dx = angles[1] - fx->pos.xRot;
 			if (abs(dx) > 0x8000)
 				dx = -dx;
 
@@ -191,30 +203,35 @@ namespace TEN::Entities::Effects
 				dx = maxRotation;
 
 			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
-				fx->pos.Orientation.y += dy;
-			fx->pos.Orientation.x += dx;
+			{
+				fx->pos.yRot += dy;
+			}
+			fx->pos.xRot += dx;
 		}
 
-		fx->pos.Orientation.z += 16 * fx->speed;
+		fx->pos.zRot += 16 * fx->speed;
 		if (fx->flag1 == 6)
-			fx->pos.Orientation.z += 16 * fx->speed;
+			fx->pos.zRot += 16 * fx->speed;
 
-		int oldX = fx->pos.Position.x;
-		int oldY = fx->pos.Position.y;
-		int oldZ = fx->pos.Position.z;
+		int oldX = fx->pos.xPos;
+		int oldY = fx->pos.yPos;
+		int oldZ = fx->pos.zPos;
 
-		int speed = (fx->speed * phd_cos(fx->pos.Orientation.x));
-		fx->pos.Position.x += (speed * phd_sin(fx->pos.Orientation.y));
-		fx->pos.Position.y += -((fx->speed * phd_sin(fx->pos.Orientation.x))) + fx->fallspeed;
-		fx->pos.Position.z += (speed * phd_cos(fx->pos.Orientation.y));
+		int speed = (fx->speed * phd_cos(fx->pos.xRot));
+		fx->pos.xPos += (speed * phd_sin(fx->pos.yRot));
+		fx->pos.yPos += -((fx->speed * phd_sin(fx->pos.xRot))) + fx->fallspeed;
+		fx->pos.zPos += (speed * phd_cos(fx->pos.yRot));
 
-		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+		short roomNumber = fx->roomNumber;
+		FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos, &roomNumber);
+		int floorHeight = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
+		int ceilingHeight = GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 
-		if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
+		if (fx->pos.yPos >= floorHeight || fx->pos.yPos <= ceilingHeight)
 		{
-			fx->pos.Position.x = oldX;
-			fx->pos.Position.y = oldY;
-			fx->pos.Position.z = oldZ;
+			fx->pos.xPos = oldX;
+			fx->pos.yPos = oldY;
+			fx->pos.zPos = oldZ;
 
 			if (fx->flag1 != 6)
 				BubblesShatterFunction(fx, 0, -32);
@@ -229,9 +246,13 @@ namespace TEN::Entities::Effects
 				if (fx->flag1)
 				{
 					if (fx->flag1 == 3 || fx->flag1 == 4)
+					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 0);
+					}
 					else if (fx->flag1 == 5)
+					{
 						TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 0);
+					}
 					else
 					{
 						if (fx->flag1 != 2)
@@ -240,19 +261,23 @@ namespace TEN::Entities::Effects
 							{
 								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
 								TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 2);
-								fx->pos.Position.y -= 128;
+								fx->pos.yPos -= 128;
 								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
-								fx->pos.Position.y += 256;
+								fx->pos.yPos += 256;
 								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
 							}
 
 						}
 						else
+						{
 							TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 0);
+						}
 					}
 				}
 				else
+				{
 					TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 0, 16, 0, 0);
+				}
 			}
 
 			KillEffect(fxNum);
@@ -261,9 +286,11 @@ namespace TEN::Entities::Effects
 
 		if (ItemNearLara(&fx->pos, 200))
 		{
-			LaraItem->HitStatus = true;
+			LaraItem->hitStatus = true;
 			if (fx->flag1 != 6)
+			{
 				BubblesShatterFunction(fx, 0, -32);
+			}
 
 			KillEffect(fxNum);
 
@@ -281,37 +308,36 @@ namespace TEN::Entities::Effects
 				case 4:
 					TriggerShockwave(&fx->pos, 32, 160, 64, 128, 64, 0, 16, 0, 1);
 					break;
-
 				case 5:
 					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 96, 128, 16, 0, 2);
 					break;
-
 				case 2:
 					TriggerShockwave(&fx->pos, 32, 160, 64, 0, 128, 128, 16, 0, 2);
 					break;
-
 				case 6:
 					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
 					TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 0);
-					fx->pos.Position.y -= 128;
+					fx->pos.yPos -= 128;
 					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
-					fx->pos.Position.y += 256;
+					fx->pos.yPos += 256;
 					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
 					LaraBurn(LaraItem);
 					break;
 				}
 			}
 			else
+			{
 				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
+			}
 		}
 		else
 		{
-			if (probe.RoomNumber != fx->roomNumber)
-				EffectNewRoom(fxNum, probe.RoomNumber);
+			if (roomNumber != fx->roomNumber)
+				EffectNewRoom(fxNum, roomNumber);
 
-			int dx = oldX - fx->pos.Position.x;
-			int dy = oldY - fx->pos.Position.y;
-			int dz = oldZ - fx->pos.Position.z;
+			int dx = oldX - fx->pos.xPos;
+			int dy = oldY - fx->pos.yPos;
+			int dz = oldZ - fx->pos.zPos;
 
 			if (Wibble & 4)
 			{
@@ -321,17 +347,14 @@ namespace TEN::Entities::Effects
 				case 1:
 					TriggerSethMissileFlame(fxNum, 32 * dx, 32 * dy, 32 * dz);
 					break;
-
 				case 2:
 					TriggerHarpyFlameFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
-
 				case 3:
 				case 4:
 				case 5:
 					TriggerDemigodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;
-
 				case 6:
 					TriggerCrocgodMissileFlame(fxNum, 16 * dx, 16 * dy, 16 * dz);
 					break;

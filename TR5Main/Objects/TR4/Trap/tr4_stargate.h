@@ -1,10 +1,10 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
 namespace TEN::Entities::TR4
 {
-	void StargateControl(short itemNumber);
-	void StargateCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+	void StargateControl(short itemNum);
+	void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c);
 }

@@ -23,24 +23,24 @@ namespace TEN::Entities::Doors
 {
 	void InitialiseSteelDoor(short itemNumber)
 	{
-		auto* doorItem = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		doorItem->MeshBits = 1;
-		doorItem->Pose.Position.y -= 1024;
+		item->meshBits = 1;
+		item->pos.yPos -= 1024;
 	}
 
-	void SteelDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void SteelDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 	{
-		auto* doorItem = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (doorItem->ItemFlags[0] != 3)
+		if (item->itemFlags[0] != 3)
 		{
-			if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))
+			if (TestBoundsCollide(item, l, coll->Setup.Radius))
 			{
-				if (TestCollision(doorItem, laraItem))
+				if (TestCollision(item, l))
 				{
 					if (coll->Setup.EnableObjectPush)
-						ItemPushItem(doorItem, laraItem, coll, 0, 1);
+						ItemPushItem(item, l, coll, 0, 1);
 				}
 			}
 		}

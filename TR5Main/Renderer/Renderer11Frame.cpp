@@ -19,8 +19,7 @@ namespace TEN::Renderer
 	{
 		short baseRoomIndex = renderView.camera.RoomNumber;
 
-		for (int i = 0; i < g_Level.Rooms.size(); i++)
-		{
+		for (int i = 0; i < g_Level.Rooms.size(); i++) {
 			m_rooms[i].ItemsToDraw.clear();
 			m_rooms[i].EffectsToDraw.clear();
 			m_rooms[i].TransparentFacesToDraw.clear();
@@ -33,30 +32,31 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectItems(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() < roomNumber)
+		if (m_rooms.size() < roomNumber) {
 			return;
+		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
 		short itemNum = NO_ITEM;
-		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].NextItem)
+		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].nextItem)
 		{
 			ITEM_INFO* item = &g_Level.Items[itemNum];
 
-			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
+			if (item->objectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].nextItem)
 				break;
 
-			if (item->ObjectNumber == ID_LARA)
+			if (item->objectNumber == ID_LARA)
 				continue;
 
-			if (item->Status == ITEM_INVISIBLE)
+			if (item->status == ITEM_INVISIBLE)
 				continue;
 
-			if (!m_moveableObjects[item->ObjectNumber].has_value())
+			if (!m_moveableObjects[item->objectNumber].has_value())
 				continue;
 
-			auto bounds = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+			auto bounds = TO_DX_BBOX(item->pos, GetBoundsAccurate(item));
 			Vector3 min = bounds.Center - bounds.Extents;
 			Vector3 max = bounds.Center + bounds.Extents;
 
@@ -66,14 +66,14 @@ namespace TEN::Renderer
 			auto newItem = &m_items[itemNum];
 
 			newItem->ItemNumber = itemNum;
-			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
-															   TO_RAD(item->Pose.Orientation.x),
-															   TO_RAD(item->Pose.Orientation.z));
+			newItem->Translation = Matrix::CreateTranslation(item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->pos.yRot),
+															   TO_RAD(item->pos.xRot),
+															   TO_RAD(item->pos.zRot));
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			CollectLightsForItem(item->RoomNumber, newItem, renderView);
+			CollectLightsForItem(item->roomNumber, newItem, renderView);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
@@ -81,8 +81,9 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectStatics(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() < roomNumber)
+		if (m_rooms.size() < roomNumber) {
 			return;
+		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
@@ -113,8 +114,9 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
 	{
 		effect->Lights.clear();
-		if (m_rooms.size() < roomNumber)
+		if (m_rooms.size() < roomNumber) {
 			return;
+		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
@@ -123,7 +125,7 @@ namespace TEN::Renderer
 			return;
 		LinearArrayBuffer<RendererLight*, 8> tempLights;
 
-		Vector3 itemPosition = Vector3(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z);
+		Vector3 itemPosition = Vector3(effect->Effect->pos.xPos, effect->Effect->pos.yPos, effect->Effect->pos.zPos);
 
 		// Dynamic lights have the priority
 		for (int i = 0; i < dynamicLights.size(); i++)
@@ -215,8 +217,9 @@ namespace TEN::Renderer
 	{
 		item->LightsToDraw.clear();
 
-		if (m_rooms.size() < roomNumber)
+		if (m_rooms.size() < roomNumber){
 			return;
+		}
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
@@ -232,21 +235,25 @@ namespace TEN::Renderer
 		// Interpolate ambient light between rooms
 		if (item->PreviousRoomNumber == NO_ITEM)
 		{
-			item->PreviousRoomNumber = nativeItem->RoomNumber;
-			item->CurrentRoomNumber = nativeItem->RoomNumber;
+			item->PreviousRoomNumber = nativeItem->roomNumber;
+			item->CurrentRoomNumber = nativeItem->roomNumber;
 			item->AmbientLightSteps = AMBIENT_LIGHT_INTERPOLATION_STEPS;
 		}
-		else if (nativeItem->RoomNumber != item->CurrentRoomNumber)
+		else if (nativeItem->roomNumber != item->CurrentRoomNumber)
 		{
 			item->PreviousRoomNumber = item->CurrentRoomNumber;
-			item->CurrentRoomNumber = nativeItem->RoomNumber;
+			item->CurrentRoomNumber = nativeItem->roomNumber;
 			item->AmbientLightSteps = 0;
 		}
 		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
+		{
 			item->AmbientLightSteps++;
+		}
 
 		if (item->PreviousRoomNumber == NO_ITEM)
-			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
+		{
+			item->AmbientLight = m_rooms[nativeItem->roomNumber].AmbientLight;
+		}
 		else
 		{
 			item->AmbientLight = (((AMBIENT_LIGHT_INTERPOLATION_STEPS - item->AmbientLightSteps) / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->PreviousRoomNumber].AmbientLight +
@@ -258,10 +265,12 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
 
-		Vector3 itemPosition = Vector3(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z);
+		Vector3 itemPosition = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
 
-		if (nativeItem->ObjectNumber == ID_LARA)
+		if (nativeItem->objectNumber == ID_LARA)
+		{
 			shadowLight = nullptr;
+		}
 
 		RendererLight* brightestLight = NULL;
 		float brightest = 0.0f;
@@ -299,7 +308,9 @@ namespace TEN::Renderer
 				light->AffectNeighbourRooms = light->Type != LIGHT_TYPES::LIGHT_TYPE_SUN;
 
 				if (!light->AffectNeighbourRooms && roomToCheck != roomNumber)
+				{
 					continue;
+				}
 
 				// Check only lights different from sun
 				if (light->Type == LIGHT_TYPE_SUN)
@@ -328,7 +339,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = intensity;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->ObjectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
+					if (nativeItem->objectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
 					{
 						if (intensity >= brightest)
 						{
@@ -359,7 +370,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = intensity;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->ObjectNumber == ID_LARA)
+					if (nativeItem->objectNumber == ID_LARA)
 					{
 						if (intensity >= brightest)
 						{
@@ -380,22 +391,25 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (nativeItem->ObjectNumber == ID_LARA)
+		if (nativeItem->objectNumber == ID_LARA)
+		{
 			shadowLight = brightestLight;
+		}
 
 		// Sort lights by distance
 		std::sort(
 			tempLights.begin(),
 			tempLights.end(),
-			[](RendererLight* a, RendererLight* b)
-			{
+			[](RendererLight* a, RendererLight* b) {
 				return a->LocalIntensity > b->LocalIntensity;
 			}
 		);
 
 		// Add max 8 lights per item, including the shadow light for Lara eventually
 		if (shadowLight != nullptr)
+		{
 			item->LightsToDraw.push_back(shadowLight);
+		}
 		for (int i = 0; i < tempLights.size(); i++)
 		{
 			if (shadowLight != nullptr && shadowLight == tempLights[i])
@@ -410,9 +424,9 @@ namespace TEN::Renderer
 
 	void Renderer11::CollectLightsForRoom(short roomNumber, RenderView &renderView)
 	{
-		if (m_rooms.size() < roomNumber)
+		if (m_rooms.size() < roomNumber){
 			return;
-		
+		}
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
 
@@ -427,8 +441,8 @@ namespace TEN::Renderer
 			Vector3 boxMax = Vector3(r->x + (r->xSize + 1) * WALL_SIZE, -(r->maxceiling - STEP_SIZE), r->z + (r->zSize + 1) * WALL_SIZE);
 			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
 
-			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1 &&
-				SphereBoxIntersection(boxMin, boxMax, center, light->Out))
+			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1
+				&& SphereBoxIntersection(boxMin, boxMax, center, light->Out))
 				renderView.lightsToDraw.push_back(light);
 		}
 	}
@@ -455,7 +469,7 @@ namespace TEN::Renderer
 
 			newEffect->Effect = fx;
 			newEffect->Id = fxNum;
-			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.y, fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.yRot, fx->pos.xPos, fx->pos.zPos) * Matrix::CreateTranslation(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
 			CollectLightsForEffect(fx->roomNumber, newEffect, renderView);
@@ -467,6 +481,8 @@ namespace TEN::Renderer
 	void Renderer11::resetAnimations()
 	{
 		for (int i = 0; i < NUM_ITEMS; i++)
+		{
 			m_items[i].DoneAnimations = false;
+		}
 	}
 } // namespace TEN::Renderer

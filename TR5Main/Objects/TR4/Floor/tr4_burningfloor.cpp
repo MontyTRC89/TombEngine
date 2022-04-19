@@ -3,12 +3,12 @@
 #include "Specific/level.h"
 #include "Game/items.h"
 
-void InitialiseBurningFloor(short itemNumber)
+void InitialiseBurningFloor(short itemNum)
 {
-	g_Level.Items[itemNumber].Animation.RequiredState = 127;
+	g_Level.Items[itemNum].requiredAnimState = 127;
 }
 
-void BurningFloorControl(short itemNumber)
+void BurningFloorControl(short itemNum)
 {
 
 }

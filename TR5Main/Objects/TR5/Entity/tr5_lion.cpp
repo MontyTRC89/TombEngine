@@ -8,163 +8,152 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
 BITE_INFO LionBite1 = { -2, -10, 250, 21 };
 BITE_INFO LionBite2 = { -2, -10, 132, 21 };
 
-void InitialiseLion(short itemNumber)
+void InitialiseLion(short itemNum)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNum];
 
-	ClearItem(itemNumber);
+	ClearItem(itemNum);
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.TargetState = 1;
-	item->Animation.ActiveState = 1;
+	item->animNumber = Objects[item->objectNumber].animIndex;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->goalAnimState = 1;
+	item->currentAnimState = 1;
 }
 
-void LionControl(short itemNumber)
+void LionControl(short itemNum)
 {
-	auto* item = &g_Level.Items[itemNumber];
-
+	short joint0 = 0;
 	short angle = 0;
 	short tilt = 0;
-	short joint0 = 0;
 	short joint1 = 0;
 
-	if (CreatureActive(itemNumber))
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+
+	if (CreatureActive(itemNum))
 	{
-		auto* creature = GetCreatureInfo(item);
+		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
-		if (item->HitPoints <= 0)
+		if (item->hitPoints <= 0)
 		{
-			item->HitPoints = 0;
-
-			if (item->Animation.ActiveState != 5)
+			item->hitPoints = 0;
+			if (item->currentAnimState != 5)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + (GetRandomControl() & 1) + 7;
-				item->Animation.ActiveState = 5;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->animNumber = Objects[item->objectNumber].animIndex + (GetRandomControl() & 1) + 7;
+				item->currentAnimState = 5;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			}
 		}
 		else
 		{
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			AI_INFO info;
+			CreatureAIInfo(item,&info);
 
-			if (AI.ahead)
-				joint1 = AI.angle;
+			if (info.ahead)
+				joint1 = info.angle;
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item,&info, VIOLENT);
+			CreatureMood(item,&info, VIOLENT);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			angle = CreatureTurn(item, creature->maximumTurn);
 			joint0 = -16 * angle;
 
-			switch (item->Animation.ActiveState)
+			switch (item->currentAnimState)
 			{
 			case 1:
-				creature->MaxTurn = 0;
-
-				if (item->Animation.RequiredState)
+				creature->maximumTurn = 0;
+				if (item->requiredAnimState)
 				{
-					item->Animation.TargetState = item->Animation.RequiredState;
+					item->goalAnimState = item->requiredAnimState;
 					break;
 				}
-
-				if (creature->Mood == MoodType::Bored)
+				if (!creature->mood)
 				{
 					if (!(GetRandomControl() & 0x3F))
-						item->Animation.TargetState = 2;
+						item->goalAnimState = 2;
 					break;
 				}
-
-				if (AI.ahead)
+				if (info.ahead)
 				{
-					if (item->TouchBits & 0x200048)
+					if (item->touchBits & 0x200048)
 					{
-						item->Animation.TargetState = 7;
+						item->goalAnimState = 7;
 						break;
 					}
-
-					if (AI.distance < pow(SECTOR(1), 2))
+					if (info.distance < SQUARE(1024))
 					{
-						item->Animation.TargetState = 4;
+						item->goalAnimState = 4;
 						break;
 					}
 				}
-
-				item->Animation.TargetState = 3;
+				item->goalAnimState = 3;
 				break;
 
 			case 2:
-				creature->MaxTurn = ANGLE(2.0f);
-
-				if (creature->Mood == MoodType::Bored)
+				creature->maximumTurn = ANGLE(2);
+				if (!creature->mood)
 				{
 					if (GetRandomControl() < 128)
 					{
-						item->Animation.RequiredState = 6;
-						item->Animation.TargetState = 1;
+						item->requiredAnimState = 6;
+						item->goalAnimState = 1;
 					}
 				}
 				else
-					item->Animation.TargetState = 1;
-
+					item->goalAnimState = 1;
 				break;
 
 			case 3:
-				creature->MaxTurn = ANGLE(5.0f);
+				creature->maximumTurn = ANGLE(5);
 				tilt = angle;
-
-				if (creature->Mood != MoodType::Bored)
+				if (creature->mood)
 				{
-					if (AI.ahead && AI.distance < pow(SECTOR(1), 2))
-						item->Animation.TargetState = 1;
-					else if (item->TouchBits & 0x200048 && AI.ahead)
-						item->Animation.TargetState = 1;
-					else if (creature->Mood != MoodType::Escape)
+					if (info.ahead && info.distance < SQUARE(1024))
+					{
+						item->goalAnimState = 1;
+					}
+					else if (item->touchBits & 0x200048 && info.ahead)
+					{
+						item->goalAnimState = 1;
+					}
+					else if (creature->mood != ESCAPE_MOOD)
 					{
 						if (GetRandomControl() < 128)
 						{
-							item->Animation.RequiredState = 6;
-							item->Animation.TargetState = 1;
+							item->requiredAnimState = 6;
+							item->goalAnimState = 1;
 						}
 					}
 				}
 				else
-					item->Animation.TargetState = 1;
-				
+				{
+					item->goalAnimState = 1;
+				}
 				break;
 
 			case 4:
-				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
+				if (!item->requiredAnimState && item->touchBits & 0x200048)
 				{
-					CreatureEffect2(item, &LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
-					item->Animation.RequiredState = 1;
-
-					LaraItem->HitPoints -= 200;
-					LaraItem->HitStatus = true;
+					LaraItem->hitPoints -= 200;
+					LaraItem->hitStatus = true;
+					CreatureEffect2(item,&LionBite1, 10, item->pos.yRot, DoBloodSplat);
+					item->requiredAnimState = 1;
 				}
-
 				break;
-
 			case 7:
-				creature->MaxTurn = ANGLE(1.0f);
-
-				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
+				creature->maximumTurn = ANGLE(1);
+				if (!item->requiredAnimState && item->touchBits & 0x200048)
 				{
-					CreatureEffect2(item, &LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
-					item->Animation.RequiredState = 1;
-
-					LaraItem->HitPoints -= 60;
-					LaraItem->HitStatus = true;
+					CreatureEffect2(item,&LionBite2, 10, item->pos.yRot, DoBloodSplat);
+					LaraItem->hitPoints -= 60;
+					LaraItem->hitStatus = true;
+					item->requiredAnimState = 1;
 				}
-
 				break;
 			}
 		}
@@ -173,5 +162,5 @@ void LionControl(short itemNumber)
 	CreatureTilt(item, tilt);
 	CreatureJoint(item, 0, joint0);
 	CreatureJoint(item, 1, joint1);
-	CreatureAnimation(itemNumber, angle, 0);
+	CreatureAnimation(itemNum, angle, 0);
 }

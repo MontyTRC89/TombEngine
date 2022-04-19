@@ -5,19 +5,19 @@
 
 enum GAME_OBJECT_ID : short;
 
-struct DisplayPickup
+struct DISPLAY_PICKUP
 {
-	int Life;
-	short ObjectNumber;
+	short life;
+	short objectNumber;
 };
 
-void DrawHealthBarOverlay(ITEM_INFO* item, int value);
-void DrawHealthBar(ITEM_INFO* item, float value);
+void DrawHealthBarOverlay(int value);
+void DrawHealthBar(float value);
 void UpdateHealthBar(ITEM_INFO* item, int flash);
 void DrawAirBar(float value);
 void UpdateAirBar(ITEM_INFO* item, int flash);
 void DrawSprintBar(float value);
-void UpdateSprintBar(ITEM_INFO* item);
+void UpdateSprintBar();
 void AddDisplayPickup(GAME_OBJECT_ID objectNumber);
 void DrawAllPickups();
 void InitialisePickupDisplay();
@@ -26,7 +26,7 @@ int FlashIt();
 extern short PickupX;
 extern short PickupY;
 extern short CurrentPickup;
-extern DisplayPickup Pickups[MAX_COLLECTED_PICKUPS];
+extern DISPLAY_PICKUP Pickups[MAX_COLLECTED_PICKUPS];
 extern short PickupVel;
 extern int OldHitPoints;
 extern int HealthBarTimer;

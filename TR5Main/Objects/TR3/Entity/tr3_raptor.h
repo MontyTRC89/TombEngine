@@ -1,3 +1,3 @@
 #pragma once
 
-void RaptorControl(short itemNumber);
+void RaptorControl(short itemNum);

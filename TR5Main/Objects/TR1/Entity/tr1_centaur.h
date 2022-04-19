@@ -1,4 +1,4 @@
 #pragma once
 
-void CentaurControl(short itemNumber);
+void CentaurControl(short itemNum);
 void ControlCentaurBomb(short itemNumber);

@@ -12,7 +12,6 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
-#include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -86,16 +85,12 @@ void FlashOrange(ITEM_INFO* item)
 
 void MeshSwapToPour(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->MeshPtrs[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
+	Lara.meshPtrs[LM_LHAND] = Objects[item->itemFlags[2]].meshIndex + LM_LHAND;
 }
 
 void MeshSwapFromPour(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+	Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void Pickup(ITEM_INFO* item)
@@ -125,12 +120,12 @@ void ResetHair(ITEM_INFO* item)
 
 void InvisibilityOff(ITEM_INFO* item)
 {
-	item->Status = ITEM_ACTIVE;
+	item->status = ITEM_ACTIVE;
 }
 
 void InvisibilityOn(ITEM_INFO* item)
 {
-	item->Status = ITEM_INVISIBLE;
+	item->status = ITEM_INVISIBLE;
 }
 
 void SetFog(ITEM_INFO* item)
@@ -140,81 +135,72 @@ void SetFog(ITEM_INFO* item)
 
 void DrawLeftPistol(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	if (lara->MeshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
+	if (Lara.meshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
 	{
-		lara->MeshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(item, LaraWeaponType::Pistol)].meshIndex + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
+		Lara.meshPtrs[LM_LHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_LHAND;
+		Lara.holsterInfo.leftHolster = HOLSTER_SLOT::Empty;
 	}
 	else
 	{
-		lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
-		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlotForWeapon(LaraWeaponType::Pistol);
+		Lara.meshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
+		Lara.holsterInfo.leftHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
 	}
 }
 
 void DrawRightPistol(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	if (lara->MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
+	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 	{
-		lara->MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(item, LaraWeaponType::Pistol)].meshIndex + LM_RHAND;
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
+		Lara.meshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(LaraItem, WEAPON_PISTOLS)].meshIndex + LM_RHAND;
+		Lara.holsterInfo.rightHolster = HOLSTER_SLOT::Empty;
 	}
 	else
 	{
-		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-		lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlotForWeapon(LaraWeaponType::Pistol);
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+		Lara.holsterInfo.rightHolster = HolsterSlotForWeapon(static_cast<LARA_WEAPON_TYPE>(WEAPON_PISTOLS));
 	}
 }
 
 void ShootLeftGun(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->LeftArm.FlashGun = 3;
+	Lara.leftArm.flash_gun = 3;
 }
 
 void ShootRightGun(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->RightArm.FlashGun = 3;
+	Lara.rightArm.flash_gun = 3;
 }
 
 void LaraHandsFree(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	lara->Control.HandStatus = HandStatus::Free;
+	Lara.gunStatus = LG_HANDS_FREE;
 }
 
 void KillActiveBaddies(ITEM_INFO* item)
 {
 	if (NextItemActive != NO_ITEM)
 	{
-		short itemNumber = NextItemActive;
+		short itemNum = NextItemActive;
+		ITEM_INFO* targetItem;
 
 		do
 		{
-			auto* targetItem = &g_Level.Items[itemNumber];
+			targetItem = &g_Level.Items[itemNum];
 
-			if (Objects[targetItem->ObjectNumber].intelligent)
+			if (Objects[targetItem->objectNumber].intelligent)
 			{
-				targetItem->Status = ITEM_INVISIBLE;
+				targetItem->status = ITEM_INVISIBLE;
 
 				if (*(int*)&item != 0xABCDEF)
 				{
-					RemoveActiveItem(itemNumber);
-					DisableEntityAI(itemNumber);
-					targetItem->Flags |= IFLAG_INVISIBLE;
+					RemoveActiveItem(itemNum);
+					DisableBaddieAI(itemNum);
+					targetItem->flags |= IFLAG_INVISIBLE;
 				}
 			}
 
-			itemNumber = targetItem->NextActive;
-		} while (itemNumber != NO_ITEM);
+			itemNum = targetItem->nextActive;
+		} while (itemNum != NO_ITEM);
 	}
 
 	FlipEffect = -1;
@@ -222,23 +208,19 @@ void KillActiveBaddies(ITEM_INFO* item)
 
 void LaraLocationPad(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	FlipEffect = -1;
 
-	lara->Location = TriggerTimer;
-	lara->LocationPad = TriggerTimer;
+	Lara.location = TriggerTimer;
+	Lara.locationPad = TriggerTimer;
 }
 
 void LaraLocation(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
 	FlipEffect = -1;
 
-	lara->Location = TriggerTimer;
-	if (lara->HighestLocation < TriggerTimer)
-		lara->HighestLocation = TriggerTimer;
+	Lara.location = TriggerTimer;
+	if (Lara.highestLocation < TriggerTimer)
+		Lara.highestLocation = TriggerTimer;
 }
 
 void ExplosionFX(ITEM_INFO* item)
@@ -250,12 +232,10 @@ void ExplosionFX(ITEM_INFO* item)
 
 void SwapCrowbar(ITEM_INFO* item)
 {
-	auto* lara = GetLaraInfo(item);
-
-	if (lara->MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
-		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
+	if (Lara.meshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;
 	else 
-		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
+		Lara.meshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
 void ActivateKey(ITEM_INFO* item)
@@ -280,14 +260,16 @@ void RubbleFX(ITEM_INFO* item)
 
 	if (itemList.size() > 0)
 	{
-		auto* eq = &g_Level.Items[itemList[0]];
+		ITEM_INFO* eq = &g_Level.Items[itemList[0]];
 
 		AddActiveItem(itemList[0]);
-		eq->Status = ITEM_ACTIVE;
-		eq->Flags |= IFLAG_ACTIVATION_MASK;
+		eq->status = ITEM_ACTIVE;
+		eq->flags |= IFLAG_ACTIVATION_MASK;
 	}
 	else
+	{
 		Camera.bounce = -150;
+	}
 
 	FlipEffect = -1;
 }
@@ -300,22 +282,20 @@ void PlaySoundEffect(ITEM_INFO* item)
 
 void FloorShake(ITEM_INFO* item)
 {
-	int x = abs(item->Pose.Position.x - Camera.pos.x);
-	int y = abs(item->Pose.Position.y - Camera.pos.y);
-	int z = abs(item->Pose.Position.z - Camera.pos.z);
+	int x = abs(item->pos.xPos - Camera.pos.x);
+	int y = abs(item->pos.yPos - Camera.pos.y);
+	int z = abs(item->pos.zPos - Camera.pos.z);
 
-	if (x < SECTOR(16) &&
-		y < SECTOR(16) &&
-		z < SECTOR(16))
+	if (x < SECTOR(16) && y < SECTOR(16) && z < SECTOR(16))
 	{
-		Camera.bounce = 66 * ((pow(x, 2) + pow(y, 2) + pow(z, 2)) / CLICK(1) - pow(SECTOR(1), 2)) / pow(SECTOR(1), 2);
+		Camera.bounce = 66 * ((SQUARE(x) + SQUARE(y) + SQUARE(z)) / 256 - SQUARE(1024)) / SQUARE(1024);
 	}
 }
 
 void Turn180(ITEM_INFO* item)
 {
-	item->Pose.Orientation.y -= ANGLE(180.0f);
-	item->Pose.Orientation.x = -item->Pose.Orientation.x;
+	item->pos.yRot -= ANGLE(180);
+	item->pos.xRot = -item->pos.xRot;
 }
 
 void FinishLevel(ITEM_INFO* item)

@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::TR4
 {
-	void CatwalkBladeControl(short itemNumber);
+	void CatwalkBladeControl(short itemNum);
 }

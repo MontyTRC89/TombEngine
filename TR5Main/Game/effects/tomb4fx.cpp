@@ -2,7 +2,6 @@
 #include "Game/effects/tomb4fx.h"
 
 #include "Game/animation.h"
-#include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/bubble.h"
@@ -468,13 +467,13 @@ void UpdateSmoke()
 	}
 }
 
-byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
+byte TriggerGunSmoke_SubFunction(int weaponType)
 {
 	switch (weaponType)
 	{
-	case LaraWeaponType::HK:
-	case LaraWeaponType::RocketLauncher:
-	case LaraWeaponType::GrenadeLauncher:
+	case WEAPON_HK:
+	case WEAPON_ROCKET_LAUNCHER:
+	case WEAPON_GRENADE_LAUNCHER:
 		return 24; //(12) Rocket and Grenade value for TriggerGunSmoke in TR3 have the value 12 ! (the HK is not included there)
 
 	// other weapon
@@ -483,7 +482,7 @@ byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
 	}
 }
 
-void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count)
+void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count)
 {
 	/*
 	SMOKE_SPARKS* spark;
@@ -497,7 +496,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 	spark->life = (GetRandomControl() & 3) + 40;
 	spark->sLife = spark->life;
 
-	if (weaponType == LaraWeaponType::Pistol || weaponType == LaraWeaponType::Revolver || weaponType == LaraWeaponType::Uzi)
+	if (weaponType == WEAPON_PISTOLS || weaponType == WEAPON_REVOLVER || weaponType == WEAPON_UZI)
 	{
 		if (spark->dShade > 64)
 			spark->dShade = 64;
@@ -605,7 +604,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 		else
 			spark->rotAdd = (GetRandomControl() & 0x3F) + 64;
 	}
-	else if (g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WIND)
+	else if (g_Level.Rooms[LaraItem->roomNumber].flags & ENV_FLAG_WIND)
 	{
 		spark->flags = SP_WIND;
 	}
@@ -793,30 +792,30 @@ int GetFreeGunshell()
 	return gsNum;
 }
 
-void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
+void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType)
 {
-	Vector3Int pos;
+	PHD_VECTOR pos;
 
 	if (hand)
 	{
 		switch (weaponType)
 		{
-		case LaraWeaponType::Pistol:
+		case WEAPON_PISTOLS:
 			pos.x = 8;
 			pos.y = 48;
 			pos.z = 40;
 			break;
-		case LaraWeaponType::Uzi:
+		case WEAPON_UZI:
 			pos.x = 8;
 			pos.y = 35;
 			pos.z = 48;
 			break;
-		case LaraWeaponType::Shotgun:
+		case WEAPON_SHOTGUN:
 			pos.x = 16;
 			pos.y = 114;
 			pos.z = 32;
 			break;
-		case LaraWeaponType::HK:
+		case WEAPON_HK:
 			pos.x = 16;
 			pos.y = 114;
 			pos.z = 96;
@@ -829,7 +828,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	}
 	else
 	{
-		if (weaponType == LaraWeaponType::Pistol)
+		if (weaponType == WEAPON_PISTOLS)
 		{
 			pos.x = -12;
 			pos.y = 48;
@@ -837,7 +836,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 
 			GetLaraJointPosition(&pos, LM_LHAND);
 		}
-		else if (weaponType == LaraWeaponType::Uzi)
+		else if (weaponType == WEAPON_UZI)
 		{
 			pos.x = -16;
 			pos.y = 35;
@@ -849,52 +848,52 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 
 	GUNSHELL_STRUCT* gshell = &Gunshells[GetFreeGunshell()];
 
-	gshell->pos.Position.x = pos.x;
-	gshell->pos.Position.y = pos.y;
-	gshell->pos.Position.z = pos.z;
-	gshell->pos.Orientation.x = 0;
-	gshell->pos.Orientation.y = 0;
-	gshell->pos.Orientation.z = GetRandomControl();
-	gshell->roomNumber = LaraItem->RoomNumber;
+	gshell->pos.xPos = pos.x;
+	gshell->pos.yPos = pos.y;
+	gshell->pos.zPos = pos.z;
+	gshell->pos.xRot = 0;
+	gshell->pos.yRot = 0;
+	gshell->pos.zRot = GetRandomControl();
+	gshell->roomNumber = LaraItem->roomNumber;
 	gshell->speed = (GetRandomControl() & 0x1F) + 16;
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);
 	gshell->objectNumber = objNum;
 	gshell->counter = (GetRandomControl() & 0x1F) + 60;
 	if (hand)
 	{
-		if (weaponType == LaraWeaponType::Shotgun)
+		if (weaponType == WEAPON_SHOTGUN)
 		{
-			gshell->dirXrot = Lara.LeftArm.Rotation.y
-				+ Lara.ExtraTorsoRot.y
-				+ LaraItem->Pose.Orientation.y
+			gshell->dirXrot = Lara.leftArm.yRot
+				+ Lara.torsoYrot
+				+ LaraItem->pos.yRot
 				- (GetRandomControl() & 0xFFF)
 				+ 10240;
-			gshell->pos.Orientation.y += Lara.LeftArm.Rotation.y 
-				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Pose.Orientation.y;
+			gshell->pos.yRot += Lara.leftArm.yRot 
+				+ Lara.torsoYrot 
+				+ LaraItem->pos.yRot;
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
 		else
 		{
-			gshell->dirXrot = Lara.LeftArm.Rotation.y 
-				+ LaraItem->Pose.Orientation.y 
+			gshell->dirXrot = Lara.leftArm.yRot 
+				+ LaraItem->pos.yRot 
 				- (GetRandomControl() & 0xFFF) 
 				+ 18432;
 		}
 	}
 	else
 	{
-		gshell->dirXrot = Lara.LeftArm.Rotation.y 
-			+ LaraItem->Pose.Orientation.y 
+		gshell->dirXrot = Lara.leftArm.yRot 
+			+ LaraItem->pos.yRot 
 			+ (GetRandomControl() & 0xFFF) 
 			- 18432;
 	}
 
-	if (LaraItem->MeshBits)
+	if (LaraItem->meshBits)
 	{
-		if (weaponType == LaraWeaponType::Shotgun)
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, LaraWeaponType::Shotgun, 24);
+		if (weaponType == WEAPON_SHOTGUN)
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, WEAPON_SHOTGUN, 24);
 		else
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, 16);
 	}
@@ -908,9 +907,9 @@ void UpdateGunShells()
 
 		if (gs->counter)
 		{
-			int oldX = gs->pos.Position.x;
-			int oldY = gs->pos.Position.y;
-			int oldZ = gs->pos.Position.z;
+			int oldX = gs->pos.xPos;
+			int oldY = gs->pos.yPos;
+			int oldZ = gs->pos.zPos;
 
 			gs->counter--;
 
@@ -936,28 +935,28 @@ void UpdateGunShells()
 				gs->fallspeed += 6;
 			}
 
-			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * ANGLE(1);
-			gs->pos.Orientation.y += gs->speed * ANGLE(1);
-			gs->pos.Orientation.z += ANGLE(23);
+			gs->pos.xRot += (gs->speed >> 1 + 7) * ANGLE(1);
+			gs->pos.yRot += gs->speed * ANGLE(1);
+			gs->pos.zRot += ANGLE(23);
 
-			gs->pos.Position.x += gs->speed * phd_sin(gs->dirXrot);
-			gs->pos.Position.y += gs->fallspeed;
-			gs->pos.Position.z += gs->speed * phd_cos(gs->dirXrot);
+			gs->pos.xPos += gs->speed * phd_sin(gs->dirXrot);
+			gs->pos.yPos += gs->fallspeed;
+			gs->pos.zPos += gs->speed * phd_cos(gs->dirXrot);
 
-			FLOOR_INFO* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
+			FLOOR_INFO* floor = GetFloor(gs->pos.xPos, gs->pos.yPos, gs->pos.zPos, &gs->roomNumber);
 			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
 				&& !(g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
 
-				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z), gs->roomNumber);
-				//AddWaterSparks(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, 8);
-				SetupRipple(gs->pos.Position.x, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.Position.z, (GetRandomControl() & 3) + 8, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+				TEN::Effects::Drip::SpawnGunshellDrips(Vector3(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos), gs->roomNumber);
+				//AddWaterSparks(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, 8);
+				SetupRipple(gs->pos.xPos, g_Level.Rooms[gs->roomNumber].maxceiling, gs->pos.zPos, (GetRandomControl() & 3) + 8, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
 				gs->fallspeed >>= 5;
 				continue;
 			}
 
-			int ceiling = GetCeiling(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
-			if (gs->pos.Position.y < ceiling)
+			int ceiling = GetCeiling(floor, gs->pos.xPos, gs->pos.yPos, gs->pos.zPos);
+			if (gs->pos.yPos < ceiling)
 			{
 				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos, 0);
 				gs->speed -= 4;
@@ -968,12 +967,12 @@ void UpdateGunShells()
 					continue;
 				}
 
-				gs->pos.Position.y = ceiling;
+				gs->pos.yPos = ceiling;
 				gs->fallspeed = -gs->fallspeed;
 			}
 
-			int height = GetFloorHeight(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
-			if (gs->pos.Position.y >= height)
+			int height = GetFloorHeight(floor, gs->pos.xPos, gs->pos.yPos, gs->pos.zPos);
+			if (gs->pos.yPos >= height)
 			{
 				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos, 0);
 				gs->speed -= 8;
@@ -986,10 +985,10 @@ void UpdateGunShells()
 					else
 					{
 						gs->dirXrot += -ANGLE(180);
-						gs->pos.Position.x = oldX;
-						gs->pos.Position.z = oldZ;
+						gs->pos.xPos = oldX;
+						gs->pos.zPos = oldZ;
 					}
-					gs->pos.Position.y = oldY;
+					gs->pos.yPos = oldY;
 				}
 				else
 				{
@@ -1037,10 +1036,10 @@ void AddWaterSparks(int x, int y, int z, int num)
 
 void LaraBubbles(ITEM_INFO* item)
 {
-	Vector3Int pos;
+	PHD_VECTOR pos;
 	int num, i;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, 1);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->pos, 1);
 
 	pos.x = 0;
 
@@ -1065,7 +1064,7 @@ void LaraBubbles(ITEM_INFO* item)
 
 	for (i = 0; i < num; i++)
 	{
-		CreateBubble(&pos, item->RoomNumber, 8, 7, 0, 0, 0, 0);
+		CreateBubble(&pos, item->roomNumber, 8, 7, 0, 0, 0, 0);
 	}
 }
 
@@ -1162,17 +1161,17 @@ void TriggerLaraDrips(ITEM_INFO* item)
 	{
 		for (int i = 0; i < NUM_LARA_MESHES; i++)
 		{
-			auto pos = Vector3Int();
+			auto pos = PHD_VECTOR();
 
 			GetLaraJointPosition(&pos, (LARA_MESHES)i);
-			auto room = GetRoom(item->Location, pos.x, pos.y, pos.z).roomNumber;
+			auto room = GetRoom(item->location, pos.x, pos.y, pos.z).roomNumber;
 
 			if (g_Level.Rooms[room].flags & ENV_FLAG_WATER)
-				Lara.Wet[i] = UCHAR_MAX;
+				Lara.wet[i] = UCHAR_MAX;
 
-			if (Lara.Wet[i] 
+			if (Lara.wet[i] 
 				&& !LaraNodeUnderwater[i] 
-				&& (GetRandomControl() & 0x1FF) < Lara.Wet[i])
+				&& (GetRandomControl() & 0x1FF) < Lara.wet[i])
 			{
 
 				pos.x = (GetRandomControl() & 0x1F) - 16;
@@ -1191,12 +1190,12 @@ void TriggerLaraDrips(ITEM_INFO* item)
 				dptr->yVel = (GetRandomControl() & 0x1F) + 32;
 				dptr->gravity = (GetRandomControl() & 0x1F) + 32;
 				dptr->life = (GetRandomControl() & 0x1F) + 8;
-				dptr->roomNumber = LaraItem->RoomNumber;
+				dptr->roomNumber = LaraItem->roomNumber;
 
-				if (Lara.Wet[i] >= 4)
-					Lara.Wet[i] -= 4;
+				if (Lara.wet[i] >= 4)
+					Lara.wet[i] -= 4;
 				else
-					Lara.Wet[i] = 0;
+					Lara.wet[i] = 0;
 
 			}
 		}
@@ -1206,23 +1205,23 @@ void TriggerLaraDrips(ITEM_INFO* item)
 int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
 	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(item->Pose.Orientation.y),
-		TO_RAD(item->Pose.Orientation.x),
-		TO_RAD(item->Pose.Orientation.z)
+		TO_RAD(item->pos.yRot),
+		TO_RAD(item->pos.xRot),
+		TO_RAD(item->pos.zRot)
 	);
 
 	int bit = 1;
 
-	if ((bit & meshBits) && (bit & item->MeshBits))
+	if ((bit & meshBits) && (bit & item->meshBits))
 	{
 		if ((GetRandomControl() & 3) == 0)
 		{
-			short fxNumber = CreateNewEffect(item->RoomNumber);
+			short fxNumber = CreateNewEffect(item->roomNumber);
 			if (fxNumber != NO_ITEM)
 			{
 				FX_INFO* fx = &EffectList[fxNumber];
@@ -1231,13 +1230,13 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				g_Renderer.getBoneMatrix(itemNumber, 0, &boneMatrix);
 				boneMatrix = world * boneMatrix;
 
-				fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-				fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-				fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
+				fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
+				fx->pos.yPos = boneMatrix.Translation().y + item->pos.yPos;
+				fx->pos.zPos = boneMatrix.Translation().z + item->pos.zPos;
 
-				fx->roomNumber = item->RoomNumber;
-				fx->pos.Orientation.x = 0;
-				fx->pos.Orientation.y = GetRandomControl() * 2;
+				fx->roomNumber = item->roomNumber;
+				fx->pos.xRot = 0;
+				fx->pos.yRot = GetRandomControl() * 2;
 
 				if (!(flags & 0x10))
 				{
@@ -1262,7 +1261,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				fx->flag2 = flags;
 			}
 
-			item->MeshBits -= bit;
+			item->meshBits -= bit;
 		}
 	}
 
@@ -1273,22 +1272,22 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 		boneMatrix = world * boneMatrix;
 
 		bit <<= 1;
-		if ((bit & meshBits) && (bit & item->MeshBits))
+		if ((bit & meshBits) && (bit & item->meshBits))
 		{
 			if ((GetRandomControl() & 3) == 0 && (flags & 0x100))
 			{
-				short fxNumber = CreateNewEffect(item->RoomNumber);
+				short fxNumber = CreateNewEffect(item->roomNumber);
 				if (fxNumber != NO_ITEM)
 				{
 					FX_INFO* fx = &EffectList[fxNumber];
 
-					fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-					fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-					fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
+					fx->pos.xPos = boneMatrix.Translation().x + item->pos.xPos;
+					fx->pos.yPos = boneMatrix.Translation().y + item->pos.yPos;
+					fx->pos.zPos = boneMatrix.Translation().z + item->pos.zPos;
 
-					fx->roomNumber = item->RoomNumber;
-					fx->pos.Orientation.x = 0;
-					fx->pos.Orientation.y = GetRandomControl() * 2;
+					fx->roomNumber = item->roomNumber;
+					fx->pos.xRot = 0;
+					fx->pos.yRot = GetRandomControl() * 2;
 
 					if (!(flags & 0x10))
 					{
@@ -1314,12 +1313,12 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 					fx->frameNumber = obj->meshIndex + i;
 				}
 
-				item->MeshBits -= bit;
+				item->meshBits -= bit;
 			}
 		}
 	}
 
-	return item->MeshBits == 0;
+	return item->meshBits == 0;
 }
 
 int GetFreeShockwave()
@@ -1342,9 +1341,9 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 	{
 		sptr = &ShockWaves[s];
 
-		sptr->x = pos->Position.x;
-		sptr->y = pos->Position.y;
-		sptr->z = pos->Position.z;
+		sptr->x = pos->xPos;
+		sptr->y = pos->yPos;
+		sptr->z = pos->zPos;
 		sptr->innerRad = innerRad;
 		sptr->outerRad = outerRad;
 		sptr->xRot = angle;
@@ -1361,8 +1360,8 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 
 void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	int dx = LaraItem->pos.xPos - x;
+	int dz = LaraItem->pos.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -1430,18 +1429,18 @@ void UpdateShockwaves()
 				sw->outerRad += sw->speed;
 				sw->speed -= (sw->speed >> 4);
 
-				if (LaraItem->HitPoints > 0)
+				if (LaraItem->hitPoints > 0)
 				{
 					if (sw->flags & 3)
 					{
 						ANIM_FRAME* frame = GetBestFrame(LaraItem);
 
-						int dx = LaraItem->Pose.Position.x - sw->x;
-						int dz = LaraItem->Pose.Position.z - sw->z;
+						int dx = LaraItem->pos.xPos - sw->x;
+						int dz = LaraItem->pos.zPos - sw->z;
 						int distance = sqrt(SQUARE(dx) + SQUARE(dz));
 						
-						if (sw->y <= LaraItem->Pose.Position.y + frame->boundingBox.Y1
-							|| sw->y >= LaraItem->Pose.Position.y + frame->boundingBox.Y2 + 256
+						if (sw->y <= LaraItem->pos.yPos + frame->boundingBox.Y1
+							|| sw->y >= LaraItem->pos.yPos + frame->boundingBox.Y2 + 256
 							|| distance <= sw->innerRad
 							|| distance >= sw->outerRad)
 						{
@@ -1450,13 +1449,13 @@ void UpdateShockwaves()
 						else
 						{
 							short angle = phd_atan(dz, dx);
-							TriggerShockwaveHitEffect(LaraItem->Pose.Position.x,
+							TriggerShockwaveHitEffect(LaraItem->pos.xPos,
 								sw->y,
-								LaraItem->Pose.Position.z,
+								LaraItem->pos.zPos,
 								sw->r, sw->g, sw->b,
 								angle,
 								sw->speed);
-							LaraItem->HitPoints -= sw->speed >> (((sw->flags >> 1) & 1) + 2);
+							LaraItem->hitPoints -= sw->speed >> (((sw->flags >> 1) & 1) + 2);
 						}
 					}
 				}
@@ -1465,15 +1464,14 @@ void UpdateShockwaves()
 	}
 }
 
-void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
+void TriggerExplosionBubble(int x, int y, int z, short roomNum)
 {
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
+	int dx = LaraItem->pos.xPos - x;
+	int dz = LaraItem->pos.zPos - z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
-
+		SPARKS* spark = &Sparks[GetFreeSpark()];
 		spark->sR = 128;
 		spark->dR = 128;
 		spark->dG = 128;
@@ -1505,18 +1503,18 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 		for (int i = 0; i < 8; i++)
 		{
-			Vector3Int pos;
+			PHD_VECTOR pos;
 			pos.x = (GetRandomControl() & 0x1FF) + x - 256;
 			pos.y = (GetRandomControl() & 0x7F) + y - 64;
 			pos.z = (GetRandomControl() & 0x1FF) + z - 256;
-			CreateBubble(&pos, roomNumber, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
+			CreateBubble(&pos, roomNum, 6, 15, BUBBLE_FLAG_CLUMP | BUBBLE_FLAG_BIG_SIZE | BUBBLE_FLAG_HIGH_AMPLITUDE, 0, 0, 0);
 		}
 	}
 }
 
 /*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	SPARKS* spark = &Sparks[GetFreeSpark()];
 	
 	spark->on = 1;
 	if (unk)
@@ -1541,19 +1539,16 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->colFadeSpeed = 8;
 	spark->fadeToBlack = 64;
 	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
-
 	if (unk)
 		spark->transType = TransTypeEnum::COLADD;
 	else
 		spark->transType = 3;
-
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
 	spark->z = (GetRandomControl() & 0x1F) + z - 16;
 	spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
 	spark->yVel = (GetRandomControl() & 0xFF) - 128;
 	spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-
 	if (unk)
 	{
 		spark->friction = 20;
@@ -1561,17 +1556,16 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 		spark->y += 32;
 	}
 	else
+	{
 		spark->friction = 6;
-	
+	}
 	spark->flags = 538;
 	spark->rotAng = GetRandomControl() & 0xFFF;
-
 	if (GetRandomControl() & 1)
 		spark->rotAdd = -((GetRandomControl() & 0xF) + 16);
 	else
 		spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 	spark->scalar = 3;
-
 	if (unk)
 	{
 		spark->maxYvel = 0;
@@ -1582,7 +1576,6 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 		spark->gravity = -3 - (GetRandomControl() & 3);
 		spark->maxYvel = -4 - (GetRandomControl() & 3);
 	}
-
 	int size = (GetRandomControl() & 0x1F) + 128;
 	spark->dSize = size;
 	spark->sSize = size >> 2;
@@ -1591,11 +1584,11 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 */
 /*void DrawLensFlares(ITEM_INFO* item)
 {
-	GameVector pos;
+	GAME_VECTOR pos;
 
-	pos.x = item->pos.Position.x;
-	pos.y = item->pos.Position.y;
-	pos.z = item->pos.Position.z;
+	pos.x = item->pos.xPos;
+	pos.y = item->pos.yPos;
+	pos.z = item->pos.zPos;
 	pos.roomNumber = item->roomNumber;
 
 	SetUpLensFlare(0, 0, 0, &pos);
@@ -1603,8 +1596,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
-
+	SPARKS* spark = &Sparks[GetFreeSpark()];
 	spark->on = 1;
 	spark->sR = (GetRandomControl() & 0x3F) - 0x40;
 	spark->sG = (GetRandomControl() & 0x3F) - 0x40;
@@ -1630,20 +1622,27 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 	spark->zVel = ((GetRandomControl() & 0xFF) - 128) << 2;
 
 	if (crane != 0)
+	{
 		spark->friction = 5;
+	}
 	else
+	{
 		spark->friction = 4;
+	}
 
 	spark->flags = SP_NONE;
 	spark->gravity = (GetRandomControl() & 0xF) + ((crane << 4) + 16);
 	spark->maxYvel = 0;
 }
 
-void TriggerSmallSplash(int x, int y, int z, int number) 
+void TriggerSmallSplash(int x, int y, int z, int num) 
 {
-	for (int i = 0; i < number; i++)
+	int i;
+	int angle;
+
+	for (i = 0; i < num; i++)
 	{
-		auto* sptr = &Sparks[GetFreeSpark()];
+		SPARKS* sptr = &Sparks[GetFreeSpark()];
 
 		sptr->on = 1;
 
@@ -1663,7 +1662,7 @@ void TriggerSmallSplash(int x, int y, int z, int number)
 
 		sptr->transType = TransTypeEnum::COLADD;
 
-		int angle = GetRandomControl() << 3;
+		angle = GetRandomControl() << 3;
 
 		sptr->xVel = -phd_sin(angle) * 512;
 		sptr->yVel = -640 - (GetRandomControl() & 0xFF);

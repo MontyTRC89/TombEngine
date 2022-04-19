@@ -8,26 +8,26 @@
 
 void SpringBoardControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-	if (item->Animation.ActiveState == 0 && LaraItem->Pose.Position.y == item->Pose.Position.y &&
-		LaraItem->Pose.Position.x / SECTOR(1) == item->Pose.Position.x / SECTOR(1) &&
-		LaraItem->Pose.Position.z / SECTOR(1) == item->Pose.Position.z / SECTOR(1))
+	if (item->currentAnimState == 0 && LaraItem->pos.yPos == item->pos.yPos &&
+		LaraItem->pos.xPos / SECTOR(1) == item->pos.xPos / SECTOR(1) &&
+		LaraItem->pos.zPos / SECTOR(1) == item->pos.zPos / SECTOR(1))
 	{
-		if (LaraItem->HitPoints <= 0)
+		if (LaraItem->hitPoints <= 0)
 			return;
 
-		if (LaraItem->Animation.ActiveState == LS_WALK_BACK || LaraItem->Animation.ActiveState == LS_RUN_BACK)
-			LaraItem->Animation.Velocity = -LaraItem->Animation.Velocity;
+		if (LaraItem->currentAnimState == LS_WALK_BACK || LaraItem->currentAnimState == LS_RUN_BACK)
+			LaraItem->speed = -LaraItem->speed;
 
-		LaraItem->Animation.AnimNumber = LA_FALL_START;
-		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-		LaraItem->Animation.ActiveState = LS_JUMP_FORWARD;
-		LaraItem->Animation.TargetState = LS_JUMP_FORWARD;
-		LaraItem->Animation.Airborne = true;
-		LaraItem->Animation.VerticalVelocity = -240;
+		LaraItem->fallspeed = -240;
+		LaraItem->gravityStatus = true;
+		LaraItem->animNumber = LA_FALL_START;
+		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+		LaraItem->currentAnimState = LS_JUMP_FORWARD;
+		LaraItem->goalAnimState = LS_JUMP_FORWARD;
 
-		item->Animation.TargetState = 1;
+		item->goalAnimState = 1;
 	}
 
 	AnimateItem(item);

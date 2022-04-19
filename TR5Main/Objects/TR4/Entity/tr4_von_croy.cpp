@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "Game/items.h"
-#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -11,178 +10,175 @@
 #include "Sound/sound.h"
 #include "Game/animation.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/misc.h"
+
+#define STATE_VON_CROY_STOP						1
+#define STATE_VON_CROY_WALK						2
+#define STATE_VON_CROY_RUN						3
+#define STATE_VON_CROY_START_MONKEY				4
+#define STATE_VON_CROY_MONKEY					5
+#define STATE_VON_CROY_TOGGLE_KNIFE				6
+#define STATE_VON_CROY_LOOK_BEFORE_JUMP			7
+#define STATE_VON_CROY_CALL_LARA1				13
+#define STATE_VON_CROY_CALL_LARA2				14
+#define STATE_VON_CROY_JUMP						15
+#define STATE_VON_CROY_JUMP_2BLOCKS				16
+#define STATE_VON_CROY_ENABLE_TRAP				20
+#define STATE_VON_CROY_KNIFE_ATTACK_HIGH		21
+#define STATE_VON_CROY_LOOK_BACK_LEFT			22
+#define STATE_VON_CROY_STEP_DOWN_HIGH			26
+#define STATE_VON_CROY_GRAB_LADDER				27
+#define STATE_VON_CROY_CLIMB_LADDER_RIGHT		28
+#define STATE_VON_CROY_LADDER_CLIMB_UP			30
+#define STATE_VON_CROY_KNIFE_ATTACK_LOW			31
+#define STATE_VON_CROY_JUMP_BACK				34
+#define STATE_VON_CROY_LOOK_BACK_RIGHT			35
+
+#define ANIMATION_VON_CROY_STEP_DOWN_HIGH		36
+#define ANIMATION_VON_CROY_CLIMB_UP_AFTER_JUMP	52
+
+#define SWAPMESHFLAGS_VON_CROY					0x40080
+
+#define VON_CROY_FLAG_JUMP						6
 
 bool VonCroyPassedWaypoints[128];
 BITE_INFO VonCroyBite = { 0, 35, 130, 18 };
 
-#define SWAPMESHFLAGS_VON_CROY	0x40080
-#define VON_CROY_FLAG_JUMP		6
-
-enum VonCroyState
-{
-	VON_CROY_STATE_IDLE = 1,
-	VON_CROY_STATE_WALK = 2,
-	VON_CROY_STATE_RUN = 3,
-	VON_CROY_STATE_START_MONKEY = 4,
-	VON_CROY_STATE_MONKEY = 5,
-	VON_CROY_STATE_TOGGLE_KNIFE = 6,
-	VON_CROY_STATE_LOOK_BEFORE_JUMP = 7,
-
-	VON_CROY_STATE_CALL_LARA_1 = 13,
-	VON_CROY_STATE_CALL_LARA_2 = 14,
-	VON_CROY_STATE_JUMP = 15,
-	VON_CROY_STATE_JUMP_2_BLOCKS = 16,
-
-	VON_CROY_STATE_ENABLE_TRAP = 20,
-	VON_CROY_STATE_KNIFE_ATTACK_HIGH = 21,
-	VON_CROY_STATE_LOOK_BACK_LEFT = 22,
-
-	VON_CROY_STATE_STEP_DOWN_HIGH = 26,
-	VON_CROY_STATE_GRAB_LADDER = 27,
-	VON_CROY_STATE_CLIMB_LADDER_RIGHT = 28,
-
-	VON_CROY_STATE_LADDER_CLIMB_UP = 30,
-	VON_CROY_STATE_KNIFE_ATTACK_LOW = 31,
-
-	VON_CROY_STATE_JUMP_BACK = 34,
-	VON_CROY_STATE_LOOK_BACK_RIGHT = 35
-};
-
-// TODO
-enum VonCroyAnim
-{
-	VON_CROY_ANIM_STEP_DOWN_HIGH = 36,
-
-	VON_CROY_ANIM_CLIMB_UP_AFTER_JUMP = 52
-};
-
 void InitialiseVonCroy(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 	
 	ClearItem(itemNumber);
 	
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
-	item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
-	item->SwapMeshFlags = SWAPMESHFLAGS_VON_CROY;
+	item->animNumber = Objects[item->objectNumber].animIndex + 11;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->goalAnimState = STATE_VON_CROY_TOGGLE_KNIFE;
+	item->currentAnimState = STATE_VON_CROY_TOGGLE_KNIFE;
+	item->swapMeshFlags = SWAPMESHFLAGS_VON_CROY;
 
 	memset(VonCroyPassedWaypoints, 0, 128);
 }
 
 void VonCroyControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	if (!CreatureActive(itemNumber))
 		return;
 
-	auto* creature = GetCreatureInfo(item);
-	auto* obj = &Objects[item->ObjectNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	OBJECT_INFO* obj = &Objects[item->objectNumber];
 
 	short angle = 0;
-	short tilt = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
 	short joint3 = 0;
+	short joint2 = 0;
+	short joint1 = 0;
+	short joint0 = 0;
+	short tilt = 0;
 
-	// Check whether Von Croy can jump 1 or 2 blocks.
+	// check if Von Croy can jump 1 or 2 blocks
 
-	int x = item->Pose.Position.x;
-	int z = item->Pose.Position.z;
+	int x = item->pos.xPos;
+	int z = item->pos.zPos;
 
-	int dx = 808 * phd_sin(item->Pose.Orientation.y);
-	int dz = 808 * phd_cos(item->Pose.Orientation.y);
-
-	x += dx;
-	z += dz;
-	int height1 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
-
-	x += dx;
-	z += dz;
-	int height2 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+	int dx = 808 * phd_sin(item->pos.yRot);
+	int dz = 808 * phd_cos(item->pos.yRot);
 
 	x += dx;
 	z += dz;
-	int height3 = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
+
+	short roomNumber = item->roomNumber;
+	FLOOR_INFO* floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	int height1 = GetFloorHeight(floor, x, item->pos.yPos, z);
 
 	x += dx;
 	z += dz;
-	auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
-	int height4 = probe.Position.Floor;
 
-	bool canJump1block = true;
-	if (item->BoxNumber == LaraItem->BoxNumber ||
-		item->Pose.Position.y >= height1 - CLICK(1.5f) ||
-		item->Pose.Position.y >= height2 + CLICK(1) ||
-		item->Pose.Position.y <= height2 - CLICK(1))
-	{
+	roomNumber = item->roomNumber;
+	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	int height2 = GetFloorHeight(floor, x, item->pos.yPos, z);
+
+	x += dx;
+	z += dz;
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	int height3 = GetFloorHeight(floor, x, item->pos.yPos, z);
+
+	x += dx ;
+	z += dz ;
+
+	roomNumber = item->roomNumber;
+	floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+	int height4 = GetFloorHeight(floor, x, item->pos.yPos, z);
+
+	bool canJump1block;
+	if (item->boxNumber == LaraItem->boxNumber
+		|| item->pos.yPos >= height1 - 384
+		|| item->pos.yPos >= height2 + 256
+		|| item->pos.yPos <= height2 - 256)
 		canJump1block = false;
-	}
+	else
+		canJump1block = true;
 
-	bool canJump2blocks = true;
-	if (item->BoxNumber == LaraItem->BoxNumber ||
-		item->Pose.Position.y >= height1 - CLICK(1.5f) ||
-		item->Pose.Position.y >= height2 - CLICK(1.5f) ||
-		item->Pose.Position.y >= height3 + CLICK(1) ||
-		item->Pose.Position.y <= height3 - CLICK(1))
-	{
+	bool canJump2blocks;
+	if (item->boxNumber == LaraItem->boxNumber
+		|| item->pos.yPos >= height1 - 384
+		|| item->pos.yPos >= height2 - 384
+		|| item->pos.yPos >= height3 + 256
+		|| item->pos.yPos <= height3 - 256)
 		canJump2blocks = false;
-	}
+	else
+		canJump2blocks = true;
 
-	bool canJump3blocks = true;
-	if (item->BoxNumber == LaraItem->BoxNumber ||
-		item->Pose.Position.y >= height1 - CLICK(1.5f) ||
-		item->Pose.Position.y >= height2 - CLICK(1.5f) ||
-		item->Pose.Position.y >= height3 - CLICK(1.5f) ||
-		item->Pose.Position.y >= height4 + CLICK(1) ||
-		item->Pose.Position.y <= height4 - CLICK(1))
-	{
+	bool canJump3blocks;
+	if (item->boxNumber == LaraItem->boxNumber
+		|| item->pos.yPos >= height1 - 384
+		|| item->pos.yPos >= height2 - 384
+		|| item->pos.yPos >= height3 - 384
+		|| item->pos.yPos >= height4 + 256
+		|| item->pos.yPos <= height4 - 256)
 		canJump3blocks = false;
-	}
+	else
+		canJump3blocks = true;
 
 	// Von Croy must follow Lara and navigate with ID_AI_FOLLOW objects
-	item->AIBits = FOLLOW;
+	item->aiBits = FOLLOW;
 	GetAITarget(creature);
 
+	AI_INFO info;
+	AI_INFO laraInfo;
 
 	// Try to find a possible enemy or target
 	ITEM_INFO* foundTarget = NULL;
 
-	if (Lara.Location <= creature->LocationAI)
+	if (Lara.location <= item->locationAI)
 	{
-		int minDistance = INT_MAX;
+		int minDistance = 0x7FFFFFFF;
 		int distance;
-		auto* targetCreature = ActiveCreatures[0];
+		CREATURE_INFO* baddie = ActiveCreatures[0];
 
 		for (int i = 0; i < ActiveCreatures.size(); i++)
 		{
-			targetCreature = ActiveCreatures[i];
+			baddie = ActiveCreatures[i];
 
-			if (targetCreature->ItemNumber == NO_ITEM ||
-				targetCreature->ItemNumber == itemNumber ||
-				g_Level.Items[targetCreature->ItemNumber].ObjectNumber == ID_VON_CROY ||
-				g_Level.Items[targetCreature->ItemNumber].ObjectNumber == ID_GUIDE)
-			{
+			if (baddie->itemNum == NO_ITEM
+				|| baddie->itemNum == itemNumber
+				|| g_Level.Items[baddie->itemNum].objectNumber == ID_VON_CROY
+				|| g_Level.Items[baddie->itemNum].objectNumber == ID_GUIDE)
 				continue;
-			}
 
-			auto* currentItem = &g_Level.Items[targetCreature->ItemNumber];
-
-			if (abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= CLICK(2))
+			ITEM_INFO* currentItem = &g_Level.Items[baddie->itemNum];
+			if (abs(currentItem->pos.yPos - item->pos.yPos) <= 512)
 			{
-				dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-				dz = currentItem->Pose.Position.z - item->Pose.Position.z;
+				dx = currentItem->pos.xPos - item->pos.xPos;
+				dz = currentItem->pos.zPos - item->pos.zPos;
 
-				if (abs(dx) < SECTOR(5) && abs(dz) < SECTOR(5))
+				if (abs(dx) < 5120 && abs(dz) < 5120)
 				{
-					distance = pow(dx, 2) + pow(dz, 2);
+					distance = SQUARE(dx) + SQUARE(dz);
 					if (distance < minDistance)
 					{
-						creature->ReachedGoal = false;
+						creature->reachedGoal = false;
 						foundTarget = currentItem;
 						minDistance = distance;
 					}
@@ -191,81 +187,84 @@ void VonCroyControl(short itemNumber)
 		}
 	}
 
-	// If a target is found, it becomes the enemy.
-	ITEM_INFO* enemy = creature->Enemy;
+	// If a target is found, that it becomes the enemy
+	ITEM_INFO* enemy = creature->enemy;
 	if (foundTarget != 0)
-		creature->Enemy = foundTarget;
-
-	AI_INFO AI;
-
-	// HACK: Even the most advanced zone in TR must have a step height of 1024, so we need to recreate zones when step difference is higher.
-	if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_STEP_DOWN_HIGH ||
-		item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_UP_AFTER_JUMP)
 	{
-		short oldRoom = item->RoomNumber;
-		item->Pose.Position.x += dx;
-		item->Pose.Position.z += dz;
+		creature->enemy = foundTarget;
+	}
 
-		GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
+	// HACK: even the most advanced zone in TR must have a step height of 1024, so we need to recreate zones when step difference is higher
+	if (item->animNumber == Objects[item->objectNumber].animIndex + ANIMATION_VON_CROY_STEP_DOWN_HIGH
+		|| item->animNumber == Objects[item->objectNumber].animIndex + ANIMATION_VON_CROY_CLIMB_UP_AFTER_JUMP)
+	{
+		short oldRoom = item->roomNumber;
+		item->pos.xPos += dx;
+		item->pos.zPos += dz;
 
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 1)
+		GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &item->roomNumber);
+
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 1)
+		{
 			CreateZone(item);
-		
-		CreatureAIInfo(item, &AI);
+		}
+		CreatureAIInfo(item, &info);
 
-		item->RoomNumber = oldRoom;
-		item->Pose.Position.x -= dx;
-		item->Pose.Position.z -= dz;
+		item->roomNumber = oldRoom;
+		item->pos.xPos -= dx;
+		item->pos.zPos -= dz;
 	}
 	else
-		CreatureAIInfo(item, &AI);
+	{
+		CreatureAIInfo(item, &info);
+	}
 
-	GetCreatureMood(item, &AI, VIOLENT);
-	CreatureMood(item, &AI, VIOLENT);
+	GetCreatureMood(item, &info, VIOLENT);
+	CreatureMood(item, &info, VIOLENT);
 
-	AI_INFO laraAI;
-	if (creature->Enemy == LaraItem)
-		memcpy(&laraAI, &AI, sizeof(AI_INFO));
+	if (creature->enemy == LaraItem)
+	{
+		memcpy(&laraInfo, &info, sizeof(AI_INFO));
+	}
 	else
 	{
-		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+		dx = LaraItem->pos.xPos - item->pos.xPos;
+		dz = LaraItem->pos.zPos - item->pos.zPos;
+		laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
 
-		laraAI.ahead = true;
-		if (laraAI.angle <= -ANGLE(90) || laraAI.angle >= ANGLE(90.0f))
-			laraAI.ahead = false;
+		laraInfo.ahead = true;
+		if (laraInfo.angle <= -ANGLE(90) || laraInfo.angle >= ANGLE(90))
+			laraInfo.ahead = false;
 
-		laraAI.enemyFacing = laraAI.angle - LaraItem->Pose.Position.x + -ANGLE(180.0f);
-
+		laraInfo.enemyFacing = laraInfo.angle - LaraItem->pos.xPos + -ANGLE(180);
 		int distance = 0;
-		if (dz > SECTOR(31.25f) || dz < -SECTOR(31.25f) || dx > SECTOR(31.25f) || dx < -SECTOR(31.25f))
-			laraAI.distance = INT_MAX;
+		if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
+			laraInfo.distance = 0x7FFFFFFF;
 		else
-			laraAI.distance = pow(dx, 2) + pow(dz, 2);
+			laraInfo.distance = dx * dx + dz * dz;
 
 		dx = abs(dx);
 		dz = abs(dz);
 
-		int dy = item->Pose.Position.y - LaraItem->Pose.Position.y;
+		int dy = item->pos.yPos - LaraItem->pos.yPos;
 		short rot2 = 0;
 
 		if (dx <= dz)
-			laraAI.xAngle = phd_atan(dz + (dx / 2), dy);
+			laraInfo.xAngle = phd_atan(dz + (dx / 2), dy);
 		else
-			laraAI.xAngle = phd_atan(dx + (dz / 2), dy);
+			laraInfo.xAngle = phd_atan(dx + (dz / 2), dy);
 	}
 
-	if (abs(laraAI.angle) < ANGLE(33.75f) && laraAI.distance < pow(1024, 2))
-		laraAI.bite = true;
+	if (abs(laraInfo.angle) < 6144 && laraInfo.distance < SQUARE(1024))
+		laraInfo.bite = true;
 	else
-		laraAI.bite = false;
+		laraInfo.bite = false;
 
-	angle = CreatureTurn(item, creature->MaxTurn);
+	angle = CreatureTurn(item, creature->maximumTurn);
 
 	if (foundTarget != NULL)
 	{
-		creature->Enemy = enemy;
+		creature->enemy = enemy;
 		enemy = foundTarget;
 	}
 
@@ -288,362 +287,403 @@ void VonCroyControl(short itemNumber)
 	}*/
 
 	short rot = 0;
-	bool flags;
+	int dy, height, ceiling, flags;
 
-	TENLog("State:" + std::to_string(item->Animation.ActiveState), LogLevel::Info);
+	TENLog("State:" + std::to_string(item->currentAnimState), LogLevel::Info);
 	
-	switch (item->Animation.ActiveState)
+	switch (item->currentAnimState)
 	{
-	case VON_CROY_STATE_IDLE:
-		creature->LOT.IsMonkeying = false;
-		creature->LOT.IsJumping = false;
-		creature->MaxTurn = 0;
-		creature->Flags = 0;
-		joint3 = AI.angle / 2;
-
-		if (AI.ahead && item->AIBits & FOLLOW)
+	case STATE_VON_CROY_STOP:
+		creature->LOT.isMonkeying = false;
+		creature->LOT.isJumping = false;
+		creature->flags = 0;
+		creature->maximumTurn = 0;
+		joint3 = info.angle / 2;
+		if (info.ahead && item->aiBits & FOLLOW)
 		{
-			joint1 = AI.angle / 2;
-			joint2 = AI.xAngle;
+			joint1 = info.angle / 2;
+			joint2 = info.xAngle;
 		}
 
-		if (item->AIBits & GUARD)
+		if (item->aiBits & GUARD)
 		{
 			joint3 = AIGuard(creature);
-			item->Animation.TargetState = 0;
+			item->goalAnimState = 0;
 			break;
 		}
 
-		if (item->AIBits & MODIFY)
+		if (item->aiBits & MODIFY)
 		{
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
-			if (item->Floor > (item->Pose.Position.y + CLICK(3)))
-				item->AIBits &= ~MODIFY;
-
+			item->goalAnimState = STATE_VON_CROY_STOP;
+			if (item->floor > item->pos.yPos + (STEP_SIZE * 3))
+				item->aiBits &= ~MODIFY;
 			break;
 		}
 
-		if (canJump3blocks || item->ItemFlags[2] == VON_CROY_FLAG_JUMP)
+		if (canJump3blocks || item->itemFlags[2] == VON_CROY_FLAG_JUMP)
 		{
-			if (item->ItemFlags[2] != VON_CROY_FLAG_JUMP && !canJump2blocks)
-				item->Animation.TargetState = VON_CROY_STATE_JUMP_BACK;
+			if (item->itemFlags[2] != VON_CROY_FLAG_JUMP && !canJump2blocks)
+			{
+				item->goalAnimState = STATE_VON_CROY_JUMP_BACK;
+			}
 			else
-				item->Animation.TargetState = VON_CROY_STATE_RUN;
-			
+			{
+				item->goalAnimState = STATE_VON_CROY_RUN;
+			}
 			break;
 		}
 		else if (canJump1block || canJump2blocks)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = VON_CROY_STATE_JUMP;
-			creature->MaxTurn = 0;
-			creature->LOT.IsJumping = true;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 22;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = STATE_VON_CROY_JUMP;
+			creature->LOT.isJumping = true;
 
 			if (!canJump2blocks && !canJump3blocks)
-				item->Animation.TargetState = VON_CROY_STATE_JUMP;
+				item->goalAnimState = STATE_VON_CROY_JUMP;
 			else
-				item->Animation.TargetState = VON_CROY_STATE_JUMP_2_BLOCKS;
-			
+			{
+				item->goalAnimState = STATE_VON_CROY_JUMP_2BLOCKS;
+			}
 			break;
 		}
 
-		if (creature->MonkeySwingAhead)
+		if (creature->monkeyAhead)
 		{
-			probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
-			if (probe.Position.Ceiling == probe.Position.Floor - 1536)
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
 			{
-				if (item->SwapMeshFlags == SWAPMESHFLAGS_VON_CROY)
-					item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
+				if (item->swapMeshFlags == SWAPMESHFLAGS_VON_CROY)
+					item->goalAnimState = STATE_VON_CROY_TOGGLE_KNIFE;
 				else
-					item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
-
+					item->goalAnimState = STATE_VON_CROY_START_MONKEY;
 				break;
 			}
 		}
 		else
 		{
-			if (creature->Enemy && creature->Enemy->HitPoints > 0 && AI.distance < pow(1024, 2) && creature->Enemy != LaraItem &&
-				creature->Enemy->ObjectNumber != ID_AI_FOLLOW)
+			if (creature->enemy && creature->enemy->hitPoints > 0 && info.distance < SQUARE(1024) && creature->enemy != LaraItem 
+				&& creature->enemy->objectNumber != ID_AI_FOLLOW)
 			{
-				if (AI.bite)
+				if (info.bite)
 				{
-					if (enemy->HitPoints > 0 && AI.ahead)
+					if (enemy->hitPoints > 0 && info.ahead)
 					{
-						if (abs(enemy->Pose.Position.y - item->Pose.Position.y + CLICK(2)) < CLICK(2))
-							item->Animation.TargetState = VON_CROY_STATE_KNIFE_ATTACK_HIGH;
+						if (abs(enemy->pos.yPos - item->pos.yPos + 512) < 512)
+							item->goalAnimState = STATE_VON_CROY_KNIFE_ATTACK_HIGH;
 						else
-							item->Animation.TargetState = VON_CROY_STATE_KNIFE_ATTACK_LOW;
-
+							item->goalAnimState = STATE_VON_CROY_KNIFE_ATTACK_LOW;
 						break;
 					}
 				}
 			}
 		}
 
-		item->Animation.TargetState = VON_CROY_STATE_WALK;
+		item->goalAnimState = STATE_VON_CROY_WALK;
 		break;
 
-	case VON_CROY_STATE_WALK:
-		creature->MaxTurn = ANGLE(7.0f);
-		creature->LOT.IsMonkeying = false;
-		creature->LOT.IsJumping = false;
-		creature->Flags = 0;
+	case STATE_VON_CROY_WALK:
+		creature->LOT.isMonkeying = false;
+		creature->LOT.isJumping = false;
+		creature->maximumTurn = ANGLE(7);
+		creature->flags = 0;
 
-		if (laraAI.ahead)
-			joint3 = laraAI.angle;
-		else if (AI.ahead)
-			joint3 = AI.angle;
+		if (laraInfo.ahead)
+		{
+			joint3 = laraInfo.angle;
+		}
+		else if (info.ahead)
+		{
+			joint3 = info.angle;
+		}
 		
 		if (canJump1block || canJump2blocks || canJump3blocks)
 		{
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->goalAnimState = STATE_VON_CROY_STOP;
 			break;
 		}
 
-		if (creature->ReachedGoal && creature->MonkeySwingAhead)
+		if (creature->reachedGoal && creature->monkeyAhead)
 		{
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
+			item->goalAnimState = STATE_VON_CROY_STOP;
 			break;
 		}
 
-		if (creature->ReachedGoal)
+		if (creature->reachedGoal)
 		{
-			if (!creature->Enemy->Flags)
+			if (!creature->enemy->flags)
 			{
-				item->AIBits = FOLLOW;
-				item->ItemFlags[3]++;
-				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
+				creature->reachedGoal = false;
+				creature->enemy = NULL;
+				item->aiBits = FOLLOW;
+				item->itemFlags[3]++;
+
 				break;
 			}
-
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
+			item->goalAnimState = STATE_VON_CROY_STOP;
 			break;
 		}
 		else
 		{
-			if (Lara.Location >= item->ItemFlags[3])
+			if (Lara.location >= item->itemFlags[3])
 			{
-				if (!foundTarget || AI.distance >= SECTOR(2048) && (item->SwapMeshFlags & 0x40000 || AI.distance >= SECTOR(8216)))
+				if (!foundTarget || info.distance >= 0x200000 && (item->swapMeshFlags & 0x40000 || info.distance >= 9437184))
 				{
-					if (creature->Enemy == LaraItem)
+					if (creature->enemy == LaraItem)
 					{
-						if (AI.distance >= SECTOR(4096))
+						if (info.distance >= 0x400000)
 						{
-							if (AI.distance > SECTOR(16384))
-								item->Animation.TargetState = VON_CROY_STATE_RUN;
+							if (info.distance > 0x1000000)
+							{
+								item->goalAnimState = STATE_VON_CROY_RUN;
+							}
 						}
 						else
-							item->Animation.TargetState = VON_CROY_STATE_IDLE;
+						{
+							item->goalAnimState = STATE_VON_CROY_STOP;
+						}
 					}
-					else if (Lara.Location > item->ItemFlags[3] && laraAI.distance > SECTOR(4096))
-						item->Animation.TargetState = VON_CROY_STATE_RUN;
+					else if (Lara.location > item->itemFlags[3] && laraInfo.distance > 0x400000)
+					{
+						item->goalAnimState = STATE_VON_CROY_RUN;
+					}
 				}
 				else
-					item->Animation.TargetState = VON_CROY_STATE_IDLE;
+				{
+					item->goalAnimState = STATE_VON_CROY_STOP;
+				}
 			}
 			else
-				item->Animation.TargetState = VON_CROY_STATE_IDLE;
+			{
+				item->goalAnimState = STATE_VON_CROY_STOP;
+			}
 		}
 
-		if (AI.bite)
+		if (info.bite)
 		{
-			if (AI.distance < pow(SECTOR(1), 2))
+			if (info.distance < SQUARE(1024))
 			{
-				item->Animation.TargetState = VON_CROY_STATE_IDLE;
+				item->goalAnimState = STATE_VON_CROY_STOP;
 				break;
 			}
 		}
 
-		if (creature->Mood == MoodType::Attack &&
-			!(creature->JumpAhead) &&
-			AI.distance > pow(SECTOR(1), 2))
+		if (creature->mood == ATTACK_MOOD &&
+			!(creature->jumpAhead) &&
+			info.distance > SQUARE(1024))
 		{
-			item->Animation.TargetState = VON_CROY_STATE_RUN;
+			item->goalAnimState = STATE_VON_CROY_RUN;
 		}
-
 		break;
 
-	case VON_CROY_STATE_RUN:
-		if (AI.ahead)
-			joint3 = AI.angle;
-
-		if (item->ItemFlags[2] == VON_CROY_FLAG_JUMP)
+	case STATE_VON_CROY_RUN:
+		if (info.ahead)
 		{
-			item->Animation.TargetState = VON_CROY_STATE_JUMP_2_BLOCKS;
-			creature->MaxTurn = 0;
+			joint3 = info.angle;
+		}
+
+		if (item->itemFlags[2] == VON_CROY_FLAG_JUMP)
+		{
+			creature->maximumTurn = 0;
+			item->goalAnimState = STATE_VON_CROY_JUMP_2BLOCKS;
 			break;
 		}
 
-		creature->MaxTurn = ANGLE(11.0f);
+		creature->maximumTurn = ANGLE(11);
 		tilt = abs(angle) / 2;
 
-		if (AI.distance < pow(SECTOR(2), 2) || Lara.Location < creature->LocationAI)
+		if (info.distance < SQUARE(2048) || Lara.location < item->locationAI)
 		{
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
+			item->goalAnimState = STATE_VON_CROY_STOP;
 			break;
 		}
 
-		if (creature->ReachedGoal)
+		if (creature->reachedGoal)
 		{
-			if (!enemy->Flags)
+			if (!enemy->flags)
 			{
-				item->AIBits = FOLLOW;
-				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
+				creature->reachedGoal = false;
+				creature->enemy = NULL;
+				item->aiBits = FOLLOW;
+
 				break;
 			}
 
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
+			item->goalAnimState = STATE_VON_CROY_STOP;
 			break;
 		}
 
-		if (canJump1block ||
-			canJump2blocks ||
-			canJump3blocks ||
-			item->AIBits & FOLLOW ||
-			creature->MonkeySwingAhead ||
-			creature->JumpAhead ||
-			AI.distance < pow(SECTOR(1), 2))
+		if (canJump1block
+			|| canJump2blocks
+			|| canJump3blocks
+			|| creature->monkeyAhead
+			|| item->aiBits & FOLLOW
+			|| info.distance < SQUARE(1024)
+			|| creature->jumpAhead)
 		{
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
+			item->goalAnimState = STATE_VON_CROY_STOP;
 			break;
 		}
 
-		if (AI.distance < pow(SECTOR(1), 2))
+		if (info.distance < SQUARE(1024))
 		{
-			item->Animation.TargetState = VON_CROY_STATE_WALK;
+			item->goalAnimState = STATE_VON_CROY_WALK;
 			break;
 		}
 
 		break;
 
-	case VON_CROY_STATE_START_MONKEY:
-		creature->MaxTurn = 0;
-
-		if (item->BoxNumber != creature->LOT.TargetBox && creature->MonkeySwingAhead) 
-			item->Animation.TargetState = VON_CROY_STATE_MONKEY;
+	case STATE_VON_CROY_START_MONKEY:
+		creature->maximumTurn = 0;
+		if (item->boxNumber != creature->LOT.targetBox && creature->monkeyAhead) 
+		{
+			item->goalAnimState = STATE_VON_CROY_MONKEY;
+		}
 		else
 		{
-			probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
-			if (probe.Position.Ceiling == probe.Position.Floor - 1536)
-				item->Animation.TargetState = VON_CROY_STATE_IDLE;
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			ceiling = GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			if (ceiling == height - 1536)
+				item->goalAnimState = STATE_VON_CROY_STOP;
 		}
 
 		break;
 
-	case VON_CROY_STATE_MONKEY:
-		creature->MaxTurn = ANGLE(6.0f);
-		creature->LOT.IsMonkeying = true;
-		creature->LOT.IsJumping = true;
+	case STATE_VON_CROY_MONKEY:
+		creature->LOT.isMonkeying = true;
+		creature->LOT.isJumping = true;
+		creature->maximumTurn = ANGLE(6);
 
-		if (item->BoxNumber == creature->LOT.TargetBox || !creature->MonkeySwingAhead)
+		if (item->boxNumber == creature->LOT.targetBox || !creature->monkeyAhead)
 		{
-			probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
-			if (probe.Position.Ceiling == (probe.Position.Floor - SECTOR(1.5f)))
-				item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
+			floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+			if (GetCeiling(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) == height - 1536)
+				item->goalAnimState = STATE_VON_CROY_START_MONKEY;
 		}
 
 		break;
 
-	case VON_CROY_STATE_TOGGLE_KNIFE:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase) 
+	case STATE_VON_CROY_TOGGLE_KNIFE:
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase) 
 		{
-			if (!(item->SwapMeshFlags & SWAPMESHFLAGS_VON_CROY))
-				item->SwapMeshFlags |= SWAPMESHFLAGS_VON_CROY;
-			else 
-				item->SwapMeshFlags &= ~SWAPMESHFLAGS_VON_CROY;
-		}
-
-		break;
-
-	case VON_CROY_STATE_LOOK_BEFORE_JUMP:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
-		{
-			item->Pose = enemy->Pose;
-
-			if (item->ItemFlags[2] == VON_CROY_FLAG_JUMP)
+			if (!(item->swapMeshFlags & SWAPMESHFLAGS_VON_CROY))
 			{
-				creature->MaxTurn = 0;
-				item->Animation.ActiveState = VON_CROY_STATE_JUMP;
-				item->Animation.TargetState = VON_CROY_STATE_JUMP_2_BLOCKS;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				creature->LOT.IsJumping = true;
+				item->swapMeshFlags |= SWAPMESHFLAGS_VON_CROY;
+			}
+			else 
+			{
+				item->swapMeshFlags &= ~SWAPMESHFLAGS_VON_CROY;
+			}
+		}
+		break;
+
+	case STATE_VON_CROY_LOOK_BEFORE_JUMP:
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
+		{
+			item->pos.xPos = enemy->pos.xPos;
+			item->pos.yPos = enemy->pos.yPos;
+			item->pos.zPos = enemy->pos.zPos;
+			item->pos.xRot = enemy->pos.xRot;
+			item->pos.yRot = enemy->pos.yRot;
+			item->pos.zRot = enemy->pos.zRot;
+
+			if (item->itemFlags[2] == VON_CROY_FLAG_JUMP)
+			{
+				creature->maximumTurn = 0;
+				item->currentAnimState = STATE_VON_CROY_JUMP;
+				item->goalAnimState = STATE_VON_CROY_JUMP_2BLOCKS;
+				item->animNumber = Objects[item->objectNumber].animIndex + 22;
+				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+				creature->LOT.isJumping = true;
 			}
 
-			item->AIBits = FOLLOW;
-			creature->ReachedGoal = false;
-			creature->Enemy = NULL;
-			creature->LocationAI++;
+			creature->reachedGoal = false;
+			creature->enemy = NULL;
+			item->aiBits = FOLLOW;
+			item->locationAI++;
 		}
 
 		break;
 
-	case VON_CROY_STATE_JUMP_2_BLOCKS:
-		if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 25 ||
-			item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 5)
+	case STATE_VON_CROY_JUMP_2BLOCKS:
+		if (item->animNumber == Objects[item->objectNumber].animIndex + 25
+			|| item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 5)
 		{
-			creature->LOT.IsJumping = true;
+			creature->LOT.isJumping = true;
 			//if (canJump3blocks)
 			//	item->itemFlags[2] = VON_CROY_FLAG_JUMP;
 		}
 		else if (canJump1block)
-			item->Animation.TargetState = VON_CROY_STATE_JUMP;
-
-		if (item->ItemFlags[2] == VON_CROY_FLAG_JUMP)
-			item->Animation.TargetState = 33;
-
-		break;
-
-	case VON_CROY_STATE_ENABLE_TRAP:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
-			item->Pose = enemy->Pose;
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
 		{
-			TestTriggers(
-				creature->AITarget->Pose.Position.x,
-				creature->AITarget->Pose.Position.y,
-				creature->AITarget->Pose.Position.z,
-				creature->AITarget->RoomNumber,
-				true);
+			item->goalAnimState = STATE_VON_CROY_JUMP;
+		}
 
-			creature->ReachedGoal = false;
-			creature->Enemy = NULL;
-			item->AIBits = FOLLOW;
-			creature->LocationAI++;
+		if (item->itemFlags[2] == VON_CROY_FLAG_JUMP)
+		{
+			item->goalAnimState = 33;
 		}
 
 		break;
 
-	case VON_CROY_STATE_KNIFE_ATTACK_HIGH:
-		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
-
-		if (AI.ahead) 
+	case STATE_VON_CROY_ENABLE_TRAP:
+		if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
 		{
-			joint2 = AI.angle / 2;
-			joint1 = AI.xAngle / 2;
+			item->pos.xPos = enemy->pos.xPos;
+			item->pos.yPos = enemy->pos.yPos;
+			item->pos.zPos = enemy->pos.zPos;
+			item->pos.xRot = enemy->pos.xRot;
+			item->pos.yRot = enemy->pos.yRot;
+			item->pos.zRot = enemy->pos.zRot;
+		}
+		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 120)
+		{
+			TestTriggers(
+				creature->aiTarget->pos.xPos,
+				creature->aiTarget->pos.yPos,
+				creature->aiTarget->pos.zPos,
+				creature->aiTarget->roomNumber,
+				true);
+
+			creature->reachedGoal = false;
+			creature->enemy = NULL;
+			item->aiBits = FOLLOW;
+			item->locationAI++;
+		}
+
+		break;
+
+	case STATE_VON_CROY_KNIFE_ATTACK_HIGH:
+		if (info.ahead) 
+		{
+			joint2 = info.angle / 2;
+			joint1 = info.xAngle / 2;
 			joint0 = joint2;
 		}
 
-		if (!creature->Flags && enemy != NULL) 
+		creature->maximumTurn = 0;
+		ClampRotation(&item->pos, info.angle, ANGLE(6));
+
+		if (!creature->flags && enemy != NULL) 
 		{
-			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
-				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 45) 
+			if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 20 
+				&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 45) 
 			{
-				if (abs(item->Pose.Position.x - enemy->Pose.Position.x) < CLICK(2) &&
-					abs(item->Pose.Position.y - enemy->Pose.Position.y) < CLICK(2) &&
-					abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
+				if (abs(item->pos.xPos - enemy->pos.xPos) < 512
+					&& abs(item->pos.yPos - enemy->pos.yPos) < 512
+					&& abs(item->pos.zPos - enemy->pos.zPos) < 512)
 				{
-					enemy->HitPoints -= 40;
-					if (enemy->HitPoints <= 0)
-						item->AIBits = FOLLOW;
-					
-					enemy->HitStatus = true;
-					creature->Flags = 1;
+					enemy->hitPoints -= 40;
+					if (enemy->hitPoints <= 0)
+					{
+						item->aiBits = FOLLOW;
+					}
+					enemy->hitStatus = true;
+					creature->flags = 1;
 					CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
 				}
 			}
@@ -651,151 +691,156 @@ void VonCroyControl(short itemNumber)
 
 		break;
 
-	case VON_CROY_STATE_LOOK_BACK_LEFT:
-	case VON_CROY_STATE_LOOK_BACK_RIGHT:
-		creature->MaxTurn = 0;
-
-		if (item->ItemFlags[2] == 0)
-			ClampRotation(&item->Pose, laraAI.angle, ANGLE(2.8f));
+	case STATE_VON_CROY_LOOK_BACK_LEFT:
+	case STATE_VON_CROY_LOOK_BACK_RIGHT:
+		creature->maximumTurn = 0;
+		if (item->itemFlags[2] == 0)
+		{
+			ClampRotation(&item->pos, laraInfo.angle, 512);
+		}
 		else
-			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, ANGLE(2.8f));
-		
+		{
+			ClampRotation(&item->pos, enemy->pos.yRot - item->pos.yRot, 512);
+		}
 		break;
 
-	case VON_CROY_STATE_GRAB_LADDER:
-		creature->MaxTurn = 0;
-		creature->LOT.IsJumping = true;
+	case STATE_VON_CROY_GRAB_LADDER:
+		creature->LOT.isJumping = true;
+		creature->maximumTurn = 0;
 
 		/*if (!creature->reachedGoal) 
-			item->TargetState = VON_CROY_STATE_CLIMB_LADDER_RIGHT;
+		{
+			item->goalAnimState = STATE_VON_CROY_CLIMB_LADDER_RIGHT;
+		}
 		else
 		{*/
-			item->Animation.TargetState = VON_CROY_STATE_LADDER_CLIMB_UP;
-			creature->ReachedGoal = false;
-			creature->Enemy = NULL;
-			item->AIBits = FOLLOW;
-			creature->LocationAI++;
+			item->goalAnimState = STATE_VON_CROY_LADDER_CLIMB_UP;
+			creature->reachedGoal = false;
+			creature->enemy = NULL;
+			item->aiBits = FOLLOW;
+			item->locationAI++;
 		//}
-
 		break;
 
-	case VON_CROY_STATE_CLIMB_LADDER_RIGHT:
-		creature->MaxTurn = 0;
-		creature->LOT.IsJumping = true;
+	case STATE_VON_CROY_CLIMB_LADDER_RIGHT:
+		creature->LOT.isJumping = true;
+		creature->maximumTurn = 0;
 		break;
 
-	case VON_CROY_STATE_KNIFE_ATTACK_LOW:
-		if (AI.ahead)
+	case STATE_VON_CROY_KNIFE_ATTACK_LOW:
+		if (info.ahead)
 		{
-			joint2 = AI.angle / 2;
-			joint1 = AI.xAngle / 2;
+			joint2 = info.angle / 2;
+			joint1 = info.xAngle / 2;
 			joint0 = joint2;
 		}
 
-		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
+		creature->maximumTurn = 0;
+		ClampRotation(&item->pos, info.angle, ANGLE(6));
 
-		if ((enemy == NULL || enemy->Flags != 0) ||
-			item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
+		if ((enemy == NULL
+			|| enemy->flags != 0) 
+			|| item->frameNumber <= g_Level.Anims[item->animNumber].frameBase + 21)
 		{
-			if (creature->Flags == 0 && enemy != NULL) 
+			if (creature->flags == 0 && enemy != NULL) 
 			{
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
+				if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 15 
+					&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 26)
 				{
-					if (abs(item->Pose.Position.x - enemy->Pose.Position.x) < CLICK(2) &&
-						abs(item->Pose.Position.y - enemy->Pose.Position.y) < CLICK(2) &&
-						abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
+					if (abs(item->pos.xPos - enemy->pos.xPos) < 512
+						&& abs(item->pos.yPos - enemy->pos.yPos) < 512
+						&& abs(item->pos.zPos - enemy->pos.zPos) < 512)
 					{
-						enemy->HitPoints -= 20;
-						if (enemy->HitPoints <= 0)
-							item->AIBits = FOLLOW;
-						
-						enemy->HitStatus = true;
-						creature->Flags = 1;
+						enemy->hitPoints -= 20;
+						if (enemy->hitPoints <= 0)
+						{
+							item->aiBits = FOLLOW;
+						}
+						enemy->hitStatus = true;
+						creature->flags = 1;
 						CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
 					}
 				}
 			}
-
 			break;
 		}
 
 		TestTriggers(
-			creature->AITarget->Pose.Position.x,
-			creature->AITarget->Pose.Position.y,
-			creature->AITarget->Pose.Position.z,
-			creature->AITarget->RoomNumber,
+			creature->aiTarget->pos.xPos,
+			creature->aiTarget->pos.yPos,
+			creature->aiTarget->pos.zPos,
+			creature->aiTarget->roomNumber,
 			true);
 
-		item->AIBits = FOLLOW;
-		creature->ReachedGoal = false;
-		creature->Enemy = NULL;
-		creature->LocationAI++;
+		creature->reachedGoal = false;
+		creature->enemy = NULL;
+		item->aiBits = FOLLOW;
+		item->locationAI++;
 
 		break;
 
 	case 32:
-		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle / 2, ANGLE(6.0f));
-
-		if (AI.ahead) 
+		if (info.ahead) 
 		{
+			joint2 = info.angle / 2;
+			joint1 = info.xAngle;
 			joint0 = joint2;
-			joint1 = AI.xAngle;
-			joint2 = AI.angle / 2;
 		}
 		
-		if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 47) 
+		creature->maximumTurn = 0;
+		ClampRotation(&item->pos, info.angle / 2, ANGLE(6));
+
+		if (item->animNumber == Objects[item->objectNumber].animIndex + 47) 
 		{
-			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase) 
+			if (item->frameNumber != g_Level.Anims[item->animNumber].frameBase) 
 				break;
 		}
 		else 
 		{
-			item->Animation.TargetState = VON_CROY_STATE_IDLE;
-
 			if (GetRandomControl() & 0x1F)
 				break;
+			item->goalAnimState = STATE_VON_CROY_STOP;
 		}
 
-		item->AIBits = FOLLOW;
-		creature->ReachedGoal = false;
-		creature->Enemy = NULL;
-		creature->LocationAI++;
+		creature->reachedGoal = false;
+		creature->enemy = NULL;
+		item->aiBits = FOLLOW;
+		item->locationAI++;
+
 		break;
 
 	case 33:
-		flags = true;
-		if (item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex + 52 ||
-			item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase) 
+		flags = 1;
+		if (item->animNumber != Objects[item->objectNumber].animIndex + 52
+			|| item->frameNumber != g_Level.Anims[item->animNumber].frameBase) 
 		{
-			flags = false;
+			flags = 0;
 		}
 		
-		item->Animation.TargetState = VON_CROY_STATE_WALK;
-		item->Animation.RequiredState = VON_CROY_STATE_RUN;
-		item->ItemFlags[2] = 0;
+		item->goalAnimState = STATE_VON_CROY_WALK;
+		item->requiredAnimState = STATE_VON_CROY_RUN;
+		item->itemFlags[2] = 0;
 		//if (sVar3 == -1) goto LAB_0041a991;
 		if (!flags)
 		{
-			item->AIBits = FOLLOW;
-			creature->ReachedGoal = false;
-			creature->Enemy = NULL;
-			creature->LocationAI++;
+			creature->reachedGoal = false;
+			creature->enemy = NULL;
+			item->aiBits = FOLLOW;
+			item->locationAI++;
 		}
 
 		break;
 	
-	case VON_CROY_STATE_JUMP_BACK:
-		item->ItemFlags[2] = VON_CROY_FLAG_JUMP;
+	case STATE_VON_CROY_JUMP_BACK:
+		item->itemFlags[2] = VON_CROY_FLAG_JUMP;
 		break;
 
 	case 36:
 	case 37:
-		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y-item->Pose.Orientation.y, 512);
+		creature->maximumTurn = 0;
+		MoveCreature3DPos(&item->pos, &enemy->pos, 15, enemy->pos.yRot-item->pos.yRot, 512);
 		break;
+
 	}
 
 	CreatureTilt(item, tilt);
@@ -804,67 +849,70 @@ void VonCroyControl(short itemNumber)
 	CreatureJoint(item, 2, joint2);
 	CreatureJoint(item, 3, joint3);
 	
-	if ((item->Animation.ActiveState < 15) && (item->Animation.ActiveState != 5)) 
+	if ((item->currentAnimState < 15) && (item->currentAnimState != 5)) 
 	{
 		switch (CreatureVault(itemNumber, angle, 2, 260)) 
 		{
 		case 2:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 29;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 19;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex+29;
+			item->currentAnimState = 19;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 3:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 18;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 28;
+			item->currentAnimState = 18;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 4:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 17;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 27;
+			item->currentAnimState = 17;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case 7:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 27;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 37;
+			item->currentAnimState = 27;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -7:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 26;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 36;
+			item->currentAnimState = 26;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -4:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 25;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 35;
+			item->currentAnimState = 25;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -3:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 24;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 41;
+			item->currentAnimState = 24;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
 
 		case -2:
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 42;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 23;
-			creature->MaxTurn = 0;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[item->objectNumber].animIndex + 42;
+			item->currentAnimState = 23;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 			break;
+
 		}
 	}
 	else
+	{
 		CreatureAnimation(itemNumber, angle, 0);
+	}
 }

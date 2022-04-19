@@ -8,222 +8,196 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-static BITE_INFO RaptorBite = { 0, 66, 318, 22 };
+static BITE_INFO raptorBite = { 0, 66, 318, 22 };
 
-// TODO
-enum RaptorState
+void RaptorControl(short itemNum)
 {
-
-};
-
-// TODO
-enum RaptorAnim
-{
-
-};
-
-void RaptorControl(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ITEM_INFO* nearestItem = NULL;
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 	short head = 0;
 	short neck = 0;
 	short angle = 0;
 	short tilt = 0;
+	INT minDistance = MAXINT;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 5)
+		if (item->currentAnimState != 5)
 		{
 			if (GetRandomControl() > 0x4000)
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
+				item->animNumber = Objects[item->objectNumber].animIndex + 9;
 			else
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 10;
-
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 5;
+				item->animNumber = Objects[item->objectNumber].animIndex + 10;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 5;
 		}
 	}
 	else
 	{
-		if (creature->Enemy == NULL || !(GetRandomControl() & 0x7F))
+		if (creature->enemy == NULL || !(GetRandomControl() & 0x7F))
 		{
-			ITEM_INFO* nearestItem = NULL;
-			int minDistance = MAXINT;
-
+			ITEM_INFO* target = NULL;
 			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				auto* currentCreatureInfo = ActiveCreatures[i];
-				if (currentCreatureInfo->ItemNumber == NO_ITEM || currentCreatureInfo->ItemNumber == itemNumber)
+				CREATURE_INFO* currentCreature = ActiveCreatures[i];
+				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNum)
 				{
-					currentCreatureInfo++;
+					currentCreature++;
 					continue;
 				}
 
-				auto* targetItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
+				target = &g_Level.Items[currentCreature->itemNum];
 
-				int x = (targetItem->Pose.Position.x - item->Pose.Position.x) / 64;
-				int y = (targetItem->Pose.Position.y - item->Pose.Position.y) / 64;
-				int z = (targetItem->Pose.Position.z - item->Pose.Position.z) / 64;
-
-				int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
-				if (distance < minDistance && item->HitPoints > 0)
+				int x = (target->pos.xPos - item->pos.xPos) / 64;
+				int y = (target->pos.yPos - item->pos.yPos) / 64;
+				int z = (target->pos.zPos - item->pos.zPos) / 64;
+				int distance = x * x + y * y + z * z;
+				if (distance < minDistance && item->hitPoints > 0)
 				{
-					nearestItem = targetItem;
+					nearestItem = target;
 					minDistance = distance;
 				}
 
-				currentCreatureInfo++;
+				currentCreature++;
 			}
 
-			if (nearestItem != NULL && (nearestItem->ObjectNumber != ID_RAPTOR || (GetRandomControl() < 0x400 && minDistance < pow(SECTOR(2), 2))))
-				creature->Enemy = nearestItem;
+			if (nearestItem != NULL && (nearestItem->objectNumber != ID_RAPTOR || (GetRandomControl() < 0x400 && minDistance < SQUARE(2048))))
+				creature->enemy = nearestItem;
 
-			int x = (LaraItem->Pose.Position.x - item->Pose.Position.x) / 64;
-			int y = (LaraItem->Pose.Position.y - item->Pose.Position.y) / 64;
-			int z = (LaraItem->Pose.Position.z - item->Pose.Position.z) / 64;
-
-			int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+			int x = (LaraItem->pos.xPos - item->pos.xPos) / 64;
+			int y = (LaraItem->pos.yPos - item->pos.yPos) / 64;
+			int z = (LaraItem->pos.zPos - item->pos.zPos) / 64;
+			int distance = x * x + y * y + z * z;
 			if (distance <= minDistance)
-				creature->Enemy = LaraItem;
+				creature->enemy = LaraItem;
 		}
 
-		if (item->AIBits)
+		if (item->aiBits)
 			GetAITarget(creature);
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
 
-		if (AI.ahead)
-			head = AI.angle;
+		if (info.ahead)
+			head = info.angle;
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
-		if (creature->Mood == MoodType::Bored)
-			creature->MaxTurn /= 2;
+		if (creature->mood == BORED_MOOD)
+			creature->maximumTurn /= 2;
 
-		angle = CreatureTurn(item, creature->MaxTurn);
-		neck = -angle * 6;
+		angle = CreatureTurn(item, creature->maximumTurn);
+		neck = -(angle * 6);
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			creature->MaxTurn = 0;
-			creature->Flags &= ~1;
+			creature->maximumTurn = 0;
+			creature->flags &= ~1;
 
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (creature->Flags & 2)
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else if (creature->flags & 2)
 			{
-				creature->Flags &= ~2;
-				item->Animation.TargetState = 6;
+				creature->flags &= ~2;
+				item->goalAnimState = 6;
 			}
-			else if (item->TouchBits & 0xFF7C00 || (AI.distance < pow(585, 2) && AI.bite))
-				item->Animation.TargetState = 8;
-			else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
-				item->Animation.TargetState = 4;
-			else if (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead && !item->HitStatus)
-				item->Animation.TargetState = 1;
-			else if (creature->Mood == MoodType::Bored)
-				item->Animation.TargetState = 2;
+			else if ((item->touchBits & 0xFF7C00) || (info.distance < SQUARE(585) && info.bite))
+				item->goalAnimState = 8;
+			else if (info.bite && info.distance < SQUARE(1536))
+				item->goalAnimState = 4;
+			else if (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead && !item->hitStatus)
+				item->goalAnimState = 1;
+			else if (creature->mood == BORED_MOOD)
+				item->goalAnimState = 2;
 			else
-				item->Animation.TargetState = 3;
-
+				item->goalAnimState = 3;
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(2.0f);
-			creature->Flags &= ~1;
+			creature->maximumTurn = ANGLE(2);
+			creature->flags &= ~1;
 
-			if (creature->Mood != MoodType::Bored)
-				item->Animation.TargetState = 1;
-			else if (AI.ahead && GetRandomControl() < 0x80)
+			if (creature->mood != BORED_MOOD)
+				item->goalAnimState = 1;
+			else if (info.ahead && GetRandomControl() < 0x80)
 			{
-				item->Animation.RequiredState = 6;
-				item->Animation.TargetState = 1;
-				creature->Flags &= ~2;
+				item->requiredAnimState = 6;
+				item->goalAnimState = 1;
+				creature->flags &= ~2;
 			}
-
 			break;
 
 		case 3:
-			creature->MaxTurn = ANGLE(4.0f);
-			creature->Flags &= ~1;
 			tilt = angle;
+			creature->maximumTurn = ANGLE(4);
+			creature->flags &= ~1;
 
-			if (item->TouchBits & 0xFF7C00)
-				item->Animation.TargetState = 1;
-			else if (creature->Flags & 2)
+			if (item->touchBits & 0xFF7C00)
+				item->goalAnimState = 1;
+			else if (creature->flags & 2)
 			{
-				item->Animation.RequiredState = 6;
-				item->Animation.TargetState = 1;
-				creature->Flags &= ~2;
+				item->requiredAnimState = 6;
+				item->goalAnimState = 1;
+				creature->flags &= ~2;
 			}
-			else if (AI.bite && AI.distance < pow(SECTOR(1.5f), 2))
+			else if (info.bite && info.distance < SQUARE(1536))
 			{
-				if (item->Animation.TargetState == 3)
+				if (item->goalAnimState == 3)
 				{
 					if (GetRandomControl() < 0x2000)
-						item->Animation.TargetState = 1;
+						item->goalAnimState = 1;
 					else
-						item->Animation.TargetState = 7;
+						item->goalAnimState = 7;
 				}
 			}
-			else if (AI.ahead && creature->Mood != MoodType::Escape && GetRandomControl() < 0x80)
+			else if (info.ahead && creature->mood != ESCAPE_MOOD && GetRandomControl() < 0x80)
 			{
-				item->Animation.RequiredState = 6;
-				item->Animation.TargetState = 1;
+				item->requiredAnimState = 6;
+				item->goalAnimState = 1;
 			}
-			else if (creature->Mood == MoodType::Bored || (creature->Mood == MoodType::Escape && Lara.TargetEntity != item && AI.ahead))
-				item->Animation.TargetState = 1;
-
+			else if (creature->mood == BORED_MOOD || (creature->mood == ESCAPE_MOOD && Lara.target != item && info.ahead))
+				item->goalAnimState = 1;
 			break;
 
 		case 4:
-			creature->MaxTurn = ANGLE(2.0f);
 			tilt = angle;
-
-			if (creature->Enemy == LaraItem)
+			creature->maximumTurn = ANGLE(2);
+			if (creature->enemy == LaraItem)
 			{
-				if (!(creature->Flags & 1) && (item->TouchBits & 0xFF7C00))
+				if (!(creature->flags & 1) && (item->touchBits & 0xFF7C00))
 				{
-					creature->Flags |= 1;
-					CreatureEffect(item, &RaptorBite, DoBloodSplat);
-
-					if (LaraItem->HitPoints <= 0)
-						creature->Flags |= 2;
-
-					LaraItem->HitPoints -= 100;
-					LaraItem->HitStatus = 1;
-
-					item->Animation.RequiredState = 1;
+					creature->flags |= 1;
+					CreatureEffect(item, &raptorBite, DoBloodSplat);
+					if (LaraItem->hitPoints <= 0)
+						creature->flags |= 2;
+					LaraItem->hitPoints -= 100;
+					LaraItem->hitStatus = 1;
+					item->requiredAnimState = 1;
 				}
 			}
 			else
 			{
-				if (!(creature->Flags & 1) && creature->Enemy)
+				if (!(creature->flags & 1) && creature->enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
+					if (abs(creature->enemy->pos.xPos - item->pos.xPos) < 512 &&
+						abs(creature->enemy->pos.yPos - item->pos.yPos) < 512 &&
+						abs(creature->enemy->pos.zPos - item->pos.zPos) < 512)
 					{
-						creature->Enemy->HitPoints -= 25;
-						creature->Enemy->HitStatus = 1;
-
-						if (creature->Enemy->HitPoints <= 0)
-							creature->Flags |= 2;
-
-						creature->Flags |= 1;
-						CreatureEffect(item, &RaptorBite, DoBloodSplat);
+						creature->enemy->hitPoints -= 25;
+						creature->enemy->hitStatus = 1;
+						if (creature->enemy->hitPoints <= 0)
+							creature->flags |= 2;
+						creature->flags |= 1;
+						CreatureEffect(item, &raptorBite, DoBloodSplat);
 
 					}
 				}
@@ -232,41 +206,36 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 8:
-			creature->MaxTurn = ANGLE(2.0f);
 			tilt = angle;
-
-			if (creature->Enemy == LaraItem)
+			creature->maximumTurn = ANGLE(2);
+			if (creature->enemy == LaraItem)
 			{
-				if (!(creature->Flags & 1) && (item->TouchBits & 0xFF7C00))
+				if (!(creature->flags & 1) && (item->touchBits & 0xFF7C00))
 				{
-					creature->Flags |= 1;
-					CreatureEffect(item, &RaptorBite, DoBloodSplat);
+					creature->flags |= 1;
+					CreatureEffect(item, &raptorBite, DoBloodSplat);
+					if (LaraItem->hitPoints <= 0)
+						creature->flags |= 2;
+					LaraItem->hitPoints -= 100;
+					LaraItem->hitStatus = 1;
 
-					if (LaraItem->HitPoints <= 0)
-						creature->Flags |= 2;
-
-					LaraItem->HitPoints -= 100;
-					LaraItem->HitStatus = 1;
-
-					item->Animation.RequiredState = 1;
+					item->requiredAnimState = 1;
 				}
 			}
 			else
 			{
-				if (!(creature->Flags & 1) && creature->Enemy)
+				if (!(creature->flags & 1) && creature->enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512)
+					if (abs(creature->enemy->pos.xPos - item->pos.xPos) < 512 &&
+						abs(creature->enemy->pos.yPos - item->pos.yPos) < 512 &&
+						abs(creature->enemy->pos.zPos - item->pos.zPos) < 512)
 					{
-						creature->Enemy->HitPoints -= 25;
-						creature->Enemy->HitStatus = 1;
-
-						if (creature->Enemy->HitPoints <= 0)
-							creature->Flags |= 2;
-
-						creature->Flags |= 1;
-						CreatureEffect(item, &RaptorBite, DoBloodSplat);
+						creature->enemy->hitPoints -= 25;
+						creature->enemy->hitStatus = 1;
+						if (creature->enemy->hitPoints <= 0)
+							creature->flags |= 2;
+						creature->flags |= 1;
+						CreatureEffect(item, &raptorBite, DoBloodSplat);
 
 					}
 				}
@@ -275,41 +244,36 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 7:
-			creature->MaxTurn = ANGLE(2.0f);
 			tilt = angle;
-
-			if (creature->Enemy == LaraItem)
+			creature->maximumTurn = ANGLE(2);
+			if (creature->enemy == LaraItem)
 			{
-				if (!(creature->Flags & 1) && item->TouchBits & 0xFF7C00)
+				if (!(creature->flags & 1) && (item->touchBits & 0xFF7C00))
 				{
-					creature->Flags |= 1;
-					CreatureEffect(item, &RaptorBite, DoBloodSplat);
+					creature->flags |= 1;
+					CreatureEffect(item, &raptorBite, DoBloodSplat);
 
-					LaraItem->HitPoints -= 100;
-					LaraItem->HitStatus = true;
-
-					if (LaraItem->HitPoints <= 0)
-						creature->Flags |= 2;
-
-					item->Animation.RequiredState = 3;
+					LaraItem->hitPoints -= 100;
+					LaraItem->hitStatus = 1;
+					if (LaraItem->hitPoints <= 0)
+						creature->flags |= 2;
+					item->requiredAnimState = 3;
 				}
 			}
 			else
 			{
-				if (!(creature->Flags & 1) && creature->Enemy)
+				if (!(creature->flags & 1) && creature->enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512)
+					if (abs(creature->enemy->pos.xPos - item->pos.xPos) < 512 &&
+						abs(creature->enemy->pos.yPos - item->pos.yPos) < 512 &&
+						abs(creature->enemy->pos.zPos - item->pos.zPos) < 512)
 					{
-						creature->Enemy->HitPoints -= 25;
-						creature->Enemy->HitStatus = 1;
-
-						if (creature->Enemy->HitPoints <= 0)
-							creature->Flags |= 2;
-
-						creature->Flags |= 1;
-						CreatureEffect(item, &RaptorBite, DoBloodSplat);
+						creature->enemy->hitPoints -= 25;
+						creature->enemy->hitStatus = 1;
+						if (creature->enemy->hitPoints <= 0)
+							creature->flags |= 2;
+						creature->flags |= 1;
+						CreatureEffect(item, &raptorBite, DoBloodSplat);
 
 					}
 				}
@@ -324,5 +288,5 @@ void RaptorControl(short itemNumber)
 	CreatureJoint(item, 1, head >> 1);
 	CreatureJoint(item, 2, neck);
 	CreatureJoint(item, 3, neck);
-	CreatureAnimation(itemNumber, angle, tilt);
+	CreatureAnimation(itemNum, angle, tilt);
 }

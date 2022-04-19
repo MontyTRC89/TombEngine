@@ -1,9 +1,9 @@
 #pragma once
 
 struct ITEM_INFO;
-struct CollisionInfo;
+struct COLL_INFO;
 
 namespace TEN::Entities::TR4
 {
-	void ChainControl(short itemNumber);
+	void ChainControl(short itemNum);
 }

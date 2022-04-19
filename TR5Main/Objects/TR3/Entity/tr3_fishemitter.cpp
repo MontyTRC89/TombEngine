@@ -9,9 +9,6 @@
 #include "Objects/TR3/fish.h"
 #include "Specific/level.h"
 
-int PirahnaHitWait = false;
-int CarcassItem = NO_ITEM;
-
 #define PIRAHNA_DAMAGE 4
 #define X 0
 #define Y 1
@@ -21,8 +18,8 @@ int CarcassItem = NO_ITEM;
 #define OCB_FISH_LETAL 0x1000
 #define OCB_FISH_EAT_CARCASS 0x2000
 
-FishLeaderInfo LeaderInfo[MAX_FISH];
-FishInfo Fishes[MAX_FISH + (MAX_FISH * 24)];
+FISH_LEADER_INFO LeaderInfo[MAX_FISH];
+FISH_INFO Fishes[MAX_FISH + (MAX_FISH * 24)];
 
 unsigned char FishRanges[1][3] =
 {
@@ -33,12 +30,17 @@ unsigned char FishRanges[1][3] =
 	}
 };
 
+int PirahnaHitWait = false;
+int CarcassItem = NO_ITEM;
+
+
 void SetupShoal(int shoalNumber)
 {
-	LeaderInfo[shoalNumber].xRange = (FishRanges[shoalNumber][0] + 2) << 8;
-	LeaderInfo[shoalNumber].zRange = (FishRanges[shoalNumber][1] + 2) << 8;
-	LeaderInfo[shoalNumber].yRange = (FishRanges[shoalNumber][2]) << 8;
+		LeaderInfo[shoalNumber].xRange = (FishRanges[shoalNumber][0] + 2) << 8;
+		LeaderInfo[shoalNumber].zRange = (FishRanges[shoalNumber][1] + 2) << 8;
+		LeaderInfo[shoalNumber].yRange = (FishRanges[shoalNumber][2]) << 8;
 }
+
 
 void SetupFish(int leader, ITEM_INFO* item)
 {
@@ -73,29 +75,29 @@ void SetupFish(int leader, ITEM_INFO* item)
 
 void ControlFish(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	auto* enemy = item;
+	int pirahnaAttack = 0;
+	int angle = 0;
+
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* enemy = item;
 
 	if (!TriggerActive(item))
 		return;
 
-	int pirahnaAttack = 0;
-	int angle = 0;
-
-	int leader = item->HitPoints;
+	int leader = item->hitPoints;
 	if (!LeaderInfo[leader].on)
 		SetupFish(leader, item);
 
-	if (item->TriggerFlags & OCB_FISH_LETAL)  
+	if (item->triggerFlags & OCB_FISH_LETAL)  
 	{
-		if ((item->TriggerFlags == OCB_FISH_EAT_CARCASS) == 0)
-			pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
+		if ((item->triggerFlags == OCB_FISH_EAT_CARCASS) == 0)
+			pirahnaAttack = (LaraItem->roomNumber == item->roomNumber);
 		else
 		{
 			if (CarcassItem != -1)
 				pirahnaAttack = 2;
 			else
-				pirahnaAttack = (LaraItem->RoomNumber == item->RoomNumber);
+				pirahnaAttack = (LaraItem->roomNumber == item->roomNumber);
 		}
 	}
 	else
@@ -104,7 +106,7 @@ void ControlFish(short itemNumber)
 	if (PirahnaHitWait)
 		PirahnaHitWait--;
 
-	auto* fish = &Fishes[leader];
+	FISH_INFO* fish = &Fishes[leader];
 
 	if (pirahnaAttack)
 	{
@@ -113,24 +115,24 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->Pose.Position.x, fish->z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z) + 0x4000)) / 16) & 4095;
+		LeaderInfo[leader].angle = fish->angle = ((-(mGetAngle(fish->x + item->pos.xPos, fish->z + item->pos.zPos, enemy->pos.xPos, enemy->pos.zPos) + 0x4000)) / 16) & 4095;
 		LeaderInfo[leader].speed = (GetRandomControl() & 63) + 192;
 	}
 
-	int deltaAngle = fish->angle - LeaderInfo[leader].angle;
+	int diff = fish->angle - LeaderInfo[leader].angle;
 
-	if (deltaAngle > 2048)
-		deltaAngle -= 4096;
-	else if (deltaAngle < -2048)
-		deltaAngle += 4096;
+	if (diff > 2048)
+		diff -= 4096;
+	else if (diff < -2048)
+		diff += 4096;
 
-	if (deltaAngle > 128)
+	if (diff > 128)
 	{
 		fish->angAdd -= 4;
 		if (fish->angAdd < -120)
 			fish->angAdd = -120;
 	}
-	else if (deltaAngle < -128)
+	else	if (diff < -128)
 	{
 		fish->angAdd += 4;
 		if (fish->angAdd > 120)
@@ -145,27 +147,26 @@ void ControlFish(short itemNumber)
 
 	fish->angle += fish->angAdd;
 
-	if (deltaAngle > 1024)
+	if (diff > 1024)
 		fish->angle += fish->angAdd / 4;
 	fish->angle &= 4095;
 
-	deltaAngle = fish->speed - LeaderInfo[leader].speed;
+	diff = fish->speed - LeaderInfo[leader].speed;
 
-	if (deltaAngle < -4)
+	if (diff < -4)
 	{
-		deltaAngle = fish->speed + (GetRandomControl() & 3) + 1;
-		if (deltaAngle < 0)
-			deltaAngle = 0;
+		diff = fish->speed + (GetRandomControl() & 3) + 1;
+		if (diff < 0)
+			diff = 0;
+		fish->speed = diff;
 
-		fish->speed = deltaAngle;
 	}
-	else if (deltaAngle > 4)
+	else	if (diff > 4)
 	{
-		deltaAngle = fish->speed - (GetRandomControl() & 3) - 1;
-		if (deltaAngle > 255)
-			deltaAngle = 255;
-
-		fish->speed = deltaAngle;
+		diff = fish->speed - (GetRandomControl() & 3) - 1;
+		if (diff > 255)
+			diff = 255;
+		fish->speed = diff;
 	}
 
 	fish->swim += fish->speed / 16;
@@ -181,28 +182,23 @@ void ControlFish(short itemNumber)
 	{
 		int fishXRange = LeaderInfo[leader].xRange;
 		int fishZRange = LeaderInfo[leader].zRange;
-
 		if (z < -fishZRange)
 		{
 			z = -fishZRange;
-
 			if (fish->angle < 2048)
 				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
 			else
 				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
-
 			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].speedTime = 0;
 		}
 		else if (z > fishZRange)
 		{
 			z = fishZRange;
-
 			if (fish->angle > 3072)
 				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
 			else
 				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
-
 			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].speedTime = 0;
 		}
@@ -210,24 +206,20 @@ void ControlFish(short itemNumber)
 		if (x < -fishXRange)
 		{
 			x = -fishXRange;
-
 			if (fish->angle < 1024)
 				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
 			else
 				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
-
 			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].speedTime = 0;
 		}
 		else if (x > fishXRange)
 		{
 			x = fishXRange;
-
 			if (fish->angle < 3072)
 				LeaderInfo[leader].angle = fish->angle - ((GetRandomControl() & 127) + 128);
 			else
 				LeaderInfo[leader].angle = fish->angle + ((GetRandomControl() & 127) + 128);
-
 			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].speedTime = 0;
 		}
@@ -241,12 +233,10 @@ void ControlFish(short itemNumber)
 		{
 			LeaderInfo[leader].angleTime = (GetRandomControl() & 15) + 8;
 			int angAdd = ((GetRandomControl() & 63) + 16) - 8 - 32;
-
 			if ((GetRandomControl() & 3) == 0)
 				LeaderInfo[leader].angle += angAdd * 32;
 			else
 				LeaderInfo[leader].angle += angAdd;
-
 			LeaderInfo[leader].angle &= 4095;
 		}
 
@@ -255,7 +245,6 @@ void ControlFish(short itemNumber)
 		else
 		{
 			LeaderInfo[leader].speedTime = (GetRandomControl() & 31) + 32;
-
 			if ((GetRandomControl() & 7) == 0)
 				LeaderInfo[leader].speed = (GetRandomControl() & 127) + 128;
 			else if ((GetRandomControl() & 3) == 0)
@@ -277,27 +266,25 @@ void ControlFish(short itemNumber)
 	fish->x = x;
 	fish->z = z;
 
-	fish = (FishInfo*)&Fishes[MAX_FISH + (leader * 24)];
+	fish = (FISH_INFO*)&Fishes[MAX_FISH + (leader * 24)];
 
 	for (int i = 0; i < 24; i++)
 	{
-		if (item->Flags & OCB_FISH_LETAL)
+		if (item->flags & OCB_FISH_LETAL)
 		{
 			PHD_3DPOS pos;
-			pos.Position.x = item->Pose.Position.x + fish->x;
-			pos.Position.y = item->Pose.Position.y + fish->y;
-			pos.Position.z = item->Pose.Position.z + fish->z;
-
+			pos.xPos = item->pos.xPos + fish->x;
+			pos.yPos = item->pos.yPos + fish->y;
+			pos.zPos = item->pos.zPos + fish->z;
 			if (FishNearLara(&pos, 256, (pirahnaAttack < 2) ? LaraItem : enemy))
 			{
 				if (PirahnaHitWait == 0)
 				{
-					DoBloodSplat(item->Pose.Position.x + fish->x, item->Pose.Position.y + fish->y, item->Pose.Position.z + fish->z, 0, 0, (pirahnaAttack < 2) ? LaraItem->RoomNumber : enemy->RoomNumber);
+					DoBloodSplat(item->pos.xPos + fish->x, item->pos.yPos + fish->y, item->pos.zPos + fish->z, 0, 0, (pirahnaAttack < 2) ? LaraItem->roomNumber : enemy->roomNumber);
 					PirahnaHitWait = 8;
 				}
-
 				if (pirahnaAttack != 2)
-					LaraItem->HitPoints -= PIRAHNA_DAMAGE;
+					LaraItem->hitPoints -= PIRAHNA_DAMAGE;
 			}
 		}
 
@@ -308,20 +295,20 @@ void ControlFish(short itemNumber)
 		dx *= dx;
 		dz *= dz;
 
-		deltaAngle = fish->angle - angle;
+		diff = fish->angle - angle;
 
-		if (deltaAngle > 2048)
-			deltaAngle -= 4096;
-		else if (deltaAngle < -2048)
-			deltaAngle += 4096;
+		if (diff > 2048)
+			diff -= 4096;
+		else if (diff < -2048)
+			diff += 4096;
 
-		if (deltaAngle > 128)
+		if (diff > 128)
 		{
 			fish->angAdd -= 4;
 			if (fish->angAdd < -92 - (i / 2))
 				fish->angAdd = -92 - (i / 2);
 		}
-		else if (deltaAngle < -128)
+		else	if (diff < -128)
 		{
 			fish->angAdd += 4;
 			if (fish->angAdd > 92 + (i / 2))
@@ -336,7 +323,7 @@ void ControlFish(short itemNumber)
 
 		fish->angle += fish->angAdd;
 
-		if (deltaAngle > 1024)
+		if (diff > 1024)
 			fish->angle += fish->angAdd / 4;
 		fish->angle &= 4095;
 
@@ -349,7 +336,6 @@ void ControlFish(short itemNumber)
 		{
 			if (fish->speed < 160 + (i / 2))
 				fish->speed += (GetRandomControl() & 3) + 1 + (i / 2);
-
 			if (fish->speed > 160 + (i / 2) - (i * 4))
 				fish->speed = 160 + (i / 2) - (i * 4);
 		}
@@ -389,7 +375,7 @@ void ControlFish(short itemNumber)
 		}
 		else
 		{
-			int y = enemy->Pose.Position.y - item->Pose.Position.y;
+			int y = enemy->pos.yPos - item->pos.yPos;
 			if (abs(fish->y - fish->destY) < 16)
 				fish->destY = y + (GetRandomControl() & 255); 
 		}
@@ -401,14 +387,14 @@ void ControlFish(short itemNumber)
 
 bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item)
 {
-	int x = pos->Position.x - item->Pose.Position.x;
-	int y = abs(pos->Position.y - item->Pose.Position.y);
-	int z = pos->Position.z - item->Pose.Position.z;
+	int x = pos->xPos - item->pos.xPos;
+	int y = abs(pos->yPos - item->pos.yPos);
+	int z = pos->zPos - item->pos.zPos;
 
-	if (x < -distance || x > distance || z < -distance || z > distance || y < -SECTOR(3) || y > SECTOR(3))
+	if (x < -distance || x > distance || z < -distance || z > distance || y < -WALL_SIZE * 3 || y > WALL_SIZE * 3)
 		return false;
 
-	if ((pow(x, 2) + pow(z, 2)) > pow(distance, 2))
+	if ((SQUARE(x) + SQUARE(z)) > SQUARE(distance))
 		return false;
 
 	if (y > distance)
@@ -416,3 +402,4 @@ bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item)
 
 	return true;
 }
+

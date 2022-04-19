@@ -8,22 +8,21 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO MonkeyBite = { 10, 10, 11, 13 };
+BITE_INFO monkeyBite = { 10, 10, 11, 13 };
 
 void InitialiseMonkey(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
-	item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 2;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.ActiveState = 6;
-	item->Animation.TargetState = 6;
+	item->animNumber = Objects[ID_MONKEY].animIndex + 2;
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->currentAnimState = 6;
+	item->goalAnimState = 6;
 }
 
 void MonkeyControl(short itemNumber)
@@ -31,403 +30,407 @@ void MonkeyControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
+	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short headX = 0;
 	short headY = 0;
 	short torsoY = 0;
 	short angle = 0;
 	short tilt = 0;
+	int x = 0;
+	int z = 0;
+	int distance = 0;
+	int dx = 0;
+	int dz = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState != 11)
+		if (item->currentAnimState != 11)
 		{
-			item->MeshBits = -1;
-			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 14;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 11;
+			item->meshBits = -1;
+			item->animNumber = Objects[ID_MONKEY].animIndex + 14;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 11;
 		}
 	}
 	else
 	{
 		GetAITarget(creature);
 
-		if (creature->HurtByLara)
-			creature->Enemy = LaraItem;
+		if (creature->hurtByLara)
+			creature->enemy = LaraItem;
 		else
 		{
 			int minDistance = 0x7FFFFFFF;
-			creature->Enemy = NULL;
+			creature->enemy = NULL;
+			
 
 			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				auto* currentCreature = ActiveCreatures[i];
-				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+				CREATURE_INFO* currentCreature = ActiveCreatures[i];
+				if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 					continue;
 
-				auto* target = &g_Level.Items[currentCreature->ItemNumber];
-				if (target->ObjectNumber == ID_LARA || target->ObjectNumber == ID_MONKEY)
+				ITEM_INFO* target = &g_Level.Items[currentCreature->itemNum];
+				if (target->objectNumber == ID_LARA || target->objectNumber == ID_MONKEY)
 					continue;
 
-				if (target->ObjectNumber == ID_SMALLMEDI_ITEM)
+				if (target->objectNumber == ID_SMALLMEDI_ITEM)
 				{
-					int x = target->Pose.Position.x - item->Pose.Position.x;
-					int z = target->Pose.Position.z - item->Pose.Position.z;
-					int distance = pow(x, 2) + pow(z, 2);
+					x = target->pos.xPos - item->pos.xPos;
+					z = target->pos.zPos - item->pos.zPos;
+					distance = SQUARE(x) + SQUARE(z);
 
 					if (distance < minDistance)
 					{
-						creature->Enemy = target;
+						creature->enemy = target;
 						minDistance = distance;
 					}
 				}
 			}
 		}
 
-		if (item->AIBits != MODIFY)
+		if (item->aiBits != MODIFY)
 		{
-			if (item->CarriedItem != NO_ITEM)
-				item->MeshBits = 0xFFFFFEFF;
+			if (item->carriedItem != NO_ITEM)
+				item->meshBits = 0xFFFFFEFF;
 			else
-				item->MeshBits = -1;
+				item->meshBits = -1;
 		}
 		else
 		{
-			if (item->CarriedItem != NO_ITEM)
-				item->MeshBits = 0xFFFF6E6F;
+			if (item->carriedItem != NO_ITEM)
+				item->meshBits = 0xFFFF6E6F;
 			else
-				item->MeshBits = 0xFFFF6F6F;
+				item->meshBits = 0xFFFF6F6F;
 		}
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		AI_INFO laraInfo;
 
-		if (!creature->HurtByLara && creature->Enemy == LaraItem)
-			creature->Enemy = NULL;
+		CreatureAIInfo(item, &info);
 
-		AI_INFO laraAI;
-		if (creature->Enemy == LaraItem)
+
+		if (!creature->hurtByLara && creature->enemy == LaraItem)
+			creature->enemy = NULL;
+
+		if (creature->enemy == LaraItem)
 		{
-			laraAI.angle = AI.angle;
-			laraAI.distance = AI.distance;
+			laraInfo.angle = info.angle;
+			laraInfo.distance = info.distance;
 		}
 		else
 		{
-			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			dx = LaraItem->pos.xPos - item->pos.xPos;
+			dz = LaraItem->pos.zPos - item->pos.zPos;
 
-			laraAI.angle = phd_atan(dz, dz) - item->Pose.Orientation.y;
-			laraAI.distance = pow(dx, 2) + pow(dz, 2);
+			laraInfo.angle = phd_atan(dz, dz) - item->pos.yRot;
+			laraInfo.distance = SQUARE(dx) + SQUARE(dz);
 		}
 
-		GetCreatureMood(item, &AI, VIOLENT);
-
+		GetCreatureMood(item, &info, VIOLENT);
 		if (Lara.Vehicle != NO_ITEM)
-			creature->Mood = MoodType::Escape;
+			creature->mood = ESCAPE_MOOD;
+		CreatureMood(item, &info, VIOLENT);
 
-		CreatureMood(item, &AI, VIOLENT);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
-		angle = CreatureTurn(item, creature->MaxTurn);
+		ITEM_INFO* enemy = creature->enemy;
+		creature->enemy = LaraItem;
 
-		auto* enemy = creature->Enemy;
-		creature->Enemy = LaraItem;
-
-		if (item->HitStatus)
+		if (item->hitStatus)
 			AlertAllGuards(itemNumber);
 
-		creature->Enemy = enemy;
+		creature->enemy = enemy;
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 6:
-			creature->Flags = 0;
-			creature->MaxTurn = 0;
-			torsoY = laraAI.angle;
+			creature->flags = 0;
+			creature->maximumTurn = 0;
 
-			if (item->AIBits & GUARD)
+			torsoY = laraInfo.angle;
+
+			if (item->aiBits & GUARD)
 			{
 				torsoY = AIGuard(creature);
 				if (!(GetRandomControl() & 0xF))
 				{
 					if (GetRandomControl() & 0x1)
-						item->Animation.TargetState = 8;
+						item->goalAnimState = 8;
 					else
-						item->Animation.TargetState = 7;
+						item->goalAnimState = 7;
 				}
-
 				break;
 			}
 
-			else if (item->AIBits & PATROL1)
-				item->Animation.TargetState = 2;
-			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 3;
-			else if (creature->Mood == MoodType::Bored)
+			else if (item->aiBits & PATROL1)
+				item->goalAnimState = 2;
+
+			else if (creature->mood == ESCAPE_MOOD)
+				item->goalAnimState = 3;
+			else if (creature->mood == BORED_MOOD)
 			{
-				if (item->Animation.RequiredState)
-					item->Animation.TargetState = item->Animation.RequiredState;
+				if (item->requiredAnimState)
+					item->goalAnimState = item->requiredAnimState;
 				else if (!(GetRandomControl() & 0xF))
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 				else if (!(GetRandomControl() & 0xF))
 				{
 					if (GetRandomControl() & 0x1)
-						item->Animation.TargetState = 8;
+						item->goalAnimState = 8;
 					else
-						item->Animation.TargetState = 7;
+						item->goalAnimState = 7;
 				}
 			}
-			else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+			else if ((item->aiBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
 			{
-				if (item->Animation.RequiredState)
-					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.ahead)
-					item->Animation.TargetState = 6;
+				if (item->requiredAnimState)
+					item->goalAnimState = item->requiredAnimState;
+				else if (info.ahead)
+					item->goalAnimState = 6;
 				else
-					item->Animation.TargetState = 3;
+					item->goalAnimState = 3;
 			}
-			else if (AI.bite && AI.distance < pow(682, 2))
-				item->Animation.TargetState = 3;
-			else if (AI.bite && AI.distance < pow(682, 2))
-				item->Animation.TargetState = 2;
+			else if (info.bite && info.distance < SQUARE(682))
+				item->goalAnimState = 3;
+			else if (info.bite && info.distance < SQUARE(682))
+				item->goalAnimState = 2;
 			else
-				item->Animation.TargetState = 3;
+				item->goalAnimState = 3;
 
 			break;
 
 		case 3:
-			creature->MaxTurn = 0;
-			creature->Flags = 0;
-			torsoY = laraAI.angle;
+			creature->flags = 0;
+			creature->maximumTurn = 0;
 
-			if (item->AIBits & GUARD)
+			torsoY = laraInfo.angle;
+
+			if (item->aiBits & GUARD)
 			{
 				torsoY = AIGuard(creature);
-
 				if (!(GetRandomControl() & 15))
 				{
 					if (GetRandomControl() & 1)
-						item->Animation.TargetState = 10;
+						item->goalAnimState = 10;
 					else
-						item->Animation.TargetState = 6;
+						item->goalAnimState = 6;
 				}
-
 				break;
 			}
-			else if (item->AIBits & PATROL1)
-				item->Animation.TargetState = 2;
-			else if (creature->Mood == MoodType::Escape)
+			else if (item->aiBits & PATROL1)
+				item->goalAnimState = 2;
+			else if (creature->mood == ESCAPE_MOOD)
 			{
-				if (Lara.TargetEntity != item && AI.ahead)
-					item->Animation.TargetState = 3;
+				if (Lara.target != item && info.ahead)
+					item->goalAnimState = 3;
 				else
-					item->Animation.TargetState = 4;
+					item->goalAnimState = 4;
 			}
-			else if (creature->Mood == MoodType::Bored)
+			else if (creature->mood == BORED_MOOD)
 			{
-				if (item->Animation.RequiredState)
-					item->Animation.TargetState = item->Animation.RequiredState;
+				if (item->requiredAnimState)
+					item->goalAnimState = item->requiredAnimState;
 				else if (!(GetRandomControl() & 15))
-					item->Animation.TargetState = 2;
+					item->goalAnimState = 2;
 				else if (!(GetRandomControl() & 15))
 				{
 					if (GetRandomControl() & 1)
-						item->Animation.TargetState = 10;
+						item->goalAnimState = 10;
 					else
-						item->Animation.TargetState = 6;
+						item->goalAnimState = 6;
 				}
 			}
-			else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+			else if ((item->aiBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
 			{
-				if (item->Animation.RequiredState)
-					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.ahead)
-					item->Animation.TargetState = 6;
+				if (item->requiredAnimState)
+					item->goalAnimState = item->requiredAnimState;
+				else if (info.ahead)
+					item->goalAnimState = 6;
 				else
-					item->Animation.TargetState = 4;
+					item->goalAnimState = 4;
 			}
-			else if (AI.bite && AI.distance < pow(341, 2))
+			else if (info.bite && info.distance < SQUARE(341))
 			{
-				if (LaraItem->Pose.Position.y < item->Pose.Position.y)
-					item->Animation.TargetState = 13;
+				if (LaraItem->pos.yPos < item->pos.yPos)
+					item->goalAnimState = 13;
 				else
-					item->Animation.TargetState = 12;
+					item->goalAnimState = 12;
 			}
-			else if (AI.bite && AI.distance < pow(682, 2))
-				item->Animation.TargetState = 14;
-			else if (AI.bite && AI.distance < pow(682, 2))
-				item->Animation.TargetState = 2;
-			else if (AI.distance < pow(682, 2) && creature->Enemy != LaraItem && creature->Enemy != NULL &&
-				creature->Enemy->ObjectNumber != ID_AI_PATROL1 && creature->Enemy->ObjectNumber != ID_AI_PATROL2 &&
-				abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < 256)
-			{
-				item->Animation.TargetState = 5;
-			}
-			else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
-				item->Animation.TargetState = 9;
+			else if (info.bite && info.distance < SQUARE(682))
+				item->goalAnimState = 14;
+			else if (info.bite && info.distance < SQUARE(682))
+				item->goalAnimState = 2;
+			else if (info.distance < SQUARE(682) && creature->enemy != LaraItem && creature->enemy != NULL
+				&& creature->enemy->objectNumber != ID_AI_PATROL1 && creature->enemy->objectNumber != ID_AI_PATROL2
+				&& abs(item->pos.yPos - creature->enemy->pos.yPos) < 256)
+				item->goalAnimState = 5;
+			else if (info.bite && info.distance < SQUARE(1024))
+				item->goalAnimState = 9;
 			else
-				item->Animation.TargetState = 4;
+				item->goalAnimState = 4;
 
 			break;
 
 		case 5:
-			creature->ReachedGoal = true;
+			creature->reachedGoal = true;
 
-			if (creature->Enemy == NULL)
+			if (creature->enemy == NULL)
 				break;
-			else if ((creature->Enemy->ObjectNumber == ID_SMALLMEDI_ITEM ||
-				creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
-				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 12)
+			else if ((creature->enemy->objectNumber == ID_SMALLMEDI_ITEM ||
+				creature->enemy->objectNumber == ID_KEY_ITEM4) &&
+				item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 12)
 			{
-				if (creature->Enemy->RoomNumber == NO_ROOM ||
-					creature->Enemy->Status == ITEM_INVISIBLE ||
-					creature->Enemy->Flags & -32768)
-					creature->Enemy = NULL;
+				if (creature->enemy->roomNumber == NO_ROOM ||
+					creature->enemy->status == ITEM_INVISIBLE ||
+					creature->enemy->flags & -32768)
+					creature->enemy = NULL;
 				else
 				{
-					item->CarriedItem = creature->Enemy - g_Level.Items.data();
-					RemoveDrawnItem(creature->Enemy - g_Level.Items.data());
-					creature->Enemy->RoomNumber = NO_ROOM;
-					creature->Enemy->CarriedItem = NO_ITEM;
+					item->carriedItem = creature->enemy - g_Level.Items.data();
+					RemoveDrawnItem(creature->enemy - g_Level.Items.data());
+					creature->enemy->roomNumber = NO_ROOM;
+					creature->enemy->carriedItem = NO_ITEM;
+
 
 					for (int i = 0; i < ActiveCreatures.size(); i++)
 					{
-						auto* currentCreature = ActiveCreatures[i];
-						if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+						CREATURE_INFO* currentCreature = ActiveCreatures[i];
+						if (currentCreature->itemNum == NO_ITEM || currentCreature->itemNum == itemNumber)
 							continue;
 
-						auto* target = &g_Level.Items[currentCreature->ItemNumber];
-						if (currentCreature->Enemy == creature->Enemy)
-							currentCreature->Enemy = NULL;
+						ITEM_INFO* target = &g_Level.Items[currentCreature->itemNum];
+						if (currentCreature->enemy == creature->enemy)
+							currentCreature->enemy = NULL;
 					}
 
-					creature->Enemy = NULL;
+					creature->enemy = NULL;
 
-					if (item->AIBits != MODIFY)
+					if (item->aiBits != MODIFY)
 					{
-						item->AIBits |= AMBUSH;
-						item->AIBits |= MODIFY;
+						item->aiBits |= AMBUSH;
+						item->aiBits |= MODIFY;
 					}
 				}
 			}
-			else if (creature->Enemy->ObjectNumber == ID_AI_AMBUSH && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 12)
+			else if (creature->enemy->objectNumber == ID_AI_AMBUSH && item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 12)
 			{
-				item->AIBits = 0;
+				item->aiBits = 0;
 
-				auto* carriedItem = &g_Level.Items[item->CarriedItem];
+				ITEM_INFO* carriedItem = &g_Level.Items[item->carriedItem];
 
-				carriedItem->Pose.Position.x = item->Pose.Position.x;
-				carriedItem->Pose.Position.y = item->Pose.Position.y;
-				carriedItem->Pose.Position.z = item->Pose.Position.z;
+				carriedItem->pos.xPos = item->pos.xPos;
+				carriedItem->pos.yPos = item->pos.yPos;
+				carriedItem->pos.zPos = item->pos.zPos;
 
-				ItemNewRoom(item->CarriedItem, item->RoomNumber);
-				item->CarriedItem = NO_ITEM;
+				ItemNewRoom(item->carriedItem, item->roomNumber);
+				item->carriedItem = NO_ITEM;
 
-				carriedItem->AIBits = GUARD;
-				creature->Enemy = NULL;
+				carriedItem->aiBits = GUARD;
+				creature->enemy = NULL;
 			}
 			else
 			{
-				creature->MaxTurn = 0;
-
-				if (abs(AI.angle) < ANGLE(7.0f))
-					item->Pose.Orientation.y += AI.angle;
-				else if (AI.angle < 0)
-					item->Pose.Orientation.y -= ANGLE(7.0f);
+				creature->maximumTurn = 0;
+				if (abs(info.angle) < ANGLE(7))
+					item->pos.yRot += info.angle;
+				else if (info.angle < 0)
+					item->pos.yRot -= ANGLE(7);
 				else
-					item->Pose.Orientation.y += ANGLE(7.0f);
+					item->pos.yRot += ANGLE(7);
 			}
 
 			break;
 
 		case 2:
-			creature->MaxTurn = ANGLE(7.0f);
-			torsoY = laraAI.angle;
+			torsoY = laraInfo.angle;
+			creature->maximumTurn = ANGLE(7);
 
-			if (item->AIBits & PATROL1)
+			if (item->aiBits & PATROL1)
 			{
-				item->Animation.TargetState = 2;
+				item->goalAnimState = 2;
 				torsoY = 0;
 			}
-			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = 4;
-			else if (creature->Mood == MoodType::Bored)
+			else if (creature->mood == ESCAPE_MOOD)
+				item->goalAnimState = 4;
+			else if (creature->mood == BORED_MOOD)
 			{
 				if (GetRandomControl() < 256)
-					item->Animation.TargetState = 6;
+				{
+					item->goalAnimState = 6;
+				}
 			}
-			else if (AI.bite && AI.distance < pow(682, 2))
-				item->Animation.TargetState = 3;
+			else if (info.bite && info.distance < SQUARE(682))
+				item->goalAnimState = 3;
 
 			break;
 
 		case 4:
-			creature->MaxTurn = ANGLE(11.0f);
+			if (info.ahead)
+				torsoY = info.angle;
+
+			creature->maximumTurn = ANGLE(11);
 			tilt = angle / 2;
 
-			if (AI.ahead)
-				torsoY = AI.angle;
-
-			if (item->AIBits & GUARD)
-				item->Animation.TargetState = 3;
-			else if (creature->Mood == MoodType::Escape)
+			if (item->aiBits & GUARD)
+				item->goalAnimState = 3;
+			else if (creature->mood == ESCAPE_MOOD)
 			{
-				if (Lara.TargetEntity != item && AI.ahead)
-					item->Animation.TargetState = 3;
+				if (Lara.target != item && info.ahead)
+					item->goalAnimState = 3;
 				break;
 			}
-			else if ((item->AIBits & FOLLOW) && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
-				item->Animation.TargetState = 3;
-			else if (creature->Mood == MoodType::Bored)
-				item->Animation.TargetState = 9;
-			else if (AI.distance < pow(682, 2))
-				item->Animation.TargetState = 3;
-			else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
-				item->Animation.TargetState = 9;
+			else if ((item->aiBits & FOLLOW) && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
+				item->goalAnimState = 3;
+			else if (creature->mood == BORED_MOOD)
+				item->goalAnimState = 9;
+			else if (info.distance < SQUARE(682))
+				item->goalAnimState = 3;
+			else if (info.bite && info.distance < SQUARE(1024))
+				item->goalAnimState = 9;
 
 			break;
 
 		case 12:
-			creature->MaxTurn = 0;
-
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headY = AI.angle;
-				headX = AI.xAngle;
+				headY = info.angle;
+				headX = info.xAngle;
 			}
 
-			if (abs(AI.angle) < ANGLE(7.0f))
-				item->Pose.Orientation.y += AI.angle;
-			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= ANGLE(7.0f);
+			creature->maximumTurn = 0;
+			if (abs(info.angle) < ANGLE(7))
+				item->pos.yRot += info.angle;
+			else if (info.angle < 0)
+				item->pos.yRot -= ANGLE(7);
 			else
-				item->Pose.Orientation.y += ANGLE(7.0f);
+				item->pos.yRot += ANGLE(7);
 
 			if (enemy == LaraItem)
 			{
-				if (!creature->Flags && (item->TouchBits & 0x2400))
+				if (!creature->flags && (item->touchBits & 0x2400))
 				{
-					CreatureEffect(item, &MonkeyBite, DoBloodSplat);
-					creature->Flags = 1;
+					LaraItem->hitPoints -= 40;
+					LaraItem->hitStatus = true;
+					CreatureEffect(item, &monkeyBite, DoBloodSplat);
 
-					LaraItem->HitPoints -= 40;
-					LaraItem->HitStatus = true;
+					creature->flags = 1;
 				}
 			}
 			else
 			{
-				if (!creature->Flags && enemy)
+				if (!creature->flags && enemy)
 				{
-					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+					if (abs(enemy->pos.xPos - item->pos.xPos) < 256 &&
+						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
+						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
-						creature->Flags = 1;
-
-						enemy->HitPoints -= 20;
-						enemy->HitStatus = true;
+						enemy->hitPoints -= 20;
+						enemy->hitStatus = true;
+						creature->flags = 1;
+						CreatureEffect(item, &monkeyBite, DoBloodSplat);
 					}
 				}
 			}
@@ -435,45 +438,43 @@ void MonkeyControl(short itemNumber)
 			break;
 
 		case 13:
-			creature->MaxTurn = 0;
-
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headY = AI.angle;
-				headX = AI.xAngle;
+				headY = info.angle;
+				headX = info.xAngle;
 			}
 
-			if (abs(AI.angle) < ANGLE(7.0f))
-				item->Pose.Orientation.y += AI.angle;
-			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= ANGLE(7.0f);
+			creature->maximumTurn = 0;
+			if (abs(info.angle) < ANGLE(7))
+				item->pos.yRot += info.angle;
+			else if (info.angle < 0)
+				item->pos.yRot -= ANGLE(7);
 			else
-				item->Pose.Orientation.y += ANGLE(7.0f);
+				item->pos.yRot += ANGLE(7);
 
 			if (enemy == LaraItem)
 			{
-				if (!creature->Flags && item->TouchBits & 0x2400)
+				if (!creature->flags && (item->touchBits & 0x2400))
 				{
-					CreatureEffect(item, &MonkeyBite, DoBloodSplat);
-					creature->Flags = 1;
+					LaraItem->hitPoints -= 40;
+					LaraItem->hitStatus = true;
+					CreatureEffect(item, &monkeyBite, DoBloodSplat);
 
-					LaraItem->HitPoints -= 40;
-					LaraItem->HitStatus = true;
+					creature->flags = 1;
 				}
 			}
 			else
 			{
-				if (!creature->Flags && enemy)
+				if (!creature->flags && enemy)
 				{
-					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+					if (abs(enemy->pos.xPos - item->pos.xPos) < 256 &&
+						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
+						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
-						creature->Flags = 1;
-
-						enemy->HitPoints -= 20;
-						enemy->HitStatus = true;
+						enemy->hitPoints -= 20;
+						enemy->hitStatus = true;
+						creature->flags = 1;
+						CreatureEffect(item, &monkeyBite, DoBloodSplat);
 					}
 				}
 			}
@@ -481,48 +482,47 @@ void MonkeyControl(short itemNumber)
 			break;
 
 		case 14:
-			creature->MaxTurn = 0;
-
-			if (AI.ahead)
+			if (info.ahead)
 			{
-				headX = AI.xAngle;
-				headY = AI.angle;
+				headY = info.angle;
+				headX = info.xAngle;
 			}
 
-			if (abs(AI.angle) < ANGLE(7.0f))
-				item->Pose.Orientation.y += AI.angle;
-			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= ANGLE(7.0f);
+			creature->maximumTurn = 0;
+			if (abs(info.angle) < ANGLE(7))
+				item->pos.yRot += info.angle;
+			else if (info.angle < 0)
+				item->pos.yRot -= ANGLE(7);
 			else
-				item->Pose.Orientation.y += ANGLE(7.0f);
+				item->pos.yRot += ANGLE(7);
 
 			if (enemy == LaraItem)
 			{
-				if (creature->Flags != 1 && item->TouchBits & 0x2400)
+				if (creature->flags != 1 && (item->touchBits & 0x2400))
 				{
-					CreatureEffect(item, &MonkeyBite, DoBloodSplat);
-					creature->Flags = 1;
+					LaraItem->hitPoints -= 50;
+					LaraItem->hitStatus = true;
+					CreatureEffect(item, &monkeyBite, DoBloodSplat);
 
-					LaraItem->HitPoints -= 50;
-					LaraItem->HitStatus = true;
+					creature->flags = 1;
 				}
 			}
 			else
 			{
-				if (creature->Flags != 1 && enemy)
+				if (creature->flags != 1 && enemy)
 				{
-					if (abs(enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(1) &&
-						abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(1) &&
-						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
+					if (abs(enemy->pos.xPos - item->pos.xPos) < 256 &&
+						abs(enemy->pos.yPos - item->pos.yPos) <= 256 &&
+						abs(enemy->pos.zPos - item->pos.zPos) < 256)
 					{
-						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
-						creature->Flags = 1;
-
-						enemy->HitPoints -= 25;
-						enemy->HitStatus = true;
+						enemy->hitPoints -= 25;
+						enemy->hitStatus = true;
+						creature->flags = 1;
+						CreatureEffect(item, &monkeyBite, DoBloodSplat);
 					}
 				}
 			}
+
 
 			break;
 		}
@@ -533,56 +533,56 @@ void MonkeyControl(short itemNumber)
 	CreatureJoint(item, 1, headX);
 	CreatureJoint(item, 2, torsoY);
 
-	if (item->Animation.ActiveState < 15)
+	if (item->currentAnimState < 15)
 	{
 		switch (CreatureVault(itemNumber, angle, 2, 128))
 		{
 		case 2:
-			creature->MaxTurn = 0;
-			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 19;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 17;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[ID_MONKEY].animIndex + 19;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 17;
 			break;
 
 		case 3:
-			creature->MaxTurn = 0;
-			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 18;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 16;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[ID_MONKEY].animIndex + 18;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 16;
 			break;
 
 		case 4:
-			creature->MaxTurn = 0;
-			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 17;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 15;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[ID_MONKEY].animIndex + 17;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 15;
 			break;
 
 		case -2:
-			creature->MaxTurn = 0;
-			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 22;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 20;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[ID_MONKEY].animIndex + 22;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 20;
 			break;
 
 		case -3:
-			creature->MaxTurn = 0;
-			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 21;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 19;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[ID_MONKEY].animIndex + 21;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 19;
 			break;
 
 		case -4:
-			creature->MaxTurn = 0;
-			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 20;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 18;
+			creature->maximumTurn = 0;
+			item->animNumber = Objects[ID_MONKEY].animIndex + 20;
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->currentAnimState = 18;
 			break;
 		}
 	}
 	else
 	{
-		creature->MaxTurn = 0;
+		creature->maximumTurn = 0;
 		CreatureAnimation(itemNumber, angle, tilt);
 	}
 }

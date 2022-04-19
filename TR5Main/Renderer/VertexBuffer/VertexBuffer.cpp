@@ -1,13 +1,10 @@
 #include "framework.h"
 #include "VertexBuffer.h"
 #include "Renderer/Renderer11.h"
-
-namespace TEN::Renderer
-{
+namespace TEN::Renderer {
 	using namespace TEN::Renderer::Utils;
 
-	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices, RendererVertex* vertices)
-	{
+	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices, RendererVertex* vertices) {
 		HRESULT res;
 		D3D11_BUFFER_DESC desc = {};
 
@@ -23,8 +20,7 @@ namespace TEN::Renderer
 		m_numVertices = numVertices;
 	}
 
-	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices)
-	{
+	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices) {
 		HRESULT res;
 		D3D11_BUFFER_DESC desc = {};
 
@@ -43,9 +39,7 @@ namespace TEN::Renderer
 		
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		HRESULT res = context->Map(Buffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-		if (SUCCEEDED(res))
-		{
+		if (SUCCEEDED(res)) {
 			void* dataPtr = (mappedResource.pData);
 			memcpy(dataPtr, &data[startVertex], count * sizeof(RendererVertex));
 			context->Unmap(Buffer.Get(), 0);

@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseYeti(short itemNumber);
-void YetiControl(short itemNumber);
+void InitialiseYeti(short itemNum);
+void YetiControl(short itemNum);

@@ -180,15 +180,14 @@ enum INPUT_BUTTONS
 	IN_LOOKRIGHT = (1 << 26),					// 0x04000000
 	IN_LOOKFORWARD = (1 << 27),					// 0x08000000
 	IN_LOOKBACK = (1 << 28),					// 0x10000000
-	IN_CROUCH = (1 << 29),						// 0x20000000
+	IN_DUCK = (1 << 29),						// 0x20000000
 	IN_SPRINT = (1 << 30),						// 0x40000000
 	IN_LOOKSWITCH = (1 << 31),					// 0x80000000
 	IN_ALL = ~0,								// 0xFFFFFFFF (-1)
 };
 
-#define IN_OPTIC_CONTROLS (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_SELECT | IN_CROUCH | IN_SPRINT)
-#define IN_WAKE (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION)
-#define IN_DIRECTION (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT)
+#define IN_OPTIC_CONTROLS (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_SELECT | IN_DUCK | IN_SPRINT)
+#define IN_WAKE (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_DUCK | IN_DRAW | IN_FLARE | IN_ACTION)
 
 enum IKEYS
 {
@@ -196,7 +195,7 @@ enum IKEYS
 	KEY_BACK = 1,
 	KEY_LEFT = 2,
 	KEY_RIGHT = 3,
-	KEY_CROUCH = 4,
+	KEY_DUCK = 4,
 	KEY_SPRINT = 5,
 	KEY_WALK = 6,
 	KEY_JUMP = 7,
@@ -206,8 +205,8 @@ enum IKEYS
 	KEY_LOOK = 11,
 	KEY_ROLL = 12,
 	KEY_OPTION = 13,
-	KEY_LSTEP = 14,
-	KEY_RSTEP = 15,
+	KEY_STEPL = 14,
+	KEY_STEPR = 15,
 	KEY_PAUSE = 16,
 	KEY_SELECT = 17,
 };
@@ -225,5 +224,5 @@ void InitialiseDirectInput(HWND handle, HINSTANCE instance);
 void DI_ReadKeyboard(byte* keys);
 int DD_SpinMessageLoopMaybe();
 int S_UpdateInput();
-bool Key(int number);
+int Key(int number);
 void DefaultConflict();

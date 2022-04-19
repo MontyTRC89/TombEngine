@@ -7,20 +7,22 @@
 
 namespace TEN::Entities::TR4
 {
-	void CatwalkBladeControl(short itemNumber)
+	void CatwalkBladeControl(short itemNum)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		ITEM_INFO* item = &g_Level.Items[itemNum];
 
 		if (!TriggerActive(item))
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		{
+			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+		}
 		else
 		{
-			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd || frameNumber < 38)
-				item->ItemFlags[3] = 0;
+			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd || frameNumber < 38)
+				item->itemFlags[3] = 0;
 			else
-				item->ItemFlags[3] = 100;
+				item->itemFlags[3] = 100;
 
 			AnimateItem(item);
 		}

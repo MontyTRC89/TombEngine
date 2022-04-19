@@ -7,157 +7,138 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
-#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-// TODO
-enum TRexState
+void LaraTyrannosaurDeath(ITEM_INFO* item)
 {
+	item->goalAnimState = 8;
 
-};
+	if (LaraItem->roomNumber != item->roomNumber)
+		ItemNewRoom(Lara.itemNumber, item->roomNumber);
 
-// TODO
-enum TRexAnim
-{
+	LaraItem->pos.xPos = item->pos.xPos;
+	LaraItem->pos.yPos = item->pos.yPos;
+	LaraItem->pos.zPos = item->pos.zPos;
+	LaraItem->pos.yRot = item->pos.yRot;
+	LaraItem->pos.xRot = 0;
+	LaraItem->pos.zRot = 0;
+	LaraItem->gravityStatus = false;
 
-};
+	LaraItem->animNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 4;
+	LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
+	LaraItem->currentAnimState = LS_DEATH;
+	LaraItem->goalAnimState = LS_DEATH;
 
-void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
-{
-	tRexItem->Animation.TargetState = 8;
+	LaraItem->hitPoints = -16384;
+	Lara.air = -1;
+	Lara.gunStatus = LG_HANDS_BUSY;
+	Lara.gunType = WEAPON_NONE;
 
-	if (laraItem->RoomNumber != tRexItem->RoomNumber)
-		ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
-
-	laraItem->Pose.Position.x = tRexItem->Pose.Position.x;
-	laraItem->Pose.Position.y = tRexItem->Pose.Position.y;
-	laraItem->Pose.Position.z = tRexItem->Pose.Position.z;
-	laraItem->Pose.Orientation.x = 0;
-	laraItem->Pose.Orientation.y = tRexItem->Pose.Orientation.y;
-	laraItem->Pose.Orientation.z = 0;
-	laraItem->Animation.Airborne = false;
-
-	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
-	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-	laraItem->Animation.ActiveState = LS_DEATH;
-	laraItem->Animation.TargetState = LS_DEATH;
-
-	laraItem->HitPoints = -16384;
-	Lara.Air = -1;
-	Lara.Control.HandStatus = HandStatus::Busy;
-	Lara.Control.Weapon.GunType = LaraWeaponType::None;
-
-	Camera.flags = 1;
-	Camera.targetAngle = ANGLE(170.0f);
-	Camera.targetElevation = -ANGLE(25.0f);
+	Camera.targetDistance = SECTOR(2);
+	Camera.flags = CF_CHASE_OBJECT;
 }
 
-void TRexControl(short itemNumber)
+void TyrannosaurControl(short itemNum)
 {
-	if (!CreatureActive(itemNumber))
+	if (!CreatureActive(itemNum))
 		return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
+	ITEM_INFO* item = &g_Level.Items[itemNum];
+	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
 
 	short head = 0;
 	short angle = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->hitPoints <= 0)
 	{
-		if (item->Animation.ActiveState == 1)
-			item->Animation.TargetState = 5;
+		if (item->currentAnimState == 1)
+			item->goalAnimState = 5;
 		else
-			item->Animation.TargetState = 1;
+			item->goalAnimState = 1;
 	}
 	else
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		AI_INFO info;
+		CreatureAIInfo(item, &info);
 
-		if (AI.ahead)
-			head = AI.angle;
+		if (info.ahead)
+			head = info.angle;
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+		GetCreatureMood(item, &info, VIOLENT);
+		CreatureMood(item, &info, VIOLENT);
 
-		angle = CreatureTurn(item, info->MaxTurn);
+		angle = CreatureTurn(item, creature->maximumTurn);
 
-		if (item->TouchBits)
-			LaraItem->HitPoints -= (item->Animation.ActiveState == 3) ? 10 : 1;
+		if (item->touchBits)
+			LaraItem->hitPoints -= (item->currentAnimState == 3) ? 10 : 1;
 
-		info->Flags = (info->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
+		creature->flags = (creature->mood != ESCAPE_MOOD && !info.ahead &&
+			info.enemyFacing > -FRONT_ARC && info.enemyFacing < FRONT_ARC);
 
-		if (AI.distance > pow(1500, 2) &&
-			AI.distance < pow(SECTOR(4), 2) &&
-			AI.bite && !info->Flags)
-		{
-			info->Flags = 1;
-		}
+		if (!creature->flags && info.distance > SQUARE(1500) && info.distance < SQUARE(4096) && info.bite)
+			creature->flags = 1;
 
-		switch (item->Animation.ActiveState)
+		switch (item->currentAnimState)
 		{
 		case 1:
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (AI.distance < pow(1500, 2) && AI.bite)
-				item->Animation.TargetState = 7;
-			else if (info->Mood == MoodType::Bored || info->Flags)
-				item->Animation.TargetState = 2;
+			if (item->requiredAnimState)
+				item->goalAnimState = item->requiredAnimState;
+			else if (info.distance < SQUARE(1500) && info.bite)
+				item->goalAnimState = 7;
+			else if (creature->mood == BORED_MOOD || creature->flags)
+				item->goalAnimState = 2;
 			else
-				item->Animation.TargetState = 3;
+				item->goalAnimState = 3;
 			break;
 
 		case 2:
-			info->MaxTurn = ANGLE(2.0f);
+			creature->maximumTurn = ANGLE(2);
 
-			if (info->Mood != MoodType::Bored || !info->Flags)
-				item->Animation.TargetState = 1;
-			else if (AI.ahead && GetRandomControl() < 0x200)
+			if (creature->mood != BORED_MOOD || !creature->flags)
+				item->goalAnimState = 1;
+			else if (info.ahead && GetRandomControl() < 0x200)
 			{
-				item->Animation.RequiredState = 6;
-				item->Animation.TargetState = 1;
+				item->requiredAnimState = 6;
+				item->goalAnimState = 1;
 			}
-
 			break;
 
 		case 3:
-			info->MaxTurn = ANGLE(4.0f);
+			creature->maximumTurn = ANGLE(4);
 
-			if (AI.distance < pow(SECTOR(5), 2) && AI.bite)
-				item->Animation.TargetState = 1;
-			else if (info->Flags)
-				item->Animation.TargetState = 1;
-			else if (info->Mood != MoodType::Escape && AI.ahead && GetRandomControl() < 0x200)
+			if (info.distance < SQUARE(5120) && info.bite)
+				item->goalAnimState = 1;
+			else if (creature->flags)
+				item->goalAnimState = 1;
+			else if (creature->mood != ESCAPE_MOOD && info.ahead && GetRandomControl() < 0x200)
 			{
-				item->Animation.RequiredState = 6;
-				item->Animation.TargetState = 1;
+				item->requiredAnimState = 6;
+				item->goalAnimState = 1;
 			}
-			else if (info->Mood == MoodType::Bored)
-				item->Animation.TargetState = 1;
-
+			else if (creature->mood == BORED_MOOD)
+				item->goalAnimState = 1;
 			break;
 
 		case 7:
-			if (item->TouchBits & 0x3000)
+			if (item->touchBits & 0x3000)
 			{
-				item->Animation.TargetState = 8;
-
-				LaraItem->HitPoints -= 1500;
-				LaraItem->HitStatus = true;
-				LaraTRexDeath(item, LaraItem);
+				LaraItem->hitPoints -= 1500;
+				LaraItem->hitStatus = true;
+				item->goalAnimState = 8;
+				if (LaraItem == LaraItem)
+					LaraTyrannosaurDeath(item);
 			}
 
-			item->Animation.RequiredState = 2;
+			item->requiredAnimState = 2;
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, (short)(head * 2));
-	info->JointRotation[1] = info->JointRotation[0];
+	creature->jointRotation[1] = creature->jointRotation[0];
 
-	CreatureAnimation(itemNumber, angle, 0);
+	CreatureAnimation(itemNum, angle, 0);
 
-	item->Collidable = true;
+	item->collidable = true;
 }

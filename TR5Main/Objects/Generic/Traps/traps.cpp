@@ -26,15 +26,15 @@ void InitialiseWreckingBall(short itemNumber)
 	short room;
 
 	item = &g_Level.Items[itemNumber];
-	item->ItemFlags[3] = FindAllItems(ID_ANIMATING16)[0];
-	room = item->RoomNumber;
-	item->Pose.Position.y = GetCeiling(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) + 1644;
-	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room);
-	if (room != item->RoomNumber)
+	item->itemFlags[3] = FindAllItems(ID_ANIMATING16)[0];
+	room = item->roomNumber;
+	item->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos) + 1644;
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
+	if (room != item->roomNumber)
 		ItemNewRoom(itemNumber, room);
 }
 
-void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
+void WreckingBallCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
 {
 	ITEM_INFO* item;
 	int x, y, z, test;
@@ -43,33 +43,33 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 	item = &g_Level.Items[itemNumber];
 	if (TestBoundsCollide(item, l, coll->Setup.Radius))
 	{
-		x = l->Pose.Position.x;
-		y = l->Pose.Position.y;
-		z = l->Pose.Position.z;
+		x = l->pos.xPos;
+		y = l->pos.yPos;
+		z = l->pos.zPos;
 		test = (x & 1023) > 256 && (x & 1023) < 768 && (z & 1023) > 256 && (z & 1023) < 768;
-		damage = item->Animation.VerticalVelocity > 0 ? 96 : 0;
-		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
+		damage = item->fallspeed > 0 ? 96 : 0;
+		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpaz, 1))
 		{
 			if (test)
-				l->HitPoints = 0;
+				l->hitPoints = 0;
 			else
-				l->HitPoints -= damage;
-			x -= l->Pose.Position.x;
-			y -= l->Pose.Position.y;
-			z -= l->Pose.Position.z;
+				l->hitPoints -= damage;
+			x -= l->pos.xPos;
+			y -= l->pos.yPos;
+			z -= l->pos.zPos;
 			if (damage)
 			{
 				for (int i = 14 + (GetRandomControl() & 3); i > 0; --i)
 				{
-					TriggerBlood(l->Pose.Position.x + (GetRandomControl() & 63) - 32, l->Pose.Position.y - (GetRandomControl() & 511) - 256,
-						l->Pose.Position.z + (GetRandomControl() & 63) - 32, -1, 1);
+					TriggerBlood(l->pos.xPos + (GetRandomControl() & 63) - 32, l->pos.yPos - (GetRandomControl() & 511) - 256,
+						l->pos.zPos + (GetRandomControl() & 63) - 32, -1, 1);
 				}
 			}
 			if (!coll->Setup.EnableObjectPush || test)
 			{
-				l->Pose.Position.x += x;
-				l->Pose.Position.y += y;
-				l->Pose.Position.z += z;
+				l->pos.xPos += x;
+				l->pos.yPos += y;
+				l->pos.zPos += z;
 			}
 		}
 	}
@@ -83,13 +83,13 @@ void WreckingBallControl(short itemNumber)
 
 	item = &g_Level.Items[itemNumber];
 	test = 1;
-	item2 = &g_Level.Items[item->ItemFlags[3]];
-	if (LaraItem->Pose.Position.x >= 45056 && LaraItem->Pose.Position.x <= 57344 && LaraItem->Pose.Position.z >= 26624 && LaraItem->Pose.Position.z <= 43008
-		|| item->ItemFlags[2] < 900)
+	item2 = &g_Level.Items[item->itemFlags[3]];
+	if (LaraItem->pos.xPos >= 45056 && LaraItem->pos.xPos <= 57344 && LaraItem->pos.zPos >= 26624 && LaraItem->pos.zPos <= 43008
+		|| item->itemFlags[2] < 900)
 	{
-		if (item->ItemFlags[2] < 900)
+		if (item->itemFlags[2] < 900)
 		{
-			if (!item->ItemFlags[2] || !(GlobalCounter & 0x3F))
+			if (!item->itemFlags[2] || !(GlobalCounter & 0x3F))
 			{
 				WreckingBallData[0] = GetRandomControl() % 7 - 3;
 				WreckingBallData[1] = GetRandomControl() % 7 - 3;
@@ -100,8 +100,8 @@ void WreckingBallControl(short itemNumber)
 		}
 		else
 		{
-			x = LaraItem->Pose.Position.x;
-			z = LaraItem->Pose.Position.z;
+			x = LaraItem->pos.xPos;
+			z = LaraItem->pos.zPos;
 		}
 	}
 	else
@@ -110,17 +110,17 @@ void WreckingBallControl(short itemNumber)
 		z = 33792;
 		test = 0;
 	}
-	if (item->ItemFlags[2] < 900)
-		++item->ItemFlags[2];
+	if (item->itemFlags[2] < 900)
+		++item->itemFlags[2];
 
-	if (item->ItemFlags[1] <= 0)
+	if (item->itemFlags[1] <= 0)
 	{
-		oldX = item->Pose.Position.x;
-		oldZ = item->Pose.Position.z;
+		oldX = item->pos.xPos;
+		oldZ = item->pos.zPos;
 		x = x & 0xFFFFFE00 | 0x200;
 		z = z & 0xFFFFFE00 | 0x200;
-		dx = x - item->Pose.Position.x;
-		dz = z - item->Pose.Position.z;
+		dx = x - item->pos.xPos;
+		dz = z - item->pos.zPos;
 		wx = 0;
 		if (dx < 0)
 			wx = -1024;
@@ -131,167 +131,167 @@ void WreckingBallControl(short itemNumber)
 			wz = -1024;
 		else if (dz > 0)
 			wz = 1024;
-		room = item->RoomNumber;
-		ceilingX = GetCeiling(GetFloor(item->Pose.Position.x + wx, item2->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x + wx, item2->Pose.Position.y, item->Pose.Position.z);
-		room = item->RoomNumber;
-		ceilingZ = GetCeiling(GetFloor(item->Pose.Position.x, item2->Pose.Position.y, item->Pose.Position.z + wz, &room), item->Pose.Position.x, item2->Pose.Position.y, item->Pose.Position.z + wz);
-		if (ceilingX <= item2->Pose.Position.y && ceilingX != NO_HEIGHT)
+		room = item->roomNumber;
+		ceilingX = GetCeiling(GetFloor(item->pos.xPos + wx, item2->pos.yPos, item->pos.zPos, &room), item->pos.xPos + wx, item2->pos.yPos, item->pos.zPos);
+		room = item->roomNumber;
+		ceilingZ = GetCeiling(GetFloor(item->pos.xPos, item2->pos.yPos, item->pos.zPos + wz, &room), item->pos.xPos, item2->pos.yPos, item->pos.zPos + wz);
+		if (ceilingX <= item2->pos.yPos && ceilingX != NO_HEIGHT)
 			flagX = 1;
 		else
 			flagX = 0;
-		if (ceilingZ <= item2->Pose.Position.y && ceilingZ != NO_HEIGHT)
+		if (ceilingZ <= item2->pos.yPos && ceilingZ != NO_HEIGHT)
 			flagZ = 1;
 		else
 			flagZ = 0;
-		if (!item->ItemFlags[0])
+		if (!item->itemFlags[0])
 		{
 			if (flagX && dx && (abs(dx) > abs(dz) || !flagZ || GetRandomControl() & 1))
 			{
-				item->ItemFlags[0] = 1;
+				item->itemFlags[0] = 1;
 			}
 			else if (flagZ && dz)
 			{
-				item->ItemFlags[0] = 2;
+				item->itemFlags[0] = 2;
 			}
 		}
-		if (item->ItemFlags[0] == 1)
+		if (item->itemFlags[0] == 1)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose, 0);
+			SoundEffect(1045, &item->pos, 0);
 			adx = abs(dx);
 			if (adx >= 32)
 				adx = 32;
 			if (dx > 0)
 			{
-				item->Pose.Position.x += adx;
+				item->pos.xPos += adx;
 			}
 			else if (dx < 0)
 			{
-				item->Pose.Position.x -= adx;
+				item->pos.xPos -= adx;
 			}
 			else
 			{
-				item->ItemFlags[0] = 0;
+				item->itemFlags[0] = 0;
 			}
 		}
-		if (item->ItemFlags[0] == 2)
+		if (item->itemFlags[0] == 2)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose, 0);
+			SoundEffect(1045, &item->pos, 0);
 			adz = abs(dz);
 			if (adz >= 32)
 				adz = 32;
 			if (dz > 0)
 			{
-				item->Pose.Position.z += adz;
+				item->pos.zPos += adz;
 			}
 			else if (dz < 0)
 			{
-				item->Pose.Position.z -= adz;
+				item->pos.zPos -= adz;
 			}
 			else
 			{
-				item->ItemFlags[0] = 0;
+				item->itemFlags[0] = 0;
 			}
 		}
-		if (item->ItemFlags[1] == -1 && (oldX != item->Pose.Position.x || oldZ != item->Pose.Position.z))
+		if (item->itemFlags[1] == -1 && (oldX != item->pos.xPos || oldZ != item->pos.zPos))
 		{
-			item->ItemFlags[1] = 0;
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_A, &item->Pose, 0);
+			item->itemFlags[1] = 0;
+			SoundEffect(1044, &item->pos, 0);
 		}
-		if ((item->Pose.Position.x & 0x3FF) == 512 && (item->Pose.Position.z & 0x3FF) == 512)
-			item->ItemFlags[0] = 0;
-		if (x == item->Pose.Position.x && z == item->Pose.Position.z && test)
+		if ((item->pos.xPos & 0x3FF) == 512 && (item->pos.zPos & 0x3FF) == 512)
+			item->itemFlags[0] = 0;
+		if (x == item->pos.xPos && z == item->pos.zPos && test)
 		{
-			if (item->ItemFlags[1] != -1)
+			if (item->itemFlags[1] != -1)
 			{
-				StopSoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP);
-				SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_C, &item->Pose, 0);
+				StopSoundEffect(1045);
+				SoundEffect(1046, &item->pos, 0);
 			}
-			item->ItemFlags[1] = 1;
-			item->TriggerFlags = 30;
+			item->itemFlags[1] = 1;
+			item->triggerFlags = 30;
 		}
 	}
-	else if (item->ItemFlags[1] == 1)
+	else if (item->itemFlags[1] == 1)
 	{
-		if (!item->TriggerFlags)
+		if (!item->triggerFlags)
 		{
-			--item->TriggerFlags;
+			--item->triggerFlags;
 		}
-		else if (!item->Animation.ActiveState)
+		else if (!item->currentAnimState)
 		{
-			item->Animation.TargetState = 1;
+			item->goalAnimState = 1;
 		}
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose, 0);
-			++item->ItemFlags[1];
-			item->Animation.VerticalVelocity = 6;
-			item->Pose.Position.y += item->Animation.VerticalVelocity;
+			SoundEffect(1042, &item->pos, 0);
+			++item->itemFlags[1];
+			item->fallspeed = 6;
+			item->pos.yPos += item->fallspeed;
 		}
 	}
-	else if (item->ItemFlags[1] == 2)
+	else if (item->itemFlags[1] == 2)
 	{
-		item->Animation.VerticalVelocity += 24;
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
-		room = item->RoomNumber;
-		height = GetFloorHeight(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-		if (height < item->Pose.Position.y)
+		item->fallspeed += 24;
+		item->pos.yPos += item->fallspeed;
+		room = item->roomNumber;
+		height = GetFloorHeight(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		if (height < item->pos.yPos)
 		{
-			item->Pose.Position.y = height;
-			if (item->Animation.VerticalVelocity > 48)
+			item->pos.yPos = height;
+			if (item->fallspeed > 48)
 			{
 				BounceCamera(item, 64, 8192);
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
+				item->fallspeed = -item->fallspeed >> 3;
 			}
 			else
 			{
-				++item->ItemFlags[1];
-				item->Animation.VerticalVelocity = 0;
+				++item->itemFlags[1];
+				item->fallspeed = 0;
 			}
 		}
-		else if (height - item->Pose.Position.y < 1536 && item->Animation.ActiveState)
+		else if (height - item->pos.yPos < 1536 && item->currentAnimState)
 		{
-			item->Animation.TargetState = 0;
+			item->goalAnimState = 0;
 		}
 	}
-	else if (item->ItemFlags[1] == 3)
+	else if (item->itemFlags[1] == 3)
 	{
-		item->Animation.VerticalVelocity -= 3;
-		item->Pose.Position.y += item->Animation.VerticalVelocity;
-		if (item->Pose.Position.y < item2->Pose.Position.y + 1644)
+		item->fallspeed -= 3;
+		item->pos.yPos += item->fallspeed;
+		if (item->pos.yPos < item2->pos.yPos + 1644)
 		{
-			StopSoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP);
-			item->ItemFlags[0] = 1;
-			item->Pose.Position.y = item2->Pose.Position.y + 1644;
-			if (item->Animation.VerticalVelocity < -32)
+			StopSoundEffect(1048);
+			item->itemFlags[0] = 1;
+			item->pos.yPos = item2->pos.yPos + 1644;
+			if (item->fallspeed < -32)
 			{
-				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Pose, 4104);
-				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
+				SoundEffect(1047, &item->pos, 4104);
+				item->fallspeed = -item->fallspeed >> 3;
 				BounceCamera(item, 16, 8192);
 			}
 			else
 			{
-				item->ItemFlags[1] = -1;
-				item->Animation.VerticalVelocity = 0;
-				item->ItemFlags[0] = 0;
+				item->itemFlags[1] = -1;
+				item->fallspeed = 0;
+				item->itemFlags[0] = 0;
 			}
 		}
-		else if (!item->ItemFlags[0])
+		else if (!item->itemFlags[0])
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP, &item->Pose, 0);
+			SoundEffect(1048, &item->pos, 0);
 		}
 	}
-	item2->Pose.Position.x = item->Pose.Position.x;
-	item2->Pose.Position.z = item->Pose.Position.z;
-	room = item->RoomNumber;
-	item2->Pose.Position.y = GetCeiling(GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room), item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-	GetFloor(item2->Pose.Position.x, item2->Pose.Position.y, item2->Pose.Position.z, &room);
-	if (room != item2->RoomNumber)
-		ItemNewRoom(item->ItemFlags[3], room);
-	TriggerAlertLight(item2->Pose.Position.x, item2->Pose.Position.y + 64, item2->Pose.Position.z, 255, 64, 0, 64 * (GlobalCounter & 0x3F), item2->RoomNumber, 24);
-	TriggerAlertLight(item2->Pose.Position.x, item2->Pose.Position.y + 64, item2->Pose.Position.z, 255, 64, 0, 64 * (GlobalCounter - 32) & 0xFFF, item2->RoomNumber, 24);
-	room = item->RoomNumber;
-	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room);
-	if (room != item->RoomNumber)
+	item2->pos.xPos = item->pos.xPos;
+	item2->pos.zPos = item->pos.zPos;
+	room = item->roomNumber;
+	item2->pos.yPos = GetCeiling(GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room), item->pos.xPos, item->pos.yPos, item->pos.zPos);
+	GetFloor(item2->pos.xPos, item2->pos.yPos, item2->pos.zPos, &room);
+	if (room != item2->roomNumber)
+		ItemNewRoom(item->itemFlags[3], room);
+	TriggerAlertLight(item2->pos.xPos, item2->pos.yPos + 64, item2->pos.zPos, 255, 64, 0, 64 * (GlobalCounter & 0x3F), item2->roomNumber, 24);
+	TriggerAlertLight(item2->pos.xPos, item2->pos.yPos + 64, item2->pos.zPos, 255, 64, 0, 64 * (GlobalCounter - 32) & 0xFFF, item2->roomNumber, 24);
+	room = item->roomNumber;
+	GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &room);
+	if (room != item->roomNumber)
 		ItemNewRoom(itemNumber, room);
 	AnimateItem(item);
 }

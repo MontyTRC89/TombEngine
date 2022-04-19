@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseLaraDouble(short itemNumber);
-void LaraDoubleControl(short itemNumber);
+void InitialiseLaraDouble(short itemNum);
+void LaraDoubleControl(short itemNum);

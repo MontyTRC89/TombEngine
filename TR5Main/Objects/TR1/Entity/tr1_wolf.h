@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseWolf(short itemNumber);
-void WolfControl(short itemNumber);
+void InitialiseWolf(short itemNum);
+void WolfControl(short itemNum);

@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Objects/TR1/Entity/tr1_bigrat.h"
 
-#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -12,13 +11,12 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-static BITE_INFO BigRatBite = { 0, -11, 108, 3 };
-
-#define BIG_RAT_RUN_TURN  ANGLE(6.0f)
+#define BIG_RAT_RUN_TURN ANGLE(6.0f)
 #define BIG_RAT_SWIM_TURN ANGLE(3.0f)
 
 constexpr auto DEFAULT_SWIM_UPDOWN_SPEED = 32;
-constexpr auto BIG_RAT_TOUCH = 0x300018f;
+
+constexpr auto BIG_RAT_TOUCH = (0x300018f);
 constexpr auto BIG_RAT_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 constexpr auto BIG_RAT_VISIBILITY_RANGE = SQUARE(SECTOR(5));
 constexpr auto BIG_RAT_BITE_RANGE = SQUARE(CLICK(1) + CLICK(1) / 3);
@@ -28,254 +26,246 @@ constexpr auto BIG_RAT_WATER_BITE_RANGE = SQUARE(CLICK(1) + CLICK(1) / 6);
 constexpr auto BIG_RAT_BITE_DAMAGE = 20;
 constexpr auto BIG_RAT_CHARGE_DAMAGE = 25;
 
-enum BigRatState
+enum big_rat_state
 {
-	BIG_RAT_STATE_EMPTY = 0,
-	BIG_RAT_STATE_IDLE = 1,
-	BIG_RAT_STATE_CHARGE_ATTACK = 2,
-	BIG_RAT_STATE_RUN = 3,
-	BIG_RAT_STATE_BITE_ATTACK = 4,
-	BIG_RAT_STATE_LAND_DEATH = 5,
-	BIG_RAT_STATE_POSE = 6,
-	BIG_RAT_STATE_SWIM = 7,
-	BIG_RAT_STATE_SWIM_ATTACK = 8,
-	BIG_RAT_STATE_WATER_DEATH = 9
+    BIG_RAT_EMPTY,
+    BIG_RAT_STOP,
+    BIG_RAT_CHARGE_ATTACK,
+    BIG_RAT_RUN,
+    BIG_RAT_BITE_ATTACK,
+    BIG_RAT_LAND_DEATH,
+    BIG_RAT_POSE,
+    BIG_RAT_SWIM,
+    BIG_RAT_SWIM_ATTACK,
+    BIG_RAT_WATER_DEATH
 };
 
-enum BigRatAnim
+enum big_rat_anims
 {
-	BIG_RAT_ANIM_EMPTY = 0,
-	BIG_RAT_ANIM_STOP_TO_RUN = 1,
-	BIG_RAT_ANIM_RUN = 2,
-	BIG_RAT_ANIM_RUN_TO_STOP = 3,
-	BIG_RAT_ANIM_POSE = 4,
-	BIG_RAT_ANIM_POSE_TO_STOP = 5,
-	BIG_RAT_ANIM_LAND_BITE_ATTACK = 6,
-	BIG_RAT_ANIM_CHARGE_ATTACK = 7,
-	BIG_RAT_ANIM_LAND_DEATH = 8,
-	BIG_RAT_ANIM_SWIM = 9,
-	BIG_RAT_ANIM_WATER_BITE = 10,
-	BIG_RAT_ANIM_WATER_DEATH = 11,
-	BIG_RAT_ANIM_RUN_TO_SWIM = 12,
-	BIG_RAT_ANIM_SWIM_TO_RUN = 13
+    BIG_RAT_ANIM_EMPTY,
+    BIG_RAT_ANIM_STOP_TO_RUN,
+    BIG_RAT_ANIM_RUN,
+    BIG_RAT_ANIM_RUN_TO_STOP,
+    BIG_RAT_ANIM_POSE,
+    BIG_RAT_ANIM_POSE_TO_STOP,
+    BIG_RAT_ANIM_LAND_BITE_ATTACK,
+    BIG_RAT_ANIM_CHARGE_ATTACK,
+    BIG_RAT_ANIM_LAND_DEATH,
+    BIG_RAT_ANIM_SWIM,
+    BIG_RAT_ANIM_WATER_BITE,
+    BIG_RAT_ANIM_WATER_DEATH,
+    BIG_RAT_ANIM_RUN_TO_SWIM,
+    BIG_RAT_ANIM_SWIM_TO_RUN
 };
+
+static BITE_INFO big_ratBite = { 0, -11, 108, 3 };
+
+static bool RatIsInWater(ITEM_INFO* item, CREATURE_INFO* big_rat)
+{
+    EntityStoringInfo info;
+    info.x = item->pos.xPos;
+    info.y = item->pos.yPos;
+    info.z = item->pos.zPos;
+    info.roomNumber = item->roomNumber;
+    GetFloor(info.x, info.y, info.z, &info.roomNumber);
+    info.waterDepth = GetWaterSurface(info.x, info.y, info.z, info.roomNumber);
+    if (info.waterDepth != NO_HEIGHT)
+    {
+        big_rat->LOT.step = SECTOR(20);
+        big_rat->LOT.drop = -SECTOR(20);
+        big_rat->LOT.fly = DEFAULT_SWIM_UPDOWN_SPEED;
+        return true;
+    }
+    else
+    {
+        big_rat->LOT.step = CLICK(1);
+        big_rat->LOT.drop = -CLICK(1);
+        big_rat->LOT.fly = NO_FLYING;
+        return false;
+    }
+}
 
 void InitialiseBigRat(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
-	InitialiseCreature(itemNumber);
+    ITEM_INFO* item = &g_Level.Items[itemNumber];
+    InitialiseCreature(itemNumber);
 
-	if (TestEnvironment(ENV_FLAG_WATER, item))
-	{
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BIG_RAT_ANIM_SWIM;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = BIG_RAT_STATE_SWIM;
-		item->Animation.TargetState = BIG_RAT_STATE_SWIM;
-	}
-	else
-	{
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BIG_RAT_ANIM_EMPTY;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = BIG_RAT_STATE_IDLE;
-		item->Animation.TargetState = BIG_RAT_STATE_IDLE;
-	}
-}
-
-static bool RatIsInWater(ITEM_INFO* item)
-{
-	auto* creature = GetCreatureInfo(item);
-
-	EntityStoringInfo storingInfo;
-	storingInfo.x = item->Pose.Position.x;
-	storingInfo.y = item->Pose.Position.y;
-	storingInfo.z = item->Pose.Position.z;
-	storingInfo.roomNumber = item->RoomNumber;
-
-	GetFloor(storingInfo.x, storingInfo.y, storingInfo.z, &storingInfo.roomNumber);
-	storingInfo.waterDepth = GetWaterSurface(storingInfo.x, storingInfo.y, storingInfo.z, storingInfo.roomNumber);
-
-	if (storingInfo.waterDepth != NO_HEIGHT)
-	{
-		creature->LOT.Step = SECTOR(20);
-		creature->LOT.Drop = -SECTOR(20);
-		creature->LOT.Fly = DEFAULT_SWIM_UPDOWN_SPEED;
-		return true;
-	}
-	else
-	{
-		creature->LOT.Step = CLICK(1);
-		creature->LOT.Drop = -CLICK(1);
-		creature->LOT.Fly = NO_FLYING;
-		return false;
-	}
+    if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+    {
+        item->animNumber = Objects[item->objectNumber].animIndex + BIG_RAT_ANIM_SWIM;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+        item->currentAnimState = BIG_RAT_SWIM;
+        item->goalAnimState = BIG_RAT_SWIM;
+    }
+    else
+    {
+        item->animNumber = Objects[item->objectNumber].animIndex + BIG_RAT_ANIM_EMPTY;
+        item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+        item->currentAnimState = BIG_RAT_STOP;
+        item->goalAnimState = BIG_RAT_STOP;
+    }
 }
 
 void BigRatControl(short itemNumber)
 {
-	if (!CreatureActive(itemNumber))
-		return;
+    if (!CreatureActive(itemNumber))
+        return;
 
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-	auto* objectInfo = &Objects[item->ObjectNumber];
+    ITEM_INFO* item;
+    OBJECT_INFO* obj;
+    CREATURE_INFO* big_rat;
+    AI_INFO info;
+    short head, angle;
+    int WaterHeight;
 
-	short head = 0;
-	short angle = 0;
-	int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+    item = &g_Level.Items[itemNumber];
+    obj = &Objects[item->objectNumber];
+    big_rat = GetCreatureInfo(item);
+    head = angle = 0;
+    WaterHeight = GetWaterHeight(item->pos.xPos, item->pos.yPos, item->pos.zPos, item->roomNumber);
 
-	if (item->HitPoints <= 0)
-	{
-		if (item->Animation.ActiveState != BIG_RAT_STATE_LAND_DEATH &&
-			item->Animation.ActiveState != BIG_RAT_STATE_WATER_DEATH)
-		{
-			if (TestEnvironment(ENV_FLAG_WATER, item))
-			{
-				item->Animation.AnimNumber = objectInfo->animIndex + BIG_RAT_ANIM_WATER_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BIG_RAT_STATE_WATER_DEATH;
-				item->Animation.TargetState = BIG_RAT_STATE_WATER_DEATH;
-			}
-			else
-			{
-				item->Animation.AnimNumber = objectInfo->animIndex + BIG_RAT_ANIM_LAND_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BIG_RAT_STATE_LAND_DEATH;
-				item->Animation.TargetState = BIG_RAT_STATE_LAND_DEATH;
-			}
-		}
+    if (item->hitPoints <= 0)
+    {
+        if (item->currentAnimState != BIG_RAT_LAND_DEATH && item->currentAnimState != BIG_RAT_WATER_DEATH)
+        {
+            if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+            {
+                item->animNumber = obj->animIndex + BIG_RAT_ANIM_WATER_DEATH;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+                item->currentAnimState = BIG_RAT_WATER_DEATH;
+                item->goalAnimState = BIG_RAT_WATER_DEATH;
+            }
+            else
+            {
+                item->animNumber = obj->animIndex + BIG_RAT_ANIM_LAND_DEATH;
+                item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+                item->currentAnimState = BIG_RAT_LAND_DEATH;
+                item->goalAnimState = BIG_RAT_LAND_DEATH;
+            }
+        }
 
-		if (TestEnvironment(ENV_FLAG_WATER, item))
-			CreatureFloat(itemNumber);
-	}
-	else
-	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+        if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_WATER)
+            CreatureFloat(itemNumber);
+    }
+    else
+    {
+        AI_INFO info;
+        CreatureAIInfo(item, &info);
 
-		if (AI.ahead)
-			head = AI.angle;
+        if (info.ahead)
+            head = info.angle;
 
-		GetCreatureMood(item, &AI, TIMID);
-		CreatureMood(item, &AI, TIMID);
-		angle = CreatureTurn(item, creature->MaxTurn);
+        GetCreatureMood(item, &info, TIMID);
+        CreatureMood(item, &info, TIMID);
+        angle = CreatureTurn(item, big_rat->maximumTurn);
 
-		if (item->AIBits & ALL_AIOBJ)
-			GetAITarget(creature);
-		else if (creature->HurtByLara)
-			creature->Enemy = LaraItem;
+        if (item->aiBits & ALL_AIOBJ)
+            GetAITarget(big_rat);
+        else if (big_rat->hurtByLara)
+            big_rat->enemy = LaraItem;
 
-		if ((item->HitStatus || AI.distance < BIG_RAT_ALERT_RANGE) ||
-			(TargetVisible(item, &AI) && AI.distance < BIG_RAT_VISIBILITY_RANGE))
-		{
-			if (!creature->Alerted)
-				creature->Alerted = true;
+        if ((item->hitStatus || info.distance < BIG_RAT_ALERT_RANGE) || (TargetVisible(item, &info) && info.distance < BIG_RAT_VISIBILITY_RANGE))
+        {
+            if (!big_rat->alerted)
+                big_rat->alerted = true;
+            AlertAllGuards(itemNumber);
+        }
 
-			AlertAllGuards(itemNumber);
-		}
+        switch (item->currentAnimState)
+        {
+        case BIG_RAT_STOP:
+            if (item->requiredAnimState)
+                item->goalAnimState = item->requiredAnimState;
+            else if (info.bite && info.distance < BIG_RAT_BITE_RANGE)
+                item->goalAnimState = BIG_RAT_BITE_ATTACK;
+            else
+                item->goalAnimState = BIG_RAT_RUN;
+            break;
 
-		switch (item->Animation.ActiveState)
-		{
-		case BIG_RAT_STATE_IDLE:
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (AI.bite && AI.distance < BIG_RAT_BITE_RANGE)
-				item->Animation.TargetState = BIG_RAT_STATE_BITE_ATTACK;
-			else
-				item->Animation.TargetState = BIG_RAT_STATE_RUN;
+        case BIG_RAT_RUN:
+            big_rat->maximumTurn = BIG_RAT_RUN_TURN;
 
-			break;
+            if (RatIsInWater(item, big_rat))
+            {
+                item->requiredAnimState = BIG_RAT_SWIM;
+                item->goalAnimState = BIG_RAT_SWIM;
+                break;
+            }
 
-		case BIG_RAT_STATE_RUN:
-			creature->MaxTurn = BIG_RAT_RUN_TURN;
+            if (info.ahead && (item->touchBits & BIG_RAT_TOUCH))
+                item->goalAnimState = BIG_RAT_STOP;
+            else if (info.bite && info.distance < BIG_RAT_CHARGE_RANGE)
+                item->goalAnimState = BIG_RAT_CHARGE_ATTACK;
+            else if (info.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
+            {
+                item->requiredAnimState = BIG_RAT_POSE;
+                item->goalAnimState = BIG_RAT_STOP;
+            }
+            break;
 
-			if (RatIsInWater(item))
-			{
-				item->Animation.RequiredState = BIG_RAT_STATE_SWIM;
-				item->Animation.TargetState = BIG_RAT_STATE_SWIM;
+        case BIG_RAT_BITE_ATTACK:
+            if (!item->requiredAnimState && info.ahead && (item->touchBits & BIG_RAT_TOUCH))
+            {
+                CreatureEffect(item, &big_ratBite, DoBloodSplat);
+                LaraItem->hitPoints -= BIG_RAT_BITE_DAMAGE;
+                LaraItem->hitStatus = true;
+                item->requiredAnimState = BIG_RAT_STOP;
+            }
+            break;
 
-				break;
-			}
+        case BIG_RAT_CHARGE_ATTACK:
+            if (!item->requiredAnimState && info.ahead && (item->touchBits & BIG_RAT_TOUCH))
+            {
+                CreatureEffect(item, &big_ratBite, DoBloodSplat);
+                LaraItem->hitPoints -= BIG_RAT_CHARGE_DAMAGE;
+                LaraItem->hitStatus = true;
+                item->requiredAnimState = BIG_RAT_RUN;
+            }
+            break;
 
-			if (AI.ahead && (item->TouchBits & BIG_RAT_TOUCH))
-				item->Animation.TargetState = BIG_RAT_STATE_IDLE;
-			else if (AI.bite && AI.distance < BIG_RAT_CHARGE_RANGE)
-				item->Animation.TargetState = BIG_RAT_STATE_CHARGE_ATTACK;
-			else if (AI.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
-			{
-				item->Animation.RequiredState = BIG_RAT_STATE_POSE;
-				item->Animation.TargetState = BIG_RAT_STATE_IDLE;
-			}
+        case BIG_RAT_POSE:
+            if (big_rat->mood != BORED_MOOD || GetRandomControl() < BIG_RAT_POSE_CHANCE)
+                item->goalAnimState = BIG_RAT_STOP;
+            break;
 
-			break;
+        case BIG_RAT_SWIM:
+            big_rat->maximumTurn = BIG_RAT_SWIM_TURN;
 
-		case BIG_RAT_STATE_BITE_ATTACK:
-			if (!item->Animation.RequiredState && AI.ahead && (item->TouchBits & BIG_RAT_TOUCH))
-			{
-				CreatureEffect(item, &BigRatBite, DoBloodSplat);
-				item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
+            if (!RatIsInWater(item, big_rat))
+            {
+                item->requiredAnimState = BIG_RAT_RUN;
+                item->goalAnimState = BIG_RAT_RUN;
+                break;
+            }
 
-				LaraItem->HitPoints -= BIG_RAT_BITE_DAMAGE;
-				LaraItem->HitStatus = true;
-			}
+            if (info.ahead && (item->touchBits & BIG_RAT_TOUCH))
+                item->goalAnimState = BIG_RAT_SWIM_ATTACK;
+            break;
 
-			break;
+        case BIG_RAT_SWIM_ATTACK:
+            if (!item->requiredAnimState && info.ahead && (item->touchBits & BIG_RAT_TOUCH))
+            {
+                CreatureEffect(item, &big_ratBite, DoBloodSplat);
+                LaraItem->hitPoints -= BIG_RAT_BITE_DAMAGE;
+                LaraItem->hitStatus = true;
+            }
 
-		case BIG_RAT_STATE_CHARGE_ATTACK:
-			if (!item->Animation.RequiredState && AI.ahead && (item->TouchBits & BIG_RAT_TOUCH))
-			{
-				CreatureEffect(item, &BigRatBite, DoBloodSplat);
-				item->Animation.RequiredState = BIG_RAT_STATE_RUN;
+            item->goalAnimState = BIG_RAT_SWIM;
+            break;
+        }
 
-				LaraItem->HitPoints -= BIG_RAT_CHARGE_DAMAGE;
-				LaraItem->HitStatus = true;
-			}
+    }
 
-			break;
+    CreatureJoint(item, 0, head);
+    CreatureAnimation(itemNumber, angle, 0);
 
-		case BIG_RAT_STATE_POSE:
-			if (creature->Mood != MoodType::Bored || GetRandomControl() < BIG_RAT_POSE_CHANCE)
-				item->Animation.TargetState = BIG_RAT_STATE_IDLE;
-
-			break;
-
-		case BIG_RAT_STATE_SWIM:
-			creature->MaxTurn = BIG_RAT_SWIM_TURN;
-
-			if (!RatIsInWater(item))
-			{
-				item->Animation.RequiredState = BIG_RAT_STATE_RUN;
-				item->Animation.TargetState = BIG_RAT_STATE_RUN;
-				break;
-			}
-
-			if (AI.ahead && item->TouchBits & BIG_RAT_TOUCH)
-				item->Animation.TargetState = BIG_RAT_STATE_SWIM_ATTACK;
-
-			break;
-
-		case BIG_RAT_STATE_SWIM_ATTACK:
-			if (!item->Animation.RequiredState && AI.ahead && item->TouchBits & BIG_RAT_TOUCH)
-			{
-				CreatureEffect(item, &BigRatBite, DoBloodSplat);
-
-				LaraItem->HitPoints -= BIG_RAT_BITE_DAMAGE;
-				LaraItem->HitStatus = true;
-			}
-
-			item->Animation.TargetState = BIG_RAT_STATE_SWIM;
-			break;
-		}
-
-	}
-
-	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNumber, angle, 0);
-
-	if (RatIsInWater(item))
-	{
-		CreatureUnderwater(item, 0);
-		item->Pose.Position.y = waterHeight;
-	}
-	else
-		item->Pose.Position.y = item->Floor;
+    if (RatIsInWater(item, big_rat))
+    {
+        CreatureUnderwater(item, CLICK(0));
+        item->pos.yPos = WaterHeight;
+    }
+    else
+    {
+        item->pos.yPos = item->floor;
+    }
 }

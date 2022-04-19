@@ -26,9 +26,7 @@ namespace TEN::Renderer
 	using DirectX::SimpleMath::Vector3;
 	using DirectX::SimpleMath::Vector2;
 	using DirectX::SimpleMath::Matrix;
-
-	struct RenderViewCamera
-	{
+	struct RenderViewCamera {
 		Matrix ViewProjection;
 		Matrix View;
 		Matrix Projection;
@@ -38,19 +36,15 @@ namespace TEN::Renderer
 		Vector2 InvViewSize;
 		int RoomNumber;
 		Frustum frustum;
-
 		RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h);
-		RenderViewCamera(const Vector3& pos, const Vector3& dir, const Vector3& up, int room, int width, int height, float fov, float n, float f);
+		RenderViewCamera(const Vector3& pos, const Vector3& dir,const Vector3& up, int room,int width, int height,float fov,float n, float f);
 	};
-
-	struct RenderView
-	{
+	struct RenderView {
 		RenderViewCamera camera;
 		D3D11_VIEWPORT viewport;
 		std::vector<RendererRoom*> roomsToDraw;
 		std::vector<RendererLight*> lightsToDraw;
 		std::vector<RendererSpriteToDraw> spritesToDraw;
-
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
 		void fillConstantBuffer(CCameraMatrixBuffer& bufferToFill);

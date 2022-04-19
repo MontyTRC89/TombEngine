@@ -1,4 +1,4 @@
 #pragma once
 
-void TribemanAxeControl(short itemNumber);
-void TribemanDartsControl(short itemNumber);
+void TribemanAxeControl(short itemNum);
+void TribemanDartsControl(short itemNum);

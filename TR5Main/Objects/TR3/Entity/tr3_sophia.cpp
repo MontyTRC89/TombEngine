@@ -21,7 +21,7 @@ enum { NORMAL_BOLT, LARGE_BOLT, SUMMON_BOLT };
 enum { RIGHT_PRONG, ICONPOS, LEFT_PRONG };
 enum { ATTACK_HEAD, ATTACK_HAND1, ATTACK_HAND2 };
 
-enum SophiaState
+enum londonboss_state
 {
 	LONDONBOSS_EMPTY,
 	LONDONBOSS_STAND,
@@ -38,12 +38,6 @@ enum SophiaState
 	LONDONBOSS_GODOWN
 };
 
-// TODO
-enum SophiaAnim
-{
-
-};
-
 #define	LONDONBOSS_VAULT2_ANIM 9
 #define	LONDONBOSS_VAULT3_ANIM 18
 #define	LONDONBOSS_VAULT4_ANIM 15
@@ -51,12 +45,11 @@ enum SophiaAnim
 #define	LONDONBOSS_STND2SUM_ANIM 1
 #define LONDONBOSS_SUMMON_ANIM 2
 #define	LONDONBOSS_GODOWN_ANIM 21
-
 #define LONDONBOSS_VAULT_SHIFT 96
-#define LONDONBOSS_AWARE_DISTANCE pow(SECTOR(1), 2)
+#define LONDONBOSS_AWARE_DISTANCE SQUARE(WALL_SIZE)
 #define LONDONBOSS_WALK_TURN ANGLE(4)
 #define LONDONBOSS_RUN_TURN ANGLE(7)
-#define LONDONBOSS_WALK_RANGE pow(SECTOR(1), 2)
+#define LONDONBOSS_WALK_RANGE SQUARE(WALL_SIZE)
 #define LONDONBOSS_WALK_CHANCE 0x100
 #define LONDONBOSS_LAUGH_CHANCE 0x100
 #define LONDONBOSS_TURN ANGLE(2.0f)
@@ -64,17 +57,17 @@ enum SophiaAnim
 #define LONDONBOSS_FINAL_HEIGHT -11776
 #define BIGZAP_TIMER 600
 
-static void TriggerLaserBolt(Vector3Int* pos, ITEM_INFO* item, long type, short yAngle)
+static void TriggerLaserBolt(PHD_VECTOR* pos, ITEM_INFO* item, long type, short yang)
 {
 	
 }
 
-static void TriggerPlasmaBallFlame(short fxNumber, long type, long xv, long yv, long zv)
+static void TriggerPlasmaBallFlame(short fx_number, long type, long xv, long yv, long zv)
 {
 	
 }
 
-static void TriggerPlasmaBall(ITEM_INFO* item, long type, Vector3Int* pos1, short roomNumber, short angle)
+static void TriggerPlasmaBall(ITEM_INFO* item, long type, PHD_VECTOR* pos1, short roomNumber, short angle)
 {
 	
 }
@@ -89,35 +82,35 @@ static void ExplodeLondonBoss(ITEM_INFO* item)
 	
 }
 
-static void LondonBossDie(short itemNumber)
+static void LondonBossDie(short item_number)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	ITEM_INFO* item;
+	item = &g_Level.Items[item_number];
+	item->collidable = false;
+	item->hitPoints = -16384;
 
-	item->Collidable = false;
-	item->HitPoints = -16384;
+	KillItem(item_number);
+	DisableBaddieAI(item_number);
 
-	KillItem(itemNumber);
-	DisableEntityAI(itemNumber);
-
-	item->Flags |= ONESHOT;
+	item->flags |= ONESHOT;
 }
 
-void ControlLaserBolts(short itemNumber)
-{
-	
-}
-
-void ControlLondBossPlasmaBall(short fxNumber)
+void ControlLaserBolts(short item_number)
 {
 	
 }
 
-void InitialiseLondonBoss(short itemNumber)
+void ControlLondBossPlasmaBall(short fx_number)
 {
 	
 }
 
-void LondonBossControl(short itemNumber)
+void InitialiseLondonBoss(short item_number)
+{
+	
+}
+
+void LondonBossControl(short item_number)
 {
 	
 }
@@ -135,7 +128,7 @@ void S_DrawLondonBoss(ITEM_INFO* item)
 		/*code*/
 	}
 
-	if (item->HitPoints <= 0 && BossData.ExplodeCount == 0)
+	if (item->hitPoints <= 0 && BossData.ExplodeCount == 0)
 	{
 		/*code*/
 	}
