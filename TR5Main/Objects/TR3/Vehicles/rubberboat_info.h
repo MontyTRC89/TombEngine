@@ -1,13 +1,15 @@
 #pragma once
 
-struct RUBBER_BOAT_INFO
+struct RubberBoatInfo
 {
-	int boatTurn;
-	int leftFallspeed;
-	int rightFallspeed;
-	short tiltAngle;
-	short extraRotation;
-	int water;
-	int pitch;
-	short propRot;
+	int TurnRate;
+	short LeanAngle;
+	short PropellerRotation;
+	short ExtraRotation;
+
+	int LeftVerticalVelocity;
+	int RightVerticalVelocity;
+
+	int Water;
+	int Pitch;
 };

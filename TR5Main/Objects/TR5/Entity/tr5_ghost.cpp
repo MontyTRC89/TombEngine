@@ -6,112 +6,109 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
 BITE_INFO InvisibleGhostBite = { 0, 0, 0, 17 };
 
-void InitialiseInvisibleGhost(short itemNum)
+void InitialiseInvisibleGhost(short itemNumber)
 {
-    ITEM_INFO* item;
+	auto* item = &g_Level.Items[itemNumber];
 
-    item = &g_Level.Items[itemNum];
-    ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
-    item->pos.yPos += CLICK(2);
+	ClearItem(itemNumber);
+
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
+	item->Pose.Position.y += CLICK(2);
 }
 
 void InvisibleGhostControl(short itemNumber)
 {
-	if (CreatureActive(itemNumber))
+	if (!CreatureActive(itemNumber))
+		return;
+
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+
+	short angle = 0;
+	short joint0 = 0;
+	short joint2 = 0;
+	short joint1 = 0;
+		
+	if (item->AIBits)
+		GetAITarget(creature);
+	else if (creature->HurtByLara)
+		creature->Enemy = LaraItem;
+
+	AI_INFO AI;
+	CreatureAIInfo(item, &AI);
+
+	angle = CreatureTurn(item, creature->MaxTurn);
+	if (abs(AI.angle) >= ANGLE(3.0f))
 	{
-		short joint0 = 0;
-		short joint2 = 0;
-		short joint1 = 0;
-		short angle = 0;
-
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		
-		if (item->aiBits)
-		{
-			GetAITarget(creature);
-		}
-		else if (creature->hurtByLara)
-		{
-			creature->enemy = LaraItem;
-		}
-
-		AI_INFO info;
-		CreatureAIInfo(item,&info);
-
-		angle = CreatureTurn(item, creature->maximumTurn);
-		if (abs(info.angle) >= ANGLE(3))
-		{
-			if (info.angle > 0)
-				item->pos.yRot += ANGLE(3);
-			else
-				item->pos.yRot -= ANGLE(3);
-		}
+		if (AI.angle > 0)
+			item->Pose.Orientation.y += ANGLE(3.0f);
 		else
-		{
-			item->pos.yRot += info.angle;
-		}
-
-		if (info.ahead)
-		{
-			joint0 = info.angle / 2;
-			joint2 = info.angle / 2;
-			joint1 = info.xAngle;
-		}
-
-		creature->maximumTurn = 0;
-		
-		if (item->currentAnimState == 1)
-		{
-			creature->flags = 0;
-			if (info.distance < SQUARE(614))
-			{
-				if (GetRandomControl() & 1)
-					item->goalAnimState = 2;
-				else
-					item->goalAnimState = 3;
-			}
-		}
-		else if (item->currentAnimState > 1
-			&& item->currentAnimState <= 3
-			&& !creature->flags
-			&& item->touchBits & 0x9470
-			&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 18)
-		{
-			LaraItem->hitPoints -= 400;
-			LaraItem->hitStatus = true;
-			CreatureEffect2(item,&InvisibleGhostBite, 10, item->pos.yRot, DoBloodSplat);
-			creature->flags = 1;
-		}
-
-		CreatureJoint(item, 0, joint0);
-		CreatureJoint(item, 1, joint1);
-		CreatureJoint(item, 2, joint2);
-
-		if (info.distance >= SQUARE(1536))
-		{
-			item->afterDeath = 125;
-			item->itemFlags[0] = 0;
-		}
-		else
-		{
-			item->afterDeath = sqrt(info.distance) / 16;
-			if (item->itemFlags[0] == 0)
-			{
-				item->itemFlags[0] = 1;
-				SoundEffect(963,&item->pos, 0);
-			}
-		}
-
-		CreatureAnimation(itemNumber, angle, 0);
+			item->Pose.Orientation.y -= ANGLE(3.0f);
 	}
+	else
+		item->Pose.Orientation.y += AI.angle;
+
+	if (AI.ahead)
+	{
+		joint0 = AI.angle / 2;
+		joint2 = AI.angle / 2;
+		joint1 = AI.xAngle;
+	}
+
+	creature->MaxTurn = 0;
+		
+	if (item->Animation.ActiveState == 1)
+	{
+		creature->Flags = 0;
+
+		if (AI.distance < pow(614, 2))
+		{
+			if (GetRandomControl() & 1)
+				item->Animation.TargetState = 2;
+			else
+				item->Animation.TargetState = 3;
+		}
+	}
+	else if (item->Animation.ActiveState > 1 &&
+		item->Animation.ActiveState <= 3 &&
+		!creature->Flags &&
+		item->TouchBits & 0x9470 &&
+		item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
+	{
+		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+		creature->Flags = 1;
+
+		LaraItem->HitPoints -= 400;
+		LaraItem->HitStatus = true;
+	}
+
+	CreatureJoint(item, 0, joint0);
+	CreatureJoint(item, 1, joint1);
+	CreatureJoint(item, 2, joint2);
+
+	if (AI.distance >= pow(SECTOR(1.5f), 2))
+	{
+		item->AfterDeath = 125;
+		item->ItemFlags[0] = 0;
+	}
+	else
+	{
+		item->AfterDeath = sqrt(AI.distance) / 16;
+		if (item->ItemFlags[0] == 0)
+		{
+			item->ItemFlags[0] = 1;
+			SoundEffect(SFX_TR5_SKELETON_GHOST_APPEAR, &item->Pose, 0);
+		}
+	}
+
+	CreatureAnimation(itemNumber, angle, 0);
 }

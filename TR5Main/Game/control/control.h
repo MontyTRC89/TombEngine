@@ -7,22 +7,22 @@
 
 struct BOUNDING_BOX;
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 class FLOOR_INFO;
 struct ANIM_STRUCT;
 struct MESH_INFO;
 struct ROOM_INFO;
 
-enum class GAME_STATUS
+enum class GameStatus
 {
-	GAME_STATUS_NONE,
-	GAME_STATUS_NEW_GAME,
-	GAME_STATUS_LOAD_GAME,
-	GAME_STATUS_SAVE_GAME,
-	GAME_STATUS_EXIT_TO_TITLE,
-	GAME_STATUS_EXIT_GAME,
-	GAME_STATUS_LARA_DEAD,
-	GAME_STATUS_LEVEL_COMPLETED
+	None,
+	NewGame,
+	LoadGame,
+	SaveGame,
+	ExitToTitle,
+	ExitGame,
+	LaraDead,
+	LevelComplete
 };
 
 enum HEADINGS
@@ -74,9 +74,9 @@ extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 
 int DrawPhase();
 
-GAME_STATUS DoTitle(int index);
-GAME_STATUS DoLevel(int index, std::string ambient, bool loadFromSavegame);
-GAME_STATUS ControlPhase(int numFrames, int demoMode);
+GameStatus DoTitle(int index);
+GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame);
+GameStatus ControlPhase(int numFrames, int demoMode);
 
 int GetRandomControl();
 int GetRandomDraw();
@@ -84,17 +84,8 @@ int GetRandomDraw();
 void KillMoveItems();
 void KillMoveEffects();
 void UpdateShatters();
-int ExplodeItemNode(ITEM_INFO* item, int Node, int NoXZVel, int bits);
+bool ExplodeItemNode(ITEM_INFO* item, int node, int noXZVel, int bits);
 
 void CleanUp();
-
-void AlterFloorHeight(ITEM_INFO* item, int height);
-int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
-FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
-int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);	
-int GetWaterSurface(int x, int y, int z, short roomNumber);
-int GetWaterDepth(int x, int y, int z, short roomNumber);
-int GetWaterHeight(int x, int y, int z, short roomNumber);
-int GetDistanceToFloor(int itemNumber, bool precise = true);
 
 unsigned CALLBACK GameMain(void*);

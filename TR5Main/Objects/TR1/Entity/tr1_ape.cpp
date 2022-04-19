@@ -5,112 +5,116 @@
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO apeBite = { 0, -19, 75, 15 };
+BITE_INFO ApeBite = { 0, -19, 75, 15 };
 
 #define ATTACK_DAMAGE 200
 
 #define TOUCH (0xFF00)
 
-#define DIE_ANIM 7
-#define VAULT_ANIM 19
+#define RUN_TURN ANGLE(5.0f)
 
-#define RUN_TURN ANGLE(5)
+#define DISPLAY_ANGLE ANGLE(45.0f)
 
-#define DISPLAY_ANGLE ANGLE(45)
-
-#define ATTACK_RANGE SQUARE(430)
-#define PANIC_RANGE SQUARE(WALL_SIZE*2)
+#define ATTACK_RANGE pow(430, 2)
+#define PANIC_RANGE  pow(SECTOR(2), 2)
 
 #define JUMP_CHANCE 0xa0
-#define WARN1_CHANCE (JUMP_CHANCE + 0xA0)
-#define WARN2_CHANCE (WARN1_CHANCE + 0xA0)
-#define RUNLEFT_CHANCE (WARN2_CHANCE + 0x110)
-
-#define ATTACK_FLAG 1
-#define TURNL_FLAG 2
-#define TURNR_FLAG 4
+#define WARNING_1_CHANCE (JUMP_CHANCE + 0xA0)
+#define WARNING_2_CHANCE (WARNING_1_CHANCE + 0xA0)
+#define RUNLEFT_CHANCE   (WARNING_2_CHANCE + 0x110)
 
 #define SHIFT 75
 
-enum ape_anims {
-	APE_EMPTY, 
-	APE_STOP, 
-	APE_WALK, 
-	APE_RUN, 
-	APE_ATTACK1, 
-	APE_DEATH,
-	APE_WARNING, 
-	APE_WARNING2, 
-	APE_RUNLEFT, 
-	APE_RUNRIGHT, 
-	APE_JUMP, 
-	APE_VAULT
+enum ApeState
+{
+	APE_STATE_NONE = 0, 
+	APE_STATE_IDLE = 1,
+	APE_STATE_WALK = 2,
+	APE_STATE_RUN = 3,
+	APE_STATE_ATTACK = 4,
+	APE_STATE_DEATH = 5,
+	APE_STATE_WARNING_1 = 6,
+	APE_STATE_WARNING_2 = 7,
+	APE_STATE_RUN_LEFT = 8,
+	APE_STATE_RUN_RIGHT = 9,
+	APE_STATE_JUMP = 10,
+	APE_STATE_VAULT = 11
 };
 
-void ApeVault(short item_number, short angle)
+// TODO
+enum ApeAnim
 {
-	ITEM_INFO *item;
-	CREATURE_INFO *ape;
-	long long y, xx, yy, x_floor, y_floor;
-	short room_number;
+	APE_ANIM_DEATH = 7,
 
-	item = &g_Level.Items[item_number];
+	APE_ANIM_VAULT = 19,
+};
 
-	ape = (CREATURE_INFO *)item->data;
-	if (ape->flags & TURNL_FLAG)
+enum ApeFlags
+{
+	APE_FLAG_ATTACK = 1,
+	APE_FLAG_TURN_LEFT = 2,
+	APE_FLAG_TURN_RIGHT = 4
+};
+
+void ApeVault(short itemNumber, short angle)
+{
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+
+	if (creature->Flags & APE_FLAG_TURN_LEFT)
 	{
-		item->pos.yRot -= 0x4000;
-		ape->flags -= TURNL_FLAG;
+		item->Pose.Orientation.y -= ANGLE(90.0f);
+		creature->Flags -= APE_FLAG_TURN_LEFT;
 	}
-	else if (item->flags & TURNR_FLAG)
+	else if (item->Flags & APE_FLAG_TURN_RIGHT)
 	{
-		item->pos.yRot += 0x4000;
-		ape->flags -= TURNR_FLAG;
+		item->Pose.Orientation.y += ANGLE(90.0f);
+		creature->Flags -= APE_FLAG_TURN_RIGHT;
 	}
 
-	xx = item->pos.zPos / SECTOR(1);
-	yy = item->pos.xPos / SECTOR(1);
-	y = item->pos.yPos;
-	room_number = item->roomNumber;
+	long long xx = item->Pose.Position.z / SECTOR(1);
+	long long yy = item->Pose.Position.x / SECTOR(1);
+	long long y = item->Pose.Position.y;
 
-	CreatureAnimation(item_number, angle, 0);
+	CreatureAnimation(itemNumber, angle, 0);
 
-	if (item->pos.yPos > y - STEP_SIZE * 3 / 2)
+	if (item->Pose.Position.y > (y - CLICK(1.5f)))
 		return;
 
-	x_floor = item->pos.zPos / SECTOR(1);
-	y_floor = item->pos.xPos / SECTOR(1);
-	if (xx == x_floor)
+	long long xFloor = item->Pose.Position.z / SECTOR(1);
+	long long yFloor = item->Pose.Position.x / SECTOR(1);
+	if (xx == xFloor)
 	{
-		if (yy == y_floor)
+		if (yy == yFloor)
 			return;
 
-		if (yy < y_floor)
+		if (yy < yFloor)
 		{
-			item->pos.xPos = (y_floor * SECTOR(1)) - SHIFT;
-			item->pos.yRot = 0x4000;
+			item->Pose.Position.x = (yFloor * SECTOR(1)) - SHIFT;
+			item->Pose.Orientation.y = ANGLE(90.0f);
 		}
 		else
 		{
-			item->pos.xPos = (yy * SECTOR(1)) + SHIFT;
-			item->pos.yRot = -0x4000;
+			item->Pose.Position.x = (yy * SECTOR(1)) + SHIFT;
+			item->Pose.Orientation.y = -ANGLE(90.0f);
 		}
 	}
-	else if (yy == y_floor)
+	else if (yy == yFloor)
 	{
-		if (xx < x_floor)
+		if (xx < xFloor)
 		{
-			item->pos.zPos = (x_floor * SECTOR(1)) - SHIFT;
-			item->pos.yRot = 0;
+			item->Pose.Position.z = (xFloor * SECTOR(1)) - SHIFT;
+			item->Pose.Orientation.y = 0;
 		}
 		else
 		{
-			item->pos.zPos = (xx * SECTOR(1)) + SHIFT;
-			item->pos.yRot = -0x8000;
+			item->Pose.Position.z = (xx * SECTOR(1)) + SHIFT;
+			item->Pose.Orientation.y = -ANGLE(180.0f);
 		}
 	}
 	else
@@ -118,13 +122,13 @@ void ApeVault(short item_number, short angle)
 		// diagonal
 	}
 
-	switch (CreatureVault(item_number, angle, 2, SHIFT))
+	switch (CreatureVault(itemNumber, angle, 2, SHIFT))
 	{
 	case 2:
-		item->pos.yPos = y;
-		item->animNumber = Objects[ID_APE].animIndex + VAULT_ANIM;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->currentAnimState = APE_VAULT;
+		item->Pose.Position.y = y;
+		item->Animation.AnimNumber = Objects[ID_APE].animIndex + APE_ANIM_VAULT;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = APE_STATE_VAULT;
 		break;
 
 	default:
@@ -132,156 +136,162 @@ void ApeVault(short item_number, short angle)
 	}
 }
 
-void ApeControl(short itemNum)
+void ApeControl(short itemNumber)
 {
-	short head, angle, random;
-
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	AI_INFO info;
-	head = angle = 0;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creatureInfo = GetCreatureInfo(item);
 
-	if (item->hitPoints <= 0)
+	short head = 0;
+	short angle = 0;
+
+	if (item->HitPoints <= 0)
 	{
-		if (item->currentAnimState != APE_DEATH)
+		if (item->Animation.ActiveState != APE_STATE_DEATH)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + DIE_ANIM + (short)(GetRandomControl() / 0x4000);
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = APE_DEATH;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + APE_ANIM_DEATH + (short)(GetRandomControl() / 0x4000);
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = APE_STATE_DEATH;
 		}
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (info.ahead)
-			head = info.angle;
+		if (AI.ahead)
+			head = AI.angle;
 
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creatureInfo->MaxTurn);
 
-		if (item->hitStatus || info.distance < PANIC_RANGE)
-			creature->flags |= ATTACK_FLAG;
+		if (item->HitStatus || AI.distance < PANIC_RANGE)
+			creatureInfo->Flags |= APE_FLAG_ATTACK;
 
-		switch (item->currentAnimState)
+		short random;
+
+		switch (item->Animation.ActiveState)
 		{
-		case APE_STOP:
-			if (creature->flags & TURNL_FLAG)
+		case APE_STATE_IDLE:
+			if (creatureInfo->Flags & APE_FLAG_TURN_LEFT)
 			{
-				item->pos.yRot -= ANGLE(90);
-				creature->flags -= TURNL_FLAG;
+				item->Pose.Orientation.y -= ANGLE(90);
+				creatureInfo->Flags -= APE_FLAG_TURN_LEFT;
 			}
-			else if (item->flags & TURNR_FLAG)
+			else if (item->Flags & APE_FLAG_TURN_RIGHT)
 			{
-				item->pos.yRot += ANGLE(90);
-				creature->flags -= TURNR_FLAG;
+				item->Pose.Orientation.y += ANGLE(90);
+				creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 			}
 
-			if (item->requiredAnimState)
-				item->goalAnimState = item->requiredAnimState;
-			else if (info.bite && info.distance < ATTACK_RANGE)
-				item->goalAnimState = APE_ATTACK1;
-			else if (!(creature->flags & ATTACK_FLAG) &&
-				info.zoneNumber == info.enemyZone && info.ahead)
+			if (item->Animation.RequiredState)
+				item->Animation.TargetState = item->Animation.RequiredState;
+			else if (AI.bite && AI.distance < ATTACK_RANGE)
+				item->Animation.TargetState = APE_STATE_ATTACK;
+			else if (!(creatureInfo->Flags & APE_FLAG_ATTACK) &&
+				AI.zoneNumber == AI.enemyZone && AI.ahead)
 			{
 				random = (short)(GetRandomControl() / 32);
 				if (random < JUMP_CHANCE)
-					item->goalAnimState = APE_JUMP;
-				else if (random < WARN1_CHANCE)
-					item->goalAnimState = APE_WARNING;
-				else if (random < WARN2_CHANCE)
-					item->goalAnimState = APE_WARNING2;
+					item->Animation.TargetState = APE_STATE_JUMP;
+				else if (random < WARNING_1_CHANCE)
+					item->Animation.TargetState = APE_STATE_WARNING_1;
+				else if (random < WARNING_2_CHANCE)
+					item->Animation.TargetState = APE_STATE_WARNING_2;
 				else if (random < RUNLEFT_CHANCE)
 				{
-					item->goalAnimState = APE_RUNLEFT;
-					creature->maximumTurn = 0;
+					item->Animation.TargetState = APE_STATE_RUN_LEFT;
+					creatureInfo->MaxTurn = 0;
 				}
 				else
 				{
-					item->goalAnimState = APE_RUNRIGHT;
-					creature->maximumTurn = 0;
+					item->Animation.TargetState = APE_STATE_RUN_RIGHT;
+					creatureInfo->MaxTurn = 0;
 				}
 			}
 			else
-				item->goalAnimState = APE_RUN;
+				item->Animation.TargetState = APE_STATE_RUN;
+
 			break;
 
-		case APE_RUN:
-			creature->maximumTurn = RUN_TURN;
+		case APE_STATE_RUN:
+			creatureInfo->MaxTurn = RUN_TURN;
 
-			if (creature->flags == 0 && info.angle > -DISPLAY_ANGLE && info.angle < DISPLAY_ANGLE)
-				item->goalAnimState = APE_STOP;
-			else if (info.ahead && (item->touchBits & TOUCH))
+			if (creatureInfo->Flags == 0 &&
+				AI.angle > -DISPLAY_ANGLE &&
+				AI.angle < DISPLAY_ANGLE)
 			{
-				item->requiredAnimState = APE_ATTACK1;
-				item->goalAnimState = APE_STOP;
+				item->Animation.TargetState = APE_STATE_IDLE;
 			}
-			else if (creature->mood != ESCAPE_MOOD)
+			else if (AI.ahead && item->TouchBits & TOUCH)
+			{
+				item->Animation.RequiredState = APE_STATE_ATTACK;
+				item->Animation.TargetState = APE_STATE_IDLE;
+			}
+			else if (creatureInfo->Mood != MoodType::Escape)
 			{
 				random = (short)GetRandomControl();
 				if (random < JUMP_CHANCE)
 				{
-					item->requiredAnimState = APE_JUMP;
-					item->goalAnimState = APE_STOP;
+					item->Animation.RequiredState = APE_STATE_JUMP;
+					item->Animation.TargetState = APE_STATE_IDLE;
 				}
-				else if (random < WARN1_CHANCE)
+				else if (random < WARNING_1_CHANCE)
 				{
-					item->requiredAnimState = APE_WARNING;
-					item->goalAnimState = APE_STOP;
+					item->Animation.RequiredState = APE_STATE_WARNING_1;
+					item->Animation.TargetState = APE_STATE_IDLE;
 				}
-				else if (random < WARN2_CHANCE)
+				else if (random < WARNING_2_CHANCE)
 				{
-					item->requiredAnimState = APE_WARNING2;
-					item->goalAnimState = APE_STOP;
+					item->Animation.RequiredState = APE_STATE_WARNING_2;
+					item->Animation.TargetState = APE_STATE_IDLE;
 				}
 			}
+
 			break;
 
-		case APE_RUNLEFT:
-			if (!(creature->flags & TURNR_FLAG))
+		case APE_STATE_RUN_LEFT:
+			if (!(creatureInfo->Flags & APE_FLAG_TURN_RIGHT))
 			{
-				item->pos.yRot -= ANGLE(90);
-				creature->flags |= TURNR_FLAG;
+				item->Pose.Orientation.y -= ANGLE(90);
+				creatureInfo->Flags |= APE_FLAG_TURN_RIGHT;
 			}
 
-			item->goalAnimState = APE_STOP;
+			item->Animation.TargetState = APE_STATE_IDLE;
 			break;
 
-		case APE_RUNRIGHT:
-			if (!(creature->flags & TURNL_FLAG))
+		case APE_STATE_RUN_RIGHT:
+			if (!(creatureInfo->Flags & APE_FLAG_TURN_LEFT))
 			{
-				item->pos.yRot += ANGLE(90);
-				creature->flags |= TURNL_FLAG;
+				item->Pose.Orientation.y += ANGLE(90);
+				creatureInfo->Flags |= APE_FLAG_TURN_LEFT;
 			}
 
-			item->goalAnimState = APE_STOP;
+			item->Animation.TargetState = APE_STATE_IDLE;
 			break;
 
-		case APE_ATTACK1:
-			if (!item->requiredAnimState && (item->touchBits & TOUCH))
+		case APE_STATE_ATTACK:
+			if (!item->Animation.RequiredState && item->TouchBits & TOUCH)
 			{
-				CreatureEffect(item, &apeBite, DoBloodSplat);
+				CreatureEffect(item, &ApeBite, DoBloodSplat);
+				item->Animation.RequiredState = APE_STATE_IDLE;
 
-				LaraItem->hitPoints -= ATTACK_DAMAGE;
-				LaraItem->hitStatus = true;
-
-				item->requiredAnimState = APE_STOP;
+				LaraItem->HitPoints -= ATTACK_DAMAGE;
+				LaraItem->HitStatus = true;
 			}
+
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, head);
 
-	if (item->currentAnimState != APE_VAULT)
-	{
-		ApeVault(itemNum, angle);
-	}
+	if (item->Animation.ActiveState != APE_STATE_VAULT)
+		ApeVault(itemNumber, angle);
 	else
-		CreatureAnimation(itemNum, angle, 0);
+		CreatureAnimation(itemNumber, angle, 0);
 }

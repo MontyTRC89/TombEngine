@@ -1,8 +1,9 @@
 #pragma once
 #include "Specific/phd_global.h"
 
+enum class LaraWeaponType;
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 enum RIPPLE_TYPE
 {
@@ -190,11 +191,11 @@ extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 extern SPARKS Sparks[MAX_SPARKS];
 extern SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
-extern int SmokeWeapon;
+extern LaraWeaponType SmokeWeapon;
 extern byte SmokeCountL;
 extern byte SmokeCountR;
 extern int SplashCount;
-extern PHD_VECTOR NodeVectors[MAX_NODE];
+extern Vector3Int NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
@@ -202,7 +203,7 @@ extern FX_INFO EffectList[NUM_EFFECTS];
 void DetatchSpark(int num, SpriteEnumFlag type);
 int GetFreeSpark();
 void UpdateSparks();
-void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num, int unk);
+void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);

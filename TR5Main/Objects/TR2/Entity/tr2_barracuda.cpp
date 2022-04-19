@@ -6,101 +6,119 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO barracudaBite = { 2, -60, 121, 7 };
+BITE_INFO BarracudaBite = { 2, -60, 121, 7 };
 
-void BarracudaControl(short itemNum)
+// TODO
+enum BarracudaState
 {
-	if (!CreatureActive(itemNum))
+
+};
+
+// TODO
+enum BarracudaAnim
+{
+
+};
+
+void BarracudaControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNum];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+
 	short angle = 0;
 	short head = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->currentAnimState != 6)
+		if (item->Animation.ActiveState != 6)
 		{
-			item->animNumber = Objects[ID_BARRACUDA].animIndex + 6;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 6;
+			item->Animation.AnimNumber = Objects[ID_BARRACUDA].animIndex + 6;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 6;
 		}
 
-		CreatureFloat(itemNum);
+		CreatureFloat(itemNumber);
 		return;
 	}
 	else
 	{
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
-		switch (item->currentAnimState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			creature->flags = 0;
+			creature->Flags = 0;
 
-			if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 2;
-			else if (info.ahead && info.distance < 680)
-				item->goalAnimState = 4;
-			else if (creature->mood == STALK_MOOD)
-				item->goalAnimState = 2;
+			if (creature->Mood == MoodType::Bored)
+				item->Animation.TargetState = 2;
+			else if (AI.ahead && AI.distance < 680)
+				item->Animation.TargetState = 4;
+			else if (creature->Mood == MoodType::Stalk)
+				item->Animation.TargetState = 2;
 			else
-				item->goalAnimState = 3;
+				item->Animation.TargetState = 3;
+
 			break;
 
 		case 2:
-			creature->maximumTurn = ANGLE(2);
+			creature->MaxTurn = ANGLE(2.0f);
 
-			if (creature->mood == BORED_MOOD)
+			if (creature->Mood == MoodType::Bored)
 				break;
-			else if (info.ahead && (item->touchBits & 0xE0))
-				item->goalAnimState = 1;
-			else if (creature->mood != STALK_MOOD)
-				item->goalAnimState = 3;
+			else if (AI.ahead && (item->TouchBits & 0xE0))
+				item->Animation.TargetState = 1;
+			else if (creature->Mood != MoodType::Stalk)
+				item->Animation.TargetState = 3;
+
 			break;
 
 		case 3:
-			creature->maximumTurn = ANGLE(4);
-			creature->flags = 0;
+			creature->MaxTurn = ANGLE(4.0f);
+			creature->Flags = 0;
 
-			if (creature->mood == BORED_MOOD)
-				item->goalAnimState = 2;
-			else if (info.ahead && info.distance < 340)
-				item->goalAnimState = 5;
-			else if (info.ahead && info.distance < 680)
-				item->goalAnimState = 1;
-			else if (creature->mood == STALK_MOOD)
-				item->goalAnimState = 2;
+			if (creature->Mood == MoodType::Bored)
+				item->Animation.TargetState = 2;
+			else if (AI.ahead && AI.distance < 340)
+				item->Animation.TargetState = 5;
+			else if (AI.ahead && AI.distance < 680)
+				item->Animation.TargetState = 1;
+			else if (creature->Mood == MoodType::Stalk)
+				item->Animation.TargetState = 2;
+
 			break;
 
 		case 4:
 		case 5:
-			if (info.ahead)
-				head = info.angle;
+			if (AI.ahead)
+				head = AI.angle;
 
-			if (!creature->flags && (item->touchBits & 0xE0))
+			if (!creature->Flags && (item->TouchBits & 0xE0))
 			{
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = true;
-				CreatureEffect(item, &barracudaBite, DoBloodSplat);
+				CreatureEffect(item, &BarracudaBite, DoBloodSplat);
+				creature->Flags = 1;
 
-				creature->flags = 1;
+				LaraItem->HitPoints -= 100;
+				LaraItem->HitStatus = true;
 			}
+
 			break;
 		}
 	}
 
 	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNum, angle, 0);
-	CreatureUnderwater(item, STEP_SIZE);
+	CreatureAnimation(itemNumber, angle, 0);
+	CreatureUnderwater(item, CLICK(1));
 }

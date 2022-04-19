@@ -43,7 +43,7 @@ namespace TEN {
 				return SparkParticles[0];
 			}
 
-			void TriggerFlareSparkParticles(PHD_VECTOR* pos, PHD_VECTOR* vel, CVECTOR* color,int room)
+			void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int room)
 			{
 				SparkParticle& s = getFreeSparkParticle();
 				s = {};
@@ -63,7 +63,7 @@ namespace TEN {
 				s.active = true;
 			}
 
-			void TriggerRicochetSpark(GAME_VECTOR* pos, short angle, int num)
+			void TriggerRicochetSpark(GameVector* pos, short angle, int num)
 			{
 				for (int i = 0; i < num; i++) {
 					SparkParticle& s = getFreeSparkParticle();

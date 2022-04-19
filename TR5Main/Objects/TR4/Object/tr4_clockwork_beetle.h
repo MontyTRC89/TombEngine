@@ -1,4 +1,4 @@
 #pragma once
 
-void ClockworkBeetleControl(short item_number);
+void ClockworkBeetleControl(short itemNumber);
 void UseClockworkBeetle(short flag);

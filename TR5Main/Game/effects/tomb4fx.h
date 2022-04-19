@@ -3,6 +3,7 @@
 #include "Game/Lara/lara_struct.h"
 #include "Specific/phd_global.h"
 
+enum class LaraWeaponType;
 struct ITEM_INFO;
 
 struct SMOKE_SPARKS
@@ -198,7 +199,7 @@ extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
-void TriggerExplosionBubble(int x, int y, int z, short roomNum);
+void TriggerExplosionBubble(int x, int y, int z, short roomNumber);
 int GetFreeFireSpark();
 void TriggerGlobalStaticFlame();
 void TriggerGlobalFireSmoke();
@@ -209,14 +210,14 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
 void UpdateSmoke();
-byte TriggerGunSmoke_SubFunction(int weaponType);
-void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, int weaponType, byte count);
+byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType);
+void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count);
 void TriggerShatterSmoke(int x, int y, int z);
 int GetFreeBlood();
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void UpdateBlood();
 int GetFreeGunshell();
-void TriggerGunShell(short hand, short objNum, LARA_WEAPON_TYPE weaponType);
+void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 int GetFreeBubble();
@@ -235,5 +236,5 @@ int GetFreeShockwave();
 void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel);
 void UpdateShockwaves();
-void TriggerSmallSplash(int x, int y, int z, int num);
-void SetFadeClip(short height, short speed);
+void TriggerSmallSplash(int x, int y, int z, int number);
+void SetFadeClip(short height, int velocity);

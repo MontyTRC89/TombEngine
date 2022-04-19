@@ -9,7 +9,18 @@
 
 enum GAME_OBJECT_ID : short;
 
+// used by fx->shade !
+#define RGB555(r, g, b) ((r << 7) & 0x7C00 | (g << 2) & 0x3E0 | (b >> 3) & 0x1F)
+#define WHITE555 RGB555(255, 255, 255)
+#define GRAY555  RGB555(128, 128, 128)
+#define BLACK555 RGB555(  0,   0,   0)
+
 constexpr unsigned int NO_MESH_BITS = UINT_MAX;
+
+constexpr auto NO_ITEM = -1;
+constexpr auto ALL_MESHBITS = -1;
+constexpr auto NOT_TARGETABLE = -16384;
+constexpr auto NUM_ITEMS = 1024;
 
 enum AIObjectType
 {
@@ -40,80 +51,77 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-struct ITEM_INFO
+struct EntityAnimationData
 {
-	int floor;
-	uint32_t touchBits;
-	uint32_t meshBits;
-	GAME_OBJECT_ID objectNumber;
-	int currentAnimState;
-	int goalAnimState;
-	int requiredAnimState;
-	int animNumber;
-	int frameNumber;
-	std::vector<BONE_MUTATOR> mutator;
-	short roomNumber;
-	ROOM_VECTOR location;
-	short nextItem;
-	short nextActive;
-	short speed;
-	short fallspeed;
-	short hitPoints;
-	int boxNumber;
-	short timer;
-	uint16_t flags; // ItemFlags enum
-	short shade;
-	short triggerFlags;
-	short carriedItem;
-	short afterDeath;
-	short firedWeapon;
-	short itemFlags[8];
-	ITEM_DATA data;
-	PHD_3DPOS pos;
-	bool active;
-	short status; // ItemStatus enum
-	bool gravityStatus;
-	bool hitStatus;
-	bool collidable;
-	bool lookedAt;
-	bool poisoned;
-	uint8_t aiBits; // AIObjectType enum
-	bool inDrawRoom;
-	bool friendly;
-	uint32_t swapMeshFlags;
-	short drawRoom;
-	short TOSSPAD;
-	PHD_3DPOS startPos;
-	short locationAI;
-	std::string luaName;
+	int AnimNumber;
+	int FrameNumber;
+	int ActiveState;
+	int TargetState;
+	int RequiredState; // TODO: Phase out this weird feature.
+
+	bool Airborne;
+	int Velocity;
+	int VerticalVelocity;
+	int LateralVelocity;
+	std::vector<BONE_MUTATOR> Mutator;
 };
 
-// used by fx->shade !
-#define RGB555(r, g, b) ((r << 7) & 0x7C00 | (g << 2) & 0x3E0 | (b >> 3) & 0x1F)
-#define WHITE555 RGB555(255, 255, 255)
-#define GRAY555  RGB555(128, 128, 128)
-#define BLACK555 RGB555(  0,   0,   0)
+struct ITEM_INFO
+{
+	std::string LuaName;
+	GAME_OBJECT_ID ObjectNumber;
+	int Status;	// ItemStatus enum.
+	bool Active;
+	short NextItem;
+	short NextActive;
 
-constexpr auto NO_ITEM = -1;
-constexpr auto ALL_MESHBITS = -1;
-constexpr auto NOT_TARGETABLE = -16384;
-constexpr auto NUM_ITEMS = 1024;
+	ITEM_DATA Data;
+	EntityAnimationData Animation;
+	PHD_3DPOS Pose;
+	PHD_3DPOS StartPose;
+	int Floor;
+
+	int HitPoints;
+	bool HitStatus;
+	bool LookedAt;
+	bool Collidable;
+	bool InDrawRoom;
+
+	ROOM_VECTOR Location;
+	short RoomNumber;
+	int BoxNumber;
+	int Timer;
+	short Shade;
+
+	uint32_t TouchBits;
+	uint32_t MeshBits;
+
+	uint16_t Flags; // ItemFlags enum
+	short ItemFlags[8];
+	short TriggerFlags;
+	uint32_t SwapMeshFlags;
+
+	// TODO: Move to CreatureInfo?
+	uint8_t AIBits; // AIObjectType enum.
+	short AfterDeath;
+	short CarriedItem;
+};
 
 void EffectNewRoom(short fxNumber, short roomNumber);
-void ItemNewRoom(short itemNum, short roomNumber);
+void ItemNewRoom(short itemNumber, short roomNumber);
 void AddActiveItem(short itemNumber);
-void ClearItem(short itemNum);
+void ClearItem(short itemNumber);
 short CreateItem();
 void RemoveAllItemsInRoom(short roomNumber, short objectNumber);
-void RemoveActiveItem(short itemNum);
-void RemoveDrawnItem(short itemNum);
-void InitialiseFXArray(int allocmem);
-short CreateNewEffect(short roomNum);
+void RemoveActiveItem(short itemNumber);
+void RemoveDrawnItem(short itemNumber);
+void InitialiseFXArray(int allocateMemory);
+short CreateNewEffect(short roomNumber);
 void KillEffect(short fxNumber);
-void InitialiseItem(short itemNum);
-void InitialiseItemArray(int numItems);
-void KillItem(short itemNum);
-void UpdateItemRoom(ITEM_INFO* item, int height);
+void InitialiseItem(short itemNumber);
+void InitialiseItemArray(int totalItems);
+void KillItem(short itemNumber);
+void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset = 0, int zOffset = 0);
 std::vector<int> FindAllItems(short objectNumber);
-ITEM_INFO* FindItem(int object_number);
+ITEM_INFO* FindItem(int objectNumber);
 int FindItem(ITEM_INFO* item);

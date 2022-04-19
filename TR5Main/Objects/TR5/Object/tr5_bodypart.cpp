@@ -4,19 +4,20 @@
 #include "Specific/trmath.h"
 #include "Sound/sound.h"
 #include "tr5_missile.h"
-#include "Game/control/control.h"
+#include "Game/collision/collide_room.h"
 #include "Game/items.h"
+
 void ControlBodyPart(short fxNumber)
 {
 	FX_INFO* fx = &EffectList[fxNumber];
-	int x = fx->pos.xPos;
-	int y = fx->pos.yPos;
-	int z = fx->pos.zPos;
+	int x = fx->pos.Position.x;
+	int y = fx->pos.Position.y;
+	int z = fx->pos.Position.z;
 
 	if (fx->counter <= 0)
 	{
 		if (fx->speed)
-			fx->pos.xRot += 4 * fx->fallspeed;
+			fx->pos.Orientation.x += 4 * fx->fallspeed;
 		fx->fallspeed += 6;
 	}
 	else
@@ -25,43 +26,43 @@ void ControlBodyPart(short fxNumber)
 		int random = modulus <= 1 ? 0 : 2 * GetRandomControl() % modulus;
 		if (fxNumber & 1)
 		{
-			fx->pos.zRot -= random;
-			fx->pos.xRot += random;
+			fx->pos.Orientation.z -= random;
+			fx->pos.Orientation.x += random;
 		}
 		else
 		{
-			fx->pos.zRot += random;
-			fx->pos.xRot -= random;
+			fx->pos.Orientation.z += random;
+			fx->pos.Orientation.x -= random;
 		}
 		if (--fx->counter < 8)
 			fx->fallspeed += 2;
 	}
 
-	fx->pos.xPos += fx->speed * phd_sin(fx->pos.yRot);
-	fx->pos.yPos += fx->fallspeed;
-	fx->pos.zPos += fx->speed * phd_cos(fx->pos.yRot);
+	fx->pos.Position.x += fx->speed * phd_sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->fallspeed;
+	fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
 
 	short roomNumber = fx->roomNumber;
-	FLOOR_INFO* floor = GetFloor(fx->pos.xPos, fx->pos.yPos, fx->pos.zPos,&roomNumber);
+	FLOOR_INFO* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
 
 	if (!fx->counter)
 	{
-		int ceiling = GetCeiling(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-		if (fx->pos.yPos < ceiling)
+		int ceiling = GetCeiling(floor, fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+		if (fx->pos.Position.y < ceiling)
 		{
-			fx->pos.yPos = ceiling;
+			fx->pos.Position.y = ceiling;
 			fx->fallspeed = -fx->fallspeed;
 			fx->speed -= (fx->speed / 8);
 		}
 
-		int height = GetFloorHeight(floor, fx->pos.xPos, fx->pos.yPos, fx->pos.zPos);
-		if (fx->pos.yPos >= height)
+		int height = GetFloorHeight(floor, fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
+		if (fx->pos.Position.y >= height)
 		{
 			if (fx->flag2 & 1)
 			{
-				fx->pos.xPos = x;
-				fx->pos.yPos = y;
-				fx->pos.zPos = z;
+				fx->pos.Position.x = x;
+				fx->pos.Position.y = y;
+				fx->pos.Position.z = z;
 
 				if (fx->flag2 & 0x200)
 					ExplodeFX(fx, -2, 32);
@@ -83,15 +84,15 @@ void ControlBodyPart(short fxNumber)
 			}
 			else
 			{
-				fx->pos.yRot += -ANGLE(180);
-				fx->pos.xPos = x;
-				fx->pos.zPos = z;
+				fx->pos.Orientation.y += -ANGLE(180);
+				fx->pos.Position.x = x;
+				fx->pos.Position.z = z;
 			}
 
 			fx->speed -= (fx->speed / 4);
 			if (abs(fx->speed) < 4)
 				fx->speed = 0;
-			fx->pos.yPos = y;
+			fx->pos.Position.y = y;
 		}
 
 		if (!fx->speed && ++fx->flag1 > 32)
@@ -103,9 +104,9 @@ void ControlBodyPart(short fxNumber)
 		if (fx->flag2 & 2 && (GetRandomControl() & 1))
 		{
 			DoBloodSplat(
-				(GetRandomControl() & 0x3F) + fx->pos.xPos - 32,
-				(GetRandomControl() & 0x1F) + fx->pos.yPos - 16,
-				(GetRandomControl() & 0x3F) + fx->pos.zPos - 32,
+				(GetRandomControl() & 0x3F) + fx->pos.Position.x - 32,
+				(GetRandomControl() & 0x1F) + fx->pos.Position.y - 16,
+				(GetRandomControl() & 0x3F) + fx->pos.Position.z - 32,
 				1,
 				2 * GetRandomControl(),
 				fx->roomNumber);

@@ -6,6 +6,7 @@
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/pickup/pickup.h"
 #include "Renderer/Renderer11.h"
@@ -15,7 +16,7 @@ using namespace TEN::Renderer;
 short PickupX;
 short PickupY;
 short CurrentPickup;
-DISPLAY_PICKUP Pickups[MAX_COLLECTED_PICKUPS];
+DisplayPickup Pickups[MAX_COLLECTED_PICKUPS];
 short PickupVel;
 int OldHitPoints = LARA_HEALTH_MAX;
 int HealthBarTimer = 40;
@@ -30,42 +31,48 @@ extern RendererHUDBar* g_AirBar;
 
 bool EnableSmoothHealthBar = true;
 
-void DrawHealthBarOverlay(int value)
+void DrawHealthBarOverlay(ITEM_INFO* item, int value)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (CurrentLevel)
 	{
 		int color2 = 0;
-		if (Lara.poisoned)
+		if (lara->PoisonPotency)
 			color2 = 0xA0A000;
 		else
 			color2 = 0xA00000;
 
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->PoisonPotency);
 	}
 }
 
-void DrawHealthBar(float value)
+void DrawHealthBar(ITEM_INFO* item, float value)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.poisoned);
+		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->PoisonPotency);
 }
 
 void UpdateHealthBar(ITEM_INFO* item, int flash)
 {
-	auto hitPoints = item->hitPoints;
+	auto* lara = GetLaraInfo(item);
 
-	if (hitPoints < 0)
-		hitPoints = 0;
-	else if (hitPoints > LARA_HEALTH_MAX)
-		hitPoints = LARA_HEALTH_MAX;
+	auto HitPoints = item->HitPoints;
+
+	if (HitPoints < 0)
+		HitPoints = 0;
+	else if (HitPoints > LARA_HEALTH_MAX)
+		HitPoints = LARA_HEALTH_MAX;
 
 	// OPT: smoothly transition health bar display.
 	if (EnableSmoothHealthBar)
 	{
-		if (OldHitPoints != hitPoints)
+		if (OldHitPoints != HitPoints)
 		{
-			MutateAmount += OldHitPoints - hitPoints;
-			OldHitPoints = hitPoints;
+			MutateAmount += OldHitPoints - HitPoints;
+			OldHitPoints = HitPoints;
 			HealthBarTimer = 40;
 		}
 
@@ -80,17 +87,17 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 		if (MutateAmount > -0.5f && MutateAmount < 0.5f)
 		{
 			MutateAmount = 0;
-			HealthBar = hitPoints;
+			HealthBar = HitPoints;
 		}
 	}
 
 	// OG: discretely transition health bar display.
 	else
 	{
-		if (OldHitPoints != hitPoints)
+		if (OldHitPoints != HitPoints)
 		{
-			OldHitPoints = hitPoints;
-			HealthBar = hitPoints;
+			OldHitPoints = HitPoints;
+			HealthBar = HitPoints;
 			HealthBarTimer = 40;
 		}
 	}
@@ -104,27 +111,27 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 		if (!BinocularRange)
 		{
 			if (flash)
-				DrawHealthBar(HealthBar / LARA_HEALTH_MAX);
+				DrawHealthBar(item, HealthBar / LARA_HEALTH_MAX);
 			else
-				DrawHealthBar(0);
+				DrawHealthBar(item, 0);
 		}
 		else
 		{
 			if (flash)
-				DrawHealthBarOverlay(HealthBar / LARA_HEALTH_MAX);
+				DrawHealthBarOverlay(item, HealthBar / LARA_HEALTH_MAX);
 			else
-				DrawHealthBarOverlay(0);
+				DrawHealthBarOverlay(item, 0);
 		}
 	}
-	else if (HealthBarTimer > 0 ||
-		HealthBar <= 0 ||
-		Lara.gunStatus == LG_READY && Lara.gunType != WEAPON_TORCH ||
-		Lara.poisoned >= 256)
+	else if (HealthBarTimer > 0 || HealthBar <= 0 ||
+		lara->Control.HandStatus == HandStatus::WeaponReady &&
+		lara->Control.Weapon.GunType != LaraWeaponType::Torch ||
+		lara->PoisonPotency)
 	{
 		if (!BinocularRange)
-			DrawHealthBar(HealthBar / LARA_HEALTH_MAX);
+			DrawHealthBar(item, HealthBar / LARA_HEALTH_MAX);
 		else
-			DrawHealthBarOverlay(HealthBar / LARA_HEALTH_MAX);
+			DrawHealthBarOverlay(item, HealthBar / LARA_HEALTH_MAX);
 	}
 
 	if (PoisonFlag)
@@ -139,23 +146,26 @@ void DrawAirBar(float value)
 
 void UpdateAirBar(ITEM_INFO* item, int flash)
 {
-	if (Lara.air == LARA_AIR_MAX || item->hitPoints <= 0)
+	auto* lara = GetLaraInfo(item);
+
+	if (lara->Air == LARA_AIR_MAX || item->HitPoints <= 0)
 		return;
 
-	if (Lara.Vehicle == NO_ITEM ||
-		g_Level.Items[Lara.Vehicle].objectNumber != ID_UPV)
+	if (lara->Vehicle == NO_ITEM ||
+		g_Level.Items[lara->Vehicle].ObjectNumber != ID_UPV)
 	{
-		if (Lara.waterStatus != LW_UNDERWATER &&
-			Lara.waterStatus != LW_SURFACE &&
-			!(TestLaraSwamp(item) && Lara.waterSurfaceDist < -(STOP_SIZE + STEP_SIZE - 1)))
+		if (lara->Control.WaterStatus != WaterStatus::Underwater &&
+			lara->Control.WaterStatus != WaterStatus::TreadWater &&
+			!(TestEnvironment(ENV_FLAG_SWAMP, item) && lara->WaterSurfaceDist < -(CLICK(3) - 1)))
 			return;
 	}
 
-	int air = Lara.air;
+	int air = lara->Air;
 	if (air < 0)
 		air = 0;
 	else if (air > LARA_AIR_MAX)
 		air = LARA_AIR_MAX;
+
 	if (air <= (LARA_AIR_MAX / 4))
 	{
 		if (flash)
@@ -173,24 +183,26 @@ void DrawSprintBar(float value)
 		g_Renderer.drawBar(value, ::g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
 }
 
-void UpdateSprintBar()
+void UpdateSprintBar(ITEM_INFO* item)
 {
-	if (Lara.sprintTimer < LARA_SPRINT_MAX)
-		DrawSprintBar(Lara.sprintTimer / LARA_SPRINT_MAX);
+	auto* lara = GetLaraInfo(item);
+
+	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX)
+		DrawSprintBar(lara->SprintEnergy / LARA_SPRINT_ENERGY_MAX);
 }
 
 void DrawAllPickups()
 {
-	DISPLAY_PICKUP* pickup = &Pickups[CurrentPickup];
+	auto* pickup = &Pickups[CurrentPickup];
 
-	if (pickup->life > 0)
+	if (pickup->Life > 0)
 	{
 		if (PickupX > 0)
 			PickupX += -PickupX >> 3;
 		else
-			pickup->life--;
+			pickup->Life--;
 	}
-	else if (pickup->life == 0)
+	else if (pickup->Life == 0)
 	{
 		if (PickupX < 128)
 		{
@@ -201,7 +213,7 @@ void DrawAllPickups()
 		}
 		else
 		{
-			pickup->life = -1;
+			pickup->Life = -1;
 			PickupVel = 0;
 		}
 	}
@@ -210,7 +222,7 @@ void DrawAllPickups()
 		int i;
 		for (i = 0; i < MAX_COLLECTED_PICKUPS; i++)
 		{
-			if (Pickups[CurrentPickup].life > 0)
+			if (Pickups[CurrentPickup].Life > 0)
 				break;
 
 			CurrentPickup++;
@@ -220,40 +232,38 @@ void DrawAllPickups()
 		if (i == MAX_COLLECTED_PICKUPS)
 		{
 			CurrentPickup = 0;
-
 			return;
 		}
 	}
 
-	g_Renderer.drawPickup(Pickups[CurrentPickup].objectNumber);
+	g_Renderer.drawPickup(Pickups[CurrentPickup].ObjectNumber);
 }
 
 
 void AddDisplayPickup(GAME_OBJECT_ID objectNumber)
 {
-	DISPLAY_PICKUP* pickup = Pickups;
+	auto* pickup = Pickups;
 
 	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
 	{
-		if (pickup->life < 0)
+		if (pickup->Life < 0)
 		{
-			pickup->life = 45;
-			pickup->objectNumber = objectNumber;
-
+			pickup->Life = 45;
+			pickup->ObjectNumber = objectNumber;
 			break;
 		}
 
 		pickup++;
 	}
 
-	// No free slot found, so just pickup the object ithout displaying it
+	// No free slot found; pickup the object without displaying it.
 	PickedUpObject(objectNumber, 0);
 }
 
 void InitialisePickupDisplay()
 {
 	for (int i = 0; i < MAX_COLLECTED_PICKUPS; i++)
-		Pickups[i].life = -1;
+		Pickups[i].Life = -1;
 
 	PickupX = 128;
 	PickupY = 128;

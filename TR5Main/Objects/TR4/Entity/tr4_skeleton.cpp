@@ -15,26 +15,24 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
+#include "Game/misc.h"
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO skeletonBite = { 0, -16, 200, 11 };
+	BITE_INFO SkeletonBite = { 0, -16, 200, 11 };
 
 	void TriggerRiseEffect(ITEM_INFO* item)
 	{
-		short fxNum = CreateNewEffect(item->roomNumber);
-		if (fxNum != NO_ITEM)
+		short fxNumber = CreateNewEffect(item->RoomNumber);
+		if (fxNumber != NO_ITEM)
 		{
-			FX_INFO* fx = &EffectList[fxNum];
+			auto* fx = &EffectList[fxNumber];
 
-			short roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-
-			fx->pos.xPos = (byte)GetRandomControl() + item->pos.xPos - 128;
-			fx->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			fx->pos.zPos = (byte)GetRandomControl() + item->pos.zPos - 128;
-			fx->roomNumber = item->roomNumber;
-			fx->pos.yRot = 2 * GetRandomControl();
+			fx->pos.Position.x = (byte)GetRandomControl() + item->Pose.Position.x - 128;
+			fx->pos.Position.y = GetCollision(item).Position.Floor;
+			fx->pos.Position.z = (byte)GetRandomControl() + item->Pose.Position.z - 128;
+			fx->roomNumber = item->RoomNumber;
+			fx->pos.Orientation.y = 2 * GetRandomControl();
 			fx->speed = GetRandomControl() / 2048;
 			fx->fallspeed = -(GetRandomControl() / 1024);
 			fx->frameNumber = Objects[103].meshIndex;
@@ -42,7 +40,7 @@ namespace TEN::Entities::TR4
 			fx->shade = 0x4210;
 			fx->flag2 = 0x601;
 
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
 			spark->on = 1;
 			spark->sR = 0;
 			spark->sG = 0;
@@ -53,24 +51,22 @@ namespace TEN::Entities::TR4
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
 			spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
-			spark->x = fx->pos.xPos;
-			spark->y = fx->pos.yPos;
-			spark->z = fx->pos.zPos;
-			spark->xVel = phd_sin(fx->pos.yRot) * 4096;
+			spark->x = fx->pos.Position.x;
+			spark->y = fx->pos.Position.y;
+			spark->z = fx->pos.Position.z;
+			spark->xVel = phd_sin(fx->pos.Orientation.y) * 4096;
 			spark->yVel = 0;
-			spark->zVel = phd_cos(fx->pos.yRot) * 4096;
+			spark->zVel = phd_cos(fx->pos.Orientation.y) * 4096;
 			spark->transType = TransTypeEnum::COLADD;
 			spark->friction = 68;
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;
+
 			if (GetRandomControl() & 1)
-			{
 				spark->rotAdd = -16 - (GetRandomControl() & 0xF);
-			}
 			else
-			{
 				spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-			}
+
 			spark->gravity = -4 - (GetRandomControl() & 3);
 			spark->scalar = 3;
 			spark->maxYvel = -4 - (GetRandomControl() & 3);
@@ -81,39 +77,39 @@ namespace TEN::Entities::TR4
 
 	void InitialiseSkeleton(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		OBJECT_INFO* obj = &Objects[item->objectNumber];
+		auto* item = &g_Level.Items[itemNumber];
+		auto* object = &Objects[item->ObjectNumber];
 
 		ClearItem(itemNumber);
 
-		switch (item->triggerFlags)
+		switch (item->TriggerFlags)
 		{
 		case 0:
-			item->goalAnimState = 0;
-			item->currentAnimState = 0;
-			item->animNumber = obj->animIndex;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->Animation.AnimNumber = object->animIndex;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = 0;
+			item->Animation.ActiveState = 0;
 			break;
 
 		case 1:
-			item->goalAnimState = STATE_SKELETON_JUMP_RIGHT;
-			item->currentAnimState = STATE_SKELETON_JUMP_RIGHT;
-			item->animNumber = obj->animIndex + 37;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->Animation.AnimNumber = object->animIndex + 37;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = SKELETON_STATE_JUMP_RIGHT;
+			item->Animation.ActiveState = SKELETON_STATE_JUMP_RIGHT;
 			break;
 
 		case 2:
-			item->goalAnimState = STATE_SKELETON_JUMP_LEFT;
-			item->currentAnimState = STATE_SKELETON_JUMP_LEFT;
-			item->animNumber = obj->animIndex + 34;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->Animation.AnimNumber = object->animIndex + 34;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = SKELETON_STATE_JUMP_LEFT;
+			item->Animation.ActiveState = SKELETON_STATE_JUMP_LEFT;
 			break;
 
 		case 3:
-			item->goalAnimState = STATE_SKELETON_JUMP_LIE_DOWN;
-			item->currentAnimState = STATE_SKELETON_JUMP_LIE_DOWN;
-			item->animNumber = obj->animIndex;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->Animation.AnimNumber = object->animIndex;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.TargetState = SKELETON_STATE_JUMP_LIE_DOWN;
+			item->Animation.ActiveState = SKELETON_STATE_JUMP_LIE_DOWN;
 			//item->status = ITEM_DEACTIVATED;
 			break;
 
@@ -125,530 +121,474 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-		ITEM_INFO* enemyItem = creature->enemy;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+		auto* enemyItem = creature->Enemy;
+
 		bool jumpLeft = false;
 		bool jumpRight = false;
+
+		int distance = 0;
 		short tilt = 0;
 		short angle = 0;
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
-		int distance = 0;
 		short rot = 0;
 
-		// Can skeleton jump? Check for a distance of 1 and 2 sectors
-		int x = item->pos.xPos;
-		int y = item->pos.yPos;
-		int z = item->pos.zPos;
+		// Can skeleton jump? Check for a distance of 1 and 2 sectors.
+		int x = item->Pose.Position.x;
+		int y = item->Pose.Position.y;
+		int z = item->Pose.Position.z;
 
-		int dx = 870 * phd_sin(item->pos.yRot);
-		int dz = 870 * phd_cos(item->pos.yRot);
-
-		x += dx;
-		z += dz;
-
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
-		int height1 = GetFloorHeight(floor, x, y, z);
+		int dx = 870 * phd_sin(item->Pose.Orientation.y);
+		int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
 		x += dx;
 		z += dz;
-
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height2 = GetFloorHeight(floor, x, y, z);
+		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		x += dx;
 		z += dz;
+		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-		roomNumber = item->roomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height3 = GetFloorHeight(floor, x, y, z);
+		x += dx;
+		z += dz;
+		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		int height = 0;
 		bool canJump1sector = true;
-		if (enemyItem && item->boxNumber == LaraItem->boxNumber && item->meshBits & 0x200
-			|| y >= height1 - 384
-			|| y >= height2 + 256
-			|| y <= height2 - 256)
+		if (enemyItem && item->BoxNumber == LaraItem->BoxNumber && item->MeshBits & 0x200 ||
+			y >= height1 - CLICK(1.5f) ||
+			y >= height2 + CLICK(2) ||
+			y <= height2 - CLICK(2))
 		{
 			height = height2;
 			canJump1sector = false;
 		}
 
 		bool canJump2sectors = true;
-		if (enemyItem && item->boxNumber == LaraItem->boxNumber && item->meshBits & 0x200
-			|| y >= height1 - 384
-			|| y >= height - 384
-			|| y >= height3 + 256
-			|| y <= height3 - 256)
+		if (enemyItem && item->BoxNumber == LaraItem->BoxNumber && item->MeshBits & 0x200 ||
+			y >= height1 - CLICK(1.5f) ||
+			y >= height - CLICK(1.5f) ||
+			y >= height3 + CLICK(2) ||
+			y <= height3 - CLICK(2))
 		{
 			canJump2sectors = false;
 		}
 
-		if (item->aiBits)
+		if (item->AIBits)
 			GetAITarget(creature);
 		else
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
-		AI_INFO info;
-		AI_INFO laraInfo;
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		if (item->hitStatus
-			&& Lara.gunType == WEAPON_SHOTGUN
-			&& info.distance < SQUARE(3584)
-			&& item->currentAnimState != 7
-			&& item->currentAnimState != 17
-			&& item->currentAnimState != STATE_SKELETON_HURT_BY_SHOTGUN1
-			&& item->currentAnimState != STATE_SKELETON_HURT_BY_SHOTGUN2
-			&& item->currentAnimState != 25)
+		if (item->HitStatus &&
+			Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun &&
+			AI.distance < pow(SECTOR(3.5f), 2) &&
+			item->Animation.ActiveState != 7 &&
+			item->Animation.ActiveState != 17 &&
+			item->Animation.ActiveState != SKELETON_STATE_HURT_BY_SHOTGUN_1 &&
+			item->Animation.ActiveState != SKELETON_STATE_HURT_BY_SHOTGUN_2 &&
+			item->Animation.ActiveState != 25)
 		{
-			if (info.angle >= 12288 || info.angle <= -12288)
+			if (AI.angle >= ANGLE(67.5f) || AI.angle <= -ANGLE(67.5f))
 			{
-				item->currentAnimState = STATE_SKELETON_HURT_BY_SHOTGUN2;
-				item->animNumber = Objects[ID_SKELETON].animIndex + 33;
-				item->pos.yRot += info.angle + -32768;
+				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_2;
+				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
+				item->Pose.Orientation.y += AI.angle + -32768;
 			}
 			else
 			{
-				item->currentAnimState = STATE_SKELETON_HURT_BY_SHOTGUN1;
-				item->animNumber = Objects[ID_SKELETON].animIndex + 17;
-				item->pos.yRot += info.angle;
+				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_1;
+				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 17;
+				item->Pose.Orientation.y += AI.angle;
 			}
 
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			creature->LOT.isJumping = true;
-			item->hitPoints = 25;
+			item->HitPoints = 25;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			creature->LOT.IsJumping = true;
 		}
 		else
 		{
-			if (creature->enemy == LaraItem)
+			AI_INFO laraAI;
+			if (creature->Enemy == LaraItem)
 			{
-				laraInfo.distance = info.distance;
-				laraInfo.angle = info.angle;
+				laraAI.distance = AI.distance;
+				laraAI.angle = AI.angle;
 			}
 			else
 			{
-				dx = LaraItem->pos.xPos - item->pos.xPos;
-				dz = LaraItem->pos.zPos - item->pos.zPos;
-				laraInfo.angle = phd_atan(dz, dx) - item->pos.yRot;
-				laraInfo.distance = SQUARE(dx) + SQUARE(dz);
+				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+				laraAI.angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
 
-			if (!(item->meshBits & 0x200))
-				creature->mood = ESCAPE_MOOD;
+			if (!(item->MeshBits & 0x200))
+				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &info, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
-			ITEM_INFO* tempEnemy = creature->enemy;
-			creature->enemy = LaraItem;
-			if (item->hitStatus
-				|| distance < SQUARE(1024)
-				|| TargetVisible(item, &laraInfo))
-				creature->alerted = true;
-			creature->enemy = tempEnemy;
+			auto* tempEnemy = creature->Enemy;
 
-			if (item != Lara.target || laraInfo.distance <= 870 || angle <= -10240 || angle >= 10240)
+			creature->Enemy = LaraItem;
+
+			if (item->HitStatus ||
+				distance < pow(SECTOR(1), 2) ||
+				TargetVisible(item, &laraAI))
+			{
+				creature->Alerted = true;
+			}
+
+			creature->Enemy = tempEnemy;
+
+			if (item != Lara.TargetEntity || laraAI.distance <= 870 || angle <= -ANGLE(56.25f) || angle >= ANGLE(56.25f))
 			{
 				jumpLeft = false;
 				jumpRight = false;
 			}
 			else
 			{
-				dx = 870 * phd_sin(item->pos.yRot + ANGLE(45));
-				dz = 870 * phd_cos(item->pos.yRot + ANGLE(45));
+				dx = 870 * phd_sin(item->Pose.Orientation.y + ANGLE(45.0f));
+				dz = 870 * phd_cos(item->Pose.Orientation.y + ANGLE(45.0f));
 
-				x = item->pos.xPos + dx;
-				y = item->pos.yPos;
-				z = item->pos.zPos + dz;
+				x = item->Pose.Position.x + dx;
+				y = item->Pose.Position.y;
+				z = item->Pose.Position.z + dz;
+				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				roomNumber = item->roomNumber;
-				floor = GetFloor(x, y, z, &roomNumber);
-				int height4 = GetFloorHeight(floor, x, y, z);
+				dx = 870 * phd_sin(item->Pose.Orientation.y + ANGLE(78.75f));
+				dz = 870 * phd_cos(item->Pose.Orientation.y + ANGLE(78.75f));
 
-				dx = 870 * phd_sin(item->pos.yRot + 14336);
-				dz = 870 * phd_cos(item->pos.yRot + 14336);
+				x = item->Pose.Position.x + dx;
+				y = item->Pose.Position.y;
+				z = item->Pose.Position.z + dz;
+				int height5 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				x = item->pos.xPos + dx;
-				y = item->pos.yPos;
-				z = item->pos.zPos + dz;
-
-				roomNumber = item->roomNumber;
-				floor = GetFloor(x, y, z, &roomNumber);
-				int height5 = GetFloorHeight(floor, x, y, z);
-
-				if (abs(height5 - item->pos.yPos) > 256)
+				if (abs(height5 - item->Pose.Position.y) > CLICK(1))
 					jumpRight = false;
 				else
 				{
 					jumpRight = true;
-					if (height4 + 512 >= item->pos.yPos)
+
+					if ((height4 + CLICK(2)) >= item->Pose.Position.y)
 						jumpRight = false;
 				}
 
-				dx = 870 * phd_sin(item->pos.yRot - 8192);
-				dz = 870 * phd_cos(item->pos.yRot - 8192);
+				dx = 870 * phd_sin(item->Pose.Orientation.y - ANGLE(45.0f));
+				dz = 870 * phd_cos(item->Pose.Orientation.y - ANGLE(45.0f));
 
-				x = item->pos.xPos + dx;
-				y = item->pos.yPos;
-				z = item->pos.zPos + dz;
+				x = item->Pose.Position.x + dx;
+				y = item->Pose.Position.y;
+				z = item->Pose.Position.z + dz;
+				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				roomNumber = item->roomNumber;
-				floor = GetFloor(x, y, z, &roomNumber);
-				int height6 = GetFloorHeight(floor, x, y, z);
+				dx = 870 * phd_sin(item->Pose.Orientation.y - ANGLE(78.75f));
+				dz = 870 * phd_cos(item->Pose.Orientation.y - ANGLE(78.75f));
 
-				dx = 870 * phd_sin(item->pos.yRot - 14336);
-				dz = 870 * phd_cos(item->pos.yRot - 14336);
+				x = item->Pose.Position.x + dx;
+				y = item->Pose.Position.y;
+				z = item->Pose.Position.z + dz;
+				int height7 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				x = item->pos.xPos + dx;
-				y = item->pos.yPos;
-				z = item->pos.zPos + dz;
-
-				roomNumber = item->roomNumber;
-				floor = GetFloor(x, y, z, &roomNumber);
-				int height7 = GetFloorHeight(floor, x, y, z);
-
-				if (abs(height7 - item->pos.yPos) > 256 || height6 + 512 >= item->pos.yPos)
+				if (abs(height7 - item->Pose.Position.y) > CLICK(1) || height6 + CLICK(2) >= item->Pose.Position.y)
 					jumpLeft = false;
 				else
 					jumpLeft = true;
 
 			}
 
-			switch (item->currentAnimState)
+			switch (item->Animation.ActiveState)
 			{
-			case STATE_SKELETON_STOP:
+			case SKELETON_STATE_IDLE:
 				if (!(GetRandomControl() & 0xF))
-				{
-					item->goalAnimState = 2;
-				}
+					item->Animation.TargetState = 2;
+				
 				break;
 
 			case 2:
-				creature->flags = 0;
-				creature->LOT.isJumping = false;
-				creature->maximumTurn = creature->mood != ESCAPE_MOOD ? ANGLE(2) : 0;
-				if (item->aiBits & GUARD
-					|| !(GetRandomControl() & 0x1F) 
-					&& (info.distance > SQUARE(1024) 
-						|| creature->mood != ATTACK_MOOD))
+				creature->MaxTurn = (creature->Mood != MoodType::Escape) ? ANGLE(2.0f) : 0;
+				creature->LOT.IsJumping = false;
+				creature->Flags = 0;
+
+				if (item->AIBits & GUARD ||
+					!(GetRandomControl() & 0x1F) &&
+					(AI.distance > pow(SECTOR(1), 2) ||
+						creature->Mood != MoodType::Attack))
 				{
 					if (!(GetRandomControl() & 0x3F))
 					{
 						if (GetRandomControl() & 1)
-						{
-							item->goalAnimState = 3;
-						}
+							item->Animation.TargetState = 3;
 						else
-						{
-							item->goalAnimState = 4;
-						}
+							item->Animation.TargetState = 4;
 					}
 				}
 				else
 				{
-					if (item->aiBits & PATROL1)
-					{
-						item->goalAnimState = 15;
-					}
+					if (item->AIBits & PATROL1)
+						item->Animation.TargetState = 15;
 					else if (canJump1sector || canJump2sectors)
 					{
-						creature->maximumTurn = 0;
-						item->animNumber = Objects[ID_SKELETON].animIndex + 40;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->currentAnimState = STATE_SKELETON_JUMP_LEFT;
+						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 40;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.ActiveState = SKELETON_STATE_JUMP_LEFT;
+						creature->MaxTurn = 0;
+
 						if (!canJump2sectors)
 						{
-							item->goalAnimState = STATE_SKELETON_JUMP_1SECTOR;
-							creature->LOT.isJumping = true;
+							item->Animation.TargetState = SKELETON_STATE_JUMP_1_BLOCK;
+							creature->LOT.IsJumping = true;
 						}
 						else
 						{
-							item->goalAnimState = STATE_SKELETON_JUMP_2SECTORS;
-							creature->LOT.isJumping = true;
+							item->Animation.TargetState = SKELETON_STATE_JUMP_2_BLOCKS;
+							creature->LOT.IsJumping = true;
 						}
 					}
 					else if (jumpLeft)
 					{
-						item->animNumber = Objects[ID_SKELETON].animIndex + 34;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->goalAnimState = STATE_SKELETON_JUMP_LEFT;
-						item->currentAnimState = STATE_SKELETON_JUMP_LEFT;
+						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 34;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.TargetState = SKELETON_STATE_JUMP_LEFT;
+						item->Animation.ActiveState = SKELETON_STATE_JUMP_LEFT;
 					}
 					else if (jumpRight)
 					{
-						item->animNumber = Objects[ID_SKELETON].animIndex + 37;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->goalAnimState = STATE_SKELETON_JUMP_RIGHT;
-						item->currentAnimState = STATE_SKELETON_JUMP_RIGHT;
+						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 37;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.TargetState = SKELETON_STATE_JUMP_RIGHT;
+						item->Animation.ActiveState = SKELETON_STATE_JUMP_RIGHT;
 					}
 					else
 					{
-						if (creature->mood == ESCAPE_MOOD)
+						if (creature->Mood == MoodType::Escape)
 						{
-							if (Lara.target == item 
-								|| !info.ahead 
-								|| item->hitStatus 
-								|| !(item->meshBits & 0x200))
+							if (Lara.TargetEntity == item ||
+								!AI.ahead ||
+								item->HitStatus ||
+								!(item->MeshBits & 0x200))
 							{
-								item->goalAnimState = 15;
+								item->Animation.TargetState = 15;
 								break;
 							}
-							item->goalAnimState = 2;
+
+							item->Animation.TargetState = 2;
 						}
-						else if (creature->mood == BORED_MOOD ||
-							item->aiBits & FOLLOW &&
-							(creature->reachedGoal ||
-								laraInfo.distance > SQUARE(2048)))
+						else if (creature->Mood == MoodType::Bored ||
+							item->AIBits & FOLLOW &&
+							(creature->ReachedGoal ||
+								laraAI.distance > pow(SECTOR(2), 2)))
 						{
-							if (item->requiredAnimState)
-							{
-								item->goalAnimState = item->requiredAnimState;
-							}
+							if (item->Animation.RequiredState)
+								item->Animation.TargetState = item->Animation.RequiredState;
 							else if (!(GetRandomControl() & 0x3F))
-							{
-								item->goalAnimState = 15;
-							}
+								item->Animation.TargetState = 15;
 						}
-						else if (Lara.target == item
-							&& laraInfo.angle
-							&& laraInfo.distance < SQUARE(2048)
-							&& GetRandomControl() & 1
-							&& (Lara.gunType == WEAPON_SHOTGUN || !(GetRandomControl() & 0xF))
-							&& item->meshBits == -1)
+						else if (Lara.TargetEntity == item &&
+							laraAI.angle &&
+							laraAI.distance < pow(SECTOR(2), 2) &&
+							GetRandomControl() & 1 &&
+							(Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || !(GetRandomControl() & 0xF)) &&
+							item->MeshBits == -1)
 						{
-							item->goalAnimState = STATE_SKELETON_USE_SHIELD;
+							item->Animation.TargetState = SKELETON_STATE_USE_SHIELD;
 						}
-						else if (info.bite && info.distance < SQUARE(682))
+						else if (AI.bite && AI.distance < pow(682, 2))
 						{
-							if (GetRandomControl() & 3 && LaraItem->hitPoints > 0)
+							if (GetRandomControl() & 3 && LaraItem->HitPoints > 0)
 							{
 								if (GetRandomControl() & 1)
-								{
-									item->goalAnimState = STATE_SKELETON_ATTACK1;
-								}
+									item->Animation.TargetState = SKELETON_STATE_ATTACK_1;
 								else
-								{
-									item->goalAnimState = STATE_SKELETON_ATTACK2;
-								}
+									item->Animation.TargetState = SKELETON_STATE_ATTACK_2;
 							}
 							else
-							{
-								item->goalAnimState = STATE_SKELETON_ATTACK3;
-							}
+								item->Animation.TargetState = SKELETON_STATE_ATTACK_3;
 						}
-						else if (item->hitStatus || item->requiredAnimState)
+						else if (item->HitStatus || item->Animation.RequiredState)
 						{
 							if (GetRandomControl() & 1)
 							{
-								item->goalAnimState = STATE_SKELETON_AVOID_ATTACK1;
-								item->requiredAnimState = item->goalAnimState;
+								item->Animation.TargetState = SKELETON_STATE_AVOID_ATTACK_1;
+								item->Animation.RequiredState = item->Animation.TargetState;
 							}
 							else
 							{
-								item->goalAnimState = STATE_SKELETON_AVOID_ATTACK2;
-								item->requiredAnimState = item->goalAnimState;
+								item->Animation.TargetState = SKELETON_STATE_AVOID_ATTACK_2;
+								item->Animation.RequiredState = item->Animation.TargetState;
 							}
 						}
 						else
-						{
-							item->goalAnimState = 15;
-						}
+							item->Animation.TargetState = 15;
 					}
 				}
+
 				break;
 
 			case 15:
-				creature->flags = 0;
-				creature->LOT.isJumping = false;
-				creature->maximumTurn = creature->mood != BORED_MOOD ? 1092 : 364;
-				if (item->aiBits & PATROL1)
+				creature->MaxTurn = (creature->Mood != MoodType::Bored) ? 1092 : 364;
+				creature->LOT.IsJumping = false;
+				creature->Flags = 0;
+
+				if (item->AIBits & PATROL1)
+					item->Animation.TargetState = 15;
+				else if (item->HitStatus)
 				{
-					item->goalAnimState = 15;
-				}
-				else if (item->hitStatus)
-				{
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 					if (GetRandomControl() & 1)
-					{
-						item->requiredAnimState = 5;
-					}
+						item->Animation.RequiredState = 5;
 					else
-					{
-						item->requiredAnimState = 6;
-					}
+						item->Animation.RequiredState = 6;
 				}
 				else
 				{
 					if (jumpLeft || jumpRight)
 					{
-						item->goalAnimState = 2;
+						item->Animation.TargetState = 2;
 						break;
 					}
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->Mood == MoodType::Escape)
+						item->Animation.TargetState = 16;
+					else if (creature->Mood != MoodType::Bored)
 					{
-						item->goalAnimState = 16;
-					}
-					else if (creature->mood != BORED_MOOD)
-					{
-						if (info.distance >= SQUARE(682))
+						if (AI.distance >= pow(682, 2))
 						{
-							if (info.bite && info.distance < SQUARE(1024))
-							{
-								item->goalAnimState = 18;
-							}
+							if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+								item->Animation.TargetState = 18;
 							else if (canJump1sector || canJump2sectors)
 							{
-								creature->maximumTurn = 0;
-								item->goalAnimState = 2;
+								item->Animation.TargetState = 2;
+								creature->MaxTurn = 0;
 							}
-							else if (!info.ahead || info.distance > SQUARE(2048))
-							{
-								item->goalAnimState = 16;
-							}
+							else if (!AI.ahead || AI.distance > pow(SECTOR(2), 2))
+								item->Animation.TargetState = 16;
 						}
 						else
-						{
-							item->goalAnimState = 2;
-						}
+							item->Animation.TargetState = 2;
 					}
 					else if (!(GetRandomControl() & 0x3F))
-					{
-						item->goalAnimState = 2;
-					}
+						item->Animation.TargetState = 2;
 				}
+
 				break;
 
 			case 16:
-				creature->maximumTurn = 1274;
-				creature->LOT.isJumping = false;
+				creature->MaxTurn = ANGLE(7.0f);
+				creature->LOT.IsJumping = false;
 
-				if (item->aiBits & GUARD || canJump1sector || canJump2sectors)
+				if (item->AIBits & GUARD || canJump1sector || canJump2sectors)
 				{
-					if (item->meshBits & 0x200)
+					if (item->MeshBits & 0x200)
 					{
-						creature->maximumTurn = 0;
-						item->goalAnimState = 2;
+						item->Animation.TargetState = 2;
+						creature->MaxTurn = 0;
 						break;
 					}
 
-					creature->LOT.isJumping = true;
-					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-					if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos + 1024)
+					creature->LOT.IsJumping = true;
+
+					if (GetCollision(item).Position.Floor > item->Pose.Position.y + SECTOR(1))
 					{
-						creature->maximumTurn = 0;
-						item->animNumber = Objects[ID_SKELETON].animIndex + 44;
-						item->currentAnimState = 23;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						creature->LOT.isJumping = false;
-						item->gravityStatus = true;
+						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 44;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.ActiveState = 23;
+						item->Animation.Airborne = true;
+						creature->MaxTurn = 0;
+						creature->LOT.IsJumping = false;
 					}
 				}
 				else
 				{
-					if (creature->mood == ESCAPE_MOOD)
+					if (creature->Mood == MoodType::Escape)
 					{
-						if (Lara.target != item && info.ahead && (item->meshBits & 0x200))
-							item->goalAnimState = 2;
+						if (Lara.TargetEntity != item && AI.ahead && (item->MeshBits & 0x200))
+							item->Animation.TargetState = 2;
 					}
-					else if (item->aiBits & FOLLOW && (creature->reachedGoal || laraInfo.distance > SQUARE(2048)))
+					else if (item->AIBits & FOLLOW && (creature->ReachedGoal || laraAI.distance > pow(SECTOR(2), 2)))
+						item->Animation.TargetState = 2;
+					else if (creature->Mood != MoodType::Bored)
 					{
-						item->goalAnimState = 2;
-					}
-					else if (creature->mood != BORED_MOOD)
-					{
-						if (info.ahead && info.distance < SQUARE(2048))
-						{
-							item->goalAnimState = 15;
-						}
+						if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+							item->Animation.TargetState = 15;
 					}
 					else
-					{
-						item->goalAnimState = 15;
-					}
+						item->Animation.TargetState = 15;
 				}
+
 				break;
 
 			case 10:
-				creature->maximumTurn = 0;
-				if (abs(info.angle) >= 1092)
+				creature->MaxTurn = 0;
+
+				if (abs(AI.angle) >= 1092)
 				{
-					if (info.angle >= 0)
-					{
-						item->pos.yRot += 1092;
-					}
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(6.0f);
 					else
-					{
-						item->pos.yRot -= 1092;
-					}
+						item->Pose.Orientation.y -= ANGLE(6.0f);
 				}
 				else
-				{
-					item->pos.yRot += info.angle;
-				}
+					item->Pose.Orientation.y += AI.angle;
 
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
-					if (item->touchBits & 0x18000)
+					if (item->TouchBits & 0x18000)
 					{
-						LaraItem->hitPoints -= 80;
-						LaraItem->hitStatus = true;
-						CreatureEffect2(item, &skeletonBite, 15, -1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
-						creature->flags = 1;
+						CreatureEffect2(item, &SkeletonBite, 15, -1, DoBloodSplat);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						creature->Flags = 1;
+
+						LaraItem->HitPoints -= 80;
+						LaraItem->HitStatus = true;
 					}
 				}
-				if (!(GetRandomControl() & 0x3F) || LaraItem->hitPoints <= 0)
-				{
-					item->goalAnimState = 11;
-				}
+				if (!(GetRandomControl() & 0x3F) || LaraItem->HitPoints <= 0)
+					item->Animation.TargetState = 11;
+				
 				break;
 
-			case STATE_SKELETON_ATTACK1:
-			case STATE_SKELETON_ATTACK2:
+			case SKELETON_STATE_ATTACK_1:
+			case SKELETON_STATE_ATTACK_2:
 			case 18:
-				creature->maximumTurn = 0;
-				if (abs(info.angle) >= 1092)
+				creature->MaxTurn = 0;
+
+				if (abs(AI.angle) >= 1092)
 				{
-					if (info.angle >= 0)
-					{
-						item->pos.yRot += 1092;
-					}
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(6.0f);
 					else
-					{
-						item->pos.yRot -= 1092;
-					}
+						item->Pose.Orientation.y -= ANGLE(6.0f);
 				}
 				else
+					item->Pose.Orientation.y += AI.angle;
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
-					item->pos.yRot += info.angle;
-				}
-				if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 15)
-				{
-					ROOM_INFO* room = &g_Level.Rooms[item->roomNumber];
-					PHD_VECTOR pos;
+					auto* room = &g_Level.Rooms[item->RoomNumber];
 
+					Vector3Int pos;
 					GetJointAbsPosition(item, &pos, 16);
 
-					auto floor = GetCollisionResult(x, y, z, item->roomNumber).Block;
+					auto floor = GetCollision(x, y, z, item->RoomNumber).Block;
 					if (floor->Stopper)
 					{
 						for (int i = 0; i < room->mesh.size(); i++)
 						{
-							MESH_INFO* staticMesh = &room->mesh[i];
-							if (abs(pos.x - staticMesh->pos.xPos) < 1024 && 
-								abs(pos.z - staticMesh->pos.zPos) < 1024 && 
+							auto* staticMesh = &room->mesh[i];
+
+							if (abs(pos.x - staticMesh->pos.Position.x) < SECTOR(1) && 
+								abs(pos.z - staticMesh->pos.Position.z) < SECTOR(1) &&
 								StaticObjects[staticMesh->staticNumber].shatterType != SHT_NONE)
 							{
-								ShatterObject(0, staticMesh, -128, LaraItem->roomNumber, 0);
-								SoundEffect(SFX_TR4_HIT_ROCK, &item->pos, 0);
+								ShatterObject(0, staticMesh, -128, LaraItem->RoomNumber, 0);
+								SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
 								staticMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->Stopper = false;
 								TestTriggers(item, true);
@@ -656,132 +596,120 @@ namespace TEN::Entities::TR4
 							}
 						}
 					}
-					if (!creature->flags)
+					if (!creature->Flags)
 					{
-						if (item->touchBits & 0x18000)
+						if (item->TouchBits & 0x18000)
 						{
-							LaraItem->hitPoints -= 80;
-							LaraItem->hitStatus = true;
-							CreatureEffect2(item, &skeletonBite, 10, item->pos.yRot, DoBloodSplat);
+							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+							creature->Flags = 1;
 
-							SoundEffect(SFX_TR4_LARA_THUD, &item->pos, 0);
-
-							creature->flags = 1;
+							LaraItem->HitPoints -= 80;
+							LaraItem->HitStatus = true;
 						}
 					}
 				}
 				break;
 
-			case STATE_SKELETON_USE_SHIELD:
-				if (item->hitStatus)
+			case SKELETON_STATE_USE_SHIELD:
+				if (item->HitStatus)
 				{
-					if (item->meshBits == -1 && laraInfo.angle && Lara.gunType == WEAPON_SHOTGUN)
+					if (item->MeshBits == -1 && laraAI.angle && Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 					{
 						if (GetRandomControl() & 3)
-						{
-							item->goalAnimState = 17;
-						}
+							item->Animation.TargetState = 17;
 						else
-						{
 							ExplodeItemNode(item, 11, 1, -24);
-						}
 					}
 					else
-					{
-						item->goalAnimState = 2;
-					}
+						item->Animation.TargetState = 2;
 				}
-				else if (Lara.target != item || item->meshBits != -1 || Lara.gunType != WEAPON_SHOTGUN || !(GetRandomControl() & 0x7F))
-				{
-					item->goalAnimState = 2;
-				}
+				else if (Lara.TargetEntity != item || item->MeshBits != -1 || Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun || !(GetRandomControl() & 0x7F))
+					item->Animation.TargetState = 2;
+				
 				break;
 
-			case STATE_SKELETON_JUMP_1SECTOR:
-				if (item->animNumber == Objects[item->objectNumber].animIndex + 43)
+			case SKELETON_STATE_JUMP_1_BLOCK:
+				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 43)
 				{
-					roomNumber = item->roomNumber;
-					floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-					if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) > item->pos.yPos + 1280)
+					if (GetCollision(item).Position.Floor > (item->Pose.Position.y + CLICK(5)))
 					{
-						creature->maximumTurn = 0;
-						item->animNumber = Objects[item->objectNumber].animIndex + 44;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->currentAnimState = 23;
-						creature->LOT.isJumping = false;
-						item->gravityStatus = true;
+						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 44;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.ActiveState = 23;
+						item->Animation.Airborne = true;
+						creature->MaxTurn = 0;
+						creature->LOT.IsJumping = false;
 					}
 				}
+
 				break;
 
 			case 23:
 			case 24:
-				roomNumber = item->roomNumber;
-				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos)
+				if (GetCollision(item).Position.Floor <= item->Pose.Position.y)
 				{
-					if (item->active)
+					if (item->Active)
 					{
 						ExplodingDeath(itemNumber, -1, 929);
 						KillItem(itemNumber);
-						DisableBaddieAI(itemNumber);
+						DisableEntityAI(itemNumber);
 						//Savegame.Kills++;
 					}
 				}
+
 				break;
 
 			case 25:
 			case 11:
-			case STATE_SKELETON_HURT_BY_SHOTGUN1:
-			case STATE_SKELETON_HURT_BY_SHOTGUN2:
-				if ((item->currentAnimState == STATE_SKELETON_HURT_BY_SHOTGUN1 
-					|| item->currentAnimState == STATE_SKELETON_HURT_BY_SHOTGUN2) &&
-					item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 20)
+			case SKELETON_STATE_HURT_BY_SHOTGUN_1:
+			case SKELETON_STATE_HURT_BY_SHOTGUN_2:
+				if ((item->Animation.ActiveState == SKELETON_STATE_HURT_BY_SHOTGUN_1 ||
+					item->Animation.ActiveState == SKELETON_STATE_HURT_BY_SHOTGUN_2) &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 				{
-					item->hitPoints = 25;
-					creature->maximumTurn = 0;
-					break;
-				}
-				if (item->currentAnimState == 11)
-				{
-					creature->maximumTurn = 0;
+					item->HitPoints = 25;
+					creature->MaxTurn = 0;
 					break;
 				}
 
-				item->hitPoints = 25;
-				creature->LOT.isJumping = false;
+				if (item->Animation.ActiveState == 11)
+				{
+					creature->MaxTurn = 0;
+					break;
+				}
 
-				roomNumber = item->roomNumber;
-				floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
-				if (GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos) <= item->pos.yPos + 1024)
+				item->HitPoints = 25;
+				creature->LOT.IsJumping = false;
+
+				if (GetCollision(item).Position.Floor <= (item->Pose.Position.y + SECTOR(1)))
 				{
 					if (!(GetRandomControl() & 0x1F))
-					{
-						item->goalAnimState = 14;
-					}
+						item->Animation.TargetState = 14;
 				}
 				else
 				{
-					creature->maximumTurn = 0;
-					item->animNumber = Objects[item->objectNumber].animIndex + 47;
-					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-					item->currentAnimState = 24;
-					item->gravityStatus = true;
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 47;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->Animation.ActiveState = 24;
+					item->Animation.Airborne = true;
+					creature->MaxTurn = 0;
 				}
+
 				break;
 
-			case STATE_SKELETON_JUMP_LEFT:
-			case STATE_SKELETON_JUMP_RIGHT:
-				creature->alerted = false;
-				creature->maximumTurn = 0;
-				item->status = ITEM_ACTIVE;
+			case SKELETON_STATE_JUMP_LEFT:
+			case SKELETON_STATE_JUMP_RIGHT:
+				item->Status = ITEM_ACTIVE;
+				creature->MaxTurn = 0;
+				creature->Alerted = false;
+
 				break;
 
-			case STATE_SKELETON_UNDER_FLOOR:
-				if (item->frameNumber - g_Level.Anims[item->animNumber].frameBase < 32)
-				{
+			case SKELETON_STATE_BENEATH_FLOOR:
+				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase < 32)
 					TriggerRiseEffect(item);
-				}
+				
 				break;
 
 			default:

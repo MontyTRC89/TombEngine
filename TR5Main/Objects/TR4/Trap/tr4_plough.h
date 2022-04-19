@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::TR4
 {
-	void PloughControl(short itemNum);
+	void PloughControl(short itemNumber);
 }
