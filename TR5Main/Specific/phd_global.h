@@ -1,11 +1,200 @@
 #pragma once
 
+// TODO: Use this class inside EulerAngles.
+class Angle
+{
+	using Radian = float;
+
+private:
+	Radian Component; // Invariant: Radian component remains in the range [-M_PI, M_PI].
+
+	Angle(Radian angle);
+	Angle Clamp(Radian angle);
+
+public:
+	// Constructors:
+	Angle();
+	static Angle FromDeg(float degrees);
+	static Angle FromRad(float radians);
+	static Angle FromShrt(short shortForm); // Temp. legacy short form support.
+	
+	// Utilities:
+	static bool Compare(Angle angle0, Angle angle1, Angle epsilon = 0.0f);
+
+	Angle Interpolate(Angle angleTo, float rate = 1.0f, Angle epsilon = 0.0f);
+	static Angle Interpolate(Angle angleFrom, Angle angleTo, float rate = 1.0f, Angle epsilon = 0.0f);
+
+	static Angle ShortestAngle(Angle angleFrom, Angle angleTo);
+
+	static Angle AngleBetweenTwoPoints(Vector3 point0, Vector3 point1);
+	static Angle DeltaHeading(Vector3 origin, Vector3 target, Angle heading);
+
+	// Converters:
+	float ToDeg();
+	float ToRad();
+	short ToShrt(); // Temp. legacy short form support.
+
+	// Operators:
+	Angle operator +(Angle angle);
+	Angle operator -(Angle angle);
+	Angle operator *(Angle angle);
+	Angle operator *(float value);
+	Angle operator /(float value);
+
+	Angle& operator +=(Angle angle);
+	Angle& operator -=(Angle angle);
+	Angle& operator *=(Angle angle);
+	Angle& operator *=(float value);
+	Angle& operator /=(float value);
+};
+
+inline Angle::Angle(Radian angle)
+{
+	*this = Clamp(angle);
+}
+
+inline Angle::Angle()
+{
+	this->Component = (Radian)0.0f;
+}
+
+inline Angle Angle::FromDeg(float degrees)
+{
+	return Angle(degrees * (M_PI / 180.0f));
+}
+
+inline Angle Angle::FromRad(float radians)
+{
+	return Angle(radians);
+}
+
+inline Angle Angle::FromShrt(short shortForm)
+{
+	return Angle(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
+}
+
+inline Angle Angle::Clamp(Radian angle)
+{
+	//if ((float)angle < -M_PI || (float)angle > M_PI)
+		return FromRad(atan2(sin((float)angle), cos((float)angle)));
+	//else
+	//	return FromRad(angle);
+}
+
+inline bool Angle::Compare(Angle angle0, Angle angle1, Angle epsilon)
+{
+	auto difference = ShortestAngle(angle0, angle1);
+	if (abs(difference.ToRad()) <= epsilon.ToRad()) // TODO
+		return true;
+	else
+		return false;
+}
+
+inline Angle Angle::Interpolate(Angle angleTo, float rate, Angle epsilon)
+{
+	*this = Interpolate(*this, angleTo, rate, epsilon);
+}
+
+inline Angle Angle::Interpolate(Angle angleFrom, Angle angleTo, float rate, Angle epsilon)
+{
+	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
+
+	if (!Compare(angleFrom, angleTo, epsilon))
+	{
+		auto difference = ShortestAngle(angleFrom, angleTo);
+		return (angleFrom + (difference * rate));
+	}
+	else
+		return angleTo;
+}
+
+inline Angle Angle::ShortestAngle(Angle angleFrom, Angle angleTo)
+{
+	return (angleTo - angleFrom);
+}
+
+inline float Angle::ToDeg()
+{
+	float degrees = Component * (180.0f / M_PI);
+	return fmod(degrees + 360.0f, 360.0f);
+}
+
+inline float Angle::ToRad()
+{
+	return (float)Component;
+}
+
+inline short Angle::ToShrt()
+{
+	return ((Component / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
+}
+
+inline Angle Angle::operator +(Angle angle)
+{
+	return Clamp(Component + angle.Component);
+}
+
+inline Angle Angle::operator -(Angle angle)
+{
+	return Clamp(Component - angle.Component);
+}
+
+inline Angle Angle::operator *(Angle angle)
+{
+	return Clamp(Component * angle.Component);
+}
+
+inline Angle Angle::operator *(float value)
+{
+	return Clamp(Component * value);
+}
+
+inline Angle Angle::operator /(float value)
+{
+	return Clamp(Component / value);
+}
+
+inline Angle& Angle::operator +=(Angle angle)
+{
+	*this = *this + angle;
+	return *this;
+}
+
+inline Angle& Angle::operator -=(Angle angle)
+{
+	*this = *this - angle;
+	return *this;
+}
+
+inline Angle& Angle::operator *=(Angle angle)
+{
+	*this = *this * angle;
+	return *this;
+}
+
+inline Angle& Angle::operator *=(float value)
+{
+	*this = *this * value;
+	return *this;
+}
+
+inline Angle& Angle::operator /=(float value)
+{
+	*this = *this / value;
+	return *this;
+}
+
+//-------------------------------------------------------------------------------------------------------------------
+
 // TODO: Move to EulerAngle.h and EulerAngle.cpp.
-class EulerAngle
+class EulerAngle//s
 {
 public:
-	// TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make components private?
+	// TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make components private? Maybe not necessary with an Angle class.
 	// Euler components in radians
+	Angle xR;
+	Angle yR;
+	Angle zR;
 	float x;
 	float y;
 	float z;
