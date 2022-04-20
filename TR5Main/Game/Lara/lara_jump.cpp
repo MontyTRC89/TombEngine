@@ -481,7 +481,7 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 // Control:		lara_as_jump_back()
 void lara_col_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, item->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f));
+	LaraJumpCollision(item, coll, EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f)));
 }
 
 // State:		LS_JUMP_RIGHT (26)
@@ -538,7 +538,7 @@ void lara_as_jump_right(ITEM_INFO* item, CollisionInfo* coll)
 // Control:		lara_as_jump_right()
 void lara_col_jump_right(ITEM_INFO* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
+	LaraJumpCollision(item, coll, EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f)));
 }
 
 // State:		LS_JUMP_LEFT (27)
@@ -595,7 +595,7 @@ void lara_as_jump_left(ITEM_INFO* item, CollisionInfo* coll)
 // Control:		lara_as_jump_left()
 void lara_col_jump_left(ITEM_INFO* item, CollisionInfo* coll)
 {
-	LaraJumpCollision(item, coll, item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
+	LaraJumpCollision(item, coll, EulerAngle::Clamp(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f)));
 }
 
 // State:		LS_JUMP_UP (28)
@@ -672,7 +672,7 @@ void lara_col_jump_up(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
-	coll->Setup.ForwardAngle = (item->Animation.Velocity >= 0) ? lara->Control.MoveAngle : lara->Control.MoveAngle + EulerAngle::DegToRad(180.0f);
+	coll->Setup.ForwardAngle = (item->Animation.Velocity >= 0) ? lara->Control.MoveAngle : EulerAngle::Clamp(lara->Control.MoveAngle + EulerAngle::DegToRad(180.0f));
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 

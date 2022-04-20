@@ -80,50 +80,50 @@ struct SECTOR_FLAGS
 
 class FLOOR_INFO
 {
-	public:
-		int Room;
-		SECTOR_COLLISION_INFO FloorCollision;
-		SECTOR_COLLISION_INFO CeilingCollision;
-		int WallPortal;
-		std::set<short> BridgeItem;
+public:
+	int Room;
+	SECTOR_COLLISION_INFO FloorCollision;
+	SECTOR_COLLISION_INFO CeilingCollision;
+	int WallPortal;
+	std::set<short> BridgeItem;
 
-		int Box;
-		bool Stopper;
-		int TriggerIndex;
-		FLOOR_MATERIAL Material;
-		SECTOR_FLAGS Flags;
+	int Box;
+	bool Stopper;
+	int TriggerIndex;
+	FLOOR_MATERIAL Material;
+	SECTOR_FLAGS Flags;
 
-		int SectorPlane(int x, int z) const;
-		int SectorPlaneCeiling(int x, int z) const;
-		Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const;
-		bool FloorIsSplit() const;
-		bool FloorIsDiagonalStep() const;
-		bool CeilingIsDiagonalStep() const;
-		bool CeilingIsSplit() const;
-		bool FloorHasSplitPortal() const;
-		bool CeilingHasSplitPortal() const;
-		std::optional<int> RoomBelow(int plane) const;
-		std::optional<int> RoomBelow(int x, int z) const;
-		std::optional<int> RoomBelow(int x, int y, int z) const;
-		std::optional<int> RoomAbove(int plane) const;
-		std::optional<int> RoomAbove(int x, int z) const;
-		std::optional<int> RoomAbove(int x, int y, int z) const;
-		std::optional<int> RoomSide() const;
-		int FloorHeight(int x, int z) const;
-		int FloorHeight(int x, int y, int z) const;
-		int BridgeFloorHeight(int x, int y, int z) const;
-		int CeilingHeight(int x, int z) const;
-		int CeilingHeight(int x, int y, int z) const;
-		int BridgeCeilingHeight(int x, int y, int z) const;
-		Vector2 FloorSlope(int plane) const;
-		Vector2 FloorSlope(int x, int z) const;
-		Vector2 CeilingSlope(int plane) const;
-		Vector2 CeilingSlope(int x, int z) const;
-		bool IsWall(int plane) const;
-		bool IsWall(int x, int z) const;
-		short InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const;
-		void AddItem(short itemNumber);
-		void RemoveItem(short itemNumber);
+	int SectorPlane(int x, int z) const;
+	int SectorPlaneCeiling(int x, int z) const;
+	Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const;
+	bool FloorIsSplit() const;
+	bool FloorIsDiagonalStep() const;
+	bool CeilingIsDiagonalStep() const;
+	bool CeilingIsSplit() const;
+	bool FloorHasSplitPortal() const;
+	bool CeilingHasSplitPortal() const;
+	std::optional<int> RoomBelow(int plane) const;
+	std::optional<int> RoomBelow(int x, int z) const;
+	std::optional<int> RoomBelow(int x, int y, int z) const;
+	std::optional<int> RoomAbove(int plane) const;
+	std::optional<int> RoomAbove(int x, int z) const;
+	std::optional<int> RoomAbove(int x, int y, int z) const;
+	std::optional<int> RoomSide() const;
+	int FloorHeight(int x, int z) const;
+	int FloorHeight(int x, int y, int z) const;
+	int BridgeFloorHeight(int x, int y, int z) const;
+	int CeilingHeight(int x, int z) const;
+	int CeilingHeight(int x, int y, int z) const;
+	int BridgeCeilingHeight(int x, int y, int z) const;
+	Vector2 FloorSlope(int plane) const;
+	Vector2 FloorSlope(int x, int z) const;
+	Vector2 CeilingSlope(int plane) const;
+	Vector2 CeilingSlope(int x, int z) const;
+	bool IsWall(int plane) const;
+	bool IsWall(int x, int z) const;
+	short InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const;
+	void AddItem(short itemNumber);
+	void RemoveItem(short itemNumber);
 };
 
 namespace TEN::Floordata

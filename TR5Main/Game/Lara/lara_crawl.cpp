@@ -188,11 +188,7 @@ void lara_col_crouch_roll(ITEM_INFO* item, CollisionInfo* coll)
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
 	// she becomes Airborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
 	if (LaraDeflectEdgeCrawl(item, coll))
-	{
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
-	}
+		item->Pose.Position = coll->Setup.OldPosition;
 
 	if (TestLaraFall(item, coll))
 	{

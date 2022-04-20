@@ -48,14 +48,14 @@ bool FLOOR_INFO::FloorIsDiagonalStep() const
 {
 	return FloorIsSplit() && 
 		   round(FloorCollision.Planes[0].z) != round(FloorCollision.Planes[1].z) &&
-		   (FloorCollision.SplitAngle == 45.0f * RADIAN || FloorCollision.SplitAngle == 135.0f * RADIAN);
+		   (FloorCollision.SplitAngle == EulerAngle::DegToRad(45.0f) || FloorCollision.SplitAngle == EulerAngle::DegToRad(135.0f));
 }
 
 bool FLOOR_INFO::CeilingIsDiagonalStep() const
 {
 	return CeilingIsSplit() &&
 		round(CeilingCollision.Planes[0].z) != round(CeilingCollision.Planes[1].z) &&
-		(CeilingCollision.SplitAngle == 45.0f * RADIAN || CeilingCollision.SplitAngle == 135.0f * RADIAN);
+		(CeilingCollision.SplitAngle == EulerAngle::DegToRad(45.0f) || CeilingCollision.SplitAngle == EulerAngle::DegToRad(135.0f));
 }
 
 bool FLOOR_INFO::CeilingIsSplit() const

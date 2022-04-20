@@ -933,7 +933,7 @@ enum class JumpDirection
 	Right
 };
 
-struct Ammo
+class Ammo
 {
 	using CountType = uint16_t;
 

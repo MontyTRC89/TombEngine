@@ -49,8 +49,8 @@ struct CollisionPosition
 	bool CeilingSlope;
 	bool DiagonalStep;
 
-	bool HasDiagonalSplit() { return SplitAngle == 45.0f * RADIAN || SplitAngle == 135.0f * RADIAN; }
-	bool HasFlippedDiagonalSplit() { return HasDiagonalSplit() && SplitAngle != 45.0f * RADIAN; }
+	bool HasDiagonalSplit() { return SplitAngle == EulerAngle::DegToRad(45.0f) || SplitAngle == EulerAngle::DegToRad(135.0f); }
+	bool HasFlippedDiagonalSplit() { return HasDiagonalSplit() && SplitAngle != EulerAngle::DegToRad(45.0f); }
 };
 
 struct CollisionResult
