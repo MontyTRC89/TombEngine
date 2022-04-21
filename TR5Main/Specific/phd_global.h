@@ -3,13 +3,11 @@
 // TODO: Use this class inside EulerAngles.
 class Angle
 {
-	using Radian = float;
-
 private:
-	Radian Component; // Invariant: Radian component remains in the range [-M_PI, M_PI].
+	float Component; // Invariant: Radian component remains in the range [-M_PI, M_PI].
 
-	Angle(Radian angle);
-	Angle Clamp(Radian angle);
+	float Clamp(float angle);
+	Angle(float angle);
 
 public:
 	// Constructors:
@@ -35,27 +33,36 @@ public:
 	short ToShrt(); // Temp. legacy short form support.
 
 	// Operators:
-	Angle operator +(Angle angle);
-	Angle operator -(Angle angle);
-	Angle operator *(Angle angle);
+	operator float() const;
+
+	Angle operator +(float angle);
+	Angle operator -(float angle);
 	Angle operator *(float value);
 	Angle operator /(float value);
 
-	Angle& operator +=(Angle angle);
-	Angle& operator -=(Angle angle);
-	Angle& operator *=(Angle angle);
+	Angle& operator =(float angle);
+	Angle& operator +=(float angle);
+	Angle& operator -=(float angle);
 	Angle& operator *=(float value);
 	Angle& operator /=(float value);
 };
 
-inline Angle::Angle(Radian angle)
+inline float Angle::Clamp(float angle)
 {
-	*this = Clamp(angle);
+	//if (angle < -M_PI || angle > M_PI)
+		return atan2(sin(angle), cos(angle));
+	//else
+	//	return angle;
+}
+
+inline Angle::Angle(float angle)
+{
+	this->Component = Clamp(angle);
 }
 
 inline Angle::Angle()
 {
-	this->Component = (Radian)0.0f;
+	*this = Angle(0.0f);
 }
 
 inline Angle Angle::FromDeg(float degrees)
@@ -73,18 +80,10 @@ inline Angle Angle::FromShrt(short shortForm)
 	return Angle(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
 }
 
-inline Angle Angle::Clamp(Radian angle)
-{
-	//if ((float)angle < -M_PI || (float)angle > M_PI)
-		return FromRad(atan2(sin((float)angle), cos((float)angle)));
-	//else
-	//	return FromRad(angle);
-}
-
 inline bool Angle::Compare(Angle angle0, Angle angle1, Angle epsilon)
 {
 	auto difference = ShortestAngle(angle0, angle1);
-	if (abs(difference.ToRad()) <= epsilon.ToRad()) // TODO
+	if (abs(difference) <= epsilon)
 		return true;
 	else
 		return false;
@@ -121,7 +120,7 @@ inline float Angle::ToDeg()
 
 inline float Angle::ToRad()
 {
-	return (float)Component;
+	return Component;
 }
 
 inline short Angle::ToShrt()
@@ -129,46 +128,50 @@ inline short Angle::ToShrt()
 	return ((Component / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
 }
 
-inline Angle Angle::operator +(Angle angle)
+inline Angle::operator float() const
 {
-	return Clamp(Component + angle.Component);
+	return Component;
 }
 
-inline Angle Angle::operator -(Angle angle)
+inline Angle Angle::operator +(float angle)
 {
-	return Clamp(Component - angle.Component);
+	this->Component = Clamp(Component + angle);
+	return *this;
 }
 
-inline Angle Angle::operator *(Angle angle)
+inline Angle Angle::operator -(float angle)
 {
-	return Clamp(Component * angle.Component);
+	this->Component = Clamp(Component - angle);
+	return *this;
 }
 
 inline Angle Angle::operator *(float value)
 {
-	return Clamp(Component * value);
+	this->Component = Clamp(Component * value);
+	return *this;
 }
 
 inline Angle Angle::operator /(float value)
 {
-	return Clamp(Component / value);
+	this->Component = Clamp(Component / value);
+	return *this;
 }
 
-inline Angle& Angle::operator +=(Angle angle)
+inline Angle& Angle::operator =(float angle)
+{
+	this->Component = Clamp(angle);
+	return *this;
+}
+
+inline Angle& Angle::operator +=(float angle)
 {
 	*this = *this + angle;
 	return *this;
 }
 
-inline Angle& Angle::operator -=(Angle angle)
+inline Angle& Angle::operator -=(float angle)
 {
 	*this = *this - angle;
-	return *this;
-}
-
-inline Angle& Angle::operator *=(Angle angle)
-{
-	*this = *this * angle;
 	return *this;
 }
 
