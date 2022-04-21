@@ -6,7 +6,7 @@ class Angle
 private:
 	float Component; // Invariant: Radian component remains in the range [-M_PI, M_PI].
 
-	float Clamp(float angle);
+	float Normalize(float angle);
 	Angle(float angle);
 
 public:
@@ -29,7 +29,6 @@ public:
 
 	// Converters:
 	float ToDeg();
-	float ToRad();
 	short ToShrt(); // Temp. legacy short form support.
 
 	// Operators:
@@ -47,17 +46,22 @@ public:
 	Angle& operator /=(float value);
 };
 
-inline float Angle::Clamp(float angle)
+inline float Angle::Normalize(float angle)
 {
-	//if (angle < -M_PI || angle > M_PI)
+	if (angle < -M_PI || angle > M_PI)
 		return atan2(sin(angle), cos(angle));
-	//else
-	//	return angle;
+	else
+		return angle;
+	
+	// Alternative (faster?) method:
+	/*return (angle > 0) ?
+		fmod(angle + M_PI, M_PI * 2) - M_PI :
+		fmod(angle - M_PI, M_PI * 2) + M_PI;*/
 }
 
 inline Angle::Angle(float angle)
 {
-	this->Component = Clamp(angle);
+	this->Component = Normalize(angle);
 }
 
 inline Angle::Angle()
@@ -118,11 +122,6 @@ inline float Angle::ToDeg()
 	return fmod(degrees + 360.0f, 360.0f);
 }
 
-inline float Angle::ToRad()
-{
-	return Component;
-}
-
 inline short Angle::ToShrt()
 {
 	return ((Component / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
@@ -135,31 +134,31 @@ inline Angle::operator float() const
 
 inline Angle Angle::operator +(float angle)
 {
-	this->Component = Clamp(Component + angle);
+	this->Component = Normalize(Component + angle);
 	return *this;
 }
 
 inline Angle Angle::operator -(float angle)
 {
-	this->Component = Clamp(Component - angle);
+	this->Component = Normalize(Component - angle);
 	return *this;
 }
 
 inline Angle Angle::operator *(float value)
 {
-	this->Component = Clamp(Component * value);
+	this->Component = Normalize(Component * value);
 	return *this;
 }
 
 inline Angle Angle::operator /(float value)
 {
-	this->Component = Clamp(Component / value);
+	this->Component = Normalize(Component / value);
 	return *this;
 }
 
 inline Angle& Angle::operator =(float angle)
 {
-	this->Component = Clamp(angle);
+	this->Component = Normalize(angle);
 	return *this;
 }
 
@@ -195,9 +194,6 @@ class EulerAngle//s
 public:
 	// TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make components private? Maybe not necessary with an Angle class.
 	// Euler components in radians
-	Angle xR;
-	Angle yR;
-	Angle zR;
 	float x;
 	float y;
 	float z;
