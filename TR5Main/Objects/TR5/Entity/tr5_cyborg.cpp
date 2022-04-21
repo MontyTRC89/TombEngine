@@ -15,6 +15,7 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/tomb4fx.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
@@ -93,6 +94,129 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 		spark->dSize = ((rand() / 4096) & 1) + 1;
 		spark->maxYvel = 0;
 		spark->gravity = 0;
+	}
+}
+
+static void TriggerHitmanElectricution(int x, int y, int z, short xv, short yv, short zv)
+{
+	int dx = LaraItem->Pose.Position.x - x;
+	int dz = LaraItem->Pose.Position.z - z;
+
+	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+		dz >= -SECTOR(16) && dz <= SECTOR(16))
+	{
+		auto* spark = &Sparks[GetFreeSpark()];
+
+		spark->sR = -1;
+		spark->sG = -1;
+		spark->sB = -1;
+		spark->dR = -1;
+		spark->on = 1;
+		spark->colFadeSpeed = 1;
+		spark->fadeToBlack = 5;
+		spark->dG = (rand() & 127) + 64;
+		spark->dB = -64 - spark->dG;
+		spark->life = 4;
+		spark->sLife = 10;
+		spark->transType = TransTypeEnum::NOTRANS;
+		spark->friction = 34;
+		spark->scalar = 1;
+		spark->flags = SP_DAMAGE;
+		spark->x = (rand() & 11) + x - 3;
+		spark->y = ((rand() / 15) & 7) + y - 3;
+		spark->z = ((rand() / 63) & 7) + z - 3;
+		spark->xVel = (byte)(rand() / 2) + xv - 128;
+		spark->yVel = (byte)(rand() / 8) + yv - 128;
+		spark->zVel = (byte)(rand() / 32) + zv - 128;
+		spark->sSize = spark->size = ((rand() / 512) & 3) + 4;
+		spark->dSize = ((rand() / 4096) & 1) + 1;
+		spark->maxYvel = 0;
+		spark->gravity = 0;
+
+		{
+			int dx = LaraItem->Pose.Position.x - x;
+			int dz = LaraItem->Pose.Position.z - z;
+
+			if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+			{
+				int r = rand();
+
+				auto* spark = &Sparks[GetFreeSpark()];
+
+				spark->dG = (r & 0x7F) + 64;
+				spark->dB = -64 - (r & 0x7F) + 64;
+				spark->life = 10;
+				spark->sLife = 100;
+				spark->sR = -1;
+				spark->sG = -1;
+				spark->sB = 10;
+				spark->dR = -1;
+				spark->x = (r & 7) + x - 3;
+				spark->on = 1;
+				spark->colFadeSpeed = 1;
+				spark->fadeToBlack = 100;
+				spark->y = ((r >> 3) & 7) + y - 3;
+				spark->transType = TransTypeEnum::COLADD;
+				spark->friction = 34;
+				spark->scalar = 2;
+				spark->z = ((r >> 3) & 7) + z - 3;
+				spark->flags = 2;
+				spark->xVel = (byte)(r >> 2) + xv - 128;
+				spark->yVel = (byte)(r >> 4) + yv - 128;
+				spark->zVel = (byte)(r >> 6) + zv - 128;
+				spark->sSize = ((r >> 9) & 3) + 4;
+				spark->size = ((r >> 9) & 3) + 4;
+				spark->dSize = ((r >> 9) & 1) + 1;
+				spark->maxYvel = 10;
+				spark->gravity = 50;
+
+				{
+					r = rand();
+					spark = &Sparks[GetFreeSpark()];
+					spark->on = 1;
+					spark->sR = spark->dR >> 1;
+					spark->sG = spark->dG >> 1;
+					spark->fadeToBlack = 4;
+					spark->transType = TransTypeEnum::COLADD;
+					spark->colFadeSpeed = (r & 3) + 8;
+					spark->sB = spark->dB >> 1;
+					spark->dR = 32;
+					spark->dG = 32;
+					spark->dB = 32;
+					spark->yVel = yv;
+					spark->life = ((r >> 3) & 7) + 13;
+					spark->sLife = ((r >> 3) & 7) + 13;
+					spark->friction = 4;
+					spark->x = x + (xv >> 5);
+					spark->y = y + (yv >> 5);
+					spark->z = z + (zv >> 5);
+					spark->xVel = (r & 0x3F) + xv - 32;
+					spark->zVel = ((r >> 6) & 0x3F) + zv - 32;
+
+					if (r & 1)
+					{
+						spark->flags = 538;
+						spark->rotAng = r >> 3;
+
+						if (r & 2)
+							spark->rotAdd = -16 - (r & 0xF);
+						else
+							spark->rotAdd = (r & 0xF) + 16;
+					}
+					else
+						spark->flags = 522;
+
+					spark->gravity = -8 - (r >> 3 & 3);
+					spark->scalar = 2;
+					spark->maxYvel = -4 - (r >> 6 & 3);
+					spark->sSize = ((r >> 8) & 0xF) + 24 >> 3;
+					spark->size = ((r >> 8) & 0xF) + 24 >> 3;
+					spark->dSize = ((r >> 8) & 0xF) + 24;
+				}
+			}
+		}
+
+		
 	}
 }
 
@@ -242,18 +366,66 @@ void CyborgControl(short itemNumber)
 
 			GetCreatureMood(item, &AI, creature->Enemy != LaraItem);
 
-			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, item)) // Gassed room?
+			// Gassed room. Cyborg will run around looking for an exit, then eventually choke to death IF NO LENS FLARE room flag is set (Original TR5 effect)
+			if (TestEnvironment(ENV_FLAG_NO_LENSFLARE, item)) 
 			{
-				if (!(GlobalCounter & 7))
+				if (!(GameTimer & 7))
 					item->HitPoints--;
 
-				creature->Mood = MoodType::Escape;
+				creature->Mood = MoodType::Attack;
+				creature->Poisoned;
 
 				if (item->HitPoints <= 0)
 				{
+					auto pos = Vector3Int(0, 0, 50);
+					SoundEffect(SFX_TR5_HITMAN_CHOKE, &item->Pose, 0);
 					item->Animation.ActiveState = CYBORG_STATE_GASSED;
 					item->Animation.AnimNumber = object->animIndex + 68;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				}
+			}
+
+			// Electricution Floor. If the COLD flag is set the Hitman will spark and die within 1 second TODO: Create a new animation for the electricution
+			if (TestEnvironment(ENV_FLAG_COLD, item)) // Electricute Hitman. 
+			if (g_Level.Rooms[item->roomNumber].flags & ENV_FLAG_NO_LENSFLARE) // Gassed room?
+			{
+				//if (!(GameTimer & 0))
+				item->HitPoints--;
+				if (!(GlobalCounter & 7))
+					item->HitPoints--;
+
+				creature->Mood = MoodType::Attack;
+				creature->Poisoned;
+
+				if (item->HitPoints < 50)
+				{
+					auto pos = Vector3Int(0, 0, 50);
+
+					GetJointAbsPosition(item, &pos, HitmanJoints[random]);
+					TriggerLightningGlow(pos.x, pos.y, pos.z, 127, 32, 32, 64);
+					TriggerHitmanElectricution(pos.x, pos.y, pos.z, -1, -1, -1);
+					TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
+					TriggerExplosionSparks;
+					SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item->Pose, 0);
+				creature->mood = ESCAPE_MOOD;
+
+
+				}
+				if (item->HitPoints <= 0)
+				if (item->hitPoints <= 0)
+				{
+					auto pos = Vector3Int(0, 0, 50);
+					SoundEffect(SFX_TR5_HITMAN_CHOKE, &item->Pose, 0);
+					GetJointAbsPosition(item, &pos, HitmanJoints[12]);
+					TriggerLightningGlow(pos.x, pos.y, pos.z, 48, 32, 32, 64);
+					TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
+					TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
+					item->Animation.ActiveState = CYBORG_STATE_GASSED;
+					item->Animation.AnimNumber = object->animIndex + 68;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+					item->currentAnimState = STATE_HITMAN_GASSED;
+					item->animNumber = obj->animIndex + 68;
+					item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 				}
 			}
 
