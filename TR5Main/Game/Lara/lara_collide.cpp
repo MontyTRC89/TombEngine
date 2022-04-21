@@ -171,6 +171,10 @@ bool LaraDeflectEdgeCrawl(ITEM_INFO* item, CollisionInfo* coll)
 
 bool LaraDeflectEdgeMonkey(ITEM_INFO* item, CollisionInfo* coll)
 {
+	// HACK
+	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
+		coll->Shift.y = 0;
+
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT ||
 		coll->HitTallObject)
 	{

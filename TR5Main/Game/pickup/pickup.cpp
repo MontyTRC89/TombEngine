@@ -239,7 +239,7 @@ void DoPickup(ITEM_INFO* laraItem)
 			lara->Control.Weapon.GunType = LaraWeaponType::Flare;
 			InitialiseNewWeapon(laraItem);
 			lara->Control.HandStatus = HandStatus::Special;
-			lara->Flare.Life = (short)(pickupItem->Data) & 0x7FFF;
+			lara->Flare.Life = (int)(pickupItem->Data) & 0x7FFF;
 			KillItem(pickupItemNumber);
 			getThisItemPlease = NO_ITEM;
 			return;
