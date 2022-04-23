@@ -18,6 +18,7 @@ public:
 
 	std::string ToString() const;
 
+	void ToLength(int newLength);
 	void StoreInPHDPos(PHD_3DPOS& pos) const;
 	void StoreInGameVector(GAME_VECTOR& vec) const;
 
