@@ -1,6 +1,7 @@
 #include "frameworkandsol.h"
 #include "Vec3.h"
 #include "Specific/phd_global.h"
+#include "ReservedScriptNames.h"
 
 /***
 Represents a 3-dimensional vector.
@@ -10,13 +11,25 @@ Represents a 3-dimensional vector.
 
 void Vec3::Register(sol::table & parent)
 {
-	parent.new_usertype<Vec3>("Vec3",
+	parent.new_usertype<Vec3>(ScriptReserved_Vec3,
 		sol::constructors<Vec3(int, int, int)>(),
 		sol::meta_function::to_string, &Vec3::ToString,
 		sol::meta_function::addition, &AddVec3s,
 		sol::meta_function::subtraction, &SubtractVec3s,
 		sol::meta_function::unary_minus, &UnaryMinusVec3,
 		sol::meta_function::multiplication, &MultiplyVec3Number,
+
+/*** Modify this vector so that it becomes close to the requested length.
+
+Note that since the engine uses integers instead of floating-point
+numbers, this will be less accurate at smaller lengths.
+For example, if you have the vector (100, 600, 700) and set it to
+the length of 1, the vector SHOULD become approximately (0.11, 0.65, 0.75).
+However, this function would return it as (0, 1, 1).
+@tparam int length the new length to set the vector to.
+@function Vec3:GetNormalised
+*/
+		ScriptReserved_ToLength, &Vec3::ToLength,
 
 		/// (int) x coordinate
 		//@mem x
@@ -91,5 +104,13 @@ Vec3 MultiplyVec3Number(Vec3 const& one, double const & two)
 Vec3 UnaryMinusVec3(Vec3 const& one)
 {
 	return Vec3{ one.x * -1, one.y * -1, one.z * -1 };
+}
+
+void Vec3::ToLength(int newLength)
+{
+	auto len = sqrt(x * x + y * y + z * z);
+	x = static_cast<int>(round((x / len) * newLength));
+	y = static_cast<int>(round((y / len) * newLength));
+	z = static_cast<int>(round((z / len) * newLength));
 }
 
