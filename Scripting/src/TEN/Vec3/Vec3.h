@@ -25,3 +25,6 @@ public:
 };
 
 Vec3 AddVec3s(Vec3 const& one, Vec3 const& two);
+Vec3 SubtractVec3s(Vec3 const& one, Vec3 const& two);
+Vec3 MultiplyVec3Number(Vec3 const& one, double const & two);
+Vec3 UnaryMinusVec3(Vec3 const& one);
