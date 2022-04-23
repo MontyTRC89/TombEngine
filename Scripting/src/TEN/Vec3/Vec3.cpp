@@ -14,6 +14,9 @@ void Vec3::Register(sol::table & parent)
 		sol::constructors<Vec3(int, int, int)>(),
 		sol::meta_function::to_string, &Vec3::ToString,
 		sol::meta_function::addition, &AddVec3s,
+		sol::meta_function::subtraction, &SubtractVec3s,
+		sol::meta_function::unary_minus, &UnaryMinusVec3,
+		sol::meta_function::multiplication, &MultiplyVec3Number,
 
 		/// (int) x coordinate
 		//@mem x
@@ -72,7 +75,21 @@ std::string Vec3::ToString() const
 
 Vec3 AddVec3s(Vec3 const & one, Vec3 const & two)
 {
-	return Vec3 { one.x + two.x, one.y + two.y, one.z + two.z };
+	return Vec3{ one.x + two.x, one.y + two.y, one.z + two.z };
 }
 
+Vec3 SubtractVec3s(Vec3 const & one, Vec3 const & two)
+{
+	return Vec3{ one.x - two.x, one.y - two.y, one.z - two.z };
+}
+
+Vec3 MultiplyVec3Number(Vec3 const& one, double const & two)
+{
+	return Vec3{ static_cast<int>(one.x * two), static_cast<int>(one.y * two), static_cast<int>(one.z * two) };
+}
+
+Vec3 UnaryMinusVec3(Vec3 const& one)
+{
+	return Vec3{ one.x * -1, one.y * -1, one.z * -1 };
+}
 
