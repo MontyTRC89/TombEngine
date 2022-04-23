@@ -48,7 +48,7 @@ Moveable::Moveable(Moveable&& other) noexcept :
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, &other);
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
 	}
-};
+}
 
 
 Moveable::~Moveable()

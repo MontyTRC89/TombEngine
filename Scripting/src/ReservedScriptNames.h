@@ -17,6 +17,7 @@ static constexpr char ScriptReserved_Sink[]				= "Sink";
 static constexpr char ScriptReserved_SoundSource[]		= "SoundSource";
 static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
+static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 
 // Member functions
 static constexpr char ScriptReserved_new[]				= "New";
@@ -70,6 +71,7 @@ static constexpr char ScriptReserved_GetOnCollidedWithObject[]	= "GetOnCollidedW
 static constexpr char ScriptReserved_SetOnCollidedWithObject[]	= "SetOnCollidedWithObject";
 static constexpr char ScriptReserved_GetOnCollidedWithRoom[]	= "GetOnCollidedWithRoom";
 static constexpr char ScriptReserved_SetOnCollidedWithRoom[]	= "SetOnCollidedWithRoom";
+static constexpr char ScriptReserved_ToLength[]					= "ToLength";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";

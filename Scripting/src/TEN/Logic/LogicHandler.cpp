@@ -71,6 +71,7 @@ sol::object GetVariable(sol::table tab, sol::object key)
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
 #if TEN_OPTIONAL_LUA
+	lua_gc(m_handler.GetState()->lua_state(), LUA_GCSTOP, 0);
 	ResetLevelTables();
 	ResetGameTables();
 #endif
@@ -434,6 +435,7 @@ void LogicHandler::OnLoad()
 
 void LogicHandler::OnControlPhase(float dt)
 {
+	lua_gc(m_handler.GetState()->lua_state(), LUA_GCCOLLECT, 0);
 #if TEN_OPTIONAL_LUA
 	if(m_onControlPhase.valid())
 		doCallback(m_onControlPhase, dt);
