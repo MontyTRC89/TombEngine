@@ -2,7 +2,8 @@
 
 struct WraithInfo
 {
-	PHD_3DPOS Pose;
+	Vector3Int Position;
+	Vector3Int Velocity;
 
 	unsigned char r;
 	unsigned char g;
