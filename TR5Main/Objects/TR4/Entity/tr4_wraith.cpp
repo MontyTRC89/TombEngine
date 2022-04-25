@@ -56,8 +56,11 @@ namespace TEN::Entities::TR4
 		// HitPoints stores the target of wraith
 		auto* target = item->ItemFlags[6] ? &g_Level.Items[item->ItemFlags[6]] : LaraItem;
 
-		int x, y, z, distance, dx, dy, dz, oldX, oldY, oldZ;
+		auto oldPos = item->Pose.Position;
 
+		int x, y, z;
+		int dy, dz;
+		int distance;
 		if (target == LaraItem || target->ObjectNumber == ID_ANIMATING10)
 		{
 			x = target->Pose.Position.x - item->Pose.Position.x;
@@ -212,7 +215,8 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if (distance >= 28900 || abs(item->Pose.Position.y - target->Pose.Position.y + CLICK(1.5f)) >= CLICK(1))
+		if (distance >= SECTOR(28.25f) ||
+			(abs(item->Pose.Position.y - target->Pose.Position.y + CLICK(1.5f))) >= CLICK(1))
 		{
 			if (Wibble & 16)
 			{
@@ -249,9 +253,9 @@ namespace TEN::Entities::TR4
 				item->ItemFlags[7]++;
 				if (item->ItemFlags[7] > 10)
 				{
-					item->Pose.Position.x = target->Pose.Position.x;
-					item->Pose.Position.y = target->Pose.Position.y - 384;
-					item->Pose.Position.z = target->Pose.Position.z;
+					item->Pose.Position = target->Pose.Position;
+					item->Pose.Position.y -= CLICK(1.5f);
+
 					WraithExplosionEffect(item, 96, 96, 96, -32);
 					WraithExplosionEffect(item, 48, 48, 48, 48);
 
@@ -285,89 +289,78 @@ namespace TEN::Entities::TR4
 			probe.Position.Ceiling > item->Pose.Position.y)
 		{
 			if (!hitWall)
-				WraithWallsEffect(oldX, oldY, oldZ, item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f), item->ObjectNumber);
+				WraithWallsEffect(oldPos, item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
-			WraithWallsEffect(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Pose.Orientation.y, item->ObjectNumber);
+			WraithWallsEffect(item->Pose.Position, item->Pose.Orientation.y, item->ObjectNumber);
 
 		// Update WRAITH nodes
-		auto* creature = (WraithInfo*)item->Data;
+		auto* wraith = (WraithInfo*)item->Data;
 
 		int j = 0;
 		for (int i = WRAITH_COUNT - 1; i > 0; i--)
 		{
-			creature[i - 1].Position += (creature[i - 1].Velocity / 16);
-			creature[i - 1].Velocity -= (creature[i - 1].Velocity / 16);
+			wraith[i - 1].Position += (wraith[i - 1].Velocity / 16);
+			wraith[i - 1].Velocity -= (wraith[i - 1].Velocity / 16);
 
-			creature[i].Position = creature[i - 1].Position;
-			creature[i].Velocity = creature[i - 1].Velocity;
+			wraith[i].Position = wraith[i - 1].Position;
+			wraith[i].Velocity = wraith[i - 1].Velocity;
 
 			if (item->ObjectNumber == ID_WRAITH1)
 			{
-				creature[i].r = (GetRandomControl() & 0x3F) - 64;
-				creature[i].g = 16 * (j + 1) + (GetRandomControl() & 0x3F);
-				creature[i].b = GetRandomControl() & 0xF;
+				wraith[i].r = (GetRandomControl() & 0x3F) - 64;
+				wraith[i].g = 16 * (j + 1) + (GetRandomControl() & 0x3F);
+				wraith[i].b = GetRandomControl() & 0xF;
 			}
 			else if (item->ObjectNumber == ID_WRAITH2)
 			{
-				creature[i].r = GetRandomControl() & 0xF;
-				creature[i].g = 16 * (j + 1) + (GetRandomControl() & 0x3F);
-				creature[i].b = (GetRandomControl() & 0x3F) - 64;
+				wraith[i].r = GetRandomControl() & 0xF;
+				wraith[i].g = 16 * (j + 1) + (GetRandomControl() & 0x3F);
+				wraith[i].b = (GetRandomControl() & 0x3F) - 64;
 			}
 			else
 			{
-				creature[i].r = 8 * (j + 2) + (GetRandomControl() & 0x3F);
-				creature[i].g = creature[i].r;
-				creature[i].b = creature[i].r + (GetRandomControl() & 0xF);
+				wraith[i].r = 8 * (j + 2) + (GetRandomControl() & 0x3F);
+				wraith[i].g = wraith[i].r;
+				wraith[i].b = wraith[i].r + (GetRandomControl() & 0xF);
 			}
 
 			j++;
 		}
 
-		creature[0].Position = item->Pose.Position;
-
-		creature[0].Velocity.x = 4 * (item->Pose.Position.x - oldX);
-		creature[0].Velocity.y = 4 * (item->Pose.Position.y - oldY);
-		creature[0].Velocity.z = 4 * (item->Pose.Position.z - oldZ);
+		wraith[0].Position = item->Pose.Position;
+		wraith[0].Velocity = (item->Pose.Position - oldPos) * 4;
 
 		// Standard WRAITH drawing code
 		DrawWraith(
-			item->Pose.Position.x,
-			item->Pose.Position.y,
-			item->Pose.Position.z,
-			creature[0].Velocity.x,
-			creature[0].Velocity.y,
-			creature[0].Velocity.z,
+			item->Pose.Position,
+			wraith[0].Velocity,
 			item->ObjectNumber);
 
 		DrawWraith(
-			(oldX + item->Pose.Position.x) / 2,
-			(oldY + item->Pose.Position.y) / 2,
-			(oldZ + item->Pose.Position.z) / 2,
-			creature[0].Velocity.x,
-			creature[0].Velocity.y,
-			creature[0].Velocity.z,
+			(oldPos + item->Pose.Position) / 2,
+			wraith[0].Velocity,
 			item->ObjectNumber);
 
 		// Lighting for WRAITH
 		byte r, g, b;
 		if (item->ObjectNumber == ID_WRAITH3)
 		{
-			r = creature[5].r;
-			g = creature[5].g;
-			b = creature[5].b;
+			r = wraith[5].r;
+			g = wraith[5].g;
+			b = wraith[5].b;
 		}
 		else
 		{
-			r = creature[1].r;
-			g = creature[1].g;
-			b = creature[1].b;
+			r = wraith[1].r;
+			g = wraith[1].g;
+			b = wraith[1].b;
 		}
 
 		TriggerDynamicLight(
-			creature[0].Position.x,
-			creature[0].Position.y,
-			creature[0].Position.z,
+			wraith[0].Position.x,
+			wraith[0].Position.y,
+			wraith[0].Position.z,
 			16,
 			r, g, b);
 	}
@@ -387,7 +380,7 @@ namespace TEN::Entities::TR4
 		item->Pose.Position.y += 384;
 	}
 
-	void DrawWraith(int x, int y, int z, short xVelocity, short yVelocity, short zVelocity, int objectNumber)
+	void DrawWraith(Vector3Int pos, Vector3Int velocity, int objectNumber)
 	{
 		auto* spark = &Sparks[GetFreeSpark()];
 		spark->on = 1;
@@ -429,14 +422,14 @@ namespace TEN::Entities::TR4
 		unsigned char life = (GetRandomControl() & 7) + 12;
 		spark->life = life;
 		spark->sLife = life;
-		spark->x = (GetRandomControl() & 0x1F) + x - 16;
-		spark->y = y;
+		spark->x = (GetRandomControl() & 0x1F) + pos.x - 16;
+		spark->y = pos.y;
 		spark->friction = 85;
 		spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-		spark->z = (GetRandomControl() & 0x1F) + z - 16;
-		spark->xVel = xVelocity;
-		spark->yVel = yVelocity;
-		spark->zVel = zVelocity;
+		spark->z = (GetRandomControl() & 0x1F) + pos.z - 16;
+		spark->xVel = velocity.x;
+		spark->yVel = velocity.y;
+		spark->zVel = velocity.z;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
 		spark->scalar = 2;
@@ -446,7 +439,7 @@ namespace TEN::Entities::TR4
 		spark->size = size;
 	}
 
-	void WraithWallsEffect(int x, int y, int z, float yRot, short objectNumber)
+	void WraithWallsEffect(Vector3Int pos, short yRot, short objectNumber)
 	{
 		byte sR, sG, sB, dR, dG, dB;
 		short color;
@@ -495,10 +488,10 @@ namespace TEN::Entities::TR4
 			short life = (GetRandomControl() & 7) + 32;
 			spark->life = life;
 			spark->sLife = life;
-			spark->x = (GetRandomControl() & 0x1F) + x - 16;
-			spark->y = (GetRandomControl() & 0x1F) + y - 16;
-			spark->z = (GetRandomControl() & 0x1F) + z - 16;
-			short rot = yRot + GetRandomControl() - EulerAngle::DegToRad(90);
+			spark->x = (GetRandomControl() & 0x1F) + pos.x - 16;
+			spark->y = (GetRandomControl() & 0x1F) + pos.y - 16;
+			spark->z = (GetRandomControl() & 0x1F) + pos.z - 16;
+			short rot = yRot + GetRandomControl() - EulerAngle::DegToRad(90.0f);
 			short velocity = ((GetRandomControl() & 0x3FF) + 1024);
 			spark->xVel = velocity * sin(rot);
 			spark->yVel = (GetRandomControl() & 0x7F) - 64;
