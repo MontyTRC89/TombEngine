@@ -330,29 +330,29 @@ void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
 
 bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* laraItem)
 {
-	float xRotRel = laraItem->Pose.Orientation.x - item->Pose.Orientation.x;
-	float yRotRel = laraItem->Pose.Orientation.y - item->Pose.Orientation.y;
-	float zRotRel = laraItem->Pose.Orientation.z - item->Pose.Orientation.z;
+	auto rotRel = laraItem->Pose.Orientation - item->Pose.Orientation;
 
-	if (xRotRel < bounds->rotX1)
+	if (rotRel.x < bounds->rotX1)
 		return false;
 
-	if (xRotRel > bounds->rotX2)
+	if (rotRel.x > bounds->rotX2)
 		return false;
 
-	if (yRotRel < bounds->rotY1)
+	if (rotRel.y < bounds->rotY1)
 		return false;
 
-	if (yRotRel > bounds->rotY2)
+	if (rotRel.y > bounds->rotY2)
 		return false;
 
-	if (zRotRel < bounds->rotZ1)
+	if (rotRel.z < bounds->rotZ1)
 		return false;
 
-	if (zRotRel > bounds->rotZ2)
+	if (rotRel.z > bounds->rotZ2)
 		return false;
 
 	auto differenceVector = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
+	int y = laraItem->Pose.Position.y - item->Pose.Position.y;
+	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
 		item->Pose.Orientation.y,
@@ -398,8 +398,7 @@ bool MoveLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	PoseData dest;
-	dest.Orientation.x = item->Pose.Orientation.x;
+	auto dest = PoseData(item->Pose.Orientation);
 	dest.Orientation.y = item->Pose.Orientation.y;
 	dest.Orientation.z = item->Pose.Orientation.z;
 
@@ -423,11 +422,9 @@ bool MoveLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 	int height = GetCollision(dest.Position.x, dest.Position.y, dest.Position.z, laraItem->RoomNumber).Position.Floor;
 	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
 	{
-		int x = dest.Position.x - laraItem->Pose.Position.x;
-		int y = dest.Position.y - laraItem->Pose.Position.y;
-		int z = dest.Position.z - laraItem->Pose.Position.z;
+		auto direction = dest.Position - laraItem->Pose.Position;
 
-		float distance = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+		float distance = sqrt(pow(direction.x, 2) + pow(direction.y, 2) + pow(direction.z, 2));
 		if (distance < CLICK(0.5f))
 			return true;
 
@@ -478,10 +475,7 @@ bool ItemNearLara(PoseData* pos, int radius)
 
 bool ItemNearTarget(PoseData* src, ITEM_INFO* target, int radius)
 {
-	Vector3Int pos;
-	pos.x = src->Position.x - target->Pose.Position.x;
-	pos.y = src->Position.y - target->Pose.Position.y;
-	pos.z = src->Position.z - target->Pose.Position.z;
+	auto pos = src->Position - target->Pose.Position;
 
 	if (!ItemCollide(pos.y, ITEM_RADIUS_YMAX))
 		return false;
@@ -582,9 +576,10 @@ bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius)
 
 	if (item->Pose.Position.y + bounds->Y1 >= laraItem->Pose.Position.y + laraBounds->Y2)
 		return false;
-
+	
 	float sinY = sin(item->Pose.Orientation.y);
 	float cosY = cos(item->Pose.Orientation.y);
+
 	int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
 	int dx = cosY * x - sinY * z;
@@ -614,9 +609,10 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 
 	if (mesh->pos.Position.y + bounds.Y1 >= item->Pose.Position.y + frame->boundingBox.Y2)
 		return false;
-
+	
 	float cosY = cos(mesh->pos.Orientation.y);
 	float sinY = sin(mesh->pos.Orientation.y);
+
 	int x = item->Pose.Position.x - mesh->pos.Position.x;
 	int z = item->Pose.Position.z - mesh->pos.Position.z;
 	int dx = cosY * x - sinY * z;
@@ -691,7 +687,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 	item2->Pose.Position.x = item->Pose.Position.x + cosY * rx + sinY * rz;
 	item2->Pose.Position.z = item->Pose.Position.z + cosY * rz - sinY * rx;
 
-	auto* lara = item2->Data.is<LaraInfo*>() ? (LaraInfo*&)item2->Data : nullptr;
+	auto* lara = item2->Data.is<LaraInfo*>() ? GetLaraInfo(item2) : nullptr;
 
 	if (lara != nullptr && spasmEnabled && bounds->Y2 - bounds->Y1 > CLICK(1))
 	{
@@ -1169,28 +1165,28 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			yAngle = (long)((unsigned short)item->Pose.Orientation.y);
 			if (collResult.FloorTilt.x < 0)
 			{
-				if (yAngle >= 0x8000)
+				if (yAngle >= EulerAngle::DegToRad(180.0f))
 					bs = 1;
 			}
 			else if (collResult.FloorTilt.x > 0)
 			{
-				if (yAngle <= 0x8000)
+				if (yAngle <= EulerAngle::DegToRad(180.0f))
 					bs = 1;
 			}
 
 			if (collResult.FloorTilt.y < 0)
 			{
-				if (yAngle >= 0x4000 && yAngle <= 0xc000)
+				if (yAngle >= EulerAngle::DegToRad(90.0f) && yAngle <= EulerAngle::DegToRad(270.0f))
 					bs = 1;
 			}
 			else if (collResult.FloorTilt.y > 0)
 			{
-				if (yAngle <= 0x4000 || yAngle >= 0xc000)
+				if (yAngle <= EulerAngle::DegToRad(90.0f) || yAngle >= EulerAngle::DegToRad(270.0f))
 					bs = 1;
 			}
 		}
 
-		/* If last position of item was also below this floor height, we've hit a wall, else we've hit a floor */
+		// If last position of item was also below this floor height, we've hit a wall, else we've hit a floor.
 
 		if (y > (collResult.Position.Floor + 32) && bs == 0 &&
 			(((x / SECTOR(1)) != (item->Pose.Position.x / SECTOR(1))) ||
@@ -1198,7 +1194,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		{
 			// Need to know which direction the wall is.
 
-			long	xs;
+			long xs;
 
 			if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))) &&	// X crossed boundary?
 				(z & (~(WALL_SIZE - 1))) != (item->Pose.Position.z & (~(WALL_SIZE - 1))))	// Z crossed boundary as well?
@@ -1213,100 +1209,107 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 			if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))) && xs)	// X crossed boundary?
 			{
-				if (xv <= 0)	// Hit angle = 0xc000.
-					item->Pose.Orientation.y = 0x4000 + (0xc000 - item->Pose.Orientation.y);
-				else			// Hit angle = 0x4000.
-					item->Pose.Orientation.y = 0xc000 + (0x4000 - item->Pose.Orientation.y);
+				// Hit angle = EulerAngle::DegToRad(270.0f).
+				if (xv <= 0)
+					item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f) + (EulerAngle::DegToRad(270.0f) - item->Pose.Orientation.y);
+				// Hit angle = EulerAngle::DegToRad(90.0f).
+				else
+					item->Pose.Orientation.y = EulerAngle::DegToRad(270.0f) + (EulerAngle::DegToRad(90.0f) - item->Pose.Orientation.y);
 			}
-			else		// Z crossed boundary.
-				item->Pose.Orientation.y = 0x8000 - item->Pose.Orientation.y;
+			// Z crossed boundary.
+			else
+				item->Pose.Orientation.y = EulerAngle::DegToRad(180.0f) - item->Pose.Orientation.y;
 
 			item->Animation.Velocity /= 2;
 
-			/* Put item back in its last position */
+			// Put item back in its last position.
 			item->Pose.Position.x = x;
 			item->Pose.Position.y = y;
 			item->Pose.Position.z = z;
 		}
-		else if (collResult.Position.FloorSlope) 	// Hit a steep slope?
+		// Hit a steep slope?
+		else if (collResult.Position.FloorSlope)
 		{
 			// Need to know which direction the slope is.
 
 			item->Animation.Velocity -= (item->Animation.Velocity / 4);
 
-			if (collResult.FloorTilt.x < 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))	// Hit angle = 0x4000
+			// Hit angle = EulerAngle::DegToRad(90.0f)
+			if (collResult.FloorTilt.x < 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x8000)
+				if (((unsigned short)item->Pose.Orientation.y) > EulerAngle::DegToRad(180.0f))
 				{
-					item->Pose.Orientation.y = 0x4000 + (0xc000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f) + (EulerAngle::DegToRad(270.0f) - (unsigned short)item->Pose.Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity -= collResult.FloorTilt.x * 2;
-						if ((unsigned short)item->Pose.Orientation.y > 0x4000 && (unsigned short)item->Pose.Orientation.y < 0xc000)
+						if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(90.0f) && (unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(270.0f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x4000)
-								item->Pose.Orientation.y = 0x4000;
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(90.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
 						}
-						else if ((unsigned short)item->Pose.Orientation.y < 0x4000)
+						else if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(90.0f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x4000)
-								item->Pose.Orientation.y = 0x4000;
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(90.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
 						}
 					}
 
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 					else
 						item->Animation.VerticalVelocity = 0;
 				}
 			}
-			else if (collResult.FloorTilt.x > 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))	// Hit angle = 0xc000
+			// Hit angle = EulerAngle::DegToRad(270.0f)
+			else if (collResult.FloorTilt.x > 0 && ((abs(collResult.FloorTilt.x)) - (abs(collResult.FloorTilt.y)) >= 2))
 			{
-				if (((unsigned short)item->Pose.Orientation.y) < 0x8000)
+				if (((unsigned short)item->Pose.Orientation.y) < EulerAngle::DegToRad(180.0f))
 				{
-					item->Pose.Orientation.y = 0xc000 + (0x4000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(270.0f) + (EulerAngle::DegToRad(90.0f) - (unsigned short)item->Pose.Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += collResult.FloorTilt.x * 2;
-						if ((unsigned short)item->Pose.Orientation.y > 0xc000 || (unsigned short)item->Pose.Orientation.y < 0x4000)
+						if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(270.0f) || (unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(90.0f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0xc000)
-								item->Pose.Orientation.y = 0xc000;
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(270.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(270.0f);
 						}
-						else if ((unsigned short)item->Pose.Orientation.y < 0xc000)
+						else if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(270.0f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xc000)
-								item->Pose.Orientation.y = 0xc000;
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(270.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(270.0f);
 						}
 					}
 
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 					else
 						item->Animation.VerticalVelocity = 0;
 				}
 			}
-			else if (collResult.FloorTilt.y < 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))	// Hit angle = 0
+			// Hit angle = 0
+			else if (collResult.FloorTilt.y < 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x4000 && ((unsigned short)item->Pose.Orientation.y) < 0xc000)
+				if (((unsigned short)item->Pose.Orientation.y) > EulerAngle::DegToRad(90.0f) && ((unsigned short)item->Pose.Orientation.y) < EulerAngle::DegToRad(270.0f))
 				{
-					item->Pose.Orientation.y = (0x8000 - item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(180.0f) - item->Pose.Orientation.y - 1;
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
@@ -1314,33 +1317,34 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					{
 						item->Animation.Velocity -= collResult.FloorTilt.y * 2;
 
-						if ((unsigned short)item->Pose.Orientation.y < 0x8000)
+						if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(180.0f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xf000)
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(337.5))
 								item->Pose.Orientation.y = 0;
 						}
-						else if ((unsigned short)item->Pose.Orientation.y >= 0x8000)
+						else if ((unsigned short)item->Pose.Orientation.y >= EulerAngle::DegToRad(180.0f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x1000)
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(22.5f))
 								item->Pose.Orientation.y = 0;
 						}
 					}
 
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 					else
 						item->Animation.VerticalVelocity = 0;
 				}
 			}
-			else if (collResult.FloorTilt.y > 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))	// Hit angle = 0x8000
+			// Hit angle = EulerAngle::DegToRad(180.0f)
+			else if (collResult.FloorTilt.y > 0 && ((abs(collResult.FloorTilt.y)) - (abs(collResult.FloorTilt.x)) >= 2))
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0xc000 || ((unsigned short)item->Pose.Orientation.y) < 0x4000)
+				if (((unsigned short)item->Pose.Orientation.y) > EulerAngle::DegToRad(270.0f) || ((unsigned short)item->Pose.Orientation.y) < EulerAngle::DegToRad(90.0f))
 				{
-					item->Pose.Orientation.y = (0x8000 - item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(180.0f) - item->Pose.Orientation.y - 1;
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
@@ -1348,149 +1352,152 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					{
 						item->Animation.Velocity += collResult.FloorTilt.y * 2;
 
-						if ((unsigned short)item->Pose.Orientation.y > 0x8000)
+						if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(180.0f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x8000)
-								item->Pose.Orientation.y = 0x8000;
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(180.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(180.0f);
 						}
-						else if ((unsigned short)item->Pose.Orientation.y < 0x8000)
+						else if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(180.0f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x8000)
-								item->Pose.Orientation.y = 0x8000;
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(180.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(180.0f);
 						}
 					}
 
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 					else
 						item->Animation.VerticalVelocity = 0;
 				}
 			}
 			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0x2000
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x6000 && ((unsigned short)item->Pose.Orientation.y) < 0xe000)
+				if (((unsigned short)item->Pose.Orientation.y) > EulerAngle::DegToRad(135.0f) && ((unsigned short)item->Pose.Orientation.y) < EulerAngle::DegToRad(315.0f))
 				{
-					item->Pose.Orientation.y = 0x2000 + (0xa000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(45.0f) + (EulerAngle::DegToRad(225.0f) - (unsigned short)item->Pose.Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
 					if (item->Animation.Velocity < 32)
 					{
-						item->Animation.Velocity += (-collResult.FloorTilt.x) + (-collResult.FloorTilt.y);
-						if ((unsigned short)item->Pose.Orientation.y > 0x2000 && (unsigned short)item->Pose.Orientation.y < 0xa000)
+						item->Animation.Velocity += -collResult.FloorTilt.x + -collResult.FloorTilt.y;
+						if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(45.0f) && (unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(225.0f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x2000)
-								item->Pose.Orientation.y = 0x2000;
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(45.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(45.0f);
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0x2000)
+						else if ((unsigned short)item->Pose.Orientation.y != EulerAngle::DegToRad(45.0f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x2000)
-								item->Pose.Orientation.y = 0x2000;
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(45.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(45.0f);
 						}
 					}
 
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 					else
 						item->Animation.VerticalVelocity = 0;
 				}
 			}
-			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y > 0)	// Hit angle = 0x6000
+			// Hit angle = EulerAngle::DegToRad(135.0f)
+			else if (collResult.FloorTilt.x < 0 && collResult.FloorTilt.y > 0)
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0xa000 || ((unsigned short)item->Pose.Orientation.y) < 0x2000)
+				if (((unsigned short)item->Pose.Orientation.y) > EulerAngle::DegToRad(225.0f) || ((unsigned short)item->Pose.Orientation.y) < EulerAngle::DegToRad(45.0f))
 				{
-					item->Pose.Orientation.y = 0x6000 + (0xe000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(135.0f) + (EulerAngle::DegToRad(315.0f) - (unsigned short)item->Pose.Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += (-collResult.FloorTilt.x) + collResult.FloorTilt.y;
-						if ((unsigned short)item->Pose.Orientation.y < 0xe000 && (unsigned short)item->Pose.Orientation.y > 0x6000)
+						if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(315.0f) && (unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(135.0f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0x6000)
-								item->Pose.Orientation.y = 0x6000;
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(135.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(135.0f);
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0x6000)
+						else if ((unsigned short)item->Pose.Orientation.y != EulerAngle::DegToRad(135.0f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0x6000)
-								item->Pose.Orientation.y = 0x6000;
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(135.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(135.0f);
 						}
 					}
 
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 					else
 						item->Animation.VerticalVelocity = 0;
 				}
 			}
-			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y > 0)	// Hit angle = 0xa000
+			// Hit angle = EulerAngle::DegToRad(225.5f)
+			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y > 0)
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0xe000 || ((unsigned short)item->Pose.Orientation.y) < 0x6000)
+				if (((unsigned short)item->Pose.Orientation.y) > EulerAngle::DegToRad(315.0f) || ((unsigned short)item->Pose.Orientation.y) < EulerAngle::DegToRad(135.0f))
 				{
-					item->Pose.Orientation.y = 0xa000 + (0x2000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(225.5f) + (EulerAngle::DegToRad(45.0f) - (unsigned short)item->Pose.Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += collResult.FloorTilt.x + collResult.FloorTilt.y;
-						if ((unsigned short)item->Pose.Orientation.y < 0x2000 || (unsigned short)item->Pose.Orientation.y > 0xa000)
+						if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(45.0f) || (unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(225.5f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0xa000)
-								item->Pose.Orientation.y = 0xa000;
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(225.5f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(225.5f);
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0xa000)
+						else if ((unsigned short)item->Pose.Orientation.y != EulerAngle::DegToRad(225.5f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xa000)
-								item->Pose.Orientation.y = 0xa000;
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(225.5f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(225.5f);
 						}
 					}
 
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 					else
 						item->Animation.VerticalVelocity = 0;
 				}
 			}
-			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y < 0)	// Hit angle = 0xe000
+			// Hit angle = EulerAngle::DegToRad(315.0f)
+			else if (collResult.FloorTilt.x > 0 && collResult.FloorTilt.y < 0)
 			{
-				if (((unsigned short)item->Pose.Orientation.y) > 0x2000 && ((unsigned short)item->Pose.Orientation.y) < 0xa000)
+				if (((unsigned short)item->Pose.Orientation.y) > EulerAngle::DegToRad(45.0f) && ((unsigned short)item->Pose.Orientation.y) < EulerAngle::DegToRad(225.5f))
 				{
-					item->Pose.Orientation.y = 0xe000 + (0x6000 - (unsigned short)item->Pose.Orientation.y - 1);
+					item->Pose.Orientation.y = EulerAngle::DegToRad(315.0f) + (EulerAngle::DegToRad(135.0f)- (unsigned short)item->Pose.Orientation.y - 1);
 					if (item->Animation.VerticalVelocity > 0)
-						item->Animation.VerticalVelocity = -(item->Animation.VerticalVelocity / 2);
+						item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 2;
 				}
 				else
 				{
 					if (item->Animation.Velocity < 32)
 					{
 						item->Animation.Velocity += collResult.FloorTilt.x + (-collResult.FloorTilt.y);
-						if ((unsigned short)item->Pose.Orientation.y < 0x6000 || (unsigned short)item->Pose.Orientation.y > 0xe000)
+						if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(135.0f) || (unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(315.0f))
 						{
-							item->Pose.Orientation.y -= 4096;
-							if ((unsigned short)item->Pose.Orientation.y < 0xe000)
-								item->Pose.Orientation.y = 0xe000;
+							item->Pose.Orientation.y -= EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y < EulerAngle::DegToRad(315.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(315.0f);
 						}
-						else if ((unsigned short)item->Pose.Orientation.y != 0xe000)
+						else if ((unsigned short)item->Pose.Orientation.y != EulerAngle::DegToRad(315.0f))
 						{
-							item->Pose.Orientation.y += 4096;
-							if ((unsigned short)item->Pose.Orientation.y > 0xe000)
-								item->Pose.Orientation.y = 0xe000;
+							item->Pose.Orientation.y += EulerAngle::DegToRad(22.5f);
+							if ((unsigned short)item->Pose.Orientation.y > EulerAngle::DegToRad(315.0f))
+								item->Pose.Orientation.y = EulerAngle::DegToRad(315.0f);
 						}
 					}
 
@@ -1501,14 +1508,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 
-			/* Put item back in its last position */
+			// Put item back in its last position.
 			item->Pose.Position.x = x;
 			item->Pose.Position.y = y;
 			item->Pose.Position.z = z;
 		}
 		else
 		{
-			/* Hit the floor; bounce and slow down */
+			// Hit the floor; bounce and slow down.
 			if (item->Animation.VerticalVelocity > 0)
 			{
 				if (item->Animation.VerticalVelocity > 16)
@@ -1524,7 +1531,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 				else
 				{
-					/* Roll on floor */
+					// Roll on floor.
 					item->Animation.VerticalVelocity = 0;
 					if (item->ObjectNumber == ID_GRENADE)
 					{
@@ -1539,10 +1546,12 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->Animation.Velocity = 0;
 				}
 			}
+
 			item->Pose.Position.y = collResult.Position.Floor;
 		}
 	}
-	else	// Check for on top of object.
+	// Check for on top of object.
+	else
 	{
 		if (yv >= 0)
 		{
@@ -1557,7 +1566,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 			if (item->Pose.Position.y >= oldCollResult.Position.Floor)
 			{
-				/* Hit the floor; bounce and slow down */
+				// Hit the floor; bounce and slow down.
 				if (item->Animation.VerticalVelocity > 0)
 				{
 					if (item->Animation.VerticalVelocity > 16)
@@ -1573,7 +1582,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					}
 					else
 					{
-						/* Roll on floor */
+						// Roll on floor.
 						item->Animation.VerticalVelocity = 0;
 						if (item->ObjectNumber == ID_GRENADE)
 						{
@@ -1588,12 +1597,13 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 							item->Animation.Velocity = 0;
 					}
 				}
+
 				item->Pose.Position.y = oldCollResult.Position.Floor;
 			}
 		}
-		//		else
+		// else
 		{
-			/* Bounce off ceiling */
+			// Bounce off ceiling.
 			collResult = GetCollision(item);
 
 			if (item->Pose.Position.y < collResult.Position.Ceiling)
@@ -1604,24 +1614,24 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					// Need to know which direction the wall is.
 
-					if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))))	// X crossed boundary?
+					// X crossed boundary?
+					if ((x & (~(WALL_SIZE - 1))) != (item->Pose.Position.x & (~(WALL_SIZE - 1))))
 					{
-						if (xv <= 0)	// Hit angle = 0xc000.
-							item->Pose.Orientation.y = 0x4000 + (0xc000 - item->Pose.Orientation.y);
-						else			// Hit angle = 0x4000.
-							item->Pose.Orientation.y = 0xc000 + (0x4000 - item->Pose.Orientation.y);
+						if (xv <= 0)	// Hit angle = EulerAngle::DegToRad(270.0f).
+							item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f) + (EulerAngle::DegToRad(270.0f) - item->Pose.Orientation.y);
+						else			// Hit angle = EulerAngle::DegToRad(90.0f).
+							item->Pose.Orientation.y = EulerAngle::DegToRad(270.0f) + (EulerAngle::DegToRad(90.0f) - item->Pose.Orientation.y);
 					}
-					else		// Z crossed boundary.
-					{
+					// Z crossed boundary.
+					else
 						item->Pose.Orientation.y = 0x8000 - item->Pose.Orientation.y;
-					}
 
 					if (item->ObjectNumber == ID_GRENADE)
 						item->Animation.Velocity -= item->Animation.Velocity / 8;
 					else
 						item->Animation.Velocity /= 2;
 
-					/* Put item back in its last position */
+					// Put item back in its last position.
 					item->Pose.Position.x = x;
 					item->Pose.Position.y = y;
 					item->Pose.Position.z = z;
@@ -1740,8 +1750,9 @@ void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 				{
 					int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 					int z = laraItem->Pose.Position.z - item->Pose.Position.z;
-					float s = sin(item->Pose.Orientation.y);
-					float c = cos(item->Pose.Orientation.y);
+
+					float sinY = sin(item->Pose.Orientation.y);
+					float cosY = cos(item->Pose.Orientation.y);
 
 					auto* frame = GetBestFrame(item);
 					int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
@@ -1749,8 +1760,8 @@ void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 
 					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 					{
-						int angle = (laraItem->Pose.Orientation.y - atan2(z - c * rx - s * rz, x - c * rx + s * rz) - EulerAngle::DegToRad(135.0f)) / EulerAngle::DegToRad(90.0f);
-						Lara.HitDirection = (short)angle;
+						float angle = (laraItem->Pose.Orientation.y - atan2(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - EulerAngle::DegToRad(135.0f)) / EulerAngle::DegToRad(90.0f);
+						Lara.HitDirection = angle;
 						// TODO: check if a second Lara.hitFrame++; is required there !
 						
 						Lara.HitFrame++;

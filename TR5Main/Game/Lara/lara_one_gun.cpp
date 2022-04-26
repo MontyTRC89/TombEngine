@@ -1668,7 +1668,7 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 	if (!lara->LeftArm.Locked)
 	{
 		angles[0] = lara->ExtraTorsoRot.y + lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.GetY();
-		angles[1] = lara->ExtraTorsoRot.z + lara->LeftArm.Rotation.x;
+		angles[1] = lara->ExtraTorsoRot.x + lara->LeftArm.Rotation.x;
 	}
 
 	if (mode)
