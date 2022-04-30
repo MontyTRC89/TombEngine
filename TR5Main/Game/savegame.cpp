@@ -27,6 +27,7 @@
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "Scripting/ScriptInterfaceLevel.h"
 #include "Scripting/ScriptInterfaceGame.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -967,8 +968,10 @@ bool SaveGame::Load(int slot)
 		if (savedItem->lua_name() != nullptr)
 		{
 			item->luaName = savedItem->lua_name()->str();
+			g_GameScriptEntities->AddName(item->luaName, i);
 		}
 
+		g_GameScriptEntities->TryAddColliding(i);
 		if (!dynamicItem)
 		{
 			// Kill immediately item if already killed and continue
