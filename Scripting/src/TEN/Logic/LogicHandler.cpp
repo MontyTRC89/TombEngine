@@ -202,6 +202,23 @@ void LogicHandler::SetVariables(std::vector<SavedVar> const & vars)
 					solTables.try_emplace(second, *m_handler.GetState(), sol::create);
 					solTables[i][vars[first]] = solTables[second];
 				}
+				else if (std::holds_alternative<double>(vars[second]))
+				{
+					double theNum = std::get<double>(vars[second]);
+					// If this is representable as an integer use an integer.
+					// This is to ensure something saved as 1 is not loaded as 1.0
+					// which would be confusing for the user.
+					// todo: should we throw a warning if the user tries to save or load a value
+					// outside of these bounds? - squidshire 30/04/2022
+					if (std::trunc(theNum) == theNum && theNum <= INT64_MAX && theNum >= INT64_MIN)
+					{
+						solTables[i][vars[first]] = static_cast<int64_t>(theNum);
+					}
+					else
+					{
+						solTables[i][vars[first]] = vars[second];
+					}
+				}
 				else
 				{
 					solTables[i][vars[first]] = vars[second];
