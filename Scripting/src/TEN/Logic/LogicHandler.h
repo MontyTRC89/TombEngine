@@ -48,7 +48,7 @@ public:
 	void								FreeLevelScripts() override;
 
 	bool								SetLevelFunc(sol::table tab, std::string const& luaName, sol::object obj);
-	void								ResetScripts() override;
+	void								ResetScripts(bool clearGameVars) override;
 
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
 
