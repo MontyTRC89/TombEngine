@@ -71,7 +71,7 @@ sol::object GetVariable(sol::table tab, sol::object key)
 LogicHandler::LogicHandler(sol::state* lua, sol::table & parent) : m_handler{ lua }
 {
 #if TEN_OPTIONAL_LUA
-	ResetScripts();
+	ResetScripts(true);
 #endif
 }
 
@@ -125,10 +125,13 @@ bool LogicHandler::SetLevelFunc(sol::table tab, std::string const& luaName, sol:
 #endif
 }
 
-void LogicHandler::ResetScripts()
+void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
-	ResetGameTables();
+
+	if(clearGameVars)
+		ResetGameTables();
+
 	m_handler.ResetGlobals();
 }
 
