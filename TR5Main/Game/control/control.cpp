@@ -476,7 +476,7 @@ GAME_STATUS DoTitle(int index, std::string const & ambient)
 		InitialiseCamera();
 		StopAllSounds();
 
-		g_GameScript->ResetScripts();
+		g_GameScript->ResetScripts(true);
 
 		// Run the level script
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
@@ -592,7 +592,7 @@ GAME_STATUS DoLevel(int index, std::string const & ambient, bool loadFromSavegam
 	InitialiseCamera();
 	StopAllSounds();
 
-	g_GameScript->ResetScripts();
+	g_GameScript->ResetScripts(loadFromSavegame);
 
 	// Run the level script
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
