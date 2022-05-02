@@ -109,7 +109,7 @@ void ApeVault(short itemNumber, float angle)
 		if (xx < xFloor)
 		{
 			item->Pose.Position.z = (xFloor * SECTOR(1)) - SHIFT;
-			item->Pose.Orientation.y = 0;
+			item->Pose.Orientation.SetY();
 		}
 		else
 		{

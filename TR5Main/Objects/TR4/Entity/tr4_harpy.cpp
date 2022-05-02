@@ -49,9 +49,7 @@ static void TriggerHarpyMissile(PoseData* pos, short roomNumber, int count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.x = pos->Orientation.x;
-		fx->pos.Orientation.y = pos->Orientation.y;
-		fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.Set(pos->Orientation.GetX(), pos->Orientation.GetY(), 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + -32768;
 		fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -200,9 +198,7 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 				pos3.z - pos1.z,
 				angles);
 
-			pos.Orientation.x = angles[1];
-			pos.Orientation.y = angles[0];
-			pos.Orientation.z = 0;
+			pos.Orientation.Set(angles[1], angles[0], 0.0f);
 
 			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
 		}
@@ -220,9 +216,7 @@ static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
 				pos3.z - pos1.z,
 				angles);
 
-			pos.Orientation.x = angles[1];
-			pos.Orientation.y = angles[0];
-			pos.Orientation.z = 0;
+			pos.Orientation.Set(angles[1], angles[0], 0.0f);
 			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
 		}
 	}
@@ -267,7 +261,7 @@ void HarpyControl(short itemNumber)
 			{
 				if (state == 1)
 				{
-					item->Pose.Orientation.x = 0;
+					item->Pose.Orientation.SetX();
 					item->Pose.Position.y = item->Floor;
 				}
 				else
@@ -277,7 +271,7 @@ void HarpyControl(short itemNumber)
 					item->Animation.ActiveState = 9;
 					item->Animation.Velocity = 0;
 					item->Animation.Airborne = true;
-					item->Pose.Orientation.x = 0;
+					item->Pose.Orientation.SetX();
 				}
 
 				CreatureTilt(item, 0);
@@ -301,7 +295,7 @@ void HarpyControl(short itemNumber)
 			item->Animation.Airborne = false;
 		}
 
-		item->Pose.Orientation.x = 0;
+		item->Pose.Orientation.SetX();
 	}
 	else
 	{

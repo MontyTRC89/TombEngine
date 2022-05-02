@@ -853,9 +853,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	gshell->pos.Position.x = pos.x;
 	gshell->pos.Position.y = pos.y;
 	gshell->pos.Position.z = pos.z;
-	gshell->pos.Orientation.x = 0;
-	gshell->pos.Orientation.y = 0;
-	gshell->pos.Orientation.z = GetRandomControl();
+	gshell->pos.Orientation.Set(0.0f, 0.0f, Angle::ShrtToRad(GetRandomControl()));
 	gshell->roomNumber = LaraItem->RoomNumber;
 	gshell->speed = (GetRandomControl() & 0x1F) + 16;
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);
@@ -1237,8 +1235,8 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
 
 				fx->roomNumber = item->RoomNumber;
-				fx->pos.Orientation.x = 0;
-				fx->pos.Orientation.y = GetRandomControl() * 2;
+				fx->pos.Orientation.SetX();
+				fx->pos.Orientation.SetY(Angle::ShrtToRad(GetRandomControl() * 2));
 
 				if (!(flags & 0x10))
 				{
@@ -1288,8 +1286,8 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 					fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
 
 					fx->roomNumber = item->RoomNumber;
-					fx->pos.Orientation.x = 0;
-					fx->pos.Orientation.y = GetRandomControl() * 2;
+					fx->pos.Orientation.SetX();
+					fx->pos.Orientation.SetY(Angle::ShrtToRad(GetRandomControl() * 2));
 
 					if (!(flags & 0x10))
 					{

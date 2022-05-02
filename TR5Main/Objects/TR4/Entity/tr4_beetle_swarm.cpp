@@ -80,8 +80,8 @@ namespace TEN::Entities::TR4
 						beetle->VerticalVelocity = 0;
 					}
 
-					beetle->Pose.Orientation.x = 0;
-					beetle->Pose.Orientation.z = 0;
+					beetle->Pose.Orientation.SetX();
+					beetle->Pose.Orientation.SetZ();
 					beetle->On = true;
 					beetle->Flags = 0;
 					beetle->Velocity = (GetRandomControl() & 0x1F) + 1;
@@ -203,8 +203,8 @@ namespace TEN::Entities::TR4
 					beetle->Pose.Position.x = oldx;
 					beetle->Pose.Position.y = oldy;
 					beetle->Pose.Position.z = oldz;
-					beetle->Pose.Orientation.x = 0;
-					beetle->Pose.Orientation.z = 0;
+					beetle->Pose.Orientation.SetX();
+					beetle->Pose.Orientation.SetZ();
 					beetle->VerticalVelocity = 0;
 				}
 				else
@@ -213,8 +213,8 @@ namespace TEN::Entities::TR4
 					if (beetle->Pose.Position.y > height)
 					{
 						beetle->Pose.Position.y = height;
-						beetle->Pose.Orientation.x = 0;
-						beetle->Pose.Orientation.z = 0;
+						beetle->Pose.Orientation.SetX();
+						beetle->Pose.Orientation.SetZ();
 						beetle->VerticalVelocity = 0;
 						beetle->Flags = 1;
 					}
@@ -226,7 +226,7 @@ namespace TEN::Entities::TR4
 					NextBeetle = 0;
 				}
 				else
-					beetle->Pose.Orientation.x = -64 * beetle->VerticalVelocity;
+					beetle->Pose.Orientation.SetX(-64 * beetle->VerticalVelocity);
 			}
 		}
 	}

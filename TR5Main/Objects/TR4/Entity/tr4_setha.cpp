@@ -542,9 +542,7 @@ void SethaThrowAttack(PoseData* pos, short roomNumber, short mesh)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.x = pos->Orientation.x;
-		fx->pos.Orientation.y = pos->Orientation.y;
-		fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.Set(pos->Orientation.GetX(), pos->Orientation.GetY(), 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 2 * GetRandomControl() + Angle::DegToRad(-180);
 		fx->flag1 = mesh;
@@ -637,11 +635,9 @@ void SethaAttack(int itemNumber)
 
 			phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
 
-			attackPos.Position.x = pos1.x;
-			attackPos.Position.y = pos1.y;
-			attackPos.Position.z = pos1.z;
-			attackPos.Orientation.x = angles[1];
-			attackPos.Orientation.y = angles[0];
+			attackPos.Position = pos1;
+			attackPos.Orientation.SetX(angles[1]);
+			attackPos.Orientation.SetY(angles[0]);
 
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
@@ -654,11 +650,9 @@ void SethaAttack(int itemNumber)
 
 			phd_GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, angles);
 
-			attackPos.Position.x = pos2.x;
-			attackPos.Position.y = pos2.y;
-			attackPos.Position.z = pos2.z;
-			attackPos.Orientation.x = angles[1];
-			attackPos.Orientation.y = angles[0];
+			attackPos.Position = pos2;
+			attackPos.Orientation.SetX(angles[1]);
+			attackPos.Orientation.SetY(angles[0]);
 
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
@@ -694,11 +688,9 @@ void SethaAttack(int itemNumber)
 
 				phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
 
-				attackPos.Position.x = pos1.x;
-				attackPos.Position.y = pos1.y;
-				attackPos.Position.z = pos1.z;
-				attackPos.Orientation.x = angles[1];
-				attackPos.Orientation.y = angles[0];
+				attackPos.Position = pos1;
+				attackPos.Orientation.SetX(angles[1]);
+				attackPos.Orientation.SetY(angles[0]);
 
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 
@@ -709,11 +701,9 @@ void SethaAttack(int itemNumber)
 
 				phd_GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, angles);
 
-				attackPos.Position.x = pos2.x;
-				attackPos.Position.y = pos2.y;
-				attackPos.Position.z = pos2.z;
-				attackPos.Orientation.x = angles[1];
-				attackPos.Orientation.y = angles[0];
+				attackPos.Position = pos2;
+				attackPos.Orientation.SetX(angles[1]);
+				attackPos.Orientation.SetY(angles[0]);
 
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 			}
@@ -778,11 +768,9 @@ void SethaAttack(int itemNumber)
 
 			phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
 
-			attackPos.Position.x = pos1.x;
-			attackPos.Position.y = pos1.y;
-			attackPos.Position.z = pos1.z;
-			attackPos.Orientation.x = angles[1];
-			attackPos.Orientation.y = angles[0];
+			attackPos.Position = pos1;
+			attackPos.Orientation.SetX(angles[1]);
+			attackPos.Orientation.SetY(angles[0]);
 
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}

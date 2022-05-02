@@ -30,12 +30,8 @@ void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
 	if (laraItem->RoomNumber != tRexItem->RoomNumber)
 		ItemNewRoom(Lara.ItemNumber, tRexItem->RoomNumber);
 
-	laraItem->Pose.Position.x = tRexItem->Pose.Position.x;
-	laraItem->Pose.Position.y = tRexItem->Pose.Position.y;
-	laraItem->Pose.Position.z = tRexItem->Pose.Position.z;
-	laraItem->Pose.Orientation.x = 0;
-	laraItem->Pose.Orientation.y = tRexItem->Pose.Orientation.y;
-	laraItem->Pose.Orientation.z = 0;
+	laraItem->Pose.Position = tRexItem->Pose.Position;
+	laraItem->Pose.Orientation.Set(0.0f, tRexItem->Pose.Orientation.GetY(), 0.0f);
 	laraItem->Animation.Airborne = false;
 
 	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;

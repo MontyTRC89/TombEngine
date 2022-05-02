@@ -30,9 +30,9 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 
 		InitialiseItem(grenadeItemNumber);
 
-		grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
+		grenadeItem->Pose.Orientation.SetX(item->Pose.Orientation.GetX());
 		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
-		grenadeItem->Pose.Orientation.z = 0;
+		grenadeItem->Pose.Orientation.SetZ();
 
 		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* sin(grenadeItem->Pose.Orientation.y);
 		grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
@@ -328,19 +328,19 @@ void EnemyJeepControl(short itemNumber)
 		if (item->ItemFlags[2] < 0)
 			item->ItemFlags[2] = 0;
 
-		if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
-			item->Pose.Orientation.x = xRot;
-		else if (xRot < item->Pose.Orientation.x)
-			item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
+		if (abs(xRot - item->Pose.Orientation.GetX()) < Angle::DegToRad(1.4f))
+			item->Pose.Orientation.SetX(xRot);
+		else if (xRot < item->Pose.Orientation.GetX())
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.4f));
 		else 
-			item->Pose.Orientation.x += Angle::DegToRad(1.4f);
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(1.4f));
 
-		if (abs(zRot - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
-			item->Pose.Orientation.z = zRot;
-		else if (zRot < item->Pose.Orientation.z)
-			item->Pose.Orientation.z -= Angle::DegToRad(1.4f);
+		if (abs(zRot - item->Pose.Orientation.GetZ()) < Angle::DegToRad(1.4f))
+			item->Pose.Orientation.SetZ(zRot);
+		else if (zRot < item->Pose.Orientation.GetZ())
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetX() - Angle::DegToRad(1.4f));
 		else
-			item->Pose.Orientation.z += Angle::DegToRad(1.4f);
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetX() + Angle::DegToRad(1.4f));
 
 		item->ItemFlags[0] += -2 - xRot / 512;
 		if (item->ItemFlags[0] < 0)

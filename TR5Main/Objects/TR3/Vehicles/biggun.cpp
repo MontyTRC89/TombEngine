@@ -64,9 +64,9 @@ void BigGunInitialise(short itemNumber)
 	bigGunItem->Data = BigGunInfo();
 	auto* bigGun = (BigGunInfo*)bigGunItem->Data;
 
-	bigGun->Orientation.x = BGUN_DISMOUNT_FRAME;
-	bigGun->Orientation.z = 0;
-	bigGun->StartYRot = bigGunItem->Pose.Orientation.y;
+	bigGun->Orientation.SetX(BGUN_DISMOUNT_FRAME);
+	bigGun->Orientation.SetZ();
+	bigGun->StartYRot = bigGunItem->Pose.Orientation.GetY();
 	bigGun->GunRotYAdd = 0;
 	bigGun->FireCount = 0;
 	bigGun->Flags = 0;
@@ -118,9 +118,9 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 
 		InitialiseItem(itemNumber);
 
-		projectileItem->Pose.Orientation.x = -((bigGun->Orientation.x - 32) * Angle::DegToRad(1.0f));
+		projectileItem->Pose.Orientation.SetX(-((bigGun->Orientation.x - 32) * Angle::DegToRad(1.0f)));
 		projectileItem->Pose.Orientation.y = bigGunItem->Pose.Orientation.y;
-		projectileItem->Pose.Orientation.z = 0;
+		projectileItem->Pose.Orientation.SetZ();
 		projectileItem->Animation.Velocity = 16;
 		projectileItem->ItemFlags[0] = BGUN_FLAG_UP_DOWN;
 
@@ -168,7 +168,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 		lara->Control.HandStatus = HandStatus::Busy;
 		bigGunItem->HitPoints = 1;
 		bigGun->Flags = 0;
-		bigGun->Orientation.x = BGUN_DISMOUNT_FRAME;
+		bigGun->Orientation.SetX(BGUN_DISMOUNT_FRAME);
 
 	}
 	else

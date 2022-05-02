@@ -279,8 +279,8 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 		laraItem->Animation.Velocity = 40;
 		laraItem->Animation.VerticalVelocity = -50;
 		laraItem->Animation.Airborne = true;
-		laraItem->Pose.Orientation.x = 0;
-		laraItem->Pose.Orientation.z = 0;
+		laraItem->Pose.Orientation.SetX();
+		laraItem->Pose.Orientation.SetZ();
 		lara->Vehicle = NO_ITEM;
 
 		int x = laraItem->Pose.Position.x + 360 * sin(laraItem->Pose.Orientation.y);
@@ -882,9 +882,9 @@ void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 	laraItem->Pose.Position.x = sBoatItem->Pose.Position.x;
 	laraItem->Pose.Position.y = sBoatItem->Pose.Position.y - 5;
 	laraItem->Pose.Position.z = sBoatItem->Pose.Position.z;
-	laraItem->Pose.Orientation.x = 0;
+	laraItem->Pose.Orientation.SetX();
 	laraItem->Pose.Orientation.y = sBoatItem->Pose.Orientation.y;
-	laraItem->Pose.Orientation.z = 0;
+	laraItem->Pose.Orientation.SetZ();
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
@@ -994,9 +994,9 @@ void SpeedBoatControl(short itemNumber)
 	sBoatItem->Pose.Orientation.z += ((zRot - sBoatItem->Pose.Orientation.z) / 2);
  
 	if (!xRot && abs(sBoatItem->Pose.Orientation.x) < 4)
-		sBoatItem->Pose.Orientation.x = 0;
+		sBoatItem->Pose.Orientation.SetX();
 	if (!zRot && abs(sBoatItem->Pose.Orientation.z) < 4)
-		sBoatItem->Pose.Orientation.z = 0;
+		sBoatItem->Pose.Orientation.SetZ();
 
 	if (lara->Vehicle == itemNumber)
 	{
@@ -1008,12 +1008,7 @@ void SpeedBoatControl(short itemNumber)
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 
-		laraItem->Pose.Position.x = sBoatItem->Pose.Position.x;
-		laraItem->Pose.Position.y = sBoatItem->Pose.Position.y;
-		laraItem->Pose.Position.z = sBoatItem->Pose.Position.z;
-		laraItem->Pose.Orientation.x = sBoatItem->Pose.Orientation.x;
-		laraItem->Pose.Orientation.y = sBoatItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = sBoatItem->Pose.Orientation.z;
+		laraItem->Pose = sBoatItem->Pose;
 		sBoatItem->Pose.Orientation.z += sBoat->LeanAngle;
 
 		AnimateItem(laraItem);

@@ -46,9 +46,7 @@ GameScriptRotation::GameScriptRotation(float aX, float aY, float aZ)
 
 void GameScriptRotation::StoreInPHDPos(PoseData& pos) const
 {
-	pos.Orientation.x = x;
-	pos.Orientation.y = y;
-	pos.Orientation.z = z;
+	pos.Orientation.Set(x, y, z);
 }
 
 GameScriptRotation::GameScriptRotation(PoseData const & pos)

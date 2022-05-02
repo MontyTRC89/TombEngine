@@ -319,14 +319,10 @@ void UseClockworkBeetle(short flag)
 			item->Shade = -15856;
 			item->ObjectNumber = ID_CLOCKWORK_BEETLE;
 			item->RoomNumber = LaraItem->RoomNumber;
-			item->Pose.Position.x = LaraItem->Pose.Position.x;
-			item->Pose.Position.y = LaraItem->Pose.Position.y;
-			item->Pose.Position.z = LaraItem->Pose.Position.z;
+			item->Pose.Position = LaraItem->Pose.Position;
 
 			InitialiseItem(itemNumber);
-			item->Pose.Orientation.x = 0;
-			item->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
-			item->Pose.Orientation.z = 0;
+			item->Pose.Orientation.Set(0.0f, LaraItem->Pose.Orientation.GetY(), 0.0f);
 
 			if (Lara.Inventory.BeetleLife)
 				item->ItemFlags[0] = GetCollision(item).Block->Flags.MarkBeetle;

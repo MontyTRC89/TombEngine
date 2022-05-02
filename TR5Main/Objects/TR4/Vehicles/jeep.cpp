@@ -406,8 +406,8 @@ static int JeepCheckGetOff()
 			LaraItem->Animation.ActiveState = LS_IDLE;
 			LaraItem->Pose.Position.x -= JEEP_GETOFF_DISTANCE * sin(LaraItem->Pose.Orientation.y);
 			LaraItem->Pose.Position.z -= JEEP_GETOFF_DISTANCE * cos(LaraItem->Pose.Orientation.y);
-			LaraItem->Pose.Orientation.x = 0;
-			LaraItem->Pose.Orientation.z = 0;
+			LaraItem->Pose.Orientation.SetX();
+			LaraItem->Pose.Orientation.SetZ();
 			Lara.Vehicle = NO_ITEM;
 			Lara.Control.HandStatus = HandStatus::Free;
 			return false;
@@ -1672,8 +1672,8 @@ int JeepControl(void)
 	item->Pose.Orientation.z += (atan2(256, height - fl.y) - item->Pose.Orientation.z) / 4;
 	if (jeep->velocity == 0)
 	{
-		item->Pose.Orientation.x = 0;
-		item->Pose.Orientation.z = 0;
+		item->Pose.Orientation.SetX();
+		item->Pose.Orientation.SetZ();
 	}
 	if (!(jeep->flags & JF_DEAD))
 	{
@@ -1683,12 +1683,7 @@ int JeepControl(void)
 			ItemNewRoom(Lara.ItemNumber, roomNumber);
 		}
 
-		LaraItem->Pose.Position.x = item->Pose.Position.x;
-		LaraItem->Pose.Position.y = item->Pose.Position.y;
-		LaraItem->Pose.Position.z = item->Pose.Position.z;
-		LaraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-		LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-		LaraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+		LaraItem->Pose = item->Pose;
 
 		int jeepAnim = Objects[ID_JEEP].animIndex;
 		int laraAnim = LaraItem->Animation.AnimNumber;

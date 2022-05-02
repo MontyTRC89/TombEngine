@@ -103,8 +103,8 @@ namespace TEN::Entities::Traps
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->Pose.Orientation.x = 0;
-			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180);
+			dartItem->Pose.Orientation.SetX();
+			dartItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
 			dartItem->Animation.Velocity = 256;
 
 			int xf = 0;

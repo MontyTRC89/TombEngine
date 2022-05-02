@@ -322,8 +322,8 @@ static void TribesmanShotDart(ITEM_INFO* item)
 
 		InitialiseItem(dartItemNumber);
 
-		dartItem->Pose.Orientation.x = angles[1];
-		dartItem->Pose.Orientation.y = angles[0];
+		dartItem->Pose.Orientation.SetX(angles[1]);
+		dartItem->Pose.Orientation.SetY(angles[0]);
 		dartItem->Animation.Velocity = CLICK(1);
 
 		AddActiveItem(dartItemNumber);

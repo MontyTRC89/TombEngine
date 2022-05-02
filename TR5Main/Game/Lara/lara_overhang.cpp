@@ -807,8 +807,8 @@ void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
 		break;
 	}
 
-	GetLaraInfo(item)->NextCornerPos.Orientation.z = 0;
-	item->Pose.Orientation.x = 0;
+	GetLaraInfo(item)->NextCornerPos.Orientation.SetZ();
+	item->Pose.Orientation.SetX();
 }
 
 // ----------------------------------------

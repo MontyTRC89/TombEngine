@@ -88,9 +88,7 @@ static void TriggerTonyEffect(const TonyFlame flame)
 		fx->pos.Position.y = flame.pos.y;
 		fx->pos.Position.z = flame.pos.z;
 		fx->fallspeed = flame.fallspeed;
-		fx->pos.Orientation.x = 0;
-		fx->pos.Orientation.y = flame.yRot;
-		fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.Set(0.0f, flame.yRot, 0.0f);
 		fx->objectNumber = ID_TONY_BOSS_FLAME;
 		fx->speed = flame.speed;
 		fx->shade = 0;

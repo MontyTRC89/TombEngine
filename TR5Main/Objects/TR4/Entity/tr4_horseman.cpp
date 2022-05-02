@@ -567,12 +567,7 @@ namespace TEN::Entities::TR4
 					item->AIBits = 0;
 					item->ItemFlags[1] = 1;
 
-					item->Pose.Position.x = horseItem->Pose.Position.x;
-					item->Pose.Position.y = horseItem->Pose.Position.y;
-					item->Pose.Position.z = horseItem->Pose.Position.z;
-					item->Pose.Orientation.x = horseItem->Pose.Orientation.x;
-					item->Pose.Orientation.y = horseItem->Pose.Orientation.y;
-					item->Pose.Orientation.z = horseItem->Pose.Orientation.z;
+					item->Pose = horseItem->Pose;
 
 					creature->ReachedGoal = false;
 					creature->Enemy = NULL;
@@ -752,22 +747,17 @@ namespace TEN::Entities::TR4
 
 			if (horseItem && item->ItemFlags[1])
 			{
-				if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
-					item->Pose.Orientation.x = xRot;
-				else if (xRot <= item->Pose.Orientation.x)
+				if (abs(xRot - item->Pose.Orientation.GetX()) < Angle::DegToRad(1.4f))
+					item->Pose.Orientation.SetX(xRot);
+				else if (xRot <= item->Pose.Orientation.GetX())
 				{
-					if (xRot < item->Pose.Orientation.x)
-						item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
+					if (xRot < item->Pose.Orientation.GetX())
+						item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.4f));
 				}
 				else
-					item->Pose.Orientation.x += Angle::DegToRad(1.4f);
+					item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(1.4f));
 
-				horseItem->Pose.Position.x = item->Pose.Position.x;
-				horseItem->Pose.Position.y = item->Pose.Position.y;
-				horseItem->Pose.Position.z = item->Pose.Position.z;
-				horseItem->Pose.Orientation.x = item->Pose.Orientation.x;
-				horseItem->Pose.Orientation.y = item->Pose.Orientation.y;
-				horseItem->Pose.Orientation.z = item->Pose.Orientation.z;
+				horseItem->Pose = item->Pose;
 
 				if (horseItem->RoomNumber != item->RoomNumber)
 					ItemNewRoom(item->ItemFlags[0], item->RoomNumber);

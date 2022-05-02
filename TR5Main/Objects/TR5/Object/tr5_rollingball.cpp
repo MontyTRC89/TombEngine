@@ -313,7 +313,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 				lara->HitPoints = -1;//?
 				lara->Pose.Orientation.y = item->Pose.Orientation.y;
 				lara->Pose.Position.z = 0;
-				lara->Pose.Orientation.z = 0;	
+				lara->Pose.Orientation.SetZ();	
 
 				lara->Animation.AnimNumber = LA_BOULDER_DEATH;
 				lara->Animation.FrameNumber = g_Level.Anims[lara->Animation.AnimNumber].frameBase;

@@ -626,8 +626,8 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	float x = atan2(SECTOR(1), kayakItem->Pose.Position.y - frontPos.y);
 	float z = atan2(KAYAK_X, height2 - leftPos.y);
 
-	kayakItem->Pose.Orientation.x = x;
-	kayakItem->Pose.Orientation.z = z;
+	kayakItem->Pose.Orientation.SetX(x);
+	kayakItem->Pose.Orientation.SetZ(z);
 
 	int xOld = kayakItem->Pose.Position.x;
 	int zOld = kayakItem->Pose.Position.z;
@@ -1056,9 +1056,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 			SetAnimation(laraItem, LA_JUMP_FORWARD);
 			laraItem->Pose.Position = vec;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - Angle::DegToRad(90.0f);
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetY(kayakItem->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
+			laraItem->Pose.Orientation.SetZ();
 			laraItem->Animation.Airborne = true;
 			laraItem->Animation.Velocity = 40;
 			laraItem->Animation.VerticalVelocity = -50;
@@ -1078,9 +1078,9 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 
 			SetAnimation(laraItem, LA_JUMP_FORWARD);
 			laraItem->Pose.Position = vec;
-			laraItem->Pose.Orientation.x = 0;
+			laraItem->Pose.Orientation.SetX();
 			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetZ();
 			laraItem->Animation.Airborne = true;
 			laraItem->Animation.Velocity = 40;
 			laraItem->Animation.VerticalVelocity = -50;
@@ -1225,9 +1225,9 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = laraItem->Animation.TargetState = KAYAK_STATE_MOUNT_LEFT;
 		laraItem->Pose.Position = kayakItem->Pose.Position;
-		laraItem->Pose.Orientation.x = 0;
+		laraItem->Pose.Orientation.SetX();
 		laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = 0;
+		laraItem->Pose.Orientation.SetZ();
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
 		laraItem->Animation.Airborne = false;

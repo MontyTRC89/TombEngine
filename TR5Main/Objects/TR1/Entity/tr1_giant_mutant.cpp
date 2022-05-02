@@ -200,11 +200,8 @@ void GiantMutantControl(short itemNumber)
 				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 				LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
 				LaraItem->RoomNumber = item->RoomNumber;
-				LaraItem->Pose.Position.x = item->Pose.Position.x;
-				LaraItem->Pose.Position.y = item->Pose.Position.y;
-				LaraItem->Pose.Position.z = item->Pose.Position.z;
-				LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-				LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
+				LaraItem->Pose.Position = item->Pose.Position;
+				LaraItem->Pose.Orientation.Set(0.0f, item->Pose.Orientation.GetY(), 0.0f);
 				LaraItem->Animation.Airborne = false;
 				LaraItem->HitPoints = -1;
 				Lara.Air = -1;

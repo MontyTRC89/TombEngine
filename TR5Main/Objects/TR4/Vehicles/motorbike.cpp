@@ -549,8 +549,8 @@ static int MotorBikeCheckGetOff(void)
 			LaraItem->Animation.ActiveState = LS_IDLE;
 			LaraItem->Pose.Position.x -= 2 * sin(item->Pose.Orientation.y);
 			LaraItem->Pose.Position.z -= 2 * cos(item->Pose.Orientation.y);
-			LaraItem->Pose.Orientation.x = 0;
-			LaraItem->Pose.Orientation.z = 0;
+			LaraItem->Pose.Orientation.SetX();
+			LaraItem->Pose.Orientation.SetZ();
 			Lara.Vehicle = NO_ITEM;
 			Lara.Control.HandStatus = HandStatus::Free;
 			Lara.SprintEnergy = 120;
@@ -1492,12 +1492,7 @@ int MotorbikeControl(void)
             ItemNewRoom(Lara.ItemNumber, room_number);
         }
 
-        LaraItem->Pose.Position.x = item->Pose.Position.x;
-        LaraItem->Pose.Position.y = item->Pose.Position.y;
-        LaraItem->Pose.Position.z = item->Pose.Position.z;
-        LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-        LaraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-        LaraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+        LaraItem->Pose = item->Pose;
 
         AnimateMotorbike(item, collide, dead);
         AnimateItem(LaraItem);

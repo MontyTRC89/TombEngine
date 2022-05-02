@@ -36,7 +36,7 @@ void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* laraItem, CollisionI
 			{
 				float oldRot = item->Pose.Orientation.y;
 
-				item->Pose.Orientation.y = 0;
+				item->Pose.Orientation.SetY();
 				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 				item->Pose.Orientation.y = oldRot;
 
@@ -545,7 +545,7 @@ bool Move3DPosTo3DPos(PoseData* src, PoseData* dest, int velocity, float angleAd
 	else if (deltaAngle < -angleAdd)
 		src->Orientation.x -= angleAdd;
 	else
-		src->Orientation.x = dest->Orientation.x;
+		src->Orientation.SetX(dest->Orientation.GetX());
 
 	deltaAngle = dest->Orientation.y - src->Orientation.y;
 	if (deltaAngle > angleAdd)
@@ -1321,13 +1321,13 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						{
 							item->Pose.Orientation.y -= Angle::DegToRad(22.5f);
 							if ((unsigned short)item->Pose.Orientation.y > Angle::DegToRad(337.5))
-								item->Pose.Orientation.y = 0;
+								item->Pose.Orientation.SetY();
 						}
 						else if ((unsigned short)item->Pose.Orientation.y >= Angle::DegToRad(180.0f))
 						{
 							item->Pose.Orientation.y += Angle::DegToRad(22.5f);
 							if ((unsigned short)item->Pose.Orientation.y < Angle::DegToRad(22.5f))
-								item->Pose.Orientation.y = 0;
+								item->Pose.Orientation.SetY();
 						}
 					}
 
@@ -1536,7 +1536,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					if (item->ObjectNumber == ID_GRENADE)
 					{
 						item->Animation.RequiredState = 1;
-						item->Pose.Orientation.x = 0;
+						item->Pose.Orientation.SetX();
 						item->Animation.Velocity--;
 					}
 					else
@@ -1587,7 +1587,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						if (item->ObjectNumber == ID_GRENADE)
 						{
 							item->Animation.RequiredState = 1;
-							item->Pose.Orientation.x = 0;
+							item->Pose.Orientation.SetX();
 							item->Animation.Velocity--;
 						}
 						else
@@ -1624,7 +1624,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					}
 					// Z crossed boundary.
 					else
-						item->Pose.Orientation.y = 0x8000 - item->Pose.Orientation.y;
+						item->Pose.Orientation.SetY(Angle::DegToRad(180.0f) - item->Pose.Orientation.GetY());
 
 					if (item->ObjectNumber == ID_GRENADE)
 						item->Animation.Velocity -= item->Animation.Velocity / 8;

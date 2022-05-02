@@ -54,13 +54,13 @@ void ControlCentaurBomb(short itemNumber)
 	item->Pose.Orientation.z += Angle::DegToRad(35.0f);
 	if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
-		if (item->Pose.Orientation.x < Angle::DegToRad(-90.0f))
-			item->Pose.Orientation.x = Angle::DegToRad(-90.0f);
+		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
+		if (item->Pose.Orientation.GetX() < Angle::DegToRad(-90.0f))
+			item->Pose.Orientation.SetX(Angle::DegToRad(-90.0f));
 
 		aboveWater = true;
-		item->Animation.Velocity = BOMB_SPEED * cos(item->Pose.Orientation.x);
-		item->Animation.VerticalVelocity = -BOMB_SPEED * sin(item->Pose.Orientation.x);
+		item->Animation.Velocity = BOMB_SPEED * cos(item->Pose.Orientation.GetX());
+		item->Animation.VerticalVelocity = -BOMB_SPEED * sin(item->Pose.Orientation.GetX());
 	}
 	else
 	{
@@ -162,9 +162,7 @@ static void RocketGun(ITEM_INFO* centaurItem)
 		projectileItem->Pose.Position.z = pos.z;
 		InitialiseItem(itemNumber);
 
-		projectileItem->Pose.Orientation.x = 0;
-		projectileItem->Pose.Orientation.y = centaurItem->Pose.Orientation.y;
-		projectileItem->Pose.Orientation.z = 0;
+		projectileItem->Pose.Orientation.Set(0.0f, centaurItem->Pose.Orientation.GetY(), 0.0f);
 
 		projectileItem->Animation.Velocity = BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);
 		projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);

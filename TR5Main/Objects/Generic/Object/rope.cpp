@@ -551,7 +551,7 @@ namespace TEN::Entities::Generic
 				item->Animation.VerticalVelocity = -20;
 			}
 
-			item->Pose.Orientation.x = 0;
+			item->Pose.Orientation.SetX();
 			item->Animation.Airborne = true;
 
 			Lara.Control.HandStatus = HandStatus::Free;
@@ -573,7 +573,7 @@ namespace TEN::Entities::Generic
 	void FallFromRope(ITEM_INFO* item)
 	{
 		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
-		item->Pose.Orientation.x = 0;
+		item->Pose.Orientation.SetX();
 		item->Pose.Position.y += 320;
 
 		item->Animation.AnimNumber = LA_FALL_START;
@@ -726,8 +726,6 @@ namespace TEN::Entities::Generic
 		item->Pose.Position.y += -112 * rotMatrix.m[1][2];
 		item->Pose.Position.z += -112 * rotMatrix.m[2][2];
 
-		item->Pose.Orientation.x = angle[0];
-		item->Pose.Orientation.y = angle[1];
-		item->Pose.Orientation.z = angle[2];
+		item->Pose.Orientation.Set(angle[0], angle[1], angle[2]);
 	}
 }

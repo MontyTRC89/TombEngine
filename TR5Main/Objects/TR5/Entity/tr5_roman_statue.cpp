@@ -68,9 +68,7 @@ static void RomanStatueHitEffect(ITEM_INFO* item, Vector3Int* pos, int joint)
 			fx->pos.Position.y = pos->y;
 			fx->pos.Position.z = pos->z;
 			fx->roomNumber = item->RoomNumber;
-			fx->pos.Orientation.z = 0;
-			fx->pos.Orientation.x = 0;
-			fx->pos.Orientation.y = 2 * GetRandomControl();
+			fx->pos.Orientation.Set(0.0f, Angle::ShrtToRad(GetRandomControl() * 2), 0.0f);
 			fx->speed = 1;
 			fx->fallspeed = 0;
 			fx->objectNumber = ID_BODY_PART;
@@ -232,9 +230,7 @@ static void RomanStatueAttack(PoseData* pos, short roomNumber, short count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.x = pos->Orientation.x;
-		fx->pos.Orientation.y = pos->Orientation.y;
-		fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.Set(pos->Orientation.GetX(), pos->Orientation.GetY(), 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 1;
@@ -734,32 +730,28 @@ void RomanStatueControl(short itemNumber)
 				float angles[2];
 				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
 
-				PoseData attackPos;
-				attackPos.Position.x = pos2.x;
-				attackPos.Position.y = pos2.y;
-				attackPos.Position.z = pos2.z;
-				attackPos.Orientation.x = angles[1];
-				attackPos.Orientation.y = angles[0];
-				attackPos.Orientation.z = 0;
+				PoseData attackPose;
+				attackPose.Position = pos2;
+				attackPose.Orientation.Set(angles[1], angles[0], 0.0f);
 
 				short roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
-				RomanStatueAttack(&attackPos, roomNumber, 1);
+				RomanStatueAttack(&attackPose, roomNumber, 1);
 
 				TriggerRomanStatueShockwaveAttackSparks(
-					attackPos.Position.x,
-					attackPos.Position.y,
-					attackPos.Position.z,
+					attackPose.Position.x,
+					attackPose.Position.y,
+					attackPose.Position.z,
 					0, 
 					(((GetRandomControl() & 0x3F) + 128) / 2),
 					(((GetRandomControl() & 0x3F) + 128)),
 					64);
 				
 				RomanStatueData.Count = 16;	
-				RomanStatueData.Position.x = attackPos.Position.x;
-				RomanStatueData.Position.y = attackPos.Position.y;
-				RomanStatueData.Position.z = attackPos.Position.z;
+				RomanStatueData.Position.x = attackPose.Position.x;
+				RomanStatueData.Position.y = attackPose.Position.y;
+				RomanStatueData.Position.z = attackPose.Position.z;
 				
 				if (item->ItemFlags[0])
 					item->ItemFlags[0]--;

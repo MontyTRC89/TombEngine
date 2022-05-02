@@ -157,9 +157,9 @@ static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		harpoonItem->Pose.Position.z = pos.z;
 		InitialiseItem(itemNumber);
 
-		harpoonItem->Pose.Orientation.x = UPVItem->Pose.Orientation.x;
+		harpoonItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX());
 		harpoonItem->Pose.Orientation.y = UPVItem->Pose.Orientation.y;
-		harpoonItem->Pose.Orientation.z = 0;
+		harpoonItem->Pose.Orientation.SetZ();
 
 		// TODO: Huh?
 		harpoonItem->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(harpoonItem->Pose.Orientation.x);
@@ -553,7 +553,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 					UPVItem->Pose.Orientation.x += Angle::DegToRad(0.1f);
 			}
 			else
-				UPVItem->Pose.Orientation.x = SURFACE_ANGLE;
+				UPVItem->Pose.Orientation.SetX(SURFACE_ANGLE);
 		}
 		else
 		{
@@ -611,7 +611,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 					UPVItem->Pose.Orientation.x += Angle::DegToRad(0.1f);
 			}
 			else
-				UPVItem->Pose.Orientation.x = SURFACE_ANGLE;
+				UPVItem->Pose.Orientation.SetX(SURFACE_ANGLE);
 		}
 		else
 		{
@@ -705,7 +705,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			SetAnimation(laraItem, LA_UNDERWATER_IDLE);
 			laraItem->Animation.VerticalVelocity = 0;
 			laraItem->Animation.Airborne = false;
-			laraItem->Pose.Orientation.x = laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetZ();
 
 			UpdateItemRoom(laraItem, 0);
 
@@ -743,8 +744,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			SetAnimation(laraItem, LA_ONWATER_IDLE);
 			laraItem->Animation.VerticalVelocity = 0;
 			laraItem->Animation.Airborne = false;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetZ();
 
 			UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
 
@@ -759,8 +760,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else
 		{
 			UPV->XRot -= UPDOWN_ACCEL;
-			if (UPVItem->Pose.Orientation.x < 0)
-				UPVItem->Pose.Orientation.x = 0;
+			if (UPVItem->Pose.Orientation.GetX() < 0)
+				UPVItem->Pose.Orientation.SetX();
 		}
 
 		break;
@@ -774,8 +775,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			laraItem->Pose.Position.x = vec.x;
 			laraItem->Pose.Position.y = vec.y;
 			laraItem->Pose.Position.z = vec.z;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetZ();
 
 			SetAnimation(UPVItem, LA_UNDERWATER_DEATH, 17);
 			laraItem->Animation.VerticalVelocity = 0;
@@ -885,12 +886,7 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
 		}
 
-		laraItem->Pose.Position.x = UPVItem->Pose.Position.x;
-		laraItem->Pose.Position.y = UPVItem->Pose.Position.y;
-		laraItem->Pose.Position.z = UPVItem->Pose.Position.z;
-		laraItem->Pose.Orientation.x = UPVItem->Pose.Orientation.x;
-		laraItem->Pose.Orientation.y = UPVItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = UPVItem->Pose.Orientation.z;
+		laraItem->Pose = UPVItem->Pose;
 		lara->Control.HandStatus = HandStatus::Busy;
 		UPVItem->HitPoints = 1;
 
@@ -936,9 +932,9 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		UPVItem->Pose.Orientation.z = UPV->Rot / (USHRT_MAX + 1);
 
 		if (UPVItem->Pose.Orientation.x > UPDOWN_LIMIT)
-			UPVItem->Pose.Orientation.x = UPDOWN_LIMIT;
+			UPVItem->Pose.Orientation.SetX(UPDOWN_LIMIT);
 		else if (UPVItem->Pose.Orientation.x < -UPDOWN_LIMIT)
-			UPVItem->Pose.Orientation.x = -UPDOWN_LIMIT;
+			UPVItem->Pose.Orientation.SetX(-UPDOWN_LIMIT);
 
 		UPVItem->Pose.Position.x += round(sin(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * cos(UPVItem->Pose.Orientation.x));
 		UPVItem->Pose.Position.y -= round(sin(UPVItem->Pose.Orientation.x) * UPVItem->Animation.Velocity);
@@ -1041,12 +1037,7 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 
-		laraItem->Pose.Position.x = UPVItem->Pose.Position.x;
-		laraItem->Pose.Position.y = UPVItem->Pose.Position.y;
-		laraItem->Pose.Position.z = UPVItem->Pose.Position.z;
-		laraItem->Pose.Orientation.x = UPVItem->Pose.Orientation.x;
-		laraItem->Pose.Orientation.y = UPVItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = UPVItem->Pose.Orientation.z;
+		laraItem->Pose = UPVItem->Pose;
 
 		AnimateItem(laraItem);
 		BackgroundCollision(laraItem, UPVItem);

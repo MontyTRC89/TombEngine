@@ -67,9 +67,7 @@ static void HydraBubblesAttack(PoseData* pos, short roomNumber, int count)
 		fx->pos.Position.x = pos->Position.x;
 		fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
 		fx->pos.Position.z = pos->Position.z;
-		fx->pos.Orientation.x = pos->Orientation.x;
-		fx->pos.Orientation.y = pos->Orientation.y;
-		fx->pos.Orientation.z = 0;
+		fx->pos.Orientation.Set(pos->Orientation.GetX(), pos->Orientation.GetY(), 0.0f);
 		fx->roomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 0;

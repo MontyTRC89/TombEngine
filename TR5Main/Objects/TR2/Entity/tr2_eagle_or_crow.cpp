@@ -86,7 +86,7 @@ void EagleControl(short itemNumber)
 			item->Animation.Airborne = true;
 			break;
 		}
-		item->Pose.Orientation.x = 0;
+		item->Pose.Orientation.SetX();
 	}
 	else
 	{

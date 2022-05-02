@@ -102,9 +102,7 @@ static void createExplosion(ITEM_INFO* item)
 		explosionItem->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 		explosionItem->Pose.Position.z = item->Pose.Position.z;
 		explosionItem->RoomNumber = item->RoomNumber;
-		explosionItem->Pose.Orientation.y = 0;
-		explosionItem->Pose.Orientation.x = 0;
-		explosionItem->Pose.Orientation.z = 0;
+		explosionItem->Pose.Orientation = EulerAngles::Zero;
 		explosionItem->Animation.Velocity = 0;
 		explosionItem->Animation.VerticalVelocity = 0;
 
@@ -127,8 +125,8 @@ static void createDragonBone(short frontNumber)
 
 		dragonBack->ObjectNumber = ID_DRAGON_BONE_BACK;
 		dragonBack->Pose = item->Pose;
-		dragonBack->Pose.Orientation.x = 0;
-		dragonBack->Pose.Orientation.z = 0;
+		dragonBack->Pose.Orientation.SetX();
+		dragonBack->Pose.Orientation.SetZ();
 		dragonBack->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneBack);
@@ -137,8 +135,8 @@ static void createDragonBone(short frontNumber)
 
 		dragonFront->ObjectNumber = ID_DRAGON_BONE_FRONT;
 		dragonFront->Pose = item->Pose;
-		dragonFront->Pose.Orientation.x = 0;
-		dragonFront->Pose.Orientation.z = 0;
+		dragonFront->Pose.Orientation.SetX();
+		dragonFront->Pose.Orientation.SetZ();
 		dragonFront->RoomNumber = item->RoomNumber;
 
 		InitialiseItem(boneFront);
@@ -449,12 +447,7 @@ void DragonControl(short backItemNumber)
 	back->Animation.ActiveState = item->Animation.ActiveState;
 	back->Animation.AnimNumber = Objects[ID_DRAGON_BACK].animIndex + (item->Animation.AnimNumber - Objects[ID_DRAGON_FRONT].animIndex);
 	back->Animation.FrameNumber = g_Level.Anims[back->Animation.AnimNumber].frameBase + (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
-	back->Pose.Position.x = item->Pose.Position.x;
-	back->Pose.Position.y = item->Pose.Position.y;
-	back->Pose.Position.z = item->Pose.Position.z;
-	back->Pose.Orientation.x = item->Pose.Orientation.x;
-	back->Pose.Orientation.y = item->Pose.Orientation.y;
-	back->Pose.Orientation.z = item->Pose.Orientation.z;
+	back->Pose = item->Pose;
 
 	if (back->RoomNumber != item->RoomNumber)
 		ItemNewRoom(backItemNumber, item->RoomNumber);

@@ -114,14 +114,14 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.Position.z = pos->Position.z;
 
-			fx->pos.Orientation.x = pos->Orientation.x;
+			fx->pos.Orientation.SetX(pos->Orientation.GetX());
 
 			if (flags < 4)
-				fx->pos.Orientation.y = pos->Orientation.y;
+				fx->pos.Orientation.SetY(pos->Orientation.GetY());
 			else
-				fx->pos.Orientation.y = pos->Orientation.y + (GetRandomControl() & 0x7FF) - 1024;
+				fx->pos.Orientation.SetY(pos->Orientation.GetY() + (GetRandomControl() & 0x7FF) - Angle::DegToRad(5.6f));
 
-			fx->pos.Orientation.z = 0;
+			fx->pos.Orientation.SetZ();
 
 			fx->roomNumber = roomNumber;
 			fx->counter = 2 * GetRandomControl() + Angle::DegToRad(-180.0f);

@@ -180,9 +180,7 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, int speed)
 
 		fx->roomNumber = item->RoomNumber;
 
-		fx->pos.Orientation.x = angles[1];
-		fx->pos.Orientation.z = 0;
-		fx->pos.Orientation.y = angles[0];
+		fx->pos.Orientation.Set(angles[1], angles[0], 0.0f);
 		fx->speed = speed * 4;
 		fx->counter = 20;
 		fx->flag1 = 0;

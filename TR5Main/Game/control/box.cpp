@@ -213,12 +213,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	LaraItem->Animation.ActiveState = 0;
 	LaraItem->Animation.TargetState = laraKillState;
 
-	LaraItem->Pose.Position.x = item->Pose.Position.x;
-	LaraItem->Pose.Position.y = item->Pose.Position.y;
-	LaraItem->Pose.Position.z = item->Pose.Position.z;
-	LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-	LaraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-	LaraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+	LaraItem->Pose = item->Pose;
 	LaraItem->Animation.Velocity = 0;
 	LaraItem->Animation.VerticalVelocity = 0;
 	LaraItem->Animation.Airborne = false;
@@ -300,7 +295,7 @@ void CreatureFloat(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	item->HitPoints = NOT_TARGETABLE;
-	item->Pose.Orientation.x = 0;
+	item->Pose.Orientation.SetX();
 
 	int waterLevel = GetWaterHeight(item);
 
@@ -675,7 +670,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		else if (angle > item->Pose.Orientation.x + Angle::DegToRad(1.0f))
 			item->Pose.Orientation.x += Angle::DegToRad(1.0f);
 		else
-			item->Pose.Orientation.x = angle;
+			item->Pose.Orientation.SetX(angle);
 	}
 	else if (LOT->IsJumping)
 	{
@@ -730,7 +725,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		else if (item->Pose.Position.y < item->Floor)
 			item->Pose.Position.y = item->Floor;
 
-		item->Pose.Orientation.x = 0;
+		item->Pose.Orientation.SetX();
 	}
 
 	/*roomNumber = item->roomNumber;
@@ -1165,7 +1160,7 @@ int CreatureVault(short itemNumber, float angle, int vault, int shift)
 		if (zBlock < newZblock)
 		{
 			item->Pose.Position.z = (newZblock * SECTOR(1)) - shift;
-			item->Pose.Orientation.y = 0;
+			item->Pose.Orientation.SetY();
 		}
 		else
 		{

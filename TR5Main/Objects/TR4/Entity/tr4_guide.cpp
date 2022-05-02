@@ -632,12 +632,7 @@ void GuideControl(short itemNumber)
 		{
 			someFlag = true;
 
-			item->Pose.Position.x = enemy->Pose.Position.x;
-			item->Pose.Position.y = enemy->Pose.Position.y;
-			item->Pose.Position.z = enemy->Pose.Position.z;
-			item->Pose.Orientation.x = enemy->Pose.Orientation.x;
-			item->Pose.Orientation.y = enemy->Pose.Orientation.y;
-			item->Pose.Orientation.z = enemy->Pose.Orientation.z;
+			item->Pose = enemy->Pose;
 		}
 		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
 		{

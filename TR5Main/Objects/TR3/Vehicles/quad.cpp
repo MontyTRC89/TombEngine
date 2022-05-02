@@ -248,8 +248,8 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		SetAnimation(laraItem, LA_STAND_IDLE);
 		laraItem->Pose.Position.x -= DISMOUNT_DISTANCE * sin(laraItem->Pose.Orientation.y);
 		laraItem->Pose.Position.z -= DISMOUNT_DISTANCE * cos(laraItem->Pose.Orientation.y);
-		laraItem->Pose.Orientation.x = 0;
-		laraItem->Pose.Orientation.z = 0;
+		laraItem->Pose.Orientation.SetX();
+		laraItem->Pose.Orientation.SetZ();
 		lara->Vehicle = NO_ITEM;
 		lara->Control.HandStatus = HandStatus::Free;
 
@@ -265,8 +265,8 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 			laraItem->Pose.Position.z = pos.z;
 			laraItem->Animation.VerticalVelocity = quadItem->Animation.VerticalVelocity;
 			laraItem->Animation.Airborne = true;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetZ();
 			laraItem->HitPoints = 0;
 			lara->Control.HandStatus = HandStatus::Free;
 			quadItem->Flags |= ONESHOT;

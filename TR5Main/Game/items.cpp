@@ -326,8 +326,8 @@ void InitialiseItem(short itemNumber)
 	item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 	item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 
-	item->Pose.Orientation.z = 0;
-	item->Pose.Orientation.x = 0;
+	item->Pose.Orientation.SetX();
+	item->Pose.Orientation.SetZ();
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Velocity = 0;

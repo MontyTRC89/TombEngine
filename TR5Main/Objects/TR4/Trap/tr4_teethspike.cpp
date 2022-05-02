@@ -52,8 +52,8 @@ namespace TEN::Entities::TR4
 		if (item->TriggerFlags & 8)
 		{
 			angle = item->TriggerFlags & 7;
-			item->Pose.Orientation.x = rotations[angle];
-			item->Pose.Orientation.y = Angle::DegToRad(90.0f);
+			item->Pose.Orientation.SetX(rotations[angle]);
+			item->Pose.Orientation.SetY(Angle::DegToRad(90.0f));
 			item->Pose.Position.z -= SPxzoffs[angle];
 		}
 		else

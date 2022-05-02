@@ -38,9 +38,7 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.x = src->Position.x;
 			fx->pos.Position.y = src->Position.y - (GetRandomControl() & 0x3F) - 32;
 			fx->pos.Position.z = src->Position.z;
-			fx->pos.Orientation.x = src->Orientation.x;
-			fx->pos.Orientation.y = src->Orientation.y;
-			fx->pos.Orientation.z = 0;
+			fx->pos.Orientation.Set(src->Orientation.GetX(), src->Orientation.GetY(), 0.0f);
 			fx->roomNumber = roomNumber;
 			fx->counter = 16 * counter + 15;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
@@ -165,9 +163,7 @@ namespace TEN::Entities::TR4
 		phd_GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z, angles);
 
 		target->Position = end;
-		target->Orientation.x = angles[1];
-		target->Orientation.y = angles[0];
-		target->Orientation.z = 0;
+		target->Orientation.Set(angles[1], angles[0], 0.0f);
 	}
 
 	static void MoveItemFront(ITEM_INFO* item, int distance)

@@ -49,10 +49,10 @@ void MoveItem(ITEM_INFO* item, float angle, int x, int z)
 void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
 	if (snapYRot)
-		item->Pose.Orientation.y = coll->NearestLedgeAngle;
+		item->Pose.Orientation.SetY(coll->NearestLedgeAngle);
 
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.z = 0;
+	item->Pose.Orientation.SetX();
+	item->Pose.Orientation.SetZ();
 	item->Pose.Position.x += (int)round(sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 	item->Pose.Position.z += (int)round(cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 }
@@ -846,8 +846,8 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, float 
 		return;
 
 	// NOTE: float(atan2()) is required, else warning about double !
-	item->Pose.Orientation.x = Angle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset;
-	item->Pose.Orientation.z = Angle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset;
+	item->Pose.Orientation.SetX(Angle::DegToRad(float(atan2(frontHDif, 2 * radiusZ)) / RADIAN) + xOffset);
+	item->Pose.Orientation.SetZ(Angle::DegToRad(float(atan2(sideHDif, 2 * radiusX)) / RADIAN) + zOffset);
 }
 
 int GetQuadrant(float angle)

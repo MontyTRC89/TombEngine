@@ -650,9 +650,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll
 	laraItem->Pose.Position.x = item->Pose.Position.x;
 	laraItem->Pose.Position.y = item->Pose.Position.y - 5;
 	laraItem->Pose.Position.z = item->Pose.Position.z;
-	laraItem->Pose.Orientation.x = 0;
-	laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-	laraItem->Pose.Orientation.z = 0;
+	laraItem->Pose.Orientation.Set(0.0f, item->Pose.Orientation.GetY(), 0.0f);
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
@@ -876,8 +874,8 @@ void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 		laraItem->Animation.Velocity = 20;
 		laraItem->Animation.VerticalVelocity = -40;
 		laraItem->Animation.Airborne = true;
-		laraItem->Pose.Orientation.x = 0;
-		laraItem->Pose.Orientation.z = 0;
+		laraItem->Pose.Orientation.SetX();
+		laraItem->Pose.Orientation.SetZ();
 		lara->Vehicle = NO_ITEM;
 
 		int x = laraItem->Pose.Position.x + 360 * sin(laraItem->Pose.Orientation.y);
@@ -987,9 +985,9 @@ void RubberBoatControl(short itemNumber)
 	rBoatItem->Pose.Orientation.z += ((rRot - rBoatItem->Pose.Orientation.z) / 2);
 
 	if (!xRot && abs(rBoatItem->Pose.Orientation.x) < 4)
-		rBoatItem->Pose.Orientation.x = 0;
+		rBoatItem->Pose.Orientation.SetX();
 	if (!rRot && abs(rBoatItem->Pose.Orientation.z) < 4)
-		rBoatItem->Pose.Orientation.z = 0;
+		rBoatItem->Pose.Orientation.SetZ();
 
 	if (lara->Vehicle == itemNumber)
 	{
@@ -1003,7 +1001,7 @@ void RubberBoatControl(short itemNumber)
 
 		rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
 		laraItem->Pose.Position.x = rBoatItem->Pose.Position.x;
-		laraItem->Pose.Orientation.x = rBoatItem->Pose.Orientation.x;
+		laraItem->Pose.Orientation.SetX(rBoatItem->Pose.Orientation.GetX());
 		laraItem->Pose.Position.y = rBoatItem->Pose.Position.y;
 		laraItem->Pose.Orientation.y = rBoatItem->Pose.Orientation.y;
 		laraItem->Pose.Position.z = rBoatItem->Pose.Position.z;

@@ -486,9 +486,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			{					
 				// For now don't use auto-align function because it can collide with climb up moves of Lara
 
-				laraItem->Pose.Orientation.x = pushableItem->Pose.Orientation.x;
-				laraItem->Pose.Orientation.y = pushableItem->Pose.Orientation.y;
-				laraItem->Pose.Orientation.z = pushableItem->Pose.Orientation.z;
+				laraItem->Pose.Orientation = pushableItem->Pose.Orientation;
 
 				laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;

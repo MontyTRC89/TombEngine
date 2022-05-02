@@ -167,16 +167,12 @@ void MoveCamera(GameVector* ideal, int speed)
 		Camera.oldType != Camera.type ||
 		BinocularOn < 0)
 	{
-		OldCam.pos.Orientation.x = LaraItem->Pose.Orientation.x;
-		OldCam.pos.Orientation.y = LaraItem->Pose.Orientation.y;
-		OldCam.pos.Orientation.z = LaraItem->Pose.Orientation.z;
-		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
+		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
+		OldCam.pos2.Orientation.SetX(Lara.ExtraHeadRot.GetX());
 		OldCam.pos2.Orientation.y = Lara.ExtraHeadRot.y;
 		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
 		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.y;
-		OldCam.pos.Position.x = LaraItem->Pose.Position.x;
-		OldCam.pos.Position.y = LaraItem->Pose.Position.y;
-		OldCam.pos.Position.z = LaraItem->Pose.Position.z;
+		OldCam.pos.Position = LaraItem->Pose.Position;
 		OldCam.ActiveState = LaraItem->Animation.ActiveState;
 		OldCam.TargetState = LaraItem->Animation.TargetState;
 		OldCam.targetDistance = Camera.targetDistance;
@@ -793,17 +789,17 @@ void LookCamera(ITEM_INFO* item)
 	// Clamp head rotation.
 	if (lara->ExtraHeadRot.x > Angle::DegToRad(55.0f))
 		lara->ExtraHeadRot.x = Angle::DegToRad(55.0f);
-	else if (lara->ExtraHeadRot.x < Angle::DegToRad(-75.0f))
+	else if (lara->ExtraHeadRot.GetX() < Angle::DegToRad(-75.0f))
 		lara->ExtraHeadRot.x = Angle::DegToRad(-75.0f);
 	if (lara->ExtraHeadRot.y < Angle::DegToRad(-80.0f))
 		lara->ExtraHeadRot.y = Angle::DegToRad(-80.0f);
-	else if (lara->ExtraHeadRot.y > Angle::DegToRad(80.0f))
+	else if (lara->ExtraHeadRot.GetY() > Angle::DegToRad(80.0f))
 		lara->ExtraHeadRot.y = Angle::DegToRad(80.0f);
 
 	if (abs(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x) >= 16)
-		OldCam.pos.Orientation.x = (lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2;
+		OldCam.pos.Orientation.SetX((lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2);
 	else
-		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
+		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
 	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y) >= 16)
 		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.y) / 2;
 	else
@@ -909,7 +905,7 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
+		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
 		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 		OldCam.pos.Position = item->Pose.Position;
 		OldCam.ActiveState = item->Animation.ActiveState;

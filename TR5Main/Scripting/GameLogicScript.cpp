@@ -41,9 +41,7 @@ static void PlaySoundEffect(int id, GameScriptPosition p, int flags)
 	pos.Position.x = p.x;
 	pos.Position.y = p.y;
 	pos.Position.z = p.z;
-	pos.Orientation.x = 0;
-	pos.Orientation.y = 0;
-	pos.Orientation.z = 0;
+	pos.Orientation = EulerAngles::Zero;
 
 	SoundEffect(id, &pos, flags);
 }

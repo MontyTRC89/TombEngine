@@ -29,7 +29,7 @@ void ShootAtLara(FX_INFO *fx)
 	y += bounds->Y2 + (bounds->Y1 - bounds->Y2) * 0.75f;
 
 	int distance = sqrt(pow(x, 2) + pow(z, 2));
-	fx->pos.Orientation.x = -atan2(distance, y);
+	fx->pos.Orientation.SetX(-atan2(distance, y));
 	fx->pos.Orientation.y = atan2(z, x);
 
 	// Random scatter (only a little bit else it's too hard to avoid).
@@ -179,8 +179,7 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->pos.Position.y = y;
 		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
-		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
-		fx->pos.Orientation.y = yRot;
+		fx->pos.Orientation.Set(0.0f, yRot, 0.0f);
 		fx->speed = SHARD_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_SHARD;
@@ -202,8 +201,7 @@ short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 		fx->pos.Position.y = y;
 		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
-		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
-		fx->pos.Orientation.y = yRot;
+		fx->pos.Orientation.Set(0.0f, yRot, 0.0f);
 		fx->speed = ROCKET_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_BOMB;
@@ -225,8 +223,7 @@ short NatlaGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->pos.Position.y = y;
 		fx->pos.Position.z = z;
 		fx->roomNumber = roomNumber;
-		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
-		fx->pos.Orientation.y = yRot;
+		fx->pos.Orientation.Set(0.0f, yRot, 0.0f);
 		fx->speed = NATLA_GUN_VELOCITY;
 		fx->frameNumber = 0;
 		fx->objectNumber = ID_PROJ_NATLA;

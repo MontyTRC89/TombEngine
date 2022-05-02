@@ -208,12 +208,12 @@ namespace TEN::Entities::Generic
 			item->Pose.Orientation.z += Angle::DegToRad(5);
 		else if (!item->Animation.Velocity)
 		{
-			item->Pose.Orientation.x = 0;
-			item->Pose.Orientation.z = 0;
+			item->Pose.Orientation.SetX();
+			item->Pose.Orientation.SetZ();
 		}
 
-		int xv = item->Animation.Velocity * sin(item->Pose.Orientation.y);
-		int zv = item->Animation.Velocity * cos(item->Pose.Orientation.y);
+		int xv = item->Animation.Velocity * sin(item->Pose.Orientation.GetY());
+		int zv = item->Animation.Velocity * cos(item->Pose.Orientation.GetY());
 
 		item->Pose.Position.x += xv;
 		item->Pose.Position.z += zv;

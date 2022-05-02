@@ -943,9 +943,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 	soundPosition.Position.x = setup->x;
 	soundPosition.Position.y = setup->y;
 	soundPosition.Position.z = setup->z;
-	soundPosition.Orientation.y = 0;
-	soundPosition.Orientation.x = 0;
-	soundPosition.Orientation.z = 0;
+	soundPosition.Orientation = EulerAngles::Zero;
 
 	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition, 0);
 }

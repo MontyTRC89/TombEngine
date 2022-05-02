@@ -87,14 +87,12 @@ void TriggerLittleBat(ITEM_INFO* item)
 	{
 		auto* bat = &Bats[batNumber];
 
+		bat->Pose.Position = item->Pose.Position;
+		bat->Pose.Orientation.SetX(Angle::ShrtToRad((GetRandomControl() & 0x3FF) - 512));
+		bat->Pose.Orientation.SetY(Angle::ShrtToRad(GetRandomControl() & 0x7FF) + item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f) - Angle::DegToRad(5.6f));
 		bat->RoomNumber = item->RoomNumber;
-		bat->Pose.Position.x = item->Pose.Position.x;
-		bat->Pose.Position.y = item->Pose.Position.y;
-		bat->Pose.Position.z = item->Pose.Position.z;
-		bat->Pose.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + Angle::DegToRad(-180.0f) - 1024;
 		bat->On = true;
 		bat->Flags = 0;
-		bat->Pose.Orientation.x = (GetRandomControl() & 0x3FF) - 512;
 		bat->Velocity = (GetRandomControl() & 0x1F) + 16;
 		bat->LaraTarget = GetRandomControl() & 0x1FF;
 		bat->Counter = 20 * ((GetRandomControl() & 7) + 15);

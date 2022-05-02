@@ -44,8 +44,8 @@ static void ShootHarpoon(ITEM_INFO* item, int x, int y, int z, int velocity, flo
 
 		InitialiseItem(harpoonItemNumber);
 
-		harpoonItem->Pose.Orientation.x = 0;
-		harpoonItem->Pose.Orientation.y = yRot;
+		harpoonItem->Pose.Orientation.SetX();
+		harpoonItem->Pose.Orientation.SetY(yRot);
 		harpoonItem->Animation.Velocity = 150;
 
 		AddActiveItem(harpoonItemNumber);

@@ -320,14 +320,14 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		return;
 
 	item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-	item->Pose.Orientation.z = 0;
+	item->Pose.Orientation.SetZ();
 
 	if (lara->Control.WaterStatus != WaterStatus::Dry &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Underwater)
 		{
-			item->Pose.Orientation.x = Angle::DegToRad(-25.0f);
+			item->Pose.Orientation.SetX(Angle::DegToRad(-25.0f));
 
 			if (TrInput & IN_ACTION && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 
@@ -416,7 +416,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	
 	bool flag = false;
 	BOUNDING_BOX* plinth = NULL;
-	item->Pose.Orientation.x = 0;
+	item->Pose.Orientation.SetX();
 	switch (triggerFlags)
 	{
 	case 1: // Pickup from wall hole

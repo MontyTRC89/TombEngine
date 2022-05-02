@@ -163,7 +163,7 @@ void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 			item->Pose.Orientation.x += Angle::DegToRad(2.0f);
 	}
 	else
-		item->Pose.Orientation.x = 0;
+		item->Pose.Orientation.SetX();
 }
 
 // State:		LS_WATER_DEATH (44)

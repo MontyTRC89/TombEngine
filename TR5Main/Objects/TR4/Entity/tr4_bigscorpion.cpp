@@ -358,7 +358,7 @@ void ScorpionControl(short itemNumber)
 	}
 
 	if ((angle1 - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
-		item->Pose.Orientation.x = Angle::DegToRad(1.4f);
+		item->Pose.Orientation.SetX(Angle::DegToRad(1.4f));
 	else
 	{
 		if (angle1 <= item->Pose.Orientation.x)

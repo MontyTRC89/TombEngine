@@ -208,8 +208,8 @@ bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 			SetAnimation(laraItem, LA_STAND_IDLE);
 			laraItem->Pose.Position.x -= SKIDOO_DISMOUNT_DISTANCE * sin(laraItem->Pose.Orientation.y);
 			laraItem->Pose.Position.z -= SKIDOO_DISMOUNT_DISTANCE * cos(laraItem->Pose.Orientation.y);
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetZ();
 			lara->Vehicle = NO_ITEM;
 			lara->Control.HandStatus = HandStatus::Free;
 		}
@@ -234,8 +234,8 @@ bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 				SoundEffect(SFX_TR4_LARA_FALL, &laraItem->Pose, 0);
 			}
 
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.z = 0;
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetZ();
 			laraItem->Animation.Airborne = true;
 			lara->Control.HandStatus = HandStatus::Free;
 			lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
@@ -434,9 +434,9 @@ void SkidooExplode(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 	pos.Position.x = skidooItem->Pose.Position.x,
 	pos.Position.y = skidooItem->Pose.Position.y - CLICK(0.5f),
 	pos.Position.z = skidooItem->Pose.Position.z,
-	pos.Orientation.x = 0,
-	pos.Orientation.y = skidooItem->Pose.Orientation.y,
-	pos.Orientation.z = 0;
+	pos.Orientation.SetX(),
+	pos.Orientation.SetY(skidooItem->Pose.Orientation.GetY()),
+	pos.Orientation.SetZ();
 
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 	//ExplodingDeath(lara->Vehicle, -1, 256);
@@ -578,14 +578,20 @@ bool SkidooControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 
 		if (drive >= 0)
 		{
-			laraItem->Pose.Orientation.x = skidooItem->Pose.Orientation.x;
-			laraItem->Pose.Orientation.z = skidooItem->Pose.Orientation.z;
+			laraItem->Pose.Orientation.SetX(skidooItem->Pose.Orientation.GetX());
+			laraItem->Pose.Orientation.SetZ(skidooItem->Pose.Orientation.GetZ());
 		}
 		else
-			laraItem->Pose.Orientation.x = laraItem->Pose.Orientation.z = 0;
+		{
+			laraItem->Pose.Orientation.SetX();
+			laraItem->Pose.Orientation.SetZ();
+		}
 	}
 	else
-		laraItem->Pose.Orientation.x = laraItem->Pose.Orientation.z = 0;
+	{
+		laraItem->Pose.Orientation.SetX();
+		laraItem->Pose.Orientation.SetZ();
+	}
 
 	AnimateItem(laraItem);
 

@@ -146,15 +146,11 @@ static void SubmarineAttack(ITEM_INFO* item)
 		torpedoItem->RoomNumber = item->RoomNumber;
 		GetFloor(pos1.x, pos1.y, pos1.z, &torpedoItem->RoomNumber);
 
-		torpedoItem->Pose.Position.x = pos1.x;
-		torpedoItem->Pose.Position.y = pos1.y;
-		torpedoItem->Pose.Position.z = pos1.z;
+		torpedoItem->Pose.Position = pos1;
 
 		InitialiseItem(itemNumber);
 
-		torpedoItem->Pose.Orientation.x = 0;
-		torpedoItem->Pose.Orientation.y = item->Pose.Orientation.y;
-		torpedoItem->Pose.Orientation.z = 0;
+		torpedoItem->Pose.Orientation.Set(0.0f, item->Pose.Orientation.GetY(), 0.0f);
 		torpedoItem->Animation.Velocity = 0;
 		torpedoItem->Animation.VerticalVelocity = 0;
 		torpedoItem->ItemFlags[0] = -1;

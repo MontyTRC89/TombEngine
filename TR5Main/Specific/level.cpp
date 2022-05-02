@@ -723,9 +723,9 @@ void ReadRooms()
 			mesh.pos.Position.x = ReadInt32();
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
-			mesh.pos.Orientation.x = 0;
-			mesh.pos.Orientation.y = Angle::ShrtToRad(ReadUInt16()); // TODO
-			mesh.pos.Orientation.z = 0;
+			mesh.pos.Orientation.SetX();
+			mesh.pos.Orientation.SetY(Angle::ShrtToRad(ReadUInt16()));
+			mesh.pos.Orientation.SetZ();
 			mesh.flags = ReadUInt16();
 			Vector3 rgb = ReadVector3();
 			float a = ReadFloat();

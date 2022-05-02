@@ -65,15 +65,13 @@ namespace TEN::Entities::TR4
 
 			locust->on = true;
 			//locust->target = target != nullptr ? target : nullptr;
-			locust->pos.Position.x = end.x;
-			locust->pos.Position.y = end.y;
-			locust->pos.Position.z = end.z;
-			locust->pos.Orientation.y = (GetRandomControl() & 0x7FF) + angles[0] - 0x400;
-			locust->pos.Orientation.x = (GetRandomControl() & 0x3FF) + angles[1] - 0x200;
+			locust->pos.Position = end;
+			locust->pos.Orientation.SetX((GetRandomControl() & 0x3FF) + angles[1] - 0x200);
+			locust->pos.Orientation.SetY((GetRandomControl() & 0x7FF) + angles[0] - 0x400);
 			locust->roomNumber = item->RoomNumber;
 			locust->randomRotation = (GetRandomControl() & 0x1F) + 0x10;
-			locust->escapeYrot = (GetRandomControl() & 0x1FF);
 			locust->escapeXrot = ((GetRandomControl() & 0x7) + 0xF) * 20;
+			locust->escapeYrot = (GetRandomControl() & 0x1FF);
 			locust->counter = 0;
 		}
 	}
