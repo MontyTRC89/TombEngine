@@ -204,7 +204,7 @@ void SubmarineControl(short itemNumber)
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-		laraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+		laraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 		laraInfo.distance = pow(dx, 2) + pow(dz, 2);
 		laraInfo.ahead = true;
 	}
@@ -365,12 +365,12 @@ void ChaffFlareControl(short itemNumber)
 	
 	if (item->Animation.VerticalVelocity)
 	{
-		item->Pose.Orientation.x += Angle::DegToRad(3.0f);
-		item->Pose.Orientation.z += Angle::DegToRad(5.0f);
+		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(3.0f));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(5.0f));
 	}
 
-	int dx = item->Animation.Velocity * sin(item->Pose.Orientation.y);
-	int dz = item->Animation.Velocity * cos(item->Pose.Orientation.y);
+	int dx = item->Animation.Velocity * sin(item->Pose.Orientation.GetY());
+	int dz = item->Animation.Velocity * cos(item->Pose.Orientation.GetY());
 
 	item->Pose.Position.x += dx;
 	item->Pose.Position.z += dz;
@@ -484,11 +484,11 @@ void TorpedoControl(short itemNumber)
 
 	if (item->ItemFlags[1] - 1 < 60)
 	{
-		float dry = angles[0] - item->Pose.Orientation.y;
+		float dry = angles[0] - item->Pose.Orientation.GetY();
 		if (abs(dry) > Angle::DegToRad(180.0f))
 			dry = -dry;
 
-		float drx = angles[1] - item->Pose.Orientation.x;
+		float drx = angles[1] - item->Pose.Orientation.GetX();
 		if (abs(drx) > Angle::DegToRad(180.0f))
 			drx = -drx;
 
@@ -512,20 +512,20 @@ void TorpedoControl(short itemNumber)
 			dry = Angle::DegToRad(2.8f);
 
 		item->Pose.Orientation.y += dry;
-		item->Pose.Orientation.x += drx;
+		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + drx);
 	}
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	item->Pose.Orientation.z += Angle::DegToRad(0.09f) * item->Animation.Velocity;
+	item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(0.09f) * item->Animation.Velocity);
 
-	int c = item->Animation.Velocity * cos(item->Pose.Orientation.x);
+	int c = item->Animation.Velocity * cos(item->Pose.Orientation.GetX());
 
-	item->Pose.Position.x += c * sin(item->Pose.Orientation.y);
-	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.x);
-	item->Pose.Position.z += c * cos(item->Pose.Orientation.y);
+	item->Pose.Position.x += c * sin(item->Pose.Orientation.GetY());
+	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.GetX());
+	item->Pose.Position.z += c * cos(item->Pose.Orientation.GetY());
 
 	auto probe = GetCollision(item);
 

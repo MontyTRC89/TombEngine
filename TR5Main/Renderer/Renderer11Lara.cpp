@@ -95,7 +95,7 @@ void Renderer11::updateLaraAnimations(bool force)
 
 	// Lara world matrix
 	translation = Matrix::CreateTranslation(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-	rotation = Matrix::CreateFromYawPitchRoll(LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.z);
+	rotation = Matrix::CreateFromYawPitchRoll(LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.GetX(), LaraItem->Pose.Orientation.z);
 
 	m_LaraWorldMatrix = rotation * translation;
 	item->World = m_LaraWorldMatrix;
@@ -327,7 +327,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
 			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.y, hairs->Pose.Orientation.x, 0) * Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
+			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.y, hairs->Pose.Orientation.GetX(), 0) * Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
 			matrices[i + 1] = world;
 		}
 

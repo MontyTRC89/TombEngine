@@ -174,8 +174,8 @@ void InitialiseGuard(short itemNum)
 		case 9:
 			item->Animation.AnimNumber = anim + 59;
 			item->Animation.TargetState = GUARD_STATE_USE_COMPUTER;
-			item->Pose.Position.x -= CLICK(2) * sin(item->Pose.Orientation.y);
-			item->Pose.Position.z -= CLICK(2) * cos(item->Pose.Orientation.y);
+			item->Pose.Position.x -= CLICK(2) * sin(item->Pose.Orientation.GetY());
+			item->Pose.Position.z -= CLICK(2) * cos(item->Pose.Orientation.GetY());
 			break;
 
 		case 8:
@@ -247,8 +247,8 @@ void GuardControl(short itemNumber)
 
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
-	int dx = 870 * sin(item->Pose.Orientation.y);
-	int dz = 870 * cos(item->Pose.Orientation.y);
+	int dx = 870 * sin(item->Pose.Orientation.GetY());
+	int dz = 870 * cos(item->Pose.Orientation.GetY());
 
 	x += dx;
 	z += dz;
@@ -309,7 +309,7 @@ void GuardControl(short itemNumber)
 	{
 		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 		laraAI.distance = pow(dx, 2) + pow(dz, 2);
 	}
 	
@@ -805,7 +805,7 @@ void GuardControl(short itemNumber)
 			{
 				currentItem->MeshBits = 0x1FFF;
 				item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
-				item->Pose.Orientation.y = currentItem->Pose.Orientation.y;
+				item->Pose.Orientation.y = currentItem->Pose.Orientation.GetY();
 				item->Pose.Position.z = currentItem->Pose.Position.z + CLICK(0.5f);
 				item->SwapMeshFlags = 1024;
 			}
@@ -1112,8 +1112,8 @@ void Mafia2Control(short itemNumber)
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	int dx = 870 * sin(item->Pose.Orientation.y);
-	int dz = 870 * cos(item->Pose.Orientation.y);
+	int dx = 870 * sin(item->Pose.Orientation.GetY());
+	int dz = 870 * cos(item->Pose.Orientation.GetY());
 
 	x += dx;
 	z += dz;
@@ -1179,7 +1179,7 @@ void Mafia2Control(short itemNumber)
 		{
 			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+			laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 

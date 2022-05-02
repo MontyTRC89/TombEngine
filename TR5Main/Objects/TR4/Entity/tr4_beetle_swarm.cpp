@@ -140,9 +140,9 @@ namespace TEN::Entities::TR4
 				int oldy = beetle->Pose.Position.y;
 				int oldz = beetle->Pose.Position.z;
 
-				beetle->Pose.Position.x += beetle->Velocity * sin(beetle->Pose.Orientation.y);
+				beetle->Pose.Position.x += beetle->Velocity * sin(beetle->Pose.Orientation.GetY());
 				beetle->Pose.Position.y += beetle->VerticalVelocity;
-				beetle->Pose.Position.z += beetle->Velocity * cos(beetle->Pose.Orientation.y);
+				beetle->Pose.Position.z += beetle->Velocity * cos(beetle->Pose.Orientation.GetY());
 
 				beetle->VerticalVelocity += GRAVITY;
 
@@ -150,7 +150,7 @@ namespace TEN::Entities::TR4
 				int dy = LaraItem->Pose.Position.y - beetle->Pose.Position.y;
 				int dz = LaraItem->Pose.Position.z - beetle->Pose.Position.z;
 
-				short angle = atan2(dz, dx) - beetle->Pose.Orientation.y;
+				short angle = atan2(dz, dx) - beetle->Pose.Orientation.GetY();
 
 				if (abs(dx) < 85 &&
 					abs(dy) < 85 &&

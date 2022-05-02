@@ -364,7 +364,7 @@ namespace TEN::Entities::Effects
 
 			/*if (((-item->TriggerFlags) & 7) == 7)
 			{
-				switch (item->Pose.Orientation.y)
+				switch (item->Pose.Orientation.GetY())
 				{
 				case 0:
 					item->Pose.Position.z += 512;
@@ -394,7 +394,7 @@ namespace TEN::Entities::Effects
 
 		if (item->TriggerFlags != 123)
 		{
-			/*switch (item->Pose.Orientation.y)
+			/*switch (item->Pose.Orientation.GetY())
 			{
 			case 0:
 				if (item->TriggerFlags == 2)
@@ -686,8 +686,8 @@ namespace TEN::Entities::Effects
 
 			}
 
-			short oldYrot = item->Pose.Orientation.y;
-			item->Pose.Orientation.y = l->Pose.Orientation.y;
+			short oldYrot = item->Pose.Orientation.GetY();
+			item->Pose.Orientation.y = l->Pose.Orientation.GetY();
 
 			if (TestLaraPosition(&FireBounds, item, l))
 			{

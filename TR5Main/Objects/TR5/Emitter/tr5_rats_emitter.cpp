@@ -137,9 +137,9 @@ void UpdateRats()
 			{
 				auto oldPos = rat->Pose.Position;
 
-				rat->Pose.Position.x += rat->Velocity * sin(rat->Pose.Orientation.y);
+				rat->Pose.Position.x += rat->Velocity * sin(rat->Pose.Orientation.GetY());
 				rat->Pose.Position.y += rat->VerticalVelocity;
-				rat->Pose.Position.z += rat->Velocity * cos(rat->Pose.Orientation.y);
+				rat->Pose.Position.z += rat->Velocity * cos(rat->Pose.Orientation.GetY());
 
 				rat->VerticalVelocity += GRAVITY;
 
@@ -149,7 +149,7 @@ void UpdateRats()
 				if (rat->Flags >= 170)
 					angle = rat->Pose.Orientation.y - atan2(dPos.z, dPos.x);
 				else
-					angle = atan2(dPos.z, dPos.x) - rat->Pose.Orientation.y;
+					angle = atan2(dPos.z, dPos.x) - rat->Pose.Orientation.GetY();
 
 				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{

@@ -30,8 +30,8 @@ void SpinningBladeControl(short itemNumber)
 	{
 		if (item->Animation.TargetState != 1)
 		{
-			int x = item->Pose.Position.x + SECTOR(3) * sin(item->Pose.Orientation.y) / 2;
-			int z = item->Pose.Position.z + SECTOR(3) * cos(item->Pose.Orientation.y) / 2;
+			int x = item->Pose.Position.x + SECTOR(3) * sin(item->Pose.Orientation.GetY()) / 2;
+			int z = item->Pose.Position.z + SECTOR(3) * cos(item->Pose.Orientation.GetY()) / 2;
 
 			int height = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).Position.Floor;
 			if (height == NO_HEIGHT)

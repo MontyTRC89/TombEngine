@@ -677,16 +677,16 @@ CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, CollisionInfo* co
 		// Then determine new test position from centerpoint of new collision box position.
 
 		// Push back item a bit to compensate for possible edge ledge cases
-		pos[i].Position.x -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * sin(pos[i].Orientation.y));
-		pos[i].Position.z -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * cos(pos[i].Orientation.y));
+		pos[i].Position.x -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * sin(pos[i].Orientation.GetY()));
+		pos[i].Position.z -= round((coll->Setup.Radius * (outer ? -0.2f : 0.2f)) * cos(pos[i].Orientation.GetY()));
 
 		// Move item at the distance of full collision diameter plus half-radius margin to movement direction 
 		pos[i].Position.x += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * sin(lara->Control.MoveAngle));
 		pos[i].Position.z += round((coll->Setup.Radius * (i == 0 ? 2.0f : 2.5f)) * cos(lara->Control.MoveAngle));
 
 		// Determine anchor point
-		auto cX = pos[i].Position.x + round(coll->Setup.Radius * sin(pos[i].Orientation.y));
-		auto cZ = pos[i].Position.z + round(coll->Setup.Radius * cos(pos[i].Orientation.y));
+		auto cX = pos[i].Position.x + round(coll->Setup.Radius * sin(pos[i].Orientation.GetY()));
+		auto cZ = pos[i].Position.z + round(coll->Setup.Radius * cos(pos[i].Orientation.GetY()));
 		cX += (coll->Setup.Radius * sin(pos[i].Orientation.y + Angle::DegToRad(90.0f * -std::copysign(1.0f, angle))));
 		cZ += (coll->Setup.Radius * cos(pos[i].Orientation.y + Angle::DegToRad(90.0f * -std::copysign(1.0f, angle))));
 
@@ -715,7 +715,7 @@ CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, CollisionInfo* co
 		{
 			result.RealPositionResult = pos[0];
 			result.ProbeResult = pos[1];
-			result.Success = newAngle == pos[i].Orientation.y;
+			result.Success = newAngle == pos[i].Orientation.GetY();
 		}
 	}
 

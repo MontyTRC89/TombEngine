@@ -257,7 +257,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.yRot = item->Pose.Orientation.y;
+		flame.yRot = item->Pose.Orientation.GetY();
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPL;
 		break;
@@ -272,7 +272,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = -16;
 		flame.speed = 0;
-		flame.yRot = item->Pose.Orientation.y;
+		flame.yRot = item->Pose.Orientation.GetY();
 		flame.room_number = roomNumber;
 		flame.type = T_ROCKZAPPR;
 		break;
@@ -287,7 +287,7 @@ static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* lar
 
 		flame.fallspeed = (GetRandomControl() & 7) + 10;
 		flame.speed = 160;
-		flame.yRot = item->Pose.Orientation.y;
+		flame.yRot = item->Pose.Orientation.GetY();
 		flame.room_number = roomNumber;
 		flame.type = T_ZAPP;
 		break;
@@ -385,8 +385,8 @@ void ControlTonyFireBall(short fxNumber)
 			fx->fallspeed = CLICK(2);
 
 		fx->pos.Position.y += fx->fallspeed / 2;
-		fx->pos.Position.z += fx->speed * cos(fx->pos.Orientation.y);
-		fx->pos.Position.x += fx->speed * sin(fx->pos.Orientation.y);
+		fx->pos.Position.z += fx->speed * cos(fx->pos.Orientation.GetY());
+		fx->pos.Position.x += fx->speed * sin(fx->pos.Orientation.GetY());
 
 		if (Wibble & 4)
 			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((oldX - fx->pos.Position.x) * 8), (short)((oldY - fx->pos.Position.y) * 8), (short)((oldZ - fx->pos.Position.z) * 4));

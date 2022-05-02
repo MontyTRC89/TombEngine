@@ -205,7 +205,7 @@ namespace TEN::Entities::Generic
 		auto oldPos = item->Pose.Position;
 
 		if (item->Animation.VerticalVelocity)
-			item->Pose.Orientation.z += Angle::DegToRad(5);
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(5.0f));
 		else if (!item->Animation.Velocity)
 		{
 			item->Pose.Orientation.SetX();
@@ -306,7 +306,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			float rot = torchItem->Pose.Orientation.y;
+			float rot = torchItem->Pose.Orientation.GetY();
 
 			switch (torchItem->ObjectNumber)
 			{
@@ -338,7 +338,7 @@ namespace TEN::Entities::Generic
 				break;
 			}
 
-			torchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			torchItem->Pose.Orientation.y = laraItem->Pose.Orientation.GetY();
 
 			if (TestLaraPosition(&FireBounds, torchItem, laraItem))
 			{

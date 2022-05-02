@@ -108,7 +108,7 @@ void ObeliskControl(short itemNumber)
 
 		if (item->ItemFlags[3] >= 256 && item->TriggerFlags == 2)
 		{
-			pos.Position.x = item->Pose.Position.x + SECTOR(8) * sin(item->Pose.Orientation.y);
+			pos.Position.x = item->Pose.Position.x + SECTOR(8) * sin(item->Pose.Orientation.GetY());
 			pos.Position.y = item->Pose.Position.y;
 			pos.Position.z = item->Pose.Position.z + SECTOR(8) * cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 

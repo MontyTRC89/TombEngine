@@ -32,9 +32,9 @@ namespace TEN::Entities::TR4
 		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose, 0);
 		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->Pose, 0);
 
-		item->Pose.Position.x = (item->ItemFlags[0] * 256) + 4608 * cos(item->TriggerFlags) * sin(item->Pose.Orientation.y);
+		item->Pose.Position.x = (item->ItemFlags[0] * 256) + 4608 * cos(item->TriggerFlags) * sin(item->Pose.Orientation.GetY());
 		item->Pose.Position.y = (item->ItemFlags[1] * 256) - 4608 * sin(item->TriggerFlags);
-		item->Pose.Position.z = (item->ItemFlags[2] * 256) + 4608 * cos(item->TriggerFlags) * cos(item->Pose.Orientation.y);
+		item->Pose.Position.z = (item->ItemFlags[2] * 256) + 4608 * cos(item->TriggerFlags) * cos(item->Pose.Orientation.GetY());
 
 		item->TriggerFlags += 170;
 

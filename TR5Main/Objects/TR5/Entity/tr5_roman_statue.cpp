@@ -522,7 +522,7 @@ void RomanStatueControl(short itemNumber)
 				if (item->TriggerFlags)
 				{
 					/*RomanStatueData.energyArcs[i] = TriggerEnergyArc(
-						(Vector3Int*)& dest.Orientation.x,
+						(Vector3Int*)& dest.Orientation.GetX(),
 						(Vector3Int*)& dest,
 						(GetRandomControl() & 0x3F) + 16,
 						(color >> 1) | ((color | 0x180000) << 8),

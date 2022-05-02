@@ -140,14 +140,14 @@ void UpdateSpiders()
 			{
 				auto oldPos = spider->Pose.Position;
 
-				spider->Pose.Position.x += spider->Velocity * sin(spider->Pose.Orientation.y);
+				spider->Pose.Position.x += spider->Velocity * sin(spider->Pose.Orientation.GetY());
 				spider->Pose.Position.y += spider->VerticalVelocity;
-				spider->Pose.Position.z += spider->Velocity * cos(spider->Pose.Orientation.y);
+				spider->Pose.Position.z += spider->Velocity * cos(spider->Pose.Orientation.GetY());
 				spider->VerticalVelocity += GRAVITY;
 
 				auto dPos = LaraItem->Pose.Position - spider->Pose.Position;
 
-				float angle = atan2(dPos.z, dPos.x) - spider->Pose.Orientation.y;
+				float angle = atan2(dPos.z, dPos.x) - spider->Pose.Orientation.GetY();
 
 				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{

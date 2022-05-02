@@ -43,7 +43,7 @@ void InitialiseLarson(short itemNumber)
 		return;
 
 	item->ItemFlags[3] = item->TriggerFlags;
-	float rotY = item->Pose.Orientation.y;
+	float rotY = item->Pose.Orientation.GetY();
 
 	if (rotY > Angle::DegToRad(22.5f) && rotY < Angle::DegToRad(157.5f))
 		item->Pose.Position.x += STEPUP_HEIGHT;

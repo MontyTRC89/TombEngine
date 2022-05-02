@@ -158,12 +158,12 @@ static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		InitialiseItem(itemNumber);
 
 		harpoonItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX());
-		harpoonItem->Pose.Orientation.y = UPVItem->Pose.Orientation.y;
+		harpoonItem->Pose.Orientation.y = UPVItem->Pose.Orientation.GetY();
 		harpoonItem->Pose.Orientation.SetZ();
 
 		// TODO: Huh?
-		harpoonItem->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(harpoonItem->Pose.Orientation.x);
-		harpoonItem->Animation.Velocity = HARPOON_VELOCITY * cos(harpoonItem->Pose.Orientation.x);
+		harpoonItem->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(harpoonItem->Pose.Orientation.GetX());
+		harpoonItem->Animation.Velocity = HARPOON_VELOCITY * cos(harpoonItem->Pose.Orientation.GetX());
 		harpoonItem->HitPoints = HARPOON_TIME;
 		harpoonItem->ItemFlags[0] = 1;
 
@@ -307,10 +307,10 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		return false;
 
 	short moveAngle = UPVItem->Pose.Orientation.y + Angle::DegToRad(180.0f);
-	int velocity = DISMOUNT_DISTANCE * cos(UPVItem->Pose.Orientation.x);
+	int velocity = DISMOUNT_DISTANCE * cos(UPVItem->Pose.Orientation.GetX());
 	int x = UPVItem->Pose.Position.x + velocity * sin(moveAngle);
 	int z = UPVItem->Pose.Position.z + velocity * cos(moveAngle);
-	int y = UPVItem->Pose.Position.y - DISMOUNT_DISTANCE * sin(-UPVItem->Pose.Orientation.x);
+	int y = UPVItem->Pose.Position.y - DISMOUNT_DISTANCE * sin(-UPVItem->Pose.Orientation.GetX());
 
 	auto probe = GetCollision(x, y, z, UPVItem->RoomNumber);
 	if ((probe.Position.Floor - probe.Position.Ceiling) < CLICK(1) ||
@@ -344,7 +344,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (distance > pow(CLICK(2), 2))
 		return false;
 
-	short deltaAngle = abs(laraItem->Pose.Orientation.y - UPVItem->Pose.Orientation.y);
+	short deltaAngle = abs(laraItem->Pose.Orientation.y - UPVItem->Pose.Orientation.GetY());
 	if (deltaAngle > Angle::DegToRad(35.0f) || deltaAngle < Angle::DegToRad(-35.0f))
 		return false;
 
@@ -441,9 +441,9 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	coll->Setup.OldPosition.y = UPVItem->Pose.Position.y;
 	coll->Setup.OldPosition.z = UPVItem->Pose.Position.z;
 
-	if ((UPVItem->Pose.Orientation.x >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Pose.Orientation.x <= (SHRT_MAX / 2 + 1)))
+	if ((UPVItem->Pose.Orientation.GetX() >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Pose.Orientation.GetX() <= (SHRT_MAX / 2 + 1)))
 	{
-		lara->Control.MoveAngle = UPVItem->Pose.Orientation.y;
+		lara->Control.MoveAngle = UPVItem->Pose.Orientation.GetY();
 		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	}
 	else
@@ -452,7 +452,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	}
 
-	int height = sin(UPVItem->Pose.Orientation.x) * UPV_LENGTH;
+	int height = sin(UPVItem->Pose.Orientation.GetX()) * UPV_LENGTH;
 	if (height < 0)
 		height = -height;
 	if (height < 200)
@@ -535,22 +535,22 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 		if (UPV->Flags & UPV_SURFACE)
 		{
-			int xa = UPVItem->Pose.Orientation.x - SURFACE_ANGLE;
-			int ax = SURFACE_ANGLE - UPVItem->Pose.Orientation.x;
+			int xa = UPVItem->Pose.Orientation.GetX() - SURFACE_ANGLE;
+			int ax = SURFACE_ANGLE - UPVItem->Pose.Orientation.GetX();
 
 			if (xa > 0)
 			{
 				if (xa > Angle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x -= Angle::DegToRad(1.0f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
 				else
-					UPVItem->Pose.Orientation.x -= Angle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() - Angle::DegToRad(0.1f));
 			}
 			else if (ax)
 			{
 				if (ax > Angle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x += Angle::DegToRad(1.0f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + Angle::DegToRad(1.0f));
 				else
-					UPVItem->Pose.Orientation.x += Angle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + Angle::DegToRad(0.1f));
 			}
 			else
 				UPVItem->Pose.Orientation.SetX(SURFACE_ANGLE);
@@ -567,7 +567,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		{
 			if (TrInput & UPV_IN_UP &&
 				UPV->Flags & UPV_SURFACE &&
-				UPVItem->Pose.Orientation.x > -DIVE_ANGLE)
+				UPVItem->Pose.Orientation.GetX() > -DIVE_ANGLE)
 			{
 				UPV->Flags |= UPV_DIVE;
 			}
@@ -594,21 +594,21 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 		if (UPV->Flags & UPV_SURFACE)
 		{
-			int xa = UPVItem->Pose.Orientation.x - SURFACE_ANGLE;
-			int ax = SURFACE_ANGLE - UPVItem->Pose.Orientation.x;
+			int xa = UPVItem->Pose.Orientation.GetX() - SURFACE_ANGLE;
+			int ax = SURFACE_ANGLE - UPVItem->Pose.Orientation.GetX();
 			if (xa > 0)
 			{
 				if (xa > Angle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x -= Angle::DegToRad(1.0f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
 				else
-					UPVItem->Pose.Orientation.x -= Angle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() - Angle::DegToRad(0.1f));
 			}
 			else if (ax)
 			{
 				if (ax > Angle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x += Angle::DegToRad(1.0f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + Angle::DegToRad(1.0f));
 				else
-					UPVItem->Pose.Orientation.x += Angle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + Angle::DegToRad(0.1f));
 			}
 			else
 				UPVItem->Pose.Orientation.SetX(SURFACE_ANGLE);
@@ -642,7 +642,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		else if (TrInput & UPV_IN_PROPEL)
 		{
 			if (TrInput & UPV_IN_UP &&
-				UPVItem->Pose.Orientation.x > -DIVE_ANGLE &&
+				UPVItem->Pose.Orientation.GetX() > -DIVE_ANGLE &&
 				UPV->Flags & UPV_SURFACE)
 			{
 				UPV->Flags |= UPV_DIVE;
@@ -657,7 +657,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		if (anim == UPV_ANIM_MOUNT_SURFACE_END)
 		{
 			UPVItem->Pose.Position.y += 4;
-			UPVItem->Pose.Orientation.x += Angle::DegToRad(1.0f);
+			UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + Angle::DegToRad(1.0f));
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
 				SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, 2);
@@ -791,8 +791,8 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 	if (UPV->Flags & UPV_DIVE)
 	{
-		if (UPVItem->Pose.Orientation.x > -DIVE_ANGLE)
-			UPVItem->Pose.Orientation.x -= DIVE_SPEED;
+		if (UPVItem->Pose.Orientation.GetX() > -DIVE_ANGLE)
+			UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() - DIVE_SPEED);
 		else
 			UPV->Flags &= ~UPV_DIVE;
 	}
@@ -927,18 +927,18 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 
 		UPVItem->Animation.Velocity = UPV->Velocity / (USHRT_MAX + 1);
 
-		UPVItem->Pose.Orientation.x += UPV->XRot / (USHRT_MAX + 1);
+		UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + UPV->XRot / (USHRT_MAX + 1));
 		UPVItem->Pose.Orientation.y += UPV->Rot / (USHRT_MAX + 1);
-		UPVItem->Pose.Orientation.z = UPV->Rot / (USHRT_MAX + 1);
+		UPVItem->Pose.Orientation.SetZ(UPV->Rot / (USHRT_MAX + 1));
 
-		if (UPVItem->Pose.Orientation.x > UPDOWN_LIMIT)
+		if (UPVItem->Pose.Orientation.GetX() > UPDOWN_LIMIT)
 			UPVItem->Pose.Orientation.SetX(UPDOWN_LIMIT);
-		else if (UPVItem->Pose.Orientation.x < -UPDOWN_LIMIT)
+		else if (UPVItem->Pose.Orientation.GetX() < -UPDOWN_LIMIT)
 			UPVItem->Pose.Orientation.SetX(-UPDOWN_LIMIT);
 
-		UPVItem->Pose.Position.x += round(sin(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * cos(UPVItem->Pose.Orientation.x));
-		UPVItem->Pose.Position.y -= round(sin(UPVItem->Pose.Orientation.x) * UPVItem->Animation.Velocity);
-		UPVItem->Pose.Position.z += round(cos(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * cos(UPVItem->Pose.Orientation.x));
+		UPVItem->Pose.Position.x += round(sin(UPVItem->Pose.Orientation.GetY()) * UPVItem->Animation.Velocity * cos(UPVItem->Pose.Orientation.GetX()));
+		UPVItem->Pose.Position.y -= round(sin(UPVItem->Pose.Orientation.GetX()) * UPVItem->Animation.Velocity);
+		UPVItem->Pose.Position.z += round(cos(UPVItem->Pose.Orientation.GetY()) * UPVItem->Animation.Velocity * cos(UPVItem->Pose.Orientation.GetX()));
 	}
 
 	int newHeight = GetCollision(UPVItem).Position.Floor;

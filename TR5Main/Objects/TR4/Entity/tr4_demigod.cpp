@@ -362,7 +362,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 				laraAI.xAngle = 0;
 
 				laraAI.ahead = true;

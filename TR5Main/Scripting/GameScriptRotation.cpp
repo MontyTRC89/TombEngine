@@ -49,7 +49,7 @@ void GameScriptRotation::StoreInPHDPos(PoseData& pos) const
 	pos.Orientation.Set(x, y, z);
 }
 
-GameScriptRotation::GameScriptRotation(PoseData const & pos)
+GameScriptRotation::GameScriptRotation(PoseData const& pos)
 {
 	x = pos.Orientation.x;
 	y = pos.Orientation.y;
@@ -65,4 +65,3 @@ std::string GameScriptRotation::ToString() const
 {
 	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
 }
-

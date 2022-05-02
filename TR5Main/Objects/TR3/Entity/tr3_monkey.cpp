@@ -118,7 +118,7 @@ void MonkeyControl(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			laraAI.angle = atan2(dz, dz) - item->Pose.Orientation.y;
+			laraAI.angle = atan2(dz, dz) - item->Pose.Orientation.GetY();
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 		}
 

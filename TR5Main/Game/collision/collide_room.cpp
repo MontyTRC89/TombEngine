@@ -826,8 +826,8 @@ void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, float 
 	auto radiusZ = bounds->Z2 / radiusDivisor; // Need divide in any case else it's too much !
 
 	auto ratioXZ = radiusZ / radiusX;
-	auto frontX = sin(item->Pose.Orientation.y) * radiusZ;
-	auto frontZ = cos(item->Pose.Orientation.y) * radiusZ;
+	auto frontX = sin(item->Pose.Orientation.GetY()) * radiusZ;
+	auto frontZ = cos(item->Pose.Orientation.GetY()) * radiusZ;
 	auto leftX  = -frontZ * ratioXZ;
 	auto leftZ  =  frontX * ratioXZ;
 	auto rightX =  frontZ * ratioXZ;

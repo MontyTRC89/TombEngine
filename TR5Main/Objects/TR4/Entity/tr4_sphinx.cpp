@@ -55,9 +55,9 @@ void SphinxControl(short itemNumber)
 	auto* creature = GetCreatureInfo(item);
 	auto* object = &Objects[item->ObjectNumber];
 
-	int x = item->Pose.Position.x + 614 * sin(item->Pose.Orientation.y);
+	int x = item->Pose.Position.x + 614 * sin(item->Pose.Orientation.GetY());
 	int y = item->Pose.Position.y;
-	int z = item->Pose.Position.z + 614 * cos(item->Pose.Orientation.y);
+	int z = item->Pose.Position.z + 614 * cos(item->Pose.Orientation.GetY());
 
 	auto probe = GetCollision(x, y, z, item->RoomNumber);
 
@@ -86,9 +86,9 @@ void SphinxControl(short itemNumber)
 		}
 	}
 
-	x = item->Pose.Position.x - 614 * sin(item->Pose.Orientation.y);
+	x = item->Pose.Position.x - 614 * sin(item->Pose.Orientation.GetY());
 	y = item->Pose.Position.y;
-	z = item->Pose.Position.z - 614 * cos(item->Pose.Orientation.y);
+	z = item->Pose.Position.z - 614 * cos(item->Pose.Orientation.GetY());
 
 	int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 

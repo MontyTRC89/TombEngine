@@ -17,7 +17,7 @@ void ControlBodyPart(short fxNumber)
 	if (fx->counter <= 0)
 	{
 		if (fx->speed)
-			fx->pos.Orientation.x += 4 * fx->fallspeed;
+			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + 4 * fx->fallspeed);
 		fx->fallspeed += 6;
 	}
 	else
@@ -26,21 +26,21 @@ void ControlBodyPart(short fxNumber)
 		int random = modulus <= 1 ? 0 : 2 * GetRandomControl() % modulus;
 		if (fxNumber & 1)
 		{
-			fx->pos.Orientation.z -= random;
-			fx->pos.Orientation.x += random;
+			fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() - random);
+			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + random);
 		}
 		else
 		{
-			fx->pos.Orientation.z += random;
-			fx->pos.Orientation.x -= random;
+			fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + random);
+			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() - random);
 		}
 		if (--fx->counter < 8)
 			fx->fallspeed += 2;
 	}
 
-	fx->pos.Position.x += fx->speed * sin(fx->pos.Orientation.y);
+	fx->pos.Position.x += fx->speed * sin(fx->pos.Orientation.GetY());
 	fx->pos.Position.y += fx->fallspeed;
-	fx->pos.Position.z += fx->speed * cos(fx->pos.Orientation.y);
+	fx->pos.Position.z += fx->speed * cos(fx->pos.Orientation.GetY());
 
 	short roomNumber = fx->roomNumber;
 	FLOOR_INFO* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);

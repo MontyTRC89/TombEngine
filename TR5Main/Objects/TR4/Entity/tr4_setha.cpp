@@ -41,8 +41,8 @@ void SethaControl(short itemNumber)
 	int y = item->Pose.Position.y;
 	int z = item->Pose.Position.z;
 
-	int dx = 870 * sin(item->Pose.Orientation.y);
-	int dz = 870 * cos(item->Pose.Orientation.y);
+	int dx = 870 * sin(item->Pose.Orientation.GetY());
+	int dz = 870 * cos(item->Pose.Orientation.GetY());
 
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);

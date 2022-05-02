@@ -156,7 +156,7 @@ namespace TEN::Entities::TR4
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				float angle = atan2(dx, dz);
-				laraAI.angle = angle - item->Pose.Orientation.y;
+				laraAI.angle = angle - item->Pose.Orientation.GetY();
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 

@@ -117,7 +117,7 @@ void GuideControl(short itemNumber)
 	int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-	laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+	laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 
 	laraAI.ahead = true;
 	if (laraAI.angle <= Angle::DegToRad(-90.0f) || laraAI.angle >= Angle::DegToRad(90.0f))
@@ -600,7 +600,7 @@ void GuideControl(short itemNumber)
 	case 43:
 		if (enemy)
 		{
-			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
+			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.GetY();
 			if (deltaAngle < Angle::DegToRad(-2.0f))
 				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			else if (deltaAngle > Angle::DegToRad(2.0f))
@@ -686,7 +686,7 @@ void GuideControl(short itemNumber)
 			{
 				TestTriggers(item, true);
 
-				item->Pose.Orientation.y = enemy->Pose.Orientation.y;
+				item->Pose.Orientation.y = enemy->Pose.Orientation.GetY();
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;

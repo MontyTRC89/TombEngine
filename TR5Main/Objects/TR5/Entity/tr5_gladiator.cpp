@@ -90,7 +90,7 @@ void ControlGladiator(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			rot = atan2(dz, dx) - item->Pose.Orientation.y;
+			rot = atan2(dz, dx) - item->Pose.Orientation.GetY();
 			if (rot <= Angle::DegToRad(-90.0f) || rot >= Angle::DegToRad(90.0f))
 				unknown = false;
 

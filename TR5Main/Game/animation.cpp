@@ -415,8 +415,8 @@ bool TestLastFrame(ITEM_INFO* item, int animNumber)
 
 void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 {
-	float sinY = sin(item->Pose.Orientation.y);
-	float cosY = cos(item->Pose.Orientation.y);
+	float sinY = sin(item->Pose.Orientation.GetY());
+	float cosY = cos(item->Pose.Orientation.GetY());
 
 	item->Pose.Position.x += (int)round(cosY * x + sinY * z);
 	item->Pose.Position.y += y;

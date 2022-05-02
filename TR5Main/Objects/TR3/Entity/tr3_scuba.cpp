@@ -70,10 +70,10 @@ void ScubaHarpoonControl(short itemNumber)
 		int ox = item->Pose.Position.x;
 		int oz = item->Pose.Position.z;
 
-		int velocity = item->Animation.Velocity * cos(item->Pose.Orientation.x);
-		item->Pose.Position.z += velocity * cos(item->Pose.Orientation.y);
-		item->Pose.Position.x += velocity * sin(item->Pose.Orientation.y);
-		item->Pose.Position.y += -item->Animation.Velocity * sin(item->Pose.Orientation.x);
+		int velocity = item->Animation.Velocity * cos(item->Pose.Orientation.GetX());
+		item->Pose.Position.z += velocity * cos(item->Pose.Orientation.GetY());
+		item->Pose.Position.x += velocity * sin(item->Pose.Orientation.GetY());
+		item->Pose.Position.y += -item->Animation.Velocity * sin(item->Pose.Orientation.GetX());
 
 		auto probe = GetCollision(item);
 

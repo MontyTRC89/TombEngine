@@ -138,7 +138,7 @@ void ImpControl(short itemNumber)
 			if (creature->Enemy == LaraItem)
 				angle2 = AI.angle;
 			else
-				angle2 = atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.y;
+				angle2 = atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x) - item->Pose.Orientation.GetY();
 
 			int d1 = item->Pose.Position.y - LaraItem->Pose.Position.y + CLICK(1.5f);
 

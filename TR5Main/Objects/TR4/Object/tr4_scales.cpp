@@ -116,7 +116,7 @@ void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		}
 		else
 		{
-			float rotY = item->Pose.Orientation.y;
+			float rotY = item->Pose.Orientation.GetY();
 			item->Pose.Orientation.y = Angle::ShrtToRad((Angle::RadToShrt(laraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) & Angle::DegToShrt(270.0f)));
 
 			ScalesBounds.boundingBox.X1 = -1408;

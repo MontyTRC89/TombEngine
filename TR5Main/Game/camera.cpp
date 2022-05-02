@@ -145,10 +145,10 @@ void MoveCamera(GameVector* ideal, int speed)
 		BinocularOn++;
 	}
 
-	if (OldCam.pos.Orientation.x != LaraItem->Pose.Orientation.x ||
+	if (OldCam.pos.Orientation.GetX() != LaraItem->Pose.Orientation.GetX() ||
 		OldCam.pos.Orientation.y != LaraItem->Pose.Orientation.y ||
 		OldCam.pos.Orientation.z != LaraItem->Pose.Orientation.z ||
-		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
+		OldCam.pos2.Orientation.GetX() != Lara.ExtraHeadRot.x ||
 		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
 		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
 		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.y ||
@@ -317,7 +317,7 @@ void ChaseCamera(ITEM_INFO* item)
 	if (!Camera.targetElevation)
 		Camera.targetElevation = Angle::DegToRad(-10.0f);
 
-	Camera.targetElevation += item->Pose.Orientation.x;
+	Camera.targetElevation += item->Pose.Orientation.GetX();
 	UpdateCameraElevation();
 
 	// Clamp x rotation.
@@ -459,12 +459,12 @@ void CombatCamera(ITEM_INFO* item)
 	if (lara->TargetEntity)
 	{
 		Camera.targetAngle = lara->TargetArmAngles[0];
-		Camera.targetElevation = lara->TargetArmAngles[1] + item->Pose.Orientation.x;
+		Camera.targetElevation = lara->TargetArmAngles[1] + item->Pose.Orientation.GetX();
 	}
 	else
 	{
 		Camera.targetAngle = lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.x - Angle::DegToRad(15.0f);
+		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.GetX() - Angle::DegToRad(15.0f);
 	}
 
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
@@ -796,12 +796,12 @@ void LookCamera(ITEM_INFO* item)
 	else if (lara->ExtraHeadRot.GetY() > Angle::DegToRad(80.0f))
 		lara->ExtraHeadRot.y = Angle::DegToRad(80.0f);
 
-	if (abs(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x) >= 16)
-		OldCam.pos.Orientation.SetX((lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2);
+	if (abs(lara->ExtraHeadRot.x - OldCam.pos.Orientation.GetX()) >= 16)
+		OldCam.pos.Orientation.SetX((lara->ExtraHeadRot.x + OldCam.pos.Orientation.GetX()) / 2);
 	else
 		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
-	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y) >= 16)
-		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.y) / 2;
+	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.GetY()) >= 16)
+		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.GetY()) / 2;
 	else
 		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 
@@ -891,7 +891,7 @@ void LookCamera(ITEM_INFO* item)
 
 	 auto ideal = GameVector(x, y, z, roomNumber);
 
-	if (OldCam.pos.Orientation.x == lara->ExtraHeadRot.x &&
+	if (OldCam.pos.Orientation.GetX() == lara->ExtraHeadRot.x &&
 		OldCam.pos.Orientation.y == lara->ExtraHeadRot.y &&
 		OldCam.pos.Position == item->Pose.Position &&
 		OldCam.ActiveState == item->Animation.ActiveState &&
@@ -1438,7 +1438,7 @@ void CalculateCamera()
 			auto dx = Camera.item->Pose.Position.x - item->Pose.Position.x;
 			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
 			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
-			float angle = atan2(dz, dx) - item->Pose.Orientation.y;
+			float angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 			float tilt = atan2(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->Pose.Position.y);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle /= 2;
@@ -1520,8 +1520,8 @@ void CalculateCamera()
 		else
 		{
 			auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->Pose.Position.x + shift * sin(item->Pose.Orientation.y);
-			z = item->Pose.Position.z + shift * cos(item->Pose.Orientation.y);
+			x = item->Pose.Position.x + shift * sin(item->Pose.Orientation.GetY());
+			z = item->Pose.Position.z + shift * cos(item->Pose.Orientation.GetY());
 
 			Camera.target.x = x;
 			Camera.target.z = z;
@@ -1707,8 +1707,8 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
 	int dz = Camera.pos.z - pos->Position.z;
-	float sinY = sin(pos->Orientation.y);
-	float cosY = cos(pos->Orientation.y);
+	float sinY = sin(pos->Orientation.GetY());
+	float cosY = cos(pos->Orientation.GetY());
 	auto x = dx * cosY - dz * sinY;
 	auto z = dx * sinY + dz * cosY;
 

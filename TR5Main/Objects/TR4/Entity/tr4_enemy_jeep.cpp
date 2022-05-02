@@ -34,9 +34,9 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 		grenadeItem->Pose.Orientation.SetZ();
 
-		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* sin(grenadeItem->Pose.Orientation.y);
+		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* sin(grenadeItem->Pose.Orientation.GetY());
 		grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
-		grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * cos(grenadeItem->Pose.Orientation.y);
+		grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * cos(grenadeItem->Pose.Orientation.GetY());
 
 		SmokeCountL = 32;
 		SmokeWeapon = (LaraWeaponType)5; // TODO: 5 is the HK. Did the TEN enum get shuffled around? @Sezz 2022.03.09
@@ -49,11 +49,11 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		else
 			grenadeItem->ItemFlags[0] = 2;
 
-		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
+		grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.GetX();
+		grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.GetY();
 		grenadeItem->Animation.RequiredState = 0;
 		grenadeItem->Animation.Velocity = 32;
-		grenadeItem->Animation.VerticalVelocity = -32 * sin(grenadeItem->Pose.Orientation.x);
+		grenadeItem->Animation.VerticalVelocity = -32 * sin(grenadeItem->Pose.Orientation.GetX());
 		grenadeItem->HitPoints = 120;
 
 		AddActiveItem(grenadeItemNumber);
@@ -93,8 +93,8 @@ void EnemyJeepControl(short itemNumber)
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
 
-		int dx = 682 * sin(item->Pose.Orientation.y);
-		int dz = 682 * cos(item->Pose.Orientation.y);
+		int dx = 682 * sin(item->Pose.Orientation.GetY());
+		int dz = 682 * cos(item->Pose.Orientation.GetY());
 
 		int height1 = GetCollision(x - dz, y, z - dx, item->RoomNumber).Position.Floor;
 		if (abs(item->Pose.Position.y - height1) > CLICK(3))
@@ -135,7 +135,7 @@ void EnemyJeepControl(short itemNumber)
 
 		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		short angle = atan2(dz, dx) - item->Pose.Orientation.y;
+		short angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 
 		int distance;
 		if (dx > SECTOR(31.25f) || dx < -SECTOR(31.25f) ||
@@ -317,8 +317,8 @@ void EnemyJeepControl(short itemNumber)
 
 					if (!(aiObject->flags & 0x20))
 					{
-						target->Pose.Position.x += CLICK(1) * sin(target->Pose.Orientation.y);
-						target->Pose.Position.z += CLICK(1) * cos(target->Pose.Orientation.y);
+						target->Pose.Position.x += CLICK(1) * sin(target->Pose.Orientation.GetY());
+						target->Pose.Position.z += CLICK(1) * cos(target->Pose.Orientation.GetY());
 					}
 				}
 			}

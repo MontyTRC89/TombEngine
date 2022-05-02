@@ -42,7 +42,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 	{
 		isStatic = true;
 		meshIndex = StaticObjects[mesh->staticNumber].meshNumber;
-		yRot = mesh->pos.Orientation.y;
+		yRot = mesh->pos.Orientation.GetY();
 		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 	}
 	else

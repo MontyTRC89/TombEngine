@@ -168,7 +168,7 @@ namespace TEN
 				auto plane = floor->FloorCollision.Planes[floor->SectorPlane(footPos.x, footPos.z)];
 				auto sinY = sin(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 				auto cosY = cos(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
-				auto yRot = item->Pose.Orientation.y;
+				auto yRot = item->Pose.Orientation.GetY();
 				auto xRot = plane.x * sinY + plane.y * cosY;
 				auto zRot = plane.y * sinY - plane.x * cosY;
 

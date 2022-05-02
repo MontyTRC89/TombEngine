@@ -51,7 +51,7 @@ void ControlCentaurBomb(short itemNumber)
 	bool aboveWater = false;
 	auto oldPos = item->Pose.Position;
 
-	item->Pose.Orientation.z += Angle::DegToRad(35.0f);
+	item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(35.0f));
 	if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
 		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
@@ -69,19 +69,18 @@ void ControlCentaurBomb(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f);
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + ((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f));
 
 			if (item->Animation.RequiredState)
 				item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
 			else
-				item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
-
+				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f));
 		}
 	}
 
-	item->Pose.Position.x += item->Animation.Velocity * cos(item->Pose.Orientation.x) * sin(item->Pose.Orientation.y);
-	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.x);
-	item->Pose.Position.z += item->Animation.Velocity * cos(item->Pose.Orientation.x) * cos(item->Pose.Orientation.y);
+	item->Pose.Position.x += item->Animation.Velocity * cos(item->Pose.Orientation.GetX()) * sin(item->Pose.Orientation.GetY());
+	item->Pose.Position.y += item->Animation.Velocity * sin(-item->Pose.Orientation.GetX());
+	item->Pose.Position.z += item->Animation.Velocity * cos(item->Pose.Orientation.GetX()) * cos(item->Pose.Orientation.GetY());
 
 	auto probe = GetCollision(item);
 
@@ -164,8 +163,8 @@ static void RocketGun(ITEM_INFO* centaurItem)
 
 		projectileItem->Pose.Orientation.Set(0.0f, centaurItem->Pose.Orientation.GetY(), 0.0f);
 
-		projectileItem->Animation.Velocity = BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);
-		projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);
+		projectileItem->Animation.Velocity = BOMB_SPEED * cos(projectileItem->Pose.Orientation.GetX());
+		projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * cos(projectileItem->Pose.Orientation.GetX());
 		projectileItem->ItemFlags[0] = 1;
 
 		AddActiveItem(itemNumber);

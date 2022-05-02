@@ -118,7 +118,7 @@ namespace TEN::Entities::Effects
 
 	void BubblesShatterFunction(FX_INFO* fx, int param1, int param2)
 	{
-		ShatterItem.yRot = fx->pos.Orientation.y;
+		ShatterItem.yRot = fx->pos.Orientation.GetY();
 		ShatterItem.meshIndex = fx->frameNumber;
 		ShatterItem.sphere.x = fx->pos.Position.x;
 		ShatterItem.sphere.y = fx->pos.Position.y;
@@ -169,11 +169,11 @@ namespace TEN::Entities::Effects
 			else
 				fx->speed += 3;
 
-			int dy = angles[0] - fx->pos.Orientation.y;
+			int dy = angles[0] - fx->pos.Orientation.GetY();
 			if (abs(dy) > 0x8000)
 				dy = -dy;
 
-			int dx = angles[1] - fx->pos.Orientation.x;
+			int dx = angles[1] - fx->pos.Orientation.GetX();
 			if (abs(dx) > 0x8000)
 				dx = -dx;
 
@@ -191,22 +191,22 @@ namespace TEN::Entities::Effects
 				dx = maxRotation;
 
 			if (fx->flag1 != 4 && (fx->flag1 != 6 || !fx->counter))
-				fx->pos.Orientation.y += dy;
-			fx->pos.Orientation.x += dx;
+				fx->pos.Orientation.SetY(fx->pos.Orientation.GetY() + dy);
+			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + dx);
 		}
 
-		fx->pos.Orientation.z += 16 * fx->speed;
+		fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + 16 * fx->speed);
 		if (fx->flag1 == 6)
-			fx->pos.Orientation.z += 16 * fx->speed;
+			fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + 16 * fx->speed);
 
 		int oldX = fx->pos.Position.x;
 		int oldY = fx->pos.Position.y;
 		int oldZ = fx->pos.Position.z;
 
-		int speed = (fx->speed * cos(fx->pos.Orientation.x));
-		fx->pos.Position.x += (speed * sin(fx->pos.Orientation.y));
-		fx->pos.Position.y += -((fx->speed * sin(fx->pos.Orientation.x))) + fx->fallspeed;
-		fx->pos.Position.z += (speed * cos(fx->pos.Orientation.y));
+		int speed = (fx->speed * cos(fx->pos.Orientation.GetX()));
+		fx->pos.Position.x += (speed * sin(fx->pos.Orientation.GetY()));
+		fx->pos.Position.y += -((fx->speed * sin(fx->pos.Orientation.GetX()))) + fx->fallspeed;
+		fx->pos.Position.z += (speed * cos(fx->pos.Orientation.GetY()));
 
 		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 

@@ -174,16 +174,16 @@ namespace TEN::Entities::TR4
 
 		if (horseItem != NULL)
 		{
-			int x = horseItem->Pose.Position.x + 341 * sin(horseItem->Pose.Orientation.y);
+			int x = horseItem->Pose.Position.x + 341 * sin(horseItem->Pose.Orientation.GetY());
 			int y = horseItem->Pose.Position.y;
-			int z = horseItem->Pose.Position.z + 341 * cos(horseItem->Pose.Orientation.y);
+			int z = horseItem->Pose.Position.z + 341 * cos(horseItem->Pose.Orientation.GetY());
 
 			auto probe = GetCollision(x, y, z, item->RoomNumber);
 			int height1 = probe.Position.Floor;
 
-			x = horseItem->Pose.Position.x - 341 * sin(horseItem->Pose.Orientation.y);
+			x = horseItem->Pose.Position.x - 341 * sin(horseItem->Pose.Orientation.GetY());
 			y = horseItem->Pose.Position.y;
-			z = horseItem->Pose.Position.z - 341 * cos(horseItem->Pose.Orientation.y);
+			z = horseItem->Pose.Position.z - 341 * cos(horseItem->Pose.Orientation.GetY());
 
 			int height2 = GetCollision(x, y, z, probe.RoomNumber).Position.Floor;
 
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR4
 				int deltaX = LaraItem->Pose.Position.z - item->Pose.Position.z;
 				int deltaZ = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-				laraAI.angle = atan2(deltaZ, deltaX) - item->Pose.Orientation.y;
+				laraAI.angle = atan2(deltaZ, deltaX) - item->Pose.Orientation.GetY();
 				laraAI.distance = pow(deltaX, 2) + pow(deltaZ, 2);
 			}
 

@@ -761,7 +761,7 @@ bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
-		ShatterItem.yRot = item->Pose.Orientation.y;
+		ShatterItem.yRot = item->Pose.Orientation.GetY();
 		ShatterItem.bit = 1 << node;
 		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;
 		ShatterItem.sphere.x = CreatureSpheres[node].x;

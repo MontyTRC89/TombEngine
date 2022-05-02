@@ -75,7 +75,7 @@ void GameScriptMeshInfo::SetPos(GameScriptPosition const& pos)
 
 int GameScriptMeshInfo::GetRot() const
 {
-	return m_mesh.pos.Orientation.y;
+	return m_mesh.pos.Orientation.GetY();
 }
 
 void GameScriptMeshInfo::SetRot(int yRot)

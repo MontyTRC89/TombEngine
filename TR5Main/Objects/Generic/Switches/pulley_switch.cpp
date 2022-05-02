@@ -51,8 +51,8 @@ namespace TEN::Entities::Switches
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
-			short oldYrot = switchItem->Pose.Orientation.y;
-			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			short oldYrot = switchItem->Pose.Orientation.GetY();
+			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.GetY();
 			if (TestLaraPosition(&PulleyBounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])

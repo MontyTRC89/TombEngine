@@ -476,8 +476,8 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
 void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset, int zOffset)
 {
-	float s = sin(item->Pose.Orientation.y);
-	float c = cos(item->Pose.Orientation.y);
+	float s = sin(item->Pose.Orientation.GetY());
+	float c = cos(item->Pose.Orientation.GetY());
 
 	int x = item->Pose.Position.x + roundf(c * xOffset + s * zOffset);
 	int y = height + item->Pose.Position.y;

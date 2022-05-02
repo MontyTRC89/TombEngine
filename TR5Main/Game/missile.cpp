@@ -33,7 +33,7 @@ void ShootAtLara(FX_INFO *fx)
 	fx->pos.Orientation.y = atan2(z, x);
 
 	// Random scatter (only a little bit else it's too hard to avoid).
-	fx->pos.Orientation.x += (GetRandomControl() - 0x4000) / 0x40;
+	fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + (GetRandomControl() - 0x4000) / 0x40);
 	fx->pos.Orientation.y += (GetRandomControl() - 0x4000) / 0x40;
 }
 
@@ -44,15 +44,15 @@ void ControlMissile(short fxNumber)
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON &&
 		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
-			fx->pos.Orientation.x > -0x3000);
+			fx->pos.Orientation.GetX() > -0x3000);
 	{
-		fx->pos.Orientation.x -= Angle::DegToRad(1.0f);
+		fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() - Angle::DegToRad(1.0f));
 	}
 
-	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
-	int velocity = fx->speed * cos(fx->pos.Orientation.x);
-	fx->pos.Position.z += velocity * cos(fx->pos.Orientation.y);
-	fx->pos.Position.x += velocity * sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.GetX());
+	int velocity = fx->speed * cos(fx->pos.Orientation.GetX());
+	fx->pos.Position.z += velocity * cos(fx->pos.Orientation.GetY());
+	fx->pos.Position.x += velocity * sin(fx->pos.Orientation.GetY());
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
@@ -108,7 +108,7 @@ void ControlMissile(short fxNumber)
 
 		LaraItem->HitStatus = 1;
 
-		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
+		fx->pos.Orientation.y = LaraItem->Pose.Orientation.GetY();
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 	}
@@ -123,7 +123,7 @@ void ControlMissile(short fxNumber)
 		KillEffect(fx_number);
 	}
 	else if (fx->objectNumber == KNIFE)
-		fx->pos.Orientation.z += 30 * ONE_DEGREE;*/
+		fx->pos.Orientation.SetZ(.Orientation.GetZ() + 30 * ONE_DEGREE;*/
 }
 
 void ControlNatlaGun(short fxNumber)
@@ -138,8 +138,8 @@ void ControlNatlaGun(short fxNumber)
 	/* If first frame, then start another explosion at next position */
 	if (fx->frameNumber == -1)
 	{
-		int z = fx->pos.Position.z + fx->speed * cos(fx->pos.Orientation.y);
-		int x = fx->pos.Position.x + fx->speed * sin(fx->pos.Orientation.y);
+		int z = fx->pos.Position.z + fx->speed * cos(fx->pos.Orientation.GetY());
+		int x = fx->pos.Position.x + fx->speed * sin(fx->pos.Orientation.GetY());
 		int y = fx->pos.Position.y;
 
 		auto probe = GetCollision(x, y, z, fx->roomNumber);
@@ -159,7 +159,7 @@ void ControlNatlaGun(short fxNumber)
 			fxNew->pos.Position.x = x;
 			fxNew->pos.Position.y = y;
 			fxNew->pos.Position.z = z;
-			fxNew->pos.Orientation.y = fx->pos.Orientation.y;
+			fxNew->pos.Orientation.y = fx->pos.Orientation.GetY();
 			fxNew->roomNumber = probe.RoomNumber;
 			fxNew->speed = fx->speed;
 			fxNew->frameNumber = 0;

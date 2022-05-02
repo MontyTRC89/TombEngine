@@ -635,7 +635,7 @@ void SetLaraSlideAnimation(ITEM_INFO* item, CollisionInfo* coll)
 	else if (coll->FloorTilt.y < -2 && -coll->FloorTilt.y > abs(coll->FloorTilt.x))
 		angle = Angle::DegToRad(0.0f);
 
-	float delta = Angle::Normalize(angle - item->Pose.Orientation.y);
+	float delta = Angle::Normalize(angle - item->Pose.Orientation.GetY());
 
 	ShiftItem(item, coll);
 

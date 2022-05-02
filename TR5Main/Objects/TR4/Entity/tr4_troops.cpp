@@ -192,7 +192,7 @@ void TroopsControl(short itemNumber)
 			dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			distance = pow(dx, 2) + pow(dz, 2);
-			rot = atan2(dz, dx) - item->Pose.Orientation.y;
+			rot = atan2(dz, dx) - item->Pose.Orientation.GetY();
 		}
 
 		if (!creature->HurtByLara && creature->Enemy == LaraItem)

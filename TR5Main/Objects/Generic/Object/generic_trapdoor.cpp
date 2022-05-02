@@ -92,9 +92,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionIn
 		trapDoorItem->Animation.TargetState = 1;
 
 		UseForcedFixedCamera = 1;
-		ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.y) * SECTOR(1);
+		ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.GetY()) * SECTOR(1);
 		ForcedFixedCamera.y = trapDoorItem->Pose.Position.y + SECTOR(1);
-		ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.y) * SECTOR(1);
+		ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.GetY()) * SECTOR(1);
 		ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
 	}
 	else
@@ -137,13 +137,13 @@ void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 				trapDoorItem->Animation.TargetState = 1;
 
 				UseForcedFixedCamera = 1;
-				ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.y) * 2048;
+				ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - sin(trapDoorItem->Pose.Orientation.GetY()) * 2048;
 				ForcedFixedCamera.y = trapDoorItem->Pose.Position.y - 2048;
 
 				if (ForcedFixedCamera.y < g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling)
 					ForcedFixedCamera.y = g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling;
 
-				ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.y) * 2048;
+				ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - cos(trapDoorItem->Pose.Orientation.GetY()) * 2048;
 				ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
 			}
 			else

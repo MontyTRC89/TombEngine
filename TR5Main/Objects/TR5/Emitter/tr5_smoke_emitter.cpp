@@ -16,7 +16,7 @@ void InitialiseSmokeEmitter(short itemNumber)
 			if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
 		}
-		else if (item->Pose.Orientation.y)
+		else if (item->Pose.Orientation.GetY())
 		{
 			if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(2);
@@ -173,7 +173,7 @@ void SmokeEmitterControl(short itemNumber)
 		{
 			v17 = GetRandomControl();
 			v18 = v17;
-			LOWORD(v17) = item->pos.Orientation.y;
+			LOWORD(v17) = item->pos.Orientation.GetY();
 			f = (v18 & 0x7F) + 2048;
 			spark->Xvel = v15 * 4 * rcossin_tbl[((v17 + 20480) >> 3) & 0x1FFE] >> 14;
 			spark->Yvel = -128 - (unsigned __int8)GetRandomControl();

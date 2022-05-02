@@ -278,8 +278,8 @@ namespace TEN::Entities::TR4
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = GOON_STATE_CLIMB_4_STEPS;
 			item->Animation.ActiveState = GOON_STATE_CLIMB_4_STEPS;
-			item->Pose.Position.x += sin(item->Pose.Orientation.y) * CLICK(4);
-			item->Pose.Position.z += cos(item->Pose.Orientation.y) * CLICK(4);
+			item->Pose.Position.x += sin(item->Pose.Orientation.GetY()) * CLICK(4);
+			item->Pose.Position.z += cos(item->Pose.Orientation.GetY()) * CLICK(4);
 			return;
 		}
 
@@ -290,8 +290,8 @@ namespace TEN::Entities::TR4
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = GOON_STATE_CROUCH;
 			item->Animation.ActiveState = GOON_STATE_CROUCH;
-			item->Pose.Position.x += sin(item->Pose.Orientation.y) * CLICK(4);
-			item->Pose.Position.z += cos(item->Pose.Orientation.y) * CLICK(4);
+			item->Pose.Position.x += sin(item->Pose.Orientation.GetY()) * CLICK(4);
+			item->Pose.Position.z += cos(item->Pose.Orientation.GetY()) * CLICK(4);
 			item->ItemFlags[3] = ocb;
 			return;
 		}
@@ -341,8 +341,8 @@ namespace TEN::Entities::TR4
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
 
-		int dx = 942 * sin(item->Pose.Orientation.y);
-		int dz = 942 * cos(item->Pose.Orientation.y);
+		int dx = 942 * sin(item->Pose.Orientation.GetY());
+		int dz = 942 * cos(item->Pose.Orientation.GetY());
 
 		x += dx;
 		z += dz;
@@ -523,7 +523,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 				laraAI.ahead = true;
 
 				if (laraAI.angle <= Angle::DegToRad(-90.0f) || laraAI.angle >= Angle::DegToRad(90.0f))

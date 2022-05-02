@@ -319,7 +319,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		return;
 
-	item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+	item->Pose.Orientation.y = laraItem->Pose.Orientation.GetY();
 	item->Pose.Orientation.SetZ();
 
 	if (lara->Control.WaterStatus != WaterStatus::Dry &&

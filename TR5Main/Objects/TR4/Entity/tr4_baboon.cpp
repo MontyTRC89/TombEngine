@@ -255,7 +255,7 @@ void BaboonControl(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			laraAI.angle = atan2(dx, dz) - item->Pose.Orientation.y;
+			laraAI.angle = atan2(dx, dz) - item->Pose.Orientation.GetY();
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
 			if (creature->Enemy == nullptr || creature->Enemy == LaraItem)
@@ -282,7 +282,7 @@ void BaboonControl(short itemNumber)
 				item->Pose.Position.x = creature->Enemy->Pose.Position.x;
 				item->Pose.Position.y = creature->Enemy->Pose.Position.y;
 				item->Pose.Position.z = creature->Enemy->Pose.Position.z;
-				item->Pose.Orientation.y = creature->Enemy->Pose.Orientation.y;
+				item->Pose.Orientation.y = creature->Enemy->Pose.Orientation.GetY();
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SWITCH_ANIM;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.TargetState = BABOON_ACTIVATE_SWITCH;
@@ -469,7 +469,7 @@ void BaboonControl(short itemNumber)
 				pos.boxNumber = 0;
 				pos.roomNumber = NO_ROOM;
 
-				//switch (item->Pose.Orientation.y)
+				//switch (item->Pose.Orientation.GetY())
 				//{
 				//case -0x4000: // WEST (OK)
 				//	pos.x = item->Pose.Position.x - SECTOR(1);

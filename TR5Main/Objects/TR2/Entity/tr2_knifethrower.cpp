@@ -42,10 +42,10 @@ void KnifeControl(short fxNumber)
 	else
 		fx->counter--;
 
-	int speed = fx->speed * cos(fx->pos.Orientation.x);
-	fx->pos.Position.z += speed * cos(fx->pos.Orientation.y);
-	fx->pos.Position.x += speed * sin(fx->pos.Orientation.y);
-	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
+	int speed = fx->speed * cos(fx->pos.Orientation.GetX());
+	fx->pos.Position.z += speed * cos(fx->pos.Orientation.GetY());
+	fx->pos.Position.x += speed * sin(fx->pos.Orientation.GetY());
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.GetX());
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
@@ -59,14 +59,14 @@ void KnifeControl(short fxNumber)
 	if (probe.RoomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	fx->pos.Orientation.z += Angle::DegToRad(30.0f);
+	fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + Angle::DegToRad(30.0f));
 
 	if (ItemNearLara(&fx->pos, 200))
 	{
 		LaraItem->HitPoints -= 50;
 		LaraItem->HitStatus = true;
 
-		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
+		fx->pos.Orientation.y = LaraItem->Pose.Orientation.GetY();
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 

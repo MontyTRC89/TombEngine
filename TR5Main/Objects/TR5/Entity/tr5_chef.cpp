@@ -42,8 +42,8 @@ void InitialiseChef(short itemNumber)
 	item->Animation.TargetState = CHEF_STATE_COOKING;
 	item->Animation.ActiveState = CHEF_STATE_COOKING;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Pose.Position.x += 192 * sin(item->Pose.Orientation.y);
-	item->Pose.Position.z += 192 * cos(item->Pose.Orientation.y);
+	item->Pose.Position.x += 192 * sin(item->Pose.Orientation.GetY());
+	item->Pose.Position.z += 192 * cos(item->Pose.Orientation.GetY());
 }
 
 void ControlChef(short itemNumber)
@@ -90,7 +90,7 @@ void ControlChef(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-			aiLaraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+			aiLaraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 			aiLaraInfo.ahead = true;
 
 			if (aiLaraInfo.angle <= Angle::DegToRad(-90.0f) || aiLaraInfo.angle >= Angle::DegToRad(90.0f))

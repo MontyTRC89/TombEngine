@@ -94,8 +94,8 @@ void VonCroyControl(short itemNumber)
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;
 
-	int dx = 808 * sin(item->Pose.Orientation.y);
-	int dz = 808 * cos(item->Pose.Orientation.y);
+	int dx = 808 * sin(item->Pose.Orientation.GetY());
+	int dz = 808 * cos(item->Pose.Orientation.GetY());
 
 	x += dx;
 	z += dz;
@@ -230,7 +230,7 @@ void VonCroyControl(short itemNumber)
 	{
 		dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 		dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 
 		laraAI.ahead = true;
 		if (laraAI.angle <= Angle::DegToRad(-90) || laraAI.angle >= Angle::DegToRad(90.0f))

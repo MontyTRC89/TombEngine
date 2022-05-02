@@ -176,8 +176,8 @@ void UpdateBats()
 		{
 			short Velocity = bat->Velocity * 128;
 
-			short xAngle = abs(angles[1] - bat->Pose.Orientation.x) / 8;
-			short yAngle = abs(angles[0] - bat->Pose.Orientation.y) / 8;
+			short xAngle = abs(angles[1] - bat->Pose.Orientation.GetX()) / 8;
+			short yAngle = abs(angles[0] - bat->Pose.Orientation.GetY()) / 8;
 
 			if (xAngle < -Velocity)
 				xAngle = -Velocity;
@@ -190,14 +190,14 @@ void UpdateBats()
 				yAngle = Velocity;
 
 			bat->Pose.Orientation.y += yAngle;
-			bat->Pose.Orientation.x += xAngle;
+			bat->Pose.Orientation.SetX(bat->Pose.Orientation.GetX() + xAngle);
 		}
 
-		int sp = bat->Velocity * cos(bat->Pose.Orientation.x);
+		int sp = bat->Velocity * cos(bat->Pose.Orientation.GetX());
 
-		bat->Pose.Position.x += sp * sin(bat->Pose.Orientation.y);
-		bat->Pose.Position.y += bat->Velocity * sin(-bat->Pose.Orientation.x);
-		bat->Pose.Position.z += sp * cos(bat->Pose.Orientation.y);
+		bat->Pose.Position.x += sp * sin(bat->Pose.Orientation.GetY());
+		bat->Pose.Position.y += bat->Velocity * sin(-bat->Pose.Orientation.GetX());
+		bat->Pose.Position.z += sp * cos(bat->Pose.Orientation.GetY());
 
 		if ((i % 2) == 0 &&
 			bat->Pose.Position.x > x1 &&

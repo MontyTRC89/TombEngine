@@ -23,16 +23,16 @@ void MissileControl(short itemNumber)
 	auto* fx = &EffectList[itemNumber];
 	if (fx->flag1 == 2)
 	{
-		fx->pos.Orientation.z += 16 * fx->speed;
+		fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + 16 * fx->speed);
 
 		if (fx->speed > 64)
 			fx->speed -= 4;
 
-		if (fx->pos.Orientation.x > -12288)
+		if (fx->pos.Orientation.GetX() > -12288)
 		{
 			if (fx->fallspeed < 512)
 				fx->fallspeed += 36;
-			fx->pos.Orientation.x -= fx->fallspeed;
+			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() - fx->fallspeed);
 		}
 	}
 	else
@@ -59,12 +59,12 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			int dy = angles[0] - fx->pos.Orientation.y;
+			int dy = angles[0] - fx->pos.Orientation.GetY();
 			if (abs(dy) > Angle::DegToRad(180.0f))
 				dy = -dy;
 			dy /= 8;
 
-			int dx = angles[1] - fx->pos.Orientation.x;
+			int dx = angles[1] - fx->pos.Orientation.GetX();
 			if (abs(dx) > Angle::DegToRad(180.0f))
 				dx = -dx;
 			dx /= 8;
@@ -86,24 +86,24 @@ void MissileControl(short itemNumber)
 				dx = dh;
 
 			fx->pos.Orientation.y += dy;
-			fx->pos.Orientation.x += dx;
+			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + dx);
 		}
 		
-		fx->pos.Orientation.z += 16 * fx->speed;
+		fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + 16 * fx->speed);
 
 		if (!fx->flag1)
-			fx->pos.Orientation.z += 16 * fx->speed;
+			fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + 16 * fx->speed);
 	}
 
 	int x = fx->pos.Position.x;
 	int y = fx->pos.Position.y;
 	int z = fx->pos.Position.z;
 
-	int c = fx->speed * cos(fx->pos.Orientation.x);
+	int c = fx->speed * cos(fx->pos.Orientation.GetX());
 
-	fx->pos.Position.x += c * sin(fx->pos.Orientation.y);
-	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);
-	fx->pos.Position.z += c * cos(fx->pos.Orientation.y);
+	fx->pos.Position.x += c * sin(fx->pos.Orientation.GetY());
+	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.GetX());
+	fx->pos.Position.z += c * cos(fx->pos.Orientation.GetY());
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 	
@@ -207,7 +207,7 @@ void MissileControl(short itemNumber)
 
 void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 {
-	ShatterItem.yRot = fx->pos.Orientation.y;
+	ShatterItem.yRot = fx->pos.Orientation.GetY();
 	ShatterItem.meshIndex = fx->frameNumber;
 	ShatterItem.sphere.x = fx->pos.Position.x;
 	ShatterItem.sphere.y = fx->pos.Position.y;

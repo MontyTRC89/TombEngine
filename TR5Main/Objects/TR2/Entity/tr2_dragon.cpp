@@ -158,8 +158,8 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		int rx = laraItem->Pose.Position.x - item->Pose.Position.x;
 		int rz = laraItem->Pose.Position.z - item->Pose.Position.z;
-		float s = sin(item->Pose.Orientation.y);
-		float c = cos(item->Pose.Orientation.y);
+		float s = sin(item->Pose.Orientation.GetY());
+		float c = cos(item->Pose.Orientation.GetY());
 
 		int sideShift = rx * s + rz * c;
 		if (sideShift > DRAGON_LCOL&& sideShift < DRAGON_RCOL)
@@ -168,7 +168,7 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
 				return;
 
-			int angle = laraItem->Pose.Orientation.y - item->Pose.Orientation.y;
+			int angle = laraItem->Pose.Orientation.y - item->Pose.Orientation.GetY();
 
 			int anim = item->Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
 			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -470,7 +470,7 @@ void InitialiseBartoli(short itemNumber)
 		back->Pose.Position.x = item->Pose.Position.x;
 		back->Pose.Position.y = item->Pose.Position.y;
 		back->Pose.Position.z = item->Pose.Position.z;
-		back->Pose.Orientation.y = item->Pose.Orientation.y;
+		back->Pose.Orientation.y = item->Pose.Orientation.GetY();
 		back->RoomNumber = item->RoomNumber;
 		back->Status = ITEM_INVISIBLE;
 		back->Shade = -1;
@@ -486,7 +486,7 @@ void InitialiseBartoli(short itemNumber)
 		front->Pose.Position.x = item->Pose.Position.x;
 		front->Pose.Position.y = item->Pose.Position.y;
 		front->Pose.Position.z = item->Pose.Position.z;
-		front->Pose.Orientation.y = item->Pose.Orientation.y;
+		front->Pose.Orientation.y = item->Pose.Orientation.GetY();
 		front->RoomNumber = item->RoomNumber;
 		front->Status = ITEM_INVISIBLE;
 		front->Shade = -1;

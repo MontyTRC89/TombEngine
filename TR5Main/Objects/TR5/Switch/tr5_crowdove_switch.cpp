@@ -51,8 +51,8 @@ namespace TEN::Entities::TR5
 		}
 		else
 		{
-			float oldYrot = switchItem->Pose.Orientation.y;
-			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			float oldYrot = switchItem->Pose.Orientation.GetY();
+			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.GetY();
 			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
 			{
 				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))

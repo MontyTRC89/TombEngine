@@ -160,7 +160,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 								}
 								else
 								{
-									angle = atan2(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
+									angle = atan2(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.GetY();
 									if (angle > Angle::DegToRad(-90) && angle < Angle::DegToRad(90))
 									{
 										item->HitPoints = 0;
@@ -313,7 +313,7 @@ int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO*
 				pos.Position.x = meshp->pos.Position.x;
 				pos.Position.y = meshp->pos.Position.y;
 				pos.Position.z = meshp->pos.Position.z;
-				pos.Orientation.y = meshp->pos.Orientation.y;
+				pos.Orientation.y = meshp->pos.Orientation.GetY();
 
 				if (DoRayBox(start, end, &StaticObjects[meshp->staticNumber].collisionBox, &pos, vec, -1 - meshp->staticNumber))
 				{
@@ -344,7 +344,7 @@ int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO*
 			pos.Position.x = item->Pose.Position.x;
 			pos.Position.y = item->Pose.Position.y;
 			pos.Position.z = item->Pose.Position.z;
-			pos.Orientation.y = item->Pose.Orientation.y;
+			pos.Orientation.y = item->Pose.Orientation.GetY();
 
 			if (DoRayBox(start, end, box, &pos, vec, linknum))
 				end->roomNumber = LosRooms[r];
@@ -527,7 +527,7 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PoseData* i
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 
-		ShatterItem.yRot = item->Pose.Orientation.y;
+		ShatterItem.yRot = item->Pose.Orientation.GetY();
 		ShatterItem.meshIndex = meshIndex;
 		ShatterItem.sphere.x = CreatureSpheres[sp].x;
 		ShatterItem.sphere.y = CreatureSpheres[sp].y;

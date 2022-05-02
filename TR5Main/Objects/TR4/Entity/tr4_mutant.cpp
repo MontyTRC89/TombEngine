@@ -138,7 +138,7 @@ namespace TEN::Entities::TR4
 	{
 		if (creature->Enemy == nullptr)
 		{
-			headAngle = item->Pose.Orientation.y;
+			headAngle = item->Pose.Orientation.GetY();
 			return;
 		}
 
@@ -148,7 +148,7 @@ namespace TEN::Entities::TR4
 
 		int x = enemy->Pose.Position.x - pos.x;
 		int z = enemy->Pose.Position.z - pos.z;
-		headAngle = (atan2(z, x) - item->Pose.Orientation.y) / 2;
+		headAngle = (atan2(z, x) - item->Pose.Orientation.GetY()) / 2;
 	}
 
 	static void GetTargetPosition(ITEM_INFO* item, PoseData* target)

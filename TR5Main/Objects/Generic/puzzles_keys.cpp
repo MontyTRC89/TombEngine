@@ -82,7 +82,7 @@ void PuzzleHoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 		(laraInfo->Control.IsMoving &&
 			laraInfo->InteractedItem == itemNumber))
 	{
-		short oldYrot = receptableItem->Pose.Orientation.y;
+		short oldYrot = receptableItem->Pose.Orientation.GetY();
 
 		auto* bounds = GetBoundsAccurate(receptableItem);
 		PuzzleBounds.boundingBox.X1 = bounds->X1 - CLICK(1);

@@ -333,7 +333,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	// Engage shimmy mode if LEFT/LSTEP or RIGHT/RSTEP are pressed.
 	if (TrInput & IN_LEFT || TrInput & IN_RIGHT)
 	{
-		lara->NextCornerPos.Orientation.z = (item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false; // HACK.
+		lara->NextCornerPos.Orientation.SetZ((item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT) ? true : false); // HACK.
 		SetAnimation(item, item->Animation.AnimNumber == LA_OVERHANG_IDLE_LEFT ? LA_OVERHANG_IDLE_2_HANG_LEFT : LA_OVERHANG_IDLE_2_HANG_RIGHT);
 		return;
 	}
@@ -437,10 +437,10 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 
 void lara_as_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 {
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()--;
 	else
-		item->Pose.Orientation.x++;
+		item->Pose.Orientation.GetX()++;*/
 
 	Camera.flags = 1;
 
@@ -456,10 +456,10 @@ void lara_as_slopefall(ITEM_INFO* item, CollisionInfo* coll)
 {
 	item->Animation.Airborne = true;
 
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()--;
 	else
-		item->Pose.Orientation.x++;
+		item->Pose.Orientation.GetX()++;*/
 
 	Camera.flags = 1;
 
@@ -536,10 +536,10 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 
 void lara_as_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 {
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()--;
 	else
-		item->Pose.Orientation.x++;
+		item->Pose.Orientation.GetX()++;*/
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -593,10 +593,10 @@ void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 
 void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 {
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()--;
 	else
-		item->Pose.Orientation.x++;
+		item->Pose.Orientation.GetX()++;*/
 
 	if (Camera.type != CameraType::Chase)
 		return;
@@ -621,10 +621,10 @@ void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 
 void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 {
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()--;
 	else
-		item->Pose.Orientation.x++;
+		item->Pose.Orientation.GetX()++;*/
 
 	Camera.flags = 1;
 
@@ -652,10 +652,10 @@ void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 
 void lara_as_slopeclimbdown(ITEM_INFO* item, CollisionInfo* coll)
 {
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x--;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()--;
 	else
-		item->Pose.Orientation.x++;
+		item->Pose.Orientation.GetX()++;*/
 
 	Camera.flags = 1;
 
@@ -720,10 +720,10 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 		Camera.speed = 15;
 	}
 
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x++;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()++;
 	else
-		item->Pose.Orientation.x--;
+		item->Pose.Orientation.GetX()--;*/
 }
 
 void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
@@ -771,11 +771,10 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 		Camera.targetspeed = 15;
 	}
 
-
-	if (GlobalCounter % 2)
-		item->Pose.Orientation.x++;
+	/*if (GlobalCounter % 2)
+		item->Pose.Orientation.GetX()++;
 	else
-		item->Pose.Orientation.x--;
+		item->Pose.Orientation.GetX()--;*/
 }
 
 void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
@@ -1064,7 +1063,7 @@ void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 
 			if (SlopeCheck(probeNow.CeilingTilt, slopeData.Goal) || bridge >= 0)
 			{
-				lara->NextCornerPos.Orientation.z = AlignToGrab(item);
+				lara->NextCornerPos.Orientation.SetZ(AlignToGrab(item));
 
 				int ceiling = GetCollision(probeNow.Block, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z).Position.Ceiling;
 				item->Pose.Position.y = ceiling + HEIGHT_ADJUST;

@@ -106,9 +106,9 @@ void ControlWaterfall(short itemNumber)
 		if (!(Wibble & 0xC))
 		{
 			TriggerWaterfallMist(
-				item->Pose.Position.x + 68 * sin(item->Pose.Orientation.y),
+				item->Pose.Position.x + 68 * sin(item->Pose.Orientation.GetY()),
 				item->Pose.Position.y,
-				item->Pose.Position.z + 68 * cos(item->Pose.Orientation.y),
+				item->Pose.Position.z + 68 * cos(item->Pose.Orientation.GetY()),
 				item->Pose.Orientation.y / 16);
 		}
 
@@ -133,7 +133,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.CanDismount)
 		{
-			if (tightropeItem->Pose.Orientation.y == laraItem->Pose.Orientation.y)
+			if (tightropeItem->Pose.Orientation.y == laraItem->Pose.Orientation.GetY())
 			{
 				if (abs(tightropeItem->Pose.Position.x - laraItem->Pose.Position.x) + abs(tightropeItem->Pose.Position.z - laraItem->Pose.Position.z) < 640)
 					laraInfo->Control.Tightrope.CanDismount = true;
@@ -145,7 +145,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 		   laraItem->Animation.TargetState != LS_TIGHTROPE_DISMOUNT &&
 		   !laraInfo->Control.Tightrope.Off)
 		{
-			if (item->Pose.Orientation.y == laraItem->Pose.Orientation.y)
+			if (item->Pose.Orientation.y == laraItem->Pose.Orientation.GetY())
 			{
 				if (abs(item->Pose.Position.x - laraItem->Pose.Position.x) + abs(item->Pose.Position.z - laraItem->Pose.Position.z) < 640)
 					laraInfo->tightRopeOff = true;
@@ -221,7 +221,7 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			ResetLaraFlex(barItem);
 
 			if (test1)
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;
+				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.GetY();
 			else
 				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 
@@ -290,7 +290,7 @@ void InitialiseTightrope(short itemNumber)
 		if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			tightropeItem->Pose.Position.x -= 256;
 	}
-	else if (tightropeItem->Pose.Orientation.y)
+	else if (tightropeItem->Pose.Orientation.GetY())
 	{
 		if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 			tightropeItem->Pose.Position.z += CLICK(1);

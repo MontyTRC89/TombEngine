@@ -193,19 +193,19 @@ static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, int speed)
 		for (int i = 0; i < 2; i++)
 		{
 			speed = (GetRandomControl() % (speed * 4)) + 32;
-			velocity = speed * cos(fx->pos.Orientation.x);
+			velocity = speed * cos(fx->pos.Orientation.GetX());
 
-			xv = velocity * sin(fx->pos.Orientation.y);
-			yv = -speed * sin(fx->pos.Orientation.x);
-			zv = velocity * cos(fx->pos.Orientation.y);
+			xv = velocity * sin(fx->pos.Orientation.GetY());
+			yv = -speed * sin(fx->pos.Orientation.GetX());
+			zv = velocity * cos(fx->pos.Orientation.GetY());
 
 			TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -1);
 		}
 
-		velocity = (speed * 2) * cos(fx->pos.Orientation.x);
-		zv = velocity * cos(fx->pos.Orientation.y);
-		xv = velocity * sin(fx->pos.Orientation.y);
-		yv = -(speed * 2) * sin(fx->pos.Orientation.x);
+		velocity = (speed * 2) * cos(fx->pos.Orientation.GetX());
+		zv = velocity * cos(fx->pos.Orientation.GetY());
+		xv = velocity * sin(fx->pos.Orientation.GetY());
+		yv = -(speed * 2) * sin(fx->pos.Orientation.GetX());
 
 		TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -2);
 	}
@@ -300,7 +300,7 @@ void FlameThrowerControl(short itemNumber)
 			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
-			laraAI.angle = atan2(dz, dz) - item->Pose.Orientation.y; 
+			laraAI.angle = atan2(dz, dz) - item->Pose.Orientation.GetY(); 
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			
 			AI.xAngle -= 0x800;

@@ -113,10 +113,10 @@ short Unk_0080DE24;
 
 static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
 {
-	pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.x) + dx * sin(item->Pose.Orientation.z);
+	pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.GetX()) + dx * sin(item->Pose.Orientation.z);
 
-	float c = cos(item->Pose.Orientation.y);
-	float s = sin(item->Pose.Orientation.y);
+	float c = cos(item->Pose.Orientation.GetY());
+	float s = sin(item->Pose.Orientation.GetY());
 
 	pos->z = item->Pose.Position.z + dz * c - dx * s;
 	pos->x = item->Pose.Position.x + dz * s + dx * c;
@@ -404,8 +404,8 @@ static int JeepCheckGetOff()
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 			LaraItem->Animation.TargetState = LS_IDLE;
 			LaraItem->Animation.ActiveState = LS_IDLE;
-			LaraItem->Pose.Position.x -= JEEP_GETOFF_DISTANCE * sin(LaraItem->Pose.Orientation.y);
-			LaraItem->Pose.Position.z -= JEEP_GETOFF_DISTANCE * cos(LaraItem->Pose.Orientation.y);
+			LaraItem->Pose.Position.x -= JEEP_GETOFF_DISTANCE * sin(LaraItem->Pose.Orientation.GetY());
+			LaraItem->Pose.Position.z -= JEEP_GETOFF_DISTANCE * cos(LaraItem->Pose.Orientation.GetY());
 			LaraItem->Pose.Orientation.SetX();
 			LaraItem->Pose.Orientation.SetZ();
 			Lara.Vehicle = NO_ITEM;
@@ -451,11 +451,11 @@ static int GetOnJeep(int itemNumber)
 		return 0;
 
 	short angle = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
-	angle -= item->Pose.Orientation.y;
+	angle -= item->Pose.Orientation.GetY();
 
 	if ((angle > Angle::DegToRad(-45)) && (angle < Angle::DegToRad(135)))
 	{
-		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.y;
+		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.GetY();
 		if (tempAngle > Angle::DegToRad(45) && tempAngle < Angle::DegToRad(135))
 		{
 			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
@@ -476,7 +476,7 @@ static int GetOnJeep(int itemNumber)
 	}
 	else
 	{
-		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.y;
+		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.GetY();
 		if (tempAngle > Angle::DegToRad(225) && tempAngle < Angle::DegToRad(315))
 		{
 			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
@@ -510,8 +510,8 @@ static int GetJeepCollisionAnim(ITEM_INFO* item, Vector3Int* p)
 
 	if (p->x || p->z)
 	{
-		float c = cos(item->Pose.Orientation.y);
-		float s = sin(item->Pose.Orientation.y);
+		float c = cos(item->Pose.Orientation.GetY());
+		float s = sin(item->Pose.Orientation.GetY());
 		int front = p->z * c + p->x * s;
 		int side = -p->z * s + p->x * c;
 
@@ -693,7 +693,7 @@ int JeepDynamics(ITEM_INFO* item)
 		if (rot >= -273)
 		{
 			if (rot <= 273)
-				jeep->momentumAngle = item->Pose.Orientation.y;
+				jeep->momentumAngle = item->Pose.Orientation.GetY();
 			else
 			{
 				if (rot > 13650)
@@ -735,7 +735,7 @@ int JeepDynamics(ITEM_INFO* item)
 	if (item->Pose.Position.y < height)
 		speed = item->Animation.Velocity;
 	else
-		speed = item->Animation.Velocity * cos(item->Pose.Orientation.x);
+		speed = item->Animation.Velocity * cos(item->Pose.Orientation.GetX());
 
 	item->Pose.Position.x += speed * sin(jeep->momentumAngle);
 	item->Pose.Position.z += speed * cos(jeep->momentumAngle);
@@ -743,7 +743,7 @@ int JeepDynamics(ITEM_INFO* item)
 	int slip = 0;
 	if (item->Pose.Position.y >= height)
 	{
-		slip = JEEP_SLIP * sin(item->Pose.Orientation.x);
+		slip = JEEP_SLIP * sin(item->Pose.Orientation.GetX());
 
 		if (abs(slip) > 16)
 		{
@@ -1531,7 +1531,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 			}*/
 
 			short ang = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
-			ang -= item->Pose.Orientation.y;
+			ang -= item->Pose.Orientation.GetY();
 
 			if ((ang > -(Angle::DegToRad(45))) && (ang < (Angle::DegToRad(135))))
 				LaraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_LEFT;
@@ -1546,7 +1546,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 			LaraItem->Pose.Position.x = item->Pose.Position.x;
 			LaraItem->Pose.Position.y = item->Pose.Position.y;
 			LaraItem->Pose.Position.z = item->Pose.Position.z;
-			LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+			LaraItem->Pose.Orientation.y = item->Pose.Orientation.GetY();
 
 			ResetLaraFlex(LaraItem);
 			Lara.HitDirection = -1;
@@ -1668,8 +1668,8 @@ int JeepControl(void)
 		}
 	}
 
-	item->Pose.Orientation.x += (xRot - item->Pose.Orientation.x) / 4;
-	item->Pose.Orientation.z += (atan2(256, height - fl.y) - item->Pose.Orientation.z) / 4;
+	item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + (xRot - item->Pose.Orientation.GetX()) / 4);
+	item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (atan2(256, height - fl.y) - item->Pose.Orientation.GetZ()) / 4);
 	if (jeep->velocity == 0)
 	{
 		item->Pose.Orientation.SetX();

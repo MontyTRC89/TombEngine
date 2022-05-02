@@ -146,7 +146,7 @@ namespace TEN::Entities::TR4
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				int ang = atan2(dz, dx) - item->Pose.Orientation.y;
+				int ang = atan2(dz, dx) - item->Pose.Orientation.GetY();
 				distance = pow(dx, 2) + pow(dz, 2);
 			}
 
@@ -595,9 +595,9 @@ namespace TEN::Entities::TR4
 
 			grenadeItem->ItemFlags[2] = 1;
 			grenadeItem->Animation.Velocity = 128;
-			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-			grenadeItem->Animation.VerticalVelocity = -128 * sin(grenadeItem->Pose.Orientation.x);
-			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
+			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.GetX();
+			grenadeItem->Animation.VerticalVelocity = -128 * sin(grenadeItem->Pose.Orientation.GetX());
+			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.GetY();
 			grenadeItem->Animation.RequiredState = 0;
 			grenadeItem->HitPoints = 120;
 
@@ -662,9 +662,9 @@ namespace TEN::Entities::TR4
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					int x = laraItem->Pose.Position.x - 512 * sin(laraItem->Pose.Orientation.y);
+					int x = laraItem->Pose.Position.x - 512 * sin(laraItem->Pose.Orientation.GetY());
 					int y = laraItem->Pose.Position.y;
-					int z = laraItem->Pose.Position.z - 512 * cos(laraItem->Pose.Orientation.y);
+					int z = laraItem->Pose.Position.z - 512 * cos(laraItem->Pose.Orientation.GetY());
 
 					TestTriggers(x, y, z, laraItem->RoomNumber, true);
 
@@ -684,7 +684,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
+					laraItem->Pose.Orientation.y = item->Pose.Orientation.GetY();
 					ResetLaraFlex(laraItem);
 					Lara.Control.IsMoving = false;
 					Lara.Control.HandStatus = HandStatus::Busy;

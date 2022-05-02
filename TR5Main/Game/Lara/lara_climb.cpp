@@ -694,7 +694,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 	auto oldPose = item->Pose;
 	float oldOrient = lara->Control.MoveAngle;
 
-	int quadrant = GetQuadrant(item->Pose.Orientation.y);
+	int quadrant = GetQuadrant(item->Pose.Orientation.GetY());
 	int x, z;
 
 	if (quadrant && quadrant != SOUTH)

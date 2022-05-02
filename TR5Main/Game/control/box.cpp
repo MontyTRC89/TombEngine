@@ -70,7 +70,7 @@ bool MoveCreature3DPos(PoseData* origin, PoseData* target, int velocity, float a
 	if (angleDif <= angleAdd)
 	{
 		if (angleDif >= -angleAdd)
-			origin->Orientation.y = target->Orientation.y;
+			origin->Orientation.y = target->Orientation.GetY();
 		else
 			origin->Orientation.y -= angleAdd;
 	}
@@ -78,7 +78,7 @@ bool MoveCreature3DPos(PoseData* origin, PoseData* target, int velocity, float a
 		origin->Orientation.y += angleAdd;
 
 	if (origin->Position == target->Position &&
-		origin->Orientation.y == target->Orientation.y)
+		origin->Orientation.y == target->Orientation.GetY())
 	{
 		return true;
 	}
@@ -237,9 +237,9 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 
 	// TODO: exist in TR5 but just commented in case.
 	/*
-	ForcedFixedCamera.x = item->pos.Position.x + (sin(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
+	ForcedFixedCamera.x = item->pos.Position.x + (sin(item->pos.Orientation.GetY()) << 13) >> W2V_SHIFT;
 	ForcedFixedCamera.y = item->pos.Position.y - WALL_SIZE;
-	ForcedFixedCamera.z = item->pos.Position.z + (cos(item->pos.Orientation.y) << 13) >> W2V_SHIFT;
+	ForcedFixedCamera.z = item->pos.Position.z + (cos(item->pos.Orientation.GetY()) << 13) >> W2V_SHIFT;
 	ForcedFixedCamera.roomNumber = item->roomNumber;
 	UseForcedFixedCamera = true;
 	*/
@@ -376,7 +376,7 @@ float CreatureTurn(ITEM_INFO* item, float maxTurn)
 
 	int x = creature->Target.x - item->Pose.Position.x;
 	int z = creature->Target.z - item->Pose.Position.z;
-	angle = atan2(z, x) - item->Pose.Orientation.y;
+	angle = atan2(z, x) - item->Pose.Orientation.GetY();
 	int range = item->Animation.Velocity * (Angle::DegToRad(90.0f) / maxTurn);
 	int distance = pow(x, 2) + pow(z, 2);
 
@@ -665,10 +665,10 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		else if (angle > Angle::DegToRad(20.0f))
 			angle = Angle::DegToRad(20.0f);
 
-		if (angle < item->Pose.Orientation.x - Angle::DegToRad(1.0f))
-			item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
-		else if (angle > item->Pose.Orientation.x + Angle::DegToRad(1.0f))
-			item->Pose.Orientation.x += Angle::DegToRad(1.0f);
+		if (angle < item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f))
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
+		else if (angle > item->Pose.Orientation.GetX() + Angle::DegToRad(1.0f))
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(1.0f));
 		else
 			item->Pose.Orientation.SetX(angle);
 	}
@@ -820,7 +820,7 @@ int CreatureCreature(short itemNumber)
 				distance = xDistance + (zDistance >> 1);
 
 			if (distance < radius + Objects[linked->ObjectNumber].radius)
-				return atan2(linked->Pose.Position.z - z, linked->Pose.Position.x - x) - item->Pose.Orientation.y;
+				return atan2(linked->Pose.Position.z - z, linked->Pose.Position.x - x) - item->Pose.Orientation.GetY();
 		}
 
 		link = linked->NextItem;
@@ -1359,8 +1359,8 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 
 			if (!(creature->AITarget->Flags & 32))
 			{
-				creature->AITarget->Pose.Position.x += sin(creature->AITarget->Pose.Orientation.y) * 256;
-				creature->AITarget->Pose.Position.z += cos(creature->AITarget->Pose.Orientation.y) * 256;
+				creature->AITarget->Pose.Position.x += sin(creature->AITarget->Pose.Orientation.GetY()) * 256;
+				creature->AITarget->Pose.Position.z += cos(creature->AITarget->Pose.Orientation.GetY()) * 256;
 			}
 		}
 	}
@@ -1417,13 +1417,13 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 
 	if (enemy == LaraItem)
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * sin(Lara.Control.MoveAngle) - item->Pose.Position.x - object->pivotLength * sin(item->Pose.Orientation.GetY());
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * cos(Lara.Control.MoveAngle) - item->Pose.Position.z - object->pivotLength * cos(item->Pose.Orientation.GetY());
 	}
 	else
 	{
-		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * sin(enemy->Pose.Orientation.y) - item->Pose.Position.x - object->pivotLength * sin(item->Pose.Orientation.y);
-		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * cos(enemy->Pose.Orientation.y) - item->Pose.Position.z - object->pivotLength * cos(item->Pose.Orientation.y);
+		vector.x = enemy->Pose.Position.x + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * sin(enemy->Pose.Orientation.GetY()) - item->Pose.Position.x - object->pivotLength * sin(item->Pose.Orientation.GetY());
+		vector.z = enemy->Pose.Position.z + enemy->Animation.Velocity * PREDICTIVE_SCALE_FACTOR * cos(enemy->Pose.Orientation.GetY()) - item->Pose.Position.z - object->pivotLength * cos(item->Pose.Orientation.GetY());
 	}
 
 	vector.y = item->Pose.Position.y - enemy->Pose.Position.y;
@@ -1439,8 +1439,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 			AI->distance = INT_MAX;
 	}
 
-	AI->angle = angle - item->Pose.Orientation.y;
-	AI->enemyFacing = Angle::DegToRad(180.0f) + angle - enemy->Pose.Orientation.y;
+	AI->angle = angle - item->Pose.Orientation.GetY();
+	AI->enemyFacing = Angle::DegToRad(180.0f) + angle - enemy->Pose.Orientation.GetY();
 
 	vector.x = abs(vector.x);
 	vector.z = abs(vector.z);

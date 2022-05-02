@@ -135,7 +135,7 @@ void ShiftLaraOnPlatform(short itemNumber, bool isExpanding)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	float angle = item->Pose.Orientation.y;
+	float angle = item->Pose.Orientation.GetY();
 	int xShift = 0;
 	int zShift = 0;
 

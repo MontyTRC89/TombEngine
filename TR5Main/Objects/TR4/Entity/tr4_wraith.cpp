@@ -82,7 +82,7 @@ namespace TEN::Entities::TR4
 		}
 
 		dy = y - item->Pose.Position.y - dy - CLICK(0.5f);
-		float angleH = atan2(z, x) - item->Pose.Orientation.y;
+		float angleH = atan2(z, x) - item->Pose.Orientation.GetY();
 
 		float angleV = 0;
 		if (abs(x) <= abs(z))
@@ -90,7 +90,7 @@ namespace TEN::Entities::TR4
 		else
 			angleV = atan2(abs(z) + (abs(x) / 2), dy);
 
-		angleV -= item->Pose.Orientation.x;
+		angleV -= item->Pose.Orientation.GetX();
 
 		int velocity = 8 * (WraithVelocity / item->Animation.Velocity);
 
@@ -126,7 +126,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[3] += velocity;
-					item->Pose.Orientation.x += item->ItemFlags[3];
+					item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + item->ItemFlags[3]);
 				}
 			}
 			else if (item->ItemFlags[3] >= 0)
@@ -134,11 +134,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[3] -= velocity;
-				item->Pose.Orientation.x += item->ItemFlags[3];
+				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + item->ItemFlags[3]);
 			}
 		}
 		else
-			item->Pose.Orientation.x += angleV;
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + angleV);
 
 		auto probe = GetCollision(item);
 
@@ -146,9 +146,9 @@ namespace TEN::Entities::TR4
 		if (probe.Position.Floor < item->Pose.Position.y || probe.Position.Ceiling > item->Pose.Position.y)
 			hitWall = true;
 
-		item->Pose.Position.x += item->Animation.Velocity * sin(item->Pose.Orientation.y);
-		item->Pose.Position.y += item->Animation.Velocity * sin(item->Pose.Orientation.x);
-		item->Pose.Position.z += item->Animation.Velocity * cos(item->Pose.Orientation.y);
+		item->Pose.Position.x += item->Animation.Velocity * sin(item->Pose.Orientation.GetY());
+		item->Pose.Position.y += item->Animation.Velocity * sin(item->Pose.Orientation.GetX());
+		item->Pose.Position.z += item->Animation.Velocity * cos(item->Pose.Orientation.GetY());
 
 		auto outsideRoom = IsRoomOutside(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 		if (item->RoomNumber != outsideRoom && outsideRoom != NO_ROOM)

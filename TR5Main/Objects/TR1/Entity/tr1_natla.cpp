@@ -109,7 +109,7 @@ void NatlaControl(short itemNumber)
 				if (FXNumber != NO_ITEM)
 				{
 					auto* fx = &EffectList[FXNumber];
-					gun = fx->pos.Orientation.x;
+					gun = fx->pos.Orientation.GetX();
 					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
 				}
 
@@ -127,7 +127,7 @@ void NatlaControl(short itemNumber)
 				if (FXNumber != NO_ITEM)
 				{
 					auto* fx = &EffectList[FXNumber];
-					gun = fx->pos.Orientation.x;
+					gun = fx->pos.Orientation.GetX();
 					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
 				}
 
@@ -240,7 +240,7 @@ void NatlaControl(short itemNumber)
 				if (FXNumber != NO_ITEM)
 				{
 					auto* fx = &EffectList[FXNumber];
-					gun = fx->pos.Orientation.x;
+					gun = fx->pos.Orientation.GetX();
 					SoundEffect(SFX_TR1_ATLANTEAN_WINGS, &fx->pos, NULL);
 				}
 
@@ -264,7 +264,7 @@ void NatlaControl(short itemNumber)
 			{
 				short FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)
-					gun = EffectList[FXNumber].pos.Orientation.x;
+					gun = EffectList[FXNumber].pos.Orientation.GetX();
 
 				FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)

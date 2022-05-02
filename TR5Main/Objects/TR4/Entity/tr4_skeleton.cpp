@@ -54,9 +54,9 @@ namespace TEN::Entities::TR4
 			spark->x = fx->pos.Position.x;
 			spark->y = fx->pos.Position.y;
 			spark->z = fx->pos.Position.z;
-			spark->xVel = sin(fx->pos.Orientation.y) * 4096;
+			spark->xVel = sin(fx->pos.Orientation.GetY()) * 4096;
 			spark->yVel = 0;
-			spark->zVel = cos(fx->pos.Orientation.y) * 4096;
+			spark->zVel = cos(fx->pos.Orientation.GetY()) * 4096;
 			spark->transType = TransTypeEnum::COLADD;
 			spark->friction = 68;
 			spark->flags = 26;
@@ -141,8 +141,8 @@ namespace TEN::Entities::TR4
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
 
-		int dx = 870 * sin(item->Pose.Orientation.y);
-		int dz = 870 * cos(item->Pose.Orientation.y);
+		int dx = 870 * sin(item->Pose.Orientation.GetY());
+		int dz = 870 * cos(item->Pose.Orientation.GetY());
 
 		x += dx;
 		z += dz;
@@ -223,7 +223,7 @@ namespace TEN::Entities::TR4
 			{
 				dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 				dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
+				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.GetY();
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 

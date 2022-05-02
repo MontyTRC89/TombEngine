@@ -74,16 +74,16 @@ void ScorpionControl(short itemNumber)
 	float joint2 = 0;
 	float joint3 = 0;
 
-	int x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.y);
-	int z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.y);
+	int x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.GetY());
+	int z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.GetY());
 
 	auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 	int height1 = probe.Position.Floor;
 	if (abs(item->Pose.Position.y - height1) > CLICK(2))
 		probe.Position.Floor = item->Pose.Position.y;
 
-	x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.y);
-	z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.y);
+	x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.GetY());
+	z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.GetY());
 
 	probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 	int height2 = probe.Position.Floor;
@@ -92,16 +92,16 @@ void ScorpionControl(short itemNumber)
 
 	float angle1 = atan2(1344, height2 - height1);
 
-	x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.y);
-	z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.y);
+	x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.GetY());
+	z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.GetY());
 
 	probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 	int height3 = probe.Position.Floor;
 	if (abs(item->Pose.Position.y - height3) > CLICK(2))
 		height3 = item->Pose.Position.y;
 
-	x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.y);
-	z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.y);
+	x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.GetY());
+	z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.GetY());
 
 	probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 	int height4 = probe.Position.Floor;
@@ -357,24 +357,24 @@ void ScorpionControl(short itemNumber)
 		}
 	}
 
-	if ((angle1 - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
+	if ((angle1 - item->Pose.Orientation.GetX()) < Angle::DegToRad(1.4f))
 		item->Pose.Orientation.SetX(Angle::DegToRad(1.4f));
 	else
 	{
-		if (angle1 <= item->Pose.Orientation.x)
-			item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
+		if (angle1 <= item->Pose.Orientation.GetX())
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.4f));
 		else
-			item->Pose.Orientation.x += Angle::DegToRad(1.4f);
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(1.4f));
 	}
 
-	if ((angle2 - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
-		item->Pose.Orientation.z = Angle::DegToRad(1.4f);
+	if ((angle2 - item->Pose.Orientation.GetZ()) < Angle::DegToRad(1.4f))
+		item->Pose.Orientation.SetZ(Angle::DegToRad(1.4f));
 	else
 	{
-		if (angle2 <= item->Pose.Orientation.z)
-			item->Pose.Orientation.z -= Angle::DegToRad(1.4f);
+		if (angle2 <= item->Pose.Orientation.GetZ())
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() - Angle::DegToRad(1.4f));
 		else
-			item->Pose.Orientation.z += Angle::DegToRad(1.4f);
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(1.4f));
 	}
 
 	if (!CutSeqNum)

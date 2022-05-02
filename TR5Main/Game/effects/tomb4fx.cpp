@@ -870,7 +870,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 				+ 10240;
 			gshell->pos.Orientation.y += Lara.LeftArm.Rotation.y 
 				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Pose.Orientation.y;
+				+ LaraItem->Pose.Orientation.GetY();
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
@@ -935,9 +935,9 @@ void UpdateGunShells()
 				gs->fallspeed += 6;
 			}
 
-			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * Angle::DegToRad(1);
+			gs->pos.Orientation.SetX(gs->pos.Orientation.GetX() + (gs->speed >> 1 + 7) * Angle::DegToRad(1.0f));
 			gs->pos.Orientation.y += gs->speed * Angle::DegToRad(1);
-			gs->pos.Orientation.z += Angle::DegToRad(23);
+			gs->pos.Orientation.SetZ(gs->pos.Orientation.GetZ() + Angle::DegToRad(23.0f));
 
 			gs->pos.Position.x += gs->speed * sin(gs->dirXrot);
 			gs->pos.Position.y += gs->fallspeed;
@@ -1211,7 +1211,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	
 	Matrix world = Matrix::CreateFromYawPitchRoll(
 		item->Pose.Orientation.y,
-		item->Pose.Orientation.x,
+		item->Pose.Orientation.GetX(),
 		item->Pose.Orientation.z
 	);
 

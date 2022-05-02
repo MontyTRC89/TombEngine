@@ -172,15 +172,15 @@ namespace TEN::Entities::TR4
 					short resultYrot, resultXrot;
 					int shiftYrot, shiftXrot;
 					int random = locust->randomRotation * 128;
-					resultYrot = angles[0] - locust->pos.Orientation.y;
+					resultYrot = angles[0] - locust->pos.Orientation.GetY();
 
 					if (abs(resultYrot) > Angle::DegToRad(180.0f))
 						resultYrot = locust->pos.Orientation.y - angles[0];
 
-					resultXrot = angles[1] - locust->pos.Orientation.x;
+					resultXrot = angles[1] - locust->pos.Orientation.GetX();
 
 					if (abs(resultXrot) > Angle::DegToRad(180.0f))
-						resultXrot = locust->pos.Orientation.x - angles[0];
+						resultXrot = locust->pos.Orientation.GetX() - angles[0];
 
 					shiftYrot = resultYrot / 8;
 					shiftXrot = resultXrot / 8;
@@ -192,12 +192,12 @@ namespace TEN::Entities::TR4
 						shiftXrot = -random;
 
 					locust->pos.Orientation.y += shiftYrot;
-					locust->pos.Orientation.x += shiftXrot;
+					locust->pos.Orientation.SetX(locust->pos.Orientation.GetX() + shiftXrot);
 				}
 
-				locust->pos.Position.x += locust->randomRotation * cos(locust->pos.Orientation.x) * sin(locust->pos.Orientation.y);
-				locust->pos.Position.y += locust->randomRotation * sin(-locust->pos.Orientation.x);
-				locust->pos.Position.z += locust->randomRotation * cos(locust->pos.Orientation.x) * cos(locust->pos.Orientation.y);
+				locust->pos.Position.x += locust->randomRotation * cos(locust->pos.Orientation.GetX()) * sin(locust->pos.Orientation.GetY());
+				locust->pos.Position.y += locust->randomRotation * sin(-locust->pos.Orientation.GetX());
+				locust->pos.Position.z += locust->randomRotation * cos(locust->pos.Orientation.GetX()) * cos(locust->pos.Orientation.GetY());
 				if (ItemNearTarget(&locust->pos, LaraItem, CLICK(1) / 2))
 				{
 					TriggerBlood(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 2 * GetRandomControl(), 2);

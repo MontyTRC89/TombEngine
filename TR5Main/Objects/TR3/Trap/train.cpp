@@ -21,12 +21,12 @@
 
 long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 {
-	float sinY = sin(item->Pose.Orientation.y);
-	float cosY = cos(item->Pose.Orientation.y);
+	float sinY = sin(item->Pose.Orientation.GetY());
+	float cosY = cos(item->Pose.Orientation.GetY());
 
 	auto pos = Vector3Int(
 		(int)round(item->Pose.Position.x + z * sinY + x * cosY),
-		(int)round(item->Pose.Position.y - z * sin(item->Pose.Orientation.x) + x * sin(item->Pose.Orientation.z)),
+		(int)round(item->Pose.Position.y - z * sin(item->Pose.Orientation.GetX()) + x * sin(item->Pose.Orientation.z)),
 		(int)round(item->Pose.Position.z + z * cosY - x * sinY)
 	);
 
@@ -46,8 +46,8 @@ void TrainControl(short itemNumber)
 	if (item->ItemFlags[0] == 0)
 		item->ItemFlags[0] = item->ItemFlags[1] = TRAIN_VEL;
 
-	float sinY = sin(item->Pose.Orientation.y);
-	float cosY = cos(item->Pose.Orientation.y);
+	float sinY = sin(item->Pose.Orientation.GetY());
+	float cosY = cos(item->Pose.Orientation.GetY());
 
 	item->Pose.Position.x += item->ItemFlags[1] * sinY;
 	item->Pose.Position.z += item->ItemFlags[1] * cosY;
@@ -113,7 +113,7 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 //	larA->ActiveState = EXTRA_TRAINKILL;
 //	larA->TargetState = EXTRA_TRAINKILL;
 	laraItem->HitPoints = 0;
-	laraItem->Pose.Orientation.y = trainItem->Pose.Orientation.y;
+	laraItem->Pose.Orientation.y = trainItem->Pose.Orientation.GetY();
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
@@ -128,8 +128,8 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 
 	trainItem->ItemFlags[1] = 160;
 
-	float s = sin(trainItem->Pose.Orientation.y);
-	float c = cos(trainItem->Pose.Orientation.y);
+	float s = sin(trainItem->Pose.Orientation.GetY());
+	float c = cos(trainItem->Pose.Orientation.GetY());
 
 	long x = laraItem->Pose.Position.x + CLICK(1) * s;
 	long z = laraItem->Pose.Position.z + CLICK(1) * c;

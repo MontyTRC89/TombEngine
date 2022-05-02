@@ -56,7 +56,7 @@ void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX
 {
 	auto world = Matrix::CreateFromYawPitchRoll(
 		pos->Orientation.y,
-		pos->Orientation.x,
+		pos->Orientation.GetX(),
 		pos->Orientation.z
 	);
 
@@ -93,7 +93,7 @@ BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
 {
 	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
 	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	auto rotation = Quaternion::CreateFromYawPitchRoll(pos.Orientation.y, pos.Orientation.x, pos.Orientation.z);
+	auto rotation = Quaternion::CreateFromYawPitchRoll(pos.Orientation.y, pos.Orientation.GetX(), pos.Orientation.z);
 
 	BoundingOrientedBox result;
 	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.Position.x, pos.Position.y, pos.Position.z));
