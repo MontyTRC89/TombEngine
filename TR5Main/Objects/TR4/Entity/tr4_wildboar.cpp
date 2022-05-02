@@ -128,12 +128,12 @@ void WildBoarControl(short itemNumber)
 		case 2:
 			if (AI.distance >= SECTOR(4096))
 			{
-				creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+				creature->MaxTurn = Angle::DegToRad(6.0f);
 				item->Flags = 0;
 			}
 			else
 			{
-				creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+				creature->MaxTurn = Angle::DegToRad(3.0f);
 				joint0 = -AI.distance;
 				joint2 = -AI.distance;
 			}

@@ -219,12 +219,12 @@ void TroopsControl(short itemNumber)
 
 			if (item->Animation.AnimNumber == object->animIndex + 17)
 			{
-				if (abs(AI.angle) >= EulerAngle::DegToRad(10.0f))
+				if (abs(AI.angle) >= Angle::DegToRad(10.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += EulerAngle::DegToRad(10.0f);
+						item->Pose.Orientation.y += Angle::DegToRad(10.0f);
 					else
-						item->Pose.Orientation.y -= EulerAngle::DegToRad(10.0f);
+						item->Pose.Orientation.y -= Angle::DegToRad(10.0f);
 				}
 				else
 					item->Pose.Orientation.y += AI.angle;
@@ -284,7 +284,7 @@ void TroopsControl(short itemNumber)
 			break;
 
 		case TROOP_STATE_WALK:
-			creature->MaxTurn = EulerAngle::DegToRad(5.0f);
+			creature->MaxTurn = Angle::DegToRad(5.0f);
 			creature->Flags = 0;
 			joint2 = rot;
 
@@ -320,7 +320,7 @@ void TroopsControl(short itemNumber)
 			break;
 
 		case TROOP_STATE_RUN:
-			creature->MaxTurn = EulerAngle::DegToRad(10.0f);
+			creature->MaxTurn = Angle::DegToRad(10.0f);
 			tilt = angle / 2;
 
 			if (AI.ahead)

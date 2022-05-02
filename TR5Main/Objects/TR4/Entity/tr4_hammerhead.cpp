@@ -73,7 +73,7 @@ void HammerheadControl(short itemNumber)
 				break;
 
 			case HAMMERHEAD_STATE_SWIM_SLOW:
-				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				creature->MaxTurn = Angle::DegToRad(7.0f);
 
 				if (AI.distance <= pow(SECTOR(1), 2))
 				{

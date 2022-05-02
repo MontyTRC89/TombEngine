@@ -82,7 +82,7 @@ void DoppelgangerControl(short itemNumber)
 		item->Animation.AnimNumber = LaraItem->Animation.AnimNumber;
 		item->Pose.Position = pos;
 		item->Pose.Orientation.x = LaraItem->Pose.Orientation.x;
-		item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - EulerAngle::DegToRad(180.0f);
+		item->Pose.Orientation.y = LaraItem->Pose.Orientation.y - Angle::DegToRad(180.0f);
 		item->Pose.Orientation.z = LaraItem->Pose.Orientation.z;
 		ItemNewRoom(itemNumber, LaraItem->RoomNumber);
 

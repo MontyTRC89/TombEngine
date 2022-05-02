@@ -17,28 +17,28 @@ void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD)
-		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - EulerAngle::DegToRad(3.0f));
+		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(3.0f));
 	else if (TrInput & IN_BACK)
-		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + EulerAngle::DegToRad(3.0f));
+		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(3.0f));
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= EulerAngle::DegToRad(3.4f);
-		if (lara->Control.TurnRate < EulerAngle::DegToRad(-6.0f))
-			lara->Control.TurnRate = EulerAngle::DegToRad(-6.0f);
+		lara->Control.TurnRate -= Angle::DegToRad(3.4f);
+		if (lara->Control.TurnRate < Angle::DegToRad(-6.0f))
+			lara->Control.TurnRate = Angle::DegToRad(-6.0f);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += EulerAngle::DegToRad(3.4f);
-		if (lara->Control.TurnRate > EulerAngle::DegToRad(6.0f))
-			lara->Control.TurnRate = EulerAngle::DegToRad(6.0f);
+		lara->Control.TurnRate += Angle::DegToRad(3.4f);
+		if (lara->Control.TurnRate > Angle::DegToRad(6.0f))
+			lara->Control.TurnRate = Angle::DegToRad(6.0f);
 	}
 
 	if (TrInput & IN_ACTION)
 		TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
 
 	if (TrInput & IN_OPTION)
-		lara->Control.TurnRate = EulerAngle::DegToRad(-12.0f);
+		lara->Control.TurnRate = Angle::DegToRad(-12.0f);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -75,7 +75,7 @@ void LaraCheatyBits(ITEM_INFO* item)
 					SetAnimation(item, LA_DOZY);
 					item->Animation.VerticalVelocity = 30;
 					item->Animation.Airborne = false;
-					item->Pose.Orientation.SetX(EulerAngle::DegToRad(30.0f));
+					item->Pose.Orientation.SetX(Angle::DegToRad(30.0f));
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					ResetLaraFlex(item);

@@ -20,9 +20,9 @@ namespace TEN::Entities::TR5
 		-256, 256,
 		0, 0,
 		-512, 512,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	auto CrowDovePos = Vector3Int(0, 0, -400);
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR5
 			AnimateItem(item);
 
 			if (item->Animation.ActiveState == SWITCH_OFF)
-				item->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(90.0f);
 		}
 	}
 }

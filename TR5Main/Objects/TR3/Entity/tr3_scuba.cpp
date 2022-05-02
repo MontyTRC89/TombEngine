@@ -142,10 +142,10 @@ void ScubaControl(short itemNumber)
 				creature->Target.z = LaraItem->Pose.Position.z;
 			}
 
-			if (AI.angle < EulerAngle::DegToRad(-45.0f) || AI.angle > EulerAngle::DegToRad(45.0f))
+			if (AI.angle < Angle::DegToRad(-45.0f) || AI.angle > Angle::DegToRad(45.0f))
 				shoot = false;
 		}
-		else if (AI.angle > EulerAngle::DegToRad(-45.0f) && AI.angle < EulerAngle::DegToRad(45.0f))
+		else if (AI.angle > Angle::DegToRad(-45.0f) && AI.angle < Angle::DegToRad(45.0f))
 		{
 			start.x = item->Pose.Position.x;
 			start.y = item->Pose.Position.y;
@@ -167,7 +167,7 @@ void ScubaControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+			creature->MaxTurn = Angle::DegToRad(3.0f);
 			if (shoot)
 				neck = -AI.angle;
 
@@ -210,7 +210,7 @@ void ScubaControl(short itemNumber)
 
 
 		case 2:
-			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+			creature->MaxTurn = Angle::DegToRad(3.0f);
 
 			if (shoot)
 				head = AI.angle;

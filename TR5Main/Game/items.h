@@ -6,7 +6,6 @@
 #include "Game/itemdata/itemdata.h"
 #include "Specific/newtypes.h"
 #include "Specific/phd_global.h"
-#include "Specific/EulerAngle.h"
 
 enum GAME_OBJECT_ID : short;
 

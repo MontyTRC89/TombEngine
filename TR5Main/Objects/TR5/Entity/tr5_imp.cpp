@@ -181,7 +181,7 @@ void ImpControl(short itemNumber)
 			switch (item->Animation.ActiveState)
 			{
 			case IMP_STATE_WALK:
-				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				creature->MaxTurn = Angle::DegToRad(7.0f);
 				if (AI.distance <= pow(SECTOR(2), 2))
 				{
 					if (AI.distance < pow(SECTOR(2), 2))
@@ -221,7 +221,7 @@ void ImpControl(short itemNumber)
 				break;
 
 			case IMP_STATE_RUN:
-				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				creature->MaxTurn = Angle::DegToRad(7.0f);
 
 				if (AI.distance >= pow(SECTOR(0.5f), 2))
 				{
@@ -249,7 +249,7 @@ void ImpControl(short itemNumber)
 				break;
 
 			case IMP_STATE_SCARED:
-				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				creature->MaxTurn = Angle::DegToRad(7.0f);
 				break;
 
 			case IMP_STATE_START_CLIMB:
@@ -284,12 +284,12 @@ void ImpControl(short itemNumber)
 		if (creature->MaxTurn == -1)
 		{
 			creature->MaxTurn = 0;
-			if (abs(angle2) >= EulerAngle::DegToRad(2.0f))
+			if (abs(angle2) >= Angle::DegToRad(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
 				item->Pose.Orientation.y += angle2;

@@ -1,49 +1,24 @@
 #pragma once
 
-// TODO: Use this class inside EulerAngles.
 class Angle
 {
-private:
-	float Component; // Invariant: Radian component remains in the range [-M_PI, M_PI].
-
-	float Normalize(float angle);
-	Angle(float angle);
-
 public:
-	// Constructors:
-	Angle();
-	static Angle FromDeg(float degrees);
-	static Angle FromRad(float radians);
-	static Angle FromShrt(short shortForm); // Temp. legacy short form support.
-	
-	// Utilities:
-	static bool Compare(Angle angle0, Angle angle1, Angle epsilon = 0.0f);
+	// Utilities
+	static float Normalize(float angle);
+	static float Interpolate(float angleFrom, float angleTo, float rate = 1.0f, float epsilon = 0.0f);
+	static bool  Compare(float angle0, float angle1, float epsilon = 0.0f);
+	static float ShortestAngle(float angleFrom, float angleTo);
+	static float AngleBetweenTwoPoints(Vector3 point0, Vector3 point1);
+	static float DeltaHeading(Vector3 origin, Vector3 target, float heading); // TODO: I don't even know what this does.
 
-	Angle Interpolate(Angle angleTo, float rate = 1.0f, Angle epsilon = 0.0f);
-	static Angle Interpolate(Angle angleFrom, Angle angleTo, float rate = 1.0f, Angle epsilon = 0.0f);
+	// Converters
+	static float DegToRad(float degrees);
+	static float RadToDeg(float radians);
 
-	static Angle ShortestAngle(Angle angleFrom, Angle angleTo);
-
-	static Angle AngleBetweenTwoPoints(Vector3 point0, Vector3 point1);
-	static Angle DeltaHeading(Vector3 origin, Vector3 target, Angle heading);
-
-	// Converters:
-	float ToDeg();
-	short ToShrt(); // Temp. legacy short form support.
-
-	// Operators:
-	operator float() const;
-
-	Angle operator +(float angle);
-	Angle operator -(float angle);
-	Angle operator *(float value);
-	Angle operator /(float value);
-
-	Angle& operator =(float angle);
-	Angle& operator +=(float angle);
-	Angle& operator -=(float angle);
-	Angle& operator *=(float value);
-	Angle& operator /=(float value);
+	// Temporary legacy short form support for particularly cryptic code
+	static float ShrtToRad(short shortForm);
+	static short DegToShrt(float degrees);
+	static short RadToShrt(float radians);
 };
 
 inline float Angle::Normalize(float angle)
@@ -52,53 +27,14 @@ inline float Angle::Normalize(float angle)
 		return atan2(sin(angle), cos(angle));
 	else
 		return angle;
-	
+
 	// Alternative (faster?) method:
 	/*return (angle > 0) ?
 		fmod(angle + M_PI, M_PI * 2) - M_PI :
 		fmod(angle - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline Angle::Angle(float angle)
-{
-	this->Component = Normalize(angle);
-}
-
-inline Angle::Angle()
-{
-	*this = Angle(0.0f);
-}
-
-inline Angle Angle::FromDeg(float degrees)
-{
-	return Angle(degrees * (M_PI / 180.0f));
-}
-
-inline Angle Angle::FromRad(float radians)
-{
-	return Angle(radians);
-}
-
-inline Angle Angle::FromShrt(short shortForm)
-{
-	return Angle(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
-}
-
-inline bool Angle::Compare(Angle angle0, Angle angle1, Angle epsilon)
-{
-	auto difference = ShortestAngle(angle0, angle1);
-	if (abs(difference) <= epsilon)
-		return true;
-	else
-		return false;
-}
-
-inline Angle Angle::Interpolate(Angle angleTo, float rate, Angle epsilon)
-{
-	*this = Interpolate(*this, angleTo, rate, epsilon);
-}
-
-inline Angle Angle::Interpolate(Angle angleFrom, Angle angleTo, float rate, Angle epsilon)
+inline float Angle::Interpolate(float angleFrom, float angleTo, float rate, float epsilon)
 {
 	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
 
@@ -111,85 +47,62 @@ inline Angle Angle::Interpolate(Angle angleFrom, Angle angleTo, float rate, Angl
 		return angleTo;
 }
 
-inline Angle Angle::ShortestAngle(Angle angleFrom, Angle angleTo)
+inline bool Angle::Compare(float angle0, float angle1, float epsilon)
 {
-	return (angleTo - angleFrom);
+	auto difference = ShortestAngle(angle0, angle1);
+	if (abs(difference) <= epsilon)
+		return true;
+	else
+		return false;
 }
 
-inline float Angle::ToDeg()
+inline float Angle::ShortestAngle(float angleFrom, float angleTo)
 {
-	float degrees = Component * (180.0f / M_PI);
+	return Normalize(angleTo - angleFrom);
+}
+
+inline float Angle::AngleBetweenTwoPoints(Vector3 point0, Vector3 point1)
+{
+	auto difference = point0 - point1;
+	return atan2(difference.x, difference.z);
+}
+
+inline float Angle::DeltaHeading(Vector3 origin, Vector3 target, float heading)
+{
+	auto difference = AngleBetweenTwoPoints(origin, target);
+	return ShortestAngle(heading, difference + DegToRad(90.0f));
+}
+
+inline float Angle::DegToRad(float degrees)
+{
+	return Normalize(degrees * (M_PI / 180.0f));
+}
+
+inline float Angle::RadToDeg(float radians)
+{
+	float degrees = Normalize(radians) * (180.0f / M_PI);
 	return fmod(degrees + 360.0f, 360.0f);
 }
 
-inline short Angle::ToShrt()
+inline float Angle::ShrtToRad(short shortForm)
 {
-	return ((Component / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
+	return Normalize(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
 }
 
-inline Angle::operator float() const
+inline short Angle::DegToShrt(float degrees)
 {
-	return Component;
+	return (degrees * ((USHRT_MAX + 1) / 360.0f));
 }
 
-inline Angle Angle::operator +(float angle)
+inline short Angle::RadToShrt(float radians)
 {
-	this->Component = Normalize(Component + angle);
-	return *this;
-}
-
-inline Angle Angle::operator -(float angle)
-{
-	this->Component = Normalize(Component - angle);
-	return *this;
-}
-
-inline Angle Angle::operator *(float value)
-{
-	this->Component = Normalize(Component * value);
-	return *this;
-}
-
-inline Angle Angle::operator /(float value)
-{
-	this->Component = Normalize(Component / value);
-	return *this;
-}
-
-inline Angle& Angle::operator =(float angle)
-{
-	this->Component = Normalize(angle);
-	return *this;
-}
-
-inline Angle& Angle::operator +=(float angle)
-{
-	*this = *this + angle;
-	return *this;
-}
-
-inline Angle& Angle::operator -=(float angle)
-{
-	*this = *this - angle;
-	return *this;
-}
-
-inline Angle& Angle::operator *=(float value)
-{
-	*this = *this * value;
-	return *this;
-}
-
-inline Angle& Angle::operator /=(float value)
-{
-	*this = *this / value;
-	return *this;
+	return ((radians / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
 }
 
 //-------------------------------------------------------------------------------------------------------------------
 
-// TODO: Move to EulerAngle.h and EulerAngle.cpp.
-class EulerAngle//s
+// TODO: Move to EulerAngles.h and EulerAngles.cpp.
+class EulerAngles
 {
 public:
 	// TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make components private? Maybe not necessary with an Angle class.
@@ -199,8 +112,8 @@ public:
 	float z;
 
 	// Constructors
-	EulerAngle();
-	EulerAngle(float xAngle, float yAngle, float zAngle);
+	EulerAngles();
+	EulerAngles(float xAngle, float yAngle, float zAngle);
 
 	// Getters
 	float GetX();
@@ -208,304 +121,217 @@ public:
 	float GetZ();
 
 	// Setters
-	void Set(EulerAngle orient);
+	void Set(EulerAngles orient);
 	void Set(float xAngle, float yAngle, float zAngle);
 	void SetX(float angle);
 	void SetY(float angle);
 	void SetZ(float angle);
 
 	// Utilities
-	bool Compare(EulerAngle orient, float epsilon);
-	static bool Compare(EulerAngle orient0, EulerAngle orient1, float epsilon);
-	static bool Compare(float angle0, float angle1, float epsilon);
+	bool Compare(EulerAngles orient, float epsilon);
+	static bool Compare(EulerAngles orient0, EulerAngles orient1, float epsilon);
 
-	void Clamp();
-	static EulerAngle Clamp(EulerAngle orient);
-	static float Clamp(float angle);
+	void Normalize();
+	static EulerAngles Normalize(EulerAngles orient);
 
-	void Interpolate(EulerAngle orientTo, float rate, float epsilon);
-	static EulerAngle Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate, float epsilon);
-	static float Interpolate(float angleFrom, float angleTo, float rate, float epsilon);
+	void Interpolate(EulerAngles orientTo, float rate, float epsilon);
+	static EulerAngles Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate, float epsilon);
 
-	EulerAngle ShortestAngle(EulerAngle orientTo);
-	static EulerAngle ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo);
-	static float ShortestAngle(float angleFrom, float angleTo);
-
-	static float AngleBetweenTwoPoints(Vector3 point0, Vector3 point1);
-	static float DeltaHeading(Vector3 origin, Vector3 target, float heading);
+	EulerAngles ShortestAngle(EulerAngles orientTo);
+	static EulerAngles ShortestAngle(EulerAngles orientFrom, EulerAngles orientTo);
 
 	Vector3 ToVector3();
 
-	// Converters
-	static float DegToRad(float degrees);
-	static float RadToDeg(float radians);
-	static float ShrtToRad(short shortForm); // Temporary legacy short form support for particularly cryptic code.
-	static short DegToShrt(float degrees);
-	static short RadToShrt(float radians);
-
 	// Operators
-	bool operator ==(EulerAngle orient);
-	bool operator !=(EulerAngle orient);
+	bool operator ==(EulerAngles orient);
+	bool operator !=(EulerAngles orient);
 
-	EulerAngle operator +(EulerAngle orient);
-	EulerAngle operator -(EulerAngle orient);
-	EulerAngle operator *(EulerAngle orient);
-	EulerAngle operator *(float value);
-	EulerAngle operator /(float value);
+	EulerAngles operator +(EulerAngles orient);
+	EulerAngles operator -(EulerAngles orient);
+	EulerAngles operator *(EulerAngles orient);
+	EulerAngles operator *(float value);
+	EulerAngles operator /(float value);
 
-	EulerAngle& operator +=(EulerAngle orient);
-	EulerAngle& operator -=(EulerAngle orient);
-	EulerAngle& operator *=(EulerAngle orient);
-	EulerAngle& operator *=(float value);
-	EulerAngle& operator /=(float value);
+	EulerAngles& operator +=(EulerAngles orient);
+	EulerAngles& operator -=(EulerAngles orient);
+	EulerAngles& operator *=(EulerAngles orient);
+	EulerAngles& operator *=(float value);
+	EulerAngles& operator /=(float value);
 };
 
-inline EulerAngle::EulerAngle()
+inline EulerAngles::EulerAngles()
 {
 	this->Set(0.0f, 0.0f, 0.0f);
 }
 
-inline EulerAngle::EulerAngle(float xAngle, float yAngle, float zAngle)
+inline EulerAngles::EulerAngles(float xAngle, float yAngle, float zAngle)
 {
 	this->Set(xAngle, yAngle, zAngle);
 }
 
-inline float EulerAngle::GetX()
+inline float EulerAngles::GetX()
 {
 	return x;
 }
 
-inline float EulerAngle::GetY()
+inline float EulerAngles::GetY()
 {
 	return y;
 }
 
-inline float EulerAngle::GetZ()
+inline float EulerAngles::GetZ()
 {
 	return z;
 }
 
-inline void EulerAngle::Set(EulerAngle orient)
+inline void EulerAngles::Set(EulerAngles orient)
 {
-	*this = Clamp(orient);
+	*this = Normalize(orient);
 }
 
-inline void EulerAngle::Set(float xAngle, float yAngle, float zAngle)
+inline void EulerAngles::Set(float xAngle, float yAngle, float zAngle)
 {
 	this->SetX(xAngle);
 	this->SetY(yAngle);
 	this->SetZ(zAngle);
 }
 
-inline void EulerAngle::SetX(float angle = 0.0f)
+inline void EulerAngles::SetX(float angle = 0.0f)
 {
-	this->x = Clamp(angle);
+	this->x = Angle::Normalize(angle);
 }
 
-inline void EulerAngle::SetY(float angle = 0.0f)
+inline void EulerAngles::SetY(float angle = 0.0f)
 {
-	this->y = Clamp(angle);
+	this->y = Angle::Normalize(angle);
 }
 
-inline void EulerAngle::SetZ(float angle = 0.0f)
+inline void EulerAngles::SetZ(float angle = 0.0f)
 {
-	this->z = Clamp(angle);
+	this->z = Angle::Normalize(angle);
 }
 
-inline bool EulerAngle::Compare(EulerAngle orient, float epsilon = 0.0f)
+inline bool EulerAngles::Compare(EulerAngles orient, float epsilon = 0.0f)
 {
 	return Compare(*this, orient, epsilon);
 }
 
-inline bool EulerAngle::Compare(EulerAngle orient0, EulerAngle orient1, float epsilon = 0.0f)
+inline bool EulerAngles::Compare(EulerAngles orient0, EulerAngles orient1, float epsilon = 0.0f)
 {
-	return (Compare(orient0.x, orient1.x, epsilon) && Compare(orient0.y, orient1.y, epsilon) && Compare(orient0.z, orient1.z, epsilon));
-}
-
-inline bool EulerAngle::Compare(float angle0, float angle1, float epsilon = 0.0f)
-{
-	float difference = ShortestAngle(angle0, angle1);
-	if (abs(difference) <= epsilon)
+	if (Angle::Compare(orient0.x, orient1.x, epsilon) &&
+		Angle::Compare(orient0.y, orient1.y, epsilon) &&
+		Angle::Compare(orient0.z, orient1.z, epsilon))
 		return true;
-	else
-		return false;
+
+	return false;
 }
 
-inline void EulerAngle::Clamp()
+inline void EulerAngles::Normalize()
 {
-	this->SetX(Clamp(this->GetX()));
-	this->SetY(Clamp(this->GetY()));
-	this->SetZ(Clamp(this->GetZ()));
+	this->SetX(this->GetX());
+	this->SetY(this->GetY());
+	this->SetZ(this->GetZ());
 }
 
-inline EulerAngle EulerAngle::Clamp(EulerAngle orient)
+inline EulerAngles EulerAngles::Normalize(EulerAngles orient)
 {
-	orient.Clamp();
+	orient.Normalize();
 	return orient;
 }
 
-inline float EulerAngle::Clamp(float angle)
-{
-	//if (angle < -M_PI || angle > M_PI)
-		return atan2(sin(angle), cos(angle));
-	//else
-	//	return angle;
-
-	// Alternative method:
-	/*return (angle > 0) ?
-		fmod(angle + M_PI, M_PI * 2) - M_PI :
-		fmod(angle - M_PI, M_PI * 2) + M_PI;*/
-}
-
-inline void EulerAngle::Interpolate(EulerAngle orientTo, float rate = 1.0f, float epsilon = 0.0f)
+inline void EulerAngles::Interpolate(EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f)
 {
 	*this = Interpolate(*this, orientTo, rate, epsilon);
 }
 
-inline EulerAngle EulerAngle::Interpolate(EulerAngle orientFrom, EulerAngle orientTo, float rate = 1.0f, float epsilon = 0.0f)
+inline EulerAngles EulerAngles::Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f)
 {
-	return EulerAngle(
-		Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, epsilon),
-		Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, epsilon),
-		Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, epsilon)
+	return EulerAngles(
+		Angle::Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, epsilon),
+		Angle::Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, epsilon),
+		Angle::Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, epsilon)
 	);
 }
 
-inline float EulerAngle::Interpolate(float angleFrom, float angleTo, float rate = 1.0f, float epsilon = 0.0f)
-{
-	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
-
-	if (!Compare(angleFrom, angleTo, epsilon))
-	{
-		float difference = ShortestAngle(angleFrom, angleTo);
-		return Clamp(angleFrom + (difference * rate));
-	}
-	else
-		return Clamp(angleTo);
-}
-
-inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientTo)
+inline EulerAngles EulerAngles::ShortestAngle(EulerAngles orientTo)
 {
 	return (orientTo - *this);
 }
 
-inline EulerAngle EulerAngle::ShortestAngle(EulerAngle orientFrom, EulerAngle orientTo)
+inline EulerAngles EulerAngles::ShortestAngle(EulerAngles orientFrom, EulerAngles orientTo)
 {
 	return (orientTo - orientFrom);
 }
 
-inline float EulerAngle::ShortestAngle(float angleFrom, float angleTo)
-{
-	return Clamp(angleTo - angleFrom);
-}
-
-inline float EulerAngle::AngleBetweenTwoPoints(Vector3 point0, Vector3 point1)
-{
-	auto difference = point0 - point1;
-	return atan2(difference.x, difference.z);
-}
-
-inline float EulerAngle::DeltaHeading(Vector3 origin, Vector3 target, float heading)
-{
-	auto difference = AngleBetweenTwoPoints(origin, target);
-	return ShortestAngle(heading, difference + DegToRad(90.0f));
-}
-
-inline Vector3 EulerAngle::ToVector3()
+inline Vector3 EulerAngles::ToVector3()
 {
 	return Vector3(this->GetX(), this->GetY(), this->GetZ());
 }
 
-inline float EulerAngle::DegToRad(float degrees)
+inline bool EulerAngles::operator ==(EulerAngles orient)
 {
-	return Clamp(degrees * (M_PI / 180.0f));
-}
-
-inline float EulerAngle::RadToDeg(float radians)
-{
-	float degrees = Clamp(radians) * (180.0f / M_PI);
-	return fmod(degrees + 360.0f, 360.0f);
-}
-
-inline float EulerAngle::ShrtToRad(short shortForm)
-{
-	return Clamp(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
-}
-
-inline short EulerAngle::DegToShrt(float degrees)
-{
-	return (degrees * ((USHRT_MAX + 1) / 360.0f));
-}
-
-inline short EulerAngle::RadToShrt(float radians)
-{
-	return ((radians / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
-}
-
-inline bool EulerAngle::operator ==(EulerAngle orient)
-{
-	auto orient1 = Clamp(*this);
-	auto orient2 = Clamp(orient);
+	auto orient1 = Normalize(*this);
+	auto orient2 = Normalize(orient);
 	return (orient1.GetX() == orient2.GetX() && orient1.GetY() == orient2.GetY() && orient1.GetZ() == orient2.GetZ());
 }
 
-inline bool EulerAngle::operator !=(EulerAngle orient)
+inline bool EulerAngles::operator !=(EulerAngles orient)
 {
-	auto orient1 = Clamp(*this);
-	auto orient2 = Clamp(orient);
+	auto orient1 = Normalize(*this);
+	auto orient2 = Normalize(orient);
 	return (orient1.GetX() != orient2.GetX() || orient1.GetY() != orient2.GetY() || orient1.GetZ() != orient2.GetZ());
 }
 
-inline EulerAngle EulerAngle::operator +(EulerAngle orient)
+inline EulerAngles EulerAngles::operator +(EulerAngles orient)
 {
-	return Clamp(EulerAngle(this->GetX() + orient.GetX(), this->GetY() + orient.GetY(), this->GetZ() + orient.GetZ()));
+	return Normalize(EulerAngles(this->GetX() + orient.GetX(), this->GetY() + orient.GetY(), this->GetZ() + orient.GetZ()));
 }
 
-inline EulerAngle EulerAngle::operator -(EulerAngle orient)
+inline EulerAngles EulerAngles::operator -(EulerAngles orient)
 {
-	return Clamp(EulerAngle(this->GetX() - orient.GetX(), this->GetY() - orient.GetY(), this->GetZ() - orient.GetZ()));
+	return Normalize(EulerAngles(this->GetX() - orient.GetX(), this->GetY() - orient.GetY(), this->GetZ() - orient.GetZ()));
 }
 
-inline EulerAngle EulerAngle::operator *(EulerAngle orient)
+inline EulerAngles EulerAngles::operator *(EulerAngles orient)
 {
-	return Clamp(EulerAngle(this->GetX() * orient.GetX(), this->GetY() * orient.GetY(), this->GetZ() * orient.GetZ()));
+	return Normalize(EulerAngles(this->GetX() * orient.GetX(), this->GetY() * orient.GetY(), this->GetZ() * orient.GetZ()));
 }
 
-inline EulerAngle EulerAngle::operator *(float value)
+inline EulerAngles EulerAngles::operator *(float value)
 {
-	return Clamp(EulerAngle(this->GetX() * value, this->GetY() * value, this->GetZ() * value));
+	return Normalize(EulerAngles(this->GetX() * value, this->GetY() * value, this->GetZ() * value));
 }
 
-inline EulerAngle EulerAngle::operator /(float value)
+inline EulerAngles EulerAngles::operator /(float value)
 {
-	return Clamp(EulerAngle(this->GetX() / value, this->GetY() / value, this->GetZ() / value));
+	return Normalize(EulerAngles(this->GetX() / value, this->GetY() / value, this->GetZ() / value));
 }
 
-inline EulerAngle& EulerAngle::operator +=(EulerAngle orient)
-{
-	this->Set(*this + orient);
-	return *this;
-}
-
-inline EulerAngle& EulerAngle::operator -=(EulerAngle orient)
+inline EulerAngles& EulerAngles::operator +=(EulerAngles orient)
 {
 	this->Set(*this + orient);
 	return *this;
 }
 
-inline EulerAngle& EulerAngle::operator *=(EulerAngle orient)
+inline EulerAngles& EulerAngles::operator -=(EulerAngles orient)
+{
+	this->Set(*this + orient);
+	return *this;
+}
+
+inline EulerAngles& EulerAngles::operator *=(EulerAngles orient)
 {
 	this->Set(*this * orient);
 	return *this;
 }
 
-inline EulerAngle& EulerAngle::operator *=(float value)
+inline EulerAngles& EulerAngles::operator *=(float value)
 {
 	this->Set(*this * value);
 	return *this;
 }
 
-inline EulerAngle& EulerAngle::operator /=(float value)
+inline EulerAngles& EulerAngles::operator /=(float value)
 {
 	this->Set(*this / value);
 	return *this;
@@ -633,27 +459,27 @@ struct Vector3Int
 struct PoseData
 {
 	Vector3Int Position;
-	EulerAngle Orientation;
+	EulerAngles Orientation;
 
 	PoseData()
 	{
 		this->Position = Vector3Int();
-		this->Orientation.Set(EulerAngle());
+		this->Orientation.Set(EulerAngles());
 	}
 
 	PoseData(Vector3Int pos)
 	{
 		this->Position = pos;
-		this->Orientation.Set(EulerAngle());
+		this->Orientation.Set(EulerAngles());
 	}
 
 	PoseData(int xPos, int yPos, int zPos)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
-		this->Orientation.Set(EulerAngle());
+		this->Orientation.Set(EulerAngles());
 	}
 
-	PoseData(EulerAngle orient)
+	PoseData(EulerAngles orient)
 	{
 		this->Position = Vector3Int();
 		this->Orientation = orient;
@@ -665,7 +491,7 @@ struct PoseData
 		this->Orientation.Set(xOrient, yOrient, zOrient);
 	}
 
-	PoseData(Vector3Int pos, EulerAngle orient)
+	PoseData(Vector3Int pos, EulerAngles orient)
 	{
 		this->Position = pos;
 		this->Orientation = orient;

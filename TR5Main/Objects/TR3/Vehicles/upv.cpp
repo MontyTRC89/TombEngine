@@ -44,23 +44,23 @@ BITE_INFO UPVBites[6] =
 #define ROT_SLOWACCEL		0x200000
 #define ROT_FRICTION 		0x100000
 #define MAX_ROTATION		0x1c00000
-#define UPDOWN_ACCEL		(EulerAngle::DegToRad(2.0f) * (USHRT_MAX + 1))
-#define UPDOWN_SLOWACCEL	(EulerAngle::DegToRad(1.0f) * (USHRT_MAX + 1))
-#define UPDOWN_FRICTION		(EulerAngle::DegToRad(1.0f) * (USHRT_MAX + 1))
-#define MAX_UPDOWN			(EulerAngle::DegToRad(2.0f) * (USHRT_MAX + 1))
-#define UPDOWN_LIMIT		EulerAngle::DegToRad(80.0f)
+#define UPDOWN_ACCEL		(Angle::DegToRad(2.0f) * (USHRT_MAX + 1))
+#define UPDOWN_SLOWACCEL	(Angle::DegToRad(1.0f) * (USHRT_MAX + 1))
+#define UPDOWN_FRICTION		(Angle::DegToRad(1.0f) * (USHRT_MAX + 1))
+#define MAX_UPDOWN			(Angle::DegToRad(2.0f) * (USHRT_MAX + 1))
+#define UPDOWN_LIMIT		Angle::DegToRad(80.0f)
 #define UPDOWN_SPEED		10
 #define SURFACE_DIST		210
-#define SURFACE_ANGLE		EulerAngle::DegToRad(30.0f)
-#define DIVE_ANGLE			EulerAngle::DegToRad(15.0f)
-#define DIVE_SPEED			EulerAngle::DegToRad(5.0f)
+#define SURFACE_ANGLE		Angle::DegToRad(30.0f)
+#define DIVE_ANGLE			Angle::DegToRad(15.0f)
+#define DIVE_SPEED			Angle::DegToRad(5.0f)
 #define UPV_DRAW_SHIFT		128
 #define UPV_RADIUS			300
 #define UPV_HEIGHT			400
 #define UPV_LENGTH			SECTOR(1)
-#define FRONT_TOLERANCE		(EulerAngle::DegToRad(45.0f) * (USHRT_MAX + 1))
-#define TOP_TOLERANCE		(EulerAngle::DegToRad(45.0f) * (USHRT_MAX + 1))
-#define WALL_DEFLECT		(EulerAngle::DegToRad(2.0f) * (USHRT_MAX + 1))
+#define FRONT_TOLERANCE		(Angle::DegToRad(45.0f) * (USHRT_MAX + 1))
+#define TOP_TOLERANCE		(Angle::DegToRad(45.0f) * (USHRT_MAX + 1))
+#define WALL_DEFLECT		(Angle::DegToRad(2.0f) * (USHRT_MAX + 1))
 #define DISMOUNT_DISTANCE 	SECTOR(1)
 #define HARPOON_VELOCITY	CLICK(1)
 #define HARPOON_RELOAD		15
@@ -244,7 +244,7 @@ void UPVEffects(short itemNumber)
 	if (lara->Vehicle == itemNumber)
 	{
 		if (!UPV->Velocity)
-			UPV->FanRot += EulerAngle::DegToRad(2.0f);
+			UPV->FanRot += Angle::DegToRad(2.0f);
 		else
 			UPV->FanRot += UPV->Velocity / 4069;
 
@@ -253,7 +253,7 @@ void UPVEffects(short itemNumber)
 			pos = { UPVBites[UPV_FAN].x, UPVBites[UPV_FAN].y, UPVBites[UPV_FAN].z };
 			GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_FAN].meshNum);
 
-			TriggerUPVMist(pos.x, pos.y + UPV_DRAW_SHIFT, pos.z, abs(UPV->Velocity) / (USHRT_MAX + 1), UPVItem->Pose.Orientation.y + EulerAngle::DegToRad(180.0f));
+			TriggerUPVMist(pos.x, pos.y + UPV_DRAW_SHIFT, pos.z, abs(UPV->Velocity) / (USHRT_MAX + 1), UPVItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
 
 			if ((GetRandomControl() & 1) == 0)
 			{
@@ -306,7 +306,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (lara->WaterCurrentPull.x || lara->WaterCurrentPull.z)
 		return false;
 
-	short moveAngle = UPVItem->Pose.Orientation.y + EulerAngle::DegToRad(180.0f);
+	short moveAngle = UPVItem->Pose.Orientation.y + Angle::DegToRad(180.0f);
 	int velocity = DISMOUNT_DISTANCE * cos(UPVItem->Pose.Orientation.x);
 	int x = UPVItem->Pose.Position.x + velocity * sin(moveAngle);
 	int z = UPVItem->Pose.Position.z + velocity * cos(moveAngle);
@@ -345,7 +345,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		return false;
 
 	short deltaAngle = abs(laraItem->Pose.Orientation.y - UPVItem->Pose.Orientation.y);
-	if (deltaAngle > EulerAngle::DegToRad(35.0f) || deltaAngle < EulerAngle::DegToRad(-35.0f))
+	if (deltaAngle > Angle::DegToRad(35.0f) || deltaAngle < Angle::DegToRad(-35.0f))
 		return false;
 
 	if (GetCollision(UPVItem).Position.Floor < -32000)
@@ -398,7 +398,7 @@ static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		target.y = g_Level.Sinks[sinkVal].y;
 		target.z = g_Level.Sinks[sinkVal].z;
 		
-		int angle = 0;// ((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - EulerAngle::DegToRad(90.0f)) / 16) & 4095;
+		int angle = 0;// ((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - Angle::DegToRad(90.0f)) / 16) & 4095;
 
 		int dx = target.x - laraItem->Pose.Position.x;
 		int dz = target.z - laraItem->Pose.Position.z;
@@ -448,7 +448,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	}
 	else
 	{
-		lara->Control.MoveAngle = UPVItem->Pose.Orientation.y - EulerAngle::DegToRad(180.0f);
+		lara->Control.MoveAngle = UPVItem->Pose.Orientation.y - Angle::DegToRad(180.0f);
 		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	}
 
@@ -489,9 +489,9 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	else if (coll->CollisionType == CT_TOP_FRONT)
 		UPV->Velocity = 0;
 	else if (coll->CollisionType == CT_LEFT)
-		UPVItem->Pose.Orientation.y += EulerAngle::DegToRad(5.0f);
+		UPVItem->Pose.Orientation.y += Angle::DegToRad(5.0f);
 	else if (coll->CollisionType == CT_RIGHT)
-		UPVItem->Pose.Orientation.y -= EulerAngle::DegToRad(5.0f);
+		UPVItem->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 	else if (coll->CollisionType == CT_CLAMP)
 	{
 		UPVItem->Pose.Position.x = coll->Setup.OldPosition.x;
@@ -540,17 +540,17 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 
 			if (xa > 0)
 			{
-				if (xa > EulerAngle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x -= EulerAngle::DegToRad(1.0f);
+				if (xa > Angle::DegToRad(1.0f))
+					UPVItem->Pose.Orientation.x -= Angle::DegToRad(1.0f);
 				else
-					UPVItem->Pose.Orientation.x -= EulerAngle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.x -= Angle::DegToRad(0.1f);
 			}
 			else if (ax)
 			{
-				if (ax > EulerAngle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x += EulerAngle::DegToRad(1.0f);
+				if (ax > Angle::DegToRad(1.0f))
+					UPVItem->Pose.Orientation.x += Angle::DegToRad(1.0f);
 				else
-					UPVItem->Pose.Orientation.x += EulerAngle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.x += Angle::DegToRad(0.1f);
 			}
 			else
 				UPVItem->Pose.Orientation.x = SURFACE_ANGLE;
@@ -598,17 +598,17 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 			int ax = SURFACE_ANGLE - UPVItem->Pose.Orientation.x;
 			if (xa > 0)
 			{
-				if (xa > EulerAngle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x -= EulerAngle::DegToRad(1.0f);
+				if (xa > Angle::DegToRad(1.0f))
+					UPVItem->Pose.Orientation.x -= Angle::DegToRad(1.0f);
 				else
-					UPVItem->Pose.Orientation.x -= EulerAngle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.x -= Angle::DegToRad(0.1f);
 			}
 			else if (ax)
 			{
-				if (ax > EulerAngle::DegToRad(1.0f))
-					UPVItem->Pose.Orientation.x += EulerAngle::DegToRad(1.0f);
+				if (ax > Angle::DegToRad(1.0f))
+					UPVItem->Pose.Orientation.x += Angle::DegToRad(1.0f);
 				else
-					UPVItem->Pose.Orientation.x += EulerAngle::DegToRad(0.1f);
+					UPVItem->Pose.Orientation.x += Angle::DegToRad(0.1f);
 			}
 			else
 				UPVItem->Pose.Orientation.x = SURFACE_ANGLE;
@@ -657,7 +657,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		if (anim == UPV_ANIM_MOUNT_SURFACE_END)
 		{
 			UPVItem->Pose.Position.y += 4;
-			UPVItem->Pose.Orientation.x += EulerAngle::DegToRad(1.0f);
+			UPVItem->Pose.Orientation.x += Angle::DegToRad(1.0f);
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
 				SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, 2);
@@ -1058,7 +1058,7 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
 		if (UPV->Flags & UPV_SURFACE)
-			Camera.targetElevation = EulerAngle::DegToRad(-60.0f);
+			Camera.targetElevation = Angle::DegToRad(-60.0f);
 		else
 			Camera.targetElevation = 0;
 

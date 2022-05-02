@@ -229,7 +229,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 					{
 						BinocularRange = 0;
 						LaserSight = false;
-						AlterFOV(EulerAngle::DegToRad(80));
+						AlterFOV(Angle::DegToRad(80));
 						LaraItem->MeshBits = 0xFFFFFFFF;
 						Lara.Inventory.IsBusy = false;
 						Camera.type = BinocularOldCamera;

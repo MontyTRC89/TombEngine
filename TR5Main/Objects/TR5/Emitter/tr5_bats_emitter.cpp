@@ -20,11 +20,11 @@ void InitialiseLittleBats(short itemNumber)
 
 	if (item->Pose.Orientation.y == 0)
 		item->Pose.Position.z += CLICK(2);
-	else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 		item->Pose.Position.z -= CLICK(2);
-	else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 		item->Pose.Position.x -= CLICK(2);
-	else if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
+	else if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 		item->Pose.Position.x += CLICK(2);
 
 	if (Objects[ID_BATS_EMITTER].loaded)
@@ -91,7 +91,7 @@ void TriggerLittleBat(ITEM_INFO* item)
 		bat->Pose.Position.x = item->Pose.Position.x;
 		bat->Pose.Position.y = item->Pose.Position.y;
 		bat->Pose.Position.z = item->Pose.Position.z;
-		bat->Pose.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f) - 1024;
+		bat->Pose.Orientation.y = (GetRandomControl() & 0x7FF) + item->Pose.Orientation.y + Angle::DegToRad(-180.0f) - 1024;
 		bat->On = true;
 		bat->Flags = 0;
 		bat->Pose.Orientation.x = (GetRandomControl() & 0x3FF) - 512;

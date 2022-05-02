@@ -143,7 +143,7 @@ bool TargetVisible(ITEM_INFO* item, AI_INFO* AI)
 	if (enemy != NULL)
 	{
 		short angle = AI->angle - creature->JointRotation[2];
-		if (enemy->HitPoints != 0 && angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(45.0f) && AI->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
+		if (enemy->HitPoints != 0 && angle > Angle::DegToRad(-45.0f) && angle < Angle::DegToRad(45.0f) && AI->distance < pow(MAX_VISIBILITY_DISTANCE, 2))
 		{
 			GameVector start;
 			start.x = item->Pose.Position.x;

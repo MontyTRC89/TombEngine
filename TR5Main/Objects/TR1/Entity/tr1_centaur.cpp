@@ -21,7 +21,7 @@ BITE_INFO CentaurRearBite = { 50, 30, 0, 5 };
 
 #define BOMB_SPEED 256
 #define CENTAUR_TOUCH 0x30199
-#define CENTAUR_TURN EulerAngle::DegToRad(4.0f)
+#define CENTAUR_TURN Angle::DegToRad(4.0f)
 #define CENTAUR_REAR_CHANCE 0x60
 #define CENTAUR_REAR_RANGE pow(SECTOR(1.5f), 2)
 #define FLYER_PART_DAMAGE 100
@@ -51,12 +51,12 @@ void ControlCentaurBomb(short itemNumber)
 	bool aboveWater = false;
 	auto oldPos = item->Pose.Position;
 
-	item->Pose.Orientation.z += EulerAngle::DegToRad(35.0f);
+	item->Pose.Orientation.z += Angle::DegToRad(35.0f);
 	if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 	{
-		item->Pose.Orientation.x -= EulerAngle::DegToRad(1.0f);
-		if (item->Pose.Orientation.x < EulerAngle::DegToRad(-90.0f))
-			item->Pose.Orientation.x = EulerAngle::DegToRad(-90.0f);
+		item->Pose.Orientation.x -= Angle::DegToRad(1.0f);
+		if (item->Pose.Orientation.x < Angle::DegToRad(-90.0f))
+			item->Pose.Orientation.x = Angle::DegToRad(-90.0f);
 
 		aboveWater = true;
 		item->Animation.Velocity = BOMB_SPEED * cos(item->Pose.Orientation.x);
@@ -69,12 +69,12 @@ void ControlCentaurBomb(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * EulerAngle::DegToRad(1.0f);
+			item->Pose.Orientation.z += ((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f);
 
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
 			else
-				item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
 
 		}
 	}

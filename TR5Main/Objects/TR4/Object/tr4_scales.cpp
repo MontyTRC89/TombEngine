@@ -20,9 +20,9 @@ OBJECT_COLLISION_BOUNDS ScalesBounds =
 	-1408, -1408,
 	0, 0,
 	-512, 512,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 void ScalesControl(short itemNumber)
@@ -117,7 +117,7 @@ void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		else
 		{
 			float rotY = item->Pose.Orientation.y;
-			item->Pose.Orientation.y = EulerAngle::ShrtToRad((EulerAngle::RadToShrt(laraItem->Pose.Orientation.y + EulerAngle::DegToRad(45.0f)) & EulerAngle::DegToShrt(270.0f)));
+			item->Pose.Orientation.y = Angle::ShrtToRad((Angle::RadToShrt(laraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) & Angle::DegToShrt(270.0f)));
 
 			ScalesBounds.boundingBox.X1 = -1408;
 			ScalesBounds.boundingBox.X2 = -640;

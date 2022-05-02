@@ -17,9 +17,9 @@ namespace TEN::Entities::Switches
 		-384, 384,
 		0, 256,
 		0, 512,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	Vector3Int FullBlockSwitchPos = { 0, 0, 0 };

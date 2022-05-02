@@ -193,26 +193,26 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 		{
 			if (!rotate)
 			{
-				angle1 = kayakItem->Pose.Orientation.y - EulerAngle::DegToRad(10.0f);
-				angle2 = kayakItem->Pose.Orientation.y - EulerAngle::DegToRad(30.0f);
+				angle1 = kayakItem->Pose.Orientation.y - Angle::DegToRad(10.0f);
+				angle2 = kayakItem->Pose.Orientation.y - Angle::DegToRad(30.0f);
 			}
 			else
 			{
-				angle1 = kayakItem->Pose.Orientation.y + EulerAngle::DegToRad(10.0f);
-				angle2 = kayakItem->Pose.Orientation.y + EulerAngle::DegToRad(30.0f);
+				angle1 = kayakItem->Pose.Orientation.y + Angle::DegToRad(10.0f);
+				angle2 = kayakItem->Pose.Orientation.y + Angle::DegToRad(30.0f);
 			}
 		}
 		else
 		{
 			if (!rotate)
 			{
-				angle1 = kayakItem->Pose.Orientation.y - EulerAngle::DegToRad(170.0f);
-				angle2 = kayakItem->Pose.Orientation.y - EulerAngle::DegToRad(150.0f);
+				angle1 = kayakItem->Pose.Orientation.y - Angle::DegToRad(170.0f);
+				angle2 = kayakItem->Pose.Orientation.y - Angle::DegToRad(150.0f);
 			}
 			else
 			{
-				angle1 = kayakItem->Pose.Orientation.y + EulerAngle::DegToRad(170.0f);
-				angle2 = kayakItem->Pose.Orientation.y + EulerAngle::DegToRad(150.0f);
+				angle1 = kayakItem->Pose.Orientation.y + Angle::DegToRad(170.0f);
+				angle2 = kayakItem->Pose.Orientation.y + Angle::DegToRad(150.0f);
 			}
 		}
 
@@ -297,16 +297,16 @@ KayakMountType KayakGetMountType(ITEM_INFO* laraItem, short itemNumber)
 		angle -= kayakItem->Pose.Orientation.y;
 
 		float deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-		if (angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
+		if (angle > Angle::DegToRad(-45.0f) && angle < Angle::DegToRad(135.0f))
 		{
 			deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-			if (deltaAngle > EulerAngle::DegToRad(45.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
+			if (deltaAngle > Angle::DegToRad(45.0f) && deltaAngle < Angle::DegToRad(135.0f))
 				return KayakMountType::Left;
 		}
 		else
 		{
 			deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-			if (deltaAngle > EulerAngle::DegToRad(225.0f) && deltaAngle < EulerAngle::DegToRad(315.0f))
+			if (deltaAngle > Angle::DegToRad(225.0f) && deltaAngle < Angle::DegToRad(315.0f))
 				return KayakMountType::Right;
 		}
 	}
@@ -418,7 +418,7 @@ void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 		int sinkval = lara->WaterCurrentActive - 1;
 		
 		auto target = Vector3Int(g_Level.Sinks[sinkval].x, g_Level.Sinks[sinkval].y, g_Level.Sinks[sinkval].z);
-		int angle = 0;// (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - EulerAngle::DegToRad(90.0f))) / 16) & 4095;
+		int angle = 0;// (((mGetAngle(target.x, target.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - Angle::DegToRad(90.0f))) / 16) & 4095;
 
 		int dx = target.x - laraItem->Pose.Position.x;
 		int dz = target.z - laraItem->Pose.Position.z;
@@ -1057,7 +1057,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			SetAnimation(laraItem, LA_JUMP_FORWARD);
 			laraItem->Pose.Position = vec;
 			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - Angle::DegToRad(90.0f);
 			laraItem->Pose.Orientation.z = 0;
 			laraItem->Animation.Airborne = true;
 			laraItem->Animation.Velocity = 40;
@@ -1079,7 +1079,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 			SetAnimation(laraItem, LA_JUMP_FORWARD);
 			laraItem->Pose.Position = vec;
 			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
 			laraItem->Pose.Orientation.z = 0;
 			laraItem->Animation.Airborne = true;
 			laraItem->Animation.Velocity = 40;
@@ -1304,7 +1304,7 @@ bool KayakControl(ITEM_INFO* laraItem)
 		kayakItem->Animation.AnimNumber = Objects[ID_KAYAK].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_KAYAK_LARA_ANIMS].animIndex);
 		kayakItem->Animation.FrameNumber = g_Level.Anims[kayakItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
-		Camera.targetElevation = EulerAngle::DegToRad(-30.0f);
+		Camera.targetElevation = Angle::DegToRad(-30.0f);
 		Camera.targetDistance = CLICK(8);
 	}
 

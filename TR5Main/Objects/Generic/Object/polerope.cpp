@@ -23,9 +23,9 @@ namespace TEN::Entities::Generic
 		-256, 256, 
 		0, 0, 
 		-512, 512, 
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	void PoleCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)

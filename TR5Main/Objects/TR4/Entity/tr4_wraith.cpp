@@ -289,7 +289,7 @@ namespace TEN::Entities::TR4
 			probe.Position.Ceiling > item->Pose.Position.y)
 		{
 			if (!hitWall)
-				WraithWallsEffect(oldPos, item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f), item->ObjectNumber);
+				WraithWallsEffect(oldPos, item->Pose.Orientation.y + Angle::DegToRad(-180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
 			WraithWallsEffect(item->Pose.Position, item->Pose.Orientation.y, item->ObjectNumber);
@@ -373,9 +373,9 @@ namespace TEN::Entities::TR4
 		item->Pose.Position.y -= 384;
 
 		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, 0, 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngle::DegToRad(45.0f), 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngle::DegToRad(90.0f), 0);
-		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, EulerAngle::DegToRad(135.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, Angle::DegToRad(45.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, Angle::DegToRad(90.0f), 0);
+		TriggerShockwave(&item->Pose, inner, outer, speed, r, g, b, 24, Angle::DegToRad(135.0f), 0);
 
 		item->Pose.Position.y += 384;
 	}
@@ -491,7 +491,7 @@ namespace TEN::Entities::TR4
 			spark->x = (GetRandomControl() & 0x1F) + pos.x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + pos.y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + pos.z - 16;
-			short rot = yRot + GetRandomControl() - EulerAngle::DegToRad(90.0f);
+			short rot = yRot + GetRandomControl() - Angle::DegToRad(90.0f);
 			short velocity = ((GetRandomControl() & 0x3FF) + 1024);
 			spark->xVel = velocity * sin(rot);
 			spark->yVel = (GetRandomControl() & 0x7F) - 64;

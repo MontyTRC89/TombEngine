@@ -48,9 +48,9 @@ namespace TEN::Entities::Effects
 		0, 0, 
 		0, 0, 
 		0, 0, 
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	bool FlameEmitterFlags[8];
@@ -211,8 +211,8 @@ namespace TEN::Entities::Effects
 
 				if (item->TriggerFlags == 2)
 				{
-					item->Pose.Position.x += sin(item->Pose.Orientation.y - EulerAngle::DegToRad(180));
-					item->Pose.Position.z += cos(item->Pose.Orientation.y - EulerAngle::DegToRad(180));
+					item->Pose.Position.x += sin(item->Pose.Orientation.y - Angle::DegToRad(180));
+					item->Pose.Position.z += cos(item->Pose.Orientation.y - Angle::DegToRad(180));
 
 					short roomNumber = item->RoomNumber;
 					FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -472,9 +472,9 @@ namespace TEN::Entities::Effects
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(180));
+						dest.x = item->Pose.Position.x + 2048 * sin(item->Pose.Orientation.y + Angle::DegToRad(180));
 						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(180));
+						dest.z = item->Pose.Position.z + 2048 * cos(item->Pose.Orientation.y + Angle::DegToRad(180));
 
 						if (GetRandomControl() & 3)
 						{

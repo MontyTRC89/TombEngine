@@ -138,9 +138,9 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_STATE_WALK:
-		creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+		creature->MaxTurn = Angle::DegToRad(3.0f);
 
-		if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= EulerAngle::DegToRad(2.8f) || item->Animation.RequiredState == SPHINX_STATE_RUN)
+		if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= Angle::DegToRad(2.8f) || item->Animation.RequiredState == SPHINX_STATE_RUN)
 			item->Animation.TargetState = SPHINX_STATE_RUN;
 		else if (AI.distance < pow(SECTOR(2), 2) && item->Animation.TargetState != SPHINX_STATE_RUN)
 		{
@@ -177,7 +177,7 @@ void SphinxControl(short itemNumber)
 		if (dx >= 50 || dz >= 50 ||
 			item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex)
 		{
-			if (AI.distance > pow(SECTOR(2), 2) && abs(AI.angle) > EulerAngle::DegToRad(2.8f))
+			if (AI.distance > pow(SECTOR(2), 2) && abs(AI.angle) > Angle::DegToRad(2.8f))
 				item->Animation.TargetState = SPHINX_STATE_IDLE;
 		}
 		else
@@ -190,7 +190,7 @@ void SphinxControl(short itemNumber)
 		break;
 
 	case SPHINX_STATE_WALK_BACK:
-		creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+		creature->MaxTurn = Angle::DegToRad(3.0f);
 
 		if (AI.distance > pow(SECTOR(2), 2) ||
 			height2 > (item->Pose.Position.y + CLICK(1)) ||

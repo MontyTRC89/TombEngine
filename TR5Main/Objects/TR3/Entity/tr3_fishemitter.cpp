@@ -109,45 +109,45 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].Angle = fish->Angle = EulerAngle::ShrtToRad(((-(EulerAngle::RadToShrt(mGetAngle(fish->Offset.x + item->Pose.Position.x, fish->Offset.z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z)) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095); // TODO
+		LeaderInfo[leader].Angle = fish->Angle = Angle::ShrtToRad(((-(Angle::RadToShrt(mGetAngle(fish->Offset.x + item->Pose.Position.x, fish->Offset.z + item->Pose.Position.z, enemy->Pose.Position.x, enemy->Pose.Position.z)) + Angle::DegToShrt(90.0f))) / 16) & 4095); // TODO
 		LeaderInfo[leader].Velocity = (GetRandomControl() & 63) + 192;
 	}
 
-	float deltaAngle = EulerAngle::ShortestAngle(fish->Angle, LeaderInfo[leader].Angle);
+	float deltaAngle = Angle::ShortestAngle(fish->Angle, LeaderInfo[leader].Angle);
 
-	if (deltaAngle > EulerAngle::DegToRad(11.35f))
-		deltaAngle -= EulerAngle::DegToRad(22.5f);
-	else if (deltaAngle < EulerAngle::DegToRad(-11.35f))
-		deltaAngle += EulerAngle::DegToRad(22.5f);
+	if (deltaAngle > Angle::DegToRad(11.35f))
+		deltaAngle -= Angle::DegToRad(22.5f);
+	else if (deltaAngle < Angle::DegToRad(-11.35f))
+		deltaAngle += Angle::DegToRad(22.5f);
 
-	if (deltaAngle > EulerAngle::DegToRad(0.7f))
+	if (deltaAngle > Angle::DegToRad(0.7f))
 	{
-		fish->AngleAdd -= EulerAngle::DegToRad(0.02f);
-		if (fish->AngleAdd < EulerAngle::DegToRad(-0.7f))
-			fish->AngleAdd = EulerAngle::DegToRad(-0.7f);
+		fish->AngleAdd -= Angle::DegToRad(0.02f);
+		if (fish->AngleAdd < Angle::DegToRad(-0.7f))
+			fish->AngleAdd = Angle::DegToRad(-0.7f);
 	}
-	else if (deltaAngle < -EulerAngle::DegToRad(-0.7f))
+	else if (deltaAngle < -Angle::DegToRad(-0.7f))
 	{
-		fish->AngleAdd += EulerAngle::DegToRad(0.02f);
-		if (fish->AngleAdd > EulerAngle::DegToRad(0.7f))
-			fish->AngleAdd = EulerAngle::DegToRad(0.7f);
+		fish->AngleAdd += Angle::DegToRad(0.02f);
+		if (fish->AngleAdd > Angle::DegToRad(0.7f))
+			fish->AngleAdd = Angle::DegToRad(0.7f);
 	}
 	else
 	{
 		fish->AngleAdd -= fish->AngleAdd / 4;
-		if (abs(fish->AngleAdd) < EulerAngle::DegToRad(0.02f))
+		if (abs(fish->AngleAdd) < Angle::DegToRad(0.02f))
 			fish->AngleAdd = 0;
 	}
 
 	fish->Angle += fish->AngleAdd;
 
-	if (deltaAngle > EulerAngle::DegToRad(5.6f))
+	if (deltaAngle > Angle::DegToRad(5.6f))
 		fish->Angle += fish->AngleAdd / 4;
-	fish->Angle = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(fish->Angle) & 4095); // TODO
+	fish->Angle = Angle::ShrtToRad(Angle::RadToShrt(fish->Angle) & 4095); // TODO
 
 	deltaAngle = fish->Velocity - LeaderInfo[leader].Velocity;
 
-	if (deltaAngle < EulerAngle::DegToRad(-0.02f))
+	if (deltaAngle < Angle::DegToRad(-0.02f))
 	{
 		deltaAngle = fish->Velocity + (GetRandomControl() & 3) + 1;
 		if (deltaAngle < 0)
@@ -155,11 +155,11 @@ void ControlFish(short itemNumber)
 
 		fish->Velocity = deltaAngle;
 	}
-	else if (deltaAngle > EulerAngle::DegToRad(0.02f))
+	else if (deltaAngle > Angle::DegToRad(0.02f))
 	{
 		deltaAngle = fish->Velocity - (GetRandomControl() & 3) - 1;
-		if (deltaAngle > EulerAngle::DegToRad(1.4f))
-			deltaAngle = EulerAngle::DegToRad(1.4f);
+		if (deltaAngle > Angle::DegToRad(1.4f))
+			deltaAngle = Angle::DegToRad(1.4f);
 
 		fish->Velocity = deltaAngle;
 	}
@@ -182,10 +182,10 @@ void ControlFish(short itemNumber)
 		{
 			z = -fishZRange;
 
-			if (fish->Angle < EulerAngle::DegToRad(11.25f))
-				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+			if (fish->Angle < Angle::DegToRad(11.25f))
+				LeaderInfo[leader].Angle = fish->Angle - Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+				LeaderInfo[leader].Angle = fish->Angle + Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
 			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].VelocityTime = 0;
@@ -194,10 +194,10 @@ void ControlFish(short itemNumber)
 		{
 			z = fishZRange;
 
-			if (fish->Angle > EulerAngle::DegToRad(16.9f))
-				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+			if (fish->Angle > Angle::DegToRad(16.9f))
+				LeaderInfo[leader].Angle = fish->Angle - Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+				LeaderInfo[leader].Angle = fish->Angle + Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
 			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].VelocityTime = 0;
@@ -207,10 +207,10 @@ void ControlFish(short itemNumber)
 		{
 			x = -fishXRange;
 
-			if (fish->Angle < EulerAngle::DegToRad(5.6f))
-				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+			if (fish->Angle < Angle::DegToRad(5.6f))
+				LeaderInfo[leader].Angle = fish->Angle - Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+				LeaderInfo[leader].Angle = fish->Angle + Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
 			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].VelocityTime = 0;
@@ -219,10 +219,10 @@ void ControlFish(short itemNumber)
 		{
 			x = fishXRange;
 
-			if (fish->Angle < EulerAngle::DegToRad(16.9f))
-				LeaderInfo[leader].Angle = fish->Angle - EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+			if (fish->Angle < Angle::DegToRad(16.9f))
+				LeaderInfo[leader].Angle = fish->Angle - Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 			else
-				LeaderInfo[leader].Angle = fish->Angle + EulerAngle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
+				LeaderInfo[leader].Angle = fish->Angle + Angle::ShrtToRad(((GetRandomControl() & 127) + 128)); // TODO
 
 			LeaderInfo[leader].AngleTime = (GetRandomControl() & 15) + 8;
 			LeaderInfo[leader].VelocityTime = 0;
@@ -243,7 +243,7 @@ void ControlFish(short itemNumber)
 			else
 				LeaderInfo[leader].Angle += AngleAdd;
 
-			LeaderInfo[leader].Angle = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(LeaderInfo[leader].Angle) & 4095);
+			LeaderInfo[leader].Angle = Angle::ShrtToRad(Angle::RadToShrt(LeaderInfo[leader].Angle) & 4095);
 		}
 
 		if (LeaderInfo[leader].VelocityTime)
@@ -295,7 +295,7 @@ void ControlFish(short itemNumber)
 			}
 		}
 
-		angle = EulerAngle::ShrtToRad(((-(EulerAngle::RadToShrt(mGetAngle(fish->Offset.x, fish->Offset.z, ftx, ftz)) + EulerAngle::DegToShrt(90.0f))) / 16) & 4095);
+		angle = Angle::ShrtToRad(((-(Angle::RadToShrt(mGetAngle(fish->Offset.x, fish->Offset.z, ftx, ftz)) + Angle::DegToShrt(90.0f))) / 16) & 4095);
 		int dx = fish->Offset.x - ftx + ((24 - i) * CLICK(0.5f));
 		int dz = fish->Offset.z - ftz - ((24 - i) * CLICK(0.5f));
 
@@ -304,35 +304,35 @@ void ControlFish(short itemNumber)
 
 		deltaAngle = fish->Angle - angle;
 
-		if (deltaAngle > EulerAngle::DegToRad(11.25f))
-			deltaAngle -= EulerAngle::DegToRad(22.5f);
-		else if (deltaAngle < EulerAngle::DegToRad(-11.25f))
-			deltaAngle += EulerAngle::DegToRad(22.5f);
+		if (deltaAngle > Angle::DegToRad(11.25f))
+			deltaAngle -= Angle::DegToRad(22.5f);
+		else if (deltaAngle < Angle::DegToRad(-11.25f))
+			deltaAngle += Angle::DegToRad(22.5f);
 
-		if (deltaAngle > EulerAngle::DegToRad(0.7f))
+		if (deltaAngle > Angle::DegToRad(0.7f))
 		{
-			fish->AngleAdd -= EulerAngle::DegToRad(0.02f);
-			if (fish->AngleAdd < EulerAngle::ShrtToRad(-92 - (i / 2))) // TODO
-				fish->AngleAdd = EulerAngle::ShrtToRad(-92 - (i / 2));
+			fish->AngleAdd -= Angle::DegToRad(0.02f);
+			if (fish->AngleAdd < Angle::ShrtToRad(-92 - (i / 2))) // TODO
+				fish->AngleAdd = Angle::ShrtToRad(-92 - (i / 2));
 		}
-		else if (deltaAngle < EulerAngle::DegToRad(-0.7f))
+		else if (deltaAngle < Angle::DegToRad(-0.7f))
 		{
-			fish->AngleAdd += EulerAngle::DegToRad(0.02f);
-			if (fish->AngleAdd > EulerAngle::ShrtToRad(92 + (i / 2))) // TODO
-				fish->AngleAdd = EulerAngle::ShrtToRad(92 + (i / 2));
+			fish->AngleAdd += Angle::DegToRad(0.02f);
+			if (fish->AngleAdd > Angle::ShrtToRad(92 + (i / 2))) // TODO
+				fish->AngleAdd = Angle::ShrtToRad(92 + (i / 2));
 		}
 		else
 		{
 			fish->AngleAdd -= fish->AngleAdd / 4;
-			if (abs(fish->AngleAdd) < EulerAngle::DegToRad(0.02f))
+			if (abs(fish->AngleAdd) < Angle::DegToRad(0.02f))
 				fish->AngleAdd = 0;
 		}
 
 		fish->Angle += fish->AngleAdd;
 
-		if (deltaAngle > EulerAngle::DegToRad(5.6f))
+		if (deltaAngle > Angle::DegToRad(5.6f))
 			fish->Angle += fish->AngleAdd / 4;
-		fish->Angle = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(fish->Angle) & 4095);
+		fish->Angle = Angle::ShrtToRad(Angle::RadToShrt(fish->Angle) & 4095);
 
 		if ((dx + dz) < (0x100000 + ((i * 128) * (i * 128))))
 		{

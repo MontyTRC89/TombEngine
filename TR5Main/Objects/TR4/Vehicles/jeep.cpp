@@ -399,7 +399,7 @@ static int JeepCheckGetOff()
 	{
 		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd)
 		{
-			LaraItem->Pose.Orientation.y += EulerAngle::DegToRad(90);
+			LaraItem->Pose.Orientation.y += Angle::DegToRad(90);
 			LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 			LaraItem->Animation.TargetState = LS_IDLE;
@@ -453,10 +453,10 @@ static int GetOnJeep(int itemNumber)
 	short angle = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
 	angle -= item->Pose.Orientation.y;
 
-	if ((angle > EulerAngle::DegToRad(-45)) && (angle < EulerAngle::DegToRad(135)))
+	if ((angle > Angle::DegToRad(-45)) && (angle < Angle::DegToRad(135)))
 	{
 		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.y;
-		if (tempAngle > EulerAngle::DegToRad(45) && tempAngle < EulerAngle::DegToRad(135))
+		if (tempAngle > Angle::DegToRad(45) && tempAngle < Angle::DegToRad(135))
 		{
 			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
@@ -477,7 +477,7 @@ static int GetOnJeep(int itemNumber)
 	else
 	{
 		int tempAngle = LaraItem->Pose.Orientation.y - item->Pose.Orientation.y;
-		if (tempAngle > EulerAngle::DegToRad(225) && tempAngle < EulerAngle::DegToRad(315))
+		if (tempAngle > Angle::DegToRad(225) && tempAngle < Angle::DegToRad(315))
 		{
 			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
@@ -675,10 +675,10 @@ int JeepDynamics(ITEM_INFO* item)
 		short rot2 = 0;
 		short momentum = 0;
 
-		if (jeep->jeepTurn < EulerAngle::DegToRad(-1))
-			jeep->jeepTurn += EulerAngle::DegToRad(1);
-		else if (jeep->jeepTurn > EulerAngle::DegToRad(1))
-			jeep->jeepTurn -= EulerAngle::DegToRad(1);
+		if (jeep->jeepTurn < Angle::DegToRad(-1))
+			jeep->jeepTurn += Angle::DegToRad(1);
+		else if (jeep->jeepTurn > Angle::DegToRad(1))
+			jeep->jeepTurn -= Angle::DegToRad(1);
 		else
 			jeep->jeepTurn = 0;
 
@@ -764,13 +764,13 @@ int JeepDynamics(ITEM_INFO* item)
 
 			if (slip >= 0)
 			{
-				item->Pose.Position.x += (slip - 24) * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(90));
-				item->Pose.Position.z += (slip - 24) * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(90));
+				item->Pose.Position.x += (slip - 24) * sin(item->Pose.Orientation.y + Angle::DegToRad(90));
+				item->Pose.Position.z += (slip - 24) * cos(item->Pose.Orientation.y + Angle::DegToRad(90));
 			}
 			else
 			{
-				item->Pose.Position.x += (slip - 24) * sin(item->Pose.Orientation.y - EulerAngle::DegToRad(90));
-				item->Pose.Position.z += (slip - 24) * cos(item->Pose.Orientation.y - EulerAngle::DegToRad(90));
+				item->Pose.Position.x += (slip - 24) * sin(item->Pose.Orientation.y - Angle::DegToRad(90));
+				item->Pose.Position.z += (slip - 24) * cos(item->Pose.Orientation.y - Angle::DegToRad(90));
 			}
 		}
 		else
@@ -905,12 +905,12 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 
 		if (abs(jeep->velocity) <= JEEP_MAX_SPEED / 2)
 		{
-			rot1 = EulerAngle::DegToRad(5) * abs(jeep->velocity) / 16384;
-			rot2 = 60 * abs(jeep->velocity) / 16384 + EulerAngle::DegToRad(1);
+			rot1 = Angle::DegToRad(5) * abs(jeep->velocity) / 16384;
+			rot2 = 60 * abs(jeep->velocity) / 16384 + Angle::DegToRad(1);
 		}
 		else
 		{
-			rot1 = EulerAngle::DegToRad(5);
+			rot1 = Angle::DegToRad(5);
 			rot2 = 242;
 		}
 
@@ -1533,7 +1533,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 			short ang = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
 			ang -= item->Pose.Orientation.y;
 
-			if ((ang > -(EulerAngle::DegToRad(45))) && (ang < (EulerAngle::DegToRad(135))))
+			if ((ang > -(Angle::DegToRad(45))) && (ang < (Angle::DegToRad(135))))
 				LaraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_LEFT;
 			else
 				LaraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_RIGHT;
@@ -1705,7 +1705,7 @@ int JeepControl(void)
 		extraAnim = Objects[ID_JEEP_LARA_ANIMS].animIndex;
 
 
-		Camera.targetElevation = EulerAngle::DegToRad(-30);
+		Camera.targetElevation = Angle::DegToRad(-30);
 		Camera.targetDistance = 2 * WALL_SIZE;
 
 		if (jeep->unknown2)

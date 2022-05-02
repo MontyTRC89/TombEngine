@@ -120,7 +120,7 @@ void GuideControl(short itemNumber)
 	laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 
 	laraAI.ahead = true;
-	if (laraAI.angle <= EulerAngle::DegToRad(-90.0f) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
+	if (laraAI.angle <= Angle::DegToRad(-90.0f) || laraAI.angle >= Angle::DegToRad(90.0f))
 		laraAI.ahead = false;
 
 	int distance = 0;
@@ -329,7 +329,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_WALK:
-		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+		creature->MaxTurn = Angle::DegToRad(7.0f);
 		creature->LOT.IsJumping = false;
 
 		if (laraAI.ahead)
@@ -397,7 +397,7 @@ void GuideControl(short itemNumber)
 		break;
 
 	case GUIDE_STATE_RUN:
-		creature->MaxTurn = EulerAngle::DegToRad(11.0f);
+		creature->MaxTurn = Angle::DegToRad(11.0f);
 		tilt = angle / 2;
 
 		if (AI.ahead)
@@ -542,12 +542,12 @@ void GuideControl(short itemNumber)
 			joint1 = AI.xAngle / 2;
 		}
 
-		if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
+		if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 		{
 			if (AI.angle < 0)
-				item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 			else
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
+				item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
 		}
 		else
 			item->Pose.Orientation.y += AI.angle;
@@ -601,10 +601,10 @@ void GuideControl(short itemNumber)
 		if (enemy)
 		{
 			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.y;
-			if (deltaAngle < EulerAngle::DegToRad(-2.0f))
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
-			else if (deltaAngle > EulerAngle::DegToRad(2.0f))
-				item->Pose.Orientation.y = EulerAngle::DegToRad(2.0f);
+			if (deltaAngle < Angle::DegToRad(-2.0f))
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+			else if (deltaAngle > Angle::DegToRad(2.0f))
+				item->Pose.Orientation.y = Angle::DegToRad(2.0f);
 		}
 
 		if (item->Animation.RequiredState == 43)
@@ -700,13 +700,13 @@ void GuideControl(short itemNumber)
 			}
 			else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
 			{
-				if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= EulerAngle::DegToRad(2.0f))
+				if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= Angle::DegToRad(2.0f))
 				{
-					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < EulerAngle::DegToRad(-2.0f))
-						item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < Angle::DegToRad(-2.0f))
+						item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 				}
 				else
-					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 			}
 		}
 
@@ -735,19 +735,19 @@ void GuideControl(short itemNumber)
 				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose, 0);
 			}
 		}
-		else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= EulerAngle::DegToRad(2.0f))
+		else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= Angle::DegToRad(2.0f))
 		{
-			if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < EulerAngle::DegToRad(-2.0f))
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+			if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < Angle::DegToRad(-2.0f))
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 		}
 		else
-			item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 
 		break;
 
 	case 40:
 		creature->LOT.IsJumping;
-		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+		creature->MaxTurn = Angle::DegToRad(7.0f);
 
 		if (laraAI.ahead)
 		{
@@ -791,7 +791,7 @@ void GuideControl(short itemNumber)
 	case 41:
 	case 42:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, EulerAngle::DegToRad(10.0f));
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, Angle::DegToRad(10.0f));
 
 	default:
 		break;

@@ -462,12 +462,12 @@ namespace TEN::Entities::Generic
 
 		if (Lara.Control.Rope.Direction)
 		{
-			if (item->Pose.Orientation.x > 0 && EulerAngle::Clamp(item->Pose.Orientation.x - Lara.Control.Rope.LastX) < EulerAngle::DegToRad(-0.55))
+			if (item->Pose.Orientation.x > 0 && Angle::Normalize(item->Pose.Orientation.x - Lara.Control.Rope.LastX) < Angle::DegToRad(-0.55))
 			{
 				Lara.Control.Rope.ArcFront = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 0;
 				Lara.Control.Rope.MaxXBackward = 0;
-				int frame = 15 * EulerAngle::RadToShrt(Lara.Control.Rope.MaxXForward) / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+				int frame = 15 * Angle::RadToShrt(Lara.Control.Rope.MaxXForward) / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
 
 				if (frame > Lara.Control.Rope.DFrame)
 				{
@@ -482,7 +482,7 @@ namespace TEN::Entities::Generic
 			else if (Lara.Control.Rope.LastX < 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
 				RopeSwing = 0;
-				Lara.Control.Rope.DFrame = 15 * EulerAngle::RadToShrt(Lara.Control.Rope.MaxXBackward) / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
+				Lara.Control.Rope.DFrame = 15 * Angle::RadToShrt(Lara.Control.Rope.MaxXBackward) / 18000 + g_Level.Anims[LA_ROPE_SWING].frameBase + 47 << 8;
 				Lara.Control.Rope.FrameRate = 15 * Lara.Control.Rope.MaxXBackward / 9000 + 1;
 			}
 			else if (Lara.Control.Rope.FrameRate < 512)
@@ -493,13 +493,13 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			if (item->Pose.Orientation.x < 0 && EulerAngle::Clamp(item->Pose.Orientation.x - Lara.Control.Rope.LastX) < EulerAngle::DegToRad(0.55))
+			if (item->Pose.Orientation.x < 0 && Angle::Normalize(item->Pose.Orientation.x - Lara.Control.Rope.LastX) < Angle::DegToRad(0.55))
 			{
 				Lara.Control.Rope.ArcBack = Lara.Control.Rope.LastX;
 				Lara.Control.Rope.Direction = 1;
 				Lara.Control.Rope.MaxXForward = 0;
 
-				int frame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * EulerAngle::RadToShrt(Lara.Control.Rope.MaxXBackward) / 18000 + 17 << 8; // TODO
+				int frame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Angle::RadToShrt(Lara.Control.Rope.MaxXBackward) / 18000 + 17 << 8; // TODO
 				if (frame < Lara.Control.Rope.DFrame)
 				{
 					Lara.Control.Rope.DFrame = frame;
@@ -513,7 +513,7 @@ namespace TEN::Entities::Generic
 			else if (Lara.Control.Rope.LastX > 0 && Lara.Control.Rope.Frame == Lara.Control.Rope.DFrame)
 			{
 				RopeSwing = 0;
-				Lara.Control.Rope.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * EulerAngle::RadToShrt(Lara.Control.Rope.MaxXForward) / 18000 + 17 << 8;
+				Lara.Control.Rope.DFrame = g_Level.Anims[LA_ROPE_SWING].frameBase - 15 * Angle::RadToShrt(Lara.Control.Rope.MaxXForward) / 18000 + 17 << 8;
 				Lara.Control.Rope.FrameRate = 15 * Lara.Control.Rope.MaxXForward / 9000 + 1;
 			}
 			else if (Lara.Control.Rope.FrameRate < 512)
@@ -594,7 +594,7 @@ namespace TEN::Entities::Generic
 			FallFromRope(item);
 		else
 		{
-			Camera.targetAngle = EulerAngle::DegToRad(30.0f);
+			Camera.targetAngle = Angle::DegToRad(30.0f);
 
 			if (Lara.Control.Rope.Count)
 			{
@@ -642,7 +642,7 @@ namespace TEN::Entities::Generic
 		auto vec = Vector3Int(4096, 0, 0);
 
 		auto* frame = (ANIM_FRAME*)GetBestFrame(item);
-		float ropeY = Lara.Control.Rope.Y - EulerAngle::DegToRad(90.0f);
+		float ropeY = Lara.Control.Rope.Y - Angle::DegToRad(90.0f);
 		auto* rope = &Ropes[Lara.Control.Rope.Ptr];
 
 		Vector3Int pos, pos2;

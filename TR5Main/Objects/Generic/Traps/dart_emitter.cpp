@@ -84,15 +84,15 @@ namespace TEN::Entities::Traps
 				z = WALL_SIZE / 2;
 				break;
 
-			case EulerAngle::DegToRad(90.0f):
+			case Angle::DegToRad(90.0f):
 				x = WALL_SIZE / 2;
 				break;
 
-			case EulerAngle::DegToRad(-180.0f):
+			case Angle::DegToRad(-180.0f):
 				z = -WALL_SIZE / 2;
 				break;
 
-			case EulerAngle::DegToRad(-90.0f):
+			case Angle::DegToRad(-90.0f):
 				x = -WALL_SIZE / 2;
 				break;
 			}*/
@@ -104,7 +104,7 @@ namespace TEN::Entities::Traps
 			InitialiseItem(dartItemNumber);
 
 			dartItem->Pose.Orientation.x = 0;
-			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + EulerAngle::DegToRad(-180);
+			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180);
 			dartItem->Animation.Velocity = 256;
 
 			int xf = 0;

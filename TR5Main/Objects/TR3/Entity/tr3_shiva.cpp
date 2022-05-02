@@ -247,8 +247,8 @@ void ShivaControl(short itemNumber)
 
 			if (shiva->Mood == MoodType::Escape)
 			{
-				int x = item->Pose.Position.x + SECTOR(1) * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f));
-				int z = item->Pose.Position.z + SECTOR(1) * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f));
+				int x = item->Pose.Position.x + SECTOR(1) * sin(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
+				int z = item->Pose.Position.z + SECTOR(1) * cos(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 				auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
 
 				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !shiva->Flags)
@@ -309,7 +309,7 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 1:
-			shiva->MaxTurn = EulerAngle::DegToRad(4.0f);
+			shiva->MaxTurn = Angle::DegToRad(4.0f);
 
 			if (AI.ahead)
 				headY = AI.angle;
@@ -332,7 +332,7 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 3:
-			shiva->MaxTurn = EulerAngle::DegToRad(4.0f);
+			shiva->MaxTurn = Angle::DegToRad(4.0f);
 
 			if (AI.ahead)
 				headY = AI.angle;
@@ -356,7 +356,7 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 8:
-			shiva->MaxTurn = EulerAngle::DegToRad(4.0f);
+			shiva->MaxTurn = Angle::DegToRad(4.0f);
 
 			if (AI.ahead)
 				headY = AI.angle;
@@ -376,7 +376,7 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 5:
-			shiva->MaxTurn = EulerAngle::DegToRad(4.0f);
+			shiva->MaxTurn = Angle::DegToRad(4.0f);
 
 			if (AI.ahead)
 			{
@@ -389,7 +389,7 @@ void ShivaControl(short itemNumber)
 			break;
 
 		case 7:
-			shiva->MaxTurn = EulerAngle::DegToRad(4.0f);
+			shiva->MaxTurn = Angle::DegToRad(4.0f);
 			headY = AI.angle;
 			torsoY = AI.angle;
 

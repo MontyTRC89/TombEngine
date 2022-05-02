@@ -18,9 +18,9 @@ namespace TEN::Entities::Switches
 		-1024, 1024,
 		-1024, 1024,
 		-1024, 512,
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f)
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f),
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f),
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f)
 	};
 	Vector3Int UnderwaterSwitchPos = { 0, 0, 108 };
 
@@ -29,9 +29,9 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		-1280, -512,
 		-512, 0,
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f)
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f),
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f),
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f)
 	};
 	Vector3Int CeilingUnderwaterSwitchPos1 = { 0, -736, -416 };
 
@@ -40,9 +40,9 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		-1280, -512,
 		0, 512,
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f),
-		EulerAngle::DegToRad(-80.0f), EulerAngle::DegToRad(80.0f)
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f),
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f),
+		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f)
 	};
 	Vector3Int CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
 
@@ -119,7 +119,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 
 				if (TestLaraPosition(&CeilingUnderwaterSwitchBounds2, switchItem, laraItem))
 				{
@@ -129,7 +129,7 @@ namespace TEN::Entities::Switches
 						lara->InteractedItem = itemNumber;
 				}
 
-				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 			}
 
 			if (flag)
@@ -143,9 +143,9 @@ namespace TEN::Entities::Switches
 
 				AddActiveItem(itemNumber);
 
-				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * sin(switchItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
+				ForcedFixedCamera.x = switchItem->Pose.Position.x - SECTOR(1) * sin(switchItem->Pose.Orientation.y + Angle::DegToRad(90.0f));
 				ForcedFixedCamera.y = switchItem->Pose.Position.y - SECTOR(1);
-				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * cos(switchItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
+				ForcedFixedCamera.z = switchItem->Pose.Position.z - SECTOR(1) * cos(switchItem->Pose.Orientation.y + Angle::DegToRad(90.0f));
 				ForcedFixedCamera.roomNumber = switchItem->RoomNumber;
 			}
 		}

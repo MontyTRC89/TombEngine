@@ -126,7 +126,7 @@ void WorkerShotgunControl(short itemNumber)
 			break;
 
 		case 1:
-			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+			creature->MaxTurn = Angle::DegToRad(3.0f);
 
 			if (AI.ahead)
 			{

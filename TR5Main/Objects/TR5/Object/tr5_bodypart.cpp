@@ -84,7 +84,7 @@ void ControlBodyPart(short fxNumber)
 			}
 			else
 			{
-				fx->pos.Orientation.y += EulerAngle::DegToRad(-180);
+				fx->pos.Orientation.y += Angle::DegToRad(-180);
 				fx->pos.Position.x = x;
 				fx->pos.Position.z = z;
 			}

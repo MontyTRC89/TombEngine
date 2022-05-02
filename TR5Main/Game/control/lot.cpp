@@ -138,7 +138,7 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->LOT.IsAmphibious = false; // only the crocodile can go water and land. (default: true)
 	creature->LOT.IsJumping = false;
 	creature->LOT.IsMonkeying = false;
-	creature->MaxTurn = EulerAngle::DegToRad(1);
+	creature->MaxTurn = Angle::DegToRad(1);
 	creature->Flags = 0;
 	creature->Enemy = NULL;
 	creature->LOT.Fly = NO_FLYING;

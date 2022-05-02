@@ -382,7 +382,7 @@ void FlameThrowerControl(short itemNumber)
 
 		case 2:
 			creature->Flags = 0;
-			creature->MaxTurn = EulerAngle::DegToRad(5.0f);
+			creature->MaxTurn = Angle::DegToRad(5.0f);
 			head = laraAI.angle;
 
 			if (item->AIBits & GUARD)

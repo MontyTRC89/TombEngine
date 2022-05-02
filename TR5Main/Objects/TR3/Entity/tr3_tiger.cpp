@@ -89,7 +89,7 @@ void TigerControl(short itemNumber)
 				item->Animation.TargetState = 6;
 			else if (AI.bite && AI.distance < pow(SECTOR(1), 2))
 			{
-				info->MaxTurn = EulerAngle::DegToRad(3.0f);
+				info->MaxTurn = Angle::DegToRad(3.0f);
 				item->Animation.TargetState = 8;
 			}
 			else if (item->Animation.RequiredState)
@@ -102,7 +102,7 @@ void TigerControl(short itemNumber)
 			break;
 
 		case 2:
-			info->MaxTurn = EulerAngle::DegToRad(3.0f);
+			info->MaxTurn = Angle::DegToRad(3.0f);
 
 			if (info->Mood == MoodType::Escape || info->Mood == MoodType::Attack)
 				item->Animation.TargetState = 3;
@@ -115,7 +115,7 @@ void TigerControl(short itemNumber)
 			break;
 
 		case 3:
-			info->MaxTurn = EulerAngle::DegToRad(6.0f);
+			info->MaxTurn = Angle::DegToRad(6.0f);
 
 			if (info->Mood == MoodType::Bored)
 				item->Animation.TargetState = 1;

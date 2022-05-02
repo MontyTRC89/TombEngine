@@ -32,9 +32,9 @@ OBJECT_COLLISION_BOUNDS PuzzleBounds =
 	0, 0,
 	-256, 256,
 	0, 0,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 static Vector3Int KeyHolePosition(0, 0, 312);
@@ -43,9 +43,9 @@ OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 	-256, 256,
 	0, 0,
 	0, 412,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 // Puzzles

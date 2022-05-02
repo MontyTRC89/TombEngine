@@ -85,7 +85,7 @@ void ControlBrowsBeast(short itemNumber)
 		CreatureMood(item, &AI, VIOLENT);
 
 		angle = CreatureTurn(item, creature->MaxTurn);
-		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+		creature->MaxTurn = Angle::DegToRad(7.0f);
 
 		switch (item->Animation.ActiveState)
 		{
@@ -122,12 +122,12 @@ void ControlBrowsBeast(short itemNumber)
 		case 6:
 			creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
+			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
 				item->Pose.Orientation.y += AI.angle;

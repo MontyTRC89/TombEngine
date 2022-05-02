@@ -71,7 +71,7 @@ void LittleRatsControl(short itemNumber)
 				else
 				{
 					rat->VerticalVelocity = 0;
-					rat->Pose.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - EulerAngle::DegToRad(45);
+					rat->Pose.Orientation.y = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - Angle::DegToRad(45);
 				}
 
 				rat->Pose.Orientation.x = 0;
@@ -100,7 +100,7 @@ void InitialiseLittleRats(short itemNumber)
 
 	char flags = item->TriggerFlags / 1000;
 
-	item->Pose.Orientation.x = EulerAngle::DegToRad(45.0f);
+	item->Pose.Orientation.x = Angle::DegToRad(45.0f);
 	item->ItemFlags[1] = flags & 2;
 	item->ItemFlags[2] = flags & 4;
 	item->ItemFlags[0] = flags & 1;
@@ -112,14 +112,14 @@ void InitialiseLittleRats(short itemNumber)
 		return;
 	}
 
-	if (item->Pose.Orientation.y > EulerAngle::DegToRad(-157.5f) && item->Pose.Orientation.y < EulerAngle::DegToRad(-22.5f))
+	if (item->Pose.Orientation.y > Angle::DegToRad(-157.5f) && item->Pose.Orientation.y < Angle::DegToRad(-22.5f))
 		item->Pose.Position.x += CLICK(2);
-	else if (item->Pose.Orientation.y > EulerAngle::DegToRad(22.5f) && item->Pose.Orientation.y < EulerAngle::DegToRad(157.5f))
+	else if (item->Pose.Orientation.y > Angle::DegToRad(22.5f) && item->Pose.Orientation.y < Angle::DegToRad(157.5f))
 		item->Pose.Position.x -= CLICK(2);
 
-	if (item->Pose.Orientation.y > EulerAngle::DegToRad(-45.0f) && item->Pose.Orientation.y < EulerAngle::DegToRad(45.0f))
+	if (item->Pose.Orientation.y > Angle::DegToRad(-45.0f) && item->Pose.Orientation.y < Angle::DegToRad(45.0f))
 		item->Pose.Position.z -= CLICK(2);
-	else if (item->Pose.Orientation.y < EulerAngle::DegToRad(-112.5f) || item->Pose.Orientation.y > EulerAngle::DegToRad(112.5f))
+	else if (item->Pose.Orientation.y < Angle::DegToRad(-112.5f) || item->Pose.Orientation.y > Angle::DegToRad(112.5f))
 		item->Pose.Position.z += CLICK(2);
 
 	ClearRats();
@@ -164,22 +164,22 @@ void UpdateRats()
 					if (abs(dPos.z) + abs(dPos.x) <= SECTOR(1))
 					{
 						if (rat->Velocity & 1)
-							rat->Pose.Orientation.y += EulerAngle::DegToRad(2.8f);
+							rat->Pose.Orientation.y += Angle::DegToRad(2.8f);
 						else
-							rat->Pose.Orientation.y -= EulerAngle::DegToRad(2.8f);
-						rat->Velocity = 48 - (abs(angle) / EulerAngle::DegToRad(5.6f));
+							rat->Pose.Orientation.y -= Angle::DegToRad(2.8f);
+						rat->Velocity = 48 - (abs(angle) / Angle::DegToRad(5.6f));
 					}
 					else
 					{
 						if (rat->Velocity < (i & 31) + 24)
 							rat->Velocity++;
 
-						if (abs(angle) >= EulerAngle::DegToRad(11.25f))
+						if (abs(angle) >= Angle::DegToRad(11.25f))
 						{
 							if (angle >= 0)
-								rat->Pose.Orientation.y += EulerAngle::DegToRad(5.6f);
+								rat->Pose.Orientation.y += Angle::DegToRad(5.6f);
 							else
-								rat->Pose.Orientation.y -= EulerAngle::DegToRad(5.6f);
+								rat->Pose.Orientation.y -= Angle::DegToRad(5.6f);
 						}
 						else
 							rat->Pose.Orientation.y += 8 * (Wibble - i);
@@ -203,9 +203,9 @@ void UpdateRats()
 					}
 
 					if (angle <= 0)
-						rat->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
+						rat->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 					else
-						rat->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
+						rat->Pose.Orientation.y += Angle::DegToRad(90.0f);
 
 					// reset rat to old Poseition and disable fall
 					rat->Pose.Position = oldPos;
@@ -239,7 +239,7 @@ void UpdateRats()
 					else
 					{
 						// if block is higher than rat Poseition then run vertically
-						rat->Pose.Orientation.x = EulerAngle::DegToRad(78.75f);
+						rat->Pose.Orientation.x = Angle::DegToRad(78.75f);
 						rat->Pose.Position = oldPos;
 						rat->Pose.Position.y -= 24;
 						rat->VerticalVelocity = 0;

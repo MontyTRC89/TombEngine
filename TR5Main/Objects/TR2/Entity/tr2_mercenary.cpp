@@ -101,7 +101,7 @@ void MercenaryUziControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+			creature->MaxTurn = Angle::DegToRad(7.0f);
 
 			if (AI.ahead)
 			{
@@ -133,7 +133,7 @@ void MercenaryUziControl(short itemNumber)
 
 		case 3:
 			tilt = angle / 3;
-			creature->MaxTurn = EulerAngle::DegToRad(10.0f);
+			creature->MaxTurn = Angle::DegToRad(10.0f);
 
 			if (AI.ahead)
 			{
@@ -272,7 +272,7 @@ void MercenaryAutoPistolControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+			creature->MaxTurn = Angle::DegToRad(7.0f);
 
 			if (AI.ahead)
 			{
@@ -298,7 +298,7 @@ void MercenaryAutoPistolControl(short itemNumber)
 
 		case 4:
 			tilt = angle / 3;
-			creature->MaxTurn = EulerAngle::DegToRad(10.0f);
+			creature->MaxTurn = Angle::DegToRad(10.0f);
 
 			if (AI.ahead)
 			{

@@ -35,8 +35,8 @@ enum SkidooManAnim
 	SMAN_ANIM_DEATH = 10
 };
 
-#define SMAN_MIN_TURN (EulerAngle::DegToRad(2.0f))
-#define SMAN_TARGET_ANGLE EulerAngle::DegToRad(15.0f)
+#define SMAN_MIN_TURN (Angle::DegToRad(2.0f))
+#define SMAN_TARGET_ANGLE Angle::DegToRad(15.0f)
 #define SMAN_WAIT_RANGE pow(SECTOR(4), 2)
 
 BITE_INFO SkidooBiteLeft = { 240, -190, 540, 0 };
@@ -151,7 +151,7 @@ void SkidooManControl(short riderItemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, EulerAngle::DegToRad(3.0f));
+		angle = CreatureTurn(item, Angle::DegToRad(3.0f));
 
 		switch (item->Animation.ActiveState)
 		{

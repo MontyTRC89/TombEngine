@@ -21,9 +21,9 @@ OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
 	-256, 256,
 	0, 900,
 	-768, -256,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 static Vector3Int CeilingTrapDoorPos = { 0, 1056, -480 };
 
@@ -32,9 +32,9 @@ OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
 	-256, 256,
 	0, 0,
 	-1024, -256,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 static Vector3Int FloorTrapDoorPos = { 0, 0, -655 };
 
@@ -64,9 +64,9 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionIn
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
 
 	bool result = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
-	laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+	laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
-	laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+	laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_JUMP_UP &&
@@ -78,7 +78,7 @@ void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionIn
 	{
 		AlignLaraPosition(&CeilingTrapDoorPos, trapDoorItem, laraItem);
 		if (result2)
-			laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+			laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 		
 		ResetLaraFlex(laraItem);
 		laraItem->Animation.VerticalVelocity = 0;

@@ -224,7 +224,7 @@ void UpdateSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF); // TODO
+				spark->rotAng = Angle::ShrtToRad(Angle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF); // TODO
 
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)
@@ -443,7 +443,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
 
-	if (dx >= EulerAngle::DegToRad(-90.0f) && dx <= EulerAngle::DegToRad(90.0f) && dz >= EulerAngle::DegToRad(-90.0f) && dz <= EulerAngle::DegToRad(90.0f))
+	if (dx >= Angle::DegToRad(-90.0f) && dx <= Angle::DegToRad(90.0f) && dz >= Angle::DegToRad(-90.0f) && dz <= Angle::DegToRad(90.0f))
 	{
 		auto* spark = &Sparks[GetFreeSpark()];
 
@@ -858,9 +858,9 @@ void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
 
 		if (item->Pose.Orientation.y == 0)
 			sptr->zVel = -(size - (size >> 2));
-		else if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
+		else if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			sptr->xVel = -(size - (size >> 2));
-		else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
+		else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 			sptr->zVel = size - (size >> 2);
 		else
 			sptr->xVel = size - (size >> 2);
@@ -1082,7 +1082,7 @@ short DoBloodSplat(int x, int y, int z, int speed, float yRot, short roomNumber)
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		TriggerUnderwaterBlood(x, y, z, speed);
 	else
-		TriggerBlood(x, y, z, EulerAngle::RadToShrt(yRot * 16), speed); // TODO: Convert short form rotation.
+		TriggerBlood(x, y, z, Angle::RadToShrt(yRot * 16), speed); // TODO: Convert short form rotation.
 
 	return 0;
 }
@@ -1140,10 +1140,10 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	int x = item->Pose.Position.x - sin(item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f)) * CLICK(2) + sin(item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f)) * CLICK(1);
-	int z = item->Pose.Position.z - cos(item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f)) * CLICK(2) + cos(item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f)) * CLICK(1);
+	int x = item->Pose.Position.x - sin(item->Pose.Orientation.y + Angle::DegToRad(180.0f)) * CLICK(2) + sin(item->Pose.Orientation.y - Angle::DegToRad(90.0f)) * CLICK(1);
+	int z = item->Pose.Position.z - cos(item->Pose.Orientation.y + Angle::DegToRad(180.0f)) * CLICK(2) + cos(item->Pose.Orientation.y - Angle::DegToRad(90.0f)) * CLICK(1);
 
-	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Pose.Orientation.y + EulerAngle::DegToRad(180.0f));
+	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Pose.Orientation.y + Angle::DegToRad(180.0f));
 	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose, 0);
 }
 

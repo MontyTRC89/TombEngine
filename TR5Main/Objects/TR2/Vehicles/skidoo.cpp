@@ -29,11 +29,11 @@ using namespace TEN::Math::Random;
 
 #define SKIDOO_DISMOUNT_DISTANCE 295
 
-#define SKIDOO_UNDO_TURN			EulerAngle::DegToRad(2.0f)
-#define SKIDOO_TURN					(EulerAngle::DegToRad(0.5f) + SKIDOO_UNDO_TURN)
-#define SKIDOO_MAX_TURN				EulerAngle::DegToRad(6.0f)
-#define SKIDOO_MOMENTUM_TURN		EulerAngle::DegToRad(3.0f)
-#define SKIDOO_MAX_MOMENTUM_TURN	EulerAngle::DegToRad(150.0f)
+#define SKIDOO_UNDO_TURN			Angle::DegToRad(2.0f)
+#define SKIDOO_TURN					(Angle::DegToRad(0.5f) + SKIDOO_UNDO_TURN)
+#define SKIDOO_MAX_TURN				Angle::DegToRad(6.0f)
+#define SKIDOO_MOMENTUM_TURN		Angle::DegToRad(3.0f)
+#define SKIDOO_MAX_MOMENTUM_TURN	Angle::DegToRad(150.0f)
 
 #define SKIDOO_FAST_VELOCITY	150
 #define SKIDOO_MAX_VELOCITY		100
@@ -148,10 +148,10 @@ int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo
 		return mountType = 0;
 	}
 
-	float deltaAngle = EulerAngle::ShortestAngle(skidooItem->Pose.Orientation.y, laraItem->Pose.Orientation.y);
-	if (deltaAngle > EulerAngle::DegToRad(45.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
+	float deltaAngle = Angle::ShortestAngle(skidooItem->Pose.Orientation.GetY(), laraItem->Pose.Orientation.GetY());
+	if (deltaAngle > Angle::DegToRad(45.0f) && deltaAngle < Angle::DegToRad(135.0f))
 		mountType = 1;
-	else if (deltaAngle > EulerAngle::DegToRad(-135.0f) && deltaAngle < EulerAngle::DegToRad(-45.0f))
+	else if (deltaAngle > Angle::DegToRad(-135.0f) && deltaAngle < Angle::DegToRad(-45.0f))
 		mountType = 2;
 	else
 		mountType = 0;
@@ -171,9 +171,9 @@ bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction)
 {
 	float angle;
 	if (direction == SKIDOO_STATE_DISMOUNT_LEFT)
-		angle = skidooItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
+		angle = skidooItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
 	else
-		angle = skidooItem->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
+		angle = skidooItem->Pose.Orientation.y - Angle::DegToRad(90.0f);
 
 	int x = skidooItem->Pose.Position.x - SKIDOO_DISMOUNT_DISTANCE * sin(angle);
 	int y = skidooItem->Pose.Position.y;
@@ -201,9 +201,9 @@ bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 			laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 		{
 			if (laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_LEFT)
-				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
+				laraItem->Pose.Orientation.y += Angle::DegToRad(90.0f);
 			else
-				laraItem->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
+				laraItem->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_IDLE);
 			laraItem->Pose.Position.x -= SKIDOO_DISMOUNT_DISTANCE * sin(laraItem->Pose.Orientation.y);

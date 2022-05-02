@@ -23,9 +23,9 @@ BITE_INFO DragonMouthBite = { 35, 171, 1168, 12 };
 #define DRAGON_TOUCH_DAMAGE 10
 #define DRAGON_LIVE_TIME (30 * 11)
 #define DRAGON_ALMOST_LIVE 100
-#define DRAGON_STATE_WALK_TURN EulerAngle::DegToRad(2.0f)
-#define DRAGON_NEED_TURN EulerAngle::DegToRad(1.0f)
-#define DRAGON_TURN_TURN EulerAngle::DegToRad(1.0f)
+#define DRAGON_STATE_WALK_TURN Angle::DegToRad(2.0f)
+#define DRAGON_NEED_TURN Angle::DegToRad(1.0f)
+#define DRAGON_TURN_TURN Angle::DegToRad(1.0f)
 #define DRAGON_CLOSE_RANGE pow(SECTOR(3), 2)
 #define DRAGON_STATE_IDLE_RANGE pow(SECTOR(6), 2)
 #define DRAGON_FLAME_SPEED 200
@@ -183,8 +183,8 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 				shift > (DRAGON_CLOSE - 350) &&
 				sideShift > -350 &&
 				sideShift < 350 &&
-				angle > (EulerAngle::DegToRad(45.0f) - EulerAngle::DegToRad(30.0f)) &&
-				angle < (EulerAngle::DegToRad(45.0f) + EulerAngle::DegToRad(30.0f)))
+				angle > (Angle::DegToRad(45.0f) - Angle::DegToRad(30.0f)) &&
+				angle < (Angle::DegToRad(45.0f) + Angle::DegToRad(30.0f)))
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -392,13 +392,13 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_TURN_LEFT:
-			item->Pose.Orientation.y += -(EulerAngle::DegToRad(1.0f) - angle);
+			item->Pose.Orientation.y += -(Angle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_TURN_RIGHT:
-			item->Pose.Orientation.y += (EulerAngle::DegToRad(1.0f) - angle);
+			item->Pose.Orientation.y += (Angle::DegToRad(1.0f) - angle);
 			creature->Flags = 0;
 
 			break;

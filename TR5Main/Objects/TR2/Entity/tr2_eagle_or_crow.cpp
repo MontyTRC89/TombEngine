@@ -96,7 +96,7 @@ void EagleControl(short itemNumber)
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, EulerAngle::DegToRad(3.0f));
+		angle = CreatureTurn(item, Angle::DegToRad(3.0f));
 
 		switch (item->Animation.ActiveState)
 		{

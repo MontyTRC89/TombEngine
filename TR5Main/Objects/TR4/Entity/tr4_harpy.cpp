@@ -359,7 +359,7 @@ void HarpyControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case STATE_HARPY_STOP:
-			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+			creature->MaxTurn = Angle::DegToRad(7.0f);
 			creature->Flags = 0;
 
 			if (creature->Enemy)
@@ -403,7 +403,7 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+			creature->MaxTurn = Angle::DegToRad(7.0f);
 			creature->Flags = 0;
 
 			if (item->Animation.RequiredState)
@@ -475,7 +475,7 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case 4:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 
 			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
 				item->Animation.TargetState = STATE_HARPY_ATTACK;
@@ -486,7 +486,7 @@ void HarpyControl(short itemNumber)
 
 		case STATE_HARPY_ATTACK:
 			item->Animation.TargetState = 2;
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 
 			if (item->TouchBits & 0x14 ||
 				creature->Enemy && creature->Enemy != LaraItem &&
@@ -519,7 +519,7 @@ void HarpyControl(short itemNumber)
 			break;
 
 		case STATE_HARPY_POISON_ATTACK:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 
 			if (creature->Flags == 0 &&
 				(item->TouchBits & 0x300000 ||

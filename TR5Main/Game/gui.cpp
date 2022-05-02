@@ -144,62 +144,62 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 {
 	// Weapons
 
-	{ID_PISTOLS_ITEM, 6, 0.5f, EulerAngle::DegToRad(90), EulerAngle::DegToRad(243.69873046875f), EulerAngle::DegToRad(276.1328125), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_PISTOLS, STRING_PISTOLS, NO_MESH_BITS,  INV_ROT_Y},
-	{ID_PISTOLS_AMMO_ITEM, 4, 0.5f, 0, EulerAngle::DegToRad(90), 0, OPT_USE, STRING_PISTOLS_AMMO, NO_MESH_BITS, INV_ROT_Y},
-	{ID_UZI_ITEM, -4, 0.5f, EulerAngle::DegToRad(-90) , EulerAngle::DegToRad(135), EulerAngle::DegToRad(90), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_UZI, STRING_UZI , NO_MESH_BITS, INV_ROT_Y},
+	{ID_PISTOLS_ITEM, 6, 0.5f, Angle::DegToRad(90), Angle::DegToRad(243.69873046875f), Angle::DegToRad(276.1328125), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_PISTOLS, STRING_PISTOLS, NO_MESH_BITS,  INV_ROT_Y},
+	{ID_PISTOLS_AMMO_ITEM, 4, 0.5f, 0, Angle::DegToRad(90), 0, OPT_USE, STRING_PISTOLS_AMMO, NO_MESH_BITS, INV_ROT_Y},
+	{ID_UZI_ITEM, -4, 0.5f, Angle::DegToRad(-90) , Angle::DegToRad(135), Angle::DegToRad(90), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_UZI, STRING_UZI , NO_MESH_BITS, INV_ROT_Y},
 	{ID_UZI_AMMO_ITEM, 5, 0.5f, 0, 5384, 0, OPT_USE, STRING_UZI_AMMO, NO_MESH_BITS, INV_ROT_Y},
-	{ID_SHOTGUN_ITEM, -6, 0.8f, EulerAngle::DegToRad(-20), EulerAngle::DegToRad(270), EulerAngle::DegToRad(45), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_SHOTGUN, STRING_SHOTGUN, 1, INV_ROT_Y},
-	{ID_SHOTGUN_AMMO1_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_SHOTGUN_AMMO1, NO_MESH_BITS, INV_ROT_Y},
-	{ID_SHOTGUN_AMMO2_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_SHOTGUN_AMMO2, NO_MESH_BITS, INV_ROT_Y},
-	{ID_REVOLVER_ITEM, 0, 0.5f, EulerAngle::DegToRad(-90), EulerAngle::DegToRad(60), EulerAngle::DegToRad(85), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_REVOLVER, STRING_REVOLVER , 1, INV_ROT_Y},
-	{ID_REVOLVER_AMMO_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), EulerAngle::DegToRad(-16), 0, OPT_USE, STRING_REVOLVER_AMMO, NO_MESH_BITS, INV_ROT_Y},
-	{ID_REVOLVER_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), EulerAngle::DegToRad(60), EulerAngle::DegToRad(85), OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_REVOLVER, STRING_REVOLVER_LASER, 3, INV_ROT_Y},
-	{ID_CROSSBOW_ITEM, 0, 0.5f, EulerAngle::DegToRad(-90), EulerAngle::DegToRad(33), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_CROSSBOW, STRING_CROSSBOW, 1, INV_ROT_Y},
-	{ID_CROSSBOW_ITEM, 0, 0.5f, EulerAngle::DegToRad(-90), EulerAngle::DegToRad(33), 0, OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_CROSSBOW, STRING_CROSSBOW_LASER, 3, INV_ROT_Y},
-	{ID_CROSSBOW_AMMO1_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_MESH_BITS, INV_ROT_Y},
-	{ID_CROSSBOW_AMMO2_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_MESH_BITS, INV_ROT_Y},
-	{ID_CROSSBOW_AMMO3_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_MESH_BITS, INV_ROT_Y},
-	{ID_HK_ITEM, 0, 0.5f, EulerAngle::DegToRad(0), EulerAngle::DegToRad(280), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_HK, STRING_HK, 1, INV_ROT_Y},
-	{ID_HK_ITEM, 0, 0.5f, EulerAngle::DegToRad(-45), EulerAngle::DegToRad(280), 0, OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_HK, STRING_HK_SILENCED, NO_MESH_BITS, INV_ROT_Y},
-	{ID_HK_AMMO_ITEM, 3, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_HK_AMMO, 2},
-	{ID_GRENADE_GUN_ITEM, 0, 0.5f, EulerAngle::DegToRad(90), 0, EulerAngle::DegToRad(65), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_GRENADEGUN, STRING_GRENADE_LAUNCHER, NO_MESH_BITS, INV_ROT_Y},
-	{ID_GRENADE_AMMO1_ITEM, 3, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_GRENADE_AMMO1, NO_MESH_BITS, INV_ROT_Y},
-	{ID_GRENADE_AMMO2_ITEM, 3, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_GRENADE_AMMO2, NO_MESH_BITS, INV_ROT_Y},
-	{ID_GRENADE_AMMO3_ITEM, 3, 0.5f, EulerAngle::DegToRad(90), 0, 0, OPT_USE, STRING_GRENADE_AMMO3, NO_MESH_BITS, INV_ROT_Y},
-	{ID_HARPOON_ITEM, 0, 0.5f, 0, EulerAngle::DegToRad(-65), EulerAngle::DegToRad(-20), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_HARPOON, STRING_HARPOON_GUN, NO_MESH_BITS, INV_ROT_Y},
-	{ID_HARPOON_AMMO_ITEM, 3, 0.5f, 0, EulerAngle::DegToRad(15), 0, OPT_USE, STRING_HARPOON_AMMO, NO_MESH_BITS, INV_ROT_Y},
-	{ID_ROCKET_LAUNCHER_ITEM, 0, 0.5f, EulerAngle::DegToRad(180), EulerAngle::DegToRad(80), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_ROCKET, STRING_ROCKET_LAUNCHER, NO_MESH_BITS, INV_ROT_Y},
-	{ID_ROCKET_LAUNCHER_AMMO_ITEM, 3, 0.5f, EulerAngle::DegToRad(90), 0, EulerAngle::DegToRad(15), OPT_USE, STRING_ROCKET_AMMO, NO_MESH_BITS, INV_ROT_Y},
+	{ID_SHOTGUN_ITEM, -6, 0.8f, Angle::DegToRad(-20), Angle::DegToRad(270), Angle::DegToRad(45), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_SHOTGUN, STRING_SHOTGUN, 1, INV_ROT_Y},
+	{ID_SHOTGUN_AMMO1_ITEM, 0, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_SHOTGUN_AMMO1, NO_MESH_BITS, INV_ROT_Y},
+	{ID_SHOTGUN_AMMO2_ITEM, 0, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_SHOTGUN_AMMO2, NO_MESH_BITS, INV_ROT_Y},
+	{ID_REVOLVER_ITEM, 0, 0.5f, Angle::DegToRad(-90), Angle::DegToRad(60), Angle::DegToRad(85), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_REVOLVER, STRING_REVOLVER , 1, INV_ROT_Y},
+	{ID_REVOLVER_AMMO_ITEM, 0, 0.5f, Angle::DegToRad(90), Angle::DegToRad(-16), 0, OPT_USE, STRING_REVOLVER_AMMO, NO_MESH_BITS, INV_ROT_Y},
+	{ID_REVOLVER_ITEM, 0, 0.5f, Angle::DegToRad(90), Angle::DegToRad(60), Angle::DegToRad(85), OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_REVOLVER, STRING_REVOLVER_LASER, 3, INV_ROT_Y},
+	{ID_CROSSBOW_ITEM, 0, 0.5f, Angle::DegToRad(-90), Angle::DegToRad(33), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_CROSSBOW, STRING_CROSSBOW, 1, INV_ROT_Y},
+	{ID_CROSSBOW_ITEM, 0, 0.5f, Angle::DegToRad(-90), Angle::DegToRad(33), 0, OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_CROSSBOW, STRING_CROSSBOW_LASER, 3, INV_ROT_Y},
+	{ID_CROSSBOW_AMMO1_ITEM, 0, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_MESH_BITS, INV_ROT_Y},
+	{ID_CROSSBOW_AMMO2_ITEM, 0, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_MESH_BITS, INV_ROT_Y},
+	{ID_CROSSBOW_AMMO3_ITEM, 0, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_MESH_BITS, INV_ROT_Y},
+	{ID_HK_ITEM, 0, 0.5f, Angle::DegToRad(0), Angle::DegToRad(280), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_HK, STRING_HK, 1, INV_ROT_Y},
+	{ID_HK_ITEM, 0, 0.5f, Angle::DegToRad(-45), Angle::DegToRad(280), 0, OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_HK, STRING_HK_SILENCED, NO_MESH_BITS, INV_ROT_Y},
+	{ID_HK_AMMO_ITEM, 3, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_HK_AMMO, 2},
+	{ID_GRENADE_GUN_ITEM, 0, 0.5f, Angle::DegToRad(90), 0, Angle::DegToRad(65), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_GRENADEGUN, STRING_GRENADE_LAUNCHER, NO_MESH_BITS, INV_ROT_Y},
+	{ID_GRENADE_AMMO1_ITEM, 3, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_GRENADE_AMMO1, NO_MESH_BITS, INV_ROT_Y},
+	{ID_GRENADE_AMMO2_ITEM, 3, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_GRENADE_AMMO2, NO_MESH_BITS, INV_ROT_Y},
+	{ID_GRENADE_AMMO3_ITEM, 3, 0.5f, Angle::DegToRad(90), 0, 0, OPT_USE, STRING_GRENADE_AMMO3, NO_MESH_BITS, INV_ROT_Y},
+	{ID_HARPOON_ITEM, 0, 0.5f, 0, Angle::DegToRad(-65), Angle::DegToRad(-20), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_HARPOON, STRING_HARPOON_GUN, NO_MESH_BITS, INV_ROT_Y},
+	{ID_HARPOON_AMMO_ITEM, 3, 0.5f, 0, Angle::DegToRad(15), 0, OPT_USE, STRING_HARPOON_AMMO, NO_MESH_BITS, INV_ROT_Y},
+	{ID_ROCKET_LAUNCHER_ITEM, 0, 0.5f, Angle::DegToRad(180), Angle::DegToRad(80), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_ROCKET, STRING_ROCKET_LAUNCHER, NO_MESH_BITS, INV_ROT_Y},
+	{ID_ROCKET_LAUNCHER_AMMO_ITEM, 3, 0.5f, Angle::DegToRad(90), 0, Angle::DegToRad(15), OPT_USE, STRING_ROCKET_AMMO, NO_MESH_BITS, INV_ROT_Y},
 
 	// Misc
 
-	{ID_LASERSIGHT_ITEM, 2, 0.5f, EulerAngle::DegToRad(90), EulerAngle::DegToRad(10), 0, OPT_USE | OPT_COMBINABLE, STRING_LASERSIGHT, NO_MESH_BITS, INV_ROT_Y},
-	{ID_SILENCER_ITEM, 1, 0.5f, 0, EulerAngle::DegToRad(10), 0, OPT_USE | OPT_COMBINABLE, STRING_SILENCER, NO_MESH_BITS, INV_ROT_Y},
-	{ID_BIGMEDI_ITEM, 2, 0.7f, EulerAngle::DegToRad(180), 0, 0, OPT_USE, STRING_LARGE_MEDIPACK, NO_MESH_BITS, INV_ROT_Y},
-	{ID_SMALLMEDI_ITEM, 0, 0.7f, EulerAngle::DegToRad(180), EulerAngle::DegToRad(112), 0, OPT_USE, STRING_SMALL_MEDIPACK, NO_MESH_BITS, INV_ROT_Y},
-	{ID_BINOCULARS_ITEM, -1, 0.5f, EulerAngle::DegToRad(180), EulerAngle::DegToRad(10), 0, OPT_USE, STRING_BINOCULARS, NO_MESH_BITS, INV_ROT_Y},
-	{ID_FLARE_INV_ITEM, 52, 0.8f, EulerAngle::DegToRad(0), 0, 0, OPT_USE, STRING_FLARES, NO_MESH_BITS, INV_ROT_Y},
+	{ID_LASERSIGHT_ITEM, 2, 0.5f, Angle::DegToRad(90), Angle::DegToRad(10), 0, OPT_USE | OPT_COMBINABLE, STRING_LASERSIGHT, NO_MESH_BITS, INV_ROT_Y},
+	{ID_SILENCER_ITEM, 1, 0.5f, 0, Angle::DegToRad(10), 0, OPT_USE | OPT_COMBINABLE, STRING_SILENCER, NO_MESH_BITS, INV_ROT_Y},
+	{ID_BIGMEDI_ITEM, 2, 0.7f, Angle::DegToRad(180), 0, 0, OPT_USE, STRING_LARGE_MEDIPACK, NO_MESH_BITS, INV_ROT_Y},
+	{ID_SMALLMEDI_ITEM, 0, 0.7f, Angle::DegToRad(180), Angle::DegToRad(112), 0, OPT_USE, STRING_SMALL_MEDIPACK, NO_MESH_BITS, INV_ROT_Y},
+	{ID_BINOCULARS_ITEM, -1, 0.5f, Angle::DegToRad(180), Angle::DegToRad(10), 0, OPT_USE, STRING_BINOCULARS, NO_MESH_BITS, INV_ROT_Y},
+	{ID_FLARE_INV_ITEM, 52, 0.8f, Angle::DegToRad(0), 0, 0, OPT_USE, STRING_FLARES, NO_MESH_BITS, INV_ROT_Y},
 	{ID_TIMEX_ITEM, 2, 0.4f, 0, 0, 0, OPT_STATS, STRING_TIMEX, NO_MESH_BITS, INV_ROT_Y},
-	{ID_PC_LOAD_INV_ITEM, 52, 0.3f, EulerAngle::DegToRad(180), 0, 0, OPT_LOAD, STRING_LOAD_GAME, NO_MESH_BITS, INV_ROT_Y},
-	{ID_PC_LOAD_SAVE_ITEM, 52, 0.3f, EulerAngle::DegToRad(180), 0, 0, OPT_SAVE, STRING_SAVE_GAME, NO_MESH_BITS, INV_ROT_Y},
-	{ID_BURNING_TORCH_ITEM, 14, 0.5f, 0, EulerAngle::DegToRad(90), 0, OPT_USE, STRING_TORCH, NO_MESH_BITS, INV_ROT_Y},
-	{ID_CROWBAR_ITEM, 4, 0.5f, 0, EulerAngle::DegToRad(90), 0, OPT_USE, STRING_CROWBAR, NO_MESH_BITS, INV_ROT_Y},
-	{ID_DIARY_ITEM, 0, 0.3f, EulerAngle::DegToRad(180), 0, 0, OPT_DIARY, STRING_DIARY, NO_MESH_BITS, INV_ROT_Y},
+	{ID_PC_LOAD_INV_ITEM, 52, 0.3f, Angle::DegToRad(180), 0, 0, OPT_LOAD, STRING_LOAD_GAME, NO_MESH_BITS, INV_ROT_Y},
+	{ID_PC_LOAD_SAVE_ITEM, 52, 0.3f, Angle::DegToRad(180), 0, 0, OPT_SAVE, STRING_SAVE_GAME, NO_MESH_BITS, INV_ROT_Y},
+	{ID_BURNING_TORCH_ITEM, 14, 0.5f, 0, Angle::DegToRad(90), 0, OPT_USE, STRING_TORCH, NO_MESH_BITS, INV_ROT_Y},
+	{ID_CROWBAR_ITEM, 4, 0.5f, 0, Angle::DegToRad(90), 0, OPT_USE, STRING_CROWBAR, NO_MESH_BITS, INV_ROT_Y},
+	{ID_DIARY_ITEM, 0, 0.3f, Angle::DegToRad(180), 0, 0, OPT_DIARY, STRING_DIARY, NO_MESH_BITS, INV_ROT_Y},
 	{ID_COMPASS_ITEM, -14, 0.5f, 0, 0, 0, 0, STRING_LOAD_GAME, NO_MESH_BITS, INV_ROT_Y},
 	{ID_CLOCKWORK_BEETLE, 14, 0.5f, 0, 0, 0, OPT_USE, STRING_CLOCKWORK_BEETLE, NO_MESH_BITS, INV_ROT_Y},
 	{ID_CLOCKWORK_BEETLE_COMBO1, 18, 0.5f, 0, 0, 0, OPT_COMBINABLE, STRING_CLOCKWORK_BEETLE_COMBO1, NO_MESH_BITS, INV_ROT_Y},
 	{ID_CLOCKWORK_BEETLE_COMBO2, 14, 0.5f, 0, 0, 0, OPT_COMBINABLE, STRING_CLOCKWORK_BEETLE_COMBO2, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN1_EMPTY, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_EMPTY, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN1_1, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_1, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN1_2, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_2, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN1_3, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_3, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN2_EMPTY, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_EMPTY, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN2_1, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_1, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN2_2, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_2, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN2_3, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_3, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN2_4, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_4, NO_MESH_BITS, INV_ROT_Y},
-	{ID_WATERSKIN2_5, 2, 0.5f, 0, EulerAngle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_5, NO_MESH_BITS, INV_ROT_Y},
-	{ID_OPEN_DIARY_ITEM, 0, 0.9f, EulerAngle::DegToRad(90), 0, 0, 0, 0, 0, 0},
+	{ID_WATERSKIN1_EMPTY, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_EMPTY, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN1_1, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_1, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN1_2, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_2, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN1_3, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_SMALL_3, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN2_EMPTY, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_EMPTY, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN2_1, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_1, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN2_2, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_2, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN2_3, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_3, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN2_4, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_4, NO_MESH_BITS, INV_ROT_Y},
+	{ID_WATERSKIN2_5, 2, 0.5f, 0, Angle::DegToRad(285), 0, OPT_USE | OPT_COMBINABLE, STRING_WATERSKIN_LARGE_5, NO_MESH_BITS, INV_ROT_Y},
+	{ID_OPEN_DIARY_ITEM, 0, 0.9f, Angle::DegToRad(90), 0, 0, 0, 0, 0, 0},
 
 	// Puzzles
 
@@ -1849,8 +1849,8 @@ void GuiController::ConstructCombineObjectList()
 
 void GuiController::InitializeInventory()
 {
-	compassNeedleAngle = EulerAngle::DegToRad(22.5f);
-	AlterFOV(EulerAngle::DegToRad(80.0f));
+	compassNeedleAngle = Angle::DegToRad(22.5f);
+	AlterFOV(Angle::DegToRad(80.0f));
 	Lara.Inventory.IsBusy = 0;
 	inventoryItemChosen = NO_ITEM;
 	ClearInputVariables(0);
@@ -2625,7 +2625,7 @@ void GuiController::UpdateWeaponStatus()
 void GuiController::SpinBack(float* angle)
 {
 	if (*angle)
-		*angle = EulerAngle::Interpolate(*angle, 0, 0.25f / 2, EulerAngle::DegToRad(0.1f));
+		*angle = Angle::Interpolate(*angle, 0, 0.25f / 2, Angle::DegToRad(0.1f));
 }
 
 void GuiController::DrawAmmoSelector()
@@ -2656,13 +2656,13 @@ void GuiController::DrawAmmoSelector()
 			if (n == *current_ammo_type)
 			{
 				if (objme->rot_flags & INV_ROT_X)
-					ammo_object_list[n].xrot += EulerAngle::DegToRad(5);
+					ammo_object_list[n].xrot += Angle::DegToRad(5);
 
 				if (objme->rot_flags & INV_ROT_Y)
-					ammo_object_list[n].yrot += EulerAngle::DegToRad(5);
+					ammo_object_list[n].yrot += Angle::DegToRad(5);
 
 				if (objme->rot_flags & INV_ROT_Z)
-					ammo_object_list[n].zrot += EulerAngle::DegToRad(5);
+					ammo_object_list[n].zrot += Angle::DegToRad(5);
 			}
 			else
 			{
@@ -2999,13 +2999,13 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 			if (!i && !rings[ringnum]->objlistmovement)
 			{
 				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_X)
-					rings[ringnum]->current_object_list[n].xrot += EulerAngle::DegToRad(5);
+					rings[ringnum]->current_object_list[n].xrot += Angle::DegToRad(5);
 
 				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_Y)
-					rings[ringnum]->current_object_list[n].yrot += EulerAngle::DegToRad(5);
+					rings[ringnum]->current_object_list[n].yrot += Angle::DegToRad(5);
 
 				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_Z)
-					rings[ringnum]->current_object_list[n].zrot += EulerAngle::DegToRad(5);
+					rings[ringnum]->current_object_list[n].zrot += Angle::DegToRad(5);
 			}
 			else
 			{
@@ -3149,8 +3149,8 @@ int GuiController::CallInventory(bool reset_mode)
 
 		OBJLIST_SPACING = phd_centerx >> 1;
 
-		if (compassNeedleAngle != EulerAngle::RadToDeg(5.6f))
-			compassNeedleAngle -= EulerAngle::RadToDeg(0.18f);
+		if (compassNeedleAngle != Angle::RadToDeg(5.6f))
+			compassNeedleAngle -= Angle::RadToDeg(0.18f);
 
 		SetDebounce = true;
 		S_UpdateInput();
@@ -3243,9 +3243,9 @@ void GuiController::DoExamineMode()
 void GuiController::DrawCompass()
 {
 	return;
-	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, EulerAngle::DegToRad(90.0f), 0, EulerAngle::DegToRad(180.0f), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
+	g_Renderer.drawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, Angle::DegToRad(90.0f), 0, Angle::DegToRad(180.0f), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
 	float compass_speed = sin(compassNeedleAngle - LaraItem->Pose.Orientation.y);
-	float compass_angle = (LaraItem->Pose.Orientation.y + compass_speed) - EulerAngle::DegToRad(180.0f);
+	float compass_angle = (LaraItem->Pose.Orientation.y + compass_speed) - Angle::DegToRad(180.0f);
 	Matrix::CreateRotationY(compass_angle);
 }
 

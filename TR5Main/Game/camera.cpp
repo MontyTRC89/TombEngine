@@ -18,7 +18,6 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Specific/EulerAngle.h"
 
 using TEN::Renderer::g_Renderer;
 using namespace TEN::Entities::Generic;
@@ -130,7 +129,7 @@ void InitialiseCamera()
 	Camera.number = -1;
 	Camera.fixedCamera = false;
 
-	AlterFOV(EulerAngle::DegToRad(80.0f));
+	AlterFOV(Angle::DegToRad(80.0f));
 
 	UseForcedFixedCamera = 0;
 	CalculateCamera();
@@ -320,16 +319,16 @@ void MoveCamera(GameVector* ideal, int speed)
 void ChaseCamera(ITEM_INFO* item)
 {
 	if (!Camera.targetElevation)
-		Camera.targetElevation = EulerAngle::DegToRad(-10.0f);
+		Camera.targetElevation = Angle::DegToRad(-10.0f);
 
 	Camera.targetElevation += item->Pose.Orientation.x;
 	UpdateCameraElevation();
 
 	// Clamp x rotation.
-	if (Camera.actualElevation > EulerAngle::DegToRad(85.0f))
-		Camera.actualElevation = EulerAngle::DegToRad(85.0f);
-	else if (Camera.actualElevation < EulerAngle::DegToRad(-85.0f))
-		Camera.actualElevation = EulerAngle::DegToRad(-85.0f);
+	if (Camera.actualElevation > Angle::DegToRad(85.0f))
+		Camera.actualElevation = Angle::DegToRad(85.0f);
+	else if (Camera.actualElevation < Angle::DegToRad(-85.0f))
+		Camera.actualElevation = Angle::DegToRad(-85.0f);
 
 	int distance = Camera.targetDistance * cos(Camera.actualElevation);
 
@@ -366,7 +365,7 @@ void ChaseCamera(ITEM_INFO* item)
 		if (i == 0)
 			angle = Camera.actualAngle;
 		else
-			angle = (i - 1) * EulerAngle::DegToRad(90.0f);
+			angle = (i - 1) * Angle::DegToRad(90.0f);
 
 		Ideals[i].x = Camera.target.x - distance * sin(angle);
 		Ideals[i].z = Camera.target.z - distance * cos(angle);
@@ -469,7 +468,7 @@ void CombatCamera(ITEM_INFO* item)
 	else
 	{
 		Camera.targetAngle = lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
-		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.x - EulerAngle::DegToRad(15.0f);
+		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.x - Angle::DegToRad(15.0f);
 	}
 
 	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
@@ -538,7 +537,7 @@ void CombatCamera(ITEM_INFO* item)
 		if (i == 0)
 			angle = Camera.actualAngle;
 		else
-			angle = (i - 1) * EulerAngle::DegToRad(90.0f);
+			angle = (i - 1) * Angle::DegToRad(90.0f);
 
 		Ideals[i].x = Camera.target.x - distance * sin(angle);
 		Ideals[i].z = Camera.target.z - distance * cos(angle);
@@ -792,14 +791,14 @@ void LookCamera(ITEM_INFO* item)
 	lara->ExtraHeadRot.y *= 2;
 
 	// Clamp head rotation.
-	if (lara->ExtraHeadRot.x > EulerAngle::DegToRad(55.0f))
-		lara->ExtraHeadRot.x = EulerAngle::DegToRad(55.0f);
-	else if (lara->ExtraHeadRot.x < EulerAngle::DegToRad(-75.0f))
-		lara->ExtraHeadRot.x = EulerAngle::DegToRad(-75.0f);
-	if (lara->ExtraHeadRot.y < EulerAngle::DegToRad(-80.0f))
-		lara->ExtraHeadRot.y = EulerAngle::DegToRad(-80.0f);
-	else if (lara->ExtraHeadRot.y > EulerAngle::DegToRad(80.0f))
-		lara->ExtraHeadRot.y = EulerAngle::DegToRad(80.0f);
+	if (lara->ExtraHeadRot.x > Angle::DegToRad(55.0f))
+		lara->ExtraHeadRot.x = Angle::DegToRad(55.0f);
+	else if (lara->ExtraHeadRot.x < Angle::DegToRad(-75.0f))
+		lara->ExtraHeadRot.x = Angle::DegToRad(-75.0f);
+	if (lara->ExtraHeadRot.y < Angle::DegToRad(-80.0f))
+		lara->ExtraHeadRot.y = Angle::DegToRad(-80.0f);
+	else if (lara->ExtraHeadRot.y > Angle::DegToRad(80.0f))
+		lara->ExtraHeadRot.y = Angle::DegToRad(80.0f);
 
 	if (abs(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x) >= 16)
 		OldCam.pos.Orientation.x = (lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2;
@@ -1076,7 +1075,7 @@ void BinocularCamera(ITEM_INFO* item)
 		{
 			exitingBinoculars = false;
 			BinocularRange = 0;
-			AlterFOV(EulerAngle::DegToRad(80.0f));
+			AlterFOV(Angle::DegToRad(80.0f));
 			item->MeshBits = -1;
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot.y = 0;
@@ -1095,15 +1094,15 @@ void BinocularCamera(ITEM_INFO* item)
 	float headXRot = lara->ExtraHeadRot.x * 2;
 	float headYRot = lara->ExtraHeadRot.y;
 
-	if (headXRot > EulerAngle::DegToRad(75.0f))
-		headXRot = EulerAngle::DegToRad(75.0f);
-	else if (headXRot < EulerAngle::DegToRad(-75.0f))
-		headXRot = EulerAngle::DegToRad(-75.0f);
+	if (headXRot > Angle::DegToRad(75.0f))
+		headXRot = Angle::DegToRad(75.0f);
+	else if (headXRot < Angle::DegToRad(-75.0f))
+		headXRot = Angle::DegToRad(-75.0f);
 
-	if (headYRot > EulerAngle::DegToRad(80.0f))
-		headYRot = EulerAngle::DegToRad(80.0f);
-	else if (headYRot < EulerAngle::DegToRad(-80.0f))
-		headYRot = EulerAngle::DegToRad(-80.0f);
+	if (headYRot > Angle::DegToRad(80.0f))
+		headYRot = Angle::DegToRad(80.0f);
+	else if (headYRot < Angle::DegToRad(-80.0f))
+		headYRot = Angle::DegToRad(-80.0f);
 
 	int x = item->Pose.Position.x;
 	int y = item->Pose.Position.y - CLICK(2);
@@ -1449,22 +1448,22 @@ void CalculateCamera()
 			angle /= 2;
 			tilt /= 2;
 
-			if (angle > EulerAngle::DegToRad(-50.0f) && angle < EulerAngle::DegToRad(50.0f) && tilt > EulerAngle::DegToRad(-85.0f) && tilt < EulerAngle::DegToRad(85.0f))
+			if (angle > Angle::DegToRad(-50.0f) && angle < Angle::DegToRad(50.0f) && tilt > Angle::DegToRad(-85.0f) && tilt < Angle::DegToRad(85.0f))
 			{
 				float change = angle - Lara.ExtraHeadRot.y;
-				if (change > EulerAngle::DegToRad(4.0f))
-					Lara.ExtraHeadRot.y += EulerAngle::DegToRad(4.0f);
-				else if (change < EulerAngle::DegToRad(-4.0f))
-					Lara.ExtraHeadRot.y -= EulerAngle::DegToRad(4.0f);
+				if (change > Angle::DegToRad(4.0f))
+					Lara.ExtraHeadRot.y += Angle::DegToRad(4.0f);
+				else if (change < Angle::DegToRad(-4.0f))
+					Lara.ExtraHeadRot.y -= Angle::DegToRad(4.0f);
 				else
 					Lara.ExtraHeadRot.y += change;
 				Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
 
 				change = tilt - Lara.ExtraHeadRot.x;
-				if (change > EulerAngle::DegToRad(4.0f))
-					Lara.ExtraHeadRot.x += EulerAngle::DegToRad(4.0f);
-				else if (change < EulerAngle::DegToRad(-4.0f))
-					Lara.ExtraHeadRot.x -= EulerAngle::DegToRad(4.0f);
+				if (change > Angle::DegToRad(4.0f))
+					Lara.ExtraHeadRot.x += Angle::DegToRad(4.0f);
+				else if (change < Angle::DegToRad(-4.0f))
+					Lara.ExtraHeadRot.x -= Angle::DegToRad(4.0f);
 				else
 					Lara.ExtraHeadRot.x += change;
 				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
@@ -1610,23 +1609,23 @@ void LookLeftRight(ITEM_INFO* item)
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
-		if (lara->ExtraHeadRot.y > EulerAngle::DegToRad(-44.0f))
+		if (lara->ExtraHeadRot.y > Angle::DegToRad(-44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.y += EulerAngle::DegToRad(2.0f) * (BinocularRange - 1792) / 1536;
+				lara->ExtraHeadRot.y += Angle::DegToRad(2.0f) * (BinocularRange - 1792) / 1536;
 			else
-				lara->ExtraHeadRot.y -= EulerAngle::DegToRad(2.0f);
+				lara->ExtraHeadRot.y -= Angle::DegToRad(2.0f);
 		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		TrInput &= ~IN_RIGHT;
-		if (lara->ExtraHeadRot.y < EulerAngle::DegToRad(44.0f))
+		if (lara->ExtraHeadRot.y < Angle::DegToRad(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.y += EulerAngle::DegToRad(2.0f) * (1792 - BinocularRange) / 1536;
+				lara->ExtraHeadRot.y += Angle::DegToRad(2.0f) * (1792 - BinocularRange) / 1536;
 			else
-				lara->ExtraHeadRot.y += EulerAngle::DegToRad(2.0f);
+				lara->ExtraHeadRot.y += Angle::DegToRad(2.0f);
 		}
 	}
 	if (lara->Control.HandStatus != HandStatus::Busy &&
@@ -1646,23 +1645,23 @@ void LookUpDown(ITEM_INFO* item)
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
-		if (lara->ExtraHeadRot.x > EulerAngle::DegToRad(-35.0f))
+		if (lara->ExtraHeadRot.x > Angle::DegToRad(-35.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.x += EulerAngle::DegToRad(2.0f) * (BinocularRange - 1792) / 3072;
+				lara->ExtraHeadRot.x += Angle::DegToRad(2.0f) * (BinocularRange - 1792) / 3072;
 			else
-				lara->ExtraHeadRot.x -= EulerAngle::DegToRad(2.0f);
+				lara->ExtraHeadRot.x -= Angle::DegToRad(2.0f);
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		TrInput &= ~IN_BACK;
-		if (lara->ExtraHeadRot.x < EulerAngle::DegToRad(30.0f))
+		if (lara->ExtraHeadRot.x < Angle::DegToRad(30.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.x += EulerAngle::DegToRad(2.0f) * (1792 - BinocularRange) / 3072;
+				lara->ExtraHeadRot.x += Angle::DegToRad(2.0f) * (1792 - BinocularRange) / 3072;
 			else
-				lara->ExtraHeadRot.x += EulerAngle::DegToRad(2.0f);
+				lara->ExtraHeadRot.x += Angle::DegToRad(2.0f);
 		}
 	}
 	if (lara->Control.HandStatus != HandStatus::Busy &&
@@ -1680,7 +1679,7 @@ void ResetLook(ITEM_INFO* item)
 
 	if (Camera.type != CameraType::Look)
 	{
-		lara->ExtraHeadRot.Interpolate(EulerAngle(), 0.1f, EulerAngle::DegToRad(0.1f));
+		lara->ExtraHeadRot.Interpolate(EulerAngles(), 0.1f, Angle::DegToRad(0.1f));
 
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked &&

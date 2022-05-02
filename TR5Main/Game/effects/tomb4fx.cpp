@@ -301,7 +301,7 @@ void UpdateFireSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF);
+				spark->rotAng = Angle::ShrtToRad(Angle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF);
 
 			float alpha = fmin(1, fmax(0, 1 - (spark->life / (float)spark->sLife)));
 			int sprite = lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex+ (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
@@ -419,7 +419,7 @@ void UpdateSmoke()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF);
+				spark->rotAng = Angle::ShrtToRad(Angle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF);
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
@@ -728,7 +728,7 @@ void UpdateBlood()
 				blood->shade = blood->sShade + ((blood->dShade - blood->sShade) * (((blood->sLife - blood->life) << 16) / blood->colFadeSpeed) >> 16);
 			}
 			
-			blood->rotAng = EulerAngle::ShrtToRad(EulerAngle::RadToShrt(blood->rotAng + blood->rotAdd) & 0xFFF); // TODO
+			blood->rotAng = Angle::ShrtToRad(Angle::RadToShrt(blood->rotAng + blood->rotAdd) & 0xFFF); // TODO
 			blood->yVel += blood->gravity;
 						
 			if (blood->friction & 0xF)
@@ -937,9 +937,9 @@ void UpdateGunShells()
 				gs->fallspeed += 6;
 			}
 
-			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * EulerAngle::DegToRad(1);
-			gs->pos.Orientation.y += gs->speed * EulerAngle::DegToRad(1);
-			gs->pos.Orientation.z += EulerAngle::DegToRad(23);
+			gs->pos.Orientation.x += (gs->speed >> 1 + 7) * Angle::DegToRad(1);
+			gs->pos.Orientation.y += gs->speed * Angle::DegToRad(1);
+			gs->pos.Orientation.z += Angle::DegToRad(23);
 
 			gs->pos.Position.x += gs->speed * sin(gs->dirXrot);
 			gs->pos.Position.y += gs->fallspeed;
@@ -986,7 +986,7 @@ void UpdateGunShells()
 					}
 					else
 					{
-						gs->dirXrot += EulerAngle::DegToRad(-180);
+						gs->dirXrot += Angle::DegToRad(-180);
 						gs->pos.Position.x = oldX;
 						gs->pos.Position.z = oldZ;
 					}
@@ -1387,9 +1387,9 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 
 		short angle;
 		if (GetRandomControl() & 1)
-			angle = rot + EulerAngle::DegToRad(90);
+			angle = rot + Angle::DegToRad(90);
 		else
-			angle = rot - EulerAngle::DegToRad(90);
+			angle = rot - Angle::DegToRad(90);
 
 		int shift = (GetRandomControl() & 0x1FF) - 256;
 		x += shift * sin(angle);

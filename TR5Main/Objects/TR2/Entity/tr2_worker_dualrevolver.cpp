@@ -116,7 +116,7 @@ void WorkerDualGunControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+			creature->MaxTurn = Angle::DegToRad(3.0f);
 
 			if (AI.ahead)
 			{
@@ -155,7 +155,7 @@ void WorkerDualGunControl(short itemNumber)
 			break;
 
 		case 4:
-			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+			creature->MaxTurn = Angle::DegToRad(6.0f);
 			tilt = angle / 4;
 
 			if (AI.ahead)

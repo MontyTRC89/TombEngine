@@ -46,7 +46,7 @@ void ControlMissile(short fxNumber)
 		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
 			fx->pos.Orientation.x > -0x3000);
 	{
-		fx->pos.Orientation.x -= EulerAngle::DegToRad(1.0f);
+		fx->pos.Orientation.x -= Angle::DegToRad(1.0f);
 	}
 
 	fx->pos.Position.y += fx->speed * sin(-fx->pos.Orientation.x);

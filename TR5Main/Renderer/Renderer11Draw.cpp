@@ -1090,16 +1090,16 @@ namespace TEN::Renderer
 		InventoryObject* obj = &inventry_objects_list[inv_item];
 
 		if (TrInput & IN_LEFT)
-			yrot += EulerAngle::DegToRad(3);
+			yrot += Angle::DegToRad(3);
 
 		if (TrInput & IN_RIGHT)
-			yrot -= EulerAngle::DegToRad(3);
+			yrot -= Angle::DegToRad(3);
 
 		if (TrInput & IN_FORWARD)
-			xrot += EulerAngle::DegToRad(3);
+			xrot += Angle::DegToRad(3);
 
 		if (TrInput & IN_BACK)
-			xrot -= EulerAngle::DegToRad(3);
+			xrot -= Angle::DegToRad(3);
 
 		if (TrInput & IN_SPRINT)
 			scaler += 0.03f;
@@ -2098,7 +2098,7 @@ namespace TEN::Renderer
 				//PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
 				//				  LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Lara Orient Ang: %f %f %f", EulerAngle::RadToDeg(LaraItem->Pose.Orientation.x), EulerAngle::RadToDeg(LaraItem->Pose.Orientation.y), EulerAngle::RadToDeg(LaraItem->Pose.Orientation.z));
+				PrintDebugMessage("Lara Orient Ang: %f %f %f", Angle::RadToDeg(LaraItem->Pose.Orientation.x), Angle::RadToDeg(LaraItem->Pose.Orientation.y), Angle::RadToDeg(LaraItem->Pose.Orientation.z));
 				PrintDebugMessage("Lara Orient Rad: %f %f %f", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
 				//PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				//PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),

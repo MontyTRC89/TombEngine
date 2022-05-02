@@ -20,9 +20,9 @@ static OBJECT_COLLISION_BOUNDS PushableBlockBounds =
 	0, 0,
 	-64, 0,
 	0, 0,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 int DoPushPull = 0;
@@ -130,7 +130,7 @@ void PushableBlockControl(short itemNumber)
 
 	Vector3Int pos = { 0, 0, 0 };
 
-	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + EulerAngle::DegToRad(45.0f)) / EulerAngle::DegToRad(90.0f);
+	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
 
 	int x, z;
 	int blockHeight = GetStackHeight(item);
@@ -472,7 +472,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 		PushableBlockBounds.boundingBox.Z2 = 0;
 
 		float rot = pushableItem->Pose.Orientation.y;
-		//pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + EulerAngle::DegToRad(45.0f)) & 0xC000;
+		//pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) & 0xC000;
 
 		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
 		{

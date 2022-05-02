@@ -321,14 +321,14 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 				lara->Animation.TargetState = LS_BOULDER_DEATH;
 						
 				Camera.flags = CF_FOLLOW_CENTER;
-				Camera.targetAngle = EulerAngle::DegToRad(170);
-				Camera.targetElevation = EulerAngle::DegToRad(-25);
+				Camera.targetAngle = Angle::DegToRad(170);
+				Camera.targetElevation = Angle::DegToRad(-25);
 				for (int i = 0; i < 15; i++)
 				{
-					int x = lara->Pose.Position.x + (GetRandomControl() - EulerAngle::DegToRad(180.0f) / 256);
+					int x = lara->Pose.Position.x + (GetRandomControl() - Angle::DegToRad(180.0f) / 256);
 					int y = lara->Pose.Position.y - (GetRandomControl() / 64);
-					int z = lara->Pose.Position.z + (GetRandomControl() - EulerAngle::DegToRad(180.0f) / 256);
-					short d = ((GetRandomControl() - EulerAngle::DegToRad(180) / 8) + item->Pose.Orientation.y);
+					int z = lara->Pose.Position.z + (GetRandomControl() - Angle::DegToRad(180.0f) / 256);
+					short d = ((GetRandomControl() - Angle::DegToRad(180) / 8) + item->Pose.Orientation.y);
 					DoBloodSplat(x, y, z, (short)(item->Animation.Velocity * 2), d, item->RoomNumber);
 				}
 			}

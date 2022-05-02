@@ -44,10 +44,10 @@ namespace TEN::Entities::TR4
 		AHMET_ANIM_DEATH_ANIM = 10
 	};
 
-	#define AHMET_WALK_ANGLE EulerAngle::DegToRad(5.0f)
-	#define AHMET_RUN_ANGLE EulerAngle::DegToRad(8.0f)
-	#define AHMET_VIEW_ANGLE EulerAngle::DegToRad(45.0f)
-	#define AHMET_ENEMY_ANGLE EulerAngle::DegToRad(90.0f)
+	#define AHMET_WALK_ANGLE Angle::DegToRad(5.0f)
+	#define AHMET_RUN_ANGLE Angle::DegToRad(8.0f)
+	#define AHMET_VIEW_ANGLE Angle::DegToRad(45.0f)
+	#define AHMET_ENEMY_ANGLE Angle::DegToRad(90.0f)
 	#define AHMET_AWARE_DISTANCE pow(SECTOR(1), 2)
 	#define AHMET_IDLE_RANGE pow(SECTOR(1.25f), 2)
 	#define AHMET_RUN_RANGE pow(SECTOR(2.5f), 2)
@@ -255,9 +255,9 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 910)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += EulerAngle::DegToRad(5.0f);
+						item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 					else
-						item->Pose.Orientation.y -= EulerAngle::DegToRad(5.0f);
+						item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 				}
 				else
 					item->Pose.Orientation.y += AI.angle;
@@ -286,12 +286,12 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START)
 				{
-					if (abs(AI.angle) >= EulerAngle::DegToRad(5.0f))
+					if (abs(AI.angle) >= Angle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 						else
-							item->Pose.Orientation.y -= EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 					}
 					else
 						item->Pose.Orientation.y += AI.angle;
@@ -319,12 +319,12 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START))
 				{
-					if (abs(AI.angle) >= EulerAngle::DegToRad(5.0f))
+					if (abs(AI.angle) >= Angle::DegToRad(5.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y += Angle::DegToRad(5.0f);
 						else
-							item->Pose.Orientation.y -= EulerAngle::DegToRad(5.0f);
+							item->Pose.Orientation.y -= Angle::DegToRad(5.0f);
 					}
 					else
 						item->Pose.Orientation.y += AI.angle;

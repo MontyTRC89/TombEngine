@@ -161,7 +161,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 								else
 								{
 									angle = atan2(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
-									if (angle > EulerAngle::DegToRad(-90) && angle < EulerAngle::DegToRad(90))
+									if (angle > Angle::DegToRad(-90) && angle < Angle::DegToRad(90))
 									{
 										item->HitPoints = 0;
 										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);

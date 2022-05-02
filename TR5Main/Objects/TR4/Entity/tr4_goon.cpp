@@ -526,7 +526,7 @@ namespace TEN::Entities::TR4
 				laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 				laraAI.ahead = true;
 
-				if (laraAI.angle <= EulerAngle::DegToRad(-90.0f) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
+				if (laraAI.angle <= Angle::DegToRad(-90.0f) || laraAI.angle >= Angle::DegToRad(90.0f))
 					laraAI.ahead = false;
 
 				laraAI.distance = dx * dx + dz * dz;
@@ -558,24 +558,24 @@ namespace TEN::Entities::TR4
 
 			if (item != Lara.TargetEntity ||
 				laraAI.distance <= 942 ||
-				laraAI.angle <= EulerAngle::DegToRad(-56.25f) ||
-				laraAI.angle >= EulerAngle::DegToRad(56.25f))
+				laraAI.angle <= Angle::DegToRad(-56.25f) ||
+				laraAI.angle >= Angle::DegToRad(56.25f))
 			{
 				roll = false;
 				jump = false;
 			}
 			else
 			{
-				dx = 942 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(45.0f));
-				dz = 942 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(45.0f));
+				dx = 942 * sin(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
+				dz = 942 * cos(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 942 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(78.75f));
-				dz = 942 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(78.75f));
+				dx = 942 * sin(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
+				dz = 942 * cos(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -591,16 +591,16 @@ namespace TEN::Entities::TR4
 						jump = false;
 				}
 
-				dx = 942 * sin(item->Pose.Orientation.y - EulerAngle::DegToRad(45.0f));
-				dz = 942 * cos(item->Pose.Orientation.y - EulerAngle::DegToRad(45.0f));
+				dx = 942 * sin(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
+				dz = 942 * cos(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 942 * sin(item->Pose.Orientation.y - EulerAngle::DegToRad(78.75f));
-				dz = 942 * cos(item->Pose.Orientation.y - EulerAngle::DegToRad(78.75f));
+				dx = 942 * sin(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
+				dz = 942 * cos(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -772,7 +772,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_WALK:
-				currentCreature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				currentCreature->MaxTurn = Angle::DegToRad(7.0f);
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsMonkeying = false;
 				currentCreature->LOT.IsJumping = false;
@@ -847,7 +847,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_RUN:
-				currentCreature->MaxTurn = EulerAngle::DegToRad(11.0f);
+				currentCreature->MaxTurn = Angle::DegToRad(11.0f);
 				tilt = abs(angle) / 2;
 
 				if (AI.ahead)
@@ -857,7 +857,7 @@ namespace TEN::Entities::TR4
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
-					(AI.angle > EulerAngle::DegToRad(-22.5f) && AI.angle < EulerAngle::DegToRad(22.5f) &&
+					(AI.angle > Angle::DegToRad(-22.5f) && AI.angle < Angle::DegToRad(22.5f) &&
 						AI.distance < pow(SECTOR(3), 2) ||
 						height2 >= (height1 + CLICK(2))))
 				{
@@ -908,12 +908,12 @@ namespace TEN::Entities::TR4
 				if (item->Animation.ActiveState != GOON_STATE_SWORD_HIT_FRONT ||
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SWORD_HIT_NO_DAMAGE_MAX)
 				{
-					if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
+					if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
+							item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 						else
-							item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
+							item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
 					}
 					else
 						item->Pose.Orientation.y += AI.angle;
@@ -981,7 +981,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_MONKEY_FORWARD:
-				currentCreature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				currentCreature->MaxTurn = Angle::DegToRad(7.0f);
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsJumping = true;
 				currentCreature->LOT.IsMonkeying = true;
@@ -1018,7 +1018,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_MONKEY_PUSH_OFF:
-				currentCreature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				currentCreature->MaxTurn = Angle::DegToRad(7.0f);
 
 				if (currentCreature->Flags == someFlag3)
 				{
@@ -1076,7 +1076,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case GOON_STATE_CROUCH_PICKUP:
-				ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(11.0f));
+				ClampRotation(&item->Pose, AI.angle, Angle::DegToRad(11.0f));
 
 				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_CROUCH_PICKUP)
 					break;
@@ -1131,7 +1131,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(7));
+				ClampRotation(&item->Pose, AI.angle, Angle::DegToRad(7));
 
 				if (!Targetable(item, &AI) ||
 					item->ItemFlags[2] < 1)
@@ -1151,7 +1151,7 @@ namespace TEN::Entities::TR4
 					joint1 = AI.angle;
 					joint2 = AI.xAngle;
 				}
-				ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(7.0f));
+				ClampRotation(&item->Pose, AI.angle, Angle::DegToRad(7.0f));
 
 				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MAX ||
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MIN)
@@ -1202,7 +1202,7 @@ namespace TEN::Entities::TR4
 			case GOON_STATE_UNKNOWN_8:
 				currentCreature->MaxTurn = 0;
 
-				ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(11.0f));
+				ClampRotation(&item->Pose, AI.angle, Angle::DegToRad(11.0f));
 
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
@@ -1224,7 +1224,7 @@ namespace TEN::Entities::TR4
 			case GOON_STATE_SOMERSAULT:
 				if (item->Animation.AnimNumber == Objects[objectNumber].animIndex + GOON_ANIM_SOMERSAULT_END)
 				{
-					ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(7.0f));
+					ClampRotation(&item->Pose, AI.angle, Angle::DegToRad(7.0f));
 					break;
 				}
 

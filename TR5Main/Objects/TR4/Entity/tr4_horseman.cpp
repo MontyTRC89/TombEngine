@@ -247,8 +247,8 @@ namespace TEN::Entities::TR4
 			}
 
 			if (item->HitStatus &&
-				laraAI.angle < EulerAngle::DegToRad(67.5f) &&
-				laraAI.angle > EulerAngle::DegToRad(-67.5f) &&
+				laraAI.angle < Angle::DegToRad(67.5f) &&
+				laraAI.angle > Angle::DegToRad(-67.5f) &&
 				laraAI.distance < pow(SECTOR(2), 2))
 			{
 				if (item->Animation.ActiveState != 15)
@@ -309,7 +309,7 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case HORSEMAN_STATE_HORSE_RUN:
-				creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+				creature->MaxTurn = Angle::DegToRad(3.0f);
 				horseItem->Animation.TargetState = HORSEMAN_STATE_HORSE_WALK;
 				if (item->Animation.RequiredState)
 				{
@@ -344,15 +344,15 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.bite)
 					{
-						if (AI.angle >= EulerAngle::DegToRad(-10.0f) ||
+						if (AI.angle >= Angle::DegToRad(-10.0f) ||
 							AI.distance >= pow(SECTOR(1), 2) &&
 							(AI.distance >= pow(1365, 2) ||
-								AI.angle <= EulerAngle::DegToRad(-20.0f)))
+								AI.angle <= Angle::DegToRad(-20.0f)))
 						{
-							if (AI.angle > EulerAngle::DegToRad(10.0f) &&
+							if (AI.angle > Angle::DegToRad(10.0f) &&
 								(AI.distance < pow(SECTOR(1), 2) ||
 									AI.distance < pow(1365, 2) &&
-									AI.angle < EulerAngle::DegToRad(20.0f)))
+									AI.angle < Angle::DegToRad(20.0f)))
 							{
 								creature->MaxTurn = 0;
 								item->Animation.TargetState = 6;
@@ -367,20 +367,20 @@ namespace TEN::Entities::TR4
 				}
 				else if (AI.bite)
 				{
-					if (AI.angle >= EulerAngle::DegToRad(-10.0f) ||
-						AI.angle <= EulerAngle::DegToRad(10.0f))
+					if (AI.angle >= Angle::DegToRad(-10.0f) ||
+						AI.angle <= Angle::DegToRad(10.0f))
 					{
 						if (AI.bite)
 						{
-							if (AI.angle >= EulerAngle::DegToRad(-10.0f) ||
+							if (AI.angle >= Angle::DegToRad(-10.0f) ||
 								AI.distance >= pow(SECTOR(1), 2) &&
 								(AI.distance >= pow(1365, 2) ||
-									AI.angle <= EulerAngle::DegToRad(-20.0f)))
+									AI.angle <= Angle::DegToRad(-20.0f)))
 							{
-								if (AI.angle > EulerAngle::DegToRad(10.0f) &&
+								if (AI.angle > Angle::DegToRad(10.0f) &&
 									(AI.distance < pow(SECTOR(1), 2) ||
 										AI.distance < pow(1365, 2) &&
-										AI.angle < EulerAngle::DegToRad(20.0f)))
+										AI.angle < Angle::DegToRad(20.0f)))
 								{
 									creature->MaxTurn = 0;
 									item->Animation.TargetState = 6;
@@ -433,8 +433,8 @@ namespace TEN::Entities::TR4
 					!horseItem->Flags &&
 					AI.distance < pow(SECTOR(1), 2) &&
 					AI.bite &&
-					AI.angle < EulerAngle::DegToRad(10.0f) &&
-					AI.angle > EulerAngle::DegToRad(-10.0f))
+					AI.angle < Angle::DegToRad(10.0f) &&
+					AI.angle > Angle::DegToRad(-10.0f))
 				{
 					item->Animation.TargetState = HORSEMAN_STATE_HORSE_REARING;
 
@@ -559,7 +559,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 10:
-				creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+				creature->MaxTurn = Angle::DegToRad(3.0f);
 				creature->Flags = 0;
 
 				if (creature->ReachedGoal)
@@ -613,12 +613,12 @@ namespace TEN::Entities::TR4
 			case 13:
 			case 14:
 				creature->MaxTurn = 0;
-				if (abs(AI.angle) >= EulerAngle::DegToRad(3.0f))
+				if (abs(AI.angle) >= Angle::DegToRad(3.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += EulerAngle::DegToRad(3.0f);
+						item->Pose.Orientation.y += Angle::DegToRad(3.0f);
 					else
-						item->Pose.Orientation.y -= EulerAngle::DegToRad(3.0f);
+						item->Pose.Orientation.y -= Angle::DegToRad(3.0f);
 				}
 				else
 					item->Pose.Orientation.y += AI.angle;
@@ -752,15 +752,15 @@ namespace TEN::Entities::TR4
 
 			if (horseItem && item->ItemFlags[1])
 			{
-				if (abs(xRot - item->Pose.Orientation.x) < EulerAngle::DegToRad(1.4f))
+				if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
 					item->Pose.Orientation.x = xRot;
 				else if (xRot <= item->Pose.Orientation.x)
 				{
 					if (xRot < item->Pose.Orientation.x)
-						item->Pose.Orientation.x -= EulerAngle::DegToRad(1.4f);
+						item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
 				}
 				else
-					item->Pose.Orientation.x += EulerAngle::DegToRad(1.4f);
+					item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 
 				horseItem->Pose.Position.x = item->Pose.Position.x;
 				horseItem->Pose.Position.y = item->Pose.Position.y;

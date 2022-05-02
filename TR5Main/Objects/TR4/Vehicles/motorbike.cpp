@@ -29,10 +29,10 @@ using namespace TEN::Math::Random;
 #define MOTORBIKE_SLIP 100
 #define MOTORBIKE_FRICTION 0x180
 /*movement stuff*/
-#define MIN_MOMENTUM_TURN EulerAngle::DegToRad(4.0f)
-#define MAX_MOMENTUM_TURN EulerAngle::DegToRad(1.5f)
-#define MOTORBIKE_MAX_MOM_TURN EulerAngle::DegToRad(150.0f)
-#define MOTORBIKE_DEFAULT_HTURN EulerAngle::DegToRad(1.5f)
+#define MIN_MOMENTUM_TURN Angle::DegToRad(4.0f)
+#define MAX_MOMENTUM_TURN Angle::DegToRad(1.5f)
+#define MOTORBIKE_MAX_MOM_TURN Angle::DegToRad(150.0f)
+#define MOTORBIKE_DEFAULT_HTURN Angle::DegToRad(1.5f)
 #define MOTORBIKE_ACCEL_1 0x4000
 #define MOTORBIKE_ACCEL_2 0x7000
 #define MOTORBIKE_ACCEL_MAX 0xC000 //with the boost
@@ -40,8 +40,8 @@ using namespace TEN::Math::Random;
 #define MOTORBIKE_BIG_SLOWDOWN 0x3000
 #define MOTORBIKE_SLOWDOWN1 0x440
 #define MOTORBIKE_SLOWDOWN2 0x600
-#define MOTORBIKE_HTURN EulerAngle::DegToRad(0.5f)
-#define MOTORBIKE_MAX_HTURN EulerAngle::DegToRad(5.0f)
+#define MOTORBIKE_HTURN Angle::DegToRad(0.5f)
+#define MOTORBIKE_MAX_HTURN Angle::DegToRad(5.0f)
 #define MOTORBIKE_PITCH_SLOWDOWN 0x8000
 #define MOTORBIKE_PITCH_MAX 0xA000
 #define MOTORBIKE_BACKING_VEL 0x800
@@ -319,16 +319,16 @@ static BOOL GetOnMotorBike(short itemNumber)
 
     angle = atan2(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x) - item->Pose.Orientation.y;
     tempangle = angle - item->Pose.Orientation.y;
-    if (angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
+    if (angle > Angle::DegToRad(-45.0f) && angle < Angle::DegToRad(135.0f))
     {
         // left
-        if (tempangle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
+        if (tempangle > Angle::DegToRad(-45.0f) && angle < Angle::DegToRad(135.0f))
             return false;
     }
     else
     {
         // right
-        if (tempangle > EulerAngle::DegToRad(225.0f) && tempangle < EulerAngle::DegToRad(315.0f))
+        if (tempangle > Angle::DegToRad(225.0f) && tempangle < Angle::DegToRad(315.0f))
             return false;
     }
     return true;
@@ -368,7 +368,7 @@ void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* co
             Lara.Control.HandStatus = HandStatus::Free;
 
             short angle = atan2(item->Pose.Position.z - laraitem->Pose.Position.z, item->Pose.Position.x - laraitem->Pose.Position.x) - item->Pose.Orientation.y;
-            if (angle <= EulerAngle::DegToRad(-45.0f) || angle >= EulerAngle::DegToRad(135.0f))
+            if (angle <= Angle::DegToRad(-45.0f) || angle >= Angle::DegToRad(135.0f))
             {
                 if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
                 {
@@ -488,7 +488,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
         speed = item->Animation.Velocity;
         if (speed > 32 && speed < 64)
         {
-            TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - EulerAngle::DegToRad(180), 64 - speed, TRUE);
+            TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - Angle::DegToRad(180), 64 - speed, TRUE);
             return;
         }
 
@@ -504,7 +504,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
             speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * ExhaustStart) * 64;
         }
 
-        TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - EulerAngle::DegToRad(180), speed, FALSE);
+        TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - Angle::DegToRad(180), speed, FALSE);
     }
 }
 
@@ -1223,7 +1223,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn -= MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn -= (EulerAngle::DegToRad(1) - MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn -= (Angle::DegToRad(1) - MOTORBIKE_HTURN * motorbike->velocity) / 16384;
 
                 if (motorbike->bikeTurn < -MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = -MOTORBIKE_MAX_HTURN;
@@ -1233,7 +1233,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn += MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn += (EulerAngle::DegToRad(1) + MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn += (Angle::DegToRad(1) + MOTORBIKE_HTURN * motorbike->velocity) / 16384;
 
                 if (motorbike->bikeTurn > MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = MOTORBIKE_MAX_HTURN;
@@ -1541,6 +1541,6 @@ void DrawMotorbikeEffect(ITEM_INFO* item)
     // TODO: speedometer
     //MOTORBIKE_INFO* motorbike = GetMotorbikeInfo(item);
     //if (Lara.Vehicle != NO_ITEM)
-        //DrawMotorBikeSpeedoMeter(phd_winwidth - 64, phd_winheight - 16, motorbike->velocity, EulerAngle::DegToRad(180), EulerAngle::DegToRad(270), 32); // angle are 2D angle...
+        //DrawMotorBikeSpeedoMeter(phd_winwidth - 64, phd_winheight - 16, motorbike->velocity, Angle::DegToRad(180), Angle::DegToRad(270), 32); // angle are 2D angle...
     DrawMotorBikeSmoke(item);
 }

@@ -172,7 +172,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemFront(ITEM_INFO* item, int distance)
 	{
-		switch ((int)EulerAngle::RadToDeg(item->Pose.Orientation.GetY()))
+		switch ((int)Angle::RadToDeg(item->Pose.Orientation.GetY()))
 		{
 		case C_NORTH:
 			item->Pose.Position.z += distance;
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 
 	static void MoveItemBack(ITEM_INFO* item, int distance)
 	{
-		switch ((int)EulerAngle::RadToDeg(item->Pose.Orientation.GetY()))
+		switch ((int)Angle::RadToDeg(item->Pose.Orientation.GetY()))
 		{
 		case C_NORTH:
 			item->Pose.Position.z -= distance;

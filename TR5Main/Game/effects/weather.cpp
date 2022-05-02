@@ -396,7 +396,7 @@ namespace TEN
 
 						auto distance = level->Weather == WeatherType::Snow ? COLLISION_CHECK_DISTANCE : COLLISION_CHECK_DISTANCE / 2;
 						auto radius = GenerateInt(0, distance);
-						short angle = 0;// GenerateInt(EulerAngle::DegToRad(0), EulerAngle::DegToRad(180));
+						short angle = 0;// GenerateInt(Angle::DegToRad(0), Angle::DegToRad(180));
 
 						auto xPos = Camera.pos.x + ((int)(cos(angle) * radius));
 						auto zPos = Camera.pos.z + ((int)(sin(angle) * radius));

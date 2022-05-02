@@ -91,7 +91,7 @@ void ControlGladiator(short itemNumber)
 			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 			
 			rot = atan2(dz, dx) - item->Pose.Orientation.y;
-			if (rot <= EulerAngle::DegToRad(-90.0f) || rot >= EulerAngle::DegToRad(90.0f))
+			if (rot <= Angle::DegToRad(-90.0f) || rot >= Angle::DegToRad(90.0f))
 				unknown = false;
 
 			distance = pow(dx, 2) + pow(dz, 2);
@@ -183,7 +183,7 @@ void ControlGladiator(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = creature->Mood != MoodType::Bored ? EulerAngle::DegToRad(7.0f) : EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = creature->Mood != MoodType::Bored ? Angle::DegToRad(7.0f) : Angle::DegToRad(2.0f);
 			joint2 = rot;
 			creature->Flags = 0;
 
@@ -216,7 +216,7 @@ void ControlGladiator(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = EulerAngle::DegToRad(11.0f);
+			creature->MaxTurn = Angle::DegToRad(11.0f);
 			creature->LOT.IsJumping = false;
 			tilt = angle / 2;
 
@@ -295,12 +295,12 @@ void ControlGladiator(short itemNumber)
 		case 11:
 			creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
+			if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
 			}
 			else
 				item->Pose.Orientation.y += AI.angle;

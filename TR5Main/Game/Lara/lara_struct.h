@@ -1,6 +1,5 @@
 #pragma once
 #include "Objects/objectslist.h"
-#include "Specific/EulerAngle.h"
 #include "Specific/trmath.h"
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
@@ -1065,7 +1064,7 @@ struct ArmInfo
 	int FrameNumber;
 	int FrameBase;
 	bool Locked;
-	EulerAngle Rotation;
+	EulerAngles Rotation;
 	short FlashGun;
 };
 
@@ -1243,8 +1242,8 @@ struct LaraInfo
 	FlareData Flare;
 	bool LitTorch;
 
-	EulerAngle ExtraHeadRot;
-	EulerAngle ExtraTorsoRot;
+	EulerAngles ExtraHeadRot;
+	EulerAngles ExtraTorsoRot;
 	Vector3Int ExtraVelocity;
 	short WaterCurrentActive;
 	Vector3Int WaterCurrentPull;
@@ -1268,7 +1267,7 @@ struct LaraInfo
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
-	EulerAngle TargetOrientation;
+	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
 	PoseData NextCornerPos;
 

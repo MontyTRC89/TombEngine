@@ -205,7 +205,7 @@ namespace TEN::Entities::Generic
 		auto oldPos = item->Pose.Position;
 
 		if (item->Animation.VerticalVelocity)
-			item->Pose.Orientation.z += EulerAngle::DegToRad(5);
+			item->Pose.Orientation.z += Angle::DegToRad(5);
 		else if (!item->Animation.Velocity)
 		{
 			item->Pose.Orientation.x = 0;

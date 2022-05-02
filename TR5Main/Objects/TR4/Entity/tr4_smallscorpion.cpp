@@ -99,7 +99,7 @@ void SmallScorpionControl(short itemNumber)
 				item->Animation.TargetState = SSCORPION_STATE_WALK;
 			else if (AI.bite)
 			{
-				creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+				creature->MaxTurn = Angle::DegToRad(6.0f);
 				if (GetRandomControl() & 1)
 					item->Animation.TargetState = SSCORPION_STATE_ATTACK_1;
 				else
@@ -111,7 +111,7 @@ void SmallScorpionControl(short itemNumber)
 			break;
 
 		case SSCORPION_STATE_WALK:
-			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+			creature->MaxTurn = Angle::DegToRad(6.0f);
 
 			if (AI.distance >= pow(341, 2))
 			{
@@ -124,7 +124,7 @@ void SmallScorpionControl(short itemNumber)
 			break;
 
 		case SSCORPION_STATE_RUN:
-			creature->MaxTurn = EulerAngle::DegToRad(8.0f);
+			creature->MaxTurn = Angle::DegToRad(8.0f);
 
 			if (AI.distance < pow(341, 2))
 				item->Animation.TargetState = SSCORPION_STATE_IDLE;
@@ -135,12 +135,12 @@ void SmallScorpionControl(short itemNumber)
 		case SSCORPION_STATE_ATTACK_2:
 			creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= EulerAngle::DegToRad(6.0f))
+			if (abs(AI.angle) >= Angle::DegToRad(6.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(6.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(6.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(6.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(6.0f);
 			}
 			else
 				item->Pose.Orientation.y += AI.angle;
@@ -160,12 +160,12 @@ void SmallScorpionControl(short itemNumber)
 						BITE_INFO* biteInfo;
 						if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 						{
-							rotation = item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f);
+							rotation = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 							biteInfo = &SmallScorpionBiteInfo1;
 						}
 						else
 						{
-							rotation = item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f);
+							rotation = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 							biteInfo = &SmallScorpionBiteInfo2;
 						}
 

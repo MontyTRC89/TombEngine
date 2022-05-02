@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 			item->Animation.ActiveState != SKELETON_STATE_HURT_BY_SHOTGUN_2 &&
 			item->Animation.ActiveState != 25)
 		{
-			if (AI.angle >= EulerAngle::DegToRad(67.5f) || AI.angle <= EulerAngle::DegToRad(-67.5f))
+			if (AI.angle >= Angle::DegToRad(67.5f) || AI.angle <= Angle::DegToRad(-67.5f))
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_2;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
@@ -249,23 +249,23 @@ namespace TEN::Entities::TR4
 
 			creature->Enemy = tempEnemy;
 
-			if (item != Lara.TargetEntity || laraAI.distance <= 870 || angle <= EulerAngle::DegToRad(-56.25f) || angle >= EulerAngle::DegToRad(56.25f))
+			if (item != Lara.TargetEntity || laraAI.distance <= 870 || angle <= Angle::DegToRad(-56.25f) || angle >= Angle::DegToRad(56.25f))
 			{
 				jumpLeft = false;
 				jumpRight = false;
 			}
 			else
 			{
-				dx = 870 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(45.0f));
-				dz = 870 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(45.0f));
+				dx = 870 * sin(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
+				dz = 870 * cos(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(78.75f));
-				dz = 870 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(78.75f));
+				dx = 870 * sin(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
+				dz = 870 * cos(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -282,16 +282,16 @@ namespace TEN::Entities::TR4
 						jumpRight = false;
 				}
 
-				dx = 870 * sin(item->Pose.Orientation.y - EulerAngle::DegToRad(45.0f));
-				dz = 870 * cos(item->Pose.Orientation.y - EulerAngle::DegToRad(45.0f));
+				dx = 870 * sin(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
+				dz = 870 * cos(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * sin(item->Pose.Orientation.y - EulerAngle::DegToRad(78.75f));
-				dz = 870 * cos(item->Pose.Orientation.y - EulerAngle::DegToRad(78.75f));
+				dx = 870 * sin(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
+				dz = 870 * cos(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -314,7 +314,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 2:
-				creature->MaxTurn = (creature->Mood != MoodType::Escape) ? EulerAngle::DegToRad(2.0f) : 0;
+				creature->MaxTurn = (creature->Mood != MoodType::Escape) ? Angle::DegToRad(2.0f) : 0;
 				creature->LOT.IsJumping = false;
 				creature->Flags = 0;
 
@@ -481,7 +481,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 16:
-				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				creature->MaxTurn = Angle::DegToRad(7.0f);
 				creature->LOT.IsJumping = false;
 
 				if (item->AIBits & GUARD || canJump1sector || canJump2sectors)
@@ -531,9 +531,9 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y += Angle::DegToRad(6.0f);
 					else
-						item->Pose.Orientation.y -= EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y -= Angle::DegToRad(6.0f);
 				}
 				else
 					item->Pose.Orientation.y += AI.angle;
@@ -563,9 +563,9 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y += Angle::DegToRad(6.0f);
 					else
-						item->Pose.Orientation.y -= EulerAngle::DegToRad(6.0f);
+						item->Pose.Orientation.y -= Angle::DegToRad(6.0f);
 				}
 				else
 					item->Pose.Orientation.y += AI.angle;

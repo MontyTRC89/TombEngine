@@ -1,6 +1,5 @@
 #pragma once
 #include "Game/items.h"
-#include "Specific/EulerAngle.h"
 
 constexpr auto NUM_BATS = 64;
 

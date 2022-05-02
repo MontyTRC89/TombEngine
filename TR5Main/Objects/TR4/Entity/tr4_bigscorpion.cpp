@@ -226,7 +226,7 @@ void ScorpionControl(short itemNumber)
 
 			if (info.bite)
 			{
-				creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+				creature->MaxTurn = Angle::DegToRad(2.0f);
 
 				if (GetRandomControl() & 1 &&
 					creature->Enemy->HitPoints <= 15 &&
@@ -243,7 +243,7 @@ void ScorpionControl(short itemNumber)
 			break;
 
 		case BSCORPION_STATE_WALK:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 
 			if (info.distance < pow(1365, 2))
 				item->Animation.TargetState = BSCORPION_STATE_IDLE;
@@ -253,7 +253,7 @@ void ScorpionControl(short itemNumber)
 			break;
 
 		case BSCORPION_STATE_RUN:
-			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+			creature->MaxTurn = Angle::DegToRad(3.0f);
 
 			if (info.distance < pow(1365, 2))
 				item->Animation.TargetState = BSCORPION_STATE_IDLE;
@@ -264,12 +264,12 @@ void ScorpionControl(short itemNumber)
 		case BSCORPION_STATE_ATTACK_2:
 			creature->MaxTurn = 0;
 
-			if (abs(info.angle) >= EulerAngle::DegToRad(2.0f))
+			if (abs(info.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (info.angle >= 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
 				item->Pose.Orientation.y += info.angle;
@@ -295,7 +295,7 @@ void ScorpionControl(short itemNumber)
 					item,
 					&BigScorpionBite1,
 					10,
-					item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f),
+					item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 					DoBloodSplat);
 			}
 			else if (item->TouchBits & 0x1B00100)
@@ -311,7 +311,7 @@ void ScorpionControl(short itemNumber)
 						item,
 						&BigScorpionBite1,
 						10,
-						item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f),
+						item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
 				else
@@ -320,7 +320,7 @@ void ScorpionControl(short itemNumber)
 						item,
 						&BigScorpionBite2,
 						10,
-						item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f),
+						item->Pose.Orientation.y - Angle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
 
@@ -357,24 +357,24 @@ void ScorpionControl(short itemNumber)
 		}
 	}
 
-	if ((angle1 - item->Pose.Orientation.x) < EulerAngle::DegToRad(1.4f))
-		item->Pose.Orientation.x = EulerAngle::DegToRad(1.4f);
+	if ((angle1 - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
+		item->Pose.Orientation.x = Angle::DegToRad(1.4f);
 	else
 	{
 		if (angle1 <= item->Pose.Orientation.x)
-			item->Pose.Orientation.x -= EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
 		else
-			item->Pose.Orientation.x += EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 	}
 
-	if ((angle2 - item->Pose.Orientation.z) < EulerAngle::DegToRad(1.4f))
-		item->Pose.Orientation.z = EulerAngle::DegToRad(1.4f);
+	if ((angle2 - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
+		item->Pose.Orientation.z = Angle::DegToRad(1.4f);
 	else
 	{
 		if (angle2 <= item->Pose.Orientation.z)
-			item->Pose.Orientation.z -= EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.z -= Angle::DegToRad(1.4f);
 		else
-			item->Pose.Orientation.z += EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.z += Angle::DegToRad(1.4f);
 	}
 
 	if (!CutSeqNum)

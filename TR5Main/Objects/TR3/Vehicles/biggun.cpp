@@ -18,8 +18,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
-#define BGUN_TURN_RATE	EulerAngle::DegToRad(2.0f)
-#define BGUN_TURN_MAX	EulerAngle::DegToRad(16.0f)
+#define BGUN_TURN_RATE	Angle::DegToRad(2.0f)
+#define BGUN_TURN_MAX	Angle::DegToRad(16.0f)
 
 #define RECOIL_TIME 26
 #define RECOIL_Z	25
@@ -92,8 +92,8 @@ static bool BigGunTestMount(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 	int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
 		return false;
 
-	float deltaAngle = EulerAngle::Clamp(laraItem->Pose.Orientation.y - bigGunItem->Pose.Orientation.y);
-	if (deltaAngle > EulerAngle::DegToRad(35.0f) || deltaAngle < EulerAngle::DegToRad(-35.0f))
+	float deltaAngle = Angle::Normalize(laraItem->Pose.Orientation.y - bigGunItem->Pose.Orientation.y);
+	if (deltaAngle > Angle::DegToRad(35.0f) || deltaAngle < Angle::DegToRad(-35.0f))
 		return false;
 
 	return true;
@@ -118,7 +118,7 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 
 		InitialiseItem(itemNumber);
 
-		projectileItem->Pose.Orientation.x = -((bigGun->Orientation.x - 32) * EulerAngle::DegToRad(1.0f));
+		projectileItem->Pose.Orientation.x = -((bigGun->Orientation.x - 32) * Angle::DegToRad(1.0f));
 		projectileItem->Pose.Orientation.y = bigGunItem->Pose.Orientation.y;
 		projectileItem->Pose.Orientation.z = 0;
 		projectileItem->Animation.Velocity = 16;
@@ -286,7 +286,7 @@ bool BigGunControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		break;
 	}
 	
-	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
+	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
 	bigGunItem->Pose.Orientation.y = bigGun->StartYRot + bigGun->Orientation.z;
 	laraItem->Pose.Orientation.y = bigGunItem->Pose.Orientation.y;

@@ -39,21 +39,21 @@ namespace TEN::Entities::TR4
 
 		short rotations[8] =
 		{
-			EulerAngle::DegToRad(180.0f),
-			EulerAngle::DegToRad(225.0f),
-			EulerAngle::DegToRad(270.0f),
-			EulerAngle::DegToRad(315.0f),
-			EulerAngle::DegToRad(0.0f),
-			EulerAngle::DegToRad(45.0f),
-			EulerAngle::DegToRad(90.0f),
-			EulerAngle::DegToRad(135.0f)
+			Angle::DegToRad(180.0f),
+			Angle::DegToRad(225.0f),
+			Angle::DegToRad(270.0f),
+			Angle::DegToRad(315.0f),
+			Angle::DegToRad(0.0f),
+			Angle::DegToRad(45.0f),
+			Angle::DegToRad(90.0f),
+			Angle::DegToRad(135.0f)
 		};
 
 		if (item->TriggerFlags & 8)
 		{
 			angle = item->TriggerFlags & 7;
 			item->Pose.Orientation.x = rotations[angle];
-			item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
+			item->Pose.Orientation.y = Angle::DegToRad(90.0f);
 			item->Pose.Position.z -= SPxzoffs[angle];
 		}
 		else

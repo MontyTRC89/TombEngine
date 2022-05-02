@@ -28,7 +28,7 @@ void lara_as_climb_end(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	Camera.flags = CF_FOLLOW_CENTER;
-	Camera.targetAngle = EulerAngle::DegToRad(-45.0f);
+	Camera.targetAngle = Angle::DegToRad(-45.0f);
 }
 
 void lara_col_climb_down(ITEM_INFO* item, CollisionInfo* coll)
@@ -114,7 +114,7 @@ void lara_as_climb_down(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
+	Camera.targetElevation = Angle::DegToRad(-45.0f);
 
 	// Overhang hook.
 	SlopeClimbDownExtra(item, coll);
@@ -189,7 +189,7 @@ void lara_as_climb_up(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(30.0f);
+	Camera.targetElevation = Angle::DegToRad(30.0f);
 }
 
 void lara_col_climb_right(ITEM_INFO* item, CollisionInfo* coll)
@@ -199,7 +199,7 @@ void lara_col_climb_right(ITEM_INFO* item, CollisionInfo* coll)
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
+		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
@@ -208,8 +208,8 @@ void lara_as_climb_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = EulerAngle::DegToRad(30.0f);
-	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
+	Camera.targetAngle = Angle::DegToRad(30.0f);
+	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
 	if (!(TrInput & (IN_RIGHT | IN_RSTEP)))
 		item->Animation.TargetState = LS_LADDER_IDLE;
@@ -222,7 +222,7 @@ void lara_col_climb_left(ITEM_INFO* item, CollisionInfo* coll)
 	if (!LaraCheckForLetGo(item, coll))
 	{
 		int shift = 0;
-		lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
+		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
@@ -231,8 +231,8 @@ void lara_as_climb_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = EulerAngle::DegToRad(-30.0f);
-	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
+	Camera.targetAngle = Angle::DegToRad(-30.0f);
+	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
 	if (!(TrInput & (IN_LEFT | IN_LSTEP)))
 		item->Animation.TargetState = LS_LADDER_IDLE;
@@ -345,12 +345,12 @@ void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.IsClimbingLadder = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-20.0f);
+	Camera.targetElevation = Angle::DegToRad(-20.0f);
 
 	if (item->Animation.AnimNumber == LA_LADDER_DISMOUNT_LEFT_START)
-		Camera.targetAngle = EulerAngle::DegToRad(-60.0f);
+		Camera.targetAngle = Angle::DegToRad(-60.0f);
 	if (item->Animation.AnimNumber == LA_LADDER_DISMOUNT_RIGHT_START)
-		Camera.targetAngle = EulerAngle::DegToRad(60.0f);
+		Camera.targetAngle = Angle::DegToRad(60.0f);
 
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
@@ -358,12 +358,12 @@ void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_LEFT;
-		lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
+		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 	}
 	else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
 	{
 		item->Animation.TargetState = LS_LADDER_RIGHT;
-		lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
+		lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 	}
 	else if (TrInput & IN_JUMP)
 	{
@@ -371,7 +371,7 @@ void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
 			lara->Control.HandStatus = HandStatus::Free;
-			lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f));
+			lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 		}
 	}
 
@@ -383,20 +383,20 @@ void lara_as_climb_stepoff_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = EulerAngle::DegToRad(-60.0f);
-	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
+	Camera.targetAngle = Angle::DegToRad(-60.0f);
+	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
+	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 }
 
 void lara_as_climb_stepoff_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetAngle = EulerAngle::DegToRad(60.0f);
-	Camera.targetElevation = EulerAngle::DegToRad(-15.0f);
+	Camera.targetAngle = Angle::DegToRad(60.0f);
+	Camera.targetElevation = Angle::DegToRad(-15.0f);
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
+	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 }
 
 // --------
@@ -529,8 +529,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, CollisionInfo* coll, int result, int 
 	if (TrInput & IN_LEFT)
 	{
 		short troomnumber = item->RoomNumber;
-		int dx = int(sin(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f)) * 10);
-		int dz = int(cos(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f)) * 10);
+		int dx = int(sin(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)) * 10);
+		int dz = int(cos(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)) * 10);
 		int height = GetFloorHeight(GetFloor(item->Pose.Position.x + dx, item->Pose.Position.y, item->Pose.Position.z + dz, &troomnumber),
 			item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - item->Pose.Position.y;
 		if (height < CLICK(1.5f)) // LADDER dismounts (left/right)
@@ -542,8 +542,8 @@ void LaraDoClimbLeftRight(ITEM_INFO* item, CollisionInfo* coll, int result, int 
 	else if (TrInput & IN_RIGHT)
 	{
 		short troomnumber = item->RoomNumber;
-		int dx = int(sin(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f)) * 10);
-		int dz = int(cos(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f)) * 10);
+		int dx = int(sin(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * 10);
+		int dz = int(cos(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * 10);
 		int height = GetFloorHeight(GetFloor(item->Pose.Position.x + dx, item->Pose.Position.y, item->Pose.Position.z + dz, &troomnumber),
 			item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) - item->Pose.Position.y;
 
@@ -622,7 +622,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
+		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
 		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
 
@@ -665,7 +665,7 @@ int LaraClimbRightCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
+			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
 			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
 
@@ -715,7 +715,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 		lara->NextCornerPos.Position.y = item->Pose.Position.y;
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
+		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
 		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.GetY();
 
@@ -757,7 +757,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.x = item->Pose.Position.x = x;
 			lara->NextCornerPos.Position.y = item->Pose.Position.y;
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
-			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
+			lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 			lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
 			item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
 

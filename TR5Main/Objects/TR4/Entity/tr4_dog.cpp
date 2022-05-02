@@ -210,7 +210,7 @@ namespace TEN::Entities::TR4
 					}
 
 					creature->Flags = 0;
-					creature->MaxTurn = EulerAngle::DegToRad(1.0f);
+					creature->MaxTurn = Angle::DegToRad(1.0f);
 
 					if (random < 256)
 					{
@@ -244,7 +244,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_WALK:
-				creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+				creature->MaxTurn = Angle::DegToRad(3.0f);
 
 				if (item->AIBits & PATROL1)
 				{
@@ -262,7 +262,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_RUN:
-				creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+				creature->MaxTurn = Angle::DegToRad(6.0f);
 
 				if (creature->Mood == MoodType::Escape)
 				{
@@ -285,7 +285,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case DOG_STATE_STALK:
-				creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+				creature->MaxTurn = Angle::DegToRad(3.0f);
 
 				if (creature->Mood != MoodType::Bored)
 				{

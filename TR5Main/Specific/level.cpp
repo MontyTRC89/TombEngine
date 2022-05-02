@@ -119,7 +119,7 @@ void LoadItems()
 			item->Pose.Position.x = ReadInt32();
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
-			item->Pose.Orientation.y = EulerAngle::ShrtToRad(ReadInt16()); // TODO
+			item->Pose.Orientation.y = Angle::ShrtToRad(ReadInt16()); // TODO
 			item->Shade = ReadInt16();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
@@ -724,7 +724,7 @@ void ReadRooms()
 			mesh.pos.Position.y = ReadInt32();
 			mesh.pos.Position.z = ReadInt32();
 			mesh.pos.Orientation.x = 0;
-			mesh.pos.Orientation.y = EulerAngle::ShrtToRad(ReadUInt16()); // TODO
+			mesh.pos.Orientation.y = Angle::ShrtToRad(ReadUInt16()); // TODO
 			mesh.pos.Orientation.z = 0;
 			mesh.flags = ReadUInt16();
 			Vector3 rgb = ReadVector3();
@@ -956,7 +956,7 @@ void LoadAIObjects()
 		obj.z = ReadInt32();
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
-		obj.yRot = EulerAngle::ShrtToRad(ReadInt16()); // TODO
+		obj.yRot = Angle::ShrtToRad(ReadInt16()); // TODO
 		obj.boxNumber = ReadInt16();
 
 		byte numBytes = ReadInt8();

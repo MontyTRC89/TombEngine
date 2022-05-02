@@ -53,7 +53,7 @@ void InitialiseHydra(short itemNumber)
 	if (item->TriggerFlags == 2)
 		item->Pose.Position.z -= CLICK(1.5f);
 
-	item->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
+	item->Pose.Orientation.y = Angle::DegToRad(90.0f);
 	item->Pose.Position.x -= CLICK(1);
 }
 
@@ -193,20 +193,20 @@ void HydraControl(short itemNumber)
 			item->Animation.ActiveState != 10 &&
 			item->Animation.ActiveState != HYDRA_STATE_DEATH)
 		{
-			if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
+			if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(1.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(1.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(1.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
 			}
 			else
 				item->Pose.Orientation.y += AI.angle;
 
 			if (item->TriggerFlags == 1)
-				tilt = EulerAngle::DegToRad(-2.8f);
+				tilt = Angle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = EulerAngle::DegToRad(2.8f);
+				tilt = Angle::DegToRad(2.8f);
 		}
 
 		if (item->Animation.ActiveState != 12)
@@ -225,13 +225,13 @@ void HydraControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case HYDRA_STATE_STOP:
-			creature->MaxTurn = EulerAngle::DegToRad(1.0f);
+			creature->MaxTurn = Angle::DegToRad(1.0f);
 			creature->Flags = 0;
 
 			if (item->TriggerFlags == 1)
-				tilt = EulerAngle::DegToRad(-2.8f);
+				tilt = Angle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = EulerAngle::DegToRad(2.8f);
+				tilt = Angle::DegToRad(2.8f);
 
 			if (AI.distance >= pow(CLICK(7), 2) && GetRandomControl() & 0x1F)
 			{
@@ -307,9 +307,9 @@ void HydraControl(short itemNumber)
 			}
 
 			if (item->TriggerFlags == 1)
-				tilt = EulerAngle::DegToRad(-2.8f);
+				tilt = Angle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = EulerAngle::DegToRad(2.8f);
+				tilt = Angle::DegToRad(2.8f);
 
 			if (!(GlobalCounter & 3))
 			{
@@ -344,13 +344,13 @@ void HydraControl(short itemNumber)
 			break;
 
 		case 6:
-			creature->MaxTurn = EulerAngle::DegToRad(1.0f);
+			creature->MaxTurn = Angle::DegToRad(1.0f);
 			creature->Flags = 0;
 
 			if (item->TriggerFlags == 1)
-				tilt = EulerAngle::DegToRad(-2.8f);
+				tilt = Angle::DegToRad(-2.8f);
 			else if (item->TriggerFlags == 2)
-				tilt = EulerAngle::DegToRad(2.8f);
+				tilt = Angle::DegToRad(2.8f);
 
 			if (AI.distance >= pow(CLICK(3), 2))
 			{

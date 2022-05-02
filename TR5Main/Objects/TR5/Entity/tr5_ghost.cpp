@@ -47,12 +47,12 @@ void InvisibleGhostControl(short itemNumber)
 	CreatureAIInfo(item, &AI);
 
 	angle = CreatureTurn(item, creature->MaxTurn);
-	if (abs(AI.angle) >= EulerAngle::DegToRad(3.0f))
+	if (abs(AI.angle) >= Angle::DegToRad(3.0f))
 	{
 		if (AI.angle > 0)
-			item->Pose.Orientation.y += EulerAngle::DegToRad(3.0f);
+			item->Pose.Orientation.y += Angle::DegToRad(3.0f);
 		else
-			item->Pose.Orientation.y -= EulerAngle::DegToRad(3.0f);
+			item->Pose.Orientation.y -= Angle::DegToRad(3.0f);
 	}
 	else
 		item->Pose.Orientation.y += AI.angle;

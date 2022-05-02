@@ -31,7 +31,7 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		InitialiseItem(grenadeItemNumber);
 
 		grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
-		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f);
+		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 		grenadeItem->Pose.Orientation.z = 0;
 
 		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* sin(grenadeItem->Pose.Orientation.y);
@@ -101,14 +101,14 @@ void EnemyJeepControl(short itemNumber)
 		{
 			item->Pose.Position.x += dz / 64;
 			item->Pose.Position.z += dx / 64;
-			item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 			height1 = y;
 		}
 
 		int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
 		if (abs(item->Pose.Position.y - height2) > CLICK(3))
 		{
-			item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+			item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			item->Pose.Position.x -= dz / 64;
 			item->Pose.Position.z += dx / 64;
 			height2 = y;
@@ -178,9 +178,9 @@ void EnemyJeepControl(short itemNumber)
 			if (item->ItemFlags[0] > 8704)
 				item->ItemFlags[0] = 8704;
 
-			if (AI.angle <= EulerAngle::DegToRad(1.4f))
+			if (AI.angle <= Angle::DegToRad(1.4f))
 			{
-				if (AI.angle < EulerAngle::DegToRad(-1.4f))
+				if (AI.angle < Angle::DegToRad(-1.4f))
 					item->Animation.TargetState = 3;
 			}
 			else
@@ -270,7 +270,7 @@ void EnemyJeepControl(short itemNumber)
 			if (distance > pow(SECTOR(2), 2) &&
 				distance < pow(SECTOR(10), 2) &&
 				!item->ItemFlags[2] &&
-				(angle < EulerAngle::DegToRad(-112.5f) || angle > EulerAngle::DegToRad(112.5f)))
+				(angle < Angle::DegToRad(-112.5f) || angle > Angle::DegToRad(112.5f)))
 			{
 				EnemyJeepLaunchGrenade(item);
 				item->ItemFlags[2] = 150;
@@ -328,19 +328,19 @@ void EnemyJeepControl(short itemNumber)
 		if (item->ItemFlags[2] < 0)
 			item->ItemFlags[2] = 0;
 
-		if (abs(xRot - item->Pose.Orientation.x) < EulerAngle::DegToRad(1.4f))
+		if (abs(xRot - item->Pose.Orientation.x) < Angle::DegToRad(1.4f))
 			item->Pose.Orientation.x = xRot;
 		else if (xRot < item->Pose.Orientation.x)
-			item->Pose.Orientation.x -= EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.x -= Angle::DegToRad(1.4f);
 		else 
-			item->Pose.Orientation.x += EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.x += Angle::DegToRad(1.4f);
 
-		if (abs(zRot - item->Pose.Orientation.z) < EulerAngle::DegToRad(1.4f))
+		if (abs(zRot - item->Pose.Orientation.z) < Angle::DegToRad(1.4f))
 			item->Pose.Orientation.z = zRot;
 		else if (zRot < item->Pose.Orientation.z)
-			item->Pose.Orientation.z -= EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.z -= Angle::DegToRad(1.4f);
 		else
-			item->Pose.Orientation.z += EulerAngle::DegToRad(1.4f);
+			item->Pose.Orientation.z += Angle::DegToRad(1.4f);
 
 		item->ItemFlags[0] += -2 - xRot / 512;
 		if (item->ItemFlags[0] < 0)

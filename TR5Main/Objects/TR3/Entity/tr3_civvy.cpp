@@ -40,8 +40,8 @@ enum CivvyAnim
 
 };
 
-#define CIVVY_WALK_TURN EulerAngle::DegToRad(5)
-#define CIVVY_RUN_TURN EulerAngle::DegToRad(6)
+#define CIVVY_WALK_TURN Angle::DegToRad(5)
+#define CIVVY_RUN_TURN Angle::DegToRad(6)
 #define CIVVY_HIT_DAMAGE 40
 #define CIVVY_SWIPE_DAMAGE 50
 #define CIVVY_ATTACK0_RANGE pow(SECTOR(3), 2)

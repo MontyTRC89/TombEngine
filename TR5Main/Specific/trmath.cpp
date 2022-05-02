@@ -1,5 +1,4 @@
 #include "framework.h"
-#include "Specific/EulerAngle.h"
 #include "Specific/trmath.h"
 
 #include <cmath>
@@ -89,10 +88,10 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 {
 	int deltaAngle = angle - *rotation;
 
-	if (deltaAngle < EulerAngle::DegToRad(-180.0f))
-		deltaAngle += EulerAngle::DegToRad(360.0f);
-	else if (deltaAngle > EulerAngle::DegToRad(180.0f))
-		deltaAngle -= EulerAngle::DegToRad(360.0f);
+	if (deltaAngle < Angle::DegToRad(-180.0f))
+		deltaAngle += Angle::DegToRad(360.0f);
+	else if (deltaAngle > Angle::DegToRad(180.0f))
+		deltaAngle -= Angle::DegToRad(360.0f);
 
 	if (outAngle)
 		*outAngle = static_cast<short>(deltaAngle);

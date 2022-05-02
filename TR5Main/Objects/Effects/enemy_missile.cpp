@@ -144,7 +144,7 @@ namespace TEN::Entities::Effects
 
 		if (fx->flag1 == 1)
 		{
-			maxRotation = EulerAngle::DegToRad(2.8f);
+			maxRotation = Angle::DegToRad(2.8f);
 			maxVelocity = CLICK(1);
 		}
 		else
@@ -154,10 +154,10 @@ namespace TEN::Entities::Effects
 				if (fx->counter)
 					fx->counter--;
 
-				maxRotation = EulerAngle::DegToRad(1.4f);
+				maxRotation = Angle::DegToRad(1.4f);
 			}
 			else
-				maxRotation = EulerAngle::DegToRad(4.5f);
+				maxRotation = Angle::DegToRad(4.5f);
 
 			maxVelocity = CLICK(0.75f);
 		}

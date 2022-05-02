@@ -27,13 +27,13 @@ void InitialiseHair()
 
 		Hairs[h][0].initialized = true;
 		Hairs[h][0].Pose.Orientation.y = 0;
-		Hairs[h][0].Pose.Orientation.x = EulerAngle::DegToRad(-90.0f);
+		Hairs[h][0].Pose.Orientation.x = Angle::DegToRad(-90.0f);
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
 			Hairs[h][i].initialized = true;
 			Hairs[h][i].Pose.Position = Vector3Int(*(bone + 1), *(bone + 2), *(bone + 3));
-			Hairs[h][i].Pose.Orientation = EulerAngle(EulerAngle::DegToRad(-90.0f), 0, 0);
+			Hairs[h][i].Pose.Orientation = EulerAngles(Angle::DegToRad(-90.0f), 0, 0);
 
 			Hairs[h][i].hvel.x = Hairs[h][i].hvel.y = Hairs[h][i].hvel.z = 0;
 		}

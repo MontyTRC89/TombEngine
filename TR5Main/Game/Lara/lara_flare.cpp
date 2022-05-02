@@ -31,8 +31,8 @@ void FlareControl(short itemNumber)
 
 	if (flareItem->Animation.VerticalVelocity)
 	{
-		flareItem->Pose.Orientation.SetX(flareItem->Pose.Orientation.GetX() + EulerAngle::DegToRad(3.0f));
-		flareItem->Pose.Orientation.SetZ(flareItem->Pose.Orientation.GetZ() + EulerAngle::DegToRad(5.0f));
+		flareItem->Pose.Orientation.SetX(flareItem->Pose.Orientation.GetX() + Angle::DegToRad(3.0f));
+		flareItem->Pose.Orientation.SetZ(flareItem->Pose.Orientation.GetZ() + Angle::DegToRad(5.0f));
 	}
 	else
 	{
@@ -88,8 +88,8 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::Free;
-	lara->LeftArm.Rotation = EulerAngle();
-	lara->RightArm.Rotation = EulerAngle();
+	lara->LeftArm.Rotation = EulerAngles();
+	lara->RightArm.Rotation = EulerAngles();
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
 	lara->TargetEntity = NULL;
@@ -306,7 +306,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		if (floorHeight < pos.y || collided)
 		{
 			flag = true;
-			flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f));
+			flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 			flareItem->Pose.Position.x = laraItem->Pose.Position.x + 320 * sin(flareItem->Pose.Orientation.GetY());
 			flareItem->Pose.Position.z = laraItem->Pose.Position.z + 320 * cos(flareItem->Pose.Orientation.GetY());
 			flareItem->RoomNumber = laraItem->RoomNumber;
@@ -316,7 +316,7 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 			if (thrown)
 				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
 			else
-				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() - EulerAngle::DegToRad(45.0f));
+				flareItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() - Angle::DegToRad(45.0f));
 
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}

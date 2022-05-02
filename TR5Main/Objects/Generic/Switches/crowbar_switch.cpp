@@ -21,9 +21,9 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		0, 0,
 		-512, -256,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	Vector3Int CrowbarPos2 = { 89, 0, 328 }; 
@@ -33,9 +33,9 @@ namespace TEN::Entities::Switches
 		-256, 256,
 		0, 0,
 		256, 512,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	void CrowbarSwitchCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
@@ -54,7 +54,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraitem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraitem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 
 				if (TestLaraPosition(&CrowbarBounds2, switchItem, laraitem))
 				{
@@ -81,7 +81,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraitem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraitem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 			}
 			else
 			{

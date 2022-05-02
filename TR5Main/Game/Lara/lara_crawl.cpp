@@ -103,7 +103,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.GetY();
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;
@@ -636,7 +636,7 @@ void lara_col_crawl_back(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Airborne = false;
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
-	lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;	// Offset of 1 is required or Lara will crawl up/down full steps.

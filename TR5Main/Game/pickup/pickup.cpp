@@ -37,9 +37,9 @@ OBJECT_COLLISION_BOUNDS PickUpBounds =
 	-256, 256,
 	-200, 200,
 	-256, 256,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
 	0, 0,
-	EulerAngle::DegToRad(-2.0f), EulerAngle::DegToRad(2.0f)
+	Angle::DegToRad(-2.0f), Angle::DegToRad(2.0f)
 };
 
 static Vector3Int HiddenPickUpPosition(0, 0, -690);
@@ -48,8 +48,8 @@ OBJECT_COLLISION_BOUNDS HiddenPickUpBounds =
 	-256, 256,
 	-100, 100,
 	-800, -256,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -59,8 +59,8 @@ OBJECT_COLLISION_BOUNDS CrowbarPickUpBounds =
 	-256, 256,
 	-100, 100,
 	200, 512,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -70,8 +70,8 @@ OBJECT_COLLISION_BOUNDS JobyCrowPickUpBounds =
 	-512, 0,
 	-100, 100,
 	0, 512,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -81,8 +81,8 @@ OBJECT_COLLISION_BOUNDS PlinthPickUpBounds =
 	-256, 256,
 	-640, 640,
 	-511, 0,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -92,9 +92,9 @@ OBJECT_COLLISION_BOUNDS PickUpBoundsUW =
 	-512, 512,
 	-512, 512,
 	-512, 512,
-	EulerAngle::DegToRad(-45.0f),  EulerAngle::DegToRad(45.0f),
-	EulerAngle::DegToRad(-45.0f),  EulerAngle::DegToRad(45.0f),
-	EulerAngle::DegToRad(-45.0f),  EulerAngle::DegToRad(45.0f)
+	Angle::DegToRad(-45.0f),  Angle::DegToRad(45.0f),
+	Angle::DegToRad(-45.0f),  Angle::DegToRad(45.0f),
+	Angle::DegToRad(-45.0f),  Angle::DegToRad(45.0f)
 };
 
 static Vector3Int SOPos(0, 0, 0);
@@ -103,9 +103,9 @@ OBJECT_COLLISION_BOUNDS SOBounds =
 	0, 0,
 	0, 0,
 	0, 0,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 short SearchCollectFrames[4] = { 180, 100, 153, 83 };
@@ -117,9 +117,9 @@ OBJECT_COLLISION_BOUNDS MSBounds =
 	0, 0,
 	0, 0,
 	0, 0,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 int NumRPickups;
@@ -327,7 +327,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Underwater)
 		{
-			item->Pose.Orientation.x = EulerAngle::DegToRad(-25.0f);
+			item->Pose.Orientation.x = Angle::DegToRad(-25.0f);
 
 			if (TrInput & IN_ACTION && 
 				item->ObjectNumber != ID_BURNING_TORCH_ITEM && 

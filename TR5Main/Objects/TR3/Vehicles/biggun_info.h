@@ -2,7 +2,7 @@
 
 struct BigGunInfo
 {
-	EulerAngle Orientation;
+	EulerAngles Orientation;
 	float BarrelZRotation;
 	float StartYRot;
 	float GunRotYAdd;

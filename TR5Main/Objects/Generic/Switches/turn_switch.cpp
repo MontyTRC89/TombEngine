@@ -27,9 +27,9 @@ namespace TEN::Entities::Switches
 		512, 896,
 		0, 0,
 		-512, 0,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	Vector3Int TurnSwitchPos = { 650, 0, 138 }; 
@@ -39,9 +39,9 @@ namespace TEN::Entities::Switches
 		512, 896,
 		0, 0,
 		0, 512,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
 	Vector3Int TurnSwitchPosA = { 650, 0, -138 };
@@ -80,7 +80,7 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 				if (TestLaraPosition(&TurnSwitchBoundsC, switchItem, laraItem))
 				{
 					if (MoveLaraPosition(&TurnSwitchPos, switchItem, laraItem))
@@ -101,7 +101,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 			}
 		}
 
@@ -164,7 +164,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.AnimNumber == Objects[switchItem->ObjectNumber].animIndex + 2)
 			{
-				switchItem->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
+				switchItem->Pose.Orientation.y += Angle::DegToRad(90.0f);
 				if (TrInput & IN_ACTION)
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_CLOCKWISE_START;
@@ -192,7 +192,7 @@ namespace TEN::Entities::Switches
 		{
 			if (switchItem->Animation.AnimNumber == Objects[ID_TURN_SWITCH].animIndex + 6)
 			{
-				switchItem->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
+				switchItem->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 				if (TrInput & IN_ACTION)
 				{
 					laraItem->Animation.AnimNumber = LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START;

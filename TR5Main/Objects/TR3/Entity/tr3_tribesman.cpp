@@ -85,7 +85,7 @@ void TribemanAxeControl(short itemNumber)
 
 		if (creature->Enemy == LaraItem &&
 			creature->HurtByLara && AI.distance > pow(SECTOR(3), 2) &&
-			AI.enemyFacing < EulerAngle::DegToRad(67.0f) && AI.enemyFacing > EulerAngle::DegToRad(-67.0f))
+			AI.enemyFacing < Angle::DegToRad(67.0f) && AI.enemyFacing > Angle::DegToRad(-67.0f))
 		{
 			creature->Mood = MoodType::Escape;
 		}
@@ -100,7 +100,7 @@ void TribemanAxeControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
+			creature->MaxTurn = Angle::DegToRad(4.0f);
 			creature->Flags = 0;
 
 			if (creature->Mood == MoodType::Bored)
@@ -139,7 +139,7 @@ void TribemanAxeControl(short itemNumber)
 			break;
 
 		case 11:
-			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
+			creature->MaxTurn = Angle::DegToRad(4.0f);
 			creature->Flags = 0;
 
 			if (creature->Mood == MoodType::Bored)
@@ -171,7 +171,7 @@ void TribemanAxeControl(short itemNumber)
 
 		case 2:
 			creature->Flags = 0;
-			creature->MaxTurn = EulerAngle::DegToRad(9.0f);
+			creature->MaxTurn = Angle::DegToRad(9.0f);
 			tilt = angle / 8;
 
 			if (creature->Mood == MoodType::Bored)
@@ -200,7 +200,7 @@ void TribemanAxeControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+			creature->MaxTurn = Angle::DegToRad(6.0f);
 			creature->Flags = 0;
 			tilt = angle / 4;
 
@@ -230,7 +230,7 @@ void TribemanAxeControl(short itemNumber)
 			break;
 
 		case 8:
-			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
+			creature->MaxTurn = Angle::DegToRad(4.0f);
 			if (AI.bite || AI.distance < pow(682, 2))
 				item->Animation.TargetState = 6;
 			else
@@ -244,7 +244,7 @@ void TribemanAxeControl(short itemNumber)
 		case 10:
 		case 12:
 			item->ItemFlags[0] = 1;
-			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
+			creature->MaxTurn = Angle::DegToRad(4.0f);
 			creature->Flags = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			if (creature->Enemy == LaraItem)
@@ -384,7 +384,7 @@ void TribemanDartsControl(short itemNumber)
 
 		CreatureMood(item, &AI, TIMID);
 
-		angle = CreatureTurn(item, creature->Mood == MoodType::Bored ? EulerAngle::DegToRad(2.0f) : creature->MaxTurn);
+		angle = CreatureTurn(item, creature->Mood == MoodType::Bored ? Angle::DegToRad(2.0f) : creature->MaxTurn);
 		if (AI.ahead)
 		{
 			headY = AI.angle / 2;
@@ -407,7 +407,7 @@ void TribemanDartsControl(short itemNumber)
 				torsoX = AI.xAngle / 2;
 			}
 			creature->Flags &= 0x0FFF;
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 
 			if (item->AIBits & GUARD)
 			{
@@ -447,7 +447,7 @@ void TribemanDartsControl(short itemNumber)
 			break;
 
 		case 11:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 			creature->Flags &= 0x0FFF;
 
 			if (item->AIBits & GUARD)
@@ -483,7 +483,7 @@ void TribemanDartsControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = EulerAngle::DegToRad(9.0f);
+			creature->MaxTurn = Angle::DegToRad(9.0f);
 
 			if (AI.bite && AI.distance < pow(SECTOR(0.5f), 2))
 				item->Animation.TargetState = 11;
@@ -508,7 +508,7 @@ void TribemanDartsControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+			creature->MaxTurn = Angle::DegToRad(6.0f);
 			creature->Flags &= 0x0FFF;
 			tilt = angle / 4;
 
@@ -543,12 +543,12 @@ void TribemanDartsControl(short itemNumber)
 				torsoY = AI.angle;
 			}
 
-			if (abs(AI.angle) < EulerAngle::DegToRad(2.0f))
+			if (abs(AI.angle) < Angle::DegToRad(2.0f))
 				item->Pose.Orientation.y += AI.angle;
 			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			else
-				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 			{

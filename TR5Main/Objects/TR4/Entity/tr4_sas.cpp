@@ -27,8 +27,8 @@ namespace TEN::Entities::TR4
 		-256, 256,
 		-64, 100,
 		-200, -460,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
 		0, 0
 	};
 
@@ -174,24 +174,24 @@ namespace TEN::Entities::TR4
 
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + SAS_ANIM_WALK_TO_STAND)
 				{
-					if (abs(AI.angle) >= EulerAngle::DegToRad(10.0f))
+					if (abs(AI.angle) >= Angle::DegToRad(10.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += EulerAngle::DegToRad(10.0f);
+							item->Pose.Orientation.y += Angle::DegToRad(10.0f);
 						else
-							item->Pose.Orientation.y -= EulerAngle::DegToRad(10.0f);
+							item->Pose.Orientation.y -= Angle::DegToRad(10.0f);
 					}
 					else
 						item->Pose.Orientation.y += AI.angle;
 				}
 				else if (item->AIBits & MODIFY || Lara.Vehicle != NO_ITEM)
 				{
-					if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
+					if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 					{
 						if (AI.angle >= 0)
-							item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+							item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 						else
-							item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+							item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 					}
 					else
 						item->Pose.Orientation.y += AI.angle;
@@ -294,7 +294,7 @@ namespace TEN::Entities::TR4
 
 			case SAS_STATE_WALK:
 				joint2 = angle;
-				creature->MaxTurn = EulerAngle::DegToRad(5.0f);
+				creature->MaxTurn = Angle::DegToRad(5.0f);
 				creature->Flags = 0;
 
 				if (item->AIBits & PATROL1)
@@ -345,7 +345,7 @@ namespace TEN::Entities::TR4
 
 			case SAS_STATE_RUN:
 				tilt = angle / 2;
-				creature->MaxTurn = EulerAngle::DegToRad(10.0f);
+				creature->MaxTurn = Angle::DegToRad(10.0f);
 
 				if (AI.ahead)
 					joint2 = AI.angle;
@@ -448,7 +448,7 @@ namespace TEN::Entities::TR4
 
 					if (AI.distance > pow(SECTOR(3), 2))
 					{
-						angle2 = sqrt(AI.distance) + AI.xAngle - EulerAngle::DegToRad(5.6f);
+						angle2 = sqrt(AI.distance) + AI.xAngle - Angle::DegToRad(5.6f);
 						joint1 = angle2;
 					}
 				}

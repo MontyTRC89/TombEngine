@@ -24,9 +24,9 @@ namespace TEN::Entities::TR4
         0, 0, 
         -64, 0, 
         0, 0,
-        EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-        EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-        EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+        Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+        Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+        Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
     };
 
     void ElementPuzzleControl(short itemNumber)

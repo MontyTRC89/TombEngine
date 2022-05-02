@@ -260,8 +260,8 @@ void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Rotation = EulerAngle();
-	lara->RightArm.Rotation = EulerAngle();
+	lara->LeftArm.Rotation = EulerAngles();
+	lara->RightArm.Rotation = EulerAngles();
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;
@@ -277,12 +277,12 @@ void FireShotgun(ITEM_INFO* laraItem)
 
 	float angles[2];
 	angles[1] = lara->LeftArm.Rotation.GetX();
-	angles[0] = EulerAngle::Clamp(lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY());
+	angles[0] = Angle::Normalize(lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY());
 
 	if (!lara->LeftArm.Locked)
 	{
-		angles[0] = EulerAngle::Clamp(lara->ExtraTorsoRot.GetY() + lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY());
-		angles[1] = EulerAngle::Clamp(lara->ExtraTorsoRot.GetZ() + lara->LeftArm.Rotation.GetX());
+		angles[0] = Angle::Normalize(lara->ExtraTorsoRot.GetY() + lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY());
+		angles[1] = Angle::Normalize(lara->ExtraTorsoRot.GetZ() + lara->LeftArm.Rotation.GetX());
 	}
 
 	float loopAngles[2];
@@ -292,8 +292,8 @@ void FireShotgun(ITEM_INFO* laraItem)
 	for (int i = 0; i < 6; i++)
 	{
 		// TODO
-		loopAngles[0] = angles[0] + value * (GetRandomControl() - EulerAngle::DegToRad(90.0f)) / EulerAngle::DegToRad(360.0f);
-		loopAngles[1] = angles[1] + value * (GetRandomControl() - EulerAngle::DegToRad(90.0f)) / EulerAngle::DegToRad(360.0f);
+		loopAngles[0] = angles[0] + value * (GetRandomControl() - Angle::DegToRad(90.0f)) / Angle::DegToRad(360.0f);
+		loopAngles[1] = angles[1] + value * (GetRandomControl() - Angle::DegToRad(90.0f)) / Angle::DegToRad(360.0f);
 
 		if (FireWeapon(LaraWeaponType::Shotgun, lara->TargetEntity, laraItem, loopAngles) != FireWeaponType::NoAmmo)
 			fired = true;
@@ -488,13 +488,13 @@ void HarpoonBoltControl(short itemNumber)
 	// Update speed and check if above water
 	if (item->HitPoints == HARPOON_TIME)
 	{
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + EulerAngle::DegToRad(35.0f));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(35.0f));
 		if (!TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 		{
-			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - EulerAngle::DegToRad(1.0f));
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
 
-			if (item->Pose.Orientation.GetX() < EulerAngle::DegToRad(-90.0f))
-				item->Pose.Orientation.SetX(EulerAngle::DegToRad(-90.0f));
+			if (item->Pose.Orientation.GetX() < Angle::DegToRad(-90.0f))
+				item->Pose.Orientation.SetX(Angle::DegToRad(-90.0f));
 
 			aboveWater = true;
 			item->Animation.Velocity = HARPOON_VELOCITY * cos(item->Pose.Orientation.GetX());
@@ -751,7 +751,7 @@ void GrenadeControl(short itemNumber)
 					
 					InitialiseItem(newGrenadeItemNumber);
 					
-					newGrenade->Pose.Orientation.SetX((GetRandomControl() & 0x3FFF) + EulerAngle::DegToRad(45.0f));
+					newGrenade->Pose.Orientation.SetX((GetRandomControl() & 0x3FFF) + Angle::DegToRad(45.0f));
 					newGrenade->Pose.Orientation.SetY(GetRandomControl() * 2);
 					newGrenade->Pose.Orientation.SetZ();
 					newGrenade->Animation.Velocity = 64;
@@ -797,11 +797,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 16) + 3) * EulerAngle::DegToRad(1.0f)));
+			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 16) + 3) * Angle::DegToRad(1.0f)));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (((item->Animation.Velocity / 4) + 3) * EulerAngle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + (((item->Animation.Velocity / 4) + 3) * EulerAngle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + (((item->Animation.Velocity / 4) + 3) * Angle::DegToRad(1.0f)));
 		}
 	}
 	else
@@ -812,11 +812,11 @@ void GrenadeControl(short itemNumber)
 
 		if (item->Animation.Velocity)
 		{
-			item->Pose.Orientation.SetZ( item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 4) + 7) * EulerAngle::DegToRad(1.0f)));
+			item->Pose.Orientation.SetZ( item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
 			else
-				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + (((item->Animation.Velocity / 2) + 7) * EulerAngle::DegToRad(1.0f)));
+				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + (((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f)));
 		}
 	}
 
@@ -824,7 +824,7 @@ void GrenadeControl(short itemNumber)
 	if (item->Animation.Velocity && aboveWater)
 	{
 		Matrix world = Matrix::CreateFromYawPitchRoll(
-			item->Pose.Orientation.GetY() - EulerAngle::DegToRad(180.0f),
+			item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
 			item->Pose.Orientation.GetX(),
 			item->Pose.Orientation.GetZ()
 		) * Matrix::CreateTranslation(0, 0, -64);
@@ -1163,7 +1163,7 @@ void RocketControl(short itemNumber)
 				item->Animation.Velocity = ROCKET_VELOCITY / 4;
 		}
 
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 8) + 3) * EulerAngle::DegToRad(1.0f)));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 8) + 3) * Angle::DegToRad(1.0f)));
 		abovewater = false;
 	}
 	else
@@ -1171,7 +1171,7 @@ void RocketControl(short itemNumber)
 		if (item->Animation.Velocity < ROCKET_VELOCITY)
 			item->Animation.Velocity += (item->Animation.Velocity / 4) + 4;
 
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 4) + 7) * EulerAngle::DegToRad(1.0f)));
+		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + (((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f)));
 		abovewater = true;
 	}
 
@@ -1179,7 +1179,7 @@ void RocketControl(short itemNumber)
 
 	// Calculate offset in rocket direction for fire and smoke sparks
 	Matrix world = Matrix::CreateFromYawPitchRoll(
-		item->Pose.Orientation.GetY() - EulerAngle::DegToRad(180.0f),
+		item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
 		item->Pose.Orientation.GetX(),
 		item->Pose.Orientation.GetZ()
 	) * Matrix::CreateTranslation(0, 0, -64);
@@ -1711,7 +1711,7 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		lara->ExtraTorsoRot = lara->LeftArm.Rotation;
 
 		if (Camera.oldType != CameraType::Look && !BinocularRange)
-			lara->ExtraHeadRot = EulerAngle();
+			lara->ExtraHeadRot = EulerAngles();
 	}
 
 	if (weaponType == LaraWeaponType::Revolver)

@@ -39,9 +39,9 @@ namespace TEN::Entities::Doors
 		-384, 384,
 		0, 0,
 		-1024, 512,
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-		EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-		EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+		Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
 	};
 
 	void PushPullKickDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
@@ -61,7 +61,7 @@ namespace TEN::Entities::Doors
 
 			if (laraItem->RoomNumber == doorItem->RoomNumber)
 			{
-				doorItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 				pull = true;
 			}
 
@@ -125,7 +125,7 @@ namespace TEN::Entities::Doors
 			}
 
 			if (pull)
-				doorItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 		}
 		else if (doorItem->Animation.ActiveState <= STATE_PUSHPULL_KICK_DOOR_CLOSED)
 			DoorCollision(itemNumber, laraItem, coll);

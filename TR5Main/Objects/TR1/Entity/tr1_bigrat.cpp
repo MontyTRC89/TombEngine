@@ -14,8 +14,8 @@
 
 static BITE_INFO BigRatBite = { 0, -11, 108, 3 };
 
-#define BIG_RAT_RUN_TURN  EulerAngle::DegToRad(6.0f)
-#define BIG_RAT_SWIM_TURN EulerAngle::DegToRad(3.0f)
+#define BIG_RAT_RUN_TURN  Angle::DegToRad(6.0f)
+#define BIG_RAT_SWIM_TURN Angle::DegToRad(3.0f)
 
 constexpr auto DEFAULT_SWIM_UPDOWN_SPEED = 32;
 constexpr auto BIG_RAT_TOUCH = 0x300018f;

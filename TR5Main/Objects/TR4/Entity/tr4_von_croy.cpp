@@ -233,10 +233,10 @@ void VonCroyControl(short itemNumber)
 		laraAI.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 
 		laraAI.ahead = true;
-		if (laraAI.angle <= EulerAngle::DegToRad(-90) || laraAI.angle >= EulerAngle::DegToRad(90.0f))
+		if (laraAI.angle <= Angle::DegToRad(-90) || laraAI.angle >= Angle::DegToRad(90.0f))
 			laraAI.ahead = false;
 
-		laraAI.enemyFacing = laraAI.angle - LaraItem->Pose.Position.x + EulerAngle::DegToRad(-180.0f);
+		laraAI.enemyFacing = laraAI.angle - LaraItem->Pose.Position.x + Angle::DegToRad(-180.0f);
 
 		int distance = 0;
 		if (dz > SECTOR(31.25f) || dz < -SECTOR(31.25f) || dx > SECTOR(31.25f) || dx < -SECTOR(31.25f))
@@ -256,7 +256,7 @@ void VonCroyControl(short itemNumber)
 			laraAI.xAngle = atan2(dx + (dz / 2), dy);
 	}
 
-	if (abs(laraAI.angle) < EulerAngle::DegToRad(33.75f) && laraAI.distance < pow(1024, 2))
+	if (abs(laraAI.angle) < Angle::DegToRad(33.75f) && laraAI.distance < pow(1024, 2))
 		laraAI.bite = true;
 	else
 		laraAI.bite = false;
@@ -385,7 +385,7 @@ void VonCroyControl(short itemNumber)
 		break;
 
 	case VON_CROY_STATE_WALK:
-		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+		creature->MaxTurn = Angle::DegToRad(7.0f);
 		creature->LOT.IsMonkeying = false;
 		creature->LOT.IsJumping = false;
 		creature->Flags = 0;
@@ -477,7 +477,7 @@ void VonCroyControl(short itemNumber)
 			break;
 		}
 
-		creature->MaxTurn = EulerAngle::DegToRad(11.0f);
+		creature->MaxTurn = Angle::DegToRad(11.0f);
 		tilt = abs(angle) / 2;
 
 		if (AI.distance < pow(SECTOR(2), 2) || Lara.Location < creature->LocationAI)
@@ -535,7 +535,7 @@ void VonCroyControl(short itemNumber)
 		break;
 
 	case VON_CROY_STATE_MONKEY:
-		creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+		creature->MaxTurn = Angle::DegToRad(6.0f);
 		creature->LOT.IsMonkeying = true;
 		creature->LOT.IsJumping = true;
 
@@ -620,7 +620,7 @@ void VonCroyControl(short itemNumber)
 
 	case VON_CROY_STATE_KNIFE_ATTACK_HIGH:
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(6.0f));
+		ClampRotation(&item->Pose, AI.angle, Angle::DegToRad(6.0f));
 
 		if (AI.ahead) 
 		{
@@ -656,9 +656,9 @@ void VonCroyControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (item->ItemFlags[2] == 0)
-			ClampRotation(&item->Pose, laraAI.angle, EulerAngle::DegToRad(2.8f));
+			ClampRotation(&item->Pose, laraAI.angle, Angle::DegToRad(2.8f));
 		else
-			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, EulerAngle::DegToRad(2.8f));
+			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, Angle::DegToRad(2.8f));
 		
 		break;
 
@@ -693,7 +693,7 @@ void VonCroyControl(short itemNumber)
 		}
 
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle, EulerAngle::DegToRad(6.0f));
+		ClampRotation(&item->Pose, AI.angle, Angle::DegToRad(6.0f));
 
 		if ((enemy == NULL || enemy->Flags != 0) ||
 			item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
@@ -737,7 +737,7 @@ void VonCroyControl(short itemNumber)
 
 	case 32:
 		creature->MaxTurn = 0;
-		ClampRotation(&item->Pose, AI.angle / 2, EulerAngle::DegToRad(6.0f));
+		ClampRotation(&item->Pose, AI.angle / 2, Angle::DegToRad(6.0f));
 
 		if (AI.ahead) 
 		{

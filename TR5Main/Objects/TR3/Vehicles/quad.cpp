@@ -50,15 +50,15 @@ using namespace TEN::Math::Random;
 
 #define DISMOUNT_DISTANCE 385	// Precise root bone offset derived from final frame of animation.
 
-#define QUAD_UNDO_TURN			EulerAngle::DegToRad(2.0f)
-#define QUAD_TURN_RATE			(EulerAngle::DegToRad(0.5f) + QUAD_UNDO_TURN)
-#define QUAD_TURN_MAX			EulerAngle::DegToRad(5.0f)
-#define QUAD_DRIFT_TURN_RATE	(EulerAngle::DegToRad(0.75f) + QUAD_UNDO_TURN)
-#define QUAD_DRIFT_TURN_MAX		EulerAngle::DegToRad(8.0f)
+#define QUAD_UNDO_TURN			Angle::DegToRad(2.0f)
+#define QUAD_TURN_RATE			(Angle::DegToRad(0.5f) + QUAD_UNDO_TURN)
+#define QUAD_TURN_MAX			Angle::DegToRad(5.0f)
+#define QUAD_DRIFT_TURN_RATE	(Angle::DegToRad(0.75f) + QUAD_UNDO_TURN)
+#define QUAD_DRIFT_TURN_MAX		Angle::DegToRad(8.0f)
 
-#define MIN_MOMENTUM_TURN EulerAngle::DegToRad(3.0f)
-#define MAX_MOMENTUM_TURN EulerAngle::DegToRad(1.5f)
-#define QUAD_MAX_MOM_TURN EulerAngle::DegToRad(150.0f)
+#define MIN_MOMENTUM_TURN Angle::DegToRad(3.0f)
+#define MAX_MOMENTUM_TURN Angle::DegToRad(1.5f)
+#define QUAD_MAX_MOM_TURN Angle::DegToRad(150.0f)
 
 #define QUAD_MAX_HEIGHT CLICK(1)
 #define QUAD_MIN_BOUNCE ((MAX_VELOCITY / 2) / CLICK(1))
@@ -201,9 +201,9 @@ static int CanQuadbikeGetOff(int direction)
 	float angle;
 
 	if (direction < 0)
-		angle = item->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
+		angle = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
 	else
-		angle = item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
+		angle = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
 
 	int x = item->Pose.Position.x + CLICK(2) * sin(angle);
 	int y = item->Pose.Position.y;
@@ -241,9 +241,9 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		TestLastFrame(laraItem))
 	{
 		if (laraItem->Animation.ActiveState == QUAD_STATE_DISMOUNT_LEFT)
-			laraItem->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y += Angle::DegToRad(90.0f);
 		else
-			laraItem->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 
 		SetAnimation(laraItem, LA_STAND_IDLE);
 		laraItem->Pose.Position.x -= DISMOUNT_DISTANCE * sin(laraItem->Pose.Orientation.y);
@@ -312,20 +312,20 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo
 	else
 	{
 		float angle = atan2(quadItem->Pose.Position.z - laraItem->Pose.Position.z, quadItem->Pose.Position.x - laraItem->Pose.Position.x);
-		angle = EulerAngle::Clamp(angle - quadItem->Pose.Orientation.y);
+		angle = Angle::Normalize(angle - quadItem->Pose.Orientation.y);
 
-		if ((angle > EulerAngle::DegToRad(-45.0f)) && (angle < EulerAngle::DegToRad(135.0f)))
+		if ((angle > Angle::DegToRad(-45.0f)) && (angle < Angle::DegToRad(135.0f)))
 		{
-			float tempAngle = EulerAngle::Clamp(laraItem->Pose.Orientation.y - quadItem->Pose.Orientation.y);
-			if (tempAngle > EulerAngle::DegToRad(45.0f) && tempAngle < EulerAngle::DegToRad(135.0f))
+			float tempAngle = Angle::Normalize(laraItem->Pose.Orientation.y - quadItem->Pose.Orientation.y);
+			if (tempAngle > Angle::DegToRad(45.0f) && tempAngle < Angle::DegToRad(135.0f))
 				return true;
 			else
 				return false;
 		}
 		else
 		{
-			float tempAngle = EulerAngle::Clamp(laraItem->Pose.Orientation.y - quadItem->Pose.Orientation.y);
-			if (tempAngle > EulerAngle::DegToRad(225.0f) && tempAngle < EulerAngle::DegToRad(315.0f))
+			float tempAngle = Angle::Normalize(laraItem->Pose.Orientation.y - quadItem->Pose.Orientation.y);
+			if (tempAngle > Angle::DegToRad(225.0f) && tempAngle < Angle::DegToRad(315.0f))
 				return true;
 			else
 				return false;
@@ -1198,7 +1198,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 		float angle = atan2(quadItem->Pose.Position.z - laraItem->Pose.Position.z, quadItem->Pose.Position.x - laraItem->Pose.Position.x);
 		angle -= quadItem->Pose.Orientation.y;
 
-		if (angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
+		if (angle > Angle::DegToRad(-45.0f) && angle < Angle::DegToRad(135.0f))
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QUAD_ANIM_MOUNT_LEFT;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = QUAD_STATE_MOUNT_LEFT;
@@ -1386,7 +1386,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		quadItem->Animation.AnimNumber = Objects[ID_QUAD].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
 		quadItem->Animation.FrameNumber = g_Level.Anims[quadItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
-		Camera.targetElevation = EulerAngle::DegToRad(-30.0f);
+		Camera.targetElevation = Angle::DegToRad(-30.0f);
 
 		if (quad->Flags & QUAD_FLAG_IS_FALLING)
 		{

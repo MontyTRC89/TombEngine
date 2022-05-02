@@ -17,7 +17,7 @@ OBJECT_COLLISION_BOUNDS DeathSlideBounds =
 	-100, 100,
 	256, 512,
 	0, 0,
-	EulerAngle::DegToRad(-25.0f), EulerAngle::DegToRad(25.0f),
+	Angle::DegToRad(-25.0f), Angle::DegToRad(25.0f),
 	0, 0
 };
 

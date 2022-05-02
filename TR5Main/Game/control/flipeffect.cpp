@@ -314,7 +314,7 @@ void FloorShake(ITEM_INFO* item)
 
 void Turn180(ITEM_INFO* item)
 {
-	item->Pose.Orientation.y -= EulerAngle::DegToRad(180.0f);
+	item->Pose.Orientation.y -= Angle::DegToRad(180.0f);
 	item->Pose.Orientation.x = -item->Pose.Orientation.x;
 }
 

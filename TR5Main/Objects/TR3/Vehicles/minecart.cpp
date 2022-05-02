@@ -202,9 +202,9 @@ static bool TestMinecartDismount(ITEM_INFO* laraItem, int direction)
 	
 	short angle;
 	if (direction < 0)
-		angle = minecartItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
+		angle = minecartItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
 	else
-		angle = minecartItem->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
+		angle = minecartItem->Pose.Orientation.y - Angle::DegToRad(90.0f);
 
 	auto probe = GetCollision(minecartItem, angle, -DISMOUNT_DISTANCE);
 
@@ -300,7 +300,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 
 	if ((lara->Control.Minecart.Left && lara->Control.Minecart.Right && !minecart->StopDelay) &&
 		(minecartItem->Pose.Position.x & 0x380 == 512 ||
-			EulerAngle::RadToShrt(minecartItem->Pose.Orientation.z) & 0x380 == 512))
+			Angle::RadToShrt(minecartItem->Pose.Orientation.z) & 0x380 == 512))
 	{
 		if (minecart->Velocity < 0xf000)
 		{
@@ -319,7 +319,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 		!(minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT)))
 	{
 		short angle;
-		unsigned short rotation = (((unsigned short)EulerAngle::RadToShrt(minecartItem->Pose.Orientation.y)) / EulerAngle::DegToShrt(90.0f)) | (lara->Control.Minecart.Left * 4);
+		unsigned short rotation = (((unsigned short)Angle::RadToShrt(minecartItem->Pose.Orientation.y)) / Angle::DegToShrt(90.0f)) | (lara->Control.Minecart.Left * 4);
 
 		switch (rotation)
 		{
@@ -364,7 +364,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 			break;
 		}
 
-		angle = EulerAngle::RadToShrt(mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, minecart->TurnX, minecart->TurnZ)) & 0x3fff;
+		angle = Angle::RadToShrt(mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, minecart->TurnX, minecart->TurnZ)) & 0x3fff;
 
 		if (rotation < 4)
 		{
@@ -376,7 +376,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 			minecart->TurnRot = minecartItem->Pose.Orientation.y;
 
 			if (angle)
-				angle = EulerAngle::DegToRad(90.0f) - angle;
+				angle = Angle::DegToRad(90.0f) - angle;
 
 			minecart->TurnLen = angle;
 		}
@@ -413,12 +413,12 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 	if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
 	{
 		minecart->TurnLen += minecartItem->Animation.Velocity * 3;
-		if (minecart->TurnLen > EulerAngle::DegToRad(90.0f))
+		if (minecart->TurnLen > Angle::DegToRad(90.0f))
 		{
 			if (minecart->Flags & CART_FLAG_TURNING_LEFT)
-				minecartItem->Pose.Orientation.y = minecart->TurnRot - EulerAngle::DegToRad(90.0f);
+				minecartItem->Pose.Orientation.y = minecart->TurnRot - Angle::DegToRad(90.0f);
 			else
-				minecartItem->Pose.Orientation.y = minecart->TurnRot + EulerAngle::DegToRad(90.0f);
+				minecartItem->Pose.Orientation.y = minecart->TurnRot + Angle::DegToRad(90.0f);
 
 			minecart->Flags &= ~(CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT);
 		}
@@ -433,8 +433,8 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 		if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
 		{
 			// TODO
-			unsigned short quadrant = ((unsigned short)EulerAngle::RadToShrt(minecartItem->Pose.Orientation.y)) / EulerAngle::DegToShrt(90.0f);
-			unsigned short degree = EulerAngle::RadToShrt(minecartItem->Pose.Orientation.y) & 16383;
+			unsigned short quadrant = ((unsigned short)Angle::RadToShrt(minecartItem->Pose.Orientation.y)) / Angle::DegToShrt(90.0f);
+			unsigned short degree = Angle::RadToShrt(minecartItem->Pose.Orientation.y) & 16383;
 
 			float x, z;
 			switch (quadrant)
@@ -512,7 +512,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 		if (minecart->Flags & CART_FLAG_TURNING_RIGHT)
 			minecartItem->Pose.Orientation.z = -(val * minecartItem->Animation.Velocity) / 512;
 		else
-			minecartItem->Pose.Orientation.z = ((EulerAngle::DegToRad(90.0f) - val) * minecartItem->Animation.Velocity) / 512;
+			minecartItem->Pose.Orientation.z = ((Angle::DegToRad(90.0f) - val) * minecartItem->Animation.Velocity) / 512;
 	}
 	else
 		minecartItem->Pose.Orientation.z -= minecartItem->Pose.Orientation.z / 8;
@@ -691,9 +691,9 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			laraItem->Pose.Position.y = pos.y;
 			laraItem->Pose.Position.z = pos.z;
 			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y = Angle::DegToRad(90.0f);
 			laraItem->Pose.Orientation.z = 0;
-			minecartItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
+			minecartItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
 			lara->Control.HandStatus = HandStatus::Free;
@@ -711,9 +711,9 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 
 			laraItem->Pose.Position= pos;
 			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y = Angle::DegToRad(90.0f);
 			laraItem->Pose.Orientation.z = 0;
-			minecartItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
+			minecartItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
 			lara->Control.HandStatus = HandStatus::Free;
@@ -738,13 +738,13 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 		break;
 
 	case CART_WALL_DEATH:
-		Camera.targetElevation = EulerAngle::DegToRad(-25.0f);
+		Camera.targetElevation = Angle::DegToRad(-25.0f);
 		Camera.targetDistance = SECTOR(4);
 
 		break;
 
 	case CART_TURN_DEATH:
-		Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
+		Camera.targetElevation = Angle::DegToRad(-45.0f);
 		Camera.targetDistance = SECTOR(2);
 
 		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.y, CLICK(2));
@@ -874,7 +874,7 @@ void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 		lara->Control.HandStatus = HandStatus::Busy;
 
 		short angle = short(mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - minecartItem->Pose.Orientation.y);
-		if (angle > EulerAngle::DegToRad(-45.0f) && angle < EulerAngle::DegToRad(135.0f))
+		if (angle > Angle::DegToRad(-45.0f) && angle < Angle::DegToRad(135.0f))
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_MOUNT_RIGHT;
 		else
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_MOUNT_LEFT;
@@ -932,7 +932,7 @@ bool MineCartControl(ITEM_INFO* laraItem)
 
 	if (!(minecart->Flags & CART_FLAG_DEAD))
 	{
-		Camera.targetElevation = EulerAngle::DegToRad(-45.0f);
+		Camera.targetElevation = Angle::DegToRad(-45.0f);
 		Camera.targetDistance = SECTOR(2);
 	}
 

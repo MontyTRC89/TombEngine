@@ -16,9 +16,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-#define BOAT_UNDO_TURN		EulerAngle::DegToRad(0.25f)
-#define BOAT_TURN			(EulerAngle::DegToRad(0.25f) / 2)
-#define BOAT_MAX_TURN		EulerAngle::DegToRad(4.0f)
+#define BOAT_UNDO_TURN		Angle::DegToRad(0.25f)
+#define BOAT_TURN			(Angle::DegToRad(0.25f) / 2)
+#define BOAT_MAX_TURN		Angle::DegToRad(4.0f)
 #define BOAT_MAX_VELOCITY	110
 #define BOAT_SLOW_SPEED		(BOAT_MAX_VELOCITY / 3)
 #define BOAT_FAST_SPEED		(BOAT_MAX_VELOCITY + 75)
@@ -195,22 +195,22 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 	if (distance > 200)
 		return mountType;
 
-	float deltaAngle = EulerAngle::ShortestAngle(sBoatItem->Pose.Orientation.y, laraItem->Pose.Orientation.y);
+	float deltaAngle = Angle::ShortestAngle(sBoatItem->Pose.Orientation.y, laraItem->Pose.Orientation.y);
 	if (lara->Control.WaterStatus == WaterStatus::TreadWater || lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (!(TrInput & IN_ACTION) || laraItem->Animation.Airborne || sBoatItem->Animation.Velocity)
 			return mountType;
 
-		if (deltaAngle > EulerAngle::DegToRad(45.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
+		if (deltaAngle > Angle::DegToRad(45.0f) && deltaAngle < Angle::DegToRad(135.0f))
 			mountType = BoatMountType::WaterRight;
-		else if (deltaAngle > EulerAngle::DegToRad(-135.0f) && deltaAngle < EulerAngle::DegToRad(-45.0f))
+		else if (deltaAngle > Angle::DegToRad(-135.0f) && deltaAngle < Angle::DegToRad(-45.0f))
 			mountType = BoatMountType::WaterLeft;
 	}
 	else if (lara->Control.WaterStatus == WaterStatus::Dry)
 	{
 		if (laraItem->Animation.VerticalVelocity > 0)
 		{
-			if (deltaAngle > EulerAngle::DegToRad(-135.0f) && deltaAngle < EulerAngle::DegToRad(135.0f) &&
+			if (deltaAngle > Angle::DegToRad(-135.0f) && deltaAngle < Angle::DegToRad(135.0f) &&
 				laraItem->Pose.Position.y > sBoatItem->Pose.Position.y)
 			{
 				mountType = BoatMountType::Jump;
@@ -218,7 +218,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 		}
 		else if (laraItem->Animation.VerticalVelocity == 0)
 		{
-			if (deltaAngle > EulerAngle::DegToRad(-135.0f) && deltaAngle < EulerAngle::DegToRad(135.0f))
+			if (deltaAngle > Angle::DegToRad(-135.0f) && deltaAngle < Angle::DegToRad(135.0f))
 			{
 				if (laraItem->Pose.Position == sBoatItem->Pose.Position)
 					mountType = BoatMountType::StartPosition;
@@ -235,9 +235,9 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 {
 	float angle;
 	if (direction < 0)
-		angle = sBoatItem->Pose.Orientation.y - EulerAngle::DegToRad(90.0f);
+		angle = sBoatItem->Pose.Orientation.y - Angle::DegToRad(90.0f);
 	else
-		angle = sBoatItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f);
+		angle = sBoatItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
 
 	int x = sBoatItem->Pose.Position.x + DISMOUNT_DISTANCE * sin(angle);
 	int y = sBoatItem->Pose.Position.y;
@@ -271,9 +271,9 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 		TestLastFrame(laraItem, laraItem->Animation.AnimNumber))
 	{
 		if (laraItem->Animation.ActiveState == SBOAT_STATE_DISMOUNT_LEFT)
-			laraItem->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 		else if(laraItem->Animation.ActiveState == SBOAT_STATE_DISMOUNT_RIGHT)
-			laraItem->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.y += Angle::DegToRad(90.0f);
 
 		SetAnimation(laraItem, LA_JUMP_FORWARD);
 		laraItem->Animation.Velocity = 40;
@@ -768,9 +768,9 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 			{
 				if (sBoatItem->Animation.Velocity == 0)
 				{
-					if (TrInput & SBOAT_IN_RIGHT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Pose.Orientation.y + EulerAngle::DegToRad(90.0f)))
+					if (TrInput & SBOAT_IN_RIGHT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Pose.Orientation.y + Angle::DegToRad(90.0f)))
 						laraItem->Animation.TargetState = SBOAT_STATE_DISMOUNT_RIGHT;
-					else if (TrInput & SBOAT_IN_LEFT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Pose.Orientation.y - EulerAngle::DegToRad(90.0f)))
+					else if (TrInput & SBOAT_IN_LEFT && TestSpeedBoatDismount(sBoatItem, sBoatItem->Pose.Orientation.y - Angle::DegToRad(90.0f)))
 						laraItem->Animation.TargetState = SBOAT_STATE_DISMOUNT_LEFT;
 				}
 			}
@@ -1024,7 +1024,7 @@ void SpeedBoatControl(short itemNumber)
 			sBoatItem->Animation.FrameNumber = g_Level.Anims[sBoatItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 		}
 
-		Camera.targetElevation = EulerAngle::DegToRad(-20.0f);
+		Camera.targetElevation = Angle::DegToRad(-20.0f);
 		Camera.targetDistance = SECTOR(2);
 	}
 	else

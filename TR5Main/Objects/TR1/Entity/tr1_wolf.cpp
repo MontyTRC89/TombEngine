@@ -50,9 +50,9 @@ enum WolfAnim
 #define SLEEP_CHANCE 0x20
 #define HOWL_CHANCE  0x180
 
-#define WALK_TURN  EulerAngle::DegToRad(2.0f)
-#define RUN_TURN   EulerAngle::DegToRad(5.0f)
-#define STALK_TURN EulerAngle::DegToRad(2.0f)
+#define WALK_TURN  Angle::DegToRad(2.0f)
+#define RUN_TURN   Angle::DegToRad(5.0f)
+#define STALK_TURN Angle::DegToRad(2.0f)
 
 void InitialiseWolf(short itemNumber)
 {

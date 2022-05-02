@@ -4,38 +4,38 @@
 struct ITEM_INFO;
 struct CollisionInfo;
 
-#define LARA_GRAB_THRESHOLD EulerAngle::DegToRad(40.0f)
-#define FRONT_ARC EulerAngle::DegToRad(90.0f)	// TODO: Check use.
+#define LARA_GRAB_THRESHOLD Angle::DegToRad(40.0f)
+#define FRONT_ARC Angle::DegToRad(90.0f)	// TODO: Check use.
 
 // Lean rates
-#define LARA_LEAN_RATE EulerAngle::DegToRad(1.5f)
-#define LARA_LEAN_MAX EulerAngle::DegToRad(11.0f)
+#define LARA_LEAN_RATE Angle::DegToRad(1.5f)
+#define LARA_LEAN_MAX Angle::DegToRad(11.0f)
 
 // Turn rates
-#define LARA_TURN_RATE EulerAngle::DegToRad(2.25f)
-#define LARA_CRAWL_MOVE_TURN_RATE EulerAngle::DegToRad(2.15f)
-#define LARA_POLE_TURN_RATE EulerAngle::DegToRad(2.25f)
-#define LARA_SUBSUIT_TURN_RATE EulerAngle::DegToRad(0.75f)
+#define LARA_TURN_RATE Angle::DegToRad(2.25f)
+#define LARA_CRAWL_MOVE_TURN_RATE Angle::DegToRad(2.15f)
+#define LARA_POLE_TURN_RATE Angle::DegToRad(2.25f)
+#define LARA_SUBSUIT_TURN_RATE Angle::DegToRad(0.75f)
 
 // Turn rate maxes
-#define LARA_SLOW_TURN_MAX EulerAngle::DegToRad(4.0f)
-#define LARA_SLOW_MED_TURN_MAX EulerAngle::DegToRad(5.0f)
-#define LARA_MED_TURN_MAX EulerAngle::DegToRad(6.0f)
-#define LARA_MED_FAST_TURN_MAX EulerAngle::DegToRad(7.0f)
-#define LARA_FAST_TURN_MAX EulerAngle::DegToRad(8.0f)
-#define LARA_WADE_TURN_MAX EulerAngle::DegToRad(5.5f)
-#define LARA_SWAMP_TURN_MAX EulerAngle::DegToRad(2.0f)
-#define LARA_JUMP_TURN_MAX EulerAngle::DegToRad(3.0f)
-#define LARA_REACH_TURN_MAX EulerAngle::DegToRad(1.3f)
-#define LARA_SLIDE_TURN_MAX EulerAngle::DegToRad(5.70f)
-#define LARA_CRAWL_TURN_MAX EulerAngle::DegToRad(2.0f)
-#define LARA_CRAWL_MOVE_TURN_MAX EulerAngle::DegToRad(3.75f)
-#define LARA_CROUCH_ROLL_TURN_MAX EulerAngle::DegToRad(2.75f)
-#define LARA_POLE_TURN_MAX EulerAngle::DegToRad(4.5f)
+#define LARA_SLOW_TURN_MAX Angle::DegToRad(4.0f)
+#define LARA_SLOW_MED_TURN_MAX Angle::DegToRad(5.0f)
+#define LARA_MED_TURN_MAX Angle::DegToRad(6.0f)
+#define LARA_MED_FAST_TURN_MAX Angle::DegToRad(7.0f)
+#define LARA_FAST_TURN_MAX Angle::DegToRad(8.0f)
+#define LARA_WADE_TURN_MAX Angle::DegToRad(5.5f)
+#define LARA_SWAMP_TURN_MAX Angle::DegToRad(2.0f)
+#define LARA_JUMP_TURN_MAX Angle::DegToRad(3.0f)
+#define LARA_REACH_TURN_MAX Angle::DegToRad(1.3f)
+#define LARA_SLIDE_TURN_MAX Angle::DegToRad(5.70f)
+#define LARA_CRAWL_TURN_MAX Angle::DegToRad(2.0f)
+#define LARA_CRAWL_MOVE_TURN_MAX Angle::DegToRad(3.75f)
+#define LARA_CROUCH_ROLL_TURN_MAX Angle::DegToRad(2.75f)
+#define LARA_POLE_TURN_MAX Angle::DegToRad(4.5f)
 
 // Flex rates
-#define LARA_CRAWL_FLEX_RATE EulerAngle::DegToRad(2.25f)
-#define LARA_CRAWL_FLEX_MAX EulerAngle::DegToRad(45.0f) / 2	// 2 = hardcoded number of bones to flex (head and torso).
+#define LARA_CRAWL_FLEX_RATE Angle::DegToRad(2.25f)
+#define LARA_CRAWL_FLEX_MAX Angle::DegToRad(45.0f) / 2	// 2 = hardcoded number of bones to flex (head and torso).
 
 constexpr auto LARA_HEIGHT = CLICK(3) - 1;	// Lara height in basic states.
 constexpr auto LARA_HEIGHT_CRAWL = 350;		// Lara height in crawl states.

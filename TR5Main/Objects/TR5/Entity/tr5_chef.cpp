@@ -93,7 +93,7 @@ void ControlChef(short itemNumber)
 			aiLaraInfo.angle = atan2(dz, dx) - item->Pose.Orientation.y;
 			aiLaraInfo.ahead = true;
 
-			if (aiLaraInfo.angle <= EulerAngle::DegToRad(-90.0f) || aiLaraInfo.angle >= EulerAngle::DegToRad(90.0f))
+			if (aiLaraInfo.angle <= Angle::DegToRad(-90.0f) || aiLaraInfo.angle >= Angle::DegToRad(90.0f))
 				aiLaraInfo.ahead = false;
 
 			aiLaraInfo.distance = pow(dx, 2) + pow(dz, 2);
@@ -134,23 +134,23 @@ void ControlChef(short itemNumber)
 			creature->MaxTurn = 0;
 
 			if (AI.angle > 0)
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			else
-				item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 
 			break;
 
 		case CHEF_STATE_ATTACK:
 			creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= EulerAngle::DegToRad(2.0f))
+			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle > 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(2.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
 			}
 			else
 				item->Pose.Orientation.y += AI.angle;
@@ -174,12 +174,12 @@ void ControlChef(short itemNumber)
 			break;
 
 		case CHEF_STATE_AIM:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 			creature->Flags = 0;
 
 			if (AI.distance >= pow(682, 2))
 			{
-				if (AI.angle > EulerAngle::DegToRad(112.5f) || AI.angle < EulerAngle::DegToRad(-112.5f))
+				if (AI.angle > Angle::DegToRad(112.5f) || AI.angle < Angle::DegToRad(-112.5f))
 					item->Animation.TargetState = CHEF_STATE_TURN_180;
 				else if (creature->Mood == MoodType::Attack)
 					item->Animation.TargetState = CHEF_STATE_WALK;
@@ -190,11 +190,11 @@ void ControlChef(short itemNumber)
 			break;
 
 		case CHEF_STATE_WALK:
-			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+			creature->MaxTurn = Angle::DegToRad(7.0f);
 
 			if (AI.distance < pow(682, 2) ||
-				AI.angle > EulerAngle::DegToRad(112.5f) ||
-				AI.angle < EulerAngle::DegToRad(-112.5f) ||
+				AI.angle > Angle::DegToRad(112.5f) ||
+				AI.angle < Angle::DegToRad(-112.5f) ||
 				creature->Mood != MoodType::Attack)
 			{
 				item->Animation.TargetState = CHEF_STATE_AIM;

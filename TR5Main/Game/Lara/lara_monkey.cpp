@@ -27,10 +27,10 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -167,10 +167,10 @@ void lara_as_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -254,10 +254,10 @@ void lara_as_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -301,7 +301,7 @@ void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(180.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(1.25f);
@@ -335,10 +335,10 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -385,7 +385,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() - EulerAngle::DegToRad(90.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
@@ -419,10 +419,10 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -469,7 +469,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.MoveAngle = EulerAngle::Clamp(item->Pose.Orientation.GetY() + EulerAngle::DegToRad(90.0f));
+	lara->Control.MoveAngle = Angle::Normalize(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = CLICK(0.5f);
@@ -503,7 +503,7 @@ void lara_as_monkey_turn_180(ITEM_INFO* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	item->Animation.TargetState = LS_MONKEY_IDLE;
 }
@@ -521,10 +521,10 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{
@@ -604,10 +604,10 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraTorsoRot = EulerAngle();
+	lara->ExtraTorsoRot = EulerAngles();
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
-	Camera.targetElevation = EulerAngle::DegToRad(-5.0f);
+	Camera.targetElevation = Angle::DegToRad(-5.0f);
 
 	if (item->HitPoints <= 0)
 	{

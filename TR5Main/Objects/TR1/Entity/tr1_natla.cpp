@@ -31,9 +31,9 @@ enum NatlaState
 #define NATLA_NEAR_DEATH 200
 #define NATLA_FLYMODE 0x8000
 #define NATLA_TIMER   0x7fff
-#define NATLA_FIRE_ARC EulerAngle::DegToRad(30.0f)
-#define NATLA_FLY_TURN EulerAngle::DegToRad(5.0f)
-#define NATLA_RUN_TURN EulerAngle::DegToRad(6.0f)
+#define NATLA_FIRE_ARC Angle::DegToRad(30.0f)
+#define NATLA_FLY_TURN Angle::DegToRad(5.0f)
+#define NATLA_RUN_TURN Angle::DegToRad(6.0f)
 #define NATLA_LAND_CHANCE 0x100
 #define NATLA_DEATH_TIME (30 * 16)
 #define NATLA_SHOT_DAMAGE 100

@@ -43,7 +43,7 @@ namespace TEN::Entities::TR4
 				end.x = item->Pose.Position.x;
 				end.y = item->Pose.Position.y;
 				end.z = item->Pose.Position.z;
-				angles[0] = item->Pose.Orientation.y - EulerAngle::DegToRad(180.0f);
+				angles[0] = item->Pose.Orientation.y - Angle::DegToRad(180.0f);
 				angles[1] = 0;
 			}
 			// Mutant.
@@ -84,14 +84,14 @@ namespace TEN::Entities::TR4
 
 		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
+			if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
 		}
 		else if (item->Pose.Orientation.y < 0)
 		{
-			if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
+			if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(2);
-			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
+			else if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(2);
 		}
 		else
@@ -176,12 +176,12 @@ namespace TEN::Entities::TR4
 					int random = locust->randomRotation * 128;
 					resultYrot = angles[0] - locust->pos.Orientation.y;
 
-					if (abs(resultYrot) > EulerAngle::DegToRad(180.0f))
+					if (abs(resultYrot) > Angle::DegToRad(180.0f))
 						resultYrot = locust->pos.Orientation.y - angles[0];
 
 					resultXrot = angles[1] - locust->pos.Orientation.x;
 
-					if (abs(resultXrot) > EulerAngle::DegToRad(180.0f))
+					if (abs(resultXrot) > Angle::DegToRad(180.0f))
 						resultXrot = locust->pos.Orientation.x - angles[0];
 
 					shiftYrot = resultYrot / 8;

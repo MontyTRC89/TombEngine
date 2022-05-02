@@ -1,6 +1,5 @@
 #pragma once
 #include <items.h>
-#include "Specific/EulerAngle.h"
 
 struct BeetleData
 {

@@ -82,7 +82,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 	if (beetle->ItemFlags[0])
 	{
-		beetle->Pose.Orientation.z = EulerAngle::DegToRad(22.5f) * sin(EulerAngle::DegToRad(22.5f) * (GlobalCounter & 0xF));
+		beetle->Pose.Orientation.z = Angle::DegToRad(22.5f) * sin(Angle::DegToRad(22.5f) * (GlobalCounter & 0xF));
 
 		switch (beetle->ItemFlags[2])
 		{
@@ -100,18 +100,18 @@ void ClockworkBeetleControl(short itemNumber)
 				float atan = atan2(z, x);
 				float rot = atan - beetle->Pose.Orientation.y;
 
-				if (abs(rot) > EulerAngle::DegToRad(180.0f))
+				if (abs(rot) > Angle::DegToRad(180.0f))
 					rot = beetle->Pose.Orientation.y - atan;
 
-				if (abs(rot) < EulerAngle::DegToRad(1.4f))
+				if (abs(rot) < Angle::DegToRad(1.4f))
 				{
 					beetle->Pose.Orientation.y = atan;
 					beetle->ItemFlags[2] = 1;
 				}
 				else if (rot < 0)
-					beetle->Pose.Orientation.y -= EulerAngle::DegToRad(1.4f);
+					beetle->Pose.Orientation.y -= Angle::DegToRad(1.4f);
 				else
-					beetle->Pose.Orientation.y += EulerAngle::DegToRad(1.4f);
+					beetle->Pose.Orientation.y += Angle::DegToRad(1.4f);
 			}
 			else
 			{
@@ -210,12 +210,12 @@ void ClockworkBeetleControl(short itemNumber)
 
 		case 2:
 		{
-			float rotation = EulerAngle::ShortestAngle(beetle->ItemFlags[1], beetle->Pose.Orientation.y);
+			float rotation = Angle::ShortestAngle(beetle->ItemFlags[1], beetle->Pose.Orientation.y);
 
-			if (abs(rotation) > EulerAngle::DegToRad(180.0f))
+			if (abs(rotation) > Angle::DegToRad(180.0f))
 				rotation = beetle->Pose.Orientation.y - beetle->ItemFlags[1];
 
-			if (abs(rotation) < EulerAngle::DegToRad(1.4f))
+			if (abs(rotation) < Angle::DegToRad(1.4f))
 			{
 				beetle->ItemFlags[2] = 3;
 				beetle->Pose.Orientation.y = beetle->ItemFlags[1];
@@ -223,9 +223,9 @@ void ClockworkBeetleControl(short itemNumber)
 			else
 			{
 				if (rotation < 0)
-					beetle->Pose.Orientation.y -= EulerAngle::DegToRad(1.4f);
+					beetle->Pose.Orientation.y -= Angle::DegToRad(1.4f);
 				else
-					beetle->Pose.Orientation.y += EulerAngle::DegToRad(1.4f);
+					beetle->Pose.Orientation.y += Angle::DegToRad(1.4f);
 			}
 
 			break;
@@ -256,7 +256,7 @@ void ClockworkBeetleControl(short itemNumber)
 	}
 	else
 	{
-		beetle->Pose.Orientation.z = EulerAngle::DegToRad(45.0f) * sin(EulerAngle::DegToRad(45.0f) * (GlobalCounter & 0x7));
+		beetle->Pose.Orientation.z = Angle::DegToRad(45.0f) * sin(Angle::DegToRad(45.0f) * (GlobalCounter & 0x7));
 
 		if (beetle->ItemFlags[3])
 			beetle->ItemFlags[3]--;

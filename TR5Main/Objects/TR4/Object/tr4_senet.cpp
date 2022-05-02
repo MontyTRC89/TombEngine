@@ -23,8 +23,8 @@ OBJECT_COLLISION_BOUNDS GameStixBounds =
 	-256, 256,
 	-200, 200,
 	-256, 256,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
 	0, 0
 };
 
@@ -430,7 +430,7 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 		Lara.Control.HandStatus == HandStatus::Free &&
 		!item->Active || Lara.Control.IsMoving && Lara.InteractedItem == itemNumber)
 	{
-		laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+		laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 
 		if (TestLaraPosition(&GameStixBounds, item, laraItem))
 		{
@@ -444,14 +444,14 @@ void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* c
 				Lara.Control.HandStatus = HandStatus::Busy;
 				item->Status = ITEM_ACTIVE;
 				AddActiveItem(itemNumber);
-				laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 				return;
 			}
 
 			Lara.InteractedItem = itemNumber;
 		}
 
-		laraItem->Pose.Orientation.y += EulerAngle::DegToRad(180.0f);
+		laraItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
 	}
 	else
 		ObjectCollision(itemNumber, laraItem, coll);

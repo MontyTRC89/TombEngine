@@ -14,8 +14,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-#define MUTANT_NEED_TURN EulerAngle::DegToRad(45.0f)
-#define MUTANT_TURN EulerAngle::DegToRad(3.0f)
+#define MUTANT_NEED_TURN Angle::DegToRad(45.0f)
+#define MUTANT_TURN Angle::DegToRad(3.0f)
 #define MUTANT_ATTACK_RANGE pow(2600, 2)
 #define MUTANT_CLOSE_RANGE pow(2250, 2)
 #define MUTANT_ATTACK_1_CHANCE 11000
@@ -145,7 +145,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 16 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Pose.Orientation.y += EulerAngle::DegToRad(14.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(14.0f);
 			}
 
 			if (angle < MUTANT_NEED_TURN)
@@ -159,7 +159,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 13 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(9.0f);
+				item->Pose.Orientation.y -= Angle::DegToRad(9.0f);
 			}
 
 			if (angle > -MUTANT_NEED_TURN)

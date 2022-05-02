@@ -141,7 +141,7 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 			creature->Flags &= ~1;
 
 			if (creature->Mood != MoodType::Bored)
@@ -156,7 +156,7 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
+			creature->MaxTurn = Angle::DegToRad(4.0f);
 			creature->Flags &= ~1;
 			tilt = angle;
 
@@ -189,7 +189,7 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 4:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 			tilt = angle;
 
 			if (creature->Enemy == LaraItem)
@@ -232,7 +232,7 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 8:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 			tilt = angle;
 
 			if (creature->Enemy == LaraItem)
@@ -275,7 +275,7 @@ void RaptorControl(short itemNumber)
 			break;
 
 		case 7:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 			tilt = angle;
 
 			if (creature->Enemy == LaraItem)

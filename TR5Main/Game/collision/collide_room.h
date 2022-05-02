@@ -1,5 +1,4 @@
 #pragma once
-#include "Specific/EulerAngle.h"
 #include "Specific/phd_global.h"
 #include "Specific/trmath.h"
 
@@ -49,8 +48,8 @@ struct CollisionPosition
 	bool CeilingSlope;
 	bool DiagonalStep;
 
-	bool HasDiagonalSplit() { return SplitAngle == EulerAngle::DegToRad(45.0f) || SplitAngle == EulerAngle::DegToRad(135.0f); }
-	bool HasFlippedDiagonalSplit() { return HasDiagonalSplit() && SplitAngle != EulerAngle::DegToRad(45.0f); }
+	bool HasDiagonalSplit() { return SplitAngle == Angle::DegToRad(45.0f) || SplitAngle == Angle::DegToRad(135.0f); }
+	bool HasFlippedDiagonalSplit() { return HasDiagonalSplit() && SplitAngle != Angle::DegToRad(45.0f); }
 };
 
 struct CollisionResult
@@ -117,8 +116,8 @@ struct CollisionInfo
 
 	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
 	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
-	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && fmod(NearestLedgeAngle, EulerAngle::DegToRad(90.0f)); }
-	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && fmod(NearestLedgeAngle, EulerAngle::DegToRad(90.0f)); }
+	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && fmod(NearestLedgeAngle, Angle::DegToRad(90.0f)); }
+	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && fmod(NearestLedgeAngle, Angle::DegToRad(90.0f)); }
 };
 
 CollisionResult GetCollision(ITEM_INFO* item, float angle, int distance, int height = 0, int side = 0);

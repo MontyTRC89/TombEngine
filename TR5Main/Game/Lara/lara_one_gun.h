@@ -4,7 +4,7 @@
 enum class LaraWeaponType;
 struct ITEM_INFO;
 
-#define PELLET_SCATTER EulerAngle::DegToRad(20.0f)
+#define PELLET_SCATTER Angle::DegToRad(20.0f)
 
 constexpr auto HARPOON_DRAW_ANIM = 1;
 constexpr auto ROCKET_DRAW_ANIM = 0;

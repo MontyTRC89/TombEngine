@@ -77,7 +77,7 @@ void SmallSpiderControl(short itemNumber)
 
 		GetCreatureMood(item, &AI, VIOLENT);
 		CreatureMood(item, &AI, VIOLENT);
-		angle = CreatureTurn(item, EulerAngle::DegToRad(8.0f));
+		angle = CreatureTurn(item, Angle::DegToRad(8.0f));
 
 		switch (item->Animation.ActiveState)
 		{
@@ -175,7 +175,7 @@ void BigSpiderControl(short itemNumber)
 		CreatureAIInfo(item, &AI);
 		GetCreatureMood(item, &AI, TRUE);
 		CreatureMood(item, &AI, TRUE);
-		angle = CreatureTurn(item, EulerAngle::DegToRad(4.0f));
+		angle = CreatureTurn(item, Angle::DegToRad(4.0f));
 
 		switch (item->Animation.ActiveState)
 		{

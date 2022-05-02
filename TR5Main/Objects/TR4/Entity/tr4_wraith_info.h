@@ -1,5 +1,4 @@
 #pragma once
-#include "Specific/EulerAngle.h"
 
 struct WraithInfo
 {

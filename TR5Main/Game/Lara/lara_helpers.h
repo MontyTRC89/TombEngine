@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 
-class EulerAngle;
+class EulerAngles;
 struct ITEM_INFO;
 struct CollisionInfo;
 struct LaraInfo;

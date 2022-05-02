@@ -162,7 +162,7 @@ void SpearGuardianControl(short itemNumber)
 			break;
 
 		case 3:
-			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+			creature->MaxTurn = Angle::DegToRad(3.0f);
 
 			if (AI.ahead)
 				neck = AI.angle;
@@ -192,7 +192,7 @@ void SpearGuardianControl(short itemNumber)
 			break;
 
 		case 4:
-			creature->MaxTurn = EulerAngle::DegToRad(5.0f);
+			creature->MaxTurn = Angle::DegToRad(5.0f);
 
 			if (AI.ahead)
 				neck = AI.angle;

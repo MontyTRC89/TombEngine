@@ -71,13 +71,13 @@ void ObeliskControl(short itemNumber)
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
-				pos.Position.x = item->Pose.Position.x + (3456 * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f)));
+				pos.Position.x = item->Pose.Position.x + (3456 * sin(item->Pose.Orientation.y + Angle::DegToRad(90.0f)));
 				pos.Position.y = item->Pose.Position.y - CLICK(1);
-				pos.Position.z = item->Pose.Position.z + (3456 * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f)));
+				pos.Position.z = item->Pose.Position.z + (3456 * cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f)));
 
-				pos2.Position.x = item->Pose.Position.x + (someNumber * sin(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f)));
+				pos2.Position.x = item->Pose.Position.x + (someNumber * sin(item->Pose.Orientation.y + Angle::DegToRad(90.0f)));
 				pos2.Position.y = item->Pose.Position.y;
-				pos2.Position.x = item->Pose.Position.z + (someNumber * cos(item->Pose.Orientation.z + EulerAngle::DegToRad(90.0f)));
+				pos2.Position.x = item->Pose.Position.z + (someNumber * cos(item->Pose.Orientation.z + Angle::DegToRad(90.0f)));
 
 				if (abs(pos.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
 					abs(pos.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&
@@ -110,7 +110,7 @@ void ObeliskControl(short itemNumber)
 		{
 			pos.Position.x = item->Pose.Position.x + SECTOR(8) * sin(item->Pose.Orientation.y);
 			pos.Position.y = item->Pose.Position.y;
-			pos.Position.z = item->Pose.Position.z + SECTOR(8) * cos(item->Pose.Orientation.y + EulerAngle::DegToRad(90.0f));
+			pos.Position.z = item->Pose.Position.z + SECTOR(8) * cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
 
 			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos, 0);
 
@@ -168,7 +168,7 @@ void ObeliskControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == obj->animIndex + 2)
 		{
-			item->Pose.Orientation.y -= EulerAngle::DegToRad(90.0f);
+			item->Pose.Orientation.y -= Angle::DegToRad(90.0f);
 
 			if (TrInput & IN_ACTION)
 			{
@@ -181,7 +181,7 @@ void ObeliskControl(short itemNumber)
 
 		if (item->Animation.AnimNumber == obj->animIndex + 6)
 		{
-			item->Pose.Orientation.y += EulerAngle::DegToRad(90.0f);
+			item->Pose.Orientation.y += Angle::DegToRad(90.0f);
 
 			if (!(TrInput & IN_ACTION))
 			{
@@ -211,8 +211,8 @@ void ObeliskControl(short itemNumber)
 				if (currentItem->ObjectNumber == ID_PULLEY)
 				{
 					currentItem->ItemFlags[1] =
-						(item->Pose.Orientation.y != EulerAngle::DegToRad(-90.0f) ||
-							g_Level.Items[item->ItemFlags[0]].Pose.Orientation.y != EulerAngle::DegToRad(90.0f) ||
+						(item->Pose.Orientation.y != Angle::DegToRad(-90.0f) ||
+							g_Level.Items[item->ItemFlags[0]].Pose.Orientation.y != Angle::DegToRad(90.0f) ||
 							g_Level.Items[item->ItemFlags[1]].Pose.Orientation.y != 0 ? 0 : 1) ^ 1;
 
 					break;

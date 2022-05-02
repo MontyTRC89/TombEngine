@@ -100,7 +100,7 @@ void LagoonWitchControl(short itemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case WITCH_STATE_SWIM:
-			creature->MaxTurn = EulerAngle::DegToRad(4.0f);
+			creature->MaxTurn = Angle::DegToRad(4.0f);
 
 			if (AI.distance < pow(SECTOR(1), 2))
 				item->Animation.TargetState = WITCH_STATE_IDLE;
@@ -108,7 +108,7 @@ void LagoonWitchControl(short itemNumber)
 			break;
 
 		case WITCH_STATE_IDLE:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 			creature->Flags = 0;
 
 			if (AI.distance < pow(CLICK(3), 2))
@@ -121,7 +121,7 @@ void LagoonWitchControl(short itemNumber)
 			break;
 
 		case WITCH_STATE_ATTACK:
-			creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+			creature->MaxTurn = Angle::DegToRad(2.0f);
 
 			if (!creature->Flags &&
 				item->TouchBits & 0x3C3C0 &&

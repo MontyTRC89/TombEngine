@@ -58,14 +58,14 @@ constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 
 #define BABOON_DAMAGE 70
 #define BABOON_IDLE_DISTANCE pow(SECTOR(1), 2)
-#define BABOON_ATTACK_ANGLE EulerAngle::DegToRad(7.0f)
+#define BABOON_ATTACK_ANGLE Angle::DegToRad(7.0f)
 #define BABOON_ATK_RANGE 0x718E4
 #define BABOON_ATK_NORMALRANGE 0x1C639
 #define BABOON_JUMP_RANGE 0x718E4
 #define BABOON_FOLLOW_RANGE 0x400000
 #define BABOON_RUNROLL_RANGE 0x100000
-#define BABOON_WALK_ANGLE EulerAngle::DegToRad(7.0f)
-#define BABOON_RUN_ANGLE EulerAngle::DegToRad(11.0f)
+#define BABOON_WALK_ANGLE Angle::DegToRad(7.0f)
+#define BABOON_RUN_ANGLE Angle::DegToRad(11.0f)
 /// NOTE (TokyoSU): these touchbits is fixed !
 /// now the baboon is a killing machine :D
 #define BABOON_RIGHT_TOUCHBITS 814
@@ -98,10 +98,10 @@ void BaboonDieEffect(ITEM_INFO* item)
 	PoseData pos = PoseData(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z);
 
 	// trigger shockwave effect
-	TriggerBaboonShockwave(pos, EulerAngle::DegToRad(0.0f));
-	TriggerBaboonShockwave(pos, EulerAngle::DegToRad(45.0f));
-	TriggerBaboonShockwave(pos, EulerAngle::DegToRad(90.0f));
-	TriggerBaboonShockwave(pos, EulerAngle::DegToRad(135.0f));
+	TriggerBaboonShockwave(pos, Angle::DegToRad(0.0f));
+	TriggerBaboonShockwave(pos, Angle::DegToRad(45.0f));
+	TriggerBaboonShockwave(pos, Angle::DegToRad(90.0f));
+	TriggerBaboonShockwave(pos, Angle::DegToRad(135.0f));
 
 	// trigger flash screen
 	Weather.Flash(255, 64, 0, 0.03f);

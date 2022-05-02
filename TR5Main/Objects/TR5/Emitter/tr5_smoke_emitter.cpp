@@ -13,14 +13,14 @@ void InitialiseSmokeEmitter(short itemNumber)
 	{
 		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
+			if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(2);
 		}
 		else if (item->Pose.Orientation.y)
 		{
-			if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
+			if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(2);
-			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
+			else if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(2);
 		}
 		else
@@ -34,16 +34,16 @@ void InitialiseSmokeEmitter(short itemNumber)
 
 		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
+			if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
 				item->Pose.Position.x += CLICK(1);
 		}
 		else
 		{
 			if (item->Pose.Orientation.y == 0)
 				item->Pose.Position.z += CLICK(1);
-			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
+			else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 				item->Pose.Position.z -= CLICK(1);
-			else if (item->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
+			else if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 				item->Pose.Position.x -= CLICK(1);
 		}
 
@@ -165,9 +165,9 @@ void SmokeEmitterControl(short itemNumber)
 
 		if (item->triggerFlags >= 0)
 		{
-			spark->xVel = flags * sin(item->pos.Orientation.y - EulerAngle::DegToRad(180)) >> W2V_SHIFT;
+			spark->xVel = flags * sin(item->pos.Orientation.y - Angle::DegToRad(180)) >> W2V_SHIFT;
 			spark->yVel = -16 - (GetRandomControl() & 0xF);
-			spark->zVel = flags * cos(item->pos.Orientation.y - EulerAngle::DegToRad(180)) >> W2V_SHIFT;
+			spark->zVel = flags * cos(item->pos.Orientation.y - Angle::DegToRad(180)) >> W2V_SHIFT;
 		}
 		else
 		{
@@ -265,8 +265,8 @@ void SmokeEmitterControl(short itemNumber)
 				spark->z = (GetRandomControl() & 0x3F) + item->pos.Position.z - 32;
 				if (item->triggerFlags == 111)
 				{
-					spark->xVel = 512 * sin(item->pos.Orientation.y - EulerAngle::DegToRad(180)) >> W2V_SHIFT;
-					spark->zVel = 512 * cos(item->pos.Orientation.y - EulerAngle::DegToRad(180)) >> W2V_SHIFT;
+					spark->xVel = 512 * sin(item->pos.Orientation.y - Angle::DegToRad(180)) >> W2V_SHIFT;
+					spark->zVel = 512 * cos(item->pos.Orientation.y - Angle::DegToRad(180)) >> W2V_SHIFT;
 					spark->friction = 5;
 				}
 				else

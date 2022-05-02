@@ -102,7 +102,7 @@ void LionControl(short itemNumber)
 				break;
 
 			case 2:
-				creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+				creature->MaxTurn = Angle::DegToRad(2.0f);
 
 				if (creature->Mood == MoodType::Bored)
 				{
@@ -118,7 +118,7 @@ void LionControl(short itemNumber)
 				break;
 
 			case 3:
-				creature->MaxTurn = EulerAngle::DegToRad(5.0f);
+				creature->MaxTurn = Angle::DegToRad(5.0f);
 				tilt = angle;
 
 				if (creature->Mood != MoodType::Bored)
@@ -154,7 +154,7 @@ void LionControl(short itemNumber)
 				break;
 
 			case 7:
-				creature->MaxTurn = EulerAngle::DegToRad(1.0f);
+				creature->MaxTurn = Angle::DegToRad(1.0f);
 
 				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{

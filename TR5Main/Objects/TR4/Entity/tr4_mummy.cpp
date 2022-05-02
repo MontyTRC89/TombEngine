@@ -194,7 +194,7 @@ void MummyControl(short itemNumber)
 			}
 			else
 			{
-				creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+				creature->MaxTurn = Angle::DegToRad(7.0f);
 
 				if (AI.distance >= pow(SECTOR(3), 2))
 				{
@@ -208,7 +208,7 @@ void MummyControl(short itemNumber)
 			break;
 
 		case MUMMY_STATE_WALK_ARMS_UP:
-			creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+			creature->MaxTurn = Angle::DegToRad(7.0f);
 			creature->Flags = 0;
 
 			if (AI.distance < pow(SECTOR(0.5f), 2))
@@ -257,12 +257,12 @@ void MummyControl(short itemNumber)
 		case MUMMY_STATE_HIT:
 			creature->MaxTurn = 0;
 
-			if (abs(AI.angle) >= EulerAngle::DegToRad(7.0f))
+			if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 				else
-					item->Pose.Orientation.y -= EulerAngle::DegToRad(7.0f);
+					item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
 			}
 			else
 				item->Pose.Orientation.y += AI.angle;

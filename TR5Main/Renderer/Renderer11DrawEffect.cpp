@@ -566,26 +566,26 @@ namespace TEN::Renderer
 			case LaraWeaponType::Revolver:
 				length = 192;
 				zOffset = 68;
-				rotationX = EulerAngle::DegToRad(-80.0f);
+				rotationX = Angle::DegToRad(-80.0f);
 				break;
 
 			case LaraWeaponType::Uzi:
 				length = 190;
 				zOffset = 50;
-				rotationX = EulerAngle::DegToRad(-80.0f);
+				rotationX = Angle::DegToRad(-80.0f);
 				break;
 
 			case LaraWeaponType::HK:
 				length = 300;
 				zOffset = 92;
-				rotationX = EulerAngle::DegToRad(-80.0f);
+				rotationX = Angle::DegToRad(-80.0f);
 				break;
 
 			default:
 			case LaraWeaponType::Pistol:
 				length = 180;
 				zOffset = 40;
-				rotationX = EulerAngle::DegToRad(92.5f);
+				rotationX = Angle::DegToRad(92.5f);
 				break;
 			}
 
@@ -698,7 +698,7 @@ namespace TEN::Renderer
 						if (flashBucket.Vertices.size() != 0)
 						{
 							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-							Matrix rotationX = Matrix::CreateRotationX(EulerAngle::DegToRad(270.0f));
+							Matrix rotationX = Matrix::CreateRotationX(Angle::DegToRad(270.0f));
 							Matrix rotationZ = Matrix::CreateRotationZ(2 * GetRandomControl());
 
 							Matrix world = item->AnimationTransforms[joint] * item->World;

@@ -16,8 +16,8 @@ OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 	-512, 512,
 	-100, 100,
 	-512, 0,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
 	0, 0
 };
 

@@ -59,7 +59,7 @@ void KnifeControl(short fxNumber)
 	if (probe.RoomNumber != fx->roomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
-	fx->pos.Orientation.z += EulerAngle::DegToRad(30.0f);
+	fx->pos.Orientation.z += Angle::DegToRad(30.0f);
 
 	if (ItemNearLara(&fx->pos, 200))
 	{
@@ -137,7 +137,7 @@ void KnifeThrowerControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->MaxTurn = EulerAngle::DegToRad(3.0f);
+			creature->MaxTurn = Angle::DegToRad(3.0f);
 
 			if (AI.ahead)
 				head = AI.angle;
@@ -165,7 +165,7 @@ void KnifeThrowerControl(short itemNumber)
 
 		case 3:
 			tilt = angle / 3;
-			creature->MaxTurn = EulerAngle::DegToRad(6.0f);
+			creature->MaxTurn = Angle::DegToRad(6.0f);
 
 			if (AI.ahead)
 				head = AI.angle;

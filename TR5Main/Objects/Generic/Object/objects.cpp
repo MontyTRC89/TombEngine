@@ -23,9 +23,9 @@ OBJECT_COLLISION_BOUNDS TightRopeBounds =
 	-256, 256,
 	0, 0,
 	-256, 256,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
@@ -33,9 +33,9 @@ OBJECT_COLLISION_BOUNDS ParallelBarsBounds =
 	-640, 640,
 	704, 832,
 	-96, 96,
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f),
-	EulerAngle::DegToRad(-30.0f), EulerAngle::DegToRad(30.0f),
-	EulerAngle::DegToRad(-10.0f), EulerAngle::DegToRad(10.0f)
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
+	Angle::DegToRad(-30.0f), Angle::DegToRad(30.0f),
+	Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 };
 
 void ControlAnimatingSlots(short itemNumber)
@@ -155,7 +155,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 	}
 	else
 	{
-		tightropeItem->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
+		tightropeItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 
 		if (TestLaraPosition(&TightRopeBounds, tightropeItem, laraItem))
 		{
@@ -180,14 +180,14 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 			else
 				laraInfo->InteractedItem = itemNumber;
 
-			tightropeItem->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
+			tightropeItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 		}
 		else
 		{
 			if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				laraInfo->Control.IsMoving = false;
 
-			tightropeItem->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
+			tightropeItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 		}
 	}
 }
@@ -205,9 +205,9 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 		int test2 = 0;
 		if (!test1)
 		{
-			barItem->Pose.Orientation.y += EulerAngle::DegToRad(-180.0f);
+			barItem->Pose.Orientation.y += Angle::DegToRad(-180.0f);
 			test2 = TestLaraPosition(&ParallelBarsBounds, barItem, laraItem);
-			barItem->Pose.Orientation.y += EulerAngle::DegToRad(-180);
+			barItem->Pose.Orientation.y += Angle::DegToRad(-180);
 		}
 
 		if (test1 || test2)
@@ -223,7 +223,7 @@ void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 			if (test1)
 				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y;
 			else
-				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + EulerAngle::DegToRad(-180.0f);
+				laraItem->Pose.Orientation.y = barItem->Pose.Orientation.y + Angle::DegToRad(-180.0f);
 
 			Vector3Int pos1 = { 0, -128, 512 };
 			GetLaraJointPosition(&pos1, LM_LHAND);
@@ -287,14 +287,14 @@ void InitialiseTightrope(short itemNumber)
 
 	if (tightropeItem->Pose.Orientation.y > 0)
 	{
-		if (tightropeItem->Pose.Orientation.y == EulerAngle::DegToRad(90.0f))
+		if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(90.0f))
 			tightropeItem->Pose.Position.x -= 256;
 	}
 	else if (tightropeItem->Pose.Orientation.y)
 	{
-		if (tightropeItem->Pose.Orientation.y == EulerAngle::DegToRad(-180.0f))
+		if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(-180.0f))
 			tightropeItem->Pose.Position.z += CLICK(1);
-		else if (tightropeItem->Pose.Orientation.y == EulerAngle::DegToRad(-90.0f))
+		else if (tightropeItem->Pose.Orientation.y == Angle::DegToRad(-90.0f))
 			tightropeItem->Pose.Position.x += CLICK(1);
 	}
 	else

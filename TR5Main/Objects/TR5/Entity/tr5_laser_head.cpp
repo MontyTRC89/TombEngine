@@ -166,7 +166,7 @@ void InitialiseLaserHead(short itemNumber)
 			}
 		}
 
-		rotation += EulerAngle::DegToRad(45.0f);
+		rotation += Angle::DegToRad(45.0f);
 	}
 
 	for (int i = 0; i < g_Level.NumItems; i++)
@@ -275,7 +275,7 @@ void LaserHeadControl(short itemNumber)
 		{
 			item->TriggerFlags++;
 			item->Pose.Position.y = item->ItemFlags[1] - 128 * sin(item->ItemFlags[2]);
-			item->ItemFlags[2] += EulerAngle::DegToRad(3.0f);
+			item->ItemFlags[2] += Angle::DegToRad(3.0f);
 
 			// Get guardian head's position
 			src.x = 0;
@@ -326,7 +326,7 @@ void LaserHeadControl(short itemNumber)
 						float xRot = (GetRandomControl() / 4) - 4096;
 						float yRot;
 						if (condition)
-							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + EulerAngle::DegToRad(135.0f);
+							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + Angle::DegToRad(135.0f);
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
@@ -365,10 +365,10 @@ void LaserHeadControl(short itemNumber)
 
 				if (JustLoaded)
 				{
-					int c = SECTOR(8) * cos(item->Pose.Orientation.x + EulerAngle::DegToRad(18.3f));
+					int c = SECTOR(8) * cos(item->Pose.Orientation.x + Angle::DegToRad(18.3f));
 					
 					dest.x = LaserHeadData.target.x = src.x + c * sin(item->Pose.Orientation.y);
-					dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * sin(EulerAngle::DegToRad(18.3f) - item->Pose.Orientation.x);
+					dest.y = LaserHeadData.target.y = src.y + SECTOR(8) * sin(Angle::DegToRad(18.3f) - item->Pose.Orientation.x);
 					dest.z = LaserHeadData.target.z = src.z + c * cos(item->Pose.Orientation.y);
 				}
 				else
@@ -390,8 +390,8 @@ void LaserHeadControl(short itemNumber)
 				if (LaserHeadData.byte2)
 				{
 					if (!(GetRandomControl() & 0x1F) &&
-						abs(LaserHeadData.xRot) < EulerAngle::DegToRad(5.6f) &&
-						abs(LaserHeadData.yRot) < EulerAngle::DegToRad(5.6f) &&
+						abs(LaserHeadData.xRot) < Angle::DegToRad(5.6f) &&
+						abs(LaserHeadData.yRot) < Angle::DegToRad(5.6f) &&
 						!LaraItem->Animation.VerticalVelocity ||
 						!(GetRandomControl() & 0x1FF))
 					{

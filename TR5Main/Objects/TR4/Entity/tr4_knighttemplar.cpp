@@ -91,7 +91,7 @@ void KnightTemplarControl(short itemNumber)
 	{
 	case 1:
 		item->Animation.TargetState = 2;
-		creature->MaxTurn = EulerAngle::DegToRad(2.0f);
+		creature->MaxTurn = Angle::DegToRad(2.0f);
 		creature->Flags = 0;
 
 		if (AI.distance > pow(682, 2))
@@ -109,7 +109,7 @@ void KnightTemplarControl(short itemNumber)
 		break;
 
 	case 2:
-		creature->MaxTurn = EulerAngle::DegToRad(7.0f);
+		creature->MaxTurn = Angle::DegToRad(7.0f);
 
 		if (Lara.TargetEntity == item || AI.distance <= pow(682, 2))
 			item->Animation.TargetState = 1;
@@ -121,12 +121,12 @@ void KnightTemplarControl(short itemNumber)
 	case 5:
 		creature->MaxTurn = 0;
 
-		if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
+		if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(1.0f);
 			else
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
 		}
 		else
 			item->Pose.Orientation.y += AI.angle;
@@ -187,12 +187,12 @@ void KnightTemplarControl(short itemNumber)
 	case 6:
 		creature->MaxTurn = 0;
 
-		if (abs(AI.angle) >= EulerAngle::DegToRad(1.0f))
+		if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y += Angle::DegToRad(1.0f);
 			else
-				item->Pose.Orientation.y -= EulerAngle::DegToRad(1.0f);
+				item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
 		}
 		else
 			item->Pose.Orientation.y += AI.angle;

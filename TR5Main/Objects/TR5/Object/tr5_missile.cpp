@@ -60,12 +60,12 @@ void MissileControl(short itemNumber)
 				fx->speed++;
 
 			int dy = angles[0] - fx->pos.Orientation.y;
-			if (abs(dy) > EulerAngle::DegToRad(180.0f))
+			if (abs(dy) > Angle::DegToRad(180.0f))
 				dy = -dy;
 			dy /= 8;
 
 			int dx = angles[1] - fx->pos.Orientation.x;
-			if (abs(dx) > EulerAngle::DegToRad(180.0f))
+			if (abs(dx) > Angle::DegToRad(180.0f))
 				dx = -dx;
 			dx /= 8;
 
