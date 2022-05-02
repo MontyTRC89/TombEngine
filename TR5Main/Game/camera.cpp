@@ -1679,7 +1679,7 @@ void ResetLook(ITEM_INFO* item)
 
 	if (Camera.type != CameraType::Look)
 	{
-		lara->ExtraHeadRot.Interpolate(EulerAngles(), 0.1f, Angle::DegToRad(0.1f));
+		lara->ExtraHeadRot.Interpolate(EulerAngles::Zero, 0.1f, Angle::DegToRad(0.1f));
 
 		if (lara->Control.HandStatus != HandStatus::Busy &&
 			!lara->LeftArm.Locked &&

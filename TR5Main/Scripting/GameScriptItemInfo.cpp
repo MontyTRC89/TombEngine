@@ -340,16 +340,16 @@ void GameScriptItemInfo::SetPos(GameScriptPosition const& pos)
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 GameScriptRotation GameScriptItemInfo::GetRot() const
 {
-	return GameScriptRotation(	int(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
-								int(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
-								int(TO_DEGREES(m_item->Pose.Orientation.z)) % 360);
+	return GameScriptRotation(	int(Angle::RadToDeg(m_item->Pose.Orientation.GetX())) % 360,
+								int(Angle::RadToDeg(m_item->Pose.Orientation.GetY())) % 360,
+								int(Angle::RadToDeg(m_item->Pose.Orientation.GetZ())) % 360);
 }
 
 void GameScriptItemInfo::SetRot(GameScriptRotation const& rot)
 {
-	m_item->Pose.Orientation.x = FROM_DEGREES(rot.x);
-	m_item->Pose.Orientation.y = FROM_DEGREES(rot.y);
-	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
+	m_item->Pose.Orientation.SetX(Angle::DegToRad(rot.x));
+	m_item->Pose.Orientation.SetY(Angle::DegToRad(rot.y));
+	m_item->Pose.Orientation.SetZ(Angle::DegToRad(rot.z));
 }
 
 short GameScriptItemInfo::GetHP() const

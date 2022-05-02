@@ -91,12 +91,12 @@ inline float Angle::ShrtToRad(short shortForm)
 
 inline short Angle::DegToShrt(float degrees)
 {
-	return (degrees * ((USHRT_MAX + 1) / 360.0f));
+	return (short)(degrees * ((USHRT_MAX + 1) / 360.0f));
 }
 
 inline short Angle::RadToShrt(float radians)
 {
-	return ((radians / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
+	return (short)((radians / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
 }
 
 //-------------------------------------------------------------------------------------------------------------------
@@ -105,8 +105,8 @@ inline short Angle::RadToShrt(float radians)
 class EulerAngles
 {
 public:
-	// TODO: Due to clamping requirements and assumed [-M_PI, M_PI] range invariant, make components private? Maybe not necessary with an Angle class.
-	// Euler components in radians
+	// TODO: Due to normalisation requirements and assumed [-M_PI, M_PI] range invariant, make components private?
+	// Radian components
 	float x;
 	float y;
 	float z;
@@ -141,6 +141,9 @@ public:
 	static EulerAngles ShortestAngle(EulerAngles orientFrom, EulerAngles orientTo);
 
 	Vector3 ToVector3();
+
+	// Constants
+	static const EulerAngles Zero;
 
 	// Operators
 	bool operator ==(EulerAngles orient);
@@ -221,7 +224,9 @@ inline bool EulerAngles::Compare(EulerAngles orient0, EulerAngles orient1, float
 	if (Angle::Compare(orient0.x, orient1.x, epsilon) &&
 		Angle::Compare(orient0.y, orient1.y, epsilon) &&
 		Angle::Compare(orient0.z, orient1.z, epsilon))
+	{
 		return true;
+	}
 
 	return false;
 }
@@ -267,6 +272,8 @@ inline Vector3 EulerAngles::ToVector3()
 {
 	return Vector3(this->GetX(), this->GetY(), this->GetZ());
 }
+
+inline EulerAngles const EulerAngles::Zero = EulerAngles(0.0f, 0.0f, 0.0f);
 
 inline bool EulerAngles::operator ==(EulerAngles orient)
 {
@@ -464,19 +471,19 @@ struct PoseData
 	PoseData()
 	{
 		this->Position = Vector3Int();
-		this->Orientation.Set(EulerAngles());
+		this->Orientation.Set(EulerAngles::Zero);
 	}
 
 	PoseData(Vector3Int pos)
 	{
 		this->Position = pos;
-		this->Orientation.Set(EulerAngles());
+		this->Orientation.Set(EulerAngles::Zero);
 	}
 
 	PoseData(int xPos, int yPos, int zPos)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
-		this->Orientation.Set(EulerAngles());
+		this->Orientation.Set(EulerAngles::Zero);
 	}
 
 	PoseData(EulerAngles orient)

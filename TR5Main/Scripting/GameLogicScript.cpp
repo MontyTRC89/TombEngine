@@ -78,14 +78,14 @@ static void AddLightningArc(GameScriptPosition src, GameScriptPosition dest, Gam
 	TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
 }
 
-static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, int angle, int flags)
+static void AddShockwave(GameScriptPosition pos, int innerRadius, int outerRadius, GameScriptColor color, int lifetime, int speed, float angle, int flags)
 {
 	PoseData p;
 	p.Position.x = pos.x;
 	p.Position.y = pos.y;
 	p.Position.z = pos.z;
 	
-	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
+	TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, Angle::DegToRad(angle), flags);
 }
 
 static void AddDynamicLight(GameScriptPosition pos, GameScriptColor color, int radius, int lifetime)

@@ -747,6 +747,6 @@ void ResetLaraFlex(ITEM_INFO* item, float rate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraHeadRot.Interpolate(EulerAngles(), rate, Angle::DegToRad(0.1f));
-	lara->ExtraTorsoRot.Interpolate(EulerAngles(), rate, Angle::DegToRad(0.1f));
+	lara->ExtraHeadRot.Interpolate(EulerAngles::Zero, rate, Angle::DegToRad(0.1f));
+	lara->ExtraTorsoRot.Interpolate(EulerAngles::Zero, rate, Angle::DegToRad(0.1f));
 }

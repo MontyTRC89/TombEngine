@@ -103,7 +103,7 @@ void lara_col_crouch_idle(ITEM_INFO* item, CollisionInfo* coll)
 	lara->Control.KeepLow = TestLaraKeepLow(item, coll);
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.GetY();
-	lara->ExtraTorsoRot = EulerAngles();
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.GetY();
 	coll->Setup.LowerFloorBound = CLICK(1) - 1;

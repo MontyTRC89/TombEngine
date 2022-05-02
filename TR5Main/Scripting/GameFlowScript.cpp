@@ -261,9 +261,9 @@ bool GameFlow::DoGameflow()
 					invObj->objname = obj->name.c_str();
 					invObj->scale1 = obj->scale;
 					invObj->yoff = obj->yOffset;
-					invObj->xrot = FROM_DEGREES(obj->rot.x);
-					invObj->yrot = FROM_DEGREES(obj->rot.y);
-					invObj->zrot = FROM_DEGREES(obj->rot.z);
+					invObj->xrot = Angle::DegToRad(obj->rot.x);
+					invObj->yrot = Angle::DegToRad(obj->rot.y);
+					invObj->zrot = Angle::DegToRad(obj->rot.z);
 					invObj->meshbits = obj->meshBits;
 					invObj->opts = obj->action;
 					invObj->rot_flags = obj->rotationFlags;

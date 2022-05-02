@@ -37,7 +37,7 @@ void GameScriptRotation::Register(sol::state* state)
 @return A Rotation object.
 @function Rotation.new
 */
-GameScriptRotation::GameScriptRotation(int aX, int aY, int aZ)
+GameScriptRotation::GameScriptRotation(float aX, float aY, float aZ)
 {
 	x = aX;
 	y = aY;

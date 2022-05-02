@@ -15,13 +15,15 @@
 #include "GameScriptCameraInfo.h"
 #include "GameScriptDisplayString.h"
 
-struct LuaFunction {
+struct LuaFunction
+{
 	std::string Name;
 	std::string Code;
 	bool Executed;
 };
 
-struct GameScriptVector3 {
+struct GameScriptVector3
+{
 	float x;
 	float y;
 	float z;
@@ -31,10 +33,10 @@ struct GameScriptVector3 {
 class LuaVariables
 {
 public:
-	std::unordered_map<std::string, sol::object>			variables;
+	std::unordered_map<std::string, sol::object> variables;
 
-	sol::object							GetVariable(sol::table tab, std::string key);
-	void								SetVariable(sol::table tab, std::string key, sol::object value);
+	sol::object GetVariable(sol::table tab, std::string key);
+	void SetVariable(sol::table tab, std::string key, sol::object value);
 };
 
 struct LuaVariable
@@ -56,6 +58,7 @@ using VarMapVal = std::variant< short,
 	std::reference_wrapper<SINK_INFO>,
 	std::reference_wrapper<SOUND_SOURCE_INFO>,
 	std::reference_wrapper<AI_OBJECT>>;
+
 class GameScript : public LuaHandler
 {
 private:
@@ -89,7 +92,6 @@ std::optional<std::reference_wrapper<UserDisplayString>>	GetDisplayString(Displa
 	sol::protected_function				GetLevelFunc(sol::table tab, std::string const& luaName);
 
 	void								AssignItemsAndLara();
-
 
 	void								ExecuteFunction(std::string const & name);
 	void								MakeItemInvisible(short id);

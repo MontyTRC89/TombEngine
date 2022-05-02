@@ -6,16 +6,6 @@
 
 using namespace TEN::Math::Random;
 
-float FROM_DEGREES(float angle)//
-{
-	return angle * (M_PI / 180.0f);
-}
-
-float TO_DEGREES(float angle)//
-{
-	return angle * (M_PI / 180.0f);
-}
-
 const float lerp(float v0, float v1, float t)
 {
 	return (1 - t) * v0 + t * v1;

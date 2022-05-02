@@ -25,9 +25,6 @@ constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
 constexpr auto OFFSET_RADIUS = [](auto x) { return round(x * M_SQRT2 + 4); };
 
-float FROM_DEGREES(float angle);
-float TO_DEGREES(float angle);
-
 BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box);
 
 const float lerp(float v0, float v1, float t);

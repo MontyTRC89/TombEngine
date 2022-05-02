@@ -1,20 +1,22 @@
 #pragma once
-
 #include "framework.h"
 
-namespace sol {
+namespace sol
+{
 	class state;
 }
+
 struct PoseData;
 
-class GameScriptRotation {
+class GameScriptRotation
+{
 public:
-	short								x{ 0 };
-	short								y{ 0 };
-	short								z{ 0 };
+	float								x{ 0 };
+	float								y{ 0 };
+	float								z{ 0 };
 
 	GameScriptRotation() = default;
-	GameScriptRotation(int x, int y, int z);
+	GameScriptRotation(float x, float y, float z);
 	GameScriptRotation(PoseData const& pos);
 
 	std::string ToString() const;
