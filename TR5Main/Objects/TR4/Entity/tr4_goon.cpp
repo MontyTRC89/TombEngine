@@ -930,7 +930,7 @@ namespace TEN::Entities::TR4
 								item,
 								&GoonSwordBite,
 								10,
-								item->Pose.Orientation.y,
+								item->Pose.Orientation.GetY(),
 								DoBloodSplat);
 
 							currentCreature->Flags = 1;

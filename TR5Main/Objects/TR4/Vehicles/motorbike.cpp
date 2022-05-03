@@ -151,7 +151,7 @@ void InitialiseMotorbike(short itemNumber)
 
 static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
 {
-    pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.GetX()) + dx * sin(item->Pose.Orientation.z);
+    pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.GetX()) + dx * sin(item->Pose.Orientation.GetZ());
 
     float c = cos(item->Pose.Orientation.GetY());
     float s = sin(item->Pose.Orientation.GetY());
@@ -286,7 +286,7 @@ static void DrawMotorbikeLight(ITEM_INFO* item)
     /*if (rnd <= 0)
         SpotLightEnabled = false;
     else
-        CreateSpotLight(&start, &target, item->pos.Orientation.y, rnd);*/
+        CreateSpotLight(&start, &target, item->pos.Orientation.GetY(), rnd);*/
 }
 
 static BOOL GetOnMotorBike(short itemNumber)
@@ -520,7 +520,7 @@ static void MotorBikeExplode(ITEM_INFO* item)
 		for (int i = 0; i < 3; i++)
 			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
 	}
-    auto pos = PoseData(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z, 0, item->Pose.Orientation.y, 0);
+    auto pos = PoseData(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z, 0, item->Pose.Orientation.GetY(), 0);
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 	ExplodingDeath(Lara.Vehicle, -2, 256);
 	ExplodingDeath(Lara.ItemNumber, -2, 258); // enable blood
@@ -681,7 +681,7 @@ void MotorbikeBaddieCollision(ITEM_INFO* bike)
                             {
                                 if (LaraItem->HitPoints > 0)
                                 {
-                                    DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - (STEP_SIZE * 2), LaraItem->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 5);
+                                    DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - (STEP_SIZE * 2), LaraItem->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.GetY(), LaraItem->RoomNumber, 5);
                                     LaraItem->HitPoints -= 8;
                                 }
                             }
@@ -690,7 +690,7 @@ void MotorbikeBaddieCollision(ITEM_INFO* bike)
                         {
                             if (TestBoundsCollide(item, bike, BIKE_FRONT))
                             {
-                                DoLotsOfBlood(bike->Pose.Position.x, bike->Pose.Position.y, bike->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 3);
+                                DoLotsOfBlood(bike->Pose.Position.x, bike->Pose.Position.y, bike->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.GetY(), LaraItem->RoomNumber, 3);
                                 item->HitPoints = 0;
                             }
                         }
@@ -826,7 +826,7 @@ static int MotorBikeDynamics(ITEM_INFO* item)
             motorbike->velocity -= anglex;
         }
 
-        short anglez = MOTORBIKE_SLIP * sin(item->Pose.Orientation.z);
+        short anglez = MOTORBIKE_SLIP * sin(item->Pose.Orientation.GetZ());
         if (abs(anglez) > 32)
         {
             short ang, angabs;
@@ -1482,7 +1482,7 @@ int MotorbikeControl(void)
     }
 
     item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + ((xrot - item->Pose.Orientation.GetX()) / 4));
-    item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + ((zrot - item->Pose.Orientation.z) / 4));
+    item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + ((zrot - item->Pose.Orientation.GetZ()) / 4));
 
     if (motorbike->flags >= 0)
     {

@@ -303,7 +303,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 			x = item->Pose.Position.x + ((x * 512) / d);
 			y = item->Pose.Position.y - 512 + ((y * 512) / d);
 			z = item->Pose.Position.z + ((z * 512) / d);
-			DoBloodSplat(x, y, z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+			DoBloodSplat(x, y, z, item->Animation.Velocity, item->Pose.Orientation.GetY(), item->RoomNumber);
 		}
 		else
 		{

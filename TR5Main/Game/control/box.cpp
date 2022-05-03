@@ -258,7 +258,7 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
-	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.GetY(), item->RoomNumber);
 }
 
 void CreatureUnderwater(ITEM_INFO* item, int depth)

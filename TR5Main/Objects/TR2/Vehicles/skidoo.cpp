@@ -364,7 +364,7 @@ void SkidooEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 							{
 								if (laraItem->HitPoints > 0)
 								{
-									DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - CLICK(2), laraItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.y, laraItem->RoomNumber, 5);
+									DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - CLICK(2), laraItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.GetY(), laraItem->RoomNumber, 5);
 									item->HitPoints -= 8;
 								}
 							}
@@ -373,7 +373,7 @@ void SkidooEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 						{
 							if (TestBoundsCollide(item, skidooItem, SKIDOO_FRONT))
 							{
-								DoLotsOfBlood(skidooItem->Pose.Position.x, skidooItem->Pose.Position.y, skidooItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
+								DoLotsOfBlood(skidooItem->Pose.Position.x, skidooItem->Pose.Position.y, skidooItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.GetY(), laraItem->RoomNumber, 3);
 								item->HitPoints = 0;
 							}
 						}
@@ -399,8 +399,8 @@ void SkidooGuns(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 	{
 		float angles[] =
 		{
-			lara->RightArm.Rotation.y + laraItem->Pose.Orientation.y,
-			lara->RightArm.Rotation.x
+			lara->RightArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY(),
+			lara->RightArm.Rotation.GetX()
 		};
 		
 		if ((int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles) +
@@ -543,7 +543,7 @@ bool SkidooControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	float zRot = atan2(SKIDOO_SIDE, height - frontLeft.y);
 
 	skidooItem->Pose.Orientation.SetX(skidooItem->Pose.Orientation.GetX() + ((xRot - skidooItem->Pose.Orientation.GetX()) / 2));
-	skidooItem->Pose.Orientation.SetZ(skidooItem->Pose.Orientation.GetZ() + ((zRot - skidooItem->Pose.Orientation.z) / 2));
+	skidooItem->Pose.Orientation.SetZ(skidooItem->Pose.Orientation.GetZ() + ((zRot - skidooItem->Pose.Orientation.GetZ()) / 2));
 
 	if (skidooItem->Flags & ONESHOT)
 	{
@@ -849,7 +849,7 @@ int DoSkidooDynamics(int height, int verticalVelocity, int* y)
 
 int TestSkidooHeight(ITEM_INFO* skidooItem, int zOffset, int xOffset, Vector3Int* pos)
 {
-	pos->y = skidooItem->Pose.Position.y - zOffset * sin(skidooItem->Pose.Orientation.GetX()) + xOffset * sin(skidooItem->Pose.Orientation.z);
+	pos->y = skidooItem->Pose.Position.y - zOffset * sin(skidooItem->Pose.Orientation.GetX()) + xOffset * sin(skidooItem->Pose.Orientation.GetZ());
 
 	float sinY = sin(skidooItem->Pose.Orientation.GetY());
 	float cosY = cos(skidooItem->Pose.Orientation.GetY());
@@ -1040,7 +1040,7 @@ int SkidooDynamics(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 		skidooItem->Pose.Position.x -= slip * sin(skidooItem->Pose.Orientation.GetY());
 	}
 
-	slip = SKIDOO_SLIP_SIDE * sin(skidooItem->Pose.Orientation.z);
+	slip = SKIDOO_SLIP_SIDE * sin(skidooItem->Pose.Orientation.GetZ());
 	if (abs(slip) > (SKIDOO_SLIP_SIDE / 2))
 	{
 		skidooItem->Pose.Position.z -= slip * sin(skidooItem->Pose.Orientation.GetY());

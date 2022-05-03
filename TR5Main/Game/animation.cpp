@@ -365,7 +365,7 @@ void AnimateItem(ITEM_INFO* item)
 		lateral >>= 16;
 	}
 
-	MoveItem(item, item->Pose.Orientation.y, item->Animation.Velocity, lateral);
+	MoveItem(item, item->Pose.Orientation.GetY(), item->Animation.Velocity, lateral);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();

@@ -215,7 +215,7 @@ namespace TEN::Entities::Generic
 
 				CurrentPendulum.velocity = Vector3Int();
 
-				ApplyVelocityToRope(segment, laraItem->Pose.Orientation.y, 16 * laraItem->Animation.Velocity);
+				ApplyVelocityToRope(segment, laraItem->Pose.Orientation.GetY(), 16 * laraItem->Animation.Velocity);
 			}
 		}
 	}

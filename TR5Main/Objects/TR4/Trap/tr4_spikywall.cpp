@@ -41,7 +41,7 @@ void ControlSpikyWall(short itemNumber)
 		LaraItem->HitPoints -= 15;
 		LaraItem->HitStatus = true;
 
-		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
+		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.GetY(), LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
 		SoundEffect(56, &item->Pose, 0);

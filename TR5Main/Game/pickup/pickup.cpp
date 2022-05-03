@@ -446,7 +446,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		break;
 
 	case 2: // Pickup with crowbar
-		item->Pose.Orientation.SetY(oldOrient.y);
+		item->Pose.Orientation.SetY(oldOrient.GetY());
 		if (lara->Control.IsLow || !TestLaraPosition(&CrowbarPickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
@@ -559,7 +559,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		return;
 
 	case 9: // Pickup object and conver it to crowbar (like submarine level)
-		item->Pose.Orientation.SetY(oldOrient.y);
+		item->Pose.Orientation.SetY(oldOrient.GetY());
 
 		if (!TestLaraPosition(&JobyCrowPickUpBounds, item, laraItem))
 		{

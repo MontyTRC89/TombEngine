@@ -340,7 +340,7 @@ void ControlGladiator(short itemNumber)
 				{
 					if (item->TouchBits & 0x6000)
 					{
-						CreatureEffect2(item, &GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &GladiatorBite, 10, item->Pose.Orientation.GetY(), DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 

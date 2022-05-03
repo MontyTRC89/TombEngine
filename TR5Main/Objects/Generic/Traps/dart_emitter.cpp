@@ -18,7 +18,7 @@ namespace TEN::Entities::Traps
 			LaraItem->HitPoints -= 25;
 			LaraItem->HitStatus = true;
 			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
-			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.GetY(), LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}
 		else

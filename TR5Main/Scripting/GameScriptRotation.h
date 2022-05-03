@@ -17,7 +17,7 @@ public:
 
 	GameScriptRotation() = default;
 	GameScriptRotation(float x, float y, float z);
-	GameScriptRotation(PoseData const& pos);
+	GameScriptRotation(PoseData& pos);
 
 	std::string ToString() const;
 

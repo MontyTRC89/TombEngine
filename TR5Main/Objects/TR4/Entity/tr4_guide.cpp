@@ -786,7 +786,7 @@ void GuideControl(short itemNumber)
 	case 41:
 	case 42:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.GetY() - item->Pose.Orientation.y, Angle::DegToRad(10.0f));
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY(), Angle::DegToRad(10.0f));
 
 	default:
 		break;

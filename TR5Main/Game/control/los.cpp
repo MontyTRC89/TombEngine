@@ -130,8 +130,8 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 						SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh, 0);
 					}
 
-					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
-					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, 0);
+					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, 0);
 				}
 				else
 				{
@@ -147,7 +147,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 							ShatterImpactData.impactDirection = direction;
 							ShatterImpactData.impactLocation = Vector3(ShatterItem.sphere.x, ShatterItem.sphere.y, ShatterItem.sphere.z);
 							ShatterObject(&ShatterItem, 0, 128, target.roomNumber, 0);
-							TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+							TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, 0);
 							/*}
 							else
 							{
@@ -180,7 +180,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 								{
 									// TR5
 									if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, 0);
 								}
 							}
 							else
@@ -190,11 +190,11 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 								else
 								{
 									if (Objects[item->ObjectNumber].hitEffect == HIT_BLOOD)
-										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.y, item->RoomNumber);
+										DoBloodSplat(target.x, target.y, target.z, (GetRandomControl() & 3) + 3, item->Pose.Orientation.GetY(), item->RoomNumber);
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_SMOKE)
-										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, -5);
+										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, -5);
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
-										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, 0);
 									
 									item->HitStatus = true;
 									if (!Objects[item->ObjectNumber].undead)
@@ -251,7 +251,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 							}
 						}
 
-						TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
+						TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, 0);
 					}
 				}
 			}
@@ -278,7 +278,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 			target.z -= target.z - src->z >> 5;
 
 			if (firing && !result)
-				TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 8, 0);
+				TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 8, 0);
 		}
 	}
 

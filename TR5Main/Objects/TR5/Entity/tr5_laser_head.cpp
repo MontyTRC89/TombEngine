@@ -240,7 +240,7 @@ void LaserHeadControl(short itemNumber)
 				item->TriggerFlags = (GetRandomControl() & 0x1000) - 2048;
 			}
 
-			//InterpolateAngle(item->ItemFlags[3], &item->Pose.Orientation.y, 0, 2);
+			//InterpolateAngle(item->ItemFlags[3], &item->Pose.Orientation.GetY(), 0, 2);
 			//InterpolateAngle(item->TriggerFlags, &item->Pose.Orientation.GetX(), 0, 2);
 
 			// Final death
@@ -382,7 +382,7 @@ void LaserHeadControl(short itemNumber)
 			float angles[2];
 			float outAngle;
 			phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
-			//InterpolateAngle(angles[0], &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
+			//InterpolateAngle(angles[0], &item->Pose.Orientation.GetY(), &LaserHeadData.yRot, LaserHeadData.byte1);
 			//InterpolateAngle(angles[1] + 3328, &item->Pose.Orientation.GetX(), &LaserHeadData.xRot, LaserHeadData.byte1);
 
 			if (item->ItemFlags[0] == 1)

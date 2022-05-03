@@ -161,7 +161,7 @@ void ControlChef(short itemNumber)
 				{
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 					{
-						CreatureEffect2(item, &ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &ChefBite, 20, item->Pose.Orientation.GetY(), DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 

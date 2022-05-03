@@ -113,7 +113,7 @@ short Unk_0080DE24;
 
 static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
 {
-	pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.GetX()) + dx * sin(item->Pose.Orientation.z);
+	pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.GetX()) + dx * sin(item->Pose.Orientation.GetZ());
 
 	float c = cos(item->Pose.Orientation.GetY());
 	float s = sin(item->Pose.Orientation.GetY());
@@ -575,7 +575,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 											LaraItem->Pose.Position.y - 512,
 											LaraItem->Pose.Position.z,
 											GetRandomControl() & 3,
-											LaraItem->Pose.Orientation.y,
+											LaraItem->Pose.Orientation.GetY(),
 											LaraItem->RoomNumber,
 											5);
 										item->HitPoints -= 8;
@@ -590,7 +590,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 										jeep->Pose.Position.y - STEP_SIZE,
 										item->Pose.Position.z,
 										GetRandomControl() & 3,
-										jeep->Pose.Orientation.y,
+										jeep->Pose.Orientation.GetY(),
 										item->RoomNumber,
 										3);
 									item->HitPoints = 0;
@@ -757,7 +757,7 @@ int JeepDynamics(ITEM_INFO* item)
 		else
 			JeepNoGetOff = 0;
 
-		slip = JEEP_SLIP_SIDE * sin(item->Pose.Orientation.z);
+		slip = JEEP_SLIP_SIDE * sin(item->Pose.Orientation.GetZ());
 		if (abs(slip) > JEEP_SLIP_SIDE / 4)
 		{
 			JeepNoGetOff = 1;

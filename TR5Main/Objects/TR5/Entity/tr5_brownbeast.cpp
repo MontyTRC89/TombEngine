@@ -142,7 +142,7 @@ void ControlBrowsBeast(short itemNumber)
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 19 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 25)
 					{
-						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.GetY(), DoBloodSplat);
 						creature->Flags |= 1;
 
 						LaraItem->HitPoints -= 150;
@@ -156,7 +156,7 @@ void ControlBrowsBeast(short itemNumber)
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
 					{
-						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.GetY(), DoBloodSplat);
 						creature->Flags |= 1;
 
 						LaraItem->HitPoints -= 150;
@@ -174,7 +174,7 @@ void ControlBrowsBeast(short itemNumber)
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 13 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 				{
-					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.GetY(), DoBloodSplat);
 					creature->Flags |= 2;
 
 					LaraItem->HitPoints -= 150;
@@ -188,7 +188,7 @@ void ControlBrowsBeast(short itemNumber)
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 33 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 43)
 				{
-					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
+					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.GetY(), DoBloodSplat);
 					creature->Flags |= 2;
 
 					LaraItem->HitPoints -= 150;

@@ -195,7 +195,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 	if (distance > 200)
 		return mountType;
 
-	float deltaAngle = Angle::ShortestAngle(sBoatItem->Pose.Orientation.y, laraItem->Pose.Orientation.GetY());
+	float deltaAngle = Angle::ShortestAngle(sBoatItem->Pose.Orientation.GetY(), laraItem->Pose.Orientation.GetY());
 	if (lara->Control.WaterStatus == WaterStatus::TreadWater || lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (!(TrInput & IN_ACTION) || laraItem->Animation.Airborne || sBoatItem->Animation.Velocity)
@@ -309,7 +309,7 @@ int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, Vec
 	float cosY = cos(sBoatItem->Pose.Orientation.GetY());
 
 	pos->x = sBoatItem->Pose.Position.x + zOffset * sinY + xOffset * cosY;
-	pos->y = sBoatItem->Pose.Position.y - zOffset * sin(sBoatItem->Pose.Orientation.GetX()) + xOffset * sin(sBoatItem->Pose.Orientation.z);
+	pos->y = sBoatItem->Pose.Position.y - zOffset * sin(sBoatItem->Pose.Orientation.GetX()) + xOffset * sin(sBoatItem->Pose.Orientation.GetZ());
 	pos->z = sBoatItem->Pose.Position.z + zOffset * cosY - xOffset * sinY;
 
 	auto probe = GetCollision(pos->x, pos->y, pos->z, sBoatItem->RoomNumber);
@@ -544,9 +544,9 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	sBoatItem->Pose.Position.x += sBoatItem->Animation.Velocity * sin(sBoatItem->Pose.Orientation.GetY());
 	sBoatItem->Pose.Position.z += sBoatItem->Animation.Velocity * cos(sBoatItem->Pose.Orientation.GetY());
 	
-	int slip = BOAT_SIDE_SLIP * sin(sBoatItem->Pose.Orientation.z);
-	if (!slip && sBoatItem->Pose.Orientation.z)
-		slip = (sBoatItem->Pose.Orientation.z > 0) ? 1 : -1;
+	int slip = BOAT_SIDE_SLIP * sin(sBoatItem->Pose.Orientation.GetZ());
+	if (!slip && sBoatItem->Pose.Orientation.GetZ())
+		slip = (sBoatItem->Pose.Orientation.GetZ() > 0) ? 1 : -1;
 	sBoatItem->Pose.Position.x += slip * sin(sBoatItem->Pose.Orientation.GetY());
 	sBoatItem->Pose.Position.z -= slip * cos(sBoatItem->Pose.Orientation.GetY());
 	
@@ -991,11 +991,11 @@ void SpeedBoatControl(short itemNumber)
 	float zRot = atan2(BOAT_SIDE, probe.Position.Floor - frontLeft.y);
 
 	sBoatItem->Pose.Orientation.SetX(sBoatItem->Pose.Orientation.GetX() + ((xRot - sBoatItem->Pose.Orientation.GetX()) / 2));
-	sBoatItem->Pose.Orientation.SetZ(sBoatItem->Pose.Orientation.GetZ() + ((zRot - sBoatItem->Pose.Orientation.z) / 2));
+	sBoatItem->Pose.Orientation.SetZ(sBoatItem->Pose.Orientation.GetZ() + ((zRot - sBoatItem->Pose.Orientation.GetZ()) / 2));
  
 	if (!xRot && abs(sBoatItem->Pose.Orientation.GetX()) < 4)
 		sBoatItem->Pose.Orientation.SetX();
-	if (!zRot && abs(sBoatItem->Pose.Orientation.z) < 4)
+	if (!zRot && abs(sBoatItem->Pose.Orientation.GetZ()) < 4)
 		sBoatItem->Pose.Orientation.SetZ();
 
 	if (lara->Vehicle == itemNumber)

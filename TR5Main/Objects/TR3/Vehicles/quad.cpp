@@ -185,7 +185,7 @@ static void QuadbikeExplode(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 			TriggerExplosionSparks(quadItem->Pose.Position.x, quadItem->Pose.Position.y, quadItem->Pose.Position.z, 3, -1, 0, quadItem->RoomNumber);
 	}
 
-	auto pos = PoseData(quadItem->Pose.Position.x, quadItem->Pose.Position.y - CLICK(0.5f), quadItem->Pose.Position.z, 0, quadItem->Pose.Orientation.y, 0);
+	auto pos = PoseData(quadItem->Pose.Position.x, quadItem->Pose.Position.y - CLICK(0.5f), quadItem->Pose.Position.z, 0, quadItem->Pose.Orientation.GetY(), 0);
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 
 	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
@@ -370,7 +370,7 @@ static void QuadEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 					{
 						if (TestBoundsCollide(item, quadItem, QUAD_RADIUS))
 						{
-							DoLotsOfBlood(item->Pose.Position.x, quadItem->Pose.Position.y - CLICK(1), item->Pose.Position.z, quadItem->Animation.Velocity, quadItem->Pose.Orientation.y, item->RoomNumber, 3);
+							DoLotsOfBlood(item->Pose.Position.x, quadItem->Pose.Position.y - CLICK(1), item->Pose.Position.z, quadItem->Animation.Velocity, quadItem->Pose.Orientation.GetY(), item->RoomNumber, 3);
 							item->HitPoints = 0;
 						}
 					}
@@ -415,7 +415,7 @@ static int GetQuadCollisionAnim(ITEM_INFO* quadItem, Vector3Int* p)
 
 static int TestQuadHeight(ITEM_INFO* quadItem, int dz, int dx, Vector3Int* pos)
 {
-	pos->y = quadItem->Pose.Position.y - dz * sin(quadItem->Pose.Orientation.GetX()) + dx * sin(quadItem->Pose.Orientation.z);
+	pos->y = quadItem->Pose.Position.y - dz * sin(quadItem->Pose.Orientation.GetX()) + dx * sin(quadItem->Pose.Orientation.GetZ());
 
 	float c = cos(quadItem->Pose.Orientation.GetY());
 	float s = sin(quadItem->Pose.Orientation.GetY());
@@ -679,7 +679,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		quadItem->Pose.Position.x -= slip * sin(quadItem->Pose.Orientation.GetY());
 	}
 
-	slip = QUAD_SLIP_SIDE * sin(quadItem->Pose.Orientation.z);
+	slip = QUAD_SLIP_SIDE * sin(quadItem->Pose.Orientation.GetZ());
 	if (abs(slip) > QUAD_SLIP_SIDE / 2)
 	{
 		quadItem->Pose.Position.z -= slip * sin(quadItem->Pose.Orientation.GetY());
@@ -1368,7 +1368,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	float zRot = atan2(QUAD_SIDE, probe.Position.Floor - frontLeft.y);
 
 	quadItem->Pose.Orientation.SetX(quadItem->Pose.Orientation.GetX() + ((xRot - quadItem->Pose.Orientation.GetX()) / 2));
-	quadItem->Pose.Orientation.SetZ(quadItem->Pose.Orientation.GetZ() + ((zRot - quadItem->Pose.Orientation.z) / 2));
+	quadItem->Pose.Orientation.SetZ(quadItem->Pose.Orientation.GetZ() + ((zRot - quadItem->Pose.Orientation.GetZ()) / 2));
 
 	if (!(quad->Flags & QUAD_FLAG_DEAD))
 	{

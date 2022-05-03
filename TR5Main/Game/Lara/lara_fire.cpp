@@ -370,7 +370,7 @@ void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 	arm->Rotation.SetX(rotX);
 
 	// TODO: Set arms to inherit rotations of parent bones.
-	arm->Rotation.z = 0;
+	arm->Rotation.SetZ();
 }
 
 void SmashItem(short itemNumber)
@@ -849,9 +849,9 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 
 	// Calculate ray from rotation angles
 	auto direction = Vector3(
-		sin(rotation.y) * cos(rotation.x),
-		-sin(rotation.x),
-		cos(rotation.y) * cos(rotation.x)
+		sin(rotation.GetY()) * cos(rotation.GetX()),
+		-sin(rotation.GetX()),
+		cos(rotation.GetY()) * cos(rotation.GetX())
 	);
 	direction.Normalize();
 
@@ -1084,8 +1084,8 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 						{
 							float angle[2];
 							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
-							angle[0] -= laraItem->Pose.Orientation.GetY() + lara->ExtraTorsoRot.y;
-							angle[1] -= laraItem->Pose.Orientation.GetX() + lara->ExtraTorsoRot.x;
+							angle[0] -= laraItem->Pose.Orientation.GetY() + lara->ExtraTorsoRot.GetY();
+							angle[1] -= laraItem->Pose.Orientation.GetX() + lara->ExtraTorsoRot.GetX();
 
 							if (angle[0] >= weaponInfo->LockAngles[0] && angle[0] <= weaponInfo->LockAngles[1] && angle[1] >= weaponInfo->LockAngles[2] && angle[1] <= weaponInfo->LockAngles[3])
 							{

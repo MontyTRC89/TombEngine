@@ -427,7 +427,7 @@ void ControlTonyFireBall(short fxNumber)
 				type = T_ROCKZAPPDEBRIS;
 
 			for (int x = 0; x < j; x++)
-				TriggerFireBall(NULL, type, &pos, fx->roomNumber, fx->pos.Orientation.y, 32 + (x * 4));
+				TriggerFireBall(NULL, type, &pos, fx->roomNumber, fx->pos.Orientation.GetY(), 32 + (x * 4));
 
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 			{
@@ -662,7 +662,7 @@ void TonyControl(short itemNumber)
 				torsoY = AI.angle;
 
 				if ((item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase) == 28)
-					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Pose.Orientation.y, 0);
+					TriggerFireBall(item, T_ZAPP, NULL, item->RoomNumber, item->Pose.Orientation.GetY(), 0);
 
 				break;
 

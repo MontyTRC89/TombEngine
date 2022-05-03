@@ -149,7 +149,7 @@ static int TestMinecartHeight(ITEM_INFO* minecartItem, int xOffset, int zOffset)
 
 	auto pos = Vector3Int(
 		minecartItem->Pose.Position.x + zOffset * sinY + xOffset * cosY,
-		minecartItem->Pose.Position.y - zOffset * sin(minecartItem->Pose.Orientation.GetX()) + xOffset * sin(minecartItem->Pose.Orientation.z),
+		minecartItem->Pose.Position.y - zOffset * sin(minecartItem->Pose.Orientation.GetX()) + xOffset * sin(minecartItem->Pose.Orientation.GetZ()),
 		minecartItem->Pose.Position.z + zOffset * cosY - xOffset * sinY
 	);
 
@@ -277,7 +277,7 @@ static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 							}
 							else
 							{
-								DoLotsOfBlood(item->Pose.Position.x, minecartItem->Pose.Position.y - CLICK(1), item->Pose.Position.z, GetRandomControl() & 3, minecartItem->Pose.Orientation.y, item->RoomNumber, 3);
+								DoLotsOfBlood(item->Pose.Position.x, minecartItem->Pose.Position.y - CLICK(1), item->Pose.Position.z, GetRandomControl() & 3, minecartItem->Pose.Orientation.GetY(), item->RoomNumber, 3);
 								item->HitPoints = 0;
 							}
 						}
@@ -300,7 +300,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 
 	if ((lara->Control.Minecart.Left && lara->Control.Minecart.Right && !minecart->StopDelay) &&
 		(minecartItem->Pose.Position.x & 0x380 == 512 ||
-			Angle::RadToShrt(minecartItem->Pose.Orientation.z) & 0x380 == 512))
+			Angle::RadToShrt(minecartItem->Pose.Orientation.GetZ()) & 0x380 == 512))
 	{
 		if (minecart->Velocity < 0xf000)
 		{
@@ -515,7 +515,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 			minecartItem->Pose.Orientation.SetZ(((Angle::DegToRad(90.0f) - val) * minecartItem->Animation.Velocity) / 512);
 	}
 	else
-		minecartItem->Pose.Orientation.SetZ(minecartItem->Pose.Orientation.GetZ() - minecartItem->Pose.Orientation.z / 8);
+		minecartItem->Pose.Orientation.SetZ(minecartItem->Pose.Orientation.GetZ() - minecartItem->Pose.Orientation.GetZ() / 8);
 }
 
 static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartInfo* minecart)
@@ -747,7 +747,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 		Camera.targetElevation = Angle::DegToRad(-45.0f);
 		Camera.targetDistance = SECTOR(2);
 
-		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.y, CLICK(2));
+		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.GetY(), CLICK(2));
 		if (floorHeight > -CLICK(1) &&
 			floorHeight < CLICK(1))
 		{
@@ -793,8 +793,8 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 		laraItem->Animation.ActiveState != CART_WALL_DEATH &&
 		laraItem->HitPoints > 0)
 	{
-		if (minecartItem->Pose.Orientation.z > TERMINAL_ANGLE ||
-			minecartItem->Pose.Orientation.z < -TERMINAL_ANGLE)
+		if (minecartItem->Pose.Orientation.GetZ() > TERMINAL_ANGLE ||
+			minecartItem->Pose.Orientation.GetZ() < -TERMINAL_ANGLE)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 31;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -805,7 +805,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			return;
 		}
 
-		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.y, CLICK(2));
+		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.GetY(), CLICK(2));
 		if (floorHeight < -CLICK(2))
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 23;
@@ -830,7 +830,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 				laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + 34;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = CART_STATE_HIT;
-				DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - CLICK(3), laraItem->Pose.Position.z, minecartItem->Animation.Velocity, minecartItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
+				DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - CLICK(3), laraItem->Pose.Position.z, minecartItem->Animation.Velocity, minecartItem->Pose.Orientation.GetY(), laraItem->RoomNumber, 3);
 
 				int hits = CART_NHITS * short(minecart->Velocity / 2048);
 				if (hits < 20)

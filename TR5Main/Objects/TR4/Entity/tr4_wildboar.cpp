@@ -148,7 +148,7 @@ void WildBoarControl(short itemNumber)
 					creature->Enemy->HitStatus = true;
 				}
 
-				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
+				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.GetY(), DoBloodSplat);
 				item->Flags = 1;
 			}
 

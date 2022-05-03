@@ -169,13 +169,13 @@ bool SaveGame::Save(int slot)
 	auto wetOffset = fbb.CreateVector(wet);
 
 	Save::Vector3 nextCornerPos = Save::Vector3(Lara.NextCornerPos.Position.x, Lara.NextCornerPos.Position.y, Lara.NextCornerPos.Position.z);
-	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.Orientation.GetX(), Lara.NextCornerPos.Orientation.y, Lara.NextCornerPos.Orientation.z);
+	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.Orientation.GetX(), Lara.NextCornerPos.Orientation.GetY(), Lara.NextCornerPos.Orientation.GetZ());
 
-	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Rotation.x, Lara.LeftArm.Rotation.y, Lara.LeftArm.Rotation.z);
-	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Rotation.x, Lara.RightArm.Rotation.y, Lara.RightArm.Rotation.z);
+	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Rotation.GetX(), Lara.LeftArm.Rotation.GetY(), Lara.LeftArm.Rotation.GetZ());
+	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Rotation.GetX(), Lara.RightArm.Rotation.GetY(), Lara.RightArm.Rotation.GetZ());
 	
-	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.x, Lara.ExtraHeadRot.y, Lara.ExtraHeadRot.z);
-	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.x, Lara.ExtraTorsoRot.y, Lara.ExtraTorsoRot.z);
+	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.GetX(), Lara.ExtraHeadRot.GetY(), Lara.ExtraHeadRot.GetZ());
+	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.GetX(), Lara.ExtraTorsoRot.GetY(), Lara.ExtraTorsoRot.GetZ());
 	Save::Vector3 extraVelocity = Save::Vector3(Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
 	Save::Vector3 waterCurrentPull = Save::Vector3(Lara.WaterCurrentPull.x, Lara.WaterCurrentPull.y, Lara.WaterCurrentPull.z);
 
@@ -454,8 +454,8 @@ bool SaveGame::Save(int slot)
 			(int32_t)itemToSerialize.Pose.Position.y,
 			(int32_t)itemToSerialize.Pose.Position.z,
 			(int32_t)itemToSerialize.Pose.Orientation.GetX(),
-			(int32_t)itemToSerialize.Pose.Orientation.y,
-			(int32_t)itemToSerialize.Pose.Orientation.z);
+			(int32_t)itemToSerialize.Pose.Orientation.GetY(),
+			(int32_t)itemToSerialize.Pose.Orientation.GetZ());
 
 		Save::ItemBuilder serializedItem{ fbb };
 
@@ -599,7 +599,7 @@ bool SaveGame::Save(int slot)
 		batInfo.add_z(bat->Pose.Position.z);
 		batInfo.add_x_rot(bat->Pose.Orientation.GetX());
 		batInfo.add_y_rot(bat->Pose.Orientation.GetY());
-		batInfo.add_z_rot(bat->Pose.Orientation.z);
+		batInfo.add_z_rot(bat->Pose.Orientation.GetZ());
 
 		bats.push_back(batInfo.Finish());
 	}
@@ -620,7 +620,7 @@ bool SaveGame::Save(int slot)
 		spiderInfo.add_z(spider->Pose.Position.z);
 		spiderInfo.add_x_rot(spider->Pose.Orientation.GetX());
 		spiderInfo.add_y_rot(spider->Pose.Orientation.GetY());
-		spiderInfo.add_z_rot(spider->Pose.Orientation.z);
+		spiderInfo.add_z_rot(spider->Pose.Orientation.GetZ());
 
 		spiders.push_back(spiderInfo.Finish());
 	}
@@ -641,7 +641,7 @@ bool SaveGame::Save(int slot)
 		ratInfo.add_z(rat->Pose.Position.z);
 		ratInfo.add_x_rot(rat->Pose.Orientation.GetX());
 		ratInfo.add_y_rot(rat->Pose.Orientation.GetY());
-		ratInfo.add_z_rot(rat->Pose.Orientation.z);
+		ratInfo.add_z_rot(rat->Pose.Orientation.GetZ());
 
 		rats.push_back(ratInfo.Finish());
 	}
@@ -662,7 +662,7 @@ bool SaveGame::Save(int slot)
 		scarabInfo.add_z(beetle->Pose.Position.z);
 		scarabInfo.add_x_rot(beetle->Pose.Orientation.GetX());
 		scarabInfo.add_y_rot(beetle->Pose.Orientation.GetY());
-		scarabInfo.add_z_rot(beetle->Pose.Orientation.z);
+		scarabInfo.add_z_rot(beetle->Pose.Orientation.GetZ());
 
 		scarabs.push_back(scarabInfo.Finish());
 	}
@@ -1246,12 +1246,12 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Weapon.UziLeft = s->lara()->control()->weapon()->uzi_left();
 	Lara.Control.Weapon.UziRight = s->lara()->control()->weapon()->uzi_right();
 	Lara.ExtraAnim = s->lara()->extra_anim();
-	Lara.ExtraHeadRot.x = s->lara()->extra_head_rot()->x();
-	Lara.ExtraHeadRot.y = s->lara()->extra_head_rot()->y();
-	Lara.ExtraHeadRot.z = s->lara()->extra_head_rot()->z();
-	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->x();
-	Lara.ExtraTorsoRot.y = s->lara()->extra_torso_rot()->y();
-	Lara.ExtraTorsoRot.z = s->lara()->extra_torso_rot()->z();
+	Lara.ExtraHeadRot.SetX( s->lara()->extra_head_rot()->x());
+	Lara.ExtraHeadRot.SetY(s->lara()->extra_head_rot()->y());
+	Lara.ExtraHeadRot.SetZ(s->lara()->extra_head_rot()->z());
+	Lara.ExtraTorsoRot.SetZ(s->lara()->extra_torso_rot()->x());
+	Lara.ExtraTorsoRot.SetY(s->lara()->extra_torso_rot()->y());
+	Lara.ExtraTorsoRot.SetZ(s->lara()->extra_torso_rot()->z());
 	Lara.ExtraVelocity.x = s->lara()->extra_velocity()->x();
 	Lara.ExtraVelocity.y = s->lara()->extra_velocity()->y();
 	Lara.ExtraVelocity.z = s->lara()->extra_velocity()->z();
@@ -1287,9 +1287,9 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Rotation.x = s->lara()->left_arm()->rotation()->x();
-	Lara.LeftArm.Rotation.y = s->lara()->left_arm()->rotation()->y();
-	Lara.LeftArm.Rotation.z = s->lara()->left_arm()->rotation()->z();
+	Lara.LeftArm.Rotation.SetX(s->lara()->left_arm()->rotation()->x());
+	Lara.LeftArm.Rotation.SetY(s->lara()->left_arm()->rotation()->y());
+	Lara.LeftArm.Rotation.SetZ(s->lara()->left_arm()->rotation()->z());
 	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
@@ -1307,9 +1307,9 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Rotation.x = s->lara()->right_arm()->rotation()->x();
-	Lara.RightArm.Rotation.y = s->lara()->right_arm()->rotation()->y();
-	Lara.RightArm.Rotation.z = s->lara()->right_arm()->rotation()->z();
+	Lara.RightArm.Rotation.SetX(s->lara()->right_arm()->rotation()->x());
+	Lara.RightArm.Rotation.SetY(s->lara()->right_arm()->rotation()->y());
+	Lara.RightArm.Rotation.SetZ(s->lara()->right_arm()->rotation()->z());
 	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
 	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();

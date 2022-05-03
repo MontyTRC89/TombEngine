@@ -600,7 +600,7 @@ namespace TEN::Entities::TR4
 					{
 						if (item->TouchBits & 0x18000)
 						{
-							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.GetY(), DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 							creature->Flags = 1;
 

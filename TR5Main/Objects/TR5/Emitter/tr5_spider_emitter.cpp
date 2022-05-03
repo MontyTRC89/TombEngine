@@ -153,7 +153,7 @@ void UpdateSpiders()
 				{
 					LaraItem->HitPoints -= 3;
 					LaraItem->HitStatus = true;
-					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Pose.Orientation.y, 1);
+					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Pose.Orientation.GetY(), 1);
 				}
 
 				if (spider->Flags)

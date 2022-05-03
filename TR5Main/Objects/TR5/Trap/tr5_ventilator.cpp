@@ -214,8 +214,8 @@ void VentilatorControl(short itemNumber)
 			zChange = 0;
 		}
 
-		VentilatorEffect(&effectBounds, 2, item->Pose.Orientation.y, speed);
-		VentilatorEffect(&effectBounds, -2, item->Pose.Orientation.y, speed);
+		VentilatorEffect(&effectBounds, 2, item->Pose.Orientation.GetY(), speed);
+		VentilatorEffect(&effectBounds, -2, item->Pose.Orientation.GetY(), speed);
 
 		if (LaraItem->Pose.Position.y >= effectBounds.Y1 && LaraItem->Pose.Position.y <= effectBounds.Y2)
 		{

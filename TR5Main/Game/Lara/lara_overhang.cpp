@@ -497,7 +497,7 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 	{
 		// Return to climbing mode.
 		if (TrInput & IN_FORWARD || TrInput & IN_BACK)
-			SetAnimation(item, lara->NextCornerPos.Orientation.z ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK.
+			SetAnimation(item, lara->NextCornerPos.Orientation.GetZ() ? LA_OVERHANG_HANG_2_IDLE_LEFT : LA_OVERHANG_HANG_2_IDLE_RIGHT); // HACK.
 
 		// Shimmy control.
 		if (TrInput & IN_LEFT || TrInput & IN_RIGHT)

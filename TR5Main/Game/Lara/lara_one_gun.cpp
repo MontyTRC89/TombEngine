@@ -1662,13 +1662,13 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 
 	float angles[2];
 
-	angles[1] = lara->LeftArm.Rotation.x;
-	angles[0] = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.GetY();
+	angles[1] = lara->LeftArm.Rotation.GetX();
+	angles[0] = lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY();
 
 	if (!lara->LeftArm.Locked)
 	{
-		angles[0] = lara->ExtraTorsoRot.y + lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.GetY();
-		angles[1] = lara->ExtraTorsoRot.x + lara->LeftArm.Rotation.x;
+		angles[0] = lara->ExtraTorsoRot.GetY() + lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY();
+		angles[1] = lara->ExtraTorsoRot.GetX() + lara->LeftArm.Rotation.GetX();
 	}
 
 	if (mode)

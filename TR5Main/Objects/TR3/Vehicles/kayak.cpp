@@ -440,7 +440,7 @@ void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 int KayakTestHeight(ITEM_INFO* kayakItem, int x, int z, Vector3Int* pos)
 {
 	Matrix world =
-		Matrix::CreateFromYawPitchRoll(kayakItem->Pose.Orientation.y, kayakItem->Pose.Orientation.GetX(), kayakItem->Pose.Orientation.z) *
+		Matrix::CreateFromYawPitchRoll(kayakItem->Pose.Orientation.GetY(), kayakItem->Pose.Orientation.GetX(), kayakItem->Pose.Orientation.GetZ()) *
 		Matrix::CreateTranslation(kayakItem->Pose.Position.x, kayakItem->Pose.Position.y, kayakItem->Pose.Position.z);
 
 	Vector3 vec = Vector3(x, 0, z);
@@ -1162,7 +1162,7 @@ void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 					{
 						if (TestBoundsCollide(item, kayakItem, KAYAK_TO_ENTITY_RADIUS))
 						{
-							DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - STEP_SIZE, laraItem->Pose.Position.z, kayakItem->Animation.Velocity, kayakItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
+							DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - STEP_SIZE, laraItem->Pose.Position.z, kayakItem->Animation.Velocity, kayakItem->Pose.Orientation.GetY(), laraItem->RoomNumber, 3);
 							laraItem->HitPoints -= 5;
 						}
 					}
@@ -1297,7 +1297,7 @@ bool KayakControl(ITEM_INFO* laraItem)
 		}
 
 		laraItem->Pose = kayakItem->Pose;
-		laraItem->Pose.Orientation.z /= 2;
+		laraItem->Pose.Orientation.SetZ(laraItem->Pose.Orientation.GetZ() / 2);
 
 		AnimateItem(laraItem);
 

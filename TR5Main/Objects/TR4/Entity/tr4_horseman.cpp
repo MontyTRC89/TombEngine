@@ -285,7 +285,7 @@ namespace TEN::Entities::TR4
 
 								Vector3Int pos = { 0, -128, 80 };
 								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
-								HorsemanSparks(&pos, item->Pose.Orientation.y, 7);
+								HorsemanSparks(&pos, item->Pose.Orientation.GetY(), 7);
 							}
 							else if (!(GetRandomControl() & 7))
 							{
@@ -504,7 +504,7 @@ namespace TEN::Entities::TR4
 							item,
 							&HorsemanBite1,
 							10,
-							item->Pose.Orientation.y,
+							item->Pose.Orientation.GetY(),
 							DoBloodSplat);
 
 						creature->Flags = 1;
@@ -528,7 +528,7 @@ namespace TEN::Entities::TR4
 							item,
 							&HorsemanBite2,
 							3,
-							item->Pose.Orientation.y,
+							item->Pose.Orientation.GetY(),
 							DoBloodSplat);
 
 						creature->Flags = 1;
@@ -629,7 +629,7 @@ namespace TEN::Entities::TR4
 							item,
 							&HorsemanBite2,
 							3,
-							item->Pose.Orientation.y,
+							item->Pose.Orientation.GetY(),
 							DoBloodSplat);
 
 						creature->Flags = 1;

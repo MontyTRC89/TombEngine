@@ -59,7 +59,7 @@ void ScubaHarpoonControl(short itemNumber)
 
 	if (item->TouchBits)
 	{
-		DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+		DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.GetY(), LaraItem->RoomNumber);
 		KillItem(itemNumber);
 
 		LaraItem->HitPoints -= 50;
@@ -202,7 +202,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.GetY(), item->RoomNumber);
 				creature->Flags = 1;
 			}
 
@@ -243,7 +243,7 @@ void ScubaControl(short itemNumber)
 
 			if (!creature->Flags)
 			{
-				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
+				ShootHarpoon(item, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->Animation.Velocity, item->Pose.Orientation.GetY(), item->RoomNumber);
 				creature->Flags = 1;
 			}
 

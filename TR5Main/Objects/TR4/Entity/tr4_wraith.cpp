@@ -292,7 +292,7 @@ namespace TEN::Entities::TR4
 				WraithWallsEffect(oldPos, item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
-			WraithWallsEffect(item->Pose.Position, item->Pose.Orientation.y, item->ObjectNumber);
+			WraithWallsEffect(item->Pose.Position, item->Pose.Orientation.GetY(), item->ObjectNumber);
 
 		// Update WRAITH nodes
 		auto* wraith = (WraithInfo*)item->Data;

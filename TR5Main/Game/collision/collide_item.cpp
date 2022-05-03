@@ -332,22 +332,22 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INF
 {
 	auto rotRel = laraItem->Pose.Orientation - item->Pose.Orientation;
 
-	if (rotRel.x < bounds->rotX1)
+	if (rotRel.GetX() < bounds->rotX1)
 		return false;
 
-	if (rotRel.x > bounds->rotX2)
+	if (rotRel.GetX() > bounds->rotX2)
 		return false;
 
-	if (rotRel.y < bounds->rotY1)
+	if (rotRel.GetY() < bounds->rotY1)
 		return false;
 
-	if (rotRel.y > bounds->rotY2)
+	if (rotRel.GetY() > bounds->rotY2)
 		return false;
 
-	if (rotRel.z < bounds->rotZ1)
+	if (rotRel.GetZ() < bounds->rotZ1)
 		return false;
 
-	if (rotRel.z > bounds->rotZ2)
+	if (rotRel.GetZ() > bounds->rotZ2)
 		return false;
 
 	auto differenceVector = (laraItem->Pose.Position - item->Pose.Position).ToVector3();
@@ -355,9 +355,9 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INF
 	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		item->Pose.Orientation.y,
+		item->Pose.Orientation.GetY(),
 		item->Pose.Orientation.GetX(),
-		item->Pose.Orientation.z
+		item->Pose.Orientation.GetZ()
 	);
 
 	// This solves once for all the minus sign hack of CreateFromYawPitchRoll.
@@ -382,9 +382,9 @@ void AlignLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		item->Pose.Orientation.y,
+		item->Pose.Orientation.GetY(),
 		item->Pose.Orientation.GetX(),
-		item->Pose.Orientation.z
+		item->Pose.Orientation.GetZ()
 	);
 
 	Vector3 pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
@@ -405,9 +405,9 @@ bool MoveLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 	Vector3 pos = Vector3(vec->x, vec->y, vec->z);
 
 	Matrix matrix = Matrix::CreateFromYawPitchRoll(
-		item->Pose.Orientation.y,
+		item->Pose.Orientation.GetY(),
 		item->Pose.Orientation.GetX(),
-		item->Pose.Orientation.z
+		item->Pose.Orientation.GetZ()
 	);
 
 	pos = Vector3::Transform(pos, matrix);
@@ -555,7 +555,7 @@ bool Move3DPosTo3DPos(PoseData* src, PoseData* dest, int velocity, float angleAd
 	else
 		src->Orientation.SetY(dest->Orientation.GetY());
 
-	deltaAngle = dest->Orientation.z - src->Orientation.z;
+	deltaAngle = dest->Orientation.GetZ() - src->Orientation.GetZ();
 	if (deltaAngle > angleAdd)
 		src->Orientation.SetZ(src->Orientation.GetZ() + angleAdd);
 	else if (deltaAngle < -angleAdd)
@@ -916,7 +916,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PoseData pos, Collisi
 	for (int i = 0; i < 4; i++)
 	{
 		// Calculate ray direction
-		auto mxR = Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.y, item->Pose.Orientation.GetX() + (Angle::DegToRad(90.0f * i)), 0);
+		auto mxR = Matrix::CreateFromYawPitchRoll(item->Pose.Orientation.GetY(), item->Pose.Orientation.GetX() + (Angle::DegToRad(90.0f * i)), 0);
 		auto mxT = Matrix::CreateTranslation(Vector3::UnitY);
 		auto direction = (mxT * mxR).Translation();
 

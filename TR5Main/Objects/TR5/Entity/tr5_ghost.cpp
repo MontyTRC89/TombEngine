@@ -84,7 +84,7 @@ void InvisibleGhostControl(short itemNumber)
 		item->TouchBits & 0x9470 &&
 		item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
 	{
-		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Pose.Orientation.GetY(), DoBloodSplat);
 		creature->Flags = 1;
 
 		LaraItem->HitPoints -= 400;

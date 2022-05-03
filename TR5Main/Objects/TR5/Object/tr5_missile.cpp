@@ -161,7 +161,7 @@ void MissileControl(short itemNumber)
 					// IMP hit effect
 					ExplodeFX(fx, 0, 32);
 					LaraItem->HitPoints -= 50;
-					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Pose.Orientation.GetY(), LaraItem->RoomNumber);
 					SoundEffect(SFX_TR5_IMP_STONEHIT, &fx->pos, 0);
 					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
 				}

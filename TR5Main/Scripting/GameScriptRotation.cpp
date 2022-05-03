@@ -49,11 +49,11 @@ void GameScriptRotation::StoreInPHDPos(PoseData& pos) const
 	pos.Orientation.Set(x, y, z);
 }
 
-GameScriptRotation::GameScriptRotation(PoseData const& pos)
+GameScriptRotation::GameScriptRotation(PoseData& pos)
 {
-	x = pos.Orientation.x;
-	y = pos.Orientation.y;
-	z = pos.Orientation.z;
+	x = pos.Orientation.GetX();
+	y = pos.Orientation.GetY();
+	z = pos.Orientation.GetZ();
 }
 
 /***

@@ -227,13 +227,13 @@ void DoLaraCrawlFlex(ITEM_INFO* item, CollisionInfo* coll, float maxAngle, float
 	int sign = copysign(1, maxAngle);
 	rate = copysign(rate, maxAngle);
 
-	lara->ExtraTorsoRot.z += std::min(abs(rate), abs(maxAngle - lara->ExtraTorsoRot.z) / 6) * sign;
+	lara->ExtraTorsoRot.SetZ(lara->ExtraTorsoRot.GetZ() + std::min(abs(rate), abs(maxAngle - lara->ExtraTorsoRot.GetZ()) / 6) * sign);
 
 	if (!(TrInput & IN_LOOK) &&
 		item->Animation.ActiveState != LS_CRAWL_BACK)
 	{
-		lara->ExtraHeadRot.z = lara->ExtraTorsoRot.z / 2;
-		lara->ExtraHeadRot.y = lara->ExtraHeadRot.z;
+		lara->ExtraHeadRot.SetZ(lara->ExtraTorsoRot.GetZ() / 2);
+		lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetZ());
 	}
 }
 

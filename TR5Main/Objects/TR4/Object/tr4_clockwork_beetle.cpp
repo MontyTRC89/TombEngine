@@ -281,7 +281,7 @@ void ClockworkBeetleControl(short itemNumber)
 		}
 		else
 		{
-			beetle->Pose.Orientation.z *= 2;
+			beetle->Pose.Orientation.SetZ(beetle->Pose.Orientation.GetZ() * 2);
 			int val = (150 - beetle->ItemFlags[3]) >> 1;
 			beetle->Pose.Orientation.SetY(Angle::ShrtToRad(Angle::RadToShrt(beetle->Pose.Orientation.GetY()) + val << 7));
 

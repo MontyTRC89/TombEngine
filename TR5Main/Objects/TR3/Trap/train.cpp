@@ -26,7 +26,7 @@ long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
 
 	auto pos = Vector3Int(
 		(int)round(item->Pose.Position.x + z * sinY + x * cosY),
-		(int)round(item->Pose.Position.y - z * sin(item->Pose.Orientation.GetX()) + x * sin(item->Pose.Orientation.z)),
+		(int)round(item->Pose.Position.y - z * sin(item->Pose.Orientation.GetX()) + x * sin(item->Pose.Orientation.GetZ())),
 		(int)round(item->Pose.Position.z + z * cosY - x * sinY)
 	);
 
@@ -134,5 +134,5 @@ void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	long x = laraItem->Pose.Position.x + CLICK(1) * s;
 	long z = laraItem->Pose.Position.z + CLICK(1) * c;
 
-	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, SECTOR(1), trainItem->Pose.Orientation.y, laraItem->RoomNumber, 15);
+	DoLotsOfBlood(x, laraItem->Pose.Position.y - CLICK(2), z, SECTOR(1), trainItem->Pose.Orientation.GetY(), laraItem->RoomNumber, 15);
 }

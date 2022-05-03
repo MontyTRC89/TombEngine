@@ -68,7 +68,7 @@ void StrobeLightControl(short itemNumber)
 			item->Pose.Position.y - 512,
 			item->Pose.Position.z,
 			r, g, b,
-			((/*item->Pose.Orientation.y*/ + 22528) / 16) & 0xFFF,
+			((/*item->Pose.Orientation.GetY()*/ + 22528) / 16) & 0xFFF,
 			item->RoomNumber,
 			12);
 

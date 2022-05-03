@@ -104,13 +104,13 @@ inline short Angle::RadToShrt(float radians)
 // TODO: Move to EulerAngles.h and EulerAngles.cpp.
 class EulerAngles
 {
-public:
-	// TODO: Due to normalisation requirements and assumed [-M_PI, M_PI] range invariant, make components private?
-	// Radian components
+private:
+	// Angle components in radians
 	float x;
 	float y;
 	float z;
-
+	
+public:
 	// Constructors
 	EulerAngles();
 	EulerAngles(float xAngle, float yAngle, float zAngle);

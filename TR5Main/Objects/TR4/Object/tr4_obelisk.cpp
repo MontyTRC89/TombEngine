@@ -77,7 +77,7 @@ void ObeliskControl(short itemNumber)
 
 				pos2.Position.x = item->Pose.Position.x + (someNumber * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)));
 				pos2.Position.y = item->Pose.Position.y;
-				pos2.Position.x = item->Pose.Position.z + (someNumber * cos(item->Pose.Orientation.z + Angle::DegToRad(90.0f)));
+				pos2.Position.x = item->Pose.Position.z + (someNumber * cos(item->Pose.Orientation.GetZ() + Angle::DegToRad(90.0f)));
 
 				if (abs(pos.Position.x - LaraItem->Pose.Position.x) < SECTOR(20) &&
 					abs(pos.Position.y - LaraItem->Pose.Position.y) < SECTOR(20) &&

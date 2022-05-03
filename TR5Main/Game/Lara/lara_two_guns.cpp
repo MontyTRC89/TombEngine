@@ -111,8 +111,8 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			{
 				if (weaponType != LaraWeaponType::Revolver)
 				{
-					angleRight[0] = lara->RightArm.Rotation.y + laraItem->Pose.Orientation.GetY();
-					angleRight[1] = lara->RightArm.Rotation.x;
+					angleRight[0] = lara->RightArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY();
+					angleRight[1] = lara->RightArm.Rotation.GetX();
 
 					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleRight) != FireWeaponType::NoAmmo)
 					{
@@ -198,8 +198,8 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				angleLeft[0] = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.GetY();
-				angleLeft[1] = lara->LeftArm.Rotation.x;
+				angleLeft[0] = lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY();
+				angleLeft[1] = lara->LeftArm.Rotation.GetX();
 
 				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleLeft) != FireWeaponType::NoAmmo)
 				{

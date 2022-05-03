@@ -192,7 +192,7 @@ int TestWaterHeight(ITEM_INFO* rBoatItem, int zOffset, int xOffset, Vector3Int* 
 	float c = cos(rBoatItem->Pose.Orientation.GetY());
 
 	pos->x = rBoatItem->Pose.Position.x + zOffset * s + xOffset * c;
-	pos->y = rBoatItem->Pose.Position.y - zOffset * sin(rBoatItem->Pose.Orientation.GetX()) + xOffset * sin(rBoatItem->Pose.Orientation.z);
+	pos->y = rBoatItem->Pose.Position.y - zOffset * sin(rBoatItem->Pose.Orientation.GetX()) + xOffset * sin(rBoatItem->Pose.Orientation.GetZ());
 	pos->z = rBoatItem->Pose.Position.z + zOffset * c - xOffset * s;
 
 	auto probe = GetCollision(pos->x, pos->y, pos->z, rBoatItem->RoomNumber);
@@ -404,9 +404,9 @@ static int RubberBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	else
 		rBoat->PropellerRotation += Angle::DegToRad(33.0f);
 
-	int slip = RBOAT_SIDE_SLIP * sin(rBoatItem->Pose.Orientation.z);
-	if (!slip && rBoatItem->Pose.Orientation.z)
-		slip = (rBoatItem->Pose.Orientation.z > 0) ? 1 : -1;
+	int slip = RBOAT_SIDE_SLIP * sin(rBoatItem->Pose.Orientation.GetZ());
+	if (!slip && rBoatItem->Pose.Orientation.GetZ())
+		slip = (rBoatItem->Pose.Orientation.GetZ() > 0) ? 1 : -1;
 
 	rBoatItem->Pose.Position.z -= slip * sin(rBoatItem->Pose.Orientation.GetY());
 	rBoatItem->Pose.Position.x += slip * cos(rBoatItem->Pose.Orientation.GetY());
@@ -982,11 +982,11 @@ void RubberBoatControl(short itemNumber)
 	short rRot = atan2(RBOAT_SIDE, height - frontLeft.y);
 
 	rBoatItem->Pose.Orientation.SetX(rBoatItem->Pose.Orientation.GetX() + ((xRot - rBoatItem->Pose.Orientation.GetX()) / 2));
-	rBoatItem->Pose.Orientation.SetZ(rBoatItem->Pose.Orientation.GetZ() + ((rRot - rBoatItem->Pose.Orientation.z) / 2));
+	rBoatItem->Pose.Orientation.SetZ(rBoatItem->Pose.Orientation.GetZ() + ((rRot - rBoatItem->Pose.Orientation.GetZ()) / 2));
 
 	if (!xRot && abs(rBoatItem->Pose.Orientation.GetX()) < 4)
 		rBoatItem->Pose.Orientation.SetX();
-	if (!rRot && abs(rBoatItem->Pose.Orientation.z) < 4)
+	if (!rRot && abs(rBoatItem->Pose.Orientation.GetZ()) < 4)
 		rBoatItem->Pose.Orientation.SetZ();
 
 	if (lara->Vehicle == itemNumber)

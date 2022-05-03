@@ -601,7 +601,7 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (item->TouchBits & 0xC000)
 					{
-						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
+						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.GetY(), DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
 						creature->Flags = 1;
 
