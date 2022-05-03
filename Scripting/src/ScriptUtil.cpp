@@ -7,7 +7,8 @@ sol::table MakeSpecialTableBase(sol::state * state, std::string const & name)
 	auto meta = sol::table{ *state, sol::create };
 	state->set(metaName, meta);
 	meta.set("__metatable", "\"metatable is protected\"");
-	auto tab = state->create_named_table(name);
+	state->safe_script("rawset(_G, \"" + name + "\", {})");
+	auto tab = (*state)[name];
 	tab[sol::metatable_key] = meta;
 	state->set(metaName, sol::nil);
 	return meta;

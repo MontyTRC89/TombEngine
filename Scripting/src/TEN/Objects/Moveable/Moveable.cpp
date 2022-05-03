@@ -48,14 +48,13 @@ Moveable::Moveable(Moveable&& other) noexcept :
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, &other);
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(m_item, this);
 	}
-};
+}
 
 
 Moveable::~Moveable()
 {
-	if (m_num > NO_ITEM && g_GameScriptEntities) {
+	if (m_item && g_GameScriptEntities) 
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
-	}
 }
 
 bool operator==(Moveable const& first, Moveable const& second)
@@ -467,7 +466,8 @@ bool Moveable::SetName(std::string const & id)
 		// remove the old name if we have one
 		if (id != m_item->luaName)
 		{
-			s_callbackRemoveName(m_item->luaName);
+			if(!m_item->luaName.empty())
+				s_callbackRemoveName(m_item->luaName);
 			m_item->luaName = id;
 		}
 	}
@@ -722,14 +722,15 @@ void Moveable::MakeInvisible()
 
 void Moveable::Invalidate()
 {
-	m_item = nullptr;
+	// keep m_item as it is so that we can properly remove it from the moveables set when
+	// its destructor is called
 	m_num = NO_ITEM;
 	m_initialised = false;
 }
 
 bool Moveable::GetValid() const
 {
-	return m_item != nullptr;
+	return m_num > NO_ITEM;
 }
 
 void Moveable::Destroy()

@@ -5,6 +5,7 @@
 class LuaHandler {
 protected:
 	sol::state*	m_lua;
+	sol::table m_globals;
 
 public:
 	LuaHandler(sol::state* lua);
@@ -14,6 +15,8 @@ public:
 
 	void ExecuteScript(const std::string & luaFilename);
 	void ExecuteString(const std::string & command);
+
+	void ResetGlobals();
 
 	sol::state* GetState() {
 		return m_lua;
