@@ -285,8 +285,8 @@ void InitialiseRomanStatue(short itemNumber)
 	item->Animation.ActiveState = 13;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Pose.Position.x += 486 * sin(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
-	item->Pose.Position.z += 486 * cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f));
+	item->Pose.Position.x += 486 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
+	item->Pose.Position.z += 486 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 
 	ZeroMemory(&RomanStatueData, sizeof(RomanStatueInfo));
 }
@@ -559,12 +559,12 @@ void RomanStatueControl(short itemNumber)
 			if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
@@ -656,12 +656,12 @@ void RomanStatueControl(short itemNumber)
 				if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 				{
 					if (AI.angle > 0)
-						item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 					else
-						item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 			}
 
 			if (AI.distance < pow(SECTOR(1), 2))
@@ -697,12 +697,12 @@ void RomanStatueControl(short itemNumber)
 			creature->Flags = 0;
 
 			if (AI.angle > 0)
-				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			else
-				item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				item->Pose.Orientation.y += Angle::DegToRad(-180.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
 		
 			break;
 

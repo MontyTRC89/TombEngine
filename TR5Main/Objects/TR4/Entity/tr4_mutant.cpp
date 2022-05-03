@@ -106,11 +106,11 @@ namespace TEN::Entities::TR4
 		switch (rotation)
 		{
 		case MissileRotationType::Left:
-			src->Orientation.y -= GetRandomControl() % 0x2000;
+			src->Orientation.SetY(src->Orientation.GetY() - GetRandomControl() % 0x2000);
 			break;
 
 		case MissileRotationType::Right:
-			src->Orientation.y += GetRandomControl() % 0x2000;
+			src->Orientation.SetY(src->Orientation.GetY() + GetRandomControl() % 0x2000);
 			break;
 		}
 

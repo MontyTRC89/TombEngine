@@ -332,11 +332,11 @@ void MonkeyControl(short itemNumber)
 				creature->MaxTurn = 0;
 
 				if (abs(AI.angle) < Angle::DegToRad(7.0f))
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 				else if (AI.angle < 0)
-					item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
 				else
-					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 			}
 
 			break;
@@ -398,11 +398,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < Angle::DegToRad(7.0f))
-				item->Pose.Orientation.y += AI.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
 			else
-				item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 
 			if (enemy == LaraItem)
 			{
@@ -444,11 +444,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < Angle::DegToRad(7.0f))
-				item->Pose.Orientation.y += AI.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
 			else
-				item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 
 			if (enemy == LaraItem)
 			{
@@ -490,11 +490,11 @@ void MonkeyControl(short itemNumber)
 			}
 
 			if (abs(AI.angle) < Angle::DegToRad(7.0f))
-				item->Pose.Orientation.y += AI.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 			else if (AI.angle < 0)
-				item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
 			else
-				item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 
 			if (enemy == LaraItem)
 			{

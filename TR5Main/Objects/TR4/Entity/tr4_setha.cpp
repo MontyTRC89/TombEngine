@@ -290,18 +290,12 @@ void SethaControl(short itemNumber)
 			if (abs(info.angle) >= Angle::DegToRad(3))
 			{
 				if (info.angle >= 0)
-				{
-					item->Pose.Orientation.y += Angle::DegToRad(3);
-				}
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(3.0f));
 				else
-				{
-					item->Pose.Orientation.y -= Angle::DegToRad(3);
-				}
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(3.0f));
 			}
 			else
-			{
-				item->Pose.Orientation.y += info.angle;
-			}
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
 
 			if (!creature->Flags)
 			{
@@ -345,17 +339,17 @@ void SethaControl(short itemNumber)
 			{
 				if (info.angle >= 0)
 				{
-					item->Pose.Orientation.y += Angle::DegToRad(3);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(3.0f));
 				}
 				else
 				{
-					item->Pose.Orientation.y -= Angle::DegToRad(3);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(3.0f));
 				}
 				SethaAttack(itemNumber);
 			}
 			else
 			{
-				item->Pose.Orientation.y += info.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
 				SethaAttack(itemNumber);
 			}
 
@@ -373,16 +367,16 @@ void SethaControl(short itemNumber)
 				{
 					if (info.angle >= 0)
 					{
-						item->Pose.Orientation.y += Angle::DegToRad(3);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(3.0f));
 					}
 					else
 					{
-						item->Pose.Orientation.y -= Angle::DegToRad(3);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(3.0f));
 					}
 				}
 				else
 				{
-					item->Pose.Orientation.y += info.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
 				}
 			}
 

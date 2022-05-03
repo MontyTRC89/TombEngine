@@ -173,9 +173,9 @@ void VentilatorControl(short itemNumber)
 
 	if (item->ObjectNumber != ID_PROPELLER_V) // TODO: check this ID
 	{
-		if (item->Pose.Orientation.y != Angle::DegToRad(-180.0f))
+		if (item->Pose.Orientation.GetY() != Angle::DegToRad(-180.0f))
 		{
-			if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
+			if (item->Pose.Orientation.GetY() == Angle::DegToRad(-90.0f))
 			{
 				effectBounds.X1 = item->Pose.Position.x - bounds->Z2;
 				effectBounds.X2 = item->Pose.Position.x - bounds->Z1;
@@ -186,7 +186,7 @@ void VentilatorControl(short itemNumber)
 			}
 			else
 			{
-				if (item->Pose.Orientation.y != Angle::DegToRad(90.0f))
+				if (item->Pose.Orientation.GetY() != Angle::DegToRad(90.0f))
 				{
 					effectBounds.X1 = item->Pose.Position.x + bounds->X1;
 					effectBounds.X2 = item->Pose.Position.x + bounds->X2;

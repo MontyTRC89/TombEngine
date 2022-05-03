@@ -76,7 +76,7 @@ void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll)
 {
 	SnapItemToLedge(item, coll);
 
-	int direction = (unsigned short)(item->Pose.Orientation.y + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
+	int direction = (unsigned short)(item->Pose.Orientation.GetY() + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
 
 	switch (direction)
 	{

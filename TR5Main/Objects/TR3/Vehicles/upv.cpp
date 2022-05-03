@@ -158,7 +158,7 @@ static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		InitialiseItem(itemNumber);
 
 		harpoonItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX());
-		harpoonItem->Pose.Orientation.y = UPVItem->Pose.Orientation.GetY();
+		harpoonItem->Pose.Orientation.SetY(UPVItem->Pose.Orientation.GetY());
 		harpoonItem->Pose.Orientation.SetZ();
 
 		// TODO: Huh?
@@ -253,7 +253,7 @@ void UPVEffects(short itemNumber)
 			pos = { UPVBites[UPV_FAN].x, UPVBites[UPV_FAN].y, UPVBites[UPV_FAN].z };
 			GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_FAN].meshNum);
 
-			TriggerUPVMist(pos.x, pos.y + UPV_DRAW_SHIFT, pos.z, abs(UPV->Velocity) / (USHRT_MAX + 1), UPVItem->Pose.Orientation.y + Angle::DegToRad(180.0f));
+			TriggerUPVMist(pos.x, pos.y + UPV_DRAW_SHIFT, pos.z, abs(UPV->Velocity) / (USHRT_MAX + 1), UPVItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 
 			if ((GetRandomControl() & 1) == 0)
 			{
@@ -306,7 +306,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (lara->WaterCurrentPull.x || lara->WaterCurrentPull.z)
 		return false;
 
-	short moveAngle = UPVItem->Pose.Orientation.y + Angle::DegToRad(180.0f);
+	short moveAngle = UPVItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f);
 	int velocity = DISMOUNT_DISTANCE * cos(UPVItem->Pose.Orientation.GetX());
 	int x = UPVItem->Pose.Position.x + velocity * sin(moveAngle);
 	int z = UPVItem->Pose.Position.z + velocity * cos(moveAngle);
@@ -344,7 +344,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	if (distance > pow(CLICK(2), 2))
 		return false;
 
-	short deltaAngle = abs(laraItem->Pose.Orientation.y - UPVItem->Pose.Orientation.GetY());
+	short deltaAngle = abs(laraItem->Pose.Orientation.GetY() - UPVItem->Pose.Orientation.GetY());
 	if (deltaAngle > Angle::DegToRad(35.0f) || deltaAngle < Angle::DegToRad(-35.0f))
 		return false;
 
@@ -448,7 +448,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	}
 	else
 	{
-		lara->Control.MoveAngle = UPVItem->Pose.Orientation.y - Angle::DegToRad(180.0f);
+		lara->Control.MoveAngle = UPVItem->Pose.Orientation.GetY() - Angle::DegToRad(180.0f);
 		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	}
 
@@ -489,9 +489,9 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	else if (coll->CollisionType == CT_TOP_FRONT)
 		UPV->Velocity = 0;
 	else if (coll->CollisionType == CT_LEFT)
-		UPVItem->Pose.Orientation.y += Angle::DegToRad(5.0f);
+		UPVItem->Pose.Orientation.SetY(UPVItem->Pose.Orientation.GetY() + Angle::DegToRad(5.0f));
 	else if (coll->CollisionType == CT_RIGHT)
-		UPVItem->Pose.Orientation.y -= Angle::DegToRad(5.0f);
+		UPVItem->Pose.Orientation.SetY(UPVItem->Pose.Orientation.GetY() - Angle::DegToRad(5.0f));
 	else if (coll->CollisionType == CT_CLAMP)
 	{
 		UPVItem->Pose.Position.x = coll->Setup.OldPosition.x;
@@ -928,7 +928,7 @@ bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 		UPVItem->Animation.Velocity = UPV->Velocity / (USHRT_MAX + 1);
 
 		UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + UPV->XRot / (USHRT_MAX + 1));
-		UPVItem->Pose.Orientation.y += UPV->Rot / (USHRT_MAX + 1);
+		UPVItem->Pose.Orientation.SetY(UPVItem->Pose.Orientation.GetY() + UPV->Rot / (USHRT_MAX + 1));
 		UPVItem->Pose.Orientation.SetZ(UPV->Rot / (USHRT_MAX + 1));
 
 		if (UPVItem->Pose.Orientation.GetX() > UPDOWN_LIMIT)

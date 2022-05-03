@@ -72,7 +72,7 @@ void ControlCentaurBomb(short itemNumber)
 			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + ((item->Animation.Velocity / 4) + 7) * Angle::DegToRad(1.0f));
 
 			if (item->Animation.RequiredState)
-				item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f));
 			else
 				item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f));
 		}

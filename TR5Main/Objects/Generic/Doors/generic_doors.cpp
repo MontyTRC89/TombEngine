@@ -61,11 +61,11 @@ namespace TEN::Entities::Doors
 		int xOffset = 0;
 		int zOffset = 0;
 
-		if (doorItem->Pose.Orientation.y == 0)
+		if (doorItem->Pose.Orientation.GetY() == 0)
 			zOffset = -SECTOR(1);
-		else if (doorItem->Pose.Orientation.y == Angle::DegToRad(180.0f))
+		else if (doorItem->Pose.Orientation.GetY() == Angle::DegToRad(180.0f))
 			zOffset = SECTOR(1);
-		else if (doorItem->Pose.Orientation.y == Angle::DegToRad(90.0f))
+		else if (doorItem->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))
 			xOffset = -SECTOR(1);
 		else
 			xOffset = SECTOR(1);
@@ -176,7 +176,7 @@ namespace TEN::Entities::Doors
 				laraInfo->Control.HandStatus == HandStatus::Free ||
 				laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
-			doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+			doorItem->Pose.Orientation.SetY(doorItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 			if (TestLaraPosition(&CrowbarDoorBounds, doorItem, laraItem))
 			{
 				if (!laraInfo->Control.IsMoving)
@@ -186,7 +186,7 @@ namespace TEN::Entities::Doors
 						if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 						{
 							g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
-							doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+							doorItem->Pose.Orientation.SetY(doorItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 						}
 						else
 						{
@@ -198,7 +198,7 @@ namespace TEN::Entities::Doors
 								SayNo();
 							}
 
-							doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+							doorItem->Pose.Orientation.SetY(doorItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 						}
 
 						return;
@@ -206,7 +206,7 @@ namespace TEN::Entities::Doors
 
 					if (g_Gui.GetInventoryItemChosen() != ID_CROWBAR_ITEM)
 					{
-						doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+						doorItem->Pose.Orientation.SetY(doorItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 						return;
 					}
 				}
@@ -216,7 +216,7 @@ namespace TEN::Entities::Doors
 				if (MoveLaraPosition(&CrowbarDoorPos, doorItem, laraItem))
 				{
 					SetAnimation(laraItem, LA_DOOR_OPEN_CROWBAR);
-					doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+					doorItem->Pose.Orientation.SetY(doorItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 
 					AddActiveItem(itemNumber);
 
@@ -236,7 +236,7 @@ namespace TEN::Entities::Doors
 				laraInfo->Control.HandStatus = HandStatus::Free;
 			}
 
-			doorItem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+			doorItem->Pose.Orientation.SetY(doorItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 		}
 
 		if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))

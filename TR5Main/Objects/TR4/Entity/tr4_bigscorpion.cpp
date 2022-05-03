@@ -267,12 +267,12 @@ void ScorpionControl(short itemNumber)
 			if (abs(info.angle) >= Angle::DegToRad(2.0f))
 			{
 				if (info.angle >= 0)
-					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			}
 			else
-				item->Pose.Orientation.y += info.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
 
 			if (creature->Flags)
 				break;
@@ -295,7 +295,7 @@ void ScorpionControl(short itemNumber)
 					item,
 					&BigScorpionBite1,
 					10,
-					item->Pose.Orientation.y - Angle::DegToRad(180.0f),
+					item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
 					DoBloodSplat);
 			}
 			else if (item->TouchBits & 0x1B00100)
@@ -311,7 +311,7 @@ void ScorpionControl(short itemNumber)
 						item,
 						&BigScorpionBite1,
 						10,
-						item->Pose.Orientation.y - Angle::DegToRad(180.0f),
+						item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
 				else
@@ -320,7 +320,7 @@ void ScorpionControl(short itemNumber)
 						item,
 						&BigScorpionBite2,
 						10,
-						item->Pose.Orientation.y - Angle::DegToRad(180.0f),
+						item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
 

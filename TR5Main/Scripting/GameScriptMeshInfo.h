@@ -24,7 +24,7 @@ public:
 	GameScriptPosition GetPos() const;
 	void SetPos(GameScriptPosition const & pos);
 	int GetRot() const;
-	void SetRot(int yRot);
+	void SetRot(float yRot);
 	std::string GetName() const;
 	void SetName(std::string const & name);
 	int GetStaticNumber() const;

@@ -178,13 +178,13 @@ void LarsonControl(short itemNumber)
 					if (abs(info.angle) >= Angle::DegToRad(2))
 					{
 						if (info.angle > 0)
-							item->Pose.Orientation.y += Angle::DegToRad(2);
+							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 						else
-							item->Pose.Orientation.y -= Angle::DegToRad(2);
+							item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 					}
 					else
 					{
-						item->Pose.Orientation.y += info.angle;
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
 					}
 				}
 				else
@@ -279,13 +279,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= Angle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Pose.Orientation.y += Angle::DegToRad(2);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.y -= Angle::DegToRad(2);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			}
 			else
 			{
-				item->Pose.Orientation.y += info.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
 			}
 
 			if (Targetable(item, &info))
@@ -323,13 +323,13 @@ void LarsonControl(short itemNumber)
 			if (abs(info.angle) >= Angle::DegToRad(2))
 			{
 				if (info.angle > 0)
-					item->Pose.Orientation.y += Angle::DegToRad(2);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.y -= Angle::DegToRad(2);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			}
 			else
 			{
-				item->Pose.Orientation.y += info.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + info.angle);
 			}
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{

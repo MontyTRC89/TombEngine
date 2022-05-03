@@ -103,7 +103,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->ItemFlags[2] += velocity;
-					item->Pose.Orientation.y += item->ItemFlags[2];
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + item->ItemFlags[2]);
 				}
 			}
 			else if (item->ItemFlags[2] >= 0)
@@ -111,11 +111,11 @@ namespace TEN::Entities::TR4
 			else
 			{
 				item->ItemFlags[2] -= velocity;
-				item->Pose.Orientation.y += item->ItemFlags[2];
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + item->ItemFlags[2]);
 			}
 		}
 		else
-			item->Pose.Orientation.y += angleH;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + angleH);
 
 		if (abs(angleV) >= item->ItemFlags[3] || angleV > 0 != item->ItemFlags[3] > 0)
 		{
@@ -289,7 +289,7 @@ namespace TEN::Entities::TR4
 			probe.Position.Ceiling > item->Pose.Position.y)
 		{
 			if (!hitWall)
-				WraithWallsEffect(oldPos, item->Pose.Orientation.y + Angle::DegToRad(-180.0f), item->ObjectNumber);
+				WraithWallsEffect(oldPos, item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f), item->ObjectNumber);
 		}
 		else if (hitWall)
 			WraithWallsEffect(item->Pose.Position, item->Pose.Orientation.y, item->ObjectNumber);

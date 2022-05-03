@@ -319,7 +319,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		return;
 
-	item->Pose.Orientation.y = laraItem->Pose.Orientation.GetY();
+	item->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
 	item->Pose.Orientation.SetZ();
 
 	if (lara->Control.WaterStatus != WaterStatus::Dry &&
@@ -446,7 +446,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		break;
 
 	case 2: // Pickup with crowbar
-		item->Pose.Orientation.y = oldOrient.y;
+		item->Pose.Orientation.SetY(oldOrient.y);
 		if (lara->Control.IsLow || !TestLaraPosition(&CrowbarPickUpBounds, item, laraItem))
 		{
 			if (!lara->Control.IsMoving)
@@ -559,7 +559,7 @@ void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 		return;
 
 	case 9: // Pickup object and conver it to crowbar (like submarine level)
-		item->Pose.Orientation.y = oldOrient.y;
+		item->Pose.Orientation.SetY(oldOrient.y);
 
 		if (!TestLaraPosition(&JobyCrowPickUpBounds, item, laraItem))
 		{

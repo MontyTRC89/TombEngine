@@ -1345,7 +1345,7 @@ bool SaveGame::Load(int slot)
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmAngles[0] = s->lara()->target_arm_angles()->Get(0);
 	Lara.TargetArmAngles[1] = s->lara()->target_arm_angles()->Get(1);
-	Lara.TargetOrientation.y = s->lara()->target_facing_angle();
+	Lara.TargetOrientation.SetY(s->lara()->target_facing_angle());
 	Lara.Vehicle = s->lara()->vehicle();
 	Lara.WaterSurfaceDist = s->lara()->water_surface_dist();
 

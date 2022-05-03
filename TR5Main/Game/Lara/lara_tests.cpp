@@ -567,7 +567,7 @@ CornerType TestLaraHangCorner(ITEM_INFO* item, CollisionInfo* coll, float testAn
 		lara->NextCornerPos.Position.x = item->Pose.Position.x;
 		lara->NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.GetY(), coll->Setup.Radius * 2, -(abs(bounds->Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds->Y1);
 		lara->NextCornerPos.Position.z = item->Pose.Position.z;
-		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.GetY();
+		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY());
 		lara->Control.MoveAngle = item->Pose.Orientation.GetY();
 
 		item->Pose = cornerResult.ProbeResult;
@@ -624,7 +624,7 @@ CornerType TestLaraHangCorner(ITEM_INFO* item, CollisionInfo* coll, float testAn
 		lara->NextCornerPos.Position.x = item->Pose.Position.x;
 		lara->NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.GetY(), coll->Setup.Radius * 2, -(abs(bounds->Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds->Y1);
 		lara->NextCornerPos.Position.z = item->Pose.Position.z;
-		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.GetY();
+		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY());
 		lara->Control.MoveAngle = item->Pose.Orientation.GetY();
 
 		item->Pose = cornerResult.ProbeResult;
@@ -687,8 +687,8 @@ CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, CollisionInfo* co
 		// Determine anchor point
 		auto cX = pos[i].Position.x + round(coll->Setup.Radius * sin(pos[i].Orientation.GetY()));
 		auto cZ = pos[i].Position.z + round(coll->Setup.Radius * cos(pos[i].Orientation.GetY()));
-		cX += (coll->Setup.Radius * sin(pos[i].Orientation.y + Angle::DegToRad(90.0f * -std::copysign(1.0f, angle))));
-		cZ += (coll->Setup.Radius * cos(pos[i].Orientation.y + Angle::DegToRad(90.0f * -std::copysign(1.0f, angle))));
+		cX += (coll->Setup.Radius * sin(pos[i].Orientation.GetY() + Angle::DegToRad(90.0f * -std::copysign(1.0f, angle))));
+		cZ += (coll->Setup.Radius * cos(pos[i].Orientation.GetY() + Angle::DegToRad(90.0f * -std::copysign(1.0f, angle))));
 
 		// Determine distance from anchor point to new item position
 		auto dist = Vector2(pos[i].Position.x, pos[i].Position.z) - Vector2(cX, cZ);
@@ -700,8 +700,8 @@ CornerTestResult TestItemAtNextCornerPosition(ITEM_INFO* item, CollisionInfo* co
 		pos[i].Position.z = dist.x * s + dist.y * c + cZ;
 
 		// Virtually rotate item to new angle
-		short newAngle = pos[i].Orientation.y - Angle::DegToRad(turnAngle);
-		pos[i].Orientation.y = newAngle;
+		short newAngle = pos[i].Orientation.GetY() - Angle::DegToRad(turnAngle);
+		pos[i].Orientation.SetY(newAngle);
 
 		// Snap to nearest ledge, if any.
 		item->Pose = pos[i];

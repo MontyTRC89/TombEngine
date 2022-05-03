@@ -77,7 +77,7 @@ void NatlaControl(short itemNumber)
 
 		if (facing)
 		{
-			item->Pose.Orientation.y += facing;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + facing);
 			facing = 0;
 		}
 
@@ -198,7 +198,7 @@ void NatlaControl(short itemNumber)
 		if (item->Animation.ActiveState != NATLA_STATE_FLY || (creature->Flags & NATLA_FLYMODE))
 			CreatureMood(item, &AI, TIMID);
 
-		item->Pose.Orientation.y -= facing;
+		item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - facing);
 		angle = CreatureTurn(item, NATLA_FLY_TURN);
 
 		if (item->Animation.ActiveState == NATLA_STATE_FLY)
@@ -210,11 +210,11 @@ void NatlaControl(short itemNumber)
 			else
 				facing += AI.angle;
 
-			item->Pose.Orientation.y += facing;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + facing);
 		}
 		else
 		{
-			item->Pose.Orientation.y += facing - angle;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + facing - angle);
 			facing = 0;
 		}
 
@@ -268,11 +268,11 @@ void NatlaControl(short itemNumber)
 
 				FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)
-					EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
+					EffectList[FXNumber].pos.Orientation.SetY(EffectList[FXNumber].pos.Orientation.GetY() + (short)((GetRandomControl() - 0x4000) / 4));
 
 				FXNumber = CreatureEffect(item, &NatlaGunBite, BombGun);
 				if (FXNumber != NO_ITEM)
-					EffectList[FXNumber].pos.Orientation.y += (short)((GetRandomControl() - 0x4000) / 4);
+					EffectList[FXNumber].pos.Orientation.SetY(EffectList[FXNumber].pos.Orientation.GetY() + (short)((GetRandomControl() - 0x4000) / 4));
 
 				item->Animation.RequiredState = NATLA_STATE_IDLE;
 			}
@@ -290,7 +290,7 @@ void NatlaControl(short itemNumber)
 	timer++;
 	creature->Flags = (creature->Flags & NATLA_FLYMODE) + timer;
 
-	item->Pose.Orientation.y -= facing;
+	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - facing);
 	CreatureAnimation(itemNumber, angle, tilt);
-	item->Pose.Orientation.y += facing;
+	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + facing);
 }

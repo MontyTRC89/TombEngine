@@ -211,8 +211,8 @@ namespace TEN::Entities::Effects
 
 				if (item->TriggerFlags == 2)
 				{
-					item->Pose.Position.x += sin(item->Pose.Orientation.y - Angle::DegToRad(180));
-					item->Pose.Position.z += cos(item->Pose.Orientation.y - Angle::DegToRad(180));
+					item->Pose.Position.x += sin(item->Pose.Orientation.GetY() - Angle::DegToRad(180));
+					item->Pose.Position.z += cos(item->Pose.Orientation.GetY() - Angle::DegToRad(180));
 
 					short roomNumber = item->RoomNumber;
 					FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -472,9 +472,9 @@ namespace TEN::Entities::Effects
 				{
 					if (item->TriggerFlags == 2 || item->TriggerFlags == 4)
 					{
-						dest.x = item->Pose.Position.x + 2048 * sin(item->Pose.Orientation.y + Angle::DegToRad(180));
+						dest.x = item->Pose.Position.x + 2048 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(180));
 						dest.y = item->Pose.Position.y;
-						dest.z = item->Pose.Position.z + 2048 * cos(item->Pose.Orientation.y + Angle::DegToRad(180));
+						dest.z = item->Pose.Position.z + 2048 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(180));
 
 						if (GetRandomControl() & 3)
 						{
@@ -687,7 +687,7 @@ namespace TEN::Entities::Effects
 			}
 
 			short oldYrot = item->Pose.Orientation.GetY();
-			item->Pose.Orientation.y = l->Pose.Orientation.GetY();
+			item->Pose.Orientation.SetY(l->Pose.Orientation.GetY());
 
 			if (TestLaraPosition(&FireBounds, item, l))
 			{
@@ -709,7 +709,7 @@ namespace TEN::Entities::Effects
 				Lara.InteractedItem = itemNumber;
 			}
 
-			item->Pose.Orientation.y = oldYrot;
+			item->Pose.Orientation.SetY(oldYrot);
 		}
 
 		if (Lara.InteractedItem == itemNumber

@@ -311,7 +311,7 @@ void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* 
 			if (lara->HitPoints > 0)
 			{
 				lara->HitPoints = -1;//?
-				lara->Pose.Orientation.y = item->Pose.Orientation.GetY();
+				lara->Pose.Orientation.SetY(item->Pose.Orientation.GetY());
 				lara->Pose.Position.z = 0;
 				lara->Pose.Orientation.SetZ();	
 

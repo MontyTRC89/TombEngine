@@ -868,16 +868,16 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 				+ LaraItem->Pose.Orientation.y
 				- (GetRandomControl() & 0xFFF)
 				+ 10240;
-			gshell->pos.Orientation.y += Lara.LeftArm.Rotation.y 
+			gshell->pos.Orientation.SetY(gshell->pos.Orientation.GetY() + Lara.LeftArm.Rotation.y
 				+ Lara.ExtraTorsoRot.y 
-				+ LaraItem->Pose.Orientation.GetY();
+				+ LaraItem->Pose.Orientation.GetY());
 			if (gshell->speed < 24)
 				gshell->speed += 24;
 		}
 		else
 		{
 			gshell->dirXrot = Lara.LeftArm.Rotation.y 
-				+ LaraItem->Pose.Orientation.y 
+				+ LaraItem->Pose.Orientation.GetY()
 				- (GetRandomControl() & 0xFFF) 
 				+ 18432;
 		}
@@ -885,7 +885,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	else
 	{
 		gshell->dirXrot = Lara.LeftArm.Rotation.y 
-			+ LaraItem->Pose.Orientation.y 
+			+ LaraItem->Pose.Orientation.GetY()
 			+ (GetRandomControl() & 0xFFF) 
 			- 18432;
 	}
@@ -936,7 +936,7 @@ void UpdateGunShells()
 			}
 
 			gs->pos.Orientation.SetX(gs->pos.Orientation.GetX() + (gs->speed >> 1 + 7) * Angle::DegToRad(1.0f));
-			gs->pos.Orientation.y += gs->speed * Angle::DegToRad(1);
+			gs->pos.Orientation.SetY(gs->pos.Orientation.GetY() + gs->speed * Angle::DegToRad(1.0f));
 			gs->pos.Orientation.SetZ(gs->pos.Orientation.GetZ() + Angle::DegToRad(23.0f));
 
 			gs->pos.Position.x += gs->speed * sin(gs->dirXrot);

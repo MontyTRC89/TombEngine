@@ -130,7 +130,7 @@ void PushableBlockControl(short itemNumber)
 
 	Vector3Int pos = { 0, 0, 0 };
 
-	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
+	short quadrant = (unsigned short)(LaraItem->Pose.Orientation.GetY() + Angle::DegToRad(45.0f)) / Angle::DegToRad(90.0f);
 
 	int x, z;
 	int blockHeight = GetStackHeight(item);
@@ -472,7 +472,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 		PushableBlockBounds.boundingBox.Z2 = 0;
 
 		float rot = pushableItem->Pose.Orientation.GetY();
-		//pushableItem->Pose.Orientation.y = (laraItem->Pose.Orientation.y + Angle::DegToRad(45.0f)) & 0xC000;
+		//pushableItem->Pose.Orientation.SetY((laraItem->Pose.Orientation.GetY() + Angle::DegToRad(45.0f)) & 0xC000;
 
 		if (TestLaraPosition(&PushableBlockBounds, pushableItem, laraItem))
 		{
@@ -495,7 +495,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->NextCornerPos.Position.x = itemNumber;
-				pushableItem->Pose.Orientation.y = rot;
+				pushableItem->Pose.Orientation.SetY(rot);
 			}
 			else
 			{
@@ -508,12 +508,12 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					laraInfo->NextCornerPos.Position.x = itemNumber;
-					pushableItem->Pose.Orientation.y = rot;
+					pushableItem->Pose.Orientation.SetY(rot);
 				}
 				else
 				{
 					laraInfo->InteractedItem = itemNumber;
-					pushableItem->Pose.Orientation.y = rot;
+					pushableItem->Pose.Orientation.SetY(rot);
 				}
 			}
 		}
@@ -525,7 +525,7 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 				laraInfo->Control.HandStatus = HandStatus::Free;
 			}
 
-			pushableItem->Pose.Orientation.y = rot;
+			pushableItem->Pose.Orientation.SetY(rot);
 		}
 	}
 }

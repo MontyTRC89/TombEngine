@@ -124,12 +124,12 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += Angle::DegToRad(1.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(1.0f));
 			else
-				item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(1.0f));
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 		frameNumber = item->Animation.FrameNumber;
 		frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -190,12 +190,12 @@ void KnightTemplarControl(short itemNumber)
 		if (abs(AI.angle) >= Angle::DegToRad(1.0f))
 		{
 			if (AI.angle >= 0)
-				item->Pose.Orientation.y += Angle::DegToRad(1.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(1.0f));
 			else
-				item->Pose.Orientation.y -= Angle::DegToRad(1.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(1.0f));
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 		if (item->HitStatus)
 		{

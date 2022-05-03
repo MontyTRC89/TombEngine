@@ -84,7 +84,7 @@ void ControlBodyPart(short fxNumber)
 			}
 			else
 			{
-				fx->pos.Orientation.y += Angle::DegToRad(-180);
+				fx->pos.Orientation.SetY(fx->pos.Orientation.GetY() + Angle::DegToRad(-180.0f));
 				fx->pos.Position.x = x;
 				fx->pos.Position.z = z;
 			}

@@ -168,7 +168,7 @@ void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 			if (shift <= DRAGON_CLOSE && shift >= DRAGON_FAR)
 				return;
 
-			int angle = laraItem->Pose.Orientation.y - item->Pose.Orientation.GetY();
+			int angle = laraItem->Pose.Orientation.GetY() - item->Pose.Orientation.GetY();
 
 			int anim = item->Animation.AnimNumber - Objects[ID_DRAGON_BACK].animIndex;
 			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -309,7 +309,7 @@ void DragonControl(short backItemNumber)
 		switch (item->Animation.ActiveState)
 		{
 		case DRAGON_STATE_IDLE:
-			item->Pose.Orientation.y -= angle;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - angle);
 
 			if (!ahead)
 			{
@@ -390,19 +390,19 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_TURN_LEFT:
-			item->Pose.Orientation.y += -(Angle::DegToRad(1.0f) - angle);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + -(Angle::DegToRad(1.0f) - angle));
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_TURN_RIGHT:
-			item->Pose.Orientation.y += (Angle::DegToRad(1.0f) - angle);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + (Angle::DegToRad(1.0f) - angle));
 			creature->Flags = 0;
 
 			break;
 
 		case DRAGON_STATE_AIM_1:
-			item->Pose.Orientation.y -= angle;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - angle);
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -421,7 +421,7 @@ void DragonControl(short backItemNumber)
 			break;
 
 		case DRAGON_STATE_FIRE_1:
-			item->Pose.Orientation.y -= angle;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - angle);
 
 			if (AI.ahead)
 				head = -AI.angle;
@@ -470,7 +470,7 @@ void InitialiseBartoli(short itemNumber)
 		back->Pose.Position.x = item->Pose.Position.x;
 		back->Pose.Position.y = item->Pose.Position.y;
 		back->Pose.Position.z = item->Pose.Position.z;
-		back->Pose.Orientation.y = item->Pose.Orientation.GetY();
+		back->Pose.Orientation.SetY(item->Pose.Orientation.GetY());
 		back->RoomNumber = item->RoomNumber;
 		back->Status = ITEM_INVISIBLE;
 		back->Shade = -1;
@@ -486,7 +486,7 @@ void InitialiseBartoli(short itemNumber)
 		front->Pose.Position.x = item->Pose.Position.x;
 		front->Pose.Position.y = item->Pose.Position.y;
 		front->Pose.Position.z = item->Pose.Position.z;
-		front->Pose.Orientation.y = item->Pose.Orientation.GetY();
+		front->Pose.Orientation.SetY(item->Pose.Orientation.GetY());
 		front->RoomNumber = item->RoomNumber;
 		front->Status = ITEM_INVISIBLE;
 		front->Shade = -1;

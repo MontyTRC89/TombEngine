@@ -31,7 +31,7 @@ void EnemyJeepLaunchGrenade(ITEM_INFO* item)
 		InitialiseItem(grenadeItemNumber);
 
 		grenadeItem->Pose.Orientation.SetX(item->Pose.Orientation.GetX());
-		grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + Angle::DegToRad(-180.0f);
+		grenadeItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-180.0f));
 		grenadeItem->Pose.Orientation.SetZ();
 
 		grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1)* sin(grenadeItem->Pose.Orientation.GetY());
@@ -101,14 +101,14 @@ void EnemyJeepControl(short itemNumber)
 		{
 			item->Pose.Position.x += dz / 64;
 			item->Pose.Position.z += dx / 64;
-			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 			height1 = y;
 		}
 
 		int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
 		if (abs(item->Pose.Position.y - height2) > CLICK(3))
 		{
-			item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			item->Pose.Position.x -= dz / 64;
 			item->Pose.Position.z += dx / 64;
 			height2 = y;
@@ -310,7 +310,7 @@ void EnemyJeepControl(short itemNumber)
 					target->Pose.Position.x = aiObject->x;
 					target->Pose.Position.y = aiObject->y;
 					target->Pose.Position.z = aiObject->z;
-					target->Pose.Orientation.y = aiObject->yRot;
+					target->Pose.Orientation.SetY(aiObject->yRot);
 					target->Flags = aiObject->flags;
 					target->TriggerFlags = aiObject->triggerFlags;
 					target->BoxNumber = aiObject->boxNumber;

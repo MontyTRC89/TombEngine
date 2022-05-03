@@ -38,33 +38,33 @@ namespace TEN::Entities::Switches
 		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
-	void CrowbarSwitchCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
+	void CrowbarSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraitem);
+		auto* laraInfo = GetLaraInfo(laraItem);
 		ITEM_INFO* switchItem = &g_Level.Items[itemNumber];
 
 		int doSwitch = 0;
 
 		if (((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
-			laraitem->Animation.ActiveState == LS_IDLE &&
-			laraitem->Animation.AnimNumber == LA_STAND_IDLE &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->ItemFlags[0] == 0) ||
 			(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 		{
 			if (switchItem->Animation.ActiveState == SWITCH_ON)
 			{
-				laraitem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 
-				if (TestLaraPosition(&CrowbarBounds2, switchItem, laraitem))
+				if (TestLaraPosition(&CrowbarBounds2, switchItem, laraItem))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MoveLaraPosition(&CrowbarPos2, switchItem, laraitem))
+						if (MoveLaraPosition(&CrowbarPos2, switchItem, laraItem))
 						{
 							doSwitch = 1;
-							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+							laraItem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 							switchItem->Animation.TargetState = SWITCH_OFF;
 						}
 						else
@@ -81,19 +81,19 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				laraitem->Pose.Orientation.y += Angle::DegToRad(180.0f);
+				laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 			}
 			else
 			{
-				if (TestLaraPosition(&CrowbarBounds, switchItem, laraitem))
+				if (TestLaraPosition(&CrowbarBounds, switchItem, laraItem))
 				{
 					if (laraInfo->Control.IsMoving || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM)
 					{
-						if (MoveLaraPosition(&CrowbarPos, switchItem, laraitem))
+						if (MoveLaraPosition(&CrowbarPos, switchItem, laraItem))
 						{
 							doSwitch = 1;
-							laraitem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
-							laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
+							laraItem->Animation.AnimNumber = LA_CROWBAR_USE_ON_FLOOR;
+							laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 							switchItem->Animation.TargetState = SWITCH_ON;
 						}
 						else
@@ -120,20 +120,20 @@ namespace TEN::Entities::Switches
 					g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
 				else
 				{
-					if (OldPickupPos.x != laraitem->Pose.Position.x || OldPickupPos.y != laraitem->Pose.Position.y || OldPickupPos.z != laraitem->Pose.Position.z)
+					if (OldPickupPos.x != laraItem->Pose.Position.x || OldPickupPos.y != laraItem->Pose.Position.y || OldPickupPos.z != laraItem->Pose.Position.z)
 					{
-						OldPickupPos.x = laraitem->Pose.Position.x;
-						OldPickupPos.y = laraitem->Pose.Position.y;
-						OldPickupPos.z = laraitem->Pose.Position.z;
+						OldPickupPos.x = laraItem->Pose.Position.x;
+						OldPickupPos.y = laraItem->Pose.Position.y;
+						OldPickupPos.z = laraItem->Pose.Position.z;
 						SayNo();
 					}
 				}
 			}
 			else
 			{
-				ResetLaraFlex(laraitem);
-				laraitem->Animation.TargetState = LS_SWITCH_DOWN;
-				laraitem->Animation.ActiveState = LS_SWITCH_DOWN;
+				ResetLaraFlex(laraItem);
+				laraItem->Animation.TargetState = LS_SWITCH_DOWN;
+				laraItem->Animation.ActiveState = LS_SWITCH_DOWN;
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				switchItem->Status = ITEM_ACTIVE;
@@ -143,6 +143,6 @@ namespace TEN::Entities::Switches
 			}
 		}
 		else
-			ObjectCollision(itemNumber, laraitem, coll);
+			ObjectCollision(itemNumber, laraItem, coll);
 	}
 }

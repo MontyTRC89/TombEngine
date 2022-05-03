@@ -78,9 +78,9 @@ int GameScriptMeshInfo::GetRot() const
 	return m_mesh.pos.Orientation.GetY();
 }
 
-void GameScriptMeshInfo::SetRot(int yRot)
+void GameScriptMeshInfo::SetRot(float yRot)
 {
-	m_mesh.pos.Orientation.y = yRot;
+	m_mesh.pos.Orientation.SetY(yRot);
 }
 
 std::string GameScriptMeshInfo::GetName() const
@@ -88,7 +88,7 @@ std::string GameScriptMeshInfo::GetName() const
 	return m_mesh.luaName;
 }
 
-void GameScriptMeshInfo::SetName(std::string const & id) 
+void GameScriptMeshInfo::SetName(std::string const& id) 
 {
 	ScriptAssert(!id.empty(), "Name cannot be blank", ERROR_MODE::TERMINATE);
 

@@ -283,12 +283,12 @@ void ImpControl(short itemNumber)
 			if (abs(angle2) >= Angle::DegToRad(2.0f))
 			{
 				if (angle2 >= 0)
-					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 				else
-					item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			}
 			else
-				item->Pose.Orientation.y += angle2;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + angle2);
 		}
 
 		CreatureTilt(item, 0);

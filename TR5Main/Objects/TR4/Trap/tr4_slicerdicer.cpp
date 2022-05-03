@@ -13,8 +13,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		int dx = sin(item->Pose.Orientation.y + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
-		int dz = cos(item->Pose.Orientation.y + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
+		int dx = sin(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
+		int dz = cos(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f)) * SECTOR(0.5f);
 
 		item->Pose.Position.x += dx;
 		item->Pose.Position.z += dz;

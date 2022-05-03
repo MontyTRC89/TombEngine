@@ -32,7 +32,7 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.y = GetCollision(item).Position.Floor;
 			fx->pos.Position.z = (byte)GetRandomControl() + item->Pose.Position.z - 128;
 			fx->roomNumber = item->RoomNumber;
-			fx->pos.Orientation.y = 2 * GetRandomControl();
+			fx->pos.Orientation.SetY(2 * GetRandomControl());
 			fx->speed = GetRandomControl() / 2048;
 			fx->fallspeed = -(GetRandomControl() / 1024);
 			fx->frameNumber = Objects[103].meshIndex;
@@ -198,13 +198,13 @@ namespace TEN::Entities::TR4
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_2;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 33;
-				item->Pose.Orientation.y += AI.angle + -32768;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle + Angle::DegToRad(-180.0f));
 			}
 			else
 			{
 				item->Animation.ActiveState = SKELETON_STATE_HURT_BY_SHOTGUN_1;
 				item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 17;
-				item->Pose.Orientation.y += AI.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 			}
 
 			item->HitPoints = 25;
@@ -256,16 +256,16 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				dx = 870 * sin(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
-				dz = 870 * cos(item->Pose.Orientation.y + Angle::DegToRad(45.0f));
+				dx = 870 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(45.0f));
+				dz = 870 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * sin(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
-				dz = 870 * cos(item->Pose.Orientation.y + Angle::DegToRad(78.75f));
+				dx = 870 * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(78.75f));
+				dz = 870 * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -282,16 +282,16 @@ namespace TEN::Entities::TR4
 						jumpRight = false;
 				}
 
-				dx = 870 * sin(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
-				dz = 870 * cos(item->Pose.Orientation.y - Angle::DegToRad(45.0f));
+				dx = 870 * sin(item->Pose.Orientation.GetY() - Angle::DegToRad(45.0f));
+				dz = 870 * cos(item->Pose.Orientation.GetY() - Angle::DegToRad(45.0f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
 				z = item->Pose.Position.z + dz;
 				int height6 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-				dx = 870 * sin(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
-				dz = 870 * cos(item->Pose.Orientation.y - Angle::DegToRad(78.75f));
+				dx = 870 * sin(item->Pose.Orientation.GetY() - Angle::DegToRad(78.75f));
+				dz = 870 * cos(item->Pose.Orientation.GetY() - Angle::DegToRad(78.75f));
 
 				x = item->Pose.Position.x + dx;
 				y = item->Pose.Position.y;
@@ -531,12 +531,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += Angle::DegToRad(6.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(6.0f));
 					else
-						item->Pose.Orientation.y -= Angle::DegToRad(6.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(6.0f));
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 				if (!creature->Flags)
 				{
@@ -563,12 +563,12 @@ namespace TEN::Entities::TR4
 				if (abs(AI.angle) >= 1092)
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += Angle::DegToRad(6.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(6.0f));
 					else
-						item->Pose.Orientation.y -= Angle::DegToRad(6.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(6.0f));
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15)
 				{
 					auto* room = &g_Level.Rooms[item->RoomNumber];

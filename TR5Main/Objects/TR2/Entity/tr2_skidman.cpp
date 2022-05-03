@@ -54,7 +54,7 @@ void InitialiseSkidooMan(short itemNumber)
 		skidooItem->Pose.Position.x = riderItem->Pose.Position.x;
 		skidooItem->Pose.Position.y = riderItem->Pose.Position.y;
 		skidooItem->Pose.Position.z = riderItem->Pose.Position.z;
-		skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.GetY();
+		skidooItem->Pose.Orientation.SetY(riderItem->Pose.Orientation.GetY());
 		skidooItem->RoomNumber = riderItem->RoomNumber;
 		skidooItem->Flags = ITEM_INVISIBLE;
 		skidooItem->Shade = -1;
@@ -126,7 +126,7 @@ void SkidooManControl(short riderItemNumber)
 			riderItem->Pose.Position.x = item->Pose.Position.x;
 			riderItem->Pose.Position.y = item->Pose.Position.y;
 			riderItem->Pose.Position.z = item->Pose.Position.z;
-			riderItem->Pose.Orientation.y = item->Pose.Orientation.GetY();
+			riderItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY());
 			riderItem->RoomNumber = item->RoomNumber;
 
 			riderItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
@@ -232,7 +232,7 @@ void SkidooManControl(short riderItemNumber)
 		riderItem->Pose.Position.x = item->Pose.Position.x;
 		riderItem->Pose.Position.y = item->Pose.Position.y;
 		riderItem->Pose.Position.z = item->Pose.Position.z;
-		riderItem->Pose.Orientation.y = item->Pose.Orientation.GetY();
+		riderItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY());
 
 		if (item->RoomNumber != riderItem->RoomNumber)
 			ItemNewRoom(riderItemNumber, item->RoomNumber);

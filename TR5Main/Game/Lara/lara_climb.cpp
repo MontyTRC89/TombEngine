@@ -717,7 +717,7 @@ int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
 		lara->NextCornerPos.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 		lara->Control.MoveAngle = lara->NextCornerPos.Orientation.GetY();
-		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.GetY();
+		item->Pose.Orientation.SetY(lara->NextCornerPos.Orientation.GetY());
 
 		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;

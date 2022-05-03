@@ -18,13 +18,13 @@ void InitialiseLittleBats(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->Pose.Orientation.y == 0)
+	if (item->Pose.Orientation.GetY() == 0)
 		item->Pose.Position.z += CLICK(2);
-	else if (item->Pose.Orientation.y == Angle::DegToRad(-180.0f))
+	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(-180.0f))
 		item->Pose.Position.z -= CLICK(2);
-	else if (item->Pose.Orientation.y == Angle::DegToRad(-90.0f))
+	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(-90.0f))
 		item->Pose.Position.x -= CLICK(2);
-	else if (item->Pose.Orientation.y == Angle::DegToRad(90.0f))
+	else if (item->Pose.Orientation.GetY() == Angle::DegToRad(90.0f))
 		item->Pose.Position.x += CLICK(2);
 
 	if (Objects[ID_BATS_EMITTER].loaded)
@@ -189,7 +189,7 @@ void UpdateBats()
 			else if (yAngle > Velocity)
 				yAngle = Velocity;
 
-			bat->Pose.Orientation.y += yAngle;
+			bat->Pose.Orientation.SetY(bat->Pose.Orientation.GetY() + yAngle);
 			bat->Pose.Orientation.SetX(bat->Pose.Orientation.GetX() + xAngle);
 		}
 

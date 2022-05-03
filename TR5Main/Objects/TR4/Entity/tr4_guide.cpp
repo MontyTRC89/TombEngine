@@ -528,7 +528,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle < -256)
-			item->Pose.Orientation.y -= 399;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - 399);
 
 		break;
 
@@ -545,12 +545,12 @@ void GuideControl(short itemNumber)
 		if (abs(AI.angle) >= Angle::DegToRad(7.0f))
 		{
 			if (AI.angle < 0)
-				item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 			else
-				item->Pose.Orientation.y -= Angle::DegToRad(7.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(7.0f));
 		}
 		else
-			item->Pose.Orientation.y += AI.angle;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 		if (!creature->Flags)
 		{
@@ -592,7 +592,7 @@ void GuideControl(short itemNumber)
 		creature->MaxTurn = 0;
 
 		if (laraAI.angle > 256)
-			item->Pose.Orientation.y += 399;
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + 399);
 
 		break;
 
@@ -600,11 +600,11 @@ void GuideControl(short itemNumber)
 	case 43:
 		if (enemy)
 		{
-			short deltaAngle = enemy->Pose.Orientation.y - item->Pose.Orientation.GetY();
+			short deltaAngle = enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY();
 			if (deltaAngle < Angle::DegToRad(-2.0f))
-				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 			else if (deltaAngle > Angle::DegToRad(2.0f))
-				item->Pose.Orientation.y = Angle::DegToRad(2.0f);
+				item->Pose.Orientation.SetY(Angle::DegToRad(2.0f));
 		}
 
 		if (item->Animation.RequiredState == 43)
@@ -686,7 +686,7 @@ void GuideControl(short itemNumber)
 			{
 				TestTriggers(item, true);
 
-				item->Pose.Orientation.y = enemy->Pose.Orientation.GetY();
+				item->Pose.Orientation.SetY(enemy->Pose.Orientation.GetY());
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
@@ -695,13 +695,13 @@ void GuideControl(short itemNumber)
 			}
 			else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
 			{
-				if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= Angle::DegToRad(2.0f))
+				if (enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY() <= Angle::DegToRad(2.0f))
 				{
-					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < Angle::DegToRad(-2.0f))
-						item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+					if (enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY() < Angle::DegToRad(-2.0f))
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 				}
 				else
-					item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 			}
 		}
 
@@ -730,13 +730,13 @@ void GuideControl(short itemNumber)
 				SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose, 0);
 			}
 		}
-		else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= Angle::DegToRad(2.0f))
+		else if (enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY() <= Angle::DegToRad(2.0f))
 		{
-			if (enemy->Pose.Orientation.y - item->Pose.Orientation.y < Angle::DegToRad(-2.0f))
-				item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+			if (enemy->Pose.Orientation.GetY() - item->Pose.Orientation.GetY() < Angle::DegToRad(-2.0f))
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 		}
 		else
-			item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 
 		break;
 
@@ -786,7 +786,7 @@ void GuideControl(short itemNumber)
 	case 41:
 	case 42:
 		creature->MaxTurn = 0;
-		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, Angle::DegToRad(10.0f));
+		MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.GetY() - item->Pose.Orientation.y, Angle::DegToRad(10.0f));
 
 	default:
 		break;

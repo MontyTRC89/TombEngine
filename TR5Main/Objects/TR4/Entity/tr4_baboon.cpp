@@ -282,7 +282,7 @@ void BaboonControl(short itemNumber)
 				item->Pose.Position.x = creature->Enemy->Pose.Position.x;
 				item->Pose.Position.y = creature->Enemy->Pose.Position.y;
 				item->Pose.Position.z = creature->Enemy->Pose.Position.z;
-				item->Pose.Orientation.y = creature->Enemy->Pose.Orientation.GetY();
+				item->Pose.Orientation.SetY(creature->Enemy->Pose.Orientation.GetY());
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BABOON_SWITCH_ANIM;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.TargetState = BABOON_ACTIVATE_SWITCH;
@@ -514,12 +514,12 @@ void BaboonControl(short itemNumber)
 			if (abs(AI.angle) >= BABOON_ATTACK_ANGLE)
 			{
 				if (AI.angle >= 0)
-					item->Pose.Orientation.y += BABOON_ATTACK_ANGLE;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + BABOON_ATTACK_ANGLE);
 				else
-					item->Pose.Orientation.y -= BABOON_ATTACK_ANGLE;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - BABOON_ATTACK_ANGLE);
 			}
 			else
-				item->Pose.Orientation.y += AI.angle;
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 			if (creature->Flags == 0 &&
 				(item->TouchBits & BABOON_TOUCHBITS ||

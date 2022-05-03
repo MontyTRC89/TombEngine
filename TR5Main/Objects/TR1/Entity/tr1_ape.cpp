@@ -179,12 +179,12 @@ void ApeControl(short itemNumber)
 		case APE_STATE_IDLE:
 			if (creatureInfo->Flags & APE_FLAG_TURN_LEFT)
 			{
-				item->Pose.Orientation.y -= Angle::DegToRad(90.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 				creatureInfo->Flags -= APE_FLAG_TURN_LEFT;
 			}
 			else if (item->Flags & APE_FLAG_TURN_RIGHT)
 			{
-				item->Pose.Orientation.y += Angle::DegToRad(90.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 				creatureInfo->Flags -= APE_FLAG_TURN_RIGHT;
 			}
 
@@ -257,7 +257,7 @@ void ApeControl(short itemNumber)
 		case APE_STATE_RUN_LEFT:
 			if (!(creatureInfo->Flags & APE_FLAG_TURN_RIGHT))
 			{
-				item->Pose.Orientation.y -= Angle::DegToRad(90);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 				creatureInfo->Flags |= APE_FLAG_TURN_RIGHT;
 			}
 
@@ -267,7 +267,7 @@ void ApeControl(short itemNumber)
 		case APE_STATE_RUN_RIGHT:
 			if (!(creatureInfo->Flags & APE_FLAG_TURN_LEFT))
 			{
-				item->Pose.Orientation.y += Angle::DegToRad(90);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 				creatureInfo->Flags |= APE_FLAG_TURN_LEFT;
 			}
 

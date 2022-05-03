@@ -145,7 +145,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 16 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Pose.Orientation.y += Angle::DegToRad(14.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(14.0f));
 			}
 
 			if (angle < MUTANT_NEED_TURN)
@@ -159,7 +159,7 @@ void GiantMutantControl(short itemNumber)
 			else if (item->Animation.FrameNumber - creature->Flags > 13 &&
 				item->Animation.FrameNumber - creature->Flags < 23)
 			{
-				item->Pose.Orientation.y -= Angle::DegToRad(9.0f);
+				item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(9.0f));
 			}
 
 			if (angle > -MUTANT_NEED_TURN)

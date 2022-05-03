@@ -42,7 +42,7 @@ namespace TEN::Entities::Generic
 			laraInfo->InteractedItem == itemNumber)
 		{
 			short rot = poleItem->Pose.Orientation.GetY();
-			poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.GetY();
+			poleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
 
 			if (TestLaraPosition(&PoleBounds, poleItem, laraItem))
 			{
@@ -57,7 +57,7 @@ namespace TEN::Entities::Generic
 				else
 					laraInfo->InteractedItem = itemNumber;
 
-				poleItem->Pose.Orientation.y = rot;
+				poleItem->Pose.Orientation.SetY(rot);
 			}
 			else
 			{
@@ -67,7 +67,7 @@ namespace TEN::Entities::Generic
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
-				poleItem->Pose.Orientation.y = rot;
+				poleItem->Pose.Orientation.SetY(rot);
 			}
 		}
 		else if (TrInput & IN_ACTION && isLara &&
@@ -83,7 +83,7 @@ namespace TEN::Entities::Generic
 				if (TestCollision(poleItem, laraItem))
 				{
 					short rot = poleItem->Pose.Orientation.GetY();
-					poleItem->Pose.Orientation.y = laraItem->Pose.Orientation.GetY();
+					poleItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY());
 					if (laraItem->Animation.ActiveState == LS_REACH)
 					{
 						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
@@ -103,7 +103,7 @@ namespace TEN::Entities::Generic
 					laraItem->Animation.VerticalVelocity = 0;
 					laraItem->Animation.Airborne = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
-					poleItem->Pose.Orientation.y = rot;
+					poleItem->Pose.Orientation.SetY(rot);
 				}
 			}
 		}

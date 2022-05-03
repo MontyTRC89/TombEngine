@@ -483,12 +483,12 @@ void CyborgControl(short itemNumber)
 				if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 					else
-						item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 				if (Targetable(item, &AI) &&
 					(AI.distance < pow(SECTOR(4), 2) ||
@@ -511,12 +511,12 @@ void CyborgControl(short itemNumber)
 				if (abs(AI.angle) >= Angle::DegToRad(2.0f))
 				{
 					if (AI.angle >= 0)
-						item->Pose.Orientation.y += Angle::DegToRad(2.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(2.0f));
 					else
-						item->Pose.Orientation.y -= Angle::DegToRad(2.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(2.0f));
 				}
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&

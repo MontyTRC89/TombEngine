@@ -247,8 +247,8 @@ void ShivaControl(short itemNumber)
 
 			if (shiva->Mood == MoodType::Escape)
 			{
-				int x = item->Pose.Position.x + SECTOR(1) * sin(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
-				int z = item->Pose.Position.z + SECTOR(1) * cos(item->Pose.Orientation.y + Angle::DegToRad(180.0f));
+				int x = item->Pose.Position.x + SECTOR(1) * sin(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
+				int z = item->Pose.Position.z + SECTOR(1) * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
 				auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
 
 				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !shiva->Flags)

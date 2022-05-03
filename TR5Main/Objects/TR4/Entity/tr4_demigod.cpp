@@ -538,11 +538,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= Angle::DegToRad(7.0f))
-						item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 					else if (AI.angle <= Angle::DegToRad(-7))
-						item->Pose.Orientation.y += Angle::DegToRad(-7.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-7.0f));
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -602,11 +602,11 @@ namespace TEN::Entities::TR4
 				if (item->Animation.AnimNumber == Objects[(signed short)item->ObjectNumber].animIndex + 6)
 				{
 					if (AI.angle >= Angle::DegToRad(7.0f))
-						item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 					else if (AI.angle <= Angle::DegToRad(-7.0f))
-						item->Pose.Orientation.y += Angle::DegToRad(-7.0f);
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-7.0f));
 					else
-						item->Pose.Orientation.y += AI.angle;
+						item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 				}
 
 				if (Targetable(item, &AI) || creature->Flags)
@@ -628,11 +628,11 @@ namespace TEN::Entities::TR4
 				joint0 = 0;
 
 				if (AI.angle >= Angle::DegToRad(7.0f))
-					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(7.0f));
 				else if (AI.angle <= Angle::DegToRad(-7.0f))
-					item->Pose.Orientation.y += Angle::DegToRad(-7.0f);
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(-7.0f));
 				else
-					item->Pose.Orientation.y += AI.angle;
+					item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
 
 				if (AI.distance >= pow(SECTOR(3), 2) ||
 					!AI.bite &&

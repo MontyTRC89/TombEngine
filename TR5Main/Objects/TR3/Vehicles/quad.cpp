@@ -201,9 +201,9 @@ static int CanQuadbikeGetOff(int direction)
 	float angle;
 
 	if (direction < 0)
-		angle = item->Pose.Orientation.y - Angle::DegToRad(90.0f);
+		angle = item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f);
 	else
-		angle = item->Pose.Orientation.y + Angle::DegToRad(90.0f);
+		angle = item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f);
 
 	int x = item->Pose.Position.x + CLICK(2) * sin(angle);
 	int y = item->Pose.Position.y;
@@ -241,9 +241,9 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		TestLastFrame(laraItem))
 	{
 		if (laraItem->Animation.ActiveState == QUAD_STATE_DISMOUNT_LEFT)
-			laraItem->Pose.Orientation.y += Angle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 		else
-			laraItem->Pose.Orientation.y -= Angle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.SetY(laraItem->Pose.Orientation.GetY() - Angle::DegToRad(90.0f));
 
 		SetAnimation(laraItem, LA_STAND_IDLE);
 		laraItem->Pose.Position.x -= DISMOUNT_DISTANCE * sin(laraItem->Pose.Orientation.GetY());
@@ -316,7 +316,7 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo
 
 		if ((angle > Angle::DegToRad(-45.0f)) && (angle < Angle::DegToRad(135.0f)))
 		{
-			float tempAngle = Angle::Normalize(laraItem->Pose.Orientation.y - quadItem->Pose.Orientation.GetY());
+			float tempAngle = Angle::Normalize(laraItem->Pose.Orientation.GetY() - quadItem->Pose.Orientation.GetY());
 			if (tempAngle > Angle::DegToRad(45.0f) && tempAngle < Angle::DegToRad(135.0f))
 				return true;
 			else
@@ -324,7 +324,7 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo
 		}
 		else
 		{
-			float tempAngle = Angle::Normalize(laraItem->Pose.Orientation.y - quadItem->Pose.Orientation.GetY());
+			float tempAngle = Angle::Normalize(laraItem->Pose.Orientation.GetY() - quadItem->Pose.Orientation.GetY());
 			if (tempAngle > Angle::DegToRad(225.0f) && tempAngle < Angle::DegToRad(315.0f))
 				return true;
 			else
@@ -625,19 +625,19 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		else
 			quad->TurnRate = 0;
 
-		quadItem->Pose.Orientation.y += quad->TurnRate + quad->ExtraRotation;
+		quadItem->Pose.Orientation.SetY(quadItem->Pose.Orientation.GetY() + quad->TurnRate + quad->ExtraRotation);
 
 		float momentum = MIN_MOMENTUM_TURN - (((((MIN_MOMENTUM_TURN - MAX_MOMENTUM_TURN) * 256) / MAX_VELOCITY) * quad->Velocity) / 256);
 		if (!(TrInput & QUAD_IN_ACCELERATE) && quad->Velocity > 0)
 			momentum += momentum / 4;
 
-		float rot = quadItem->Pose.Orientation.y - quad->MomentumAngle;
+		float rot = quadItem->Pose.Orientation.GetY() - quad->MomentumAngle;
 		if (rot < -MAX_MOMENTUM_TURN)
 		{
 			if (rot < -QUAD_MAX_MOM_TURN)
 			{
 				rot = -QUAD_MAX_MOM_TURN;
-				quad->MomentumAngle = quadItem->Pose.Orientation.y - rot;
+				quad->MomentumAngle = quadItem->Pose.Orientation.GetY() - rot;
 			}
 			else
 				quad->MomentumAngle -= momentum;
@@ -647,7 +647,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 			if (rot > QUAD_MAX_MOM_TURN)
 			{
 				rot = QUAD_MAX_MOM_TURN;
-				quad->MomentumAngle = quadItem->Pose.Orientation.y - rot;
+				quad->MomentumAngle = quadItem->Pose.Orientation.GetY() - rot;
 			}
 			else
 				quad->MomentumAngle += momentum;
@@ -656,7 +656,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 			quad->MomentumAngle = quadItem->Pose.Orientation.GetY();
 	}
 	else
-		quadItem->Pose.Orientation.y += quad->TurnRate + quad->ExtraRotation;
+		quadItem->Pose.Orientation.SetY(quadItem->Pose.Orientation.GetY() + quad->TurnRate + quad->ExtraRotation);
 
 	auto probe = GetCollision(quadItem);
 	int speed = 0;
@@ -1125,7 +1125,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 			else
 				quad->Velocity = MAX_VELOCITY;
 
-			quad->Velocity -= abs(quadItem->Pose.Orientation.y - quad->MomentumAngle) / 64;
+			quad->Velocity -= abs(quadItem->Pose.Orientation.GetY() - quad->MomentumAngle) / 64;
 		}
 
 		else if (quad->Velocity > 0x0100)
@@ -1211,7 +1211,7 @@ void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Pose.Position = quadItem->Pose.Position;
-		laraItem->Pose.Orientation.y = quadItem->Pose.Orientation.GetY();
+		laraItem->Pose.Orientation.SetY(quadItem->Pose.Orientation.GetY());
 		ResetLaraFlex(laraItem);
 		lara->HitDirection = -1;
 		quadItem->HitPoints = 1;
@@ -1417,7 +1417,7 @@ bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 			pos.y = quadEffectsPositions[i].y;
 			pos.z = quadEffectsPositions[i].z;
 			GetJointAbsPosition(quadItem, &pos, quadEffectsPositions[i].meshNum);
-			angle = quadItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
+			angle = quadItem->Pose.Orientation.GetY() + ((i == 0) ? 0x9000 : 0x7000);
 			if (quadItem->Animation.Velocity > 32)
 			{
 				if (quadItem->Animation.Velocity < 64)

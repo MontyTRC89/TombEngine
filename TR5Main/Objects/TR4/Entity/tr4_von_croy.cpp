@@ -658,7 +658,7 @@ void VonCroyControl(short itemNumber)
 		if (item->ItemFlags[2] == 0)
 			ClampRotation(&item->Pose, laraAI.angle, Angle::DegToRad(2.8f));
 		else
-			ClampRotation(&item->Pose, enemy->Pose.Orientation.y - item->Pose.Orientation.y, Angle::DegToRad(2.8f));
+			ClampRotation(&item->Pose, enemy->Pose.Orientation.GetY() - item->Pose.Orientation.y, Angle::DegToRad(2.8f));
 		
 		break;
 

@@ -202,9 +202,9 @@ static bool TestMinecartDismount(ITEM_INFO* laraItem, int direction)
 	
 	short angle;
 	if (direction < 0)
-		angle = minecartItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
+		angle = minecartItem->Pose.Orientation.GetY() + Angle::DegToRad(90.0f);
 	else
-		angle = minecartItem->Pose.Orientation.y - Angle::DegToRad(90.0f);
+		angle = minecartItem->Pose.Orientation.GetY() - Angle::DegToRad(90.0f);
 
 	auto probe = GetCollision(minecartItem, angle, -DISMOUNT_DISTANCE);
 
@@ -416,18 +416,18 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 		if (minecart->TurnLen > Angle::DegToRad(90.0f))
 		{
 			if (minecart->Flags & CART_FLAG_TURNING_LEFT)
-				minecartItem->Pose.Orientation.y = minecart->TurnRot - Angle::DegToRad(90.0f);
+				minecartItem->Pose.Orientation.SetY(minecart->TurnRot - Angle::DegToRad(90.0f));
 			else
-				minecartItem->Pose.Orientation.y = minecart->TurnRot + Angle::DegToRad(90.0f);
+				minecartItem->Pose.Orientation.SetY(minecart->TurnRot + Angle::DegToRad(90.0f));
 
 			minecart->Flags &= ~(CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT);
 		}
 		else
 		{
 			if (minecart->Flags & CART_FLAG_TURNING_LEFT)
-				minecartItem->Pose.Orientation.y = minecart->TurnRot - minecart->TurnLen;
+				minecartItem->Pose.Orientation.SetY(minecart->TurnRot - minecart->TurnLen);
 			else
-				minecartItem->Pose.Orientation.y = minecart->TurnRot + minecart->TurnLen;
+				minecartItem->Pose.Orientation.SetY(minecart->TurnRot + minecart->TurnLen);
 		}
 
 		if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
@@ -508,7 +508,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 
 	if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
 	{
-		short val = 0;// minecartItem->Pose.Orientation.y & 16383;
+		short val = 0;// minecartItem->Pose.Orientation.GetY()& 16383;
 		if (minecart->Flags & CART_FLAG_TURNING_RIGHT)
 			minecartItem->Pose.Orientation.SetZ(-(val * minecartItem->Animation.Velocity) / 512);
 		else
@@ -691,9 +691,9 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 			laraItem->Pose.Position.y = pos.y;
 			laraItem->Pose.Position.z = pos.z;
 			laraItem->Pose.Orientation.SetX();
-			laraItem->Pose.Orientation.y = Angle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.SetY(Angle::DegToRad(90.0f));
 			laraItem->Pose.Orientation.SetZ();
-			minecartItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
+			minecartItem->Pose.Orientation.GetY() + Angle::DegToRad(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
 			lara->Control.HandStatus = HandStatus::Free;
@@ -711,9 +711,9 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 
 			laraItem->Pose.Position= pos;
 			laraItem->Pose.Orientation.SetX();
-			laraItem->Pose.Orientation.y = Angle::DegToRad(90.0f);
+			laraItem->Pose.Orientation.SetY(Angle::DegToRad(90.0f));
 			laraItem->Pose.Orientation.SetZ();
-			minecartItem->Pose.Orientation.y + Angle::DegToRad(90.0f);
+			minecartItem->Pose.Orientation.GetY() + Angle::DegToRad(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
 			lara->Control.HandStatus = HandStatus::Free;

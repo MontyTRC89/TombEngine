@@ -66,7 +66,7 @@ void KnifeControl(short fxNumber)
 		LaraItem->HitPoints -= 50;
 		LaraItem->HitStatus = true;
 
-		fx->pos.Orientation.y = LaraItem->Pose.Orientation.GetY();
+		fx->pos.Orientation.SetY(LaraItem->Pose.Orientation.GetY());
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 

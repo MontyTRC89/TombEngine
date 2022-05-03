@@ -159,7 +159,7 @@ void InitialiseLaserHead(short itemNumber)
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE && g_Level.Items[i].Pose.Orientation.y == rotation)
+			if (g_Level.Items[i].ObjectNumber == ID_LASERHEAD_TENTACLE && g_Level.Items[i].Pose.Orientation.GetY() == rotation)
 			{
 				info->Tentacles[j] = i;
 				break;
@@ -236,7 +236,7 @@ void LaserHeadControl(short itemNumber)
 
 			if (!(GlobalCounter & 7))
 			{
-				item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) - 4096;
+				item->ItemFlags[3] = item->Pose.Orientation.GetY() + (GetRandomControl() & 0x3FFF) - 4096;
 				item->TriggerFlags = (GetRandomControl() & 0x1000) - 2048;
 			}
 
@@ -326,7 +326,7 @@ void LaserHeadControl(short itemNumber)
 						float xRot = (GetRandomControl() / 4) - 4096;
 						float yRot;
 						if (condition)
-							yRot = item->Pose.Orientation.y + (GetRandomControl() & 0x3FFF) + Angle::DegToRad(135.0f);
+							yRot = item->Pose.Orientation.GetY() + (GetRandomControl() & 0x3FFF) + Angle::DegToRad(135.0f);
 						else
 							yRot = 2 * GetRandomControl();
 						int v = ((GetRandomControl() & 0x1FFF) + 8192);
@@ -665,7 +665,7 @@ void LaserHeadControl(short itemNumber)
 
 			item->Animation.Velocity = 3;
 			item->ItemFlags[0] = 3;
-			item->ItemFlags[3] = item->Pose.Orientation.y + (GetRandomControl() & 0x1000) - 2048;
+			item->ItemFlags[3] = item->Pose.Orientation.GetY() + (GetRandomControl() & 0x1000) - 2048;
 			item->TriggerFlags = item->Pose.Orientation.GetX() + (GetRandomControl() & 0x1000) - 2048;
 		}
 	}

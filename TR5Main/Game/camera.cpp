@@ -146,10 +146,10 @@ void MoveCamera(GameVector* ideal, int speed)
 	}
 
 	if (OldCam.pos.Orientation.GetX() != LaraItem->Pose.Orientation.GetX() ||
-		OldCam.pos.Orientation.y != LaraItem->Pose.Orientation.y ||
+		OldCam.pos.Orientation.GetY() != LaraItem->Pose.Orientation.GetY()||
 		OldCam.pos.Orientation.z != LaraItem->Pose.Orientation.z ||
 		OldCam.pos2.Orientation.GetX() != Lara.ExtraHeadRot.x ||
-		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
+		OldCam.pos2.Orientation.GetY() != Lara.ExtraHeadRot.y ||
 		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
 		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.y ||
 		OldCam.pos.Position.x != LaraItem->Pose.Position.x ||
@@ -169,9 +169,9 @@ void MoveCamera(GameVector* ideal, int speed)
 	{
 		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
 		OldCam.pos2.Orientation.SetX(Lara.ExtraHeadRot.GetX());
-		OldCam.pos2.Orientation.y = Lara.ExtraHeadRot.y;
-		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
-		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.y;
+		OldCam.pos2.Orientation.SetY(Lara.ExtraHeadRot.GetY());
+		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.GetX();
+		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.GetY();
 		OldCam.pos.Position = LaraItem->Pose.Position;
 		OldCam.ActiveState = LaraItem->Animation.ActiveState;
 		OldCam.TargetState = LaraItem->Animation.TargetState;
@@ -444,7 +444,7 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + atan2(pos.z, pos.x);
 	}
 	else
-		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
+		Camera.actualAngle = LaraItem->Pose.Orientation.GetY() + Camera.targetAngle;
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
@@ -801,9 +801,9 @@ void LookCamera(ITEM_INFO* item)
 	else
 		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
 	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.GetY()) >= 16)
-		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.GetY()) / 2;
+		OldCam.pos.Orientation.SetY((lara->ExtraHeadRot.GetY() + OldCam.pos.Orientation.GetY()) / 2);
 	else
-		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
+		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.GetY());
 
 	auto pos = Vector3Int(0, CLICK(0.25f) / 4, CLICK(0.25f));
 	GetLaraJointPosition(&pos, LM_HEAD);
@@ -892,7 +892,7 @@ void LookCamera(ITEM_INFO* item)
 	 auto ideal = GameVector(x, y, z, roomNumber);
 
 	if (OldCam.pos.Orientation.GetX() == lara->ExtraHeadRot.x &&
-		OldCam.pos.Orientation.y == lara->ExtraHeadRot.y &&
+		OldCam.pos.Orientation.GetY() == lara->ExtraHeadRot.y &&
 		OldCam.pos.Position == item->Pose.Position &&
 		OldCam.ActiveState == item->Animation.ActiveState &&
 		OldCam.TargetState == item->Animation.TargetState &&
@@ -906,7 +906,7 @@ void LookCamera(ITEM_INFO* item)
 	else
 	{
 		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
-		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
+		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.GetY());
 		OldCam.pos.Position = item->Pose.Position;
 		OldCam.ActiveState = item->Animation.ActiveState;
 		OldCam.TargetState = item->Animation.TargetState;
@@ -1017,7 +1017,7 @@ void LookCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.actualAngle = item->Pose.Orientation.GetY() + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
 		Camera.mikePos.x = item->Pose.Position.x;
 		Camera.mikePos.y = item->Pose.Position.y;
 		Camera.mikePos.z = item->Pose.Position.z;
@@ -1117,9 +1117,9 @@ void BinocularCamera(ITEM_INFO* item)
 
 	int l = SECTOR(20.25f) * cos(headXRot);
 
-	int tx = x + l * sin(item->Pose.Orientation.y + headYRot);
+	int tx = x + l * sin(item->Pose.Orientation.GetY() + headYRot);
 	int ty = y - SECTOR(20.25f) * sin(headXRot);
-	int tz = z + l * cos(item->Pose.Orientation.y + headYRot);
+	int tz = z + l * cos(item->Pose.Orientation.GetY() + headYRot);
 
 	if (Camera.oldType == CameraType::Fixed)
 	{
@@ -1158,7 +1158,7 @@ void BinocularCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.actualAngle = item->Pose.Orientation.GetY() + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
 		Camera.mikePos.x = item->Pose.Position.x;
 		Camera.mikePos.y = item->Pose.Position.y;
 		Camera.mikePos.z = item->Pose.Position.z;

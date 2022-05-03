@@ -119,7 +119,7 @@ void LoadItems()
 			item->Pose.Position.x = ReadInt32();
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
-			item->Pose.Orientation.y = Angle::ShrtToRad(ReadInt16()); // TODO
+			item->Pose.Orientation.SetY(Angle::ShrtToRad(ReadInt16())); // TODO
 			item->Shade = ReadInt16();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();

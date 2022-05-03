@@ -85,8 +85,8 @@ void MissileControl(short itemNumber)
 			else
 				dx = dh;
 
-			fx->pos.Orientation.y += dy;
 			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + dx);
+			fx->pos.Orientation.SetY(fx->pos.Orientation.GetY() + dy);
 		}
 		
 		fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + 16 * fx->speed);
