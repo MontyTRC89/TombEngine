@@ -26,3 +26,4 @@ x64/
 *.wav
 *.trc
 *.str
+packages/
