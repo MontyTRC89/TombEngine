@@ -18,6 +18,7 @@ public:
 
 	std::string ToString() const;
 
+	void ToLength(int newLength);
 	void StoreInPHDPos(PHD_3DPOS& pos) const;
 	void StoreInGameVector(GAME_VECTOR& vec) const;
 
@@ -25,3 +26,6 @@ public:
 };
 
 Vec3 AddVec3s(Vec3 const& one, Vec3 const& two);
+Vec3 SubtractVec3s(Vec3 const& one, Vec3 const& two);
+Vec3 MultiplyVec3Number(Vec3 const& one, double const & two);
+Vec3 UnaryMinusVec3(Vec3 const& one);
