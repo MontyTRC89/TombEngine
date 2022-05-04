@@ -439,7 +439,7 @@ namespace TEN::Entities::TR4
 		spark->size = size;
 	}
 
-	void WraithWallsEffect(Vector3Int pos, short yRot, short objectNumber)
+	void WraithWallsEffect(Vector3Int pos, float yOrient, short objectNumber)
 	{
 		byte sR, sG, sB, dR, dG, dB;
 		short color;
@@ -461,7 +461,8 @@ namespace TEN::Entities::TR4
 			dR = 24;
 			dG = (GetRandomControl() & 0x1F) + 64;
 		}
-		else {
+		else
+		{
 			color = (GetRandomControl() & 0x1F) + 64;
 			dG = color;
 			dR = color;
@@ -491,11 +492,11 @@ namespace TEN::Entities::TR4
 			spark->x = (GetRandomControl() & 0x1F) + pos.x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + pos.y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + pos.z - 16;
-			short rot = yRot + GetRandomControl() - Angle::DegToRad(90.0f);
+			float orient = yOrient + Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f));
 			short velocity = ((GetRandomControl() & 0x3FF) + 1024);
-			spark->xVel = velocity * sin(rot);
+			spark->xVel = velocity * sin(orient);
 			spark->yVel = (GetRandomControl() & 0x7F) - 64;
-			spark->zVel = velocity * cos(rot);
+			spark->zVel = velocity * cos(orient);
 			spark->friction = 4;
 			spark->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
 			spark->maxYvel = 0;

@@ -374,6 +374,11 @@ struct Vector2Int
 		this->x = x;
 		this->y = y;
 	}
+
+	Vector2 ToVector2()
+	{
+		return Vector2(x, y);
+	}
 };
 
 struct Vector3Int
@@ -381,7 +386,26 @@ struct Vector3Int
 	int x;
 	int y;
 	int z;
-	
+
+	Vector3Int()
+	{
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
+	}
+
+	Vector3Int(int x, int y, int z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+
+	Vector3 ToVector3()
+	{
+		return Vector3(x, y, z);
+	}
+
 	bool operator ==(Vector3Int vector)
 	{
 		return (x == vector.x && y == vector.y && z == vector.z);
@@ -454,48 +478,29 @@ struct Vector3Int
 		*this = *this / value;
 		return *this;
 	}
-	
-	Vector3Int()
-	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-	}
-
-	Vector3Int(int x, int y, int z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
-	Vector3 ToVector3()
-	{
-		return Vector3(x, y, z);
-	}
 };
 
 struct PoseData
 {
-	Vector3Int Position;
+	Vector3Int  Position;
 	EulerAngles Orientation;
 
 	PoseData()
 	{
 		this->Position = Vector3Int();
-		this->Orientation.Set(EulerAngles::Zero);
+		this->Orientation = EulerAngles::Zero;
 	}
 
 	PoseData(Vector3Int pos)
 	{
 		this->Position = pos;
-		this->Orientation.Set(EulerAngles::Zero);
+		this->Orientation = EulerAngles::Zero;
 	}
 
 	PoseData(int xPos, int yPos, int zPos)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
-		this->Orientation.Set(EulerAngles::Zero);
+		this->Orientation = EulerAngles::Zero;
 	}
 
 	PoseData(EulerAngles orient)
@@ -513,6 +518,18 @@ struct PoseData
 	PoseData(Vector3Int pos, EulerAngles orient)
 	{
 		this->Position = pos;
+		this->Orientation = orient;
+	}
+
+	PoseData(Vector3Int pos, float xOrient, float yOrient, float zOrient)
+	{
+		this->Position = pos;
+		this->Orientation.Set(xOrient, yOrient, zOrient);
+	}
+
+	PoseData(int xPos, int yPos, int zPos, EulerAngles orient)
+	{
+		this->Position = Vector3Int(xPos, yPos, zPos);
 		this->Orientation = orient;
 	}
 

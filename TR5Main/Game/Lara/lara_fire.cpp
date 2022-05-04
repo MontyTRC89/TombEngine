@@ -1054,7 +1054,8 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 		laraItem->Pose.Position.x,
 		muzzleOffset.y,
 		laraItem->Pose.Position.z,
-		laraItem->RoomNumber);
+		laraItem->RoomNumber
+	);
 
 	ITEM_INFO* bestItem = NULL;
 	float bestYrot = FLT_MAX;
@@ -1085,8 +1086,8 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 							auto angles = GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z);
 
 							angles.Set(
-								angles.GetX() - laraItem->Pose.Orientation.GetX() + lara->ExtraTorsoRot.GetX(),
-								angles.GetY() - laraItem->Pose.Orientation.GetY() + lara->ExtraTorsoRot.GetY(),
+								angles.GetX() - (laraItem->Pose.Orientation.GetX() + lara->ExtraTorsoRot.GetX()),
+								angles.GetY() - (laraItem->Pose.Orientation.GetY() + lara->ExtraTorsoRot.GetY()),
 								0.0f
 							);
 

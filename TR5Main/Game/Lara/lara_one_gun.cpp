@@ -285,7 +285,7 @@ void FireShotgun(ITEM_INFO* laraItem)
 	{
 		armOrient.Set(
 			lara->ExtraTorsoRot.GetX() + lara->LeftArm.Orientation.GetX(),
-			lara->ExtraTorsoRot.GetY() + lara->LeftArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY(),
+			lara->ExtraTorsoRot.GetY() + (lara->LeftArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY()),
 			0.0f
 		);
 	}
