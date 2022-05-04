@@ -781,8 +781,7 @@ void LookCamera(ITEM_INFO* item)
 	auto oldHeadRot = lara->ExtraHeadRot;
 	auto oldTorsoRot = lara->ExtraTorsoRot;
 
-	lara->ExtraTorsoRot.SetX();
-	lara->ExtraTorsoRot.SetY();
+	lara->ExtraTorsoRot = EulerAngles::Zero;
 	lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() * 2);
 	lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() * 2);
 
@@ -796,11 +795,12 @@ void LookCamera(ITEM_INFO* item)
 	else if (lara->ExtraHeadRot.GetY() > Angle::DegToRad(80.0f))
 		lara->ExtraHeadRot.SetY(Angle::DegToRad(80.0f));
 
-	if (abs(lara->ExtraHeadRot.GetX() - OldCam.pos.Orientation.GetX()) >= 16)
+	// Prevent following of breathing motion.
+	if (abs(Angle::Normalize(lara->ExtraHeadRot.GetX() - OldCam.pos.Orientation.GetX())) >= Angle::DegToRad(0.09f))
 		OldCam.pos.Orientation.SetX((lara->ExtraHeadRot.GetX() + OldCam.pos.Orientation.GetX()) / 2);
 	else
 		OldCam.pos.Orientation.SetX(lara->ExtraHeadRot.GetX());
-	if (abs(lara->ExtraHeadRot.GetY() - OldCam.pos.Orientation.GetY()) >= 16)
+	if (abs(Angle::Normalize(lara->ExtraHeadRot.GetY() - OldCam.pos.Orientation.GetY())) >= Angle::DegToRad(0.09f))
 		OldCam.pos.Orientation.SetY((lara->ExtraHeadRot.GetY() + OldCam.pos.Orientation.GetY()) / 2);
 	else
 		OldCam.pos.Orientation.SetY(lara->ExtraHeadRot.GetY());
@@ -1017,7 +1017,7 @@ void LookCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Pose.Orientation.GetY() + lara->ExtraHeadRot.GetY() + lara->ExtraTorsoRot.GetY();
+		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.GetY() + lara->ExtraHeadRot.GetY() + lara->ExtraTorsoRot.GetY());
 		Camera.mikePos.x = item->Pose.Position.x;
 		Camera.mikePos.y = item->Pose.Position.y;
 		Camera.mikePos.z = item->Pose.Position.z;
