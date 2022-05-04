@@ -171,8 +171,8 @@ bool SaveGame::Save(int slot)
 	Save::Vector3 nextCornerPos = Save::Vector3(Lara.NextCornerPos.Position.x, Lara.NextCornerPos.Position.y, Lara.NextCornerPos.Position.z);
 	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.Orientation.GetX(), Lara.NextCornerPos.Orientation.GetY(), Lara.NextCornerPos.Orientation.GetZ());
 
-	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Rotation.GetX(), Lara.LeftArm.Rotation.GetY(), Lara.LeftArm.Rotation.GetZ());
-	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Rotation.GetX(), Lara.RightArm.Rotation.GetY(), Lara.RightArm.Rotation.GetZ());
+	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Orientation.GetX(), Lara.LeftArm.Orientation.GetY(), Lara.LeftArm.Orientation.GetZ());
+	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Orientation.GetX(), Lara.RightArm.Orientation.GetY(), Lara.RightArm.Orientation.GetZ());
 	
 	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.GetX(), Lara.ExtraHeadRot.GetY(), Lara.ExtraHeadRot.GetZ());
 	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.GetX(), Lara.ExtraTorsoRot.GetY(), Lara.ExtraTorsoRot.GetZ());
@@ -180,8 +180,8 @@ bool SaveGame::Save(int slot)
 	Save::Vector3 waterCurrentPull = Save::Vector3(Lara.WaterCurrentPull.x, Lara.WaterCurrentPull.y, Lara.WaterCurrentPull.z);
 
 	std::vector<int> laraTargetAngles{};
-	laraTargetAngles.push_back(Lara.TargetArmAngles[0]);
-	laraTargetAngles.push_back(Lara.TargetArmAngles[1]);
+	laraTargetAngles.push_back(Lara.TargetArmOrient.GetY());
+	laraTargetAngles.push_back(Lara.TargetArmOrient.GetX());
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
 	std::vector<int> subsuitVelocity{};
@@ -1287,9 +1287,9 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Rotation.SetX(s->lara()->left_arm()->rotation()->x());
-	Lara.LeftArm.Rotation.SetY(s->lara()->left_arm()->rotation()->y());
-	Lara.LeftArm.Rotation.SetZ(s->lara()->left_arm()->rotation()->z());
+	Lara.LeftArm.Orientation.SetX(s->lara()->left_arm()->rotation()->x());
+	Lara.LeftArm.Orientation.SetY(s->lara()->left_arm()->rotation()->y());
+	Lara.LeftArm.Orientation.SetZ(s->lara()->left_arm()->rotation()->z());
 	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
@@ -1307,9 +1307,9 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Rotation.SetX(s->lara()->right_arm()->rotation()->x());
-	Lara.RightArm.Rotation.SetY(s->lara()->right_arm()->rotation()->y());
-	Lara.RightArm.Rotation.SetZ(s->lara()->right_arm()->rotation()->z());
+	Lara.RightArm.Orientation.SetX(s->lara()->right_arm()->rotation()->x());
+	Lara.RightArm.Orientation.SetY(s->lara()->right_arm()->rotation()->y());
+	Lara.RightArm.Orientation.SetZ(s->lara()->right_arm()->rotation()->z());
 	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
 	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
@@ -1343,8 +1343,8 @@ bool SaveGame::Load(int slot)
 	Lara.SpasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.SprintEnergy = s->lara()->sprint_energy();
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
-	Lara.TargetArmAngles[0] = s->lara()->target_arm_angles()->Get(0);
-	Lara.TargetArmAngles[1] = s->lara()->target_arm_angles()->Get(1);
+	Lara.TargetArmOrient.SetY(s->lara()->target_arm_angles()->Get(0));
+	Lara.TargetArmOrient.SetX(s->lara()->target_arm_angles()->Get(1));
 	Lara.TargetOrientation.SetY(s->lara()->target_facing_angle());
 	Lara.Vehicle = s->lara()->vehicle();
 	Lara.WaterSurfaceDist = s->lara()->water_surface_dist();

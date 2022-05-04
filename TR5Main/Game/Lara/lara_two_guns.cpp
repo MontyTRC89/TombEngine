@@ -42,7 +42,6 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int soundPlayed = false;
-	float angleLeft[2], angleRight[2];
 
 	if (laraItem->MeshBits)
 	{
@@ -111,10 +110,13 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 			{
 				if (weaponType != LaraWeaponType::Revolver)
 				{
-					angleRight[0] = lara->RightArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY();
-					angleRight[1] = lara->RightArm.Rotation.GetX();
+					auto rightArmOrient = EulerAngles(
+						lara->RightArm.Orientation.GetX(),
+						lara->RightArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY(),
+						0.0f
+					);
 
-					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleRight) != FireWeaponType::NoAmmo)
+					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, rightArmOrient) != FireWeaponType::NoAmmo)
 					{
 						SmokeCountR = 28;
 						SmokeWeapon = weaponType;
@@ -198,10 +200,13 @@ void AnimatePistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				angleLeft[0] = lara->LeftArm.Rotation.GetY() + laraItem->Pose.Orientation.GetY();
-				angleLeft[1] = lara->LeftArm.Rotation.GetX();
+				auto leftArmOrient = EulerAngles(
+					lara->LeftArm.Orientation.GetX(),
+					lara->LeftArm.Orientation.GetY() + laraItem->Pose.Orientation.GetY(),
+					0.0f
+				);
 
-				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleLeft) != FireWeaponType::NoAmmo)
+				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, leftArmOrient) != FireWeaponType::NoAmmo)
 				{
 					if (weaponType == LaraWeaponType::Revolver)
 					{
@@ -290,21 +295,21 @@ void PistolHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (lara->LeftArm.Locked && !lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot = lara->LeftArm.Rotation / 2;
+		lara->ExtraTorsoRot = lara->LeftArm.Orientation / 2;
 
 		if (Camera.oldType != CameraType::Look)
 			lara->ExtraHeadRot = lara->ExtraTorsoRot;
 	}
 	else if (!lara->LeftArm.Locked && lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot = lara->RightArm.Rotation / 2;
+		lara->ExtraTorsoRot = lara->RightArm.Orientation / 2;
 
 		if (Camera.oldType != CameraType::Look)
 			lara->ExtraHeadRot = lara->ExtraTorsoRot;
 	}
 	else if (lara->LeftArm.Locked && lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot = (lara->LeftArm.Rotation + lara->RightArm.Rotation) / 4;
+		lara->ExtraTorsoRot = (lara->LeftArm.Orientation + lara->RightArm.Orientation) / 4;
 
 		if (Camera.oldType != CameraType::Look)
 			lara->ExtraHeadRot = lara->ExtraTorsoRot;
@@ -330,8 +335,8 @@ void ReadyPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Rotation = EulerAngles::Zero;
-	lara->RightArm.Rotation = EulerAngles::Zero;
+	lara->LeftArm.Orientation = EulerAngles::Zero;
+	lara->RightArm.Orientation = EulerAngles::Zero;
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->TargetEntity = nullptr;
@@ -386,12 +391,12 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	}*/
 	else if (frameLeft > 0 && frameLeft < p->Draw1Anim)
 	{
-		lara->LeftArm.Rotation -= lara->LeftArm.Rotation / frameLeft;
+		lara->LeftArm.Orientation -= lara->LeftArm.Orientation / frameLeft;
 		frameLeft--;
 	}
 	else if (frameLeft == 0)
 	{
-		lara->LeftArm.Rotation = EulerAngles::Zero;
+		lara->LeftArm.Orientation = EulerAngles::Zero;
 		frameLeft = p->RecoilAnim - 1;
 	}
 	else if (frameLeft > p->Draw1Anim && (frameLeft < p->RecoilAnim))
@@ -421,12 +426,12 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	}*/
 	else if (frameRight > 0 && frameRight < p->Draw1Anim)
 	{
-		lara->RightArm.Rotation -= lara->RightArm.Rotation / frameRight;
+		lara->RightArm.Orientation -= lara->RightArm.Orientation / frameRight;
 		frameRight--;
 	}
 	else if (frameRight == 0)
 	{
-		lara->RightArm.Rotation = EulerAngles::Zero;
+		lara->RightArm.Orientation = EulerAngles::Zero;
 		frameRight = p->RecoilAnim - 1;
 	}
 	else if (frameRight > p->Draw1Anim && (frameRight < p->RecoilAnim))
@@ -454,8 +459,8 @@ void UndrawPistols(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 
 	if (!(TrInput & IN_LOOK))
 	{
-		lara->ExtraHeadRot = (lara->LeftArm.Rotation + lara->RightArm.Rotation) / 4;
-		lara->ExtraTorsoRot = (lara->LeftArm.Rotation + lara->RightArm.Rotation) / 4;
+		lara->ExtraHeadRot = (lara->LeftArm.Orientation + lara->RightArm.Orientation) / 4;
+		lara->ExtraTorsoRot = (lara->LeftArm.Orientation + lara->RightArm.Orientation) / 4;
 	}
 }
 

@@ -458,8 +458,8 @@ void CombatCamera(ITEM_INFO* item)
 
 	if (lara->TargetEntity)
 	{
-		Camera.targetAngle = lara->TargetArmAngles[0];
-		Camera.targetElevation = lara->TargetArmAngles[1] + item->Pose.Orientation.GetX();
+		Camera.targetAngle = lara->TargetArmOrient.GetY();
+		Camera.targetElevation = lara->TargetArmOrient.GetX() + item->Pose.Orientation.GetX();
 	}
 	else
 	{

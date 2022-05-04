@@ -127,12 +127,12 @@ void Renderer11::updateLaraAnimations(bool force)
 		// While handling weapon some extra rotation could be applied to arms
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol || Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
 		{
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(Lara.LeftArm.Rotation.GetX()), Lara.LeftArm.Rotation.GetY(), Lara.LeftArm.Rotation.GetZ();
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Rotation.GetX()), Lara.RightArm.Rotation.GetY(), Lara.RightArm.Rotation.GetZ();
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(Lara.LeftArm.Orientation.GetX()), Lara.LeftArm.Orientation.GetY(), Lara.LeftArm.Orientation.GetZ();
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Orientation.GetX()), Lara.RightArm.Orientation.GetY(), Lara.RightArm.Orientation.GetZ();
 		}
 		else
 		{
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Rotation.GetX(), Lara.RightArm.Rotation.GetY(), Lara.RightArm.Rotation.GetZ());
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(Lara.RightArm.Orientation.GetX(), Lara.RightArm.Orientation.GetY(), Lara.RightArm.Orientation.GetZ());
 			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
 		}
 

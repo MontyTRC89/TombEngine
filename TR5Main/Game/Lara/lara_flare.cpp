@@ -88,8 +88,8 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::Free;
-	lara->LeftArm.Rotation = EulerAngles::Zero;
-	lara->RightArm.Rotation = EulerAngles::Zero;
+	lara->LeftArm.Orientation = EulerAngles::Zero;
+	lara->RightArm.Orientation = EulerAngles::Zero;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
 	lara->TargetEntity = NULL;

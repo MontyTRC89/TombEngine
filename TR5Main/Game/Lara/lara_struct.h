@@ -1063,8 +1063,9 @@ struct ArmInfo
 	int AnimNumber;
 	int FrameNumber;
 	int FrameBase;
+	EulerAngles Orientation;
 	bool Locked;
-	EulerAngles Rotation;
+
 	short FlashGun;
 };
 
@@ -1250,7 +1251,7 @@ struct LaraInfo
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	float TargetArmAngles[2];
+	EulerAngles TargetArmOrient;
 	ITEM_INFO* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
