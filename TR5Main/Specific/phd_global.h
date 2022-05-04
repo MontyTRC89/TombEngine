@@ -25,8 +25,8 @@ inline float Angle::Normalize(float angle)
 {
 	if (angle < -M_PI || angle > M_PI)
 		return atan2(sin(angle), cos(angle));
-	else
-		return angle;
+	
+	return angle;
 
 	// Alternative (faster?) method:
 	/*return (angle > 0) ?
@@ -43,8 +43,8 @@ inline float Angle::Interpolate(float angleFrom, float angleTo, float rate, floa
 		auto difference = ShortestAngle(angleFrom, angleTo);
 		return (angleFrom + (difference * rate));
 	}
-	else
-		return angleTo;
+
+	return angleTo;
 }
 
 inline bool Angle::Compare(float angle0, float angle1, float epsilon)
@@ -52,8 +52,8 @@ inline bool Angle::Compare(float angle0, float angle1, float epsilon)
 	auto difference = ShortestAngle(angle0, angle1);
 	if (abs(difference) <= epsilon)
 		return true;
-	else
-		return false;
+	
+	return false;
 }
 
 inline float Angle::ShortestAngle(float angleFrom, float angleTo)
@@ -128,14 +128,14 @@ public:
 	void SetZ(float angle);
 
 	// Utilities
-	bool Compare(EulerAngles orient, float epsilon);
-	static bool Compare(EulerAngles orient0, EulerAngles orient1, float epsilon);
-
 	void Normalize();
 	static EulerAngles Normalize(EulerAngles orient);
 
-	void Interpolate(EulerAngles orientTo, float rate, float epsilon);
-	static EulerAngles Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate, float epsilon);
+	void Interpolate(EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
+	static EulerAngles Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
+
+	bool Compare(EulerAngles orient, float epsilon = 0.0f);
+	static bool Compare(EulerAngles orient0, EulerAngles orient1, float epsilon = 0.0f);
 
 	EulerAngles ShortestAngle(EulerAngles orientTo);
 	static EulerAngles ShortestAngle(EulerAngles orientFrom, EulerAngles orientTo);
@@ -214,23 +214,6 @@ inline void EulerAngles::SetZ(float angle = 0.0f)
 	this->z = Angle::Normalize(angle);
 }
 
-inline bool EulerAngles::Compare(EulerAngles orient, float epsilon = 0.0f)
-{
-	return Compare(*this, orient, epsilon);
-}
-
-inline bool EulerAngles::Compare(EulerAngles orient0, EulerAngles orient1, float epsilon = 0.0f)
-{
-	if (Angle::Compare(orient0.x, orient1.x, epsilon) &&
-		Angle::Compare(orient0.y, orient1.y, epsilon) &&
-		Angle::Compare(orient0.z, orient1.z, epsilon))
-	{
-		return true;
-	}
-
-	return false;
-}
-
 inline void EulerAngles::Normalize()
 {
 	this->SetX(this->GetX());
@@ -244,18 +227,37 @@ inline EulerAngles EulerAngles::Normalize(EulerAngles orient)
 	return orient;
 }
 
-inline void EulerAngles::Interpolate(EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f)
+inline void EulerAngles::Interpolate(EulerAngles orientTo, float rate, float epsilon)
 {
-	*this = Interpolate(*this, orientTo, rate, epsilon);
+	this->SetX(Angle::Interpolate(this->GetX(), orientTo.GetX(), rate, epsilon));
+	this->SetY(Angle::Interpolate(this->GetY(), orientTo.GetY(), rate, epsilon));
+	this->SetZ(Angle::Interpolate(this->GetZ(), orientTo.GetZ(), rate, epsilon));
 }
 
-inline EulerAngles EulerAngles::Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f)
+inline EulerAngles EulerAngles::Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate, float epsilon)
 {
 	return EulerAngles(
 		Angle::Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, epsilon),
 		Angle::Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, epsilon),
 		Angle::Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, epsilon)
 	);
+}
+
+inline bool EulerAngles::Compare(EulerAngles orient, float epsilon)
+{
+	return Compare(*this, orient, epsilon);
+}
+
+inline bool EulerAngles::Compare(EulerAngles orient0, EulerAngles orient1, float epsilon)
+{
+	if (Angle::Compare(orient0.x, orient1.x, epsilon) &&
+		Angle::Compare(orient0.y, orient1.y, epsilon) &&
+		Angle::Compare(orient0.z, orient1.z, epsilon))
+	{
+		return true;
+	}
+
+	return false;
 }
 
 inline EulerAngles EulerAngles::ShortestAngle(EulerAngles orientTo)
