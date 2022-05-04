@@ -207,7 +207,7 @@ void CreatureTilt(ITEM_INFO* item, float angle);
 float CreatureTurn(ITEM_INFO* item, float maxTurn);
 void CreatureDie(short itemNumber, int explode);
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
-int CreatureCreature(short itemNumber);
+float CreatureCreature(short itemNumber);
 int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber);
 int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber);
 void TargetBox(LOTInfo* LOT, int boxNumber);

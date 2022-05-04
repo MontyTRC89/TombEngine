@@ -368,29 +368,27 @@ void CreatureTilt(ITEM_INFO* item, float angle)
 
 float CreatureTurn(ITEM_INFO* item, float maxTurn)
 {
-	if (!item->Data || maxTurn == 0)
-		return 0;
+	if (!item->Data || !maxTurn)
+		return Angle::DegToRad(0.0f);
 
 	auto* creature = GetCreatureInfo(item);
-	float angle = 0;
 
-	int x = creature->Target.x - item->Pose.Position.x;
-	int z = creature->Target.z - item->Pose.Position.z;
-	angle = atan2(z, x) - item->Pose.Orientation.GetY();
+	auto direction = creature->Target - item->Pose.Position;
+	float turnAngle = Angle::Normalize(atan2(direction.z, direction.x) - item->Pose.Orientation.GetY());
+
 	int range = item->Animation.Velocity * (Angle::DegToRad(90.0f) / maxTurn);
-	int distance = pow(x, 2) + pow(z, 2);
+	int distance = pow(direction.x, 2) + pow(direction.z, 2);
 
-	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
+	if (turnAngle > FRONT_ARC || turnAngle < -FRONT_ARC && distance < pow(range, 2))
 		maxTurn /= 2;
 
-	if (angle > maxTurn)
-		angle = maxTurn;
-	else if (angle < -maxTurn)
-		angle = -maxTurn;
+	if (turnAngle > maxTurn)
+		turnAngle = maxTurn;
+	else if (turnAngle < -maxTurn)
+		turnAngle = -maxTurn;
 
-	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + angle);
-
-	return angle;
+	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + turnAngle);
+	return turnAngle;
 }
 
 int CreatureAnimation(short itemNumber, float angle, float tilt)
@@ -412,7 +410,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 	else
 		boxHeight = item->Floor;
 
-	auto old = item->Pose.Position;
+	auto oldPos = item->Pose.Position;
 	
 	/*if (!Objects[item->objectNumber].waterCreature)
 	{
@@ -433,7 +431,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 	int y = item->Pose.Position.y + bounds->Y1;
 
 	short roomNumber = item->RoomNumber;
-	GetFloor(old.x, y, old.z, &roomNumber);  
+	GetFloor(oldPos.x, y, oldPos.z, &roomNumber);  
 	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 
 	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
@@ -462,18 +460,18 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 	{
 		xPos = item->Pose.Position.x / SECTOR(1);
 		zPos = item->Pose.Position.z / SECTOR(1);
-		shiftX = old.x / SECTOR(1);
-		shiftZ = old.z / SECTOR(1);
+		shiftX = oldPos.x / SECTOR(1);
+		shiftZ = oldPos.z / SECTOR(1);
 
 		if (xPos < shiftX)
-			item->Pose.Position.x = old.x & (~(SECTOR(1) - 1));
+			item->Pose.Position.x = oldPos.x & (~(SECTOR(1) - 1));
 		else if (xPos > shiftX)
-			item->Pose.Position.x = old.x | (SECTOR(1) - 1);
+			item->Pose.Position.x = oldPos.x | (SECTOR(1) - 1);
 
 		if (zPos < shiftZ)
-			item->Pose.Position.z = old.z & (~(SECTOR(1) - 1));
+			item->Pose.Position.z = oldPos.z & (~(SECTOR(1) - 1));
 		else if (zPos > shiftZ)
-			item->Pose.Position.z = old.z | (SECTOR(1) - 1);
+			item->Pose.Position.z = oldPos.z | (SECTOR(1) - 1);
 
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
@@ -625,8 +623,8 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 				{
 					if (item->Pose.Position.y + top < ceiling)
 					{
-						item->Pose.Position.x = old.x;
-						item->Pose.Position.z = old.z;
+						item->Pose.Position.x = oldPos.x;
+						item->Pose.Position.z = oldPos.z;
 						dy = LOT->Fly;
 					}
 					else
@@ -650,8 +648,8 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		}
 		else
 		{
-			item->Pose.Position.x = old.x;
-			item->Pose.Position.z = old.z;
+			item->Pose.Position.x = oldPos.x;
+			item->Pose.Position.z = oldPos.z;
 			dy = -LOT->Fly;
 		}
 
@@ -659,15 +657,15 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, y, item->Pose.Position.z);
  
-		angle = (item->Animation.Velocity) ? atan2(item->Animation.Velocity, -dy) : 0;
+		angle = item->Animation.Velocity ? atan2(item->Animation.Velocity, -dy) : Angle::DegToRad(0.0f);
 		if (angle < Angle::DegToRad(-20.0f))
 			angle = Angle::DegToRad(-20.0f);
 		else if (angle > Angle::DegToRad(20.0f))
 			angle = Angle::DegToRad(20.0f);
 
-		if (angle < item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f))
+		if (angle < Angle::Normalize(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f)))
 			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(1.0f));
-		else if (angle > item->Pose.Orientation.GetX() + Angle::DegToRad(1.0f))
+		else if (angle > Angle::Normalize(item->Pose.Orientation.GetX() + Angle::DegToRad(1.0f)))
 			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + Angle::DegToRad(1.0f));
 		else
 			item->Pose.Orientation.SetX(angle);
@@ -688,11 +686,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 			if (item->Pose.Position.y > item->Floor)
 			{
 				if (item->Pose.Position.y > (item->Floor + CLICK(1)))
-				{
-					item->Pose.Position.x = old.x;
-					item->Pose.Position.y = old.y;
-					item->Pose.Position.z = old.z;
-				}
+					item->Pose.Position = oldPos;
 				else
 					item->Pose.Position.y = item->Floor;
 			}
@@ -709,11 +703,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 			top = bounds->Y1; // TODO: check if Y1 or Y2
 
 		if (item->Pose.Position.y + top < ceiling)
-		{
-			item->Pose.Position.x = old.x;
-			item->Pose.Position.z = old.z;
-			item->Pose.Position.y = old.y;
-		}
+			item->Pose.Position = oldPos;
 
 		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
@@ -794,7 +784,7 @@ int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumbe
 	return false;
 }
 
-int CreatureCreature(short itemNumber)  
+float CreatureCreature(short itemNumber)  
 {
 	auto* item = &g_Level.Items[itemNumber];
 	auto* object = &Objects[item->ObjectNumber];
@@ -826,7 +816,7 @@ int CreatureCreature(short itemNumber)
 		link = linked->NextItem;
 	} while (link != NO_ITEM);
 
-	return 0;
+	return Angle::DegToRad(0.0f);
 }
 
 int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber) 
@@ -1427,7 +1417,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	}
 
 	vector.y = item->Pose.Position.y - enemy->Pose.Position.y;
-	short angle = atan2(vector.z, vector.x);
+	float angle = atan2(vector.z, vector.x);
 
 	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
 		AI->distance = INT_MAX;
@@ -1439,8 +1429,8 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 			AI->distance = INT_MAX;
 	}
 
-	AI->angle = angle - item->Pose.Orientation.GetY();
-	AI->enemyFacing = Angle::DegToRad(180.0f) + angle - enemy->Pose.Orientation.GetY();
+	AI->angle = Angle::Normalize(angle - item->Pose.Orientation.GetY());
+	AI->enemyFacing = Angle::Normalize(Angle::DegToRad(180.0f) + angle - enemy->Pose.Orientation.GetY());
 
 	vector.x = abs(vector.x);
 	vector.z = abs(vector.z);
