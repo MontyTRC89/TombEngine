@@ -11,7 +11,7 @@ local RotationAxis = Flow.RotationAxis
 local ItemAction = Flow.ItemAction
 
 -- Title level
-Flow.SetIntroImagePath("SCREENS\\MAIN.PNG")
+Flow.SetIntroImagePath("Screens\\Main.png")
 Flow.SetTitleScreenImagePath("Screens\\Title.png")
 Flow.SetFarView(210)
 
