@@ -18,8 +18,6 @@ struct Animations
 	bool HasCrawlExtended;		// Extended crawl moveset.
 	bool HasCrouchRoll;			// Crouch roll.
 	bool HasOverhangClimb;		// Overhang functionality.
-	bool HasMonkeyTurn180;
-	bool HasOscillateHang;
 
 	static void Register(sol::table &);
 };
