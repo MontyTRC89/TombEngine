@@ -53,7 +53,7 @@ namespace TEN::Entities::Traps
 
 	void DartEmitterControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		if (item->Active)
 		{
@@ -70,7 +70,7 @@ namespace TEN::Entities::Traps
 
 		if (dartItemNumber != NO_ITEM)
 		{
-			ITEM_INFO* dartItem = &g_Level.Items[dartItemNumber];
+			ItemInfo* dartItem = &g_Level.Items[dartItemNumber];
 
 			dartItem->ObjectNumber = ID_DARTS;
 			dartItem->RoomNumber = item->RoomNumber;

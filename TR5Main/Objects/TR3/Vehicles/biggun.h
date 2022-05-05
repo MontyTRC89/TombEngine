@@ -1,10 +1,10 @@
 #pragma once
 
 struct CollisionInfo;
-struct ITEM_INFO;
+struct ItemInfo;
 
 void BigGunInitialise(short itemNumber);
-static bool BigGunTestMount(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem);
-void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem);
-void BigGunCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-bool BigGunControl(ITEM_INFO* laraItem, CollisionInfo* coll);
+static bool BigGunTestMount(ItemInfo* laraItem, ItemInfo* bigGunItem);
+void BigGunFire(ItemInfo* laraItem, ItemInfo* bigGunItem);
+void BigGunCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+bool BigGunControl(ItemInfo* laraItem, CollisionInfo* coll);

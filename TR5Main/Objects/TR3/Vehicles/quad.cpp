@@ -171,7 +171,7 @@ void InitialiseQuadBike(short itemNumber)
 	quad->Flags = 0;
 }
 
-static void QuadbikeExplode(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
+static void QuadbikeExplode(ItemInfo* laraItem, ItemInfo* quadItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -229,7 +229,7 @@ static int CanQuadbikeGetOff(int direction)
 	return true;
 }
 
-static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
+static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* quad = (QuadInfo*)quadItem->Data;
@@ -289,7 +289,7 @@ static bool QuadCheckGetOff(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 		return true;
 }
 
-static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo* coll)
+static int GetOnQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -335,7 +335,7 @@ static int GetOnQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, CollisionInfo
 	return true;
 }
 
-static void QuadEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
+static void QuadEntityCollision(ItemInfo* laraItem, ItemInfo* quadItem)
 {
 	vector<short> roomsList;
 	roomsList.push_back(quadItem->RoomNumber);
@@ -382,7 +382,7 @@ static void QuadEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 	}
 }
 
-static int GetQuadCollisionAnim(ITEM_INFO* quadItem, Vector3Int* p)
+static int GetQuadCollisionAnim(ItemInfo* quadItem, Vector3Int* p)
 {
 	p->x = quadItem->Pose.Position.x - p->x;
 	p->z = quadItem->Pose.Position.z - p->z;
@@ -413,7 +413,7 @@ static int GetQuadCollisionAnim(ITEM_INFO* quadItem, Vector3Int* p)
 	return 0;
 }
 
-static int TestQuadHeight(ITEM_INFO* quadItem, int dz, int dx, Vector3Int* pos)
+static int TestQuadHeight(ItemInfo* quadItem, int dz, int dx, Vector3Int* pos)
 {
 	pos->y = quadItem->Pose.Position.y - dz * phd_sin(quadItem->Pose.Orientation.x) + dx * phd_sin(quadItem->Pose.Orientation.z);
 
@@ -433,7 +433,7 @@ static int TestQuadHeight(ITEM_INFO* quadItem, int dz, int dx, Vector3Int* pos)
 	return probe.Position.Floor;
 }
 
-static int DoQuadShift(ITEM_INFO* quadItem, Vector3Int* pos, Vector3Int* old)
+static int DoQuadShift(ItemInfo* quadItem, Vector3Int* pos, Vector3Int* old)
 {
 	CollisionResult probe;
 	int x = pos->x / SECTOR(1);
@@ -558,7 +558,7 @@ static int DoQuadDynamics(int height, int verticalVelocity, int* y)
 	return verticalVelocity;
 }
 
-static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
+static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* quad = (QuadInfo*)quadItem->Data;
@@ -793,7 +793,7 @@ static int QuadDynamics(ITEM_INFO* laraItem, ITEM_INFO* quadItem)
 	return collide;
 }
 
-static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collide, bool dead)
+static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide, bool dead)
 {
 	auto* quad = (QuadInfo*)quadItem->Data;
 
@@ -978,7 +978,7 @@ static void AnimateQuadBike(ITEM_INFO* laraItem, ITEM_INFO* quadItem, int collid
 	}
 }
 
-static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
+static int QuadUserControl(ItemInfo* quadItem, int height, int* pitch)
 {
 	auto* quad = (QuadInfo*)quadItem->Data;
 
@@ -1172,7 +1172,7 @@ static int QuadUserControl(ITEM_INFO* quadItem, int height, int* pitch)
 	return drive;
 }
 
-void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void QuadBikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* quadItem = &g_Level.Items[itemNumber];
@@ -1285,7 +1285,7 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	spark->size = spark->sSize = size / 2;
 }
 
-bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll)
+bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* quadItem = &g_Level.Items[lara->Vehicle];

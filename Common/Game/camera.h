@@ -35,8 +35,8 @@ struct CAMERA_INFO
 	short timer; // size=0, offset=84
 	short speed; // size=0, offset=86
 	short targetspeed; // size=0, offset=88
-	ITEM_INFO* item; // size=144, offset=92
-	ITEM_INFO* lastItem; // size=144, offset=96
+	ItemInfo* item; // size=144, offset=92
+	ItemInfo* lastItem; // size=144, offset=96
 	int mikeAtLara; // size=0, offset=104
 	Vector3Int mikePos; // size=12, offset=108
 };
@@ -79,19 +79,19 @@ void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);
 void InitialiseCamera();
 void MoveCamera(GameVector* ideal, int speed);
-void ChaseCamera(ITEM_INFO* item);
+void ChaseCamera(ItemInfo* item);
 void UpdateCameraElevation();
-void CombatCamera(ITEM_INFO* item);
+void CombatCamera(ItemInfo* item);
 bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst);
-void FixedCamera(ITEM_INFO* item);
-void LookCamera(ITEM_INFO* item);
-void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance);
-void BinocularCamera(ITEM_INFO* item);
+void FixedCamera(ItemInfo* item);
+void LookCamera(ItemInfo* item);
+void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
+void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
-void LookLeftRight(ITEM_INFO* item);
-void LookUpDown(ITEM_INFO* item);
-void ResetLook(ITEM_INFO* item);
+void LookLeftRight(ItemInfo* item);
+void LookUpDown(ItemInfo* item);
+void ResetLook(ItemInfo* item);
 void RumbleScreen();
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);

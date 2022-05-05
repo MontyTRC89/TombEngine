@@ -42,14 +42,14 @@ void InitialiseHair()
 	}
 }
 
-void HairControl(ITEM_INFO* item, bool young)
+void HairControl(ItemInfo* item, bool young)
 {
 	HairControl(item, 0, 0);
 	if (young)
 		HairControl(item, 1, 0);
 }
 
-void HairControl(ITEM_INFO* item, int ponytail, ANIM_FRAME* framePtr)
+void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 {
 	SPHERE sphere[HAIR_SPHERE];
 	OBJECT_INFO* object = &Objects[ID_LARA];

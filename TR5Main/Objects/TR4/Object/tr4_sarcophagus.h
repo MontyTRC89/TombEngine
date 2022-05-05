@@ -3,4 +3,4 @@
 #include "Game/collision/collide_room.h"
 
 void InitialiseSarcophagus(short itemNumber);
-void SarcophagusCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

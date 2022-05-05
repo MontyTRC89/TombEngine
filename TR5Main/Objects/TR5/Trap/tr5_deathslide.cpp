@@ -35,7 +35,7 @@ void InitialiseDeathSlide(short itemNumber)
 	pos->roomNumber = item->RoomNumber;
 }
 
-void DeathSlideCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 

@@ -38,9 +38,9 @@ constexpr auto FRAME_PRIO_BASE = 4;
 constexpr auto FRAME_PRIO_EXP = 1.5;
 #endif // CREATURE_AI_PRIORITY_OPTIMIZATION
 
-void DropEntityPickups(ITEM_INFO* item)
+void DropEntityPickups(ItemInfo* item)
 {
-	ITEM_INFO* pickup = NULL;
+	ItemInfo* pickup = NULL;
 
 	for (short pickupNumber = item->CarriedItem; pickupNumber != NO_ITEM; pickupNumber = pickup->CarriedItem)
 	{
@@ -103,7 +103,7 @@ void CreatureYRot2(PHD_3DPOS* srcPos, short angle, short angleAdd)
 	srcPos->Orientation.y += angle;
 }
 
-bool SameZone(CreatureInfo* creature, ITEM_INFO* target)
+bool SameZone(CreatureInfo* creature, ItemInfo* target)
 {
 	int* zone = g_Level.Zones[creature->LOT.Zone][FlipStatus].data();
 	auto* item = &g_Level.Items[creature->ItemNumber];
@@ -159,7 +159,7 @@ short AIGuard(CreatureInfo* creature)
 	return -ANGLE(90.0f);
 }
 
-void AlertNearbyGuards(ITEM_INFO* item) 
+void AlertNearbyGuards(ItemInfo* item) 
 {
 	for (int i = 0; i < ActiveCreatures.size(); i++)
 	{
@@ -202,7 +202,7 @@ void AlertAllGuards(short itemNumber)
 	}
 }
 
-void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillState)
+void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState)
 {
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + killAnim;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
@@ -250,7 +250,7 @@ void CreatureKill(ITEM_INFO* item, int killAnim, int killState, int laraKillStat
 	*/
 }
 
-short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
+short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
 {
 	Vector3Int pos = { bite->x, bite->y, bite->z };
 	GetJointAbsPosition(item, &pos, bite->meshNum);
@@ -258,7 +258,7 @@ short CreatureEffect2(ITEM_INFO* item, BITE_INFO* bite, short damage, short angl
 	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
 }
 
-short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
+short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
 {
 	Vector3Int pos = { bite->x, bite->y, bite->z };
 	GetJointAbsPosition(item, &pos, bite->meshNum);
@@ -266,7 +266,7 @@ short CreatureEffect(ITEM_INFO* item, BITE_INFO* bite, std::function<CreatureEff
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
 }
 
-void CreatureUnderwater(ITEM_INFO* item, int depth)
+void CreatureUnderwater(ItemInfo* item, int depth)
 {
 	int waterLevel = depth;
 	int wh = 0;
@@ -332,7 +332,7 @@ void CreatureFloat(short itemNumber)
 	}
 }
 
-void CreatureJoint(ITEM_INFO* item, short joint, short required) 
+void CreatureJoint(ItemInfo* item, short joint, short required) 
 {
 	if (!item->Data)
 		return;
@@ -353,7 +353,7 @@ void CreatureJoint(ITEM_INFO* item, short joint, short required)
 		creature->JointRotation[joint] = -ANGLE(70.0f);
 }
 
-void CreatureTilt(ITEM_INFO* item, short angle) 
+void CreatureTilt(ItemInfo* item, short angle) 
 {
 	angle = (angle << 2) - item->Pose.Orientation.z;
 
@@ -371,7 +371,7 @@ void CreatureTilt(ITEM_INFO* item, short angle)
 	item->Pose.Orientation.z += angle;
 }
 
-short CreatureTurn(ITEM_INFO* item, short maxTurn)
+short CreatureTurn(ItemInfo* item, short maxTurn)
 {
 	if (!item->Data || maxTurn == 0)
 		return 0;
@@ -834,7 +834,7 @@ int CreatureCreature(short itemNumber)
 	return 0;
 }
 
-int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber) 
+int ValidBox(ItemInfo* item, short zoneNumber, short boxNumber) 
 {
 	if (boxNumber == NO_BOX)
 		return false;
@@ -859,7 +859,7 @@ int ValidBox(ITEM_INFO* item, short zoneNumber, short boxNumber)
 	return true;
 }
 
-int EscapeBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber) 
+int EscapeBox(ItemInfo* item, ItemInfo* enemy, int boxNumber) 
 {
 	if (boxNumber == NO_BOX)
 		return false;
@@ -1008,7 +1008,7 @@ int SearchLOT(LOTInfo* LOT, int depth)
 
 
 #if CREATURE_AI_PRIORITY_OPTIMIZATION
-CreatureAIPriority GetCreatureLOTPriority(ITEM_INFO* item)
+CreatureAIPriority GetCreatureLOTPriority(ItemInfo* item)
 {
 	Vector3 itemPos = Vector3(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 	Vector3 cameraPos = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -1059,7 +1059,7 @@ void InitialiseCreature(short itemNumber)
 	ClearItem(itemNumber);
 }
 
-int StalkBox(ITEM_INFO* item, ITEM_INFO* enemy, int boxNumber)
+int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 {
 	if (boxNumber == NO_BOX)
 		return false;
@@ -1297,7 +1297,7 @@ void GetAITarget(CreatureInfo* creature)
 void FindAITarget(CreatureInfo* creature, short objectNumber)
 {
 	auto* item = &g_Level.Items[creature->ItemNumber];
-	ITEM_INFO* targetItem;
+	ItemInfo* targetItem;
 
 	int i;
 	for (i = 0, targetItem = &g_Level.Items[0]; i < g_Level.NumItems; i++, targetItem++)
@@ -1371,7 +1371,7 @@ void FindAITargetObject(CreatureInfo* creature, short objectNumber)
 	}
 }
 
-void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
+void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 {
 	if (!item->Data)
 		return;
@@ -1463,7 +1463,7 @@ void CreatureAIInfo(ITEM_INFO* item, AI_INFO* AI)
 	AI->bite = (AI->ahead && enemy->HitPoints > 0 && abs(enemy->Pose.Position.y - item->Pose.Position.y) <= CLICK(2));
 }
 
-void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
+void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 {
 	if (!item->Data)
 		return;
@@ -1614,7 +1614,7 @@ void CreatureMood(ITEM_INFO* item, AI_INFO* AI, int violent)
 	}
 }
 
-void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int isViolent)
+void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
 {
 	if (!item->Data)
 		return;
@@ -1726,7 +1726,7 @@ void GetCreatureMood(ITEM_INFO* item, AI_INFO* AI, int isViolent)
 	}
 }
 
-TARGET_TYPE CalculateTarget(Vector3Int* target, ITEM_INFO* item, LOTInfo* LOT)
+TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 {
 	UpdateLOT(LOT, 5);
 
@@ -1959,7 +1959,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ITEM_INFO* item, LOTInfo* LOT)
 	return TARGET_TYPE::NO_TARGET;
 }
 
-void AdjustStopperFlag(ITEM_INFO* item, int direction, bool set)
+void AdjustStopperFlag(ItemInfo* item, int direction, bool set)
 {
 	int x = item->Pose.Position.x;
 	int z = item->Pose.Position.z;

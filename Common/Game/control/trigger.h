@@ -1,6 +1,6 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 class FLOOR_INFO;
 
 #define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
@@ -60,18 +60,18 @@ enum TRIGOBJECTS_TYPES
 extern int TriggerTimer;
 extern int KeyTriggerActive;
 
-bool GetKeyTrigger(ITEM_INFO* item);
-int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch);
+bool GetKeyTrigger(ItemInfo* item);
+int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch);
 int SwitchTrigger(short itemNumber, short timer);
 int KeyTrigger(short itemNum);
 int PickupTrigger(short itemNum);
 void RefreshCamera(short type, short* data);
-int TriggerActive(ITEM_INFO* item);
+int TriggerActive(ItemInfo* item);
 short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z);
-short* GetTriggerIndex(ITEM_INFO* item);
+short* GetTriggerIndex(ItemInfo* item);
 void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags = 0);
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags = 0);
-void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags = 0);
+void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags = 0);
 void ProcessSectorFlags(FLOOR_INFO* floor);
 void ProcessSectorFlags(int x, int y, int z, short roomNumber);
-void ProcessSectorFlags(ITEM_INFO* item);
+void ProcessSectorFlags(ItemInfo* item);

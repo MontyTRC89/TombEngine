@@ -178,7 +178,7 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, int count)
 		}
 }
 
-void CollectCarriedItems(ITEM_INFO* item) 
+void CollectCarriedItems(ItemInfo* item) 
 {
 	short pickupNumber = item->CarriedItem;
 	while (pickupNumber != NO_ITEM)
@@ -194,7 +194,7 @@ void CollectCarriedItems(ITEM_INFO* item)
 	item->CarriedItem = NO_ITEM;
 }
 
-void DoPickup(ITEM_INFO* laraItem)
+void DoPickup(ItemInfo* laraItem)
 {
 	if (getThisItemPlease == NO_ITEM)
 		return;
@@ -311,7 +311,7 @@ void DoPickup(ITEM_INFO* laraItem)
 	getThisItemPlease = NO_ITEM;
 }
 
-void PickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -817,7 +817,7 @@ void PickupControl(short itemNumber)
 	}
 }
 
-BOUNDING_BOX* FindPlinth(ITEM_INFO* item)
+BOUNDING_BOX* FindPlinth(ItemInfo* item)
 {
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	
@@ -948,7 +948,7 @@ void InitialiseSearchObject(short itemNumber)
 	}
 }
 
-void SearchObjectCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
+void SearchObjectCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	int objectNumber = (item->ObjectNumber - ID_SEARCH_OBJECT1) / 2;
@@ -1021,7 +1021,7 @@ void SearchObjectControl(short itemNumber)
 	if (item->ObjectNumber != ID_SEARCH_OBJECT4 || item->ItemFlags[0] == 1)
 		AnimateItem(item);
 
-	ITEM_INFO* item2;
+	ItemInfo* item2;
 
 	int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
@@ -1108,7 +1108,7 @@ void SearchObjectControl(short itemNumber)
 	}
 }
 
-bool UseSpecialItem(ITEM_INFO* item)
+bool UseSpecialItem(ItemInfo* item)
 {
 	int flag = 0;
 	int use = g_Gui.GetInventoryItemChosen();

@@ -2,7 +2,7 @@
 #include "Specific/trmath.h"
 
 enum class LaraWeaponType;
-struct ITEM_INFO;
+struct ItemInfo;
 
 #define PELLET_SCATTER ANGLE(20.0f)
 
@@ -36,30 +36,30 @@ enum class GrenadeType
 	Flags
 };
 
-void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
-void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
-void FireShotgun(ITEM_INFO* laraItem);
-void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
-void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType);
-void DrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType);
-void UndrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType);
+void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
+void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
+void FireShotgun(ItemInfo* laraItem);
+void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
+void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType);
+void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType);
+void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType);
 
-void FireHarpoon(ITEM_INFO* laraItem);
+void FireHarpoon(ItemInfo* laraItem);
 void HarpoonBoltControl(short itemNumber);
-void FireGrenade(ITEM_INFO* laraItem);
+void FireGrenade(ItemInfo* laraItem);
 void GrenadeControl(short itemNumber);
 //void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
-void FireRocket(ITEM_INFO* laraItem);
+void FireRocket(ItemInfo* laraItem);
 void RocketControl(short itemNumber);
-void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos);
+void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos);
 void CrossbowBoltControl(short itemNumber);
-void FireCrossBowFromLaserSight(ITEM_INFO* laraItem, GameVector* src, GameVector* target);
+void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector* target);
 
-void FireHK(ITEM_INFO* laraItem, int mode);
-void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType);
+void FireHK(ItemInfo* laraItem, int mode);
+void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
 
-void DoExplosiveDamageOnBaddie(ITEM_INFO* laraItem, ITEM_INFO* src, ITEM_INFO* dest, LaraWeaponType weaponType);
-void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag);
+void DoExplosiveDamageOnBaddie(ItemInfo* laraItem, ItemInfo* src, ItemInfo* dest, LaraWeaponType weaponType);
+void TriggerUnderwaterExplosion(ItemInfo* item, int flag);
 void SomeSparkEffect(int x, int y, int z, int count);
 
-void HitSpecial(ITEM_INFO* projectile, ITEM_INFO* target, int flags);
+void HitSpecial(ItemInfo* projectile, ItemInfo* target, int flags);

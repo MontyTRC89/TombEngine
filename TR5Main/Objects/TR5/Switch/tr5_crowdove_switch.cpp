@@ -32,7 +32,7 @@ namespace TEN::Entities::TR5
 		g_Level.Items[itemNumber].MeshBits = 3;
 	}
 
-	void CrowDoveSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void CrowDoveSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

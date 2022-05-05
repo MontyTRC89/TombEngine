@@ -548,7 +548,7 @@ namespace TEN::Entities::TR4
 		CreatureAnimation(itemNumber, angle, 0);
 	}
 
-	void SasFireGrenade(ITEM_INFO* item, short angle1, short angle2)
+	void SasFireGrenade(ItemInfo* item, short angle1, short angle2)
 	{
 		short itemNumber = CreateItem();
 		if (itemNumber != NO_ITEM)
@@ -647,7 +647,7 @@ namespace TEN::Entities::TR4
 			AnimateItem(item);
 	}
 
-	void SasDragBlokeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void SasDragBlokeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

@@ -87,9 +87,9 @@ void ScalesControl(short itemNumber)
 	AnimateItem(item);
 }
 
-void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 
 	if (TestBoundsCollide(item, laraItem, LARA_RADIUS))
 	{

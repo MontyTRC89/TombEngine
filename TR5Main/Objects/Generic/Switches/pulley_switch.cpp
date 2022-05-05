@@ -39,7 +39,7 @@ namespace TEN::Entities::Switches
 		}
 	}
 
-	void PulleySwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void PulleySwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

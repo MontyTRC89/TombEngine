@@ -22,7 +22,7 @@
 // For State Control & Collision
 // -----------------------------
 
-bool LaraDeflectEdge(ITEM_INFO* item, CollisionInfo* coll)
+bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 {
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
@@ -48,7 +48,7 @@ bool LaraDeflectEdge(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-bool LaraDeflectEdgeJump(ITEM_INFO* item, CollisionInfo* coll)
+bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -109,7 +109,7 @@ bool LaraDeflectEdgeJump(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-void LaraSlideEdgeJump(ITEM_INFO* item, CollisionInfo* coll)
+void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 {
 	ShiftItem(item, coll);
 
@@ -143,7 +143,7 @@ void LaraSlideEdgeJump(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-bool LaraDeflectEdgeCrawl(ITEM_INFO* item, CollisionInfo* coll)
+bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 {
 	// Useless in the best case; Lara does not have to embed in order to perform climbing actions in crawl states. Keeping for security. @Sezz 2021.11.26
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
@@ -169,7 +169,7 @@ bool LaraDeflectEdgeCrawl(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-bool LaraDeflectEdgeMonkey(ITEM_INFO* item, CollisionInfo* coll)
+bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 {
 	// HACK
 	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
@@ -200,7 +200,7 @@ bool LaraDeflectEdgeMonkey(ITEM_INFO* item, CollisionInfo* coll)
 	return false;
 }
 
-void LaraCollideStop(ITEM_INFO* item, CollisionInfo* coll)
+void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 {
 	switch (coll->Setup.OldState)
 	{
@@ -251,7 +251,7 @@ void LaraCollideStop(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void LaraCollideStopCrawl(ITEM_INFO* item, CollisionInfo* coll)
+void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll)
 {
 	switch (coll->Setup.OldState)
 	{
@@ -286,7 +286,7 @@ void LaraCollideStopCrawl(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void LaraCollideStopMonkey(ITEM_INFO* item, CollisionInfo* coll)
+void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 {
 	switch (coll->Setup.OldState)
 	{
@@ -321,7 +321,7 @@ void LaraCollideStopMonkey(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, short angle)
+void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 {
 	if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 	{
@@ -370,7 +370,7 @@ void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, short angle)
 	}
 }
 
-void LaraResetGravityStatus(ITEM_INFO* item, CollisionInfo* coll)
+void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 {
 	// This routine cleans gravity status flag and VerticalVelocity, making it
 	// impossible to perform bugs such as QWOP and flare jump. Found by Troye -- Lwmte, 25.09.2021
@@ -382,7 +382,7 @@ void LaraResetGravityStatus(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void LaraSnapToHeight(ITEM_INFO* item, CollisionInfo* coll)
+void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 {
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && coll->Middle.Floor > 0)
 		item->Pose.Position.y += SWAMP_GRAVITY;
@@ -404,7 +404,7 @@ void GetLaraDeadlyBounds()
 	DeadlyBounds[5] = LaraItem->Pose.Position.z + tBounds.Z2;
 }
 
-void LaraJumpCollision(ITEM_INFO* item, CollisionInfo* coll, short moveAngle)
+void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -418,7 +418,7 @@ void LaraJumpCollision(ITEM_INFO* item, CollisionInfo* coll, short moveAngle)
 	LaraDeflectEdgeJump(item, coll);
 }
 
-void LaraSurfaceCollision(ITEM_INFO* item, CollisionInfo* coll)
+void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -446,7 +446,7 @@ void LaraSurfaceCollision(ITEM_INFO* item, CollisionInfo* coll)
 		SetLaraSwimDiveAnimation(item);
 }
 
-void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll)
+void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -592,7 +592,7 @@ void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll)
 		TestLaraWaterDepth(item, coll);
 }
 
-void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll)
+void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -679,7 +679,7 @@ bool TestLaraHitCeiling(CollisionInfo* coll)
 	return false;
 }
 
-void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll)
+void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Pose.Position.x = coll->Setup.OldPosition.x;
 	item->Pose.Position.y = coll->Setup.OldPosition.y;
@@ -690,7 +690,7 @@ void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll)
 	item->Animation.Airborne = false;
 }
 
-bool TestLaraObjectCollision(ITEM_INFO* item, short angle, int distance, int height, int side)
+bool TestLaraObjectCollision(ItemInfo* item, short angle, int distance, int height, int side)
 {
 	auto oldPos = item->Pose;
 	int sideSign = copysign(1, side);

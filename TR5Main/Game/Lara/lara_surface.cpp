@@ -20,7 +20,7 @@
 
 // State:		LS_ONWATER_DIVE (35)
 // Collision:	lara_col_surface_dive()
-void lara_as_surface_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_surface_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	if (TrInput & IN_FORWARD)
 		item->Pose.Orientation.x -= ANGLE(1.0f);
@@ -28,14 +28,14 @@ void lara_as_surface_dive(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_DIVE (35)
 // Control:		lara_as_surface_dive()
-void lara_col_surface_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_surface_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
 // State:		LS_ONWATER_IDLE (33)
 // Collision:	lara_col_surface_idle()
-void lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -107,7 +107,7 @@ void lara_as_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_IDLE (33)
 // Control:		lara_as_surface_idle()
-void lara_col_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -117,7 +117,7 @@ void lara_col_surface_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_FORWARD (34)
 // Collision:	lara_col_surface_swim_forward()
-void lara_as_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -153,7 +153,7 @@ void lara_as_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_FORWARD (34)
 // Control:		lara_as_surface_swim_forward()
-void lara_col_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -166,7 +166,7 @@ void lara_col_surface_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_LEFT (48)
 // Collision:	lara_col_surface_swim_left()
-void lara_as_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -205,7 +205,7 @@ void lara_as_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_LEFT (48)
 // Control:		lara_as_surface_swim_left()
-void lara_col_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -215,7 +215,7 @@ void lara_col_surface_swim_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_RIGHT (49)
 // Collision:	lara_col_surface_swim_right()
-void lara_as_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -254,7 +254,7 @@ void lara_as_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_RIGHT (49)
 // Conrol:		lara_as_surface_swim_right()
-void lara_col_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -264,7 +264,7 @@ void lara_col_surface_swim_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_BACK (47)
 // Collision:	lara_col_surface_swim_back()
-void lara_as_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -300,7 +300,7 @@ void lara_as_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_BACK (47)
 // Control:		lara_as_surface_swim_back()
-void lara_col_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -310,7 +310,7 @@ void lara_col_surface_swim_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ONWATER_EXIT (55)
 // Collision:	lara_default_col()
-void lara_as_surface_climb_out(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_surface_climb_out(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;

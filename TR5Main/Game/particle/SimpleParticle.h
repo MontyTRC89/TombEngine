@@ -5,7 +5,7 @@
 #include <SimpleMath.h>
 #include "Objects\objectslist.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 namespace TEN::Effects{
 	struct SimpleParticle {
 		DirectX::SimpleMath::Vector3 worldPosition;
@@ -21,7 +21,7 @@ namespace TEN::Effects{
 	extern std::array<SimpleParticle, 15> simpleParticles;
 
 	SimpleParticle& getFreeSimpleParticle();
-	void TriggerSnowmobileSnow(ITEM_INFO* snowMobile);
-	void TriggerSpeedboatFoam(ITEM_INFO* boat);
+	void TriggerSnowmobileSnow(ItemInfo* snowMobile);
+	void TriggerSpeedboatFoam(ItemInfo* boat);
 	void updateSimpleParticles();
 }

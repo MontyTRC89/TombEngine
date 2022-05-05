@@ -116,7 +116,7 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->dSize = size;
 }
 
-static void ShivaDamage(ITEM_INFO* item, CreatureInfo* creature, int damage)
+static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 {
 	if (!(creature->Flags) && item->TouchBits & 0x2400000)
 	{

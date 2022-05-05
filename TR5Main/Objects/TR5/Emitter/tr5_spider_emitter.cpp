@@ -50,7 +50,7 @@ void ClearSpiders()
 	}
 }
 
-void ClearSpidersPatch(ITEM_INFO* item)
+void ClearSpidersPatch(ItemInfo* item)
 {
 	ClearSpiders();
 }

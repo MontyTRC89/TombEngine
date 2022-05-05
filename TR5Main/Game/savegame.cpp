@@ -80,7 +80,7 @@ bool SaveGame::Save(int slot)
 {
 	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
 
-	ITEM_INFO itemToSerialize{};
+	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
 	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
@@ -1010,7 +1010,7 @@ bool SaveGame::Load(int slot)
 			dynamicItem = true;
 		}
 
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
 
 		OBJECT_INFO* obj = &Objects[item->ObjectNumber];

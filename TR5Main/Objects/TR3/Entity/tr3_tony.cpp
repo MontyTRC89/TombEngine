@@ -242,7 +242,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	}
 }
 
-static void TriggerFireBall(ITEM_INFO* item, TonyFlameType type, Vector3Int* laraPos, short roomNumber, short angle, int zdVelocity)
+static void TriggerFireBall(ItemInfo* item, TonyFlameType type, Vector3Int* laraPos, short roomNumber, short angle, int zdVelocity)
 {
 	TonyFlame flame;
 	memset(&flame, 0, sizeof(TonyFlame));
@@ -503,7 +503,7 @@ static bool TonyIsDying()
 			BossData.ExplodeCount == 55;
 }
 
-static void ExplodeTonyBoss(ITEM_INFO* item)
+static void ExplodeTonyBoss(ItemInfo* item)
 {
 	if (item->HitPoints <= 0 && TonyIsDying())
 	{
@@ -737,7 +737,7 @@ void TonyControl(short itemNumber)
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
-void S_DrawTonyBoss(ITEM_INFO* item)
+void S_DrawTonyBoss(ItemInfo* item)
 {
 	DrawAnimatingItem(item);
 }

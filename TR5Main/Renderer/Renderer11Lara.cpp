@@ -19,7 +19,7 @@ extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 {
-	ITEM_INFO& laraItem = *LaraItem;
+	ItemInfo& laraItem = *LaraItem;
 	LaraInfo& laraInfo = Lara;
 
 	switch (weapon)
@@ -214,7 +214,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		case LaraWeaponType::Flare:
 		case LaraWeaponType::Torch:
 			// Left arm
-			ITEM_INFO tempItem;
+			ItemInfo tempItem;
 			tempItem.Animation.AnimNumber = Lara.LeftArm.AnimNumber;
 			tempItem.Animation.FrameNumber = Lara.LeftArm.FrameNumber;
 

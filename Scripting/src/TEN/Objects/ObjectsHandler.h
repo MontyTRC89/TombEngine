@@ -13,13 +13,13 @@ class ObjectsHandler : public ScriptInterfaceObjectsHandler
 public:
 	ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent);
 
-	bool NotifyKilled(ITEM_INFO* key) override;
-	bool AddMoveableToMap(ITEM_INFO* key, Moveable* mov);
-	bool RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov);
+	bool NotifyKilled(ItemInfo* key) override;
+	bool AddMoveableToMap(ItemInfo* key, Moveable* mov);
+	bool RemoveMoveableFromMap(ItemInfo* key, Moveable* mov);
 
 	bool TryAddColliding(short id) override
 	{
-		ITEM_INFO* item = &g_Level.Items[id];
+		ItemInfo* item = &g_Level.Items[id];
 		bool hasName = !(item->luaCallbackOnCollidedWithObjectName.empty() && item->luaCallbackOnCollidedWithRoomName.empty());
 		if(hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return m_collidingItems.insert(id).second;
@@ -29,7 +29,7 @@ public:
 
 	bool TryRemoveColliding(short id, bool force = false) override
 	{
-		ITEM_INFO* item = &g_Level.Items[id];
+		ItemInfo* item = &g_Level.Items[id];
 		bool hasName = !(item->luaCallbackOnCollidedWithObjectName.empty() && item->luaCallbackOnCollidedWithRoomName.empty());
 		if(!force && hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return false;
@@ -44,7 +44,7 @@ private:
 	// A map between moveables and the engine entities they represent. This is needed
 	// so that something that is killed by the engine can notify all corresponding
 	// Lua variables which can then become invalid.
-	std::unordered_map<ITEM_INFO *, std::unordered_set<Moveable*>>	m_moveables{};
+	std::unordered_map<ItemInfo *, std::unordered_set<Moveable*>>	m_moveables{};
 	std::unordered_map<std::string, VarMapVal>						m_nameMap{};
 	std::unordered_map<std::string, short>	 						m_itemsMapName{};
 	// A set of items that are visible, collidable, and have Lua OnCollide callbacks.

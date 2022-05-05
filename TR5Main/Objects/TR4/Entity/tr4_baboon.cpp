@@ -93,7 +93,7 @@ static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
 	}
 }
 
-void BaboonDieEffect(ITEM_INFO* item)
+void BaboonDieEffect(ItemInfo* item)
 {
 	PHD_3DPOS pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z);
 
@@ -547,7 +547,7 @@ void BaboonRespawnClass::Free(void)
 	baboonRespawnArray.clear();
 }
 
-void BaboonRespawnClass::Add(ITEM_INFO* item, unsigned int maxCount)
+void BaboonRespawnClass::Add(ItemInfo* item, unsigned int maxCount)
 {
 	BaboonRespawnStruct toAdd;
 	toAdd.ID = GetBaboonFreePlace();

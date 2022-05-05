@@ -378,7 +378,7 @@ void PushableBlockControl(short itemNumber)
 	}
 }
 
-void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* pushableItem = &g_Level.Items[itemNumber];
@@ -532,18 +532,18 @@ void PushableBlockCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo
 	}
 }
 
-void PushLoop(ITEM_INFO* item) // Do Flipeffect 18 in anims
+void PushLoop(ItemInfo* item) // Do Flipeffect 18 in anims
 {
 	DoPushPull = 1;
 }
 
-void PushEnd(ITEM_INFO* item) // Do Flipeffect 19 in anims
+void PushEnd(ItemInfo* item) // Do Flipeffect 19 in anims
 {
 	if (DoPushPull == 1)
 		DoPushPull = -1;
 }
 
-bool TestBlockMovable(ITEM_INFO* item, int blokhite)
+bool TestBlockMovable(ItemInfo* item, int blokhite)
 {
 	short roomNumber = item->RoomNumber;
 	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -557,7 +557,7 @@ bool TestBlockMovable(ITEM_INFO* item, int blokhite)
 	return true;
 }
 
-bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant)
+bool TestBlockPush(ItemInfo* item, int blockHeight, unsigned short quadrant)
 {
 	auto* info = (PushableInfo*)item->Data;
 
@@ -643,7 +643,7 @@ bool TestBlockPush(ITEM_INFO* item, int blockHeight, unsigned short quadrant)
 	return true;
 }
 
-bool TestBlockPull(ITEM_INFO* item, int blockHeight, short quadrant)
+bool TestBlockPull(ItemInfo* item, int blockHeight, short quadrant)
 {
 	int xadd = 0;
 	int zadd = 0;
@@ -929,7 +929,7 @@ int FindStack(short itemNumber)
 	return stackTop;
 }
 
-int GetStackHeight(ITEM_INFO* item)
+int GetStackHeight(ItemInfo* item)
 {
 	auto* info = (PushableInfo*)item->Data;
 
@@ -945,7 +945,7 @@ int GetStackHeight(ITEM_INFO* item)
 	return height;
 }
 
-bool CheckStackLimit(ITEM_INFO* item)
+bool CheckStackLimit(ItemInfo* item)
 {
 	auto* info = (PushableInfo*)item->Data;
 

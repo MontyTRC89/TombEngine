@@ -2,7 +2,7 @@
 #include "Objects/objectslist.h"
 #include "Specific/phd_global.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 enum ZoneType : char;
 
@@ -42,9 +42,9 @@ struct OBJECT_INFO
 	std::function<std::optional<int>(short itemNumber, int x, int y, int z)> ceiling;
 	std::function<int(short itemNumber)> floorBorder;
 	std::function<int(short itemNumber)> ceilingBorder;
-	std::function<void(ITEM_INFO* item)> drawRoutine;
-	std::function<void(ITEM_INFO* item)> drawRoutineExtra;
-	std::function<void(short item_num, ITEM_INFO* laraitem, CollisionInfo* coll)> collision;
+	std::function<void(ItemInfo* item)> drawRoutine;
+	std::function<void(ItemInfo* item)> drawRoutineExtra;
+	std::function<void(short item_num, ItemInfo* laraitem, CollisionInfo* coll)> collision;
 	ZoneType zoneType;
 	int animIndex; 
 	short HitPoints; 

@@ -41,7 +41,7 @@ namespace TEN::Entities::TR4
 		BAT_ANIM_IDLE = 5
 	};
 
-	static bool isBatCollideTarget(ITEM_INFO* item)
+	static bool isBatCollideTarget(ItemInfo* item)
 	{
 		return item->TouchBits >= 0;
 	}
@@ -63,7 +63,7 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		ITEM_INFO* target;
+		ItemInfo* target;
 		CreatureInfo* slots;
 		int distance, bestdistance;
 		short angle;

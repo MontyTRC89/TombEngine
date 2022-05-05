@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/collision/floordata.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 
 struct DOORPOS_DATA
 {
@@ -25,5 +25,5 @@ struct DOOR_DATA
 	unsigned char dn2;
 	unsigned char dn3;
 	unsigned char dn4;
-	ITEM_INFO* item;
+	ItemInfo* item;
 };

@@ -12,7 +12,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -55,7 +55,7 @@ void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void LaraCheatyBits(ITEM_INFO* item)
+void LaraCheatyBits(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -97,7 +97,7 @@ void LaraCheatyBits(ITEM_INFO* item)
 		lara->Control.Count.NoCheat--;
 }
 
-void LaraCheatGetStuff(ITEM_INFO* item)
+void LaraCheatGetStuff(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -212,7 +212,7 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 	}
 }
 
-void DelsGiveLaraItemsCheat(ITEM_INFO* item)
+void DelsGiveLaraItemsCheat(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 

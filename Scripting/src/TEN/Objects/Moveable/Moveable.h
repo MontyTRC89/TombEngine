@@ -8,7 +8,7 @@ namespace sol {
 }
 class Vec3;
 class Rotation;
-struct ITEM_INFO;
+struct ItemInfo;
 enum GAME_OBJECT_ID : short;
 
 using aiBitsArray = std::array<int, 6>;
@@ -86,7 +86,7 @@ public:
 
 	friend bool operator==(Moveable const&, Moveable const&);
 private:
-	ITEM_INFO* m_item;
+	ItemInfo* m_item;
 	short m_num;
 	bool m_initialised;
 };

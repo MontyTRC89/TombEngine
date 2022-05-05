@@ -159,7 +159,7 @@ void ObjectsHandler::AssignLara()
 }
 
 
-bool ObjectsHandler::NotifyKilled(ITEM_INFO* key)
+bool ObjectsHandler::NotifyKilled(ItemInfo* key)
 {
 #if TEN_OPTIONAL_LUA
 	auto it = m_moveables.find(key);
@@ -175,7 +175,7 @@ bool ObjectsHandler::NotifyKilled(ITEM_INFO* key)
 #endif
 }
 
-bool ObjectsHandler::AddMoveableToMap(ITEM_INFO* key, Moveable* mov)
+bool ObjectsHandler::AddMoveableToMap(ItemInfo* key, Moveable* mov)
 {
 #if TEN_OPTIONAL_LUA
 	std::unordered_set<Moveable*> movVec;
@@ -193,7 +193,7 @@ bool ObjectsHandler::AddMoveableToMap(ITEM_INFO* key, Moveable* mov)
 #endif
 }
 
-bool ObjectsHandler::RemoveMoveableFromMap(ITEM_INFO* key, Moveable* mov)
+bool ObjectsHandler::RemoveMoveableFromMap(ItemInfo* key, Moveable* mov)
 {
 #if TEN_OPTIONAL_LUA
 	//todo why is "lara" destroyed here???

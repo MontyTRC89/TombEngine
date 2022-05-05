@@ -12,20 +12,20 @@ enum class BoatMountType
 };
 
 void InitialiseSpeedBoat(short itemNumber);
-void DoBoatWakeEffect(ITEM_INFO* sBoatItem);
-BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, CollisionInfo* coll);
-bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction);
-void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);
-int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, Vector3Int* pos);
+void DoBoatWakeEffect(ItemInfo* sBoatItem);
+BoatMountType GetSpeedBoatMountType(ItemInfo* laraItem, ItemInfo* sBoatItem, CollisionInfo* coll);
+bool TestSpeedBoatDismount(ItemInfo* sBoatItem, int direction);
+void DoSpeedBoatDismount(ItemInfo* laraItem, ItemInfo* sBoatItem);
+int SpeedBoatTestWaterHeight(ItemInfo* sBoatItem, int zOffset, int xOffset, Vector3Int* pos);
 
-void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNumber);
-short SpeedBoatDoShift(ITEM_INFO* sBoatItem, Vector3Int* pos, Vector3Int* old);
+void SpeedBoatDoBoatShift(ItemInfo* sBoatItem, int itemNumber);
+short SpeedBoatDoShift(ItemInfo* sBoatItem, Vector3Int* pos, Vector3Int* old);
 
-int GetSpeedBoatHitAnim(ITEM_INFO* sBoatItem, Vector3Int* moved);
+int GetSpeedBoatHitAnim(ItemInfo* sBoatItem, Vector3Int* moved);
 int DoSpeedBoatDynamics(int height, int verticalVelocity, int* y);
-int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber);
-bool SpeedBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem);
-void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide);
-void SpeedBoatSplash(ITEM_INFO* item, long verticalVelocity, long water);
-void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+int SpeedBoatDynamics(ItemInfo* laraItem, short itemNumber);
+bool SpeedBoatUserControl(ItemInfo* laraItem, ItemInfo* sBoatItem);
+void SpeedBoatAnimation(ItemInfo* laraItem, ItemInfo* sBoatItem, int collide);
+void SpeedBoatSplash(ItemInfo* item, long verticalVelocity, long water);
+void SpeedBoatCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void SpeedBoatControl(short itemNumber);

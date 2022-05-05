@@ -33,9 +33,9 @@ void InitialiseFallingBlock(short itemNumber)
 		item->Animation.Mutator[i].Rotation = Vector3::Zero;
 }
 
-void FallingBlockCollision(short itemNum, ITEM_INFO* l, CollisionInfo* coll)
+void FallingBlockCollision(short itemNum, ItemInfo* l, CollisionInfo* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ItemInfo* item = &g_Level.Items[itemNum];
 	if (!item->ItemFlags[0] && !item->TriggerFlags && item->Pose.Position.y == l->Pose.Position.y)
 	{
 		if (!((item->Pose.Position.x ^ l->Pose.Position.x) & 0xFFFFFC00) && !((l->Pose.Position.z ^ item->Pose.Position.z) & 0xFFFFFC00))
@@ -52,7 +52,7 @@ void FallingBlockCollision(short itemNum, ITEM_INFO* l, CollisionInfo* coll)
 
 void FallingBlockControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 
 	if (item->TriggerFlags)
 	{
@@ -132,7 +132,7 @@ void FallingBlockControl(short itemNumber)
 
 std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 	if (!item->MeshBits || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;
 
@@ -141,7 +141,7 @@ std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z)
 
 std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 
 	if (!item->MeshBits || item->ItemFlags[0] >= FALLINGBLOCK_DELAY)
 		return std::nullopt;

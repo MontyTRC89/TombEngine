@@ -4,7 +4,7 @@
 #include "Specific/phd_global.h"
 
 enum class LaraWeaponType;
-struct ITEM_INFO;
+struct ItemInfo;
 
 struct SMOKE_SPARKS
 {
@@ -221,12 +221,12 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType);
 void UpdateGunShells();
 void AddWaterSparks(int x, int y, int z, int num);
 int GetFreeBubble();
-void LaraBubbles(ITEM_INFO* item);
+void LaraBubbles(ItemInfo* item);
 void DisableBubbles();
 void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
-void TriggerLaraDrips(ITEM_INFO* item);
+void TriggerLaraDrips(ItemInfo* item);
 
 constexpr auto EXPLODE_HIT_EFFECT = 258;
 constexpr auto EXPLODE_NORMAL = 256;

@@ -14,7 +14,7 @@ using namespace TEN::Effects::Smoke;
 
 namespace TEN::Effects::Lara
 {
-	void LaraBurn(ITEM_INFO* item)
+	void LaraBurn(ItemInfo* item)
 	{
 		if (!item->Data.is<LaraInfo*>())
 			return;
@@ -32,7 +32,7 @@ namespace TEN::Effects::Lara
 		}
 	}
 
-	void LavaBurn(ITEM_INFO* item)
+	void LavaBurn(ItemInfo* item)
 	{
 		if (!item->Data.is<LaraInfo*>())
 			return;
@@ -57,7 +57,7 @@ namespace TEN::Effects::Lara
 		}
 	}
 
-	void LaraBreath(ITEM_INFO* item)
+	void LaraBreath(ItemInfo* item)
 	{
 		if (!item->Data.is<LaraInfo*>())
 			return;

@@ -216,7 +216,7 @@ namespace TEN::Renderer
 					}
 					else 
 					{
-						ITEM_INFO* item = &g_Level.Items[spark->fxObj];
+						ItemInfo* item = &g_Level.Items[spark->fxObj];
 
 						if (spark->flags & SP_NODEATTACH) {
 							if (NodeOffsets[spark->nodeNumber].gotIt) {
@@ -642,7 +642,7 @@ namespace TEN::Renderer
 			for (auto item : room->ItemsToDraw)
 			{
 				// Does the item need gunflash?
-				ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+				ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 				OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
 
 				if (obj->biteOffset == -1)

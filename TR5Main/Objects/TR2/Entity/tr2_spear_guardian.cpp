@@ -27,7 +27,7 @@ enum SpearGuardianAnim
 
 };
 
-static void XianDamage(ITEM_INFO* item, int damage)
+static void XianDamage(ItemInfo* item, int damage)
 {
 	auto* creature = GetCreatureInfo(item);
 

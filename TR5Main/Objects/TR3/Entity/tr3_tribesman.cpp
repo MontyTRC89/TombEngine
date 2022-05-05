@@ -292,7 +292,7 @@ void TribemanAxeControl(short itemNumber)
 	CreatureAnimation(itemNumber, angle, 0);
 }
 
-static void TribesmanShotDart(ITEM_INFO* item)
+static void TribesmanShotDart(ItemInfo* item)
 {
 	short dartItemNumber = CreateItem();
 	if (dartItemNumber != NO_ITEM)

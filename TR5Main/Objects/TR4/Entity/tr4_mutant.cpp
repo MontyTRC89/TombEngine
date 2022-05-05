@@ -119,7 +119,7 @@ namespace TEN::Entities::TR4
 		TriggerCrocgodMissile(src, roomNumber, timer);
 	}
 
-	static bool ShootFrame(ITEM_INFO* item)
+	static bool ShootFrame(ItemInfo* item)
 	{
 		int frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		if (frameNumber == 45 ||
@@ -136,7 +136,7 @@ namespace TEN::Entities::TR4
 			return false;
 	}
 
-	static void RotateHeadToTarget(ITEM_INFO* item, CreatureInfo* creature, int joint, short& headAngle)
+	static void RotateHeadToTarget(ItemInfo* item, CreatureInfo* creature, int joint, short& headAngle)
 	{
 		if (creature->Enemy == nullptr)
 		{
@@ -153,7 +153,7 @@ namespace TEN::Entities::TR4
 		headAngle = (short)(phd_atan(z, x) - item->Pose.Orientation.y) / 2;
 	}
 
-	static void GetTargetPosition(ITEM_INFO* item, PHD_3DPOS* target)
+	static void GetTargetPosition(ItemInfo* item, PHD_3DPOS* target)
 	{
 		auto start = Vector3Int(0, -96, 144);
 		GetJointAbsPosition(item, &start, 9);
@@ -172,7 +172,7 @@ namespace TEN::Entities::TR4
 		target->Orientation.z = 0;
 	}
 
-	static void MoveItemFront(ITEM_INFO* item, int distance)
+	static void MoveItemFront(ItemInfo* item, int distance)
 	{
 		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
@@ -195,7 +195,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MoveItemBack(ITEM_INFO* item, int distance)
+	static void MoveItemBack(ItemInfo* item, int distance)
 	{
 		short angle = short(TO_DEGREES(item->Pose.Orientation.y));
 		switch (angle)
@@ -218,7 +218,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MutantAIFix(ITEM_INFO* item, AI_INFO* info)
+	static void MutantAIFix(ItemInfo* item, AI_INFO* info)
 	{
 		MoveItemFront(item, SECTOR(2));
 		item->Pose.Position.y -= CLICK(3);

@@ -150,7 +150,7 @@ void VonCroyControl(short itemNumber)
 
 
 	// Try to find a possible enemy or target
-	ITEM_INFO* foundTarget = NULL;
+	ItemInfo* foundTarget = NULL;
 
 	if (Lara.Location <= creature->LocationAI)
 	{
@@ -192,7 +192,7 @@ void VonCroyControl(short itemNumber)
 	}
 
 	// If a target is found, it becomes the enemy.
-	ITEM_INFO* enemy = creature->Enemy;
+	ItemInfo* enemy = creature->Enemy;
 	if (foundTarget != 0)
 		creature->Enemy = foundTarget;
 
