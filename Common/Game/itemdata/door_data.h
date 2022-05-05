@@ -5,8 +5,8 @@ struct ItemInfo;
 
 struct DOORPOS_DATA
 {
-	FLOOR_INFO* floor;
-	FLOOR_INFO data;
+	FloorInfo* floor;
+	FloorInfo data;
 	short block;
 };
 

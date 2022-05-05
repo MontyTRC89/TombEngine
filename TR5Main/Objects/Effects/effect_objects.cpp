@@ -9,7 +9,7 @@ using namespace TEN::Entities::Effects;
 
 void InitialiseEffectsObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	// Flame is always loaded
 	obj = &Objects[ID_FLAME];

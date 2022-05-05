@@ -33,7 +33,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-static void StartEntity(OBJECT_INFO* obj)
+static void StartEntity(ObjectInfo* obj)
 {
 	obj = &Objects[ID_TONY_BOSS];
 	if (obj->loaded)
@@ -361,12 +361,12 @@ static void StartEntity(OBJECT_INFO* obj)
 	}
 }
 
-static void StartObject(OBJECT_INFO* obj)
+static void StartObject(ObjectInfo* obj)
 {
 
 }
 
-static void StartTrap(OBJECT_INFO* obj)
+static void StartTrap(ObjectInfo* obj)
 {
 	obj = &Objects[ID_TRAIN];
 	if (obj->loaded)
@@ -380,7 +380,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	}
 }
 
-static void StartVehicles(OBJECT_INFO* obj)
+static void StartVehicles(ObjectInfo* obj)
 {
 	obj = &Objects[ID_QUAD];
 	if (obj->loaded)
@@ -455,14 +455,14 @@ static void StartVehicles(OBJECT_INFO* obj)
 	}
 }
 
-static void StartProjectiles(OBJECT_INFO* obj)
+static void StartProjectiles(ObjectInfo* obj)
 {
 	obj = &Objects[ID_TONY_BOSS_FLAME];
 	obj->control = ControlTonyFireBall;
 	obj->drawRoutine = NULL;
 }
 
-static OBJECT_INFO* objToInit;
+static ObjectInfo* objToInit;
 void InitialiseTR3Objects()
 {
 	StartEntity(objToInit);

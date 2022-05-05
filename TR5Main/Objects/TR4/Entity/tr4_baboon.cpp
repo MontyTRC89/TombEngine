@@ -494,7 +494,7 @@ void BaboonControl(short itemNumber)
 
 				pos.y = item->Pose.Position.y;
 				pos.roomNumber = item->RoomNumber;
-				FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
+				FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
 				int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 				item->Floor = height;
 				TestTriggers(pos.x, pos.y, pos.z, pos.roomNumber, TRUE);

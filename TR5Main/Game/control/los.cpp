@@ -410,7 +410,7 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* 
 	{
 		// For items instead we need to test spheres
 		ItemInfo* item = &g_Level.Items[closesItemNumber];
-		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+		ObjectInfo* obj = &Objects[item->ObjectNumber];
 
 		// Get the transformed sphere of meshes
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -577,7 +577,7 @@ bool LOS(GameVector* start, GameVector* end)
 int xLOS(GameVector* start, GameVector* end)
 {
 	int x, y, z;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 
 	int dx = end->x - start->x;
 	if (!dx)
@@ -698,7 +698,7 @@ int xLOS(GameVector* start, GameVector* end)
 int zLOS(GameVector* start, GameVector* end)
 {
 	int  x, y, z;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 
 	int dz = end->z - start->z;
 	if (!dz)
@@ -819,7 +819,7 @@ int zLOS(GameVector* start, GameVector* end)
 bool LOSAndReturnTarget(GameVector* start, GameVector* target, int push)
 {
 	int floorHeight, ceilingHeight;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 
 	int x = start->x;
 	int y = start->y;

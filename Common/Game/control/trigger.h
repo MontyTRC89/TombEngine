@@ -1,7 +1,7 @@
 #pragma once
 
 struct ItemInfo;
-class FLOOR_INFO;
+class FloorInfo;
 
 #define TRIG_BITS(T) ((T & 0x3FFF) >> 10)
 
@@ -67,11 +67,11 @@ int KeyTrigger(short itemNum);
 int PickupTrigger(short itemNum);
 void RefreshCamera(short type, short* data);
 int TriggerActive(ItemInfo* item);
-short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z);
+short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z);
 short* GetTriggerIndex(ItemInfo* item);
-void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags = 0);
+void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags = 0);
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags = 0);
 void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags = 0);
-void ProcessSectorFlags(FLOOR_INFO* floor);
+void ProcessSectorFlags(FloorInfo* floor);
 void ProcessSectorFlags(int x, int y, int z, short roomNumber);
 void ProcessSectorFlags(ItemInfo* item);

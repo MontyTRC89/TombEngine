@@ -29,7 +29,7 @@
 
 using namespace TEN::Entities::Switches;
 
-OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+ObjectInfo Objects[ID_NUMBER_OBJECTS];
 STATIC_INFO StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags()
@@ -44,7 +44,7 @@ void InitialiseGameFlags()
 
 void ObjectObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	obj = &Objects[ID_CAMERA_TARGET];
 	if (obj->loaded)
@@ -270,7 +270,7 @@ void ObjectObjects()
 
 void TrapObjects()
 {
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 	obj = &Objects[ID_KILL_ALL_TRIGGERS];
 	if (obj->loaded)
 	{
@@ -394,7 +394,7 @@ void InitialiseObjects()
 	AllocTR4Objects();
 	AllocTR5Objects();
 
-	OBJECT_INFO* obj;
+	ObjectInfo* obj;
 
 	for (int i = 0; i < ID_NUMBER_OBJECTS; i++)
 	{

@@ -50,7 +50,7 @@ void ControlAnimatingSlots(short itemNumber)
 void ControlTriggerTriggerer(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
 
 	if (floor->Flags.MarkTriggerer)
 	{

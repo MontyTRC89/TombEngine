@@ -343,7 +343,7 @@ void ClassicRollingBallControl(short itemNum)
 {
 	short x, z, dist, oldx, oldz, roomNum;
 	short y1, y2, ydist;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 	GameVector* old;
 	ROOM_INFO* r;
 

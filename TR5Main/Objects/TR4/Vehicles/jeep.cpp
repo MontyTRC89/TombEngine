@@ -122,7 +122,7 @@ static int TestJeepHeight(ItemInfo* item, int dz, int dx, Vector3Int* pos)
 	pos->x = item->Pose.Position.x + dz * s + dx * c;
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
+	FloorInfo* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
 	int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
 	if (pos->y < ceiling || ceiling == NO_HEIGHT)
 		return NO_HEIGHT;
@@ -176,7 +176,7 @@ static int DoJeepShift(ItemInfo* jeep, Vector3Int* pos, Vector3Int* old)
 		z = 0;
 
 		short roomNumber = jeep->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
+		FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
 		int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -284,7 +284,7 @@ static int JeepCanGetOff()
 	int z = item->Pose.Position.z - JEEP_GETOFF_DISTANCE * phd_cos(angle);
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 	int height = GetFloorHeight(floor, x, y, z);
 
 	auto collResult = GetCollision(x, y, z, item->RoomNumber);
@@ -446,7 +446,7 @@ static int GetOnJeep(int itemNumber)
 		return 0;
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) < -32000)
 		return 0;
 
@@ -556,7 +556,7 @@ static void JeepBaddieCollision(ItemInfo* jeep)
 				}
 				else
 				{
-					OBJECT_INFO* object = &Objects[item->ObjectNumber];
+					ObjectInfo* object = &Objects[item->ObjectNumber];
 					if (object->collision && object->intelligent ||
 						item->ObjectNumber == ID_ROLLINGBALL)
 					{
@@ -728,7 +728,7 @@ int JeepDynamics(ItemInfo* item)
 	}
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	int height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 	short speed;
@@ -1577,7 +1577,7 @@ int JeepControl(void)
 	int collide = JeepDynamics(item);
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 	GameVector oldPos;
 	oldPos.x = item->Pose.Position.x;

@@ -576,7 +576,7 @@ void RomanStatueControl(short itemNumber)
 				GetJointAbsPosition(item, &pos, 16);
 
 				auto* room = &g_Level.Rooms[item->RoomNumber];
-				FLOOR_INFO* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+				FloorInfo* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
 
 				// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 				if (floor->Stopper)

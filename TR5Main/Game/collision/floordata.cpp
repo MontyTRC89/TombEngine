@@ -9,7 +9,7 @@
 
 using namespace TEN::Floordata;
 
-int FLOOR_INFO::SectorPlane(int x, int z) const
+int FloorInfo::SectorPlane(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);
 	auto vector = Vector2(point.x, point.y);
@@ -19,7 +19,7 @@ int FLOOR_INFO::SectorPlane(int x, int z) const
 	return vector.x < 0 ? 0 : 1;
 }
 
-int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
+int FloorInfo::SectorPlaneCeiling(int x, int z) const
 {
 	const auto point = GetSectorPoint(x, z);
 	auto vector = Vector2(point.x, point.y);
@@ -29,7 +29,7 @@ int FLOOR_INFO::SectorPlaneCeiling(int x, int z) const
 	return vector.x < 0 ? 0 : 1;
 }
 
-Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const
+Vector2 FloorInfo::TiltXZ(int x, int z, bool floor) const
 {
 	auto plane = floor ? FloorCollision.Planes[SectorPlane(x, z)] : CeilingCollision.Planes[SectorPlane(x, z)];
 	auto tiltX = (int)-(plane.x * WALL_SIZE / STEP_SIZE);
@@ -38,54 +38,54 @@ Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const
 	return Vector2(tiltX, tiltZ);
 }
 
-bool FLOOR_INFO::FloorIsSplit() const
+bool FloorInfo::FloorIsSplit() const
 {
 	bool differentPlanes  = FloorCollision.Planes[0] != FloorCollision.Planes[1];
 	return differentPlanes || FloorHasSplitPortal();
 }
 
-bool FLOOR_INFO::FloorIsDiagonalStep() const
+bool FloorInfo::FloorIsDiagonalStep() const
 {
 	return FloorIsSplit() && 
 		   round(FloorCollision.Planes[0].z) != round(FloorCollision.Planes[1].z) &&
 		   (FloorCollision.SplitAngle == 45.0f * RADIAN || FloorCollision.SplitAngle == 135.0f * RADIAN);
 }
 
-bool FLOOR_INFO::CeilingIsDiagonalStep() const
+bool FloorInfo::CeilingIsDiagonalStep() const
 {
 	return CeilingIsSplit() &&
 		round(CeilingCollision.Planes[0].z) != round(CeilingCollision.Planes[1].z) &&
 		(CeilingCollision.SplitAngle == 45.0f * RADIAN || CeilingCollision.SplitAngle == 135.0f * RADIAN);
 }
 
-bool FLOOR_INFO::CeilingIsSplit() const
+bool FloorInfo::CeilingIsSplit() const
 {
 	bool differentPlanes = CeilingCollision.Planes[0] != CeilingCollision.Planes[1];
 	return differentPlanes || CeilingHasSplitPortal();
 }
 
-bool FLOOR_INFO::FloorHasSplitPortal() const
+bool FloorInfo::FloorHasSplitPortal() const
 {
 	return FloorCollision.Portals[0] != FloorCollision.Portals[1];
 }
 
-bool FLOOR_INFO::CeilingHasSplitPortal() const
+bool FloorInfo::CeilingHasSplitPortal() const
 {
 	return CeilingCollision.Portals[0] != CeilingCollision.Portals[1];
 }
 
-std::optional<int> FLOOR_INFO::RoomBelow(int plane) const
+std::optional<int> FloorInfo::RoomBelow(int plane) const
 {
 	const auto room = FloorCollision.Portals[plane];
 	return room != -1 ? std::optional{room} : std::nullopt;
 }
 
-std::optional<int> FLOOR_INFO::RoomBelow(int x, int z) const
+std::optional<int> FloorInfo::RoomBelow(int x, int z) const
 {
 	return RoomBelow(SectorPlane(x, z));
 }
 
-std::optional<int> FLOOR_INFO::RoomBelow(int x, int y, int z) const
+std::optional<int> FloorInfo::RoomBelow(int x, int y, int z) const
 {
 	const auto floorHeight = FloorHeight(x, z);
 	const auto ceilingHeight = CeilingHeight(x, z);
@@ -101,18 +101,18 @@ std::optional<int> FLOOR_INFO::RoomBelow(int x, int y, int z) const
 	return RoomBelow(x, z);
 }
 
-std::optional<int> FLOOR_INFO::RoomAbove(int plane) const
+std::optional<int> FloorInfo::RoomAbove(int plane) const
 {
 	const auto room = CeilingCollision.Portals[plane];
 	return room != NO_ROOM ? std::optional{room} : std::nullopt;
 }
 
-std::optional<int> FLOOR_INFO::RoomAbove(int x, int z) const
+std::optional<int> FloorInfo::RoomAbove(int x, int z) const
 {
 	return RoomAbove(SectorPlaneCeiling(x, z));
 }
 
-std::optional<int> FLOOR_INFO::RoomAbove(int x, int y, int z) const
+std::optional<int> FloorInfo::RoomAbove(int x, int y, int z) const
 {
 	const auto floorHeight = FloorHeight(x, z);
 	const auto ceilingHeight = CeilingHeight(x, z);
@@ -128,12 +128,12 @@ std::optional<int> FLOOR_INFO::RoomAbove(int x, int y, int z) const
 	return RoomAbove(x, z);
 }
 
-std::optional<int> FLOOR_INFO::RoomSide() const
+std::optional<int> FloorInfo::RoomSide() const
 {
 	return WallPortal != -1 ? std::optional{WallPortal} : std::nullopt;
 }
 
-int FLOOR_INFO::FloorHeight(int x, int z) const
+int FloorInfo::FloorHeight(int x, int z) const
 {
 	const auto plane = SectorPlane(x, z);
 	const auto vector = GetSectorPoint(x, z);
@@ -141,7 +141,7 @@ int FLOOR_INFO::FloorHeight(int x, int z) const
 	return FloorCollision.Planes[plane].x * vector.x + FloorCollision.Planes[plane].y * vector.y + FloorCollision.Planes[plane].z;
 }
 
-int FLOOR_INFO::FloorHeight(int x, int y, int z) const
+int FloorInfo::FloorHeight(int x, int y, int z) const
 {
 	auto height = FloorHeight(x, z);
 	const auto ceilingHeight = CeilingHeight(x, z);
@@ -157,7 +157,7 @@ int FLOOR_INFO::FloorHeight(int x, int y, int z) const
 	return height;
 }
 
-int FLOOR_INFO::BridgeFloorHeight(int x, int y, int z) const
+int FloorInfo::BridgeFloorHeight(int x, int y, int z) const
 {
 	for (const auto itemNumber : BridgeItem)
 	{
@@ -171,7 +171,7 @@ int FLOOR_INFO::BridgeFloorHeight(int x, int y, int z) const
 	return FloorHeight(x, y, z);
 }
 
-int FLOOR_INFO::CeilingHeight(int x, int z) const
+int FloorInfo::CeilingHeight(int x, int z) const
 {
 	const auto plane = SectorPlaneCeiling(x, z);
 	const auto vector = GetSectorPoint(x, z);
@@ -179,7 +179,7 @@ int FLOOR_INFO::CeilingHeight(int x, int z) const
 	return CeilingCollision.Planes[plane].x * vector.x + CeilingCollision.Planes[plane].y * vector.y + CeilingCollision.Planes[plane].z;
 }
 
-int FLOOR_INFO::CeilingHeight(int x, int y, int z) const
+int FloorInfo::CeilingHeight(int x, int y, int z) const
 {
 	auto height = CeilingHeight(x, z);
 	const auto floorHeight = FloorHeight(x, z);
@@ -195,7 +195,7 @@ int FLOOR_INFO::CeilingHeight(int x, int y, int z) const
 	return height;
 }
 
-int FLOOR_INFO::BridgeCeilingHeight(int x, int y, int z) const
+int FloorInfo::BridgeCeilingHeight(int x, int y, int z) const
 {
 	for (const auto itemNumber : BridgeItem)
 	{
@@ -209,37 +209,37 @@ int FLOOR_INFO::BridgeCeilingHeight(int x, int y, int z) const
 	return CeilingHeight(x, y, z);
 }
 
-Vector2 FLOOR_INFO::FloorSlope(int plane) const
+Vector2 FloorInfo::FloorSlope(int plane) const
 {
 	return Vector2{FloorCollision.Planes[plane].x, FloorCollision.Planes[plane].y};
 }
 
-Vector2 FLOOR_INFO::FloorSlope(int x, int z) const
+Vector2 FloorInfo::FloorSlope(int x, int z) const
 {
 	return FloorSlope(SectorPlane(x, z));
 }
 
-Vector2 FLOOR_INFO::CeilingSlope(int plane) const
+Vector2 FloorInfo::CeilingSlope(int plane) const
 {
 	return Vector2{CeilingCollision.Planes[plane].x, CeilingCollision.Planes[plane].y};
 }
 
-Vector2 FLOOR_INFO::CeilingSlope(int x, int z) const
+Vector2 FloorInfo::CeilingSlope(int x, int z) const
 {
 	return CeilingSlope(SectorPlaneCeiling(x, z));
 }
 
-bool FLOOR_INFO::IsWall(int plane) const
+bool FloorInfo::IsWall(int plane) const
 {
 	return FloorCollision.SplitAngle == CeilingCollision.SplitAngle && FloorCollision.Planes[plane] == CeilingCollision.Planes[plane];
 }
 
-bool FLOOR_INFO::IsWall(int x, int z) const
+bool FloorInfo::IsWall(int x, int z) const
 {
 	return IsWall(SectorPlane(x, z));
 }
 
-short FLOOR_INFO::InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const
+short FloorInfo::InsideBridge(int x, int y, int z, bool floorBorder, bool ceilingBorder) const
 {
 	for (const auto itemNumber : BridgeItem)
 	{
@@ -253,12 +253,12 @@ short FLOOR_INFO::InsideBridge(int x, int y, int z, bool floorBorder, bool ceili
 	return -1;
 }
 
-void FLOOR_INFO::AddItem(short itemNumber)
+void FloorInfo::AddItem(short itemNumber)
 {
 	BridgeItem.insert(itemNumber);
 }
 
-void FLOOR_INFO::RemoveItem(short itemNumber)
+void FloorInfo::RemoveItem(short itemNumber)
 {
 	BridgeItem.erase(itemNumber);
 }
@@ -301,18 +301,18 @@ namespace TEN::Floordata
 		return pos;
 	}
 
-	FLOOR_INFO& GetFloor(int roomNumber, const Vector2Int& pos)
+	FloorInfo& GetFloor(int roomNumber, const Vector2Int& pos)
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 		return room.floor[room.zSize * pos.x + pos.y];
 	}
 
-	FLOOR_INFO& GetFloor(int roomNumber, int x, int z)
+	FloorInfo& GetFloor(int roomNumber, int x, int z)
 	{
 		return GetFloor(roomNumber, GetRoomPosition(roomNumber, x, z));
 	}
 
-	FLOOR_INFO& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber)
+	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber)
 	{
 		auto floor = &GetFloor(roomNumber, x, z);
 
@@ -330,7 +330,7 @@ namespace TEN::Floordata
 		return *floor;
 	}
 
-	FLOOR_INFO& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber)
+	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber)
 	{
 		auto floor = &GetFloorSide(roomNumber, x, z, bottomRoomNumber);
 		auto wall = floor->IsWall(x, z);
@@ -347,7 +347,7 @@ namespace TEN::Floordata
 		return *floor;
 	}
 
-	FLOOR_INFO& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber)
+	FloorInfo& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber)
 	{
 		auto floor = &GetFloorSide(roomNumber, x, z, topRoomNumber);
 		auto wall = floor->IsWall(x, z);
@@ -364,7 +364,7 @@ namespace TEN::Floordata
 		return *floor;
 	}
 
-	std::optional<int> GetTopHeight(FLOOR_INFO& startFloor, int x, int y, int z, int* topRoomNumber, FLOOR_INFO** topFloor)
+	std::optional<int> GetTopHeight(FloorInfo& startFloor, int x, int y, int z, int* topRoomNumber, FloorInfo** topFloor)
 	{
 		auto floor = &startFloor;
 		int roomNumber;
@@ -392,7 +392,7 @@ namespace TEN::Floordata
 		return std::optional{y};
 	}
 
-	std::optional<int> GetBottomHeight(FLOOR_INFO& startFloor, int x, int y, int z, int* bottomRoomNumber, FLOOR_INFO** bottomFloor)
+	std::optional<int> GetBottomHeight(FloorInfo& startFloor, int x, int y, int z, int* bottomRoomNumber, FloorInfo** bottomFloor)
 	{
 		auto floor = &startFloor;
 		int roomNumber;

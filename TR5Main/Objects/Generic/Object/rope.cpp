@@ -32,7 +32,7 @@ namespace TEN::Entities::Generic
 		itemPos.y = item->Pose.Position.y;
 		itemPos.z = item->Pose.Position.z;
 
-		FLOOR_INFO* floor = GetFloor(itemPos.x, itemPos.y, itemPos.z, &roomNumber);
+		FloorInfo* floor = GetFloor(itemPos.x, itemPos.y, itemPos.z, &roomNumber);
 		itemPos.y = GetCeiling(floor, itemPos.x, itemPos.y, itemPos.z);
 
 		Vector3Int pos = { 0, 16384, 0 };

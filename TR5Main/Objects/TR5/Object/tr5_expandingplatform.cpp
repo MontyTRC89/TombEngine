@@ -19,7 +19,7 @@ void InitialiseExpandingPlatform(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	g_Level.Boxes[floor->Box].flags &= ~BLOCKED;
 
 	// Set mutators to default

@@ -78,7 +78,7 @@ struct SECTOR_FLAGS
 	}
 };
 
-class FLOOR_INFO
+class FloorInfo
 {
 	public:
 		int Room;
@@ -95,7 +95,7 @@ class FLOOR_INFO
 
 		int SectorPlane(int x, int z) const;
 		int SectorPlaneCeiling(int x, int z) const;
-		Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const;
+		Vector2 FloorInfo::TiltXZ(int x, int z, bool floor) const;
 		bool FloorIsSplit() const;
 		bool FloorIsDiagonalStep() const;
 		bool CeilingIsDiagonalStep() const;
@@ -130,13 +130,13 @@ namespace TEN::Floordata
 {
 	Vector2Int GetSectorPoint(int x, int z);
 	Vector2Int GetRoomPosition(int roomNumber, int x, int z);
-	FLOOR_INFO& GetFloor(int roomNumber, const Vector2Int& pos);
-	FLOOR_INFO& GetFloor(int roomNumber, int x, int z);
-	FLOOR_INFO& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
-	FLOOR_INFO& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
-	FLOOR_INFO& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber = nullptr);
-	std::optional<int> GetTopHeight(FLOOR_INFO& startFloor, int x, int y, int z, int* topRoomNumber = nullptr, FLOOR_INFO** topFloor = nullptr);
-	std::optional<int> GetBottomHeight(FLOOR_INFO& startFloor, int x, int y, int z, int* bottomRoomNumber = nullptr, FLOOR_INFO** bottomFloor = nullptr);
+	FloorInfo& GetFloor(int roomNumber, const Vector2Int& pos);
+	FloorInfo& GetFloor(int roomNumber, int x, int z);
+	FloorInfo& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
+	FloorInfo& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);
+	FloorInfo& GetTopFloor(int roomNumber, int x, int z, int* topRoomNumber = nullptr);
+	std::optional<int> GetTopHeight(FloorInfo& startFloor, int x, int y, int z, int* topRoomNumber = nullptr, FloorInfo** topFloor = nullptr);
+	std::optional<int> GetBottomHeight(FloorInfo& startFloor, int x, int y, int z, int* bottomRoomNumber = nullptr, FloorInfo** bottomFloor = nullptr);
 	std::optional<int> GetFloorHeight(const ROOM_VECTOR& location, int x, int z);
 	std::optional<int> GetCeilingHeight(const ROOM_VECTOR& location, int x, int z);
 	std::optional<ROOM_VECTOR> GetBottomRoom(ROOM_VECTOR location, int x, int y, int z);

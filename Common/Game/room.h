@@ -105,7 +105,7 @@ struct ROOM_INFO
 	std::vector<ROOM_DOOR> doors;
 	int xSize;
 	int zSize;
-	std::vector<FLOOR_INFO> floor;
+	std::vector<FloorInfo> floor;
 	Vector3 ambient;
 	std::vector<ROOM_LIGHT> lights;
 	std::vector<MESH_INFO> mesh;
@@ -138,4 +138,4 @@ PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);
 
-FLOOR_INFO* GetSector(ROOM_INFO* room, int x, int z);
+FloorInfo* GetSector(ROOM_INFO* room, int x, int z);
