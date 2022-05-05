@@ -10,35 +10,34 @@
 
 using std::vector;
 
-CREATURE_INFO* GetCreatureInfo(ITEM_INFO* item)
+CreatureInfo* GetCreatureInfo(ITEM_INFO* item)
 {
-    return (CREATURE_INFO*)item->data;
+    return (CreatureInfo*)item->Data;
 }
 
-void TargetNearestEntity(ITEM_INFO* item, CREATURE_INFO* creature)
+void TargetNearestEntity(ITEM_INFO* item, CreatureInfo* creature)
 {
-	ITEM_INFO* target;
-	int bestdistance;
-	int distance;
-	int x, z;
-
-	bestdistance = MAXINT;
+	int bestDistance = MAXINT;
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
-		target = &g_Level.Items[i];
+		auto* target = &g_Level.Items[i];
 
 		if (target == nullptr)
 			continue;
 
-		if (target != item && target->hitPoints > 0 && target->status != ITEM_INVISIBLE)
+		if (target != item &&
+			target->HitPoints > 0 &&
+			target->Status != ITEM_INVISIBLE)
 		{
-			x = target->pos.xPos - item->pos.xPos;
-			z = target->pos.zPos - item->pos.zPos;
-			distance = SQUARE(z) + SQUARE(x);
-			if (distance < bestdistance)
+			int x = target->Pose.Position.x - item->Pose.Position.x;
+			int y = target->Pose.Position.y - item->Pose.Position.y;
+			int z = target->Pose.Position.z - item->Pose.Position.z;
+
+			int distance = pow(x, 2) + pow(y, 2) + pow(z, 2);
+			if (distance < bestDistance)
 			{
-				creature->enemy = target;
-				bestdistance = distance;
+				creature->Enemy = target;
+				bestDistance = distance;
 			}
 		}
 	}

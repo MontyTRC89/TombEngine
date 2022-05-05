@@ -81,14 +81,14 @@ void Static::Register(sol::table & parent)
 
 Vec3 Static::GetPos() const
 {
-	return Vec3{ m_mesh.pos.xPos, m_mesh.pos.yPos, m_mesh.pos.zPos };
+	return Vec3{ m_mesh.pos.Position.x, m_mesh.pos.Position.y, m_mesh.pos.Position.z };
 }
 
 void Static::SetPos(Vec3 const& pos)
 {
-	m_mesh.pos.xPos = pos.x;
-	m_mesh.pos.yPos = pos.y;
-	m_mesh.pos.zPos = pos.z;
+	m_mesh.pos.Position.x = pos.x;
+	m_mesh.pos.Position.y = pos.y;
+	m_mesh.pos.Position.z = pos.z;
 }
 
 // This does not guarantee that the returned value will be identical
@@ -98,17 +98,17 @@ void Static::SetPos(Vec3 const& pos)
 Rotation Static::GetRot() const
 {
 	return {
-		static_cast<int>(TO_DEGREES(m_mesh.pos.xRot)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.yRot)) % 360,
-		static_cast<int>(TO_DEGREES(m_mesh.pos.zRot)) % 360
+		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.x)) % 360,
+		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.y)) % 360,
+		static_cast<int>(TO_DEGREES(m_mesh.pos.Orientation.z)) % 360
 	};
 }
 
 void Static::SetRot(Rotation const& rot)
 {
-	m_mesh.pos.xRot = FROM_DEGREES(rot.x);
-	m_mesh.pos.yRot = FROM_DEGREES(rot.y);
-	m_mesh.pos.zRot = FROM_DEGREES(rot.z);
+	m_mesh.pos.Orientation.x = FROM_DEGREES(rot.x);
+	m_mesh.pos.Orientation.y = FROM_DEGREES(rot.y);
+	m_mesh.pos.Orientation.z = FROM_DEGREES(rot.z);
 }
 
 std::string Static::GetName() const

@@ -7,23 +7,36 @@
 #include "Game/control/control.h"
 #include "Specific/trmath.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/itemdata/creature_info.h"
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO BitBeetleBite = { 0,0,0,12 };
+	BITE_INFO BigBeetleBite = { 0, 0, 0, 12 };
+
+	// TODO
+	enum BigBeetleState
+	{
+
+	};
+
+	// TODO
+	enum BigBeetleAnim
+	{
+
+	};
 
 	void InitialiseBigBeetle(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
 
-		item->animNumber = Objects[item->objectNumber].animIndex + 3;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->goalAnimState = 1;
-		item->currentAnimState = 1;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.TargetState = 1;
+		item->Animation.ActiveState = 1;
 	}
 
 	void BigBeetleControl(short itemNumber)
@@ -31,167 +44,158 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
 
 		short angle = 0;
 
-		if (item->hitPoints <= 0)
+		if (item->HitPoints <= 0)
 		{
-			if (item->currentAnimState != 6)
+			if (item->Animation.ActiveState != 6)
 			{
-				if (item->currentAnimState != 7)
+				if (item->Animation.ActiveState != 7)
 				{
-					if (item->currentAnimState == 8)
+					if (item->Animation.ActiveState == 8)
 					{
-						item->pos.xRot = 0;
-						item->pos.yPos = item->floor;
+						item->Pose.Orientation.x = 0;
+						item->Pose.Position.y = item->Floor;
 					}
 					else
 					{
-						item->animNumber = Objects[item->objectNumber].animIndex + 5;
-						item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-						item->gravityStatus = true;
-						item->currentAnimState = 6;
-						item->speed = 0;
-						item->pos.xRot = 0;
+						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.ActiveState = 6;
+						item->Animation.Velocity = 0;
+						item->Animation.Airborne = true;
+						item->Pose.Orientation.x = 0;
 					}
 				}
-				else if (item->pos.yPos >= item->floor)
+				else if (item->Pose.Position.y >= item->Floor)
 				{
-					item->pos.yPos = item->floor;
-					item->gravityStatus = false;
-					item->fallspeed = 0;
-					item->goalAnimState = 8;
+					item->Pose.Position.y = item->Floor;
+					item->Animation.VerticalVelocity = 0;
+					item->Animation.Airborne = false;
+					item->Animation.TargetState = 8;
 				}
 			}
-			item->pos.xRot = 0;
+
+			item->Pose.Orientation.x = 0;
 		}
 		else
 		{
-			AI_INFO info;
-			CreatureAIInfo(item, &info);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &info, VIOLENT);
-			if (creature->flags)
-				creature->mood = ESCAPE_MOOD;
-			CreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
 
-			angle = CreatureTurn(item, creature->maximumTurn);
+			if (creature->Flags)
+				creature->Mood = MoodType::Escape;
 
-			if (info.distance > SQUARE(3072)
-				|| !(GetRandomControl() & 0x7F)
-				|| item->hitStatus)
+			CreatureMood(item, &AI, VIOLENT);
+
+			angle = CreatureTurn(item, creature->MaxTurn);
+
+			if (item->HitStatus ||
+				AI.distance > pow(SECTOR(3), 2) ||
+				!(GetRandomControl() & 0x7F))
 			{
-				creature->flags = 0;
+				creature->Flags = 0;
 			}
 
-			switch (item->currentAnimState)
+			switch (item->Animation.ActiveState)
 			{
 			case 1:
-				item->pos.yPos = item->floor;
-				creature->maximumTurn = ANGLE(1);
+				item->Pose.Position.y = item->Floor;
+				creature->MaxTurn = ANGLE(1.0f);
 
-				if (item->hitStatus
-					|| info.distance < SQUARE(3072)
-					|| creature->hurtByLara
-					|| item->aiBits == MODIFY)
+				if (item->HitStatus ||
+					item->AIBits == MODIFY ||
+					creature->HurtByLara ||
+					AI.distance < pow(SECTOR(3), 2))
 				{
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 				}
 
 				break;
 
 			case 3:
-				creature->maximumTurn = ANGLE(7);
+				creature->MaxTurn = ANGLE(7.0f);
 
-				if (item->requiredAnimState)
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
+				else if (AI.ahead)
 				{
-					item->goalAnimState = item->requiredAnimState;
-				}
-				else if (info.ahead)
-				{
-					if (info.distance < SQUARE(256))
-					{
-						item->goalAnimState = 9;
-					}
+					if (AI.distance < pow(CLICK(1), 2))
+						item->Animation.TargetState = 9;
 				}
 
 				break;
 
 			case 4u:
-				creature->maximumTurn = ANGLE(7);
+				creature->MaxTurn = ANGLE(7.0f);
 
-				if (info.ahead)
+				if (AI.ahead)
 				{
-					if (info.distance < SQUARE(256))
-					{
-						item->goalAnimState = 4;
-					}
+					if (AI.distance < pow(CLICK(1), 2))
+						item->Animation.TargetState = 4;
 				}
-				else if (info.distance < SQUARE(256))
-				{
-					item->goalAnimState = 9;
-				}
+				else if (AI.distance < pow(CLICK(1), 2))
+					item->Animation.TargetState = 9;
 				else
 				{
-					item->requiredAnimState = 3;
-					item->goalAnimState = 9;
+					item->Animation.RequiredState = 3;
+					item->Animation.TargetState = 9;
 				}
 
-				if (!creature->flags)
+				if (!creature->Flags)
 				{
-					if (item->touchBits & 0x60)
+					if (item->TouchBits & 0x60)
 					{
-						LaraItem->hitPoints -= 50;
-						LaraItem->hitStatus = true;
+						LaraItem->HitPoints -= 50;
+						LaraItem->HitStatus = true;
+
 						CreatureEffect2(
 							item,
-							&BitBeetleBite,
+							&BigBeetleBite,
 							5,
 							-1,
 							DoBloodSplat);
-						creature->flags = 1;
+
+						creature->Flags = 1;
 					}
 				}
 
 				break;
 
 			case 5:
-				creature->flags = 0;
+				creature->Flags = 0;
 
-				item->pos.yPos += 51;
-				if (item->pos.yPos > item->floor)
-					item->pos.yPos = item->floor;
+				item->Pose.Position.y += 51;
+				if (item->Pose.Position.y > item->Floor)
+					item->Pose.Position.y = item->Floor;
 
 				break;
 
 			case 9u:
-				creature->maximumTurn = ANGLE(7);
+				creature->MaxTurn = ANGLE(7.0f);
 
-				if (item->requiredAnimState)
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
+				else if (!item->HitStatus &&
+					item->AIBits != MODIFY &&
+					GetRandomControl() >= 384 &&
+					(creature->Mood != MoodType::Bored && GetRandomControl() >= 128 ||
+						creature->HurtByLara ||
+						item->AIBits == MODIFY))
 				{
-					item->goalAnimState = item->requiredAnimState;
-				}
-				else if (!item->hitStatus
-					&& GetRandomControl() >= 384
-					&& item->aiBits != MODIFY
-					&& (creature->mood && GetRandomControl() >= 128
-						|| creature->hurtByLara
-						|| item->aiBits == MODIFY))
-				{
-					if (info.ahead)
+					if (AI.ahead)
 					{
-						if (info.distance < SQUARE(256) && !creature->flags)
-						{
-							item->goalAnimState = 4;
-						}
+						if (AI.distance < pow(CLICK(1), 2) && !creature->Flags)
+							item->Animation.TargetState = 4;
 					}
 				}
 				else
-				{
-					item->goalAnimState = 3;
-				}
+					item->Animation.TargetState = 3;
 
 				break;
 

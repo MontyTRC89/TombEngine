@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Traps/dart_emitter.h"
 #include "Specific/level.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -10,42 +11,40 @@ namespace TEN::Entities::Traps
 {
 	void DartControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->touchBits)
+		if (item->TouchBits)
 		{
-			LaraItem->hitPoints -= 25;
-			LaraItem->hitStatus = true;
-			Lara.poisoned += 160;
-			DoBloodSplat(item->pos.xPos, item->pos.yPos, item->pos.zPos, (GetRandomControl() & 3) + 4, LaraItem->pos.yRot, LaraItem->roomNumber);
+			LaraItem->HitPoints -= 25;
+			LaraItem->HitStatus = true;
+			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
+			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
 			KillItem(itemNumber);
 		}
 		else
 		{
-			int oldX = item->pos.xPos;
-			int oldZ = item->pos.zPos-1000;
+			int oldX = item->Pose.Position.x;
+			int oldZ = item->Pose.Position.z - 1000;
 
-			int speed = item->speed * phd_cos(item->pos.xRot);
+			int velocity = item->Animation.Velocity * phd_cos(item->Pose.Orientation.x);
 
-			item->pos.xPos += speed * phd_sin(item->pos.yRot);
-			item->pos.yPos -= item->speed * phd_sin(item->pos.xRot);
-			item->pos.zPos += speed * phd_cos(item->pos.yRot);
+			item->Pose.Position.x += velocity * phd_sin(item->Pose.Orientation.y);
+			item->Pose.Position.y -= item->Animation.Velocity * phd_sin(item->Pose.Orientation.x);
+			item->Pose.Position.z += velocity * phd_cos(item->Pose.Orientation.y);
 
-			short roomNumber = item->roomNumber;
-			FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos, &roomNumber);
+			short roomNumber = item->RoomNumber;
+			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
-			if (item->roomNumber != roomNumber)
+			if (item->RoomNumber != roomNumber)
 				ItemNewRoom(itemNumber, roomNumber);
 
-			int height = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-			item->floor = height;
+			int height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+			item->Floor = height;
 
-			if (item->pos.yPos >= height)
+			if (item->Pose.Position.y >= height)
 			{
 				for (int i = 0; i < 4; i++)
-				{
-					TriggerDartSmoke(oldX, item->pos.yPos, oldZ, 0, 0, true);
-				}
+					TriggerDartSmoke(oldX, item->Pose.Position.y, oldZ, 0, 0, true);
 
 				KillItem(itemNumber);
 			}
@@ -56,17 +55,15 @@ namespace TEN::Entities::Traps
 	{
 		ITEM_INFO* item = &g_Level.Items[itemNumber];
 
-		if (item->active)
+		if (item->Active)
 		{
-			if (item->timer > 0)
+			if (item->Timer > 0)
 			{
-				item->timer--;
+				item->Timer--;
 				return;
 			}
 			else
-			{
-				item->timer = 24;
-			}
+				item->Timer = 24;
 		}
 
 		short dartItemNumber = CreateItem();
@@ -75,13 +72,13 @@ namespace TEN::Entities::Traps
 		{
 			ITEM_INFO* dartItem = &g_Level.Items[dartItemNumber];
 
-			dartItem->objectNumber = ID_DARTS;
-			dartItem->roomNumber = item->roomNumber;
+			dartItem->ObjectNumber = ID_DARTS;
+			dartItem->RoomNumber = item->RoomNumber;
 
 			int x = 0;
 			int z = 0;
 
-			switch (item->pos.yRot)
+			switch (item->Pose.Orientation.y)
 			{
 			case 0:
 				z = WALL_SIZE / 2;
@@ -100,15 +97,15 @@ namespace TEN::Entities::Traps
 				break;
 			}
 
-			dartItem->pos.xPos = x + item->pos.xPos;
-			dartItem->pos.yPos = item->pos.yPos - WALL_SIZE / 2;
-			dartItem->pos.zPos = z + item->pos.zPos;
+			dartItem->Pose.Position.x = x + item->Pose.Position.x;
+			dartItem->Pose.Position.y = item->Pose.Position.y - WALL_SIZE / 2;
+			dartItem->Pose.Position.z = z + item->Pose.Position.z;
 
 			InitialiseItem(dartItemNumber);
 
-			dartItem->pos.xRot = 0;
-			dartItem->pos.yRot = item->pos.yRot + -ANGLE(180);
-			dartItem->speed = 256;
+			dartItem->Pose.Orientation.x = 0;
+			dartItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180);
+			dartItem->Animation.Velocity = 256;
 
 			int xf = 0;
 			int zf = 0;
@@ -135,20 +132,20 @@ namespace TEN::Entities::Traps
 				else
 					xv = -(xf & random);
 
-				TriggerDartSmoke(dartItem->pos.xPos, dartItem->pos.yPos, dartItem->pos.zPos, xv, zv, false);
+				TriggerDartSmoke(dartItem->Pose.Position.x, dartItem->Pose.Position.y, dartItem->Pose.Position.z, xv, zv, false);
 			}
 
 			AddActiveItem(dartItemNumber);
-			dartItem->status = ITEM_ACTIVE;
+			dartItem->Status = ITEM_ACTIVE;
 
-			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->pos, 0);
+			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->Pose, 0);
 		}
 	}
 
 	void TriggerDartSmoke(int x, int y, int z, int xv, int zv, bool hit)
 	{
-		int dx = LaraItem->pos.xPos - x;
-		int dz = LaraItem->pos.zPos - z;
+		int dx = LaraItem->Pose.Position.x - x;
+		int dz = LaraItem->Pose.Position.z - z;
 
 		if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 			return;

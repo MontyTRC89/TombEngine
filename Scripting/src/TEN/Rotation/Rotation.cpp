@@ -46,16 +46,16 @@ Rotation::Rotation(int aX, int aY, int aZ)
 
 void Rotation::StoreInPHDPos(PHD_3DPOS& pos) const
 {
-	pos.xRot = x;
-	pos.yRot = y;
-	pos.zRot = z;
+	pos.Orientation.x = x;
+	pos.Orientation.y = y;
+	pos.Orientation.z = z;
 }
 
 Rotation::Rotation(PHD_3DPOS const & pos)
 {
-	x = pos.xRot;
-	y = pos.yRot;
-	z = pos.zRot;
+	x = pos.Orientation.x;
+	y = pos.Orientation.y;
+	z = pos.Orientation.z;
 }
 
 /***

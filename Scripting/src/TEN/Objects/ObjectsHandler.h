@@ -21,7 +21,7 @@ public:
 	{
 		ITEM_INFO* item = &g_Level.Items[id];
 		bool hasName = !(item->luaCallbackOnCollidedWithObjectName.empty() && item->luaCallbackOnCollidedWithRoomName.empty());
-		if(hasName && item->collidable && (item->status != ITEM_INVISIBLE))
+		if(hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return m_collidingItems.insert(id).second;
 
 		return false;
@@ -31,7 +31,7 @@ public:
 	{
 		ITEM_INFO* item = &g_Level.Items[id];
 		bool hasName = !(item->luaCallbackOnCollidedWithObjectName.empty() && item->luaCallbackOnCollidedWithRoomName.empty());
-		if(!force && hasName && item->collidable && (item->status != ITEM_INVISIBLE))
+		if(!force && hasName && item->Collidable && (item->Status != ITEM_INVISIBLE))
 			return false;
 
 		return m_collidingItemsToRemove.insert(id).second;

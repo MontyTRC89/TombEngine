@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <regex>
 #include "Game/camera.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
@@ -135,7 +136,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMultiplier, float gainMultiplier)
+long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMultiplier, float gainMultiplier)
 {
 	if (effectID >= g_Level.SoundMap.size())
 		return 0;
@@ -143,10 +144,10 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	if (BASS_GetDevice() == -1)
 		return 0;
 
-	if (!(env_flags & SFX_ALWAYS))
+	if (!(envFlags & SFX_ALWAYS))
 	{
 		// Don't play effect if effect's environment isn't the same as camera position's environment
-		if ((env_flags & ENV_FLAG_WATER) != (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER))
+		if (envFlags & ENV_FLAG_WATER != TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
 			return 0;
 	}
 
@@ -264,7 +265,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int env_flags, float pitchMu
 	SoundSlot[freeSlot].EffectID = effectID;
 	SoundSlot[freeSlot].Channel = channel;
 	SoundSlot[freeSlot].Gain = gain;
-	SoundSlot[freeSlot].Origin = position ? Vector3(position->xPos, position->yPos, position->zPos) : SOUND_OMNIPRESENT_ORIGIN;
+	SoundSlot[freeSlot].Origin = position ? Vector3(position->Position.x, position->Position.y, position->Position.z) : SOUND_OMNIPRESENT_ORIGIN;
 
 	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", false, channel, sampleToPlay))
 		return 0;
@@ -393,7 +394,7 @@ void PlaySoundTrack(std::string track, SOUNDTRACK_PLAYTYPE mode, QWORD position)
 			fullTrackName = TRACKS_PATH + track + ".wav";
 			if (!std::filesystem::exists(fullTrackName))
 			{
-				TENLog("No any soundtrack files with name '" + track + "' were found", LogLevel::Error);
+				TENLog("No soundtrack files with name '" + track + "' were found", LogLevel::Error);
 				return;
 			}
 		}
@@ -588,7 +589,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 
 				// Check if effect origin is equal OR in nearest possible hearing range.
 
-				Vector3 origin = Vector3(position->xPos, position->yPos, position->zPos);
+				Vector3 origin = Vector3(position->Position.x, position->Position.y, position->Position.z);
 				if (Vector3::Distance(origin, SoundSlot[i].Origin) < SOUND_MAXVOL_RADIUS)
 					return i;
 			}
@@ -604,7 +605,7 @@ int Sound_EffectIsPlaying(int effectID, PHD_3DPOS *position)
 float Sound_DistanceToListener(PHD_3DPOS *position)
 {
 	if (!position) return 0.0f;	// Assume sound is 2D menu sound
-	return Sound_DistanceToListener(Vector3(position->xPos, position->yPos, position->zPos));
+	return Sound_DistanceToListener(Vector3(position->Position.x, position->Position.y, position->Position.z));
 }
 float Sound_DistanceToListener(Vector3 position)
 {
@@ -653,12 +654,12 @@ bool Sound_UpdateEffectPosition(int index, PHD_3DPOS *position, bool force)
 		BASS_ChannelGetInfo(SoundSlot[index].Channel, &info);
 		if (info.flags & BASS_SAMPLE_3D)
 		{
-			SoundSlot[index].Origin.x = position->xPos;
-			SoundSlot[index].Origin.y = position->yPos;
-			SoundSlot[index].Origin.z = position->zPos;
+			SoundSlot[index].Origin.x = position->Position.x;
+			SoundSlot[index].Origin.y = position->Position.y;
+			SoundSlot[index].Origin.z = position->Position.z;
 
-			auto pos = BASS_3DVECTOR(position->xPos, position->yPos, position->zPos);
-			auto rot = BASS_3DVECTOR(position->xRot, position->yRot, position->zRot);
+			auto pos = BASS_3DVECTOR(position->Position.x, position->Position.y, position->Position.z);
+			auto rot = BASS_3DVECTOR(position->Orientation.x, position->Orientation.y, position->Orientation.z);
 			BASS_ChannelSet3DPosition(SoundSlot[index].Channel, &pos, &rot, NULL);
 			BASS_Apply3D();
 		}
@@ -740,14 +741,16 @@ void Sound_UpdateScene()
 	Vector3 at = Vector3(Camera.target.x, Camera.target.y, Camera.target.z) -
 		Vector3(Camera.mikePos.x, Camera.mikePos.y, Camera.mikePos.z);
 	at.Normalize();
-	auto mikePos = BASS_3DVECTOR( Camera.mikePos.x,		// Pos
+	auto mikePos = BASS_3DVECTOR(					// Pos
+		Camera.mikePos.x,
 		Camera.mikePos.y,
 		Camera.mikePos.z);
-	auto laraVel = BASS_3DVECTOR(Lara.currentXvel,		// Vel
-		Lara.currentYvel,
-		Lara.currentZvel);
-	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);			// At
-	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);		// Up
+	auto laraVel = BASS_3DVECTOR(					// Vel
+		Lara.WaterCurrentPull.x,
+		Lara.WaterCurrentPull.y,
+		Lara.WaterCurrentPull.z);
+	auto atVec = BASS_3DVECTOR(at.x, at.y, at.z);	// At
+	auto upVec = BASS_3DVECTOR(0.0f, 1.0f, 0.0f);	// Up
 	BASS_Set3DPosition(&mikePos,
 					   &laraVel,
 					   &atVec,

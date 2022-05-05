@@ -16,52 +16,52 @@ int GunShipCounter = 0;
 
 void ControlGunShip(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(SFX_TR4_HELICOPTER_LOOP,&item->pos, 0);
+		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Pose, 0);
 
-		GAME_VECTOR pos;
+		GameVector pos;
 		pos.x = ((GetRandomControl() & 0x1FF) - 255);
 		pos.y = (GetRandomControl() & 0x1FF) - 255;
 		pos.z = (GetRandomControl() & 0x1FF) - 255;
-		GetLaraJointPosition((PHD_VECTOR*)&pos, LM_TORSO);
+		GetLaraJointPosition((Vector3Int*)&pos, LM_TORSO);
 
-		GAME_VECTOR end = pos;
+		GameVector end = pos;
 
-		if (!item->itemFlags[0] && !item->itemFlags[1] && !item->itemFlags[2])
+		if (!item->ItemFlags[0] && !item->ItemFlags[1] && !item->ItemFlags[2])
 		{
-			item->itemFlags[0] = pos.x / 16;
-			item->itemFlags[1] = pos.y / 16;
-			item->itemFlags[2] = pos.z / 16;
+			item->ItemFlags[0] = pos.x / 16;
+			item->ItemFlags[1] = pos.y / 16;
+			item->ItemFlags[2] = pos.z / 16;
 		}
 
-		pos.x = (pos.x + 80 * item->itemFlags[0]) / 6;
-		pos.y = (pos.y + 80 * item->itemFlags[1]) / 6;
-		pos.z = (pos.z + 80 * item->itemFlags[2]) / 6;
+		pos.x = (pos.x + 80 * item->ItemFlags[0]) / 6;
+		pos.y = (pos.y + 80 * item->ItemFlags[1]) / 6;
+		pos.z = (pos.z + 80 * item->ItemFlags[2]) / 6;
 
-		item->itemFlags[0] = pos.x / 16;
-		item->itemFlags[1] = pos.y / 16;
-		item->itemFlags[2] = pos.z / 16;
+		item->ItemFlags[0] = pos.x / 16;
+		item->ItemFlags[1] = pos.y / 16;
+		item->ItemFlags[2] = pos.z / 16;
 
-		if (item->triggerFlags == 1)
-			item->pos.zPos += (pos.z - item->pos.zPos) / 32;
+		if (item->TriggerFlags == 1)
+			item->Pose.Position.z += (pos.z - item->Pose.Position.z) / 32;
 		else
-			item->pos.xPos += (pos.x - item->pos.xPos) / 32;
-		item->pos.yPos += (pos.y - item->pos.yPos - 256) / 32;
+			item->Pose.Position.x += (pos.x - item->Pose.Position.x) / 32;
+		item->Pose.Position.y += (pos.y - item->Pose.Position.y - 256) / 32;
 
-		GAME_VECTOR start;
-		start.x = GetRandomControl() + item->pos.xPos - 128;
-		start.y = GetRandomControl() + item->pos.yPos - 128;
-		start.z = GetRandomControl() + item->pos.zPos - 128;
-		start.roomNumber = item->roomNumber;
-		int los = LOS(&start,&end);
+		GameVector start;
+		start.x = GetRandomControl() + item->Pose.Position.x - 128;
+		start.y = GetRandomControl() + item->Pose.Position.y - 128;
+		start.z = GetRandomControl() + item->Pose.Position.z - 128;
+		start.roomNumber = item->RoomNumber;
+		bool los = LOS(&start, &end);
 
 		end.x = 3 * pos.x - 2 * start.x;
 		end.y = 3 * pos.y - 2 * start.y;
 		end.z = 3 * pos.z - 2 * start.z;
-		int los2 = LOS(&start,&end);
+		bool los2 = LOS(&start, &end);
 
 		if (los)
 			GunShipCounter = 1;
@@ -69,19 +69,19 @@ void ControlGunShip(short itemNumber)
 			GunShipCounter++;
 
 		if (GunShipCounter <= 15)
-			item->meshBits |= 0x100;
+			item->MeshBits |= 0x100;
 		else
-			item->meshBits &= 0xFEFF;
+			item->MeshBits &= 0xFEFF;
 
 		if (GunShipCounter < 15)
-			SoundEffect(SFX_LARA_HK_FIRE,&item->pos, 0xC00004);
+			SoundEffect(SFX_LARA_HK_FIRE, &item->Pose, 0xC00004);
 
 		if (!(GlobalCounter & 1))
 			return AnimateItem(item);
 
-		PHD_VECTOR hitPos;
+		Vector3Int hitPos;
 		MESH_INFO* hitMesh = NULL;
-		int objOnLos = ObjectOnLOS2(&start,&end,&hitPos,&hitMesh, GAME_OBJECT_ID::ID_LARA);
+		int objOnLos = ObjectOnLOS2(&start, &end, &hitPos, &hitMesh, GAME_OBJECT_ID::ID_LARA);
 
 		if (objOnLos == NO_LOS_ITEM || objOnLos < 0)
 		{
@@ -106,22 +106,22 @@ void ControlGunShip(short itemNumber)
 				{
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
 					hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-					TestTriggers(hitMesh->pos.xPos, hitMesh->pos.yPos, hitMesh->pos.zPos, end.roomNumber, true);
-					SoundEffect(GetShatterSound(hitMesh->staticNumber),&hitMesh->pos, 0);
+					TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, end.roomNumber, true);
+					SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos, 0);
 				}
 
-				TriggerRicochetSpark((GAME_VECTOR*)&hitPos, 2 * GetRandomControl(), 3, 0);
-				TriggerRicochetSpark((GAME_VECTOR*)&hitPos, 2 * GetRandomControl(), 3, 0);
+				TriggerRicochetSpark((GameVector*)&hitPos, 2 * GetRandomControl(), 3, 0);
+				TriggerRicochetSpark((GameVector*)&hitPos, 2 * GetRandomControl(), 3, 0);
 			}
 		}
 		else
 		{
-			ITEM_INFO* hitItem = &g_Level.Items[objOnLos];
+			auto* hitItem = &g_Level.Items[objOnLos];
 
-			if (hitItem->objectNumber != ID_LARA)
+			if (hitItem->ObjectNumber != ID_LARA)
 			{
-				if (hitItem->objectNumber >= ID_SMASH_OBJECT1
-					&& hitItem->objectNumber <= ID_SMASH_OBJECT8)
+				if (hitItem->ObjectNumber >= ID_SMASH_OBJECT1 &&
+					hitItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
 					ExplodeItemNode(hitItem, 0, 0, 128);
 					SmashObject(objOnLos);
@@ -141,20 +141,23 @@ void ControlGunShip(short itemNumber)
 					start.x, start.y, start.z,
 					(GetRandomControl() & 1) + 2,
 					2 * GetRandomControl(),
-					LaraItem->roomNumber);
+					LaraItem->RoomNumber);
 
-				LaraItem->hitPoints -= 20;
+				LaraItem->HitPoints -= 20;
 			}
 		}
 
 		if (GunShipCounter < 15)
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
+
 			spark->on = 1;
 			spark->sR = spark->dR = (GetRandomControl() & 0x7F) + -128;
 			spark->sG = (spark->dR / 2) + (GetRandomControl() & 0x7F);
+
 			if (spark->sG > spark->sR)
 				spark->sG = spark->sR;
+
 			spark->sB = 0;
 			spark->dB = 0;
 			spark->dR = 0;

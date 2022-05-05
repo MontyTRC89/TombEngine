@@ -31,4 +31,4 @@ extern std::vector<BUBBLE_STRUCT> Bubbles;
 void DisableBubbles();
 void UpdateBubbles();
 int GetFreeBubble();//8BEAC(<), 8DEF0(<) (F)
-void CreateBubble(PHD_VECTOR* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv);//8BF14(<), 8DF58(<) (F)
+void CreateBubble(Vector3Int* pos, short roomNum, int unk1, int unk2, int flags, int xv, int yv, int zv);//8BF14(<), 8DF58(<) (F)

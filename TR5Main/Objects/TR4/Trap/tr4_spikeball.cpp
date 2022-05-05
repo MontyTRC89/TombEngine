@@ -7,36 +7,37 @@
 
 namespace TEN::Entities::TR4
 {
-	void SpikeballControl(short itemNum)
+	void SpikeballControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item))
 		{
-			int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
+			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-			if ((frameNumber <= 14 || frameNumber >= 24) && (frameNumber < 138 || frameNumber > 140))
+			if ((frameNumber <= 14 || frameNumber >= 24) &&
+				(frameNumber < 138 || frameNumber > 140))
 			{
 				if (frameNumber < 141)
-					*((int*)&item->itemFlags[0]) = 0;
+					*((int*)&item->ItemFlags[0]) = 0;
 				else
 				{
-					item->itemFlags[3] = 50;
-					*((int*)&item->itemFlags[0]) = 0x7FF800;
+					item->ItemFlags[3] = 50;
+					*((int*)&item->ItemFlags[0]) = 0x7FF800;
 				}
 			}
 			else
 			{
-				item->itemFlags[3] = 150;
-				*((int*)&item->itemFlags[0]) = 0x7FF800;
+				item->ItemFlags[3] = 150;
+				*((int*)&item->ItemFlags[0]) = 0x7FF800;
 			}
 
 			AnimateItem(item);
 		}
 		else
 		{
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			*((int*)&item->itemFlags[0]) = 0;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			*((int*)&item->ItemFlags[0]) = 0;
 		}
 	}
 }

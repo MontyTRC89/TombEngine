@@ -7,23 +7,21 @@
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
 
-void InitialiseLaraDouble(short itemNum)
+void InitialiseLaraDouble(short itemNumber)
 {
-	ClearItem(itemNum);
+	ClearItem(itemNumber);
 }
 
-void LaraDoubleControl(short itemNum)
+void LaraDoubleControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	auto* item = &g_Level.Items[itemNumber];
 
-	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->pos, 0);
+	SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose, 0);
 
-	if (CreatureActive(itemNum))
+	if (CreatureActive(itemNumber))
 	{
-		if (item->hitStatus)
-		{
-			LaraItem->hitPoints = item->hitPoints;
-		}
+		if (item->HitStatus)
+			LaraItem->HitPoints = item->HitPoints;
 
 		AnimateItem(item);
 	}

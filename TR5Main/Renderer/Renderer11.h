@@ -609,7 +609,7 @@ namespace TEN::Renderer
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHUDBar* bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
-		std::vector<VectorInt2> EnumerateScreenResolutions();
+		std::vector<Vector2Int> EnumerateScreenResolutions();
 		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Draw();
 		bool PrepareDataForTheRenderer();

@@ -7,74 +7,62 @@
 
 void InitialiseSmokeEmitter(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->triggerFlags == 111)
+	if (item->TriggerFlags == 111)
 	{
-		if (item->pos.yRot > 0)
+		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->pos.yRot == ANGLE(90.0f))
-				item->pos.xPos += 512;
+			if (item->Pose.Orientation.y == ANGLE(90.0f))
+				item->Pose.Position.x += CLICK(2);
 		}
-		else if (item->pos.yRot)
+		else if (item->Pose.Orientation.y)
 		{
-			if (item->pos.yRot == -ANGLE(180.0f))
-			{
-				item->pos.zPos -= 512;
-			}
-			else if (item->pos.yRot == -ANGLE(90.0f))
-			{
-				item->pos.xPos -= 512;
-			}
+			if (item->Pose.Orientation.y == -ANGLE(180.0f))
+				item->Pose.Position.z -= CLICK(2);
+			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
+				item->Pose.Position.x -= CLICK(2);
 		}
 		else
-		{
-			item->pos.zPos += 512;
-		}
+			item->Pose.Position.z += CLICK(2);
 	}
-	else if (item->objectNumber != ID_SMOKE_EMITTER)
-	{
+	else if (item->ObjectNumber != ID_SMOKE_EMITTER)
 		return;
-	}
-	else if (item->triggerFlags & 8)
+	else if (item->TriggerFlags & 8)
 	{
-		item->itemFlags[0] = item->triggerFlags / 16;
+		item->ItemFlags[0] = item->TriggerFlags / 16;
 
-		if (item->pos.yRot > 0)
+		if (item->Pose.Orientation.y > 0)
 		{
-			if (item->pos.yRot == ANGLE(90.0f))
-				item->pos.xPos += 256;
+			if (item->Pose.Orientation.y == ANGLE(90.0f))
+				item->Pose.Position.x += CLICK(1);
 		}
 		else
 		{
-			if (item->pos.yRot == 0)
-			{
-				item->pos.zPos += 256;
-			}
-			else if (item->pos.yRot == -ANGLE(180.0f))
-			{
-				item->pos.zPos -= 256;
-			}
-			else if (item->pos.yRot == -ANGLE(90.0f))
-				item->pos.xPos -= 256;
+			if (item->Pose.Orientation.y == 0)
+				item->Pose.Position.z += CLICK(1);
+			else if (item->Pose.Orientation.y == -ANGLE(180.0f))
+				item->Pose.Position.z -= CLICK(1);
+			else if (item->Pose.Orientation.y == -ANGLE(90.0f))
+				item->Pose.Position.x -= CLICK(1);
 		}
 
-		if ((signed short)(item->triggerFlags / 16) <= 0)
+		if ((signed short)(item->TriggerFlags / 16) <= 0)
 		{
-			item->itemFlags[2] = 4096;
-			item->triggerFlags |= 4;
+			item->ItemFlags[2] = 4096;
+			item->TriggerFlags |= 4;
 		}
 	}
-	else if (g_Level.Rooms[item->roomNumber].flags & 1 && item->triggerFlags == 1)
+	else if (g_Level.Rooms[item->RoomNumber].flags & 1 && item->TriggerFlags == 1)
 	{
-		item->itemFlags[0] = 20;
-		item->itemFlags[1] = 1;
+		item->ItemFlags[0] = 20;
+		item->ItemFlags[1] = 1;
 	}
 }
 
 void SmokeEmitterControl(short itemNumber)
 {
-	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
+	/*auto* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
@@ -88,10 +76,10 @@ void SmokeEmitterControl(short itemNumber)
 		{
 			if (!(GetRandomControl() & 3) || item->itemFlags[1])
 			{
-				PHD_VECTOR pos;
-				pos.x = (GetRandomControl() & 0x3F) + item->pos.xPos - 32;
-				pos.y = item->pos.yPos - (GetRandomControl() & 0x1F) - 16;
-				pos.z = (GetRandomControl() & 0x3F) + item->pos.zPos - 32;
+				Vector3Int pos;
+				pos.x = (GetRandomControl() & 0x3F) + item->pos.Position.x - 32;
+				pos.y = item->pos.Position.y - (GetRandomControl() & 0x1F) - 16;
+				pos.z = (GetRandomControl() & 0x3F) + item->pos.Position.z - 32;
 
 				if (item->triggerFlags == 1)
 				{
@@ -150,8 +138,8 @@ void SmokeEmitterControl(short itemNumber)
 		}
 	}
 
-	int dx = LaraItem->pos.xPos - item->pos.xPos;
-	int dz = LaraItem->pos.zPos - item->pos.zPos;
+	int dx = LaraItem->pos.Position.x - item->pos.Position.x;
+	int dz = LaraItem->pos.Position.z - item->pos.Position.z;
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
@@ -162,9 +150,9 @@ void SmokeEmitterControl(short itemNumber)
 		spark->dG = 48;
 		spark->dB = 48;
 		spark->transType = TransTypeEnum::COLADD;
-		spark->x = (GetRandomControl() & 0x3F) + item->pos.xPos - 32;
-		spark->y = (GetRandomControl() & 0x3F) + item->pos.yPos - 32;
-		spark->z = (GetRandomControl() & 0x3F) + item->pos.zPos - 32;
+		spark->x = (GetRandomControl() & 0x3F) + item->pos.Position.x - 32;
+		spark->y = (GetRandomControl() & 0x3F) + item->pos.Position.y - 32;
+		spark->z = (GetRandomControl() & 0x3F) + item->pos.Position.z - 32;
 
 		int flags = item->itemFlags[2];
 		if (flags == 4096)
@@ -177,19 +165,19 @@ void SmokeEmitterControl(short itemNumber)
 
 		if (item->triggerFlags >= 0)
 		{
-			spark->xVel = flags * phd_sin(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+			spark->xVel = flags * phd_sin(item->pos.Orientation.y - ANGLE(180)) >> W2V_SHIFT;
 			spark->yVel = -16 - (GetRandomControl() & 0xF);
-			spark->zVel = flags * phd_cos(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+			spark->zVel = flags * phd_cos(item->pos.Orientation.y - ANGLE(180)) >> W2V_SHIFT;
 		}
 		else
 		{
 			v17 = GetRandomControl();
 			v18 = v17;
-			LOWORD(v17) = item->pos.yRot;
+			LOWORD(v17) = item->pos.Orientation.y;
 			f = (v18 & 0x7F) + 2048;
 			spark->Xvel = v15 * 4 * rcossin_tbl[((v17 + 20480) >> 3) & 0x1FFE] >> 14;
 			spark->Yvel = -128 - (unsigned __int8)GetRandomControl();
-			spark->Zvel = v15 * 4 * rcossin_tbl[((((unsigned __int16)item->pos.yRot + 20480) >> 3) & 0x1FFE) + 1] >> 14;
+			spark->Zvel = v15 * 4 * rcossin_tbl[((((unsigned __int16)item->pos.Orientation.y + 20480) >> 3) & 0x1FFE) + 1] >> 14;
 		}
 		spark->Flags = 538;
 		if (!(GlobalCounter & 3) && !(item->triggerFlags & 4))
@@ -272,13 +260,13 @@ void SmokeEmitterControl(short itemNumber)
 					spark->transType = TransTypeEnum::COLSUB;
 				else
 					spark->transType = TransTypeEnum::COLADD;
-				spark->x = (GetRandomControl() & 0x3F) + item->pos.xPos - 32;
-				spark->y = (GetRandomControl() & 0x3F) + item->pos.yPos - 32;
-				spark->z = (GetRandomControl() & 0x3F) + item->pos.zPos - 32;
+				spark->x = (GetRandomControl() & 0x3F) + item->pos.Position.x - 32;
+				spark->y = (GetRandomControl() & 0x3F) + item->pos.Position.y - 32;
+				spark->z = (GetRandomControl() & 0x3F) + item->pos.Position.z - 32;
 				if (item->triggerFlags == 111)
 				{
-					spark->xVel = 512 * phd_sin(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
-					spark->zVel = 512 * phd_cos(item->pos.yRot - ANGLE(180)) >> W2V_SHIFT;
+					spark->xVel = 512 * phd_sin(item->pos.Orientation.y - ANGLE(180)) >> W2V_SHIFT;
+					spark->zVel = 512 * phd_cos(item->pos.Orientation.y - ANGLE(180)) >> W2V_SHIFT;
 					spark->friction = 5;
 				}
 				else

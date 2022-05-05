@@ -38,9 +38,9 @@ const float lerp(float v0, float v1, float t)
 
 const Vector3 getRandomVector()
 {
-	Vector3 v = {GenerateFloat(-1,1),GenerateFloat(-1,1),GenerateFloat(-1,1)};
-	v.Normalize();
-	return v;
+	auto vector = Vector3(GenerateFloat(-1, 1), GenerateFloat(-1, 1), GenerateFloat(-1, 1));
+	vector.Normalize();
+	return vector;
 }
 
 const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees)
@@ -48,8 +48,9 @@ const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleD
 	float x = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	float y = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	float z = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
-	Matrix m = Matrix::CreateRotationX(x)* Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
-	Vector3 result = direction.TransformNormal(direction, m);
+	auto matrix = Matrix::CreateRotationX(x) * Matrix::CreateRotationY(y) * Matrix::CreateRotationZ(z);
+	
+	auto result = direction.TransformNormal(direction, matrix);
 	result.Normalize();
 	return result;
 }
@@ -88,21 +89,19 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles)
 
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
-	auto v1 = Vector3(first->xPos, first->yPos, first->zPos);
-	auto v2 = Vector3(second->xPos, second->yPos, second->zPos);
-	return (int)round(Vector3::Distance(v1, v2));
+	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
 }
 
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
-	Matrix world = Matrix::CreateFromYawPitchRoll(
-		TO_RAD(pos->yRot),
-		TO_RAD(pos->xRot),
-		TO_RAD(pos->zRot)
+	auto world = Matrix::CreateFromYawPitchRoll(
+		TO_RAD(pos->Orientation.y),
+		TO_RAD(pos->Orientation.x),
+		TO_RAD(pos->Orientation.z)
 	);
 
-	Vector3 bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
-	Vector3 bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
+	auto bMin = Vector3(bounds->X1, bounds->Y1, bounds->Z1);
+	auto bMax = Vector3(bounds->X2, bounds->Y2, bounds->Z2);
 
 	bMin = Vector3::Transform(bMin, world);
 	bMax = Vector3::Transform(bMax, world);
@@ -119,10 +118,10 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 {
 	int deltaAngle = angle - *rotation;
 
-	if (deltaAngle < -32768)
-		deltaAngle += 65536;
-	else if (deltaAngle > 32768)
-		deltaAngle -= 65536;
+	if (deltaAngle < -ANGLE(180.0f))
+		deltaAngle += ANGLE(360.0f);
+	else if (deltaAngle > ANGLE(180.0f))
+		deltaAngle -= ANGLE(360.0f);
 
 	if (outAngle)
 		*outAngle = static_cast<short>(deltaAngle);
@@ -130,15 +129,13 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
-void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
+void GetMatrixFromTrAngle(Matrix* matrix, short* framePtr, int index)
 {
-	short* ptr = &frameptr[0];
+	short* ptr = &framePtr[0];
 
 	ptr += 9;
 	for (int i = 0; i < index; i++)
-	{
 		ptr += ((*ptr & 0xc000) == 0 ? 2 : 1);
-	}
 
 	int rot0 = *ptr++;
 	int frameMode = (rot0 & 0xc000);
@@ -177,15 +174,14 @@ void GetMatrixFromTrAngle(Matrix* matrix, short* frameptr, int index)
 
 BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 {
-	Vector3 boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
-	Vector3 boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
-	Quaternion rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.yRot), TO_RAD(pos.xRot), TO_RAD(pos.zRot));
+	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
+	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
+	auto rotation = Quaternion::CreateFromYawPitchRoll(TO_RAD(pos.Orientation.y), TO_RAD(pos.Orientation.x), TO_RAD(pos.Orientation.z));
 
 	BoundingOrientedBox result;
-	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.xPos, pos.yPos, pos.zPos));
+	BoundingOrientedBox(boxCentre, boxExtent, Vector4::UnitY).Transform(result, 1, rotation, Vector3(pos.Position.x, pos.Position.y, pos.Position.z));
 	return result;
 }
-
 
 __int64 FP_Mul(__int64 a, __int64 b)
 {
@@ -197,19 +193,19 @@ __int64 FP_Div(__int64 a, __int64 b)
 	return (int)(((a) / (b >> 8)) << 8);
 }
 
-void FP_VectorMul(PHD_VECTOR* v, int scale, PHD_VECTOR* result)
+void FP_VectorMul(Vector3Int* v, int scale, Vector3Int* result)
 {
 	result->x = FP_FromFixed(v->x * scale);
 	result->y = FP_FromFixed(v->y * scale);
 	result->z = FP_FromFixed(v->z * scale);
 }
 
-int FP_DotProduct(PHD_VECTOR* a, PHD_VECTOR* b)
+int FP_DotProduct(Vector3Int* a, Vector3Int* b)
 {
 	return ((a->x * b->x) + (a->y * b->y) + (a->z * b->z)) >> W2V_SHIFT;
 }
 
-void FP_CrossProduct(PHD_VECTOR* a, PHD_VECTOR* b, PHD_VECTOR* result)
+void FP_CrossProduct(Vector3Int* a, Vector3Int* b, Vector3Int* result)
 {
 	result->x = ((a->y * b->z) - (a->z * b->y)) >> W2V_SHIFT;
 	result->y = ((a->z * b->x) - (a->x * b->z)) >> W2V_SHIFT;
@@ -225,9 +221,11 @@ void FP_GetMatrixAngles(MATRIX3D* m, short* angles)
 	int cy = phd_cos(yaw);
 	short roll = phd_atan(((cy * m->m00) - (sy * m->m20)), ((sy * m->m21) - (cy * m->m01)));
 
-	if (((m->m12 >= 0) && pitch > 0)
-		|| ((m->m12 < 0) && pitch < 0))
+	if ((m->m12 >= 0 && pitch > 0) ||
+		(m->m12 < 0 && pitch < 0))
+	{
 		pitch = -pitch;
+	}
 
 	angles[0] = pitch;
 	angles[1] = yaw;
@@ -244,13 +242,13 @@ __int64 FP_FromFixed(__int64 value)
 	return (value >> FP_SHIFT);
 }
 
-PHD_VECTOR* FP_Normalise(PHD_VECTOR* v)
+Vector3Int* FP_Normalise(Vector3Int* v)
 {
 	long a = v->x >> FP_SHIFT;
 	long b = v->y >> FP_SHIFT;
 	long c = v->z >> FP_SHIFT;
 
-	if ((a == 0) && (b == 0) && (c == 0))	
+	if (a == 0 && b == 0 && c == 0)	
 		return v;
 
 	a = a * a;

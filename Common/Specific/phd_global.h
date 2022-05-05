@@ -1,77 +1,294 @@
 #pragma once
 
-struct PHD_VECTOR
+struct Vector2Int
+{
+	int x;
+	int y;
+
+	Vector2Int()
+	{
+		this->x = 0;
+		this->y = 0;
+	}
+
+	Vector2Int(int x, int y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+};
+
+struct Vector3Int
 {
 	int x;
 	int y;
 	int z;
 
-	PHD_VECTOR()
+	bool operator ==(Vector3Int vector)
+	{
+		return (x == vector.x && y == vector.y && z == vector.z);
+	}
+
+	bool operator !=(Vector3Int vector)
+	{
+		return (x != vector.x || y != vector.y || z != vector.z);
+	}
+
+	Vector3Int operator =(Vector3Int vector)
+	{
+		this->x = vector.x;
+		this->y = vector.y;
+		this->z = vector.z;
+		return *this;
+	}
+
+	Vector3Int operator +(Vector3Int vector)
+	{
+		return Vector3Int(x + vector.x, y + vector.y, z + vector.z);
+	}
+
+	Vector3Int operator -(Vector3Int vector)
+	{
+		return Vector3Int(x - vector.x, y - vector.y, z - vector.z);
+	}
+
+	Vector3Int operator *(Vector3Int vector)
+	{
+		return Vector3Int(x * vector.x, y * vector.y, z * vector.z);
+	}
+
+	Vector3Int operator *(float value)
+	{
+		return Vector3Int((int)round(x * value), (int)round(y * value), (int)round(z * value));
+	}
+
+	Vector3Int operator /(float value)
+	{
+		return Vector3Int((int)round(x / value), (int)round(y / value), (int)round(z / value));
+	}
+
+	Vector3Int& operator +=(const Vector3Int vector)
+	{
+		*this = *this + vector;
+		return *this;
+	}
+
+	Vector3Int& operator -=(Vector3Int vector)
+	{
+		*this = *this - vector;
+		return *this;
+	}
+
+	Vector3Int& operator *=(Vector3Int vector)
+	{
+		*this = *this * vector;
+		return *this;
+	}
+
+	Vector3Int& operator *=(float value)
+	{
+		*this = *this * value;
+		return *this;
+	}
+
+	Vector3Int& operator /=(float value)
+	{
+		*this = *this / value;
+		return *this;
+	}
+
+	Vector3Int()
 	{
 		this->x = 0;
 		this->y = 0;
 		this->z = 0;
 	}
 
-	PHD_VECTOR(int xpos, int ypos, int zpos)
+	Vector3Int(int x, int y, int z)
 	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+
+	Vector3 ToVector3()
+	{
+		return Vector3(x, y, z);
+	}
+};
+
+struct Vector3Shrt
+{
+	short x;
+	short y;
+	short z;
+
+	bool operator ==(Vector3Shrt vector)
+	{
+		return (x == vector.x && y == vector.y && z == vector.z);
+	}
+
+	bool operator !=(Vector3Shrt vector)
+	{
+		return (x != vector.x || y != vector.y || z != vector.z);
+	}
+
+	Vector3Shrt operator =(Vector3Shrt vector)
+	{
+		this->x = vector.x;
+		this->y = vector.y;
+		this->z = vector.z;
+		return *this;
+	}
+
+	Vector3Shrt operator +(Vector3Shrt vector)
+	{
+		return Vector3Shrt(x + vector.x, y + vector.y, z + vector.z);
+	}
+
+	Vector3Shrt operator -(Vector3Shrt vector)
+	{
+		return Vector3Shrt(x - vector.x, y - vector.y, z - vector.z);
+	}
+
+	Vector3Shrt operator *(Vector3Shrt vector)
+	{
+		return Vector3Shrt(x * vector.x, y * vector.y, z * vector.z);
+	}
+
+	Vector3Shrt operator *(float value)
+	{
+		return Vector3Shrt((short)round(x * value), (short)round(y * value), (short)round(z * value));
+	}
+
+	Vector3Shrt operator /(float value)
+	{
+		return Vector3Shrt((short)round(x / value), (short)round(y / value), (short)round(z / value));
+	}
+
+	Vector3Shrt& operator +=(const Vector3Shrt vector)
+	{
+		*this = *this + vector;
+		return *this;
+	}
+
+	Vector3Shrt& operator -=(Vector3Shrt vector)
+	{
+		*this = *this - vector;
+		return *this;
+	}
+
+	Vector3Shrt& operator *=(Vector3Shrt vector)
+	{
+		*this = *this * vector;
+		return *this;
+	}
+
+	Vector3Shrt& operator *=(float value)
+	{
+		*this = *this * value;
+		return *this;
+	}
+
+	Vector3Shrt& operator /=(float value)
+	{
+		*this = *this / value;
+		return *this;
+	}
+
+	Vector3Shrt()
+	{
+		this->x = 0;
+		this->y = 0;
+		this->z = 0;
+	}
+
+	Vector3Shrt(short x, short y, short z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+
+	Vector3 ToVector3()
+	{
+		return Vector3(x, y, z);
+	}
+};
+
+struct RendererRectangle
+{
+	int left;
+	int top;
+	int right;
+	int bottom;
+
+	RendererRectangle()
+	{
+		left = 0;
+		top = 0;
+		right = 0;
+		bottom = 0;
+	}
+
+	RendererRectangle(int left, int top, int right, int bottom)
+	{
+		this->left = left;
+		this->top = top;
+		this->right = right;
+		this->bottom = bottom;
 	}
 };
 
 struct PHD_3DPOS
 {
-	int xPos;
-	int yPos;
-	int zPos;
-	short xRot;
-	short yRot;
-	short zRot;
+	Vector3Int Position;
+	Vector3Shrt Orientation;
 
 	PHD_3DPOS()
 	{
-		this->xPos = 0;
-		this->yPos = 0;
-		this->zPos = 0;
-		this->xRot = 0;
-		this->yRot = 0;
-		this->zRot = 0;
+		this->Position = Vector3Int();
+		this->Orientation = Vector3Shrt();
 	}
 
-	PHD_3DPOS(int x, int y, int z)
+	PHD_3DPOS(Vector3Int pos)
 	{
-		this->xPos = x;
-		this->yPos = y;
-		this->zPos = z;
-		this->xRot = 0;
-		this->yRot = 0;
-		this->zRot = 0;
+		this->Position = pos;
+		this->Orientation = Vector3Shrt();
 	}
 
-	PHD_3DPOS(short xrot, short yrot, short zrot)
+	PHD_3DPOS(int xPos, int yPos, int zPos)
 	{
-		this->xPos = 0;
-		this->yPos = 0;
-		this->zPos = 0;
-		this->xRot = xrot;
-		this->yRot = yrot;
-		this->zRot = zrot;
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->Orientation = Vector3Shrt();
 	}
 
-	PHD_3DPOS(int x, int y, int z, short xrot, short yrot, short zrot)
+	PHD_3DPOS(Vector3Shrt orient)
 	{
-		this->xPos = x;
-		this->yPos = y;
-		this->zPos = z;
-		this->xRot = xrot;
-		this->yRot = yrot;
-		this->zRot = zrot;
+		this->Position = Vector3Int();
+		this->Orientation = orient;
+	}
+
+	PHD_3DPOS(short xOrient, short yOrient, short zOrient)
+	{
+		this->Position = Vector3Int();
+		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
+	}
+
+	PHD_3DPOS(Vector3Int pos, Vector3Shrt orient)
+	{
+		this->Position = pos;
+		this->Orientation = orient;
+	}
+
+	PHD_3DPOS(int xPos, int yPos, int zPos, short xOrient, short yOrient, short zOrient)
+	{
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
 	}
 };
 
-struct GAME_VECTOR
+struct GameVector
 {
 	int x;
 	int y;
@@ -79,7 +296,7 @@ struct GAME_VECTOR
 	int boxNumber;
 	short roomNumber;
 
-	GAME_VECTOR()
+	GameVector()
 	{
 		this->x = 0;
 		this->y = 0;
@@ -88,7 +305,7 @@ struct GAME_VECTOR
 		this->boxNumber = 0;
 	}
 
-	GAME_VECTOR(int xpos, int ypos, int zpos)
+	GameVector(int xpos, int ypos, int zpos)
 	{
 		this->x = xpos;
 		this->y = ypos;
@@ -97,7 +314,7 @@ struct GAME_VECTOR
 		this->boxNumber = 0;
 	}
 
-	GAME_VECTOR(int xpos, int ypos, int zpos, short roomNumber)
+	GameVector(int xpos, int ypos, int zpos, short roomNumber)
 	{
 		this->x = xpos;
 		this->y = ypos;
@@ -106,7 +323,7 @@ struct GAME_VECTOR
 		this->boxNumber = 0;
 	}
 
-	GAME_VECTOR(int xpos, int ypos, int zpos, short roomNumber, short boxNumber)
+	GameVector(int xpos, int ypos, int zpos, short roomNumber, short boxNumber)
 	{
 		this->x = xpos;
 		this->y = ypos;

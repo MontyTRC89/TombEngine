@@ -130,11 +130,11 @@ void ObjectsHandler::TestCollidingObjects()
 		if (!item->luaCallbackOnCollidedWithObjectName.empty())
 		{
 			//test against other moveables
-			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0, true);
+			GetCollidedObjects(item, 0, true, CollidedItems, nullptr, 0);
 			size_t i = 0;
 			while (CollidedItems[i])
 			{
-				short idTwo = GetIndexByName(CollidedItems[i]->luaName);
+				short idTwo = GetIndexByName(CollidedItems[i]->LuaName);
 				g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedWithObjectName, idOne, idTwo);
 				++i;
 			}
@@ -154,7 +154,7 @@ void ObjectsHandler::TestCollidingObjects()
 void ObjectsHandler::AssignLara()
 {
 #if TEN_OPTIONAL_LUA
-	m_table_objects.set("Lara", Moveable(Lara.itemNumber, false));
+	m_table_objects.set("Lara", Moveable(Lara.ItemNumber, false));
 #endif
 }
 
