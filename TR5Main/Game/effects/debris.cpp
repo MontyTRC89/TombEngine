@@ -168,7 +168,7 @@ void UpdateDebris()
 	{
 		if (deb.active)
 		{
-			FLOOR_INFO* floor;
+			FloorInfo* floor;
 			short roomNumber;
 
 			deb.velocity *= deb.linearDrag;

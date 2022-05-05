@@ -123,14 +123,14 @@ enum MOTORBIKE_FLAGS
 static char ExhaustStart = 0;
 static bool NoGetOff = false;
 
-static MotorbikeInfo* GetMotorbikeInfo(ITEM_INFO* item)
+static MotorbikeInfo* GetMotorbikeInfo(ItemInfo* item)
 {
     return (MotorbikeInfo*)item->Data;
 }
 
 void InitialiseMotorbike(short itemNumber)
 {
-    ITEM_INFO* item;
+    ItemInfo* item;
     MotorbikeInfo* motorbike;
 
     item = &g_Level.Items[itemNumber];
@@ -149,7 +149,7 @@ void InitialiseMotorbike(short itemNumber)
     item->MeshBits = 0x3F7;
 }
 
-static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
+static int TestMotorbikeHeight(ItemInfo* item, int dz, int dx, Vector3Int* pos)
 {
     pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.GetX()) + dx * sin(item->Pose.Orientation.GetZ());
 
@@ -160,7 +160,7 @@ static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
     pos->x = item->Pose.Position.x + dz * s + dx * c;
 
     short roomNumber = item->RoomNumber;
-    FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
+    FloorInfo* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
     int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
     if (pos->y < ceiling || ceiling == NO_HEIGHT)
         return NO_HEIGHT;
@@ -168,7 +168,7 @@ static int TestMotorbikeHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
     return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-static int DoMotorbikeShift(ITEM_INFO* motorbike, Vector3Int* pos, Vector3Int* old)
+static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* old)
 {
     int x = pos->x / SECTOR(1);
     int z = pos->z / SECTOR(1);
@@ -214,7 +214,7 @@ static int DoMotorbikeShift(ITEM_INFO* motorbike, Vector3Int* pos, Vector3Int* o
         z = 0;
 
         short roomNumber = motorbike->RoomNumber;
-        FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
+        FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
         int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
         if (height < old->y - STEP_SIZE)
         {
@@ -266,7 +266,7 @@ static int DoMotorbikeShift(ITEM_INFO* motorbike, Vector3Int* pos, Vector3Int* o
     return 0;
 }
 
-static void DrawMotorbikeLight(ITEM_INFO* item)
+static void DrawMotorbikeLight(ItemInfo* item)
 {
     MotorbikeInfo* motorbike;
     Vector3Int start, target;
@@ -291,8 +291,8 @@ static void DrawMotorbikeLight(ITEM_INFO* item)
 
 static BOOL GetOnMotorBike(short itemNumber)
 {
-    ITEM_INFO* item;
-    FLOOR_INFO* floor;
+    ItemInfo* item;
+    FloorInfo* floor;
     int dx, dz, distance, height;
     unsigned short tempangle;
     short angle;
@@ -334,9 +334,9 @@ static BOOL GetOnMotorBike(short itemNumber)
     return true;
 }
 
-void MotorbikeCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
+void MotorbikeCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll)
 {
-    ITEM_INFO* item;
+    ItemInfo* item;
     MotorbikeInfo* motorbike;
 
     if (laraitem->HitPoints >= 0 && Lara.Vehicle == NO_ITEM)
@@ -470,7 +470,7 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     sptr->size = size / 2;
 }
 
-static void DrawMotorBikeSmoke(ITEM_INFO* item)
+static void DrawMotorBikeSmoke(ItemInfo* item)
 {
     if (Lara.Vehicle == NO_ITEM)
         return;
@@ -508,7 +508,7 @@ static void DrawMotorBikeSmoke(ITEM_INFO* item)
     }
 }
 
-static void MotorBikeExplode(ITEM_INFO* item)
+static void MotorBikeExplode(ItemInfo* item)
 {
 	if (g_Level.Rooms[item->RoomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
 	{
@@ -535,7 +535,7 @@ static void MotorBikeExplode(ITEM_INFO* item)
 
 static int MotorBikeCheckGetOff(void)
 {
-    ITEM_INFO* item;
+    ItemInfo* item;
 
 	if (Lara.Vehicle != NO_ITEM)
 	{
@@ -617,7 +617,7 @@ static int DoMotorBikeDynamics(int height, int fallspeed, int* y, int flags)
     return fallspeed;
 }
 
-static int GetMotorbikeCollisionAnim(ITEM_INFO* item, Vector3Int* pos)
+static int GetMotorbikeCollisionAnim(ItemInfo* item, Vector3Int* pos)
 {
     pos->x = item->Pose.Position.x - pos->x;
     pos->z = item->Pose.Position.z - pos->z;
@@ -642,7 +642,7 @@ static int GetMotorbikeCollisionAnim(ITEM_INFO* item, Vector3Int* pos)
     return 0;
 }
 
-void MotorbikeBaddieCollision(ITEM_INFO* bike)
+void MotorbikeBaddieCollision(ItemInfo* bike)
 {
     int x, y, z, i;
 
@@ -661,11 +661,11 @@ void MotorbikeBaddieCollision(ITEM_INFO* bike)
 
         while (itemNum != NO_ITEM)
         {
-            ITEM_INFO* item = &g_Level.Items[itemNum];
+            ItemInfo* item = &g_Level.Items[itemNum];
 
             if (item->Collidable && item->Status != IFLAG_INVISIBLE && item != LaraItem && item != bike)
             {
-                OBJECT_INFO* object = &Objects[item->ObjectNumber];
+                ObjectInfo* object = &Objects[item->ObjectNumber];
 
                 if (object->collision && (object->intelligent))
                 {
@@ -703,13 +703,13 @@ void MotorbikeBaddieCollision(ITEM_INFO* bike)
     }
 }
 
-static int MotorBikeDynamics(ITEM_INFO* item)
+static int MotorBikeDynamics(ItemInfo* item)
 {
     MotorbikeInfo* motorbike;
     Vector3Int bl_old, mtb_old, br_old, mtf_old, fl_old;
     Vector3Int fl, bl, mtf, mtb, br;
     Vector3Int oldpos, moved;
-    FLOOR_INFO* floor;
+    FloorInfo* floor;
     int hmf_old, hbl_old, hbr_old, hmtb_old, hfl_old;
     int height, collide, speed, newspeed;
     short momentum = 0, rot, room_number;
@@ -963,7 +963,7 @@ static BOOL MotorbikeCanGetOff(void)
     return true;
 }
 
-static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
+static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
 {
     MotorbikeInfo* motorbike;
     motorbike = GetMotorbikeInfo(item);
@@ -1173,7 +1173,7 @@ static void AnimateMotorbike(ITEM_INFO* item, int collide, BOOL dead)
     }
 }
 
-static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
+static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
 {
     MotorbikeInfo* motorbike;
     Vector3Int pos;
@@ -1354,7 +1354,7 @@ static int MotorbikeUserControl(ITEM_INFO* item, int height, int* pitch)
     return drive;
 }
 
-void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* lara)//is this function even used
+void SetLaraOnMotorBike(ItemInfo* item, ItemInfo* lara)//is this function even used
 {
     MotorbikeInfo* motorbike;
     motorbike = GetMotorbikeInfo(item);
@@ -1375,9 +1375,9 @@ void SetLaraOnMotorBike(ITEM_INFO* item, ITEM_INFO* lara)//is this function even
 
 int MotorbikeControl(void)
 {
-    ITEM_INFO* item;
+    ItemInfo* item;
     MotorbikeInfo* motorbike;
-    FLOOR_INFO* floor;
+    FloorInfo* floor;
     Vector3Int oldpos, fl, fr, fm;
     int drive, collide, pitch = 0, dead, ceiling;
 
@@ -1525,13 +1525,13 @@ int MotorbikeControl(void)
     return 1;
 }
 
-void DrawMotorbike(ITEM_INFO* item)
+void DrawMotorbike(ItemInfo* item)
 {
     // TODO: recreate the motorbike render here, then include the rotation for the wheel:
     //MOTORBIKE_INFO* motorbike = GetMotorbikeInfo(item);
 }
 
-void DrawMotorbikeEffect(ITEM_INFO* item)
+void DrawMotorbikeEffect(ItemInfo* item)
 {
     // TODO: speedometer
     //MOTORBIKE_INFO* motorbike = GetMotorbikeInfo(item);

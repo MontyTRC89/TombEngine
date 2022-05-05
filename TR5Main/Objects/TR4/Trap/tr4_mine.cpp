@@ -89,7 +89,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void MineCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void MineCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* mineItem = &g_Level.Items[itemNumber];
 

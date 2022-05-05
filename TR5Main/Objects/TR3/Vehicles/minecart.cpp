@@ -142,7 +142,7 @@ void InitialiseMineCart(short itemNumber)
 	minecart->Flags = NULL;
 }
 
-static int TestMinecartHeight(ITEM_INFO* minecartItem, int xOffset, int zOffset)
+static int TestMinecartHeight(ItemInfo* minecartItem, int xOffset, int zOffset)
 {
 	float sinY = sin(minecartItem->Pose.Orientation.GetY());
 	float cosY = cos(minecartItem->Pose.Orientation.GetY());
@@ -156,7 +156,7 @@ static int TestMinecartHeight(ITEM_INFO* minecartItem, int xOffset, int zOffset)
 	return GetCollision(pos.x, pos.y, pos.z, minecartItem->RoomNumber).Position.Floor;
 }
 
-static short GetMinecartCollision(ITEM_INFO* minecartItem, float angle, int distance)
+static short GetMinecartCollision(ItemInfo* minecartItem, float angle, int distance)
 {
 	auto probe = GetCollision(minecartItem, angle, distance, -LARA_HEIGHT);
 
@@ -166,7 +166,7 @@ static short GetMinecartCollision(ITEM_INFO* minecartItem, float angle, int dist
 	return (short)probe.Position.Floor;
 }
 
-static bool GetInMineCart(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, CollisionInfo* coll)
+static bool GetInMineCart(ItemInfo* minecartItem, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -195,7 +195,7 @@ static bool GetInMineCart(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, Collisio
 	return true;
 }
 
-static bool TestMinecartDismount(ITEM_INFO* laraItem, int direction)
+static bool TestMinecartDismount(ItemInfo* laraItem, int direction)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* minecartItem = &g_Level.Items[lara->Vehicle];
@@ -223,7 +223,7 @@ static bool TestMinecartDismount(ITEM_INFO* laraItem, int direction)
 	return true;
 }
 
-static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
+static void CartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem)
 {
 	vector<short> roomsList;
 	roomsList.push_back(minecartItem->RoomNumber);
@@ -290,7 +290,7 @@ static void CartToEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 	}
 }
 
-static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
+static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* minecart = (MinecartInfo*)minecartItem->Data;
@@ -518,7 +518,7 @@ static void MoveCart(ITEM_INFO* laraItem, ITEM_INFO* minecartItem)
 		minecartItem->Pose.Orientation.SetZ(minecartItem->Pose.Orientation.GetZ() - minecartItem->Pose.Orientation.GetZ() / 8);
 }
 
-static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartInfo* minecart)
+static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo* minecart)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -848,7 +848,7 @@ static void DoUserInput(ITEM_INFO* minecartItem, ITEM_INFO* laraItem, MinecartIn
 	}
 }
 
-void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void MineCartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -889,7 +889,7 @@ void MineCartCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 		ObjectCollision(itemNumber, laraItem, coll);
 }
 
-bool MineCartControl(ITEM_INFO* laraItem)
+bool MineCartControl(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* minecartItem = &g_Level.Items[lara->Vehicle];

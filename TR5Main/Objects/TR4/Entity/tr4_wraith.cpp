@@ -365,7 +365,7 @@ namespace TEN::Entities::TR4
 			r, g, b);
 	}
 
-	void WraithExplosionEffect(ITEM_INFO* item, byte r, byte g, byte b, int speed)
+	void WraithExplosionEffect(ItemInfo* item, byte r, byte g, byte b, int speed)
 	{
 		short inner = speed >= 0 ? 32 : 640;
 		short outer = speed >= 0 ? 160 : 512;
@@ -509,9 +509,9 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void KillWraith(ITEM_INFO* item)
+	void KillWraith(ItemInfo* item)
 	{
-		ITEM_INFO* item2 = nullptr;
+		ItemInfo* item2 = nullptr;
 
 		if (NextItemActive != NO_ITEM)
 		{

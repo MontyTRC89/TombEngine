@@ -18,7 +18,10 @@
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/ScriptInterfaceGame.h"
+#include "Scripting/ScriptInterfaceLevel.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 
@@ -129,7 +132,8 @@ void LoadItems()
 			ReadBytes(buffer, numBytes);
 			item->LuaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddName(item->LuaName, i);
+			g_GameScriptEntities->AddName(item->LuaName, i);
+			g_GameScriptEntities->TryAddColliding(i);
 
 			memcpy(&item->StartPose, &item->Pose, sizeof(PoseData));
 		}
@@ -141,7 +145,7 @@ void LoadItems()
 
 void LoadObjects()
 {
-	std::memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
+	std::memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
 	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
@@ -372,7 +376,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		camera.luaName = std::string(buffer, buffer + numBytes);
 
-		g_GameScript->AddName(camera.luaName, camera);
+		g_GameScriptEntities->AddName(camera.luaName, camera);
 	}
 
 	NumberSpotcams = ReadInt32();
@@ -400,7 +404,7 @@ void LoadCameras()
 		ReadBytes(buffer, numBytes);
 		sink.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddName(sink.luaName, sink);
+		g_GameScriptEntities->AddName(sink.luaName, sink);
 	}
 }
 
@@ -643,7 +647,7 @@ void ReadRooms()
 
 		for (int j = 0; j < room.zSize * room.xSize; j++)
 		{
-			FLOOR_INFO floor;
+			FloorInfo floor;
 
 			floor.TriggerIndex = ReadInt32();
 			floor.Box = ReadInt32();
@@ -738,7 +742,7 @@ void ReadRooms()
 			ReadBytes(buffer, numBytes);
 			mesh.luaName = std::string(buffer, buffer + numBytes);
 
-			g_GameScript->AddName(mesh.luaName, mesh);
+			g_GameScriptEntities->AddName(mesh.luaName, mesh);
 		}
 
 		int numTriggerVolumes = ReadInt32();
@@ -838,6 +842,7 @@ void FreeLevel()
 	g_Level.Sinks.resize(0);
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
+	g_Level.LuaFunctionNames.resize(0);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -845,8 +850,9 @@ void FreeLevel()
 			g_Level.Zones[j][i].clear();
 	}
 
-	g_Renderer.freeRendererData();
+	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
+	g_GameScriptEntities->FreeEntities();
 }
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
@@ -878,7 +884,7 @@ void LoadSoundSources()
 		ReadBytes(buffer, numBytes);
 		source.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddName(source.luaName, source);
+		g_GameScriptEntities->AddName(source.luaName, source);
 	}
 }
 
@@ -964,7 +970,20 @@ void LoadAIObjects()
 		ReadBytes(buffer, numBytes);
 		obj.luaName = std::string(buffer, buffer+numBytes);
 
-		g_GameScript->AddName(obj.luaName, obj);
+		g_GameScriptEntities->AddName(obj.luaName, obj);
+	}
+}
+
+void LoadLuaFunctionNames()
+{
+	int luaFunctionsCount = ReadInt32();
+	for (int i = 0; i < luaFunctionsCount; i++)
+	{
+		byte numBytes = ReadInt8();
+		char buffer[255];
+		ReadBytes(buffer, numBytes);
+		auto luaFunctionName = std::string(buffer, buffer + numBytes);
+		g_Level.LuaFunctionNames.push_back(luaFunctionName);
 	}
 }
 
@@ -1008,17 +1027,50 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 	return true;
 }
 
-unsigned CALLBACK LoadLevel(void* data)
+void ThreadLoadLevel(int levelNumber)
 {
-	char* filename = (char*)data;
+	/*BeginThread(&LoadLevel, (void*)filename, FileThread);
 
-	TENLog("Loading level flie: " + std::string(filename), LogLevel::Info);
+	while (FileThread.ThreadActive)
+	{
+		g_Renderer.RenderLoadingScreen()
+		if (LoadBarState)
+		{
+			if (bGotMonoScreen == true && lscnt < 2)
+			{
+				DrawLoadingScreen();
 
-	LevelDataPtr = NULL;
-	LevelFilePtr = NULL;
-	char* baseLevelDataPtr = NULL;
+				lscnt++;
+			}
 
-	g_Renderer.updateProgress(0);
+			flag = S_DrawLoadBar();
+		}
+	}
+
+	while (!S_DrawLoadBar());*/
+}
+
+unsigned int _stdcall LoadLevel(void* data)
+{
+	const int levelIndex = reinterpret_cast<int>(data);
+
+	char filename[80];
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(levelIndex);
+	strcpy_s(filename, level->FileName.c_str());
+
+	TENLog("Loading level file: " + std::string(filename), LogLevel::Info);
+
+	LevelDataPtr = nullptr;
+	LevelFilePtr = nullptr;
+	char* baseLevelDataPtr = nullptr;
+
+	wchar_t loadscreenFileName[80];
+	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(), 80);
+	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
+	g_Renderer.SetLoadingScreen(loadScreenFile);
+
+	SetScreenFadeIn(FADE_SCREEN_SPEED);
+	g_Renderer.UpdateProgress(0);
 
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
@@ -1046,21 +1098,21 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadTextures();
 
-		g_Renderer.updateProgress(20);
+		g_Renderer.UpdateProgress(20);
 
 		ReadInt8(); // TODO: Remove!
 		ReadInt8(); // TODO: Remove!
 
 		LoadRooms();
-		g_Renderer.updateProgress(40);
+		g_Renderer.UpdateProgress(40);
 
 		LoadObjects();
-		g_Renderer.updateProgress(50);
+		g_Renderer.UpdateProgress(50);
 
 		LoadSprites();
 		LoadCameras();
 		LoadSoundSources();
-		g_Renderer.updateProgress(60);
+		g_Renderer.UpdateProgress(60);
 
 		LoadBoxes();
 
@@ -1068,12 +1120,15 @@ unsigned CALLBACK LoadLevel(void* data)
 
 		LoadAnimatedTextures();
 		LoadTextureInfos();
-		g_Renderer.updateProgress(70);
+		g_Renderer.UpdateProgress(70);
 
 		LoadItems();
 		LoadAIObjects();
+
+		LoadLuaFunctionNames();
+
 		LoadSamples();
-		g_Renderer.updateProgress(80);
+		g_Renderer.UpdateProgress(80);
 
 		free(baseLevelDataPtr);
 		LevelDataPtr = NULL;
@@ -1082,22 +1137,22 @@ unsigned CALLBACK LoadLevel(void* data)
 	else
 		return false;
 
-	g_Renderer.updateProgress(90);
+	g_Renderer.UpdateProgress(90);
 	g_Renderer.PrepareDataForTheRenderer();
 	
 	// Initialise the game
-	GameScriptLevel* level = g_GameFlow->GetLevel(CurrentLevel);
-
 	InitialiseGameFlags();
 	InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
 	GetCarriedItems();
 	GetAIPickups();
 	Lara.Vehicle = -1;
-	g_GameScript->AssignItemsAndLara();
+	g_GameScriptEntities->AssignLara();
+
+	SetScreenFadeOut(FADE_SCREEN_SPEED);
+	g_Renderer.UpdateProgress(100);
 
 	// Level loaded
 	IsLevelLoading = false;
-	g_Renderer.updateProgress(100);
 
 	_endthreadex(1);
 
@@ -1181,23 +1236,22 @@ int LoadLevelFile(int levelIndex)
 	 
 	StopAllSounds();
 	FreeSamples();
+
 	if (!g_FirstLevel)
+	{
 		FreeLevel();
+	}
 	g_FirstLevel = false;
-	
-	char filename[80];
-	GameScriptLevel* level = g_GameFlow->Levels[levelIndex];
-	strcpy_s(filename, level->FileName.c_str());
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;
-	hLoadLevel = _beginthreadex(0, 0, LoadLevel, filename, 0, &ThreadId);
-
-	// This function loops until progress is 100%. Not very thread safe, but behaviour should be predictable.
-	wchar_t loadscreenFileName[80];
-	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(),80);
-	std::wstring loadScreenFile = std::wstring(loadscreenFileName);
-	g_Renderer.renderLoadingScreen(loadScreenFile);
+	hLoadLevel = _beginthreadex(
+		nullptr,
+		0, 
+		LoadLevel, 
+		reinterpret_cast<void*>(levelIndex), 
+		0, 
+		&ThreadId);
 
 	while (IsLevelLoading);
 

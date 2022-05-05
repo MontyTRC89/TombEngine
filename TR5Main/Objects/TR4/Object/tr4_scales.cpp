@@ -87,7 +87,7 @@ void ScalesControl(short itemNumber)
 	AnimateItem(item);
 }
 
-void ScalesCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

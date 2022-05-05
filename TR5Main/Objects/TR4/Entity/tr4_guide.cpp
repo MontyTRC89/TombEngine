@@ -140,7 +140,7 @@ void GuideControl(short itemNumber)
 	else
 		laraAI.xAngle = atan2(dx + (dz / 2), dy);
 
-	ITEM_INFO* foundEnemy = NULL;
+	ItemInfo* foundEnemy = NULL;
 
 	if (!Objects[ID_WRAITH1].loaded)
 	{
@@ -202,7 +202,7 @@ void GuideControl(short itemNumber)
 	}
 
 	bool someFlag = false;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 	Vector3Int pos1;
 	int frameNumber;
 	short random;
@@ -639,7 +639,7 @@ void GuideControl(short itemNumber)
 			item->SwapMeshFlags &= 0xFFFBFFFF;
 
 			auto* room = &g_Level.Rooms[item->RoomNumber];
-			ITEM_INFO* currentItem = NULL;
+			ItemInfo* currentItem = NULL;
 
 			short currentitemNumber = room->itemNumber;
 			while (currentitemNumber != NO_ITEM)

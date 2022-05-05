@@ -31,7 +31,7 @@ extern RendererHUDBar* g_AirBar;
 
 bool EnableSmoothHealthBar = true;
 
-void DrawHealthBarOverlay(ITEM_INFO* item, int value)
+void DrawHealthBarOverlay(ItemInfo* item, int value)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -43,19 +43,19 @@ void DrawHealthBarOverlay(ITEM_INFO* item, int value)
 		else
 			color2 = 0xA00000;
 
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->PoisonPotency);
+		g_Renderer.DrawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
 	}
 }
 
-void DrawHealthBar(ITEM_INFO* item, float value)
+void DrawHealthBar(ItemInfo* item, float value)
 {
 	auto* lara = GetLaraInfo(item);
 
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, lara->PoisonPotency);
+		g_Renderer.DrawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
 }
 
-void UpdateHealthBar(ITEM_INFO* item, int flash)
+void UpdateHealthBar(ItemInfo* item, int flash)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -141,10 +141,10 @@ void UpdateHealthBar(ITEM_INFO* item, int flash)
 void DrawAirBar(float value)
 {
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
+		g_Renderer.DrawBar(value, ::g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
 }
 
-void UpdateAirBar(ITEM_INFO* item, int flash)
+void UpdateAirBar(ItemInfo* item, int flash)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -180,10 +180,10 @@ void UpdateAirBar(ITEM_INFO* item, int flash)
 void DrawSprintBar(float value)
 {
 	if (CurrentLevel)
-		g_Renderer.drawBar(value, ::g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
+		g_Renderer.DrawBar(value, ::g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
 }
 
-void UpdateSprintBar(ITEM_INFO* item)
+void UpdateSprintBar(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 

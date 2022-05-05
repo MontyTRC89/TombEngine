@@ -16,6 +16,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
+#include "input.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
@@ -170,7 +171,7 @@ namespace TEN::Entities::Effects
 
 	void FlameEmitter2Control(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item))
 		{
@@ -215,7 +216,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.z += cos(item->Pose.Orientation.GetY() - Angle::DegToRad(180));
 
 					short roomNumber = item->RoomNumber;
-					FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+					FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 					if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 					{
@@ -355,7 +356,7 @@ namespace TEN::Entities::Effects
 
 	void InitialiseFlameEmitter(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		if (item->TriggerFlags < 0)
 		{
@@ -388,7 +389,7 @@ namespace TEN::Entities::Effects
 
 	void InitialiseFlameEmitter2(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		item->Pose.Position.y -= 64;
 
@@ -429,13 +430,13 @@ namespace TEN::Entities::Effects
 
 	void InitialiseFlameEmitter3(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		if (item->TriggerFlags >= 3)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				ITEM_INFO* currentItem = &g_Level.Items[i];
+				ItemInfo* currentItem = &g_Level.Items[i];
 
 				if (currentItem->ObjectNumber == ID_ANIMATING3)
 				{
@@ -450,7 +451,7 @@ namespace TEN::Entities::Effects
 
 	void FlameEmitter3Control(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item))
 		{
@@ -510,7 +511,7 @@ namespace TEN::Entities::Effects
 				if (item->TriggerFlags >= 3 && !(GlobalCounter & 1))
 				{
 					short targetItemNumber = item->ItemFlags[((GlobalCounter >> 2) & 1) + 2];
-					ITEM_INFO* targetItem = &g_Level.Items[targetItemNumber];
+					ItemInfo* targetItem = &g_Level.Items[targetItemNumber];
 
 					dest.x = 0;
 					dest.y = -64;
@@ -636,9 +637,9 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void FlameEmitterCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
+	void FlameEmitterCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Torch
 			|| Lara.Control.HandStatus != HandStatus::WeaponReady

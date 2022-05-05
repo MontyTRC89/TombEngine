@@ -10,9 +10,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
-#include "Scripting/GameFlowScript.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
 constexpr auto HORIZONTAL_ALIGN_SOUTHWEST = 101;
@@ -180,7 +181,7 @@ bool InStrip(int x, int z, short facing, int min, int max)
 }
 
 // Align facing and X/Z pos to sector edge.
-void AlignToEdge(ITEM_INFO* item, short edgeDist)
+void AlignToEdge(ItemInfo* item, short edgeDist)
 {
 	if (edgeDist > WALL_MASK)
 		edgeDist = WALL_MASK;
@@ -215,7 +216,7 @@ void AlignToEdge(ITEM_INFO* item, short edgeDist)
 }
 
 // Correct position after grabbing slope.
-bool AlignToGrab(ITEM_INFO* item)
+bool AlignToGrab(ItemInfo* item)
 {
 	bool legLeft = false;
 
@@ -260,7 +261,7 @@ bool AlignToGrab(ITEM_INFO* item)
 	return legLeft;
 }
 
-SlopeData GetSlopeData(ITEM_INFO* item)
+SlopeData GetSlopeData(ItemInfo* item)
 {
 	SlopeData slopeData;
 	switch (GetQuadrant(item->Pose.Orientation.GetY()))
@@ -302,7 +303,7 @@ SlopeData GetSlopeData(ITEM_INFO* item)
 // Control & Collision Functions
 // -----------------------------
 
-void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -435,7 +436,7 @@ void lara_col_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void lara_as_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 {
 	/*if (GlobalCounter % 2)
 		item->Pose.Orientation.GetX()--;
@@ -452,7 +453,7 @@ void lara_as_slopeclimb(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.speed = 15;
 }
 
-void lara_as_slopefall(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_slopefall(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.Airborne = true;
 
@@ -471,7 +472,7 @@ void lara_as_slopefall(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.speed = 15;
 }
 
-void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -534,7 +535,7 @@ void lara_col_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void lara_as_slopehang(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_slopehang(ItemInfo* item, CollisionInfo* coll)
 {
 	/*if (GlobalCounter % 2)
 		item->Pose.Orientation.GetX()--;
@@ -549,7 +550,7 @@ void lara_as_slopehang(ITEM_INFO* item, CollisionInfo* coll)
 	Camera.speed = 15;
 }
 
-void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_slopeshimmy(ItemInfo* item, CollisionInfo* coll)
 {
 	GetCollisionInfo(coll, item);
 
@@ -591,7 +592,7 @@ void lara_col_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 		SetAnimation(item, (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT) ? LA_OVERHANG_SHIMMY_LEFT_STOP : LA_OVERHANG_SHIMMY_RIGHT_STOP);
 }
 
-void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_slopeshimmy(ItemInfo* item, CollisionInfo* coll)
 {
 	/*if (GlobalCounter % 2)
 		item->Pose.Orientation.GetX()--;
@@ -619,7 +620,7 @@ void lara_as_slopeshimmy(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_slopeclimbup(ItemInfo* item, CollisionInfo* coll)
 {
 	/*if (GlobalCounter % 2)
 		item->Pose.Orientation.GetX()--;
@@ -650,7 +651,7 @@ void lara_as_slopeclimbup(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void lara_as_slopeclimbdown(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_slopeclimbdown(ItemInfo* item, CollisionInfo* coll)
 {
 	/*if (GlobalCounter % 2)
 		item->Pose.Orientation.GetX()--;
@@ -680,7 +681,7 @@ void lara_as_slopeclimbdown(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_sclimbstart(ItemInfo* item, CollisionInfo* coll)
 {
 	// Rotating camera effect during monkey to overhead slope transition.
 	if (item->Animation.AnimNumber == LA_OVERHANG_MONKEY_SLOPE_CONVEX)
@@ -726,7 +727,7 @@ void lara_as_sclimbstart(ITEM_INFO* item, CollisionInfo* coll)
 		item->Pose.Orientation.GetX()--;*/
 }
 
-void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_sclimbstop(ItemInfo* item, CollisionInfo* coll)
 {
 	// Rotating camera effect during monkey to overhead slope transition.
 
@@ -777,7 +778,7 @@ void lara_as_sclimbstop(ITEM_INFO* item, CollisionInfo* coll)
 		item->Pose.Orientation.GetX()--;*/
 }
 
-void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_sclimbend(ItemInfo* item, CollisionInfo* coll)
 {
 	switch (item->Animation.AnimNumber)
 	{
@@ -816,9 +817,9 @@ void lara_as_sclimbend(ITEM_INFO* item, CollisionInfo* coll)
 // ----------------------------------------
 
 // Extends LS_HANG (10)
-void SlopeHangExtra(ITEM_INFO* item, CollisionInfo* coll)
+void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->Animations.HasOverhangClimb)
+	if (!g_GameFlow->HasOverhangClimb())
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -861,9 +862,9 @@ void SlopeHangExtra(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Extends LS_REACH (11)
-void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
+void SlopeReachExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->Animations.HasOverhangClimb)
+	if (!g_GameFlow->HasOverhangClimb())
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -895,9 +896,9 @@ void SlopeReachExtra(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Extends LS_CLIMB_IDLE (56)
-void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
+void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->Animations.HasOverhangClimb)
+	if (!g_GameFlow->HasOverhangClimb())
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -954,9 +955,9 @@ void SlopeClimbExtra(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Extends LS_LADDER_IDLE (56)
-bool LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
+bool LadderMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->Animations.HasOverhangClimb)
+	if (!g_GameFlow->HasOverhangClimb())
 		return false;
 
 	auto probe = GetCollision(item);
@@ -974,9 +975,9 @@ bool LadderMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Extends LS_LADDER_DOWN (61)
-void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
+void SlopeClimbDownExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->Animations.HasOverhangClimb)
+	if (!g_GameFlow->HasOverhangClimb())
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -1034,11 +1035,11 @@ void SlopeClimbDownExtra(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Extends LS_MONKEY_IDLE (75)
-void SlopeMonkeyExtra(ITEM_INFO* item, CollisionInfo* coll)
+void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!g_GameFlow->Animations.HasOverhangClimb)
+	if (!g_GameFlow->HasOverhangClimb())
 		return;
 
 	auto slopeData = GetSlopeData(item);

@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 	byte Sequences[3];
 	byte CurrentSequence;
 
-	void FullBlockSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void FullBlockSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
@@ -81,7 +81,7 @@ namespace TEN::Entities::Switches
 
 	void FullBlockSwitchControl(short itemNumber)
 	{
-		ITEM_INFO* switchItem = &g_Level.Items[itemNumber];
+		ItemInfo* switchItem = &g_Level.Items[itemNumber];
 
 		if (switchItem->Animation.AnimNumber != Objects[switchItem->ObjectNumber].animIndex + 2 ||
 			CurrentSequence >= 3 ||

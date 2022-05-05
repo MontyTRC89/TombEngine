@@ -8,18 +8,18 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Specific/level.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include <Specific\setup.h>
 #include "Game/Lara/lara_fire.h"
 #include "Game/items.h"
 
 using namespace TEN::Renderer;
 
-extern GameFlow* g_GameFlow;
+extern ScriptInterfaceFlowHandler *g_GameFlow;
 
 bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 {
-	ITEM_INFO& laraItem = *LaraItem;
+	ItemInfo& laraItem = *LaraItem;
 	LaraInfo& laraInfo = Lara;
 
 	switch (weapon)
@@ -72,7 +72,7 @@ bool shouldAnimateUpperBody(const LaraWeaponType& weapon)
 	}
 }
 
-void Renderer11::updateLaraAnimations(bool force)
+void Renderer11::UpdateLaraAnimations(bool force)
 {
 	Matrix translation;
 	Matrix rotation;
@@ -214,7 +214,7 @@ void Renderer11::updateLaraAnimations(bool force)
 		case LaraWeaponType::Flare:
 		case LaraWeaponType::Torch:
 			// Left arm
-			ITEM_INFO tempItem;
+			ItemInfo tempItem;
 			tempItem.Animation.AnimNumber = Lara.LeftArm.AnimNumber;
 			tempItem.Animation.FrameNumber = Lara.LeftArm.FrameNumber;
 
@@ -237,7 +237,7 @@ void Renderer11::updateLaraAnimations(bool force)
 	m_items[Lara.ItemNumber].DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
+void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool transparent)
 {
 	// Don't draw Lara if binoculars or sniper
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
@@ -266,12 +266,10 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 	}
 
 	// Set texture
-	BindTexture(TextureRegister::MainTexture, &std::get<0>(m_moveablesTextures[0]), SamplerStateType::LinearClamp);
-	BindTexture(TextureRegister::NormalMapTexture, &std::get<1>(m_moveablesTextures[0]), SamplerStateType::None);
+	BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_LINEAR_CLAMP);
+	BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
 
-	m_stMisc.AlphaTest = true;
-	m_cbMisc.updateData(m_stMisc, m_context.Get());
-	m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+	SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
 	RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 	RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
@@ -298,11 +296,11 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
-		drawMoveableMesh(item, mesh, room, k);
+		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
+		DrawMoveableMesh(item, mesh, room, k, transparent);
 	}
 
-	DrawLaraHolsters();
+	DrawLaraHolsters(transparent);
 
 	if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 	{
@@ -311,8 +309,8 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 
 		for (int k = 1; k < laraSkinJoints.ObjectMeshes.size(); k++)
 		{
-			RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
-			drawMoveableMesh(item, mesh, room, k);
+			RendererMesh *mesh = laraSkinJoints.ObjectMeshes[k];
+			DrawMoveableMesh(item, mesh, room, k, transparent);
 		}
 	}
 
@@ -339,12 +337,12 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 		{
 			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-			drawMoveableMesh(item, mesh, room, k);
-		}
+			DrawMoveableMesh(item, mesh, room, k, transparent);
+		}	
 	}
 }
 
-void Renderer11::DrawLaraHolsters()
+void Renderer11::DrawLaraHolsters(bool transparent)
 {
 	RendererItem* item = &m_items[Lara.ItemNumber];
 	RendererRoom* room = &m_rooms[LaraItem->RoomNumber];
@@ -357,20 +355,20 @@ void Renderer11::DrawLaraHolsters()
 	{
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(leftHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
-		drawMoveableMesh(item, mesh, room, LM_LTHIGH);
+		DrawMoveableMesh(item, mesh, room, LM_LTHIGH, transparent);
 	}
 
 	if (m_moveableObjects[static_cast<int>(rightHolsterID)])
 	{
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(rightHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
-		drawMoveableMesh(item, mesh, room, LM_RTHIGH);
+		DrawMoveableMesh(item, mesh, room, LM_RTHIGH, transparent);
 	}
 
 	if (backHolsterID != HolsterSlot::Empty && m_moveableObjects[static_cast<int>(backHolsterID)])
 	{
 		RendererObject& holsterSkin = *m_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
-		drawMoveableMesh(item, mesh, room, LM_TORSO);
+		DrawMoveableMesh(item, mesh, room, LM_TORSO, transparent);
 	}
 }

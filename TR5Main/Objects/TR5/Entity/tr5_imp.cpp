@@ -65,7 +65,7 @@ void InitialiseImp(short itemNumber)
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
-static void ImpThrowStones(ITEM_INFO* item)
+static void ImpThrowStones(ItemInfo* item)
 {
 	auto pos1 = Vector3Int();
 	GetJointAbsPosition(item, &pos1, 9);

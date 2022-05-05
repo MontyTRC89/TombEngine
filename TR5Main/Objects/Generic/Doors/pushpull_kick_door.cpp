@@ -44,7 +44,7 @@ namespace TEN::Entities::Doors
 		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f),
 	};
 
-	void PushPullKickDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void PushPullKickDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* doorItem = &g_Level.Items[itemNumber];

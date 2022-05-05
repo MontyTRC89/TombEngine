@@ -17,12 +17,14 @@ namespace TEN
 		{
 			std::deque<FootprintData> footprints = std::deque<FootprintData>();
 
-			bool CheckFootOnFloor(ITEM_INFO const& item, int mesh, Vector3& outFootprintPosition) 
-			{
-				int x = item.Pose.Position.x;
-				int y = item.Pose.Position.y;
-				int z = item.Pose.Position.z;
-				short roomNumber = item.RoomNumber;
+	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
+
+	bool CheckFootOnFloor(ItemInfo const& item, int mesh, Vector3& outFootprintPosition) 
+	{
+		int x = item.Pose.Position.x;
+		int y = item.Pose.Position.y;
+		int z = item.Pose.Position.z;
+		short roomNumber = item.RoomNumber;
 
 				auto floor = GetFloor(x, y, z, &roomNumber);
 
@@ -38,10 +40,10 @@ namespace TEN
 				return abs(pos.y - height) < 64;
 			}
 
-			void AddFootprint(ITEM_INFO* item, bool rightFoot)
-			{
-				if (item != LaraItem)
-					return;
+	void AddFootprint(ItemInfo* item, bool rightFoot)
+	{
+		if (item != LaraItem)
+			return;
 
 				auto foot = rightFoot ? LM_RFOOT : LM_LFOOT;
 

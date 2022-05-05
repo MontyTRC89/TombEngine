@@ -21,7 +21,7 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO SkeletonBite = { 0, -16, 200, 11 };
 
-	void TriggerRiseEffect(ITEM_INFO* item)
+	void TriggerRiseEffect(ItemInfo* item)
 	{
 		short fxNumber = CreateNewEffect(item->RoomNumber);
 		if (fxNumber != NO_ITEM)

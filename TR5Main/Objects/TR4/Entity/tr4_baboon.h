@@ -16,7 +16,7 @@ private:
 	std::vector<BaboonRespawnStruct> baboonRespawnArray;
 public:
 	void Free(void);
-	void Add(ITEM_INFO* item, unsigned int maxCount);
+	void Add(ItemInfo* item, unsigned int maxCount);
 	void Remove(int ID);
 	int GetBaboonFreePlace(void);
 	BaboonRespawnStruct* GetBaboonRespawn(int ID);

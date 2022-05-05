@@ -5,8 +5,10 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Scripting/ScriptInterfaceGame.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Floordata;
 
@@ -20,7 +22,7 @@ void ClearItem(short itemNumber)
 	item->StartPose = item->Pose;
 }
 
-void KillItem(short itemNumber)
+void KillItem(short const itemNumber)
 {
 	if (InItemControlLoop)
 	{
@@ -80,7 +82,16 @@ void KillItem(short itemNumber)
 			NextItemFree = itemNumber;
 		}
 		else
+		{
 			item->Flags |= IFLAG_KILLED;
+		}
+
+		g_GameScriptEntities->NotifyKilled(item);
+		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
+		if (!item->luaCallbackOnKilledName.empty())
+		{
+			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNumber);
+		}
 	}
 }
 
@@ -295,6 +306,8 @@ void RemoveDrawnItem(short itemNumber)
 
 void RemoveActiveItem(short itemNumber) 
 {
+	auto& item = g_Level.Items[itemNumber];
+
 	if (g_Level.Items[itemNumber].Active)
 	{
 		g_Level.Items[itemNumber].Active = false;
@@ -311,6 +324,12 @@ void RemoveActiveItem(short itemNumber)
 					break;
 				}
 			}
+		}
+
+		g_GameScriptEntities->NotifyKilled(&item);
+		if (!item.luaCallbackOnKilledName.empty())
+		{
+			g_GameScript->ExecuteFunction(item.luaCallbackOnKilledName, itemNumber);
 		}
 	}
 }
@@ -383,7 +402,7 @@ void InitialiseItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FLOOR_INFO* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	item->Floor = floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z);
 	item->BoxNumber = floor->Box;
 
@@ -433,7 +452,7 @@ void InitialiseItemArray(int totalItem)
 	item->NextItem = NO_ITEM;
 }
 
-short SpawnItem(ITEM_INFO* item, GAME_OBJECT_ID objectNumber)
+short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 {
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -474,7 +493,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
-void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset, int zOffset)
+void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
 	float s = sin(item->Pose.Orientation.GetY());
 	float c = cos(item->Pose.Orientation.GetY());
@@ -503,7 +522,7 @@ std::vector<int> FindAllItems(short objectNumber)
 	return itemList;
 }
 
-ITEM_INFO* FindItem(int objectNumber)
+ItemInfo* FindItem(int objectNumber)
 {
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
@@ -516,7 +535,7 @@ ITEM_INFO* FindItem(int objectNumber)
 	return 0;
 }
 
-int FindItem(ITEM_INFO* item)
+int FindItem(ItemInfo* item)
 {
 	if (item == LaraItem)
 		return Lara.ItemNumber;

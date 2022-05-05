@@ -81,7 +81,7 @@ void InitialiseBigRat(short itemNumber)
 	}
 }
 
-static bool RatIsInWater(ITEM_INFO* item)
+static bool RatIsInWater(ItemInfo* item)
 {
 	auto* creature = GetCreatureInfo(item);
 

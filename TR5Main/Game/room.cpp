@@ -43,7 +43,7 @@ void DoFlipMap(short group)
 
 			AddRoomFlipItems(room);
 
-			g_Renderer.flipRooms(static_cast<short>(i), room->flippedRoom);
+			g_Renderer.FlipRooms(static_cast<short>(i), room->flippedRoom);
 
 			for (auto& fd : room->floor)
 				fd.Room = i;
@@ -149,7 +149,7 @@ int IsRoomOutside(int x, int y, int z)
 	return NO_ROOM;
 }
 
-FLOOR_INFO* GetSector(ROOM_INFO* room, int x, int z) 
+FloorInfo* GetSector(ROOM_INFO* room, int x, int z) 
 {
 	int sectorX = std::clamp(x / SECTOR(1), 0, room->xSize - 1);
 	int sectorZ = std::clamp(z / SECTOR(1), 0, room->zSize - 1);

@@ -68,7 +68,7 @@ namespace TEN::Entities::TR4
 		item->Pose.Position.y += SPyoffs[angle];
 	}
 
-	bool TestBoundsCollideTeethSpikes(ITEM_INFO* item)
+	bool TestBoundsCollideTeethSpikes(ItemInfo* item)
 	{
 		int x;
 		int z;

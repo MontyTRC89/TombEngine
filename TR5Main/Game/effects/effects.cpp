@@ -19,7 +19,7 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/trmath.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer/Renderer11.h"
 
 using TEN::Renderer::g_Renderer;
@@ -803,7 +803,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	}
 }*/
 
-void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
+void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 {
 	long dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	long dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
@@ -1226,10 +1226,10 @@ void KillAllCurrentItems(short itemNumber)
 
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
-	g_Renderer.addDynamicLight(x, y, z, falloff, r, g, b);
+	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void WadeSplash(ITEM_INFO* item, int wh, int wd)
+void WadeSplash(ItemInfo* item, int wh, int wd)
 {
 	short roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -1278,7 +1278,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	}
 }
 
-void Splash(ITEM_INFO* item)
+void Splash(ItemInfo* item)
 {
 	short roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -1460,7 +1460,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->Mirror.Room);
+	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->GetMirrorRoom());
 
 	bool water = false;
 	if (room->flags & ENV_FLAG_WATER)

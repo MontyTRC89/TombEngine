@@ -9,6 +9,7 @@
 #include "Game/items.h"
 #include "Game/control/flipeffect.h"
 #include "Game/gui.h"
+#include "Game/control/volume.h"
 #include "Game/control/lot.h"
 #include "Game/health.h"
 #include "Game/savegame.h"
@@ -44,7 +45,10 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/winmain.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/ScriptInterfaceGame.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;
 using std::unordered_map;
@@ -98,7 +102,8 @@ int DrawPhase()
 GameStatus ControlPhase(int numFrames, int demoMode)
 {
 	short oldLaraFrame;
-	auto* level = g_GameFlow->GetLevel(CurrentLevel);
+
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
 
@@ -110,7 +115,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 	SetDebounce = true;
 
-	g_GameScript->ProcessDisplayStrings(DELTA_TIME);
+	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
 	static int framesCount = 0;
 	for (framesCount += numFrames; framesCount > 0; framesCount -= 2)
@@ -140,7 +145,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		// Does the player want to enter inventory?
 		SetDebounce = false;
 
-		if (CurrentLevel != 0 && !g_Renderer.isFading())
+		if (CurrentLevel != 0)
 		{
 			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
@@ -277,9 +282,10 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				if (Objects[item->ObjectNumber].control)
 					Objects[item->ObjectNumber].control(itemNumber);
 
+				TEN::Control::Volumes::TestVolumes(itemNumber);
+
 				if (item->AfterDeath > 0 && item->AfterDeath < 128 && !(Wibble & 3))
 					item->AfterDeath++;
-
 				if (item->AfterDeath == 128)
 					KillItem(itemNumber);
 			}
@@ -327,13 +333,14 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		if (CurrentLevel != 0)
 		{
+			g_GameScriptEntities->TestCollidingObjects();
 			// Control Lara
 			InItemControlLoop = true;
 			LaraControl(LaraItem, &LaraCollision);
 			InItemControlLoop = false;
 			KillMoveItems();
 
-			g_Renderer.updateLaraAnimations(true);
+			g_Renderer.UpdateLaraAnimations(true);
 
 			if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
 			{
@@ -345,7 +352,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			TriggerLaraDrips(LaraItem);
 
 			// Update Lara's ponytails
-			HairControl(LaraItem, level->LaraType == LaraType::Young);
+			HairControl(LaraItem, level->GetLaraType() == LaraType::Young);
 		}
 
 		if (UseSpotCam)
@@ -429,10 +436,10 @@ unsigned CALLBACK GameMain(void *)
 			throw TENScriptException("Intro image path is not set.");
 
 		// Do a fixed time title image
-		g_Renderer.renderTitleImage();
+		g_Renderer.RenderTitleImage();
 
-		// Execute the Lua gameflow and play the game
-		g_GameFlow->DoGameflow();
+		// Execute the LUA gameflow and play the game
+		g_GameFlow->DoFlow();
 
 		DoTheGame = false;
 
@@ -450,7 +457,7 @@ unsigned CALLBACK GameMain(void *)
 	return true;
 }
 
-GameStatus DoTitle(int index)
+GameStatus DoTitle(int index, std::string const& ambient)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
@@ -470,17 +477,18 @@ GameStatus DoTitle(int index)
 		InitialiseCamera();
 		StopAllSounds();
 
-		// Run the level script
-		auto* level = g_GameFlow->Levels[index];
+		g_GameScript->ResetScripts(true);
 
-		std::string err;
+		// Run the level script
+		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
+
 		if (!level->ScriptFileName.empty())
 		{
-			g_GameScript->ExecuteScript(level->ScriptFileName);
+			g_GameScript->ExecuteScriptFile(level->ScriptFileName);
 			g_GameScript->InitCallbacks();
-			g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
-				g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+				g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 			});
 		}
 
@@ -500,7 +508,7 @@ GameStatus DoTitle(int index)
 		UseSpotCam = true;
 
 		// Play background music
-		PlaySoundTrack(83);
+		// MERGE: PlaySoundTrack(index);
 
 		// Initialize menu
 		g_Gui.SetMenuToDisplay(Menu::Title);
@@ -522,7 +530,7 @@ GameStatus DoTitle(int index)
 
 		while (status == InventoryResult::None)
 		{
-			g_Renderer.renderTitle();
+			g_Renderer.RenderTitle();
 
 			SetDebounce = true;
 			S_UpdateInput();
@@ -547,6 +555,7 @@ GameStatus DoTitle(int index)
 
 	g_GameScript->OnEnd();
 	g_GameScript->FreeLevelScripts();
+	g_GameScriptEntities->FreeEntities();
 
 	switch (inventoryResult)
 	{
@@ -563,7 +572,7 @@ GameStatus DoTitle(int index)
 	return GameStatus::NewGame;
 }
 
-GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame)
+GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
 	// If not loading a savegame, then clear all the infos
 	if (!loadFromSavegame)
@@ -587,16 +596,18 @@ GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	InitialiseCamera();
 	StopAllSounds();
 
+	g_GameScript->ResetScripts(loadFromSavegame);
+
 	// Run the level script
-	auto* level = g_GameFlow->Levels[index];
-  
+	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(index);
+
 	if (!level->ScriptFileName.empty())
 	{
-		g_GameScript->ExecuteScript(level->ScriptFileName);
+		g_GameScript->ExecuteScriptFile(level->ScriptFileName);
 		g_GameScript->InitCallbacks();
-		g_GameScript->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
+		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
-			g_Renderer.drawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+			g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
 		});
 	}
 
@@ -653,8 +664,8 @@ GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame)
 	int nFrames = 2;
 
 	// First control phase
-	g_Renderer.resetAnimations();
-	auto result = ControlPhase(nFrames, 0);
+	g_Renderer.ResetAnimations();
+	GameStatus result = ControlPhase(nFrames, 0);
 
 	// Fade in screen
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
@@ -672,6 +683,8 @@ GameStatus DoLevel(int index, std::string ambient, bool loadFromSavegame)
 		{
 			g_GameScript->OnEnd();
 			g_GameScript->FreeLevelScripts();
+			g_GameScriptEntities->FreeEntities();
+
 			// Here is the only way for exiting from the loop
 			StopAllSounds();
 			StopSoundTracks();
@@ -690,7 +703,7 @@ void UpdateShatters()
 	{
 		SmashedMeshCount--;
 
-		FLOOR_INFO* floor = GetFloor(
+		FloorInfo* floor = GetFloor(
 			SmashedMesh[SmashedMeshCount]->pos.Position.x,
 			SmashedMesh[SmashedMeshCount]->pos.Position.y,
 			SmashedMesh[SmashedMeshCount]->pos.Position.z,
@@ -750,7 +763,7 @@ int GetRandomDraw()
 	return GenerateInt();
 }
 
-bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
+bool ExplodeItemNode(ItemInfo *item, int node, int noXZVel, int bits)
 {
 	if (1 << node & item->MeshBits)
 	{

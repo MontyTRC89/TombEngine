@@ -109,7 +109,7 @@ void InitialiseRubberBoat(short itemNumber)
 	rBoat->Pitch = 0;
 }
 
-void DrawRubberBoat(ITEM_INFO* rBoatItem)
+void DrawRubberBoat(ItemInfo* rBoatItem)
 {
 	/* TODO: WTF?
 	RUBBER_BOAT_INFO *b;
@@ -121,7 +121,7 @@ void DrawRubberBoat(ITEM_INFO* rBoatItem)
 	*/
 }
 
-RubberBoatMountType GetRubberBoatMountType(ITEM_INFO* laraItem, short itemNumber, CollisionInfo* coll)
+RubberBoatMountType GetRubberBoatMountType(ItemInfo* laraItem, short itemNumber, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* rBoat = &g_Level.Items[itemNumber];
@@ -186,7 +186,7 @@ RubberBoatMountType GetRubberBoatMountType(ITEM_INFO* laraItem, short itemNumber
 	return mountType;
 }
 
-int TestWaterHeight(ITEM_INFO* rBoatItem, int zOffset, int xOffset, Vector3Int* pos)
+int TestWaterHeight(ItemInfo* rBoatItem, int zOffset, int xOffset, Vector3Int* pos)
 {
 	float s = sin(rBoatItem->Pose.Orientation.GetY());
 	float c = cos(rBoatItem->Pose.Orientation.GetY());
@@ -208,7 +208,7 @@ int TestWaterHeight(ITEM_INFO* rBoatItem, int zOffset, int xOffset, Vector3Int* 
 	return (height - 5);
 }
 
-static void DoRubberBoatShift(ITEM_INFO* laraItem, int itemNumber)
+static void DoRubberBoatShift(ItemInfo* laraItem, int itemNumber)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* boatItem = &g_Level.Items[itemNumber];
@@ -237,7 +237,7 @@ static void DoRubberBoatShift(ITEM_INFO* laraItem, int itemNumber)
 	}
 }
 
-static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, Vector3Int* pos, Vector3Int* old)
+static int DoRubberBoatShift2(ItemInfo* rBoatItem, Vector3Int* pos, Vector3Int* old)
 {
 	int x = pos->x / SECTOR(1);
 	int z = pos->z / SECTOR(1);
@@ -333,7 +333,7 @@ static int DoRubberBoatShift2(ITEM_INFO* rBoatItem, Vector3Int* pos, Vector3Int*
 	return 0;
 }
 
-static int GetRubberBoatCollisionAnim(ITEM_INFO* rBoatItem, Vector3Int* moved)
+static int GetRubberBoatCollisionAnim(ItemInfo* rBoatItem, Vector3Int* moved)
 {
 	moved->x = rBoatItem->Pose.Position.x - moved->x;
 	moved->z = rBoatItem->Pose.Position.z - moved->z;
@@ -363,7 +363,7 @@ static int GetRubberBoatCollisionAnim(ITEM_INFO* rBoatItem, Vector3Int* moved)
 	return 0;
 }
 
-static int RubberBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
+static int RubberBoatDynamics(ItemInfo* laraItem, short itemNumber)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* rBoatItem = &g_Level.Items[itemNumber];
@@ -524,7 +524,7 @@ static int DoRubberBoatDynamics(int height, int verticalVelocity, int* y)
 	return verticalVelocity;
 }
 
-bool RubberBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
+bool RubberBoatUserControl(ItemInfo* laraItem, ItemInfo* rBoatItem)
 {
 	auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
 
@@ -619,7 +619,7 @@ bool RubberBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
 	return noTurn;
 }
 
-void RubberBoatCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
+void RubberBoatCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -670,7 +670,7 @@ void RubberBoatCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll
 	}
 }
 
-static bool TestRubberBoatDismount(ITEM_INFO* laraItem, int direction)
+static bool TestRubberBoatDismount(ItemInfo* laraItem, int direction)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* sBoatItem = &g_Level.Items[lara->Vehicle];
@@ -702,7 +702,7 @@ static bool TestRubberBoatDismount(ITEM_INFO* laraItem, int direction)
 	return true;
 }
 
-void RubberBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem, int collide)
+void RubberBoatAnimation(ItemInfo* laraItem, ItemInfo* rBoatItem, int collide)
 {
 	auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
 
@@ -855,7 +855,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long velocity, short a
 	}
 }
 
-void DoRubberBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* rBoatItem)
+void DoRubberBoatDismount(ItemInfo* laraItem, ItemInfo* rBoatItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 

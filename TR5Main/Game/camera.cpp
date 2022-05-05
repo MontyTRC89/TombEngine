@@ -312,7 +312,7 @@ void MoveCamera(GameVector* ideal, int speed)
 	}
 }
 
-void ChaseCamera(ITEM_INFO* item)
+void ChaseCamera(ItemInfo* item)
 {
 	if (!Camera.targetElevation)
 		Camera.targetElevation = Angle::DegToRad(-10.0f);
@@ -449,7 +449,7 @@ void UpdateCameraElevation()
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
 
-void CombatCamera(ITEM_INFO* item)
+void CombatCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -731,7 +731,7 @@ bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst)
 	return false;
 }
 
-void FixedCamera(ITEM_INFO* item)
+void FixedCamera(ItemInfo* item)
 {
 	GameVector from, to;
 
@@ -774,7 +774,7 @@ void FixedCamera(ITEM_INFO* item)
 	}
 }
 
-void LookCamera(ITEM_INFO* item)
+void LookCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1036,7 +1036,7 @@ void LookCamera(ITEM_INFO* item)
 	lara->ExtraTorsoRot = oldTorsoRot;
 }
 
-void BounceCamera(ITEM_INFO* item, int bounce, int maxDistance)
+void BounceCamera(ItemInfo* item, int bounce, int maxDistance)
 {
 	int distance = sqrt(
 		pow(item->Pose.Position.x - Camera.pos.x, 2) +
@@ -1054,7 +1054,7 @@ void BounceCamera(ITEM_INFO* item, int bounce, int maxDistance)
 		Camera.bounce = bounce;
 }
 
-void BinocularCamera(ITEM_INFO* item)
+void BinocularCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1411,7 +1411,7 @@ void CalculateCamera()
 			Camera.underwater = false;
 	}
 
-	ITEM_INFO* item;
+	ItemInfo* item;
 	bool fixedCamera = false;
 	if (Camera.item != NULL &&
 		(Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
@@ -1597,7 +1597,7 @@ void CalculateCamera()
 	}
 }
 
-void LookLeftRight(ITEM_INFO* item)
+void LookLeftRight(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1633,7 +1633,7 @@ void LookLeftRight(ITEM_INFO* item)
 	}
 }
 
-void LookUpDown(ITEM_INFO* item)
+void LookUpDown(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1669,7 +1669,7 @@ void LookUpDown(ITEM_INFO* item)
 	}
 }
 
-void ResetLook(ITEM_INFO* item)
+void ResetLook(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1747,7 +1747,7 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius)
 	}
 }
 
-static bool CheckItemCollideCamera(ITEM_INFO* item)
+static bool CheckItemCollideCamera(ItemInfo* item)
 {
 	auto dx = Camera.pos.x - item->Pose.Position.x;
 	auto dy = Camera.pos.y - item->Pose.Position.y;
@@ -1873,7 +1873,7 @@ void ItemsCollideCamera()
 			ItemPushCamera(bounds, &item->Pose, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(item->Pose, bounds),
+		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(item->Pose, bounds),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
@@ -1904,7 +1904,7 @@ void ItemsCollideCamera()
 			ItemPushCamera(bounds, &mesh->pos, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.addDebugBox(TO_DX_BBOX(mesh->pos, bounds),
+		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(mesh->pos, bounds),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}

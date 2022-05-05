@@ -142,7 +142,7 @@ static void TriggerHarpySparks(int x, int y, int z, int xv, int yv, int zv)
 	}
 }
 
-static void DoHarpyEffects(ITEM_INFO* item, short itemNumber)
+static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 {
 	item->ItemFlags[0]++;
 

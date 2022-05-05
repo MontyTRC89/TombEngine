@@ -15,15 +15,16 @@
 #include "Specific/trmath.h"
 #include "Specific/prng.h"
 #include "Renderer/Renderer11.h"
+#include "Scripting/ScriptInterfaceGame.h"
 
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;
 
 BOUNDING_BOX GlobalCollisionBounds;
-ITEM_INFO* CollidedItems[MAX_COLLIDED_OBJECTS];
+ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
 MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
-void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -93,7 +94,7 @@ void GenericSphereBoxCollision(short itemNumber, ITEM_INFO* laraItem, CollisionI
 	}
 }
 
-bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, ITEM_INFO** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
 {
 	short numItems = 0;
 	short numMeshes = 0;
@@ -210,9 +211,38 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 							if (radius + rz + CLICK(0.5f) >= framePtr->boundingBox.Z1 && rz - radius - CLICK(0.5f) <= framePtr->boundingBox.Z2)
 							{
 								collidedItems[numItems++] = item;
+							}
 
-								if (!radius)
-									return true;
+						}
+						else
+						{
+							if (collidingItem->Pose.Position.y + radius + 128 >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
+								collidingItem->Pose.Position.y - radius - 128 <= item->Pose.Position.y + framePtr->boundingBox.Y2)
+							{
+								float s = phd_sin(item->Pose.Orientation.y);
+								float c = phd_cos(item->Pose.Orientation.y);
+
+								int rx = dx * c - s * dz;
+								int rz = dz * c + s * dx;
+
+								if (item->ObjectNumber == ID_TURN_SWITCH)
+								{
+									framePtr->boundingBox.X1 = -256;
+									framePtr->boundingBox.X2 = 256;
+									framePtr->boundingBox.Z1 = -256;
+									framePtr->boundingBox.Z1 = 256;
+								}
+
+								if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
+								{
+									if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
+									{
+										collidedItems[numItems++] = item;
+
+										if (!radius)
+											return true;
+									}
+								}
 							}
 						}
 					}
@@ -228,7 +258,7 @@ bool GetCollidedObjects(ITEM_INFO* collidingItem, int radius, bool onlyVisible, 
 	return (numItems || numMeshes);
 }
 
-bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* laraItem, CollisionInfo* coll)
+bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* framePtr = GetBestFrame(laraItem);
 
@@ -256,7 +286,7 @@ bool TestWithGlobalCollisionBounds(ITEM_INFO* item, ITEM_INFO* laraItem, Collisi
 	return true;
 }
 
-void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
+void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* bounds = GetBoundsAccurate(item);
 	int height = abs(bounds->Y2 + bounds->Y1);
@@ -274,7 +304,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
 		auto mxR = Matrix::CreateFromYawPitchRoll(coll->Setup.ForwardAngle, 0, 0);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
-		// g_Renderer.addDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
+		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 
 		for (auto i : GetRoomList(item->RoomNumber))
 		{
@@ -328,7 +358,7 @@ void TestForObjectOnLedge(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INFO* laraItem)
+bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto rotRel = laraItem->Pose.Orientation - item->Pose.Orientation;
 
@@ -377,7 +407,7 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ITEM_INFO* item, ITEM_INF
 	return true;
 }
 
-void AlignLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
+void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
@@ -394,7 +424,7 @@ void AlignLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
 	laraItem->Pose.Position.z = item->Pose.Position.z + pos.z;
 }
 
-bool MoveLaraPosition(Vector3Int* vec, ITEM_INFO* item, ITEM_INFO* laraItem)
+bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -473,7 +503,7 @@ bool ItemNearLara(PoseData* pos, int radius)
 	return false;
 }
 
-bool ItemNearTarget(PoseData* src, ITEM_INFO* target, int radius)
+bool ItemNearTarget(PoseData* src, ItemInfo* target, int radius)
 {
 	auto pos = src->Position - target->Pose.Position;
 
@@ -566,7 +596,7 @@ bool Move3DPosTo3DPos(PoseData* src, PoseData* dest, int velocity, float angleAd
 	return (src == dest);
 }
 
-bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius)
+bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 {
 	auto bounds = (BOUNDING_BOX*)GetBestFrame(item);
 	auto laraBounds = (BOUNDING_BOX*)GetBestFrame(laraItem);
@@ -596,7 +626,7 @@ bool TestBoundsCollide(ITEM_INFO* item, ITEM_INFO* laraItem, int radius)
 	return false;
 }
 
-bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
+bool TestBoundsCollideStatic(ItemInfo* item, MESH_INFO* mesh, int radius)
 {
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
@@ -629,7 +659,7 @@ bool TestBoundsCollideStatic(ITEM_INFO* item, MESH_INFO* mesh, int radius)
 		return false;
 }
 
-bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush) // previously ItemPushLara
+bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spasmEnabled, char bigPush) // previously ItemPushLara
 {
 	// Get item's rotation
 	float sinY = sin(item->Pose.Orientation.GetY());
@@ -747,7 +777,7 @@ bool ItemPushItem(ITEM_INFO* item, ITEM_INFO* item2, CollisionInfo* coll, bool s
 	return true;
 }
 
-bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // previously ItemPushLaraStatic
+bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // previously ItemPushLaraStatic
 {
 	auto bounds = StaticObjects[mesh->staticNumber].collisionBox;
 
@@ -817,7 +847,7 @@ bool ItemPushStatic(ITEM_INFO* item, MESH_INFO* mesh, CollisionInfo* coll) // pr
 	return true;
 }
 
-void CollideSolidStatics(ITEM_INFO* item, CollisionInfo* coll)
+void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->HitTallObject = false;
 
@@ -841,7 +871,7 @@ void CollideSolidStatics(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PoseData pos, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PoseData pos, CollisionInfo* coll)
 {
 	bool result = false;
 
@@ -863,7 +893,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PoseData pos, Collisi
 	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE);
 
 	// Draw static bounds
-	g_Renderer.addDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Calculate horizontal item coll bounds according to radius
 	BOUNDING_BOX collBox;
@@ -890,7 +920,7 @@ bool CollideSolidBounds(ITEM_INFO* item, BOUNDING_BOX box, PoseData pos, Collisi
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Draw item coll bounds
-	g_Renderer.addDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Decompose static bounds into top/bottom plane vertices
 	Vector3 corners[8];
@@ -1650,7 +1680,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ITEM_INFO* laraItem, CollisionInfo* coll) // previously LaraBaddieCollision
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddieCollision
 {
 	laraItem->HitStatus = false;
 	coll->HitStatic = false;
@@ -1708,7 +1738,7 @@ void DoObjectCollision(ITEM_INFO* laraItem, CollisionInfo* coll) // previously L
 	}
 }
 
-void AIPickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -1716,7 +1746,7 @@ void AIPickupCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 		item->Status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo * coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -1730,7 +1760,7 @@ void ObjectCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	}
 }
 
-void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -1774,7 +1804,7 @@ void CreatureCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* col
 	}
 }
 
-void TrapCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

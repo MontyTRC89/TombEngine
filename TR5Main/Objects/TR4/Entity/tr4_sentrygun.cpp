@@ -19,7 +19,7 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO SentryGunBite = { 0, 0, 0, 8 };
 
-	static void SentryGunThrowFire(ITEM_INFO* item)
+	static void SentryGunThrowFire(ItemInfo* item)
 	{
 		for (int i = 0; i < 3; i++)
 		{

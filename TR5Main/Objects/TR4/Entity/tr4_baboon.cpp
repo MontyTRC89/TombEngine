@@ -93,7 +93,7 @@ static void TriggerBaboonShockwave(PoseData pos, short xRot)
 	}
 }
 
-void BaboonDieEffect(ITEM_INFO* item)
+void BaboonDieEffect(ItemInfo* item)
 {
 	PoseData pos = PoseData(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z);
 
@@ -494,7 +494,7 @@ void BaboonControl(short itemNumber)
 
 				pos.y = item->Pose.Position.y;
 				pos.roomNumber = item->RoomNumber;
-				FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
+				FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &pos.roomNumber);
 				int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 				item->Floor = height;
 				TestTriggers(pos.x, pos.y, pos.z, pos.roomNumber, TRUE);
@@ -547,7 +547,7 @@ void BaboonRespawnClass::Free(void)
 	baboonRespawnArray.clear();
 }
 
-void BaboonRespawnClass::Add(ITEM_INFO* item, unsigned int maxCount)
+void BaboonRespawnClass::Add(ItemInfo* item, unsigned int maxCount)
 {
 	BaboonRespawnStruct toAdd;
 	toAdd.ID = GetBaboonFreePlace();

@@ -5,14 +5,14 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Scripting/GameFlowScript.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -55,11 +55,11 @@ void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void LaraCheatyBits(ITEM_INFO* item)
+void LaraCheatyBits(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (g_GameFlow->FlyCheat)
+	if (g_GameFlow->IsFlyCheatEnabled())
 	{
 		if (KeyMap[DIK_O])
 		{
@@ -97,7 +97,7 @@ void LaraCheatyBits(ITEM_INFO* item)
 		lara->Control.Count.NoCheat--;
 }
 
-void LaraCheatGetStuff(ITEM_INFO* item)
+void LaraCheatGetStuff(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -212,7 +212,7 @@ void LaraCheatGetStuff(ITEM_INFO* item)
 	}
 }
 
-void DelsGiveLaraItemsCheat(ITEM_INFO* item)
+void DelsGiveLaraItemsCheat(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 

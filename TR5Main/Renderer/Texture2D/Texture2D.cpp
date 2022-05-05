@@ -51,7 +51,22 @@ namespace TEN::Renderer
 		ComPtr<ID3D11Resource> resource;
 		ID3D11DeviceContext* context = nullptr;
 		device->GetImmediateContext(&context);
-		throwIfFailed(CreateWICTextureFromMemory(device, context, data, length, resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0));
+		throwIfFailed(CreateWICTextureFromMemoryEx(
+			device,
+			context,
+			data,
+			length, 
+			(size_t)0,
+			D3D11_USAGE_DEFAULT,
+			D3D11_BIND_SHADER_RESOURCE,
+			0,
+			D3D11_RESOURCE_MISC_GENERATE_MIPS,
+			WIC_LOADER_DEFAULT,
+			resource.GetAddressOf(), 
+			ShaderResourceView.GetAddressOf()));
+
+		context->GenerateMips(ShaderResourceView.Get());
+
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
 }

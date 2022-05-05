@@ -79,7 +79,7 @@ short GetNextBat()
 	return batNumber;
 }
 
-void TriggerLittleBat(ITEM_INFO* item)
+void TriggerLittleBat(ItemInfo* item)
 {
 	short batNumber = GetNextBat();
 

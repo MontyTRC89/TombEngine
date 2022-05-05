@@ -12,9 +12,9 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
-#include "Scripting/GameFlowScript.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 
 // -----------------------------
 // MONKEY SWING
@@ -23,7 +23,7 @@
 
 // State:		LS_MONKEY_IDLE (75)
 // Collision:	lara_col_monkey_idle()
-void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -126,7 +126,7 @@ void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_IDLE (75)
 // Control:		lara_as_monkey_idle()
-void lara_col_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -163,7 +163,7 @@ void lara_col_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_FORWARD (76)
 // Collision:	lara_col_monkey_forward()
-void lara_as_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -216,7 +216,7 @@ void lara_as_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_FORWARD (76)
 // Control:		lara_as_monkey_forward()
-void lara_col_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -250,7 +250,7 @@ void lara_col_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_BACK (163)
 // Collision:	lara_col_monkey_back()
-void lara_as_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -297,7 +297,7 @@ void lara_as_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_BACK (163)
 // Control:		lara_as_monkey_back()
-void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -331,7 +331,7 @@ void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_SHIMMY_LEFT (77)
 // Collision:	lara_col_monkey_shimmy_left()
-void lara_as_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -381,7 +381,7 @@ void lara_as_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_SHIMMY_LEFT (7)
 // Control:		lara_as_monkey_shimmy_left()
-void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -415,7 +415,7 @@ void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_SHIMMY_RIGHT (78)
 // Collision:	lara_col_monkey_shimmy_right()
-void lara_as_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -465,7 +465,7 @@ void lara_as_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_SHIMMY_RIGHT (78)
 // Control:		lara_as_monkey_shimmy_right()
-void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -499,7 +499,7 @@ void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_TURN_180 (79)
 // Collision:	lara_as_monkey_turn_180()
-void lara_as_monkey_turn_180(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -510,14 +510,14 @@ void lara_as_monkey_turn_180(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_TURN_180 (79)
 // Control:		lara_as_monkey_turn_180()
-void lara_col_monkey_turn_180(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_monkey_idle(item, coll);
 }
 
 // State:		LS_MONKEY_TURN_LEFT (82)
 // Collision:	lara_col_monkey_turn_left()
-void lara_as_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -593,14 +593,14 @@ void lara_as_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_TURN_LEFT (82)
 // Control:		lara_as_monkey_turn_left()
-void lara_col_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_monkey_idle(item, coll);
 }
 
 // State:		LS_MONKEY_TURN_RIGHT (83)
 // Collision:	lara_col_monkey_turn_right()
-void lara_as_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -676,7 +676,7 @@ void lara_as_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_MONKEY_TURN_RIGHT (83)
 // Control:		lara_as_monkey_turn_right()
-void lara_col_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_monkey_idle(item, coll);
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 struct CollisionInfo;
-struct ITEM_INFO;
+struct ItemInfo;
 
-void ProcessExplodingSwitchType8(ITEM_INFO* item);
+void ProcessExplodingSwitchType8(ItemInfo* item);
 void InitialiseShootSwitch(short itemNumber);
-void ShootSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+void ShootSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);

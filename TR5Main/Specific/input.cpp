@@ -313,7 +313,7 @@ int S_UpdateInput()
 		if (debugTimeout == 0)
 		{
 			debugTimeout = 1;
-			g_Renderer.switchDebugPage(KeyMap[DIK_F10]);
+			g_Renderer.SwitchDebugPage(KeyMap[DIK_F10]);
 		}
 	}
 	else

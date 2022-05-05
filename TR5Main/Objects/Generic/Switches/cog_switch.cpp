@@ -27,14 +27,14 @@ namespace TEN::Entities::Switches
 	};
 	Vector3Int CogSwitchPos(0, 0, -856);
 
-	void CogSwitchCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void CogSwitchCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNum];
 		auto* triggerIndex = GetTriggerIndex(switchItem);
 
 		int targetItemNum;
-		ITEM_INFO* target = nullptr;
+		ItemInfo* target = nullptr;
 		DOOR_DATA* door   = nullptr;
 
 		// Try to find first item in a trigger list, and if it is a door,

@@ -140,7 +140,7 @@ void KnightTemplarControl(short itemNumber)
 			GetJointAbsPosition(item, &pos, 11);
 
 			auto* room = &g_Level.Rooms[item->RoomNumber];
-			FLOOR_INFO* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];
+			FloorInfo* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];
 
 			if (currentFloor->Stopper)
 			{

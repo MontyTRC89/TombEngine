@@ -188,7 +188,7 @@ void UpdateRats()
 
 				short oldRoomNumber = rat->RoomNumber;
 
-				FLOOR_INFO* floor = GetFloor(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z,&rat->RoomNumber);
+				FloorInfo* floor = GetFloor(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z,&rat->RoomNumber);
 				int height = GetFloorHeight(floor, rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
 
 				// if height is higher than 5 clicks 

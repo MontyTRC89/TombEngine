@@ -8,11 +8,11 @@
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "resource.h"
-#include "Scripting/GameFlowScript.h"
-#include "Scripting/GameLogicScript.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
+#include "Scripting/LanguageScript.h"
+#include "Scripting/ScriptInterfaceState.h"
 
 using namespace TEN::Renderer;
 using std::exception;
@@ -29,13 +29,71 @@ bool Debug = false;
 HWND WindowsHandle;
 DWORD MainThreadID;
 
+// Indicates to hybrid graphics systems to prefer the discrete part by default
+extern "C"
+{
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	__declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}
+
 #if _DEBUG
 string commit;
 #endif
 
-int lua_exception_handler(lua_State* L, sol::optional<const exception&> maybe_exception, sol::string_view description)
+Vector2Int GetScreenResolution()
 {
-	return luaL_error(L, description.data());
+	RECT desktop;
+	const HWND hDesktop = GetDesktopWindow();
+	GetWindowRect(hDesktop, &desktop);
+	Vector2Int resolution;
+	resolution.x = desktop.right;
+	resolution.y = desktop.bottom;
+	return resolution;
+}
+
+std::vector<Vector2Int> GetAllSupportedScreenResolutions()
+{
+	std::vector<Vector2Int> result;
+
+	DEVMODE dm = { 0 };
+	dm.dmSize = sizeof(dm);
+	for (int iModeNum = 0; EnumDisplaySettings(NULL, iModeNum, &dm) != 0; iModeNum++)
+	{
+		bool add = true;
+		for (auto m : result)
+		{
+			if (m.x == dm.dmPelsWidth && m.y == dm.dmPelsHeight)
+			{
+				add = false;
+				break;
+			}
+		}
+		if (add)
+		{
+			Vector2Int resolution;
+			resolution.x = dm.dmPelsWidth;
+			resolution.y = dm.dmPelsHeight;
+			result.push_back(resolution);
+		}
+	}
+
+	std::sort(
+		result.begin(),
+		result.end(),
+		[](Vector2Int& a, Vector2Int& b)
+		{
+			if (a.x == b.x)
+			{
+				return (a.y < b.y);
+			}
+			else
+			{
+				return (a.x < b.x);
+			}
+		}
+	);
+
+	return result;
 }
 
 void WinProcMsg()
@@ -61,10 +119,10 @@ void CALLBACK HandleWmCommand(unsigned short wParam)
 		if (!IsLevelLoading)
 		{
 			SuspendThread((HANDLE)ThreadHandle);
-			g_Renderer.toggleFullScreen();
+			g_Renderer.ToggleFullScreen();
 			ResumeThread((HANDLE)ThreadHandle);
 
-			if (g_Renderer.isFullsScreen())
+			if (g_Renderer.IsFullsScreen())
 			{
 				SetCursor(0);
 				ShowCursor(false);
@@ -82,7 +140,18 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	// Disables ALT + SPACE
 	if (msg == WM_SYSCOMMAND && wParam == SC_KEYMENU)
+	{
 		return 0;
+	}
+
+	// Manually handle ALT + ENTER toggle fullscreen
+	if ((msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)
+		&& wParam == VK_RETURN
+		&& (HIWORD(lParam) & KF_ALTDOWN))
+	{
+		g_Renderer.ToggleFullScreen();
+		return 0;
+	}
 
 	if (msg > 0x10)
 	{
@@ -162,16 +231,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	InitTENLog();
 
+	// Collect numbered tracks
+	EnumerateLegacyTracks();
+
 	// Initialise the new scripting system
-	sol::state luaState;
-	luaState.open_libraries(sol::lib::base, sol::lib::math);
-	luaState.set_exception_handler(lua_exception_handler);
+	ScriptInterfaceState::Init();
 
 	try 
 	{
-		g_GameFlow = new GameFlow(&luaState);
-		g_GameFlow->LoadGameFlowScript();
-		g_GameScript = new GameScript(&luaState);
+		// todo make sure the right objects are deleted at the end
+		g_GameFlow = ScriptInterfaceState::CreateFlow();
+		g_GameFlow->LoadFlowScript();
+		g_GameScript = ScriptInterfaceState::CreateGame();
+		g_GameScriptEntities = ScriptInterfaceState::CreateObjectsHandler();
+		g_GameStringsHandler = ScriptInterfaceState::CreateStringsHandler();
 	}
 	catch (TENScriptException const& e)
 	{
@@ -207,7 +280,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// Create the renderer and enumerate adapters and video modes
 	g_Renderer.Create();
-	g_Renderer.EnumerateVideoModes();
 
 	// Load configuration and optionally show the setup dialog
 	InitDefaultConfiguration();
@@ -252,7 +324,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	WindowsHandle = App.WindowHandle;
 	// Initialise the renderer
-	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.RefreshRate, g_Configuration.Windowed, App.WindowHandle);
+	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
 	// Initialize audio
 	if (g_Configuration.EnableSound)	
@@ -291,7 +363,16 @@ void WinClose()
 		Sound_DeInit();
 	
 	delete g_GameScript;
+	g_GameScript = nullptr;
+
 	delete g_GameFlow;
+	g_GameFlow = nullptr;
+
+	delete g_GameScriptEntities;
+	g_GameScriptEntities = nullptr;
+
+	delete g_GameStringsHandler;
+	g_GameStringsHandler = nullptr;
 
 	ShutdownTENLog();
 }

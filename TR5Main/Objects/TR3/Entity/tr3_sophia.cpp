@@ -64,7 +64,7 @@ enum SophiaAnim
 #define LONDONBOSS_FINAL_HEIGHT -11776
 #define BIGZAP_TIMER 600
 
-static void TriggerLaserBolt(Vector3Int* pos, ITEM_INFO* item, long type, float yAngle)
+static void TriggerLaserBolt(Vector3Int* pos, ItemInfo* item, long type, float yAngle)
 {
 	
 }
@@ -74,7 +74,7 @@ static void TriggerPlasmaBallFlame(short fxNumber, long type, long xv, long yv, 
 	
 }
 
-static void TriggerPlasmaBall(ITEM_INFO* item, long type, Vector3Int* pos1, short roomNumber, float angle)
+static void TriggerPlasmaBall(ItemInfo* item, long type, Vector3Int* pos1, short roomNumber, float angle)
 {
 	
 }
@@ -84,7 +84,7 @@ static int KnockBackCollision()
 	return 0;
 }
 
-static void ExplodeLondonBoss(ITEM_INFO* item)
+static void ExplodeLondonBoss(ItemInfo* item)
 {
 	
 }
@@ -122,7 +122,7 @@ void LondonBossControl(short itemNumber)
 	
 }
 
-void S_DrawLondonBoss(ITEM_INFO* item)
+void S_DrawLondonBoss(ItemInfo* item)
 {
 	DrawAnimatingItem(item);
 

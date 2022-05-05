@@ -1,9 +1,8 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 
-namespace TEN::Renderer
-{
-	void Renderer11::drawString(int x, int y, const char* string, D3DCOLOR color, int flags)
+namespace TEN::Renderer {
+	void Renderer11::DrawString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
 		int realX = x;
 		int realY = y;
@@ -35,7 +34,8 @@ namespace TEN::Renderer
 			rect.right = x * factorX + width / 2;
 			rect.top += y * factorY;
 			rect.bottom += y * factorY;
-		} else
+		}
+		else
 		{
 			rect.left = x * factorX;
 			rect.right += x * factorX;
@@ -72,7 +72,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::DrawAllStrings()
-{
+	{
 		m_spriteBatch->Begin();
 
 		for (int i = 0; i < m_strings.size(); i++)
@@ -82,11 +82,11 @@ namespace TEN::Renderer
 			// Draw shadow if needed
 			if (str->Flags & PRINTSTRING_OUTLINE)
 				m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X + 1, str->Y + 1),
-									   Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+					Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 
 			// Draw string
 			m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X, str->Y),
-								   Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f));
+				Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f));
 		}
 
 		m_spriteBatch->End();

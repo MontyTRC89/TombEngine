@@ -12,7 +12,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -943,7 +943,7 @@ void UpdateGunShells()
 			gs->pos.Position.y += gs->fallspeed;
 			gs->pos.Position.z += gs->speed * cos(gs->dirXrot);
 
-			FLOOR_INFO* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
+			FloorInfo* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
 			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
 				&& !(g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
@@ -1034,7 +1034,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 	}
 }
 
-void LaraBubbles(ITEM_INFO* item)
+void LaraBubbles(ItemInfo* item)
 {
 	Vector3Int pos;
 	int num, i;
@@ -1045,7 +1045,7 @@ void LaraBubbles(ITEM_INFO* item)
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->LaraType == LaraType::Divesuit)
+	if (level->GetLaraType() == LaraType::Divesuit)
 	{
 		pos.y = -192;
 		pos.z = -160;
@@ -1140,7 +1140,7 @@ void UpdateDrips()
 
 			drip->y += drip->yVel >> 5;
 			
-			FLOOR_INFO* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
+			FloorInfo* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
 			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
 				drip->on = false;
 
@@ -1155,7 +1155,7 @@ void UpdateDrips()
 	}
 }
 
-void TriggerLaraDrips(ITEM_INFO* item)
+void TriggerLaraDrips(ItemInfo* item)
 {
 	if (!(Wibble & 0xF))
 	{
@@ -1204,8 +1204,8 @@ void TriggerLaraDrips(ITEM_INFO* item)
 
 int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
+	ObjectInfo* obj = &Objects[item->ObjectNumber];
 
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
@@ -1227,7 +1227,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				FX_INFO* fx = &EffectList[fxNumber];
 
 				Matrix boneMatrix;
-				g_Renderer.getBoneMatrix(itemNumber, 0, &boneMatrix);
+				g_Renderer.GetBoneMatrix(itemNumber, 0, &boneMatrix);
 				boneMatrix = world * boneMatrix;
 
 				fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
@@ -1268,7 +1268,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 	for (int i = 1; i < obj->nmeshes; i++)
 	{
 		Matrix boneMatrix;
-		g_Renderer.getBoneMatrix(itemNumber, i, &boneMatrix);
+		g_Renderer.GetBoneMatrix(itemNumber, i, &boneMatrix);
 		boneMatrix = world * boneMatrix;
 
 		bit <<= 1;
@@ -1588,7 +1588,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->size = size >> 2;
 }
 */
-/*void DrawLensFlares(ITEM_INFO* item)
+/*void DrawLensFlares(ItemInfo* item)
 {
 	GameVector pos;
 

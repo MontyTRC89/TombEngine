@@ -32,7 +32,8 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Renderer/Renderer11.h"
 
@@ -42,7 +43,7 @@ using std::function;
 using TEN::Renderer::g_Renderer;
 
 LaraInfo Lara;
-ITEM_INFO* LaraItem;
+ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
@@ -400,7 +401,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_idle,//170
 };
 
-void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
+void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -689,8 +690,8 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 	case WaterStatus::Underwater:
 		if (item->HitPoints >= 0)
 		{
-			auto* level = g_GameFlow->GetLevel(CurrentLevel);
-			if (level->LaraType != LaraType::Divesuit)
+			auto level = g_GameFlow->GetLevel(CurrentLevel);
+			if (level->GetLaraType() != LaraType::Divesuit)
 				lara->Air--;
 
 			if (lara->Air < 0)
@@ -724,7 +725,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 	Statistics.Game.Distance += Vector3::Distance(item->Pose.Position.ToVector3(), oldPos.ToVector3());
 }
 
-void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
+void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -795,10 +796,10 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	// Test for flags and triggers.
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(item);
+	TestVolumes(Lara.ItemNumber);
 }
 
-void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
+void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -843,6 +844,9 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.TurnRate = 0;
 	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + lara->Control.TurnRate);
 
+	if (level->GetLaraType() == LaraType::Divesuit)
+		UpdateLaraSubsuitAngles(item);
+
 	// Reset lean.
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
 		ResetLaraLean(item, 8.0f);
@@ -868,10 +872,10 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(item);
+	TestVolumes(Lara.ItemNumber);
 }
 
-void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
+void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -906,7 +910,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->LaraType == LaraType::Divesuit)
+	if (level->GetLaraType() == LaraType::Divesuit)
 	{
 		if (lara->Control.TurnRate < Angle::DegToRad(-0.5f))
 			lara->Control.TurnRate += Angle::DegToRad(0.5f);
@@ -923,7 +927,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 		lara->Control.TurnRate = 0;
 	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + lara->Control.TurnRate);
 
-	if (level->LaraType == LaraType::Divesuit)
+	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
 	if (!lara->Control.IsMoving && !(TrInput & (IN_LEFT | IN_RIGHT)))
@@ -934,7 +938,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	else if (item->Pose.Orientation.GetX() > Angle::DegToRad(85.0f))
 		item->Pose.Orientation.SetX(Angle::DegToRad(85.0f));
 
-	if (level->LaraType == LaraType::Divesuit)
+	if (level->GetLaraType() == LaraType::Divesuit)
 	{
 		if (item->Pose.Orientation.GetZ() > Angle::DegToRad(44.0f))
 			item->Pose.Orientation.SetZ(Angle::DegToRad(44.0f));
@@ -971,10 +975,10 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
-	TestVolumes(item);
+	TestVolumes(Lara.ItemNumber);
 }
 
-void LaraCheat(ITEM_INFO* item, CollisionInfo* coll)
+void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

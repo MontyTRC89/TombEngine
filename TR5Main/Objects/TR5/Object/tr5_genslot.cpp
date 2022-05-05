@@ -74,7 +74,7 @@ void InitialiseGenSlot3(short itemNumber)
 
 void InitialiseGenSlot4(short itemNumber)
 {
-	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
+	/*ItemInfo* item = &g_Level.Items[itemNumber];
 
 	HIWORD(v1) = HIWORD(items);
 	item = &g_Level.Items[itemNumber];

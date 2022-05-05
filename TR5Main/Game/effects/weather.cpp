@@ -9,7 +9,8 @@
 #include "Sound/sound.h"
 #include "Specific/prng.h"
 #include "Specific/setup.h"
-#include "Scripting/GameScriptLevel.h"
+#include "Specific/level.h"
+#include "Scripting/ScriptInterfaceLevel.h"
 
 using namespace TEN::Math::Random;
 
@@ -73,61 +74,65 @@ namespace TEN
 				Particles.clear();
 			}
 
-			void EnvironmentController::Flash(int r, int g, int b, float speed)
+	void EnvironmentController::Flash(int r, int g, int b, float speed)
+	{
+		FlashProgress = 1.0f;
+		FlashSpeed = std::clamp(speed, 0.005f, 1.0f);
+		FlashColorBase = Vector3(std::clamp(r, 0, UCHAR_MAX) / (float)UCHAR_MAX,
+								 std::clamp(g, 0, UCHAR_MAX) / (float)UCHAR_MAX,
+								 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX);
+	}
+
+	void EnvironmentController::UpdateSky(ScriptInterfaceLevel* level)
+	{
+		if (level->GetSkyLayerEnabled(0))
+		{
+			SkyPosition1 += level->GetSkyLayerSpeed(0);
+			if (SkyPosition1 <= SKY_POSITION_LIMIT)
 			{
-				FlashProgress = 1.0f;
-				FlashSpeed = std::clamp(speed, 0.005f, 1.0f);
-				FlashColorBase = Vector3(std::clamp(r, 0, UCHAR_MAX) / (float)UCHAR_MAX,
-										 std::clamp(g, 0, UCHAR_MAX) / (float)UCHAR_MAX,
-										 std::clamp(b, 0, UCHAR_MAX) / (float)UCHAR_MAX);
+				if (SkyPosition1 < 0)
+					SkyPosition1 += SKY_POSITION_LIMIT;
 			}
-
-			void EnvironmentController::UpdateSky(GameScriptLevel* level)
+			else
 			{
-				if (level->Layer1.Enabled)
-				{
-					SkyPosition1 += level->Layer1.CloudSpeed;
-					if (SkyPosition1 <= SKY_POSITION_LIMIT)
-					{
-						if (SkyPosition1 < 0)
-							SkyPosition1 += SKY_POSITION_LIMIT;
-					}
-					else
-						SkyPosition1 -= SKY_POSITION_LIMIT;
-				}
-
-				if (level->Layer2.Enabled)
-				{
-					SkyPosition2 += level->Layer2.CloudSpeed;
-					if (SkyPosition2 <= SKY_POSITION_LIMIT)
-					{
-						if (SkyPosition2 < 0)
-							SkyPosition2 += SKY_POSITION_LIMIT;
-					}
-					else
-						SkyPosition2 -= SKY_POSITION_LIMIT;
-				}
+				SkyPosition1 -= SKY_POSITION_LIMIT;
 			}
+		}
 
-			void EnvironmentController::UpdateStorm(GameScriptLevel* level)
+		if (level->GetSkyLayerEnabled(1))
+		{
+			SkyPosition2 += level->GetSkyLayerSpeed(1);
+			if (SkyPosition2 <= SKY_POSITION_LIMIT)
 			{
-				auto color = Vector4(level->Layer1.R / 255.0f, level->Layer1.G / 255.0f, level->Layer1.B / 255.0f, 1.0f);
+				if (SkyPosition2 < 0)
+					SkyPosition2 += SKY_POSITION_LIMIT;
+			}
+			else
+			{
+				SkyPosition2 -= SKY_POSITION_LIMIT;
+			}
+		}
+	}
 
-				if (level->Storm)
-				{
-					if (StormCount || StormRand)
-					{
-						UpdateLightning();
-						if (StormTimer > -1)
-							StormTimer--;
-						if (!StormTimer)
-							SoundEffect(SFX_TR4_THUNDER_RUMBLE, NULL, 0);
-					}
-					else if (!(rand() & 0x7F))
-					{
-						StormCount = (rand() & 0x1F) + 16;
-						StormTimer = (rand() & 3) + 12;
-					}
+	void EnvironmentController::UpdateStorm(ScriptInterfaceLevel* level)
+	{
+		auto color = Vector4(level->GetSkyLayerColor(0).GetR() / 255.0f, level->GetSkyLayerColor(0).GetG() / 255.0f, level->GetSkyLayerColor(0).GetB() / 255.0f, 1.0f);
+
+		if (level->HasStorm())
+		{
+			if (StormCount || StormRand)
+			{
+				UpdateLightning();
+				if (StormTimer > -1)
+					StormTimer--;
+				if (!StormTimer)
+					SoundEffect(SFX_TR4_THUNDER_RUMBLE, NULL, 0);
+			}
+			else if (!(rand() & 0x7F))
+			{
+				StormCount = (rand() & 0x1F) + 16;
+				StormTimer = (rand() & 3) + 12;
+			}
 
 					auto flashBrightness = StormSkyColor / 255.0f;
 					auto r = std::clamp(color.x + flashBrightness, 0.0f, 1.0f);
@@ -166,13 +171,13 @@ namespace TEN
 				}
 			}
 
-			void EnvironmentController::UpdateWind(GameScriptLevel* level)
-			{
-				WindCurrent += (GetRandomControl() & 7) - 3;
-				if (WindCurrent <= -2)
-					WindCurrent++;
-				else if (WindCurrent >= 9)
-					WindCurrent--;
+	void EnvironmentController::UpdateWind(ScriptInterfaceLevel* level)
+	{
+		WindCurrent += (GetRandomControl() & 7) - 3;
+		if (WindCurrent <= -2)
+			WindCurrent++;
+		else if (WindCurrent >= 9)
+			WindCurrent--;
 
 				WindDAngle = (WindDAngle + 2 * (GetRandomControl() & 63) - 64) & 0x1FFE;
 
@@ -187,24 +192,24 @@ namespace TEN
 				WindZ = WindCurrent * cos(WindAngle << 3);
 			}
 
-			void EnvironmentController::UpdateFlash(GameScriptLevel* level)
-			{
-				if (FlashProgress > 0.0f)
-				{
-					FlashProgress -= FlashSpeed;
-					if (FlashProgress < 0.0f)
-						FlashProgress = 0.0f;
-				}
+	void EnvironmentController::UpdateFlash(ScriptInterfaceLevel* level)
+	{
+		if (FlashProgress > 0.0f)
+		{
+			FlashProgress -= FlashSpeed;
+			if (FlashProgress < 0.0f)
+				FlashProgress = 0.0f;
+		}
 
 				if (FlashProgress == 0.0f)
 					FlashColorBase = Vector3::Zero;
 			}
 
-			void EnvironmentController::UpdateWeather(GameScriptLevel* level)
-			{
-				for (auto& p : Particles)
-				{
-					p.Life -= 2;
+	void EnvironmentController::UpdateWeather(ScriptInterfaceLevel* level)
+	{
+		for (auto& p : Particles)
+		{
+			p.Life -= 2;
 
 					// Disable particle if it is dead. It will be cleaned on next call of
 					// SpawnWeatherParticles().
@@ -361,42 +366,42 @@ namespace TEN
 								p.Velocity.z = 4;
 						}
 
-						if (p.Velocity.y < p.Size * 2 * std::clamp(level->WeatherStrength, 0.6f, 1.0f))
-							p.Velocity.y += p.Size / 5.0f;
+				if (p.Velocity.y < p.Size * 2 * std::clamp(level->GetWeatherStrength(), 0.6f, 1.0f))
+					p.Velocity.y += p.Size / 5.0f;
 
 						break;
 					}
 				}
 			}
 
-			void EnvironmentController::SpawnWeatherParticles(GameScriptLevel* level)
+	void EnvironmentController::SpawnWeatherParticles(ScriptInterfaceLevel* level)
+	{
+		// Clean up dead particles
+		if (Particles.size() > 0)
+			Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
+
+		if (level->GetWeatherType() == WeatherType::None || level->GetWeatherStrength() == 0.0f)
+			return;
+
+		int newParticlesCount = 0;
+		int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->GetWeatherStrength();
+
+		// Snow is falling twice as fast, and must be spawned accordingly fast
+		if (level->GetWeatherType() == WeatherType::Snow)
+			density *= 2;
+
+		if (density > 0.0f && level->GetWeatherType() != WeatherType::None)
+		{
+			while (Particles.size() < WEATHER_PARTICLES_MAX_COUNT)
 			{
-				// Clean up dead particles
-				if (Particles.size() > 0)
-					Particles.erase(std::remove_if(Particles.begin(), Particles.end(), [](const WeatherParticle& part) { return !part.Enabled; }), Particles.end());
-
-				if (level->Weather == WeatherType::None || level->WeatherStrength == 0.0f)
-					return;
-
-				int newParticlesCount = 0;
-				int density = WEATHER_PARTICLES_SPAWN_DENSITY * level->WeatherStrength;
-
-				// Snow is falling twice as fast, and must be spawned accordingly fast
-				if (level->Weather == WeatherType::Snow)
-					density *= 2;
-
-				if (density > 0.0f && level->Weather != WeatherType::None)
-				{
-					while (Particles.size() < WEATHER_PARTICLES_MAX_COUNT)
-					{
-						if (newParticlesCount > density)
-							break;
+				if (newParticlesCount > density)
+					break;
 
 						newParticlesCount++;
 
-						auto distance = level->Weather == WeatherType::Snow ? COLLISION_CHECK_DISTANCE : COLLISION_CHECK_DISTANCE / 2;
-						auto radius = GenerateInt(0, distance);
-						short angle = 0;// GenerateInt(Angle::DegToRad(0), Angle::DegToRad(180));
+				auto distance = level->GetWeatherType() == WeatherType::Snow ? COLLISION_CHECK_DISTANCE : COLLISION_CHECK_DISTANCE / 2;
+				auto radius = GenerateInt(0, distance);
+				short angle = 0;// GenerateInt(Angle::DegToRad(0), Angle::DegToRad(180));
 
 						auto xPos = Camera.pos.x + ((int)(cos(angle) * radius));
 						auto zPos = Camera.pos.z + ((int)(sin(angle) * radius));
@@ -417,33 +422,33 @@ namespace TEN
 
 						auto part = WeatherParticle();
 
-						switch (level->Weather)
-						{
-						case WeatherType::Snow:
-							part.Size = GenerateFloat(MAX_SNOW_SIZE / 3, MAX_SNOW_SIZE);
-							part.Velocity.y = GenerateFloat(SNOW_SPEED / 4, SNOW_SPEED) * (part.Size / MAX_SNOW_SIZE);
-							part.Life = (SNOW_SPEED / 3) + ((SNOW_SPEED / 2) - ((int)part.Velocity.y >> 2));
-							break;
+				switch (level->GetWeatherType())
+				{
+				case WeatherType::Snow:
+					part.Size = GenerateFloat(MAX_SNOW_SIZE / 3, MAX_SNOW_SIZE);
+					part.Velocity.y = GenerateFloat(SNOW_SPEED / 4, SNOW_SPEED) * (part.Size / MAX_SNOW_SIZE);
+					part.Life = (SNOW_SPEED / 3) + ((SNOW_SPEED / 2) - ((int)part.Velocity.y >> 2));
+					break;
 
-						case WeatherType::Rain:
-							part.Size = GenerateFloat(MAX_RAIN_SIZE / 2, MAX_RAIN_SIZE);
-							part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE) * std::clamp(level->WeatherStrength, 0.6f, 1.0f);
-							part.Life = (RAIN_SPEED * 2) - part.Velocity.y;
-							break;
-						}
+				case WeatherType::Rain:
+					part.Size = GenerateFloat(MAX_RAIN_SIZE / 2, MAX_RAIN_SIZE);
+					part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE) * std::clamp(level->GetWeatherStrength(), 0.6f, 1.0f);
+					part.Life = (RAIN_SPEED * 2) - part.Velocity.y;
+					break;
+				}
 
 						part.Velocity.x = GenerateFloat(WEATHER_PARTICLE_HORIZONTAL_SPEED / 2, WEATHER_PARTICLE_HORIZONTAL_SPEED);
 						part.Velocity.z = GenerateFloat(WEATHER_PARTICLE_HORIZONTAL_SPEED / 2, WEATHER_PARTICLE_HORIZONTAL_SPEED);
 
-						part.Type = level->Weather;
-						part.Room = outsideRoom;
-						part.Position.x = xPos;
-						part.Position.y = yPos;
-						part.Position.z = zPos;
-						part.Stopped = false;
-						part.Enabled = true;
-						part.CollisionCheckDelay = 0;
-						part.StartLife = part.Life;
+				part.Type = level->GetWeatherType();
+				part.Room = outsideRoom;
+				part.Position.x = xPos;
+				part.Position.y = yPos;
+				part.Position.z = zPos;
+				part.Stopped = false;
+				part.Enabled = true;
+				part.CollisionCheckDelay = 0;
+				part.StartLife = part.Life;
 
 						Particles.push_back(part);
 					}

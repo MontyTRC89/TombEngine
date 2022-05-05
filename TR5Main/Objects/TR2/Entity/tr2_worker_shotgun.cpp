@@ -25,7 +25,7 @@ enum ShotgunWorkerAnim
 
 };
 
-static void ShotLaraWithShotgun(ITEM_INFO* item, AI_INFO* info, BITE_INFO* bite, float angleY, int damage)
+static void ShotLaraWithShotgun(ItemInfo* item, AI_INFO* info, BITE_INFO* bite, float angleY, int damage)
 {
 	ShotLara(item, info, bite, angleY, damage);
 	ShotLara(item, info, bite, angleY, damage);

@@ -15,7 +15,7 @@ using namespace TEN::Effects::Smoke;
 
 namespace TEN::Effects::Lara
 {
-	void LaraBurn(ITEM_INFO* item)
+	void LaraBurn(ItemInfo* item)
 	{
 		if (!item->Data.is<LaraInfo*>())
 			return;
@@ -33,7 +33,7 @@ namespace TEN::Effects::Lara
 		}
 	}
 
-	void LavaBurn(ITEM_INFO* item)
+	void LavaBurn(ItemInfo* item)
 	{
 		if (!item->Data.is<LaraInfo*>())
 			return;
@@ -43,7 +43,7 @@ namespace TEN::Effects::Lara
 		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		{
 			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
+			FloorInfo* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
 			if (item->Floor == GetFloorHeight(floor, item->Pose.Position.x, 32000, item->Pose.Position.z))
 			{
 				//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
@@ -58,7 +58,7 @@ namespace TEN::Effects::Lara
 		}
 	}
 
-	void LaraBreath(ITEM_INFO* item)
+	void LaraBreath(ItemInfo* item)
 	{
 		if (!item->Data.is<LaraInfo*>())
 			return;

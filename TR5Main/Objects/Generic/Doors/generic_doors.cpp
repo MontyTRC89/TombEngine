@@ -162,7 +162,7 @@ namespace TEN::Entities::Doors
 		}
 	}
 
-	void DoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void DoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* doorItem = &g_Level.Items[itemNumber];
@@ -386,7 +386,7 @@ namespace TEN::Entities::Doors
 
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
-		FLOOR_INFO* floor = doorPos->floor;
+		FloorInfo* floor = doorPos->floor;
 
 		if (floor != NULL)
 		{
@@ -407,7 +407,7 @@ namespace TEN::Entities::Doors
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
-		FLOOR_INFO* floor = doorPos->floor;
+		FloorInfo* floor = doorPos->floor;
 
 		if (floor)
 		{

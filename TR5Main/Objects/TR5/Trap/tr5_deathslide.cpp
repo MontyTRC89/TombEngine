@@ -35,7 +35,7 @@ void InitialiseDeathSlide(short itemNumber)
 	pos->roomNumber = item->RoomNumber;
 }
 
-void DeathSlideCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 
@@ -129,7 +129,7 @@ void ControlDeathSlide(short itemNumber)
 		int y = zipLineItem->Pose.Position.y + 64;
 		int z = zipLineItem->Pose.Position.z + 1024 * cosY;
 
-		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+		FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{

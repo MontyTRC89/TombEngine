@@ -1,6 +1,6 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 constexpr auto DEFLECT_STRAIGHT_ANGLE = 5.0f;
@@ -13,26 +13,26 @@ constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = 5.0f;
 // For State Control & Collision
 // -----------------------------
 
-bool LaraDeflectEdge(ITEM_INFO* item, CollisionInfo* coll);
-bool LaraDeflectEdgeJump(ITEM_INFO* item, CollisionInfo* coll);
-void LaraSlideEdgeJump(ITEM_INFO* item, CollisionInfo* coll);
-bool LaraDeflectEdgeCrawl(ITEM_INFO* item, CollisionInfo* coll);
-bool LaraDeflectEdgeMonkey(ITEM_INFO* item, CollisionInfo* coll);
-void LaraCollideStop(ITEM_INFO* item, CollisionInfo* coll);
-void LaraCollideStopCrawl(ITEM_INFO* item, CollisionInfo* coll);
-void LaraCollideStopMonkey(ITEM_INFO* item, CollisionInfo* coll);
-void LaraSnapToEdgeOfBlock(ITEM_INFO* item, CollisionInfo* coll, float angle);
-void LaraResetGravityStatus(ITEM_INFO* item, CollisionInfo* coll);
-void LaraSnapToHeight(ITEM_INFO* item, CollisionInfo* coll);
+bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll);
+bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll);
+void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll);
+bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll);
+bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll);
+void LaraCollideStop(ItemInfo* item, CollisionInfo* coll);
+void LaraCollideStopCrawl(ItemInfo* item, CollisionInfo* coll);
+void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll);
+void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, float angle);
+void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll);
+void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll);
 void GetLaraDeadlyBounds();
 
-void LaraJumpCollision(ITEM_INFO* item, CollisionInfo* coll, float moveAngle);
-void LaraSurfaceCollision(ITEM_INFO* item, CollisionInfo* coll);
-void LaraSwimCollision(ITEM_INFO* item, CollisionInfo* coll);
+void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, float moveAngle);
+void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll);
+void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll);
 
-void LaraWaterCurrent(ITEM_INFO* item, CollisionInfo* coll);
+void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraHitCeiling(CollisionInfo* coll);
-void SetLaraHitCeiling(ITEM_INFO* item, CollisionInfo* coll);
+void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraObjectCollision(ITEM_INFO* item, float angle, int distance, int height = 0, int side = 0);
+bool TestLaraObjectCollision(ItemInfo* item, float angle, int distance, int height = 0, int side = 0);

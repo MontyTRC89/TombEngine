@@ -20,7 +20,7 @@ using TEN::Renderer::g_Renderer;
 
 BOUNDING_BOX InterpolatedBounds;
 
-void AnimateLara(ITEM_INFO* item)
+void AnimateLara(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -197,10 +197,10 @@ void AnimateLara(ITEM_INFO* item)
 		MoveItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
 
 	// Update matrices
-	g_Renderer.updateLaraAnimations(true);
+	g_Renderer.UpdateLaraAnimations(true);
 }
 
-void AnimateItem(ITEM_INFO* item)
+void AnimateItem(ItemInfo* item)
 {
 	item->TouchBits = 0;
 	item->HitStatus = false;
@@ -369,10 +369,10 @@ void AnimateItem(ITEM_INFO* item)
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
-	g_Renderer.updateItemAnimations(itemNumber, true);
+	g_Renderer.UpdateItemAnimations(itemNumber, true);
 }
 
-bool HasStateDispatch(ITEM_INFO* item, int targetState)
+bool HasStateDispatch(ItemInfo* item, int targetState)
 {
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
@@ -401,7 +401,7 @@ bool HasStateDispatch(ITEM_INFO* item, int targetState)
 	return false;
 }
 
-bool TestLastFrame(ITEM_INFO* item, int animNumber)
+bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	if (animNumber < 0)
 		animNumber = item->Animation.AnimNumber;
@@ -413,7 +413,7 @@ bool TestLastFrame(ITEM_INFO* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim->frameEnd);
 }
 
-void TranslateItem(ITEM_INFO* item, int x, int y, int z)
+void TranslateItem(ItemInfo* item, int x, int y, int z)
 {
 	float sinY = sin(item->Pose.Orientation.GetY());
 	float cosY = cos(item->Pose.Orientation.GetY());
@@ -423,7 +423,7 @@ void TranslateItem(ITEM_INFO* item, int x, int y, int z)
 	item->Pose.Position.z += (int)round(-sinY * x + cosY * z);
 }
 
-void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
+void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 {
 	int index = Objects[item->ObjectNumber].animIndex + animIndex;
 
@@ -442,7 +442,7 @@ void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart)
 	item->Animation.TargetState = item->Animation.ActiveState;
 }
 
-bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
+bool GetChange(ItemInfo* item, ANIM_STRUCT* anim)
 {
 	if (item->Animation.ActiveState == item->Animation.TargetState)
 		return false;
@@ -473,7 +473,7 @@ bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim)
 	return false;
 }
 
-BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item)
+BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item)
 {
 	int rate = 0;
 	ANIM_FRAME* framePtr[2];
@@ -493,7 +493,7 @@ BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item)
 	}
 }
 
-ANIM_FRAME* GetBestFrame(ITEM_INFO* item)
+ANIM_FRAME* GetBestFrame(ItemInfo* item)
 {
 	int rate = 0;
 	ANIM_FRAME* framePtr[2];
@@ -506,7 +506,7 @@ ANIM_FRAME* GetBestFrame(ITEM_INFO* item)
 		return framePtr[1];
 }
 
-int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
+int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
 {
 	int frame = item->Animation.FrameNumber;
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
@@ -530,12 +530,12 @@ int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate)
 	return interpolation;
 }
 
-int GetCurrentRelativeFrameNumber(ITEM_INFO* item)
+int GetCurrentRelativeFrameNumber(ItemInfo* item)
 {
 	return item->Animation.FrameNumber - GetFrameNumber(item, 0);
 }
 
-int GetFrameNumber(ITEM_INFO* item, int frameToStart)
+int GetFrameNumber(ItemInfo* item, int frameToStart)
 {
 	return GetFrameNumber(item->ObjectNumber, item->Animation.AnimNumber, frameToStart);
 }
@@ -555,7 +555,7 @@ int GetFrameCount(int animNumber)
 	return (end - base);
 }
 
-int GetNextAnimState(ITEM_INFO* item)
+int GetNextAnimState(ItemInfo* item)
 {
 	return GetNextAnimState(item->ObjectNumber, item->Animation.AnimNumber);
 }
@@ -566,10 +566,10 @@ int GetNextAnimState(int objectID, int animNumber)
 	return g_Level.Anims[Objects[objectID].animIndex + nextAnim].ActiveState;
 }
 
-void DrawAnimatingItem(ITEM_INFO* item)
+void DrawAnimatingItem(ItemInfo* item)
 {
 	// TODO: to refactor
-	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
+	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in ObjectInfo
 }
 
 void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex)
@@ -577,12 +577,12 @@ void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex)
 	if (laraMeshIndex >= NUM_LARA_MESHES)
 		laraMeshIndex = LM_HEAD;
 
-	auto pos2 = Vector3(pos->x, pos->y, pos->z);
-	g_Renderer.getLaraAbsBonePosition(&pos2, laraMeshIndex);
+	Vector3 p = Vector3(pos->x, pos->y, pos->z);
+	g_Renderer.GetLaraAbsBonePosition(&p, laraMeshIndex);
 
-	pos->x = pos2.x;
-	pos->y = pos2.y;
-	pos->z = pos2.z;
+	pos->x = p.x;
+	pos->y = p.y;
+	pos->z = p.z;
 }
 
 void ClampRotation(PoseData* pose, float angle, float rotation)

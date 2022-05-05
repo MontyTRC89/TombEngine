@@ -46,7 +46,7 @@ namespace TEN::Entities::Switches
 
 	Vector3Int TurnSwitchPosA = { 650, 0, -138 };
 
-	void TurnSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void TurnSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

@@ -277,7 +277,7 @@ namespace TEN::Entities::TR4
 
 		/*if (g_Level.NumItems > 0)
 		{
-			ITEM_INFO* currentItem = &g_Level.Items[0];
+			ItemInfo* currentItem = &g_Level.Items[0];
 			int k = 0;
 
 			while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])
@@ -654,7 +654,7 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos, 17);
 
 					short roomNumber = item->RoomNumber;
-					FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+					FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 					int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 					if (height == NO_HEIGHT)
 						pos.y = pos.y - 128;

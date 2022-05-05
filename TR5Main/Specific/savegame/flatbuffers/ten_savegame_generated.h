@@ -117,6 +117,32 @@ struct Pendulum;
 struct PendulumBuilder;
 struct PendulumT;
 
+struct KeyValPair;
+
+struct ScriptTable;
+struct ScriptTableBuilder;
+struct ScriptTableT;
+
+struct stringTable;
+struct stringTableBuilder;
+struct stringTableT;
+
+struct doubleTable;
+struct doubleTableBuilder;
+struct doubleTableT;
+
+struct boolTable;
+struct boolTableBuilder;
+struct boolTableT;
+
+struct UnionTable;
+struct UnionTableBuilder;
+struct UnionTableT;
+
+struct UnionVec;
+struct UnionVecBuilder;
+struct UnionVecT;
+
 struct SaveGameHeader;
 struct SaveGameHeaderBuilder;
 struct SaveGameHeaderT;
@@ -128,6 +154,134 @@ struct SaveGameStatisticsT;
 struct SaveGame;
 struct SaveGameBuilder;
 struct SaveGameT;
+
+enum class VarUnion : uint8_t {
+  NONE = 0,
+  str = 1,
+  tab = 2,
+  num = 3,
+  boolean = 4,
+  MIN = NONE,
+  MAX = boolean
+};
+
+inline const VarUnion (&EnumValuesVarUnion())[5] {
+  static const VarUnion values[] = {
+    VarUnion::NONE,
+    VarUnion::str,
+    VarUnion::tab,
+    VarUnion::num,
+    VarUnion::boolean
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesVarUnion() {
+  static const char * const names[6] = {
+    "NONE",
+    "str",
+    "tab",
+    "num",
+    "boolean",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameVarUnion(VarUnion e) {
+  if (flatbuffers::IsOutRange(e, VarUnion::NONE, VarUnion::boolean)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesVarUnion()[index];
+}
+
+template<typename T> struct VarUnionTraits {
+  static const VarUnion enum_value = VarUnion::NONE;
+};
+
+template<> struct VarUnionTraits<TEN::Save::stringTable> {
+  static const VarUnion enum_value = VarUnion::str;
+};
+
+template<> struct VarUnionTraits<TEN::Save::ScriptTable> {
+  static const VarUnion enum_value = VarUnion::tab;
+};
+
+template<> struct VarUnionTraits<TEN::Save::doubleTable> {
+  static const VarUnion enum_value = VarUnion::num;
+};
+
+template<> struct VarUnionTraits<TEN::Save::boolTable> {
+  static const VarUnion enum_value = VarUnion::boolean;
+};
+
+struct VarUnionUnion {
+  VarUnion type;
+  void *value;
+
+  VarUnionUnion() : type(VarUnion::NONE), value(nullptr) {}
+  VarUnionUnion(VarUnionUnion&& u) FLATBUFFERS_NOEXCEPT :
+    type(VarUnion::NONE), value(nullptr)
+    { std::swap(type, u.type); std::swap(value, u.value); }
+  VarUnionUnion(const VarUnionUnion &);
+  VarUnionUnion &operator=(const VarUnionUnion &u)
+    { VarUnionUnion t(u); std::swap(type, t.type); std::swap(value, t.value); return *this; }
+  VarUnionUnion &operator=(VarUnionUnion &&u) FLATBUFFERS_NOEXCEPT
+    { std::swap(type, u.type); std::swap(value, u.value); return *this; }
+  ~VarUnionUnion() { Reset(); }
+
+  void Reset();
+
+#ifndef FLATBUFFERS_CPP98_STL
+  template <typename T>
+  void Set(T&& val) {
+    using RT = typename std::remove_reference<T>::type;
+    Reset();
+    type = VarUnionTraits<typename RT::TableType>::enum_value;
+    if (type != VarUnion::NONE) {
+      value = new RT(std::forward<T>(val));
+    }
+  }
+#endif  // FLATBUFFERS_CPP98_STL
+
+  static void *UnPack(const void *obj, VarUnion type, const flatbuffers::resolver_function_t *resolver);
+  flatbuffers::Offset<void> Pack(flatbuffers::FlatBufferBuilder &_fbb, const flatbuffers::rehasher_function_t *_rehasher = nullptr) const;
+
+  TEN::Save::stringTableT *Asstr() {
+    return type == VarUnion::str ?
+      reinterpret_cast<TEN::Save::stringTableT *>(value) : nullptr;
+  }
+  const TEN::Save::stringTableT *Asstr() const {
+    return type == VarUnion::str ?
+      reinterpret_cast<const TEN::Save::stringTableT *>(value) : nullptr;
+  }
+  TEN::Save::ScriptTableT *Astab() {
+    return type == VarUnion::tab ?
+      reinterpret_cast<TEN::Save::ScriptTableT *>(value) : nullptr;
+  }
+  const TEN::Save::ScriptTableT *Astab() const {
+    return type == VarUnion::tab ?
+      reinterpret_cast<const TEN::Save::ScriptTableT *>(value) : nullptr;
+  }
+  TEN::Save::doubleTableT *Asnum() {
+    return type == VarUnion::num ?
+      reinterpret_cast<TEN::Save::doubleTableT *>(value) : nullptr;
+  }
+  const TEN::Save::doubleTableT *Asnum() const {
+    return type == VarUnion::num ?
+      reinterpret_cast<const TEN::Save::doubleTableT *>(value) : nullptr;
+  }
+  TEN::Save::boolTableT *Asboolean() {
+    return type == VarUnion::boolean ?
+      reinterpret_cast<TEN::Save::boolTableT *>(value) : nullptr;
+  }
+  const TEN::Save::boolTableT *Asboolean() const {
+    return type == VarUnion::boolean ?
+      reinterpret_cast<const TEN::Save::boolTableT *>(value) : nullptr;
+  }
+};
+
+bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, VarUnion type);
+bool VerifyVarUnionVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types);
 
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) RoomVector FLATBUFFERS_FINAL_CLASS {
  private:
@@ -155,6 +309,34 @@ FLATBUFFERS_STRUCT_END(RoomVector, 8);
 
 struct RoomVector::Traits {
   using type = RoomVector;
+};
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) KeyValPair FLATBUFFERS_FINAL_CLASS {
+ private:
+  uint32_t key_;
+  uint32_t val_;
+
+ public:
+  struct Traits;
+  KeyValPair()
+      : key_(0),
+        val_(0) {
+  }
+  KeyValPair(uint32_t _key, uint32_t _val)
+      : key_(flatbuffers::EndianScalar(_key)),
+        val_(flatbuffers::EndianScalar(_val)) {
+  }
+  uint32_t key() const {
+    return flatbuffers::EndianScalar(key_);
+  }
+  uint32_t val() const {
+    return flatbuffers::EndianScalar(val_);
+  }
+};
+FLATBUFFERS_STRUCT_END(KeyValPair, 8);
+
+struct KeyValPair::Traits {
+  using type = KeyValPair;
 };
 
 struct ItemT : public flatbuffers::NativeTable {
@@ -190,6 +372,7 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t ai_bits = 0;
   int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
+  std::string lua_name{};
 };
 
 struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -228,7 +411,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_AI_BITS = 60,
     VT_SWAP_MESH_FLAGS = 62,
     VT_DATA_TYPE = 64,
-    VT_DATA = 66
+    VT_DATA = 66,
+    VT_LUA_NAME = 68
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -393,6 +577,9 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Minecart *data_as_Minecart() const {
     return data_type() == TEN::Save::ItemData::Minecart ? static_cast<const TEN::Save::Minecart *>(data()) : nullptr;
   }
+  const flatbuffers::String *lua_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_NAME);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_FLOOR) &&
@@ -429,6 +616,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
            VerifyOffset(verifier, VT_DATA) &&
            VerifyItemData(verifier, data(), data_type()) &&
+           VerifyOffset(verifier, VT_LUA_NAME) &&
+           verifier.VerifyString(lua_name()) &&
            verifier.EndTable();
   }
   ItemT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -624,6 +813,9 @@ struct ItemBuilder {
   void add_data(flatbuffers::Offset<void> data) {
     fbb_.AddOffset(Item::VT_DATA, data);
   }
+  void add_lua_name(flatbuffers::Offset<flatbuffers::String> lua_name) {
+    fbb_.AddOffset(Item::VT_LUA_NAME, lua_name);
+  }
   explicit ItemBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -668,8 +860,10 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t ai_bits = 0,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
-    flatbuffers::Offset<void> data = 0) {
+    flatbuffers::Offset<void> data = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_name = 0) {
   ItemBuilder builder_(_fbb);
+  builder_.add_lua_name(lua_name);
   builder_.add_data(data);
   builder_.add_swap_mesh_flags(swap_mesh_flags);
   builder_.add_ai_bits(ai_bits);
@@ -743,8 +937,10 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t ai_bits = 0,
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
-    flatbuffers::Offset<void> data = 0) {
+    flatbuffers::Offset<void> data = 0,
+    const char *lua_name = nullptr) {
   auto item_flags__ = item_flags ? _fbb.CreateVector<int32_t>(*item_flags) : 0;
+  auto lua_name__ = lua_name ? _fbb.CreateString(lua_name) : 0;
   return TEN::Save::CreateItem(
       _fbb,
       floor,
@@ -778,7 +974,8 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       ai_bits,
       swap_mesh_flags,
       data_type,
-      data);
+      data,
+      lua_name__);
 }
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -4426,6 +4623,425 @@ struct Pendulum::Traits {
 
 flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuilder &_fbb, const PendulumT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct ScriptTableT : public flatbuffers::NativeTable {
+  typedef ScriptTable TableType;
+  std::vector<TEN::Save::KeyValPair> keys_vals{};
+};
+
+struct ScriptTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ScriptTableT NativeTableType;
+  typedef ScriptTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_KEYS_VALS = 4
+  };
+  const flatbuffers::Vector<const TEN::Save::KeyValPair *> *keys_vals() const {
+    return GetPointer<const flatbuffers::Vector<const TEN::Save::KeyValPair *> *>(VT_KEYS_VALS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_KEYS_VALS) &&
+           verifier.VerifyVector(keys_vals()) &&
+           verifier.EndTable();
+  }
+  ScriptTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ScriptTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ScriptTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ScriptTableBuilder {
+  typedef ScriptTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_keys_vals(flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::KeyValPair *>> keys_vals) {
+    fbb_.AddOffset(ScriptTable::VT_KEYS_VALS, keys_vals);
+  }
+  explicit ScriptTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ScriptTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ScriptTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ScriptTable> CreateScriptTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<const TEN::Save::KeyValPair *>> keys_vals = 0) {
+  ScriptTableBuilder builder_(_fbb);
+  builder_.add_keys_vals(keys_vals);
+  return builder_.Finish();
+}
+
+struct ScriptTable::Traits {
+  using type = ScriptTable;
+  static auto constexpr Create = CreateScriptTable;
+};
+
+inline flatbuffers::Offset<ScriptTable> CreateScriptTableDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<TEN::Save::KeyValPair> *keys_vals = nullptr) {
+  auto keys_vals__ = keys_vals ? _fbb.CreateVectorOfStructs<TEN::Save::KeyValPair>(*keys_vals) : 0;
+  return TEN::Save::CreateScriptTable(
+      _fbb,
+      keys_vals__);
+}
+
+flatbuffers::Offset<ScriptTable> CreateScriptTable(flatbuffers::FlatBufferBuilder &_fbb, const ScriptTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct stringTableT : public flatbuffers::NativeTable {
+  typedef stringTable TableType;
+  std::string str{};
+};
+
+struct stringTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef stringTableT NativeTableType;
+  typedef stringTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_STR = 4
+  };
+  const flatbuffers::String *str() const {
+    return GetPointer<const flatbuffers::String *>(VT_STR);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_STR) &&
+           verifier.VerifyString(str()) &&
+           verifier.EndTable();
+  }
+  stringTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(stringTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<stringTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const stringTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct stringTableBuilder {
+  typedef stringTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_str(flatbuffers::Offset<flatbuffers::String> str) {
+    fbb_.AddOffset(stringTable::VT_STR, str);
+  }
+  explicit stringTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<stringTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<stringTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<stringTable> CreatestringTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::String> str = 0) {
+  stringTableBuilder builder_(_fbb);
+  builder_.add_str(str);
+  return builder_.Finish();
+}
+
+struct stringTable::Traits {
+  using type = stringTable;
+  static auto constexpr Create = CreatestringTable;
+};
+
+inline flatbuffers::Offset<stringTable> CreatestringTableDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const char *str = nullptr) {
+  auto str__ = str ? _fbb.CreateString(str) : 0;
+  return TEN::Save::CreatestringTable(
+      _fbb,
+      str__);
+}
+
+flatbuffers::Offset<stringTable> CreatestringTable(flatbuffers::FlatBufferBuilder &_fbb, const stringTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct doubleTableT : public flatbuffers::NativeTable {
+  typedef doubleTable TableType;
+  double scalar = 0.0;
+};
+
+struct doubleTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef doubleTableT NativeTableType;
+  typedef doubleTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  double scalar() const {
+    return GetField<double>(VT_SCALAR, 0.0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<double>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  doubleTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(doubleTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<doubleTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const doubleTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct doubleTableBuilder {
+  typedef doubleTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(double scalar) {
+    fbb_.AddElement<double>(doubleTable::VT_SCALAR, scalar, 0.0);
+  }
+  explicit doubleTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<doubleTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<doubleTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<doubleTable> CreatedoubleTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    double scalar = 0.0) {
+  doubleTableBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct doubleTable::Traits {
+  using type = doubleTable;
+  static auto constexpr Create = CreatedoubleTable;
+};
+
+flatbuffers::Offset<doubleTable> CreatedoubleTable(flatbuffers::FlatBufferBuilder &_fbb, const doubleTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct boolTableT : public flatbuffers::NativeTable {
+  typedef boolTable TableType;
+  bool scalar = false;
+};
+
+struct boolTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef boolTableT NativeTableType;
+  typedef boolTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  bool scalar() const {
+    return GetField<uint8_t>(VT_SCALAR, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  boolTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(boolTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<boolTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct boolTableBuilder {
+  typedef boolTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(bool scalar) {
+    fbb_.AddElement<uint8_t>(boolTable::VT_SCALAR, static_cast<uint8_t>(scalar), 0);
+  }
+  explicit boolTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<boolTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<boolTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<boolTable> CreateboolTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    bool scalar = false) {
+  boolTableBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct boolTable::Traits {
+  using type = boolTable;
+  static auto constexpr Create = CreateboolTable;
+};
+
+flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UnionTableT : public flatbuffers::NativeTable {
+  typedef UnionTable TableType;
+  TEN::Save::VarUnionUnion u{};
+};
+
+struct UnionTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef UnionTableT NativeTableType;
+  typedef UnionTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_U_TYPE = 4,
+    VT_U = 6
+  };
+  TEN::Save::VarUnion u_type() const {
+    return static_cast<TEN::Save::VarUnion>(GetField<uint8_t>(VT_U_TYPE, 0));
+  }
+  const void *u() const {
+    return GetPointer<const void *>(VT_U);
+  }
+  template<typename T> const T *u_as() const;
+  const TEN::Save::stringTable *u_as_str() const {
+    return u_type() == TEN::Save::VarUnion::str ? static_cast<const TEN::Save::stringTable *>(u()) : nullptr;
+  }
+  const TEN::Save::ScriptTable *u_as_tab() const {
+    return u_type() == TEN::Save::VarUnion::tab ? static_cast<const TEN::Save::ScriptTable *>(u()) : nullptr;
+  }
+  const TEN::Save::doubleTable *u_as_num() const {
+    return u_type() == TEN::Save::VarUnion::num ? static_cast<const TEN::Save::doubleTable *>(u()) : nullptr;
+  }
+  const TEN::Save::boolTable *u_as_boolean() const {
+    return u_type() == TEN::Save::VarUnion::boolean ? static_cast<const TEN::Save::boolTable *>(u()) : nullptr;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint8_t>(verifier, VT_U_TYPE) &&
+           VerifyOffset(verifier, VT_U) &&
+           VerifyVarUnion(verifier, u(), u_type()) &&
+           verifier.EndTable();
+  }
+  UnionTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UnionTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<UnionTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const UnionTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+template<> inline const TEN::Save::stringTable *UnionTable::u_as<TEN::Save::stringTable>() const {
+  return u_as_str();
+}
+
+template<> inline const TEN::Save::ScriptTable *UnionTable::u_as<TEN::Save::ScriptTable>() const {
+  return u_as_tab();
+}
+
+template<> inline const TEN::Save::doubleTable *UnionTable::u_as<TEN::Save::doubleTable>() const {
+  return u_as_num();
+}
+
+template<> inline const TEN::Save::boolTable *UnionTable::u_as<TEN::Save::boolTable>() const {
+  return u_as_boolean();
+}
+
+struct UnionTableBuilder {
+  typedef UnionTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_u_type(TEN::Save::VarUnion u_type) {
+    fbb_.AddElement<uint8_t>(UnionTable::VT_U_TYPE, static_cast<uint8_t>(u_type), 0);
+  }
+  void add_u(flatbuffers::Offset<void> u) {
+    fbb_.AddOffset(UnionTable::VT_U, u);
+  }
+  explicit UnionTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<UnionTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<UnionTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<UnionTable> CreateUnionTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    TEN::Save::VarUnion u_type = TEN::Save::VarUnion::NONE,
+    flatbuffers::Offset<void> u = 0) {
+  UnionTableBuilder builder_(_fbb);
+  builder_.add_u(u);
+  builder_.add_u_type(u_type);
+  return builder_.Finish();
+}
+
+struct UnionTable::Traits {
+  using type = UnionTable;
+  static auto constexpr Create = CreateUnionTable;
+};
+
+flatbuffers::Offset<UnionTable> CreateUnionTable(flatbuffers::FlatBufferBuilder &_fbb, const UnionTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct UnionVecT : public flatbuffers::NativeTable {
+  typedef UnionVec TableType;
+  std::vector<std::unique_ptr<TEN::Save::UnionTableT>> members{};
+};
+
+struct UnionVec FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef UnionVecT NativeTableType;
+  typedef UnionVecBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_MEMBERS = 4
+  };
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::UnionTable>> *members() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::UnionTable>> *>(VT_MEMBERS);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_MEMBERS) &&
+           verifier.VerifyVector(members()) &&
+           verifier.VerifyVectorOfTables(members()) &&
+           verifier.EndTable();
+  }
+  UnionVecT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(UnionVecT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<UnionVec> Pack(flatbuffers::FlatBufferBuilder &_fbb, const UnionVecT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct UnionVecBuilder {
+  typedef UnionVec Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_members(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::UnionTable>>> members) {
+    fbb_.AddOffset(UnionVec::VT_MEMBERS, members);
+  }
+  explicit UnionVecBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<UnionVec> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<UnionVec>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<UnionVec> CreateUnionVec(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::UnionTable>>> members = 0) {
+  UnionVecBuilder builder_(_fbb);
+  builder_.add_members(members);
+  return builder_.Finish();
+}
+
+struct UnionVec::Traits {
+  using type = UnionVec;
+  static auto constexpr Create = CreateUnionVec;
+};
+
+inline flatbuffers::Offset<UnionVec> CreateUnionVecDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<flatbuffers::Offset<TEN::Save::UnionTable>> *members = nullptr) {
+  auto members__ = members ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::UnionTable>>(*members) : 0;
+  return TEN::Save::CreateUnionVec(
+      _fbb,
+      members__);
+}
+
+flatbuffers::Offset<UnionVec> CreateUnionVec(flatbuffers::FlatBufferBuilder &_fbb, const UnionVecT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct SaveGameHeaderT : public flatbuffers::NativeTable {
   typedef SaveGameHeader TableType;
   std::string level_name{};
@@ -4738,6 +5354,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::RopeT> rope{};
   std::unique_ptr<TEN::Save::PendulumT> pendulum{};
   std::unique_ptr<TEN::Save::PendulumT> alternate_pendulum{};
+  std::unique_ptr<TEN::Save::UnionVecT> script_vars{};
 };
 
 struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -4771,7 +5388,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_CD_FLAGS = 50,
     VT_ROPE = 52,
     VT_PENDULUM = 54,
-    VT_ALTERNATE_PENDULUM = 56
+    VT_ALTERNATE_PENDULUM = 56,
+    VT_SCRIPT_VARS = 58
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -4854,6 +5472,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Pendulum *alternate_pendulum() const {
     return GetPointer<const TEN::Save::Pendulum *>(VT_ALTERNATE_PENDULUM);
   }
+  const TEN::Save::UnionVec *script_vars() const {
+    return GetPointer<const TEN::Save::UnionVec *>(VT_SCRIPT_VARS);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_HEADER) &&
@@ -4914,6 +5535,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(pendulum()) &&
            VerifyOffset(verifier, VT_ALTERNATE_PENDULUM) &&
            verifier.VerifyTable(alternate_pendulum()) &&
+           VerifyOffset(verifier, VT_SCRIPT_VARS) &&
+           verifier.VerifyTable(script_vars()) &&
            verifier.EndTable();
   }
   SaveGameT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -5006,6 +5629,9 @@ struct SaveGameBuilder {
   void add_alternate_pendulum(flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum) {
     fbb_.AddOffset(SaveGame::VT_ALTERNATE_PENDULUM, alternate_pendulum);
   }
+  void add_script_vars(flatbuffers::Offset<TEN::Save::UnionVec> script_vars) {
+    fbb_.AddOffset(SaveGame::VT_SCRIPT_VARS, script_vars);
+  }
   explicit SaveGameBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -5045,10 +5671,12 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> cd_flags = 0,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
-    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0) {
+    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
+    flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0) {
   SaveGameBuilder builder_(_fbb);
   builder_.add_oneshot_position(oneshot_position);
   builder_.add_ambient_position(ambient_position);
+  builder_.add_script_vars(script_vars);
   builder_.add_alternate_pendulum(alternate_pendulum);
   builder_.add_pendulum(pendulum);
   builder_.add_rope(rope);
@@ -5110,7 +5738,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<int32_t> *cd_flags = nullptr,
     flatbuffers::Offset<TEN::Save::Rope> rope = 0,
     flatbuffers::Offset<TEN::Save::Pendulum> pendulum = 0,
-    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0) {
+    flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
+    flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
@@ -5153,7 +5782,8 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       cd_flags__,
       rope,
       pendulum,
-      alternate_pendulum);
+      alternate_pendulum,
+      script_vars);
 }
 
 flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -5199,6 +5829,7 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = swap_mesh_flags(); _o->swap_mesh_flags = _e; }
   { auto _e = data_type(); _o->data.type = _e; }
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
+  { auto _e = lua_name(); if (_e) _o->lua_name = _e->str(); }
 }
 
 inline flatbuffers::Offset<Item> Item::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ItemT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5241,6 +5872,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _swap_mesh_flags = _o->swap_mesh_flags;
   auto _data_type = _o->data.type;
   auto _data = _o->data.Pack(_fbb);
+  auto _lua_name = _o->lua_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_name);
   return TEN::Save::CreateItem(
       _fbb,
       _floor,
@@ -5274,7 +5906,8 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _ai_bits,
       _swap_mesh_flags,
       _data_type,
-      _data);
+      _data,
+      _lua_name);
 }
 
 inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -6458,6 +7091,165 @@ inline flatbuffers::Offset<Pendulum> CreatePendulum(flatbuffers::FlatBufferBuild
       _node);
 }
 
+inline ScriptTableT *ScriptTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ScriptTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ScriptTable::UnPackTo(ScriptTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = keys_vals(); if (_e) { _o->keys_vals.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->keys_vals[_i] = *_e->Get(_i); } } }
+}
+
+inline flatbuffers::Offset<ScriptTable> ScriptTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScriptTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateScriptTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ScriptTable> CreateScriptTable(flatbuffers::FlatBufferBuilder &_fbb, const ScriptTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ScriptTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _keys_vals = _fbb.CreateVectorOfStructs(_o->keys_vals);
+  return TEN::Save::CreateScriptTable(
+      _fbb,
+      _keys_vals);
+}
+
+inline stringTableT *stringTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<stringTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void stringTable::UnPackTo(stringTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = str(); if (_e) _o->str = _e->str(); }
+}
+
+inline flatbuffers::Offset<stringTable> stringTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const stringTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatestringTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<stringTable> CreatestringTable(flatbuffers::FlatBufferBuilder &_fbb, const stringTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const stringTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _str = _o->str.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->str);
+  return TEN::Save::CreatestringTable(
+      _fbb,
+      _str);
+}
+
+inline doubleTableT *doubleTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<doubleTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void doubleTable::UnPackTo(doubleTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
+}
+
+inline flatbuffers::Offset<doubleTable> doubleTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const doubleTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatedoubleTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<doubleTable> CreatedoubleTable(flatbuffers::FlatBufferBuilder &_fbb, const doubleTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const doubleTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreatedoubleTable(
+      _fbb,
+      _scalar);
+}
+
+inline boolTableT *boolTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<boolTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void boolTable::UnPackTo(boolTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
+}
+
+inline flatbuffers::Offset<boolTable> boolTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateboolTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const boolTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreateboolTable(
+      _fbb,
+      _scalar);
+}
+
+inline UnionTableT *UnionTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<UnionTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UnionTable::UnPackTo(UnionTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = u_type(); _o->u.type = _e; }
+  { auto _e = u(); if (_e) _o->u.value = TEN::Save::VarUnionUnion::UnPack(_e, u_type(), _resolver); }
+}
+
+inline flatbuffers::Offset<UnionTable> UnionTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const UnionTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUnionTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<UnionTable> CreateUnionTable(flatbuffers::FlatBufferBuilder &_fbb, const UnionTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const UnionTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _u_type = _o->u.type;
+  auto _u = _o->u.Pack(_fbb);
+  return TEN::Save::CreateUnionTable(
+      _fbb,
+      _u_type,
+      _u);
+}
+
+inline UnionVecT *UnionVec::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<UnionVecT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void UnionVec::UnPackTo(UnionVecT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = members(); if (_e) { _o->members.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->members[_i] = std::unique_ptr<TEN::Save::UnionTableT>(_e->Get(_i)->UnPack(_resolver)); } } }
+}
+
+inline flatbuffers::Offset<UnionVec> UnionVec::Pack(flatbuffers::FlatBufferBuilder &_fbb, const UnionVecT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateUnionVec(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<UnionVec> CreateUnionVec(flatbuffers::FlatBufferBuilder &_fbb, const UnionVecT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const UnionVecT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _members = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::UnionTable>> (_o->members.size(), [](size_t i, _VectorArgs *__va) { return CreateUnionTable(*__va->__fbb, __va->__o->members[i].get(), __va->__rehasher); }, &_va );
+  return TEN::Save::CreateUnionVec(
+      _fbb,
+      _members);
+}
+
 inline SaveGameHeaderT *SaveGameHeader::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<SaveGameHeaderT>();
   UnPackTo(_o.get(), _resolver);
@@ -6585,6 +7377,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeT>(_e->UnPack(_resolver)); }
   { auto _e = pendulum(); if (_e) _o->pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
   { auto _e = alternate_pendulum(); if (_e) _o->alternate_pendulum = std::unique_ptr<TEN::Save::PendulumT>(_e->UnPack(_resolver)); }
+  { auto _e = script_vars(); if (_e) _o->script_vars = std::unique_ptr<TEN::Save::UnionVecT>(_e->UnPack(_resolver)); }
 }
 
 inline flatbuffers::Offset<SaveGame> SaveGame::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SaveGameT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -6622,6 +7415,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _rope = _o->rope ? CreateRope(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _pendulum = _o->pendulum ? CreatePendulum(_fbb, _o->pendulum.get(), _rehasher) : 0;
   auto _alternate_pendulum = _o->alternate_pendulum ? CreatePendulum(_fbb, _o->alternate_pendulum.get(), _rehasher) : 0;
+  auto _script_vars = _o->script_vars ? CreateUnionVec(_fbb, _o->script_vars.get(), _rehasher) : 0;
   return TEN::Save::CreateSaveGame(
       _fbb,
       _header,
@@ -6650,7 +7444,140 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _cd_flags,
       _rope,
       _pendulum,
-      _alternate_pendulum);
+      _alternate_pendulum,
+      _script_vars);
+}
+
+inline bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, VarUnion type) {
+  switch (type) {
+    case VarUnion::NONE: {
+      return true;
+    }
+    case VarUnion::str: {
+      auto ptr = reinterpret_cast<const TEN::Save::stringTable *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case VarUnion::tab: {
+      auto ptr = reinterpret_cast<const TEN::Save::ScriptTable *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case VarUnion::num: {
+      auto ptr = reinterpret_cast<const TEN::Save::doubleTable *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    default: return true;
+  }
+}
+
+inline bool VerifyVarUnionVector(flatbuffers::Verifier &verifier, const flatbuffers::Vector<flatbuffers::Offset<void>> *values, const flatbuffers::Vector<uint8_t> *types) {
+  if (!values || !types) return !values && !types;
+  if (values->size() != types->size()) return false;
+  for (flatbuffers::uoffset_t i = 0; i < values->size(); ++i) {
+    if (!VerifyVarUnion(
+        verifier,  values->Get(i), types->GetEnum<VarUnion>(i))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline void *VarUnionUnion::UnPack(const void *obj, VarUnion type, const flatbuffers::resolver_function_t *resolver) {
+  switch (type) {
+    case VarUnion::str: {
+      auto ptr = reinterpret_cast<const TEN::Save::stringTable *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case VarUnion::tab: {
+      auto ptr = reinterpret_cast<const TEN::Save::ScriptTable *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case VarUnion::num: {
+      auto ptr = reinterpret_cast<const TEN::Save::doubleTable *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
+      return ptr->UnPack(resolver);
+    }
+    default: return nullptr;
+  }
+}
+
+inline flatbuffers::Offset<void> VarUnionUnion::Pack(flatbuffers::FlatBufferBuilder &_fbb, const flatbuffers::rehasher_function_t *_rehasher) const {
+  switch (type) {
+    case VarUnion::str: {
+      auto ptr = reinterpret_cast<const TEN::Save::stringTableT *>(value);
+      return CreatestringTable(_fbb, ptr, _rehasher).Union();
+    }
+    case VarUnion::tab: {
+      auto ptr = reinterpret_cast<const TEN::Save::ScriptTableT *>(value);
+      return CreateScriptTable(_fbb, ptr, _rehasher).Union();
+    }
+    case VarUnion::num: {
+      auto ptr = reinterpret_cast<const TEN::Save::doubleTableT *>(value);
+      return CreatedoubleTable(_fbb, ptr, _rehasher).Union();
+    }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<const TEN::Save::boolTableT *>(value);
+      return CreateboolTable(_fbb, ptr, _rehasher).Union();
+    }
+    default: return 0;
+  }
+}
+
+inline VarUnionUnion::VarUnionUnion(const VarUnionUnion &u) : type(u.type), value(nullptr) {
+  switch (type) {
+    case VarUnion::str: {
+      value = new TEN::Save::stringTableT(*reinterpret_cast<TEN::Save::stringTableT *>(u.value));
+      break;
+    }
+    case VarUnion::tab: {
+      FLATBUFFERS_ASSERT(false);  // TEN::Save::ScriptTableT not copyable.
+      break;
+    }
+    case VarUnion::num: {
+      value = new TEN::Save::doubleTableT(*reinterpret_cast<TEN::Save::doubleTableT *>(u.value));
+      break;
+    }
+    case VarUnion::boolean: {
+      value = new TEN::Save::boolTableT(*reinterpret_cast<TEN::Save::boolTableT *>(u.value));
+      break;
+    }
+    default:
+      break;
+  }
+}
+
+inline void VarUnionUnion::Reset() {
+  switch (type) {
+    case VarUnion::str: {
+      auto ptr = reinterpret_cast<TEN::Save::stringTableT *>(value);
+      delete ptr;
+      break;
+    }
+    case VarUnion::tab: {
+      auto ptr = reinterpret_cast<TEN::Save::ScriptTableT *>(value);
+      delete ptr;
+      break;
+    }
+    case VarUnion::num: {
+      auto ptr = reinterpret_cast<TEN::Save::doubleTableT *>(value);
+      delete ptr;
+      break;
+    }
+    case VarUnion::boolean: {
+      auto ptr = reinterpret_cast<TEN::Save::boolTableT *>(value);
+      delete ptr;
+      break;
+    }
+    default: break;
+  }
+  value = nullptr;
+  type = VarUnion::NONE;
 }
 
 inline const TEN::Save::SaveGame *GetSaveGame(const void *buf) {

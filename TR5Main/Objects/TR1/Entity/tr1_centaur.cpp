@@ -140,7 +140,7 @@ void ControlCentaurBomb(short itemNumber)
 	}
 }
 
-static void RocketGun(ITEM_INFO* centaurItem)
+static void RocketGun(ItemInfo* centaurItem)
 {
 	short itemNumber;
 	itemNumber = CreateItem();

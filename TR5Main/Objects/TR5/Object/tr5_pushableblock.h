@@ -1,6 +1,6 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 void ClearMovableBlockSplitters(int x, int y, int z, short roomNumber);
@@ -16,10 +16,10 @@ void RemoveBridgeStack(short itemNumber);
 void AddBridgeStack(short itemNumber);
 void RemoveFromStack(short itemNumber);
 int FindStack(short itemNumber);
-int GetStackHeight(ITEM_INFO* item);
-bool CheckStackLimit(ITEM_INFO* item);
-void PushLoop(ITEM_INFO* item);
-void PushEnd(ITEM_INFO* item);
+int GetStackHeight(ItemInfo* item);
+bool CheckStackLimit(ItemInfo* item);
+void PushLoop(ItemInfo* item);
+void PushEnd(ItemInfo* item);
 std::optional<int> PushableBlockFloor(short itemNumber, int x, int y, int z);
 std::optional<int> PushableBlockCeiling(short itemNumber, int x, int y, int z);
 int PushableBlockFloorBorder(short itemNumber);

@@ -52,14 +52,14 @@ namespace TEN
 						d.velocity.z = Weather.Wind().z;
 					}
 
-					d.pos += d.velocity;
-					float normalizedAge = d.age / d.life;
-					d.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
-					d.height = lerp(DRIP_WIDTH / 0.15625, 0, normalizedAge);
-					short room = d.room;
-					FLOOR_INFO* floor = GetFloor(d.pos.x, d.pos.y, d.pos.z, &room);
-					int floorheight = floor->FloorHeight(d.pos.x, d.pos.z);
-					int wh = GetWaterHeight(d.pos.x, d.pos.y, d.pos.z, d.room);
+			d.pos += d.velocity;
+			float normalizedAge = d.age / d.life;
+			d.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
+			d.height = lerp(DRIP_WIDTH / 0.15625, 0, normalizedAge);
+			short room = d.room;
+			FloorInfo* floor = GetFloor(d.pos.x, d.pos.y, d.pos.z, &room);
+			int floorheight = floor->FloorHeight(d.pos.x, d.pos.z);
+			int wh = GetWaterHeight(d.pos.x, d.pos.y, d.pos.z, d.room);
 
 					if (d.pos.y > floorheight) 
 						d.active = false;

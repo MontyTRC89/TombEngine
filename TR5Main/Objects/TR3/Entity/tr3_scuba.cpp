@@ -28,7 +28,7 @@ enum ScubaDiverAnim
 
 };
 
-static void ShootHarpoon(ITEM_INFO* item, int x, int y, int z, int velocity, float yRot, short roomNumber)
+static void ShootHarpoon(ItemInfo* item, int x, int y, int z, int velocity, float yRot, short roomNumber)
 {
 	short harpoonItemNumber = CreateItem();
 	if (harpoonItemNumber != NO_ITEM)

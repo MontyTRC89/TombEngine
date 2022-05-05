@@ -8,6 +8,8 @@
     "language='*'\"")
 
 #include <process.h>
+#include <vector>
+#include "Specific/trmath.h"
 
 struct WINAPP
 {
@@ -33,9 +35,10 @@ extern std::string commit;
 #define BeginThread(function, threadid) _beginthreadex(0, 0, &function, 0, 0, &threadid)
 #define EndThread() _endthreadex(1)
 
-int lua_exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description);
 void WinProcMsg();
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 void WinClose();
 LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void CALLBACK HandleWmCommand(unsigned short wParam);
+Vector2Int GetScreenResolution();
+std::vector<Vector2Int> GetAllSupportedScreenResolutions();

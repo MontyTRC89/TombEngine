@@ -37,6 +37,7 @@ table Item {
 	ai_bits: int32;
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
+	lua_name: string;
 }
 
 table AmmoInfo {
@@ -316,6 +317,42 @@ table Pendulum {
 	node: int32;
 }
 
+struct KeyValPair {
+	key: uint32;
+	val: uint32;
+}
+
+table ScriptTable {
+	keys_vals: [KeyValPair];
+}
+
+table stringTable {
+	str: string;
+}
+
+table doubleTable {
+	scalar: double;
+}
+
+table boolTable {
+	scalar: bool;
+}
+
+union VarUnion {
+	str: stringTable,
+	tab: ScriptTable,
+	num: doubleTable,
+	boolean: boolTable
+}
+
+table UnionTable{
+	u:VarUnion;
+}
+
+table UnionVec {
+	members: [UnionTable];
+}
+
 table SaveGameHeader {
 	level_name: string;
 	days: int32;
@@ -343,7 +380,7 @@ table SaveGame {
 	level: SaveGameStatistics;
 	lara: Lara;
 	active_weapon: WeaponInfo;
-    items: [Item];
+	items: [Item];
 	fixed_cameras: [FixedCamera];
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];
@@ -365,6 +402,7 @@ table SaveGame {
 	rope: Rope;
 	pendulum: Pendulum;
 	alternate_pendulum: Pendulum;
-}
+	script_vars: UnionVec;
+	}
 
 root_type TEN.Save.SaveGame;

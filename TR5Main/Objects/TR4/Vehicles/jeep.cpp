@@ -111,7 +111,7 @@ short Unk_0080DE1A;
 int Unk_0080DDE8;
 short Unk_0080DE24;
 
-static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
+static int TestJeepHeight(ItemInfo* item, int dz, int dx, Vector3Int* pos)
 {
 	pos->y = item->Pose.Position.y - dz * sin(item->Pose.Orientation.GetX()) + dx * sin(item->Pose.Orientation.GetZ());
 
@@ -122,7 +122,7 @@ static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
 	pos->x = item->Pose.Position.x + dz * s + dx * c;
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
+	FloorInfo* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
 	int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
 	if (pos->y < ceiling || ceiling == NO_HEIGHT)
 		return NO_HEIGHT;
@@ -130,7 +130,7 @@ static int TestJeepHeight(ITEM_INFO* item, int dz, int dx, Vector3Int* pos)
 	return GetFloorHeight(floor, pos->x, pos->y, pos->z);
 }
 
-static int DoJeepShift(ITEM_INFO* jeep, Vector3Int* pos, Vector3Int* old)
+static int DoJeepShift(ItemInfo* jeep, Vector3Int* pos, Vector3Int* old)
 {
 	int x = pos->x / SECTOR(1);
 	int z = pos->z / SECTOR(1);
@@ -176,7 +176,7 @@ static int DoJeepShift(ITEM_INFO* jeep, Vector3Int* pos, Vector3Int* old)
 		z = 0;
 
 		short roomNumber = jeep->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
+		FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
 		int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
 		if (height < old->y - STEP_SIZE)
 		{
@@ -275,7 +275,7 @@ static int DoJeepDynamics(int height, int speed, int* y, int flags)
 
 static int JeepCanGetOff()
 {
-	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
+	ItemInfo* item = &g_Level.Items[Lara.Vehicle];
 
 	short angle = item->Pose.Orientation.GetY() + 0x4000;
 
@@ -284,7 +284,7 @@ static int JeepCanGetOff()
 	int z = item->Pose.Position.z - JEEP_GETOFF_DISTANCE * cos(angle);
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 	int height = GetFloorHeight(floor, x, y, z);
 
 	auto collResult = GetCollision(x, y, z, item->RoomNumber);
@@ -370,7 +370,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 
 void InitialiseJeep(short itemNum)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ItemInfo* item = &g_Level.Items[itemNum];
 	
 	JeepInfo* jeep;
 	item->Data = JeepInfo();
@@ -419,7 +419,7 @@ static int JeepCheckGetOff()
 
 static int GetOnJeep(int itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 
 	if (!(TrInput & IN_ACTION) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
 		return 0;
@@ -446,7 +446,7 @@ static int GetOnJeep(int itemNumber)
 		return 0;
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	if (GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z) < -32000)
 		return 0;
 
@@ -498,7 +498,7 @@ static int GetOnJeep(int itemNumber)
 	return 0;
 }
 
-static int GetJeepCollisionAnim(ITEM_INFO* item, Vector3Int* p)
+static int GetJeepCollisionAnim(ItemInfo* item, Vector3Int* p)
 {
 	JeepInfo* jeep = (JeepInfo*)item->Data;
 
@@ -524,7 +524,7 @@ static int GetJeepCollisionAnim(ITEM_INFO* item, Vector3Int* p)
 	return 0;
 }
 
-static void JeepBaddieCollision(ITEM_INFO* jeep)
+static void JeepBaddieCollision(ItemInfo* jeep)
 {
 	vector<short> roomsList;
 	short* door, numDoors;
@@ -543,7 +543,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 
 		while (itemNum != NO_ITEM)
 		{
-			ITEM_INFO* item = &g_Level.Items[itemNum];
+			ItemInfo* item = &g_Level.Items[itemNum];
 			if (item->Collidable && item->Status != ITEM_INVISIBLE && item != LaraItem && item != jeep)
 			{
 				if (item->ObjectNumber == ID_ENEMY_JEEP)
@@ -556,7 +556,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 				}
 				else
 				{
-					OBJECT_INFO* object = &Objects[item->ObjectNumber];
+					ObjectInfo* object = &Objects[item->ObjectNumber];
 					if (object->collision && object->intelligent ||
 						item->ObjectNumber == ID_ROLLINGBALL)
 					{
@@ -605,7 +605,7 @@ static void JeepBaddieCollision(ITEM_INFO* jeep)
 	}
 }
 
-static void JeepExplode(ITEM_INFO* item)
+static void JeepExplode(ItemInfo* item)
 {
 	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
 	{
@@ -628,7 +628,7 @@ static void JeepExplode(ITEM_INFO* item)
 	Lara.Vehicle = NO_ITEM;
 }
 
-int JeepDynamics(ITEM_INFO* item)
+int JeepDynamics(ItemInfo* item)
 {
 	JeepInfo* jeep = (JeepInfo*)item->Data;
 
@@ -728,7 +728,7 @@ int JeepDynamics(ITEM_INFO* item)
 	}
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	int height = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 	short speed;
@@ -877,7 +877,7 @@ int JeepDynamics(ITEM_INFO* item)
 	return collide;
 }
 
-static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
+static int JeepUserControl(ItemInfo* item, int height, int* pitch)
 {
 	if (LaraItem->Animation.ActiveState == JS_GETOFF || LaraItem->Animation.TargetState == JS_GETOFF)
 		TrInput = 0;
@@ -1024,7 +1024,7 @@ static int JeepUserControl(ITEM_INFO* item, int height, int* pitch)
 	return 1;
 }
 
-static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
+static void AnimateJeep(ItemInfo* item, int collide, int dead)
 {
 	JeepInfo* jeep = (JeepInfo*)item->Data;
 	bool dismount;
@@ -1487,11 +1487,11 @@ static void AnimateJeep(ITEM_INFO* item, int collide, int dead)
 	}
 }
 
-void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
+void JeepCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 {
 	if (l->HitPoints > 0 && Lara.Vehicle == NO_ITEM)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
 
 		if (GetOnJeep(itemNumber))
 		{
@@ -1568,7 +1568,7 @@ void JeepCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 
 int JeepControl(void)
 {
-	ITEM_INFO* item = &g_Level.Items[Lara.Vehicle];
+	ItemInfo* item = &g_Level.Items[Lara.Vehicle];
 	JeepInfo* jeep = (JeepInfo*)item->Data;
 
 	int drive = -1;
@@ -1577,7 +1577,7 @@ int JeepControl(void)
 	int collide = JeepDynamics(item);
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 	GameVector oldPos;
 	oldPos.x = item->Pose.Position.x;

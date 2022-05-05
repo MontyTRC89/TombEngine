@@ -2,6 +2,12 @@ Build/
 TR5Main/CustomObjects/
 TR5Main/x64/
 TR5Main/Debug/
+TR5Main/Release
+TR5Main/Legacy Engine Objects
+Scripting/bin/Debug/*.lib
+Scripting/bin/Debug/*.dll
+Scripting/bin/Release/*.lib
+Scripting/bin/Release/*.dll
 x64/
 .vs/
 *.dll
@@ -20,29 +26,4 @@ x64/
 *.wav
 *.trc
 *.str
-/TR5Main/Release
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-21 17-38LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-21 17-47LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 08-59LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-08LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-16LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-24LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-33LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-41LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-49LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-03LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-12LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-20LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-28LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-00LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-08LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-17LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-25LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-33LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-42LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-50LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-58LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 21-07LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/Spectrum2_TombEngine.wad2
+packages/

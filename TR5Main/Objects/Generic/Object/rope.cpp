@@ -40,7 +40,7 @@ namespace TEN::Entities::Generic
 		Ropes.push_back(rope);
 	}
 
-	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ITEM_INFO* item)
+	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ItemInfo* item)
 	{
 		rope->position = *pos1;
 		rope->segmentLength = length << 16;
@@ -165,7 +165,7 @@ namespace TEN::Entities::Generic
 			rope->active = 0;
 	}
 
-	void RopeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void RopeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* ropeItem = &g_Level.Items[itemNumber];
@@ -452,7 +452,7 @@ namespace TEN::Entities::Generic
 		*nextVelocity -= vec;
 	}
 
-	void UpdateRopeSwing(ITEM_INFO* item)
+	void UpdateRopeSwing(ItemInfo* item)
 	{
 		if (Lara.Control.Rope.MaxXForward > 9000)
 			Lara.Control.Rope.MaxXForward = 9000;
@@ -536,7 +536,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void JumpOffRope(ITEM_INFO* item)
+	void JumpOffRope(ItemInfo* item)
 	{
 		if (Lara.Control.Rope.Ptr != -1)
 		{
@@ -570,7 +570,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void FallFromRope(ITEM_INFO* item)
+	void FallFromRope(ItemInfo* item)
 	{
 		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
 		item->Pose.Orientation.SetX();
@@ -588,7 +588,7 @@ namespace TEN::Entities::Generic
 		Lara.Control.Rope.Ptr = -1;
 	}
 
-	void LaraClimbRope(ITEM_INFO* item, CollisionInfo* coll)
+	void LaraClimbRope(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (!(TrInput & IN_ACTION))
 			FallFromRope(item);
@@ -637,7 +637,7 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void DelAlignLaraToRope(ITEM_INFO* item)
+	void DelAlignLaraToRope(ItemInfo* item)
 	{
 		auto vec = Vector3Int(4096, 0, 0);
 

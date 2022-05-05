@@ -35,7 +35,7 @@ namespace TEN::Entities::Switches
 		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
-	void RailSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void RailSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

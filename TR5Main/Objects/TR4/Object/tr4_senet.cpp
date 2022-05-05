@@ -285,7 +285,7 @@ void GameSticksControl(short itemNumber)
 	}
 }
 
-void _0x0040FAE0(ITEM_INFO* item)
+void _0x0040FAE0(ItemInfo* item)
 {
 	SenetDisplacement = 0;
 	item->ItemFlags[7] = 0;
@@ -308,7 +308,7 @@ void _0x0040FAE0(ITEM_INFO* item)
 		g_Level.Items[SenetPiecesNumber[i]].TriggerFlags = 1;
 }
 
-void SenetPieceExplosionEffect(ITEM_INFO* item, int color, int speed)
+void SenetPieceExplosionEffect(ItemInfo* item, int color, int speed)
 {
 	int radius = speed >= 0 ? 0xA00020 : 0x2000280;
 	int clr = color | 0x18000000;
@@ -420,9 +420,9 @@ void MakeMove(int piece, int displacement)
 	}
 }
 
-void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_IDLE &&

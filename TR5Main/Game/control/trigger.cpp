@@ -25,7 +25,7 @@ using namespace TEN::Entities::Switches;
 int TriggerTimer;
 int KeyTriggerActive;
 
-int TriggerActive(ITEM_INFO* item)
+int TriggerActive(ItemInfo* item)
 {
 	int flag;
 
@@ -56,7 +56,7 @@ int TriggerActive(ITEM_INFO* item)
 	return flag;
 }
 
-bool GetKeyTrigger(ITEM_INFO* item)
+bool GetKeyTrigger(ItemInfo* item)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
@@ -77,7 +77,7 @@ bool GetKeyTrigger(ITEM_INFO* item)
 	return true;
 }
 
-int GetSwitchTrigger(ITEM_INFO* item, short* itemNos, int attatchedToSwitch)
+int GetSwitchTrigger(ItemInfo* item, short* itemNos, int attatchedToSwitch)
 {
 	auto triggerIndex = GetTriggerIndex(item);
 
@@ -159,7 +159,7 @@ int SwitchTrigger(short itemNumber, short timer)
 
 int KeyTrigger(short itemNum)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ItemInfo* item = &g_Level.Items[itemNum];
 	int oldkey;
 
 	if ((item->Status != ITEM_ACTIVE || Lara.Control.HandStatus == HandStatus::Busy) && (!KeyTriggerActive || Lara.Control.HandStatus != HandStatus::Busy))
@@ -177,7 +177,7 @@ int KeyTrigger(short itemNum)
 
 int PickupTrigger(short itemNum)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ItemInfo* item = &g_Level.Items[itemNum];
 
 	if (item->Flags & IFLAG_KILLED
 		|| (item->Status != ITEM_INVISIBLE
@@ -242,7 +242,7 @@ void RefreshCamera(short type, short* data)
 		Camera.timer = -1;
 }
 
-short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
+short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
 	auto bottomBlock = GetCollision(x, y, z, floor->Room).BottomBlock; 
 
@@ -252,14 +252,14 @@ short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
 	return &g_Level.FloorData[bottomBlock->TriggerIndex];
 }
 
-short* GetTriggerIndex(ITEM_INFO* item)
+short* GetTriggerIndex(ItemInfo* item)
 {
 	auto roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
 
-void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags)
+void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -414,8 +414,8 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 	short targetType = 0;
 	short trigger = 0;
 
-	ITEM_INFO* item = NULL;
-	ITEM_INFO* cameraItem = NULL;
+	ItemInfo* item = NULL;
+	ItemInfo* cameraItem = NULL;
 
 	do
 	{
@@ -695,7 +695,7 @@ void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyF
 		FlipEffect = newEffect;
 }
 
-void TestTriggers(ITEM_INFO* item, bool heavy, int heavyFlags)
+void TestTriggers(ItemInfo* item, bool heavy, int heavyFlags)
 {
 	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, heavy, heavyFlags);
 }
@@ -712,7 +712,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	TestTriggers(floor, x, y, z, heavy, heavyFlags);
 }
 
-void ProcessSectorFlags(ITEM_INFO* item)
+void ProcessSectorFlags(ItemInfo* item)
 {
 	ProcessSectorFlags(GetCollision(item).BottomBlock);
 }
@@ -722,7 +722,7 @@ void ProcessSectorFlags(int x, int y, int z, short roomNumber)
 	ProcessSectorFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
 }
 
-void ProcessSectorFlags(FLOOR_INFO* floor)
+void ProcessSectorFlags(FloorInfo* floor)
 {
 	// Monkeyswing
 	Lara.Control.CanMonkeySwing = floor->Flags.Monkeyswing;

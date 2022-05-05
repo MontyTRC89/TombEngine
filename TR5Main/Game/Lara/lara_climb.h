@@ -18,29 +18,29 @@ static CLIMB_DIRECTION LeftExtRightIntTab[4] =
 // Control & Collision Functions
 // -----------------------------
 
-void lara_col_climb_end(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_end(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_climb_down(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_down(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_climb_up(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_up(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_climb_right(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_right(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_climb_left(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_left(ITEM_INFO* item, CollisionInfo* coll);
-void lara_col_climb_idle(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_idle(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_stepoff_left(ITEM_INFO* item, CollisionInfo* coll);
-void lara_as_climb_stepoff_right(ITEM_INFO* item, CollisionInfo* coll);
+void lara_col_climb_end(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_end(ItemInfo* item, CollisionInfo* coll);
+void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_down(ItemInfo* item, CollisionInfo* coll);
+void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_up(ItemInfo* item, CollisionInfo* coll);
+void lara_col_climb_right(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_right(ItemInfo* item, CollisionInfo* coll);
+void lara_col_climb_left(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_left(ItemInfo* item, CollisionInfo* coll);
+void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_stepoff_left(ItemInfo* item, CollisionInfo* coll);
+void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll);
 
 int GetClimbFlags(int x, int y, int z, short roomNumber);
-int GetClimbFlags(FLOOR_INFO* floor);
+int GetClimbFlags(FloorInfo* floor);
 CLIMB_DIRECTION GetClimbDirection(float angle);
 
-int LaraTestClimbPos(ITEM_INFO* item, int front, int right, int origin, int height, int* shift);
-void LaraDoClimbLeftRight(ITEM_INFO* item, CollisionInfo* coll, int result, int shift);
-int LaraClimbRightCornerTest(ITEM_INFO* item, CollisionInfo* coll);
-int LaraClimbLeftCornerTest(ITEM_INFO* item, CollisionInfo* coll);
-int LaraTestClimb(ITEM_INFO* item, int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift);
-int LaraTestClimbUpPos(ITEM_INFO* item, int front, int right, int* shift, int* ledge);
-bool LaraCheckForLetGo(ITEM_INFO* item, CollisionInfo* coll);
+int LaraTestClimbPos(ItemInfo* item, int front, int right, int origin, int height, int* shift);
+void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int shift);
+int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll);
+int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll);
+int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift);
+int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* ledge);
+bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll);

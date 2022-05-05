@@ -12,7 +12,7 @@
 #include "Game/misc.h"
 #include "Sound/sound.h"
 
-bool ShotLara(ITEM_INFO* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation, int damage) 
+bool ShotLara(ItemInfo* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation, int damage) 
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
@@ -106,7 +106,7 @@ short GunShot(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	return -1;
 }
 
-bool Targetable(ITEM_INFO* item, AI_INFO* AI) 
+bool Targetable(ItemInfo* item, AI_INFO* AI) 
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;
@@ -135,7 +135,7 @@ bool Targetable(ITEM_INFO* item, AI_INFO* AI)
 	return LOS(&start, &target);
 }
 
-bool TargetVisible(ITEM_INFO* item, AI_INFO* AI) 
+bool TargetVisible(ItemInfo* item, AI_INFO* AI) 
 {
 	auto* creature = GetCreatureInfo(item);
 	auto* enemy = creature->Enemy;

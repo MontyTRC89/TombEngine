@@ -1291,7 +1291,7 @@ SILENCER_ITEM = {
 	}
 }
 
-SetStrings(strings)
+TEN.Flow.SetStrings(strings)
 
 local languages = {
 	"English",
@@ -1304,5 +1304,5 @@ local languages = {
 	"Russian"
 }
 
-SetLanguageNames(languages)
+TEN.Flow.SetLanguageNames(languages)
 

@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
@@ -39,19 +39,19 @@ void InitialiseHair()
 	}
 }
 
-void HairControl(ITEM_INFO* item, bool young)
+void HairControl(ItemInfo* item, bool young)
 {
 	HairControl(item, 0, 0);
 	if (young)
 		HairControl(item, 1, 0);
 }
 
-void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
+void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 {
 	auto* lara = GetLaraInfo(item);
 	auto* object = &Objects[ID_LARA];
 
-	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->LaraType == LaraType::Young;
+	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;
 
 	ANIM_FRAME* frame;
 	if (framePtr == NULL)
@@ -163,7 +163,7 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 	sphere[5].r = youngLara ? 0 : (int)(3.0f * (float)sphere[2].r / 4.0f);
 
 	Matrix world;
-	g_Renderer.getBoneMatrix(lara->ItemNumber, LM_HEAD, &world);
+	g_Renderer.GetBoneMatrix(lara->ItemNumber, LM_HEAD, &world);
 
 	if (braid)
 		world = Matrix::CreateTranslation(44, -48, -50) * world;

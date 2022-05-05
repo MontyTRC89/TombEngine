@@ -99,7 +99,7 @@ void InitialiseSpeedBoat(short itemNumber)
 	sBoat->Pitch = 0;
 }
 
-void DoBoatWakeEffect(ITEM_INFO* sBoatItem)
+void DoBoatWakeEffect(ItemInfo* sBoatItem)
 {
 	SetupRipple(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.y, sBoatItem->Pose.Position.z, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, sBoatItem->Pose.Orientation.GetY());
 	TEN::Effects::TriggerSpeedboatFoam(sBoatItem);
@@ -176,7 +176,7 @@ void DoBoatWakeEffect(ITEM_INFO* sBoatItem)
 	}*/
 }
 
-BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, CollisionInfo* coll)
+BoatMountType GetSpeedBoatMountType(ItemInfo* laraItem, ItemInfo* sBoatItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -231,7 +231,7 @@ BoatMountType GetSpeedBoatMountType(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, C
 	return mountType;
 }
 
-bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
+bool TestSpeedBoatDismount(ItemInfo* sBoatItem, int direction)
 {
 	float angle;
 	if (direction < 0)
@@ -262,7 +262,7 @@ bool TestSpeedBoatDismount(ITEM_INFO* sBoatItem, int direction)
 	return true;
 }
 
-void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
+void DoSpeedBoatDismount(ItemInfo* laraItem, ItemInfo* sBoatItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -303,7 +303,7 @@ void DoSpeedBoatDismount(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 	}
 }
 
-int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, Vector3Int* pos)
+int SpeedBoatTestWaterHeight(ItemInfo* sBoatItem, int zOffset, int xOffset, Vector3Int* pos)
 {
 	float sinY = sin(sBoatItem->Pose.Orientation.GetY());
 	float cosY = cos(sBoatItem->Pose.Orientation.GetY());
@@ -325,7 +325,7 @@ int SpeedBoatTestWaterHeight(ITEM_INFO* sBoatItem, int zOffset, int xOffset, Vec
 	return (height - 5);
 }
 
-void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNumber)
+void SpeedBoatDoBoatShift(ItemInfo* sBoatItem, int itemNumber)
 {
 	short itemNumber2 = g_Level.Rooms[sBoatItem->RoomNumber].itemNumber;
 	while (itemNumber2 != NO_ITEM)
@@ -354,7 +354,7 @@ void SpeedBoatDoBoatShift(ITEM_INFO* sBoatItem, int itemNumber)
 	}
 }
 
-short SpeedBoatDoShift(ITEM_INFO* sBoatItem, Vector3Int* pos, Vector3Int* old)
+short SpeedBoatDoShift(ItemInfo* sBoatItem, Vector3Int* pos, Vector3Int* old)
 {
 	int x = pos->x / SECTOR(1);
 	int z = pos->z / SECTOR(1);
@@ -450,7 +450,7 @@ short SpeedBoatDoShift(ITEM_INFO* sBoatItem, Vector3Int* pos, Vector3Int* old)
 	return 0;
 }
 
-int GetSpeedBoatHitAnim(ITEM_INFO* sBoatItem, Vector3Int* moved)
+int GetSpeedBoatHitAnim(ItemInfo* sBoatItem, Vector3Int* moved)
 {
 	moved->x = sBoatItem->Pose.Position.x - moved->x;
 	moved->z = sBoatItem->Pose.Position.z - moved->z;
@@ -508,7 +508,7 @@ int DoSpeedBoatDynamics(int height, int verticalVelocity, int* y)
 	return verticalVelocity;
 }
 
-int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
+int SpeedBoatDynamics(ItemInfo* laraItem, short itemNumber)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* sBoatItem = &g_Level.Items[itemNumber];
@@ -633,7 +633,7 @@ int SpeedBoatDynamics(ITEM_INFO* laraItem, short itemNumber)
 	return collide;
 }
 
-bool SpeedBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
+bool SpeedBoatUserControl(ItemInfo* laraItem, ItemInfo* sBoatItem)
 {
 	auto* sBoat = (SpeedBoatInfo*)sBoatItem->Data;
 
@@ -728,7 +728,7 @@ bool SpeedBoatUserControl(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem)
 	return noTurn;
 }
 
-void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
+void SpeedBoatAnimation(ItemInfo* laraItem, ItemInfo* sBoatItem, int collide)
 {
 	auto* sBoat = (SpeedBoatInfo*)sBoatItem->Data;
 
@@ -816,7 +816,7 @@ void SpeedBoatAnimation(ITEM_INFO* laraItem, ITEM_INFO* sBoatItem, int collide)
 	}
 }
 
-void SpeedBoatSplash(ITEM_INFO* item, long verticalVelocity, long water)
+void SpeedBoatSplash(ItemInfo* item, long verticalVelocity, long water)
 {
 	//OLD SPLASH
 	/*
@@ -846,7 +846,7 @@ void SpeedBoatSplash(ITEM_INFO* item, long verticalVelocity, long water)
 	*/
 }
 
-void SpeedBoatCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void SpeedBoatCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 

@@ -10,9 +10,12 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
+#include "Scripting/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
+
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 int NumberLosRooms;
 short LosRooms[20];
@@ -199,6 +202,12 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 									item->HitStatus = true;
 									if (!Objects[item->ObjectNumber].undead)
 										item->HitPoints -= Weapons[(int)Lara.Control.Weapon.GunType].Damage;
+
+									if (!item->luaCallbackOnHitName.empty())
+									{
+										short index = g_GameScriptEntities->GetIndexByName(item->LuaName);
+										g_GameScript->ExecuteFunction(item->luaCallbackOnHitName, index);
+									}
 								}
 							}
 						}
@@ -400,8 +409,8 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PoseData* i
 	else
 	{
 		// For items instead we need to test spheres
-		ITEM_INFO* item = &g_Level.Items[closesItemNumber];
-		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+		ItemInfo* item = &g_Level.Items[closesItemNumber];
+		ObjectInfo* obj = &Objects[item->ObjectNumber];
 
 		// Get the transformed sphere of meshes
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
@@ -523,7 +532,7 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PoseData* i
 	// If collided object is an item, then setup the shatter item data struct
 	if (sp >= 0)
 	{
-		ITEM_INFO* item = &g_Level.Items[closesItemNumber];
+		ItemInfo* item = &g_Level.Items[closesItemNumber];
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 
@@ -568,7 +577,7 @@ bool LOS(GameVector* start, GameVector* end)
 int xLOS(GameVector* start, GameVector* end)
 {
 	int x, y, z;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 
 	int dx = end->x - start->x;
 	if (!dx)
@@ -689,7 +698,7 @@ int xLOS(GameVector* start, GameVector* end)
 int zLOS(GameVector* start, GameVector* end)
 {
 	int  x, y, z;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 
 	int dz = end->z - start->z;
 	if (!dz)
@@ -810,7 +819,7 @@ int zLOS(GameVector* start, GameVector* end)
 bool LOSAndReturnTarget(GameVector* start, GameVector* target, int push)
 {
 	int floorHeight, ceilingHeight;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 
 	int x = start->x;
 	int y = start->y;

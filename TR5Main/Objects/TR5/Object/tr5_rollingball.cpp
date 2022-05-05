@@ -14,7 +14,7 @@
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
 
-void RollingBallCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* ballItem = &g_Level.Items[itemNumber];
 
@@ -276,7 +276,7 @@ void RollingBallControl(short itemNumber)
 	TestTriggers(item, true);
 }
 
-void ClassicRollingBallCollision(short itemNum, ITEM_INFO* lara, CollisionInfo* coll)
+void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNum];
 
@@ -343,7 +343,7 @@ void ClassicRollingBallControl(short itemNum)
 {
 	short x, z, dist, oldx, oldz, roomNum;
 	short y1, y2, ydist;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 	GameVector* old;
 	ROOM_INFO* r;
 
@@ -461,7 +461,7 @@ void ClassicRollingBallControl(short itemNum)
 
 void InitialiseClassicRollingBall(short itemNum)
 {
-	ITEM_INFO *item;
+	ItemInfo *item;
 	GameVector* old;
 
 	item = &g_Level.Items[itemNum];

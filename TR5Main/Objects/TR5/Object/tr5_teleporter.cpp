@@ -12,11 +12,11 @@ using namespace TEN::Effects::Environment;
 
 void InitialiseTeleporter(short itemNumber)
 {
-	/*ITEM_INFO* item = &g_Level.Items[itemNumber];
+	/*ItemInfo* item = &g_Level.Items[itemNumber];
 
 	if (item->triggerFlags == 512)
 	{
-		ITEM_INFO* puzzleHoleItem = FindItem(ID_PUZZLE_HOLE2);
+		ItemInfo* puzzleHoleItem = FindItem(ID_PUZZLE_HOLE2);
 		v4 = (signed int)((unsigned __int64)(391146079i64 * ((char*)v3 - (char*)items)) >> 32) >> 9;
 		result = (unsigned int)((unsigned __int64)(391146079i64 * ((char*)v3 - (char*)items)) >> 32) >> 31;
 		item->itemFlags[1] = result + v4;
@@ -25,7 +25,7 @@ void InitialiseTeleporter(short itemNumber)
 
 void ControlTeleporter(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 
 	if (!TriggerActive(item))
 		return;
@@ -55,7 +55,7 @@ void ControlTeleporter(short itemNumber)
 					flags = 4;
 				}
 
-				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[1]];
+				ItemInfo* targetItem = &g_Level.Items[item->itemFlags[1]];
 				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
 
 				if (GlobalCounter & 1)
@@ -200,7 +200,7 @@ void ControlTeleporter(short itemNumber)
 		LaraItem->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f));
 
 		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 		LaraItem->Pose.Position.y = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 		if (LaraItem->RoomNumber != roomNumber)

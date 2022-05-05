@@ -78,7 +78,7 @@
 
 using namespace TEN::Entities::TR4;
 
-static void StartEntity(OBJECT_INFO* obj)
+static void StartEntity(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SMALL_SCORPION];
 	if (obj->loaded)
@@ -847,7 +847,7 @@ static void StartEntity(OBJECT_INFO* obj)
 	}
 }
 
-static void StartObject(OBJECT_INFO* obj)
+static void StartObject(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SARCOPHAGUS];
 	if (obj->loaded)
@@ -958,7 +958,7 @@ static void StartObject(OBJECT_INFO* obj)
 	}
 }
 
-static void StartTrap(OBJECT_INFO* obj)
+static void StartTrap(ObjectInfo* obj)
 {
 	obj = &Objects[ID_CHAIN];
 	if (obj->loaded)
@@ -1179,7 +1179,7 @@ static void StartTrap(OBJECT_INFO* obj)
 	}
 }
 
-static void StartVehicles(OBJECT_INFO* obj)
+static void StartVehicles(ObjectInfo* obj)
 {
 	obj = &Objects[ID_JEEP];
 	if (obj->loaded)
@@ -1206,12 +1206,12 @@ static void StartVehicles(OBJECT_INFO* obj)
 	}
 }
 
-static void StartSwitch(OBJECT_INFO* obj)
+static void StartSwitch(ObjectInfo* obj)
 {
 	
 }
 
-static OBJECT_INFO* objToInit;
+static ObjectInfo* objToInit;
 void InitialiseTR4Objects()
 {
 	StartEntity(objToInit);

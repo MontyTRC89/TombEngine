@@ -14,7 +14,7 @@ using namespace TEN::Renderer;
 SPHERE LaraSpheres[MAX_SPHERES];
 SPHERE CreatureSpheres[MAX_SPHERES];
 
-int GetSpheres(ITEM_INFO* item, SPHERE* ptr, int worldSpace, Matrix local)
+int GetSpheres(ItemInfo* item, SPHERE* ptr, int worldSpace, Matrix local)
 {
 	if (!item)
 		return 0;
@@ -35,7 +35,7 @@ int GetSpheres(ITEM_INFO* item, SPHERE* ptr, int worldSpace, Matrix local)
 	return num;
 }
 
-int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
+int TestCollision(ItemInfo* item, ItemInfo* l)
 {
 	int flags = 0;
 
@@ -94,14 +94,14 @@ int TestCollision(ITEM_INFO* item, ITEM_INFO* l)
 	}
 }
 
-void GetJointAbsPosition(ITEM_INFO* item, Vector3Int* vec, int joint)
+void GetJointAbsPosition(ItemInfo* item, Vector3Int* vec, int joint)
 {
 	// Get the real item number
 	short itemNumber = item - g_Level.Items.data();
 
 	// Use matrices done in the renderer and transform the input vector
 	Vector3 p = Vector3(vec->x, vec->y, vec->z);
-	g_Renderer.getItemAbsBonePosition(itemNumber, &p, joint);
+	g_Renderer.GetItemAbsBonePosition(itemNumber, &p, joint);
 
 	// Store the result
 	vec->x = p.x;

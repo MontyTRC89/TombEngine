@@ -50,7 +50,7 @@ void ClearSpiders()
 	}
 }
 
-void ClearSpidersPatch(ITEM_INFO* item)
+void ClearSpidersPatch(ItemInfo* item)
 {
 	ClearSpiders();
 }
@@ -184,7 +184,7 @@ void UpdateSpiders()
 					}
 				}
 
-				FLOOR_INFO* floor = GetFloor(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z,&spider->RoomNumber);
+				FloorInfo* floor = GetFloor(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z,&spider->RoomNumber);
 				int height = GetFloorHeight(floor, spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z);
 
 				if (height >= spider->Pose.Position.y - CLICK(5) || height == -SECTOR(31.75f))

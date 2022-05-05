@@ -33,7 +33,7 @@ namespace TEN::Entities::Doors
 		Angle::DegToRad(-80.0f), Angle::DegToRad(80.0f)
 	};
 
-	void UnderwaterDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void UnderwaterDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* doorItem = &g_Level.Items[itemNumber];

@@ -47,7 +47,7 @@ namespace TEN::Entities::Switches
 		AnimateItem(switchItem);
 	}
 
-	void SwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void SwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

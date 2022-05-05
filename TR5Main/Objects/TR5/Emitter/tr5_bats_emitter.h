@@ -24,5 +24,5 @@ extern BatData Bats[NUM_BATS];
 short GetNextBat();
 void InitialiseLittleBats(short itemNumber);
 void LittleBatsControl(short itemNumber);
-void TriggerLittleBat(ITEM_INFO* item);
+void TriggerLittleBat(ItemInfo* item);
 void UpdateBats();

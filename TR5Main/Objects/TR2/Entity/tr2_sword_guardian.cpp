@@ -22,7 +22,7 @@ void InitialiseSwordGuardian(short itemNumber)
 	ClearItem(itemNumber);
 }
 
-static void SwordGuardianFly(ITEM_INFO* item)
+static void SwordGuardianFly(ItemInfo* item)
 {
 	Vector3Int pos;
 	pos.x = (GetRandomControl() * 256 / 32768) + item->Pose.Position.x - 128;

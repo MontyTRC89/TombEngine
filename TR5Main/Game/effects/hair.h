@@ -7,7 +7,7 @@ constexpr auto HAIR_SPHERE = 6; // current hair max collision
 
 class EulerAngles;
 struct ANIM_FRAME;
-struct ITEM_INFO;
+struct ItemInfo;
 
 struct HairData
 {
@@ -19,5 +19,5 @@ struct HairData
 extern HairData Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 void InitialiseHair();
-void HairControl(ITEM_INFO* item, bool young);
-void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr);
+void HairControl(ItemInfo* item, bool young);
+void HairControl(ItemInfo* item, int braid, ANIM_FRAME* framePtr);

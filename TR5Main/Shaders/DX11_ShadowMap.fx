@@ -1,4 +1,6 @@
 #include "./CameraMatrixBuffer.hlsli"
+#include "./AlphaTestBuffer.hlsli"
+#include "./VertexInput.hlsli"
 
 cbuffer ItemBuffer : register(b1)
 {
@@ -8,18 +10,10 @@ cbuffer ItemBuffer : register(b1)
 	float4 AmbientLight;
 };
 
-cbuffer MiscBuffer : register(b3)
-{
-	int AlphaTest;
-	int Caustics;
-};
-
-#include "./VertexInput.hlsli"
 
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
-	//float2 UV: TEXCOORD0;
 	float4 PositionCopy : TEXCOORD1;
 	float Depth: TEXCOORD2;
 };
@@ -34,7 +28,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	float4x4 world = mul(Bones[input.Bone], World);
 
 	output.Position = mul(mul(float4(input.Position, 1.0f), world), ViewProjection);
-	//output.UV = input.UV;
 	output.Depth = output.Position.z / output.Position.w;
 	output.PositionCopy = output.Position;
 
@@ -43,9 +36,5 @@ PixelShaderInput VS(VertexShaderInput input)
 
 float4 PS(PixelShaderInput input) : SV_TARGET
 {
-	/*float4 output = Texture.Sample(Sampler, input.UV);
-	if (AlphaTest)
-		clip(output.w - 0.5f);*/
-	return float4(input.PositionCopy.z / input.PositionCopy.w,0,0,0);
-	//return float4(input.Depth, 0.0f, 0.0f, 0.0f);
+	return float4(input.PositionCopy.z / input.PositionCopy.w, 0, 0, 0);
 }

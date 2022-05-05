@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 			item->ItemFlags[0] = 0;
 	}
 
-	void StargateCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void StargateCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 

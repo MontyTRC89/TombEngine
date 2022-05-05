@@ -20,7 +20,7 @@ void InitialiseDoppelganger(short itemNumber)
 	ClearItem(itemNumber);
 }
 
-ITEM_INFO* FindReference(ITEM_INFO* item, short objectNumber)
+ItemInfo* FindReference(ItemInfo* item, short objectNumber)
 {
 	bool found = false;
 	int itemNumber;
@@ -119,7 +119,7 @@ void DoppelgangerControl(short itemNumber)
 }
 
 // TODO: DrawLara not exist ! use Renderer11.cpp DrawLara instead or create DrawLara() function with old behaviour.
-void DrawEvilLara(ITEM_INFO* item)
+void DrawEvilLara(ItemInfo* item)
 {
 	/*
 	short* meshstore[15];

@@ -1,6 +1,6 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 struct Vector3Int;
 
@@ -36,7 +36,7 @@ namespace TEN::Entities::Generic
 	extern int RopeSwing;
 
 	void InitialiseRope(short itemNumber);
-	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ITEM_INFO* item);
+	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ItemInfo* item);
 	Vector3Int* NormaliseRopeVector(Vector3Int* vec);
 	void GetRopePos(ROPE_STRUCT* rope, int segmentFrame, int* x, int* y, int* z);
 	int DotProduct(Vector3Int* u, Vector3Int* v);
@@ -44,7 +44,7 @@ namespace TEN::Entities::Generic
 	void CrossProduct(Vector3Int* u, Vector3Int* v, Vector3Int* dest);
 	void phd_GetMatrixAngles(int* array, float* angle);
 	void RopeControl(short itemNumber);
-	void RopeCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll);
+	void RopeCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll);
 	void RopeDynamics(ROPE_STRUCT* rope);
 	int RopeNodeCollision(ROPE_STRUCT* rope, int x, int y, int z, int value);
 	void ApplyVelocityToRope(int node, short angle, short n);
@@ -52,9 +52,9 @@ namespace TEN::Entities::Generic
 	void SetPendulumPoint(ROPE_STRUCT* rope, int node);
 	void ModelRigidRope(ROPE_STRUCT* rope, PENDULUM* pendulumPointer, Vector3Int* ropeVelocity, Vector3Int* pendulumVelocity, int value);
 	void ModelRigid(Vector3Int* segment, Vector3Int* nextSegment, Vector3Int* velocity, Vector3Int* nextVelocity, int length);
-	void DelAlignLaraToRope(ITEM_INFO* item);
-	void UpdateRopeSwing(ITEM_INFO* item);
-	void JumpOffRope(ITEM_INFO* item);
-	void FallFromRope(ITEM_INFO* item);
-	void LaraClimbRope(ITEM_INFO* item, CollisionInfo* coll);
+	void DelAlignLaraToRope(ItemInfo* item);
+	void UpdateRopeSwing(ItemInfo* item);
+	void JumpOffRope(ItemInfo* item);
+	void FallFromRope(ItemInfo* item);
+	void LaraClimbRope(ItemInfo* item, CollisionInfo* coll);
 }

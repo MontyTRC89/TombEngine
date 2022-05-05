@@ -50,7 +50,7 @@ void ControlAnimatingSlots(short itemNumber)
 void ControlTriggerTriggerer(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
 
 	if (floor->Flags.MarkTriggerer)
 	{
@@ -116,7 +116,7 @@ void ControlWaterfall(short itemNumber)
 	}
 }
 
-void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* tightropeItem = &g_Level.Items[itemNumber];
@@ -192,7 +192,7 @@ void TightropeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* co
 	}
 }
 
-void HorizontalBarCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* barItem = &g_Level.Items[itemNumber];
@@ -268,7 +268,7 @@ void CutsceneRopeControl(short itemNumber)
 	ropeItem->Pose.Orientation.SetX(Angle::DegToRad(26.0f));
 }
 
-void HybridCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll) 
+void HybridCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll) 
 {
 	auto* item = &g_Level.Items[itemNumber];
 

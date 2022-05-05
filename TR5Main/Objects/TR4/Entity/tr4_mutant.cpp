@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 		TriggerCrocgodMissile(src, roomNumber, timer);
 	}
 
-	static bool ShootFrame(ITEM_INFO* item)
+	static bool ShootFrame(ItemInfo* item)
 	{
 		int frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		if (frameNumber == 45 ||
@@ -134,7 +134,7 @@ namespace TEN::Entities::TR4
 			return false;
 	}
 
-	static void RotateHeadToTarget(ITEM_INFO* item, CreatureInfo* creature, int joint, float& headAngle)
+	static void RotateHeadToTarget(ItemInfo* item, CreatureInfo* creature, int joint, float& headAngle)
 	{
 		if (creature->Enemy == nullptr)
 		{
@@ -151,7 +151,7 @@ namespace TEN::Entities::TR4
 		headAngle = (atan2(z, x) - item->Pose.Orientation.GetY()) / 2;
 	}
 
-	static void GetTargetPosition(ITEM_INFO* item, PoseData* target)
+	static void GetTargetPosition(ItemInfo* item, PoseData* target)
 	{
 		auto start = Vector3Int(0, -96, 144);
 		GetJointAbsPosition(item, &start, 9);
@@ -166,7 +166,7 @@ namespace TEN::Entities::TR4
 		target->Orientation.Set(angles[1], angles[0], 0.0f);
 	}
 
-	static void MoveItemFront(ITEM_INFO* item, int distance)
+	static void MoveItemFront(ItemInfo* item, int distance)
 	{
 		switch ((int)Angle::RadToDeg(item->Pose.Orientation.GetY()))
 		{
@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MoveItemBack(ITEM_INFO* item, int distance)
+	static void MoveItemBack(ItemInfo* item, int distance)
 	{
 		switch ((int)Angle::RadToDeg(item->Pose.Orientation.GetY()))
 		{
@@ -210,7 +210,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MutantAIFix(ITEM_INFO* item, AI_INFO* info)
+	static void MutantAIFix(ItemInfo* item, AI_INFO* info)
 	{
 		MoveItemFront(item, SECTOR(2));
 		item->Pose.Position.y -= CLICK(3);

@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_struct.h"
 #include <tuple>
 #include <stack>
+#include <execution>
 
 using std::optional;
 using std::stack;
@@ -17,6 +18,10 @@ namespace TEN::Renderer
 {
 	bool Renderer11::PrepareDataForTheRenderer()
 	{
+		lastBlendMode = BLENDMODE_UNSET;
+		lastCullMode = CULL_MODE_UNSET;
+		lastDepthState = DEPTH_STATE_UNSET;
+
 		m_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		m_spriteSequences.resize(ID_NUMBER_OBJECTS);
 		m_staticObjects.resize(MAX_STATICS);
@@ -48,7 +53,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.RoomTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
@@ -70,7 +75,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.AnimatedTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			}
 			else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
@@ -85,7 +90,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.MoveablesTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
@@ -107,7 +112,7 @@ namespace TEN::Renderer
 			TEXTURE *texture = &g_Level.StaticsTextures[i];
 			Texture2D normal;
 			if (texture->normalMapData.size() < 1) {
-				normal = createDefaultNormalTexture();
+				normal = CreateDefaultNormalTexture();
 			} else {
 				normal = Texture2D(m_device.Get(), texture->normalMapData.data(), texture->normalMapData.size());
 			}
@@ -316,6 +321,25 @@ namespace TEN::Renderer
 		m_roomsVertexBuffer = VertexBuffer(m_device.Get(), roomsVertices.size(), roomsVertices.data());
 		m_roomsIndexBuffer = IndexBuffer(m_device.Get(), roomsIndices.size(), roomsIndices.data());
 
+		std::for_each(std::execution::par_unseq,
+			m_rooms.begin(),
+			m_rooms.end(),
+			[](RendererRoom& room)
+			{
+				std::sort(
+					room.Buckets.begin(),
+					room.Buckets.end(),
+					[](RendererBucket& a, RendererBucket& b)
+					{
+						if (a.BlendMode == b.BlendMode)
+							return (a.Texture < b.Texture);
+						else
+							return (a.BlendMode < b.BlendMode);
+					}
+				);
+			}
+		);
+
 		m_numHairVertices = 0;
 		m_numHairIndices = 0;
 
@@ -327,7 +351,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
-			OBJECT_INFO* obj = &Objects[objNum];
+			ObjectInfo* obj = &Objects[objNum];
 
 			for (int j = 0; j < obj->nmeshes; j++)
 			{
@@ -343,12 +367,14 @@ namespace TEN::Renderer
 		moveablesVertices.resize(totalVertices);
 		moveablesIndices.resize(totalIndices);
 
+	
+
 		lastVertex = 0;
 		lastIndex = 0;
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
-			OBJECT_INFO *obj = &Objects[objNum];
+			ObjectInfo *obj = &Objects[objNum];
 
 			if (obj->nmeshes > 0)
 			{
@@ -674,7 +700,7 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
-			OBJECT_INFO *obj = &Objects[MoveablesIds[i]];
+			ObjectInfo *obj = &Objects[MoveablesIds[i]];
 
 			if (obj->nmeshes < 0)
 			{

@@ -47,16 +47,16 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\spdlog;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)TR5Main\Libs\spdlog</LibraryPath>
+    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\sol;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\spdlog;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)TR5Main\Libs\bass;$(SolutionDir)TR5Main\Libs\lua;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)TR5Main\Libs\spdlog</LibraryPath>
+    <IncludePath>$(SolutionDir)Common\Libs;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\sol;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs;$(SolutionDir)TR5Main\Libs\zlib;$(SolutionDir)TR5Main\Libs\flatbuffers;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)TR5Main\Libs\zlib\dll32;$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Common\Libs\spdlog;$(SolutionDir)Common\Libs\lua;$(SolutionDir)Common\Libs\bass;$(SolutionDir)TR5Main\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -65,7 +65,7 @@
       <WarningLevel>Level1</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\Generic;$(SolutionDir)TR5Main\Objects\Generic\Doors;$(SolutionDir)TR5Main\Objects\Generic\Switches;$(SolutionDir)TR5Main\Objects\Generic\Object;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;$(SolutionDir)TR5Main\Sound;$(SolutionDir)TR5Main\Game\pickup;$(SolutionDir)TR5Main\Game\itemdata;$(SolutionDir)TR5Main\Game\effects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\Generic;$(SolutionDir)TR5Main\Objects\Generic\Doors;$(SolutionDir)TR5Main\Objects\Generic\Switches;$(SolutionDir)TR5Main\Objects\Generic\Object;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;$(SolutionDir)TR5Main\Sound;$(SolutionDir)TR5Main\Game\pickup;$(SolutionDir)TR5Main\Game\itemdata;$(SolutionDir)TR5Main\Game\effects;$(SolutionDir)Common;$(SolutionDir)Common\Specific;$(SolutionDir)Common\Game;$(SolutionDir)Common\Scripting;$(SolutionDir)Scripting\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -80,7 +80,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlogd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlogd.lib;Scripting.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
@@ -103,7 +103,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <WarningLevel>Level1</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TR5MAIN_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\Generic;$(SolutionDir)TR5Main\Objects\Generic\Doors;$(SolutionDir)TR5Main\Objects\Generic\Switches;$(SolutionDir)TR5Main\Objects\Generic\Object;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;$(SolutionDir)TR5Main\Sound;$(SolutionDir)TR5Main\Game\pickup;$(SolutionDir)TR5Main\Game\itemdata;$(SolutionDir)TR5Main\Game\effects;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TR5Main;$(SolutionDir)TR5Main\Game;$(SolutionDir)TR5Main\Game\Lara;$(SolutionDir)TR5Main\Objects;$(SolutionDir)TR5Main\Objects\Utils;$(SolutionDir)TR5Main\Objects\Effects;$(SolutionDir)TR5Main\Objects\Generic;$(SolutionDir)TR5Main\Objects\Generic\Doors;$(SolutionDir)TR5Main\Objects\Generic\Switches;$(SolutionDir)TR5Main\Objects\Generic\Object;$(SolutionDir)TR5Main\Objects\TR1;$(SolutionDir)TR5Main\Objects\TR1\Entity;$(SolutionDir)TR5Main\Objects\TR1\Trap;$(SolutionDir)TR5Main\Objects\TR2;$(SolutionDir)TR5Main\Objects\TR2\Entity;$(SolutionDir)TR5Main\Objects\TR2\Trap;$(SolutionDir)TR5Main\Objects\TR2\Vehicles;$(SolutionDir)TR5Main\Objects\TR3;$(SolutionDir)TR5Main\Objects\TR3\Entity;$(SolutionDir)TR5Main\Objects\TR3\Trap;$(SolutionDir)TR5Main\Objects\TR3\Vehicles;$(SolutionDir)TR5Main\Objects\TR4;$(SolutionDir)TR5Main\Objects\TR4\Entity;$(SolutionDir)TR5Main\Objects\TR4\Trap;$(SolutionDir)TR5Main\Objects\TR4\Object;$(SolutionDir)TR5Main\Objects\TR4\Floor;$(SolutionDir)TR5Main\Objects\TR4\Switch;$(SolutionDir)TR5Main\Objects\TR4\Vehicles;$(SolutionDir)TR5Main\Objects\TR5;$(SolutionDir)TR5Main\Objects\TR5\Entity;$(SolutionDir)TR5Main\Objects\TR5\Trap;$(SolutionDir)TR5Main\Objects\TR5\Light;$(SolutionDir)TR5Main\Objects\TR5\Emitter;$(SolutionDir)TR5Main\Objects\TR5\Shatter;$(SolutionDir)TR5Main\Objects\TR5\Switch;$(SolutionDir)TR5Main\Objects\TR5\Object;$(SolutionDir)TR5Main\Objects\Vehicles;$(SolutionDir)TR5Main\Renderer;$(SolutionDir)TR5Main\Scripting;$(SolutionDir)TR5Main\Specific;$(SolutionDir)TR5Main\Specific\IO;$(SolutionDir)TR5Main\Sound;$(SolutionDir)TR5Main\Game\pickup;$(SolutionDir)TR5Main\Game\itemdata;$(SolutionDir)TR5Main\Game\effects;$(SolutionDir)Common;$(SolutionDir)Common\Specific;$(SolutionDir)Common\Game;$(SolutionDir)Common\Scripting;$(SolutionDir)Scripting\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -129,7 +129,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlog.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlog.lib;Scripting.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <TargetMachine>MachineX86</TargetMachine>
@@ -191,17 +191,24 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\Structures\RendererBone.h" />
+    <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
+    <ClInclude Include="Renderer\Structures\RendererLight.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
     <ClInclude Include="Specific\Angles.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
-    <ClInclude Include="Scripting\GameScriptAnimations.h" />
     <ClInclude Include="Specific\fast_vector.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
@@ -242,13 +249,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR5\Entity\tr5_laserhead_info.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_pushableblock_info.h" />
     <ClInclude Include="Objects\TR5\Switch\tr5_crowdove_switch.h" />
-    <ClInclude Include="Scripting\GameScriptAIObject.h" />
-    <ClInclude Include="Scripting\GameScriptAudioTrack.h" />
-    <ClInclude Include="Scripting\GameScriptCameraInfo.h" />
-    <ClInclude Include="Scripting\GameScriptDisplayString.h" />
-    <ClInclude Include="Scripting\GameScriptColor.h" />
-    <ClInclude Include="Scripting\GameScriptInventoryObject.h" />
-    <ClInclude Include="Scripting\GameScriptItemInfo.h" />
     <ClInclude Include="Game\effects\smoke.h" />
     <ClInclude Include="Game\effects\spark.h" />
     <ClInclude Include="Objects\Generic\generic_objects.h" />
@@ -460,7 +460,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
-    <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
     <ClInclude Include="Scripting\GameScriptLevel.h" />
     <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
@@ -477,11 +476,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\LanguageScript.h" />
     <ClInclude Include="Renderer\Renderer11.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Scripting\LuaHandler.h" />
-    <ClInclude Include="Scripting\ObjectIDs.h" />
-    <ClInclude Include="Scripting\ReservedScriptNames.h" />
-    <ClInclude Include="Scripting\ScriptAssert.h" />
-    <ClInclude Include="Scripting\ScriptUtil.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\configuration.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
@@ -497,7 +491,6 @@ CALL gen.bat</Command>
     <ClInclude Include="CustomObjects\raptor.h" />
     <ClInclude Include="CustomObjects\shark.h" />
     <ClInclude Include="CustomObjects\tribesman.h" />
-    <ClInclude Include="Scripting\GameFlowScript.h" />
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
     <ClInclude Include="Game\collision\collide_room.h" />
@@ -533,7 +526,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
-    <ClInclude Include="Scripting\GameLogicScript.h" />
     <ClInclude Include="Specific\input.h" />
     <ClInclude Include="Specific\IO\Streams.h" />
     <ClInclude Include="Specific\level.h" />
@@ -598,6 +590,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
+    <ClCompile Include="Specific\phd_global.cpp" />
     <ClCompile Include="Scripting\GameScriptFog.cpp" />
     <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
     <ClCompile Include="Specific\Angles.cpp" />
@@ -620,6 +613,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp" />
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp" />
     <ClCompile Include="Specific\clock.cpp" />
+    <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
     <ClCompile Include="Specific\trmath.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
@@ -801,7 +795,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Renderer\RenderTarget2D\RenderTarget2D.cpp" />
     <ClCompile Include="Renderer\RenderTargetCube\RenderTargetCube.cpp" />
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
-    <ClCompile Include="Renderer\RenderPipelineState\RenderPipelineState.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp" />
@@ -859,26 +852,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Object\tr5_genslot.cpp" />
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
-    <ClCompile Include="Scripting\GameFlowScript.cpp" />
-    <ClCompile Include="Scripting\GameScriptLevel.cpp" />
-    <ClCompile Include="Scripting\GameScriptMeshInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptMirror.cpp" />
-    <ClCompile Include="Scripting\GameScriptPosition.cpp" />
-    <ClCompile Include="Scripting\GameScriptRotation.cpp" />
-    <ClCompile Include="Scripting\GameScriptSettings.cpp" />
-    <ClCompile Include="Scripting\GameScriptSinkInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptSkyLayer.cpp" />
-    <ClCompile Include="Scripting\GameScriptSoundSourceInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptAIObject.cpp" />
-    <ClCompile Include="Scripting\GameScriptAudioTrack.cpp" />
-    <ClCompile Include="Scripting\GameScriptCameraInfo.cpp" />
-    <ClCompile Include="Scripting\GameScriptColor.cpp" />
-    <ClCompile Include="Scripting\GameScriptDisplayString.cpp" />
-    <ClCompile Include="Scripting\GameScriptInventoryObject.cpp" />
-    <ClCompile Include="Scripting\GameScriptItemInfo.cpp" />
-    <ClCompile Include="Scripting\GameLogicScript.cpp" />
-    <ClCompile Include="Scripting\LuaHandler.cpp" />
-    <ClCompile Include="Scripting\ScriptAssert.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
@@ -886,6 +859,7 @@ CALL gen.bat</Command>
     <None Include="packages.config" />
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
+    <None Include="Shaders\AlphaTestBuffer.hlsli" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
@@ -1064,11 +1038,14 @@ CALL gen.bat</Command>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets" Condition="Exists('..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets')" />
+    <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets" Condition="Exists('..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2015.2019.10.17.1\build\native\directxtk_desktop_2015.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.8\build\native\Microsoft.XAudio2.Redist.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2017.2021.11.8.1\build\native\directxtk_desktop_2017.targets'))" />
   </Target>
 </Project>

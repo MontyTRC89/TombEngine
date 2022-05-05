@@ -6,7 +6,7 @@ struct LOCUST_INFO
 {
     bool on;
     PoseData pos;
-    ITEM_INFO* target;
+    ItemInfo* target;
     short roomNumber;
     short randomRotation;
     short escapeXrot;
@@ -23,7 +23,7 @@ namespace TEN::Entities::TR4 {
     extern LOCUST_INFO Locusts[MAX_LOCUSTS];
 
     extern int CreateLocust(void);
-    extern void SpawnLocust(ITEM_INFO* item);
+    extern void SpawnLocust(ItemInfo* item);
     extern void InitialiseLocust(short itemNumber);
     extern void LocustControl(short itemNumber);
     extern void UpdateLocusts(void);

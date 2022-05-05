@@ -9,17 +9,18 @@
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/Renderer11.h"
-
+#include "Scripting/ScriptInterfaceGame.h"
 
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Control::Volumes
 {
+
 	constexpr auto CAM_SIZE = 32;
 
 	int CurrentCollidedVolume;
 
-	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType)
+	void TestVolumes(short roomNumber, BoundingOrientedBox bbox, TriggerVolumeActivators activatorType, VolumeTriggerer triggerer)
 	{
 		CurrentCollidedVolume = 0;
 
@@ -38,15 +39,13 @@ namespace TEN::Control::Volumes
 			{
 			case TriggerVolumeType::Box:
 				if (roomNumber == Camera.pos.roomNumber)
-					g_Renderer.addDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-				
+					g_Renderer.AddDebugBox(volume->Box, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->Box.Intersects(bbox);
 				break;
 
 			case TriggerVolumeType::Sphere:
 				if (roomNumber == Camera.pos.roomNumber)
-					g_Renderer.addDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
-				
+					g_Renderer.AddDebugSphere(volume->Sphere.Center, volume->Sphere.Radius, Vector4(1.0f, 0.0f, 1.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 				contains = volume->Sphere.Intersects(bbox);
 				break;
 			}
@@ -61,16 +60,14 @@ namespace TEN::Control::Volumes
 				if (volume->Status == TriggerStatus::Outside)
 				{
 					volume->Status = TriggerStatus::Entering;
-					
 					if (!volume->OnEnter.empty())
-						g_GameScript->ExecuteFunction(volume->OnEnter);
+						g_GameScript->ExecuteFunction(volume->OnEnter, triggerer);
 				}
 				else
 				{
 					volume->Status = TriggerStatus::Inside;
-					
 					if (!volume->OnInside.empty())
-						g_GameScript->ExecuteFunction(volume->OnInside);
+						g_GameScript->ExecuteFunction(volume->OnInside, triggerer);
 				}
 			}
 			else
@@ -78,9 +75,8 @@ namespace TEN::Control::Volumes
 				if (volume->Status == TriggerStatus::Inside)
 				{
 					volume->Status = TriggerStatus::Leaving;
-					
 					if (!volume->OnLeave.empty())
-						g_GameScript->ExecuteFunction(volume->OnLeave);
+						g_GameScript->ExecuteFunction(volume->OnLeave, triggerer);
 				}
 				else
 					volume->Status = TriggerStatus::Outside;
@@ -96,7 +92,8 @@ namespace TEN::Control::Volumes
 		box.X2 = box.Y2 = box.Z2 = -CAM_SIZE;
 
 		auto bbox = TO_DX_BBOX(pos, &box);
-		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::Flyby);
+
+		TestVolumes(camera->pos.roomNumber, bbox, TriggerVolumeActivators::Flyby, camera);
 	}
 
 	void TestVolumes(short roomNumber, MESH_INFO* mesh)
@@ -104,22 +101,23 @@ namespace TEN::Control::Volumes
 		auto* staticInfo = &StaticObjects[mesh->staticNumber];
 		auto bbox = TO_DX_BBOX(mesh->pos, &staticInfo->collisionBox);
 
-		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static);
+		TestVolumes(roomNumber, bbox, TriggerVolumeActivators::Static, mesh);
 	}
 
-	void TestVolumes(ITEM_INFO* item)
+	void TestVolumes(short itemNum)
 	{
+		auto item = &g_Level.Items[itemNum];
 		auto bbox = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
 
 #ifdef _DEBUG
-		g_Renderer.addDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+		g_Renderer.AddDebugBox(bbox, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 #endif
 
 		if (item->ObjectNumber == ID_LARA)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Player);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Player, itemNum);
 		else if (Objects[item->ObjectNumber].intelligent)
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::NPC, itemNum);
 		else
-			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable);
+			TestVolumes(item->RoomNumber, bbox, TriggerVolumeActivators::Movable, itemNum);
 	}
 }

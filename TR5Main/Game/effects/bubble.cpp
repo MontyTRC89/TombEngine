@@ -42,7 +42,7 @@ void UpdateBubbles()
 		short roomNumber = bubble->roomNumber;
 
 		auto probe = GetCollision(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, bubble->roomNumber);
-		FLOOR_INFO* floor = GetFloor(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, &roomNumber);
+		FloorInfo* floor = GetFloor(bubble->worldPosition.x, bubble->worldPosition.y, bubble->worldPosition.z, &roomNumber);
 
 		if (bubble->worldPosition.y > probe.Position.Floor || !floor)
 		{

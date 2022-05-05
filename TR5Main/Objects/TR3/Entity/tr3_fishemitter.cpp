@@ -40,7 +40,7 @@ void SetupShoal(int shoalNumber)
 	LeaderInfo[shoalNumber].Range.y = (FishRanges[shoalNumber][2]) << 8;
 }
 
-void SetupFish(int leader, ITEM_INFO* item)
+void SetupFish(int leader, ItemInfo* item)
 {
 	auto range = LeaderInfo[leader].Range;
 
@@ -393,7 +393,7 @@ void ControlFish(short itemNumber)
 	}
 }
 
-bool FishNearLara(PoseData* pos, int distance, ITEM_INFO* item)
+bool FishNearLara(PoseData* pos, int distance, ItemInfo* item)
 {
 	int x = pos->Position.x - item->Pose.Position.x;
 	int y = abs(pos->Position.y - item->Pose.Position.y);

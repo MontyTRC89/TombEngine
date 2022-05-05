@@ -1,7 +1,7 @@
 #pragma once
 
 struct Vector3Int;
-struct ITEM_INFO;
+struct ItemInfo;
 
 namespace TEN::Entities::TR4
 {
@@ -9,6 +9,6 @@ namespace TEN::Entities::TR4
 	void WraithControl(short itemNumber);
 	void WraithWallsEffect(Vector3Int pos, float yOrient, short objectNumber);
 	void DrawWraith(Vector3Int pos, Vector3Int velocity, int objectNumber);
-	void KillWraith(ITEM_INFO* item);
-	void WraithExplosionEffect(ITEM_INFO* item, byte r, byte g, byte b, int velocity);
+	void KillWraith(ItemInfo* item);
+	void WraithExplosionEffect(ItemInfo* item, byte r, byte g, byte b, int velocity);
 }

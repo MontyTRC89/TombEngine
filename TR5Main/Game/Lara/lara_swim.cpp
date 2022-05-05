@@ -8,7 +8,9 @@
 #include "Game/Lara/lara_collide.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara.h"
-#include "Scripting/GameFlowScript.h"
+#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/ScriptInterfaceLevel.h"
+#include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
 
@@ -19,17 +21,19 @@
 
 // State:		LS_UNDERWATER_IDLE (13)
 // Collision:	lara_col_underwater_idle()
-void lara_as_underwater_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
+	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
+
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
 	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) && laraType != LaraType::Divesuit)
 	{
@@ -58,16 +62,16 @@ void lara_as_underwater_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_IDLE (13)
 // Control:		lara_as_underwater_idle()
-void lara_col_underwater_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
 // State:		LS_UNDERWATER_SWIM_FORWARD (17)
 // Collision:	lara_col_underwater_swim_forward()
-void lara_as_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
+	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
 	if (item->HitPoints <= 0)
 	{
@@ -96,16 +100,16 @@ void lara_as_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_SWIM_FORWARD (17)
 // Control:		lara_as_underwater_swim_forward()
-void lara_col_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
 // State:		LS_UNDERWATER_INERTIA (18)
 // Collision:	lara_col_underwater_inertia()
-void lara_as_underwater_inertia(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
-	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->LaraType;
+	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
 	if (item->HitPoints <= 0)
 	{
@@ -137,14 +141,14 @@ void lara_as_underwater_inertia(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_INERTIA (18)
 // Collision:	lara_as_underwater_inertia()
-void lara_col_underwater_inertia(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
 // State:		LS_WATER_DEATH (44)
 // Collision:	lara_col_underwater_death()
-void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -168,7 +172,7 @@ void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_WATER_DEATH (44)
 // Control:	lara_as_underwater_death()
-void lara_col_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -188,14 +192,14 @@ void lara_col_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_ROLL (66)
 // Collision:	lara_col_underwater_roll_180()
-void lara_as_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_roll_180(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.VerticalVelocity = 0;
 }
 
 // State:		LS_UNDERWATER_ROLL (66)
 // Control:		lara_as_underwater_roll_180()
-void lara_col_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_roll_180(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }

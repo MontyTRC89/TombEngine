@@ -1,10 +1,19 @@
 -- Place in this LUA script all the levels of your game
 -- Title is mandatory and must be the first level
 
+local Flow = TEN.Flow
+local Level = Flow.Level
+local Color = TEN.Color
+local Rotation = TEN.Rotation
+local InventoryItem = Flow.InventoryItem
+local InvID = Flow.InvID
+local RotationAxis = Flow.RotationAxis
+local ItemAction = Flow.ItemAction
+
 -- Title level
-SetIntroImagePath("SCREENS\\MAIN.PNG")
-SetTitleScreenImagePath("Screens\\Title.png")
-SetGameFarView(210)
+Flow.SetIntroImagePath("Screens\\Main.png")
+Flow.SetTitleScreenImagePath("Screens\\Title.png")
+Flow.SetFarView(210)
 
 title = Level.new();
 
@@ -13,7 +22,7 @@ title.levelFile = "Data\\title.trc";
 title.scriptFile = "Scripts\\title.lua";
 title.loadScreenFile = "Screens\\rome.jpg";
 
-AddLevel(title);
+Flow.AddLevel(title);
 
 -- Test
 test = Level.new();
@@ -28,12 +37,12 @@ test.weatherStrength = 1;
 test.horizon = true
 test.farView = 10
 test.colAddHorizon = true
-test.layer1 = SkyLayer.new(Color.new(255, 0, 0), 15)
+test.layer1 = Flow.SkyLayer.new(Color.new(255, 0, 0), 15)
 
 test.objects = {
-	InventoryObject.new(
+	InventoryItem.new(
 		"tut1_ba_cartouche1",
-		InvItem.PUZZLE_ITEM3_COMBO1,
+		InvID.PUZZLE_ITEM3_COMBO1,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -42,9 +51,9 @@ test.objects = {
 		ItemAction.USE
 	),
 	myObj, 
-	InventoryObject.new(
+	InventoryItem.new(
 		"tut1_ba_cartouche2",
-		InvItem.PUZZLE_ITEM3_COMBO2,
+		InvID.PUZZLE_ITEM3_COMBO2,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -52,9 +61,9 @@ test.objects = {
 		-1,
 		ItemAction.USE
 	),
-	InventoryObject.new(
+	InventoryItem.new(
 		"tut1_ba_cartouche",
-		InvItem.PUZZLE_ITEM3,
+		InvID.PUZZLE_ITEM3,
 		0,
 		0.5,
 		Rotation.new(0, 0, 0),
@@ -62,9 +71,9 @@ test.objects = {
 		-1,
 		ItemAction.USE
 	),
-	InventoryObject.new(
+	InventoryItem.new(
 		"tut1_hand_orion",
-		InvItem.PUZZLE_ITEM6,
+		InvID.PUZZLE_ITEM6,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),
@@ -72,9 +81,9 @@ test.objects = {
 		-1,
 		ItemAction.USE
 	),
-	InventoryObject.new(
+	InventoryItem.new(
 		"tut1_hand_sirius",
-		InvItem.PUZZLE_ITEM8,
+		InvID.PUZZLE_ITEM8,
 		0,
 		0.5,
 		Rotation.new(270, 180, 0),
@@ -85,4 +94,4 @@ test.objects = {
 
 };
 
-AddLevel(test);
+Flow.AddLevel(test);

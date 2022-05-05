@@ -83,7 +83,7 @@ void FlareControl(short itemNumber)
 	}
 }
 
-void ReadyFlare(ITEM_INFO* laraItem)
+void ReadyFlare(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -95,21 +95,21 @@ void ReadyFlare(ITEM_INFO* laraItem)
 	lara->TargetEntity = NULL;
 }
 
-void UndrawFlareMeshes(ITEM_INFO* laraItem)
+void UndrawFlareMeshes(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
-void DrawFlareMeshes(ITEM_INFO* laraItem)
+void DrawFlareMeshes(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
-void UndrawFlare(ITEM_INFO* laraItem)
+void UndrawFlare(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -219,7 +219,7 @@ void UndrawFlare(ITEM_INFO* laraItem)
 	SetFlareArm(laraItem, lara->LeftArm.FrameNumber);
 }
 
-void DrawFlare(ITEM_INFO* laraItem)
+void DrawFlare(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -265,7 +265,7 @@ void DrawFlare(ITEM_INFO* laraItem)
 	}
 }
 
-void SetFlareArm(ITEM_INFO* laraItem, int armFrame)
+void SetFlareArm(ItemInfo* laraItem, int armFrame)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	int flareAnimNum = Objects[ID_LARA_FLARE_ANIM].animIndex;
@@ -283,7 +283,7 @@ void SetFlareArm(ITEM_INFO* laraItem, int armFrame)
 	lara->LeftArm.FrameBase = g_Level.Anims[flareAnimNum].framePtr;
 }
 
-void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
+void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto itemNumber = CreateItem();
@@ -358,12 +358,12 @@ void CreateFlare(ITEM_INFO* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 	}
 }
 
-void DrawFlareInAir(ITEM_INFO* flareItem)
+void DrawFlareInAir(ItemInfo* flareItem)
 {
 	TENLog("DrawFlareInAir() not implemented!", LogLevel::Warning);
 }
 
-void DoFlareInHand(ITEM_INFO* laraItem, int flareLife)
+void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 {
 	auto* lara = GetLaraInfo(laraItem);
 

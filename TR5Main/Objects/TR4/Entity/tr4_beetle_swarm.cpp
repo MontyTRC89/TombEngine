@@ -190,7 +190,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				FLOOR_INFO* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &beetle->RoomNumber);
+				FloorInfo* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &beetle->RoomNumber);
 				int height = GetFloorHeight(floor, beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
 				if (height < (beetle->Pose.Position.y - SECTOR(1.25f)) || height == NO_HEIGHT)
 				{

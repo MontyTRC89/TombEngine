@@ -104,7 +104,7 @@ void InitialiseLara(int restore)
 	Lara.Inventory.BeetleLife = 3;
 }
 
-void LaraInitialiseMeshes(ITEM_INFO* item)
+void LaraInitialiseMeshes(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -135,7 +135,7 @@ void LaraInitialiseMeshes(ITEM_INFO* item)
 	lara->RightArm.Locked = false;
 }
 
-void InitialiseLaraAnims(ITEM_INFO* item)
+void InitialiseLaraAnims(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 

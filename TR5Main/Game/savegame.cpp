@@ -26,6 +26,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Scripting/ScriptInterfaceLevel.h"
+#include "Scripting/ScriptInterfaceGame.h"
+#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -43,7 +46,6 @@ GameStats Statistics;
 SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
 FileStream* SaveGame::m_stream;
-std::vector<LuaVariable> SaveGame::m_luaVariables;
 int SaveGame::LastSaveGame;
 
 void LoadSavegameInfos()
@@ -78,7 +80,7 @@ bool SaveGame::Save(int slot)
 {
 	auto fileName = std::string(SAVEGAME_PATH) + "savegame." + std::to_string(slot);
 
-	ITEM_INFO itemToSerialize{};
+	ItemInfo itemToSerialize{};
 	FlatBufferBuilder fbb{};
 
 	std::vector<flatbuffers::Offset< Save::Item>> serializedItems{};
@@ -400,9 +402,12 @@ bool SaveGame::Save(int slot)
 	lara.add_wet(wetOffset);
 	auto laraOffset = lara.Finish();
 
+	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
-		OBJECT_INFO* obj = &Objects[itemToSerialize.ObjectNumber];
+		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
+
+		auto luaNameOffset = fbb.CreateString(itemToSerialize.LuaName);
 
 		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
@@ -509,8 +514,15 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data(data);
 		}
 
+		if (currentItemIndex >= g_Level.NumItems)
+		{
+			serializedItem.add_lua_name(luaNameOffset);
+		}
+
 		auto serializedItemOffset = serializedItem.Finish();
 		serializedItems.push_back(serializedItemOffset);
+
+		currentItemIndex++;
 	}
 
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
@@ -523,7 +535,7 @@ bool SaveGame::Save(int slot)
 
 	// Legacy soundtrack map
 	std::vector<int> soundTrackMap;
-	for (auto& track : SoundTracks) { soundTrackMap.push_back(track.Mask); }
+	for (auto& track : SoundTracks) { soundTrackMap.push_back(track.second.Mask); }
 	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
 
 	// Flipmaps
@@ -758,6 +770,87 @@ bool SaveGame::Save(int slot)
 		alternatePendulumOffset = alternatePendulumInfo.Finish();
 	}
 
+
+	std::vector<flatbuffers::Offset<Save::ScriptTable>> levelTableVec;
+	std::vector<flatbuffers::Offset<flatbuffers::String>> levelStringVec2;
+	
+	//std::vector<savedTable> savedTables;
+	std::vector<std::string> savedStrings;
+	std::vector<SavedVar> savedVars;
+
+	g_GameScript->GetVariables(savedVars);
+
+	
+	std::vector<flatbuffers::Offset<Save::UnionTable>> varsVec;
+	for (auto const& s : savedVars)
+	{
+		flatbuffers::Offset<Save::ScriptTable> scriptTableOffset;
+		flatbuffers::Offset<Save::stringTable> strOffset;
+		flatbuffers::Offset<Save::doubleTable> doubleOffset;
+		flatbuffers::Offset<Save::boolTable> boolOffset;
+
+		if (std::holds_alternative<std::string>(s))
+		{
+			auto strOffset2 = fbb.CreateString(std::get<std::string>(s));
+			Save::stringTableBuilder stb{ fbb };
+			stb.add_str(strOffset2);
+			strOffset = stb.Finish();
+		}
+		else if (std::holds_alternative<double>(s))
+		{
+			Save::doubleTableBuilder dtb{ fbb };
+			dtb.add_scalar(std::get<double>(s));
+			doubleOffset = dtb.Finish();
+		}
+		else if (std::holds_alternative<bool>(s))
+		{
+			Save::boolTableBuilder btb{ fbb };
+			btb.add_scalar(std::get<bool>(s));
+			boolOffset = btb.Finish();
+		}
+		else if (std::holds_alternative<IndexTable>(s))
+		{
+			std::vector<Save::KeyValPair> keyValVec;
+			auto& vec = std::get<IndexTable>(s);
+			for (auto& id : vec)
+			{
+				keyValVec.push_back(Save::KeyValPair(id.first, id.second));
+			}
+
+			auto vecOffset = fbb.CreateVectorOfStructs(keyValVec);
+			Save::ScriptTableBuilder stb{ fbb };
+			stb.add_keys_vals(vecOffset);
+			scriptTableOffset = stb.Finish();
+		}
+
+		Save::UnionTableBuilder ut{ fbb };
+		if (std::holds_alternative<std::string>(s))
+		{
+			ut.add_u_type(Save::VarUnion::str);
+			ut.add_u(strOffset.Union());
+		}
+		else if (std::holds_alternative<double>(s))
+		{
+			ut.add_u_type(Save::VarUnion::num);
+			ut.add_u(doubleOffset.Union());
+		}
+		else if (std::holds_alternative<bool>(s))
+		{
+			ut.add_u_type(Save::VarUnion::boolean);
+			ut.add_u(boolOffset.Union());
+		}
+		else if (std::holds_alternative<IndexTable>(s))
+		{
+			ut.add_u_type(Save::VarUnion::tab);
+			ut.add_u(scriptTableOffset.Union());
+		}
+		varsVec.push_back(ut.Finish());
+	}
+	auto unionVec = fbb.CreateVector(varsVec);
+	Save::UnionVecBuilder uvb{ fbb };
+	uvb.add_members(unionVec);
+	auto unionVecOffset = uvb.Finish();
+
 	Save::SaveGameBuilder sgb{ fbb };
 
 	sgb.add_header(headerOffset);
@@ -790,6 +883,9 @@ bool SaveGame::Save(int slot)
 		sgb.add_pendulum(pendulumOffset);
 		sgb.add_alternate_pendulum(alternatePendulumOffset);
 	}
+
+
+	sgb.add_script_vars(unionVecOffset);
 
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
@@ -862,7 +958,7 @@ bool SaveGame::Load(int slot)
 		if (!room->mesh[i].flags)
 		{
 			short roomNumber = staticMesh->room_number();
-			FLOOR_INFO* floor = GetFloor(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, &roomNumber);
+			FloorInfo* floor = GetFloor(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, &roomNumber);
 			TestTriggers(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, staticMesh->room_number(), true, 0);
 			floor->Stopper = false;
 		}
@@ -892,6 +988,8 @@ bool SaveGame::Load(int slot)
 	ZeroMemory(&Lara, sizeof(LaraInfo));
 
 	// Items
+	InitialiseItemArray(NUM_ITEMS);
+
 	for (int i = 0; i < s->items()->size(); i++)
 	{
 		const Save::Item* savedItem = s->items()->Get(i);
@@ -912,9 +1010,18 @@ bool SaveGame::Load(int slot)
 			dynamicItem = true;
 		}
 
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+		ItemInfo* item = &g_Level.Items[itemNumber];
+		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
 
+		ObjectInfo* obj = &Objects[item->ObjectNumber];
+		
+		if (savedItem->lua_name() != nullptr)
+		{
+			item->LuaName = savedItem->lua_name()->str();
+			g_GameScriptEntities->AddName(item->LuaName, i);
+		}
+
+		g_GameScriptEntities->TryAddColliding(i);
 		if (!dynamicItem)
 		{
 			// Kill immediately item if already killed and continue
@@ -964,11 +1071,13 @@ bool SaveGame::Load(int slot)
 		// Do the correct way for assigning new room number
 		if (item->ObjectNumber == ID_LARA)
 		{
-			LaraItem->Location.roomNumber = roomNumber;
-			LaraItem->Location.yNumber = item->Pose.Position.y;
-			item->RoomNumber = roomNumber;
+			LaraItem->Data = nullptr;
 			Lara.ItemNumber = i;
 			LaraItem = item;
+			LaraItem->Location.roomNumber = roomNumber;
+			LaraItem->Location.yNumber = item->Pose.Orientation.y;
+			LaraItem->Data = &Lara;
+
 			UpdateItemRoom(item, -LARA_HEIGHT / 2);
 		}
 		else
@@ -978,7 +1087,7 @@ bool SaveGame::Load(int slot)
 
 			if (obj->shadowSize)
 			{
-				FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+				FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 				item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			}
 		}
@@ -1447,6 +1556,40 @@ bool SaveGame::Load(int slot)
 		AlternatePendulum.node = s->alternate_pendulum()->node();
 		AlternatePendulum.rope = rope;
 	}
+
+	std::vector<SavedVar> loadedVars;
+
+	auto theVec = s->script_vars();
+	if (theVec)
+	{
+		for (auto const& var : *(theVec->members()))
+		{
+			if (var->u_type() == Save::VarUnion::num)
+			{
+				loadedVars.push_back(var->u_as_num()->scalar());
+			}
+			else if (var->u_type() == Save::VarUnion::boolean)
+			{
+				loadedVars.push_back(var->u_as_boolean()->scalar());
+			}
+			else if (var->u_type() == Save::VarUnion::str)
+			{
+				loadedVars.push_back(var->u_as_str()->str()->str());
+			}
+			else if (var->u_type() == Save::VarUnion::tab)
+			{
+				auto tab = var->u_as_tab()->keys_vals();
+				auto& loadedTab = loadedVars.emplace_back(IndexTable{});
+				
+				for (auto const& p : *tab)
+				{
+					std::get<IndexTable>(loadedTab).push_back(std::make_pair(p->key(), p->val()));
+				}
+			}
+		}
+	}
+
+	g_GameScript->SetVariables(loadedVars);
 
 	return true;
 }
