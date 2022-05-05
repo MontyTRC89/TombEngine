@@ -2,7 +2,7 @@
 #include "Specific/phd_global.h"
 #include "Specific/trmath.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 struct FLOOR_INFO;
 struct ROOM_INFO;
@@ -120,44 +120,44 @@ struct CollisionInfo
 	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && (NearestLedgeAngle % ANGLE(90.0f)); }
 };
 
-[[nodiscard]] bool TestItemRoomCollisionAABB(ITEM_INFO* item);
+[[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
-CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int height = 0, int side = 0);
+CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height = 0, int side = 0);
 CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
-CollisionResult GetCollision(ITEM_INFO* item);
+CollisionResult GetCollision(ItemInfo* item);
 
-void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, bool resetRoom = false);
-void  GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
-short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance);
+short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
 
 FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
 int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
 int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
-void AlterFloorHeight(ITEM_INFO* item, int height);
+void AlterFloorHeight(ItemInfo* item, int height);
 
 int GetWaterSurface(int x, int y, int z, short roomNumber);
-int GetWaterSurface(ITEM_INFO* item);
+int GetWaterSurface(ItemInfo* item);
 int GetWaterDepth(int x, int y, int z, short roomNumber);
-int GetWaterDepth(ITEM_INFO* item);
+int GetWaterDepth(ItemInfo* item);
 int GetWaterHeight(int x, int y, int z, short roomNumber);
-int GetWaterHeight(ITEM_INFO* item);
+int GetWaterHeight(ItemInfo* item);
 
 int  FindGridShift(int x, int z);
-void ShiftItem(ITEM_INFO* item, CollisionInfo* coll);
-void MoveItem(ITEM_INFO* item, short angle, int x, int z = 0);
-void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
-void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
-void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll);
+void ShiftItem(ItemInfo* item, CollisionInfo* coll);
+void MoveItem(ItemInfo* item, short angle, int x, int z = 0);
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
+void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
-void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
+void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor = 1.0f, short xOffset = 0, short zOffset = 0);
 
 short GetSurfaceAspectAngle(float xTilt, float zTilt);
 short GetSurfaceSteepnessAngle(float xTilt, float zTilt);
 
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
-bool TestEnvironment(RoomEnvFlags environmentType, ITEM_INFO* item);
+bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);

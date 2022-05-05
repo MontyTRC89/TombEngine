@@ -15,7 +15,7 @@ namespace Footprints {
 
 	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
-	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, Vector3& outFootprintPosition) 
+	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition) 
 	{
 		int x = item.Pose.Position.x;
 		int y = item.Pose.Position.y;
@@ -35,7 +35,7 @@ namespace Footprints {
 		return abs(pos.y - height) < 64;
 	}
 
-	void AddFootprint(ITEM_INFO* item, bool rightFoot)
+	void AddFootprint(ItemInfo* item, bool rightFoot)
 	{
 		if (item != LaraItem)
 			return;

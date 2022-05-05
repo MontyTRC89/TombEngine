@@ -24,7 +24,7 @@
 template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
 
-struct ITEM_INFO;
+struct ItemInfo;
 
 class ITEM_DATA
 {
@@ -43,7 +43,7 @@ class ITEM_DATA
 		double,
 		long double,
 		std::array<short, 4>,
-		ITEM_INFO*,
+		ItemInfo*,
 		CreatureInfo,
 		LaserHeadInfo,
 		QuadInfo,

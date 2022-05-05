@@ -127,7 +127,7 @@ void InitialiseGuard(short itemNum)
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 			if (roomItemNumber != NO_ITEM)
 			{
-				ITEM_INFO* item2;
+				ItemInfo* item2;
 				while (true)
 				{
 					auto* item2 = &g_Level.Items[roomItemNumber];
@@ -412,7 +412,7 @@ void GuardControl(short itemNumber)
 
 		creature->MaxTurn = 0;
 
-		ITEM_INFO* currentItem;
+		ItemInfo* currentItem;
 		short currentItemNumber;
 		switch (item->Animation.ActiveState)
 		{

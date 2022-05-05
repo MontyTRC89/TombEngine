@@ -19,7 +19,7 @@
 
 // State:		LS_HANG (10)
 // Collision:	lara_col_hang()
-void lara_as_hang(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -43,7 +43,7 @@ void lara_as_hang(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_HANG (10)
 // Control:		lara_as_hang()
-void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -199,7 +199,7 @@ void lara_col_hang(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SHIMMY_LEFT (30)
 // Collision:	lara_col_shimmy_left()
-void lara_as_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.Mode = CollisionProbeMode::FreeFlat;
 	coll->Setup.EnableObjectPush = false;
@@ -213,7 +213,7 @@ void lara_as_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SHIMMY_LEFT (30)
 // Control:		lara_as_shimmy_left()
-void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -226,7 +226,7 @@ void lara_col_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SHIMMY_RIGHT (31)
 // Collision:	lara_col_shimmy_right()
-void lara_as_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -240,7 +240,7 @@ void lara_as_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SHIMMY_RIGHT (31)
 // Control:		lara_as_shimmy_right()
-void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -252,7 +252,7 @@ void lara_col_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SHIMMY_OUTER_LEFT (107), LS_SHIMMY_OUTER_RIGHT (108), LS_SHIMMY_INNER_LEFT (109), LS_SHIMMY_INNER_RIGHT (110),
 // Collision:	lara_default_col()
-void lara_as_shimmy_corner(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_shimmy_corner(ItemInfo* item, CollisionInfo* coll)
 {
 	Camera.targetAngle = 0;
 	Camera.targetElevation = -ANGLE(33.0f);
@@ -263,7 +263,7 @@ void lara_as_shimmy_corner(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_HANDSTAND (54)
 // Collision:	lara_default_col()
-void lara_as_handstand(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_handstand(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;

@@ -30,7 +30,7 @@ BITE_INFO PierreGun2 = { -57, 200, 0, 14 };
 
 void InitialiseLarson(short itemNum)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ItemInfo* item = &g_Level.Items[itemNum];
 
 	ClearItem(itemNum);
 

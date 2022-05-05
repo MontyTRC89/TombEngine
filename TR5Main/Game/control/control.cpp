@@ -763,7 +763,7 @@ int GetRandomDraw()
 	return GenerateInt();
 }
 
-bool ExplodeItemNode(ITEM_INFO *item, int node, int noXZVel, int bits)
+bool ExplodeItemNode(ItemInfo *item, int node, int noXZVel, int bits)
 {
 	if (1 << node & item->MeshBits)
 	{

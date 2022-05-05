@@ -388,7 +388,7 @@ namespace TEN::Entities::TR4
 		{
 			currentCreature = creature;
 			creature->Enemy = LaraItem;
-			ITEM_INFO* currentItem = NULL;
+			ItemInfo* currentItem = NULL;
 			for (short itemNum = g_Level.Rooms[item->RoomNumber].itemNumber; itemNum != NO_ITEM; itemNum = currentItem->NextItem)
 			{
 				currentItem = &g_Level.Items[itemNum];
@@ -544,7 +544,7 @@ namespace TEN::Entities::TR4
 
 			//currentCreature->enemy = LaraItem;
 
-			//ITEM_INFO* oldEnemy = creature->enemy;
+			//ItemInfo* oldEnemy = creature->enemy;
 			//creature->enemy = LaraItem;
 
 			// Is goon alerted?

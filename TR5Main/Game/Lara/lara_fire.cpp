@@ -31,8 +31,8 @@
 using namespace TEN::Entities::Generic;
 
 bool MonksAttackLara;
-ITEM_INFO* LastTargets[MAX_TARGETS];
-ITEM_INFO* TargetList[MAX_TARGETS];
+ItemInfo* LastTargets[MAX_TARGETS];
+ItemInfo* TargetList[MAX_TARGETS];
 
 WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
@@ -337,7 +337,7 @@ GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 	}
 }
 
-void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
+void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -385,7 +385,7 @@ void SmashItem(short itemNumber)
 		SmashObject(itemNumber);
 }
 
-void LaraGun(ITEM_INFO* laraItem)
+void LaraGun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -662,14 +662,14 @@ void LaraGun(ITEM_INFO* laraItem)
 	}
 }
 
-Ammo& GetAmmo(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+Ammo& GetAmmo(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
 	return lara->Weapons[(int)weaponType].Ammo[(int)lara->Weapons[(int)weaponType].SelectedAmmo];
 }
 
-void InitialiseNewWeapon(ITEM_INFO* laraItem)
+void InitialiseNewWeapon(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -725,7 +725,7 @@ void InitialiseNewWeapon(ITEM_INFO* laraItem)
 	}
 }
 
-GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -760,7 +760,7 @@ GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	}
 }
 
-void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int damage, int grenade)
+void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int damage, int grenade)
 {	
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -832,7 +832,7 @@ void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int d
 	}
 }
 
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, short* angles)
 {
 	auto* lara = GetLaraInfo(src);
 
@@ -954,7 +954,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 	}
 }
 
-void FindTargetPoint(ITEM_INFO* item, GameVector* target)
+void FindTargetPoint(ItemInfo* item, GameVector* target)
 {
 	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 	int x = (int)(bounds->X1 + bounds->X2) / 2;
@@ -970,7 +970,7 @@ void FindTargetPoint(ITEM_INFO* item, GameVector* target)
 	target->roomNumber = item->RoomNumber;
 }
 
-void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
+void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1042,7 +1042,7 @@ void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 	lara->TargetArmAngles[1] = angles[1];
 }
 
-void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
+void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1061,7 +1061,7 @@ void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo)
 		laraItem->Pose.Position.z,
 		laraItem->RoomNumber);
 
-	ITEM_INFO* bestItem = NULL;
+	ItemInfo* bestItem = NULL;
 	short bestYrot = MAXSHORT;
 	int bestDistance = MAXINT;
 	int maxDistance = weaponInfo->TargetDist;

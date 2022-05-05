@@ -84,7 +84,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	spark->dSize = spark->size / 2;
 }
 
-void TriggerElectricitySparks(ITEM_INFO* item, int joint, int flame)
+void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 {
 	Vector3Int pos = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos, joint);

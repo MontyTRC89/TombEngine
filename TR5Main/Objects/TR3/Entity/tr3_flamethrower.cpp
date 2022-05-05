@@ -158,7 +158,7 @@ static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv
 	spark->dSize = size / 2;
 }
 
-static short TriggerFlameThrower(ITEM_INFO* item, BITE_INFO* bite, short speed)
+static short TriggerFlameThrower(ItemInfo* item, BITE_INFO* bite, short speed)
 {
 	short effectNumber = CreateNewEffect(item->RoomNumber);
 	if (effectNumber != NO_ITEM)
@@ -260,7 +260,7 @@ void FlameThrowerControl(short itemNumber)
 		{
 			creature->Enemy = NULL;
 
-			ITEM_INFO* target = NULL;
+			ItemInfo* target = NULL;
 			int minDistance = INT_MAX;
 
 			for (int i = 0; i < ActiveCreatures.size(); i++)

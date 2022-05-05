@@ -155,7 +155,7 @@ namespace TEN::Renderer
 		// Apply mutations on top
 		if (item) 
 		{
-			ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+			ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
 			if (nativeItem->Animation.Mutator.size() == boneIndexList.size())
 			{
@@ -178,7 +178,7 @@ namespace TEN::Renderer
 	void Renderer11::UpdateItemAnimations(int itemNumber, bool force)
 	{
 		RendererItem* itemToDraw = &m_items[itemNumber];
-		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[itemNumber];
 
 		// TODO: hack for fixing a bug, check again if needed
 		itemToDraw->ItemNumber = itemNumber;
@@ -305,7 +305,7 @@ namespace TEN::Renderer
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
-				ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
+				ItemInfo* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
 
 				// Lara has her own routine
 				if (nativeItem->ObjectNumber == ID_LARA)
@@ -425,7 +425,7 @@ namespace TEN::Renderer
 	void Renderer11::GetItemAbsBonePosition(int itemNumber, Vector3 *pos, int joint)
 	{
 		RendererItem *rendererItem = &m_items[itemNumber];
-		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[itemNumber];
 
 		rendererItem->ItemNumber = itemNumber;
 
@@ -447,7 +447,7 @@ namespace TEN::Renderer
 	int Renderer11::getSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
 	{
 		RendererItem* itemToDraw = &m_items[itemNumber];
-		ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[itemNumber];
 
 		itemToDraw->ItemNumber = itemNumber;
 
@@ -508,7 +508,7 @@ namespace TEN::Renderer
 			UpdateItemAnimations(itemNumber, true);
 			
 			RendererItem* rendererItem = &m_items[itemNumber];
-			ITEM_INFO* nativeItem = &g_Level.Items[itemNumber];
+			ItemInfo* nativeItem = &g_Level.Items[itemNumber];
 
 			RendererObject& obj = *m_moveableObjects[nativeItem->ObjectNumber];
 			*outMatrix = obj.AnimationTransforms[joint] * rendererItem->World;

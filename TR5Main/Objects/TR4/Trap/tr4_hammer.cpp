@@ -13,7 +13,7 @@
 
 void HammerControl(short itemNumber)
 {
-    /*ITEM_INFO* item = &g_Level.Items[itemNumber];
+    /*ItemInfo* item = &g_Level.Items[itemNumber];
 
     item->itemFlags[3] = 150;
 
@@ -42,7 +42,7 @@ void HammerControl(short itemNumber)
 
                 for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].nextItem)
                 {
-                    ITEM_INFO* currentItem = &g_Level.Items[linknum];
+                    ItemInfo* currentItem = &g_Level.Items[linknum];
 
                     if (currentItem->objectNumber==ID_OBELISK 
                         && )
@@ -55,7 +55,7 @@ void HammerControl(short itemNumber)
                     {
                         v16 = 2811 * linkNum;
                         v17 = *(_WORD*)(Items + 2 * v16 + 12) == 165;
-                        currentItem = (ITEM_INFO_OK*)(Items + 2 * v16);
+                        currentItem = (ItemInfo_OK*)(Items + 2 * v16);
                         if (v17
                             && currentItem->pos.Orientation.y == -16384
                             && *(_WORD*)(Items + 5622 * (signed __int16)currentItem->itemFlags[0] + 78) == 0x4000
@@ -107,7 +107,7 @@ void HammerControl(short itemNumber)
                     {
                         do
                         {
-                            currentItem_1 = (ITEM_INFO_OK*)(5622 * v12);
+                            currentItem_1 = (ItemInfo_OK*)(5622 * v12);
                             v14 = *(WORD*)((char*)&currentItem_1->objectNumber + v9);
                             if ((v14 == 193 || v14 == 194 || v14 == 179)
                                 && *(_DWORD*)((char*)&currentItem_1->pos.Position.x + v9) == item->pos.Position.x

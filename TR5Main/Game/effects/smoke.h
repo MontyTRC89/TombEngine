@@ -3,7 +3,7 @@
 #include <SimpleMath.h>
 #include <array>
 
-struct ITEM_INFO;
+struct ItemInfo;
 enum class LaraWeaponType;
 
 namespace TEN

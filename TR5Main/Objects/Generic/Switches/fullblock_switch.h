@@ -1,6 +1,6 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 namespace TEN::Entities::Switches
@@ -11,5 +11,5 @@ namespace TEN::Entities::Switches
 	extern byte CurrentSequence;
 
 	void FullBlockSwitchControl(short itemNumber);
-	void FullBlockSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+	void FullBlockSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 }

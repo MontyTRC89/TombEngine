@@ -2,7 +2,7 @@
 #include <vector>
 #include "Specific/phd_global.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 
 struct BOX_NODE 
 {
@@ -99,9 +99,9 @@ struct CreatureInfo
 
 	LOTInfo LOT;
 	MoodType Mood;
-	ITEM_INFO* Enemy;
+	ItemInfo* Enemy;
 	short AITargetNumber;
-	ITEM_INFO* AITarget;
+	ItemInfo* AITarget;
 	short Pad;				// Unused?
 	Vector3Int Target;
 

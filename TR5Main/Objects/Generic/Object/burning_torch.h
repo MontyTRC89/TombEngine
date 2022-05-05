@@ -1,7 +1,7 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 namespace TEN::Entities::Generic
@@ -11,5 +11,5 @@ namespace TEN::Entities::Generic
 	void GetFlameTorch();
 	void TorchControl(short itemNumber);
 	void LaraTorch(Vector3Int* src, Vector3Int* target, int rot, int color);
-	void FireCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+	void FireCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 }

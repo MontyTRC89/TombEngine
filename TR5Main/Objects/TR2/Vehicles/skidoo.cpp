@@ -135,7 +135,7 @@ void InitialiseSkidoo(short itemNumber)
 	}
 }
 
-int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo* coll)
+int GetSkidooMountType(ItemInfo* laraItem, ItemInfo* skidooItem, CollisionInfo* coll)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 
@@ -167,7 +167,7 @@ int GetSkidooMountType(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, CollisionInfo
 	return mountType;
 }
 
-bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction)
+bool TestSkidooDismountOK(ItemInfo* skidooItem, int direction)
 {
 	short angle;
 	if (direction == SKIDOO_STATE_DISMOUNT_LEFT)
@@ -191,7 +191,7 @@ bool TestSkidooDismountOK(ITEM_INFO* skidooItem, int direction)
 	return true;
 }
 
-bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
+bool TestSkidooDismount(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 
@@ -251,7 +251,7 @@ bool TestSkidooDismount(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 		return true;
 }
 
-int GetSkidooCollisionAnim(ITEM_INFO* skidooItem, Vector3Int* moved)
+int GetSkidooCollisionAnim(ItemInfo* skidooItem, Vector3Int* moved)
 {
 	moved->x = skidooItem->Pose.Position.x - moved->x;
 	moved->z = skidooItem->Pose.Position.z - moved->z;
@@ -283,7 +283,7 @@ int GetSkidooCollisionAnim(ITEM_INFO* skidooItem, Vector3Int* moved)
 	return 0;
 }
 
-void SkidooCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
+void SkidooCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 	auto* skidooItem = &g_Level.Items[itemNum];
@@ -325,7 +325,7 @@ void SkidooCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 }
 
 
-void SkidooEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
+void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
 	vector<short> roomsList;
 	roomsList.push_back(skidooItem->RoomNumber);
@@ -386,7 +386,7 @@ void SkidooEntityCollision(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 	}
 }
 
-void SkidooGuns(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
+void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 	auto* skidoo = (SkidooInfo*)skidooItem->Data;
@@ -416,7 +416,7 @@ void SkidooGuns(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 		skidooItem->ItemFlags[0]--;
 }
 
-void SkidooExplode(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
+void SkidooExplode(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
 	LaraInfo*& lara = laraItem->Data;
 
@@ -450,7 +450,7 @@ void SkidooExplode(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 	lara->Vehicle = NO_ITEM;
 }
 
-void DoSnowEffect(ITEM_INFO* skidooItem)
+void DoSnowEffect(ItemInfo* skidooItem)
 {
 	auto material = GetCollision(skidooItem).BottomBlock->Material;
 	if (material != FLOOR_MATERIAL::Ice && material != FLOOR_MATERIAL::Snow)
@@ -459,7 +459,7 @@ void DoSnowEffect(ITEM_INFO* skidooItem)
 	TEN::Effects::TriggerSnowmobileSnow(skidooItem);
 }
 
-bool SkidooControl(ITEM_INFO* laraItem, CollisionInfo* coll)
+bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
 	auto* skidooItem = &g_Level.Items[lara->Vehicle];
@@ -614,7 +614,7 @@ bool SkidooControl(ITEM_INFO* laraItem, CollisionInfo* coll)
 	return TestSkidooDismount(laraItem, skidooItem);
 }
 
-bool SkidooUserControl(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, int height, int* pitch)
+bool SkidooUserControl(ItemInfo* laraItem, ItemInfo* skidooItem, int height, int* pitch)
 {
 	auto* skidoo = (SkidooInfo*)skidooItem->Data;
 
@@ -696,7 +696,7 @@ bool SkidooUserControl(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, int height, i
 	return drive;
 }
 
-void SkidooAnimation(ITEM_INFO* laraItem, ITEM_INFO* skidooItem, int collide, bool dead)
+void SkidooAnimation(ItemInfo* laraItem, ItemInfo* skidooItem, int collide, bool dead)
 {
 	auto* skidoo = (SkidooInfo*)skidooItem->Data;
 
@@ -841,7 +841,7 @@ int DoSkidooDynamics(int height, int verticalVelocity, int* y)
 	return verticalVelocity;
 }
 
-int TestSkidooHeight(ITEM_INFO* skidooItem, int zOffset, int xOffset, Vector3Int* pos)
+int TestSkidooHeight(ItemInfo* skidooItem, int zOffset, int xOffset, Vector3Int* pos)
 {
 	pos->y = skidooItem->Pose.Position.y - zOffset * phd_sin(skidooItem->Pose.Orientation.x) + xOffset * phd_sin(skidooItem->Pose.Orientation.z);
 
@@ -861,7 +861,7 @@ int TestSkidooHeight(ITEM_INFO* skidooItem, int zOffset, int xOffset, Vector3Int
 	return probe.Position.Floor;
 }
 
-short DoSkidooShift(ITEM_INFO* skidooItem, Vector3Int* pos, Vector3Int* old)
+short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old)
 {
 	int	x = pos->x / SECTOR(1);
 	int z = pos->z / SECTOR(1);
@@ -961,7 +961,7 @@ short DoSkidooShift(ITEM_INFO* skidooItem, Vector3Int* pos, Vector3Int* old)
 	return 0;
 }
 
-int SkidooDynamics(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
+int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
 	auto* skidoo = (SkidooInfo*)skidooItem->Data;
 
@@ -1095,7 +1095,7 @@ int SkidooDynamics(ITEM_INFO* laraItem, ITEM_INFO* skidooItem)
 	return collide;
 }
 
-void DrawSkidoo(ITEM_INFO* skidooItem)
+void DrawSkidoo(ItemInfo* skidooItem)
 {
 
 }

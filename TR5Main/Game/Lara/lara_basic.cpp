@@ -28,12 +28,12 @@
 // MISCELLANEOUS:
 // --------------
 
-void lara_void_func(ITEM_INFO* item, CollisionInfo* coll)
+void lara_void_func(ItemInfo* item, CollisionInfo* coll)
 {
 	return;
 }
 
-void lara_default_col(ITEM_INFO* item, CollisionInfo* coll)
+void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -48,20 +48,20 @@ void lara_default_col(ITEM_INFO* item, CollisionInfo* coll)
 	LaraResetGravityStatus(item, coll);
 }
 
-void lara_as_special(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_special(ItemInfo* item, CollisionInfo* coll)
 {
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.targetAngle = ANGLE(170.0f);
 	Camera.targetElevation = -ANGLE(25.0f);
 }
 
-void lara_as_null(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_null(ItemInfo* item, CollisionInfo* coll)
 {
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 }
 
-void lara_as_controlled(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -78,7 +78,7 @@ void lara_as_controlled(ITEM_INFO* item, CollisionInfo* coll)
 	}
 }
 
-void lara_as_controlled_no_look(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -91,7 +91,7 @@ void lara_as_controlled_no_look(ITEM_INFO* item, CollisionInfo* coll)
 //				LS_VAULT_2_STEPS (165), LS_VAULT_3_STEPS (166),
 //				VAULT_1_STEP_CROUCH (167), VAULT_2_STEPS_CROUCH (168), VAULT_3_STEPS_CROUCH (169)
 // Collision:	lara_void_func()
-void lara_as_vault(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -106,7 +106,7 @@ void lara_as_vault(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_AUTO_JUMP (62)
 // Collision:	lara_as_jump_prepare()
-void lara_as_auto_jump(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -123,7 +123,7 @@ void lara_as_auto_jump(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_WALK_FORWARD (0)
 // Collision:	lara_col_walk_forward()
-void lara_as_walk_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -183,7 +183,7 @@ void lara_as_walk_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LA_WALK_FORWARD (0)
 // Control:		lara_as_walk_forward()
-void lara_col_walk_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -241,7 +241,7 @@ void lara_col_walk_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_RUN_FORWARD (1)
 // Collision:	lara_col_run_forward()
-void lara_as_run_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -325,7 +325,7 @@ void lara_as_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_RUN_FORWARD (1)
 // Control:		lara_as_run_forward()
-void lara_col_run_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -395,7 +395,7 @@ void lara_col_run_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_IDLE (2), LS_SPLAT_SOFT (170)
 // Collision:	lara_col_idle()
-void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -573,7 +573,7 @@ void lara_as_idle(ITEM_INFO* item, CollisionInfo* coll)
 // TODO: Future-proof for rising water.
 // TODO: Make these into true states someday? It may take a bit of work. @Sezz 2021.10.13
 // Pseudo-state for idling in wade-height water.
-void PseudoLaraAsWadeIdle(ITEM_INFO* item, CollisionInfo* coll)
+void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 	
@@ -641,7 +641,7 @@ void PseudoLaraAsWadeIdle(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Pseudo-state for idling in swamps.
-void PseudoLaraAsSwampIdle(ITEM_INFO* item, CollisionInfo* coll)
+void PseudoLaraAsSwampIdle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -703,7 +703,7 @@ void PseudoLaraAsSwampIdle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_IDLE (2), LS_POSE (4), LS_SPLAT_SOFT (170)
 // Control:		lara_as_idle(), lara_as_pose()
-void lara_col_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -753,7 +753,7 @@ void lara_col_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_POSE (4)
 // Collision:	lara_col_idle()
-void lara_as_pose(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 {
 	if (item->HitPoints <= 0)
 	{
@@ -787,7 +787,7 @@ void lara_as_pose(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_RUN_BACK (5)
 // Collision:	lara_col_run_back()
-void lara_as_run_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -819,7 +819,7 @@ void lara_as_run_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_RUN_BACK (5)
 // Control:		lara_as_run_back()
-void lara_col_run_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -863,7 +863,7 @@ void lara_col_run_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_TURN_RIGHT_SLOW (6)
 // Collision:	lara_col_turn_right_slow()
-void lara_as_turn_right_slow(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1002,7 +1002,7 @@ void lara_as_turn_right_slow(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Pseudo-state for turning right slowly in wade-height water.
-void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
+void PsuedoLaraAsWadeTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1067,7 +1067,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Pseudo-state for turning right slowly in swamps.
-void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
+void PsuedoLaraAsSwampTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1126,14 +1126,14 @@ void PsuedoLaraAsSwampTurnRightSlow(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_TURN_RIGHT_SLOW (6)
 // Control:		lara_as_turn_right_slow()
-void lara_col_turn_right_slow(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_idle(item, coll);
 }
 
 // State:		LS_TURN_LEFT_SLOW (7)
 // Collision:	lara_col_turn_left_slow()
-void lara_as_turn_left_slow(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1272,7 +1272,7 @@ void lara_as_turn_left_slow(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Pseudo-state for turning left slowly in wade-height water.
-void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
+void PsuedoLaraAsWadeTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1337,7 +1337,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Pseudo-state for turning left slowly in swamps.
-void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
+void PsuedoLaraAsSwampTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1396,14 +1396,14 @@ void PsuedoLaraAsSwampTurnLeftSlow(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_TURN_LEFT_SLOW (7)
 // Control:		lara_as_turn_left_slow()
-void lara_col_turn_left_slow(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_turn_right_slow(item, coll);
 }
 
 // State:		LS_DEATH (8)
 // Collision:	lara_col_death()
-void lara_as_death(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1423,7 +1423,7 @@ void lara_as_death(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_DEATH (8)
 // Control:		lara_as_death()
-void lara_col_death(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1451,7 +1451,7 @@ void lara_col_death(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SPLAT (12)
 // Collision:	lara_col_splat()
-void lara_as_splat(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1460,7 +1460,7 @@ void lara_as_splat(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SPLAT (12)
 // Control:		lara_as_splat()
-void lara_col_splat(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_splat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1484,7 +1484,7 @@ void lara_col_splat(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_WALK_BACK (16)
 // Collision:	lara_col_walk_back()
-void lara_as_walk_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1537,7 +1537,7 @@ void lara_as_walk_back(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Pseudo-state for walking back in swamps.
-void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, CollisionInfo* coll)
+void PseudoLaraAsSwampWalkBack(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1570,7 +1570,7 @@ void PseudoLaraAsSwampWalkBack(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_WALK_BACK (16)
 // Control:		lara_as_walk_back()
-void lara_col_walk_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1618,7 +1618,7 @@ void lara_col_walk_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_TURN_RIGHT_FAST (20)
 // Collision:	lara_col_turn_right_fast()
-void lara_as_turn_right_fast(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1742,14 +1742,14 @@ void lara_as_turn_right_fast(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_TURN_RIGHT_FAST (20)
 // Control:		lara_as_turn_right_fast()
-void lara_col_turn_right_fast(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_idle(item, coll);
 }
 
 // State:		LS_TURN_LEFT_FAST (152)
 // Collision:	lara_col_turn_left_fast()
-void lara_as_turn_left_fast(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1872,14 +1872,14 @@ void lara_as_turn_left_fast(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_TURN_LEFT_FAST (152)
 // Control:		lara_as_turn_left_fast()
-void lara_col_turn_left_fast(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_idle(item, coll);
 }
 
 // State:		LS_STEP_RIGHT (21)
 // Collision:	lara_col_step_right()
-void lara_as_step_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1922,7 +1922,7 @@ void lara_as_step_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_STEP_RIGHT (21)
 // Control:		lara_as_step_right()
-void lara_col_step_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1979,7 +1979,7 @@ void lara_col_step_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_STEP_LEFT (22)
 // Collision:	lara_col_step_left()
-void lara_as_step_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2021,7 +2021,7 @@ void lara_as_step_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_STEP_LEFT (22)
 // Control:		lara_as_step_left()
-void lara_col_step_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2078,7 +2078,7 @@ void lara_col_step_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ROLL_BACK (23)
 // Collision:	lara_col_roll_back()
-void lara_as_roll_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2095,7 +2095,7 @@ void lara_as_roll_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ROLL_BACK (23)
 // Control:		lara_as_roll_back()
-void lara_col_roll_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2139,7 +2139,7 @@ void lara_col_roll_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ROLL_FORWARD (45)
 // Collision:	lara_col_roll_forward()
-void lara_as_roll_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2164,7 +2164,7 @@ void lara_as_roll_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_ROLL_FORWARD (45)
 // Control:		lara_as_roll_forward()
-void lara_col_roll_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_roll_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2207,7 +2207,7 @@ void lara_col_roll_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_WADE_FORWARD (65)
 // Collision:	lara_col_wade_forward()
-void lara_as_wade_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2267,7 +2267,7 @@ void lara_as_wade_forward(ITEM_INFO* item, CollisionInfo* coll)
 }
 
 // Pseudo-state for wading in swamps.
-void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, CollisionInfo* coll)
+void PseudoLaraAsSwampWadeForward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2309,7 +2309,7 @@ void PseudoLaraAsSwampWadeForward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_WADE_FORWARD (65)
 // Control:		lara_as_wade_forward()
-void lara_col_wade_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2355,7 +2355,7 @@ void lara_col_wade_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SPRINT (73)
 // Collision:	lara_col_sprint()
-void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2441,7 +2441,7 @@ void lara_as_sprint(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SPRINT (73)
 // Control:		lara_as_sprint()
-void lara_col_sprint(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2508,7 +2508,7 @@ void lara_col_sprint(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SPRINT_DIVE (74)
 // Collision:	lara_col_sprint_dive()
-void lara_as_sprint_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -2538,7 +2538,7 @@ void lara_as_sprint_dive(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SPRINT_DIVE (74)
 // Control:		lara_col_sprint_dive()
-void lara_col_sprint_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

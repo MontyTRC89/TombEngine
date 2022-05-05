@@ -20,7 +20,7 @@ namespace TEN::Effects
 		return simpleParticles[0];
 	}
 
-	void TriggerSnowmobileSnow(ITEM_INFO* snowMobile)
+	void TriggerSnowmobileSnow(ItemInfo* snowMobile)
 	{
 		float angle = TO_RAD(snowMobile->Pose.Orientation.y);
 		const float angleVariation = GenerateFloat(-10, 10) * RADIAN;
@@ -40,7 +40,7 @@ namespace TEN::Effects
 		p.size = GenerateFloat(256, 512);
 	}
 
-	void TriggerSpeedboatFoam(ITEM_INFO* boat)
+	void TriggerSpeedboatFoam(ItemInfo* boat)
 	{
 		for (float i = -0.5; i < 1; i += 1)
 		{

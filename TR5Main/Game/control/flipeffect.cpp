@@ -78,67 +78,67 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	KillActiveBaddies			//46
 };
 
-void FlashOrange(ITEM_INFO* item) 
+void FlashOrange(ItemInfo* item) 
 {
 	FlipEffect = -1;
 	Weather.Flash(255, 128, 0, 0.03f);
 }
 
-void MeshSwapToPour(ITEM_INFO* item)
+void MeshSwapToPour(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->MeshPtrs[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
 }
 
-void MeshSwapFromPour(ITEM_INFO* item)
+void MeshSwapFromPour(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
-void Pickup(ITEM_INFO* item)
+void Pickup(ItemInfo* item)
 {
 	DoPickup(item);
 }
 
-void Puzzle(ITEM_INFO* item)
+void Puzzle(ItemInfo* item)
 {
 	DoPuzzle();
 }
 
-void AddLeftFootprint(ITEM_INFO* item)
+void AddLeftFootprint(ItemInfo* item)
 {
 	AddFootprint(item, false);
 }
 
-void AddRightFootprint(ITEM_INFO* item)
+void AddRightFootprint(ItemInfo* item)
 {
 	AddFootprint(item, true);
 }
 
-void ResetHair(ITEM_INFO* item)
+void ResetHair(ItemInfo* item)
 {
 	InitialiseHair();
 }
 
-void InvisibilityOff(ITEM_INFO* item)
+void InvisibilityOff(ItemInfo* item)
 {
 	item->Status = ITEM_ACTIVE;
 }
 
-void InvisibilityOn(ITEM_INFO* item)
+void InvisibilityOn(ItemInfo* item)
 {
 	item->Status = ITEM_INVISIBLE;
 }
 
-void SetFog(ITEM_INFO* item)
+void SetFog(ItemInfo* item)
 {
 	FlipEffect = -1;
 }
 
-void DrawLeftPistol(ITEM_INFO* item)
+void DrawLeftPistol(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -154,7 +154,7 @@ void DrawLeftPistol(ITEM_INFO* item)
 	}
 }
 
-void DrawRightPistol(ITEM_INFO* item)
+void DrawRightPistol(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -170,28 +170,28 @@ void DrawRightPistol(ITEM_INFO* item)
 	}
 }
 
-void ShootLeftGun(ITEM_INFO* item)
+void ShootLeftGun(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->LeftArm.FlashGun = 3;
 }
 
-void ShootRightGun(ITEM_INFO* item)
+void ShootRightGun(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->RightArm.FlashGun = 3;
 }
 
-void LaraHandsFree(ITEM_INFO* item)
+void LaraHandsFree(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
-void KillActiveBaddies(ITEM_INFO* item)
+void KillActiveBaddies(ItemInfo* item)
 {
 	if (NextItemActive != NO_ITEM)
 	{
@@ -220,7 +220,7 @@ void KillActiveBaddies(ITEM_INFO* item)
 	FlipEffect = -1;
 }
 
-void LaraLocationPad(ITEM_INFO* item)
+void LaraLocationPad(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -230,7 +230,7 @@ void LaraLocationPad(ITEM_INFO* item)
 	lara->LocationPad = TriggerTimer;
 }
 
-void LaraLocation(ITEM_INFO* item)
+void LaraLocation(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -241,14 +241,14 @@ void LaraLocation(ITEM_INFO* item)
 		lara->HighestLocation = TriggerTimer;
 }
 
-void ExplosionFX(ITEM_INFO* item)
+void ExplosionFX(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
 	Camera.bounce = -75;
 	FlipEffect = -1;
 }
 
-void SwapCrowbar(ITEM_INFO* item)
+void SwapCrowbar(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -258,23 +258,23 @@ void SwapCrowbar(ITEM_INFO* item)
 		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
-void ActivateKey(ITEM_INFO* item)
+void ActivateKey(ItemInfo* item)
 {
 	KeyTriggerActive = 1;
 }
 
-void ActivateCamera(ITEM_INFO* item)
+void ActivateCamera(ItemInfo* item)
 {
 	KeyTriggerActive = 2;
 }
 
-void PoseidonSFX(ITEM_INFO* item)
+void PoseidonSFX(ItemInfo* item)
 {
 	SoundEffect(SFX_TR4_WATER_FLUSHES, NULL, 0);
 	FlipEffect = -1;
 }
 
-void RubbleFX(ITEM_INFO* item)
+void RubbleFX(ItemInfo* item)
 {
 	const auto itemList = FindAllItems(ID_EARTHQUAKE);
 
@@ -292,13 +292,13 @@ void RubbleFX(ITEM_INFO* item)
 	FlipEffect = -1;
 }
 
-void PlaySoundEffect(ITEM_INFO* item)
+void PlaySoundEffect(ItemInfo* item)
 {
 	SoundEffect(TriggerTimer, NULL, 0);
 	FlipEffect = -1;
 }
 
-void FloorShake(ITEM_INFO* item)
+void FloorShake(ItemInfo* item)
 {
 	int x = abs(item->Pose.Position.x - Camera.pos.x);
 	int y = abs(item->Pose.Position.y - Camera.pos.y);
@@ -312,23 +312,23 @@ void FloorShake(ITEM_INFO* item)
 	}
 }
 
-void Turn180(ITEM_INFO* item)
+void Turn180(ItemInfo* item)
 {
 	item->Pose.Orientation.y -= ANGLE(180.0f);
 	item->Pose.Orientation.x = -item->Pose.Orientation.x;
 }
 
-void FinishLevel(ITEM_INFO* item)
+void FinishLevel(ItemInfo* item)
 {
 	LevelComplete = CurrentLevel + 1;
 }
 
-void VoidEffect(ITEM_INFO* item)
+void VoidEffect(ItemInfo* item)
 {
 
 }
 
-void DoFlipEffect(int number, ITEM_INFO* item)
+void DoFlipEffect(int number, ItemInfo* item)
 {
 	if (number != -1 && number < NUM_FLIPEFFECTS && effect_routines[number] != nullptr)
 		effect_routines[number](item);

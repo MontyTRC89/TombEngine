@@ -172,7 +172,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 					if (itemRoom != NO_ITEM)
 					{
-						ITEM_INFO* item;
+						ItemInfo* item;
 						short nextItem;
 
 						while (true)
@@ -338,7 +338,7 @@ void UseClockworkBeetle(short flag)
 
 			if (item->ItemFlags[0])
 			{
-				ITEM_INFO* item2;
+				ItemInfo* item2;
 				short itemRoom = g_Level.Rooms[item->RoomNumber].itemNumber;
 
 				if (itemRoom != NO_ITEM)

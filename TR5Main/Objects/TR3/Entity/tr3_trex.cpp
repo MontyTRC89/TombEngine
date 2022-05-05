@@ -23,7 +23,7 @@ enum TRexAnim
 
 };
 
-void LaraTRexDeath(ITEM_INFO* tRexItem, ITEM_INFO* laraItem)
+void LaraTRexDeath(ItemInfo* tRexItem, ItemInfo* laraItem)
 {
 	tRexItem->Animation.TargetState = 8;
 

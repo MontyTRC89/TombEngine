@@ -21,7 +21,7 @@
 
 // State:		LS_UNDERWATER_IDLE (13)
 // Collision:	lara_col_underwater_idle()
-void lara_as_underwater_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -62,14 +62,14 @@ void lara_as_underwater_idle(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_IDLE (13)
 // Control:		lara_as_underwater_idle()
-void lara_col_underwater_idle(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
 // State:		LS_UNDERWATER_SWIM_FORWARD (17)
 // Collision:	lara_col_underwater_swim_forward()
-void lara_as_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
@@ -100,14 +100,14 @@ void lara_as_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_SWIM_FORWARD (17)
 // Control:		lara_as_underwater_swim_forward()
-void lara_col_underwater_swim_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
 // State:		LS_UNDERWATER_INERTIA (18)
 // Collision:	lara_col_underwater_inertia()
-void lara_as_underwater_inertia(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
@@ -141,14 +141,14 @@ void lara_as_underwater_inertia(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_INERTIA (18)
 // Collision:	lara_as_underwater_inertia()
-void lara_col_underwater_inertia(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }
 
 // State:		LS_WATER_DEATH (44)
 // Collision:	lara_col_underwater_death()
-void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -172,7 +172,7 @@ void lara_as_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_WATER_DEATH (44)
 // Control:	lara_as_underwater_death()
-void lara_col_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -192,14 +192,14 @@ void lara_col_underwater_death(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_UNDERWATER_ROLL (66)
 // Collision:	lara_col_underwater_roll_180()
-void lara_as_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_underwater_roll_180(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.VerticalVelocity = 0;
 }
 
 // State:		LS_UNDERWATER_ROLL (66)
 // Control:		lara_as_underwater_roll_180()
-void lara_col_underwater_roll_180(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_underwater_roll_180(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraSwimCollision(item, coll);
 }

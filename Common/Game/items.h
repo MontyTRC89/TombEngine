@@ -67,7 +67,7 @@ struct EntityAnimationData
 	std::vector<BONE_MUTATOR> Mutator;
 };
 
-struct ITEM_INFO
+struct ItemInfo
 {
 	std::string LuaName;
 	GAME_OBJECT_ID ObjectNumber;
@@ -128,7 +128,7 @@ void KillEffect(short fxNumber);
 void InitialiseItem(short itemNumber);
 void InitialiseItemArray(int totalItems);
 void KillItem(short itemNumber);
-void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset = 0, int zOffset = 0);
+void UpdateItemRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0);
 std::vector<int> FindAllItems(short objectNumber);
-ITEM_INFO* FindItem(int objectNumber);
-int FindItem(ITEM_INFO* item);
+ItemInfo* FindItem(int objectNumber);
+int FindItem(ItemInfo* item);

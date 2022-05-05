@@ -135,7 +135,7 @@ void UPVInitialise(short itemNumber)
 	UPV->HarpoonLeft = false;
 }
 
-static void FireUPVHarpoon(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto UPV = (UPVInfo*)UPVItem->Data;
@@ -299,7 +299,7 @@ void UPVEffects(short itemNumber)
 		UPV->HarpoonTimer--;
 }
 
-static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static bool TestUPVDismount(ItemInfo* laraItem, ItemInfo* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -325,7 +325,7 @@ static bool TestUPVDismount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	return true;
 }
 
-static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static bool TestUPVMount(ItemInfo* laraItem, ItemInfo* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -354,7 +354,7 @@ static bool TestUPVMount(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	return true;
 }
 
-static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static void DoCurrent(ItemInfo* laraItem, ItemInfo* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -416,7 +416,7 @@ static void DoCurrent(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	UPVItem->Pose.Position.z += lara->WaterCurrentPull.z / CLICK(1);
 }
 
-static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static void BackgroundCollision(ItemInfo* laraItem, ItemInfo* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPV = (UPVInfo*)UPVItem->Data;
@@ -508,7 +508,7 @@ static void BackgroundCollision(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 	}
 }
 
-static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
+static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPV = (UPVInfo*)UPVItem->Data;
@@ -851,7 +851,7 @@ static void UPVControl(ITEM_INFO* laraItem, ITEM_INFO* UPVItem)
 		UPV->XRot = -MAX_UPDOWN;
 }
 
-void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void NoGetOnCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -863,7 +863,7 @@ void NoGetOnCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll
 	ItemPushItem(item, laraItem, coll, 0, 0);
 }
 
-void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void UPVCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPVItem = &g_Level.Items[itemNumber];
@@ -916,7 +916,7 @@ void UPVCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	}
 }
 
-bool UPVControl(ITEM_INFO* laraItem, CollisionInfo* coll)
+bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* UPVItem = &g_Level.Items[lara->Vehicle];

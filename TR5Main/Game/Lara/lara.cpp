@@ -43,7 +43,7 @@ using std::function;
 using TEN::Renderer::g_Renderer;
 
 LaraInfo Lara;
-ITEM_INFO* LaraItem;
+ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
@@ -401,7 +401,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_idle,//170
 };
 
-void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
+void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -728,7 +728,7 @@ void LaraControl(ITEM_INFO* item, CollisionInfo* coll)
 		pow(item->Pose.Position.z - oldPos.z, 2));
 }
 
-void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
+void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -802,7 +802,7 @@ void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll)
 	TestVolumes(Lara.ItemNumber);
 }
 
-void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
+void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -893,7 +893,7 @@ void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll)
 	TestVolumes(Lara.ItemNumber);
 }
 
-void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
+void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -996,7 +996,7 @@ void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll)
 	TestVolumes(Lara.ItemNumber);
 }
 
-void LaraCheat(ITEM_INFO* item, CollisionInfo* coll)
+void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 

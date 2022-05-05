@@ -114,7 +114,7 @@ static std::unique_ptr<Moveable> Create(
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
 
-		ITEM_INFO* item = &g_Level.Items[num];
+		ItemInfo* item = &g_Level.Items[num];
 		ptr->SetPos(pos);
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
 		ptr->SetRoom(room);

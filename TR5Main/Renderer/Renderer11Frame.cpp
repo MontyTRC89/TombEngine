@@ -328,7 +328,7 @@ namespace TEN::Renderer
 		short itemNum = NO_ITEM;
 		for (itemNum = r->itemNumber; itemNum != NO_ITEM; itemNum = g_Level.Items[itemNum].NextItem)
 		{
-			ITEM_INFO* item = &g_Level.Items[itemNum];
+			ItemInfo* item = &g_Level.Items[itemNum];
 
 			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
 				break;
@@ -506,7 +506,7 @@ namespace TEN::Renderer
 
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
-		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		std::vector<int> roomsToCheck;
 		roomsToCheck.push_back(roomNumber);

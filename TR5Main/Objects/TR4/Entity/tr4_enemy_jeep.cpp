@@ -16,7 +16,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/misc.h"
 
-void EnemyJeepLaunchGrenade(ITEM_INFO* item)
+void EnemyJeepLaunchGrenade(ItemInfo* item)
 {
 	short grenadeItemNumber = CreateItem();
 

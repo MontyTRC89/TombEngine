@@ -6,7 +6,7 @@
 #include "Specific/phd_global.h"
 
 struct BOUNDING_BOX;
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 class FLOOR_INFO;
 struct ANIM_STRUCT;
@@ -84,7 +84,7 @@ int GetRandomDraw();
 void KillMoveItems();
 void KillMoveEffects();
 void UpdateShatters();
-bool ExplodeItemNode(ITEM_INFO* item, int node, int noXZVel, int bits);
+bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits);
 
 void CleanUp();
 

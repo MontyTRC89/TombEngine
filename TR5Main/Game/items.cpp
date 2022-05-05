@@ -452,7 +452,7 @@ void InitialiseItemArray(int totalItem)
 	item->NextItem = NO_ITEM;
 }
 
-short SpawnItem(ITEM_INFO* item, GAME_OBJECT_ID objectNumber)
+short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
 {
 	short itemNumber = CreateItem();
 	if (itemNumber != NO_ITEM)
@@ -493,7 +493,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
-void UpdateItemRoom(ITEM_INFO* item, int height, int xOffset, int zOffset)
+void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
 	float s = phd_sin(item->Pose.Orientation.y);
 	float c = phd_cos(item->Pose.Orientation.y);
@@ -522,7 +522,7 @@ std::vector<int> FindAllItems(short objectNumber)
 	return itemList;
 }
 
-ITEM_INFO* FindItem(int objectNumber)
+ItemInfo* FindItem(int objectNumber)
 {
 	for (int i = 0; i < g_Level.NumItems; i++)
 	{
@@ -535,7 +535,7 @@ ITEM_INFO* FindItem(int objectNumber)
 	return 0;
 }
 
-int FindItem(ITEM_INFO* item)
+int FindItem(ItemInfo* item)
 {
 	if (item == LaraItem)
 		return Lara.ItemNumber;

@@ -10,12 +10,12 @@
 
 using std::vector;
 
-CreatureInfo* GetCreatureInfo(ITEM_INFO* item)
+CreatureInfo* GetCreatureInfo(ItemInfo* item)
 {
     return (CreatureInfo*)item->Data;
 }
 
-void TargetNearestEntity(ITEM_INFO* item, CreatureInfo* creature)
+void TargetNearestEntity(ItemInfo* item, CreatureInfo* creature)
 {
 	int bestDistance = MAXINT;
 	for (int i = 0; i < g_Level.NumItems; i++)

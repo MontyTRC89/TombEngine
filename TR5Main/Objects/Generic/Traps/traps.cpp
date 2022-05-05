@@ -22,7 +22,7 @@ static short WreckingBallData[2] = {0, 0};
 
 void InitialiseWreckingBall(short itemNumber)
 {
-	ITEM_INFO* item;
+	ItemInfo* item;
 	short room;
 
 	item = &g_Level.Items[itemNumber];
@@ -34,9 +34,9 @@ void InitialiseWreckingBall(short itemNumber)
 		ItemNewRoom(itemNumber, room);
 }
 
-void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
+void WreckingBallCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 {
-	ITEM_INFO* item;
+	ItemInfo* item;
 	int x, y, z, test;
 	short damage;
 
@@ -77,7 +77,7 @@ void WreckingBallCollision(short itemNumber, ITEM_INFO* l, CollisionInfo* coll)
 
 void WreckingBallControl(short itemNumber)
 {
-	ITEM_INFO* item, *item2;
+	ItemInfo* item, *item2;
 	int test, x, z, oldX, oldZ, wx, wz, flagX, flagZ, height, dx, dz, ceilingX, ceilingZ, adx, adz;
 	short room;
 

@@ -115,7 +115,7 @@ void LoadItems()
 	{
 		for (int i = 0; i < g_Level.NumItems; i++)
 		{
-			ITEM_INFO* item = &g_Level.Items[i];
+			ItemInfo* item = &g_Level.Items[i];
 			
 			item->ObjectNumber = from_underlying(ReadInt16());
 			item->RoomNumber = ReadInt16();

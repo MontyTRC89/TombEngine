@@ -295,7 +295,7 @@ namespace TEN::Entities::TR4
 
 		/*if (g_Level.NumItems > 0)
 		{
-			ITEM_INFO* currentItem = &g_Level.Items[0];
+			ItemInfo* currentItem = &g_Level.Items[0];
 			int k = 0;
 
 			while (item == currentItem || currentItem->objectNumber != ID_DEMIGOD3 || currentItem->itemFlags[0])

@@ -38,10 +38,10 @@ namespace TEN::Entities::Switches
 		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	void CrowbarSwitchCollision(short itemNumber, ITEM_INFO* laraitem, CollisionInfo* coll)
+	void CrowbarSwitchCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraitem);
-		ITEM_INFO* switchItem = &g_Level.Items[itemNumber];
+		ItemInfo* switchItem = &g_Level.Items[itemNumber];
 
 		int doSwitch = 0;
 

@@ -56,7 +56,7 @@ void RaptorControl(short itemNumber)
 	{
 		if (creature->Enemy == NULL || !(GetRandomControl() & 0x7F))
 		{
-			ITEM_INFO* nearestItem = NULL;
+			ItemInfo* nearestItem = NULL;
 			int minDistance = MAXINT;
 
 			for (int i = 0; i < ActiveCreatures.size(); i++)

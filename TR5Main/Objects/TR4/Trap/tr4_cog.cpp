@@ -35,7 +35,7 @@ namespace TEN::Entities::TR4
             item->Status |= ITEM_INVISIBLE;
     }
 
-    void CogCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+    void CogCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
     {
         auto* cogItem = &g_Level.Items[itemNumber];
         
