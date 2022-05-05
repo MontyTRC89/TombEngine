@@ -533,7 +533,7 @@ namespace TEN::Renderer
 		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
 
-		OBJECT_INFO* obj = &Objects[0];
+		ObjectInfo* obj = &Objects[0];
 		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
@@ -586,7 +586,7 @@ namespace TEN::Renderer
 				break;
 			}
 
-			OBJECT_INFO* flashObj = &Objects[ID_GUN_FLASH];
+			ObjectInfo* flashObj = &Objects[ID_GUN_FLASH];
 			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
@@ -643,7 +643,7 @@ namespace TEN::Renderer
 			{
 				// Does the item need gunflash?
 				ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-				OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
+				ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
 
 				if (obj->biteOffset == -1)
 					continue;
@@ -753,7 +753,7 @@ namespace TEN::Renderer
 
 				// Check if water room
 				short roomNumber = Camera.pos.roomNumber;
-				FLOOR_INFO* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
+				FloorInfo* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
 				if (!IsRoomUnderwater(roomNumber))
 					continue;
 
@@ -1097,7 +1097,7 @@ namespace TEN::Renderer
 			for (auto effect : room->EffectsToDraw)
 			{
 				RendererRoom const& room = m_rooms[effect->Effect->roomNumber];
-				OBJECT_INFO* obj = &Objects[effect->Effect->objectNumber];
+				ObjectInfo* obj = &Objects[effect->Effect->objectNumber];
 
 				if (obj->drawRoutine && obj->loaded)
 					DrawEffect(view, effect, transparent);

@@ -200,7 +200,7 @@ void ControlTeleporter(short itemNumber)
 		LaraItem->Pose.Orientation.y = item->Pose.Orientation.y - ANGLE(180.0f);
 
 		short roomNumber = item->RoomNumber;
-		FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 		LaraItem->Pose.Position.y = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
 		if (LaraItem->RoomNumber != roomNumber)

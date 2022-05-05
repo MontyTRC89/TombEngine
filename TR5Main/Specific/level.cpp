@@ -145,7 +145,7 @@ void LoadItems()
 
 void LoadObjects()
 {
-	std::memset(Objects, 0, sizeof(OBJECT_INFO) * ID_NUMBER_OBJECTS);
+	std::memset(Objects, 0, sizeof(ObjectInfo) * ID_NUMBER_OBJECTS);
 	std::memset(StaticObjects, 0, sizeof(STATIC_INFO) * MAX_STATICS);
 
 	int numMeshes = ReadInt32();
@@ -647,7 +647,7 @@ void ReadRooms()
 
 		for (int j = 0; j < room.zSize * room.xSize; j++)
 		{
-			FLOOR_INFO floor;
+			FloorInfo floor;
 
 			floor.TriggerIndex = ReadInt32();
 			floor.Box = ReadInt32();

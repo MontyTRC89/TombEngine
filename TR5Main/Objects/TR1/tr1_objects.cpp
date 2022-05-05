@@ -19,7 +19,7 @@
 #include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/Utils/object_helper.h"
 
-static void StartEntity(OBJECT_INFO* obj)
+static void StartEntity(ObjectInfo* obj)
 {
 	obj = &Objects[ID_WOLF];
 	if (obj->loaded)
@@ -173,7 +173,7 @@ static void StartEntity(OBJECT_INFO* obj)
 	}
 }
 
-static void StartObject(OBJECT_INFO* obj)
+static void StartObject(ObjectInfo* obj)
 {
 	obj = &Objects[ID_BACON_REFERENCE];
 	if (obj->loaded)
@@ -184,17 +184,17 @@ static void StartObject(OBJECT_INFO* obj)
 	}
 }
 
-static void StartTrap(OBJECT_INFO* obj)
+static void StartTrap(ObjectInfo* obj)
 {
 
 }
 
-static void StartProjectiles(OBJECT_INFO* obj)
+static void StartProjectiles(ObjectInfo* obj)
 {
 	InitProjectile(obj, ControlCentaurBomb, ID_PROJ_BOMB);
 }
 
-static OBJECT_INFO* objToInit;
+static ObjectInfo* objToInit;
 void InitialiseTR1Objects()
 {
 	StartEntity(objToInit);

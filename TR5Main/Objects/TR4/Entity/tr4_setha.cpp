@@ -45,7 +45,7 @@ void SethaControl(short itemNumber)
 	int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 	int ceiling = GetCeiling(floor, x, y, z);
 
 	x += dx;

@@ -405,7 +405,7 @@ bool SaveGame::Save(int slot)
 	int currentItemIndex = 0;
 	for (auto& itemToSerialize : g_Level.Items) 
 	{
-		OBJECT_INFO* obj = &Objects[itemToSerialize.ObjectNumber];
+		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
 
 		auto luaNameOffset = fbb.CreateString(itemToSerialize.LuaName);
 
@@ -958,7 +958,7 @@ bool SaveGame::Load(int slot)
 		if (!room->mesh[i].flags)
 		{
 			short roomNumber = staticMesh->room_number();
-			FLOOR_INFO* floor = GetFloor(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, &roomNumber);
+			FloorInfo* floor = GetFloor(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, &roomNumber);
 			TestTriggers(room->mesh[i].pos.Position.x, room->mesh[i].pos.Position.y, room->mesh[i].pos.Position.z, staticMesh->room_number(), true, 0);
 			floor->Stopper = false;
 		}
@@ -1013,7 +1013,7 @@ bool SaveGame::Load(int slot)
 		ItemInfo* item = &g_Level.Items[itemNumber];
 		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
 
-		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+		ObjectInfo* obj = &Objects[item->ObjectNumber];
 		
 		if (savedItem->lua_name() != nullptr)
 		{
@@ -1087,7 +1087,7 @@ bool SaveGame::Load(int slot)
 
 			if (obj->shadowSize)
 			{
-				FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+				FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 				item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			}
 		}

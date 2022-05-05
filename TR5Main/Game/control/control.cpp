@@ -703,7 +703,7 @@ void UpdateShatters()
 	{
 		SmashedMeshCount--;
 
-		FLOOR_INFO* floor = GetFloor(
+		FloorInfo* floor = GetFloor(
 			SmashedMesh[SmashedMeshCount]->pos.Position.x,
 			SmashedMesh[SmashedMeshCount]->pos.Position.y,
 			SmashedMesh[SmashedMeshCount]->pos.Position.z,

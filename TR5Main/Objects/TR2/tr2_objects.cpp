@@ -35,7 +35,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 
-static void StartEntity(OBJECT_INFO* obj)
+static void StartEntity(ObjectInfo* obj)
 {
 	obj = &Objects[ID_SHARK];
 	if (obj->loaded)
@@ -628,12 +628,12 @@ static void StartEntity(OBJECT_INFO* obj)
 	}
 }
 
-static void StartObject(OBJECT_INFO* obj)
+static void StartObject(ObjectInfo* obj)
 {
 	
 }
 
-static void StartTrap(OBJECT_INFO* obj)
+static void StartTrap(ObjectInfo* obj)
 {
 	obj = &Objects[ID_ROLLING_SPINDLE];
 	if (obj->loaded)
@@ -656,7 +656,7 @@ static void StartTrap(OBJECT_INFO* obj)
 }
 
 // boat, snowmobile, snowmobile gun
-static void StartVehicles(OBJECT_INFO* obj)
+static void StartVehicles(ObjectInfo* obj)
 {
 	// TODO: fix BoatControl() not using int BoatControl(void)
 	obj = &Objects[ID_SPEEDBOAT];
@@ -684,7 +684,7 @@ static void StartVehicles(OBJECT_INFO* obj)
 	}
 }
 
-static OBJECT_INFO* objToInit;
+static ObjectInfo* objToInit;
 void InitialiseTR2Objects()
 {
 	StartEntity(objToInit);

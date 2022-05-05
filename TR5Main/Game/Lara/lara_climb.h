@@ -34,7 +34,7 @@ void lara_as_climb_stepoff_left(ItemInfo* item, CollisionInfo* coll);
 void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll);
 
 short GetClimbFlags(int x, int y, int z, short roomNumber);
-short GetClimbFlags(FLOOR_INFO* floor);
+short GetClimbFlags(FloorInfo* floor);
 CLIMB_DIRECTION GetClimbDirection(short angle);
 
 int LaraTestClimbPos(ItemInfo* item, int front, int right, int origin, int height, int* shift);

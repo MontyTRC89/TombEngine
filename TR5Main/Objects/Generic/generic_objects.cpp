@@ -305,7 +305,7 @@ void StartSwitches()
 
 void StartDoors()
 {
-	OBJECT_INFO* object;
+	ObjectInfo* object;
 
 	for (int objectNumber = ID_DOOR_TYPE1; objectNumber <= ID_DOOR_TYPE30; objectNumber++)
 	{

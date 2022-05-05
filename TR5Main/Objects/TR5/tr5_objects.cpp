@@ -67,7 +67,7 @@
 #include "Game/control/box.h"
 using namespace TEN::Entities::TR5;
 
-static void StartEntity(OBJECT_INFO *obj)
+static void StartEntity(ObjectInfo *obj)
 {
 	obj = &Objects[ID_LARA];
 	if (obj->loaded)
@@ -878,7 +878,7 @@ static void StartEntity(OBJECT_INFO *obj)
 	}
 }
 
-static void StartObject(OBJECT_INFO *obj)
+static void StartObject(ObjectInfo *obj)
 {
 	InitPickupItem(obj, FlareControl, ID_FLARE_ITEM);
 
@@ -1052,7 +1052,7 @@ static void StartObject(OBJECT_INFO *obj)
 	}
 }
 
-static void StartTrap(OBJECT_INFO *obj)
+static void StartTrap(ObjectInfo *obj)
 {
 	obj = &Objects[ID_ZIPLINE_HANDLE];
 	if (obj->loaded)
@@ -1173,7 +1173,7 @@ static void StartTrap(OBJECT_INFO *obj)
 	}
 }
 
-static void StartSwitch(OBJECT_INFO *obj)
+static void StartSwitch(ObjectInfo *obj)
 {
 	obj = &Objects[ID_RAISING_COG];
 	if (obj->loaded)
@@ -1199,13 +1199,13 @@ static void StartSwitch(OBJECT_INFO *obj)
 	}
 }
 
-static void StartShatter(OBJECT_INFO *obj)
+static void StartShatter(ObjectInfo *obj)
 {
 	for (int i = ID_SMASH_OBJECT1; i <= ID_SMASH_OBJECT16; i++)
 		InitSmashObject(obj, i);
 }
 
-static void StartProjectiles(OBJECT_INFO *obj)
+static void StartProjectiles(ObjectInfo *obj)
 {
 	InitProjectile(obj, MissileControl, ID_BUBBLES, true);
 	InitProjectile(obj, MissileControl, ID_IMP_ROCK, true);
@@ -1216,7 +1216,7 @@ static void StartProjectiles(OBJECT_INFO *obj)
 	InitProjectile(obj, CrossbowBoltControl, ID_CROSSBOW_BOLT);
 }
 
-static void StartPickup(OBJECT_INFO *obj)
+static void StartPickup(ObjectInfo *obj)
 {
 	for (int objNumber = ID_PUZZLE_ITEM1; objNumber <= ID_EXAMINE8_COMBO2; objNumber++)
 	{
@@ -1260,7 +1260,7 @@ static void StartPickup(OBJECT_INFO *obj)
 	InitPickup(obj, ID_DIARY_ITEM);
 }
 
-static OBJECT_INFO *objToInit;
+static ObjectInfo *objToInit;
 void InitialiseTR5Objects()
 {
 	StartEntity(objToInit);

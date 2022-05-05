@@ -4,7 +4,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FLOOR_INFO;
+struct FloorInfo;
 struct MESH_INFO;
 
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;

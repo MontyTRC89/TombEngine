@@ -242,7 +242,7 @@ void RefreshCamera(short type, short* data)
 		Camera.timer = -1;
 }
 
-short* GetTriggerIndex(FLOOR_INFO* floor, int x, int y, int z)
+short* GetTriggerIndex(FloorInfo* floor, int x, int y, int z)
 {
 	auto bottomBlock = GetCollision(x, y, z, floor->Room).BottomBlock; 
 
@@ -259,7 +259,7 @@ short* GetTriggerIndex(ItemInfo* item)
 	return GetTriggerIndex(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 }
 
-void TestTriggers(FLOOR_INFO* floor, int x, int y, int z, bool heavy, int heavyFlags)
+void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFlags)
 {
 	int flip = -1;
 	int flipAvailable = 0;
@@ -722,7 +722,7 @@ void ProcessSectorFlags(int x, int y, int z, short roomNumber)
 	ProcessSectorFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
 }
 
-void ProcessSectorFlags(FLOOR_INFO* floor)
+void ProcessSectorFlags(FloorInfo* floor)
 {
 	// Monkeyswing
 	Lara.Control.CanMonkeySwing = floor->Flags.Monkeyswing;

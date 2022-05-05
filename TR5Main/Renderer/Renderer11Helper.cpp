@@ -191,7 +191,7 @@ namespace TEN::Renderer
 		if (!force && itemToDraw->DoneAnimations)
 			return;
 
-		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
+		ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
 		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 
 		// Update animation matrices

@@ -191,7 +191,7 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 // may be reused instead both GetFloorHeight and GetCeilingHeight calls to increase
 // readability.
 
-CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z)
+CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
 	CollisionResult result = {};
 
@@ -1160,19 +1160,19 @@ short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 	return finalResult[usedProbe];
 }
 
-FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber)
+FloorInfo* GetFloor(int x, int y, int z, short* roomNumber)
 {
 	const auto location = GetRoom(ROOM_VECTOR{ *roomNumber, y }, x, y, z);
 	*roomNumber = location.roomNumber;
 	return &GetFloor(*roomNumber, x, z);
 }
 
-int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z)
+int GetFloorHeight(FloorInfo* floor, int x, int y, int z)
 {
 	return GetFloorHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 }
 
-int GetCeiling(FLOOR_INFO* floor, int x, int y, int z)
+int GetCeiling(FloorInfo* floor, int x, int y, int z)
 {
 	return GetCeilingHeight(ROOM_VECTOR{ floor->Room, y }, x, z).value_or(NO_HEIGHT);
 }
@@ -1205,8 +1205,8 @@ void AlterFloorHeight(ItemInfo* item, int height)
 	}
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-	FLOOR_INFO* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - SECTOR(1), item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* ceiling = GetFloor(item->Pose.Position.x, height + item->Pose.Position.y - SECTOR(1), item->Pose.Position.z, &roomNumber);
 
 	floor->FloorCollision.Planes[0].z += height;
 	floor->FloorCollision.Planes[1].z += height;
@@ -1224,7 +1224,7 @@ void AlterFloorHeight(ItemInfo* item, int height)
 int GetWaterSurface(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO* floor = GetSector(room, x - room->x, z - room->z);
+	FloorInfo* floor = GetSector(room, x - room->x, z - room->z);
 
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
@@ -1261,7 +1261,7 @@ int GetWaterSurface(ItemInfo* item)
 
 int GetWaterDepth(int x, int y, int z, short roomNumber)
 {
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 	auto* room = &g_Level.Rooms[roomNumber];
 
 	short roomIndex = NO_ROOM;
@@ -1348,7 +1348,7 @@ int GetWaterDepth(ItemInfo* item)
 int GetWaterHeight(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 
 	short adjoiningRoom = NO_ROOM;
 	do

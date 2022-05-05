@@ -202,7 +202,7 @@ void GuideControl(short itemNumber)
 	}
 
 	bool someFlag = false;
-	FLOOR_INFO* floor;
+	FloorInfo* floor;
 	Vector3Int pos1;
 	int frameNumber;
 	short random;

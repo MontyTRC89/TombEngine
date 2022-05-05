@@ -43,7 +43,7 @@ void ControlBodyPart(short fxNumber)
 	fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
 
 	short roomNumber = fx->roomNumber;
-	FLOOR_INFO* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
+	FloorInfo* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
 
 	if (!fx->counter)
 	{

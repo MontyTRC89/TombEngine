@@ -569,7 +569,7 @@ int GetNextAnimState(int objectID, int animNumber)
 void DrawAnimatingItem(ItemInfo* item)
 {
 	// TODO: to refactor
-	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in OBJECT_INFO
+	// Empty stub because actually we disable items drawing when drawRoutine pointer is NULL in ObjectInfo
 }
 
 void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex)

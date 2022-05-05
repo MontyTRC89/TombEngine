@@ -944,7 +944,7 @@ void UpdateGunShells()
 			gs->pos.Position.y += gs->fallspeed;
 			gs->pos.Position.z += gs->speed * phd_cos(gs->dirXrot);
 
-			FLOOR_INFO* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
+			FloorInfo* floor = GetFloor(gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z, &gs->roomNumber);
 			if (g_Level.Rooms[gs->roomNumber].flags & ENV_FLAG_WATER
 				&& !(g_Level.Rooms[oldRoomNumber].flags & ENV_FLAG_WATER))
 			{
@@ -1141,7 +1141,7 @@ void UpdateDrips()
 
 			drip->y += drip->yVel >> 5;
 			
-			FLOOR_INFO* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
+			FloorInfo* floor = GetFloor(drip->x, drip->y, drip->z, &drip->roomNumber);
 			if (g_Level.Rooms[drip->roomNumber].flags & ENV_FLAG_WATER)
 				drip->on = false;
 
@@ -1206,7 +1206,7 @@ void TriggerLaraDrips(ItemInfo* item)
 int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+	ObjectInfo* obj = &Objects[item->ObjectNumber];
 
 	ANIM_FRAME* frame = GetBestFrame(item);
 	

@@ -402,7 +402,7 @@ void InitialiseItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FLOOR_INFO* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	item->Floor = floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z);
 	item->BoxNumber = floor->Box;
 

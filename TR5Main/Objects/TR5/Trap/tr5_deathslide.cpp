@@ -129,7 +129,7 @@ void ControlDeathSlide(short itemNumber)
 		int y = zipLineItem->Pose.Position.y + 64;
 		int z = zipLineItem->Pose.Position.z + 1024 * c;
 
-		FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+		FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 
 		if (GetFloorHeight(floor, x, y, z) <= y + 256 || GetCeiling(floor, x, y, z) >= y - 256)
 		{

@@ -42,7 +42,7 @@ namespace TEN::Effects::Lara
 		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		{
 			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
+			FloorInfo* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
 			if (item->Floor == GetFloorHeight(floor, item->Pose.Position.x, 32000, item->Pose.Position.z))
 			{
 				//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.

@@ -408,7 +408,7 @@ short GetClimbFlags(int x, int y, int z, short roomNumber)
 	return GetClimbFlags(GetFloor(x, y, z, &roomNumber));
 }
 
-short GetClimbFlags(FLOOR_INFO* floor)
+short GetClimbFlags(FloorInfo* floor)
 {
 	short result = 0;
 
@@ -775,7 +775,7 @@ int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, i
 		return 0;
 
 	short roomNumber = itemRoom;
-	FLOOR_INFO* floor = GetFloor(x, y - CLICK(0.5f), z, &roomNumber);
+	FloorInfo* floor = GetFloor(x, y - CLICK(0.5f), z, &roomNumber);
 	int height = GetFloorHeight(floor, x, y, z);
 	if (height == NO_HEIGHT)
 		return 0;
@@ -823,7 +823,7 @@ int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, i
 		
 		roomNumber = itemRoom;
 		GetFloor(x, y + itemHeight, z, &roomNumber);
-		FLOOR_INFO* floor2 = GetFloor(dx, y + itemHeight, dz, &roomNumber);
+		FloorInfo* floor2 = GetFloor(dx, y + itemHeight, dz, &roomNumber);
 		ceiling = GetCeiling(floor2, dx, y + itemHeight, dz);
 		
 		if (ceiling == NO_HEIGHT)
@@ -908,7 +908,7 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 	*shift = 0;
 
 	short roomNumber = item->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 	int ceiling = CLICK(1) - y + GetCeiling(floor, x, y, z);
 	
 	if (ceiling > 70)

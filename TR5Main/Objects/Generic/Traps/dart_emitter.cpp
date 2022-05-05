@@ -33,7 +33,7 @@ namespace TEN::Entities::Traps
 			item->Pose.Position.z += velocity * phd_cos(item->Pose.Orientation.y);
 
 			short roomNumber = item->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+			FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 			if (item->RoomNumber != roomNumber)
 				ItemNewRoom(itemNumber, roomNumber);
