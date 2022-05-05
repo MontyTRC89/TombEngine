@@ -4,7 +4,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FLOOR_INFO;
+struct FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
@@ -57,8 +57,8 @@ struct CollisionResult
 	Vector3 Coordinates;
 	int RoomNumber;
 
-	FLOOR_INFO* Block;
-	FLOOR_INFO* BottomBlock;
+	FloorInfo* Block;
+	FloorInfo* BottomBlock;
 
 	CollisionPosition Position;
 	Vector2 FloorTilt;			// x = x, y = z
@@ -123,7 +123,7 @@ struct CollisionInfo
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
 CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height = 0, int side = 0);
-CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z);
+CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ItemInfo* item);
 
@@ -132,9 +132,9 @@ void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = fal
 int   GetQuadrant(short angle);
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
 
-FLOOR_INFO* GetFloor(int x, int y, int z, short* roomNumber);
-int GetFloorHeight(FLOOR_INFO* floor, int x, int y, int z);
-int GetCeiling(FLOOR_INFO* floor, int x, int y, int z);
+FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
+int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
+int GetCeiling(FloorInfo* floor, int x, int y, int z);
 int GetDistanceToFloor(int itemNumber, bool precise = true);
 void AlterFloorHeight(ItemInfo* item, int height);
 

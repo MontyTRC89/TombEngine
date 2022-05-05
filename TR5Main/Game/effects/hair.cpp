@@ -52,7 +52,7 @@ void HairControl(ItemInfo* item, bool young)
 void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 {
 	SPHERE sphere[HAIR_SPHERE];
-	OBJECT_INFO* object = &Objects[ID_LARA];
+	ObjectInfo* object = &Objects[ID_LARA];
 	ANIM_FRAME* frame;
 	int spaz;
 	bool youngLara = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young;

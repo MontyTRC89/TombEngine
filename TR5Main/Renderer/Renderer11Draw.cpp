@@ -87,7 +87,7 @@ namespace TEN::Renderer
 		if (!moveableObj)
 			return;
 
-		OBJECT_INFO* obj = &Objects[objectNum];
+		ObjectInfo* obj = &Objects[objectNum];
 
 		if (obj->animIndex != -1)
 		{
@@ -382,7 +382,7 @@ namespace TEN::Renderer
 
 			if (gunshell->counter > 0)
 			{
-				OBJECT_INFO* obj = &Objects[gunshell->objectNumber];
+				ObjectInfo* obj = &Objects[gunshell->objectNumber];
 				RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
 
 				Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
@@ -1408,7 +1408,7 @@ namespace TEN::Renderer
 
 		if (Objects[ID_SPIDERS_EMITTER].loaded)
 		{
-		    OBJECT_INFO* obj = &Objects[ID_SPIDERS_EMITTER];
+		    ObjectInfo* obj = &Objects[ID_SPIDERS_EMITTER];
 		    RendererObject* moveableObj = m_moveableObjects[ID_SPIDERS_EMITTER].get();
 		    short* meshPtr = Meshes[Objects[ID_SPIDERS_EMITTER].meshIndex + ((Wibble >> 2) & 2)];
 		    RendererMesh* mesh = m_meshPointersToMesh[meshPtr];
@@ -1479,7 +1479,7 @@ namespace TEN::Renderer
 
 		if (Objects[ID_RATS_EMITTER].loaded)
 		{
-			OBJECT_INFO* obj = &Objects[ID_RATS_EMITTER];
+			ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
 			for (int m = 0; m < 32; m++)
@@ -1529,7 +1529,7 @@ namespace TEN::Renderer
 
 		if (Objects[ID_BATS_EMITTER].loaded)
 		{
-			OBJECT_INFO* obj = &Objects[ID_BATS_EMITTER];
+			ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
 			RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
@@ -1579,7 +1579,7 @@ namespace TEN::Renderer
 
 		if (Objects[ID_LITTLE_BEETLE].loaded)
 		{
-			OBJECT_INFO* obj = &Objects[ID_LITTLE_BEETLE];
+			ObjectInfo* obj = &Objects[ID_LITTLE_BEETLE];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
 
 			for (int m = 0; m < 32; m++)
@@ -1630,7 +1630,7 @@ namespace TEN::Renderer
 
 		if (Objects[ID_LOCUSTS].loaded)
 		{
-			OBJECT_INFO* obj = &Objects[ID_LOCUSTS];
+			ObjectInfo* obj = &Objects[ID_LOCUSTS];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LOCUSTS];
 
 			for (int m = 0; m < 32; m++)
@@ -2848,7 +2848,7 @@ namespace TEN::Renderer
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &m_rooms[nativeItem->RoomNumber];
 		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
-		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
+		ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
 
 		Vector3 itemPosition = Vector3(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z);
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -2903,7 +2903,7 @@ namespace TEN::Renderer
 		ItemInfo* nativeItem = &g_Level.Items[info->item->ItemNumber];
 		RendererRoom& room = m_rooms[nativeItem->RoomNumber];
 		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
-		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
+		ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
 
 		// Set shaders
 		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);

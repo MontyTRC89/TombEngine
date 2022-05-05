@@ -3,13 +3,13 @@
 
 #define InitFunction void(short itemNumber)
 
-void InitSmashObject(OBJECT_INFO* obj, int objectNumber);
-void InitKeyHole(OBJECT_INFO* obj, int objectNumber);
-void InitPuzzleHole(OBJECT_INFO* obj, int objectNumber);
-void InitPuzzleDone(OBJECT_INFO* obj, int objectNumber);
-void InitAnimating(OBJECT_INFO* obj, int objectNumber);
-void InitPickup(OBJECT_INFO* obj, int objectNumber);
-void InitPickupItem(OBJECT_INFO* obj, std::function<InitFunction> func, int objectNumber, bool useDrawAnimItem = false);
-void InitProjectile(OBJECT_INFO* obj, std::function<InitFunction> func, int objectNumber, bool noLoad = false);
-void InitSearchObject(OBJECT_INFO* obj, int objectNumber);
-void InitPushableObject(OBJECT_INFO* obj, int objectNumber);
+void InitSmashObject(ObjectInfo* obj, int objectNumber);
+void InitKeyHole(ObjectInfo* obj, int objectNumber);
+void InitPuzzleHole(ObjectInfo* obj, int objectNumber);
+void InitPuzzleDone(ObjectInfo* obj, int objectNumber);
+void InitAnimating(ObjectInfo* obj, int objectNumber);
+void InitPickup(ObjectInfo* obj, int objectNumber);
+void InitPickupItem(ObjectInfo* obj, std::function<InitFunction> func, int objectNumber, bool useDrawAnimItem = false);
+void InitProjectile(ObjectInfo* obj, std::function<InitFunction> func, int objectNumber, bool noLoad = false);
+void InitSearchObject(ObjectInfo* obj, int objectNumber);
+void InitPushableObject(ObjectInfo* obj, int objectNumber);

@@ -40,7 +40,7 @@ void ClockworkBeetleControl(short itemNumber)
 		if (LaraItem->Animation.FrameNumber == fb + 104)
 		{
 			short roomNumber = beetle->RoomNumber;
-			FLOOR_INFO* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &roomNumber);
+			FloorInfo* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, &roomNumber);
 			int height = GetFloorHeight(floor, beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
 
 			if (abs(LaraItem->Pose.Position.y - height) > 64)
@@ -60,7 +60,7 @@ void ClockworkBeetleControl(short itemNumber)
 	beetle->Pose.Position.y += beetle->Animation.VerticalVelocity;
 
 	short roomNumber = beetle->RoomNumber;
-	FLOOR_INFO* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y - 20, beetle->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(beetle->Pose.Position.x, beetle->Pose.Position.y - 20, beetle->Pose.Position.z, &roomNumber);
 	int height = GetFloorHeight(floor, beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
 
 	if (beetle->Pose.Position.y > height)

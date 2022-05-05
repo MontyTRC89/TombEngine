@@ -30,7 +30,7 @@ enum ShatterType
 	SHT_EXPLODE
 };
 
-struct OBJECT_INFO
+struct ObjectInfo
 {
 	int nmeshes; 
 	int meshIndex;
@@ -89,7 +89,7 @@ constexpr auto SF_SHATTERABLE = 0x02;
 constexpr auto GRAVITY = 6;
 constexpr auto SWAMP_GRAVITY = GRAVITY / 3;
 
-extern OBJECT_INFO Objects[ID_NUMBER_OBJECTS];
+extern ObjectInfo Objects[ID_NUMBER_OBJECTS];
 extern STATIC_INFO StaticObjects[MAX_STATICS];
 
 void InitialiseGameFlags();

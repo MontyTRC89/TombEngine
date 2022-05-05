@@ -109,7 +109,7 @@ bool SameZone(CreatureInfo* creature, ItemInfo* target)
 	auto* item = &g_Level.Items[creature->ItemNumber];
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
-	FLOOR_INFO* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	if (floor->Box == NO_BOX)
 		return false;
 
@@ -439,7 +439,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
-	FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
+	FloorInfo* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 
 	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
 	if (floor->Box == NO_BOX)
@@ -776,7 +776,7 @@ void CreatureDie(short itemNumber, int explode)
 
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT)
 {
-	FLOOR_INFO* floor = GetFloor(x, y, z, &roomNumber);
+	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 	if (floor->Box == NO_BOX)
 		return true;
 
@@ -1390,7 +1390,7 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 	item->BoxNumber = NO_BOX;
-	FLOOR_INFO* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	if(floor)
 		item->BoxNumber = floor->Box;
 
@@ -1966,7 +1966,7 @@ void AdjustStopperFlag(ItemInfo* item, int direction, bool set)
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
 
-	FLOOR_INFO* floor = GetSector(room, x - room->x, z - room->z);
+	FloorInfo* floor = GetSector(room, x - room->x, z - room->z);
 	floor->Stopper = set;
 
 	x = item->Pose.Position.x + SECTOR(1) * phd_sin(direction);
@@ -1996,7 +1996,7 @@ void InitialiseItemBoxData()
 			if (index > room.floor.size())
 				continue;
 
-			FLOOR_INFO* floor = &room.floor[index];
+			FloorInfo* floor = &room.floor[index];
 
 			if (floor->Box == NO_BOX)
 				continue;

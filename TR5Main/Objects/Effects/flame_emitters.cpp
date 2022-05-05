@@ -216,7 +216,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180));
 
 					short roomNumber = item->RoomNumber;
-					FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+					FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
 					if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
 					{

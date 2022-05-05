@@ -351,7 +351,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
-			OBJECT_INFO* obj = &Objects[objNum];
+			ObjectInfo* obj = &Objects[objNum];
 
 			for (int j = 0; j < obj->nmeshes; j++)
 			{
@@ -374,7 +374,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
 			int objNum = MoveablesIds[i];
-			OBJECT_INFO *obj = &Objects[objNum];
+			ObjectInfo *obj = &Objects[objNum];
 
 			if (obj->nmeshes > 0)
 			{
@@ -700,7 +700,7 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < MoveablesIds.size(); i++)
 		{
-			OBJECT_INFO *obj = &Objects[MoveablesIds[i]];
+			ObjectInfo *obj = &Objects[MoveablesIds[i]];
 
 			if (obj->nmeshes < 0)
 			{

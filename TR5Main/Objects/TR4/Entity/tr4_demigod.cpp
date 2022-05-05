@@ -672,7 +672,7 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos, 17);
 
 					short roomNumber = item->RoomNumber;
-					FLOOR_INFO* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
+					FloorInfo* floor = GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 					int height = GetFloorHeight(floor, pos.x, pos.y, pos.z);
 					if (height == NO_HEIGHT)
 						pos.y = pos.y - 128;

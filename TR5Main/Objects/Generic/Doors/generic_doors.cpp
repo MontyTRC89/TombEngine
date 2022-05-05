@@ -386,7 +386,7 @@ namespace TEN::Entities::Doors
 
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
-		FLOOR_INFO* floor = doorPos->floor;
+		FloorInfo* floor = doorPos->floor;
 
 		if (floor != NULL)
 		{
@@ -407,7 +407,7 @@ namespace TEN::Entities::Doors
 
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
 	{
-		FLOOR_INFO* floor = doorPos->floor;
+		FloorInfo* floor = doorPos->floor;
 
 		if (floor)
 		{

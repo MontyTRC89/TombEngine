@@ -160,7 +160,7 @@ static int TestMotorbikeHeight(ItemInfo* item, int dz, int dx, Vector3Int* pos)
     pos->x = item->Pose.Position.x + dz * s + dx * c;
 
     short roomNumber = item->RoomNumber;
-    FLOOR_INFO* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
+    FloorInfo* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
     int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
     if (pos->y < ceiling || ceiling == NO_HEIGHT)
         return NO_HEIGHT;
@@ -214,7 +214,7 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
         z = 0;
 
         short roomNumber = motorbike->RoomNumber;
-        FLOOR_INFO* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
+        FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
         int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
         if (height < old->y - STEP_SIZE)
         {
@@ -292,7 +292,7 @@ static void DrawMotorbikeLight(ItemInfo* item)
 static BOOL GetOnMotorBike(short itemNumber)
 {
     ItemInfo* item;
-    FLOOR_INFO* floor;
+    FloorInfo* floor;
     int dx, dz, distance, height;
     unsigned short tempangle;
     short angle;
@@ -665,7 +665,7 @@ void MotorbikeBaddieCollision(ItemInfo* bike)
 
             if (item->Collidable && item->Status != IFLAG_INVISIBLE && item != LaraItem && item != bike)
             {
-                OBJECT_INFO* object = &Objects[item->ObjectNumber];
+                ObjectInfo* object = &Objects[item->ObjectNumber];
 
                 if (object->collision && (object->intelligent))
                 {
@@ -709,7 +709,7 @@ static int MotorBikeDynamics(ItemInfo* item)
     Vector3Int bl_old, mtb_old, br_old, mtf_old, fl_old;
     Vector3Int fl, bl, mtf, mtb, br;
     Vector3Int oldpos, moved;
-    FLOOR_INFO* floor;
+    FloorInfo* floor;
     int hmf_old, hbl_old, hbr_old, hmtb_old, hfl_old;
     int height, collide, speed, newspeed;
     short momentum = 0, rot, room_number;
@@ -1377,7 +1377,7 @@ int MotorbikeControl(void)
 {
     ItemInfo* item;
     MotorbikeInfo* motorbike;
-    FLOOR_INFO* floor;
+    FloorInfo* floor;
     Vector3Int oldpos, fl, fr, fm;
     int drive, collide, pitch = 0, dead, ceiling;
 

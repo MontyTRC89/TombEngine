@@ -114,7 +114,7 @@ void DisableEntityAI(short itemNumber)
 void InitialiseSlot(short itemNum, short slot)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
-	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
+	ObjectInfo* obj = &Objects[item->ObjectNumber];
 
 	item->Data = CreatureInfo();
 	CreatureInfo* creature = item->Data;
