@@ -3,19 +3,23 @@
 #include "ScriptAssert.h"
 #include <string>
 
-namespace sol {
+namespace sol
+{
 	class state;
 }
 
 struct Animations
 {
-	bool CrawlExtended;				// Extended crawl moveset
-	bool CrouchRoll;				// Crouch roll
-	bool CrawlspaceSwandive;		// Swandive into crawlspaces
-	bool MonkeyTurn180;				// 180 degree turn on monkey swing
-	bool MonkeyAutoJump;			// Auto jump to monkey swing when pressing UP + ACTION beneath
-	bool OscillateHang;				// Grab thin ledge animation from TR1 and 2
-	bool Pose;						// Crossed arms AFK posing
+	bool HasPose;				// Crossed arms AFK posing.
+	bool HasSlideExtended;		// Extended slope sliding functionality (not ready yet).
+	bool HasSprintJump;			// Sprint jump.
+	bool HasMonkeyAutoJump;		// Auto jump to monkey swing when pressing UP + ACTION. TODO: Make this a player setting.
+	bool HasCrawlspaceDive;		// Dive into crawlspaces.
+	bool HasCrawlExtended;		// Extended crawl moveset.
+	bool HasCrouchRoll;			// Crouch roll.
+	bool HasOverhangClimb;		// Overhang functionality.
+	bool HasMonkeyTurn180;
+	bool HasOscillateHang;
 
 	static void Register(sol::table &);
 };

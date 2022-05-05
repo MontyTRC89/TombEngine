@@ -40,20 +40,20 @@ extern "C"
 string commit;
 #endif
 
-VectorInt2 GetScreenResolution()
+Vector2Int GetScreenResolution()
 {
 	RECT desktop;
 	const HWND hDesktop = GetDesktopWindow();
 	GetWindowRect(hDesktop, &desktop);
-	VectorInt2 resolution;
+	Vector2Int resolution;
 	resolution.x = desktop.right;
 	resolution.y = desktop.bottom;
 	return resolution;
 }
 
-std::vector<VectorInt2> GetAllSupportedScreenResolutions()
+std::vector<Vector2Int> GetAllSupportedScreenResolutions()
 {
-	std::vector<VectorInt2> result;
+	std::vector<Vector2Int> result;
 
 	DEVMODE dm = { 0 };
 	dm.dmSize = sizeof(dm);
@@ -70,7 +70,7 @@ std::vector<VectorInt2> GetAllSupportedScreenResolutions()
 		}
 		if (add)
 		{
-			VectorInt2 resolution;
+			Vector2Int resolution;
 			resolution.x = dm.dmPelsWidth;
 			resolution.y = dm.dmPelsHeight;
 			result.push_back(resolution);
@@ -80,7 +80,7 @@ std::vector<VectorInt2> GetAllSupportedScreenResolutions()
 	std::sort(
 		result.begin(),
 		result.end(),
-		[](VectorInt2& a, VectorInt2& b)
+		[](Vector2Int& a, Vector2Int& b)
 		{
 			if (a.x == b.x)
 			{

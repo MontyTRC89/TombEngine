@@ -5,6 +5,14 @@
 
 constexpr auto WALL_PLANE = Vector3(0, 0, static_cast<float>(-CLICK(127)));
 
+enum class CLIMB_DIRECTION : short
+{
+	North = 0x0100,
+	East = 0x0200,
+	South = 0x0400,
+	West = 0x0800
+};
+
 enum class FLOOR_MATERIAL : unsigned char
 {
 	Mud = 0,
@@ -51,6 +59,23 @@ struct SECTOR_FLAGS
 
 	bool MarkTriggerer;
 	bool MarkTriggererActive; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
+
+	bool ClimbPossible(CLIMB_DIRECTION direction)
+	{
+		switch (direction)
+		{
+		case CLIMB_DIRECTION::North:
+			return ClimbNorth;
+		case CLIMB_DIRECTION::South:
+			return ClimbSouth;
+		case CLIMB_DIRECTION::East:
+			return ClimbEast;
+		case CLIMB_DIRECTION::West:
+			return ClimbWest;
+		}
+
+		return false;
+	}
 };
 
 class FLOOR_INFO
@@ -70,7 +95,7 @@ class FLOOR_INFO
 
 		int SectorPlane(int x, int z) const;
 		int SectorPlaneCeiling(int x, int z) const;
-		std::pair<int, int> FLOOR_INFO::TiltXZ(int x, int z) const;
+		Vector2 FLOOR_INFO::TiltXZ(int x, int z, bool floor) const;
 		bool FloorIsSplit() const;
 		bool FloorIsDiagonalStep() const;
 		bool CeilingIsDiagonalStep() const;
@@ -103,9 +128,9 @@ class FLOOR_INFO
 
 namespace TEN::Floordata
 {
-	VectorInt2 GetSectorPoint(int x, int z);
-	VectorInt2 GetRoomPosition(int roomNumber, int x, int z);
-	FLOOR_INFO& GetFloor(int roomNumber, const VectorInt2& pos);
+	Vector2Int GetSectorPoint(int x, int z);
+	Vector2Int GetRoomPosition(int roomNumber, int x, int z);
+	FLOOR_INFO& GetFloor(int roomNumber, const Vector2Int& pos);
 	FLOOR_INFO& GetFloor(int roomNumber, int x, int z);
 	FLOOR_INFO& GetFloorSide(int roomNumber, int x, int z, int* sideRoomNumber = nullptr);
 	FLOOR_INFO& GetBottomFloor(int roomNumber, int x, int z, int* bottomRoomNumber = nullptr);

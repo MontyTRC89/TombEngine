@@ -13,16 +13,17 @@
 #include "Objects/objectslist.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/animation.h"
+#include "Game/misc.h"
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO sentryGunBite = { 0, 0, 0, 8 };
+	BITE_INFO SentryGunBite = { 0, 0, 0, 8 };
 
 	static void SentryGunThrowFire(ITEM_INFO* item)
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
 
 			spark->on = 1;
 			spark->sR = (GetRandomControl() & 0x1F) + 48;
@@ -35,22 +36,14 @@ namespace TEN::Entities::TR4
 			spark->fadeToBlack = 8;
 			spark->transType = TransTypeEnum::COLADD;
 
-			PHD_VECTOR pos1;
-			pos1.x = -140;
-			pos1.y = -30;
-			pos1.z = -4;
-
+			auto pos1 = Vector3Int(-140, -30, -4);
 			GetJointAbsPosition(item, &pos1, 7);
 
 			spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
 			spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 			spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-			PHD_VECTOR pos2;
-			pos2.x = -280;
-			pos2.y = -30;
-			pos2.z = -4;
-
+			auto pos2 = Vector3Int(-280, -30, -4);
 			GetJointAbsPosition(item, &pos2, 7);
 
 			int v = (GetRandomControl() & 0x3F) + 192;
@@ -75,72 +68,69 @@ namespace TEN::Entities::TR4
 
 	void InitialiseSentryGun(short itemNum)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNum];
 
 		ClearItem(itemNum);
 
-		item->itemFlags[0] = 0;
-		item->itemFlags[1] = 768;
-		item->itemFlags[2] = 0;
+		item->ItemFlags[0] = 0;
+		item->ItemFlags[1] = 768;
+		item->ItemFlags[2] = 0;
 	}
 
 	void SentryGunControl(short itemNum)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNum];
 
 		if (!CreatureActive(itemNum))
 			return;
 
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+		auto* creature = GetCreatureInfo(item);
 
-		AI_INFO info = {};
 		int c = 0;
 
 		if (!creature)
 			return;
 
 		// Flags set by the ID_MINE object?
-		if (item->meshBits & 0x40)
+		if (item->MeshBits & 0x40)
 		{
-			if (item->itemFlags[0])
+			if (item->ItemFlags[0])
 			{
-				PHD_VECTOR pos;
+				auto pos = Vector3Int(SentryGunBite.x, SentryGunBite.y, SentryGunBite.z);
+				GetJointAbsPosition(item, &pos, SentryGunBite.meshNum);
 
-				pos.x = sentryGunBite.x;
-				pos.y = sentryGunBite.y;
-				pos.z = sentryGunBite.z;
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);
 
-				GetJointAbsPosition(item, &pos, sentryGunBite.meshNum);
-
-				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->itemFlags[0] + 12, 24, 16, 4);
-
-				item->itemFlags[0]--;
+				item->ItemFlags[0]--;
 			}
 
-			if (item->itemFlags[0] & 1)
-				item->meshBits |= 0x100;
+			if (item->ItemFlags[0] & 1)
+				item->MeshBits |= 0x100;
 			else
-				item->meshBits &= ~0x100;
+				item->MeshBits &= ~0x100;
 
-			if (item->triggerFlags == 0)
+			if (item->TriggerFlags == 0)
 			{
-				item->pos.yPos -= 512;
-				CreatureAIInfo(item, &info);
-				item->pos.yPos += 512;
+				item->Pose.Position.y -= CLICK(2);
 
-				int deltaAngle = info.angle - creature->jointRotation[0];
+				AI_INFO AI;;
+				CreatureAIInfo(item, &AI);
 
-				info.ahead = true;
-				if (deltaAngle <= -ANGLE(90) || deltaAngle >= ANGLE(90))
-					info.ahead = false;
+				item->Pose.Position.y += CLICK(2);
 
-				if (Targetable(item, &info))
+				int deltaAngle = AI.angle - creature->JointRotation[0];
+
+				AI.ahead = true;
+				if (deltaAngle <= -ANGLE(90.0f) || deltaAngle >= ANGLE(90.0f))
+					AI.ahead = false;
+
+				if (Targetable(item, &AI))
 				{
-					if (info.distance < SQUARE(SECTOR(9)))
+					if (AI.distance < pow(SECTOR(9), 2))
 					{
-						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->itemFlags[0])
+						if (!g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM5) && !item->ItemFlags[0])
 						{
-							if (info.distance <= SQUARE(SECTOR(2)))
+							if (AI.distance <= pow(SECTOR(2), 2))
 							{
 								// Throw fire
 								SentryGunThrowFire(item);
@@ -150,79 +140,71 @@ namespace TEN::Entities::TR4
 							{
 								// Shot to Lara with bullets
 								c = 0;
-								item->itemFlags[0] = 2;
+								item->ItemFlags[0] = 2;
 
-								ShotLara(item, &info, &sentryGunBite, creature->jointRotation[0], 5);
-								SoundEffect(SFX_TR4_AUTOGUNS, &item->pos, 0);
+								ShotLara(item, &AI, &SentryGunBite, creature->JointRotation[0], 5);
+								SoundEffect(SFX_TR4_AUTOGUNS, &item->Pose, 0);
 
-								item->itemFlags[2] += 256;
-								if (item->itemFlags[2] > 6144)
-								{
-									item->itemFlags[2] = 6144;
-								}
+								item->ItemFlags[2] += 256;
+								if (item->ItemFlags[2] > 6144)
+									item->ItemFlags[2] = 6144;
 							}
 						}
 
-						deltaAngle = c + info.angle - creature->jointRotation[0];
-						if (deltaAngle <= ANGLE(10))
+						deltaAngle = c + AI.angle - creature->JointRotation[0];
+						if (deltaAngle <= ANGLE(10.0f))
 						{
-							if (deltaAngle < -ANGLE(10))
-							{
-								deltaAngle = -ANGLE(10);
-							}
+							if (deltaAngle < -ANGLE(10.0f))
+								deltaAngle = -ANGLE(10.0f);
 						}
 						else
-						{
-							deltaAngle = ANGLE(10);
-						}
+							deltaAngle = ANGLE(10.0f);
 
-						creature->jointRotation[0] += deltaAngle;
+						creature->JointRotation[0] += deltaAngle;
 
-						CreatureJoint(item, 1, -info.xAngle);
+						CreatureJoint(item, 1, -AI.xAngle);
 					}
 				}
 
-				item->itemFlags[2] -= 32;
+				item->ItemFlags[2] -= 32;
 
-				if (item->itemFlags[2] < 0)
+				if (item->ItemFlags[2] < 0)
+					item->ItemFlags[2] = 0;
+
+				creature->JointRotation[3] += item->ItemFlags[2];
+				creature->JointRotation[2] += item->ItemFlags[1];
+
+				if (creature->JointRotation[2] > ANGLE(90.0f) ||
+					creature->JointRotation[2] < -ANGLE(90.0f))
 				{
-					item->itemFlags[2] = 0;
-				}
-
-				creature->jointRotation[3] += item->itemFlags[2];
-				creature->jointRotation[2] += item->itemFlags[1];
-
-				if (creature->jointRotation[2] > ANGLE(90) ||
-					creature->jointRotation[2] < -ANGLE(90))
-				{
-					item->itemFlags[1] = -item->itemFlags[1];
+					item->ItemFlags[1] = -item->ItemFlags[1];
 				}
 			}
 			else
 			{
 				// Stuck sentry gun 
 				CreatureJoint(item, 0, (GetRandomControl() & 0x7FF) - 1024);
-				CreatureJoint(item, 1, ANGLE(45));
-				CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45));
+				CreatureJoint(item, 1, ANGLE(45.0f));
+				CreatureJoint(item, 2, (GetRandomControl() & 0x3FFF) - ANGLE(45.0f));
 			}
 		}
 		else
 		{
 			ExplodingDeath(itemNum, -1, 257);
-			DisableBaddieAI(itemNum);
+			DisableEntityAI(itemNum);
 			KillItem(itemNum);
 
-			item->flags |= 1u;
-			item->status = ITEM_DEACTIVATED;
+			item->Flags |= 1u;
+			item->Status = ITEM_DEACTIVATED;
 
-			RemoveAllItemsInRoom(item->roomNumber, ID_SMOKE_EMITTER_BLACK);
+			RemoveAllItemsInRoom(item->RoomNumber, ID_SMOKE_EMITTER_BLACK);
 
-			TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -2, 0, item->roomNumber);
+			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y - CLICK(3), item->Pose.Position.z, 3, -2, 0, item->RoomNumber);
 			for (int i = 0; i < 2; i++)
-				TriggerExplosionSparks(item->pos.xPos, item->pos.yPos - 768, item->pos.zPos, 3, -1, 0, item->roomNumber);
+				TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y - CLICK(3), item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
 
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->pos, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->pos, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 25165828);
+			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
 		}
 	}
 }

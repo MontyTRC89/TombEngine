@@ -1,6 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="framework.cpp" />
+    <ClCompile Include="Game\collision\collide_item.cpp" />
     <ClCompile Include="Game\control\los.cpp" />
     <ClCompile Include="Game\effects\bubble.cpp" />
     <ClCompile Include="Game\effects\chaffFX.cpp" />
@@ -10,6 +12,7 @@
     <ClCompile Include="Game\effects\drip.cpp" />
     <ClCompile Include="Game\effects\explosion.cpp" />
     <ClCompile Include="Game\effects\weather.cpp" />
+    <ClCompile Include="Game\collision\floordata.cpp" />
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
@@ -17,13 +20,17 @@
     <ClCompile Include="Game\Lara\lara_collide.cpp" />
     <ClCompile Include="Game\Lara\lara_crawl.cpp" />
     <ClCompile Include="Game\Lara\lara_hang.cpp" />
+    <ClCompile Include="Game\Lara\lara_helpers.cpp" />
     <ClCompile Include="Game\Lara\lara_initialise.cpp" />
+    <ClCompile Include="Game\Lara\lara_jump.cpp" />
     <ClCompile Include="Game\Lara\lara_monkey.cpp" />
     <ClCompile Include="Game\Lara\lara_objects.cpp" />
+    <ClCompile Include="Game\Lara\lara_overhang.cpp" />
     <ClCompile Include="Game\Lara\lara_slide.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
+    <ClCompile Include="Game\gui.cpp" />
     <ClCompile Include="Game\particle\SimpleParticle.cpp" />
     <ClCompile Include="Game\pickup\pickup_ammo.cpp" />
     <ClCompile Include="Game\pickup\pickup_consumable.cpp" />
@@ -37,8 +44,11 @@
     <ClCompile Include="Objects\Generic\Traps\falling_block.cpp" />
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
+    <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
+    <ClCompile Include="Specific\phd_global.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
+    <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
     <ClCompile Include="Objects\Generic\Doors\double_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\generic_doors.cpp" />
     <ClCompile Include="Objects\Generic\Doors\pushpull_kick_door.cpp" />
@@ -56,6 +66,7 @@
     <ClCompile Include="Objects\Generic\Switches\underwater_switch.cpp" />
     <ClCompile Include="Objects\TR5\Switch\tr5_crowdove_switch.cpp" />
     <ClCompile Include="Specific\clock.cpp" />
+    <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
     <ClCompile Include="Specific\trmath.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
     <ClCompile Include="Game\effects\spark.cpp" />
@@ -183,7 +194,7 @@
     <ClCompile Include="Objects\TR2\Entity\tr2_monk.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mpgun.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_mpstick.cpp" />
-    <ClCompile Include="Objects\TR2\Vehicles\snowmobile.cpp" />
+    <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_bear.cpp" />
@@ -205,7 +216,7 @@
     <ClCompile Include="Objects\TR4\Entity\tr4_bigscorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_crocodile.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_harpy.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_littlebeetle.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_beetle_swarm.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_smallscorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sphinx.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp" />
@@ -240,10 +251,12 @@
     <ClCompile Include="Renderer\Renderer11.cpp" />
     <ClCompile Include="Game\control\box.cpp" />
     <ClCompile Include="Game\camera.cpp" />
+    <ClCompile Include="Game\collision\collide_room.cpp" />
     <ClCompile Include="Game\control\control.cpp" />
     <ClCompile Include="Game\effects\debris.cpp" />
     <ClCompile Include="Game\animation.cpp" />
     <ClCompile Include="Game\effects\effects.cpp" />
+    <ClCompile Include="Game\control\flipeffect.cpp" />
     <ClCompile Include="Game\effects\hair.cpp" />
     <ClCompile Include="Game\health.cpp" />
     <ClCompile Include="Game\items.cpp" />
@@ -257,13 +270,17 @@
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\control\lot.cpp" />
     <ClCompile Include="Game\missile.cpp" />
+    <ClCompile Include="Objects\Generic\Object\objects.cpp" />
     <ClCompile Include="Game\people.cpp" />
     <ClCompile Include="Game\pickup\pickup.cpp" />
     <ClCompile Include="Game\savegame.cpp" />
     <ClCompile Include="Sound\sound.cpp" />
+    <ClCompile Include="Game\collision\sphere.cpp" />
     <ClCompile Include="Game\spotcam.cpp" />
+    <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Game\effects\tomb4fx.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
+    <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_goon.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\quad.cpp" />
@@ -283,24 +300,10 @@
     <ClCompile Include="Renderer\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="Objects\TR5\Object\tr5_expandingplatform.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
-    <ClCompile Include="Game\gui.cpp" />
-    <ClCompile Include="Game\effects\lara_fx.cpp" />
-    <ClCompile Include="Game\Lara\lara_helpers.cpp" />
-    <ClCompile Include="Game\Lara\lara_jump.cpp" />
-    <ClCompile Include="Game\collision\sphere.cpp" />
-    <ClCompile Include="Game\collision\floordata.cpp" />
-    <ClCompile Include="Game\collision\collide_item.cpp" />
-    <ClCompile Include="Game\collision\collide_room.cpp" />
-    <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
-    <ClCompile Include="Objects\Generic\Object\objects.cpp" />
-    <ClCompile Include="Game\control\flipeffect.cpp" />
-    <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
-    <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
-    <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
-    <ClCompile Include="framework.cpp" />
-    <ClCompile Include="Specific\phd_global.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
     <ClInclude Include="Game\effects\bubble.h" />
@@ -313,13 +316,19 @@
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
     <ClInclude Include="Game\effects\weather.h" />
+    <ClInclude Include="Game\collision\floordata.h" />
     <ClInclude Include="Game\effects\footprint.h" />
+    <ClInclude Include="Game\Lara\lara_helpers.h" />
+    <ClInclude Include="Game\Lara\lara_jump.h" />
+    <ClInclude Include="Game\Lara\lara_overhang.h" />
+    <ClInclude Include="Game\Lara\lara_test_structs.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
     <ClInclude Include="Objects\Generic\Traps\falling_block.h" />
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
+    <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
     <ClInclude Include="Objects\TR2\Vehicles\boat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
@@ -336,8 +345,24 @@
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
+    <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
+    <ClInclude Include="Renderer\Structures\RendererBone.h" />
+    <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
+    <ClInclude Include="Renderer\Structures\RendererLight.h" />
+    <ClInclude Include="Renderer\Structures\RendererRoom.h" />
+    <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
+    <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
+    <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
+    <ClInclude Include="Specific\memory\Vector.h" />
+    <ClInclude Include="Game\gui.h" />
     <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
+    <ClInclude Include="Renderer\TextureBase.h" />
+    <ClInclude Include="Renderer\RendererTransparentFace.h" />
+    <ClInclude Include="Scripting\GameScriptFog.h" />
+    <ClInclude Include="Specific\fast_vector.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
     <ClInclude Include="Game\pickup\pickuputil.h" />
@@ -348,6 +373,7 @@
     <ClInclude Include="Game\pickup\pickup_weapon.h" />
     <ClInclude Include="Game\precompute\precompute.h" />
     <ClInclude Include="Specific\prng.h" />
+    <ClInclude Include="Objects\Generic\puzzles_keys.h" />
     <ClInclude Include="Game\room.h" />
     <ClInclude Include="Objects\Generic\Doors\double_doors.h" />
     <ClInclude Include="Objects\Generic\Doors\pushpull_kick_door.h" />
@@ -535,7 +561,7 @@
     <ClInclude Include="Objects\TR2\tr2_objects.h" />
     <ClInclude Include="Objects\TR3\tr3_objects.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_ahmet.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_baddy.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_goon.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_bat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_bigscorpion.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_crocodile.h" />
@@ -545,7 +571,7 @@
     <ClInclude Include="Objects\TR4\Entity\tr4_horseman.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_jeanyves.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_knighttemplar.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_littlebeetle.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_beetle_swarm.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mummy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sas.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sentrygun.h" />
@@ -564,7 +590,7 @@
     <ClInclude Include="Objects\TR3\Vehicles\minecart.h" />
     <ClInclude Include="Objects\TR4\Vehicles\motorbike.h" />
     <ClInclude Include="Objects\TR3\Vehicles\quad.h" />
-    <ClInclude Include="Objects\TR2\Vehicles\snowmobile.h" />
+    <ClInclude Include="Objects\TR2\Vehicles\skidoo.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv.h" />
     <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h" />
     <ClInclude Include="Renderer\Frustum.h" />
@@ -587,7 +613,6 @@
     <ClInclude Include="Renderer\RenderTarget2D\RenderTarget2D.h" />
     <ClInclude Include="Renderer\RenderTargetCube\RenderTargetCube.h" />
     <ClInclude Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.h" />
-    <ClInclude Include="Renderer\RenderPipelineState\RenderPipelineState.h" />
     <ClInclude Include="Scripting\AudioTracks.h" />
     <ClInclude Include="Scripting\GameScriptLevel.h" />
     <ClInclude Include="Scripting\GameScriptMeshInfo.h" />
@@ -621,10 +646,12 @@
     <ClInclude Include="CustomObjects\tribesman.h" />
     <ClInclude Include="Game\camera.h" />
     <ClInclude Include="CustomObjects\cobra.h" />
+    <ClInclude Include="Game\collision\collide_room.h" />
     <ClInclude Include="Game\control\control.h" />
     <ClInclude Include="Game\effects\debris.h" />
     <ClInclude Include="Game\animation.h" />
     <ClInclude Include="Game\effects\effects.h" />
+    <ClInclude Include="Game\control\flipeffect.h" />
     <ClInclude Include="Game\effects\hair.h" />
     <ClInclude Include="Game\health.h" />
     <ClInclude Include="Game\items.h" />
@@ -639,13 +666,17 @@
     <ClInclude Include="Game\control\lot.h" />
     <ClInclude Include="Game\misc.h" />
     <ClInclude Include="Game\missile.h" />
+    <ClInclude Include="Objects\Generic\Object\objects.h" />
     <ClInclude Include="Game\people.h" />
     <ClInclude Include="Game\pickup\pickup.h" />
     <ClInclude Include="Game\savegame.h" />
     <ClInclude Include="Sound\sound.h" />
+    <ClInclude Include="Game\collision\sphere.h" />
     <ClInclude Include="Game\spotcam.h" />
+    <ClInclude Include="Objects\Generic\Switches\switch.h" />
     <ClInclude Include="CustomObjects\tiger.h" />
     <ClInclude Include="Game\effects\tomb4fx.h" />
+    <ClInclude Include="Objects\Generic\Traps\traps.h" />
     <ClInclude Include="Objects\objectslist.h" />
     <ClInclude Include="Game\memory\malloc.h" />
     <ClInclude Include="Specific\input.h" />
@@ -662,35 +693,6 @@
     <ClInclude Include="Objects\TR5\Object\tr5_genslot.h" />
     <ClInclude Include="Renderer\VertexBuffer\VertexBuffer.h" />
     <ClInclude Include="Objects\TR5\Object\tr5_expandingplatform.h" />
-    <ClInclude Include="Renderer\RendererTransparentFace.h" />
-    <ClInclude Include="Scripting\GameScriptFog.h" />
-    <ClInclude Include="Game\gui.h" />
-    <ClInclude Include="Game\effects\lara_fx.h" />
-    <ClInclude Include="Game\Lara\lara_helpers.h" />
-    <ClInclude Include="Game\Lara\lara_jump.h" />
-    <ClInclude Include="Renderer\TextureBase.h" />
-    <ClInclude Include="Specific\fast_vector.h" />
-    <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
-    <ClInclude Include="Game\collision\sphere.h" />
-    <ClInclude Include="Game\collision\floordata.h" />
-    <ClInclude Include="Game\collision\collide_room.h" />
-    <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
-    <ClInclude Include="Specific\memory\Vector.h" />
-    <ClInclude Include="Objects\Generic\puzzles_keys.h" />
-    <ClInclude Include="Objects\Generic\Object\objects.h" />
-    <ClInclude Include="Game\control\flipeffect.h" />
-    <ClInclude Include="Objects\Generic\Traps\traps.h" />
-    <ClInclude Include="Objects\Generic\Switches\switch.h" />
-    <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
-    <ClInclude Include="Game\collision\collide_item.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="Renderer\Structures\RendererBone.h" />
-    <ClInclude Include="Renderer\Structures\RendererDisplayMode.h" />
-    <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
-    <ClInclude Include="Renderer\Structures\RendererLight.h" />
-    <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
-    <ClInclude Include="Renderer\Structures\RendererRoom.h" />
-    <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resources.rc" />
@@ -704,7 +706,9 @@
     <None Include="packages.config" />
     <None Include="Resources.aps" />
     <None Include="RuleSet.ruleset" />
+    <None Include="Shaders\AlphaTestBuffer.hlsli" />
     <None Include="Shaders\CameraMatrixBuffer.hlsli" />
+    <None Include="Shaders\ShaderLight.hlsli" />
     <None Include="Shaders\Math.hlsli" />
     <None Include="Shaders\VertexInput.hlsli" />
     <None Include="Shaders\DX11\Test.fx" />
@@ -725,7 +729,5 @@
     <None Include="Shaders\DX11_Solid.fx" />
     <None Include="Shaders\DX11_Sprites.fx" />
     <None Include="Shaders\DX11_Statics.fx" />
-    <None Include="Shaders\ShaderLight.hlsli" />
-    <None Include="Shaders\AlphaTestBuffer.hlsli" />
   </ItemGroup>
 </Project>

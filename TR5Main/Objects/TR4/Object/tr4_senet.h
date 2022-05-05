@@ -1,16 +1,16 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
-void InitialiseGameStix(short itemNumber);
-void GameStixControl(short itemNumber);
+void InitialiseGameSticks(short itemNumber);
+void GameSticksControl(short itemNumber);
 void _0x0040FAE0(ITEM_INFO* item);
 void SenetPieceExplosionEffect(ITEM_INFO* item, int color, int speed);
-void trigger_item_in_room(short room_number, int object);
-int CheckSenetWinner(short num);
+void TriggerItemInRoom(short roomNumber, int object);
+bool CheckSenetWinner(short number);
 void MakeMove(int piece, int displacement);
-void GameStixCollision(short item_num, ITEM_INFO* laraitem, COLL_INFO* coll);
+void GameSticksCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 void ControlGodHead(short itemNumber);
 void InitialiseGamePiece(short itemNumber);
 void SenetControl(short itemNumber);

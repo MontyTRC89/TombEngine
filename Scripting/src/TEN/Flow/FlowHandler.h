@@ -9,7 +9,7 @@
 #include "ScriptInterfaceGame.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
-class FlowHandler :  public ScriptInterfaceFlowHandler
+class FlowHandler : public ScriptInterfaceFlowHandler
 {
 private:
 	Settings				m_settings;
@@ -54,13 +54,16 @@ public:
 	bool				IsFlyCheatEnabled() const;
 	bool				CanPlayAnyLevel() const;
 
-	bool HasCrawlExtended() const override { return Anims.CrawlExtended; }
-	bool HasCrouchRoll() const override { return Anims.CrouchRoll; }
-	bool HasCrawlspaceSwandive() const override { return Anims.CrawlspaceSwandive; }
-	bool HasMonkeyTurn180() const override { return Anims.MonkeyTurn180; }
-	bool HasMonkeyAutoJump() const override { return Anims.MonkeyAutoJump; }
-	bool HasOscillateHang() const override { return Anims.OscillateHang; }
-	bool HasAFKPose() const override { return Anims.Pose; }
+	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
+	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }
+	bool HasCrawlspaceSwandive() const override { return Anims.HasCrawlspaceDive; }
+	bool HasMonkeyTurn180() const override { return Anims.HasMonkeyTurn180; }
+	bool HasMonkeyAutoJump() const override { return Anims.HasMonkeyAutoJump; }
+	bool HasAFKPose() const override { return Anims.HasPose; }
+	bool HasOverhangClimb() const override { return Anims.HasOverhangClimb; }
+	bool HasSlideExtended() const override { return Anims.HasSlideExtended; }
+	bool HasSprintJump() const override { return Anims.HasSprintJump; }
+	bool HasOscillateHang() const override { return Anims.HasOscillateHang; }
 	bool DoFlow() override;
 };
 

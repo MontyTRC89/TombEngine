@@ -1,4 +1,4 @@
 #pragma once
 
-void MercenaryUziControl(short itemNum);
-void MercenaryAutoPistolControl(short itemNum);
+void MercenaryUziControl(short itemNumber);
+void MercenaryAutoPistolControl(short itemNumber);

@@ -2,31 +2,44 @@
 #include "Objects/TR3/Entity/tr3_shiva.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO shivaLeftBite = { 0, 0, 920, 13 };
-BITE_INFO shivaRightBite = { 0, 0, 920, 22 };
+BITE_INFO ShivaBiteLeft = { 0, 0, 920, 13 };
+BITE_INFO ShivaBiteRight = { 0, 0, 920, 22 };
+
+// TODO
+enum ShivaState
+{
+
+};
+
+// TODO
+enum ShivaAnim
+{
+
+};
 
 static void TriggerShivaSmoke(long x, long y, long z, long uw)
 {
-	long size;
-	SPARKS* sptr;
-	long dx, dz;
+	long dx = LaraItem->Pose.Position.x - x;
+	long dz = LaraItem->Pose.Position.z - z;
 
-	dx = LaraItem->pos.xPos - x;
-	dz = LaraItem->pos.zPos - z;
-
-	if (dx < -0x4000 || dx > 0x4000 || dz < -0x4000 || dz > 0x4000)
+	if (dx < -SECTOR(16) || dx > SECTOR(16) ||
+		dz < -SECTOR(16) || dz > SECTOR(16))
+	{
 		return;
+	}
 
-	sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = &Sparks[GetFreeSpark()];
 
 	sptr->on = 1;
 	if (uw)
@@ -74,28 +87,28 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 		sptr->friction = 4 | (16);
 	}
 	else
-	{
 		sptr->friction = 6;
-	}
 
 	sptr->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 	sptr->rotAng = GetRandomControl() & 4095;
+
 	if (GetRandomControl() & 1)
 		sptr->rotAdd = -(GetRandomControl() & 15) - 16;
 	else
 		sptr->rotAdd = (GetRandomControl() & 15) + 16;
 
 	sptr->scalar = 3;
+
 	if (uw)
-	{
 		sptr->gravity = sptr->maxYvel = 0;
-	}
 	else
 	{
 		sptr->gravity = -(GetRandomControl() & 3) - 3;
 		sptr->maxYvel = -(GetRandomControl() & 3) - 4;
 	}
-	size = (GetRandomControl() & 31) + 128;
+	
+	long size = (GetRandomControl() & 31) + 128;
+
 	sptr->size = sptr->sSize = size / 4;
 	sptr->dSize = size;
 	size += (GetRandomControl() & 31) + 32;
@@ -103,314 +116,319 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->dSize = size;
 }
 
-static void ShivaDamage(ITEM_INFO* item, CREATURE_INFO* shiva, int damage)
+static void ShivaDamage(ITEM_INFO* item, CreatureInfo* creature, int damage)
 {
-	if (!(shiva->flags) && (item->touchBits & 0x2400000))
+	if (!(creature->Flags) && item->TouchBits & 0x2400000)
 	{
-		LaraItem->hitPoints -= damage;
-		LaraItem->hitStatus = true;
-		CreatureEffect(item, &shivaRightBite, DoBloodSplat);
-		shiva->flags = 1;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
+		creature->Flags = 1;
+
+		LaraItem->HitPoints -= damage;
+		LaraItem->HitStatus = true;
 	}
 
-	if (!(shiva->flags) && (item->touchBits & 0x2400))
+	if (!(creature->Flags) && item->TouchBits & 0x2400)
 	{
-		LaraItem->hitPoints -= damage;
-		LaraItem->hitStatus = true;
-		CreatureEffect(item, &shivaLeftBite, DoBloodSplat);
-		shiva->flags = 1;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->pos, 0);
+		CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
+		creature->Flags = 1;
+
+		LaraItem->HitPoints -= damage;
+		LaraItem->HitStatus = true;
 	}
 }
 
-void InitialiseShiva(short itemNum)
+void InitialiseShiva(short itemNumber)
 {
-	ANIM_STRUCT* anim;
-	ITEM_INFO* item;
+	ClearItem(itemNumber);
 
-	ClearItem(itemNum);
+	auto* item = &g_Level.Items[itemNumber];
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 14;
+	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 
-	item = &g_Level.Items[itemNum];
-	item->animNumber = Objects[item->objectNumber].animIndex + 14;
-
-	anim = &g_Level.Anims[item->animNumber];
-
-	item->frameNumber = anim->frameBase;
-	item->currentAnimState = anim->currentAnimState;
+	item->Animation.FrameNumber = anim->frameBase;
+	item->Animation.ActiveState = anim->ActiveState;
 }
 
-void ShivaControl(short itemNum)
+void ShivaControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CREATURE_INFO* shiva;
-	short angle, head_x, head_y, torso_x, torso_y, tilt, roomNumber;
-	int x, z;
-	int random, lara_alive;
-	AI_INFO info;
-	PHD_VECTOR	pos;
-	FLOOR_INFO* floor;
-	int effect_mesh = 0;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* shiva = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	shiva = (CREATURE_INFO*)item->data;
-	head_x = head_y = torso_x = torso_y = angle = tilt = 0;
-	lara_alive = (LaraItem->hitPoints > 0);
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 256;
+	Vector3Int pos = { 0, 0, 256 };
+	int laraAlive = LaraItem->HitPoints > 0;
 
-	if (item->hitPoints <= 0)
+	short headX = 0;
+	short headY = 0;
+	short torsoX = 0;
+	short torsoY = 0;
+	short angle = 0;
+	short tilt = 0;
+
+	if (item->HitPoints <= 0)
 	{
-		if (item->currentAnimState != 9)
+		if (item->Animation.ActiveState != 9)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 22;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 9;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 9;
 		}
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		if (shiva->mood == ESCAPE_MOOD)
+		if (shiva->Mood == MoodType::Escape)
 		{
-			shiva->target.x = LaraItem->pos.xPos;
-			shiva->target.z = LaraItem->pos.zPos;
+			shiva->Target.x = LaraItem->Pose.Position.x;
+			shiva->Target.z = LaraItem->Pose.Position.z;
 		}
 
-		angle = CreatureTurn(item, shiva->maximumTurn);
+		angle = CreatureTurn(item, shiva->MaxTurn);
 
-		if (item->currentAnimState != 4)
-			item->meshBits = 0xFFFFFFFF;
+		if (item->Animation.ActiveState != 4)
+			item->MeshBits = 0xFFFFFFFF;
 
-		switch (item->currentAnimState)
+		int effectMesh = 0;
+
+		switch (item->Animation.ActiveState)
 		{
 		case 4:
-			shiva->maximumTurn = 0;
+			shiva->MaxTurn = 0;
 
-			if (!shiva->flags)
+			if (!shiva->Flags)
 			{
-				if (item->meshBits == 0)
-					effect_mesh = 0;
-				item->meshBits = (item->meshBits * 2) + 1;
-				shiva->flags = 1;
+				if (item->MeshBits == 0)
+					effectMesh = 0;
 
-				GetJointAbsPosition(item, &pos, effect_mesh++);
-				TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->roomNumber);
+				item->MeshBits = (item->MeshBits * 2) + 1;
+				shiva->Flags = 1;
+
+				GetJointAbsPosition(item, &pos, effectMesh++);
+				TriggerExplosionSparks(pos.x, pos.y, pos.z, 2, 0, 0, item->RoomNumber);
 				TriggerShivaSmoke(pos.x, pos.y, pos.z, 1);
 
 			}
 			else
+				shiva->Flags--;
+
+			if (item->MeshBits == 0x7FFFFFFF)
 			{
-				shiva->flags--;
+				item->Animation.TargetState = 0;
+				shiva->Flags = -45;
+				effectMesh = 0;
 			}
 
-			if (item->meshBits == 0x7FFFFFFF)
-			{
-				item->goalAnimState = 0;
-				effect_mesh = 0;
-				shiva->flags = -45;
-			}
 			break;
 
 		case 0:
-			if (info.ahead)
-				head_y = info.angle;
+			shiva->MaxTurn = 0;
 
-			if (shiva->flags < 0)
+			if (AI.ahead)
+				headY = AI.angle;
+
+			if (shiva->Flags < 0)
 			{
-				shiva->flags++;
-				TriggerShivaSmoke(item->pos.xPos + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->pos.zPos + (GetRandomControl() & 0x5FF) - 0x300, 1);
+				shiva->Flags++;
+				TriggerShivaSmoke(item->Pose.Position.x + (GetRandomControl() & 0x5FF) - 0x300, pos.y - (GetRandomControl() & 0x5FF), item->Pose.Position.z + (GetRandomControl() & 0x5FF) - 0x300, 1);
 				break;
 			}
 
-			if (shiva->flags == 1)
-				shiva->flags = 0;
+			if (shiva->Flags == 1)
+				shiva->Flags = 0;
 
-			shiva->maximumTurn = 0;
-
-			if (shiva->mood == ESCAPE_MOOD)
+			if (shiva->Mood == MoodType::Escape)
 			{
-				roomNumber = item->roomNumber;
-				x = item->pos.xPos + WALL_SIZE * phd_sin(item->pos.yRot + 0x8000);
-				z = item->pos.zPos + WALL_SIZE * phd_cos(item->pos.yRot + 0x8000);
-				floor = GetFloor(x, item->pos.yPos, z, &roomNumber);
+				int x = item->Pose.Position.x + SECTOR(1) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+				int z = item->Pose.Position.z + SECTOR(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
+				auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
 
-				if (!shiva->flags && floor->Box != NO_BOX && !(g_Level.Boxes[floor->Box].flags & BLOCKABLE))
-					item->goalAnimState = 8;
+				if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !shiva->Flags)
+					item->Animation.TargetState = 8;
 				else
-					item->goalAnimState = 2;
+					item->Animation.TargetState = 2;
 			}
-			else if (shiva->mood == BORED_MOOD)
+			else if (shiva->Mood == MoodType::Bored)
 			{
-				random = GetRandomControl();
+				int random = GetRandomControl();
 				if (random < 0x400)
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 			}
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 5 / 4))
+			else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
 			{
-				item->goalAnimState = 5;
-				shiva->flags = 0;
+				item->Animation.TargetState = 5;
+				shiva->Flags = 0;
 			}
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3))
+			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{
-				item->goalAnimState = 7;
-				shiva->flags = 0;
+				item->Animation.TargetState = 7;
+				shiva->Flags = 0;
 			}
-			else if (item->hitStatus && info.ahead)
+			else if (item->HitStatus && AI.ahead)
 			{
-				shiva->flags = 4;
-				item->goalAnimState = 2;
+				shiva->Flags = 4;
+				item->Animation.TargetState = 2;
 			}
 			else
-			{
-				item->goalAnimState = 1;
-			}
+				item->Animation.TargetState = 1;
+
 			break;
 
 		case 2:
-			if (info.ahead)
-				head_y = info.angle;
+			shiva->MaxTurn = 0;
 
-			shiva->maximumTurn = 0;
-			if (item->hitStatus || shiva->mood == ESCAPE_MOOD)
-				shiva->flags = 4;
+			if (AI.ahead)
+				headY = AI.angle;
 
-			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags) || !info.ahead)
+			if (item->HitStatus || shiva->Mood == MoodType::Escape)
+				shiva->Flags = 4;
+
+			if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2) ||
+				(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
+					!shiva->Flags) ||
+				!AI.ahead)
 			{
-				item->goalAnimState = 0;
-				shiva->flags = 0;
+				item->Animation.TargetState = 0;
+				shiva->Flags = 0;
 			}
-			else if (shiva->flags)
-			{
-				item->goalAnimState = 2;
-			}
+			else if (shiva->Flags)
+				item->Animation.TargetState = 2;
 
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && shiva->flags > 1)
-				shiva->flags -= 2;
+
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase && shiva->Flags > 1)
+				shiva->Flags -= 2;
+
 			break;
 
 		case 1:
-			if (info.ahead)
-				head_y = info.angle;
+			shiva->MaxTurn = ANGLE(4.0f);
 
-			shiva->maximumTurn = ANGLE(4);
+			if (AI.ahead)
+				headY = AI.angle;
 
-			if (shiva->mood == ESCAPE_MOOD)
+			if (shiva->Mood == MoodType::Escape)
+				item->Animation.TargetState = 0;
+			else if (shiva->Mood == MoodType::Bored)
+				item->Animation.TargetState = 0;
+			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{
-				item->goalAnimState = 0;
+				item->Animation.TargetState = 0;
+				shiva->Flags = 0;
 			}
-			else if (shiva->mood == BORED_MOOD)
+			else if (item->HitStatus)
 			{
-				item->goalAnimState = 0;
+				shiva->Flags = 4;
+				item->Animation.TargetState = 3;
 			}
-			else if (info.bite && info.distance < SQUARE(WALL_SIZE * 4 / 3))
-			{
-				item->goalAnimState = 0;
-				shiva->flags = 0;
-			}
-			else if (item->hitStatus)
-			{
-				shiva->flags = 4;
-				item->goalAnimState = 3;
-			}
+
 			break;
 
 		case 3:
-			if (info.ahead)
-				head_y = info.angle;
+			shiva->MaxTurn = ANGLE(4.0f);
 
-			shiva->maximumTurn = ANGLE(4);
+			if (AI.ahead)
+				headY = AI.angle;
 
-			if (item->hitStatus)
-				shiva->flags = 4;
+			if (item->HitStatus)
+				shiva->Flags = 4;
 
-			if ((info.bite && info.distance < SQUARE(WALL_SIZE * 5 / 4)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags))
+			if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2) ||
+				(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
+					!shiva->Flags))
 			{
-				item->goalAnimState = 1;
-				shiva->flags = 0;
+				item->Animation.TargetState = 1;
+				shiva->Flags = 0;
 			}
-			else if (shiva->flags)
-			{
-				item->goalAnimState = 3;
-			}
+			else if (shiva->Flags)
+				item->Animation.TargetState = 3;
 
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase)
-			{
-				shiva->flags = 0;
-			}
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+				shiva->Flags = 0;
+			
 			break;
 
 		case 8:
-			if (info.ahead)
-				head_y = info.angle;
+			shiva->MaxTurn = ANGLE(4.0f);
 
-			shiva->maximumTurn = ANGLE(4);
-			if ((info.ahead && info.distance < SQUARE(WALL_SIZE * 4 / 3)) || (item->frameNumber == g_Level.Anims[item->animNumber].frameBase && !shiva->flags))
+			if (AI.ahead)
+				headY = AI.angle;
+
+			if (AI.ahead && AI.distance < pow(SECTOR(4) / 3, 2) ||
+				(item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase &&
+					!shiva->Flags))
 			{
-				item->goalAnimState = 0;
+				item->Animation.TargetState = 0;
 			}
-			else if (item->hitStatus)
+			else if (item->HitStatus)
 			{
-				shiva->flags = 4;
-				item->goalAnimState = 0;
+				shiva->Flags = 4;
+				item->Animation.TargetState = 0;
 			}
+			
 			break;
 
-
 		case 5:
-			if (info.ahead)
-			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
-				head_y = info.angle;
-			}
+			shiva->MaxTurn = ANGLE(4.0f);
 
-			shiva->maximumTurn = ANGLE(4);
+			if (AI.ahead)
+			{
+				headY = AI.angle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
+			}
 
 			ShivaDamage(item, shiva, 150);
 			break;
 
 		case 7:
-			torso_y = info.angle;
-			head_y = info.angle;
-			if (info.xAngle > 0)
-				torso_x = info.xAngle;
+			shiva->MaxTurn = ANGLE(4.0f);
+			headY = AI.angle;
+			torsoY = AI.angle;
 
-			shiva->maximumTurn = ANGLE(4);
+			if (AI.xAngle > 0)
+				torsoX = AI.xAngle;
 
 			ShivaDamage(item, shiva, 180);
 			break;
 
 		case 6:
-			torso_y = torso_x = head_x = head_y = shiva->maximumTurn = 0;
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 10 || item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 21 || item->frameNumber == g_Level.Anims[item->animNumber].frameBase + 33)
+			shiva->MaxTurn = 0;
+			headX = 0;
+			headY = 0;
+			torsoX = 0;
+			torsoY = 0;
+
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 10 ||
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 21 ||
+				item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 33)
 			{
-				CreatureEffect(item, &shivaRightBite, DoBloodSplat);
-				CreatureEffect(item, &shivaLeftBite, DoBloodSplat);
+				CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
+				CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
 			}
+
 			break;
 		}
 	}
 
-	if (lara_alive && LaraItem->hitPoints <= 0)
+	if (laraAlive && LaraItem->HitPoints <= 0)
 	{
 		CreatureKill(item, 18, 6, 2);
 		return;
 	}
 
 	CreatureTilt(item, tilt);
-	head_y -= torso_y;
-	CreatureJoint(item, 0, torso_y);
-	CreatureJoint(item, 1, torso_x);
-	CreatureJoint(item, 2, head_y);
-	CreatureJoint(item, 3, head_x);
-	CreatureAnimation(itemNum, angle, tilt);
+	headY -= torsoY;
+	CreatureJoint(item, 0, torsoY);
+	CreatureJoint(item, 1, torsoX);
+	CreatureJoint(item, 2, headY);
+	CreatureJoint(item, 3, headX);
+	CreatureAnimation(itemNumber, angle, tilt);
 }

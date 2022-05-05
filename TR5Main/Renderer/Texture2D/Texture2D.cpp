@@ -2,9 +2,13 @@
 #include "Texture2D.h"
 #include "Utils.h"
 #include <WICTextureLoader.h>
-namespace TEN::Renderer {
+
+namespace TEN::Renderer
+{
 	using Utils::throwIfFailed;
-	Texture2D::Texture2D(ID3D11Device* device, int w, int h, byte* data) {
+
+	Texture2D::Texture2D(ID3D11Device* device, int w, int h, byte* data)
+	{
 		D3D11_TEXTURE2D_DESC desc;
 		desc.Width = w;
 		desc.Height = h;
@@ -32,7 +36,8 @@ namespace TEN::Renderer {
 		throwIfFailed(device->CreateShaderResourceView(Texture.Get(), &shaderDesc, ShaderResourceView.GetAddressOf()));
 	}
 
-	Texture2D::Texture2D(ID3D11Device* device, const std::wstring& fileName) {
+	Texture2D::Texture2D(ID3D11Device* device, const std::wstring& fileName)
+	{
 		ComPtr<ID3D11Resource> resource;
 		ID3D11DeviceContext* context = NULL;
 		device->GetImmediateContext(&context);
@@ -40,8 +45,9 @@ namespace TEN::Renderer {
 		throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0));
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
-	Texture2D::Texture2D(ID3D11Device* device, byte* data, int length) {
 
+	Texture2D::Texture2D(ID3D11Device* device, byte* data, int length)
+	{
 		ComPtr<ID3D11Resource> resource;
 		ID3D11DeviceContext* context = nullptr;
 		device->GetImmediateContext(&context);
@@ -64,4 +70,3 @@ namespace TEN::Renderer {
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
 }
-

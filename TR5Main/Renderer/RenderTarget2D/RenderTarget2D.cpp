@@ -1,9 +1,13 @@
 #include "framework.h"
 #include "RenderTarget2D.h"
 #include "Utils.h"
-namespace TEN::Renderer {
+
+namespace TEN::Renderer
+{
 	using TEN::Renderer::Utils::throwIfFailed;
-	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat) {
+
+	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat)
+	{
 
 		D3D11_TEXTURE2D_DESC desc = {};
 		desc.Width = w;
@@ -64,5 +68,4 @@ namespace TEN::Renderer {
 		res = device->CreateDepthStencilView(DepthStencilTexture.Get(), &dsvDesc, &DepthStencilView);
 		throwIfFailed(res);
 	}
-
 }

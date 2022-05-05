@@ -15,7 +15,7 @@
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Objects/TR4/Entity/tr4_littlebeetle.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "RenderView/RenderView.h"
 #include "Game/effects/hair.h"
 #include "Game/effects/weather.h"
@@ -53,7 +53,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
-	                                        float scale1)
+		float scale1)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -80,7 +80,7 @@ namespace TEN::Renderer
 		}
 
 		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f),
-		                            Vector3(0.0f, -1.0f, 0.0f));
+			Vector3(0.0f, -1.0f, 0.0f));
 		projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
 
 		auto& moveableObj = m_moveableObjects[objectNum];
@@ -91,7 +91,7 @@ namespace TEN::Renderer
 
 		if (obj->animIndex != -1)
 		{
-			ANIM_FRAME* frame[] = {&g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr]};
+			ANIM_FRAME* frame[] = { &g_Level.Frames[g_Level.Anims[obj->animIndex].framePtr] };
 			UpdateAnimation(nullptr, *moveableObj, frame, 0, 0, 0xFFFFFFFF);
 		}
 
@@ -119,12 +119,12 @@ namespace TEN::Renderer
 
 			/*if (GLOBAL_invMode)
 			{
-			    InventoryObject* objme;
+				InventoryObject* objme;
 
-			    objme = &inventry_objects_list[g_Gui.ConvertObjectToInventoryItem(objectNum)];
+				objme = &inventry_objects_list[g_Gui.ConvertObjectToInventoryItem(objectNum)];
 
-			    if (!(objme->meshbits & (1 << n)))
-			        continue;
+				if (!(objme->meshbits & (1 << n)))
+					continue;
 			}*/
 
 			// Finish the world matrix
@@ -154,9 +154,9 @@ namespace TEN::Renderer
 				SetDepthState(DEPTH_STATE_WRITE_ZBUFFER);
 
 				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]),
-				            SAMPLER_ANISOTROPIC_CLAMP);
+					SAMPLER_ANISOTROPIC_CLAMP);
 				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]),
-				            SAMPLER_NONE);
+					SAMPLER_NONE);
 
 				SetAlphaTest(
 					bucket.BlendMode == BLENDMODE_ALPHATEST ? ALPHA_TEST_GREATER_THAN : ALPHA_TEST_NONE,
@@ -180,9 +180,9 @@ namespace TEN::Renderer
 		// Bind and clear render target
 		m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView.Get(), Colors::White);
 		m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		                                 1.0f, 0);
+			1.0f, 0);
 		m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView.GetAddressOf(),
-		                              m_shadowMap.DepthStencilView.Get());
+			m_shadowMap.DepthStencilView.Get());
 
 		m_context->RSSetViewports(1, &m_shadowMapViewport);
 		ResetScissor();
@@ -190,7 +190,7 @@ namespace TEN::Renderer
 		//DrawLara(false, true);
 
 		Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
-		Vector3 itemPos = Vector3(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
+		Vector3 itemPos = Vector3(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 		if (lightPos == itemPos)
 			return;
 
@@ -208,17 +208,17 @@ namespace TEN::Renderer
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
-		            SAMPLER_ANISOTROPIC_CLAMP);
+			SAMPLER_ANISOTROPIC_CLAMP);
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
 
 		// Set camera matrices
 		Matrix view = Matrix::CreateLookAt(lightPos,
-		                                   itemPos,
-		                                   Vector3(0.0f, -1.0f, 0.0f));
+			itemPos,
+			Vector3(0.0f, -1.0f, 0.0f));
 		Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
-		                                                         (shadowLight->Type == LIGHT_TYPE_POINT
-			                                                          ? shadowLight->Out
-			                                                          : shadowLight->Range) * 1.2f);
+			(shadowLight->Type == LIGHT_TYPE_POINT
+				? shadowLight->Out
+				: shadowLight->Range) * 1.2f);
 		CCameraMatrixBuffer shadowProjection;
 		shadowProjection.ViewProjection = view * projection;
 		m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
@@ -230,10 +230,10 @@ namespace TEN::Renderer
 
 		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
 		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-		RendererRoom& room = m_rooms[LaraItem->roomNumber];
+		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
 
 		m_stItem.World = m_LaraWorldMatrix;
-		m_stItem.Position = Vector4(LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos, 1.0f);
+		m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -242,7 +242,7 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 		{
-			RendererMesh* mesh = GetMesh(Lara.meshPtrs[k]);
+			RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
 
 			for (auto& bucket : mesh->buckets)
 			{
@@ -301,8 +301,8 @@ namespace TEN::Renderer
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
 			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.yRot), TO_RAD(hairs->pos.xRot), 0) *
-				Matrix::CreateTranslation(hairs->pos.xPos, hairs->pos.yPos, hairs->pos.zPos);
+			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
 			matrices[i + 1] = world;
 		}
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
@@ -362,8 +362,8 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawGunShells(RenderView& view)
 	{
-		RendererRoom& room = m_rooms[LaraItem->roomNumber];
-		RendererItem* item = &m_items[Lara.itemNumber];
+		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
+		RendererItem* item = &m_items[Lara.ItemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -385,10 +385,10 @@ namespace TEN::Renderer
 				OBJECT_INFO* obj = &Objects[gunshell->objectNumber];
 				RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
 
-				Matrix translation = Matrix::CreateTranslation(gunshell->pos.xPos, gunshell->pos.yPos,
-				                                               gunshell->pos.zPos);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.yRot), TO_RAD(gunshell->pos.xRot),
-				                                                 TO_RAD(gunshell->pos.zRot));
+				Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
+															   gunshell->pos.Position.z);
+				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.Orientation.y), TO_RAD(gunshell->pos.Orientation.x),
+																 TO_RAD(gunshell->pos.Orientation.z));
 				Matrix world = rotation * translation;
 
 				m_stItem.World = world;
@@ -467,10 +467,10 @@ namespace TEN::Renderer
                 ScriptInterfaceLevel* levelScript = g_GameFlow->GetLevel(i);
 
 				DrawString(400, lastY, g_GameFlow->GetString(levelScript->NameStringKey.c_str()),
-				           D3DCOLOR_ARGB(255, 255, 255, 255),
-				           PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == (i - 1)
-					                                                       ? PRINTSTRING_BLINK
-					                                                       : 0));
+					D3DCOLOR_ARGB(255, 255, 255, 255),
+					PRINTSTRING_CENTER | PRINTSTRING_OUTLINE | (title_option == (i - 1)
+						? PRINTSTRING_BLINK
+						: 0));
 
 				lastY += 24;
 			}
@@ -1102,7 +1102,7 @@ namespace TEN::Renderer
 		if (TrInput & IN_SPRINT)
 			scaler += 0.03f;
 
-		if (TrInput & IN_DUCK)
+		if (TrInput & IN_CROUCH)
 			scaler -= 0.03f;
 
 		if (scaler > 1.6f)
@@ -1120,14 +1120,14 @@ namespace TEN::Renderer
 	void Renderer11::DrawDiary()
 	{
 		InventoryObject* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
-		short currentPage = Lara.Diary.currentPage;
+		short currentPage = Lara.Inventory.Diary.currentPage;
 		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
 		                       obj->yrot, obj->zrot, obj->scale1);
 
 		for (int i = 0; i < MaxStringsPerPage; i++)
 		{
-			if (!Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].x && !Lara.Diary.Pages[Lara.Diary.currentPage].
-				Strings[i].y && !Lara.Diary.Pages[Lara.Diary.currentPage].Strings[i].stringID)
+			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].
+				Strings[i].y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].stringID)
 				break;
 
 			//DrawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
@@ -1137,7 +1137,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-	                                      ID3D11ShaderResourceView* background)
+										  ID3D11ShaderResourceView* background)
 	{
 		char stringBuffer[255];
 
@@ -1326,7 +1326,7 @@ namespace TEN::Renderer
 
 				for (int n = 0; n < ROPE_SEGMENTS; n++)
 				{
-					PHD_VECTOR* s = &rope->meshSegment[n];
+					Vector3Int* s = &rope->meshSegment[n];
 					Vector3 t;
 					Vector3 output;
 
@@ -1357,7 +1357,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
 		Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth,
-		                                                   m_viewport.MaxDepth);
+														   m_viewport.MaxDepth);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
@@ -1487,19 +1487,19 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < NUM_RATS; i++)
 			{
-				RAT_STRUCT* rat = &Rats[i];
+				auto* rat = &Rats[i];
 
-				if (rat->on)
+				if (rat->On)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
-					Matrix translation = Matrix::CreateTranslation(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->pos.yRot), TO_RAD(rat->pos.xRot),
-					                                                 TO_RAD(rat->pos.zRot));
+					Matrix translation = Matrix::CreateTranslation(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(rat->Pose.Orientation.y), TO_RAD(rat->Pose.Orientation.x),
+																	 TO_RAD(rat->Pose.Orientation.z));
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(rat->pos.xPos, rat->pos.yPos, rat->pos.zPos, 1.0f);
-					m_stItem.AmbientLight = m_rooms[rat->roomNumber].AmbientLight;
+					m_stItem.Position = Vector4(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z, 1.0f);
+					m_stItem.AmbientLight = m_rooms[rat->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
 					for (int b = 0; b < mesh->buckets.size(); b++)
@@ -1545,18 +1545,18 @@ namespace TEN::Renderer
 
 				for (int i = 0; i < NUM_BATS; i++)
 				{
-					BAT_STRUCT* bat = &Bats[i];
+					auto* bat = &Bats[i];
 
-					if (bat->on)
+					if (bat->On)
 					{
-						Matrix translation = Matrix::CreateTranslation(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos);
+						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
 						Matrix rotation = Matrix::CreateFromYawPitchRoll(
-							TO_RAD(bat->pos.yRot), TO_RAD(bat->pos.xRot), TO_RAD(bat->pos.zRot));
+							TO_RAD(bat->Pose.Orientation.y), TO_RAD(bat->Pose.Orientation.x), TO_RAD(bat->Pose.Orientation.z));
 						Matrix world = rotation * translation;
 
 						m_stItem.World = world;
-						m_stItem.Position = Vector4(bat->pos.xPos, bat->pos.yPos, bat->pos.zPos, 1.0f);
-						m_stItem.AmbientLight = m_rooms[bat->roomNumber].AmbientLight;
+						m_stItem.Position = Vector4(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 1.0f);
+						m_stItem.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
 						m_cbItem.updateData(m_stItem, m_context.Get());
 
 						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
@@ -1585,22 +1585,22 @@ namespace TEN::Renderer
 			for (int m = 0; m < 32; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-			for (int i = 0; i < TEN::Entities::TR4::NUM_SCARABS; i++)
+			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
-				SCARAB_STRUCT* beetle = &TEN::Entities::TR4::Scarabs[i];
+				auto* beetle = &TEN::Entities::TR4::BeetleSwarm[i];
 
-				if (beetle->on)
+				if (beetle->On)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
 					Matrix translation =
-						Matrix::CreateTranslation(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->pos.yRot), TO_RAD(beetle->pos.xRot),
-					                                                 TO_RAD(beetle->pos.zRot));
+						Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Pose.Orientation.y), TO_RAD(beetle->Pose.Orientation.x),
+																	 TO_RAD(beetle->Pose.Orientation.z));
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(beetle->pos.xPos, beetle->pos.yPos, beetle->pos.zPos, 1.0f);
-					m_stItem.AmbientLight = m_rooms[beetle->roomNumber].AmbientLight;
+					m_stItem.Position = Vector4(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, 1.0f);
+					m_stItem.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
 					for (int b = 0; b < mesh->buckets.size(); b++)
@@ -1644,13 +1644,13 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
 					Matrix translation =
-						Matrix::CreateTranslation(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.yRot, locust->pos.xRot,
-					                                                 locust->pos.zRot);
+						Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.Orientation.y, locust->pos.Orientation.x,
+																	 locust->pos.Orientation.z);
 					Matrix world = rotation * translation;
 
 					m_stItem.World = world;
-					m_stItem.Position = Vector4(locust->pos.xPos, locust->pos.yPos, locust->pos.zPos, 1.0f);
+					m_stItem.Position = Vector4(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 1.0f);
 					m_stItem.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
@@ -1903,9 +1903,9 @@ namespace TEN::Renderer
 			SetBlendMode(BLENDMODE_OPAQUE);
 			SetCullMode(CULL_MODE_CCW);
 
-		    // Clear screen
-		    m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
-		    m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			// Clear screen
+			m_context->ClearRenderTargetView(m_backBufferRTV, Colors::Black);
+			m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		    // Bind the back buffer
 		    m_context->OMSetRenderTargets(1, &m_backBufferRTV, m_depthStencilView);
@@ -1959,7 +1959,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
-	                                     ID3D11DepthStencilView* depthTarget)
+										 ID3D11DepthStencilView* depthTarget)
 	{
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
@@ -1993,7 +1993,7 @@ namespace TEN::Renderer
 		DrawString(0, 0, commit.c_str(), D3DCOLOR_ARGB(255, 255, 255, 255), 0);
 		DrawAllStrings();
 #else
-        DrawAllStrings();
+		DrawAllStrings();
 #endif
 		m_swapChain->Present(0, 0);
 	}
@@ -2022,7 +2022,7 @@ namespace TEN::Renderer
 		{
 			m_currentY = 60;
 
-			ROOM_INFO* r = &g_Level.Rooms[LaraItem->roomNumber];
+			ROOM_INFO* r = &g_Level.Rooms[LaraItem->RoomNumber];
 
 			switch (m_numDebugPage)
 			{
@@ -2038,7 +2038,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
-				PrintDebugMessage("    For moveables: %d", m_numMoveablesTransparentDrawCalls);
+				PrintDebugMessage("    For movables: %d", m_numMoveablesTransparentDrawCalls);
 				PrintDebugMessage("    For statics: %d", m_numStaticsTransparentDrawCalls);
 				PrintDebugMessage("    For sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
@@ -2047,14 +2047,15 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:
-				PrintDebugMessage("Lara.location: %d %d", LaraItem->location.roomNumber, LaraItem->location.yNumber);
-				PrintDebugMessage("Lara.roomNumber: %d", LaraItem->roomNumber);
-				PrintDebugMessage("LaraItem.boxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
-				                  LaraItem->boxNumber);
-				PrintDebugMessage("Lara.pos: %d %d %d", LaraItem->pos.xPos, LaraItem->pos.yPos, LaraItem->pos.zPos);
-				PrintDebugMessage("Lara.rot: %d %d %d", LaraItem->pos.xRot, LaraItem->pos.yRot, LaraItem->pos.zRot);
-				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * WALL_SIZE,
-				                  r->z + r->zSize * WALL_SIZE);
+				PrintDebugMessage("Lara Location: %d %d", LaraItem->Location.roomNumber, LaraItem->Location.yNumber);
+				PrintDebugMessage("Lara RoomNumber: %d", LaraItem->RoomNumber);
+				PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
+								  LaraItem->BoxNumber);
+				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+				PrintDebugMessage("Lara Rot: %d %d %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
+				PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
+				PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
+								  r->z + r->zSize * SECTOR(1));
 				PrintDebugMessage("Room.y, minFloor, maxCeiling: %d %d %d ", r->y, r->minfloor, r->maxceiling);
 				PrintDebugMessage("Camera.pos: %d %d %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 				PrintDebugMessage("Camera.target: %d %d %d", Camera.target.x, Camera.target.y, Camera.target.z);
@@ -2062,21 +2063,21 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LARA_STATS:
-				PrintDebugMessage("Lara.animNumber: %d", LaraItem->animNumber);
-				PrintDebugMessage("Lara.frameNumber: %d", LaraItem->frameNumber);
-				PrintDebugMessage("Lara.currentAnimState: %d", LaraItem->currentAnimState);
-				PrintDebugMessage("Lara.requiredAnimState: %d", LaraItem->requiredAnimState);
-				PrintDebugMessage("Lara.goalAnimState: %d", LaraItem->goalAnimState);
-				PrintDebugMessage("Lara.weaponItem: %d", Lara.weaponItem);
-				PrintDebugMessage("Lara.gunType: %d", Lara.gunType);
-				PrintDebugMessage("Lara.gunStatus: %d", Lara.gunStatus);
-				PrintDebugMessage("Lara.speed, fallspeed: %d %d", LaraItem->speed, LaraItem->fallspeed);
-				PrintDebugMessage("Lara.climbStatus: %d", Lara.climbStatus);
-				PrintDebugMessage("Lara.waterSurfaceDist: %d", Lara.waterSurfaceDist);
+				PrintDebugMessage("Lara AnimNumber: %d", LaraItem->Animation.AnimNumber);
+				PrintDebugMessage("Lara FrameNumber: %d", LaraItem->Animation.FrameNumber);
+				PrintDebugMessage("Lara ActiveState: %d", LaraItem->Animation.ActiveState);
+				PrintDebugMessage("Lara TargetState: %d", LaraItem->Animation.TargetState);
+				PrintDebugMessage("Lara Velocity, VerticalVelocity, LateralVelocity: %d %d %d", LaraItem->Animation.Velocity, LaraItem->Animation.VerticalVelocity, LaraItem->Animation.LateralVelocity);
+				PrintDebugMessage("Lara ExtraVelocity.x, y, z: %d %d %d", Lara.ExtraVelocity.x, Lara.ExtraVelocity.y, Lara.ExtraVelocity.z);
+				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
+				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
+				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
+				PrintDebugMessage("Lara Airborne: %d", LaraItem->Animation.Airborne);
+				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
-				PrintDebugMessage("target hitPoints: %d", Lara.target ? Lara.target->hitPoints : 0);
+				PrintDebugMessage("target hitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
 				break;
 			}
@@ -2103,19 +2104,19 @@ namespace TEN::Renderer
 	void Renderer11::DrawTransparentFaces(RenderView& view)
 	{
 		std::for_each(std::execution::par_unseq,
-		              view.roomsToDraw.begin(),
-		              view.roomsToDraw.end(),
-		              [](RendererRoom* room)
-		              {
-			              std::sort(
-				              room->TransparentFacesToDraw.begin(),
-				              room->TransparentFacesToDraw.end(),
-				              [](RendererTransparentFace& a, RendererTransparentFace& b)
-				              {
-					              return (a.distance > b.distance);
-				              }
-			              );
-		              }
+					  view.roomsToDraw.begin(),
+					  view.roomsToDraw.end(),
+					  [](RendererRoom* room)
+					  {
+						  std::sort(
+							  room->TransparentFacesToDraw.begin(),
+							  room->TransparentFacesToDraw.end(),
+							  [](RendererTransparentFace& a, RendererTransparentFace& b)
+							  {
+								  return (a.distance > b.distance);
+							  }
+						  );
+					  }
 		);
 
 		for (int r = view.roomsToDraw.size() - 1; r >= 0; r--)
@@ -2220,21 +2221,21 @@ namespace TEN::Renderer
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face.info.polygon->shape == 0 ? 6 : 3);
 					m_transparentFacesIndices.bulk_push_back(roomsIndices.data(), face.info.polygon->baseIndex,
-					                                         numIndices);
+															 numIndices);
 				}
 				else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_MOVEABLE)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face.info.polygon->shape == 0 ? 6 : 3);
 					m_transparentFacesIndices.bulk_push_back(moveablesIndices.data(), face.info.polygon->baseIndex,
-					                                         numIndices);
+															 numIndices);
 				}
 				else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_STATIC)
 				{
 					// For rooms, we already pass world coordinates, just copy vertices
 					int numIndices = (face.info.polygon->shape == 0 ? 6 : 3);
 					m_transparentFacesIndices.bulk_push_back(staticsIndices.data(), face.info.polygon->baseIndex,
-					                                         numIndices);
+															 numIndices);
 				}
 				else if (face.type == RendererTransparentFaceType::TRANSPARENT_FACE_SPRITE)
 				{
@@ -2440,8 +2441,8 @@ namespace TEN::Renderer
 		while (drawnVertices < size)
 		{
 			int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size
-				             ? size - drawnVertices
-				             : TRANSPARENT_BUCKET_SIZE);
+							 ? size - drawnVertices
+							 : TRANSPARENT_BUCKET_SIZE);
 
 			m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
 			m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
@@ -2493,8 +2494,8 @@ namespace TEN::Renderer
 		while (drawnVertices < size)
 		{
 			int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size
-				             ? size - drawnVertices
-				             : TRANSPARENT_BUCKET_SIZE);
+							 ? size - drawnVertices
+							 : TRANSPARENT_BUCKET_SIZE);
 
 			m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
 			m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
@@ -2510,7 +2511,7 @@ namespace TEN::Renderer
 	}
 
 	void Renderer11::DoFadingAndCinematicBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-	                                          RenderView& view)
+											  RenderView& view)
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetCullMode(CULL_MODE_CCW);
@@ -2609,8 +2610,8 @@ namespace TEN::Renderer
 			RenderShadowMap(view);
 
 		// Setup Lara item
-		m_items[Lara.itemNumber].ItemNumber = Lara.itemNumber;
-		CollectLightsForItem(LaraItem->roomNumber, &m_items[Lara.itemNumber], view);
+		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
+		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -2732,7 +2733,7 @@ namespace TEN::Renderer
 
 		// Bars
 		int flash = FlashIt();
-		UpdateSprintBar();
+		UpdateSprintBar(LaraItem);
 		UpdateHealthBar(LaraItem, flash);
 		UpdateAirBar(LaraItem, flash);
 		DrawAllPickups();
@@ -2810,13 +2811,13 @@ namespace TEN::Renderer
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
 				ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
-				RendererRoom& room = m_rooms[nativeItem->roomNumber];
-				RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
+				RendererRoom& room = m_rooms[nativeItem->RoomNumber];
+				RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 
 				if (moveableObj.DoNotDraw)
 					continue;
 
-				short objectNumber = nativeItem->objectNumber;
+				short objectNumber = nativeItem->ObjectNumber;
 
 				if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
 				{
@@ -2845,16 +2846,16 @@ namespace TEN::Renderer
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
 	{
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-		RendererRoom* room = &m_rooms[nativeItem->roomNumber];
-		RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
-		OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+		RendererRoom* room = &m_rooms[nativeItem->RoomNumber];
+		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
+		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
 
-		Vector3 itemPosition = Vector3(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos);
+		Vector3 itemPosition = Vector3(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z);
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		// Bind item main properties
 		m_stItem.World = item->World;
-		m_stItem.Position = Vector4(nativeItem->pos.xPos, nativeItem->pos.yPos, nativeItem->pos.zPos, 1.0f);
+		m_stItem.Position = Vector4(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
@@ -2870,13 +2871,13 @@ namespace TEN::Renderer
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
-			if (!(nativeItem->meshBits & (1 << k)))
+			if (!(nativeItem->MeshBits & (1 << k)))
 				continue;
 
 			RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
 			// Do the swapmesh
-			if (obj->meshSwapSlot != -1 && ((nativeItem->swapMeshFlags >> k) & 1))
+			if (obj->meshSwapSlot != -1 && ((nativeItem->SwapMeshFlags >> k) & 1))
 			{
 				RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
 				if (swapMeshObj.ObjectMeshes.size() > k)
@@ -2900,9 +2901,9 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		ITEM_INFO* nativeItem = &g_Level.Items[info->item->ItemNumber];
-		RendererRoom& room = m_rooms[nativeItem->roomNumber];
-		RendererObject& moveableObj = *m_moveableObjects[nativeItem->objectNumber];
-		OBJECT_INFO* obj = &Objects[nativeItem->objectNumber];
+		RendererRoom& room = m_rooms[nativeItem->RoomNumber];
+		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
+		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
 
 		// Set shaders
 		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
@@ -2938,8 +2939,8 @@ namespace TEN::Renderer
 		while (drawnVertices < size)
 		{
 			int count = (drawnVertices + TRANSPARENT_BUCKET_SIZE > size
-				             ? size - drawnVertices
-				             : TRANSPARENT_BUCKET_SIZE);
+							 ? size - drawnVertices
+							 : TRANSPARENT_BUCKET_SIZE);
 
 			m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
 			m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
@@ -2959,16 +2960,16 @@ namespace TEN::Renderer
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		Vector3 start = Vector3(
-			nativeItem->pos.xPos,
-			nativeItem->pos.yPos,
-			nativeItem->pos.zPos);
+			nativeItem->Pose.Position.x,
+			nativeItem->Pose.Position.y,
+			nativeItem->Pose.Position.z);
 
-		float speed = (-96 * phd_cos(TO_RAD(nativeItem->pos.xRot)));
+		float speed = (-96 * phd_cos(TO_RAD(nativeItem->Pose.Orientation.x)));
 
 		Vector3 end = Vector3(
-			nativeItem->pos.xPos + speed * phd_sin(TO_RAD(nativeItem->pos.yRot)),
-			nativeItem->pos.yPos + 96 * phd_sin(TO_RAD(nativeItem->pos.xRot)),
-			nativeItem->pos.zPos + speed * phd_cos(TO_RAD(nativeItem->pos.yRot)));
+			nativeItem->Pose.Position.x + speed * phd_sin(TO_RAD(nativeItem->Pose.Orientation.y)),
+			nativeItem->Pose.Position.y + 96 * phd_sin(TO_RAD(nativeItem->Pose.Orientation.x)),
+			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
 
 		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
 	}
@@ -2976,7 +2977,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
 	{
 		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
-		WRAITH_INFO* info = (WRAITH_INFO*)nativeItem->data;
+		WraithInfo* info = (WraithInfo*)nativeItem->Data;
 
 		for (int j = 0; j <= 4; j++)
 		{
@@ -3005,8 +3006,8 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < 7; i++)
 			{
-				Vector3 p1 = Vector3(info[i].xPos, info[i].yPos, info[i].zPos);
-				Vector3 p2 = Vector3(info[i + 1].xPos, info[i + 1].yPos, info[i + 1].zPos);
+				Vector3 p1 = Vector3(info[i].Position.x, info[i].Position.y, info[i].Position.z);
+				Vector3 p2 = Vector3(info[i + 1].Position.x, info[i + 1].Position.y, info[i + 1].Position.z);
 
 				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
 			}
@@ -3037,11 +3038,12 @@ namespace TEN::Renderer
 				if (!m_staticObjects[msh->staticNumber])
 					continue;
 
-				Matrix world =
-					Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.yRot), TO_RAD(msh->pos.xRot), TO_RAD(msh->pos.zRot)) * 
-					Matrix::CreateTranslation(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
+				Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.Orientation.y), TO_RAD(msh->pos.Orientation.x),
+															   TO_RAD(msh->pos.Orientation.z)) * 
+								Matrix::CreateTranslation(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z));
+
 				m_stStatic.World = world;
-				m_stStatic.Position = Vector4(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos, 1);
+				m_stStatic.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
 				m_stStatic.Color = msh->color;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
@@ -3084,7 +3086,7 @@ namespace TEN::Renderer
 								face.info.room = room;
 								face.info.staticMesh = msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = Vector3(msh->pos.xPos, msh->pos.yPos, msh->pos.zPos);
+								face.info.position = Vector3(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z);
 								face.info.color = Vector4(msh->color.x, msh->color.y, msh->color.z, 1.0f);
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
@@ -3395,7 +3397,7 @@ namespace TEN::Renderer
 			auto weather = TEN::Effects::Environment::Weather;
 
 			Matrix translation = Matrix::CreateTranslation(Camera.pos.x + weather.SkyLayer1Position() - i * 9728.0f,
-			                                               Camera.pos.y - 1536.0f, Camera.pos.z);
+														   Camera.pos.y - 1536.0f, Camera.pos.z);
 			Matrix world = rotation * translation;
 
 			m_stStatic.World = (rotation * translation);

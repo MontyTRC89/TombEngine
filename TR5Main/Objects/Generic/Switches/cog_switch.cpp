@@ -3,6 +3,7 @@
 #include "Game/control/control.h"
 #include "Specific/input.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Game/itemdata/door_data.h"
 #include "Game/control/box.h"
@@ -20,16 +21,17 @@ namespace TEN::Entities::Switches
 		-512, 512,
 		0, 0,
 		-1536, -512,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
-	PHD_VECTOR CogSwitchPos(0, 0, -856);
+	Vector3Int CogSwitchPos(0, 0, -856);
 
-	void CogSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void CogSwitchCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		auto item = &g_Level.Items[itemNum];
-		auto triggerIndex = GetTriggerIndex(item);
+		auto* lara = GetLaraInfo(laraItem);
+		auto* switchItem = &g_Level.Items[itemNum];
+		auto* triggerIndex = GetTriggerIndex(switchItem);
 
 		int targetItemNum;
 		ITEM_INFO* target = nullptr;
@@ -47,8 +49,8 @@ namespace TEN::Entities::Switches
 			if (targetItemNum < g_Level.Items.size())
 			{
 				target = &g_Level.Items[targetItemNum];
-				if (target->data.is<DOOR_DATA>())
-					door = (DOOR_DATA*)target->data;
+				if (target->Data.is<DOOR_DATA>())
+					door = (DOOR_DATA*)target->Data;
 			}
 		}
 
@@ -56,106 +58,102 @@ namespace TEN::Entities::Switches
 
 		if (door == nullptr)
 		{
-			ObjectCollision(itemNum, l, coll);
+			ObjectCollision(itemNum, laraItem, coll);
 			return;
 		}
 
 		// Door is found, attach to it.
 
-		if (item->status == ITEM_NOT_ACTIVE)
+		if (switchItem->Status == ITEM_NOT_ACTIVE)
 		{
-			if (!(item->flags & ONESHOT)
-				&& (TrInput & IN_ACTION
-					&& !Lara.gunStatus
-					&& !item->gravityStatus
-					&& l->currentAnimState == LS_IDLE
-					&& l->animNumber == LA_STAND_IDLE
-					|| Lara.isMoving
-					&& Lara.interactedItem == itemNum))
+			if (!(switchItem->Flags & ONESHOT) &&
+				(TrInput & IN_ACTION &&
+					laraItem->Animation.ActiveState == LS_IDLE &&
+					laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+					lara->Control.HandStatus == HandStatus::Free &&
+					!switchItem->Animation.Airborne ||
+					lara->Control.IsMoving &&
+					lara->InteractedItem == itemNum))
 			{
-				if (TestLaraPosition(&CogSwitchBounds, item, l))
+				if (TestLaraPosition(&CogSwitchBounds, switchItem, laraItem))
 				{
-					if (MoveLaraPosition(&CogSwitchPos, item, l))
+					if (MoveLaraPosition(&CogSwitchPos, switchItem, laraItem))
 					{
-						Lara.isMoving = false;
-						Lara.headYrot = 0;
-						Lara.headXrot = 0;
-						Lara.torsoYrot = 0;
-						Lara.torsoXrot = 0;
-						Lara.gunStatus = LG_HANDS_BUSY;
-						Lara.interactedItem = targetItemNum;
-						l->animNumber = LA_COGWHEEL_GRAB;
-						l->goalAnimState = LS_COGWHEEL;
-						l->currentAnimState = LS_COGWHEEL;
-						l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+						ResetLaraFlex(laraItem);
+						laraItem->Animation.AnimNumber = LA_COGWHEEL_GRAB;
+						laraItem->Animation.TargetState = LS_COGWHEEL;
+						laraItem->Animation.ActiveState = LS_COGWHEEL;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+						lara->Control.IsMoving = false;
+						lara->Control.HandStatus = HandStatus::Busy;
+						lara->InteractedItem = targetItemNum;
 
 						AddActiveItem(itemNum);
-						item->goalAnimState = SWITCH_ON;
-						item->status = ITEM_ACTIVE;
+						switchItem->Animation.TargetState = SWITCH_ON;
+						switchItem->Status = ITEM_ACTIVE;
 
 						if (door != NULL)
 						{
 							if (!door->opened)
 							{
 								AddActiveItem((target - g_Level.Items.data()));
-								target->status = ITEM_ACTIVE;
+								target->Status = ITEM_ACTIVE;
 							}
 						}
 					}
 					else
-					{
-						Lara.interactedItem = itemNum;
-					}
+						lara->InteractedItem = itemNum;
+
 					return;
 				}
-				else if (Lara.isMoving && Lara.interactedItem == itemNum)
+				else if (lara->Control.IsMoving && lara->InteractedItem == itemNum)
 				{
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					lara->Control.IsMoving = false;
+					lara->Control.HandStatus = HandStatus::Free;
 				}
 			}
 
-			ObjectCollision(itemNum, l, coll);
+			ObjectCollision(itemNum, laraItem, coll);
 		}
 	}
 
 	void CogSwitchControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* switchItem = &g_Level.Items[itemNumber];
 
-		AnimateItem(item);
+		AnimateItem(switchItem);
 
-		if (item->currentAnimState == SWITCH_ON)
+		if (switchItem->Animation.ActiveState == SWITCH_ON)
 		{
-			if (item->goalAnimState == SWITCH_ON && !(TrInput & IN_ACTION))
+			if (switchItem->Animation.TargetState == SWITCH_ON && !(TrInput & IN_ACTION))
 			{
-				LaraItem->goalAnimState = LS_IDLE;
-				item->goalAnimState = SWITCH_OFF;
+				LaraItem->Animation.TargetState = LS_IDLE;
+				switchItem->Animation.TargetState = SWITCH_OFF;
 			}
 
-			if (LaraItem->animNumber == LA_COGWHEEL_PULL)
+			if (LaraItem->Animation.AnimNumber == LA_COGWHEEL_PULL)
 			{
-				if (LaraItem->frameNumber == g_Level.Anims[LaraItem->animNumber].frameBase + 10)
+				if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase + 10)
 				{
-					ITEM_INFO* doorItem = &g_Level.Items[Lara.interactedItem];
-					doorItem->itemFlags[0] = COG_DOOR_TURN;
+					auto* doorItem = &g_Level.Items[Lara.InteractedItem];
+					doorItem->ItemFlags[0] = COG_DOOR_TURN;
 				}
 			}
 		}
 		else
 		{
-			if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
+			if (switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
 			{
-				item->currentAnimState = SWITCH_OFF;
-				item->status = ITEM_NOT_ACTIVE;
+				switchItem->Animation.ActiveState = SWITCH_OFF;
+				switchItem->Status = ITEM_NOT_ACTIVE;
 
 				RemoveActiveItem(itemNumber);
 
-				LaraItem->animNumber = LA_STAND_SOLID;
-				LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-				LaraItem->goalAnimState = LS_IDLE;
-				LaraItem->currentAnimState = LS_IDLE;
-				Lara.gunStatus = LG_HANDS_FREE;
+				LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
+				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				LaraItem->Animation.TargetState = LS_IDLE;
+				LaraItem->Animation.ActiveState = LS_IDLE;
+				Lara.Control.HandStatus = HandStatus::Free;
 			}
 		}
 	}

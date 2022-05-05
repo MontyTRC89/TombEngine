@@ -1,9 +1,9 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 namespace TEN::Entities::TR4
 {
-	void BladeCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void BladeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 }

@@ -4,6 +4,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
 #include "Game/animation.h"
@@ -19,104 +20,102 @@ namespace TEN::Entities::TR5
 		-256, 256,
 		0, 0,
 		-512, 512,
-		-ANGLE(10), ANGLE(10),
-		-ANGLE(30), ANGLE(30),
-		-ANGLE(10), ANGLE(10)
+		-ANGLE(10.0f), ANGLE(10.0f),
+		-ANGLE(30.0f), ANGLE(30.0f),
+		-ANGLE(10.0f), ANGLE(10.0f)
 	};
 
-	PHD_VECTOR CrowDovePos = { 0, 0, -400 }; 
+	auto CrowDovePos = Vector3Int(0, 0, -400);
 
 	void InitialiseCrowDoveSwitch(short itemNumber)
 	{
-		g_Level.Items[itemNumber].meshBits = 3;
+		g_Level.Items[itemNumber].MeshBits = 3;
 	}
 
-	void CrowDoveSwitchCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll)
+	void CrowDoveSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (item->flags & ONESHOT
-			|| !(item->meshBits & 4)
-			|| (!(TrInput & IN_ACTION)
-				|| Lara.gunStatus
-				|| l->currentAnimState != LS_IDLE
-				|| l->animNumber != LA_STAND_IDLE
-				|| l->gravityStatus)
-			&& (!Lara.isMoving || Lara.interactedItem != itemNum))
+		if (switchItem->Flags & ONESHOT ||
+			!(switchItem->MeshBits & 4) ||
+			(!(TrInput & IN_ACTION) ||
+				laraItem->Animation.ActiveState != LS_IDLE ||
+				laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
+				laraItem->Animation.Airborne ||
+				laraInfo->Control.HandStatus != HandStatus::Free) &&
+			(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 		{
-			if (l->currentAnimState != LS_DOVESWITCH)
-				ObjectCollision(itemNum, l, coll);
+			if (laraItem->Animation.ActiveState != LS_DOVE_SWITCH)
+				ObjectCollision(itemNumber, laraItem, coll);
 		}
 		else
 		{
-			int oldYrot = item->pos.yRot;
-			item->pos.yRot = l->pos.yRot;
-			if (TestLaraPosition(&CrowDoveBounds, item, l))
+			int oldYrot = switchItem->Pose.Orientation.y;
+			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+			if (TestLaraPosition(&CrowDoveBounds, switchItem, laraItem))
 			{
-				if (MoveLaraPosition(&CrowDovePos, item, l))
+				if (MoveLaraPosition(&CrowDovePos, switchItem, laraItem))
 				{
-					l->animNumber = LA_DOVESWITCH_TURN;
-					l->currentAnimState = LS_DOVESWITCH;
-					l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
+					laraItem->Animation.AnimNumber = LA_DOVESWITCH_TURN;
+					laraItem->Animation.ActiveState = LS_DOVE_SWITCH;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-					AddActiveItem(itemNum);
+					AddActiveItem(itemNumber);
 
 					// NOTE: In original TR5 the switch was used together with heavy switches.
 					// This little fix make it usable normaly and less hardcoded.
-					item->itemFlags[0] = 0;
+					switchItem->ItemFlags[0] = 0;
 
-					item->status = ITEM_ACTIVE;
-					item->pos.yRot = oldYrot;
-					Lara.isMoving = false;
-					Lara.headYrot = 0;
-					Lara.headXrot = 0;
-					Lara.torsoYrot = 0;
-					Lara.torsoXrot = 0;
-					Lara.gunStatus = LG_HANDS_BUSY;
-					Lara.interactedItem = itemNum;
+					switchItem->Status = ITEM_ACTIVE;
+					switchItem->Pose.Orientation.y = oldYrot;
+					ResetLaraFlex(laraItem);
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Busy;
+					laraInfo->InteractedItem = itemNumber;
 				}
 				else
-				{
-					Lara.interactedItem = itemNum;
-				}
-				item->pos.yRot = oldYrot;
+					laraInfo->InteractedItem = itemNumber;
+				
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 			else
 			{
-				if (Lara.isMoving && Lara.interactedItem == itemNum)
+				if (laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 				{
-					Lara.isMoving = false;
-					Lara.gunStatus = LG_HANDS_FREE;
+					laraInfo->Control.IsMoving = false;
+					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
-				item->pos.yRot = oldYrot;
+
+				switchItem->Pose.Orientation.y = oldYrot;
 			}
 		}
 	}
 
 	void CrowDoveSwitchControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->meshBits & 2) 
+		if (item->MeshBits & 2) 
 		{
 			ExplodeItemNode(item, 1, 0, 256); 
-			SoundEffect(1081,&item->pos, 0);
-			item->meshBits = 5;	
+			SoundEffect(SFX_TR5_RAVEN_SWITCH_EXPLODE, &item->Pose, 0);
+			item->MeshBits = 5;	
 			RemoveActiveItem(itemNumber);
 
 			// NOTE: In original TR5 the switch was used together with heavy switches.
 			// This little fix make it usable normaly and less hardcoded.
-			item->itemFlags[0] = 1; 
+			item->ItemFlags[0] = 1; 
 		}
-		else if (item->itemFlags[0] == 0)
+		else if (item->ItemFlags[0] == 0)
 		{
-			if (item->currentAnimState == SWITCH_OFF)
-				item->goalAnimState = SWITCH_ON;
+			if (item->Animation.ActiveState == SWITCH_OFF)
+				item->Animation.TargetState = SWITCH_ON;
 
 			AnimateItem(item);
 
-			if (item->currentAnimState == SWITCH_OFF)
-				item->pos.yRot += ANGLE(90);
+			if (item->Animation.ActiveState == SWITCH_OFF)
+				item->Pose.Orientation.y += ANGLE(90.0f);
 		}
 	}
 }

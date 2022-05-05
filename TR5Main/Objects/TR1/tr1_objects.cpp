@@ -19,7 +19,7 @@
 #include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/Utils/object_helper.h"
 
-static void StartBaddy(OBJECT_INFO* obj)
+static void StartEntity(OBJECT_INFO* obj)
 {
 	obj = &Objects[ID_WOLF];
 	if (obj->loaded)
@@ -28,7 +28,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = WolfControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 6;
+		obj->HitPoints = 6;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 375;
 		obj->radius = 340;
@@ -48,7 +48,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = BearControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 20;
+		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 500;
 		obj->radius = 340;
@@ -66,7 +66,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 	{
 		obj->control = ApeControl;
 		obj->collision = CreatureCollision;
-		obj->hitPoints = 22;
+		obj->HitPoints = 22;
 		obj->hitEffect = HIT_BLOOD;
 		obj->shadowSize = 128;
 		obj->pivotLength = 250;
@@ -86,7 +86,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = BigRatControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 5;
+		obj->HitPoints = 5;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
 		obj->radius = 204;
@@ -108,7 +108,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->hitEffect = HIT_BLOOD;
 		obj->control = NatlaControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 400;
+		obj->HitPoints = 400;
 		obj->radius = 204;
 		obj->intelligent = true;
 		obj->saveAnim = true;
@@ -123,9 +123,9 @@ static void StartBaddy(OBJECT_INFO* obj)
 	{
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
-		obj->control = AbortionControl;
+		obj->control = GiantMutantControl;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 500;
+		obj->HitPoints = 500;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
 		obj->intelligent = true;
@@ -147,7 +147,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = DoppelgangerControl;
 		//obj->drawRoutine = DrawEvilLara;
 		obj->shadowSize = UNIT_SHADOW / 2;
-		obj->hitPoints = 1000;
+		obj->HitPoints = 1000;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
 		//obj->intelligent = true;
@@ -163,7 +163,7 @@ static void StartBaddy(OBJECT_INFO* obj)
 		obj->control = CentaurControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = UNIT_SHADOW / 3;
-		obj->hitPoints = 120;
+		obj->HitPoints = 120;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 400;
 		obj->radius = WALL_SIZE / 3;
@@ -180,7 +180,7 @@ static void StartObject(OBJECT_INFO* obj)
 	{
 		obj->drawRoutine = nullptr;
 		obj->collision = AIPickupCollision;
-		obj->hitPoints = 0;
+		obj->HitPoints = 0;
 	}
 }
 
@@ -197,7 +197,7 @@ static void StartProjectiles(OBJECT_INFO* obj)
 static OBJECT_INFO* objToInit;
 void InitialiseTR1Objects()
 {
-	StartBaddy(objToInit);
+	StartEntity(objToInit);
 	StartObject(objToInit);
 	StartTrap(objToInit);
 	StartProjectiles(objToInit);

@@ -1,9 +1,9 @@
 #pragma once
 
 struct ITEM_INFO;
-struct COLL_INFO;
+struct CollisionInfo;
 
 namespace TEN::Entities::Doors
 {
-	void DoubleDoorCollision(short itemNum, ITEM_INFO* l, COLL_INFO* coll);
+	void DoubleDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
 }

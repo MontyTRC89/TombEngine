@@ -21,7 +21,7 @@ using namespace TEN::Effects::Lightning;
 namespace Misc {
 	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
 	{
-		GAME_VECTOR vec1, vec2;
+		GameVector vec1, vec2;
 		pos1.StoreInGameVector(vec1);
 		vec1.roomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
@@ -35,12 +35,12 @@ namespace Misc {
 
 	static void AddLightningArc(Vec3 src, Vec3 dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
 	{
-		PHD_VECTOR p1;
+		Vector3Int p1;
 		p1.x = src.x;
 		p1.y = src.y;
 		p1.z = src.z;
 
-		PHD_VECTOR p2;
+		Vector3Int p2;
 		p2.x = dest.x;
 		p2.y = dest.y;
 		p2.z = dest.z;
@@ -51,9 +51,9 @@ namespace Misc {
 	static void AddShockwave(Vec3 pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
 	{
 		PHD_3DPOS p;
-		p.xPos = pos.x;
-		p.yPos = pos.y;
-		p.zPos = pos.z;
+		p.Position.x = pos.x;
+		p.Position.y = pos.y;
+		p.Position.z = pos.z;
 
 		TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 	}
@@ -88,12 +88,12 @@ namespace Misc {
 	{
 		PHD_3DPOS pos;
 
-		pos.xPos = p.x;
-		pos.yPos = p.y;
-		pos.zPos = p.z;
-		pos.xRot = 0;
-		pos.yRot = 0;
-		pos.zRot = 0;
+		pos.Position.x = p.x;
+		pos.Position.y = p.y;
+		pos.Position.z = p.z;
+		pos.Orientation.x = 0;
+		pos.Orientation.y = 0;
+		pos.Orientation.z = 0;
 
 		SoundEffect(id, &pos, flags);
 	}

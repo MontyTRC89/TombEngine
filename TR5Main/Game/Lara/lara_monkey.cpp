@@ -9,529 +9,678 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
 
-using namespace TEN::Floordata;
+// -----------------------------
+// MONKEY SWING
+// Control & Collision Functions
+// -----------------------------
 
-/*this file has all the related functions to monkeyswinging*/
-
-/*monkeyswing state handling functions*/
-void lara_as_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_MONKEY_IDLE (75)
+// Collision:	lara_col_monkey_idle()
+void lara_as_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
 {
-	/*state 75*/
-	/*collision: lara_col_hang2*/
-	if (item->hitPoints <= 0)
+	auto* lara = GetLaraInfo(item);
+
+	lara->ExtraTorsoRot = Vector3Shrt();
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
+	if (item->HitPoints <= 0)
 	{
-		item->goalAnimState = LS_IDLE;
+		item->Animation.TargetState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	if (TrInput & IN_LOOK)
+		LookUpDown(item);
 
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
+	// Overhang hook.
+	SlopeMonkeyExtra(item, coll);
 
-	if (Lara.canMonkeySwing)
+	if (TrInput & IN_LEFT &&
+		!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Shimmy locks orientation.
 	{
-		if (!(TrInput & IN_ACTION) || item->hitPoints <= 0)
-			MonkeySwingFall(item);
-
-		Camera.targetAngle = 0;
-		Camera.targetElevation = -ANGLE(45.0f);
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX / 2)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX / 2;
+	}
+	else if (TrInput & IN_RIGHT &&
+		!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX / 2)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX / 2;
 	}
 
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-}
-
-void lara_col_monkey_idle(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 75*/
-	/*state code: lara_as_hang2*/
-	item->fallspeed = 0;
-	item->gravityStatus = false;
-
-	if (Lara.canMonkeySwing)
+	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-		coll->Setup.BadHeightUp = NO_HEIGHT;
-		coll->Setup.BadCeilingHeight = 0;
-
-		coll->Setup.SlopesAreWalls = false;
-		coll->Setup.ForwardAngle = Lara.moveAngle;
-		coll->Setup.Radius = LARA_RAD;
-		coll->Setup.Height = LARA_HEIGHT_MONKEY;
-
-		Lara.moveAngle = item->pos.yRot;
-
-		GetCollisionInfo(coll, item);
-
-		if (TrInput & IN_FORWARD && coll->CollisionType != CT_FRONT && abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
+		if (TrInput & IN_JUMP)
 		{
-			bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
-			if (monkeyFront)
-				item->goalAnimState = LS_MONKEYSWING_FORWARD;
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+			lara->Control.HandStatus = HandStatus::Free;
+			return;
 		}
-		else if (TrInput & IN_LSTEP && TestMonkeyLeft(item, coll))
+
+		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
 		{
-			item->goalAnimState = LS_MONKEYSWING_LEFT;
+			item->Animation.TargetState = LS_MONKEY_TURN_180;
+			return;
 		}
-		else if (TrInput & IN_RSTEP && TestMonkeyRight(item, coll))
+
+		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			item->goalAnimState = LS_MONKEYSWING_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
+			return;
 		}
-		else if (TrInput & IN_LEFT)
+		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
 		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_LEFT;
+			item->Animation.TargetState = LS_MONKEY_BACK;
+			return;
+		}
+
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		{
+			if (TestLaraMonkeyShimmyLeft(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
+			return;
+		}
+		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		{
+			if (TestLaraMonkeyShimmyRight(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
+
+			return;
+		}
+
+		if (TrInput & IN_LEFT)
+		{
+			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_RIGHT;
+			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
 		}
 		else if (TrInput & IN_ROLL && g_GameFlow->HasMonkeyTurn180())
 		{
-			item->goalAnimState = LS_MONKEYSWING_TURN_180;
+			item->Animation.TargetState = LS_MONKEY_TURN_180;
 		}
-
-		if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) < 50)
-			MonkeySwingSnap(item, coll);
-	}
-	else
-	{
-		TestLaraHang(item, coll);
-
-		if (item->goalAnimState == LS_MONKEYSWING_IDLE)
+		else
 		{
-			TestForObjectOnLedge(item, coll);
-
-			if (!(TrInput & IN_FORWARD) ||
-				coll->Front.Floor <= -850 ||
-				coll->Front.Floor >= -650 ||
-				coll->Front.Floor < coll->Front.Ceiling ||
-				coll->FrontLeft.Floor < coll->FrontLeft.Ceiling ||
-				coll->FrontRight.Floor < coll->FrontRight.Ceiling ||
-				coll->HitStatic)
-			{
-				if (!(TrInput & IN_FORWARD) ||
-					coll->Front.Floor <= -850 ||
-					coll->Front.Floor >= -650 ||
-					coll->Front.Floor - coll->Front.Ceiling < -256 ||
-					coll->FrontLeft.Floor - coll->FrontLeft.Ceiling < -256 ||
-					coll->FrontRight.Floor - coll->FrontRight.Ceiling < -256 ||
-					coll->HitStatic)
-				{
-					if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
-					{
-						item->goalAnimState = LS_SHIMMY_LEFT;
-					}
-					else if (TrInput & IN_RIGHT || TrInput & IN_RSTEP)
-					{
-						item->goalAnimState = LS_SHIMMY_RIGHT;
-					}
-				}
-				else
-				{
-					item->goalAnimState = LS_HANG_TO_CRAWL;
-					item->requiredAnimState = LS_CROUCH_IDLE;
-				}
-			}
-			else if (TrInput & IN_WALK)
-			{
-				item->goalAnimState = LS_HANDSTAND;
-			}
-			else if (TrInput & IN_DUCK)
-			{
-				item->goalAnimState = LS_HANG_TO_CRAWL;
-				item->requiredAnimState = LS_CROUCH_IDLE;
-			}
-			else
-			{
-				item->goalAnimState = LS_GRABBING;
-			}
+			item->Animation.TargetState = LS_MONKEY_IDLE;
 		}
-	}
-}
-
-void lara_as_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 76*/
-	/*collision: lara_col_monkeyswing*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
 		return;
 	}
 
-	coll->Setup.EnableSpaz = false;
+	item->Animation.TargetState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
+}
+
+// State:		LS_MONKEY_IDLE (75)
+// Control:		lara_as_monkey_idle()
+void lara_col_monkey_idle(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	item->Animation.Airborne = false;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(1.25f);
+	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
+	GetCollisionInfo(coll, item);
+	
+	// HACK: Prevent ShiftItem() from causing an instantaneous snap, thereby interfering with DoLaraMonkeyStep(), when going down a step. @Sezz 2022.01.28
+	if (coll->Shift.y >= 0 && coll->Shift.y <= CLICK(1.25f))
+		coll->Shift.y = 0;
+	ShiftItem(item, coll);
+
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallAnimation(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
+}
+
+// State:		LS_MONKEY_FORWARD (76)
+// Collision:	lara_col_monkey_forward()
+void lara_as_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
 
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-
-	if (TrInput & IN_LOOK)
-		LookUpDown();
-
-	if (TrInput & IN_FORWARD)
-		item->goalAnimState = LS_MONKEYSWING_FORWARD;
-	else
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+	if (item->HitPoints <= 0)
+	{
+		item->Animation.TargetState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
+		return;
+	}
 
 	if (TrInput & IN_LEFT)
 	{
-		Lara.turnRate -= LARA_TURN_RATE;
-
-		if (Lara.turnRate < -ANGLE(3.0f))
-			Lara.turnRate = -ANGLE(3.0f);
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		Lara.turnRate += LARA_TURN_RATE;
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+	}
 
-		if (Lara.turnRate > ANGLE(3.0f))
-			Lara.turnRate = ANGLE(3.0f);
+	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	{
+		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+		{
+			item->Animation.TargetState = LS_MONKEY_TURN_180;
+			return;
+		}
+
+		if (TrInput & IN_FORWARD)
+		{
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
+			return;
+		}
+
+		item->Animation.TargetState = LS_MONKEY_IDLE;
+		return;
+	}
+
+	item->Animation.TargetState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
+}
+
+// State:		LS_MONKEY_FORWARD (76)
+// Control:		lara_as_monkey_forward()
+void lara_col_monkey_forward(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(1.25f);
+	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
+	GetCollisionInfo(coll, item);
+
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
+
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallAnimation(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
 	}
 }
 
-void lara_col_monkeyswing(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_MONKEY_BACK (163)
+// Collision:	lara_col_monkey_back()
+void lara_as_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
 {
-	/*state 76*/
-	/*state code: lara_as_monkeyswing*/
-	if (TrInput & IN_ACTION && Lara.canMonkeySwing)
+	auto* lara = GetLaraInfo(item);
+
+	lara->ExtraTorsoRot = Vector3Shrt();
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
+	if (item->HitPoints <= 0)
 	{
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-		coll->Setup.BadHeightUp = NO_HEIGHT;
-		coll->Setup.BadCeilingHeight = 0;
+		item->Animation.TargetState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
+		return;
+	}
 
-		Lara.moveAngle = item->pos.yRot;
+	if (TrInput & IN_LEFT)
+	{
+		lara->Control.TurnRate -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		lara->Control.TurnRate += LARA_TURN_RATE;
+		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+	}
 
-		coll->Setup.EnableSpaz = false;
-		coll->Setup.EnableObjectPush = false;
-
-		coll->Setup.ForwardAngle = Lara.moveAngle;
-		coll->Setup.Radius = LARA_RAD;
-		coll->Setup.Height = LARA_HEIGHT_MONKEY;
-
-		GetCollisionInfo(coll, item);
-
-		bool monkeyFront = LaraCollisionFront(item, item->pos.yRot, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing;
-
-		if (!monkeyFront || coll->CollisionType == CT_FRONT	|| abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
+	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	{
+		if (TrInput & IN_BACK)
 		{
-			SetAnimation(item, LA_MONKEYSWING_IDLE);
+			item->Animation.TargetState = LS_MONKEY_BACK;
+			return;
 		}
-		else
+
+		item->Animation.TargetState = LS_MONKEY_IDLE;
+		return;
+	}
+
+	item->Animation.TargetState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
+}
+
+// State:		LS_MONKEY_BACK (163)
+// Control:		lara_as_monkey_back()
+void lara_col_monkey_back(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(1.25f);
+	coll->Setup.UpperCeilingBound = -CLICK(1.25f);
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
+	GetCollisionInfo(coll, item);
+
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
+
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallAnimation(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
+}
+
+// State:		LS_MONKEY_SHIMMY_LEFT (77)
+// Collision:	lara_col_monkey_shimmy_left()
+void lara_as_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->ExtraTorsoRot = Vector3Shrt();
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
+	if (item->HitPoints <= 0)
+	{
+		item->Animation.TargetState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
+		return;
+	}
+
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	{
+		if (TrInput & IN_LEFT)
 		{
-			if (abs(coll->Middle.Ceiling - coll->FrontLeft.Ceiling) <= 50)
-			{
-				if (abs(coll->Middle.Ceiling - coll->FrontRight.Ceiling) > 50)
-				{
-					ShiftItem(item, coll);
-					item->pos.yRot -= ANGLE(5.0f);
-				}
-			}
+			lara->Control.TurnRate -= LARA_TURN_RATE;
+			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE;
+			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		}
+	}
+
+	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	{
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		{
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			return;
+		}
+
+		item->Animation.TargetState = LS_MONKEY_IDLE;
+		return;
+	}
+
+	item->Animation.TargetState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
+}
+
+// State:		LS_MONKEY_SHIMMY_LEFT (7)
+// Control:		lara_as_monkey_shimmy_left()
+void lara_col_monkey_shimmy_left(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(0.5f);
+	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
+	GetCollisionInfo(coll, item);
+
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
+
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallAnimation(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
+}
+
+// State:		LS_MONKEY_SHIMMY_RIGHT (78)
+// Collision:	lara_col_monkey_shimmy_right()
+void lara_as_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->ExtraTorsoRot = Vector3Shrt();
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
+	if (item->HitPoints <= 0)
+	{
+		item->Animation.TargetState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
+		return;
+	}
+
+	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	{
+		if (TrInput & IN_LEFT)
+		{
+			lara->Control.TurnRate -= LARA_TURN_RATE;
+			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+		}
+		else if (TrInput & IN_RIGHT)
+		{
+			lara->Control.TurnRate += LARA_TURN_RATE;
+			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+		}
+	}
+
+	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	{
+		if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		{
+			item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			return;
+		}
+
+		item->Animation.TargetState = LS_MONKEY_IDLE;
+		return;
+	}
+
+	item->Animation.TargetState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
+}
+
+// State:		LS_MONKEY_SHIMMY_RIGHT (78)
+// Control:		lara_as_monkey_shimmy_right()
+void lara_col_monkey_shimmy_right(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
+	coll->Setup.UpperFloorBound = 0;
+	coll->Setup.LowerCeilingBound = CLICK(0.5f);
+	coll->Setup.UpperCeilingBound = -CLICK(0.5f);
+	coll->Setup.BlockCeilingSlope = true;
+	coll->Setup.BlockMonkeySwingEdge = true;
+	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.Radius = LARA_RADIUS;
+	coll->Setup.Height = LARA_HEIGHT_MONKEY;
+	GetCollisionInfo(coll, item);
+
+	if (LaraDeflectEdgeMonkey(item, coll))
+		LaraCollideStopMonkey(item, coll);
+
+	if (TestLaraMonkeyFall(item, coll))
+	{
+		SetLaraMonkeyFallAnimation(item);
+		return;
+	}
+
+	if (TestLaraMonkeyStep(item, coll))
+	{
+		DoLaraMonkeyStep(item, coll);
+		return;
+	}
+}
+
+// State:		LS_MONKEY_TURN_180 (79)
+// Collision:	lara_as_monkey_turn_180()
+void lara_as_monkey_turn_180(ITEM_INFO* item, CollisionInfo* coll)
+{
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
+	item->Animation.TargetState = LS_MONKEY_IDLE;
+}
+
+// State:		LS_MONKEY_TURN_180 (79)
+// Control:		lara_as_monkey_turn_180()
+void lara_col_monkey_turn_180(ITEM_INFO* item, CollisionInfo* coll)
+{
+	lara_col_monkey_idle(item, coll);
+}
+
+// State:		LS_MONKEY_TURN_LEFT (82)
+// Collision:	lara_col_monkey_turn_left()
+void lara_as_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->ExtraTorsoRot = Vector3Shrt();
+	coll->Setup.EnableObjectPush = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
+
+	if (item->HitPoints <= 0)
+	{
+		item->Animation.TargetState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
+		return;
+	}
+
+	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
+	{
+		if (TrInput & IN_JUMP)
+		{
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+			lara->Control.HandStatus = HandStatus::Free;
+			return;
+		}
+
+		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
+		{
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
+			return;
+		}
+		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		{
+			item->Animation.TargetState = LS_MONKEY_BACK;
+			return;
+		}
+
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		{
+			if (TestLaraMonkeyShimmyLeft(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
 			else
-			{
-				ShiftItem(item, coll);
-				item->pos.yRot += ANGLE(5.0f);
-			}
+				item->Animation.TargetState = LS_MONKEY_IDLE;
 
-			Camera.targetElevation = ANGLE(10.0f);
-			MonkeySwingSnap(item, coll);
+			return;
 		}
-	}
-	else
-	{
-		MonkeySwingFall(item);
-	}
-}
+		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		{
+			if (TestLaraMonkeyShimmyRight(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
 
-void lara_as_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 78*/
-	/*collision: lara_col_monkeyr*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+			return;
+		}
+
+		if (TrInput & IN_LEFT)
+		{
+			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
+
+			lara->Control.TurnRate -= LARA_TURN_RATE;
+			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+
+			return;
+		}
+
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
+	item->Animation.TargetState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
+}
 
+// State:		LS_MONKEY_TURN_LEFT (82)
+// Control:		lara_as_monkey_turn_left()
+void lara_col_monkey_turn_left(ITEM_INFO* item, CollisionInfo* coll)
+{
+	lara_col_monkey_idle(item, coll);
+}
+
+// State:		LS_MONKEY_TURN_RIGHT (83)
+// Collision:	lara_col_monkey_turn_right()
+void lara_as_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
+	coll->Setup.EnableSpasm = false;
+	Camera.targetElevation = -ANGLE(5.0f);
 
-	if (TrInput & IN_RSTEP)
+	if (item->HitPoints <= 0)
 	{
-		item->goalAnimState = LS_MONKEYSWING_RIGHT;
-		Camera.targetElevation = ANGLE(10.0f);
-	}
-	else
-	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-		Camera.targetElevation = ANGLE(10.0f);
-	}
-}
-
-void lara_col_monkeyr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 78*/
-	/*state code: lara_as_monkeyr*/
-	if ((TrInput & IN_ACTION) && Lara.canMonkeySwing)
-	{
-		if (TestMonkeyRight(item, coll))
-		{
-			MonkeySwingSnap(item, coll);
-		}
-		else
-		{
-			SetAnimation(item, LA_MONKEYSWING_IDLE);
-		}
-	}
-	else
-	{
-		MonkeySwingFall(item);
-	}
-}
-
-void lara_as_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 77*/
-	/*collision: lara_col_monkeyl*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-
+		item->Animation.TargetState = LS_DEATH;
+		SetLaraMonkeyRelease(item);
 		return;
 	}
 
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
-
-	if (TrInput & IN_LSTEP)
+	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
-		item->goalAnimState = LS_MONKEYSWING_LEFT;
-		Camera.targetElevation = ANGLE(10.0f);
-	}
-	else
-	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-		Camera.targetElevation = ANGLE(10.0f);
-	}
-}
-
-void lara_col_monkeyl(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 77*/
-	/*state code: lara_as_monkeyl*/
-	if ((TrInput & IN_ACTION) && Lara.canMonkeySwing)
-	{
-		if (TestMonkeyLeft(item, coll))
+		if (TrInput & IN_JUMP)
 		{
-			MonkeySwingSnap(item, coll);
+			item->Animation.TargetState = LS_JUMP_FORWARD;
+			lara->Control.HandStatus = HandStatus::Free;
+			return;
 		}
-		else
+
+		if (TrInput & IN_FORWARD && TestLaraMonkeyForward(item, coll))
 		{
-			SetAnimation(item, LA_MONKEYSWING_IDLE);
+			item->Animation.TargetState = LS_MONKEY_FORWARD;
+			return;
 		}
-	}
-	else
-	{
-		MonkeySwingFall(item);
-	}
-}
+		else if (TrInput & IN_BACK && TestLaraMonkeyBack(item, coll))
+		{
+			item->Animation.TargetState = LS_MONKEY_BACK;
+			return;
+		}
 
-void lara_as_monkey180(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 79*/
-	/*collision: lara_col_monkey180*/
-	coll->Setup.EnableObjectPush = false;
-	coll->Setup.EnableSpaz = false;
-	item->goalAnimState = LS_MONKEYSWING_IDLE;
-}
+		if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+		{
+			if (TestLaraMonkeyShimmyLeft(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_LEFT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
 
-void lara_col_monkey180(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 79*/
-	/*state code: lara_as_monkey180*/
-	lara_col_monkeyswing(item, coll);
-}
+			return;
+		}
+		else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+		{
+			if (TestLaraMonkeyShimmyRight(item, coll))
+				item->Animation.TargetState = LS_MONKEY_SHIMMY_RIGHT;
+			else
+				item->Animation.TargetState = LS_MONKEY_IDLE;
 
-void lara_as_hangturnr(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 83*/
-	/*collision: lara_col_hangturnlr*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+			return;
+		}
+
+		if (TrInput & IN_RIGHT)
+		{
+			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
+
+			lara->Control.TurnRate += LARA_TURN_RATE;
+			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+
+			return;
+		}
+
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
-	Camera.targetElevation = 1820;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-	item->pos.yRot += ANGLE(1.5f);
-
-	if (!(TrInput & IN_RIGHT))
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-}
-//both lara_as_hangturnl and lara_as_hangturnr states use lara_col_hangturnlr for collision//
-void lara_as_hangturnl(ITEM_INFO* item, COLL_INFO* coll)
-{
-	/*state 82*/
-	/*collision: lara_col_hangturnlr*/
-	if (item->hitPoints <= 0)
-	{
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
-		return;
-	}
-
-	Camera.targetElevation = 1820;
-	Lara.torsoYrot = 0;
-	Lara.torsoXrot = 0;
-	item->pos.yRot -= ANGLE(1.5f);
-
-	if (!(TrInput & IN_LEFT))
-		item->goalAnimState = LS_MONKEYSWING_IDLE;
+	item->Animation.TargetState = LS_JUMP_UP;
+	SetLaraMonkeyRelease(item);
 }
 
-void lara_col_hangturnlr(ITEM_INFO* item, COLL_INFO* coll)
+// State:		LS_MONKEY_TURN_RIGHT (83)
+// Control:		lara_as_monkey_turn_right()
+void lara_col_monkey_turn_right(ITEM_INFO* item, CollisionInfo* coll)
 {
-	/*state 82 and 83*/
-	/*state code: lara_as_hangturnr(83), lara_as_hangturnl(82)*/
-	if ((TrInput & IN_ACTION) && Lara.canMonkeySwing)
-	{
-		coll->Setup.BadHeightDown = NO_BAD_POS;
-		coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-		coll->Setup.BadCeilingHeight = 0;
-
-		Lara.moveAngle = item->pos.yRot;
-
-		coll->Setup.ForwardAngle = item->pos.yRot;
-		coll->Setup.Radius = LARA_RAD;
-		coll->Setup.Height = LARA_HEIGHT_MONKEY;
-		coll->Setup.SlopesAreWalls = true;
-
-		GetCollisionInfo(coll, item);
-		MonkeySwingSnap(item, coll);
-	}
-	else
-	{
-		MonkeySwingFall(item);
-	}
-}
-
-/*tests and other functions*/
-
-short TestMonkeyRight(ITEM_INFO* item, COLL_INFO* coll)
-{
-	short oct;
-
-	Lara.moveAngle = item->pos.yRot + ANGLE(90);
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = -STEPUP_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY;
-
-	GetCollisionInfo(coll, item);
-
-	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
-		return 0;
-
-	if (!LaraCollisionFront(item, Lara.moveAngle, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
-		return 0;
-
-	if (coll->CollisionType == CT_NONE)
-		return 1;
-
-	oct = GetDirOctant(item->pos.yRot);
-	if (oct)
-	{
-		if (oct != 1)
-			return 1;
-		if (coll->CollisionType != CT_FRONT && coll->CollisionType != CT_RIGHT && coll->CollisionType != CT_LEFT)
-			return 1;
-	}
-	else if (coll->CollisionType != CT_FRONT)
-	{
-		return 1;
-	}
-
-	return 0;
-}
-
-short TestMonkeyLeft(ITEM_INFO* item, COLL_INFO* coll)
-{
-	short oct;
-
-	Lara.moveAngle = item->pos.yRot - ANGLE(90);
-
-	coll->Setup.BadHeightDown = NO_BAD_POS;
-	coll->Setup.BadHeightUp = NO_HEIGHT;
-	coll->Setup.BadCeilingHeight = 0;
-	coll->Setup.SlopesAreWalls = false;
-	coll->Setup.ForwardAngle = Lara.moveAngle;
-	coll->Setup.Radius = LARA_RAD;
-	coll->Setup.Height = LARA_HEIGHT_MONKEY;
-
-	GetCollisionInfo(coll, item);
-
-	if (abs(coll->Middle.Ceiling - coll->Front.Ceiling) > 50)
-		return 0;
-
-	if (!LaraCollisionFront(item, Lara.moveAngle, coll->Setup.Radius).BottomBlock->Flags.Monkeyswing)
-		return 0;
-
-	if (coll->CollisionType == CT_NONE)
-		return 1;
-
-	oct = GetDirOctant(item->pos.yRot);
-	if (oct)
-	{
-		if (oct != 1)
-			return 1;
-		if (coll->CollisionType != CT_RIGHT && coll->CollisionType != CT_LEFT)
-			return 1;
-	}
-	else
-	{
-		if (coll->CollisionType != CT_FRONT && coll->CollisionType != CT_LEFT)
-			return 1;
-	}
-
-	return 0;
-}
-
-void MonkeySwingSnap(ITEM_INFO* item, COLL_INFO* coll)
-{
-	ROOM_VECTOR location = GetRoom(item->location, item->pos.xPos, item->pos.yPos, item->pos.zPos);
-	int height = GetCeilingHeight(location, item->pos.xPos, item->pos.zPos).value_or(NO_HEIGHT);
-	if (height != NO_HEIGHT)
-		item->pos.yPos = height + 704;
-}
-
-void MonkeySwingFall(ITEM_INFO* item)
-{
-	if (item->currentAnimState != LS_MONKEYSWING_TURN_180)
-	{
-		SetAnimation(item, LA_JUMP_UP, 9);
-
-		item->speed = 2;
-		item->gravityStatus = true;
-		item->fallspeed = 1;
-		item->pos.yPos += 256;
-
-		Lara.gunStatus = LG_HANDS_FREE;
-	}
+	lara_col_monkey_idle(item, coll);
 }

@@ -7,21 +7,22 @@
 #include "Game/control/lot.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
-BITE_INFO wildboardBiteInfo = { 0, 0, 0, 14 };
+BITE_INFO WildBoatBiteInfo = { 0, 0, 0, 14 };
 
 void InitialiseWildBoar(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
 	ClearItem(itemNumber);
 
-	item->animNumber = Objects[ID_WILD_BOAR].animIndex + 6;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
+	item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 6;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
 }
 
 void WildBoarControl(short itemNumber)
@@ -29,8 +30,9 @@ void WildBoarControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+
 	short angle = 0;
 	short head = 0;
 	short neck = 0;
@@ -40,132 +42,132 @@ void WildBoarControl(short itemNumber)
 	short joint2 = 0;
 	short joint3 = 0;
 
-	if (item->hitPoints > 0)
+	if (item->HitPoints > 0)
 	{
-		int dx = LaraItem->pos.xPos - item->pos.xPos;
-		int dz = LaraItem->pos.zPos - item->pos.zPos;
-		int laraDistance = dx * dx + dz * dz;
+		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+		int laraDistance = pow(dx, 2) + pow(dz, 2);
 
-		if (item->aiBits & GUARD)
-		{
+		if (item->AIBits & GUARD)
 			GetAITarget(creature);
-		}
 		else
 		{
-			creature->enemy = LaraItem;
+			creature->Enemy = LaraItem;
 
-			int minDistance = 0x7FFFFFFF;
+			int minDistance = INT_MAX;
 
 			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				CREATURE_INFO* baddie = ActiveCreatures[i];
+				auto* currentItem = ActiveCreatures[i];
 
-				if (baddie->itemNum == NO_ITEM || baddie->itemNum == itemNumber)
+				if (currentItem->ItemNumber == NO_ITEM || currentItem->ItemNumber == itemNumber)
 					continue;
 
-				ITEM_INFO* target = &g_Level.Items[baddie->itemNum];
-				if (target->objectNumber != ID_WILD_BOAR)
+				auto* target = &g_Level.Items[currentItem->ItemNumber];
+				if (target->ObjectNumber != ID_WILD_BOAR)
 				{
-					int dx2 = target->pos.xPos - item->pos.xPos;
-					int dz2 = target->pos.zPos - item->pos.zPos;
-					int distance = dx2 * dx2 + dz2 * dz2;
+					int dx2 = target->Pose.Position.x - item->Pose.Position.x;
+					int dz2 = target->Pose.Position.z - item->Pose.Position.z;
+					int distance = pow(dx2, 2) + pow(dz2, 2);
 
-					if (distance < minDistance && distance < laraDistance)
+					if (distance < minDistance &&
+						distance < laraDistance)
 					{
-						creature->enemy = target;
+						creature->Enemy = target;
 						minDistance = distance;
 					}
 				}
 			}
 		}
 
-		AI_INFO info;
-		CreatureAIInfo(item, &info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &info, VIOLENT);
-		if (item->flags)
-			creature->mood = ESCAPE_MOOD;
-		CreatureMood(item, &info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		if (item->Flags)
+			creature->Mood = MoodType::Escape;
 
-		if (info.ahead)
+		CreatureMood(item, &AI, VIOLENT);
+
+		angle = CreatureTurn(item, creature->MaxTurn);
+
+		if (AI.ahead)
 		{
-			joint1 = info.angle / 2;
-			joint3 = info.angle / 2;
+			joint1 = AI.angle / 2;
+			joint3 = AI.angle / 2;
 		}
 
-		switch (item->currentAnimState)
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			creature->maximumTurn = 0;
-			if (info.ahead && info.distance || item->flags)
-			{
-				item->goalAnimState = 2;
-			}
+			creature->MaxTurn = 0;
+
+			if (AI.ahead && AI.distance || item->Flags)
+				item->Animation.TargetState = 2;
 			else if (GetRandomControl() & 0x7F)
 			{
 				joint1 = AIGuard(creature) / 2;
 				joint3 = joint1;
 			}
 			else
-			{
-				item->goalAnimState = 3;
-			}
+				item->Animation.TargetState = 3;
+			
 			break;
 
 		case 3:
-			creature->maximumTurn = 0;
-			if (info.ahead && info.distance)
-			{
-				item->goalAnimState = 1;
-			}
+			creature->MaxTurn = 0;
+
+			if (AI.ahead && AI.distance)
+				item->Animation.TargetState = 1;
 			else if (!(GetRandomControl() & 0x7F))
-			{
-				item->goalAnimState = 1;
-			}
+				item->Animation.TargetState = 1;
+			
 			break;
 
 		case 2:
-			if (info.distance >= 0x400000)
+			if (AI.distance >= SECTOR(4096))
 			{
-				creature->maximumTurn = 1092;
-				item->flags = 0;
+				creature->MaxTurn = ANGLE(6.0f);
+				item->Flags = 0;
 			}
 			else
 			{
-				creature->maximumTurn = 546;
-				joint0 = -info.distance;
-				joint2 = -info.distance;
+				creature->MaxTurn = ANGLE(3.0f);
+				joint0 = -AI.distance;
+				joint2 = -AI.distance;
 			}
-			if (!item->flags && (info.distance < 0x10000 && info.bite))
+
+			if (!item->Flags && (AI.distance < SECTOR(64) && AI.bite))
 			{
-				item->goalAnimState = 4;
-				if (creature->enemy == LaraItem)
+				item->Animation.TargetState = 4;
+
+				if (creature->Enemy == LaraItem)
 				{
-					LaraItem->hitPoints -= 30;
-					LaraItem->hitStatus = true;
+					creature->Enemy->HitPoints -= 30;
+					creature->Enemy->HitStatus = true;
 				}
 
-				CreatureEffect2(item, &wildboardBiteInfo, 3, item->pos.yRot, DoBloodSplat);
-				item->flags = 1;
+				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
+				item->Flags = 1;
 			}
+
 			break;
 
 		case 4:
-			creature->maximumTurn = 0;
+			creature->MaxTurn = 0;
 			break;
-
 		}
 	}
 	else
 	{
-		item->hitPoints = 0;
-		if (item->currentAnimState != 5)
+		item->HitPoints = 0;
+
+		if (item->Animation.ActiveState != 5)
 		{
-			item->animNumber = Objects[ID_WILD_BOAR].animIndex + 5;
-			item->currentAnimState = 5;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 5;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 5;
 		}
 	}
 

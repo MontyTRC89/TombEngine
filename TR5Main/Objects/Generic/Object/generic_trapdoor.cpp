@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/Generic/Object/generic_trapdoor.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/collision/floordata.h"
 #include "Specific/input.h"
 #include "Game/camera.h"
@@ -15,170 +16,187 @@ using namespace TEN::Renderer;
 
 using namespace TEN::Floordata;
 
-OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds = {-256, 256, 0, 900, -768, -256, -1820, 1820, -5460, 5460, -1820, 1820};
-static PHD_VECTOR CeilingTrapDoorPos = {0, 1056, -480};
-OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds = {-256, 256, 0, 0, -1024, -256, -1820, 1820, -5460, 5460, -1820, 1820};
-static PHD_VECTOR FloorTrapDoorPos = {0, 0, -655};
+OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =
+{
+	-256, 256,
+	0, 900,
+	-768, -256,
+	-ANGLE(10.0f), ANGLE(10.0f),
+	-ANGLE(30.0f), ANGLE(30.0f),
+	-ANGLE(10.0f), ANGLE(10.0f)
+};
+static Vector3Int CeilingTrapDoorPos = { 0, 1056, -480 };
+
+OBJECT_COLLISION_BOUNDS FloorTrapDoorBounds =
+{
+	-256, 256,
+	0, 0,
+	-1024, -256,
+	-ANGLE(10.0f), ANGLE(10.0f),
+	-ANGLE(30.0f), ANGLE(30.0f),
+	-ANGLE(10.0f), ANGLE(10.0f)
+};
+static Vector3Int FloorTrapDoorPos = { 0, 0, -655 };
 
 void InitialiseTrapDoor(short itemNumber)
 {
-	ITEM_INFO* item;
-
-	item = &g_Level.Items[itemNumber];
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
 	TEN::Floordata::UpdateBridgeItem(itemNumber);
 	CloseTrapDoor(itemNumber);
 }
 
-void TrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void TrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
-	ITEM_INFO* item;
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	item = &g_Level.Items[itemNumber];
-	if (item->currentAnimState == 1 && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-		ObjectCollision(itemNumber, l, coll);
+	if (trapDoorItem->Animation.ActiveState == 1 &&
+		trapDoorItem->Animation.FrameNumber == g_Level.Anims[trapDoorItem->Animation.AnimNumber].frameEnd)
+	{
+		ObjectCollision(itemNumber, laraItem, coll);
+	}
 }
 
-void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void CeilingTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
-	auto item = &g_Level.Items[itemNumber];
-	bool itemIsAbove = item->pos.yPos <= l->pos.yPos - LARA_HEIGHT + LARA_HEADROOM;
-	bool result = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
-	l->pos.yRot += ANGLE(180);
-	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, item, l);
-	l->pos.yRot += ANGLE(180);
+	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_JUMP_UP && l->gravityStatus && Lara.gunStatus == LG_HANDS_FREE && itemIsAbove && (result || result2))
+	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
+
+	bool result = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	laraItem->Pose.Orientation.y += ANGLE(180.0f);
+	bool result2 = TestLaraPosition(&CeilingTrapDoorBounds, trapDoorItem, laraItem);
+	laraItem->Pose.Orientation.y += ANGLE(180.0f);
+
+	if (TrInput & IN_ACTION &&
+		laraItem->Animation.ActiveState == LS_JUMP_UP &&
+		laraItem->Animation.Airborne &&
+		laraInfo->Control.HandStatus == HandStatus::Free &&
+		trapDoorItem->Status != ITEM_ACTIVE &&
+		itemIsAbove &&
+		(result || result2))
 	{
-		AlignLaraPosition(&CeilingTrapDoorPos, item, l);
+		AlignLaraPosition(&CeilingTrapDoorPos, trapDoorItem, laraItem);
 		if (result2)
-			l->pos.yRot += ANGLE(180);
-		Lara.headYrot = 0;
-		Lara.headXrot = 0;
-		Lara.torsoYrot = 0;
-		Lara.torsoXrot = 0;
-		Lara.gunStatus = LG_HANDS_BUSY;
-		l->gravityStatus = false;
-		l->fallspeed = 0;
-		l->animNumber = LA_TRAPDOOR_CEILING_OPEN;
-		l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-		l->currentAnimState = LS_FREEFALL_BIS;
+			laraItem->Pose.Orientation.y += ANGLE(180.0f);
+		
+		ResetLaraFlex(laraItem);
+		laraItem->Animation.VerticalVelocity = 0;
+		laraItem->Animation.Airborne = false;
+		laraItem->Animation.AnimNumber = LA_TRAPDOOR_CEILING_OPEN;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.ActiveState = LS_FREEFALL_BIS;
+		laraInfo->Control.HandStatus = HandStatus::Busy;
 		AddActiveItem(itemNumber);
-		item->status = ITEM_ACTIVE;
-		item->goalAnimState = 1;
+		trapDoorItem->Status = ITEM_ACTIVE;
+		trapDoorItem->Animation.TargetState = 1;
 
 		UseForcedFixedCamera = 1;
-		ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) * 1024;
-		ForcedFixedCamera.y = item->pos.yPos + 1024;
-		ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) * 1024;
-		ForcedFixedCamera.roomNumber = item->roomNumber;
+		ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - phd_sin(trapDoorItem->Pose.Orientation.y) * 1024;
+		ForcedFixedCamera.y = trapDoorItem->Pose.Position.y + 1024;
+		ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - phd_cos(trapDoorItem->Pose.Orientation.y) * 1024;
+		ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
 	}
 	else
 	{
-		if (item->currentAnimState == 1)
+		if (trapDoorItem->Animation.ActiveState == 1)
 			UseForcedFixedCamera = 0;
 	}
 
-	if (item->currentAnimState == 1 && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-		ObjectCollision(itemNumber, l, coll);
+	if (trapDoorItem->Animation.ActiveState == 1 &&
+		trapDoorItem->Animation.FrameNumber == g_Level.Anims[trapDoorItem->Animation.AnimNumber].frameEnd)
+	{
+		ObjectCollision(itemNumber, laraItem, coll);
+	}
 }
 
-void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* l, COLL_INFO* coll)
+void FloorTrapDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 {
-	ITEM_INFO* item;
+	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	item = &g_Level.Items[itemNumber];
-	if (TrInput & IN_ACTION && item->status != ITEM_ACTIVE && l->currentAnimState == LS_IDLE && l->animNumber == LA_STAND_IDLE && Lara.gunStatus == LG_HANDS_FREE
-		|| Lara.isMoving && Lara.interactedItem == itemNumber)
+	if ((TrInput & IN_ACTION &&
+		laraItem->Animation.ActiveState == LS_IDLE &&
+		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
+		laraInfo->Control.HandStatus == HandStatus::Free &&
+		trapDoorItem->Status != ITEM_ACTIVE) ||
+		(laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber))
 	{
-		if (TestLaraPosition(&FloorTrapDoorBounds, item, l))
+		if (TestLaraPosition(&FloorTrapDoorBounds, trapDoorItem, laraItem))
 		{
-			if (MoveLaraPosition(&FloorTrapDoorPos, item, l))
+			if (MoveLaraPosition(&FloorTrapDoorPos, trapDoorItem, laraItem))
 			{
-				l->animNumber = LA_TRAPDOOR_FLOOR_OPEN;
-				l->frameNumber = g_Level.Anims[l->animNumber].frameBase;
-				l->currentAnimState = LS_TRAPDOOR_FLOOR_OPEN;
-				Lara.isMoving = false;
-				Lara.headYrot = 0;
-				Lara.headXrot = 0;
-				Lara.torsoYrot = 0;
-				Lara.torsoXrot = 0;
-				Lara.gunStatus = LG_HANDS_BUSY;
+				ResetLaraFlex(laraItem);
+				laraItem->Animation.AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.ActiveState = LS_TRAPDOOR_FLOOR_OPEN;
+				laraInfo->Control.IsMoving = false;
+				laraInfo->Control.HandStatus = HandStatus::Busy;
 				AddActiveItem(itemNumber);
-				item->status = ITEM_ACTIVE;
-				item->goalAnimState = 1;
+				trapDoorItem->Status = ITEM_ACTIVE;
+				trapDoorItem->Animation.TargetState = 1;
 
 				UseForcedFixedCamera = 1;
-				ForcedFixedCamera.x = item->pos.xPos - phd_sin(item->pos.yRot) * 2048;
-				ForcedFixedCamera.y = item->pos.yPos - 2048;
-				if (ForcedFixedCamera.y < g_Level.Rooms[item->roomNumber].maxceiling)
-					ForcedFixedCamera.y = g_Level.Rooms[item->roomNumber].maxceiling;
-				ForcedFixedCamera.z = item->pos.zPos - phd_cos(item->pos.yRot) * 2048;
-				ForcedFixedCamera.roomNumber = item->roomNumber;
+				ForcedFixedCamera.x = trapDoorItem->Pose.Position.x - phd_sin(trapDoorItem->Pose.Orientation.y) * 2048;
+				ForcedFixedCamera.y = trapDoorItem->Pose.Position.y - 2048;
+
+				if (ForcedFixedCamera.y < g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling)
+					ForcedFixedCamera.y = g_Level.Rooms[trapDoorItem->RoomNumber].maxceiling;
+
+				ForcedFixedCamera.z = trapDoorItem->Pose.Position.z - phd_cos(trapDoorItem->Pose.Orientation.y) * 2048;
+				ForcedFixedCamera.roomNumber = trapDoorItem->RoomNumber;
 			}
 			else
-			{
-				Lara.interactedItem =itemNumber;
-			}
+				laraInfo->InteractedItem =itemNumber;
 		}
 	}
 	else
 	{
-		if (item->currentAnimState == 1)
+		if (trapDoorItem->Animation.ActiveState == 1)
 			UseForcedFixedCamera = 0;
 	}
 
-	if (item->currentAnimState == 1 && item->frameNumber == g_Level.Anims[item->animNumber].frameEnd)
-		ObjectCollision(itemNumber, l, coll);
+	if (trapDoorItem->Animation.ActiveState == 1 && trapDoorItem->Animation.FrameNumber == g_Level.Anims[trapDoorItem->Animation.AnimNumber].frameEnd)
+		ObjectCollision(itemNumber, laraItem, coll);
 }
 
 void TrapDoorControl(short itemNumber)
 {
-	ITEM_INFO* item;
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	item = &g_Level.Items[itemNumber];
-	if (TriggerActive(item))
+	if (TriggerActive(trapDoorItem))
 	{
-		if (!item->currentAnimState && item->triggerFlags >= 0)
-		{
-			item->goalAnimState = 1;
-		}
-		else if (item->frameNumber == g_Level.Anims[item->animNumber].frameEnd && CurrentLevel == 14 && item->objectNumber == ID_TRAPDOOR1)
-		{
-			item->status = ITEM_INVISIBLE;
-		}
+		if (!trapDoorItem->Animation.ActiveState && trapDoorItem->TriggerFlags >= 0)
+			trapDoorItem->Animation.TargetState = 1;
+		else if (trapDoorItem->Animation.FrameNumber == g_Level.Anims[trapDoorItem->Animation.AnimNumber].frameEnd && CurrentLevel == 14 && trapDoorItem->ObjectNumber == ID_TRAPDOOR1)
+			trapDoorItem->Status = ITEM_INVISIBLE;
 	}
 	else
 	{
-		item->status = ITEM_ACTIVE;
+		trapDoorItem->Status = ITEM_ACTIVE;
 
-		if (item->currentAnimState == 1)
-		{
-			item->goalAnimState = 0;
-		}
+		if (trapDoorItem->Animation.ActiveState == 1)
+			trapDoorItem->Animation.TargetState = 0;
 	}
 
-	AnimateItem(item);
+	AnimateItem(trapDoorItem);
 
-	if (item->currentAnimState == 1 && (item->itemFlags[2] || JustLoaded))
-	{
+	if (trapDoorItem->Animation.ActiveState == 1 && (trapDoorItem->ItemFlags[2] || JustLoaded))
 		OpenTrapDoor(itemNumber);
-	}
-	else if (!item->currentAnimState && !item->itemFlags[2])
-	{
+	else if (!trapDoorItem->Animation.ActiveState && !trapDoorItem->ItemFlags[2])
 		CloseTrapDoor(itemNumber);
-	}
 }
 
 void CloseTrapDoor(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->itemFlags[2] = 1;
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
+	trapDoorItem->ItemFlags[2] = 1;
 }
 
 void OpenTrapDoor(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	item->itemFlags[2] = 0;
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
+	trapDoorItem->ItemFlags[2] = 0;
 }
 
 int TrapDoorFloorBorder(short itemNumber)
@@ -193,8 +211,9 @@ int TrapDoorCeilingBorder(short itemNumber)
 
 std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	if (!item->meshBits || item->itemFlags[2] == 0)
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
+
+	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, false);
@@ -202,9 +221,9 @@ std::optional<int> TrapDoorFloor(short itemNumber, int x, int y, int z)
 
 std::optional<int> TrapDoorCeiling(short itemNumber, int x, int y, int z)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
-	if (!item->meshBits || item->itemFlags[2] == 0)
+	if (!trapDoorItem->MeshBits || trapDoorItem->ItemFlags[2] == 0)
 		return std::nullopt;
 
 	return GetBridgeItemIntersect(itemNumber, x, y, z, true);

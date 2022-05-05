@@ -9,20 +9,20 @@
 
 void InitialiseJeanYves(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	auto* item = &g_Level.Items[itemNumber];
+	auto* objectInfo = &Objects[item->ObjectNumber];
 	
-	item->goalAnimState = 1;
-	item->currentAnimState = 1;
-	item->animNumber = obj->animIndex;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
+	item->Animation.AnimNumber = objectInfo->animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
 void JeanYvesControl(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->triggerFlags >= Lara.highestLocation)
+	if (item->TriggerFlags >= Lara.HighestLocation)
 	{
 		short state = 0;
 
@@ -31,22 +31,22 @@ void JeanYvesControl(short itemNumber)
 		else
 			state = 3 * (GetRandomControl() & 1);
 
-		item->goalAnimState = (((byte)(item->currentAnimState) - 1) & 0xC) + state + 1;
+		item->Animation.TargetState = (((byte)(item->Animation.ActiveState) - 1) & 0xC) + state + 1;
 		AnimateItem(item);
 	}
 	else
 	{
-		if (Lara.highestLocation > 3)
-			Lara.highestLocation = 3;
+		if (Lara.HighestLocation > 3)
+			Lara.HighestLocation = 3;
 
-		short state = (GetRandomControl() & 3) + 4 * Lara.highestLocation;
-		short animNumber = Objects[item->objectNumber].animIndex + state;
+		int state = (GetRandomControl() & 3) + 4 * Lara.HighestLocation;
+		int animNumber = Objects[item->ObjectNumber].animIndex + state;
 		state++;
 
-		item->goalAnimState = item->currentAnimState = state;
-		item->animNumber = animNumber;
-		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-		item->triggerFlags = Lara.highestLocation;
+		item->Animation.TargetState = item->Animation.ActiveState = state;
+		item->Animation.AnimNumber = animNumber;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->TriggerFlags = Lara.HighestLocation;
 
 		AnimateItem(item);
 	}

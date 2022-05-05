@@ -2,6 +2,6 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 
-void InitialiseSkidman(short itemNum);
-void SkidManCollision(short itemNum, ITEM_INFO* laraitem, COLL_INFO* coll);
-void SkidManControl(short riderNum);
+void InitialiseSkidooMan(short itemNumber);
+void SkidooManCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+void SkidooManControl(short riderNumber);
