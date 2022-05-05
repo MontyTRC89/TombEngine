@@ -11,16 +11,17 @@
 #define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
 #define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
 
-struct CREATURE_INFO;
+struct CreatureInfo;
 struct ITEM_INFO;
 struct FX_INFO;
 
-namespace TEN::Renderer {
+namespace TEN::Renderer
+{
 	struct RendererMesh;
 }
 
 #pragma region state_and_animation
-enum LARA_STATE
+enum LaraState
 {
 	// TR1
 	LS_WALK_FORWARD = 0,
@@ -36,11 +37,11 @@ enum LARA_STATE
 	LS_HANG = 10,
 	LS_REACH = 11,
 	LS_SPLAT = 12,
-	LS_UNDERWATER_STOP = 13,
+	LS_UNDERWATER_IDLE = 13,
 	LS_GRAB_TO_FALL = 14,
 	LS_JUMP_PREPARE = 15,
 	LS_WALK_BACK = 16,
-	LS_UNDERWATER_FORWARD = 17,
+	LS_UNDERWATER_SWIM_FORWARD = 17,
 	LS_UNDERWATER_INERTIA = 18,
 	LS_GRABBING = 19,
 	LS_TURN_RIGHT_FAST = 20,
@@ -56,9 +57,9 @@ enum LARA_STATE
 	LS_SHIMMY_LEFT = 30,
 	LS_SHIMMY_RIGHT = 31,
 	LS_SLIDE_BACK = 32,
-	LS_ONWATER_STOP = 33,
+	LS_ONWATER_IDLE = 33,
 	LS_ONWATER_FORWARD = 34,
-	LS_DIVE = 35,
+	LS_ONWATER_DIVE = 35,
 	LS_PUSHABLE_PUSH = 36,
 	LS_PUSHABLE_PULL = 37,
 	LS_PUSHABLE_GRAB = 38,
@@ -75,8 +76,8 @@ enum LARA_STATE
 	LS_ONWATER_RIGHT = 49,
 	LS_USE_MIDAS = 50,
 	LS_MIDAS_DEATH = 51,
-	LS_SWANDIVE_START = 52,
-	LS_SWANDIVE_END = 53,
+	LS_SWAN_DIVE = 52,
+	LS_FREEFALL_DIVE = 53,
 	LS_HANDSTAND = 54,
 	LS_ONWATER_EXIT = 55,
 
@@ -87,7 +88,7 @@ enum LARA_STATE
 	LS_LADDER_STOP = 59,
 	LS_LADDER_RIGHT = 60,
 	LS_LADDER_DOWN = 61,
-	LS_MONKEY_VAULT = 62,	// Used for auto monkey up jump.
+	LS_AUTO_JUMP = 62,
 	LS_TEST_2 = 63,
 	LS_TEST_3 = 64,
 	LS_WADE_FORWARD = 65,
@@ -95,22 +96,22 @@ enum LARA_STATE
 	LS_PICKUP_FLARE = 67,
 	LS_JUMP_ROLL_180 = 68,
 	LS_KICK = 69,
-	LS_ZIPLINE_RIDE = 70,
+	LS_ZIP_LINE = 70,
 
 	// TR3
 	LS_CROUCH_IDLE = 71,
 	LS_CROUCH_ROLL = 72,
 	LS_SPRINT = 73,
 	LS_SPRINT_DIVE = 74,
-	LS_MONKEYSWING_IDLE = 75,
-	LS_MONKEYSWING_FORWARD = 76,
-	LS_MONKEYSWING_LEFT = 77,
-	LS_MONKEYSWING_RIGHT = 78,
-	LS_MONKEYSWING_TURN_180 = 79,
+	LS_MONKEY_IDLE = 75,
+	LS_MONKEY_FORWARD = 76,
+	LS_MONKEY_SHIMMY_LEFT = 77,
+	LS_MONKEY_SHIMMY_RIGHT = 78,
+	LS_MONKEY_TURN_180 = 79,
 	LS_CRAWL_IDLE = 80,
 	LS_CRAWL_FORWARD = 81,
-	LS_MONKEYSWING_TURN_LEFT = 82,
-	LS_MONKEYSWING_TURN_RIGHT = 83,
+	LS_MONKEY_TURN_LEFT = 82,
+	LS_MONKEY_TURN_RIGHT = 83,
 	LS_CRAWL_TURN_LEFT = 84,
 	LS_CRAWL_TURN_RIGHT = 85,
 	LS_CRAWL_BACK = 86,
@@ -144,7 +145,7 @@ enum LARA_STATE
 	LS_ROPE_UP = 112,
 	LS_ROPE_DOWN = 113,
 	LS_ROPE_SWING = 114,
-	LS_LADDER_TO_SHIMMY = 115,
+	LS_ROPE_UNKNOWN = 115,
 	LS_CORRECT_POSITION = 116,
 	LS_DOUBLEDOOR_PUSH = 117,
 	LS_DOZY = 118,
@@ -152,15 +153,15 @@ enum LARA_STATE
 	// TR5
 	LS_TIGHTROPE_IDLE = 119,
 	LS_TIGHTROPE_TURN_180 = 120,
-	LS_TIGHTROPE_FORWARD = 121,
+	LS_TIGHTROPE_WALK = 121,
 	LS_TIGHTROPE_UNBALANCE_LEFT = 122,
 	LS_TIGHTROPE_UNBALANCE_RIGHT = 123,
 	LS_TIGHTROPE_ENTER = 124,
-	LS_TIGHTROPE_EXIT = 125,
-	LS_DOVESWITCH = 126,
+	LS_TIGHTROPE_DISMOUNT = 125,
+	LS_DOVE_SWITCH = 126,
 	LS_TIGHTROPE_RECOVER_BALANCE = 127,
-	LS_BARS_SWING = 128,
-	LS_BARS_JUMP = 129,
+	LS_HORIZONTAL_BAR_SWING = 128,
+	LS_HORIZONTAL_BAR_LEAP = 129,
 	LS_UNKNOWN_1 = 130,
 	LS_RADIO_LISTENING = 131,
 	LS_RADIO_OFF = 132,
@@ -176,27 +177,39 @@ enum LARA_STATE
 	LS_SHIMMY_45_OUTER_RIGHT = 140,
 	LS_SHIMMY_45_INNER_LEFT = 141,
 	LS_SHIMMY_45_INNER_RIGHT = 142,
-	LS_UNUSED1 = 143, // Foot hang leftovers - may be safely reused
-	LS_UNUSED2 = 144, // Foot hang leftovers - may be safely reused
-	LS_UNUSED3 = 145, // Foot hang leftovers - may be safely reused
+	LS_SLOPE_CLIMB_IDLE = 143,
+	LS_SLOPE_CLIMB_UP = 144,
+	LS_SLOPE_CLIMB_DOWN = 145,
 	LS_COGWHEEL_UNGRAB = 146,
 	LS_STEP_UP = 147,
 	LS_STEP_DOWN = 148,
-	LS_UNUSED4 = 149,		// Vestige of step back down; a new state can be added in its place.
+	LS_SLOPE_CLIMB_FALL = 149,
 	LS_LADDER_DISMOUNT_LEFT = 150,
 	LS_LADDER_DISMOUNT_RIGHT = 151,
 	LS_TURN_LEFT_FAST = 152,
-	LS_CRAWL_EXIT_DOWN_STEP = 153,
+	LS_CRAWL_EXIT_STEP_DOWN = 153,
 	LS_CRAWL_EXIT_JUMP = 154,
 	LS_CRAWL_EXIT_FLIP = 155,
+	LS_SLOPE_CLIMB_HANG = 156,
+	LS_SLOPE_CLIMB_SHIMMY = 157,
+	LS_SLOPE_CLIMB_START = 158,
+	LS_SLOPE_CLIMB_STOP = 159,
+	LS_SLOPE_CLIMB_END = 160,
+	LS_CRAWL_STEP_UP = 161,
+	LS_CRAWL_STEP_DOWN = 162,
+	LS_MONKEY_BACK = 163,
+	LS_VAULT = 164,
+	LS_VAULT_2_STEPS = 165,
+	LS_VAULT_3_STEPS = 166,
+	LS_VAULT_1_STEP_CROUCH = 167,
+	LS_VAULT_2_STEPS_CROUCH = 168,
+	LS_VAULT_3_STEPS_CROUCH = 169,
+	LS_SOFT_SPLAT = 170,
 
 	NUM_LARA_STATES
-
-	// TRASHED STATES (please reuse slots before going any higher and remove entries from this list as you go):
-	// 143, 144, 145, 149
 };
 
-enum LARA_ANIM
+enum LaraAnim
 {
 	// TR1
 	LA_RUN = 0,												// Run forward (looped)
@@ -224,7 +237,7 @@ enum LARA_ANIM
 	LA_STAND_TO_WALK_END = 21,								// Stand > walk forward (1/2)
 	LA_JUMP_FORWARD_TO_FREEFALL_UNUSED = 22,				// Jump > fall (possibly unused?)
 																// TODO: confirm lack of dispatch for this anim.
-	LA_FREEFALL = 23,										// Freefall, after falling more than 7 clicks (looped)
+	LA_FREEFALL = 23,										// Freefall, after falling more than 7 steps (looped)
 	LA_FREEFALL_LAND = 24,									// Freefall > hard landing
 	LA_FREEFALL_DEATH = 25,									// Freefall death
 	LA_STAND_TO_JUMP_UP_START = 26,							// Stand > jump up (1/2)
@@ -244,28 +257,27 @@ enum LARA_ANIM
 	LA_WALK_BACK_TO_STAND_LEFT = 39,						// Walk back > stand, left foot first
 	LA_WALK_BACK = 40,										// Walk back (looped)
 	LA_STAND_TO_WALK_BACK = 41,								// Stand > walk back
-	LA_VAULT_TO_STAND_3CLICK = 42,							// Standing 3-click vault > stand
-	LA_VAULT_TO_STAND_3CLICK_TO_RUN = 43,					// Standing 3-click vault > run
-																// TODO: implement properly.
+	LA_VAULT_TO_STAND_3_STEPS = 42,							// Standing 3-step vault > stand
+	LA_VAULT_TO_STAND_3_STEPS_TO_RUN = 43,					// Standing 3-step vault > run
 	LA_TURN_RIGHT_FAST = 44,								// Rotate right quickly
-	LA_JUMP_FORWARD_TO_FREEFALL_OG = 45,					// Jump forward > fall
-	LA_REACH_TO_FREEFALL_ALTERNATE_UNUSED = 46,				// Reach > freefall
+	LA_HANG_IDLE = 45,										// Hang from ledge (looped)
+	LA_UNDERWATER_USE_PUZZLE = 46,							// Insert puzzle underwater
 	LA_ROLL_180_START_ALTERNATE_UNUSED = 47,				// Standing roll 180 (1/2)
 	LA_ROLL_180_END_ALTERNATE_UNUSED = 48,					// Standing roll 180 (2/2)
 	LA_JUMP_FORWARD_TO_FREEFALL = 49,						// Jump forward > freefall
-	LA_VAULT_TO_STAND_2CLICK_START = 50,					// Standing 2-click vault > stand (1/2) 
-	LA_VAULT_TO_STAND_2CLICK_END = 51,						// Standing 2-click vault > stand (2/2) 
-	LA_VAULT_TO_STAND_2CLICK_END_TO_RUN = 52,				// Standing 2-click vault > stand (2/2) > run
+	LA_VAULT_TO_STAND_2_STEPS_START = 50,					// Standing 2-step vault > stand (1/2) 
+	LA_VAULT_TO_STAND_2_STEPS_END = 51,						// Standing 2-step vault > stand (2/2) 
+	LA_VAULT_TO_STAND_2_STEPS_END_TO_RUN = 52,				// Standing 2-step vault > stand (2/2) > run
 	LA_RUN_WALL_SMASH_LEFT = 53,							// Running smash > stand, left foot first
 	LA_RUN_WALL_SMASH_RIGHT = 54,							// Running smash > stand, right foot first
-	LA_RUN_UP_STEP_LEFT = 55,								// Run up 1-click, left foot first
-	LA_RUN_UP_STEP_RIGHT = 56,								// Run up 1-click, right foot first
-	LA_WALK_UP_STEP_LEFT = 57,								// Walk up 1-click, left foot first
-	LA_WALK_UP_STEP_RIGHT = 58,								// Walk up 1-click, right foot first
-	LA_WALK_DOWN_STEP_RIGHT = 59,							// Walk down 1-click, right foot first
-	LA_WALK_DOWN_STEP_LEFT = 60,							// Walk down 1-click, left foot first
-	LA_WALK_BACK_DOWN_LEFT = 61,							// Walk back down 1-click, left foot first
-	LA_WALK_BACK_DOWN_RIGHT = 62,							// Walk back down 1-click, right foot first
+	LA_RUN_UP_STEP_LEFT = 55,								// Run up a step, left foot first
+	LA_RUN_UP_STEP_RIGHT = 56,								// Run up a step, right foot first
+	LA_WALK_UP_STEP_LEFT = 57,								// Walk up a step, left foot first
+	LA_WALK_UP_STEP_RIGHT = 58,								// Walk up a step, right foot first
+	LA_WALK_DOWN_STEP_RIGHT = 59,							// Walk down a step, right foot first
+	LA_WALK_DOWN_STEP_LEFT = 60,							// Walk down a step, left foot first
+	LA_WALK_BACK_DOWN_LEFT = 61,							// Walk back down a step, left foot first
+	LA_WALK_BACK_DOWN_RIGHT = 62,							// Walk back down a step, right foot first
 	LA_WALLSWITCH_DOWN = 63,								// Activate horizontal wall switch
 	LA_WALLSWITCH_UP = 64,									// Deactivate horizontal wall switch
 	LA_SIDESTEP_LEFT = 65,									// Sidestep left (looped)
@@ -297,17 +309,15 @@ enum LARA_ANIM
 	LA_JUMP_UP_START = 91,									// Prepare standing jump > jump up
 	LA_LAND_TO_RUN = 92,									// Jump forward > land running
 	LA_FALL_BACK = 93,										// Light fall back
-																// TODO: remove? This is a duplicate of 35, only without the RUN_FORWARD state change.
 	LA_JUMP_FORWARD_TO_REACH_3 = 94,						// Jump forward > reach, 3rd opportunity
 	LA_REACH = 95,											// Reach (looped)
 	LA_REACH_TO_HANG = 96,									// Reach > hang
 	LA_HANG_TO_STAND = 97,									// Pull up from hang > stand (1/2)
 	LA_REACH_TO_FREEFALL = 98,								// Reach > freefall
-	LA_LAND_TRANSITION_UNUSED = 99,							// Light fall > mid-land transition
-																// TODO: remove. Possibly a leftover linking anim.
+	LA_UNDERWATER_USE_KEY = 99,								// Use key underwater
 	LA_JUMP_FORWARD_TO_REACH_4 = 100,						// Jump forward > reach, 4th opportunity
 	LA_JUMP_FORWARD_TO_REACH_ALTERNATE_UNUSED = 101,		// Jump forward (from jump forward anim) > reach
-	LA_HANG_TO_STAND_END = 102,								// Pull up from hang > stand (2/2)
+	LA_HANG_TO_STAND_END = 102,								// Pull up from hang > stand (2/2) TODO: remove, not used anymore
 	LA_STAND_IDLE = 103,									// Stand idle (looped)
 	LA_SLIDE_BACK_START = 104,								// Land on slope > slide back
 	LA_SLIDE_BACK = 105,									// Slide back (looped) 
@@ -316,7 +326,7 @@ enum LARA_ANIM
 	LA_UNDERWATER_IDLE = 108,								// Underwater idle (looped)
 	LA_UNDERWARER_IDLE_TO_SWIM = 109,						// Underwater idle > swim forward underwater
 	LA_ONWATER_IDLE = 110,									// Tread water idle (looped)
-	LA_ONWATER_TO_STAND_1CLICK = 111,						// Pull up 1-click from tread > stand
+	LA_ONWATER_TO_STAND_1_STEP = 111,						// Pull up 1 step from tread > stand
 	LA_FREEFALL_DIVE = 112,									// Freefall > underwater
 	LA_ONWATER_DIVE_ALTERNATE_1_UNUSED = 113,				// Tread water > underwater
 	LA_UNDERWATER_RESURFACE = 114,							// Underwater > tread water
@@ -356,7 +366,7 @@ enum LARA_ANIM
 	LA_ROLL_180_CONTINUE = 147,								// Standing roll 180 (2/3)
 	LA_ROLL_180_END = 148,									// Standing roll 180 (3/3)
 	LA_SPIKE_DEATH = 149,									// Spike death
-	LA_REACH_TO_MONKEYSWING = 150,							// Reach > monkey swing
+	LA_REACH_TO_MONKEY = 150,								// Reach > monkey swing
 	LA_SWANDIVE_ROLL = 151,									// Swan dive > roll landing
 	LA_SWANDIVE_DIVE = 152,									// Swan dive > underwater
 	LA_SWANDIVE_FREEFALL = 153,								// Swan dive freefall
@@ -385,7 +395,7 @@ enum LARA_ANIM
 	LA_LADDER_HANG_TO_IDLE = 173,							// Ladder hang > ladder idle
 	LA_LADDER_TO_STAND = 174,								// Ladder idle > stand, pulling up
 	LA_UNKNOWN = 175,										// Pushed back?
-	LA_ONWATER_TO_WADE_0CLICK = 176,						// Tread water up 0-click > wade
+	LA_ONWATER_TO_WADE_0_STEP = 176,						// Tread water > wade
 																// TODO: implement this properly?
 	LA_WADE = 177,											// Wade (looped)
 	LA_RUN_TO_WADE_RIGHT = 178,								// Run > wade, right foot first
@@ -401,10 +411,10 @@ enum LARA_ANIM
 	LA_LADDER_SHIMMY_UP = 187,								// Ascend ladder hanging
 	LA_LADDER_SHIMMY_DOWN = 188,							// Descend ladder hanging
 	LA_DISCARD_FLARE = 189,									// Throw flare standing
-	LA_ONWATER_TO_WADE_1CLICK = 190,						// Tread water up 1-click > wade
-	LA_ONWATER_TO_STAND_0CLICK = 191,						// Pull up 0-click from thread > stand
+	LA_ONWATER_TO_WADE_1_STEP = 190,						// Tread water up a step > wade
+	LA_ONWATER_TO_STAND_0_STEP = 191,						// Pull up from tread > stand
 	LA_UNDERWATER_TO_STAND = 192,							// Underwater > stand
-	LA_ONWATER_TO_STAND_M1CLICK = 193,						// Pull up -1-click from tread > stand
+	LA_ONWATER_TO_STAND_M1_STEP = 193,						// Pull up on lower step from tread > stand
 	LA_LADDER_TO_HANG_DOWN = 194,							// Descend ladder > hang
 																// TODO: this links to regular hang at 96. Address this?
 	LA_SWITCH_SMALL_DOWN = 195,								// Activate small switch
@@ -447,87 +457,87 @@ enum LARA_ANIM
 	LA_SPRINT_ROLL_TO_RUN_LEFT_START = 230,							// Sprint roll, left foot first > run (1/2)
 	LA_SPRINT_ROLL_TO_RUN_RIGHT_CONTINUE_ALTERNATE_UNUSED = 231,	// Sprint roll, left foot first > run (2/3)
 	LA_SPRINT_ROLL_TO_RUN_LEFT_END = 232,							// Sprint roll, left foot first > run (2/2)
-	LA_JUMP_UP_TO_MONKEYSWING = 233,								// Jump up > monkey swing
-	LA_MONKEYSWING_IDLE = 234,										// Monkey swing idle (looped)
-	LA_MONKEYSWING_TO_FREEFALL = 235,								// Monkey swing > freefall
-	LA_MONKEYSWING_FORWARD = 236,									// Monkey swing forward (looped)
-	LA_MONKEYSWING_FORWARD_TO_IDLE_RIGHT = 237,						// Monkey-swing forward > monkey swing idle, right hand first
-	LA_MONKEYSWING_FORWARD_TO_IDLE_LEFT = 238,						// Monkey-swing forward > monkey swing idle, left hand first
-	LA_MONKEYSWING_IDLE_TO_FORWARD_LEFT = 239,						// Monkey idle > monkey forward, left hand first
+	LA_JUMP_UP_TO_MONKEY = 233,										// Jump up > monkey swing
+	LA_MONKEY_IDLE = 234,											// Monkey swing idle (looped)
+	LA_MONKEY_TO_FREEFALL = 235,									// Monkey swing > freefall
+	LA_MONKEY_FORWARD = 236,										// Monkey swing forward (looped)
+	LA_MONKEY_FORWARD_TO_IDLE_RIGHT = 237,							// Monkey-swing forward > monkey swing idle, right hand first
+	LA_MONKEY_FORWARD_TO_IDLE_LEFT = 238,							// Monkey-swing forward > monkey swing idle, left hand first
+	LA_MONKEY_IDLE_TO_FORWARD_LEFT = 239,							// Monkey idle > monkey forward, left hand first
 	LA_SPRINT_ROLL_TO_RUN_LEFT_START_ALTERNATE_UNUSED = 240,		// Sprint roll, left foot first > run (1/3)
 	LA_SPRINT_ROLL_TO_RUN_LEFT_CONTINUE_ALTERNATE_UNUSED = 241,		// Sprint roll, left foot first > run (2/3)
 	LA_SPRINT_ROLL_TO_RUN_LEFT_END_ALTERNATE_UNUSED = 242,			// Sprint roll, left foot first > run (3/3)
 	LA_SPRINT_TO_RUN_LEFT = 243,									// Sprint > run, left foot first
 	LA_SPRINT_TO_RUN_RIGHT = 244,									// Sprint > run, right foot first
-	LA_STAND_TO_CROUCH_END = 245,									// Stand > crouch (2/2)
+	LA_KNEE_DEATH = 245,											// TR1 knee death
 	LA_SLIDE_TO_RUN = 246,											// Slide forward > run
 	LA_CROUCH_ROLL_FORWARD_START = 247,								// Crouch roll forward (1/3)
 	LA_JUMP_FORWARD_TO_REACH_1 = 248,								// Jump forward > reach, 1st opportunity
 	LA_JUMP_FORWARD_TO_REACH_2 = 249,								// Jump forward > reach, 2nd opportunity
 	LA_RUN_JUMP_LEFT_TO_REACH = 251,								// Run jump, left foot first > reach
-	LA_MONKEYSWING_IDLE_TO_FORWARD_RIGHT = 252,						// Monkey swing idle > monkey swing forward, right hand first
-	LA_MONKEYSWING_SHIMMY_LEFT = 253,								// Monkey swing shimmy left (looped)
-	LA_MONKEYSWING_SHIMMY_LEFT_END = 254,							// Monkey swing shimmy left > monkey swing idle
-	LA_MONKEYSWING_SHIMMY_RIGHT = 255,								// Monkey swing shimmy right (looped)
-	LA_MONKEYSWING_SHIMMY_RIGHT_END = 256,							// Monkey swing shimmy right > monkey swing idle
+	LA_MONKEY_IDLE_TO_FORWARD_RIGHT = 252,							// Monkey swing idle > monkey swing forward, right hand first
+	LA_MONKEY_SHIMMY_LEFT = 253,									// Monkey swing shimmy left (looped)
+	LA_MONKEY_SHIMMY_LEFT_END = 254,								// Monkey swing shimmy left > monkey swing idle
+	LA_MONKEY_SHIMMY_RIGHT = 255,									// Monkey swing shimmy right (looped)
+	LA_MONKEY_SHIMMY_RIGHT_END = 256,								// Monkey swing shimmy right > monkey swing idle
 																		// TODO: generic shimmy anims between ledges and ladders?
-	LA_MONKEYSWING_TURN_180 = 257,							// Monkey swing turn 180
-	LA_CROUCH_TO_CRAWL_START = 258,							// Crouch > crawl (1/3)
-	LA_CRAWL_TO_CROUCH_START = 259,							// Crawl > crouch (1/3)
-	LA_CRAWL = 260,											// Crawl forward (looped)
-	LA_CRAWL_IDLE_TO_FORWARD = 261,							// Crawl idle > crawl forward
-	LA_CRAWL_TO_IDLE_LEFT = 262,							// Crawl forward > crawl idle, left leg first
-	LA_CRAWL_IDLE = 263,									// Crwal idle
-	LA_CROUCH_TO_CRAWL_END = 264,							// Crawl > crouch (2/2)
-	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,					// Crouch > crawl (3/3)
-	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,					// TODO: remove.
-	LA_CRAWL_TO_IDLE_RIGHT = 267,							// Crawl forward > crawl idle, right leg first
-	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,					// TODO: remove.
-	LA_CRAWL_TURN_LEFT = 269,								// Crawl rotate left (looped)
-	LA_CRAWL_TURN_RIGHT = 270,								// Crawl rotate right (looped)
-	LA_MONKEYSWING_TURN_LEFT = 271,							// Monkey swing rotate left
-	LA_MONKEYSWING_TURN_RIGHT = 272,						// Monkey swing rotate right
-	LA_CROUCH_TO_CRAWL_CONTINUE = 273,						// Crouch > crawl (2/3)
-	LA_CRAWL_TO_CROUCH_CONTINUE = 274,						// Crouch > crawl (2/3)
-	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,						// Crawl > crawl back
-	LA_CRAWL_BACK = 276,									// Crawl back (looped)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_START = 277,				// Crawl back > crawl idle, right foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,					// Crawl back > crawl idle, right foot first (2/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_START = 279,					// Crawl back > crawl idle, left foot first (1/2)
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,					// Crawl back > crawl idle, left foot first (2/2)
-	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,					// Crawl rotate left > crawl idle, early opportunity
-	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,				// Crawl rotate right > crawl idle, early opportunity
-	LA_MONKEYSWING_TURN_LEFT_TO_IDLE_EARLY = 283,			// Turn left on monkey swing > monkey swing idle, 1st opportunity
-	LA_MONKEYSWING_TURN_LEFT_TO_IDLE_LATE = 284,			// Turn left on monkey swing > monkey swing idle, 2nd opportunity
-	LA_MONKEYSWING_TURN_RIGHT_TO_IDLE_EARLY = 285,			// Turn right on monkey swing > monkey swing idle, 1st opportunity
-	LA_MONKEYSWING_TURN_RIGHT_TO_IDLE_LATE = 286,			// Turn right on monkey swing > monkey swing idle, 2nd opportunity
-	LA_HANG_TO_CROUCH_START = 287,							// Pull up from hang > crouch (1/2)
-	LA_HANG_TO_CROUCH_END = 288,							// Pull up from hang > crouch (2/2)
-	LA_CRAWL_TO_HANG_START = 289,							// Crawl > hang (1/3)
-	LA_CRAWL_TO_HANG_CONTINUE = 290,						// Crawl > hang (2/3)
-																// TODO: position commands in 302 may be stacked in 290, so can remove 302?
-	LA_CROUCH_PICKUP = 291,									// Crouching pickup
-	LA_CRAWL_PICKUP = 292,									// Crawling pickup
-	LA_CROUCH_HIT_BACK = 293,								// Jerk back crouching from damage
-	LA_CROUCH_HIT_FRONT = 294,								// Jerk forward crouching from damage
-	LA_CROUCH_HIT_LEFT = 295,								// Jerk right crouching from damage
-	LA_CROUCH_HIT_RIGHT = 296,								// Jerk left crouching from damage
-	LA_CRAWL_HIT_BACK = 297,								// Jerk forward crawling from damage
-	LA_CRAWL_HIT_FRONT = 298,								// Jerk back crawling from damage
-	LA_CRAWL_HIT_LEFT = 299,								// Jerk left crawling from damage
-	LA_CRAWL_HIT_RIGHT = 300,								// Jerk right crawling from damage
-	LA_CRAWL_DEATH = 301,									// Crawl death
-	LA_CRAWL_TO_HANG_END = 302,								// Crawl > hang (3/3)
-	LA_STAND_TO_CROUCH_ABORT = 303,							// Stand > crouch abort
-	LA_RUN_TO_CROUCH_LEFT_START = 304,						// Run > crouch, left foot first (1/2)
-	LA_RUN_TO_CROUCH_RIGHT_START = 305,						// Run > crouch, right foot first (1/2)
-	LA_RUN_TO_CROUCH_LEFT_END = 306,						// Run > crouch, left foot first (2/2)
-	LA_RUN_TO_CROUCH_RIGHT_END = 307,						// Run > crouch, right foot first (2/2)
-	LA_SPRINT_ROLL_TO_RUN_RIGHT_START = 308,				// Sprint roll, right foot first > run (2/2)
-	LA_SPRINT_ROLL_TO_RUN_RIGHT_END = 309,					// Sprint roll, right foot first > run (2/2)
-	LA_SPRINT_TO_CROUCH_LEFT = 310,							// Sprint roll, left foot first > crouch
-	LA_SPRINT_TO_CROUCH_RIGHT = 311,						// Sprint roll, right foot first > crouch
-	LA_CROUCH_PICKUP_FLARE = 312,							// Pickup flare crouching
+	LA_MONKEY_TURN_180 = 257,										// Monkey swing turn 180
+	LA_CROUCH_TO_CRAWL_START = 258,									// Crouch > crawl (1/3)
+	LA_CRAWL_TO_CROUCH_START = 259,									// Crawl > crouch (1/3)
+	LA_CRAWL = 260,													// Crawl forward (looped)
+	LA_CRAWL_IDLE_TO_FORWARD = 261,									// Crawl idle > crawl forward
+	LA_CRAWL_TO_IDLE_LEFT = 262,									// Crawl forward > crawl idle, left leg first
+	LA_CRAWL_IDLE = 263,											// Crwal idle
+	LA_CROUCH_TO_CRAWL_END = 264,									// Crawl > crouch (2/2)
+	LA_CRAWL_TO_CROUCH_END_UNUSED = 265,								// Crouch > crawl (3/3) remove
+	LA_CRAWL_TO_IDLE_END_RIGHT_POINTLESS = 266,							// TODO: remove.
+	LA_CRAWL_TO_IDLE_RIGHT = 267,									// Crawl forward > crawl idle, right leg first
+	LA_CRAWL_TO_IDLE_END_LEFT_POINTLESS = 268,							// TODO: remove.
+	LA_CRAWL_TURN_LEFT = 269,										// Crawl rotate left (looped)
+	LA_CRAWL_TURN_RIGHT = 270,										// Crawl rotate right (looped)
+	LA_MONKEY_TURN_LEFT = 271,										// Monkey swing rotate left
+	LA_MONKEY_TURN_RIGHT = 272,										// Monkey swing rotate right
+	LA_CROUCH_TO_CRAWL_CONTINUE = 273,								// Crouch > crawl (2/3)
+	LA_CRAWL_TO_CROUCH_CONTINUE = 274,								// Crouch > crawl (2/3)
+	LA_CRAWL_IDLE_TO_CRAWL_BACK = 275,								// Crawl > crawl back
+	LA_CRAWL_BACK = 276,											// Crawl back (looped)
+	LA_CRAWL_BACK_TO_IDLE_RIGHT_START = 277,						// Crawl back > crawl idle, right foot first (1/2)
+	LA_CRAWL_BACK_TO_IDLE_RIGHT_END = 278,							// Crawl back > crawl idle, right foot first (2/2)
+	LA_CRAWL_BACK_TO_IDLE_LEFT_START = 279,							// Crawl back > crawl idle, left foot first (1/2)
+	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Crawl back > crawl idle, left foot first (2/2)
+	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
+	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
+	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
+	LA_MONKEY_TURN_LEFT_TO_IDLE_LATE = 284,							// Turn left on monkey swing > monkey swing idle, 2nd opportunity
+	LA_MONKEY_TURN_RIGHT_TO_IDLE_EARLY = 285,						// Turn right on monkey swing > monkey swing idle, 1st opportunity
+	LA_MONKEY_TURN_RIGHT_TO_IDLE_LATE = 286,						// Turn right on monkey swing > monkey swing idle, 2nd opportunity
+	LA_HANG_TO_CROUCH_START = 287,									// Pull up from hang > crouch (1/2)
+	LA_HANG_TO_CROUCH_END = 288,									// Pull up from hang > crouch (2/2)
+	LA_CRAWL_TO_HANG_START = 289,									// Crawl > hang (1/3)
+	LA_CRAWL_TO_HANG_CONTINUE = 290,								// Crawl > hang (2/3)
+																		// TODO: position commands in 302 may be stacked in 290, so can remove 302?
+	LA_CROUCH_PICKUP = 291,											// Crouching pickup
+	LA_CRAWL_PICKUP = 292,											// Crawling pickup
+	LA_CROUCH_HIT_BACK = 293,										// Jerk back crouching from damage
+	LA_CROUCH_HIT_FRONT = 294,										// Jerk forward crouching from damage
+	LA_CROUCH_HIT_LEFT = 295,										// Jerk right crouching from damage
+	LA_CROUCH_HIT_RIGHT = 296,										// Jerk left crouching from damage
+	LA_CRAWL_HIT_BACK = 297,										// Jerk forward crawling from damage
+	LA_CRAWL_HIT_FRONT = 298,										// Jerk back crawling from damage
+	LA_CRAWL_HIT_LEFT = 299,										// Jerk left crawling from damage
+	LA_CRAWL_HIT_RIGHT = 300,										// Jerk right crawling from damage
+	LA_CRAWL_DEATH = 301,											// Crawl death
+	LA_CRAWL_TO_HANG_END = 302,										// Crawl > hang (3/3)
+	LA_STAND_TO_CROUCH_ABORT = 303,									// Stand > crouch abort
+	LA_RUN_TO_CROUCH_LEFT_START = 304,								// Run > crouch, left foot first (1/2)
+	LA_RUN_TO_CROUCH_RIGHT_START = 305,								// Run > crouch, right foot first (1/2)
+	LA_RUN_TO_CROUCH_LEFT_END = 306,								// Run > crouch, left foot first (2/2)
+	LA_RUN_TO_CROUCH_RIGHT_END = 307,								// Run > crouch, right foot first (2/2)
+	LA_SPRINT_ROLL_TO_RUN_RIGHT_START = 308,						// Sprint roll, right foot first > run (2/2)
+	LA_SPRINT_ROLL_TO_RUN_RIGHT_END = 309,							// Sprint roll, right foot first > run (2/2)
+	LA_SPRINT_TO_CROUCH_LEFT = 310,									// Sprint roll, left foot first > crouch
+	LA_SPRINT_TO_CROUCH_RIGHT = 311,								// Sprint roll, right foot first > crouch
+	LA_CROUCH_PICKUP_FLARE = 312,									// Pickup flare crouching
 
 	// TR4
 	LA_DOOR_OPEN_PUSH = 313,								// Push door open using doorknob
@@ -561,7 +571,7 @@ enum LARA_ANIM
 	LA_PULLEY_RELEASE = 341,								// Pull pulley > stand
 	LA_POLE_TO_STAND = 342,									// Pole > stand
 	LA_POLE_TURN_CLOCKWISE_CONTINUE_UNUSED = 343,				// TODO: remove.
-	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clickwise on pole (2/2)
+	LA_POLE_TURN_CLOCKWISE_END = 344,						// Rotate clockwise on pole (2/2)
 	LA_POLE_TURN_COUNTER_CLOCKWISE_CONTINUE_UNUSED = 345,		// TODO: remove.
 	LA_POLE_TURN_COUNTER_CLOCKWISE_END = 346,				// Rotate counter-clockwise on pole (2/2)
 	LA_TURNSWITCH_PUSH_CLOCKWISE_START = 347,				// Push turnswitch clockwise (1/3)
@@ -647,11 +657,11 @@ enum LARA_ANIM
 	LA_PICKUP_PEDESTAL_HIGH = 424,							// Standing pickup from high pedestal
 	LA_PICKUP_PEDESTAL_LOW = 425,							// Standing pickup from low pedestal
 	LA_SENET_ROLL = 426,									// Roll Senet sticks
-	LA_TORCH_LIGHT_1 = 427,									// Light torch with flame 0-1 clicks high
-	LA_TORCH_LIGHT_2 = 428,									// Light torch with flame 2-3 clicks high
-	LA_TORCH_LIGHT_3 = 429,									// Light torch with flame 4-5 clicks high
-	LA_TORCH_LIGHT_4 = 430,									// Light torch with flame 6-7 clicks high
-	LA_TORCH_LIGHT_5 = 431,									// Light torch with flame higher than 7 clicks
+	LA_TORCH_LIGHT_1 = 427,									// Light torch with flame 0-1 steps high
+	LA_TORCH_LIGHT_2 = 428,									// Light torch with flame 2-3 steps high
+	LA_TORCH_LIGHT_3 = 429,									// Light torch with flame 4-5 steps high
+	LA_TORCH_LIGHT_4 = 430,									// Light torch with flame 6-7 steps high
+	LA_TORCH_LIGHT_5 = 431,									// Light torch with flame higher than 7 steps
 	LA_DETONATOR_USE = 432,									// Use mine detonator
 	LA_CORRECT_POSITION_FRONT = 433,						// Adjust position forward
 	LA_CORRECT_POSITION_LEFT = 434,							// Adjust position left
@@ -701,74 +711,105 @@ enum LARA_ANIM
 	LA_LADDER_TO_CROUCH = 473,								// Pull up from ladder > crouch
 
 	// TombEngine
-	LA_VAULT_TO_CROUCH_1CLICK = 474, 						// Vault standing up 1-click > crouch
-	LA_VAULT_TO_CROUCH_2CLICK = 475,						// Vault standing up 2-click > crouch
-	LA_VAULT_TO_CROUCH_3CLICK = 476,						// Vault standing up 2-click > crouch
-	LA_CRAWL_JUMP_DOWN_1CLICK = 477,						// Jump down 1-click from crawl > stand
-	LA_CRAWL_JUMP_DOWN_23CLICK = 478,						// Jump down 2-3-click from crawl > stand
-	LA_CRAWL_UP_STEP = 479,									// Crawl up step
-	LA_CRAWL_DOWN_STEP = 480,								// Crawl down step
-	LA_ONWATER_TO_CROUCH_1CLICK = 481,						// Pull up 1-click from tread > stand
-	LA_ONWATER_TO_CROUCH_0CLICK = 482,						// Pull up 0-click from tread > stand
-	LA_ONWATER_TO_CROUCH_M1CLICK = 483,						// Pull up -1-click from tread > stand
-	LA_UNUSED1 = 484,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED2 = 485,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED3 = 486,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED4 = 487,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED5 = 488,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED6 = 489,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED7 = 490,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED8 = 491,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED9 = 492,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED10 = 493,										// Foot hang leftovers - may be safely reused
-	LA_UNUSED11 = 494,										// Foot hang leftovers - may be safely reused
+	LA_VAULT_TO_CROUCH_1_STEP = 474, 						// Vault standing up 1 step > crouch
+	LA_VAULT_TO_CROUCH_2_STEP = 475,						// Vault standing up 2 steps > crouch
+	LA_VAULT_TO_CROUCH_3_STEP = 476,						// Vault standing up 2 steps > crouch
+	LA_CRAWL_JUMP_DOWN_1_STEP = 477,						// Jump down 1 step from crawl > stand
+	LA_CRAWL_JUMP_DOWN = 478,								// Jump down 2 steps and beyond from crawl > fall
+	LA_CRAWL_STEP_UP = 479,									// Crawl up step > crawl idle
+	LA_CRAWL_STEP_DOWN = 480,								// Crawl down step > crawl idle
+	LA_ONWATER_TO_CROUCH_1_STEP = 481,						// Pull up 1 step from tread > stand
+	LA_ONWATER_TO_CROUCH_0_STEP = 482,						// Pull up flat step from tread > stand
+	LA_ONWATER_TO_CROUCH_M1_STEP = 483,						// Pull up lower step from tread > stand
+	LA_LADDER_TO_MONKEY = 484,								// Ladder idle > monkey swing idle
+	LA_ONWATER_TURN_180_START = 485,						// Tread water 180 turn (1/2)
+	LA_ONWATER_TURN_180_END = 486,							// Tread water 180 turn (2/2)
+	LA_MONKEY_TO_LADDER_OVERHEAD_START = 487,				// Monkey idle > ladder idle, overhead (1/2)
+	LA_MONKEY_TO_LADDER_OVERHEAD_END = 488,					// Monkey idle > ladder idle, overhead (2/2)
+	LA_JUMP_PREPARE_TO_STAND = 489,							// Jump prepare > stand
+	LA_MONKEY_IDLE_TO_BACK_LEFT = 490,						// Monkey swing idle > monkey swing back, left hand leading
+	LA_MONKEY_IDLE_TO_BACK_RIGHT = 491,						// Monkey swing idle > monkey swing back, right hand leading
+	LA_MONKEY_BACK = 492,									// Monkey swing back
+	LA_MONKEY_BACK_TO_IDLE_LEFT = 493,						// Monkey swing back > monkey swing idle, left hand leading
+	LA_MONKEY_BACK_TO_IDLE_RIGHT = 494,						// Monkey swing back > monkey swing idle, right hand leading
 	LA_REACH_TO_HANG_OSCILLATE = 495,						// Reach > hang, thin ledge
 	LA_SWANDIVE_ROLL_TO_RUN = 496,							// Swandive roll > run
 	LA_LADDER_DISMOUNT_LEFT_START = 497,					// Ladder dismount left (1/2)
 	LA_LADDER_DISMOUNT_LEFT_END = 498,						// Ladder dismount left (2/2)
 	LA_LADDER_DISMOUNT_RIGHT_START = 499,					// Ladder dismount right (1/2)
 	LA_LADDER_DISMOUNT_RIGHT_END = 500,						// Ladder dismount right (2/2)
-	LA_ONWATER_TO_LADDER = 501,								// Tread water > climb to ladder idle
+	LA_ONWATER_TO_LADDER = 501,								// Tread water > ladder idle
 	LA_POSE_START = 502,									// Stand > AFK pose
 	LA_POSE_CONTINUE = 503,									// AFK pose (looped)
 	LA_POSE_END = 504,										// AFK pose > stand
 
-	NUM_LARA_ANIMS
-	
+	LA_OVERHANG_IDLE_LEFT = 505,
+	LA_OVERHANG_IDLE_RIGHT = 506,
+	LA_OVERHANG_CLIMB_UP_LEFT = 507,
+	LA_OVERHANG_CLIMB_UP_RIGHT = 508,
+	LA_OVERHANG_CLIMB_DOWN_LEFT = 509,
+	LA_OVERHANG_CLIMB_DOWN_RIGHT = 510,
+	LA_OVERHANG_DROP_LEFT = 511,
+	LA_OVERHANG_DROP_RIGHT = 512,
+	LA_OVERHANG_IDLE_2_HANG_LEFT = 513,
+	LA_OVERHANG_IDLE_2_HANG_RIGHT = 514,
+	LA_OVERHANG_HANG_2_IDLE_LEFT = 515,
+	LA_OVERHANG_HANG_2_IDLE_RIGHT = 516,
+	LA_OVERHANG_HANG_SWING = 517,
+	LA_OVERHANG_HANG_LOOP = 518,
+	LA_OVERHANG_HANG_DROP = 519,
+	LA_OVERHANG_SHIMMY_LEFT = 520,
+	LA_OVERHANG_SHIMMY_LEFT_STOP = 521,
+	LA_OVERHANG_SHIMMY_RIGHT = 522,
+	LA_OVERHANG_SHIMMY_RIGHT_STOP = 523,
+	LA_OVERHANG_LEDGE_VAULT_START = 524,
+	LA_OVERHANG_LEDGE_VAULT = 525,
+	LA_OVERHANG_LADDER_SLOPE_CONCAVE = 526,
+	LA_OVERHANG_SLOPE_LADDER_CONCAVE = 527,
+	LA_OVERHANG_LADDER_SLOPE_CONVEX = 528,
+	LA_OVERHANG_SLOPE_LADDER_CONVEX_START = 529,
+	LA_OVERHANG_SLOPE_LADDER_CONVEX = 530,
+	LA_OVERHANG_MONKEY_SLOPE_CONCAVE = 531,
+	LA_OVERHANG_SLOPE_MONKEY_CONCAVE = 532,
+	LA_OVERHANG_SLOPE_MONKEY_CONCAVE_END = 533,
+	LA_OVERHANG_MONKEY_SLOPE_CONVEX = 534,
+	LA_OVERHANG_MONKEY_SLOPE_CONVEX_END = 535,
+	LA_OVERHANG_SLOPE_MONKEY_CONVEX = 536,
+	LA_OVERHANG_EXIT_MONKEY_FORWARD = 537,
+	LA_OVERHANG_EXIT_MONKEY_IDLE = 538,
+	LA_OVERHANG_EXIT_LADDER = 539,
+	LA_OVERHANG_EXIT_VAULT = 540,
+	LA_OVERHANG_EXIT_DROP = 541,
+	LA_OVERHANG_EXIT_HANG = 542,
+
+	LA_VAULT_TO_STAND_3_STEPS_END = 543,
+	LA_RUN_START_LEFT = 544,
+	LA_RUN_TO_STAND_LEFT_SOFT = 545,
+	LA_RUN_TO_STAND_RIGHT_SOFT = 546,
+	LA_MONKEY_JUMP_START = 547,
+	LA_MONKEY_JUMP_CONTINUE = 548,
+	LA_SPRINT_JUMP_LEFT_START = 549,
+	LA_SPRINT_JUMP_LEFT_CONTINUE = 550,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_1 = 551,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_2 = 552,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_3 = 553,
+	LA_SPRINT_JUMP_LEFT_TO_REACH_4 = 554,
+	LA_SPRINT_JUMP_RIGHT_START = 555,
+	LA_SPRINT_JUMP_RIGHT_CONTINUE = 556,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_1 = 557,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_2 = 558,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_3 = 559,
+	LA_SPRINT_JUMP_RIGHT_TO_REACH_4 = 560,
+
+	NUM_LARA_ANIMS,
+
 	// TRASHED ANIMS (please reuse slots before going any higher and remove entries from this list as you go):
-	// 45,
-	// 245, 265, 266, 268, 273, 274, 278, 280,
+	// 102
+	// 265, 266, 268, 273, 274, 278, 280,
+	// 343, 345,
 	// 364, 366, 368, 370,
-	// 484, 485, 486, 487, 488, 499, 490, 491, 492, 493, 494
 };
 #pragma endregion
-
-enum LARA_WATER_STATUS
-{
-	LW_ABOVE_WATER,
-	LW_UNDERWATER,
-	LW_SURFACE,
-	LW_FLYCHEAT,
-	LW_WADE
-};
-
-enum LARA_GUN_STATUS
-{
-	LG_HANDS_FREE,
-	LG_HANDS_BUSY,
-	LG_DRAW_GUNS,
-	LG_UNDRAW_GUNS,
-	LG_READY,
-	LG_SPECIAL
-};
-
-enum WeaponAmmoType
-{
-	WEAPON_AMMO1,
-	WEAPON_AMMO2,
-	WEAPON_AMMO3,
-	MAX_AMMOTYPE
-};
 
 enum LARA_MESHES
 {
@@ -787,28 +828,39 @@ enum LARA_MESHES
 	LM_LOUTARM,
 	LM_LHAND,
 	LM_HEAD,
+
 	NUM_LARA_MESHES
 };
 
-enum LARA_WEAPON_TYPE
+enum class WeaponAmmoType
 {
-	WEAPON_NONE,
-	WEAPON_PISTOLS,
-	WEAPON_REVOLVER,
-	WEAPON_UZI,
-	WEAPON_SHOTGUN,
-	WEAPON_HK = 5,
-	WEAPON_CROSSBOW,
-	WEAPON_FLARE,
-	WEAPON_TORCH,
-	WEAPON_GRENADE_LAUNCHER,
-	WEAPON_HARPOON_GUN,
-	WEAPON_ROCKET_LAUNCHER,
-	WEAPON_SNOWMOBILE,
-	NUM_WEAPONS
+	Ammo1,
+	Ammo2,
+	Ammo3,
+
+	NumAmmos
 };
 
-enum LARA_WEAPON_TYPE_CARRIED
+enum class LaraWeaponType
+{
+	None,
+	Pistol,
+	Revolver,
+	Uzi,
+	Shotgun,
+	HK,
+	Crossbow,
+	Flare,
+	Torch,
+	GrenadeLauncher,
+	HarpoonGun,
+	RocketLauncher,
+	Snowmobile,
+
+	NumWeapons
+};
+
+enum LaraWeaponTypeCarried
 {
 	WTYPE_MISSING = 0x0,
 	WTYPE_PRESENT = 0x1,
@@ -820,15 +872,7 @@ enum LARA_WEAPON_TYPE_CARRIED
 	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
 };
 
-
-enum LARA_CLOTH_TYPES
-{
-	CLOTH_MISSING,
-	CLOTH_DRY,
-	CLOTH_WET
-};
-
-enum class HOLSTER_SLOT : int 
+enum class HolsterSlot : int
 {
 	Empty = ID_LARA_HOLSTERS,
 	Pistols = ID_LARA_HOLSTERS_PISTOLS,
@@ -840,69 +884,109 @@ enum class HOLSTER_SLOT : int
 	Crowssbow = ID_CROSSBOW_ANIM,
 	GrenadeLauncher = ID_GRENADE_ANIM,
 	RocketLauncher = ID_ROCKET_ANIM,
-
 };
 
-struct HolsterInfo 
+// TODO: Unused.
+enum class ClothType
 {
-	HOLSTER_SLOT leftHolster;
-	HOLSTER_SLOT rightHolster;
-	HOLSTER_SLOT backHolster;
+	None,
+	Dry,
+	Wet
 };
 
-struct Ammo 
+enum class BurnType
+{
+	None,
+	Normal,
+	Smoke,
+	Blue,
+	Blue2
+};
+
+enum class WaterStatus
+{
+	Dry,
+	Wade,
+	TreadWater,
+	Underwater,
+	FlyCheat
+};
+
+enum class HandStatus
+{
+	Free,
+	Busy,
+	WeaponDraw,
+	WeaponUndraw,
+	WeaponReady,
+	Special
+};
+
+enum class JumpDirection
+{
+	None,
+	Up,
+	Forward,
+	Back,
+	Left,
+	Right
+};
+
+struct Ammo
 {
 	using CountType = uint16_t;
+
 private:
 	CountType count;
 	bool isInfinite;
+
 public:
 
-	Ammo& operator --() 
+	Ammo& operator --()
 	{
 		--count;
 		return *this;
 	}
 
-	Ammo operator --(int) 
+	Ammo operator --(int)
 	{
 		Ammo tmp = *this;
 		--*this;
 		return tmp;
 	}
 
-	Ammo& operator ++() 
+	Ammo& operator ++()
 	{
 		++count;
 		return *this;
 	}
 
-	Ammo operator ++(int) 
+	Ammo operator ++(int)
 	{
 		Ammo tmp = *this;
 		++*this;
 		return tmp;
 	}
 
-	Ammo& operator =(size_t val) 
+	Ammo& operator =(size_t val)
 	{
 		count = clamp(val);
 		return *this;
 	}
 
-	bool operator ==(size_t val) 
+	bool operator ==(size_t val)
 	{
 		return count == clamp(val);
 	}
 
-	Ammo& operator =(Ammo& rhs) 
+	Ammo& operator =(Ammo& rhs)
 	{
 		count = rhs.count;
 		isInfinite = rhs.count;
 		return *this;
 	}
 
-	Ammo operator +(size_t val) 
+	Ammo operator +(size_t val)
 	{
 		Ammo tmp = *this;
 		tmp += val;
@@ -916,57 +1000,83 @@ public:
 		return tmp;
 	}
 
-	Ammo& operator +=(size_t val) 
+	Ammo& operator +=(size_t val)
 	{
 		int tmp = this->count + val;
 		this->count = clamp(tmp);
 		return *this;
 	}
 
-	Ammo& operator -=(size_t val) 
+	Ammo& operator -=(size_t val)
 	{
 		int tmp = this->count - val;
 		this->count = clamp(tmp);
 		return *this;
 	}
 
-	operator bool() 
+	operator bool()
 	{
 		return isInfinite || (count > 0);
 	}
 
-	static CountType clamp(int val) 
+	static CountType clamp(int val)
 	{
 		return std::clamp(val, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
 	}
 
-	bool hasInfinite() const 
+	bool hasInfinite() const
 	{
 		return isInfinite;
 	}
 
-	CountType getCount() const 
+	CountType getCount() const
 	{
 		return count;
 	}
 
-	void setInfinite(bool infinite) 
+	void setInfinite(bool infinite)
 	{
 		isInfinite = infinite;
 	}
 };
 
+struct HolsterInfo
+{
+	HolsterSlot LeftHolster;
+	HolsterSlot RightHolster;
+	HolsterSlot BackHolster;
+};
+
 struct CarriedWeaponInfo
 {
 	bool Present;
-	Ammo Ammo[MAX_AMMOTYPE];
-	int SelectedAmmo; // WeaponAmmoType_enum
-	bool HasLasersight;
-	bool HasSilencer;
+	Ammo Ammo[(int)WeaponAmmoType::NumAmmos];
+	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
+	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
+	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
 };
 
-#define MaxDiaryPages	64
-#define MaxStringsPerPage	8
+// TODO: There is an abandoned WeaponInfo struct in ten_savegame.fbs.
+
+struct ArmInfo
+{
+	int AnimNumber;
+	int FrameNumber;
+	int FrameBase;
+	bool Locked;
+	Vector3Shrt Rotation;
+	short FlashGun;
+};
+
+struct FlareData
+{
+	unsigned int Life;
+	int Frame;
+	bool ControlLeft;
+};
+
+#define MaxDiaryPages	  64
+#define MaxStringsPerPage 8
 
 struct DiaryString
 {
@@ -984,135 +1094,32 @@ struct DiaryInfo
 	bool Present;
 	short numPages;
 	short currentPage;
-	DiaryPage	Pages[MaxDiaryPages];
+	DiaryPage Pages[MaxDiaryPages];
 };
 
-struct LARA_ARM
+struct LaraInventoryData
 {
-	int frameBase;
-	int frameNumber;
-	int animNumber;
-	bool lock;
-	short yRot;
-	short xRot;
-	short zRot;
-	short flash_gun;
-};
+	bool IsBusy;
+	bool OldBusy;
 
-#ifdef NEW_TIGHTROPE
-struct LaraTightrope
-{
-	float balance;
-	unsigned short timeOnTightrope;
-	bool canGoOff;
-	short tightropeItem; // maybe give Tightrope Item a property for difficulty?
-};
-#endif
-
-struct LaraInfo
-{
-	short itemNumber;
-	LARA_GUN_STATUS gunStatus; // LG_enum
-	LARA_WEAPON_TYPE gunType; // WEAPON_enum
-	LARA_WEAPON_TYPE requestGunType; // WEAPON_enum
-	LARA_WEAPON_TYPE lastGunType; // WEAPON_enum
-	short calcFallSpeed;
-	LARA_WATER_STATUS waterStatus; // LW_enum
-	short climbStatus;
-	short poseCount;
-	int jumpCount;
-	bool jumpQueued;
-	short hitFrame;
-	short hitDirection;
-	int sprintTimer;
-	short air;
-	short diveCount;
-	short deathCount;
-	short currentActive;
-	short currentXvel;
-	short currentYvel;
-	short currentZvel;
-	short spazEffectCount;
-	short flareAge;
-	short burnCount;
-	short weaponItem;
-	HolsterInfo holsterInfo;
-	short flareFrame;
-	short poisoned;
-	byte wet[NUM_LARA_MESHES];
-	bool flareControlLeft;
-	bool look;
-	bool burn;
-	bool keepCrouched;
-	bool isMoving;
-	bool canMonkeySwing;
-	byte burnBlue;
-	bool burnSmoke;
-	bool isDucked;
-	bool hasFired;
-	bool busy;
-	bool oldBusy;
-	bool uncontrollable;
-	bool litTorch;
-	bool isClimbing;
-	bool fired;
-	int waterSurfaceDist;
-	PHD_VECTOR lastPos;
-	PHD_3DPOS nextCornerPos;
-	FX_INFO* spazEffect;
-	int meshPtrs[NUM_LARA_MESHES];
-	ITEM_INFO* target;
-	short targetAngles[2];
-	short turnRate;
-	short moveAngle;
-	short headYrot;
-	short headXrot;
-	short headZrot;
-	short torsoYrot;
-	short torsoXrot;
-	short torsoZrot;
-	LARA_ARM leftArm;
-	LARA_ARM rightArm;
-	CREATURE_INFO* creature;
-	byte ropeSegment;
-	byte ropeDirection;
-	short ropeArcFront;
-	short ropeArcBack;
-	short ropeLastX;
-	short ropeMaxXForward;
-	short ropeMaxXBackward;
-	int ropeDFrame;
-	int ropeFrame;
-	unsigned short ropeFrameRate;
-	unsigned short ropeY;
-	int ropePtr;
-	short interactedItem;
-	int ropeOffset;
-	int ropeDownVel;
-	byte ropeFlag;
-	byte moveCount;
-	int ropeCount;
-	signed char location;
-	signed char highestLocation;
-	signed char locationPad;
-#if NEW_TIGHTROPE
-	LaraTightrope tightrope;
-#else
-	byte tightRopeOnCount;
-	byte tightRopeOff;
-	byte tightRopeFall;
-#endif
-	/// =================================== NEW:
-	byte BeetleLife;
-	short hasBeetleThings;// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
-	byte small_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 4: has skin + 3 = 4
-	byte big_waterskin;// 1 = has the waterskin. 2 = has the waterskin and it has 1 liter. etc. max value is 6: has skin + 5 liters = 6
-	short Vehicle;
-	short ExtraAnim;
-	bool mineL;
-	bool mineR;
-	CarriedWeaponInfo Weapons[static_cast<int>(LARA_WEAPON_TYPE::NUM_WEAPONS)];
 	DiaryInfo Diary;
+
+	byte BeetleLife;
+	int BeetleComponents;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
+	byte SmallWaterskin;	// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4: has skin + 3 = 4
+	byte BigWaterskin;		// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6: has skin + 5 liters = 6
+
+	bool HasBinoculars;
+	bool HasCrowbar;
+	bool HasTorch;
+	bool HasLasersight;	// TODO: Duplicated in CarriedWeaponInfo.
+	bool HasSilencer;	// TODO: Duplicated in CarriedWeaponInfo.
+
+	int TotalSmallMedipacks;
+	int TotalLargeMedipacks;
+	int TotalFlares;
+	unsigned int TotalSecrets;
+
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];
@@ -1121,13 +1128,159 @@ struct LaraInfo
 	int KeysCombo[NUM_KEYS * 2];
 	int PickupsCombo[NUM_PICKUPS * 2];
 	int ExaminesCombo[NUM_EXAMINES * 2];
-	int Secrets;
-	bool Lasersight;
-	bool Crowbar;
-	bool Torch;
-	bool Silencer;
-	bool Binoculars;
-	int NumSmallMedipacks;
-	int NumLargeMedipacks;
-	int NumFlares;
+};
+
+struct LaraCountData
+{
+	unsigned int Pose;
+	unsigned int PositionAdjust;
+	unsigned int RunJump;
+	unsigned int Death;
+	unsigned int NoCheat;
+};
+
+struct WeaponControlData
+{
+	short WeaponItem;
+	bool HasFired;
+	bool Fired;
+
+	bool UziLeft;
+	bool UziRight;
+
+	LaraWeaponType GunType;
+	LaraWeaponType RequestGunType;
+	LaraWeaponType LastGunType;
+	HolsterInfo HolsterInfo;
+};
+
+struct RopeControlData
+{
+	byte Segment;
+	byte Direction;
+	short ArcFront;
+	short ArcBack;
+	short LastX;
+	short MaxXForward;
+	short MaxXBackward;
+	int DFrame;
+	int Frame;
+	unsigned short FrameRate;
+	unsigned short Y;
+	int Ptr;
+	int Offset;
+	int DownVel;
+	byte Flag;
+	int Count;
+};
+
+struct TightropeControlData
+{
+#if NEW_TIGHTROPE
+	float Balance;
+	unsigned int TimeOnTightrope;
+	bool CanDismount;
+	short TightropeItem; // TODO: Give tightrope a property for difficulty?
+#else // !NEW_TIGHTROPE
+	unsigned int OnCount;
+	byte Off;
+	byte Fall;
+#endif
+};
+
+struct SubsuitControlData
+{
+	short XRot;
+	short DXRot;
+	int Velocity[2];
+	int VerticalVelocity;
+
+	// TODO: These appear to be unused.
+	short XRotVel;
+	unsigned short HitCount;
+};
+
+struct MinecartControlData
+{
+	bool Left;
+	bool Right;
+};
+
+struct LaraControlData
+{
+	short MoveAngle;
+	short TurnRate;
+	int CalculatedJumpVelocity;
+	JumpDirection JumpDirection;
+	HandStatus HandStatus;
+	WaterStatus WaterStatus;
+	LaraCountData Count;
+
+	bool CanLook;
+	bool IsMoving;
+	bool KeepLow;
+	bool IsLow;
+	bool CanClimbLadder;
+	bool IsClimbingLadder;
+	bool CanMonkeySwing;
+	bool RunJumpQueued;
+	bool Locked;
+
+	WeaponControlData Weapon;
+	RopeControlData Rope;
+	TightropeControlData Tightrope;
+	SubsuitControlData Subsuit;
+	MinecartControlData Minecart;
+};
+
+struct LaraInfo
+{
+	short ItemNumber;
+	LaraControlData Control;
+	LaraInventoryData Inventory;
+	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
+	FlareData Flare;
+	bool LitTorch;
+
+	Vector3Shrt ExtraHeadRot;
+	Vector3Shrt ExtraTorsoRot;
+	Vector3Int ExtraVelocity;
+	short WaterCurrentActive;
+	Vector3Int WaterCurrentPull;
+
+	ArmInfo LeftArm;
+	ArmInfo RightArm;
+	short TargetArmAngles[2];
+	ITEM_INFO* TargetEntity;
+	CreatureInfo* Creature;	// Not saved. Unused?
+
+	int Air;
+	int SprintEnergy;
+	int PoisonPotency;
+
+	short Vehicle;
+	int ExtraAnim;
+	int HitFrame;
+	int HitDirection;
+	FX_INFO* SpasmEffect;	// Not saved.
+	unsigned int SpasmEffectCount;
+
+	short InteractedItem;
+	int ProjectedFloorHeight;
+	Vector3Shrt TargetOrientation;
+	int WaterSurfaceDist;
+	PHD_3DPOS NextCornerPos;
+
+	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
+	BurnType BurnType;
+	unsigned int BurnCount;
+	bool Burn;
+	byte BurnBlue;
+	bool BurnSmoke;
+
+	byte Wet[NUM_LARA_MESHES];
+	int MeshPtrs[NUM_LARA_MESHES];
+	signed char Location;
+	signed char HighestLocation;
+	signed char LocationPad;
 };

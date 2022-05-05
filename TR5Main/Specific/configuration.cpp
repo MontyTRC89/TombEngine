@@ -60,7 +60,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	HWND ctlHandle;
 
-	VectorInt2 mode;
+	Vector2Int mode;
 	int selectedAdapter;
 	int selectedMode;
 

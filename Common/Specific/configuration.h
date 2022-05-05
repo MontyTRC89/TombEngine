@@ -77,7 +77,7 @@ struct GameConfiguration {
 	int JoyRoll;
 	int JoyWalk;
 	int shadowMapSize = 1024;
-	std::vector<VectorInt2> SupportedScreenResolutions;
+	std::vector<Vector2Int> SupportedScreenResolutions;
 	std::string AdapterName;
 };
 

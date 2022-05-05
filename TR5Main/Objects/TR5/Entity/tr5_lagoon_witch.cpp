@@ -9,27 +9,35 @@
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
 #include "Game/itemdata/creature_info.h"
-
-#define STATE_LAGOON_WITCH_SWIM			1
-#define STATE_LAGOON_WITCH_STOP			2
-#define STATE_LAGOON_WITCH_ATTACK		3
-#define STATE_LAGOON_WITCH_DEATH		5
-
-#define ANIMATION_LAGOON_WITCH_DEATH	7
+#include "Game/misc.h"
 
 BITE_INFO LagoonWitchBite = { 0, 0, 0, 7 };
 
+enum LagoonWitchState
+{
+	WITCH_STATE_SWIM = 1,
+	WITCH_STATE_IDLE = 2,
+	WITCH_STATE_ATTACK = 3,
+	WITCH_STATE_DEATH = 5
+};
+
+// TODO
+enum LagoonWitchAnim
+{
+	WITCH_ANIM_DEATH = 7
+};
+
 void InitialiseLagoonWitch(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 	
 	ClearItem(itemNumber);
 
-	item->animNumber = Objects[item->objectNumber].animIndex + 1;
-	item->goalAnimState = STATE_LAGOON_WITCH_STOP;
-	item->currentAnimState = STATE_LAGOON_WITCH_STOP;
-	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-	item->pos.yPos += 512;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+	item->Animation.TargetState = WITCH_STATE_IDLE;
+	item->Animation.ActiveState = WITCH_STATE_IDLE;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Pose.Position.y += CLICK(2);
 }
 
 void LagoonWitchControl(short itemNumber)
@@ -37,106 +45,110 @@ void LagoonWitchControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 	
+	short angle = 0;
 	short joint0 = 0;
 	short joint1 = 0;
 	short joint2 = 0;
-	short angle = 0;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
-	CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-	OBJECT_INFO* obj = &Objects[item->objectNumber];
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+	auto* object = &Objects[item->ObjectNumber];
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->currentAnimState != STATE_LAGOON_WITCH_DEATH)
+		if (item->Animation.ActiveState != WITCH_STATE_DEATH)
 		{
-			item->hitPoints = 0;
-			item->currentAnimState = STATE_LAGOON_WITCH_DEATH;
-			item->animNumber = obj->animIndex + ANIMATION_LAGOON_WITCH_DEATH;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
+			item->HitPoints = 0;
+			item->Animation.ActiveState = WITCH_STATE_DEATH;
+			item->Animation.AnimNumber = object->animIndex + WITCH_ANIM_DEATH;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 	else
 	{
 		if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM2))
 		{
-			item->aiBits = 0;
-			creature->enemy = LaraItem;
+			item->AIBits = 0;
+			creature->Enemy = LaraItem;
 		}
 
-		if (item->aiBits)
-		{
+		if (item->AIBits)
 			GetAITarget(creature);
-		}
-		else if (creature->hurtByLara)
-		{
-			creature->enemy = LaraItem;
-		}
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
 
-		AI_INFO info;
-		CreatureAIInfo(item,&info);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
 		//if (creature->enemy != LaraItem)
 		//	phd_atan(lara_item->pos.z_pos - item->pos.z_pos, lara_item->pos.x_pos - item->pos.x_pos);
 
-		GetCreatureMood(item,&info, VIOLENT);
-		CreatureMood(item,&info, VIOLENT);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->maximumTurn);
+		angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (info.ahead)
+		if (AI.ahead)
 		{
-			joint0 = info.angle / 2;
-			joint2 = info.angle / 2;
-			joint1 = info.xAngle;
+			joint0 = AI.angle / 2;
+			joint1 = AI.xAngle;
+			joint2 = AI.angle / 2;
 		}
 
-		creature->maximumTurn = 0;
+		creature->MaxTurn = 0;
 
-		switch (item->currentAnimState)
+		switch (item->Animation.ActiveState)
 		{
-		case STATE_LAGOON_WITCH_SWIM:
-			creature->maximumTurn = 728;
-			if (info.distance < SQUARE(1024))
-				item->goalAnimState = STATE_LAGOON_WITCH_STOP;
+		case WITCH_STATE_SWIM:
+			creature->MaxTurn = ANGLE(4.0f);
+
+			if (AI.distance < pow(SECTOR(1), 2))
+				item->Animation.TargetState = WITCH_STATE_IDLE;
+
 			break;
 
-		case STATE_LAGOON_WITCH_STOP:
-			creature->flags = 0;
-			creature->maximumTurn = ANGLE(2);
-			if (info.distance < SQUARE(768))
-				item->goalAnimState = STATE_LAGOON_WITCH_ATTACK;
-			else if (info.distance > SQUARE(1024))
-				item->goalAnimState = STATE_LAGOON_WITCH_SWIM;
+		case WITCH_STATE_IDLE:
+			creature->MaxTurn = ANGLE(2.0f);
+			creature->Flags = 0;
+
+			if (AI.distance < pow(CLICK(3), 2))
+				item->Animation.TargetState = WITCH_STATE_ATTACK;
+			else if (AI.distance > pow(SECTOR(1), 2))
+				item->Animation.TargetState = WITCH_STATE_SWIM;
 			else
-				item->goalAnimState = STATE_LAGOON_WITCH_STOP;
+				item->Animation.TargetState = WITCH_STATE_IDLE;
+
 			break;
 
-		case STATE_LAGOON_WITCH_ATTACK:
-			creature->maximumTurn = ANGLE(2);
-			if (!creature->flags
-				&& item->touchBits & 0x3C3C0
-				&& item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 29)
+		case WITCH_STATE_ATTACK:
+			creature->MaxTurn = ANGLE(2.0f);
+
+			if (!creature->Flags &&
+				item->TouchBits & 0x3C3C0 &&
+				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 29)
 			{
-				LaraItem->hitPoints -= 100;
-				LaraItem->hitStatus = true;
-				CreatureEffect2(item,&LagoonWitchBite, 10, item->pos.yRot, DoBloodSplat);
-				creature->flags = STATE_LAGOON_WITCH_SWIM;
-			}
-			break;
+				CreatureEffect2(item, &LagoonWitchBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+				creature->Flags = WITCH_STATE_SWIM;
 
+				LaraItem->HitPoints -= 100;
+				LaraItem->HitStatus = true;
+			}
+
+			break;
 		}
 
-		if (creature->reachedGoal)
+		if (creature->ReachedGoal)
 		{
-			ITEM_INFO* enemy = creature->enemy;
+			auto* enemy = creature->Enemy;
+
 			if (enemy)
 			{
-				if (enemy->flags & 2)
-					item->itemFlags[3] = (item->TOSSPAD & 0xFF) - 1;
-				item->itemFlags[3]++;
-				creature->reachedGoal = false;
-				creature->enemy = 0;
+				if (enemy->Flags & 2)
+					item->ItemFlags[3] = (creature->Tosspad & 0xFF) - 1;
+
+				item->ItemFlags[3]++;
+				creature->ReachedGoal = false;
+				creature->Enemy = 0;
 			}
 		}
 	}

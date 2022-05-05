@@ -29,7 +29,8 @@ namespace TEN::Renderer
 		Utils::throwIfFailed(output->GetDisplayModeList(scd.BufferDesc.Format, 0, &numModes, modes));
 
 		DXGI_MODE_DESC* mode = &modes[0];
-		for (int i = 0; i < numModes; i++) {
+		for (int i = 0; i < numModes; i++)
+		{
 			mode = &modes[i];
 			if (mode->Width == width && mode->Height == height)
 				break;

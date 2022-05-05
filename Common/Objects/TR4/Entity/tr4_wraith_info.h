@@ -1,11 +1,10 @@
 #pragma once
-struct WRAITH_INFO {
-	int xPos;
-	int yPos;
-	int zPos;
-	short xRot;
-	short yRot;
-	short zRot;
+
+struct WraithInfo
+{
+	Vector3Int Position;
+	Vector3Int Velocity;
+
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;

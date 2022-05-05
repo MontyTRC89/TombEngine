@@ -1,4 +1,4 @@
 #pragma once
 
-void InitialiseReaper(short itemNum);
+void InitialiseReaper(short itemNumber);
 void ReaperControl(short itemNumber);

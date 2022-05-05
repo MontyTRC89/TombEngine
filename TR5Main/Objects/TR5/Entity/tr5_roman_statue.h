@@ -1,6 +1,6 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-void InitialiseRomanStatue(short itemNum);
+void InitialiseRomanStatue(short itemNumber);
 void RomanStatueControl(short itemNumber);
-void TriggerRomanStatueMissileSparks(PHD_VECTOR* pos, char fxObj);
+void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject);

@@ -10,6 +10,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Objects/Generic/Object/burning_torch.h"
@@ -29,42 +30,42 @@ constexpr auto CAMERA_RADIUS          = CLICK(1);
 
 struct OLD_CAMERA
 {
-	short currentAnimState;
-	short goalAnimState;
+	short ActiveState;
+	short TargetState;
 	int targetDistance;
 	short actualElevation;
 	short targetElevation;
 	short actualAngle;
 	PHD_3DPOS pos;
 	PHD_3DPOS pos2;
-	PHD_VECTOR target;
+	Vector3Int target;
 };
 
 float LfAspectCorrection;
-GAME_VECTOR LastTarget;
+GameVector LastTarget;
 byte SniperCamActive;
 
 extern int KeyTriggerActive;
 
-PHD_VECTOR CurrentCameraPosition;
+Vector3Int CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
-GAME_VECTOR LastIdeal;
-GAME_VECTOR	Ideals[5];
+GameVector LastIdeal;
+GameVector	Ideals[5];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
-GAME_VECTOR LookCamPosition;
-GAME_VECTOR LookCamTarget;
+GameVector LookCamPosition;
+GameVector LookCamTarget;
 int LSHKTimer = 0;
 int LSHKShotsFired = 0;
-PHD_VECTOR CamOldPos;
+Vector3Int CamOldPos;
 CAMERA_INFO Camera;
-GAME_VECTOR ForcedFixedCamera;
+GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 int NumberCameras;
 int BinocularRange;
 int BinocularOn;
-CAMERA_TYPE BinocularOldCamera;
+CameraType BinocularOldCamera;
 bool LaserSight;
 int PhdPerspective;
 short CurrentFOV;
@@ -94,7 +95,7 @@ void LookAt(CAMERA_INFO* cam, short roll)
 }
 
 void AlterFOV(int value)
-{ 
+{
 	CurrentFOV = value;
 	PhdPerspective = g_Renderer.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
@@ -102,42 +103,42 @@ void AlterFOV(int value)
 
 void InitialiseCamera()
 {
-	Camera.shift = LaraItem->pos.yPos - WALL_SIZE;
-	
-	LastTarget.x = LaraItem->pos.xPos;
+	Camera.shift = LaraItem->Pose.Position.y - SECTOR(1);
+
+	LastTarget.x = LaraItem->Pose.Position.x;
 	LastTarget.y = Camera.shift;
-	LastTarget.z = LaraItem->pos.zPos;
-	LastTarget.roomNumber = LaraItem->roomNumber;
+	LastTarget.z = LaraItem->Pose.Position.z;
+	LastTarget.roomNumber = LaraItem->RoomNumber;
 
 	Camera.target.x = LastTarget.x;
 	Camera.target.y = Camera.shift;
 	Camera.target.z = LastTarget.z;
-	Camera.target.roomNumber = LaraItem->roomNumber;
+	Camera.target.roomNumber = LaraItem->RoomNumber;
 
 	Camera.pos.x = LastTarget.x;
 	Camera.pos.y = Camera.shift;
 	Camera.pos.z = LastTarget.z - 100;
-	Camera.pos.roomNumber = LaraItem->roomNumber;
+	Camera.pos.roomNumber = LaraItem->RoomNumber;
 
-	Camera.targetDistance = WALL_SIZE + STEP_SIZE * 2;
+	Camera.targetDistance = SECTOR(1.5f);
 	Camera.item = NULL;
 	Camera.numberFrames = 1;
-	Camera.type = CAMERA_TYPE::CHASE_CAMERA;
+	Camera.type = CameraType::Chase;
 	Camera.speed = 1;
 	Camera.flags = CF_FOLLOW_CENTER;
 	Camera.bounce = 0;
 	Camera.number = -1;
 	Camera.fixedCamera = false;
-	
+
 	AlterFOV(14560);
-	
+
 	UseForcedFixedCamera = 0;
 	CalculateCamera();
 }
 
-void MoveCamera(GAME_VECTOR* ideal, int speed)
+void MoveCamera(GameVector* ideal, int speed)
 {
-	GAME_VECTOR from, to;
+	GameVector from, to;
 
 	if (BinocularOn < 0)
 	{
@@ -145,18 +146,18 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		BinocularOn++;
 	}
 
-	if (OldCam.pos.xRot != LaraItem->pos.xRot ||
-		OldCam.pos.yRot != LaraItem->pos.yRot ||
-		OldCam.pos.zRot != LaraItem->pos.zRot ||
-		OldCam.pos2.xRot != Lara.headXrot ||
-		OldCam.pos2.yRot != Lara.headYrot ||
-		OldCam.pos2.xPos != Lara.torsoXrot ||
-		OldCam.pos2.yPos != Lara.torsoYrot ||
-		OldCam.pos.xPos != LaraItem->pos.xPos ||
-		OldCam.pos.yPos != LaraItem->pos.yPos ||
-		OldCam.pos.zPos != LaraItem->pos.zPos ||
-		OldCam.currentAnimState != LaraItem->currentAnimState ||
-		OldCam.goalAnimState != LaraItem->goalAnimState ||
+	if (OldCam.pos.Orientation.x != LaraItem->Pose.Orientation.x ||
+		OldCam.pos.Orientation.y != LaraItem->Pose.Orientation.y ||
+		OldCam.pos.Orientation.z != LaraItem->Pose.Orientation.z ||
+		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
+		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
+		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
+		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.y ||
+		OldCam.pos.Position.x != LaraItem->Pose.Position.x ||
+		OldCam.pos.Position.y != LaraItem->Pose.Position.y ||
+		OldCam.pos.Position.z != LaraItem->Pose.Position.z ||
+		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
+		OldCam.TargetState != LaraItem->Animation.TargetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
 		OldCam.targetElevation != Camera.targetElevation ||
 		OldCam.actualElevation != Camera.actualElevation ||
@@ -167,18 +168,18 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		Camera.oldType != Camera.type ||
 		BinocularOn < 0)
 	{
-		OldCam.pos.xRot = LaraItem->pos.xRot;
-		OldCam.pos.yRot = LaraItem->pos.yRot;
-		OldCam.pos.zRot = LaraItem->pos.zRot;
-		OldCam.pos2.xRot = Lara.headXrot;
-		OldCam.pos2.yRot = Lara.headYrot;
-		OldCam.pos2.xPos = Lara.torsoXrot;
-		OldCam.pos2.yPos = Lara.torsoYrot;
-		OldCam.pos.xPos = LaraItem->pos.xPos;
-		OldCam.pos.yPos = LaraItem->pos.yPos;
-		OldCam.pos.zPos = LaraItem->pos.zPos;
-		OldCam.currentAnimState = LaraItem->currentAnimState;
-		OldCam.goalAnimState = LaraItem->goalAnimState;
+		OldCam.pos.Orientation.x = LaraItem->Pose.Orientation.x;
+		OldCam.pos.Orientation.y = LaraItem->Pose.Orientation.y;
+		OldCam.pos.Orientation.z = LaraItem->Pose.Orientation.z;
+		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
+		OldCam.pos2.Orientation.y = Lara.ExtraHeadRot.y;
+		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
+		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.y;
+		OldCam.pos.Position.x = LaraItem->Pose.Position.x;
+		OldCam.pos.Position.y = LaraItem->Pose.Position.y;
+		OldCam.pos.Position.z = LaraItem->Pose.Position.z;
+		OldCam.ActiveState = LaraItem->Animation.ActiveState;
+		OldCam.TargetState = LaraItem->Animation.TargetState;
 		OldCam.targetDistance = Camera.targetDistance;
 		OldCam.targetElevation = Camera.targetElevation;
 		OldCam.actualElevation = Camera.actualElevation;
@@ -224,18 +225,18 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 	}
 
 	int y = Camera.pos.y;
-	if (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_SWAMP)
-		y = g_Level.Rooms[Camera.pos.roomNumber].y - STEP_SIZE;
+	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber))
+		y = g_Level.Rooms[Camera.pos.roomNumber].y - CLICK(1);
 
-	auto probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	auto probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
 	if (y < probe.Position.Ceiling ||
 		y > probe.Position.Floor)
 	{
 		LOSAndReturnTarget(&Camera.target, &Camera.pos, 0);
-		
-		if (abs(Camera.pos.x - ideal->x) < (WALL_SIZE - STEP_SIZE) &&
-			abs(Camera.pos.y - ideal->y) < (WALL_SIZE - STEP_SIZE) &&
-			abs(Camera.pos.z - ideal->z) < (WALL_SIZE - STEP_SIZE))
+
+		if (abs(Camera.pos.x - ideal->x) < SECTOR(0.5f) &&
+			abs(Camera.pos.y - ideal->y) < SECTOR(0.5f) &&
+			abs(Camera.pos.z - ideal->z) < SECTOR(0.5f))
 		{
 			to.x = Camera.pos.x;
 			to.y = Camera.pos.y;
@@ -259,7 +260,7 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 		}
 	}
 
-	probe = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
+	probe = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
 
 	int buffer = CLICK(1) - 1;
 	if ((Camera.pos.y - buffer) < probe.Position.Ceiling &&
@@ -296,14 +297,14 @@ void MoveCamera(GAME_VECTOR* ideal, int speed)
 
 	ItemsCollideCamera();
 
-	Camera.pos.roomNumber = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber).RoomNumber;
+	Camera.pos.roomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber).RoomNumber;
 	LookAt(&Camera, 0);
-	
+
 	if (Camera.mikeAtLara)
 	{
-		Camera.mikePos.x = LaraItem->pos.xPos;
-		Camera.mikePos.y = LaraItem->pos.yPos;
-		Camera.mikePos.z = LaraItem->pos.zPos;
+		Camera.mikePos.x = LaraItem->Pose.Position.x;
+		Camera.mikePos.y = LaraItem->Pose.Position.y;
+		Camera.mikePos.z = LaraItem->Pose.Position.z;
 		Camera.oldType = Camera.type;
 	}
 	else
@@ -321,9 +322,9 @@ void ChaseCamera(ITEM_INFO* item)
 	if (!Camera.targetElevation)
 		Camera.targetElevation = -ANGLE(10.0f);
 
-	Camera.targetElevation += item->pos.xRot;
+	Camera.targetElevation += item->Pose.Orientation.x;
 	UpdateCameraElevation();
-	
+
 	// Clamp x rotation.
 	if (Camera.actualElevation > ANGLE(85.0f))
 		Camera.actualElevation = ANGLE(85.0f);
@@ -332,13 +333,13 @@ void ChaseCamera(ITEM_INFO* item)
 
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
-	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, Camera.target.roomNumber);
-	
-	if (g_Level.Rooms[probe.RoomNumber].flags & ENV_FLAG_SWAMP)
-		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - STEP_SIZE;
+	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
+
+	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
+		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 
 	int y = Camera.target.y;
-	probe = GetCollisionResult(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
+	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
 	if (((y < probe.Position.Ceiling || probe.Position.Floor < y) || probe.Position.Floor <= probe.Position.Ceiling) ||
 		(probe.Position.Floor == NO_HEIGHT || probe.Position.Ceiling == NO_HEIGHT))
 	{
@@ -350,13 +351,13 @@ void ChaseCamera(ITEM_INFO* item)
 	}
 	else
 		TargetSnaps = 0;
-	
+
 	for (int i = 0; i < 5; i++)
 		Ideals[i].y = Camera.target.y + Camera.targetDistance * phd_sin(Camera.actualElevation);
-	
+
 	int farthest = INT_MAX;
 	int farthestnum = 0;
-	GAME_VECTOR temp[2];
+	GameVector temp[2];
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -426,10 +427,10 @@ void ChaseCamera(ITEM_INFO* item)
 		}
 	}
 
-	GAME_VECTOR ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
+	GameVector ideal = { Ideals[farthestnum].x , Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
-	CameraCollisionBounds(&ideal, (STEP_SIZE + STEP_SIZE / 2), 1);
+	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
 	MoveCamera(&ideal, Camera.speed);
 }
 
@@ -437,10 +438,10 @@ void UpdateCameraElevation()
 {
 	if (Camera.laraNode != -1)
 	{
-		PHD_VECTOR pos = { 0, 0, 0 };
+		Vector3Int pos = { 0, 0, 0 };
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
-		PHD_VECTOR pos1 = { 0, -STEP_SIZE, WALL_SIZE * 2 };
+		Vector3Int pos1 = { 0, -CLICK(1), SECTOR(2) };
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
 		pos.z = pos1.z - pos.z;
@@ -448,32 +449,34 @@ void UpdateCameraElevation()
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
-		Camera.actualAngle = LaraItem->pos.yRot + Camera.targetAngle;
+		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }
 
 void CombatCamera(ITEM_INFO* item)
 {
-	Camera.target.x = item->pos.xPos;
-	Camera.target.z = item->pos.zPos;
-	
-	if (Lara.target)
+	auto* lara = GetLaraInfo(item);
+
+	Camera.target.x = item->Pose.Position.x;
+	Camera.target.z = item->Pose.Position.z;
+
+	if (lara->TargetEntity)
 	{
-		Camera.targetAngle = Lara.targetAngles[0];
-		Camera.targetElevation = Lara.targetAngles[1] + item->pos.xRot;
+		Camera.targetAngle = lara->TargetArmAngles[0];
+		Camera.targetElevation = lara->TargetArmAngles[1] + item->Pose.Orientation.x;
 	}
 	else
 	{
-		Camera.targetAngle = Lara.headYrot + Lara.torsoYrot;
-		Camera.targetElevation = Lara.headXrot + Lara.torsoXrot + item->pos.xRot - ANGLE(15.0f);
+		Camera.targetAngle = lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.targetElevation = lara->ExtraHeadRot.x + lara->ExtraTorsoRot.x + item->Pose.Orientation.x - ANGLE(15.0f);
 	}
 
-	auto probe = GetCollisionResult(Camera.target.x, Camera.target.y + STEP_SIZE, Camera.target.z, Camera.target.roomNumber);
-	if (g_Level.Rooms[probe.RoomNumber].flags & ENV_FLAG_SWAMP)
-		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - STEP_SIZE;
+	auto probe = GetCollision(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z, Camera.target.roomNumber);
+	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
+		Camera.target.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 
-	probe = GetCollisionResult(Camera.target.x, Camera.target.y, Camera.target.z, Camera.target.roomNumber);
+	probe = GetCollision(Camera.target.x, Camera.target.y, Camera.target.z, Camera.target.roomNumber);
 	Camera.target.roomNumber = probe.RoomNumber;
 
 	int buffer = CLICK(0.25f);
@@ -498,7 +501,7 @@ void CombatCamera(ITEM_INFO* item)
 	}
 
 	int y = Camera.target.y;
-	probe = GetCollisionResult(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
+	probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
 	Camera.target.roomNumber = probe.RoomNumber;
 
 	if (y < probe.Position.Ceiling ||
@@ -518,7 +521,7 @@ void CombatCamera(ITEM_INFO* item)
 
 	UpdateCameraElevation();
 
-	Camera.targetDistance = WALL_SIZE + STEP_SIZE * 2;
+	Camera.targetDistance = SECTOR(1.5f);
 	int distance = Camera.targetDistance * phd_cos(Camera.actualElevation);
 
 	for (int i = 0; i < 5; i++)
@@ -526,7 +529,7 @@ void CombatCamera(ITEM_INFO* item)
 
 	int farthest = INT_MAX;
 	int farthestnum = 0;
-	GAME_VECTOR temp[2];
+	GameVector temp[2];
 
 	for (int i = 0; i < 5; i++)
 	{
@@ -598,28 +601,28 @@ void CombatCamera(ITEM_INFO* item)
 		}
 	}
 
-	GAME_VECTOR ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
+	GameVector ideal = { Ideals[farthestnum].x, Ideals[farthestnum].y, Ideals[farthestnum].z };
 	ideal.roomNumber = Ideals[farthestnum].roomNumber;
 
-	CameraCollisionBounds(&ideal, (STEP_SIZE + STEP_SIZE / 2), 1);
+	CameraCollisionBounds(&ideal, CLICK(1.5f), 1);
 
-	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
+	if (Camera.oldType == CameraType::Fixed)
 		Camera.speed = 1;
 
 	MoveCamera(&ideal, Camera.speed);
 }
 
-bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
+bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst)
 {
 	int x = ideal->x;
 	int y = ideal->y;
 	int z = ideal->z;
 
-	COLL_RESULT probe;
-	
+	CollisionResult probe;
+
 	if (yFirst)
 	{
-		probe = GetCollisionResult(x, y, z, ideal->roomNumber);
+		probe = GetCollision(x, y, z, ideal->roomNumber);
 
 		int buffer = CLICK(1) - 1;
 		if ((y - buffer) < probe.Position.Ceiling &&
@@ -646,7 +649,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		}
 	}
 
-	probe = GetCollisionResult(x - push, y, z, ideal->roomNumber);
+	probe = GetCollision(x - push, y, z, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -656,7 +659,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		x = (x & (~1023)) + push;
 	}
 
-	probe = GetCollisionResult(x, y, z - push, ideal->roomNumber);
+	probe = GetCollision(x, y, z - push, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -666,7 +669,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		z = (z & (~1023)) + push;
 	}
 
-	probe = GetCollisionResult(x + push, y, z, ideal->roomNumber);
+	probe = GetCollision(x + push, y, z, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -676,7 +679,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		x = (x | 1023) - push;
 	}
 
-	probe = GetCollisionResult(x, y, z + push, ideal->roomNumber);
+	probe = GetCollision(x, y, z + push, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
@@ -688,7 +691,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 
 	if (!yFirst)
 	{
-		probe = GetCollisionResult(x, y, z, ideal->roomNumber);
+		probe = GetCollision(x, y, z, ideal->roomNumber);
 
 		int buffer = CLICK(1) - 1;
 		if ((y - buffer) < probe.Position.Ceiling &&
@@ -715,7 +718,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 		}
 	}
 
-	probe = GetCollisionResult(x, y, z, ideal->roomNumber);
+	probe = GetCollision(x, y, z, ideal->roomNumber);
 	if (y > probe.Position.Floor ||
 		y < probe.Position.Ceiling ||
 		probe.Position.Floor == NO_HEIGHT ||
@@ -735,7 +738,7 @@ bool CameraCollisionBounds(GAME_VECTOR* ideal, int push, int yFirst)
 
 void FixedCamera(ITEM_INFO* item)
 {
-	GAME_VECTOR from, to;
+	GameVector from, to;
 
 	// Fixed cameras before TR3 had optional "movement" effect. 
 	// Later for some reason it was forced to always be 1, and actual speed value
@@ -755,7 +758,7 @@ void FixedCamera(ITEM_INFO* item)
 	else
 	{
 		LEVEL_CAMERA_INFO* camera = &g_Level.Cameras[Camera.number];
-		
+
 		from.x = camera->x;
 		from.y = camera->y;
 		from.z = camera->z;
@@ -778,58 +781,58 @@ void FixedCamera(ITEM_INFO* item)
 
 void LookCamera(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->data;
+	auto* lara = GetLaraInfo(item);
 
-	short headXrot = info->headXrot;
-	short headYrot = info->headYrot;
-	short torsoXrot = info->torsoXrot;
-	short torsoYrot = info->torsoYrot;
+	short headXRot = lara->ExtraHeadRot.x;
+	short headYRot = lara->ExtraHeadRot.y;
+	short torsoXRot = lara->ExtraTorsoRot.x;
+	short torsoYRot = lara->ExtraTorsoRot.y;
 
-	info->torsoXrot = 0;
-	info->torsoYrot = 0;
-	info->headXrot *= 2;
-	info->headYrot *= 2;
+	lara->ExtraTorsoRot.x = 0;
+	lara->ExtraTorsoRot.y = 0;
+	lara->ExtraHeadRot.x *= 2;
+	lara->ExtraHeadRot.y *= 2;
 
 	// Clamp head rotation.
-	if (info->headXrot > ANGLE(55.0f)) 
-		info->headXrot = ANGLE(55.0f);
-	else if (info->headXrot < -ANGLE(75.0f))
-		info->headXrot = -ANGLE(75.0f);
-	if (info->headYrot < -ANGLE(80.0f))
-		info->headYrot = -ANGLE(80.0f);
-	else if (info->headYrot > ANGLE(80.0f))
-		info->headYrot = ANGLE(80.0f);
+	if (lara->ExtraHeadRot.x > ANGLE(55.0f))
+		lara->ExtraHeadRot.x = ANGLE(55.0f);
+	else if (lara->ExtraHeadRot.x < -ANGLE(75.0f))
+		lara->ExtraHeadRot.x = -ANGLE(75.0f);
+	if (lara->ExtraHeadRot.y < -ANGLE(80.0f))
+		lara->ExtraHeadRot.y = -ANGLE(80.0f);
+	else if (lara->ExtraHeadRot.y > ANGLE(80.0f))
+		lara->ExtraHeadRot.y = ANGLE(80.0f);
 
-	if (abs(info->headXrot - OldCam.pos.xRot) >= 16)
-		OldCam.pos.xRot = (info->headXrot + OldCam.pos.xRot) / 2;
+	if (abs(lara->ExtraHeadRot.x - OldCam.pos.Orientation.x) >= 16)
+		OldCam.pos.Orientation.x = (lara->ExtraHeadRot.x + OldCam.pos.Orientation.x) / 2;
 	else
-		OldCam.pos.xRot = info->headXrot;
-	if (abs(info->headYrot - OldCam.pos.yRot) >= 16)
-		OldCam.pos.yRot = (info->headYrot + OldCam.pos.yRot) / 2;
+		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
+	if (abs(lara->ExtraHeadRot.y - OldCam.pos.Orientation.y) >= 16)
+		OldCam.pos.Orientation.y = (lara->ExtraHeadRot.y + OldCam.pos.Orientation.y) / 2;
 	else
-		OldCam.pos.yRot = info->headYrot;
+		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
 
-	PHD_VECTOR pos = { 0, STEP_SIZE / 16, STEP_SIZE / 4 };
+	Vector3Int pos = { 0, (int)CLICK(0.25f) / 4, (int)CLICK(0.25f) };
 	GetLaraJointPosition(&pos, LM_HEAD);
 
-	auto probe = GetCollisionResult(pos.x, pos.y, pos.z, item->roomNumber);
+	auto probe = GetCollision(pos.x, pos.y, pos.z, item->RoomNumber);
 	if (probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
 		probe.Position.Ceiling >= probe.Position.Floor ||
 		pos.y > probe.Position.Floor ||
 		pos.y < probe.Position.Ceiling)
 	{
-		pos = { 0, STEP_SIZE / 16 , 0 };
+		pos = { 0, (int)CLICK(0.25f) / 4 , 0 };
 		GetLaraJointPosition(&pos, LM_HEAD);
-		
-		probe = GetCollisionResult(pos.x, pos.y + STEP_SIZE, pos.z, item->roomNumber);
-		if (g_Level.Rooms[probe.RoomNumber].flags & ENV_FLAG_SWAMP)
+
+		probe = GetCollision(pos.x, pos.y + CLICK(1), pos.z, item->RoomNumber);
+		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		{
-			pos.y = g_Level.Rooms[probe.RoomNumber].y - STEP_SIZE;
-			probe = GetCollisionResult(pos.x, pos.y, pos.z, probe.RoomNumber);
+			pos.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
+			probe = GetCollision(pos.x, pos.y, pos.z, probe.RoomNumber);
 		}
 		else
-			probe = GetCollisionResult(pos.x, pos.y, pos.z, probe.RoomNumber);
+			probe = GetCollision(pos.x, pos.y, pos.z, probe.RoomNumber);
 
 		if (probe.Position.Floor == NO_HEIGHT ||
 			probe.Position.Ceiling == NO_HEIGHT ||
@@ -838,16 +841,16 @@ void LookCamera(ITEM_INFO* item)
 			pos.y < probe.Position.Ceiling)
 		{
 			pos.x = 0;
-			pos.y = STEP_SIZE / 16;
+			pos.y = CLICK(0.25f) / 4;
 			pos.z = -CLICK(0.25f);
 			GetLaraJointPosition(&pos, LM_HEAD);
 		}
 	}
 
-	PHD_VECTOR pos2 = { 0, 0, -WALL_SIZE };
+	Vector3Int pos2 = { 0, 0, -SECTOR(1) };
 	GetLaraJointPosition(&pos2, LM_HEAD);
 
-	PHD_VECTOR pos3 = { 0, 0, CLICK(8) };
+	Vector3Int pos3 = { 0, 0, CLICK(8) };
 	GetLaraJointPosition(&pos3, LM_HEAD);
 
 	int dx = (pos2.x - pos.x) >> 3;
@@ -858,19 +861,19 @@ void LookCamera(ITEM_INFO* item)
 	int z = pos.z;
 
 	int roomNum;
-	probe.RoomNumber = item->roomNumber;
+	probe.RoomNumber = item->RoomNumber;
 	int i = 0;
 	for (i = 0; i < 8; i++)
 	{
 		roomNum = probe.RoomNumber;
-		probe = GetCollisionResult(x, y + STEP_SIZE, z, probe.RoomNumber);
-		if (g_Level.Rooms[probe.RoomNumber].flags & ENV_FLAG_SWAMP)
+		probe = GetCollision(x, y + CLICK(1), z, probe.RoomNumber);
+		if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 		{
-			y = g_Level.Rooms[probe.RoomNumber].y - STEP_SIZE;
+			y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 			break;
 		}
 		else
-			probe = GetCollisionResult(x, y, z, probe.RoomNumber);
+			probe = GetCollision(x, y, z, probe.RoomNumber);
 
 		if (probe.Position.Floor == NO_HEIGHT ||
 			probe.Position.Ceiling == NO_HEIGHT ||
@@ -893,17 +896,17 @@ void LookCamera(ITEM_INFO* item)
 		z -= dz;
 	}
 
-	GAME_VECTOR ideal = { x, y, z };
+	GameVector ideal = { x, y, z };
 	ideal.roomNumber = roomNum;
 
-	if (OldCam.pos.xRot == info->headXrot &&
-		OldCam.pos.yRot == info->headYrot &&
-		OldCam.pos.xPos == item->pos.xPos &&
-		OldCam.pos.yPos == item->pos.yPos &&
-		OldCam.pos.zPos == item->pos.zPos &&
-		OldCam.currentAnimState == item->currentAnimState &&
-		OldCam.goalAnimState == item->goalAnimState &&
-		Camera.oldType == CAMERA_TYPE::LOOK_CAMERA)
+	if (OldCam.pos.Orientation.x == lara->ExtraHeadRot.x &&
+		OldCam.pos.Orientation.y == lara->ExtraHeadRot.y &&
+		OldCam.pos.Position.x == item->Pose.Position.x &&
+		OldCam.pos.Position.y == item->Pose.Position.y &&
+		OldCam.pos.Position.z == item->Pose.Position.z &&
+		OldCam.ActiveState == item->Animation.ActiveState &&
+		OldCam.TargetState == item->Animation.TargetState &&
+		Camera.oldType == CameraType::Look)
 	{
 		ideal.x = LookCamPosition.x;
 		ideal.y = LookCamPosition.y;
@@ -915,13 +918,13 @@ void LookCamera(ITEM_INFO* item)
 	}
 	else
 	{
-		OldCam.pos.xRot = info->headXrot;
-		OldCam.pos.yRot = info->headYrot;
-		OldCam.pos.xPos = item->pos.xPos;
-		OldCam.pos.yPos = item->pos.yPos;
-		OldCam.pos.zPos = item->pos.zPos;
-		OldCam.currentAnimState = item->currentAnimState;
-		OldCam.goalAnimState = item->goalAnimState;
+		OldCam.pos.Orientation.x = lara->ExtraHeadRot.x;
+		OldCam.pos.Orientation.y = lara->ExtraHeadRot.y;
+		OldCam.pos.Position.x = item->Pose.Position.x;
+		OldCam.pos.Position.y = item->Pose.Position.y;
+		OldCam.pos.Position.z = item->Pose.Position.z;
+		OldCam.ActiveState = item->Animation.ActiveState;
+		OldCam.TargetState = item->Animation.TargetState;
 		LookCamPosition.x = ideal.x;
 		LookCamPosition.y = ideal.y;
 		LookCamPosition.z = ideal.z;
@@ -931,9 +934,9 @@ void LookCamera(ITEM_INFO* item)
 		LookCamTarget.z = pos3.z;
 	}
 
-	CameraCollisionBounds(&ideal, (CLICK(1) - CLICK(0.25f) / 2), 1);
+	CameraCollisionBounds(&ideal, CLICK(1) - CLICK(0.25f) / 2, 1);
 
-	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
+	if (Camera.oldType == CameraType::Fixed)
 	{
 		Camera.pos.x = ideal.x;
 		Camera.pos.y = ideal.y;
@@ -941,7 +944,7 @@ void LookCamera(ITEM_INFO* item)
 		Camera.target.x = pos3.x;
 		Camera.target.y = pos3.y;
 		Camera.target.z = pos3.z;
-		Camera.target.roomNumber = item->roomNumber;
+		Camera.target.roomNumber = item->RoomNumber;
 	}
 	else
 	{
@@ -951,7 +954,7 @@ void LookCamera(ITEM_INFO* item)
 		Camera.target.x += (pos3.x - Camera.target.x) >> 2;
 		Camera.target.y += (pos3.y - Camera.target.y) >> 2;
 		Camera.target.z += (pos3.z - Camera.target.z) >> 2;
-		Camera.target.roomNumber = item->roomNumber;
+		Camera.target.roomNumber = item->RoomNumber;
 	}
 
 	if (Camera.bounce && Camera.type == Camera.oldType)
@@ -972,7 +975,7 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	y = Camera.pos.y;
-	probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
 
 	int buffer = CLICK(1) - 1;
 	if ((y - buffer) < probe.Position.Ceiling &&
@@ -998,9 +1001,9 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	y = Camera.pos.y;
-	probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
-	if ((g_Level.Rooms[probe.RoomNumber].flags & ENV_FLAG_SWAMP))
-		Camera.pos.y = g_Level.Rooms[probe.RoomNumber].y - STEP_SIZE;
+	probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	if (TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
+		Camera.pos.y = g_Level.Rooms[probe.RoomNumber].y - CLICK(1);
 	else if (y < probe.Position.Ceiling ||
 		y > probe.Position.Floor ||
 		probe.Position.Ceiling >= probe.Position.Floor ||
@@ -1011,18 +1014,18 @@ void LookCamera(ITEM_INFO* item)
 	}
 
 	y = Camera.pos.y;
-	probe = GetCollisionResult(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
+	probe = GetCollision(Camera.pos.x, y, Camera.pos.z, Camera.pos.roomNumber);
 	if (y < probe.Position.Ceiling ||
 		y > probe.Position.Floor ||
 		probe.Position.Ceiling >= probe.Position.Floor ||
 		probe.Position.Floor == NO_HEIGHT ||
 		probe.Position.Ceiling == NO_HEIGHT ||
-		g_Level.Rooms[probe.RoomNumber].flags & ENV_FLAG_SWAMP)
+		TestEnvironment(ENV_FLAG_SWAMP, probe.RoomNumber))
 	{
 		Camera.pos.x = pos.x;
 		Camera.pos.y = pos.y;
 		Camera.pos.z = pos.z;
-		Camera.pos.roomNumber = item->roomNumber;
+		Camera.pos.roomNumber = item->RoomNumber;
 	}
 
 	ItemsCollideCamera();
@@ -1032,10 +1035,10 @@ void LookCamera(ITEM_INFO* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->pos.yRot + info->headYrot + info->torsoYrot;
-		Camera.mikePos.x = item->pos.xPos;
-		Camera.mikePos.y = item->pos.yPos;
-		Camera.mikePos.z = item->pos.zPos;
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.mikePos.x = item->Pose.Position.x;
+		Camera.mikePos.y = item->Pose.Position.y;
+		Camera.mikePos.z = item->Pose.Position.z;
 	}
 	else
 	{
@@ -1047,18 +1050,18 @@ void LookCamera(ITEM_INFO* item)
 
 	Camera.oldType = Camera.type;
 
-	info->headXrot = headXrot;
-	info->headYrot = headYrot;
-	info->torsoXrot = torsoXrot;
-	info->torsoYrot = torsoYrot;
+	lara->ExtraHeadRot.x = headXRot;
+	lara->ExtraHeadRot.y = headYRot;
+	lara->ExtraTorsoRot.x = torsoXRot;
+	lara->ExtraTorsoRot.y = torsoYRot;
 }
 
 void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 {
 	int distance = sqrt(
-		SQUARE(item->pos.xPos - Camera.pos.x) +
-		SQUARE(item->pos.yPos - Camera.pos.y) +
-		SQUARE(item->pos.zPos - Camera.pos.z));
+		pow(item->Pose.Position.x - Camera.pos.x, 2) +
+		pow(item->Pose.Position.y - Camera.pos.y, 2) +
+		pow(item->Pose.Position.z - Camera.pos.z, 2));
 
 	if (distance < maxDistance)
 	{
@@ -1073,7 +1076,7 @@ void BounceCamera(ITEM_INFO* item, short bounce, short maxDistance)
 
 void BinocularCamera(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->data;
+	auto* lara = GetLaraInfo(item);
 
 	static bool exitingBinoculars = false;
 
@@ -1089,39 +1092,39 @@ void BinocularCamera(ITEM_INFO* item)
 			exitingBinoculars = false;
 			BinocularRange = 0;
 			AlterFOV(14560);
-			item->meshBits = -1;
-			info->busy = false;
-			info->headYrot = 0;
-			info->headXrot = 0;
-			info->torsoYrot = 0;
-			info->torsoXrot = 0;
+			item->MeshBits = -1;
+			lara->Inventory.IsBusy = false;
+			lara->ExtraHeadRot.y = 0;
+			lara->ExtraHeadRot.x = 0;
+			lara->ExtraTorsoRot.y = 0;
+			lara->ExtraTorsoRot.x = 0;
 			Camera.type = BinocularOldCamera;
 
 			return;
 		}
 	}
 
-	item->meshBits = 0;
+	item->MeshBits = 0;
 	AlterFOV(7 * (2080 - BinocularRange));
 
-	short headXrot = info->headXrot * 2;
-	short headYrot = info->headYrot;
+	short headXRot = lara->ExtraHeadRot.x * 2;
+	short headYRot = lara->ExtraHeadRot.y;
 
-	if (headXrot > ANGLE(75.0f))
-		headXrot = ANGLE(75.0f);
-	else if (headXrot < -ANGLE(75.0f))
-		headXrot = -ANGLE(75.0f);
+	if (headXRot > ANGLE(75.0f))
+		headXRot = ANGLE(75.0f);
+	else if (headXRot < -ANGLE(75.0f))
+		headXRot = -ANGLE(75.0f);
 
-	if (headYrot > ANGLE(80.0f))
-		headYrot = ANGLE(80.0f);
-	else if (headYrot < -ANGLE(80.0f))
-		headYrot = -ANGLE(80.0f);
+	if (headYRot > ANGLE(80.0f))
+		headYRot = ANGLE(80.0f);
+	else if (headYRot < -ANGLE(80.0f))
+		headYRot = -ANGLE(80.0f);
 
-	int x = item->pos.xPos;
-	int y = item->pos.yPos - CLICK(2);
-	int z = item->pos.zPos;
+	int x = item->Pose.Position.x;
+	int y = item->Pose.Position.y - CLICK(2);
+	int z = item->Pose.Position.z;
 
-	auto probe = GetCollisionResult(x, y, z, item->roomNumber);
+	auto probe = GetCollision(x, y, z, item->RoomNumber);
 	if (probe.Position.Ceiling <= (y - CLICK(1)))
 		y -= CLICK(1);
 	else
@@ -1129,38 +1132,38 @@ void BinocularCamera(ITEM_INFO* item)
 
 	Camera.pos.x = x;
 	Camera.pos.y = y;
-	Camera.pos.z = z;	
+	Camera.pos.z = z;
 	Camera.pos.roomNumber = probe.RoomNumber;
-	
-	int l = (WALL_SIZE * 20 + CLICK(1)) * phd_cos(headXrot);
-	
-	int tx = x + l * phd_sin(item->pos.yRot + headYrot);
-	int ty = y - (WALL_SIZE * 20 + CLICK(1)) * phd_sin(headXrot);
-	int tz = z + l * phd_cos(item->pos.yRot + headYrot);
 
-	if (Camera.oldType == CAMERA_TYPE::FIXED_CAMERA)
+	int l = SECTOR(20.25f) * phd_cos(headXRot);
+
+	int tx = x + l * phd_sin(item->Pose.Orientation.y + headYRot);
+	int ty = y - SECTOR(20.25f) * phd_sin(headXRot);
+	int tz = z + l * phd_cos(item->Pose.Orientation.y + headYRot);
+
+	if (Camera.oldType == CameraType::Fixed)
 	{
 		Camera.target.x = tx;
 		Camera.target.y = ty;
 		Camera.target.z = tz;
-		Camera.target.roomNumber = item->roomNumber;
+		Camera.target.roomNumber = item->RoomNumber;
 	}
 	else
 	{
 		Camera.target.x += (tx - Camera.target.x) >> 2;
 		Camera.target.y += (ty - Camera.target.y) >> 2;
 		Camera.target.z += (tz - Camera.target.z) >> 2;
-		Camera.target.roomNumber = item->roomNumber;
+		Camera.target.roomNumber = item->RoomNumber;
 	}
-	
+
 	if (Camera.bounce &&
 		Camera.type == Camera.oldType)
 	{
 		if (Camera.bounce <= 0)
 		{
-			Camera.target.x += (STEP_SIZE / 16) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.y += (STEP_SIZE / 16) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
-			Camera.target.z += (STEP_SIZE / 16) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
+			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
 			Camera.bounce += 5;
 		}
 		else
@@ -1170,15 +1173,15 @@ void BinocularCamera(ITEM_INFO* item)
 		}
 	}
 
-	Camera.target.roomNumber = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.roomNumber).RoomNumber;
+	Camera.target.roomNumber = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.target.roomNumber).RoomNumber;
 	LookAt(&Camera, 0);
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->pos.yRot + info->headYrot + info->torsoYrot;
-		Camera.mikePos.x = item->pos.xPos;
-		Camera.mikePos.y = item->pos.yPos;
-		Camera.mikePos.z = item->pos.zPos;
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.mikePos.x = item->Pose.Position.x;
+		Camera.mikePos.y = item->Pose.Position.y;
+		Camera.mikePos.z = item->Pose.Position.z;
 	}
 	else
 	{
@@ -1209,10 +1212,10 @@ void BinocularCamera(ITEM_INFO* item)
 		BinocularRange -= range;
 		if (BinocularRange < 128)
 			BinocularRange = 128;
-		else 
+		else
 			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
-	else if (InputBusy & IN_DUCK)
+	else if (InputBusy & IN_CROUCH)
 	{
 		BinocularRange += range;
 		if (BinocularRange > 1536)
@@ -1221,13 +1224,13 @@ void BinocularCamera(ITEM_INFO* item)
 			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
 
-	PHD_VECTOR src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
-	PHD_VECTOR target = { Camera.target.x, Camera.target.y, Camera.target.z };
+	Vector3Int src = { Camera.pos.x, Camera.pos.y, Camera.pos.z };
+	Vector3Int target = { Camera.target.x, Camera.target.y, Camera.target.z };
 
 	if (LaserSight)
 	{
 		int firing = 0;
-		Ammo& ammo = GetAmmo(item, info->gunType);
+		Ammo& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
 		if (!(InputBusy & IN_ACTION) ||
 			WeaponDelay ||
@@ -1235,7 +1238,7 @@ void BinocularCamera(ITEM_INFO* item)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
-				if (info->gunType != WEAPON_CROSSBOW)
+				if (lara->Control.Weapon.GunType != LaraWeaponType::Crossbow)
 					WeaponDelay = 0;
 
 				LSHKShotsFired = 0;
@@ -1244,7 +1247,7 @@ void BinocularCamera(ITEM_INFO* item)
 		}
 		else
 		{
-			if (info->gunType == WEAPON_REVOLVER)
+			if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
 			{
 				firing = 1;
 				WeaponDelay = 16;
@@ -1255,19 +1258,19 @@ void BinocularCamera(ITEM_INFO* item)
 
 				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
-			else if (info->gunType == WEAPON_CROSSBOW)
+			else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
 			{
 				firing = 1;
 				WeaponDelay = 32;
 			}
 			else
 			{
-				if (info->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO1)
+				if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
 				{
 					WeaponDelay = 12;
 					firing = 1;
 
-					if (info->Weapons[WEAPON_HK].HasSilencer)
+					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 						SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 					else
 					{
@@ -1275,7 +1278,7 @@ void BinocularCamera(ITEM_INFO* item)
 						SoundEffect(SFX_LARA_HK_FIRE, 0, 0);
 					}
 				}
-				else if (info->Weapons[WEAPON_HK].SelectedAmmo == WEAPON_AMMO2)
+				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
 				{
 					if (!LSHKTimer)
 					{
@@ -1288,7 +1291,7 @@ void BinocularCamera(ITEM_INFO* item)
 						LSHKTimer = 4;
 						firing = 1;
 
-						if (info->Weapons[WEAPON_HK].HasSilencer)
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
@@ -1300,7 +1303,7 @@ void BinocularCamera(ITEM_INFO* item)
 					{
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
-						if (info->Weapons[WEAPON_HK].HasSilencer)
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
@@ -1313,7 +1316,7 @@ void BinocularCamera(ITEM_INFO* item)
 				{
 					if (LSHKTimer)
 					{
-						if (info->Weapons[WEAPON_HK].HasSilencer)
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
@@ -1326,7 +1329,7 @@ void BinocularCamera(ITEM_INFO* item)
 						LSHKTimer = 4;
 						firing = 1;
 
-						if (info->Weapons[WEAPON_HK].HasSilencer)
+						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
@@ -1354,13 +1357,13 @@ void BinocularCamera(ITEM_INFO* item)
 			// Reimplement this mode?
 		}
 		else
-			LaraTorch(&src, &target, info->headYrot, 192);
+			LaraTorch(&src, &target, lara->ExtraHeadRot.y, 192);
 	}
 }
 
-void ConfirmCameraTargetPos() 
+void ConfirmCameraTargetPos()
 {
-	PHD_VECTOR pos = { 0, 0, 0 };
+	Vector3Int pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, LM_TORSO);
 
 	if (Camera.laraNode != -1)
@@ -1371,13 +1374,13 @@ void ConfirmCameraTargetPos()
 	}
 	else
 	{
-		Camera.target.x = LaraItem->pos.xPos;
+		Camera.target.x = LaraItem->Pose.Position.x;
 		Camera.target.y = (Camera.target.y + pos.y) >> 1;
-		Camera.target.z = LaraItem->pos.zPos;
+		Camera.target.z = LaraItem->Pose.Position.z;
 	}
 
 	int y = Camera.target.y;
-	auto probe = GetCollisionResult(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
+	auto probe = GetCollision(Camera.target.x, y, Camera.target.z, Camera.target.roomNumber);
 	if (y < probe.Position.Ceiling ||
 		probe.Position.Floor < y ||
 		probe.Position.Floor <= probe.Position.Ceiling ||
@@ -1410,14 +1413,13 @@ void CalculateCamera()
 
 	if (UseForcedFixedCamera != 0)
 	{
-		Camera.type = CAMERA_TYPE::FIXED_CAMERA;
-		if (Camera.oldType != CAMERA_TYPE::FIXED_CAMERA)
+		Camera.type = CameraType::Fixed;
+		if (Camera.oldType != CameraType::Fixed)
 			Camera.speed = 1;
 	}
 
 	// Camera is in a water room, play water sound effect.
-
-	if (g_Level.Rooms[Camera.pos.roomNumber].flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
 	{
 		SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
 		if (Camera.underwater == false)
@@ -1432,7 +1434,7 @@ void CalculateCamera()
 	ITEM_INFO* item;
 	bool fixedCamera = false;
 	if (Camera.item != NULL &&
-		(Camera.type == CAMERA_TYPE::FIXED_CAMERA || Camera.type == CAMERA_TYPE::HEAVY_CAMERA))
+		(Camera.type == CameraType::Fixed || Camera.type == CameraType::Heavy))
 	{
 		item = Camera.item;
 		fixedCamera = true;
@@ -1443,55 +1445,55 @@ void CalculateCamera()
 		fixedCamera = false;
 	}
 
-	BOUNDING_BOX* bounds = GetBoundsAccurate(item);
-	
+	auto* bounds = GetBoundsAccurate(item);
+
 	int x;
-	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->pos.yPos - STEP_SIZE;
+	int y = ((bounds->Y1 + bounds->Y2) / 2) + item->Pose.Position.y - CLICK(1);
 	int z;
 
 	if (Camera.item)
 	{
 		if (!fixedCamera)
 		{
-			auto dx = Camera.item->pos.xPos - item->pos.xPos;
-			auto dz = Camera.item->pos.zPos - item->pos.zPos;
-			int shift = sqrt(SQUARE(dx) + SQUARE(dz));
-			short angle = phd_atan(dz, dx) - item->pos.yRot;
-			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->pos.yPos);
+			auto dx = Camera.item->Pose.Position.x - item->Pose.Position.x;
+			auto dz = Camera.item->Pose.Position.z - item->Pose.Position.z;
+			int shift = sqrt(pow(dx, 2) + pow(dz, 2));
+			short angle = phd_atan(dz, dx) - item->Pose.Orientation.y;
+			short tilt = phd_atan(shift, y - (bounds->Y1 + bounds->Y2) / 2 - Camera.item->Pose.Position.y);
 			bounds = GetBoundsAccurate(Camera.item);
 			angle /= 2;
 			tilt /= 2;
 
 			if (angle > -ANGLE(50.0f) && angle < ANGLE(50.0f) && tilt > -ANGLE(85.0f) && tilt < ANGLE(85.0f))
 			{
-				short change = angle - Lara.headYrot;
+				short change = angle - Lara.ExtraHeadRot.y;
 				if (change > ANGLE(4.0f))
-					Lara.headYrot += ANGLE(4.0f);
+					Lara.ExtraHeadRot.y += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.headYrot -= ANGLE(4.0f);
+					Lara.ExtraHeadRot.y -= ANGLE(4.0f);
 				else
-					Lara.headYrot += change;
-				Lara.torsoYrot = Lara.headYrot;
+					Lara.ExtraHeadRot.y += change;
+				Lara.ExtraTorsoRot.y = Lara.ExtraHeadRot.y;
 
-				change = tilt - Lara.headXrot;
+				change = tilt - Lara.ExtraHeadRot.x;
 				if (change > ANGLE(4.0f))
-					Lara.headXrot += ANGLE(4.0f);
+					Lara.ExtraHeadRot.x += ANGLE(4.0f);
 				else if (change < -ANGLE(4.0f))
-					Lara.headXrot -= ANGLE(4.0f);
+					Lara.ExtraHeadRot.x -= ANGLE(4.0f);
 				else
-					Lara.headXrot += change;
-				Lara.torsoXrot = Lara.headXrot;
+					Lara.ExtraHeadRot.x += change;
+				Lara.ExtraTorsoRot.x = Lara.ExtraHeadRot.x;
 
-				Camera.type = CAMERA_TYPE::LOOK_CAMERA;
-				Camera.item->lookedAt = 1;
+				Camera.type = CameraType::Look;
+				Camera.item->LookedAt = 1;
 			}
 		}
 	}
 
-	if (Camera.type == CAMERA_TYPE::LOOK_CAMERA ||
-		Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
+	if (Camera.type == CameraType::Look ||
+		Camera.type == CameraType::Combat)
 	{
-		if (Camera.type == CAMERA_TYPE::COMBAT_CAMERA)
+		if (Camera.type == CameraType::Combat)
 		{
 			LastTarget.x = Camera.target.x;
 			LastTarget.y = Camera.target.y;
@@ -1499,7 +1501,7 @@ void CalculateCamera()
 			LastTarget.roomNumber = Camera.target.roomNumber;
 		}
 
-		Camera.target.roomNumber = item->roomNumber;
+		Camera.target.roomNumber = item->RoomNumber;
 
 		if (Camera.fixedCamera || BinocularOn < 0)
 		{
@@ -1509,11 +1511,11 @@ void CalculateCamera()
 		else
 		{
 			Camera.target.y += (y - Camera.target.y) >> 2;
-			Camera.speed = Camera.type != CAMERA_TYPE::LOOK_CAMERA ? 8 : 4;
+			Camera.speed = Camera.type != CameraType::Look ? 8 : 4;
 		}
 
 		Camera.fixedCamera = false;
-		if (Camera.type == CAMERA_TYPE::LOOK_CAMERA)
+		if (Camera.type == CameraType::Look)
 			LookCamera(item);
 		else
 			CombatCamera(item);
@@ -1525,14 +1527,14 @@ void CalculateCamera()
 		LastTarget.z = Camera.target.z;
 		LastTarget.roomNumber = Camera.target.roomNumber;
 
-		Camera.target.roomNumber = item->roomNumber;
+		Camera.target.roomNumber = item->RoomNumber;
 		Camera.target.y = y;
 
-		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA &&
+		if (Camera.type != CameraType::Chase &&
 			Camera.flags != CF_CHASE_OBJECT &&
-			(Camera.number != -1 &&(SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
+			(Camera.number != -1 && (SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
 		{
-			PHD_VECTOR pos = { 0, 0, 0 };
+			Vector3Int pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_TORSO);
 
 			x = pos.x;
@@ -1546,13 +1548,13 @@ void CalculateCamera()
 		else
 		{
 			auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->pos.xPos + shift * phd_sin(item->pos.yRot);
-			z = item->pos.zPos + shift * phd_cos(item->pos.yRot);
+			x = item->Pose.Position.x + shift * phd_sin(item->Pose.Orientation.y);
+			z = item->Pose.Position.z + shift * phd_cos(item->Pose.Orientation.y);
 
 			Camera.target.x = x;
 			Camera.target.z = z;
 
-			if (item->objectNumber == ID_LARA)
+			if (item->ObjectNumber == ID_LARA)
 			{
 				ConfirmCameraTargetPos();
 				x = Camera.target.x;
@@ -1565,7 +1567,7 @@ void CalculateCamera()
 		{
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
-				Camera.oldType != CAMERA_TYPE::LOOK_CAMERA &&
+				Camera.oldType != CameraType::Look &&
 				BinocularOn >= 0)
 			{
 				if (TargetSnaps <= 8)
@@ -1587,7 +1589,7 @@ void CalculateCamera()
 			Camera.speed = 1;
 		}
 
-		Camera.target.roomNumber = GetCollisionResult(x, y, z, Camera.target.roomNumber).RoomNumber;
+		Camera.target.roomNumber = GetCollision(x, y, z, Camera.target.roomNumber).RoomNumber;
 
 		if (abs(LastTarget.x - Camera.target.x) < 4 &&
 			abs(LastTarget.y - Camera.target.y) < 4 &&
@@ -1598,7 +1600,7 @@ void CalculateCamera()
 			Camera.target.z = LastTarget.z;
 		}
 
-		if (Camera.type != CAMERA_TYPE::CHASE_CAMERA && Camera.flags != CF_CHASE_OBJECT)
+		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
 			FixedCamera(item);
 		else
 			ChaseCamera(item);
@@ -1607,10 +1609,10 @@ void CalculateCamera()
 	Camera.fixedCamera = fixedCamera;
 	Camera.last = Camera.number;
 
-	if (Camera.type != CAMERA_TYPE::HEAVY_CAMERA ||
+	if (Camera.type != CameraType::Heavy ||
 		Camera.timer == -1)
 	{
-		Camera.type = CAMERA_TYPE::CHASE_CAMERA;
+		Camera.type = CameraType::Chase;
 		Camera.speed = 10;
 		Camera.number = -1;
 		Camera.lastItem = Camera.item;
@@ -1623,112 +1625,116 @@ void CalculateCamera()
 	}
 }
 
-void LookLeftRight()
+void LookLeftRight(ITEM_INFO* item)
 {
-	Camera.type = CAMERA_TYPE::LOOK_CAMERA;
+	auto* lara = GetLaraInfo(item);
+
+	Camera.type = CameraType::Look;
 	if (TrInput & IN_LEFT)
 	{
 		TrInput &= ~IN_LEFT;
-		if (Lara.headYrot > -ANGLE(44.0f))
+		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.headYrot += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
 			else
-				Lara.headYrot -= ANGLE(2.0f);
+				lara->ExtraHeadRot.y -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_RIGHT)
 	{
 		TrInput &= ~IN_RIGHT;
-		if (Lara.headYrot < ANGLE(44.0f))
+		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				Lara.headYrot += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
 			else
-				Lara.headYrot += ANGLE(2.0f);
+				lara->ExtraHeadRot.y += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY &&
-		Lara.Vehicle == NO_ITEM &&
-		!Lara.leftArm.lock &&
-		!Lara.rightArm.lock)
+	if (lara->Control.HandStatus != HandStatus::Busy &&
+		lara->Vehicle == NO_ITEM &&
+		!lara->LeftArm.Locked &&
+		!lara->RightArm.Locked)
 	{
-		Lara.torsoYrot = Lara.headYrot;
+		lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
 	}
 }
 
-void LookUpDown()
+void LookUpDown(ITEM_INFO* item)
 {
-	Camera.type = CAMERA_TYPE::LOOK_CAMERA;
+	auto* lara = GetLaraInfo(item);
+
+	Camera.type = CameraType::Look;
 	if (TrInput & IN_FORWARD)
 	{
 		TrInput &= ~IN_FORWARD;
-		if (Lara.headXrot > -ANGLE(35.0f))
+		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
 		{
 			if (BinocularRange)
-				Lara.headXrot += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
 			else
-				Lara.headXrot -= ANGLE(2.0f);
+				lara->ExtraHeadRot.x -= ANGLE(2.0f);
 		}
 	}
 	else if (TrInput & IN_BACK)
 	{
 		TrInput &= ~IN_BACK;
-		if (Lara.headXrot < ANGLE(30.0f))
+		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
 		{
 			if (BinocularRange)
-				Lara.headXrot += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
 			else
-				Lara.headXrot += ANGLE(2.0f);
+				lara->ExtraHeadRot.x += ANGLE(2.0f);
 		}
 	}
-	if (Lara.gunStatus != LG_HANDS_BUSY &&
-		Lara.Vehicle == NO_ITEM &&
-		!Lara.leftArm.lock &&
-		!Lara.rightArm.lock)
+	if (lara->Control.HandStatus != HandStatus::Busy &&
+		lara->Vehicle == NO_ITEM &&
+		!lara->LeftArm.Locked &&
+		!lara->RightArm.Locked)
 	{
-		Lara.torsoXrot = Lara.headXrot;
+		lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
 	}
 }
 
 void ResetLook(ITEM_INFO* item)
 {
-	LaraInfo*& info = item->data;
+	auto* lara = GetLaraInfo(item);
 
-	if (Camera.type != CAMERA_TYPE::LOOK_CAMERA)
+	if (Camera.type != CameraType::Look)
 	{
-		if (abs(info->headXrot) > ANGLE(0.1f))
-			info->headXrot += info->headXrot / -8;
+		if (abs(lara->ExtraHeadRot.x) > ANGLE(0.1f))
+			lara->ExtraHeadRot.x += lara->ExtraHeadRot.x / -8;
 		else
-			info->headXrot = 0;
+			lara->ExtraHeadRot.x = 0;
 
-		if (abs(info->headYrot) > ANGLE(0.1f))
-			info->headYrot += info->headYrot / -8;
+		if (abs(lara->ExtraHeadRot.y) > ANGLE(0.1f))
+			lara->ExtraHeadRot.y += lara->ExtraHeadRot.y / -8;
 		else
-			info->headYrot = 0;
+			lara->ExtraHeadRot.y = 0;
 
-		if (abs(info->headZrot) > ANGLE(0.1f))
-			info->headZrot += info->headZrot / -8;
+		if (abs(lara->ExtraHeadRot.z) > ANGLE(0.1f))
+			lara->ExtraHeadRot.z += lara->ExtraHeadRot.z / -8;
 		else
-			info->headZrot = 0;
+			lara->ExtraHeadRot.z = 0;
 
-		if (info->gunStatus != LG_HANDS_BUSY &&
-			!info->leftArm.lock &&
-			!info->rightArm.lock &&
-			 info->Vehicle == NO_ITEM)
+		if (lara->Control.HandStatus != HandStatus::Busy &&
+			!lara->LeftArm.Locked &&
+			!lara->RightArm.Locked &&
+			lara->Vehicle == NO_ITEM)
 		{
-			info->torsoXrot = info->headXrot;
-			info->torsoYrot = info->headYrot;
-			info->torsoZrot = info->headZrot;
+			lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
+			lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
+			lara->ExtraTorsoRot.z = lara->ExtraHeadRot.z;
 		}
 		else
 		{
-			if (!info->headXrot)
-				info->torsoXrot = 0;
-			if (!info->headYrot)
-				info->torsoYrot = 0;
-			if (!info->headZrot)
-				info->torsoZrot = 0;
+			if (!lara->ExtraHeadRot.x)
+				lara->ExtraTorsoRot.x = 0;
+			if (!lara->ExtraHeadRot.y)
+				lara->ExtraTorsoRot.y = 0;
+			if (!lara->ExtraHeadRot.z)
+				lara->ExtraTorsoRot.z = 0;
 		}
 	}
 }
@@ -1742,10 +1748,10 @@ bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 
 void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 {
-	int dx = Camera.pos.x - pos->xPos;
-	int dz = Camera.pos.z - pos->zPos;
-	auto sin = phd_sin(pos->yRot);
-	auto cos = phd_cos(pos->yRot);
+	int dx = Camera.pos.x - pos->Position.x;
+	int dz = Camera.pos.z - pos->Position.z;
+	auto sin = phd_sin(pos->Orientation.y);
+	auto cos = phd_cos(pos->Orientation.y);
 	auto x = dx * cos - dz * sin;
 	auto z = dx * sin + dz * cos;
 
@@ -1771,10 +1777,10 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 	else
 		z -= bottom; // Bottom
 
-	Camera.pos.x = pos->xPos + (cos * x + sin * z);
-	Camera.pos.z = pos->zPos + (cos * z - sin * x);
+	Camera.pos.x = pos->Position.x + (cos * x + sin * z);
+	Camera.pos.z = pos->Position.z + (cos * z - sin * x);
 
-	auto coll = GetCollisionResult(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
+	auto coll = GetCollision(Camera.pos.x, Camera.pos.y, Camera.pos.z, Camera.pos.roomNumber);
 	if (coll.Position.Floor == NO_HEIGHT || Camera.pos.y > coll.Position.Floor || Camera.pos.y < coll.Position.Ceiling)
 	{
 		Camera.pos.x = CamOldPos.x;
@@ -1786,24 +1792,24 @@ void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius)
 
 static bool CheckItemCollideCamera(ITEM_INFO* item)
 {
-	auto dx = Camera.pos.x - item->pos.xPos;
-	auto dy = Camera.pos.y - item->pos.yPos;
-	auto dz = Camera.pos.z - item->pos.zPos;
+	auto dx = Camera.pos.x - item->Pose.Position.x;
+	auto dy = Camera.pos.y - item->Pose.Position.y;
+	auto dz = Camera.pos.z - item->Pose.Position.z;
 
 	bool closeEnough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
-						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD && 
+						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
 						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
 
-	if (!closeEnough || !item->collidable || !Objects[item->objectNumber].usingDrawAnimatingItem)
+	if (!closeEnough || !item->Collidable || !Objects[item->ObjectNumber].usingDrawAnimatingItem)
 		return false;
 
 	// TODO: Find a better way to define objects which are collidable with camera.
-	auto obj = &Objects[item->objectNumber];
+	auto obj = &Objects[item->ObjectNumber];
 	if (obj->intelligent || obj->isPickup || obj->isPuzzleHole || obj->collision == nullptr)
 		return false;
 
 	// Check extents, if any 2 bounds are smaller than threshold, discard.
-	Vector3 extents = TO_DX_BBOX(item->pos, GetBoundsAccurate(item)).Extents;
+	Vector3 extents = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item)).Extents;
 	if ((abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.y) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.x) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD) ||
 		(abs(extents.y) < COLL_DISCARD_THRESHOLD && abs(extents.z) < COLL_DISCARD_THRESHOLD))
@@ -1821,12 +1827,12 @@ std::vector<short> FillCollideableItemList()
 	{
 		auto item = &g_Level.Items[i];
 
-		if (!roomList.count(item->roomNumber))
+		if (!roomList.count(item->RoomNumber))
 			continue;
 
 		if (!CheckItemCollideCamera(&g_Level.Items[i]))
 			continue;
-		
+
 		itemList.push_back(i);
 	}
 
@@ -1835,9 +1841,9 @@ std::vector<short> FillCollideableItemList()
 
 static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 {
-	auto dx = Camera.pos.x - mesh->pos.xPos;
-	auto dy = Camera.pos.y - mesh->pos.yPos;
-	auto dz = Camera.pos.z - mesh->pos.zPos;
+	auto dx = Camera.pos.x - mesh->pos.Position.x;
+	auto dy = Camera.pos.y - mesh->pos.Position.y;
+	auto dz = Camera.pos.z - mesh->pos.Position.z;
 
 	bool closeEnough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
 						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
@@ -1897,20 +1903,20 @@ void ItemsCollideCamera()
 		if (!item)
 			return;
 
-		auto dx = abs(LaraItem->pos.xPos - item->pos.xPos);
-		auto dy = abs(LaraItem->pos.yPos - item->pos.yPos);
-		auto dz = abs(LaraItem->pos.zPos - item->pos.zPos);
+		auto dx = abs(LaraItem->Pose.Position.x - item->Pose.Position.x);
+		auto dy = abs(LaraItem->Pose.Position.y - item->Pose.Position.y);
+		auto dz = abs(LaraItem->Pose.Position.z - item->Pose.Position.z);
 
 		// If camera is stuck behind some item, and Lara runs off somewhere
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;
 
 		auto bounds = GetBoundsAccurate(item);
-		if (TestBoundsCollideCamera(bounds, &item->pos, CAMERA_RADIUS))
-			ItemPushCamera(bounds, &item->pos, rad);
+		if (TestBoundsCollideCamera(bounds, &item->Pose, CAMERA_RADIUS))
+			ItemPushCamera(bounds, &item->Pose, rad);
 
 #ifdef _DEBUG
-		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(item->pos, bounds),
+		TEN::Renderer::g_Renderer.AddDebugBox(TO_DX_BBOX(item->Pose, bounds),
 			Vector4(1.0f, 0.0f, 0.0f, 1.0f), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
 #endif
 	}
@@ -1929,9 +1935,9 @@ void ItemsCollideCamera()
 		if (!mesh || !stat)
 			return;
 
-		auto dx = abs(LaraItem->pos.xPos - mesh->pos.xPos);
-		auto dy = abs(LaraItem->pos.yPos - mesh->pos.yPos);
-		auto dz = abs(LaraItem->pos.zPos - mesh->pos.zPos);
+		auto dx = abs(LaraItem->Pose.Position.x - mesh->pos.Position.x);
+		auto dy = abs(LaraItem->Pose.Position.y - mesh->pos.Position.y);
+		auto dz = abs(LaraItem->Pose.Position.z - mesh->pos.Position.z);
 
 		if (dx > COLL_CANCEL_THRESHOLD || dz > COLL_CANCEL_THRESHOLD || dy > COLL_CANCEL_THRESHOLD)
 			continue;

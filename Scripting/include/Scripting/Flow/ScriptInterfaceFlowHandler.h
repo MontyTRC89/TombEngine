@@ -29,7 +29,10 @@ public:
 	virtual bool HasMonkeyTurn180() const = 0;
 	virtual bool HasMonkeyAutoJump() const = 0;
 	virtual bool HasOscillateHang() const = 0;
+	virtual bool HasSprintJump() const = 0;
 	virtual bool HasAFKPose() const = 0;
+	virtual bool HasOverhangClimb() const = 0;
+	virtual bool HasSlideExtended() const = 0;
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
 	virtual bool CanPlayAnyLevel() const = 0;
 	virtual bool DoFlow() = 0;

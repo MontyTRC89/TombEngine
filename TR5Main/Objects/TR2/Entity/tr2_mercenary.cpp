@@ -5,411 +5,413 @@
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/items.h"
+#include "Game/misc.h"
 #include "Game/people.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
 
-BITE_INFO mercUziBite = { 0, 150, 19, 17 };
-BITE_INFO mercAutoPistolBite = { 0, 230, 9, 17 };
+BITE_INFO MercenaryUziBite = { 0, 150, 19, 17 };
+BITE_INFO MercenaryAutoPistolBite = { 0, 230, 9, 17 };
 
-void MercenaryUziControl(short itemNum)
+// TODO
+enum MercenaryState
 {
-	if (!CreatureActive(itemNum))
+
+};
+
+// TODO
+enum MercenaryAnim
+{
+
+};
+
+void MercenaryUziControl(short itemNumber)
+{
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CREATURE_INFO* mc1;
-	AI_INFO info;
-	short angle, head_y, head_x, torso_y, torso_x, tilt;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	mc1 = (CREATURE_INFO*)item->data;
-	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
+	short angle = 0;
+	short tilt = 0;
+	short headX = 0;
+	short headY = 0;
+	short torsoX = 0;
+	short torsoY = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->currentAnimState != 13)
+		if (item->Animation.ActiveState != 13)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 14;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 13;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 14;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 13;
 		}
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
-		GetCreatureMood(item, &info, TIMID);
-		CreatureMood(item, &info, TIMID);
-		angle = CreatureTurn(item, mc1->maximumTurn);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		switch (item->currentAnimState)
+		GetCreatureMood(item, &AI, TIMID);
+		CreatureMood(item, &AI, TIMID);
+
+		angle = CreatureTurn(item, creature->MaxTurn);
+
+		switch (item->Animation.ActiveState)
 		{
 		case 1:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			mc1->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (mc1->mood == ESCAPE_MOOD)
+			if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = 2;
+			else if (Targetable(item, &AI))
 			{
-				item->goalAnimState = 2;
-			}
-			else if (Targetable(item, &info))
-			{
-				if (info.distance > 0x400000)
-				{
-					item->goalAnimState = 2;
-				}
+				if (AI.distance > SECTOR(4096))
+					item->Animation.TargetState = 2;
 
 				if (GetRandomControl() >= 0x2000)
 				{
 					if (GetRandomControl() >= 0x4000)
-						item->goalAnimState = 11;
+						item->Animation.TargetState = 11;
 					else
-						item->goalAnimState = 7;
+						item->Animation.TargetState = 7;
 				}
 				else
-				{
-					item->goalAnimState = 5;
-				}
+					item->Animation.TargetState = 5;
 			}
 			else
 			{
-				if (mc1->mood == ATTACK_MOOD)
-				{
-					item->goalAnimState = 3;
-				}
-				else if (!info.ahead)
-				{
-					item->goalAnimState = 2;
-				}
+				if (creature->Mood == MoodType::Attack)
+					item->Animation.TargetState = 3;
+				else if (!AI.ahead)
+					item->Animation.TargetState = 2;
 				else
-				{
-					item->goalAnimState = 1;
-				}
+					item->Animation.TargetState = 1;
 			}
+
 			break;
+
 		case 2:
-			if (info.ahead)
+			creature->MaxTurn = ANGLE(7.0f);
+
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			mc1->maximumTurn = ANGLE(7.0f);
-
-			if (mc1->mood == ESCAPE_MOOD)
+			if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = 3;
+			else if (Targetable(item, &AI))
 			{
-				item->goalAnimState = 3;
-			}
-			else if (Targetable(item, &info))
-			{
-				if (info.distance <= 0x400000 || info.zoneNumber != info.enemyZone)
-				{
-					item->goalAnimState = 1;
-				}
+				if (AI.distance <= SECTOR(4096) || AI.zoneNumber != AI.enemyZone)
+					item->Animation.TargetState = 1;
 				else
-				{
-					item->goalAnimState = 12;
-				}
+					item->Animation.TargetState = 12;
 			}
-			else if (mc1->mood == ATTACK_MOOD)
-			{
-				item->goalAnimState = 3;
-			}
+			else if (creature->Mood == MoodType::Attack)
+				item->Animation.TargetState = 3;
 			else
 			{
-				if (info.ahead)
-				{
-					item->goalAnimState = 2;
-				}
+				if (AI.ahead)
+					item->Animation.TargetState = 2;
 				else
-				{
-					item->goalAnimState = 1;
-				}
+					item->Animation.TargetState = 1;
+			
 			}
+			
 			break;
+
 		case 3:
-			if (info.ahead)
+			tilt = angle / 3;
+			creature->MaxTurn = ANGLE(10.0f);
+
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			mc1->maximumTurn = ANGLE(10.0f);
-			tilt = (angle / 3);
-
-			if (mc1->mood != ESCAPE_MOOD)
+			if (creature->Mood != MoodType::Escape)
 			{
-				if (Targetable(item, &info))
-				{
-					item->goalAnimState = 1;
-				}
-				else if (mc1->mood == BORED_MOOD)
-				{
-					item->goalAnimState = 2;
-				}
+				if (Targetable(item, &AI))
+					item->Animation.TargetState = 1;
+				else if (creature->Mood == MoodType::Bored)
+					item->Animation.TargetState = 2;
 			}
+
 			break;
 
 		case 5:
 		case 7:
 		case 8:
 		case 9:
-			mc1->maximumTurn = 0;
+			creature->MaxTurn = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (!ShotLara(item, &info, &mercUziBite, torso_y, 8))
-				item->goalAnimState = 1;
+			if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
+				item->Animation.TargetState = 1;
 
-			if (info.distance < 0x400000)
-				item->goalAnimState = 1;
+			if (AI.distance < SECTOR(4096))
+				item->Animation.TargetState = 1;
+
 			break;
 
 		case 10:
 		case 14:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (!ShotLara(item, &info, &mercUziBite, torso_y, 8))
-				item->goalAnimState = 1;
+			if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
+				item->Animation.TargetState = 1;
 
-			if (info.distance < 0x400000)
-				item->goalAnimState = 2;
+			if (AI.distance < SECTOR(4096))
+				item->Animation.TargetState = 2;
+
 			break;
 		}
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, torso_y);
-	CreatureJoint(item, 1, torso_x);
-	CreatureJoint(item, 2, head_y);
-	CreatureJoint(item, 3, head_x);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureJoint(item, 0, torsoY);
+	CreatureJoint(item, 1, torsoX);
+	CreatureJoint(item, 2, headY);
+	CreatureJoint(item, 3, headX);
+	CreatureAnimation(itemNumber, angle, tilt);
 }
 
-void MercenaryAutoPistolControl(short itemNum)
+void MercenaryAutoPistolControl(short itemNumber)
 {
-	if (!CreatureActive(itemNum))
+	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item;
-	CREATURE_INFO* mc2;
-	AI_INFO info;
-	short angle, head_y, head_x, torso_y, torso_x, tilt;
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
 
-	item = &g_Level.Items[itemNum];
-	mc2 = (CREATURE_INFO*)item->data;
-	angle = head_y = head_x = torso_y = torso_x = tilt = 0;
+	short angle = 0;
+	short tilt = 0;
+	short headX = 0;
+	short headY = 0;
+	short torsoX = 0;
+	short torsoY = 0;
 
-	if (item->hitPoints <= 0)
+	if (item->HitPoints <= 0)
 	{
-		if (item->currentAnimState != 11)
+		if (item->Animation.ActiveState != 11)
 		{
-			item->animNumber = Objects[item->objectNumber].animIndex + 9;
-			item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			item->currentAnimState = 11;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 9;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = 11;
 		}
 	}
 	else
 	{
-		CreatureAIInfo(item, &info);
-		GetCreatureMood(item, &info, VIOLENT);
-		CreatureMood(item, &info, VIOLENT);
-		angle = CreatureTurn(item, mc2->maximumTurn);
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
 
-		switch (item->currentAnimState)
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
+
+		angle = CreatureTurn(item, creature->MaxTurn);
+
+		switch (item->Animation.ActiveState)
 		{
 		case 2:
-			mc2->maximumTurn = 0;
-			if (info.ahead)
+			creature->MaxTurn = 0;
+
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (mc2->mood == ESCAPE_MOOD)
+			if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = 4;
+			else if (Targetable(item, &AI))
 			{
-				item->goalAnimState = 4;
-			}
-			else if (Targetable(item, &info))
-			{
-				if (info.distance <= 0x400000)
+				if (AI.distance <= SECTOR(4096))
 				{
 					if (GetRandomControl() >= 0x2000)
 					{
 						if (GetRandomControl() >= 0x4000)
-							item->goalAnimState = 5;
+							item->Animation.TargetState = 5;
 						else
-							item->goalAnimState = 8;
+							item->Animation.TargetState = 8;
 					}
 					else
-					{
-						item->goalAnimState = 7;
-					}
+						item->Animation.TargetState = 7;
 				}
 				else
-				{
-					item->goalAnimState = 3;
-				}
+					item->Animation.TargetState = 3;
 			}
 			else
 			{
-				if (mc2->mood == ATTACK_MOOD)
-					item->goalAnimState = 4;
-				if (!info.ahead || GetRandomControl() < 0x100)
-					item->goalAnimState = 3;
+				if (creature->Mood == MoodType::Attack)
+					item->Animation.TargetState = 4;
+				if (!AI.ahead || GetRandomControl() < 0x100)
+					item->Animation.TargetState = 3;
 			}
+
 			break;
+
 		case 3:
-			mc2->maximumTurn = ANGLE(7);
-			if (info.ahead)
+			creature->MaxTurn = ANGLE(7.0f);
+
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (mc2->mood == ESCAPE_MOOD)
+			if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = 4;
+			else if (Targetable(item, &AI))
 			{
-				item->goalAnimState = 4;
-			}
-			else if (Targetable(item, &info))
-			{
-				if (info.distance < 0x400000 || info.zoneNumber == info.enemyZone || GetRandomControl() < 1024)
-					item->goalAnimState = 2;
+				if (AI.distance < SECTOR(4096) || AI.zoneNumber == AI.enemyZone || GetRandomControl() < 1024)
+					item->Animation.TargetState = 2;
 				else
-					item->goalAnimState = 1;
+					item->Animation.TargetState = 1;
 			}
-			else if (mc2->mood == ESCAPE_MOOD)
-			{
-				item->goalAnimState = 4;
-			}
-			else if (info.ahead && GetRandomControl() < 1024)
-			{
-				item->goalAnimState = 2;
-			}
+			else if (creature->Mood == MoodType::Escape)
+				item->Animation.TargetState = 4;
+			else if (AI.ahead && GetRandomControl() < 1024)
+				item->Animation.TargetState = 2;
+			
 			break;
+
 		case 4:
-			mc2->maximumTurn = ANGLE(10);
-			tilt = (angle / 3);
+			tilt = angle / 3;
+			creature->MaxTurn = ANGLE(10.0f);
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				head_y = info.angle;
-				head_x = info.xAngle;
+				headX = AI.xAngle;
+				headY = AI.angle;
 			}
 
-			if (mc2->mood != ESCAPE_MOOD && (mc2->mood == ESCAPE_MOOD || Targetable(item, &info)))
-				item->goalAnimState = 2;
+			if (creature->Mood != MoodType::Escape && (creature->Mood == MoodType::Escape || Targetable(item, &AI)))
+				item->Animation.TargetState = 2;
+
 			break;
+
 		case 1:
 		case 5:
 		case 6:
-			mc2->flags = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
+
 			break;
+
 		case 7:
 		case 8:
 		case 13:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 
-				if (!mc2->flags)
+				if (!creature->Flags)
 				{
 					if (GetRandomControl() < 0x2000)
-						item->goalAnimState = 2;
+						item->Animation.TargetState = 2;
 
-					ShotLara(item, &info, &mercAutoPistolBite, torso_y, 50);
-					mc2->flags = 1;
+					ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50);
+					creature->Flags = 1;
 				}
 			}
 			else
-			{
-				item->goalAnimState = 2;
-			}
+				item->Animation.TargetState = 2;
+			
 			break;
+
 		case 9:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 
-				if (info.distance < 0x400000)
-					item->goalAnimState = 3;
+				if (AI.distance < SECTOR(4096))
+					item->Animation.TargetState = 3;
 
-				if (mc2->flags != 1)
+				if (creature->Flags != 1)
 				{
-					if (!ShotLara(item, &info, &mercAutoPistolBite, torso_y, 50))
-						item->goalAnimState = 3;
-					mc2->flags = 1;
+					if (!ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50))
+						item->Animation.TargetState = 3;
+
+					creature->Flags = 1;
 				}
 			}
 			else
-			{
-				item->goalAnimState = 3;
-			}
+				item->Animation.TargetState = 3;
+			
 			break;
+
 		case 12:
-			mc2->flags = 0;
+			creature->Flags = 0;
 
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 			}
 
-			if (Targetable(item, &info))
-				item->goalAnimState = 13;
+			if (Targetable(item, &AI))
+				item->Animation.TargetState = 13;
 			else
-				item->goalAnimState = 2;
+				item->Animation.TargetState = 2;
+
 			break;
+
 		case 10:
-			if (info.ahead)
+			if (AI.ahead)
 			{
-				torso_y = info.angle;
-				torso_x = info.xAngle;
+				torsoX = AI.xAngle;
+				torsoY = AI.angle;
 
-				if (info.distance < 0x400000)
-					item->goalAnimState = 3;
+				if (AI.distance < SECTOR(4096))
+					item->Animation.TargetState = 3;
 
-				if (mc2->flags != 2)
+				if (creature->Flags != 2)
 				{
-					if (!ShotLara(item, &info, &mercAutoPistolBite, torso_y, 50))
-						item->goalAnimState = 3;
-					mc2->flags = 2;
+					if (!ShotLara(item, &AI, &MercenaryAutoPistolBite, torsoY, 50))
+						item->Animation.TargetState = 3;
+
+					creature->Flags = 2;
 				}
 			}
 			else
-			{
-				item->goalAnimState = 3;
-			}
+				item->Animation.TargetState = 3;
+			
 			break;
 		}
 	}
 
 	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, torso_y);
-	CreatureJoint(item, 1, torso_x);
-	CreatureJoint(item, 2, head_y);
-	CreatureJoint(item, 3, head_x);
-	CreatureAnimation(itemNum, angle, tilt);
+	CreatureJoint(item, 0, torsoY);
+	CreatureJoint(item, 1, torsoX);
+	CreatureJoint(item, 2, headY);
+	CreatureJoint(item, 3, headX);
+	CreatureAnimation(itemNumber, angle, tilt);
 }

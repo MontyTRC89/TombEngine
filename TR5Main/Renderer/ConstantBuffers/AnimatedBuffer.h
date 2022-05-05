@@ -2,6 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <SimpleMath.h>
+
 struct AnimatedFrame
 {
 	DirectX::SimpleMath::Vector2 topLeft;

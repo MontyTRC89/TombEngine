@@ -126,7 +126,7 @@ static std::unique_ptr<Moveable> Create(
 		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
-		item->carriedItem = NO_ITEM;
+		item->CarriedItem = NO_ITEM;
 
 		// call this when resetting name too?
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->AddMoveableToMap(item, ptr.get());
@@ -373,16 +373,16 @@ void Moveable::Register(sol::table & parent)
 
 void Moveable::Init()
 {
-	bool cond = IsPointInRoom(m_item->pos, m_item->roomNumber);
+	bool cond = IsPointInRoom(m_item->Pose, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
-	if (!ScriptAssertF(cond, err, m_item->luaName))
+	if (!ScriptAssertF(cond, err, m_item->LuaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
-		PHD_3DPOS center = GetRoomCenter(m_item->roomNumber);
+		PHD_3DPOS center = GetRoomCenter(m_item->RoomNumber);
 		// reset position but not rotation
-		m_item->pos.xPos = center.xPos;
-		m_item->pos.yPos = center.yPos;
-		m_item->pos.zPos = center.zPos;
+		m_item->Pose.Position.x = center.Position.x;
+		m_item->Pose.Position.y = center.Position.y;
+		m_item->Pose.Position.z = center.Position.z;
 	}
 	InitialiseItem(m_num);
 	m_initialised = true;
@@ -390,12 +390,12 @@ void Moveable::Init()
 
 GAME_OBJECT_ID Moveable::GetObjectID() const
 {
-	return m_item->objectNumber;
+	return m_item->ObjectNumber;
 }
 
 void Moveable::SetObjectID(GAME_OBJECT_ID id) 
 {
-	m_item->objectNumber = id;
+	m_item->ObjectNumber = id;
 }
 
 
@@ -451,7 +451,7 @@ std::string Moveable::GetOnCollidedWithRoom() const
 
 std::string Moveable::GetName() const
 {
-	return m_item->luaName;
+	return m_item->LuaName;
 }
 
 bool Moveable::SetName(std::string const & id) 
@@ -464,11 +464,11 @@ bool Moveable::SetName(std::string const & id)
 	if (s_callbackSetName(id, m_num))
 	{
 		// remove the old name if we have one
-		if (id != m_item->luaName)
+		if (id != m_item->LuaName)
 		{
-			if(!m_item->luaName.empty())
-				s_callbackRemoveName(m_item->luaName);
-			m_item->luaName = id;
+			if(!m_item->LuaName.empty())
+				s_callbackRemoveName(m_item->LuaName);
+			m_item->LuaName = id;
 		}
 	}
 	else
@@ -483,12 +483,12 @@ bool Moveable::SetName(std::string const & id)
 
 Vec3 Moveable::GetPos() const
 {
-	return Vec3(m_item->pos	);
+	return Vec3(m_item->Pose);
 }
 
 void Moveable::SetPos(Vec3 const& pos)
 {
-	pos.StoreInPHDPos(m_item->pos);
+	pos.StoreInPHDPos(m_item->Pose);
 }
 
 // This does not guarantee that the returned value will be identical
@@ -498,28 +498,28 @@ void Moveable::SetPos(Vec3 const& pos)
 Rotation Moveable::GetRot() const
 {
 	return {
-		static_cast<int>(TO_DEGREES(m_item->pos.xRot)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->pos.yRot)) % 360,
-		static_cast<int>(TO_DEGREES(m_item->pos.zRot)) % 360
+		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.x)) % 360,
+		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.y)) % 360,
+		static_cast<int>(TO_DEGREES(m_item->Pose.Orientation.z)) % 360
 	};
 }
 
 void Moveable::SetRot(Rotation const& rot)
 {
-	m_item->pos.xRot = FROM_DEGREES(rot.x);
-	m_item->pos.yRot = FROM_DEGREES(rot.y);
-	m_item->pos.zRot = FROM_DEGREES(rot.z);
+	m_item->Pose.Orientation.x = FROM_DEGREES(rot.x);
+	m_item->Pose.Orientation.y = FROM_DEGREES(rot.y);
+	m_item->Pose.Orientation.z = FROM_DEGREES(rot.z);
 }
 
 short Moveable::GetHP() const
 {
-	return(m_item->hitPoints);
+	return(m_item->HitPoints);
 }
 
 void Moveable::SetHP(short hp)
 {
-	if(Objects[m_item->objectNumber].intelligent &&
-		(hp < 0 || hp > Objects[m_item->objectNumber].hitPoints))
+	if(Objects[m_item->ObjectNumber].intelligent &&
+		(hp < 0 || hp > Objects[m_item->ObjectNumber].HitPoints))
 	{
 		ScriptAssert(false, "Invalid HP value: " + std::to_string(hp));
 		if (hp < 0)
@@ -527,24 +527,24 @@ void Moveable::SetHP(short hp)
 			hp = 0;
 			ScriptWarn("Setting HP to 0.");
 		}
-		else if (hp > Objects[m_item->objectNumber].hitPoints)
+		else if (hp > Objects[m_item->ObjectNumber].HitPoints)
 		{
-			hp = Objects[m_item->objectNumber].hitPoints;
+			hp = Objects[m_item->ObjectNumber].HitPoints;
 			ScriptWarn("Setting HP to default value (" + std::to_string(hp) + ")");
 		}
 	}
 
-	m_item->hitPoints = hp;
+	m_item->HitPoints = hp;
 }
 
 short Moveable::GetOCB() const
 {
-	return m_item->triggerFlags;
+	return m_item->TriggerFlags;
 }
 
 void Moveable::SetOCB(short ocb)
 {
-	m_item->triggerFlags = ocb;
+	m_item->TriggerFlags = ocb;
 }
 
 aiBitsType Moveable::GetAIBits() const
@@ -554,7 +554,7 @@ aiBitsType Moveable::GetAIBits() const
 	aiBitsArray ret{};
 	for (size_t i = 0; i < ret.size(); ++i)
 	{
-		uint8_t isSet = m_item->aiBits & (1 << i);
+		uint8_t isSet = m_item->AIBits & (1 << i);
 		ret[i] = static_cast<int>( isSet > 0);
 	}
 	return ret;
@@ -564,39 +564,39 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 {
 	for (size_t i = 0; i < bits.value().size(); ++i)
 	{
-		m_item->aiBits &= ~(1 << i);
+		m_item->AIBits &= ~(1 << i);
 		uint8_t isSet = bits.value()[i] > 0;
-		m_item->aiBits |= isSet << i;
+		m_item->AIBits |= isSet << i;
 	}
 }
 
 int Moveable::GetAnimNumber() const
 {
-	return m_item->animNumber - Objects[m_item->objectNumber].animIndex;
+	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
 }
 
 void Moveable::SetAnimNumber(int animNumber)
 {
 	//TODO fixme: we need bounds checking with an error message once it's in the level file format
-	m_item->animNumber = animNumber +  Objects[m_item->objectNumber].animIndex;
+	m_item->Animation.AnimNumber = animNumber +  Objects[m_item->ObjectNumber].animIndex;
 }
 
 int Moveable::GetFrameNumber() const
 {
-	return m_item->frameNumber - g_Level.Anims[m_item->animNumber].frameBase;
+	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
 
 
 void Moveable::SetFrameNumber(int frameNumber)
 {
-	auto const fBase = g_Level.Anims[m_item->animNumber].frameBase;
-	auto const fEnd = g_Level.Anims[m_item->animNumber].frameEnd;
+	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
+	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
 	auto frameCount = fEnd - fBase;
 	bool cond = frameNumber < frameCount;
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
-	if (ScriptAssertF(cond, err, frameNumber, m_item->animNumber, frameCount-1))
+	if (ScriptAssertF(cond, err, frameNumber, m_item->Animation.AnimNumber, frameCount-1))
 	{
-		m_item->frameNumber = frameNumber + fBase;
+		m_item->Animation.FrameNumber = frameNumber + fBase;
 	}
 	else
 	{
@@ -606,22 +606,22 @@ void Moveable::SetFrameNumber(int frameNumber)
 
 bool Moveable::GetActive() const
 {
-	return m_item->active;
+	return m_item->Active;
 }
 
 void Moveable::SetActive(bool active)
 {
-	m_item->active = active;
+	m_item->Active = active;
 }
 
 bool Moveable::GetHitStatus() const
 {
-	return m_item->hitStatus;
+	return m_item->HitStatus;
 }
 
 short Moveable::GetRoom() const
 {
-	return m_item->roomNumber;
+	return m_item->RoomNumber;
 }
 
 void Moveable::SetRoom(short room)
@@ -635,44 +635,44 @@ void Moveable::SetRoom(short room)
 	}
 
 	if (!m_initialised)
-		m_item->roomNumber = room;
+		m_item->RoomNumber = room;
 	else
 		ItemNewRoom(m_num, room);
 }
 
 short Moveable::GetStatus() const
 {
-	return m_item->status;
+	return m_item->Status;
 }
 
 void Moveable::EnableItem()
 {
-	if (!m_item->active)
+	if (!m_item->Active)
 	{
-		if (Objects[m_item->objectNumber].intelligent)
+		if (Objects[m_item->ObjectNumber].intelligent)
 		{
-			if (m_item->status == ITEM_DEACTIVATED)
+			if (m_item->Status == ITEM_DEACTIVATED)
 			{
-				m_item->touchBits = 0;
-				m_item->status = ITEM_ACTIVE;
+				m_item->TouchBits = 0;
+				m_item->Status = ITEM_ACTIVE;
 				AddActiveItem(m_num);
 				EnableBaddieAI(m_num, 1);
 			}
-			else if (m_item->status == ITEM_INVISIBLE)
+			else if (m_item->Status == ITEM_INVISIBLE)
 			{
-				m_item->touchBits = 0;
+				m_item->TouchBits = 0;
 				if (EnableBaddieAI(m_num, 0))
-					m_item->status = ITEM_ACTIVE;
+					m_item->Status = ITEM_ACTIVE;
 				else
-					m_item->status = ITEM_INVISIBLE;
+					m_item->Status = ITEM_INVISIBLE;
 				AddActiveItem(m_num);
 			}
 		}
 		else
 		{
-			m_item->touchBits = 0;
+			m_item->TouchBits = 0;
 			AddActiveItem(m_num);
-			m_item->status = ITEM_ACTIVE;
+			m_item->Status = ITEM_ACTIVE;
 		}
 
 		// Try add colliding in case the item went from invisible -> activated
@@ -682,23 +682,23 @@ void Moveable::EnableItem()
 
 void Moveable::DisableItem()
 {
-	if (m_item->active)
+	if (m_item->Active)
 	{
-		if (Objects[m_item->objectNumber].intelligent)
+		if (Objects[m_item->ObjectNumber].intelligent)
 		{
-			if (m_item->status == ITEM_ACTIVE)
+			if (m_item->Status == ITEM_ACTIVE)
 			{
-				m_item->touchBits = 0;
-				m_item->status = ITEM_DEACTIVATED;
+				m_item->TouchBits = 0;
+				m_item->Status = ITEM_DEACTIVATED;
 				RemoveActiveItem(m_num);
-				DisableBaddieAI(m_num);
+				DisableEntityAI(m_num);
 			}
 		}
 		else
 		{
-			m_item->touchBits = 0;
+			m_item->TouchBits = 0;
 			RemoveActiveItem(m_num);
-			m_item->status = ITEM_DEACTIVATED;
+			m_item->Status = ITEM_DEACTIVATED;
 		}
 		// Try add colliding in case the item went from invisible -> deactivated
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
@@ -707,14 +707,14 @@ void Moveable::DisableItem()
 
 void Moveable::MakeInvisible()
 {
-	m_item->status = ITEM_INVISIBLE;
-	if (m_item->active)
+	m_item->Status = ITEM_INVISIBLE;
+	if (m_item->Active)
 	{
-		m_item->touchBits = 0;
+		m_item->TouchBits = 0;
 		RemoveActiveItem(m_num);
-		if (Objects[m_item->objectNumber].intelligent)
+		if (Objects[m_item->ObjectNumber].intelligent)
 		{
-			DisableBaddieAI(m_num);
+			DisableEntityAI(m_num);
 		}
 	}
 	dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
@@ -737,7 +737,7 @@ void Moveable::Destroy()
 {
 	if (m_num > NO_ITEM) {
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
-		s_callbackRemoveName(m_item->luaName);
+		s_callbackRemoveName(m_item->LuaName);
 		KillItem(m_num);
 	}
 

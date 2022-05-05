@@ -25,31 +25,29 @@ namespace TEN::Entities::TR4
 		0, -96, 96
 	};
 
-	void StargateControl(short itemNum)
+	void StargateControl(short itemNumber)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
-		item->itemFlags[3] = 50;
+		auto* item = &g_Level.Items[itemNumber];
+		item->ItemFlags[3] = 50;
 
 		if (TriggerActive(item))
 		{
-			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->pos, 0);
-			item->itemFlags[0] = 0x36DB600;
+			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->Pose, 0);
+			item->ItemFlags[0] = 0x36DB600;
 			AnimateItem(item);
 		}
 		else
-		{
-			item->itemFlags[0] = 0;
-		}
+			item->ItemFlags[0] = 0;
 	}
 
-	void StargateCollision(short itemNum, ITEM_INFO* l, COLL_INFO* c)
+	void StargateCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNum];
+		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->status == ITEM_INVISIBLE)
+		if (item->Status == ITEM_INVISIBLE)
 			return;
 
-		if (TestBoundsCollide(item, l, c->Setup.Radius))
+		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		{
 			for (int i = 0; i < 8; i++)
 			{
@@ -57,15 +55,15 @@ namespace TEN::Entities::TR4
 				GlobalCollisionBounds.Y1 = StargateBounds[3 * i + 1];
 				GlobalCollisionBounds.Z1 = StargateBounds[3 * i + 2];
 
-				if (TestWithGlobalCollisionBounds(item, l, c))
-					ItemPushItem(item, l, c, 0, 2);
+				if (TestWithGlobalCollisionBounds(item, laraItem, coll))
+					ItemPushItem(item, laraItem, coll, 0, 2);
 			}
 
-			int result = TestCollision(item, l);
+			int result = TestCollision(item, laraItem);
 			if (result)
 			{
-				result &= item->itemFlags[0];
-				int flags = item->itemFlags[0];
+				result &= item->ItemFlags[0];
+				int flags = item->ItemFlags[0];
 
 				if (result)
 				{
@@ -74,32 +72,33 @@ namespace TEN::Entities::TR4
 					{
 						if (result & 1)
 						{
-							GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->pos.xPos;
-							GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->pos.yPos;
-							GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->pos.zPos;
-							GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->pos.xPos;
-							GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->pos.yPos;
-							GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->pos.zPos;
+							GlobalCollisionBounds.X1 = CreatureSpheres[j].x - CreatureSpheres[j].r - item->Pose.Position.x;
+							GlobalCollisionBounds.Y1 = CreatureSpheres[j].y - CreatureSpheres[j].r - item->Pose.Position.y;
+							GlobalCollisionBounds.Z1 = CreatureSpheres[j].z - CreatureSpheres[j].r - item->Pose.Position.z;
+							GlobalCollisionBounds.X2 = CreatureSpheres[j].x + CreatureSpheres[j].r - item->Pose.Position.x;
+							GlobalCollisionBounds.Y2 = CreatureSpheres[j].y + CreatureSpheres[j].r - item->Pose.Position.y;
+							GlobalCollisionBounds.Z2 = CreatureSpheres[j].z + CreatureSpheres[j].r - item->Pose.Position.z;
 
-							int oldX = LaraItem->pos.xPos;
-							int oldY = LaraItem->pos.yPos;
-							int oldZ = LaraItem->pos.zPos;
+							int oldX = LaraItem->Pose.Position.x;
+							int oldY = LaraItem->Pose.Position.y;
+							int oldZ = LaraItem->Pose.Position.z;
 
-							if (ItemPushItem(item, l, c, flags & 1, 2))
+							if (ItemPushItem(item, laraItem, coll, flags & 1, 2))
 							{
 								if ((flags & 1) &&
-									(oldX != LaraItem->pos.xPos 
-									|| oldY != LaraItem->pos.yPos 
-									|| oldZ != LaraItem->pos.zPos) &&
+									(oldX != LaraItem->Pose.Position.x ||
+									oldY != LaraItem->Pose.Position.y ||
+									oldZ != LaraItem->Pose.Position.z) &&
 									TriggerActive(item))
 								{
-									DoBloodSplat((GetRandomControl() & 0x3F) + l->pos.xPos - 32,
+									DoBloodSplat((GetRandomControl() & 0x3F) + laraItem->Pose.Position.x - 32,
 										(GetRandomControl() & 0x1F) + CreatureSpheres[j].y - 16,
-										(GetRandomControl() & 0x3F) + l->pos.zPos - 32,
+										(GetRandomControl() & 0x3F) + laraItem->Pose.Position.z - 32,
 										(GetRandomControl() & 3) + 2,
 										2 * GetRandomControl(),
-										l->roomNumber);
-									LaraItem->hitPoints -= 100;
+										laraItem->RoomNumber);
+
+									LaraItem->HitPoints -= 100;
 								}
 							}
 						}

@@ -1,3 +1,3 @@
 #pragma once
 
-void ControlSpikyWall(short itemNum);
+void ControlSpikyWall(short itemNumber);

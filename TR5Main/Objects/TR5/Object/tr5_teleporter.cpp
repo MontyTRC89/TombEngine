@@ -2,7 +2,7 @@
 #include "tr5_teleporter.h"
 #include "Game/items.h"
 #include "Specific/level.h"
-#include "Game/control/control.h"
+#include "Game/collision/collide_room.h"
 #include "Sound/sound.h"
 #include "Game/effects/weather.h"
 #include "Game/Lara/lara.h"
@@ -56,18 +56,18 @@ void ControlTeleporter(short itemNumber)
 				}
 
 				ITEM_INFO* targetItem = &g_Level.Items[item->itemFlags[1]];
-				SoundEffect(SFX_RICH_TELEPORT,&targetItem->pos, (flags << 8) | 8);
+				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
 
 				if (GlobalCounter & 1)
 				{
-					PHD_VECTOR src;
-					pos.x = targetItem->pos.xPos;
-					pos.y = targetItem->pos.yPos - 496;
-					pos.z = targetItem->pos.zPos + 472;
+					Vector3Int src;
+					pos.x = targetItem->pos.Position.x;
+					pos.y = targetItem->pos.Position.y - 496;
+					pos.z = targetItem->pos.Position.z + 472;
 
 					int dl = 4 * item->itemFlags[0] + 256;
 
-					PHD_VECTOR dest;
+					Vector3Int dest;
 					dest.x = src.x + GetRandomControl() % dl - (dl >> 1);
 					dest.y = src.y + GetRandomControl() % dl - (dl >> 1);
 					dest.z = src.z + GetRandomControl() % dl - (dl >> 1);
@@ -75,7 +75,7 @@ void ControlTeleporter(short itemNumber)
 					int color = (item->itemFlags[0] >> 2) | (((item->itemFlags[0] - (GetRandomControl() % (item->itemFlags[0] >> 1))) | (item->itemFlags[0] << 8)) << 8);
 					color |= 0x18; // BYTE1
 
-					//TriggerEnergyArc(&src,&dest, (GetRandomControl() & 0x1F) + 16, color, 15, 40, 5);
+					//TriggerEnergyArc(&src, &dest, (GetRandomControl() & 0x1F) + 16, color, 15, 40, 5);
 
 					v20 = v16;
 					v21 = v12 & 0xFFFFFFFE;
@@ -118,16 +118,16 @@ void ControlTeleporter(short itemNumber)
 					}
 					v30 = item->itemFlags[0];
 					v31 = &g_Level.Items[item->itemFlags[1]];
-					src.xPos = v29 + v31->pos.xPos;
-					src.yPos = v31->pos.yPos - 2328;
-					src.zPos = v27 + v31->pos.zPos;
-					*(_DWORD*)& src.xRot = v31->pos.xPos;
+					src.Position.x = v29 + v31->pos.Position.x;
+					src.Position.y = v31->pos.Position.y - 2328;
+					src.zPos = v27 + v31->pos.Position.z;
+					*(_DWORD*)& src.xRot = v31->pos.Position.x;
 					v32 = item->itemFlags[0];
-					*(_DWORD*)& src.zRot = v31->pos.yPos - 496;
-					v45 = v31->pos.zPos + 472;
+					*(_DWORD*)& src.zRot = v31->pos.Position.y - 496;
+					v45 = v31->pos.Position.z + 472;
 					v33 = (v30 >> 2) | (((v30 - GetRandomControl() % (v30 >> 1)) | ((v32 | 0x2400) << 8)) << 8);
 					v34 = GetRandomControl();
-					TriggerEnergyArc((PHD_VECTOR*)& src, (PHD_VECTOR*)& src.xRot, (v34 & 0xF) + 16, v33, 13, 56, 5);
+					TriggerEnergyArc((Vector3Int*)& src, (Vector3Int*)& src.xRot, (v34 & 0xF) + 16, v33, 13, 56, 5);
 					v35 = &spark[GetFreeSpark()];
 					v35->On = 1;
 					v36 = item->itemFlags[0];
@@ -145,8 +145,8 @@ void ControlTeleporter(short itemNumber)
 					v35->Life = 24;
 					v35->sLife = 24;
 					v35->TransType = TransTypeEnum::COLADD;
-					v35->x = src.xPos;
-					v35->y = src.yPos;
+					v35->x = src.Position.x;
+					v35->y = src.Position.y;
 					v35->z = src.zPos;
 					v35->Zvel = 0;
 					v35->Yvel = 0;
@@ -173,47 +173,47 @@ void ControlTeleporter(short itemNumber)
 		}
 	}*/
 
-	Lara.uncontrollable = false;
+	Lara.Control.Locked = false;
 
-	if (item->triggerFlags == 666)
+	if (item->TriggerFlags == 666)
 	{
-		if (item->itemFlags[0] == 70)
+		if (item->ItemFlags[0] == 70)
 		{
-			SoundEffect(1060, 0, 0);
-			SoundEffect(1061, 0, 0);
+			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, 0, 0);
+			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, 0, 0);
 		}
 
-		LaraItem->animNumber = LA_ELEVATOR_RECOVER;
-		LaraItem->frameNumber = g_Level.Anims[LaraItem->animNumber].frameBase;
-		LaraItem->goalAnimState = LS_MISC_CONTROL;
-		LaraItem->currentAnimState = LS_MISC_CONTROL;
+		LaraItem->Animation.AnimNumber = LA_ELEVATOR_RECOVER;
+		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+		LaraItem->Animation.TargetState = LS_MISC_CONTROL;
+		LaraItem->Animation.ActiveState = LS_MISC_CONTROL;
 
-		item->itemFlags[0]++;
-		if (item->itemFlags[0] >= 150)
+		item->ItemFlags[0]++;
+		if (item->ItemFlags[0] >= 150)
 			KillItem(itemNumber);
 	}
 	else
 	{
 		Camera.fixedCamera = true;
-		LaraItem->pos.xPos = item->pos.xPos;
-		LaraItem->pos.zPos = item->pos.zPos;
-		LaraItem->pos.yRot = item->pos.yRot - ANGLE(180.0f);
+		LaraItem->Pose.Position.x = item->Pose.Position.x;
+		LaraItem->Pose.Position.z = item->Pose.Position.z;
+		LaraItem->Pose.Orientation.y = item->Pose.Orientation.y - ANGLE(180.0f);
 
-		short roomNumber = item->roomNumber;
-		FLOOR_INFO* floor = GetFloor(item->pos.xPos, item->pos.yPos, item->pos.zPos,&roomNumber);
-		LaraItem->pos.yPos = GetFloorHeight(floor, item->pos.xPos, item->pos.yPos, item->pos.zPos);
+		short roomNumber = item->RoomNumber;
+		FLOOR_INFO* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		LaraItem->Pose.Position.y = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
-		if (LaraItem->roomNumber != roomNumber)
-			ItemNewRoom(Lara.itemNumber, roomNumber);
+		if (LaraItem->RoomNumber != roomNumber)
+			ItemNewRoom(Lara.ItemNumber, roomNumber);
 
-		if (item->flags & ONESHOT)
+		if (item->Flags & ONESHOT)
 		{
 			KillItem(itemNumber);
 		}
-		else if (item->triggerFlags != 512)
+		else if (item->TriggerFlags != 512)
 		{
 			RemoveActiveItem(itemNumber);
-			item->flags &= 0xC1FFu;
+			item->Flags &= 0xC1FFu;
 		}
 	}
 }

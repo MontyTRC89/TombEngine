@@ -7,195 +7,202 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/misc.h"
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
 BITE_INFO BrownBeastBite1 = { 0, 0, 0, 16 };
 BITE_INFO BrownBeastBite2 = { 0, 0, 0, 22 };
 
-void InitialiseBrownBeast(short itemNum)
+// TODO
+enum BrownBeastState
 {
-    ITEM_INFO* item;
 
-    item = &g_Level.Items[itemNum];
-    ClearItem(itemNum);
-    item->animNumber = Objects[item->objectNumber].animIndex;
-    item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-    item->goalAnimState = 1;
-    item->currentAnimState = 1;
+};
+
+// TODO
+enum BrownBeastAnim
+{
+
+};
+
+void InitialiseBrownBeast(short itemNumber)
+{
+	auto* item = &g_Level.Items[itemNumber];
+
+	ClearItem(itemNumber);
+	
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	item->Animation.TargetState = 1;
+	item->Animation.ActiveState = 1;
 }
 
 void ControlBrowsBeast(short itemNumber)
 {
-	if (CreatureActive(itemNumber))
+	if (!CreatureActive(itemNumber))
+		return;
+	
+	auto* item = &g_Level.Items[itemNumber];
+	auto* creature = GetCreatureInfo(item);
+
+	short angle  = 0;
+
+	if (item->HitPoints <= 0)
 	{
-		ITEM_INFO* item = &g_Level.Items[itemNumber];
-		CREATURE_INFO* creature = (CREATURE_INFO*)item->data;
-
-		short angle  = 0;
-
-		if (item->hitPoints <= 0)
+		item->HitPoints = 0;
+		if (item->Animation.ActiveState != 7)
 		{
-			item->hitPoints = 0;
-			if (item->currentAnimState != 7)
-			{
-				item->animNumber = Objects[ID_BROWN_BEAST].animIndex + 10;
-				item->currentAnimState = 7;
-				item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
-			}
+			item->Animation.AnimNumber = Objects[ID_BROWN_BEAST].animIndex + 10;
+			item->Animation.ActiveState = 7;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
+	}
+	else
+	{
+		if (item->AIBits)
+			GetAITarget(creature);
+		else if (creature->HurtByLara)
+			creature->Enemy = LaraItem;
+
+		AI_INFO AI;
+		CreatureAIInfo(item, &AI);
+
+		int distance;
+
+		if (creature->Enemy == LaraItem)
+			distance = AI.distance;
 		else
 		{
-			if (item->aiBits)
-			{
-				GetAITarget(creature);
-			}
-			else if (creature->hurtByLara)
-			{
-				creature->enemy = LaraItem;
-			}
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			phd_atan(dz, dz);
 
-			AI_INFO info;
-			CreatureAIInfo(item,&info);
-
-			int distance;
-
-			if (creature->enemy == LaraItem)
-			{
-				distance = info.distance;
-			}
-			else
-			{
-				int dx = LaraItem->pos.xPos - item->pos.xPos;
-				int dz = LaraItem->pos.zPos - item->pos.zPos;
-				phd_atan(dz, dz);
-				distance = SQUARE(dx) + SQUARE(dz);
-			}
-
-			GetCreatureMood(item,&info, VIOLENT);
-			CreatureMood(item,&info, VIOLENT);
-
-			angle = CreatureTurn(item, creature->maximumTurn);
-			creature->maximumTurn = ANGLE(7);
-			switch (item->currentAnimState)
-			{
-			case 1:
-				creature->flags = 0;
-				if (creature->mood == ATTACK_MOOD)
-				{
-					if (distance <= SQUARE(1024))
-					{
-						if (GetRandomControl() & 1)
-							item->goalAnimState = 4;
-						else
-							item->goalAnimState = 6;
-					}
-					else if (GetRandomControl() & 1)
-					{
-						item->goalAnimState = 2;
-					}
-					else
-					{
-						item->goalAnimState = 3;
-					}
-				}
-				else
-				{
-					item->goalAnimState = 1;
-				}
-				break;
-
-			case 2:
-			case 3:
-				if (distance < SQUARE(1024) || creature->mood != ATTACK_MOOD)
-					item->goalAnimState = 1;
-				SoundEffect(938,&item->pos, 0);
-				break;
-
-			case 4:
-			case 6:
-				creature->maximumTurn = 0;
-				if (abs(info.angle) >= ANGLE(2))
-				{
-					if (info.angle > 0)
-						item->pos.yRot += ANGLE(2);
-					else
-						item->pos.yRot -= ANGLE(2);
-				}
-				else
-				{
-					item->pos.yRot += info.angle;
-				}
-
-				if (creature->flags)
-					break;
-
-				if (item->touchBits & 0x3C000)
-				{
-					if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
-					{
-						if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 19
-							&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 25)
-						{
-							CreatureEffect2(item,&BrownBeastBite1, 20, item->pos.yRot, DoBloodSplat);
-							LaraItem->hitPoints -= 150;
-							LaraItem->hitStatus = true;
-							creature->flags |= 1;
-							break;
-						}
-					}
-
-					if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
-					{
-						if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 6 
-							&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 16)
-						{
-							CreatureEffect2(item,&BrownBeastBite1, 20, item->pos.yRot, DoBloodSplat);
-							LaraItem->hitPoints -= 150;
-							LaraItem->hitStatus = true;
-							creature->flags |= 1;
-							break;
-						}
-					}
-				}
-
-				if (!(item->touchBits & 0xF00000))
-					break;
-
-				if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
-				{
-					if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 13
-						&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 20)
-					{
-						CreatureEffect2(item,&BrownBeastBite2, 20, item->pos.yRot, DoBloodSplat);
-						LaraItem->hitPoints -= 150;
-						LaraItem->hitStatus = true;
-						creature->flags |= 2;
-						break;
-					}
-				}
-
-				if (item->animNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
-				{
-					if (item->frameNumber > g_Level.Anims[item->animNumber].frameBase + 33
-						&& item->frameNumber < g_Level.Anims[item->animNumber].frameBase + 43)
-					{
-						CreatureEffect2(item,&BrownBeastBite2, 20, item->pos.yRot, DoBloodSplat);
-						LaraItem->hitPoints -= 150;
-						LaraItem->hitStatus = true;
-						creature->flags |= 2;
-						break;
-					}
-				}
-
-				break;
-
-			default:
-				break;
-
-			}
+			distance = pow(dx, 2) + pow(dz, 2);
 		}
 
-		CreatureAnimation(itemNumber, angle, 0);
+		GetCreatureMood(item, &AI, VIOLENT);
+		CreatureMood(item, &AI, VIOLENT);
+
+		angle = CreatureTurn(item, creature->MaxTurn);
+		creature->MaxTurn = ANGLE(7.0f);
+
+		switch (item->Animation.ActiveState)
+		{
+		case 1:
+			creature->Flags = 0;
+			if (creature->Mood == MoodType::Attack)
+			{
+				if (distance <= pow(SECTOR(1), 2))
+				{
+					if (GetRandomControl() & 1)
+						item->Animation.TargetState = 4;
+					else
+						item->Animation.TargetState = 6;
+				}
+				else if (GetRandomControl() & 1)
+					item->Animation.TargetState = 2;
+				else
+					item->Animation.TargetState = 3;
+			}
+			else
+				item->Animation.TargetState = 1;
+			
+			break;
+
+		case 2:
+		case 3:
+			if (distance < pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack)
+				item->Animation.TargetState = 1;
+
+			SoundEffect(SFX_TR5_IMP_BARRELROLL, &item->Pose, 0);
+			break;
+
+		case 4:
+		case 6:
+			creature->MaxTurn = 0;
+
+			if (abs(AI.angle) >= ANGLE(2.0f))
+			{
+				if (AI.angle > 0)
+					item->Pose.Orientation.y += ANGLE(2.0f);
+				else
+					item->Pose.Orientation.y -= ANGLE(2.0f);
+			}
+			else
+				item->Pose.Orientation.y += AI.angle;
+
+			if (creature->Flags)
+				break;
+
+			if (item->TouchBits & 0x3C000)
+			{
+				if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
+				{
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 19 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 25)
+					{
+						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
+						creature->Flags |= 1;
+
+						LaraItem->HitPoints -= 150;
+						LaraItem->HitStatus = true;
+						break;
+					}
+				}
+
+				if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
+				{
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
+					{
+						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
+						creature->Flags |= 1;
+
+						LaraItem->HitPoints -= 150;
+						LaraItem->HitStatus = true;
+						break;
+					}
+				}
+			}
+
+			if (!(item->TouchBits & 0xF00000))
+				break;
+
+			if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 8)
+			{
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 13 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
+				{
+					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
+					creature->Flags |= 2;
+
+					LaraItem->HitPoints -= 150;
+					LaraItem->HitStatus = true;
+					break;
+				}
+			}
+
+			if (item->Animation.AnimNumber == Objects[ID_BROWN_BEAST].animIndex + 2)
+			{
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 33 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 43)
+				{
+					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
+					creature->Flags |= 2;
+
+					LaraItem->HitPoints -= 150;
+					LaraItem->HitStatus = true;
+					break;
+				}
+			}
+
+			break;
+
+		default:
+			break;
+		}
 	}
+
+	CreatureAnimation(itemNumber, angle, 0);
 }

@@ -130,9 +130,7 @@ Specify which translations in the strings table correspond to which languages.
 FlowHandler::~FlowHandler()
 {
 	for (auto& lev : Levels)
-	{
 		delete lev;
-	}
 }
 
 void FlowHandler::SetLanguageNames(sol::as_table_t<std::vector<std::string>> && src)
@@ -180,9 +178,7 @@ void FlowHandler::SetGameFarView(byte val)
 		GameFarView = 32;
 	}
 	else
-	{
 		GameFarView = val;
-	}
 }
 
 void FlowHandler::LoadFlowScript()
@@ -197,9 +193,7 @@ void FlowHandler::LoadFlowScript()
 char const * FlowHandler::GetString(const char* id) const
 {
 	if (!ScriptAssert(m_translationsMap.find(id) != m_translationsMap.end(), std::string{ "Couldn't find string " } + id))
-	{
 		return "String not found";
-	}
 	else
 		return m_translationsMap.at(string(id)).at(0).c_str();
 }
@@ -240,7 +234,7 @@ bool FlowHandler::DoFlow()
 		// First we need to fill some legacy variables in PCTomb5.exe
 		Level* level = Levels[CurrentLevel];
 
-		GAME_STATUS status;
+		GameStatus status;
 
 		if (CurrentLevel == 0)
 		{
@@ -274,17 +268,17 @@ bool FlowHandler::DoFlow()
 
 		switch (status)
 		{
-		case GAME_STATUS::GAME_STATUS_EXIT_GAME:
+		case GameStatus::ExitGame:
 			return true;
-		case GAME_STATUS::GAME_STATUS_EXIT_TO_TITLE:
+		case GameStatus::ExitToTitle:
 			CurrentLevel = 0;
 			break;
-		case GAME_STATUS::GAME_STATUS_NEW_GAME:
+		case GameStatus::NewGame:
 			CurrentLevel = (SelectedLevelForNewGame != 0 ? SelectedLevelForNewGame : 1);
 			SelectedLevelForNewGame = 0;
 			InitialiseGame = true;
 			break;
-		case GAME_STATUS::GAME_STATUS_LOAD_GAME:
+		case GameStatus::LoadGame:
 			// Load the header of the savegame for getting the level to load
 			SaveGame::LoadHeader(SelectedSaveGame, &header);
 
@@ -293,7 +287,7 @@ bool FlowHandler::DoFlow()
 			loadFromSavegame = true;
 
 			break;
-		case GAME_STATUS::GAME_STATUS_LEVEL_COMPLETED:
+		case GameStatus::LevelComplete:
 			if (LevelComplete == Levels.size())
 			{
 				// TODO: final credits
