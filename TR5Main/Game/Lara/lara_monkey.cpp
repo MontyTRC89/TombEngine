@@ -108,19 +108,15 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
+			return;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
+			return;
 		}
-		else if (TrInput & IN_ROLL && g_GameFlow->HasMonkeyTurn180())
-		{
-			item->Animation.TargetState = LS_MONKEY_TURN_180;
-		}
-		else
-		{
-			item->Animation.TargetState = LS_MONKEY_IDLE;
-		}
+
+		item->Animation.TargetState = LS_MONKEY_IDLE;
 		return;
 	}
 
