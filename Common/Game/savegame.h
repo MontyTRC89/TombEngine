@@ -41,21 +41,17 @@ struct SaveGameHeader
 extern GameStats Statistics;
 extern SaveGameHeader SavegameInfos[SAVEGAME_MAX];
 
-class SaveGame 
+class SaveGame
 {
 private:
 	static FileStream* m_stream;
-	
+
 public:
 	static int LastSaveGame;
 
 	static bool Load(int slot);
 	static bool LoadHeader(int slot, SaveGameHeader* header);
 	static bool Save(int slot);
-
-private:
-	static FileStream* m_stream;
-	static std::vector<LuaVariable> m_luaVariables;
 };
 
 void LoadSavegameInfos();
