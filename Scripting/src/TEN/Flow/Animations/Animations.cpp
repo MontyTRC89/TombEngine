@@ -14,8 +14,6 @@ void Animations::Register(sol::table& parent)
 		"crouchRoll", &Animations::HasCrouchRoll,
 		"crawlspaceSwandive", &Animations::HasCrawlspaceDive,
 		"monkeyAutoJump", &Animations::HasMonkeyAutoJump,
-		"monkeyTurn180", &Animations::HasMonkeyTurn180,
-		"oscillateHang", &Animations::HasOscillateHang,
 		"overhangClimb", &Animations::HasOverhangClimb,
 		"slideExtended", &Animations::HasSlideExtended,
 		"sprintJump", &Animations::HasSprintJump,
