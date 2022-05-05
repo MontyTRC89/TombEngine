@@ -291,13 +291,13 @@ void FireShotgun(ITEM_INFO* laraItem)
 	}
 
 	EulerAngles wobbleArmOrient;
-	int value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 1820 : 5460);
+	float value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? Angle::DegToRad(10.0f) : Angle::DegToRad(30.0f));
 	bool fired = false;
 	for (int i = 0; i < 6; i++)
 	{
 		wobbleArmOrient.Set(
-			armOrient.GetX() + Angle::ShrtToRad(value * (GetRandomControl() - Angle::DegToShrt(90.0f)) / 65536),
-			armOrient.GetY() + Angle::ShrtToRad(value * (GetRandomControl() - Angle::DegToShrt(90.0f)) / 65536),
+			armOrient.GetX() + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
+			armOrient.GetY() + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
 			0.0f
 		);
 

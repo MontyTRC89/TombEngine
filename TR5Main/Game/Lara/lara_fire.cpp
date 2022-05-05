@@ -837,8 +837,8 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INF
 	auto pos = Vector3Int(src->Pose.Position.x, muzzleOffset.y, src->Pose.Position.z);
 
 	auto wobbleOrient = EulerAngles(
-		armOrient.GetX() + Angle::ShrtToRad((GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536),
-		armOrient.GetY() + Angle::ShrtToRad((GetRandomControl() - 16384) * weapon->ShotAccuracy / 65536),
+		armOrient.GetX() + Angle::ShrtToRad((GetRandomControl() - Angle::DegToShrt(90.0f)) * weapon->ShotAccuracy / 65536),
+		armOrient.GetY() + Angle::ShrtToRad((GetRandomControl() - Angle::DegToShrt(90.0f)) * weapon->ShotAccuracy / 65536),
 		0.0f
 	);
 
