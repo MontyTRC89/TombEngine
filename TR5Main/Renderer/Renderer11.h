@@ -423,6 +423,7 @@ namespace TEN::Renderer
 		int m_biggestRoomIndexBuffer = 0;
 		RENDERER_DEBUG_PAGE m_numDebugPage = NO_PAGE;
 		int numRoomsTransparentPolygons;
+		int m_numPolygons = 0;
 
 		// Times for debug
 		int m_timeUpdate;
@@ -577,6 +578,20 @@ namespace TEN::Renderer
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
 		Vector2 GetScreenResolution();
+
+		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
+		{
+			m_context->DrawIndexed(count, baseIndex, baseVertex);
+			m_numPolygons += count / 3;
+			m_numDrawCalls++;
+		}
+
+		inline void DrawTriangles(int count, int baseVertex)
+		{
+			m_context->Draw(count, baseVertex);
+			m_numPolygons += count / 3;
+			m_numDrawCalls++;
+		}
 
 		template <typename C>
 		ConstantBuffer<C> CreateConstantBuffer()

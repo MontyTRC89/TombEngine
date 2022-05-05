@@ -109,7 +109,8 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
 		BindTexture(TEXTURE_HUD, m_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
 
-		m_context->DrawIndexed(56, 0, 0);
+		DrawIndexedTriangles(56, 0, 0);
+
 		m_context->PSSetShaderResources(0, 1, m_sprites[Objects[textureSlot].meshIndex].Texture->ShaderResourceView.GetAddressOf());
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
@@ -131,7 +132,7 @@ namespace TEN::Renderer
 
 		BindTexture(TEXTURE_HUD, m_sprites[Objects[textureSlot].meshIndex].Texture, SAMPLER_LINEAR_CLAMP);
 
-		m_context->DrawIndexed(12, 0, 0);
+		DrawIndexedTriangles(12, 0, 0);
 	}
 
 	void Renderer11::DrawLoadingBar(float percentage)
@@ -157,7 +158,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_HUD, m_cbHUD.get());
 		BindTexture(TEXTURE_HUD, &loadingBarBorder, SAMPLER_LINEAR_CLAMP);
 
-		m_context->DrawIndexed(56, 0, 0);
+		DrawIndexedTriangles(56, 0, 0);
 
 		m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 0.0f, 0xFF);
 		
@@ -178,7 +179,7 @@ namespace TEN::Renderer
 
 		BindTexture(TEXTURE_HUD, &loadingBarInner, SAMPLER_LINEAR_CLAMP);
 
-		m_context->DrawIndexed(12, 0, 0);
+		DrawIndexedTriangles(12, 0, 0);
 	}
 
 	void Renderer11::AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a) {

@@ -609,8 +609,7 @@ namespace TEN::Renderer
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
-						m_numDrawCalls++;
+						DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
 					}
 
 					if (Lara.RightArm.FlashGun)
@@ -623,8 +622,7 @@ namespace TEN::Renderer
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
-						m_numDrawCalls++;
+						DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
 					}
 				}
 			}
@@ -703,8 +701,7 @@ namespace TEN::Renderer
 							m_cbItem.updateData(m_stItem, m_context.Get());
 							m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-							m_context->DrawIndexed(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
-							m_numDrawCalls++;
+							DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
 						}
 					}
 				}
@@ -874,6 +871,8 @@ namespace TEN::Renderer
 					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 					m_context->Draw(4, 0);
+					m_numDrawCalls++;
+					m_numPolygons += 2;
 
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) 
@@ -900,6 +899,8 @@ namespace TEN::Renderer
 					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 					m_context->Draw(4, 0);
+					m_numDrawCalls++;
+					m_numPolygons += 2;
 
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
@@ -925,6 +926,8 @@ namespace TEN::Renderer
 					BindConstantBufferVS(CB_SPRITE, m_cbSprite.get());
 
 					m_context->Draw(4, 0);
+					m_numDrawCalls++;
+					m_numPolygons += 2;
 
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) 
@@ -1022,9 +1025,8 @@ namespace TEN::Renderer
 
 		BindTexture(TEXTURE_COLOR_MAP, info->sprite->Sprite->Texture, SAMPLER_LINEAR_CLAMP);
 
-		m_context->Draw(m_transparentFacesVertices.size(), 0);
+		DrawTriangles(m_transparentFacesVertices.size(), 0);
 
-		m_numDrawCalls++;
 		m_numTransparentDrawCalls++;
 		m_numSpritesTransparentDrawCalls++;
 	}
@@ -1073,8 +1075,7 @@ namespace TEN::Renderer
 				continue;
 
 			// Draw vertices
-			m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-			m_numDrawCalls++;
+			DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 		}
 
 	}
