@@ -26,7 +26,9 @@ public:
 	virtual bool HasCrawlExtended() const = 0;
 	virtual bool HasCrouchRoll() const = 0;
 	virtual bool HasCrawlspaceSwandive() const = 0;
+	virtual bool HasMonkeyTurn180() const = 0;
 	virtual bool HasMonkeyAutoJump() const = 0;
+	virtual bool HasOscillateHang() const = 0;
 	virtual bool HasSprintJump() const = 0;
 	virtual bool HasAFKPose() const = 0;
 	virtual bool HasOverhangClimb() const = 0;

@@ -57,11 +57,13 @@ public:
 	bool HasCrawlExtended() const override { return Anims.HasCrawlExtended; }
 	bool HasCrouchRoll() const override { return Anims.HasCrouchRoll; }
 	bool HasCrawlspaceSwandive() const override { return Anims.HasCrawlspaceDive; }
+	bool HasMonkeyTurn180() const override { return Anims.HasMonkeyTurn180; }
 	bool HasMonkeyAutoJump() const override { return Anims.HasMonkeyAutoJump; }
 	bool HasAFKPose() const override { return Anims.HasPose; }
 	bool HasOverhangClimb() const override { return Anims.HasOverhangClimb; }
 	bool HasSlideExtended() const override { return Anims.HasSlideExtended; }
 	bool HasSprintJump() const override { return Anims.HasSprintJump; }
+	bool HasOscillateHang() const override { return Anims.HasOscillateHang; }
 	bool DoFlow() override;
 };
 
