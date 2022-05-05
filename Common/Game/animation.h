@@ -3,7 +3,7 @@
 
 struct PHD_3DPOS;
 struct Vector3Int;
-struct ITEM_INFO;
+struct ItemInfo;
 
 struct ANIM_FRAME
 {
@@ -68,29 +68,29 @@ struct BONE_MUTATOR
 	bool IsEmpty() { return (Scale == Vector3::One) && (Offset == Vector3::Zero) && (Rotation == Vector3::Zero); };
 };
 
-void AnimateLara(ITEM_INFO* item);
-void AnimateItem(ITEM_INFO* item);
+void AnimateLara(ItemInfo* item);
+void AnimateItem(ItemInfo* item);
 
-bool HasStateDispatch(ITEM_INFO* item, int targetState = -1);
-bool TestLastFrame(ITEM_INFO* item, int animNumber = -1);
+bool HasStateDispatch(ItemInfo* item, int targetState = -1);
+bool TestLastFrame(ItemInfo* item, int animNumber = -1);
 
-void TranslateItem(ITEM_INFO* item, int x, int y, int z);
-void SetAnimation(ITEM_INFO* item, int animIndex, int frameToStart = 0);
+void TranslateItem(ItemInfo* item, int x, int y, int z);
+void SetAnimation(ItemInfo* item, int animIndex, int frameToStart = 0);
 
-int GetCurrentRelativeFrameNumber(ITEM_INFO* item);
-int GetFrameNumber(ITEM_INFO* item, int frameToStart);
+int GetCurrentRelativeFrameNumber(ItemInfo* item);
+int GetFrameNumber(ItemInfo* item, int frameToStart);
 int GetFrameNumber(int objectID, int animNumber, int frameToStart);
 int GetFrameCount(int animNumber);
-int GetNextAnimState(ITEM_INFO* item);
+int GetNextAnimState(ItemInfo* item);
 int GetNextAnimState(int objectID, int animNumber);
-bool GetChange(ITEM_INFO* item, ANIM_STRUCT* anim);
-int GetFrame(ITEM_INFO* item, ANIM_FRAME* framePtr[], int* rate);
-ANIM_FRAME* GetBestFrame(ITEM_INFO* item);
+bool GetChange(ItemInfo* item, ANIM_STRUCT* anim);
+int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate);
+ANIM_FRAME* GetBestFrame(ItemInfo* item);
 
-BOUNDING_BOX* GetBoundsAccurate(ITEM_INFO* item);
+BOUNDING_BOX* GetBoundsAccurate(ItemInfo* item);
 void GetLaraJointPosition(Vector3Int* pos, int laraMeshIndex);
-void GetJointAbsPosition(ITEM_INFO* item, Vector3Int* vec, int joint);
+void GetJointAbsPosition(ItemInfo* item, Vector3Int* vec, int joint);
 
 void ClampRotation(PHD_3DPOS* pos, short angle, short rotation); 
 
-void DrawAnimatingItem(ITEM_INFO* item);
+void DrawAnimatingItem(ItemInfo* item);

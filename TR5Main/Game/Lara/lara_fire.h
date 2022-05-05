@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/Lara/lara.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 constexpr auto MAX_TARGETS = 8;
@@ -47,15 +47,15 @@ extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
 void SmashItem(short itemNum);
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType);
-void LaraGun(ITEM_INFO* laraItem);
-Ammo& GetAmmo(ITEM_INFO* laraItem, LaraWeaponType weaponType);
-void InitialiseNewWeapon(ITEM_INFO* laraItem);
-GAME_OBJECT_ID WeaponObjectMesh(ITEM_INFO* laraItem, LaraWeaponType weaponType);
-void AimWeapon(ITEM_INFO* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm);
-void HitTarget(ITEM_INFO* laraItem, ITEM_INFO* target, GameVector* hitPos, int damage, int flag);
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ITEM_INFO* target, ITEM_INFO* src, short* angles);
-void FindTargetPoint(ITEM_INFO* laraItem, GameVector* target);
-void LaraTargetInfo(ITEM_INFO* laraItem, WeaponInfo* weaponInfo);
+void LaraGun(ItemInfo* laraItem);
+Ammo& GetAmmo(ItemInfo* laraItem, LaraWeaponType weaponType);
+void InitialiseNewWeapon(ItemInfo* laraItem);
+GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType);
+void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm);
+void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int damage, int flag);
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, short* angles);
+void FindTargetPoint(ItemInfo* laraItem, GameVector* target);
+void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo);
 bool CheckForHoldingState(LaraState state);
-void LaraGetNewTarget(ITEM_INFO* laraItem, WeaponInfo* weaponInfo);
+void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo);
 HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType);

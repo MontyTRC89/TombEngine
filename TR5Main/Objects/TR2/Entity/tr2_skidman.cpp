@@ -70,7 +70,7 @@ void InitialiseSkidooMan(short itemNumber)
 		TENLog("Can't create skidoo for rider!", LogLevel::Error);
 }
 
-void SkidooManCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	

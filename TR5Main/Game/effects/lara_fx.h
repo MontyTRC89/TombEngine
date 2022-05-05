@@ -1,10 +1,10 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 
 namespace TEN::Effects::Lara
 {
-	void LaraBurn(ITEM_INFO* item);
-	void LavaBurn(ITEM_INFO* item);
-	void LaraBreath(ITEM_INFO* item);
+	void LaraBurn(ItemInfo* item);
+	void LavaBurn(ItemInfo* item);
+	void LaraBreath(ItemInfo* item);
 }

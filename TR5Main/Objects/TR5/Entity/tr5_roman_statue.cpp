@@ -53,7 +53,7 @@ enum RomanStatueAnim
 	STATUE_ANIM_START_JUMP_DOWN = 16
 };
 
-static void RomanStatueHitEffect(ITEM_INFO* item, Vector3Int* pos, int joint)
+static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 {
 	GetJointAbsPosition(item, pos, joint);
 

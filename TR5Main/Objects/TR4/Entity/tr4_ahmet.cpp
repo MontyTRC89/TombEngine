@@ -57,12 +57,12 @@ namespace TEN::Entities::TR4
 	#define AHMET_HAND_DAMAGE 80
 	#define AHMET_JAW_DAMAGE 120
 
-	static void AhmetHeavyTriggers(ITEM_INFO* item)
+	static void AhmetHeavyTriggers(ItemInfo* item)
 	{
 		TestTriggers(item, true);
 	}
 
-	static void TriggerAhmetDeathEffect(ITEM_INFO* item)
+	static void TriggerAhmetDeathEffect(ItemInfo* item)
 	{
 		// HACK: Using CreatureSpheres here in release mode results in total mess-up
 		// of LaraSpheres, which looks in game as ghost Lara fire silhouette.

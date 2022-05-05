@@ -409,7 +409,7 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* 
 	else
 	{
 		// For items instead we need to test spheres
-		ITEM_INFO* item = &g_Level.Items[closesItemNumber];
+		ItemInfo* item = &g_Level.Items[closesItemNumber];
 		OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 		// Get the transformed sphere of meshes
@@ -532,7 +532,7 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* 
 	// If collided object is an item, then setup the shatter item data struct
 	if (sp >= 0)
 	{
-		ITEM_INFO* item = &g_Level.Items[closesItemNumber];
+		ItemInfo* item = &g_Level.Items[closesItemNumber];
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
 

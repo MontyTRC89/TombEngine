@@ -1,7 +1,7 @@
 #pragma once
 #include "Game/Lara/lara_struct.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 #define LARA_GRAB_THRESHOLD ANGLE(40.0f)
@@ -74,7 +74,7 @@ constexpr auto LARA_SPRINT_ENERGY_MAX = 120.0f;
 constexpr auto LARA_POISON_POTENCY_MAX = 16.0f;
 
 extern LaraInfo Lara;
-extern ITEM_INFO* LaraItem;
+extern ItemInfo* LaraItem;
 extern CollisionInfo LaraCollision;
 extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 
@@ -82,13 +82,13 @@ extern byte LaraNodeUnderwater[NUM_LARA_MESHES];
 #define CHECK_LARA_MESHES(slot, mesh) Lara.meshPtrs[mesh] == MESHES(slot, mesh)
 #define INIT_LARA_MESHES(mesh, to, from) Lara.meshPtrs[mesh] = LARA_MESHES(to, mesh) = LARA_MESHES(from, mesh)
 
-#define LaraRoutineFunction void(ITEM_INFO* item, CollisionInfo* coll)
+#define LaraRoutineFunction void(ItemInfo* item, CollisionInfo* coll)
 extern std::function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1];
 extern std::function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1];
 
-void LaraControl(ITEM_INFO* item, CollisionInfo* coll);
-void LaraAboveWater(ITEM_INFO* item, CollisionInfo* coll);
-void LaraWaterSurface(ITEM_INFO* item, CollisionInfo* coll);
-void LaraUnderwater(ITEM_INFO* item, CollisionInfo* coll);
-void LaraCheat(ITEM_INFO* item, CollisionInfo* coll);
-void AnimateLara(ITEM_INFO* item);
+void LaraControl(ItemInfo* item, CollisionInfo* coll);
+void LaraAboveWater(ItemInfo* item, CollisionInfo* coll);
+void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll);
+void LaraUnderwater(ItemInfo* item, CollisionInfo* coll);
+void LaraCheat(ItemInfo* item, CollisionInfo* coll);
+void AnimateLara(ItemInfo* item);

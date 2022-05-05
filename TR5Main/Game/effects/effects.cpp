@@ -803,7 +803,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	}
 }*/
 
-void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly)
+void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 {
 	long dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 	long dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
@@ -1230,7 +1230,7 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
-void WadeSplash(ITEM_INFO* item, int wh, int wd)
+void WadeSplash(ItemInfo* item, int wh, int wd)
 {
 	short roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -1279,7 +1279,7 @@ void WadeSplash(ITEM_INFO* item, int wh, int wd)
 	}
 }
 
-void Splash(ITEM_INFO* item)
+void Splash(ItemInfo* item)
 {
 	short roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);

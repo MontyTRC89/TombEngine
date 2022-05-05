@@ -2,7 +2,7 @@
 #include "Specific/phd_global.h"
 
 enum class LaraWeaponType;
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 enum RIPPLE_TYPE
@@ -209,7 +209,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
-void TriggerSuperJetFlame(ITEM_INFO* item, int yvel, int deadly);
+void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup,int room);
 void UpdateSplashes();
 void SetupRipple(int x, int y, int z, float size, char flags,unsigned int spriteID,float rotation = 0);
@@ -226,8 +226,8 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void TriggerFireFlame(int x, int y, int z, int flag1, int flag2);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additional);
-void WadeSplash(ITEM_INFO* item, int wh, int wd);
-void Splash(ITEM_INFO* item);
+void WadeSplash(ItemInfo* item, int wh, int wd);
+void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Richochet(PHD_3DPOS* pos);

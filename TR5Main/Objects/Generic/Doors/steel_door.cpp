@@ -29,7 +29,7 @@ namespace TEN::Entities::Doors
 		doorItem->Pose.Position.y -= 1024;
 	}
 
-	void SteelDoorCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void SteelDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* doorItem = &g_Level.Items[itemNumber];
 

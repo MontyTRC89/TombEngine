@@ -12,7 +12,7 @@
 #define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
 
 struct CreatureInfo;
-struct ITEM_INFO;
+struct ItemInfo;
 struct FX_INFO;
 
 namespace TEN::Renderer
@@ -1251,7 +1251,7 @@ struct LaraInfo
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
 	short TargetArmAngles[2];
-	ITEM_INFO* TargetEntity;
+	ItemInfo* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
 	int Air;

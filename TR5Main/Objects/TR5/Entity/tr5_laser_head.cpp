@@ -71,7 +71,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 	}
 }
 
-static void LaserHeadCharge(ITEM_INFO* item)
+static void LaserHeadCharge(ItemInfo* item)
 {
 	byte size = item->ItemFlags[3];
 	byte g = ((GetRandomControl() & 0x1F) + 128);

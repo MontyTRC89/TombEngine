@@ -1,8 +1,8 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 void InitialiseQuadBike(short itemNumber);
-void QuadBikeCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
-bool QuadBikeControl(ITEM_INFO* laraItem, CollisionInfo* coll);
+void QuadBikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll);

@@ -1,10 +1,10 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 namespace TEN::Entities::Switches
 {
 	void TurnSwitchControl(short itemNumber);
-	void TurnSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll);
+	void TurnSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 }

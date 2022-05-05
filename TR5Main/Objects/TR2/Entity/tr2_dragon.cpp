@@ -83,7 +83,7 @@ static short DragonFire(int x, int y, int z, short speed, short yRot, short room
 	return fxNumber;
 }
 
-static void createExplosion(ITEM_INFO* item)
+static void createExplosion(ItemInfo* item)
 {
 	short ExplosionIndex = CreateItem();
 
@@ -147,7 +147,7 @@ static void createDragonBone(short frontNumber)
 	}
 }
 
-void DragonCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -508,7 +508,7 @@ void InitialiseBartoli(short itemNumber)
 
 void BartoliControl(short itemNumber)
 {
-	ITEM_INFO* back, *front;
+	ItemInfo* back, *front;
 	short frontItem, backItem;
 
 	auto* item = &g_Level.Items[itemNumber];

@@ -165,12 +165,12 @@ void InitialiseKayak(short itemNumber)
 	}
 }
 
-void KayakDraw(ITEM_INFO* kayakItem)
+void KayakDraw(ItemInfo* kayakItem)
 {
 	DrawAnimatingItem(kayakItem);
 }
 
-void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
+void KayakDoWake(ItemInfo* kayakItem, int xOffset, int zOffset, short rotate)
 {
 	auto* kayak = (KayakInfo*)kayakItem->Data;
 
@@ -241,7 +241,7 @@ void KayakDoWake(ITEM_INFO* kayakItem, int xOffset, int zOffset, short rotate)
 	}
 }
 
-void KayakDoRipple(ITEM_INFO* kayakItem, int xOffset, int zOffset)
+void KayakDoRipple(ItemInfo* kayakItem, int xOffset, int zOffset)
 {
 	float s = phd_sin(kayakItem->Pose.Orientation.y);
 	float c = phd_cos(kayakItem->Pose.Orientation.y);
@@ -274,7 +274,7 @@ void KayakUpdateWakeFX()
 	}
 }
 
-KayakMountType KayakGetMountType(ITEM_INFO* laraItem, short itemNumber)
+KayakMountType KayakGetMountType(ItemInfo* laraItem, short itemNumber)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* kayakItem = &g_Level.Items[itemNumber];
@@ -314,7 +314,7 @@ KayakMountType KayakGetMountType(ITEM_INFO* laraItem, short itemNumber)
 	return KayakMountType::None;
 }
 
-int KayakGetCollisionAnim(ITEM_INFO* kayakItem, int xDiff, int zDiff)
+int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
 {
 	xDiff = kayakItem->Pose.Position.x - xDiff;
 	zDiff = kayakItem->Pose.Position.z - zDiff;
@@ -376,7 +376,7 @@ int KayakDoDynamics(int height, int verticalVelocity, int* y)
 	return verticalVelocity;
 }
 
-void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
+void KayakDoCurrent(ItemInfo* laraItem, ItemInfo* kayakItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* room = &g_Level.Rooms[kayakItem->RoomNumber];
@@ -437,7 +437,7 @@ void KayakDoCurrent(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	lara->WaterCurrentActive = 0;
 }
 
-int KayakTestHeight(ITEM_INFO* kayakItem, int x, int z, Vector3Int* pos)
+int KayakTestHeight(ItemInfo* kayakItem, int x, int z, Vector3Int* pos)
 {
 	Matrix world =
 		Matrix::CreateFromYawPitchRoll(TO_RAD(kayakItem->Pose.Orientation.y), TO_RAD(kayakItem->Pose.Orientation.x), TO_RAD(kayakItem->Pose.Orientation.z)) *
@@ -464,7 +464,7 @@ int KayakTestHeight(ITEM_INFO* kayakItem, int x, int z, Vector3Int* pos)
 	return (height - 5);
 }
 
-bool KayakCanGetOut(ITEM_INFO* kayakItem, int dir)
+bool KayakCanGetOut(ItemInfo* kayakItem, int dir)
 {
 	Vector3Int pos;
 	int height = KayakTestHeight(kayakItem, (dir < 0) ? -DISMOUNT_DISTANCE : DISMOUNT_DISTANCE, 0, &pos);
@@ -475,7 +475,7 @@ bool KayakCanGetOut(ITEM_INFO* kayakItem, int dir)
 	return true;
 }
 
-int KayakDoShift(ITEM_INFO* kayakItem, Vector3Int* pos, Vector3Int* old)
+int KayakDoShift(ItemInfo* kayakItem, Vector3Int* pos, Vector3Int* old)
 {
 	int x = pos->x / SECTOR(1);
 	int z = pos->z / SECTOR(1);
@@ -578,7 +578,7 @@ int KayakDoShift(ITEM_INFO* kayakItem, Vector3Int* pos, Vector3Int* old)
 	return 0;
 }
 
-void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
+void KayakToBackground(ItemInfo* laraItem, ItemInfo* kayakItem)
 {
 	auto* kayak = (KayakInfo*)kayakItem->Data;
 
@@ -724,7 +724,7 @@ void KayakToBackground(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	}
 }
 
-void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
+void KayakUserInput(ItemInfo* laraItem, ItemInfo* kayakItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* kayak = (KayakInfo*)kayakItem->Data;
@@ -1128,7 +1128,7 @@ void KayakUserInput(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	}
 }
 
-void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
+void KayakToItemCollision(ItemInfo* laraItem, ItemInfo* kayakItem)
 {
 	short roomsToCheck[128];
 	short numRoomsToCheck = 0;
@@ -1178,7 +1178,7 @@ void KayakToItemCollision(ITEM_INFO* laraItem, ITEM_INFO* kayakItem)
 	}
 }
 
-void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
+void KayakLaraRapidsDrown(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1199,7 +1199,7 @@ void KayakLaraRapidsDrown(ITEM_INFO* laraItem)
 	lara->HitDirection = -1;
 }
 
-void KayakCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void KayakCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* kayakItem = &g_Level.Items[itemNumber];
@@ -1254,7 +1254,7 @@ void KayakCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
 	}
 }
 
-bool KayakControl(ITEM_INFO* laraItem)
+bool KayakControl(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* kayakItem = &g_Level.Items[lara->Vehicle];

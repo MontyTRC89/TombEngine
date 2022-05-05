@@ -19,7 +19,7 @@ BITE_INFO SethaAttack2 = { 16,200,32,17 };
 
 void InitialiseSetha(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 	
 	ClearItem(itemNumber);
 	
@@ -34,7 +34,7 @@ void SethaControl(short itemNumber)
 	if (!CreatureActive(itemNumber))
 		return;
 
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 
 	int x = item->Pose.Position.x;
@@ -556,7 +556,7 @@ void SethaThrowAttack(PHD_3DPOS* pos, short roomNumber, short mesh)
 
 void SethaAttack(int itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 
 	item->ItemFlags[0]++;
 

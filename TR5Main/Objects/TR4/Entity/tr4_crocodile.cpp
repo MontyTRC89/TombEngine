@@ -78,7 +78,7 @@ void InitialiseCrocodile(short itemNumber)
 	}
 }
 
-static bool CrocodileIsInWater(ITEM_INFO* item)
+static bool CrocodileIsInWater(ItemInfo* item)
 {
 	auto* info = GetCreatureInfo(item);
 

@@ -19,7 +19,7 @@ public:
 
 	[[nodiscard]] virtual short GetIndexByName(std::string const& name) const = 0;
 	virtual bool AddName(std::string const& key, VarMapVal val) = 0;
-	virtual bool NotifyKilled(ITEM_INFO *) = 0;
+	virtual bool NotifyKilled(ItemInfo *) = 0;
 	virtual void FreeEntities() = 0;
 	virtual void AssignLara() = 0;
 

@@ -164,7 +164,7 @@ namespace TEN::Entities::TR4
 			item->ItemFlags[0] = 0;
 
 		// The horse
-		ITEM_INFO* horseItem = NULL;
+		ItemInfo* horseItem = NULL;
 		if (item->ItemFlags[0] != 0)
 			horseItem = &g_Level.Items[item->ItemFlags[0]];
 

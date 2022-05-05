@@ -41,7 +41,7 @@ void TriggerChaffEffects(int flareAge)
 	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Animation.Velocity, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
 }
 
-void TriggerChaffEffects(ITEM_INFO* Item,int age)
+void TriggerChaffEffects(ItemInfo* Item,int age)
 {
 	Matrix world
 		= Matrix::CreateTranslation(-6, 6, 32)
@@ -65,7 +65,7 @@ void TriggerChaffEffects(ITEM_INFO* Item,int age)
 	TriggerChaffEffects(Item, &pos, &vel, Item->Animation.Velocity, (bool)(g_Level.Rooms[Item->RoomNumber].flags & ENV_FLAG_WATER),age);
 }
 
-void TriggerChaffEffects(ITEM_INFO* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater,int age)
+void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater,int age)
 {
 	int numSparks = (int)GenerateFloat(2, 5);
 	for (int i = 0; i < numSparks; i++)
@@ -99,7 +99,7 @@ void TriggerChaffEffects(ITEM_INFO* item, Vector3Int* pos, Vector3Int* vel, int 
 }
 
 
-void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int age,ITEM_INFO* item)
+void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int age,ItemInfo* item)
 {
 	/*
 	SPARKS* sparkle;

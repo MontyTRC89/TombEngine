@@ -2810,7 +2810,7 @@ namespace TEN::Renderer
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
-				ITEM_INFO* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
+				ItemInfo* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
 				RendererRoom& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 
@@ -2845,7 +2845,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
 	{
-		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		RendererRoom* room = &m_rooms[nativeItem->RoomNumber];
 		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
@@ -2900,7 +2900,7 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		ITEM_INFO* nativeItem = &g_Level.Items[info->item->ItemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[info->item->ItemNumber];
 		RendererRoom& room = m_rooms[nativeItem->RoomNumber];
 		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
 		OBJECT_INFO* obj = &Objects[nativeItem->ObjectNumber];
@@ -2957,7 +2957,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDarts(RendererItem* item, RenderView& view)
 	{
-		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		Vector3 start = Vector3(
 			nativeItem->Pose.Position.x,
@@ -2976,7 +2976,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
 	{
-		ITEM_INFO* nativeItem = &g_Level.Items[item->ItemNumber];
+		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		WraithInfo* info = (WraithInfo*)nativeItem->Data;
 
 		for (int j = 0; j <= 4; j++)

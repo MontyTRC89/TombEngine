@@ -40,7 +40,7 @@ void SetupShoal(int shoalNumber)
 	LeaderInfo[shoalNumber].yRange = (FishRanges[shoalNumber][2]) << 8;
 }
 
-void SetupFish(int leader, ITEM_INFO* item)
+void SetupFish(int leader, ItemInfo* item)
 {
 	int fishXRange = LeaderInfo[leader].xRange;
 	int fishYRange = LeaderInfo[leader].yRange;
@@ -399,7 +399,7 @@ void ControlFish(short itemNumber)
 	}
 }
 
-bool FishNearLara(PHD_3DPOS* pos, int distance, ITEM_INFO* item)
+bool FishNearLara(PHD_3DPOS* pos, int distance, ItemInfo* item)
 {
 	int x = pos->Position.x - item->Pose.Position.x;
 	int y = abs(pos->Position.y - item->Pose.Position.y);

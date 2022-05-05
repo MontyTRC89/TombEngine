@@ -73,7 +73,7 @@ void BigGunInitialise(short itemNumber)
 	bigGun->BarrelRotating = false;
 }
 
-static bool BigGunTestMount(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
+static bool BigGunTestMount(ItemInfo* laraItem, ItemInfo* bigGunItem)
 {
 	// TODO: If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
 	auto* lara = &Lara/* GetLaraInfo(laraItem)*/;
@@ -100,7 +100,7 @@ static bool BigGunTestMount(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 	return true;
 }
 
-void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
+void BigGunFire(ItemInfo* laraItem, ItemInfo* bigGunItem)
 {
 	auto* bigGun = (BigGunInfo*)bigGunItem->Data;
 
@@ -139,7 +139,7 @@ void BigGunFire(ITEM_INFO* laraItem, ITEM_INFO* bigGunItem)
 	}
 }
 
-void BigGunCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
+void BigGunCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* bigGunItem = &g_Level.Items[itemNum];
@@ -178,7 +178,7 @@ void BigGunCollision(short itemNum, ITEM_INFO* laraItem, CollisionInfo* coll)
 		ObjectCollision(itemNum, laraItem, coll);
 }
 
-bool BigGunControl(ITEM_INFO* laraItem, CollisionInfo* coll)
+bool BigGunControl(ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* bigGunItem = &g_Level.Items[lara->Vehicle];

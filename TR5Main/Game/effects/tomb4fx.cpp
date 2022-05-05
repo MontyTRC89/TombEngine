@@ -1035,7 +1035,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 	}
 }
 
-void LaraBubbles(ITEM_INFO* item)
+void LaraBubbles(ItemInfo* item)
 {
 	Vector3Int pos;
 	int num, i;
@@ -1156,7 +1156,7 @@ void UpdateDrips()
 	}
 }
 
-void TriggerLaraDrips(ITEM_INFO* item)
+void TriggerLaraDrips(ItemInfo* item)
 {
 	if (!(Wibble & 0xF))
 	{
@@ -1205,7 +1205,7 @@ void TriggerLaraDrips(ITEM_INFO* item)
 
 int ExplodingDeath(short itemNumber, int meshBits, short flags)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 	ANIM_FRAME* frame = GetBestFrame(item);
@@ -1589,7 +1589,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->size = size >> 2;
 }
 */
-/*void DrawLensFlares(ITEM_INFO* item)
+/*void DrawLensFlares(ItemInfo* item)
 {
 	GameVector pos;
 

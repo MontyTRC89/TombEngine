@@ -42,7 +42,7 @@ enum class CrossbowBoltType
 //int HKFlag = 0;
 //byte HKFlag2 = 0;
 
-void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -255,7 +255,7 @@ void AnimateShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
-void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -271,7 +271,7 @@ void ReadyShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->TargetEntity = nullptr;
 }
 
-void FireShotgun(ITEM_INFO* laraItem)
+void FireShotgun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -326,11 +326,11 @@ void FireShotgun(ITEM_INFO* laraItem)
 	}
 }
 
-void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	ITEM_INFO* item;
+	ItemInfo* item;
 
 	if (lara->Control.Weapon.WeaponItem == NO_ITEM)
 	{
@@ -374,7 +374,7 @@ void DrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
-void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -405,7 +405,7 @@ void UndrawShotgun(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber;
 }
 
-void DrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -413,7 +413,7 @@ void DrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
 }
 
-void UndrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -421,7 +421,7 @@ void UndrawShotgunMeshes(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 }
 
-void FireHarpoon(ITEM_INFO* laraItem)
+void FireHarpoon(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -635,7 +635,7 @@ void HarpoonBoltControl(short itemNumber)
 	}
 }
 
-void FireGrenade(ITEM_INFO* laraItem)
+void FireGrenade(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1100,7 +1100,7 @@ void GrenadeControl(short itemNumber)
 	}
 }
 
-void FireRocket(ITEM_INFO* laraItem)
+void FireRocket(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1373,7 +1373,7 @@ void RocketControl(short itemNumber)
 	}
 }
 
-void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
+void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1455,7 +1455,7 @@ void FireCrossbow(ITEM_INFO* laraItem, PHD_3DPOS* pos)
 	}
 }
 
-void FireCrossBowFromLaserSight(ITEM_INFO* laraItem, GameVector* src, GameVector* target)
+void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector* target)
 {
 	/* this part makes arrows fire at bad angles
 	target->x &= ~1023;
@@ -1695,7 +1695,7 @@ void CrossbowBoltControl(short itemNumber)
 	}
 }
 
-void FireHK(ITEM_INFO* laraItem, int mode)
+void FireHK(ItemInfo* laraItem, int mode)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1744,7 +1744,7 @@ void FireHK(ITEM_INFO* laraItem, int mode)
 	}
 }
 
-void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
+void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
@@ -1800,7 +1800,7 @@ void RifleHandler(ITEM_INFO* laraItem, LaraWeaponType weaponType)
 	}
 }
 
-void DoExplosiveDamageOnBaddie(ITEM_INFO* laraItem, ITEM_INFO* dest, ITEM_INFO* src, LaraWeaponType weaponType)
+void DoExplosiveDamageOnBaddie(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src, LaraWeaponType weaponType)
 {
 	if (!(dest->Flags & 0x8000))
 	{
@@ -1836,7 +1836,7 @@ void DoExplosiveDamageOnBaddie(ITEM_INFO* laraItem, ITEM_INFO* dest, ITEM_INFO* 
 	}
 }
 
-void TriggerUnderwaterExplosion(ITEM_INFO* item, int flag)
+void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 {
 	if (flag)
 	{
@@ -1909,7 +1909,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 	}
 }
 
-void HitSpecial(ITEM_INFO* projectile, ITEM_INFO* target, int flags)
+void HitSpecial(ItemInfo* projectile, ItemInfo* target, int flags)
 {
 
 }

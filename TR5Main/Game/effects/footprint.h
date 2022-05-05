@@ -2,7 +2,7 @@
 #include <deque>
 #include "Specific/phd_global.h"
 
-struct ITEM_INFO;
+struct ItemInfo;
 
 namespace TEN{
 namespace Effects {
@@ -25,8 +25,8 @@ namespace Footprints {
 	extern std::deque<FOOTPRINT_STRUCT> footprints;
 	constexpr int FOOT_HEIGHT_OFFSET = 64;
 
-	bool CheckFootOnFloor(ITEM_INFO const & item, int mesh, Vector3& outFootprintPosition);
-	void AddFootprint(ITEM_INFO* item, bool rightFoot);
+	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition);
+	void AddFootprint(ItemInfo* item, bool rightFoot);
 	void UpdateFootprints();
 
 }}}

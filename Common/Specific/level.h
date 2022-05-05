@@ -118,7 +118,7 @@ struct LEVEL
 	std::vector<short> Commands;
 	std::vector<ANIM_FRAME> Frames;
 	std::vector<OBJECT_TEXTURE> ObjectTextures;
-	std::vector<ITEM_INFO> Items;
+	std::vector<ItemInfo> Items;
 	std::vector<AI_OBJECT> AIObjects;
 	std::vector<SPRITE> Sprites;
 	std::vector<LEVEL_CAMERA_INFO> Cameras;

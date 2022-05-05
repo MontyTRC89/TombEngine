@@ -112,7 +112,7 @@ static void TriggerTorpedoSparks2(Vector3Int* pos1, Vector3Int* pos2, char scale
 	spark->dSize = spark->size * 2;
 }
 
-static void SubmarineAttack(ITEM_INFO* item)
+static void SubmarineAttack(ItemInfo* item)
 {
 	short itemNumber = CreateItem();
 

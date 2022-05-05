@@ -16,7 +16,7 @@
 
 BITE_INFO SpiderBite = { 0, 0, 41, 1 };
 
-static void S_SpiderBite(ITEM_INFO* item)
+static void S_SpiderBite(ItemInfo* item)
 {
 	Vector3Int pos = { SpiderBite.x, SpiderBite.y, SpiderBite.z };
 	GetJointAbsPosition(item, &pos, SpiderBite.meshNum);
@@ -24,7 +24,7 @@ static void S_SpiderBite(ITEM_INFO* item)
 	DoBloodSplat(pos.x, pos.y, pos.z, 10, item->Pose.Position.y, item->RoomNumber);
 }
 
-static void SpiderLeap(short itemNumber, ITEM_INFO* item, short angle)
+static void SpiderLeap(short itemNumber, ItemInfo* item, short angle)
 {
 	GameVector vec;
 	vec.x = item->Pose.Position.x;

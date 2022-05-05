@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 		return NO_ITEM;
 	}
 
-	void SpawnLocust(ITEM_INFO* item)
+	void SpawnLocust(ItemInfo* item)
 	{
 		Vector3Int start, end;
 		short angles[2];

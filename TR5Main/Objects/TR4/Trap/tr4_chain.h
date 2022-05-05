@@ -1,6 +1,6 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
 namespace TEN::Entities::TR4

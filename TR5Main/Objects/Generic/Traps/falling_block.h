@@ -2,9 +2,9 @@
 #include <optional>
 
 struct CollisionInfo;
-struct ITEM_INFO;
+struct ItemInfo;
 
-void FallingBlockCollision(short itemNum, ITEM_INFO* l, CollisionInfo* coll);
+void FallingBlockCollision(short itemNum, ItemInfo* l, CollisionInfo* coll);
 void FallingBlockControl(short itemNumber);
 std::optional<int> FallingBlockFloor(short itemNumber, int x, int y, int z);
 std::optional<int> FallingBlockCeiling(short itemNumber, int x, int y, int z);

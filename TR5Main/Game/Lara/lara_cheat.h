@@ -1,9 +1,9 @@
 #pragma once
 
-struct ITEM_INFO;
+struct ItemInfo;
 struct CollisionInfo;
 
-void lara_as_swimcheat(ITEM_INFO* item, CollisionInfo* coll);
-void LaraCheatyBits(ITEM_INFO* item);
-void LaraCheatGetStuff(ITEM_INFO* item);
-void DelsGiveLaraItemsCheat(ITEM_INFO* item);
+void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll);
+void LaraCheatyBits(ItemInfo* item);
+void LaraCheatGetStuff(ItemInfo* item);
+void DelsGiveLaraItemsCheat(ItemInfo* item);

@@ -46,7 +46,7 @@ namespace TEN::Entities::Switches
 	};
 	Vector3Int CeilingUnderwaterSwitchPos2 = { 0, -736, 416 };
 
-	void UnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void UnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
 
@@ -56,7 +56,7 @@ namespace TEN::Entities::Switches
 			CeilingUnderwaterSwitchCollision(itemNumber, laraItem, coll);
 	}
 
-	void WallUnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void WallUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
@@ -95,7 +95,7 @@ namespace TEN::Entities::Switches
 		}
 	}
 
-	void CeilingUnderwaterSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void CeilingUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];

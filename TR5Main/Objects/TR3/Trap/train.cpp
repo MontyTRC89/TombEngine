@@ -19,7 +19,7 @@
 #define TRAIN_VEL	260
 #define LARA_TRAIN_DEATH_ANIM 3;
 
-long TrainTestHeight(ITEM_INFO* item, long x, long z, short* roomNumber)
+long TrainTestHeight(ItemInfo* item, long x, long z, short* roomNumber)
 {
 	float s = phd_sin(item->Pose.Orientation.y);
 	float c = phd_cos(item->Pose.Orientation.y);
@@ -93,7 +93,7 @@ void TrainControl(short itemNumber)
 		SoundEffect(SFX_TR3_TUBE_LOOP, &item->Pose, SFX_ALWAYS);
 }
 
-void TrainCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trainItem = &g_Level.Items[itemNumber];

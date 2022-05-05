@@ -16,7 +16,7 @@ using std::vector;
 using namespace TEN::Floordata;
 using namespace TEN::Renderer;
 
-void ShiftItem(ITEM_INFO* item, CollisionInfo* coll)
+void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Pose.Position.x += coll->Shift.x;
 	item->Pose.Position.y += coll->Shift.y;
@@ -26,7 +26,7 @@ void ShiftItem(ITEM_INFO* item, CollisionInfo* coll)
 	coll->Shift.z = 0;
 }
 
-void MoveItem(ITEM_INFO* item, short angle, int x, int z)
+void MoveItem(ItemInfo* item, short angle, int x, int z)
 {
 	if (!x && !z)
 		return;
@@ -50,7 +50,7 @@ void MoveItem(ITEM_INFO* item, short angle, int x, int z)
 	}
 }
 
-void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
 	if (snapYRot)
 		item->Pose.Orientation.y = coll->NearestLedgeAngle;
@@ -61,7 +61,7 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, float offsetMultiplie
 	item->Pose.Position.z += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
-void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float offsetMultiplier)
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier)
 {
 	short backup = coll->Setup.ForwardAngle;
 	coll->Setup.ForwardAngle = angle;
@@ -78,7 +78,7 @@ void SnapItemToLedge(ITEM_INFO* item, CollisionInfo* coll, short angle, float of
 	item->Pose.Position.z += round(phd_cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 }
 
-void SnapItemToGrid(ITEM_INFO* item, CollisionInfo* coll)
+void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 {
 	SnapItemToLedge(item, coll);
 
@@ -114,7 +114,7 @@ int FindGridShift(int x, int z)
 
 // Test if the axis-aligned bounding box collides with geometry at all.
 
-bool TestItemRoomCollisionAABB(ITEM_INFO* item)
+bool TestItemRoomCollisionAABB(ItemInfo* item)
 {
 	ANIM_FRAME* framePtr = GetBestFrame(item);
 	auto box = framePtr->boundingBox + item->Pose;
@@ -144,7 +144,7 @@ bool TestItemRoomCollisionAABB(ITEM_INFO* item)
 // Overload of GetCollisionResult which can be used to probe collision parameters
 // from a given item.
 
-CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int height, int side)
+CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height, int side)
 {
 	float s = phd_sin(angle);
 	float c = phd_cos(angle);
@@ -159,7 +159,7 @@ CollisionResult GetCollision(ITEM_INFO* item, short angle, int distance, int hei
 // A handy overload of GetCollisionResult which can be used to quickly get collision parameters
 // such as floor height under specific item.
 
-CollisionResult GetCollision(ITEM_INFO* item)
+CollisionResult GetCollision(ItemInfo* item)
 {
 	auto room = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room);
@@ -235,12 +235,12 @@ CollisionResult GetCollision(FLOOR_INFO* floor, int x, int y, int z)
 	return result;
 }
 
-void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, bool resetRoom)
+void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
 {
 	GetCollisionInfo(coll, item, Vector3Int(), resetRoom);
 }
 
-void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, bool resetRoom)
+void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom)
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
@@ -844,7 +844,7 @@ void GetCollisionInfo(CollisionInfo* coll, ITEM_INFO* item, Vector3Int offset, b
 // (int radiusDivide) is for radiusZ, else the MaxZ is too high and cause rotation problem !
 // Dont need to set a value in radiusDivisor if you dont need it (radiusDivisor is set to 1 by default).
 // Warning: dont set it to 0 !!!!
-void CalculateItemRotationToSurface(ITEM_INFO* item, float radiusDivisor, short xOffset, short zOffset)
+void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, short xOffset, short zOffset)
 {
 	if (!radiusDivisor)
 	{
@@ -895,7 +895,7 @@ int GetQuadrant(short angle)
 // Determines vertical surfaces and gets nearest ledge angle.
 // Allows to eventually use unconstrained vaults and shimmying.
 
-short GetNearestLedgeAngle(ITEM_INFO* item, CollisionInfo* coll, float& distance)
+short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 {
 	// Get item bounds and current rotation
 	auto bounds = GetBoundsAccurate(item);
@@ -1194,7 +1194,7 @@ int GetDistanceToFloor(int itemNumber, bool precise)
 	return (minHeight + item->Pose.Position.y - height);
 }
 
-void AlterFloorHeight(ITEM_INFO* item, int height)
+void AlterFloorHeight(ItemInfo* item, int height)
 {
 	if (abs(height))
 	{
@@ -1254,7 +1254,7 @@ int GetWaterSurface(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
-int GetWaterSurface(ITEM_INFO* item)
+int GetWaterSurface(ItemInfo* item)
 {
 	return GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
@@ -1340,7 +1340,7 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 }
 
 
-int GetWaterDepth(ITEM_INFO* item)
+int GetWaterDepth(ItemInfo* item)
 {
 	return GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
@@ -1435,7 +1435,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	return NO_HEIGHT;
 }
 
-int GetWaterHeight(ITEM_INFO* item)
+int GetWaterHeight(ItemInfo* item)
 {
 	return GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 }
@@ -1461,7 +1461,7 @@ bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
 	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, ITEM_INFO* item)
+bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
 {
 	return TestEnvironment(environmentType, item->RoomNumber);
 }

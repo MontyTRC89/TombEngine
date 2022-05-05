@@ -14,7 +14,7 @@
 
 // NOTE: we need to decompile/inspect if these functions are still needed
 
-void ProcessExplodingSwitchType8(ITEM_INFO* item) 
+void ProcessExplodingSwitchType8(ItemInfo* item) 
 {
 	auto pos = Vector3Int();
 	GetJointAbsPosition(item, &pos, 0);
@@ -32,7 +32,7 @@ void InitialiseShootSwitch(short itemNumber)
 		switchItem->MeshBits &= ~(1 << (Objects[switchItem->ObjectNumber].nmeshes - 2));
 }
 
-void ShootSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+void ShootSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* switchItem = &g_Level.Items[itemNumber];
 

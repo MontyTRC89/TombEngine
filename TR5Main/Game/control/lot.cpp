@@ -29,7 +29,7 @@ void InitialiseLOTarray(int itemNumber)
 
 int EnableBaddieAI(short itemNum, int always)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ItemInfo* item = &g_Level.Items[itemNum];
 
 	if (item->Data.is<CreatureInfo>())
 		return true;
@@ -69,7 +69,7 @@ int EnableBaddieAI(short itemNum, int always)
 		if (slotToDisable < 0 || slotToDisable > NUM_SLOTS)
 			return false;
 
-		ITEM_INFO* itemToDisable = &g_Level.Items[ActiveCreatures[slotToDisable].itemNum];
+		ItemInfo* itemToDisable = &g_Level.Items[ActiveCreatures[slotToDisable].itemNum];
 		CREATURE_INFO* creatureToDisable = &ActiveCreatures[slotToDisable];
 
 		itemToDisable->status = ITEM_INVISIBLE;
@@ -99,7 +99,7 @@ int EnableBaddieAI(short itemNum, int always)
 
 void DisableEntityAI(short itemNumber)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNumber];
+	ItemInfo* item = &g_Level.Items[itemNumber];
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	
 	if (creature)
@@ -113,7 +113,7 @@ void DisableEntityAI(short itemNumber)
 
 void InitialiseSlot(short itemNum, short slot)
 {
-	ITEM_INFO* item = &g_Level.Items[itemNum];
+	ItemInfo* item = &g_Level.Items[itemNum];
 	OBJECT_INFO* obj = &Objects[item->ObjectNumber];
 
 	item->Data = CreatureInfo();
@@ -297,7 +297,7 @@ void ClearLOT(LOTInfo* LOT)
 	}
 }
 
-void CreateZone(ITEM_INFO* item)
+void CreateZone(ItemInfo* item)
 {
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	ROOM_INFO* r = &g_Level.Rooms[item->RoomNumber];

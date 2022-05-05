@@ -24,14 +24,14 @@
 // TODO: Unused? Naming is also completely mismatched.
 // State:		LS_GRAB_TO_FALL
 // Collision:	lara_void_func()
-void lara_col_land(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_land(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_idle(item, coll);
 }
 
 // State:		LS_JUMP_FORWARD (3)
 // Collision:	lara_col_jump_forward()
-void lara_as_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -115,7 +115,7 @@ void lara_as_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_FORWARD (3)
 // Control:		lara_as_jump_forward()
-void lara_col_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -134,7 +134,7 @@ void lara_col_jump_forward(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_FREEFALL (9)
 // Collision:	lara_col_freefall()
-void lara_as_freefall(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.Velocity = item->Animation.Velocity * 0.95f;
 
@@ -165,7 +165,7 @@ void lara_as_freefall(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_FREEFALL (9)
 // Control:		lara_as_freefall()
-void lara_col_freefall(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_freefall(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -181,7 +181,7 @@ void lara_col_freefall(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_REACH (11)
 // Collision:	lara_col_reach()
-void lara_as_reach(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -237,7 +237,7 @@ void lara_as_reach(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_REACH (11)
 // Control:		lara_as_reach()
-void lara_col_reach(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -273,7 +273,7 @@ void lara_col_reach(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_PREPARE (15)
 // Collision:	lara_col_jump_prepare()
-void lara_as_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -353,7 +353,7 @@ void lara_as_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_PREPARE (15)
 // Collision:	lara_as_jump_prepare()
-void lara_col_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -416,7 +416,7 @@ void lara_col_jump_prepare(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_BACK (25)
 // Collision:	lara_col_jump_back()
-void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -479,14 +479,14 @@ void lara_as_jump_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_BACK (25)
 // Control:		lara_as_jump_back()
-void lara_col_jump_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraJumpCollision(item, coll, item->Pose.Orientation.y + ANGLE(180.0f));
 }
 
 // State:		LS_JUMP_RIGHT (26)
 // Collision:	lara_col_jump_right()
-void lara_as_jump_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -536,14 +536,14 @@ void lara_as_jump_right(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_RIGHT (26)
 // Control:		lara_as_jump_right()
-void lara_col_jump_right(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_jump_right(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraJumpCollision(item, coll, item->Pose.Orientation.y + ANGLE(90.0f));
 }
 
 // State:		LS_JUMP_LEFT (27)
 // Collision:	lara_as_jump_left()
-void lara_as_jump_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -593,14 +593,14 @@ void lara_as_jump_left(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_LEFT (27)
 // Control:		lara_as_jump_left()
-void lara_col_jump_left(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_jump_left(ItemInfo* item, CollisionInfo* coll)
 {
 	LaraJumpCollision(item, coll, item->Pose.Orientation.y - ANGLE(90.0f));
 }
 
 // State:		LS_JUMP_UP (28)
 // Collision:	lara_col_jump_up()
-void lara_as_jump_up(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -663,7 +663,7 @@ void lara_as_jump_up(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_JUMP_UP (28)
 // Control:		lara_as_jump_up()
-void lara_col_jump_up(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -692,7 +692,7 @@ void lara_col_jump_up(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_FALL_BACK (29)
 // Collision:	lara_col_fall_back()
-void lara_as_fall_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -753,14 +753,14 @@ void lara_as_fall_back(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_FALL_BACK (29)
 // Collision:	lara_col_fall_back()
-void lara_col_fall_back(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_fall_back(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_jump_back(item, coll);
 }
 
 // State:		LS_SWAN_DIVE (52)
 // Collision:	lara_col_swan_dive()
-void lara_as_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -836,7 +836,7 @@ void lara_as_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_SWAN_DIVE (52)
 // Control:		lara_as_swan_dive()
-void lara_col_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -863,7 +863,7 @@ void lara_col_swan_dive(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_FREEFALL_DIVE (53)
 // Collision:	lara_col_freefall_dive()
-void lara_as_freefall_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	item->Animation.Velocity = item->Animation.Velocity * 0.95f;
 	coll->Setup.EnableObjectPush = true;
@@ -907,7 +907,7 @@ void lara_as_freefall_dive(ITEM_INFO* item, CollisionInfo* coll)
 
 // State:		LS_FREEFALL_DIVE (53)
 // Control:		lara_as_freefall_dive()
-void lara_col_freefall_dive(ITEM_INFO* item, CollisionInfo* coll)
+void lara_col_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_jump_forward(item, coll);
 }
