@@ -17,7 +17,7 @@
 using namespace TEN::Effects::Environment;
 using TEN::Renderer::g_Renderer;
 
-HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
+HairData Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 void InitialiseHair()
 {
@@ -25,17 +25,16 @@ void InitialiseHair()
 	{
 		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
-		Hairs[h][0].initialized = true;
-		Hairs[h][0].Pose.Orientation.SetY();
+		Hairs[h][0].Initialized = true;
 		Hairs[h][0].Pose.Orientation.SetX(Angle::DegToRad(-90.0f));
+		Hairs[h][0].Pose.Orientation.SetY();
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
-			Hairs[h][i].initialized = true;
+			Hairs[h][i].Initialized = true;
 			Hairs[h][i].Pose.Position = Vector3Int(*(bone + 1), *(bone + 2), *(bone + 3));
-			Hairs[h][i].Pose.Orientation = EulerAngles(Angle::DegToRad(-90.0f), 0, 0);
-
-			Hairs[h][i].hvel.x = Hairs[h][i].hvel.y = Hairs[h][i].hvel.z = 0;
+			Hairs[h][i].Pose.Orientation = EulerAngles(Angle::DegToRad(-90.0f), 0.0f, 0.0f);
+			Hairs[h][i].Velocity = Vector3::Zero;
 		}
 	}
 }
@@ -67,6 +66,7 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 					spasm = 294;
 				else
 					spasm = 125;
+
 				break;
 
 			case SOUTH:
@@ -74,6 +74,7 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 					spasm = 293;
 				else
 					spasm = 126;
+
 				break;
 
 			case EAST:
@@ -81,6 +82,7 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 					spasm = 295;
 				else
 					spasm = 127;
+
 				break;
 
 			default:
@@ -88,6 +90,7 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 					spasm = 296;
 				else
 					spasm = 128;
+
 				break;
 			}
 
@@ -173,9 +176,9 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 
 	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
-	if (Hairs[braid][0].initialized)
+	if (Hairs[braid][0].Initialized)
 	{
-		Hairs[braid][0].initialized = false;
+		Hairs[braid][0].Initialized = false;
 		Hairs[braid][0].Pose.Position = pos;
 
 		for (int i = 0; i < HAIR_SEGMENTS; i++, bone += 4)
@@ -184,7 +187,7 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 			world = Matrix::CreateFromYawPitchRoll(Hairs[braid][i].Pose.Orientation.GetY(), Hairs[braid][i].Pose.Orientation.GetX(), 0) * world;			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
-			Hairs[braid][i + 1].initialized = false;
+			Hairs[braid][i + 1].Initialized = false;
 			Hairs[braid][i + 1].Pose.Position = Vector3Int(world.Translation().x, world.Translation().y, world.Translation().z);
 		}
 	}
@@ -200,16 +203,14 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
-			Hairs[braid][0].hvel.x = Hairs[braid][i].Pose.Position.x;
-			Hairs[braid][0].hvel.y = Hairs[braid][i].Pose.Position.y;
-			Hairs[braid][0].hvel.z = Hairs[braid][i].Pose.Position.z;
+			Hairs[braid][0].Velocity = Hairs[braid][i].Pose.Position.ToVector3();
 
 			FLOOR_INFO* floor = GetFloor(Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z, &roomNumber);
 			int height = GetFloorHeight(floor, Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z);
 
-			Hairs[braid][i].Pose.Position.x += Hairs[braid][i].hvel.x * 3 / 4;
-			Hairs[braid][i].Pose.Position.y += Hairs[braid][i].hvel.y * 3 / 4;
-			Hairs[braid][i].Pose.Position.z += Hairs[braid][i].hvel.z * 3 / 4;
+			Hairs[braid][i].Pose.Position.x += Hairs[braid][i].Velocity.x * 3 / 4;
+			Hairs[braid][i].Pose.Position.y += Hairs[braid][i].Velocity.y * 3 / 4;
+			Hairs[braid][i].Pose.Position.z += Hairs[braid][i].Velocity.z * 3 / 4;
 
 			// TR3 UPV uses a hack which forces Lara water status to dry. 
 			// Therefore, we can't directly use water status value to determine hair mode.
@@ -229,8 +230,8 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 					Hairs[braid][i].Pose.Position.y = waterHeight;
 				else if (Hairs[braid][i].Pose.Position.y > height)
 				{
-					Hairs[braid][i].Pose.Position.x = Hairs[braid][0].hvel.x;
-					Hairs[braid][i].Pose.Position.z = Hairs[braid][0].hvel.z;
+					Hairs[braid][i].Pose.Position.x = Hairs[braid][0].Velocity.x;
+					Hairs[braid][i].Pose.Position.z = Hairs[braid][0].Velocity.z;
 				}
 			}
 			else
@@ -272,15 +273,10 @@ void HairControl(ITEM_INFO* item, int braid, ANIM_FRAME* framePtr)
 			if (i == HAIR_SEGMENTS)
 				world = Matrix::CreateTranslation(*(bone - 3), *(bone - 2), *(bone - 1)) * world;
 			else
-				world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
+				world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;	
 
 			Hairs[braid][i].Pose.Position = Vector3Int(world.Translation().x, world.Translation().y, world.Translation().z);
-
-			Hairs[braid][i].hvel = Vector3Int(
-				Hairs[braid][i].Pose.Position.x - Hairs[braid][0].hvel.x,
-				Hairs[braid][i].Pose.Position.y - Hairs[braid][0].hvel.y,
-				Hairs[braid][i].Pose.Position.z - Hairs[braid][0].hvel.z
-			);
+			Hairs[braid][i].Velocity = Hairs[braid][i].Pose.Position.ToVector3() - Hairs[braid][0].Velocity;
 		}
 	}
 }

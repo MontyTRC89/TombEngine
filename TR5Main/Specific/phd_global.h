@@ -86,7 +86,7 @@ inline float Angle::RadToDeg(float radians)
 
 inline float Angle::ShrtToRad(short shortForm)
 {
-	return Normalize(shortForm * (360.0f / (USHRT_MAX + 1)) * (180.0f / M_PI));
+	return Normalize(shortForm * ((360.0f / (USHRT_MAX + 1)) * (M_PI / 180.0f)));
 }
 
 inline short Angle::DegToShrt(float degrees)
@@ -96,7 +96,7 @@ inline short Angle::DegToShrt(float degrees)
 
 inline short Angle::RadToShrt(float radians)
 {
-	return (short)((radians / (180.0f / M_PI)) * ((USHRT_MAX + 1) / 360.0f));
+	return (short)((radians / (M_PI / 180.0f)) * ((USHRT_MAX + 1) / 360.0f));
 }
 
 //-------------------------------------------------------------------------------------------------------------------

@@ -9,15 +9,14 @@ class EulerAngles;
 struct ANIM_FRAME;
 struct ITEM_INFO;
 
-struct HAIR_STRUCT
+struct HairData
 {
 	PoseData Pose;
-	Vector3Int hvel;
-	Vector3Int unknown;
+	Vector3  Velocity;
 
-	bool initialized = false;
+	bool Initialized = false;
 };
-extern HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
+extern HairData Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 void InitialiseHair();
 void HairControl(ITEM_INFO* item, bool young);

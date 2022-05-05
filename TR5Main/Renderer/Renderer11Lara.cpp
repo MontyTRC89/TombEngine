@@ -326,7 +326,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view)
 		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
-			HAIR_STRUCT* hairs = &Hairs[0][i];
+			auto* hairs = &Hairs[0][i];
 			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.GetY(), hairs->Pose.Orientation.GetX(), 0) * Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
 			matrices[i + 1] = world;
 		}

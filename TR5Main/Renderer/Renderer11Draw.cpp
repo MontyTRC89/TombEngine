@@ -298,7 +298,7 @@ namespace TEN::Renderer
 		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
-			HAIR_STRUCT* hairs = &Hairs[0][i];
+			auto* hairs = &Hairs[0][i];
 			Matrix world = Matrix::CreateFromYawPitchRoll(hairs->Pose.Orientation.GetY(), hairs->Pose.Orientation.GetX(), 0) *
 				Matrix::CreateTranslation(hairs->Pose.Position.x, hairs->Pose.Position.y, hairs->Pose.Position.z);
 			matrices[i + 1] = world;
@@ -2098,8 +2098,8 @@ namespace TEN::Renderer
 				//PrintDebugMessage("LaraItem BoxNumber: %d",/* canJump: %d, canLongJump: %d, canMonkey: %d,*/
 				//				  LaraItem->BoxNumber);
 				PrintDebugMessage("Lara Pos: %d %d %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-				PrintDebugMessage("Lara Orient Ang: %f %f %f", Angle::RadToDeg(LaraItem->Pose.Orientation.GetX()), Angle::RadToDeg(LaraItem->Pose.Orientation.GetY()), Angle::RadToDeg(LaraItem->Pose.Orientation.GetZ()));
-				PrintDebugMessage("Lara Orient Rad: %f %f %f", LaraItem->Pose.Orientation.GetX(), LaraItem->Pose.Orientation.GetY(), LaraItem->Pose.Orientation.GetZ());
+				PrintDebugMessage("Lara Orient Rad: %f %f %f", LaraItem->Pose.Orientation.GetX(),LaraItem->Pose.Orientation.GetY(), LaraItem->Pose.Orientation.GetZ());
+				PrintDebugMessage("Lara Orient Deg: %f %f %f", Angle::RadToDeg(LaraItem->Pose.Orientation.GetX()), Angle::RadToDeg(LaraItem->Pose.Orientation.GetY()), Angle::RadToDeg(LaraItem->Pose.Orientation.GetZ()));
 				//PrintDebugMessage("Lara WaterSurfaceDist: %d", Lara.WaterSurfaceDist);
 				//PrintDebugMessage("Room: %d %d %d %d", r->x, r->z, r->x + r->xSize * SECTOR(1),
 				//				  r->z + r->zSize * SECTOR(1));
