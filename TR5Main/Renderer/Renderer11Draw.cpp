@@ -163,7 +163,7 @@ namespace TEN::Renderer
 					ALPHA_TEST_THRESHOLD
 				);
 
-				m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 			}
 		}
 	}
@@ -250,8 +250,7 @@ namespace TEN::Renderer
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-				m_numDrawCalls++;
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 			}
 		}
 
@@ -269,8 +268,7 @@ namespace TEN::Renderer
 						continue;
 
 					// Draw vertices
-					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-					m_numDrawCalls++;
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 				}
 			}
 		}
@@ -285,8 +283,7 @@ namespace TEN::Renderer
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-				m_numDrawCalls++;
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 			}
 		}
 
@@ -320,8 +317,7 @@ namespace TEN::Renderer
 					continue;
 
 				// Draw vertices
-				m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-				m_numDrawCalls++;
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 			}
 		}
 	}
@@ -403,8 +399,7 @@ namespace TEN::Renderer
 						continue;
 
 					// Draw vertices
-					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-					m_numDrawCalls++;
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 				}
 			}
 		}
@@ -1509,8 +1504,7 @@ namespace TEN::Renderer
 						if (bucket->Vertices.size() == 0)
 							continue;
 
-						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-						m_numDrawCalls++;
+						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
 					}
 				}
 			}
@@ -1559,8 +1553,7 @@ namespace TEN::Renderer
 						m_stItem.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
 						m_cbItem.updateData(m_stItem, m_context.Get());
 
-						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-						m_numDrawCalls++;
+						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
 					}
 				}
 			}
@@ -1610,8 +1603,7 @@ namespace TEN::Renderer
 						if (bucket->Vertices.size() == 0)
 							continue;
 
-						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-						m_numDrawCalls++;
+						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
 					}
 				}
 			}
@@ -1661,8 +1653,7 @@ namespace TEN::Renderer
 						if (bucket->Vertices.size() == 0)
 							continue;
 
-						m_context->DrawIndexed(bucket->Indices.size(), bucket->StartIndex, 0);
-						m_numDrawCalls++;
+						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
 					}
 				}
 			}
@@ -2036,6 +2027,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
 				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
+				PrintDebugMessage("Total triangles: %d", m_numPolygons);
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
 				PrintDebugMessage("    For movables: %d", m_numMoveablesTransparentDrawCalls);
@@ -2447,9 +2439,8 @@ namespace TEN::Renderer
 			m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
 			m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			m_context->DrawIndexed(count, 0, 0);
+			DrawIndexedTriangles(count, 0, 0);
 
-			m_numDrawCalls++;
 			m_numTransparentDrawCalls++;
 			m_numRoomsTransparentDrawCalls++;
 
@@ -2500,9 +2491,8 @@ namespace TEN::Renderer
 			m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
 			m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			m_context->DrawIndexed(count, 0, 0);
+			DrawIndexedTriangles(count, 0, 0);
 
-			m_numDrawCalls++;
 			m_numTransparentDrawCalls++;
 			m_numStaticsTransparentDrawCalls++;
 
@@ -2585,6 +2575,7 @@ namespace TEN::Renderer
 		m_numStaticsTransparentDrawCalls = 0;
 		m_numSpritesTransparentDrawCalls = 0;
 		m_biggestRoomIndexBuffer = 0;
+		m_numPolygons = 0;
 
 		m_transparentFaces.clear();
 
@@ -2945,9 +2936,8 @@ namespace TEN::Renderer
 			m_transparentFacesIndexBuffer.Update(m_context.Get(), m_transparentFacesIndices, drawnVertices, count);
 			m_context->IASetIndexBuffer(m_transparentFacesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			m_context->DrawIndexed(count, 0, 0);
+			DrawIndexedTriangles(count, 0, 0);
 
-			m_numDrawCalls++;
 			m_numTransparentDrawCalls++;
 			m_numStaticsTransparentDrawCalls++;
 
@@ -3119,8 +3109,7 @@ namespace TEN::Renderer
 								BindTexture(TEXTURE_NORMAL_MAP,
 								            &std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
 
-								m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-								m_numDrawCalls++;
+								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 							}
 						}
 					}
@@ -3298,8 +3287,7 @@ namespace TEN::Renderer
 								            &std::get<1>(m_roomTextures[bucket.Texture]), SAMPLER_NONE);
 							}
 
-							m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-							m_numDrawCalls++;
+							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 						}
 					}
 				}
@@ -3446,8 +3434,7 @@ namespace TEN::Renderer
 					SetBlendMode(bucket.BlendMode);
 
 					// Draw vertices
-					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-					m_numDrawCalls++;
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 				}
 			}
 		}
@@ -3530,8 +3517,7 @@ namespace TEN::Renderer
 						SetAlphaTest(ALPHA_TEST_LESS_THAN, FAST_ALPHA_BLEND_THRESHOLD);
 					}
 
-					m_context->DrawIndexed(bucket.NumIndices, bucket.StartIndex, 0);
-					m_numDrawCalls++;
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 				}
 			}
 		}
