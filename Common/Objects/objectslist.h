@@ -65,7 +65,6 @@ enum GAME_OBJECT_ID : short
 	ID_RUBBER_BOAT,									// TR3 / (TR4 TRNG)
 	ID_BIGGUN_ANIMS,
 	ID_BIGGUN,										// TR3
-	
 
 	ID_VEHICLE_SMASHABLE_FLOOR = 90, // NEW
 	ID_VEHICLE_SMASHABLE_WALL, // NEW
@@ -275,13 +274,13 @@ enum GAME_OBJECT_ID : short
 	ID_GAME_PIECE2,				// TR4 - OK
 	ID_GAME_PIECE3,				// TR4 - OK
 	ID_RAISING_COG,
-	ID_MINE,					// TR4 - TESTING	
-	ID_SCALES,					// TR4 - OK			
+	ID_MINE,					// TR4 - TESTING
+	ID_SCALES,					// TR4 - OK
 	ID_ROME_HAMMER,
-	ID_FLAME,					// TR4 - OK	
-	ID_FLAME_EMITTER,			// TR4 - OK	
-	ID_FLAME_EMITTER2,			// TR4 - OK	
-	ID_FLAME_EMITTER3,			// TR4 - OK	
+	ID_FLAME,					// TR4 - OK
+	ID_FLAME_EMITTER,			// TR4 - OK
+	ID_FLAME_EMITTER2,			// TR4 - OK
+	ID_FLAME_EMITTER3,			// TR4 - OK
 	ID_BURNING_ROOTS,
 	ID_ROPE,					// TR4 - OK but needs rendering
 	ID_FIREROPE,
@@ -289,8 +288,8 @@ enum GAME_OBJECT_ID : short
 	ID_ELECTRICAL_CABLES,       // TR5 - OK
 	ID_BURNING_FLOOR,
 	ID_DARTS,					// TR4 - OK	but needs rendering
-	ID_DART_EMITTER,			// TR4 - OK	
-	ID_HOMING_DART_EMITTER,		// TR4 - OK	
+	ID_DART_EMITTER,			// TR4 - OK
+	ID_HOMING_DART_EMITTER,		// TR4 - OK
 	ID_FALLING_CEILING,
 	ID_FALLING_BLOCK,			// TR5 - OK
 	ID_FALLING_BLOCK2,
@@ -300,7 +299,7 @@ enum GAME_OBJECT_ID : short
 	ID_TRAPDOOR3,				// No floor/ceiling portal blockage applied
 	ID_FLOOR_TRAPDOOR1,			// No floor/ceiling portal blockage applied
 	ID_FLOOR_TRAPDOOR2,			// No floor/ceiling portal blockage applied
-	ID_CEILING_TRAPDOOR1,		// No floor/ceiling portal blockage applied	
+	ID_CEILING_TRAPDOOR1,		// No floor/ceiling portal blockage applied
 	ID_CEILING_TRAPDOOR2,		// No floor/ceiling portal blockage applied
 	ID_SCALING_TRAPDOOR,		// No floor/ceiling portal blockage applied
 	ID_ROLLINGBALL,				// TR4 - OK
@@ -351,7 +350,7 @@ enum GAME_OBJECT_ID : short
 	ID_SQUISHY_BLOCK2,
 	ID_TRIPWIRE,
 	ID_MINE_DETECTOR,
-	ID_MAP, 
+	ID_MAP,
 	ID_SECRET_MAP,
 	ID_SETH_DOOR,
 	ID_HORUS_STATUE,
@@ -755,7 +754,7 @@ enum GAME_OBJECT_ID : short
 	ID_LOCUST_EMITTER,
 	ID_EARTHQUAKE,
 	ID_BUBBLES,						// TR4 - OK
-	ID_WATERFALLMIST,			
+	ID_WATERFALLMIST,
 	ID_GUNSHELL,					// OK
 	ID_SHOTGUNSHELL,				// OK
 	ID_GUN_FLASH,					// OK
@@ -1016,47 +1015,47 @@ template <typename T, typename Enum> constexpr bool same_or_underlying = std::is
 // += operator that only allows addition of shorts or GAME_OBJECT_IDs. This is to
 // allow us to see and manually review any places where we're adding something that
 // might be the wrong type.
-template <typename T> std::enable_if_t<same_or_underlying<T, GAME_OBJECT_ID>, GAME_OBJECT_ID> & operator+=(GAME_OBJECT_ID & lhs, T const & rhs)
+template <typename T> std::enable_if_t<same_or_underlying<T, GAME_OBJECT_ID>, GAME_OBJECT_ID>& operator+=(GAME_OBJECT_ID& lhs, T const& rhs)
 {
 	lhs = GAME_OBJECT_ID{ lhs + GAME_OBJECT_ID{ rhs } };
 	return lhs;
 }
 
 template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<GAME_OBJECT_ID>>, GAME_OBJECT_ID>
-	from_underlying (T rhs)
-{
-	return GAME_OBJECT_ID{ rhs };
-}
+	from_underlying(T rhs)
+	{
+		return GAME_OBJECT_ID{ rhs };
+	}
 
-enum SPRITE_TYPES
-{
-	SPR_FIRE0,
-	SPR_FIRE1,
-	SPR_FIRE2,
-	SPR_FIRE3,
-	SPR_SPLASH1,
-	SPR_SPLASH2,
-	SPR_SPLASH3,
-	SPR_SPLASH4,
-	SPR_SPLASH,
-	SPR_RIPPLES,
-	SPR_LENSFLARE,
-	SPR_LENSFLARE_LIGHT,
-	SPR_BULLETIMPACT,
-	SPR_BUBBLES,
-	SPR_UNDERWATERDUST,
-	SPR_BLOOD,
-	SPR_EMPTY1,
-	SPR_UNKNOWN1,
-	SPR_EMPTY2,
-	SPR_BACKGROUND,
-	SPR_GUI_UPLEFT,
-	SPR_GUI_UPRIGHT,
-	SPR_GUI_DOWNLEFT,
-	SPR_GUI_DOWNRIGHT,
-	SPR_GUI_DOWN,
-	SPR_GUI_UP,
-	SPR_GUI_LEFT,
-	SPR_GUI_RIGHT,
-	SPR_LIGHTHING
-};
+	enum SPRITE_TYPES
+	{
+		SPR_FIRE0,
+		SPR_FIRE1,
+		SPR_FIRE2,
+		SPR_FIRE3,
+		SPR_SPLASH1,
+		SPR_SPLASH2,
+		SPR_SPLASH3,
+		SPR_SPLASH4,
+		SPR_SPLASH,
+		SPR_RIPPLES,
+		SPR_LENSFLARE,
+		SPR_LENSFLARE_LIGHT,
+		SPR_BULLETIMPACT,
+		SPR_BUBBLES,
+		SPR_UNDERWATERDUST,
+		SPR_BLOOD,
+		SPR_EMPTY1,
+		SPR_UNKNOWN1,
+		SPR_EMPTY2,
+		SPR_BACKGROUND,
+		SPR_GUI_UPLEFT,
+		SPR_GUI_UPRIGHT,
+		SPR_GUI_DOWNLEFT,
+		SPR_GUI_DOWNRIGHT,
+		SPR_GUI_DOWN,
+		SPR_GUI_UP,
+		SPR_GUI_LEFT,
+		SPR_GUI_RIGHT,
+		SPR_LIGHTHING
+	};
