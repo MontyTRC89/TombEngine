@@ -208,7 +208,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
-    <ClInclude Include="Scripting\GameScriptFog.h" />
     <ClInclude Include="Specific\fast_vector.h" />
     <ClInclude Include="Specific\phd_global.h" />
     <ClInclude Include="Game\memory\qmalloc.h" />
@@ -591,8 +590,6 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Specific\phd_global.cpp" />
-    <ClCompile Include="Scripting\GameScriptFog.cpp" />
-    <ClCompile Include="Scripting\GameScriptAnimations.cpp" />
     <ClCompile Include="Specific\Angles.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
