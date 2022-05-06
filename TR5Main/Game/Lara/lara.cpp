@@ -844,6 +844,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.TurnRate = 0;
 	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + lara->Control.TurnRate);
 
+	auto level = g_GameFlow->GetLevel(CurrentLevel);
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 

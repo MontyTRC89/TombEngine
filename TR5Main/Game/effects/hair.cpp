@@ -46,7 +46,7 @@ void HairControl(ItemInfo* item, bool young)
 		HairControl(item, 1, 0);
 }
 
-void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
+void HairControl(ItemInfo* item, int braid, ANIM_FRAME* framePtr)
 {
 	auto* lara = GetLaraInfo(item);
 	auto* object = &Objects[ID_LARA];
@@ -205,7 +205,7 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 		{
 			Hairs[braid][0].Velocity = Hairs[braid][i].Pose.Position.ToVector3();
 
-			FLOOR_INFO* floor = GetFloor(Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z, &roomNumber);
+			FloorInfo* floor = GetFloor(Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z, &roomNumber);
 			int height = GetFloorHeight(floor, Hairs[braid][i].Pose.Position.x, Hairs[braid][i].Pose.Position.y, Hairs[braid][i].Pose.Position.z);
 
 			Hairs[braid][i].Pose.Position.x += Hairs[braid][i].Velocity.x * 3 / 4;

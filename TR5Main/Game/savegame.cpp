@@ -1075,7 +1075,7 @@ bool SaveGame::Load(int slot)
 			Lara.ItemNumber = i;
 			LaraItem = item;
 			LaraItem->Location.roomNumber = roomNumber;
-			LaraItem->Location.yNumber = item->Pose.Orientation.y;
+			LaraItem->Location.yNumber = item->Pose.Orientation.GetY();
 			LaraItem->Data = &Lara;
 
 			UpdateItemRoom(item, -LARA_HEIGHT / 2);

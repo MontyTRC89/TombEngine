@@ -315,7 +315,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	if (ladder)
 		SnapItemToGrid(item, coll); // HACK: until fragile ladder code is refactored, we must exactly snap to grid.
 	else
-		SnapItemToLedge(item, coll, 0.2f);
+		SnapItemToLedge(item, coll, 0.2f, true);
 
 	item->Animation.Airborne = true;
 	item->Animation.Velocity = 2;
@@ -705,7 +705,7 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 
 		// Snap to nearest ledge, if any.
 		item->Pose = pos[i];
-		SnapItemToLedge(item, coll, item->Pose.Orientation.GetY());
+		SnapItemToLedge(item, coll, item->Pose.Orientation.GetY(), true);
 
 		// Copy resulting position to an array and restore original item position.
 		pos[i] = item->Pose;
@@ -979,7 +979,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
-	SnapItemToLedge(item, coll, 1.7f);
+	SnapItemToLedge(item, coll, 1.7f, true);
 
 	item->Pose.Position.y += frontFloor - 5;
 	item->Animation.ActiveState = LS_ONWATER_EXIT;

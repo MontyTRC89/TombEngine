@@ -219,8 +219,8 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 							if (collidingItem->Pose.Position.y + radius + 128 >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
 								collidingItem->Pose.Position.y - radius - 128 <= item->Pose.Position.y + framePtr->boundingBox.Y2)
 							{
-								float s = phd_sin(item->Pose.Orientation.y);
-								float c = phd_cos(item->Pose.Orientation.y);
+								float s = sin(item->Pose.Orientation.GetY());
+								float c = cos(item->Pose.Orientation.GetY());
 
 								int rx = dx * c - s * dz;
 								int rz = dz * c + s * dx;

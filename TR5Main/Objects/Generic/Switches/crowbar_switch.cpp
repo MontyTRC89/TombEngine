@@ -38,7 +38,7 @@ namespace TEN::Entities::Switches
 		Angle::DegToRad(-10.0f), Angle::DegToRad(10.0f)
 	};
 
-	void CrowbarSwitchCollision(short itemNumber, ITEM_INFO* laraItem, CollisionInfo* coll)
+	void CrowbarSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		ItemInfo* switchItem = &g_Level.Items[itemNumber];
