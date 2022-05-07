@@ -342,8 +342,6 @@ void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 	auto* lara = GetLaraInfo(laraItem);
 
 	EulerAngles targetOrient = EulerAngles::Zero;
-
-	// Have target lock; get x and y angles for arms.
 	if (arm->Locked)
 		targetOrient = lara->TargetArmOrient;
 
@@ -1018,7 +1016,9 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 					angles.GetY() > weaponInfo->LeftAngles[1] ||
 					angles.GetX() < weaponInfo->LeftAngles[2] ||
 					angles.GetX() > weaponInfo->LeftAngles[3])
+				{
 					lara->LeftArm.Locked = false;
+				}
 			}
 
 			if (lara->RightArm.Locked)
@@ -1039,11 +1039,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		lara->RightArm.Locked = false;
 	}
 
-	lara->TargetArmOrient.Set(
-		angles.GetX(),
-		angles.GetY(),
-		0.0f
-	);
+	lara->TargetArmOrient = angles;
 }
 
 void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
@@ -1066,7 +1062,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		laraItem->RoomNumber
 	);
 
-	ItemInfo* bestItem = NULL;
+	ItemInfo* bestItem = nullptr;
 	float bestYrot = FLT_MAX;
 	int bestDistance = MAXINT;
 	int maxDistance = weaponInfo->TargetDist;
@@ -1120,15 +1116,15 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		}
 	}
 
-	TargetList[targets] = NULL;
+	TargetList[targets] = nullptr;
 	if (!TargetList[0])
-		lara->TargetEntity = NULL;
+		lara->TargetEntity = nullptr;
 	else
 	{
 		for (int slot = 0; slot < MAX_TARGETS; ++slot)
 		{
 			if (!TargetList[slot])
-				lara->TargetEntity = NULL;
+				lara->TargetEntity = nullptr;
 
 			if (TargetList[slot] == lara->TargetEntity)
 				break;
@@ -1139,11 +1135,11 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 			if (!lara->TargetEntity)
 			{
 				lara->TargetEntity = bestItem;
-				LastTargets[0] = NULL;
+				LastTargets[0] = nullptr;
 			}
 			else if (TrInput & IN_LOOKSWITCH)
 			{
-				lara->TargetEntity = NULL;
+				lara->TargetEntity = nullptr;
 				bool flag = true;
 
 				for (int match = 0; match < MAX_TARGETS && TargetList[match]; ++match)
@@ -1171,7 +1167,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 				if (flag)
 				{
 					lara->TargetEntity = bestItem;
-					LastTargets[0] = NULL;
+					LastTargets[0] = nullptr;
 				}
 			}
 		}

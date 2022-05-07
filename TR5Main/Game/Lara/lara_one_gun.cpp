@@ -290,12 +290,11 @@ void FireShotgun(ItemInfo* laraItem)
 		);
 	}
 
-	EulerAngles wobbleArmOrient;
 	float value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? Angle::DegToRad(10.0f) : Angle::DegToRad(30.0f));
 	bool fired = false;
 	for (int i = 0; i < 6; i++)
 	{
-		wobbleArmOrient.Set(
+		auto wobbleArmOrient = EulerAngles(
 			armOrient.GetX() + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
 			armOrient.GetY() + value * Angle::ShrtToRad(GetRandomControl() - Angle::DegToShrt(90.0f)) / Angle::DegToRad(360.0f),
 			0.0f
@@ -1400,7 +1399,6 @@ void FireCrossbow(ItemInfo* laraItem, PoseData* pos)
 			InitialiseItem(itemNumber);
 
 			item->Pose.Orientation = lara->LeftArm.Orientation + laraItem->Pose.Orientation;
-			item->Pose.Orientation.SetZ();
 
 			if (!lara->LeftArm.Locked)
 				item->Pose.Orientation += lara->ExtraTorsoRot;

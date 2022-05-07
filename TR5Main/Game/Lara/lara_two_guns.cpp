@@ -48,7 +48,6 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		if (SmokeCountL)
 		{
 			Vector3Int pos;
-
 			switch (SmokeWeapon)
 			{
 			case LaraWeaponType::Pistol:
@@ -452,7 +451,7 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		lara->Control.HandStatus = HandStatus::Free;
 		lara->LeftArm.FrameNumber = 0;
 		lara->RightArm.FrameNumber = 0;
-		lara->TargetEntity = NULL;
+		lara->TargetEntity = nullptr;
 		lara->RightArm.Locked = false;
 		lara->LeftArm.Locked = false;
 	}

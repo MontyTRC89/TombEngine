@@ -171,16 +171,11 @@ static short TriggerFlameThrower(ItemInfo* item, BITE_INFO* bite, int speed)
 		auto pos2 = Vector3Int(bite->x, bite->y / 2, bite->z);
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
-		float angles[2];
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+		auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
 
-		fx->pos.Position.x = pos1.x;
-		fx->pos.Position.y = pos1.y;
-		fx->pos.Position.z = pos1.z;
-
+		fx->pos.Position = pos1;
+		fx->pos.Orientation = angles;
 		fx->roomNumber = item->RoomNumber;
-
-		fx->pos.Orientation.Set(angles[1], angles[0], 0.0f);
 		fx->speed = speed * 4;
 		fx->counter = 20;
 		fx->flag1 = 0;

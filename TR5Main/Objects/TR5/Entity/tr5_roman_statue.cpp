@@ -721,18 +721,14 @@ void RomanStatueControl(short itemNumber)
 
 			if (deltaFrame == 34)
 			{
-				pos1 = { -48, 48, SECTOR(1) };
+				pos1 = Vector3Int(-48, 48, SECTOR(1));
 				GetJointAbsPosition(item, &pos1, 14);
 
-				pos2 = { -48, 48, 450 };
+				pos2 = Vector3Int(-48, 48, 450);
 				GetJointAbsPosition(item, &pos2, 14);
 
-				float angles[2];
-				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
-
-				PoseData attackPose;
-				attackPose.Position = pos2;
-				attackPose.Orientation.Set(angles[1], angles[0], 0.0f);
+				auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
+				auto attackPose = PoseData(pos2, angles);
 
 				short roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);

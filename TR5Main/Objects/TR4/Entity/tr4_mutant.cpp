@@ -159,11 +159,9 @@ namespace TEN::Entities::TR4
 		auto end = Vector3Int(0, -128, 288);
 		GetJointAbsPosition(item, &end, 9);
 
-		float angles[2];
-		phd_GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z, angles);
-
+		auto angles = GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z);
 		target->Position = end;
-		target->Orientation.Set(angles[1], angles[0], 0.0f);
+		target->Orientation = angles;
 	}
 
 	static void MoveItemFront(ItemInfo* item, int distance)

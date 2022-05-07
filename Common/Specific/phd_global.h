@@ -216,9 +216,7 @@ inline void EulerAngles::SetZ(float angle = 0.0f)
 
 inline void EulerAngles::Normalize()
 {
-	this->SetX(this->GetX());
-	this->SetY(this->GetY());
-	this->SetZ(this->GetZ());
+	this->Set(this->GetX(), this->GetY(), this->GetZ());
 }
 
 inline EulerAngles EulerAngles::Normalize(EulerAngles orient)
@@ -318,41 +316,51 @@ inline EulerAngles EulerAngles::operator /(float value)
 
 inline EulerAngles& EulerAngles::operator +=(EulerAngles orient)
 {
-	this->SetX(this->GetX() + orient.GetX());
-	this->SetY(this->GetY() + orient.GetY());
-	this->SetZ(this->GetZ() + orient.GetZ());
+	this->Set(
+		this->GetX() + orient.GetX(),
+		this->GetY() + orient.GetY(),
+		this->GetZ() + orient.GetZ()
+	);
 	return *this;
 }
 
 inline EulerAngles& EulerAngles::operator -=(EulerAngles orient)
 {
-	this->SetX(this->GetX() - orient.GetX());
-	this->SetY(this->GetY() - orient.GetY());
-	this->SetZ(this->GetZ() - orient.GetZ());
+	this->Set(
+		this->GetX() - orient.GetX(),
+		this->GetY() - orient.GetY(),
+		this->GetZ() - orient.GetZ()
+	);
 	return *this;
 }
 
 inline EulerAngles& EulerAngles::operator *=(EulerAngles orient)
 {
-	this->SetX(this->GetX() * orient.GetX());
-	this->SetY(this->GetY() * orient.GetY());
-	this->SetZ(this->GetZ() * orient.GetZ());
+	this->Set(
+		this->GetX() * orient.GetX(),
+		this->GetY() * orient.GetY(),
+		this->GetZ() * orient.GetZ()
+	);
 	return *this;
 }
 
 inline EulerAngles& EulerAngles::operator *=(float value)
 {
-	this->SetX(this->GetX() * value);
-	this->SetY(this->GetY() * value);
-	this->SetZ(this->GetZ() * value);
+	this->Set(
+		this->GetX() * value,
+		this->GetY() * value,
+		this->GetZ() * value
+	);
 	return *this;
 }
 
 inline EulerAngles& EulerAngles::operator /=(float value)
 {
-	this->SetX(this->GetX() / value);
-	this->SetY(this->GetY() / value);
-	this->SetZ(this->GetZ() / value);
+	this->Set(
+		this->GetX() / value,
+		this->GetY() / value,
+		this->GetZ() / value
+	);
 	return *this;
 }
 

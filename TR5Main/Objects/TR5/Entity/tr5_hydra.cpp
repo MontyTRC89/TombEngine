@@ -217,7 +217,6 @@ void HydraControl(short itemNumber)
 		joint0 = -joint1;
 
 		int distance, damage, frame;
-		float angles[2];
 		short roomNumber;
 
 		switch (item->Animation.ActiveState)
@@ -329,14 +328,13 @@ void HydraControl(short itemNumber)
 				auto pos2 = Vector3Int(0, 144, 40);
 				GetJointAbsPosition(item, &pos2, 10);
 
-				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
-
-				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
+				auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
+				auto pose = PoseData(pos1, angles);
 				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
 				// TEST: uncomment this for making HYDRA not firing bubbles
-				HydraBubblesAttack(&pos, roomNumber, 1);
+				HydraBubblesAttack(&pose, roomNumber, 1);
 			}
 
 			break;

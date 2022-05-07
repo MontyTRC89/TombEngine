@@ -301,39 +301,27 @@ static void TribesmanShotDart(ItemInfo* item)
 		dartItem->ObjectNumber = ID_DARTS;
 		dartItem->RoomNumber = item->RoomNumber;
 
-		auto pos1 = Vector3Int(
-			TribesmanDartBite2.x,
-			TribesmanDartBite2.y,
-			TribesmanDartBite2.z
-		);
+		auto pos1 = Vector3Int(TribesmanDartBite2.x, TribesmanDartBite2.y, TribesmanDartBite2.z);
 		GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
 
-		auto pos2 = Vector3Int(
-			TribesmanDartBite2.x,
-			TribesmanDartBite2.y,
-			TribesmanDartBite2.z
-		);
+		auto pos2 = pos1;
+		pos2.z *= 2;
 		GetJointAbsPosition(item, &pos2, TribesmanDartBite2.meshNum);
 
-		float angles[2];
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+		auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
 
 		dartItem->Pose.Position = pos1;
 
 		InitialiseItem(dartItemNumber);
 
-		dartItem->Pose.Orientation.SetX(angles[1]);
-		dartItem->Pose.Orientation.SetY(angles[0]);
+		dartItem->Pose.Orientation = angles;
 		dartItem->Animation.Velocity = CLICK(1);
 
 		AddActiveItem(dartItemNumber);
 
 		dartItem->Status = ITEM_ACTIVE;
 
-		pos1.x = TribesmanDartBite2.x;
-		pos1.y = TribesmanDartBite2.y;
-		pos1.z = TribesmanDartBite2.z + 96;
-
+		pos1 = Vector3Int(TribesmanDartBite2.x, TribesmanDartBite2.y, TribesmanDartBite2.z +96);
 		GetJointAbsPosition(item, &pos1, TribesmanDartBite2.meshNum);
 		
 		TriggerDartSmoke(pos1.x, pos1.y, pos1.z, 0, 0, 1);

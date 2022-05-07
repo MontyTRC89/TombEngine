@@ -1065,7 +1065,6 @@ struct ArmInfo
 	int FrameBase;
 	EulerAngles Orientation;
 	bool Locked;
-
 	short FlashGun;
 };
 

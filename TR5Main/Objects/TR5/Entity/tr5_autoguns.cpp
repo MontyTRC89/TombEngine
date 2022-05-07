@@ -70,27 +70,25 @@ void AutoGunsControl(short itemNumber)
 
 			pos1.roomNumber = item->RoomNumber;
 
-			float angles[2];
-
-			bool los = LOS(&pos1, &pos2);
+			int los = LOS(&pos1, &pos2);
+			EulerAngles angles;
 
 			// FIXME:
 			if (los)
 			{
-				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-				angles[0] -= item->Pose.Orientation.GetY();
+				angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+				angles.SetY(angles.GetY() - item->Pose.Orientation.GetY());
 			}
 			else
 			{
-				angles[0] = item->ItemFlags[0];
-				angles[1] = item->ItemFlags[1];
+				angles.SetX(item->ItemFlags[1]);
+				angles.SetY(item->ItemFlags[0]);
 			}
 
-			float angle1, angle2;
-
-			// TODO: Short to float
-			//InterpolateAngle(angles[0], item->ItemFlags, &angle1, 4);
-			//InterpolateAngle(angles[1], &item->ItemFlags[1], &angle2, 4);
+			// TODO: Short to float conversion
+			short angle1, angle2;
+			InterpolateAngle(angles.GetX(), &item->ItemFlags[1], &angle2, 4);
+			InterpolateAngle(angles.GetY(), item->ItemFlags, &angle1, 4);
 
 			data[0] = item->ItemFlags[0];
 			data[1] = item->ItemFlags[1];
@@ -108,9 +106,7 @@ void AutoGunsControl(short itemNumber)
 
 					if (GetRandomControl() & 3)
 					{
-						pos2.x = 0;
-						pos2.y = 0;
-						pos2.z = 0;
+						auto pos2 = Vector3Int();
 						GetLaraJointPosition((Vector3Int*)& pos2, GetRandomControl() % 15);
 
 						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
@@ -149,9 +145,7 @@ void AutoGunsControl(short itemNumber)
 					}
 				}
 				else
-				{
 					item->MeshBits &= ~0x100;
-				}
 
 				if (item->ItemFlags[2] < 1024)
 					item->ItemFlags[2] += 64;

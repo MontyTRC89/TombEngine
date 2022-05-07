@@ -77,15 +77,14 @@ static void ImpThrowStones(ItemInfo* item)
 	int dy = pos1.y - pos2.y;
 	int dz = pos1.z - pos2.z;
 
-	float angles[2];
-	phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+	auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
 	
 	int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
 	if (distance < 8)
 		distance = 8;
 
-	angles[0] += GetRandomControl() % (distance / 4) - (distance / 8);
-	angles[1] += GetRandomControl() % (distance / 2) - (distance / 4);
+	angles.SetX(angles.GetX() + GetRandomControl() % (distance / 2) - (distance / 4));
+	angles.SetY(angles.GetY() + GetRandomControl() % (distance / 4) - (distance / 8));
 	
 	short fxNumber = CreateNewEffect(item->RoomNumber);
 	if (fxNumber != NO_ITEM)
@@ -93,7 +92,7 @@ static void ImpThrowStones(ItemInfo* item)
 		auto* fx = &EffectList[fxNumber];
 
 		fx->pos.Position = pos1;
-		fx->pos.Orientation.Set((angles[1] + distance) / 2, angles[0], 0.0f);
+		fx->pos.Orientation.Set((angles.GetX() + distance) / 2, angles.GetY(), 0.0f);
 		fx->roomNumber = item->RoomNumber;
 		fx->speed = 4 * sqrt(distance);
 

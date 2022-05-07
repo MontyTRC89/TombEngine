@@ -148,15 +148,12 @@ namespace TEN::Entities::TR4
 				auto pos2 = Vector3Int(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				float angles[2];
-				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
-
+				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+				auto pose = PoseData(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
-					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
-					TriggerDemigodMissile(&pos, item->RoomNumber, 5);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 5);
 			}
 		}
 		else if (animIndex == 19)
@@ -170,15 +167,12 @@ namespace TEN::Entities::TR4
 				auto pos2 = Vector3Int(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				float angles[2];
-				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
-
+				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+				auto pose = PoseData(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
-					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
-					TriggerDemigodMissile(&pos, item->RoomNumber, 5);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 5);
 			}
 		}
 		else if (animIndex == 16)
@@ -202,12 +196,10 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos2, 17);
 				}
 
-				float angles[2];
-				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				auto pos = PoseData(pos1.x, pos1.y, pos1.z, angles[1], angles[0], 0);
-
-				TriggerDemigodMissile(&pos, item->RoomNumber, 4);
+				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+				auto pose = PoseData(pos1, angles);
+				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}
 		}
 	}

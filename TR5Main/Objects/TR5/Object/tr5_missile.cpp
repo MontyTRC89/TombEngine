@@ -37,12 +37,10 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		float angles[2];
-		phd_GetVectorAngles(
+		auto angles = GetVectorAngles(
 			LaraItem->Pose.Position.x - fx->pos.Position.x,
 			LaraItem->Pose.Position.y - fx->pos.Position.y - CLICK(1),
-			LaraItem->Pose.Position.z - fx->pos.Position.z,
-			angles);
+			LaraItem->Pose.Position.z - fx->pos.Position.z);
 
 		int dh;
 		if (fx->flag1)
@@ -51,6 +49,7 @@ void MissileControl(short itemNumber)
 		{
 			if (fx->counter)
 				fx->counter--;
+
 			dh = 256;
 		}
 
@@ -59,12 +58,12 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 0 || fx->flag1 == 1)
 				fx->speed++;
 
-			int dy = angles[0] - fx->pos.Orientation.GetY();
+			float dy = Angle::Normalize(angles.GetY() - fx->pos.Orientation.GetY());
 			if (abs(dy) > Angle::DegToRad(180.0f))
 				dy = -dy;
 			dy /= 8;
 
-			int dx = angles[1] - fx->pos.Orientation.GetX();
+			float dx = Angle::Normalize(angles.GetX() - fx->pos.Orientation.GetX());
 			if (abs(dx) > Angle::DegToRad(180.0f))
 				dx = -dx;
 			dx /= 8;

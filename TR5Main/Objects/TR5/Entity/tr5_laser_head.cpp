@@ -379,9 +379,8 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			float angles[2];
-			float outAngle;
-			phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
+			// TODO: Short to float conversion
+			auto angles = GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z);
 			//InterpolateAngle(angles[0], &item->Pose.Orientation.GetY(), &LaserHeadData.yRot, LaserHeadData.byte1);
 			//InterpolateAngle(angles[1] + 3328, &item->Pose.Orientation.GetX(), &LaserHeadData.xRot, LaserHeadData.byte1);
 
@@ -460,9 +459,9 @@ void LaserHeadControl(short itemNumber)
 								src.z = 0;
 								GetJointAbsPosition(item, (Vector3Int*)& src, GuardianMeshes[i]);
 
-								int c = 8192 * cos(angles[1]);
+								int c = 8192 * cos(angles.GetX());
 								dest.x = src.x + c * sin(item->Pose.Orientation.GetY());
-								dest.y = src.y + 8192 * sin(-angles[1]);
+								dest.y = src.y + 8192 * sin(-angles.GetX());
 								dest.z = src.z + c * cos(item->Pose.Orientation.GetY());
 
 								if (item->ItemFlags[3] != 90 &&
