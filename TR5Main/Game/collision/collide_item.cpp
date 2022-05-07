@@ -593,7 +593,7 @@ bool Move3DPosTo3DPos(PoseData* src, PoseData* dest, int velocity, float angleAd
 	else
 		src->Orientation.SetZ(dest->Orientation.GetZ());
 
-	return (src == dest);
+	return (src->Position == dest->Position && src->Orientation == dest->Orientation);
 }
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
