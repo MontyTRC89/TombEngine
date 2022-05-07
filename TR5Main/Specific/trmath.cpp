@@ -87,6 +87,21 @@ void phd_GetVectorAngles(int x, int y, int z, short* angles)
 	angles[1] = FROM_RAD(-atan2(y, vector.z));
 }
 
+Vector3Shrt GetVectorAngles(int x, int y, int z)
+{
+	const float angle = atan2(x, z);
+
+	auto vector = Vector3(x, y, z);
+	const auto matrix = Matrix::CreateRotationY(-angle);
+	Vector3::Transform(vector, matrix, vector);
+
+	return Vector3Shrt(
+		FROM_RAD(-atan2(y, vector.z)),
+		FROM_RAD(angle),
+		0
+	);
+}
+
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
 	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));

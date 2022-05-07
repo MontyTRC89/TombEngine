@@ -397,11 +397,11 @@ void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)
 
 	if (TrInput & SKIDOO_IN_FIRE && !skidooItem->ItemFlags[0])
 	{
-		short angles[] =
-		{
-			lara->RightArm.Rotation.y + laraItem->Pose.Orientation.y,
-			lara->RightArm.Rotation.x
-		};
+		auto angles = Vector3Shrt(
+			lara->RightArm.Orientation.x,
+			lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
+			0
+		);
 		
 		if ((int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles) +
 			(int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles))

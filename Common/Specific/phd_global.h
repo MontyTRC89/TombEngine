@@ -281,6 +281,18 @@ struct PHD_3DPOS
 		this->Orientation = orient;
 	}
 
+	PHD_3DPOS(Vector3Int pos, short xOrient, short yOrient, short zOrient)
+	{
+		this->Position = pos;
+		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
+	}
+
+	PHD_3DPOS(int xPos, int yPos, int zPos, Vector3Shrt orient)
+	{
+		this->Position = Vector3Int(xPos, yPos, zPos);
+		this->Orientation = orient;
+	}
+
 	PHD_3DPOS(int xPos, int yPos, int zPos, short xOrient, short yOrient, short zOrient)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
