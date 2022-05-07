@@ -260,8 +260,8 @@ void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Rotation = Vector3Shrt();
-	lara->RightArm.Rotation = Vector3Shrt();
+	lara->LeftArm.Orientation = Vector3Shrt();
+	lara->RightArm.Orientation = Vector3Shrt();
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;
@@ -275,26 +275,32 @@ void FireShotgun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	short angles[2];
-	angles[1] = lara->LeftArm.Rotation.x;
-	angles[0] = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
+	auto armOrient = Vector3Shrt(
+		lara->LeftArm.Orientation.x,
+		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
+		0
+	);
 
 	if (!lara->LeftArm.Locked)
 	{
-		angles[0] = lara->ExtraTorsoRot.y + lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
-		angles[1] = lara->ExtraTorsoRot.x + lara->LeftArm.Rotation.x;
+		armOrient = Vector3Shrt(
+			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
+			lara->ExtraTorsoRot.y + lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
+			0
+		);
 	}
 
-	short loopAngles[2];
-	bool fired = false;
 	int value = (lara->Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo1 ? 1820 : 5460);
-
+	bool fired = false;
 	for (int i = 0; i < 6; i++)
 	{
-		loopAngles[0] = angles[0] + value * (GetRandomControl() - 0x4000) / 0x10000;
-		loopAngles[1] = angles[1] + value * (GetRandomControl() - 0x4000) / 0x10000;
+		auto wobbleArmOrient = Vector3Shrt(
+			armOrient.x + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			armOrient.y + value * (GetRandomControl() - ANGLE(90.0f)) / 65536,
+			0
+		);
 
-		if (FireWeapon(LaraWeaponType::Shotgun, lara->TargetEntity, laraItem, loopAngles) != FireWeaponType::NoAmmo)
+		if (FireWeapon(LaraWeaponType::Shotgun, lara->TargetEntity, laraItem, wobbleArmOrient) != FireWeaponType::NoAmmo)
 			fired = true;
 	}
 
@@ -449,11 +455,7 @@ void FireHarpoon(ItemInfo* laraItem)
 
 		int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 		if (floorHeight >= jointPos.y)
-		{
-			item->Pose.Position.x = jointPos.x;
-			item->Pose.Position.y = jointPos.y;
-			item->Pose.Position.z = jointPos.z;
-		}
+			item->Pose.Position = jointPos;
 		else
 		{
 			item->Pose.Position.x = laraItem->Pose.Position.x;
@@ -464,8 +466,8 @@ void FireHarpoon(ItemInfo* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Pose.Orientation.x = lara->LeftArm.Rotation.x + laraItem->Pose.Orientation.x;
-		item->Pose.Orientation.y = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
+		item->Pose.Orientation.x = lara->LeftArm.Orientation.x + laraItem->Pose.Orientation.x;
+		item->Pose.Orientation.y = lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y;
 		item->Pose.Orientation.z = 0;
 
 		if (!lara->LeftArm.Locked)
@@ -491,9 +493,7 @@ void HarpoonBoltControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
-	int oldX = item->Pose.Position.x;
-	int oldY = item->Pose.Position.y;
-	int oldZ = item->Pose.Position.z;
+	auto oldPos = item->Pose.Position;
 	short roomNumber = item->RoomNumber;
 	bool aboveWater = false;
 
@@ -688,8 +688,8 @@ void FireGrenade(ItemInfo* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Pose.Orientation.x = laraItem->Pose.Orientation.x + lara->LeftArm.Rotation.x;
-		item->Pose.Orientation.y = laraItem->Pose.Orientation.y + lara->LeftArm.Rotation.y;
+		item->Pose.Orientation.x = laraItem->Pose.Orientation.x + lara->LeftArm.Orientation.x;
+		item->Pose.Orientation.y = laraItem->Pose.Orientation.y + lara->LeftArm.Orientation.y;
 		item->Pose.Orientation.z = 0;
 
 		if (!lara->LeftArm.Locked)
@@ -1145,8 +1145,8 @@ void FireRocket(ItemInfo* laraItem)
 
 		InitialiseItem(itemNumber);
 
-		item->Pose.Orientation.x = laraItem->Pose.Orientation.x + lara->LeftArm.Rotation.x;
-		item->Pose.Orientation.y = laraItem->Pose.Orientation.y + lara->LeftArm.Rotation.y;
+		item->Pose.Orientation.x = laraItem->Pose.Orientation.x + lara->LeftArm.Orientation.x;
+		item->Pose.Orientation.y = laraItem->Pose.Orientation.y + lara->LeftArm.Orientation.y;
 		item->Pose.Orientation.z = 0;
 
 		if (!lara->LeftArm.Locked)
@@ -1395,16 +1395,12 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 		if (pos)
 		{
+			item->Pose.Position = pos->Position;
 			item->RoomNumber = laraItem->RoomNumber;
-			item->Pose.Position.x = pos->Position.x;
-			item->Pose.Position.y = pos->Position.y;
-			item->Pose.Position.z = pos->Position.z;
 
 			InitialiseItem(itemNumber);
 
-			item->Pose.Orientation.x = pos->Orientation.x;
-			item->Pose.Orientation.y = pos->Orientation.y;
-			item->Pose.Orientation.z = pos->Orientation.z;
+			item->Pose.Orientation = pos->Orientation;
 		}
 		else
 		{
@@ -1416,11 +1412,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 			int floorHeight = GetCollision(jointPos.x, jointPos.y, jointPos.z, item->RoomNumber).Position.Floor;
 			if (floorHeight >= jointPos.y)
-			{
-				item->Pose.Position.x = jointPos.x;
-				item->Pose.Position.y = jointPos.y;
-				item->Pose.Position.z = jointPos.z;
-			}
+				item->Pose.Position = jointPos;
 			else
 			{
 				item->Pose.Position.x = laraItem->Pose.Position.x;
@@ -1431,9 +1423,9 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 			InitialiseItem(itemNumber);
 
-			item->Pose.Orientation.x = lara->LeftArm.Rotation.x + laraItem->Pose.Orientation.x;
+			item->Pose.Orientation.x = lara->LeftArm.Orientation.x + laraItem->Pose.Orientation.x;
 			item->Pose.Orientation.z = 0;
-			item->Pose.Orientation.y = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
+			item->Pose.Orientation.y = lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y;
 
 			if (!lara->LeftArm.Locked)
 			{
@@ -1463,18 +1455,9 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector*
 	target->x |= 512;
 	target->z |= 512;*/
 
-	short angles[2];
-	phd_GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z, &angles[0]);
-
-	PHD_3DPOS pos;
-	pos.Position.x = src->x;
-	pos.Position.y = src->y;
-	pos.Position.z = src->z;
-	pos.Orientation.x = angles[1];
-	pos.Orientation.y = angles[0];
-	pos.Orientation.z = 0;
-
-	FireCrossbow(laraItem, &pos);
+	auto angles = GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z);
+	auto boltPose = PHD_3DPOS(src->x, src->y, src->z, angles);
+	FireCrossbow(laraItem, &boltPose);
 }
 
 void CrossbowBoltControl(short itemNumber)
@@ -1483,9 +1466,7 @@ void CrossbowBoltControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
-	int oldX = item->Pose.Position.x;
-	int oldY = item->Pose.Position.y;
-	int oldZ = item->Pose.Position.z;
+	auto oldPos = item->Pose.Position;
 
 	bool aboveWater = false;
 	bool explode = false;
@@ -1518,9 +1499,7 @@ void CrossbowBoltControl(short itemNumber)
 		probe.Position.Ceiling > item->Pose.Position.y)
 	{
 		// I have hit a solid wall, this is the end for the bolt
-		item->Pose.Position.x = oldX;
-		item->Pose.Position.y = oldY;
-		item->Pose.Position.z = oldZ;
+		item->Pose.Position = oldPos;
 
 		// If ammos are normal, then just shatter the bolt and quit
 		if (item->ItemFlags[0] != (int)CrossbowBoltType::Explosive)
@@ -1679,10 +1658,10 @@ void CrossbowBoltControl(short itemNumber)
 		{
 			TriggerShockwave(&item->Pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 			item->Pose.Position.y += 128;
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, item->RoomNumber);
+			TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -2, 0, item->RoomNumber);
 
 			for (int j = 0; j < 2; j++)
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, item->RoomNumber);
+				TriggerExplosionSparks(oldPos.x, oldPos.y, oldPos.z, 3, -1, 0, item->RoomNumber);
 		}
 
 		AlertNearbyGuards(item);
@@ -1713,15 +1692,19 @@ void FireHK(ItemInfo* laraItem, int mode)
 			}
 		}*/
 
-	short angles[2];
-
-	angles[1] = lara->LeftArm.Rotation.x;
-	angles[0] = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
+	auto angles = Vector3Shrt(
+		lara->LeftArm.Orientation.x,
+		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
+		0
+	);
 
 	if (!lara->LeftArm.Locked)
 	{
-		angles[0] = lara->ExtraTorsoRot.y + lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
-		angles[1] = lara->ExtraTorsoRot.x + lara->LeftArm.Rotation.x;
+		angles = Vector3Shrt(
+			lara->ExtraTorsoRot.x + lara->LeftArm.Orientation.x,
+			lara->ExtraTorsoRot.y + lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
+			0
+		);
 	}
 
 	if (mode)
@@ -1761,8 +1744,8 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if (lara->LeftArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = lara->LeftArm.Rotation.x;
-		lara->ExtraTorsoRot.y = lara->LeftArm.Rotation.y;
+		lara->ExtraTorsoRot.x = lara->LeftArm.Orientation.x;
+		lara->ExtraTorsoRot.y = lara->LeftArm.Orientation.y;
 
 		if (Camera.oldType != CameraType::Look && !BinocularRange)
 			lara->ExtraHeadRot = { 0, 0, 0 };

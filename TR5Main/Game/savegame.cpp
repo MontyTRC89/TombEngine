@@ -173,8 +173,8 @@ bool SaveGame::Save(int slot)
 	Save::Vector3 nextCornerPos = Save::Vector3(Lara.NextCornerPos.Position.x, Lara.NextCornerPos.Position.y, Lara.NextCornerPos.Position.z);
 	Save::Vector3 nextCornerRot = Save::Vector3(Lara.NextCornerPos.Orientation.x, Lara.NextCornerPos.Orientation.y, Lara.NextCornerPos.Orientation.z);
 
-	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Rotation.x, Lara.LeftArm.Rotation.y, Lara.LeftArm.Rotation.z);
-	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Rotation.x, Lara.RightArm.Rotation.y, Lara.RightArm.Rotation.z);
+	Save::Vector3 leftArmRotation = Save::Vector3(Lara.LeftArm.Orientation.x, Lara.LeftArm.Orientation.y, Lara.LeftArm.Orientation.z);
+	Save::Vector3 rightArmRotation = Save::Vector3(Lara.RightArm.Orientation.x, Lara.RightArm.Orientation.y, Lara.RightArm.Orientation.z);
 	
 	Save::Vector3 extraHeadRot = Save::Vector3(Lara.ExtraHeadRot.x, Lara.ExtraHeadRot.y, Lara.ExtraHeadRot.z);
 	Save::Vector3 extraTorsoRot = Save::Vector3(Lara.ExtraTorsoRot.x, Lara.ExtraTorsoRot.y, Lara.ExtraTorsoRot.z);
@@ -182,8 +182,8 @@ bool SaveGame::Save(int slot)
 	Save::Vector3 waterCurrentPull = Save::Vector3(Lara.WaterCurrentPull.x, Lara.WaterCurrentPull.y, Lara.WaterCurrentPull.z);
 
 	std::vector<int> laraTargetAngles{};
-	laraTargetAngles.push_back(Lara.TargetArmAngles[0]);
-	laraTargetAngles.push_back(Lara.TargetArmAngles[1]);
+	laraTargetAngles.push_back(Lara.TargetArmOrient.y);
+	laraTargetAngles.push_back(Lara.TargetArmOrient.x);
 	auto laraTargetAnglesOffset = fbb.CreateVector(laraTargetAngles);
 
 	std::vector<int> subsuitVelocity{};
@@ -1396,9 +1396,9 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
-	Lara.LeftArm.Rotation.x = s->lara()->left_arm()->rotation()->x();
-	Lara.LeftArm.Rotation.y = s->lara()->left_arm()->rotation()->y();
-	Lara.LeftArm.Rotation.z = s->lara()->left_arm()->rotation()->z();
+	Lara.LeftArm.Orientation.x = s->lara()->left_arm()->rotation()->x();
+	Lara.LeftArm.Orientation.y = s->lara()->left_arm()->rotation()->y();
+	Lara.LeftArm.Orientation.z = s->lara()->left_arm()->rotation()->z();
 	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
@@ -1416,9 +1416,9 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
-	Lara.RightArm.Rotation.x = s->lara()->right_arm()->rotation()->x();
-	Lara.RightArm.Rotation.y = s->lara()->right_arm()->rotation()->y();
-	Lara.RightArm.Rotation.z = s->lara()->right_arm()->rotation()->z();
+	Lara.RightArm.Orientation.x = s->lara()->right_arm()->rotation()->x();
+	Lara.RightArm.Orientation.y = s->lara()->right_arm()->rotation()->y();
+	Lara.RightArm.Orientation.z = s->lara()->right_arm()->rotation()->z();
 	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
 	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
@@ -1452,8 +1452,8 @@ bool SaveGame::Load(int slot)
 	Lara.SpasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.SprintEnergy = s->lara()->sprint_energy();
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
-	Lara.TargetArmAngles[0] = s->lara()->target_arm_angles()->Get(0);
-	Lara.TargetArmAngles[1] = s->lara()->target_arm_angles()->Get(1);
+	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);
+	Lara.TargetArmOrient.x = s->lara()->target_arm_angles()->Get(1);
 	Lara.TargetOrientation.y = s->lara()->target_facing_angle();
 	Lara.Vehicle = s->lara()->vehicle();
 	Lara.WaterSurfaceDist = s->lara()->water_surface_dist();

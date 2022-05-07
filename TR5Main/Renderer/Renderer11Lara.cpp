@@ -127,12 +127,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 		// While handling weapon some extra rotation could be applied to arms
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol || Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
 		{
-			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.LeftArm.Rotation.x), TO_RAD(Lara.LeftArm.Rotation.y), TO_RAD(Lara.LeftArm.Rotation.z));
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.RightArm.Rotation.x), TO_RAD(Lara.RightArm.Rotation.y), TO_RAD(Lara.RightArm.Rotation.z));
+			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation += Vector3(TO_RAD(Lara.LeftArm.Orientation.x), TO_RAD(Lara.LeftArm.Orientation.y), TO_RAD(Lara.LeftArm.Orientation.z));
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.RightArm.Orientation.x), TO_RAD(Lara.RightArm.Orientation.y), TO_RAD(Lara.RightArm.Orientation.z));
 		}
 		else
 		{
-			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.RightArm.Rotation.x), TO_RAD(Lara.RightArm.Rotation.y), TO_RAD(Lara.RightArm.Rotation.z));
+			laraObj.LinearizedBones[LM_RINARM]->ExtraRotation += Vector3(TO_RAD(Lara.RightArm.Orientation.x), TO_RAD(Lara.RightArm.Orientation.y), TO_RAD(Lara.RightArm.Orientation.z));
 			laraObj.LinearizedBones[LM_LINARM]->ExtraRotation = laraObj.LinearizedBones[LM_RINARM]->ExtraRotation;
 		}
 

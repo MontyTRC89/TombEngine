@@ -1063,8 +1063,10 @@ struct ArmInfo
 	int AnimNumber;
 	int FrameNumber;
 	int FrameBase;
+
+	Vector3Shrt Orientation;
+
 	bool Locked;
-	Vector3Shrt Rotation;
 	short FlashGun;
 };
 
@@ -1250,7 +1252,7 @@ struct LaraInfo
 
 	ArmInfo LeftArm;
 	ArmInfo RightArm;
-	short TargetArmAngles[2];
+	Vector3Shrt TargetArmOrient;
 	ItemInfo* TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
