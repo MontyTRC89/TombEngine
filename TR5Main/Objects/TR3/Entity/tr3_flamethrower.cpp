@@ -165,24 +165,17 @@ static short TriggerFlameThrower(ItemInfo* item, BITE_INFO* bite, short speed)
 	{
 		auto* fx = &EffectList[effectNumber];
 
-		Vector3Int pos1 = { bite->x, bite->y, bite->z };
+		auto pos1 = Vector3Int(bite->x, bite->y, bite->z);
 		GetJointAbsPosition(item, &pos1, bite->meshNum);
 
-		Vector3Int pos2 = { bite->x, bite->y / 2, bite->z };
+		auto pos2 = Vector3Int(bite->x, bite->y / 2, bite->z);
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
-		short angles[2];
-		phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
+		auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
 
-		fx->pos.Position.x = pos1.x;
-		fx->pos.Position.y = pos1.y;
-		fx->pos.Position.z = pos1.z;
-
+		fx->pos.Position = pos1;
+		fx->pos.Orientation = angles;
 		fx->roomNumber = item->RoomNumber;
-
-		fx->pos.Orientation.x = angles[1];
-		fx->pos.Orientation.z = 0;
-		fx->pos.Orientation.y = angles[0];
 		fx->speed = speed * 4;
 		fx->counter = 20;
 		fx->flag1 = 0;

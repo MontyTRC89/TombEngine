@@ -473,8 +473,7 @@ void TorpedoControl(short itemNumber)
 		}
 	}
 
-	short angles[2];
-	phd_GetVectorAngles(pos.x - item->Pose.Position.x, pos.y - item->Pose.Position.y, pos.z - item->Pose.Position.z, angles);
+	auto angles = GetVectorAngles(pos.x - item->Pose.Position.x, pos.y - item->Pose.Position.y, pos.z - item->Pose.Position.z);
 
 	if (item->Animation.Velocity >= 48)
 	{
@@ -488,12 +487,12 @@ void TorpedoControl(short itemNumber)
 
 	if (item->ItemFlags[1] - 1 < 60)
 	{
-		short dry = angles[0] - item->Pose.Orientation.y;
-		if (abs(dry) > 0x8000)
+		short dry = angles.y - item->Pose.Orientation.y;
+		if (abs(dry) > ANGLE(180.0f))
 			dry = -dry;
 
-		short drx = angles[1] - item->Pose.Orientation.x;
-		if (abs(drx) > 0x8000)
+		short drx = angles.x - item->Pose.Orientation.x;
+		if (abs(drx) > ANGLE(180.0f))
 			drx = -drx;
 
 		drx /= 8;
