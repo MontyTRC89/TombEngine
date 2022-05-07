@@ -414,9 +414,9 @@ void SethaControl(short itemNumber)
 
 	if (item->HitStatus)
 	{
-		if ((Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
-			&& info.distance < SQUARE(2048)
-			&& !(creature->LOT.IsJumping))
+		if ((Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Lara.Control.Weapon.GunType == LaraWeaponType::Revolver) &&
+			info.distance < pow(SECTOR(2), 2) &&
+			!(creature->LOT.IsJumping))
 		{
 			if (item->Animation.ActiveState != 12)
 			{
@@ -574,7 +574,7 @@ void SethaAttack(int itemNumber)
 
 	int i, size;
 	Vector3Int pos;
-	short angles[2];
+	Vector3Shrt angles;
 	PHD_3DPOS attackPos;
 
 	switch (item->Animation.ActiveState)
@@ -618,48 +618,27 @@ void SethaAttack(int itemNumber)
 		if ((Wibble & 0xF) == 8)
 		{
 			if (item->ItemFlags[0] < 127)
-			{
 				TriggerSethaSparks2(itemNumber, 2, size);
-			}
 		}
-		else if (!(Wibble & 0xF) 
-			&& item->ItemFlags[0] < 103)
-		{
+		else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
 			TriggerSethaSparks2(itemNumber, 3, size);
-		}
 
 		if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 		{
-			pos.x = SethaAttack1.x;
-			pos.y = 2 * SethaAttack1.y;
-			pos.z = SethaAttack1.z;
+			pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 			GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-			phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
-
-			attackPos.Position.x = pos1.x;
-			attackPos.Position.y = pos1.y;
-			attackPos.Position.z = pos1.z;
-			attackPos.Orientation.x = angles[1];
-			attackPos.Orientation.y = angles[0];
-
+			angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
+			attackPos = PHD_3DPOS(pos1, angles);
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
 		else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 		{
-			pos.x = SethaAttack2.x;
-			pos.y = 2 * SethaAttack2.y;
-			pos.z = SethaAttack2.z;
+			pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 			GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-			phd_GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, angles);
-
-			attackPos.Position.x = pos2.x;
-			attackPos.Position.y = pos2.y;
-			attackPos.Position.z = pos2.z;
-			attackPos.Orientation.x = angles[1];
-			attackPos.Orientation.y = angles[0];
-
+			angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
+			attackPos = PHD_3DPOS(pos2, angles);
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
 		
@@ -673,48 +652,28 @@ void SethaAttack(int itemNumber)
 		if ((Wibble & 0xF) == 8)
 		{
 			if (item->ItemFlags[0] < 132)
-			{
 				TriggerSethaSparks2(itemNumber, 2, size);
-			}
 		}
 		else if (!(Wibble & 0xF) && item->ItemFlags[0] < 132)
-		{
 			TriggerSethaSparks2(itemNumber, 3, size);
-		}
 		
-		if (item->ItemFlags[0] >= 60 && item->ItemFlags[0] <= 74
-			|| item->ItemFlags[0] >= 112 && item->ItemFlags[0] <= 124)
+		if (item->ItemFlags[0] >= 60 && item->ItemFlags[0] <= 74 ||
+			item->ItemFlags[0] >= 112 && item->ItemFlags[0] <= 124)
 		{
 			if (Wibble & 4)
 			{
-				pos.x = SethaAttack1.x;
-				pos.y = 2 * SethaAttack1.y;
-				pos.z = SethaAttack1.z;
+				pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
-
-				attackPos.Position.x = pos1.x;
-				attackPos.Position.y = pos1.y;
-				attackPos.Position.z = pos1.z;
-				attackPos.Orientation.x = angles[1];
-				attackPos.Orientation.y = angles[0];
-
+				angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
+				attackPos = PHD_3DPOS(pos1, angles);
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 
-				pos.x = SethaAttack2.x;
-				pos.y = 2 * SethaAttack2.y;
-				pos.z = SethaAttack2.z;
+				pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-				phd_GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, angles);
-
-				attackPos.Position.x = pos2.x;
-				attackPos.Position.y = pos2.y;
-				attackPos.Position.z = pos2.z;
-				attackPos.Orientation.x = angles[1];
-				attackPos.Orientation.y = angles[0];
-
+				angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
+				attackPos = PHD_3DPOS(pos2, angles);
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 			}
 		}
@@ -722,9 +681,9 @@ void SethaAttack(int itemNumber)
 		break;
 
 	case 13:
-		if (item->ItemFlags[0] > 40
-			&& item->ItemFlags[0] < 100
-			&& (GetRandomControl() & 7) < item->ItemFlags[0] - 40)
+		if (item->ItemFlags[0] > 40 &&
+			item->ItemFlags[0] < 100 &&
+			(GetRandomControl() & 7) < item->ItemFlags[0] - 40)
 		{
 			for (i = 0; i < 2; i++)
 			{
@@ -761,29 +720,18 @@ void SethaAttack(int itemNumber)
 		if ((Wibble & 0xF) == 8)
 		{
 			if (item->ItemFlags[0] < 103)
-			{
 				TriggerSethaSparks2(itemNumber, 2, size);
-			}
 		}
 		else if (!(Wibble & 0xF) && item->ItemFlags[0] < 103)
-		{
 			TriggerSethaSparks2(itemNumber, 3, size);
-		}
+		
 		if (item->ItemFlags[0] == 102)
 		{
-			pos.x = SethaAttack1.x;
-			pos.y = 2 * SethaAttack1.y;
-			pos.z = SethaAttack1.z;
+			pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 			GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-			phd_GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z, angles);
-
-			attackPos.Position.x = pos1.x;
-			attackPos.Position.y = pos1.y;
-			attackPos.Position.z = pos1.z;
-			attackPos.Orientation.x = angles[1];
-			attackPos.Orientation.y = angles[0];
-
+			angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
+			attackPos = PHD_3DPOS(pos1, angles);
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
 

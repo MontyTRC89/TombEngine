@@ -379,11 +379,9 @@ void LaserHeadControl(short itemNumber)
 				}
 			}
 
-			short angles[2];
-			short outAngle;
-			phd_GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z, angles);
-			InterpolateAngle(angles[0], &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
-			InterpolateAngle(angles[1] + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
+			auto angles = GetVectorAngles(LaserHeadData.target.x - src.x, LaserHeadData.target.y - src.y, LaserHeadData.target.z - src.z);
+			InterpolateAngle(angles.x + 3328, &item->Pose.Orientation.x, &LaserHeadData.xRot, LaserHeadData.byte1);
+			InterpolateAngle(angles.y, &item->Pose.Orientation.y, &LaserHeadData.yRot, LaserHeadData.byte1);
 
 			if (item->ItemFlags[0] == 1)
 			{
@@ -460,9 +458,9 @@ void LaserHeadControl(short itemNumber)
 								src.z = 0;
 								GetJointAbsPosition(item, (Vector3Int*)& src, GuardianMeshes[i]);
 
-								int c = 8192 * phd_cos(angles[1]);
+								int c = 8192 * phd_cos(angles.x);
 								dest.x = src.x + c * phd_sin(item->Pose.Orientation.y);
-								dest.y = src.y + 8192 * phd_sin(-angles[1]);
+								dest.y = src.y + 8192 * phd_sin(-angles.x);
 								dest.z = src.z + c * phd_cos(item->Pose.Orientation.y);
 
 								if (item->ItemFlags[3] != 90 &&

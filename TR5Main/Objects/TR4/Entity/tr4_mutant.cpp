@@ -161,15 +161,9 @@ namespace TEN::Entities::TR4
 		auto end = Vector3Int(0, -128, 288);
 		GetJointAbsPosition(item, &end, 9);
 
-		short angles[2];
-		phd_GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z, angles);
-
-		target->Position.x = end.x;
-		target->Position.y = end.y;
-		target->Position.z = end.z;
-		target->Orientation.x = angles[1];
-		target->Orientation.y = angles[0];
-		target->Orientation.z = 0;
+		auto angles = GetVectorAngles(end.x - start.x, end.y - start.y, end.z - start.z);
+		target->Position = end;
+		target->Orientation = angles;
 	}
 
 	static void MoveItemFront(ItemInfo* item, int distance)
