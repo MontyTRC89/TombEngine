@@ -192,19 +192,11 @@ static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 			auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
 			GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
-			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
+			auto pose = PHD_3DPOS(pos1);
 
-			short angles[2];
-			phd_GetVectorAngles(pos3.x - pos1.x,
-				pos3.y - pos1.y,
-				pos3.z - pos1.z,
-				angles);
-
-			pos.Orientation.x = angles[1];
-			pos.Orientation.y = angles[0];
-			pos.Orientation.z = 0;
-
-			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
+			auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
+			pose.Orientation = angles;
+			TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 		}
 
 		if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
@@ -214,15 +206,8 @@ static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 
 			auto pos = PHD_3DPOS(pos1.x, pos1.y, pos1.z);
 
-			short angles[2];
-			phd_GetVectorAngles(pos3.x - pos1.x,
-				pos3.y - pos1.y,
-				pos3.z - pos1.z,
-				angles);
-
-			pos.Orientation.x = angles[1];
-			pos.Orientation.y = angles[0];
-			pos.Orientation.z = 0;
+			auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
+			pos.Orientation = angles;
 			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
 		}
 	}

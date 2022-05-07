@@ -725,22 +725,14 @@ void RomanStatueControl(short itemNumber)
 
 			if (deltaFrame == 34)
 			{
-				pos1 = { -48, 48, SECTOR(1) };
+				pos1 = Vector3Int(-48, 48, SECTOR(1));
 				GetJointAbsPosition(item, &pos1, 14);
 
-				pos2 = { -48, 48, 450 };
+				pos2 = Vector3Int(-48, 48, 450);
 				GetJointAbsPosition(item, &pos2, 14);
 
-				short angles[2];
-				phd_GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z, angles);
-
-				PHD_3DPOS attackPos;
-				attackPos.Position.x = pos2.x;
-				attackPos.Position.y = pos2.y;
-				attackPos.Position.z = pos2.z;
-				attackPos.Orientation.x = angles[1];
-				attackPos.Orientation.y = angles[0];
-				attackPos.Orientation.z = 0;
+				auto angles = GetVectorAngles(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
+				auto attackPos = PHD_3DPOS(pos2, angles);
 
 				short roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);

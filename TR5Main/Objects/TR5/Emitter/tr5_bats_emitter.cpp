@@ -147,12 +147,10 @@ void UpdateBats()
 			bat->ZTarget = (GetRandomControl() & 0x7F) - 64;
 		}
 
-		short angles[2];
-		phd_GetVectorAngles(
+		auto angles = GetVectorAngles(
 			LaraItem->Pose.Position.x + 8 * bat->XTarget - bat->Pose.Position.x,
 			LaraItem->Pose.Position.y - bat->LaraTarget - bat->Pose.Position.y,
-			LaraItem->Pose.Position.z + 8 * bat->ZTarget - bat->Pose.Position.z,
-			angles);
+			LaraItem->Pose.Position.z + 8 * bat->ZTarget - bat->Pose.Position.z);
 
 		int x = LaraItem->Pose.Position.x - bat->Pose.Position.x;
 		int z = LaraItem->Pose.Position.z - bat->Pose.Position.z;
@@ -178,8 +176,8 @@ void UpdateBats()
 		{
 			short Velocity = bat->Velocity * 128;
 
-			short xAngle = abs(angles[1] - bat->Pose.Orientation.x) / 8;
-			short yAngle = abs(angles[0] - bat->Pose.Orientation.y) / 8;
+			short xAngle = abs(angles.x - bat->Pose.Orientation.x) / 8;
+			short yAngle = abs(angles.y - bat->Pose.Orientation.y) / 8;
 
 			if (xAngle < -Velocity)
 				xAngle = -Velocity;

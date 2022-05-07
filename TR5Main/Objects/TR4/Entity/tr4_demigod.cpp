@@ -142,27 +142,18 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				Vector3Int pos1 = { -544, 96, 0 };
+				auto pos1 = Vector3Int(-544, 96, 0);
 				GetJointAbsPosition(item, &pos1, 16);
 
-				Vector3Int pos2 = { -900, 96, 0 };
+				auto pos2 = Vector3Int (-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				short angles[2];
-				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-				PHD_3DPOS pos;
-				pos.Position.x = pos1.x;
-				pos.Position.y = pos1.y;
-				pos.Position.z = pos1.z;
-				pos.Orientation.x = angles[1];
-				pos.Orientation.y = angles[0];
-				pos.Orientation.z = 0;
-
+				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+				auto pose = PHD_3DPOS(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
-					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
-					TriggerDemigodMissile(&pos, item->RoomNumber, 5);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 5);
 			}
 		}
 		else if (animIndex == 19)
@@ -170,27 +161,18 @@ namespace TEN::Entities::TR4
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				Vector3Int pos1 = { -544, 96, 0 };
+				auto pos1 = Vector3Int(-544, 96, 0 );
 				GetJointAbsPosition(item, &pos1, 16);
 
-				Vector3Int pos2 = { -900, 96, 0 };
+				auto pos2 = Vector3Int(-900, 96, 0);
 				GetJointAbsPosition(item, &pos2, 16);
 
-				short angles[2];
-				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
-
-				PHD_3DPOS pos;
-				pos.Position.x = pos1.x;
-				pos.Position.y = pos1.y;
-				pos.Position.z = pos1.z;
-				pos.Orientation.x = angles[1];
-				pos.Orientation.y = angles[0];
-				pos.Orientation.z = 0;
-
+				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+				auto pose = PHD_3DPOS(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
-					TriggerDemigodMissile(&pos, item->RoomNumber, 3);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
-					TriggerDemigodMissile(&pos, item->RoomNumber, 5);
+					TriggerDemigodMissile(&pose, item->RoomNumber, 5);
 			}
 		}
 		else if (animIndex == 16)
@@ -214,18 +196,10 @@ namespace TEN::Entities::TR4
 					GetJointAbsPosition(item, &pos2, 17);
 				}
 
-				short angles[2];
-				phd_GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z, angles);
 
-				PHD_3DPOS pos;
-				pos.Position.x = pos1.x;
-				pos.Position.y = pos1.y;
-				pos.Position.z = pos1.z;
-				pos.Orientation.x = angles[1];
-				pos.Orientation.y = angles[0];
-				pos.Orientation.z = 0;
-
-				TriggerDemigodMissile(&pos, item->RoomNumber, 4);
+				auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+				auto pose = PHD_3DPOS(pos1, angles);
+				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}
 		}
 	}
