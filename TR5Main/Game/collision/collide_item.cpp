@@ -589,7 +589,7 @@ bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, short angle
 	else
 		src->Orientation.z = dest->Orientation.z;
 
-	return (src == dest);
+	return (src->Position == dest->Position && src->Orientation == dest->Orientation);
 }
 
 bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
