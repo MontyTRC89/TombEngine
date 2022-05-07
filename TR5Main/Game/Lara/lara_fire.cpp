@@ -1082,19 +1082,19 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 						FindTargetPoint(item, &target);
 						if (LOS(&src, &target))
 						{
-							short angle[2];
-							phd_GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z, angle);
-							angle[0] -= laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y;
-							angle[1] -= laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x;
+							auto angles = GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z);
+							angles.x -= laraItem->Pose.Orientation.x + lara->ExtraTorsoRot.x;
+							angles.y -= laraItem->Pose.Orientation.y + lara->ExtraTorsoRot.y;
 
-							if (angle[0] >= weaponInfo->LockAngles[0] && angle[0] <= weaponInfo->LockAngles[1] && angle[1] >= weaponInfo->LockAngles[2] && angle[1] <= weaponInfo->LockAngles[3])
+							if (angles.y >= weaponInfo->LockAngles[0] && angles.y <= weaponInfo->LockAngles[1] &&
+								angles.x >= weaponInfo->LockAngles[2] && angles.x <= weaponInfo->LockAngles[3])
 							{
 								TargetList[targets] = item;
 								++targets;
-								if (abs(angle[0]) < bestYrot + ANGLE(15.0f) && distance < bestDistance)
+								if (abs(angles.y) < bestYrot + ANGLE(15.0f) && distance < bestDistance)
 								{
 									bestDistance = distance;
-									bestYrot = abs(angle[0]);
+									bestYrot = abs(angles.y);
 									bestItem = item;
 								}
 							}
