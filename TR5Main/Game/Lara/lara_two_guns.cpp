@@ -42,14 +42,12 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int soundPlayed = false;
-	short angleLeft[2], angleRight[2];
 
 	if (laraItem->MeshBits)
 	{
 		if (SmokeCountL)
 		{
 			Vector3Int pos;
-
 			switch (SmokeWeapon)
 			{
 			case LaraWeaponType::Pistol:
@@ -112,10 +110,13 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 			{
 				if (weaponType != LaraWeaponType::Revolver)
 				{
-					angleRight[0] = lara->RightArm.Rotation.y + laraItem->Pose.Orientation.y;
-					angleRight[1] = lara->RightArm.Rotation.x;
+					auto rightArmOrient = Vector3Shrt(
+						lara->RightArm.Orientation.x,
+						lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
+						0
+					);
 
-					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleRight) != FireWeaponType::NoAmmo)
+					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, rightArmOrient) != FireWeaponType::NoAmmo)
 					{
 						SmokeCountR = 28;
 						SmokeWeapon = weaponType;
@@ -199,10 +200,13 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		{
 			if (TrInput & IN_ACTION)
 			{
-				angleLeft[0] = lara->LeftArm.Rotation.y + laraItem->Pose.Orientation.y;
-				angleLeft[1] = lara->LeftArm.Rotation.x;
+				auto leftArmOrient = Vector3Shrt(
+					lara->LeftArm.Orientation.x,
+					lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
+					0
+				);
 
-				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, angleLeft) != FireWeaponType::NoAmmo)
+				if (FireWeapon(weaponType, lara->TargetEntity, laraItem, leftArmOrient) != FireWeaponType::NoAmmo)
 				{
 					if (weaponType == LaraWeaponType::Revolver)
 					{
@@ -291,24 +295,24 @@ void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if (lara->LeftArm.Locked && !lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = lara->LeftArm.Rotation.x / 2;
-		lara->ExtraTorsoRot.y = lara->LeftArm.Rotation.y / 2;
+		lara->ExtraTorsoRot.x = lara->LeftArm.Orientation.x / 2;
+		lara->ExtraTorsoRot.y = lara->LeftArm.Orientation.y / 2;
 
 		if (Camera.oldType != CameraType::Look)
 			lara->ExtraHeadRot = lara->ExtraTorsoRot;
 	}
 	else if (!lara->LeftArm.Locked && lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = lara->RightArm.Rotation.x / 2;
-		lara->ExtraTorsoRot.y = lara->RightArm.Rotation.y / 2;
+		lara->ExtraTorsoRot.x = lara->RightArm.Orientation.x / 2;
+		lara->ExtraTorsoRot.y = lara->RightArm.Orientation.y / 2;
 
 		if (Camera.oldType != CameraType::Look)
 			lara->ExtraHeadRot = lara->ExtraTorsoRot;
 	}
 	else if (lara->LeftArm.Locked && lara->RightArm.Locked)
 	{
-		lara->ExtraTorsoRot.x = (lara->LeftArm.Rotation.x + lara->RightArm.Rotation.x) / 4;
-		lara->ExtraTorsoRot.y = (lara->LeftArm.Rotation.y + lara->RightArm.Rotation.y) / 4;
+		lara->ExtraTorsoRot.x = (lara->LeftArm.Orientation.x + lara->RightArm.Orientation.x) / 4;
+		lara->ExtraTorsoRot.y = (lara->LeftArm.Orientation.y + lara->RightArm.Orientation.y) / 4;
 
 		if (Camera.oldType != CameraType::Look)
 			lara->ExtraHeadRot = lara->ExtraTorsoRot;
@@ -333,8 +337,8 @@ void ReadyPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
-	lara->LeftArm.Rotation = Vector3Shrt();
-	lara->RightArm.Rotation = Vector3Shrt();
+	lara->LeftArm.Orientation = Vector3Shrt();
+	lara->RightArm.Orientation = Vector3Shrt();
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
 	lara->TargetEntity = nullptr;
@@ -389,15 +393,13 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}*/
 	else if (frameLeft > 0 && frameLeft < p->Draw1Anim)
 	{
-		lara->LeftArm.Rotation.x -= lara->LeftArm.Rotation.x / frameLeft;
-		lara->LeftArm.Rotation.y -= lara->LeftArm.Rotation.y / frameLeft;
+		lara->LeftArm.Orientation.x -= lara->LeftArm.Orientation.x / frameLeft;
+		lara->LeftArm.Orientation.y -= lara->LeftArm.Orientation.y / frameLeft;
 		frameLeft--;
 	}
 	else if (frameLeft == 0)
 	{
-		lara->LeftArm.Rotation.y = 0;
-		lara->LeftArm.Rotation.x = 0;
-		lara->LeftArm.Rotation.z = 0;
+		lara->LeftArm.Orientation = Vector3Shrt();
 		frameLeft = p->RecoilAnim - 1;
 	}
 	else if (frameLeft > p->Draw1Anim && (frameLeft < p->RecoilAnim))
@@ -427,15 +429,13 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}*/
 	else if (frameRight > 0 && frameRight < p->Draw1Anim)
 	{
-		lara->RightArm.Rotation.x -= lara->RightArm.Rotation.x / frameRight;
-		lara->RightArm.Rotation.y -= lara->RightArm.Rotation.y / frameRight;
+		lara->RightArm.Orientation.x -= lara->RightArm.Orientation.x / frameRight;
+		lara->RightArm.Orientation.y -= lara->RightArm.Orientation.y / frameRight;
 		frameRight--;
 	}
 	else if (frameRight == 0)
 	{
-		lara->RightArm.Rotation.y = 0;
-		lara->RightArm.Rotation.x = 0;
-		lara->RightArm.Rotation.z = 0;
+		lara->RightArm.Orientation = Vector3Shrt();
 		frameRight = p->RecoilAnim - 1;
 	}
 	else if (frameRight > p->Draw1Anim && (frameRight < p->RecoilAnim))
@@ -456,17 +456,17 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		lara->Control.HandStatus = HandStatus::Free;
 		lara->LeftArm.FrameNumber = 0;
 		lara->RightArm.FrameNumber = 0;
-		lara->TargetEntity = NULL;
+		lara->TargetEntity = nullptr;
 		lara->RightArm.Locked = false;
 		lara->LeftArm.Locked = false;
 	}
 
 	if (!(TrInput & IN_LOOK))
 	{
-		lara->ExtraHeadRot.x = (lara->LeftArm.Rotation.x + lara->RightArm.Rotation.x) / 4;
-		lara->ExtraTorsoRot.x = (lara->LeftArm.Rotation.x + lara->RightArm.Rotation.x) / 4;
-		lara->ExtraHeadRot.y = (lara->LeftArm.Rotation.y + lara->RightArm.Rotation.y) / 4;
-		lara->ExtraTorsoRot.y = (lara->LeftArm.Rotation.y + lara->RightArm.Rotation.y) / 4;
+		lara->ExtraHeadRot.x = (lara->LeftArm.Orientation.x + lara->RightArm.Orientation.x) / 4;
+		lara->ExtraTorsoRot.x = (lara->LeftArm.Orientation.x + lara->RightArm.Orientation.x) / 4;
+		lara->ExtraHeadRot.y = (lara->LeftArm.Orientation.y + lara->RightArm.Orientation.y) / 4;
+		lara->ExtraTorsoRot.y = (lara->LeftArm.Orientation.y + lara->RightArm.Orientation.y) / 4;
 	}
 }
 

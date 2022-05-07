@@ -463,8 +463,8 @@ void CombatCamera(ItemInfo* item)
 
 	if (lara->TargetEntity)
 	{
-		Camera.targetAngle = lara->TargetArmAngles[0];
-		Camera.targetElevation = lara->TargetArmAngles[1] + item->Pose.Orientation.x;
+		Camera.targetAngle = lara->TargetArmOrient.y;
+		Camera.targetElevation = lara->TargetArmOrient.x + item->Pose.Orientation.x;
 	}
 	else
 	{
