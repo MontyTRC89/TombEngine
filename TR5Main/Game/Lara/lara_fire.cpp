@@ -990,7 +990,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 	
 	auto targetPoint = GameVector();
 	FindTargetPoint(lara->TargetEntity, &targetPoint);
-	auto angles = GetVectorAngles(targetPoint.x - src.x, targetPoint.y - src.y, targetPoint.z - src.z);
+	auto angles = EulerAngles::OrientBetweenPointsXY(Vector3(src.x, src.y, src.z), Vector3(targetPoint.x, targetPoint.y, targetPoint.z));
 
 	angles.Set(
 		angles.GetX() - laraItem->Pose.Orientation.GetX(),
@@ -1088,7 +1088,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 						FindTargetPoint(item, &target);
 						if (LOS(&src, &target))
 						{
-							auto angles = GetVectorAngles(target.x - src.x, target.y - src.y, target.z - src.z);
+							auto angles = EulerAngles::OrientBetweenPointsXY(Vector3(src.x, src.y, src.z), Vector3(target.x, target.y, target.z));
 
 							angles.Set(
 								angles.GetX() - (laraItem->Pose.Orientation.GetX() + lara->ExtraTorsoRot.GetX()),

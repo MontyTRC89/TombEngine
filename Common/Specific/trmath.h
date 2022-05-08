@@ -30,8 +30,6 @@ BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box);
 const float lerp(float v0, float v1, float t);
 const Vector3 getRandomVector();
 const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees);
-float mGetAngle(int x1, int y1, int x2, int y2);
-EulerAngles GetVectorAngles(int x, int y, int z);
 void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 int phd_Distance(PoseData* first, PoseData* second);
 

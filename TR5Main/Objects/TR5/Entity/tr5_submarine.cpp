@@ -469,7 +469,7 @@ void TorpedoControl(short itemNumber)
 		}
 	}
 
-	auto angles = GetVectorAngles(pos.x - item->Pose.Position.x, pos.y - item->Pose.Position.y, pos.z - item->Pose.Position.z);
+	auto angles = EulerAngles::OrientBetweenPointsXY(item->Pose.Position.ToVector3(), pos.ToVector3());
 
 	if (item->Animation.Velocity >= 48)
 	{

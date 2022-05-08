@@ -171,7 +171,7 @@ static short TriggerFlameThrower(ItemInfo* item, BITE_INFO* bite, int speed)
 		auto pos2 = Vector3Int(bite->x, bite->y / 2, bite->z);
 		GetJointAbsPosition(item, &pos2, bite->meshNum);
 
-		auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
+		auto angles = EulerAngles::OrientBetweenPointsXY(pos1.ToVector3(), pos2.ToVector3());
 
 		fx->pos.Position = pos1;
 		fx->pos.Orientation = angles;

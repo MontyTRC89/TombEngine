@@ -192,7 +192,7 @@ static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 
 			auto pose = PoseData(pos1);
 
-			auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
+			auto angles = EulerAngles::OrientBetweenPointsXY(pos1.ToVector3(), pos3.ToVector3());
 			pose.Orientation = angles;
 			TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 		}
@@ -204,7 +204,7 @@ static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 
 			auto pos = PoseData(pos1.x, pos1.y, pos1.z);
 
-			auto angles = GetVectorAngles(pos3.x - pos1.x, pos3.y - pos1.y, pos3.z - pos1.z);
+			auto angles = EulerAngles::OrientBetweenPointsXY(pos1.ToVector3(), pos3.ToVector3());
 			pos.Orientation = angles;
 			TriggerHarpyMissile(&pos, item->RoomNumber, 2);
 		}

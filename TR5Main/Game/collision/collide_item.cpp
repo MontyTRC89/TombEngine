@@ -537,7 +537,7 @@ bool Move3DPosTo3DPos(PoseData* src, PoseData* dest, int velocity, float angleAd
 	{
 		if (Lara.Control.WaterStatus != WaterStatus::Underwater)
 		{
-			float angle = mGetAngle(dest->Position.x, dest->Position.z, src->Position.x, src->Position.z);
+			float angle = Angle::OrientBetweenPointsY(dest->Position.ToVector3(), src->Position.ToVector3());
 			int direction = (GetQuadrant(angle) - GetQuadrant(dest->Orientation.GetY())) & 3;
 
 			switch (direction)

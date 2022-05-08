@@ -1125,7 +1125,7 @@ void TriggerUnderwaterBlood(int x, int y, int z, int sizeme)
 
 void Richochet(PoseData* pos)
 {
-	short angle = mGetAngle(pos->Position.z, pos->Position.x, LaraItem->Pose.Position.z, LaraItem->Pose.Position.x);
+	float angle = Angle::OrientBetweenPointsY(pos->Position.ToVector3(), LaraItem->Pose.Position.ToVector3());
 	GameVector target;
 	target.x = pos->Position.x;
 	target.y = pos->Position.y;

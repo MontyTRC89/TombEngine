@@ -1425,7 +1425,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector*
 	target->x |= 512;
 	target->z |= 512;*/
 
-	auto angles = GetVectorAngles(target->x - src->x, target->y - src->y, target->z - src->z);
+	auto angles = EulerAngles::OrientBetweenPointsXY(Vector3(src->x, src->y, src->z), Vector3(target->x, target->y, target->z));
 
 	auto boltPose = PoseData(src->x, src->y, src->z, angles.GetX(), angles.GetY(), angles.GetZ());
 	FireCrossbow(laraItem, &boltPose);

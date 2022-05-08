@@ -30,35 +30,6 @@ const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleD
 	return result;
 }
 
-float mGetAngle(int x1, int y1, int x2, int y2)
-{
-	return atan2(x2 - x1, y2 - y1);
-}
-
-void phd_GetVectorAngles(int x, int y, int z, float* angles)
-{
-	const float angle = atan2(x, z);
-
-	auto vector = Vector3(x, y, z);
-	const auto matrix = Matrix::CreateRotationY(-angle);
-	Vector3::Transform(vector, matrix, vector);
-
-	angles[0] = angle;
-	angles[1] = -atan2(y, vector.z);
-}
-
-EulerAngles GetVectorAngles(int x, int y, int z)
-{
-	const float yOrient = atan2(x, z);
-
-	auto vector = Vector3(x, y, z);
-	const auto matrix = Matrix::CreateRotationY(-yOrient);
-	Vector3::Transform(vector, matrix, vector);
-
-	float xOrient = -atan2(y, vector.z);
-	return EulerAngles(xOrient, yOrient, 0.0f);
-}
-
 int phd_Distance(PoseData* first, PoseData* second)
 {
 	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
