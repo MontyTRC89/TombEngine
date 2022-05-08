@@ -308,7 +308,7 @@ static void TribesmanShotDart(ItemInfo* item)
 		pos2.z *= 2;
 		GetJointAbsPosition(item, &pos2, TribesmanDartBite2.meshNum);
 
-		auto angles = EulerAngles::OrientBetweenPointsXY(pos1.ToVector3(), pos2.ToVector3());
+		auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
 
 		dartItem->Pose.Position = pos1;
 

@@ -159,7 +159,7 @@ namespace TEN::Entities::TR4
 		auto end = Vector3Int(0, -128, 288);
 		GetJointAbsPosition(item, &end, 9);
 
-		auto angles = EulerAngles::OrientBetweenPointsXY(start.ToVector3(), end.ToVector3());
+		auto angles = EulerAngles::OrientBetweenPoints(start.ToVector3(), end.ToVector3());
 		target->Position = end;
 		target->Orientation = angles;
 	}

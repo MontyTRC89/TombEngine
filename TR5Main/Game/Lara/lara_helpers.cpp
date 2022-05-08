@@ -737,16 +737,16 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)
 {
 	if (resetPitch)
-		item->Pose.Orientation.SetX(Angle::Interpolate(item->Pose.Orientation.GetX(), 0, rate, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.SetX(Angle::Lerp(item->Pose.Orientation.GetX(), 0, rate, Angle::DegToRad(0.1f)));
 
 	if (resetRoll)
-		item->Pose.Orientation.SetZ(Angle::Interpolate(item->Pose.Orientation.GetZ(), 0, rate, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.SetZ(Angle::Lerp(item->Pose.Orientation.GetZ(), 0, rate, Angle::DegToRad(0.1f)));
 }
 
 void ResetLaraFlex(ItemInfo* item, float rate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->ExtraHeadRot.Interpolate(EulerAngles::Zero, rate, Angle::DegToRad(0.1f));
-	lara->ExtraTorsoRot.Interpolate(EulerAngles::Zero, rate, Angle::DegToRad(0.1f));
+	lara->ExtraHeadRot.Lerp(EulerAngles::Zero, rate, Angle::DegToRad(0.1f));
+	lara->ExtraTorsoRot.Lerp(EulerAngles::Zero, rate, Angle::DegToRad(0.1f));
 }

@@ -328,7 +328,7 @@ void HydraControl(short itemNumber)
 				auto pos2 = Vector3Int(0, 144, 40);
 				GetJointAbsPosition(item, &pos2, 10);
 
-				auto angles = EulerAngles::OrientBetweenPointsXY(pos2.ToVector3(), pos1.ToVector3());
+				auto angles = EulerAngles::OrientBetweenPoints(pos2.ToVector3(), pos1.ToVector3());
 				auto pose = PoseData(pos1, angles);
 				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);

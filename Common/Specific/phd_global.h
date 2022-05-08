@@ -5,10 +5,10 @@ class Angle
 public:
 	// Utilities
 	static float Normalize(float angle);
-	static float Interpolate(float angleFrom, float angleTo, float rate = 1.0f, float epsilon = 0.0f);
+	static float Lerp(float angleFrom, float angleTo, float rate = 1.0f, float epsilon = 0.0f);
 	static bool  Compare(float angle0, float angle1, float epsilon = 0.0f);
 	static float ShortestAngle(float angleFrom, float angleTo);
-	static float OrientBetweenPointsY(Vector3 point0, Vector3 point1);
+	static float OrientBetweenPoints(Vector3 point0, Vector3 point1);
 
 	static float DeltaHeading(Vector3 origin, Vector3 target, float heading); // TODO: I don't even know what this does.
 
@@ -35,7 +35,7 @@ inline float Angle::Normalize(float angle)
 		fmod(angle - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline float Angle::Interpolate(float angleFrom, float angleTo, float rate, float epsilon)
+inline float Angle::Lerp(float angleFrom, float angleTo, float rate, float epsilon)
 {
 	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
 
@@ -62,7 +62,7 @@ inline float Angle::ShortestAngle(float angleFrom, float angleTo)
 	return Normalize(angleTo - angleFrom);
 }
 
-inline float Angle::OrientBetweenPointsY(Vector3 point0, Vector3 point1)
+inline float Angle::OrientBetweenPoints(Vector3 point0, Vector3 point1)
 {
 	auto direction = point1 - point0;
 	return atan2(direction.x, direction.z);
@@ -70,7 +70,7 @@ inline float Angle::OrientBetweenPointsY(Vector3 point0, Vector3 point1)
 
 inline float Angle::DeltaHeading(Vector3 origin, Vector3 target, float heading)
 {
-	auto difference = OrientBetweenPointsY(origin, target);
+	auto difference = OrientBetweenPoints(origin, target);
 	return ShortestAngle(heading, difference + DegToRad(90.0f));
 }
 
@@ -132,8 +132,8 @@ public:
 	void Normalize();
 	static EulerAngles Normalize(EulerAngles orient);
 
-	void Interpolate(EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
-	static EulerAngles Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
+	void Lerp(EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
+	static EulerAngles Lerp(EulerAngles orientFrom, EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
 
 	bool Compare(EulerAngles orient, float epsilon = 0.0f);
 	static bool Compare(EulerAngles orient0, EulerAngles orient1, float epsilon = 0.0f);
@@ -141,8 +141,7 @@ public:
 	EulerAngles ShortestAngle(EulerAngles orientTo);
 	static EulerAngles ShortestAngle(EulerAngles orientFrom, EulerAngles orientTo);
 
-	// TODO: Move to Angle class later.
-	static EulerAngles OrientBetweenPointsXY(Vector3 point0, Vector3 point1);
+	static EulerAngles OrientBetweenPoints(Vector3 point0, Vector3 point1);
 
 	Vector3 ToVector3();
 
@@ -229,21 +228,21 @@ inline EulerAngles EulerAngles::Normalize(EulerAngles orient)
 	return orient;
 }
 
-inline void EulerAngles::Interpolate(EulerAngles orientTo, float rate, float epsilon)
+inline void EulerAngles::Lerp(EulerAngles orientTo, float rate, float epsilon)
 {
 	this->Set(
-		Angle::Interpolate(this->GetX(), orientTo.GetX(), rate, epsilon),
-		Angle::Interpolate(this->GetY(), orientTo.GetY(), rate, epsilon),
-		Angle::Interpolate(this->GetZ(), orientTo.GetZ(), rate, epsilon)
+		Angle::Lerp(this->GetX(), orientTo.GetX(), rate, epsilon),
+		Angle::Lerp(this->GetY(), orientTo.GetY(), rate, epsilon),
+		Angle::Lerp(this->GetZ(), orientTo.GetZ(), rate, epsilon)
 	);
 }
 
-inline EulerAngles EulerAngles::Interpolate(EulerAngles orientFrom, EulerAngles orientTo, float rate, float epsilon)
+inline EulerAngles EulerAngles::Lerp(EulerAngles orientFrom, EulerAngles orientTo, float rate, float epsilon)
 {
 	return EulerAngles(
-		Angle::Interpolate(orientFrom.GetX(), orientTo.GetX(), rate, epsilon),
-		Angle::Interpolate(orientFrom.GetY(), orientTo.GetY(), rate, epsilon),
-		Angle::Interpolate(orientFrom.GetZ(), orientTo.GetZ(), rate, epsilon)
+		Angle::Lerp(orientFrom.GetX(), orientTo.GetX(), rate, epsilon),
+		Angle::Lerp(orientFrom.GetY(), orientTo.GetY(), rate, epsilon),
+		Angle::Lerp(orientFrom.GetZ(), orientTo.GetZ(), rate, epsilon)
 	);
 }
 
@@ -274,7 +273,7 @@ inline EulerAngles EulerAngles::ShortestAngle(EulerAngles orientFrom, EulerAngle
 	return (orientTo - orientFrom);
 }
 
-inline EulerAngles EulerAngles::OrientBetweenPointsXY(Vector3 point0, Vector3 point1)
+inline EulerAngles EulerAngles::OrientBetweenPoints(Vector3 point0, Vector3 point1)
 {
 	auto direction = point1 - point0;
 

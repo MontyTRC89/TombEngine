@@ -363,7 +363,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 			break;
 		}
 
-		float angle = Angle::RadToShrt(Angle::OrientBetweenPointsY(minecartItem->Pose.Position.ToVector3(), Vector3(minecart->TurnX, 0.0f, minecart->TurnZ))) & 0x3fff;
+		float angle = Angle::RadToShrt(Angle::OrientBetweenPoints(minecartItem->Pose.Position.ToVector3(), Vector3(minecart->TurnX, 0.0f, minecart->TurnZ))) & 0x3fff;
 
 		if (rotation < 4)
 		{
@@ -872,7 +872,7 @@ void MineCartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 
 		lara->Control.HandStatus = HandStatus::Busy;
 
-		float angle = Angle::Normalize((Angle::OrientBetweenPointsY(minecartItem->Pose.Position.ToVector3(), laraItem->Pose.Position.ToVector3()) - minecartItem->Pose.Orientation.GetY()));
+		float angle = Angle::Normalize((Angle::OrientBetweenPoints(minecartItem->Pose.Position.ToVector3(), laraItem->Pose.Position.ToVector3()) - minecartItem->Pose.Orientation.GetY()));
 		if (angle > Angle::DegToRad(-45.0f) && angle < Angle::DegToRad(135.0f))
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_MOUNT_RIGHT;
 		else

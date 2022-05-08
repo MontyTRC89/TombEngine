@@ -109,7 +109,7 @@ void ControlFish(short itemNumber)
 		else
 			enemy = &g_Level.Items[CarcassItem];
 
-		LeaderInfo[leader].Angle = fish->Angle = Angle::ShrtToRad(((-(Angle::RadToShrt(Angle::OrientBetweenPointsY((fish->Offset + item->Pose.Position).ToVector3(), enemy->Pose.Position.ToVector3())) + Angle::DegToShrt(90.0f))) / 16) & 4095); // TODO
+		LeaderInfo[leader].Angle = fish->Angle = Angle::ShrtToRad(((-(Angle::RadToShrt(Angle::OrientBetweenPoints((fish->Offset + item->Pose.Position).ToVector3(), enemy->Pose.Position.ToVector3())) + Angle::DegToShrt(90.0f))) / 16) & 4095); // TODO
 		LeaderInfo[leader].Velocity = (GetRandomControl() & 63) + 192;
 	}
 
@@ -295,7 +295,7 @@ void ControlFish(short itemNumber)
 			}
 		}
 
-		angle = Angle::ShrtToRad(((-(Angle::RadToShrt(Angle::OrientBetweenPointsY(fish->Offset.ToVector3(), Vector3(ftx, 0.0f, ftz))) + Angle::DegToShrt(90.0f))) / 16) & 4095);
+		angle = Angle::ShrtToRad(((-(Angle::RadToShrt(Angle::OrientBetweenPoints(fish->Offset.ToVector3(), Vector3(ftx, 0.0f, ftz))) + Angle::DegToShrt(90.0f))) / 16) & 4095);
 		int dx = fish->Offset.x - ftx + ((24 - i) * CLICK(0.5f));
 		int dz = fish->Offset.z - ftz - ((24 - i) * CLICK(0.5f));
 

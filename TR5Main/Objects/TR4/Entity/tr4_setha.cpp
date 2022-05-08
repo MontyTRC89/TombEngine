@@ -620,7 +620,7 @@ void SethaAttack(int itemNumber)
 			pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 			GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-			angles = EulerAngles::OrientBetweenPointsXY(pos1.ToVector3(), pos.ToVector3());
+			angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
 			attackPos = PoseData(pos1, angles);
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
@@ -629,7 +629,7 @@ void SethaAttack(int itemNumber)
 			pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 			GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-			angles = EulerAngles::OrientBetweenPointsXY(pos2.ToVector3(), pos.ToVector3());
+			angles = EulerAngles::OrientBetweenPoints(pos2.ToVector3(), pos.ToVector3());
 			attackPos = PoseData(pos2, angles);
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
@@ -657,14 +657,14 @@ void SethaAttack(int itemNumber)
 				pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				angles = EulerAngles::OrientBetweenPointsXY(pos1.ToVector3(), pos.ToVector3());
+				angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
 				attackPos = PoseData(pos1, angles);
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 
 				pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-				angles = EulerAngles::OrientBetweenPointsXY(pos2.ToVector3(), pos.ToVector3());
+				angles = EulerAngles::OrientBetweenPoints(pos2.ToVector3(), pos.ToVector3());
 				attackPos = PoseData(pos2, angles);
 				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 			}
@@ -722,7 +722,7 @@ void SethaAttack(int itemNumber)
 			pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 			GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-			angles = EulerAngles::OrientBetweenPointsXY(pos1.ToVector3(), pos.ToVector3());
+			angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos.ToVector3());
 			attackPos = PoseData(pos1, angles);
 			SethaThrowAttack(&attackPos, item->RoomNumber, 0);
 		}
