@@ -56,11 +56,41 @@ struct CrawlVaultTestResult
 	LaraState TargetState;
 };
 
+struct WaterClimbOutTestSetup
+{
+	int LowerFloorBound;
+	int UpperFloorBound;
+	int ClampMin;
+	int ClampMax;
+	int GapMin;
+};
+
+struct WaterClimbOutTestResult
+{
+	bool Success;
+	int Height;
+	LaraState TargetState;
+};
+
 struct JumpTestSetup
 {
 	short Angle;
 	int Distance = CLICK(0.85f);
 	bool CheckWadeStatus = true;
+};
+
+struct LedgeHangTestResult
+{
+	bool Success;
+	int Height;
+};
+
+struct HangClimbTestSetup
+{
+	int ClampMin;
+	int ClampMax;
+	int GapMin;
+	bool CheckSlope;
 };
 
 struct CornerTestResult

@@ -246,8 +246,7 @@ static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 			laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 
 		SetAnimation(laraItem, LA_STAND_IDLE);
-		laraItem->Pose.Position.x -= DISMOUNT_DISTANCE * phd_sin(laraItem->Pose.Orientation.y);
-		laraItem->Pose.Position.z -= DISMOUNT_DISTANCE * phd_cos(laraItem->Pose.Orientation.y);
+		TranslateItem(laraItem, laraItem->Pose.Orientation.y, -DISMOUNT_DISTANCE);
 		laraItem->Pose.Orientation.x = 0;
 		laraItem->Pose.Orientation.z = 0;
 		lara->Vehicle = NO_ITEM;
@@ -255,18 +254,16 @@ static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 
 		if (laraItem->Animation.ActiveState == QUAD_STATE_FALL_OFF)
 		{
-			Vector3Int pos = { 0, 0, 0 };
-
 			SetAnimation(laraItem, LA_FREEFALL);
+
+			auto pos = Vector3Int();
 			GetJointAbsPosition(laraItem, &pos, LM_HIPS);
 
-			laraItem->Pose.Position.x = pos.x;
-			laraItem->Pose.Position.y = pos.y;
-			laraItem->Pose.Position.z = pos.z;
-			laraItem->Animation.VerticalVelocity = quadItem->Animation.VerticalVelocity;
-			laraItem->Animation.Airborne = true;
+			laraItem->Pose.Position = pos;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
+			laraItem->Animation.Airborne = true;
+			laraItem->Animation.VerticalVelocity = quadItem->Animation.VerticalVelocity;
 			laraItem->HitPoints = 0;
 			lara->Control.HandStatus = HandStatus::Free;
 			quadItem->Flags |= ONESHOT;
@@ -581,10 +578,7 @@ static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 	int hmoldBottomLeft = TestQuadHeight(quadItem, -QUAD_FRONT / 2, -QUAD_SIDE, &moldBottomLeft);
 	int hmoldBottomRight = TestQuadHeight(quadItem, -QUAD_FRONT / 2, QUAD_SIDE, &moldBottomRight);
 
-	Vector3Int old;
-	old.x = quadItem->Pose.Position.x;
-	old.y = quadItem->Pose.Position.y;
-	old.z = quadItem->Pose.Position.z;
+	auto oldPos = quadItem->Pose.Position;
 
 	if (oldBottomLeft.y > holdBottomLeft)
 		oldBottomLeft.y = holdBottomLeft;
@@ -665,8 +659,7 @@ static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 	else
 		speed = quadItem->Animation.Velocity;
 
-	quadItem->Pose.Position.z += speed * phd_cos(quad->MomentumAngle);
-	quadItem->Pose.Position.x += speed * phd_sin(quad->MomentumAngle);
+	TranslateItem(quadItem, quad->MomentumAngle, speed);
 
 	int slip = QUAD_SLIP * phd_sin(quadItem->Pose.Orientation.x);
 	if (abs(slip) > QUAD_SLIP / 2)
@@ -675,6 +668,7 @@ static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 			slip -= 10;
 		else
 			slip += 10;
+
 		quadItem->Pose.Position.z -= slip * phd_cos(quadItem->Pose.Orientation.y);
 		quadItem->Pose.Position.x -= slip * phd_sin(quadItem->Pose.Orientation.y);
 	}
@@ -760,7 +754,7 @@ static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 
 	probe = GetCollision(quadItem);
 	if (probe.Position.Floor < quadItem->Pose.Position.y - CLICK(1))
-		DoQuadShift(quadItem, (Vector3Int*)&quadItem->Pose, &old);
+		DoQuadShift(quadItem, (Vector3Int*)&quadItem->Pose, &oldPos);
 
 	quad->ExtraRotation = rot;
 
@@ -769,7 +763,7 @@ static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 	int newVelocity = 0;
 	if (collide)
 	{
-		newVelocity = (quadItem->Pose.Position.z - old.z) * phd_cos(quad->MomentumAngle) + (quadItem->Pose.Position.x - old.x) * phd_sin(quad->MomentumAngle);
+		newVelocity = (quadItem->Pose.Position.z - oldPos.z) * phd_cos(quad->MomentumAngle) + (quadItem->Pose.Position.x - oldPos.x) * phd_sin(quad->MomentumAngle);
 		newVelocity *= 256;
 
 		if (&g_Level.Items[lara->Vehicle] == quadItem &&

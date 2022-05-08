@@ -34,7 +34,7 @@ enum LaraState
 	LS_TURN_LEFT_SLOW = 7,
 	LS_DEATH = 8,
 	LS_FREEFALL = 9,
-	LS_HANG = 10,
+	LS_HANG_IDLE = 10,
 	LS_REACH = 11,
 	LS_SPLAT = 12,
 	LS_UNDERWATER_IDLE = 13,
@@ -115,7 +115,7 @@ enum LaraState
 	LS_CRAWL_TURN_LEFT = 84,
 	LS_CRAWL_TURN_RIGHT = 85,
 	LS_CRAWL_BACK = 86,
-	LS_HANG_TO_CRAWL = 87,
+	LS_HANG_TO_CROUCH = 87,
 	LS_CRAWL_TO_HANG = 88,
 	LS_MISC_CONTROL = 89,
 
@@ -1211,7 +1211,7 @@ struct MinecartControlData
 struct LaraControlData
 {
 	short MoveAngle;
-	short TurnRate;
+	Vector3Shrt TurnRate;
 	int CalculatedJumpVelocity;
 	JumpDirection JumpDirection;
 	HandStatus HandStatus;

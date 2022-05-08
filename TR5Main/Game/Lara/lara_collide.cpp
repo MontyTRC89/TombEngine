@@ -28,9 +28,9 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 
+		item->Animation.Airborne = false;
 		item->Animation.TargetState = LS_IDLE;
 		item->Animation.Velocity = 0;
-		item->Animation.Airborne = false;
 		return true;
 	}
 
@@ -64,7 +64,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 				SetAnimation(item, LA_LAND);
 				LaraSnapToHeight(item, coll);
 			}
-			else if (abs(item->Animation.Velocity) > 50) // TODO: Tune and demagic this value.
+			else if (abs(item->Animation.Velocity) > CLICK(0.5f))
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 
 			item->Animation.Velocity /= 4;
@@ -95,8 +95,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
-		item->Pose.Position.z += CLICK(1.5f) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
-		item->Pose.Position.x += CLICK(1.5f) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+		TranslateItem(item, item->Pose.Orientation.y + ANGLE(180.0f), CLICK(1.5f), 0, 0);
 		item->Animation.Velocity = 0;
 		coll->Middle.Floor = 0;
 
@@ -131,8 +130,7 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
-		item->Pose.Position.z += CLICK(1.5f) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
-		item->Pose.Position.x += CLICK(1.5f) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
+		TranslateItem(item, item->Pose.Orientation.y + ANGLE(180.0f), CLICK(1.5f), 0, 0);
 		item->Animation.Velocity = 0;
 		coll->Middle.Floor = 0;
 
@@ -377,8 +375,8 @@ void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 
 	if (coll->Middle.Floor <= STEPUP_HEIGHT)
 	{
-		item->Animation.VerticalVelocity = 0;
 		item->Animation.Airborne = false;
+		item->Animation.VerticalVelocity = 0;
 	}
 }
 
@@ -431,9 +429,7 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 		coll->Middle.Floor < 0 && coll->Middle.FloorSlope)
 	{
 		item->Animation.VerticalVelocity = 0;
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position = coll->Setup.OldPosition;
 	}
 	else if (coll->CollisionType == CT_LEFT)
 		item->Pose.Orientation.y += ANGLE(5.0f);
@@ -450,12 +446,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	int oldX = item->Pose.Position.x;
-	int oldY = item->Pose.Position.y;
-	int oldZ = item->Pose.Position.z;
-	short oldXrot = item->Pose.Orientation.x;
-	short oldYrot = item->Pose.Orientation.y;
-	short oldZrot = item->Pose.Orientation.z;
+	auto oldPose = item->Pose;
 
 	if (item->Pose.Orientation.x < -ANGLE(90.0f) ||
 		item->Pose.Orientation.x > ANGLE(90.0f))
@@ -562,9 +553,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		break;
 
 	case CT_CLAMP:
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position = coll->Setup.OldPosition;
 		item->Animation.VerticalVelocity = 0;
 		flag = 2;
 		break;
@@ -577,11 +566,10 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y += coll->Middle.Floor;
 	}
 
-	if (oldX == item->Pose.Position.x &&
-		oldY == item->Pose.Position.y &&
-		oldZ == item->Pose.Position.z &&
-		oldXrot == item->Pose.Orientation.x &&
-		oldYrot == item->Pose.Orientation.y ||
+	if (
+		oldPose.Position == item->Pose.Position &&
+		oldPose.Orientation.x == item->Pose.Orientation.x &&
+		oldPose.Orientation.y == item->Pose.Orientation.y ||
 		flag != 1)
 	{
 		if (flag == 2)
@@ -662,10 +650,7 @@ void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y += coll->Middle.Floor;
 
 	ShiftItem(item, coll);
-
-	coll->Setup.OldPosition.x = item->Pose.Position.x;
-	coll->Setup.OldPosition.y = item->Pose.Position.y;
-	coll->Setup.OldPosition.z = item->Pose.Position.z;
+	coll->Setup.OldPosition = item->Pose.Position;
 }
 
 bool TestLaraHitCeiling(CollisionInfo* coll)
@@ -681,18 +666,15 @@ bool TestLaraHitCeiling(CollisionInfo* coll)
 
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Pose.Position.x = coll->Setup.OldPosition.x;
-	item->Pose.Position.y = coll->Setup.OldPosition.y;
-	item->Pose.Position.z = coll->Setup.OldPosition.z;
-
+	item->Pose.Position = coll->Setup.OldPosition;
+	item->Animation.Airborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
 }
 
 bool TestLaraObjectCollision(ItemInfo* item, short angle, int distance, int height, int side)
 {
-	auto oldPos = item->Pose;
+	auto oldPose = item->Pose;
 	int sideSign = copysign(1, side);
 
 	item->Pose.Position.x += phd_sin(item->Pose.Orientation.y + angle) * distance + phd_cos(angle + ANGLE(90.0f) * sideSign) * abs(side);
@@ -701,6 +683,6 @@ bool TestLaraObjectCollision(ItemInfo* item, short angle, int distance, int heig
 
 	auto result = GetCollidedObjects(item, LARA_RADIUS, true, CollidedItems, CollidedMeshes, 0);
 
-	item->Pose = oldPos;
+	item->Pose = oldPose;
 	return result;
 }

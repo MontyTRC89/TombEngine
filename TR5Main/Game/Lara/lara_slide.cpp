@@ -46,17 +46,17 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 			// TODO: Prepped for another time.
 			if (TrInput & IN_LEFT)
 			{
-				lara->Control.TurnRate -= LARA_TURN_RATE;
-				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate.y -= LARA_TURN_RATE;
+				if (lara->Control.TurnRate.y < -LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate.y = -LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				lara->Control.TurnRate += LARA_TURN_RATE;
-				if (lara->Control.TurnRate > LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate.y += LARA_TURN_RATE;
+				if (lara->Control.TurnRate.y > LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate.y = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
@@ -155,17 +155,17 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 			// TODO: Prepped for another time.
 			if (TrInput & IN_LEFT)
 			{
-				lara->Control.TurnRate -= LARA_TURN_RATE;
-				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate.y -= LARA_TURN_RATE;
+				if (lara->Control.TurnRate.y < -LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate.y = -LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				lara->Control.TurnRate += LARA_TURN_RATE;
-				if (lara->Control.TurnRate > LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate.y += LARA_TURN_RATE;
+				if (lara->Control.TurnRate.y > LARA_SLIDE_TURN_MAX)
+					lara->Control.TurnRate.y = LARA_SLIDE_TURN_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}

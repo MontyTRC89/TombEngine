@@ -417,7 +417,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	else
 		boxHeight = item->Floor;
 
-	auto old = item->Pose.Position;
+	auto oldPos = item->Pose.Position;
 	
 	/*if (!Objects[item->objectNumber].waterCreature)
 	{
@@ -438,7 +438,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	int y = item->Pose.Position.y + bounds->Y1;
 
 	short roomNumber = item->RoomNumber;
-	GetFloor(old.x, y, old.z, &roomNumber);  
+	GetFloor(oldPos.x, y, oldPos.z, &roomNumber);  
 	FloorInfo* floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 
 	// TODO: Check why some blocks have box = -1 assigned to them -- Lwmte, 10.11.21
@@ -467,18 +467,18 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	{
 		xPos = item->Pose.Position.x / SECTOR(1);
 		zPos = item->Pose.Position.z / SECTOR(1);
-		shiftX = old.x / SECTOR(1);
-		shiftZ = old.z / SECTOR(1);
+		shiftX = oldPos.x / SECTOR(1);
+		shiftZ = oldPos.z / SECTOR(1);
 
 		if (xPos < shiftX)
-			item->Pose.Position.x = old.x & (~(SECTOR(1) - 1));
+			item->Pose.Position.x = oldPos.x & (~(SECTOR(1) - 1));
 		else if (xPos > shiftX)
-			item->Pose.Position.x = old.x | (SECTOR(1) - 1);
+			item->Pose.Position.x = oldPos.x | (SECTOR(1) - 1);
 
 		if (zPos < shiftZ)
-			item->Pose.Position.z = old.z & (~(SECTOR(1) - 1));
+			item->Pose.Position.z = oldPos.z & (~(SECTOR(1) - 1));
 		else if (zPos > shiftZ)
-			item->Pose.Position.z = old.z | (SECTOR(1) - 1);
+			item->Pose.Position.z = oldPos.z | (SECTOR(1) - 1);
 
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
@@ -630,8 +630,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 				{
 					if (item->Pose.Position.y + top < ceiling)
 					{
-						item->Pose.Position.x = old.x;
-						item->Pose.Position.z = old.z;
+						item->Pose.Position.x = oldPos.x;
+						item->Pose.Position.z = oldPos.z;
 						dy = LOT->Fly;
 					}
 					else
@@ -655,8 +655,8 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		}
 		else
 		{
-			item->Pose.Position.x = old.x;
-			item->Pose.Position.z = old.z;
+			item->Pose.Position.x = oldPos.x;
+			item->Pose.Position.z = oldPos.z;
 			dy = -LOT->Fly;
 		}
 
@@ -693,11 +693,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			if (item->Pose.Position.y > item->Floor)
 			{
 				if (item->Pose.Position.y > (item->Floor + CLICK(1)))
-				{
-					item->Pose.Position.x = old.x;
-					item->Pose.Position.y = old.y;
-					item->Pose.Position.z = old.z;
-				}
+					item->Pose.Position = oldPos;
 				else
 					item->Pose.Position.y = item->Floor;
 			}
@@ -714,11 +710,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			top = bounds->Y1; // TODO: check if Y1 or Y2
 
 		if (item->Pose.Position.y + top < ceiling)
-		{
-			item->Pose.Position.x = old.x;
-			item->Pose.Position.z = old.z;
-			item->Pose.Position.y = old.y;
-		}
+			item->Pose.Position = oldPos;
 
 		floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 		item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);

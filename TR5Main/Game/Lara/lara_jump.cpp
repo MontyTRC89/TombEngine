@@ -53,15 +53,15 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX;
+		lara->Control.TurnRate.y -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate.y = -LARA_JUMP_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
+		lara->Control.TurnRate.y += LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate.y = LARA_JUMP_TURN_MAX;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -200,15 +200,15 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
+		lara->Control.TurnRate.y -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_JUMP_TURN_MAX / 2)
+			lara->Control.TurnRate.y = -LARA_JUMP_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
+		lara->Control.TurnRate.y += LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_JUMP_TURN_MAX / 2)
+			lara->Control.TurnRate.y = LARA_JUMP_TURN_MAX / 2;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -245,24 +245,18 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.Airborne = true;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
-
-	// HACK: height is altered according to VerticalVelocity to fix "issues" with physically impossible
-	// 6-click high ceiling running jumps. While TEN model is physically correct, original engines
-	// allowed certain margin of deflection due to bug caused by hacky inclusion of headroom in coll checks.
-
-	coll->Setup.Height = item->Animation.VerticalVelocity > 0 ? LARA_HEIGHT_REACH : LARA_HEIGHT;
+	coll->Setup.Height = LARA_HEIGHT;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = 0;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
-	coll->Setup.Radius = coll->Setup.Radius * 1.2f;
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
 	// Overhang hook.
 	SlopeReachExtra(item, coll);
 
-	if (TestLaraHangJump(item, coll))
+	if (DoLaraLedgeHang(item, coll))
 		return;
 
 	LaraSlideEdgeJump(item, coll);
@@ -288,15 +282,15 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			lara->Control.TurnRate -= LARA_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+			lara->Control.TurnRate.y -= LARA_TURN_RATE;
+			if (lara->Control.TurnRate.y < -LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate.y = -LARA_SLOW_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			lara->Control.TurnRate += LARA_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+			lara->Control.TurnRate.y += LARA_TURN_RATE;
+			if (lara->Control.TurnRate.y > LARA_SLOW_TURN_MAX)
+				lara->Control.TurnRate.y = LARA_SLOW_TURN_MAX;
 		}
 	}
 
@@ -436,15 +430,15 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX;
+		lara->Control.TurnRate.y -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate.y = -LARA_JUMP_TURN_MAX;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
+		lara->Control.TurnRate.y += LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate.y = LARA_JUMP_TURN_MAX;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -676,7 +670,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.Mode = CollisionProbeMode::FreeForward;
 	GetCollisionInfo(coll, item);
 
-	if (TestLaraHangJumpUp(item, coll))
+	if (DoLaraLedgeHang(item, coll))
 		return;
 
 	if (coll->Middle.Ceiling >= 0 ||
@@ -709,15 +703,15 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
+		lara->Control.TurnRate.y -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_JUMP_TURN_MAX / 2)
+			lara->Control.TurnRate.y = -LARA_JUMP_TURN_MAX / 2;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
+		lara->Control.TurnRate.y += LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_JUMP_TURN_MAX / 2)
+			lara->Control.TurnRate.y = LARA_JUMP_TURN_MAX / 2;
 	}
 
 	if (TestLaraLand(item, coll))
@@ -788,17 +782,17 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX;
+		lara->Control.TurnRate.y -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate.y = -LARA_JUMP_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
+		lara->Control.TurnRate.y += LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_JUMP_TURN_MAX)
+			lara->Control.TurnRate.y = LARA_JUMP_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
@@ -815,7 +809,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			g_GameFlow->HasCrawlspaceSwandive())
 		{
 			item->Animation.TargetState = LS_CROUCH_IDLE;
-			MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f)); // HACK: Move forward to avoid standing up or falling out on an edge.
+			TranslateItem(item, coll->Setup.ForwardAngle, CLICK(0.5f), 0, 0); // HACK: Move forward to avoid standing up or falling out on an edge.
 		}
 		else [[likely]]
 			item->Animation.TargetState = LS_IDLE;

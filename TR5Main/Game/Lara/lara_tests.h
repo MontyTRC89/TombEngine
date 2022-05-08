@@ -15,9 +15,7 @@ bool TestValidLedge(ItemInfo* item, CollisionInfo* coll, bool ignoreHeadroom = f
 bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll);
-int  TestLaraEdgeCatch(ItemInfo* item, CollisionInfo* coll, int* edge);
+bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
@@ -37,7 +35,7 @@ CollisionResult LaraCollisionFront(ItemInfo* item, short angle, int distance);
 CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int distance, int height);
 
 bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
+WaterClimbOutTestResult TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll);
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 
@@ -108,6 +106,24 @@ CrawlVaultTestResult TestLaraCrawlExitDownStep(ItemInfo* item, CollisionInfo* co
 CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll);
 CrawlVaultTestResult TestLaraCrawlVault(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll);
+
+WaterClimbOutTestResult TestLaraWaterClimbOutTolerance(ItemInfo* item, CollisionInfo* coll, WaterClimbOutTestSetup testSetup);
+WaterClimbOutTestResult TestLaraWaterClimbOutDownStep(ItemInfo* item, CollisionInfo* coll);
+WaterClimbOutTestResult TestLaraWaterClimbOutDownStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+WaterClimbOutTestResult TestLaraWaterClimbOutFlatStep(ItemInfo* item, CollisionInfo* coll);
+WaterClimbOutTestResult TestLaraWaterClimbOutFlatStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+WaterClimbOutTestResult TestLaraWaterClimbOutUpStep(ItemInfo* item, CollisionInfo* coll);
+WaterClimbOutTestResult TestLaraWaterClimbOutUpStepToCrouch(ItemInfo* item, CollisionInfo* coll);
+WaterClimbOutTestResult TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll);
+
+LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraShimmyLeft(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraShimmyRight(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraLadderShimmyUp(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraLadderShimmyDown(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraHangClimbTolerance(ItemInfo* item, CollisionInfo* coll, HangClimbTestSetup testSetup);
+bool TestLaraHangToCrouch(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup testSetup);
 bool TestLaraRunJumpForward(ItemInfo* item, CollisionInfo* coll);

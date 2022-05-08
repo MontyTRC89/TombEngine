@@ -271,3 +271,51 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 
 	return v;
 }
+
+Vector3 TranslateVector(Vector3 vector, short orient, float forward, float vertical, float lateral)
+{
+	float sinOrient = phd_sin(orient);
+	float cosOrient = phd_cos(orient);
+
+	vector.x += (forward * sinOrient) + (lateral * cosOrient);
+	vector.y += vertical;
+	vector.z += (forward * cosOrient) + (lateral * -sinOrient);
+	return vector;
+}
+
+Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
+{
+	float sinX = phd_sin(orient.x);
+	float cosX = phd_cos(orient.x);
+	float sinY = phd_sin(orient.y);
+	float cosY = phd_cos(orient.y);
+
+	vector.x += distance * (sinY * cosX);
+	vector.y -= distance * sinX;
+	vector.z += distance * (cosY * cosX);
+	return vector;
+}
+
+Vector3Int TranslateVector(Vector3Int vector, short orient, int forward, int vertical, int lateral)
+{
+	float sinOrient = phd_sin(orient);
+	float cosOrient = phd_cos(orient);
+
+	vector.x += (int)round((forward * sinOrient) + (lateral * cosOrient));
+	vector.y += vertical;
+	vector.z += (int)round((forward * cosOrient) + (lateral * -sinOrient));
+	return vector;
+}
+
+Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance)
+{
+	float sinX = phd_sin(orient.x);
+	float cosX = phd_cos(orient.x);
+	float sinY = phd_sin(orient.y);
+	float cosY = phd_cos(orient.y);
+
+	vector.x += (int)round(distance * (sinY * cosX));
+	vector.y -= (int)round(distance * sinX);
+	vector.z += (int)round(distance * (cosY * cosX));
+	return vector;
+}

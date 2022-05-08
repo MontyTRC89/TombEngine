@@ -18,47 +18,18 @@ using namespace TEN::Renderer;
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Pose.Position.x += coll->Shift.x;
-	item->Pose.Position.y += coll->Shift.y;
-	item->Pose.Position.z += coll->Shift.z;
-	coll->Shift.x = 0;
-	coll->Shift.y = 0;
-	coll->Shift.z = 0;
-}
-
-void MoveItem(ItemInfo* item, short angle, int x, int z)
-{
-	if (!x && !z)
-		return;
-
-	if (x != 0)
-	{
-		float s = phd_sin(angle);
-		float c = phd_cos(angle);
-
-		item->Pose.Position.x += round(x * s);
-		item->Pose.Position.z += round(x * c);
-	}
-
-	if (z != 0)
-	{
-		float s = phd_sin(angle + ANGLE(90.0f));
-		float c = phd_cos(angle + ANGLE(90.0f));
-
-		item->Pose.Position.x += round(z * s);
-		item->Pose.Position.z += round(z * c);
-	}
+	item->Pose.Position += coll->Shift;
+	coll->Shift = Vector3Int();
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
-	if (snapYRot)
-		item->Pose.Orientation.y = coll->NearestLedgeAngle;
-
+	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier));
 	item->Pose.Orientation.x = 0;
 	item->Pose.Orientation.z = 0;
-	item->Pose.Position.x += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+
+	if (snapYRot)
+		item->Pose.Orientation.y = coll->NearestLedgeAngle;
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier)
@@ -144,16 +115,10 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 // Overload of GetCollisionResult which can be used to probe collision parameters
 // from a given item.
 
-CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height, int side)
+CollisionResult GetCollision(ItemInfo* item, short orient, int forward, int vertical, int lateral)
 {
-	float s = phd_sin(angle);
-	float c = phd_cos(angle);
-
-	auto x = item->Pose.Position.x + (distance * s) + (side * c);
-	auto y = item->Pose.Position.y + height;
-	auto z = item->Pose.Position.z + (distance * c) + (-side * s);
-
-	return GetCollision(x, y, z, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
+	auto point = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
+	return GetCollision(point.x, point.y, point.z, GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber);
 }
 
 // A handy overload of GetCollisionResult which can be used to quickly get collision parameters
@@ -744,7 +709,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
 			// HACK: Force slight push-out to the left side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity, 0, 0);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -796,7 +761,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
 			// HACK: Force slight push-out to the right side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity, 0, 0);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -852,11 +817,12 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, short x
 		return;
 	}
 
-	GameVector pos = {};
-	pos.x = item->Pose.Position.x;
-	pos.y = item->Pose.Position.y;
-	pos.z = item->Pose.Position.z;
-	pos.roomNumber = item->RoomNumber;
+	auto pos = GameVector(
+		item->Pose.Position.x,
+		item->Pose.Position.y,
+		item->Pose.Position.z,
+		item->RoomNumber
+	);
 
 	auto* bounds = GetBoundsAccurate(item);
 	auto radiusX = bounds->X2;

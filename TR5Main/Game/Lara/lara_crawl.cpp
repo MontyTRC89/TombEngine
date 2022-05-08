@@ -54,9 +54,9 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		LookUpDown(item);
 
 	if (TrInput & IN_LEFT)
-		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate.y = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate.y = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
@@ -149,17 +149,17 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_CROUCH_ROLL_TURN_MAX)
-			lara->Control.TurnRate = -LARA_CROUCH_ROLL_TURN_MAX;
+		lara->Control.TurnRate.y -= LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_CROUCH_ROLL_TURN_MAX)
+			lara->Control.TurnRate.y = -LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_CROUCH_ROLL_TURN_MAX)
-			lara->Control.TurnRate = LARA_CROUCH_ROLL_TURN_MAX;
+		lara->Control.TurnRate.y += LARA_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_CROUCH_ROLL_TURN_MAX)
+			lara->Control.TurnRate.y = LARA_CROUCH_ROLL_TURN_MAX;
 
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
@@ -242,7 +242,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate.y = -LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
@@ -299,7 +299,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate.y = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
@@ -367,9 +367,9 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		LookUpDown(item);
 
 	if (TrInput & IN_LEFT)
-		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate.y = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
-		lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+		lara->Control.TurnRate.y = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
@@ -498,17 +498,17 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate.y -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate.y = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate.y += LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate.y = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
@@ -603,17 +603,17 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = -LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate.y -= LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate.y < -LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate.y = -LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_CRAWL_MOVE_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_CRAWL_MOVE_TURN_MAX)
-			lara->Control.TurnRate = LARA_CRAWL_MOVE_TURN_MAX;
+		lara->Control.TurnRate.y += LARA_CRAWL_MOVE_TURN_RATE;
+		if (lara->Control.TurnRate.y > LARA_CRAWL_MOVE_TURN_MAX)
+			lara->Control.TurnRate.y = LARA_CRAWL_MOVE_TURN_MAX;
 
 		DoLaraCrawlFlex(item, coll, -LARA_CRAWL_FLEX_MAX, LARA_CRAWL_FLEX_RATE);
 	}
@@ -697,7 +697,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate.y = -LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
@@ -757,7 +757,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	lara->Control.TurnRate = LARA_CRAWL_TURN_MAX;
+	lara->Control.TurnRate.y = LARA_CRAWL_TURN_MAX;
 
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
@@ -818,16 +818,16 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
-		MoveItem(item, item->Pose.Orientation.y, -CLICK(1));
+		TranslateItem(item, item->Pose.Orientation.y, -CLICK(1));
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
 
 		GetCollisionInfo(coll, item);
-		lara->Control.HandStatus = HandStatus::Busy;
-		item->Pose.Position.y += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
 		item->Animation.Airborne = true;
 		item->Animation.Velocity = 2;
 		item->Animation.VerticalVelocity = 1;
+		item->Pose.Position.y += coll->Front.Floor - GetBoundsAccurate(item)->Y1 - 20;
+		lara->Control.HandStatus = HandStatus::Busy;
 	}
 }

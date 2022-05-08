@@ -397,9 +397,9 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 	{
 		// HACK: Set position command can't move Lara laterally?
 		if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_LEFT)
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
+			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1), 0, 0);
 		else if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
+			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1), 0, 0);
 
 		item->Animation.VerticalVelocity = 10;
 	}
@@ -741,15 +741,15 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			if (TrInput & IN_LEFT)
 			{
-				lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-				if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-					lara->Control.TurnRate = LARA_POLE_TURN_MAX;
+				lara->Control.TurnRate.y += LARA_POLE_TURN_RATE;
+				if (lara->Control.TurnRate.y > LARA_POLE_TURN_MAX)
+					lara->Control.TurnRate.y = LARA_POLE_TURN_MAX;
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-				if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-					lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
+				lara->Control.TurnRate.y -= LARA_POLE_TURN_RATE;
+				if (lara->Control.TurnRate.y < -LARA_POLE_TURN_MAX)
+					lara->Control.TurnRate.y = -LARA_POLE_TURN_MAX;
 			}
 		}
 
@@ -842,15 +842,15 @@ void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = LARA_POLE_TURN_MAX;
+			lara->Control.TurnRate.y += LARA_POLE_TURN_RATE;
+			if (lara->Control.TurnRate.y > LARA_POLE_TURN_MAX)
+				lara->Control.TurnRate.y = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
+			lara->Control.TurnRate.y -= LARA_POLE_TURN_RATE;
+			if (lara->Control.TurnRate.y < -LARA_POLE_TURN_MAX)
+				lara->Control.TurnRate.y = -LARA_POLE_TURN_MAX;
 		}
 
 		if (TrInput & IN_JUMP)
@@ -901,15 +901,15 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_LEFT)
 		{
-			lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = LARA_POLE_TURN_MAX;
+			lara->Control.TurnRate.y += LARA_POLE_TURN_RATE;
+			if (lara->Control.TurnRate.y > LARA_POLE_TURN_MAX)
+				lara->Control.TurnRate.y = LARA_POLE_TURN_MAX;
 		}
 		else if (TrInput & IN_RIGHT)
 		{
-			lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
+			lara->Control.TurnRate.y -= LARA_POLE_TURN_RATE;
+			if (lara->Control.TurnRate.y < -LARA_POLE_TURN_MAX)
+				lara->Control.TurnRate.y = -LARA_POLE_TURN_MAX;
 		}
 
 		if (TrInput & IN_JUMP)
@@ -999,9 +999,9 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_LEFT)
 		{
-			lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = LARA_POLE_TURN_MAX;
+			lara->Control.TurnRate.y += LARA_POLE_TURN_RATE;
+			if (lara->Control.TurnRate.y > LARA_POLE_TURN_MAX)
+				lara->Control.TurnRate.y = LARA_POLE_TURN_MAX;
 
 			item->Animation.TargetState = LS_POLE_TURN_CLOCKWISE;
 			return;
@@ -1054,9 +1054,9 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_RIGHT)
 		{
-			lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
+			lara->Control.TurnRate.y -= LARA_POLE_TURN_RATE;
+			if (lara->Control.TurnRate.y < -LARA_POLE_TURN_MAX)
+				lara->Control.TurnRate.y = -LARA_POLE_TURN_MAX;
 
 			item->Animation.TargetState = LS_POLE_TURN_COUNTER_CLOCKWISE;
 			return;

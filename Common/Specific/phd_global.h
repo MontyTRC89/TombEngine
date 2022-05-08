@@ -16,6 +16,11 @@ struct Vector2Int
 		this->x = x;
 		this->y = y;
 	}
+
+	Vector2 ToVector2()
+	{
+		return Vector2(x, y);
+	}
 };
 
 struct Vector3Int

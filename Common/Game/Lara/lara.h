@@ -9,12 +9,16 @@ struct CollisionInfo;
 
 // Lean rates
 #define LARA_LEAN_RATE ANGLE(1.5f)
+#define LARA_SWIM_LEAN_RATE ANGLE(2.0f)
+
+// Lean maxes
 #define LARA_LEAN_MAX ANGLE(11.0f)
 
 // Turn rates
 #define LARA_TURN_RATE ANGLE(2.25f)
 #define LARA_CRAWL_MOVE_TURN_RATE ANGLE(2.15f)
 #define LARA_POLE_TURN_RATE ANGLE(2.25f)
+#define LARA_SWIM_TURN_RATE ANGLE(2.55f);
 #define LARA_SUBSUIT_TURN_RATE ANGLE(0.75f)
 
 // Turn rate maxes
@@ -42,7 +46,6 @@ constexpr auto LARA_HEIGHT_CRAWL = 350;		// Lara height in crawl states.
 constexpr auto LARA_HEIGHT_MONKEY = 850;	// Lara height in monkey swing states.
 constexpr auto LARA_HEIGHT_TREAD = 700;		// Lara height in water treading states.
 constexpr auto LARA_HEIGHT_STRETCH = 870;	// Lara height in jump-up and ledge hanging states.
-constexpr auto LARA_HEIGHT_REACH = 820;		// Lara height in reach state.
 constexpr auto LARA_HEIGHT_SURFACE = 800;	// Lara height when surfacing water.
 constexpr auto LARA_HEADROOM = 160;			// Amount of reasonable space above Lara's head.
 constexpr auto LARA_RADIUS = 100;
