@@ -240,7 +240,7 @@ void GiantMutantControl(short itemNumber)
 
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		SoundEffect(171, &item->Pose, NULL);
+		SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose, NULL);
 		ExplodingDeath(itemNumber, UINT_MAX, MUTANT_PART_DAMAGE);
 		
 		TestTriggers(item, true);

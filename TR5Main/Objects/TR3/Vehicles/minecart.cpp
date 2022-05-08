@@ -264,7 +264,7 @@ static void CartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem)
 									int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 									if (frame >= 12 && frame <= 22)
 									{
-										SoundEffect(220, &item->Pose, 2);
+										SoundEffect(SFX_TR5_SWORD_GOD_HITMETAL, &item->Pose, 2);
 										TestTriggers(item, true);
 										item->Animation.FrameNumber++;
 									}
@@ -392,21 +392,21 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 	if (minecartItem->Animation.Velocity < CART_MIN_VEL)
 	{
 		minecartItem->Animation.Velocity = CART_MIN_VEL;
-		StopSoundEffect(209);
+		StopSoundEffect(SFX_TR3_MINE_CART_TRACK_LOOP);
 
 		if (minecart->VerticalVelocity)
-			StopSoundEffect(210);
+			StopSoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP);
 		else
-			SoundEffect(210, &minecartItem->Pose, 2);
+			SoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP, &minecartItem->Pose, 2);
 	}
 	else
 	{
-		StopSoundEffect(210);
+		StopSoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP);
 
 		if (minecart->VerticalVelocity)
-			StopSoundEffect(209);
+			StopSoundEffect(SFX_TR3_MINE_CART_TRACK_LOOP);
 		else
-			SoundEffect(209, &minecartItem->Pose, (2 | 4) + 0x1000000 + (minecartItem->Animation.Velocity * 32768));
+			SoundEffect(SFX_TR3_MINE_CART_TRACK_LOOP, &minecartItem->Pose, (2 | 4) + 0x1000000 + (minecartItem->Animation.Velocity * 32768));
 	}
 
 	if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
@@ -487,7 +487,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 		if (minecartItem->Pose.Position.y > minecart->FloorHeightMiddle)
 		{
 			if (minecart->VerticalVelocity > 0)
-				SoundEffect(202, &minecartItem->Pose, 2);
+				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, 2);
 
 			minecartItem->Pose.Position.y = minecart->FloorHeightMiddle;
 			minecart->VerticalVelocity = 0;
@@ -597,7 +597,7 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 	case CART_STATE_IDLE:
 		if (!(minecart->Flags & CART_FLAG_CONTROL))
 		{
-			SoundEffect(211, &minecartItem->Pose, 2);
+			SoundEffect(SFX_TR3_MINE_CART_START, &minecartItem->Pose, 2);
 			minecart->Flags |= CART_FLAG_CONTROL;
 			minecart->StopDelay = 64;
 		}
@@ -641,17 +641,17 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		if (TrInput & CART_IN_DUCK)
 		{
 			laraItem->Animation.TargetState = CART_STATE_DUCK;
-			StopSoundEffect(219);
+			StopSoundEffect(SFX_TR3_MINE_CART_BRAKE);
 		}
 		else if (!(TrInput & CART_IN_BRAKE) || minecart->Flags & CART_FLAG_STOPPED)
 		{
 			laraItem->Animation.TargetState = CART_STATE_MOVE;
-			StopSoundEffect(219);
+			StopSoundEffect(SFX_TR3_MINE_CART_BRAKE);
 		}
 		else
 		{
 			minecart->Velocity += CART_DEC;
-			SoundEffect(219, &laraItem->Pose, 2);
+			SoundEffect(SFX_TR3_MINE_CART_BRAKE, &laraItem->Pose, 2);
 		}
 
 		break;
