@@ -208,21 +208,21 @@ void SkidooManControl(short riderItemNumber)
 
 		if (creatureInfo->Flags)
 		{
-			SoundEffect(43, &item->Pose, 0);
+			SoundEffect(SFX_TR4_BAD_TROOP_UZI, &item->Pose, 0);
 			creatureInfo->Flags--;
 		}
 	}
 
 	if (item->Animation.ActiveState == SMAN_STATE_WAIT)
 	{
-		SoundEffect(153, &item->Pose, 0);
+		SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &item->Pose, 0);
 		creatureInfo->JointRotation[0] = 0;
 	}
 	else
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
-		SoundEffect(155, &item->Pose, 4 + ((0x10000 - (100 - item->Animation.Velocity) * 100) << 8));
+		SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &item->Pose, 4 + ((0x10000 - (100 - item->Animation.Velocity) * 100) << 8));
 	}
 
 	CreatureAnimation(itemNumber, angle, 0);

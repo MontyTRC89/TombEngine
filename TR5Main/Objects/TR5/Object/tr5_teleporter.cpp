@@ -97,7 +97,7 @@ void ControlTeleporter(short itemNumber)
 					auto B = v24 >> 2;
 					Weather.Flash(R, G, B, 0.03f);
 
-					LOBYTE(v3) = SoundEffect(399, 0, 0);
+					LOBYTE(v3) = SoundEffect(SFX_TR5_TELEPORT_CRACKLES, 0, 0);
 				}
 				if (!(GlobalCounter & 3))
 				{
@@ -169,7 +169,7 @@ void ControlTeleporter(short itemNumber)
 			FlashFadeB = 64;
 			FlashFader = 32;
 			item->itemFlags[2] = 1;
-			SoundEffect(400, 0, (int)& unk_800004);
+			SoundEffect(SFX_TR5_TELEPORT_FLASH, 0, (int)& unk_800004);
 		}
 	}*/
 

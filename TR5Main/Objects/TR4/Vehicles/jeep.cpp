@@ -1627,12 +1627,12 @@ int JeepControl(void)
 		else
 			jeep->pitch = -32768;
 
-		SoundEffect(155, &item->Pose, (jeep->pitch * 256) + 16777220);
+		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, (jeep->pitch * 256) + 16777220);
 	}
 	else
 	{
 		if (drive != -1)
-			SoundEffect(153, &item->Pose, 0);
+			SoundEffect(SFX_TR4_JEEP_IDLE, &item->Pose, 0);
 		jeep->pitch = 0;
 	}
 

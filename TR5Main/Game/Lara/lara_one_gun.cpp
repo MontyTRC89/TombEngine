@@ -207,7 +207,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						item->Animation.TargetState = 8;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(14, 0, 0);
+							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 83888140);
