@@ -1,13 +1,9 @@
 Build/
-TR5Main/CustomObjects/
-TR5Main/x64/
-TR5Main/Debug/
-TR5Main/Release
-TR5Main/Legacy Engine Objects
-Scripting/bin/Debug/*.lib
-Scripting/bin/Debug/*.dll
-Scripting/bin/Release/*.lib
-Scripting/bin/Release/*.dll
+TombEngine/CustomObjects/
+TR5MTombEngineain/x64/
+TombEngine/Debug/
+TombEngine/Release
+TombEngine/Legacy Engine Objects
 x64/
 .vs/
 *.dll
