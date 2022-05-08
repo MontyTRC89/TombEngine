@@ -1355,7 +1355,7 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(944, pos, 0);
+		SoundEffect(SFX_TR5_IMP_STONEHIT, pos, 0);
 	}
 }
 
