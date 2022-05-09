@@ -417,7 +417,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim->frameEnd);
 }
 
-void TranslateItem(ItemInfo* item, short orient, int forward, int vertical, int lateral)
+void TranslateItem(ItemInfo* item, short orient, float forward, float vertical, float lateral)
 {
 	item->Pose.Position = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
 }
@@ -433,7 +433,7 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 
 	if (index < 0 || index >= g_Level.Anims.size())
 	{
-		TENLog(std::string("Attempt to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+		TENLog(std::string("Attempted to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 		return;
 	}
 

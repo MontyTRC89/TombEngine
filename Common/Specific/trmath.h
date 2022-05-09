@@ -67,5 +67,5 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 Vector3 TranslateVector(Vector3 vector, short orient, float forward, float vertical, float lateral);
 Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance);
-Vector3Int TranslateVector(Vector3Int vector, short orient, int forward, int vertical, int lateral);
+Vector3Int TranslateVector(Vector3Int vector, short orient, float forward, float vertical = 0.0f, float lateral = 0.0f);
 Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance);

@@ -296,13 +296,13 @@ Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
 	return vector;
 }
 
-Vector3Int TranslateVector(Vector3Int vector, short orient, int forward, int vertical, int lateral)
+Vector3Int TranslateVector(Vector3Int vector, short orient, float forward, float vertical, float lateral)
 {
 	float sinOrient = phd_sin(orient);
 	float cosOrient = phd_cos(orient);
 
 	vector.x += (int)round((forward * sinOrient) + (lateral * cosOrient));
-	vector.y += vertical;
+	vector.y += (int)round(vertical);
 	vector.z += (int)round((forward * cosOrient) + (lateral * -sinOrient));
 	return vector;
 }
