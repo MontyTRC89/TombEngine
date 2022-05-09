@@ -65,7 +65,7 @@
       <WarningLevel>Level1</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Scripting;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -103,7 +103,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <WarningLevel>Level1</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;NEW_TIGHTROPE;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Scripting;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;$(SolutionDir)TombEngine\Game;$(SolutionDir)TombEngine\Game\Lara;$(SolutionDir)TombEngine\Objects;$(SolutionDir)TombEngine\Objects\Utils;$(SolutionDir)TombEngine\Objects\Effects;$(SolutionDir)TombEngine\Objects\Generic;$(SolutionDir)TombEngine\Objects\Generic\Doors;$(SolutionDir)TombEngine\Objects\Generic\Switches;$(SolutionDir)TombEngine\Objects\Generic\Object;$(SolutionDir)TombEngine\Objects\TR1;$(SolutionDir)TombEngine\Objects\TR1\Entity;$(SolutionDir)TombEngine\Objects\TR1\Trap;$(SolutionDir)TombEngine\Objects\TR2;$(SolutionDir)TombEngine\Objects\TR2\Entity;$(SolutionDir)TombEngine\Objects\TR2\Trap;$(SolutionDir)TombEngine\Objects\TR2\Vehicles;$(SolutionDir)TombEngine\Objects\TR3;$(SolutionDir)TombEngine\Objects\TR3\Entity;$(SolutionDir)TombEngine\Objects\TR3\Trap;$(SolutionDir)TombEngine\Objects\TR3\Vehicles;$(SolutionDir)TombEngine\Objects\TR4;$(SolutionDir)TombEngine\Objects\TR4\Entity;$(SolutionDir)TombEngine\Objects\TR4\Trap;$(SolutionDir)TombEngine\Objects\TR4\Object;$(SolutionDir)TombEngine\Objects\TR4\Floor;$(SolutionDir)TombEngine\Objects\TR4\Switch;$(SolutionDir)TombEngine\Objects\TR4\Vehicles;$(SolutionDir)TombEngine\Objects\TR5;$(SolutionDir)TombEngine\Objects\TR5\Entity;$(SolutionDir)TombEngine\Objects\TR5\Trap;$(SolutionDir)TombEngine\Objects\TR5\Light;$(SolutionDir)TombEngine\Objects\TR5\Emitter;$(SolutionDir)TombEngine\Objects\TR5\Shatter;$(SolutionDir)TombEngine\Objects\TR5\Switch;$(SolutionDir)TombEngine\Objects\TR5\Object;$(SolutionDir)TombEngine\Objects\Vehicles;$(SolutionDir)TombEngine\Renderer;$(SolutionDir)TombEngine\Specific;$(SolutionDir)TombEngine\Specific\IO;$(SolutionDir)TombEngine\Sound;$(SolutionDir)TombEngine\Game\pickup;$(SolutionDir)TombEngine\Game\itemdata;$(SolutionDir)TombEngine\Game\effects;$(SolutionDir)TombEngine\Scripting\Include;$(SolutionDir)TombEngine\Scripting\Internal;$(SolutionDir)TombEngine\Scripting\Internal\TEN;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -152,6 +152,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\collision\collide_item.h" />
     <ClInclude Include="Game\control\box.h" />
     <ClInclude Include="Game\control\los.h" />
+    <ClInclude Include="Game\control\volumetriggerer.h" />
     <ClInclude Include="Game\effects\bubble.h" />
     <ClInclude Include="Game\effects\chaffFX.h" />
     <ClInclude Include="Game\control\trigger.h" />
@@ -200,6 +201,45 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
     <ClInclude Include="Scripting\Flow\ScriptInterfaceFlowHandler.h" />
+    <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
+    <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
+    <ClInclude Include="Scripting\Include\ScriptInterfaceGame.h" />
+    <ClInclude Include="Scripting\Include\ScriptInterfaceLevel.h" />
+    <ClInclude Include="Scripting\Include\ScriptInterfaceState.h" />
+    <ClInclude Include="Scripting\Include\Strings\ScriptInterfaceStringsHandler.h" />
+    <ClInclude Include="Scripting\Internal\AudioTracks.h" />
+    <ClInclude Include="Scripting\Internal\InventorySlots.h" />
+    <ClInclude Include="Scripting\Internal\ItemEnumPair.h" />
+    <ClInclude Include="Scripting\Internal\LanguageScript.h" />
+    <ClInclude Include="Scripting\Internal\LuaHandler.h" />
+    <ClInclude Include="Scripting\Internal\ReservedScriptNames.h" />
+    <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
+    <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Settings\Settings.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Inventory\InventoryHandler.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Logic\LogicHandler.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Misc\Miscellanous.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\AIObject\AIObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Camera\CameraObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Moveable\MoveableObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\NamedBase.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\ObjectIDs.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\ObjectsHandler.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Sink\SinkObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\SoundSource\SoundSourceObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Static\StaticObject.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Rotation\Rotation.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Strings\StringsHandler.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Vec3\Vec3.h" />
     <ClInclude Include="Scripting\Objects\ScriptInterfaceObjectsHandler.h" />
     <ClInclude Include="Scripting\ScriptInterfaceGame.h" />
     <ClInclude Include="Scripting\ScriptInterfaceLevel.h" />
@@ -209,31 +249,6 @@ CALL gen.bat</Command>
     <ClInclude Include="Scripting\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\ScriptAssert.h" />
     <ClInclude Include="Scripting\ScriptUtil.h" />
-    <ClInclude Include="Scripting\TEN\Color\Color.h" />
-    <ClInclude Include="Scripting\TEN\Flow\Animations\Animations.h" />
-    <ClInclude Include="Scripting\TEN\Flow\FlowHandler.h" />
-    <ClInclude Include="Scripting\TEN\Flow\Fog\Fog.h" />
-    <ClInclude Include="Scripting\TEN\Flow\InventoryItem\InventoryItem.h" />
-    <ClInclude Include="Scripting\TEN\Flow\Level\FlowLevel.h" />
-    <ClInclude Include="Scripting\TEN\Flow\Mirror\Mirror.h" />
-    <ClInclude Include="Scripting\TEN\Flow\Settings\Settings.h" />
-    <ClInclude Include="Scripting\TEN\Flow\SkyLayer\SkyLayer.h" />
-    <ClInclude Include="Scripting\TEN\Inventory\InventoryHandler.h" />
-    <ClInclude Include="Scripting\TEN\Logic\LogicHandler.h" />
-    <ClInclude Include="Scripting\TEN\Misc\Miscellanous.h" />
-    <ClInclude Include="Scripting\TEN\Objects\AIObject\AIObject.h" />
-    <ClInclude Include="Scripting\TEN\Objects\Camera\CameraObject.h" />
-    <ClInclude Include="Scripting\TEN\Objects\Moveable\MoveableObject.h" />
-    <ClInclude Include="Scripting\TEN\Objects\NamedBase.h" />
-    <ClInclude Include="Scripting\TEN\Objects\ObjectIDs.h" />
-    <ClInclude Include="Scripting\TEN\Objects\ObjectsHandler.h" />
-    <ClInclude Include="Scripting\TEN\Objects\Sink\SinkObject.h" />
-    <ClInclude Include="Scripting\TEN\Objects\SoundSource\SoundSourceObject.h" />
-    <ClInclude Include="Scripting\TEN\Objects\Static\StaticObject.h" />
-    <ClInclude Include="Scripting\TEN\Rotation\Rotation.h" />
-    <ClInclude Include="Scripting\TEN\Strings\DisplayString\DisplayString.h" />
-    <ClInclude Include="Scripting\TEN\Strings\StringsHandler.h" />
-    <ClInclude Include="Scripting\TEN\Vec3\Vec3.h" />
     <ClInclude Include="Specific\memory\LinearArrayBuffer.h" />
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
@@ -610,33 +625,33 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
-    <ClCompile Include="Scripting\LuaHandler.cpp" />
-    <ClCompile Include="Scripting\ScriptAssert.cpp" />
-    <ClCompile Include="Scripting\ScriptInterfaceState.cpp" />
-    <ClCompile Include="Scripting\ScriptUtil.cpp" />
-    <ClCompile Include="Scripting\TEN\Color\Color.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\Animations\Animations.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\FlowHandler.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\Fog\Fog.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\InventoryItem\InventoryItem.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\Level\FlowLevel.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\Mirror\Mirror.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\Settings\Settings.cpp" />
-    <ClCompile Include="Scripting\TEN\Flow\SkyLayer\SkyLayer.cpp" />
-    <ClCompile Include="Scripting\TEN\Inventory\InventoryHandler.cpp" />
-    <ClCompile Include="Scripting\TEN\Logic\LogicHandler.cpp" />
-    <ClCompile Include="Scripting\TEN\Misc\Miscellanous.cpp" />
-    <ClCompile Include="Scripting\TEN\Objects\AIObject\AIObject.cpp" />
-    <ClCompile Include="Scripting\TEN\Objects\Camera\CameraObject.cpp" />
-    <ClCompile Include="Scripting\TEN\Objects\Moveable\MoveableObject.cpp" />
-    <ClCompile Include="Scripting\TEN\Objects\ObjectsHandler.cpp" />
-    <ClCompile Include="Scripting\TEN\Objects\Sink\SinkObject.cpp" />
-    <ClCompile Include="Scripting\TEN\Objects\SoundSource\SoundSourceObject.cpp" />
-    <ClCompile Include="Scripting\TEN\Objects\Static\StaticObject.cpp" />
-    <ClCompile Include="Scripting\TEN\Rotation\Rotation.cpp" />
-    <ClCompile Include="Scripting\TEN\Strings\DisplayString\DisplayString.cpp" />
-    <ClCompile Include="Scripting\TEN\Strings\StringsHandler.cpp" />
-    <ClCompile Include="Scripting\TEN\Vec3\Vec3.cpp" />
+    <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />
+    <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />
+    <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
+    <ClCompile Include="Scripting\Internal\ScriptUtil.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Color\Color.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Animations\Animations.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Fog\Fog.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Settings\Settings.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Inventory\InventoryHandler.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Logic\LogicHandler.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Misc\Miscellanous.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\AIObject\AIObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Camera\CameraObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Moveable\MoveableObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\ObjectsHandler.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Sink\SinkObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\SoundSource\SoundSourceObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Objects\Static\StaticObject.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Rotation\Rotation.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Strings\StringsHandler.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Vec3\Vec3.cpp" />
     <ClCompile Include="Specific\phd_global.cpp" />
     <ClCompile Include="Specific\prng.cpp" />
     <ClCompile Include="Objects\Generic\puzzles_keys.cpp" />
