@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 
 // -----------------------------
 // CROUCH & CRAWL

@@ -18,15 +18,15 @@
 #include "Game/savegame.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
-#include "Scripting/ScriptInterfaceLevel.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 
-#include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "ScriptInterfaceGame.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Entities::Generic;
 

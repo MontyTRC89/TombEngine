@@ -1,5 +1,5 @@
 #pragma once
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 #include "Game/items.h"
 #include "LuaHandler.h"
 #include <unordered_set>

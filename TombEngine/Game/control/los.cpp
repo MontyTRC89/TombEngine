@@ -10,12 +10,12 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 int NumberLosRooms;
 short LosRooms[20];
