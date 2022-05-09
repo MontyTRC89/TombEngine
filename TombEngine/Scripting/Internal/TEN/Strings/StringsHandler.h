@@ -3,7 +3,7 @@
 #include <optional>
 #include "LuaHandler.h"
 #include "DisplayString/DisplayString.h"
-#include "Scripting/Strings/ScriptInterfaceStringsHandler.h"
+#include "Strings/ScriptInterfaceStringsHandler.h"
 
 using DisplayStringMap = std::unordered_map<DisplayStringIDType, UserDisplayString>;
 

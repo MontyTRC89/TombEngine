@@ -11,7 +11,7 @@
 #include "Game/Lara/lara_overhang.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 
 // -----------------------------
 // LADDER CLIMB

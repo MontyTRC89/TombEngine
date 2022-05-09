@@ -9,7 +9,7 @@
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 
 using TEN::Renderer::g_Renderer;
 

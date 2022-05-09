@@ -4,8 +4,8 @@
 #include <CommCtrl.h>
 #include "resource.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/LanguageScript.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "LanguageScript.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/input.h"
 #include "Specific/winmain.h"
 #include "Sound/sound.h"
