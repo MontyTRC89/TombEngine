@@ -5,10 +5,10 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Floordata;
 

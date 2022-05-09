@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "LuaHandler.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 #include "Objects/Moveable/MoveableObject.h"
 #include "Objects/Static/StaticObject.h"
 #include "Objects/AIObject/AIObject.h"

@@ -12,7 +12,7 @@
 #include "Game/items.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
