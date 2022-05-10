@@ -13,8 +13,10 @@ __Not currently implemented.__
 
 void Mirror::Register(sol::table& parent)
 {
+	using ctors = sol::constructors<Mirror(short, int, int, int, int)>;
 	parent.new_usertype<Mirror>("Mirror",
-		sol::constructors<Mirror(short, int, int, int, int)>(),
+		ctors(),
+		sol::call_constructor, ctors(),
 		"room", &Mirror::Room,
 		"startX", &Mirror::StartX,
 		"endX", &Mirror::EndX,
