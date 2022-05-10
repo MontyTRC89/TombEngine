@@ -1,0 +1,161 @@
+#pragma once
+#include "Specific/phd_global.h"
+#include "Specific/trmath.h"
+
+struct ItemInfo;
+struct CollisionInfo;
+struct FloorInfo;
+struct ROOM_INFO;
+struct MESH_INFO;
+enum RoomEnvFlags;
+
+constexpr auto NO_LOWER_BOUND = -NO_HEIGHT;	// used by coll->Setup.LowerFloorBound
+constexpr auto NO_UPPER_BOUND = NO_HEIGHT;	// used by coll->Setup.UpperFloorBound
+constexpr auto COLLISION_CHECK_DISTANCE = SECTOR(8);
+
+enum CollisionType
+{
+	CT_NONE = 0,				// 0x00
+	CT_FRONT = (1 << 0),		// 0x01
+	CT_LEFT = (1 << 1),			// 0x02
+	CT_RIGHT = (1 << 2),		// 0x04
+	CT_TOP = (1 << 3),			// 0x08
+	CT_TOP_FRONT = (1 << 4),	// 0x10
+	CT_CLAMP = (1 << 5)			// 0x20
+};
+
+enum class CollisionProbeMode
+{
+	Quadrants,
+	FreeForward,
+	FreeFlat
+};
+
+enum class CornerType
+{
+	None,
+	Inner,
+	Outer
+};
+
+struct CollisionPosition
+{
+	int Floor;
+	int Ceiling;
+	int Bridge;
+	float SplitAngle;
+	bool FloorSlope;
+	bool CeilingSlope;
+	bool DiagonalStep;
+
+	bool HasDiagonalSplit() { return SplitAngle == Angle::DegToRad(45.0f) || SplitAngle == Angle::DegToRad(135.0f); }
+	bool HasFlippedDiagonalSplit() { return HasDiagonalSplit() && SplitAngle != Angle::DegToRad(45.0f); }
+};
+
+struct CollisionResult
+{
+	Vector3 Coordinates;
+	int RoomNumber;
+
+	FloorInfo* Block;
+	FloorInfo* BottomBlock;
+
+	CollisionPosition Position;
+	Vector2 FloorTilt;			// x = x, y = z
+	Vector2 CeilingTilt;		// x = x, y = z
+};
+
+struct CollisionSetup
+{
+	CollisionProbeMode Mode;	// Probe rotation mode
+	int   Radius;				// Collision bounds horizontal size
+	int   Height;				// Collision bounds vertical size
+	float ForwardAngle;			// Forward angle direction
+
+	int LowerFloorBound;		// Borderline floor step-up height 
+	int UpperFloorBound;		// Borderline floor step-down height
+	int LowerCeilingBound;		// Borderline ceiling step-up height
+	int UpperCeilingBound;		// Borderline ceiling step-down height
+
+	bool BlockFloorSlopeUp;		// Treat steep slopes as walls
+	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
+	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
+	bool BlockDeathFloorDown;	// Treat death sectors as pits
+	bool BlockMonkeySwingEdge;		// Treat non-monkey sectors as walls
+	
+	bool EnableObjectPush;		// Can be pushed by objects
+	bool EnableSpasm;			// Convulse when pushed
+
+	// Preserve old parameters to restore later
+	Vector3Int OldPosition;
+	int OldState;
+	int OldAnimNumber;
+	int OldFrameNumber;
+};
+
+struct CollisionInfo
+{
+	CollisionSetup    Setup;    // In parameters
+
+	CollisionPosition Middle;       
+	CollisionPosition MiddleLeft;   
+	CollisionPosition MiddleRight;  
+	CollisionPosition Front;        
+	CollisionPosition FrontLeft;    
+	CollisionPosition FrontRight;   
+
+	Vector3Int Shift;
+	CollisionType CollisionType;
+	Vector2 FloorTilt;				// x = x, y = z
+	Vector2 CeilingTilt;			// x = x, y = z
+	float NearestLedgeAngle;
+	float NearestLedgeDistance;
+
+	bool HitStatic;
+	bool HitTallObject;
+
+	bool TriangleAtRight() { return MiddleRight.SplitAngle != 0.0f && MiddleRight.SplitAngle == Middle.SplitAngle; }
+	bool TriangleAtLeft() { return MiddleLeft.SplitAngle != 0.0f && MiddleLeft.SplitAngle == Middle.SplitAngle; }
+	bool DiagonalStepAtRight() { return MiddleRight.DiagonalStep && TriangleAtRight() && fmod(NearestLedgeAngle, Angle::DegToRad(90.0f)); }
+	bool DiagonalStepAtLeft()  { return MiddleLeft.DiagonalStep && TriangleAtLeft() && fmod(NearestLedgeAngle, Angle::DegToRad(90.0f)); }
+};
+
+[[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
+CollisionResult GetCollision(ItemInfo* item, float orient, int forward, int vertical = 0, int lateral = 0);
+CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
+CollisionResult GetCollision(int x, int y, int z, short roomNumber);
+CollisionResult GetCollision(ItemInfo* item);
+
+void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom = false);
+void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
+int   GetQuadrant(float angle);
+float GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance);
+
+FloorInfo* GetFloor(int x, int y, int z, short* roomNumber);
+int GetFloorHeight(FloorInfo* floor, int x, int y, int z);
+int GetCeiling(FloorInfo* floor, int x, int y, int z);
+int GetDistanceToFloor(int itemNumber, bool precise = true);
+void AlterFloorHeight(ItemInfo* item, int height);
+
+int GetWaterSurface(int x, int y, int z, short roomNumber);
+int GetWaterSurface(ItemInfo* item);
+int GetWaterDepth(int x, int y, int z, short roomNumber);
+int GetWaterDepth(ItemInfo* item);
+int GetWaterHeight(int x, int y, int z, short roomNumber);
+int GetWaterHeight(ItemInfo* item);
+
+int  FindGridShift(int x, int z);
+void ShiftItem(ItemInfo* item, CollisionInfo* coll);
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float angle, float offsetMultiplier = 0.0f);
+void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
+
+void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor = 1.0f, float xOffset = 0, float zOffset = 0);
+
+float GetSurfaceAspectAngle(float xTilt, float zTilt);
+float GetSurfaceSteepnessAngle(float xTilt, float zTilt);
+
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
+bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
