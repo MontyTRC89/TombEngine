@@ -10,6 +10,9 @@ Settings that will be run on game startup.
 void Settings::Register(sol::table & parent)
 {
 	parent.new_usertype<Settings>("Settings",
+		sol::constructors<Settings()>(),
+		sol::call_constructor, sol::constructors<Settings>(),
+
 		"screenWidth", &Settings::ScreenWidth,
 		"screenHeight", &Settings::ScreenHeight,
 		"enableDynamicShadows", &Settings::EnableDynamicShadows,

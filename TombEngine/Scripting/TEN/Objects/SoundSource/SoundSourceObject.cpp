@@ -22,6 +22,7 @@ SoundSource::SoundSource(SOUND_SOURCE_INFO & ref) : m_soundSource{ref}
 void SoundSource::Register(sol::table & parent)
 {
 	parent.new_usertype<SoundSource>(ScriptReserved_SoundSource,
+		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 		

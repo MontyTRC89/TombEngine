@@ -15,10 +15,10 @@ These are things things which aren't present in the compiled level file itself.
 	@return a Level object
 	*/
 void Level::Register(sol::table & parent)
-{
+{	
 	parent.new_usertype<Level>("Level",
 		sol::constructors<Level()>(),
-
+		sol::call_constructor, sol::constructors<Level()>(),
 /// (string) string key for the level's (localised) name.
 // Corresponds to an entry in strings.lua.
 //@mem nameKey

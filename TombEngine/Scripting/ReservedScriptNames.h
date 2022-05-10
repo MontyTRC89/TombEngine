@@ -20,8 +20,7 @@ static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Vec3[]				= "Vec3";
 
 // Member functions
-static constexpr char ScriptReserved_new[]				= "New";
-static constexpr char ScriptReserved_newTemporary[]		= "NewTemporary";
+static constexpr char ScriptReserved_new[]				= "new";
 static constexpr char ScriptReserved_Init[]				= "Init";
 static constexpr char ScriptReserved_Enable[]			= "Enable";
 static constexpr char ScriptReserved_Disable[]			= "Disable";

@@ -16,7 +16,7 @@ public:
 	Vec3(int x, int y, int z);
 	Vec3(PHD_3DPOS const& pos);
 
-	std::string ToString() const;
+	[[nodiscard]] std::string ToString() const;
 
 	void ToLength(int newLength);
 	void StoreInPHDPos(PHD_3DPOS& pos) const;
