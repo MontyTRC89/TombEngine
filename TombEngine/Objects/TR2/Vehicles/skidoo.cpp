@@ -148,7 +148,7 @@ int GetSkidooMountType(ItemInfo* laraItem, ItemInfo* skidooItem, CollisionInfo* 
 		return mountType = 0;
 	}
 
-	float deltaAngle = Angle::ShortestAngle(skidooItem->Pose.Orientation.GetY(), laraItem->Pose.Orientation.GetY());
+	float deltaAngle = Angle::ShortestAngularDistance(skidooItem->Pose.Orientation.GetY(), laraItem->Pose.Orientation.GetY());
 	if (deltaAngle > Angle::DegToRad(45.0f) && deltaAngle < Angle::DegToRad(135.0f))
 		mountType = 1;
 	else if (deltaAngle > Angle::DegToRad(-135.0f) && deltaAngle < Angle::DegToRad(-45.0f))

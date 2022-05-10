@@ -7,7 +7,7 @@ public:
 	static float Normalize(float angle);
 	static float Lerp(float angleFrom, float angleTo, float rate = 1.0f, float epsilon = 0.0f);
 	static bool  Compare(float angle0, float angle1, float epsilon = 0.0f);
-	static float ShortestAngle(float angleFrom, float angleTo);
+	static float ShortestAngularDistance(float angleFrom, float angleTo);
 	static float OrientBetweenPoints(Vector3 point0, Vector3 point1);
 
 	static float DeltaHeading(Vector3 origin, Vector3 target, float heading); // TODO: I don't even know what this does.
@@ -41,7 +41,7 @@ inline float Angle::Lerp(float angleFrom, float angleTo, float rate, float epsil
 
 	if (!Compare(angleFrom, angleTo, epsilon))
 	{
-		auto difference = ShortestAngle(angleFrom, angleTo);
+		auto difference = ShortestAngularDistance(angleFrom, angleTo);
 		return (angleFrom + (difference * rate));
 	}
 
@@ -50,14 +50,14 @@ inline float Angle::Lerp(float angleFrom, float angleTo, float rate, float epsil
 
 inline bool Angle::Compare(float angle0, float angle1, float epsilon)
 {
-	auto difference = ShortestAngle(angle0, angle1);
+	auto difference = ShortestAngularDistance(angle0, angle1);
 	if (abs(difference) <= epsilon)
 		return true;
 	
 	return false;
 }
 
-inline float Angle::ShortestAngle(float angleFrom, float angleTo)
+inline float Angle::ShortestAngularDistance(float angleFrom, float angleTo)
 {
 	return Normalize(angleTo - angleFrom);
 }
@@ -71,7 +71,7 @@ inline float Angle::OrientBetweenPoints(Vector3 point0, Vector3 point1)
 inline float Angle::DeltaHeading(Vector3 origin, Vector3 target, float heading)
 {
 	auto difference = OrientBetweenPoints(origin, target);
-	return ShortestAngle(heading, difference + DegToRad(90.0f));
+	return ShortestAngularDistance(heading, difference + DegToRad(90.0f));
 }
 
 inline float Angle::DegToRad(float degrees)
@@ -106,7 +106,7 @@ inline short Angle::RadToShrt(float radians)
 class EulerAngles
 {
 private:
-	// Angle components in radians
+	// Normalized angle components in radians
 	float x;
 	float y;
 	float z;
@@ -138,8 +138,8 @@ public:
 	bool Compare(EulerAngles orient, float epsilon = 0.0f);
 	static bool Compare(EulerAngles orient0, EulerAngles orient1, float epsilon = 0.0f);
 
-	EulerAngles ShortestAngle(EulerAngles orientTo);
-	static EulerAngles ShortestAngle(EulerAngles orientFrom, EulerAngles orientTo);
+	EulerAngles ShortestAngularDistance(EulerAngles orientTo);
+	static EulerAngles ShortestAngularDistance(EulerAngles orientFrom, EulerAngles orientTo);
 
 	static EulerAngles OrientBetweenPoints(Vector3 point0, Vector3 point1);
 
@@ -263,12 +263,12 @@ inline bool EulerAngles::Compare(EulerAngles orient0, EulerAngles orient1, float
 	return false;
 }
 
-inline EulerAngles EulerAngles::ShortestAngle(EulerAngles orientTo)
+inline EulerAngles EulerAngles::ShortestAngularDistance(EulerAngles orientTo)
 {
 	return (orientTo - *this);
 }
 
-inline EulerAngles EulerAngles::ShortestAngle(EulerAngles orientFrom, EulerAngles orientTo)
+inline EulerAngles EulerAngles::ShortestAngularDistance(EulerAngles orientFrom, EulerAngles orientTo)
 {
 	return (orientTo - orientFrom);
 }

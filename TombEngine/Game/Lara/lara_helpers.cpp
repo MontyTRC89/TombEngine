@@ -395,7 +395,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 		float velocityMultiplier = 1 / Angle::DegToRad(33.75f);
 		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
-		float deltaAngle = Angle::ShortestAngle(direction, item->Pose.Orientation.GetY());
+		float deltaAngle = Angle::ShortestAngularDistance(direction, item->Pose.Orientation.GetY());
 
 		g_Renderer.PrintDebugMessage("%d", slideVelocity);
 

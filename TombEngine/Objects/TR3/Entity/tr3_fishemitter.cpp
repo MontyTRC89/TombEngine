@@ -113,7 +113,7 @@ void ControlFish(short itemNumber)
 		LeaderInfo[leader].Velocity = (GetRandomControl() & 63) + 192;
 	}
 
-	float deltaAngle = Angle::ShortestAngle(fish->Angle, LeaderInfo[leader].Angle);
+	float deltaAngle = Angle::ShortestAngularDistance(fish->Angle, LeaderInfo[leader].Angle);
 
 	if (deltaAngle > Angle::DegToRad(11.35f))
 		deltaAngle -= Angle::DegToRad(22.5f);
