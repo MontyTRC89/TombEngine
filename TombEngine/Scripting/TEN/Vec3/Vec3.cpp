@@ -11,8 +11,10 @@ Represents a 3-dimensional vector.
 
 void Vec3::Register(sol::table & parent)
 {
+	using ctors = sol::constructors<Vec3(int, int, int)>;
 	parent.new_usertype<Vec3>(ScriptReserved_Vec3,
-		sol::constructors<Vec3(int, int, int)>(),
+		ctors(),
+		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Vec3::ToString,
 		sol::meta_function::addition, &AddVec3s,
 		sol::meta_function::subtraction, &SubtractVec3s,
@@ -51,7 +53,7 @@ However, this function would return it as (0, 1, 1).
 @int Y y coordinate
 @int Z z coordinate
 @return A Vec3 object.
-@function Vec3.new
+@function Vec3
 */
 Vec3::Vec3(int aX, int aY, int aZ) : x{aX}, y{aY}, z{aZ}
 {

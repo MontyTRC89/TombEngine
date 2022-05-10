@@ -24,6 +24,7 @@ Camera::Camera(LEVEL_CAMERA_INFO & ref) : m_camera{ref}
 void Camera::Register(sol::table & parent)
 {
 	parent.new_usertype<Camera>(ScriptReserved_Camera,
+		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 
