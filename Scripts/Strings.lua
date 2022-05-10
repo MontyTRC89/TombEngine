@@ -1169,8 +1169,8 @@ SILENCER_ITEM = {
 		"",
 		""
 	},
-	torch = {
-		"Torch",
+	torch2 = {
+		"Torch2",
 		"",
 		"",
 		"",
