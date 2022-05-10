@@ -18,7 +18,7 @@ Flow.SetFarView(210)
 title = Level.new();
 
 title.ambientTrack = "108_A8_Coastal";
-title.levelFile = "Data\\title.trc";
+title.levelFile = "Data\\title.ten";
 title.scriptFile = "Scripts\\title.lua";
 title.loadScreenFile = "Screens\\rome.jpg";
 
@@ -30,7 +30,7 @@ test = Level.new();
 test.nameKey = "level_andrea1";
 test.scriptFile = "Scripts\\andrea1.lua";
 test.ambientTrack = "108_A8_Coastal";
-test.levelFile = "Data\\andrea1.trc";
+test.levelFile = "Data\\andrea1.ten";
 test.loadScreenFile = "Screens\\rome.jpg";
 test.weather = 1;
 test.weatherStrength = 1;
