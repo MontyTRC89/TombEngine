@@ -10,8 +10,10 @@ As seen in TR4's City of the Dead.
 
 void SkyLayer::Register(sol::table & parent)
 {
+	using ctors = sol::constructors<SkyLayer(ScriptColor const&, short)>;
 	parent.new_usertype<SkyLayer>("SkyLayer",
-		sol::constructors<SkyLayer(ScriptColor const &, short)>(),
+		ctors(),
+		sol::call_constructor, ctors(),	
 
 /// (@{Color}) RGB sky color
 //@mem color

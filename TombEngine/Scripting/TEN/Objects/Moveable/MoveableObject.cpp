@@ -64,12 +64,12 @@ bool operator==(Moveable const& first, Moveable const& second)
 
 /*** For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
-most can just be set to zero (see usage).
-	@function Moveable.New
+most can just be ignored (see usage).
+	@function Moveable
 	@tparam ObjID object ID
 	@tparam string name Lua name of the item
 	@tparam Vec3 position position in level
-	@tparam Rotation rotation rotation about x, y, and z axes (default Rotation.new(0, 0, 0))
+	@tparam Rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
 	@tparam int room room ID item is in
 	@tparam int animNumber anim number (default 0)
 	@tparam int frameNumber frame number (default 0)
@@ -78,17 +78,12 @@ most can just be set to zero (see usage).
 	@tparam table AIBits table with AI bits (default {0,0,0,0,0,0})
 	@return reference to new Moveable object
 	@usage 
-	local item = Moveable.New(
+	local item = Moveable(
 		TEN.ObjID.PISTOLS_ITEM, -- object id
 		"test", -- name
-		Vec3.new(18907, 0, 21201),
-		Rotation.new(0,0,0),
+		Vec3(18907, 0, 21201),
+		Rotation(0,0,0),
 		0, -- room
-		0, -- animNumber
-		0, -- frameNumber
-		10, -- HP
-		0, -- OCB
-		{0,0,0,0,0,0} -- aiBits
 		)
 	*/
 
@@ -139,22 +134,22 @@ void Moveable::Register(sol::table & parent)
 {
 	parent.new_usertype<Moveable>(LUA_CLASS_NAME,
 		ScriptReserved_new, Create,
-		ScriptReserved_newTemporary, Create,
+		sol::call_constructor, Create,
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
 /// Enable the item
 // @function Moveable:EnableItem
-		ScriptReserved_Enable, &Moveable::EnableItem,
+	ScriptReserved_Enable, &Moveable::EnableItem,
 
 /// Disable the item
 // @function Moveable:DisableItem
-		ScriptReserved_Disable, &Moveable::DisableItem,
+	ScriptReserved_Disable, &Moveable::DisableItem,
 
 /// Make the item invisible. Use EnableItem to make it visible again.
 // @function Moveable:MakeInvisible
-		ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
+	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
 /// Get the status of object.
 // possible values:
@@ -164,38 +159,38 @@ void Moveable::Register(sol::table & parent)
 // 3 - invisible
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
-		ScriptReserved_GetStatus, &Moveable::GetStatus,
+	ScriptReserved_GetStatus, &Moveable::GetStatus,
 		
 /// Set the name of the function to be called when the moveable is shot by Lara
 // Note that this will be triggered twice when shot with both pistols at once. 
 // @function Moveable:SetOnHit
 // @tparam string name of callback function to be called
-		ScriptReserved_SetOnHit, &Moveable::SetOnHit,
+	ScriptReserved_SetOnHit, &Moveable::SetOnHit,
 
 /// Get the name of the function called when this moveable is shot
 // @function Moveable:GetOnHit
 // @treturn string name of the function
-		ScriptReserved_GetOnHit, &Moveable::GetOnHit,
+	ScriptReserved_GetOnHit, &Moveable::GetOnHit,
 
 /// Set the name of the function called when this moveable collides with another moveable
 // @function Moveable:SetOnCollidedWithObject
 // @tparam string name of callback function to be called
-		ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
+	ScriptReserved_SetOnCollidedWithObject, &Moveable::SetOnCollidedWithObject,
 
 /// Get the name of the function called when this moveable collides with another moveable
 // @function Moveable:GetOnCollidedWithObject
 // @treturn string name of the function
-		ScriptReserved_GetOnCollidedWithObject, &Moveable::GetOnCollidedWithObject,
+	ScriptReserved_GetOnCollidedWithObject, &Moveable::GetOnCollidedWithObject,
 
 /// Set the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
 // @function Moveable:SetOnCollidedWithRoom
 // @tparam string name of callback function to be called
-		ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
+	ScriptReserved_SetOnCollidedWithRoom, &Moveable::SetOnCollidedWithRoom,
 
 /// Get the name of the function called when this moveable collides with room geometry (e.g. a wall or floor)
 // @function Moveable:GetOnCollidedWithRoom
 // @treturn string name of the function
-		ScriptReserved_GetOnCollidedWithRoom, &Moveable::GetOnCollidedWithRoom,
+	ScriptReserved_GetOnCollidedWithRoom, &Moveable::GetOnCollidedWithRoom,
 
 /// Set the name of the function to be called when the moveable is destroyed/killed
 // @function Moveable:SetOnKilled
@@ -203,17 +198,17 @@ void Moveable::Register(sol::table & parent)
 // @usage
 // LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
 // baddy:SetOnKilled("baddyKilled")
-		ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
+	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
 
 /// Get the name of the function called when this moveable is killed
 // @function Moveable:GetOnKilled
 // @treturn string name of the function
-		ScriptReserved_GetOnKilled, &Moveable::GetOnKilled,
+	ScriptReserved_GetOnKilled, &Moveable::GetOnKilled,
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
 // @treturn int a number representing the ID of the object
-		ScriptReserved_GetObjectID, &Moveable::GetObjectID,
+	ScriptReserved_GetObjectID, &Moveable::GetObjectID,
 
 /// Change the object's ID. This will literally change the object.
 // @function Moveable:SetObjectID
@@ -221,26 +216,26 @@ void Moveable::Register(sol::table & parent)
 // @usage
 // shiva = TEN.Objects.GetMoveableByName("shiva_60")
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
-		ScriptReserved_SetObjectID, &Moveable::SetObjectID,
+	ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
 /// Retrieve the index of the current animation.
 // This corresponds to the number shown in the item's animation list in WadTool.
 // @function Moveable:GetAnim
 // @treturn int the index of the active animation
-		ScriptReserved_GetAnimNumber, &Moveable::GetAnimNumber,
+	ScriptReserved_GetAnimNumber, &Moveable::GetAnimNumber,
 
 /// Set the opject's animation to the one specified by the given index.
 // Performs no bounds checking. *Ensure the number given is correct, else
 // the program is likely to crash with an unhelpful error message.*
 // @function Moveable:SetAnim
 // @tparam int index the index of the desired anim 
-		ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
+	ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
 
 /// Retrieve frame number.
 // This is the current frame of the object's active animation.
 // @function Moveable:GetFrame
 // @treturn int the current frame of the active animation
-		ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
+	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
 
 /// Set frame number.
 // This will move the animation to the given frame.
@@ -249,27 +244,27 @@ void Moveable::Register(sol::table & parent)
 // is -1.
 // @function Moveable:SetFrame
 // @tparam int frame the new frame number
-		ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
+	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 		
 /// Get current HP (hit points/health points)
 // @function Moveable:GetHP
 // @treturn int the amount of HP the moveable currently has
-		ScriptReserved_GetHP, &Moveable::GetHP,
+	ScriptReserved_GetHP, &Moveable::GetHP,
 
 /// Set current HP (hit points/health points)
 // @function Moveable:SetHP
 // @tparam int HP the amount of HP to give the moveable
-		ScriptReserved_SetHP, &Moveable::SetHP,
+	ScriptReserved_SetHP, &Moveable::SetHP,
 
 /// Get OCB (object code bit) of the moveable
 // @function Moveable:GetOCB
 // @treturn int the moveable's current OCB value
-		ScriptReserved_GetOCB, &Moveable::GetOCB,
+	ScriptReserved_GetOCB, &Moveable::GetOCB,
 
 /// Set OCB (object code bit) of the moveable
 // @function Moveable:SetOCB
 // @tparam int OCB the new value for the moveable's OCB
-		ScriptReserved_SetOCB, &Moveable::SetOCB,
+	ScriptReserved_SetOCB, &Moveable::SetOCB,
 
 /// Get AIBits of object
 // This will return a table with six values, each corresponding to
@@ -284,7 +279,7 @@ void Moveable::Register(sol::table & parent)
 // 6 - patrol 2
 // @function Moveable:GetAIBits
 // @treturn table a table of AI bits
-		ScriptReserved_GetAIBits, &Moveable::GetAIBits, 
+	ScriptReserved_GetAIBits, &Moveable::GetAIBits, 
 			
 /// Set AIBits of object
 // Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
@@ -294,22 +289,22 @@ void Moveable::Register(sol::table & parent)
 // @usage 
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
 // sas:SetAIBits({1, 0, 0, 0, 0, 0})
-		ScriptReserved_SetAIBits, &Moveable::SetAIBits,
+	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
 /// Get the hit status of the object
 // @function Moveable:GetHitStatus
 // @treturn bool true if the moveable was hit by something in the last gameplay frame, false otherwise 
-		ScriptReserved_GetHitStatus, &Moveable::GetHitStatus,
+	ScriptReserved_GetHitStatus, &Moveable::GetHitStatus,
 
 /// Determine whether the moveable is active or not 
 // @function Moveable:GetActive
 // @treturn bool true if the moveable is active
-		ScriptReserved_GetActive, &Moveable::GetActive,
+	ScriptReserved_GetActive, &Moveable::GetActive,
 
 /// Get the current room of the object
 // @function Moveable:GetRoom
 // @treturn int number representing the current room of the object
-		ScriptReserved_GetRoom, &Moveable::GetRoom,
+	ScriptReserved_GetRoom, &Moveable::GetRoom,
 
 /// Set room of object 
 // This is used in conjunction with SetPosition to teleport an item to a new room.

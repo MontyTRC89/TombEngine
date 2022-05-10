@@ -12,7 +12,7 @@ Represents the properties of an object as it appears in the inventory.
 */
 
 /*** Create an InventoryItem.
-	@function InventoryItem.new
+	@function InventoryItem
 	@tparam string nameKey key for the item's (localised) name.<br />
 Corresponds to an entry in strings.lua.
 	@tparam Flow.InvItem slot slot of inventory object to change
@@ -49,9 +49,11 @@ InventoryItem::InventoryItem(std::string const& a_name, ItemEnumPair a_slot, sho
 
 void InventoryItem::Register(sol::table & parent)
 {
+	using ctors = sol::constructors<InventoryItem(std::string const&, ItemEnumPair, short, float, Rotation const&, RotationFlags, int, ItemOptions)>;
 	parent.new_usertype<InventoryItem>(ScriptReserved_InventoryItem,
-		sol::constructors<InventoryItem(std::string const &, ItemEnumPair, short, float, Rotation const &, RotationFlags, int, ItemOptions)>()
-		);
+	ctors(),
+		sol::call_constructor, ctors()
+	);
 }
 
 // Add validation so the user can't choose something unimplemented
