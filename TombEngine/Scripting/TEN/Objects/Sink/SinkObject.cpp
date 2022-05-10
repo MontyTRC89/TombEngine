@@ -23,6 +23,7 @@ Sink::Sink(SINK_INFO & ref) : m_sink{ref}
 void Sink::Register(sol::table& parent)
 {
 	parent.new_usertype<Sink>(ScriptReserved_Sink,
+		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 

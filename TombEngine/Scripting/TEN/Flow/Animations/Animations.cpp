@@ -10,6 +10,8 @@ New custom animations which Lara can perform.
 void Animations::Register(sol::table& parent)
 {
 	parent.new_usertype<Animations>("Animations",
+		sol::constructors<Animations()>(),
+		sol::call_constructor, sol::constructors<Animations()>(),
 		"crawlExtended", &Animations::HasCrawlExtended,
 		"crouchRoll", &Animations::HasCrouchRoll,
 		"crawlspaceSwandive", &Animations::HasCrawlspaceDive,

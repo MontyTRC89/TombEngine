@@ -12,19 +12,21 @@ All values will be clamped to [-32768, 32767].
 
 void Rotation::Register(sol::table & parent)
 {
+	using ctors = sol::constructors<Rotation(int, int, int)>;
 	parent.new_usertype<Rotation>("Rotation",
-		sol::constructors<Rotation(int, int, int)>(),
+		ctors(),
+		sol::call_constructor, ctors(),
 		sol::meta_function::to_string, &Rotation::ToString,
 
 /// (int) rotation about x axis
 //@mem x
 		"x", &Rotation::x,
 
-/// (int) rotation about x axis
+/// (int) rotation about y axis
 //@mem y
 		"y", &Rotation::y,
 
-/// (int) rotation about x axis
+/// (int) rotation about z axis
 //@mem z
 		"z", &Rotation::z
 	);
@@ -35,7 +37,7 @@ void Rotation::Register(sol::table & parent)
 @int Y rotation about y axis
 @int Z rotation about z axis
 @return A Rotation object.
-@function Rotation.new
+@function Rotation
 */
 Rotation::Rotation(int aX, int aY, int aZ)
 {
