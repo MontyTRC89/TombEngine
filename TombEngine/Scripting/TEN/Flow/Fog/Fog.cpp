@@ -10,8 +10,10 @@ Fog
  
 void Fog::Register(sol::table & parent)
 {
+	using ctors = sol::constructors<Fog(RGBAColor8Byte const&, short, short)>;
 	parent.new_usertype<Fog>("Fog",
-		sol::constructors<Fog(RGBAColor8Byte const&, short, short)>(),
+		ctors(),
+		sol::call_constructor, ctors(), 
 
 		/// (@{Color}) RGB fog color
 		//@mem color
@@ -29,7 +31,7 @@ void Fog::Register(sol::table & parent)
 		This is the distance at which the fog reaches the maximum strength
 
 		@mem maxDistance*/
-		"maxDistance", & Fog::MaxDistance
+		"maxDistance", &Fog::MaxDistance
 		);
 }
 

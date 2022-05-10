@@ -9,7 +9,7 @@
 #include "ScriptUtil.h"
 #include "ReservedScriptNames.h"
 /***
-Mesh info
+Statics
 
 @tenclass Objects.Static
 @pragma nostrip
@@ -24,6 +24,7 @@ Static::Static(MESH_INFO & ref) : m_mesh{ref}
 void Static::Register(sol::table & parent)
 {
 	parent.new_usertype<Static>(ScriptReserved_Static,
+		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, index_error,
 		sol::meta_function::new_index, newindex_error,
 

@@ -39,7 +39,7 @@ DisplayString::DisplayString()
 
 /*** Create a DisplayString.
 For use in @{Strings.ShowString|ShowString} and @{Strings.HideString|HideString}.
-@function DisplayString.new
+@function DisplayString
 @tparam string str string to print or key of translated string
 @tparam int x x-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
 @tparam int y y-coordinate of top-left of string (or the center if DisplayStringOption.CENTER is given)
@@ -94,6 +94,7 @@ void DisplayString::Register(sol::table & parent)
 	parent.new_usertype<DisplayString>(
 		ScriptReserved_DisplayString,
 		ScriptReserved_new, &CreateString,
+		sol::call_constructor, &CreateString,
 
 		/// Get the display string's color
 		// @function GetColor

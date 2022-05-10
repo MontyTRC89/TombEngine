@@ -12,8 +12,10 @@ Components are specified in bytes; all values are clamped to [0, 255].
 
 void ScriptColor::Register(sol::table & parent)
 {
+	using ctors = sol::constructors<ScriptColor(byte, byte, byte), ScriptColor(byte, byte, byte, byte)>;
 	parent.new_usertype<ScriptColor>("Color",
-		sol::constructors<ScriptColor(byte, byte, byte), ScriptColor(byte, byte, byte, byte)>(),
+		ctors(),
+		sol::call_constructor, ctors(),	
 		sol::meta_function::to_string, &ScriptColor::ToString,
 
 /// (int) red component
@@ -84,7 +86,7 @@ ScriptColor::operator Vector4() const
 	return m_color;
 }
 
-// D3DCOLOR is 32 bits and is layed out as ARGB.
+// D3DCOLOR is 32 bits and is laid out as ARGB.
 ScriptColor::operator D3DCOLOR() const
 {	
 	return m_color;
