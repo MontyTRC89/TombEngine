@@ -502,10 +502,6 @@ void ModulateLaraSubsuitSwimTurn(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// TODO: What is this block for?
-	if (item->Pose.Position.y < SECTOR(13))
-		lara->Control.Subsuit.VerticalVelocity += (SECTOR(13) - item->Pose.Position.y) / 16;
-
 	if (TrInput & IN_FORWARD && item->Pose.Orientation.x > -ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
 	else if (TrInput & IN_BACK && item->Pose.Orientation.x < ANGLE(85.0f))

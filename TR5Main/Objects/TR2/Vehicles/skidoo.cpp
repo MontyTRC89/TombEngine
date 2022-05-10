@@ -845,11 +845,11 @@ int TestSkidooHeight(ItemInfo* skidooItem, int zOffset, int xOffset, Vector3Int*
 {
 	pos->y = skidooItem->Pose.Position.y - zOffset * phd_sin(skidooItem->Pose.Orientation.x) + xOffset * phd_sin(skidooItem->Pose.Orientation.z);
 
-	float s = phd_sin(skidooItem->Pose.Orientation.y);
-	float c = phd_cos(skidooItem->Pose.Orientation.y);
+	float sinY = phd_sin(skidooItem->Pose.Orientation.y);
+	float cosY = phd_cos(skidooItem->Pose.Orientation.y);
 
-	pos->x = skidooItem->Pose.Position.x + zOffset * s + xOffset * c;
-	pos->z = skidooItem->Pose.Position.z + zOffset * c - xOffset * s;
+	pos->x = skidooItem->Pose.Position.x + zOffset * sinY + xOffset * cosY;
+	pos->z = skidooItem->Pose.Position.z + zOffset * cosY - xOffset * sinY;
 	
 	auto probe = GetCollision(pos->x, pos->y, pos->z, skidooItem->RoomNumber);
 	if (probe.Position.Ceiling > pos->y ||
@@ -971,10 +971,7 @@ int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem)
 	auto heightBackLeftOld = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, &backLeftOld);
 	auto heightBackRightOld = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, &backRightOld);
 
-	Vector3Int old;
-	old.x = skidooItem->Pose.Position.x;
-	old.y = skidooItem->Pose.Position.y;
-	old.z = skidooItem->Pose.Position.z;
+	auto oldPos = skidooItem->Pose.Position;
 
 	if (backLeftOld.y > heightBackLeftOld)
 		backLeftOld.y = heightBackLeftOld;
@@ -1068,14 +1065,14 @@ int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem)
 
 	auto probe = GetCollision(skidooItem);
 	if (probe.Position.Floor < (skidooItem->Pose.Position.y - CLICK(1)))
-		DoSkidooShift(skidooItem, (Vector3Int*)&skidooItem->Pose, &old);
+		DoSkidooShift(skidooItem, (Vector3Int*)&skidooItem->Pose, &oldPos);
 
 	skidoo->ExtraRotation = rotation;
 
 	auto collide = GetSkidooCollisionAnim(skidooItem, &moved);
 	if (collide)
 	{
-		int newVelocity = (skidooItem->Pose.Position.z - old.z) * phd_cos(skidoo->MomentumAngle) + (skidooItem->Pose.Position.x - old.x) * phd_sin(skidoo->MomentumAngle);
+		int newVelocity = (skidooItem->Pose.Position.z - oldPos.z) * phd_cos(skidoo->MomentumAngle) + (skidooItem->Pose.Position.x - oldPos.x) * phd_sin(skidoo->MomentumAngle);
 		if (skidooItem->Animation.Velocity > (SKIDOO_MAX_VELOCITY + SKIDOO_ACCELERATION) &&
 			newVelocity < (skidooItem->Animation.Velocity - 10))
 		{

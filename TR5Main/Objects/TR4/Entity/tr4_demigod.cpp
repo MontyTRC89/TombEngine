@@ -642,7 +642,7 @@ namespace TEN::Entities::TR4
 			case STATE_DEMIGOD_HAMMER_ATTACK:
 				if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 26)
 				{
-					Vector3Int pos = { 80, -8, -40 };
+					auto pos = Vector3Int(80, -8, -40);
 					GetJointAbsPosition(item, &pos, 17);
 
 					short roomNumber = item->RoomNumber;

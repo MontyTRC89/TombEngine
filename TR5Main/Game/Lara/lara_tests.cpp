@@ -2330,8 +2330,8 @@ LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 	int sign = copysign(1, item->Animation.VerticalVelocity);
 	if (
 		// TODO: Will need to modify this when ledge grabs are made to occur from control functions.
-		(probeFront.Position.Floor * sign) >= (y * sign) &&											// Ledge is lower than player's current position.
-		(probeFront.Position.Floor * sign) <= ((y + item->Animation.VerticalVelocity) * sign) &&	// Ledge is higher than player's projected position.
+		(probeFront.Position.Floor * sign) >= (y * sign) &&											// Ledge is lower/higher than player's current position.
+		(probeFront.Position.Floor * sign) <= ((y + item->Animation.VerticalVelocity) * sign) &&	// Ledge is higher/lower than player's projected position.
 		
 		//abs(probeFront.Position.Floor - y) <= abs(item->Animation.VerticalVelocity) &&			// Ledge height within snap threshold. TODO: Not ideal.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) >= CLICK(0.1f) &&				// Adequate hand room.

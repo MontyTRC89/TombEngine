@@ -796,14 +796,14 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		}
 
 		lara->ExtraVelocity = Vector3Int();
+
+		// Handle Lara collision.
+		if (lara->Vehicle == NO_ITEM)
+			lara_collision_routines[item->Animation.ActiveState](item, coll);
+		//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
+		//	TrInput &= ~IN_ACTION;
 	}
 	dbU = KeyMap[DIK_U] ? true : false;
-
-	// Handle Lara collision.
-	if (lara->Vehicle == NO_ITEM)
-		lara_collision_routines[item->Animation.ActiveState](item, coll);
-	//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
-	//	TrInput &= ~IN_ACTION;
 
 	// Handle weapons.
 	LaraGun(item);
