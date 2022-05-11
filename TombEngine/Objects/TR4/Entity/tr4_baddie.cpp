@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_goon.h"
+#include "tr4_baddie.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
@@ -15,22 +15,22 @@
 #include "Game/misc.h"
 
 /*
-ID_GOON1
+ID_BADDIE1
 1 - Rolls to the right 1 pow
 2 - Jumps to the left 1 pow
 3 - ducks when triggered
 4 - Climbs up 4 clicks when triggered
 101-104 – Slides to the left while crouching when triggered (eg. train level – just doesn’t work in trainmode)
 1004 - Climbs up 6 clicks when triggered
-1000 – N x 1000 – Is activated once the goon with the previous thousand is dead and needs no trigger (have tested up to 20.000). Must be placed in room 2 of a level.
+1000 – N x 1000 – Is activated once the baddie with the previous thousand is dead and needs no trigger (have tested up to 20.000). Must be placed in room 2 of a level.
 This means that:
-2000 - Attacks Lara after she kills 1st goon triggered
-3000 - Same as above but after she kills 2nd goon triggered
-4000 - Same as above but after she kills 3rd goon triggered
-6000 - Same as above but after she kills 5th goon triggered
+2000 - Attacks Lara after she kills 1st baddie triggered
+3000 - Same as above but after she kills 2nd baddie triggered
+4000 - Same as above but after she kills 3rd baddie triggered
+6000 - Same as above but after she kills 5th baddie triggered
 etc.
 
-ID_GOON2
+ID_BADDIE2
 1 - Jumps to right when triggered
 2 - Rolls to left when triggered
 3 - Crouches when triggered
@@ -41,181 +41,181 @@ ID_GOON2
 13 - Crouches when triggered and draws uzi
 14 - Climbs up 4 clicks when triggered and draws uzi
 101 - Slides to the left while crouching when triggered (eg. Train level)
-101-104 - Slides to the left while crouching when triggered. The setup requires an enemy jeep and an AI_X1 nullmesh with the same OCB as the jeep and the goon. It works only in trainmode. When triggered, the goon will ride the roof of the enemy jeep parallel to the railtracks, until they reach the AI_X1 nullmesh. The goon will jump off in the direction he’s placed in the map, while the jeep will fall back.
+101-104 - Slides to the left while crouching when triggered. The setup requires an enemy jeep and an AI_X1 nullmesh with the same OCB as the jeep and the baddie. It works only in trainmode. When triggered, the baddie will ride the roof of the enemy jeep parallel to the railtracks, until they reach the AI_X1 nullmesh. The baddie will jump off in the direction he’s placed in the map, while the jeep will fall back.
 */
 
 namespace TEN::Entities::TR4
 {
-	enum GoonState
+	enum BaddieState
 	{
-		GOON_STATE_IDLE = 0,
-		GOON_STATE_WALK = 1,
-		GOON_STATE_RUN = 2,
+		BADDIE_STATE_IDLE = 0,
+		BADDIE_STATE_WALK = 1,
+		BADDIE_STATE_RUN = 2,
 		// 3
-		GOON_STATE_DODGE_START = 4,
+		BADDIE_STATE_DODGE_START = 4,
 		// 5
 		// 6
 		// 7
-		GOON_STATE_UNKNOWN_8 = 8,
-		GOON_STATE_UNKNOWN_9 = 9,
-		GOON_STATE_DRAW_GUN = 10,
-		GOON_STATE_HOLSTER_GUN = 11,
-		GOON_STATE_DRAW_SWORD = 12,
-		GOON_STATE_HOLSTER_SWORD = 13,
-		GOON_STATE_FIRE = 14,
-		GOON_STATE_SWORD_HIT_FRONT = 15,
-		GOON_STATE_SWORD_HIT_RIGHT = 16,
-		GOON_STATE_SWORD_HIT_LEFT = 17,
-		GOON_STATE_MONKEY_GRAB = 18,
-		GOON_STATE_MONKEY_IDLE = 19,
-		GOON_STATE_MONKEY_FORWARD = 20,
-		GOON_STATE_MONKEY_PUSH_OFF = 21,
-		GOON_STATE_MONKEY_FALL_LAND = 22,
-		GOON_STATE_ROLL_LEFT = 23,
-		GOON_STATE_JUMP_RIGHT = 24,
-		GOON_STATE_STAND_TO_CROUCH = 25,
-		GOON_STATE_CROUCH = 26,
-		GOON_STATE_CROUCH_PICKUP = 27,
-		GOON_STATE_CROUCH_TO_STAND = 28,
-		GOON_STATE_WALK_SWORD_HIT_RIGHT = 29,
-		GOON_STATE_SOMERSAULT = 30,
-		GOON_STATE_AIM = 31,
-		GOON_STATE_DEATH = 32,
-		GOON_STATE_JUMP_FORWARD_1_BLOCK = 33,
-		GOON_STATE_JUMP_FORWARD_FALL = 34,
-		GOON_STATE_MONKEY_TO_FREEFALL = 35,
-		GOON_STATE_FREEFALL = 36,
-		GOON_STATE_FREEFALL_LAND_DEATH = 37,
-		GOON_STATE_JUMP_FORWARD_2_BLOCKS = 38,
-		GOON_STATE_CLIMB_4_STEPS = 39,
-		GOON_STATE_CLIMB_3_STEPS = 40,
-		GOON_STATE_CLIMB_2_STEPS = 41,
-		GOON_STATE_JUMP_OFF_4_STEPS = 42,
-		GOON_STATE_JUMP_OFF_3_STEPS = 43,
-		GOON_STATE_BLIND = 44
+		BADDIE_STATE_UNKNOWN_8 = 8,
+		BADDIE_STATE_UNKNOWN_9 = 9,
+		BADDIE_STATE_DRAW_GUN = 10,
+		BADDIE_STATE_HOLSTER_GUN = 11,
+		BADDIE_STATE_DRAW_SWORD = 12,
+		BADDIE_STATE_HOLSTER_SWORD = 13,
+		BADDIE_STATE_FIRE = 14,
+		BADDIE_STATE_SWORD_HIT_FRONT = 15,
+		BADDIE_STATE_SWORD_HIT_RIGHT = 16,
+		BADDIE_STATE_SWORD_HIT_LEFT = 17,
+		BADDIE_STATE_MONKEY_GRAB = 18,
+		BADDIE_STATE_MONKEY_IDLE = 19,
+		BADDIE_STATE_MONKEY_FORWARD = 20,
+		BADDIE_STATE_MONKEY_PUSH_OFF = 21,
+		BADDIE_STATE_MONKEY_FALL_LAND = 22,
+		BADDIE_STATE_ROLL_LEFT = 23,
+		BADDIE_STATE_JUMP_RIGHT = 24,
+		BADDIE_STATE_STAND_TO_CROUCH = 25,
+		BADDIE_STATE_CROUCH = 26,
+		BADDIE_STATE_CROUCH_PICKUP = 27,
+		BADDIE_STATE_CROUCH_TO_STAND = 28,
+		BADDIE_STATE_WALK_SWORD_HIT_RIGHT = 29,
+		BADDIE_STATE_SOMERSAULT = 30,
+		BADDIE_STATE_AIM = 31,
+		BADDIE_STATE_DEATH = 32,
+		BADDIE_STATE_JUMP_FORWARD_1_BLOCK = 33,
+		BADDIE_STATE_JUMP_FORWARD_FALL = 34,
+		BADDIE_STATE_MONKEY_TO_FREEFALL = 35,
+		BADDIE_STATE_FREEFALL = 36,
+		BADDIE_STATE_FREEFALL_LAND_DEATH = 37,
+		BADDIE_STATE_JUMP_FORWARD_2_BLOCKS = 38,
+		BADDIE_STATE_CLIMB_4_STEPS = 39,
+		BADDIE_STATE_CLIMB_3_STEPS = 40,
+		BADDIE_STATE_CLIMB_2_STEPS = 41,
+		BADDIE_STATE_JUMP_OFF_4_STEPS = 42,
+		BADDIE_STATE_JUMP_OFF_3_STEPS = 43,
+		BADDIE_STATE_BLIND = 44
 	};
 
-	enum GoonAnim
+	enum BaddieAnim
 	{
-		GOON_ANIM_RUN = 0,
-		GOON_ANIM_RUN_STOP_START = 1,
-		GOON_ANIM_RUN_STOP_END = 2,
-		GOON_ANIM_SOMERSAULT_START = 3,
-		GOON_ANIM_SOMERSAULT_END = 4,
-		GOON_ANIM_DODGE_START = 5,
+		BADDIE_ANIM_RUN = 0,
+		BADDIE_ANIM_RUN_STOP_START = 1,
+		BADDIE_ANIM_RUN_STOP_END = 2,
+		BADDIE_ANIM_SOMERSAULT_START = 3,
+		BADDIE_ANIM_SOMERSAULT_END = 4,
+		BADDIE_ANIM_DODGE_START = 5,
 		// 6
 		// 7
 		// 8
-		GOON_ANIM_MONKEY_GRAB = 9,
-		GOON_ANIM_MONKEY_IDLE = 10,
-		GOON_ANIM_MONKEY_FORWARD = 11,
-		GOON_ANIM_MONKEY_IDLE_TO_FORWARD = 12,
-		GOON_ANIM_MONKEY_STOP_LEFT = 13,
-		GOON_ANIM_MONKEY_STOP_RIGHT = 14,
-		GOON_ANIM_MONKEY_FALL_LAND = 15,
-		GOON_ANIM_MONKEY_PUSH_OFF = 16,
-		GOON_ANIM_DODGE_END = 17,
-		GOON_ANIM_STAND_IDLE = 18,
-		GOON_ANIM_DODGE_END_TO_STAND = 19,
-		GOON_ANIM_DRAW_GUN = 20,
-		GOON_ANIM_HOLSTER_GUN = 21,
-		GOON_ANIM_DRAW_SWORD = 22,
-		GOON_ANIM_HOLSTER_SWORD = 23,
-		GOON_ANIM_STAND_TO_ROLL_LEFT = 24,
-		GOON_ANIM_ROLL_LEFT_START = 25,
-		GOON_ANIM_ROLL_LEFT_CONTINUE = 26,
-		GOON_ANIM_ROLL_LEFT_END = 27,
-		GOON_ANIM_ROLL_LEFT_TO_CROUCH = 28,
-		GOON_ANIM_CROUCH = 29,
-		GOON_ANIM_CROUCH_TO_STAND = 30,
-		GOON_ANIM_STAND_TO_WALK = 31,
-		GOON_ANIM_WALK = 32,
-		GOON_ANIM_WALK_TO_RUN = 33,
-		GOON_ANIM_STAND_TO_AIM = 34,
-		GOON_ANIM_AIM = 35,
-		GOON_ANIM_FIRE = 36,
-		GOON_ANIM_AIM_TO_STAND = 37,
-		GOON_ANIM_SWORD_HIT_FRONT = 38,
-		GOON_ANIM_CROUCH_PICKUP = 39,
-		GOON_ANIM_STAND_TO_CROUCH = 40,
-		GOON_ANIM_SWORD_HIT_RIGHT = 41,
-		GOON_ANIM_SWORD_HIT_RIGHT_TO_LEFT = 42,
-		GOON_ANIM_SWORD_HIT_RIGHT_TO_STAND = 43,
-		GOON_ANIM_SWORD_HIT_LEFT = 44,
-		GOON_ANIM_STAND_DEATH = 45,
-		GOON_ANIM_WALK_SWORD_HIT_RIGHT = 46,
-		GOON_ANIM_STAND_TO_JUMP_RIGHT = 47,
-		GOON_ANIM_JUMP_RIGHT_START = 48,
-		GOON_ANIM_JUMP_RIGHT_CONTINUE = 49,
-		GOON_ANIM_JUMP_RIGHT_END = 50,
-		GOON_ANIM_RUN_TO_WALK = 51,
+		BADDIE_ANIM_MONKEY_GRAB = 9,
+		BADDIE_ANIM_MONKEY_IDLE = 10,
+		BADDIE_ANIM_MONKEY_FORWARD = 11,
+		BADDIE_ANIM_MONKEY_IDLE_TO_FORWARD = 12,
+		BADDIE_ANIM_MONKEY_STOP_LEFT = 13,
+		BADDIE_ANIM_MONKEY_STOP_RIGHT = 14,
+		BADDIE_ANIM_MONKEY_FALL_LAND = 15,
+		BADDIE_ANIM_MONKEY_PUSH_OFF = 16,
+		BADDIE_ANIM_DODGE_END = 17,
+		BADDIE_ANIM_STAND_IDLE = 18,
+		BADDIE_ANIM_DODGE_END_TO_STAND = 19,
+		BADDIE_ANIM_DRAW_GUN = 20,
+		BADDIE_ANIM_HOLSTER_GUN = 21,
+		BADDIE_ANIM_DRAW_SWORD = 22,
+		BADDIE_ANIM_HOLSTER_SWORD = 23,
+		BADDIE_ANIM_STAND_TO_ROLL_LEFT = 24,
+		BADDIE_ANIM_ROLL_LEFT_START = 25,
+		BADDIE_ANIM_ROLL_LEFT_CONTINUE = 26,
+		BADDIE_ANIM_ROLL_LEFT_END = 27,
+		BADDIE_ANIM_ROLL_LEFT_TO_CROUCH = 28,
+		BADDIE_ANIM_CROUCH = 29,
+		BADDIE_ANIM_CROUCH_TO_STAND = 30,
+		BADDIE_ANIM_STAND_TO_WALK = 31,
+		BADDIE_ANIM_WALK = 32,
+		BADDIE_ANIM_WALK_TO_RUN = 33,
+		BADDIE_ANIM_STAND_TO_AIM = 34,
+		BADDIE_ANIM_AIM = 35,
+		BADDIE_ANIM_FIRE = 36,
+		BADDIE_ANIM_AIM_TO_STAND = 37,
+		BADDIE_ANIM_SWORD_HIT_FRONT = 38,
+		BADDIE_ANIM_CROUCH_PICKUP = 39,
+		BADDIE_ANIM_STAND_TO_CROUCH = 40,
+		BADDIE_ANIM_SWORD_HIT_RIGHT = 41,
+		BADDIE_ANIM_SWORD_HIT_RIGHT_TO_LEFT = 42,
+		BADDIE_ANIM_SWORD_HIT_RIGHT_TO_STAND = 43,
+		BADDIE_ANIM_SWORD_HIT_LEFT = 44,
+		BADDIE_ANIM_STAND_DEATH = 45,
+		BADDIE_ANIM_WALK_SWORD_HIT_RIGHT = 46,
+		BADDIE_ANIM_STAND_TO_JUMP_RIGHT = 47,
+		BADDIE_ANIM_JUMP_RIGHT_START = 48,
+		BADDIE_ANIM_JUMP_RIGHT_CONTINUE = 49,
+		BADDIE_ANIM_JUMP_RIGHT_END = 50,
+		BADDIE_ANIM_RUN_TO_WALK = 51,
 		// 52
 		// 53
-		GOON_ANIM_WALK_STOP_RIGHT = 54,
-		GOON_ANIM_STAND_TO_JUMP_FORWARD = 55,
-		GOON_ANIM_JUMP_FORWARD_1_BLOCK = 56,
-		GOON_ANIM_JUMP_FORWARD_FALL = 57,
-		GOON_ANIM_JUMP_FORWARD_LAND = 58,
-		GOON_ANIM_MONKEY_TO_FREEFALL = 59,
-		GOON_ANIM_FREEFALL = 60,
-		GOON_ANIM_FREEFALL_LAND_DEATH = 61,
-		GOON_ANIM_CLIMB_4_STEPS = 62,
-		GOON_ANIM_CLIMB_3_STEPS = 63,
-		GOON_ANIM_CLIMB_2_STEPS = 64,
-		GOON_ANIM_JUMP_OFF_4_STEPS = 65,
-		GOON_ANIM_JUMP_OFF_3_STEPS = 66,
-		GOON_ANIM_JUMP_FORWARD_2_BLOCKS = 67,
-		GOON_ANIM_BLIND = 68,
-		GOON_ANIM_BLIND_TO_STAND = 69,
-		GOON_ANIM_DEAD = 70,
+		BADDIE_ANIM_WALK_STOP_RIGHT = 54,
+		BADDIE_ANIM_STAND_TO_JUMP_FORWARD = 55,
+		BADDIE_ANIM_JUMP_FORWARD_1_BLOCK = 56,
+		BADDIE_ANIM_JUMP_FORWARD_FALL = 57,
+		BADDIE_ANIM_JUMP_FORWARD_LAND = 58,
+		BADDIE_ANIM_MONKEY_TO_FREEFALL = 59,
+		BADDIE_ANIM_FREEFALL = 60,
+		BADDIE_ANIM_FREEFALL_LAND_DEATH = 61,
+		BADDIE_ANIM_CLIMB_4_STEPS = 62,
+		BADDIE_ANIM_CLIMB_3_STEPS = 63,
+		BADDIE_ANIM_CLIMB_2_STEPS = 64,
+		BADDIE_ANIM_JUMP_OFF_4_STEPS = 65,
+		BADDIE_ANIM_JUMP_OFF_3_STEPS = 66,
+		BADDIE_ANIM_JUMP_FORWARD_2_BLOCKS = 67,
+		BADDIE_ANIM_BLIND = 68,
+		BADDIE_ANIM_BLIND_TO_STAND = 69,
+		BADDIE_ANIM_DEAD = 70,
 	};
 
-	enum GoonFrame
+	enum BaddieFrame
 	{
-		FRAME_GOON_HOLSTER_GUN = 20,
-		FRAME_GOON_DRAW_GUN = 21,
-		FRAME_GOON_HOLSTER_SWORD = 22,
-		FRAME_GOON_DRAW_SWORD = 12,
-		FRAME_GOON_RUN_TO_SOMERSAULT = 11,
-		FRAME_GOON_SWORD_HIT_NO_DAMAGE_MAX = 12,
-		FRAME_GOON_SWORD_HIT_DAMAGE_MIN = 13,
-		FRAME_GOON_SWORD_HIT_DAMAGE_MAX = 21,
-		FRAME_GOON_CROUCH_PICKUP = 9,
-		FRAME_GOON_FIRE_MIN = 1,
-		FRAME_GOON_FIRE_MAX = 13,
-		FRAME_GOON_SOMERSAULT_START_TAKE_OFF = 18,
+		FRAME_BADDIE_HOLSTER_GUN = 20,
+		FRAME_BADDIE_DRAW_GUN = 21,
+		FRAME_BADDIE_HOLSTER_SWORD = 22,
+		FRAME_BADDIE_DRAW_SWORD = 12,
+		FRAME_BADDIE_RUN_TO_SOMERSAULT = 11,
+		FRAME_BADDIE_SWORD_HIT_NO_DAMAGE_MAX = 12,
+		FRAME_BADDIE_SWORD_HIT_DAMAGE_MIN = 13,
+		FRAME_BADDIE_SWORD_HIT_DAMAGE_MAX = 21,
+		FRAME_BADDIE_CROUCH_PICKUP = 9,
+		FRAME_BADDIE_FIRE_MIN = 1,
+		FRAME_BADDIE_FIRE_MAX = 13,
+		FRAME_BADDIE_SOMERSAULT_START_TAKE_OFF = 18,
 	};
 
-	enum GoonMeshSwapFlags
+	enum BaddieMeshSwapFlags
 	{
-		MESHSWAPFLAGS_GOON_EMPTY = 0x7FC800,
-		MESHSWAPFLAGS_GOON_SWORD_SIMPLE = 0x7E0880,
-		MESHSWAPFLAGS_GOON_SWORD_NINJA = 0x000880,
-		MESHSWAPFLAGS_GOON_GUN = 0x7FC010,
+		MESHSWAPFLAGS_BADDIE_EMPTY = 0x7FC800,
+		MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE = 0x7E0880,
+		MESHSWAPFLAGS_BADDIE_SWORD_NINJA = 0x000880,
+		MESHSWAPFLAGS_BADDIE_GUN = 0x7FC010,
 	};
 
-	#define GOON_USE_UZI	24
+	#define BADDIE_USE_UZI	24
 
-	BITE_INFO GoonGunBite = { 0, -16, 200, 11 };
-	BITE_INFO GoonSwordBite = { 0, 0, 0, 15 };
+	BITE_INFO BaddieGunBite = { 0, -16, 200, 11 };
+	BITE_INFO BaddieSwordBite = { 0, 0, 0, 15 };
 
-	void InitialiseGoon(short itemNumber)
+	void InitialiseBaddie(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 	
 		ClearItem(itemNumber);
 
-		short objectNumber = (Objects[ID_GOON2].loaded ? ID_GOON2 : ID_GOON1);
+		short objectNumber = (Objects[ID_BADDIE2].loaded ? ID_BADDIE2 : ID_BADDIE1);
 
-		if (item->ObjectNumber == ID_GOON1)
+		if (item->ObjectNumber == ID_BADDIE1)
 		{
-			item->SwapMeshFlags = MESHSWAPFLAGS_GOON_GUN;
+			item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_GUN;
 			item->MeshBits = 0xFF81FFFF;
-			item->ItemFlags[2] = GOON_USE_UZI;
+			item->ItemFlags[2] = BADDIE_USE_UZI;
 		}
 		else
 		{
-			item->SwapMeshFlags = MESHSWAPFLAGS_GOON_SWORD_NINJA;
+			item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_SWORD_NINJA;
 			item->MeshBits = -1;
 			item->ItemFlags[2] = 0;
 		}
@@ -227,57 +227,57 @@ namespace TEN::Entities::TR4
 		// To the same things of OCB 1, 2, 3, 4 but also drawing uzis
 		if (ocb > 9 && ocb < 20)
 		{
-			item->ItemFlags[2] += GOON_USE_UZI;
+			item->ItemFlags[2] += BADDIE_USE_UZI;
 			item->TriggerFlags -= 10;
 			ocb -= 10;
 		}
 	
 		if (!ocb || ocb > 4 && ocb < 7)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_IDLE;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_IDLE;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = GOON_STATE_IDLE;
-			item->Animation.ActiveState = GOON_STATE_IDLE;
+			item->Animation.TargetState = BADDIE_STATE_IDLE;
+			item->Animation.ActiveState = BADDIE_STATE_IDLE;
 			return;
 		}
 
 		// OCB: jump right
 		if (ocb == 1)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_TO_JUMP_RIGHT;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_JUMP_RIGHT;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = GOON_STATE_JUMP_RIGHT;
-			item->Animation.ActiveState = GOON_STATE_JUMP_RIGHT;
+			item->Animation.TargetState = BADDIE_STATE_JUMP_RIGHT;
+			item->Animation.ActiveState = BADDIE_STATE_JUMP_RIGHT;
 			return;
 		}
 
 		// OCB: jump left
 		if (ocb == 2)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_TO_ROLL_LEFT;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_ROLL_LEFT;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = GOON_STATE_ROLL_LEFT;
-			item->Animation.ActiveState = GOON_STATE_ROLL_LEFT;
+			item->Animation.TargetState = BADDIE_STATE_ROLL_LEFT;
+			item->Animation.ActiveState = BADDIE_STATE_ROLL_LEFT;
 			return;
 		}
 	
 		// OCB: crouch
 		if (ocb == 3)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CROUCH;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CROUCH;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = GOON_STATE_CROUCH;
-			item->Animation.ActiveState = GOON_STATE_CROUCH;
+			item->Animation.TargetState = BADDIE_STATE_CROUCH;
+			item->Animation.ActiveState = BADDIE_STATE_CROUCH;
 			return;
 		}
 
 		// OCB: climb up 4 or 6 clicks 
 		if (ocb == 4)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_4_STEPS;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_4_STEPS;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = GOON_STATE_CLIMB_4_STEPS;
-			item->Animation.ActiveState = GOON_STATE_CLIMB_4_STEPS;
+			item->Animation.TargetState = BADDIE_STATE_CLIMB_4_STEPS;
+			item->Animation.ActiveState = BADDIE_STATE_CLIMB_4_STEPS;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
 			item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * CLICK(4);
 			return;
@@ -286,10 +286,10 @@ namespace TEN::Entities::TR4
 		// OCB: crouch and jump in train levels?
 		if (ocb > 100)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CROUCH;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CROUCH;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = GOON_STATE_CROUCH;
-			item->Animation.ActiveState = GOON_STATE_CROUCH;
+			item->Animation.TargetState = BADDIE_STATE_CROUCH;
+			item->Animation.ActiveState = BADDIE_STATE_CROUCH;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
 			item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * CLICK(4);
 			item->ItemFlags[3] = ocb;
@@ -299,7 +299,7 @@ namespace TEN::Entities::TR4
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
-	void GoonControl(short itemNumber)
+	void BaddieControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
@@ -307,7 +307,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 		auto* enemyItem = creature->Enemy;
-		auto* object = &Objects[ID_GOON1];
+		auto* object = &Objects[ID_BADDIE1];
 
 		short tilt = 0;
 		short angle = 0;
@@ -315,8 +315,8 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 		short joint3 = 0;
 
-		// TODO: better add a second control routine for goon 2 instead of mixing them?
-		short objectNumber = (Objects[ID_GOON2].loaded ? ID_GOON2 : ID_GOON1);
+		// TODO: better add a second control routine for baddie 2 instead of mixing them?
+		short objectNumber = (Objects[ID_BADDIE2].loaded ? ID_BADDIE2 : ID_BADDIE1);
 
 		bool roll = false;
 		bool jump = false;
@@ -336,7 +336,7 @@ namespace TEN::Entities::TR4
 			item->TriggerFlags = 1000 * (item->TriggerFlags / 1000);
 		}
 
-		// Can goon jump? Check for a distance of 1 and 2 sectors
+		// Can baddie jump? Check for a distance of 1 and 2 sectors
 		int x = item->Pose.Position.x;
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
@@ -408,11 +408,11 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[1] = item->RoomNumber;
 
-		// Handle goon firing
+		// Handle baddie firing
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(GoonGunBite.x, GoonGunBite.y, GoonGunBite.z);
-			GetJointAbsPosition(item, &pos, GoonGunBite.meshNum);
+			auto pos = Vector3Int(BaddieGunBite.x, BaddieGunBite.y, BaddieGunBite.z);
+			GetJointAbsPosition(item, &pos, BaddieGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
 			creature->FiredWeapon--;
@@ -427,7 +427,7 @@ namespace TEN::Entities::TR4
 
 			switch (item->Animation.ActiveState)
 			{
-			case GOON_STATE_DEATH:
+			case BADDIE_STATE_DEATH:
 				item->Animation.Airborne = true;
 				currentCreature->LOT.IsMonkeying = false;
 
@@ -440,12 +440,12 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case GOON_STATE_MONKEY_TO_FREEFALL:
-				item->Animation.TargetState = GOON_STATE_FREEFALL;
+			case BADDIE_STATE_MONKEY_TO_FREEFALL:
+				item->Animation.TargetState = BADDIE_STATE_FREEFALL;
 				item->Animation.Airborne = false;
 				break;
 
-			case GOON_STATE_FREEFALL:
+			case BADDIE_STATE_FREEFALL:
 				item->Animation.Airborne = true;
 
 				if (item->Pose.Position.y >= item->Floor)
@@ -453,38 +453,38 @@ namespace TEN::Entities::TR4
 					item->Pose.Position.y = item->Floor;
 					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
-					item->Animation.TargetState = GOON_STATE_FREEFALL_LAND_DEATH;
+					item->Animation.TargetState = BADDIE_STATE_FREEFALL_LAND_DEATH;
 				}
 
 				break;
 
-			case GOON_STATE_FREEFALL_LAND_DEATH:
+			case BADDIE_STATE_FREEFALL_LAND_DEATH:
 				item->Pose.Position.y = item->Floor;
 				break;
 
-			case GOON_STATE_MONKEY_GRAB:
-			case GOON_STATE_MONKEY_IDLE:
-			case GOON_STATE_MONKEY_FORWARD:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_MONKEY_TO_FREEFALL;
+			case BADDIE_STATE_MONKEY_GRAB:
+			case BADDIE_STATE_MONKEY_IDLE:
+			case BADDIE_STATE_MONKEY_FORWARD:
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_MONKEY_TO_FREEFALL;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = GOON_STATE_MONKEY_TO_FREEFALL;
+				item->Animation.ActiveState = BADDIE_STATE_MONKEY_TO_FREEFALL;
 				item->Animation.Velocity = 0;
 				break;
 
 			default:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_DEATH;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = GOON_STATE_DEATH;
+				item->Animation.ActiveState = BADDIE_STATE_DEATH;
 				currentCreature->LOT.IsJumping = true;
 
-				// OCB: respawn code for GOON_1
+				// OCB: respawn code for BADDIE_1
 				if (item->TriggerFlags > 999)
 				{
 					for (int i = 0; i < g_Level.NumItems; i++)
 					{
 						auto* possibleEnemy = &g_Level.Items[i];
 
-						if (possibleEnemy->ObjectNumber == ID_GOON1 || possibleEnemy->ObjectNumber == ID_GOON2 &&
+						if (possibleEnemy->ObjectNumber == ID_BADDIE1 || possibleEnemy->ObjectNumber == ID_BADDIE2 &&
 							(item->TriggerFlags / 1000) == (possibleEnemy->TriggerFlags / 1000) - 1 &&
 							!(possibleEnemy->Flags & IFLAG_KILLED))
 						{
@@ -547,7 +547,7 @@ namespace TEN::Entities::TR4
 			//ItemInfo* oldEnemy = creature->enemy;
 			//creature->enemy = LaraItem;
 
-			// Is goon alerted?
+			// Is baddie alerted?
 			if (item->HitStatus ||
 				laraAI.distance < pow(SECTOR(1), 2) ||
 				TargetVisible(item, &laraAI) &&
@@ -619,7 +619,7 @@ namespace TEN::Entities::TR4
 
 			switch (item->Animation.ActiveState)
 			{
-			case GOON_STATE_IDLE:
+			case BADDIE_STATE_IDLE:
 				currentCreature->MaxTurn = 0;
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsMonkeying = false;
@@ -639,36 +639,36 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->SwapMeshFlags == MESHSWAPFLAGS_GOON_SWORD_NINJA &&
+				if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_SWORD_NINJA &&
 					item == Lara.TargetEntity &&
 					laraAI.ahead &&
 					laraAI.distance > pow(682, 2))
 				{
-					item->Animation.TargetState = GOON_STATE_DODGE_START;
+					item->Animation.TargetState = BADDIE_STATE_DODGE_START;
 					break;
 				}
 
 				if (Targetable(item, &AI) && item->ItemFlags[2] > 0)
 				{
-					if (item->SwapMeshFlags == MESHSWAPFLAGS_GOON_GUN)
+					if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN)
 					{
-						item->Animation.TargetState = GOON_STATE_AIM;
+						item->Animation.TargetState = BADDIE_STATE_AIM;
 						break;
 					}
 
-					if (item->SwapMeshFlags != MESHSWAPFLAGS_GOON_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_GOON_SWORD_NINJA)
+					if (item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_NINJA)
 					{
-						item->Animation.TargetState = GOON_STATE_DRAW_GUN;
+						item->Animation.TargetState = BADDIE_STATE_DRAW_GUN;
 						break;
 					}
 
-					item->Animation.TargetState = GOON_STATE_HOLSTER_SWORD;
+					item->Animation.TargetState = BADDIE_STATE_HOLSTER_SWORD;
 					break;
 				}
 
 				if (item->AIBits & MODIFY)
 				{
-					item->Animation.TargetState = GOON_STATE_IDLE;
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 
 					if (item->Floor > item->Pose.Position.y + CLICK(3))
 						item->AIBits &= ~MODIFY;
@@ -680,14 +680,14 @@ namespace TEN::Entities::TR4
 				{
 					currentCreature->MaxTurn = 0;
 					currentCreature->LOT.IsJumping = true;
-					item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_STAND_TO_JUMP_FORWARD;
+					item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_JUMP_FORWARD;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = GOON_STATE_JUMP_FORWARD_1_BLOCK;
+					item->Animation.ActiveState = BADDIE_STATE_JUMP_FORWARD_1_BLOCK;
 
 					if (!canJump2Sectors)
-						item->Animation.TargetState = GOON_STATE_JUMP_FORWARD_1_BLOCK;
+						item->Animation.TargetState = BADDIE_STATE_JUMP_FORWARD_1_BLOCK;
 					else
-						item->Animation.TargetState = GOON_STATE_JUMP_FORWARD_2_BLOCKS;
+						item->Animation.TargetState = BADDIE_STATE_JUMP_FORWARD_2_BLOCKS;
 
 					break;
 				}
@@ -698,15 +698,15 @@ namespace TEN::Entities::TR4
 					if ((objectNumber == ID_SMALLMEDI_ITEM || objectNumber == ID_UZI_AMMO_ITEM || objectNumber == ID_BIGMEDI_ITEM) &&
 						AI.distance < pow(SECTOR(0.5f), 2))
 					{
-						item->Animation.TargetState = GOON_STATE_STAND_TO_CROUCH;
-						item->Animation.RequiredState = GOON_STATE_CROUCH_PICKUP;
+						item->Animation.TargetState = BADDIE_STATE_STAND_TO_CROUCH;
+						item->Animation.RequiredState = BADDIE_STATE_CROUCH_PICKUP;
 						break;
 					}
 				}
 
-				if (item->SwapMeshFlags == MESHSWAPFLAGS_GOON_GUN && item->ItemFlags[2] < 1)
+				if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN && item->ItemFlags[2] < 1)
 				{
-					item->Animation.TargetState = GOON_STATE_HOLSTER_GUN;
+					item->Animation.TargetState = BADDIE_STATE_HOLSTER_GUN;
 					break;
 				}
 
@@ -715,19 +715,19 @@ namespace TEN::Entities::TR4
 					probe = GetCollision(item);
 					if (probe.Position.Ceiling == probe.Position.Floor - CLICK(6))
 					{
-						if (item->SwapMeshFlags == MESHSWAPFLAGS_GOON_EMPTY)
+						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_EMPTY)
 						{
-							item->Animation.TargetState = GOON_STATE_MONKEY_GRAB;
+							item->Animation.TargetState = BADDIE_STATE_MONKEY_GRAB;
 							break;
 						}
 
-						if (item->SwapMeshFlags == MESHSWAPFLAGS_GOON_GUN)
+						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN)
 						{
-							item->Animation.TargetState = GOON_STATE_HOLSTER_GUN;
+							item->Animation.TargetState = BADDIE_STATE_HOLSTER_GUN;
 							break;
 						}
 
-						item->Animation.TargetState = GOON_STATE_HOLSTER_SWORD;
+						item->Animation.TargetState = BADDIE_STATE_HOLSTER_SWORD;
 						break;
 					}
 				}
@@ -736,42 +736,42 @@ namespace TEN::Entities::TR4
 					if (roll)
 					{
 						currentCreature->MaxTurn = 0;
-						item->Animation.TargetState = GOON_STATE_ROLL_LEFT;
+						item->Animation.TargetState = BADDIE_STATE_ROLL_LEFT;
 						break;
 					}
 
 					if (jump)
 					{
 						currentCreature->MaxTurn = 0;
-						item->Animation.TargetState = GOON_STATE_JUMP_RIGHT;
+						item->Animation.TargetState = BADDIE_STATE_JUMP_RIGHT;
 						break;
 					}
 
-					if (item->SwapMeshFlags == MESHSWAPFLAGS_GOON_EMPTY)
+					if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_EMPTY)
 					{
-						item->Animation.TargetState = GOON_STATE_DRAW_SWORD;
+						item->Animation.TargetState = BADDIE_STATE_DRAW_SWORD;
 						break;
 					}
 
 					if (currentCreature->Enemy && currentCreature->Enemy->HitPoints > 0 && AI.distance < pow(682, 2))
 					{
-						if (item->SwapMeshFlags == MESHSWAPFLAGS_GOON_GUN)
-							item->Animation.TargetState = GOON_STATE_HOLSTER_GUN;
+						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN)
+							item->Animation.TargetState = BADDIE_STATE_HOLSTER_GUN;
 						else if (AI.distance >= pow(SECTOR(0.5f), 2))
-							item->Animation.TargetState = GOON_STATE_SWORD_HIT_FRONT;
+							item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_FRONT;
 						else if (GetRandomControl() & 1)
-							item->Animation.TargetState = GOON_STATE_SWORD_HIT_LEFT;
+							item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_LEFT;
 						else
-							item->Animation.TargetState = GOON_STATE_SWORD_HIT_RIGHT;
+							item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_RIGHT;
 						
 						break;
 					}
 				}
 
-				item->Animation.TargetState = GOON_STATE_WALK;
+				item->Animation.TargetState = BADDIE_STATE_WALK;
 				break;
 
-			case GOON_STATE_WALK:
+			case BADDIE_STATE_WALK:
 				currentCreature->MaxTurn = ANGLE(7.0f);
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsMonkeying = false;
@@ -784,35 +784,35 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &AI) && item->ItemFlags[2] > 0)
 				{
-					item->Animation.TargetState = GOON_STATE_IDLE;
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 					break;
 				}
 
 				if (canJump1Sector || canJump2Sectors)
 				{
 					currentCreature->MaxTurn = 0;
-					item->Animation.TargetState = GOON_STATE_IDLE;
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 					break;
 				}
 
 				if (currentCreature->ReachedGoal && currentCreature->MonkeySwingAhead)
 				{
-					item->Animation.TargetState = GOON_STATE_IDLE;
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 					break;
 				}
 
 				if (item->ItemFlags[2] < 1)
 				{
-					if (item->SwapMeshFlags != MESHSWAPFLAGS_GOON_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_GOON_SWORD_NINJA)
+					if (item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_NINJA)
 					{
-						item->Animation.TargetState = GOON_STATE_IDLE;
+						item->Animation.TargetState = BADDIE_STATE_IDLE;
 						break;
 					}
 				}
 
 				if (AI.ahead && AI.distance < SECTOR(256))
 				{
-					item->Animation.TargetState = GOON_STATE_IDLE;
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 					break;
 				}
 
@@ -820,20 +820,20 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(482, 2))
 					{
-						item->Animation.TargetState = GOON_STATE_IDLE;
+						item->Animation.TargetState = BADDIE_STATE_IDLE;
 						break;
 					}
 
 					if (AI.distance < pow(SECTOR(1), 2))
 					{
-						item->Animation.TargetState = GOON_STATE_WALK_SWORD_HIT_RIGHT;
+						item->Animation.TargetState = BADDIE_STATE_WALK_SWORD_HIT_RIGHT;
 						break;
 					}
 				}
 
 				if (roll || jump)
 				{
-					item->Animation.ActiveState = GOON_STATE_IDLE;
+					item->Animation.ActiveState = BADDIE_STATE_IDLE;
 					break;
 				}
 
@@ -841,27 +841,27 @@ namespace TEN::Entities::TR4
 					!(currentCreature->JumpAhead) &&
 					AI.distance > pow(SECTOR(1), 2))
 				{
-					item->Animation.TargetState = GOON_STATE_RUN;
+					item->Animation.TargetState = BADDIE_STATE_RUN;
 				}
 
 				break;
 
-			case GOON_STATE_RUN:
+			case BADDIE_STATE_RUN:
 				currentCreature->MaxTurn = ANGLE(11.0f);
 				tilt = abs(angle) / 2;
 
 				if (AI.ahead)
 					joint3 = AI.angle;
 				
-				if (objectNumber == ID_GOON2 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_RUN_TO_SOMERSAULT &&
+				if (objectNumber == ID_BADDIE2 &&
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
 					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) &&
 						AI.distance < pow(SECTOR(3), 2) ||
 						height2 >= (height1 + CLICK(2))))
 				{
-					item->Animation.TargetState = GOON_STATE_SOMERSAULT;
+					item->Animation.TargetState = BADDIE_STATE_SOMERSAULT;
 					currentCreature->MaxTurn = 0;
 					break;
 				}
@@ -875,28 +875,28 @@ namespace TEN::Entities::TR4
 					AI.distance < pow(614, 2) ||
 					currentCreature->JumpAhead)
 				{
-					item->Animation.TargetState = GOON_STATE_IDLE;
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 					break;
 				}
 
 				if (AI.distance < pow(SECTOR(1), 2))
 				{
-					item->Animation.TargetState = GOON_STATE_WALK;
+					item->Animation.TargetState = BADDIE_STATE_WALK;
 					break;
 				}
 
 				break;
 
-			case GOON_STATE_SWORD_HIT_RIGHT:
-			case GOON_STATE_SWORD_HIT_FRONT:
-			case GOON_STATE_SWORD_HIT_LEFT:
-			case GOON_STATE_WALK_SWORD_HIT_RIGHT:
+			case BADDIE_STATE_SWORD_HIT_RIGHT:
+			case BADDIE_STATE_SWORD_HIT_FRONT:
+			case BADDIE_STATE_SWORD_HIT_LEFT:
+			case BADDIE_STATE_WALK_SWORD_HIT_RIGHT:
 				currentCreature->MaxTurn = 0;
 
-				if (item->Animation.ActiveState == GOON_STATE_SWORD_HIT_RIGHT &&
+				if (item->Animation.ActiveState == BADDIE_STATE_SWORD_HIT_RIGHT &&
 					AI.distance < SECTOR(254))
 				{
-					item->Animation.TargetState = GOON_STATE_SWORD_HIT_LEFT;
+					item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_LEFT;
 				}
 
 				if (AI.ahead)
@@ -905,8 +905,8 @@ namespace TEN::Entities::TR4
 					joint2 = AI.xAngle;
 				}
 
-				if (item->Animation.ActiveState != GOON_STATE_SWORD_HIT_FRONT ||
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SWORD_HIT_NO_DAMAGE_MAX)
+				if (item->Animation.ActiveState != BADDIE_STATE_SWORD_HIT_FRONT ||
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SWORD_HIT_NO_DAMAGE_MAX)
 				{
 					if (abs(AI.angle) >= ANGLE(7.0f))
 					{
@@ -923,12 +923,12 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits & 0x1C000)
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SWORD_HIT_DAMAGE_MIN &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SWORD_HIT_DAMAGE_MAX)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SWORD_HIT_DAMAGE_MIN &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SWORD_HIT_DAMAGE_MAX)
 						{
 							CreatureEffect2(
 								item,
-								&GoonSwordBite,
+								&BaddieSwordBite,
 								10,
 								item->Pose.Orientation.y,
 								DoBloodSplat);
@@ -946,7 +946,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case GOON_STATE_MONKEY_IDLE:
+			case BADDIE_STATE_MONKEY_IDLE:
 				currentCreature->MaxTurn = 0;
 				currentCreature->Flags = 0;
 				joint1 = 0;
@@ -963,24 +963,24 @@ namespace TEN::Entities::TR4
 						LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
 						LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
 				{
-					item->Animation.TargetState = GOON_STATE_MONKEY_PUSH_OFF;
+					item->Animation.TargetState = BADDIE_STATE_MONKEY_PUSH_OFF;
 				}
 				else if (item->BoxNumber != currentCreature->LOT.TargetBox &&
 					currentCreature->MonkeySwingAhead ||
 					probe.Position.Ceiling != (probe.Position.Floor - CLICK(6)))
 				{
-					item->Animation.TargetState = GOON_STATE_MONKEY_FORWARD;
+					item->Animation.TargetState = BADDIE_STATE_MONKEY_FORWARD;
 				}
 				else
 				{
-					item->Animation.TargetState = GOON_STATE_MONKEY_FALL_LAND;
+					item->Animation.TargetState = BADDIE_STATE_MONKEY_FALL_LAND;
 					currentCreature->LOT.IsMonkeying = false;
 					currentCreature->LOT.IsJumping = false;
 				}
 
 				break;
 
-			case GOON_STATE_MONKEY_FORWARD:
+			case BADDIE_STATE_MONKEY_FORWARD:
 				currentCreature->MaxTurn = ANGLE(7.0f);
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsJumping = true;
@@ -994,7 +994,7 @@ namespace TEN::Entities::TR4
 					probe = GetCollision(item);
 
 					if (probe.Position.Ceiling == probe.Position.Floor - CLICK(6))
-						item->Animation.TargetState = GOON_STATE_MONKEY_IDLE;
+						item->Animation.TargetState = BADDIE_STATE_MONKEY_IDLE;
 				}
 
 				if (laraAI.ahead)
@@ -1010,14 +1010,14 @@ namespace TEN::Entities::TR4
 							LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
 							LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT)
 						{
-							item->Animation.TargetState = GOON_STATE_MONKEY_IDLE;
+							item->Animation.TargetState = BADDIE_STATE_MONKEY_IDLE;
 						}
 					}
 				}
 
 				break;
 
-			case GOON_STATE_MONKEY_PUSH_OFF:
+			case BADDIE_STATE_MONKEY_PUSH_OFF:
 				currentCreature->MaxTurn = ANGLE(7.0f);
 
 				if (currentCreature->Flags == someFlag3)
@@ -1039,14 +1039,14 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case GOON_STATE_ROLL_LEFT:
-			case GOON_STATE_JUMP_RIGHT:
+			case BADDIE_STATE_ROLL_LEFT:
+			case BADDIE_STATE_JUMP_RIGHT:
 				item->Status = ITEM_ACTIVE;
 				currentCreature->MaxTurn = someFlag3;
 				currentCreature->Alerted = false;
 				break;
 
-			case GOON_STATE_CROUCH:
+			case BADDIE_STATE_CROUCH:
 				if (item->ItemFlags[0] == someFlag3)
 				{
 					if (currentCreature->Enemy)
@@ -1056,29 +1056,29 @@ namespace TEN::Entities::TR4
 							currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM) &&
 							AI.distance < pow(SECTOR(0.5f), 2))
 						{
-							item->Animation.TargetState = GOON_STATE_CROUCH_PICKUP;
+							item->Animation.TargetState = BADDIE_STATE_CROUCH_PICKUP;
 							break;
 						}
 					}
 
 					if (currentCreature->Alerted)
-						item->Animation.TargetState = GOON_STATE_CROUCH_TO_STAND;
+						item->Animation.TargetState = BADDIE_STATE_CROUCH_TO_STAND;
 				}
 				else
 				{
 					if (AI.distance >= pow(682, 2))
 						break;
 					
-					item->Animation.TargetState = GOON_STATE_CROUCH_TO_STAND;
+					item->Animation.TargetState = BADDIE_STATE_CROUCH_TO_STAND;
 					currentCreature->Enemy = NULL;
 				}
 
 				break;
 
-			case GOON_STATE_CROUCH_PICKUP:
+			case BADDIE_STATE_CROUCH_PICKUP:
 				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_CROUCH_PICKUP)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_CROUCH_PICKUP)
 					break;
 
 				if (!currentCreature->Enemy)
@@ -1104,7 +1104,7 @@ namespace TEN::Entities::TR4
 				else if (currentCreature->Enemy->ObjectNumber == ID_BIGMEDI_ITEM)
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 				else if (currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM)
-					item->ItemFlags[2] += GOON_USE_UZI;
+					item->ItemFlags[2] += BADDIE_USE_UZI;
 				else
 				{
 					currentCreature->Enemy = NULL;
@@ -1113,7 +1113,7 @@ namespace TEN::Entities::TR4
 			
 				KillItem(currentCreature->Enemy - g_Level.Items.data());
 
-				// cancel enemy pointer for other active goons
+				// cancel enemy pointer for other active baddies
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
 					if (ActiveCreatures[i]->ItemNumber != NO_ITEM && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)
@@ -1123,7 +1123,7 @@ namespace TEN::Entities::TR4
 				creature->Enemy = NULL;
 				break;
 
-			case GOON_STATE_AIM:
+			case BADDIE_STATE_AIM:
 				currentCreature->MaxTurn = 0;
 
 				if (AI.ahead)
@@ -1136,14 +1136,14 @@ namespace TEN::Entities::TR4
 				if (!Targetable(item, &AI) ||
 					item->ItemFlags[2] < 1)
 				{
-					item->Animation.TargetState = GOON_STATE_IDLE;
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 					break;
 				}
 
-				item->Animation.TargetState = GOON_STATE_FIRE;
+				item->Animation.TargetState = BADDIE_STATE_FIRE;
 				break;
 
-			case GOON_STATE_FIRE:
+			case BADDIE_STATE_FIRE:
 				creature->FiredWeapon = true;
 
 				if (AI.ahead)
@@ -1153,8 +1153,8 @@ namespace TEN::Entities::TR4
 				}
 				ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
 
-				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MAX ||
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_FIRE_MIN)
+				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_FIRE_MAX ||
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_FIRE_MIN)
 				{
 					break;
 				}
@@ -1162,44 +1162,44 @@ namespace TEN::Entities::TR4
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;
 				
-				if (!ShotLara(item, &AI, &GoonGunBite, joint1, 15));
-					item->Animation.TargetState = GOON_STATE_IDLE;
+				if (!ShotLara(item, &AI, &BaddieGunBite, joint1, 15));
+					item->Animation.TargetState = BADDIE_STATE_IDLE;
 
 				break;
 
 			default:
 				break;
 
-			case GOON_STATE_HOLSTER_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_HOLSTER_GUN)
-					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_EMPTY;
+			case BADDIE_STATE_HOLSTER_GUN:
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_HOLSTER_GUN)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_EMPTY;
 
 				break;
 
-			case GOON_STATE_DRAW_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_DRAW_GUN)
-					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_GUN;
+			case BADDIE_STATE_DRAW_GUN:
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_DRAW_GUN)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_GUN;
 
 				break;
 
-			case GOON_STATE_HOLSTER_SWORD:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_HOLSTER_SWORD)
-					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_EMPTY;
+			case BADDIE_STATE_HOLSTER_SWORD:
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_HOLSTER_SWORD)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_EMPTY;
 				
 				break;
 
-			case GOON_STATE_DRAW_SWORD:
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_DRAW_SWORD)
+			case BADDIE_STATE_DRAW_SWORD:
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_DRAW_SWORD)
 					break;
 
-				if (item->ObjectNumber == ID_GOON1)
-					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_SWORD_SIMPLE;
+				if (item->ObjectNumber == ID_BADDIE1)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE;
 				else
-					item->SwapMeshFlags = MESHSWAPFLAGS_GOON_SWORD_NINJA;
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_SWORD_NINJA;
 
 				break;
 
-			case GOON_STATE_UNKNOWN_8:
+			case BADDIE_STATE_UNKNOWN_8:
 				currentCreature->MaxTurn = 0;
 
 				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
@@ -1207,39 +1207,39 @@ namespace TEN::Entities::TR4
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
 				{
-					item->Animation.TargetState = GOON_STATE_UNKNOWN_9;
+					item->Animation.TargetState = BADDIE_STATE_UNKNOWN_9;
 				}
 
 				break;
 
-			case GOON_STATE_BLIND:
+			case BADDIE_STATE_BLIND:
 				if (!WeaponEnemyTimer)
 				{
 					if ((GetRandomControl() & 0x7F) == 0)
-						item->Animation.TargetState = GOON_STATE_IDLE;
+						item->Animation.TargetState = BADDIE_STATE_IDLE;
 				}
 
 				break;
 
-			case GOON_STATE_SOMERSAULT:
-				if (item->Animation.AnimNumber == Objects[objectNumber].animIndex + GOON_ANIM_SOMERSAULT_END)
+			case BADDIE_STATE_SOMERSAULT:
+				if (item->Animation.AnimNumber == Objects[objectNumber].animIndex + BADDIE_ANIM_SOMERSAULT_END)
 				{
 					ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
 					break;
 				}
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_GOON_SOMERSAULT_START_TAKE_OFF)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SOMERSAULT_START_TAKE_OFF)
 					break;
 
 				currentCreature->LOT.IsJumping = true;
 				break;
 
-			case GOON_STATE_JUMP_FORWARD_1_BLOCK:
-			case GOON_STATE_JUMP_FORWARD_2_BLOCKS:
+			case BADDIE_STATE_JUMP_FORWARD_1_BLOCK:
+			case BADDIE_STATE_JUMP_FORWARD_2_BLOCKS:
 				if (item->ItemFlags[0] >= someFlag3)
 					break;
 
-				if (item->Animation.AnimNumber != Objects[objectNumber].animIndex + GOON_ANIM_STAND_TO_JUMP_FORWARD)
+				if (item->Animation.AnimNumber != Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_JUMP_FORWARD)
 					item->ItemFlags[0] += 2;
 				
 				break;
@@ -1251,12 +1251,12 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 1, joint2);
 		CreatureJoint(item, 2, joint3);
 
-		if (item->Animation.ActiveState >= GOON_STATE_JUMP_FORWARD_2_BLOCKS ||
-			item->Animation.ActiveState == GOON_STATE_JUMP_FORWARD_1_BLOCK ||
-			item->Animation.ActiveState == GOON_STATE_MONKEY_FORWARD ||
-			item->Animation.ActiveState == GOON_STATE_DEATH ||
-			item->Animation.ActiveState == GOON_STATE_SOMERSAULT ||
-			item->Animation.ActiveState == GOON_STATE_BLIND)
+		if (item->Animation.ActiveState >= BADDIE_STATE_JUMP_FORWARD_2_BLOCKS ||
+			item->Animation.ActiveState == BADDIE_STATE_JUMP_FORWARD_1_BLOCK ||
+			item->Animation.ActiveState == BADDIE_STATE_MONKEY_FORWARD ||
+			item->Animation.ActiveState == BADDIE_STATE_DEATH ||
+			item->Animation.ActiveState == BADDIE_STATE_SOMERSAULT ||
+			item->Animation.ActiveState == BADDIE_STATE_BLIND)
 		{
 			CreatureAnimation(itemNumber, angle, 0);
 		}
@@ -1267,37 +1267,37 @@ namespace TEN::Entities::TR4
 			switch (vault)
 			{
 			case 2:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_2_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_2_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = GOON_STATE_CLIMB_2_STEPS;
+				item->Animation.ActiveState = BADDIE_STATE_CLIMB_2_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_3_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_3_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = GOON_STATE_CLIMB_3_STEPS;
+				item->Animation.ActiveState = BADDIE_STATE_CLIMB_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case 4:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_CLIMB_4_STEPS;
-				item->Animation.ActiveState = GOON_STATE_CLIMB_4_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_4_STEPS;
+				item->Animation.ActiveState = BADDIE_STATE_CLIMB_4_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_JUMP_OFF_3_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_JUMP_OFF_3_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = GOON_STATE_JUMP_OFF_3_STEPS;
+				item->Animation.ActiveState = BADDIE_STATE_JUMP_OFF_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_JUMP_OFF_4_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_JUMP_OFF_4_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = GOON_STATE_JUMP_OFF_4_STEPS;
+				item->Animation.ActiveState = BADDIE_STATE_JUMP_OFF_4_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
@@ -1307,9 +1307,9 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + GOON_ANIM_BLIND;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_BLIND;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
-			item->Animation.ActiveState = GOON_STATE_BLIND;
+			item->Animation.ActiveState = BADDIE_STATE_BLIND;
 			creature->MaxTurn = 0;
 		}
 

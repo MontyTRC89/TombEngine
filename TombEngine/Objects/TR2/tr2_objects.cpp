@@ -155,7 +155,7 @@ static void StartEntity(ObjectInfo* obj)
 		g_Level.Bones[obj->boneIndex + 14 * 4] |= (ROT_Y);
 	}
 
-	obj = &Objects[ID_GOON_SILENCER1];
+	obj = &Objects[ID_BADDIE_SILENCER1];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseCreature;
@@ -176,17 +176,17 @@ static void StartEntity(ObjectInfo* obj)
 		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
 
-	obj = &Objects[ID_GOON_SILENCER2];
+	obj = &Objects[ID_BADDIE_SILENCER2];
 	if (obj->loaded)
 	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
+		if (Objects[ID_BADDIE_SILENCER1].loaded)
 		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
+			obj->animIndex = Objects[ID_BADDIE_SILENCER1].animIndex;
+			obj->frameBase = Objects[ID_BADDIE_SILENCER1].frameBase;
 		}
 		else
 		{
-			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
+			TENLog("ID_BADDIE_SILENCER1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
@@ -207,17 +207,17 @@ static void StartEntity(ObjectInfo* obj)
 		g_Level.Bones[obj->boneIndex + 1 * 4] |= (ROT_X | ROT_Y);
 	}
 
-	obj = &Objects[ID_GOON_SILENCER3];
+	obj = &Objects[ID_BADDIE_SILENCER3];
 	if (obj->loaded)
 	{
-		if (Objects[ID_GOON_SILENCER1].loaded)
+		if (Objects[ID_BADDIE_SILENCER1].loaded)
 		{
-			obj->animIndex = Objects[ID_GOON_SILENCER1].animIndex;
-			obj->frameBase = Objects[ID_GOON_SILENCER1].frameBase;
+			obj->animIndex = Objects[ID_BADDIE_SILENCER1].animIndex;
+			obj->frameBase = Objects[ID_BADDIE_SILENCER1].frameBase;
 		}
 		else
 		{
-			TENLog("ID_GOON_SILENCER1 not found!", LogLevel::Error);
+			TENLog("ID_BADDIE_SILENCER1 not found!", LogLevel::Error);
 		}
 
 		obj->initialise = InitialiseCreature;
