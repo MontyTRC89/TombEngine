@@ -6,6 +6,7 @@ public:
 	// Utilities
 	static float Normalize(float angle);
 	static float Lerp(float angleFrom, float angleTo, float alpha = 1.0f, float epsilon = 0.0f);
+	static float LerpLimited(float angleFrom, float angleTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 	static float LerpConstant(float angleFrom, float angleTo, float rate);
 	static bool  Compare(float angle0, float angle1, float epsilon = 0.0f);
 	static float ShortestAngularDistance(float angleFrom, float angleTo);
@@ -48,8 +49,31 @@ inline float Angle::Lerp(float angleFrom, float angleTo, float alpha, float epsi
 
 	if (!Compare(angleFrom, angleTo, epsilon))
 	{
-		auto difference = ShortestAngularDistance(angleFrom, angleTo);
+		float difference = ShortestAngularDistance(angleFrom, angleTo);
 		return (angleFrom + (difference * alpha));
+	}
+
+	return angleTo;
+}
+
+inline float Angle::LerpLimited(float angleFrom, float angleTo, float rate, float alpha, float epsilon)
+{
+	rate = ClampEpsilon(rate);
+	alpha = ClampAlpha(alpha);
+	epsilon = ClampEpsilon(epsilon);
+
+	if (!Compare(angleFrom, angleTo, epsilon))
+	{
+		if (!Compare(angleFrom, angleTo, rate))
+		{
+			int sign = copysign(1, ShortestAngularDistance(angleFrom, angleTo));
+			return (angleFrom + (rate * sign));
+		}
+		else
+		{
+			float difference = ShortestAngularDistance(angleFrom, angleTo);
+			return (angleFrom + (difference * alpha));
+		}
 	}
 
 	return angleTo;
@@ -72,7 +96,7 @@ inline bool Angle::Compare(float angle0, float angle1, float epsilon)
 {
 	epsilon = ClampEpsilon(epsilon);
 
-	auto difference = ShortestAngularDistance(angle0, angle1);
+	float difference = ShortestAngularDistance(angle0, angle1);
 	if (abs(difference) <= epsilon)
 		return true;
 	
@@ -92,7 +116,7 @@ inline float Angle::OrientBetweenPoints(Vector3 point0, Vector3 point1)
 
 inline float Angle::DeltaHeading(Vector3 origin, Vector3 target, float heading)
 {
-	auto difference = OrientBetweenPoints(origin, target);
+	float difference = OrientBetweenPoints(origin, target);
 	return ShortestAngularDistance(heading, difference + DegToRad(90.0f));
 }
 
@@ -166,6 +190,9 @@ public:
 
 	void Lerp(EulerAngles orientTo, float alpha = 1.0f, float epsilon = 0.0f);
 	static EulerAngles Lerp(EulerAngles orientFrom, EulerAngles orientTo, float alpha = 1.0f, float epsilon = 0.0f);
+
+	void LerpLimited(EulerAngles orientTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
+	static EulerAngles LerpLimited(EulerAngles orientFrom, EulerAngles orientTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 
 	void LerpConstant(EulerAngles orientTo, float rate);
 	static EulerAngles LerpConstant(EulerAngles orientFrom, EulerAngles orientTo, float rate);
@@ -277,6 +304,23 @@ inline EulerAngles EulerAngles::Lerp(EulerAngles orientFrom, EulerAngles orientT
 		Angle::Lerp(orientFrom.GetX(), orientTo.GetX(), alpha, epsilon),
 		Angle::Lerp(orientFrom.GetY(), orientTo.GetY(), alpha, epsilon),
 		Angle::Lerp(orientFrom.GetZ(), orientTo.GetZ(), alpha, epsilon)
+	);
+}
+
+inline void EulerAngles::LerpLimited(EulerAngles orientTo, float rate, float alpha, float epsilon)
+{
+	this->Set(
+		Angle::LerpLimited(this->GetX(), orientTo.GetX(), rate, alpha, epsilon),
+		Angle::LerpLimited(this->GetY(), orientTo.GetY(), rate, alpha, epsilon),
+		Angle::LerpLimited(this->GetZ(), orientTo.GetZ(), rate, alpha, epsilon));
+}
+
+inline EulerAngles EulerAngles::LerpLimited(EulerAngles orientFrom, EulerAngles orientTo, float rate, float alpha, float epsilon)
+{
+	return EulerAngles(
+		Angle::LerpLimited(orientFrom.GetX(), orientTo.GetX(), rate, alpha, epsilon),
+		Angle::LerpLimited(orientFrom.GetY(), orientTo.GetY(), rate, alpha, epsilon),
+		Angle::LerpLimited(orientFrom.GetZ(), orientTo.GetZ(), rate, alpha, epsilon)
 	);
 }
 

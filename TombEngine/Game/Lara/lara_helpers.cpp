@@ -150,13 +150,8 @@ void DoLaraLean(ItemInfo* item, CollisionInfo* coll, float maxAngle, float rate)
 	if (!item->Animation.Velocity && !item->Animation.VerticalVelocity)
 		return;
 
-	rate = abs(rate);
-	int sign = copysign(1, maxAngle);
-
-	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + std::min(rate, abs((maxAngle * 3) / 5 - item->Pose.Orientation.GetZ()) / 3) * sign);
-	else
-		item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + std::min(rate, abs(maxAngle - item->Pose.Orientation.GetZ()) / 3) * sign);
+	maxAngle = (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT) ? (maxAngle * 0.6f) : maxAngle;
+	item->Pose.Orientation.SetZ(Angle::LerpLimited(item->Pose.Orientation.GetZ(), maxAngle, rate, 0.4f, Angle::DegToRad(0.1f)));
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
@@ -840,8 +835,8 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 		lara->Control.TurnRate.SetX(Angle::LerpConstant(lara->Control.TurnRate.GetX(), 0.0f, Angle::DegToRad(0.5f)));
 
 	// Ease rotation near poles.
-	if (item->Pose.Orientation.GetX() >= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() > 0 ||
-		item->Pose.Orientation.GetX() <= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() < 0)
+	if (item->Pose.Orientation.GetX() >= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() > 0.0f ||
+		item->Pose.Orientation.GetX() <= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() < 0.0f)
 	{
 		int sign = copysign(1, lara->Control.TurnRate.GetX());
 
@@ -866,10 +861,10 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)
 {
 	if (resetPitch)
-		item->Pose.Orientation.SetX(Angle::Lerp(item->Pose.Orientation.GetX(), 0, rate, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.SetX(Angle::Lerp(item->Pose.Orientation.GetX(), 0.0f, rate, Angle::DegToRad(0.1f)));
 
 	if (resetRoll)
-		item->Pose.Orientation.SetZ(Angle::Lerp(item->Pose.Orientation.GetZ(), 0, rate, Angle::DegToRad(0.1f)));
+		item->Pose.Orientation.SetZ(Angle::Lerp(item->Pose.Orientation.GetZ(), 0.0f, rate, Angle::DegToRad(0.1f)));
 }
 
 void ResetLaraFlex(ItemInfo* item, float rate)
