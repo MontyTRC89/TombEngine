@@ -3,7 +3,7 @@
 #include "Game/pickup/pickup.h"
 /// entities
 #include "tr4_ahmet.h" // OK
-#include "tr4_goon.h" // OK
+#include "tr4_baddie.h" // OK
 #include "tr4_bat.h" // OK
 #include "tr4_bigscorpion.h" // OK
 #include "tr4_crocodile.h" // OK
@@ -222,11 +222,11 @@ static void StartEntity(ObjectInfo* obj)
 		g_Level.Bones[obj->boneIndex + 9 * 4] |= ROT_Y;
 	}
 
-	obj = &Objects[ID_GOON1];
+	obj = &Objects[ID_BADDIE1];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGoon;
-		obj->control = GoonControl;
+		obj->initialise = InitialiseBaddie;
+		obj->control = BaddieControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->HitPoints = 25;
@@ -247,11 +247,11 @@ static void StartEntity(ObjectInfo* obj)
 		//g_Level.Bones[obj->boneIndex + 88 * 4] |= ROT_X;
 	}
 
-	obj = &Objects[ID_GOON2];
+	obj = &Objects[ID_BADDIE2];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseGoon;
-		obj->control = GoonControl;
+		obj->initialise = InitialiseBaddie;
+		obj->control = BaddieControl;
 		obj->collision = CreatureCollision;
 		obj->shadowSize = 128;
 		obj->HitPoints = 25;

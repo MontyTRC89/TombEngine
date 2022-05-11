@@ -76,9 +76,9 @@ void AIObject::Register(sol::table & parent)
 		ScriptReserved_GetObjectID, &AIObject::GetObjectID,
 
 		/// Change the object's ID. This will change the type of AI object it is.
-		// Note that a baddy will gain the behaviour of the tile it's on _before_ said baddy is triggered.
+		// Note that a baddie will gain the behaviour of the tile it's on _before_ said baddie is triggered.
 		// This means that changing the type of an AI object beneath a moveable will have no effect.
-		// Instead, this function can be used to change an object that the baddy isn't standing on.
+		// Instead, this function can be used to change an object that the baddie isn't standing on.
 		// For example, you could have a pair of AI_GUARD objects, and change one or the other two
 		// AI_PATROL_1 based on whether the player has a certain item or not.
 		// @function AIObject:SetObjectID

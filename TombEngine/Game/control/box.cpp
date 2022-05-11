@@ -1119,15 +1119,15 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 	// FIXME: edit assets adding climb down animations for Von Croy and baddies?
 	else if (item->Floor > y + CHECK_CLICK(5) &&
 		item->ObjectNumber != ID_VON_CROY &&
-		item->ObjectNumber != ID_GOON1 &&
-		item->ObjectNumber != ID_GOON2)
+		item->ObjectNumber != ID_BADDIE1 &&
+		item->ObjectNumber != ID_BADDIE2)
 	{
 		vault = -3;
 	}
 	else if (item->Floor > y + CHECK_CLICK(3) &&
 		item->ObjectNumber != ID_VON_CROY &&
-		item->ObjectNumber != ID_GOON1 &&
-		item->ObjectNumber != ID_GOON2)
+		item->ObjectNumber != ID_BADDIE1 &&
+		item->ObjectNumber != ID_BADDIE2)
 	{
 		vault = -2;
 	}
