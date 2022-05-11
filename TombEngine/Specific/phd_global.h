@@ -5,7 +5,8 @@ class Angle
 public:
 	// Utilities
 	static float Normalize(float angle);
-	static float Lerp(float angleFrom, float angleTo, float rate = 1.0f, float epsilon = 0.0f);
+	static float Lerp(float angleFrom, float angleTo, float alpha = 1.0f, float epsilon = 0.0f);
+	static float LerpConstant(float angleFrom, float angleTo, float rate);
 	static bool  Compare(float angle0, float angle1, float epsilon = 0.0f);
 	static float ShortestAngularDistance(float angleFrom, float angleTo);
 	static float OrientBetweenPoints(Vector3 point0, Vector3 point1);
@@ -20,6 +21,11 @@ public:
 	static float ShrtToRad(short shortForm);
 	static short DegToShrt(float degrees);
 	static short RadToShrt(float radians);
+
+private:
+	// Utilities
+	static float ClampAlpha(float value);
+	static float ClampEpsilon(float value);
 };
 
 inline float Angle::Normalize(float angle)
@@ -35,14 +41,28 @@ inline float Angle::Normalize(float angle)
 		fmod(angle - M_PI, M_PI * 2) + M_PI;*/
 }
 
-inline float Angle::Lerp(float angleFrom, float angleTo, float rate, float epsilon)
+inline float Angle::Lerp(float angleFrom, float angleTo, float alpha, float epsilon)
 {
-	rate = (abs(rate) > 1.0f) ? 1.0f : abs(rate);
+	alpha = ClampAlpha(alpha);
+	epsilon = ClampEpsilon(epsilon);
 
 	if (!Compare(angleFrom, angleTo, epsilon))
 	{
 		auto difference = ShortestAngularDistance(angleFrom, angleTo);
-		return (angleFrom + (difference * rate));
+		return (angleFrom + (difference * alpha));
+	}
+
+	return angleTo;
+}
+
+inline float Angle::LerpConstant(float angleFrom, float angleTo, float rate)
+{
+	rate = ClampEpsilon(rate);
+
+	if (!Compare(angleFrom, angleTo, rate))
+	{
+		int sign = copysign(1, ShortestAngularDistance(angleFrom, angleTo));
+		return (angleFrom + (rate * sign));
 	}
 
 	return angleTo;
@@ -50,6 +70,8 @@ inline float Angle::Lerp(float angleFrom, float angleTo, float rate, float epsil
 
 inline bool Angle::Compare(float angle0, float angle1, float epsilon)
 {
+	epsilon = ClampEpsilon(epsilon);
+
 	auto difference = ShortestAngularDistance(angle0, angle1);
 	if (abs(difference) <= epsilon)
 		return true;
@@ -100,6 +122,16 @@ inline short Angle::RadToShrt(float radians)
 	return (short)((radians / (M_PI / 180.0f)) * ((USHRT_MAX + 1) / 360.0f));
 }
 
+inline float Angle::ClampAlpha(float value)
+{
+	return ((abs(value) > 1.0f) ? 1.0f : abs(value));
+}
+
+inline float Angle::ClampEpsilon(float value)
+{
+	return abs(Normalize(value));
+}
+
 //-------------------------------------------------------------------------------------------------------------------
 
 // TODO: Move to EulerAngles.h and EulerAngles.cpp.
@@ -124,16 +156,19 @@ public:
 	// Setters
 	void Set(EulerAngles orient);
 	void Set(float xAngle, float yAngle, float zAngle);
-	void SetX(float angle);
-	void SetY(float angle);
-	void SetZ(float angle);
+	void SetX(float angle = 0.0f);
+	void SetY(float angle = 0.0f);
+	void SetZ(float angle = 0.0f);
 
 	// Utilities
 	void Normalize();
 	static EulerAngles Normalize(EulerAngles orient);
 
-	void Lerp(EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
-	static EulerAngles Lerp(EulerAngles orientFrom, EulerAngles orientTo, float rate = 1.0f, float epsilon = 0.0f);
+	void Lerp(EulerAngles orientTo, float alpha = 1.0f, float epsilon = 0.0f);
+	static EulerAngles Lerp(EulerAngles orientFrom, EulerAngles orientTo, float alpha = 1.0f, float epsilon = 0.0f);
+
+	void LerpConstant(EulerAngles orientTo, float rate);
+	static EulerAngles LerpConstant(EulerAngles orientFrom, EulerAngles orientTo, float rate);
 
 	bool Compare(EulerAngles orient, float epsilon = 0.0f);
 	static bool Compare(EulerAngles orient0, EulerAngles orient1, float epsilon = 0.0f);
@@ -202,17 +237,17 @@ inline void EulerAngles::Set(float xAngle, float yAngle, float zAngle)
 	this->SetZ(zAngle);
 }
 
-inline void EulerAngles::SetX(float angle = 0.0f)
+inline void EulerAngles::SetX(float angle)
 {
 	this->x = Angle::Normalize(angle);
 }
 
-inline void EulerAngles::SetY(float angle = 0.0f)
+inline void EulerAngles::SetY(float angle)
 {
 	this->y = Angle::Normalize(angle);
 }
 
-inline void EulerAngles::SetZ(float angle = 0.0f)
+inline void EulerAngles::SetZ(float angle)
 {
 	this->z = Angle::Normalize(angle);
 }
@@ -228,21 +263,37 @@ inline EulerAngles EulerAngles::Normalize(EulerAngles orient)
 	return orient;
 }
 
-inline void EulerAngles::Lerp(EulerAngles orientTo, float rate, float epsilon)
+inline void EulerAngles::Lerp(EulerAngles orientTo, float alpha, float epsilon)
 {
 	this->Set(
-		Angle::Lerp(this->GetX(), orientTo.GetX(), rate, epsilon),
-		Angle::Lerp(this->GetY(), orientTo.GetY(), rate, epsilon),
-		Angle::Lerp(this->GetZ(), orientTo.GetZ(), rate, epsilon)
+		Angle::Lerp(this->GetX(), orientTo.GetX(), alpha, epsilon),
+		Angle::Lerp(this->GetY(), orientTo.GetY(), alpha, epsilon),
+		Angle::Lerp(this->GetZ(), orientTo.GetZ(), alpha, epsilon));
+}
+
+inline EulerAngles EulerAngles::Lerp(EulerAngles orientFrom, EulerAngles orientTo, float alpha, float epsilon)
+{
+	return EulerAngles(
+		Angle::Lerp(orientFrom.GetX(), orientTo.GetX(), alpha, epsilon),
+		Angle::Lerp(orientFrom.GetY(), orientTo.GetY(), alpha, epsilon),
+		Angle::Lerp(orientFrom.GetZ(), orientTo.GetZ(), alpha, epsilon)
 	);
 }
 
-inline EulerAngles EulerAngles::Lerp(EulerAngles orientFrom, EulerAngles orientTo, float rate, float epsilon)
+inline void EulerAngles::LerpConstant(EulerAngles orientTo, float rate)
+{
+	this->Set(
+		Angle::LerpConstant(this->GetX(), orientTo.GetX(), rate),
+		Angle::LerpConstant(this->GetY(), orientTo.GetY(), rate),
+		Angle::LerpConstant(this->GetZ(), orientTo.GetZ(), rate));
+}
+
+inline EulerAngles EulerAngles::LerpConstant(EulerAngles orientFrom, EulerAngles orientTo, float rate)
 {
 	return EulerAngles(
-		Angle::Lerp(orientFrom.GetX(), orientTo.GetX(), rate, epsilon),
-		Angle::Lerp(orientFrom.GetY(), orientTo.GetY(), rate, epsilon),
-		Angle::Lerp(orientFrom.GetZ(), orientTo.GetZ(), rate, epsilon)
+		Angle::LerpConstant(orientFrom.GetX(), orientTo.GetX(), rate),
+		Angle::LerpConstant(orientFrom.GetY(), orientTo.GetY(), rate),
+		Angle::LerpConstant(orientFrom.GetZ(), orientTo.GetZ(), rate)
 	);
 }
 
@@ -338,8 +389,7 @@ inline EulerAngles& EulerAngles::operator +=(EulerAngles orient)
 	this->Set(
 		this->GetX() + orient.GetX(),
 		this->GetY() + orient.GetY(),
-		this->GetZ() + orient.GetZ()
-	);
+		this->GetZ() + orient.GetZ());
 	return *this;
 }
 
@@ -348,8 +398,7 @@ inline EulerAngles& EulerAngles::operator -=(EulerAngles orient)
 	this->Set(
 		this->GetX() - orient.GetX(),
 		this->GetY() - orient.GetY(),
-		this->GetZ() - orient.GetZ()
-	);
+		this->GetZ() - orient.GetZ());
 	return *this;
 }
 
@@ -358,8 +407,7 @@ inline EulerAngles& EulerAngles::operator *=(EulerAngles orient)
 	this->Set(
 		this->GetX() * orient.GetX(),
 		this->GetY() * orient.GetY(),
-		this->GetZ() * orient.GetZ()
-	);
+		this->GetZ() * orient.GetZ());
 	return *this;
 }
 
@@ -368,8 +416,7 @@ inline EulerAngles& EulerAngles::operator *=(float value)
 	this->Set(
 		this->GetX() * value,
 		this->GetY() * value,
-		this->GetZ() * value
-	);
+		this->GetZ() * value);
 	return *this;
 }
 
@@ -378,8 +425,7 @@ inline EulerAngles& EulerAngles::operator /=(float value)
 	this->Set(
 		this->GetX() / value,
 		this->GetY() / value,
-		this->GetZ() / value
-	);
+		this->GetZ() / value);
 	return *this;
 }
 

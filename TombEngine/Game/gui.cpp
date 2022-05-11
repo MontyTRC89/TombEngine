@@ -2621,7 +2621,7 @@ void GuiController::UpdateWeaponStatus()
 void GuiController::SpinBack(float* angle)
 {
 	if (*angle)
-		*angle = Angle::Lerp(*angle, 0, 0.25f / 2, Angle::DegToRad(0.1f));
+		*angle = Angle::Lerp(*angle, 0.0f, 0.25f / 2, Angle::DegToRad(0.1f));
 }
 
 void GuiController::DrawAmmoSelector()

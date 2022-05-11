@@ -834,35 +834,28 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit)
 	auto* lara = GetLaraInfo(item);
 
 	// Reset x axis turn rate.
-	int sign = copysign(1, lara->Control.TurnRate.GetX());
 	if (abs(lara->Control.TurnRate.GetX()) > Angle::DegToRad(2.0f))
-		lara->Control.TurnRate.SetX(lara->Control.TurnRate.GetX() - Angle::DegToRad(2.0f) * sign);
-	else if (abs(lara->Control.TurnRate.GetX()) > Angle::DegToRad(0.5f))
-		lara->Control.TurnRate.SetX(lara->Control.TurnRate.GetX() - Angle::DegToRad(0.5f) * sign);
+		lara->Control.TurnRate.SetX(Angle::LerpConstant(lara->Control.TurnRate.GetX(), 0.0f, Angle::DegToRad(2.0f)));
 	else
-		lara->Control.TurnRate.SetX();
+		lara->Control.TurnRate.SetX(Angle::LerpConstant(lara->Control.TurnRate.GetX(), 0.0f, Angle::DegToRad(0.5f)));
 
 	// Ease rotation near poles.
 	if (item->Pose.Orientation.GetX() >= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() > 0 ||
 		item->Pose.Orientation.GetX() <= Angle::DegToRad(80.0f) && lara->Control.TurnRate.GetX() < 0)
 	{
+		int sign = copysign(1, lara->Control.TurnRate.GetX());
+
 		item->Pose.Orientation.SetX(
-			item->Pose.Orientation.GetX() + std::min<short>(abs(lara->Control.TurnRate.GetX()), (Angle::DegToRad(90.0f) - abs(item->Pose.Orientation.GetX())) / 3) * sign);
+			item->Pose.Orientation.GetX() + std::min(abs(lara->Control.TurnRate.GetX()), (Angle::DegToRad(90.0f) - abs(item->Pose.Orientation.GetX())) / 3) * sign);
 	}
 	else
-	{
-		item->Pose.Orientation.SetX(
-			item->Pose.Orientation.GetX() + lara->Control.TurnRate.GetX());
-	}
+		item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() + lara->Control.TurnRate.GetX());
 
 	// Reset y axis turn rate.
-	sign = copysign(1, lara->Control.TurnRate.GetY());
 	if (abs(lara->Control.TurnRate.GetY()) > Angle::DegToRad(2.0f) && !divesuit)
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - Angle::DegToRad(2.0f) * sign);
-	else if (abs(lara->Control.TurnRate.GetY()) > Angle::DegToRad(0.5f))
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - Angle::DegToRad(0.5f) * sign);
+		lara->Control.TurnRate.SetY(Angle::LerpConstant(lara->Control.TurnRate.GetY(), 0.0f, Angle::DegToRad(2.0f)));
 	else
-		lara->Control.TurnRate.SetY();
+		lara->Control.TurnRate.SetY(Angle::LerpConstant(lara->Control.TurnRate.GetY(), 0.0f, Angle::DegToRad(0.5f)));
 
 	item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + lara->Control.TurnRate.GetY());
 
