@@ -772,13 +772,13 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 			switch (object->hitEffect)
 			{
 			case HIT_BLOOD:
-				if (target->ObjectNumber == ID_GOON2 &&
+				if (target->ObjectNumber == ID_BADDIE2 &&
 					(target->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
 					(lara->Control.Weapon.GunType == LaraWeaponType::Pistol ||
 						lara->Control.Weapon.GunType == LaraWeaponType::Shotgun ||
 						lara->Control.Weapon.GunType == LaraWeaponType::Uzi))
 				{
-					// Baddy2 gun hitting sword
+					// Baddie2 gun hitting sword
 					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &target->Pose, 0);
 					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
 					return;
