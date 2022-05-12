@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 
 // -----------------------------
 // CROUCH & CRAWL
@@ -395,7 +395,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				ResetLaraFlex(item);
 				return;
 			}
-			else if (TestLaraCrawlForward(item, coll)) [[likely]]
+			else if (TestLaraCrawlForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				item->Animation.TargetState = LS_CRAWL_FORWARD;
 				return;
@@ -409,7 +409,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
-			else if (TestLaraCrawlBack(item, coll)) [[likely]]
+			else if (TestLaraCrawlBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				item->Animation.TargetState = LS_CRAWL_BACK;
 				return;

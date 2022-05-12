@@ -15,7 +15,7 @@
 #include "Specific/trmath.h"
 #include "Specific/prng.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
 #include "Specific/IO/ChunkWriter.h"
