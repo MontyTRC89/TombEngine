@@ -1,6 +1,5 @@
 #include "framework.h"
 
-#ifdef TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "MoveableObject.h"
 #include "ScriptUtil.h"
@@ -739,4 +738,3 @@ void Moveable::Destroy()
 	Invalidate();
 }
 
-#endif

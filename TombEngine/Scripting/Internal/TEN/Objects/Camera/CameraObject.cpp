@@ -1,6 +1,5 @@
 #include "framework.h"
 
-#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Objects/Camera/CameraObject.h"
 #include "Vec3/Vec3.h"
@@ -115,4 +114,3 @@ void Camera::SetRoom(short room)
 
 	m_camera.roomNumber = room;
 }
-#endif
