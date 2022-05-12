@@ -170,7 +170,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 			item->Animation.TargetState = LS_WADE_FORWARD;
-		else if (TrInput & IN_WALK) [[likely]]
+		else if (TrInput & IN_WALK) USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_WALK_FORWARD;
 		else
 			item->Animation.TargetState = LS_RUN_FORWARD;
@@ -314,7 +314,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_WALK_FORWARD;
 		else if (TrInput & IN_SPRINT && lara->SprintEnergy)
 			item->Animation.TargetState = LS_SPRINT;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_RUN_FORWARD;
 
 		return;
@@ -439,7 +439,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (isSwamp)
 			PseudoLaraAsSwampIdle(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			PseudoLaraAsWadeIdle(item, coll);
 
 		return;
@@ -489,7 +489,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_SPRINT;
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 			return;
@@ -505,7 +505,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TestLaraRunBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -538,7 +538,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
 		}
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_TURN_LEFT_SLOW;
 
 		return;
@@ -550,7 +550,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		}
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
 
 		return;
@@ -594,7 +594,7 @@ void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
@@ -887,7 +887,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (isSwamp)
 			PsuedoLaraAsSwampTurnRightSlow(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			PsuedoLaraAsWadeTurnRightSlow(item, coll);
 
 		return;
@@ -938,7 +938,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_SPRINT;
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 			return;
@@ -954,7 +954,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TestLaraRunBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -992,7 +992,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 		else */if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
 
 		return;
@@ -1026,7 +1026,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
@@ -1084,7 +1084,7 @@ void PsuedoLaraAsSwampTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (TestLaraWadeForwardSwamp(item, coll)) [[likely]]
+		else if (TestLaraWadeForwardSwamp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
@@ -1157,7 +1157,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (isSwamp)
 			PsuedoLaraAsSwampTurnLeftSlow(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			PsuedoLaraAsWadeTurnLeftSlow(item, coll);
 
 		return;
@@ -1208,7 +1208,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_SPRINT;
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 			return;
@@ -1224,7 +1224,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TestLaraRunBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -1262,7 +1262,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 		else */if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_TURN_LEFT_SLOW;
 
 		return;
@@ -1296,7 +1296,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
@@ -1354,7 +1354,7 @@ void PsuedoLaraAsSwampTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (TestLaraWadeForwardSwamp(item, coll)) [[likely]]
+		else if (TestLaraWadeForwardSwamp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_WADE_FORWARD;
 			return;
@@ -1688,7 +1688,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_SPRINT;
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 			return;
@@ -1704,7 +1704,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TestLaraRunBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -1819,7 +1819,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_SPRINT;
 			return;
 		}
-		else if (TestLaraRunForward(item, coll)) [[likely]]
+		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_FORWARD;
 			return;
@@ -1835,7 +1835,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TestLaraRunBack(item, coll)) [[likely]]
+		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
 			item->Animation.TargetState = LS_RUN_BACK;
 			return;
@@ -2257,7 +2257,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Control.WaterStatus == WaterStatus::Dry)
 			item->Animation.TargetState = LS_RUN_FORWARD;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_WADE_FORWARD;
 
 		return;
@@ -2298,7 +2298,7 @@ void PseudoLaraAsSwampWadeForward(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_WADE_FORWARD;
 
 		return;
@@ -2428,7 +2428,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_RUN_FORWARD; // TODO: Dispatch to wade forward state directly. @Sezz 2021.09.29
 		else if (TrInput & IN_WALK)
 			item->Animation.TargetState = LS_RUN_FORWARD;
-		else if (TrInput & IN_SPRINT && lara->SprintEnergy > 0) [[likely]]
+		else if (TrInput & IN_SPRINT && lara->SprintEnergy > 0) USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_SPRINT;
 		else
 			item->Animation.TargetState = LS_RUN_FORWARD;

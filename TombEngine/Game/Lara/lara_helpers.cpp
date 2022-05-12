@@ -332,7 +332,7 @@ void DoLaraFallDamage(ItemInfo* item)
 	{
 		if (item->Animation.VerticalVelocity >= LARA_DEATH_VELOCITY)
 			item->HitPoints = 0;
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 		{
 			int base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
@@ -543,7 +543,7 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;
 	}
-	else if (TestLaraJumpUp(item, coll)) [[likely]]
+	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		lara->Control.JumpDirection = JumpDirection::Up;
 	else
 		lara->Control.JumpDirection = JumpDirection::None;
