@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "ObjectsHandler.h"
 
-#if TEN_OPTIONAL_LUA
 #include "ReservedScriptNames.h"
 #include "Lara/lara.h"
 #include "ObjectIDs.h"
@@ -17,13 +16,11 @@ Scripts that will be run on game startup.
 @tentable Objects 
 @pragma nostrip
 */
-#endif
 
 ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	m_handler{ lua },
 	m_table_objects(sol::table{m_handler.GetState()->lua_state(), sol::create})
 {
-#if TEN_OPTIONAL_LUA
 	parent.set(ScriptReserved_Objects, m_table_objects);
 
 	/***
@@ -112,7 +109,6 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table & parent) :
 	);
 
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
-#endif
 }
 
 void ObjectsHandler::TestCollidingObjects()
@@ -153,15 +149,12 @@ void ObjectsHandler::TestCollidingObjects()
 
 void ObjectsHandler::AssignLara()
 {
-#if TEN_OPTIONAL_LUA
 	m_table_objects.set("Lara", Moveable(Lara.ItemNumber, false));
-#endif
 }
 
 
 bool ObjectsHandler::NotifyKilled(ItemInfo* key)
 {
-#if TEN_OPTIONAL_LUA
 	auto it = m_moveables.find(key);
 	if (std::end(m_moveables) != it)
 	{
@@ -172,12 +165,10 @@ bool ObjectsHandler::NotifyKilled(ItemInfo* key)
 		return true;
 	}
 	return false;
-#endif
 }
 
 bool ObjectsHandler::AddMoveableToMap(ItemInfo* key, Moveable* mov)
 {
-#if TEN_OPTIONAL_LUA
 	std::unordered_set<Moveable*> movVec;
 	movVec.insert(mov);
 	auto it = m_moveables.find(key);
@@ -190,13 +181,10 @@ bool ObjectsHandler::AddMoveableToMap(ItemInfo* key, Moveable* mov)
 		m_moveables[key].insert(mov);
 		return true;
 	}
-#endif
 }
 
 bool ObjectsHandler::RemoveMoveableFromMap(ItemInfo* key, Moveable* mov)
 {
-#if TEN_OPTIONAL_LUA
-	//todo why is "lara" destroyed here???
 	auto it = m_moveables.find(key);
 	if (std::end(m_moveables) != it)
 	{
@@ -209,7 +197,6 @@ bool ObjectsHandler::RemoveMoveableFromMap(ItemInfo* key, Moveable* mov)
 		return erased;
 	}
 	return false;
-#endif
 }
 
 

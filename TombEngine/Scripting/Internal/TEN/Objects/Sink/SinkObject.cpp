@@ -1,7 +1,6 @@
 #pragma once
 #include "framework.h"
 
-#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "SinkObject.h"
 #include "Vec3/Vec3.h"
@@ -108,4 +107,3 @@ void Sink::SetStrength(int str)
 	m_sink.strength = std::clamp(str, 1, 32);
 }
 
-#endif
