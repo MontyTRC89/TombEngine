@@ -1,6 +1,5 @@
 #include "framework.h"
 
-#if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "SoundSourceObject.h"
 #include "Vec3/Vec3.h"
@@ -105,4 +104,3 @@ void SoundSource::SetSoundID(int soundID)
 {	
 	m_soundSource.soundId = soundID;
 }
-#endif
