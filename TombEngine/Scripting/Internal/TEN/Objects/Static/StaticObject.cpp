@@ -1,6 +1,6 @@
 #pragma once
 #include "framework.h"
-#if TEN_OPTIONAL_LUA
+
 #include "ScriptAssert.h"
 #include "StaticObject.h"
 #include "Vec3/Vec3.h"
@@ -156,4 +156,3 @@ void Static::SetColor(ScriptColor const & col)
 {
 	m_mesh.color = col;
 }
-#endif

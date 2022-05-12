@@ -1,7 +1,6 @@
 #pragma once
 #include "framework.h"
 
-#if TEN_OPTIONAL_LUA
 #include "AIObject.h"
 #include "ScriptAssert.h"
 #include "Vec3/Vec3.h"
@@ -164,4 +163,3 @@ void AIObject::SetRoom(short room)
 
 	m_aiObject.roomNumber = room;
 }
-#endif
