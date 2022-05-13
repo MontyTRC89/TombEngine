@@ -50,9 +50,6 @@ namespace TEN::Control::Volumes
 				break;
 			}
 
-			// TODO: Implement checks on which item is entering/inside/leaving volume
-			// and pass item name or ID as argument for Lua function, so it knows its caller.
-
 			if (contains)
 			{
 				CurrentCollidedVolume = i + 1;
