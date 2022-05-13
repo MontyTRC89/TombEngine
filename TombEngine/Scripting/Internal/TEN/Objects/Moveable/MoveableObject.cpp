@@ -138,7 +138,7 @@ void Moveable::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
 
-/// Enable the item
+/// Enable the item, as if a trigger for it had been stepped on.
 // @function Moveable:EnableItem
 	ScriptReserved_Enable, &Moveable::EnableItem,
 
@@ -643,6 +643,7 @@ void Moveable::EnableItem()
 {
 	if (!m_item->Active)
 	{
+		m_item->Flags |= IFLAG_ACTIVATION_MASK;
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{
 			if (m_item->Status == ITEM_DEACTIVATED)
@@ -678,6 +679,7 @@ void Moveable::DisableItem()
 {
 	if (m_item->Active)
 	{
+		m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{
 			if (m_item->Status == ITEM_ACTIVE)
@@ -694,8 +696,10 @@ void Moveable::DisableItem()
 			RemoveActiveItem(m_num);
 			m_item->Status = ITEM_DEACTIVATED;
 		}
+
 		// Try add colliding in case the item went from invisible -> deactivated
-		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+		if (m_num > NO_ITEM)
+			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
 }
 
