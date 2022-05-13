@@ -509,7 +509,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if ((item->Flags & CODE_BITS) == CODE_BITS)
 			{
-				item->Flags |= 0x20;
+				item->Flags |= TRIGGERED;
 
 				if (flags & ONESHOT)
 					item->Flags |= ONESHOT;
