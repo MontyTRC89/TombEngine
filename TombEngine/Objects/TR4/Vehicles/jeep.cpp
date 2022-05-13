@@ -1559,7 +1559,7 @@ void JeepCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 			jeep->revs = 0;
 			jeep->unknown2 = 0;
 
-			item->Flags |= 0x20;
+			item->Flags |= TRIGGERED;
 		}
 		else
 			ObjectCollision(itemNumber, l, coll);
