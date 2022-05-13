@@ -66,7 +66,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		9,
 		3,
 		0,
-		SFX_TR4_LARA_FIRE,
+		SFX_TEN_PISTOL_FIRE,
 		0
 	},
 
@@ -83,7 +83,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		16,
 		3,
 		0,
-		SFX_TR4_DESSERT_EAGLE_FIRE,
+		SFX_TEN_REVOLVER_FIRE,
 		0
 	},
 
@@ -100,7 +100,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		3,
 		3,
 		0,
-		SFX_TR4_LARA_UZI_FIRE,
+		SFX_TEN_LARA_UZI_FIRE,
 		0
 	},
 
@@ -117,7 +117,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		9,
 		3,
 		10,
-		SFX_TR4_LARA_SHOTGUN,
+		SFX_TEN_SHOTGUN_FIRE,
 		0
 	},
 
@@ -151,7 +151,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		2,
 		10,
-		SFX_TR4_LARA_CROSSBOW,
+		SFX_TEN_CROSSBOW_FIRE,
 		20
 	},
 
@@ -185,7 +185,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		2,
 		0,
-		SFX_TR4_LARA_UZI_FIRE,
+		SFX_TEN_LARA_UZI_FIRE,
 		0
 	},
 
@@ -253,7 +253,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		0,
 		0,
-		SFX_TR4_LARA_UZI_FIRE,
+		SFX_TEN_LARA_UZI_FIRE,
 		0
 	}
 };
@@ -779,7 +779,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 						lara->Control.Weapon.GunType == LaraWeaponType::Uzi))
 				{
 					// Baddie2 gun hitting sword
-					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &target->Pose, 0);
+					SoundEffect(SFX_TR4_BADDY_SWORD_RICO, &target->Pose, 0);
 					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
 					return;
 				}
@@ -798,7 +798,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 				if (target->ObjectNumber == ID_ROMAN_GOD1 ||
 					target->ObjectNumber == ID_ROMAN_GOD2)
 				{
-					SoundEffect(SFX_TR5_SWORD_GOD_HITMETAL, &target->Pose, 0);
+					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target->Pose, 0);
 				}
 
 				break;
@@ -917,7 +917,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 			target->HitPoints--;
 			ricochet_angle = (mGetAngle(lara->pos.Position.z, lara->pos.Position.x, target->pos.Position.z, target->pos.Position.x) >> 4) & 4095;
 			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-			SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos, 0);		// play RICOCHET Sample
+			SoundEffect(SFX_TEN_WEAPON_RICOCHET, &target->pos, 0);		// play RICOCHET Sample
 		}
 		else if (target->objectNumber == ID_SHIVA) //So must be Shiva
 		{
@@ -930,7 +930,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 				target->hitStatus = true; //need to do this to maintain defence state
 				ricochet_angle = (mGetAngle(lara->pos.Position.z, lara->pos.Position.x, target->pos.Position.z, target->pos.Position.x) >> 4) & 4095;
 				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-				SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos, 0); // play RICOCHET Sample
+				SoundEffect(SFX_TEN_WEAPON_RICOCHET, &target->pos, 0); // play RICOCHET Sample
 			}
 			else //Shiva's not in defence mode or has its back to Lara
 				HitTarget(target, &vDest, weapon->damage, 0);

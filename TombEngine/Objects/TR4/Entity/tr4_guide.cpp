@@ -78,7 +78,7 @@ void GuideControl(short itemNumber)
 		GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
 
 		AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
-		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+		SoundEffect(SFX_TEN_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
 		TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
 
 		short random = GetRandomControl();

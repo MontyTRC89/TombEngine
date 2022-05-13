@@ -85,7 +85,7 @@ void SpearGuardianControl(short itemNumber)
 
 		if (!item->MeshBits)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
+			SoundEffect(SFX_TEN_EXPLOSION1, NULL, 0);
 			// TODO: exploding death
 		}
 

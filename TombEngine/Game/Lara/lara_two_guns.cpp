@@ -124,7 +124,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 						lara->RightArm.FlashGun = weapon->FlashTime;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 0, 0.9f, 0.5f);
+						SoundEffect(SFX_TEN_EXPLOSION1, &laraItem->Pose, 0, 0.9f, 0.5f);
 						SoundEffect(weapon->SampleNum, &laraItem->Pose, 0);
 						soundPlayed = true;
 
@@ -224,7 +224,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 					if (!soundPlayed)
 					{
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 0, 0.9f, 0.5f);
+						SoundEffect(SFX_TEN_EXPLOSION1, &laraItem->Pose, 0, 0.9f, 0.5f);
 						SoundEffect(weapon->SampleNum, &laraItem->Pose, 0);
 					}
 
@@ -360,7 +360,7 @@ void DrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	else if (frame == p->Draw2Anim)
 	{
 		DrawPistolMeshes(laraItem, weaponType);
-		SoundEffect(SFX_TR4_LARA_DRAW, &laraItem->Pose, 0);
+		SoundEffect(SFX_TEN_LARA_DRAW, &laraItem->Pose, 0);
 	}
 	else if (frame == p->RecoilAnim - 1)
 	{
@@ -409,7 +409,7 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		if (frameLeft == p->Draw2Anim - 1)
 		{
 			UndrawPistolMeshLeft(laraItem, weaponType);
-			SoundEffect(SFX_TR4_LARA_HOLSTER, &laraItem->Pose, 0);
+			SoundEffect(SFX_TEN_LARA_HOLSTER, &laraItem->Pose, 0);
 		}
 	}
 
@@ -445,7 +445,7 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		if (frameRight == p->Draw2Anim - 1)
 		{
 			UndrawPistolMeshRight(laraItem, weaponType);
-			SoundEffect(SFX_TR4_LARA_HOLSTER, &laraItem->Pose, 0);
+			SoundEffect(SFX_TEN_LARA_HOLSTER, &laraItem->Pose, 0);
 		}
 	}
 

@@ -335,7 +335,7 @@ void MPStickControl(short itemNumber)
 				if (!creature->Flags && item->TouchBits & 0x2400)
 				{
 					CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+					SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 80;
@@ -352,7 +352,7 @@ void MPStickControl(short itemNumber)
 					{
 						creature->Flags = 1;
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = 1;
@@ -376,7 +376,7 @@ void MPStickControl(short itemNumber)
 				if (!creature->Flags && item->TouchBits & 0x2400)
 				{
 					CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+					SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 80;
@@ -393,7 +393,7 @@ void MPStickControl(short itemNumber)
 					{
 						creature->Flags = 1;
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = 1;
@@ -437,7 +437,7 @@ void MPStickControl(short itemNumber)
 					{
 						creature->Flags = 2;
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 6;
 						enemy->HitStatus = 1;
@@ -459,7 +459,7 @@ void MPStickControl(short itemNumber)
 					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 				{
 					CreatureEffect(item, &MPStickBite2, DoBloodSplat);
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+					SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= 150;
@@ -477,7 +477,7 @@ void MPStickControl(short itemNumber)
 					{
 						creature->Flags = 1;
 						CreatureEffect(item, &MPStickBite2, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 
 						enemy->HitPoints -= 9;
 						enemy->HitStatus = 1;

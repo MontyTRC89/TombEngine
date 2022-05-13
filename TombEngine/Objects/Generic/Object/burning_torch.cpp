@@ -177,7 +177,7 @@ namespace TEN::Entities::Generic
 			if (!(Wibble & 7))
 				TriggerTorchFlame(LaraItem - g_Level.Items.data(), 0);
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
+			SoundEffect(SFX_TEN_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos, 0);
 		}
 	}
 
@@ -257,7 +257,7 @@ namespace TEN::Entities::Generic
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+			SoundEffect(SFX_TEN_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
 		}
 	}
 

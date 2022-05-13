@@ -476,7 +476,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+			SoundEffect(SFX_TEN_FLAME_EMITTER, &item->Pose, 0);
 			break;
 			
 		case 6:
@@ -511,7 +511,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+			SoundEffect(SFX_TEN_FLAME_EMITTER, &item->Pose, 0);
 			break;
 		}
 	}

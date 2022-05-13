@@ -243,7 +243,7 @@ void LaraLocation(ItemInfo* item)
 
 void ExplosionFX(ItemInfo* item)
 {
-	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_TEN_EXPLOSION1, NULL, 0);
 	Camera.bounce = -75;
 	FlipEffect = -1;
 }

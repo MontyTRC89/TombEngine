@@ -487,7 +487,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					lara->Air = LARA_AIR_MAX;
 
 					UpdateItemRoom(item, 0);
-					StopSoundEffect(SFX_TR4_LARA_FALL);
+					StopSoundEffect(SFX_TEN_LARA_FALL);
 
 					if (item->Animation.ActiveState == LS_SWAN_DIVE)
 					{
@@ -571,7 +571,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
-						SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, 2);
+						SoundEffect(SFX_TEN_LARA_BREATH, &item->Pose, 2);
 					}
 				}
 			}
@@ -585,7 +585,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 				UpdateItemRoom(item, 0);
-				SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, 2);
+				SoundEffect(SFX_TEN_LARA_BREATH, &item->Pose, 2);
 			}
 
 			break;

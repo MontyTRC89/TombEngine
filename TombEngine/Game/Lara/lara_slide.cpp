@@ -67,7 +67,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
-			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+			StopSoundEffect(SFX_TEN_LARA_SLIPPING);
 			return;
 		}
 
@@ -80,7 +80,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 	else
 		item->Animation.TargetState = LS_IDLE;
 
-	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+	StopSoundEffect(SFX_TEN_LARA_SLIPPING);
 	return;
 }
 
@@ -108,7 +108,7 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallAnimation(item);
-		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+		StopSoundEffect(SFX_TEN_LARA_SLIPPING);
 		return;
 	}
 
@@ -176,7 +176,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_JUMP && TestLaraSlideJump(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_BACK;
-			StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+			StopSoundEffect(SFX_TEN_LARA_SLIPPING);
 			return;
 		}
 
@@ -185,7 +185,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	item->Animation.TargetState = LS_IDLE;
-	StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+	StopSoundEffect(SFX_TEN_LARA_SLIPPING);
 	return;
 }
 
@@ -213,7 +213,7 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Floor > CLICK(1) && !TestEnvironment(ENV_FLAG_SWAMP, item))
 	{
 		SetLaraFallBackAnimation(item);
-		StopSoundEffect(SFX_TR4_LARA_SLIPPING);
+		StopSoundEffect(SFX_TEN_LARA_SLIPPING);
 		return;
 	}
 

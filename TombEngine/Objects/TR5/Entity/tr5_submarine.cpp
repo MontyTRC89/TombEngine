@@ -255,7 +255,7 @@ void SubmarineControl(short itemNumber)
 		if (laraInfo.distance >= pow(SECTOR(3), 2))
 		{
 			item->Animation.TargetState = 1;
-			SoundEffect(SFX_TR5_DIVE_SUIT_LOOP, &item->Pose, 2);
+			SoundEffect(SFX_TEN_VEHICLE_DIVESUIT_LOOP, &item->Pose, 2);
 		}
 		else
 			item->Animation.TargetState = 0;
@@ -423,7 +423,7 @@ void TorpedoControl(short itemNumber)
 {
 	auto*  item = &g_Level.Items[itemNumber];
 
-	SoundEffect(SFX_TR5_DIVE_SUIT_HIT, &item->Pose, 2);
+	SoundEffect(SFX_TEN_VEHICLE_DIVESUIT_HIT, &item->Pose, 2);
 
 	Vector3Int pos;
 
@@ -542,7 +542,7 @@ void TorpedoControl(short itemNumber)
 			KillItem(itemNumber);
 			TriggerUnderwaterExplosion(item, 1);
 			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->Pose, 2);
-			SoundEffect(SFX_TR5_DIVE_SUIT_HIT, &LaraItem->Pose, 2); 
+			SoundEffect(SFX_TEN_VEHICLE_DIVESUIT_HIT, &LaraItem->Pose, 2); 
 			LaraItem->HitPoints -= 200;
 		//	if (Lara.anxiety >= 0x7F)
 		//		Lara.anxiety--;

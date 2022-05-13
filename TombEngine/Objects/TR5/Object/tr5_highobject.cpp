@@ -107,7 +107,7 @@ void ControlHighObject1(short itemNumber)
 				else
 					flags = item->ItemFlags[1] / 8;
 
-				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+				SoundEffect(SFX_TEN_RAISING_BLOCK, &item->Pose, (flags * 256) | 8);
 
 				item->Pose.Position.y += 8;
 
@@ -196,7 +196,7 @@ void ControlHighObject1(short itemNumber)
 		else
 			flags = item->ItemFlags[1];
 
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+		SoundEffect(SFX_TEN_RAISING_BLOCK, &item->Pose, (flags * 256) | 8);
 
 		item->ItemFlags[1] += 16;
 		item->Pose.Position.y -= 16;

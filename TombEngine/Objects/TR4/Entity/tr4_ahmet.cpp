@@ -81,7 +81,7 @@ namespace TEN::Entities::TR4
 
 		// NOTE: fixed light below the ground with -STEP_L!
 		TriggerDynamicLight(item->Pose.Position.x, (item->Pose.Position.y - STEP_SIZE), item->Pose.Position.z, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
-		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, NULL);
+		SoundEffect(SFX_TEN_LOOP_FOR_SMALL_FIRES, &item->Pose, NULL);
 	}
 
 	void InitialiseAhmet(short itemNumber)

@@ -107,7 +107,7 @@ void RaisingCogControl(short itemNumber)
 				else
 					flags = item->ItemFlags[2];
 
-				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+				SoundEffect(SFX_TEN_RAISING_BLOCK, &item->Pose, (flags * 256) | 8);
 
 				item->ItemFlags[2] += 2;
 				item->Pose.Position.y -= 2;

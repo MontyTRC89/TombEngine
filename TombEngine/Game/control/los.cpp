@@ -94,7 +94,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 		Lara.Control.Weapon.Fired = true;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
-			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, NULL, 0);
+			SoundEffect(SFX_TEN_REVOLVER_FIRE, NULL, 0);
 	}
 
 	bool hit = false;

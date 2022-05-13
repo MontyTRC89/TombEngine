@@ -275,12 +275,12 @@ void UpdateRats()
 					{
 						AddWaterSparks(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, 16);
 						SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-						SoundEffect(SFX_TR5_RATS_SPLASH,&rat->Pose, 0);
+						SoundEffect(SFX_TR5_RATS_1PLASH,&rat->Pose, 0);
 					}
 				}
 
 				if (!i && !(GetRandomControl() & 4))
-					SoundEffect(SFX_TR5_RATS,&rat->Pose, 0);
+					SoundEffect(SFX_TR5_RATS_1,&rat->Pose, 0);
 			}
 		}
 	}

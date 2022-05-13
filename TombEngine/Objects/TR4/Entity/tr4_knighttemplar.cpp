@@ -153,7 +153,7 @@ void KnightTemplarControl(short itemNumber)
 						StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 					{
 						ShatterObject(NULL, mesh, -64, LaraItem->RoomNumber, 0);
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+						SoundEffect(SFX_TEN_HIT_ROCK, &item->Pose, 0);
 
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 						currentFloor->Stopper = false;

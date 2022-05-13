@@ -1436,7 +1436,7 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 
-	StopSoundEffect(SFX_TR4_LARA_FALL);
+	StopSoundEffect(SFX_TEN_LARA_FALL);
 	item->HitPoints = -1;
 	lara->Air = -1;
 

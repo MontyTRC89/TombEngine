@@ -375,6 +375,6 @@ void EnemyJeepControl(short itemNumber)
 			item->Animation.VerticalVelocity = 0;
 		}
 
-		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, (item->ItemFlags[0] * 1024) + 16777220);
+		SoundEffect(SFX_TEN_VEHICLE_JEEP_MOVE, &item->Pose, (item->ItemFlags[0] * 1024) + 16777220);
 	}
 }

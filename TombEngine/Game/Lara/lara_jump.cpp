@@ -141,7 +141,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.VerticalVelocity == LARA_DEATH_VELOCITY &&
 		item->HitPoints > 0)
 	{
-		SoundEffect(SFX_TR4_LARA_FALL, &item->Pose, 0);
+		SoundEffect(SFX_TEN_LARA_FALL, &item->Pose, 0);
 	}
 
 	if (TestLaraLand(item, coll))
@@ -156,7 +156,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
-		StopSoundEffect(SFX_TR4_LARA_FALL);
+		StopSoundEffect(SFX_TEN_LARA_FALL);
 		return;
 	}
 

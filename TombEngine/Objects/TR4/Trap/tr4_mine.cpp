@@ -29,9 +29,9 @@ namespace TEN::Entities::TR4
 		int num = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 		if (item->ItemFlags[0] >= 150)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0, 0.7f, 0.5f);
+			SoundEffect(SFX_TEN_EXPLOSION1, &item->Pose, 0);
+			SoundEffect(SFX_TEN_EXPLOSION2, &item->Pose, 0);
+			SoundEffect(SFX_TEN_EXPLOSION1, &item->Pose, 0, 0.7f, 0.5f);
 
 			if (num > 0)
 			{
@@ -85,7 +85,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+			SoundEffect(SFX_TEN_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
 		}
 	}
 

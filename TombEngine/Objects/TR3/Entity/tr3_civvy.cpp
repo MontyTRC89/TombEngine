@@ -326,7 +326,7 @@ void CivvyControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & CIVVY_TOUCH))
 			{
 				CreatureEffect(item, &CivvyBite, DoBloodSplat);
-				SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+				SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 				creature->Flags = 1;
 
 				LaraItem->HitPoints -= CIVVY_HIT_DAMAGE;
@@ -347,7 +347,7 @@ void CivvyControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & CIVVY_TOUCH))
 			{
 				CreatureEffect(item, &CivvyBite, DoBloodSplat);
-				SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+				SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 				creature->Flags = 1;
 
 				LaraItem->HitPoints -= CIVVY_HIT_DAMAGE;
@@ -371,7 +371,7 @@ void CivvyControl(short itemNumber)
 			if (creature->Flags != 2 && (item->TouchBits & CIVVY_TOUCH))
 			{
 				CreatureEffect(item, &CivvyBite, DoBloodSplat);
-				SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+				SoundEffect(SFX_TEN_LARA_THUD, &item->Pose, 0);
 				creature->Flags = 2;
 
 				LaraItem->HitPoints -= CIVVY_SWIPE_DAMAGE;

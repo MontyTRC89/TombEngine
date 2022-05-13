@@ -22,7 +22,7 @@ void ControlSpikyWall(short itemNumber)
 		if (probe.Position.Floor != item->Pose.Position.y)
 		{
 			item->Status = ITEM_DEACTIVATED;
-			StopSoundEffect(SFX_TR4_ROLLING_BALL);
+			StopSoundEffect(SFX_TEN_ROLLING_BALL);
 		}
 		else
 		{
@@ -32,7 +32,7 @@ void ControlSpikyWall(short itemNumber)
 			if (probe.RoomNumber != item->RoomNumber)
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
-			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose, 0);
+			SoundEffect(SFX_TEN_ROLLING_BALL, &item->Pose, 0);
 		}
 	}
 
@@ -44,6 +44,6 @@ void ControlSpikyWall(short itemNumber)
 		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
-		SoundEffect(SFX_TR4_LARA_GRABFEET, &item->Pose, 0);
+		SoundEffect(SFX_TEN_LARA_GRABFEET, &item->Pose, 0);
 	}
 }

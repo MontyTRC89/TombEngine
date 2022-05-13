@@ -947,7 +947,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 	soundPosition.Orientation.x = 0;
 	soundPosition.Orientation.z = 0;
 
-	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition, 0);
+	SoundEffect(SFX_TEN_LARA_SPLASH, &soundPosition, 0);
 }
 
 void UpdateSplashes()
@@ -1132,7 +1132,7 @@ void Richochet(PHD_3DPOS* pos)
 	target.y = pos->Position.y;
 	target.z = pos->Position.z;
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_LARA_RICOCHET, pos, 0);
+	SoundEffect(SFX_TEN_WEAPON_RICOCHET, pos, 0);
 }
 
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist

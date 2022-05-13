@@ -114,9 +114,9 @@ void InitialisePushableBlock(short itemNumber)
 
 	info->height = height;
 
-	info->loopSound = SFX_TR4_PUSHABLE_SOUND; // LUA
-	info->stopSound = SFX_TR4_PUSH_BLOCK_END; // LUA
-	info->fallSound = SFX_TR4_BOULDER_FALL; // LUA
+	info->loopSound = SFX_TEN_PUSHABLE_SOUND; // LUA
+	info->stopSound = SFX_TEN_PUSH_BLOCK_END; // LUA
+	info->fallSound = SFX_TEN_BOULDER_FALL; // LUA
 
 	FindStack(itemNumber); // check for stack formation when pushables are initialised
 }

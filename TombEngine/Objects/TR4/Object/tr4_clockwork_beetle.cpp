@@ -54,7 +54,7 @@ void ClockworkBeetleControl(short itemNumber)
 		}
 	}
 
-	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->Pose, 0);
+	SoundEffect(SFX_TR4_CLOCKWORK_BEETLE_WINDUP, &beetle->Pose, 0);
 
 	beetle->Animation.VerticalVelocity += 12;
 	beetle->Pose.Position.y += beetle->Animation.VerticalVelocity;

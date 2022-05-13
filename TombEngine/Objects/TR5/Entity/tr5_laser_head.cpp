@@ -224,7 +224,7 @@ void LaserHeadControl(short itemNumber)
 						tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd &&
 						tentacleItem->MeshBits & 1)
 					{
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+						SoundEffect(SFX_TEN_HIT_ROCK, &item->Pose, 0);
 						ExplodeItemNode(tentacleItem, 0, 0, 128);
 						KillItem(creature->Tentacles[i]);
 					}
@@ -264,9 +264,9 @@ void LaserHeadControl(short itemNumber)
 				TestTriggers(item, true);
 
 				SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose, 0x800004);
-				SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 20971524);
-				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0);
-				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 4194308);
+				SoundEffect(SFX_TEN_EXPLOSION2, &item->Pose, 20971524);
+				SoundEffect(SFX_TEN_EXPLOSION1, &item->Pose, 0);
+				SoundEffect(SFX_TEN_EXPLOSION1, &item->Pose, 4194308);
 
 				KillItem(itemNumber);
 			}
@@ -467,7 +467,7 @@ void LaserHeadControl(short itemNumber)
 									LaserHeadData.fireArcs[i] != NULL)
 								{
 									// Eye is aready firing
-									SoundEffect(SFX_TR5_GOD_HEAD_LASERLOOPS, &item->Pose, 0);
+									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose, 0);
 
 									LaserHeadData.fireArcs[i]->pos1.x = src.x;
 									LaserHeadData.fireArcs[i]->pos1.y = src.y;

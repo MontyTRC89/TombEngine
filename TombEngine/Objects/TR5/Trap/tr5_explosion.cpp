@@ -70,8 +70,8 @@ void ExplosionControl(short itemNumber)
 			else
 				flag = item->ItemFlags[1] == 1 ? 2 : 0;
 			
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 25165828);
-			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
+			SoundEffect(SFX_TEN_EXPLOSION1, &item->Pose, 25165828);
+			SoundEffect(SFX_TEN_EXPLOSION2, &item->Pose, 0);
 			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, flag, item->RoomNumber);
 			
 			for (int i = 0; i < item->ItemFlags[2]; ++i)

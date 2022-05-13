@@ -843,7 +843,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 
 void SayNo()
 {
-	SoundEffect(SFX_TR4_LARA_NO, NULL, SFX_ALWAYS);
+	SoundEffect(SFX_TEN_LARA_NO_ENGLISH, NULL, SFX_ALWAYS);
 }
 
 void PlaySecretTrack()

@@ -527,8 +527,8 @@ static void MotorBikeExplode(ItemInfo* item)
 	LaraItem->HitPoints = 0;
 	item->Status = ITEM_DEACTIVATED;
 
-	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
-	SoundEffect(SFX_TR4_EXPLOSION2, NULL, 0);
+	SoundEffect(SFX_TEN_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_TEN_EXPLOSION2, NULL, 0);
 
 	Lara.Vehicle = NO_ITEM;
 }
@@ -1433,14 +1433,14 @@ int MotorbikeControl(void)
     if (motorbike->pitch > MOTORBIKE_PITCH_MAX)
         motorbike->pitch = MOTORBIKE_PITCH_MAX;
 
-        SoundEffect(SFX_TR4_BIKE_MOVING, &item->Pose, (motorbike->pitch * 256) + 0x1000004);
+        SoundEffect(SFX_TEN_VEHICLE_MOTORBIKE_MOVING, &item->Pose, (motorbike->pitch * 256) + 0x1000004);
     }
     else
     {
         if (drive != -1)
         {
-            SoundEffect(SFX_TR4_BIKE_IDLE, &item->Pose, 0);
-            SoundEffect(SFX_TR4_BIKE_MOVING, &item->Pose, (motorbike->pitch * 256) + 0x1000004);
+            SoundEffect(SFX_TEN_VEHICLE_MOTORBIKE_IDLE, &item->Pose, 0);
+            SoundEffect(SFX_TEN_VEHICLE_MOTORBIKE_MOVING, &item->Pose, (motorbike->pitch * 256) + 0x1000004);
         }
         motorbike->pitch = 0;
     }
