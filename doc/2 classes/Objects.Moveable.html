@@ -87,13 +87,13 @@ pickups, and Lara herself.</p>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Moveable.New">Moveable.New(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
+	<td class="name" ><a href="#Moveable">Moveable(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
 	<td class="summary">For more information on each parameter, see the
 associated getters and setters.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:EnableItem">Moveable:EnableItem()</a></td>
-	<td class="summary">Enable the item</td>
+	<td class="summary">Enable the item, as if a trigger for it had been stepped on.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:DisableItem">Moveable:DisableItem()</a></td>
@@ -255,13 +255,13 @@ associated getters and setters.</td>
 
     <dl class="function">
     <dt>
-    <a name = "Moveable.New"></a>
-    <strong>Moveable.New(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</strong>
+    <a name = "Moveable"></a>
+    <strong>Moveable(object, name, position, rotation, room, animNumber, frameNumber, hp, OCB, AIBits)</strong>
     </dt>
     <dd>
     For more information on each parameter, see the
 associated getters and setters.  If you do not know what to set for these,
-most can just be set to zero (see usage).
+most can just be ignored (see usage).
 
 
     <h3>Parameters:</h3>
@@ -280,7 +280,7 @@ most can just be set to zero (see usage).
         </li>
         <li><span class="parameter">rotation</span>
             <span class="types"><span class="type">Rotation</span></span>
-         rotation about x, y, and z axes (default Rotation.new(0, 0, 0))
+         rotation about x, y, and z axes (default Rotation(0, 0, 0))
         </li>
         <li><span class="parameter">room</span>
             <span class="types"><span class="type">int</span></span>
@@ -318,17 +318,12 @@ most can just be set to zero (see usage).
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> item = Moveable.New(
+        <pre class="example"><span class="keyword">local</span> item = Moveable(
 	TEN.ObjID.PISTOLS_ITEM, <span class="comment">-- object id
 </span>	<span class="string">"test"</span>, <span class="comment">-- name
-</span>	Vec3.new(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>),
-	Rotation.new(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),
+</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>),
+	Rotation(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>),
 	<span class="number">0</span>, <span class="comment">-- room
-</span>	<span class="number">0</span>, <span class="comment">-- animNumber
-</span>	<span class="number">0</span>, <span class="comment">-- frameNumber
-</span>	<span class="number">10</span>, <span class="comment">-- HP
-</span>	<span class="number">0</span>, <span class="comment">-- OCB
-</span>	{<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>} <span class="comment">-- aiBits
 </span>	)</pre>
     </ul>
 
@@ -338,7 +333,7 @@ most can just be set to zero (see usage).
     <strong>Moveable:EnableItem()</strong>
     </dt>
     <dd>
-    Enable the item
+    Enable the item, as if a trigger for it had been stepped on.
 
 
 
