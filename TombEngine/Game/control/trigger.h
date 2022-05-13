@@ -11,7 +11,7 @@ constexpr auto ATONESHOT   = 0x0080;
 constexpr auto VALUE_BITS  = 0x03FF;
 constexpr auto CODE_BITS   = 0x3E00;
 constexpr auto END_BIT     = 0x8000;
-constexpr auto TRIGGERED = 0x20;
+constexpr auto TRIGGERED   = 0x20;
 enum FLOORDATA_MASKS
 {
 	FD_MASK_FUNCTION = 0x001F,

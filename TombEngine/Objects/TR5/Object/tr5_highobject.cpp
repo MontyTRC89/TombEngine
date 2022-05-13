@@ -112,7 +112,7 @@ void ControlHighObject1(short itemNumber)
 				item->Pose.Position.y += 8;
 
 				auto* targetItem = &g_Level.Items[(item->ItemFlags[3] / 256) & 0xFF];
-				targetItem->Flags |= 0x20u;
+				targetItem->Flags |= TRIGGERED;
 				targetItem->Pose.Position.y = item->Pose.Position.y - 560;
 			}
 
@@ -120,7 +120,7 @@ void ControlHighObject1(short itemNumber)
 			{
 				auto* targetItem = &g_Level.Items[item->ItemFlags[2] & 0xFF];
 				targetItem->ItemFlags[1] = 0;
-				targetItem->Flags |= 0x20u;
+				targetItem->Flags |= TRIGGERED;
 
 				item->ItemFlags[0] = 0;
 				item->ItemFlags[1] = 0;
@@ -172,7 +172,7 @@ void ControlHighObject1(short itemNumber)
 				targetItem = &g_Level.Items[targetItemNumber];
 
 				targetItem->ItemFlags[1] = 1;
-				targetItem->Flags |= 0x20;
+				targetItem->Flags |= TRIGGERED;
 				targetItem->Flags &= 0xC1FF;
 				return;
 			}
@@ -203,7 +203,7 @@ void ControlHighObject1(short itemNumber)
 
 		short targetItemNumber = (item->ItemFlags[3] / 256) & 0xFF;
 		auto* targetItem = &g_Level.Items[targetItemNumber];
-		targetItem->Flags |= 0x20;
+		targetItem->Flags |= TRIGGERED;
 		targetItem->Pose.Position.y = item->Pose.Position.y - 560;
 	}
 }
