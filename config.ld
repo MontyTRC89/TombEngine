@@ -20,7 +20,7 @@ To save on typing, you can put the following at the start of a Lua file:
 	local Util = require("Util")
 	Util.ShortenTENCalls()
 This will put the modules and classes in the global table. In other words, it means you can do the following:
-	local door = etMoveableByName("door_type4_14")
+	local door = GetMoveableByName("door_type4_14")
 
 Enjoy.
 

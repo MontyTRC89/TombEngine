@@ -12,7 +12,7 @@
 #include "ScriptInterfaceGame.h"
 
 /***
-Scripts that will be run on game startup.
+Moveables, statics, cameras, and so on.
 @tentable Objects 
 @pragma nostrip
 */
