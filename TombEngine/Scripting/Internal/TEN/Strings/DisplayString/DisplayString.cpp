@@ -106,13 +106,13 @@ void DisplayString::Register(sol::table & parent)
 		// @tparam Color color the new color of the display string 
 		ScriptReserved_SetColor, &DisplayString::SetCol,
 
-		/// Get the string key to use. If `translated` is true when @{DisplayString.new}
+		/// Get the string key to use. If `translated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @treturn String a string
 		ScriptReserved_GetKey, &DisplayString::GetKey, 
 
-		/// Set the string key to use. If `translated` is true when @{DisplayString.new}
+		/// Set the string key to use. If `translated` is true when @{DisplayString}
 		// is called, this will be the string key for the translation that will be displayed.
 		// If false or omitted, this will be the string that's displayed.
 		// @function SetKey
