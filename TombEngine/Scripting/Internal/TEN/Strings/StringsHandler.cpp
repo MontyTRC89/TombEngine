@@ -7,7 +7,7 @@
 #include "ReservedScriptNames.h"
 
 /***
-Scripts that will be run on game startup.
+On-screen strings.
 @tentable Strings 
 @pragma nostrip
 */

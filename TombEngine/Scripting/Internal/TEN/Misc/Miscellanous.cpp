@@ -11,7 +11,7 @@
 #include "camera.h"
 
 /***
-Scripts that will be run on game startup.
+Functions that don't fit in the other modules.
 @tentable Misc 
 @pragma nostrip
 */
