@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_baddie.h"
+#include "tr4_baddy.h"
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
@@ -15,22 +15,22 @@
 #include "Game/misc.h"
 
 /*
-ID_BADDIE1
+ID_BADDY1
 1 - Rolls to the right 1 pow
 2 - Jumps to the left 1 pow
 3 - ducks when triggered
 4 - Climbs up 4 clicks when triggered
 101-104 – Slides to the left while crouching when triggered (eg. train level – just doesn’t work in trainmode)
 1004 - Climbs up 6 clicks when triggered
-1000 – N x 1000 – Is activated once the baddie with the previous thousand is dead and needs no trigger (have tested up to 20.000). Must be placed in room 2 of a level.
+1000 – N x 1000 – Is activated once the baddy with the previous thousand is dead and needs no trigger (have tested up to 20.000). Must be placed in room 2 of a level.
 This means that:
-2000 - Attacks Lara after she kills 1st baddie triggered
-3000 - Same as above but after she kills 2nd baddie triggered
-4000 - Same as above but after she kills 3rd baddie triggered
-6000 - Same as above but after she kills 5th baddie triggered
+2000 - Attacks Lara after she kills 1st baddy triggered
+3000 - Same as above but after she kills 2nd baddy triggered
+4000 - Same as above but after she kills 3rd baddy triggered
+6000 - Same as above but after she kills 5th baddy triggered
 etc.
 
-ID_BADDIE2
+ID_BADDY2
 1 - Jumps to right when triggered
 2 - Rolls to left when triggered
 3 - Crouches when triggered
@@ -41,181 +41,181 @@ ID_BADDIE2
 13 - Crouches when triggered and draws uzi
 14 - Climbs up 4 clicks when triggered and draws uzi
 101 - Slides to the left while crouching when triggered (eg. Train level)
-101-104 - Slides to the left while crouching when triggered. The setup requires an enemy jeep and an AI_X1 nullmesh with the same OCB as the jeep and the baddie. It works only in trainmode. When triggered, the baddie will ride the roof of the enemy jeep parallel to the railtracks, until they reach the AI_X1 nullmesh. The baddie will jump off in the direction he’s placed in the map, while the jeep will fall back.
+101-104 - Slides to the left while crouching when triggered. The setup requires an enemy jeep and an AI_X1 nullmesh with the same OCB as the jeep and the baddy. It works only in trainmode. When triggered, the baddy will ride the roof of the enemy jeep parallel to the railtracks, until they reach the AI_X1 nullmesh. The baddy will jump off in the direction he’s placed in the map, while the jeep will fall back.
 */
 
 namespace TEN::Entities::TR4
 {
-	enum BaddieState
+	enum BaddyState
 	{
-		BADDIE_STATE_IDLE = 0,
-		BADDIE_STATE_WALK = 1,
-		BADDIE_STATE_RUN = 2,
+		BADDY_STATE_IDLE = 0,
+		BADDY_STATE_WALK = 1,
+		BADDY_STATE_RUN = 2,
 		// 3
-		BADDIE_STATE_DODGE_START = 4,
+		BADDY_STATE_DODGE_START = 4,
 		// 5
 		// 6
 		// 7
-		BADDIE_STATE_UNKNOWN_8 = 8,
-		BADDIE_STATE_UNKNOWN_9 = 9,
-		BADDIE_STATE_DRAW_GUN = 10,
-		BADDIE_STATE_HOLSTER_GUN = 11,
-		BADDIE_STATE_DRAW_SWORD = 12,
-		BADDIE_STATE_HOLSTER_SWORD = 13,
-		BADDIE_STATE_FIRE = 14,
-		BADDIE_STATE_SWORD_HIT_FRONT = 15,
-		BADDIE_STATE_SWORD_HIT_RIGHT = 16,
-		BADDIE_STATE_SWORD_HIT_LEFT = 17,
-		BADDIE_STATE_MONKEY_GRAB = 18,
-		BADDIE_STATE_MONKEY_IDLE = 19,
-		BADDIE_STATE_MONKEY_FORWARD = 20,
-		BADDIE_STATE_MONKEY_PUSH_OFF = 21,
-		BADDIE_STATE_MONKEY_FALL_LAND = 22,
-		BADDIE_STATE_ROLL_LEFT = 23,
-		BADDIE_STATE_JUMP_RIGHT = 24,
-		BADDIE_STATE_STAND_TO_CROUCH = 25,
-		BADDIE_STATE_CROUCH = 26,
-		BADDIE_STATE_CROUCH_PICKUP = 27,
-		BADDIE_STATE_CROUCH_TO_STAND = 28,
-		BADDIE_STATE_WALK_SWORD_HIT_RIGHT = 29,
-		BADDIE_STATE_SOMERSAULT = 30,
-		BADDIE_STATE_AIM = 31,
-		BADDIE_STATE_DEATH = 32,
-		BADDIE_STATE_JUMP_FORWARD_1_BLOCK = 33,
-		BADDIE_STATE_JUMP_FORWARD_FALL = 34,
-		BADDIE_STATE_MONKEY_TO_FREEFALL = 35,
-		BADDIE_STATE_FREEFALL = 36,
-		BADDIE_STATE_FREEFALL_LAND_DEATH = 37,
-		BADDIE_STATE_JUMP_FORWARD_2_BLOCKS = 38,
-		BADDIE_STATE_CLIMB_4_STEPS = 39,
-		BADDIE_STATE_CLIMB_3_STEPS = 40,
-		BADDIE_STATE_CLIMB_2_STEPS = 41,
-		BADDIE_STATE_JUMP_OFF_4_STEPS = 42,
-		BADDIE_STATE_JUMP_OFF_3_STEPS = 43,
-		BADDIE_STATE_BLIND = 44
+		BADDY_STATE_UNKNOWN_8 = 8,
+		BADDY_STATE_UNKNOWN_9 = 9,
+		BADDY_STATE_DRAW_GUN = 10,
+		BADDY_STATE_HOLSTER_GUN = 11,
+		BADDY_STATE_DRAW_SWORD = 12,
+		BADDY_STATE_HOLSTER_SWORD = 13,
+		BADDY_STATE_FIRE = 14,
+		BADDY_STATE_SWORD_HIT_FRONT = 15,
+		BADDY_STATE_SWORD_HIT_RIGHT = 16,
+		BADDY_STATE_SWORD_HIT_LEFT = 17,
+		BADDY_STATE_MONKEY_GRAB = 18,
+		BADDY_STATE_MONKEY_IDLE = 19,
+		BADDY_STATE_MONKEY_FORWARD = 20,
+		BADDY_STATE_MONKEY_PUSH_OFF = 21,
+		BADDY_STATE_MONKEY_FALL_LAND = 22,
+		BADDY_STATE_ROLL_LEFT = 23,
+		BADDY_STATE_JUMP_RIGHT = 24,
+		BADDY_STATE_STAND_TO_CROUCH = 25,
+		BADDY_STATE_CROUCH = 26,
+		BADDY_STATE_CROUCH_PICKUP = 27,
+		BADDY_STATE_CROUCH_TO_STAND = 28,
+		BADDY_STATE_WALK_SWORD_HIT_RIGHT = 29,
+		BADDY_STATE_SOMERSAULT = 30,
+		BADDY_STATE_AIM = 31,
+		BADDY_STATE_DEATH = 32,
+		BADDY_STATE_JUMP_FORWARD_1_BLOCK = 33,
+		BADDY_STATE_JUMP_FORWARD_FALL = 34,
+		BADDY_STATE_MONKEY_TO_FREEFALL = 35,
+		BADDY_STATE_FREEFALL = 36,
+		BADDY_STATE_FREEFALL_LAND_DEATH = 37,
+		BADDY_STATE_JUMP_FORWARD_2_BLOCKS = 38,
+		BADDY_STATE_CLIMB_4_STEPS = 39,
+		BADDY_STATE_CLIMB_3_STEPS = 40,
+		BADDY_STATE_CLIMB_2_STEPS = 41,
+		BADDY_STATE_JUMP_OFF_4_STEPS = 42,
+		BADDY_STATE_JUMP_OFF_3_STEPS = 43,
+		BADDY_STATE_BLIND = 44
 	};
 
-	enum BaddieAnim
+	enum BaddyAnim
 	{
-		BADDIE_ANIM_RUN = 0,
-		BADDIE_ANIM_RUN_STOP_START = 1,
-		BADDIE_ANIM_RUN_STOP_END = 2,
-		BADDIE_ANIM_SOMERSAULT_START = 3,
-		BADDIE_ANIM_SOMERSAULT_END = 4,
-		BADDIE_ANIM_DODGE_START = 5,
+		BADDY_ANIM_RUN = 0,
+		BADDY_ANIM_RUN_STOP_START = 1,
+		BADDY_ANIM_RUN_STOP_END = 2,
+		BADDY_ANIM_SOMERSAULT_START = 3,
+		BADDY_ANIM_SOMERSAULT_END = 4,
+		BADDY_ANIM_DODGE_START = 5,
 		// 6
 		// 7
 		// 8
-		BADDIE_ANIM_MONKEY_GRAB = 9,
-		BADDIE_ANIM_MONKEY_IDLE = 10,
-		BADDIE_ANIM_MONKEY_FORWARD = 11,
-		BADDIE_ANIM_MONKEY_IDLE_TO_FORWARD = 12,
-		BADDIE_ANIM_MONKEY_STOP_LEFT = 13,
-		BADDIE_ANIM_MONKEY_STOP_RIGHT = 14,
-		BADDIE_ANIM_MONKEY_FALL_LAND = 15,
-		BADDIE_ANIM_MONKEY_PUSH_OFF = 16,
-		BADDIE_ANIM_DODGE_END = 17,
-		BADDIE_ANIM_STAND_IDLE = 18,
-		BADDIE_ANIM_DODGE_END_TO_STAND = 19,
-		BADDIE_ANIM_DRAW_GUN = 20,
-		BADDIE_ANIM_HOLSTER_GUN = 21,
-		BADDIE_ANIM_DRAW_SWORD = 22,
-		BADDIE_ANIM_HOLSTER_SWORD = 23,
-		BADDIE_ANIM_STAND_TO_ROLL_LEFT = 24,
-		BADDIE_ANIM_ROLL_LEFT_START = 25,
-		BADDIE_ANIM_ROLL_LEFT_CONTINUE = 26,
-		BADDIE_ANIM_ROLL_LEFT_END = 27,
-		BADDIE_ANIM_ROLL_LEFT_TO_CROUCH = 28,
-		BADDIE_ANIM_CROUCH = 29,
-		BADDIE_ANIM_CROUCH_TO_STAND = 30,
-		BADDIE_ANIM_STAND_TO_WALK = 31,
-		BADDIE_ANIM_WALK = 32,
-		BADDIE_ANIM_WALK_TO_RUN = 33,
-		BADDIE_ANIM_STAND_TO_AIM = 34,
-		BADDIE_ANIM_AIM = 35,
-		BADDIE_ANIM_FIRE = 36,
-		BADDIE_ANIM_AIM_TO_STAND = 37,
-		BADDIE_ANIM_SWORD_HIT_FRONT = 38,
-		BADDIE_ANIM_CROUCH_PICKUP = 39,
-		BADDIE_ANIM_STAND_TO_CROUCH = 40,
-		BADDIE_ANIM_SWORD_HIT_RIGHT = 41,
-		BADDIE_ANIM_SWORD_HIT_RIGHT_TO_LEFT = 42,
-		BADDIE_ANIM_SWORD_HIT_RIGHT_TO_STAND = 43,
-		BADDIE_ANIM_SWORD_HIT_LEFT = 44,
-		BADDIE_ANIM_STAND_DEATH = 45,
-		BADDIE_ANIM_WALK_SWORD_HIT_RIGHT = 46,
-		BADDIE_ANIM_STAND_TO_JUMP_RIGHT = 47,
-		BADDIE_ANIM_JUMP_RIGHT_START = 48,
-		BADDIE_ANIM_JUMP_RIGHT_CONTINUE = 49,
-		BADDIE_ANIM_JUMP_RIGHT_END = 50,
-		BADDIE_ANIM_RUN_TO_WALK = 51,
+		BADDY_ANIM_MONKEY_GRAB = 9,
+		BADDY_ANIM_MONKEY_IDLE = 10,
+		BADDY_ANIM_MONKEY_FORWARD = 11,
+		BADDY_ANIM_MONKEY_IDLE_TO_FORWARD = 12,
+		BADDY_ANIM_MONKEY_STOP_LEFT = 13,
+		BADDY_ANIM_MONKEY_STOP_RIGHT = 14,
+		BADDY_ANIM_MONKEY_FALL_LAND = 15,
+		BADDY_ANIM_MONKEY_PUSH_OFF = 16,
+		BADDY_ANIM_DODGE_END = 17,
+		BADDY_ANIM_STAND_IDLE = 18,
+		BADDY_ANIM_DODGE_END_TO_STAND = 19,
+		BADDY_ANIM_DRAW_GUN = 20,
+		BADDY_ANIM_HOLSTER_GUN = 21,
+		BADDY_ANIM_DRAW_SWORD = 22,
+		BADDY_ANIM_HOLSTER_SWORD = 23,
+		BADDY_ANIM_STAND_TO_ROLL_LEFT = 24,
+		BADDY_ANIM_ROLL_LEFT_START = 25,
+		BADDY_ANIM_ROLL_LEFT_CONTINUE = 26,
+		BADDY_ANIM_ROLL_LEFT_END = 27,
+		BADDY_ANIM_ROLL_LEFT_TO_CROUCH = 28,
+		BADDY_ANIM_CROUCH = 29,
+		BADDY_ANIM_CROUCH_TO_STAND = 30,
+		BADDY_ANIM_STAND_TO_WALK = 31,
+		BADDY_ANIM_WALK = 32,
+		BADDY_ANIM_WALK_TO_RUN = 33,
+		BADDY_ANIM_STAND_TO_AIM = 34,
+		BADDY_ANIM_AIM = 35,
+		BADDY_ANIM_FIRE = 36,
+		BADDY_ANIM_AIM_TO_STAND = 37,
+		BADDY_ANIM_SWORD_HIT_FRONT = 38,
+		BADDY_ANIM_CROUCH_PICKUP = 39,
+		BADDY_ANIM_STAND_TO_CROUCH = 40,
+		BADDY_ANIM_SWORD_HIT_RIGHT = 41,
+		BADDY_ANIM_SWORD_HIT_RIGHT_TO_LEFT = 42,
+		BADDY_ANIM_SWORD_HIT_RIGHT_TO_STAND = 43,
+		BADDY_ANIM_SWORD_HIT_LEFT = 44,
+		BADDY_ANIM_STAND_DEATH = 45,
+		BADDY_ANIM_WALK_SWORD_HIT_RIGHT = 46,
+		BADDY_ANIM_STAND_TO_JUMP_RIGHT = 47,
+		BADDY_ANIM_JUMP_RIGHT_START = 48,
+		BADDY_ANIM_JUMP_RIGHT_CONTINUE = 49,
+		BADDY_ANIM_JUMP_RIGHT_END = 50,
+		BADDY_ANIM_RUN_TO_WALK = 51,
 		// 52
 		// 53
-		BADDIE_ANIM_WALK_STOP_RIGHT = 54,
-		BADDIE_ANIM_STAND_TO_JUMP_FORWARD = 55,
-		BADDIE_ANIM_JUMP_FORWARD_1_BLOCK = 56,
-		BADDIE_ANIM_JUMP_FORWARD_FALL = 57,
-		BADDIE_ANIM_JUMP_FORWARD_LAND = 58,
-		BADDIE_ANIM_MONKEY_TO_FREEFALL = 59,
-		BADDIE_ANIM_FREEFALL = 60,
-		BADDIE_ANIM_FREEFALL_LAND_DEATH = 61,
-		BADDIE_ANIM_CLIMB_4_STEPS = 62,
-		BADDIE_ANIM_CLIMB_3_STEPS = 63,
-		BADDIE_ANIM_CLIMB_2_STEPS = 64,
-		BADDIE_ANIM_JUMP_OFF_4_STEPS = 65,
-		BADDIE_ANIM_JUMP_OFF_3_STEPS = 66,
-		BADDIE_ANIM_JUMP_FORWARD_2_BLOCKS = 67,
-		BADDIE_ANIM_BLIND = 68,
-		BADDIE_ANIM_BLIND_TO_STAND = 69,
-		BADDIE_ANIM_DEAD = 70,
+		BADDY_ANIM_WALK_STOP_RIGHT = 54,
+		BADDY_ANIM_STAND_TO_JUMP_FORWARD = 55,
+		BADDY_ANIM_JUMP_FORWARD_1_BLOCK = 56,
+		BADDY_ANIM_JUMP_FORWARD_FALL = 57,
+		BADDY_ANIM_JUMP_FORWARD_LAND = 58,
+		BADDY_ANIM_MONKEY_TO_FREEFALL = 59,
+		BADDY_ANIM_FREEFALL = 60,
+		BADDY_ANIM_FREEFALL_LAND_DEATH = 61,
+		BADDY_ANIM_CLIMB_4_STEPS = 62,
+		BADDY_ANIM_CLIMB_3_STEPS = 63,
+		BADDY_ANIM_CLIMB_2_STEPS = 64,
+		BADDY_ANIM_JUMP_OFF_4_STEPS = 65,
+		BADDY_ANIM_JUMP_OFF_3_STEPS = 66,
+		BADDY_ANIM_JUMP_FORWARD_2_BLOCKS = 67,
+		BADDY_ANIM_BLIND = 68,
+		BADDY_ANIM_BLIND_TO_STAND = 69,
+		BADDY_ANIM_DEAD = 70,
 	};
 
-	enum BaddieFrame
+	enum BaddyFrame
 	{
-		FRAME_BADDIE_HOLSTER_GUN = 20,
-		FRAME_BADDIE_DRAW_GUN = 21,
-		FRAME_BADDIE_HOLSTER_SWORD = 22,
-		FRAME_BADDIE_DRAW_SWORD = 12,
-		FRAME_BADDIE_RUN_TO_SOMERSAULT = 11,
-		FRAME_BADDIE_SWORD_HIT_NO_DAMAGE_MAX = 12,
-		FRAME_BADDIE_SWORD_HIT_DAMAGE_MIN = 13,
-		FRAME_BADDIE_SWORD_HIT_DAMAGE_MAX = 21,
-		FRAME_BADDIE_CROUCH_PICKUP = 9,
-		FRAME_BADDIE_FIRE_MIN = 1,
-		FRAME_BADDIE_FIRE_MAX = 13,
-		FRAME_BADDIE_SOMERSAULT_START_TAKE_OFF = 18,
+		FRAME_BADDY_HOLSTER_GUN = 20,
+		FRAME_BADDY_DRAW_GUN = 21,
+		FRAME_BADDY_HOLSTER_SWORD = 22,
+		FRAME_BADDY_DRAW_SWORD = 12,
+		FRAME_BADDY_RUN_TO_SOMERSAULT = 11,
+		FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX = 12,
+		FRAME_BADDY_SWORD_HIT_DAMAGE_MIN = 13,
+		FRAME_BADDY_SWORD_HIT_DAMAGE_MAX = 21,
+		FRAME_BADDY_CROUCH_PICKUP = 9,
+		FRAME_BADDY_FIRE_MIN = 1,
+		FRAME_BADDY_FIRE_MAX = 13,
+		FRAME_BADDY_SOMERSAULT_START_TAKE_OFF = 18,
 	};
 
-	enum BaddieMeshSwapFlags
+	enum BaddyMeshSwapFlags
 	{
-		MESHSWAPFLAGS_BADDIE_EMPTY = 0x7FC800,
-		MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE = 0x7E0880,
-		MESHSWAPFLAGS_BADDIE_SWORD_NINJA = 0x000880,
-		MESHSWAPFLAGS_BADDIE_GUN = 0x7FC010,
+		MESHSWAPFLAGS_BADDY_EMPTY = 0x7FC800,
+		MESHSWAPFLAGS_BADDY_SWORD_SIMPLE = 0x7E0880,
+		MESHSWAPFLAGS_BADDY_SWORD_NINJA = 0x000880,
+		MESHSWAPFLAGS_BADDY_GUN = 0x7FC010,
 	};
 
-	#define BADDIE_USE_UZI	24
+	#define BADDY_USE_UZI	24
 
-	BITE_INFO BaddieGunBite = { 0, -16, 200, 11 };
-	BITE_INFO BaddieSwordBite = { 0, 0, 0, 15 };
+	BITE_INFO BaddyGunBite = { 0, -16, 200, 11 };
+	BITE_INFO BaddySwordBite = { 0, 0, 0, 15 };
 
-	void InitialiseBaddie(short itemNumber)
+	void InitialiseBaddy(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 	
 		ClearItem(itemNumber);
 
-		short objectNumber = (Objects[ID_BADDIE2].loaded ? ID_BADDIE2 : ID_BADDIE1);
+		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 
-		if (item->ObjectNumber == ID_BADDIE1)
+		if (item->ObjectNumber == ID_BADDY1)
 		{
-			item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_GUN;
+			item->SwapMeshFlags = MESHSWAPFLAGS_BADDY_GUN;
 			item->MeshBits = 0xFF81FFFF;
-			item->ItemFlags[2] = BADDIE_USE_UZI;
+			item->ItemFlags[2] = BADDY_USE_UZI;
 		}
 		else
 		{
-			item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_SWORD_NINJA;
+			item->SwapMeshFlags = MESHSWAPFLAGS_BADDY_SWORD_NINJA;
 			item->MeshBits = -1;
 			item->ItemFlags[2] = 0;
 		}
@@ -227,57 +227,57 @@ namespace TEN::Entities::TR4
 		// To the same things of OCB 1, 2, 3, 4 but also drawing uzis
 		if (ocb > 9 && ocb < 20)
 		{
-			item->ItemFlags[2] += BADDIE_USE_UZI;
+			item->ItemFlags[2] += BADDY_USE_UZI;
 			item->TriggerFlags -= 10;
 			ocb -= 10;
 		}
 	
 		if (!ocb || ocb > 4 && ocb < 7)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_IDLE;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_IDLE;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = BADDIE_STATE_IDLE;
-			item->Animation.ActiveState = BADDIE_STATE_IDLE;
+			item->Animation.TargetState = BADDY_STATE_IDLE;
+			item->Animation.ActiveState = BADDY_STATE_IDLE;
 			return;
 		}
 
 		// OCB: jump right
 		if (ocb == 1)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_JUMP_RIGHT;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_RIGHT;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = BADDIE_STATE_JUMP_RIGHT;
-			item->Animation.ActiveState = BADDIE_STATE_JUMP_RIGHT;
+			item->Animation.TargetState = BADDY_STATE_JUMP_RIGHT;
+			item->Animation.ActiveState = BADDY_STATE_JUMP_RIGHT;
 			return;
 		}
 
 		// OCB: jump left
 		if (ocb == 2)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_ROLL_LEFT;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_ROLL_LEFT;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = BADDIE_STATE_ROLL_LEFT;
-			item->Animation.ActiveState = BADDIE_STATE_ROLL_LEFT;
+			item->Animation.TargetState = BADDY_STATE_ROLL_LEFT;
+			item->Animation.ActiveState = BADDY_STATE_ROLL_LEFT;
 			return;
 		}
 	
 		// OCB: crouch
 		if (ocb == 3)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CROUCH;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = BADDIE_STATE_CROUCH;
-			item->Animation.ActiveState = BADDIE_STATE_CROUCH;
+			item->Animation.TargetState = BADDY_STATE_CROUCH;
+			item->Animation.ActiveState = BADDY_STATE_CROUCH;
 			return;
 		}
 
 		// OCB: climb up 4 or 6 clicks 
 		if (ocb == 4)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_4_STEPS;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_4_STEPS;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = BADDIE_STATE_CLIMB_4_STEPS;
-			item->Animation.ActiveState = BADDIE_STATE_CLIMB_4_STEPS;
+			item->Animation.TargetState = BADDY_STATE_CLIMB_4_STEPS;
+			item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
 			item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * CLICK(4);
 			return;
@@ -286,10 +286,10 @@ namespace TEN::Entities::TR4
 		// OCB: crouch and jump in train levels?
 		if (ocb > 100)
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CROUCH;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = BADDIE_STATE_CROUCH;
-			item->Animation.ActiveState = BADDIE_STATE_CROUCH;
+			item->Animation.TargetState = BADDY_STATE_CROUCH;
+			item->Animation.ActiveState = BADDY_STATE_CROUCH;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
 			item->Pose.Position.z += phd_cos(item->Pose.Orientation.y) * CLICK(4);
 			item->ItemFlags[3] = ocb;
@@ -299,7 +299,7 @@ namespace TEN::Entities::TR4
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
-	void BaddieControl(short itemNumber)
+	void BaddyControl(short itemNumber)
 	{
 		if (!CreatureActive(itemNumber))
 			return;
@@ -307,7 +307,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 		auto* enemyItem = creature->Enemy;
-		auto* object = &Objects[ID_BADDIE1];
+		auto* object = &Objects[ID_BADDY1];
 
 		short tilt = 0;
 		short angle = 0;
@@ -315,8 +315,8 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 		short joint3 = 0;
 
-		// TODO: better add a second control routine for baddie 2 instead of mixing them?
-		short objectNumber = (Objects[ID_BADDIE2].loaded ? ID_BADDIE2 : ID_BADDIE1);
+		// TODO: better add a second control routine for baddy 2 instead of mixing them?
+		short objectNumber = (Objects[ID_BADDY2].loaded ? ID_BADDY2 : ID_BADDY1);
 
 		bool roll = false;
 		bool jump = false;
@@ -336,7 +336,7 @@ namespace TEN::Entities::TR4
 			item->TriggerFlags = 1000 * (item->TriggerFlags / 1000);
 		}
 
-		// Can baddie jump? Check for a distance of 1 and 2 sectors
+		// Can baddy jump? Check for a distance of 1 and 2 sectors
 		int x = item->Pose.Position.x;
 		int y = item->Pose.Position.y;
 		int z = item->Pose.Position.z;
@@ -408,11 +408,11 @@ namespace TEN::Entities::TR4
 
 		item->ItemFlags[1] = item->RoomNumber;
 
-		// Handle baddie firing
+		// Handle baddy firing
 		if (creature->FiredWeapon)
 		{
-			auto pos = Vector3Int(BaddieGunBite.x, BaddieGunBite.y, BaddieGunBite.z);
-			GetJointAbsPosition(item, &pos, BaddieGunBite.meshNum);
+			auto pos = Vector3Int(BaddyGunBite.x, BaddyGunBite.y, BaddyGunBite.z);
+			GetJointAbsPosition(item, &pos, BaddyGunBite.meshNum);
 
 			TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * creature->FiredWeapon + 8, 24, 16, 4);
 			creature->FiredWeapon--;
@@ -427,7 +427,7 @@ namespace TEN::Entities::TR4
 
 			switch (item->Animation.ActiveState)
 			{
-			case BADDIE_STATE_DEATH:
+			case BADDY_STATE_DEATH:
 				item->Animation.Airborne = true;
 				currentCreature->LOT.IsMonkeying = false;
 
@@ -440,12 +440,12 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case BADDIE_STATE_MONKEY_TO_FREEFALL:
-				item->Animation.TargetState = BADDIE_STATE_FREEFALL;
+			case BADDY_STATE_MONKEY_TO_FREEFALL:
+				item->Animation.TargetState = BADDY_STATE_FREEFALL;
 				item->Animation.Airborne = false;
 				break;
 
-			case BADDIE_STATE_FREEFALL:
+			case BADDY_STATE_FREEFALL:
 				item->Animation.Airborne = true;
 
 				if (item->Pose.Position.y >= item->Floor)
@@ -453,42 +453,42 @@ namespace TEN::Entities::TR4
 					item->Pose.Position.y = item->Floor;
 					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
-					item->Animation.TargetState = BADDIE_STATE_FREEFALL_LAND_DEATH;
+					item->Animation.TargetState = BADDY_STATE_FREEFALL_LAND_DEATH;
 				}
 
 				break;
 
-			case BADDIE_STATE_FREEFALL_LAND_DEATH:
+			case BADDY_STATE_FREEFALL_LAND_DEATH:
 				item->Pose.Position.y = item->Floor;
 				break;
 
-			case BADDIE_STATE_MONKEY_GRAB:
-			case BADDIE_STATE_MONKEY_IDLE:
-			case BADDIE_STATE_MONKEY_FORWARD:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_MONKEY_TO_FREEFALL;
+			case BADDY_STATE_MONKEY_GRAB:
+			case BADDY_STATE_MONKEY_IDLE:
+			case BADDY_STATE_MONKEY_FORWARD:
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_MONKEY_TO_FREEFALL;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDIE_STATE_MONKEY_TO_FREEFALL;
+				item->Animation.ActiveState = BADDY_STATE_MONKEY_TO_FREEFALL;
 				item->Animation.Velocity = 0;
 				break;
 
 			default:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_DEATH;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDIE_STATE_DEATH;
+				item->Animation.ActiveState = BADDY_STATE_DEATH;
 				currentCreature->LOT.IsJumping = true;
 
-				// OCB: respawn code for BADDIE_1
+				// OCB: respawn code for BADDY_1
 				if (item->TriggerFlags > 999)
 				{
 					for (int i = 0; i < g_Level.NumItems; i++)
 					{
 						auto* possibleEnemy = &g_Level.Items[i];
 
-						if (possibleEnemy->ObjectNumber == ID_BADDIE1 || possibleEnemy->ObjectNumber == ID_BADDIE2 &&
+						if (possibleEnemy->ObjectNumber == ID_BADDY1 || possibleEnemy->ObjectNumber == ID_BADDY2 &&
 							(item->TriggerFlags / 1000) == (possibleEnemy->TriggerFlags / 1000) - 1 &&
 							!(possibleEnemy->Flags & IFLAG_KILLED))
 						{
-							if (EnableBaddieAI(i, 0))
+							if (EnableBaddyAI(i, 0))
 								possibleEnemy->Status = ITEM_ACTIVE;
 							else
 								possibleEnemy->Status = ITEM_INVISIBLE;
@@ -547,7 +547,7 @@ namespace TEN::Entities::TR4
 			//ItemInfo* oldEnemy = creature->enemy;
 			//creature->enemy = LaraItem;
 
-			// Is baddie alerted?
+			// Is baddy alerted?
 			if (item->HitStatus ||
 				laraAI.distance < pow(SECTOR(1), 2) ||
 				TargetVisible(item, &laraAI) &&
@@ -619,7 +619,7 @@ namespace TEN::Entities::TR4
 
 			switch (item->Animation.ActiveState)
 			{
-			case BADDIE_STATE_IDLE:
+			case BADDY_STATE_IDLE:
 				currentCreature->MaxTurn = 0;
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsMonkeying = false;
@@ -639,36 +639,36 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_SWORD_NINJA &&
+				if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDY_SWORD_NINJA &&
 					item == Lara.TargetEntity &&
 					laraAI.ahead &&
 					laraAI.distance > pow(682, 2))
 				{
-					item->Animation.TargetState = BADDIE_STATE_DODGE_START;
+					item->Animation.TargetState = BADDY_STATE_DODGE_START;
 					break;
 				}
 
 				if (Targetable(item, &AI) && item->ItemFlags[2] > 0)
 				{
-					if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN)
+					if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDY_GUN)
 					{
-						item->Animation.TargetState = BADDIE_STATE_AIM;
+						item->Animation.TargetState = BADDY_STATE_AIM;
 						break;
 					}
 
-					if (item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_NINJA)
+					if (item->SwapMeshFlags != MESHSWAPFLAGS_BADDY_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_BADDY_SWORD_NINJA)
 					{
-						item->Animation.TargetState = BADDIE_STATE_DRAW_GUN;
+						item->Animation.TargetState = BADDY_STATE_DRAW_GUN;
 						break;
 					}
 
-					item->Animation.TargetState = BADDIE_STATE_HOLSTER_SWORD;
+					item->Animation.TargetState = BADDY_STATE_HOLSTER_SWORD;
 					break;
 				}
 
 				if (item->AIBits & MODIFY)
 				{
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 
 					if (item->Floor > item->Pose.Position.y + CLICK(3))
 						item->AIBits &= ~MODIFY;
@@ -680,14 +680,14 @@ namespace TEN::Entities::TR4
 				{
 					currentCreature->MaxTurn = 0;
 					currentCreature->LOT.IsJumping = true;
-					item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_JUMP_FORWARD;
+					item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = BADDIE_STATE_JUMP_FORWARD_1_BLOCK;
+					item->Animation.ActiveState = BADDY_STATE_JUMP_FORWARD_1_BLOCK;
 
 					if (!canJump2Sectors)
-						item->Animation.TargetState = BADDIE_STATE_JUMP_FORWARD_1_BLOCK;
+						item->Animation.TargetState = BADDY_STATE_JUMP_FORWARD_1_BLOCK;
 					else
-						item->Animation.TargetState = BADDIE_STATE_JUMP_FORWARD_2_BLOCKS;
+						item->Animation.TargetState = BADDY_STATE_JUMP_FORWARD_2_BLOCKS;
 
 					break;
 				}
@@ -698,15 +698,15 @@ namespace TEN::Entities::TR4
 					if ((objectNumber == ID_SMALLMEDI_ITEM || objectNumber == ID_UZI_AMMO_ITEM || objectNumber == ID_BIGMEDI_ITEM) &&
 						AI.distance < pow(SECTOR(0.5f), 2))
 					{
-						item->Animation.TargetState = BADDIE_STATE_STAND_TO_CROUCH;
-						item->Animation.RequiredState = BADDIE_STATE_CROUCH_PICKUP;
+						item->Animation.TargetState = BADDY_STATE_STAND_TO_CROUCH;
+						item->Animation.RequiredState = BADDY_STATE_CROUCH_PICKUP;
 						break;
 					}
 				}
 
-				if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN && item->ItemFlags[2] < 1)
+				if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDY_GUN && item->ItemFlags[2] < 1)
 				{
-					item->Animation.TargetState = BADDIE_STATE_HOLSTER_GUN;
+					item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
 					break;
 				}
 
@@ -715,19 +715,19 @@ namespace TEN::Entities::TR4
 					probe = GetCollision(item);
 					if (probe.Position.Ceiling == probe.Position.Floor - CLICK(6))
 					{
-						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_EMPTY)
+						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDY_EMPTY)
 						{
-							item->Animation.TargetState = BADDIE_STATE_MONKEY_GRAB;
+							item->Animation.TargetState = BADDY_STATE_MONKEY_GRAB;
 							break;
 						}
 
-						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN)
+						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDY_GUN)
 						{
-							item->Animation.TargetState = BADDIE_STATE_HOLSTER_GUN;
+							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
 							break;
 						}
 
-						item->Animation.TargetState = BADDIE_STATE_HOLSTER_SWORD;
+						item->Animation.TargetState = BADDY_STATE_HOLSTER_SWORD;
 						break;
 					}
 				}
@@ -736,42 +736,42 @@ namespace TEN::Entities::TR4
 					if (roll)
 					{
 						currentCreature->MaxTurn = 0;
-						item->Animation.TargetState = BADDIE_STATE_ROLL_LEFT;
+						item->Animation.TargetState = BADDY_STATE_ROLL_LEFT;
 						break;
 					}
 
 					if (jump)
 					{
 						currentCreature->MaxTurn = 0;
-						item->Animation.TargetState = BADDIE_STATE_JUMP_RIGHT;
+						item->Animation.TargetState = BADDY_STATE_JUMP_RIGHT;
 						break;
 					}
 
-					if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_EMPTY)
+					if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDY_EMPTY)
 					{
-						item->Animation.TargetState = BADDIE_STATE_DRAW_SWORD;
+						item->Animation.TargetState = BADDY_STATE_DRAW_SWORD;
 						break;
 					}
 
 					if (currentCreature->Enemy && currentCreature->Enemy->HitPoints > 0 && AI.distance < pow(682, 2))
 					{
-						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDIE_GUN)
-							item->Animation.TargetState = BADDIE_STATE_HOLSTER_GUN;
+						if (item->SwapMeshFlags == MESHSWAPFLAGS_BADDY_GUN)
+							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
 						else if (AI.distance >= pow(SECTOR(0.5f), 2))
-							item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_FRONT;
+							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_FRONT;
 						else if (GetRandomControl() & 1)
-							item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_LEFT;
+							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 						else
-							item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_RIGHT;
+							item->Animation.TargetState = BADDY_STATE_SWORD_HIT_RIGHT;
 						
 						break;
 					}
 				}
 
-				item->Animation.TargetState = BADDIE_STATE_WALK;
+				item->Animation.TargetState = BADDY_STATE_WALK;
 				break;
 
-			case BADDIE_STATE_WALK:
+			case BADDY_STATE_WALK:
 				currentCreature->MaxTurn = ANGLE(7.0f);
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsMonkeying = false;
@@ -784,35 +784,35 @@ namespace TEN::Entities::TR4
 
 				if (Targetable(item, &AI) && item->ItemFlags[2] > 0)
 				{
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
 				}
 
 				if (canJump1Sector || canJump2Sectors)
 				{
 					currentCreature->MaxTurn = 0;
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
 				}
 
 				if (currentCreature->ReachedGoal && currentCreature->MonkeySwingAhead)
 				{
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
 				}
 
 				if (item->ItemFlags[2] < 1)
 				{
-					if (item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_BADDIE_SWORD_NINJA)
+					if (item->SwapMeshFlags != MESHSWAPFLAGS_BADDY_SWORD_SIMPLE && item->SwapMeshFlags != MESHSWAPFLAGS_BADDY_SWORD_NINJA)
 					{
-						item->Animation.TargetState = BADDIE_STATE_IDLE;
+						item->Animation.TargetState = BADDY_STATE_IDLE;
 						break;
 					}
 				}
 
 				if (AI.ahead && AI.distance < SECTOR(256))
 				{
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
 				}
 
@@ -820,20 +820,20 @@ namespace TEN::Entities::TR4
 				{
 					if (AI.distance < pow(482, 2))
 					{
-						item->Animation.TargetState = BADDIE_STATE_IDLE;
+						item->Animation.TargetState = BADDY_STATE_IDLE;
 						break;
 					}
 
 					if (AI.distance < pow(SECTOR(1), 2))
 					{
-						item->Animation.TargetState = BADDIE_STATE_WALK_SWORD_HIT_RIGHT;
+						item->Animation.TargetState = BADDY_STATE_WALK_SWORD_HIT_RIGHT;
 						break;
 					}
 				}
 
 				if (roll || jump)
 				{
-					item->Animation.ActiveState = BADDIE_STATE_IDLE;
+					item->Animation.ActiveState = BADDY_STATE_IDLE;
 					break;
 				}
 
@@ -841,27 +841,27 @@ namespace TEN::Entities::TR4
 					!(currentCreature->JumpAhead) &&
 					AI.distance > pow(SECTOR(1), 2))
 				{
-					item->Animation.TargetState = BADDIE_STATE_RUN;
+					item->Animation.TargetState = BADDY_STATE_RUN;
 				}
 
 				break;
 
-			case BADDIE_STATE_RUN:
+			case BADDY_STATE_RUN:
 				currentCreature->MaxTurn = ANGLE(11.0f);
 				tilt = abs(angle) / 2;
 
 				if (AI.ahead)
 					joint3 = AI.angle;
 				
-				if (objectNumber == ID_BADDIE2 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_RUN_TO_SOMERSAULT &&
+				if (objectNumber == ID_BADDY2 &&
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
 					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) &&
 						AI.distance < pow(SECTOR(3), 2) ||
 						height2 >= (height1 + CLICK(2))))
 				{
-					item->Animation.TargetState = BADDIE_STATE_SOMERSAULT;
+					item->Animation.TargetState = BADDY_STATE_SOMERSAULT;
 					currentCreature->MaxTurn = 0;
 					break;
 				}
@@ -875,28 +875,28 @@ namespace TEN::Entities::TR4
 					AI.distance < pow(614, 2) ||
 					currentCreature->JumpAhead)
 				{
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
 				}
 
 				if (AI.distance < pow(SECTOR(1), 2))
 				{
-					item->Animation.TargetState = BADDIE_STATE_WALK;
+					item->Animation.TargetState = BADDY_STATE_WALK;
 					break;
 				}
 
 				break;
 
-			case BADDIE_STATE_SWORD_HIT_RIGHT:
-			case BADDIE_STATE_SWORD_HIT_FRONT:
-			case BADDIE_STATE_SWORD_HIT_LEFT:
-			case BADDIE_STATE_WALK_SWORD_HIT_RIGHT:
+			case BADDY_STATE_SWORD_HIT_RIGHT:
+			case BADDY_STATE_SWORD_HIT_FRONT:
+			case BADDY_STATE_SWORD_HIT_LEFT:
+			case BADDY_STATE_WALK_SWORD_HIT_RIGHT:
 				currentCreature->MaxTurn = 0;
 
-				if (item->Animation.ActiveState == BADDIE_STATE_SWORD_HIT_RIGHT &&
+				if (item->Animation.ActiveState == BADDY_STATE_SWORD_HIT_RIGHT &&
 					AI.distance < SECTOR(254))
 				{
-					item->Animation.TargetState = BADDIE_STATE_SWORD_HIT_LEFT;
+					item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 				}
 
 				if (AI.ahead)
@@ -905,8 +905,8 @@ namespace TEN::Entities::TR4
 					joint2 = AI.xAngle;
 				}
 
-				if (item->Animation.ActiveState != BADDIE_STATE_SWORD_HIT_FRONT ||
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SWORD_HIT_NO_DAMAGE_MAX)
+				if (item->Animation.ActiveState != BADDY_STATE_SWORD_HIT_FRONT ||
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
 				{
 					if (abs(AI.angle) >= ANGLE(7.0f))
 					{
@@ -923,12 +923,12 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits & 0x1C000)
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SWORD_HIT_DAMAGE_MIN &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SWORD_HIT_DAMAGE_MAX)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
 						{
 							CreatureEffect2(
 								item,
-								&BaddieSwordBite,
+								&BaddySwordBite,
 								10,
 								item->Pose.Orientation.y,
 								DoBloodSplat);
@@ -946,7 +946,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case BADDIE_STATE_MONKEY_IDLE:
+			case BADDY_STATE_MONKEY_IDLE:
 				currentCreature->MaxTurn = 0;
 				currentCreature->Flags = 0;
 				joint1 = 0;
@@ -963,24 +963,24 @@ namespace TEN::Entities::TR4
 						LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
 						LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT))
 				{
-					item->Animation.TargetState = BADDIE_STATE_MONKEY_PUSH_OFF;
+					item->Animation.TargetState = BADDY_STATE_MONKEY_PUSH_OFF;
 				}
 				else if (item->BoxNumber != currentCreature->LOT.TargetBox &&
 					currentCreature->MonkeySwingAhead ||
 					probe.Position.Ceiling != (probe.Position.Floor - CLICK(6)))
 				{
-					item->Animation.TargetState = BADDIE_STATE_MONKEY_FORWARD;
+					item->Animation.TargetState = BADDY_STATE_MONKEY_FORWARD;
 				}
 				else
 				{
-					item->Animation.TargetState = BADDIE_STATE_MONKEY_FALL_LAND;
+					item->Animation.TargetState = BADDY_STATE_MONKEY_FALL_LAND;
 					currentCreature->LOT.IsMonkeying = false;
 					currentCreature->LOT.IsJumping = false;
 				}
 
 				break;
 
-			case BADDIE_STATE_MONKEY_FORWARD:
+			case BADDY_STATE_MONKEY_FORWARD:
 				currentCreature->MaxTurn = ANGLE(7.0f);
 				currentCreature->Flags = 0;
 				currentCreature->LOT.IsJumping = true;
@@ -994,7 +994,7 @@ namespace TEN::Entities::TR4
 					probe = GetCollision(item);
 
 					if (probe.Position.Ceiling == probe.Position.Floor - CLICK(6))
-						item->Animation.TargetState = BADDIE_STATE_MONKEY_IDLE;
+						item->Animation.TargetState = BADDY_STATE_MONKEY_IDLE;
 				}
 
 				if (laraAI.ahead)
@@ -1010,14 +1010,14 @@ namespace TEN::Entities::TR4
 							LaraItem->Animation.ActiveState == LS_MONKEY_TURN_LEFT ||
 							LaraItem->Animation.ActiveState == LS_MONKEY_TURN_RIGHT)
 						{
-							item->Animation.TargetState = BADDIE_STATE_MONKEY_IDLE;
+							item->Animation.TargetState = BADDY_STATE_MONKEY_IDLE;
 						}
 					}
 				}
 
 				break;
 
-			case BADDIE_STATE_MONKEY_PUSH_OFF:
+			case BADDY_STATE_MONKEY_PUSH_OFF:
 				currentCreature->MaxTurn = ANGLE(7.0f);
 
 				if (currentCreature->Flags == someFlag3)
@@ -1039,14 +1039,14 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case BADDIE_STATE_ROLL_LEFT:
-			case BADDIE_STATE_JUMP_RIGHT:
+			case BADDY_STATE_ROLL_LEFT:
+			case BADDY_STATE_JUMP_RIGHT:
 				item->Status = ITEM_ACTIVE;
 				currentCreature->MaxTurn = someFlag3;
 				currentCreature->Alerted = false;
 				break;
 
-			case BADDIE_STATE_CROUCH:
+			case BADDY_STATE_CROUCH:
 				if (item->ItemFlags[0] == someFlag3)
 				{
 					if (currentCreature->Enemy)
@@ -1056,29 +1056,29 @@ namespace TEN::Entities::TR4
 							currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM) &&
 							AI.distance < pow(SECTOR(0.5f), 2))
 						{
-							item->Animation.TargetState = BADDIE_STATE_CROUCH_PICKUP;
+							item->Animation.TargetState = BADDY_STATE_CROUCH_PICKUP;
 							break;
 						}
 					}
 
 					if (currentCreature->Alerted)
-						item->Animation.TargetState = BADDIE_STATE_CROUCH_TO_STAND;
+						item->Animation.TargetState = BADDY_STATE_CROUCH_TO_STAND;
 				}
 				else
 				{
 					if (AI.distance >= pow(682, 2))
 						break;
 					
-					item->Animation.TargetState = BADDIE_STATE_CROUCH_TO_STAND;
+					item->Animation.TargetState = BADDY_STATE_CROUCH_TO_STAND;
 					currentCreature->Enemy = NULL;
 				}
 
 				break;
 
-			case BADDIE_STATE_CROUCH_PICKUP:
+			case BADDY_STATE_CROUCH_PICKUP:
 				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_CROUCH_PICKUP)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
 					break;
 
 				if (!currentCreature->Enemy)
@@ -1104,7 +1104,7 @@ namespace TEN::Entities::TR4
 				else if (currentCreature->Enemy->ObjectNumber == ID_BIGMEDI_ITEM)
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 				else if (currentCreature->Enemy->ObjectNumber == ID_UZI_AMMO_ITEM)
-					item->ItemFlags[2] += BADDIE_USE_UZI;
+					item->ItemFlags[2] += BADDY_USE_UZI;
 				else
 				{
 					currentCreature->Enemy = NULL;
@@ -1113,7 +1113,7 @@ namespace TEN::Entities::TR4
 			
 				KillItem(currentCreature->Enemy - g_Level.Items.data());
 
-				// cancel enemy pointer for other active baddies
+				// cancel enemy pointer for other active baddys
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
 					if (ActiveCreatures[i]->ItemNumber != NO_ITEM && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)
@@ -1123,7 +1123,7 @@ namespace TEN::Entities::TR4
 				creature->Enemy = NULL;
 				break;
 
-			case BADDIE_STATE_AIM:
+			case BADDY_STATE_AIM:
 				currentCreature->MaxTurn = 0;
 
 				if (AI.ahead)
@@ -1136,14 +1136,14 @@ namespace TEN::Entities::TR4
 				if (!Targetable(item, &AI) ||
 					item->ItemFlags[2] < 1)
 				{
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
 				}
 
-				item->Animation.TargetState = BADDIE_STATE_FIRE;
+				item->Animation.TargetState = BADDY_STATE_FIRE;
 				break;
 
-			case BADDIE_STATE_FIRE:
+			case BADDY_STATE_FIRE:
 				creature->FiredWeapon = true;
 
 				if (AI.ahead)
@@ -1153,8 +1153,8 @@ namespace TEN::Entities::TR4
 				}
 				ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
 
-				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_FIRE_MAX ||
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_FIRE_MIN)
+				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MIN)
 				{
 					break;
 				}
@@ -1162,44 +1162,44 @@ namespace TEN::Entities::TR4
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;
 				
-				if (!ShotLara(item, &AI, &BaddieGunBite, joint1, 15));
-					item->Animation.TargetState = BADDIE_STATE_IDLE;
+				if (!ShotLara(item, &AI, &BaddyGunBite, joint1, 15));
+					item->Animation.TargetState = BADDY_STATE_IDLE;
 
 				break;
 
 			default:
 				break;
 
-			case BADDIE_STATE_HOLSTER_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_HOLSTER_GUN)
-					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_EMPTY;
+			case BADDY_STATE_HOLSTER_GUN:
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDY_EMPTY;
 
 				break;
 
-			case BADDIE_STATE_DRAW_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_DRAW_GUN)
-					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_GUN;
+			case BADDY_STATE_DRAW_GUN:
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_GUN)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDY_GUN;
 
 				break;
 
-			case BADDIE_STATE_HOLSTER_SWORD:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_HOLSTER_SWORD)
-					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_EMPTY;
+			case BADDY_STATE_HOLSTER_SWORD:
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDY_EMPTY;
 				
 				break;
 
-			case BADDIE_STATE_DRAW_SWORD:
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_DRAW_SWORD)
+			case BADDY_STATE_DRAW_SWORD:
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
 					break;
 
-				if (item->ObjectNumber == ID_BADDIE1)
-					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_SWORD_SIMPLE;
+				if (item->ObjectNumber == ID_BADDY1)
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDY_SWORD_SIMPLE;
 				else
-					item->SwapMeshFlags = MESHSWAPFLAGS_BADDIE_SWORD_NINJA;
+					item->SwapMeshFlags = MESHSWAPFLAGS_BADDY_SWORD_NINJA;
 
 				break;
 
-			case BADDIE_STATE_UNKNOWN_8:
+			case BADDY_STATE_UNKNOWN_8:
 				currentCreature->MaxTurn = 0;
 
 				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
@@ -1207,39 +1207,39 @@ namespace TEN::Entities::TR4
 				if (laraAI.distance < pow(682, 2) ||
 					item != Lara.TargetEntity)
 				{
-					item->Animation.TargetState = BADDIE_STATE_UNKNOWN_9;
+					item->Animation.TargetState = BADDY_STATE_UNKNOWN_9;
 				}
 
 				break;
 
-			case BADDIE_STATE_BLIND:
+			case BADDY_STATE_BLIND:
 				if (!WeaponEnemyTimer)
 				{
 					if ((GetRandomControl() & 0x7F) == 0)
-						item->Animation.TargetState = BADDIE_STATE_IDLE;
+						item->Animation.TargetState = BADDY_STATE_IDLE;
 				}
 
 				break;
 
-			case BADDIE_STATE_SOMERSAULT:
-				if (item->Animation.AnimNumber == Objects[objectNumber].animIndex + BADDIE_ANIM_SOMERSAULT_END)
+			case BADDY_STATE_SOMERSAULT:
+				if (item->Animation.AnimNumber == Objects[objectNumber].animIndex + BADDY_ANIM_SOMERSAULT_END)
 				{
 					ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
 					break;
 				}
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDIE_SOMERSAULT_START_TAKE_OFF)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
 					break;
 
 				currentCreature->LOT.IsJumping = true;
 				break;
 
-			case BADDIE_STATE_JUMP_FORWARD_1_BLOCK:
-			case BADDIE_STATE_JUMP_FORWARD_2_BLOCKS:
+			case BADDY_STATE_JUMP_FORWARD_1_BLOCK:
+			case BADDY_STATE_JUMP_FORWARD_2_BLOCKS:
 				if (item->ItemFlags[0] >= someFlag3)
 					break;
 
-				if (item->Animation.AnimNumber != Objects[objectNumber].animIndex + BADDIE_ANIM_STAND_TO_JUMP_FORWARD)
+				if (item->Animation.AnimNumber != Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD)
 					item->ItemFlags[0] += 2;
 				
 				break;
@@ -1251,12 +1251,12 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 1, joint2);
 		CreatureJoint(item, 2, joint3);
 
-		if (item->Animation.ActiveState >= BADDIE_STATE_JUMP_FORWARD_2_BLOCKS ||
-			item->Animation.ActiveState == BADDIE_STATE_JUMP_FORWARD_1_BLOCK ||
-			item->Animation.ActiveState == BADDIE_STATE_MONKEY_FORWARD ||
-			item->Animation.ActiveState == BADDIE_STATE_DEATH ||
-			item->Animation.ActiveState == BADDIE_STATE_SOMERSAULT ||
-			item->Animation.ActiveState == BADDIE_STATE_BLIND)
+		if (item->Animation.ActiveState >= BADDY_STATE_JUMP_FORWARD_2_BLOCKS ||
+			item->Animation.ActiveState == BADDY_STATE_JUMP_FORWARD_1_BLOCK ||
+			item->Animation.ActiveState == BADDY_STATE_MONKEY_FORWARD ||
+			item->Animation.ActiveState == BADDY_STATE_DEATH ||
+			item->Animation.ActiveState == BADDY_STATE_SOMERSAULT ||
+			item->Animation.ActiveState == BADDY_STATE_BLIND)
 		{
 			CreatureAnimation(itemNumber, angle, 0);
 		}
@@ -1267,37 +1267,37 @@ namespace TEN::Entities::TR4
 			switch (vault)
 			{
 			case 2:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_2_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_2_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDIE_STATE_CLIMB_2_STEPS;
+				item->Animation.ActiveState = BADDY_STATE_CLIMB_2_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_3_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_3_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDIE_STATE_CLIMB_3_STEPS;
+				item->Animation.ActiveState = BADDY_STATE_CLIMB_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case 4:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_CLIMB_4_STEPS;
-				item->Animation.ActiveState = BADDIE_STATE_CLIMB_4_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_4_STEPS;
+				item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_JUMP_OFF_3_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_JUMP_OFF_3_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDIE_STATE_JUMP_OFF_3_STEPS;
+				item->Animation.ActiveState = BADDY_STATE_JUMP_OFF_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
-				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_JUMP_OFF_4_STEPS;
+				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_JUMP_OFF_4_STEPS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = BADDIE_STATE_JUMP_OFF_4_STEPS;
+				item->Animation.ActiveState = BADDY_STATE_JUMP_OFF_4_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
@@ -1307,9 +1307,9 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDIE_ANIM_BLIND;
+			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_BLIND;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
-			item->Animation.ActiveState = BADDIE_STATE_BLIND;
+			item->Animation.ActiveState = BADDY_STATE_BLIND;
 			creature->MaxTurn = 0;
 		}
 

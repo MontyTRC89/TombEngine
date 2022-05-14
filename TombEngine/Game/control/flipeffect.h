@@ -25,7 +25,7 @@ void SwapCrowbar(ItemInfo* item);
 void ExplosionFX(ItemInfo* item);
 void LaraLocation(ItemInfo* item);
 void LaraLocationPad(ItemInfo* item);
-void KillActiveBaddies(ItemInfo* item);
+void KillActiveBaddys(ItemInfo* item);
 void LaraHandsFree(ItemInfo* item);
 void ShootRightGun(ItemInfo* item);
 void ShootLeftGun(ItemInfo* item);
