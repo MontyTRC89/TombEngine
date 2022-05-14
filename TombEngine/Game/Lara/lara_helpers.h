@@ -52,5 +52,5 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip);
 void SetLaraSwimDiveAnimation(ItemInfo* item);
 
 void ResetLaraTurnRate(ItemInfo* item, bool divesuit = false);
-void ResetLaraLean(ItemInfo* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
-void ResetLaraFlex(ItemInfo* item, float rate = 1.0f);
+void ResetLaraLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, bool resetPitch = true);
+void ResetLaraFlex(ItemInfo* item, float alpha = 1.0f);

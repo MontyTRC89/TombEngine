@@ -369,6 +369,6 @@ void lara_as_surface_climb_out(ItemInfo* item, CollisionInfo* coll)
 	Camera.laraNode = LM_HIPS;	// Forces the camera to follow Lara instead of snapping.
 
 	EaseOutLaraHeight(item, lara->ProjectedFloorHeight - item->Pose.Position.y);
-	item->Pose.Orientation.Lerp(lara->TargetOrientation, 0.4f, Angle::DegToRad(0.1f));
+	item->Pose.Orientation.InterpolateLinear(lara->TargetOrientation, 0.4f, Angle::DegToRad(0.1f));
 	item->Animation.TargetState = LS_IDLE;
 }
