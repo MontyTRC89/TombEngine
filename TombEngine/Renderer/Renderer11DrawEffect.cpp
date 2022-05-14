@@ -633,7 +633,7 @@ namespace TEN::Renderer
 		return true;
 	}
 
-	void Renderer11::DrawBaddieGunflashes(RenderView& view)
+	void Renderer11::DrawBaddyGunflashes(RenderView& view)
 	{
 		for (auto room : view.roomsToDraw)
 		{
