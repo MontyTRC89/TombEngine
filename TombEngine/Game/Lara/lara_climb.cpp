@@ -292,14 +292,11 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), &shiftRight, &ledgeRight);
 		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
 
-		// Overhang hook.
-		if (g_GameFlow->HasOverhangClimb())
+		// Overhang + ladder-to-monkey hook.
+		if (!resultRight || !resultLeft)
 		{
-			if (!resultRight || !resultLeft)
-			{
-				if (LadderMonkeyExtra(item, coll))
-					return;
-			}
+			if (LadderMonkeyExtra(item, coll))
+				return;
 		}
 
 		if (resultRight >= 0 && resultLeft >= 0)
@@ -319,8 +316,14 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 					yShift = shiftRight;
 			}
 
-			item->Animation.TargetState = LS_LADDER_UP;
-			item->Pose.Position.y += yShift;
+			// HACK: Prevent climbing inside sloped ceilings. Breaks overhang even more, but that shouldn't matter since we'll be doing it over. @Sezz 2022.05.13
+			int y = item->Pose.Position.y - (coll->Setup.Height + CLICK(0.5f));
+			auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height + CLICK(0.5f)));
+			if ((probe.Position.Ceiling - y) < 0)
+			{
+				item->Animation.TargetState = LS_LADDER_UP;
+				item->Pose.Position.y += yShift;
+			}
 		}
 		else if (abs(ledgeLeft - ledgeRight) <= CLICK(0.5f))
 		{

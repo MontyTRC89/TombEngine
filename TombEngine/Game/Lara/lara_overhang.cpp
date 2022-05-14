@@ -958,9 +958,6 @@ void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_LADDER_IDLE (56)
 bool LadderMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->HasOverhangClimb())
-		return false;
-
 	auto probe = GetCollision(item);
 
 	if (probe.Position.CeilingSlope)
