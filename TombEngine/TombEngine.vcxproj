@@ -444,7 +444,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR2\tr2_objects.h" />
     <ClInclude Include="Objects\TR3\tr3_objects.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_ahmet.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_baddie.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_baddy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_bat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_bigscorpion.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_crocodile.h" />
@@ -894,7 +894,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Generic\Switches\switch.cpp" />
     <ClCompile Include="Game\effects\tomb4fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\traps.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_baddie.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\quad.cpp" />
