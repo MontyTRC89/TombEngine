@@ -61,9 +61,8 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (TrInput & IN_SPRINT 
-			&& TestLaraCrouchRoll(item, coll) 
-			&& g_GameFlow->HasCrouchRoll())
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
@@ -189,11 +188,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	// TODO: With sufficient speed, Lara can still roll off ledges. This is particularly a problem in the uncommon scenario where
 	// she becomes Airborne within a crawlspace; collision handling will push her back very rapidly and potentially cause a softlock. @Sezz 2021.11.02
 	if (LaraDeflectEdgeCrawl(item, coll))
-	{
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
-	}
+		item->Pose.Position = coll->Setup.OldPosition;
 
 	if (TestLaraFall(item, coll))
 	{
@@ -247,9 +242,8 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (TrInput & IN_SPRINT
-			&& TestLaraCrouchRoll(item, coll) 
-			&& g_GameFlow->HasCrouchRoll())
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
@@ -304,9 +298,8 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (TrInput & IN_SPRINT 
-			&& TestLaraCrouchRoll(item, coll)
-			&& g_GameFlow->HasCrouchRoll())
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
@@ -387,9 +380,8 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
 
-			if (TrInput & (IN_ACTION | IN_JUMP) 
-				&& crawlVaultResult.Success 
-				&& g_GameFlow->HasCrawlExtended())
+			if (TrInput & (IN_ACTION | IN_JUMP) && crawlVaultResult.Success &&
+				g_GameFlow->HasCrawlExtended())
 			{
 				item->Animation.TargetState = crawlVaultResult.TargetState;
 				ResetLaraFlex(item);
