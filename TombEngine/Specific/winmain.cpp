@@ -357,6 +357,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	WaitForSingleObject((HANDLE)ThreadHandle, INFINITE);
+
 	DestroyAcceleratorTable(hAccTable);
 
 	if (g_Configuration.EnableSound)
