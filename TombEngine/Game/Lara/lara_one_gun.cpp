@@ -964,7 +964,7 @@ void GrenadeControl(short itemNumber)
 						if (currentItem->ObjectNumber < ID_SHOOT_SWITCH1 || currentItem->ObjectNumber > ID_SHOOT_SWITCH4 || (currentItem->Flags & 0x40))
 						{
 							if (Objects[currentItem->ObjectNumber].intelligent || currentItem->ObjectNumber == ID_LARA)
-								DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, LaraWeaponType::GrenadeLauncher);
+								DoExplosiveDamageOnBaddy(LaraItem, currentItem, item, LaraWeaponType::GrenadeLauncher);
 						}
 						else
 						{
@@ -1274,7 +1274,7 @@ void RocketControl(short itemNumber)
 					// Explosion is handled by CreatureDie()
 					// Also Lara can be damaged
 					// HitTarget() is called inside this
-					DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, LaraWeaponType::RocketLauncher);
+					DoExplosiveDamageOnBaddy(LaraItem, currentItem, item, LaraWeaponType::RocketLauncher);
 				}
 				else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 && currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
@@ -1546,7 +1546,7 @@ void CrossbowBoltControl(short itemNumber)
 						// Explosion is handled by CreatureDie()
 						// Also Lara can be damaged
 						// HitTarget() is called inside this
-						DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, LaraWeaponType::Crossbow);
+						DoExplosiveDamageOnBaddy(LaraItem, currentItem, item, LaraWeaponType::Crossbow);
 					}
 					else if (currentItem->ObjectNumber != ID_LARA)
 					{
@@ -1767,7 +1767,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 }
 
-void DoExplosiveDamageOnBaddie(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src, LaraWeaponType weaponType)
+void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src, LaraWeaponType weaponType)
 {
 	if (!(dest->Flags & 0x8000))
 	{

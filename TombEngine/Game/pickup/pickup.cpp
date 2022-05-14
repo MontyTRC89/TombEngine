@@ -261,7 +261,7 @@ void DoPickup(ItemInfo* laraItem)
 			else
 			{
 				pickupItem->ItemFlags[3] = 1;
-				pickupItem->Flags |= 0x20;
+				pickupItem->Flags |= TRIGGERED;
 				pickupItem->Status = ITEM_INVISIBLE;
 			}
 
@@ -294,7 +294,7 @@ void DoPickup(ItemInfo* laraItem)
 				if (pickupItem->TriggerFlags & 0xC0)
 				{
 					pickupItem->ItemFlags[3] = 1;
-					pickupItem->Flags |= 0x20;
+					pickupItem->Flags |= TRIGGERED;
 					pickupItem->Status = ITEM_INVISIBLE;
 				}
 
@@ -900,7 +900,7 @@ void InitialisePickup(short itemNumber)
 			item->MeshBits = 0;
 		
 		if (item->Status == ITEM_INVISIBLE)
-			item->Flags |= 0x20;
+			item->Flags |= TRIGGERED;
 	}
 }
 

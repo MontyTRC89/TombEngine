@@ -399,7 +399,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		coll->Front.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
-			!collResult.BottomBlock->Flags.Monkeyswing)
+		!GetCollision(x, y + coll->Setup.Height, z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
 	{
 		coll->Front.Floor = MAX_HEIGHT;
 	}
@@ -457,7 +457,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		coll->MiddleLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
-			!collResult.BottomBlock->Flags.Monkeyswing)
+		!GetCollision(x, y + coll->Setup.Height, z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
 	{
 		coll->MiddleLeft.Floor = MAX_HEIGHT;
 	}
@@ -510,7 +510,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		coll->FrontLeft.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
-			!collResult.BottomBlock->Flags.Monkeyswing)
+		!GetCollision(x, y + coll->Setup.Height, z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
 	{
 		coll->FrontLeft.Floor = MAX_HEIGHT;
 	}
@@ -568,7 +568,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		coll->MiddleRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
-			!collResult.BottomBlock->Flags.Monkeyswing)
+		!GetCollision(x, y + coll->Setup.Height, z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
 	{
 		coll->MiddleRight.Floor = MAX_HEIGHT;
 	}
@@ -621,7 +621,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		coll->FrontRight.Floor = STOP_SIZE;
 	}
 	else if (coll->Setup.BlockMonkeySwingEdge &&
-			!collResult.BottomBlock->Flags.Monkeyswing)
+		!GetCollision(x, y + coll->Setup.Height, z, item->RoomNumber).BottomBlock->Flags.Monkeyswing)
 	{
 		coll->FrontRight.Floor = MAX_HEIGHT;
 	}

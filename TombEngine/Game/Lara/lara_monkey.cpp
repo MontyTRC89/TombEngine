@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_tests.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 
 // -----------------------------
 // MONKEY SWING

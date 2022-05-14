@@ -14,8 +14,8 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
-#include "Scripting/ScriptInterfaceLevel.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "ScriptInterfaceLevel.h"
 
 // -----------------------------
 // COLLISION TEST FUNCTIONS
