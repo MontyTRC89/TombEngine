@@ -642,7 +642,7 @@ static int GetMotorbikeCollisionAnim(ItemInfo* item, Vector3Int* pos)
     return 0;
 }
 
-void MotorbikeBaddieCollision(ItemInfo* bike)
+void MotorbikeBaddyCollision(ItemInfo* bike)
 {
     int x, y, z, i;
 
@@ -859,7 +859,7 @@ static int MotorBikeDynamics(ItemInfo* item)
 
     if (!(item->Flags & ONESHOT))
     {
-        MotorbikeBaddieCollision(item);
+        MotorbikeBaddyCollision(item);
         //MotorBikeStaticCollision(item->pos.x, item->pos.y, item->pos.z, item->room_number, (WALL_L / 2));
     }
 

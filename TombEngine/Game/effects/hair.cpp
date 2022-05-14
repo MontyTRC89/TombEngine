@@ -10,7 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 

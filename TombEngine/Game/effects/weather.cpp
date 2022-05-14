@@ -10,7 +10,7 @@
 #include "Specific/prng.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Scripting/ScriptInterfaceLevel.h"
+#include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Math::Random;
 

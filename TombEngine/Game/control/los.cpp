@@ -10,12 +10,12 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 int NumberLosRooms;
 short LosRooms[20];
@@ -111,7 +111,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firi
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
 		// TODO: for covering scientist
-//		if ((itemNumber >= 0) && (BaddieSlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
+//		if ((itemNumber >= 0) && (BaddySlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
 //			Lara.target = &g_Level.Items[itemNumber];
 		// this is crashing and it's not really doing anything..
 

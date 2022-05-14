@@ -509,7 +509,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if ((item->Flags & CODE_BITS) == CODE_BITS)
 			{
-				item->Flags |= 0x20;
+				item->Flags |= TRIGGERED;
 
 				if (flags & ONESHOT)
 					item->Flags |= ONESHOT;
@@ -523,7 +523,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 							if (item->Status == ITEM_INVISIBLE)
 							{
 								item->TouchBits = 0;
-								if (EnableBaddieAI(value, 0))
+								if (EnableBaddyAI(value, 0))
 								{
 									item->Status = ITEM_ACTIVE;
 									AddActiveItem(value);
@@ -540,7 +540,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 							item->TouchBits = 0;
 							item->Status = ITEM_ACTIVE;
 							AddActiveItem(value);
-							EnableBaddieAI(value, 1);
+							EnableBaddyAI(value, 1);
 						}
 					}
 					else

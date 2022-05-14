@@ -393,7 +393,7 @@ namespace TEN::Entities::TR4
 		item->Status = ITEM_ACTIVE;
 		item->Collidable = true;
 
-		EnableBaddieAI(itemNumber, 1);
+		EnableBaddyAI(itemNumber, 1);
 
 		item->TriggerFlags = 1;
 		return true;

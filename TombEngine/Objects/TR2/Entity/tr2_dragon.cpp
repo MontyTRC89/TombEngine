@@ -552,7 +552,7 @@ void BartoliControl(short itemNumber)
 			front = &g_Level.Items[frontItem];
 
 			front->TouchBits = back->TouchBits = 0;
-			EnableBaddieAI(frontItem, 1);
+			EnableBaddyAI(frontItem, 1);
 			AddActiveItem(frontItem);
 			AddActiveItem(backItem);
 			back->Status = ITEM_ACTIVE;

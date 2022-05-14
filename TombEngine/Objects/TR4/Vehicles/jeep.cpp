@@ -524,7 +524,7 @@ static int GetJeepCollisionAnim(ItemInfo* item, Vector3Int* p)
 	return 0;
 }
 
-static void JeepBaddieCollision(ItemInfo* jeep)
+static void JeepBaddyCollision(ItemInfo* jeep)
 {
 	vector<short> roomsList;
 	short* door, numDoors;
@@ -788,7 +788,7 @@ int JeepDynamics(ItemInfo* item)
 
 	if (!(item->Flags & ONESHOT))
 	{
-		JeepBaddieCollision(item);
+		JeepBaddyCollision(item);
 		// v37 = sub_467850(item->pos.Position.x, item->pos.Position.y, item->pos.Position.z, item->roomNumber, 512);
 	}
 
@@ -1525,7 +1525,7 @@ void JeepCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 						goto LABEL_11;
 					}
 				}
-				EnableBaddieAI(v4, 1);
+				EnableBaddyAI(v4, 1);
 				*(_DWORD*)(v5 + 5610) = *(_DWORD*)(v5 + 5610) & 0xFFFFFFFB | 2;
 				AddActiveItem(v4);
 			}*/
@@ -1559,7 +1559,7 @@ void JeepCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 			jeep->revs = 0;
 			jeep->unknown2 = 0;
 
-			item->Flags |= 0x20;
+			item->Flags |= TRIGGERED;
 		}
 		else
 			ObjectCollision(itemNumber, l, coll);

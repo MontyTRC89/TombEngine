@@ -1,6 +1,6 @@
 #pragma once
 #include <SimpleMath.h>
-#include "Scripting/ScriptInterfaceLevel.h"
+#include "ScriptInterfaceLevel.h"
 #include "Specific/trmath.h"
 
 namespace TEN

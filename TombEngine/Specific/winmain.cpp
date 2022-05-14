@@ -11,8 +11,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
-#include "Scripting/LanguageScript.h"
-#include "Scripting/ScriptInterfaceState.h"
+#include "LanguageScript.h"
+#include "ScriptInterfaceState.h"
 
 using namespace TEN::Renderer;
 using std::exception;

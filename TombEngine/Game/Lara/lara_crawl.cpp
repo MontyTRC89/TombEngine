@@ -14,7 +14,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 
 // -----------------------------
 // CROUCH & CRAWL
@@ -242,9 +242,8 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (TrInput & IN_SPRINT
-			&& TestLaraCrouchRoll(item, coll) 
-			&& g_GameFlow->HasCrouchRoll())
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
@@ -299,9 +298,8 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (TrInput & IN_SPRINT 
-			&& TestLaraCrouchRoll(item, coll)
-			&& g_GameFlow->HasCrouchRoll())
+		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
+			g_GameFlow->HasCrouchRoll())
 		{
 			item->Animation.TargetState = LS_CROUCH_ROLL;
 			return;
@@ -382,15 +380,14 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		{
 			auto crawlVaultResult = TestLaraCrawlVault(item, coll);
 
-			if (TrInput & (IN_ACTION | IN_JUMP) 
-				&& crawlVaultResult.Success 
-				&& g_GameFlow->HasCrawlExtended())
+			if (TrInput & (IN_ACTION | IN_JUMP) && crawlVaultResult.Success &&
+				g_GameFlow->HasCrawlExtended())
 			{
 				item->Animation.TargetState = crawlVaultResult.TargetState;
 				ResetLaraFlex(item);
 				return;
 			}
-			else if (TestLaraCrawlForward(item, coll)) [[likely]]
+			else if (TestLaraCrawlForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				item->Animation.TargetState = LS_CRAWL_FORWARD;
 				return;
@@ -404,7 +401,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				DoLaraCrawlToHangSnap(item, coll);
 				return;
 			}
-			else if (TestLaraCrawlBack(item, coll)) [[likely]]
+			else if (TestLaraCrawlBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				item->Animation.TargetState = LS_CRAWL_BACK;
 				return;

@@ -27,7 +27,7 @@ void InitialiseLOTarray(int itemNumber)
 	}
 }
 
-int EnableBaddieAI(short itemNum, int always)
+int EnableBaddyAI(short itemNum, int always)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
@@ -73,7 +73,7 @@ int EnableBaddieAI(short itemNum, int always)
 		CREATURE_INFO* creatureToDisable = &ActiveCreatures[slotToDisable];
 
 		itemToDisable->status = ITEM_INVISIBLE;
-		DisableBaddieAI(creatureToDisable->itemNum);
+		DisableBaddyAI(creatureToDisable->itemNum);
 		InitialiseSlot(itemNum, slotToDisable);
 		return true;
 	}

@@ -89,7 +89,7 @@ namespace TEN::Entities::TR4
 				/*bestdistance = MAXINT;
 				bat->enemy = LaraItem;
 
-				slots = &BaddieSlots[0];
+				slots = &BaddySlots[0];
 				for (int i = 0; i < NUM_SLOTS; i++, slots++)
 				{
 					if (slots->itemNum != NO_ITEM && slots->itemNum != itemNumber)

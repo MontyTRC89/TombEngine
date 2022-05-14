@@ -45,10 +45,10 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/winmain.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
-#include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
-#include "Scripting/Strings/ScriptInterfaceStringsHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "ScriptInterfaceGame.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;
 using std::unordered_map;
