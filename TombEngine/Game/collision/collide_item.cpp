@@ -1676,7 +1676,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddieCollision
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision
 {
 	laraItem->HitStatus = false;
 	coll->HitStatic = false;

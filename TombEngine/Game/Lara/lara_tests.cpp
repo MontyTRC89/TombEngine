@@ -1062,9 +1062,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 	if (waterDepth == NO_HEIGHT)
 	{
 		item->Animation.VerticalVelocity = 0;
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position = coll->Setup.OldPosition;
 	}
 	// Height check was at CLICK(2) before but changed to this 
 	// because now Lara surfaces on a head level, not mid-body level.
@@ -1075,9 +1073,9 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y = probe.Position.Floor;
 		item->Pose.Orientation.x = 0;
 		item->Pose.Orientation.z = 0;
+		item->Animation.Airborne = false;
 		item->Animation.Velocity = 0;
 		item->Animation.VerticalVelocity = 0;
-		item->Animation.Airborne = false;
 		lara->Control.WaterStatus = WaterStatus::Wade;
 	}
 }
@@ -1251,7 +1249,10 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
+	int y = item->Pose.Position.y;
+	auto probe = GetCollision(item);
+
+	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT ||
 		lara->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
 	{
 		return false;
@@ -1374,25 +1375,29 @@ bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup te
 		item->Pose.Position.x,
 		y + testSetup.UpperFloorBound - 1,
 		item->Pose.Position.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	auto end1 = GameVector(
 		probe.Coordinates.x,
 		y + testSetup.UpperFloorBound - 1,
 		probe.Coordinates.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	auto start2 = GameVector(
 		item->Pose.Position.x,
 		y - laraHeight + 1,
 		item->Pose.Position.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	auto end2 = GameVector(
 		probe.Coordinates.x,
 		probe.Coordinates.y + 1,
 		probe.Coordinates.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	// Discard walls.
 	if (probe.Position.Floor == NO_HEIGHT)
@@ -1402,11 +1407,11 @@ bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup te
 	if (isSlopeDown || isSlopeUp || isDeath)
 		return false;
 
-	// Conduct ray test at upper floor bound and lowest ceiling bound.
+	// Assess ray/room collision.
 	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 
-	// Assess move feasibility to location ahead.
+	// Assess point/room collision.
 	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&			// Within lower floor bound.
 		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&			// Within upper floor bound.
 		(probe.Position.Ceiling - y) < -laraHeight &&						// Within lowest ceiling bound.
@@ -1660,25 +1665,29 @@ bool TestLaraMonkeyMoveTolerance(ItemInfo* item, CollisionInfo* coll, MonkeyMove
 		item->Pose.Position.x,
 		y + testSetup.LowerCeilingBound + 1,
 		item->Pose.Position.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	auto end1 = GameVector(
 		probe.Coordinates.x,
 		probe.Coordinates.y - LARA_HEIGHT_MONKEY + testSetup.LowerCeilingBound + 1,
 		probe.Coordinates.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	auto start2 = GameVector(
 		item->Pose.Position.x,
 		y + LARA_HEIGHT_MONKEY - 1,
 		item->Pose.Position.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	auto end2 = GameVector(
 		probe.Coordinates.x,
 		probe.Coordinates.y - 1,
 		probe.Coordinates.z,
-		item->RoomNumber);
+		item->RoomNumber
+	);
 
 	// Discard walls.
 	if (probe.Position.Ceiling == NO_HEIGHT)
@@ -1688,11 +1697,11 @@ bool TestLaraMonkeyMoveTolerance(ItemInfo* item, CollisionInfo* coll, MonkeyMove
 	if (probe.Position.CeilingSlope)
 		return false;
 
-	// Conduct ray test at lower ceiling bound and highest floor bound.
+	// Assess ray/room collision.
 	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
 		return false;
 
-	// Assess move feasibility to location ahead.
+	// Assess point/room collision.
 	if (probe.BottomBlock->Flags.Monkeyswing &&										// Is monkey sector.
 		(probe.Position.Floor - y) > LARA_HEIGHT_MONKEY &&							// Within highest floor bound.
 		(probe.Position.Ceiling - y) <= testSetup.LowerCeilingBound &&				// Within lower ceiling bound.
@@ -1773,9 +1782,12 @@ VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, Vaul
 	if (swampTooDeep)
 		return VaultTestResult{ false };
 
-	// HACK: Where the probe finds that the wall in front is formed by a ceiling or the space between the floor and ceiling is a clamp,
-	// any climbable floor in a room above will be missed.
-	// Raise y position of probe point by increments of CLICK(0.5f) to find this potential vault candidate location.
+	// NOTE: Where the point/room probe finds that
+	// a) the "wall" in front is formed by a ceiling, or
+	// b) the space between the floor and ceiling is a clamp (i.e. it is too narrow),
+	// any potentially climbable floor in a room above will be missed. The following block considers this.
+	
+	// Raise y position of point/room probe by increments of CLICK(0.5f) to find potential vault ledge.
 	int yOffset = testSetup.LowerFloorBound;
 	while (((probeFront.Position.Ceiling - y) > -coll->Setup.Height ||								// Ceiling is below Lara's height...
 			abs(probeFront.Position.Ceiling - probeFront.Position.Floor) <= testSetup.ClampMin ||		// OR clamp is too small
@@ -1790,7 +1802,7 @@ VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, Vaul
 	if (probeFront.Position.Floor == NO_HEIGHT)
 		return VaultTestResult{ false };
 
-	// Assess vault candidate location.
+	// Assess point/room collision.
 	if ((probeFront.Position.Floor - y) < testSetup.LowerFloorBound &&							// Within lower floor bound.
 		(probeFront.Position.Floor - y) >= testSetup.UpperFloorBound &&							// Within upper floor bound.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > testSetup.ClampMin &&	// Within clamp min.
@@ -2150,7 +2162,7 @@ CrawlVaultTestResult TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* 
 	if (isSlope || isDeath)
 		return CrawlVaultTestResult{ false };
 
-	// Assess crawl vault feasibility to location ahead.
+	// Assess point/room collision.
 	if ((probeA.Position.Floor - y) <= testSetup.LowerFloorBound &&							// Within lower floor bound.
 		(probeA.Position.Floor - y) >= testSetup.UpperFloorBound &&							// Within upper floor bound.
 		abs(probeA.Position.Ceiling - probeA.Position.Floor) > testSetup.ClampMin &&		// Crossing clamp limit.
@@ -2325,7 +2337,7 @@ bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup te
 	if (isSwamp || isWading)
 		return false;
 
-	// Assess jump feasibility toward location ahead.
+	// Assess point/room collision.
 	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Distance) &&						// Avoid jumping through corners.
 		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Within highest floor bound.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// Within lowest ceiling bound... 
