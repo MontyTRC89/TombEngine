@@ -195,8 +195,8 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:SetOnKilled
 // @tparam string callback name of function to be called
 // @usage
-// LevelFuncs.baddieKilled = function(theBaddie) print("You killed a baddie!") end
-// baddie:SetOnKilled("baddieKilled")
+// LevelFuncs.baddyKilled = function(theBaddy) print("You killed a baddy!") end
+// baddy:SetOnKilled("baddyKilled")
 	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled,
 
 /// Get the name of the function called when this moveable is killed
@@ -323,7 +323,7 @@ void Moveable::Register(sol::table & parent)
 
 /// Set the moveable's position
 // If you are moving a moveable whose behaviour involves knowledge of room geometry,
-// (e.g. a BADDIE1, which uses it for pathfinding), then you *must* use this in conjunction
+// (e.g. a BADDY1, which uses it for pathfinding), then you *must* use this in conjunction
 // with @{Moveable:SetRoom}. Otherwise, said moveable will not behave correctly.
 // @function Moveable:SetPosition
 // @tparam Vec3 position the new position of the moveable 
@@ -651,12 +651,12 @@ void Moveable::EnableItem()
 				m_item->TouchBits = 0;
 				m_item->Status = ITEM_ACTIVE;
 				AddActiveItem(m_num);
-				EnableBaddieAI(m_num, 1);
+				EnableBaddyAI(m_num, 1);
 			}
 			else if (m_item->Status == ITEM_INVISIBLE)
 			{
 				m_item->TouchBits = 0;
-				if (EnableBaddieAI(m_num, 0))
+				if (EnableBaddyAI(m_num, 0))
 					m_item->Status = ITEM_ACTIVE;
 				else
 					m_item->Status = ITEM_INVISIBLE;
