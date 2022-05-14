@@ -1251,7 +1251,10 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (coll->Middle.Floor <= STEPUP_HEIGHT ||
+	int y = item->Pose.Position.y;
+	auto probe = GetCollision(item);
+
+	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT ||
 		lara->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
 	{
 		return false;
