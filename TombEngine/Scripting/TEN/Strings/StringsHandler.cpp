@@ -4,7 +4,7 @@
 #if TEN_OPTIONAL_LUA
 #include "ScriptAssert.h"
 #include "Flow/FlowHandler.h"
-#include <Renderer/RenderEnums.h>
+#include <Renderer/Renderer11Enums.h>
 #include "ReservedScriptNames.h"
 
 /***
