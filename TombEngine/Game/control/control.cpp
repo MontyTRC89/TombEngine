@@ -692,6 +692,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			return result;
 		}
 	}
+	return GameStatus::ExitGame;
 }
 
 void UpdateShatters()
