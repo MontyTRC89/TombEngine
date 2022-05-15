@@ -146,7 +146,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			laraInfo->Control.HandStatus = HandStatus::Busy;
 			laraInfo->InteractedItem = itemNumber;
 			receptableItem->Pose.Orientation.y = oldYrot;
-			receptableItem->Flags |= 0x20;
+			receptableItem->Flags |= TRIGGERED;
 			return;
 		}
 
@@ -309,7 +309,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				laraInfo->Control.IsMoving = false;
 				ResetLaraFlex(laraItem);
 				laraInfo->Control.HandStatus = HandStatus::Busy;
-				keyHoleItem->Flags |= 0x20;
+				keyHoleItem->Flags |= TRIGGERED;
 				keyHoleItem->Status = ITEM_ACTIVE;
 
 				if (keyHoleItem->TriggerFlags == 1 && keyHoleItem->ObjectNumber == ID_KEY_HOLE8)

@@ -2743,7 +2743,7 @@ namespace TEN::Renderer
 		DrawItems(view, true);
 		DrawEffects(view, true);
 		DrawGunFlashes(view);
-		DrawBaddieGunflashes(view);
+		DrawBaddyGunflashes(view);
 
 		DrawTransparentFaces(view);
 

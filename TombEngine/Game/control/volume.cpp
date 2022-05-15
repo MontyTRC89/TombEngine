@@ -9,7 +9,7 @@
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -49,9 +49,6 @@ namespace TEN::Control::Volumes
 				contains = volume->Sphere.Intersects(bbox);
 				break;
 			}
-
-			// TODO: Implement checks on which item is entering/inside/leaving volume
-			// and pass item name or ID as argument for Lua function, so it knows its caller.
 
 			if (contains)
 			{

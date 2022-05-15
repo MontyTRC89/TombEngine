@@ -26,9 +26,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
-#include "Scripting/ScriptInterfaceLevel.h"
-#include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "ScriptInterfaceLevel.h"
+#include "ScriptInterfaceGame.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 
 using namespace TEN::Effects::Lara;
@@ -1127,7 +1127,7 @@ bool SaveGame::Load(int slot)
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && obj->intelligent)
 		{
-			EnableBaddieAI(i, true);
+			EnableBaddyAI(i, true);
 
 			auto creature = GetCreatureInfo(item);
 			auto data = savedItem->data();

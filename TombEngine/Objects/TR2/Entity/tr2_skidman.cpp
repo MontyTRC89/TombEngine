@@ -110,7 +110,7 @@ void SkidooManControl(short riderItemNumber)
 
 	if (!item->Data)
 	{
-		EnableBaddieAI(itemNumber, TRUE);
+		EnableBaddyAI(itemNumber, TRUE);
 		item->Status = ITEM_ACTIVE;
 	}
 

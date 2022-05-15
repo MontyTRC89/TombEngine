@@ -12,7 +12,7 @@
 #include "Game/items.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
@@ -958,9 +958,6 @@ void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_LADDER_IDLE (56)
 bool LadderMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->HasOverhangClimb())
-		return false;
-
 	auto probe = GetCollision(item);
 
 	if (probe.Position.CeilingSlope)
