@@ -291,6 +291,16 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMul
 	return 1;
 }
 
+void PauseAllSounds()
+{
+	BASS_Pause();
+}
+
+void ResumeAllSounds()
+{
+	BASS_Start();
+}
+
 void StopSoundEffect(short effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
