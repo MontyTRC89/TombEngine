@@ -100,7 +100,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		3,
 		3,
 		0,
-		SFX_TEN_LARA_UZI_FIRE,
+		SFX_TEN_UZI_FIRE,
 		0
 	},
 
@@ -185,7 +185,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		2,
 		0,
-		SFX_TEN_LARA_UZI_FIRE,
+		SFX_TEN_UZI_FIRE,
 		0
 	},
 
@@ -253,7 +253,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		0,
 		0,
-		SFX_TEN_LARA_UZI_FIRE,
+		SFX_TEN_UZI_FIRE,
 		0
 	}
 };
