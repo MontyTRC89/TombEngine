@@ -75,7 +75,7 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	MeshSwapToPour,				//43
 	MeshSwapFromPour,			//44
 	LaraLocationPad,			//45
-	KillActiveBaddies			//46
+	KillActiveBaddys			//46
 };
 
 void FlashOrange(ItemInfo* item) 
@@ -191,7 +191,7 @@ void LaraHandsFree(ItemInfo* item)
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
-void KillActiveBaddies(ItemInfo* item)
+void KillActiveBaddys(ItemInfo* item)
 {
 	if (NextItemActive != NO_ITEM)
 	{

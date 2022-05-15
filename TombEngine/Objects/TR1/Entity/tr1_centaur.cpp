@@ -88,9 +88,7 @@ void ControlCentaurBomb(short itemNumber)
 	if (probe.Position.Floor < item->Pose.Position.y ||
 		probe.Position.Ceiling > item->Pose.Position.y)
 	{
-		item->Pose.Position.x = oldPos.x;
-		item->Pose.Position.y = oldPos.y;
-		item->Pose.Position.z = oldPos.z;
+		item->Pose.Position = oldPos;
 
 		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 			TriggerUnderwaterExplosion(item, 0);
@@ -131,7 +129,7 @@ void ControlCentaurBomb(short itemNumber)
 				currentObject->intelligent && !currentObject->undead &&
 				currentObject->collision)
 			{
-				DoExplosiveDamageOnBaddie(LaraItem, currentItem, item, LaraWeaponType::Crossbow);
+				DoExplosiveDamageOnBaddy(LaraItem, currentItem, item, LaraWeaponType::Crossbow);
 			}
 
 			k++;
@@ -154,12 +152,10 @@ static void RocketGun(ItemInfo* centaurItem)
 		projectileItem->Shade = 16 * 256;
 		projectileItem->RoomNumber = centaurItem->RoomNumber;
 
-		Vector3Int pos = { 11, 415, 41 };
+		auto pos = Vector3Int(11, 415, 41);
 		GetJointAbsPosition(centaurItem, &pos, 13);
 
-		projectileItem->Pose.Position.x = pos.x;
-		projectileItem->Pose.Position.y = pos.y;
-		projectileItem->Pose.Position.z = pos.z;
+		projectileItem->Pose.Position = pos;
 		InitialiseItem(itemNumber);
 
 		projectileItem->Pose.Orientation.x = 0;

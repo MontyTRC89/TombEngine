@@ -499,7 +499,7 @@ namespace TEN::Renderer
 		void DrawItems(RenderView& view, bool transparent);
 		void DrawItemsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
-		void DrawBaddieGunflashes(RenderView& view);
+		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
 		void RenderShadowMap(RenderView& view);
 		void DrawWraithExtra(RendererItem* item, RenderView& view);

@@ -519,7 +519,7 @@ local strings = {
 		"",
 		""
 	},
-	HARPOON_ITEM = {
+	harpoon_item = {
 		"Harpoon Launcher",
 		"",
 		"",
@@ -1169,8 +1169,8 @@ SILENCER_ITEM = {
 		"",
 		""
 	},
-	torch = {
-		"Torch",
+	torch2 = {
+		"Torch2",
 		"",
 		"",
 		"",
