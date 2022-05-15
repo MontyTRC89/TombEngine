@@ -298,7 +298,7 @@ bool FlowHandler::DoFlow()
 		}
 	}
 
-	g_GameScript->FreeLevelScripts();
+	g_GameScript->ResetScripts(true);
 	return true;
 }
 

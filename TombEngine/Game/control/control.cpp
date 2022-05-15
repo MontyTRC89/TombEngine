@@ -692,6 +692,8 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			return result;
 		}
 	}
+
+	g_GameScript->ResetScripts(true);
 	return GameStatus::ExitGame;
 }
 
