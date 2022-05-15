@@ -17,6 +17,7 @@
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
+#include <savegame.h>
 
 
 using namespace TEN::Effects::Lara;
@@ -677,6 +678,15 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 		case TO_CUTSCENE:
 			// TODO: not used for now
+			break;
+
+		case TO_SECRET:
+			if (!(Statistics.Level.Secrets & (1 << value)))
+			{
+				PlaySecretTrack();
+				Statistics.Level.Secrets |= (1 << value);
+				Statistics.Game.Secrets++;
+			}
 			break;
 
 		default:

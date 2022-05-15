@@ -32,7 +32,7 @@ const std::string TRACKS_PATH = "Audio\\";
 
 std::map<std::string, int> SoundTrackMap;
 std::unordered_map<int, SoundTrackInfo> SoundTracks;
-int SecretSoundIndex;
+int SecretSoundIndex = 5;
 
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
@@ -340,7 +340,6 @@ void EnumerateLegacyTracks()
 					}
 					s.Name = result[1];
 					SoundTracks.insert(std::make_pair(index, s));
-					SecretSoundIndex = std::max(SecretSoundIndex, index);
 				}
 			}
 		}
