@@ -413,7 +413,7 @@ void LarsonControl(short itemNumber)
 		else
 		{
 			item->HitPoints = -16384;
-			DisableBaddieAI(itemNumber);
+			DisableBaddyAI(itemNumber);
 			KillItem(itemNumber);
 		}
 	}*/

@@ -10,7 +10,7 @@
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_overhang.h"
 #include "Game/Lara/lara_slide.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -68,7 +68,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		DoLaraFallDamage(item);
 
-		if (item->HitPoints <= 0) [[unlikely]]
+		if (item->HitPoints <= 0) USE_FEATURE_IF_CPP20([[unlikely]])
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
@@ -152,7 +152,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -219,7 +219,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -455,7 +455,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -511,7 +511,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -568,7 +568,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -623,7 +623,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -728,7 +728,7 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_DEATH;
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -817,7 +817,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_CROUCH_IDLE;
 			MoveItem(item, coll->Setup.ForwardAngle, CLICK(0.5f)); // HACK: Move forward to avoid standing up or falling out on an edge.
 		}
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);
@@ -889,7 +889,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
-		else [[likely]]
+		else USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_IDLE;
 
 		SetLaraLand(item, coll);

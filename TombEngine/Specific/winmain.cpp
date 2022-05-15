@@ -11,8 +11,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
-#include "Scripting/LanguageScript.h"
-#include "Scripting/ScriptInterfaceState.h"
+#include "LanguageScript.h"
+#include "ScriptInterfaceState.h"
 
 using namespace TEN::Renderer;
 using std::exception;
@@ -357,6 +357,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
+
 	DestroyAcceleratorTable(hAccTable);
 
 	if (g_Configuration.EnableSound)

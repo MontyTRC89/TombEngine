@@ -45,10 +45,10 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/winmain.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
-#include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
-#include "Scripting/Strings/ScriptInterfaceStringsHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "ScriptInterfaceGame.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;
 using std::unordered_map;
@@ -528,7 +528,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		int frames = 0;
 		auto status = InventoryResult::None;
 
-		while (status == InventoryResult::None)
+		while (status == InventoryResult::None && DoTheGame)
 		{
 			g_Renderer.RenderTitle();
 
@@ -671,7 +671,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 
 	// The game loop, finally!
-	while (true)
+	while (DoTheGame)
 	{
 		result = ControlPhase(nFrames, 0);
 		nFrames = DrawPhase();

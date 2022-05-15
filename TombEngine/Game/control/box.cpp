@@ -1040,7 +1040,7 @@ int CreatureActive(short itemNumber)
 
 	if (item->Status == ITEM_INVISIBLE || !item->Data.is<CreatureInfo>())
 	{
-		if (!EnableBaddieAI(itemNumber, 0))
+		if (!EnableBaddyAI(itemNumber, 0))
 			return false; // AI couldn't be activated
 
 		item->Status = ITEM_ACTIVE;
@@ -1088,13 +1088,13 @@ int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 	if (enemyQuad == boxQuad)
 		return false;
 
-	int baddieQuad = 0;
+	int baddyQuad = 0;
 	if (item->Pose.Position.z > enemy->Pose.Position.z)
-		baddieQuad = (item->Pose.Position.x > enemy->Pose.Position.x) ? 2 : 1;
+		baddyQuad = (item->Pose.Position.x > enemy->Pose.Position.x) ? 2 : 1;
 	else
-		baddieQuad = (item->Pose.Position.x > enemy->Pose.Position.x) ? 3 : 0;
+		baddyQuad = (item->Pose.Position.x > enemy->Pose.Position.x) ? 3 : 0;
 
-	if (enemyQuad == baddieQuad && abs(enemyQuad - boxQuad) == 2)
+	if (enemyQuad == baddyQuad && abs(enemyQuad - boxQuad) == 2)
 		return false;
 
 	return true;
@@ -1116,18 +1116,18 @@ int CreatureVault(short itemNumber, short angle, int vault, int shift)
 		vault = 0;
 	else if (item->Floor > y + CHECK_CLICK(7))
 		vault = -4;
-	// FIXME: edit assets adding climb down animations for Von Croy and baddies?
+	// FIXME: edit assets adding climb down animations for Von Croy and baddys?
 	else if (item->Floor > y + CHECK_CLICK(5) &&
 		item->ObjectNumber != ID_VON_CROY &&
-		item->ObjectNumber != ID_GOON1 &&
-		item->ObjectNumber != ID_GOON2)
+		item->ObjectNumber != ID_BADDY1 &&
+		item->ObjectNumber != ID_BADDY2)
 	{
 		vault = -3;
 	}
 	else if (item->Floor > y + CHECK_CLICK(3) &&
 		item->ObjectNumber != ID_VON_CROY &&
-		item->ObjectNumber != ID_GOON1 &&
-		item->ObjectNumber != ID_GOON2)
+		item->ObjectNumber != ID_BADDY1 &&
+		item->ObjectNumber != ID_BADDY2)
 	{
 		vault = -2;
 	}

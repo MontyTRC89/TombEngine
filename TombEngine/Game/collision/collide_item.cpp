@@ -15,7 +15,7 @@
 #include "Specific/trmath.h"
 #include "Specific/prng.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/ScriptInterfaceGame.h"
+#include "ScriptInterfaceGame.h"
 
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;
@@ -1676,7 +1676,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddieCollision
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision
 {
 	laraItem->HitStatus = false;
 	coll->HitStatic = false;

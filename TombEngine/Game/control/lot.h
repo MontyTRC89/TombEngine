@@ -4,7 +4,7 @@
 extern std::vector<CreatureInfo*> ActiveCreatures;
 
 void InitialiseLOTarray(int allocMem);
-int EnableBaddieAI(short itemNum, int always);
+int EnableBaddyAI(short itemNum, int always);
 void InitialiseSlot(short itemNum, short slot);
 void DisableEntityAI(short itemNumber);
 void ClearLOT(LOTInfo* LOT);

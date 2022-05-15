@@ -18,15 +18,15 @@
 #include "Game/savegame.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/objects.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
-#include "Scripting/ScriptInterfaceLevel.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
+#include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 
-#include "Scripting/ScriptInterfaceGame.h"
-#include "Scripting/Objects/ScriptInterfaceObjectsHandler.h"
+#include "ScriptInterfaceGame.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Entities::Generic;
 
@@ -772,7 +772,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 			switch (object->hitEffect)
 			{
 			case HIT_BLOOD:
-				if (target->ObjectNumber == ID_GOON2 &&
+				if (target->ObjectNumber == ID_BADDY2 &&
 					(target->Animation.ActiveState == 8 || GetRandomControl() & 1) &&
 					(lara->Control.Weapon.GunType == LaraWeaponType::Pistol ||
 						lara->Control.Weapon.GunType == LaraWeaponType::Shotgun ||

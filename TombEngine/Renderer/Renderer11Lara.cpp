@@ -8,7 +8,7 @@
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Specific/level.h"
-#include "Scripting/Flow/ScriptInterfaceFlowHandler.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include <Specific\setup.h>
 #include "Game/Lara/lara_fire.h"
 #include "Game/items.h"
