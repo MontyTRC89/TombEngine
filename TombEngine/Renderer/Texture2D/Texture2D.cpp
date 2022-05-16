@@ -42,7 +42,7 @@ namespace TEN::Renderer
 		ID3D11DeviceContext* context = NULL;
 		device->GetImmediateContext(&context);
 
-		throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0),L"Opening Texture file '"+fileName+L"': ");
+		throwIfFailed(CreateWICTextureFromFile(device, context, fileName.c_str(), resource.GetAddressOf(), ShaderResourceView.GetAddressOf(), (size_t)0), L"Opening Texture file '" + fileName + L"': ");
 		throwIfFailed(resource->QueryInterface(Texture.GetAddressOf()));
 	}
 
