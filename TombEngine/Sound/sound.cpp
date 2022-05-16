@@ -472,7 +472,7 @@ void PlaySoundTrack(std::string track, short mask)
 
 void PlaySoundTrack(int index, short mask)
 {
-	if (SoundTracks.size() <= index)
+	if (SoundTracks.find(index) == SoundTracks.end())
 	{
 		static int lastAttemptedIndex = -1;
 		if (lastAttemptedIndex != index)
