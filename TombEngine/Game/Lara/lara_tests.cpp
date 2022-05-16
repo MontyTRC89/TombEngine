@@ -566,7 +566,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 		item->Pose = cornerResult.RealPositionResult;
 		lara->NextCornerPos.Position = Vector3Int(
 			item->Pose.Position.x,
-			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius, -(coll->Setup.Height + CLICK(0.5f))).Position.Floor + abs(bounds->Y1),
+			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius + 16, -(coll->Setup.Height + CLICK(0.5f))).Position.Floor + abs(bounds->Y1),
 			item->Pose.Position.z
 		);
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
