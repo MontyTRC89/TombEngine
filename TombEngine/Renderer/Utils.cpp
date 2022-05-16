@@ -5,6 +5,9 @@
 #include <wrl/client.h>
 #include <d3dcompiler.h>
 
+#include <locale>
+#include <codecvt>
+
 namespace TEN::Renderer::Utils
 {
 	using std::wstring;
@@ -17,6 +20,26 @@ namespace TEN::Renderer::Utils
 		if (FAILED(res))
 		{
 			std::string message = std::system_category().message(res);
+			TENLog(message, LogLevel::Error);
+			throw std::runtime_error("An error occured!");
+		}
+	}
+
+	void Utils::throwIfFailed(const HRESULT& res, const std::string &info) 
+	{
+		if (FAILED(res))
+		{
+			std::string message = info + std::system_category().message(res);
+			TENLog(message, LogLevel::Error);
+			throw std::runtime_error("An error occured!");
+		}
+	}
+
+	void Utils::throwIfFailed(const HRESULT& res, const std::wstring &info) 
+	{
+		if (FAILED(res))
+		{
+			std::string message = (std::wstring_convert<std::codecvt_utf8<wchar_t>,wchar_t>{}.to_bytes(info)) + std::system_category().message(res);
 			TENLog(message, LogLevel::Error);
 			throw std::runtime_error("An error occured!");
 		}
