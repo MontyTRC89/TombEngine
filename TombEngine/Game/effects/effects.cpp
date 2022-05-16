@@ -1076,13 +1076,13 @@ void SetupRipple(int x, int y, int z, float size, char flags, unsigned int sprit
 	}
 }
 
-short DoBloodSplat(int x, int y, int z, short a4, short a5, short roomNumber)
+short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
 {
 	short probedRoomNumber = GetCollision(x, y, z, roomNumber).RoomNumber;
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-		TriggerUnderwaterBlood(x, y, z, a4);
+		TriggerUnderwaterBlood(x, y, z, speed);
 	else
-		TriggerBlood(x, y, z, a5 >> 4, a4);
+		TriggerBlood(x, y, z, direction >> 4, speed);
 
 	return 0;
 }
