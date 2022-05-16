@@ -1396,11 +1396,12 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			floor = GetSector(r, x - r->x, z - r->z);
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
-				return GetCollision(x, r->maxceiling, z, floor->RoomAbove(x, r->maxceiling, z).value_or(NO_ROOM)).Block->FloorHeight(x, r->maxceiling, z);
+				return GetCollision(floor, x, y, z).Block->FloorHeight(x, y, z);
 				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
 			}
 
@@ -1417,15 +1418,14 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room2))
 			{
-				return GetCollision(x, room2->minfloor, z, floor->RoomBelow(x, room2->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, room2->minfloor, z);
-				//return r->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
+				return GetCollision(floor, x, y, z).Block->CeilingHeight(x, y, z);
+				//return room2->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
 			}
-
-			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
