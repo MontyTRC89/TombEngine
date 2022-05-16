@@ -350,6 +350,7 @@ void EnumerateLegacyTracks()
 					}
 					s.Name = result[1];
 					SoundTracks.insert(std::make_pair(index, s));
+					SecretSoundIndex = std::max(SecretSoundIndex, index);
 				}
 			}
 		}
