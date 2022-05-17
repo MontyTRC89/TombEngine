@@ -1220,7 +1220,7 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)
 {
 	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item);
+	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
 
 	if (abs(probe.Position.Floor - y) <= STEPUP_HEIGHT &&
 		probe.Position.FloorSlope &&
