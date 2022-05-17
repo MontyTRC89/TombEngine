@@ -1403,8 +1403,6 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
 			}
 
-			floor = GetSector(room, x - room->x, z - room->z);
-
 			if (floor->RoomAbove(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
 		}
