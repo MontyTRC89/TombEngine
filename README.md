@@ -23,29 +23,31 @@ Visual Studio might also complain about the NuGet packages, to fix that:
 4) Compile again and once that is done, you should now be able to go to TombEditor, make a simple level, compile and run it with TombEngine.
 
 ## Developers
+
 - MontyTRC (Project Leader)
-- Lwmte (general coding, code cleanups, and bug fixing)
-- Sezz (state refactoring, general coding and bug fixing)
-- Troye (general coding, refactoring)
-- ChocolateFan (general coding)
-- Krys (general coding)
-- Squidshire (Hispidence) (lua implementation and bug fixing)
-- RicardoLuis0 (general coding)
-- Raildex (renderer refactoring & general coding) 
-- TokyoSU (Decompiling Vehicles & Entities)
+
+- ChocolateFan (General coding)
 - Gancian (general coding)
-- WolfCheese (General coding)
+- Krys (general coding)
+- Lwmte (general coding, code cleanups, and bug fixing)
 - Moooonyeah (Jumanji) (entity decompilation)
+- Raildex (renderer refactoring & general coding) 
+- RicardoLuis0 (general coding)
+- Sezz (state refactoring, general coding and bug fixing)
+- Squidshire (Hispidence) (lua implementation and bug fixing)
 - Stranger1992 (Sounds Project)
+- TokyoSU (Decompiling Vehicles & Entities)
+- Troye (General coding, refactoring)
+- WolfCheese (General coding)
 
 ## Testers
-- Stranger1992
-- RemRem
-- Kubsy
-- Kamillos
 - Caesum
-- Lore
-- WolfCheese
 - Dustie
-- Lgg_productions
 - JoeyQuint
+- Kamillos
+- Kubsy
+- Lgg_productions
+- Lore
+- RemRem
+- Stranger1992
+- WolfCheese
