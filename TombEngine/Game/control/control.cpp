@@ -217,7 +217,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) && (!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE || LaraItem->Animation.TargetState != LS_CROUCH_IDLE)))
+				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
+					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE || LaraItem->Animation.TargetState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
