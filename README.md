@@ -21,5 +21,5 @@ Steps:
 1) Clone the repo to your Github Desktop
 2) launch TombEngine.sln and compile
 3) Once compiled, make a separate folder and copy everything from the Build folder (before compilation there will be nothing in that folder) and also copy the scripts folder to your TombEngine executable directory (make sure you have data, texture files aswell)
-3.1) Windows will also complain about missing dll files (Bass etc) in that case copy the dlls from the Libs folder
+> Windows will also complain about missing dll files (Bass etc) in that case copy the dlls from the Libs folder
 4) Once that is done, you should now be able to go to TombEditor, make a simple level, compile and run it with TombEngine
