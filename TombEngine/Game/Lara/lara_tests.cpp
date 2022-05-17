@@ -1107,7 +1107,7 @@ bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 		weaponType == LaraWeaponType::HarpoonGun ||
 		weaponType == LaraWeaponType::RocketLauncher||
 		weaponType == LaraWeaponType::Snowmobile ||
-		lara->Weapons[(int)lara->Control.Weapon.GunType].HasLasersight)
+		lara->Weapons[(int)weaponType].HasLasersight)
 	{
 		return true;
 	}
