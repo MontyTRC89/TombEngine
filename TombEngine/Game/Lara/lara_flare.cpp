@@ -377,6 +377,13 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 
 	if (lara->Flare.Life >= FLARE_LIFE_MAX)
 	{
+		// Prevent Lara from intercepting reach/jump states with flare throws.
+		if (laraItem->Animation.ActiveState == LS_JUMP_PREPARE ||
+			laraItem->Animation.ActiveState == LS_REACH ||
+			laraItem->Animation.ActiveState == LS_JUMP_UP ||
+			laraItem->Animation.ActiveState == LS_JUMP_FORWARD)
+			return;
+
 		if (lara->Control.HandStatus == HandStatus::Free)
 			lara->Control.HandStatus = HandStatus::WeaponUndraw;
 	}
