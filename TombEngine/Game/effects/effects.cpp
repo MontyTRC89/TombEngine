@@ -1080,7 +1080,7 @@ short DoBloodSplat(int x, int y, int z, int speed, float direction, short roomNu
 	if (TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
 		TriggerUnderwaterBlood(x, y, z, speed);
 	else
-		TriggerBlood(x, y, z, Angle::RadToShrt(yRot * 16), speed); // TODO: Convert short form rotation.
+		TriggerBlood(x, y, z, Angle::RadToShrt(direction * 16), speed); // TODO: Convert short form rotation.
 
 	return 0;
 }

@@ -341,34 +341,8 @@ void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	EulerAngles targetOrient = EulerAngles::Zero;
-	if (arm->Locked)
-		targetOrient = lara->TargetArmOrient;
-
-	float rate = weaponInfo->AimRate;
-
-	// Rotate arms on x axis toward target.
-	float xOrient = arm->Orientation.GetX();
-	if (xOrient >= (targetOrient.GetX() - rate) && xOrient <= (targetOrient.GetX() + rate))
-		xOrient = targetOrient.GetX();
-	else if (xOrient < targetOrient.GetX())
-		xOrient += rate;
-	else
-		xOrient -= rate;
-	arm->Orientation.SetX(xOrient);
-
-	// Rotate arms on y axis toward target.
-	float yOrient = arm->Orientation.GetY();
-	if (yOrient >= (targetOrient.GetY() - rate) && yOrient <= (targetOrient.GetY() + rate))
-		yOrient = targetOrient.GetY();
-	else if (yOrient < targetOrient.GetY())
-		yOrient += rate;
-	else
-		yOrient -= rate;
-	arm->Orientation.SetY(arm->Orientation.GetY() - yOrient);
-
-	// TODO: Set arms to inherit orientations of parent bones.
-	arm->Orientation.SetZ();
+	auto targetOrient = arm->Locked ? lara->TargetArmOrient : EulerAngles::Zero;
+	arm->Orientation.InterpolateConstant(targetOrient, weaponInfo->AimRate);
 }
 
 void SmashItem(short itemNumber)
