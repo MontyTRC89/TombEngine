@@ -519,7 +519,7 @@ local strings = {
 		"",
 		""
 	},
-	HARPOON_ITEM = {
+	harpoon_item = {
 		"Harpoon Launcher",
 		"",
 		"",
@@ -1169,8 +1169,8 @@ SILENCER_ITEM = {
 		"",
 		""
 	},
-	torch = {
-		"Torch",
+	torch2 = {
+		"Torch2",
 		"",
 		"",
 		"",
@@ -1291,7 +1291,7 @@ SILENCER_ITEM = {
 	}
 }
 
-SetStrings(strings)
+TEN.Flow.SetStrings(strings)
 
 local languages = {
 	"English",
@@ -1304,5 +1304,5 @@ local languages = {
 	"Russian"
 }
 
-SetLanguageNames(languages)
+TEN.Flow.SetLanguageNames(languages)
 
