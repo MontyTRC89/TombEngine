@@ -594,7 +594,8 @@ namespace TEN::Renderer
 			{
 				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
-				if (flashBucket.Vertices.size() != 0) 
+
+				if (flashBucket.Polygons.size() > 0) 
 				{
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
@@ -609,7 +610,7 @@ namespace TEN::Renderer
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 
 					if (Lara.RightArm.FlashGun)
@@ -622,7 +623,7 @@ namespace TEN::Renderer
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
 			}
