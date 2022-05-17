@@ -1220,7 +1220,10 @@ void RocketControl(short itemNumber)
 	// Trigger fire, smoke and lighting
 	TriggerRocketSmoke(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z, -1);
 	TriggerRocketFire(wx + item->Pose.Position.x, wy + item->Pose.Position.y, wz + item->Pose.Position.z);
-	TriggerDynamicLight(wx + item->Pose.Position.x + (GetRandomControl() & 15) - 8, wy + item->Pose.Position.y + (GetRandomControl() & 15) - 8, wz + item->Pose.Position.z + (GetRandomControl() & 15) - 8, 14, 28 + (GetRandomControl() & 3), 16 + (GetRandomControl() & 7), (GetRandomControl() & 7));
+	TriggerDynamicLight(wx + item->Pose.Position.x + (GetRandomControl() & 15) - 8, 
+						wy + item->Pose.Position.y + (GetRandomControl() & 15) - 8, 
+						wz + item->Pose.Position.z + (GetRandomControl() & 15) - 8, 
+						14, 28 + (GetRandomControl() & 3), 16 + (GetRandomControl() & 7), (GetRandomControl() & 7));
 
 	// If underwater generate bubbles
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
@@ -1236,6 +1239,7 @@ void RocketControl(short itemNumber)
 	item->Pose.Position.z += speed * phd_cos(item->Pose.Orientation.y);
 
 	bool explode = false;
+	bool hitRoom = false;
 	
 	// Check if solid wall and then decide if explode or not
 	auto probe = GetCollision(item);
@@ -1245,7 +1249,7 @@ void RocketControl(short itemNumber)
 		item->Pose.Position.x = oldX;
 		item->Pose.Position.y = oldY;
 		item->Pose.Position.z = oldZ;
-		explode = true;
+		hitRoom = true;
 	}
 
 	// Has bolt changed room?
@@ -1259,12 +1263,9 @@ void RocketControl(short itemNumber)
 	int radius = (explode ? ROCKET_EXPLODE_RADIUS : ROCKET_HIT_RADIUS);
 	bool foundCollidedObjects = false;
 
+	// Decrease launch timer
 	if (item->HitPoints)
-	{
 		item->HitPoints--;
-		if (item->HitPoints > EXPLOSION_TRIGGER_TIME)
-			return;
-	}
 
 	for (int n = 0; n < 2; n++)
 	{
@@ -1293,9 +1294,14 @@ void RocketControl(short itemNumber)
 				{
 					// All active intelligent creatures explode, if their HP is <= 0
 					// Explosion is handled by CreatureDie()
-					// Also Lara can be damaged
+					// Also Lara can be damaged, if enough time has passed or missile has hit the room.
 					// HitTarget() is called inside this
-					DoExplosiveDamageOnBaddy(LaraItem, currentItem, item, LaraWeaponType::RocketLauncher);
+
+					if (currentItem != LaraItem || (hitRoom || item->HitPoints < EXPLOSION_TRIGGER_TIME))
+					{
+						DoExplosiveDamageOnBaddy(LaraItem, currentItem, item, LaraWeaponType::RocketLauncher);
+						explode = true;
+					}
 				}
 				else if (currentItem->ObjectNumber >= ID_SMASH_OBJECT1 && currentItem->ObjectNumber <= ID_SMASH_OBJECT8)
 				{
@@ -1307,6 +1313,7 @@ void RocketControl(short itemNumber)
 					short currentItemNumber = (currentItem - CollidedItems[0]);
 					SmashObject(currentItemNumber);
 					KillItem(currentItemNumber);
+					explode = true;
 				}
 				// TODO_LUA: we need to handle it with an event like OnDestroy
 				/*else if (currentObj->hitEffect == HIT_SPECIAL)
@@ -1347,18 +1354,18 @@ void RocketControl(short itemNumber)
 					}
 				}
 
+				explode = true;
 				k++;
 				currentMesh = CollidedMeshes[k];
 
 			} while (currentMesh);
 		}
 
-		explode = true;
 		radius = ROCKET_EXPLODE_RADIUS;
 	}
 
 	// Do explosion if needed
-	if (explode)
+	if (hitRoom || explode)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber))
 			TriggerUnderwaterExplosion(item, 0);
