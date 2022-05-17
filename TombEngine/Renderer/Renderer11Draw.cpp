@@ -1513,10 +1513,10 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->buckets[b];
 
-						if (bucket->Vertices.size() == 0)
+						if (bucket->Polygons.size() == 0)
 							continue;
 
-						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
 
 						m_numMoveablesDrawCalls++;
 					}
@@ -1548,7 +1548,7 @@ namespace TEN::Renderer
 			{
 				RendererBucket* bucket = &mesh->buckets[b];
 
-				if (bucket->Vertices.size() == 0)
+				if (bucket->Polygons.size() == 0)
 					continue;
 
 				for (int i = 0; i < NUM_BATS; i++)
@@ -1567,7 +1567,7 @@ namespace TEN::Renderer
 						m_stItem.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
 						m_cbItem.updateData(m_stItem, m_context.Get());
 
-						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
 
 						m_numMoveablesDrawCalls++;
 					}
@@ -1616,10 +1616,10 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->buckets[b];
 
-						if (bucket->Vertices.size() == 0)
+						if (bucket->Polygons.size() == 0)
 							continue;
 
-						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
 
 						m_numMoveablesDrawCalls++;
 					}
@@ -1668,10 +1668,10 @@ namespace TEN::Renderer
 					{
 						RendererBucket* bucket = &mesh->buckets[b];
 
-						if (bucket->Vertices.size() == 0)
+						if (bucket->Polygons.size() == 0)
 							continue;
 
-						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
 
 						m_numMoveablesDrawCalls++;
 					}
