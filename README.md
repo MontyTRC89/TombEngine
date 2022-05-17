@@ -11,6 +11,8 @@ although you can still implement with plugin (with C++ knowledge) however it is 
 TEN (TombEngine) is supposed to be a new engine which is (most importantly) open-source, removes limits, and fixes bugs from the original game,
 it also provides support for Lua (a programming language), all objects from TR1-5, and many more exciting features and gameplay functionalities such as: corner shimmying or enlarged 2D map (where you can build a massive level).
 
+TEN (TombEngine) is based on TR5 engine which has been gradually built upon that.
+
 # To compile TombEngine
 
 In order to compile TombEngine, make sure you have:
@@ -23,3 +25,31 @@ Steps:
 3) Once compiled, make a separate folder and copy everything from the Build folder (before compilation there will be nothing in that folder) and also copy the scripts folder to your TombEngine executable directory (make sure you have data, texture files aswell)
 > Windows will also complain about missing dll files (Bass etc) in that case copy the dlls from the Libs folder
 4) Once that is done, you should now be able to go to TombEditor, make a simple level, compile and run it with TombEngine
+
+# Credits
+
+**Not in order of importance**
+**Sorry if you have been missed on the list, please let us know and we can add you to the credit list.**
+
+## Developers
+- MontyTRC (Project Leader)
+- Lwmte
+- Sezz
+- Troye
+- ChocolateFan
+- Krys
+- Squidshire (Hispidence)
+- RicardoLuis0
+- Raildex
+- JoeyQuint
+
+## Testers
+- Stranger1992
+- RemRem
+- Kubsy
+- Kamillos
+- Caesum
+- Lore
+- WolfCheese
+- Dustie
+- Lgg_productions
