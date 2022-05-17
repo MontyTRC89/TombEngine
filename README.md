@@ -42,8 +42,10 @@ Steps:
 - Squidshire (Hispidence)
 - RicardoLuis0
 - Raildex
-- JoeyQuint
 - TokyoSU
+- Gancian 
+- WolfCheese
+- Moooonyeah (Jumanji)
 
 ## Testers
 - Stranger1992
@@ -55,3 +57,4 @@ Steps:
 - WolfCheese
 - Dustie
 - Lgg_productions
+- JoeyQuint
