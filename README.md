@@ -18,7 +18,7 @@ In order to compile TombEngine, make sure you have:
 - TombEditor (if you would like to create and test levels)
 
 Steps:
-1) Clone the repo to you Github Desktop
+1) Clone the repo to your Github Desktop
 2) launch TombEngine.sln and compile
 3) Once compiled, make a separate folder and copy everything from the Build folder and also copy the scripts folder to your TombEngine directory (make sure you have data files aswell)
   3.1) Windows will also complain about missing dll files (Bass etc) in that case copy the dlls from the Libs folder
