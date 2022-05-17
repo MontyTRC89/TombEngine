@@ -421,16 +421,9 @@ void LaraGun(ItemInfo* laraItem)
 			}
 		}
 
-		if (TrInput & IN_DRAW ||
-			lara->Control.Weapon.RequestGunType != lara->Control.Weapon.GunType)
+		if (TrInput & IN_DRAW || lara->Control.Weapon.RequestGunType != lara->Control.Weapon.GunType)
 		{
-			if ((laraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
-				laraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
-				laraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT) &&
-				(lara->Control.Weapon.RequestGunType == LaraWeaponType::HK ||
-					lara->Control.Weapon.RequestGunType == LaraWeaponType::Crossbow ||
-					lara->Control.Weapon.RequestGunType == LaraWeaponType::Shotgun ||
-					lara->Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun))
+			if (lara->Control.IsLow && lara->Control.Weapon.RequestGunType >= LaraWeaponType::Shotgun && lara->Control.Weapon.RequestGunType != LaraWeaponType::Flare)
 			{
 				if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 					lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
