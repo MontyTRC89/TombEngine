@@ -10,6 +10,3 @@ although you can still implement with plugin (with C++ knowledge) however it is 
 
 TEN (TombEngine) is supposed to be a new engine which is (most importantly) open-source, removes limits, and fixes bugs from the original game,
 it also provides support for Lua (a programming language), all objects from TR1-5, and many more exciting features and gameplay functionalities such as: corner shimmying or enlarged 2D map (where you can build a massive level).
-
-At the moment it is at the Beta stage and not everything is fixed, bugs and more functionalities will be implemented/fixed over time and complete version of TEN may not be here until several years.
-
