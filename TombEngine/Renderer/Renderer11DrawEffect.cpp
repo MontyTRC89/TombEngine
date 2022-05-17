@@ -687,7 +687,8 @@ namespace TEN::Renderer
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
-						if (flashBucket.Vertices.size() != 0)
+
+						if (flashBucket.Polygons.size() > 0)
 						{
 							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
 							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
@@ -702,7 +703,7 @@ namespace TEN::Renderer
 							m_cbItem.updateData(m_stItem, m_context.Get());
 							m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-							DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+							DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 						}
 					}
 				}
