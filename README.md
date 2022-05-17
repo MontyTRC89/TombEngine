@@ -32,34 +32,40 @@ Steps:
 > 4) Compile again
 4) Once that is done, you should now be able to go to TombEditor, make a simple level, compile and run it with TombEngine
 
+# Disclaimer
+
+I don't work for/have ever worked for Core Design, Eidos Interactive or Square Enix. This is a hobby project. I don't want this code to be sold since Tomb Raider is a registered trademark of Square Enix. The code is currently open source to allow more people to improve the engine and for study purposes. I'm not responsible for illegal use of this source code. This source code is released as-is and it's maintained by me and by other (not paid) contributors in our free time.
+
 # Credits
+
+**Not in order of importance**
+
+**Sorry if you have been missed on the list, please let us know and we can add you to the credit list.**
 
 ## Developers
 - MontyTRC (Project Leader)
-- ChocolateFan
-- Gancian
-- Krys 
-- Lwmte
-- Moooonyeah (Jumanji)
-- Raildex
-- RicardoLuis0
-- Sezz
-- Stranger1992
-- Squidshire (Hispidence)
-- TokyoSU
-- Troye
-- WolfCheese
+- Lwmte (general coding, code cleanups, and bug fixing)
+- Sezz (state refactoring, general coding and bug fixing)
+- Troye (general coding, refactoring)
+- ChocolateFan (general coding)
+- Krys (general coding)
+- Squidshire (Hispidence) (lua implementation and bug fixing)
+- RicardoLuis0 (general coding)
+- Raildex (renderer refactoring & general coding) 
+- TokyoSU (Decompiling Vehicles & Entities)
+- Gancian (general coding)
+- WolfCheese (General coding)
+- Moooonyeah (Jumanji) (entity decompilation)
+- Stranger1992 (Sounds Project)
 
-## Quality Assurance / Testing 
-- Caesum
-- Dustie
-- JoeyQuint
-- Kamillos
-- Kubsy
-- Lgg_productions
-- Lore
+## Testers
 - Stranger1992
 - RemRem
+- Kubsy
+- Kamillos
+- Caesum
+- Lore
 - WolfCheese
-
-**Sorry if you have been missed on the list, please let us know and we can add you to the credit list.**
+- Dustie
+- Lgg_productions
+- JoeyQuint
