@@ -1095,8 +1095,10 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 }
 #endif
 
-bool IsStandingWeapon(LaraWeaponType weaponType)
+bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (weaponType == LaraWeaponType::Shotgun ||
 		weaponType == LaraWeaponType::HK ||
 		weaponType == LaraWeaponType::Crossbow ||
@@ -1104,7 +1106,8 @@ bool IsStandingWeapon(LaraWeaponType weaponType)
 		weaponType == LaraWeaponType::GrenadeLauncher ||
 		weaponType == LaraWeaponType::HarpoonGun ||
 		weaponType == LaraWeaponType::RocketLauncher||
-		weaponType == LaraWeaponType::Snowmobile)
+		weaponType == LaraWeaponType::Snowmobile ||
+		lara->Weapons[(int)lara->Control.Weapon.GunType].HasLasersight)
 	{
 		return true;
 	}
@@ -1620,7 +1623,7 @@ bool TestLaraCrouch(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if ((lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
+	if ((lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(item, lara->Control.Weapon.GunType)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		return true;
