@@ -18,12 +18,8 @@ using namespace TEN::Renderer;
 
 void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Pose.Position.x += coll->Shift.x;
-	item->Pose.Position.y += coll->Shift.y;
-	item->Pose.Position.z += coll->Shift.z;
-	coll->Shift.x = 0;
-	coll->Shift.y = 0;
-	coll->Shift.z = 0;
+	item->Pose.Position += coll->Shift;
+	coll->Shift = Vector3Int();
 }
 
 void MoveItem(ItemInfo* item, short angle, int x, int z)
@@ -71,9 +67,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float off
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.y = angle2;
-	item->Pose.Orientation.z = 0;
+	item->Pose.Orientation = Vector3Shrt(0, angle2, 0);
 	item->Pose.Position.x += round(phd_sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 	item->Pose.Position.z += round(phd_cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 }
@@ -87,16 +81,19 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 	switch (direction)
 	{
 	case NORTH:
-		item->Pose.Position.z = (item->Pose.Position.z | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z | (SECTOR(1) - 1)) - coll->Setup.Radius;
 		break;
+
 	case EAST:
-		item->Pose.Position.x = (item->Pose.Position.x | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x | (SECTOR(1) - 1)) - coll->Setup.Radius;
 		break;
+
 	case SOUTH:
-		item->Pose.Position.z = (item->Pose.Position.z & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z & ~(SECTOR(1) - 1)) + coll->Setup.Radius;
 		break;
+
 	case WEST:
-		item->Pose.Position.x = (item->Pose.Position.x & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x & ~(SECTOR(1) - 1)) + coll->Setup.Radius;
 		break;
 	}
 }
@@ -116,7 +113,7 @@ int FindGridShift(int x, int z)
 
 bool TestItemRoomCollisionAABB(ItemInfo* item)
 {
-	ANIM_FRAME* framePtr = GetBestFrame(item);
+	auto* framePtr = GetBestFrame(item);
 	auto box = framePtr->boundingBox + item->Pose;
 	short maxY = std::min(box.Y1, box.Y2);
 	short minY = std::max(box.Y1, box.Y2);
@@ -852,11 +849,12 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor, short x
 		return;
 	}
 
-	GameVector pos = {};
-	pos.x = item->Pose.Position.x;
-	pos.y = item->Pose.Position.y;
-	pos.z = item->Pose.Position.z;
-	pos.roomNumber = item->RoomNumber;
+	auto pos = GameVector(
+		item->Pose.Position.x,
+		item->Pose.Position.y,
+		item->Pose.Position.z,
+		item->RoomNumber
+	);
 
 	auto* bounds = GetBoundsAccurate(item);
 	auto radiusX = bounds->X2;
@@ -1298,7 +1296,8 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			roomNumber = roomIndex;
 			room = &g_Level.Rooms[roomIndex];
 		}
-	} while (roomIndex != NO_ROOM);
+	}
+	while (roomIndex != NO_ROOM);
 
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1338,7 +1337,6 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		return NO_HEIGHT;
 	}
 }
-
 
 int GetWaterDepth(ItemInfo* item)
 {
@@ -1395,8 +1393,8 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	{
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			auto r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-			floor = GetSector(r, x - r->x, z - r->z);
+			auto* room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			floor = GetSector(room, x - room->x, z - room->z);
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1405,7 +1403,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
 			}
 
-			floor = GetSector(r, x - r->x, z - r->z);
+			floor = GetSector(room, x - room->x, z - room->z);
 
 			if (floor->RoomAbove(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
@@ -1417,7 +1415,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	{
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			auto room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			auto* room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
 			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
