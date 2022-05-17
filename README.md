@@ -34,33 +34,32 @@ Steps:
 
 # Credits
 
-**Not in order of importance**
-
-**Sorry if you have been missed on the list, please let us know and we can add you to the credit list.**
-
 ## Developers
 - MontyTRC (Project Leader)
-- Lwmte
-- Sezz
-- Troye
 - ChocolateFan
-- Krys
-- Squidshire (Hispidence)
-- RicardoLuis0
-- Raildex
-- TokyoSU
-- Gancian 
-- WolfCheese
+- Gancian
+- Krys 
+- Lwmte
 - Moooonyeah (Jumanji)
+- Raildex
+- RicardoLuis0
+- Sezz
+- Stranger1992
+- Squidshire (Hispidence)
+- TokyoSU
+- Troye
+- WolfCheese
 
-## Testers
+## Quality Assurance / Testing 
+- Caesum
+- Dustie
+- JoeyQuint
+- Kamillos
+- Kubsy
+- Lgg_productions
+- Lore
 - Stranger1992
 - RemRem
-- Kubsy
-- Kamillos
-- Caesum
-- Lore
 - WolfCheese
-- Dustie
-- Lgg_productions
-- JoeyQuint
+
+**Sorry if you have been missed on the list, please let us know and we can add you to the credit list.**
