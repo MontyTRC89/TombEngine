@@ -7,6 +7,7 @@ Unfortunately, TRNG is closed-source, and essentially an abandonware program. No
 TEN (TombEngine) is supposed to be a new engine which is (most importantly) open-source, removes limits, and fixes bugs from the original game,
 it also provides support for Lua (a programming language), all objects from TR1-5, and many more exciting features and gameplay functionalities such as corner shimmying or an enlarged 2D map which lets you build a massive level (Imagine 5 split levels into 1 big level).
 TEN (TombEngine) is based on TR5 engine which has been gradually built upon that.
+
 # To compile TombEngine
 In order to compile TombEngine, make sure you have:
 - Microsoft Visual Studio 
@@ -16,11 +17,17 @@ Steps:
 2) Launch TombEngine.sln and compile
 3) Once compiled, make a separate folder and copy everything from the Build folder (before compilation there will be nothing in that folder) and also copy the scripts folder to your TombEngine executable directory (make sure you have data, texture files as well)
 4) Windows will also complain about missing DLL files (Bass etc) in that case copy the missing DLL(s) from the Libs folder
+
 Visual Studio might also complain about the NuGet packages, to fix that:
 1) Delete the packages folder
 2) Go back to Visual studio
 3) Right-click on solution explorer and restore Nuget Packages
 4) Compile again and once that is done, you should now be able to go to TombEditor, make a simple level, compile and run it with TombEngine.
+
+#Disclaimer
+I don't work for/have ever worked for Core Design, Eidos Interactive or Square Enix. This is a hobby project. I don't want this code to be sold since Tomb Raider is a registered trademark of Square Enix. The code is currently open source to allow more people to improve the engine and for study purposes. I'm not responsible for illegal use of this source code. This source code is released as-is and it's maintained by me and by other (not paid) contributors in our free time.
+
+# Credit List
 
 ## Developers
 
