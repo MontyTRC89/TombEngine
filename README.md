@@ -1,9 +1,9 @@
 # TombEngine 
 
-In the year 2000, Core gave us a great gift: level editor where people can create their own custom levels based on TR4 engine.
+In the year 2000, Core Design gave us a great gift: level editor where people can create their own custom levels based on TR4 engine.
 unfortunately it was quite limited, hence over the decades, the engine was upgraded massively via TREP and TRNG:
 - TREP (Tomb Raider Engine Patcher) is a tool that allows you to modify the exe to expand certain limits and implement new features.
-- TRNG builds upon TREP and gives a lot of new features including its own scripting language and even more extended limits and its own DLL.
+- TRNG (Tomb Raider Next Generation) builds upon TREP and gives a lot of new features including its own scripting language and even more extended limits and its own DLL.
 
 Unfortunately, TRNG is a closed-source, and essentially an abandonware program. No one is able to fix well-known bugs in TRNG, and implement new features, 
 although you can still implement some features with plugin (with C++ knowledge) however it is not user-friendly (you need to know C++ which is quite complex) and it is poorly documented.
