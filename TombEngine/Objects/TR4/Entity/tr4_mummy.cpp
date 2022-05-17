@@ -65,7 +65,6 @@ void InitialiseMummy(short itemNumber)
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = MUMMY_STATE_LYING_DOWN;
 		item->Animation.ActiveState = MUMMY_STATE_LYING_DOWN;
-		item->Status = ITEM_INVISIBLE;
 	}
 	else
 	{
@@ -175,7 +174,7 @@ void MummyControl(short itemNumber)
 					joint1 = 0;
 					joint2 = 0;
 
-					if (item->TriggerFlags > -100 && item->TriggerFlags & 0x8000 < 0)
+					if (item->TriggerFlags > -100 && item->TriggerFlags < 0)
 						item->TriggerFlags++;
 				}
 			}

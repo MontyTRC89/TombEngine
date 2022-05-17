@@ -42,7 +42,7 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float angle, float off
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Pose.Orientation = EulerAngles(0, angle2, 0);
+	item->Pose.Orientation = EulerAngles(0.0f, angle2, 0.0f);
 	item->Pose.Position.x += (int)round(sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 	item->Pose.Position.z += (int)round(cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
 }
@@ -56,16 +56,19 @@ void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
 	switch (direction)
 	{
 	case NORTH:
-		item->Pose.Position.z = (item->Pose.Position.z | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z | (SECTOR(1) - 1)) - coll->Setup.Radius;
 		break;
+
 	case EAST:
-		item->Pose.Position.x = (item->Pose.Position.x | (WALL_SIZE - 1)) - coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x | (SECTOR(1) - 1)) - coll->Setup.Radius;
 		break;
+
 	case SOUTH:
-		item->Pose.Position.z = (item->Pose.Position.z & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		item->Pose.Position.z = (item->Pose.Position.z & ~(SECTOR(1) - 1)) + coll->Setup.Radius;
 		break;
+
 	case WEST:
-		item->Pose.Position.x = (item->Pose.Position.x & ~(WALL_SIZE - 1)) + coll->Setup.Radius;
+		item->Pose.Position.x = (item->Pose.Position.x & ~(SECTOR(1) - 1)) + coll->Setup.Radius;
 		break;
 	}
 }
@@ -85,7 +88,7 @@ int FindGridShift(int x, int z)
 
 bool TestItemRoomCollisionAABB(ItemInfo* item)
 {
-	ANIM_FRAME* framePtr = GetBestFrame(item);
+	auto* framePtr = GetBestFrame(item);
 	auto box = framePtr->boundingBox + item->Pose;
 	short maxY = std::min(box.Y1, box.Y2);
 	short minY = std::max(box.Y1, box.Y2);
@@ -1260,7 +1263,8 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 			roomNumber = roomIndex;
 			room = &g_Level.Rooms[roomIndex];
 		}
-	} while (roomIndex != NO_ROOM);
+	}
+	while (roomIndex != NO_ROOM);
 
 	if (TestEnvironment(ENV_FLAG_WATER, room) ||
 		TestEnvironment(ENV_FLAG_SWAMP, room))
@@ -1300,7 +1304,6 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		return NO_HEIGHT;
 	}
 }
-
 
 int GetWaterDepth(ItemInfo* item)
 {
@@ -1357,16 +1360,17 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	{
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			auto r = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			auto* room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+			floor = GetSector(room, x - room->x, z - room->z);
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) ||
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
-				return GetCollision(x, r->maxceiling, z, floor->RoomAbove(x, r->maxceiling, z).value_or(NO_ROOM)).Block->FloorHeight(x, r->maxceiling, z);
+				return GetCollision(floor, x, y, z).Block->FloorHeight(x, y, z);
 				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
 			}
 
-			floor = GetSector(r, x - r->x, z - r->z);
+			floor = GetSector(room, x - room->x, z - room->z);
 
 			if (floor->RoomAbove(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
@@ -1378,16 +1382,15 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 	{
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
-			auto room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			auto* room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
+			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room2))
 			{
-				return GetCollision(x, room2->minfloor, z, floor->RoomBelow(x, room2->minfloor, z).value_or(NO_ROOM)).Block->CeilingHeight(x, room2->minfloor, z);
-				//return r->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
+				return GetCollision(floor, x, y, z).Block->CeilingHeight(x, y, z);
+				//return room2->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
 			}
-
-			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;

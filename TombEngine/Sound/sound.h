@@ -115,6 +115,8 @@ void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
 void StopAllSounds();
+void PauseAllSounds();
+void ResumeAllSounds();
 
 void PlaySoundTrack(std::string trackName, SOUNDTRACK_PLAYTYPE mode, QWORD position = 0);
 void PlaySoundTrack(std::string trackName, short mask = 0);

@@ -415,6 +415,10 @@ namespace TEN::Renderer
 
 		// Debug variables
 		int m_numDrawCalls = 0;
+		int m_numRoomsDrawCalls = 0;
+		int m_numMoveablesDrawCalls = 0;
+		int m_numStaticsDrawCalls = 0;
+		int m_numSpritesDrawCalls = 0;
 		int m_numTransparentDrawCalls = 0;
 		int m_numRoomsTransparentDrawCalls = 0;
 		int m_numMoveablesTransparentDrawCalls = 0;

@@ -229,7 +229,7 @@ bool FlowHandler::DoFlow()
 	// We loop indefinitely, looking for return values of DoTitle or DoLevel
 	bool loadFromSavegame = false;
 
-	while (true)
+	while (DoTheGame)
 	{
 		// First we need to fill some legacy variables in PCTomb5.exe
 		Level* level = Levels[CurrentLevel];
@@ -298,6 +298,7 @@ bool FlowHandler::DoFlow()
 		}
 	}
 
+	g_GameScript->ResetScripts(true);
 	return true;
 }
 

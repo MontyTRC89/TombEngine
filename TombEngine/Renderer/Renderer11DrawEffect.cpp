@@ -792,6 +792,15 @@ namespace TEN::Renderer
 		
 		BindRenderTargetAsTexture(TEXTURE_DEPTH_MAP, &m_depthMap, SAMPLER_LINEAR_CLAMP);
 
+		std::sort(
+			view.spritesToDraw.begin(),
+			view.spritesToDraw.end(),
+			[](RendererSpriteToDraw& a, RendererSpriteToDraw& b)
+			{
+				return (a.Type > b.Type);
+			}
+		);
+
 		for (auto& spr : view.spritesToDraw) 
 		{
 			// Calculate matrices for sprites
@@ -873,6 +882,7 @@ namespace TEN::Renderer
 					m_context->Draw(4, 0);
 					m_numDrawCalls++;
 					m_numPolygons += 2;
+					m_numSpritesDrawCalls++;
 
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM) 
@@ -901,6 +911,7 @@ namespace TEN::Renderer
 					m_context->Draw(4, 0);
 					m_numDrawCalls++;
 					m_numPolygons += 2;
+					m_numSpritesDrawCalls++;
 
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_LOOKAT)
@@ -928,6 +939,7 @@ namespace TEN::Renderer
 					m_context->Draw(4, 0);
 					m_numDrawCalls++;
 					m_numPolygons += 2;
+					m_numSpritesDrawCalls++;
 
 				}
 				else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_3D) 
@@ -991,8 +1003,11 @@ namespace TEN::Renderer
 					m_primitiveBatch->DrawTriangle(v0, v1, v3);
 					m_primitiveBatch->DrawTriangle(v1, v2, v3);
 					m_primitiveBatch->End();
+
+					m_numSpritesDrawCalls++;
+					m_numSpritesDrawCalls++;
+					m_numDrawCalls++;
 				}
-				m_numDrawCalls++;
 			}
 		}
 
