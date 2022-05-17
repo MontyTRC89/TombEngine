@@ -4,6 +4,7 @@ In the year 2000, Core Design gave us a great gift: level editor where people ca
 - TREP (Tomb Raider Engine Patcher) is a tool that allows you to modify the exe to expand certain limits and implement new features.
 - TRNG (Tomb Raider Next Generation) builds upon TREP and gives a lot of new features including its own scripting language and even more extended limits and its own DLL.
 Unfortunately, TRNG is closed-source, and essentially an abandonware program. No one can fix well-known bugs in TRNG, and implement new features, although you can still implement some features with plugin (with C++ knowledge) however it is not user-friendly (you need to know C++ which is quite complex) and it is poorly documented.
+
 TEN (TombEngine) is supposed to be a new engine which is (most importantly) open-source, removes limits, and fixes bugs from the original game,
 it also provides support for Lua (a programming language), all objects from TR1-5, and many more exciting features and gameplay functionalities such as corner shimmying or an enlarged 2D map which lets you build a massive level (Imagine 5 split levels into 1 big level).
 TEN (TombEngine) is based on TR5 engine which has been gradually built upon that.
@@ -12,6 +13,7 @@ TEN (TombEngine) is based on TR5 engine which has been gradually built upon that
 In order to compile TombEngine, make sure you have:
 - Microsoft Visual Studio 
 - TombEditor (if you would like to create and test levels)
+
 Steps:
 1) Clone the repo to your Github Desktop
 2) Launch TombEngine.sln and compile
