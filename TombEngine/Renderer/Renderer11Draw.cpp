@@ -164,6 +164,8 @@ namespace TEN::Renderer
 				);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				m_numMoveablesDrawCalls++;
 			}
 		}
 	}
@@ -251,6 +253,8 @@ namespace TEN::Renderer
 
 				// Draw vertices
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				m_numMoveablesDrawCalls++;
 			}
 		}
 
@@ -269,6 +273,8 @@ namespace TEN::Renderer
 
 					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
 				}
 			}
 		}
@@ -284,6 +290,8 @@ namespace TEN::Renderer
 
 				// Draw vertices
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				m_numMoveablesDrawCalls++;
 			}
 		}
 
@@ -318,6 +326,8 @@ namespace TEN::Renderer
 
 				// Draw vertices
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+				m_numMoveablesDrawCalls++;
 			}
 		}
 	}
@@ -400,6 +410,8 @@ namespace TEN::Renderer
 
 					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
 				}
 			}
 		}
@@ -1505,6 +1517,8 @@ namespace TEN::Renderer
 							continue;
 
 						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+
+						m_numMoveablesDrawCalls++;
 					}
 				}
 			}
@@ -1554,6 +1568,8 @@ namespace TEN::Renderer
 						m_cbItem.updateData(m_stItem, m_context.Get());
 
 						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+
+						m_numMoveablesDrawCalls++;
 					}
 				}
 			}
@@ -1604,6 +1620,8 @@ namespace TEN::Renderer
 							continue;
 
 						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+
+						m_numMoveablesDrawCalls++;
 					}
 				}
 			}
@@ -1654,6 +1672,8 @@ namespace TEN::Renderer
 							continue;
 
 						DrawIndexedTriangles(bucket->Indices.size(), bucket->StartIndex, 0);
+
+						m_numMoveablesDrawCalls++;
 					}
 				}
 			}
@@ -2027,6 +2047,10 @@ namespace TEN::Renderer
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
 				PrintDebugMessage("Total draw calls: %d", m_numDrawCalls);
+				PrintDebugMessage("    For rooms: %d", m_numRoomsDrawCalls);
+				PrintDebugMessage("    For movables: %d", m_numMoveablesDrawCalls);
+				PrintDebugMessage("    For statics: %d", m_numStaticsDrawCalls);
+				PrintDebugMessage("    For sprites: %d", m_numSpritesDrawCalls);
 				PrintDebugMessage("Total triangles: %d", m_numPolygons);
 				PrintDebugMessage("Transparent faces draw calls: %d", m_numTransparentDrawCalls);
 				PrintDebugMessage("    For rooms: %d", m_numRoomsTransparentDrawCalls);
@@ -2568,6 +2592,10 @@ namespace TEN::Renderer
 		m_timeDraw = 0;
 		m_timeFrame = 0;
 		m_numDrawCalls = 0;
+		m_numRoomsDrawCalls = 0;
+		m_numMoveablesDrawCalls = 0;
+		m_numStaticsDrawCalls = 0;
+		m_numSpritesDrawCalls = 0;
 		m_numTransparentDrawCalls = 0;
 		m_nextSprite = 0;
 		m_numRoomsTransparentDrawCalls = 0;
@@ -3110,6 +3138,8 @@ namespace TEN::Renderer
 								            &std::get<1>(m_staticsTextures[bucket.Texture]), SAMPLER_NONE);
 
 								DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+								m_numStaticsDrawCalls++;
 							}
 						}
 					}
@@ -3288,6 +3318,8 @@ namespace TEN::Renderer
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+							m_numRoomsDrawCalls++;
 						}
 					}
 				}
@@ -3435,6 +3467,8 @@ namespace TEN::Renderer
 
 					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
 				}
 			}
 		}
@@ -3518,6 +3552,8 @@ namespace TEN::Renderer
 					}
 
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
 				}
 			}
 		}

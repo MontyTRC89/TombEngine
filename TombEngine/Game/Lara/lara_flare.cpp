@@ -296,12 +296,10 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
 
-		auto pos = Vector3Int (-16, 32, 42);
+		auto pos = Vector3Int(-16, 32, 42);
 		GetLaraJointPosition(&pos, LM_LHAND);
 
-		flareItem->Pose.Position.x = pos.x;
-		flareItem->Pose.Position.y = pos.y;
-		flareItem->Pose.Position.z = pos.z;
+		flareItem->Pose.Position = pos;
 
 		int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem->RoomNumber).Position.Floor;
 		auto collided = GetCollidedObjects(flareItem, 0, true, CollidedItems, CollidedMeshes, true);

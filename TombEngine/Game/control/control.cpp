@@ -217,7 +217,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) && (!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE || LaraItem->Animation.TargetState != LS_CROUCH_IDLE)))
+				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
+					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE || LaraItem->Animation.TargetState != LS_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
@@ -528,7 +529,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		int frames = 0;
 		auto status = InventoryResult::None;
 
-		while (status == InventoryResult::None)
+		while (status == InventoryResult::None && DoTheGame)
 		{
 			g_Renderer.RenderTitle();
 
@@ -671,7 +672,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 
 	// The game loop, finally!
-	while (true)
+	while (DoTheGame)
 	{
 		result = ControlPhase(nFrames, 0);
 		nFrames = DrawPhase();
@@ -692,6 +693,9 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			return result;
 		}
 	}
+
+	g_GameScript->ResetScripts(true);
+	return GameStatus::ExitGame;
 }
 
 void UpdateShatters()

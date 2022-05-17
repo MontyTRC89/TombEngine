@@ -32,7 +32,7 @@ const std::string TRACKS_PATH = "Audio\\";
 
 std::map<std::string, int> SoundTrackMap;
 std::unordered_map<int, SoundTrackInfo> SoundTracks;
-int SecretSoundIndex;
+int SecretSoundIndex = 5;
 
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
@@ -291,6 +291,16 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMul
 	return 1;
 }
 
+void PauseAllSounds()
+{
+	BASS_Pause();
+}
+
+void ResumeAllSounds()
+{
+	BASS_Start();
+}
+
 void StopSoundEffect(short effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
@@ -462,7 +472,7 @@ void PlaySoundTrack(std::string track, short mask)
 
 void PlaySoundTrack(int index, short mask)
 {
-	if (SoundTracks.size() <= index)
+	if (SoundTracks.find(index) == SoundTracks.end())
 	{
 		static int lastAttemptedIndex = -1;
 		if (lastAttemptedIndex != index)

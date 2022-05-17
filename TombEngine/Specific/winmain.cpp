@@ -183,8 +183,11 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
 			//DB_Log(6, "WM_ACTIVE");
-			if (!Debug)
+			if (!Debug && ThreadHandle > 0)
+			{
 				ResumeThread((HANDLE)ThreadHandle);
+				ResumeAllSounds();
+			}
 
 			return 0;
 		}
@@ -194,7 +197,10 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		//DB_Log(6, "WM_INACTIVE");
 		//DB_Log(5, "HangGameThread");
 		if (!Debug)
+		{
 			SuspendThread((HANDLE)ThreadHandle);
+			PauseAllSounds();
+		}
 	}
 
 	return 0;
@@ -346,6 +352,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	ThreadEnded = false;
 	ThreadHandle = BeginThread(GameMain, ThreadID);
+
+	// The game window likes to steal input anyway, so let's put it at the
+	// foreground so the user at least expects it.
+	if (GetForegroundWindow() != WindowsHandle)
+		SetForegroundWindow(WindowsHandle);
+
 	WinProcMsg();
 	ThreadEnded = true;
 
@@ -357,6 +369,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
+
 	DestroyAcceleratorTable(hAccTable);
 
 	if (g_Configuration.EnableSound)

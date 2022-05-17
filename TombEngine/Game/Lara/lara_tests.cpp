@@ -462,9 +462,11 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 
 		// Store next position
 		item->Pose = cornerResult.RealPositionResult;
-		lara->NextCornerPos.Position.x = item->Pose.Position.x;
-		lara->NextCornerPos.Position.y = GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius * 2, -(abs(bounds->Y1) + LARA_HEADROOM)).Position.Floor + abs(bounds->Y1);
-		lara->NextCornerPos.Position.z = item->Pose.Position.z;
+		lara->NextCornerPos.Position = Vector3Int(
+			item->Pose.Position.x,
+			GetCollision(item, item->Pose.Orientation.y, coll->Setup.Radius + 16, -(coll->Setup.Height + CLICK(0.5f))).Position.Floor + abs(bounds->Y1),
+			item->Pose.Position.z
+		);
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y;
 		lara->Control.MoveAngle = item->Pose.Orientation.y;
 
@@ -909,8 +911,10 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 }
 #endif
 
-bool IsStandingWeapon(LaraWeaponType weaponType)
+bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (weaponType == LaraWeaponType::Shotgun ||
 		weaponType == LaraWeaponType::HK ||
 		weaponType == LaraWeaponType::Crossbow ||
@@ -918,7 +922,8 @@ bool IsStandingWeapon(LaraWeaponType weaponType)
 		weaponType == LaraWeaponType::GrenadeLauncher ||
 		weaponType == LaraWeaponType::HarpoonGun ||
 		weaponType == LaraWeaponType::RocketLauncher||
-		weaponType == LaraWeaponType::Snowmobile)
+		weaponType == LaraWeaponType::Snowmobile ||
+		lara->Weapons[(int)weaponType].HasLasersight)
 	{
 		return true;
 	}
@@ -1034,7 +1039,7 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)
 {
 	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item);
+	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		return false;
@@ -1436,7 +1441,7 @@ bool TestLaraCrouch(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if ((lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(lara->Control.Weapon.GunType)) &&
+	if ((lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(item, lara->Control.Weapon.GunType)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		return true;
