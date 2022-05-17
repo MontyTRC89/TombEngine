@@ -703,7 +703,7 @@ void FireGrenade(ItemInfo* laraItem)
 		item->Animation.ActiveState = item->Pose.Orientation.x;
 		item->Animation.TargetState = item->Pose.Orientation.y;
 		item->Animation.RequiredState = 0;
-		item->HitPoints = 120;	
+		item->HitPoints = GRENADE_TIME;
 		item->ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
 
 		AddActiveItem(itemNumber);
@@ -932,7 +932,7 @@ void GrenadeControl(short itemNumber)
 
 		if (item->HitPoints)
 		{
-			if (item->HitPoints > 118)
+			if (item->HitPoints > EXPLOSION_TRIGGER_TIME)
 				return;
 		}
 		else
@@ -1148,6 +1148,7 @@ void FireRocket(ItemInfo* laraItem)
 		item->Pose.Orientation.x = laraItem->Pose.Orientation.x + lara->LeftArm.Orientation.x;
 		item->Pose.Orientation.y = laraItem->Pose.Orientation.y + lara->LeftArm.Orientation.y;
 		item->Pose.Orientation.z = 0;
+		item->HitPoints = ROCKET_TIME;
 
 		if (!lara->LeftArm.Locked)
 		{
@@ -1258,13 +1259,20 @@ void RocketControl(short itemNumber)
 	int radius = (explode ? ROCKET_EXPLODE_RADIUS : ROCKET_HIT_RADIUS);
 	bool foundCollidedObjects = false;
 
+	if (item->HitPoints)
+	{
+		item->HitPoints--;
+		if (item->HitPoints > EXPLOSION_TRIGGER_TIME)
+			return;
+	}
+
 	for (int n = 0; n < 2; n++)
 	{
 		// Step 0: check for specific collision in a small radius
 		// Step 1: done only if explosion, try to smash all objects in the blast radius
 
 		// Found possible collided items and statics
-		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], true);
+		GetCollidedObjects(item, radius, true, &CollidedItems[0], &CollidedMeshes[0], false);
 
 		// If no collided items and meshes are found, then exit the loop
 		if (!CollidedItems[0] && !CollidedMeshes[0])
