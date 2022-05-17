@@ -24,7 +24,7 @@ Visual Studio might also complain about the NuGet packages, to fix that:
 3) Right-click on solution explorer and restore Nuget Packages
 4) Compile again and once that is done, you should now be able to go to TombEditor, make a simple level, compile and run it with TombEngine.
 
-#Disclaimer
+# Disclaimer
 I don't work for/have ever worked for Core Design, Eidos Interactive or Square Enix. This is a hobby project. I don't want this code to be sold since Tomb Raider is a registered trademark of Square Enix. The code is currently open source to allow more people to improve the engine and for study purposes. I'm not responsible for illegal use of this source code. This source code is released as-is and it's maintained by me and by other (not paid) contributors in our free time.
 
 # Credit List
