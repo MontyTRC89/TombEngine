@@ -1175,7 +1175,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType)
 {
-	switch(weaponType)
+	switch (weaponType)
 	{
 		case LaraWeaponType::Pistol:
 			return HolsterSlot::Pistols;
