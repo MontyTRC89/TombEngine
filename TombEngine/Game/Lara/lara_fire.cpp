@@ -423,7 +423,10 @@ void LaraGun(ItemInfo* laraItem)
 
 		if (TrInput & IN_DRAW || lara->Control.Weapon.RequestGunType != lara->Control.Weapon.GunType)
 		{
-			if (lara->Control.IsLow && lara->Control.Weapon.RequestGunType >= LaraWeaponType::Shotgun && lara->Control.Weapon.RequestGunType != LaraWeaponType::Flare)
+			if (lara->Control.IsLow && 
+				lara->Control.Weapon.RequestGunType >= LaraWeaponType::Shotgun && 
+				lara->Control.Weapon.RequestGunType != LaraWeaponType::Flare && 
+				lara->Control.Weapon.RequestGunType != LaraWeaponType::Torch)
 			{
 				if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 					lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
