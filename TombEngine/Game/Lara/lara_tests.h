@@ -45,7 +45,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
-bool IsStandingWeapon(LaraWeaponType weaponType);
+bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(LaraState state);
 bool IsJumpState(LaraState state);
 bool IsRunJumpQueueableState(LaraState state);
