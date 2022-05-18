@@ -723,7 +723,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 		dx -= cosY * rx + sinY * rz;
 		dz -= cosY * rz - sinY * rx;
 
-		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / 16384;
+		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / ANGLE(90.0f);
 
 		if (!lara->HitFrame && !lara->SpasmEffectCount)
 		{
@@ -764,7 +764,8 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 		item2->Pose.Position.z = coll->Setup.OldPosition.z;
 	}
 
-	if (lara != nullptr && lara->Control.Count.PositionAdjust > 15)
+	// If Lara is in the process of aligning to an object, cancel it.
+	if (lara != nullptr && lara->Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
 	{
 		Lara.Control.IsMoving = false;
 		Lara.Control.HandStatus = HandStatus::Free;
@@ -834,7 +835,8 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 		item->Pose.Position.z = coll->Setup.OldPosition.z;
 	}
 
-	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > 15)
+	// If Lara is in the process of aligning to an object, cancel it.
+	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
 	{
 		Lara.Control.IsMoving = false;
 		Lara.Control.HandStatus = HandStatus::Free;
