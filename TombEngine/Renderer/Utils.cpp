@@ -39,7 +39,7 @@ namespace TEN::Renderer::Utils
 	{
 		if (FAILED(res))
 		{
-			std::string message = (std::wstring_convert<std::codecvt_utf8<wchar_t>,wchar_t>{}.to_bytes(info)) + std::system_category().message(res);
+			std::string message = (std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>{}.to_bytes(info)) + std::system_category().message(res);
 			TENLog(message, LogLevel::Error);
 			throw std::runtime_error("An error occured!");
 		}
