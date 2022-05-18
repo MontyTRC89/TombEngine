@@ -5357,7 +5357,6 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
-  std::unique_ptr<TEN::Save::WeaponInfoT> active_weapon{};
   std::vector<std::unique_ptr<TEN::Save::ItemT>> items{};
   int32_t next_item_free = 0;
   int32_t next_item_active = 0;
@@ -5395,33 +5394,32 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_GAME = 6,
     VT_LEVEL = 8,
     VT_LARA = 10,
-    VT_ACTIVE_WEAPON = 12,
-    VT_ITEMS = 14,
-    VT_NEXT_ITEM_FREE = 16,
-    VT_NEXT_ITEM_ACTIVE = 18,
-    VT_ROOM_ITEMS = 20,
-    VT_FIXED_CAMERAS = 22,
-    VT_SINKS = 24,
-    VT_STATIC_MESHES = 26,
-    VT_FLYBY_CAMERAS = 28,
-    VT_RATS = 30,
-    VT_SPIDERS = 32,
-    VT_SCARABS = 34,
-    VT_BATS = 36,
-    VT_FLIP_MAPS = 38,
-    VT_FLIP_STATS = 40,
-    VT_FLIP_EFFECT = 42,
-    VT_FLIP_TIMER = 44,
-    VT_FLIP_STATUS = 46,
-    VT_AMBIENT_TRACK = 48,
-    VT_AMBIENT_POSITION = 50,
-    VT_ONESHOT_TRACK = 52,
-    VT_ONESHOT_POSITION = 54,
-    VT_CD_FLAGS = 56,
-    VT_ROPE = 58,
-    VT_PENDULUM = 60,
-    VT_ALTERNATE_PENDULUM = 62,
-    VT_SCRIPT_VARS = 64
+    VT_ITEMS = 12,
+    VT_NEXT_ITEM_FREE = 14,
+    VT_NEXT_ITEM_ACTIVE = 16,
+    VT_ROOM_ITEMS = 18,
+    VT_FIXED_CAMERAS = 20,
+    VT_SINKS = 22,
+    VT_STATIC_MESHES = 24,
+    VT_FLYBY_CAMERAS = 26,
+    VT_RATS = 28,
+    VT_SPIDERS = 30,
+    VT_SCARABS = 32,
+    VT_BATS = 34,
+    VT_FLIP_MAPS = 36,
+    VT_FLIP_STATS = 38,
+    VT_FLIP_EFFECT = 40,
+    VT_FLIP_TIMER = 42,
+    VT_FLIP_STATUS = 44,
+    VT_AMBIENT_TRACK = 46,
+    VT_AMBIENT_POSITION = 48,
+    VT_ONESHOT_TRACK = 50,
+    VT_ONESHOT_POSITION = 52,
+    VT_CD_FLAGS = 54,
+    VT_ROPE = 56,
+    VT_PENDULUM = 58,
+    VT_ALTERNATE_PENDULUM = 60,
+    VT_SCRIPT_VARS = 62
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -5434,9 +5432,6 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Lara *lara() const {
     return GetPointer<const TEN::Save::Lara *>(VT_LARA);
-  }
-  const TEN::Save::WeaponInfo *active_weapon() const {
-    return GetPointer<const TEN::Save::WeaponInfo *>(VT_ACTIVE_WEAPON);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>> *items() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>> *>(VT_ITEMS);
@@ -5526,8 +5521,6 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(level()) &&
            VerifyOffset(verifier, VT_LARA) &&
            verifier.VerifyTable(lara()) &&
-           VerifyOffset(verifier, VT_ACTIVE_WEAPON) &&
-           verifier.VerifyTable(active_weapon()) &&
            VerifyOffset(verifier, VT_ITEMS) &&
            verifier.VerifyVector(items()) &&
            verifier.VerifyVectorOfTables(items()) &&
@@ -5604,9 +5597,6 @@ struct SaveGameBuilder {
   }
   void add_lara(flatbuffers::Offset<TEN::Save::Lara> lara) {
     fbb_.AddOffset(SaveGame::VT_LARA, lara);
-  }
-  void add_active_weapon(flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon) {
-    fbb_.AddOffset(SaveGame::VT_ACTIVE_WEAPON, active_weapon);
   }
   void add_items(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items) {
     fbb_.AddOffset(SaveGame::VT_ITEMS, items);
@@ -5703,7 +5693,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
-    flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items = 0,
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
@@ -5757,7 +5746,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_next_item_active(next_item_active);
   builder_.add_next_item_free(next_item_free);
   builder_.add_items(items);
-  builder_.add_active_weapon(active_weapon);
   builder_.add_lara(lara);
   builder_.add_level(level);
   builder_.add_game(game);
@@ -5776,7 +5764,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
-    flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Item>> *items = nullptr,
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
@@ -5824,7 +5811,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       game,
       level,
       lara,
-      active_weapon,
       items__,
       next_item_free,
       next_item_active,
@@ -7427,7 +7413,6 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
-  { auto _e = active_weapon(); if (_e) _o->active_weapon = std::unique_ptr<TEN::Save::WeaponInfoT>(_e->UnPack(_resolver)); }
   { auto _e = items(); if (_e) { _o->items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->items[_i] = std::unique_ptr<TEN::Save::ItemT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = next_item_free(); _o->next_item_free = _e; }
   { auto _e = next_item_active(); _o->next_item_active = _e; }
@@ -7468,7 +7453,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
   auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
-  auto _active_weapon = _o->active_weapon ? CreateWeaponInfo(_fbb, _o->active_weapon.get(), _rehasher) : 0;
   auto _items = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>> (_o->items.size(), [](size_t i, _VectorArgs *__va) { return CreateItem(*__va->__fbb, __va->__o->items[i].get(), __va->__rehasher); }, &_va );
   auto _next_item_free = _o->next_item_free;
   auto _next_item_active = _o->next_item_active;
@@ -7501,7 +7485,6 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _game,
       _level,
       _lara,
-      _active_weapon,
       _items,
       _next_item_free,
       _next_item_active,

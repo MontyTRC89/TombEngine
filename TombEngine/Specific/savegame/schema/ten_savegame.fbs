@@ -381,7 +381,6 @@ table SaveGame {
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
 	lara: Lara;
-	active_weapon: WeaponInfo;
 	items: [Item];
 	next_item_free: int32;
 	next_item_active: int32;
