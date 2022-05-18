@@ -428,6 +428,10 @@ short CreateItem()
 	itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	g_Level.Items[NextItemFree].LuaName = "";
+	g_Level.Items[NextItemFree].luaCallbackOnCollidedWithObjectName = "";
+	g_Level.Items[NextItemFree].luaCallbackOnCollidedWithRoomName = "";
+	g_Level.Items[NextItemFree].luaCallbackOnHitName = "";
+	g_Level.Items[NextItemFree].luaCallbackOnKilledName = "";
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
 
 	return itemNumber;
