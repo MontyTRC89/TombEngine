@@ -1846,7 +1846,7 @@ void GuiController::ConstructCombineObjectList()
 void GuiController::InitializeInventory()
 {
 	compassNeedleAngle = 4096;
-	AlterFOV(14560);
+	AlterFOV(ANGLE(80.0f));
 	Lara.Inventory.IsBusy = 0;
 	inventoryItemChosen = NO_ITEM;
 	ClearInputVariables(0);
@@ -2083,7 +2083,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_SMALL_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= LARA_HEALTH_MAX) && !Lara.PoisonPotency)
 			{
 				SayNo();
 				return;
@@ -2095,10 +2095,10 @@ void GuiController::UseCurrentItem()
 					Lara.Inventory.TotalSmallMedipacks--;
 
 				Lara.PoisonPotency = 0;
-				LaraItem->HitPoints += 500;
+				LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
 
-				if (LaraItem->HitPoints > 1000)
-					LaraItem->HitPoints = 1000;
+				if (LaraItem->HitPoints > LARA_HEALTH_MAX)
+					LaraItem->HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;
@@ -2110,7 +2110,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_LARGE_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= LARA_HEALTH_MAX) && !Lara.PoisonPotency)
 			{
 				SayNo();
 				return;
@@ -2122,7 +2122,7 @@ void GuiController::UseCurrentItem()
 					Lara.Inventory.TotalLargeMedipacks--;
 
 				Lara.PoisonPotency = 0;
-				LaraItem->HitPoints = 1000;
+				LaraItem->HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;
