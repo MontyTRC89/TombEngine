@@ -27,6 +27,8 @@ table Item {
     after_death: int32;
     item_flags: [int32];
 	position: Position;
+	next_item: int32;
+	next_item_active: int32;
 	triggered: bool;
 	active: bool;
 	status: int32;
@@ -381,6 +383,9 @@ table SaveGame {
 	lara: Lara;
 	active_weapon: WeaponInfo;
 	items: [Item];
+	next_item_free: int32;
+	next_item_active: int32;
+	room_items: [int32];
 	fixed_cameras: [FixedCamera];
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];
