@@ -375,6 +375,10 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
   std::string lua_name{};
+  std::string lua_on_killed_name{};
+  std::string lua_on_hit_name{};
+  std::string lua_on_collided_with_object_name{};
+  std::string lua_on_collided_with_room_name{};
 };
 
 struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -416,7 +420,11 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_SWAP_MESH_FLAGS = 66,
     VT_DATA_TYPE = 68,
     VT_DATA = 70,
-    VT_LUA_NAME = 72
+    VT_LUA_NAME = 72,
+    VT_LUA_ON_KILLED_NAME = 74,
+    VT_LUA_ON_HIT_NAME = 76,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 78,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 80
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -590,6 +598,18 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *lua_name() const {
     return GetPointer<const flatbuffers::String *>(VT_LUA_NAME);
   }
+  const flatbuffers::String *lua_on_killed_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_KILLED_NAME);
+  }
+  const flatbuffers::String *lua_on_hit_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_HIT_NAME);
+  }
+  const flatbuffers::String *lua_on_collided_with_object_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME);
+  }
+  const flatbuffers::String *lua_on_collided_with_room_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_COLLIDED_WITH_ROOM_NAME);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_FLOOR) &&
@@ -630,6 +650,14 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyItemData(verifier, data(), data_type()) &&
            VerifyOffset(verifier, VT_LUA_NAME) &&
            verifier.VerifyString(lua_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_KILLED_NAME) &&
+           verifier.VerifyString(lua_on_killed_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_HIT_NAME) &&
+           verifier.VerifyString(lua_on_hit_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME) &&
+           verifier.VerifyString(lua_on_collided_with_object_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_COLLIDED_WITH_ROOM_NAME) &&
+           verifier.VerifyString(lua_on_collided_with_room_name()) &&
            verifier.EndTable();
   }
   ItemT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -834,6 +862,18 @@ struct ItemBuilder {
   void add_lua_name(flatbuffers::Offset<flatbuffers::String> lua_name) {
     fbb_.AddOffset(Item::VT_LUA_NAME, lua_name);
   }
+  void add_lua_on_killed_name(flatbuffers::Offset<flatbuffers::String> lua_on_killed_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_KILLED_NAME, lua_on_killed_name);
+  }
+  void add_lua_on_hit_name(flatbuffers::Offset<flatbuffers::String> lua_on_hit_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_HIT_NAME, lua_on_hit_name);
+  }
+  void add_lua_on_collided_with_object_name(flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_object_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME, lua_on_collided_with_object_name);
+  }
+  void add_lua_on_collided_with_room_name(flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_room_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_COLLIDED_WITH_ROOM_NAME, lua_on_collided_with_room_name);
+  }
   explicit ItemBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -881,8 +921,16 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
-    flatbuffers::Offset<flatbuffers::String> lua_name = 0) {
+    flatbuffers::Offset<flatbuffers::String> lua_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_killed_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_hit_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_object_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_room_name = 0) {
   ItemBuilder builder_(_fbb);
+  builder_.add_lua_on_collided_with_room_name(lua_on_collided_with_room_name);
+  builder_.add_lua_on_collided_with_object_name(lua_on_collided_with_object_name);
+  builder_.add_lua_on_hit_name(lua_on_hit_name);
+  builder_.add_lua_on_killed_name(lua_on_killed_name);
   builder_.add_lua_name(lua_name);
   builder_.add_data(data);
   builder_.add_swap_mesh_flags(swap_mesh_flags);
@@ -962,9 +1010,17 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
-    const char *lua_name = nullptr) {
+    const char *lua_name = nullptr,
+    const char *lua_on_killed_name = nullptr,
+    const char *lua_on_hit_name = nullptr,
+    const char *lua_on_collided_with_object_name = nullptr,
+    const char *lua_on_collided_with_room_name = nullptr) {
   auto item_flags__ = item_flags ? _fbb.CreateVector<int32_t>(*item_flags) : 0;
   auto lua_name__ = lua_name ? _fbb.CreateString(lua_name) : 0;
+  auto lua_on_killed_name__ = lua_on_killed_name ? _fbb.CreateString(lua_on_killed_name) : 0;
+  auto lua_on_hit_name__ = lua_on_hit_name ? _fbb.CreateString(lua_on_hit_name) : 0;
+  auto lua_on_collided_with_object_name__ = lua_on_collided_with_object_name ? _fbb.CreateString(lua_on_collided_with_object_name) : 0;
+  auto lua_on_collided_with_room_name__ = lua_on_collided_with_room_name ? _fbb.CreateString(lua_on_collided_with_room_name) : 0;
   return TEN::Save::CreateItem(
       _fbb,
       floor,
@@ -1001,7 +1057,11 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       swap_mesh_flags,
       data_type,
       data,
-      lua_name__);
+      lua_name__,
+      lua_on_killed_name__,
+      lua_on_hit_name__,
+      lua_on_collided_with_object_name__,
+      lua_on_collided_with_room_name__);
 }
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -5885,6 +5945,10 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = data_type(); _o->data.type = _e; }
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
   { auto _e = lua_name(); if (_e) _o->lua_name = _e->str(); }
+  { auto _e = lua_on_killed_name(); if (_e) _o->lua_on_killed_name = _e->str(); }
+  { auto _e = lua_on_hit_name(); if (_e) _o->lua_on_hit_name = _e->str(); }
+  { auto _e = lua_on_collided_with_object_name(); if (_e) _o->lua_on_collided_with_object_name = _e->str(); }
+  { auto _e = lua_on_collided_with_room_name(); if (_e) _o->lua_on_collided_with_room_name = _e->str(); }
 }
 
 inline flatbuffers::Offset<Item> Item::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ItemT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5930,6 +5994,10 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _data_type = _o->data.type;
   auto _data = _o->data.Pack(_fbb);
   auto _lua_name = _o->lua_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_name);
+  auto _lua_on_killed_name = _o->lua_on_killed_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_killed_name);
+  auto _lua_on_hit_name = _o->lua_on_hit_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_hit_name);
+  auto _lua_on_collided_with_object_name = _o->lua_on_collided_with_object_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_collided_with_object_name);
+  auto _lua_on_collided_with_room_name = _o->lua_on_collided_with_room_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_collided_with_room_name);
   return TEN::Save::CreateItem(
       _fbb,
       _floor,
@@ -5966,7 +6034,11 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _swap_mesh_flags,
       _data_type,
       _data,
-      _lua_name);
+      _lua_name,
+      _lua_on_killed_name,
+      _lua_on_hit_name,
+      _lua_on_collided_with_object_name,
+      _lua_on_collided_with_room_name);
 }
 
 inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

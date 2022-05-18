@@ -40,6 +40,10 @@ table Item {
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
 	lua_name: string;
+	lua_on_killed_name: string;
+	lua_on_hit_name: string;
+	lua_on_collided_with_object_name: string;
+	lua_on_collided_with_room_name: string;
 }
 
 table AmmoInfo {
