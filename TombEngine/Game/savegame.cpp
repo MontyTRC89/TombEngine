@@ -464,6 +464,8 @@ bool SaveGame::Save(int slot)
 
 		Save::ItemBuilder serializedItem{ fbb };
 
+		serializedItem.add_next_item(itemToSerialize.NextItem);
+		serializedItem.add_next_item_active(itemToSerialize.NextActive);
 		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
@@ -514,7 +516,7 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data(data);
 		}
 
-		if (currentItemIndex >= g_Level.NumItems)
+		if (currentItemIndex >= g_Level.NumItems && !itemToSerialize.LuaName.empty())
 		{
 			serializedItem.add_lua_name(luaNameOffset);
 		}
@@ -548,6 +550,11 @@ bool SaveGame::Save(int slot)
 	for (int i = 0; i < MAX_FLIPMAP; i++)
 		flipStats.push_back(FlipStats[i]);
 	auto flipStatsOffset = fbb.CreateVector(flipStats);
+
+	std::vector<int> roomItems;
+	for (auto const& r : g_Level.Rooms)
+		roomItems.push_back(r.itemNumber);
+	auto roomItemsOffset = fbb.CreateVector(roomItems);
 
 	// Cameras
 	std::vector<flatbuffers::Offset<Save::FixedCamera>> cameras;
@@ -857,6 +864,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
+	sgb.add_next_item_free(NextItemFree);
+	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
 	sgb.add_ambient_track(bgmTrackOffset);
 	sgb.add_ambient_position(bgmTrackData.second);
@@ -865,6 +874,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
+	sgb.add_room_items(roomItemsOffset);
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_flip_timer(0);
@@ -990,6 +1000,14 @@ bool SaveGame::Load(int slot)
 	// Items
 	InitialiseItemArray(NUM_ITEMS);
 
+	NextItemFree = s->next_item_free();
+	NextItemActive = s->next_item_active();
+
+	for(int i = 0; i < s->room_items()->size(); ++i)
+	{
+		g_Level.Rooms[i].itemNumber = s->room_items()->Get(i);
+	}
+
 	for (int i = 0; i < s->items()->size(); i++)
 	{
 		const Save::Item* savedItem = s->items()->Get(i);
@@ -998,20 +1016,13 @@ bool SaveGame::Load(int slot)
 		bool dynamicItem = false;
 
 		if (i >= g_Level.NumItems)
-		{
-			// Items beyond items level space must be active
-			if (!savedItem->active())
-				continue;
-
-			// Items beyond items level space must be initialised differently
-			itemNumber = CreateItem();
-			if (itemNumber == NO_ITEM)
-				continue;
 			dynamicItem = true;
-		}
-
+	
 		ItemInfo* item = &g_Level.Items[itemNumber];
 		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
+
+		item->NextItem = savedItem->next_item();
+		item->NextActive = savedItem->next_item_active();
 
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
 		
@@ -1024,18 +1035,6 @@ bool SaveGame::Load(int slot)
 		g_GameScriptEntities->TryAddColliding(i);
 		if (!dynamicItem)
 		{
-			// Kill immediately item if already killed and continue
-			if (savedItem->flags() & IFLAG_KILLED)
-			{
-				if (obj->floor != nullptr)
-					UpdateBridgeItem(itemNumber, true);
-
-				KillItem(i);
-				item->Status = ITEM_DEACTIVATED;
-				item->Flags |= ONESHOT;
-				continue;
-			}
-
 			// If not triggered, don't load remaining data
 			if (item->ObjectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 				continue;
@@ -1048,49 +1047,24 @@ bool SaveGame::Load(int slot)
 		item->Pose.Orientation.y = savedItem->position()->y_rot();
 		item->Pose.Orientation.z = savedItem->position()->z_rot();
 
-		short roomNumber = savedItem->room_number();
-
-		if (dynamicItem)
-		{
-			item->RoomNumber = roomNumber;
-
-			InitialiseItem(itemNumber);
-			
-			// InitialiseItem could overwrite position so restore it
-			item->Pose.Position.x = savedItem->position()->x_pos();
-			item->Pose.Position.y = savedItem->position()->y_pos();
-			item->Pose.Position.z = savedItem->position()->z_pos();
-			item->Pose.Orientation.x = savedItem->position()->x_rot();
-			item->Pose.Orientation.y = savedItem->position()->y_rot();
-			item->Pose.Orientation.z = savedItem->position()->z_rot();
-		}
+		item->RoomNumber = savedItem->room_number();
 
 		item->Animation.Velocity = savedItem->velocity();
 		item->Animation.VerticalVelocity = savedItem->vertical_velocity();
 
 		// Do the correct way for assigning new room number
-		if (item->ObjectNumber == ID_LARA)
+		if (item->ObjectNumber == ID_LARA && itemNumber == 0)
 		{
 			LaraItem->Data = nullptr;
 			Lara.ItemNumber = i;
 			LaraItem = item;
-			LaraItem->Location.roomNumber = roomNumber;
+			LaraItem->Location.roomNumber = savedItem->room_number();
 			LaraItem->Location.yNumber = item->Pose.Orientation.y;
 			LaraItem->Data = &Lara;
-
-			UpdateItemRoom(item, -LARA_HEIGHT / 2);
 		}
-		else
-		{
-			if (item->RoomNumber != roomNumber)
-				ItemNewRoom(i, roomNumber);
 
-			if (obj->shadowSize)
-			{
-				FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-				item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			}
-		}
+		item->Floor = savedItem->floor();
+		item->BoxNumber = savedItem->box_number();
 
 		// Animations
 		item->Animation.ActiveState = savedItem->active_state();
@@ -1111,10 +1085,6 @@ bool SaveGame::Load(int slot)
 
 		// Carried item
 		item->CarriedItem = savedItem->carried_item();
-
-		// Activate item if needed
-		if (savedItem->active() && !item->Active)
-			AddActiveItem(i);
 
 		item->Active = savedItem->active();
 		item->HitStatus = savedItem->hit_stauts();
