@@ -64,7 +64,7 @@ GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 int NumberCameras;
 int BinocularRange;
-int BinocularOn;
+bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
 int PhdPerspective;
@@ -140,11 +140,8 @@ void MoveCamera(GameVector* ideal, int speed)
 {
 	GameVector from, to;
 
-	if (BinocularOn < 0)
-	{
+	if (BinocularOn)
 		speed = 1;
-		BinocularOn++;
-	}
 
 	if (OldCam.pos.Orientation.x != LaraItem->Pose.Orientation.x ||
 		OldCam.pos.Orientation.y != LaraItem->Pose.Orientation.y ||
@@ -1078,25 +1075,21 @@ void BinocularCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	static bool exitingBinoculars = false;
-
 	if (LSHKTimer)
 		--LSHKTimer;
 
 	if (!LaserSight)
 	{
-		if (InputBusy & IN_DRAW)
-			exitingBinoculars = true;
-		else if (exitingBinoculars)
+		if (InputBusy & (IN_DESELECT | IN_DRAW | IN_WALK | IN_JUMP))
 		{
-			exitingBinoculars = false;
-			BinocularRange = 0;
-			AlterFOV(ANGLE(80.0f));
 			item->MeshBits = -1;
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = Vector3Shrt();
 			lara->ExtraTorsoRot = Vector3Shrt();
 			Camera.type = BinocularOldCamera;
+			BinocularOn = false;
+			BinocularRange = 0;
+			AlterFOV(ANGLE(80.0f));
 			return;
 		}
 	}
@@ -1393,17 +1386,11 @@ void CalculateCamera()
 	CamOldPos.y = Camera.pos.y;
 	CamOldPos.z = Camera.pos.z;
 
-	if (BinocularRange != 0)
+	if (BinocularOn)
 	{
-		BinocularOn = 1;
 		BinocularCamera(LaraItem);
-
-		if (BinocularRange != 0)
-			return;
+		return;
 	}
-
-	if (BinocularOn == 1)
-		BinocularOn = -8;
 
 	if (UseForcedFixedCamera != 0)
 	{

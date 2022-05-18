@@ -2061,14 +2061,17 @@ void GuiController::UseCurrentItem()
 		switch (invobject)
 		{
 		case INV_OBJECT_BINOCULARS:
-
-			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE)
-				|| (Lara.Control.IsLow && !(TrInput & IN_CROUCH)))
-				&& !UseSpotCam
-				&& !TrackCameraInit)
+			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
+					(Lara.Control.IsLow && !(TrInput & IN_CROUCH))) &&
+				!UseSpotCam && !TrackCameraInit)
 			{
-				Lara.Inventory.OldBusy = true;
 				BinocularRange = 128;
+				BinocularOn = true;
+				Lara.Inventory.OldBusy = true;
+
+				// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
+				// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
+				//SetAnimation(LaraItem, LA_BINOCULARS_IDLE);
 
 				if (Lara.Control.HandStatus != HandStatus::Free)
 					Lara.Control.HandStatus = HandStatus::WeaponUndraw;
