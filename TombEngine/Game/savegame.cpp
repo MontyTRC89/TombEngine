@@ -1041,12 +1041,10 @@ bool SaveGame::Load(int slot)
 		item->luaCallbackOnCollidedWithRoomName = savedItem->lua_on_collided_with_room_name()->str();
 
 		g_GameScriptEntities->TryAddColliding(i);
-		if (!dynamicItem)
-		{
-			// If not triggered, don't load remaining data
-			if (item->ObjectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
-				continue;
-		}
+
+		// If not triggered, don't load remaining data
+		if (!dynamicItem && item->ObjectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
+			continue;
 
 		item->Pose.Position.x = savedItem->position()->x_pos();
 		item->Pose.Position.y = savedItem->position()->y_pos();
