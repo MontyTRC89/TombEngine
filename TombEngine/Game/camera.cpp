@@ -143,16 +143,12 @@ void MoveCamera(GameVector* ideal, int speed)
 	if (BinocularOn)
 		speed = 1;
 
-	if (OldCam.pos.Orientation.x != LaraItem->Pose.Orientation.x ||
-		OldCam.pos.Orientation.y != LaraItem->Pose.Orientation.y ||
-		OldCam.pos.Orientation.z != LaraItem->Pose.Orientation.z ||
+	if (OldCam.pos.Orientation != LaraItem->Pose.Orientation ||
 		OldCam.pos2.Orientation.x != Lara.ExtraHeadRot.x ||
 		OldCam.pos2.Orientation.y != Lara.ExtraHeadRot.y ||
 		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.x ||
 		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.y ||
-		OldCam.pos.Position.x != LaraItem->Pose.Position.x ||
-		OldCam.pos.Position.y != LaraItem->Pose.Position.y ||
-		OldCam.pos.Position.z != LaraItem->Pose.Position.z ||
+		OldCam.pos.Position != LaraItem->Pose.Position ||
 		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
 		OldCam.TargetState != LaraItem->Animation.TargetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
@@ -163,18 +159,14 @@ void MoveCamera(GameVector* ideal, int speed)
 		OldCam.target.y != Camera.target.y ||
 		OldCam.target.z != Camera.target.z ||
 		Camera.oldType != Camera.type ||
-		BinocularOn < 0)
+		!BinocularOn)
 	{
-		OldCam.pos.Orientation.x = LaraItem->Pose.Orientation.x;
-		OldCam.pos.Orientation.y = LaraItem->Pose.Orientation.y;
-		OldCam.pos.Orientation.z = LaraItem->Pose.Orientation.z;
+		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
 		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
 		OldCam.pos2.Orientation.y = Lara.ExtraHeadRot.y;
 		OldCam.pos2.Position.x = Lara.ExtraTorsoRot.x;
 		OldCam.pos2.Position.y = Lara.ExtraTorsoRot.y;
-		OldCam.pos.Position.x = LaraItem->Pose.Position.x;
-		OldCam.pos.Position.y = LaraItem->Pose.Position.y;
-		OldCam.pos.Position.z = LaraItem->Pose.Position.z;
+		OldCam.pos.Position = LaraItem->Pose.Position;
 		OldCam.ActiveState = LaraItem->Animation.ActiveState;
 		OldCam.TargetState = LaraItem->Animation.TargetState;
 		OldCam.targetDistance = Camera.targetDistance;
@@ -1075,12 +1067,14 @@ void BinocularCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// TODO: Lasersight on HK is unusable. @Sezz 2022.05.19
 	if (LSHKTimer)
 		--LSHKTimer;
 
 	if (!LaserSight)
 	{
-		if (InputBusy & (IN_DESELECT | IN_DRAW | IN_WALK | IN_JUMP))
+		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
+		if (InputBusy & (IN_DESELECT | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
 		{
 			item->MeshBits = -1;
 			lara->Inventory.IsBusy = false;
@@ -1095,7 +1089,7 @@ void BinocularCamera(ItemInfo* item)
 	}
 
 	item->MeshBits = 0;
-	AlterFOV(7 * (2080 - BinocularRange));
+	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange));
 
 	short headXRot = lara->ExtraHeadRot.x * 2;
 	short headYRot = lara->ExtraHeadRot.y;
@@ -1198,16 +1192,16 @@ void BinocularCamera(ItemInfo* item)
 	if (InputBusy & IN_SPRINT)
 	{
 		BinocularRange -= range;
-		if (BinocularRange < 128)
-			BinocularRange = 128;
+		if (BinocularRange < ANGLE(0.7f))
+			BinocularRange = ANGLE(0.7f);
 		else
 			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
 	else if (InputBusy & IN_CROUCH)
 	{
 		BinocularRange += range;
-		if (BinocularRange > 1536)
-			BinocularRange = 1536;
+		if (BinocularRange > ANGLE(8.5f))
+			BinocularRange = ANGLE(8.5f);
 		else
 			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
@@ -1600,7 +1594,7 @@ void CalculateCamera()
 		Camera.item = NULL;
 		Camera.targetElevation = 0;
 		Camera.targetAngle = 0;
-		Camera.targetDistance = 1536;
+		Camera.targetDistance = SECTOR(1.5f);
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
@@ -1617,7 +1611,7 @@ void LookLeftRight(ItemInfo* item)
 		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - 1792) / 1536;
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f);
 			else
 				lara->ExtraHeadRot.y -= ANGLE(2.0f);
 		}
@@ -1628,11 +1622,12 @@ void LookLeftRight(ItemInfo* item)
 		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.y += ANGLE(2.0f) * (1792 - BinocularRange) / 1536;
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(8.5f);
 			else
 				lara->ExtraHeadRot.y += ANGLE(2.0f);
 		}
 	}
+
 	if (lara->Control.HandStatus != HandStatus::Busy &&
 		lara->Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
@@ -1653,7 +1648,7 @@ void LookUpDown(ItemInfo* item)
 		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - 1792) / 3072;
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
 			else
 				lara->ExtraHeadRot.x -= ANGLE(2.0f);
 		}
@@ -1664,11 +1659,12 @@ void LookUpDown(ItemInfo* item)
 		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.x += ANGLE(2.0f) * (1792 - BinocularRange) / 3072;
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(17.0f);
 			else
 				lara->ExtraHeadRot.x += ANGLE(2.0f);
 		}
 	}
+
 	if (lara->Control.HandStatus != HandStatus::Busy &&
 		lara->Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
@@ -1704,9 +1700,7 @@ void ResetLook(ItemInfo* item)
 			!lara->RightArm.Locked &&
 			lara->Vehicle == NO_ITEM)
 		{
-			lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
-			lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
-			lara->ExtraTorsoRot.z = lara->ExtraHeadRot.z;
+			lara->ExtraTorsoRot = lara->ExtraHeadRot;
 		}
 		else
 		{
