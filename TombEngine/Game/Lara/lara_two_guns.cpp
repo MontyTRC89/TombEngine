@@ -440,10 +440,8 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if (!(TrInput & IN_LOOK))
 	{
-		lara->ExtraHeadRot.x = (lara->LeftArm.Orientation.x + lara->RightArm.Orientation.x) / 4;
-		lara->ExtraTorsoRot.x = (lara->LeftArm.Orientation.x + lara->RightArm.Orientation.x) / 4;
-		lara->ExtraHeadRot.y = (lara->LeftArm.Orientation.y + lara->RightArm.Orientation.y) / 4;
-		lara->ExtraTorsoRot.y = (lara->LeftArm.Orientation.y + lara->RightArm.Orientation.y) / 4;
+		lara->ExtraHeadRot = (lara->LeftArm.Orientation + lara->RightArm.Orientation) / 4;
+		lara->ExtraTorsoRot = (lara->LeftArm.Orientation + lara->RightArm.Orientation) / 4;
 	}
 }
 
