@@ -1036,7 +1036,7 @@ bool SaveGame::Load(int slot)
 			g_GameScriptEntities->AddName(item->LuaName, i);
 
 		item->luaCallbackOnKilledName = savedItem->lua_on_killed_name()->str();
-		item->luaCallbackOnHitName = savedItem->lua_on_killed_name()->str();
+		item->luaCallbackOnHitName = savedItem->lua_on_hit_name()->str();
 		item->luaCallbackOnCollidedWithObjectName = savedItem->lua_on_collided_with_object_name()->str();
 		item->luaCallbackOnCollidedWithRoomName = savedItem->lua_on_collided_with_room_name()->str();
 
