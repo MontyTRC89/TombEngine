@@ -1240,8 +1240,7 @@ bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
 	int heightFromFloor = GetCollision(item).Position.Floor - item->Pose.Position.y;
 
-	if (item->Animation.Airborne &&
-		item->Animation.VerticalVelocity >= 0 &&
+	if (item->Animation.Airborne && item->Animation.VerticalVelocity >= 0 &&
 		(heightFromFloor <= item->Animation.VerticalVelocity ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{
@@ -2344,7 +2343,7 @@ bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup te
 		return false;
 
 	// Assess point/room collision.
-	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Distance) &&						// Avoid jumping through corners.
+	if (!TestLaraFacingCorner(item, testSetup.Angle, testSetup.Distance) &&					// Avoid jumping through corners.
 		(probe.Position.Floor - y) >= -STEPUP_HEIGHT &&										// Within highest floor bound.
 		((probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||	// Within lowest ceiling bound... 
 			((probe.Position.Ceiling - y) < -coll->Setup.Height &&								// OR ceiling is level with Lara's head
