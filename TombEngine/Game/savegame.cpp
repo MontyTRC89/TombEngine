@@ -1017,13 +1017,9 @@ bool SaveGame::Load(int slot)
 	{
 		const Save::Item* savedItem = s->items()->Get(i);
 
-		short itemNumber = i;
-		bool dynamicItem = false;
+		bool dynamicItem = i >= g_Level.NumItems;
 
-		if (i >= g_Level.NumItems)
-			dynamicItem = true;
-	
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[i];
 		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
 
 		item->NextItem = savedItem->next_item();
@@ -1165,7 +1161,7 @@ bool SaveGame::Load(int slot)
 			item->MeshBits = 0x00100;
 
 		if (obj->floor != nullptr)
-			UpdateBridgeItem(itemNumber);
+			UpdateBridgeItem(i);
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
