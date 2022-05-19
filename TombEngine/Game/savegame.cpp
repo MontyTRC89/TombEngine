@@ -1038,10 +1038,6 @@ bool SaveGame::Load(int slot)
 
 		g_GameScriptEntities->TryAddColliding(i);
 
-		// If not triggered, don't load remaining data
-		if (!dynamicItem && item->ObjectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
-			continue;
-
 		item->Pose.Position.x = savedItem->position()->x_pos();
 		item->Pose.Position.y = savedItem->position()->y_pos();
 		item->Pose.Position.z = savedItem->position()->z_pos();
@@ -1097,7 +1093,7 @@ bool SaveGame::Load(int slot)
 		item->LookedAt = savedItem->looked_at();
 
 		// Creature data for intelligent items
-		if (item->ObjectNumber != ID_LARA && obj->intelligent)
+		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 		{
 			EnableBaddyAI(i, true);
 
