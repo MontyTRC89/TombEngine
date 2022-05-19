@@ -50,7 +50,7 @@ extern int KeyTriggerActive;
 Vector3Int CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
 GameVector LastIdeal;
-GameVector	Ideals[5];
+GameVector Ideals[5];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
@@ -63,10 +63,12 @@ CAMERA_INFO Camera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 int NumberCameras;
+
 int BinocularRange;
 bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
+
 int PhdPerspective;
 short CurrentFOV;
 
@@ -159,7 +161,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		OldCam.target.y != Camera.target.y ||
 		OldCam.target.z != Camera.target.z ||
 		Camera.oldType != Camera.type ||
-		!BinocularOn)
+		BinocularOn)
 	{
 		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
 		OldCam.pos2.Orientation.x = Lara.ExtraHeadRot.x;
@@ -1067,7 +1069,6 @@ void BinocularCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	// TODO: Lasersight on HK is unusable. @Sezz 2022.05.19
 	if (LSHKTimer)
 		--LSHKTimer;
 
@@ -1478,7 +1479,7 @@ void CalculateCamera()
 
 		Camera.target.roomNumber = item->RoomNumber;
 
-		if (Camera.fixedCamera || BinocularOn < 0)
+		if (Camera.fixedCamera || BinocularOn)
 		{
 			Camera.target.y = y;
 			Camera.speed = 1;
@@ -1543,7 +1544,7 @@ void CalculateCamera()
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
 				Camera.oldType != CameraType::Look &&
-				BinocularOn >= 0)
+				!BinocularOn)
 			{
 				if (TargetSnaps <= 8)
 				{
