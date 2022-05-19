@@ -967,8 +967,10 @@ bool SaveGame::Load(int slot)
 	{
 		auto staticMesh = s->static_meshes()->Get(i);
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
+
 		if (i >= room->mesh.size())
 			break;
+
 		room->mesh[i].flags = staticMesh->flags();
 		if (!room->mesh[i].flags)
 		{
@@ -1009,9 +1011,7 @@ bool SaveGame::Load(int slot)
 	NextItemActive = s->next_item_active();
 
 	for(int i = 0; i < s->room_items()->size(); ++i)
-	{
 		g_Level.Rooms[i].itemNumber = s->room_items()->Get(i);
-	}
 
 	for (int i = 0; i < s->items()->size(); i++)
 	{
@@ -1058,7 +1058,6 @@ bool SaveGame::Load(int slot)
 		item->Animation.Velocity = savedItem->velocity();
 		item->Animation.VerticalVelocity = savedItem->vertical_velocity();
 
-		// Do the correct way for assigning new room number
 		if (item->ObjectNumber == ID_LARA && itemNumber == 0)
 		{
 			LaraItem->Data = nullptr;
@@ -1085,6 +1084,7 @@ bool SaveGame::Load(int slot)
 		// Flags and timers
 		for (int j = 0; j < 7; j++)
 			item->ItemFlags[j] = savedItem->item_flags()->Get(j);
+
 		item->Timer = savedItem->timer();
 		item->TriggerFlags = savedItem->trigger_flags();
 		item->Flags = savedItem->flags();
