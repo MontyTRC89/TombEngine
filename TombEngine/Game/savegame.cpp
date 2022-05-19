@@ -1058,7 +1058,7 @@ bool SaveGame::Load(int slot)
 		item->Animation.Velocity = savedItem->velocity();
 		item->Animation.VerticalVelocity = savedItem->vertical_velocity();
 
-		if (item->ObjectNumber == ID_LARA && itemNumber == 0)
+		if (item->ObjectNumber == ID_LARA && !dynamicItem)
 		{
 			LaraItem->Data = nullptr;
 			Lara.ItemNumber = i;
