@@ -1213,7 +1213,7 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 	if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) < LARA_HEIGHT ||	// Front is not a clamp.
 		abs(probeBack.Position.Ceiling - probeBack.Position.Floor) < LARA_HEIGHT ||		// Back is not a clamp.
 		abs(probeMiddle.Position.Ceiling - probeMiddle.Position.Floor) < LARA_HEIGHT ||	// Middle is not a clamp.
-		abs(coll->Middle.Ceiling + coll->Setup.Height) < LARA_HEIGHT)					// TEMP: Consider statics above detected by GetCollisionInfo().
+		abs(coll->Middle.Ceiling - LARA_HEIGHT_CRAWL) < LARA_HEIGHT)					// TEMP: Consider statics overhead detected by GetCollisionInfo().
 	{
 		return true;
 	}
