@@ -1349,7 +1349,25 @@ namespace TEN::Renderer
 
 				for (int n = 0; n < ROPE_SEGMENTS - 1; n++)
 				{
-					AddLine3D(absolute[n], absolute[n + 1], Vector4::One);
+					//AddLine3D(absolute[n], absolute[n + 1], Vector4::One);
+
+					Vector3 pos1 = Vector3(absolute[n].x, absolute[n].y, absolute[n].z);
+					Vector3 pos2 = Vector3(absolute[n + 1].x, absolute[n + 1].y, absolute[n + 1].z);
+
+					Vector3 d = pos2 - pos1;
+					d.Normalize();
+
+					Vector3 c = (pos1 + pos2) / 2.0f;
+
+					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
+						c,
+						Vector4::One,
+						(PI / 2),
+						1.0f,
+						{ 32,
+						Vector3::Distance(pos1, pos2) },
+						BLENDMODE_OPAQUE,
+						d, view);
 				}
 			}
 		}
