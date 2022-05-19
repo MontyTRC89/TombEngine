@@ -2,6 +2,7 @@ Build/
 TR5Main/CustomObjects/
 TR5Main/x64/
 TR5Main/Debug/
+TR5Main/Release/
 x64/
 .vs/
 *.dll
@@ -20,64 +21,3 @@ x64/
 *.wav
 *.trc
 *.str
-/TR5Main/Release
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-21 17-38LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-21 17-47LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 08-59LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-08LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-16LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-24LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-33LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-41LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/2021-12-22 09-49LegacyTestLevel.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-03LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-12LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-20LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 18-28LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-00LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-08LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-17LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-25LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-33LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-42LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-50LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 20-58LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/2021-12-21 21-07LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/LegacyTestLevel_tr4.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/LegacyTestLevel_tr4_TombEngine.prj2
-TR5Main/Legacy Engine Objects/Legacy Test Level/Levels/Legacy Test Level/Maps/Spectrum2_TombEngine.wad2
-TombEngine/Release/vc142.pdb
-TombEngine/Release/TombEngine.vcxproj.FileListAbsolute.txt
-TombEngine/Release/TombEngine.vcxproj.CopyComplete
-TombEngine/Release/TombEngine.tlog/TombEngine.write.1u.tlog
-TombEngine/Release/TombEngine.tlog/TombEngine.lastbuildstate
-TombEngine/Release/TombEngine.tlog/rc.write.1.tlog
-TombEngine/Release/TombEngine.tlog/rc.read.1.tlog
-TombEngine/Release/TombEngine.tlog/rc.command.1.tlog
-TombEngine/Release/TombEngine.tlog/link.write.1.tlog
-TombEngine/Release/TombEngine.tlog/link.read.1.tlog
-TombEngine/Release/TombEngine.tlog/link.command.1.tlog
-TombEngine/Release/TombEngine.tlog/CopyLocal.write.1u.tlog
-TombEngine/Release/TombEngine.tlog/CopyLocal.read.1u.tlog
-TombEngine/Release/TombEngine.tlog/CL.write.1.tlog
-TombEngine/Release/TombEngine.tlog/CL.read.1.tlog
-TombEngine/Release/TombEngine.tlog/CL.command.1.tlog
-TombEngine/Release/TombEngine.pch
-TombEngine/Release/TombEngine.log
-TombEngine/Release/TombEngine.exe.recipe
-TombEngine/Release/TombEngine.Build.CppClean.log
-TombEngine/Release/Resources.res
-TombEngine/Debug/vc142.pdb
-TombEngine/Debug/vc142.idb
-TombEngine/Debug/TombEngine.vcxproj.FileListAbsolute.txt
-TombEngine/Debug/TombEngine.tlog/unsuccessfulbuild
-TombEngine/Debug/TombEngine.tlog/TombEngine.lastbuildstate
-TombEngine/Debug/TombEngine.tlog/CopyLocal.write.1u.tlog
-TombEngine/Debug/TombEngine.tlog/CopyLocal.read.1u.tlog
-TombEngine/Debug/TombEngine.tlog/CL.write.1.tlog
-TombEngine/Debug/TombEngine.tlog/CL.read.1.tlog
-TombEngine/Debug/TombEngine.tlog/CL.command.1.tlog
-TombEngine/Debug/TombEngine.pch
-TombEngine/Debug/TombEngine.log
-TombEngine/Debug/TombEngine.exe.recipe
-TombEngine/Debug/TombEngine.Build.CppClean.log
