@@ -1220,9 +1220,6 @@ void BinocularCamera(ItemInfo* item)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
-				if (lara->Control.Weapon.GunType != LaraWeaponType::Crossbow)
-					WeaponDelay = 0;
-
 				LSHKShotsFired = 0;
 				Camera.bounce = 0;
 			}
