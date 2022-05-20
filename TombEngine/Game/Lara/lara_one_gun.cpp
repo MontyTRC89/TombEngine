@@ -420,10 +420,13 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		lara->RightArm.FrameNumber = 0;
 		lara->LeftArm.FrameNumber = 0;
 	}
-	else if (item->Animation.ActiveState == WEAPON_STATE_UNDRAW &&
-		item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 21)
+	else if (item->Animation.ActiveState == WEAPON_STATE_UNDRAW)
 	{
-		UndrawShotgunMeshes(laraItem, weaponType);
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 21 ||
+			(weaponType == LaraWeaponType::GrenadeLauncher && item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 15))
+		{
+			UndrawShotgunMeshes(laraItem, weaponType);
+		}
 	}
 
 	lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].framePtr;
