@@ -137,12 +137,12 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 				if (!radius)
 				{
-					collidedItems[0] = NULL;
+					collidedItems[0] = nullptr;
 					return true;
 				}
 			}
 
-			collidedMeshes[numMeshes] = NULL;
+			collidedMeshes[numMeshes] = nullptr;
 		}
 
 		if (collidedItems)
