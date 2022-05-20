@@ -306,9 +306,7 @@ namespace Environment
 
 					if (inSubstance)
 					{
-						SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateFloat(16, 24),
-							RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY,
-							Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+						SetupRipple(p.Position.x, p.Position.y, p.Position.z, GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
 					}
 
 					// Immediately disable rain particle because it doesn't need fading out.

@@ -417,6 +417,10 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK && lara->Control.CanLook)
 		LookUpDown(item);
 
+	// HACK.
+	if (BinocularOn)
+		return;
+
 	if (!(TrInput & IN_JUMP) ||	isSwamp)	// JUMP locks orientation outside swamps.
 	{
 		if (TrInput & IN_LEFT &&
@@ -559,9 +563,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Without animation blending, the AFK state's
 	// movement lock will be rather obnoxious.
 	// Adding some idle breathing would also be nice. @Sezz 2021.10.31
-	if (lara->Control.Count.Pose >= LARA_POSE_TIME 
-		&& TestLaraPose(item, coll) 
-		&& g_GameFlow->HasAFKPose())
+	if (lara->Control.Count.Pose >= LARA_POSE_TIME && TestLaraPose(item, coll) &&
+		g_GameFlow->HasAFKPose())
 	{
 		item->Animation.TargetState = LS_POSE;
 		return;
