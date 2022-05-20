@@ -92,7 +92,9 @@ namespace TEN::Entities::TR4
 
 			int distance;
 			if (creature->Enemy == LaraItem)
+			{
 				distance = AI.distance;
+			}
 			else
 			{
 				int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
@@ -111,7 +113,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, VIOLENT);
 
 			if (creature->Mood == MoodType::Bored)
-				creature->MaxTurn /= 2;
+				creature->MaxTurn >>= 1;
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 			joint0 = 4 * angle;
@@ -159,7 +161,7 @@ namespace TEN::Entities::TR4
 				{
 					joint1 = AIGuard(creature);
 
-					if (GetRandomControl())
+					if (GetRandomControl() & 0xFF)
 						break;
 
 					if (item->Animation.ActiveState == DOG_STATE_STOP)
@@ -249,16 +251,16 @@ namespace TEN::Entities::TR4
 				if (item->AIBits & PATROL1)
 				{
 					item->Animation.TargetState = DOG_STATE_WALK;
-					break;
 				}
-
-				if (creature->Mood == MoodType::Bored && random < 256)
+				else if (creature->Mood == MoodType::Bored && random < 256)
 				{
 					item->Animation.TargetState = DOG_STATE_STOP;
-					break;
+				}
+				else
+				{
+					item->Animation.TargetState = DOG_STATE_STALK;
 				}
 
-				item->Animation.TargetState = DOG_STATE_STALK;
 				break;
 
 			case DOG_STATE_RUN:

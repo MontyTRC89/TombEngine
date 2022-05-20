@@ -2061,14 +2061,17 @@ void GuiController::UseCurrentItem()
 		switch (invobject)
 		{
 		case INV_OBJECT_BINOCULARS:
-
-			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE)
-				|| (Lara.Control.IsLow && !(TrInput & IN_CROUCH)))
-				&& !UseSpotCam
-				&& !TrackCameraInit)
+			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
+					(Lara.Control.IsLow && !(TrInput & IN_CROUCH))) &&
+				!UseSpotCam && !TrackCameraInit)
 			{
-				Lara.Inventory.OldBusy = true;
 				BinocularRange = 128;
+				BinocularOn = true;
+				Lara.Inventory.OldBusy = true;
+
+				// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
+				// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
+				//SetAnimation(LaraItem, LA_BINOCULARS_IDLE);
 
 				if (Lara.Control.HandStatus != HandStatus::Free)
 					Lara.Control.HandStatus = HandStatus::WeaponUndraw;
@@ -2083,7 +2086,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_SMALL_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= LARA_HEALTH_MAX) && !Lara.PoisonPotency)
 			{
 				SayNo();
 				return;
@@ -2095,10 +2098,10 @@ void GuiController::UseCurrentItem()
 					Lara.Inventory.TotalSmallMedipacks--;
 
 				Lara.PoisonPotency = 0;
-				LaraItem->HitPoints += 500;
+				LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
 
-				if (LaraItem->HitPoints > 1000)
-					LaraItem->HitPoints = 1000;
+				if (LaraItem->HitPoints > LARA_HEALTH_MAX)
+					LaraItem->HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;
@@ -2110,7 +2113,7 @@ void GuiController::UseCurrentItem()
 
 		case INV_OBJECT_LARGE_MEDIPACK:
 
-			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= 1000) && !Lara.PoisonPotency)
+			if ((LaraItem->HitPoints <= 0 || LaraItem->HitPoints >= LARA_HEALTH_MAX) && !Lara.PoisonPotency)
 			{
 				SayNo();
 				return;
@@ -2122,7 +2125,7 @@ void GuiController::UseCurrentItem()
 					Lara.Inventory.TotalLargeMedipacks--;
 
 				Lara.PoisonPotency = 0;
-				LaraItem->HitPoints = 1000;
+				LaraItem->HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
 				Statistics.Game.HealthUsed++;

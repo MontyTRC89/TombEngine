@@ -44,22 +44,6 @@ void InitialiseLara(int restore)
 	Lara.PoisonPotency = 0;
 	Lara.WaterSurfaceDist = 100;
 
-	if (Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
-	{
-		Lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Pistols;
-		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Pistols;
-	}
-	else
-	{
-		Lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
-		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
-	}
-
-	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
-		Lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Shotgun;
-	else
-		Lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
-
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
 	Lara.Control.Rope.Ptr = -1;
@@ -88,6 +72,22 @@ void InitialiseLara(int restore)
 		Lara.Weapons[(int)LaraWeaponType::HK].Present = true;
 		Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1] = 100;
 	}
+
+	if (Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
+	{
+		Lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Pistols;
+		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Pistols;
+	}
+	else
+	{
+		Lara.Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
+		Lara.Control.Weapon.HolsterInfo.RightHolster = HolsterSlot::Empty;
+	}
+
+	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
+		Lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Shotgun;
+	else
+		Lara.Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 
 	Lara.Inventory.HasBinoculars = true;
 

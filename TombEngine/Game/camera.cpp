@@ -50,7 +50,7 @@ extern int KeyTriggerActive;
 Vector3Int CurrentCameraPosition;
 SVECTOR CurrentCameraRotation;
 GameVector LastIdeal;
-GameVector	Ideals[5];
+GameVector Ideals[5];
 OLD_CAMERA OldCam;
 int CameraSnaps = 0;
 int TargetSnaps = 0;
@@ -63,10 +63,12 @@ CAMERA_INFO Camera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 int NumberCameras;
+
 int BinocularRange;
-int BinocularOn;
+bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
+
 float PhdPerspective;
 float CurrentFOV;
 
@@ -139,22 +141,15 @@ void MoveCamera(GameVector* ideal, int speed)
 {
 	GameVector from, to;
 
-	if (BinocularOn < 0)
-	{
+	if (BinocularOn)
 		speed = 1;
-		BinocularOn++;
-	}
 
-	if (OldCam.pos.Orientation.GetX() != LaraItem->Pose.Orientation.GetX() ||
-		OldCam.pos.Orientation.GetY() != LaraItem->Pose.Orientation.GetY()||
-		OldCam.pos.Orientation.GetZ() != LaraItem->Pose.Orientation.GetZ() ||
+	if (OldCam.pos.Orientation != LaraItem->Pose.Orientation ||
 		OldCam.pos2.Orientation.GetX() != Lara.ExtraHeadRot.GetX() ||
 		OldCam.pos2.Orientation.GetY() != Lara.ExtraHeadRot.GetY() ||
 		OldCam.pos2.Position.x != Lara.ExtraTorsoRot.GetX() ||
 		OldCam.pos2.Position.y != Lara.ExtraTorsoRot.GetY() ||
-		OldCam.pos.Position.x != LaraItem->Pose.Position.x ||
-		OldCam.pos.Position.y != LaraItem->Pose.Position.y ||
-		OldCam.pos.Position.z != LaraItem->Pose.Position.z ||
+		OldCam.pos.Position != LaraItem->Pose.Position ||
 		OldCam.ActiveState != LaraItem->Animation.ActiveState ||
 		OldCam.TargetState != LaraItem->Animation.TargetState ||
 		OldCam.targetDistance != Camera.targetDistance ||
@@ -165,7 +160,7 @@ void MoveCamera(GameVector* ideal, int speed)
 		OldCam.target.y != Camera.target.y ||
 		OldCam.target.z != Camera.target.z ||
 		Camera.oldType != Camera.type ||
-		BinocularOn < 0)
+		BinocularOn)
 	{
 		OldCam.pos.Orientation = LaraItem->Pose.Orientation;
 		OldCam.pos2.Orientation.SetX(Lara.ExtraHeadRot.GetX());
@@ -1058,34 +1053,28 @@ void BinocularCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	static bool exitingBinoculars = false;
-
 	if (LSHKTimer)
 		--LSHKTimer;
 
 	if (!LaserSight)
 	{
-		if (InputBusy & IN_DRAW)
-			exitingBinoculars = true;
-		else if (exitingBinoculars)
+		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
+		if (InputBusy & (IN_DESELECT | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
 		{
-			exitingBinoculars = false;
-			BinocularRange = 0;
-			AlterFOV(Angle::DegToRad(80.0f));
 			item->MeshBits = -1;
 			lara->Inventory.IsBusy = false;
-			lara->ExtraHeadRot.SetX();
-			lara->ExtraHeadRot.SetY();
-			lara->ExtraTorsoRot.SetX();
-			lara->ExtraTorsoRot.SetY();
+			lara->ExtraHeadRot = EulerAngles::Zero;
+			lara->ExtraTorsoRot = EulerAngles::Zero;
 			Camera.type = BinocularOldCamera;
-
+			BinocularOn = false;
+			BinocularRange = 0;
+			AlterFOV(Angle::DegToRad(80.0f));
 			return;
 		}
 	}
 
 	item->MeshBits = 0;
-	AlterFOV(7 * (2080 - BinocularRange));
+	AlterFOV(7 * (Angle::DegToRad(11.5f) - BinocularRange));
 
 	float headXRot = lara->ExtraHeadRot.GetX() * 2;
 	float headYRot = lara->ExtraHeadRot.GetY();
@@ -1158,10 +1147,8 @@ void BinocularCamera(ItemInfo* item)
 
 	if (Camera.mikeAtLara)
 	{
-		Camera.actualAngle = item->Pose.Orientation.GetY() + lara->ExtraHeadRot.GetY() + lara->ExtraTorsoRot.GetY();
-		Camera.mikePos.x = item->Pose.Position.x;
-		Camera.mikePos.y = item->Pose.Position.y;
-		Camera.mikePos.z = item->Pose.Position.z;
+		Camera.actualAngle = Angle::Normalize(item->Pose.Orientation.GetY() + lara->ExtraHeadRot.GetY() + lara->ExtraTorsoRot.GetY());
+		Camera.mikePos = item->Pose.Position;
 	}
 	else
 	{
@@ -1190,16 +1177,16 @@ void BinocularCamera(ItemInfo* item)
 	if (InputBusy & IN_SPRINT)
 	{
 		BinocularRange -= range;
-		if (BinocularRange < 128)
-			BinocularRange = 128;
+		if (BinocularRange < Angle::DegToRad(0.7f))
+			BinocularRange = Angle::DegToRad(0.7f);
 		else
 			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
 	else if (InputBusy & IN_CROUCH)
 	{
 		BinocularRange += range;
-		if (BinocularRange > 1536)
-			BinocularRange = 1536;
+		if (BinocularRange > Angle::DegToRad(8.5f))
+			BinocularRange = Angle::DegToRad(8.5f);
 		else
 			SoundEffect(SFX_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
 	}
@@ -1209,18 +1196,14 @@ void BinocularCamera(ItemInfo* item)
 
 	if (LaserSight)
 	{
-		int firing = 0;
-		Ammo& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
+		bool firing = false;
+		auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
 		if (!(InputBusy & IN_ACTION) ||
-			WeaponDelay ||
-			!ammo)
+			WeaponDelay || !ammo)
 		{
 			if (!(InputBusy & IN_ACTION))
 			{
-				if (lara->Control.Weapon.GunType != LaraWeaponType::Crossbow)
-					WeaponDelay = 0;
-
 				LSHKShotsFired = 0;
 				Camera.bounce = 0;
 			}
@@ -1229,7 +1212,7 @@ void BinocularCamera(ItemInfo* item)
 		{
 			if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
 			{
-				firing = 1;
+				firing = true;
 				WeaponDelay = 16;
 				Statistics.Game.AmmoUsed++;
 
@@ -1240,7 +1223,7 @@ void BinocularCamera(ItemInfo* item)
 			}
 			else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
 			{
-				firing = 1;
+				firing = true;
 				WeaponDelay = 32;
 			}
 			else
@@ -1248,7 +1231,7 @@ void BinocularCamera(ItemInfo* item)
 				if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
 				{
 					WeaponDelay = 12;
-					firing = 1;
+					firing = true;
 
 					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 						SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
@@ -1269,7 +1252,7 @@ void BinocularCamera(ItemInfo* item)
 						}
 
 						LSHKTimer = 4;
-						firing = 1;
+						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
@@ -1307,7 +1290,7 @@ void BinocularCamera(ItemInfo* item)
 					else
 					{
 						LSHKTimer = 4;
-						firing = 1;
+						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
@@ -1326,11 +1309,11 @@ void BinocularCamera(ItemInfo* item)
 			}
 		}
 
-		GetTargetOnLOS(&Camera.pos, &Camera.target, 1, firing);
+		GetTargetOnLOS(&Camera.pos, &Camera.target, true, firing);
 	}
 	else
 	{
-		GetTargetOnLOS(&Camera.pos, &Camera.target, 0, 0);
+		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
 		if (!(InputBusy & IN_ACTION))
 		{
@@ -1379,17 +1362,11 @@ void CalculateCamera()
 	CamOldPos.y = Camera.pos.y;
 	CamOldPos.z = Camera.pos.z;
 
-	if (BinocularRange != 0)
+	if (BinocularOn)
 	{
-		BinocularOn = 1;
 		BinocularCamera(LaraItem);
-
-		if (BinocularRange != 0)
-			return;
+		return;
 	}
-
-	if (BinocularOn == 1)
-		BinocularOn = -8;
 
 	if (UseForcedFixedCamera != 0)
 	{
@@ -1478,7 +1455,7 @@ void CalculateCamera()
 
 		Camera.target.roomNumber = item->RoomNumber;
 
-		if (Camera.fixedCamera || BinocularOn < 0)
+		if (Camera.fixedCamera || BinocularOn)
 		{
 			Camera.target.y = y;
 			Camera.speed = 1;
@@ -1540,7 +1517,7 @@ void CalculateCamera()
 			Camera.fixedCamera = false;
 			if (Camera.speed != 1 &&
 				Camera.oldType != CameraType::Look &&
-				BinocularOn >= 0)
+				!BinocularOn)
 			{
 				if (TargetSnaps <= 8)
 				{
@@ -1591,7 +1568,7 @@ void CalculateCamera()
 		Camera.item = NULL;
 		Camera.targetElevation = 0;
 		Camera.targetAngle = 0;
-		Camera.targetDistance = 1536;
+		Camera.targetDistance = SECTOR(1.5f);
 		Camera.flags = 0;
 		Camera.laraNode = -1;
 	}
@@ -1608,7 +1585,7 @@ void LookLeftRight(ItemInfo* item)
 		if (lara->ExtraHeadRot.GetY() > Angle::DegToRad(-44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f) * (BinocularRange - 1792) / 1536);
+				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(8.5f));
 			else
 				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() - Angle::DegToRad(2.0f));
 		}
@@ -1619,11 +1596,12 @@ void LookLeftRight(ItemInfo* item)
 		if (lara->ExtraHeadRot.GetY() < Angle::DegToRad(44.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f) * (1792 - BinocularRange) / 1536);
+				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(8.5f));
 			else
 				lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetY() + Angle::DegToRad(2.0f));
 		}
 	}
+
 	if (lara->Control.HandStatus != HandStatus::Busy &&
 		lara->Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&
@@ -1644,7 +1622,7 @@ void LookUpDown(ItemInfo* item)
 		if (lara->ExtraHeadRot.GetX() > Angle::DegToRad(-35.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f) * (BinocularRange - 1792) / 3072);
+				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f) * (BinocularRange - Angle::DegToRad(10.0f)) / Angle::DegToRad(17.0f));
 			else
 				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() - Angle::DegToRad(2.0f));
 		}
@@ -1655,11 +1633,12 @@ void LookUpDown(ItemInfo* item)
 		if (lara->ExtraHeadRot.GetX() < Angle::DegToRad(30.0f))
 		{
 			if (BinocularRange)
-				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f) * (1792 - BinocularRange) / 3072);
+				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f) * (Angle::DegToRad(10.0f) - BinocularRange) / Angle::DegToRad(17.0f));
 			else
 				lara->ExtraHeadRot.SetX(lara->ExtraHeadRot.GetX() + Angle::DegToRad(2.0f));
 		}
 	}
+
 	if (lara->Control.HandStatus != HandStatus::Busy &&
 		lara->Vehicle == NO_ITEM &&
 		!lara->LeftArm.Locked &&

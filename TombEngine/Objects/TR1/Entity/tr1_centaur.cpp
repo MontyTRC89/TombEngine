@@ -108,7 +108,7 @@ void ControlCentaurBomb(short itemNumber)
 		ItemNewRoom(itemNumber, probe.RoomNumber);
 
 	if (TestEnvironment(ENV_FLAG_WATER, item->RoomNumber) && aboveWater)
-		SetupRipple(item->Pose.Position.x, g_Level.Rooms[item->RoomNumber].minfloor, item->Pose.Position.z, (GetRandomControl() & 7) + 8, 0, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+		SetupRipple(item->Pose.Position.x, g_Level.Rooms[item->RoomNumber].minfloor, item->Pose.Position.z, (GetRandomControl() & 7) + 8, 0);
 
 	GetCollidedObjects(item, HARPOON_HIT_RADIUS, true, &CollidedItems[0], &CollidedMeshes[0], 0);
 

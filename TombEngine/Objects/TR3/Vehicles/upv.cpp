@@ -931,7 +931,8 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 	int newHeight = GetCollision(UPVItem).Position.Floor;
 	int waterHeight = GetWaterHeight(UPVItem);
 
-	if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Pose.Position.y - UPV_HEIGHT / 2))
+	if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Pose.Position.y - UPV_HEIGHT / 2) || 
+		(newHeight == NO_HEIGHT) || (waterHeight == NO_HEIGHT))
 	{
 		UPVItem->Animation.Velocity = 0;
 		UPVItem->Pose.Position = oldPos.Position;

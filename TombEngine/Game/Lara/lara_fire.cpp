@@ -116,7 +116,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		3,
 		9,
 		3,
-		10,
+		9,
 		SFX_TR4_LARA_SHOTGUN,
 		0
 	},
@@ -133,7 +133,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		4,
 		0,
 		3,
-		10,
+		16,
 		0,     // FIRE/SILENCER_FIRE
 		0
 	},
@@ -150,7 +150,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		5,
 		0,
 		2,
-		10,
+		9,
 		SFX_TR4_LARA_CROSSBOW,
 		20
 	},
@@ -201,7 +201,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		20,
 		0,
 		2,
-		10,
+		9,
 		0,
 		30
 	},
@@ -395,16 +395,12 @@ void LaraGun(ItemInfo* laraItem)
 			}
 		}
 
-		if (TrInput & IN_DRAW ||
-			lara->Control.Weapon.RequestGunType != lara->Control.Weapon.GunType)
+		if (TrInput & IN_DRAW || lara->Control.Weapon.RequestGunType != lara->Control.Weapon.GunType)
 		{
-			if ((laraItem->Animation.ActiveState == LS_CROUCH_IDLE ||
-				laraItem->Animation.ActiveState == LS_CROUCH_TURN_LEFT ||
-				laraItem->Animation.ActiveState == LS_CROUCH_TURN_RIGHT) &&
-				(lara->Control.Weapon.RequestGunType == LaraWeaponType::HK ||
-					lara->Control.Weapon.RequestGunType == LaraWeaponType::Crossbow ||
-					lara->Control.Weapon.RequestGunType == LaraWeaponType::Shotgun ||
-					lara->Control.Weapon.RequestGunType == LaraWeaponType::HarpoonGun))
+			if (lara->Control.IsLow && 
+				lara->Control.Weapon.RequestGunType >= LaraWeaponType::Shotgun && 
+				lara->Control.Weapon.RequestGunType != LaraWeaponType::Flare && 
+				lara->Control.Weapon.RequestGunType != LaraWeaponType::Torch)
 			{
 				if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 					lara->Control.Weapon.RequestGunType = LaraWeaponType::Flare;
@@ -1160,7 +1156,7 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType)
 {
-	switch(weaponType)
+	switch (weaponType)
 	{
 		case LaraWeaponType::Pistol:
 			return HolsterSlot::Pistols;

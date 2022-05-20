@@ -66,7 +66,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0) USE_FEATURE_IF_CPP20([[unlikely]])
 			item->Animation.TargetState = LS_DEATH;
@@ -146,7 +146,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -213,7 +213,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -443,7 +443,7 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -499,7 +499,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -556,7 +556,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -716,7 +716,7 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -799,7 +799,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DoLaraFallDamage(item);
+		DealLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;

@@ -163,7 +163,6 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	// HAS LET GO OF ACTION
 	else
 	{
-		// BUGFIX: rapid-fire no more. -Sezz
 		// let (3) SHOOT_CONTINUE finish
 		if ((frameRight >= p->RecoilAnim) && (frameRight < p->RecoilAnim + weapon->RecoilFrame))
 			frameRight++;
@@ -173,12 +172,6 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 		// go back to ready stance
 		else if ((frameRight > 0) && (frameRight <= p->Draw1Anim2))
 			frameRight--;
-
-		// OLD:
-		//if (frameRight >= p->recoilAnim)
-		//	frameRight = p->draw1Anim2;
-		//else if ((frameRight > 0) && (frameRight <= p->draw1Anim2))
-		//	frameRight--;
 
 		if (lara->Control.Weapon.UziRight)
 		{
@@ -263,12 +256,6 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 			frameLeft = p->Draw1Anim2;
 		else if ((frameLeft > 0) && (frameLeft <= p->Draw1Anim2))
 			frameLeft--;
-
-		// OLD:
-		//if (frameLeft >= p->recoilAnim) 									// If Gun is Recoiling Stop it now...
-		//	frameLeft = p->draw1Anim2;
-		//else if (frameLeft > 0 && frameLeft <= p->draw1Anim2)
-		//	frameLeft--;													// UnLock ARM
 
 		if (lara->Control.Weapon.UziLeft)
 		{
@@ -380,14 +367,9 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	// Finish recoil anim before reholstering weapon.
 	if ((frameLeft >= p->RecoilAnim) && (frameLeft < p->RecoilAnim + weapon->RecoilFrame))
 		frameLeft++;
+
 	if (frameLeft == (p->RecoilAnim + weapon->RecoilFrame))
 		frameLeft = p->Draw1Anim2;
-
-	// OLD:
-	/*if (frameLeft >= p->recoilAnim)
-	{
-		frameLeft = p->draw1Anim2;
-	}*/
 	else if (frameLeft > 0 && frameLeft < p->Draw1Anim)
 	{
 		lara->LeftArm.Orientation -= lara->LeftArm.Orientation / frameLeft;
@@ -415,14 +397,9 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if ((frameRight >= p->RecoilAnim) && (frameRight < p->RecoilAnim + weapon->RecoilFrame))
 		frameRight++;
+
 	if (frameRight == (p->RecoilAnim + weapon->RecoilFrame))
 		frameRight = p->Draw1Anim2;
-
-	// OLD:
-	/*if (frameRight >= p->recoilAnim)
-	{
-		frameRight = p->draw1Anim2;
-	}*/
 	else if (frameRight > 0 && frameRight < p->Draw1Anim)
 	{
 		lara->RightArm.Orientation -= lara->RightArm.Orientation / frameRight;

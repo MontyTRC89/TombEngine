@@ -430,6 +430,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 		++lara->Control.Count.PositionAdjust;
 	}
+	else
+		lara->Control.Count.PositionAdjust = 0;
 
 	if (!lara->Control.Locked)
 		lara->LocationPad = 128;

@@ -64,15 +64,13 @@ namespace TEN
 					if (d.pos.y > floorheight) 
 						d.active = false;
 
-					if (d.pos.y > wh) 
-					{
-						d.active = false;
-						SetupRipple(d.pos.x, wh, d.pos.z, GenerateFloat(16, 24), 
-							RIPPLE_FLAG_SHORT_LIFE | RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_LOW_OPACITY, 
-							Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
-					}
-				}
+			if (d.pos.y > wh) 
+			{
+				d.active = false;
+				SetupRipple(d.pos.x, wh, d.pos.z, GenerateInt(16, 24), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
 			}
+		}
+	}
 
 			DripParticle& getFreeDrip()
 			{

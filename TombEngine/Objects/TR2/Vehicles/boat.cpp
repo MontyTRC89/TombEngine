@@ -101,7 +101,7 @@ void InitialiseSpeedBoat(short itemNumber)
 
 void DoBoatWakeEffect(ItemInfo* sBoatItem)
 {
-	SetupRipple(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.y, sBoatItem->Pose.Position.z, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, sBoatItem->Pose.Orientation.GetY());
+	//SetupRipple(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.y, sBoatItem->Pose.Position.z, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, sBoatItem->Pose.Orientation.GetY());
 	TEN::Effects::TriggerSpeedboatFoam(sBoatItem);
 
 	// OLD WAKE EFFECT

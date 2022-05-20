@@ -59,7 +59,7 @@ extern GameVector ForcedFixedCamera;
 extern int UseForcedFixedCamera;
 extern int NumberCameras;
 extern int BinocularRange;
-extern int BinocularOn;
+extern bool BinocularOn;
 extern CameraType BinocularOldCamera;
 extern bool LaserSight;
 extern float PhdPerspective;

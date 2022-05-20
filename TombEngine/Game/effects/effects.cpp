@@ -983,93 +983,31 @@ void UpdateSplashes()
 	{
 		auto* ripple = &Ripples[i];
 
-		if (ripple->active)
+		if (ripple->flags & RIPPLE_FLAG_ACTIVE)
 		{
-			if (ripple->lifeTime > ripple->life)
+			if (ripple->size < 252)
 			{
-				ripple->active = false;
-				continue;
-			}
-			//normalized Lifetime
-			float n = ripple->lifeTime / ripple->life;
-			n = fmin(n, 1.0f);
-			n = fmax(0.0f, n);
-			constexpr float peakTime = 0.2f;
-			constexpr float expIn = 1.5f;
-			constexpr float expOut = 2.0f;
-
-			if (n <= peakTime)
-			{
-				//we ascend our color
-				float alpha = pow((n / peakTime), expIn);
-				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
-			}
-			else 
-			{
-				//we descend
-				float alphaTerm = 1.0f - ((n - peakTime) / 1 - peakTime);
-				float alpha = pow(alphaTerm, expOut);
-				//float alpha = alphaTerm;
-				ripple->currentColor = Vector4::Lerp(Vector4::Zero, ripple->initialColor, alpha);
-				
+				if (ripple->flags & RIPPLE_FLAG_SHORT_INIT)
+					ripple->size += 2;
+				else
+					ripple->size += 4;
 			}
 
-			ripple->size += ripple->sizeRate;
-			ripple->lifeTime += ripple->lifeRate;
-		}
-	}
-}
-
-void SetupRipple(int x, int y, int z, float size, char flags, unsigned int spriteID, float rotation)
-{
-	for (int i = 0; i < MAX_RIPPLES; i++)
-	{
-		auto* ripple = &Ripples[i];
-
-		if (!(ripple->active)) 
-		{
-			ripple->active = true;
-			ripple->size = size;
-			ripple->lifeTime = 0;
-			ripple->SpriteID = spriteID;
-
-			if (flags & RIPPLE_FLAG_SHORT_LIFE)
-				ripple->life = (rand() & 16) + 16;
-			else
-				ripple->life = (rand() & 16) + 48;
-
-			ripple->worldPos = Vector3((float)x,(float)y,(float)z);
-			ripple->currentColor = Vector4(0, 0, 0, 0);
-			ripple->rotation = rotation;
-
-			if (flags & RIPPLE_FLAG_BLOOD ) 
+			if (!ripple->init)
 			{
-				ripple->initialColor = Vector4(1, 0, 0, 1);
-				ripple->lifeRate = 0.9f;
-				ripple->sizeRate = 8.0f;
-				ripple->isBillboard = false;
+				ripple->life -= 3;
+				if (ripple->life > 250)
+					ripple->flags = 0;
 			}
-			else 
+			else if (ripple->init < ripple->life)
 			{
-				ripple->initialColor = Vector4(0.5, 0.5, 0.5, 1);
-				ripple->lifeRate = 1.0f;
-				ripple->sizeRate = 4.0f;
-				ripple->isBillboard = false;
+				if (ripple->flags & RIPPLE_FLAG_SHORT_INIT)
+					ripple->init += 8;
+				else
+					ripple->init += 4;
+				if (ripple->init >= ripple->life)
+					ripple->init = 0;
 			}
-
-			if (flags & RIPPLE_FLAG_LOW_OPACITY)
-				ripple->initialColor *= 0.6f;
-
-			if (flags & RIPPLE_FLAG_RAND_POS)
-			{
-				ripple->worldPos.x += GenerateFloat(-32, 32);
-				ripple->worldPos.z += GenerateFloat(-32, 32);
-			}
-
-			if (flags & RIPPLE_FLAG_RAND_ROT)
-				ripple->rotation += GenerateFloat(-M_PI, M_PI);
-
-			break;
 		}
 	}
 }
@@ -1118,9 +1056,26 @@ void TriggerLaraBlood()
 	}
 }
 
-void TriggerUnderwaterBlood(int x, int y, int z, int sizeme) 
+void TriggerUnderwaterBlood(int x, int y, int z, int size) 
 {
-	SetupRipple(x, y, z, sizeme, RIPPLE_FLAG_BLOOD | RIPPLE_FLAG_RAND_POS | RIPPLE_FLAG_RAND_ROT, Objects[ID_SMOKE_SPRITES].meshIndex);
+	for (int i = 0; i < MAX_RIPPLES; i++)
+	{
+		auto* ripple = &Ripples[i];
+
+		if (!(ripple->flags & RIPPLE_FLAG_ACTIVE))
+		{
+			ripple->flags = RIPPLE_FLAG_ACTIVE | RIPPLE_FLAG_LOW_OPACITY | RIPPLE_FLAG_BLOOD;
+
+			ripple->life = 240 + (GetRandomControl() & 7);
+			ripple->init = 1;
+			ripple->size = size;
+			ripple->x = x + (GetRandomControl() & 63) - 32;
+			ripple->y = y;
+			ripple->z = z + (GetRandomControl() & 63) - 32;
+			
+			return;
+		}
+	}
 }
 
 void Richochet(PoseData* pos)
@@ -1229,6 +1184,32 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
+void SetupRipple(int x, int y, int z, int size, int flags)
+{
+	for (int i = 0; i < MAX_RIPPLES; i++)
+	{
+		auto* ripple = &Ripples[i];
+
+		if (!(ripple->flags & RIPPLE_FLAG_ACTIVE))
+		{
+			ripple->flags = RIPPLE_FLAG_ACTIVE | flags;
+			ripple->life = 48 + (GetRandomControl() & 15);
+			ripple->init = 1;
+			ripple->size = size;
+			ripple->x = x;
+			ripple->y = y;
+			ripple->z = z;
+			if (flags & RIPPLE_FLAG_NO_RAND)
+			{
+				ripple->x += (GetRandomControl() & 127) - 64;
+				ripple->z += (GetRandomControl() & 127) - 64;
+			}
+
+			return;
+		}
+	}
+}
+
 void WadeSplash(ItemInfo* item, int wh, int wd)
 {
 	short roomNumber = item->RoomNumber;
@@ -1259,10 +1240,10 @@ void WadeSplash(ItemInfo* item, int wh, int wd)
 		{
 			if (!(GetRandomControl() & 0xF) || item->Animation.ActiveState != LS_IDLE)
 			{
-				if (item->Animation.ActiveState == LS_IDLE)
-					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+				if (item->Animation.ActiveState != LS_IDLE)
+					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, 112 + (GetRandomControl() & 15), RIPPLE_FLAG_SHORT_INIT | RIPPLE_FLAG_LOW_OPACITY);
 				else
-					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, (GetRandomControl() & 0xF) + 112, RIPPLE_FLAG_RAND_ROT | RIPPLE_FLAG_RAND_POS, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+					SetupRipple(item->Pose.Position.x, wh - 1, item->Pose.Position.z, 112 + (GetRandomControl() & 15), RIPPLE_FLAG_LOW_OPACITY);	
 			}
 		}
 	}
