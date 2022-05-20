@@ -1,33 +1,42 @@
 # TombEngine 
 
-In the year 2000, Core Design gave us a great gift: level editor where people can create their own custom levels based on TR4 engine. Unfortunately, it was quite limited, hence over the decades, the engine was upgraded massively via TREP and TRNG:
-- TREP (Tomb Raider Engine Patcher) is a tool that allows you to modify the exe to expand certain limits and implement new features.
-- TRNG (Tomb Raider Next Generation) builds upon TREP and gives a lot of new features including its own scripting language and even more extended limits and its own DLL.
-Unfortunately, TRNG is closed-source, and essentially an abandonware program. No one can fix well-known bugs in TRNG, and implement new features, although you can still implement some features with plugin (with C++ knowledge) however it is not user-friendly (you need to know C++ which is quite complex) and it is poorly documented.
+In the year 2000, Core Design granted us a great gift: their TR4-based Level Editor, which allowed people to create custom levels. It was, unfortunately, quite limited, hence why over the decades it was upgraded massively with fan projects such as Tomb Raider Engine Patcher (TREP) and Tomb Raider Next Generation (TRNG).
+- TREP was a tool which allowed modification of the executable to expand certain limits and implement new features.
+- TRNG built upon TREP and provided many new tools, including a scripting language, expanding even more limits with its own .DLL.
 
-TEN (TombEngine) is supposed to be a new engine which is (most importantly) open-source, removes limits, and fixes bugs from the original game,
-it also provides support for Lua (a programming language), all objects from TR1-5, and many more exciting features and gameplay functionalities such as corner shimmying or an enlarged 2D map which lets you build a massive level (Imagine 5 split levels into 1 big level).
-TEN (TombEngine) is based on TR5 engine which has been gradually built upon that.
+Unfortunately, TRNG's toolset is poorly documented and not user-friendly; the program remains closed-source to this day and is in all practicality abandonware. As a direct consequence, no one is able to fix the countless well-known bugs and issues extant in TRNG, rendering implementation of new features nigh impossible without an in-depth knowledge of C++ plugin creation and a solid understanding of the classic Tomb Raider engine's many idiosyncrasies.
 
-# To compile TombEngine
-In order to compile TombEngine, make sure you have:
+TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, fix bugs from the original games, introduce new features while refining old ones, and provide for a refined, user-friendly level creation process. Current support includes:
+- Lua (as the native scripting language)
+- All objects from the classic series (1-5)
+- Many more exciting gameplay functionalities such as corner shimmying and expanded crawlspace flexibility
+- An enlarged 2D map, allowing for the creation of massive levels (imagine one big level may previously have been split into five!)
+- A streamlined player control scheme.
+
+TEN is based on the Tomb Raider: Chronicles engine of the classic era and continues to build upon and replace its systems to modernize ...
+
+# Compiling TombEngine
+To compile TEM, ensure you have:
 - Microsoft Visual Studio 
 - TombEditor (if you would like to create and test levels)
 
 Steps:
-1) Clone the repo to your Github Desktop
+1) Clone the repository to your GitHub Desktop
 2) Launch TombEngine.sln and compile
-3) Once compiled, make a separate folder and copy everything from the Build folder (before compilation there will be nothing in that folder) and also copy the scripts folder to your TombEngine executable directory (make sure you have data, texture files as well)
-4) Windows will also complain about missing DLL files (Bass etc) in that case copy the missing DLL(s) from the Libs folder
+3) Once compiled, create a separate folder to serve as your main TEN directory
+4) Copy everything inside the Build folder to the main TEN directory
+5) Copy the Scripts folder to your main TEN directory
+6) Ensure you have the necessary level data and texture files as well
+7) In the case Windows warns about missing DLLs, (bass.dll, etc.) copy the missing DLL files found inside the Libs folder to your main TEN directory.
 
-Visual Studio might also complain about the NuGet packages, to fix that:
-1) Delete the packages folder
-2) Go back to Visual studio
-3) Right-click on solution explorer and restore Nuget Packages
-4) Compile again and once that is done, you should now be able to go to TombEditor, make a simple level, compile and run it with TombEngine.
+Visual Studio may also warn about NuGet packages. To fix:
+1) Delete the Packages folder
+2) Go back to Microsoft Visual Studio
+3) Right-click on the TombEngine solution in the Solution Explorer tab and select "Restore NuGet Packages"
+4) Compile again and once done, you should be able to compile a level with TombEditor and run it in TEN.
 
 # Disclaimer
-I don't work for/have ever worked for Core Design, Eidos Interactive or Square Enix. This is a hobby project. I don't want this code to be sold since Tomb Raider is a registered trademark of Square Enix. The code is currently open source to allow more people to improve the engine and for study purposes. I'm not responsible for illegal use of this source code. This source code is released as-is and it's maintained by me and by other (not paid) contributors in our free time.
+We do not and have never worked for Core Design, Eidos Interactive, or Square Enix. This is a hobby project. Tomb Raider is a registered trademark of Square Enix; TombEngine is not be sold. The code is open-source to encourage contributions and to be used for study purposes. We are not responsible for illegal uses of this source code. This source code is released as-is and continues to be maintained by non-paid contributors in their free time.
 
 # Credit List
 
@@ -35,19 +44,19 @@ I don't work for/have ever worked for Core Design, Eidos Interactive or Square E
 
 - MontyTRC (Project Leader)
 
-- ChocolateFan (General coding)
+- ChocolateFan (general coding)
 - Gancian (general coding)
 - Krys (general coding)
-- Lwmte (general coding, code cleanups, and bug fixing)
+- Lwmte (sound refactoring, general coding, code cleanups, bug fixing)
 - Moooonyeah (Jumanji) (entity decompilation)
-- Raildex (renderer refactoring & general coding) 
+- Raildex (renderer refactoring, particle coding, general coding) 
 - RicardoLuis0 (general coding)
-- Sezz (state refactoring, general coding and bug fixing)
-- Squidshire (Hispidence) (lua implementation and bug fixing)
-- Stranger1992 (Sounds Project)
-- TokyoSU (Decompiling Vehicles & Entities)
-- Troye (General coding, refactoring)
-- WolfCheese (General coding)
+- Sezz (player state refactoring, general coding, code cleanups, bug fixing, assets)
+- Squidshire (Hispidence) (Lua implementation, bug fixing)
+- Stranger1992 (sound asset refactoring and organisation, assets)
+- TokyoSU (entity and vehicle decompilation)
+- Troye (general coding, refactoring)
+- WolfCheese (general coding)
 
 ## Testers
 - Caesum
@@ -55,7 +64,7 @@ I don't work for/have ever worked for Core Design, Eidos Interactive or Square E
 - JoeyQuint
 - Kamillos
 - Kubsy
-- Lgg_productions
+- LGG_PRODUCTION
 - Lore
 - RemRem
 - Stranger1992
