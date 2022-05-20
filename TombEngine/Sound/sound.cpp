@@ -33,6 +33,8 @@ const std::string TRACKS_PATH = "Audio\\";
 std::map<std::string, int> SoundTrackMap;
 std::unordered_map<int, SoundTrackInfo> SoundTracks;
 int SecretSoundIndex = 5;
+constexpr int LegacyLoopingTrackMin = 98;
+constexpr int LegacyLoopingTrackMax = 111;
 
 static int GlobalMusicVolume;
 static int GlobalFXVolume;
@@ -344,7 +346,7 @@ void EnumerateLegacyTracks()
 					SoundTrackInfo s;
 
 					// TRLE default looping tracks
-					if (index >= 98 && index <= 111)
+					if (index >= LegacyLoopingTrackMin && index <= LegacyLoopingTrackMax)
 					{
 						s.Mode = SOUNDTRACK_PLAYTYPE::BGM;
 					}
