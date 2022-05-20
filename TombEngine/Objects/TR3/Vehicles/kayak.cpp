@@ -252,8 +252,8 @@ void KayakDoRipple(ItemInfo* kayakItem, int xOffset, int zOffset)
 	int probedRoomNum = GetCollision(x, kayakItem->Pose.Position.y, z, kayakItem->RoomNumber).RoomNumber;
 	int waterHeight = GetWaterHeight(x, kayakItem->Pose.Position.y, z, probedRoomNum);
 
-	if (waterHeight != NO_HEIGHT)
-		SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
+	//if (waterHeight != NO_HEIGHT)
+	//	SetupRipple(x, kayakItem->Pose.Position.y, z, -2 - (GetRandomControl() & 1), 0, Objects[ID_KAYAK_PADDLE_TRAIL_SPRITE].meshIndex,TO_RAD(kayakItem->Pose.Orientation.y));
 }
 
 void KayakUpdateWakeFX()

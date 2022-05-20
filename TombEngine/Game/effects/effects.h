@@ -7,12 +7,14 @@ struct CollisionInfo;
 
 enum RIPPLE_TYPE
 {
-	RIPPLE_FLAG_NONE = 0x0,
-	RIPPLE_FLAG_SHORT_LIFE = 0x1,
-	RIPPLE_FLAG_RAND_ROT = 0x20,
-	RIPPLE_FLAG_RAND_POS = 0x40,
-	RIPPLE_FLAG_BLOOD = 0x80,
-	RIPPLE_FLAG_LOW_OPACITY = 0x02
+	RIPPLE_FLAG_NONE = 0x00,
+	RIPPLE_FLAG_ACTIVE = 0x01,
+	RIPPLE_FLAG_SHORT_INIT = 0x02,
+	RIPPLE_FLAG_RIPPLE_INNER = 0x04,
+	RIPPLE_FLAG_RIPPLE_MIDDLE = 0x08,
+	RIPPLE_FLAG_LOW_OPACITY = 0x10,
+	RIPPLE_FLAG_BLOOD = 0x20,
+	RIPPLE_FLAG_NO_RAND = 0x40
 };
 
 enum SpriteEnumFlag
@@ -87,18 +89,13 @@ struct SPLASH_SETUP
 
 struct RIPPLE_STRUCT
 {
-	Vector4 currentColor;
-	Vector4 initialColor;
-	Vector3 worldPos;
-	unsigned int SpriteID;
-	float rotation;
-	float size;
-	float sizeRate;
-	float life; //max life
-	float lifeTime; // current life
-	float lifeRate; // life change rate
-	bool active;
-	bool isBillboard; //used for Blood
+	int x;
+	int y;
+	int z;
+	char flags;
+	unsigned char life;
+	unsigned char size;
+	unsigned char init;
 };
 
 struct SPARKS
@@ -212,7 +209,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
 void SetupSplash(const SPLASH_SETUP* const setup,int room);
 void UpdateSplashes();
-void SetupRipple(int x, int y, int z, float size, char flags,unsigned int spriteID,float rotation = 0);
+void SetupRipple(int x, int y, int z, int size, int flags);
 void TriggerLaraBlood();
 short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);

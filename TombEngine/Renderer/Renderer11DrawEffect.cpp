@@ -386,22 +386,70 @@ namespace TEN::Renderer
 		{
 			RIPPLE_STRUCT* ripple = &Ripples[i];
 
-			if (ripple->active) 
+			if (ripple->flags & RIPPLE_FLAG_ACTIVE) 
 			{
-				float y = ripple->worldPos.y;
-				if (ripple->isBillboard) 
-				{
-					AddSpriteBillboard(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, { ripple->size, ripple->size }, BLENDMODE_ADDITIVE, view);
-				} 
-				else 
-				{
-					AddSpriteBillboardConstrainedLookAt(&m_sprites[ripple->SpriteID], 
-						ripple->worldPos, 
-						ripple->currentColor, 
-						ripple->rotation, 
-						1, { ripple->size * 2, ripple->size * 2 }, BLENDMODE_ADDITIVE, Vector3(0, -1, 0), view);
+				int spriteId;
+				if (ripple->flags & RIPPLE_FLAG_BLOOD)
+					spriteId = 0;
+				else
+					spriteId = SPR_RIPPLES;
 
-					//AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+				Vector4 color;
+				if (ripple->flags & RIPPLE_FLAG_LOW_OPACITY)
+				{
+					if (ripple->flags & RIPPLE_FLAG_BLOOD)
+					{
+						if (ripple->init)
+							color = Vector4(ripple->init >> 1, 0, ripple->init >> 4, 255);
+						else
+							color = Vector4(ripple->life >> 1, 0, ripple->life >> 4, 255);
+					}
+					else
+					{
+						if (ripple->init)
+							color = Vector4(ripple->init, ripple->init, ripple->init, 255);
+						else
+							color = Vector4(ripple->life, ripple->life, ripple->life, 255);
+					}
+				}
+				else
+				{
+					if (ripple->init)
+						color = Vector4(ripple->init << 1, ripple->init << 1, ripple->init << 1, 255);
+					else
+						color = Vector4(ripple->life << 1, ripple->life << 1, ripple->life << 1, 255);
+				}
+
+				color.x = (int)std::clamp((int)color.x, 0, 255);
+				color.y = (int)std::clamp((int)color.y, 0, 255);
+				color.z = (int)std::clamp((int)color.z, 0, 255);
+
+				color /= 255.0f;
+
+				if (ripple->flags & RIPPLE_FLAG_BLOOD)
+				{
+					AddSpriteBillboard(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex],
+						Vector3(ripple->x, ripple->y, ripple->z), 
+						color,
+						0, 
+						1,
+						{ ripple->size * 2.0f, ripple->size * 2.0f },
+						BLENDMODE_ADDITIVE, 
+						view);
+				}
+				else
+				{
+					AddSpriteBillboardConstrainedLookAt(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES],
+						Vector3(ripple->x, ripple->y, ripple->z),
+						color,
+						0,
+						1,
+						{ ripple->size * 2.0f, ripple->size * 2.0f },
+						BLENDMODE_ADDITIVE,
+						Vector3(0, -1, 0),
+						view);
 				}
 			}
 		}
