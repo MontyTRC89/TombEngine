@@ -23,7 +23,7 @@ void DoLaraCrawlFlex(ItemInfo* item, CollisionInfo* coll, short maxAngle, short 
 void DoLaraTightropeBalance(ItemInfo* item);
 void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
-void DoLaraFallDamage(ItemInfo* item);
+void DealLaraFallDamage(ItemInfo* item);
 
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);

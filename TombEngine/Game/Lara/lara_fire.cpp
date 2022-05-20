@@ -116,7 +116,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		3,
 		9,
 		3,
-		10,
+		9,
 		SFX_TR4_LARA_SHOTGUN,
 		0
 	},
@@ -133,7 +133,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		4,
 		0,
 		3,
-		10,
+		16,
 		0,     // FIRE/SILENCER_FIRE
 		0
 	},
@@ -150,7 +150,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		5,
 		0,
 		2,
-		10,
+		9,
 		SFX_TR4_LARA_CROSSBOW,
 		20
 	},
@@ -201,7 +201,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		20,
 		0,
 		2,
-		10,
+		9,
 		0,
 		30
 	},
