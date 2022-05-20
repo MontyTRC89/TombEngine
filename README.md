@@ -9,14 +9,14 @@ Unfortunately, TRNG's toolset is poorly documented and not user-friendly; the pr
 TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, fix bugs from the original games, introduce new features while refining old ones, and provide for a refined, user-friendly level creation process. Current support includes:
 - Lua (as the native scripting language)
 - All objects from the classic series (1-5)
-- Many more exciting gameplay functionalities such as corner shimmying and expanded crawlspace flexibility
+- Many more exciting gameplay functionalities such as diagonal shimmying and expanded crawlspace flexibility
 - An enlarged 2D map, allowing for the creation of massive levels (imagine one big level may previously have been split into five!)
 - A streamlined player control scheme.
 
 TEN is based on the Tomb Raider: Chronicles engine of the classic era and continues to build upon and replace its systems to modernize ...
 
 # Compiling TombEngine
-To compile TEM, ensure you have:
+To compile TEN, ensure you have installed:
 - Microsoft Visual Studio 
 - TombEditor (if you would like to create and test levels)
 
