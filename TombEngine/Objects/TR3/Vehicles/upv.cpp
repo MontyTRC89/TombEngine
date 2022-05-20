@@ -172,7 +172,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, 2);
+		SoundEffect(SFX_TR4_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, 2);
 
 		Statistics.Game.AmmoUsed++;
 		UPV->HarpoonLeft = !UPV->HarpoonLeft;
