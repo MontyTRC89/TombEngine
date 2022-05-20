@@ -52,7 +52,7 @@ void UpdateBubbles()
 
 		if (!TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber))
 		{
-			SetupRipple(bubble->worldPosition.x, g_Level.Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_LIFE + RIPPLE_FLAG_RAND_ROT, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+			SetupRipple(bubble->worldPosition.x, g_Level.Rooms[bubble->roomNumber].maxceiling, bubble->worldPosition.z, (GetRandomControl() & 0xF) + 48, RIPPLE_FLAG_SHORT_INIT);
 			bubble->active = false;
 			continue;
 		}
