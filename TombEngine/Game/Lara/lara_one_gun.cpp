@@ -72,7 +72,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity != 0);
-	bool harpoonFired = false;
+	static bool reloadHarpoonGun = false;
 
 	switch (item->Animation.ActiveState)
 	{
@@ -87,6 +87,12 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 			item->Animation.TargetState = WEAPON_STATE_UNAIM;
 		else
 			item->Animation.TargetState = WEAPON_STATE_RECOIL;
+
+		if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		{
+			item->Animation.TargetState = WEAPON_STATE_RELOAD;
+			reloadHarpoonGun = false;
+		}
 
 		break;
 
@@ -105,6 +111,12 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.TargetState = WEAPON_STATE_AIM;
 
+		if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		{
+			item->Animation.TargetState = WEAPON_STATE_RELOAD;
+			reloadHarpoonGun = false;
+		}
+
 		break;
 
 	case WEAPON_STATE_RECOIL:
@@ -112,7 +124,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		{
 			item->Animation.TargetState = WEAPON_STATE_UNAIM;
 
-			if (lara->Control.WaterStatus != WaterStatus::Underwater && !running && !harpoonFired)
+			if (lara->Control.WaterStatus != WaterStatus::Underwater && !running && !reloadHarpoonGun)
 			{
 				if (TrInput & IN_ACTION && (!lara->TargetEntity || lara->LeftArm.Locked))
 				{
@@ -120,8 +132,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->getCount() & 3))
-							harpoonFired = true;
+						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->getCount() % 4) &&
+							!lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+						{
+							reloadHarpoonGun = true;
+						}
 					}
 					else if (weaponType == LaraWeaponType::RocketLauncher)
 						FireRocket(laraItem);
@@ -150,6 +165,9 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				else if (lara->LeftArm.Locked)
 					item->Animation.TargetState = WEAPON_STATE_AIM;
 			}
+
+			if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun)
+				item->Animation.TargetState = WEAPON_STATE_UNAIM;
 
 			if (item->Animation.TargetState != WEAPON_STATE_RECOIL &&
 				//HKFlag &&
@@ -186,7 +204,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		{
 			item->Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
-			if ((lara->Control.WaterStatus == WaterStatus::Underwater || running) && !harpoonFired)
+			if ((lara->Control.WaterStatus == WaterStatus::Underwater || running) && !reloadHarpoonGun)
 			{
 				if (TrInput & IN_ACTION &&
 					(!lara->TargetEntity || lara->LeftArm.Locked))
@@ -195,8 +213,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					{
 						FireHarpoon(laraItem);
 
-						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->getCount() & 3))
-							harpoonFired = true;
+						if (!(lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo->getCount() % 4) &&
+							!lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+						{
+							reloadHarpoonGun = true;
+						}
 					}
 					else if (weaponType == LaraWeaponType::HK)// && (/*!(lara->HKtypeCarried & 0x18) || */!HKTimer))
 					{
@@ -1419,7 +1440,6 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 		}
 		else
 		{
-
 			auto jointPos = Vector3Int(0, 228, 32);
 			GetLaraJointPosition(&jointPos, LM_RHAND);
 
