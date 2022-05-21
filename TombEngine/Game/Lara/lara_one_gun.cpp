@@ -72,7 +72,9 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity != 0);
+	
 	static bool reloadHarpoonGun = false;
+	reloadHarpoonGun = lara->Weapons[(int)weaponType].Ammo->hasInfinite() ? false : reloadHarpoonGun;
 
 	switch (item->Animation.ActiveState)
 	{
@@ -88,10 +90,13 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.TargetState = WEAPON_STATE_RECOIL;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
 		{
-			item->Animation.TargetState = WEAPON_STATE_RELOAD;
-			reloadHarpoonGun = false;
+			if (reloadHarpoonGun)
+			{
+				item->Animation.TargetState = WEAPON_STATE_RELOAD;
+				reloadHarpoonGun = false;
+			}
 		}
 
 		break;
@@ -111,10 +116,13 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.TargetState = WEAPON_STATE_AIM;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
 		{
-			item->Animation.TargetState = WEAPON_STATE_RELOAD;
-			reloadHarpoonGun = false;
+			if (reloadHarpoonGun)
+			{
+				item->Animation.TargetState = WEAPON_STATE_RELOAD;
+				reloadHarpoonGun = false;
+			}
 		}
 
 		break;
