@@ -78,7 +78,7 @@ bool ClipTarget(GameVector* start, GameVector* target)
 	return true;
 }
 
-bool GetTargetOnLOS(GameVector* src, GameVector* dest, int drawTarget, bool firing)
+bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool firing)
 {
 	Vector3 direction = Vector3(dest->x, dest->y, dest->z) - Vector3(src->x, src->y, src->z);
 	direction.Normalize();

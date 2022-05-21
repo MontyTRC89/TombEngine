@@ -269,12 +269,12 @@ void UpdateRats()
 					if (TestEnvironment(ENV_FLAG_WATER, oldRoomNumber))
 					{
 						if (!(GetRandomControl() & 0xF))
-							SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, 2,Objects[ID_DEFAULT_SPRITES].meshIndex+SPR_RIPPLES);
+							SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, RIPPLE_FLAG_SHORT_INIT);
 					}
 					else
 					{
 						AddWaterSparks(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, 16);
-						SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, 2, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+						SetupRipple(rat->Pose.Position.x, room->maxceiling, rat->Pose.Position.z, (GetRandomControl() & 3) + 48, RIPPLE_FLAG_SHORT_INIT);
 						SoundEffect(SFX_TR5_RATS_SPLASH,&rat->Pose, 0);
 					}
 				}

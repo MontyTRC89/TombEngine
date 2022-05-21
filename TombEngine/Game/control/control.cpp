@@ -173,7 +173,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetMenuToDisplay(Menu::Pause);
 				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) && LaraItem->HitPoints > 0)
+			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) &&
+				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
 				// Stop all sounds
 				StopAllSounds();
@@ -218,7 +219,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		{
 			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
 				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
-					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE || LaraItem->Animation.TargetState != LS_CROUCH_IDLE)))
+					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.TargetState != LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE)))
 			{
 				if (BinocularRange == 0)
 				{
@@ -234,16 +235,15 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 					if (LaserSight)
 					{
 						BinocularRange = 0;
+						BinocularOn = false;
 						LaserSight = false;
-						AlterFOV(ANGLE(80));
+						Camera.type = BinocularOldCamera;
+						Camera.bounce = 0;
+						AlterFOV(ANGLE(80.0f));
+
 						LaraItem->MeshBits = 0xFFFFFFFF;
 						Lara.Inventory.IsBusy = false;
-						Camera.type = BinocularOldCamera;
-
 						ResetLaraFlex(LaraItem);
-
-						Camera.bounce = 0;
-						BinocularOn = -8;
 
 						TrInput &= ~IN_LOOK;
 					}
@@ -256,15 +256,16 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			}
 			else if (BinocularRange == 0)
 			{
-				if (Lara.Control.HandStatus == HandStatus::WeaponReady && ((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-												   (Lara.Control.Weapon.GunType == LaraWeaponType::HK) || 
-												   (Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+				if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
+					((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+						Lara.Control.Weapon.GunType == LaraWeaponType::HK || 
+						(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
 				{
 					BinocularRange = 128;
 					BinocularOldCamera = Camera.oldType;
-
-					Lara.Inventory.IsBusy = true;
+					BinocularOn = true;
 					LaserSight = true;
+					Lara.Inventory.IsBusy = true;
 				}
 			}
 		}
