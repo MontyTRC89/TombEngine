@@ -74,7 +74,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity != 0);
 	
 	static bool reloadHarpoonGun = false;
-	reloadHarpoonGun = lara->Weapons[(int)weaponType].Ammo->hasInfinite() ? false : reloadHarpoonGun;
+	reloadHarpoonGun = (lara->Weapons[(int)weaponType].Ammo->hasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
 
 	switch (item->Animation.ActiveState)
 	{
