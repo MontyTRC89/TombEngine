@@ -386,22 +386,70 @@ namespace TEN::Renderer
 		{
 			RIPPLE_STRUCT* ripple = &Ripples[i];
 
-			if (ripple->active) 
+			if (ripple->flags & RIPPLE_FLAG_ACTIVE) 
 			{
-				float y = ripple->worldPos.y;
-				if (ripple->isBillboard) 
-				{
-					AddSpriteBillboard(&m_sprites[ripple->SpriteID], ripple->worldPos, ripple->currentColor, ripple->rotation, 1, { ripple->size, ripple->size }, BLENDMODE_ADDITIVE, view);
-				} 
-				else 
-				{
-					AddSpriteBillboardConstrainedLookAt(&m_sprites[ripple->SpriteID], 
-						ripple->worldPos, 
-						ripple->currentColor, 
-						ripple->rotation, 
-						1, { ripple->size * 2, ripple->size * 2 }, BLENDMODE_ADDITIVE, Vector3(0, -1, 0), view);
+				int spriteId;
+				if (ripple->flags & RIPPLE_FLAG_BLOOD)
+					spriteId = 0;
+				else
+					spriteId = SPR_RIPPLES;
 
-					//AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + ripple->SpriteID], Vector3(x1, y, z2), Vector3(x2, y, z2), Vector3(x2, y, z1), Vector3(x1, y, z1), ripple->currentColor, 0.0f, 1.0f, ripple->size, ripple->size, BLENDMODE_ALPHABLEND);
+				Vector4 color;
+				if (ripple->flags & RIPPLE_FLAG_LOW_OPACITY)
+				{
+					if (ripple->flags & RIPPLE_FLAG_BLOOD)
+					{
+						if (ripple->init)
+							color = Vector4(ripple->init >> 1, 0, ripple->init >> 4, 255);
+						else
+							color = Vector4(ripple->life >> 1, 0, ripple->life >> 4, 255);
+					}
+					else
+					{
+						if (ripple->init)
+							color = Vector4(ripple->init, ripple->init, ripple->init, 255);
+						else
+							color = Vector4(ripple->life, ripple->life, ripple->life, 255);
+					}
+				}
+				else
+				{
+					if (ripple->init)
+						color = Vector4(ripple->init << 1, ripple->init << 1, ripple->init << 1, 255);
+					else
+						color = Vector4(ripple->life << 1, ripple->life << 1, ripple->life << 1, 255);
+				}
+
+				color.x = (int)std::clamp((int)color.x, 0, 255);
+				color.y = (int)std::clamp((int)color.y, 0, 255);
+				color.z = (int)std::clamp((int)color.z, 0, 255);
+
+				color /= 255.0f;
+
+				if (ripple->flags & RIPPLE_FLAG_BLOOD)
+				{
+					AddSpriteBillboard(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex],
+						Vector3(ripple->x, ripple->y, ripple->z), 
+						color,
+						0, 
+						1,
+						{ ripple->size * 2.0f, ripple->size * 2.0f },
+						BLENDMODE_ADDITIVE, 
+						view);
+				}
+				else
+				{
+					AddSpriteBillboardConstrainedLookAt(
+						&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES],
+						Vector3(ripple->x, ripple->y, ripple->z),
+						color,
+						0,
+						1,
+						{ ripple->size * 2.0f, ripple->size * 2.0f },
+						BLENDMODE_ADDITIVE,
+						Vector3(0, -1, 0),
+						view);
 				}
 			}
 		}
@@ -594,7 +642,8 @@ namespace TEN::Renderer
 			{
 				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
-				if (flashBucket.Vertices.size() != 0) 
+
+				if (flashBucket.Polygons.size() > 0) 
 				{
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
@@ -609,7 +658,7 @@ namespace TEN::Renderer
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 
 					if (Lara.RightArm.FlashGun)
@@ -622,7 +671,7 @@ namespace TEN::Renderer
 						m_cbItem.updateData(m_stItem, m_context.Get());
 						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-						DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
 			}
@@ -686,7 +735,8 @@ namespace TEN::Renderer
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
-						if (flashBucket.Vertices.size() != 0)
+
+						if (flashBucket.Polygons.size() > 0)
 						{
 							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
 							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
@@ -701,7 +751,7 @@ namespace TEN::Renderer
 							m_cbItem.updateData(m_stItem, m_context.Get());
 							m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
 
-							DrawIndexedTriangles(flashBucket.Indices.size(), flashBucket.StartIndex, 0);
+							DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 						}
 					}
 				}
