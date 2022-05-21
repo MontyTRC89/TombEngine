@@ -12,6 +12,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
@@ -140,6 +141,12 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 	auto* lara = GetLaraInfo(laraItem);
 	auto UPV = (UPVInfo*)UPVItem->Data;
 
+	Ammo& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+	if (ammo.getCount() == 0 && !ammo.hasInfinite())
+		return;
+	else if (!ammo.hasInfinite())
+		ammo--;
+
 	short itemNumber = CreateItem();
 
 	if (itemNumber != NO_ITEM)
@@ -149,17 +156,13 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 		harpoonItem->Shade = 0xC210;
 		harpoonItem->RoomNumber = UPVItem->RoomNumber;
 
-		Vector3Int pos{ (UPV->HarpoonLeft ? 22 : -22), 24, 230 };
+		auto pos = Vector3Int((UPV->HarpoonLeft ? 22 : -22), 24, 230);
 		GetJointAbsPosition(UPVItem, &pos, UPV_TURBINE_BONE);
 
-		harpoonItem->Pose.Position.x = pos.x;
-		harpoonItem->Pose.Position.y = pos.y;
-		harpoonItem->Pose.Position.z = pos.z;
+		harpoonItem->Pose.Position = pos;
 		InitialiseItem(itemNumber);
 
-		harpoonItem->Pose.Orientation.x = UPVItem->Pose.Orientation.x;
-		harpoonItem->Pose.Orientation.y = UPVItem->Pose.Orientation.y;
-		harpoonItem->Pose.Orientation.z = 0;
+		harpoonItem->Pose.Orientation = Vector3Shrt(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
 
 		// TODO: Huh?
 		harpoonItem->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(harpoonItem->Pose.Orientation.x);
@@ -250,7 +253,7 @@ void UPVEffects(short itemNumber)
 
 		if (UPV->Velocity)
 		{
-			pos = { UPVBites[UPV_FAN].x, UPVBites[UPV_FAN].y, UPVBites[UPV_FAN].z };
+			pos = Vector3Int(UPVBites[UPV_FAN].x, UPVBites[UPV_FAN].y, UPVBites[UPV_FAN].z);
 			GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_FAN].meshNum);
 
 			TriggerUPVMist(pos.x, pos.y + UPV_DRAW_SHIFT, pos.z, abs(UPV->Velocity) / (USHRT_MAX + 1), UPVItem->Pose.Orientation.y + ANGLE(180.0f));
@@ -271,10 +274,10 @@ void UPVEffects(short itemNumber)
 	for (int lp = 0; lp < 2; lp++)
 	{
 		int random = 31 - (GetRandomControl() & 3);
-		pos = { UPVBites[UPV_FRONT_LIGHT].x, UPVBites[UPV_FRONT_LIGHT].y, UPVBites[UPV_FRONT_LIGHT].z << (lp * 6) };
+		pos = Vector3Int(UPVBites[UPV_FRONT_LIGHT].x, UPVBites[UPV_FRONT_LIGHT].y, UPVBites[UPV_FRONT_LIGHT].z << (lp * 6));
 		GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_FRONT_LIGHT].meshNum);
 
-		GameVector	source, target;
+		GameVector source, target;
 		if (lp == 1)
 		{
 			target.x = pos.x;
@@ -282,7 +285,7 @@ void UPVEffects(short itemNumber)
 			target.z = pos.z;
 			target.roomNumber = UPVItem->RoomNumber;
 			LOS(&source, &target);
-			pos = { target.x, target.y, target.z };
+			pos = Vector3Int(target.x, target.y, target.z);
 		}
 		else
 		{
@@ -437,9 +440,7 @@ static void BackgroundCollision(ItemInfo* laraItem, ItemInfo* UPVItem)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
-	coll->Setup.OldPosition.x = UPVItem->Pose.Position.x;
-	coll->Setup.OldPosition.y = UPVItem->Pose.Position.y;
-	coll->Setup.OldPosition.z = UPVItem->Pose.Position.z;
+	coll->Setup.OldPosition = UPVItem->Pose.Position;
 
 	if ((UPVItem->Pose.Orientation.x >= -(SHRT_MAX / 2 + 1)) && (UPVItem->Pose.Orientation.x <= (SHRT_MAX / 2 + 1)))
 	{
@@ -494,9 +495,7 @@ static void BackgroundCollision(ItemInfo* laraItem, ItemInfo* UPVItem)
 		UPVItem->Pose.Orientation.y -= ANGLE(5.0f);
 	else if (coll->CollisionType == CT_CLAMP)
 	{
-		UPVItem->Pose.Position.x = coll->Setup.OldPosition.x;
-		UPVItem->Pose.Position.y = coll->Setup.OldPosition.y;
-		UPVItem->Pose.Position.z = coll->Setup.OldPosition.z;
+		UPVItem->Pose.Position = coll->Setup.OldPosition;
 		UPV->Velocity = 0;
 		return;
 	}
@@ -685,22 +684,22 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 			Vector3Int vec = { 0, 0, 0 };
 			GetLaraJointPosition(&vec, LM_HIPS);
 
-			GameVector LPos;
-			LPos.x = vec.x;
-			LPos.y = vec.y;
-			LPos.z = vec.z;
-			LPos.roomNumber = UPVItem->RoomNumber;
+			auto LPos = GameVector(
+				vec.x,
+				vec.y,
+				vec.z,
+				UPVItem->RoomNumber
+			);
 
-			GameVector VPos;
-			VPos.x = UPVItem->Pose.Position.x;
-			VPos.y = UPVItem->Pose.Position.y;
-			VPos.z = UPVItem->Pose.Position.z;
-			VPos.roomNumber = UPVItem->RoomNumber;
+			auto VPos = GameVector(
+				UPVItem->Pose.Position.x,
+				UPVItem->Pose.Position.y,
+				UPVItem->Pose.Position.z,
+				UPVItem->RoomNumber
+			);
 			LOSAndReturnTarget(&VPos, &LPos, 0);
 
-			laraItem->Pose.Position.x = LPos.x;
-			laraItem->Pose.Position.y = LPos.y;
-			laraItem->Pose.Position.z = LPos.z;
+			laraItem->Pose.Position = Vector3Int(LPos.x, LPos.y, LPos.z);
 
 			SetAnimation(laraItem, LA_UNDERWATER_IDLE);
 			laraItem->Animation.VerticalVelocity = 0;
@@ -768,12 +767,10 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 	case UPV_STATE_DEATH:
 		if (anim == UPV_ANIM_DEATH && (frame == DEATH_FRAME_1 || frame == DEATH_FRAME_2))
 		{
-			Vector3Int vec = { 0, 0, 0 };
+			auto vec = Vector3Int();
 			GetLaraJointPosition(&vec, LM_HIPS);
 
-			laraItem->Pose.Position.x = vec.x;
-			laraItem->Pose.Position.y = vec.y;
-			laraItem->Pose.Position.z = vec.z;
+			laraItem->Pose.Position = vec;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 
@@ -885,12 +882,7 @@ void UPVCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
 		}
 
-		laraItem->Pose.Position.x = UPVItem->Pose.Position.x;
-		laraItem->Pose.Position.y = UPVItem->Pose.Position.y;
-		laraItem->Pose.Position.z = UPVItem->Pose.Position.z;
-		laraItem->Pose.Orientation.x = UPVItem->Pose.Orientation.x;
-		laraItem->Pose.Orientation.y = UPVItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = UPVItem->Pose.Orientation.z;
+		laraItem->Pose = UPVItem->Pose;
 		lara->Control.HandStatus = HandStatus::Busy;
 		UPVItem->HitPoints = 1;
 
@@ -951,9 +943,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 	if ((newHeight - waterHeight) < UPV_HEIGHT || (newHeight < UPVItem->Pose.Position.y - UPV_HEIGHT / 2) || 
 		(newHeight == NO_HEIGHT) || (waterHeight == NO_HEIGHT))
 	{
-		UPVItem->Pose.Position.x = oldPos.Position.x;
-		UPVItem->Pose.Position.y = oldPos.Position.y;
-		UPVItem->Pose.Position.z = oldPos.Position.z;
+		UPVItem->Pose.Position = oldPos.Position;
 		UPVItem->Animation.Velocity = 0;
 	}
 
@@ -1042,12 +1032,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 
-		laraItem->Pose.Position.x = UPVItem->Pose.Position.x;
-		laraItem->Pose.Position.y = UPVItem->Pose.Position.y;
-		laraItem->Pose.Position.z = UPVItem->Pose.Position.z;
-		laraItem->Pose.Orientation.x = UPVItem->Pose.Orientation.x;
-		laraItem->Pose.Orientation.y = UPVItem->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = UPVItem->Pose.Orientation.z;
+		laraItem->Pose = UPVItem->Pose;
 
 		AnimateItem(laraItem);
 		BackgroundCollision(laraItem, UPVItem);
