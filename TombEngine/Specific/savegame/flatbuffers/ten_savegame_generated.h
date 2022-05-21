@@ -362,6 +362,8 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t after_death = 0;
   std::vector<int32_t> item_flags{};
   std::unique_ptr<TEN::Save::Position> position{};
+  int32_t next_item = 0;
+  int32_t next_item_active = 0;
   bool triggered = false;
   bool active = false;
   int32_t status = 0;
@@ -373,6 +375,10 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
   std::string lua_name{};
+  std::string lua_on_killed_name{};
+  std::string lua_on_hit_name{};
+  std::string lua_on_collided_with_object_name{};
+  std::string lua_on_collided_with_room_name{};
 };
 
 struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -401,18 +407,24 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_AFTER_DEATH = 40,
     VT_ITEM_FLAGS = 42,
     VT_POSITION = 44,
-    VT_TRIGGERED = 46,
-    VT_ACTIVE = 48,
-    VT_STATUS = 50,
-    VT_AIRBORNE = 52,
-    VT_HIT_STAUTS = 54,
-    VT_COLLIDABLE = 56,
-    VT_LOOKED_AT = 58,
-    VT_AI_BITS = 60,
-    VT_SWAP_MESH_FLAGS = 62,
-    VT_DATA_TYPE = 64,
-    VT_DATA = 66,
-    VT_LUA_NAME = 68
+    VT_NEXT_ITEM = 46,
+    VT_NEXT_ITEM_ACTIVE = 48,
+    VT_TRIGGERED = 50,
+    VT_ACTIVE = 52,
+    VT_STATUS = 54,
+    VT_AIRBORNE = 56,
+    VT_HIT_STAUTS = 58,
+    VT_COLLIDABLE = 60,
+    VT_LOOKED_AT = 62,
+    VT_AI_BITS = 64,
+    VT_SWAP_MESH_FLAGS = 66,
+    VT_DATA_TYPE = 68,
+    VT_DATA = 70,
+    VT_LUA_NAME = 72,
+    VT_LUA_ON_KILLED_NAME = 74,
+    VT_LUA_ON_HIT_NAME = 76,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 78,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 80
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -476,6 +488,12 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Position *position() const {
     return GetStruct<const TEN::Save::Position *>(VT_POSITION);
+  }
+  int32_t next_item() const {
+    return GetField<int32_t>(VT_NEXT_ITEM, 0);
+  }
+  int32_t next_item_active() const {
+    return GetField<int32_t>(VT_NEXT_ITEM_ACTIVE, 0);
   }
   bool triggered() const {
     return GetField<uint8_t>(VT_TRIGGERED, 0) != 0;
@@ -580,6 +598,18 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::String *lua_name() const {
     return GetPointer<const flatbuffers::String *>(VT_LUA_NAME);
   }
+  const flatbuffers::String *lua_on_killed_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_KILLED_NAME);
+  }
+  const flatbuffers::String *lua_on_hit_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_HIT_NAME);
+  }
+  const flatbuffers::String *lua_on_collided_with_object_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME);
+  }
+  const flatbuffers::String *lua_on_collided_with_room_name() const {
+    return GetPointer<const flatbuffers::String *>(VT_LUA_ON_COLLIDED_WITH_ROOM_NAME);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_FLOOR) &&
@@ -604,6 +634,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_ITEM_FLAGS) &&
            verifier.VerifyVector(item_flags()) &&
            VerifyField<TEN::Save::Position>(verifier, VT_POSITION) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_ITEM) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_ITEM_ACTIVE) &&
            VerifyField<uint8_t>(verifier, VT_TRIGGERED) &&
            VerifyField<uint8_t>(verifier, VT_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_STATUS) &&
@@ -618,6 +650,14 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyItemData(verifier, data(), data_type()) &&
            VerifyOffset(verifier, VT_LUA_NAME) &&
            verifier.VerifyString(lua_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_KILLED_NAME) &&
+           verifier.VerifyString(lua_on_killed_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_HIT_NAME) &&
+           verifier.VerifyString(lua_on_hit_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME) &&
+           verifier.VerifyString(lua_on_collided_with_object_name()) &&
+           VerifyOffset(verifier, VT_LUA_ON_COLLIDED_WITH_ROOM_NAME) &&
+           verifier.VerifyString(lua_on_collided_with_room_name()) &&
            verifier.EndTable();
   }
   ItemT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -780,6 +820,12 @@ struct ItemBuilder {
   void add_position(const TEN::Save::Position *position) {
     fbb_.AddStruct(Item::VT_POSITION, position);
   }
+  void add_next_item(int32_t next_item) {
+    fbb_.AddElement<int32_t>(Item::VT_NEXT_ITEM, next_item, 0);
+  }
+  void add_next_item_active(int32_t next_item_active) {
+    fbb_.AddElement<int32_t>(Item::VT_NEXT_ITEM_ACTIVE, next_item_active, 0);
+  }
   void add_triggered(bool triggered) {
     fbb_.AddElement<uint8_t>(Item::VT_TRIGGERED, static_cast<uint8_t>(triggered), 0);
   }
@@ -816,6 +862,18 @@ struct ItemBuilder {
   void add_lua_name(flatbuffers::Offset<flatbuffers::String> lua_name) {
     fbb_.AddOffset(Item::VT_LUA_NAME, lua_name);
   }
+  void add_lua_on_killed_name(flatbuffers::Offset<flatbuffers::String> lua_on_killed_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_KILLED_NAME, lua_on_killed_name);
+  }
+  void add_lua_on_hit_name(flatbuffers::Offset<flatbuffers::String> lua_on_hit_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_HIT_NAME, lua_on_hit_name);
+  }
+  void add_lua_on_collided_with_object_name(flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_object_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME, lua_on_collided_with_object_name);
+  }
+  void add_lua_on_collided_with_room_name(flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_room_name) {
+    fbb_.AddOffset(Item::VT_LUA_ON_COLLIDED_WITH_ROOM_NAME, lua_on_collided_with_room_name);
+  }
   explicit ItemBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -850,6 +908,8 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t after_death = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> item_flags = 0,
     const TEN::Save::Position *position = 0,
+    int32_t next_item = 0,
+    int32_t next_item_active = 0,
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
@@ -861,13 +921,23 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
-    flatbuffers::Offset<flatbuffers::String> lua_name = 0) {
+    flatbuffers::Offset<flatbuffers::String> lua_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_killed_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_hit_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_object_name = 0,
+    flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_room_name = 0) {
   ItemBuilder builder_(_fbb);
+  builder_.add_lua_on_collided_with_room_name(lua_on_collided_with_room_name);
+  builder_.add_lua_on_collided_with_object_name(lua_on_collided_with_object_name);
+  builder_.add_lua_on_hit_name(lua_on_hit_name);
+  builder_.add_lua_on_killed_name(lua_on_killed_name);
   builder_.add_lua_name(lua_name);
   builder_.add_data(data);
   builder_.add_swap_mesh_flags(swap_mesh_flags);
   builder_.add_ai_bits(ai_bits);
   builder_.add_status(status);
+  builder_.add_next_item_active(next_item_active);
+  builder_.add_next_item(next_item);
   builder_.add_position(position);
   builder_.add_item_flags(item_flags);
   builder_.add_after_death(after_death);
@@ -927,6 +997,8 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t after_death = 0,
     const std::vector<int32_t> *item_flags = nullptr,
     const TEN::Save::Position *position = 0,
+    int32_t next_item = 0,
+    int32_t next_item_active = 0,
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
@@ -938,9 +1010,17 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
-    const char *lua_name = nullptr) {
+    const char *lua_name = nullptr,
+    const char *lua_on_killed_name = nullptr,
+    const char *lua_on_hit_name = nullptr,
+    const char *lua_on_collided_with_object_name = nullptr,
+    const char *lua_on_collided_with_room_name = nullptr) {
   auto item_flags__ = item_flags ? _fbb.CreateVector<int32_t>(*item_flags) : 0;
   auto lua_name__ = lua_name ? _fbb.CreateString(lua_name) : 0;
+  auto lua_on_killed_name__ = lua_on_killed_name ? _fbb.CreateString(lua_on_killed_name) : 0;
+  auto lua_on_hit_name__ = lua_on_hit_name ? _fbb.CreateString(lua_on_hit_name) : 0;
+  auto lua_on_collided_with_object_name__ = lua_on_collided_with_object_name ? _fbb.CreateString(lua_on_collided_with_object_name) : 0;
+  auto lua_on_collided_with_room_name__ = lua_on_collided_with_room_name ? _fbb.CreateString(lua_on_collided_with_room_name) : 0;
   return TEN::Save::CreateItem(
       _fbb,
       floor,
@@ -964,6 +1044,8 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       after_death,
       item_flags__,
       position,
+      next_item,
+      next_item_active,
       triggered,
       active,
       status,
@@ -975,7 +1057,11 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       swap_mesh_flags,
       data_type,
       data,
-      lua_name__);
+      lua_name__,
+      lua_on_killed_name__,
+      lua_on_hit_name__,
+      lua_on_collided_with_object_name__,
+      lua_on_collided_with_room_name__);
 }
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
@@ -5331,8 +5417,10 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
-  std::unique_ptr<TEN::Save::WeaponInfoT> active_weapon{};
   std::vector<std::unique_ptr<TEN::Save::ItemT>> items{};
+  int32_t next_item_free = 0;
+  int32_t next_item_active = 0;
+  std::vector<int32_t> room_items{};
   std::vector<std::unique_ptr<TEN::Save::FixedCameraT>> fixed_cameras{};
   std::vector<std::unique_ptr<TEN::Save::SinkT>> sinks{};
   std::vector<std::unique_ptr<TEN::Save::StaticMeshInfoT>> static_meshes{};
@@ -5366,30 +5454,32 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_GAME = 6,
     VT_LEVEL = 8,
     VT_LARA = 10,
-    VT_ACTIVE_WEAPON = 12,
-    VT_ITEMS = 14,
-    VT_FIXED_CAMERAS = 16,
-    VT_SINKS = 18,
-    VT_STATIC_MESHES = 20,
-    VT_FLYBY_CAMERAS = 22,
-    VT_RATS = 24,
-    VT_SPIDERS = 26,
-    VT_SCARABS = 28,
-    VT_BATS = 30,
-    VT_FLIP_MAPS = 32,
-    VT_FLIP_STATS = 34,
-    VT_FLIP_EFFECT = 36,
-    VT_FLIP_TIMER = 38,
-    VT_FLIP_STATUS = 40,
-    VT_AMBIENT_TRACK = 42,
-    VT_AMBIENT_POSITION = 44,
-    VT_ONESHOT_TRACK = 46,
-    VT_ONESHOT_POSITION = 48,
-    VT_CD_FLAGS = 50,
-    VT_ROPE = 52,
-    VT_PENDULUM = 54,
-    VT_ALTERNATE_PENDULUM = 56,
-    VT_SCRIPT_VARS = 58
+    VT_ITEMS = 12,
+    VT_NEXT_ITEM_FREE = 14,
+    VT_NEXT_ITEM_ACTIVE = 16,
+    VT_ROOM_ITEMS = 18,
+    VT_FIXED_CAMERAS = 20,
+    VT_SINKS = 22,
+    VT_STATIC_MESHES = 24,
+    VT_FLYBY_CAMERAS = 26,
+    VT_RATS = 28,
+    VT_SPIDERS = 30,
+    VT_SCARABS = 32,
+    VT_BATS = 34,
+    VT_FLIP_MAPS = 36,
+    VT_FLIP_STATS = 38,
+    VT_FLIP_EFFECT = 40,
+    VT_FLIP_TIMER = 42,
+    VT_FLIP_STATUS = 44,
+    VT_AMBIENT_TRACK = 46,
+    VT_AMBIENT_POSITION = 48,
+    VT_ONESHOT_TRACK = 50,
+    VT_ONESHOT_POSITION = 52,
+    VT_CD_FLAGS = 54,
+    VT_ROPE = 56,
+    VT_PENDULUM = 58,
+    VT_ALTERNATE_PENDULUM = 60,
+    VT_SCRIPT_VARS = 62
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -5403,11 +5493,17 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Lara *lara() const {
     return GetPointer<const TEN::Save::Lara *>(VT_LARA);
   }
-  const TEN::Save::WeaponInfo *active_weapon() const {
-    return GetPointer<const TEN::Save::WeaponInfo *>(VT_ACTIVE_WEAPON);
-  }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>> *items() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>> *>(VT_ITEMS);
+  }
+  int32_t next_item_free() const {
+    return GetField<int32_t>(VT_NEXT_ITEM_FREE, 0);
+  }
+  int32_t next_item_active() const {
+    return GetField<int32_t>(VT_NEXT_ITEM_ACTIVE, 0);
+  }
+  const flatbuffers::Vector<int32_t> *room_items() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ROOM_ITEMS);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *>(VT_FIXED_CAMERAS);
@@ -5485,11 +5581,13 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(level()) &&
            VerifyOffset(verifier, VT_LARA) &&
            verifier.VerifyTable(lara()) &&
-           VerifyOffset(verifier, VT_ACTIVE_WEAPON) &&
-           verifier.VerifyTable(active_weapon()) &&
            VerifyOffset(verifier, VT_ITEMS) &&
            verifier.VerifyVector(items()) &&
            verifier.VerifyVectorOfTables(items()) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_ITEM_FREE) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_ITEM_ACTIVE) &&
+           VerifyOffset(verifier, VT_ROOM_ITEMS) &&
+           verifier.VerifyVector(room_items()) &&
            VerifyOffset(verifier, VT_FIXED_CAMERAS) &&
            verifier.VerifyVector(fixed_cameras()) &&
            verifier.VerifyVectorOfTables(fixed_cameras()) &&
@@ -5560,11 +5658,17 @@ struct SaveGameBuilder {
   void add_lara(flatbuffers::Offset<TEN::Save::Lara> lara) {
     fbb_.AddOffset(SaveGame::VT_LARA, lara);
   }
-  void add_active_weapon(flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon) {
-    fbb_.AddOffset(SaveGame::VT_ACTIVE_WEAPON, active_weapon);
-  }
   void add_items(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items) {
     fbb_.AddOffset(SaveGame::VT_ITEMS, items);
+  }
+  void add_next_item_free(int32_t next_item_free) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_ITEM_FREE, next_item_free, 0);
+  }
+  void add_next_item_active(int32_t next_item_active) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_ITEM_ACTIVE, next_item_active, 0);
+  }
+  void add_room_items(flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items) {
+    fbb_.AddOffset(SaveGame::VT_ROOM_ITEMS, room_items);
   }
   void add_fixed_cameras(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras) {
     fbb_.AddOffset(SaveGame::VT_FIXED_CAMERAS, fixed_cameras);
@@ -5649,8 +5753,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
-    flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Item>>> items = 0,
+    int32_t next_item_free = 0,
+    int32_t next_item_active = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Sink>>> sinks = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>> static_meshes = 0,
@@ -5696,8 +5802,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_static_meshes(static_meshes);
   builder_.add_sinks(sinks);
   builder_.add_fixed_cameras(fixed_cameras);
+  builder_.add_room_items(room_items);
+  builder_.add_next_item_active(next_item_active);
+  builder_.add_next_item_free(next_item_free);
   builder_.add_items(items);
-  builder_.add_active_weapon(active_weapon);
   builder_.add_lara(lara);
   builder_.add_level(level);
   builder_.add_game(game);
@@ -5716,8 +5824,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
-    flatbuffers::Offset<TEN::Save::WeaponInfo> active_weapon = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Item>> *items = nullptr,
+    int32_t next_item_free = 0,
+    int32_t next_item_active = 0,
+    const std::vector<int32_t> *room_items = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Sink>> *sinks = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *static_meshes = nullptr,
@@ -5741,6 +5851,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::Pendulum> alternate_pendulum = 0,
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
+  auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
   auto static_meshes__ = static_meshes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>(*static_meshes) : 0;
@@ -5760,8 +5871,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       game,
       level,
       lara,
-      active_weapon,
       items__,
+      next_item_free,
+      next_item_active,
+      room_items__,
       fixed_cameras__,
       sinks__,
       static_meshes__,
@@ -5818,6 +5931,8 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = after_death(); _o->after_death = _e; }
   { auto _e = item_flags(); if (_e) { _o->item_flags.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->item_flags[_i] = _e->Get(_i); } } }
   { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = next_item(); _o->next_item = _e; }
+  { auto _e = next_item_active(); _o->next_item_active = _e; }
   { auto _e = triggered(); _o->triggered = _e; }
   { auto _e = active(); _o->active = _e; }
   { auto _e = status(); _o->status = _e; }
@@ -5830,6 +5945,10 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = data_type(); _o->data.type = _e; }
   { auto _e = data(); if (_e) _o->data.value = TEN::Save::ItemDataUnion::UnPack(_e, data_type(), _resolver); }
   { auto _e = lua_name(); if (_e) _o->lua_name = _e->str(); }
+  { auto _e = lua_on_killed_name(); if (_e) _o->lua_on_killed_name = _e->str(); }
+  { auto _e = lua_on_hit_name(); if (_e) _o->lua_on_hit_name = _e->str(); }
+  { auto _e = lua_on_collided_with_object_name(); if (_e) _o->lua_on_collided_with_object_name = _e->str(); }
+  { auto _e = lua_on_collided_with_room_name(); if (_e) _o->lua_on_collided_with_room_name = _e->str(); }
 }
 
 inline flatbuffers::Offset<Item> Item::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ItemT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -5861,6 +5980,8 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _after_death = _o->after_death;
   auto _item_flags = _fbb.CreateVector(_o->item_flags);
   auto _position = _o->position ? _o->position.get() : 0;
+  auto _next_item = _o->next_item;
+  auto _next_item_active = _o->next_item_active;
   auto _triggered = _o->triggered;
   auto _active = _o->active;
   auto _status = _o->status;
@@ -5873,6 +5994,10 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _data_type = _o->data.type;
   auto _data = _o->data.Pack(_fbb);
   auto _lua_name = _o->lua_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_name);
+  auto _lua_on_killed_name = _o->lua_on_killed_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_killed_name);
+  auto _lua_on_hit_name = _o->lua_on_hit_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_hit_name);
+  auto _lua_on_collided_with_object_name = _o->lua_on_collided_with_object_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_collided_with_object_name);
+  auto _lua_on_collided_with_room_name = _o->lua_on_collided_with_room_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->lua_on_collided_with_room_name);
   return TEN::Save::CreateItem(
       _fbb,
       _floor,
@@ -5896,6 +6021,8 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _after_death,
       _item_flags,
       _position,
+      _next_item,
+      _next_item_active,
       _triggered,
       _active,
       _status,
@@ -5907,7 +6034,11 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _swap_mesh_flags,
       _data_type,
       _data,
-      _lua_name);
+      _lua_name,
+      _lua_on_killed_name,
+      _lua_on_hit_name,
+      _lua_on_collided_with_object_name,
+      _lua_on_collided_with_room_name);
 }
 
 inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -7354,8 +7485,10 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
-  { auto _e = active_weapon(); if (_e) _o->active_weapon = std::unique_ptr<TEN::Save::WeaponInfoT>(_e->UnPack(_resolver)); }
   { auto _e = items(); if (_e) { _o->items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->items[_i] = std::unique_ptr<TEN::Save::ItemT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = next_item_free(); _o->next_item_free = _e; }
+  { auto _e = next_item_active(); _o->next_item_active = _e; }
+  { auto _e = room_items(); if (_e) { _o->room_items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->room_items[_i] = _e->Get(_i); } } }
   { auto _e = fixed_cameras(); if (_e) { _o->fixed_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fixed_cameras[_i] = std::unique_ptr<TEN::Save::FixedCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = sinks(); if (_e) { _o->sinks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->sinks[_i] = std::unique_ptr<TEN::Save::SinkT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = static_meshes(); if (_e) { _o->static_meshes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->static_meshes[_i] = std::unique_ptr<TEN::Save::StaticMeshInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -7392,8 +7525,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
   auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
-  auto _active_weapon = _o->active_weapon ? CreateWeaponInfo(_fbb, _o->active_weapon.get(), _rehasher) : 0;
   auto _items = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>> (_o->items.size(), [](size_t i, _VectorArgs *__va) { return CreateItem(*__va->__fbb, __va->__o->items[i].get(), __va->__rehasher); }, &_va );
+  auto _next_item_free = _o->next_item_free;
+  auto _next_item_active = _o->next_item_active;
+  auto _room_items = _fbb.CreateVector(_o->room_items);
   auto _fixed_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>> (_o->fixed_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFixedCamera(*__va->__fbb, __va->__o->fixed_cameras[i].get(), __va->__rehasher); }, &_va );
   auto _sinks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>> (_o->sinks.size(), [](size_t i, _VectorArgs *__va) { return CreateSink(*__va->__fbb, __va->__o->sinks[i].get(), __va->__rehasher); }, &_va );
   auto _static_meshes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> (_o->static_meshes.size(), [](size_t i, _VectorArgs *__va) { return CreateStaticMeshInfo(*__va->__fbb, __va->__o->static_meshes[i].get(), __va->__rehasher); }, &_va );
@@ -7422,8 +7557,10 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _game,
       _level,
       _lara,
-      _active_weapon,
       _items,
+      _next_item_free,
+      _next_item_active,
+      _room_items,
       _fixed_cameras,
       _sinks,
       _static_meshes,
