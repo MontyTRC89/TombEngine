@@ -174,9 +174,6 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 		SoundEffect(SFX_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, 2);
 
-		if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1])
-			lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1]--;
-
 		Statistics.Game.AmmoUsed++;
 		UPV->HarpoonLeft = !UPV->HarpoonLeft;
 	}
