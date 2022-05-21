@@ -67,18 +67,20 @@ namespace TEN::Entities::Generic
 
 	void DoFlameTorch()
 	{
-		switch (Lara.LeftArm.Locked)
+		int const holdAnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
+		int const throwAnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 1;
+		int const dropAnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 2;
+
+		if (Lara.CurrentTorchState == TorchState::Holding)
 		{
-		case 0:
 			if (Lara.Control.Weapon.RequestGunType != Lara.Control.Weapon.GunType)
 			{
 				Lara.LeftArm.Locked = true;
 				Lara.LeftArm.FrameNumber = 31;
-				Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 2;
-				break;
+				Lara.LeftArm.AnimNumber = dropAnimNumber;
+				Lara.CurrentTorchState = TorchState::Dropping;
 			}
-
-			if (TrInput & IN_DRAW &&
+			else if (TrInput & IN_DRAW &&
 				!LaraItem->Animation.VerticalVelocity &&
 				!LaraItem->Animation.Airborne &&
 				LaraItem->Animation.ActiveState != LS_JUMP_PREPARE &&
@@ -91,20 +93,22 @@ namespace TEN::Entities::Generic
 			{
 				Lara.LeftArm.Locked = true;
 				Lara.LeftArm.FrameNumber = 1;
-				Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex + 1;
+				Lara.LeftArm.AnimNumber = throwAnimNumber;
+				Lara.CurrentTorchState = TorchState::Throwing;
 
 				if (Lara.Control.WaterStatus == WaterStatus::Underwater)
 					Lara.LitTorch = false;
 			}
 
-			break;
-
-		case 1:
+		}
+		else if (Lara.CurrentTorchState == TorchState::Throwing)
+		{
 			if (Lara.LeftArm.FrameNumber < 12 && LaraItem->Animation.Airborne)
 			{
 				Lara.LeftArm.Locked = false;
 				Lara.LeftArm.FrameNumber = 0;
-				Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
+				Lara.LeftArm.AnimNumber = holdAnimNumber;
+				Lara.CurrentTorchState = TorchState::Holding;
 			}
 			else
 			{
@@ -114,6 +118,7 @@ namespace TEN::Entities::Generic
 					Lara.LitTorch = false;
 					Lara.Flare.ControlLeft = false;
 					Lara.LeftArm.Locked = false;
+					Lara.CurrentTorchState = TorchState::Holding;
 					Lara.Control.Weapon.GunType = Lara.Control.Weapon.LastGunType;
 					Lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
 					Lara.Control.HandStatus = HandStatus::Free;
@@ -124,16 +129,16 @@ namespace TEN::Entities::Generic
 					CreateFlare(LaraItem, ID_BURNING_TORCH_ITEM, true);
 				}
 			}
-
-			break;
-
-		case 2:
+		}
+		else if (Lara.CurrentTorchState == TorchState::Dropping)
+		{
 			Lara.LeftArm.FrameNumber++;
 			if (Lara.LeftArm.FrameNumber == 41)
 			{
 				Lara.LitTorch = false;
 				Lara.Flare.ControlLeft = false;
 				Lara.LeftArm.Locked = false;
+				Lara.CurrentTorchState = TorchState::Holding;
 				Lara.Control.Weapon.LastGunType = LaraWeaponType::None;
 				Lara.Control.Weapon.GunType = LaraWeaponType::None;
 				Lara.Control.HandStatus = HandStatus::Free;
@@ -143,23 +148,18 @@ namespace TEN::Entities::Generic
 				Lara.MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 				CreateFlare(LaraItem, ID_BURNING_TORCH_ITEM, false);
 			}
-
-			break;
-
-		case 3:
+		}
+		else if (Lara.CurrentTorchState == TorchState::JustLit)
+		{
 			if (LaraItem->Animation.ActiveState != LS_MISC_CONTROL)
 			{
 				Lara.LeftArm.Locked = false;
+				Lara.CurrentTorchState = TorchState::Holding;
 				Lara.LeftArm.FrameNumber = 0;
 				Lara.Flare.ControlLeft = true;
 				Lara.LitTorch = LaraItem->ItemFlags[3] & 1;
-				Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
+				Lara.LeftArm.AnimNumber = holdAnimNumber;
 			}
-
-			break;
-
-		default:
-			break;
 		}
 
 		if (Lara.Flare.ControlLeft)
