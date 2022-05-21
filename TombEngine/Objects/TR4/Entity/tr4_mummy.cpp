@@ -65,6 +65,7 @@ void InitialiseMummy(short itemNumber)
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = MUMMY_STATE_LYING_DOWN;
 		item->Animation.ActiveState = MUMMY_STATE_LYING_DOWN;
+		item->Status -= ITEM_INVISIBLE;
 	}
 	else
 	{

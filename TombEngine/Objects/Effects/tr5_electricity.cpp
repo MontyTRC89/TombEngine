@@ -207,7 +207,7 @@ void ElectricityWiresControl(short itemNumber)
 			{
 				waterTouch = true;
 				if ((GetRandomControl() & 127) < 16)
-					SetupRipple(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z, (GetRandomControl() & 7) + 32, 16, Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_RIPPLES);
+					SetupRipple(pos.x, floor->FloorHeight(pos.x, pos.y, pos.z), pos.z, (GetRandomControl() & 7) + 32, RIPPLE_FLAG_LOW_OPACITY);
 			}
 
 			if (pos.y < cableBottomPlane)

@@ -299,7 +299,7 @@ void AnimateItem(ItemInfo* item)
 					}
 					else if (TestEnvironment(ENV_FLAG_WATER, item))
 					{
-						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)  || Objects[item->ObjectNumber].intelligent))
+						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) || Objects[item->ObjectNumber].intelligent))
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, 2);
 					}
 					else if (!flags || flags == (int)SOUND_PLAYCONDITION::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
