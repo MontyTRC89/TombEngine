@@ -130,7 +130,7 @@ void ObjectsHandler::TestCollidingObjects()
 			size_t i = 0;
 			while (CollidedItems[i])
 			{
-				short idTwo = GetIndexByName(CollidedItems[i]->LuaName);
+				short idTwo = CollidedItems[i] - &g_Level.Items[0];
 				g_GameScript->ExecuteFunction(item->luaCallbackOnCollidedWithObjectName, idOne, idTwo);
 				++i;
 			}
