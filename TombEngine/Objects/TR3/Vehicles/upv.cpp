@@ -141,7 +141,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 	auto* lara = GetLaraInfo(laraItem);
 	auto UPV = (UPVInfo*)UPVItem->Data;
 
-	Ammo& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+	auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
 		return;
 	else if (!ammo.hasInfinite())
