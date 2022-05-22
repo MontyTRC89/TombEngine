@@ -46,7 +46,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 
 - ChocolateFan (general coding)
 - Gancian (general coding)
-- Krys (general coding)
+- Krystian (general coding)
 - Lwmte (sound refactoring, general coding, code cleanups, bug fixing)
 - Moooonyeah (Jumanji) (entity decompilation)
 - Raildex (renderer refactoring, particle coding, general coding) 
@@ -69,3 +69,8 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - RemRem
 - Stranger1992
 - WolfCheese
+
+## Animations 
+- Daniel (Diagonal shimmy transitions)
+- Krystian (Flexibility crawlspace, slope climbing animations)
+- Sezz (Additional Animations for player state refactoring) 
