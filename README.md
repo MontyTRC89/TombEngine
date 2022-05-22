@@ -71,6 +71,6 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - WolfCheese
 
 ## Animations 
-- Daniel (Diagonal shimmy transitions)
+- SrDanielPonces (Diagonal shimmy transitions)
 - Krystian (Flexibility crawlspace, slope climbing animations)
 - Sezz (Additional Animations for player state refactoring) 
