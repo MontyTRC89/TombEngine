@@ -484,7 +484,7 @@ behaviour for a particular scenario, you do not need to implement the function. 
 example, if your level does not need any special initialisation when it is loaded,
 you can just leave out `LevelFuncs.OnStart`.
 
-@tfield function OnStart Will be called when a level is loaded
+@tfield function OnStart Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
 @tfield function OnLoad Will be called when a saved game is loaded
 @tfield function(float) OnControlPhase Will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
