@@ -12,9 +12,13 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "camera.h"
 
-BITE_INFO ShivaBiteLeft = { 0, 0, 920, 13 };
-BITE_INFO ShivaBiteRight = { 0, 0, 920, 22 };
+BITE_INFO	ShivaBiteLeft = { 0, 0, 920, 13 };
+BITE_INFO	ShivaBiteRight = { 0, 0, 920, 22 };
+
+#define		LARA_SHIVA_DEATH_KILL_ANIM 7;
+#define		SHIVA_DEATH_KILL_ANIM 18; 
 
 enum ShivaState
 {
@@ -445,12 +449,30 @@ void ShivaControl(short itemNumber)
 		}
 	}
 
-	if (laraAlive && LaraItem->HitPoints <= 0)
+	if (laraAlive && LaraItem->HitPoints <= 0) // Shiva Death Kill Routine
 	{
-		CreatureKill(item, 18, 6, 2);
+		item->Animation.TargetState = SHIVA_STATE_KILL;
+
+		if (LaraItem->RoomNumber != item->RoomNumber)
+			ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
+
+		LaraItem->Pose.Position = item->Pose.Position;
+		LaraItem->Pose.Orientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
+		LaraItem->Animation.Airborne = false;
+
+		LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_SHIVA_DEATH_KILL_ANIM;
+		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+		LaraItem->Animation.ActiveState = LS_DEATH;
+		LaraItem->Animation.TargetState = LS_DEATH;
+
+		LaraItem->HitPoints = -16384;
+		Lara.Air = -1;
+		Lara.Control.HandStatus = HandStatus::Special;
+		Lara.Control.Weapon.GunType = LaraWeaponType::None;
+		Camera.targetDistance = SECTOR(4);
+		Camera.flags = CF_FOLLOW_CENTER;
 		return;
 	}
-
 	CreatureTilt(item, tilt);
 
 	extraHeadRot.y -= extraTorsoRot.y;
