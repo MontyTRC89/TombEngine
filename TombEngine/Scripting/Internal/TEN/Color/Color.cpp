@@ -41,7 +41,7 @@ void ScriptColor::Register(sol::table & parent)
 @int G green component
 @int B blue component
 @return A Color object.
-@function Color.new
+@function Color
 */
 ScriptColor::ScriptColor(byte r, byte g, byte b) :
 m_color(r, g, b)
