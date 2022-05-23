@@ -659,9 +659,10 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 
 	InitialiseItemBoxData();
 
-	g_GameScript->OnStart();
 	if (loadFromSavegame)
 		g_GameScript->OnLoad();
+	else
+		g_GameScript->OnStart();
 
 	int nFrames = 2;
 
