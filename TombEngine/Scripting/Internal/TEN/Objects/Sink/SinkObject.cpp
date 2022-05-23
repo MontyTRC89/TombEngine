@@ -27,34 +27,34 @@ void Sink::Register(sol::table& parent)
 		sol::meta_function::new_index, newindex_error,
 
 		/// Get the sink's position
-		// @function GetPosition
+		// @function Sink:GetPosition
 		// @treturn Vec3 a copy of the sink's position
 		ScriptReserved_GetPosition, &Sink::GetPos,
 
 		/// Set the sink's position
-		// @function SetPosition
+		// @function Sink:SetPosition
 		// @tparam Vec3 position the new position of the sink 
 		ScriptReserved_SetPosition, &Sink::SetPos,
 
 		/// Get the sink's unique string identifier
 		// e.g. "strong\_river\_current" or "propeller\_death\_sink"
-		// @function GetName
+		// @function Sink:GetName
 		// @treturn string the sink's name
 		ScriptReserved_GetName, &Sink::GetName,
 
 		/// Set the sink's name (its unique string identifier)
-		// @function SetName
+		// @function Sink:SetName
 		// @tparam string name The sink's new name
 		ScriptReserved_SetName, &Sink::SetName,
 
 		/// Get the sink's strength
-		// @function GetStrength
+		// @function Sink:GetStrength
 		// @treturn int the sink's current strength
 		ScriptReserved_GetStrength, &Sink::GetStrength,
 
 		/// Set the strength of the sink
 		// Higher numbers provide stronger currents. Will be clamped to [1, 32].
-		// @function SetStrength
+		// @function Sink:SetStrength
 		// @tparam int strength The sink's new strength
 		ScriptReserved_SetStrength, &Sink::SetStrength
 		);

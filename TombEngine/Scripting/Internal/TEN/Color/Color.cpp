@@ -54,7 +54,7 @@ m_color(r, g, b)
 @int B blue component
 @int A alpha component (255 is opaque, 0 is invisible)
 @return A Color object.
-@function Color.new
+@function Color
 */
 ScriptColor::ScriptColor(byte r, byte g, byte b, byte a) : ScriptColor(r, g, b)
 {
