@@ -848,6 +848,15 @@ void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
+		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
+			(TrInput & (IN_DRAW | IN_FLARE) &&
+				!IsStandingWeapon(item, lara->Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
+		{
+			item->Animation.TargetState = LS_CROUCH_IDLE;
+			lara->Control.HandStatus = HandStatus::Free;
+			return;
+		}
+
 		item->Animation.TargetState = LS_CRAWL_IDLE;
 		return;
 	}
