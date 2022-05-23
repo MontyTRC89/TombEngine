@@ -419,8 +419,10 @@ bool SaveGame::Save(int slot)
 		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
+		flatbuffers::Offset<Save::Short> shortOffset;
+		flatbuffers::Offset<Save::Int> intOffset;
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent 
+		if (Objects[itemToSerialize.ObjectNumber].intelligent
 			&& itemToSerialize.Data.is<CreatureInfo>())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
@@ -456,7 +458,19 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_reached_goal(creature->ReachedGoal);
 			creatureBuilder.add_tosspad(creature->Tosspad);
 			creatureOffset = creatureBuilder.Finish();
-		} 
+		}
+		else if (itemToSerialize.Data.is<short>())
+		{
+			Save::ShortBuilder sb{ fbb };
+			sb.add_scalar(short(itemToSerialize.Data));
+			shortOffset = sb.Finish();
+		}
+		else if (itemToSerialize.Data.is<int>())
+		{
+			Save::IntBuilder ib{ fbb };
+			ib.add_scalar(int(itemToSerialize.Data));
+			intOffset = ib.Finish();
+		}
 
 		Save::Position position = Save::Position(
 			(int32_t)itemToSerialize.Pose.Position.x,
@@ -509,15 +523,13 @@ bool SaveGame::Save(int slot)
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
-			short& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Short);
-			serializedItem.add_data(data);
+			serializedItem.add_data(shortOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<int>())
 		{
-			int& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Int);
-			serializedItem.add_data(data);
+			serializedItem.add_data(intOffset.Union());
 		}
 
 		serializedItem.add_lua_name(luaNameOffset);
