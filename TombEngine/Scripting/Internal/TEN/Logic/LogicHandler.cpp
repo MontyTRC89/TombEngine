@@ -456,7 +456,7 @@ For example, you may wish to have a final boss say a specific voice line based o
 a choice the player made in a previous level. In the level with the choice, you could
 write:
 
-	GameVars.playerSnoopedInDraws = true
+	GameVars.playerSnoopedInDrawers = true
 
 And in the script file for the level with the boss, you could write:
 
@@ -483,6 +483,14 @@ The following are the level callbacks. They are optional; if your level has no s
 behaviour for a particular scenario, you do not need to implement the function. For
 example, if your level does not need any special initialisation when it is loaded,
 you can just leave out `LevelFuncs.OnStart`.
+
+__The order of loading is as follows:__
+
+1. The level data itself is loaded.
+2. The level script itself is run (i.e. any code you put outside the `LevelFuncs` callbacks is executed).
+3. Save data is loaded, if saving from a saved game (will empty `LevelVars` and `GameVars` and repopulate them with what they contained when the game was saved).
+4. If loading from a save, `OnLoaded` will be called. Otherwise, `OnStart` will be called.
+5. The control loop, in which `OnControlPhase` will be called once per frame, begins.
 
 @tfield function OnStart Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
 @tfield function OnLoad Will be called when a saved game is loaded

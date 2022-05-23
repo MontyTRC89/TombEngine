@@ -92,6 +92,7 @@
 # else
 # if modName:find("class") then modName = "Class" end
 # if modName:find("Tentable") then modName = "Table" end
+# if modName:find("Tenprimitive") then modName = "Primitive Class" end
 <h1>$(modName) <code>$(module.name)</code></h1>
 # end
 <p>$(M(module.summary,module))</p>
