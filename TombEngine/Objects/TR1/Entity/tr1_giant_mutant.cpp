@@ -26,6 +26,7 @@
 #define MUTANT_PART_DAMAGE 250
 #define MUTANT_ATTACK_DAMAGE 500
 #define MUTANT_TOUCH_DAMAGE 5
+#define LARA_GIANT_MUTANT_DEATH 6
 
 enum GiantMutantState
 {
@@ -196,7 +197,7 @@ void GiantMutantControl(short itemNumber)
 				Camera.targetDistance = SECTOR(2);
 				Camera.flags = CF_FOLLOW_CENTER;
 
-				LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex;
+				LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex+LARA_GIANT_MUTANT_DEATH;
 				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 				LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
 				LaraItem->RoomNumber = item->RoomNumber;
