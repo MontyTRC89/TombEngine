@@ -11,6 +11,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+#define LARA_TREX_DEATH 4
+
 // TODO
 enum TRexState
 {
@@ -34,7 +36,7 @@ void LaraTRexDeath(ItemInfo* tRexItem, ItemInfo* laraItem)
 	laraItem->Pose.Orientation= Vector3Shrt(0, tRexItem->Pose.Orientation.y, 0);
 	laraItem->Animation.Airborne = false;
 
-	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + 1;
+	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TREX_DEATH;
 	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 	laraItem->Animation.ActiveState = LS_DEATH;
 	laraItem->Animation.TargetState = LS_DEATH;
