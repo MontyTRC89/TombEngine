@@ -13,11 +13,11 @@
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
+#include "Game/savegame.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
-#include <savegame.h>
 
 
 using namespace TEN::Effects::Lara;
