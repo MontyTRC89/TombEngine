@@ -14,11 +14,10 @@
 #include "Specific/setup.h"
 #include "camera.h"
 
-BITE_INFO	ShivaBiteLeft = { 0, 0, 920, 13 };
-BITE_INFO	ShivaBiteRight = { 0, 0, 920, 22 };
+BITE_INFO ShivaBiteLeft = { 0, 0, 920, 13 };
+BITE_INFO ShivaBiteRight = { 0, 0, 920, 22 };
 
-#define		LARA_SHIVA_DEATH_KILL_ANIM 7;
-#define		SHIVA_DEATH_KILL_ANIM 18; 
+#define LARA_SHIVA_DEATH_KILL_ANIM 7;
 
 enum ShivaState
 {
@@ -449,7 +448,8 @@ void ShivaControl(short itemNumber)
 		}
 	}
 
-	if (laraAlive && LaraItem->HitPoints <= 0) // Shiva Death Kill Routine
+	// Dispatch kill animation
+	if (laraAlive && LaraItem->HitPoints <= 0)
 	{
 		item->Animation.TargetState = SHIVA_STATE_KILL;
 
@@ -473,6 +473,7 @@ void ShivaControl(short itemNumber)
 		Camera.flags = CF_FOLLOW_CENTER;
 		return;
 	}
+
 	CreatureTilt(item, tilt);
 
 	extraHeadRot.y -= extraTorsoRot.y;

@@ -213,15 +213,10 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	LaraItem->Animation.ActiveState = 0;
 	LaraItem->Animation.TargetState = laraKillState;
 
-	LaraItem->Pose.Position.x = item->Pose.Position.x;
-	LaraItem->Pose.Position.y = item->Pose.Position.y;
-	LaraItem->Pose.Position.z = item->Pose.Position.z;
-	LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-	LaraItem->Pose.Orientation.x = item->Pose.Orientation.x;
-	LaraItem->Pose.Orientation.z = item->Pose.Orientation.z;
+	LaraItem->Pose = item->Pose;
+	LaraItem->Animation.Airborne = false;
 	LaraItem->Animation.Velocity = 0;
 	LaraItem->Animation.VerticalVelocity = 0;
-	LaraItem->Animation.Airborne = false;
 
 	if (item->RoomNumber != LaraItem->RoomNumber)
 		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -252,7 +247,7 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 
 short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle, std::function<CreatureEffectFunction> func)
 {
-	Vector3Int pos = { bite->x, bite->y, bite->z };
+	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
 	return func(pos.x, pos.y, pos.z, damage, angle, item->RoomNumber);
@@ -260,7 +255,7 @@ short CreatureEffect2(ItemInfo* item, BITE_INFO* bite, short damage, short angle
 
 short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffectFunction> func)
 {
-	Vector3Int pos = { bite->x, bite->y, bite->z };
+	auto pos = Vector3Int(bite->x, bite->y, bite->z);
 	GetJointAbsPosition(item, &pos, bite->meshNum);
 
 	return func(pos.x, pos.y, pos.z, item->Animation.Velocity, item->Pose.Orientation.y, item->RoomNumber);
@@ -269,17 +264,17 @@ short CreatureEffect(ItemInfo* item, BITE_INFO* bite, std::function<CreatureEffe
 void CreatureUnderwater(ItemInfo* item, int depth)
 {
 	int waterLevel = depth;
-	int wh = 0;
+	int waterHeight = 0;
 
 	if (depth < 0)
 	{
-		wh = abs(depth);
+		waterHeight = abs(depth);
 		waterLevel = 0;
 	}
 	else
-		wh = GetWaterHeight(item);
+		waterHeight = GetWaterHeight(item);
 
-	int y = wh + waterLevel;
+	int y = waterHeight + waterLevel;
 
 	if (item->Pose.Position.y < y)
 	{
