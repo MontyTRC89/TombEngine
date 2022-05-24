@@ -754,7 +754,7 @@ void CreatureDie(short itemNumber, int explode)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->HitPoints = -16384;
+	item->HitPoints = NOT_TARGETABLE;
 	item->Collidable = false;
 
 	if (explode)
