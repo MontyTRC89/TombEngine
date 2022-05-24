@@ -17,7 +17,7 @@
 BITE_INFO ShivaBiteLeft = { 0, 0, 920, 13 };
 BITE_INFO ShivaBiteRight = { 0, 0, 920, 22 };
 
-#define LARA_SHIVA_DEATH_KILL_ANIM 7;
+#define LARA_ANIM_SHIVA_DEATH 7;
 
 enum ShivaState
 {
@@ -26,9 +26,9 @@ enum ShivaState
 	SHIVA_STATE_GUARD_IDLE = 2,
 	SHIVA_STATE_WALK_FORWARD_GUARDING = 3,
 	SHIVA_STATE_INACTIVE = 4,
-	SHIVA_STATE_ATTACK_GRAB = 5,
+	SHIVA_STATE_ATTACK_1 = 5,
 	SHIVA_STATE_KILL = 6,
-	SHIVA_STATE_ATTACK = 7,
+	SHIVA_STATE_ATTACK_2 = 7,
 	SHIVA_STATE_WALK_BACK = 8,
 	SHIVA_STATE_DEATH = 9
 };
@@ -294,12 +294,12 @@ void ShivaControl(short itemNumber)
 			}
 			else if (AI.bite && AI.distance < pow(SECTOR(1.25f), 2))
 			{
-				item->Animation.TargetState = SHIVA_STATE_ATTACK_GRAB;
+				item->Animation.TargetState = SHIVA_STATE_ATTACK_1;
 				shiva->Flags = 0;
 			}
 			else if (AI.bite && AI.distance < pow(SECTOR(4) / 3, 2))
 			{
-				item->Animation.TargetState = SHIVA_STATE_ATTACK;
+				item->Animation.TargetState = SHIVA_STATE_ATTACK_2;
 				shiva->Flags = 0;
 			}
 			else if (item->HitStatus && AI.ahead)
@@ -408,7 +408,7 @@ void ShivaControl(short itemNumber)
 			
 			break;
 
-		case SHIVA_STATE_ATTACK_GRAB:
+		case SHIVA_STATE_ATTACK_1:
 			shiva->MaxTurn = ANGLE(4.0f);
 
 			if (AI.ahead)
@@ -420,7 +420,7 @@ void ShivaControl(short itemNumber)
 			ShivaDamage(item, shiva, 150);
 			break;
 
-		case SHIVA_STATE_ATTACK:
+		case SHIVA_STATE_ATTACK_2:
 			shiva->MaxTurn = ANGLE(4.0f);
 			extraHeadRot.y = AI.angle;
 			extraTorsoRot.y = AI.angle;
@@ -460,7 +460,7 @@ void ShivaControl(short itemNumber)
 		LaraItem->Pose.Orientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
 		LaraItem->Animation.Airborne = false;
 
-		LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_SHIVA_DEATH_KILL_ANIM;
+		LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SHIVA_DEATH;
 		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 		LaraItem->Animation.ActiveState = LS_DEATH;
 		LaraItem->Animation.TargetState = LS_DEATH;
