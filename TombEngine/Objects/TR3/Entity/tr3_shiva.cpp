@@ -465,7 +465,7 @@ void ShivaControl(short itemNumber)
 		LaraItem->Animation.ActiveState = LS_DEATH;
 		LaraItem->Animation.TargetState = LS_DEATH;
 
-		LaraItem->HitPoints = -16384;
+		LaraItem->HitPoints = NOT_TARGETABLE;
 		Lara.Air = -1;
 		Lara.Control.HandStatus = HandStatus::Special;
 		Lara.Control.Weapon.GunType = LaraWeaponType::None;

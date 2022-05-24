@@ -41,7 +41,7 @@ void LaraTRexDeath(ItemInfo* tRexItem, ItemInfo* laraItem)
 	laraItem->Animation.ActiveState = LS_DEATH;
 	laraItem->Animation.TargetState = LS_DEATH;
 
-	laraItem->HitPoints = -16384;
+	laraItem->HitPoints = NOT_TARGETABLE;
 	Lara.Air = -1;
 	Lara.Control.HandStatus = HandStatus::Busy;
 	Lara.Control.Weapon.GunType = LaraWeaponType::None;
