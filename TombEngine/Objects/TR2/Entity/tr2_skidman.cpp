@@ -246,7 +246,7 @@ void SkidooManControl(short riderItemNumber)
 	{
 		RemoveActiveItem(riderItemNumber);
 		riderItem->Collidable = false;
-		riderItem->HitPoints = -16384;
+		riderItem->HitPoints = NOT_TARGETABLE;
 		riderItem->Flags |= ONESHOT;
 
 		DisableEntityAI(itemNumber);

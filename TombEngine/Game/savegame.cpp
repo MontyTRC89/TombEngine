@@ -422,8 +422,10 @@ bool SaveGame::Save(int slot)
 		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
+		flatbuffers::Offset<Save::Short> shortOffset;
+		flatbuffers::Offset<Save::Int> intOffset;
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent 
+		if (Objects[itemToSerialize.ObjectNumber].intelligent
 			&& itemToSerialize.Data.is<CreatureInfo>())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
@@ -458,8 +460,21 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_poisoned(creature->Poisoned);
 			creatureBuilder.add_reached_goal(creature->ReachedGoal);
 			creatureBuilder.add_tosspad(creature->Tosspad);
+			creatureBuilder.add_ai_target_number(creature->AITargetNumber);
 			creatureOffset = creatureBuilder.Finish();
-		} 
+		}
+		else if (itemToSerialize.Data.is<short>())
+		{
+			Save::ShortBuilder sb{ fbb };
+			sb.add_scalar(short(itemToSerialize.Data));
+			shortOffset = sb.Finish();
+		}
+		else if (itemToSerialize.Data.is<int>())
+		{
+			Save::IntBuilder ib{ fbb };
+			ib.add_scalar(int(itemToSerialize.Data));
+			intOffset = ib.Finish();
+		}
 
 		Save::Position position = Save::Position(
 			(int32_t)itemToSerialize.Pose.Position.x,
@@ -512,15 +527,13 @@ bool SaveGame::Save(int slot)
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
-			short& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Short);
-			serializedItem.add_data(data);
+			serializedItem.add_data(shortOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<int>())
 		{
-			int& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Int);
-			serializedItem.add_data(data);
+			serializedItem.add_data(intOffset.Union());
 		}
 
 		serializedItem.add_lua_name(luaNameOffset);
@@ -1098,7 +1111,7 @@ bool SaveGame::Load(int slot)
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 		{
-			EnableBaddyAI(i, true);
+			EnableBaddyAI(i, true, false);
 
 			auto creature = GetCreatureInfo(item);
 			auto data = savedItem->data();
@@ -1132,6 +1145,7 @@ bool SaveGame::Load(int slot)
 			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
 			creature->Tosspad = savedCreature->tosspad();
+			SetBaddyTarget(i, savedCreature->ai_target_number());
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
@@ -1139,6 +1153,13 @@ bool SaveGame::Load(int slot)
 			auto savedData = (Save::Short*)data;
 			item->Data = savedData->scalar();
 		}
+		else if (savedItem->data_type() == Save::ItemData::Int)
+		{
+			auto data = savedItem->data();
+			auto savedData = (Save::Int*)data;
+			item->Data = savedData->scalar();
+		}
+
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();

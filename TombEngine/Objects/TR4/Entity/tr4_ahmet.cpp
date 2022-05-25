@@ -25,23 +25,33 @@ namespace TEN::Entities::TR4
 
 	enum AhmetState
 	{
-		AHMET_STATE_NONE,
-		AHMET_STATE_IDLE,
-		AHMET_STATE_WALK,
-		AHMET_STATE_RUN,
-		AHMET_STATE_STAND_DUALATK,
-		AHMET_STATE_JUMP_BITE,
-		AHMET_STATE_JUMP_DUALATK,
-		AHMET_STATE_DIE
+		AHMET_STATE_NONE = 0,
+		AHMET_STATE_IDLE = 1,
+		AHMET_STATE_WALK_FORWARD = 2,
+		AHMET_STATE_RUN_FORWARD = 3,
+		AHMET_STATE_SWIPE_ATTACK = 4,
+		AHMET_STATE_JUMP_ATTACK = 5,
+		AHMET_STATE_JUMP_SWIPE_ATTACK = 6,
+		AHMET_STATE_DEATH = 7
 	};
 
 	enum AhmetAnim
 	{
-		AHMET_ANIM_JUMP_ATTACK = 4,
-
-		AHMET_ANIM_JUMP_START = 7,
-
-		AHMET_ANIM_DEATH_ANIM = 10
+		AHMET_ANIM_IDLE = 0,
+		AHMET_ANIM_RUN_FORWARD = 1,
+		AHMET_ANIM_SWIPE_ATTACK = 2,
+		AHMET_ANIM_JUMP_ATTACK_START = 3,
+		AHMET_ANIM_JUMP_ATTACK_CONTINUE = 4,
+		AHMET_ANIM_JUMP_ATTACK_END = 5,
+		AHMET_ANIM_WALK_FORWARD = 6,
+		AHMET_ANIM_JUMP_SWIPE_ATTACK_START = 7,
+		AHMET_ANIM_JUMP_SWIPE_ATTACK_CONTINUE = 8,
+		AHMET_ANIM_JUMP_SWIPE_ATTACK_END = 9,
+		AHMET_ANIM_DEATH = 10,
+		AHMET_ANIM_IDLE_TO_WALK_FORWARD = 11,
+		AHMET_ANIM_WALK_FORWARD_TO_IDLE = 12,
+		AHMET_ANIM_IDLE_TO_RUN_FORWARD = 13,
+		AHMET_ANIM_RUN_FORWARD_TO_IDLE = 14,
 	};
 
 	#define AHMET_WALK_ANGLE ANGLE(5.0f)
@@ -80,7 +90,7 @@ namespace TEN::Entities::TR4
 		}
 
 		// NOTE: fixed light below the ground with -STEP_L!
-		TriggerDynamicLight(item->Pose.Position.x, (item->Pose.Position.y - STEP_SIZE), item->Pose.Position.z, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
+		TriggerDynamicLight(item->Pose.Position.x, (item->Pose.Position.y - CLICK(1)), item->Pose.Position.z, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
 		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, NULL);
 	}
 
@@ -103,8 +113,6 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		AI_INFO laraAI, AI;
-
 		auto* item = &g_Level.Items[itemNumber];
 		if (item->TriggerFlags == 1)
 		{
@@ -119,7 +127,7 @@ namespace TEN::Entities::TR4
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState == AHMET_STATE_DIE)
+			if (item->Animation.ActiveState == AHMET_STATE_DEATH)
 			{
 				// dont clear it !
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
@@ -130,10 +138,10 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + AHMET_ANIM_DEATH_ANIM;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + AHMET_ANIM_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = AHMET_STATE_DIE;
-				item->Animation.TargetState = AHMET_STATE_DIE;
+				item->Animation.ActiveState = AHMET_STATE_DEATH;
+				item->Animation.TargetState = AHMET_STATE_DEATH;
 				Lara.InteractedItem = itemNumber;
 			}
 
@@ -144,8 +152,10 @@ namespace TEN::Entities::TR4
 			if (item->AIBits & ALL_AIOBJ)
 				GetAITarget(creature);
 
+			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
 
+			AI_INFO laraAI;
 			if (creature->Enemy == LaraItem)
 			{
 				laraAI.angle = AI.angle;
@@ -189,13 +199,13 @@ namespace TEN::Entities::TR4
 				}
 				else if (item->AIBits & PATROL1)
 				{
-					item->Animation.TargetState = AHMET_STATE_WALK;
+					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 					headY = 0;
 				}
 				else if (creature->Mood == MoodType::Attack && creature->Mood != MoodType::Escape)
 				{
 					if (AI.bite && AI.distance < AHMET_STAND_DUALATK_RANGE)
-						item->Animation.TargetState = AHMET_STATE_STAND_DUALATK;
+						item->Animation.TargetState = AHMET_STATE_SWIPE_ATTACK;
 					else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) || AI.distance >= AHMET_IDLE_RANGE)
 					{
 						if (item->Animation.RequiredState)
@@ -203,53 +213,53 @@ namespace TEN::Entities::TR4
 						else
 						{
 							if (!AI.ahead || AI.distance >= AHMET_RUN_RANGE)
-								item->Animation.TargetState = AHMET_STATE_RUN;
+								item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
 							else
-								item->Animation.TargetState = AHMET_STATE_WALK;
+								item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 						}
 					}
 					else if (GetRandomControl() & 1)
-						item->Animation.TargetState = AHMET_STATE_JUMP_BITE;
+						item->Animation.TargetState = AHMET_STATE_JUMP_ATTACK;
 					else
-						item->Animation.TargetState = AHMET_STATE_JUMP_DUALATK;
+						item->Animation.TargetState = AHMET_STATE_JUMP_SWIPE_ATTACK;
 				}
 				else
 				{
 					if (Lara.TargetEntity == item || !AI.ahead)
-						item->Animation.TargetState = AHMET_STATE_RUN;
+						item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
 					else
 						item->Animation.TargetState = AHMET_STATE_IDLE;
 				}
 
 				break;
 
-			case AHMET_STATE_WALK:
+			case AHMET_STATE_WALK_FORWARD:
 				creature->MaxTurn = AHMET_WALK_ANGLE;
 
 				if (item->AIBits & PATROL1)
 				{
-					item->Animation.TargetState = AHMET_STATE_WALK;
+					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 					headY = 0;
 				}
 				else if (AI.bite && AI.distance < AHMET_IDLE_RANGE)
 					item->Animation.TargetState = AHMET_STATE_IDLE;
 				else if (creature->Mood == MoodType::Escape || AI.distance > AHMET_RUN_RANGE || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
-					item->Animation.TargetState = AHMET_STATE_RUN;
+					item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
 				
 				break;
 
-			case AHMET_STATE_RUN:
+			case AHMET_STATE_RUN_FORWARD:
 				creature->MaxTurn = AHMET_RUN_ANGLE;
 				creature->Flags = 0;
 
 				if (item->AIBits & GUARD || (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) && (Lara.TargetEntity == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
 					item->Animation.TargetState = AHMET_STATE_IDLE;
 				else if (AI.ahead && AI.distance < AHMET_RUN_RANGE && (AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
-					item->Animation.TargetState = AHMET_STATE_WALK;
+					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 
 				break;
 
-			case AHMET_STATE_STAND_DUALATK:
+			case AHMET_STATE_SWIPE_ATTACK:
 				creature->MaxTurn = 0;
 
 				if (abs(AI.angle) >= 910)
@@ -281,10 +291,10 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case AHMET_STATE_JUMP_BITE:
+			case AHMET_STATE_JUMP_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START)
+				if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_SWIPE_ATTACK_START)
 				{
 					if (abs(AI.angle) >= ANGLE(5.0f))
 					{
@@ -298,7 +308,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if (!(creature->Flags & 1) && item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_ATTACK)
+					if (!(creature->Flags & 1) && item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_ATTACK_CONTINUE)
 					{
 						if (item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 11) &&
 							item->TouchBits & AHMET_LEFT_TOUCH)
@@ -314,10 +324,10 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case AHMET_STATE_JUMP_DUALATK:
+			case AHMET_STATE_JUMP_SWIPE_ATTACK:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_START))
+				if (item->Animation.AnimNumber == (Objects[item->ObjectNumber].animIndex + AHMET_ANIM_JUMP_SWIPE_ATTACK_START))
 				{
 					if (abs(AI.angle) >= ANGLE(5.0f))
 					{
@@ -367,7 +377,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->Animation.ActiveState != 7 || item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+		if (item->Animation.ActiveState != AHMET_STATE_DEATH || item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			return false;
 
 		Weather.Flash(255, 64, 0, 0.03f);
@@ -381,9 +391,9 @@ namespace TEN::Entities::TR4
 			ItemNewRoom(itemNumber, outsideRoom);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-		item->Animation.TargetState = 1;
+		item->Animation.TargetState = AHMET_STATE_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.ActiveState = 1;
+		item->Animation.ActiveState = AHMET_STATE_IDLE;
 		item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 
 		AddActiveItem(itemNumber);
@@ -393,7 +403,7 @@ namespace TEN::Entities::TR4
 		item->Status = ITEM_ACTIVE;
 		item->Collidable = true;
 
-		EnableBaddyAI(itemNumber, 1);
+		EnableBaddyAI(itemNumber, true);
 
 		item->TriggerFlags = 1;
 		return true;
