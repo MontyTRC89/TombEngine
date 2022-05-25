@@ -2,16 +2,16 @@
 #include "Renderer/Renderer11.h"
 #include "Game/animation.h"
 #include "Game/effects/hair.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/camera.h"
 #include "Game/collision/sphere.h"
 #include "Specific/level.h"
+#include "Specific/setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
-#include <Specific\setup.h>
-#include "Game/Lara/lara_fire.h"
-#include "Game/items.h"
 
 using namespace TEN::Renderer;
 

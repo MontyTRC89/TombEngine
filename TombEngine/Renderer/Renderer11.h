@@ -1,4 +1,9 @@
 #pragma once
+#include <wrl/client.h>
+#include <CommonStates.h>
+#include <SpriteFont.h>
+#include <PrimitiveBatch.h>
+#include <d3d9types.h>
 #include "Renderer/Renderer11Enums.h"
 #include "Renderer/ConstantBuffers/StaticBuffer.h"
 #include "Renderer/ConstantBuffers/LightBuffer.h"
@@ -29,11 +34,6 @@
 #include "Specific/fast_vector.h"
 #include "Renderer/TextureBase.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
-#include <wrl/client.h>
-#include <CommonStates.h>
-#include <SpriteFont.h>
-#include <PrimitiveBatch.h>
-#include <d3d9types.h>
 #include "Renderer/Structures/RendererBone.h"
 #include "Renderer/Structures/RendererVideoAdapter.h"
 #include "Renderer/Structures/RendererLight.h"

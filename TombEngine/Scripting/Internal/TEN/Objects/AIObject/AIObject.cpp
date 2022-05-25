@@ -27,34 +27,34 @@ void AIObject::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 
 		/// Get the object's position
-		// @function GetPosition
+		// @function AIObject:GetPosition
 		// @treturn Vec3 a copy of the object's position
 		ScriptReserved_GetPosition, &AIObject::GetPos,
 
 		/// Set the object's position
-		// @function SetPosition
+		// @function AIObject:SetPosition
 		// @tparam Vec3 position the new position of the object 
 		ScriptReserved_SetPosition, &AIObject::SetPos,
 
 		/// Get the object's Y-axis rotation
 		// To the best of my knowledge, the rotation of an AIObject has no effect.
-		// @function GetRotationY
+		// @function AIObject:GetRotationY
 		// @treturn number the object's Y-axis rotation 
 		ScriptReserved_GetRotationY, &AIObject::GetYRot,
 
 		/// Set the object's Y-axis rotation
 		// To the best of my knowledge, the rotation of an AIObject has no effect.
-		// @function SetRotationY
+		// @function AIObject:SetRotationY
 		// @tparam number The object's new Y-axis rotation
 		ScriptReserved_SetRotationY, &AIObject::SetYRot,
 
 		/// Get the object's unique string identifier
-		// @function GetName
+		// @function AIObject:GetName
 		// @treturn string the object's name
 		ScriptReserved_GetName, &AIObject::GetName,
 
 		/// Set the object's name (its unique string identifier)
-		// @function SetName
+		// @function AIObject:SetName
 		// @tparam string name The object's new name
 		ScriptReserved_SetName, &AIObject::SetName,
 

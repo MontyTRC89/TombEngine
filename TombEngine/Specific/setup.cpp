@@ -409,7 +409,7 @@ void InitialiseObjects()
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowSize = NO_SHADOW;
-		obj->HitPoints = -16384;
+		obj->HitPoints = NOT_TARGETABLE;
 		obj->hitEffect = HIT_NONE;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;

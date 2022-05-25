@@ -721,7 +721,7 @@ struct CreatureT : public flatbuffers::NativeTable {
   int32_t fired_weapon = 0;
   int32_t mood = 0;
   int32_t enemy = 0;
-  std::unique_ptr<TEN::Save::CreatureTargetT> ai_target{};
+  int32_t ai_target_number = 0;
   int32_t flags = 0;
   bool can_jump = false;
   bool can_monkey = false;
@@ -752,7 +752,7 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FIRED_WEAPON = 32,
     VT_MOOD = 34,
     VT_ENEMY = 36,
-    VT_AI_TARGET = 38,
+    VT_AI_TARGET_NUMBER = 38,
     VT_FLAGS = 40,
     VT_CAN_JUMP = 42,
     VT_CAN_MONKEY = 44,
@@ -811,8 +811,8 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t enemy() const {
     return GetField<int32_t>(VT_ENEMY, 0);
   }
-  const TEN::Save::CreatureTarget *ai_target() const {
-    return GetPointer<const TEN::Save::CreatureTarget *>(VT_AI_TARGET);
+  int32_t ai_target_number() const {
+    return GetField<int32_t>(VT_AI_TARGET_NUMBER, 0);
   }
   int32_t flags() const {
     return GetField<int32_t>(VT_FLAGS, 0);
@@ -852,8 +852,7 @@ struct Creature FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FIRED_WEAPON) &&
            VerifyField<int32_t>(verifier, VT_MOOD) &&
            VerifyField<int32_t>(verifier, VT_ENEMY) &&
-           VerifyOffset(verifier, VT_AI_TARGET) &&
-           verifier.VerifyTable(ai_target()) &&
+           VerifyField<int32_t>(verifier, VT_AI_TARGET_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            VerifyField<uint8_t>(verifier, VT_CAN_JUMP) &&
            VerifyField<uint8_t>(verifier, VT_CAN_MONKEY) &&
@@ -922,8 +921,8 @@ struct CreatureBuilder {
   void add_enemy(int32_t enemy) {
     fbb_.AddElement<int32_t>(Creature::VT_ENEMY, enemy, 0);
   }
-  void add_ai_target(flatbuffers::Offset<TEN::Save::CreatureTarget> ai_target) {
-    fbb_.AddOffset(Creature::VT_AI_TARGET, ai_target);
+  void add_ai_target_number(int32_t ai_target_number) {
+    fbb_.AddElement<int32_t>(Creature::VT_AI_TARGET_NUMBER, ai_target_number, 0);
   }
   void add_flags(int32_t flags) {
     fbb_.AddElement<int32_t>(Creature::VT_FLAGS, flags, 0);
@@ -973,7 +972,7 @@ inline flatbuffers::Offset<Creature> CreateCreature(
     int32_t fired_weapon = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
-    flatbuffers::Offset<TEN::Save::CreatureTarget> ai_target = 0,
+    int32_t ai_target_number = 0,
     int32_t flags = 0,
     bool can_jump = false,
     bool can_monkey = false,
@@ -982,7 +981,7 @@ inline flatbuffers::Offset<Creature> CreateCreature(
     bool is_monkeying = false) {
   CreatureBuilder builder_(_fbb);
   builder_.add_flags(flags);
-  builder_.add_ai_target(ai_target);
+  builder_.add_ai_target_number(ai_target_number);
   builder_.add_enemy(enemy);
   builder_.add_mood(mood);
   builder_.add_fired_weapon(fired_weapon);
@@ -1032,7 +1031,7 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
     int32_t fired_weapon = 0,
     int32_t mood = 0,
     int32_t enemy = 0,
-    flatbuffers::Offset<TEN::Save::CreatureTarget> ai_target = 0,
+    int32_t ai_target_number = 0,
     int32_t flags = 0,
     bool can_jump = false,
     bool can_monkey = false,
@@ -1059,7 +1058,7 @@ inline flatbuffers::Offset<Creature> CreateCreatureDirect(
       fired_weapon,
       mood,
       enemy,
-      ai_target,
+      ai_target_number,
       flags,
       can_jump,
       can_monkey,
@@ -1908,7 +1907,7 @@ flatbuffers::Offset<Short> CreateShort(flatbuffers::FlatBufferBuilder &_fbb, con
 
 struct IntT : public flatbuffers::NativeTable {
   typedef Int TableType;
-  uint64_t scalar = 0;
+  int32_t scalar = 0;
 };
 
 struct Int FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1918,12 +1917,12 @@ struct Int FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_SCALAR = 4
   };
-  uint64_t scalar() const {
-    return GetField<uint64_t>(VT_SCALAR, 0);
+  int32_t scalar() const {
+    return GetField<int32_t>(VT_SCALAR, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
-           VerifyField<uint64_t>(verifier, VT_SCALAR) &&
+           VerifyField<int32_t>(verifier, VT_SCALAR) &&
            verifier.EndTable();
   }
   IntT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1935,8 +1934,8 @@ struct IntBuilder {
   typedef Int Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
-  void add_scalar(uint64_t scalar) {
-    fbb_.AddElement<uint64_t>(Int::VT_SCALAR, scalar, 0);
+  void add_scalar(int32_t scalar) {
+    fbb_.AddElement<int32_t>(Int::VT_SCALAR, scalar, 0);
   }
   explicit IntBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1951,7 +1950,7 @@ struct IntBuilder {
 
 inline flatbuffers::Offset<Int> CreateInt(
     flatbuffers::FlatBufferBuilder &_fbb,
-    uint64_t scalar = 0) {
+    int32_t scalar = 0) {
   IntBuilder builder_(_fbb);
   builder_.add_scalar(scalar);
   return builder_.Finish();
@@ -2157,7 +2156,7 @@ inline void Creature::UnPackTo(CreatureT *_o, const flatbuffers::resolver_functi
   { auto _e = fired_weapon(); _o->fired_weapon = _e; }
   { auto _e = mood(); _o->mood = _e; }
   { auto _e = enemy(); _o->enemy = _e; }
-  { auto _e = ai_target(); if (_e) _o->ai_target = std::unique_ptr<TEN::Save::CreatureTargetT>(_e->UnPack(_resolver)); }
+  { auto _e = ai_target_number(); _o->ai_target_number = _e; }
   { auto _e = flags(); _o->flags = _e; }
   { auto _e = can_jump(); _o->can_jump = _e; }
   { auto _e = can_monkey(); _o->can_monkey = _e; }
@@ -2191,7 +2190,7 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
   auto _fired_weapon = _o->fired_weapon;
   auto _mood = _o->mood;
   auto _enemy = _o->enemy;
-  auto _ai_target = _o->ai_target ? CreateCreatureTarget(_fbb, _o->ai_target.get(), _rehasher) : 0;
+  auto _ai_target_number = _o->ai_target_number;
   auto _flags = _o->flags;
   auto _can_jump = _o->can_jump;
   auto _can_monkey = _o->can_monkey;
@@ -2217,7 +2216,7 @@ inline flatbuffers::Offset<Creature> CreateCreature(flatbuffers::FlatBufferBuild
       _fired_weapon,
       _mood,
       _enemy,
-      _ai_target,
+      _ai_target_number,
       _flags,
       _can_jump,
       _can_monkey,
@@ -3044,7 +3043,7 @@ inline ItemDataUnion::ItemDataUnion(const ItemDataUnion &u) : type(u.type), valu
       break;
     }
     case ItemData::Creature: {
-      FLATBUFFERS_ASSERT(false);  // TEN::Save::CreatureT not copyable.
+      value = new TEN::Save::CreatureT(*reinterpret_cast<TEN::Save::CreatureT *>(u.value));
       break;
     }
     case ItemData::LaserHead: {

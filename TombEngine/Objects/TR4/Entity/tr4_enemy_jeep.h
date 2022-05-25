@@ -1,5 +1,5 @@
 #pragma once
-#include <items.h>
+#include "Game/items.h"
 
 void InitialiseEnemyJeep(short itemNumber);
 void EnemyJeepControl(short itemNumber);
