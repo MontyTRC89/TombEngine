@@ -122,6 +122,10 @@ void LaraSlideEdgeJump(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(DEFLECT_STRAIGHT_ANGLE));
 		break;
 
+	case CT_FRONT:
+		item->Animation.Velocity = 0;
+		break;
+
 	case CT_TOP:
 	case CT_TOP_FRONT:
 		if (item->Animation.VerticalVelocity <= 0)

@@ -92,6 +92,12 @@ void KillItem(short const itemNumber)
 		{
 			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNumber);
 		}
+
+		item->LuaName.clear();
+		item->luaCallbackOnKilledName.clear();
+		item->luaCallbackOnHitName.clear();
+		item->luaCallbackOnCollidedWithObjectName.clear();
+		item->luaCallbackOnCollidedWithRoomName.clear();
 	}
 }
 
@@ -427,7 +433,6 @@ short CreateItem()
 
 	itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
-	g_Level.Items[NextItemFree].LuaName = "";
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
 
 	return itemNumber;
@@ -442,10 +447,11 @@ void InitialiseItemArray(int totalItem)
 
 	if (g_Level.NumItems + 1 < totalItem)
 	{
-		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
+		for(int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
 			item->NextItem = i;
 			item->Active = false;
+			item->Data = nullptr;
 		}
 	}
 
@@ -493,6 +499,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
+// Note: may not work for dynamic items because of FindItem.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
 	float s = sin(item->Pose.Orientation.GetY());

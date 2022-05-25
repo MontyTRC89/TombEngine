@@ -131,6 +131,7 @@ void CrocodileControl(short itemNumber)
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = CROC_STATE_UNDERWATER_DEATH;
 				item->Animation.TargetState = CROC_STATE_UNDERWATER_DEATH;
+				item->HitPoints = NOT_TARGETABLE;
 			}
 			else
 			{
@@ -142,7 +143,10 @@ void CrocodileControl(short itemNumber)
 		}
 
 		if (TestEnvironment(ENV_FLAG_WATER, item))
+		{
 			CreatureFloat(itemNumber);
+			return;
+		}
 	}
 	else
 	{

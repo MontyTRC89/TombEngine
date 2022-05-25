@@ -170,8 +170,8 @@ void TribemanAxeControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->Flags = 0;
 			creature->MaxTurn = Angle::DegToRad(9.0f);
+			creature->Flags = 0;
 			tilt = angle / 8;
 
 			if (creature->Mood == MoodType::Bored)
@@ -266,9 +266,9 @@ void TribemanAxeControl(short itemNumber)
 			{
 				if (creature->Enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < CLICK(2) &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < CLICK(2) &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2) &&
+					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.5f) &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < SECTOR(0.5f) &&
+						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.5f) &&
 						creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 						creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 					{

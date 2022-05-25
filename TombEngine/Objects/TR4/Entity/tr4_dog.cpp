@@ -113,7 +113,7 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, VIOLENT);
 
 			if (creature->Mood == MoodType::Bored)
-				creature->MaxTurn >>= 1;
+				creature->MaxTurn /= 2;
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 			joint0 = 4 * angle;

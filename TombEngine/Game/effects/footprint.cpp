@@ -69,45 +69,45 @@ namespace TEN
 					fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
 					break;
 
-				case FLOOR_MATERIAL::Grass:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_GRASS;
-					break;
+		case FLOOR_MATERIAL::Grass:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
+			break;
 
-				case FLOOR_MATERIAL::Gravel:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_GRAVEL;
-					break;
+		case FLOOR_MATERIAL::Gravel:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRAVEL;
+			break;
 
-				case FLOOR_MATERIAL::Ice:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_ICE;
-					break;
+		case FLOOR_MATERIAL::Ice:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_ICE;
+			break;
 
-				case FLOOR_MATERIAL::Marble:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_MARBLE;
-					break;
+		case FLOOR_MATERIAL::Marble:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MARBLE;
+			break;
 
-				case FLOOR_MATERIAL::Metal:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_METAL;
-					break;
+		case FLOOR_MATERIAL::Metal:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
+			break;
 
-				case FLOOR_MATERIAL::Mud:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_MUD;
-					break;
+		case FLOOR_MATERIAL::Mud:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_MUD;
+			break;
 
-				case FLOOR_MATERIAL::OldMetal:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_METAL;
-					break;
+		case FLOOR_MATERIAL::OldMetal:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_METAL;
+			break;
 
-				case FLOOR_MATERIAL::OldWood:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_WOOD;
-					break;
+		case FLOOR_MATERIAL::OldWood:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
+			break;
 
-				case FLOOR_MATERIAL::Sand:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOSTEPS_SAND;
-					break;
+		case FLOOR_MATERIAL::Sand:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SAND;
+			break;
 
-				case FLOOR_MATERIAL::Snow:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_SNOW;
-					break;
+		case FLOOR_MATERIAL::Snow:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
+			break;
 
 				case FLOOR_MATERIAL::Stone:
 					fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
@@ -117,9 +117,9 @@ namespace TEN
 					fx = SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
 					break;
 
-				case FLOOR_MATERIAL::Wood:
-					fx = SOUND_EFFECTS::SFX_LARA_FOOTSTEPS_WOOD;
-					break;
+		case FLOOR_MATERIAL::Wood:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
+			break;
 
 				case FLOOR_MATERIAL::Custom_Sound_1:
 					fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_1;

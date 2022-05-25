@@ -29,53 +29,53 @@ void Static::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 
 		/// Get the static's position
-		// @function GetPosition
+		// @function Static:GetPosition
 		// @treturn Vec3 a copy of the static's position
 		ScriptReserved_GetPosition, &Static::GetPos,
 
 		/// Set the static's position
-		// @function SetPosition
+		// @function Static:SetPosition
 		// @tparam Vec3 position the new position of the static 
 		ScriptReserved_SetPosition, &Static::SetPos,
 
 		/// Get the static's rotation
-		// @function GetRotation
+		// @function Static:GetRotation
 		// @treturn Rotation a copy of the static's rotation
 		ScriptReserved_GetRotation, &Static::GetRot,
 
 		/// Set the static's rotation
-		// @function SetRotation
-		// @tparam Rotation The static's new rotation
+		// @function Static:SetRotation
+		// @tparam Rotation rotation the static's new rotation
 		ScriptReserved_SetRotation, &Static::SetRot,
 
 		/// Get the static's unique string identifier
-		// @function GetName
+		// @function Static:GetName
 		// @treturn string the static's name
 		ScriptReserved_GetName, &Static::GetName,
 
 		/// Set the static's name (its unique string identifier)
 		// e.g. "my\_vase" or "oldrubble"
-		// @function SetName
+		// @function Static:SetName
 		// @tparam string name The static's new name
 		ScriptReserved_SetName, &Static::SetName,
 
 		/// Get the static's slot number (as listed in Tomb Editor and WadTool)
-		// @function GetSlot
+		// @function Static:GetSlot
 		// @treturn string the static's slot number
 		ScriptReserved_GetSlot, &Static::GetSlot,
 
 		/// Set the static's slot number (as listed in Tomb Editor and WadTool)
-		// @function SetSlot
+		// @function Static:SetSlot
 		// @tparam int slot The static's slot number 
 		ScriptReserved_SetSlot, &Static::SetSlot,
 
 		/// Get the static's color
-		// @function GetColor
+		// @function Static:GetColor
 		// @treturn Color a copy of the static's color
 		ScriptReserved_GetColor, &Static::GetColor,
 
 		/// Set the static's color
-		// @function SetColor
+		// @function Static:SetColor
 		// @tparam Color color the new color of the static 
 		ScriptReserved_SetColor, &Static::SetColor);
 }

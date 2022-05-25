@@ -26,33 +26,33 @@ void SoundSource::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 		
 		/// Get the sound source's position
-		// @function GetPosition
+		// @function SoundSource:GetPosition
 		// @treturn Vec3 a copy of the sound source's position
 		ScriptReserved_GetPosition, &SoundSource::GetPos,
 
 		/// Set the sound source's position
-		// @function SetPosition
+		// @function SoundSource:SetPosition
 		// @tparam Vec3 position the new position of the sound source 
 		ScriptReserved_SetPosition, &SoundSource::SetPos,
 
 		/// Get the sound source's unique string identifier
-		// @function GetName
+		// @function SoundSource:GetName
 		// @treturn string the sound source's name
 		ScriptReserved_GetName, &SoundSource::GetName,
 
 		/// Set the sound source's name (its unique string identifier)
-		// @function SetName
+		// @function SoundSource:SetName
 		// @tparam string name The sound source's new name
 		ScriptReserved_SetName, &SoundSource::SetName,
 
 		/// Get the sound source's unique int identifier
-		// @function GetSoundID
+		// @function SoundSource:GetSoundID
 		// @treturn int the ID of the sound
 		ScriptReserved_GetSoundID, &SoundSource::GetSoundID,
 
 		/// Set the sound source's ID 
 		// __TODO__ this and getSoundID should use enums
-		// @function SetSoundID
+		// @function SoundSource:SetSoundID
 		// @tparam int name The sound source's new name
 		ScriptReserved_SetSoundID, &SoundSource::SetSoundID
 	);

@@ -265,7 +265,7 @@ static void CartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem)
 									int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 									if (frame >= 12 && frame <= 22)
 									{
-										SoundEffect(SFX_TR5_SWORD_GOD_HITMETAL, &item->Pose, 2);
+										SoundEffect(SFX_TR3_SPANNER, &item->Pose, 2);
 										TestTriggers(item, true);
 										item->Animation.FrameNumber++;
 									}

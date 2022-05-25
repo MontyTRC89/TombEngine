@@ -99,10 +99,10 @@ void CobraControl(short itemNumber)
 		case 3:
 			info->Flags = 0;
 
-			if (item->HitPoints != -16384)
+			if (item->HitPoints != NOT_TARGETABLE)
 			{
 				item->ItemFlags[2] = item->HitPoints;
-				item->HitPoints = -16384;
+				item->HitPoints = NOT_TARGETABLE;
 			}
 			if (AI.distance < pow(SECTOR(1.5f), 2) && LaraItem->HitPoints > 0)
 			{

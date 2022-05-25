@@ -51,7 +51,7 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_JUMP)
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
-	item->Animation.VerticalVelocity -= 6;
+	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 

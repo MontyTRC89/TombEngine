@@ -404,7 +404,7 @@ void LarsonControl(short itemNumber)
 		}
 		else
 		{
-			item->HitPoints = -16384;
+			item->HitPoints = NOT_TARGETABLE;
 			DisableBaddyAI(itemNumber);
 			KillItem(itemNumber);
 		}

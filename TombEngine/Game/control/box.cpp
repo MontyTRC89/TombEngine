@@ -214,9 +214,9 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	LaraItem->Animation.TargetState = laraKillState;
 
 	LaraItem->Pose = item->Pose;
+	LaraItem->Animation.Airborne = false;
 	LaraItem->Animation.Velocity = 0;
 	LaraItem->Animation.VerticalVelocity = 0;
-	LaraItem->Animation.Airborne = false;
 
 	if (item->RoomNumber != LaraItem->RoomNumber)
 		ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
@@ -739,7 +739,7 @@ void CreatureDie(short itemNumber, int explode)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	item->HitPoints = -16384;
+	item->HitPoints = NOT_TARGETABLE;
 	item->Collidable = false;
 
 	if (explode)

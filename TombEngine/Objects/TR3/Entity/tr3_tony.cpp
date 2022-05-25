@@ -483,7 +483,7 @@ static void TonyBossDie(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 	item->Collidable = false;
-	item->HitPoints = -16384;
+	item->HitPoints = NOT_TARGETABLE;
 	
 	KillItem(itemNumber);
 	DisableEntityAI(itemNumber);
