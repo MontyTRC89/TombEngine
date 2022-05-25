@@ -1150,6 +1150,13 @@ bool SaveGame::Load(int slot)
 			auto savedData = (Save::Short*)data;
 			item->Data = savedData->scalar();
 		}
+		else if (savedItem->data_type() == Save::ItemData::Int)
+		{
+			auto data = savedItem->data();
+			auto savedData = (Save::Int*)data;
+			item->Data = savedData->scalar();
+		}
+
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();

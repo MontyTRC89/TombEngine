@@ -118,7 +118,7 @@ table Short {
 }
 
 table Int {
-    scalar: ulong;
+    scalar: int32;
 }
 
 table Float {
