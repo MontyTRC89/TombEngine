@@ -36,7 +36,7 @@ table Creature {
 	fired_weapon: int32;
 	mood: int32;
 	enemy: int32;
-	ai_target: CreatureTarget;
+	ai_target_number: int32;
 	flags: int32;
 	can_jump: bool;
 	can_monkey: bool;
