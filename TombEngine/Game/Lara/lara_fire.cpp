@@ -826,7 +826,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 {
 	auto* lara = GetLaraInfo(src);
 
-	Ammo& ammo = GetAmmo(src, weaponType);
+	auto& ammo = GetAmmo(src, weaponType);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
 		return FireWeaponType::NoAmmo;
 	if (!ammo.hasInfinite())

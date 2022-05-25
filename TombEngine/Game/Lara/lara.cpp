@@ -224,6 +224,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_vault,//168
 	lara_as_vault,//169
 	lara_as_idle,//170
+	lara_as_crouch_turn_180,//171
+	lara_as_crawl_turn_180,//172
 };
 
 function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
@@ -399,6 +401,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_void_func,//168
 	lara_void_func,//169
 	lara_col_idle,//170
+	lara_col_crouch_turn_180,//171
+	lara_col_crawl_turn_180,//172
 };
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)

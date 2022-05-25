@@ -61,6 +61,12 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
+		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+		{
+			item->Animation.TargetState = LS_CROUCH_TURN_180;
+			return;
+		}
+
 		if (TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll) &&
 			g_GameFlow->HasCrouchRoll())
 		{
@@ -331,6 +337,38 @@ void lara_col_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	lara_col_crouch_idle(item, coll);
 }
 
+// State:		LS_CROUCH_TURN_180 (171)
+// Collision:	lara_col_crouch_turn_180()
+void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	coll->Setup.EnableSpasm = false;
+	Camera.targetDistance = SECTOR(1);
+
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
+	{
+		if (TrInput & (IN_FORWARD | IN_BACK) && TestLaraCrouchToCrawl(item))
+		{
+			item->Animation.TargetState = LS_CRAWL_IDLE;
+			return;
+		}
+
+		item->Animation.TargetState = LS_CROUCH_IDLE;
+		return;
+	}
+
+	item->Animation.TargetState = LS_CROUCH_IDLE;
+}
+
+// State:		LS_CROUCH_TURN_180 (171)
+// Control:		lara_as_crouch_turn_180()
+void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	lara_col_crouch_idle(item, coll);
+}
+
 // ------
 // CRAWL:
 // ------
@@ -367,6 +405,12 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
+		if (TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK))
+		{
+			item->Animation.TargetState = LS_CRAWL_TURN_180;
+			return;
+		}
+
 		if ((TrInput & IN_SPRINT && TestLaraCrouchRoll(item, coll)) ||
 			(TrInput & (IN_DRAW | IN_FLARE) &&
 			!IsStandingWeapon(item, lara->Control.Weapon.GunType) && HasStateDispatch(item, LS_CROUCH_IDLE)))
@@ -788,6 +832,33 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 // State:		LS_CRAWL_TURN_RIGHT (85)
 // Control:		lara_as_crawl_turn_right()
 void lara_col_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
+{
+	lara_col_crawl_idle(item, coll);
+}
+
+// State:		LS_CRAWL_TURN_180 (172)
+// Collision:	lara_col_crawl_turn_180()
+void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	coll->Setup.EnableSpasm = false;
+	Camera.targetDistance = SECTOR(1);
+
+	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
+		lara->Control.WaterStatus != WaterStatus::Wade)
+	{
+		item->Animation.TargetState = LS_CRAWL_IDLE;
+		return;
+	}
+
+	item->Animation.TargetState = LS_CROUCH_IDLE;
+	lara->Control.HandStatus = HandStatus::Free;
+}
+
+// State:		LS_CRAWL_TURN_180 (172)
+// Control:		lara_as_crawl_turn_180()
+void lara_col_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_crawl_idle(item, coll);
 }

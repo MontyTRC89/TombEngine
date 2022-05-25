@@ -12,6 +12,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
@@ -140,6 +141,12 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 	auto* lara = GetLaraInfo(laraItem);
 	auto UPV = (UPVInfo*)UPVItem->Data;
 
+	auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+	if (ammo.getCount() == 0 && !ammo.hasInfinite())
+		return;
+	else if (!ammo.hasInfinite())
+		ammo--;
+
 	short itemNumber = CreateItem();
 
 	if (itemNumber != NO_ITEM)
@@ -155,8 +162,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 		harpoonItem->Pose.Position = pos;
 		InitialiseItem(itemNumber);
 
-		harpoonItem->Pose.Orientation = UPVItem->Pose.Orientation;
-		harpoonItem->Pose.Orientation.z = 0;
+		harpoonItem->Pose.Orientation = Vector3Shrt(UPVItem->Pose.Orientation.x, UPVItem->Pose.Orientation.y, 0);
 
 		// TODO: Huh?
 		harpoonItem->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(harpoonItem->Pose.Orientation.x);
@@ -166,10 +172,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, 2);
-
-		if (lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1])
-			lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1]--;
+		SoundEffect(SFX_TR4_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, 2);
 
 		Statistics.Game.AmmoUsed++;
 		UPV->HarpoonLeft = !UPV->HarpoonLeft;
@@ -279,7 +282,7 @@ void UPVEffects(short itemNumber)
 			target.z = pos.z;
 			target.roomNumber = UPVItem->RoomNumber;
 			LOS(&source, &target);
-			pos = { target.x, target.y, target.z };
+			pos = Vector3Int(target.x, target.y, target.z);
 		}
 		else
 		{
@@ -678,22 +681,22 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 			Vector3Int vec = { 0, 0, 0 };
 			GetLaraJointPosition(&vec, LM_HIPS);
 
-			GameVector LPos;
-			LPos.x = vec.x;
-			LPos.y = vec.y;
-			LPos.z = vec.z;
-			LPos.roomNumber = UPVItem->RoomNumber;
+			auto LPos = GameVector(
+				vec.x,
+				vec.y,
+				vec.z,
+				UPVItem->RoomNumber
+			);
 
-			GameVector VPos;
-			VPos.x = UPVItem->Pose.Position.x;
-			VPos.y = UPVItem->Pose.Position.y;
-			VPos.z = UPVItem->Pose.Position.z;
-			VPos.roomNumber = UPVItem->RoomNumber;
+			auto VPos = GameVector(
+				UPVItem->Pose.Position.x,
+				UPVItem->Pose.Position.y,
+				UPVItem->Pose.Position.z,
+				UPVItem->RoomNumber
+			);
 			LOSAndReturnTarget(&VPos, &LPos, 0);
 
-			laraItem->Pose.Position.x = LPos.x;
-			laraItem->Pose.Position.y = LPos.y;
-			laraItem->Pose.Position.z = LPos.z;
+			laraItem->Pose.Position = Vector3Int(LPos.x, LPos.y, LPos.z);
 
 			SetAnimation(laraItem, LA_UNDERWATER_IDLE);
 			laraItem->Animation.VerticalVelocity = 0;
