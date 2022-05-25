@@ -67,6 +67,7 @@ struct EntityAnimationData
 	std::vector<BONE_MUTATOR> Mutator;
 };
 
+//todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
 	std::string LuaName;
