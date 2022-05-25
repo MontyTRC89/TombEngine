@@ -447,10 +447,11 @@ void InitialiseItemArray(int totalItem)
 
 	if (g_Level.NumItems + 1 < totalItem)
 	{
-		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
+		for(int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
 			item->NextItem = i;
 			item->Active = false;
+			item->Data = nullptr;
 		}
 	}
 

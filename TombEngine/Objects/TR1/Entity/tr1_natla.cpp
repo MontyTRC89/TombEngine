@@ -57,7 +57,7 @@ void NatlaControl(short itemNumber)
 
 	AI_INFO AI;
 
-	if (item->HitPoints <= 0 && item->HitPoints > -16384)
+	if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
 		item->Animation.TargetState = NATLA_STATE_DEATH;
 	else if (item->HitPoints <= NATLA_NEAR_DEATH)
 	{
@@ -148,7 +148,7 @@ void NatlaControl(short itemNumber)
 				item->HitPoints = NATLA_NEAR_DEATH;
 			}
 			else
-				item->HitPoints = -16384;
+				item->HitPoints = NOT_TARGETABLE;
 
 			break;
 

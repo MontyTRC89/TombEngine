@@ -464,9 +464,6 @@ void ModulateLaraSubsuitSwimTurn(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (item->Pose.Position.y < 14080)
-		lara->Control.Subsuit.VerticalVelocity += (14080 - item->Pose.Position.y) >> 4;
-
 	if (TrInput & IN_FORWARD && item->Pose.Orientation.x > -ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
 	else if (TrInput & IN_BACK && item->Pose.Orientation.x < ANGLE(85.0f))

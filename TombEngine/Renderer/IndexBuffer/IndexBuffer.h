@@ -1,10 +1,10 @@
 #pragma once
 #include <d3d11.h>
-#include "Utils.h"
-#include <wrl/client.h>
 #include <vector>
-#include <Game\debug\debug.h>
-#include "Specific\fast_vector.h"
+#include <wrl/client.h>
+#include "Utils.h"
+#include "Game/debug/debug.h"
+#include "Specific/fast_vector.h"
 
 namespace TEN::Renderer {
 	class IndexBuffer {

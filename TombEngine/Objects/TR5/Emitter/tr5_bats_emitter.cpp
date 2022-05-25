@@ -8,7 +8,6 @@
 #include "Sound/sound.h"
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
-#include <Game\items.h>
 #include "Game/items.h"
 
 int NextBat;
