@@ -698,6 +698,7 @@ namespace TEN::Entities::Effects
 				}
 				else
 				{
+					Lara.CurrentTorchState = TorchState::JustLit;
 					int dy = abs(l->Pose.Position.y - item->Pose.Position.y);
 					l->ItemFlags[3] = 1;
 					l->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
