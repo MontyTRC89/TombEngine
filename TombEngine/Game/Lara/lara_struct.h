@@ -1083,6 +1083,14 @@ struct FlareData
 	bool ControlLeft;
 };
 
+enum class TorchState : int
+{
+	Holding,
+	Throwing,
+	Dropping,
+	JustLit
+};
+
 #define MaxDiaryPages	  64
 #define MaxStringsPerPage 8
 
@@ -1248,6 +1256,7 @@ struct LaraInfo
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare;
+	TorchState CurrentTorchState;
 	bool LitTorch;
 
 	Vector3Shrt ExtraHeadRot;
