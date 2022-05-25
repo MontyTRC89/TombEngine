@@ -155,6 +155,42 @@ struct SaveGame;
 struct SaveGameBuilder;
 struct SaveGameT;
 
+enum class TorchState : int32_t {
+  holding = 0,
+  throwing = 1,
+  dropping = 2,
+  just_lit = 3,
+  MIN = holding,
+  MAX = just_lit
+};
+
+inline const TorchState (&EnumValuesTorchState())[4] {
+  static const TorchState values[] = {
+    TorchState::holding,
+    TorchState::throwing,
+    TorchState::dropping,
+    TorchState::just_lit
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesTorchState() {
+  static const char * const names[5] = {
+    "holding",
+    "throwing",
+    "dropping",
+    "just_lit",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameTorchState(TorchState e) {
+  if (flatbuffers::IsOutRange(e, TorchState::holding, TorchState::just_lit)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesTorchState()[index];
+}
+
 enum class VarUnion : uint8_t {
   NONE = 0,
   str = 1,
@@ -3055,6 +3091,7 @@ struct LaraT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::LaraInventoryDataT> inventory{};
   std::vector<std::unique_ptr<TEN::Save::CarriedWeaponInfoT>> weapons{};
   std::unique_ptr<TEN::Save::FlareDataT> flare{};
+  TEN::Save::TorchState current_torch_state = TEN::Save::TorchState::holding;
   bool lit_torch = false;
   std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
   std::unique_ptr<TEN::Save::Vector3> extra_torso_rot{};
@@ -3101,40 +3138,41 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_INVENTORY = 8,
     VT_WEAPONS = 10,
     VT_FLARE = 12,
-    VT_LIT_TORCH = 14,
-    VT_EXTRA_HEAD_ROT = 16,
-    VT_EXTRA_TORSO_ROT = 18,
-    VT_EXTRA_VELOCITY = 20,
-    VT_WATER_CURRENT_ACTIVE = 22,
-    VT_WATER_CURRENT_PULL = 24,
-    VT_LEFT_ARM = 26,
-    VT_RIGHT_ARM = 28,
-    VT_TARGET_ARM_ANGLES = 30,
-    VT_TARGET_ENTITY_NUMBER = 32,
-    VT_AIR = 34,
-    VT_SPRINT_ENERGY = 36,
-    VT_POISON_POTENCY = 38,
-    VT_VEHICLE = 40,
-    VT_EXTRA_ANIM = 42,
-    VT_HIT_FRAME = 44,
-    VT_HIT_DIRECTION = 46,
-    VT_SPASM_EFFECT_COUNT = 48,
-    VT_PROJECTED_FLOOR_HEIGHT = 50,
-    VT_TARGET_FACING_ANGLE = 52,
-    VT_WATER_SURFACE_DIST = 54,
-    VT_INTERACTED_ITEM = 56,
-    VT_NEXT_CORNER_POSITION = 58,
-    VT_NEXT_CORNER_ROTATION = 60,
-    VT_BURN_TYPE = 62,
-    VT_BURN_COUNT = 64,
-    VT_BURN = 66,
-    VT_BURN_BLUE = 68,
-    VT_BURN_SMOKE = 70,
-    VT_WET = 72,
-    VT_MESH_PTRS = 74,
-    VT_LOCATION = 76,
-    VT_HIGHEST_LOCATION = 78,
-    VT_LOCATION_PAD = 80
+    VT_CURRENT_TORCH_STATE = 14,
+    VT_LIT_TORCH = 16,
+    VT_EXTRA_HEAD_ROT = 18,
+    VT_EXTRA_TORSO_ROT = 20,
+    VT_EXTRA_VELOCITY = 22,
+    VT_WATER_CURRENT_ACTIVE = 24,
+    VT_WATER_CURRENT_PULL = 26,
+    VT_LEFT_ARM = 28,
+    VT_RIGHT_ARM = 30,
+    VT_TARGET_ARM_ANGLES = 32,
+    VT_TARGET_ENTITY_NUMBER = 34,
+    VT_AIR = 36,
+    VT_SPRINT_ENERGY = 38,
+    VT_POISON_POTENCY = 40,
+    VT_VEHICLE = 42,
+    VT_EXTRA_ANIM = 44,
+    VT_HIT_FRAME = 46,
+    VT_HIT_DIRECTION = 48,
+    VT_SPASM_EFFECT_COUNT = 50,
+    VT_PROJECTED_FLOOR_HEIGHT = 52,
+    VT_TARGET_FACING_ANGLE = 54,
+    VT_WATER_SURFACE_DIST = 56,
+    VT_INTERACTED_ITEM = 58,
+    VT_NEXT_CORNER_POSITION = 60,
+    VT_NEXT_CORNER_ROTATION = 62,
+    VT_BURN_TYPE = 64,
+    VT_BURN_COUNT = 66,
+    VT_BURN = 68,
+    VT_BURN_BLUE = 70,
+    VT_BURN_SMOKE = 72,
+    VT_WET = 74,
+    VT_MESH_PTRS = 76,
+    VT_LOCATION = 78,
+    VT_HIGHEST_LOCATION = 80,
+    VT_LOCATION_PAD = 82
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -3150,6 +3188,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::FlareData *flare() const {
     return GetPointer<const TEN::Save::FlareData *>(VT_FLARE);
+  }
+  TEN::Save::TorchState current_torch_state() const {
+    return static_cast<TEN::Save::TorchState>(GetField<int32_t>(VT_CURRENT_TORCH_STATE, 0));
   }
   bool lit_torch() const {
     return GetField<uint8_t>(VT_LIT_TORCH, 0) != 0;
@@ -3265,6 +3306,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(weapons()) &&
            VerifyOffset(verifier, VT_FLARE) &&
            verifier.VerifyTable(flare()) &&
+           VerifyField<int32_t>(verifier, VT_CURRENT_TORCH_STATE) &&
            VerifyField<uint8_t>(verifier, VT_LIT_TORCH) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_TORSO_ROT) &&
@@ -3329,6 +3371,9 @@ struct LaraBuilder {
   }
   void add_flare(flatbuffers::Offset<TEN::Save::FlareData> flare) {
     fbb_.AddOffset(Lara::VT_FLARE, flare);
+  }
+  void add_current_torch_state(TEN::Save::TorchState current_torch_state) {
+    fbb_.AddElement<int32_t>(Lara::VT_CURRENT_TORCH_STATE, static_cast<int32_t>(current_torch_state), 0);
   }
   void add_lit_torch(bool lit_torch) {
     fbb_.AddElement<uint8_t>(Lara::VT_LIT_TORCH, static_cast<uint8_t>(lit_torch), 0);
@@ -3450,6 +3495,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<TEN::Save::LaraInventoryData> inventory = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>> weapons = 0,
     flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
+    TEN::Save::TorchState current_torch_state = TEN::Save::TorchState::holding,
     bool lit_torch = false,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
@@ -3516,6 +3562,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_extra_velocity(extra_velocity);
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
+  builder_.add_current_torch_state(current_torch_state);
   builder_.add_flare(flare);
   builder_.add_weapons(weapons);
   builder_.add_inventory(inventory);
@@ -3539,6 +3586,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::Offset<TEN::Save::LaraInventoryData> inventory = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *weapons = nullptr,
     flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
+    TEN::Save::TorchState current_torch_state = TEN::Save::TorchState::holding,
     bool lit_torch = false,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
@@ -3584,6 +3632,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       inventory,
       weapons__,
       flare,
+      current_torch_state,
       lit_torch,
       extra_head_rot,
       extra_torso_rot,
@@ -6707,6 +6756,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = inventory(); if (_e) _o->inventory = std::unique_ptr<TEN::Save::LaraInventoryDataT>(_e->UnPack(_resolver)); }
   { auto _e = weapons(); if (_e) { _o->weapons.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->weapons[_i] = std::unique_ptr<TEN::Save::CarriedWeaponInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = flare(); if (_e) _o->flare = std::unique_ptr<TEN::Save::FlareDataT>(_e->UnPack(_resolver)); }
+  { auto _e = current_torch_state(); _o->current_torch_state = _e; }
   { auto _e = lit_torch(); _o->lit_torch = _e; }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
@@ -6756,6 +6806,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _inventory = _o->inventory ? CreateLaraInventoryData(_fbb, _o->inventory.get(), _rehasher) : 0;
   auto _weapons = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> (_o->weapons.size(), [](size_t i, _VectorArgs *__va) { return CreateCarriedWeaponInfo(*__va->__fbb, __va->__o->weapons[i].get(), __va->__rehasher); }, &_va );
   auto _flare = _o->flare ? CreateFlareData(_fbb, _o->flare.get(), _rehasher) : 0;
+  auto _current_torch_state = _o->current_torch_state;
   auto _lit_torch = _o->lit_torch;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
@@ -6797,6 +6848,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _inventory,
       _weapons,
       _flare,
+      _current_torch_state,
       _lit_torch,
       _extra_head_rot,
       _extra_torso_rot,

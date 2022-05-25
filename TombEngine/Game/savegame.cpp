@@ -221,6 +221,8 @@ bool SaveGame::Save(int slot)
 	flare.add_life(Lara.Flare.Life);
 	auto flareOffset = flare.Finish();
 
+	Save::TorchState currentTorchState{ (int)Lara.CurrentTorchState };
+
 	Save::LaraInventoryDataBuilder inventory{ fbb };
 	inventory.add_beetle_life(Lara.Inventory.BeetleLife);
 	inventory.add_big_waterskin(Lara.Inventory.BigWaterskin);
@@ -375,6 +377,7 @@ bool SaveGame::Save(int slot)
 	lara.add_extra_torso_rot(&extraTorsoRot);
 	lara.add_extra_velocity(&extraVelocity);
 	lara.add_flare(flareOffset);
+	lara.add_current_torch_state(currentTorchState);
 	lara.add_highest_location(Lara.HighestLocation);
 	lara.add_hit_direction(Lara.HitDirection);
 	lara.add_hit_frame(Lara.HitFrame);
@@ -1360,6 +1363,7 @@ bool SaveGame::Load(int slot)
 	Lara.Flare.Life = s->lara()->flare()->life();
 	Lara.Flare.ControlLeft = s->lara()->flare()->control_left();
 	Lara.Flare.Frame = s->lara()->flare()->frame();
+	Lara.CurrentTorchState = (TorchState)s->lara()->current_torch_state();
 	Lara.HighestLocation = s->lara()->highest_location();
 	Lara.HitDirection = s->lara()->hit_direction();
 	Lara.HitFrame = s->lara()->hit_frame();
