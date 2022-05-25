@@ -113,17 +113,20 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-// Overload of GetCollisionResult which can be used to probe collision parameters
-// from a given item.
-
 CollisionResult GetCollision(ItemInfo* item, short orient, int forward, int vertical, int lateral)
 {
+	// NOTE: GetRoom() call is necessary to fetch the index of the room directly above in order to perform a correct L-shaped test.
+	// Probes MUST traverse through portals between rooms, otherwise they will not work correctly.
+
 	auto point = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
 	return GetCollision(point.x, point.y, point.z, GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber);
 }
 
-// A handy overload of GetCollisionResult which can be used to quickly get collision parameters
-// such as floor height under specific item.
+CollisionResult GetCollision(Vector3 pos, int roomIndex, short orient, int forward, int vertical, int lateral)
+{
+	auto point = TranslateVector(pos, orient, forward, vertical, lateral);
+	return GetCollision(point.x, point.y, point.z, roomIndex);
+}
 
 CollisionResult GetCollision(ItemInfo* item)
 {
@@ -135,12 +138,6 @@ CollisionResult GetCollision(ItemInfo* item)
 	return result;
 }
 
-// This variation of GetCollisionResult is an universal wrapper to be used across whole
-// collisional code to replace "holy trinity" of roomNumber-GetFloor-GetFloorHeight operations.
-// The advantage of this wrapper is that it does NOT modify incoming roomNumber parameter,
-// instead putting modified one returned by GetFloor into return COLL_RESULT structure.
-// This way, function never modifies any external variables.
-
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
@@ -150,12 +147,6 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	result.RoomNumber = room;
 	return result;
 }
-
-// GetCollisionResult is a reworked legacy GetFloorHeight function, which does not
-// write any data into globals, but instead into special COLL_RESULT struct.
-// Additionally, it writes ceiling height for same coordinates, so this function
-// may be reused instead both GetFloorHeight and GetCeilingHeight calls to increase
-// readability.
 
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
