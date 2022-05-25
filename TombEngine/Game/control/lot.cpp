@@ -27,7 +27,7 @@ void InitialiseLOTarray(int itemNumber)
 	}
 }
 
-int EnableBaddyAI(short itemNum, int always)
+int EnableBaddyAI(short itemNum, int always, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
@@ -90,7 +90,7 @@ int EnableBaddyAI(short itemNum, int always)
 			}
 		}
 		*/
-		InitialiseSlot(itemNum, 0);
+		InitialiseSlot(itemNum, 0, makeTarget);
 		ActiveCreatures.push_back(item->Data);
 	}
 
@@ -111,7 +111,7 @@ void DisableEntityAI(short itemNumber)
 	}
 }
 
-void InitialiseSlot(short itemNum, short slot)
+void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 	ObjectInfo* obj = &Objects[item->ObjectNumber];
@@ -143,7 +143,11 @@ void InitialiseSlot(short itemNum, short slot)
 	creature->Enemy = NULL;
 	creature->LOT.Fly = NO_FLYING;
 	creature->LOT.BlockMask = BLOCKED;
-	creature->AITargetNumber = CreateItem();
+
+	if (makeTarget)
+		creature->AITargetNumber = CreateItem();
+	else
+		creature->AITargetNumber = NO_ITEM;
 
 	if (creature->AITargetNumber != NO_ITEM)
 		creature->AITarget = &g_Level.Items[creature->AITargetNumber];
@@ -278,6 +282,20 @@ void InitialiseSlot(short itemNum, short slot)
 		CreateZone(item);
 
 	SlotsUsed++;
+}
+
+void SetBaddyTarget(short itemNum, short target)
+{
+	ItemInfo* item = &g_Level.Items[itemNum];
+
+	CreatureInfo* creature = item->Data;
+
+	creature->AITargetNumber = target;
+
+	if (creature->AITargetNumber != NO_ITEM)
+		creature->AITarget = &g_Level.Items[creature->AITargetNumber];
+	else
+		creature->AITarget = nullptr;
 }
 
 void ClearLOT(LOTInfo* LOT)

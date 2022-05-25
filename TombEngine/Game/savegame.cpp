@@ -457,6 +457,7 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_poisoned(creature->Poisoned);
 			creatureBuilder.add_reached_goal(creature->ReachedGoal);
 			creatureBuilder.add_tosspad(creature->Tosspad);
+			creatureBuilder.add_ai_target_number(creature->AITargetNumber);
 			creatureOffset = creatureBuilder.Finish();
 		}
 		else if (itemToSerialize.Data.is<short>())
@@ -1107,7 +1108,7 @@ bool SaveGame::Load(int slot)
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 		{
-			EnableBaddyAI(i, true);
+			EnableBaddyAI(i, true, false);
 
 			auto creature = GetCreatureInfo(item);
 			auto data = savedItem->data();
@@ -1141,6 +1142,7 @@ bool SaveGame::Load(int slot)
 			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
 			creature->Tosspad = savedCreature->tosspad();
+			SetBaddyTarget(i, savedCreature->ai_target_number());
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
