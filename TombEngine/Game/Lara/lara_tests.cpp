@@ -2332,7 +2332,7 @@ WaterClimbOutTestResult TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* col
 LedgeHangTestResult TestLaraLedgeHang(ItemInfo* item, CollisionInfo* coll)
 {
 	int y = item->Pose.Position.y - coll->Setup.Height;
-	auto probeFront = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius), -(coll->Setup.Height + abs(item->Animation.VerticalVelocity)));
+	auto probeFront = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius), -coll->Setup.Height + std::min(item->Animation.VerticalVelocity, 0));
 	auto probeMiddle = GetCollision(item);
 
 	if (!TestValidLedge(item, coll, true))
