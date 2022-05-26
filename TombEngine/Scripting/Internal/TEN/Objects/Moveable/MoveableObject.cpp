@@ -395,17 +395,17 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 
 void Moveable::SetOnHit(std::string const & cbName)
 {
-	m_item->luaCallbackOnHitName = cbName;
+	m_item->LuaCallbackOnHitName = cbName;
 }
 
 void Moveable::SetOnKilled(std::string const & cbName)
 {
-	m_item->luaCallbackOnKilledName = cbName;
+	m_item->LuaCallbackOnKilledName = cbName;
 }
 
 void Moveable::SetOnCollidedWithObject(std::string const & cbName)
 {
-	m_item->luaCallbackOnCollidedWithObjectName = cbName;
+	m_item->LuaCallbackOnCollidedWithObjectName = cbName;
 
 	if(cbName.empty())
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
@@ -415,7 +415,7 @@ void Moveable::SetOnCollidedWithObject(std::string const & cbName)
 
 void Moveable::SetOnCollidedWithRoom(std::string const & cbName)
 {
-	m_item->luaCallbackOnCollidedWithRoomName = cbName;
+	m_item->LuaCallbackOnCollidedWithRoomName = cbName;
 
 	if(cbName.empty())
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
@@ -425,22 +425,22 @@ void Moveable::SetOnCollidedWithRoom(std::string const & cbName)
 
 std::string Moveable::GetOnHit() const
 {
-	return m_item->luaCallbackOnHitName;
+	return m_item->LuaCallbackOnHitName;
 }
 
 std::string Moveable::GetOnKilled() const
 {
-	return m_item->luaCallbackOnKilledName;
+	return m_item->LuaCallbackOnKilledName;
 }
 
 std::string Moveable::GetOnCollidedWithObject() const
 {
-	return m_item->luaCallbackOnCollidedWithObjectName;
+	return m_item->LuaCallbackOnCollidedWithObjectName;
 }
 
 std::string Moveable::GetOnCollidedWithRoom() const
 {
-	return m_item->luaCallbackOnCollidedWithRoomName;
+	return m_item->LuaCallbackOnCollidedWithRoomName;
 }
 
 std::string Moveable::GetName() const

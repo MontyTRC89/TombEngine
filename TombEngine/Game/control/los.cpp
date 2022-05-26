@@ -203,10 +203,10 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 									if (!Objects[item->ObjectNumber].undead)
 										item->HitPoints -= Weapons[(int)Lara.Control.Weapon.GunType].Damage;
 
-									if (!item->luaCallbackOnHitName.empty())
+									if (!item->LuaCallbackOnHitName.empty())
 									{
 										short index = g_GameScriptEntities->GetIndexByName(item->LuaName);
-										g_GameScript->ExecuteFunction(item->luaCallbackOnHitName, index);
+										g_GameScript->ExecuteFunction(item->LuaCallbackOnHitName, index);
 									}
 								}
 							}
