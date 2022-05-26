@@ -237,7 +237,7 @@ namespace TEN::Entities::TR4
                 puzzleItem->ItemFlags[0] != 1 ||
                 laraItem->Animation.ActiveState != LS_IDLE ||
                 laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-                !laraInfo->LitTorch ||
+                !laraInfo->Torch.IsLit ||
                 laraItem->Animation.Airborne)
             {
                 if (laraItem->Animation.AnimNumber != LA_TORCH_LIGHT_3 ||

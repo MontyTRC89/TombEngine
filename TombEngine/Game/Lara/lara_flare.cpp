@@ -351,7 +351,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 				life = lara->Flare.Life & 0x7FFF;
 		}
 		else
-			flareItem->ItemFlags[3] = lara->LitTorch;
+			flareItem->ItemFlags[3] = lara->Torch.IsLit;
 
 		AddActiveItem(itemNumber);
 		flareItem->Status = ITEM_ACTIVE;

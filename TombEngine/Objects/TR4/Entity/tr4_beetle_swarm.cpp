@@ -169,7 +169,7 @@ namespace TEN::Entities::TR4
 						else
 							beetle->Pose.Orientation.y -= ANGLE(2.8f);
 
-						beetle->Velocity = 48 - Lara.LitTorch * 64 - (abs(angle) / 128);
+						beetle->Velocity = 48 - Lara.Torch.IsLit * 64 - (abs(angle) / 128);
 						if (beetle->Velocity < -16)
 							beetle->Velocity = i & 0xF;
 					}
