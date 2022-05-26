@@ -90,7 +90,7 @@ constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
 #define BABOON_DAMAGE 70
 #define BABOON_IDLE_DISTANCE pow(SECTOR(1), 2)
 #define BABOON_ATTACK_ANGLE ANGLE(7.0f)
-#define BABOON_ATK_RANGE 0x718E4
+#define BABOON_ATTACK_RANGE 0x718E4
 #define BABOON_ATTACK_NORMAL_RANGE 0x1C639
 #define BABOON_JUMP_RANGE 0x718E4
 #define BABOON_FOLLOW_RANGE 0x400000
@@ -448,7 +448,7 @@ void BaboonControl(short itemNumber)
 				item->Animation.TargetState = BABOON_STATE_RUN_FORWARD;
 			else if (creature->Mood == MoodType::Attack)
 			{
-				if (AI.bite && AI.distance < BABOON_ATK_RANGE)
+				if (AI.bite && AI.distance < BABOON_ATTACK_RANGE)
 					item->Animation.TargetState = BABOON_STATE_IDLE;
 			}
 			else if (GetRandomControl() < 256)
@@ -471,7 +471,7 @@ void BaboonControl(short itemNumber)
 				item->Animation.TargetState = BABOON_STATE_IDLE;
 			else if (creature->Mood == MoodType::Attack)
 			{
-				if (AI.distance < BABOON_ATK_RANGE)
+				if (AI.distance < BABOON_ATTACK_RANGE)
 					item->Animation.TargetState = BABOON_STATE_IDLE;
 				else if (AI.bite && AI.distance < BABOON_RUN_FORWARD_ROLL_RANGE)
 					item->Animation.TargetState = BABOON_STATE_RUN_FORWARD_ROLL;

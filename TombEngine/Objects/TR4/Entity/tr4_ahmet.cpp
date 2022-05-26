@@ -61,7 +61,7 @@ namespace TEN::Entities::TR4
 	#define AHMET_AWARE_DISTANCE pow(SECTOR(1), 2)
 	#define AHMET_IDLE_RANGE pow(SECTOR(1.25f), 2)
 	#define AHMET_RUN_RANGE pow(SECTOR(2.5f), 2)
-	#define AHMET_STAND_DUALATK_RANGE pow(682, 2)
+	#define AHMET_SWIPE_ATTACK_RANGE pow(682, 2)
 	#define AHMET_RIGHT_TOUCH 0xF00000
 	#define AHMET_LEFT_TOUCH 0x3C000
 	#define AHMET_HAND_DAMAGE 80
@@ -204,7 +204,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood == MoodType::Attack && creature->Mood != MoodType::Escape)
 				{
-					if (AI.bite && AI.distance < AHMET_STAND_DUALATK_RANGE)
+					if (AI.bite && AI.distance < AHMET_SWIPE_ATTACK_RANGE)
 						item->Animation.TargetState = AHMET_STATE_SWIPE_ATTACK;
 					else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) || AI.distance >= AHMET_IDLE_RANGE)
 					{
