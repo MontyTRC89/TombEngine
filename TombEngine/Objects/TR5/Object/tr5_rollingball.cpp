@@ -443,8 +443,6 @@ void ClassicRollingBallControl(short itemNum)
 			{
 				RemoveDrawnItem(itemNum);
 				r = &g_Level.Rooms[old->roomNumber];
-				item->NextItem = r->itemNumber;
-				r->itemNumber = itemNum;
 				item->RoomNumber = old->roomNumber;
 			}
 			item->Animation.ActiveState = 0;

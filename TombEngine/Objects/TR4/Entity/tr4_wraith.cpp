@@ -156,10 +156,9 @@ namespace TEN::Entities::TR4
 			ItemNewRoom(itemNumber, outsideRoom);
 
 			auto* room = &g_Level.Rooms[outsideRoom];
-			short linkNumber = NO_ITEM;
-			for (linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+			for (short currentItemNumber : g_Level.Rooms[item->RoomNumber].Items)
 			{
-				auto* target = &g_Level.Items[linkNumber];
+				auto* target = &g_Level.Items[currentItemNumber];
 
 				if (target->Active)
 				{
@@ -172,8 +171,8 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			if (linkNumber != NO_ITEM)
-				item->ItemFlags[6] = linkNumber;
+			//if (linkNumber != NO_ITEM)
+			//	item->ItemFlags[6] = linkNumber;
 		}
 
 		if (item->ObjectNumber != ID_WRAITH3)
@@ -512,7 +511,7 @@ namespace TEN::Entities::TR4
 	{
 		ItemInfo* item2 = nullptr;
 
-		if (NextItemActive != NO_ITEM)
+		/*if (NextItemActive != NO_ITEM)
 		{
 			for (; NextItemActive != NO_ITEM;)
 			{
@@ -528,7 +527,7 @@ namespace TEN::Entities::TR4
 			}
 
 			item2->HitPoints = item - g_Level.Items.data();
-		}
+		}*/
 
 		FlipEffect = -1;
 	}

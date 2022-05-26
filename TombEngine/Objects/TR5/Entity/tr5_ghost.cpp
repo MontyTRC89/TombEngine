@@ -97,12 +97,12 @@ void InvisibleGhostControl(short itemNumber)
 
 	if (AI.distance >= pow(SECTOR(1.5f), 2))
 	{
-		item->AfterDeath = 125;
+		item->AlphaOverride = 125;
 		item->ItemFlags[0] = 0;
 	}
 	else
 	{
-		item->AfterDeath = sqrt(AI.distance) / 16;
+		item->AlphaOverride = sqrt(AI.distance) / 16;
 		if (item->ItemFlags[0] == 0)
 		{
 			item->ItemFlags[0] = 1;

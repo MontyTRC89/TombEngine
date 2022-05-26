@@ -115,7 +115,7 @@ static void KillRespawnedBaboon(short itemNumber, bool remove = false)
 	RemoveActiveItem(itemNumber); // remove it from the active item list
 
 	item->Flags = IFLAG_CLEAR_BODY;
-	item->AfterDeath = 128; // instant disappear !
+	item->AlphaOverride = 0; // instant disappear !
 	item->Status = ITEM_DEACTIVATED; // wont triggered again...
 
 	if (remove)
@@ -172,7 +172,7 @@ static void UpdateRespawnedBaboon(short itemNumber)
 
 	RemoveActiveItem(itemNumber);
 	item->Flags = NULL;
-	item->AfterDeath = 0;
+	item->AlphaOverride = 0;
 	item->Status = ITEM_INVISIBLE;
 
 	DisableEntityAI(itemNumber);

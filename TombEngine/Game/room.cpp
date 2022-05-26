@@ -38,7 +38,7 @@ void DoFlipMap(short group)
 			room->flippedRoom = flipped->flippedRoom;
 			flipped->flippedRoom = -1;
 
-			room->itemNumber = flipped->itemNumber;
+			room->Items = flipped->Items;
 			room->fxNumber = flipped->fxNumber;
 
 			AddRoomFlipItems(room);
@@ -60,52 +60,45 @@ void DoFlipMap(short group)
 
 void AddRoomFlipItems(ROOM_INFO* room)
 {
-	for (short linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+	for (short currentItemNumber : room->Items)
 	{
-		auto* item = &g_Level.Items[linkNumber];
+		auto* item = &g_Level.Items[currentItemNumber];
 
 		if (Objects[item->ObjectNumber].floor != nullptr)
-			UpdateBridgeItem(linkNumber);
+			UpdateBridgeItem(currentItemNumber);
 	}
 }
 
 void RemoveRoomFlipItems(ROOM_INFO* room)
 {
-	for (short linkNumber = room->itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+	for (short currentItemNumber : room->Items)
 	{
-		auto* item = &g_Level.Items[linkNumber];
+		auto* item = &g_Level.Items[currentItemNumber];
 
 		if (item->Flags & ONESHOT &&
 			Objects[item->ObjectNumber].intelligent &&
 			item->HitPoints <= 0 &&
 			item->HitPoints != NOT_TARGETABLE)
 		{
-			KillItem(linkNumber);
+			KillItem(currentItemNumber);
 		}
 
 		if (Objects[item->ObjectNumber].floor != nullptr)
-			UpdateBridgeItem(linkNumber, true);
+			UpdateBridgeItem(currentItemNumber, true);
 	}
 }
 
 bool IsObjectInRoom(short roomNumber, short objectNumber)
 {
-	short itemNumber = g_Level.Rooms[roomNumber].itemNumber;
-
-	if (itemNumber == NO_ITEM)
+	if (g_Level.Rooms[roomNumber].Items.size()==0)
 		return false;
 
-	while (true)
+	for (short currentItemNumber : g_Level.Rooms[roomNumber].Items)
 	{
-		auto* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[currentItemNumber];
 
 		if (item->ObjectNumber == objectNumber)
 			break;
-
-		itemNumber = item->NextItem;
-
-		if (itemNumber == NO_ITEM)
-			return false;
 	}
 
 	return true;

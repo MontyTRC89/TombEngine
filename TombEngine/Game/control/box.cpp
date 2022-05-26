@@ -325,9 +325,8 @@ void CreatureFloat(short itemNumber)
 			item->Pose.Position.y = waterLevel;
 			item->Collidable = false;
 			item->Status = ITEM_DEACTIVATED;
-			DisableEntityAI(itemNumber);
 			RemoveActiveItem(itemNumber);
-			item->AfterDeath = 1;
+			DisableEntityAI(itemNumber);
 		}
 	}
 }
@@ -767,7 +766,9 @@ void CreatureDie(short itemNumber, int explode)
 		KillItem(itemNumber);
 	}
 	else
+	{
 		RemoveActiveItem(itemNumber);
+	}
 
 	DisableEntityAI(itemNumber);
 	item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
@@ -808,17 +809,17 @@ int CreatureCreature(short itemNumber)
 	short radius = object->radius;
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
-	short link = room->itemNumber;
 	int distance = 0;
-	do
+	
+	for (short currentItemNumber : room->Items)
 	{
-		auto* linked = &g_Level.Items[link];
-		
-		if (link != itemNumber && linked != LaraItem && linked->Status == ITEM_ACTIVE && linked->HitPoints > 0)
+		auto* linked = &g_Level.Items[currentItemNumber];
+
+		if (currentItemNumber != itemNumber && linked != LaraItem && linked->Status == ITEM_ACTIVE && linked->HitPoints > 0)
 		{
 			int xDistance = abs(linked->Pose.Position.x - x);
 			int zDistance = abs(linked->Pose.Position.z - z);
-			
+
 			if (xDistance > zDistance)
 				distance = xDistance + (zDistance >> 1);
 			else
@@ -827,9 +828,7 @@ int CreatureCreature(short itemNumber)
 			if (distance < radius + Objects[linked->ObjectNumber].radius)
 				return phd_atan(linked->Pose.Position.z - z, linked->Pose.Position.x - x) - item->Pose.Orientation.y;
 		}
-
-		link = linked->NextItem;
-	} while (link != NO_ITEM);
+	}
 
 	return 0;
 }

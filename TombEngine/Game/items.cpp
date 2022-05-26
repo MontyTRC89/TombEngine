@@ -29,7 +29,7 @@ void KillItem(short const itemNumber)
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNumber | 0x8000;
 		ItemNewRoomNo++;
 	}
-	else// if (NextItemActive != NO_ITEM)
+	else
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -37,37 +37,21 @@ void KillItem(short const itemNumber)
 
 		item->Active = false;
 
-		if (NextItemActive == itemNumber)
-			NextItemActive = item->NextActive;
-		else
-		{
-			short linkNumber;
-			for (linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
-			{
-				if (g_Level.Items[linkNumber].NextActive == itemNumber)
-				{
-					g_Level.Items[linkNumber].NextActive = item->NextActive;
-					break;
-				}
-			}
-		}
+		ActiveItems.erase(
+			std::remove(
+				ActiveItems.begin(),
+				ActiveItems.end(),
+				itemNumber),
+			ActiveItems.end());
 
 		if (item->RoomNumber != NO_ROOM)
 		{
-			if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
-				g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
-			else
-			{
-				short linkNumber;
-				for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-				{
-					if (g_Level.Items[linkNumber].NextItem == itemNumber)
-					{
-						g_Level.Items[linkNumber].NextItem = item->NextItem;
-						break;
-					}
-				}
-			}
+			g_Level.Rooms[item->RoomNumber].Items.erase(
+				std::remove(
+					g_Level.Rooms[item->RoomNumber].Items.begin(),
+					g_Level.Rooms[item->RoomNumber].Items.end(),
+					itemNumber),
+				g_Level.Rooms[item->RoomNumber].Items.end());
 		}
 
 		if (item == Lara.TargetEntity)
@@ -78,7 +62,6 @@ void KillItem(short const itemNumber)
 
 		if (itemNumber >= g_Level.NumItems)
 		{
-			item->NextItem = NextItemFree;
 			NextItemFree = itemNumber;
 		}
 		else
@@ -99,8 +82,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	short currentItemNumber = room->itemNumber;
-	while (currentItemNumber != NO_ITEM)
+	for (short currentItemNumber : room->Items)
 	{
 		auto* item = &g_Level.Items[currentItemNumber];
 
@@ -110,8 +92,6 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 			item->Status = ITEM_NOT_ACTIVE;
 			item->Flags &= 0xC1;
 		}
-
-		currentItemNumber = item->NextItem;
 	}
 }
 
@@ -124,15 +104,13 @@ void AddActiveItem(short itemNumber)
 	if (Objects[item->ObjectNumber].control == NULL)
 	{
 		item->Status = ITEM_NOT_ACTIVE;
-		return;
 	}
-
-	if (!item->Active)
+	else if (std::find(ActiveItems.begin(), ActiveItems.end(), itemNumber) == ActiveItems.end())
 	{
 		item->Active = true;
-		item->NextActive = NextItemActive;
-		NextItemActive = itemNumber;
+		ActiveItems.push_back(itemNumber);
 	}
+
 }
 
 void ItemNewRoom(short itemNumber, short roomNumber)
@@ -149,26 +127,17 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 
 		if (item->RoomNumber != NO_ROOM)
 		{
-			auto* room = &g_Level.Rooms[item->RoomNumber];
-
-			if (room->itemNumber == itemNumber)
-				room->itemNumber = item->NextItem;
-			else
-			{
-				for (short linkNumber = room->itemNumber; linkNumber != -1; linkNumber = g_Level.Items[linkNumber].NextItem)
-				{
-					if (g_Level.Items[linkNumber].NextItem == itemNumber)
-					{
-						g_Level.Items[linkNumber].NextItem = item->NextItem;
-						break;
-					}
-				}
-			}
+			auto* oldRoom = &g_Level.Rooms[item->RoomNumber];
+			oldRoom->Items.erase(
+				std::remove(
+					oldRoom->Items.begin(),
+					oldRoom->Items.end(),
+					itemNumber),
+				oldRoom->Items.end());
 		}
 
 		item->RoomNumber = roomNumber;
-		item->NextItem = g_Level.Rooms[roomNumber].itemNumber;
-		g_Level.Rooms[roomNumber].itemNumber = itemNumber;
+		g_Level.Rooms[roomNumber].Items.push_back(itemNumber);
 	}
 }
 
@@ -288,48 +257,34 @@ void InitialiseFXArray(int allocateMemory)
 void RemoveDrawnItem(short itemNumber) 
 {
 	auto* item = &g_Level.Items[itemNumber];
-
-	if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
-		g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
-	else
-	{
-		for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
-		{
-			if (g_Level.Items[linkNumber].NextItem == itemNumber)
-			{
-				g_Level.Items[linkNumber].NextItem = item->NextItem;
-				break;
-			}
-		}
-	}
+	auto* oldRoom = &g_Level.Rooms[item->RoomNumber];
+	oldRoom->Items.erase(
+		std::remove(
+			oldRoom->Items.begin(),
+			oldRoom->Items.end(),
+			itemNumber),
+		oldRoom->Items.end());
 }
 
 void RemoveActiveItem(short itemNumber) 
 {
-	auto& item = g_Level.Items[itemNumber];
+	auto* item = &g_Level.Items[itemNumber];
 
-	if (g_Level.Items[itemNumber].Active)
+	if (item->Active)
 	{
-		g_Level.Items[itemNumber].Active = false;
+		item->Active = false;
 
-		if (NextItemActive == itemNumber)
-			NextItemActive = g_Level.Items[itemNumber].NextActive;
-		else
-		{
-			for (short linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
-			{
-				if (g_Level.Items[linkNumber].NextActive == itemNumber)
-				{
-					g_Level.Items[linkNumber].NextActive = g_Level.Items[itemNumber].NextActive;
-					break;
-				}
-			}
-		}
+		ActiveItems.erase(
+			std::remove(
+				ActiveItems.begin(),
+				ActiveItems.end(),
+				itemNumber),
+			ActiveItems.end());
 
-		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.luaCallbackOnKilledName.empty())
+		g_GameScriptEntities->NotifyKilled(item);
+		if (!item->luaCallbackOnKilledName.empty())
 		{
-			g_GameScript->ExecuteFunction(item.luaCallbackOnKilledName, itemNumber);
+			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNumber);
 		}
 	}
 }
@@ -378,7 +333,7 @@ void InitialiseItem(short itemNumber)
 		item->MeshBits = -1;
 
 	item->TouchBits = 0;
-	item->AfterDeath = 0;
+	item->AlphaOverride = 255;
 	item->SwapMeshFlags = 0;
 
 	if (item->Flags & IFLAG_INVISIBLE)
@@ -398,9 +353,7 @@ void InitialiseItem(short itemNumber)
 	}
 
 	auto* room = &g_Level.Rooms[item->RoomNumber];
-
-	item->NextItem = room->itemNumber;
-	room->itemNumber = itemNumber;
+	room->Items.push_back(itemNumber);
 
 	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
 	item->Floor = floor->FloorHeight(item->Pose.Position.x, item->Pose.Position.z);
@@ -423,12 +376,21 @@ short CreateItem()
 {
 	short itemNumber = 0;
 
-	if (NextItemFree == -1) return NO_ITEM;
+	if (NextItemFree == NO_ITEM) return NO_ITEM;
 
 	itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	g_Level.Items[NextItemFree].LuaName = "";
-	NextItemFree = g_Level.Items[NextItemFree].NextItem;
+
+	for (short currentItemNumber = g_Level.NumItems; currentItemNumber < g_Level.Items.size(); currentItemNumber++)
+	{
+		auto* currentItem = &g_Level.Items[currentItemNumber];
+		if (!currentItem->Active)
+		{
+			NextItemFree = currentItemNumber;
+			break;
+		}
+	}
 
 	return itemNumber;
 }
@@ -437,19 +399,16 @@ void InitialiseItemArray(int totalItem)
 {
 	auto* item = &g_Level.Items[g_Level.NumItems];
 
-	NextItemActive = NO_ITEM;
+	ActiveItems.clear();
 	NextItemFree = g_Level.NumItems;
 
 	if (g_Level.NumItems + 1 < totalItem)
 	{
 		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
-			item->NextItem = i;
 			item->Active = false;
 		}
 	}
-
-	item->NextItem = NO_ITEM;
 }
 
 short SpawnItem(ItemInfo* item, GAME_OBJECT_ID objectNumber)
@@ -479,7 +438,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+		for (short itemNumber : room->Items)
 		{
 			if (g_Level.Items[itemNumber].ObjectNumber == search)
 			{

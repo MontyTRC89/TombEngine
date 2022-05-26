@@ -380,7 +380,7 @@ namespace TEN::Entities::TR4
 		auto* currentCreature = creature;
 
 		if (item->ItemFlags[1] == item->RoomNumber ||
-			g_Level.Rooms[item->RoomNumber].itemNumber == NO_ITEM)
+			g_Level.Rooms[item->RoomNumber].Items.size() == 0)
 		{
 			currentCreature = creature;
 		}
@@ -389,9 +389,9 @@ namespace TEN::Entities::TR4
 			currentCreature = creature;
 			creature->Enemy = LaraItem;
 			ItemInfo* currentItem = NULL;
-			for (short itemNum = g_Level.Rooms[item->RoomNumber].itemNumber; itemNum != NO_ITEM; itemNum = currentItem->NextItem)
+			for (short itemNumber : g_Level.Rooms[item->RoomNumber].Items)
 			{
-				currentItem = &g_Level.Items[itemNum];
+				currentItem = &g_Level.Items[itemNumber];
 				if ((currentItem->ObjectNumber == ID_SMALLMEDI_ITEM ||
 					currentItem->ObjectNumber == ID_BIGMEDI_ITEM ||
 					currentItem->ObjectNumber == ID_UZI_AMMO_ITEM) &&

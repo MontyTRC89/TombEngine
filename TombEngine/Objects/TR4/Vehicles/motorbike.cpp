@@ -657,11 +657,9 @@ void MotorbikeBaddyCollision(ItemInfo* bike)
 
     for (int i = 0; i < roomsList.size(); i++)
     {
-        short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
-
-        while (itemNum != NO_ITEM)
+        for (short itemNumber : g_Level.Rooms[roomsList[i]].Items)
         {
-            ItemInfo* item = &g_Level.Items[itemNum];
+            ItemInfo* item = &g_Level.Items[itemNumber];
 
             if (item->Collidable && item->Status != IFLAG_INVISIBLE && item != LaraItem && item != bike)
             {
@@ -697,8 +695,6 @@ void MotorbikeBaddyCollision(ItemInfo* bike)
                     }
                 }
             }
-
-            itemNum = item->NextItem;
         }
     }
 }

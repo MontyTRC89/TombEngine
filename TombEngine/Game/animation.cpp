@@ -238,9 +238,6 @@ void AnimateItem(ItemInfo* item)
 					break;
 
 				case COMMAND_DEACTIVATE:
-					if (Objects[item->ObjectNumber].intelligent && !item->AfterDeath)
-						item->AfterDeath = 1;
-
 					item->Status = ITEM_DEACTIVATED;
 					break;
 

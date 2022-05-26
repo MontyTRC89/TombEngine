@@ -389,7 +389,7 @@ namespace TEN::Entities::TR4
 		AddActiveItem(itemNumber);
 
 		item->Flags &= 0xFE;
-		item->AfterDeath = 0;
+		item->AlphaOverride = 255;
 		item->Status = ITEM_ACTIVE;
 		item->Collidable = true;
 

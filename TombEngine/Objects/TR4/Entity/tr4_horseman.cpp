@@ -203,7 +203,7 @@ namespace TEN::Entities::TR4
 
 					if (item->ItemFlags[0])
 					{
-						horseItem->AfterDeath = 1;
+						//TODO: horseItem->AfterDeath = 1;
 						item->ItemFlags[0] = 0;
 					}
 				}

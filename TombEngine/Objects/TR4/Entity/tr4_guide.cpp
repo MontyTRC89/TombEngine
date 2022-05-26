@@ -646,10 +646,9 @@ void GuideControl(short itemNumber)
 			auto* room = &g_Level.Rooms[item->RoomNumber];
 			ItemInfo* currentItem = NULL;
 
-			short currentitemNumber = room->itemNumber;
-			while (currentitemNumber != NO_ITEM)
+			for (short currentItemNumber : g_Level.Rooms[item->RoomNumber].Items)
 			{
-				currentItem = &g_Level.Items[currentitemNumber];
+				currentItem = &g_Level.Items[currentItemNumber];
 
 				if (currentItem->ObjectNumber >= ID_ANIMATING1 &&
 					currentItem->ObjectNumber <= ID_ANIMATING15 &&
@@ -658,8 +657,6 @@ void GuideControl(short itemNumber)
 				{
 					break;
 				}
-
-				currentitemNumber = currentItem->NextItem;
 			}
 
 			if (currentItem != NULL)

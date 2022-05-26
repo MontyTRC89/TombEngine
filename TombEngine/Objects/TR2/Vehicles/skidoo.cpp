@@ -336,11 +336,9 @@ void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem)
 
 	for (int i = 0; i < roomsList.size(); i++)
 	{
-		short itemNumber = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNumber != NO_ITEM)
+		for (short currentItemNumber : g_Level.Rooms[roomsList[i]].Items)
 		{
-			auto* item = &g_Level.Items[itemNumber];
+			auto* item = &g_Level.Items[currentItemNumber];
 
 			if (item->Collidable &&
 				item->Status != IFLAG_INVISIBLE &&
@@ -380,8 +378,6 @@ void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem)
 					}
 				}
 			}
-
-			itemNumber = item->NextItem;
 		}
 	}
 }

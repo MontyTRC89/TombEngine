@@ -73,12 +73,11 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 	}
 	else
 	{
-		short linkNumber;
-		for (linkNumber = g_Level.Items[g_Level.Rooms[sarcItem->RoomNumber].itemNumber].NextItem; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		for (short currentItemNumber : g_Level.Rooms[sarcItem->RoomNumber].Items)
 		{
-			auto* currentItem = &g_Level.Items[linkNumber];
+			auto* currentItem = &g_Level.Items[currentItemNumber];
 
-			if (linkNumber != itemNumber &&
+			if (currentItemNumber != itemNumber &&
 				currentItem->Pose.Position.x == sarcItem->Pose.Position.x &&
 				currentItem->Pose.Position.z == sarcItem->Pose.Position.z)
 			{

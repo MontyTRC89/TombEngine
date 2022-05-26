@@ -114,10 +114,10 @@ struct ROOM_INFO
 	int meshEffect;
 	int reverbType;
 	int flipNumber;
-	short itemNumber;
 	short fxNumber;
 	bool boundActive;
 	std::vector<TriggerVolume> triggerVolumes;
+	std::vector<short> Items;
 };
 
 constexpr auto NUM_ROOMS = 1024;

@@ -213,12 +213,11 @@ static void DoRubberBoatShift(ItemInfo* laraItem, int itemNumber)
 	auto* lara = GetLaraInfo(laraItem);
 	auto* boatItem = &g_Level.Items[itemNumber];
 
-	int itemNumber2 = g_Level.Rooms[boatItem->RoomNumber].itemNumber;
-	while (itemNumber2 != NO_ITEM)
+	for (short currentItemNumber : g_Level.Rooms[boatItem->RoomNumber].Items)
 	{
-		auto* item = &g_Level.Items[itemNumber2];
+		auto* item = &g_Level.Items[currentItemNumber];
 
-		if (item->ObjectNumber == ID_RUBBER_BOAT && itemNumber2 != itemNumber && lara->Vehicle != itemNumber2)
+		if (item->ObjectNumber == ID_RUBBER_BOAT && currentItemNumber != itemNumber && lara->Vehicle != currentItemNumber)
 		{
 			int x = item->Pose.Position.x - boatItem->Pose.Position.x;
 			int z = item->Pose.Position.z - boatItem->Pose.Position.z;
@@ -232,8 +231,6 @@ static void DoRubberBoatShift(ItemInfo* laraItem, int itemNumber)
 
 			return;
 		}
-
-		itemNumber2 = item->NextItem;
 	}
 }
 

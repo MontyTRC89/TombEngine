@@ -62,13 +62,14 @@ extern int LevelComplete;
 extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;
 extern short ItemNewRooms[MAX_ROOMS];
-extern short NextItemActive;
 extern short NextItemFree;
 extern short NextFxActive;
 extern short NextFxFree;
 
 extern int WeaponDelay;
 extern int WeaponEnemyTimer;
+
+extern std::vector<short> ActiveItems;
 
 extern std::vector<short> OutsideRoomTable[OUTSIDE_SIZE][OUTSIDE_SIZE];
 

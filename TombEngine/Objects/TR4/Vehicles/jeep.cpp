@@ -539,11 +539,9 @@ static void JeepBaddyCollision(ItemInfo* jeep)
 
 	for (int i = 0; i < roomsList.size(); i++)
 	{
-		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNum != NO_ITEM)
+		for (short itemNumber : g_Level.Rooms[roomsList[i]].Items)
 		{
-			ItemInfo* item = &g_Level.Items[itemNum];
+			ItemInfo* item = &g_Level.Items[itemNumber];
 			if (item->Collidable && item->Status != ITEM_INVISIBLE && item != LaraItem && item != jeep)
 			{
 				if (item->ObjectNumber == ID_ENEMY_JEEP)
@@ -600,7 +598,6 @@ static void JeepBaddyCollision(ItemInfo* jeep)
 					}
 				}
 			}
-			itemNum = item->NextItem;
 		}
 	}
 }

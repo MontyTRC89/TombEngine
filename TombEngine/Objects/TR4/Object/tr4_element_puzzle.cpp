@@ -101,11 +101,7 @@ namespace TEN::Entities::TR4
             return;
         }
 
-        short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-        if (currentItemNumber == NO_ITEM)
-            return;
-
-        while (currentItemNumber != NO_ITEM)
+        for (short currentItemNumber : g_Level.Rooms[item->RoomNumber].Items)
         {
             auto* currentItem = &g_Level.Items[currentItemNumber];
 
@@ -118,7 +114,6 @@ namespace TEN::Entities::TR4
                     currentItem->ItemFlags[3] = 90;
                 }
 
-                currentItemNumber = currentItem->NextItem;
                 continue;
             }
 
@@ -127,7 +122,6 @@ namespace TEN::Entities::TR4
                 currentItem->ItemFlags[3] = 255 - GetRandomControl() % (4 * item->ItemFlags[0]);
                 if (currentItem->ItemFlags[3] >= 2)
                 {
-                    currentItemNumber = currentItem->NextItem;
                     continue;
                 }
 

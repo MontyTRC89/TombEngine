@@ -147,108 +147,99 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 
 		if (collidedItems)
 		{
-			int itemNumber = room->itemNumber;
-			if (itemNumber != NO_ITEM)
+			for (short itemNumber : g_Level.Rooms[collidingItem->RoomNumber].Items)
 			{
-				do
+				auto* item = &g_Level.Items[itemNumber];
+
+				if (item == collidingItem ||
+					item->ObjectNumber == ID_LARA && ignoreLara ||
+					item->Flags & 0x8000 ||
+					item->MeshBits == 0 ||
+					(Objects[item->ObjectNumber].drawRoutine == NULL && item->ObjectNumber != ID_LARA) ||
+					(Objects[item->ObjectNumber].collision == NULL && item->ObjectNumber != ID_LARA) ||
+					onlyVisible && item->Status == ITEM_INVISIBLE ||
+					item->ObjectNumber == ID_BURNING_FLOOR)
 				{
-					auto* item = &g_Level.Items[itemNumber];
+					continue;
+				}
 
-					if (item == collidingItem ||
-						item->ObjectNumber == ID_LARA && ignoreLara ||
-						item->Flags & 0x8000 ||
-						item->MeshBits == 0 ||
-						(Objects[item->ObjectNumber].drawRoutine == NULL && item->ObjectNumber != ID_LARA) ||
-						(Objects[item->ObjectNumber].collision == NULL && item->ObjectNumber != ID_LARA) ||
-						onlyVisible && item->Status == ITEM_INVISIBLE ||
-						item->ObjectNumber == ID_BURNING_FLOOR)
+				/*this is awful*/
+				if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
+				{
+					continue;
+				}
+				if (item->ObjectNumber == ID_BIGGUN && item->HitPoints == 1)
+				{
+					continue;
+				}
+				/*we need a better system*/
+
+				int dx = collidingItem->Pose.Position.x - item->Pose.Position.x;
+				int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
+				int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
+
+				auto* framePtr = GetBestFrame(item);
+
+				if (dx >= -SECTOR(2) && dx <= SECTOR(2) &&
+					dy >= -SECTOR(2) && dy <= SECTOR(2) &&
+					dz >= -SECTOR(2) && dz <= SECTOR(2) &&
+					collidingItem->Pose.Position.y + radius + CLICK(0.5f) >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
+					collidingItem->Pose.Position.y - radius - CLICK(0.5f) <= item->Pose.Position.y + framePtr->boundingBox.Y2)
+				{
+					float s = phd_sin(item->Pose.Orientation.y);
+					float c = phd_cos(item->Pose.Orientation.y);
+
+					int rx = dx * c - s * dz;
+					int rz = dz * c + s * dx;
+
+					if (item->ObjectNumber == ID_TURN_SWITCH)
 					{
-						itemNumber = item->NextItem;
-						continue;
+						framePtr->boundingBox.X1 = -CLICK(1);
+						framePtr->boundingBox.X2 = CLICK(1);
+						framePtr->boundingBox.Z1 = -CLICK(1);
+						framePtr->boundingBox.Z1 = CLICK(1);
 					}
 
-					/*this is awful*/
-					if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
+					if (radius + rx + CLICK(0.5f) >= framePtr->boundingBox.X1 && rx - radius - CLICK(0.5f) <= framePtr->boundingBox.X2)
 					{
-						itemNumber = item->NextItem;
-						continue;
-					}
-					if (item->ObjectNumber == ID_BIGGUN && item->HitPoints == 1)
-					{
-						itemNumber = item->NextItem;
-						continue;
-					}
-					/*we need a better system*/
-
-					int dx = collidingItem->Pose.Position.x - item->Pose.Position.x;
-					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
-					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
-
-					auto* framePtr = GetBestFrame(item);
-
-					if (dx >= -SECTOR(2) && dx <= SECTOR(2) &&
-						dy >= -SECTOR(2) && dy <= SECTOR(2) &&
-						dz >= -SECTOR(2) && dz <= SECTOR(2) &&
-						collidingItem->Pose.Position.y + radius + CLICK(0.5f) >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
-						collidingItem->Pose.Position.y - radius - CLICK(0.5f) <= item->Pose.Position.y + framePtr->boundingBox.Y2)
-					{
-						float s = phd_sin(item->Pose.Orientation.y);
-						float c = phd_cos(item->Pose.Orientation.y);
-
-						int rx = dx * c - s * dz;
-						int rz = dz * c + s * dx;
-
-						if (item->ObjectNumber == ID_TURN_SWITCH)
+						if (radius + rz + CLICK(0.5f) >= framePtr->boundingBox.Z1 && rz - radius - CLICK(0.5f) <= framePtr->boundingBox.Z2)
 						{
-							framePtr->boundingBox.X1 = -CLICK(1);
-							framePtr->boundingBox.X2 = CLICK(1);
-							framePtr->boundingBox.Z1 = -CLICK(1);
-							framePtr->boundingBox.Z1 = CLICK(1);
+							collidedItems[numItems++] = item;
 						}
 
-						if (radius + rx + CLICK(0.5f) >= framePtr->boundingBox.X1 && rx - radius - CLICK(0.5f) <= framePtr->boundingBox.X2)
+					}
+					else
+					{
+						if (collidingItem->Pose.Position.y + radius + 128 >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
+							collidingItem->Pose.Position.y - radius - 128 <= item->Pose.Position.y + framePtr->boundingBox.Y2)
 						{
-							if (radius + rz + CLICK(0.5f) >= framePtr->boundingBox.Z1 && rz - radius - CLICK(0.5f) <= framePtr->boundingBox.Z2)
+							float s = phd_sin(item->Pose.Orientation.y);
+							float c = phd_cos(item->Pose.Orientation.y);
+
+							int rx = dx * c - s * dz;
+							int rz = dz * c + s * dx;
+
+							if (item->ObjectNumber == ID_TURN_SWITCH)
 							{
-								collidedItems[numItems++] = item;
+								framePtr->boundingBox.X1 = -256;
+								framePtr->boundingBox.X2 = 256;
+								framePtr->boundingBox.Z1 = -256;
+								framePtr->boundingBox.Z1 = 256;
 							}
 
-						}
-						else
-						{
-							if (collidingItem->Pose.Position.y + radius + 128 >= item->Pose.Position.y + framePtr->boundingBox.Y1 &&
-								collidingItem->Pose.Position.y - radius - 128 <= item->Pose.Position.y + framePtr->boundingBox.Y2)
+							if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
 							{
-								float s = phd_sin(item->Pose.Orientation.y);
-								float c = phd_cos(item->Pose.Orientation.y);
-
-								int rx = dx * c - s * dz;
-								int rz = dz * c + s * dx;
-
-								if (item->ObjectNumber == ID_TURN_SWITCH)
+								if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
 								{
-									framePtr->boundingBox.X1 = -256;
-									framePtr->boundingBox.X2 = 256;
-									framePtr->boundingBox.Z1 = -256;
-									framePtr->boundingBox.Z1 = 256;
-								}
+									collidedItems[numItems++] = item;
 
-								if (radius + rx + 128 >= framePtr->boundingBox.X1 && rx - radius - 128 <= framePtr->boundingBox.X2)
-								{
-									if (radius + rz + 128 >= framePtr->boundingBox.Z1 && rz - radius - 128 <= framePtr->boundingBox.Z2)
-									{
-										collidedItems[numItems++] = item;
-
-										if (!radius)
-											return true;
-									}
+									if (!radius)
+										return true;
 								}
 							}
 						}
 					}
-
-					itemNumber = item->NextItem;
-				} while (itemNumber != NO_ITEM);
+				}
 			}
 
 			collidedItems[numItems] = NULL;
@@ -308,15 +299,13 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		for (auto i : GetRoomList(item->RoomNumber))
 		{
-			short itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
+			for (short itemNumber : g_Level.Rooms[i].Items)
 			{
 				auto item2 = &g_Level.Items[itemNumber];
 				auto obj = &Objects[item2->ObjectNumber];
 
 				if (obj->isPickup || obj->collision == nullptr || !item2->Collidable || item2->Status == ITEM_INVISIBLE)
 				{
-					itemNumber = item2->NextItem;
 					continue;
 				}
 
@@ -331,8 +320,6 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 						return;
 					}
 				}
-
-				itemNumber = item2->NextItem;
 			}
 
 			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
@@ -1691,8 +1678,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 		short* door, numDoors;
 		for (auto i : GetRoomList(laraItem->RoomNumber))
 		{
-			short itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
+			for (short itemNumber : g_Level.Rooms[i].Items)
 			{
 				auto* item = &g_Level.Items[itemNumber];
 				if (item->Collidable && item->Status != ITEM_INVISIBLE)
@@ -1704,8 +1690,6 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 							object->collision(itemNumber, laraItem, coll);
 					}
 				}
-
-				itemNumber = item->NextItem;
 			}
 
 			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)

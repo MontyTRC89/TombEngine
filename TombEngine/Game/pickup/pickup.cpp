@@ -849,13 +849,13 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 	if (found != -1)
 		return &StaticObjects[found].collisionBox;
 
-	if (room->itemNumber == NO_ITEM)
+	if (room->Items.size() == 0)
 		return NULL;
 
-	short itemNumber = room->itemNumber;
-	for (itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+	short foundItemNumber = NO_ITEM;
+	for (short currentItemNumber : room->Items)
 	{
-		auto* currentItem = &g_Level.Items[itemNumber];
+		auto* currentItem = &g_Level.Items[currentItemNumber];
 		auto* object = &Objects[currentItem->ObjectNumber];
 
 		if (!object->isPickup &&
@@ -864,14 +864,15 @@ BOUNDING_BOX* FindPlinth(ItemInfo* item)
 			item->Pose.Position.z == currentItem->Pose.Position.z &&
 			(currentItem->ObjectNumber != ID_HIGH_OBJECT1 || currentItem->ItemFlags[0] == 5))
 		{
+			foundItemNumber = currentItemNumber;
 			break;
 		}
 	}
 
-	if (itemNumber == NO_ITEM)
+	if (foundItemNumber == NO_ITEM)
 		return NULL;
 	else
-		return (BOUNDING_BOX*)GetBestFrame(&g_Level.Items[itemNumber]);
+		return (BOUNDING_BOX*)GetBestFrame(&g_Level.Items[foundItemNumber]);
 }
 
 void InitialisePickup(short itemNumber)

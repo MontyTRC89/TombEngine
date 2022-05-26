@@ -331,12 +331,11 @@ int SpeedBoatTestWaterHeight(ItemInfo* sBoatItem, int zOffset, int xOffset, Vect
 
 void SpeedBoatDoBoatShift(ItemInfo* sBoatItem, int itemNumber)
 {
-	short itemNumber2 = g_Level.Rooms[sBoatItem->RoomNumber].itemNumber;
-	while (itemNumber2 != NO_ITEM)
+	for (short currentItemNumber : g_Level.Rooms[sBoatItem->RoomNumber].Items)
 	{
-		auto* item = &g_Level.Items[itemNumber2];
+		auto* item = &g_Level.Items[currentItemNumber];
 
-		if (item->ObjectNumber == ID_SPEEDBOAT && itemNumber2 != itemNumber && Lara.Vehicle != itemNumber2)
+		if (item->ObjectNumber == ID_SPEEDBOAT && currentItemNumber != itemNumber && Lara.Vehicle != currentItemNumber)
 		{
 			int x = item->Pose.Position.x - sBoatItem->Pose.Position.x;
 			int z = item->Pose.Position.z - sBoatItem->Pose.Position.z;
@@ -353,8 +352,6 @@ void SpeedBoatDoBoatShift(ItemInfo* sBoatItem, int itemNumber)
 		}
 
 		// TODO: mine and gondola
-
-		itemNumber2 = item->NextItem;
 	}
 }
 

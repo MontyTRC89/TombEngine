@@ -1140,12 +1140,9 @@ void KayakToItemCollision(ItemInfo* laraItem, ItemInfo* kayakItem)
 
 	for (int i = 0; i < numRoomsToCheck; i++)
 	{
-		short itemNum = g_Level.Rooms[roomsToCheck[i]].itemNumber;
-
-		while (itemNum != NO_ITEM)
+		for (short currentItemNumber : g_Level.Rooms[roomsToCheck[i]].Items)
 		{
-			auto* item = &g_Level.Items[itemNum];
-			short nextItem = item->NextItem;
+			auto* item = &g_Level.Items[currentItemNumber];
 
 			if (item->Collidable && item->Status != ITEM_INVISIBLE)
 			{
@@ -1172,8 +1169,6 @@ void KayakToItemCollision(ItemInfo* laraItem, ItemInfo* kayakItem)
 					}
 				}
 			}
-
-			itemNum = nextItem;
 		}
 	}
 }

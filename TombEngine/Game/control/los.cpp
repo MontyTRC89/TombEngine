@@ -332,9 +332,9 @@ int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO*
 			}
 		}
 
-		for (short linknum = room->itemNumber; linknum != NO_ITEM; linknum = g_Level.Items[linknum].NextItem)
+		for (short currentItemNumber : room->Items)
 		{
-			auto* item = &g_Level.Items[linknum];
+			auto* item = &g_Level.Items[currentItemNumber];
 
 			if ((item->Status == ITEM_DEACTIVATED) || (item->Status == ITEM_INVISIBLE))
 				continue;
@@ -355,7 +355,7 @@ int ObjectOnLOS2(GameVector* start, GameVector* end, Vector3Int* vec, MESH_INFO*
 			pos.Position.z = item->Pose.Position.z;
 			pos.Orientation.y = item->Pose.Orientation.y;
 
-			if (DoRayBox(start, end, box, &pos, vec, linknum))
+			if (DoRayBox(start, end, box, &pos, vec, currentItemNumber))
 				end->roomNumber = LosRooms[r];
 		}
 	}

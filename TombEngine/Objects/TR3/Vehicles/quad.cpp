@@ -346,11 +346,9 @@ static void QuadEntityCollision(ItemInfo* laraItem, ItemInfo* quadItem)
 
 	for (int i = 0; i < roomsList.size(); i++)
 	{
-		short itemNumber = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNumber != NO_ITEM)
+		for (short currentItemNumber : g_Level.Rooms[roomsList[i]].Items)
 		{
-			auto* item = &g_Level.Items[itemNumber];
+			auto* item = &g_Level.Items[currentItemNumber];
 
 			if (item->Collidable &&
 				item->Status != ITEM_INVISIBLE &&
@@ -376,8 +374,6 @@ static void QuadEntityCollision(ItemInfo* laraItem, ItemInfo* quadItem)
 					}
 				}
 			}
-
-			itemNumber = item->NextItem;
 		}
 	}
 }

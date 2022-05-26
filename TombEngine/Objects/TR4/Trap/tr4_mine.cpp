@@ -53,17 +53,13 @@ namespace TEN::Entities::TR4
 
 			Weather.Flash(255, 192, 64, 0.03f);
 
-			short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-
 			// Make the sentry gun explode?
-			while (currentItemNumber != NO_ITEM)
+			for (short currentItemNumber : g_Level.Rooms[item->RoomNumber].Items)
 			{
 				auto* currentItem = &g_Level.Items[currentItemNumber];
 
 				if (currentItem->ObjectNumber == ID_SENTRY_GUN)
 					currentItem->MeshBits &= ~0x40;
-
-				currentItemNumber = currentItem->NextItem;
 			}
 
 			KillItem(itemNumber);

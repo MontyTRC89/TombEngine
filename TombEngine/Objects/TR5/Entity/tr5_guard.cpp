@@ -100,6 +100,8 @@ void InitialiseGuard(short itemNum)
 		anim = Objects[ID_GUARD1].animIndex;
 
 	short roomItemNumber;
+	bool foundItem;
+
 	switch (item->TriggerFlags)
 	{
 		case 0:
@@ -124,31 +126,24 @@ void InitialiseGuard(short itemNum)
 			item->Animation.TargetState = GUARD_STATE_SIT;
 			item->SwapMeshFlags = 9216;
 
-			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-			if (roomItemNumber != NO_ITEM)
+			for (short roomItemNumber : g_Level.Rooms[item->RoomNumber].Items)
 			{
-				ItemInfo* item2;
-				while (true)
+				auto* item2 = &g_Level.Items[roomItemNumber];
+				if (item2->ObjectNumber >= ID_ANIMATING1 &&
+					item2->ObjectNumber <= ID_ANIMATING15 &&
+					item2->RoomNumber == item->RoomNumber &&
+					item2->TriggerFlags == 3)
 				{
-					auto* item2 = &g_Level.Items[roomItemNumber];
-					if (item2->ObjectNumber >= ID_ANIMATING1 &&
-						item2->ObjectNumber <= ID_ANIMATING15 &&
-						item2->RoomNumber == item->RoomNumber &&
-						item2->TriggerFlags == 3)
-					{
-						break;
-					}
-
-					roomItemNumber = item2->NextItem;
-					if (roomItemNumber == NO_ITEM)
-					{
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = item->Animation.TargetState;
-						break;
-					}
+					foundItem = true;
+					item2->MeshBits = -5;
+					break;
 				}
+			}
 
-				item2->MeshBits = -5;
+			if (!foundItem)
+			{
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = item->Animation.TargetState;
 			}
 
 			break;
@@ -716,34 +711,29 @@ void GuardControl(short itemNumber)
 			{
 				item->SwapMeshFlags = 0;
 
-				short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-				if (currentItemNumber == NO_ITEM)
+				if (g_Level.Rooms[item->RoomNumber].Items.size() == 0)
 					break;
 
-				while (true)
+				for (short currentItemNumber : g_Level.Rooms[item->RoomNumber].Items)
 				{
-					auto* currentItem = &g_Level.Items[currentItemNumber];
+					currentItem = &g_Level.Items[currentItemNumber];
 					if (currentItem->ObjectNumber >= ID_ANIMATING1 &&
 						currentItem->ObjectNumber <= ID_ANIMATING15 &&
 						currentItem->RoomNumber == item->RoomNumber)
 					{
 						if (currentItem->TriggerFlags > 2 && currentItem->TriggerFlags < 5)
+						{
+							currentItem->MeshBits = -3;
 							break;
+						}
 					}
-
-					currentItemNumber = currentItem->NextItem;
-					if (currentItemNumber == -1)
-						break;
 				}
-
-				if (currentItemNumber == NO_ITEM)
-					break;
-
-				currentItem->MeshBits = -3;
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+			{
 				item->Pose.Orientation.y -= ANGLE(90.0f);
-			
+			}
+
 			break;
 
 		case 17:
@@ -794,7 +784,7 @@ void GuardControl(short itemNumber)
 		case GUARD_STATE_START_USE_COMPUTER:
 			currentItem = NULL;
 
-			for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->NextItem)
+			for (short currentItemNumber : g_Level.Rooms[item->RoomNumber].Items)
 			{
 				currentItem = &g_Level.Items[currentItemNumber];
 

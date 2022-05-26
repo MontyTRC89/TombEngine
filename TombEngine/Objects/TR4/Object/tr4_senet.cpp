@@ -87,7 +87,7 @@ void GameSticksControl(short itemNumber)
 		number = ActivePiece >= 3 ? 2 : 1;
 		auto* item2 = &g_Level.Items[SenetPiecesNumber[ActivePiece]];
 		item2->Flags |= 32;
-		item2->AfterDeath = 48;
+		item2->AlphaOverride = 48;
 
 		piece = ActiveSenetPieces[ActivePiece];
 		if (piece == -1 || piece >= 5)
@@ -124,7 +124,7 @@ void GameSticksControl(short itemNumber)
 		if (x == item2->Pose.Position.x &&
 			z == item2->Pose.Position.z)
 		{
-			item2->AfterDeath = 0;
+			item2->AlphaOverride = 0;
 
 			if (piece == 16)
 			{
@@ -153,7 +153,7 @@ void GameSticksControl(short itemNumber)
 							item3->Flags |= IFLAG_INVISIBLE | IFLAG_ACTIVATION_MASK;
 							RemoveActiveItem(i);
 							item3->Status = ITEM_NOT_ACTIVE;
-							item3->AfterDeath = 1;
+							item3->AlphaOverride = 1;
 						}
 					}
 				}
@@ -322,20 +322,16 @@ void SenetPieceExplosionEffect(ItemInfo* item, int color, int speed)
 
 void TriggerItemInRoom(short room_number, int object)//originally this is in deltapak
 {
-	short num = g_Level.Rooms[room_number].itemNumber;
-	while (num != NO_ITEM)
+	for (short currentItemNumber : g_Level.Rooms[room_number].Items)
 	{
-		auto* item = &g_Level.Items[num];
-		short nex = item->NextItem;
+		auto* item = &g_Level.Items[currentItemNumber];
 
 		if (item->ObjectNumber == object)
 		{
-			AddActiveItem(num);
+			AddActiveItem(currentItemNumber);
 			item->Status = ITEM_ACTIVE;
 			item->Flags |= IFLAG_ACTIVATION_MASK;
 		}
-
-		num = nex;
 	}
 }
 

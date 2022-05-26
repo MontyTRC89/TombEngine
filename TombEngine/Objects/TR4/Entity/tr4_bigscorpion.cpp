@@ -124,21 +124,17 @@ void ScorpionControl(short itemNumber)
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Status = ITEM_INVISIBLE;
 				creature->MaxTurn = 0;
-				
-				short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-				if (linkNumber != NO_ITEM)
+
+				for (short itemNumber : g_Level.Rooms[item->RoomNumber].Items)
 				{
-					for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+					auto* currentItem = &g_Level.Items[itemNumber];
+
+					if (currentItem->ObjectNumber == ID_TROOPS && currentItem->TriggerFlags == 1)
 					{
-						auto* currentItem = &g_Level.Items[linkNumber];
-						
-						if (currentItem->ObjectNumber == ID_TROOPS && currentItem->TriggerFlags == 1)
-						{
-							DisableEntityAI(linkNumber);
-							KillItem(linkNumber);
-							currentItem->Flags |= IFLAG_KILLED;
-							break;
-						}
+						DisableEntityAI(itemNumber);
+						KillItem(itemNumber);
+						currentItem->Flags |= IFLAG_KILLED;
+						break;
 					}
 				}
 			}

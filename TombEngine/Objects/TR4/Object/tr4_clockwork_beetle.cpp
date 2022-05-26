@@ -168,17 +168,16 @@ void ClockworkBeetleControl(short itemNumber)
 				{
 					Lara.Inventory.BeetleLife--;
 					beetle->ItemFlags[2] = 5;
-					short itemRoom = g_Level.Rooms[beetle->RoomNumber].itemNumber;
+					short itemRoom = NO_ITEM;
 
-					if (itemRoom != NO_ITEM)
+					if (g_Level.Rooms[beetle->RoomNumber].Items.size() > 0)
 					{
 						ItemInfo* item;
 						short nextItem;
 
-						while (true)
+						for (short itemNum : g_Level.Rooms[beetle->RoomNumber].Items)
 						{
-							item = &g_Level.Items[itemRoom];
-							nextItem = item->NextItem;
+							item = &g_Level.Items[itemNum];
 
 							if (item->ObjectNumber == ID_MAPPER)
 							{
@@ -190,11 +189,10 @@ void ClockworkBeetleControl(short itemNumber)
 									dz > -SECTOR(1) && dz < SECTOR(1) &&
 									dy > -SECTOR(1) && dy < SECTOR(1))
 								{
+									itemRoom = itemNum;
 									break;
 								}
 							}
-
-							itemRoom = nextItem;
 
 							if (itemRoom == NO_ITEM)
 								return;
@@ -337,11 +335,11 @@ void UseClockworkBeetle(short flag)
 			AddActiveItem(itemNumber);
 
 			if (item->ItemFlags[0])
-			{
+			/*{
 				ItemInfo* item2;
 				short itemRoom = g_Level.Rooms[item->RoomNumber].itemNumber;
 
-				if (itemRoom != NO_ITEM)
+				if (g_Level.Rooms[item->RoomNumber].Items.size() > 0)
 				{
 					while (true)
 					{
@@ -380,7 +378,7 @@ void UseClockworkBeetle(short flag)
 					else
 						item2->ItemFlags[0] = 1;
 				}
-			}
+			}*/
 
 			if (!item->ItemFlags[0])
 				item->ItemFlags[3] = 150;

@@ -465,7 +465,7 @@ bool SaveGame::Save(int slot)
 		Save::ItemBuilder serializedItem{ fbb };
 
 		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
-		serializedItem.add_after_death(itemToSerialize.AfterDeath);
+		serializedItem.add_after_death(itemToSerialize.AlphaOverride);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
 		serializedItem.add_carried_item(itemToSerialize.CarriedItem);
 		serializedItem.add_active_state(itemToSerialize.Animation.ActiveState);
