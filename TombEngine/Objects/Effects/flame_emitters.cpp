@@ -644,7 +644,7 @@ namespace TEN::Entities::Effects
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Torch
 			|| Lara.Control.HandStatus != HandStatus::WeaponReady
 			|| Lara.LeftArm.Locked
-			|| Lara.LitTorch == (item->Status & 1)
+			|| Lara.Torch.IsLit == (item->Status & 1)
 			|| item->Timer == -1
 			|| !(TrInput & IN_ACTION)
 			|| l->Animation.ActiveState != LS_IDLE
@@ -698,7 +698,7 @@ namespace TEN::Entities::Effects
 				}
 				else
 				{
-					Lara.CurrentTorchState = TorchState::JustLit;
+					Lara.Torch.State = TorchState::JustLit;
 					int dy = abs(l->Pose.Position.y - item->Pose.Position.y);
 					l->ItemFlags[3] = 1;
 					l->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;

@@ -221,7 +221,12 @@ bool SaveGame::Save(int slot)
 	flare.add_life(Lara.Flare.Life);
 	auto flareOffset = flare.Finish();
 
-	Save::TorchState currentTorchState{ (int)Lara.CurrentTorchState };
+	Save::TorchState currentTorchState{ (int)Lara.Torch.State };
+
+	Save::TorchDataBuilder torch{ fbb };
+	torch.add_state(currentTorchState);
+	torch.add_is_lit(Lara.Torch.IsLit);
+	auto torchOffset = torch.Finish();
 
 	Save::LaraInventoryDataBuilder inventory{ fbb };
 	inventory.add_beetle_life(Lara.Inventory.BeetleLife);
@@ -377,7 +382,6 @@ bool SaveGame::Save(int slot)
 	lara.add_extra_torso_rot(&extraTorsoRot);
 	lara.add_extra_velocity(&extraVelocity);
 	lara.add_flare(flareOffset);
-	lara.add_current_torch_state(currentTorchState);
 	lara.add_highest_location(Lara.HighestLocation);
 	lara.add_hit_direction(Lara.HitDirection);
 	lara.add_hit_frame(Lara.HitFrame);
@@ -385,7 +389,6 @@ bool SaveGame::Save(int slot)
 	lara.add_inventory(inventoryOffset);
 	lara.add_item_number(Lara.ItemNumber);
 	lara.add_left_arm(leftArmOffset);
-	lara.add_lit_torch(Lara.LitTorch);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
 	lara.add_mesh_ptrs(meshPtrsOffset);
@@ -1363,7 +1366,6 @@ bool SaveGame::Load(int slot)
 	Lara.Flare.Life = s->lara()->flare()->life();
 	Lara.Flare.ControlLeft = s->lara()->flare()->control_left();
 	Lara.Flare.Frame = s->lara()->flare()->frame();
-	Lara.CurrentTorchState = (TorchState)s->lara()->current_torch_state();
 	Lara.HighestLocation = s->lara()->highest_location();
 	Lara.HitDirection = s->lara()->hit_direction();
 	Lara.HitFrame = s->lara()->hit_frame();
@@ -1392,7 +1394,6 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.Orientation.x = s->lara()->left_arm()->rotation()->x();
 	Lara.LeftArm.Orientation.y = s->lara()->left_arm()->rotation()->y();
 	Lara.LeftArm.Orientation.z = s->lara()->left_arm()->rotation()->z();
-	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.NextCornerPos = PHD_3DPOS(
@@ -1412,6 +1413,8 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.Orientation.x = s->lara()->right_arm()->rotation()->x();
 	Lara.RightArm.Orientation.y = s->lara()->right_arm()->rotation()->y();
 	Lara.RightArm.Orientation.z = s->lara()->right_arm()->rotation()->z();
+	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
+	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
 	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
 	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();

@@ -95,6 +95,11 @@ enum TorchState:int32 {
 	just_lit
 }
 
+table TorchData {
+	state: TorchState;
+	is_lit: bool;
+}
+
 table LaraInventoryData {
 	is_busy: bool;
 	old_busy: bool;
@@ -211,8 +216,7 @@ table Lara {
 	inventory: LaraInventoryData;
 	weapons: [CarriedWeaponInfo];
 	flare: FlareData;
-	current_torch_state: TorchState;
-	lit_torch: bool;
+	torch: TorchData;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
 	extra_velocity: Vector3;
