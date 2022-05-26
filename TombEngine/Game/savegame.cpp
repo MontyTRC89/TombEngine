@@ -400,6 +400,7 @@ bool SaveGame::Save(int slot)
 	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
+	lara.add_torch(torchOffset);
 	lara.add_vehicle(Lara.Vehicle);
 	lara.add_water_current_active(Lara.WaterCurrentActive);
 	lara.add_water_current_pull(&waterCurrentPull);
