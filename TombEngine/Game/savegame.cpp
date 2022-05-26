@@ -414,10 +414,10 @@ bool SaveGame::Save(int slot)
 		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
 
 		auto luaNameOffset = fbb.CreateString(itemToSerialize.LuaName);
-		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.luaCallbackOnKilledName);
-		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.luaCallbackOnHitName);
-		auto luaOnCollidedObjectNameOffset = fbb.CreateString(itemToSerialize.luaCallbackOnCollidedWithObjectName);
-		auto luaOnCollidedRoomNameOffset = fbb.CreateString(itemToSerialize.luaCallbackOnCollidedWithRoomName);
+		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnKilledName);
+		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnHitName);
+		auto luaOnCollidedObjectNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnCollidedWithObjectName);
+		auto luaOnCollidedRoomNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnCollidedWithRoomName);
 
 		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
@@ -1050,10 +1050,10 @@ bool SaveGame::Load(int slot)
 		if (!item->LuaName.empty())
 			g_GameScriptEntities->AddName(item->LuaName, i);
 
-		item->luaCallbackOnKilledName = savedItem->lua_on_killed_name()->str();
-		item->luaCallbackOnHitName = savedItem->lua_on_hit_name()->str();
-		item->luaCallbackOnCollidedWithObjectName = savedItem->lua_on_collided_with_object_name()->str();
-		item->luaCallbackOnCollidedWithRoomName = savedItem->lua_on_collided_with_room_name()->str();
+		item->LuaCallbackOnKilledName = savedItem->lua_on_killed_name()->str();
+		item->LuaCallbackOnHitName = savedItem->lua_on_hit_name()->str();
+		item->LuaCallbackOnCollidedWithObjectName = savedItem->lua_on_collided_with_object_name()->str();
+		item->LuaCallbackOnCollidedWithRoomName = savedItem->lua_on_collided_with_room_name()->str();
 
 		g_GameScriptEntities->TryAddColliding(i);
 

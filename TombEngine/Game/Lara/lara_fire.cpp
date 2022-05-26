@@ -815,10 +815,10 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 				target->HitPoints = 0;
 		}
 	}
-	if (!target->luaCallbackOnHitName.empty())
+	if (!target->LuaCallbackOnHitName.empty())
 	{
 		short index = g_GameScriptEntities->GetIndexByName(target->LuaName);
-		g_GameScript->ExecuteFunction(target->luaCallbackOnHitName, index);
+		g_GameScript->ExecuteFunction(target->LuaCallbackOnHitName, index);
 	}
 }
 

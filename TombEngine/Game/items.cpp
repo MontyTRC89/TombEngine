@@ -88,16 +88,16 @@ void KillItem(short const itemNumber)
 
 		g_GameScriptEntities->NotifyKilled(item);
 		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
-		if (!item->luaCallbackOnKilledName.empty())
+		if (!item->LuaCallbackOnKilledName.empty())
 		{
-			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNumber);
+			g_GameScript->ExecuteFunction(item->LuaCallbackOnKilledName, itemNumber);
 		}
 
 		item->LuaName.clear();
-		item->luaCallbackOnKilledName.clear();
-		item->luaCallbackOnHitName.clear();
-		item->luaCallbackOnCollidedWithObjectName.clear();
-		item->luaCallbackOnCollidedWithRoomName.clear();
+		item->LuaCallbackOnKilledName.clear();
+		item->LuaCallbackOnHitName.clear();
+		item->LuaCallbackOnCollidedWithObjectName.clear();
+		item->LuaCallbackOnCollidedWithRoomName.clear();
 	}
 }
 
@@ -333,9 +333,9 @@ void RemoveActiveItem(short itemNumber)
 		}
 
 		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.luaCallbackOnKilledName.empty())
+		if (!item.LuaCallbackOnKilledName.empty())
 		{
-			g_GameScript->ExecuteFunction(item.luaCallbackOnKilledName, itemNumber);
+			g_GameScript->ExecuteFunction(item.LuaCallbackOnKilledName, itemNumber);
 		}
 	}
 }
