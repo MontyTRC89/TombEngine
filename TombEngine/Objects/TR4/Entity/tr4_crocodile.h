@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseCrocodile(short itemNumber);
-void CrocodileControl(short itemNumber);
+namespace TEN::Entities::TR4
+{
+	void InitialiseCrocodile(short itemNumber);
+	void CrocodileControl(short itemNumber);
+}

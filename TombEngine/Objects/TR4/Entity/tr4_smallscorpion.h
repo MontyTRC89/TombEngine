@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseSmallScorpion(short itemNumber);
-void SmallScorpionControl(short itemNumber);
+namespace TEN::Entities::TR4
+{
+	void InitialiseSmallScorpion(short itemNumber);
+	void SmallScorpionControl(short itemNumber);
+}
