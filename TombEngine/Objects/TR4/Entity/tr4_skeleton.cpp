@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 			fx->pos.Position.x = (byte)GetRandomControl() + item->Pose.Position.x - 128;
 			fx->pos.Position.y = GetCollision(item).Position.Floor;
 			fx->pos.Position.z = (byte)GetRandomControl() + item->Pose.Position.z - 128;
-			fx->roomNumber = item->RoomNumber;
+			fx->RoomNumber = item->RoomNumber;
 			fx->pos.Orientation.y = 2 * GetRandomControl();
 			fx->speed = GetRandomControl() / 2048;
 			fx->fallspeed = -(GetRandomControl() / 1024);

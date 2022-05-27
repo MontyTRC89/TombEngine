@@ -39,7 +39,7 @@ static void Flame(int x, int y, int z, int velocity, short yRot, short roomNumbe
 		fx->pos.Position.x = x;
 		fx->pos.Position.y = y;
 		fx->pos.Position.z = z;
-		fx->roomNumber = roomNumber;
+		fx->RoomNumber = roomNumber;
 		//TODO: complete fx parameters
 		fx->shade = 14 * 256;
 		fx->counter = 40;

@@ -100,7 +100,7 @@ struct ROOM_INFO
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
 	std::vector<Vector3> colors;
-	std::vector<Vector3> effects;
+	std::vector<Vector3> verticesEffects;
 	std::vector<BUCKET> buckets;
 	std::vector<ROOM_DOOR> doors;
 	int xSize;
@@ -114,10 +114,10 @@ struct ROOM_INFO
 	int meshEffect;
 	int reverbType;
 	int flipNumber;
-	short fxNumber;
 	bool boundActive;
 	std::vector<TriggerVolume> triggerVolumes;
 	std::vector<short> Items;
+	std::vector<short> Effects;
 };
 
 constexpr auto NUM_ROOMS = 1024;

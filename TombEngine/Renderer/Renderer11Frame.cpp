@@ -723,8 +723,7 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		short fxNum = NO_ITEM;
-		for (fxNum = r->fxNumber; fxNum != NO_ITEM; fxNum = EffectList[fxNum].nextFx)
+		for (short fxNum : r->Effects)
 		{
 			FX_INFO *fx = &EffectList[fxNum];
 
@@ -740,7 +739,7 @@ namespace TEN::Renderer
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.y, fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
-			CollectLightsForEffect(fx->roomNumber, newEffect, renderView);
+			CollectLightsForEffect(fx->RoomNumber, newEffect, renderView);
 
 			room.EffectsToDraw.push_back(newEffect);
 		}

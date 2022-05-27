@@ -104,7 +104,7 @@ void MissileControl(short itemNumber)
 	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
 	fx->pos.Position.z += c * phd_cos(fx->pos.Orientation.y);
 
-	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->RoomNumber);
 	
 	if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
 	{
@@ -116,7 +116,7 @@ void MissileControl(short itemNumber)
 		{
 			if (fx->flag1 == 1)
 			{
-				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
+				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->RoomNumber);
 				fx->pos.Position.y -= 64;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 64, 128, 0, 24, 0, 1);
 				fx->pos.Position.y -= 128;
@@ -130,7 +130,7 @@ void MissileControl(short itemNumber)
 		}
 		else
 		{
-			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
+			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->RoomNumber);
 			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 2);
 		}
 		
@@ -145,7 +145,7 @@ void MissileControl(short itemNumber)
 			if (fx->flag1 == 1)
 			{
 				// ROMAN_GOD hit effect
-				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->roomNumber);
+				TriggerExplosionSparks(x, y, z, 3, -2, 2, fx->RoomNumber);
 				fx->pos.Position.y -= 64;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
 				fx->pos.Position.y -= 128;
@@ -171,7 +171,7 @@ void MissileControl(short itemNumber)
 		else
 		{
 			// HYDRA hit effect
-			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
+			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->RoomNumber);
 			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
 			if (LaraItem->HitPoints >= 500)
 				LaraItem->HitPoints -= 300;
@@ -182,7 +182,7 @@ void MissileControl(short itemNumber)
 	}
 	else
 	{
-		if (probe.RoomNumber != fx->roomNumber)
+		if (probe.RoomNumber != fx->RoomNumber)
 			EffectNewRoom(itemNumber, probe.RoomNumber);
 
 		if (GlobalCounter & 1)
@@ -217,7 +217,7 @@ void ExplodeFX(FX_INFO* fx, int noXZVel, int bits)
 	if (fx->flag2 & 0x2000)
 		DebrisFlags = 1;
 
-	ShatterObject(&ShatterItem, 0, bits, fx->roomNumber, noXZVel);
+	ShatterObject(&ShatterItem, 0, bits, fx->RoomNumber, noXZVel);
 
 	DebrisFlags = 0;
 }

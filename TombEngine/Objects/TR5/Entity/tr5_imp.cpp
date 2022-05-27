@@ -92,7 +92,7 @@ static void ImpThrowStones(ItemInfo* item)
 		auto* fx = &EffectList[fxNumber];
 
 		fx->pos.Position = pos1;
-		fx->roomNumber = item->RoomNumber;
+		fx->RoomNumber = item->RoomNumber;
 		fx->speed = 4 * sqrt(distance);
 
 		fx->pos.Orientation = Vector3Shrt(

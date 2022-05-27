@@ -394,7 +394,7 @@ void ControlTonyFireBall(short fxNumber)
 			TriggerFireBallFlame(fxNumber, (TonyFlameType)fx->flag1, (short)((oldX - fx->pos.Position.x) * 8), (short)((oldY - fx->pos.Position.y) * 8), (short)((oldZ - fx->pos.Position.z) * 4));
 	}
 
-	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->RoomNumber);
 
 	if (fx->pos.Position.y >= probe.Position.Floor ||
 		fx->pos.Position.y < probe.Position.Ceiling)
@@ -403,11 +403,11 @@ void ControlTonyFireBall(short fxNumber)
 		{
 			Vector3Int pos;
 
-			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
+			TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->RoomNumber);
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 			{
 				for (int x = 0; x < 2; x++)
-					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, fx->roomNumber);
+					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -1, 0, fx->RoomNumber);
 			}
 
 			pos.x = oldX;
@@ -429,7 +429,7 @@ void ControlTonyFireBall(short fxNumber)
 				type = T_ROCKZAPPDEBRIS;
 
 			for (int x = 0; x < j; x++)
-				TriggerFireBall(NULL, type, &pos, fx->roomNumber, fx->pos.Orientation.y, 32 + (x * 4));
+				TriggerFireBall(NULL, type, &pos, fx->RoomNumber, fx->pos.Orientation.y, 32 + (x * 4));
 
 			if (fx->flag1 == T_ROCKZAPPL || fx->flag1 == T_ROCKZAPPR)
 			{
@@ -467,7 +467,7 @@ void ControlTonyFireBall(short fxNumber)
 		}
 	}
 
-	if (probe.RoomNumber != fx->roomNumber)
+	if (probe.RoomNumber != fx->RoomNumber)
 		EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
 	unsigned char radtab[7] = { 16, 0, 14, 9, 7, 7, 7 };

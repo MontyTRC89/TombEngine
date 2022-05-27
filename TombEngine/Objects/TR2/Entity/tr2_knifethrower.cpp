@@ -47,7 +47,7 @@ void KnifeControl(short fxNumber)
 	fx->pos.Position.x += speed * phd_sin(fx->pos.Orientation.y);
 	fx->pos.Position.y += fx->speed * phd_sin(-fx->pos.Orientation.x);
 
-	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->RoomNumber);
 
 	if (fx->pos.Position.y >= probe.Position.Floor ||
 		fx->pos.Position.y <= probe.Position.Ceiling)
@@ -56,7 +56,7 @@ void KnifeControl(short fxNumber)
 		return;
 	}
 
-	if (probe.RoomNumber != fx->roomNumber)
+	if (probe.RoomNumber != fx->RoomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
 	fx->pos.Orientation.z += ANGLE(30.0f);
@@ -71,7 +71,7 @@ void KnifeControl(short fxNumber)
 		fx->frameNumber = fx->counter = 0;
 
 		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0);
-		DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.y, fx->roomNumber);
+		DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.y, fx->RoomNumber);
 		KillEffect(fxNumber);
 	}
 }

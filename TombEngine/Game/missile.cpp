@@ -43,7 +43,7 @@ void ControlMissile(short fxNumber)
 	printf("ControlMissile\n");
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON &&
-		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
+		!TestEnvironment(ENV_FLAG_WATER, fx->RoomNumber) &&
 			fx->pos.Orientation.x > -0x3000);
 	{
 		fx->pos.Orientation.x -= ANGLE(1.0f);
@@ -54,7 +54,7 @@ void ControlMissile(short fxNumber)
 	fx->pos.Position.z += velocity * phd_cos(fx->pos.Orientation.y);
 	fx->pos.Position.x += velocity * phd_sin(fx->pos.Orientation.y);
 
-	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->RoomNumber);
 
 	// Check for hitting something.
 	if (fx->pos.Position.y >= probe.Position.Floor ||
@@ -77,7 +77,7 @@ void ControlMissile(short fxNumber)
 		return;
 	}
 
-	if (probe.RoomNumber != fx->roomNumber)
+	if (probe.RoomNumber != fx->RoomNumber)
 		EffectNewRoom(fxNumber, probe.RoomNumber);
 
 	// Check for hitting Lara.
@@ -114,8 +114,8 @@ void ControlMissile(short fxNumber)
 	}
 
 	// Create bubbles in wake of harpoon bolt.
-	//if (fx->objectNumber == ID_SCUBA_HARPOON && g_Level.Rooms[fx->roomNumber].flags & 1)
-	//	CreateBubble(&fx->pos, fx->roomNumber, 1, 0);
+	//if (fx->objectNumber == ID_SCUBA_HARPOON && g_Level.Rooms[fx->RoomNumber].flags & 1)
+	//	CreateBubble(&fx->pos, fx->RoomNumber, 1, 0);
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
 	{
 		AddDynamicLight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 14, 11);
@@ -142,7 +142,7 @@ void ControlNatlaGun(short fxNumber)
 		int x = fx->pos.Position.x + fx->speed * phd_sin(fx->pos.Orientation.y);
 		int y = fx->pos.Position.y;
 
-		auto probe = GetCollision(x, y, z, fx->roomNumber);
+		auto probe = GetCollision(x, y, z, fx->RoomNumber);
 
 		// Don't create one if hit a wall.
 		if (y >= probe.Position.Floor ||
@@ -160,7 +160,7 @@ void ControlNatlaGun(short fxNumber)
 			fxNew->pos.Position.y = y;
 			fxNew->pos.Position.z = z;
 			fxNew->pos.Orientation.y = fx->pos.Orientation.y;
-			fxNew->roomNumber = probe.RoomNumber;
+			fxNew->RoomNumber = probe.RoomNumber;
 			fxNew->speed = fx->speed;
 			fxNew->frameNumber = 0;
 			fxNew->objectNumber = ID_PROJ_NATLA;
@@ -178,7 +178,7 @@ short ShardGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->pos.Position.x = x;
 		fx->pos.Position.y = y;
 		fx->pos.Position.z = z;
-		fx->roomNumber = roomNumber;
+		fx->RoomNumber = roomNumber;
 		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
 		fx->pos.Orientation.y = yRot;
 		fx->speed = SHARD_VELOCITY;
@@ -201,7 +201,7 @@ short BombGun(int x, int y, int z, short velocity, short yRot, short roomNumber)
 		fx->pos.Position.x = x;
 		fx->pos.Position.y = y;
 		fx->pos.Position.z = z;
-		fx->roomNumber = roomNumber;
+		fx->RoomNumber = roomNumber;
 		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
 		fx->pos.Orientation.y = yRot;
 		fx->speed = ROCKET_VELOCITY;
@@ -224,7 +224,7 @@ short NatlaGun(int x, int y, int z, short velocity, short yRot, short roomNumber
 		fx->pos.Position.x = x;
 		fx->pos.Position.y = y;
 		fx->pos.Position.z = z;
-		fx->roomNumber = roomNumber;
+		fx->RoomNumber = roomNumber;
 		fx->pos.Orientation.x = fx->pos.Orientation.z = 0;
 		fx->pos.Orientation.y = yRot;
 		fx->speed = NATLA_GUN_VELOCITY;

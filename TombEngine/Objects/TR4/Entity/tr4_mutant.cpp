@@ -41,7 +41,7 @@ namespace TEN::Entities::TR4
 			fx->pos.Orientation.x = src->Orientation.x;
 			fx->pos.Orientation.y = src->Orientation.y;
 			fx->pos.Orientation.z = 0;
-			fx->roomNumber = roomNumber;
+			fx->RoomNumber = roomNumber;
 			fx->counter = 16 * counter + 15;
 			fx->objectNumber = ID_ENERGY_BUBBLES;
 			fx->frameNumber = Objects[fx->objectNumber].meshIndex + 5;

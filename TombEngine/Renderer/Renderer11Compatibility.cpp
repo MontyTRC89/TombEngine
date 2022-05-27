@@ -220,7 +220,7 @@ namespace TEN::Renderer
 						vertex->BiTangent = poly.bitangents[k];
 						vertex->IndexInPoly = k;
 						vertex->OriginalIndex = index;
-						vertex->Effects = room.effects[index];
+						vertex->Effects = room.verticesEffects[index];
 						unsigned long long primes[]{ 73856093ULL ,19349663ULL ,83492791ULL };
 
 						vertex->hash = std::hash<float>{}((vertex->Position.x)* primes[0]) ^ (std::hash<float>{}(vertex->Position.y)* primes[1]) ^ std::hash<float>{}(vertex->Position.z) * primes[2];

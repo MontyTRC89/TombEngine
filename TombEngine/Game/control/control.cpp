@@ -84,11 +84,12 @@ int LevelComplete;
 bool  InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[MAX_ROOMS];
+
 short NextItemFree;
-short NextFxActive;
 short NextFxFree;
 
 std::vector<short> ActiveItems;
+std::vector<short> ActiveEffects;
 
 int WeaponDelay;
 int WeaponEnemyTimer;
@@ -290,15 +291,12 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		// Update all effects
 		InItemControlLoop = true;
 
-		short fxNumber = NextFxActive;
-		while (fxNumber != NO_ITEM)
+		for (short fxNumber : ActiveEffects)
 		{
-			short nextFx = EffectList[fxNumber].nextActive;
 			auto* fx = &EffectList[fxNumber];
+
 			if (Objects[fx->objectNumber].control)
 				Objects[fx->objectNumber].control(fxNumber);
-
-			fxNumber = nextFx;
 		}
 
 		InItemControlLoop = false;

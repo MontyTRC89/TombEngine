@@ -1235,7 +1235,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 				fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
 				fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
 
-				fx->roomNumber = item->RoomNumber;
+				fx->RoomNumber = item->RoomNumber;
 				fx->pos.Orientation.x = 0;
 				fx->pos.Orientation.y = GetRandomControl() * 2;
 
@@ -1286,7 +1286,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 					fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
 					fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
 
-					fx->roomNumber = item->RoomNumber;
+					fx->RoomNumber = item->RoomNumber;
 					fx->pos.Orientation.x = 0;
 					fx->pos.Orientation.y = GetRandomControl() * 2;
 

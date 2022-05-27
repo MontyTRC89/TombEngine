@@ -123,7 +123,7 @@ namespace TEN::Entities::TR4
 
 			fx->pos.Orientation.z = 0;
 
-			fx->roomNumber = roomNumber;
+			fx->RoomNumber = roomNumber;
 			fx->counter = 2 * GetRandomControl() + -ANGLE(180.0f);
 			fx->flag1 = flags;
 			fx->speed = (GetRandomControl() & 0x1F) + 96;

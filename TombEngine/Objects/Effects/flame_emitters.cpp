@@ -330,10 +330,10 @@ namespace TEN::Entities::Effects
 				(GetRandomControl() & 0x1F) + 96);
 		}
 
-		if (LaraItem->RoomNumber != fx->roomNumber)
+		if (LaraItem->RoomNumber != fx->RoomNumber)
 			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
-		int wh = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+		int wh = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->RoomNumber);
 		if (wh == NO_HEIGHT || fx->pos.Position.y <= wh || Lara.BurnBlue)
 		{
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos, 0);

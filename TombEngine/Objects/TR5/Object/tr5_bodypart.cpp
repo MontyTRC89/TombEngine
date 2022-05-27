@@ -42,7 +42,7 @@ void ControlBodyPart(short fxNumber)
 	fx->pos.Position.y += fx->fallspeed;
 	fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
 
-	short roomNumber = fx->roomNumber;
+	short roomNumber = fx->RoomNumber;
 	FloorInfo* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
 
 	if (!fx->counter)
@@ -109,10 +109,10 @@ void ControlBodyPart(short fxNumber)
 				(GetRandomControl() & 0x3F) + fx->pos.Position.z - 32,
 				1,
 				2 * GetRandomControl(),
-				fx->roomNumber);
+				fx->RoomNumber);
 		}
 	}
 
-	if (roomNumber != fx->roomNumber)
+	if (roomNumber != fx->RoomNumber)
 		EffectNewRoom(fxNumber, roomNumber);
 }

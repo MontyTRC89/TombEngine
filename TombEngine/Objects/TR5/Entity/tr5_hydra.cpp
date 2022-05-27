@@ -70,7 +70,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 		fx->pos.Orientation.x = pos->Orientation.x;
 		fx->pos.Orientation.y = pos->Orientation.y;
 		fx->pos.Orientation.z = 0;
-		fx->roomNumber = roomNumber;
+		fx->RoomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 0;
 		fx->objectNumber = ID_BUBBLES;

@@ -125,7 +125,7 @@ namespace TEN::Entities::Effects
 		ShatterItem.sphere.z = fx->pos.Position.z;
 		ShatterItem.bit = 0;
 		ShatterItem.flags = fx->flag2 & 0x400;
-		ShatterObject(&ShatterItem, 0, param2, fx->roomNumber, param1);
+		ShatterObject(&ShatterItem, 0, param2, fx->RoomNumber, param1);
 	}
 
 	void ControlEnemyMissile(short fxNum)
@@ -206,7 +206,7 @@ namespace TEN::Entities::Effects
 		fx->pos.Position.y += -((fx->speed * phd_sin(fx->pos.Orientation.x))) + fx->fallspeed;
 		fx->pos.Position.z += (speed * phd_cos(fx->pos.Orientation.y));
 
-		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+		auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->RoomNumber);
 
 		if (fx->pos.Position.y >= probe.Position.Floor || fx->pos.Position.y <= probe.Position.Ceiling)
 		{
@@ -219,8 +219,8 @@ namespace TEN::Entities::Effects
 
 			if (fx->flag1 == 1)
 			{
-				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerShockwave(&fx->pos, 32, 160, 64, 64, 128, 00, 24, (((~g_Level.Rooms[fx->RoomNumber].flags) / 16) & 2) * 65536, 0);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->RoomNumber);
 			}
 			else
 			{
@@ -236,7 +236,7 @@ namespace TEN::Entities::Effects
 						{
 							if (fx->flag1 == 6)
 							{
-								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
+								TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->RoomNumber);
 								TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 2);
 								fx->pos.Position.y -= 128;
 								TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 2);
@@ -268,7 +268,7 @@ namespace TEN::Entities::Effects
 			if (fx->flag1 == 1)
 			{
 				TriggerShockwave(&fx->pos, 48, 240, 64, 64, 128, 0, 24, 0, 0);
-				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->roomNumber);
+				TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 2, fx->RoomNumber);
 				LaraBurn(LaraItem);
 			}
 			else if (fx->flag1)
@@ -289,7 +289,7 @@ namespace TEN::Entities::Effects
 					break;
 
 				case 6:
-					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->roomNumber);
+					TriggerExplosionSparks(oldX, oldY, oldZ, 3, -2, 0, fx->RoomNumber);
 					TriggerShockwave(&fx->pos, 48, 240, 64, 0, 96, 128, 24, 0, 0);
 					fx->pos.Position.y -= 128;
 					TriggerShockwave(&fx->pos, 48, 240, 48, 0, 112, 128, 16, 0, 0);
@@ -300,11 +300,11 @@ namespace TEN::Entities::Effects
 				}
 			}
 			else
-				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->roomNumber].flags) / 16) & 2) * 65536, 0);
+				TriggerShockwave(&fx->pos, 24, 88, 48, 64, 128, 0, 16, (((~g_Level.Rooms[fx->RoomNumber].flags) / 16) & 2) * 65536, 0);
 		}
 		else
 		{
-			if (probe.RoomNumber != fx->roomNumber)
+			if (probe.RoomNumber != fx->RoomNumber)
 				EffectNewRoom(fxNum, probe.RoomNumber);
 
 			int dx = oldX - fx->pos.Position.x;

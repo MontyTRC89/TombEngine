@@ -67,7 +67,7 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 			fx->pos.Position.x = pos->x;
 			fx->pos.Position.y = pos->y;
 			fx->pos.Position.z = pos->z;
-			fx->roomNumber = item->RoomNumber;
+			fx->RoomNumber = item->RoomNumber;
 			fx->pos.Orientation.z = 0;
 			fx->pos.Orientation.x = 0;
 			fx->pos.Orientation.y = 2 * GetRandomControl();
@@ -235,7 +235,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 		fx->pos.Orientation.x = pos->Orientation.x;
 		fx->pos.Orientation.y = pos->Orientation.y;
 		fx->pos.Orientation.z = 0;
-		fx->roomNumber = roomNumber;
+		fx->RoomNumber = roomNumber;
 		fx->counter = 16 * count + 15;
 		fx->flag1 = 1;
 		fx->objectNumber = ID_BUBBLES;

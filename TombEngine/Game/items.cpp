@@ -152,25 +152,20 @@ void EffectNewRoom(short fxNumber, short roomNumber)
 	else
 	{
 		auto* fx = &EffectList[fxNumber];
-		auto* room = &g_Level.Rooms[fx->roomNumber];
 
-		if (room->fxNumber == fxNumber)
-			room->fxNumber = fx->nextFx;
-		else
+		if (fx->RoomNumber != NO_ROOM)
 		{
-			for (short linkNumber = room->fxNumber; linkNumber != -1; linkNumber = EffectList[linkNumber].nextFx)
-			{
-				if (EffectList[linkNumber].nextFx == fxNumber)
-				{
-					EffectList[linkNumber].nextFx = fx->nextFx;
-					break;
-				}
-			}
+			auto* oldRoom = &g_Level.Rooms[fx->RoomNumber];
+			oldRoom->Effects.erase(
+				std::remove(
+					oldRoom->Effects.begin(),
+					oldRoom->Effects.end(),
+					fxNumber),
+				oldRoom->Effects.end());
 		}
 
-		fx->roomNumber = roomNumber;
-		fx->nextFx = g_Level.Rooms[roomNumber].fxNumber;
-		g_Level.Rooms[roomNumber].fxNumber = fxNumber;
+		fx->RoomNumber = roomNumber;
+		g_Level.Rooms[roomNumber].Effects.push_back(fxNumber);
 	}
 }
 
@@ -184,74 +179,74 @@ void KillEffect(short fxNumber)
 	else
 	{
 		auto* fx = &EffectList[fxNumber];
+
 		DetatchSpark(fxNumber, SP_FX);
 
-		if (NextFxActive == fxNumber)
-			NextFxActive = fx->nextActive;
-		else
+		fx->Active = false;
+
+		ActiveEffects.erase(
+			std::remove(
+				ActiveEffects.begin(),
+				ActiveEffects.end(),
+				fxNumber),
+			ActiveEffects.end());
+
+		if (fx->RoomNumber != NO_ROOM)
 		{
-			for (short linknum = NextFxActive; linknum != NO_ITEM; linknum = EffectList[linknum].nextActive)
-			{
-				if (EffectList[linknum].nextActive == fxNumber)
-				{
-					EffectList[linknum].nextActive = fx->nextActive;
-					break;
-				}
-			}
+			g_Level.Rooms[fx->RoomNumber].Items.erase(
+				std::remove(
+					g_Level.Rooms[fx->RoomNumber].Effects.begin(),
+					g_Level.Rooms[fx->RoomNumber].Effects.end(),
+					fxNumber),
+				g_Level.Rooms[fx->RoomNumber].Effects.end());
 		}
 
-		if (g_Level.Rooms[fx->roomNumber].fxNumber == fxNumber)
-			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
-		else
-		{
-			for (short linknum = g_Level.Rooms[fx->roomNumber].fxNumber; linknum != NO_ITEM; linknum = EffectList[linknum].nextFx)
-			{
-				if (EffectList[linknum].nextFx == fxNumber)
-				{
-					EffectList[linknum].nextFx = fx->nextFx;
-					break;
-				}
-			}
-		}
-
-		fx->nextFx = NextFxFree;
 		NextFxFree = fxNumber;
 	}
 }
 
 short CreateNewEffect(short roomNum) 
 {
-	short fxNumber = NextFxFree;
-
 	if (NextFxFree != NO_ITEM)
 	{
-		auto* fx = &EffectList[NextFxFree];
-		NextFxFree = fx->nextFx;
+		short fxNumber = NextFxFree;
+		auto* fx = &EffectList[fxNumber];
 
-		auto* room = &g_Level.Rooms[roomNum];
-		fx->roomNumber = roomNum;
-		fx->nextFx = room->fxNumber;
-		room->fxNumber = fxNumber;
-		fx->nextActive = NextFxActive;
-		NextFxActive = fxNumber;
+		fx->Active = true;
+		fx->RoomNumber = roomNum;
 		fx->shade = GRAY555;
-	}
+		
+		auto* room = &g_Level.Rooms[roomNum];
+		room->Effects.push_back(fxNumber);
 
-	return fxNumber;
+		NextFxFree = NO_ITEM;
+		for (short currentFxNumber = 0; currentFxNumber < NUM_EFFECTS; currentFxNumber++)
+		{
+			auto* currentFx = &EffectList[currentFxNumber];
+			if (!currentFx->Active)
+			{
+				NextFxFree = currentFxNumber;
+				break;
+			}
+		}
+
+		return fxNumber;
+	}
+	else
+	{
+		return NO_ITEM;
+	}
 }
 
 void InitialiseFXArray(int allocateMemory)
 {
-	NextFxActive = NO_ITEM;
 	NextFxFree = 0;
+	ActiveEffects.clear();
 
-	for (int i = 0; i < NUM_EFFECTS; i++)
+	for (short currentFxNumber = 0; currentFxNumber < NUM_EFFECTS; currentFxNumber++)
 	{
-		auto* fx = &EffectList[i];
-		fx->nextFx = i + 1;
+		EffectList[currentFxNumber].Active = false;
 	}
-
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_ITEM;
 }
 
 void RemoveDrawnItem(short itemNumber) 

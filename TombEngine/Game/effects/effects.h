@@ -54,11 +54,10 @@ enum FireSizeEnum
 
 struct FX_INFO
 {
+	bool Active;
 	PHD_3DPOS pos;
-	short roomNumber;
+	short RoomNumber;
 	short objectNumber;
-	short nextFx;
-	short nextActive;
 	short speed;
 	short fallspeed;
 	int frameNumber;

@@ -1104,7 +1104,7 @@ namespace TEN::Renderer
 		int firstBucket = (transparent ? 2 : 0);
 		int lastBucket = (transparent ? 4 : 2);
 
-		RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
+		RendererRoom const & room = m_rooms[effect->Effect->RoomNumber];
 		//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
 		m_stItem.World = effect->World;
@@ -1162,7 +1162,7 @@ namespace TEN::Renderer
 		{
 			for (auto effect : room->EffectsToDraw)
 			{
-				RendererRoom const& room = m_rooms[effect->Effect->roomNumber];
+				RendererRoom const& room = m_rooms[effect->Effect->RoomNumber];
 				ObjectInfo* obj = &Objects[effect->Effect->objectNumber];
 
 				if (obj->drawRoutine && obj->loaded)

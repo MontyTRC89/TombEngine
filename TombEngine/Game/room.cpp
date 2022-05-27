@@ -39,7 +39,7 @@ void DoFlipMap(short group)
 			flipped->flippedRoom = -1;
 
 			room->Items = flipped->Items;
-			room->fxNumber = flipped->fxNumber;
+			room->Effects = flipped->Effects;
 
 			AddRoomFlipItems(room);
 

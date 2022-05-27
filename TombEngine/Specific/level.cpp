@@ -567,9 +567,9 @@ void ReadRooms()
 		for (int j = 0; j < numVertices; j++)
 			room.colors.push_back(ReadVector3());
 
-		room.effects.reserve(numVertices);
+		room.verticesEffects.reserve(numVertices);
 		for (int j = 0; j < numVertices; j++)
-			room.effects.push_back(ReadVector3());
+			room.verticesEffects.push_back(ReadVector3());
 
 		int numBuckets = ReadInt32();
 		room.buckets.reserve(numBuckets);
