@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseJeanYves(short itemNumber);
-void JeanYvesControl(short itemNumber);
+namespace TEN::Entities::TR4
+{
+	void InitialiseJeanYves(short itemNumber);
+	void JeanYvesControl(short itemNumber);
+}

@@ -1,5 +1,8 @@
 #pragma once
 #include "Game/items.h"
 
-void InitialiseEnemyJeep(short itemNumber);
-void EnemyJeepControl(short itemNumber);
+namespace TEN::Entities::TR4
+{
+	void InitialiseEnemyJeep(short itemNumber);
+	void EnemyJeepControl(short itemNumber);
+}
