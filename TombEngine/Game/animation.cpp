@@ -429,7 +429,7 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 
 	if (index < 0 || index >= g_Level.Anims.size())
 	{
-		TENLog(std::string("Attempt to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
+		TENLog(std::string("Attempted to set nonexistent animation ") + std::to_string(animIndex) + std::string(" for object ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 		return;
 	}
 

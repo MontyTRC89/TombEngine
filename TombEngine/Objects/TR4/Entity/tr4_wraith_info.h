@@ -1,11 +1,14 @@
 #pragma once
 
-struct WraithInfo
+namespace TEN::Entities::TR4
 {
-	Vector3Int Position;
-	Vector3Int Velocity;
+	struct WraithInfo
+	{
+		Vector3Int Position;
+		Vector3Int Velocity;
 
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
-};
+		unsigned char r;
+		unsigned char g;
+		unsigned char b;
+	};
+}

@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseGuide(short itemNumber);
-void GuideControl(short itemNumber);
+namespace TEN::Entities::TR4
+{
+	void InitialiseGuide(short itemNumber);
+	void GuideControl(short itemNumber);
+}
