@@ -33,7 +33,7 @@ namespace TEN::Entities::TR4
 			InitialiseItem(grenadeItemNumber);
 
 			grenadeItem->Pose.Orientation.x = item->Pose.Orientation.x;
-			grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y + -ANGLE(180.0f);
+			grenadeItem->Pose.Orientation.y = item->Pose.Orientation.y - ANGLE(180.0f);
 			grenadeItem->Pose.Orientation.z = 0;
 
 			grenadeItem->Pose.Position.x = item->Pose.Position.x + SECTOR(1) * phd_sin(grenadeItem->Pose.Orientation.y);
