@@ -642,7 +642,7 @@ namespace TEN::Entities::TR4
 					item->AIBits = 0;
 					item->ItemFlags[1] = 1;
 
-					item->Pose.Position = horseItem->Pose.Position;
+					item->Pose = horseItem->Pose;
 
 					creature->ReachedGoal = false;
 					creature->Enemy = nullptr;
@@ -833,7 +833,7 @@ namespace TEN::Entities::TR4
 				else
 					item->Pose.Orientation.x += ANGLE(1.4f);
 
-				horseItem->Pose.Position = item->Pose.Position;
+				horseItem->Pose = item->Pose;
 
 				if (horseItem->RoomNumber != item->RoomNumber)
 					ItemNewRoom(item->ItemFlags[0], item->RoomNumber);
