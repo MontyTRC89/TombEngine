@@ -76,15 +76,6 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
-		if (itemNumber >= g_Level.NumItems)
-		{
-			item->NextItem = NextItemFree;
-			NextItemFree = itemNumber;
-		}
-		else
-		{
-			item->Flags |= IFLAG_KILLED;
-		}
 
 		g_GameScriptEntities->NotifyKilled(item);
 		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
@@ -98,6 +89,17 @@ void KillItem(short const itemNumber)
 		item->LuaCallbackOnHitName.clear();
 		item->LuaCallbackOnCollidedWithObjectName.clear();
 		item->LuaCallbackOnCollidedWithRoomName.clear();
+
+		if (itemNumber >= g_Level.NumItems)
+		{
+			item->NextItem = NextItemFree;
+			NextItemFree = itemNumber;
+		}
+		else
+		{
+			item->Flags |= IFLAG_KILLED;
+		}
+
 	}
 }
 
