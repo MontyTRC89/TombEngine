@@ -19,9 +19,9 @@ namespace TEN::Entities::TR4
 	BITE_INFO BigScorpionBite1 = { 0, 0, 0, 8 };
 	BITE_INFO BigScorpionBite2 = { 0, 0, 0, 23 };
 
-	constexpr auto BIG_SCORPION_POISON_POTENCY = 8;
-	constexpr auto BIG_SCORPION_DAMAGE = 120;
-	constexpr auto BIG_SCORPION_TROOP_DAMAGE = 15;
+	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
+	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
+	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
 
 	enum BigScorpionState
 	{
@@ -295,7 +295,7 @@ namespace TEN::Entities::TR4
 					creature->Enemy != LaraItem &&
 					AI.distance < pow(1365, 2))
 				{
-					creature->Enemy->HitPoints -= BIG_SCORPION_TROOP_DAMAGE;
+					creature->Enemy->HitPoints -= BIG_SCORPION_TROOP_ATTACK_DAMAGE;
 					if (creature->Enemy->HitPoints <= 0)
 					{
 						item->Animation.TargetState = BSCORPION_STATE_KILL;
@@ -314,12 +314,12 @@ namespace TEN::Entities::TR4
 				}
 				else if (item->TouchBits & 0x1B00100)
 				{
-					LaraItem->HitPoints -= BIG_SCORPION_DAMAGE;
+					LaraItem->HitPoints -= BIG_SCORPION_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;
 
 					if (item->Animation.ActiveState == BSCORPION_STATE_STINGER_ATTACK)
 					{
-						Lara.PoisonPotency += BIG_SCORPION_POISON_POTENCY;
+						Lara.PoisonPotency += BIG_SCORPION_STINGER_POISON_POTENCY;
 
 						CreatureEffect2(
 							item,
