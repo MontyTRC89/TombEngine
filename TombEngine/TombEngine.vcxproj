@@ -453,7 +453,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR4\Entity\tr4_harpy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_horseman.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_jeanyves.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_knighttemplar.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_knight_templar.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_beetle_swarm.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mummy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sas.h" />
@@ -859,7 +859,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_knighttemplar.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_knight_templar.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_troops.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_wraith.cpp" />
     <ClCompile Include="Renderer\Renderer11.cpp" />
