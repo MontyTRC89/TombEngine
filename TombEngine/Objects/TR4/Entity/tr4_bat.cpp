@@ -20,7 +20,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BAT_ATTACK_RANGE = SQUARE(CLICK(1));
 	constexpr auto BAT_TARGETING_RANGE = SQUARE(SECTOR(5));
 	constexpr auto BAT_TARGET_YPOS = 896;
-	constexpr auto BAT_DAMAGE = 100;
+	constexpr auto BAT_DAMAGE = 50;
 
 	enum BatState
 	{
