@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_knighttemplar.h"
+#include "tr4_knight_templar.h"
 #include "Game/items.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
@@ -16,15 +16,47 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO KnightTemplarBite = { 0, 0, 0, 11 };
 
+	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
+
+	enum KnightTemplarState
+	{
+		KTEMPLAR_STATE_NONE = 0,
+		KTEMPLAR_STATE_IDLE = 1,
+		KTEMPLAR_STATE_WALK_FORWARD = 2,
+		KTEMPLAR_STATE_SWORD_ATTACK_1 = 3,
+		KTEMPLAR_STATE_SWORD_ATTACK_2 = 4,
+		KTEMPLAR_STATE_SWORD_ATTACK_3 = 5,
+		KTEMPLAR_STATE_SHIELD = 6,
+		KTEMPLAR_STATE_SHIELD_HIT_1 = 7,
+		KTEMPLAR_STATE_SHIELD_HIT_2 = 8
+	};
+
+	enum KnightTemplarAnim
+	{
+		KTEMPLAR_ANIM_WALK_FORWARD_LEFT_1 = 0,
+		KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 = 1,
+		KTEMPLAR_ANIM_IDLE = 2,
+		KTEMPLAR_ANIM_SWORD_ATTACK_1 = 3,
+		KTEMPLAR_ANIM_SWORD_ATTACK_2 = 4,
+		KTEMPLAR_ANIM_SWORD_ATTACK_3 = 5,
+		KTEMPLAR_ANIM_SHIELD_START = 6,
+		KTEMPLAR_ANIM_SHIELD_CONTINUE = 7,
+		KTEMPLAR_ANIM_SHIELD_END = 8,
+		KTEMPLAR_ANIM_SHIELD_HIT_1 = 9,
+		KTEMPLAR_ANIM_SHIELD_HIT_2 = 10,
+		KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 = 11,
+		KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2 = 12
+	};
+
 	void InitialiseKnightTemplar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
 
-		item->Animation.AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + 2;
-		item->Animation.TargetState = 1;
-		item->Animation.ActiveState = 1;
+		item->Animation.AnimNumber = Objects[ID_KNIGHT_TEMPLAR].animIndex + KTEMPLAR_ANIM_IDLE;
+		item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
+		item->Animation.ActiveState = KTEMPLAR_STATE_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->MeshBits &= 0xF7FF;
 	}
@@ -39,13 +71,13 @@ namespace TEN::Entities::TR4
 		auto* object = &Objects[item->ObjectNumber];
 
 		if (item->Animation.AnimNumber == object->animIndex ||
-			item->Animation.AnimNumber - object->animIndex == 1 ||
-			item->Animation.AnimNumber - object->animIndex == 11 ||
-			item->Animation.AnimNumber - object->animIndex == 12)
+			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_1 ||
+			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_LEFT_2 ||
+			item->Animation.AnimNumber - object->animIndex == KTEMPLAR_ANIM_WALK_FORWARD_RIGHT_2)
 		{
 			if (GetRandomControl() & 1)
 			{
-				Vector3Int pos = { 0, 48, 448 };
+				auto pos = Vector3Int(0, 48, 448);
 				GetJointAbsPosition(item, &pos, 10);
 
 				TriggerMetalSparks(pos.x, pos.y, pos.z, (GetRandomControl() & 0x1FF) - 256, -128 - (GetRandomControl() & 0x7F), (GetRandomControl() & 0x1FF) - 256, 0);
@@ -70,6 +102,7 @@ namespace TEN::Entities::TR4
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 
+		// TODO: Unused block.
 		int a = 0;
 		if (creature->Enemy != LaraItem)
 			a = phd_atan(item->Pose.Position.z - LaraItem->Pose.Position.z, item->Pose.Position.x - LaraItem->Pose.Position.x);
@@ -91,36 +124,36 @@ namespace TEN::Entities::TR4
 
 		switch (item->Animation.ActiveState)
 		{
-		case 1:
-			item->Animation.TargetState = 2;
+		case KTEMPLAR_STATE_IDLE:
+			item->Animation.TargetState = KTEMPLAR_STATE_WALK_FORWARD;
 			creature->MaxTurn = ANGLE(2.0f);
 			creature->Flags = 0;
 
 			if (AI.distance > pow(682, 2))
 			{
 				if (Lara.TargetEntity == item)
-					item->Animation.TargetState = 6;
+					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
 			}
 			else if (GetRandomControl() & 1)
-				item->Animation.TargetState = 4;
+				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_2;
 			else if (GetRandomControl() & 1)
-				item->Animation.TargetState = 3;
+				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_1;
 			else
-				item->Animation.TargetState = 5;
+				item->Animation.TargetState = KTEMPLAR_STATE_SWORD_ATTACK_3;
 
 			break;
 
-		case 2:
+		case KTEMPLAR_STATE_WALK_FORWARD:
 			creature->MaxTurn = ANGLE(7.0f);
 
 			if (Lara.TargetEntity == item || AI.distance <= pow(682, 2))
-				item->Animation.TargetState = 1;
+				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 
 			break;
 
-		case 3:
-		case 4:
-		case 5:
+		case KTEMPLAR_STATE_SWORD_ATTACK_1:
+		case KTEMPLAR_STATE_SWORD_ATTACK_2:
+		case KTEMPLAR_STATE_SWORD_ATTACK_3:
 			creature->MaxTurn = 0;
 
 			if (abs(AI.angle) >= ANGLE(1.0f))
@@ -135,12 +168,12 @@ namespace TEN::Entities::TR4
 
 			frameNumber = item->Animation.FrameNumber;
 			frameBase = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-
-			if (frameNumber > frameBase + 42 && frameNumber < frameBase + 51)
+			if (frameNumber > (frameBase + 42) &&
+				frameNumber < (frameBase + 51))
 			{
 				auto pos = Vector3Int();
-				GetJointAbsPosition(item, &pos, 11);
-
+				GetJointAbsPosition(item, &pos, LM_LINARM);
+				
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 				FloorInfo* currentFloor = &room->floor[(pos.z - room->z) / SECTOR(1) + (pos.z - room->x) / SECTOR(1) * room->zSize];
 
@@ -154,7 +187,7 @@ namespace TEN::Entities::TR4
 							floor(pos.z) == floor(mesh->pos.Position.z) &&
 							StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 						{
-							ShatterObject(NULL, mesh, -64, LaraItem->RoomNumber, 0);
+							ShatterObject(nullptr, mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
 
 							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
@@ -180,13 +213,13 @@ namespace TEN::Entities::TR4
 
 						creature->Flags = 1;
 
-						LaraItem->HitPoints -= 120;
+						LaraItem->HitPoints -= KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
 				}
 			}
 
-		case 6:
+		case KTEMPLAR_STATE_SHIELD:
 			creature->MaxTurn = 0;
 
 			if (abs(AI.angle) >= ANGLE(1.0f))
@@ -202,14 +235,14 @@ namespace TEN::Entities::TR4
 			if (item->HitStatus)
 			{
 				if (GetRandomControl() & 1)
-					item->Animation.TargetState = 7;
+					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_1;
 				else
-					item->Animation.TargetState = 8;
+					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_2;
 			}
 			else if (AI.distance <= pow(682, 2) || Lara.TargetEntity != item)
-				item->Animation.TargetState = 1;
+				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 			else
-				item->Animation.TargetState = 6;
+				item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
 
 			break;
 

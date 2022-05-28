@@ -29,7 +29,7 @@ namespace TEN::Entities::TR4
 		HORSEMAN_STATE_MOUNTED_RUN_FORWARD = 1,
 		HORSEMAN_STATE_MOUNTED_WALK_FORWARD = 2,
 		HORSEMAN_STATE_MOUNTED_IDLE = 3,
-		HORSEMAN_STATE_MOUNTED_REARING = 4,
+		HORSEMAN_STATE_MOUNTED_REAR = 4,
 		HORSEMAN_STATE_MOUNT_HORSE = 5,
 		HORSEMAN_STATE_MOUNTED_ATTACK_RIGHT = 6,
 		HORSEMAN_STATE_MOUNTED_ATTACK_LEFT = 7,
@@ -48,7 +48,7 @@ namespace TEN::Entities::TR4
 	enum HorsemanAnim
 	{
 		HORSEMAN_ANIM_MOUNTED_RUN_FORWARD = 0,
-		HORSEMAN_ANIM_MOUNTED_REARING = 1,
+		HORSEMAN_ANIM_MOUNTED_REAR = 1,
 		HORSEMAN_ANIM_MOUNTED_IDLE = 2,
 		HORSEMAN_ANIM_FALL_OFF_HORSE_START = 3,
 		HORSEMAN_ANIM_FALL_OFF_HORSE_END = 4,
@@ -88,14 +88,14 @@ namespace TEN::Entities::TR4
 		HORSE_STATE_IDLE = 1,
 		HORSE_STATE_RUN_FORWARD = 2,
 		HORSE_STATE_WALK_FORWARD = 3,
-		HORSE_STATE_REARING = 4,
+		HORSE_STATE_REAR = 4,
 		HORSE_STATE_SPRINT = 5
 	};
 
 	enum HorseAnim
 	{
 		HORSE_ANIM_RUN = 0,
-		HORSE_ANIM_REARING = 1,
+		HORSE_ANIM_REAR = 1,
 		HORSE_ANIM_IDLE = 2,
 		HORSE_ANIM_RUN_TO_IDLE = 3,
 		HORSE_ANIM_WALK_FORWARD = 4,
@@ -511,7 +511,7 @@ namespace TEN::Entities::TR4
 					AI.angle < ANGLE(10.0f) &&
 					AI.angle > -ANGLE(10.0f))
 				{
-					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_REARING;
+					item->Animation.TargetState = HORSEMAN_STATE_MOUNTED_REAR;
 
 					if (creature->ReachedGoal)
 						item->Animation.RequiredState = HORSEMAN_STATE_MOUNTED_SPRINT;
@@ -527,14 +527,14 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case HORSEMAN_STATE_MOUNTED_REARING:
+			case HORSEMAN_STATE_MOUNTED_REAR:
 				creature->MaxTurn = 0;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				{
-					horseItem->Animation.AnimNumber = Objects[ID_HORSE].animIndex + HORSE_ANIM_REARING;
+					horseItem->Animation.AnimNumber = Objects[ID_HORSE].animIndex + HORSE_ANIM_REAR;
 					horseItem->Animation.FrameNumber = g_Level.Anims[horseItem->Animation.AnimNumber].frameBase;
-					horseItem->Animation.ActiveState = HORSE_STATE_REARING;
+					horseItem->Animation.ActiveState = HORSE_STATE_REAR;
 				}
 
 				if (!horseItem->Flags)
