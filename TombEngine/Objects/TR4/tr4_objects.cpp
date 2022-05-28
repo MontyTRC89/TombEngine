@@ -12,7 +12,7 @@
 #include "tr4_harpy.h" // OK
 #include "tr4_horseman.h" // OFF
 #include "tr4_jeanyves.h" // OK
-#include "tr4_knighttemplar.h" // OK
+#include "tr4_knight_templar.h" // OK
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "tr4_mummy.h" // OK
 #include "tr4_sas.h" // OK

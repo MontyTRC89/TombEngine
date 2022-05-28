@@ -9,6 +9,16 @@
 
 namespace TEN::Entities::TR4
 {
+	enum JeanYvesState
+	{
+
+	};
+
+	enum JeanYvesAnim
+	{
+
+	};
+
 	void InitialiseJeanYves(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
@@ -26,7 +36,7 @@ namespace TEN::Entities::TR4
 
 		if (item->TriggerFlags >= Lara.HighestLocation)
 		{
-			short state = 0;
+			int state = 0;
 
 			if (GetRandomControl() & 3)
 				state = (GetRandomControl() & 1) + 1;
@@ -45,9 +55,10 @@ namespace TEN::Entities::TR4
 			int animNumber = Objects[item->ObjectNumber].animIndex + state;
 			state++;
 
-			item->Animation.TargetState = item->Animation.ActiveState = state;
 			item->Animation.AnimNumber = animNumber;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+			item->Animation.ActiveState = state;
+			item->Animation.TargetState = state;
 			item->TriggerFlags = Lara.HighestLocation;
 
 			AnimateItem(item);
