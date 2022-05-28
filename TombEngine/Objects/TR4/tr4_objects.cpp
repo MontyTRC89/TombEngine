@@ -60,7 +60,7 @@
 #include "tr4_spikyceiling.h"
 #include "tr4_stargate.h"
 #include "tr4_cog.h"
-#include "tr4_laradouble.h"
+#include "tr4_lara_double.h"
 #include "tr4_setha.h"
 #include "tr4_teethspike.h"
 
