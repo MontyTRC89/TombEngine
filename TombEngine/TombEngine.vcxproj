@@ -331,7 +331,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_baboon.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h" />
-    <ClInclude Include="Objects\TR4\Object\tr4_laradouble.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_lara_double.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_sarcophagus.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_scales.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_smoke_emitter.h" />
@@ -707,7 +707,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baboon.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp" />
-    <ClCompile Include="Objects\TR4\Object\tr4_laradouble.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_lara_double.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_sarcophagus.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_scales.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_smoke_emitter.cpp" />
