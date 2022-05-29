@@ -962,8 +962,8 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			UPV->Flags |= UPV_SURFACE;
 		}
-
-		else if ((waterHeight - UPVItem->Pose.Position.y) >= -SURFACE_DIST && waterHeight != NO_HEIGHT)
+		else if ((waterHeight - UPVItem->Pose.Position.y) >= -SURFACE_DIST && waterHeight != NO_HEIGHT &&
+			     (laraItem->Pose.Position.y - probe.Position.Ceiling) >= CLICK(1))
 		{
 			UPVItem->Pose.Position.y = waterHeight + SURFACE_DIST;
 
@@ -975,7 +975,6 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			UPV->Flags |= UPV_SURFACE;
 		}
-
 		else
 			UPV->Flags &= ~UPV_SURFACE;
 
