@@ -12,7 +12,6 @@ enum class BoatMountType
 };
 
 void InitialiseSpeedBoat(short itemNumber);
-void DoBoatWakeEffect(ItemInfo* sBoatItem);
 BoatMountType GetSpeedBoatMountType(ItemInfo* laraItem, ItemInfo* sBoatItem, CollisionInfo* coll);
 bool TestSpeedBoatDismount(ItemInfo* sBoatItem, int direction);
 void DoSpeedBoatDismount(ItemInfo* laraItem, ItemInfo* sBoatItem);
