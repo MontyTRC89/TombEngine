@@ -894,6 +894,6 @@ void PlaySoundSources()
 		else if (FlipStats[group] && (sound->flags & 128) == 0)
 			continue;
 
-		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x, 0);
+		SoundEffect(sound->soundId, (PHD_3DPOS*)&sound->x);
 	}
 }

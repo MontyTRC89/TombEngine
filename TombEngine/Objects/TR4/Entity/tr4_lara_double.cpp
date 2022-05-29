@@ -18,7 +18,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose, 0);
+		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose);
 
 		if (CreatureActive(itemNumber))
 		{

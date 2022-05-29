@@ -54,7 +54,7 @@ void ClockworkBeetleControl(short itemNumber)
 		}
 	}
 
-	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->Pose, 0);
+	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->Pose);
 
 	beetle->Animation.VerticalVelocity += 12;
 	beetle->Pose.Position.y += beetle->Animation.VerticalVelocity;
@@ -293,7 +293,7 @@ void ClockworkBeetleControl(short itemNumber)
 
 			if (beetle->ItemFlags[3] < 30)
 			{
-				SoundEffect(102, &beetle->Pose, 0);
+				SoundEffect(102, &beetle->Pose);
 				ExplodeItemNode(beetle, 0, 0, 128);
 				KillItem(itemNumber);
 			}

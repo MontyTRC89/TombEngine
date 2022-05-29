@@ -264,7 +264,7 @@ static void CartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem)
 									int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 									if (frame >= 12 && frame <= 22)
 									{
-										SoundEffect(SFX_TR3_SPANNER, &item->Pose, 2);
+										SoundEffect(SFX_TR3_SPANNER, &item->Pose, SFX_ALWAYS);
 										TestTriggers(item, true);
 										item->Animation.FrameNumber++;
 									}
@@ -397,7 +397,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 		if (minecart->VerticalVelocity)
 			StopSoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP);
 		else
-			SoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP, &minecartItem->Pose, 2);
+			SoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP, &minecartItem->Pose, SFX_ALWAYS);
 	}
 	else
 	{
@@ -487,7 +487,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 		if (minecartItem->Pose.Position.y > minecart->FloorHeightMiddle)
 		{
 			if (minecart->VerticalVelocity > 0)
-				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, 2);
+				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SFX_ALWAYS);
 
 			minecartItem->Pose.Position.y = minecart->FloorHeightMiddle;
 			minecart->VerticalVelocity = 0;
@@ -597,7 +597,7 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 	case CART_STATE_IDLE:
 		if (!(minecart->Flags & CART_FLAG_CONTROL))
 		{
-			SoundEffect(SFX_TR3_MINE_CART_START, &minecartItem->Pose, 2);
+			SoundEffect(SFX_TR3_MINE_CART_START, &minecartItem->Pose, SFX_ALWAYS);
 			minecart->Flags |= CART_FLAG_CONTROL;
 			minecart->StopDelay = 64;
 		}
@@ -651,7 +651,7 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		else
 		{
 			minecart->Velocity += CART_DEC;
-			SoundEffect(SFX_TR3_MINE_CART_BRAKE, &laraItem->Pose, 2);
+			SoundEffect(SFX_TR3_MINE_CART_BRAKE, &laraItem->Pose, SFX_ALWAYS);
 		}
 
 		break;
@@ -752,7 +752,7 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 			floorHeight < CLICK(1))
 		{
 			if (Wibble & 7 == 0)
-				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, 2);
+				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SFX_ALWAYS);
 
 			minecartItem->Pose.Position.x += TURN_DEATH_VEL * phd_sin(minecartItem->Pose.Orientation.y);
 			minecartItem->Pose.Position.z += TURN_DEATH_VEL * phd_cos(minecartItem->Pose.Orientation.y);

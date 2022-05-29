@@ -20,7 +20,7 @@ void ControlGunShip(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Pose, 0);
+		SoundEffect(SFX_TR4_HELICOPTER_LOOP, &item->Pose);
 
 		GameVector pos;
 		pos.x = ((GetRandomControl() & 0x1FF) - 255);
@@ -107,7 +107,7 @@ void ControlGunShip(short itemNumber)
 					ShatterObject(0, hitMesh, 64, end.roomNumber, 0);
 					hitMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 					TestTriggers(hitMesh->pos.Position.x, hitMesh->pos.Position.y, hitMesh->pos.Position.z, end.roomNumber, true);
-					SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos, 0);
+					SoundEffect(GetShatterSound(hitMesh->staticNumber), &hitMesh->pos);
 				}
 
 				TriggerRicochetSpark((GameVector*)&hitPos, 2 * GetRandomControl(), 3, 0);

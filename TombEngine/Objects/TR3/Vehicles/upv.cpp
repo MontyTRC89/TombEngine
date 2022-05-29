@@ -172,7 +172,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_TR4_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, 2);
+		SoundEffect(SFX_TR4_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, SFX_ALWAYS);
 
 		Statistics.Game.AmmoUsed++;
 		UPV->HarpoonLeft = !UPV->HarpoonLeft;
@@ -631,7 +631,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
 				StopSoundEffect(SFX_TR3_UPV_LOOP);
-				SoundEffect(SFX_TR3_UPV_STOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, 2);
+				SoundEffect(SFX_TR3_UPV_STOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SFX_ALWAYS);
 			}
 		}
 
@@ -656,7 +656,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 			UPVItem->Pose.Orientation.x += ANGLE(1.0f);
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SFX_ALWAYS);
 
 			if (frame == MOUNT_SURFACE_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -665,7 +665,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 		else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
 		{
 			if (frame == MOUNT_UNDERWATER_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SFX_ALWAYS);
 
 			if (frame == MOUNT_UNDERWATER_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -956,7 +956,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (!(UPV->Flags & UPV_SURFACE))
 			{
-				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, SFX_ALWAYS);
 				UPV->Flags &= ~UPV_DIVE;
 			}
 
@@ -969,7 +969,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (!(UPV->Flags & UPV_SURFACE))
 			{
-				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, SFX_ALWAYS);
 				UPV->Flags &= ~UPV_DIVE;
 			}
 

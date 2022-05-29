@@ -138,7 +138,7 @@ namespace TEN::Entities::Traps
 			AddActiveItem(dartItemNumber);
 			dartItem->Status = ITEM_ACTIVE;
 
-			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->Pose, 0);
+			SoundEffect(SFX_TR4_DART_SPITT, &dartItem->Pose);
 		}
 	}
 

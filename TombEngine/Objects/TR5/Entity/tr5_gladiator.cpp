@@ -326,7 +326,7 @@ void ControlGladiator(short itemNumber)
 								if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 								{
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-									//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28, 0);
+									//SoundEffect(ShatterSounds[gfCurrentLevel - 5][*(v28 + 18)], v28);
 									mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 
 									TestTriggers(pos.x, pos.y, pos.z, item->RoomNumber, true);
@@ -341,7 +341,7 @@ void ControlGladiator(short itemNumber)
 					if (item->TouchBits & 0x6000)
 					{
 						CreatureEffect2(item, &GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 120;
