@@ -1445,7 +1445,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->GetMirrorRoom());
 
 	bool water = false;
-	if (room->flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
 		TriggerExplosionBubble(x, y, z, roomNumber);
 		water = true;
@@ -1477,7 +1477,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 		spark->friction = 85;
 	}
 
-	if (TestEnvironment(ENV_FLAG_WIND, room->flags))
+	if (TestEnvironment(ENV_FLAG_WIND, room))
 		spark->flags = 272;
 	else
 		spark->flags = 16;
