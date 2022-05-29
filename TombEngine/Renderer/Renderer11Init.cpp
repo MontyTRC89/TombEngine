@@ -33,7 +33,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	wchar_t titleScreenFile[255];
 	std::wstring titleFile = std::wstring(titleScreenFile);
 	std::mbstowcs(titleScreenFile, g_GameFlow->TitleScreenImagePath.c_str(), 255);
-	m_titleScreen = Texture2D(m_device.Get(), titleScreenFile);
+	m_titleScreen = std::filesystem::exists(titleScreenFile) ? Texture2D(m_device.Get(), titleScreenFile) : Texture2D();
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
 	m_whiteTexture = std::filesystem::exists(whiteSpriteName) ? Texture2D(m_device.Get(), L"Textures/WhiteSprite.png") : Texture2D();
