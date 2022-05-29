@@ -161,7 +161,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 83888140);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, ENV_FLAG_NONE, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
 						}
 					}
@@ -192,7 +192,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				SoundEffect(SFX_HK_SILENCED, nullptr);
 			else
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, 83888140);
+				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, ENV_FLAG_NONE, 1.0f, 0.4f);
 				SoundEffect(SFX_HK_FIRE, &laraItem->pos);
 			}
 		}*/
@@ -237,7 +237,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 83888140);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, ENV_FLAG_NONE, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
 						}
 					}
@@ -263,7 +263,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					SoundEffect(SFX_HK_SILENCED, nullptr);
 				else
 				{
-					SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, 83888140);
+					SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, ENV_FLAG_NONE, 1.0f, 0.4f);
 					SoundEffect(SFX_HK_FIRE, &laraItem->pos);
 				}
 			}*/
