@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 		{
 			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
 			SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
-			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, ENV_FLAG_NONE, 0.7f, 0.5f);
+			SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 
 			if (num > 0)
 			{

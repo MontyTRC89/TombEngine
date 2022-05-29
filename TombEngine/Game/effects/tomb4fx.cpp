@@ -1040,7 +1040,7 @@ void LaraBubbles(ItemInfo* item)
 	Vector3Int pos;
 	int num, i;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, ENV_FLAG_WATER);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Water);
 
 	pos.x = 0;
 

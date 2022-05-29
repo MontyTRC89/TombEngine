@@ -1344,7 +1344,7 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 		else if (quad->Pitch > 0xA000)
 			quad->Pitch = 0xA000;
 
-		SoundEffect(SFX_TR3_QUADBIKE_MOVE, &quadItem->Pose, 0, 0.5f + (float)abs(quad->Pitch) / (float)MAX_VELOCITY);
+		SoundEffect(SFX_TR3_QUADBIKE_MOVE, &quadItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(quad->Pitch) / (float)MAX_VELOCITY);
 	}
 	else
 	{

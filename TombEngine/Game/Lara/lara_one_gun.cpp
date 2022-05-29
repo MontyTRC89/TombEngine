@@ -161,7 +161,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, ENV_FLAG_NONE, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
 						}
 					}
@@ -192,7 +192,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				SoundEffect(SFX_HK_SILENCED, nullptr);
 			else
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, ENV_FLAG_NONE, 1.0f, 0.4f);
+				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, SoundEnvironment::Land, 1.0f, 0.4f);
 				SoundEffect(SFX_HK_FIRE, &laraItem->pos);
 			}
 		}*/
@@ -237,7 +237,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, ENV_FLAG_NONE, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
 						}
 					}
@@ -263,7 +263,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					SoundEffect(SFX_HK_SILENCED, nullptr);
 				else
 				{
-					SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, ENV_FLAG_NONE, 1.0f, 0.4f);
+					SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, SoundEnvironment::Land, 1.0f, 0.4f);
 					SoundEffect(SFX_HK_FIRE, &laraItem->pos);
 				}
 			}*/
@@ -352,7 +352,7 @@ void FireShotgun(ItemInfo* laraItem)
 
 		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 20971524);
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, laraItem));
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
 
 		Statistics.Game.AmmoUsed++;
@@ -1116,7 +1116,7 @@ void GrenadeControl(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, ENV_FLAG_NONE, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
 		// Setup the counter for spawned grenades in the case of flash and super grenades ammos
@@ -1412,7 +1412,7 @@ void RocketControl(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, ENV_FLAG_NONE, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
@@ -1710,7 +1710,7 @@ void CrossbowBoltControl(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, ENV_FLAG_NONE, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);

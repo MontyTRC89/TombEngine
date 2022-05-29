@@ -56,7 +56,7 @@ void ControlTeleporter(short itemNumber)
 				}
 
 				ItemInfo* targetItem = &g_Level.Items[item->itemFlags[1]];
-				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
+				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, SoundEnvironment::Land);
 
 				if (GlobalCounter & 1)
 				{
@@ -169,7 +169,7 @@ void ControlTeleporter(short itemNumber)
 			FlashFadeB = 64;
 			FlashFader = 32;
 			item->itemFlags[2] = 1;
-			SoundEffect(SFX_TR5_TELEPORT_FLASH, 0, (int)& unk_800004);
+			SoundEffect(SFX_TR5_TELEPORT_FLASH, nullptr, SoundEnvironment::Land);
 		}
 	}*/
 

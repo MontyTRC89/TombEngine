@@ -1627,7 +1627,7 @@ int JeepControl(void)
 		else
 			jeep->pitch = -32768;
 
-		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, (jeep->pitch * 256) + 16777220);
+		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, SoundEnvironment::Land, 0.5f + jeep->pitch / 65535.0f);
 	}
 	else
 	{
