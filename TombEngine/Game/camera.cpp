@@ -1196,7 +1196,7 @@ void BinocularCamera(ItemInfo* item)
 		if (BinocularRange < ANGLE(0.7f))
 			BinocularRange = ANGLE(0.7f);
 		else
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, (flags << 8) | 6);
+			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, 0, 0.9f);
 	}
 	else if (InputBusy & IN_CROUCH)
 	{
@@ -1204,7 +1204,7 @@ void BinocularCamera(ItemInfo* item)
 		if (BinocularRange > ANGLE(8.5f))
 			BinocularRange = ANGLE(8.5f);
 		else
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, (flags << 8) | 6);
+			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, 0, 1.0f);
 	}
 
 	auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -1253,8 +1253,8 @@ void BinocularCamera(ItemInfo* item)
 						SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 					else
 					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, 83888140);
-						SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
+						//SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 					}
 				}
 				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
@@ -1274,7 +1274,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, 83888140);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
@@ -1286,7 +1286,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, 83888140);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
@@ -1299,7 +1299,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, 83888140);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
@@ -1312,7 +1312,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, 83888140);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
