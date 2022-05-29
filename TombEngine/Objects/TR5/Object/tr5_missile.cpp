@@ -125,7 +125,7 @@ void MissileControl(short itemNumber)
 			else if (fx->flag1 == 2)
 			{
 				ExplodeFX(fx, 0, 32);
-				SoundEffect(251, &fx->pos, 0);
+				SoundEffect(251, &fx->pos);
 			}
 		}
 		else
@@ -161,8 +161,8 @@ void MissileControl(short itemNumber)
 					ExplodeFX(fx, 0, 32);
 					LaraItem->HitPoints -= 50;
 					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-					SoundEffect(SFX_TR5_IMP_STONEHIT, &fx->pos, 0);
-					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
+					SoundEffect(SFX_TR5_IMP_STONEHIT, &fx->pos);
+					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 				}
 				
 				KillEffect(itemNumber);

@@ -75,8 +75,8 @@ void HammerControl(short itemNumber)
                     *(_BYTE*)(Items + 5622 * (signed __int16)currentItem->itemFlags[1] + 41) |= 0x3Eu;
                 }
             LABEL_40:
-                SoundEffect(255, (#64 *) & item->pos, 0);
-                SoundEffect(106, (#64 *) & item->pos, 0);
+                SoundEffect(255, (#64 *) & item->pos);
+                SoundEffect(106, (#64 *) & item->pos);
                 return AnimateItem((int)item);
             }
             v8 = *(signed __int16*)(Rooms + 148 * (signed __int16)item->roomNumber + 72);

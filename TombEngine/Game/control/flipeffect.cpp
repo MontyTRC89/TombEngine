@@ -243,7 +243,7 @@ void LaraLocation(ItemInfo* item)
 
 void ExplosionFX(ItemInfo* item)
 {
-	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, nullptr);
 	Camera.bounce = -75;
 	FlipEffect = -1;
 }
@@ -270,7 +270,7 @@ void ActivateCamera(ItemInfo* item)
 
 void PoseidonSFX(ItemInfo* item)
 {
-	SoundEffect(SFX_TR4_WATER_FLUSHES, NULL, 0);
+	SoundEffect(SFX_TR4_WATER_FLUSHES, nullptr);
 	FlipEffect = -1;
 }
 
@@ -294,7 +294,7 @@ void RubbleFX(ItemInfo* item)
 
 void PlaySoundEffect(ItemInfo* item)
 {
-	SoundEffect(TriggerTimer, NULL, 0);
+	SoundEffect(TriggerTimer, nullptr);
 	FlipEffect = -1;
 }
 

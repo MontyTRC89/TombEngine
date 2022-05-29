@@ -153,7 +153,7 @@ namespace Footprints {
 
 		// HACK: must be here until reference wad2 is revised
 		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
-			SoundEffect(fx, &item->Pose, 0);
+			SoundEffect(fx, &item->Pose);
 
 		if (floor->Material != FLOOR_MATERIAL::Sand &&
 			floor->Material != FLOOR_MATERIAL::Snow &&

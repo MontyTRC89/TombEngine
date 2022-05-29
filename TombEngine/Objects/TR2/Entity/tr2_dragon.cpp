@@ -428,7 +428,7 @@ void DragonControl(short backItemNumber)
 			if (AI.ahead)
 				head = -AI.angle;
 
-			SoundEffect(SFX_TR2_DRAGON_FIRE, &item->Pose, 0);
+			SoundEffect(SFX_TR2_DRAGON_FIRE, &item->Pose);
 
 			if (creature->Flags)
 			{

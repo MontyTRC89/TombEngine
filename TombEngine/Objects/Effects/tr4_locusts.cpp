@@ -206,7 +206,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (locust->counter > 0)
-					SoundEffect(SFX_TR4_LOCUSTS_LOOP, &locust->pos, NULL);
+					SoundEffect(SFX_TR4_LOCUSTS_LOOP, &locust->pos);
 			}
 		}
 	}

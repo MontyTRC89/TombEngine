@@ -94,7 +94,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 		Lara.Control.Weapon.Fired = true;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
-			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, NULL, 0);
+			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, nullptr);
 	}
 
 	bool hit = false;
@@ -130,7 +130,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
+						SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
 					}
 
 					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
