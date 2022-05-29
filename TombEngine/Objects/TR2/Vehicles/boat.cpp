@@ -1043,7 +1043,7 @@ void SpeedBoatControl(short itemNumber)
 	sBoat->Pitch += (pitch - sBoat->Pitch) / 4;
 
 	int fx = (sBoatItem->Animation.Velocity > 8) ? SFX_TR2_SPEEDBOAT_MOVING : (drive ? SFX_TR2_SPEEDBOAT_IDLE : SFX_TR2_SPEEDBOAT_ACCELERATE);
-	SoundEffect(fx, &sBoatItem->Pose, ENV_FLAG_NONE, sBoat->Pitch / (float)BOAT_MAX_VELOCITY);
+	SoundEffect(fx, &sBoatItem->Pose, SoundEnvironment::Land, sBoat->Pitch / (float)BOAT_MAX_VELOCITY);
 
 	if (sBoatItem->Animation.Velocity && (water - 5) == sBoatItem->Pose.Position.y)
 		DoBoatWakeEffect(sBoatItem);

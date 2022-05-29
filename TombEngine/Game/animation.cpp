@@ -106,13 +106,17 @@ void AnimateLara(ItemInfo* item)
 					cmd += 2;
 					break;
 				}
-
-				flags = cmd[1] & 0xC000;
-				if (flags == (int)SOUND_PLAYCONDITION::LandAndWater ||
-					(flags == (int)SOUND_PLAYCONDITION::Land && (lara->WaterSurfaceDist >= 0 || lara->WaterSurfaceDist == NO_HEIGHT)) ||
-					(flags == (int)SOUND_PLAYCONDITION::Water && lara->WaterSurfaceDist < 0 && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+				else
 				{
-					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SFX_ALWAYS);
+					flags = cmd[1] & 0xC000;
+					auto condition = flags ? (flags == (1 << 14) ? SoundEnvironment::Land : SoundEnvironment::Water) : SoundEnvironment::Always;
+
+					if (condition == SoundEnvironment::Always ||
+						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= 0 || lara->WaterSurfaceDist == NO_HEIGHT)) ||
+						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist < -CLICK(0.5f) && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+					{
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+					}
 				}
 
 				cmd += 2;
@@ -304,22 +308,19 @@ void AnimateItem(ItemInfo* item)
 						item->Pose.Position.y = LaraItem->Pose.Position.y - 762;
 						item->Pose.Position.z = LaraItem->Pose.Position.z;
 
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SFX_ALWAYS);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}
 					else if (TestEnvironment(ENV_FLAG_WATER, item))
 					{
-						if (!flags || flags == (int)SOUND_PLAYCONDITION::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) || Objects[item->ObjectNumber].intelligent))
-							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SFX_ALWAYS);
+						if (!flags || flags == (int)SoundEnvironment::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) || Objects[item->ObjectNumber].intelligent))
+							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}
-					else if (!flags || flags == (int)SOUND_PLAYCONDITION::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SFX_ALWAYS);
+					else if (!flags || flags == (int)SoundEnvironment::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 				}
 				else
 				{
-					if (TestEnvironment(ENV_FLAG_WATER, item))
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, ENV_FLAG_WATER);
-					else
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose);
+					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, item));
 				}
 
 				break;

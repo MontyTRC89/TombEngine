@@ -67,7 +67,7 @@ void ControlMissile(short fxNumber)
 			//			fx->frameNumber = -GetRandomControl()/11000;
 			//			fx->counter = 6;
 			//			fx->objectNumber = RICOCHET1;
-			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? 10 : 258, &fx->pos);
+			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? SFX_TR4_LARA_RICOCHET : SFX_TR2_CIRCLE_BLADE_HIT, &fx->pos);
 		}
 		/*else if (fx->objectNumber == DRAGON_FIRE)
 		{
