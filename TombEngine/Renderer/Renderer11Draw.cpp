@@ -27,6 +27,7 @@
 #include <chrono>
 #include <algorithm>
 #include <execution>
+#include <filesystem>
 
 using namespace TEN::Entities::Generic;
 
@@ -338,7 +339,7 @@ namespace TEN::Renderer
 
 		std::mbstowcs(introFileChars, g_GameFlow->IntroImagePath.c_str(), 255);
 		std::wstring titleStringFileName(introFileChars);
-		Texture2D texture = Texture2D(m_device.Get(), titleStringFileName);
+		Texture2D texture = std::filesystem::exists(titleStringFileName) ? Texture2D(m_device.Get(), titleStringFileName) : Texture2D();
 
 		float currentFade = 0;
 		while (currentFade <= 1.0f)
@@ -1919,7 +1920,7 @@ namespace TEN::Renderer
 			delete loadingScreenTexture;
 		}
 
-		loadingScreenTexture = new Texture2D(m_device.Get(), fileName);
+		loadingScreenTexture = std::filesystem::exists(fileName) ? new Texture2D(m_device.Get(), fileName) : new Texture2D();
 	}
 
 	void Renderer11::RenderLoadingScreen(float percentage)
