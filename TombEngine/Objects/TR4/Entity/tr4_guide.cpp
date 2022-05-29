@@ -77,7 +77,7 @@ namespace TEN::Entities::TR4
 			GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
 
 			AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 			TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
 
 			short random = GetRandomControl();
@@ -722,7 +722,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.RequiredState = GUIDE_STATE_RUN;
 					item->SwapMeshFlags |= 0x200000;
-					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose, 0);
+					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose);
 				}
 			}
 			else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))

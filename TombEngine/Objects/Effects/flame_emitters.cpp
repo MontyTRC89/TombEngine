@@ -68,7 +68,7 @@ namespace TEN::Entities::Effects
 				short flags = -item->TriggerFlags;
 				if ((flags & 7) == 2 || (flags & 7) == 7)
 				{
-					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 					TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
 					TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 						(GetRandomControl() & 3) + 20,
@@ -111,7 +111,7 @@ namespace TEN::Entities::Effects
 
 					if (item->ItemFlags[1])
 					{
-						SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+						SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 
 						if (item->ItemFlags[1] <= -8192)
 							TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
@@ -136,7 +136,7 @@ namespace TEN::Entities::Effects
 					}
 				}
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 			}
 			else
 			{
@@ -150,7 +150,7 @@ namespace TEN::Entities::Effects
 					(GetRandomControl() & 0x3F) + 192,
 					(GetRandomControl() & 0x1F) + 96, 0);
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 				if (!Lara.Burn &&
 					ItemNearLara(&item->Pose, 600) &&
@@ -238,7 +238,7 @@ namespace TEN::Entities::Effects
 					}
 				}
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 			}
 			else if (item->ItemFlags[0] == 0)
 			{
@@ -336,7 +336,7 @@ namespace TEN::Entities::Effects
 		int wh = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 		if (wh == NO_HEIGHT || fx->pos.Position.y <= wh || Lara.BurnBlue)
 		{
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos, 0);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos);
 
 			LaraItem->HitPoints -= 7;
 			LaraItem->HitStatus = true;
@@ -457,7 +457,7 @@ namespace TEN::Entities::Effects
 		{
 			if (item->TriggerFlags)
 			{
-				SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &item->Pose, 0);
+				SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &item->Pose);
 
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
@@ -610,7 +610,7 @@ namespace TEN::Entities::Effects
 					TriggerFireFlame(x + item->Pose.Position.x, item->Pose.Position.y, z + item->Pose.Position.z, -1, 2);
 				}
 
-				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 

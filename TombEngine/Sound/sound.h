@@ -110,7 +110,7 @@ extern std::map<std::string, int> SoundTrackMap;
 extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
 extern int SecretSoundIndex;
 
-long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
+long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags = ENV_FLAG_NONE, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();

@@ -590,7 +590,7 @@ void RomanStatueControl(short itemNumber)
 							if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 							{
 								ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh, 0);
+								SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
 
 								mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->Stopper = false;
@@ -606,7 +606,7 @@ void RomanStatueControl(short itemNumber)
 					if (item->TouchBits & 0xC000)
 					{
 						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 200;

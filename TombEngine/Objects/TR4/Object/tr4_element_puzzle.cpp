@@ -38,7 +38,7 @@ namespace TEN::Entities::TR4
 
         if (item->TriggerFlags == 1)
         {
-            SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose, 0);
+            SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 
             byte r = (GetRandomControl() & 0x3F) + 192;
             byte g = (GetRandomControl() & 0x1F) + 96;
@@ -73,7 +73,7 @@ namespace TEN::Entities::TR4
             return;
 
         if (item->ItemFlags[1] > 90)
-            SoundEffect(SFX_TR4_JOBY_WIND, &item->Pose, 0);
+            SoundEffect(SFX_TR4_JOBY_WIND, &item->Pose);
 
         if (item->ItemFlags[1] < 60)
         {

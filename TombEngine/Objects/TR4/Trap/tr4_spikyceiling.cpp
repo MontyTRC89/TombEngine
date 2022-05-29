@@ -30,7 +30,7 @@ void ControlSpikyCeiling(short itemNumber)
 			if (probe.RoomNumber != item->RoomNumber)
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
-			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose, 0);
+			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);
 		}
 	}
 
@@ -42,7 +42,7 @@ void ControlSpikyCeiling(short itemNumber)
 		DoLotsOfBlood(LaraItem->Pose.Position.x, item->Pose.Position.y + CLICK(3), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
 		item->TouchBits = 0;
 
-		SoundEffect(SFX_TR4_LARA_GRABFEET, &item->Pose, 0);
+		SoundEffect(SFX_TR4_LARA_GRABFEET, &item->Pose);
 	}
 
 	if (TriggerActive(item) && item->Status != ITEM_DEACTIVATED && item->ItemFlags[0] == 1)

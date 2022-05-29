@@ -96,7 +96,7 @@ short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
 
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose, 0);
+	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }

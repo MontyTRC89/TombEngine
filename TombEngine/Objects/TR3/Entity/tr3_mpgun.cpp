@@ -172,7 +172,7 @@ void MPGunControl(short itemNumber)
 		if (laraAI.distance < pow(SECTOR(1), 2) || item->HitStatus || TargetVisible(item, &laraAI)) 
 		{
 			if (!creature->Alerted)
-				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose, 0);
+				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose);
 
 			AlertAllGuards(itemNumber);
 		}

@@ -51,7 +51,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->Pose, 0);
+		SoundEffect(SFX_TR4_WRAITH_WHISPERS, &item->Pose);
 
 		// HitPoints stores the target of wraith
 		auto* target = item->ItemFlags[6] ? &g_Level.Items[item->ItemFlags[6]] : LaraItem;

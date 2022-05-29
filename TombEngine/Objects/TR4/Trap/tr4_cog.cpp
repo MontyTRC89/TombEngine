@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
             {
                 Vector3Int pos;
                 GetJointAbsPosition(item, &pos, 0);
-                SoundEffect(SFX_TR4_HELICOPTER_LOOP, (PHD_3DPOS*)&pos, 0);
+                SoundEffect(SFX_TR4_HELICOPTER_LOOP, (PHD_3DPOS*)&pos);
 
                 if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
                     item->Flags &= 0xC1;

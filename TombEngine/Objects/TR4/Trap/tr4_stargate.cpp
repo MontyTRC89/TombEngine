@@ -32,7 +32,7 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
-			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->Pose, 0);
+			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->Pose);
 			item->ItemFlags[0] = 0x36DB600;
 			AnimateItem(item);
 		}

@@ -153,7 +153,7 @@ static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	if (!(creature->Flags) && item->TouchBits & 0x2400000)
 	{
 		CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
-		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 		creature->Flags = 1;
 
 		LaraItem->HitPoints -= damage;
@@ -163,7 +163,7 @@ static void ShivaDamage(ItemInfo* item, CreatureInfo* creature, int damage)
 	if (!(creature->Flags) && item->TouchBits & 0x2400)
 	{
 		CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
-		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 		creature->Flags = 1;
 
 		LaraItem->HitPoints -= damage;

@@ -577,7 +577,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						lara->Control.WaterStatus = WaterStatus::TreadWater;
 
 						UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
-						SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, 2);
+						SoundEffect(SFX_TR4_LARA_BREATH, &item->Pose, SFX_ALWAYS);
 					}
 				}
 			}
