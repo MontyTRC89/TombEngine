@@ -263,10 +263,10 @@ void LaserHeadControl(short itemNumber)
 				g_Level.Items[creature->PuzzleItem].Pose.Position.y = item->Pose.Position.y;
 				TestTriggers(item, true);
 
-				SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose, 0x800004);
-				SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 20971524);
+				SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose, SoundEnvironment::Land, 0.5f);
+				SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, SoundEnvironment::Land, 1.25f);
 				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
-				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 4194308);
+				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.25f);
 
 				KillItem(itemNumber);
 			}

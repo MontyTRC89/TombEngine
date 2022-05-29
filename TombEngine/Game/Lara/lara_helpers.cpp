@@ -457,7 +457,12 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		lara->Control.Subsuit.Velocity[1] = SECTOR(1.5f);
 
 	if (lara->Control.Subsuit.Velocity[0] != 0 || lara->Control.Subsuit.Velocity[1] != 0)
-		SoundEffect(SFX_TR5_DIVE_SUIT_ENGINE, &item->Pose, (((lara->Control.Subsuit.Velocity[0] + lara->Control.Subsuit.Velocity[1]) * 4) & 0x1F00) + 10);
+	{
+		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / SECTOR(8);
+		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / SECTOR(8);
+		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
+		SoundEffect(SFX_TR5_DIVE_SUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
+	}
 }
 
 void ModulateLaraSubsuitSwimTurn(ItemInfo* item)

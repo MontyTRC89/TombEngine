@@ -614,7 +614,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	}
 
 	// Play default background music
-	PlaySoundTrack(ambient, SOUNDTRACK_PLAYTYPE::BGM);
+	PlaySoundTrack(ambient, SoundTrackType::BGM);
 
 	// Restore the game?
 	if (loadFromSavegame)

@@ -112,7 +112,7 @@ struct ROOM_INFO
 	int flippedRoom;
 	int flags;
 	int meshEffect;
-	int reverbType;
+    int reverbType;
 	int flipNumber;
 	short itemNumber;
 	short fxNumber;

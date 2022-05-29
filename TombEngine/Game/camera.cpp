@@ -1196,7 +1196,7 @@ void BinocularCamera(ItemInfo* item)
 		if (BinocularRange < ANGLE(0.7f))
 			BinocularRange = ANGLE(0.7f);
 		else
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, 0, 0.9f);
+			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 	}
 	else if (InputBusy & IN_CROUCH)
 	{
@@ -1204,7 +1204,7 @@ void BinocularCamera(ItemInfo* item)
 		if (BinocularRange > ANGLE(8.5f))
 			BinocularRange = ANGLE(8.5f);
 		else
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, 0, 1.0f);
+			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 	}
 
 	auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -1253,7 +1253,7 @@ void BinocularCamera(ItemInfo* item)
 						SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 					else
 					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
+						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 						//SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 					}
 				}
@@ -1274,7 +1274,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
@@ -1286,7 +1286,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
@@ -1299,7 +1299,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
@@ -1312,7 +1312,7 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, ENV_FLAG_NONE, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
@@ -1394,7 +1394,7 @@ void CalculateCamera()
 	// Camera is in a water room, play water sound effect.
 	if (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
 	{
-		SoundEffect(SFX_TR4_UNDERWATER, nullptr, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_UNDERWATER, nullptr, SoundEnvironment::Always);
 		if (Camera.underwater == false)
 			Camera.underwater = true;
 	}
@@ -1931,7 +1931,7 @@ void ItemsCollideCamera()
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
-		SoundEffect(SFX_TR5_KLAXON, nullptr, 4104);
+		SoundEffect(SFX_TR5_KLAXON, nullptr, SoundEnvironment::Land, 0.25f);
 
 	if (RumbleTimer >= 0)
 		RumbleTimer++;

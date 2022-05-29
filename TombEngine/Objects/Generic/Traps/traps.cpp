@@ -264,7 +264,7 @@ void WreckingBallControl(short itemNumber)
 			item->Pose.Position.y = item2->Pose.Position.y + 1644;
 			if (item->Animation.VerticalVelocity < -32)
 			{
-				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Pose, 4104);
+				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Pose, SoundEnvironment::Land, 1.0f, 0.5f);
 				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
 				BounceCamera(item, 16, 8192);
 			}
