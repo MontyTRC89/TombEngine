@@ -1439,14 +1439,9 @@ short GetSurfaceAspectAngle(float xTilt, float zTilt)
 	return (short)phd_atan(-zTilt, -xTilt);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
+bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
 {
-	return (room->flags & environmentType);
-}
-
-bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
-{
-	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
+	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
 }
 
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
@@ -1454,7 +1449,17 @@ bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
 	return TestEnvironment(environmentType, item->RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
 {
-	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
+	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
+}
+
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
+{
+	return TestEnvironmentFlags(environmentType, room->flags);
+}
+
+bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags)
+{
+	return ((flags & environmentType) == environmentType);
 }
