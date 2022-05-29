@@ -149,7 +149,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, int envFlags, float pitchMul
 	if (!(envFlags & SFX_ALWAYS))
 	{
 		// Don't play effect if effect's environment isn't the same as camera position's environment
-		if (envFlags & ENV_FLAG_WATER != TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
+		if (TestEnvironmentFlags(ENV_FLAG_WATER, envFlags) != TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
 			return 0;
 	}
 
