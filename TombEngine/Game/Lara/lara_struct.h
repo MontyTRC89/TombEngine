@@ -1079,7 +1079,7 @@ struct ArmInfo
 	Vector3Shrt Orientation;
 
 	bool Locked;
-	short FlashGun;
+	int FlashGun;
 };
 
 struct FlareData
@@ -1236,6 +1236,12 @@ struct LaraControlData
 	WaterStatus WaterStatus;
 	LaraCountData Count;
 
+	WeaponControlData Weapon;
+	RopeControlData Rope;
+	TightropeControlData Tightrope;
+	SubsuitControlData Subsuit;
+	MinecartControlData Minecart;
+
 	bool CanLook;
 	bool IsMoving;
 	bool KeepLow;
@@ -1245,12 +1251,6 @@ struct LaraControlData
 	bool CanMonkeySwing;
 	bool RunJumpQueued;
 	bool Locked;
-
-	WeaponControlData Weapon;
-	RopeControlData Rope;
-	TightropeControlData Tightrope;
-	SubsuitControlData Subsuit;
-	MinecartControlData Minecart;
 };
 
 struct LaraInfo
