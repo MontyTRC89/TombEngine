@@ -114,16 +114,14 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item) && item->ItemFlags[2] == 0)
 		{
-			bool hit = false;
-
-			if (item->ItemFlags[0] == 1024)	// Just started.
+			// Just emerging.
+			if (item->ItemFlags[0] == 1024)
 				SoundEffect(SFX_TR4_TEETH_SPIKES, (PHD_3DPOS*)&item->Pose);
 
 			item->Status = ITEM_ACTIVE;
 
-			hit = TestBoundsCollideTeethSpikes(item);
-
-			if (LaraItem->HitPoints > 0 && hit)
+			bool collided = TestBoundsCollideTeethSpikes(item);
+			if (LaraItem->Animation.ActiveState != LS_DEATH && collided)
 			{
 				auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 				auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
@@ -134,7 +132,8 @@ namespace TEN::Entities::TR4
 					(item->TriggerFlags & 7) > 2 &&
 					(item->TriggerFlags & 7) < 6)
 				{
-					if (LaraItem->Animation.VerticalVelocity > 6 || item->ItemFlags[0] > 1024)
+					if (LaraItem->Animation.VerticalVelocity > 6 ||
+						item->ItemFlags[0] > 1024)
 					{
 						LaraItem->HitPoints = -1;
 						bloodCount = 20;
@@ -185,13 +184,11 @@ namespace TEN::Entities::TR4
 
 				if (LaraItem->HitPoints <= 0)
 				{
-					int height = GetCollision(LaraItem).Position.Floor - LaraItem->Pose.Position.y;
-					if (item->Pose.Position.y >= LaraItem->Pose.Position.y && height < 50)
+					int heightFromFloor = GetCollision(LaraItem).Position.Floor - LaraItem->Pose.Position.y;
+					if (item->Pose.Position.y >= LaraItem->Pose.Position.y &&
+						heightFromFloor < CLICK(1))
 					{
-						LaraItem->Animation.AnimNumber = LA_SPIKE_DEATH;
-						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-						LaraItem->Animation.ActiveState = LS_DEATH;
-						LaraItem->Animation.TargetState = LS_DEATH;
+						SetAnimation(LaraItem, LA_SPIKE_DEATH);
 						LaraItem->Animation.Airborne = false;
 					}
 				}
