@@ -116,19 +116,20 @@ namespace TEN::Entities::TR4
 		{
 			// Just emerging.
 			if (item->ItemFlags[0] == 1024)
-				SoundEffect(SFX_TR4_TEETH_SPIKES, (PHD_3DPOS*)&item->Pose);
+				SoundEffect(SFX_TR4_TEETH_SPIKES, &item->Pose);
 
 			item->Status = ITEM_ACTIVE;
 
-			bool collided = TestBoundsCollideTeethSpikes(item);
-			if (LaraItem->Animation.ActiveState != LS_DEATH && collided)
+			if (LaraItem->Animation.ActiveState != LS_DEATH &&
+				TestBoundsCollideTeethSpikes(item))
 			{
 				auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
 				auto* laraBounds = (BOUNDING_BOX*)GetBestFrame(LaraItem);
 
 				int bloodCount = 0;
 
-				if ((item->ItemFlags[0] > 1024 || LaraItem->Animation.Airborne) &&
+				if ((item->ItemFlags[0] > 1024 ||
+					LaraItem->Animation.Airborne) &&
 					(item->TriggerFlags & 7) > 2 &&
 					(item->TriggerFlags & 7) < 6)
 				{
@@ -240,7 +241,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		// Update bone mutators
+		// Update bone mutators.
 		if (item->ItemFlags[1])
 		{
 			for (int i = 0; i < item->Animation.Mutator.size(); i++)
