@@ -59,6 +59,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - WolfCheese (general coding)
 
 ## Testers
+- Adngel
 - Caesum
 - Dustie
 - JoeyQuint
@@ -70,7 +71,14 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Stranger1992
 - WolfCheese
 
-## Animations 
+## Assets and Miscellaneous
+
+### Animations
 - SrDanielPonces (Diagonal shimmy transitions)
 - Krystian (Flexibility crawlspace, slope climbing animations)
 - Sezz (Additional Animations for player state refactoring) 
+
+### TombEngine Wiki tutorials 
+- Kubsy (Lua Basics tutorial)
+- Stranger1992 (Sound Setups)
+- Wolfcheese (Lua puzzles setups)
