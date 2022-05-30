@@ -174,9 +174,6 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					item->Animation.TargetState = WEAPON_STATE_AIM;
 			}
 
-			if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun)
-				item->Animation.TargetState = WEAPON_STATE_UNAIM;
-
 			if (item->Animation.TargetState != WEAPON_STATE_RECOIL &&
 				//HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
