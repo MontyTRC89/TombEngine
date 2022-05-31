@@ -48,7 +48,7 @@ void CobraControl(short itemNumber)
 	short angle = 0;
 	short tilt = 0;
 
-	if (item->HitPoints <= 0)
+	if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
 	{
 		if (item->Animation.ActiveState != 4)
 		{
