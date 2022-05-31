@@ -292,7 +292,12 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 				if (g_Gui.GetInventoryItemChosen() != keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
+
+				laraInfo->InteractedItem = itemNumber;
 			}
+
+			if (laraInfo->InteractedItem != itemNumber)
+				return;
 
 			if (MoveLaraPosition(&KeyHolePosition, keyHoleItem, laraItem))
 			{
@@ -319,8 +324,6 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					return;
 				}
 			}
-			else
-				laraInfo->InteractedItem = itemNumber;
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			return;
