@@ -1096,7 +1096,7 @@ namespace TEN::Renderer
 		m_numSpritesTransparentDrawCalls++;
 	}
 
-	void Renderer11::DrawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
+	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, bool transparent) 
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1171,7 +1171,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawDebris(RenderView& view,bool transparent)
+	void Renderer11::DrawDebris(RenderView& view, bool transparent)
 	{		
 		extern vector<DebrisFragment> DebrisFragments;
 		vector<RendererVertex> vertices;
