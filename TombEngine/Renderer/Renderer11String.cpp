@@ -82,11 +82,11 @@ namespace TEN::Renderer {
 			// Draw shadow if needed
 			if (str->Flags & PRINTSTRING_OUTLINE)
 				m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X + 1, str->Y + 1),
-					Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent);
 
 			// Draw string
 			m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X, str->Y),
-				Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f));
+				Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f) * ScreenFadeCurrent);
 		}
 
 		m_spriteBatch->End();

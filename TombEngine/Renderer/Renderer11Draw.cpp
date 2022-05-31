@@ -1222,7 +1222,7 @@ namespace TEN::Renderer
 				rect.bottom = 200 * factorY;
 
 				m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->Additive());
-				m_spriteBatch->Draw(m_logo.ShaderResourceView.Get(), rect, Vector4::One);
+				m_spriteBatch->Draw(m_logo.ShaderResourceView.Get(), rect, Vector4::One * ScreenFadeCurrent);
 				m_spriteBatch->End();
 			}
 
@@ -2033,6 +2033,7 @@ namespace TEN::Renderer
 		ClearSceneItems();
 
 		m_strings.clear();
+		m_transparentFaces.clear();
 
 		m_currentCausticsFrame++;
 		m_currentCausticsFrame %= 32;
@@ -2618,7 +2619,7 @@ namespace TEN::Renderer
 		m_biggestRoomIndexBuffer = 0;
 		m_numPolygons = 0;
 
-		m_transparentFaces.clear();
+		ClearScene();
 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -2777,11 +2778,10 @@ namespace TEN::Renderer
 		m_timeFrame = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
 		time1 = time2;
 
-		DoFadingAndCinematicBars(target, depthTarget, view);
-
 		DrawDebugInfo(view);
 		DrawAllStrings();
-		ClearScene();
+
+		DoFadingAndCinematicBars(target, depthTarget, view);
 	}
 
 	void Renderer11::RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
