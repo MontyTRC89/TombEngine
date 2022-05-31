@@ -339,7 +339,8 @@ namespace TEN::Renderer
 
 		std::mbstowcs(introFileChars, g_GameFlow->IntroImagePath.c_str(), 255);
 		std::wstring titleStringFileName(introFileChars);
-		Texture2D texture = std::filesystem::exists(titleStringFileName) ? Texture2D(m_device.Get(), titleStringFileName) : Texture2D();
+		Texture2D texture;
+		SetTextureOrDefault(texture, titleStringFileName);
 
 		float currentFade = 0;
 		while (currentFade <= 1.0f)
@@ -1915,12 +1916,7 @@ namespace TEN::Renderer
 
 	void Renderer11::SetLoadingScreen(std::wstring& fileName)
 	{
-		if (loadingScreenTexture!=nullptr)
-		{
-			delete loadingScreenTexture;
-		}
-
-		loadingScreenTexture = std::filesystem::exists(fileName) ? new Texture2D(m_device.Get(), fileName) : new Texture2D();
+		 SetTextureOrDefault(loadingScreenTexture, fileName);
 	}
 
 	void Renderer11::RenderLoadingScreen(float percentage)
@@ -1942,7 +1938,7 @@ namespace TEN::Renderer
 
 		    // Draw the full screen background
 			DrawFullScreenQuad(
-				loadingScreenTexture->ShaderResourceView.Get(),
+				loadingScreenTexture.ShaderResourceView.Get(),
 				Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
 		    m_context->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 

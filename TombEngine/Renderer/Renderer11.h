@@ -341,7 +341,7 @@ namespace TEN::Renderer
 		RenderTargetCubeArray m_shadowMaps;
 		Texture2D loadingBarBorder;
 		Texture2D loadingBarInner;
-		Texture2D* loadingScreenTexture = nullptr;
+		Texture2D loadingScreenTexture;
 
 		// Level data
 		Texture2D m_titleScreen;
@@ -676,6 +676,7 @@ namespace TEN::Renderer
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
 		                            float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
+		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 	};
 
