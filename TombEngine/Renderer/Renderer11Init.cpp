@@ -31,15 +31,14 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_states = std::make_unique<CommonStates>(m_device.Get());
 
 	wchar_t titleScreenFile[255];
-	std::wstring titleFile = std::wstring(titleScreenFile);
 	std::mbstowcs(titleScreenFile, g_GameFlow->TitleScreenImagePath.c_str(), 255);
-	m_titleScreen = std::filesystem::exists(titleScreenFile) ? Texture2D(m_device.Get(), titleScreenFile) : Texture2D();
+	SetTextureOrDefault(m_titleScreen, titleScreenFile);
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
-	m_whiteTexture = std::filesystem::exists(whiteSpriteName) ? Texture2D(m_device.Get(), L"Textures/WhiteSprite.png") : Texture2D();
+	SetTextureOrDefault(m_whiteTexture, L"Textures/WhiteSprite.png");
 
 	auto logoName = L"Textures/Logo.png";
-	m_logo = std::filesystem::exists(logoName) ? Texture2D(m_device.Get(), logoName) : Texture2D();
+	SetTextureOrDefault(m_logo, logoName);
 
 	m_shadowMaps = RenderTargetCubeArray(m_device.Get(), g_Configuration.shadowMapSize, MAX_DYNAMIC_SHADOWS, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_D16_UNORM);
 	// Load shaders
@@ -292,8 +291,8 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HW
 	m_gameFont = std::make_unique<SpriteFont>(m_device.Get(), L"Textures/Font.spritefont");
 	m_primitiveBatch = std::make_unique<PrimitiveBatch<RendererVertex>>(m_context.Get());
 
-	loadingBarBorder = Texture2D(m_device.Get(), L"Textures/LoadingBarBorder.png");
-	loadingBarInner = Texture2D(m_device.Get(), L"Textures/LoadingBarInner.png");
+	SetTextureOrDefault(loadingBarBorder, L"Textures/LoadingBarBorder.png");
+	SetTextureOrDefault(loadingBarInner, L"Textures/LoadingBarInner.png");
 
 	// Initialise buffers
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
