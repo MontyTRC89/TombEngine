@@ -677,8 +677,6 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	while (DoTheGame)
 	{
 		result = ControlPhase(nFrames, 0);
-		nFrames = DrawPhase();
-		Sound_UpdateScene();
 
 		if (result == GameStatus::ExitToTitle ||
 			result == GameStatus::LoadGame ||
@@ -694,6 +692,9 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 
 			return result;
 		}
+
+		nFrames = DrawPhase();
+		Sound_UpdateScene();
 	}
 
 	g_GameScript->ResetScripts(true);
