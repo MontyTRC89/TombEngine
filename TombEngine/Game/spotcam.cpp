@@ -521,7 +521,7 @@ void CalculateSpotCameras()
 			}
 		}
 
-		LookAt(&Camera, 0);
+		LookAt(&Camera, croll);
 
 		if (CheckTrigger)
 		{

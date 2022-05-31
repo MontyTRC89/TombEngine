@@ -91,7 +91,7 @@ void LookAt(CAMERA_INFO* cam, short roll)
 	Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
-	float r = 0; TO_RAD(roll);
+	float r = TO_RAD(roll);
 
 	g_Renderer.UpdateCameraMatrices(cam, r, fov);
 }
