@@ -15,16 +15,19 @@ BITE_INFO CobraBite = { 0, 0, 0, 13 };
 // TODO
 enum CobraState
 {
-
+	COBRA_STATE_NONE = 0,
+	COBRA_STATE_IDLE = 1,
+	COBRA_STATE_ATTACK = 2,
+	COBRA_STATE_SLEEP = 3,
 };
 
 // TODO
 enum CobraAnim
 {
-	COBRA_ANIM_WAKE_IDLE = 0,
+	COBRA_ANIM_IDLE = 0,
 	COBRA_ANIM_WAKE_UP = 1,
 	COBRA_ANIM_BACK_TO_SLEEP = 2,
-	COBRA_ANIM_BITE = 3,
+	COBRA_ANIM_BITE_ATTACK = 3,
 	COBRA_ANIM_DEATH = 4,
 };
 
@@ -36,7 +39,7 @@ void InitialiseCobra(short itemNumber)
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_BACK_TO_SLEEP;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 45;
-	item->Animation.ActiveState = item->Animation.TargetState = 3;
+	item->Animation.ActiveState = item->Animation.TargetState = COBRA_STATE_SLEEP;
 	item->ItemFlags[2] = item->HitStatus;
 }
 
@@ -87,20 +90,20 @@ void CobraControl(short itemNumber)
 
 		switch (item->Animation.ActiveState)
 		{
-		case 1:
+		case COBRA_STATE_IDLE:
 			info->Flags = 0;
 
 			if (AI.distance > pow(SECTOR(2.5f), 2))
-				item->Animation.TargetState = 3;
+				item->Animation.TargetState = COBRA_STATE_SLEEP;
 			else if (LaraItem->HitPoints > 0 &&
 				((AI.ahead && AI.distance < pow(SECTOR(1), 2)) || item->HitStatus || LaraItem->Animation.Velocity > 15))
 			{
-				item->Animation.TargetState = 2;
+				item->Animation.TargetState = COBRA_STATE_ATTACK;
 			}
 
 			break;
 
-		case 3:
+		case COBRA_STATE_SLEEP:
 			info->Flags = 0;
 
 			if (item->HitPoints != NOT_TARGETABLE)
@@ -116,7 +119,7 @@ void CobraControl(short itemNumber)
 
 			break;
 
-		case 2:
+		case COBRA_STATE_ATTACK:
 			if (info->Flags != 1 && item->TouchBits & 0x2000)
 			{
 				CreatureEffect(item, &CobraBite, DoBloodSplat);
