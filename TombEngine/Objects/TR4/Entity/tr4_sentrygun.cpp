@@ -19,6 +19,17 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO SentryGunBite = { 0, 0, 0, 8 };
 
+	void InitialiseSentryGun(short itemNum)
+	{
+		auto* item = &g_Level.Items[itemNum];
+
+		ClearItem(itemNum);
+
+		item->ItemFlags[0] = 0;
+		item->ItemFlags[1] = 768;
+		item->ItemFlags[2] = 0;
+	}
+
 	static void SentryGunThrowFire(ItemInfo* item)
 	{
 		for (int i = 0; i < 3; i++)
@@ -64,17 +75,6 @@ namespace TEN::Entities::TR4
 			spark->sSize = spark->dSize / 4;
 			spark->size = spark->dSize / 2;
 		}
-	}
-
-	void InitialiseSentryGun(short itemNum)
-	{
-		auto* item = &g_Level.Items[itemNum];
-
-		ClearItem(itemNum);
-
-		item->ItemFlags[0] = 0;
-		item->ItemFlags[1] = 768;
-		item->ItemFlags[2] = 0;
 	}
 
 	void SentryGunControl(short itemNum)

@@ -15,6 +15,37 @@
 
 namespace TEN::Entities::TR4
 {
+	#define MUTANT_PROJECTILE_ATTACK_RANGE pow(SECTOR(10), 2)
+	#define MUTANT_LOCUST_ATTACK_1_RANGE pow(SECTOR(15), 2)
+	#define MUTANT_LOCUST_ATTACK_2_RANGE pow(SECTOR(30), 2)
+
+	enum MutantState
+	{
+		MUTANT_STATE_NONE = 0,
+		MUTANT_STATE_APPEAR = 1,
+		MUTANT_STATE_IDLE = 2,
+		MUTANT_STATE_PROJECTILE_ATTACK = 3,
+		MUTANT_STATE_LOCUST_ATTACK_1 = 4,
+		MUTANT_STATE_LOCUST_ATTACK_2 = 5,
+	};
+
+	enum MutantAnim
+	{
+		MUTANT_ANIM_APPEAR = 0,
+		MUTANT_ANIM_IDLE = 1,
+		MUTANT_ANIM_PROJECTILE_ATTACK = 2,
+		MUTANT_ANIM_LOCUST_ATTACK_1 = 3,
+		MUTANT_ANIM_LOCUST_ATTACK_1_TO_PROJECTILE_ATTACK = 4,
+		MUTANT_ANIM_LOCUST_ATTACK_2 = 5
+	};
+
+	enum class MissileRotationType
+	{
+		Front,
+		Left,
+		Right
+	};
+
 	enum CARDINAL_POINT
 	{
 		C_NORTH = 0,
@@ -103,9 +134,9 @@ namespace TEN::Entities::TR4
 		sptr->dSize = size / 4;
 	}
 
-	static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotation, short roomNumber, int timer)
+	static void ShootFireball(PHD_3DPOS* src, MissileRotationType rotationType, short roomNumber, int timer)
 	{
-		switch (rotation)
+		switch (rotationType)
 		{
 		case MissileRotationType::Left:
 			src->Orientation.y -= GetRandomControl() % 0x2000;
@@ -145,7 +176,7 @@ namespace TEN::Entities::TR4
 		}
 
 		auto* enemy = creature->Enemy;
-		Vector3Int pos = { 0, 0, 0 };
+		auto pos = Vector3Int();
 		GetJointAbsPosition(item, &pos, joint);
 
 		int x = enemy->Pose.Position.x - pos.x;
@@ -212,11 +243,11 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	static void MutantAIFix(ItemInfo* item, AI_INFO* info)
+	static void MutantAIFix(ItemInfo* item, AI_INFO* AI)
 	{
 		MoveItemFront(item, SECTOR(2));
 		item->Pose.Position.y -= CLICK(3);
-		CreatureAIInfo(item, info);
+		CreatureAIInfo(item, AI);
 		item->Pose.Position.y += CLICK(3);
 		MoveItemBack(item, SECTOR(2));
 	}
@@ -268,18 +299,18 @@ namespace TEN::Entities::TR4
 			if (AI.ahead)
 			{
 				int random = GetRandomControl() & 31;
-				if ((random > 0 && random < 10) && AI.distance <= MUTANT_SHOOT_RANGE)
-					item->Animation.TargetState = MUTANT_STATE_SHOOT;
-				else if ((random > 10 && random < 20) && AI.distance <= MUTANT_LOCUST_1_RANGE)
-					item->Animation.TargetState = MUTANT_STATE_LOCUST_1;
-				else if ((random > 20 && random < 30) && AI.distance <= MUTANT_LOCUST_2_RANGE)
-					item->Animation.TargetState = MUTANT_STATE_LOCUST_2;
+				if ((random > 0 && random < 10) && AI.distance <= MUTANT_PROJECTILE_ATTACK_RANGE)
+					item->Animation.TargetState = MUTANT_STATE_PROJECTILE_ATTACK;
+				else if ((random > 10 && random < 20) && AI.distance <= MUTANT_LOCUST_ATTACK_1_RANGE)
+					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_1;
+				else if ((random > 20 && random < 30) && AI.distance <= MUTANT_LOCUST_ATTACK_2_RANGE)
+					item->Animation.TargetState = MUTANT_STATE_LOCUST_ATTACK_2;
 			}
 
 			break;
 
-		case MUTANT_STATE_SHOOT:
-			frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
+		case MUTANT_STATE_PROJECTILE_ATTACK:
+			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			if (frameNumber >= 94 && frameNumber <= 96)
 			{
 				PHD_3DPOS src;
@@ -301,14 +332,14 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case MUTANT_STATE_LOCUST_1:
+		case MUTANT_STATE_LOCUST_ATTACK_1:
 			frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 			if (frameNumber >= 60 && frameNumber <= 120)
-				TEN::Entities::TR4::SpawnLocust(item);
+				SpawnLocust(item);
 
 			break;
 
-		case MUTANT_STATE_LOCUST_2:
+		case MUTANT_STATE_LOCUST_ATTACK_2:
 			if (ShootFrame(item))
 			{
 				PHD_3DPOS src;
@@ -319,7 +350,7 @@ namespace TEN::Entities::TR4
 			break;
 		}
 
-		if (item->Animation.ActiveState != MUTANT_STATE_LOCUST_1)
+		if (item->Animation.ActiveState != MUTANT_STATE_LOCUST_ATTACK_1)
 			mutantJoint = OBJECT_BONES(headY, AI.xAngle, true);
 		else
 			mutantJoint = OBJECT_BONES(0);

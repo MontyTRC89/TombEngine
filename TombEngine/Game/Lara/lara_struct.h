@@ -928,7 +928,7 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState : int
+enum class TorchState
 {
 	Holding,
 	Throwing,

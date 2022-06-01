@@ -14,6 +14,8 @@
 
 namespace TEN::Entities::TR4
 {
+	BITE_INFO SphinxBiteInfo = { 0, 0, 0, 6 };
+
 	enum SphinxState
 	{
 		SPHINX_STATE_NONE,
@@ -33,8 +35,6 @@ namespace TEN::Entities::TR4
 	{
 
 	};
-
-	BITE_INFO SphinxBiteInfo = { 0, 0, 0, 6 };
 
 	void InitialiseSphinx(short itemNumber)
 	{

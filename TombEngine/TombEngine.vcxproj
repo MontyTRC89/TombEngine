@@ -462,7 +462,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR4\Entity\tr4_smallscorpion.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sphinx.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_troops.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_wildboar.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_wild_boar.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_wraith.h" />
     <ClInclude Include="Objects\TR4\tr4_objects.h" />
     <ClInclude Include="Objects\TR5\tr5_objects.h" />
@@ -830,7 +830,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_beetle_swarm.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_smallscorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sphinx.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_wild_boar.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\upv.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp">
