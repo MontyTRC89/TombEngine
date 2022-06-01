@@ -14,6 +14,8 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO HammerheadBite = { 0, 0, 0, 12 };
 
+	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
+
 	enum HammerheadState
 	{
 		HAMMERHEAD_STATE_IDLE = 0,
@@ -120,7 +122,7 @@ namespace TEN::Entities::TR4
 							CreatureEffect(item, &HammerheadBite, DoBloodSplat);
 							creature->Flags = 1;
 
-							LaraItem->HitPoints -= 120;
+							LaraItem->HitPoints -= HAMMERHEAD_BITE_ATTACK_DAMAGE;
 							LaraItem->HitStatus = true;
 						}
 					}
