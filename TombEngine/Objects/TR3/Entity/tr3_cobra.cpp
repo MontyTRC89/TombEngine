@@ -12,6 +12,8 @@
 
 BITE_INFO CobraBite = { 0, 0, 0, 13 };
 
+constexpr auto COBRA_BITE_ATTACK_DAMAGE = 80;
+constexpr auto COBRA_BITE_POISON_POTENCY = 1;
 
 enum CobraState
 {
@@ -125,9 +127,9 @@ void CobraControl(short itemNumber)
 				CreatureEffect(item, &CobraBite, DoBloodSplat);
 				info->Flags = 1;
 
-				LaraItem->HitPoints -= 80;
+				LaraItem->HitPoints -= COBRA_BITE_ATTACK_DAMAGE;
 				LaraItem->HitStatus = true;
-				Lara.PoisonPotency += 1;
+				Lara.PoisonPotency += COBRA_BITE_POISON_POTENCY;
 			}
 
 			break;
