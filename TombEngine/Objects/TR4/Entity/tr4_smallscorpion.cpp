@@ -15,6 +15,11 @@ namespace TEN::Entities::TR4
 	BITE_INFO SmallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 	BITE_INFO SmallScorpionBiteInfo2 = { 0, 0, 0, 23 };
 
+	constexpr auto SMALL_SCORPION_PINCERS_ATTACK_DAMAGE = 50;
+	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE = 20;
+	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
+	constexpr auto SMALL_SCORPION_RANGE_ATTACK = SECTOR(0.314);
+
 	enum SmallScorionState
 	{
 		SSCORPION_STATE_IDLE = 1,
@@ -60,7 +65,6 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
-		short attackRange = 314;
 
 		if (item->HitPoints <= 0)
 		{
@@ -95,7 +99,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(attackRange, 2))
+				if (AI.distance > pow(SMALL_SCORPION_RANGE_ATTACK, 2))
 					item->Animation.TargetState = SSCORPION_STATE_WALK;
 				else if (AI.bite)
 				{
@@ -113,7 +117,7 @@ namespace TEN::Entities::TR4
 			case SSCORPION_STATE_WALK:
 				creature->MaxTurn = ANGLE(6.0f);
 
-				if (AI.distance >= pow(attackRange, 2))
+				if (AI.distance >= pow(SMALL_SCORPION_RANGE_ATTACK, 2))
 				{
 						item->Animation.TargetState = SSCORPION_STATE_RUN;
 				}
@@ -125,7 +129,7 @@ namespace TEN::Entities::TR4
 			case SSCORPION_STATE_RUN:
 				creature->MaxTurn = ANGLE(8.0f);
 
-				if (AI.distance < pow(attackRange, 2))
+				if (AI.distance < pow(SMALL_SCORPION_RANGE_ATTACK, 2))
 					item->Animation.TargetState = SSCORPION_STATE_IDLE;
 
 				break;
@@ -159,15 +163,15 @@ namespace TEN::Entities::TR4
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 							{
 								//Pinzers Attack
-								LaraItem->HitPoints -= 20;
+								LaraItem->HitPoints -= SMALL_SCORPION_PINCERS_ATTACK_DAMAGE;
 								rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo1;
 							}
 							else
 							{
 								//Tail Attack
-								Lara.PoisonPotency += 2;
-								LaraItem->HitPoints -= 20;
+								Lara.PoisonPotency += SMALL_SCORPION_STINGER_POISON_POTENCY;
+								LaraItem->HitPoints -= SMALL_SCORPION_STINGER_ATTACK_DAMAGE;
 								rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo2;
 							}
