@@ -86,7 +86,7 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
-		short attackRange = 1340;
+		short attackRange = 1350;
 
 		int x = item->Pose.Position.x + 682 * phd_sin(item->Pose.Orientation.y);
 		int z = item->Pose.Position.z + 682 * phd_cos(item->Pose.Orientation.y);
