@@ -12,7 +12,7 @@
 
 BITE_INFO CobraBite = { 0, 0, 0, 13 };
 
-// TODO
+
 enum CobraState
 {
 	COBRA_STATE_NONE = 0,
@@ -21,7 +21,7 @@ enum CobraState
 	COBRA_STATE_SLEEP = 3,
 };
 
-// TODO
+
 enum CobraAnim
 {
 	COBRA_ANIM_IDLE = 0,
@@ -61,7 +61,7 @@ void CobraControl(short itemNumber)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_DEATH;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 4;
+			item->Animation.ActiveState = 4; //Core prob made a mistake putting 4 as this block of code clearly makes cobra die but I'll leave it for now - Kubsy 2022/06/01
 		}
 	}
 	else
@@ -132,7 +132,7 @@ void CobraControl(short itemNumber)
 
 			break;
 
-		case 0:
+		case 0: //No Idea what this is - Kubsy 2022/06/01
 			item->HitPoints = item->ItemFlags[2];
 			break;
 		}
