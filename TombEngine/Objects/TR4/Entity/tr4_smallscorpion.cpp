@@ -60,6 +60,7 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
+		short attackRange = 314;
 
 		if (item->HitPoints <= 0)
 		{
@@ -74,9 +75,6 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-			int laraDistance = dx * dx + dz * dz;
 
 			if (item->AIBits & GUARD)
 				GetAITarget(creature);
@@ -97,7 +95,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(341, 2))
+				if (AI.distance > pow(attackRange, 2))
 					item->Animation.TargetState = SSCORPION_STATE_WALK;
 				else if (AI.bite)
 				{
@@ -115,9 +113,8 @@ namespace TEN::Entities::TR4
 			case SSCORPION_STATE_WALK:
 				creature->MaxTurn = ANGLE(6.0f);
 
-				if (AI.distance >= pow(341, 2))
+				if (AI.distance >= pow(attackRange, 2))
 				{
-					if (AI.distance > pow(213, 2))
 						item->Animation.TargetState = SSCORPION_STATE_RUN;
 				}
 				else
@@ -128,7 +125,7 @@ namespace TEN::Entities::TR4
 			case SSCORPION_STATE_RUN:
 				creature->MaxTurn = ANGLE(8.0f);
 
-				if (AI.distance < pow(341, 2))
+				if (AI.distance < pow(attackRange, 2))
 					item->Animation.TargetState = SSCORPION_STATE_IDLE;
 
 				break;
@@ -149,24 +146,28 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x1B00100)
+					if (item->TouchBits & 0x6C00100)
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
 						{
-							Lara.PoisonPotency += 2;
-							LaraItem->HitPoints -= 20;
+							
 							LaraItem->HitStatus = true;
 
 							short rotation;
 							BITE_INFO* biteInfo;
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 							{
+								//Pinzers Attack
+								LaraItem->HitPoints -= 20;
 								rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo1;
 							}
 							else
 							{
+								//Tail Attack
+								Lara.PoisonPotency += 2;
+								LaraItem->HitPoints -= 20;
 								rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo2;
 							}
