@@ -21,6 +21,7 @@ enum CobraState
 	COBRA_STATE_IDLE = 1,
 	COBRA_STATE_ATTACK = 2,
 	COBRA_STATE_SLEEP = 3,
+	COBRA_STATE_DEATH = 4,
 };
 
 
@@ -59,11 +60,11 @@ void CobraControl(short itemNumber)
 
 	if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
 	{
-		if (item->Animation.ActiveState != 4)
+		if (item->Animation.ActiveState != COBRA_STATE_DEATH)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_DEATH;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = 4; //Core prob made a mistake putting 4 as this block of code clearly makes cobra die but I'll leave it for now - Kubsy 2022/06/01
+			item->Animation.ActiveState = COBRA_STATE_DEATH;
 		}
 	}
 	else
