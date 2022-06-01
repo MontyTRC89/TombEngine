@@ -86,6 +86,7 @@ namespace TEN::Entities::TR4
 		short joint1 = 0;
 		short joint2 = 0;
 		short joint3 = 0;
+		short attackRange = 1340;
 
 		int x = item->Pose.Position.x + 682 * phd_sin(item->Pose.Orientation.y);
 		int z = item->Pose.Position.z + 682 * phd_cos(item->Pose.Orientation.y);
@@ -232,7 +233,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(1365, 2))
+				if (AI.distance > pow(attackRange, 2))
 				{
 					item->Animation.TargetState = BSCORPION_STATE_WALK_FORWARD;
 					break;
@@ -242,7 +243,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->MaxTurn = ANGLE(2.0f);
 
-					if (GetRandomControl() & 1 &&
+					if (GetRandomControl() & 1 || //If random conditional, OR, troop is almost dying... choose the pincers attack.
 						creature->Enemy->HitPoints <= 15 &&
 						creature->Enemy->ObjectNumber == ID_TROOPS)
 					{
@@ -259,7 +260,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (AI.distance < pow(1365, 2))
+				if (AI.distance < pow(attackRange, 2))
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
 				else if (AI.distance > pow(853, 2))
 					item->Animation.TargetState = BSCORPION_STATE_RUN_FORWARD;
@@ -269,7 +270,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 
-				if (AI.distance < pow(1365, 2))
+				if (AI.distance < pow(attackRange, 2))
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
 
 				break;
@@ -312,7 +313,7 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y - ANGLE(180.0f),
 						DoBloodSplat);
 				}
-				else if (item->TouchBits & 0x1B00100)
+				else if (item->TouchBits & 0x6C00100)
 				{
 					LaraItem->HitPoints -= BIG_SCORPION_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;

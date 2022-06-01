@@ -94,6 +94,8 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 		short joint1 = 0;
 		short joint0 = 0;
+		short attackRange1 = SECTOR(1); //For jump attack
+		short attackRange2 = 550; //For bite attack
 
 		if (item->HitPoints <= 0)
 		{
@@ -313,7 +315,7 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->Mood == MoodType::Escape)
 						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
-					else if (AI.bite && AI.distance < pow(341, 2))
+					else if (AI.bite && AI.distance < pow(attackRange2, 2))
 					{
 						item->Animation.TargetState = DOG_STATE_BITE_ATTACK;
 						item->Animation.RequiredState = DOG_STATE_STALK;
