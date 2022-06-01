@@ -295,7 +295,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+					if (AI.bite && AI.distance < pow(attackRange1, 2))
 						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
 					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
