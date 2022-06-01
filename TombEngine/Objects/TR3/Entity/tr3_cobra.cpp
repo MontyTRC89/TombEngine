@@ -21,7 +21,11 @@ enum CobraState
 // TODO
 enum CobraAnim
 {
-
+	COBRA_ANIM_WAKE_IDLE = 0,
+	COBRA_ANIM_WAKE_UP = 1,
+	COBRA_ANIM_BACK_TO_SLEEP = 2,
+	COBRA_ANIM_BITE = 3,
+	COBRA_ANIM_DEATH = 4,
 };
 
 void InitialiseCobra(short itemNumber)
@@ -30,7 +34,7 @@ void InitialiseCobra(short itemNumber)
 
 	ClearItem(itemNumber);
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 2;
+	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_BACK_TO_SLEEP;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 45;
 	item->Animation.ActiveState = item->Animation.TargetState = 3;
 	item->ItemFlags[2] = item->HitStatus;
@@ -52,7 +56,7 @@ void CobraControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState != 4)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_DEATH;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = 4;
 		}
