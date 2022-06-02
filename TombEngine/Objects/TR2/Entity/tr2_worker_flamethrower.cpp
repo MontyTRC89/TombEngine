@@ -2,6 +2,7 @@
 #include "Objects/TR2/Entity/tr2_worker_flamethrower.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -96,11 +97,20 @@ void WorkerFlamethrower(short itemNumber)
 		if (item->Animation.ActiveState != 5 && item->Animation.ActiveState != 6)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-			AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
+
+			int dx = Camera.pos.x - item->Pose.Position.x;
+			int dz = Camera.pos.z - item->Pose.Position.z;
+			if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+				return;
+
+			TriggerPilotFlame(itemNumber, WorkerFlamethrowerBite.meshNum);
 		}
 		else
+		{
+			ThrowFire(itemNumber, WorkerFlamethrowerBite.meshNum, Vector3Int(0, 140, -4));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 14, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-
+		}
+			
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 
