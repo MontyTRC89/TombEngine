@@ -612,7 +612,7 @@ int SpeedBoatDynamics(ItemInfo* laraItem, short itemNumber)
 		{
 			laraItem->HitPoints -= sBoatItem->Animation.Velocity;
 			laraItem->HitStatus = true;
-			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose, 0);
+			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose);
 			newVelocity /= 2;
 			sBoatItem->Animation.Velocity /= 2;
 		}
@@ -1043,7 +1043,7 @@ void SpeedBoatControl(short itemNumber)
 	sBoat->Pitch += (pitch - sBoat->Pitch) / 4;
 
 	int fx = (sBoatItem->Animation.Velocity > 8) ? SFX_TR2_SPEEDBOAT_MOVING : (drive ? SFX_TR2_SPEEDBOAT_IDLE : SFX_TR2_SPEEDBOAT_ACCELERATE);
-	SoundEffect(fx, &sBoatItem->Pose, 0, sBoat->Pitch / (float)BOAT_MAX_VELOCITY);
+	SoundEffect(fx, &sBoatItem->Pose, SoundEnvironment::Land, 1.0f + sBoat->Pitch / (float)BOAT_MAX_VELOCITY / 4.0f);
 
 	if (sBoatItem->Animation.Velocity && (water - 5) == sBoatItem->Pose.Position.y)
 		DoBoatWakeEffect(sBoatItem);

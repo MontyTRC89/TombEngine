@@ -727,7 +727,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 
 		if (!lara->HitFrame && !lara->SpasmEffectCount)
 		{
-			SoundEffect(SFX_TR4_LARA_INJURY, &item2->Pose, 0);
+			SoundEffect(SFX_TR4_LARA_INJURY, &item2->Pose);
 			lara->SpasmEffectCount = GenerateInt(15, 35);
 		}
 

@@ -928,6 +928,14 @@ enum class HandStatus
 	Special
 };
 
+enum class TorchState : int
+{
+	Holding,
+	Throwing,
+	Dropping,
+	JustLit
+};
+
 enum class JumpDirection
 {
 	None,
@@ -1062,8 +1070,6 @@ struct CarriedWeaponInfo
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
 };
 
-// TODO: There is an abandoned WeaponInfo struct in ten_savegame.fbs.
-
 struct ArmInfo
 {
 	int AnimNumber;
@@ -1081,6 +1087,12 @@ struct FlareData
 	unsigned int Life;
 	int Frame;
 	bool ControlLeft;
+};
+
+struct TorchData
+{
+	TorchState State;
+	bool IsLit;
 };
 
 #define MaxDiaryPages	  64
@@ -1248,7 +1260,7 @@ struct LaraInfo
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare;
-	bool LitTorch;
+	TorchData Torch;
 
 	Vector3Shrt ExtraHeadRot;
 	Vector3Shrt ExtraTorsoRot;

@@ -68,7 +68,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 					item->ItemFlags[1] = 1;
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose, 0);
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
 					item->Pose.Position.y -= 4;
 				}
 			}
@@ -78,7 +78,7 @@ void TwoBlocksPlatformControl(short itemNumber)
 					item->ItemFlags[1] = -1;
 				else
 				{
-					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose, 0);
+					SoundEffect(SFX_TR4_RUMBLE_NEXTDOOR, &item->Pose);
 					item->Pose.Position.y += 4;
 				}
 			}

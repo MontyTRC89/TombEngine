@@ -895,7 +895,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// TODO: In WAD.
-	SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose, 0);
+	SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose);
 
 	if (TrInput & IN_ACTION)
 	{

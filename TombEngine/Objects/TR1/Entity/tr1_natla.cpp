@@ -110,7 +110,7 @@ void NatlaControl(short itemNumber)
 				{
 					auto* fx = &EffectList[FXNumber];
 					gun = fx->pos.Orientation.x;
-					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
+					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos);
 				}
 
 				timer = 0;
@@ -128,7 +128,7 @@ void NatlaControl(short itemNumber)
 				{
 					auto* fx = &EffectList[FXNumber];
 					gun = fx->pos.Orientation.x;
-					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos, NULL);
+					SoundEffect(SFX_TR1_ATLANTEAN_BALL, &fx->pos);
 				}
 
 				timer = 0;
@@ -241,7 +241,7 @@ void NatlaControl(short itemNumber)
 				{
 					auto* fx = &EffectList[FXNumber];
 					gun = fx->pos.Orientation.x;
-					SoundEffect(SFX_TR1_ATLANTEAN_WINGS, &fx->pos, NULL);
+					SoundEffect(SFX_TR1_ATLANTEAN_WINGS, &fx->pos);
 				}
 
 				timer = 0;

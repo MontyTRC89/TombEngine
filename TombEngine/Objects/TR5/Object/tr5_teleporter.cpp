@@ -56,7 +56,7 @@ void ControlTeleporter(short itemNumber)
 				}
 
 				ItemInfo* targetItem = &g_Level.Items[item->itemFlags[1]];
-				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, (flags << 8) | 8);
+				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, SoundEnvironment::Land);
 
 				if (GlobalCounter & 1)
 				{
@@ -97,7 +97,7 @@ void ControlTeleporter(short itemNumber)
 					auto B = v24 >> 2;
 					Weather.Flash(R, G, B, 0.03f);
 
-					LOBYTE(v3) = SoundEffect(SFX_TR5_TELEPORT_CRACKLES, 0, 0);
+					LOBYTE(v3) = SoundEffect(SFX_TR5_TELEPORT_CRACKLES, nullptr);
 				}
 				if (!(GlobalCounter & 3))
 				{
@@ -169,7 +169,7 @@ void ControlTeleporter(short itemNumber)
 			FlashFadeB = 64;
 			FlashFader = 32;
 			item->itemFlags[2] = 1;
-			SoundEffect(SFX_TR5_TELEPORT_FLASH, 0, (int)& unk_800004);
+			SoundEffect(SFX_TR5_TELEPORT_FLASH, nullptr, SoundEnvironment::Land);
 		}
 	}*/
 
@@ -179,8 +179,8 @@ void ControlTeleporter(short itemNumber)
 	{
 		if (item->ItemFlags[0] == 70)
 		{
-			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, 0, 0);
-			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, 0, 0);
+			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR1, nullptr);
+			SoundEffect(SFX_TR5_LIFT_HIT_FLOOR2, nullptr);
 		}
 
 		LaraItem->Animation.AnimNumber = LA_ELEVATOR_RECOVER;

@@ -2,29 +2,33 @@
 #include "Specific/phd_global.h"
 #include "Game/items.h"
 
-struct BaboonRespawnStruct
+namespace TEN::Entities::TR4
 {
-	int ID;
-	PHD_3DPOS Pos;
-	unsigned int Count;
-	unsigned int MaxCount;  // Used to limit the number of respawns.
-};
+	struct BaboonRespawnData
+	{
+		int ID;
+		PHD_3DPOS Pose;
+		unsigned int Count;
+		unsigned int MaxCount;  // Used to limit the number of respawns.
+	};
 
-class BaboonRespawnClass
-{
-private:
-	std::vector<BaboonRespawnStruct> baboonRespawnArray;
-public:
-	void Free(void);
-	void Add(ItemInfo* item, unsigned int maxCount);
-	void Remove(int ID);
-	int GetBaboonFreePlace(void);
-	BaboonRespawnStruct* GetBaboonRespawn(int ID);
-	int GetCount(int ID);
-	int GetCountMax(int ID);
-};
+	class BaboonRespawner
+	{
+	private:
+		std::vector<BaboonRespawnData> BaboonRespawnArray;
 
-extern BaboonRespawnClass BaboonRespawn;
+	public:
+		void Free(void);
+		void Add(ItemInfo* item, unsigned int maxCount);
+		void Remove(int ID);
+		int GetBaboonFreePlace(void);
+		BaboonRespawnData* GetBaboonRespawn(int ID);
+		int GetCount(int ID);
+		int GetCountMax(int ID);
+	};
 
-extern void InitialiseBaboon(short itemNumber);
-extern void BaboonControl(short itemNumber);
+	extern BaboonRespawner BaboonRespawn;
+
+	extern void InitialiseBaboon(short itemNumber);
+	extern void BaboonControl(short itemNumber);
+}

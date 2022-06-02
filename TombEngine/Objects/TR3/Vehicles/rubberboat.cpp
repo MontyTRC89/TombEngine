@@ -473,7 +473,7 @@ static int RubberBoatDynamics(ItemInfo* laraItem, short itemNumber)
 		{
 			laraItem->HitPoints -= rBoatItem->Animation.Velocity;
 			laraItem->HitStatus = 1;
-			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose, 0);
+			SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose);
 			newVelocity /= 2;
 			rBoatItem->Animation.Velocity /= 2;
 		}
@@ -1032,9 +1032,9 @@ void RubberBoatControl(short itemNumber)
 	rBoat->Pitch += ((pitch - rBoat->Pitch) / 4);
 
 	if (rBoatItem->Animation.Velocity > 8)
-		SoundEffect(SFX_TR3_RUBBERBOAT_MOVING, &rBoatItem->Pose, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+		SoundEffect(SFX_TR3_RUBBERBOAT_MOVING, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
 	else if (drive)
-		SoundEffect(SFX_TR3_RUBBERBOAT_IDLE, &rBoatItem->Pose, 0, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+		SoundEffect(SFX_TR3_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
 
 	if (lara->Vehicle != itemNumber)
 		return;

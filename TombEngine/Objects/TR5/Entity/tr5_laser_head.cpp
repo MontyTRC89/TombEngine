@@ -224,7 +224,7 @@ void LaserHeadControl(short itemNumber)
 						tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd &&
 						tentacleItem->MeshBits & 1)
 					{
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose);
 						ExplodeItemNode(tentacleItem, 0, 0, 128);
 						KillItem(creature->Tentacles[i]);
 					}
@@ -263,10 +263,10 @@ void LaserHeadControl(short itemNumber)
 				g_Level.Items[creature->PuzzleItem].Pose.Position.y = item->Pose.Position.y;
 				TestTriggers(item, true);
 
-				SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose, 0x800004);
-				SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 20971524);
-				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0);
-				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 4194308);
+				SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose, SoundEnvironment::Land, 0.5f);
+				SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, SoundEnvironment::Land, 1.25f);
+				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
+				SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.25f);
 
 				KillItem(itemNumber);
 			}
@@ -408,7 +408,7 @@ void LaserHeadControl(short itemNumber)
 			{
 				if (item->ItemFlags[3] <= 90)
 				{
-					SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item->Pose, 0);
+					SoundEffect(SFX_TR5_GOD_HEAD_CHARGE, &item->Pose);
 					LaserHeadCharge(item);
 					item->ItemFlags[3]++;
 				}
@@ -467,7 +467,7 @@ void LaserHeadControl(short itemNumber)
 									LaserHeadData.fireArcs[i] != NULL)
 								{
 									// Eye is aready firing
-									SoundEffect(SFX_TR5_GOD_HEAD_LASERLOOPS, &item->Pose, 0);
+									SoundEffect(SFX_TR5_GOD_HEAD_LASERLOOPS, &item->Pose);
 
 									LaserHeadData.fireArcs[i]->pos1.x = src.x;
 									LaserHeadData.fireArcs[i]->pos1.y = src.y;
@@ -480,7 +480,7 @@ void LaserHeadControl(short itemNumber)
 									LaserHeadData.LOS[i] = LOS(&src, &dest);
 									//LaserHeadData.fireArcs[i] = TriggerEnergyArc((Vector3Int*)& src, (Vector3Int*)& dest, r, g, b, 32, 64, 64, ENERGY_ARC_NO_RANDOMIZE, ENERGY_ARC_STRAIGHT_LINE); // (GetRandomControl() & 7) + 4, b | ((&unk_640000 | g) << 8), 12, 64, 5);
 									StopSoundEffect(SFX_TR5_GOD_HEAD_CHARGE);
-									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose, 0);
+									SoundEffect(SFX_TR5_GOD_HEAD_BLAST, &item->Pose);
 								}
 
 								auto* currentArc = LaserHeadData.fireArcs[i];

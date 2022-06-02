@@ -67,7 +67,7 @@ void ControlMissile(short fxNumber)
 			//			fx->frameNumber = -GetRandomControl()/11000;
 			//			fx->counter = 6;
 			//			fx->objectNumber = RICOCHET1;
-			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? 10 : 258, &fx->pos, 0);
+			SoundEffect((fx->objectNumber == ID_SCUBA_HARPOON) ? SFX_TR4_LARA_RICOCHET : SFX_TR2_CIRCLE_BLADE_HIT, &fx->pos);
 		}
 		/*else if (fx->objectNumber == DRAGON_FIRE)
 		{
@@ -96,13 +96,13 @@ void ControlMissile(short fxNumber)
 		/*if (fx->objectNumber == KNIFE)
 		{
 			LaraItem->HitPoints -= KNIFE_DAMAGE;
-			SoundEffect(317, &fx->pos, 0);
+			SoundEffect(317, &fx->pos);
 			KillEffect(fx_number);
 		}
 		else*/ if (fx->objectNumber == ID_SCUBA_HARPOON)
 		{
 			LaraItem->HitPoints -= DIVER_HARPOON_DAMAGE;
-			SoundEffect(317, &fx->pos, 0);
+			SoundEffect(317, &fx->pos);
 			KillEffect(fxNumber);
 		}
 
@@ -119,7 +119,7 @@ void ControlMissile(short fxNumber)
 	/*else if (fx->objectNumber == DRAGON_FIRE && !fx->counter--)
 	{
 		AddDynamicLight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 14, 11);
-		SoundEffect(305, &fx->pos, 0);
+		SoundEffect(305, &fx->pos);
 		KillEffect(fx_number);
 	}
 	else if (fx->objectNumber == KNIFE)

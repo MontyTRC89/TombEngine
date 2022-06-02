@@ -354,7 +354,7 @@ void GuardControl(short itemNumber)
 				item->ItemFlags[0]++;
 				if (item->ItemFlags[0] > 60 && !(GetRandomControl() & 0xF))
 				{
-					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Pose, 0);
+					SoundEffect(SFX_TR5_BIO_BREATHE_OUT, &item->Pose);
 					item->ItemFlags[0] = 0;
 				}
 			}
@@ -682,7 +682,7 @@ void GuardControl(short itemNumber)
 			{
 				item->TriggerFlags = 0;
 				TestTriggers(item, true);
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose, 0);
+				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose);
 			}
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{

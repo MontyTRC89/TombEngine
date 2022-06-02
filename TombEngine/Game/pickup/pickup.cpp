@@ -212,7 +212,7 @@ void DoPickup(ItemInfo* laraItem)
 	{
 		AddDisplayPickup(ID_BURNING_TORCH_ITEM);
 		GetFlameTorch();
-		lara->LitTorch = (pickupItem->ItemFlags[3] & 1);
+		lara->Torch.IsLit = (pickupItem->ItemFlags[3] & 1);
 
 		KillItem(pickupItemNumber);
 		pickupItem->Pose.Orientation.x = oldXrot;

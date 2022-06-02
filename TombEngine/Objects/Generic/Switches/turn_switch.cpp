@@ -185,7 +185,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 58 &&
 				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_CLOCKWISE_START].frameBase + 115)
 			{
-				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Pose, 2);
+				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Pose, SoundEnvironment::Always);
 			}
 		}
 		else
@@ -211,7 +211,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.FrameNumber >= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 58 &&
 				laraItem->Animation.FrameNumber <= g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_START].frameBase + 115)
 			{
-				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Pose, 2);
+				SoundEffect(SFX_TR4_PUSHABLE_SOUND, &switchItem->Pose, SoundEnvironment::Always);
 			}
 		}
 

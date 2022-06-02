@@ -88,6 +88,18 @@ table FlareData {
 	control_left: bool;
 }
 
+enum TorchState:int32 { 
+	holding = 0,
+	throwing,
+	dropping,
+	just_lit
+}
+
+table TorchData {
+	state: TorchState;
+	is_lit: bool;
+}
+
 table LaraInventoryData {
 	is_busy: bool;
 	old_busy: bool;
@@ -204,7 +216,7 @@ table Lara {
 	inventory: LaraInventoryData;
 	weapons: [CarriedWeaponInfo];
 	flare: FlareData;
-	lit_torch: bool;
+	torch: TorchData;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
 	extra_velocity: Vector3;
