@@ -16,10 +16,9 @@ namespace TEN::Entities::TR4
 
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
-	constexpr auto DOG_RANGE_ATTACK_BITE = SECTOR(0.55);
-	constexpr auto DOG_RANGE_ATTACK_JUMP = SECTOR(1);
+	constexpr auto DOG_BITE_ATTACK_RANGE = SECTOR(0.55);
+	constexpr auto DOG_JUMP_ATTACK_RANGE = SECTOR(1);
 	
-
 	enum DogState
 	{
 		DOG_STATE_NONE = 0,
@@ -296,7 +295,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.bite && AI.distance < pow(DOG_RANGE_ATTACK_JUMP, 2))
+					if (AI.bite && AI.distance < pow(DOG_JUMP_ATTACK_RANGE, 2))
 						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
 					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
@@ -316,7 +315,7 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->Mood == MoodType::Escape)
 						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
-					else if (AI.bite && AI.distance < pow(DOG_RANGE_ATTACK_BITE, 2))
+					else if (AI.bite && AI.distance < pow(DOG_BITE_ATTACK_RANGE, 2))
 					{
 						item->Animation.TargetState = DOG_STATE_BITE_ATTACK;
 						item->Animation.RequiredState = DOG_STATE_STALK;

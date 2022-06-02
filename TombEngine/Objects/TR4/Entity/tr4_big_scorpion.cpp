@@ -22,8 +22,7 @@ namespace TEN::Entities::TR4
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
 	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
-	constexpr auto BIG_SCORPION_RANGE_ATTACK = SECTOR(1.35);
-	constexpr auto BIG_SCORPION_RADIUS = SECTOR(0.68f);
+	constexpr auto BIG_SCORPION_ATTACK_RANGE = SECTOR(1.35);
 
 	enum BigScorpionState
 	{
@@ -89,41 +88,41 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 		short joint3 = 0;
 
-		int x = item->Pose.Position.x + BIG_SCORPION_RADIUS * phd_sin(item->Pose.Orientation.y);
-		int z = item->Pose.Position.z + BIG_SCORPION_RADIUS * phd_cos(item->Pose.Orientation.y);
+		int x = item->Pose.Position.x + SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
+		int z = item->Pose.Position.z + SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
 
 		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 		int height1 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height1) > CLICK(2))
 			probe.Position.Floor = item->Pose.Position.y;
 
-		x = item->Pose.Position.x - BIG_SCORPION_RADIUS * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z - BIG_SCORPION_RADIUS * phd_cos(item->Pose.Orientation.y);
+		x = item->Pose.Position.x - SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z - SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
 
 		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 		int height2 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height2) > CLICK(2))
 			height2 = item->Pose.Position.y;
 
-		short angle1 = phd_atan(1344, height2 - height1);
+		short angle1 = phd_atan((SECTOR(1.34), height2 - height1);
 
-		x = item->Pose.Position.x - BIG_SCORPION_RADIUS * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z + BIG_SCORPION_RADIUS * phd_cos(item->Pose.Orientation.y);
+		x = item->Pose.Position.x - SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z + SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
 
 		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 		int height3 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height3) > CLICK(2))
 			height3 = item->Pose.Position.y;
 
-		x = item->Pose.Position.x + BIG_SCORPION_RADIUS * phd_sin(item->Pose.Orientation.y);
-		z = item->Pose.Position.z - BIG_SCORPION_RADIUS * phd_cos(item->Pose.Orientation.y);
+		x = item->Pose.Position.x + SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z - SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
 
 		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 		int height4 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height4) > CLICK(2))
 			height4 = item->Pose.Position.y;
 
-		short angle2 = phd_atan(1344, height4 - height3);
+		short angle2 = phd_atan(SECTOR(1.34), height4 - height3);
 
 		if (item->HitPoints <= 0)
 		{
@@ -234,7 +233,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(BIG_SCORPION_RANGE_ATTACK, 2))
+				if (AI.distance > pow(BIG_SCORPION_ATTACK_RANGE, 2))
 				{
 					item->Animation.TargetState = BSCORPION_STATE_WALK_FORWARD;
 					break;
@@ -261,7 +260,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (AI.distance < pow(BIG_SCORPION_RANGE_ATTACK, 2))
+				if (AI.distance < pow(BIG_SCORPION_ATTACK_RANGE, 2))
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
 				else if (AI.distance > pow(853, 2))
 					item->Animation.TargetState = BSCORPION_STATE_RUN_FORWARD;
@@ -271,7 +270,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 
-				if (AI.distance < pow(BIG_SCORPION_RANGE_ATTACK, 2))
+				if (AI.distance < pow(BIG_SCORPION_ATTACK_RANGE, 2))
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
 
 				break;
@@ -395,5 +394,7 @@ namespace TEN::Entities::TR4
 
 		if (!CutSeqNum)
 			CreatureAnimation(itemNumber, angle, 0);
+	
 	}
+
 }
