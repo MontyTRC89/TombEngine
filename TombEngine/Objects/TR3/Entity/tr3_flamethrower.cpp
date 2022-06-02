@@ -2,6 +2,7 @@
 #include "Objects/TR3/Entity/tr3_flamethrower.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
@@ -185,6 +186,12 @@ void FlameThrowerControl(short itemNumber)
 	if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3); 
+
+		int dx = Camera.pos.x - item->Pose.Position.x;
+		int dz = Camera.pos.z - item->Pose.Position.z;
+		if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+			return;
+
 		TriggerPilotFlame(itemNumber, 7);
 	}
 	else
