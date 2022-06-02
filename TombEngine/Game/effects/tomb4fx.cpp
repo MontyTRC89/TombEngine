@@ -201,6 +201,97 @@ void TriggerGlobalFireFlame()
 	spark->dSize = spark->size;
 }
 
+void TriggerPilotFlame(int itemNum, int meshIndex)
+{
+	auto* item = &g_Level.Items[itemNum];
+	auto* spark = &Sparks[GetFreeSpark()];
+
+	spark->on = 1;
+	spark->sR = 48 + (GetRandomControl() & 31);
+	spark->sG = spark->sR;
+	spark->sB = 192 + (GetRandomControl() & 63);
+
+	spark->dR = 192 + (GetRandomControl() & 63);
+	spark->dG = 128 + (GetRandomControl() & 63);
+	spark->dB = 32;
+
+	spark->colFadeSpeed = 12 + (GetRandomControl() & 3);
+	spark->fadeToBlack = 4;
+	spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
+	spark->transType = TransTypeEnum::COLADD;
+	spark->extras = 0;
+	spark->dynamic = -1;
+	spark->fxObj = itemNum;
+
+	spark->x = (GetRandomControl() & 31) - 16;
+	spark->y = (GetRandomControl() & 31) - 16;
+	spark->z = (GetRandomControl() & 31) - 16;
+
+	spark->xVel =  (GetRandomControl() & 31) - 16;
+	spark->yVel = -(GetRandomControl() & 3);
+	spark->zVel =  (GetRandomControl() & 31) - 16;
+
+	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
+	spark->nodeNumber = meshIndex;
+	spark->friction = 4;
+	spark->gravity = -(GetRandomControl() & 3) - 2;
+	spark->maxYvel = -(GetRandomControl() & 3) - 4;
+	//spark->def = Objects[EXPLOSION1].mesh_index;
+	spark->scalar = 0;
+	int size = (GetRandomControl() & 7) + 32;
+	spark->size = size / 2;
+	spark->dSize = size;
+}
+
+void ThrowFire(int itemNum, int meshIndex, Vector3Int offset)
+{
+	auto* item = &g_Level.Items[itemNum];
+
+	for (int i = 0; i < 3; i++)
+	{
+		auto* spark = &Sparks[GetFreeSpark()];
+
+		spark->on = 1;
+		spark->sR = (GetRandomControl() & 0x1F) + 48;
+		spark->sG = 48;
+		spark->sB = 255;
+		spark->dR = (GetRandomControl() & 0x3F) - 64;
+		spark->dG = (GetRandomControl() & 0x3F) + -128;
+		spark->dB = 32;
+		spark->colFadeSpeed = 12;
+		spark->fadeToBlack = 8;
+		spark->transType = TransTypeEnum::COLADD;
+
+		auto pos1 = Vector3Int(-4, -30, -4) + offset;
+		GetJointAbsPosition(item, &pos1, meshIndex);
+
+		spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
+		spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
+		spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
+
+		auto pos2 = Vector3Int(-4, -30, -4) + offset * 2;
+		GetJointAbsPosition(item, &pos2, meshIndex);
+
+		int v = (GetRandomControl() & 0x3F) + 192;
+
+		spark->life = spark->sLife = v / 6;
+
+		spark->xVel = v * (pos2.x - pos1.x) / 10;
+		spark->yVel = v * (pos2.y - pos1.y) / 10;
+		spark->zVel = v * (pos2.z - pos1.z) / 10;
+
+		spark->friction = 85;
+		spark->gravity = -16 - (GetRandomControl() & 0x1F);
+		spark->maxYvel = 0;
+		spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+
+		spark->scalar = 3;
+		spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
+		spark->sSize = spark->dSize / 4;
+		spark->size = spark->dSize / 2;
+	}
+}
+
 void keep_those_fires_burning()
 {
 	TriggerGlobalStaticFlame();
