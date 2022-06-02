@@ -944,7 +944,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_items(serializedItemsOffset);
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
-	sgb.add_next_fx_free(NextFxActive);
+	sgb.add_next_fx_active(NextFxActive);
 	sgb.add_ambient_track(bgmTrackOffset);
 	sgb.add_ambient_position(bgmTrackData.second);
 	sgb.add_oneshot_track(oneshotTrackOffset);
