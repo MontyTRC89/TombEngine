@@ -18,7 +18,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SMALL_SCORPION_PINCERS_ATTACK_DAMAGE = 50;
 	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE = 20;
 	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
-	constexpr auto SMALL_SCORPION_RANGE_ATTACK = SECTOR(0.314);
+	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SECTOR(0.31);
 
 	enum SmallScorionState
 	{
@@ -99,7 +99,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(SMALL_SCORPION_RANGE_ATTACK, 2))
+				if (AI.distance > pow(SMALL_SCORPION_ATTACK_RANGE, 2))
 					item->Animation.TargetState = SSCORPION_STATE_WALK;
 				else if (AI.bite)
 				{
@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 			case SSCORPION_STATE_WALK:
 				creature->MaxTurn = ANGLE(6.0f);
 
-				if (AI.distance >= pow(SMALL_SCORPION_RANGE_ATTACK, 2))
+				if (AI.distance >= pow(SMALL_SCORPION_ATTACK_RANGE, 2))
 				{
 						item->Animation.TargetState = SSCORPION_STATE_RUN;
 				}
@@ -129,7 +129,7 @@ namespace TEN::Entities::TR4
 			case SSCORPION_STATE_RUN:
 				creature->MaxTurn = ANGLE(8.0f);
 
-				if (AI.distance < pow(SMALL_SCORPION_RANGE_ATTACK, 2))
+				if (AI.distance < pow(SMALL_SCORPION_ATTACK_RANGE, 2))
 					item->Animation.TargetState = SSCORPION_STATE_IDLE;
 
 				break;
@@ -164,7 +164,7 @@ namespace TEN::Entities::TR4
 							{
 								//Pinzers Attack
 								LaraItem->HitPoints -= SMALL_SCORPION_PINCERS_ATTACK_DAMAGE;
-								rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
+								rotation = item->Pose.Orientation.y - ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo1;
 							}
 							else
@@ -172,7 +172,7 @@ namespace TEN::Entities::TR4
 								//Tail Attack
 								Lara.PoisonPotency += SMALL_SCORPION_STINGER_POISON_POTENCY;
 								LaraItem->HitPoints -= SMALL_SCORPION_STINGER_ATTACK_DAMAGE;
-								rotation = item->Pose.Orientation.y + -ANGLE(180.0f);
+								rotation = item->Pose.Orientation.y - ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo2;
 							}
 
