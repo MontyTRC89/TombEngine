@@ -186,18 +186,12 @@ void FlameThrowerControl(short itemNumber)
 	if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3); 
-
-		int dx = Camera.pos.x - item->Pose.Position.x;
-		int dz = Camera.pos.z - item->Pose.Position.z;
-		if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
-			return;
-
 		TriggerPilotFlame(itemNumber, 7);
 	}
 	else
 	{
-		ThrowFire(itemNumber, FlamethrowerBite.meshNum, Vector3Int(0, 140, -4));
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random / 16) & 3), 24 - ((random / 64) & 3), random & 7);
+		ThrowFire(itemNumber, FlamethrowerBite.meshNum, Vector3Int(0, 140, -4));
 	}
 
 	if (item->HitPoints <= 0)

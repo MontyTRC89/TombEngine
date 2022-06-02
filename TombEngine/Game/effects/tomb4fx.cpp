@@ -204,6 +204,12 @@ void TriggerGlobalFireFlame()
 void TriggerPilotFlame(int itemNum, int meshIndex)
 {
 	auto* item = &g_Level.Items[itemNum];
+
+	int dx = Camera.pos.x - item->Pose.Position.x;
+	int dz = Camera.pos.z - item->Pose.Position.z;
+	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+		return;
+
 	auto* spark = &Sparks[GetFreeSpark()];
 
 	spark->on = 1;

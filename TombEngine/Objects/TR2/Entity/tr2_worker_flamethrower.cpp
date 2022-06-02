@@ -97,18 +97,12 @@ void WorkerFlamethrower(short itemNumber)
 		if (item->Animation.ActiveState != 5 && item->Animation.ActiveState != 6)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-
-			int dx = Camera.pos.x - item->Pose.Position.x;
-			int dz = Camera.pos.z - item->Pose.Position.z;
-			if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
-				return;
-
 			TriggerPilotFlame(itemNumber, WorkerFlamethrowerBite.meshNum);
 		}
 		else
 		{
-			ThrowFire(itemNumber, WorkerFlamethrowerBite.meshNum, Vector3Int(0, 140, -4));
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 14, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
+			ThrowFire(itemNumber, WorkerFlamethrowerBite.meshNum, Vector3Int(0, 140, -4));
 		}
 			
 		AI_INFO AI;
