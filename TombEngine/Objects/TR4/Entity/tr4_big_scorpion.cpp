@@ -18,7 +18,7 @@ namespace TEN::Entities::TR4
 
 	BITE_INFO BigScorpionBite1 = { 0, 0, 0, 8 };
 	BITE_INFO BigScorpionBite2 = { 0, 0, 0, 23 };
-	std::vector<int> BigScorpionTouchBits = { 8, 22, 23 };
+	std::vector<int> BigScorpionTouchBits = { 8, 22, 24 };
 
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
