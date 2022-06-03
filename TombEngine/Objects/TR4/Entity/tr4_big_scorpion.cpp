@@ -18,6 +18,7 @@ namespace TEN::Entities::TR4
 
 	BITE_INFO BigScorpionBite1 = { 0, 0, 0, 8 };
 	BITE_INFO BigScorpionBite2 = { 0, 0, 0, 23 };
+	std::vector<int> BigScorpionTouchBits = { 8, 22, 23 };
 
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
@@ -104,7 +105,7 @@ namespace TEN::Entities::TR4
 		if (abs(item->Pose.Position.y - height2) > CLICK(2))
 			height2 = item->Pose.Position.y;
 
-		short angle1 = phd_atan((SECTOR(1.34), height2 - height1);
+		short angle1 = phd_atan(SECTOR(1.34), height2 - height1);
 
 		x = item->Pose.Position.x - SECTOR(0.68f) * phd_sin(item->Pose.Orientation.y);
 		z = item->Pose.Position.z + SECTOR(0.68f) * phd_cos(item->Pose.Orientation.y);
@@ -313,7 +314,7 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y - ANGLE(180.0f),
 						DoBloodSplat);
 				}
-				else if (item->TouchBits & 0x6C00100)
+				else if (item->CheckTouchBits(BigScorpionTouchBits))
 				{
 					LaraItem->HitPoints -= BIG_SCORPION_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;
@@ -354,9 +355,8 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				{
 					item->TriggerFlags++;
-				}
+
 				if (creature->Enemy &&
 					creature->Enemy->HitPoints <= 0 ||
 					item->TriggerFlags > 6)
@@ -394,7 +394,5 @@ namespace TEN::Entities::TR4
 
 		if (!CutSeqNum)
 			CreatureAnimation(itemNumber, angle, 0);
-	
 	}
-
 }
