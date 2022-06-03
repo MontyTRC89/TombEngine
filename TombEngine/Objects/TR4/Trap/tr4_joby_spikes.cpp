@@ -28,7 +28,7 @@ namespace TEN::Entities::TR4
         //v6 = 1321528399i64 * ((probe.Position.Floor - probe.Position.Ceiling) << 12);
         //item->itemFlags[3] = (HIDWORD(v6) >> 31) + (SHIDWORD(v6) >> 10);
 
-        item->ItemFlags[3] = (short)((probe.Position.Floor - probe.Position.Ceiling) * 1024 * 12 / 13);
+        item->ItemFlags[3] = (short)(probe.Position.Floor - probe.Position.Ceiling);
     }
 
     void JobySpikesControl(short itemNumber)
