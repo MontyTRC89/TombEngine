@@ -12,6 +12,23 @@
 
 using namespace TEN::Floordata;
 
+bool ItemInfo::CheckTouchBits(std::vector<int> meshIndices)
+{
+	for (int i = 0; i < meshIndices.size(); i++)
+	{
+		if ((TouchBits & ((uint64_t)1 << meshIndices[i])) == ((uint64_t)1 << meshIndices[i]))
+			return true;
+	}
+
+	return false;
+}
+
+void ItemInfo::SetTouchBits(std::vector<int> meshIndices)
+{
+	for (int i = 0; i < meshIndices.size(); i++)
+		this->TouchBits |= (uint64_t)1 << meshIndices[i];
+}
+
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -76,13 +93,10 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
-
 		g_GameScriptEntities->NotifyKilled(item);
 		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
 		if (!item->LuaCallbackOnKilledName.empty())
-		{
 			g_GameScript->ExecuteFunction(item->LuaCallbackOnKilledName, itemNumber);
-		}
 
 		item->LuaName.clear();
 		item->LuaCallbackOnKilledName.clear();
@@ -96,10 +110,7 @@ void KillItem(short const itemNumber)
 			NextItemFree = itemNumber;
 		}
 		else
-		{
 			item->Flags |= IFLAG_KILLED;
-		}
-
 	}
 }
 

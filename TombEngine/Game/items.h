@@ -94,7 +94,7 @@ struct ItemInfo
 	int Timer;
 	short Shade;
 
-	uint32_t TouchBits;
+	uint64_t TouchBits;
 	uint32_t MeshBits;
 
 	uint16_t Flags; // ItemFlags enum
@@ -113,6 +113,9 @@ struct ItemInfo
 	std::string LuaCallbackOnHitName;
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
+	
+	bool CheckTouchBits(std::vector<int> meshIndices);
+	void SetTouchBits(std::vector<int> meshIndices);
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);
