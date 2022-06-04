@@ -6,7 +6,7 @@ struct CollisionInfo;
 
 constexpr auto MAX_TARGETS = 8;
 
-	enum class FireWeaponType
+enum class FireWeaponType
 {
 	Miss = -1,
 	NoAmmo = 0,

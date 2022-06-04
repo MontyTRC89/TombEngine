@@ -679,9 +679,18 @@ namespace TEN::Renderer
 
 			m_staticObjects[StaticObjectsIds[i]] = staticObject;
 		}
-		m_staticsVertexBuffer = VertexBuffer(m_device.Get(), staticsVertices.size(), staticsVertices.data());
-		m_staticsIndexBuffer = IndexBuffer(m_device.Get(), staticsIndices.size(), staticsIndices.data());
 
+		if (staticsVertices.size() > 0)
+		{
+			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), staticsVertices.size(), staticsVertices.data());
+			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), staticsIndices.size(), staticsIndices.data());
+		}
+		else
+		{
+			m_staticsVertexBuffer = VertexBuffer(m_device.Get(), 1);
+			m_staticsIndexBuffer = IndexBuffer(m_device.Get(), 1);
+		}
+		
 		// Step 5: prepare sprites
 		m_sprites.resize(g_Level.Sprites.size());
 

@@ -636,7 +636,7 @@ InventoryResult GuiController::TitleOptions()
 			else
 				selected_option--;
 
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (goDown)
@@ -646,14 +646,14 @@ InventoryResult GuiController::TitleOptions()
 			else
 				selected_option -= option_count;
 
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (goDeselect && menu_to_display != Menu::Title)
 		{
 			menu_to_display = Menu::Title;
 			selected_option = selected_option_bak;
-			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		}
 	}
 
@@ -661,7 +661,7 @@ InventoryResult GuiController::TitleOptions()
 	{
 		if (menu_to_display == Menu::Title)
 		{
-			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 			switch (selected_option)
 			{
@@ -696,7 +696,7 @@ InventoryResult GuiController::TitleOptions()
 		}
 		else if (menu_to_display == Menu::SelectLevel)
 		{
-			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			// Level 0 is the title level, so increment the option by 1 to offset it.
 			g_GameFlow->SelectedLevelForNewGame = selected_option + 1;
 			menu_to_display = Menu::Title;
@@ -709,7 +709,7 @@ InventoryResult GuiController::TitleOptions()
 				SayNo();
 			else
 			{
-				SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 				g_GameFlow->SelectedSaveGame = selected_option;
 				selected_option = 0;
 				ret = InventoryResult::LoadGame;
@@ -770,7 +770,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
 		menu_to_display = Menu::Options;
 		selected_option = 0;
 		return;
@@ -781,28 +781,28 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			if (CurrentSettings.selectedScreenResolution > 0)
 				CurrentSettings.selectedScreenResolution--;
 			break;
 
 		case 1:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 3:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 4:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -813,28 +813,28 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			if (CurrentSettings.selectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
 				CurrentSettings.selectedScreenResolution++;
 			break;
 
 		case 1:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 3:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 4:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -847,7 +847,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		else
 			selected_option--;
 
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (goDown)
@@ -857,12 +857,12 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		else
 			selected_option -= option_count;
 
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
 
 		if (selected_option == 5)
 		{
@@ -908,7 +908,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 	if (goSelect && selected_option != 16 && selected_option != 17)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
 		CurrentSettings.waitingForkey = true;
 	}
 
@@ -970,7 +970,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			else
 				selected_option--;
 
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (goDown)
@@ -980,14 +980,14 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			else
 				selected_option -= option_count;
 
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (goSelect)
 		{
 			if (selected_option == 16) // Apply
 			{
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
@@ -997,7 +997,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 			if (selected_option == 17) // Cancel
 			{
-				SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
 				return;
@@ -1039,7 +1039,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1051,7 +1051,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 					db = 10;
 				}
 				else
@@ -1068,7 +1068,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 					db = 10;
 				}
 				else
@@ -1084,7 +1084,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1096,7 +1096,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 					db = 10;
 				}
 				else
@@ -1113,7 +1113,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, NULL, 0);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
 					db = 10;
 				}
 				else
@@ -1131,7 +1131,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		else
 			selected_option--;
 
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (goDown)
@@ -1141,12 +1141,12 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		else
 			selected_option -= option_count;
 
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
 
 		if (selected_option == 3)
 		{
@@ -1159,7 +1159,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		}
 		else if (selected_option == 4)
 		{
-			SoundEffect(SFX_TR4_MENU_SELECT, NULL, 0);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
 			SetVolumeMusic(g_Configuration.MusicVolume);
 			SetVolumeFX(g_Configuration.SfxVolume);
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
@@ -1217,7 +1217,7 @@ InventoryResult GuiController::DoPauseMenu()
 			else
 				selected_option--;
 
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (goDown)
@@ -1227,7 +1227,7 @@ InventoryResult GuiController::DoPauseMenu()
 			else
 				selected_option -= option_count;
 
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 	}
 
@@ -1236,7 +1236,7 @@ InventoryResult GuiController::DoPauseMenu()
 		if (menu_to_display == Menu::Pause)
 		{
 			invMode = InventoryMode::None;
-			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			return InventoryResult::None;
 		}
 
@@ -1244,7 +1244,7 @@ InventoryResult GuiController::DoPauseMenu()
 		{
 			selected_option = menu_to_display == Menu::Statistics ? 0 : 1;
 			menu_to_display = Menu::Pause;
-			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		}
 	}
 
@@ -2103,7 +2103,7 @@ void GuiController::UseCurrentItem()
 				if (LaraItem->HitPoints > LARA_HEALTH_MAX)
 					LaraItem->HitPoints = LARA_HEALTH_MAX;
 
-				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 				Statistics.Game.HealthUsed++;
 			}
 			else
@@ -2127,7 +2127,7 @@ void GuiController::UseCurrentItem()
 				Lara.PoisonPotency = 0;
 				LaraItem->HitPoints = LARA_HEALTH_MAX;
 
-				SoundEffect(SFX_TR4_MENU_MEDI, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 				Statistics.Game.HealthUsed++;
 			}
 			else
@@ -2279,7 +2279,7 @@ void GuiController::HandleInventoryMenu()
 				combine_type_flag = 1;
 				combine_obj1 = invItem;
 				combine_obj2 = ammoItem;
-				SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 			}
 			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN && ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L && invItem >= INV_OBJECT_BIG_WATERSKIN && invItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
@@ -2287,7 +2287,7 @@ void GuiController::HandleInventoryMenu()
 				{
 					combine_type_flag = 2;
 					combine_ring_fade_dir = 2;
-					SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 					return;
 				}
 
@@ -2300,7 +2300,7 @@ void GuiController::HandleInventoryMenu()
 				{
 					combine_type_flag = 2;
 					combine_ring_fade_dir = 2;
-					SoundEffect(SFX_TR4_MENU_COMBINE, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 					return;
 				}
 
@@ -2316,7 +2316,7 @@ void GuiController::HandleInventoryMenu()
 
 		if (goDeselect)
 		{
-			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			combine_ring_fade_dir = 2;
 			goDeselect = 0;
 		}
@@ -2468,12 +2468,12 @@ void GuiController::HandleInventoryMenu()
 			if (goUp && current_selected_option > 0)
 			{
 				current_selected_option--;
-				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			}
 			else if (goDown && current_selected_option < n - 1)
 			{
 				current_selected_option++;
-				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			}
 
 			if (ammo_active)
@@ -2481,13 +2481,13 @@ void GuiController::HandleInventoryMenu()
 				if (goLeft && current_selected_option > 0)
 				{
 					current_selected_option--;
-					SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				}
 
 				if (goRight && current_selected_option < n - 1)
 				{
 					current_selected_option++;
-					SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				}
 
 				*current_ammo_type = current_selected_option;
@@ -2496,7 +2496,7 @@ void GuiController::HandleInventoryMenu()
 			if (goSelect)
 			{
 				if (current_options[current_selected_option].type != MenuType::Equip && current_options[current_selected_option].type != MenuType::Use)
-					SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 				switch (current_options[current_selected_option].type)
 				{
@@ -2570,7 +2570,7 @@ void GuiController::HandleInventoryMenu()
 
 			if (goDeselect && ammo_active)
 			{
-				SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				goDeselect = 0;
 				ammo_active = 0;
 				rings[(int)RingTypes::Inventory]->ringactive = 1;
@@ -3106,7 +3106,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				{
 					if (!rings[ringnum]->objlistmovement)
 					{
-						SoundEffect(SFX_TR4_MENU_ROTATE, 0, SFX_ALWAYS);
+						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
 						rings[ringnum]->objlistmovement += 8192;
 
 						if (ammo_selector_flag)
@@ -3118,7 +3118,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				{
 					if (!rings[ringnum]->objlistmovement)
 					{
-						SoundEffect(SFX_TR4_MENU_ROTATE, 0, SFX_ALWAYS);
+						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
 						rings[ringnum]->objlistmovement -= 8192;
 
 						if (ammo_selector_flag)
@@ -3194,7 +3194,7 @@ int GuiController::CallInventory(bool reset_mode)
 
 		if (DbInput & IN_OPTION)
 		{
-			SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			val = 1;
 		}
 
@@ -3257,7 +3257,7 @@ void GuiController::DoStatisticsMode()
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		goDeselect = 0;
 		invMode = InventoryMode::None;
 	}
@@ -3269,7 +3269,7 @@ void GuiController::DoExamineMode()
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		goDeselect = 0;
 		invMode = InventoryMode::None;
 	}
@@ -3291,18 +3291,18 @@ void GuiController::DoDiary()
 	if (goRight && Lara.Inventory.Diary.currentPage < Lara.Inventory.Diary.numPages)
 	{
 		Lara.Inventory.Diary.currentPage++;
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (goLeft && Lara.Inventory.Diary.currentPage > 1)
 	{
 		Lara.Inventory.Diary.currentPage--;
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		goDeselect = 0;
 		invMode = InventoryMode::None;
 	}
@@ -3319,7 +3319,7 @@ int GuiController::DoLoad()
 
 	if (goDown)
 	{
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 		if (selected_slot == SAVEGAME_MAX - 1)
 			selected_slot -= SAVEGAME_MAX - 1;	//go back up
@@ -3329,7 +3329,7 @@ int GuiController::DoLoad()
 
 	if (goUp)
 	{
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 		if (selected_slot== 0)
 			selected_slot += SAVEGAME_MAX - 1;	//go back down
@@ -3343,7 +3343,7 @@ int GuiController::DoLoad()
 			SayNo();
 		else
 		{
-			SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			g_GameFlow->SelectedSaveGame = selected_slot;
 			ExitInvLoop = 1;
 			return 1;
@@ -3352,7 +3352,7 @@ int GuiController::DoLoad()
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		goDeselect = 0;
 		invMode = InventoryMode::InGame;
 	}
@@ -3366,7 +3366,7 @@ void GuiController::DoSave()
 
 	if (goDown)
 	{
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 		if (selected_slot == SAVEGAME_MAX - 1)
 			selected_slot -= SAVEGAME_MAX - 1;	//go back up
@@ -3376,7 +3376,7 @@ void GuiController::DoSave()
 
 	if (goUp)
 	{
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 		if (selected_slot == 0)
 			selected_slot += SAVEGAME_MAX - 1;	//go back down
@@ -3386,14 +3386,14 @@ void GuiController::DoSave()
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_TR4_MENU_CHOOSE, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		SaveGame::Save(selected_slot);
 		ExitInvLoop = 1;	//exit inv if the user has saved
 	}
 
 	if (goDeselect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, 0, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		goDeselect = 0;
 		invMode = InventoryMode::InGame;
 	}

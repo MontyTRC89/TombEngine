@@ -205,6 +205,8 @@ enum LaraState
 	LS_VAULT_2_STEPS_CROUCH = 168,
 	LS_VAULT_3_STEPS_CROUCH = 169,
 	LS_SOFT_SPLAT = 170,
+	LS_CROUCH_TURN_180 = 171,
+	LS_CRAWL_TURN_180 = 172,
 
 	NUM_LARA_STATES
 };
@@ -800,6 +802,10 @@ enum LaraAnim
 	LA_SPRINT_JUMP_RIGHT_TO_REACH_2 = 558,
 	LA_SPRINT_JUMP_RIGHT_TO_REACH_3 = 559,
 	LA_SPRINT_JUMP_RIGHT_TO_REACH_4 = 560,
+	LA_CROUCH_TURN_180_START = 561,
+	LA_CROUCH_TURN_180_END = 562,
+	LA_CRAWL_TURN_180_START = 653,
+	LA_CRAWL_TURN_180_END = 654,
 
 	NUM_LARA_ANIMS,
 
@@ -920,6 +926,14 @@ enum class HandStatus
 	WeaponUndraw,
 	WeaponReady,
 	Special
+};
+
+enum class TorchState : int
+{
+	Holding,
+	Throwing,
+	Dropping,
+	JustLit
 };
 
 enum class JumpDirection
@@ -1056,8 +1070,6 @@ struct CarriedWeaponInfo
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
 };
 
-// TODO: There is an abandoned WeaponInfo struct in ten_savegame.fbs.
-
 struct ArmInfo
 {
 	int AnimNumber;
@@ -1075,6 +1087,12 @@ struct FlareData
 	unsigned int Life;
 	int Frame;
 	bool ControlLeft;
+};
+
+struct TorchData
+{
+	TorchState State;
+	bool IsLit;
 };
 
 #define MaxDiaryPages	  64
@@ -1242,7 +1260,7 @@ struct LaraInfo
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare;
-	bool LitTorch;
+	TorchData Torch;
 
 	Vector3Shrt ExtraHeadRot;
 	Vector3Shrt ExtraTorsoRot;

@@ -543,7 +543,7 @@ namespace TEN::Entities::TR4
 					if (item->TouchBits & 0x18000)
 					{
 						CreatureEffect2(item, &SkeletonBite, 15, -1, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
 
 						LaraItem->HitPoints -= 80;
@@ -588,7 +588,7 @@ namespace TEN::Entities::TR4
 								StaticObjects[staticMesh->staticNumber].shatterType != SHT_NONE)
 							{
 								ShatterObject(0, staticMesh, -128, LaraItem->RoomNumber, 0);
-								SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose, 0);
+								SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose);
 								staticMesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 								floor->Stopper = false;
 								TestTriggers(item, true);
@@ -601,7 +601,7 @@ namespace TEN::Entities::TR4
 						if (item->TouchBits & 0x18000)
 						{
 							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
-							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;
 
 							LaraItem->HitPoints -= 80;

@@ -311,7 +311,7 @@ void FlameThrowerControl(short itemNumber)
 		if (item->HitStatus || laraAI.distance < pow(SECTOR(1), 2) || TargetVisible(item, &laraAI))
 		{
 			if (!creature->Alerted)
-				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose, 0);
+				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose);
 
 			AlertAllGuards(itemNumber);
 		}
@@ -476,7 +476,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+			SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 			break;
 			
 		case 6:
@@ -511,7 +511,7 @@ void FlameThrowerControl(short itemNumber)
 				}
 			}
 
-			SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose, 0);
+			SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 			break;
 		}
 	}

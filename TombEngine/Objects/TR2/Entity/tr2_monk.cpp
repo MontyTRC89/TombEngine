@@ -196,7 +196,7 @@ void MonkControl(short itemNumber)
 				if (!(creature->Flags & 0xF000) && item->TouchBits & 0x4000)
 				{
 					creature->Flags |= 0x1000;
-					SoundEffect(SFX_TR2_CRUNCH1, &item->Pose, 0);
+					SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
 					CreatureEffect(item, &MonkBite, DoBloodSplat);
 
 					enemy->HitPoints -= 150;
@@ -212,7 +212,7 @@ void MonkControl(short itemNumber)
 						abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(2))
 					{
 						creature->Flags |= 0x1000;
-						SoundEffect(SFX_TR2_CRUNCH1, &item->Pose, 0);
+						SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
 
 						enemy->HitPoints -= 5;
 						enemy->HitStatus = true;

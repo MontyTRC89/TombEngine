@@ -8,7 +8,6 @@
 #include "Sound/sound.h"
 #include "Game/Lara/lara.h"
 #include "Game/animation.h"
-#include <Game\items.h>
 #include "Game/items.h"
 
 int NextBat;
@@ -218,6 +217,6 @@ void UpdateBats()
 		auto* bat = &Bats[minIndex];
 
 		if (!(GetRandomControl() & 4))
-			SoundEffect(SFX_TR4_BATS_1,&bat->Pose, 0);
+			SoundEffect(SFX_TR4_BATS_1,&bat->Pose);
 	}
 }

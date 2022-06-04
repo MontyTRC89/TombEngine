@@ -12,43 +12,69 @@
 
 namespace TEN::Entities::TR4
 {
-	BYTE DogAnims[] = { 20, 21, 22, 20 };
 	BITE_INFO DogBite = { 0, 0, 100, 3 };
 
-	constexpr auto DOG_CROUCH_ATTACK_DAMAGE = 10;
+	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
 
 	enum DogState
 	{
 		DOG_STATE_NONE = 0,
-		DOG_STATE_STOP = 1,
-		DOG_STATE_WALK = 2,
-		DOG_STATE_RUN = 3,
+		DOG_STATE_IDLE = 1,
+		DOG_STATE_WALK_FORWARD = 2,
+		DOG_STATE_RUN_FORWARD = 3,
 		DOG_STATE_STALK = 5,
 		DOG_STATE_JUMP_ATTACK = 6,
 		DOG_STATE_HOWL = 7,
 		DOG_STATE_SLEEP = 8,
-		DOG_STATE_CROUCH = 9,
+		DOG_STATE_STALK_IDLE = 9,
+		DOG_STATE_RUN_FORWARD_RIGHT = 10,	// Unused.
 		DOG_STATE_DEATH = 11,
-		DOG_STATE_CROUCH_ATTACK = 12
+		DOG_STATE_BITE_ATTACK = 12
 	};
 
-	// TODO
 	enum DogAnim
 	{
-
+		DOG_ANIM_SLEEP = 0,
+		DOG_ANIM_AWAKEN = 1,
+		DOG_ANIM_IDLE_TO_WALK_FORWARD = 2,
+		DOG_ANIM_WALK_FORWARD = 3,
+		DOG_ANIM_WALK_FORWARD_TO_STALK = 4,
+		DOG_ANIM_STALK_FORWARD = 5,
+		DOG_ANIM_STALK_FORWARD_TO_RUN_FORWARD = 6,
+		DOG_ANIM_RUN_FORWARD = 7,
+		DOG_ANIM_IDLE = 8,
+		DOG_ANIM_JUMP_ATTACK = 9,
+		DOG_ANIM_STALK_IDLE_TO_STALK_FORWARD = 10,
+		DOG_ANIM_STALK_FORWARD_TO_STALK_IDLE_START = 11,
+		DOG_ANIM_STALK_FORWARD_TO_STALK_IDLE_END = 12,
+		DOG_ANIM_STALK_IDLE_TO_RUN_FORWARD = 13,
+		DOG_ANIM_STALK_IDLE = 14,
+		DOG_ANIM_RUN_FORWARD_TO_STALK_IDLE = 15,
+		DOG_ANIM_HOWL = 16,
+		DOG_ANIM_IDLE_TO_STALK_IDLE = 17,
+		DOG_ANIM_RUN_FORWARD_RIGHT = 18,	// Unused.
+		DOG_ANIM_WALK_FORWARD_TO_IDLE = 19,
+		DOG_ANIM_DEATH_1 = 20,
+		DOG_ANIM_DEATH_2 = 21,
+		DOG_ANIM_DEATH_3 = 22,
+		DOG_ANIM_BITE_ATTACK = 23,
+		DOG_ANIM_STALK_IDLE_TO_IDLE = 24
 	};
+
+	int DeathAnims[] = { DOG_ANIM_DEATH_1, DOG_ANIM_DEATH_2, DOG_ANIM_DEATH_3, DOG_ANIM_DEATH_1 };
 
 	void InitialiseTr4Dog(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		item->Animation.ActiveState = DOG_STATE_STOP;
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
+
+		item->Animation.ActiveState = DOG_STATE_IDLE;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DOG_ANIM_IDLE;
 
 		// OCB 1 makes the dog sitting down until fired
 		if (item->TriggerFlags)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DOG_ANIM_AWAKEN;
 			item->Status -= ITEM_INVISIBLE;
 		}
 
@@ -75,9 +101,9 @@ namespace TEN::Entities::TR4
 				item->HitPoints = object->HitPoints;
 			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
-				item->Animation.ActiveState = DOG_STATE_DEATH;
+				item->Animation.AnimNumber = object->animIndex + DeathAnims[GetRandomControl() & 3];
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.ActiveState = DOG_STATE_DEATH;
 			}
 		}
 		else
@@ -105,7 +131,7 @@ namespace TEN::Entities::TR4
 
 			if (AI.ahead)
 			{
-				joint2 = AI.xAngle; // Maybe swapped
+				joint2 = AI.xAngle; // TODO: Maybe swapped
 				joint1 = AI.angle;
 			}
 
@@ -113,10 +139,10 @@ namespace TEN::Entities::TR4
 			CreatureMood(item, &AI, VIOLENT);
 
 			if (creature->Mood == MoodType::Bored)
-				creature->MaxTurn >>= 1;
+				creature->MaxTurn /= 2;
 
 			angle = CreatureTurn(item, creature->MaxTurn);
-			joint0 = 4 * angle;
+			joint0 = angle * 4;
 
 			if (creature->HurtByLara || distance < pow(SECTOR(3), 2) && !(item->AIBits & MODIFY))
 			{
@@ -135,23 +161,24 @@ namespace TEN::Entities::TR4
 				joint2 = 0;
 
 				if (creature->Mood != MoodType::Bored && item->AIBits != MODIFY)
-					item->Animation.TargetState = DOG_STATE_STOP;
+					item->Animation.TargetState = DOG_STATE_IDLE;
 				else
 				{
 					creature->Flags++;
 					creature->MaxTurn = 0;
 
 					if (creature->Flags > 300 && random < 128)
-						item->Animation.TargetState = DOG_STATE_STOP;
+						item->Animation.TargetState = DOG_STATE_IDLE;
 				}
 
 				break;
 
-			case DOG_STATE_STOP:
-			case DOG_STATE_CROUCH:
+			case DOG_STATE_IDLE:
+			case DOG_STATE_STALK_IDLE:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.ActiveState == DOG_STATE_CROUCH && item->Animation.RequiredState)
+				if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE &&
+					item->Animation.RequiredState)
 				{
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
@@ -164,26 +191,26 @@ namespace TEN::Entities::TR4
 					if (GetRandomControl() & 0xFF)
 						break;
 
-					if (item->Animation.ActiveState == DOG_STATE_STOP)
+					if (item->Animation.ActiveState == DOG_STATE_IDLE)
 					{
-						item->Animation.TargetState = DOG_STATE_CROUCH;
+						item->Animation.TargetState = DOG_STATE_STALK_IDLE;
 						break;
 					}
 				}
 				else
 				{
-					if (item->Animation.ActiveState == DOG_STATE_CROUCH && random < 128)
+					if (item->Animation.ActiveState == DOG_STATE_STALK_IDLE && random < 128)
 					{
-						item->Animation.TargetState = DOG_STATE_STOP;
+						item->Animation.TargetState = DOG_STATE_IDLE;
 						break;
 					}
 
 					if (item->AIBits & PATROL1)
 					{
-						if (item->Animation.ActiveState == DOG_STATE_STOP)
-							item->Animation.TargetState = DOG_STATE_WALK;
+						if (item->Animation.ActiveState == DOG_STATE_IDLE)
+							item->Animation.TargetState = DOG_STATE_WALK_FORWARD;
 						else
-							item->Animation.TargetState = DOG_STATE_STOP;
+							item->Animation.TargetState = DOG_STATE_IDLE;
 
 						break;
 					}
@@ -192,22 +219,21 @@ namespace TEN::Entities::TR4
 					{
 						if (Lara.TargetEntity == item || !AI.ahead || item->HitStatus)
 						{
-							item->Animation.RequiredState = DOG_STATE_RUN;
-							item->Animation.TargetState = DOG_STATE_CROUCH;
+							item->Animation.TargetState = DOG_STATE_STALK_IDLE;
+							item->Animation.RequiredState = DOG_STATE_RUN_FORWARD;
 						}
 						else
-							item->Animation.TargetState = DOG_STATE_STOP;
+							item->Animation.TargetState = DOG_STATE_IDLE;
 
 						break;
 					}
 
 					if (creature->Mood != MoodType::Bored)
 					{
-						item->Animation.RequiredState = DOG_STATE_RUN;
+						if (item->Animation.ActiveState == DOG_STATE_IDLE)
+							item->Animation.TargetState = DOG_STATE_STALK_IDLE;
 
-						if (item->Animation.ActiveState == DOG_STATE_STOP)
-							item->Animation.TargetState = DOG_STATE_CROUCH;
-
+						item->Animation.RequiredState = DOG_STATE_RUN_FORWARD;
 						break;
 					}
 
@@ -218,7 +244,7 @@ namespace TEN::Entities::TR4
 					{
 						if (item->AIBits & MODIFY)
 						{
-							if (item->Animation.ActiveState == DOG_STATE_STOP)
+							if (item->Animation.ActiveState == DOG_STATE_IDLE)
 							{
 								item->Animation.TargetState = DOG_STATE_SLEEP;
 								creature->Flags = 0;
@@ -235,41 +261,35 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (item->Animation.ActiveState == DOG_STATE_STOP)
+					if (item->Animation.ActiveState == DOG_STATE_IDLE)
 					{
-						item->Animation.TargetState = DOG_STATE_WALK;
+						item->Animation.TargetState = DOG_STATE_WALK_FORWARD;
 						break;
 					}
 				}
 
-				item->Animation.TargetState = DOG_STATE_STOP;
+				item->Animation.TargetState = DOG_STATE_IDLE;
 				break;
 
-			case DOG_STATE_WALK:
+			case DOG_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 
 				if (item->AIBits & PATROL1)
-				{
-					item->Animation.TargetState = DOG_STATE_WALK;
-				}
+					item->Animation.TargetState = DOG_STATE_WALK_FORWARD;
 				else if (creature->Mood == MoodType::Bored && random < 256)
-				{
-					item->Animation.TargetState = DOG_STATE_STOP;
-				}
+					item->Animation.TargetState = DOG_STATE_IDLE;
 				else
-				{
 					item->Animation.TargetState = DOG_STATE_STALK;
-				}
 
 				break;
 
-			case DOG_STATE_RUN:
+			case DOG_STATE_RUN_FORWARD:
 				creature->MaxTurn = ANGLE(6.0f);
 
 				if (creature->Mood == MoodType::Escape)
 				{
 					if (Lara.TargetEntity != item && AI.ahead)
-						item->Animation.TargetState = DOG_STATE_CROUCH;
+						item->Animation.TargetState = DOG_STATE_STALK_IDLE;
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
@@ -277,12 +297,12 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
 					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
+						item->Animation.TargetState = DOG_STATE_STALK_IDLE;
 						item->Animation.RequiredState = DOG_STATE_STALK;
-						item->Animation.TargetState = DOG_STATE_CROUCH;
 					}
 				}
 				else
-					item->Animation.TargetState = DOG_STATE_CROUCH;
+					item->Animation.TargetState = DOG_STATE_STALK_IDLE;
 
 				break;
 
@@ -292,17 +312,17 @@ namespace TEN::Entities::TR4
 				if (creature->Mood != MoodType::Bored)
 				{
 					if (creature->Mood == MoodType::Escape)
-						item->Animation.TargetState = DOG_STATE_RUN;
+						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
 					else if (AI.bite && AI.distance < pow(341, 2))
 					{
-						item->Animation.TargetState = DOG_STATE_CROUCH_ATTACK;
+						item->Animation.TargetState = DOG_STATE_BITE_ATTACK;
 						item->Animation.RequiredState = DOG_STATE_STALK;
 					}
 					else if (AI.distance > pow(SECTOR(1.5f), 2) || item->HitStatus)
-						item->Animation.TargetState = DOG_STATE_RUN;
+						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
 				}
 				else
-					item->Animation.TargetState = DOG_STATE_CROUCH;
+					item->Animation.TargetState = DOG_STATE_STALK_IDLE;
 
 				break;
 
@@ -318,7 +338,7 @@ namespace TEN::Entities::TR4
 					LaraItem->HitStatus = true;
 				}
 
-				item->Animation.TargetState = DOG_STATE_RUN;
+				item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
 				break;
 
 			case DOG_STATE_HOWL:
@@ -326,7 +346,7 @@ namespace TEN::Entities::TR4
 				joint2 = 0;
 				break;
 
-			case DOG_STATE_CROUCH_ATTACK:
+			case DOG_STATE_BITE_ATTACK:
 				if (AI.bite &&
 					item->TouchBits & 0x48 &&
 					(frame >= 9 &&
@@ -336,7 +356,7 @@ namespace TEN::Entities::TR4
 				{
 					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
 
-					LaraItem->HitPoints -= DOG_CROUCH_ATTACK_DAMAGE;
+					LaraItem->HitPoints -= DOG_BITE_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;
 				}
 

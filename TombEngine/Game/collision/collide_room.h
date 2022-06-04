@@ -157,7 +157,8 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor = 1.0f, 
 short GetSurfaceAspectAngle(float xTilt, float zTilt);
 short GetSurfaceSteepnessAngle(float xTilt, float zTilt);
 
-bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
-bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
-bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
+bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);

@@ -330,37 +330,37 @@ void Moveable::Register(sol::table & parent)
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
 /// Get the moveable's rotation
-// @function GetRotation
+// @function Moveable:GetRotation
 // @treturn Rotation a copy of the moveable's rotation
 	ScriptReserved_GetRotation, &Moveable::GetRot,
 
 /// Set the moveable's rotation
-// @function SetRotation
-// @tparam Rotation The moveable's new rotation
+// @function Moveable:SetRotation
+// @tparam Rotation rotation The moveable's new rotation
 	ScriptReserved_SetRotation, &Moveable::SetRot,
 
 /// Set the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
-// @function GetName
+// @function Moveable:GetName
 // @treturn string the moveable's name
 	ScriptReserved_GetName, &Moveable::GetName,
 
 /// Set the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // It cannot be blank and cannot share a name with any existing object.
-// @function SetName
+// @function Moveable:SetName
 // @tparam name string the new moveable's name
 // @treturn bool true if we successfully set the name, false otherwise (e.g. if another object has the name already)
 	ScriptReserved_SetName, &Moveable::SetName, 
 
 /// Test if the object is in a valid state (i.e. has not been destroyed through Lua or killed by Lara).
-// @function GetValid
+// @function Moveable:GetValid
 // @treturn valid bool true if the object is still not destroyed
 	ScriptReserved_GetValid, &Moveable::GetValid,
 
 /// Destroy the moveable. This will mean it can no longer be used, except to re-initialise it with another object.
-// @function Destroy
+// @function Moveable:Destroy
 	ScriptReserved_Destroy, &Moveable::Destroy);
 }
 
@@ -395,17 +395,17 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 
 void Moveable::SetOnHit(std::string const & cbName)
 {
-	m_item->luaCallbackOnHitName = cbName;
+	m_item->LuaCallbackOnHitName = cbName;
 }
 
 void Moveable::SetOnKilled(std::string const & cbName)
 {
-	m_item->luaCallbackOnKilledName = cbName;
+	m_item->LuaCallbackOnKilledName = cbName;
 }
 
 void Moveable::SetOnCollidedWithObject(std::string const & cbName)
 {
-	m_item->luaCallbackOnCollidedWithObjectName = cbName;
+	m_item->LuaCallbackOnCollidedWithObjectName = cbName;
 
 	if(cbName.empty())
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
@@ -415,7 +415,7 @@ void Moveable::SetOnCollidedWithObject(std::string const & cbName)
 
 void Moveable::SetOnCollidedWithRoom(std::string const & cbName)
 {
-	m_item->luaCallbackOnCollidedWithRoomName = cbName;
+	m_item->LuaCallbackOnCollidedWithRoomName = cbName;
 
 	if(cbName.empty())
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
@@ -425,22 +425,22 @@ void Moveable::SetOnCollidedWithRoom(std::string const & cbName)
 
 std::string Moveable::GetOnHit() const
 {
-	return m_item->luaCallbackOnHitName;
+	return m_item->LuaCallbackOnHitName;
 }
 
 std::string Moveable::GetOnKilled() const
 {
-	return m_item->luaCallbackOnKilledName;
+	return m_item->LuaCallbackOnKilledName;
 }
 
 std::string Moveable::GetOnCollidedWithObject() const
 {
-	return m_item->luaCallbackOnCollidedWithObjectName;
+	return m_item->LuaCallbackOnCollidedWithObjectName;
 }
 
 std::string Moveable::GetOnCollidedWithRoom() const
 {
-	return m_item->luaCallbackOnCollidedWithRoomName;
+	return m_item->LuaCallbackOnCollidedWithRoomName;
 }
 
 std::string Moveable::GetName() const

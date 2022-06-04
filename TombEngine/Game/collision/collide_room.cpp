@@ -1394,38 +1394,30 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto* room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-			floor = GetSector(room, x - room->x, z - room->z);
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				return GetCollision(floor, x, y, z).Block->FloorHeight(x, y, z);
-				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
-			}
-
-			if (floor->RoomAbove(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
+
+			floor = GetSector(room, x - room->x, z - room->z);
 		}
 
-		return room->maxceiling;
+		return GetCollision(floor, x, y, z).Block->CeilingHeight(x, y, z);
 	}
 	else
 	{
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto* room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room2))
-			{
-				return GetCollision(floor, x, y, z).Block->CeilingHeight(x, y, z);
-				//return room2->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
-			}
-
-			if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
+
+			floor = GetSector(room2, x - room2->x, z - room2->z);
 		}
+
+		return GetCollision(floor, x, y, z).Block->FloorHeight(x, y, z);
 	}
 
 	return NO_HEIGHT;
@@ -1447,14 +1439,9 @@ short GetSurfaceAspectAngle(float xTilt, float zTilt)
 	return (short)phd_atan(-zTilt, -xTilt);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
+bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
 {
-	return (room->flags & environmentType);
-}
-
-bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
-{
-	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
+	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
 }
 
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
@@ -1462,7 +1449,17 @@ bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
 	return TestEnvironment(environmentType, item->RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
 {
-	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
+	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
+}
+
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
+{
+	return TestEnvironmentFlags(environmentType, room->flags);
+}
+
+bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags)
+{
+	return ((flags & environmentType) == environmentType);
 }
