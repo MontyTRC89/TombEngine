@@ -314,7 +314,7 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y - ANGLE(180.0f),
 						DoBloodSplat);
 				}
-				else if (item->CheckTouchBits(BigScorpionTouchJoints))
+				else if (item->TestTouchBits(BigScorpionTouchJoints))
 				{
 					LaraItem->HitPoints -= BIG_SCORPION_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;
