@@ -47,7 +47,7 @@ void FlareControl(short itemNumber)
 	);
 
 	auto oldPos = flareItem->Pose.Position;
-	flareItem->Pose.Position += Vector3Int(velocity.x, flareItem->Animation.VerticalVelocity, velocity.z);
+	flareItem->Pose.Position += Vector3Int(velocity.x, 0, velocity.z);
 
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
 		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
@@ -58,6 +58,7 @@ void FlareControl(short itemNumber)
 	else
 		flareItem->Animation.VerticalVelocity += 6;
 
+	flareItem->Pose.Position.y += flareItem->Animation.VerticalVelocity;
 	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
 	int& life = flareItem->Data;

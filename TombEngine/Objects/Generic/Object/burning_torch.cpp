@@ -219,7 +219,7 @@ namespace TEN::Entities::Generic
 		);
 
 		auto oldPos = item->Pose.Position;
-		item->Pose.Position += Vector3Int(velocity.x, item->Animation.VerticalVelocity, velocity.z);
+		item->Pose.Position += Vector3Int(velocity.x, 0, velocity.z);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item))
@@ -233,6 +233,7 @@ namespace TEN::Entities::Generic
 		else
 			item->Animation.VerticalVelocity += 6;
 
+		item->Pose.Position.y += item->Animation.VerticalVelocity;
 		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
 		// Collide with entities.
