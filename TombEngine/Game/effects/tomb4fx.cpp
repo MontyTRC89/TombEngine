@@ -201,7 +201,7 @@ void TriggerGlobalFireFlame()
 	spark->dSize = spark->size;
 }
 
-void TriggerPilotFlame(int itemNum, int meshIndex)
+void TriggerPilotFlame(int itemNum, int nodeIndex)
 {
 	auto* item = &g_Level.Items[itemNum];
 
@@ -238,7 +238,7 @@ void TriggerPilotFlame(int itemNum, int meshIndex)
 	spark->zVel =  (GetRandomControl() & 31) - 16;
 
 	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
-	spark->nodeNumber = meshIndex;
+	spark->nodeNumber = nodeIndex;
 	spark->friction = 4;
 	spark->gravity = -(GetRandomControl() & 3) - 2;
 	spark->maxYvel = -(GetRandomControl() & 3) - 4;
@@ -249,7 +249,7 @@ void TriggerPilotFlame(int itemNum, int meshIndex)
 	spark->dSize = size;
 }
 
-void ThrowFire(int itemNum, int meshIndex, Vector3Int offset)
+void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed)
 {
 	auto* item = &g_Level.Items[itemNum];
 
@@ -275,7 +275,7 @@ void ThrowFire(int itemNum, int meshIndex, Vector3Int offset)
 		spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
 		spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
 
-		auto pos2 = Vector3Int(-4, -30, -4) + offset * 2;
+		auto pos2 = Vector3Int(-4, -30, -4) + offset + speed;
 		GetJointAbsPosition(item, &pos2, meshIndex);
 
 		int v = (GetRandomControl() & 0x3F) + 192;

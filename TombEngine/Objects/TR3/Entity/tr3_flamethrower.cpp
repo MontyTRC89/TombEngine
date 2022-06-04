@@ -17,6 +17,7 @@
 #include "Specific/setup.h"
 
 BITE_INFO FlamethrowerBite = { 0, 340, 64, 7 };
+Vector3Int FlamethrowerOffset = { 0, 340, 0 };
 
 // TODO
 enum FlamethrowerState
@@ -29,141 +30,6 @@ enum FlamethrowerAnim
 {
 
 };
-
-
-static void TriggerFlamethrowerFlame(int x, int y, int z, int xv, int yv, int zv, int fxNumber)
-{
-	auto* spark = &Sparks[GetFreeSpark()];
-
-	spark->on = true;
-	spark->sR = 48 + (GetRandomControl() & 31);
-	spark->sG = spark->sR;
-	spark->sB = 192 + (GetRandomControl() & 63);
-
-	spark->dR = 192 + (GetRandomControl() & 63);
-	spark->dG = 128 + (GetRandomControl() & 63);
-	spark->dB = 32;
-
-	if (xv || yv || zv)
-	{
-		spark->colFadeSpeed = 6;
-		spark->fadeToBlack = 2;
-		spark->sLife = spark->life = (GetRandomControl() & 1) + 12;
-	}
-	else
-	{
-		spark->colFadeSpeed = 8;
-		spark->fadeToBlack = 16;
-		spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
-	}
-
-	spark->transType = TransTypeEnum::COLADD;
-
-	spark->extras = 0;
-	spark->dynamic = -1;
-
-	spark->x = x + ((GetRandomControl() & 31) - 16);
-	spark->y = y;
-	spark->z = z + ((GetRandomControl() & 31) - 16);
-
-	spark->xVel = ((GetRandomControl() & 15) - 16) + xv;
-	spark->yVel = yv;
-	spark->zVel = ((GetRandomControl() & 15) - 16) + zv;
-	spark->friction = 0;
-
-	if (GetRandomControl() & 1)
-	{
-		if (fxNumber >= 0)
-			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_FX;
-		else
-			spark->flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-
-		spark->rotAng = GetRandomControl() & 4095;
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -(GetRandomControl() & 15) - 16;
-		else
-			spark->rotAdd = (GetRandomControl() & 15) + 16;
-	}
-	else
-	{
-		if (fxNumber >= 0)
-			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
-		else
-			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
-	}
-
-	spark->fxObj = fxNumber;
-	spark->gravity = 0;
-	spark->maxYvel = 0;
-
-	int size = (GetRandomControl() & 31) + 64;
-
-	if (xv || yv || zv)
-	{
-		spark->size = size / 32;
-		if (fxNumber == -2)
-			spark->scalar = 2;
-		else
-			spark->scalar = 3;
-	}
-	else
-	{
-		spark->size = size / 16;
-		spark->scalar = 4;
-	}
-
-	spark->dSize = size / 2;
-}
-
-static short TriggerFlameThrower(ItemInfo* item, BITE_INFO* bite, short speed)
-{
-	short effectNumber = CreateNewEffect(item->RoomNumber);
-	if (effectNumber != NO_ITEM)
-	{
-		auto* fx = &EffectList[effectNumber];
-
-		auto pos1 = Vector3Int(bite->x, bite->y, bite->z);
-		GetJointAbsPosition(item, &pos1, bite->meshNum);
-
-		auto pos2 = Vector3Int(bite->x, bite->y / 2, bite->z);
-		GetJointAbsPosition(item, &pos2, bite->meshNum);
-
-		auto angles = GetVectorAngles(pos2.x - pos1.x, pos2.y - pos1.y, pos2.z - pos1.z);
-
-		fx->pos.Position = pos1;
-		fx->pos.Orientation = angles;
-		fx->roomNumber = item->RoomNumber;
-		fx->speed = speed * 4;
-		fx->counter = 20;
-		fx->flag1 = 0;
-
-		TriggerFlamethrowerFlame(0, 0, 0, 0, 0, 0, effectNumber);
-
-		int velocity;
-		int xv, yv, zv;
-		
-		for (int i = 0; i < 2; i++)
-		{
-			speed = (GetRandomControl() % (speed * 4)) + 32;
-			velocity = speed * phd_cos(fx->pos.Orientation.x);
-
-			xv = velocity * phd_sin(fx->pos.Orientation.y);
-			yv = -speed * phd_sin(fx->pos.Orientation.x);
-			zv = velocity * phd_cos(fx->pos.Orientation.y);
-
-			TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -1);
-		}
-
-		velocity = (speed * 2) * phd_cos(fx->pos.Orientation.x);
-		zv = velocity * phd_cos(fx->pos.Orientation.y);
-		xv = velocity * phd_sin(fx->pos.Orientation.y);
-		yv = -(speed * 2) * phd_sin(fx->pos.Orientation.x);
-
-		TriggerFlamethrowerFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, xv * 32, yv * 32, zv * 32, -2);
-	}
-
-	return effectNumber;
-}
 
 void FlameThrowerControl(short itemNumber)
 {
@@ -186,12 +52,11 @@ void FlameThrowerControl(short itemNumber)
 	if (item->Animation.ActiveState != 6 && item->Animation.ActiveState != 11)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 6, 24 - ((random / 16) & 3), 16 - ((random / 64) & 3), random & 3); 
-		TriggerPilotFlame(itemNumber, 7);
+		TriggerPilotFlame(itemNumber, 9);
 	}
 	else
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, (random & 3) + 10, 31 - ((random / 16) & 3), 24 - ((random / 64) & 3), random & 7);
-		ThrowFire(itemNumber, FlamethrowerBite.meshNum, Vector3Int(0, 140, -4));
 	}
 
 	if (item->HitPoints <= 0)
@@ -426,10 +291,10 @@ void FlameThrowerControl(short itemNumber)
 				item->Animation.TargetState = 1;
 
 			if (creature->Flags < 40)
-				TriggerFlameThrower(item, &FlamethrowerBite, creature->Flags);
+				ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, creature->Flags * 1.5f, 0));
 			else
 			{
-				TriggerFlameThrower(item, &FlamethrowerBite, (GetRandomControl() & 31) + 12);
+				ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, (GetRandomControl() & 63) + 12, 0));
 				if (realEnemy)
 				{
 					/*code*/
@@ -461,10 +326,10 @@ void FlameThrowerControl(short itemNumber)
 				item->Animation.TargetState = 2;
 
 			if (creature->Flags < 40)
-				TriggerFlameThrower(item, &FlamethrowerBite, creature->Flags);
+				ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, creature->Flags * 1.5f, 0));
 			else
 			{
-				TriggerFlameThrower(item, &FlamethrowerBite, (GetRandomControl() & 31) + 12);
+				ThrowFire(itemNumber, FlamethrowerBite.meshNum, FlamethrowerOffset, Vector3Int(0, (GetRandomControl() & 63) + 12, 0));
 				if (realEnemy)
 				{
 					/*code*/
