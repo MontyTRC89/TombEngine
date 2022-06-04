@@ -64,3 +64,8 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)
+
+Vector3 TranslateVector(Vector3 vector, short orient, float forward, float vertical = 0.0f, float lateral = 0.0f);
+Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance);
+Vector3Int TranslateVector(Vector3Int vector, short orient, float forward, float vertical = 0.0f, float lateral = 0.0f);
+Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance);

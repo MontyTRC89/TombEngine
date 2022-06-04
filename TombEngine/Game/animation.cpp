@@ -43,7 +43,7 @@ void AnimateLara(ItemInfo* item)
 				switch (*(cmd++))
 				{
 				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
 					UpdateItemRoom(item, -LARA_HEIGHT / 2, -cmd[0], -cmd[2]);
 					cmd += 3;
 					break;
@@ -198,7 +198,7 @@ void AnimateLara(ItemInfo* item)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)
-		MoveItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
+		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, 0, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
 
 	// Update matrices
 	g_Renderer.UpdateLaraAnimations(true);
@@ -231,7 +231,7 @@ void AnimateItem(ItemInfo* item)
 				switch (*(cmd++))
 				{
 				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
 					cmd += 3;
 					break;
 
@@ -365,8 +365,8 @@ void AnimateItem(ItemInfo* item)
 
 		lateral >>= 16;
 	}
-
-	MoveItem(item, item->Pose.Orientation.y, item->Animation.Velocity, lateral);
+	
+	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0, lateral);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
@@ -414,14 +414,14 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim->frameEnd);
 }
 
-void TranslateItem(ItemInfo* item, int x, int y, int z)
+void TranslateItem(ItemInfo* item, short orient, float forward, float vertical, float lateral)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	item->Pose.Position = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
+}
 
-	item->Pose.Position.x += round(c * x + s * z);
-	item->Pose.Position.y += y;
-	item->Pose.Position.z += round(-s * x + c * z);
+void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance)
+{
+	item->Pose.Position = TranslateVector(item->Pose.Position, orient, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)

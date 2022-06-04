@@ -22,30 +22,6 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3Int();
 }
 
-void MoveItem(ItemInfo* item, short angle, int x, int z)
-{
-	if (!x && !z)
-		return;
-
-	if (x != 0)
-	{
-		float s = phd_sin(angle);
-		float c = phd_cos(angle);
-
-		item->Pose.Position.x += round(x * s);
-		item->Pose.Position.z += round(x * c);
-	}
-
-	if (z != 0)
-	{
-		float s = phd_sin(angle + ANGLE(90.0f));
-		float c = phd_cos(angle + ANGLE(90.0f));
-
-		item->Pose.Position.x += round(z * s);
-		item->Pose.Position.z += round(z * c);
-	}
-}
-
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
 	if (snapYRot)
@@ -120,41 +96,36 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 
 	auto test = [item](short x, short y, short z, bool floor)
 	{
-		CollisionPosition pos = GetCollision(x, y, z, item->RoomNumber).Position;
-		if (floor) return y > pos.Floor;
-		return y < pos.Ceiling;
+		auto collPos = GetCollision(x, y, z, item->RoomNumber).Position;
+		if (floor) return y > collPos.Floor;
+		return y < collPos.Ceiling;
 	};
 
-	bool collided = 
-			test(box.X1, minY, box.Z1, true)
-		||	test(box.X2, minY, box.Z1, true)
-		||	test(box.X1, minY, box.Z2, true)
-		||	test(box.X2, minY, box.Z2, true)
-		||	test(box.X1, maxY, box.Z1, false)
-		||	test(box.X2, maxY, box.Z1, false)
-		||	test(box.X1, maxY, box.Z2, false)
-		||	test(box.X2, maxY, box.Z2, false);
+	bool collided =
+		test(box.X1, minY, box.Z1, true) ||
+		test(box.X2, minY, box.Z1, true) ||
+		test(box.X1, minY, box.Z2, true) ||
+		test(box.X2, minY, box.Z2, true) ||
+		test(box.X1, maxY, box.Z1, false) ||
+		test(box.X2, maxY, box.Z1, false) ||
+		test(box.X1, maxY, box.Z2, false) ||
+		test(box.X2, maxY, box.Z2, false) ;
 
 	return collided;
 }
 
-// Overload of GetCollisionResult which can be used to probe collision parameters
-// from a given item.
-
-CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height, int side)
+CollisionResult GetCollision(ItemInfo* item, short orient, float forward, float vertical, float lateral)
 {
-	float s = phd_sin(angle);
-	float c = phd_cos(angle);
-
-	auto x = item->Pose.Position.x + (distance * s) + (side * c);
-	auto y = item->Pose.Position.y + height;
-	auto z = item->Pose.Position.z + (distance * c) + (-side * s);
-
-	return GetCollision(x, y, z, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
+	auto point = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
+	int adjacentRoomNumber = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
-// A handy overload of GetCollisionResult which can be used to quickly get collision parameters
-// such as floor height under specific item.
+CollisionResult GetCollision(Vector3 pos, int roomNumber, short orient, float forward, float vertical, float lateral)
+{
+	auto point = TranslateVector(pos, orient, forward, vertical, lateral);
+	return GetCollision(point.x, point.y, point.z, roomNumber);
+}
 
 CollisionResult GetCollision(ItemInfo* item)
 {
@@ -166,12 +137,6 @@ CollisionResult GetCollision(ItemInfo* item)
 	return result;
 }
 
-// This variation of GetCollisionResult is an universal wrapper to be used across whole
-// collisional code to replace "holy trinity" of roomNumber-GetFloor-GetFloorHeight operations.
-// The advantage of this wrapper is that it does NOT modify incoming roomNumber parameter,
-// instead putting modified one returned by GetFloor into return COLL_RESULT structure.
-// This way, function never modifies any external variables.
-
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
@@ -181,12 +146,6 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	result.RoomNumber = room;
 	return result;
 }
-
-// GetCollisionResult is a reworked legacy GetFloorHeight function, which does not
-// write any data into globals, but instead into special COLL_RESULT struct.
-// Additionally, it writes ceiling height for same coordinates, so this function
-// may be reused instead both GetFloorHeight and GetCeilingHeight calls to increase
-// readability.
 
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
@@ -741,7 +700,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
 			// HACK: Force slight push-out to the left side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -793,7 +752,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
 			// HACK: Force slight push-out to the right side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;

@@ -397,9 +397,9 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 	{
 		// HACK: Set position command can't move Lara laterally?
 		if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_LEFT)
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
+			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
 		else if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
+			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
 
 		item->Animation.VerticalVelocity = 10;
 	}

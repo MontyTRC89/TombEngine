@@ -122,7 +122,8 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
-CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height = 0, int side = 0);
+CollisionResult GetCollision(ItemInfo* item, short orient, float forward, float vertical = 0, float lateral = 0);
+CollisionResult GetCollision(Vector3 pos, int roomNumber, short orient, float forward, float vertical = 0, float lateral = 0);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ItemInfo* item);
@@ -147,7 +148,6 @@ int GetWaterHeight(ItemInfo* item);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
-void MoveItem(ItemInfo* item, short angle, int x, int z = 0);
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
