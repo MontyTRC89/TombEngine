@@ -18,6 +18,7 @@
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SentryGunBite = { 0, 0, 0, 8 };
+	Vector3Int SentryGunFlameOffset = { -140, 0, 0 };
 
 	void InitialiseSentryGun(short itemNum)
 	{
@@ -86,7 +87,7 @@ namespace TEN::Entities::TR4
 							if (AI.distance <= pow(SECTOR(2), 2))
 							{
 								// Throw fire
-								ThrowFire(itemNum, 7, Vector3Int(-140, 0, 0));
+								ThrowFire(itemNum, 7, SentryGunFlameOffset, SentryGunFlameOffset);
 								c = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
 							}
 							else

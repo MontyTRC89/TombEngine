@@ -17,6 +17,7 @@
 #include "Specific/trmath.h"
 
 BITE_INFO WorkerFlamethrowerBite = { 0, 250, 32, 9 };
+Vector3Int WorkerFlamethrowerOffset = { 0, 140, 0 };
 
 // TODO
 enum WorkerFlamethrowerState
@@ -102,7 +103,7 @@ void WorkerFlamethrower(short itemNumber)
 		else
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 14, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-			ThrowFire(itemNumber, WorkerFlamethrowerBite.meshNum, Vector3Int(0, 140, -4));
+			ThrowFire(itemNumber, WorkerFlamethrowerBite.meshNum, WorkerFlamethrowerOffset, WorkerFlamethrowerOffset);
 		}
 			
 		AI_INFO AI;
