@@ -197,7 +197,7 @@ void ControlExpandingPlatform(short itemNumber)
 			item->ItemFlags[1] = 1;
 		else if (item->ItemFlags[1] < 4096)
 		{
-			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, 0);
+			SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose);
 
 			item->ItemFlags[1] += 64;
 			ShiftLaraOnPlatform(itemNumber, true);
@@ -226,7 +226,7 @@ void ControlExpandingPlatform(short itemNumber)
 	}
 	else
 	{
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, 0);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose);
 
 		if (item->TriggerFlags >= 0)
 		{

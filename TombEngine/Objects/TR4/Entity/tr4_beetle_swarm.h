@@ -1,19 +1,19 @@
 #pragma once
-#include <items.h>
-
-struct BeetleData
-{
-	PHD_3DPOS Pose;
-	short RoomNumber;
-	int Velocity;
-	int VerticalVelocity;
-	bool On;
-
-	byte Flags;
-};
+#include "Game/items.h"
 
 namespace TEN::Entities::TR4
 {
+	struct BeetleData
+	{
+		PHD_3DPOS Pose;
+		short RoomNumber;
+		int Velocity;
+		int VerticalVelocity;
+		bool On;
+
+		byte Flags;
+	};
+
 	constexpr auto NUM_BEETLES = 256;
 
 	extern BeetleData BeetleSwarm[NUM_BEETLES];

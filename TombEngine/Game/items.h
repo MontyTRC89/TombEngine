@@ -67,9 +67,9 @@ struct EntityAnimationData
 	std::vector<BoneMutator> Mutator;
 };
 
+//todo we need to find good "default states" for a lot of these - squidshire 25/05/2022
 struct ItemInfo
 {
-	std::string LuaName;
 	GAME_OBJECT_ID ObjectNumber;
 	int Status;	// ItemStatus enum.
 	bool Active;
@@ -107,11 +107,12 @@ struct ItemInfo
 	short AfterDeath;
 	short CarriedItem;
 
-	// New LUA stuff
-	std::string luaCallbackOnKilledName;
-	std::string luaCallbackOnHitName;
-	std::string luaCallbackOnCollidedWithObjectName;
-	std::string luaCallbackOnCollidedWithRoomName;
+	// Lua
+	std::string LuaName;
+	std::string LuaCallbackOnKilledName;
+	std::string LuaCallbackOnHitName;
+	std::string LuaCallbackOnCollidedWithObjectName;
+	std::string LuaCallbackOnCollidedWithRoomName;
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);

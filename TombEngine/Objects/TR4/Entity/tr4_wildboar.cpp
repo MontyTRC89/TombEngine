@@ -11,13 +11,15 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
-BITE_INFO WildBoatBiteInfo = { 0, 0, 0, 14 };
-
-void InitialiseWildBoar(short itemNumber)
+namespace TEN::Entities::TR4
 {
-	auto* item = &g_Level.Items[itemNumber];
+	BITE_INFO WildBoatBiteInfo = { 0, 0, 0, 14 };
 
-	ClearItem(itemNumber);
+	void InitialiseWildBoar(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 6;
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
@@ -25,143 +27,143 @@ void InitialiseWildBoar(short itemNumber)
 	item->Animation.ActiveState = 1;
 }
 
-void WildBoarControl(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
-		return;
-
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-
-	short angle = 0;
-	short head = 0;
-	short neck = 0;
-	short tilt = 0;
-	short joint0 = 0;
-	short joint1 = 0;
-	short joint2 = 0;
-	short joint3 = 0;
-
-	if (item->HitPoints > 0)
+	void WildBoarControl(short itemNumber)
 	{
-		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-		int laraDistance = pow(dx, 2) + pow(dz, 2);
+		if (!CreatureActive(itemNumber))
+			return;
 
-		if (item->AIBits & GUARD)
-			GetAITarget(creature);
-		else
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
+
+		short angle = 0;
+		short head = 0;
+		short neck = 0;
+		short tilt = 0;
+		short joint0 = 0;
+		short joint1 = 0;
+		short joint2 = 0;
+		short joint3 = 0;
+
+		if (item->HitPoints > 0)
 		{
-			creature->Enemy = LaraItem;
+			int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+			int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
+			int laraDistance = pow(dx, 2) + pow(dz, 2);
 
-			int minDistance = INT_MAX;
-
-			for (int i = 0; i < ActiveCreatures.size(); i++)
+			if (item->AIBits & GUARD)
+				GetAITarget(creature);
+			else
 			{
-				auto* currentItem = ActiveCreatures[i];
+				creature->Enemy = LaraItem;
 
-				if (currentItem->ItemNumber == NO_ITEM || currentItem->ItemNumber == itemNumber)
-					continue;
+				int minDistance = INT_MAX;
 
-				auto* target = &g_Level.Items[currentItem->ItemNumber];
-				if (target->ObjectNumber != ID_WILD_BOAR)
+				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
-					int dx2 = target->Pose.Position.x - item->Pose.Position.x;
-					int dz2 = target->Pose.Position.z - item->Pose.Position.z;
-					int distance = pow(dx2, 2) + pow(dz2, 2);
+					auto* currentItem = ActiveCreatures[i];
 
-					if (distance < minDistance &&
-						distance < laraDistance)
+					if (currentItem->ItemNumber == NO_ITEM || currentItem->ItemNumber == itemNumber)
+						continue;
+
+					auto* target = &g_Level.Items[currentItem->ItemNumber];
+					if (target->ObjectNumber != ID_WILD_BOAR)
 					{
-						creature->Enemy = target;
-						minDistance = distance;
+						int dx2 = target->Pose.Position.x - item->Pose.Position.x;
+						int dz2 = target->Pose.Position.z - item->Pose.Position.z;
+						int distance = pow(dx2, 2) + pow(dz2, 2);
+
+						if (distance < minDistance &&
+							distance < laraDistance)
+						{
+							creature->Enemy = target;
+							minDistance = distance;
+						}
 					}
 				}
 			}
-		}
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-		GetCreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
 
-		if (item->Flags)
-			creature->Mood = MoodType::Escape;
+			if (item->Flags)
+				creature->Mood = MoodType::Escape;
 
-		CreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->MaxTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (AI.ahead)
-		{
-			joint1 = AI.angle / 2;
-			joint3 = AI.angle / 2;
-		}
-
-		switch (item->Animation.ActiveState)
-		{
-		case 1:
-			creature->MaxTurn = 0;
-
-			if (AI.ahead && AI.distance || item->Flags)
-				item->Animation.TargetState = 2;
-			else if (GetRandomControl() & 0x7F)
+			if (AI.ahead)
 			{
-				joint1 = AIGuard(creature) / 2;
-				joint3 = joint1;
-			}
-			else
-				item->Animation.TargetState = 3;
-			
-			break;
-
-		case 3:
-			creature->MaxTurn = 0;
-
-			if (AI.ahead && AI.distance)
-				item->Animation.TargetState = 1;
-			else if (!(GetRandomControl() & 0x7F))
-				item->Animation.TargetState = 1;
-			
-			break;
-
-		case 2:
-			if (AI.distance >= SECTOR(4096))
-			{
-				creature->MaxTurn = ANGLE(6.0f);
-				item->Flags = 0;
-			}
-			else
-			{
-				creature->MaxTurn = ANGLE(3.0f);
-				joint0 = -AI.distance;
-				joint2 = -AI.distance;
+				joint1 = AI.angle / 2;
+				joint3 = AI.angle / 2;
 			}
 
-			if (!item->Flags && (AI.distance < SECTOR(64) && AI.bite))
+			switch (item->Animation.ActiveState)
 			{
-				item->Animation.TargetState = 4;
+			case 1:
+				creature->MaxTurn = 0;
 
-				if (creature->Enemy == LaraItem)
+				if (AI.ahead && AI.distance || item->Flags)
+					item->Animation.TargetState = 2;
+				else if (GetRandomControl() & 0x7F)
 				{
-					creature->Enemy->HitPoints -= 30;
-					creature->Enemy->HitStatus = true;
+					joint1 = AIGuard(creature) / 2;
+					joint3 = joint1;
+				}
+				else
+					item->Animation.TargetState = 3;
+
+				break;
+
+			case 3:
+				creature->MaxTurn = 0;
+
+				if (AI.ahead && AI.distance)
+					item->Animation.TargetState = 1;
+				else if (!(GetRandomControl() & 0x7F))
+					item->Animation.TargetState = 1;
+
+				break;
+
+			case 2:
+				if (AI.distance >= SECTOR(4096))
+				{
+					creature->MaxTurn = ANGLE(6.0f);
+					item->Flags = 0;
+				}
+				else
+				{
+					creature->MaxTurn = ANGLE(3.0f);
+					joint0 = -AI.distance;
+					joint2 = -AI.distance;
 				}
 
-				CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
-				item->Flags = 1;
+				if (!item->Flags && (AI.distance < SECTOR(64) && AI.bite))
+				{
+					item->Animation.TargetState = 4;
+
+					if (creature->Enemy == LaraItem)
+					{
+						creature->Enemy->HitPoints -= 30;
+						creature->Enemy->HitStatus = true;
+					}
+
+					CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
+					item->Flags = 1;
+				}
+
+				break;
+
+			case 4:
+				creature->MaxTurn = 0;
+				break;
 			}
-
-			break;
-
-		case 4:
-			creature->MaxTurn = 0;
-			break;
 		}
-	}
-	else
-	{
-		item->HitPoints = 0;
+		else
+		{
+			item->HitPoints = 0;
 
 		if (item->Animation.ActiveState != 5)
 		{
@@ -171,9 +173,10 @@ void WildBoarControl(short itemNumber)
 		}
 	}
 
-	CreatureJoint(item, 0, joint0);
-	CreatureJoint(item, 1, joint1);
-	CreatureJoint(item, 2, joint2);
-	CreatureJoint(item, 3, joint3);
-	CreatureAnimation(itemNumber, angle, 0);
+		CreatureJoint(item, 0, joint0);
+		CreatureJoint(item, 1, joint1);
+		CreatureJoint(item, 2, joint2);
+		CreatureJoint(item, 3, joint3);
+		CreatureAnimation(itemNumber, angle, 0);
+	}
 }

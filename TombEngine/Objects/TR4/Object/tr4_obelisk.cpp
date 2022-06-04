@@ -67,7 +67,7 @@ void ObeliskControl(short itemNumber)
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Pose, 0);
+					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Pose);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
@@ -112,7 +112,7 @@ void ObeliskControl(short itemNumber)
 			pos.Position.y = item->Pose.Position.y;
 			pos.Position.z = item->Pose.Position.z + SECTOR(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 
-			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos, 0);
+			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos);
 
 			if (GlobalCounter & 1)
 			{
@@ -140,8 +140,8 @@ void ObeliskControl(short itemNumber)
 						item2 = FindItem(ID_PUZZLE_ITEM1_COMBO1);
 						item2->Status = ITEM_NOT_ACTIVE;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &item2->Pose, 0);
-						SoundEffect(SFX_TR4_EXPLOSION2, &item2->Pose, 0);
+						SoundEffect(SFX_TR4_EXPLOSION1, &item2->Pose);
+						SoundEffect(SFX_TR4_EXPLOSION2, &item2->Pose);
 					}
 
 					TriggerLightning(

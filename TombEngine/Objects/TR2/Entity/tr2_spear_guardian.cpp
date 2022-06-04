@@ -37,7 +37,7 @@ static void XianDamage(ItemInfo* item, int damage)
 		LaraItem->HitStatus = true;
 		CreatureEffect(item, &SpearBiteRight, DoBloodSplat);
 		creature->Flags |= 1;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 	}
 
 	if (!(creature->Flags & 2) && item->TouchBits & 0x800)
@@ -46,7 +46,7 @@ static void XianDamage(ItemInfo* item, int damage)
 		LaraItem->HitStatus = true;
 		CreatureEffect(item, &SpearBiteLeft, DoBloodSplat);
 		creature->Flags |= 2;
-		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 	}
 }
 
@@ -85,7 +85,7 @@ void SpearGuardianControl(short itemNumber)
 
 		if (!item->MeshBits)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, NULL);
 			// TODO: exploding death
 		}
 

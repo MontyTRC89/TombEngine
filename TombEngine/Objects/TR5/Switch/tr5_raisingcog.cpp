@@ -107,7 +107,7 @@ void RaisingCogControl(short itemNumber)
 				else
 					flags = item->ItemFlags[2];
 
-				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, SoundEnvironment::Land, 1.0f, (flags * 256) / 32767.0f); // TODO: check actual sound!
 
 				item->ItemFlags[2] += 2;
 				item->Pose.Position.y -= 2;

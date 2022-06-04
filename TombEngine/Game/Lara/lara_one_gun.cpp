@@ -72,7 +72,9 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	bool running = (weaponType == LaraWeaponType::HK && laraItem->Animation.Velocity != 0);
+	
 	static bool reloadHarpoonGun = false;
+	reloadHarpoonGun = (lara->Weapons[(int)weaponType].Ammo->hasInfinite() || weaponType != LaraWeaponType::HarpoonGun) ? false : reloadHarpoonGun;
 
 	switch (item->Animation.ActiveState)
 	{
@@ -88,10 +90,13 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.TargetState = WEAPON_STATE_RECOIL;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
 		{
-			item->Animation.TargetState = WEAPON_STATE_RELOAD;
-			reloadHarpoonGun = false;
+			if (reloadHarpoonGun)
+			{
+				item->Animation.TargetState = WEAPON_STATE_RELOAD;
+				reloadHarpoonGun = false;
+			}
 		}
 
 		break;
@@ -111,10 +116,13 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.TargetState = WEAPON_STATE_AIM;
 
-		if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
+		if (weaponType == LaraWeaponType::HarpoonGun && !lara->Weapons[(int)weaponType].Ammo->hasInfinite())
 		{
-			item->Animation.TargetState = WEAPON_STATE_RELOAD;
-			reloadHarpoonGun = false;
+			if (reloadHarpoonGun)
+			{
+				item->Animation.TargetState = WEAPON_STATE_RELOAD;
+				reloadHarpoonGun = false;
+			}
 		}
 
 		break;
@@ -150,11 +158,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						//HKFlag = 1;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 83888140);
-							SoundEffect(SFX_LARA_HK_FIRE, &laraItem->Pose, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
 						}
 					}
 					else
@@ -173,19 +181,19 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				//HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_LARA_HK_FIRE);
-				SoundEffect(SFX_LARA_HK_STOP, &laraItem->Pose, 0);
+				StopSoundEffect(SFX_TR4_LARA_HK_FIRE);
+				SoundEffect(SFX_TR4_LARA_HK_STOP, &laraItem->Pose);
 				//HKFlag = 0;
 			}
 		}
 		/*else if (HKFlag)
 		{
 			if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-				SoundEffect(SFX_HK_SILENCED, 0, 0);
+				SoundEffect(SFX_HK_SILENCED, nullptr);
 			else
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, 83888140);
-				SoundEffect(SFX_HK_FIRE, &laraItem->pos, 0);
+				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, SoundEnvironment::Land, 1.0f, 0.4f);
+				SoundEffect(SFX_HK_FIRE, &laraItem->pos);
 			}
 		}*/
 		else if (weaponType == LaraWeaponType::Shotgun && !(TrInput & IN_ACTION) && !lara->LeftArm.Locked)
@@ -226,11 +234,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						item->Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_LARA_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 83888140);
-							SoundEffect(SFX_LARA_HK_FIRE, &laraItem->Pose, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
 						}
 					}
 					else
@@ -245,18 +253,18 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				//HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_LARA_HK_FIRE);
-				SoundEffect(SFX_LARA_HK_STOP, &laraItem->Pose, 0);
+				StopSoundEffect(SFX_TR4_LARA_HK_FIRE);
+				SoundEffect(SFX_TR4_LARA_HK_STOP, &laraItem->Pose);
 				//HKFlag = 0;
 			}
 			/*else if (HKFlag)
 			{
 				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-					SoundEffect(SFX_HK_SILENCED, 0, 0);
+					SoundEffect(SFX_HK_SILENCED, nullptr);
 				else
 				{
-					SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, 83888140);
-					SoundEffect(SFX_HK_FIRE, &laraItem->pos, 0);
+					SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, SoundEnvironment::Land, 1.0f, 0.4f);
+					SoundEffect(SFX_HK_FIRE, &laraItem->pos);
 				}
 			}*/
 		}
@@ -344,8 +352,8 @@ void FireShotgun(ItemInfo* laraItem)
 
 		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, 20971524);
-		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, laraItem));
+		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
 
 		Statistics.Game.AmmoUsed++;
 	}
@@ -1108,8 +1116,8 @@ void GrenadeControl(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0, 0.7f, 0.5f);
-		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
 		// Setup the counter for spawned grenades in the case of flash and super grenades ammos
 		if (item->ItemFlags[0] != (int)GrenadeType::Normal && item->ItemFlags[0] != (int)GrenadeType::Ultra)
@@ -1185,7 +1193,7 @@ void FireRocket(ItemInfo* laraItem)
 
 		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
 		Statistics.Game.AmmoUsed++;
@@ -1404,8 +1412,8 @@ void RocketControl(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0, 0.7f, 0.5f);
-		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 		KillItem(itemNumber);
@@ -1476,7 +1484,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo;
 
-		SoundEffect(SFX_TR4_LARA_CROSSBOW, 0, 0);
+		SoundEffect(SFX_TR4_LARA_CROSSBOW, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
 		Statistics.Game.AmmoUsed++;
@@ -1702,8 +1710,8 @@ void CrossbowBoltControl(short itemNumber)
 
 		AlertNearbyGuards(item);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, 0, 0.7f, 0.5f);
-		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
+		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
 		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
 		KillItem(itemNumber);

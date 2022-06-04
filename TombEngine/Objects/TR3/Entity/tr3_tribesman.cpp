@@ -170,8 +170,8 @@ void TribemanAxeControl(short itemNumber)
 			break;
 
 		case 2:
-			creature->Flags = 0;
 			creature->MaxTurn = ANGLE(9.0f);
+			creature->Flags = 0;
 			tilt = angle / 8;
 
 			if (creature->Mood == MoodType::Bored)
@@ -256,7 +256,7 @@ void TribemanAxeControl(short itemNumber)
 					for (int i = 0; i < TribesmanAxeHit[item->Animation.ActiveState][2]; i += 8)
 						CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
 
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 
 					LaraItem->HitPoints -= TribesmanAxeHit[item->Animation.ActiveState][2];
 					LaraItem->HitStatus = true;
@@ -266,9 +266,9 @@ void TribemanAxeControl(short itemNumber)
 			{
 				if (creature->Enemy)
 				{
-					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < 512 &&
-						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < 512 &&
-						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < 512 &&
+					if (abs(creature->Enemy->Pose.Position.x - item->Pose.Position.x) < SECTOR(0.5f) &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < SECTOR(0.5f) &&
+						abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < SECTOR(0.5f) &&
 						creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 						creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 					{
@@ -276,7 +276,7 @@ void TribemanAxeControl(short itemNumber)
 						creature->Enemy->HitStatus = true;
 
 						CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					}
 				}
 			}
@@ -551,7 +551,7 @@ void TribemanDartsControl(short itemNumber)
 			{
 				if (!(creature->Flags & 0xf000) && item->TouchBits & 0x2400)
 				{
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					CreatureEffect(item, &TribesmanDartBite1, DoBloodSplat);
 					creature->Flags |= 0x1000;
 
@@ -571,7 +571,7 @@ void TribemanDartsControl(short itemNumber)
 						creature->Enemy->HitStatus = true;
 						creature->Flags |= 0x1000;
 
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					}
 				}
 			}

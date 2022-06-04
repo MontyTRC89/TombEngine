@@ -124,7 +124,7 @@ namespace Environment
 				if (StormTimer > -1)
 					StormTimer--;
 				if (!StormTimer)
-					SoundEffect(SFX_TR4_THUNDER_RUMBLE, NULL, 0);
+					SoundEffect(SFX_TR4_THUNDER_RUMBLE, NULL);
 			}
 			else if (!(rand() & 0x7F))
 			{

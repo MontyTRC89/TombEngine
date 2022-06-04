@@ -27,6 +27,8 @@ table Item {
     after_death: int32;
     item_flags: [int32];
 	position: Position;
+	next_item: int32;
+	next_item_active: int32;
 	triggered: bool;
 	active: bool;
 	status: int32;
@@ -38,6 +40,10 @@ table Item {
 	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
 	lua_name: string;
+	lua_on_killed_name: string;
+	lua_on_hit_name: string;
+	lua_on_collided_with_object_name: string;
+	lua_on_collided_with_room_name: string;
 }
 
 table AmmoInfo {
@@ -80,6 +86,18 @@ table FlareData {
 	life: uint32;
 	frame: int32;
 	control_left: bool;
+}
+
+enum TorchState:int32 { 
+	holding = 0,
+	throwing,
+	dropping,
+	just_lit
+}
+
+table TorchData {
+	state: TorchState;
+	is_lit: bool;
 }
 
 table LaraInventoryData {
@@ -198,7 +216,7 @@ table Lara {
 	inventory: LaraInventoryData;
 	weapons: [CarriedWeaponInfo];
 	flare: FlareData;
-	lit_torch: bool;
+	torch: TorchData;
 	extra_head_rot: Vector3;
 	extra_torso_rot: Vector3;
 	extra_velocity: Vector3;
@@ -379,8 +397,10 @@ table SaveGame {
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
 	lara: Lara;
-	active_weapon: WeaponInfo;
 	items: [Item];
+	next_item_free: int32;
+	next_item_active: int32;
+	room_items: [int32];
 	fixed_cameras: [FixedCamera];
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];

@@ -244,7 +244,7 @@ void DrawFlare(ItemInfo* laraItem)
 		{
 			if (armFrame == 72)
 			{
-				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem));
+				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, laraItem));
 				lara->Flare.Life = 1;
 			}
 
@@ -351,7 +351,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 				life = lara->Flare.Life & 0x7FFF;
 		}
 		else
-			flareItem->ItemFlags[3] = lara->LitTorch;
+			flareItem->ItemFlags[3] = lara->Torch.IsLit;
 
 		AddActiveItem(itemNumber);
 		flareItem->Status = ITEM_ACTIVE;

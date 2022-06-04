@@ -221,6 +221,13 @@ bool SaveGame::Save(int slot)
 	flare.add_life(Lara.Flare.Life);
 	auto flareOffset = flare.Finish();
 
+	Save::TorchState currentTorchState{ (int)Lara.Torch.State };
+
+	Save::TorchDataBuilder torch{ fbb };
+	torch.add_state(currentTorchState);
+	torch.add_is_lit(Lara.Torch.IsLit);
+	auto torchOffset = torch.Finish();
+
 	Save::LaraInventoryDataBuilder inventory{ fbb };
 	inventory.add_beetle_life(Lara.Inventory.BeetleLife);
 	inventory.add_big_waterskin(Lara.Inventory.BigWaterskin);
@@ -382,7 +389,6 @@ bool SaveGame::Save(int slot)
 	lara.add_inventory(inventoryOffset);
 	lara.add_item_number(Lara.ItemNumber);
 	lara.add_left_arm(leftArmOffset);
-	lara.add_lit_torch(Lara.LitTorch);
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
 	lara.add_mesh_ptrs(meshPtrsOffset);
@@ -394,6 +400,7 @@ bool SaveGame::Save(int slot)
 	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
 	lara.add_target_entity_number(Lara.TargetEntity - g_Level.Items.data());
+	lara.add_torch(torchOffset);
 	lara.add_vehicle(Lara.Vehicle);
 	lara.add_water_current_active(Lara.WaterCurrentActive);
 	lara.add_water_current_pull(&waterCurrentPull);
@@ -408,6 +415,10 @@ bool SaveGame::Save(int slot)
 		ObjectInfo* obj = &Objects[itemToSerialize.ObjectNumber];
 
 		auto luaNameOffset = fbb.CreateString(itemToSerialize.LuaName);
+		auto luaOnKilledNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnKilledName);
+		auto luaOnHitNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnHitName);
+		auto luaOnCollidedObjectNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnCollidedWithObjectName);
+		auto luaOnCollidedRoomNameOffset = fbb.CreateString(itemToSerialize.LuaCallbackOnCollidedWithRoomName);
 
 		std::vector<int> itemFlags;
 		for (int i = 0; i < 7; i++)
@@ -415,8 +426,10 @@ bool SaveGame::Save(int slot)
 		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
+		flatbuffers::Offset<Save::Short> shortOffset;
+		flatbuffers::Offset<Save::Int> intOffset;
 
-		if (Objects[itemToSerialize.ObjectNumber].intelligent 
+		if (Objects[itemToSerialize.ObjectNumber].intelligent
 			&& itemToSerialize.Data.is<CreatureInfo>())
 		{
 			auto creature = GetCreatureInfo(&itemToSerialize);
@@ -451,8 +464,21 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_poisoned(creature->Poisoned);
 			creatureBuilder.add_reached_goal(creature->ReachedGoal);
 			creatureBuilder.add_tosspad(creature->Tosspad);
+			creatureBuilder.add_ai_target_number(creature->AITargetNumber);
 			creatureOffset = creatureBuilder.Finish();
-		} 
+		}
+		else if (itemToSerialize.Data.is<short>())
+		{
+			Save::ShortBuilder sb{ fbb };
+			sb.add_scalar(short(itemToSerialize.Data));
+			shortOffset = sb.Finish();
+		}
+		else if (itemToSerialize.Data.is<int>())
+		{
+			Save::IntBuilder ib{ fbb };
+			ib.add_scalar(int(itemToSerialize.Data));
+			intOffset = ib.Finish();
+		}
 
 		Save::Position position = Save::Position(
 			(int32_t)itemToSerialize.Pose.Position.x,
@@ -464,6 +490,8 @@ bool SaveGame::Save(int slot)
 
 		Save::ItemBuilder serializedItem{ fbb };
 
+		serializedItem.add_next_item(itemToSerialize.NextItem);
+		serializedItem.add_next_item_active(itemToSerialize.NextActive);
 		serializedItem.add_anim_number(itemToSerialize.Animation.AnimNumber - obj->animIndex);
 		serializedItem.add_after_death(itemToSerialize.AfterDeath);
 		serializedItem.add_box_number(itemToSerialize.BoxNumber);
@@ -503,21 +531,20 @@ bool SaveGame::Save(int slot)
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
-			short& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Short);
-			serializedItem.add_data(data);
+			serializedItem.add_data(shortOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<int>())
 		{
-			int& data = itemToSerialize.Data;
 			serializedItem.add_data_type(Save::ItemData::Int);
-			serializedItem.add_data(data);
+			serializedItem.add_data(intOffset.Union());
 		}
 
-		if (currentItemIndex >= g_Level.NumItems)
-		{
-			serializedItem.add_lua_name(luaNameOffset);
-		}
+		serializedItem.add_lua_name(luaNameOffset);
+		serializedItem.add_lua_on_killed_name(luaOnKilledNameOffset);
+		serializedItem.add_lua_on_hit_name(luaOnHitNameOffset);
+		serializedItem.add_lua_on_collided_with_object_name(luaOnCollidedObjectNameOffset);
+		serializedItem.add_lua_on_collided_with_room_name(luaOnCollidedRoomNameOffset);
 
 		auto serializedItemOffset = serializedItem.Finish();
 		serializedItems.push_back(serializedItemOffset);
@@ -528,8 +555,8 @@ bool SaveGame::Save(int slot)
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
 	// Soundtrack playheads
-	auto bgmTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::BGM);
-	auto oneshotTrackData = GetSoundTrackNameAndPosition(SOUNDTRACK_PLAYTYPE::OneShot);
+	auto bgmTrackData = GetSoundTrackNameAndPosition(SoundTrackType::BGM);
+	auto oneshotTrackData = GetSoundTrackNameAndPosition(SoundTrackType::OneShot);
 	auto bgmTrackOffset = fbb.CreateString(bgmTrackData.first);
 	auto oneshotTrackOffset = fbb.CreateString(oneshotTrackData.first);
 
@@ -548,6 +575,11 @@ bool SaveGame::Save(int slot)
 	for (int i = 0; i < MAX_FLIPMAP; i++)
 		flipStats.push_back(FlipStats[i]);
 	auto flipStatsOffset = fbb.CreateVector(flipStats);
+
+	std::vector<int> roomItems;
+	for (auto const& r : g_Level.Rooms)
+		roomItems.push_back(r.itemNumber);
+	auto roomItemsOffset = fbb.CreateVector(roomItems);
 
 	// Cameras
 	std::vector<flatbuffers::Offset<Save::FixedCamera>> cameras;
@@ -857,6 +889,8 @@ bool SaveGame::Save(int slot)
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
 	sgb.add_lara(laraOffset);
+	sgb.add_next_item_free(NextItemFree);
+	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
 	sgb.add_ambient_track(bgmTrackOffset);
 	sgb.add_ambient_position(bgmTrackData.second);
@@ -865,6 +899,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
+	sgb.add_room_items(roomItemsOffset);
 	sgb.add_flip_effect(FlipEffect);
 	sgb.add_flip_status(FlipStatus);
 	sgb.add_flip_timer(0);
@@ -934,8 +969,8 @@ bool SaveGame::Load(int slot)
 	//FlipTimer = s->flip_timer();
 
 	// Restore soundtracks
-	PlaySoundTrack(s->ambient_track()->str(), SOUNDTRACK_PLAYTYPE::BGM, s->ambient_position());
-	PlaySoundTrack(s->oneshot_track()->str(), SOUNDTRACK_PLAYTYPE::OneShot, s->oneshot_position());
+	PlaySoundTrack(s->ambient_track()->str(), SoundTrackType::BGM, s->ambient_position());
+	PlaySoundTrack(s->oneshot_track()->str(), SoundTrackType::OneShot, s->oneshot_position());
 
 	// Legacy soundtrack map
 	for (int i = 0; i < s->cd_flags()->size(); i++)
@@ -952,8 +987,10 @@ bool SaveGame::Load(int slot)
 	{
 		auto staticMesh = s->static_meshes()->Get(i);
 		auto room = &g_Level.Rooms[staticMesh->room_number()];
+
 		if (i >= room->mesh.size())
 			break;
+
 		room->mesh[i].flags = staticMesh->flags();
 		if (!room->mesh[i].flags)
 		{
@@ -990,56 +1027,36 @@ bool SaveGame::Load(int slot)
 	// Items
 	InitialiseItemArray(NUM_ITEMS);
 
+	NextItemFree = s->next_item_free();
+	NextItemActive = s->next_item_active();
+
+	for(int i = 0; i < s->room_items()->size(); ++i)
+		g_Level.Rooms[i].itemNumber = s->room_items()->Get(i);
+
 	for (int i = 0; i < s->items()->size(); i++)
 	{
 		const Save::Item* savedItem = s->items()->Get(i);
 
-		short itemNumber = i;
-		bool dynamicItem = false;
+		bool dynamicItem = i >= g_Level.NumItems;
 
-		if (i >= g_Level.NumItems)
-		{
-			// Items beyond items level space must be active
-			if (!savedItem->active())
-				continue;
-
-			// Items beyond items level space must be initialised differently
-			itemNumber = CreateItem();
-			if (itemNumber == NO_ITEM)
-				continue;
-			dynamicItem = true;
-		}
-
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		ItemInfo* item = &g_Level.Items[i];
 		item->ObjectNumber = static_cast<GAME_OBJECT_ID>(savedItem->object_id());
+
+		item->NextItem = savedItem->next_item();
+		item->NextActive = savedItem->next_item_active();
 
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
 		
-		if (savedItem->lua_name() != nullptr)
-		{
-			item->LuaName = savedItem->lua_name()->str();
+		item->LuaName = savedItem->lua_name()->str();
+		if (!item->LuaName.empty())
 			g_GameScriptEntities->AddName(item->LuaName, i);
-		}
+
+		item->LuaCallbackOnKilledName = savedItem->lua_on_killed_name()->str();
+		item->LuaCallbackOnHitName = savedItem->lua_on_hit_name()->str();
+		item->LuaCallbackOnCollidedWithObjectName = savedItem->lua_on_collided_with_object_name()->str();
+		item->LuaCallbackOnCollidedWithRoomName = savedItem->lua_on_collided_with_room_name()->str();
 
 		g_GameScriptEntities->TryAddColliding(i);
-		if (!dynamicItem)
-		{
-			// Kill immediately item if already killed and continue
-			if (savedItem->flags() & IFLAG_KILLED)
-			{
-				if (obj->floor != nullptr)
-					UpdateBridgeItem(itemNumber, true);
-
-				KillItem(i);
-				item->Status = ITEM_DEACTIVATED;
-				item->Flags |= ONESHOT;
-				continue;
-			}
-
-			// If not triggered, don't load remaining data
-			if (item->ObjectNumber != ID_LARA && !(savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
-				continue;
-		}
 
 		item->Pose.Position.x = savedItem->position()->x_pos();
 		item->Pose.Position.y = savedItem->position()->y_pos();
@@ -1048,49 +1065,23 @@ bool SaveGame::Load(int slot)
 		item->Pose.Orientation.y = savedItem->position()->y_rot();
 		item->Pose.Orientation.z = savedItem->position()->z_rot();
 
-		short roomNumber = savedItem->room_number();
-
-		if (dynamicItem)
-		{
-			item->RoomNumber = roomNumber;
-
-			InitialiseItem(itemNumber);
-			
-			// InitialiseItem could overwrite position so restore it
-			item->Pose.Position.x = savedItem->position()->x_pos();
-			item->Pose.Position.y = savedItem->position()->y_pos();
-			item->Pose.Position.z = savedItem->position()->z_pos();
-			item->Pose.Orientation.x = savedItem->position()->x_rot();
-			item->Pose.Orientation.y = savedItem->position()->y_rot();
-			item->Pose.Orientation.z = savedItem->position()->z_rot();
-		}
+		item->RoomNumber = savedItem->room_number();
 
 		item->Animation.Velocity = savedItem->velocity();
 		item->Animation.VerticalVelocity = savedItem->vertical_velocity();
 
-		// Do the correct way for assigning new room number
-		if (item->ObjectNumber == ID_LARA)
+		if (item->ObjectNumber == ID_LARA && !dynamicItem)
 		{
 			LaraItem->Data = nullptr;
 			Lara.ItemNumber = i;
 			LaraItem = item;
-			LaraItem->Location.roomNumber = roomNumber;
+			LaraItem->Location.roomNumber = savedItem->room_number();
 			LaraItem->Location.yNumber = item->Pose.Orientation.y;
 			LaraItem->Data = &Lara;
-
-			UpdateItemRoom(item, -LARA_HEIGHT / 2);
 		}
-		else
-		{
-			if (item->RoomNumber != roomNumber)
-				ItemNewRoom(i, roomNumber);
 
-			if (obj->shadowSize)
-			{
-				FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-				item->Floor = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
-			}
-		}
+		item->Floor = savedItem->floor();
+		item->BoxNumber = savedItem->box_number();
 
 		// Animations
 		item->Animation.ActiveState = savedItem->active_state();
@@ -1105,16 +1096,13 @@ bool SaveGame::Load(int slot)
 		// Flags and timers
 		for (int j = 0; j < 7; j++)
 			item->ItemFlags[j] = savedItem->item_flags()->Get(j);
+
 		item->Timer = savedItem->timer();
 		item->TriggerFlags = savedItem->trigger_flags();
 		item->Flags = savedItem->flags();
 
 		// Carried item
 		item->CarriedItem = savedItem->carried_item();
-
-		// Activate item if needed
-		if (savedItem->active() && !item->Active)
-			AddActiveItem(i);
 
 		item->Active = savedItem->active();
 		item->HitStatus = savedItem->hit_stauts();
@@ -1125,9 +1113,9 @@ bool SaveGame::Load(int slot)
 		item->LookedAt = savedItem->looked_at();
 
 		// Creature data for intelligent items
-		if (item->ObjectNumber != ID_LARA && obj->intelligent)
+		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 		{
-			EnableBaddyAI(i, true);
+			EnableBaddyAI(i, true, false);
 
 			auto creature = GetCreatureInfo(item);
 			auto data = savedItem->data();
@@ -1161,6 +1149,7 @@ bool SaveGame::Load(int slot)
 			creature->Poisoned = savedCreature->poisoned();
 			creature->ReachedGoal = savedCreature->reached_goal();
 			creature->Tosspad = savedCreature->tosspad();
+			SetBaddyTarget(i, savedCreature->ai_target_number());
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
@@ -1168,6 +1157,13 @@ bool SaveGame::Load(int slot)
 			auto savedData = (Save::Short*)data;
 			item->Data = savedData->scalar();
 		}
+		else if (savedItem->data_type() == Save::ItemData::Int)
+		{
+			auto data = savedItem->data();
+			auto savedData = (Save::Int*)data;
+			item->Data = savedData->scalar();
+		}
+
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();
@@ -1189,7 +1185,7 @@ bool SaveGame::Load(int slot)
 			item->MeshBits = 0x00100;
 
 		if (obj->floor != nullptr)
-			UpdateBridgeItem(itemNumber);
+			UpdateBridgeItem(i);
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
@@ -1399,7 +1395,6 @@ bool SaveGame::Load(int slot)
 	Lara.LeftArm.Orientation.x = s->lara()->left_arm()->rotation()->x();
 	Lara.LeftArm.Orientation.y = s->lara()->left_arm()->rotation()->y();
 	Lara.LeftArm.Orientation.z = s->lara()->left_arm()->rotation()->z();
-	Lara.LitTorch = s->lara()->lit_torch();
 	Lara.Location = s->lara()->location();
 	Lara.LocationPad = s->lara()->location_pad();
 	Lara.NextCornerPos = PHD_3DPOS(
@@ -1419,6 +1414,8 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.Orientation.x = s->lara()->right_arm()->rotation()->x();
 	Lara.RightArm.Orientation.y = s->lara()->right_arm()->rotation()->y();
 	Lara.RightArm.Orientation.z = s->lara()->right_arm()->rotation()->z();
+	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
+	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
 	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
 	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
