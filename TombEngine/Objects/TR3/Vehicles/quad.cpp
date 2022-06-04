@@ -188,8 +188,8 @@ static void QuadbikeExplode(ItemInfo* laraItem, ItemInfo* quadItem)
 	auto pos = PoseData(quadItem->Pose.Position.x, quadItem->Pose.Position.y - CLICK(0.5f), quadItem->Pose.Position.z, 0, quadItem->Pose.Orientation.GetY(), 0);
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
 
-	SoundEffect(SFX_TR4_EXPLOSION1, NULL, 0);
-	SoundEffect(SFX_TR4_EXPLOSION2, NULL, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, NULL);
+	SoundEffect(SFX_TR4_EXPLOSION2, NULL);
 
 	quadItem->Status = ITEM_DEACTIVATED;
 	lara->Vehicle = NO_ITEM;
@@ -839,7 +839,7 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 		}
 
 		laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-		SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &quadItem->Pose, 0);
+		SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &quadItem->Pose);
 	}
 	else
 	{
@@ -1334,12 +1334,12 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 		else if (quad->Pitch > 0xA000)
 			quad->Pitch = 0xA000;
 
-		SoundEffect(SFX_TR3_QUADBIKE_MOVE, &quadItem->Pose, 0, 0.5f + (float)abs(quad->Pitch) / (float)MAX_VELOCITY);
+		SoundEffect(SFX_TR3_QUADBIKE_MOVE, &quadItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(quad->Pitch) / (float)MAX_VELOCITY);
 	}
 	else
 	{
 		if (drive != -1)
-			SoundEffect(SFX_TR3_QUADBIKE_IDLE, &quadItem->Pose, 0);
+			SoundEffect(SFX_TR3_QUADBIKE_IDLE, &quadItem->Pose);
 
 		quad->Pitch = 0;
 	}

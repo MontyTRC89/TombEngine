@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 
         ANIM_FRAME* framePtr[2];
         int rate;
-        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose, 0);
+        SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose);
         GetFrame(LaraItem, framePtr, &rate);
 
         int dy = LaraItem->Pose.Position.y + framePtr[0]->boundingBox.Y1;

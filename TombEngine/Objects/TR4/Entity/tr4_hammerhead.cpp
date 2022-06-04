@@ -10,134 +10,156 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
 
-BITE_INFO HammerheadBite = { 0, 0, 0, 12 };
-
-enum HammerheadState
+namespace TEN::Entities::TR4
 {
-	HAMMERHEAD_STATE_IDLE = 0,
-	HAMMERHEAD_STATE_SWIM_SLOW = 1,
-	HAMMERHEAD_STATE_SWIM_FAST = 2,
-	HAMMERHEAD_STATE_ATTACK = 3,
-	HAMMERHEAD_STATE_DEATH = 5,
-	HAMMERHEAD_STATE_KILL = 6
-};
+	BITE_INFO HammerheadBite = { 0, 0, 0, 12 };
 
-// TODO
-enum HammerheadAnim
-{
+	enum HammerheadState
+	{
+		HAMMERHEAD_STATE_IDLE = 0,
+		HAMMERHEAD_STATE_SWIM_SLOW = 1,
+		HAMMERHEAD_STATE_SWIM_FAST = 2,
+		HAMMERHEAD_STATE_IDLE_BITE_ATTACK = 3,
+		HAMMERHEAD_STATE_SWIM_FAST_BITE_ATTACK = 4,
+		HAMMERHEAD_STATE_DEATH = 5,
+		HAMMERHEAD_STATE_KILL = 6
+	};
 
-};
+	enum HammerheadAnim
+	{
+		HAMMERHEAD_ANIM_SWIM_FAST_BITE_ATTACK_LEFT_END = 0,
+		HAMMERHEAD_ANIM_BITE_IDLE_BITE_ATTACK_END = 1,
+		HAMMERHEAD_ANIM_BITE_IDLE_BITE_ATTACK_CONTINUE = 2,
+		HAMMERHEAD_ANIM_SWIM_FAST_BITE_ATTACK_LEFT_CONTINUE = 3,
+		HAMMERHEAD_ANIM_DEATH_START = 4,
+		HAMMERHEAD_ANIM_DEATH_CONTINUE = 5,
+		HAMMERHEAD_ANIM_BITE_IDLE_BITE_ATTACK_START = 6,
+		HAMMERHEAD_ANIM_IDLE_TO_SWIM_SLOW = 7,
+		HAMMERHEAD_ANIM_IDLE = 8,
+		HAMMERHEAD_ANIM_SWIM_SLOW = 9,
+		HAMMERHEAD_ANIM_SWIM_FAST = 10,
+		HAMMERHEAD_ANIM_SWIM_SLOW_TO_IDLE = 11,
+		HAMMERHEAD_ANIM_SWIM_SLOW_TO_SWIM_FAST = 12,
+		HAMMERHEAD_ANIM_SWIM_FAST_BITE_ATTACK_LEFT_START = 13,
+		HAMMERHEAD_ANIM_SWIM_FAST_TO_IDLE = 14,
+		HAMMERHEAD_ANIM_SWIM_FAST_TO_SWIM_SLOW = 15,
+		HAMMERHEAD_ANIM_SWIM_FAST_BITE_ATTACK_RIGHT_CONTINUE = 16,
+		HAMMERHEAD_ANIM_SWIM_FAST_BITE_ATTACK_RIGHT_END = 17,
+		HAMMERHEAD_ANIM_SWIM_FAST_BITE_ATTACK_RIGHT_START = 18,
+		HAMMERHEAD_ANIM_KILL = 19
+	};
 
-void InitialiseHammerhead(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	ClearItem(itemNumber);
-
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 8;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.TargetState = HAMMERHEAD_STATE_IDLE;
-	item->Animation.ActiveState = HAMMERHEAD_STATE_IDLE;
-}
-
-void HammerheadControl(short itemNumber)
-{
-	if (CreatureActive(itemNumber))
+	void InitialiseHammerhead(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		auto* creature = GetCreatureInfo(item);
 
-		if (item->HitPoints > 0)
+		ClearItem(itemNumber);
+
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMERHEAD_ANIM_IDLE;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.ActiveState = HAMMERHEAD_STATE_IDLE;
+		item->Animation.TargetState = HAMMERHEAD_STATE_IDLE;
+	}
+
+	void HammerheadControl(short itemNumber)
+	{
+		if (CreatureActive(itemNumber))
 		{
-			if (item->AIBits)
-				GetAITarget(creature);
-			else if (creature->HurtByLara)
-				creature->Enemy = LaraItem;
+			auto* item = &g_Level.Items[itemNumber];
+			auto* creature = GetCreatureInfo(item);
 
-			AI_INFO AI;
-			CreatureAIInfo(item, &AI);
+			if (item->HitPoints > 0)
+			{
+				if (item->AIBits)
+					GetAITarget(creature);
+				else if (creature->HurtByLara)
+					creature->Enemy = LaraItem;
+
+				AI_INFO AI;
+				CreatureAIInfo(item, &AI);
 
 			if (creature->Enemy != LaraItem)
 				atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
-			GetCreatureMood(item, &AI, VIOLENT);
-			CreatureMood(item, &AI, VIOLENT);
+				GetCreatureMood(item, &AI, VIOLENT);
+				CreatureMood(item, &AI, VIOLENT);
 
 			float angle = CreatureTurn(item, creature->MaxTurn);
 
-			switch (item->Animation.ActiveState)
-			{
-			case HAMMERHEAD_STATE_IDLE:
-				item->Animation.TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
-				creature->Flags = 0;
-				break;
+				switch (item->Animation.ActiveState)
+				{
+				case HAMMERHEAD_STATE_IDLE:
+					item->Animation.TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
+					creature->Flags = 0;
+					break;
 
 			case HAMMERHEAD_STATE_SWIM_SLOW:
 				creature->MaxTurn = Angle::DegToRad(7.0f);
 
-				if (AI.distance <= pow(SECTOR(1), 2))
-				{
-					if (AI.distance < pow(682, 2))
-						item->Animation.TargetState = HAMMERHEAD_STATE_ATTACK;
-				}
-				else
-					item->Animation.TargetState = HAMMERHEAD_STATE_SWIM_FAST;
-				
-				break;
-
-			case HAMMERHEAD_STATE_SWIM_FAST:
-				if (AI.distance < pow(SECTOR(1), 2))
-					item->Animation.TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
-				
-				break;
-
-			case HAMMERHEAD_STATE_ATTACK:
-				if (!creature->Flags)
-				{
-					if (item->TouchBits & 0x3400)
+					if (AI.distance <= pow(SECTOR(1), 2))
 					{
-						CreatureEffect(item, &HammerheadBite, DoBloodSplat);
-						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 120;
-						LaraItem->HitStatus = true;
+						if (AI.distance < pow(682, 2))
+							item->Animation.TargetState = HAMMERHEAD_STATE_IDLE_BITE_ATTACK;
 					}
+					else
+						item->Animation.TargetState = HAMMERHEAD_STATE_SWIM_FAST;
+
+					break;
+
+				case HAMMERHEAD_STATE_SWIM_FAST:
+					if (AI.distance < pow(SECTOR(1), 2))
+						item->Animation.TargetState = HAMMERHEAD_STATE_SWIM_SLOW;
+
+					break;
+
+				case HAMMERHEAD_STATE_IDLE_BITE_ATTACK:
+					if (!creature->Flags)
+					{
+						if (item->TouchBits & 0x3400)
+						{
+							CreatureEffect(item, &HammerheadBite, DoBloodSplat);
+							creature->Flags = 1;
+
+							LaraItem->HitPoints -= 120;
+							LaraItem->HitStatus = true;
+						}
+					}
+
+					break;
+
+				default:
+					break;
 				}
 
-				break;
+				CreatureTilt(item, 0);
+				CreatureJoint(item, 0, angle * -2);
+				CreatureJoint(item, 1, angle * -2);
+				CreatureJoint(item, 2, angle * -2);
+				CreatureJoint(item, 3, angle * 2);
 
-			default:
-				break;
+				// NOTE: in TR2 shark there was a call to CreatureKill with special kill anim
+				// Hammerhead seems to not have it in original code but this check is still there as a leftover
+				if (item->Animation.ActiveState == HAMMERHEAD_STATE_KILL)
+					AnimateItem(item);
+				else
+				{
+					CreatureAnimation(itemNumber, angle, 0);
+					CreatureUnderwater(item, 341);
+				}
 			}
-
-			CreatureTilt(item, 0);
-			CreatureJoint(item, 0, -2 * angle);
-			CreatureJoint(item, 1, -2 * angle);
-			CreatureJoint(item, 2, -2 * angle);
-			CreatureJoint(item, 3, 2 * angle);
-
-			// NOTE: in TR2 shark there was a call to CreatureKill with special kill anim
-			// Hammerhead seems to not have it in original code but this check is still there as a leftover
-			if (item->Animation.ActiveState == HAMMERHEAD_STATE_KILL)
-				AnimateItem(item);
 			else
 			{
-				CreatureAnimation(itemNumber, angle, 0);
-				CreatureUnderwater(item, 341);
-			}
-		}
-		else
-		{
-			item->HitPoints = 0;
+				item->HitPoints = 0;
 
-			if (item->Animation.ActiveState != HAMMERHEAD_STATE_DEATH)
-			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-				item->Animation.ActiveState = HAMMERHEAD_STATE_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.FrameNumber].frameBase;
-			}
+				if (item->Animation.ActiveState != HAMMERHEAD_STATE_DEATH)
+				{
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMERHEAD_ANIM_DEATH_START;
+					item->Animation.ActiveState = HAMMERHEAD_STATE_DEATH;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.FrameNumber].frameBase;
+				}
 
-			CreatureFloat(itemNumber);
+				CreatureFloat(itemNumber);
+			}
 		}
 	}
 }

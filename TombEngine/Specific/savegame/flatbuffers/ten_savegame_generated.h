@@ -41,6 +41,10 @@ struct FlareData;
 struct FlareDataBuilder;
 struct FlareDataT;
 
+struct TorchData;
+struct TorchDataBuilder;
+struct TorchDataT;
+
 struct LaraInventoryData;
 struct LaraInventoryDataBuilder;
 struct LaraInventoryDataT;
@@ -154,6 +158,42 @@ struct SaveGameStatisticsT;
 struct SaveGame;
 struct SaveGameBuilder;
 struct SaveGameT;
+
+enum class TorchState : int32_t {
+  holding = 0,
+  throwing = 1,
+  dropping = 2,
+  just_lit = 3,
+  MIN = holding,
+  MAX = just_lit
+};
+
+inline const TorchState (&EnumValuesTorchState())[4] {
+  static const TorchState values[] = {
+    TorchState::holding,
+    TorchState::throwing,
+    TorchState::dropping,
+    TorchState::just_lit
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesTorchState() {
+  static const char * const names[5] = {
+    "holding",
+    "throwing",
+    "dropping",
+    "just_lit",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNameTorchState(TorchState e) {
+  if (flatbuffers::IsOutRange(e, TorchState::holding, TorchState::just_lit)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesTorchState()[index];
+}
 
 enum class VarUnion : uint8_t {
   NONE = 0,
@@ -1631,6 +1671,75 @@ struct FlareData::Traits {
 
 flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBuilder &_fbb, const FlareDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct TorchDataT : public flatbuffers::NativeTable {
+  typedef TorchData TableType;
+  TEN::Save::TorchState state = TEN::Save::TorchState::holding;
+  bool is_lit = false;
+};
+
+struct TorchData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef TorchDataT NativeTableType;
+  typedef TorchDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_STATE = 4,
+    VT_IS_LIT = 6
+  };
+  TEN::Save::TorchState state() const {
+    return static_cast<TEN::Save::TorchState>(GetField<int32_t>(VT_STATE, 0));
+  }
+  bool is_lit() const {
+    return GetField<uint8_t>(VT_IS_LIT, 0) != 0;
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_STATE) &&
+           VerifyField<uint8_t>(verifier, VT_IS_LIT) &&
+           verifier.EndTable();
+  }
+  TorchDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(TorchDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<TorchData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const TorchDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct TorchDataBuilder {
+  typedef TorchData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_state(TEN::Save::TorchState state) {
+    fbb_.AddElement<int32_t>(TorchData::VT_STATE, static_cast<int32_t>(state), 0);
+  }
+  void add_is_lit(bool is_lit) {
+    fbb_.AddElement<uint8_t>(TorchData::VT_IS_LIT, static_cast<uint8_t>(is_lit), 0);
+  }
+  explicit TorchDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<TorchData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<TorchData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<TorchData> CreateTorchData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    TEN::Save::TorchState state = TEN::Save::TorchState::holding,
+    bool is_lit = false) {
+  TorchDataBuilder builder_(_fbb);
+  builder_.add_state(state);
+  builder_.add_is_lit(is_lit);
+  return builder_.Finish();
+}
+
+struct TorchData::Traits {
+  using type = TorchData;
+  static auto constexpr Create = CreateTorchData;
+};
+
+flatbuffers::Offset<TorchData> CreateTorchData(flatbuffers::FlatBufferBuilder &_fbb, const TorchDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct LaraInventoryDataT : public flatbuffers::NativeTable {
   typedef LaraInventoryData TableType;
   bool is_busy = false;
@@ -3055,7 +3164,7 @@ struct LaraT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::LaraInventoryDataT> inventory{};
   std::vector<std::unique_ptr<TEN::Save::CarriedWeaponInfoT>> weapons{};
   std::unique_ptr<TEN::Save::FlareDataT> flare{};
-  bool lit_torch = false;
+  std::unique_ptr<TEN::Save::TorchDataT> torch{};
   std::unique_ptr<TEN::Save::Vector3> extra_head_rot{};
   std::unique_ptr<TEN::Save::Vector3> extra_torso_rot{};
   std::unique_ptr<TEN::Save::Vector3> extra_velocity{};
@@ -3101,7 +3210,7 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_INVENTORY = 8,
     VT_WEAPONS = 10,
     VT_FLARE = 12,
-    VT_LIT_TORCH = 14,
+    VT_TORCH = 14,
     VT_EXTRA_HEAD_ROT = 16,
     VT_EXTRA_TORSO_ROT = 18,
     VT_EXTRA_VELOCITY = 20,
@@ -3151,8 +3260,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::FlareData *flare() const {
     return GetPointer<const TEN::Save::FlareData *>(VT_FLARE);
   }
-  bool lit_torch() const {
-    return GetField<uint8_t>(VT_LIT_TORCH, 0) != 0;
+  const TEN::Save::TorchData *torch() const {
+    return GetPointer<const TEN::Save::TorchData *>(VT_TORCH);
   }
   const TEN::Save::Vector3 *extra_head_rot() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_EXTRA_HEAD_ROT);
@@ -3265,7 +3374,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyVectorOfTables(weapons()) &&
            VerifyOffset(verifier, VT_FLARE) &&
            verifier.VerifyTable(flare()) &&
-           VerifyField<uint8_t>(verifier, VT_LIT_TORCH) &&
+           VerifyOffset(verifier, VT_TORCH) &&
+           verifier.VerifyTable(torch()) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_HEAD_ROT) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_TORSO_ROT) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_EXTRA_VELOCITY) &&
@@ -3330,8 +3440,8 @@ struct LaraBuilder {
   void add_flare(flatbuffers::Offset<TEN::Save::FlareData> flare) {
     fbb_.AddOffset(Lara::VT_FLARE, flare);
   }
-  void add_lit_torch(bool lit_torch) {
-    fbb_.AddElement<uint8_t>(Lara::VT_LIT_TORCH, static_cast<uint8_t>(lit_torch), 0);
+  void add_torch(flatbuffers::Offset<TEN::Save::TorchData> torch) {
+    fbb_.AddOffset(Lara::VT_TORCH, torch);
   }
   void add_extra_head_rot(const TEN::Save::Vector3 *extra_head_rot) {
     fbb_.AddStruct(Lara::VT_EXTRA_HEAD_ROT, extra_head_rot);
@@ -3450,7 +3560,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     flatbuffers::Offset<TEN::Save::LaraInventoryData> inventory = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>>> weapons = 0,
     flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
-    bool lit_torch = false,
+    flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
     const TEN::Save::Vector3 *extra_velocity = 0,
@@ -3516,6 +3626,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_extra_velocity(extra_velocity);
   builder_.add_extra_torso_rot(extra_torso_rot);
   builder_.add_extra_head_rot(extra_head_rot);
+  builder_.add_torch(torch);
   builder_.add_flare(flare);
   builder_.add_weapons(weapons);
   builder_.add_inventory(inventory);
@@ -3523,7 +3634,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_item_number(item_number);
   builder_.add_burn_smoke(burn_smoke);
   builder_.add_burn(burn);
-  builder_.add_lit_torch(lit_torch);
   return builder_.Finish();
 }
 
@@ -3539,7 +3649,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     flatbuffers::Offset<TEN::Save::LaraInventoryData> inventory = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> *weapons = nullptr,
     flatbuffers::Offset<TEN::Save::FlareData> flare = 0,
-    bool lit_torch = false,
+    flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
     const TEN::Save::Vector3 *extra_head_rot = 0,
     const TEN::Save::Vector3 *extra_torso_rot = 0,
     const TEN::Save::Vector3 *extra_velocity = 0,
@@ -3584,7 +3694,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       inventory,
       weapons__,
       flare,
-      lit_torch,
+      torch,
       extra_head_rot,
       extra_torso_rot,
       extra_velocity,
@@ -6251,6 +6361,35 @@ inline flatbuffers::Offset<FlareData> CreateFlareData(flatbuffers::FlatBufferBui
       _control_left);
 }
 
+inline TorchDataT *TorchData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<TorchDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void TorchData::UnPackTo(TorchDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = state(); _o->state = _e; }
+  { auto _e = is_lit(); _o->is_lit = _e; }
+}
+
+inline flatbuffers::Offset<TorchData> TorchData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const TorchDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateTorchData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<TorchData> CreateTorchData(flatbuffers::FlatBufferBuilder &_fbb, const TorchDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const TorchDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _state = _o->state;
+  auto _is_lit = _o->is_lit;
+  return TEN::Save::CreateTorchData(
+      _fbb,
+      _state,
+      _is_lit);
+}
+
 inline LaraInventoryDataT *LaraInventoryData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraInventoryDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -6707,7 +6846,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = inventory(); if (_e) _o->inventory = std::unique_ptr<TEN::Save::LaraInventoryDataT>(_e->UnPack(_resolver)); }
   { auto _e = weapons(); if (_e) { _o->weapons.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->weapons[_i] = std::unique_ptr<TEN::Save::CarriedWeaponInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = flare(); if (_e) _o->flare = std::unique_ptr<TEN::Save::FlareDataT>(_e->UnPack(_resolver)); }
-  { auto _e = lit_torch(); _o->lit_torch = _e; }
+  { auto _e = torch(); if (_e) _o->torch = std::unique_ptr<TEN::Save::TorchDataT>(_e->UnPack(_resolver)); }
   { auto _e = extra_head_rot(); if (_e) _o->extra_head_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = extra_torso_rot(); if (_e) _o->extra_torso_rot = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = extra_velocity(); if (_e) _o->extra_velocity = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
@@ -6756,7 +6895,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _inventory = _o->inventory ? CreateLaraInventoryData(_fbb, _o->inventory.get(), _rehasher) : 0;
   auto _weapons = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::CarriedWeaponInfo>> (_o->weapons.size(), [](size_t i, _VectorArgs *__va) { return CreateCarriedWeaponInfo(*__va->__fbb, __va->__o->weapons[i].get(), __va->__rehasher); }, &_va );
   auto _flare = _o->flare ? CreateFlareData(_fbb, _o->flare.get(), _rehasher) : 0;
-  auto _lit_torch = _o->lit_torch;
+  auto _torch = _o->torch ? CreateTorchData(_fbb, _o->torch.get(), _rehasher) : 0;
   auto _extra_head_rot = _o->extra_head_rot ? _o->extra_head_rot.get() : 0;
   auto _extra_torso_rot = _o->extra_torso_rot ? _o->extra_torso_rot.get() : 0;
   auto _extra_velocity = _o->extra_velocity ? _o->extra_velocity.get() : 0;
@@ -6797,7 +6936,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _inventory,
       _weapons,
       _flare,
-      _lit_torch,
+      _torch,
       _extra_head_rot,
       _extra_torso_rot,
       _extra_velocity,

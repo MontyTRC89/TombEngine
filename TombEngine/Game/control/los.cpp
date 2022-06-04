@@ -94,7 +94,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 		Lara.Control.Weapon.Fired = true;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
-			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, NULL, 0);
+			SoundEffect(SFX_TR4_DESSERT_EAGLE_FIRE, nullptr);
 	}
 
 	bool hit = false;
@@ -130,7 +130,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 						SmashedMesh[SmashedMeshCount] = mesh;
 						++SmashedMeshCount;
 						mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
-						SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh, 0);
+						SoundEffect(GetShatterSound(mesh->staticNumber), (PoseData*)mesh);
 					}
 
 					TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.GetY(), 3, 0);
@@ -203,10 +203,10 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 									if (!Objects[item->ObjectNumber].undead)
 										item->HitPoints -= Weapons[(int)Lara.Control.Weapon.GunType].Damage;
 
-									if (!item->luaCallbackOnHitName.empty())
+									if (!item->LuaCallbackOnHitName.empty())
 									{
 										short index = g_GameScriptEntities->GetIndexByName(item->LuaName);
-										g_GameScript->ExecuteFunction(item->luaCallbackOnHitName, index);
+										g_GameScript->ExecuteFunction(item->LuaCallbackOnHitName, index);
 									}
 								}
 							}

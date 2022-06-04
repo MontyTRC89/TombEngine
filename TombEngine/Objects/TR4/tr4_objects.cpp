@@ -5,14 +5,14 @@
 #include "tr4_ahmet.h" // OK
 #include "tr4_baddy.h" // OK
 #include "tr4_bat.h" // OK
-#include "tr4_bigscorpion.h" // OK
+#include "tr4_big_scorpion.h" // OK
 #include "tr4_crocodile.h" // OK
 #include "tr4_demigod.h" // OK
 #include "tr4_guide.h" // OK
 #include "tr4_harpy.h" // OK
 #include "tr4_horseman.h" // OFF
 #include "tr4_jeanyves.h" // OK
-#include "tr4_knighttemplar.h" // OK
+#include "tr4_knight_templar.h" // OK
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "tr4_mummy.h" // OK
 #include "tr4_sas.h" // OK
@@ -60,7 +60,7 @@
 #include "tr4_spikyceiling.h"
 #include "tr4_stargate.h"
 #include "tr4_cog.h"
-#include "tr4_laradouble.h"
+#include "tr4_lara_double.h"
 #include "tr4_setha.h"
 #include "tr4_teethspike.h"
 

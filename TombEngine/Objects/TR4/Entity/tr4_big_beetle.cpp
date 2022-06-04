@@ -15,16 +15,33 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO BigBeetleBite = { 0, 0, 0, 12 };
 
-	// TODO
 	enum BigBeetleState
 	{
-
+		BBEETLE_STATE_NONE = 0,
+		BBEETLE_STATE_IDLE = 1,
+		BBEETLE_STATE_TAKE_OFF = 2,
+		BBEETLE_STATE_FLY_FORWARD = 3,
+		BBEETLE_STATE_ATTACK = 4,
+		BBEETLE_STATE_LAND = 5,
+		BBEETLE_STATE_DEATH_START = 6,
+		BBEETLE_STATE_DEATH_FALL = 7,
+		BBEETLE_STATE_DEATH_END = 8,
+		BBEETLE_STATE_FLY_IDLE = 9,
 	};
 
-	// TODO
 	enum BigBeetleAnim
 	{
-
+		BBEETLE_ANIM_IDLE_TO_FLY_FORWARD = 0,
+		BBEETLE_ANIM_FLY_FORWARD = 1,
+		BBEETLE_ANIM_FLY_FORWARD_TO_IDLE = 2,
+		BBEETLE_ANIM_IDLE = 3,
+		BBEETLE_ANIM_ATTACK = 4,
+		BBEETLE_ANIM_DEATH_START = 5,
+		BBEETLE_ANIM_DEATH_FALL = 6,
+		BBEETLE_ANIM_DEATH_END = 7,
+		BBEETLE_ANIM_FLY_IDLE = 8,
+		BBEETLE_ANIM_FLY_FORWARD_TO_FLY_IDLE = 9,
+		BBEETLE_ANIM_FLY_IDLE_TO_FLY_FORWARD = 10,
 	};
 
 	void InitialiseBigBeetle(short itemNumber)
@@ -33,10 +50,10 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 3;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BBEETLE_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 1;
-		item->Animation.ActiveState = 1;
+		item->Animation.TargetState = BBEETLE_STATE_IDLE;
+		item->Animation.ActiveState = BBEETLE_STATE_IDLE;
 	}
 
 	void BigBeetleControl(short itemNumber)
@@ -51,31 +68,31 @@ namespace TEN::Entities::TR4
 
 		if (item->HitPoints <= 0)
 		{
-			if (item->Animation.ActiveState != 6)
+			if (item->Animation.ActiveState != BBEETLE_STATE_DEATH_START)
 			{
-				if (item->Animation.ActiveState != 7)
+				if (item->Animation.ActiveState != BBEETLE_STATE_DEATH_FALL)
 				{
-					if (item->Animation.ActiveState == 8)
+					if (item->Animation.ActiveState == BBEETLE_STATE_DEATH_END)
 					{
 						item->Pose.Orientation.SetX();
 						item->Pose.Position.y = item->Floor;
 					}
 					else
 					{
-						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 5;
-						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						item->Animation.ActiveState = 6;
-						item->Animation.Velocity = 0;
-						item->Animation.Airborne = true;
 						item->Pose.Orientation.SetX();
+						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BBEETLE_ANIM_DEATH_START;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.ActiveState = BBEETLE_STATE_DEATH_START;
+						item->Animation.Airborne = true;
+						item->Animation.Velocity = 0;
 					}
 				}
 				else if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
-					item->Animation.VerticalVelocity = 0;
 					item->Animation.Airborne = false;
-					item->Animation.TargetState = 8;
+					item->Animation.VerticalVelocity = 0;
+					item->Animation.TargetState = BBEETLE_STATE_DEATH_END;
 				}
 			}
 
@@ -104,7 +121,7 @@ namespace TEN::Entities::TR4
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case BBEETLE_STATE_IDLE:
 				item->Pose.Position.y = item->Floor;
 				creature->MaxTurn = Angle::DegToRad(1.0f);
 
@@ -113,12 +130,12 @@ namespace TEN::Entities::TR4
 					creature->HurtByLara ||
 					AI.distance < pow(SECTOR(3), 2))
 				{
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = BBEETLE_STATE_TAKE_OFF;
 				}
 
 				break;
 
-			case 3:
+			case BBEETLE_STATE_FLY_FORWARD:
 				creature->MaxTurn = Angle::DegToRad(7.0f);
 
 				if (item->Animation.RequiredState)
@@ -126,12 +143,12 @@ namespace TEN::Entities::TR4
 				else if (AI.ahead)
 				{
 					if (AI.distance < pow(CLICK(1), 2))
-						item->Animation.TargetState = 9;
+						item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
 				}
 
 				break;
 
-			case 4u:
+			case BBEETLE_STATE_ATTACK:
 				creature->MaxTurn = Angle::DegToRad(7.0f);
 
 				if (AI.ahead)
@@ -140,11 +157,11 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = 4;
 				}
 				else if (AI.distance < pow(CLICK(1), 2))
-					item->Animation.TargetState = 9;
+					item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
 				else
 				{
-					item->Animation.RequiredState = 3;
-					item->Animation.TargetState = 9;
+					item->Animation.RequiredState = BBEETLE_STATE_FLY_FORWARD;
+					item->Animation.TargetState = BBEETLE_STATE_FLY_IDLE;
 				}
 
 				if (!creature->Flags)
@@ -167,7 +184,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case 5:
+			case BBEETLE_STATE_LAND:
 				creature->Flags = 0;
 
 				item->Pose.Position.y += 51;
@@ -176,7 +193,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case 9u:
+			case BBEETLE_STATE_FLY_IDLE:
 				creature->MaxTurn = Angle::DegToRad(7.0f);
 
 				if (item->Animation.RequiredState)
@@ -191,11 +208,11 @@ namespace TEN::Entities::TR4
 					if (AI.ahead)
 					{
 						if (AI.distance < pow(CLICK(1), 2) && !creature->Flags)
-							item->Animation.TargetState = 4;
+							item->Animation.TargetState = BBEETLE_STATE_ATTACK;
 					}
 				}
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = BBEETLE_STATE_FLY_FORWARD;
 
 				break;
 
@@ -205,7 +222,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		CreatureTilt(item, 2 * angle);
+		CreatureTilt(item, angle * 2);
 		CreatureAnimation(itemNumber, angle, angle);
 	}
 }

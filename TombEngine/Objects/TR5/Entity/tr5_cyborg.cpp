@@ -260,7 +260,7 @@ void CyborgControl(short itemNumber)
 			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
-			SoundEffect(SFX_TR5_HITMAN_ELECSHORT, &item->Pose, 0);
+			SoundEffect(SFX_TR5_HITMAN_ELECSHORT, &item->Pose);
 
 			if (random == 5 || random == 7 || random == 10)
 			{

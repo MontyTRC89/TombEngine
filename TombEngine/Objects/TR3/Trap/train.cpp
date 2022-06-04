@@ -91,7 +91,7 @@ void TrainControl(short itemNumber)
 		}
 	}
 	else
-		SoundEffect(SFX_TR3_TUBE_LOOP, &item->Pose, SFX_ALWAYS);
+		SoundEffect(SFX_TR3_TUBE_LOOP, &item->Pose, SoundEnvironment::Always);
 }
 
 void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -104,8 +104,8 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	if (!TestCollision(trainItem, laraItem))
 		return;
 
-	SoundEffect(SFX_TR4_LARA_GENERAL_DEATH, &laraItem->Pose, SFX_ALWAYS);
-	SoundEffect(SFX_TR4_LARA_HIGH_FALL_DEATH, &laraItem->Pose, SFX_ALWAYS);
+	SoundEffect(SFX_TR4_LARA_GENERAL_DEATH, &laraItem->Pose, SoundEnvironment::Always);
+	SoundEffect(SFX_TR4_LARA_HIGH_FALL_DEATH, &laraItem->Pose, SoundEnvironment::Always);
 	StopSoundEffect(SFX_TR3_TUBE_LOOP);
 
 	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;

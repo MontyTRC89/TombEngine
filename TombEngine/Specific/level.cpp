@@ -1075,18 +1075,28 @@ unsigned int _stdcall LoadLevel(void* data)
 	LevelFilePtr = FileOpen(filename);
 	if (LevelFilePtr)
 	{
-		int version;
-		int uncompressedSize;
+		char header[4];
+		byte version[4];
+		int systemHash;
 		int compressedSize;
-		char* compressedBuffer;
+		int uncompressedSize;
 
 		// Read file header
+		ReadFileEx(&header, 1, 4, LevelFilePtr);
 		ReadFileEx(&version, 1, 4, LevelFilePtr);
+		ReadFileEx(&systemHash, 1, 4, LevelFilePtr); // Reserved: for future quick start feature! Check builder system 
+
+		if (std::string(header) != "TEN")
+			TENLog("Level file header is not valid! Must be TEN. Probably old level version?", LogLevel::Warning);
+		else
+			TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+
+		// Read data sizes
 		ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
 		ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
 
 		// The entire level is ZLIB compressed
-		compressedBuffer = (char*)malloc(compressedSize);
+		auto compressedBuffer = (char*)malloc(compressedSize);
 		LevelDataPtr = (char*)malloc(uncompressedSize);
 		baseLevelDataPtr = LevelDataPtr;
 
@@ -1099,9 +1109,6 @@ unsigned int _stdcall LoadLevel(void* data)
 		LoadTextures();
 
 		g_Renderer.UpdateProgress(20);
-
-		ReadInt8(); // TODO: Remove!
-		ReadInt8(); // TODO: Remove!
 
 		LoadRooms();
 		g_Renderer.UpdateProgress(40);

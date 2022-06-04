@@ -29,8 +29,8 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose, 0);
-		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->Pose, 0);
+		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP1, &item->Pose);
+		SoundEffect(SFX_TR4_METAL_SCRAPE_LOOP2, &item->Pose);
 
 		item->Pose.Position.x = (item->ItemFlags[0] * 256) + 4608 * cos(item->TriggerFlags) * sin(item->Pose.Orientation.GetY());
 		item->Pose.Position.y = (item->ItemFlags[1] * 256) - 4608 * sin(item->TriggerFlags);

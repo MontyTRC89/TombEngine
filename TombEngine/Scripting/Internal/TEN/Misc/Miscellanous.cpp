@@ -80,29 +80,24 @@ namespace Misc {
 
 	static void PlayAudioTrack(std::string const& trackName, sol::optional<bool> looped)
 	{
-		auto mode = looped.value_or(false) ? SOUNDTRACK_PLAYTYPE::OneShot : SOUNDTRACK_PLAYTYPE::BGM;
+		auto mode = looped.value_or(false) ? SoundTrackType::OneShot : SoundTrackType::BGM;
 		PlaySoundTrack(trackName, mode);
 	}
 
 	static void PlaySoundEffect(int id, Vec3 p, int flags)
 	{
-		auto pos = PoseData(
-			p.x,
-			p.y,
-			p.z,
-			EulerAngles::Zero
-		);
-		SoundEffect(id, &pos, flags);
+		auto pos = PoseData(p.x, p.y, p.z, EulerAngles::Zero);
+		SoundEffect(id, &pos, (SoundEnvironment)flags);
 	}
 
 	static void PlaySoundEffect(int id, int flags)
 	{
-		SoundEffect(id, NULL, flags);
+		SoundEffect(id, NULL, (SoundEnvironment)flags);
 	}
 
 	static void SetAmbientTrack(std::string const& trackName)
 	{
-		PlaySoundTrack(trackName, SOUNDTRACK_PLAYTYPE::BGM);
+		PlaySoundTrack(trackName, SoundTrackType::BGM);
 	}
 
 	static int CalculateDistance(Vec3 const& pos1, Vec3 const& pos2)

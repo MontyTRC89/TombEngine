@@ -143,7 +143,7 @@ void ControlDeathSlide(short itemNumber)
 			}
 
 			// Stop
-			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &zipLineItem->Pose, 0);
+			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &zipLineItem->Pose);
 			RemoveActiveItem(itemNumber);
 			zipLineItem->Status = ITEM_NOT_ACTIVE;
 			zipLineItem->Flags -= ONESHOT;
@@ -151,7 +151,7 @@ void ControlDeathSlide(short itemNumber)
 		else
 		{
 			// Whizz
-			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &zipLineItem->Pose, 0);
+			SoundEffect(SFX_TR4_TRAIN_DOOR_CLOSE, &zipLineItem->Pose);
 		}
 	}
 }

@@ -113,17 +113,20 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-// Overload of GetCollisionResult which can be used to probe collision parameters
-// from a given item.
-
 CollisionResult GetCollision(ItemInfo* item, float orient, int forward, int vertical, int lateral)
 {
+	// NOTE: GetRoom() call is necessary to fetch the index of the room directly above in order to perform a correct L-shaped test.
+	// Probes MUST traverse through portals between rooms, otherwise they will not work correctly.
+
 	auto point = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
 	return GetCollision(point.x, point.y, point.z, GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber);
 }
 
-// A handy overload of GetCollisionResult which can be used to quickly get collision parameters
-// such as floor height under specific item.
+CollisionResult GetCollision(Vector3 pos, int roomIndex, short orient, int forward, int vertical, int lateral)
+{
+	auto point = TranslateVector(pos, orient, forward, vertical, lateral);
+	return GetCollision(point.x, point.y, point.z, roomIndex);
+}
 
 CollisionResult GetCollision(ItemInfo* item)
 {
@@ -135,12 +138,6 @@ CollisionResult GetCollision(ItemInfo* item)
 	return result;
 }
 
-// This variation of GetCollisionResult is an universal wrapper to be used across whole
-// collisional code to replace "holy trinity" of roomNumber-GetFloor-GetFloorHeight operations.
-// The advantage of this wrapper is that it does NOT modify incoming roomNumber parameter,
-// instead putting modified one returned by GetFloor into return COLL_RESULT structure.
-// This way, function never modifies any external variables.
-
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
@@ -150,12 +147,6 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	result.RoomNumber = room;
 	return result;
 }
-
-// GetCollisionResult is a reworked legacy GetFloorHeight function, which does not
-// write any data into globals, but instead into special COLL_RESULT struct.
-// Additionally, it writes ceiling height for same coordinates, so this function
-// may be reused instead both GetFloorHeight and GetCeilingHeight calls to increase
-// readability.
 
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
@@ -1361,38 +1352,30 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto* room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
-			floor = GetSector(room, x - room->x, z - room->z);
 
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
-			{
-				return GetCollision(floor, x, y, z).Block->FloorHeight(x, y, z);
-				//return r->minfloor; // TODO: check if individual block floor height checks provoke any game-breaking bugs!
-			}
-
-			if (floor->RoomAbove(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
+
+			floor = GetSector(room, x - room->x, z - room->z);
 		}
 
-		return room->maxceiling;
+		return GetCollision(floor, x, y, z).Block->CeilingHeight(x, y, z);
 	}
 	else
 	{
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			auto* room2 = &g_Level.Rooms[floor->RoomBelow(x, y, z).value_or(floor->Room)];
-			floor = GetSector(room2, x - room2->x, z - room2->z);
 
 			if (TestEnvironment(ENV_FLAG_WATER, room2) ||
 				TestEnvironment(ENV_FLAG_SWAMP, room2))
-			{
-				return GetCollision(floor, x, y, z).Block->CeilingHeight(x, y, z);
-				//return room2->maxceiling; // TODO: check if individual block ceiling height checks provoke any game-breaking bugs!
-			}
-
-			if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) == NO_ROOM)
 				break;
+
+			floor = GetSector(room2, x - room2->x, z - room2->z);
 		}
+
+		return GetCollision(floor, x, y, z).Block->FloorHeight(x, y, z);
 	}
 
 	return NO_HEIGHT;
@@ -1414,14 +1397,9 @@ float GetSurfaceAspectAngle(float xTilt, float zTilt)
 	return atan2(-zTilt, -xTilt);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
+bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
 {
-	return (room->flags & environmentType);
-}
-
-bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
-{
-	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
+	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
 }
 
 bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
@@ -1429,7 +1407,17 @@ bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item)
 	return TestEnvironment(environmentType, item->RoomNumber);
 }
 
-bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber)
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber)
 {
-	return TestEnvironment(environmentType, GetCollision(x, y, z, roomNumber).RoomNumber);
+	return TestEnvironment(environmentType, &g_Level.Rooms[roomNumber]);
+}
+
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room)
+{
+	return TestEnvironmentFlags(environmentType, room->flags);
+}
+
+bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags)
+{
+	return ((flags & environmentType) == environmentType);
 }

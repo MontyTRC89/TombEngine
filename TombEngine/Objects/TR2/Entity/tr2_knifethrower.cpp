@@ -70,7 +70,7 @@ void KnifeControl(short fxNumber)
 		fx->speed = LaraItem->Animation.Velocity;
 		fx->frameNumber = fx->counter = 0;
 
-		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos, 0);
+		SoundEffect(SFX_TR2_CRUNCH2, &fx->pos);
 		DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, 80, fx->pos.Orientation.GetY(), fx->roomNumber);
 		KillEffect(fxNumber);
 	}

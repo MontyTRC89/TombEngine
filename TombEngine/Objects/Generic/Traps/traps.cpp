@@ -156,7 +156,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->ItemFlags[0] == 1)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose);
 			adx = abs(dx);
 			if (adx >= 32)
 				adx = 32;
@@ -175,7 +175,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		if (item->ItemFlags[0] == 2)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP, &item->Pose);
 			adz = abs(dz);
 			if (adz >= 32)
 				adz = 32;
@@ -195,7 +195,7 @@ void WreckingBallControl(short itemNumber)
 		if (item->ItemFlags[1] == -1 && (oldX != item->Pose.Position.x || oldZ != item->Pose.Position.z))
 		{
 			item->ItemFlags[1] = 0;
-			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_A, &item->Pose, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_A, &item->Pose);
 		}
 		if ((item->Pose.Position.x & 0x3FF) == 512 && (item->Pose.Position.z & 0x3FF) == 512)
 			item->ItemFlags[0] = 0;
@@ -204,7 +204,7 @@ void WreckingBallControl(short itemNumber)
 			if (item->ItemFlags[1] != -1)
 			{
 				StopSoundEffect(SFX_TR5_BASE_CLAW_MOTOR_B_LOOP);
-				SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_C, &item->Pose, 0);
+				SoundEffect(SFX_TR5_BASE_CLAW_MOTOR_C, &item->Pose);
 			}
 			item->ItemFlags[1] = 1;
 			item->TriggerFlags = 30;
@@ -222,7 +222,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose);
 			++item->ItemFlags[1];
 			item->Animation.VerticalVelocity = 6;
 			item->Pose.Position.y += item->Animation.VerticalVelocity;
@@ -264,7 +264,7 @@ void WreckingBallControl(short itemNumber)
 			item->Pose.Position.y = item2->Pose.Position.y + 1644;
 			if (item->Animation.VerticalVelocity < -32)
 			{
-				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Pose, 4104);
+				SoundEffect(SFX_TR5_BASE_CLAW_TOP_IMPACT, &item->Pose, SoundEnvironment::Land, 1.0f, 0.5f);
 				item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity >> 3;
 				BounceCamera(item, 16, 8192);
 			}
@@ -277,7 +277,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (!item->ItemFlags[0])
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP, &item->Pose, 0);
+			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP, &item->Pose);
 		}
 	}
 	item2->Pose.Position.x = item->Pose.Position.x;

@@ -112,7 +112,7 @@ void ControlWaterfall(short itemNumber)
 				item->Pose.Orientation.GetY() / 16);
 		}
 
-		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose, 0);
+		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 	}
 }
 

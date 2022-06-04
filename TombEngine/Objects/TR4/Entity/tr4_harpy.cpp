@@ -13,31 +13,58 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
-BITE_INFO HarpyBite1 = { 0, 0, 0, 4 };
-BITE_INFO HarpyBite2 = { 0, 0, 0, 2 };
-BITE_INFO HarpyBite3 = { 0, 0, 0, 21 };
-BITE_INFO HarpyAttack1 = { 0, 128, 0, 2 };
-BITE_INFO HarpyAttack2 = { 0, 128, 0, 4 };
-
-// TODO
-enum HarpyState
+namespace TEN::Entities::TR4
 {
-	STATE_HARPY_STOP = 1,
+	BITE_INFO HarpyBite1 = { 0, 0, 0, 4 };
+	BITE_INFO HarpyBite2 = { 0, 0, 0, 2 };
+	BITE_INFO HarpyBite3 = { 0, 0, 0, 21 };
+	BITE_INFO HarpyAttack1 = { 0, 128, 0, 2 };
+	BITE_INFO HarpyAttack2 = { 0, 128, 0, 4 };
 
-	STATE_HARPY_ATTACK = 5,
-	STATE_HARPY_POISON_ATTACK = 6,
+	constexpr auto HARPY_STINGER_ATTACK_DAMAGE = 100;
+	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE = 10;
+	constexpr auto HARPY_STINGER_POISON_POTENCY = 8;
 
-	STATE_HARPY_FLAME_ATTACK = 8,
+	enum HarpyState
+	{
+		HARPY_STATE_NONE = 0,
+		HARPY_STATE_IDLE = 1,
+		HARPY_STATE_FLY_FORWARD = 2,
+		HARPY_STATE_FLY_DOWN = 3,
+		HARPY_STATE_FLY_FORWARD_DOWN = 4,
+		HARPY_STATE_SWOOP_ATTACK = 5,
+		HARPY_STATE_STINGER_ATTACK = 6,
+		HARPY_STATE_FLY_FORWARD_SPIN = 7,
+		HARPY_STATE_FLAME_ATTACK = 8,
+		HARPY_STATE_DEATH_START = 9,
+		HARPY_STATE_DEATH_FALL = 10,
+		HARPY_STATE_DEATH_END = 11,
+		HARPY_STATE_FLY_BACK = 12,
+		HARPY_STATE_GLIDE = 13
+	};
 
-	STATE_HARPY_FALLING = 10,
-	STATE_HARPY_DEATH = 11
-};
-
-// TODO
-enum HarpyAnim
-{
-
-};
+	enum HarpyAnim
+	{
+		HARPY_ANIM_FLY_FORWARD = 0,
+		HARPY_ANIM_FLAME_ATTACK_START = 1,
+		HARPY_ANIM_FLAME_ATTACK_CONTINUE = 2,
+		HARPY_ANIM_FLAME_ATTACK_END = 3,
+		HARPY_ANIM_IDLE = 4,
+		HARPY_ANIM_DEATH_START = 5,
+		HARPY_ANIM_DEATH_FALL = 6,
+		HARPY_ANIM_DEATH_END = 7,
+		HARPY_ANIM_STINGER_ATTACK = 8,
+		HARPY_ANIM_FLY_BACK = 9,
+		HARPY_ANIM_FLY_FORWARD_DOWN_START = 10,
+		HARPY_ANIM_FLY_FORWARD_DOWN_CONTINUE = 11,
+		HARPY_ANIM_FLY_FORWARD_DOWN_END = 12,
+		HARPY_ANIM_SWOOP_ATTACK = 13,
+		HARPY_ANIM_FLY_DOWN_START = 14,
+		HARPY_ANIM_FLY_DOWN_CONTINUE = 15,
+		HARPY_ANIM_FLY_DOWN_END = 16,
+		HARPY_ANIM_FLY_FORWARD_SPIN = 17,
+		HARPY_ANIM_GLIDE = 18
+	};
 
 static void TriggerHarpyMissile(PoseData* pos, short roomNumber, int count)
 {
@@ -59,136 +86,137 @@ static void TriggerHarpyMissile(PoseData* pos, short roomNumber, int count)
 	}
 }
 
-static void TriggerHarpyFlame(short itemNumber, byte number, int size)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
-	int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
-
-	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
-		dz >= -SECTOR(16) && dz <= SECTOR(16))
+	static void TriggerHarpyFlame(short itemNumber, byte number, int size)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* item = &g_Level.Items[itemNumber];
 
-		spark->on = true;
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dB = 0;
-		spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
-		spark->fadeToBlack = 8;
-		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = TransTypeEnum::COLADD;
-		spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
-		spark->x = (GetRandomControl() & 0xF) - 8;
-		spark->y = 0;
-		spark->z = (GetRandomControl() & 0xF) - 8;
-		spark->xVel = (byte)GetRandomControl() - 128;
-		spark->yVel = 0;
-		spark->zVel = (byte)GetRandomControl() - 128;
-		spark->friction = 5;
-		spark->flags = 4762;
-		spark->rotAng = GetRandomControl() & 0xFFF;
+		int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
+		int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;
 
-		if (GetRandomControl() & 1)
-			spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-		else
-			spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-
-		spark->maxYvel = 0;
-		spark->gravity = (GetRandomControl() & 0x1F) + 16;
-		spark->fxObj = itemNumber;
-		spark->nodeNumber = number;
-		spark->scalar = 2;
-		spark->sSize = spark->size = GetRandomControl() & 0xF + size;
-		spark->dSize = spark->size / 8;
-	}
-}
-
-static void TriggerHarpySparks(int x, int y, int z, int xv, int yv, int zv)
-{
-	int dx = LaraItem->Pose.Position.x - x;
-	int dz = LaraItem->Pose.Position.z - z;
-
-	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
-	{
-		auto* spark = &Sparks[GetFreeSpark()];
-
-		spark->on = true;
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dR = spark->dG = (GetRandomControl() & 0x7F) + 64;
-		spark->dB = 0;
-		spark->life = 16;
-		spark->sLife = 16;
-		spark->colFadeSpeed = 4;
-		spark->y = y;
-		spark->transType = TransTypeEnum::COLADD;
-		spark->fadeToBlack = 4;
-		spark->x = x;
-		spark->z = z;
-		spark->xVel = xv;
-		spark->yVel = yv;
-		spark->zVel = zv;
-		spark->friction = 34;
-		spark->scalar = 1;
-		spark->sSize = spark->size = (GetRandomControl() & 3) + 4;
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-		spark->dSize = (GetRandomControl() & 1) + 1;
-		spark->flags = SP_NONE;
-	}
-}
-
-static void DoHarpyEffects(ItemInfo* item, short itemNumber)
-{
-	item->ItemFlags[0]++;
-
-	auto pos1 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y, HarpyAttack1.z);
-	GetJointAbsPosition(item, &pos1, HarpyAttack1.meshNum);
-
-	auto pos2 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y, HarpyAttack2.z);
-	GetJointAbsPosition(item, &pos2, HarpyAttack2.meshNum);
-
-	if (item->ItemFlags[0] >= 24 &&
-		item->ItemFlags[0] <= 47 &&
-		(GetRandomControl() & 0x1F) < item->ItemFlags[0])
-	{
-		for (int i = 0; i < 2; i++)
+		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			int dx = (GetRandomControl() & 0x7FF) + pos1.x - 1024;
-			int dy = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
-			int dz = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
+			auto* spark = &Sparks[GetFreeSpark()];
 
-			TriggerHarpySparks(dx, dy, dz, 8 * (pos1.x - dx), 8 * (pos1.y - dy), 8 * (pos1.z - dz));
+			spark->on = true;
+			spark->sR = 0;
+			spark->sG = 0;
+			spark->sB = 0;
+			spark->dB = 0;
+			spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
+			spark->fadeToBlack = 8;
+			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
+			spark->transType = TransTypeEnum::COLADD;
+			spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
+			spark->x = (GetRandomControl() & 0xF) - 8;
+			spark->y = 0;
+			spark->z = (GetRandomControl() & 0xF) - 8;
+			spark->xVel = (byte)GetRandomControl() - 128;
+			spark->yVel = 0;
+			spark->zVel = (byte)GetRandomControl() - 128;
+			spark->friction = 5;
+			spark->flags = 4762;
+			spark->rotAng = GetRandomControl() & 0xFFF;
 
-			dx = (GetRandomControl() & 0x7FF) + pos2.x - 1024;
-			dy = (GetRandomControl() & 0x7FF) + pos2.y - 1024;
-			dz = (GetRandomControl() & 0x7FF) + pos2.z - 1024;
+			if (GetRandomControl() & 1)
+				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
+			else
+				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
 
-			TriggerHarpySparks(dx, dy, dz, 8 * (pos2.x - dx), 8 * (pos2.y - dy), 8 * (pos2.z - dz));
+			spark->maxYvel = 0;
+			spark->gravity = (GetRandomControl() & 0x1F) + 16;
+			spark->fxObj = itemNumber;
+			spark->nodeNumber = number;
+			spark->scalar = 2;
+			spark->sSize = spark->size = GetRandomControl() & 0xF + size;
+			spark->dSize = spark->size / 8;
 		}
 	}
 
-	int something = 2 * item->ItemFlags[0];
-	if (something > 64)
-		something = 64;
-	if (something < 80)
+	static void TriggerHarpySparks(int x, int y, int z, int xv, int yv, int zv)
 	{
-		if ((Wibble & 0xF) == 8)
-			TriggerHarpyFlame(itemNumber, 4, something);
-		else if (!(Wibble & 0xF))
-			TriggerHarpyFlame(itemNumber, 5, something);
+		int dx = LaraItem->Pose.Position.x - x;
+		int dz = LaraItem->Pose.Position.z - z;
+
+		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+			dz >= -SECTOR(16) && dz <= SECTOR(16))
+		{
+			auto* spark = &Sparks[GetFreeSpark()];
+
+			spark->on = true;
+			spark->sR = 0;
+			spark->sG = 0;
+			spark->sB = 0;
+			spark->dR = spark->dG = (GetRandomControl() & 0x7F) + 64;
+			spark->dB = 0;
+			spark->life = 16;
+			spark->sLife = 16;
+			spark->colFadeSpeed = 4;
+			spark->y = y;
+			spark->transType = TransTypeEnum::COLADD;
+			spark->fadeToBlack = 4;
+			spark->x = x;
+			spark->z = z;
+			spark->xVel = xv;
+			spark->yVel = yv;
+			spark->zVel = zv;
+			spark->friction = 34;
+			spark->scalar = 1;
+			spark->sSize = spark->size = (GetRandomControl() & 3) + 4;
+			spark->maxYvel = 0;
+			spark->gravity = 0;
+			spark->dSize = (GetRandomControl() & 1) + 1;
+			spark->flags = SP_NONE;
+		}
 	}
 
-	if (item->ItemFlags[0] >= 61)
+	static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 	{
-		if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
+		item->ItemFlags[0]++;
+
+		auto pos1 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y, HarpyAttack1.z);
+		GetJointAbsPosition(item, &pos1, HarpyAttack1.meshNum);
+
+		auto pos2 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y, HarpyAttack2.z);
+		GetJointAbsPosition(item, &pos2, HarpyAttack2.meshNum);
+
+		if (item->ItemFlags[0] >= 24 &&
+			item->ItemFlags[0] <= 47 &&
+			(GetRandomControl() & 0x1F) < item->ItemFlags[0])
 		{
-			auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
-			GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
+			for (int i = 0; i < 2; i++)
+			{
+				int dx = (GetRandomControl() & 0x7FF) + pos1.x - 1024;
+				int dy = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
+				int dz = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
+
+				TriggerHarpySparks(dx, dy, dz, 8 * (pos1.x - dx), 8 * (pos1.y - dy), 8 * (pos1.z - dz));
+
+				dx = (GetRandomControl() & 0x7FF) + pos2.x - 1024;
+				dy = (GetRandomControl() & 0x7FF) + pos2.y - 1024;
+				dz = (GetRandomControl() & 0x7FF) + pos2.z - 1024;
+
+				TriggerHarpySparks(dx, dy, dz, 8 * (pos2.x - dx), 8 * (pos2.y - dy), 8 * (pos2.z - dz));
+			}
+		}
+
+		int something = item->ItemFlags[0] * 2;
+		if (something > 64)
+			something = 64;
+		if (something < 80)
+		{
+			if ((Wibble & 0xF) == 8)
+				TriggerHarpyFlame(itemNumber, 4, something);
+			else if (!(Wibble & 0xF))
+				TriggerHarpyFlame(itemNumber, 5, something);
+		}
+
+		if (item->ItemFlags[0] >= 61)
+		{
+			if (item->ItemFlags[0] <= 65 && GlobalCounter & 1)
+			{
+				auto pos3 = Vector3Int(HarpyAttack1.x, HarpyAttack1.y * 2, HarpyAttack1.z);
+				GetJointAbsPosition(item, &pos3, HarpyAttack1.meshNum);
 
 			auto pose = PoseData(pos1);
 
@@ -197,10 +225,10 @@ static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 			TriggerHarpyMissile(&pose, item->RoomNumber, 2);
 		}
 
-		if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
-		{
-			auto pos3 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y * 2, HarpyAttack2.z);
-			GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
+			if (item->ItemFlags[0] >= 61 && item->ItemFlags[0] <= 65 && !(GlobalCounter & 1))
+			{
+				auto pos3 = Vector3Int(HarpyAttack2.x, HarpyAttack2.y * 2, HarpyAttack2.z);
+				GetJointAbsPosition(item, &pos3, HarpyAttack2.meshNum);
 
 			auto pos = PoseData(pos1.x, pos1.y, pos1.z);
 
@@ -211,27 +239,27 @@ static void DoHarpyEffects(ItemInfo* item, short itemNumber)
 	}
 }
 
-void InitialiseHarpy(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
+	void InitialiseHarpy(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
 
-	ClearItem(itemNumber);
+		ClearItem(itemNumber);
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-	item->Animation.TargetState = STATE_HARPY_STOP;
-	item->Animation.ActiveState = STATE_HARPY_STOP;
-}
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HARPY_ANIM_IDLE;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+		item->Animation.TargetState = HARPY_STATE_IDLE;
+		item->Animation.ActiveState = HARPY_STATE_IDLE;
+	}
 
-void HarpyControl(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
+	void HarpyControl(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
 
-	if (!CreatureActive(itemNumber))
-		return;
+		if (!CreatureActive(itemNumber))
+			return;
 
-	auto* creature = GetCreatureInfo(item);
-	auto* object = &Objects[item->ObjectNumber];
+		auto* creature = GetCreatureInfo(item);
+		auto* object = &Objects[item->ObjectNumber];
 
 	float angle = 0;
 	float joint0 = 0;
@@ -243,46 +271,46 @@ void HarpyControl(short itemNumber)
 		int state = item->Animation.ActiveState - 9;
 		item->HitPoints = 0;
 
-		if (state)
-		{
-			state--;
 			if (state)
 			{
-				if (state == 1)
+				state--;
+				if (state)
 				{
-					item->Pose.Orientation.SetX();
-					item->Pose.Position.y = item->Floor;
+					if (state == HARPY_STATE_IDLE)
+					{
+						item->Pose.Position.y = item->Floor;
+						item->Pose.Orientation.SetX();
+					}
+					else
+					{
+						item->Pose.Orientation.SetX();
+						item->Animation.AnimNumber = object->animIndex + 5;
+						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+						item->Animation.ActiveState = HARPY_STATE_DEATH_START;
+						item->Animation.Airborne = true;
+						item->Animation.Velocity = 0;
+					}
+
+					CreatureTilt(item, 0);
+
+					CreatureJoint(item, 0, joint0);
+					CreatureJoint(item, 1, joint1);
+					CreatureJoint(item, 2, joint2);
+
+					CreatureAnimation(itemNumber, angle, 0);
+					return;
 				}
-				else
-				{
-					item->Animation.AnimNumber = object->animIndex + 5;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					item->Animation.ActiveState = 9;
-					item->Animation.Velocity = 0;
-					item->Animation.Airborne = true;
-					item->Pose.Orientation.SetX();
-				}
-
-				CreatureTilt(item, 0);
-
-				CreatureJoint(item, 0, joint0);
-				CreatureJoint(item, 1, joint1);
-				CreatureJoint(item, 2, joint2);
-
-				CreatureAnimation(itemNumber, angle, 0);
-				return;
 			}
-		}
-		else
-			item->Animation.TargetState = STATE_HARPY_FALLING;
+			else
+				item->Animation.TargetState = HARPY_STATE_DEATH_FALL;
 
-		if (item->Pose.Position.y >= item->Floor)
-		{
-			item->Pose.Position.y = item->Floor;
-			item->Animation.VerticalVelocity = 0;
-			item->Animation.TargetState = STATE_HARPY_DEATH;
-			item->Animation.Airborne = false;
-		}
+			if (item->Pose.Position.y >= item->Floor)
+			{
+				item->Pose.Position.y = item->Floor;
+				item->Animation.TargetState = HARPY_STATE_DEATH_END;
+				item->Animation.Airborne = false;
+				item->Animation.VerticalVelocity = 0;
+			}
 
 		item->Pose.Orientation.SetX();
 	}
@@ -291,270 +319,278 @@ void HarpyControl(short itemNumber)
 		if (item->AIBits)
 			GetAITarget(creature);
 
-		int minDistance = INT_MAX;
+			int minDistance = INT_MAX;
 
-		creature->Enemy = NULL;
+			creature->Enemy = nullptr;
 
-		for (int i = 0; i < ActiveCreatures.size(); i++)
-		{
-			auto* currentCreature = ActiveCreatures[i];
-
-			if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
-				continue;
-
-			auto* target = &g_Level.Items[currentCreature->ItemNumber];
-
-			if (target->ObjectNumber == ID_LARA_DOUBLE)
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				int dx = target->Pose.Position.x - item->Pose.Position.x;
-				int dz = target->Pose.Position.z - item->Pose.Position.z;
-				int distance = dx * dx + dz * dz;
+				auto* currentCreature = ActiveCreatures[i];
 
-				if (distance < minDistance)
+				if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					continue;
+
+				auto* target = &g_Level.Items[currentCreature->ItemNumber];
+
+				if (target->ObjectNumber == ID_LARA_DOUBLE)
 				{
-					creature->Enemy = target;
-					minDistance = distance;
+					int dx = target->Pose.Position.x - item->Pose.Position.x;
+					int dz = target->Pose.Position.z - item->Pose.Position.z;
+					int distance = pow(dx, 2) + pow(dz, 2);
+
+					if (distance < minDistance)
+					{
+						creature->Enemy = target;
+						minDistance = distance;
+					}
 				}
 			}
-		}
 
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
 		if (creature->Enemy != LaraItem)
 			atan2(LaraItem->Pose.Position.z - item->Pose.Position.z, LaraItem->Pose.Position.x - item->Pose.Position.x);
 
-		GetCreatureMood(item, &AI, VIOLENT);
-		CreatureMood(item, &AI, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
-		angle = CreatureTurn(item, creature->MaxTurn);
+			angle = CreatureTurn(item, creature->MaxTurn);
 
-		if (AI.ahead)
-		{
-			joint0 = AI.angle / 2;
-			joint2 = AI.angle / 2;
-			joint1 = AI.xAngle;
-		}
-
-		int height = 0;
-		int dy = 0;
-
-		switch (item->Animation.ActiveState)
-		{
-		case STATE_HARPY_STOP:
-			creature->MaxTurn = Angle::DegToRad(7.0f);
-			creature->Flags = 0;
-
-			if (creature->Enemy)
+			if (AI.ahead)
 			{
-				height = (item->Pose.Position.y + SECTOR(2));
-				if (creature->Enemy->Pose.Position.y > height && item->Floor > height)
+				joint0 = AI.angle / 2;
+				joint2 = AI.angle / 2;
+				joint1 = AI.xAngle;
+			}
+
+			int height = 0;
+			int dy = 0;
+
+			switch (item->Animation.ActiveState)
+			{
+			case HARPY_STATE_IDLE:
+				creature->MaxTurn = Angle::DegToRad(7.0f);
+				creature->Flags = 0;
+
+				if (creature->Enemy)
 				{
-					item->Animation.TargetState = 3;
+					height = (item->Pose.Position.y + SECTOR(2));
+					if (creature->Enemy->Pose.Position.y > height && item->Floor > height)
+					{
+						item->Animation.TargetState = HARPY_STATE_FLY_DOWN;
+						break;
+					}
+				}
+
+				if (AI.ahead)
+				{
+					dy = abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y);
+					if (dy <= SECTOR(1))
+					{
+						if (AI.distance < pow(341, 2))
+						{
+							item->Animation.TargetState = HARPY_STATE_STINGER_ATTACK;
+							break;
+						}
+
+						if (dy <= SECTOR(1) && AI.distance < pow(SECTOR(2), 2))
+						{
+							item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_DOWN;
+							break;
+						}
+					}
+				}
+
+				if (creature->Enemy != LaraItem ||
+					!Targetable(item, &AI) ||
+					AI.distance <= pow(SECTOR(3.5f), 2) ||
+					!(GetRandomControl() & 1))
+				{
+					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 					break;
 				}
-			}
-			if (AI.ahead)
-			{
-				dy = abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y);
-				if (dy <= SECTOR(1))
+
+				item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
+				item->ItemFlags[0] = 0;
+				break;
+
+			case HARPY_STATE_FLY_FORWARD:
+				creature->MaxTurn = Angle::DegToRad(7.0f);
+				creature->Flags = 0;
+
+				if (item->Animation.RequiredState)
 				{
-					if (AI.distance < pow(341, 2))
-					{
-						item->Animation.TargetState = STATE_HARPY_POISON_ATTACK;
-						break;
-					}
-					if (dy <= SECTOR(1) && AI.distance < pow(SECTOR(2), 2))
-					{
-						item->Animation.TargetState = 4;
-						break;
-					}
+					item->Animation.TargetState = item->Animation.RequiredState;
+					if (item->Animation.RequiredState == HARPY_STATE_FLAME_ATTACK)
+						item->ItemFlags[0] = 0;
+
+					break;
 				}
-			}
 
-			if (creature->Enemy != LaraItem ||
-				!Targetable(item, &AI) ||
-				AI.distance <= pow(SECTOR(3.5f), 2) ||
-				!(GetRandomControl() & 1))
-			{
-				item->Animation.TargetState = 2;
-				break;
-			}
+				if (item->HitStatus)
+				{
+					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_SPIN;
+					break;
+				}
 
-			item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
-			item->ItemFlags[0] = 0;
-			break;
+				if (AI.ahead)
+				{
+					if (AI.distance >= pow(341, 2))
+					{
+						if (AI.ahead &&
+							AI.distance >= pow(SECTOR(2), 2) &&
+							AI.distance > pow(SECTOR(3.5f), 2) &&
+							GetRandomControl() & 1)
+						{
+							item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
+							item->ItemFlags[0] = 0;
+						}
+						else
+							item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_DOWN;
+					}
+					else
+						item->Animation.TargetState = HARPY_STATE_STINGER_ATTACK;
 
-		case 2:
-			creature->MaxTurn = Angle::DegToRad(7.0f);
-			creature->Flags = 0;
+					break;
+				}
 
-			if (item->Animation.RequiredState)
-			{
-				item->Animation.TargetState = item->Animation.RequiredState;
-				if (item->Animation.RequiredState == 8)
-					item->ItemFlags[0] = 0;
+				if (GetRandomControl() & 1)
+				{
+					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_SPIN;
+					break;
+				}
 
-				break;
-			}
-			if (item->HitStatus)
-			{
-				item->Animation.TargetState = 7;
-				break;
-			}
-			if (AI.ahead)
-			{
+				if (!AI.ahead)
+				{
+					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_DOWN;
+					break;
+				}
+
 				if (AI.distance >= pow(341, 2))
 				{
-					if (AI.ahead &&
-						AI.distance >= pow(SECTOR(2), 2) &&
-						AI.distance > pow(SECTOR(3.5f), 2) &&
-						GetRandomControl() & 1)
+					if (AI.ahead && AI.distance >= pow(SECTOR(2), 2) &&
+						AI.distance > pow(SECTOR(3.5f), 2) && GetRandomControl() & 1)
 					{
-						item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
+						item->Animation.TargetState = HARPY_STATE_FLAME_ATTACK;
 						item->ItemFlags[0] = 0;
 					}
 					else
-						item->Animation.TargetState = 4;
+						item->Animation.TargetState = HARPY_STATE_FLY_FORWARD_DOWN;
 				}
 				else
-					item->Animation.TargetState = STATE_HARPY_POISON_ATTACK;
+					item->Animation.TargetState = HARPY_STATE_STINGER_ATTACK;
 
 				break;
-			}
-			if (GetRandomControl() & 1)
-			{
-				item->Animation.TargetState = 7;
-				break;
-			}
-			if (!AI.ahead)
-			{
-				item->Animation.TargetState = 4;
-				break;
-			}
-			if (AI.distance >= pow(341, 2))
-			{
-				if (AI.ahead && AI.distance >= pow(SECTOR(2), 2) &&
-					AI.distance > pow(SECTOR(3.5f), 2) && GetRandomControl() & 1)
+
+			case HARPY_STATE_FLY_DOWN:
+				if (!creature->Enemy ||
+					creature->Enemy->Pose.Position.y < (item->Pose.Position.y + SECTOR(2)))
 				{
-					item->Animation.TargetState = STATE_HARPY_FLAME_ATTACK;
-					item->ItemFlags[0] = 0;
+					item->Animation.TargetState = HARPY_STATE_IDLE;
 				}
+
+				break;
+
+			case HARPY_STATE_FLY_FORWARD_DOWN:
+				creature->MaxTurn = Angle::DegToRad(2.0f);
+
+				if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
+					item->Animation.TargetState = HARPY_STATE_SWOOP_ATTACK;
 				else
-					item->Animation.TargetState = 4;
-			}
-			else
-				item->Animation.TargetState = STATE_HARPY_POISON_ATTACK;
+					item->Animation.TargetState = HARPY_STATE_GLIDE;
 
-			break;
+				break;
 
-		case 3:
-			if (!creature->Enemy ||
-				creature->Enemy->Pose.Position.y < (item->Pose.Position.y + SECTOR(2)))
-			{
-				item->Animation.TargetState = STATE_HARPY_STOP;
-			}
+			case HARPY_STATE_SWOOP_ATTACK:
+				item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
+				creature->MaxTurn = Angle::DegToRad(2.0f);
 
-			break;
-
-		case 4:
-			creature->MaxTurn = Angle::DegToRad(2.0f);
-
-			if (AI.ahead && AI.distance < pow(SECTOR(2), 2))
-				item->Animation.TargetState = STATE_HARPY_ATTACK;
-			else
-				item->Animation.TargetState = 13;
-
-			break;
-
-		case STATE_HARPY_ATTACK:
-			item->Animation.TargetState = 2;
-			creature->MaxTurn = Angle::DegToRad(2.0f);
-
-			if (item->TouchBits & 0x14 ||
-				creature->Enemy && creature->Enemy != LaraItem &&
-				abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
-				AI.distance < pow(SECTOR(2), 2))
-			{
-				LaraItem->HitPoints -= 10;
-				LaraItem->HitStatus = true;
-
-				if (item->TouchBits & 0x10)
-				{
-					CreatureEffect2(
-						item,
-						&HarpyBite1,
-						5,
-						-1,
-						DoBloodSplat);
-				}
-				else
-				{
-					CreatureEffect2(
-						item,
-						&HarpyBite2,
-						5,
-						-1,
-						DoBloodSplat);
-				}
-			}
-
-			break;
-
-		case STATE_HARPY_POISON_ATTACK:
-			creature->MaxTurn = Angle::DegToRad(2.0f);
-
-			if (creature->Flags == 0 &&
-				(item->TouchBits & 0x300000 ||
+				if (item->TouchBits & 0x14 ||
 					creature->Enemy && creature->Enemy != LaraItem &&
 					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
-					AI.distance < pow(SECTOR(2), 2)))
-			{
-				LaraItem->HitPoints -= 100;
-				LaraItem->HitStatus = true;
+					AI.distance < pow(SECTOR(2), 2))
+				{
+					LaraItem->HitPoints -= HARPY_SWOOP_ATTACK_DAMAGE;
+					LaraItem->HitStatus = true;
 
-				CreatureEffect2(
-					item,
-					&HarpyBite3,
-					10,
-					-1,
-					DoBloodSplat);
+					if (item->TouchBits & 0x10)
+					{
+						CreatureEffect2(
+							item,
+							&HarpyBite1,
+							5,
+							-1,
+							DoBloodSplat);
+					}
+					else
+					{
+						CreatureEffect2(
+							item,
+							&HarpyBite2,
+							5,
+							-1,
+							DoBloodSplat);
+					}
+				}
 
-				if (creature->Enemy == LaraItem)
-					Lara.PoisonPotency += 8;
+				break;
 
-				creature->Flags = 1;
+			case HARPY_STATE_STINGER_ATTACK:
+				creature->MaxTurn = Angle::DegToRad(2.0f);
+
+				if (creature->Flags == 0 &&
+					(item->TouchBits & 0x300000 ||
+						creature->Enemy && creature->Enemy != LaraItem &&
+						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
+						AI.distance < pow(SECTOR(2), 2)))
+				{
+					LaraItem->HitPoints -= HARPY_STINGER_ATTACK_DAMAGE;
+					LaraItem->HitStatus = true;
+
+					CreatureEffect2(
+						item,
+						&HarpyBite3,
+						10,
+						-1,
+						DoBloodSplat);
+
+					if (creature->Enemy == LaraItem)
+						Lara.PoisonPotency += HARPY_STINGER_POISON_POTENCY;
+
+					creature->Flags = 1;
+				}
+
+				break;
+
+			case HARPY_STATE_FLAME_ATTACK:
+				DoHarpyEffects(item, itemNumber);
+				break;
+
+			case HARPY_STATE_FLY_BACK:
+				if (AI.ahead && AI.distance > pow(SECTOR(3.5f), 2))
+				{
+					item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
+					item->Animation.RequiredState = HARPY_STATE_FLAME_ATTACK;
+				}
+				else if (GetRandomControl() & 1)
+					item->Animation.TargetState = HARPY_STATE_IDLE;
+
+				break;
+
+			case HARPY_STATE_GLIDE:
+				item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
+				break;
+
+			default:
+				break;
 			}
-
-			break;
-
-		case STATE_HARPY_FLAME_ATTACK:
-			DoHarpyEffects(item, itemNumber);
-			break;
-
-		case 12:
-			if (AI.ahead && AI.distance > pow(SECTOR(3.5f), 2))
-			{
-				item->Animation.TargetState = 2;
-				item->Animation.RequiredState = STATE_HARPY_FLAME_ATTACK;
-			}
-			else if (GetRandomControl() & 1)
-				item->Animation.TargetState = STATE_HARPY_STOP;
-
-			break;
-
-		case 13:
-			item->Animation.TargetState = 2;
-			break;
-
-		default:
-			break;
 		}
-	}
 
-	CreatureTilt(item, 0);
-	CreatureJoint(item, 0, joint0);
-	CreatureJoint(item, 1, joint1);
-	CreatureJoint(item, 2, joint2);
-	CreatureAnimation(itemNumber, angle, 0);
+		CreatureTilt(item, 0);
+		CreatureJoint(item, 0, joint0);
+		CreatureJoint(item, 1, joint1);
+		CreatureJoint(item, 2, joint2);
+		CreatureAnimation(itemNumber, angle, 0);
+	}
 }

@@ -101,10 +101,9 @@ void MPGunControl(short itemNumber)
 					head = AI.angle;
 					torsoY = AI.angle;
 					ShotLara(item, &AI, &MPGunBite, torsoY, 32);
-					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, 24576);
+					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, SoundEnvironment::Land, 1.0f, 0.7f);
 				}
 			}
-
 		}
 	}
 	else
@@ -172,7 +171,7 @@ void MPGunControl(short itemNumber)
 		if (laraAI.distance < pow(SECTOR(1), 2) || item->HitStatus || TargetVisible(item, &laraAI)) 
 		{
 			if (!creature->Alerted)
-				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose, 0);
+				SoundEffect(SFX_TR3_AMERCAN_HOY, &item->Pose);
 
 			AlertAllGuards(itemNumber);
 		}

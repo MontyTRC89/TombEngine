@@ -40,7 +40,7 @@ void FallingBlockCollision(short itemNum, ItemInfo* l, CollisionInfo* coll)
 	{
 		if (!((item->Pose.Position.x ^ l->Pose.Position.x) & 0xFFFFFC00) && !((l->Pose.Position.z ^ item->Pose.Position.z) & 0xFFFFFC00))
 		{
-			SoundEffect(SFX_TR4_ROCK_FALL_CRUMBLE, &item->Pose, 0);
+			SoundEffect(SFX_TR4_ROCK_FALL_CRUMBLE, &item->Pose);
 			AddActiveItem(itemNum);
 
 			item->ItemFlags[0] = 0;
@@ -117,7 +117,7 @@ void FallingBlockControl(short itemNumber)
 				ShatterImpactData.impactLocation = { (float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z };
 				ShatterObject(&ShatterItem, nullptr, 0, item->RoomNumber, false);
 
-				SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->Pose, 0);
+				SoundEffect(SFX_TR4_ROCK_FALL_LAND, &item->Pose);
 				KillItem(itemNumber);
 			}
 		}
@@ -125,7 +125,7 @@ void FallingBlockControl(short itemNumber)
 		{
 			item->MeshBits = -2;
 			item->ItemFlags[0]++;
-			SoundEffect(SFX_TR4_ROCK_FALL_CRUMBLE, &item->Pose, 0);
+			SoundEffect(SFX_TR4_ROCK_FALL_CRUMBLE, &item->Pose);
 		}
 	}
 }

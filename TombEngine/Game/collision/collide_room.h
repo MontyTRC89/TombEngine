@@ -122,6 +122,7 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, float orient, int forward, int vertical = 0, int lateral = 0);
+CollisionResult GetCollision(Vector3 pos, int roomIndex, float orient, int forward, int vertical = 0, int lateral = 0);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ItemInfo* item);
@@ -155,7 +156,8 @@ void CalculateItemRotationToSurface(ItemInfo* item, float radiusDivisor = 1.0f, 
 float GetSurfaceAspectAngle(float xTilt, float zTilt);
 float GetSurfaceSteepnessAngle(float xTilt, float zTilt);
 
-bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
-bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
-bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int x, int y, int z, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
+bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
+bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
+bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);

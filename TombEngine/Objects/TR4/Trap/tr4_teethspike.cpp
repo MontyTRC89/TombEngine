@@ -117,7 +117,7 @@ namespace TEN::Entities::TR4
 			bool hit = false;
 
 			if (item->ItemFlags[0] == 1024)	// Just started.
-				SoundEffect(SFX_TR4_TEETH_SPIKES, (PoseData*)&item->Pose, 0);
+				SoundEffect(SFX_TR4_TEETH_SPIKES, (PoseData*)&item->Pose);
 
 			item->Status = ITEM_ACTIVE;
 

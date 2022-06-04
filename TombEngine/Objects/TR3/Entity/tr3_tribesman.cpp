@@ -256,7 +256,7 @@ void TribemanAxeControl(short itemNumber)
 					for (int i = 0; i < TribesmanAxeHit[item->Animation.ActiveState][2]; i += 8)
 						CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
 
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 
 					LaraItem->HitPoints -= TribesmanAxeHit[item->Animation.ActiveState][2];
 					LaraItem->HitStatus = true;
@@ -276,7 +276,7 @@ void TribemanAxeControl(short itemNumber)
 						creature->Enemy->HitStatus = true;
 
 						CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					}
 				}
 			}
@@ -551,7 +551,7 @@ void TribemanDartsControl(short itemNumber)
 			{
 				if (!(creature->Flags & 0xf000) && item->TouchBits & 0x2400)
 				{
-					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					CreatureEffect(item, &TribesmanDartBite1, DoBloodSplat);
 					creature->Flags |= 0x1000;
 
@@ -571,7 +571,7 @@ void TribemanDartsControl(short itemNumber)
 						creature->Enemy->HitStatus = true;
 						creature->Flags |= 0x1000;
 
-						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose, 0);
+						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					}
 				}
 			}

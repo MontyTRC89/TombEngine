@@ -1180,7 +1180,7 @@ void BinocularCamera(ItemInfo* item)
 		if (BinocularRange < Angle::DegToRad(0.7f))
 			BinocularRange = Angle::DegToRad(0.7f);
 		else
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
+			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 	}
 	else if (InputBusy & IN_CROUCH)
 	{
@@ -1188,7 +1188,7 @@ void BinocularCamera(ItemInfo* item)
 		if (BinocularRange > Angle::DegToRad(8.5f))
 			BinocularRange = Angle::DegToRad(8.5f);
 		else
-			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, 0, (flags << 8) | 6);
+			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 	}
 
 	auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -1234,11 +1234,11 @@ void BinocularCamera(ItemInfo* item)
 					firing = true;
 
 					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_LARA_HK_SILENCED, 0, 0);
+						SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 					else
 					{
-						SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-						SoundEffect(SFX_TR4_LARA_HK_FIRE, 0, 0);
+						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+						//SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 					}
 				}
 				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
@@ -1255,11 +1255,11 @@ void BinocularCamera(ItemInfo* item)
 						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
 					else
@@ -1267,11 +1267,11 @@ void BinocularCamera(ItemInfo* item)
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
 				}
@@ -1280,11 +1280,11 @@ void BinocularCamera(ItemInfo* item)
 					if (LSHKTimer)
 					{
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
 					else
@@ -1293,11 +1293,11 @@ void BinocularCamera(ItemInfo* item)
 						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, 0, 0);
+							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
 						else
 						{
-							SoundEffect(SFX_TR4_EXPLOSION1, 0, 83888140);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, 0, 0);
+							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
 						}
 					}
 
@@ -1378,7 +1378,7 @@ void CalculateCamera()
 	// Camera is in a water room, play water sound effect.
 	if (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
 	{
-		SoundEffect(SFX_TR4_UNDERWATER, NULL, SFX_ALWAYS);
+		SoundEffect(SFX_TR4_UNDERWATER, nullptr, SoundEnvironment::Always);
 		if (Camera.underwater == false)
 			Camera.underwater = true;
 	}
@@ -1894,7 +1894,7 @@ void ItemsCollideCamera()
 void RumbleScreen()
 {
 	if (!(GlobalCounter & 0x1FF))
-		SoundEffect(SFX_TR5_KLAXON, 0, 4104);
+		SoundEffect(SFX_TR5_KLAXON, nullptr, SoundEnvironment::Land, 0.25f);
 
 	if (RumbleTimer >= 0)
 		RumbleTimer++;

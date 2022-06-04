@@ -30,7 +30,7 @@ static void SwordGuardianFly(ItemInfo* item)
 	pos.z = (GetRandomControl() * 256 / 32768) + item->Pose.Position.z - 128;
 
 	TriggerGunSmoke(pos.x, pos.y, pos.z, 1, 1, 1, 1, LaraWeaponType::GrenadeLauncher, 32);
-	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose, 0);
+	SoundEffect(SFX_TR2_WARRIOR_HOVER, &item->Pose);
 }
 
 void SwordGuardianControl(short itemNumber)
@@ -52,8 +52,8 @@ void SwordGuardianControl(short itemNumber)
 		if (item->Animation.ActiveState != 12)
 		{
 			//item->meshBits >>= 1;
-			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Pose, 0);
-			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Pose, 0);
+			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Pose);
+			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Pose);
 			//item->meshBits = 0xFFFFFFFF;
 			//item->objectNumber = ID_SAS;
 			ExplodingDeath(itemNumber, -1, 256);

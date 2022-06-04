@@ -1,13 +1,14 @@
 #pragma once
 
+struct Vector3Int;
 struct PoseData;
 
 namespace TEN::Entities::TR4
 {
 	void InitialiseDemigod(short itemNumber);
 	void DemigodControl(short itemNumber);
-	void TriggerDemigodMissile(PoseData* pos, short roomNumber, int flags);
+	void TriggerDemigodMissile(PoseData* pose, short roomNumber, int flags);
 	void DoDemigodEffects(short itemNumber);
-	void TriggerHammerSmoke(int x, int y, int z, int something);
-	void TriggerDemigodMissileFlame(short fxNumber, short xVelocity, short yVelocity, short zVelocity);
+	void TriggerHammerSmoke(int x, int y, int z, int maxSmokeCount);
+	void TriggerDemigodMissileFlame(short fxNumber, short xVel, short yVel, short zVel);
 }

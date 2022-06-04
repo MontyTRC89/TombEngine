@@ -238,7 +238,7 @@ void UpdateSpiders()
 				}
 
 				if (!i && !(GetRandomControl() & 4))
-					SoundEffect(SFX_TR5_INSECTS,&spider->Pose, 0);
+					SoundEffect(SFX_TR5_INSECTS,&spider->Pose);
 			}
 		}
 	}

@@ -623,8 +623,8 @@ static void JeepExplode(ItemInfo* item)
 	ExplodingDeath(Lara.Vehicle, -1, 256);
 	KillItem(Lara.Vehicle);
 	item->Status = ITEM_DEACTIVATED;
-	SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
-	SoundEffect(SFX_TR4_EXPLOSION2, 0, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
+	SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 	Lara.Vehicle = NO_ITEM;
 }
 
@@ -1627,12 +1627,12 @@ int JeepControl(void)
 		else
 			jeep->pitch = -32768;
 
-		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, (jeep->pitch * 256) + 16777220);
+		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, SoundEnvironment::Land, 0.5f + jeep->pitch / 65535.0f);
 	}
 	else
 	{
 		if (drive != -1)
-			SoundEffect(SFX_TR4_JEEP_IDLE, &item->Pose, 0);
+			SoundEffect(SFX_TR4_JEEP_IDLE, &item->Pose);
 		jeep->pitch = 0;
 	}
 

@@ -945,7 +945,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 	soundPosition.Position.z = setup->z;
 	soundPosition.Orientation = EulerAngles::Zero;
 
-	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition, 0);
+	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition);
 }
 
 void UpdateSplashes()
@@ -1086,7 +1086,7 @@ void Richochet(PoseData* pos)
 	target.y = pos->Position.y;
 	target.z = pos->Position.z;
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_LARA_RICOCHET, pos, 0);
+	SoundEffect(SFX_TR4_LARA_RICOCHET, pos);
 }
 
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
@@ -1097,7 +1097,7 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 	int z = item->Pose.Position.z - cos(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f)) * CLICK(2) + cos(item->Pose.Orientation.GetY() - Angle::DegToRad(90.0f)) * CLICK(1);
 
 	TriggerWaterfallMist(x, item->Pose.Position.y, z, item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
-	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose, 0);
+	SoundEffect(SFX_TR4_WATERFALL_LOOP, &item->Pose);
 }
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
@@ -1444,7 +1444,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->GetMirrorRoom());
 
 	bool water = false;
-	if (room->flags & ENV_FLAG_WATER)
+	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
 		TriggerExplosionBubble(x, y, z, roomNumber);
 		water = true;
@@ -1476,7 +1476,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 		spark->friction = 85;
 	}
 
-	if (TestEnvironment(ENV_FLAG_WIND, room->flags))
+	if (TestEnvironment(ENV_FLAG_WIND, room))
 		spark->flags = 272;
 	else
 		spark->flags = 16;

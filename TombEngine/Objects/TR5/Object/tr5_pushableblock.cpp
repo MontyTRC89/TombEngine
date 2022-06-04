@@ -137,11 +137,11 @@ void PushableBlockControl(short itemNumber)
 
 	// do sound effects, it works for now
 	if (DoPushPull > 0)
-		SoundEffect(info->loopSound, &item->Pose, 2);
+		SoundEffect(info->loopSound, &item->Pose, SoundEnvironment::Always);
 	else if (DoPushPull < 0)
 	{
 		DoPushPull = 0;
-		SoundEffect(info->stopSound, &item->Pose, 2);
+		SoundEffect(info->stopSound, &item->Pose, SoundEnvironment::Always);
 	}
 
 	// control block falling
@@ -169,7 +169,7 @@ void PushableBlockControl(short itemNumber)
 				FloorShake(item);
 
 			item->Animation.VerticalVelocity = 0;
-			SoundEffect(info->fallSound, &item->Pose, 2);
+			SoundEffect(info->fallSound, &item->Pose, SoundEnvironment::Always);
 
 			MoveStackY(itemNumber, relY);
 			AddBridgeStack(itemNumber);
@@ -253,7 +253,7 @@ void PushableBlockControl(short itemNumber)
 					item->Pose.Position.x = item->Pose.Position.x & 0xFFFFFE00 | 0x200;
 					item->Pose.Position.z = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
 					MoveStackXZ(itemNumber);
-					//SoundEffect(pushable->stopSound, &item->pos, 2);
+					//SoundEffect(pushable->stopSound, &item->pos, SoundEnvironment::Always);
 					DoPushPull = 0;
 					LaraItem->Animation.TargetState = LS_IDLE;
 

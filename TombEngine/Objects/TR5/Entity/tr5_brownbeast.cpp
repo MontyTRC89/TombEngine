@@ -115,7 +115,7 @@ void ControlBrowsBeast(short itemNumber)
 			if (distance < pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack)
 				item->Animation.TargetState = 1;
 
-			SoundEffect(SFX_TR5_IMP_BARRELROLL, &item->Pose, 0);
+			SoundEffect(SFX_TR5_IMP_BARRELROLL, &item->Pose);
 			break;
 
 		case 4:

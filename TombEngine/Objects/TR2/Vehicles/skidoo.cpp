@@ -231,7 +231,7 @@ bool TestSkidooDismount(ItemInfo* laraItem, ItemInfo* skidooItem)
 				laraItem->Pose.Position.y -= 200;
 				laraItem->Animation.Velocity = skidooItem->Animation.Velocity;
 				laraItem->Animation.VerticalVelocity = skidooItem->Animation.VerticalVelocity;
-				SoundEffect(SFX_TR4_LARA_FALL, &laraItem->Pose, 0);
+				SoundEffect(SFX_TR4_LARA_FALL, &laraItem->Pose);
 			}
 
 			laraItem->Pose.Orientation.SetX();
@@ -407,7 +407,7 @@ void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)
 			(int)FireWeapon(LaraWeaponType::Pistol, lara->TargetEntity, laraItem, angles))
 		{
 			skidoo->FlashTimer = 2;
-			SoundEffect(weapon->SampleNum, &laraItem->Pose, 0);
+			SoundEffect(weapon->SampleNum, &laraItem->Pose);
 			skidooItem->ItemFlags[0] = 4;
 		}
 	}
@@ -444,8 +444,8 @@ void SkidooExplode(ItemInfo* laraItem, ItemInfo* skidooItem)
 	KillItem(lara->Vehicle);
 	skidooItem->Status = ITEM_DEACTIVATED;
 
-	SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
-	SoundEffect(SFX_TR4_EXPLOSION2, 0, 0);
+	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
+	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem->Pose);
 
 	lara->Vehicle = NO_ITEM;
 }
@@ -523,13 +523,13 @@ bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 		skidoo->TrackMesh = ((skidoo->TrackMesh & 3) == 1) ? 2 : 1;
 
 		skidoo->Pitch += (pitch - skidoo->Pitch) / 4;
-		SoundEffect(skidoo->Pitch ? SFX_TR2_SNOWMOBILE_MOVING : SFX_TR2_SNOWMOBILE_ACCELERATE, &skidooItem->Pose, 0, 0.5f + skidoo->Pitch / (float)SKIDOO_MAX_VELOCITY);
+		SoundEffect(skidoo->Pitch ? SFX_TR2_SNOWMOBILE_MOVING : SFX_TR2_SNOWMOBILE_ACCELERATE, &skidooItem->Pose, SoundEnvironment::Land, 0.5f + skidoo->Pitch / (float)SKIDOO_MAX_VELOCITY);
 	}
 	else
 	{
 		skidoo->TrackMesh = 0;
 		if (!drive)
-			SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &skidooItem->Pose, 0);
+			SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &skidooItem->Pose);
 		skidoo->Pitch = 0;
 	}
 	skidooItem->Floor = height;
@@ -722,9 +722,9 @@ void SkidooAnimation(ItemInfo* laraItem, ItemInfo* skidooItem, int collide, bool
 		if (laraItem->Animation.ActiveState != SKIDOO_STATE_HIT)
 		{
 			if (collide == SKIDOO_ANIM_HIT_FRONT)
-				SoundEffect(SFX_TR2_VEHICLE_IMPACT_1, &skidooItem->Pose, 0);
+				SoundEffect(SFX_TR2_VEHICLE_IMPACT_1, &skidooItem->Pose);
 			else
-				SoundEffect(SFX_TR2_VEHICLE_IMPACT_2, &skidooItem->Pose, 0);
+				SoundEffect(SFX_TR2_VEHICLE_IMPACT_2, &skidooItem->Pose);
 
 			laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + collide;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -800,7 +800,7 @@ void SkidooAnimation(ItemInfo* laraItem, ItemInfo* skidooItem, int collide, bool
 				skidoo->RightVerticalVelocity <= 0)
 			{
 				laraItem->Animation.TargetState = SKIDOO_STATE_SIT;
-				SoundEffect(SFX_TR2_VEHICLE_IMPACT_3, &skidooItem->Pose, 0);
+				SoundEffect(SFX_TR2_VEHICLE_IMPACT_3, &skidooItem->Pose);
 			}
 			else if (skidooItem->Animation.VerticalVelocity > (DAMAGE_START + DAMAGE_LENGTH))
 				laraItem->Animation.TargetState = SKIDOO_STATE_JUMP_OFF;

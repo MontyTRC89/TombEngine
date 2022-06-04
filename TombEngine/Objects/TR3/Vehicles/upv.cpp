@@ -172,7 +172,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_TR4_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, 2);
+		SoundEffect(SFX_TR4_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, SoundEnvironment::Always);
 
 		Statistics.Game.AmmoUsed++;
 		UPV->HarpoonLeft = !UPV->HarpoonLeft;
@@ -631,7 +631,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
 				StopSoundEffect(SFX_TR3_UPV_LOOP);
-				SoundEffect(SFX_TR3_UPV_STOP, (PoseData*)&UPVItem->Pose.Position.x, 2);
+				SoundEffect(SFX_TR3_UPV_STOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 			}
 		}
 
@@ -656,7 +656,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 			UPVItem->Pose.Orientation.SetX(UPVItem->Pose.Orientation.GetX() + Angle::DegToRad(1.0f));
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 
 			if (frame == MOUNT_SURFACE_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -665,7 +665,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 		else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
 		{
 			if (frame == MOUNT_UNDERWATER_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, 2);
+				SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 
 			if (frame == MOUNT_UNDERWATER_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -953,7 +953,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (!(UPV->Flags & UPV_SURFACE))
 			{
-				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, SoundEnvironment::Always);
 				UPV->Flags &= ~UPV_DIVE;
 			}
 
@@ -966,7 +966,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			if (!(UPV->Flags & UPV_SURFACE))
 			{
-				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, 2);
+				SoundEffect(SFX_TR4_LARA_BREATH, &laraItem->Pose, SoundEnvironment::Always);
 				UPV->Flags &= ~UPV_DIVE;
 			}
 
@@ -1032,7 +1032,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPV->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, 2 | 4 | 0x1000000 | (UPVItem->Animation.Velocity * (USHRT_MAX + 1)));
+			SoundEffect(SFX_TR3_UPV_LOOP, (PoseData*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity / 96.0f);
 
 		UPVItem->Animation.AnimNumber = Objects[ID_UPV].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
