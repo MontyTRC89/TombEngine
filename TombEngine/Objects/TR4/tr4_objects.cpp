@@ -378,7 +378,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->saveAnim = true;
 		obj->savePosition = true;
-		obj->undead = true;
+		obj->undead = false;
 		obj->zoneType = ZONE_FLYER;
 	}
 
