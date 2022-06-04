@@ -12,7 +12,16 @@
 
 using namespace TEN::Floordata;
 
-bool ItemInfo::CheckTouchBits(std::vector<int> jointIndices)
+void ItemInfo::SetTouchBits(std::vector<int> jointIndices)
+{
+	for (int i = 0; i < jointIndices.size(); i++)
+	{
+		uint64_t jointBit = (uint64_t)1 << jointIndices[i];
+		this->TouchBits |= jointBit;
+	}
+}
+
+bool ItemInfo::TestTouchBits(std::vector<int> jointIndices)
 {
 	for (int i = 0; i < jointIndices.size(); i++)
 	{
@@ -22,15 +31,6 @@ bool ItemInfo::CheckTouchBits(std::vector<int> jointIndices)
 	}
 
 	return false;
-}
-
-void ItemInfo::SetTouchBits(std::vector<int> jointIndices)
-{
-	for (int i = 0; i < jointIndices.size(); i++)
-	{
-		uint64_t jointBit = (uint64_t)1 << jointIndices[i];
-		this->TouchBits |= jointBit;
-	}
 }
 
 void ClearItem(short itemNumber)

@@ -113,9 +113,9 @@ struct ItemInfo
 	std::string LuaCallbackOnHitName;
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
-	
-	bool CheckTouchBits(std::vector<int> jointIndices);
+
 	void SetTouchBits(std::vector<int> jointIndices);
+	bool TestTouchBits(std::vector<int> jointIndices);
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);
