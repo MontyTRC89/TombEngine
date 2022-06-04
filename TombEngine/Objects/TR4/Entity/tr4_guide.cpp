@@ -631,7 +631,7 @@ namespace TEN::Entities::TR4
 			{
 				someFlag = true;
 
-				item->Pose.Position = enemy->Pose.Position;
+				item->Pose = enemy->Pose;
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
 			{
