@@ -64,9 +64,7 @@ namespace TEN::Entities::TR4
 				{
 					auto* beetle = &BeetleSwarm[beetleNumber];
 
-					beetle->Pose.Position.x = item->Pose.Position.x;
-					beetle->Pose.Position.y = item->Pose.Position.y;
-					beetle->Pose.Position.z = item->Pose.Position.z;
+					beetle->Pose.Position = item->Pose.Position;
 					beetle->RoomNumber = item->RoomNumber;
 
 					if (item->ItemFlags[0])
@@ -136,9 +134,7 @@ namespace TEN::Entities::TR4
 
 			if (beetle->On)
 			{
-				int oldx = beetle->Pose.Position.x;
-				int oldy = beetle->Pose.Position.y;
-				int oldz = beetle->Pose.Position.z;
+				auto oldPos = beetle->Pose.Position;
 
 				beetle->Pose.Position.x += beetle->Velocity * phd_sin(beetle->Pose.Orientation.y);
 				beetle->Pose.Position.y += beetle->VerticalVelocity;
@@ -169,7 +165,7 @@ namespace TEN::Entities::TR4
 						else
 							beetle->Pose.Orientation.y -= ANGLE(2.8f);
 
-						beetle->Velocity = 48 - Lara.LitTorch * 64 - (abs(angle) / 128);
+						beetle->Velocity = 48 - Lara.Torch.IsLit * 64 - (abs(angle) / 128);
 						if (beetle->Velocity < -16)
 							beetle->Velocity = i & 0xF;
 					}
@@ -200,9 +196,7 @@ namespace TEN::Entities::TR4
 					else
 						beetle->Pose.Orientation.y += ANGLE(90.0f);
 
-					beetle->Pose.Position.x = oldx;
-					beetle->Pose.Position.y = oldy;
-					beetle->Pose.Position.z = oldz;
+					beetle->Pose.Position = oldPos;
 					beetle->Pose.Orientation.x = 0;
 					beetle->Pose.Orientation.z = 0;
 					beetle->VerticalVelocity = 0;

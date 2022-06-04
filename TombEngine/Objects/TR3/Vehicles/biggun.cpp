@@ -135,7 +135,7 @@ void BigGunFire(ItemInfo* laraItem, ItemInfo* bigGunItem)
 		for (int i = 0; i < 5; i++)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, 32);
 
-		SoundEffect(SFX_TR4_EXPLOSION1, 0, 0);
+		SoundEffect(SFX_TR4_EXPLOSION1, &projectileItem->Pose);
 	}
 }
 

@@ -76,6 +76,20 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
+
+		g_GameScriptEntities->NotifyKilled(item);
+		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
+		if (!item->LuaCallbackOnKilledName.empty())
+		{
+			g_GameScript->ExecuteFunction(item->LuaCallbackOnKilledName, itemNumber);
+		}
+
+		item->LuaName.clear();
+		item->LuaCallbackOnKilledName.clear();
+		item->LuaCallbackOnHitName.clear();
+		item->LuaCallbackOnCollidedWithObjectName.clear();
+		item->LuaCallbackOnCollidedWithRoomName.clear();
+
 		if (itemNumber >= g_Level.NumItems)
 		{
 			item->NextItem = NextItemFree;
@@ -86,12 +100,6 @@ void KillItem(short const itemNumber)
 			item->Flags |= IFLAG_KILLED;
 		}
 
-		g_GameScriptEntities->NotifyKilled(item);
-		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
-		if (!item->luaCallbackOnKilledName.empty())
-		{
-			g_GameScript->ExecuteFunction(item->luaCallbackOnKilledName, itemNumber);
-		}
 	}
 }
 
@@ -327,9 +335,9 @@ void RemoveActiveItem(short itemNumber)
 		}
 
 		g_GameScriptEntities->NotifyKilled(&item);
-		if (!item.luaCallbackOnKilledName.empty())
+		if (!item.LuaCallbackOnKilledName.empty())
 		{
-			g_GameScript->ExecuteFunction(item.luaCallbackOnKilledName, itemNumber);
+			g_GameScript->ExecuteFunction(item.LuaCallbackOnKilledName, itemNumber);
 		}
 	}
 }
@@ -427,7 +435,6 @@ short CreateItem()
 
 	itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
-	g_Level.Items[NextItemFree].LuaName = "";
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
 
 	return itemNumber;
@@ -442,10 +449,11 @@ void InitialiseItemArray(int totalItem)
 
 	if (g_Level.NumItems + 1 < totalItem)
 	{
-		for (int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
+		for(int i = g_Level.NumItems + 1; i < totalItem; i++, item++)
 		{
 			item->NextItem = i;
 			item->Active = false;
+			item->Data = nullptr;
 		}
 	}
 
@@ -493,6 +501,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 }
 
 // Offset values may be used to account for the quirk of room traversal only being able to occur at portals.
+// Note: may not work for dynamic items because of FindItem.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
 	float s = phd_sin(item->Pose.Orientation.y);

@@ -356,7 +356,7 @@ namespace TEN::Entities::Doors
 				else
 				{
 					if (!item->itemFlags[0])
-						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
+						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
 					item->itemFlags[0] += STEP_SIZE;
 				}
 			}
@@ -365,7 +365,7 @@ namespace TEN::Entities::Doors
 				if (item->itemFlags[0] > 0)
 				{
 					if (item->itemFlags[0] == SECTOR(4))
-						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos, 0);
+						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
 					item->itemFlags[0] -= STEP_SIZE;
 				}
 				if (!door->opened)

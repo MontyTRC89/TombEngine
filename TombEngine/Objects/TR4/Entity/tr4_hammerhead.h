@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseHammerhead(short itemNumber);
-void HammerheadControl(short itemNumber);
+namespace TEN::Entities::TR4
+{
+	void InitialiseHammerhead(short itemNumber);
+	void HammerheadControl(short itemNumber);
+}

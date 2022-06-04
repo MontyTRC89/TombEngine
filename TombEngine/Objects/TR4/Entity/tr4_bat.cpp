@@ -20,25 +20,27 @@ namespace TEN::Entities::TR4
 	constexpr auto BAT_ATTACK_RANGE = SQUARE(CLICK(1));
 	constexpr auto BAT_TARGETING_RANGE = SQUARE(SECTOR(5));
 	constexpr auto BAT_TARGET_YPOS = 896;
-	constexpr auto BAT_DAMAGE = 2;
+	constexpr auto BAT_DAMAGE = 50;
 
 	enum BatState
 	{
 		BAT_STATE_NONE = 0,
-		BAT_STATE_START = 1,
+		BAT_STATE_DROP_FROM_CEILING = 1,
 		BAT_STATE_FLY = 2,
 		BAT_STATE_ATTACK = 3,
-		BAT_STATE_FALL = 4,
+		BAT_STATE_DEATH_FALL = 4,
 		BAT_STATE_DEATH = 5,
 		BAT_STATE_IDLE = 6
 	};
 
-	// TODO
 	enum BatAnim
 	{
-		BAT_ANIM_FALL = 3,
-
-		BAT_ANIM_IDLE = 5
+		BAT_ANIM_DROP_FROM_CEILING = 0,
+		BAT_ANIM_FLY = 1,
+		BAT_ANIM_ATTACK = 2,
+		BAT_ANIM_DEATH_FALL = 3,
+		BAT_ANIM_DEATH = 4,
+		BAT_ANIM_IDLE = 5,
 	};
 
 	static bool isBatCollideTarget(ItemInfo* item)
@@ -100,7 +102,7 @@ namespace TEN::Entities::TR4
 							int x, z;
 							x = target->pos.Position.x - item->pos.Position.x;
 							z = target->pos.Position.z - item->pos.Position.z;
-							distance = SQUARE(x) + SQUARE(z);
+							distance = pow(x, 2) + pow(z, 2);
 							if (distance < bestdistance)
 							{
 								bat->enemy = target;
@@ -115,39 +117,36 @@ namespace TEN::Entities::TR4
 			// Personally, i feel fine with bat always VIOLENT, but I will inspect also GetCreatureMood and CreatureMood functions
 			// for bugs.
 
-			AI_INFO aiInfo;
-			CreatureAIInfo(item, &aiInfo);
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &aiInfo, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
 
 			if (creature->Flags)
 				creature->Mood = MoodType::Escape;
 
-			CreatureMood(item, &aiInfo, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
 			angle = CreatureTurn(item, BAT_ANGLE);
 
 			switch (item->Animation.ActiveState)
 			{
 			case BAT_STATE_IDLE:
-				if (aiInfo.distance < BAT_TARGETING_RANGE
-					|| item->HitStatus
-					|| creature->HurtByLara)
-					item->Animation.TargetState = BAT_STATE_START;
+				if (AI.distance < BAT_TARGETING_RANGE || item->HitStatus || creature->HurtByLara)
+					item->Animation.TargetState = BAT_STATE_DROP_FROM_CEILING;
 
 				break;
 
 			case BAT_STATE_FLY:
-				if (aiInfo.distance < BAT_ATTACK_RANGE || !(GetRandomControl() & 0x3F))
+				if (AI.distance < BAT_ATTACK_RANGE || !(GetRandomControl() & 0x3F))
 					creature->Flags = 0;
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits
-						|| creature->Enemy != LaraItem
-						&& aiInfo.distance < BAT_ATTACK_RANGE
-						&& aiInfo.ahead
-						&& abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_TARGET_YPOS)
+					if (item->TouchBits ||
+						(creature->Enemy != LaraItem &&
+						AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
+						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_TARGET_YPOS))
 					{
 						item->Animation.TargetState = BAT_STATE_ATTACK;
 					}
@@ -156,11 +155,9 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BAT_STATE_ATTACK:
-				if (!creature->Flags
-					&& (item->TouchBits
-						|| creature->Enemy != LaraItem)
-					&& aiInfo.distance < BAT_ATTACK_RANGE
-					&& aiInfo.ahead &&
+				if (!creature->Flags &&
+					(item->TouchBits || creature->Enemy != LaraItem) &&
+					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_TARGET_YPOS)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
@@ -169,6 +166,7 @@ namespace TEN::Entities::TR4
 						LaraItem->HitPoints -= BAT_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
+
 					creature->Flags = 1;
 				}
 				else
@@ -182,7 +180,7 @@ namespace TEN::Entities::TR4
 		}
 		else if (item->Animation.ActiveState == BAT_STATE_ATTACK)
 		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FLY;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.TargetState = BAT_STATE_FLY;
 			item->Animation.ActiveState = BAT_STATE_FLY;
@@ -192,16 +190,16 @@ namespace TEN::Entities::TR4
 			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Animation.TargetState = BAT_STATE_DEATH;
-				item->Pose.Position.y = item->Floor;
 				item->Animation.Airborne = false;
+				item->Pose.Position.y = item->Floor;
 			}
 			else
 			{
-				item->Animation.Airborne = true;
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FALL;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_DEATH_FALL;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
-				item->Animation.TargetState = BAT_STATE_FALL;
-				item->Animation.ActiveState = BAT_STATE_FALL;
+				item->Animation.ActiveState = BAT_STATE_DEATH_FALL;
+				item->Animation.TargetState = BAT_STATE_DEATH_FALL;
+				item->Animation.Airborne = true;
 				item->Animation.Velocity = 0;
 			}
 		}

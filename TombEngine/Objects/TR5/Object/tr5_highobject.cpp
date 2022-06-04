@@ -107,7 +107,7 @@ void ControlHighObject1(short itemNumber)
 				else
 					flags = item->ItemFlags[1] / 8;
 
-				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+				SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, SoundEnvironment::Land, 1.0f, (flags * 256) / 32767.0f); // TODO: check actual sound!
 
 				item->Pose.Position.y += 8;
 
@@ -196,7 +196,7 @@ void ControlHighObject1(short itemNumber)
 		else
 			flags = item->ItemFlags[1];
 
-		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, (flags * 256) | 8);
+		SoundEffect(SFX_TR4_BLK_PLAT_RAISE_AND_LOW, &item->Pose, SoundEnvironment::Land, 1.0f, (flags * 256) / 32767.0f); // TODO: check actual sound!
 
 		item->ItemFlags[1] += 16;
 		item->Pose.Position.y -= 16;

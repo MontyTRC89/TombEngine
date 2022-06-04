@@ -50,7 +50,7 @@ void GameSticksControl(short itemNumber)
 	if (item->ItemFlags[7] > -1)
 	{
 		if (item->HitPoints == 100)
-			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->Pose, 0);
+			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->Pose);
 		for (int i = 0; i < 4; ++i)
 		{
 			if (item->HitPoints < 100 - 2 * i)

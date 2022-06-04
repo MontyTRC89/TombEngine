@@ -28,22 +28,22 @@ void Camera::Register(sol::table & parent)
 		sol::meta_function::new_index, newindex_error,
 
 		/// Get the camera's position
-		// @function GetPosition
+		// @function Camera:GetPosition
 		// @treturn Vec3 a copy of the camera's position
 		ScriptReserved_GetPosition, &Camera::GetPos,
 
 		/// Set the camera's position
-		// @function SetPosition
+		// @function Camera:SetPosition
 		// @tparam Vec3 position the new position of the camera 
 		ScriptReserved_SetPosition, &Camera::SetPos,
 
 		/// Get the camera's unique string identifier
-		// @function GetName
+		// @function Camera:GetName
 		// @treturn string the camera's name
 		ScriptReserved_GetName, &Camera::GetName,
 
 		/// Set the camera's name (its unique string identifier)
-		// @function SetName
+		// @function Camera:SetName
 		// @tparam string name The camera's new name
 		ScriptReserved_SetName, &Camera::SetName,
 
