@@ -823,7 +823,6 @@ void CleanUp()
 	DisableDripParticles();
 	DisableBubbles();
 	DisableDebris();
-	DisableFires();
 
 	// Clear soundtrack masks
 	ClearSoundTrackMasks();
