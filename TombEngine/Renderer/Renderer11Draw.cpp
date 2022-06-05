@@ -1067,7 +1067,7 @@ namespace TEN::Renderer
 		DrawString(200, ypos + 6 * 25, g_GameFlow->GetString(STRING_USED_MEDIPACKS), PRINTSTRING_COLOR_WHITE, 0);
 		DrawString(200, ypos + 7 * 25, g_GameFlow->GetString(STRING_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, 0);
 
-		seconds = GameTimer / 30;
+		seconds = GameTimer / FPS;
 		Days = seconds / (24 * 60 * 60);
 		Hours = (seconds % (24 * 60 * 60)) / (60 * 60);
 		Min = (seconds / 60) % 60;
