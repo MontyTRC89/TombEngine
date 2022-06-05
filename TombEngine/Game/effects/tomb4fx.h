@@ -207,7 +207,7 @@ void TriggerGlobalFireFlame();
 void TriggerPilotFlame(int itemNum, int nodeIndex);
 void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed);
 void UpdateFireProgress();
-void DisableFires();
+void ClearFires();
 void AddFire(int x, int y, int z, short roomNum, float size, short fade);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
