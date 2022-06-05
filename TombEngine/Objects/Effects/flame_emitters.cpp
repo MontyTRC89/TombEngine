@@ -212,30 +212,27 @@ namespace TEN::Entities::Effects
 
 				if (item->TriggerFlags == 2)
 				{
-					item->Pose.Position.x += phd_sin(item->Pose.Orientation.y - ANGLE(180));
-					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180));
+					item->Pose.Position.x += phd_sin(item->Pose.Orientation.y - ANGLE(180)) * (CLICK(1) / FPS);
+					item->Pose.Position.z += phd_cos(item->Pose.Orientation.y - ANGLE(180)) * (CLICK(1) / FPS);
 
-					short roomNumber = item->RoomNumber;
-					FloorInfo* floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
-
-					if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
+					auto probe = GetCollision(item);
+					
+					if (TestEnvironment(ENV_FLAG_WATER, probe.RoomNumber) ||
+						probe.Position.Floor - item->Pose.Position.y > CLICK(2) ||
+						probe.Position.Floor == NO_HEIGHT)
 					{
 						Weather.Flash(255, 128, 0, 0.03f);
 						KillItem(itemNumber);
 						return;
 					}
 
-					if (item->RoomNumber != roomNumber)
-					{
-						ItemNewRoom(itemNumber, roomNumber);
-					}
+					if (item->RoomNumber != probe.RoomNumber)
+						ItemNewRoom(itemNumber, probe.RoomNumber);
 
-					item->Pose.Position.y = GetFloorHeight(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);;
+					item->Pose.Position.y = probe.Position.Floor;
 
 					if (Wibble & 7)
-					{
 						TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y - 32, item->Pose.Position.z, -1, 1);
-					}
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
