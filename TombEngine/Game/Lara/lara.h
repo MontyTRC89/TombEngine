@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
 
 struct ItemInfo;
@@ -64,8 +65,8 @@ constexpr auto LARA_DEATH_VELOCITY = 155;
 constexpr auto LARA_DIVE_DEATH_VELOCITY = 134;
 constexpr auto LARA_TERMINAL_VELOCITY = CLICK(10);
 
-constexpr auto LARA_POSITION_ADJUST_MAX_TIME = 30 * 3;	// 30 frames * 3 = 3 seconds allowed for position adjustment.
-constexpr auto LARA_POSE_TIME = 30 * 30;				// 30 frames * 30 = 30 seconds to AFK pose.
+constexpr auto LARA_POSITION_ADJUST_MAX_TIME = FPS * 3;	// 30 frames * 3 = 3 seconds allowed for position adjustment.
+constexpr auto LARA_POSE_TIME = FPS * 30;				// 30 frames * 30 = 30 seconds to AFK pose.
 constexpr auto LARA_RUN_JUMP_TIME = 22;					// Frames to count before a running jump is possible.
 
 constexpr auto LARA_HEALTH_MAX = 1000.0f;
