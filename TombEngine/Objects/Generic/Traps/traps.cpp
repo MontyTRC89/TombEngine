@@ -259,7 +259,7 @@ void WreckingBallControl(short itemNumber)
 		item->Pose.Position.y += item->Animation.VerticalVelocity;
 		if (item->Pose.Position.y < item2->Pose.Position.y + 1644)
 		{
-			StopSoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP);
+			StopSoundEffect(SFX_TR5_BASE_CLAW_WINCH_UP_LOOP);
 			item->ItemFlags[0] = 1;
 			item->Pose.Position.y = item2->Pose.Position.y + 1644;
 			if (item->Animation.VerticalVelocity < -32)
@@ -277,7 +277,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (!item->ItemFlags[0])
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP, &item->Pose);
+			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_UP_LOOP, &item->Pose);
 		}
 	}
 	item2->Pose.Position.x = item->Pose.Position.x;
