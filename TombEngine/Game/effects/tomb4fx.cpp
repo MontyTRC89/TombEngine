@@ -332,7 +332,7 @@ void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 	fptr->size = size;
 }
 
-void DisableFires()
+void ClearFires()
 {
 	for (int i = 0; i < MAX_FIRE_LIST; i++)
 		Fires[i].on = false;

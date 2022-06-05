@@ -2026,6 +2026,7 @@ namespace TEN::Renderer
 	{
 		ResetAnimations();
 
+		ClearFires();
 		ClearDynamicLights();
 		ClearSceneItems();
 
@@ -2616,8 +2617,6 @@ namespace TEN::Renderer
 		m_biggestRoomIndexBuffer = 0;
 		m_numPolygons = 0;
 
-		ClearScene();
-
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
 
@@ -2779,6 +2778,8 @@ namespace TEN::Renderer
 		DrawAllStrings();
 
 		DoFadingAndCinematicBars(target, depthTarget, view);
+
+		ClearScene();
 	}
 
 	void Renderer11::RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
