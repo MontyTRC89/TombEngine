@@ -1221,7 +1221,7 @@ namespace TEN::Renderer
 				rect.top = 50 * factorY;
 				rect.bottom = 200 * factorY;
 
-				m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->Additive());
+				m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->NonPremultiplied());
 				m_spriteBatch->Draw(m_logo.ShaderResourceView.Get(), rect, Vector4::One * ScreenFadeCurrent);
 				m_spriteBatch->End();
 			}
