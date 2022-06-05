@@ -261,7 +261,7 @@ namespace TEN::Entities::TR4
 			xRot = phd_atan(682, height2 - height1);
 		}
 
-		short angle;
+		short angle = 0;
 
 		if (item->HitPoints <= 0)
 		{
