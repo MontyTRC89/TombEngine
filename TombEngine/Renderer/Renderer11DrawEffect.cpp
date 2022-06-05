@@ -1191,7 +1191,7 @@ namespace TEN::Renderer
 				m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 				m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-				if (!deb->isStatic) 
+				if (deb->isStatic) 
 				{
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				} 
