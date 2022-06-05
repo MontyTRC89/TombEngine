@@ -64,7 +64,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 				SetAnimation(item, LA_LAND);
 				LaraSnapToHeight(item, coll);
 			}
-			else if (abs(item->Animation.Velocity) > 50) // TODO: Tune and demagic this value.
+			else if (abs(item->Animation.Velocity) > 47) // TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
 
 			item->Animation.Velocity /= 4;
