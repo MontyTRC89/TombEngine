@@ -43,28 +43,28 @@ namespace TEN::Entities::TR4
             byte r = (GetRandomControl() & 0x3F) + 192;
             byte g = (GetRandomControl() & 0x1F) + 96;
             byte b = 0;
-            int on = 0;
+            short fade = 0;
 
             if (item->ItemFlags[3])
             {
                 item->ItemFlags[3]--;
-                on = 255 - GetRandomControl() % (4 * (91 - item->ItemFlags[3]));
-                if (on < 1)
+                fade = 255 - GetRandomControl() % (4 * (91 - item->ItemFlags[3]));
+                if (fade < 1)
                 {
-                    on = 1;
-                    r = (r * on) / 256;
-                    g = (g * on) / 256;
+                    fade = 1;
+                    r = (r * fade) / 256;
+                    g = (g * fade) / 256;
                 }
-                else if (on <= 255)
+                else if (fade <= 255)
                 {
-                    r = (r * on) / 256;
-                    g = (g * on) / 256;
+                    r = (r * fade) / 256;
+                    g = (g * fade) / 256;
                 }
             }
             else
-                on = 0;
+                fade = 0;
 
-            AddFire(item->Pose.Position.x, item->Pose.Position.y - 620, item->Pose.Position.z, 1, item->RoomNumber, on);
+            AddFire(item->Pose.Position.x, item->Pose.Position.y - 620, item->Pose.Position.z, item->RoomNumber, 0.5f, fade);
             TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y - 768, item->Pose.Position.z, 12, r, g, b);
             return;
         }
