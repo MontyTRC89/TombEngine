@@ -272,25 +272,25 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
-Vector3 TranslateVector(Vector3 vector, short orient, float forward, float vertical, float lateral)
+Vector3 TranslateVector(Vector3 vector, short yOrient, float forward, float vertical, float lateral)
 {
-	float sinOrient = phd_sin(orient);
-	float cosOrient = phd_cos(orient);
+	float sinY = phd_sin(yOrient);
+	float cosY = phd_cos(yOrient);
 
-	vector.x += (forward * sinOrient) + (lateral * cosOrient);
+	vector.x += (forward * sinY) + (lateral * cosY);
 	vector.y = vertical;
-	vector.z += (forward * cosOrient) + (lateral * -sinOrient);
+	vector.z += (forward * cosY) + (lateral * -sinY);
 	return vector;
 }
 
-Vector3Int TranslateVector(Vector3Int vector, short orient, float forward, float vertical, float lateral)
+Vector3Int TranslateVector(Vector3Int vector, short yOrient, float forward, float vertical, float lateral)
 {
-	float sinOrient = phd_sin(orient);
-	float cosOrient = phd_cos(orient);
+	float sinY = phd_sin(yOrient);
+	float cosY = phd_cos(yOrient);
 
-	vector.x += (int)round((forward * sinOrient) + (lateral * cosOrient));
+	vector.x += (int)round((forward * sinY) + (lateral * cosY));
 	vector.y += (int)round(vertical);
-	vector.z += (int)round((forward * cosOrient) + (lateral * -sinOrient));
+	vector.z += (int)round((forward * cosY) + (lateral * -sinY));
 	return vector;
 }
 

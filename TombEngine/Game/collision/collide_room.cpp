@@ -126,20 +126,20 @@ CollisionResult GetCollision(ItemInfo* item)
 }
 
 // Overload used to probe point/room collision parameters from a given item's position.
-CollisionResult GetCollision(ItemInfo* item, short orient, float forward, float vertical, float lateral)
+CollisionResult GetCollision(ItemInfo* item, short yOrient, float forward, float vertical, float lateral)
 {
-	auto point = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
+	auto point = TranslateVector(item->Pose.Position, yOrient, forward, vertical, lateral);
 	int adjacentRoomNumber = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
 // Overload used to probe point/room collision parameters from a given position.
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, short orient, float forward, float vertical, float lateral)
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, short yOrient, float forward, float vertical, float lateral)
 {
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
 
-	auto point = TranslateVector(pos, orient, forward, vertical, lateral);
+	auto point = TranslateVector(pos, yOrient, forward, vertical, lateral);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
