@@ -298,7 +298,7 @@ void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed)
 	}
 }
 
-void keep_those_fires_burning()
+void UpdateFireProgress()
 {
 	TriggerGlobalStaticFlame();
 	if (!(Wibble & 0xF))
@@ -309,7 +309,7 @@ void keep_those_fires_burning()
 	}
 }
 
-void AddFire(int x, int y, int z, char size, short roomNum, short on)
+void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 {
 	FIRE_LIST* fptr = &Fires[0];
 	int i = 0;
@@ -318,10 +318,10 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 		fptr++;
 		if (++i >= MAX_FIRE_LIST)
 			return;
-	}
-
-	if (on)
-		fptr->on = on;
+	}	
+	
+	if (fade)
+		fptr->on = fade;
 	else
 		fptr->on = 1;
 
@@ -329,19 +329,7 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 	fptr->y = y;
 	fptr->z = z;
 	fptr->roomNumber = roomNum;
-
-	switch (size)
-	{
-	case SP_NORMALFIRE:
-		fptr->size = 1;
-		break;
-	case SP_SMALLFIRE:
-		fptr->size = 2;
-		break;
-	case SP_BIGFIRE:
-		fptr->size = 3;
-		break;
-	}
+	fptr->size = size;
 }
 
 void DisableFires()
@@ -352,7 +340,7 @@ void DisableFires()
 
 void UpdateFireSparks()
 {
-	keep_those_fires_burning();
+	UpdateFireProgress();
 
 	for (int i = 0; i < MAX_SPARKS_FIRE; i++)
 	{

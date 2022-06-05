@@ -107,7 +107,7 @@ namespace TEN::Entities::Effects
 					}
 
 					if (item->ItemFlags[2])
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_NORMALFIRE, item->RoomNumber, item->ItemFlags[2]);
+						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 0.5f, item->ItemFlags[2]);
 
 					if (item->ItemFlags[1])
 					{
@@ -143,7 +143,7 @@ namespace TEN::Entities::Effects
 				if (item->TriggerFlags < 8)
 					FlameEmitterFlags[item->TriggerFlags] = true;
 
-				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_BIGFIRE, item->RoomNumber, 0);
+				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 1.0f, 0);
 
 				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 					16 - (GetRandomControl() & 1),
@@ -184,10 +184,29 @@ namespace TEN::Entities::Effects
 					if (item->TriggerFlags == 123)
 					{
 						// Middle of the block
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_SMALLFIRE, item->RoomNumber, item->ItemFlags[3]);
+						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 0.25f, item->ItemFlags[3]);
 					}
 					else
-						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, SP_SMALLFIRE - item->TriggerFlags, item->RoomNumber, item->ItemFlags[3]);
+					{
+						float size = 1.0f;
+						switch (item->TriggerFlags)
+						{
+						default:
+						case 0:
+							size = 2.0f;
+							break;
+
+						case 1:
+							size = 1.0f;
+							break;
+
+						case 3:
+							size = 0.5f;
+							break;
+						}
+
+						AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, size, item->ItemFlags[3]);
+					}
 				}
 
 				if (item->TriggerFlags == 0 || item->TriggerFlags == 2)
