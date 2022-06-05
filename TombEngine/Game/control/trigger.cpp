@@ -125,7 +125,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			item->Timer = timer;
 			item->Status = ITEM_ACTIVE;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->Timer = FPS * timer;
 			return 1;
 		}
 		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
@@ -456,7 +456,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			item->Timer = timer;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->Timer = FPS * timer;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH ||
 				triggerType == TRIGGER_TYPES::HEAVYSWITCH)
@@ -576,7 +576,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
-				Camera.timer = (trigger & 0xFF) * 30;
+				Camera.timer = (trigger & 0xFF) * FPS;
 				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
