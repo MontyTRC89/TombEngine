@@ -132,7 +132,7 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			}
 			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
 			{
-				SoundEffect(SFX_TR4_POUR, &laraItem->Pose);
+				SoundEffect(SFX_TR4_POUR_WATER, &laraItem->Pose);
 				item->Pose.Orientation.y = rotY;
 			}
 			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)

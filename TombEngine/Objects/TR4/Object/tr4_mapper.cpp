@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 
         if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase >= 200)
         {
-            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->Pose);
+            SoundEffect(SFX_TR4_MAPPER_LASER, &item->Pose);
 
             item->MeshBits |= 2;
 
