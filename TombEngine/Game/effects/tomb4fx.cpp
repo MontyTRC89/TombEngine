@@ -344,7 +344,7 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 	}
 }
 
-void ClearFires()
+void DisableFires()
 {
 	for (int i = 0; i < MAX_FIRE_LIST; i++)
 		Fires[i].on = false;
