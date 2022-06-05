@@ -114,6 +114,7 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
+// Overload used to probe point/room collision parameters from a given item's position.
 CollisionResult GetCollision(ItemInfo* item, short orient, float forward, float vertical, float lateral)
 {
 	auto point = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
@@ -121,12 +122,7 @@ CollisionResult GetCollision(ItemInfo* item, short orient, float forward, float 
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
-CollisionResult GetCollision(Vector3 pos, int roomNumber, short orient, float forward, float vertical, float lateral)
-{
-	auto point = TranslateVector(pos, orient, forward, vertical, lateral);
-	return GetCollision(point.x, point.y, point.z, roomNumber);
-}
-
+// Overload used to quickly get point/room collision parameters at a given item's position.
 CollisionResult GetCollision(ItemInfo* item)
 {
 	auto room = item->RoomNumber;
@@ -137,6 +133,11 @@ CollisionResult GetCollision(ItemInfo* item)
 	return result;
 }
 
+// Overload used as a universal wrapper across collisional code to replace
+// triads of roomNumber-GetFloor()-GetFloorHeight() operations.
+// The advantage is that it does NOT modify the incoming roomNumber argument,
+// instead storing one modified by GetFloor() within the returned CollisionResult struct.
+// This way, no external variables are modified as output arguments.
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
@@ -147,14 +148,16 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
+// A reworked legacy GetFloorHeight() function which writes data
+// into a special CollisionResult struct instead of global variables.
+// It writes for both floor and ceiling heights at the same coordinates, meaning it should be used
+// in place of successive GetFloorHeight() and GetCeilingHeight() calls to increase readability.
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
 	CollisionResult result = {};
 
 	// Record coordinates.
-	result.Coordinates.x = x;
-	result.Coordinates.y = y;
-	result.Coordinates.z = z;
+	result.Coordinates = Vector3(x, y, z);
 
 	// Return provided block into result as itself.
 	result.Block = floor;

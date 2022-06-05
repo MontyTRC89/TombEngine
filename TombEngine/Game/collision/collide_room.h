@@ -123,7 +123,6 @@ struct CollisionInfo
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
 CollisionResult GetCollision(ItemInfo* item, short orient, float forward, float vertical = 0, float lateral = 0);
-CollisionResult GetCollision(Vector3 pos, int roomNumber, short orient, float forward, float vertical = 0, float lateral = 0);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ItemInfo* item);
