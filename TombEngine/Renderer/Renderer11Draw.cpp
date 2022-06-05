@@ -2026,9 +2026,6 @@ namespace TEN::Renderer
 	{
 		ResetAnimations();
 
-		// Clear dynamic lights
-		ClearFires();
-
 		ClearDynamicLights();
 		ClearSceneItems();
 
