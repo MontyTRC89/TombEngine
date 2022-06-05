@@ -686,6 +686,7 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.y = angle;
 	}
 
+	LaraSnapToHeight(item, coll);
 	lara->Control.MoveAngle = angle;
 	oldAngle = angle;
 }
