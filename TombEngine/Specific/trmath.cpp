@@ -272,6 +272,35 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
+Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
+{
+	auto direction = target - vector;
+	direction.Normalize();
+
+	float distanceBetween = Vector3::Distance(vector, target);
+	if (distance > distanceBetween)
+		return target;
+
+	return (vector + (direction * distance));
+}
+
+Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
+{
+	auto direction = target.ToVector3() - vector.ToVector3();
+	direction.Normalize();
+
+	float distanceBetween = Vector3::Distance(vector.ToVector3(), target.ToVector3());
+	if (distance > distanceBetween)
+		return target;
+
+	auto offset = Vector3Int(
+		(int)round(direction.x * distance),
+		(int)round(direction.y * distance),
+		(int)round(direction.z * distance)
+	);
+	return (vector + offset);
+}
+
 Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical, float lateral)
 {
 	float sinAngle = phd_sin(angle);
