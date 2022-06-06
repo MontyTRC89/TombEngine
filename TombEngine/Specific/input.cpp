@@ -255,7 +255,7 @@ int S_UpdateInput()
 				LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
 				LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG)
 			{
-				SoundEffect(SFX_TR4_LARA_NO, nullptr, SoundEnvironment::Always);
+				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
 				flareNo = true;
 			}
 			else
