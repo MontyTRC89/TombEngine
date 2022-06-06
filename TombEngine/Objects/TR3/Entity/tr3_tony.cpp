@@ -62,7 +62,7 @@ enum TonyAnim
 static BOSS_STRUCT BossData;
 
 #define TONY_TURN ANGLE(2.0f)
-#define TONY_HITS 1	// Tony Harder To Kill, was 100 (6 shotgun shots)
+#define TONY_HITS 100
 #define MAX_TONY_TRIGGER_RANGE 0x4000
 
 void InitialiseTony(short itemNumber)
