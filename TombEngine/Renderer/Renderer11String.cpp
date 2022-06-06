@@ -23,24 +23,25 @@ namespace TEN::Renderer {
 		str.X = 0;
 		str.Y = 0;
 		str.Color = Vector3((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
+		str.Scale = ScreenWidth > ScreenHeight ? factorY : factorX;
 
 		// Measure the string
 		Vector2 size = m_gameFont->MeasureString(wstr.c_str());
 
 		if (flags & PRINTSTRING_CENTER)
 		{
-			int width = size.x;
+			int width = size.x * str.Scale;
 			rect.left = x * factorX - width / 2;
 			rect.right = x * factorX + width / 2;
-			rect.top += y * factorY;
-			rect.bottom += y * factorY;
+			rect.top += y * str.Scale;
+			rect.bottom += y * str.Scale;
 		}
 		else
 		{
 			rect.left = x * factorX;
 			rect.right += x * factorX;
-			rect.top = y * factorY;
-			rect.bottom += y * factorY;
+			rect.top = y * str.Scale;
+			rect.bottom += y * str.Scale;
 		}
 
 		str.X = rect.left;
@@ -81,12 +82,14 @@ namespace TEN::Renderer {
 
 			// Draw shadow if needed
 			if (str->Flags & PRINTSTRING_OUTLINE)
-				m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X + 1, str->Y + 1),
-					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent);
+				m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X + 2 * str->Scale, str->Y + 2 * str->Scale),
+					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent,
+					0.0f, Vector4::Zero, str->Scale);
 
 			// Draw string
 			m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X, str->Y),
-				Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f) * ScreenFadeCurrent);
+				Vector4(str->Color.x / 255.0f, str->Color.y / 255.0f, str->Color.z / 255.0f, 1.0f) * ScreenFadeCurrent,
+				0.0f, Vector4::Zero, str->Scale);
 		}
 
 		m_spriteBatch->End();
