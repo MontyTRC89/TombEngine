@@ -66,8 +66,12 @@ namespace TEN::Renderer
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		x *= (ScreenWidth / 800.0f);
-		y *= (ScreenHeight / 600.0f);
+		float factorX = ScreenWidth / ASSUMED_WIDTH_FOR_TEXT_DRAWING;
+		float factorY = ScreenHeight / ASSUMED_HEIGHT_FOR_TEXT_DRAWING;
+
+		x *= factorX;
+		y *= factorY;
+		scale1 *= factorX > factorY ? factorY : factorX;
 
 		auto index = g_Gui.ConvertObjectToInventoryItem(objectNum);
 
@@ -1214,12 +1218,13 @@ namespace TEN::Renderer
 			{
 				float factorX = (float)ScreenWidth / REFERENCE_RES_WIDTH;
 				float factorY = (float)ScreenHeight / REFERENCE_RES_HEIGHT;
+				float scale = ScreenWidth > ScreenHeight ? factorX : factorY;
 
 				RECT rect;
-				rect.left = 250 * factorX;
-				rect.right = 550 * factorX;
-				rect.top = 50 * factorY;
-				rect.bottom = 200 * factorY;
+				rect.left = 250 * scale;
+				rect.right = 550 * scale;
+				rect.top = 50 * scale;
+				rect.bottom = 200 * scale;
 
 				m_spriteBatch->Begin(SpriteSortMode_BackToFront, m_states->NonPremultiplied());
 				m_spriteBatch->Draw(m_logo.ShaderResourceView.Get(), rect, Vector4::One * ScreenFadeCurrent);
