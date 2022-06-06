@@ -274,24 +274,23 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 
 Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
 {
-	auto direction = target - vector;
-	direction.Normalize();
-
 	float distanceBetween = Vector3::Distance(vector, target);
 	if (distance > distanceBetween)
 		return target;
 
+	auto direction = target - vector;
+	direction.Normalize();
 	return (vector + (direction * distance));
 }
 
 Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
 {
-	auto direction = target.ToVector3() - vector.ToVector3();
-	direction.Normalize();
-
 	float distanceBetween = Vector3::Distance(vector.ToVector3(), target.ToVector3());
 	if (distance > distanceBetween)
 		return target;
+
+	auto direction = target.ToVector3() - vector.ToVector3();
+	direction.Normalize();
 
 	auto offset = Vector3Int(
 		(int)round(direction.x * distance),
