@@ -114,7 +114,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.ActiveState = LS_DEATH;
 					laraItem->Animation.Velocity = 0;
 
-					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &mineItem->Pose);
+					SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY, &mineItem->Pose);
 				}
 			}
 			else
