@@ -510,7 +510,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo3 = {
-		"Grenadegun Flash Ammo",
+		"Grenadegun (Flash Ammo)",
 		"",
 		"",
 		"",
@@ -570,7 +570,7 @@ local strings = {
 		""
 	},
 	hk_burst_mode = {
-		"HK Burst mode",
+		"HK (Burst mode)",
 		"",
 		"",
 		"",
@@ -580,7 +580,7 @@ local strings = {
 		""
 	},
 	hk_rapid_mode = {
-		"HK Rapid mode",
+		"HK (Rapid mode)",
 		"",
 		"",
 		"",
@@ -610,7 +610,7 @@ local strings = {
 		""
 	},
 	lara_home = {
-		"Lara's home",
+		"Lara's Home",
 		"",
 		"",
 		"",

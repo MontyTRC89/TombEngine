@@ -264,7 +264,7 @@ static void CartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem)
 									int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 									if (frame >= 12 && frame <= 22)
 									{
-										SoundEffect(SFX_TR3_SPANNER, &item->Pose, SoundEnvironment::Always);
+										SoundEffect(SFX_TR4_VEHICLE_MINECART_WRENCH, &item->Pose, SoundEnvironment::Always);
 										TestTriggers(item, true);
 										item->Animation.FrameNumber++;
 									}
@@ -392,21 +392,21 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 	if (minecartItem->Animation.Velocity < CART_MIN_VEL)
 	{
 		minecartItem->Animation.Velocity = CART_MIN_VEL;
-		StopSoundEffect(SFX_TR3_MINE_CART_TRACK_LOOP);
+		StopSoundEffect(SFX_TR4_VEHICLE_MINECART_TRACK_LOOP);
 
 		if (minecart->VerticalVelocity)
-			StopSoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP);
+			StopSoundEffect(SFX_TR4_VEHICLE_MINECART_PULLY_LOOP);
 		else
-			SoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP, &minecartItem->Pose, SoundEnvironment::Always);
+			SoundEffect(SFX_TR4_VEHICLE_MINECART_PULLY_LOOP, &minecartItem->Pose, SoundEnvironment::Always);
 	}
 	else
 	{
-		StopSoundEffect(SFX_TR3_MINE_CART_PULLY_LOOP);
+		StopSoundEffect(SFX_TR4_VEHICLE_MINECART_PULLY_LOOP);
 
 		if (minecart->VerticalVelocity)
-			StopSoundEffect(SFX_TR3_MINE_CART_TRACK_LOOP);
+			StopSoundEffect(SFX_TR4_VEHICLE_MINECART_TRACK_LOOP);
 		else
-			SoundEffect(SFX_TR3_MINE_CART_TRACK_LOOP, &minecartItem->Pose, SoundEnvironment::Land, 1.0f + ((float)minecartItem->Animation.Velocity / SECTOR(8))); // TODO: check actual sound!
+			SoundEffect(SFX_TR4_VEHICLE_MINECART_TRACK_LOOP, &minecartItem->Pose, SoundEnvironment::Land, 1.0f + ((float)minecartItem->Animation.Velocity / SECTOR(8))); // TODO: check actual sound!
 	}
 
 	if (minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT))
@@ -487,7 +487,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 		if (minecartItem->Pose.Position.y > minecart->FloorHeightMiddle)
 		{
 			if (minecart->VerticalVelocity > 0)
-				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
+				SoundEffect(SFX_TR4_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
 
 			minecartItem->Pose.Position.y = minecart->FloorHeightMiddle;
 			minecart->VerticalVelocity = 0;
@@ -597,7 +597,7 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 	case CART_STATE_IDLE:
 		if (!(minecart->Flags & CART_FLAG_CONTROL))
 		{
-			SoundEffect(SFX_TR3_MINE_CART_START, &minecartItem->Pose, SoundEnvironment::Always);
+			SoundEffect(SFX_TR4_VEHICLE_MINECART_START, &minecartItem->Pose, SoundEnvironment::Always);
 			minecart->Flags |= CART_FLAG_CONTROL;
 			minecart->StopDelay = 64;
 		}
@@ -641,17 +641,17 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		if (TrInput & CART_IN_DUCK)
 		{
 			laraItem->Animation.TargetState = CART_STATE_DUCK;
-			StopSoundEffect(SFX_TR3_MINE_CART_BRAKE);
+			StopSoundEffect(SFX_TR4_VEHICLE_MINECART_BRAKE);
 		}
 		else if (!(TrInput & CART_IN_BRAKE) || minecart->Flags & CART_FLAG_STOPPED)
 		{
 			laraItem->Animation.TargetState = CART_STATE_MOVE;
-			StopSoundEffect(SFX_TR3_MINE_CART_BRAKE);
+			StopSoundEffect(SFX_TR4_VEHICLE_MINECART_BRAKE);
 		}
 		else
 		{
 			minecart->Velocity += CART_DEC;
-			SoundEffect(SFX_TR3_MINE_CART_BRAKE, &laraItem->Pose, SoundEnvironment::Always);
+			SoundEffect(SFX_TR4_VEHICLE_MINECART_BRAKE, &laraItem->Pose, SoundEnvironment::Always);
 		}
 
 		break;
@@ -752,7 +752,7 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 			floorHeight < CLICK(1))
 		{
 			if (Wibble & 7 == 0)
-				SoundEffect(SFX_TR3_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
+				SoundEffect(SFX_TR4_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
 
 			minecartItem->Pose.Position.x += TURN_DEATH_VEL * phd_sin(minecartItem->Pose.Orientation.y);
 			minecartItem->Pose.Position.z += TURN_DEATH_VEL * phd_cos(minecartItem->Pose.Orientation.y);

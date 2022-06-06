@@ -26,6 +26,7 @@ namespace TEN::Entities::TR4
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SETHBLADE_ANIM_IDLE;
 		item->Animation.TargetState = SETHBLADE_STATE_ACTIVE;
 		item->Animation.ActiveState = SETHBLADE_STATE_IDLE;
+
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->ItemFlags[2] = abs(item->TriggerFlags);
 	}

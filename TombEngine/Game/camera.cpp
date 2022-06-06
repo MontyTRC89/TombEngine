@@ -1250,11 +1250,11 @@ void BinocularCamera(ItemInfo* item)
 					firing = true;
 
 					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 					else
 					{
 						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						//SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+						//SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 					}
 				}
 				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
@@ -1271,11 +1271,11 @@ void BinocularCamera(ItemInfo* item)
 						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 					else
@@ -1283,11 +1283,11 @@ void BinocularCamera(ItemInfo* item)
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 				}
@@ -1296,11 +1296,11 @@ void BinocularCamera(ItemInfo* item)
 					if (LSHKTimer)
 					{
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 					else
@@ -1309,11 +1309,11 @@ void BinocularCamera(ItemInfo* item)
 						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 
