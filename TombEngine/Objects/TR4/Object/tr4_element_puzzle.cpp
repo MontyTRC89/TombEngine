@@ -73,7 +73,7 @@ namespace TEN::Entities::TR4
             return;
 
         if (item->ItemFlags[1] > 90)
-            SoundEffect(SFX_TR4_JOBY_WIND, &item->Pose);
+            SoundEffect(SFX_TR4_WIND, &item->Pose);
 
         if (item->ItemFlags[1] < 60)
         {

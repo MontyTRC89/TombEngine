@@ -4,7 +4,7 @@ In the year 2000, Core Design granted us a great gift: their TR4-based Level Edi
 - TREP was a tool which allowed modification of the executable to expand certain limits and implement new features.
 - TRNG built upon TREP and provided many new tools, including a scripting language, expanding even more limits with its own .DLL.
 
-Unfortunately, TRNG's toolset is poorly documented and not user-friendly; the program remains closed-source to this day and is in all practicality abandonware. As a direct consequence, no one is able to fix the countless well-known bugs and issues extant in TRNG, rendering implementation of new features nigh impossible without an in-depth knowledge of C++ plugin creation and a solid understanding of the classic Tomb Raider engine's many idiosyncrasies.
+Unfortunately, TRNG's toolset is poorly documented and not user-friendly; the program remains closed-source to this day and is in all practicality an abandonware. As a direct consequence, no one is able to fix the countless well-known bugs and issues extant in TRNG, rendering implementation of new features is impossible without an in-depth knowledge of C++ plugin creation and a solid understanding of the classic Tomb Raider engine's many idiosyncrasies.
 
 TombEngine (TEN) is a new, open-source engine which aims to abolish all limits, fix bugs from the original games, introduce new features while refining old ones, and provide for a refined, user-friendly level creation process. Current support includes:
 - Lua (as the native scripting language)
@@ -59,6 +59,7 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - WolfCheese (general coding)
 
 ## Testers
+- Adngel
 - Caesum
 - Dustie
 - JoeyQuint
@@ -70,7 +71,14 @@ We do not and have never worked for Core Design, Eidos Interactive, or Square En
 - Stranger1992
 - WolfCheese
 
-## Animations 
+## Assets and Miscellaneous
+
+### Animations
 - SrDanielPonces (Diagonal shimmy transitions)
 - Krystian (Flexibility crawlspace, slope climbing animations)
 - Sezz (Additional Animations for player state refactoring) 
+
+### TombEngine Wiki tutorials 
+- Kubsy (Lua Basics tutorial)
+- Stranger1992 (Sound Setups)
+- Wolfcheese (Lua puzzles setups)

@@ -1087,7 +1087,7 @@ void Richochet(PHD_3DPOS* pos)
 	target.y = pos->Position.y;
 	target.z = pos->Position.z;
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_LARA_RICOCHET, pos);
+	SoundEffect(SFX_TR4_WEAPON_RICOCHET, pos);
 }
 
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist

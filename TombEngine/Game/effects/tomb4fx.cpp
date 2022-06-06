@@ -1044,7 +1044,7 @@ void UpdateGunShells()
 			int ceiling = GetCeiling(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
 			if (gs->pos.Position.y < ceiling)
 			{
-				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos);
+				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gs->pos);
 				gs->speed -= 4;
 
 				if (gs->speed < 8)
@@ -1060,7 +1060,7 @@ void UpdateGunShells()
 			int height = GetFloorHeight(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
 			if (gs->pos.Position.y >= height)
 			{
-				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos);
+				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gs->pos);
 				gs->speed -= 8;
 				if (gs->speed >= 8)
 				{
@@ -1440,7 +1440,7 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(SFX_TR5_IMP_STONEHIT, pos);
+		SoundEffect(SFX_TR5_IMP_STONE_HIT, pos);
 	}
 }
 
