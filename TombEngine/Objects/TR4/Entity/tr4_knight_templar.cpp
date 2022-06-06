@@ -188,7 +188,7 @@ namespace TEN::Entities::TR4
 							StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 						{
 							ShatterObject(nullptr, mesh, -64, LaraItem->RoomNumber, 0);
-							SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose);
+							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
 							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 							currentFloor->Stopper = false;
