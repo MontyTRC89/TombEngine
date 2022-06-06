@@ -814,6 +814,9 @@ void CalculateSpotCameras()
 
 					SplineToCamera = 1;
 				}
+
+				if (CurrentSplineCamera > LastCamera)
+					CurrentSplineCamera = LastCamera;
 			}
 			else
 			{
