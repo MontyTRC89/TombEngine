@@ -356,7 +356,7 @@ namespace TEN::Entities::TR4
 									item->HitPoints--;
 
 								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Pose);
-								SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->Pose);
+								SoundEffect(SFX_TR4_HORSE_RICOCHET, &item->Pose);
 
 								auto pos = Vector3Int(0, -128, 80);
 								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);

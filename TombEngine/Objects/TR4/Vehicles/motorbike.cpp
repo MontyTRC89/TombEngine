@@ -1433,14 +1433,14 @@ int MotorbikeControl(void)
     if (motorbike->pitch > MOTORBIKE_PITCH_MAX)
         motorbike->pitch = MOTORBIKE_PITCH_MAX;
 
-        SoundEffect(SFX_TR4_BIKE_MOVING, &item->Pose, SoundEnvironment::Land, 0.7f + motorbike->pitch / 24756.0f);
+        SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &item->Pose, SoundEnvironment::Land, 0.7f + motorbike->pitch / 24756.0f);
     }
     else
     {
         if (drive != -1)
         {
-            SoundEffect(SFX_TR4_BIKE_IDLE, &item->Pose);
-            SoundEffect(SFX_TR4_BIKE_MOVING, &item->Pose, SoundEnvironment::Land, 0.7f + motorbike->pitch / 24756.0f, 0.5f);
+            SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_IDLE, &item->Pose);
+            SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &item->Pose, SoundEnvironment::Land, 0.7f + motorbike->pitch / 24756.0f, 0.5f);
         }
         motorbike->pitch = 0;
     }

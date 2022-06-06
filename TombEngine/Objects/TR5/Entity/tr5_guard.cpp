@@ -682,7 +682,7 @@ void GuardControl(short itemNumber)
 			{
 				item->TriggerFlags = 0;
 				TestTriggers(item, true);
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose);
+				SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &item->Pose);
 			}
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
