@@ -666,9 +666,6 @@ namespace TEN::Renderer
 	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 		ID3D11ShaderResourceView* background)
 	{
-		m_lines2DToDraw.clear();
-		m_strings.clear();
-
 		// Set basic render states
 		SetBlendMode(BLENDMODE_OPAQUE, true);
 		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
@@ -728,35 +725,36 @@ namespace TEN::Renderer
 			}
 
 			RenderTitleMenu(title_menu);
-			return;
 		}
-
-		switch (g_Gui.GetInventoryMode())
+		else
 		{
-		case InventoryMode::Load:
-		case InventoryMode::Save:
-			RenderLoadSaveMenu();
-			return;
+			switch (g_Gui.GetInventoryMode())
+			{
+			case InventoryMode::Load:
+			case InventoryMode::Save:
+				RenderLoadSaveMenu();
+				break;
 
-		case InventoryMode::InGame:
-			RenderNewInventory();
-			return;
+			case InventoryMode::InGame:
+				RenderNewInventory();
+				break;
 
-		case InventoryMode::Statistics:
-			DrawStatistics();
-			return;
+			case InventoryMode::Statistics:
+				DrawStatistics();
+				break;
 
-		case InventoryMode::Examine:
-			DrawExamines();
-			return;
+			case InventoryMode::Examine:
+				DrawExamines();
+				break;
 
-		case InventoryMode::Pause:
-			RenderPauseMenu(g_Gui.GetMenuToDisplay());
-			return;
+			case InventoryMode::Pause:
+				RenderPauseMenu(g_Gui.GetMenuToDisplay());
+				break;
 
-		case InventoryMode::Diary:
-			DrawDiary();
-			return;
+			case InventoryMode::Diary:
+				DrawDiary();
+				break;
+			}
 		}
 	}
 
