@@ -18,8 +18,6 @@ extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer;
-
 	// Horizontal alignment constants
 	constexpr auto MenuLeftSideEntry = 200;
 	constexpr auto MenuCenterEntry = 400;
