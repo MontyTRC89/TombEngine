@@ -626,15 +626,27 @@ InventoryResult GuiController::TitleOptions()
 
 	DoDebouncedInput();
 
-	if (menu_to_display == Menu::Title || menu_to_display == Menu::SelectLevel ||
-		menu_to_display == Menu::LoadGame || menu_to_display == Menu::Options)
+	if (menu_to_display == Menu::LoadGame)
+	{
+		DoLoad();
+
+		if (invMode == InventoryMode::InGame)
+		{
+			menu_to_display = Menu::Title;
+			selected_option = selected_option_bak;
+		}
+	}
+	else if (menu_to_display == Menu::Title || 
+			 menu_to_display == Menu::SelectLevel || 
+			 menu_to_display == Menu::Options)
 	{
 		if (goUp)
 		{
-			if (selected_option <= 0)
-				selected_option += option_count;
+
+			if (menu_to_display == Menu::LoadGame)
+				selected_save_slot = (selected_save_slot <= 0) ? option_count : selected_option - 1;
 			else
-				selected_option--;
+				selected_option = (selected_option <= 0) ? option_count : selected_option - 1;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
@@ -705,13 +717,12 @@ InventoryResult GuiController::TitleOptions()
 		}
 		else if (menu_to_display == Menu::LoadGame)
 		{
-			if (!SavegameInfos[selected_option].Present)
+			if (!SavegameInfos[selected_save_slot].Present)
 				SayNo();
 			else
 			{
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-				g_GameFlow->SelectedSaveGame = selected_option;
-				selected_option = 0;
+				g_GameFlow->SelectedSaveGame = selected_save_slot;
 				ret = InventoryResult::LoadGame;
 			}
 		}
@@ -1250,8 +1261,10 @@ InventoryResult GuiController::DoPauseMenu()
 
 	if (goSelect)
 	{
-		if (menu_to_display == Menu::Pause)
+		switch (menu_to_display)
 		{
+		case Menu::Pause:
+
 			switch (selected_option)
 			{
 			case 0:
@@ -1268,9 +1281,10 @@ InventoryResult GuiController::DoPauseMenu()
 				invMode = InventoryMode::None;
 				return InventoryResult::ExitToTitle;
 			}
-		}
-		else if (menu_to_display == Menu::Options)
-		{
+			break;
+
+		case Menu::Options:
+
 			switch (selected_option)
 			{
 			case 0:
@@ -1289,6 +1303,12 @@ InventoryResult GuiController::DoPauseMenu()
 				menu_to_display = Menu::Sound;
 				break;
 			}
+			break;
+
+		case Menu::Statistics:
+			menu_to_display = Menu::Pause;
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+			break;
 		}
 	}
 
@@ -2250,7 +2270,7 @@ void GuiController::UseCurrentItem()
 	}
 }
 
-void GuiController::HandleInventoryMenu()
+void GuiController::DoInventory()
 {
 	int n;
 	unsigned __int64 opts;
@@ -2260,7 +2280,7 @@ void GuiController::HandleInventoryMenu()
 
 	if (rings[(int)RingTypes::Ammo]->ringactive)
 	{
-		g_Renderer.DrawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
+		g_Renderer.DrawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 		if (rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
@@ -2452,12 +2472,12 @@ void GuiController::HandleInventoryMenu()
 			{
 				if (i == current_selected_option)
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER);
+					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					ypos += font_height;
 				}
 				else
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER);
+					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					ypos += font_height;
 				}
 			}
@@ -2722,7 +2742,7 @@ void GuiController::DrawAmmoSelector()
 					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 
 				if (ammo_selector_fade_val)
-					g_Renderer.DrawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+					g_Renderer.DrawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 				
 				if (n == *current_ammo_type)
@@ -3028,7 +3048,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				else
 					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
 
-				g_Renderer.DrawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER);
+				g_Renderer.DrawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3204,24 +3224,35 @@ int GuiController::CallInventory(bool reset_mode)
 			return return_value;
 
 		DoDebouncedInput();
-
-		if (invMode == InventoryMode::Statistics)
-			DoStatisticsMode();
-		
-		if (invMode == InventoryMode::Examine)
-			DoExamineMode();
-
-		if (invMode == InventoryMode::Diary)
-			DoDiary();
-
-		if (invMode == InventoryMode::Load)
-			return_value = DoLoad();
-
-		if (invMode == InventoryMode::Save)
-			DoSave();
-
 		DrawInventory();
 		DrawCompass();
+
+		switch (invMode)
+		{
+		case InventoryMode::InGame:
+			DoInventory();
+			break;
+
+		case InventoryMode::Statistics:
+			DoStatisticsMode();
+			break;
+
+		case InventoryMode::Examine:
+			DoExamineMode();
+			break;
+
+		case InventoryMode::Diary:
+			DoDiary();
+			break;
+
+		case InventoryMode::Load:
+			return_value = DoLoad();
+			break;
+
+		case InventoryMode::Save:
+			DoSave();
+			break;
+		}
 
 		if (useItem && !TrInput)
 			val = 1;
@@ -3310,7 +3341,7 @@ void GuiController::DoDiary()
 
 short GuiController::GetLoadSaveSelection()
 {
-	return selected_slot;
+	return selected_save_slot;
 }
 
 int GuiController::DoLoad()
@@ -3321,30 +3352,30 @@ int GuiController::DoLoad()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_slot == SAVEGAME_MAX - 1)
-			selected_slot -= SAVEGAME_MAX - 1;	//go back up
+		if (selected_save_slot == SAVEGAME_MAX - 1)
+			selected_save_slot -= SAVEGAME_MAX - 1;	//go back up
 		else
-			selected_slot++;
+			selected_save_slot++;
 	}
 
 	if (goUp)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_slot== 0)
-			selected_slot += SAVEGAME_MAX - 1;	//go back down
+		if (selected_save_slot== 0)
+			selected_save_slot += SAVEGAME_MAX - 1;	//go back down
 		else
-			selected_slot--;
+			selected_save_slot--;
 	}
 
 	if (goSelect)
 	{
-		if (!SavegameInfos[selected_slot].Present)
+		if (!SavegameInfos[selected_save_slot].Present)
 			SayNo();
 		else
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			g_GameFlow->SelectedSaveGame = selected_slot;
+			g_GameFlow->SelectedSaveGame = selected_save_slot;
 			ExitInvLoop = 1;
 			return 1;
 		}
@@ -3368,26 +3399,26 @@ void GuiController::DoSave()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_slot == SAVEGAME_MAX - 1)
-			selected_slot -= SAVEGAME_MAX - 1;	//go back up
+		if (selected_save_slot == SAVEGAME_MAX - 1)
+			selected_save_slot -= SAVEGAME_MAX - 1;	//go back up
 		else
-			selected_slot++;
+			selected_save_slot++;
 	}
 
 	if (goUp)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_slot == 0)
-			selected_slot += SAVEGAME_MAX - 1;	//go back down
+		if (selected_save_slot == 0)
+			selected_save_slot += SAVEGAME_MAX - 1;	//go back down
 		else
-			selected_slot--;
+			selected_save_slot--;
 	}
 
 	if (goSelect)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		SaveGame::Save(selected_slot);
+		SaveGame::Save(selected_save_slot);
 		ExitInvLoop = 1;	//exit inv if the user has saved
 	}
 

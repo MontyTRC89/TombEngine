@@ -220,7 +220,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	rasterizerStateDesc.ScissorEnable = true;
 	Utils::throwIfFailed(m_device->CreateRasterizerState(&rasterizerStateDesc, m_cullNoneRasterizerState.GetAddressOf()));
 
-	InitialiseBars();
+	InitialiseGameBars();
 	initQuad(m_device.Get());
 }
 
