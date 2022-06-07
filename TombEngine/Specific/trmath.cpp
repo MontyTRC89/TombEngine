@@ -274,7 +274,7 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 
 Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical, float lateral)
 {
-	if (forward == 0 && vertical == 0 && lateral == 0)
+	if (forward == 0.0f && vertical == 0.0f && lateral == 0.0f)
 		return vector;
 
 	float sinAngle = phd_sin(angle);
