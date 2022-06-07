@@ -929,9 +929,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 		else if (UPVItem->Pose.Orientation.x < -UPDOWN_LIMIT)
 			UPVItem->Pose.Orientation.x = -UPDOWN_LIMIT;
 
-		UPVItem->Pose.Position.x += round(phd_sin(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Pose.Orientation.x));
-		UPVItem->Pose.Position.y -= round(phd_sin(UPVItem->Pose.Orientation.x) * UPVItem->Animation.Velocity);
-		UPVItem->Pose.Position.z += round(phd_cos(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Pose.Orientation.x));
+		TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity);
 	}
 
 	int newHeight = GetCollision(UPVItem).Position.Floor;

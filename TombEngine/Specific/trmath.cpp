@@ -271,3 +271,77 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 
 	return v;
 }
+
+Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical, float lateral)
+{
+	if (forward == 0.0f && vertical == 0.0f && lateral == 0.0f)
+		return vector;
+
+	float sinAngle = phd_sin(angle);
+	float cosAngle = phd_cos(angle);
+
+	vector.x += (forward * sinAngle) + (lateral * cosAngle);
+	vector.y += vertical;
+	vector.z += (forward * cosAngle) + (lateral * -sinAngle);
+	return vector;
+}
+
+Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float vertical, float lateral)
+{
+	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
+	return Vector3Int(
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
+	);
+}
+
+Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
+{
+	if (distance == 0.0f)
+		return vector;
+
+	float sinX = phd_sin(orient.x);
+	float cosX = phd_cos(orient.x);
+	float sinY = phd_sin(orient.y);
+	float cosY = phd_cos(orient.y);
+
+	vector.x += distance * (sinY * cosX);
+	vector.y -= distance * sinX;
+	vector.z += distance * (cosY * cosX);
+	return vector;
+}
+
+Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance)
+{
+	auto newVector = TranslateVector(vector.ToVector3(), orient, distance);
+	return Vector3Int(
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
+	);
+}
+
+Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
+{
+	if (distance == 0.0f)
+		return vector;
+
+	float distanceBetween = Vector3::Distance(vector, target);
+	if (distance > distanceBetween)
+		return target;
+
+	auto direction = target - vector;
+	direction.Normalize();
+	return (vector + (direction * distance));
+}
+
+Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
+{
+	auto newVector = TranslateVector(vector.ToVector3(), target.ToVector3(), distance);
+	return Vector3Int(
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
+	);
+}

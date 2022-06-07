@@ -881,7 +881,7 @@ void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 		coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
 		coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
-		MoveItem(item, item->Pose.Orientation.y, -CLICK(1));
+		TranslateItem(item, item->Pose.Orientation.y, -CLICK(1));
 		GetCollisionInfo(coll, item);
 		SnapItemToLedge(item, coll);
 		SetAnimation(item, LA_REACH_TO_HANG, 12);
