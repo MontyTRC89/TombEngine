@@ -285,11 +285,11 @@ Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertic
 
 Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float vertical, float lateral)
 {
-	auto movedVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
+	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
 	return Vector3Int(
-		(int)round(movedVector.x),
-		(int)round(movedVector.y),
-		(int)round(movedVector.z)
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
 	);
 }
 
@@ -311,11 +311,11 @@ Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
 
 Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance)
 {
-	auto movedVector = TranslateVector(vector.ToVector3(), orient, distance);
+	auto newVector = TranslateVector(vector.ToVector3(), orient, distance);
 	return Vector3Int(
-		(int)round(movedVector.x),
-		(int)round(movedVector.y),
-		(int)round(movedVector.z)
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
 	);
 }
 
@@ -335,10 +335,10 @@ Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
 
 Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
 {
-	auto movedVector = TranslateVector(vector.ToVector3(), target.ToVector3(), distance);
+	auto newVector = TranslateVector(vector.ToVector3(), target.ToVector3(), distance);
 	return Vector3Int(
-		(int)round(movedVector.x),
-		(int)round(movedVector.y),
-		(int)round(movedVector.z)
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
 	);
 }
