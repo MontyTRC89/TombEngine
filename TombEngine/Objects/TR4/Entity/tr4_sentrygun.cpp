@@ -18,53 +18,7 @@
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SentryGunBite = { 0, 0, 0, 8 };
-
-	static void SentryGunThrowFire(ItemInfo* item)
-	{
-		for (int i = 0; i < 3; i++)
-		{
-			auto* spark = &Sparks[GetFreeSpark()];
-
-			spark->on = 1;
-			spark->sR = (GetRandomControl() & 0x1F) + 48;
-			spark->sG = 48;
-			spark->sB = 255;
-			spark->dR = (GetRandomControl() & 0x3F) - 64;
-			spark->dG = (GetRandomControl() & 0x3F) + -128;
-			spark->dB = 32;
-			spark->colFadeSpeed = 12;
-			spark->fadeToBlack = 8;
-			spark->transType = TransTypeEnum::COLADD;
-
-			auto pos1 = Vector3Int(-140, -30, -4);
-			GetJointAbsPosition(item, &pos1, 7);
-
-			spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
-			spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
-			spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
-
-			auto pos2 = Vector3Int(-280, -30, -4);
-			GetJointAbsPosition(item, &pos2, 7);
-
-			int v = (GetRandomControl() & 0x3F) + 192;
-
-			spark->life = spark->sLife = v / 6;
-
-			spark->xVel = v * (pos2.x - pos1.x) / 10;
-			spark->yVel = v * (pos2.y - pos1.y) / 10;
-			spark->zVel = v * (pos2.z - pos1.z) / 10;
-
-			spark->friction = 85;
-			spark->gravity = -16 - (GetRandomControl() & 0x1F);
-			spark->maxYvel = 0;
-			spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
-
-			spark->scalar = 3;
-			spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
-			spark->sSize = spark->dSize / 4;
-			spark->size = spark->dSize / 2;
-		}
-	}
+	auto SentryGunFlameOffset = Vector3Int(-140, 0, 0);
 
 	void InitialiseSentryGun(short itemNum)
 	{
@@ -133,7 +87,7 @@ namespace TEN::Entities::TR4
 							if (AI.distance <= pow(SECTOR(2), 2))
 							{
 								// Throw fire
-								SentryGunThrowFire(item);
+								ThrowFire(itemNum, 7, SentryGunFlameOffset, SentryGunFlameOffset);
 								c = phd_sin((GlobalCounter & 0x1F) * 2048) * 4096;
 							}
 							else

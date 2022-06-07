@@ -35,7 +35,7 @@ enum NatlaState
 #define NATLA_FLY_TURN ANGLE(5.0f)
 #define NATLA_RUN_TURN ANGLE(6.0f)
 #define NATLA_LAND_CHANCE 0x100
-#define NATLA_DEATH_TIME (30 * 16)
+#define NATLA_DEATH_TIME (FPS * 16)
 #define NATLA_SHOT_DAMAGE 100
 
 void NatlaControl(short itemNumber)
