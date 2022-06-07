@@ -281,7 +281,7 @@ Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertic
 	float cosAngle = phd_cos(angle);
 
 	vector.x += (forward * sinAngle) + (lateral * cosAngle);
-	vector.y = vertical;
+	vector.y += vertical;
 	vector.z += (forward * cosAngle) + (lateral * -sinAngle);
 	return vector;
 }
