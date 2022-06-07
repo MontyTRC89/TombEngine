@@ -411,7 +411,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			RumbleScreen();
 
 		PlaySoundSources();
-		DoFlipEffect(FlipEffect);
+		DoFlipEffect(FlipEffect, LaraItem);
 
 		UpdateFadeScreenAndCinematicBars();
 
