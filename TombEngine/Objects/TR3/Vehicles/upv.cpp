@@ -102,7 +102,8 @@ enum UPVState
 // TODO
 enum UPVAnim
 {
-	UPV_ANIM_DEATH = 0,
+	UPV_ANIM_DEATH_MOVING = 0,
+	UPV_ANIM_DEATH = 1,
 
 	UPV_ANIM_IDLE = 5,
 
@@ -762,7 +763,8 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 		break;
 
 	case UPV_STATE_DEATH:
-		if (anim == UPV_ANIM_DEATH && (frame == DEATH_FRAME_1 || frame == DEATH_FRAME_2))
+		if ((anim == UPV_ANIM_DEATH || anim == UPV_ANIM_DEATH_MOVING) &&
+			(frame == DEATH_FRAME_1 || frame == DEATH_FRAME_2))
 		{
 			auto vec = Vector3Int();
 			GetLaraJointPosition(&vec, LM_HIPS);
@@ -771,7 +773,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 
-			SetAnimation(UPVItem, LA_UNDERWATER_DEATH, 17);
+			SetAnimation(laraItem, LA_UNDERWATER_DEATH, 17);
 			laraItem->Animation.VerticalVelocity = 0;
 			laraItem->Animation.Airborne = false;
 			
