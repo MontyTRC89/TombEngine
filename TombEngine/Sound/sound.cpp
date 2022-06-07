@@ -706,7 +706,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Level.Rooms[Camera.pos.roomNumber].reverbType;
+	auto roomReverb = g_Configuration.EnableAudioSpecialEffects ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
