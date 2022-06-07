@@ -45,13 +45,6 @@ enum class TransTypeEnum
 	WEIRD
 };
 
-enum FireSizeEnum
-{
-	SP_NORMALFIRE,
-	SP_SMALLFIRE,
-	SP_BIGFIRE
-};
-
 struct FX_INFO
 {
 	PHD_3DPOS pos;

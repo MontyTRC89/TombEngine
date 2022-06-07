@@ -12,6 +12,7 @@
 #define STRING_SAVE_GAME				"save_game"
 #define STRING_EXIT_GAME				"exit_game"
 #define STRING_EXIT_TO_TITLE			"exit_to_title"	
+#define STRING_OPTIONS					"options"
 #define STRING_UZI						"uzi"
 #define STRING_PISTOLS					"pistols_ammo"
 #define STRING_SHOTGUN					"shotgun"

@@ -96,7 +96,7 @@ struct FIRE_LIST
 	int y;
 	int z;
 	byte on;
-	byte size;
+	float size;
 	short roomNumber;
 };
 
@@ -204,9 +204,11 @@ int GetFreeFireSpark();
 void TriggerGlobalStaticFlame();
 void TriggerGlobalFireSmoke();
 void TriggerGlobalFireFlame();
-void keep_those_fires_burning();
+void TriggerPilotFlame(int itemNum, int nodeIndex);
+void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed);
+void UpdateFireProgress();
 void ClearFires();
-void AddFire(int x, int y, int z, char size, short roomNum, short on);
+void AddFire(int x, int y, int z, short roomNum, float size, short fade);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
 void UpdateSmoke();
