@@ -2730,7 +2730,7 @@ void GuiController::DrawAmmoSelector()
 			yrot = ammo_object_list[n].yrot;
 			zrot = ammo_object_list[n].zrot;
 			x = phd_centerx - 300 + xpos;
-			y = 430;
+			y = 480;
 			short obj = ConvertInventoryItemToObject(ammo_object_list[n].invitem);
 			float scaler = inventry_objects_list[ammo_object_list[n].invitem].scale1;
 
@@ -3103,7 +3103,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 			int x, y, y2;
 			x = 400 + xoff + i * OBJLIST_SPACING;
 			y = 150;
-			y2 = 430;//combine 
+			y2 = 480;//combine 
 			short obj = ConvertInventoryItemToObject(rings[ringnum]->current_object_list[n].invitem);
 			float scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
 			g_Renderer.DrawObjectOn2DPosition(x, ringnum == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
