@@ -76,7 +76,7 @@ namespace TEN::Entities::TR4
 			auto pos = Vector3Int(GuideBite1.x, GuideBite1.y, GuideBite1.z);
 			GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
 
-			AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
+			AddFire(pos.x, pos.y, pos.z, item->RoomNumber, 1.0f, 0);
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 			TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
 

@@ -780,7 +780,7 @@ local strings = {
 		""
 	},
 	savegame_timestamp = {
-		"%d Days %d:%d:%d",
+		"%02d Days %02d:%02d:%02d",
 		"",
 		"",
 		"",
@@ -881,6 +881,16 @@ local strings = {
 	},
 	small_medipack = {
 		"Small Medipack",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	options = {
+		"Options",
 		"",
 		"",
 		"",

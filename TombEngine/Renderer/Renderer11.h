@@ -19,6 +19,7 @@
 #include "RendererBucket.h"
 #include "Game/items.h"
 #include "Game/animation.h"
+#include "Game/gui.h"
 #include "Game/effects/effects.h"
 #include "IndexBuffer/IndexBuffer.h"
 #include "VertexBuffer/VertexBuffer.h"
@@ -322,13 +323,16 @@ namespace TEN::Renderer
 		CAlphaTestBuffer m_stAlphaTest;
 		ConstantBuffer<CAlphaTestBuffer> m_cbAlphaTest;
 
-		// Text and sprites
-		std::unique_ptr<SpriteFont> m_gameFont;
+		// Sprites
 		std::unique_ptr<SpriteBatch> m_spriteBatch;
+		std::unique_ptr<PrimitiveBatch<RendererVertex>> m_primitiveBatch;
+
+		// Text
+		std::unique_ptr<SpriteFont> m_gameFont;
 		std::vector<RendererStringToDraw> m_strings;
 		int m_blinkColorValue;
 		int m_blinkColorDirection;
-		std::unique_ptr<PrimitiveBatch<RendererVertex>> m_primitiveBatch;
+		bool m_blinkUpdated = false;
 		int m_currentY;
 
 		// System resources
@@ -341,7 +345,7 @@ namespace TEN::Renderer
 		RenderTargetCubeArray m_shadowMaps;
 		Texture2D loadingBarBorder;
 		Texture2D loadingBarInner;
-		Texture2D* loadingScreenTexture = nullptr;
+		Texture2D loadingScreenTexture;
 
 		// Level data
 		Texture2D m_titleScreen;
@@ -531,9 +535,10 @@ namespace TEN::Renderer
 		void DrawLocusts(RenderView& view);
 		void RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 		                          ID3D11ShaderResourceView* background);
-		void RenderTitleMenu();
-		void RenderPauseMenu();
+		void RenderTitleMenu(Menu menu);
+		void RenderPauseMenu(Menu menu);
 		void RenderLoadSaveMenu();
+		void RenderOptionsMenu(Menu menu, int initialY);
 		void RenderNewInventory();
 		void DrawStatistics();
 		void DrawExamines();
@@ -548,7 +553,8 @@ namespace TEN::Renderer
 		bool IsRoomUnderwater(short roomNumber);
 		bool IsInRoom(int x, int y, int z, short roomNumber);
 		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
-		void InitialiseBars();
+		void InitialiseGameBars();
+		void InitialiseMenuBars(int y);
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
 		void DrawDripParticles(RenderView& view);
@@ -581,7 +587,6 @@ namespace TEN::Renderer
 		Texture2D CreateDefaultNormalTexture();
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
-		Vector2 GetScreenResolution();
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{
@@ -642,8 +647,8 @@ namespace TEN::Renderer
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
-		void drawPickup(short objectNum);
-		int SyncRenderer();
+		void DrawPickup(short objectNum);
+		int  SyncRenderer();
 		void DrawString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void ClearDynamicLights();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
@@ -676,6 +681,7 @@ namespace TEN::Renderer
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
 		                            float scale1);
 		void SetLoadingScreen(std::wstring& fileName);
+		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 	};
 

@@ -158,11 +158,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						//HKFlag = 1;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
+							SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
 						}
 					}
 					else
@@ -178,8 +178,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				//HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_TR4_LARA_HK_FIRE);
-				SoundEffect(SFX_TR4_LARA_HK_STOP, &laraItem->Pose);
+				StopSoundEffect(SFX_TR4_HK_FIRE);
+				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
 				//HKFlag = 0;
 			}
 		}
@@ -231,11 +231,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						item->Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
+							SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
 						}
 					}
 					else
@@ -250,8 +250,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				//HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_TR4_LARA_HK_FIRE);
-				SoundEffect(SFX_TR4_LARA_HK_STOP, &laraItem->Pose);
+				StopSoundEffect(SFX_TR4_HK_FIRE);
+				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
 				//HKFlag = 0;
 			}
 			/*else if (HKFlag)
@@ -1481,7 +1481,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo;
 
-		SoundEffect(SFX_TR4_LARA_CROSSBOW, &laraItem->Pose);
+		SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
 		Statistics.Game.AmmoUsed++;

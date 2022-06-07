@@ -135,6 +135,8 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 
 	// Create actual sample
 	SamplePointer[index] = BASS_SampleLoad(true, uncompBuffer, 0, cleanLength + 44, 65535, SOUND_SAMPLE_FLAGS | BASS_SAMPLE_3D);
+	delete uncompBuffer;
+
 	return true;
 }
 
@@ -856,7 +858,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 
 void SayNo()
 {
-	SoundEffect(SFX_TR4_LARA_NO, NULL, SoundEnvironment::Always);
+	SoundEffect(SFX_TR4_LARA_NO_ENGLISH, NULL, SoundEnvironment::Always);
 }
 
 void PlaySecretTrack()
