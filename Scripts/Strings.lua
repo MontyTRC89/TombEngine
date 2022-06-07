@@ -490,7 +490,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo1 = {
-		"Grenadegun (Normal Ammo)",
+		"Grenade Gun Normal Ammo",
 		"",
 		"",
 		"",
@@ -500,7 +500,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo2 = {
-		"Grenadegun (Super Ammo)",
+		"Grenade Gun Super Ammo",
 		"",
 		"",
 		"",
@@ -510,7 +510,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo3 = {
-		"Grenadegun (Flash Ammo)",
+		"Grenade Gun Flash Ammo",
 		"",
 		"",
 		"",
@@ -519,8 +519,8 @@ local strings = {
 		"",
 		""
 	},
-	harpoon_item = {
-		"Harpoon Launcher",
+	harpoon_gun = {
+		"Harpoon Gun",
 		"",
 		"",
 		"",
@@ -530,7 +530,7 @@ local strings = {
 		""
 	},
 	harpoon_ammo = {
-		"Harpoon Launcher Ammo",
+		"Harpoon Gun Ammo",
 		"",
 		"",
 		"",
