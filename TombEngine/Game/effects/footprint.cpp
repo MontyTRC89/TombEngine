@@ -209,9 +209,9 @@ namespace Footprints {
 		footprint.Position[1] = p1;
 		footprint.Position[2] = p2;
 		footprint.Position[3] = p3;
-		footprint.LifeStartFading = 30 * 10;
 		footprint.StartOpacity = 0.25f;
-		footprint.Life = 30 * 20;
+		footprint.LifeStartFading = FPS * 10;
+		footprint.Life = FPS * 20;
 		footprint.Active = true;
 		footprint.RightFoot = rightFoot;
 

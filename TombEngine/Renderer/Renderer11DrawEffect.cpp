@@ -161,16 +161,19 @@ namespace TEN::Renderer
 		for (int k = 0; k < MAX_FIRE_LIST; k++) 
 		{
 			FIRE_LIST* fire = &Fires[k];
-			if (fire->on) {
+			if (fire->on) 
+			{
+				auto fade = fire->on == 1 ? 1.0f : (float)(255 - fire->on) / 255.0f;
+
 				for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
 				{
 					FIRE_SPARKS* spark = &FireSparks[i];
 					if (spark->on)
-						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
-																   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
+						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
+																   Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
 																   TO_RAD(spark->rotAng), 
 																   spark->scalar,
-																   { spark->size * (float)fire->size, spark->size * (float)fire->size }, BLENDMODE_ADDITIVE, view);
+																   { spark->size * fire->size, spark->size * fire->size }, BLENDMODE_ADDITIVE, view);
 				}
 			}
 		}
@@ -1096,7 +1099,7 @@ namespace TEN::Renderer
 		m_numSpritesTransparentDrawCalls++;
 	}
 
-	void Renderer11::DrawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
+	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, bool transparent) 
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1171,7 +1174,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawDebris(RenderView& view,bool transparent)
+	void Renderer11::DrawDebris(RenderView& view, bool transparent)
 	{		
 		extern vector<DebrisFragment> DebrisFragments;
 		vector<RendererVertex> vertices;
@@ -1188,7 +1191,7 @@ namespace TEN::Renderer
 				m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 				m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-				if (!deb->isStatic) 
+				if (deb->isStatic) 
 				{
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				} 

@@ -1024,10 +1024,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits)
 					{
-						LaraItem->Animation.ActiveState = LS_JUMP_UP;
-						LaraItem->Animation.TargetState = LS_JUMP_UP;
-						LaraItem->Animation.AnimNumber = LA_JUMP_UP;
-						LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.FrameNumber].frameBase + 9;
+						SetAnimation(LaraItem, LA_JUMP_UP);
 						LaraItem->Animation.Airborne = true;
 						LaraItem->Animation.VerticalVelocity = 2;
 						LaraItem->Animation.VerticalVelocity = 1;
