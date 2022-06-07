@@ -3,18 +3,20 @@
 
 #include <CommCtrl.h>
 #include <process.h>
+#include <resource.h>
 #include <iostream>
+#include <codecvt>
+#include <filesystem>
+
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
-#include "resource.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
 #include "ScriptInterfaceLevel.h"
-#include <codecvt>
 
 using namespace TEN::Renderer;
 using std::exception;
@@ -368,7 +370,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			auto level = g_GameFlow->GetLevel(i)->FileName;
 			std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
 
-			if (level == levelFile)
+			if (level == levelFile && std::filesystem::exists(level))
 			{
 				CurrentLevel = i;
 				break;
