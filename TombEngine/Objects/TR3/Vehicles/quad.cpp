@@ -847,7 +847,7 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 		}
 
 		laraItem->Animation.FrameNumber = GetFrameNumber(laraItem, laraItem->Animation.AnimNumber);
-		SoundEffect(SFX_TR4_VEHICLE_QUADBIKE_FRONT_IMPACT, &quadItem->Pose);
+		SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &quadItem->Pose);
 	}
 	else
 	{
@@ -1344,12 +1344,12 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 		else if (quad->Pitch > 0xA000)
 			quad->Pitch = 0xA000;
 
-		SoundEffect(SFX_TR4_VEHICLE_QUADBIKE_MOVE, &quadItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(quad->Pitch) / (float)MAX_VELOCITY);
+		SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_MOVE, &quadItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(quad->Pitch) / (float)MAX_VELOCITY);
 	}
 	else
 	{
 		if (drive != -1)
-			SoundEffect(SFX_TR4_VEHICLE_QUADBIKE_IDLE, &quadItem->Pose);
+			SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_IDLE, &quadItem->Pose);
 
 		quad->Pitch = 0;
 	}

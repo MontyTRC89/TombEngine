@@ -215,14 +215,14 @@ void SkidooManControl(short riderItemNumber)
 
 	if (item->Animation.ActiveState == SMAN_STATE_WAIT)
 	{
-		SoundEffect(SFX_TR4_VEHICLE_SNOWMOBILE_IDLE, &item->Pose);
+		SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose);
 		creatureInfo->JointRotation[0] = 0;
 	}
 	else
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
-		SoundEffect(SFX_TR4_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
+		SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 	}
 
 	CreatureAnimation(itemNumber, angle, 0);
