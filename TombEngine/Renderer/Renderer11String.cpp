@@ -6,8 +6,8 @@ namespace TEN::Renderer {
 	{
 		float factorX = ScreenWidth / REFERENCE_RES_WIDTH;
 		float factorY = ScreenHeight / REFERENCE_RES_HEIGHT;
-
-		RECT rect = { 0, 0, 0, 0 };
+		float UIScale = ScreenWidth > ScreenHeight ? factorY : factorX;
+		float fontScale = REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing();
 
 		// Convert the string to wstring
 		int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, string, strlen(string), NULL, 0);
@@ -21,56 +21,34 @@ namespace TEN::Renderer {
 		str.X = 0;
 		str.Y = 0;
 		str.Color = Vector3((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF);
-		str.Scale = ScreenWidth > ScreenHeight ? factorY : factorX;
+		str.Scale = UIScale * fontScale;
 
 		// Measure the string
 		Vector2 size = m_gameFont->MeasureString(wstr.c_str());
+		float width = size.x * str.Scale;
 
-		if (flags & PRINTSTRING_CENTER)
-		{
-			int width = size.x * str.Scale;
-			rect.left = x * factorX - width / 2;
-			rect.right = x * factorX + width / 2;
-			rect.top += y * str.Scale;
-			rect.bottom += y * str.Scale;
-		}
-		else
-		{
-			rect.left = x * factorX;
-			rect.right += x * factorX;
-			rect.top = y * str.Scale;
-			rect.bottom += y * str.Scale;
-		}
-
-		str.X = rect.left;
-		str.Y = rect.top;
+		str.X = (flags & PRINTSTRING_CENTER) ? (float)x * factorX - (width / 2.0f) : (float)x * factorX;
+		str.Y = y * UIScale;
 
 		if (flags & PRINTSTRING_BLINK)
 		{
-			if (flags & PRINTSTRING_DONT_UPDATE_BLINK)
-			{
-				str.Color = Vector3(128);
-			}
-			else
-			{
-				str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
+			str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
 
-				if (!m_blinkUpdated)
+			if (!m_blinkUpdated)
+			{
+				m_blinkColorValue += m_blinkColorDirection * 16;
+				m_blinkUpdated = true;
+
+				if (m_blinkColorValue < 0)
 				{
-					m_blinkColorValue += m_blinkColorDirection * 16;
-					m_blinkUpdated = true;
+					m_blinkColorValue = 0;
+					m_blinkColorDirection = 1;
+				}
 
-					if (m_blinkColorValue < 0)
-					{
-						m_blinkColorValue = 0;
-						m_blinkColorDirection = 1;
-					}
-
-					if (m_blinkColorValue > 255)
-					{
-						m_blinkColorValue = 255;
-						m_blinkColorDirection = -1;
-					}
+				if (m_blinkColorValue > 255)
+				{
+					m_blinkColorValue = 255;
+					m_blinkColorDirection = -1;
 				}
 			}
 		}
@@ -80,6 +58,8 @@ namespace TEN::Renderer {
 
 	void Renderer11::DrawAllStrings()
 	{
+		float shadeOffset = 1.5f / (REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing());
+
 		m_spriteBatch->Begin();
 
 		for (int i = 0; i < m_strings.size(); i++)
@@ -88,7 +68,7 @@ namespace TEN::Renderer {
 
 			// Draw shadow if needed
 			if (str->Flags & PRINTSTRING_OUTLINE)
-				m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X + 2 * str->Scale, str->Y + 2 * str->Scale),
+				m_gameFont->DrawString(m_spriteBatch.get(), str->String.c_str(), Vector2(str->X + shadeOffset * str->Scale, str->Y + shadeOffset * str->Scale),
 					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent,
 					0.0f, Vector4::Zero, str->Scale);
 
