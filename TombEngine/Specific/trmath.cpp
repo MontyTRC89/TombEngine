@@ -272,34 +272,6 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
-Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
-{
-	float distanceBetween = Vector3::Distance(vector, target);
-	if (distance > distanceBetween)
-		return target;
-
-	auto direction = target - vector;
-	direction.Normalize();
-	return (vector + (direction * distance));
-}
-
-Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
-{
-	float distanceBetween = Vector3::Distance(vector.ToVector3(), target.ToVector3());
-	if (distance > distanceBetween)
-		return target;
-
-	auto direction = target.ToVector3() - vector.ToVector3();
-	direction.Normalize();
-
-	auto offset = Vector3Int(
-		(int)round(direction.x * distance),
-		(int)round(direction.y * distance),
-		(int)round(direction.z * distance)
-	);
-	return (vector + offset);
-}
-
 Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical, float lateral)
 {
 	float sinAngle = phd_sin(angle);
@@ -313,17 +285,19 @@ Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertic
 
 Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float vertical, float lateral)
 {
-	float sinAngle = phd_sin(angle);
-	float cosAngle = phd_cos(angle);
-
-	vector.x += (int)round((forward * sinAngle) + (lateral * cosAngle));
-	vector.y += (int)round(vertical);
-	vector.z += (int)round((forward * cosAngle) + (lateral * -sinAngle));
-	return vector;
+	auto movedVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
+	return Vector3Int(
+		(int)round(movedVector.x),
+		(int)round(movedVector.y),
+		(int)round(movedVector.z)
+	);
 }
 
 Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
 {
+	if (distance == 0.0f)
+		return vector;
+
 	float sinX = phd_sin(orient.x);
 	float cosX = phd_cos(orient.x);
 	float sinY = phd_sin(orient.y);
@@ -337,13 +311,34 @@ Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
 
 Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance)
 {
-	float sinX = phd_sin(orient.x);
-	float cosX = phd_cos(orient.x);
-	float sinY = phd_sin(orient.y);
-	float cosY = phd_cos(orient.y);
+	auto movedVector = TranslateVector(vector.ToVector3(), orient, distance);
+	return Vector3Int(
+		(int)round(movedVector.x),
+		(int)round(movedVector.y),
+		(int)round(movedVector.z)
+	);
+}
 
-	vector.x += (int)round(distance * (sinY * cosX));
-	vector.y -= (int)round(distance * sinX);
-	vector.z += (int)round(distance * (cosY * cosX));
-	return vector;
+Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
+{
+	if (distance == 0.0f)
+		return vector;
+
+	float distanceBetween = Vector3::Distance(vector, target);
+	if (distance > distanceBetween)
+		return target;
+
+	auto direction = target - vector;
+	direction.Normalize();
+	return (vector + (direction * distance));
+}
+
+Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
+{
+	auto movedVector = TranslateVector(vector.ToVector3(), target.ToVector3(), distance);
+	return Vector3Int(
+		(int)round(movedVector.x),
+		(int)round(movedVector.y),
+		(int)round(movedVector.z)
+	);
 }
