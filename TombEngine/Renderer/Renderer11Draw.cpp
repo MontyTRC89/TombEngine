@@ -1467,11 +1467,7 @@ namespace TEN::Renderer
 		DrawLines2D();
 
 		// Bars
-		int flash = FlashIt();
-		UpdateSprintBar(LaraItem);
-		UpdateHealthBar(LaraItem, flash);
-		UpdateAirBar(LaraItem, flash);
-		DrawAllPickups();
+		DrawHUD(LaraItem);
 
 		// Draw binoculars or lasersight
 		DrawOverlays(view); 
