@@ -153,7 +153,7 @@ namespace TEN::Entities::TR4
 						KillItem(i);
 
 						if (!(GetRandomControl() & 3))
-							SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &currentItem->Pose);
+							SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY, &currentItem->Pose);
 
 						currentItem->Status = ITEM_INVISIBLE;
 					}
