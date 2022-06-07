@@ -49,24 +49,28 @@ namespace TEN::Renderer {
 		{
 			if (flags & PRINTSTRING_DONT_UPDATE_BLINK)
 			{
-				str.Color = Vector3(192);
+				str.Color = Vector3(128);
 			}
-			else if (!m_blinkUpdated)
+			else
 			{
 				str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
-				m_blinkColorValue += m_blinkColorDirection * 16;
-				m_blinkUpdated = true;
 
-				if (m_blinkColorValue < 0)
+				if (!m_blinkUpdated)
 				{
-					m_blinkColorValue = 0;
-					m_blinkColorDirection = 1;
-				}
+					m_blinkColorValue += m_blinkColorDirection * 16;
+					m_blinkUpdated = true;
 
-				if (m_blinkColorValue > 255)
-				{
-					m_blinkColorValue = 255;
-					m_blinkColorDirection = -1;
+					if (m_blinkColorValue < 0)
+					{
+						m_blinkColorValue = 0;
+						m_blinkColorDirection = 1;
+					}
+
+					if (m_blinkColorValue > 255)
+					{
+						m_blinkColorValue = 255;
+						m_blinkColorDirection = -1;
+					}
 				}
 			}
 		}
