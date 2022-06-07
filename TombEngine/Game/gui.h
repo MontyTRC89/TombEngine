@@ -402,7 +402,6 @@ public:
 	int CallInventory(bool reset_mode);
 	InventoryResult TitleOptions();
 	InventoryResult DoPauseMenu();
-	void HandleInventoryMenu();
 	void DrawInventory();
 	void DrawCurrentObjectList(int ringnum);
 	int IsObjectInInventory(short object_number);
@@ -460,9 +459,11 @@ private:
 	void DoDiary();
 	int DoLoad();
 	void DoSave();
+	void DoInventory();
 	void ConstructCombineObjectList();
 	
 	/*vars*/
+
 	// Input
 	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
 	bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
@@ -536,14 +537,13 @@ private:
 	char StashedCurrentHarpoonAmmoType;
 	char StashedCurrentRocketAmmoType;
 
+	// GUI vars
 	Menu menu_to_display = Menu::Title;
-	short selected_option;
+	int selected_option;
 	int option_count;
+	int selected_save_slot;
 
 	SettingsData CurrentSettings;
-
-	// Load / save
-	short selected_slot;
 };
 
 /*inventory*/
