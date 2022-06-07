@@ -4,10 +4,8 @@
 namespace TEN::Renderer {
 	void Renderer11::DrawString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
-		int realX = x;
-		int realY = y;
-		float factorX = ScreenWidth / ASSUMED_WIDTH_FOR_TEXT_DRAWING;
-		float factorY = ScreenHeight / ASSUMED_HEIGHT_FOR_TEXT_DRAWING;
+		float factorX = ScreenWidth / REFERENCE_RES_WIDTH;
+		float factorY = ScreenHeight / REFERENCE_RES_HEIGHT;
 
 		RECT rect = { 0, 0, 0, 0 };
 
@@ -49,11 +47,15 @@ namespace TEN::Renderer {
 
 		if (flags & PRINTSTRING_BLINK)
 		{
-			str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
-
-			if (!(flags & PRINTSTRING_DONT_UPDATE_BLINK))
+			if (flags & PRINTSTRING_DONT_UPDATE_BLINK)
 			{
+				str.Color = Vector3(192);
+			}
+			else if (!m_blinkUpdated)
+			{
+				str.Color = Vector3(m_blinkColorValue, m_blinkColorValue, m_blinkColorValue);
 				m_blinkColorValue += m_blinkColorDirection * 16;
+				m_blinkUpdated = true;
 
 				if (m_blinkColorValue < 0)
 				{
@@ -93,5 +95,8 @@ namespace TEN::Renderer {
 		}
 
 		m_spriteBatch->End();
+
+		m_blinkUpdated = false;
+		m_strings.clear();
 	}
 }
