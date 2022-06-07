@@ -15,7 +15,7 @@
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO GuideBite1 = { 0, 20, 200, 18 };
+	BITE_INFO GuideBite1 = { 0, 20, 180, 18 };
 	BITE_INFO GuideBite2 = { 30, 80, 50, 15 };
 
 	enum GuideState
@@ -76,9 +76,8 @@ namespace TEN::Entities::TR4
 			auto pos = Vector3Int(GuideBite1.x, GuideBite1.y, GuideBite1.z);
 			GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
 
-			AddFire(pos.x, pos.y, pos.z, item->RoomNumber, 1.0f, 0);
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
-			TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
+			TriggerFireFlame(pos.x, pos.y - 20, pos.z, -1, 3);
 
 			short random = GetRandomControl();
 			TriggerDynamicLight(
@@ -100,7 +99,7 @@ namespace TEN::Entities::TR4
 						((random / 8) & 0x3F) + pos.y - 128,
 						pos.z + ((random / 64) & 0x3F) - 32,
 						-1,
-						1);
+						3);
 				}
 			}
 		}
@@ -461,7 +460,7 @@ namespace TEN::Entities::TR4
 								((random >> 5) & 0x3F) + pos1.y - 96,
 								((random >> 10) & 0x3F) + pos1.z - 64,
 								-1,
-								7);
+								3);
 
 							TriggerDynamicLight(
 								pos1.x - 32,
@@ -504,7 +503,7 @@ namespace TEN::Entities::TR4
 						((random >> 5) & 0x3F) + pos1.y - 96,
 						((random >> 10) & 0x3F) + pos1.z - 64,
 						-1,
-						7);
+						3);
 				}
 			}
 			else
