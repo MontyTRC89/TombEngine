@@ -521,7 +521,7 @@ void CalculateSpotCameras()
 			}
 		}
 
-		LookAt(&Camera, 0);
+		LookAt(&Camera, croll);
 
 		if (CheckTrigger)
 		{
@@ -814,6 +814,9 @@ void CalculateSpotCameras()
 
 					SplineToCamera = 1;
 				}
+
+				if (CurrentSplineCamera > LastCamera)
+					CurrentSplineCamera = LastCamera;
 			}
 			else
 			{
