@@ -418,7 +418,7 @@ namespace TEN::Entities::TR4
 
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 7;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 		unsigned char life = (GetRandomControl() & 7) + 12;
 		spark->life = life;
 		spark->sLife = life;
@@ -484,7 +484,7 @@ namespace TEN::Entities::TR4
 			spark->dB = dB;
 			spark->colFadeSpeed = 4;
 			spark->fadeToBlack = 7;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			short life = (GetRandomControl() & 7) + 32;
 			spark->life = life;
 			spark->sLife = life;

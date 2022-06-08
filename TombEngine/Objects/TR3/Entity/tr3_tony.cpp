@@ -16,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Effects::Lara;
 
@@ -131,7 +132,7 @@ static void TriggerTonyFlame(short itemNumber, int hand)
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 8;
 	sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = NULL;
 	sptr->dynamic = -1;
 	sptr->x = ((GetRandomControl() & 15) - 8);
@@ -185,7 +186,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 8;
 	sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 	sptr->x = ((GetRandomControl() & 15) - 8);

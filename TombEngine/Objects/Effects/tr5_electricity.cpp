@@ -43,7 +43,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	}
 
 	spark->fxObj = objNum;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->flags = SP_ITEM | SP_NODEATTACH | SP_SCALE | SP_DEF;
 	spark->nodeNumber = node;
 	spark->x = x;
@@ -100,7 +100,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	spark->sG = color;
 	spark->dB = color;
 	spark->dG = color / 2;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->fadeToBlack = 4;
 	spark->life = 12;
 	spark->sLife = 12;

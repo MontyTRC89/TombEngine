@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_mapper.h"
+#include "Objects/TR4/Object/tr4_mapper.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
@@ -9,6 +9,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Renderer/Renderer11Enums.h"
 
 namespace TEN::Entities::TR4
 {
@@ -51,7 +52,7 @@ namespace TEN::Entities::TR4
                 spark->dB = 0;
                 spark->colFadeSpeed = 4;
                 spark->fadeToBlack = 4;
-                spark->transType = TransTypeEnum::COLADD;
+                spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
                 spark->life = 12;
                 spark->sLife = 12;
                 spark->x = pos.x;

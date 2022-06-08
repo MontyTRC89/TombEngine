@@ -2,6 +2,7 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_struct.h"
 #include "Specific/phd_global.h"
+#include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
 struct ItemInfo;
@@ -33,7 +34,7 @@ struct SMOKE_SPARKS
 	byte fadeToBlack;
 	signed char sLife;
 	signed char life;
-	TransTypeEnum transType;
+	BLEND_MODES transType;
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;
@@ -209,6 +210,7 @@ void TriggerGlobalFireSmoke();
 void TriggerGlobalFireFlame();
 void TriggerPilotFlame(int itemNum, int nodeIndex);
 void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed);
+void ThrowPoison(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed, Vector3 color);
 void UpdateFireProgress();
 void ClearFires();
 void AddFire(int x, int y, int z, short roomNum, float size, short fade);

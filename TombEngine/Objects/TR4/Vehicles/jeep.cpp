@@ -16,6 +16,7 @@
 #include "Specific/level.h"
 #include "Game/animation.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
+#include "Renderer/Renderer11Enums.h"
 
 using std::vector;
 
@@ -333,7 +334,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 		spark->sLife = 9;
 	}
 
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;

@@ -91,7 +91,7 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 32;
 		spark->dShade = (GetRandomControl() & 0xF) + 64;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 64;
 		spark->x = (GetRandomControl() & 0x1F) + pos->x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
@@ -120,7 +120,7 @@ static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r,
 	spark->colFadeSpeed = 2;
 	spark->dR = r;
 	spark->sR = r;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = 16;
 	spark->sLife = 16;
 	spark->x = x;
@@ -172,7 +172,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 	spark->xVel = xv;
 	spark->yVel = yv;
 	spark->zVel = zv;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->friction = 34;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
@@ -199,7 +199,7 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->dG = spark->dB / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->y = 0;
@@ -257,7 +257,7 @@ void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
 	spark->dB = spark->dG / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 	spark->x = (GetRandomControl() & 0xF) - 8;

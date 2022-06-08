@@ -144,7 +144,7 @@ void ControlTeleporter(short itemNumber)
 					v35->FadeToBlack = 4;
 					v35->Life = 24;
 					v35->sLife = 24;
-					v35->TransType = TransTypeEnum::COLADD;
+					v35->TransType = BLEND_MODES::BLENDMODE_ADDITIVE;
 					v35->x = src.Position.x;
 					v35->y = src.Position.y;
 					v35->z = src.zPos;

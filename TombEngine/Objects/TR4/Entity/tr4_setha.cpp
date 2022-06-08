@@ -469,7 +469,7 @@ namespace TEN::Entities::TR4
 			spark->life = 16;
 			spark->sLife = 16;
 			spark->colFadeSpeed = 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->fadeToBlack = 4;
 			spark->x = x;
 			spark->y = y;
@@ -505,7 +505,7 @@ namespace TEN::Entities::TR4
 			spark->dB = spark->dG + 64;
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
 			spark->x = (GetRandomControl() & 0xF) - 8;
 			spark->y = 0;

@@ -12,6 +12,7 @@
 #include "Specific/input.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_item.h"
+#include "Renderer/Renderer11Enums.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
@@ -357,7 +358,7 @@ void HighObject2Control(short itemNumber)
 		spark->dG = (GetRandomControl() & 0x3F) + -128;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
 		spark->x = item->ItemFlags[1] + (GetRandomControl() & 0x3F) + item->Pose.Position.x - 544;
 		spark->y = item->Pose.Position.y;

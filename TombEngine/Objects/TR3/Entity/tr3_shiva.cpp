@@ -12,7 +12,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "camera.h"
+#include "Game/camera.h"
+#include "Renderer/Renderer11Enums.h"
 
 BITE_INFO ShivaBiteLeft = { 0, 0, 920, 13 };
 BITE_INFO ShivaBiteRight = { 0, 0, 920, 22 };
@@ -98,9 +99,9 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->sLife = sptr->life = (GetRandomControl() & 31) + 96;
 
 	if (uw)
-		sptr->transType = TransTypeEnum::COLADD;
+		sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	else
-		sptr->transType = TransTypeEnum::COLADD;
+		sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 	sptr->extras = 0;
 	sptr->dynamic = -1;

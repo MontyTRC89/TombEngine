@@ -196,7 +196,7 @@ static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 

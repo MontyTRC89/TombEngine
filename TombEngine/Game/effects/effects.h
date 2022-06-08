@@ -1,5 +1,6 @@
 #pragma once
 #include "Specific/phd_global.h"
+#include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
 struct ItemInfo;
@@ -33,16 +34,8 @@ enum SpriteEnumFlag
 	SP_DAMAGE = 0x0400,
 	SP_UNDERWEXP = 0x0800,
 	SP_NODEATTACH = 0x1000,
-	SP_PLASMAEXP = 0x2000
-};
-
-enum class TransTypeEnum
-{
-	NOTRANS,
-	SEMITRANS,
-	COLADD,
-	COLSUB,
-	WEIRD
+	SP_PLASMAEXP = 0x2000,
+	SP_POISON = 0x4000
 };
 
 struct FX_INFO
@@ -124,7 +117,7 @@ struct SPARKS
 	unsigned char fadeToBlack;
 	unsigned char sLife;
 	unsigned char life;
-	TransTypeEnum transType;
+	BLEND_MODES transType;
 	unsigned char extras;
 	signed char dynamic;
 	unsigned char fxObj;

@@ -14,6 +14,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/los.h"
+#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Entities::Effects;
 
@@ -34,7 +35,7 @@ namespace TEN::Entities::Generic
 
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 12;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
 
 		spark->x = (GetRandomControl() & 0xF) - 8;

@@ -126,7 +126,7 @@ namespace TEN::Entities::TR4
 
 				// Rotating radar
 				creature->JointRotation[2] += item->ItemFlags[1];
-				if (creature->JointRotation[2] > ANGLE(90.0f) || creature->JointRotation[3] < -ANGLE(90.0f))
+				if (creature->JointRotation[2] > ANGLE(90.0f) || creature->JointRotation[2] < -ANGLE(90.0f))
 					item->ItemFlags[1] = -item->ItemFlags[1];
 			}
 			else

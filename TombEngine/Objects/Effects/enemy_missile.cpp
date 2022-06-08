@@ -13,6 +13,7 @@
 #include "Objects/TR4/Entity/tr4_mutant.h"
 #include "Objects/TR4/Entity/tr4_demigod.h"
 #include "Specific/level.h"
+#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::TR4;
@@ -40,7 +41,7 @@ namespace TEN::Entities::Effects
 			spark->dG = spark->dB + 64;
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;
@@ -90,7 +91,7 @@ namespace TEN::Entities::Effects
 			spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;

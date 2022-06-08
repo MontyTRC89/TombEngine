@@ -12,6 +12,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
+#include "Renderer/Renderer11Enums.h"
 
 namespace TEN::Entities::TR4
 {
@@ -108,7 +109,7 @@ namespace TEN::Entities::TR4
 			spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
 			spark->x = (GetRandomControl() & 0xF) - 8;
 			spark->y = 0;
@@ -155,7 +156,7 @@ namespace TEN::Entities::TR4
 			spark->sLife = 16;
 			spark->colFadeSpeed = 4;
 			spark->y = y;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->fadeToBlack = 4;
 			spark->x = x;
 			spark->z = z;

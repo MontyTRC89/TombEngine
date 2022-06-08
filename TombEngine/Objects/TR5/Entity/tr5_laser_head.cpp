@@ -56,7 +56,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 			spark->fadeToBlack = 0;
 			spark->life = 9 << unk;
 			spark->sLife = 9 << unk;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;

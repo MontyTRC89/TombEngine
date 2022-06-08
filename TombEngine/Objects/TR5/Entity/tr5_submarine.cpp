@@ -29,7 +29,7 @@ static void TriggerSubmarineSparks(short itemNumber)
 	spark->dR = spark->dG / 2;
 	spark->dB = spark->dG / 2;
 	spark->sLife = 2;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->fadeToBlack = 0;
 	spark->flags = 20650;
 	spark->fxObj = itemNumber;
@@ -60,7 +60,7 @@ static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char facto
 	spark->dB = 80;
 	spark->colFadeSpeed = 2;
 	spark->fadeToBlack = 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 	spark->x = pos1->x + (GetRandomControl() & 0x1F);
 	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
@@ -93,7 +93,7 @@ static void TriggerTorpedoSparks2(Vector3Int* pos1, Vector3Int* pos2, char scale
 	spark->dB = -128;
 	spark->colFadeSpeed = 2;
 	spark->fadeToBlack = 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 	spark->x = pos1->x + (GetRandomControl() & 0x1F);
 	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;

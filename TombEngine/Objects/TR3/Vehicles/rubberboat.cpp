@@ -14,6 +14,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Renderer/Renderer11Enums.h"
 
 #define RBOAT_SLIP		10
 #define RBOAT_SIDE_SLIP	30
@@ -819,7 +820,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long velocity, short a
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12 - (snow * 8);
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 

@@ -273,7 +273,7 @@ namespace TEN::Renderer
 									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
 									   TO_RAD(spark->rotAng), spark->scalar, 
 									   {spark->size, spark->size},
-						BLENDMODE_ADDITIVE, view);
+						spark->transType, view);
 				} 
 				else 
 				{
@@ -285,7 +285,7 @@ namespace TEN::Renderer
 						Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
 						TO_RAD(spark->rotAng), 
 						spark->scalar, 
-						Vector2(4, spark->size), BLENDMODE_ADDITIVE, v, view);
+						Vector2(4, spark->size), spark->transType, v, view);
 				}
 			}
 		}

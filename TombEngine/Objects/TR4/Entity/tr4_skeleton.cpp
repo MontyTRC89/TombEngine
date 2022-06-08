@@ -57,7 +57,7 @@ namespace TEN::Entities::TR4
 			spark->xVel = phd_sin(fx->pos.Orientation.y) * 4096;
 			spark->yVel = 0;
 			spark->zVel = phd_cos(fx->pos.Orientation.y) * 4096;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->friction = 68;
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;

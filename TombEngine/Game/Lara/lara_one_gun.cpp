@@ -1921,7 +1921,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 		spark->dG = spark->sG >> 1;
 		spark->dB = spark->sB >> 1;
 		spark->sLife = 24;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 5;
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -128 * phd_sin(random << 4);

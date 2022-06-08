@@ -11,6 +11,7 @@
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/prng.h"
+#include "Renderer/Renderer11Enums.h"
 
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;
@@ -119,7 +120,7 @@ void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int 
 	sparkle->colFadeSpeed = 3;
 	sparkle->fadeToBlack = 5;
 	sparkle->sLife = sparkle->life = 10;
-	sparkle->transType = TransTypeEnum::COLADD;
+	sparkle->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sparkle->dynamic = true;
 
 	sparkle->x = pos->x + (GetRandomDraw() & 7) - 3;
@@ -174,7 +175,7 @@ void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving,
 		smoke->sLife = rnd;
 	}
 
-	smoke->transType = TransTypeEnum::COLADD;
+	smoke->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	
 	smoke->x = pos->x + (GetRandomControl() & 7) - 3;
 	smoke->y = pos->y + (GetRandomControl() & 7) - 3;
