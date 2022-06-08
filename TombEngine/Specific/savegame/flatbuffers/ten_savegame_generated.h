@@ -412,7 +412,7 @@ struct ItemT : public flatbuffers::NativeTable {
   bool collidable = false;
   bool looked_at = false;
   int32_t ai_bits = 0;
-  int32_t swap_mesh_flags = 0;
+  int64_t swap_mesh_flags = 0;
   TEN::Save::ItemDataUnion data{};
   std::string lua_name{};
   std::string lua_on_killed_name{};
@@ -559,8 +559,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t ai_bits() const {
     return GetField<int32_t>(VT_AI_BITS, 0);
   }
-  int32_t swap_mesh_flags() const {
-    return GetField<int32_t>(VT_SWAP_MESH_FLAGS, 0);
+  int64_t swap_mesh_flags() const {
+    return GetField<int64_t>(VT_SWAP_MESH_FLAGS, 0);
   }
   TEN::Save::ItemData data_type() const {
     return static_cast<TEN::Save::ItemData>(GetField<uint8_t>(VT_DATA_TYPE, 0));
@@ -684,7 +684,7 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_COLLIDABLE) &&
            VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
            VerifyField<int32_t>(verifier, VT_AI_BITS) &&
-           VerifyField<int32_t>(verifier, VT_SWAP_MESH_FLAGS) &&
+           VerifyField<int64_t>(verifier, VT_SWAP_MESH_FLAGS) &&
            VerifyField<uint8_t>(verifier, VT_DATA_TYPE) &&
            VerifyOffset(verifier, VT_DATA) &&
            VerifyItemData(verifier, data(), data_type()) &&
@@ -890,8 +890,8 @@ struct ItemBuilder {
   void add_ai_bits(int32_t ai_bits) {
     fbb_.AddElement<int32_t>(Item::VT_AI_BITS, ai_bits, 0);
   }
-  void add_swap_mesh_flags(int32_t swap_mesh_flags) {
-    fbb_.AddElement<int32_t>(Item::VT_SWAP_MESH_FLAGS, swap_mesh_flags, 0);
+  void add_swap_mesh_flags(int64_t swap_mesh_flags) {
+    fbb_.AddElement<int64_t>(Item::VT_SWAP_MESH_FLAGS, swap_mesh_flags, 0);
   }
   void add_data_type(TEN::Save::ItemData data_type) {
     fbb_.AddElement<uint8_t>(Item::VT_DATA_TYPE, static_cast<uint8_t>(data_type), 0);
@@ -958,7 +958,7 @@ inline flatbuffers::Offset<Item> CreateItem(
     bool collidable = false,
     bool looked_at = false,
     int32_t ai_bits = 0,
-    int32_t swap_mesh_flags = 0,
+    int64_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
     flatbuffers::Offset<flatbuffers::String> lua_name = 0,
@@ -967,6 +967,7 @@ inline flatbuffers::Offset<Item> CreateItem(
     flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_object_name = 0,
     flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_room_name = 0) {
   ItemBuilder builder_(_fbb);
+  builder_.add_swap_mesh_flags(swap_mesh_flags);
   builder_.add_mesh_bits(mesh_bits);
   builder_.add_touch_bits(touch_bits);
   builder_.add_lua_on_collided_with_room_name(lua_on_collided_with_room_name);
@@ -975,7 +976,6 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_lua_on_killed_name(lua_on_killed_name);
   builder_.add_lua_name(lua_name);
   builder_.add_data(data);
-  builder_.add_swap_mesh_flags(swap_mesh_flags);
   builder_.add_ai_bits(ai_bits);
   builder_.add_status(status);
   builder_.add_next_item_active(next_item_active);
@@ -1047,7 +1047,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     bool collidable = false,
     bool looked_at = false,
     int32_t ai_bits = 0,
-    int32_t swap_mesh_flags = 0,
+    int64_t swap_mesh_flags = 0,
     TEN::Save::ItemData data_type = TEN::Save::ItemData::NONE,
     flatbuffers::Offset<void> data = 0,
     const char *lua_name = nullptr,
