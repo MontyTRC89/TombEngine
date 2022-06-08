@@ -139,7 +139,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			ExplodingDeath(itemNum, -1, 257);
+			ExplodingDeath(itemNum, ALL_JOINT_BITS, 257);
 			DisableEntityAI(itemNum);
 			KillItem(itemNum);
 

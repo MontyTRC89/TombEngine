@@ -1394,7 +1394,7 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 		{
 			if (quadItem->Pose.Position.y == quadItem->Floor)
 			{
-				ExplodingDeath(lara->ItemNumber, 0xffffffff, 1);
+				ExplodingDeath(lara->ItemNumber, ALL_JOINT_BITS, 1);
 				laraItem->HitPoints = 0;
 				laraItem->Flags |= ONESHOT;
 				QuadbikeExplode(laraItem, quadItem);
