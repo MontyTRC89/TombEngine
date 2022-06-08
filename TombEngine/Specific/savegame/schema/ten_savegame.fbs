@@ -7,8 +7,8 @@ struct RoomVector {
 
 table Item {
     floor: int;
-    touch_bits: int64;
-    mesh_bits: int64;
+    touch_bits: int32;
+    mesh_bits: int32;
     object_id: int32;
     active_state: int32;
     target_state: int32;
@@ -37,7 +37,7 @@ table Item {
 	collidable: bool;
 	looked_at: bool;
 	ai_bits: int32;
-	swap_mesh_flags: int64;
+	swap_mesh_flags: int32;
     data: TEN.Save.ItemData;
 	lua_name: string;
 	lua_on_killed_name: string;

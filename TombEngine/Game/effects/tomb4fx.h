@@ -179,14 +179,17 @@ extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
 
-#define MAX_SPARKS_FIRE 20
-#define MAX_FIRE_LIST 32
-#define MAX_SPARKS_SMOKE 32
-#define MAX_SPARKS_BLOOD 32
-#define MAX_GUNFLASH 4
-#define MAX_GUNSHELL 24
-#define MAX_DRIPS 32
-#define MAX_SHOCKWAVE 16
+constexpr auto MAX_SPARKS_FIRE = 20;
+constexpr auto MAX_FIRE_LIST = 32;
+constexpr auto MAX_SPARKS_SMOKE = 32;
+constexpr auto MAX_SPARKS_BLOOD = 32;
+constexpr auto MAX_GUNFLASH = 4;
+constexpr auto MAX_GUNSHELL = 24;
+constexpr auto MAX_DRIPS = 32;
+constexpr auto MAX_SHOCKWAVE = 16;
+
+constexpr auto EXPLODE_HIT_EFFECT = 258;
+constexpr auto EXPLODE_NORMAL = 256;
 
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -229,11 +232,7 @@ void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
-
-constexpr auto EXPLODE_HIT_EFFECT = 258;
-constexpr auto EXPLODE_NORMAL = 256;
-int ExplodingDeath(short itemNumber, unsigned __int64 meshBits, short flags); // EXPLODE_ flags
-
+int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
 void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel);

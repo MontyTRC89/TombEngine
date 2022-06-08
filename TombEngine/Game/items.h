@@ -49,8 +49,8 @@ enum ItemFlags
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
-constexpr unsigned __int64 ALL_JOINT_BITS = INT64_MAX;
-constexpr unsigned __int64 NO_JOINT_BITS = 0;
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS  = 0;
 
 enum class JointBitType
 {
@@ -101,9 +101,9 @@ struct ItemInfo
 	int Timer;
 	short Shade;
 
-	unsigned __int64 TouchBits;
-	unsigned __int64 MeshBits;
-	unsigned __int64 SwapMeshBits;
+	unsigned int TouchBits;
+	unsigned int MeshBits;
+	unsigned int SwapMeshBits;
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];

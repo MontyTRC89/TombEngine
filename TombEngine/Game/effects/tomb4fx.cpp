@@ -1288,7 +1288,7 @@ void TriggerLaraDrips(ItemInfo* item)
 	}
 }
 
-int ExplodingDeath(short itemNumber, unsigned __int64 meshBits, short flags)
+int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->ObjectNumber];
