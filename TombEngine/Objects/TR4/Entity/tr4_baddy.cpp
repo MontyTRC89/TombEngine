@@ -1146,7 +1146,6 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BADDY_STATE_FIRE:
-				creature->FiredWeapon = true;
 
 				if (AI.ahead)
 				{
@@ -1160,6 +1159,8 @@ namespace TEN::Entities::TR4
 				{
 					break;
 				}
+
+				creature->FiredWeapon = 1;
 
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;

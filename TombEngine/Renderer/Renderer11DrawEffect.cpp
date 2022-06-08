@@ -39,7 +39,7 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-BITE_INFO EnemyBites[9] =
+BITE_INFO EnemyBites[12] =
 {
 	{ 20, -95, 240, 13 },
 	{ 48, 0, 180, -11 },
@@ -49,7 +49,10 @@ BITE_INFO EnemyBites[9] =
 	{ -30, -65, 250, 18 },
 	{ 0, -110, 480, 13 },
 	{ -20, -80, 190, -10 },
-	{ 10, -60, 200, 13 }
+	{ 10, -60, 200, 13 },
+	{ 10, -60, 200, 11 },   // Baddy 2
+	{ 20, -60, 400, 7 },    // SAS
+	{ 0, -64, 250, 7 }      // Troops
 };
 
 namespace TEN::Renderer 
