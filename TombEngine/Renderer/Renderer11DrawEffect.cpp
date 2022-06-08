@@ -637,8 +637,17 @@ namespace TEN::Renderer
 				break;
 			}
 
-			ObjectInfo* flashObj = &Objects[ID_GUN_FLASH];
-			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
+			// Use MP5 flash if available
+			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
+			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
+			{
+				gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
+				length += 20;
+				zOffset += 10;
+			}
+
+			ObjectInfo* flashObj = &Objects[gunflash];
+			RendererObject& flashMoveable = *m_moveableObjects[gunflash];
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
 			for (auto& flashBucket : flashMesh->buckets) 
