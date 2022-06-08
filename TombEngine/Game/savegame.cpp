@@ -521,7 +521,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.SwapMeshFlags);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.SwapMeshBits);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1167,7 +1167,7 @@ bool SaveGame::Load(int slot)
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();
-		item->SwapMeshFlags = savedItem->swap_mesh_flags();
+		item->SwapMeshBits = savedItem->swap_mesh_flags();
 
 		// Now some post-load specific hacks for objects
 		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 

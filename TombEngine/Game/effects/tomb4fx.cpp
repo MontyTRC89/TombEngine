@@ -1404,7 +1404,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 		}
 	}
 
-	return item->MeshBits == 0;
+	return item->MeshBits == NO_JOINT_BITS;
 }
 
 int GetFreeShockwave()

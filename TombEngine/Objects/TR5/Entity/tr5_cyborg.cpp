@@ -242,7 +242,7 @@ void CyborgControl(short itemNumber)
 			{
 				if (item->ItemFlags[0] < 11)
 				{
-					item->SwapMeshFlags |= 1 << HitmanJoints[item->ItemFlags[0]];
+					item->SwapMeshBits |= 1 << HitmanJoints[item->ItemFlags[0]];
 					item->ItemFlags[0]++;
 				}
 			}

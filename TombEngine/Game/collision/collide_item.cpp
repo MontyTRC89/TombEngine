@@ -157,7 +157,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					if (item == collidingItem ||
 						item->ObjectNumber == ID_LARA && ignoreLara ||
 						item->Flags & 0x8000 ||
-						item->MeshBits == 0 ||
+						item->MeshBits == NO_JOINT_BITS ||
 						(Objects[item->ObjectNumber].drawRoutine == NULL && item->ObjectNumber != ID_LARA) ||
 						(Objects[item->ObjectNumber].collision == NULL && item->ObjectNumber != ID_LARA) ||
 						onlyVisible && item->Status == ITEM_INVISIBLE ||

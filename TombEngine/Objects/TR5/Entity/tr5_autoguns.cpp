@@ -161,7 +161,7 @@ void AutoGunsControl(short itemNumber)
 		}
 		else
 		{
-			item->MeshBits = -1281;
+			item->MeshBits = 0xFFFFFAFF;
 			AnimateItem(item);
 		}
 	}

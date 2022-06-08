@@ -392,7 +392,7 @@ struct InventoryObject
 	short zrot;
 	unsigned __int64 opts;
 	const char* objname;
-	unsigned long meshbits;
+	unsigned __int64 meshbits;
 	short rot_flags;
 };
 

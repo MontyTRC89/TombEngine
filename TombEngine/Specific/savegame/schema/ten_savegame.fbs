@@ -7,8 +7,8 @@ struct RoomVector {
 
 table Item {
     floor: int;
-    touch_bits: int32;
-    mesh_bits: int32;
+    touch_bits: int64;
+    mesh_bits: int64;
     object_id: int32;
     active_state: int32;
     target_state: int32;

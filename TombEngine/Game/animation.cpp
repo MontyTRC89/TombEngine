@@ -206,7 +206,7 @@ void AnimateLara(ItemInfo* item)
 
 void AnimateItem(ItemInfo* item)
 {
-	item->TouchBits = 0;
+	item->TouchBits = NO_JOINT_BITS;
 	item->HitStatus = false;
 
 	item->Animation.FrameNumber++;

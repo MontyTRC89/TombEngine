@@ -174,7 +174,7 @@ namespace TEN::Entities::TR4
 
 			case 1:
 				item->ItemFlags[0] += 37;
-				item->MeshBits = -147457;
+				item->MeshBits = 0xFFFDBFFF;
 				creature->MaxTurn = item->ItemFlags[0] / 16;
 
 				if (item->ItemFlags[0] > 8704)

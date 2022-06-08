@@ -122,7 +122,7 @@ void InitialiseGuard(short itemNum)
 		case 3:
 			item->Animation.AnimNumber = anim + 28;
 			item->Animation.TargetState = GUARD_STATE_SIT;
-			item->SwapMeshFlags = 9216;
+			item->SwapMeshBits = 9216;
 
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 			if (roomItemNumber != NO_ITEM)
@@ -156,7 +156,7 @@ void InitialiseGuard(short itemNum)
 		case 4:
 			item->Animation.AnimNumber = anim + 30;
 			item->Animation.TargetState = 17;
-			item->SwapMeshFlags = 8192;
+			item->SwapMeshBits = 8192;
 			break;
 
 		case 5:
@@ -714,7 +714,7 @@ void GuardControl(short itemNumber)
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 44)
 			{
-				item->SwapMeshFlags = 0;
+				item->SwapMeshBits = NO_JOINT_BITS;
 
 				short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 				if (currentItemNumber == NO_ITEM)
@@ -807,7 +807,7 @@ void GuardControl(short itemNumber)
 				item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
 				item->Pose.Orientation.y = currentItem->Pose.Orientation.y;
 				item->Pose.Position.z = currentItem->Pose.Position.z + CLICK(0.5f);
-				item->SwapMeshFlags = 1024;
+				item->SwapMeshBits = 1024;
 			}
 			else
 			{
@@ -826,7 +826,7 @@ void GuardControl(short itemNumber)
 					currentItem->MeshBits = 0x1FFF;
 					TestTriggers(item, true);
 					item->Animation.RequiredState = GUARD_STATE_WALK;
-					item->SwapMeshFlags = 0;
+					item->SwapMeshBits = NO_JOINT_BITS;
 				}
 			}
 
@@ -1032,7 +1032,7 @@ void SniperControl(short itemNumber)
 			break;
 
 		case SNIPER_STATE_UNCOVER:
-			item->MeshBits = -1;
+			item->MeshBits = ALL_JOINT_BITS;
 			break;
 
 		case 3:
@@ -1091,7 +1091,7 @@ void InitialiseMafia2(short itemNumber)
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = GUARD_STATE_IDLE;
 	item->Animation.ActiveState = GUARD_STATE_IDLE;
-	item->SwapMeshFlags = 9216;
+	item->SwapMeshBits = 9216;
 }
 
 void Mafia2Control(short itemNumber)
@@ -1218,13 +1218,13 @@ void Mafia2Control(short itemNumber)
 			}
 			if (laraAI.angle <= ANGLE(112.5f) && laraAI.angle >= -ANGLE(112.5f))
 			{
-				if (item->SwapMeshFlags == 9216)
+				if (item->SwapMeshBits == 9216)
 				{
 					item->Animation.TargetState = MAFIA2_STATE_UNDRAW_GUNS;
 					break;
 				}
 			}
-			else if (item->SwapMeshFlags == 9216)
+			else if (item->SwapMeshBits == 9216)
 			{
 				item->Animation.TargetState = MAFIA2_STATE_TURN_180;
 				break;
@@ -1280,13 +1280,13 @@ void Mafia2Control(short itemNumber)
 				item->Pose.Orientation.y += ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
-				item->SwapMeshFlags != 9216)
+				item->SwapMeshBits != 9216)
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 			}
 			else
-				item->SwapMeshFlags = 128;
+				item->SwapMeshBits = 128;
 			
 			break;
 
@@ -1420,9 +1420,9 @@ void Mafia2Control(short itemNumber)
 				item->Pose.Orientation.y -= ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
-				item->SwapMeshFlags == 9216)
+				item->SwapMeshBits == 9216)
 			{
-				item->SwapMeshFlags = 128;
+				item->SwapMeshBits = 128;
 			}
 
 			break;

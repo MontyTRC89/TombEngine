@@ -241,7 +241,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 						Camera.bounce = 0;
 						AlterFOV(ANGLE(80.0f));
 
-						LaraItem->MeshBits = 0xFFFFFFFF;
+						LaraItem->MeshBits = ALL_JOINT_BITS;
 						Lara.Inventory.IsBusy = false;
 						ResetLaraFlex(LaraItem);
 
