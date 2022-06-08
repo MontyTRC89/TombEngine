@@ -39,6 +39,8 @@ extern SPARKS Sparks[MAX_SPARKS];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
+// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
+
 BITE_INFO EnemyBites[12] =
 {
 	{ 20, -95, 240, 13 },
