@@ -88,17 +88,17 @@ bool ItemInfo::TestBits(std::vector<int> jointIndices, JointBitType testType)
 
 bool ItemInfo::TestBits(int jointIndex, JointBitType testType)
 {
-	return TestBits({ jointIndex }, testType);
+	return TestBits(std::vector { jointIndex }, testType);
 }
 
 void ItemInfo::SetBits(int jointIndex, JointBitType testType)
 {
-	return SetBits({ jointIndex }, testType);
+	return SetBits(std::vector { jointIndex }, testType);
 }
 
 void ItemInfo::ClearBits(int jointIndex, JointBitType testType)
 {
-	return ClearBits({ jointIndex }, testType);
+	return ClearBits(std::vector { jointIndex }, testType);
 }
 
 void ClearItem(short itemNumber)
