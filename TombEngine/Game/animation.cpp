@@ -112,8 +112,8 @@ void AnimateLara(ItemInfo* item)
 					auto condition = flags ? (flags == (1 << 14) ? SoundEnvironment::Land : SoundEnvironment::Water) : SoundEnvironment::Always;
 
 					if (condition == SoundEnvironment::Always ||
-						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= 0 || lara->WaterSurfaceDist == NO_HEIGHT)) ||
-						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist < -CLICK(0.5f) && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= -SHALLOW_WATER_START_LEVEL || lara->WaterSurfaceDist == NO_HEIGHT)) ||
+						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist <  -SHALLOW_WATER_START_LEVEL && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 					{
 						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}

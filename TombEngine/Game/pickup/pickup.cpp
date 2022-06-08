@@ -1129,7 +1129,7 @@ bool UseSpecialItem(ItemInfo* item)
 
 		if (flag == 1)
 		{
-			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->Pose.Position.y > Lara.WaterSurfaceDist))
+			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (Lara.WaterSurfaceDist < -SHALLOW_WATER_START_LEVEL))
 			{
 				if (use < ID_WATERSKIN1_3)
 					Lara.Inventory.SmallWaterskin = 4;
