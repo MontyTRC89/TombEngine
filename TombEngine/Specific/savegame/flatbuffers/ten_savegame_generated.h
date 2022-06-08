@@ -382,8 +382,8 @@ struct KeyValPair::Traits {
 struct ItemT : public flatbuffers::NativeTable {
   typedef Item TableType;
   int32_t floor = 0;
-  int32_t touch_bits = 0;
-  int32_t mesh_bits = 0;
+  int64_t touch_bits = 0;
+  int64_t mesh_bits = 0;
   int32_t object_id = 0;
   int32_t active_state = 0;
   int32_t target_state = 0;
@@ -469,11 +469,11 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
   }
-  int32_t touch_bits() const {
-    return GetField<int32_t>(VT_TOUCH_BITS, 0);
+  int64_t touch_bits() const {
+    return GetField<int64_t>(VT_TOUCH_BITS, 0);
   }
-  int32_t mesh_bits() const {
-    return GetField<int32_t>(VT_MESH_BITS, 0);
+  int64_t mesh_bits() const {
+    return GetField<int64_t>(VT_MESH_BITS, 0);
   }
   int32_t object_id() const {
     return GetField<int32_t>(VT_OBJECT_ID, 0);
@@ -653,8 +653,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_FLOOR) &&
-           VerifyField<int32_t>(verifier, VT_TOUCH_BITS) &&
-           VerifyField<int32_t>(verifier, VT_MESH_BITS) &&
+           VerifyField<int64_t>(verifier, VT_TOUCH_BITS) &&
+           VerifyField<int64_t>(verifier, VT_MESH_BITS) &&
            VerifyField<int32_t>(verifier, VT_OBJECT_ID) &&
            VerifyField<int32_t>(verifier, VT_ACTIVE_STATE) &&
            VerifyField<int32_t>(verifier, VT_TARGET_STATE) &&
@@ -800,11 +800,11 @@ struct ItemBuilder {
   void add_floor(int32_t floor) {
     fbb_.AddElement<int32_t>(Item::VT_FLOOR, floor, 0);
   }
-  void add_touch_bits(int32_t touch_bits) {
-    fbb_.AddElement<int32_t>(Item::VT_TOUCH_BITS, touch_bits, 0);
+  void add_touch_bits(int64_t touch_bits) {
+    fbb_.AddElement<int64_t>(Item::VT_TOUCH_BITS, touch_bits, 0);
   }
-  void add_mesh_bits(int32_t mesh_bits) {
-    fbb_.AddElement<int32_t>(Item::VT_MESH_BITS, mesh_bits, 0);
+  void add_mesh_bits(int64_t mesh_bits) {
+    fbb_.AddElement<int64_t>(Item::VT_MESH_BITS, mesh_bits, 0);
   }
   void add_object_id(int32_t object_id) {
     fbb_.AddElement<int32_t>(Item::VT_OBJECT_ID, object_id, 0);
@@ -928,8 +928,8 @@ struct ItemBuilder {
 inline flatbuffers::Offset<Item> CreateItem(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t floor = 0,
-    int32_t touch_bits = 0,
-    int32_t mesh_bits = 0,
+    int64_t touch_bits = 0,
+    int64_t mesh_bits = 0,
     int32_t object_id = 0,
     int32_t active_state = 0,
     int32_t target_state = 0,
@@ -967,6 +967,8 @@ inline flatbuffers::Offset<Item> CreateItem(
     flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_object_name = 0,
     flatbuffers::Offset<flatbuffers::String> lua_on_collided_with_room_name = 0) {
   ItemBuilder builder_(_fbb);
+  builder_.add_mesh_bits(mesh_bits);
+  builder_.add_touch_bits(touch_bits);
   builder_.add_lua_on_collided_with_room_name(lua_on_collided_with_room_name);
   builder_.add_lua_on_collided_with_object_name(lua_on_collided_with_object_name);
   builder_.add_lua_on_hit_name(lua_on_hit_name);
@@ -996,8 +998,6 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_target_state(target_state);
   builder_.add_active_state(active_state);
   builder_.add_object_id(object_id);
-  builder_.add_mesh_bits(mesh_bits);
-  builder_.add_touch_bits(touch_bits);
   builder_.add_floor(floor);
   builder_.add_data_type(data_type);
   builder_.add_looked_at(looked_at);
@@ -1017,8 +1017,8 @@ struct Item::Traits {
 inline flatbuffers::Offset<Item> CreateItemDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t floor = 0,
-    int32_t touch_bits = 0,
-    int32_t mesh_bits = 0,
+    int64_t touch_bits = 0,
+    int64_t mesh_bits = 0,
     int32_t object_id = 0,
     int32_t active_state = 0,
     int32_t target_state = 0,

@@ -52,7 +52,7 @@ namespace TEN::Entities::TR4
 			item->ItemFlags[1] = 2;
 		}
 		else
-			item->SwapMeshBits = NO_JOINT_BITSx40000;
+			item->SwapMeshBits = 0x40000;
 	}
 
 	void GuideControl(short itemNumber)
