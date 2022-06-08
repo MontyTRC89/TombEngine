@@ -85,8 +85,6 @@ void AnimateLara(ItemInfo* item)
 	if (anim->numberCommands > 0)
 	{
 		short* cmd = &g_Level.Commands[anim->commandIndex];
-		int flags;
-		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -108,14 +106,20 @@ void AnimateLara(ItemInfo* item)
 				}
 				else
 				{
-					flags = cmd[1] & 0xC000;
-					auto condition = flags ? (flags == (1 << 14) ? SoundEnvironment::Land : SoundEnvironment::Water) : SoundEnvironment::Always;
+					bool inWater = (cmd[1] & 0x8000) != 0;
+					bool inDry   = (cmd[1] & 0x4000) != 0;
+					bool always  = (inWater && inDry) || (!inWater && !inDry);
+
+					SoundEnvironment condition = SoundEnvironment::Always;
+					if (inWater) condition = SoundEnvironment::Water;
+					if (inDry)   condition = SoundEnvironment::Land;
+					if (always)  condition = SoundEnvironment::Always;
 
 					if (condition == SoundEnvironment::Always ||
 						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= -SHALLOW_WATER_START_LEVEL || lara->WaterSurfaceDist == NO_HEIGHT)) ||
 						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist <  -SHALLOW_WATER_START_LEVEL && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 					{
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, condition);
 					}
 				}
 
@@ -129,8 +133,7 @@ void AnimateLara(ItemInfo* item)
 					break;
 				}
 
-				effectID = cmd[1] & 0x3FFF;
-				DoFlipEffect(effectID, item);
+				DoFlipEffect((cmd[1] & 0x3FFF), item);
 
 				cmd += 2;
 				break;
@@ -276,8 +279,6 @@ void AnimateItem(ItemInfo* item)
 	if (anim->numberCommands > 0)
 	{
 		short* cmd = &g_Level.Commands[anim->commandIndex];
-		int flags;
-		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -298,10 +299,12 @@ void AnimateItem(ItemInfo* item)
 					break;
 				}
 
-				flags = cmd[1] & 0xC000;
-
 				if (!Objects[item->ObjectNumber].waterCreature)
 				{
+					bool inWater = (cmd[1] & 0x8000) != 0;
+					bool inDry   = (cmd[1] & 0x4000) != 0;
+					bool always  = (inWater && inDry) || (!inWater && !inDry);
+
 					if (item->RoomNumber == NO_ROOM)
 					{
 						item->Pose.Position.x = LaraItem->Pose.Position.x;
@@ -312,10 +315,10 @@ void AnimateItem(ItemInfo* item)
 					}
 					else if (TestEnvironment(ENV_FLAG_WATER, item))
 					{
-						if (!flags || flags == (int)SoundEnvironment::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) || Objects[item->ObjectNumber].intelligent))
+						if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)))
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}
-					else if (!flags || flags == (int)SoundEnvironment::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
+					else if (always || (inDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber)))
 						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 				}
 				else
@@ -332,8 +335,7 @@ void AnimateItem(ItemInfo* item)
 					break;
 				}
 
-				effectID = cmd[1] & 0x3FFF;
-				DoFlipEffect(effectID, item);
+				DoFlipEffect((cmd[1] & 0x3FFF), item);
 
 				cmd += 2;
 				break;
