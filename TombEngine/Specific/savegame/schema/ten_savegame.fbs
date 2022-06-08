@@ -37,7 +37,7 @@ table Item {
 	collidable: bool;
 	looked_at: bool;
 	ai_bits: int32;
-	swap_mesh_flags: int32;
+	swap_mesh_flags: int64;
     data: TEN.Save.ItemData;
 	lua_name: string;
 	lua_on_killed_name: string;
