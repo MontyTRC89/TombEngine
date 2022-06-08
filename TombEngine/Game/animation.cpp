@@ -323,7 +323,7 @@ void AnimateItem(ItemInfo* item)
 				}
 				else
 				{
-					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, item));
+					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, TestEnvironment(ENV_FLAG_WATER, item) ? SoundEnvironment::Water : SoundEnvironment::Land);
 				}
 
 				break;
