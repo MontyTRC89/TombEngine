@@ -954,6 +954,23 @@ bool SaveGame::Load(int slot)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
+	// Statistics
+	Statistics.Game.AmmoHits = s->game()->ammo_hits();
+	Statistics.Game.AmmoUsed = s->game()->ammo_used();
+	Statistics.Game.Distance = s->game()->distance();
+	Statistics.Game.HealthUsed = s->game()->medipacks_used();
+	Statistics.Game.Kills = s->game()->kills();
+	Statistics.Game.Secrets = s->game()->secrets();
+	Statistics.Game.Timer = s->game()->timer();
+
+	Statistics.Level.AmmoHits = s->level()->ammo_hits();
+	Statistics.Level.AmmoUsed = s->level()->ammo_used();
+	Statistics.Level.Distance = s->level()->distance();
+	Statistics.Level.HealthUsed = s->level()->medipacks_used();
+	Statistics.Level.Kills = s->level()->kills();
+	Statistics.Level.Secrets = s->level()->secrets();
+	Statistics.Level.Timer = s->level()->timer();
+
 	// Flipmaps
 	for (int i = 0; i < s->flip_stats()->size(); i++)
 	{

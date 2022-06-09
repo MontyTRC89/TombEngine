@@ -576,16 +576,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// If not loading a savegame, then clear all the infos
-	if (!loadFromSavegame)
-	{
-		Statistics.Level.Timer = 0;
-		Statistics.Level.Distance = 0;
-		Statistics.Level.AmmoUsed = 0;
-		Statistics.Level.AmmoHits = 0;
-		Statistics.Level.Kills = 0;
-	}
-
 	// Reset all the globals for the game which needs this
 	CleanUp();
 
@@ -637,15 +627,17 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	}
 	else
 	{
+		// If not loading a savegame, then clear all the infos
+		Statistics.Level = {};
 		RequiredStartPos = false;
+
 		if (InitialiseGame)
 		{
+			// Clear all game infos as well
+			Statistics.Game = {};
 			GameTimer = 0;
-			RequiredStartPos = false;
 			InitialiseGame = false;
 		}
-
-		Statistics.Level.Timer = 0;
 	}
 
 	g_Gui.SetInventoryItemChosen(NO_ITEM);
