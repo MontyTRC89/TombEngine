@@ -263,12 +263,15 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 	}
 
-	if ((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM) &&
-		!BinocularRange &&
-		laraItem->Animation.ActiveState == LS_IDLE &&
-		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-		laraInfo->Control.HandStatus == HandStatus::Free &&
-		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
+	bool actionReady = (TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM);
+
+	bool laraAvailable = !BinocularRange &&
+						 laraItem->Animation.ActiveState == LS_IDLE &&
+						 laraItem->Animation.AnimNumber == LA_STAND_IDLE;
+
+	bool actionActive = laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber;
+
+	if (actionActive || (actionReady && laraAvailable))
 	{
 		if (TestLaraPosition(&KeyHoleBounds, keyHoleItem, laraItem))
 		{
