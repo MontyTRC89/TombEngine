@@ -418,6 +418,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.z += 80;
 				else
 					item->Pose.Position.z += 256;
+
 				break;
 
 			case 0x4000:
@@ -425,6 +426,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.x += 80;
 				else
 					item->Pose.Position.x += 256;
+
 				break;
 
 			case -0x8000:
@@ -432,6 +434,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.z -= 80;
 				else
 					item->Pose.Position.z -= 256;
+
 				break;
 
 			case -0x4000:
@@ -439,6 +442,7 @@ namespace TEN::Entities::Effects
 					item->Pose.Position.x -= 80;
 				else
 					item->Pose.Position.x -= 256;
+
 				break;
 			}
 		}
@@ -559,6 +563,7 @@ namespace TEN::Entities::Effects
 								5);
 						}
 					}
+
 					if (item->TriggerFlags != 3 || targetItem->TriggerFlags)
 						TriggerLightningGlow(dest.x, dest.y, dest.z, 64, 0, g, b);
 				}
@@ -642,22 +647,22 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	void FlameEmitterCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
+	void FlameEmitterCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (Lara.Control.Weapon.GunType != LaraWeaponType::Torch
-			|| Lara.Control.HandStatus != HandStatus::WeaponReady
-			|| Lara.LeftArm.Locked
-			|| Lara.Torch.IsLit == (item->Status & 1)
-			|| item->Timer == -1
-			|| !(TrInput & IN_ACTION)
-			|| l->Animation.ActiveState != LS_IDLE
-			|| l->Animation.AnimNumber != LA_STAND_IDLE
-			|| l->Animation.Airborne)
+		if (Lara.Control.Weapon.GunType != LaraWeaponType::Torch ||
+			Lara.Control.HandStatus != HandStatus::WeaponReady ||
+			Lara.LeftArm.Locked ||
+			Lara.Torch.IsLit == (item->Status & 1) ||
+			item->Timer == -1 ||
+			!(TrInput & IN_ACTION) ||
+			laraItem->Animation.ActiveState != LS_IDLE ||
+			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
+			laraItem->Animation.Airborne)
 		{
 			if (item->ObjectNumber == ID_BURNING_ROOTS)
-				ObjectCollision(itemNumber, l, coll);
+				ObjectCollision(itemNumber, laraItem, coll);
 		}
 		else
 		{
@@ -689,26 +694,25 @@ namespace TEN::Entities::Effects
 				FireBounds.boundingBox.Z1 = -384;
 				FireBounds.boundingBox.Z2 = 384;
 				break;
-
 			}
 
 			short oldYrot = item->Pose.Orientation.y;
-			item->Pose.Orientation.y = l->Pose.Orientation.y;
+			item->Pose.Orientation.y = laraItem->Pose.Orientation.y;
 
-			if (TestLaraPosition(&FireBounds, item, l))
+			if (TestLaraPosition(&FireBounds, item, laraItem))
 			{
 				if (item->ObjectNumber == ID_BURNING_ROOTS)
-					l->Animation.AnimNumber = LA_TORCH_LIGHT_5;
+					laraItem->Animation.AnimNumber = LA_TORCH_LIGHT_5;
 				else
 				{
 					Lara.Torch.State = TorchState::JustLit;
-					int dy = abs(l->Pose.Position.y - item->Pose.Position.y);
-					l->ItemFlags[3] = 1;
-					l->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
+					int dy = abs(laraItem->Pose.Position.y - item->Pose.Position.y);
+					laraItem->ItemFlags[3] = 1;
+					laraItem->Animation.AnimNumber = (dy >> 8) + LA_TORCH_LIGHT_1;
 				}
 
-				l->Animation.ActiveState = LS_MISC_CONTROL;
-				l->Animation.FrameNumber = g_Level.Anims[l->Animation.AnimNumber].frameBase;
+				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				Lara.Flare.ControlLeft = false;
 				Lara.LeftArm.Locked = true;
 				Lara.InteractedItem = itemNumber;
@@ -719,11 +723,11 @@ namespace TEN::Entities::Effects
 
 		if (Lara.InteractedItem == itemNumber &&
 			item->Status != ITEM_ACTIVE &&
-			l->Animation.ActiveState == LS_MISC_CONTROL)
+			laraItem->Animation.ActiveState == LS_MISC_CONTROL)
 		{
-			if (l->Animation.AnimNumber >= LA_TORCH_LIGHT_1 && l->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
+			if (laraItem->Animation.AnimNumber >= LA_TORCH_LIGHT_1 && laraItem->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if (l->Animation.FrameNumber - g_Level.Anims[l->Animation.AnimNumber].frameBase == 40)
+				if (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase == 40)
 				{
 					TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 
