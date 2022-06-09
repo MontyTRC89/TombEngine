@@ -746,7 +746,7 @@ void ProcessSectorFlags(FloorInfo* floor)
 	}
 
 	// Set climb status
-	if ((1 << (GetQuadrant(LaraItem->Pose.Orientation.y) + 8)) & GetClimbFlags(floor))
+	if (TestLaraNearClimbableWall(LaraItem, floor))
 		Lara.Control.CanClimbLadder = true;
 	else
 		Lara.Control.CanClimbLadder = false;

@@ -32,6 +32,18 @@ extern RendererHUDBar* g_AirBar;
 
 bool EnableSmoothHealthBar = true;
 
+void DrawHUD(ItemInfo* item)
+{
+	if (CurrentLevel == 0 || CinematicBarsHeight > 0)
+		return;
+
+	int flash = FlashIt();
+	UpdateSprintBar(LaraItem);
+	UpdateHealthBar(LaraItem, flash);
+	UpdateAirBar(LaraItem, flash);
+	DrawAllPickups();
+}
+
 void DrawHealthBarOverlay(ItemInfo* item, int value)
 {
 	auto* lara = GetLaraInfo(item);

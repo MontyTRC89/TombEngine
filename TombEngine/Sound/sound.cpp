@@ -706,7 +706,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Level.Rooms[Camera.pos.roomNumber].reverbType;
+	auto roomReverb = g_Configuration.EnableAudioSpecialEffects ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -874,9 +874,9 @@ int GetShatterSound(int shatterID)
 		return fxID;
 
 	if (shatterID < 3)
-		return 1095;
+		return SFX_TR5_SMASH_WOOD;
 	else
-		return 1092;
+		return SFX_TR5_SMASH_GLASS;
 }
 
 void PlaySoundSources()

@@ -306,6 +306,11 @@ namespace TEN::Entities::TR4
 
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
+
+		// Don't focus on disabled items
+		if (creature->Enemy && (creature->Enemy->Flags & IFLAG_KILLED))
+			creature->Enemy = nullptr;
+
 		auto* enemyItem = creature->Enemy;
 		auto* object = &Objects[ID_BADDY1];
 
