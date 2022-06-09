@@ -263,17 +263,12 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 	}
 
-	if (!((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM) &&
+	if ((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM) &&
 		!BinocularRange &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
-		laraItem->Animation.AnimNumber == LA_STAND_IDLE) &&
+		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
-	{
-		if (keyHoleItem->ObjectNumber < ID_KEY_HOLE6)
-			ObjectCollision(itemNumber, laraItem, coll);
-	}
-	else
 	{
 		if (TestLaraPosition(&KeyHoleBounds, keyHoleItem, laraItem))
 		{
@@ -334,6 +329,11 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Free;
 		}
+	}
+	else
+	{
+		if (keyHoleItem->ObjectNumber < ID_KEY_HOLE6)
+			ObjectCollision(itemNumber, laraItem, coll);
 	}
 
 	return;
