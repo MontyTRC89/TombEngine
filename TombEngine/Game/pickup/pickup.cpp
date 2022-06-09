@@ -694,32 +694,60 @@ void RegeneratePickups()
 		if (item->Status == ITEM_INVISIBLE)
 		{
 			short ammo = 0;
-			if (item->ObjectNumber == ID_CROSSBOW_AMMO1_ITEM)
+			switch (item->ObjectNumber)
+			{
+			case ID_CROSSBOW_AMMO1_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_CROSSBOW_AMMO2_ITEM)
+				break;
+
+			case ID_CROSSBOW_AMMO2_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2];
-			else if (item->ObjectNumber == ID_CROSSBOW_AMMO3_ITEM)
+				break;
+
+			case ID_CROSSBOW_AMMO3_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3];
-			else if(item->ObjectNumber == ID_GRENADE_AMMO1_ITEM)
+				break;
+
+			case ID_GRENADE_AMMO1_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_GRENADE_AMMO2_ITEM)
+				break;
+
+			case ID_GRENADE_AMMO2_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2];
-			else if (item->ObjectNumber == ID_GRENADE_AMMO3_ITEM)
+				break;
+
+			case ID_GRENADE_AMMO3_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3];
-			else if (item->ObjectNumber == ID_HK_AMMO_ITEM)
+				break;
+
+			case ID_HK_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_UZI_AMMO_ITEM)
+				break;
+
+			case ID_UZI_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_HARPOON_AMMO_ITEM)
+				break;
+
+			case ID_HARPOON_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_ROCKET_LAUNCHER_AMMO_ITEM)
+				break;
+
+			case ID_ROCKET_LAUNCHER_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_REVOLVER_AMMO_ITEM)
+				break;
+
+			case ID_REVOLVER_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_SHOTGUN_AMMO1_ITEM)
+				break;
+
+			case ID_SHOTGUN_AMMO1_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1];
-			else if (item->ObjectNumber == ID_SHOTGUN_AMMO1_ITEM)
+				break;
+
+			case ID_SHOTGUN_AMMO2_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2];
+				break;
+			}
 
 			if (ammo == 0)
 				item->Status = ITEM_NOT_ACTIVE;
