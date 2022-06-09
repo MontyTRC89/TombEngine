@@ -171,7 +171,7 @@ namespace TEN::Entities::Effects
 
 	void FlameEmitter2Control(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item))
 		{
@@ -267,7 +267,7 @@ namespace TEN::Entities::Effects
 
 	void FlameControl(short fxNumber)
 	{
-		FX_INFO* fx = &EffectList[fxNumber];
+		auto* fx = &EffectList[fxNumber];
 
 		for (int i = 0; i < 14; i++)
 		{
@@ -295,7 +295,7 @@ namespace TEN::Entities::Effects
 		byte g = (GetRandomControl() & 0x1F) + 96;
 		byte b;
 
-		Vector3Int pos{ 0,0,0 };
+		auto pos = Vector3Int();
 		GetLaraJointPosition(&pos, LM_HIPS);
 
 		if (!Lara.BurnSmoke)
@@ -349,8 +349,8 @@ namespace TEN::Entities::Effects
 		if (LaraItem->RoomNumber != fx->roomNumber)
 			EffectNewRoom(fxNumber, LaraItem->RoomNumber);
 
-		int wh = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
-		if (wh == NO_HEIGHT || fx->pos.Position.y <= wh || Lara.BurnBlue)
+		int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
+		if (waterHeight == NO_HEIGHT || fx->pos.Position.y <= waterHeight || Lara.BurnBlue)
 		{
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos);
 
@@ -372,7 +372,7 @@ namespace TEN::Entities::Effects
 
 	void InitialiseFlameEmitter(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->TriggerFlags < 0)
 		{
@@ -405,7 +405,7 @@ namespace TEN::Entities::Effects
 
 	void InitialiseFlameEmitter2(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		item->Pose.Position.y -= 64;
 
@@ -446,13 +446,13 @@ namespace TEN::Entities::Effects
 
 	void InitialiseFlameEmitter3(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (item->TriggerFlags >= 3)
 		{
 			for (int i = 0; i < g_Level.NumItems; i++)
 			{
-				ItemInfo* currentItem = &g_Level.Items[i];
+				auto* currentItem = &g_Level.Items[i];
 
 				if (currentItem->ObjectNumber == ID_ANIMATING3)
 				{
@@ -467,7 +467,7 @@ namespace TEN::Entities::Effects
 
 	void FlameEmitter3Control(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (TriggerActive(item))
 		{
@@ -478,12 +478,8 @@ namespace TEN::Entities::Effects
 				byte g = (GetRandomControl() & 0x3F) + 192;
 				byte b = (GetRandomControl() & 0x3F) + 192;
 
-				Vector3Int src;
+				auto src = item->Pose.Position;
 				Vector3Int dest;
-
-				src.x = item->Pose.Position.x;
-				src.y = item->Pose.Position.y;
-				src.z = item->Pose.Position.z;
 
 				if (!(GlobalCounter & 3))
 				{
@@ -527,11 +523,9 @@ namespace TEN::Entities::Effects
 				if (item->TriggerFlags >= 3 && !(GlobalCounter & 1))
 				{
 					short targetItemNumber = item->ItemFlags[((GlobalCounter >> 2) & 1) + 2];
-					ItemInfo* targetItem = &g_Level.Items[targetItemNumber];
+					auto* targetItem = &g_Level.Items[targetItemNumber];
 
-					dest.x = 0;
-					dest.y = -64;
-					dest.z = 20;
+					dest = Vector3Int(0, -64, 20);
 					GetJointAbsPosition(targetItem, &dest, 0);
 
 					if (!(GlobalCounter & 3))
@@ -571,13 +565,13 @@ namespace TEN::Entities::Effects
 
 				if ((GlobalCounter & 3) == 2)
 				{
-					src.x = item->Pose.Position.x;
-					src.y = item->Pose.Position.y;
-					src.z = item->Pose.Position.z;
+					src = item->Pose.Position;
 
-					dest.x = (GetRandomControl() & 0x1FF) + src.x - 256;
-					dest.y = (GetRandomControl() & 0x1FF) + src.y - 256;
-					dest.z = (GetRandomControl() & 0x1FF) + src.z - 256;
+					dest = Vector3Int(
+						(GetRandomControl() & 0x1FF) + src.x - 256,
+						(GetRandomControl() & 0x1FF) + src.y - 256,
+						(GetRandomControl() & 0x1FF) + src.z - 256
+					);
 
 					TriggerLightning(
 						&src, 
@@ -597,9 +591,7 @@ namespace TEN::Entities::Effects
 			{
 				// Small fires
 				if (item->ItemFlags[0] != 0)
-				{
 					item->ItemFlags[0]--;
-				}
 				else
 				{
 					item->ItemFlags[0] = (GetRandomControl() & 3) + 8;
@@ -630,10 +622,7 @@ namespace TEN::Entities::Effects
 
 				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
-				PHD_3DPOS pos;
-				pos.Position.x = item->Pose.Position.x;
-				pos.Position.y = item->Pose.Position.y;
-				pos.Position.z = item->Pose.Position.z;
+				auto pos = PHD_3DPOS(item->Pose.Position);
 
 				if (ItemNearLara(&pos, 600))
 				{
@@ -655,7 +644,7 @@ namespace TEN::Entities::Effects
 
 	void FlameEmitterCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Torch
 			|| Lara.Control.HandStatus != HandStatus::WeaponReady
@@ -709,9 +698,7 @@ namespace TEN::Entities::Effects
 			if (TestLaraPosition(&FireBounds, item, l))
 			{
 				if (item->ObjectNumber == ID_BURNING_ROOTS)
-				{
 					l->Animation.AnimNumber = LA_TORCH_LIGHT_5;
-				}
 				else
 				{
 					Lara.Torch.State = TorchState::JustLit;
@@ -730,9 +717,9 @@ namespace TEN::Entities::Effects
 			item->Pose.Orientation.y = oldYrot;
 		}
 
-		if (Lara.InteractedItem == itemNumber
-			&& item->Status != ITEM_ACTIVE
-			&& l->Animation.ActiveState == LS_MISC_CONTROL)
+		if (Lara.InteractedItem == itemNumber &&
+			item->Status != ITEM_ACTIVE &&
+			l->Animation.ActiveState == LS_MISC_CONTROL)
 		{
 			if (l->Animation.AnimNumber >= LA_TORCH_LIGHT_1 && l->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
