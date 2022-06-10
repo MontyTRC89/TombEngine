@@ -8,6 +8,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -627,6 +628,59 @@ bool SaveGame::Save(int slot)
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
 
+	// Particles
+	std::vector<flatbuffers::Offset<Save::SparkInfo>> sparks;
+	for (int i = 0; i < MAX_SPARKS; i++)
+	{
+		auto* spark = &Sparks[i];
+
+		if (!spark->on)
+			continue;
+
+		Save::SparkInfoBuilder sparkInfo{ fbb };
+
+		sparkInfo.add_b(spark->b);
+		sparkInfo.add_colFadeSpeed(spark->colFadeSpeed);
+		sparkInfo.add_dB(spark->dB);
+		sparkInfo.add_def(spark->def);
+		sparkInfo.add_dG(spark->dG);
+		sparkInfo.add_dR(spark->dR);
+		sparkInfo.add_dSize(spark->dSize);
+		sparkInfo.add_dynamic(spark->dynamic);
+		sparkInfo.add_extras(spark->extras);
+		sparkInfo.add_fadeToBlack(spark->fadeToBlack);
+		sparkInfo.add_flags(spark->flags);
+		sparkInfo.add_friction(spark->friction);
+		sparkInfo.add_fxObj(spark->fxObj);
+		sparkInfo.add_g(spark->g);
+		sparkInfo.add_gravity(spark->gravity);
+		sparkInfo.add_life(spark->life);
+		sparkInfo.add_maxYvel(spark->maxYvel);
+		sparkInfo.add_nodeNumber(spark->nodeNumber);
+		sparkInfo.add_on(spark->on);
+		sparkInfo.add_r(spark->r);
+		sparkInfo.add_roomNumber(spark->roomNumber);
+		sparkInfo.add_rotAdd(spark->rotAdd);
+		sparkInfo.add_rotAng(spark->rotAng);
+		sparkInfo.add_sB(spark->sB);
+		sparkInfo.add_scalar(spark->scalar);
+		sparkInfo.add_sG(spark->sG);
+		sparkInfo.add_size(spark->size);
+		sparkInfo.add_sLife(spark->sLife);
+		sparkInfo.add_sR(spark->sR);
+		sparkInfo.add_sSize(spark->sSize);
+		sparkInfo.add_transType(spark->transType);
+		sparkInfo.add_x(spark->x);
+		sparkInfo.add_xVel(spark->sSize);
+		sparkInfo.add_y(spark->y);
+		sparkInfo.add_yVel(spark->yVel);
+		sparkInfo.add_z(spark->z);
+		sparkInfo.add_zVel(spark->zVel);
+
+		sparks.push_back(sparkInfo.Finish());
+	}
+	auto sparkCamerasOffset = fbb.CreateVector(sparks);
+
 	// Particle enemies
 	std::vector<flatbuffers::Offset<Save::BatInfo>> bats;
 	for (int i = 0; i < NUM_BATS; i++)
@@ -905,6 +959,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_timer(0);
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
+	sgb.add_sparks(sparkCamerasOffset);
 	sgb.add_bats(batsOffset);
 	sgb.add_rats(ratsOffset);
 	sgb.add_spiders(spidersOffset);
@@ -1203,6 +1258,50 @@ bool SaveGame::Load(int slot)
 
 		if (obj->floor != nullptr)
 			UpdateBridgeItem(i);
+	}
+
+	for (int i = 0; i < s->sparks()->size(); i++)
+	{
+		auto sparkInfo = s->sparks()->Get(i);
+		auto* spark = &Sparks[i];
+
+		spark->x = sparkInfo->x();
+		spark->y = sparkInfo->y();
+		spark->z = sparkInfo->z();
+		spark->xVel = sparkInfo->xVel();
+		spark->yVel = sparkInfo->yVel();
+		spark->zVel = sparkInfo->zVel();
+		spark->gravity = sparkInfo->gravity();
+		spark->rotAng = sparkInfo->rotAng();
+		spark->flags = sparkInfo->flags();
+		spark->sSize = sparkInfo->sSize();
+		spark->dSize = sparkInfo->dSize();
+		spark->size = sparkInfo->size();
+		spark->friction = sparkInfo->friction();
+		spark->scalar = sparkInfo->scalar();
+		spark->def = sparkInfo->def();
+		spark->rotAdd = sparkInfo->rotAdd();
+		spark->maxYvel = sparkInfo->maxYvel();
+		spark->on = sparkInfo->on();
+		spark->sR = sparkInfo->sR();
+		spark->sG = sparkInfo->sG();
+		spark->sB = sparkInfo->sB();
+		spark->dR = sparkInfo->dR();
+		spark->dG = sparkInfo->dG();
+		spark->dB = sparkInfo->dB();
+		spark->r = sparkInfo->r();
+		spark->g = sparkInfo->g();
+		spark->b = sparkInfo->b();
+		spark->colFadeSpeed = sparkInfo->colFadeSpeed();
+		spark->fadeToBlack = sparkInfo->fadeToBlack();
+		spark->sLife = sparkInfo->sLife();
+		spark->life = sparkInfo->life();
+		spark->transType = (BLEND_MODES)sparkInfo->transType();
+		spark->extras = sparkInfo->extras();
+		spark->dynamic = sparkInfo->dynamic();
+		spark->fxObj = sparkInfo->fxObj();
+		spark->roomNumber = sparkInfo->roomNumber();
+		spark->nodeNumber = sparkInfo->nodeNumber();
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)

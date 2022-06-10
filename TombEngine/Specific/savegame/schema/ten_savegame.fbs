@@ -269,6 +269,46 @@ table StaticMeshInfo {
 	flags: int32;
 }
 
+table SparkInfo {
+	x: int32;
+	y: int32;
+	z: int32;
+	xVel: int32;
+	yVel: int32;
+	zVel: int32;
+	gravity: int32;
+	rotAng: int32;
+	flags: int32;
+	sSize: float;
+	dSize: float;
+	size: float;
+	friction: int32;
+	scalar: int32;
+	def: int32;
+	rotAdd: int32;
+	maxYvel: int32;
+	on: bool;
+	sR: int32;
+	sG: int32;
+	sB: int32;
+	dR: int32;
+	dG: int32;
+	dB: int32;
+	r: int32;
+	g: int32;
+	b: int32;
+	colFadeSpeed: int32;
+	fadeToBlack: int32;
+	sLife: int32;
+	life: int32;
+	transType: int32;
+	extras: int32;
+	dynamic: int32;
+	fxObj: int32;
+	roomNumber: int32;
+	nodeNumber: int32;
+}
+
 table RatInfo {
 	on: bool;
 	x: int32;
@@ -405,6 +445,7 @@ table SaveGame {
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];
 	flyby_cameras: [FlyByCamera];
+	sparks: [SparkInfo];
 	rats: [RatInfo];
 	spiders: [SpiderInfo];
 	scarabs: [ScarabInfo];

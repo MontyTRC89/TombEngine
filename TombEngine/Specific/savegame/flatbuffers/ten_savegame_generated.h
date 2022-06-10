@@ -97,6 +97,10 @@ struct StaticMeshInfo;
 struct StaticMeshInfoBuilder;
 struct StaticMeshInfoT;
 
+struct SparkInfo;
+struct SparkInfoBuilder;
+struct SparkInfoT;
+
 struct RatInfo;
 struct RatInfoBuilder;
 struct RatInfoT;
@@ -3975,6 +3979,460 @@ struct StaticMeshInfo::Traits {
 
 flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(flatbuffers::FlatBufferBuilder &_fbb, const StaticMeshInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct SparkInfoT : public flatbuffers::NativeTable {
+  typedef SparkInfo TableType;
+  int32_t x = 0;
+  int32_t y = 0;
+  int32_t z = 0;
+  int32_t xVel = 0;
+  int32_t yVel = 0;
+  int32_t zVel = 0;
+  int32_t gravity = 0;
+  int32_t rotAng = 0;
+  int32_t flags = 0;
+  float sSize = 0.0f;
+  float dSize = 0.0f;
+  float size = 0.0f;
+  int32_t friction = 0;
+  int32_t scalar = 0;
+  int32_t def = 0;
+  int32_t rotAdd = 0;
+  int32_t maxYvel = 0;
+  bool on = false;
+  int32_t sR = 0;
+  int32_t sG = 0;
+  int32_t sB = 0;
+  int32_t dR = 0;
+  int32_t dG = 0;
+  int32_t dB = 0;
+  int32_t r = 0;
+  int32_t g = 0;
+  int32_t b = 0;
+  int32_t colFadeSpeed = 0;
+  int32_t fadeToBlack = 0;
+  int32_t sLife = 0;
+  int32_t life = 0;
+  int32_t transType = 0;
+  int32_t extras = 0;
+  int32_t dynamic = 0;
+  int32_t fxObj = 0;
+  int32_t roomNumber = 0;
+  int32_t nodeNumber = 0;
+};
+
+struct SparkInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef SparkInfoT NativeTableType;
+  typedef SparkInfoBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_X = 4,
+    VT_Y = 6,
+    VT_Z = 8,
+    VT_XVEL = 10,
+    VT_YVEL = 12,
+    VT_ZVEL = 14,
+    VT_GRAVITY = 16,
+    VT_ROTANG = 18,
+    VT_FLAGS = 20,
+    VT_SSIZE = 22,
+    VT_DSIZE = 24,
+    VT_SIZE = 26,
+    VT_FRICTION = 28,
+    VT_SCALAR = 30,
+    VT_DEF = 32,
+    VT_ROTADD = 34,
+    VT_MAXYVEL = 36,
+    VT_ON = 38,
+    VT_SR = 40,
+    VT_SG = 42,
+    VT_SB = 44,
+    VT_DR = 46,
+    VT_DG = 48,
+    VT_DB = 50,
+    VT_R = 52,
+    VT_G = 54,
+    VT_B = 56,
+    VT_COLFADESPEED = 58,
+    VT_FADETOBLACK = 60,
+    VT_SLIFE = 62,
+    VT_LIFE = 64,
+    VT_TRANSTYPE = 66,
+    VT_EXTRAS = 68,
+    VT_DYNAMIC = 70,
+    VT_FXOBJ = 72,
+    VT_ROOMNUMBER = 74,
+    VT_NODENUMBER = 76
+  };
+  int32_t x() const {
+    return GetField<int32_t>(VT_X, 0);
+  }
+  int32_t y() const {
+    return GetField<int32_t>(VT_Y, 0);
+  }
+  int32_t z() const {
+    return GetField<int32_t>(VT_Z, 0);
+  }
+  int32_t xVel() const {
+    return GetField<int32_t>(VT_XVEL, 0);
+  }
+  int32_t yVel() const {
+    return GetField<int32_t>(VT_YVEL, 0);
+  }
+  int32_t zVel() const {
+    return GetField<int32_t>(VT_ZVEL, 0);
+  }
+  int32_t gravity() const {
+    return GetField<int32_t>(VT_GRAVITY, 0);
+  }
+  int32_t rotAng() const {
+    return GetField<int32_t>(VT_ROTANG, 0);
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
+  float sSize() const {
+    return GetField<float>(VT_SSIZE, 0.0f);
+  }
+  float dSize() const {
+    return GetField<float>(VT_DSIZE, 0.0f);
+  }
+  float size() const {
+    return GetField<float>(VT_SIZE, 0.0f);
+  }
+  int32_t friction() const {
+    return GetField<int32_t>(VT_FRICTION, 0);
+  }
+  int32_t scalar() const {
+    return GetField<int32_t>(VT_SCALAR, 0);
+  }
+  int32_t def() const {
+    return GetField<int32_t>(VT_DEF, 0);
+  }
+  int32_t rotAdd() const {
+    return GetField<int32_t>(VT_ROTADD, 0);
+  }
+  int32_t maxYvel() const {
+    return GetField<int32_t>(VT_MAXYVEL, 0);
+  }
+  bool on() const {
+    return GetField<uint8_t>(VT_ON, 0) != 0;
+  }
+  int32_t sR() const {
+    return GetField<int32_t>(VT_SR, 0);
+  }
+  int32_t sG() const {
+    return GetField<int32_t>(VT_SG, 0);
+  }
+  int32_t sB() const {
+    return GetField<int32_t>(VT_SB, 0);
+  }
+  int32_t dR() const {
+    return GetField<int32_t>(VT_DR, 0);
+  }
+  int32_t dG() const {
+    return GetField<int32_t>(VT_DG, 0);
+  }
+  int32_t dB() const {
+    return GetField<int32_t>(VT_DB, 0);
+  }
+  int32_t r() const {
+    return GetField<int32_t>(VT_R, 0);
+  }
+  int32_t g() const {
+    return GetField<int32_t>(VT_G, 0);
+  }
+  int32_t b() const {
+    return GetField<int32_t>(VT_B, 0);
+  }
+  int32_t colFadeSpeed() const {
+    return GetField<int32_t>(VT_COLFADESPEED, 0);
+  }
+  int32_t fadeToBlack() const {
+    return GetField<int32_t>(VT_FADETOBLACK, 0);
+  }
+  int32_t sLife() const {
+    return GetField<int32_t>(VT_SLIFE, 0);
+  }
+  int32_t life() const {
+    return GetField<int32_t>(VT_LIFE, 0);
+  }
+  int32_t transType() const {
+    return GetField<int32_t>(VT_TRANSTYPE, 0);
+  }
+  int32_t extras() const {
+    return GetField<int32_t>(VT_EXTRAS, 0);
+  }
+  int32_t dynamic() const {
+    return GetField<int32_t>(VT_DYNAMIC, 0);
+  }
+  int32_t fxObj() const {
+    return GetField<int32_t>(VT_FXOBJ, 0);
+  }
+  int32_t roomNumber() const {
+    return GetField<int32_t>(VT_ROOMNUMBER, 0);
+  }
+  int32_t nodeNumber() const {
+    return GetField<int32_t>(VT_NODENUMBER, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_X) &&
+           VerifyField<int32_t>(verifier, VT_Y) &&
+           VerifyField<int32_t>(verifier, VT_Z) &&
+           VerifyField<int32_t>(verifier, VT_XVEL) &&
+           VerifyField<int32_t>(verifier, VT_YVEL) &&
+           VerifyField<int32_t>(verifier, VT_ZVEL) &&
+           VerifyField<int32_t>(verifier, VT_GRAVITY) &&
+           VerifyField<int32_t>(verifier, VT_ROTANG) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
+           VerifyField<float>(verifier, VT_SSIZE) &&
+           VerifyField<float>(verifier, VT_DSIZE) &&
+           VerifyField<float>(verifier, VT_SIZE) &&
+           VerifyField<int32_t>(verifier, VT_FRICTION) &&
+           VerifyField<int32_t>(verifier, VT_SCALAR) &&
+           VerifyField<int32_t>(verifier, VT_DEF) &&
+           VerifyField<int32_t>(verifier, VT_ROTADD) &&
+           VerifyField<int32_t>(verifier, VT_MAXYVEL) &&
+           VerifyField<uint8_t>(verifier, VT_ON) &&
+           VerifyField<int32_t>(verifier, VT_SR) &&
+           VerifyField<int32_t>(verifier, VT_SG) &&
+           VerifyField<int32_t>(verifier, VT_SB) &&
+           VerifyField<int32_t>(verifier, VT_DR) &&
+           VerifyField<int32_t>(verifier, VT_DG) &&
+           VerifyField<int32_t>(verifier, VT_DB) &&
+           VerifyField<int32_t>(verifier, VT_R) &&
+           VerifyField<int32_t>(verifier, VT_G) &&
+           VerifyField<int32_t>(verifier, VT_B) &&
+           VerifyField<int32_t>(verifier, VT_COLFADESPEED) &&
+           VerifyField<int32_t>(verifier, VT_FADETOBLACK) &&
+           VerifyField<int32_t>(verifier, VT_SLIFE) &&
+           VerifyField<int32_t>(verifier, VT_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_TRANSTYPE) &&
+           VerifyField<int32_t>(verifier, VT_EXTRAS) &&
+           VerifyField<int32_t>(verifier, VT_DYNAMIC) &&
+           VerifyField<int32_t>(verifier, VT_FXOBJ) &&
+           VerifyField<int32_t>(verifier, VT_ROOMNUMBER) &&
+           VerifyField<int32_t>(verifier, VT_NODENUMBER) &&
+           verifier.EndTable();
+  }
+  SparkInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(SparkInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<SparkInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const SparkInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct SparkInfoBuilder {
+  typedef SparkInfo Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_x(int32_t x) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_X, x, 0);
+  }
+  void add_y(int32_t y) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_Y, y, 0);
+  }
+  void add_z(int32_t z) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_Z, z, 0);
+  }
+  void add_xVel(int32_t xVel) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_XVEL, xVel, 0);
+  }
+  void add_yVel(int32_t yVel) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_YVEL, yVel, 0);
+  }
+  void add_zVel(int32_t zVel) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_ZVEL, zVel, 0);
+  }
+  void add_gravity(int32_t gravity) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_GRAVITY, gravity, 0);
+  }
+  void add_rotAng(int32_t rotAng) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_ROTANG, rotAng, 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_FLAGS, flags, 0);
+  }
+  void add_sSize(float sSize) {
+    fbb_.AddElement<float>(SparkInfo::VT_SSIZE, sSize, 0.0f);
+  }
+  void add_dSize(float dSize) {
+    fbb_.AddElement<float>(SparkInfo::VT_DSIZE, dSize, 0.0f);
+  }
+  void add_size(float size) {
+    fbb_.AddElement<float>(SparkInfo::VT_SIZE, size, 0.0f);
+  }
+  void add_friction(int32_t friction) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_FRICTION, friction, 0);
+  }
+  void add_scalar(int32_t scalar) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_SCALAR, scalar, 0);
+  }
+  void add_def(int32_t def) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_DEF, def, 0);
+  }
+  void add_rotAdd(int32_t rotAdd) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_ROTADD, rotAdd, 0);
+  }
+  void add_maxYvel(int32_t maxYvel) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_MAXYVEL, maxYvel, 0);
+  }
+  void add_on(bool on) {
+    fbb_.AddElement<uint8_t>(SparkInfo::VT_ON, static_cast<uint8_t>(on), 0);
+  }
+  void add_sR(int32_t sR) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_SR, sR, 0);
+  }
+  void add_sG(int32_t sG) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_SG, sG, 0);
+  }
+  void add_sB(int32_t sB) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_SB, sB, 0);
+  }
+  void add_dR(int32_t dR) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_DR, dR, 0);
+  }
+  void add_dG(int32_t dG) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_DG, dG, 0);
+  }
+  void add_dB(int32_t dB) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_DB, dB, 0);
+  }
+  void add_r(int32_t r) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_R, r, 0);
+  }
+  void add_g(int32_t g) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_G, g, 0);
+  }
+  void add_b(int32_t b) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_B, b, 0);
+  }
+  void add_colFadeSpeed(int32_t colFadeSpeed) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_COLFADESPEED, colFadeSpeed, 0);
+  }
+  void add_fadeToBlack(int32_t fadeToBlack) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_FADETOBLACK, fadeToBlack, 0);
+  }
+  void add_sLife(int32_t sLife) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_SLIFE, sLife, 0);
+  }
+  void add_life(int32_t life) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_LIFE, life, 0);
+  }
+  void add_transType(int32_t transType) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_TRANSTYPE, transType, 0);
+  }
+  void add_extras(int32_t extras) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_EXTRAS, extras, 0);
+  }
+  void add_dynamic(int32_t dynamic) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_DYNAMIC, dynamic, 0);
+  }
+  void add_fxObj(int32_t fxObj) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_FXOBJ, fxObj, 0);
+  }
+  void add_roomNumber(int32_t roomNumber) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_ROOMNUMBER, roomNumber, 0);
+  }
+  void add_nodeNumber(int32_t nodeNumber) {
+    fbb_.AddElement<int32_t>(SparkInfo::VT_NODENUMBER, nodeNumber, 0);
+  }
+  explicit SparkInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<SparkInfo> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<SparkInfo>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<SparkInfo> CreateSparkInfo(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t x = 0,
+    int32_t y = 0,
+    int32_t z = 0,
+    int32_t xVel = 0,
+    int32_t yVel = 0,
+    int32_t zVel = 0,
+    int32_t gravity = 0,
+    int32_t rotAng = 0,
+    int32_t flags = 0,
+    float sSize = 0.0f,
+    float dSize = 0.0f,
+    float size = 0.0f,
+    int32_t friction = 0,
+    int32_t scalar = 0,
+    int32_t def = 0,
+    int32_t rotAdd = 0,
+    int32_t maxYvel = 0,
+    bool on = false,
+    int32_t sR = 0,
+    int32_t sG = 0,
+    int32_t sB = 0,
+    int32_t dR = 0,
+    int32_t dG = 0,
+    int32_t dB = 0,
+    int32_t r = 0,
+    int32_t g = 0,
+    int32_t b = 0,
+    int32_t colFadeSpeed = 0,
+    int32_t fadeToBlack = 0,
+    int32_t sLife = 0,
+    int32_t life = 0,
+    int32_t transType = 0,
+    int32_t extras = 0,
+    int32_t dynamic = 0,
+    int32_t fxObj = 0,
+    int32_t roomNumber = 0,
+    int32_t nodeNumber = 0) {
+  SparkInfoBuilder builder_(_fbb);
+  builder_.add_nodeNumber(nodeNumber);
+  builder_.add_roomNumber(roomNumber);
+  builder_.add_fxObj(fxObj);
+  builder_.add_dynamic(dynamic);
+  builder_.add_extras(extras);
+  builder_.add_transType(transType);
+  builder_.add_life(life);
+  builder_.add_sLife(sLife);
+  builder_.add_fadeToBlack(fadeToBlack);
+  builder_.add_colFadeSpeed(colFadeSpeed);
+  builder_.add_b(b);
+  builder_.add_g(g);
+  builder_.add_r(r);
+  builder_.add_dB(dB);
+  builder_.add_dG(dG);
+  builder_.add_dR(dR);
+  builder_.add_sB(sB);
+  builder_.add_sG(sG);
+  builder_.add_sR(sR);
+  builder_.add_maxYvel(maxYvel);
+  builder_.add_rotAdd(rotAdd);
+  builder_.add_def(def);
+  builder_.add_scalar(scalar);
+  builder_.add_friction(friction);
+  builder_.add_size(size);
+  builder_.add_dSize(dSize);
+  builder_.add_sSize(sSize);
+  builder_.add_flags(flags);
+  builder_.add_rotAng(rotAng);
+  builder_.add_gravity(gravity);
+  builder_.add_zVel(zVel);
+  builder_.add_yVel(yVel);
+  builder_.add_xVel(xVel);
+  builder_.add_z(z);
+  builder_.add_y(y);
+  builder_.add_x(x);
+  builder_.add_on(on);
+  return builder_.Finish();
+}
+
+struct SparkInfo::Traits {
+  using type = SparkInfo;
+  static auto constexpr Create = CreateSparkInfo;
+};
+
+flatbuffers::Offset<SparkInfo> CreateSparkInfo(flatbuffers::FlatBufferBuilder &_fbb, const SparkInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct RatInfoT : public flatbuffers::NativeTable {
   typedef RatInfo TableType;
   bool on = false;
@@ -5535,6 +5993,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::vector<std::unique_ptr<TEN::Save::SinkT>> sinks{};
   std::vector<std::unique_ptr<TEN::Save::StaticMeshInfoT>> static_meshes{};
   std::vector<std::unique_ptr<TEN::Save::FlyByCameraT>> flyby_cameras{};
+  std::vector<std::unique_ptr<TEN::Save::SparkInfoT>> sparks{};
   std::vector<std::unique_ptr<TEN::Save::RatInfoT>> rats{};
   std::vector<std::unique_ptr<TEN::Save::SpiderInfoT>> spiders{};
   std::vector<std::unique_ptr<TEN::Save::ScarabInfoT>> scarabs{};
@@ -5572,24 +6031,25 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_SINKS = 22,
     VT_STATIC_MESHES = 24,
     VT_FLYBY_CAMERAS = 26,
-    VT_RATS = 28,
-    VT_SPIDERS = 30,
-    VT_SCARABS = 32,
-    VT_BATS = 34,
-    VT_FLIP_MAPS = 36,
-    VT_FLIP_STATS = 38,
-    VT_FLIP_EFFECT = 40,
-    VT_FLIP_TIMER = 42,
-    VT_FLIP_STATUS = 44,
-    VT_AMBIENT_TRACK = 46,
-    VT_AMBIENT_POSITION = 48,
-    VT_ONESHOT_TRACK = 50,
-    VT_ONESHOT_POSITION = 52,
-    VT_CD_FLAGS = 54,
-    VT_ROPE = 56,
-    VT_PENDULUM = 58,
-    VT_ALTERNATE_PENDULUM = 60,
-    VT_SCRIPT_VARS = 62
+    VT_SPARKS = 28,
+    VT_RATS = 30,
+    VT_SPIDERS = 32,
+    VT_SCARABS = 34,
+    VT_BATS = 36,
+    VT_FLIP_MAPS = 38,
+    VT_FLIP_STATS = 40,
+    VT_FLIP_EFFECT = 42,
+    VT_FLIP_TIMER = 44,
+    VT_FLIP_STATUS = 46,
+    VT_AMBIENT_TRACK = 48,
+    VT_AMBIENT_POSITION = 50,
+    VT_ONESHOT_TRACK = 52,
+    VT_ONESHOT_POSITION = 54,
+    VT_CD_FLAGS = 56,
+    VT_ROPE = 58,
+    VT_PENDULUM = 60,
+    VT_ALTERNATE_PENDULUM = 62,
+    VT_SCRIPT_VARS = 64
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -5626,6 +6086,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *flyby_cameras() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *>(VT_FLYBY_CAMERAS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::SparkInfo>> *sparks() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::SparkInfo>> *>(VT_SPARKS);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>> *rats() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>> *>(VT_RATS);
@@ -5710,6 +6173,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_FLYBY_CAMERAS) &&
            verifier.VerifyVector(flyby_cameras()) &&
            verifier.VerifyVectorOfTables(flyby_cameras()) &&
+           VerifyOffset(verifier, VT_SPARKS) &&
+           verifier.VerifyVector(sparks()) &&
+           verifier.VerifyVectorOfTables(sparks()) &&
            VerifyOffset(verifier, VT_RATS) &&
            verifier.VerifyVector(rats()) &&
            verifier.VerifyVectorOfTables(rats()) &&
@@ -5792,6 +6258,9 @@ struct SaveGameBuilder {
   void add_flyby_cameras(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>>> flyby_cameras) {
     fbb_.AddOffset(SaveGame::VT_FLYBY_CAMERAS, flyby_cameras);
   }
+  void add_sparks(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::SparkInfo>>> sparks) {
+    fbb_.AddOffset(SaveGame::VT_SPARKS, sparks);
+  }
   void add_rats(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>>> rats) {
     fbb_.AddOffset(SaveGame::VT_RATS, rats);
   }
@@ -5871,6 +6340,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Sink>>> sinks = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>> static_meshes = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>>> flyby_cameras = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::SparkInfo>>> sparks = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>>> rats = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::SpiderInfo>>> spiders = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScarabInfo>>> scarabs = 0,
@@ -5908,6 +6378,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_scarabs(scarabs);
   builder_.add_spiders(spiders);
   builder_.add_rats(rats);
+  builder_.add_sparks(sparks);
   builder_.add_flyby_cameras(flyby_cameras);
   builder_.add_static_meshes(static_meshes);
   builder_.add_sinks(sinks);
@@ -5942,6 +6413,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     const std::vector<flatbuffers::Offset<TEN::Save::Sink>> *sinks = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *static_meshes = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *flyby_cameras = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::SparkInfo>> *sparks = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::RatInfo>> *rats = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::SpiderInfo>> *spiders = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::ScarabInfo>> *scarabs = nullptr,
@@ -5966,6 +6438,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
   auto static_meshes__ = static_meshes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>(*static_meshes) : 0;
   auto flyby_cameras__ = flyby_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FlyByCamera>>(*flyby_cameras) : 0;
+  auto sparks__ = sparks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SparkInfo>>(*sparks) : 0;
   auto rats__ = rats ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RatInfo>>(*rats) : 0;
   auto spiders__ = spiders ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SpiderInfo>>(*spiders) : 0;
   auto scarabs__ = scarabs ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScarabInfo>>(*scarabs) : 0;
@@ -5989,6 +6462,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       sinks__,
       static_meshes__,
       flyby_cameras__,
+      sparks__,
       rats__,
       spiders__,
       scarabs__,
@@ -7079,6 +7553,140 @@ inline flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(flatbuffers::Fla
       _flags);
 }
 
+inline SparkInfoT *SparkInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<SparkInfoT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void SparkInfo::UnPackTo(SparkInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = z(); _o->z = _e; }
+  { auto _e = xVel(); _o->xVel = _e; }
+  { auto _e = yVel(); _o->yVel = _e; }
+  { auto _e = zVel(); _o->zVel = _e; }
+  { auto _e = gravity(); _o->gravity = _e; }
+  { auto _e = rotAng(); _o->rotAng = _e; }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = sSize(); _o->sSize = _e; }
+  { auto _e = dSize(); _o->dSize = _e; }
+  { auto _e = size(); _o->size = _e; }
+  { auto _e = friction(); _o->friction = _e; }
+  { auto _e = scalar(); _o->scalar = _e; }
+  { auto _e = def(); _o->def = _e; }
+  { auto _e = rotAdd(); _o->rotAdd = _e; }
+  { auto _e = maxYvel(); _o->maxYvel = _e; }
+  { auto _e = on(); _o->on = _e; }
+  { auto _e = sR(); _o->sR = _e; }
+  { auto _e = sG(); _o->sG = _e; }
+  { auto _e = sB(); _o->sB = _e; }
+  { auto _e = dR(); _o->dR = _e; }
+  { auto _e = dG(); _o->dG = _e; }
+  { auto _e = dB(); _o->dB = _e; }
+  { auto _e = r(); _o->r = _e; }
+  { auto _e = g(); _o->g = _e; }
+  { auto _e = b(); _o->b = _e; }
+  { auto _e = colFadeSpeed(); _o->colFadeSpeed = _e; }
+  { auto _e = fadeToBlack(); _o->fadeToBlack = _e; }
+  { auto _e = sLife(); _o->sLife = _e; }
+  { auto _e = life(); _o->life = _e; }
+  { auto _e = transType(); _o->transType = _e; }
+  { auto _e = extras(); _o->extras = _e; }
+  { auto _e = dynamic(); _o->dynamic = _e; }
+  { auto _e = fxObj(); _o->fxObj = _e; }
+  { auto _e = roomNumber(); _o->roomNumber = _e; }
+  { auto _e = nodeNumber(); _o->nodeNumber = _e; }
+}
+
+inline flatbuffers::Offset<SparkInfo> SparkInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const SparkInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateSparkInfo(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<SparkInfo> CreateSparkInfo(flatbuffers::FlatBufferBuilder &_fbb, const SparkInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SparkInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  auto _z = _o->z;
+  auto _xVel = _o->xVel;
+  auto _yVel = _o->yVel;
+  auto _zVel = _o->zVel;
+  auto _gravity = _o->gravity;
+  auto _rotAng = _o->rotAng;
+  auto _flags = _o->flags;
+  auto _sSize = _o->sSize;
+  auto _dSize = _o->dSize;
+  auto _size = _o->size;
+  auto _friction = _o->friction;
+  auto _scalar = _o->scalar;
+  auto _def = _o->def;
+  auto _rotAdd = _o->rotAdd;
+  auto _maxYvel = _o->maxYvel;
+  auto _on = _o->on;
+  auto _sR = _o->sR;
+  auto _sG = _o->sG;
+  auto _sB = _o->sB;
+  auto _dR = _o->dR;
+  auto _dG = _o->dG;
+  auto _dB = _o->dB;
+  auto _r = _o->r;
+  auto _g = _o->g;
+  auto _b = _o->b;
+  auto _colFadeSpeed = _o->colFadeSpeed;
+  auto _fadeToBlack = _o->fadeToBlack;
+  auto _sLife = _o->sLife;
+  auto _life = _o->life;
+  auto _transType = _o->transType;
+  auto _extras = _o->extras;
+  auto _dynamic = _o->dynamic;
+  auto _fxObj = _o->fxObj;
+  auto _roomNumber = _o->roomNumber;
+  auto _nodeNumber = _o->nodeNumber;
+  return TEN::Save::CreateSparkInfo(
+      _fbb,
+      _x,
+      _y,
+      _z,
+      _xVel,
+      _yVel,
+      _zVel,
+      _gravity,
+      _rotAng,
+      _flags,
+      _sSize,
+      _dSize,
+      _size,
+      _friction,
+      _scalar,
+      _def,
+      _rotAdd,
+      _maxYvel,
+      _on,
+      _sR,
+      _sG,
+      _sB,
+      _dR,
+      _dG,
+      _dB,
+      _r,
+      _g,
+      _b,
+      _colFadeSpeed,
+      _fadeToBlack,
+      _sLife,
+      _life,
+      _transType,
+      _extras,
+      _dynamic,
+      _fxObj,
+      _roomNumber,
+      _nodeNumber);
+}
+
 inline RatInfoT *RatInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<RatInfoT>();
   UnPackTo(_o.get(), _resolver);
@@ -7632,6 +8240,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = sinks(); if (_e) { _o->sinks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->sinks[_i] = std::unique_ptr<TEN::Save::SinkT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = static_meshes(); if (_e) { _o->static_meshes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->static_meshes[_i] = std::unique_ptr<TEN::Save::StaticMeshInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = flyby_cameras(); if (_e) { _o->flyby_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->flyby_cameras[_i] = std::unique_ptr<TEN::Save::FlyByCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = sparks(); if (_e) { _o->sparks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->sparks[_i] = std::unique_ptr<TEN::Save::SparkInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = rats(); if (_e) { _o->rats.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rats[_i] = std::unique_ptr<TEN::Save::RatInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = spiders(); if (_e) { _o->spiders.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->spiders[_i] = std::unique_ptr<TEN::Save::SpiderInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = scarabs(); if (_e) { _o->scarabs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->scarabs[_i] = std::unique_ptr<TEN::Save::ScarabInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -7672,6 +8281,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _sinks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>> (_o->sinks.size(), [](size_t i, _VectorArgs *__va) { return CreateSink(*__va->__fbb, __va->__o->sinks[i].get(), __va->__rehasher); }, &_va );
   auto _static_meshes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> (_o->static_meshes.size(), [](size_t i, _VectorArgs *__va) { return CreateStaticMeshInfo(*__va->__fbb, __va->__o->static_meshes[i].get(), __va->__rehasher); }, &_va );
   auto _flyby_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FlyByCamera>> (_o->flyby_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFlyByCamera(*__va->__fbb, __va->__o->flyby_cameras[i].get(), __va->__rehasher); }, &_va );
+  auto _sparks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SparkInfo>> (_o->sparks.size(), [](size_t i, _VectorArgs *__va) { return CreateSparkInfo(*__va->__fbb, __va->__o->sparks[i].get(), __va->__rehasher); }, &_va );
   auto _rats = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RatInfo>> (_o->rats.size(), [](size_t i, _VectorArgs *__va) { return CreateRatInfo(*__va->__fbb, __va->__o->rats[i].get(), __va->__rehasher); }, &_va );
   auto _spiders = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SpiderInfo>> (_o->spiders.size(), [](size_t i, _VectorArgs *__va) { return CreateSpiderInfo(*__va->__fbb, __va->__o->spiders[i].get(), __va->__rehasher); }, &_va );
   auto _scarabs = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScarabInfo>> (_o->scarabs.size(), [](size_t i, _VectorArgs *__va) { return CreateScarabInfo(*__va->__fbb, __va->__o->scarabs[i].get(), __va->__rehasher); }, &_va );
@@ -7704,6 +8314,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _sinks,
       _static_meshes,
       _flyby_cameras,
+      _sparks,
       _rats,
       _spiders,
       _scarabs,
