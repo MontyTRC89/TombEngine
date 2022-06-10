@@ -53,6 +53,10 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
+	// HACK.
+	if (BinocularOn)
+		return;
+
 	if (TrInput & IN_LEFT)
 		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
 	else if (TrInput & IN_RIGHT)
@@ -396,6 +400,10 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
+
+	// HACK.
+	if (BinocularOn)
+		return;
 
 	if (TrInput & IN_LEFT)
 		lara->Control.TurnRate = -LARA_CRAWL_TURN_MAX;
