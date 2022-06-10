@@ -431,9 +431,7 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 		coll->Middle.Floor < 0 && coll->Middle.FloorSlope)
 	{
 		item->Animation.VerticalVelocity = 0;
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position = coll->Setup.OldPosition;
 	}
 	else if (coll->CollisionType == CT_LEFT)
 		item->Pose.Orientation.y += ANGLE(5.0f);
@@ -681,13 +679,10 @@ bool TestLaraHitCeiling(CollisionInfo* coll)
 
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Pose.Position.x = coll->Setup.OldPosition.x;
-	item->Pose.Position.y = coll->Setup.OldPosition.y;
-	item->Pose.Position.z = coll->Setup.OldPosition.z;
-
+	item->Animation.Airborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
+	item->Pose.Position = coll->Setup.OldPosition;
 }
 
 bool TestLaraObjectCollision(ItemInfo* item, short angle, int distance, int height, int side)
