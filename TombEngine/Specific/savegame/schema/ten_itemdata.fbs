@@ -97,6 +97,14 @@ table Skidoo {
 }
 
 table UPV {
+	velocity: int32;
+	rot: int32;
+	x_rot: int32;
+	fan_rot: int32;
+	harpoon_timer: int32;
+	harpoon_left: bool;
+	
+	flags: int32;
 
 }
 

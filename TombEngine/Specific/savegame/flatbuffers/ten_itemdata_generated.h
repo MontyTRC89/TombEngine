@@ -1609,14 +1609,58 @@ flatbuffers::Offset<Skidoo> CreateSkidoo(flatbuffers::FlatBufferBuilder &_fbb, c
 
 struct UPVT : public flatbuffers::NativeTable {
   typedef UPV TableType;
+  int32_t velocity = 0;
+  int32_t rot = 0;
+  int32_t x_rot = 0;
+  int32_t fan_rot = 0;
+  int32_t harpoon_timer = 0;
+  bool harpoon_left = false;
+  int32_t flags = 0;
 };
 
 struct UPV FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef UPVT NativeTableType;
   typedef UPVBuilder Builder;
   struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VELOCITY = 4,
+    VT_ROT = 6,
+    VT_X_ROT = 8,
+    VT_FAN_ROT = 10,
+    VT_HARPOON_TIMER = 12,
+    VT_HARPOON_LEFT = 14,
+    VT_FLAGS = 16
+  };
+  int32_t velocity() const {
+    return GetField<int32_t>(VT_VELOCITY, 0);
+  }
+  int32_t rot() const {
+    return GetField<int32_t>(VT_ROT, 0);
+  }
+  int32_t x_rot() const {
+    return GetField<int32_t>(VT_X_ROT, 0);
+  }
+  int32_t fan_rot() const {
+    return GetField<int32_t>(VT_FAN_ROT, 0);
+  }
+  int32_t harpoon_timer() const {
+    return GetField<int32_t>(VT_HARPOON_TIMER, 0);
+  }
+  bool harpoon_left() const {
+    return GetField<uint8_t>(VT_HARPOON_LEFT, 0) != 0;
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_ROT) &&
+           VerifyField<int32_t>(verifier, VT_X_ROT) &&
+           VerifyField<int32_t>(verifier, VT_FAN_ROT) &&
+           VerifyField<int32_t>(verifier, VT_HARPOON_TIMER) &&
+           VerifyField<uint8_t>(verifier, VT_HARPOON_LEFT) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
   UPVT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1628,6 +1672,27 @@ struct UPVBuilder {
   typedef UPV Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_velocity(int32_t velocity) {
+    fbb_.AddElement<int32_t>(UPV::VT_VELOCITY, velocity, 0);
+  }
+  void add_rot(int32_t rot) {
+    fbb_.AddElement<int32_t>(UPV::VT_ROT, rot, 0);
+  }
+  void add_x_rot(int32_t x_rot) {
+    fbb_.AddElement<int32_t>(UPV::VT_X_ROT, x_rot, 0);
+  }
+  void add_fan_rot(int32_t fan_rot) {
+    fbb_.AddElement<int32_t>(UPV::VT_FAN_ROT, fan_rot, 0);
+  }
+  void add_harpoon_timer(int32_t harpoon_timer) {
+    fbb_.AddElement<int32_t>(UPV::VT_HARPOON_TIMER, harpoon_timer, 0);
+  }
+  void add_harpoon_left(bool harpoon_left) {
+    fbb_.AddElement<uint8_t>(UPV::VT_HARPOON_LEFT, static_cast<uint8_t>(harpoon_left), 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(UPV::VT_FLAGS, flags, 0);
+  }
   explicit UPVBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1640,8 +1705,22 @@ struct UPVBuilder {
 };
 
 inline flatbuffers::Offset<UPV> CreateUPV(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t velocity = 0,
+    int32_t rot = 0,
+    int32_t x_rot = 0,
+    int32_t fan_rot = 0,
+    int32_t harpoon_timer = 0,
+    bool harpoon_left = false,
+    int32_t flags = 0) {
   UPVBuilder builder_(_fbb);
+  builder_.add_flags(flags);
+  builder_.add_harpoon_timer(harpoon_timer);
+  builder_.add_fan_rot(fan_rot);
+  builder_.add_x_rot(x_rot);
+  builder_.add_rot(rot);
+  builder_.add_velocity(velocity);
+  builder_.add_harpoon_left(harpoon_left);
   return builder_.Finish();
 }
 
@@ -2644,6 +2723,13 @@ inline UPVT *UPV::UnPack(const flatbuffers::resolver_function_t *_resolver) cons
 inline void UPV::UnPackTo(UPVT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = velocity(); _o->velocity = _e; }
+  { auto _e = rot(); _o->rot = _e; }
+  { auto _e = x_rot(); _o->x_rot = _e; }
+  { auto _e = fan_rot(); _o->fan_rot = _e; }
+  { auto _e = harpoon_timer(); _o->harpoon_timer = _e; }
+  { auto _e = harpoon_left(); _o->harpoon_left = _e; }
+  { auto _e = flags(); _o->flags = _e; }
 }
 
 inline flatbuffers::Offset<UPV> UPV::Pack(flatbuffers::FlatBufferBuilder &_fbb, const UPVT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -2654,8 +2740,22 @@ inline flatbuffers::Offset<UPV> CreateUPV(flatbuffers::FlatBufferBuilder &_fbb, 
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const UPVT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _velocity = _o->velocity;
+  auto _rot = _o->rot;
+  auto _x_rot = _o->x_rot;
+  auto _fan_rot = _o->fan_rot;
+  auto _harpoon_timer = _o->harpoon_timer;
+  auto _harpoon_left = _o->harpoon_left;
+  auto _flags = _o->flags;
   return TEN::Save::CreateUPV(
-      _fbb);
+      _fbb,
+      _velocity,
+      _rot,
+      _x_rot,
+      _fan_rot,
+      _harpoon_timer,
+      _harpoon_left,
+      _flags);
 }
 
 inline MotorboatT *Motorboat::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

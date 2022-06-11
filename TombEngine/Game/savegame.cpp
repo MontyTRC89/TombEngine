@@ -428,6 +428,8 @@ bool SaveGame::Save(int slot)
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
 		flatbuffers::Offset<Save::QuadBike> quadOffset;
+		flatbuffers::Offset<Save::UPV> upvOffset;
+
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
 
@@ -492,6 +494,21 @@ bool SaveGame::Save(int slot)
 			quadBuilder.add_turn_rate(quad->TurnRate);
 			quadBuilder.add_velocity(quad->Velocity);
 			quadOffset = quadBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<UPVInfo>())
+		{
+			auto upv = (UPVInfo*)itemToSerialize.Data;
+
+			Save::UPVBuilder upvBuilder{ fbb };
+
+			upvBuilder.add_fan_rot(upv->FanRot);
+			upvBuilder.add_flags(upv->Flags);
+			upvBuilder.add_harpoon_left(upv->HarpoonLeft);
+			upvBuilder.add_harpoon_timer(upv->HarpoonTimer);
+			upvBuilder.add_rot(upv->Rot);
+			upvBuilder.add_velocity(upv->Velocity);
+			upvBuilder.add_x_rot(upv->XRot);
+			upvOffset = upvBuilder.Finish();
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -559,6 +576,11 @@ bool SaveGame::Save(int slot)
 		{
 			serializedItem.add_data_type(Save::ItemData::QuadBike);
 			serializedItem.add_data(quadOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<UPVInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::UPV);
+			serializedItem.add_data(upvOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -1293,6 +1315,19 @@ bool SaveGame::Load(int slot)
 			quad->SmokeStart = savedQuad->smoke_start();
 			quad->TurnRate = savedQuad->turn_rate();
 			quad->Velocity = savedQuad->velocity();
+		}
+		else if (item->Data.is<UPVInfo>())
+		{
+			auto upv = (UPVInfo*)item->Data;
+			auto savedUpv = (Save::UPV*)savedItem->data();
+
+			upv->FanRot = savedUpv->fan_rot();
+			upv->Flags = savedUpv->flags();
+			upv->HarpoonLeft = savedUpv->harpoon_left();
+			upv->HarpoonTimer = savedUpv->harpoon_timer();
+			upv->Rot = savedUpv->rot();
+			upv->Velocity = savedUpv->velocity();
+			upv->XRot = savedUpv->x_rot();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
