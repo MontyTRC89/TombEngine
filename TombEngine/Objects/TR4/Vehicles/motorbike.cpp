@@ -404,11 +404,11 @@ void MotorbikeCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* col
 
 static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, BOOL moving)
 {
-    SPARKS* sptr;
     int rnd = 0;
     BYTE trans, size;
 
-    sptr = &Sparks[GetFreeSpark()];
+    auto sptr = GetFreeParticle();
+
     sptr->dR = 96;
     sptr->dG = 96;
     sptr->on = 1;
@@ -437,7 +437,7 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
         sptr->sLife = rnd;
     }
 
-    sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+    sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
     sptr->x = x + (GetRandomControl() & 0xF) - 8;
     sptr->y = y + (GetRandomControl() & 0xF) - 8;
     sptr->z = z + (GetRandomControl() & 0xF) - 8;
@@ -461,7 +461,7 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     }
 
     sptr->scalar = 1;
-    sptr->def = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
+    sptr->spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
     sptr->gravity = (GetRandomControl() & 3) - 4;
     sptr->maxYvel = (GetRandomControl() & 7) - 8;
     size = (GetRandomControl() & 7) + (speed / 128) + 32;

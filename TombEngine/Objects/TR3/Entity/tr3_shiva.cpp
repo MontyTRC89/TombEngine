@@ -72,7 +72,7 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 		return;
 	}
 
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	if (uw)
@@ -99,9 +99,9 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 	sptr->sLife = sptr->life = (GetRandomControl() & 31) + 96;
 
 	if (uw)
-		sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	else
-		sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 	sptr->extras = 0;
 	sptr->dynamic = -1;

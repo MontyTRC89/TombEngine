@@ -35,7 +35,7 @@ extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
-extern SPARKS Sparks[MAX_SPARKS];
+extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
@@ -184,83 +184,85 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawSparks(RenderView& view) 
+	void Renderer11::DrawParticles(RenderView& view)
 	{
 		Vector3Int nodePos;
 
 		for (int i = 0; i < MAX_NODE; i++)
 			NodeOffsets[i].gotIt = false;
 
-		for (int i = 0; i < MAX_SPARKS; i++) 
+		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
-			SPARKS* spark = &Sparks[i];
-			if (spark->on) 
+			auto particle = &Particles[i];
+			if (particle->on)
 			{
-				if (spark->flags & SP_DEF) 
+				if (particle->flags & SP_DEF)
 				{
-					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
+					Vector3 pos = Vector3(particle->x, particle->y, particle->z);
 
-					if (spark->flags & SP_FX) 
+					if (particle->flags & SP_FX)
 					{
-						FX_INFO* fx = &EffectList[spark->fxObj];
+						FX_INFO* fx = &EffectList[particle->fxObj];
 
 						pos.x += fx->pos.Position.x;
 						pos.y += fx->pos.Position.y;
 						pos.z += fx->pos.Position.z;
 
-						if ((spark->sLife - spark->life) > (rand() & 7) + 4) 
+						if ((particle->sLife - particle->life) > (rand() & 7) + 4)
 						{
-							spark->flags &= ~SP_FX;
-							spark->x = pos.x;
-							spark->y = pos.y;
-							spark->z = pos.z;
+							particle->flags &= ~SP_FX;
+							particle->x = pos.x;
+							particle->y = pos.y;
+							particle->z = pos.z;
 						}
-					} 
-					else if (!(spark->flags & SP_ITEM)) 
-					{
-						pos.x = spark->x;
-						pos.y = spark->y;
-						pos.z = spark->z;
 					}
-					else 
+					else if (!(particle->flags & SP_ITEM))
 					{
-						ItemInfo* item = &g_Level.Items[spark->fxObj];
+						pos.x = particle->x;
+						pos.y = particle->y;
+						pos.z = particle->z;
+					}
+					else
+					{
+						ItemInfo* item = &g_Level.Items[particle->fxObj];
 
-						if (spark->flags & SP_NODEATTACH) {
-							if (NodeOffsets[spark->nodeNumber].gotIt) {
-								nodePos.x = NodeVectors[spark->nodeNumber].x;
-								nodePos.y = NodeVectors[spark->nodeNumber].y;
-								nodePos.z = NodeVectors[spark->nodeNumber].z;
-							} else {
-								nodePos.x = NodeOffsets[spark->nodeNumber].x;
-								nodePos.y = NodeOffsets[spark->nodeNumber].y;
-								nodePos.z = NodeOffsets[spark->nodeNumber].z;
+						if (particle->flags & SP_NODEATTACH) {
+							if (NodeOffsets[particle->nodeNumber].gotIt) {
+								nodePos.x = NodeVectors[particle->nodeNumber].x;
+								nodePos.y = NodeVectors[particle->nodeNumber].y;
+								nodePos.z = NodeVectors[particle->nodeNumber].z;
+							}
+							else {
+								nodePos.x = NodeOffsets[particle->nodeNumber].x;
+								nodePos.y = NodeOffsets[particle->nodeNumber].y;
+								nodePos.z = NodeOffsets[particle->nodeNumber].z;
 
-								int meshNum = NodeOffsets[spark->nodeNumber].meshNum;
+								int meshNum = NodeOffsets[particle->nodeNumber].meshNum;
 								if (meshNum >= 0)
 									GetJointAbsPosition(item, &nodePos, meshNum);
 								else
 									GetLaraJointPosition(&nodePos, -meshNum);
 
-								NodeOffsets[spark->nodeNumber].gotIt = true;
+								NodeOffsets[particle->nodeNumber].gotIt = true;
 
-								NodeVectors[spark->nodeNumber].x = nodePos.x;
-								NodeVectors[spark->nodeNumber].y = nodePos.y;
-								NodeVectors[spark->nodeNumber].z = nodePos.z;
+								NodeVectors[particle->nodeNumber].x = nodePos.x;
+								NodeVectors[particle->nodeNumber].y = nodePos.y;
+								NodeVectors[particle->nodeNumber].z = nodePos.z;
 							}
 
 							pos.x += nodePos.x;
 							pos.y += nodePos.y;
 							pos.z += nodePos.z;
 
-							if (spark->sLife - spark->life > (rand() & 3) + 8) {
-								spark->flags &= ~SP_ITEM;
-								spark->x = pos.x;
-								spark->y = pos.y;
-								spark->z = pos.z;
+							if (particle->sLife - particle->life > (rand() & 3) + 8)
+							{
+								particle->flags &= ~SP_ITEM;
+								particle->x = pos.x;
+								particle->y = pos.y;
+								particle->z = pos.z;
 							}
-						} 
-						else 
+						}
+						else
 						{
 							pos.x += item->Pose.Position.x;
 							pos.y += item->Pose.Position.y;
@@ -268,24 +270,24 @@ namespace TEN::Renderer
 						}
 					}
 
-					AddSpriteBillboard(&m_sprites[spark->def],
-									   pos,
-									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
-									   TO_RAD(spark->rotAng), spark->scalar, 
-									   {spark->size, spark->size},
-						spark->transType, view);
-				} 
-				else 
+					AddSpriteBillboard(&m_sprites[particle->spriteIndex],
+						pos,
+						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
+						TO_RAD(particle->rotAng), particle->scalar,
+						{ particle->size, particle->size },
+						particle->blendMode, view);
+				}
+				else
 				{
-					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
-					Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
+					Vector3 pos = Vector3(particle->x, particle->y, particle->z);
+					Vector3 v = Vector3(particle->xVel, particle->yVel, particle->zVel);
 					v.Normalize();
-					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
-						pos, 
-						Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
-						TO_RAD(spark->rotAng), 
-						spark->scalar, 
-						Vector2(4, spark->size), spark->transType, v, view);
+					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
+						pos,
+						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
+						TO_RAD(particle->rotAng),
+						particle->scalar,
+						Vector2(4, particle->size), particle->blendMode, v, view);
 				}
 			}
 		}

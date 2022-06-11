@@ -91,7 +91,7 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 32;
 		spark->dShade = (GetRandomControl() & 0xF) + 64;
-		spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 64;
 		spark->x = (GetRandomControl() & 0x1F) + pos->x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
@@ -113,14 +113,14 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 
 static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto spark = GetFreeParticle();
 
 	spark->dG = g;
 	spark->sG = g;
 	spark->colFadeSpeed = 2;
 	spark->dR = r;
 	spark->sR = r;
-	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = 16;
 	spark->sLife = 16;
 	spark->x = x;
@@ -136,14 +136,14 @@ static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r,
 	spark->flags = SP_SCALE | SP_DEF;
 	spark->scalar = 3;
 	spark->maxYvel = 0;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 	spark->gravity = 0;
 	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 }
 
 static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -172,7 +172,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 	spark->xVel = xv;
 	spark->yVel = yv;
 	spark->zVel = zv;
-	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->friction = 34;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
@@ -181,7 +181,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 
 static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -199,7 +199,7 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->dG = spark->dB / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->y = 0;
@@ -246,7 +246,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 
 void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -257,7 +257,7 @@ void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
 	spark->dB = spark->dG / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 	spark->x = (GetRandomControl() & 0xF) - 8;

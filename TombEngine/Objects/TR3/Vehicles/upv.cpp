@@ -182,7 +182,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 {
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	sptr->sR = 0;
@@ -196,7 +196,7 @@ static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 

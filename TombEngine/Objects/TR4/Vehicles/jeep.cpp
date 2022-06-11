@@ -307,7 +307,7 @@ static int JeepCanGetOff()
 
 static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short speed, int moving)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto spark = GetFreeParticle();
 
 	spark->dR = 16;
 	spark->dG = 16;
@@ -334,7 +334,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 		spark->sLife = 9;
 	}
 
-	spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;

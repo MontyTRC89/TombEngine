@@ -84,7 +84,7 @@ struct RIPPLE_STRUCT
 	unsigned char init;
 };
 
-struct SPARKS
+struct Particle
 {
 	int x;
 	int y;
@@ -100,24 +100,24 @@ struct SPARKS
 	float size;
 	unsigned char friction;
 	unsigned char scalar;
-	unsigned char def;
+	unsigned char spriteIndex;
 	signed char rotAdd;
 	signed char maxYvel;
 	bool on;
-	byte sR;
-	byte sG;
-	byte sB;
-	byte dR;
-	byte dG;
-	byte dB;
-	byte r;
-	byte g;
-	byte b;
+	unsigned char sR;
+	unsigned char sG;
+	unsigned char sB;
+	unsigned char dR;
+	unsigned char dG;
+	unsigned char dB;
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 	unsigned char colFadeSpeed;
 	unsigned char fadeToBlack;
-	unsigned char sLife;
-	unsigned char life;
-	BLEND_MODES transType;
+	int sLife;
+	int life;
+	BLEND_MODES blendMode;
 	unsigned char extras;
 	signed char dynamic;
 	unsigned char fxObj;
@@ -146,7 +146,7 @@ struct SPLASH_STRUCT
 	bool isActive;
 };
 
-struct SP_DYNAMIC
+struct ParticleDynamic
 {
 	byte On;
 	byte Falloff;
@@ -162,29 +162,37 @@ constexpr auto SD_UWEXPLOSION = 2;
 
 #define MAX_NODE 23
 #define MAX_DYNAMICS 64
-#define MAX_SPARKS 1024
 #define MAX_RIPPLES 256
 #define MAX_SPLASHES 8
-#define MAX_SPARKS_DYNAMICS 8
 #define NUM_EFFECTS 256
-extern int NextSpark;
+
 extern int DeadlyBounds[6];
+
+
+// New particle class
+
+constexpr auto MAX_PARTICLES = 1024;
+constexpr auto MAX_PARTICLE_DYNAMICS = 8;
+extern Particle Particles[MAX_PARTICLES];
+extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
+
 extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-extern SPARKS Sparks[MAX_SPARKS];
-extern SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
+
 extern LaraWeaponType SmokeWeapon;
 extern byte SmokeCountL;
 extern byte SmokeCountR;
 extern int SplashCount;
+
 extern Vector3Int NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
 extern FX_INFO EffectList[NUM_EFFECTS];
 
+Particle* GetFreeParticle();
+
 void DetatchSpark(int num, SpriteEnumFlag type);
-int GetFreeSpark();
 void UpdateSparks();
 void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);

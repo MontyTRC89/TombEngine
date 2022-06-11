@@ -58,7 +58,7 @@ namespace TEN::Entities::TR4
 		//if (x >= -0x4000u && x <= 0x4000 && z >= -0x4000u && z <= 0x4000)
 
 		auto* fx = &EffectList[fxNumber];
-		auto* sptr = &Sparks[GetFreeSpark()];
+		auto sptr = GetFreeParticle();
 
 		sptr->on = true;
 		BYTE color = (GetRandomControl() & 0x3F) - 128;
@@ -71,7 +71,7 @@ namespace TEN::Entities::TR4
 		sptr->dG = color / 2;
 		sptr->fadeToBlack = 8;
 		sptr->colFadeSpeed = (GetRandomControl() & 3) + 8;
-		sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		sptr->dynamic = -1;
 		BYTE life = (GetRandomControl() & 7) + 32;
 		sptr->life = life;

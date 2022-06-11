@@ -43,7 +43,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 	{
 		for (int i = 0; i < count; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = r;
@@ -56,7 +56,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 			spark->fadeToBlack = 0;
 			spark->life = 9 << unk;
 			spark->sLife = 9 << unk;
-			spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;

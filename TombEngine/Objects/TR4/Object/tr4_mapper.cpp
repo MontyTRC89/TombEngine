@@ -41,7 +41,7 @@ namespace TEN::Entities::TR4
 
             for (int i = 0; i < 2; i++)
             {
-                SPARKS* spark = &Sparks[GetFreeSpark()];
+                auto spark = GetFreeParticle();
 
                 spark->on = 1;
                 spark->sR = (GetRandomControl() & 0x7F) + 64;
@@ -52,7 +52,7 @@ namespace TEN::Entities::TR4
                 spark->dB = 0;
                 spark->colFadeSpeed = 4;
                 spark->fadeToBlack = 4;
-                spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+                spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
                 spark->life = 12;
                 spark->sLife = 12;
                 spark->x = pos.x;

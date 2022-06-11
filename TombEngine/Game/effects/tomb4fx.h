@@ -34,7 +34,7 @@ struct SMOKE_SPARKS
 	byte fadeToBlack;
 	signed char sLife;
 	signed char life;
-	BLEND_MODES transType;
+	BLEND_MODES blendMode;
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;

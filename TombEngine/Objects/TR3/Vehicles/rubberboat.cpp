@@ -797,7 +797,7 @@ void RubberBoatAnimation(ItemInfo* laraItem, ItemInfo* rBoatItem, int collide)
 
 static void TriggerRubberBoatMist(long x, long y, long z, long velocity, short angle, long snow)
 {
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	sptr->sR = 0;
@@ -820,7 +820,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long velocity, short a
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12 - (snow * 8);
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -847,7 +847,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long velocity, short a
 	else
 		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 
-	sptr->def = Objects[ID_EXPLOSION_SPRITES].meshIndex;
+	sptr->spriteIndex = Objects[ID_EXPLOSION_SPRITES].meshIndex;
 
 	if (!snow)
 	{

@@ -1228,7 +1228,7 @@ void QuadBikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 
 static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto spark = GetFreeParticle();
 
 	spark->on = true;
 	spark->sR = 0;
@@ -1276,7 +1276,7 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	else
 		spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	spark->scalar = 2;
 	spark->gravity = -(GetRandomControl() & 3) - 4;
 	spark->maxYvel = -(GetRandomControl() & 7) - 8;

@@ -137,7 +137,7 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 		dz >= -SECTOR(16) && dz <= SECTOR(16))
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto spark = GetFreeParticle();
 
 		spark->sR = -1;
 		spark->sG = -1;
@@ -150,7 +150,7 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 		spark->dB = -64 - spark->dG;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->flags = SP_SCALE;
