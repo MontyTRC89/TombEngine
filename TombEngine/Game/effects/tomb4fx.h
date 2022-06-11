@@ -200,7 +200,6 @@ extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber);
