@@ -1744,7 +1744,7 @@ void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		item->Status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo * coll)
+void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

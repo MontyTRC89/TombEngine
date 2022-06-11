@@ -19,6 +19,7 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 #include "Specific/prng.h"
+#include "Game/particle/SimpleParticle.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -969,11 +970,32 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 		if (TestEnvironment(ENV_FLAG_WATER, quadItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, quadItem))
 		{
-			laraItem->Animation.TargetState = QUAD_STATE_FALL_OFF;
-			laraItem->Pose.Position.y = quadItem->Pose.Position.y + 700;
-			laraItem->RoomNumber = quadItem->RoomNumber;
-			laraItem->HitPoints = 0;
-			QuadbikeExplode(laraItem, quadItem);
+			auto watedDepth = GetWaterDepth(laraItem);
+
+			if (watedDepth < CLICK(2.5f))
+			{
+				if (quad->Velocity != 0)
+					quad->Velocity -= std::copysign(quad->Velocity / 6, quad->Velocity);
+
+				if (quad->TurnRate != 0)
+					quad->TurnRate -= quad->TurnRate / 8;
+
+				if (TestEnvironment(ENV_FLAG_WATER, quadItem))
+				{
+					TEN::Effects::TriggerSpeedboatFoam(quadItem, Vector3(0, -watedDepth / 2, QUAD_BACK));
+
+					if (GenerateInt(0, 32) > 28)
+						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(quadItem->Pose.Position), SoundEnvironment::Land, 0.8f);
+				}
+			}
+			else
+			{
+				laraItem->Animation.TargetState = QUAD_STATE_FALL_OFF;
+				laraItem->Pose.Position.y = quadItem->Pose.Position.y + 700;
+				laraItem->RoomNumber = quadItem->RoomNumber;
+				laraItem->HitPoints = 0;
+				QuadbikeExplode(laraItem, quadItem);
+			}
 		}
 	}
 }
@@ -1297,7 +1319,11 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	oldPos.z = quadItem->Pose.Position.z;
 	oldPos.roomNumber = quadItem->RoomNumber;
 
+	GetCollisionInfo(coll, quadItem);
+	DoObjectCollision(quadItem, coll);
+
 	bool collide = QuadDynamics(laraItem, quadItem);
+	CollideSolidStatics(quadItem, coll);
 
 	auto probe = GetCollision(quadItem);
 
