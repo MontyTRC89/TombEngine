@@ -970,17 +970,17 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 		if (TestEnvironment(ENV_FLAG_WATER, quadItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, quadItem))
 		{
-			auto watedDepth = GetWaterDepth(laraItem);
+			auto waterDepth = GetWaterDepth(laraItem);
 
-			if (watedDepth < CLICK(2.5f))
+			if (waterDepth < CLICK(2.5f))
 			{
 				if (quad->Velocity != 0)
 				{
-					quad->Velocity -= std::copysign(quad->Velocity / 6, quad->Velocity);
+					quad->Velocity -= std::copysign(quad->Velocity / (waterDepth / 64), quad->Velocity);
 
 					if (TestEnvironment(ENV_FLAG_WATER, quadItem))
 					{
-						TEN::Effects::TriggerSpeedboatFoam(quadItem, Vector3(0, -watedDepth / 2, QUAD_BACK));
+						TEN::Effects::TriggerSpeedboatFoam(quadItem, Vector3(0, -waterDepth / 2, QUAD_BACK));
 
 						if (GenerateInt(0, 32) > 28)
 							SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(quadItem->Pose.Position), SoundEnvironment::Land, 0.8f);
@@ -988,7 +988,7 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 				}
 
 				if (quad->TurnRate != 0)
-					quad->TurnRate -= quad->TurnRate / 8;
+					quad->TurnRate -= quad->TurnRate / (waterDepth / 48);
 			}
 			else
 			{
