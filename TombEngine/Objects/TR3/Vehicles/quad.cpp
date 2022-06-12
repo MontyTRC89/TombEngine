@@ -977,6 +977,11 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 			TestEnvironment(ENV_FLAG_SWAMP, quadItem))
 		{
 			auto waterDepth = (float)GetWaterDepth(quadItem);
+			
+			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
+			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
+			if (waterDepth == DEEP_WATER)
+				waterDepth = QUAD_MAX_WATER_HEIGHT;
 
 			if (waterDepth <= QUAD_MAX_WATER_HEIGHT)
 			{
