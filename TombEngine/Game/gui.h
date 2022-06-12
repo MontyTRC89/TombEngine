@@ -457,8 +457,8 @@ private:
 	void DoStatisticsMode();
 	void DoExamineMode();
 	void DoDiary();
-	int DoLoad();
-	void DoSave();
+	bool DoLoad();
+	bool DoSave();
 	void DoInventory();
 	void ConstructCombineObjectList();
 	
@@ -468,8 +468,6 @@ private:
 	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
 	bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
 	long rptRight, rptLeft;
-	bool stop_killing_me_you_dumb_input_system;
-	bool stop_killing_me_you_dumb_input_system2;
 
 	// Inventory
 	short combine_obj1;
@@ -500,7 +498,6 @@ private:
 	int inventoryItemChosen;
 	int enterInventory;
 	int lastInvItem;
-	bool ExitInvLoop;
 
 	// Ammo vars
 	unsigned short AmountShotGunAmmo1;
