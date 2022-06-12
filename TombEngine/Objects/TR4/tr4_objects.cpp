@@ -225,6 +225,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BADDY1];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 9;
 		obj->initialise = InitialiseBaddy;
 		obj->control = BaddyControl;
 		obj->collision = CreatureCollision;
@@ -250,6 +251,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BADDY2];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 9;
 		obj->initialise = InitialiseBaddy;
 		obj->control = BaddyControl;
 		obj->collision = CreatureCollision;
@@ -275,6 +277,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SAS_CAIRO];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 10;
 		obj->initialise = InitialiseSas;
 		obj->control = SasControl;
 		obj->collision = CreatureCollision;
@@ -482,6 +485,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_TROOPS];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 11;
 		obj->initialise = InitialiseTroops;
 		obj->control = TroopsControl;
 		obj->collision = CreatureCollision;

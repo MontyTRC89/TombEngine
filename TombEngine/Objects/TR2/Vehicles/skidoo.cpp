@@ -439,7 +439,7 @@ void SkidooExplode(ItemInfo* laraItem, ItemInfo* skidooItem)
 	pos.Orientation.z = 0;
 
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
-	//ExplodingDeath(lara->Vehicle, -1, 256);
+	//ExplodingDeath(lara->Vehicle, ALL_JOINT_BITS, 256);
 
 	KillItem(lara->Vehicle);
 	skidooItem->Status = ITEM_DEACTIVATED;

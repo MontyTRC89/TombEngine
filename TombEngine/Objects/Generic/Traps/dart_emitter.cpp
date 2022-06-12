@@ -6,6 +6,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Sound/sound.h"
+#include "Renderer/Renderer11Enums.h"
 
 namespace TEN::Entities::Traps
 {
@@ -150,7 +151,7 @@ namespace TEN::Entities::Traps
 		if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 			return;
 
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->on = true;
 		
@@ -165,7 +166,7 @@ namespace TEN::Entities::Traps
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 4;
 
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	

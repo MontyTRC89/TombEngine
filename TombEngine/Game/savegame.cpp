@@ -8,6 +8,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -426,6 +427,9 @@ bool SaveGame::Save(int slot)
 		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
+		flatbuffers::Offset<Save::QuadBike> quadOffset;
+		flatbuffers::Offset<Save::UPV> upvOffset;
+
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
 
@@ -466,6 +470,45 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_tosspad(creature->Tosspad);
 			creatureBuilder.add_ai_target_number(creature->AITargetNumber);
 			creatureOffset = creatureBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<QuadInfo>())
+		{
+			auto quad = (QuadInfo*)itemToSerialize.Data;
+
+			Save::QuadBikeBuilder quadBuilder{ fbb };
+
+			quadBuilder.add_can_start_drift(quad->CanStartDrift);
+			quadBuilder.add_drift_starting(quad->DriftStarting);
+			quadBuilder.add_engine_revs(quad->EngineRevs);
+			quadBuilder.add_extra_rotation(quad->ExtraRotation);
+			quadBuilder.add_flags(quad->Flags);
+			quadBuilder.add_front_rot(quad->FrontRot);
+			quadBuilder.add_left_vertical_velocity(quad->LeftVerticalVelocity);
+			quadBuilder.add_momentum_angle(quad->MomentumAngle);
+			quadBuilder.add_no_dismount(quad->NoDismount);
+			quadBuilder.add_pitch(quad->Pitch);
+			quadBuilder.add_rear_rot(quad->RearRot);
+			quadBuilder.add_revs(quad->Revs);
+			quadBuilder.add_right_vertical_velocity(quad->RightVerticalVelocity);
+			quadBuilder.add_smoke_start(quad->SmokeStart);
+			quadBuilder.add_turn_rate(quad->TurnRate);
+			quadBuilder.add_velocity(quad->Velocity);
+			quadOffset = quadBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<UPVInfo>())
+		{
+			auto upv = (UPVInfo*)itemToSerialize.Data;
+
+			Save::UPVBuilder upvBuilder{ fbb };
+
+			upvBuilder.add_fan_rot(upv->FanRot);
+			upvBuilder.add_flags(upv->Flags);
+			upvBuilder.add_harpoon_left(upv->HarpoonLeft);
+			upvBuilder.add_harpoon_timer(upv->HarpoonTimer);
+			upvBuilder.add_rot(upv->Rot);
+			upvBuilder.add_velocity(upv->Velocity);
+			upvBuilder.add_x_rot(upv->XRot);
+			upvOffset = upvBuilder.Finish();
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -521,13 +564,23 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.SwapMeshFlags);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<QuadInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::QuadBike);
+			serializedItem.add_data(quadOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<UPVInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::UPV);
+			serializedItem.add_data(upvOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -626,6 +679,59 @@ bool SaveGame::Save(int slot)
 		}
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
+
+	// Particles
+	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		auto* particle = &Particles[i];
+
+		if (!particle->on)
+			continue;
+
+		Save::ParticleInfoBuilder particleInfo{ fbb };
+
+		particleInfo.add_b(particle->b);
+		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
+		particleInfo.add_d_b(particle->dB);
+		particleInfo.add_sprite_index(particle->spriteIndex);
+		particleInfo.add_d_g(particle->dG);
+		particleInfo.add_d_r(particle->dR);
+		particleInfo.add_d_size(particle->dSize);
+		particleInfo.add_dynamic(particle->dynamic);
+		particleInfo.add_extras(particle->extras);
+		particleInfo.add_fade_to_black(particle->fadeToBlack);
+		particleInfo.add_flags(particle->flags);
+		particleInfo.add_friction(particle->friction);
+		particleInfo.add_fx_obj(particle->fxObj);
+		particleInfo.add_g(particle->g);
+		particleInfo.add_gravity(particle->gravity);
+		particleInfo.add_life(particle->life);
+		particleInfo.add_max_y_vel(particle->maxYvel);
+		particleInfo.add_node_number(particle->nodeNumber);
+		particleInfo.add_on(particle->on);
+		particleInfo.add_r(particle->r);
+		particleInfo.add_room_number(particle->roomNumber);
+		particleInfo.add_rot_add(particle->rotAdd);
+		particleInfo.add_rot_ang(particle->rotAng);
+		particleInfo.add_s_b(particle->sB);
+		particleInfo.add_scalar(particle->scalar);
+		particleInfo.add_s_g(particle->sG);
+		particleInfo.add_size(particle->size);
+		particleInfo.add_s_life(particle->sLife);
+		particleInfo.add_s_r(particle->sR);
+		particleInfo.add_s_size(particle->sSize);
+		particleInfo.add_blend_mode(particle->blendMode);
+		particleInfo.add_x(particle->x);
+		particleInfo.add_x_vel(particle->sSize);
+		particleInfo.add_y(particle->y);
+		particleInfo.add_y_vel(particle->yVel);
+		particleInfo.add_z(particle->z);
+		particleInfo.add_z_vel(particle->zVel);
+
+		particles.push_back(particleInfo.Finish());
+	}
+	auto particleOffset = fbb.CreateVector(particles);
 
 	// Particle enemies
 	std::vector<flatbuffers::Offset<Save::BatInfo>> bats;
@@ -905,6 +1011,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_timer(0);
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
+	sgb.add_particles(particleOffset);
 	sgb.add_bats(batsOffset);
 	sgb.add_rats(ratsOffset);
 	sgb.add_spiders(spidersOffset);
@@ -953,6 +1060,23 @@ bool SaveGame::Load(int slot)
 	file.close();
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
+
+	// Statistics
+	Statistics.Game.AmmoHits = s->game()->ammo_hits();
+	Statistics.Game.AmmoUsed = s->game()->ammo_used();
+	Statistics.Game.Distance = s->game()->distance();
+	Statistics.Game.HealthUsed = s->game()->medipacks_used();
+	Statistics.Game.Kills = s->game()->kills();
+	Statistics.Game.Secrets = s->game()->secrets();
+	Statistics.Game.Timer = s->game()->timer();
+
+	Statistics.Level.AmmoHits = s->level()->ammo_hits();
+	Statistics.Level.AmmoUsed = s->level()->ammo_used();
+	Statistics.Level.Distance = s->level()->distance();
+	Statistics.Level.HealthUsed = s->level()->medipacks_used();
+	Statistics.Level.Kills = s->level()->kills();
+	Statistics.Level.Secrets = s->level()->secrets();
+	Statistics.Level.Timer = s->level()->timer();
 
 	// Flipmaps
 	for (int i = 0; i < s->flip_stats()->size(); i++)
@@ -1112,6 +1236,25 @@ bool SaveGame::Load(int slot)
 		item->Collidable = savedItem->collidable();
 		item->LookedAt = savedItem->looked_at();
 
+		// Mesh stuff
+		item->MeshBits = savedItem->mesh_bits();
+		item->MeshSwapBits = savedItem->swap_mesh_flags();
+
+		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
+			(item->Flags & ONESHOT))
+			item->MeshBits = 0x00100;
+
+		// Now some post-load specific hacks for objects
+		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 && item->ObjectNumber <= ID_PUZZLE_HOLE16 &&
+			(item->Status == ITEM_ACTIVE || item->Status == ITEM_DEACTIVATED))
+		{
+			item->ObjectNumber = (GAME_OBJECT_ID)((int)item->ObjectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
+		}
+
+		if (obj->floor != nullptr)
+			UpdateBridgeItem(i);
+
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 		{
@@ -1151,6 +1294,41 @@ bool SaveGame::Load(int slot)
 			creature->Tosspad = savedCreature->tosspad();
 			SetBaddyTarget(i, savedCreature->ai_target_number());
 		}
+		else if (item->Data.is<QuadInfo>())
+		{
+			auto quad = (QuadInfo*)item->Data;
+			auto savedQuad = (Save::QuadBike*)savedItem->data();
+
+			quad->CanStartDrift = savedQuad->can_start_drift();
+			quad->DriftStarting = savedQuad->drift_starting();
+			quad->EngineRevs = savedQuad->engine_revs();
+			quad->ExtraRotation = savedQuad->extra_rotation();
+			quad->Flags = savedQuad->flags();
+			quad->FrontRot = savedQuad->front_rot();
+			quad->LeftVerticalVelocity = savedQuad->left_vertical_velocity();
+			quad->MomentumAngle = savedQuad->momentum_angle();
+			quad->NoDismount = savedQuad->no_dismount();
+			quad->Pitch = savedQuad->pitch();
+			quad->RearRot = savedQuad->rear_rot();
+			quad->Revs = savedQuad->revs();
+			quad->RightVerticalVelocity = savedQuad->right_vertical_velocity();
+			quad->SmokeStart = savedQuad->smoke_start();
+			quad->TurnRate = savedQuad->turn_rate();
+			quad->Velocity = savedQuad->velocity();
+		}
+		else if (item->Data.is<UPVInfo>())
+		{
+			auto upv = (UPVInfo*)item->Data;
+			auto savedUpv = (Save::UPV*)savedItem->data();
+
+			upv->FanRot = savedUpv->fan_rot();
+			upv->Flags = savedUpv->flags();
+			upv->HarpoonLeft = savedUpv->harpoon_left();
+			upv->HarpoonTimer = savedUpv->harpoon_timer();
+			upv->Rot = savedUpv->rot();
+			upv->Velocity = savedUpv->velocity();
+			upv->XRot = savedUpv->x_rot();
+		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
 			auto data = savedItem->data();
@@ -1163,29 +1341,50 @@ bool SaveGame::Load(int slot)
 			auto savedData = (Save::Int*)data;
 			item->Data = savedData->scalar();
 		}
+	}
 
+	for (int i = 0; i < s->particles()->size(); i++)
+	{
+		auto particleInfo = s->particles()->Get(i);
+		auto* particle = &Particles[i];
 
-		// Mesh stuff
-		item->MeshBits = savedItem->mesh_bits();
-		item->SwapMeshFlags = savedItem->swap_mesh_flags();
-
-		// Now some post-load specific hacks for objects
-		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 
-			&& item->ObjectNumber <= ID_PUZZLE_HOLE16 
-			&& (item->Status == ITEM_ACTIVE
-				|| item->Status == ITEM_DEACTIVATED))
-		{
-			item->ObjectNumber = (GAME_OBJECT_ID)((int)item->ObjectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
-		}
-
-		if ((item->ObjectNumber >= ID_SMASH_OBJECT1)
-			&& (item->ObjectNumber <= ID_SMASH_OBJECT8)
-			&& (item->Flags & ONESHOT))
-			item->MeshBits = 0x00100;
-
-		if (obj->floor != nullptr)
-			UpdateBridgeItem(i);
+		particle->x = particleInfo->x();
+		particle->y = particleInfo->y();
+		particle->z = particleInfo->z();
+		particle->xVel = particleInfo->x_vel();
+		particle->yVel = particleInfo->y_vel();
+		particle->zVel = particleInfo->z_vel();
+		particle->gravity = particleInfo->gravity();
+		particle->rotAng = particleInfo->rot_ang();
+		particle->flags = particleInfo->flags();
+		particle->sSize = particleInfo->s_size();
+		particle->dSize = particleInfo->d_size();
+		particle->size = particleInfo->size();
+		particle->friction = particleInfo->friction();
+		particle->scalar = particleInfo->scalar();
+		particle->spriteIndex = particleInfo->sprite_index();
+		particle->rotAdd = particleInfo->rot_add();
+		particle->maxYvel = particleInfo->max_y_vel();
+		particle->on = particleInfo->on();
+		particle->sR = particleInfo->s_r();
+		particle->sG = particleInfo->s_g();
+		particle->sB = particleInfo->s_b();
+		particle->dR = particleInfo->d_r();
+		particle->dG = particleInfo->d_g();
+		particle->dB = particleInfo->d_b();
+		particle->r = particleInfo->r();
+		particle->g = particleInfo->g();
+		particle->b = particleInfo->b();
+		particle->colFadeSpeed = particleInfo->col_fade_speed();
+		particle->fadeToBlack = particleInfo->fade_to_black();
+		particle->sLife = particleInfo->s_life();
+		particle->life = particleInfo->life();
+		particle->blendMode = (BLEND_MODES)particleInfo->blend_mode();
+		particle->extras = particleInfo->extras();
+		particle->dynamic = particleInfo->dynamic();
+		particle->fxObj = particleInfo->fx_obj();
+		particle->roomNumber = particleInfo->room_number();
+		particle->nodeNumber = particleInfo->node_number();
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
