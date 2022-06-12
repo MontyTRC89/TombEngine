@@ -201,7 +201,154 @@ void TriggerGlobalFireFlame()
 	spark->dSize = spark->size;
 }
 
-void keep_those_fires_burning()
+void TriggerPilotFlame(int itemNum, int nodeIndex)
+{
+	auto* item = &g_Level.Items[itemNum];
+
+	int dx = Camera.pos.x - item->Pose.Position.x;
+	int dz = Camera.pos.z - item->Pose.Position.z;
+	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
+		return;
+
+	auto* spark = GetFreeParticle();
+
+	spark->on = 1;
+	spark->sR = 48 + (GetRandomControl() & 31);
+	spark->sG = spark->sR;
+	spark->sB = 192 + (GetRandomControl() & 63);
+
+	spark->dR = 192 + (GetRandomControl() & 63);
+	spark->dG = 128 + (GetRandomControl() & 63);
+	spark->dB = 32;
+
+	spark->colFadeSpeed = 12 + (GetRandomControl() & 3);
+	spark->fadeToBlack = 4;
+	spark->sLife = spark->life = (GetRandomControl() & 3) + 20;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+	spark->extras = 0;
+	spark->dynamic = -1;
+	spark->fxObj = itemNum;
+
+	spark->x = (GetRandomControl() & 31) - 16;
+	spark->y = (GetRandomControl() & 31) - 16;
+	spark->z = (GetRandomControl() & 31) - 16;
+
+	spark->xVel =  (GetRandomControl() & 31) - 16;
+	spark->yVel = -(GetRandomControl() & 3);
+	spark->zVel =  (GetRandomControl() & 31) - 16;
+
+	spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_ITEM | SP_NODEATTACH;
+	spark->nodeNumber = nodeIndex;
+	spark->friction = 4;
+	spark->gravity = -(GetRandomControl() & 3) - 2;
+	spark->maxYvel = -(GetRandomControl() & 3) - 4;
+	//spark->def = Objects[EXPLOSION1].mesh_index;
+	spark->scalar = 0;
+	int size = (GetRandomControl() & 7) + 32;
+	spark->size = size / 2;
+	spark->dSize = size;
+}
+
+Particle* SetupPoisonSpark(Vector3 color)
+{
+	auto* spark = GetFreeParticle();
+
+	bool rMax = color.x > color.y && color.x > color.z;
+	bool gMax = color.y > color.x && color.y > color.z;
+	bool bMax = color.z > color.x && color.z > color.y;
+
+	char seed = (GetRandomControl() & 0x1F) + 220;
+
+	spark->sR = (rMax ? seed : 255) * (color.x * 0.4);
+	spark->sG = (gMax ? seed : 255) * (color.y * 0.4);
+	spark->sB = (bMax ? seed : 255) * (color.z * 0.4);
+	spark->dR = 255 * color.x;
+	spark->dG = 255 * color.y;
+	spark->dB = 255 * color.z;
+	spark->colFadeSpeed = 14;
+	spark->fadeToBlack = 8;
+	spark->blendMode = BLEND_MODES::BLENDMODE_SCREEN;
+
+	return spark;
+}
+
+Particle* SetupFireSpark()
+{
+	auto* spark = GetFreeParticle();
+
+	spark->sR = (GetRandomControl() & 0x1F) + 48;
+	spark->sG = 38;
+	spark->sB = 255;
+	spark->dR = (GetRandomControl() & 0x3F) - 64;
+	spark->dG = (GetRandomControl() & 0x3F) + -128;
+	spark->dB = 32;
+	spark->colFadeSpeed = 12;
+	spark->fadeToBlack = 8;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+	return spark;
+}
+
+void AttachAndCreateSpark(Particle* spark, ItemInfo* item, int meshIndex, Vector3Int offset, Vector3Int speed)
+{
+	auto pos1 = Vector3Int(-4, -30, -4) + offset;
+	GetJointAbsPosition(item, &pos1, meshIndex);
+
+	spark->x = (GetRandomControl() & 0x1F) + pos1.x - 16;
+	spark->y = (GetRandomControl() & 0x1F) + pos1.y - 16;
+	spark->z = (GetRandomControl() & 0x1F) + pos1.z - 16;
+
+	auto pos2 = Vector3Int(-4, -30, -4) + offset + speed;
+	GetJointAbsPosition(item, &pos2, meshIndex);
+
+	int v = (GetRandomControl() & 0x3F) + 192;
+
+	spark->life = spark->sLife = v / 6;
+
+	spark->xVel = v * (pos2.x - pos1.x) / 10;
+	spark->yVel = v * (pos2.y - pos1.y) / 10;
+	spark->zVel = v * (pos2.z - pos1.z) / 10;
+
+	spark->friction = 85;
+	spark->gravity = -16 - (GetRandomControl() & 0x1F);
+	spark->maxYvel = 0;
+	spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+
+	spark->scalar = 3;
+	spark->dSize = (v * ((GetRandomControl() & 7) + 60)) / 256;
+	spark->sSize = spark->dSize / 4;
+	spark->size = spark->dSize / 2;
+
+	spark->on = 1;
+}
+
+void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed)
+{
+	auto* item = &g_Level.Items[itemNum];
+
+	for (int i = 0; i < 3; i++)
+	{
+		auto* spark = SetupFireSpark();
+		AttachAndCreateSpark(spark, item, meshIndex, offset, speed);
+
+		spark->flags = SP_FIRE | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+	}
+}
+
+void ThrowPoison(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed, Vector3 color)
+{
+	auto* item = &g_Level.Items[itemNum];
+
+	for (int i = 0; i < 2; i++)
+	{
+		auto* spark = SetupPoisonSpark(color);
+		AttachAndCreateSpark(spark, item, meshIndex, offset, speed);
+
+		spark->flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+	}
+}
+
+void UpdateFireProgress()
 {
 	TriggerGlobalStaticFlame();
 	if (!(Wibble & 0xF))
@@ -212,7 +359,7 @@ void keep_those_fires_burning()
 	}
 }
 
-void AddFire(int x, int y, int z, char size, short roomNum, short on)
+void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 {
 	FIRE_LIST* fptr = &Fires[0];
 	int i = 0;
@@ -221,10 +368,10 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 		fptr++;
 		if (++i >= MAX_FIRE_LIST)
 			return;
-	}
-
-	if (on)
-		fptr->on = on;
+	}	
+	
+	if (fade)
+		fptr->on = fade;
 	else
 		fptr->on = 1;
 
@@ -232,19 +379,7 @@ void AddFire(int x, int y, int z, char size, short roomNum, short on)
 	fptr->y = y;
 	fptr->z = z;
 	fptr->roomNumber = roomNum;
-
-	switch (size)
-	{
-	case SP_NORMALFIRE:
-		fptr->size = 1;
-		break;
-	case SP_SMALLFIRE:
-		fptr->size = 2;
-		break;
-	case SP_BIGFIRE:
-		fptr->size = 3;
-		break;
-	}
+	fptr->size = size;
 }
 
 void ClearFires()
@@ -255,7 +390,7 @@ void ClearFires()
 
 void UpdateFireSparks()
 {
-	keep_those_fires_burning();
+	UpdateFireProgress();
 
 	for (int i = 0; i < MAX_SPARKS_FIRE; i++)
 	{
@@ -503,7 +638,7 @@ void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte ini
 			spark->dShade = 64;
 	}
 
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->x = x + (GetRandomControl() & 31) - 16;
 	spark->y = y + (GetRandomControl() & 31) - 16;
 	spark->z = z + (GetRandomControl() & 31) - 16;
@@ -586,7 +721,7 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->colFadeSpeed = 4;
 	spark->dShade = (GetRandomControl() & 0x1F) + 64;
 	spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -959,7 +1094,7 @@ void UpdateGunShells()
 			int ceiling = GetCeiling(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
 			if (gs->pos.Position.y < ceiling)
 			{
-				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos);
+				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gs->pos);
 				gs->speed -= 4;
 
 				if (gs->speed < 8)
@@ -975,7 +1110,7 @@ void UpdateGunShells()
 			int height = GetFloorHeight(floor, gs->pos.Position.x, gs->pos.Position.y, gs->pos.Position.z);
 			if (gs->pos.Position.y >= height)
 			{
-				SoundEffect(SFX_TR4_LARA_SHOTGUN_SHELL, &gs->pos);
+				SoundEffect(SFX_TR4_SHOTGUN_SHELL, &gs->pos);
 				gs->speed -= 8;
 				if (gs->speed >= 8)
 				{
@@ -1004,7 +1139,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->on = 1;
 		spark->sR = 127;
@@ -1020,7 +1155,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 		spark->sSize = 8;
 		spark->dSize = 32;
 		spark->scalar = 1;
-		spark->transType = TransTypeEnum::COLADD;	
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;	
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -phd_sin(random << 4) * 128;
 		spark->yVel = -GenerateInt(128, 256);
@@ -1203,7 +1338,7 @@ void TriggerLaraDrips(ItemInfo* item)
 	}
 }
 
-int ExplodingDeath(short itemNumber, int meshBits, short flags)
+int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->ObjectNumber];
@@ -1319,7 +1454,7 @@ int ExplodingDeath(short itemNumber, int meshBits, short flags)
 		}
 	}
 
-	return item->MeshBits == 0;
+	return item->MeshBits == NO_JOINT_BITS;
 }
 
 int GetFreeShockwave()
@@ -1355,7 +1490,7 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 		sptr->b = b;
 		sptr->life = life;
 		
-		SoundEffect(SFX_TR5_IMP_STONEHIT, pos);
+		SoundEffect(SFX_TR5_IMP_STONE_HIT, pos);
 	}
 }
 
@@ -1366,7 +1501,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 		spark->dB = b;
 		spark->on = true;
 		spark->sR = 0;
@@ -1376,7 +1511,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 		spark->dR = r;
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 8;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 
 		int speed = (GetRandomControl() & 0xF) + vel;
@@ -1407,7 +1542,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 
 		spark->scalar = 1;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x3F) + 64;
 		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
@@ -1472,7 +1607,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->sR = 128;
 		spark->dR = 128;
@@ -1485,7 +1620,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 		spark->sB = 0;
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 12;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->x = x;
 		spark->y = y;
 		spark->z = z;
@@ -1496,7 +1631,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 		spark->flags = 2058;
 		spark->scalar = 3;
 		spark->gravity = 0;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
 		spark->maxYvel = 0;
 		int size = (GetRandomControl() & 7) + 63;
 		spark->sSize = size >> 1;
@@ -1516,7 +1651,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 /*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 	
 	spark->on = 1;
 	if (unk)
@@ -1543,9 +1678,9 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
 
 	if (unk)
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	else
-		spark->transType = 3;
+		spark->blendMode = 3;
 
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1603,7 +1738,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = (GetRandomControl() & 0x3F) - 0x40;
@@ -1618,7 +1753,7 @@ void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 
 	spark->life = (GetRandomControl() & 7) + 24;
 	spark->sLife = (GetRandomControl() & 7) + 24;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 
 	spark->x = x;
@@ -1643,7 +1778,7 @@ void TriggerSmallSplash(int x, int y, int z, int number)
 {
 	for (int i = 0; i < number; i++)
 	{
-		auto* sptr = &Sparks[GetFreeSpark()];
+		auto* sptr = GetFreeParticle();
 
 		sptr->on = 1;
 
@@ -1661,7 +1796,7 @@ void TriggerSmallSplash(int x, int y, int z, int number)
 		sptr->life = 24;
 		sptr->sLife = 24;
 
-		sptr->transType = TransTypeEnum::COLADD;
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 		int angle = GetRandomControl() << 3;
 

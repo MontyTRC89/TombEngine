@@ -13,7 +13,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-		item->Animation.TargetState = 2;
+		item->Animation.TargetState = 1;
 		item->Animation.ActiveState = 2;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->ItemFlags[2] = abs(item->TriggerFlags);

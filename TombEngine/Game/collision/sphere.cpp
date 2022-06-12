@@ -35,25 +35,25 @@ int GetSpheres(ItemInfo* item, SPHERE* ptr, int worldSpace, Matrix local)
 	return num;
 }
 
-int TestCollision(ItemInfo* item, ItemInfo* l)
+int TestCollision(ItemInfo* item, ItemInfo* laraItem)
 {
 	int flags = 0;
 
 	int creatureSphereCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-	int laraSphereCount = GetSpheres(l, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
+	int laraSphereCount = GetSpheres(laraItem, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 
-	l->TouchBits = 0;
+	laraItem->TouchBits = NO_JOINT_BITS;
 
 	if (creatureSphereCount <= 0)
 	{
-		item->TouchBits = 0;
+		item->TouchBits = NO_JOINT_BITS;
 		return 0;
 	}
 	else
 	{
 		for (int i = 0; i < creatureSphereCount; i++)
 		{
-			SPHERE* ptr1 = &CreatureSpheres[i];
+			auto* ptr1 = &CreatureSpheres[i];
 			
 			int x1 = item->Pose.Position.x + ptr1->x;
 			int y1 = item->Pose.Position.y + ptr1->y;
@@ -64,7 +64,7 @@ int TestCollision(ItemInfo* item, ItemInfo* l)
 			{
 				for (int j = 0; j < laraSphereCount; j++)
 				{
-					SPHERE* ptr2 = &LaraSpheres[j];
+					auto* ptr2 = &LaraSpheres[j];
 
 					int x2 = item->Pose.Position.x + ptr2->x;
 					int y2 = item->Pose.Position.y + ptr2->y;
@@ -78,10 +78,11 @@ int TestCollision(ItemInfo* item, ItemInfo* l)
 						int dz = z1 - z2;
 						int r = r1 + r2;
 
-						if (SQUARE(dx) + SQUARE(dy) + SQUARE(dz) < SQUARE(r))
+						if ((pow(dx, 2) + pow(dy, 2) + pow(dz, 2)) < pow(r, 2))
 						{
-							l->TouchBits |= (1 << j);
-							flags |= (1 << i);
+							item->SetBits(JointBitType::Touch, i);
+							laraItem->SetBits(JointBitType::Touch, j);
+							flags |= 1 << i;
 							break;
 						}
 					}
@@ -89,7 +90,6 @@ int TestCollision(ItemInfo* item, ItemInfo* l)
 			}
 		}
 
-		item->TouchBits = flags;
 		return flags;
 	}
 }
@@ -100,7 +100,7 @@ void GetJointAbsPosition(ItemInfo* item, Vector3Int* vec, int joint)
 	short itemNumber = item - g_Level.Items.data();
 
 	// Use matrices done in the renderer and transform the input vector
-	Vector3 p = Vector3(vec->x, vec->y, vec->z);
+	auto p = vec->ToVector3();
 	g_Renderer.GetItemAbsBonePosition(itemNumber, &p, joint);
 
 	// Store the result

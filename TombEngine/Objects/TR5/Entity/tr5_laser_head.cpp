@@ -43,7 +43,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 	{
 		for (int i = 0; i < count; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = r;
@@ -56,7 +56,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 			spark->fadeToBlack = 0;
 			spark->life = 9 << unk;
 			spark->sLife = 9 << unk;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -224,7 +224,7 @@ void LaserHeadControl(short itemNumber)
 						tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].FrameEnd &&
 						tentacleItem->MeshBits & 1)
 					{
-						SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose);
+						SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 						ExplodeItemNode(tentacleItem, 0, 0, 128);
 						KillItem(creature->Tentacles[i]);
 					}
@@ -467,7 +467,7 @@ void LaserHeadControl(short itemNumber)
 									LaserHeadData.fireArcs[i] != NULL)
 								{
 									// Eye is aready firing
-									SoundEffect(SFX_TR5_GOD_HEAD_LASERLOOPS, &item->Pose);
+									SoundEffect(SFX_TR5_GOD_HEAD_LASER_LOOPS, &item->Pose);
 
 									LaserHeadData.fireArcs[i]->pos1.x = src.x;
 									LaserHeadData.fireArcs[i]->pos1.y = src.y;

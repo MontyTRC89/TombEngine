@@ -11,6 +11,7 @@ struct DisplayPickup
 	short ObjectNumber;
 };
 
+void DrawHUD(ItemInfo* item);
 void DrawHealthBarOverlay(ItemInfo* item, int value);
 void DrawHealthBar(ItemInfo* item, float value);
 void UpdateHealthBar(ItemInfo* item, int flash);

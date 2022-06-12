@@ -102,7 +102,8 @@ enum UPVState
 // TODO
 enum UPVAnim
 {
-	UPV_ANIM_DEATH = 0,
+	UPV_ANIM_DEATH_MOVING = 0,
+	UPV_ANIM_DEATH = 1,
 
 	UPV_ANIM_IDLE = 5,
 
@@ -172,7 +173,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 		AddActiveItem(itemNumber);
 
-		SoundEffect(SFX_TR4_LARA_HARPOON_FIRE_WATER, &laraItem->Pose, SoundEnvironment::Always);
+		SoundEffect(SFX_TR4_HARPOON_FIRE_UNDERWATER, &laraItem->Pose, SoundEnvironment::Always);
 
 		Statistics.Game.AmmoUsed++;
 		UPV->HarpoonLeft = !UPV->HarpoonLeft;
@@ -181,7 +182,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 {
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	sptr->sR = 0;
@@ -195,7 +196,7 @@ static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -630,8 +631,8 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 				//sub->Flags &= ~UPV_CONTROL; having this here causes the UPV glitch, moving it directly to the states' code is better
 
-				StopSoundEffect(SFX_TR3_UPV_LOOP);
-				SoundEffect(SFX_TR3_UPV_STOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
+				StopSoundEffect(SFX_TR3_VEHICLE_UPV_LOOP);
+				SoundEffect(SFX_TR3_VEHICLE_UPV_STOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 			}
 		}
 
@@ -656,7 +657,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 			UPVItem->Pose.Orientation.x += ANGLE(1.0f);
 
 			if (frame == MOUNT_SURFACE_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
+				SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 
 			if (frame == MOUNT_SURFACE_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -665,7 +666,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 		else if (anim == UPV_ANIM_MOUNT_UNDERWATER)
 		{
 			if (frame == MOUNT_UNDERWATER_SOUND_FRAME)
-				SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
+				SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 
 			if (frame == MOUNT_UNDERWATER_CONTROL_FRAME)
 				UPV->Flags |= UPV_CONTROL;
@@ -762,7 +763,8 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 		break;
 
 	case UPV_STATE_DEATH:
-		if (anim == UPV_ANIM_DEATH && (frame == DEATH_FRAME_1 || frame == DEATH_FRAME_2))
+		if ((anim == UPV_ANIM_DEATH || anim == UPV_ANIM_DEATH_MOVING) &&
+			(frame == DEATH_FRAME_1 || frame == DEATH_FRAME_2))
 		{
 			auto vec = Vector3Int();
 			GetLaraJointPosition(&vec, LM_HIPS);
@@ -771,7 +773,7 @@ static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 
-			SetAnimation(UPVItem, LA_UNDERWATER_DEATH, 17);
+			SetAnimation(laraItem, LA_UNDERWATER_DEATH, 17);
 			laraItem->Animation.VerticalVelocity = 0;
 			laraItem->Animation.Airborne = false;
 			
@@ -929,9 +931,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 		else if (UPVItem->Pose.Orientation.x < -UPDOWN_LIMIT)
 			UPVItem->Pose.Orientation.x = -UPDOWN_LIMIT;
 
-		UPVItem->Pose.Position.x += round(phd_sin(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Pose.Orientation.x));
-		UPVItem->Pose.Position.y -= round(phd_sin(UPVItem->Pose.Orientation.x) * UPVItem->Animation.Velocity);
-		UPVItem->Pose.Position.z += round(phd_cos(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Pose.Orientation.x));
+		TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity);
 	}
 
 	int newHeight = GetCollision(UPVItem).Position.Floor;
@@ -962,8 +962,8 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			UPV->Flags |= UPV_SURFACE;
 		}
-
-		else if ((waterHeight - UPVItem->Pose.Position.y) >= -SURFACE_DIST && waterHeight != NO_HEIGHT)
+		else if ((waterHeight - UPVItem->Pose.Position.y) >= -SURFACE_DIST && waterHeight != NO_HEIGHT &&
+			     (laraItem->Pose.Position.y - probe.Position.Ceiling) >= CLICK(1))
 		{
 			UPVItem->Pose.Position.y = waterHeight + SURFACE_DIST;
 
@@ -975,7 +975,6 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			UPV->Flags |= UPV_SURFACE;
 		}
-
 		else
 			UPV->Flags &= ~UPV_SURFACE;
 
@@ -1035,7 +1034,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 		BackgroundCollision(laraItem, UPVItem);
 
 		if (UPV->Flags & UPV_CONTROL)
-			SoundEffect(SFX_TR3_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity / 96.0f);
+			SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity / 96.0f);
 
 		UPVItem->Animation.AnimNumber = Objects[ID_UPV].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex);
 		UPVItem->Animation.FrameNumber = g_Level.Anims[UPVItem->Animation.AnimNumber].FrameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase);
