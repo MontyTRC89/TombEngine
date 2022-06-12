@@ -81,16 +81,16 @@ struct CollisionSetup
 	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
 	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
 	bool BlockDeathFloorDown;	// Treat death sectors as pits
-	bool BlockMonkeySwingEdge;		// Treat non-monkey sectors as walls
+	bool BlockMonkeySwingEdge;	// Treat non-monkey sectors as walls
 	
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
 	Vector3Int OldPosition;
-	int OldState;
 	int OldAnimNumber;
 	int OldFrameNumber;
+	int OldState;
 };
 
 struct CollisionInfo
