@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_jeanyves.h"
+#include "tr4_jean_yves.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"

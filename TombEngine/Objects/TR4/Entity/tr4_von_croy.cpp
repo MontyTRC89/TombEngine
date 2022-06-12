@@ -150,7 +150,6 @@ namespace TEN::Entities::TR4
 		item->AIBits = FOLLOW;
 		GetAITarget(creature);
 
-
 		// Try to find a possible enemy or target
 		ItemInfo* foundTarget = NULL;
 

@@ -253,8 +253,7 @@ static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 			laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 
 		SetAnimation(laraItem, LA_STAND_IDLE);
-		laraItem->Pose.Position.x -= DISMOUNT_DISTANCE * phd_sin(laraItem->Pose.Orientation.y);
-		laraItem->Pose.Position.z -= DISMOUNT_DISTANCE * phd_cos(laraItem->Pose.Orientation.y);
+		TranslateItem(laraItem, laraItem->Pose.Orientation.y, -DISMOUNT_DISTANCE);
 		laraItem->Pose.Orientation.x = 0;
 		laraItem->Pose.Orientation.z = 0;
 		lara->Vehicle = NO_ITEM;
@@ -262,16 +261,14 @@ static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 
 		if (laraItem->Animation.ActiveState == QUAD_STATE_FALL_OFF)
 		{
-			Vector3Int pos = { 0, 0, 0 };
+			auto pos = Vector3Int();
 
 			SetAnimation(laraItem, LA_FREEFALL);
 			GetJointAbsPosition(laraItem, &pos, LM_HIPS);
 
-			laraItem->Pose.Position.x = pos.x;
-			laraItem->Pose.Position.y = pos.y;
-			laraItem->Pose.Position.z = pos.z;
-			laraItem->Animation.VerticalVelocity = quadItem->Animation.VerticalVelocity;
+			laraItem->Pose.Position = pos;
 			laraItem->Animation.Airborne = true;
+			laraItem->Animation.VerticalVelocity = quadItem->Animation.VerticalVelocity;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 			laraItem->HitPoints = 0;
@@ -283,8 +280,8 @@ static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 		else if (laraItem->Animation.ActiveState == QUAD_STATE_FALL_DEATH)
 		{
 			laraItem->Animation.TargetState = LS_DEATH;
-			laraItem->Animation.VerticalVelocity = DAMAGE_START + DAMAGE_LENGTH;
 			laraItem->Animation.Velocity = 0;
+			laraItem->Animation.VerticalVelocity = DAMAGE_START + DAMAGE_LENGTH;
 			quad->Flags |= QUAD_FLAG_DEAD;
 
 			return false;
@@ -672,8 +669,7 @@ static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 	else
 		speed = quadItem->Animation.Velocity;
 
-	quadItem->Pose.Position.z += speed * phd_cos(quad->MomentumAngle);
-	quadItem->Pose.Position.x += speed * phd_sin(quad->MomentumAngle);
+	TranslateItem(quadItem, quad->MomentumAngle, speed);
 
 	int slip = QUAD_SLIP * phd_sin(quadItem->Pose.Orientation.x);
 	if (abs(slip) > QUAD_SLIP / 2)

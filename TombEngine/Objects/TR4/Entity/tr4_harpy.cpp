@@ -21,6 +21,8 @@ namespace TEN::Entities::TR4
 	BITE_INFO HarpyBite3 = { 0, 0, 0, 21 };
 	BITE_INFO HarpyAttack1 = { 0, 128, 0, 2 };
 	BITE_INFO HarpyAttack2 = { 0, 128, 0, 4 };
+	const std::vector<int> HarpySwoopAttackJoints = { 2, 4 };
+	const std::vector<int> HarpyStingerAttackJoints = { 20, 21 };
 
 	constexpr auto HARPY_STINGER_ATTACK_DAMAGE = 100;
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE = 10;
@@ -505,7 +507,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (item->TouchBits & 0x14 ||
+				if (item->TestBits(JointBitType::Touch, HarpySwoopAttackJoints) ||
 					creature->Enemy && creature->Enemy != LaraItem &&
 					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 					AI.distance < pow(SECTOR(2), 2))
@@ -539,7 +541,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (creature->Flags == 0 &&
-					(item->TouchBits & 0x300000 ||
+					(item->TestBits(JointBitType::Touch, HarpyStingerAttackJoints) ||
 						creature->Enemy && creature->Enemy != LaraItem &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 						AI.distance < pow(SECTOR(2), 2)))

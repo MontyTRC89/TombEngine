@@ -1,3 +1,6 @@
 #pragma once
 
-void ApeControl(short itemNumber);
+namespace TEN::Entities::TR1
+{
+	void ApeControl(short itemNumber);
+}

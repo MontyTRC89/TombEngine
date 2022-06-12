@@ -8,6 +8,7 @@
 #include "Game/effects/smoke.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Smoke;
@@ -19,7 +20,7 @@ namespace TEN::Effects::Lara
 		if (!item->Data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto* lara = GetLaraInfo(item);
 
 		if (!lara->Burn && !lara->BurnSmoke)
 		{
@@ -37,7 +38,7 @@ namespace TEN::Effects::Lara
 		if (!item->Data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto* lara = GetLaraInfo(item);
 
 		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		{
@@ -62,7 +63,7 @@ namespace TEN::Effects::Lara
 		if (!item->Data.is<LaraInfo*>())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto* lara = GetLaraInfo(item);
 
 		if (lara->Control.WaterStatus == WaterStatus::Underwater || item->HitPoints <= 0)
 			return;
