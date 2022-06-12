@@ -61,6 +61,10 @@ using namespace TEN::Math::Random;
 #define MAX_MOMENTUM_TURN ANGLE(1.5f)
 #define QUAD_MAX_MOM_TURN ANGLE(150.0f)
 
+#define QUAD_MAX_WATER_HEIGHT CLICK(2)
+#define QUAD_VEL_COEFFICIENT 8.0f
+#define QUAD_TURN_COEFFICIENT 6.0f
+
 #define QUAD_MAX_HEIGHT CLICK(1)
 #define QUAD_MIN_BOUNCE ((MAX_VELOCITY / 2) / CLICK(1))
 
@@ -970,17 +974,17 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 		if (TestEnvironment(ENV_FLAG_WATER, quadItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, quadItem))
 		{
-			auto waterDepth = GetWaterDepth(laraItem);
+			auto waterDepth = (float)GetWaterDepth(quadItem);
 
-			if (waterDepth < CLICK(2.5f))
+			if (waterDepth <= QUAD_MAX_WATER_HEIGHT)
 			{
 				if (quad->Velocity != 0)
 				{
-					quad->Velocity -= std::copysign(quad->Velocity / (waterDepth / 64), quad->Velocity);
+					quad->Velocity -= std::copysign(quad->Velocity * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / QUAD_VEL_COEFFICIENT), quad->Velocity);
 
 					if (TestEnvironment(ENV_FLAG_WATER, quadItem))
 					{
-						TEN::Effects::TriggerSpeedboatFoam(quadItem, Vector3(0, -waterDepth / 2, QUAD_BACK));
+						TEN::Effects::TriggerSpeedboatFoam(quadItem, Vector3(0, -waterDepth / 2.0f, QUAD_BACK));
 
 						if (GenerateInt(0, 32) > 28)
 							SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(quadItem->Pose.Position), SoundEnvironment::Land, 0.8f);
@@ -988,7 +992,7 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 				}
 
 				if (quad->TurnRate != 0)
-					quad->TurnRate -= quad->TurnRate / (waterDepth / 48);
+					quad->TurnRate -= quad->TurnRate * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / QUAD_TURN_COEFFICIENT);
 			}
 			else
 			{
@@ -1321,11 +1325,7 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	oldPos.z = quadItem->Pose.Position.z;
 	oldPos.roomNumber = quadItem->RoomNumber;
 
-	GetCollisionInfo(coll, quadItem);
-	DoObjectCollision(quadItem, coll);
-
 	bool collide = QuadDynamics(laraItem, quadItem);
-	CollideSolidStatics(quadItem, coll);
 
 	auto probe = GetCollision(quadItem);
 
