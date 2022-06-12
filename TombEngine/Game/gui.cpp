@@ -608,17 +608,17 @@ InventoryResult GuiController::TitleOptions()
 
 	case Menu::Display:
 		option_count = 6;
-		HandleDisplaySettingsInput(0);
+		HandleDisplaySettingsInput(false);
 		break;
 
 	case Menu::Controls:
 		option_count = 17;
-		HandleControlSettingsInput(0);
+		HandleControlSettingsInput(false);
 		break;
 
 	case Menu::Sound:
 		option_count = 4;
-		HandleSoundSettingsInput(0);
+		HandleSoundSettingsInput(false);
 		break;
 	}
 
@@ -648,12 +648,7 @@ InventoryResult GuiController::TitleOptions()
 	{
 		if (goUp)
 		{
-
-			if (menu_to_display == Menu::LoadGame)
-				selected_save_slot = (selected_save_slot <= 0) ? option_count : selected_option - 1;
-			else
-				selected_option = (selected_option <= 0) ? option_count : selected_option - 1;
-
+			selected_option = (selected_option <= 0) ? option_count : selected_option - 1;
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
@@ -676,10 +671,10 @@ InventoryResult GuiController::TitleOptions()
 
 		if (goSelect)
 		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
 			if (menu_to_display == Menu::Title)
 			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-
 				switch (selected_option)
 				{
 				case 0:
@@ -713,7 +708,6 @@ InventoryResult GuiController::TitleOptions()
 			}
 			else if (menu_to_display == Menu::SelectLevel)
 			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				// Level 0 is the title level, so increment the option by 1 to offset it.
 				g_GameFlow->SelectedLevelForNewGame = selected_option + 1;
 				menu_to_display = Menu::Title;
@@ -787,28 +781,28 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			if (CurrentSettings.selectedScreenResolution > 0)
 				CurrentSettings.selectedScreenResolution--;
 			break;
 
 		case 1:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 3:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 4:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -819,28 +813,28 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			if (CurrentSettings.selectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
 				CurrentSettings.selectedScreenResolution++;
 			break;
 
 		case 1:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
 			break;
 
 		case 2:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
 			break;
 
 		case 3:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
 			break;
 
 		case 4:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
 			break;
 		}
@@ -868,7 +862,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 		if (selected_option == 5)
 		{
@@ -914,7 +908,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 	if (goSelect && selected_option != 16 && selected_option != 17)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		CurrentSettings.waitingForkey = true;
 		CurrentSettings.ignoreInput = true;
 	}
@@ -1002,7 +996,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 		{
 			if (selected_option == 16) // Apply
 			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
@@ -1012,7 +1006,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 			if (selected_option == 17) // Cancel
 			{
-				SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
+				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
 				return;
@@ -1021,6 +1015,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 		if (goDeselect)
 		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
 			menu_to_display = Menu::Options;
 			selected_option = 1;
 		}
@@ -1041,6 +1037,8 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 
 	if (goDeselect)
 	{
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
 		menu_to_display = Menu::Options;
 		selected_option = 2;
 
@@ -1054,7 +1052,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1066,7 +1064,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 					db = 10;
 				}
 				else
@@ -1083,7 +1081,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 					db = 10;
 				}
 				else
@@ -1099,7 +1097,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		switch (selected_option)
 		{
 		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
 			break;
 
@@ -1111,7 +1109,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 					db = 10;
 				}
 				else
@@ -1128,7 +1126,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				SetVolumeFX(CurrentSettings.conf.SfxVolume);
 				if (!db)
 				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr);
+					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 					db = 10;
 				}
 				else
@@ -1161,7 +1159,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 
 	if (goSelect)
 	{
-		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
+		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 		if (selected_option == 3)
 		{
@@ -1174,7 +1172,7 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		}
 		else if (selected_option == 4)
 		{
-			SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			SetVolumeMusic(g_Configuration.MusicVolume);
 			SetVolumeFX(g_Configuration.SfxVolume);
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
@@ -1203,17 +1201,17 @@ InventoryResult GuiController::DoPauseMenu()
 
 	case Menu::Display:
 		option_count = 6;
-		HandleDisplaySettingsInput(1);
+		HandleDisplaySettingsInput(true);
 		break;
 
 	case Menu::Controls:
 		option_count = 17;
-		HandleControlSettingsInput(1);
+		HandleControlSettingsInput(true);
 		break;
 
 	case Menu::Sound:
 		option_count = 4;
-		HandleSoundSettingsInput(1);
+		HandleSoundSettingsInput(true);
 		break;
 	}
 
