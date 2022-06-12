@@ -42,11 +42,11 @@ int TestCollision(ItemInfo* item, ItemInfo* laraItem)
 	int creatureSphereCount = GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 	int laraSphereCount = GetSpheres(laraItem, LaraSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
 
-	laraItem->TouchBits = 0;
+	laraItem->TouchBits = NO_JOINT_BITS;
 
 	if (creatureSphereCount <= 0)
 	{
-		item->TouchBits = 0;
+		item->TouchBits = NO_JOINT_BITS;
 		return 0;
 	}
 	else
@@ -80,8 +80,8 @@ int TestCollision(ItemInfo* item, ItemInfo* laraItem)
 
 						if ((pow(dx, 2) + pow(dy, 2) + pow(dz, 2)) < pow(r, 2))
 						{
-							item->SetTouchBits({ i });
-							laraItem->SetTouchBits({ j });
+							item->SetBits(JointBitType::Touch, i);
+							laraItem->SetBits(JointBitType::Touch, j);
 							flags |= 1 << i;
 							break;
 						}

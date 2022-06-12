@@ -244,7 +244,7 @@ void DrawFlare(ItemInfo* laraItem)
 		{
 			if (armFrame == 72)
 			{
-				SoundEffect(SFX_TR4_FLARE_IGNITE_DRY, &laraItem->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, laraItem));
+				SoundEffect(SFX_TR4_FLARE_IGNITE_DRY, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 				lara->Flare.Life = 1;
 			}
 

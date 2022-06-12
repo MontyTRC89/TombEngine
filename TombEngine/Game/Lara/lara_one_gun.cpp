@@ -349,7 +349,7 @@ void FireShotgun(ItemInfo* laraItem)
 
 		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, laraItem));
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
 
 		Statistics.Game.AmmoUsed++;
@@ -1888,7 +1888,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 {
 	for (int i = 0; i < count; i++)
 	{
-		auto * spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->on = 1;
 		spark->sR = 112;
@@ -1901,7 +1901,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 		spark->dG = spark->sG >> 1;
 		spark->dB = spark->sB >> 1;
 		spark->sLife = 24;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 5;
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -128 * phd_sin(random << 4);

@@ -17,7 +17,7 @@
 
 static void TriggerSubmarineSparks(short itemNumber)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = -1;
@@ -29,7 +29,7 @@ static void TriggerSubmarineSparks(short itemNumber)
 	spark->dR = spark->dG / 2;
 	spark->dB = spark->dG / 2;
 	spark->sLife = 2;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->fadeToBlack = 0;
 	spark->flags = 20650;
 	spark->fxObj = itemNumber;
@@ -43,13 +43,13 @@ static void TriggerSubmarineSparks(short itemNumber)
 	spark->maxYvel = 0;
 	spark->gravity = 0;
 	spark->scalar = 1;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 }
 
 static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char factor)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 32;
@@ -60,7 +60,7 @@ static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char facto
 	spark->dB = 80;
 	spark->colFadeSpeed = 2;
 	spark->fadeToBlack = 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 	spark->x = pos1->x + (GetRandomControl() & 0x1F);
 	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
@@ -69,7 +69,7 @@ static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char facto
 	spark->yVel = pos2->y + (GetRandomControl() & 0x7F) - pos1->y - 64;
 	spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - pos1->z - 64;
 	spark->friction = 0;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
 	spark->maxYvel = 0;
 	spark->gravity = -4 - (GetRandomControl() & 3);
 	spark->scalar = 1;
@@ -82,7 +82,7 @@ static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char facto
 
 static void TriggerTorpedoSparks2(Vector3Int* pos1, Vector3Int* pos2, char scale)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 32;
@@ -93,7 +93,7 @@ static void TriggerTorpedoSparks2(Vector3Int* pos1, Vector3Int* pos2, char scale
 	spark->dB = -128;
 	spark->colFadeSpeed = 2;
 	spark->fadeToBlack = 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 16;
 	spark->x = pos1->x + (GetRandomControl() & 0x1F);
 	spark->y = (GetRandomControl() & 0x1F) + pos1->y - 16;
@@ -255,7 +255,7 @@ void SubmarineControl(short itemNumber)
 		if (laraInfo.distance >= pow(SECTOR(3), 2))
 		{
 			item->Animation.TargetState = 1;
-			SoundEffect(SFX_TR4_VEHICLE_DIVESUIT_LOOP, &item->Pose, SoundEnvironment::Always);
+			SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_LOOP, &item->Pose, SoundEnvironment::Always);
 		}
 		else
 			item->Animation.TargetState = 0;
@@ -423,7 +423,7 @@ void TorpedoControl(short itemNumber)
 {
 	auto*  item = &g_Level.Items[itemNumber];
 
-	SoundEffect(SFX_TR4_VEHICLE_DIVESUIT_HIT, &item->Pose, SoundEnvironment::Always);
+	SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_HIT, &item->Pose, SoundEnvironment::Always);
 
 	Vector3Int pos;
 
@@ -542,7 +542,7 @@ void TorpedoControl(short itemNumber)
 			KillItem(itemNumber);
 			TriggerUnderwaterExplosion(item, 1);
 			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->Pose, SoundEnvironment::Always);
-			SoundEffect(SFX_TR4_VEHICLE_DIVESUIT_HIT, &LaraItem->Pose, SoundEnvironment::Always);
+			SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_HIT, &LaraItem->Pose, SoundEnvironment::Always);
 			LaraItem->HitPoints -= 200;
 		//	if (Lara.anxiety >= 0x7F)
 		//		Lara.anxiety--;

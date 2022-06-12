@@ -547,9 +547,9 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y += AI.angle;
 
 				if (creature->Flags == 0 &&
-					(item->TestTouchBits(BaboonAttackJoints) ||
-						item->TestTouchBits(BaboonAttackRightJoints) ||
-						item->TestTouchBits(BaboonJumpAttackJoints)))
+					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||
+						item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
+						item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
 				{
 					CreatureEffect2(item, &BaboonBite, 10, -1, DoBloodSplat);
 					creature->Flags = 1;

@@ -266,7 +266,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					item->Animation.RequiredState = 0;
 
-				if (AI.bite && item->TestTouchBits(CrocodileBiteAttackJoints))
+				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{
@@ -310,7 +310,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					item->Animation.RequiredState = CROC_STATE_NONE_1;
 
-				if (AI.bite && item->TestTouchBits(CrocodileBiteAttackJoints))
+				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{

@@ -377,6 +377,7 @@ namespace TEN::Entities::TR4
 					creature->Flags--;
 				else
 				{
+					creature->FiredWeapon = 1;
 					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
@@ -435,6 +436,7 @@ namespace TEN::Entities::TR4
 					creature->Flags--;
 				else
 				{
+					creature->FiredWeapon = 1;
 					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}

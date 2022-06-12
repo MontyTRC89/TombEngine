@@ -198,7 +198,7 @@ namespace TEN::Entities::TR1
 					break;
 				}
 
-				if (AI.ahead && item->TestTouchBits(BigRatAttackJoints))
+				if (AI.ahead && item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
 				else if (AI.bite && AI.distance < BIG_RAT_CHARGE_RANGE)
 					item->Animation.TargetState = BIG_RAT_STATE_CHARGE_ATTACK;
@@ -212,7 +212,7 @@ namespace TEN::Entities::TR1
 
 			case BIG_RAT_STATE_BITE_ATTACK:
 				if (!item->Animation.RequiredState && AI.ahead &&
-					item->TestTouchBits(BigRatAttackJoints))
+					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
 					CreatureEffect(item, &BigRatBite, DoBloodSplat);
 					item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
@@ -225,7 +225,7 @@ namespace TEN::Entities::TR1
 
 			case BIG_RAT_STATE_CHARGE_ATTACK:
 				if (!item->Animation.RequiredState && AI.ahead &&
-					item->TestTouchBits(BigRatAttackJoints))
+					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
 					CreatureEffect(item, &BigRatBite, DoBloodSplat);
 					item->Animation.RequiredState = BIG_RAT_STATE_RUN;
@@ -252,14 +252,14 @@ namespace TEN::Entities::TR1
 					break;
 				}
 
-				if (AI.ahead && item->TestTouchBits(BigRatAttackJoints))
+				if (AI.ahead && item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 					item->Animation.TargetState = BIG_RAT_STATE_SWIM_ATTACK;
 
 				break;
 
 			case BIG_RAT_STATE_SWIM_ATTACK:
 				if (!item->Animation.RequiredState && AI.ahead &&
-					item->TestTouchBits(BigRatAttackJoints))
+					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
 					CreatureEffect(item, &BigRatBite, DoBloodSplat);
 

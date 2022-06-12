@@ -18,8 +18,6 @@ extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer;
-
 	// Horizontal alignment constants
 	constexpr auto MenuLeftSideEntry = 200;
 	constexpr auto MenuCenterEntry = 400;
@@ -56,9 +54,6 @@ namespace TEN::Renderer
 	// Helper functions to construct string flags
 	inline int SF(bool selected = false) { return PRINTSTRING_OUTLINE | (selected ? PRINTSTRING_BLINK : 0); }
 	inline int SF_Center(bool selected = false) { return PRINTSTRING_OUTLINE | PRINTSTRING_CENTER | (selected ? PRINTSTRING_BLINK : 0); }
-	inline int SF_Option(bool selected) { return PRINTSTRING_OUTLINE | PRINTSTRING_DONT_UPDATE_BLINK | (selected ? PRINTSTRING_BLINK : 0); }
-	inline int SF_Value(bool selected) { return PRINTSTRING_OUTLINE | (selected ? PRINTSTRING_BLINK : 0); }
-	inline int SF_Selector(bool selected, bool active) { return PRINTSTRING_OUTLINE | (active ? 0 : PRINTSTRING_DONT_UPDATE_BLINK) | (selected ? PRINTSTRING_BLINK : 0); }
 	
 	// Helper functions to get specific generic strings
 	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
@@ -127,28 +122,28 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Screen resolution
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 0));
-			DrawString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF_Value(title_option == 0));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SCREEN_RESOLUTION), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
+			DrawString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
 			// Windowed mode
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 1));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.Windowed), PRINTSTRING_COLOR_WHITE, SF_Value(title_option == 1));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.Windowed), PRINTSTRING_COLOR_WHITE, SF(title_option == 1));
 			GetNextLinePosition(&y);
 
 			// Enable dynamic shadows
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SHADOWS), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 2));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableShadows), PRINTSTRING_COLOR_WHITE, SF_Value(title_option == 2));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SHADOWS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableShadows), PRINTSTRING_COLOR_WHITE, SF(title_option == 2));
 			GetNextLinePosition(&y);
 
 			// Enable caustics
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CAUSTICS), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 3));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF_Value(title_option == 3));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CAUSTICS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
 			// Enable volumetric fog
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 4));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog), PRINTSTRING_COLOR_WHITE, SF_Value(title_option == 4));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
 			GetNextBlockPosition(&y);
 
 			// Apply
@@ -169,8 +164,8 @@ namespace TEN::Renderer
 			GetNextBlockPosition(&y);
 
 			// Enable sound special effects
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 0));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects), PRINTSTRING_COLOR_WHITE, SF_Value(title_option == 0));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
 			// Initialize bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
@@ -178,12 +173,12 @@ namespace TEN::Renderer
 				InitialiseMenuBars(y);
 
 			// Music volume
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 1));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
 			DrawBar(g_Gui.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextLinePosition(&y);
 
 			// Sound FX volume
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF_Option(title_option == 2));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
 			DrawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
@@ -207,7 +202,7 @@ namespace TEN::Renderer
 			// Control listing
 			for (int k = 0; k < 16; k++)
 			{
-				DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(controlmsgs[k]), PRINTSTRING_COLOR_WHITE, SF_Option(title_option == k));
+				DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(controlmsgs[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
 				if (g_Gui.GetCurrentSettings().waitingForkey && title_option == k)
 					DrawString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
@@ -362,14 +357,14 @@ namespace TEN::Renderer
 			{
 				// Number
 				sprintf(stringBuffer, "%03d", save.Count);
-				DrawString(MenuLoadNumberLeftSide, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF_Value(selection == n));
+				DrawString(MenuLoadNumberLeftSide, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
 
 				// Level name
-				DrawString(MenuLoadNameLeftSide, y, (char*)save.LevelName.c_str(), PRINTSTRING_COLOR_WHITE, SF_Value(selection == n));
+				DrawString(MenuLoadNameLeftSide, y, (char*)save.LevelName.c_str(), PRINTSTRING_COLOR_WHITE, SF(selection == n));
 
 				// Timestamp
 				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), save.Days, save.Hours, save.Minutes, save.Seconds);
-				DrawString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF_Value(selection == n));
+				DrawString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
 			}
 
 			GetNextLinePosition(&y);
@@ -671,9 +666,6 @@ namespace TEN::Renderer
 	void Renderer11::RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 		ID3D11ShaderResourceView* background)
 	{
-		m_lines2DToDraw.clear();
-		m_strings.clear();
-
 		// Set basic render states
 		SetBlendMode(BLENDMODE_OPAQUE, true);
 		SetDepthState(DEPTH_STATE_WRITE_ZBUFFER, true);
@@ -733,35 +725,36 @@ namespace TEN::Renderer
 			}
 
 			RenderTitleMenu(title_menu);
-			return;
 		}
-
-		switch (g_Gui.GetInventoryMode())
+		else
 		{
-		case InventoryMode::Load:
-		case InventoryMode::Save:
-			RenderLoadSaveMenu();
-			return;
+			switch (g_Gui.GetInventoryMode())
+			{
+			case InventoryMode::Load:
+			case InventoryMode::Save:
+				RenderLoadSaveMenu();
+				break;
 
-		case InventoryMode::InGame:
-			RenderNewInventory();
-			return;
+			case InventoryMode::InGame:
+				RenderNewInventory();
+				break;
 
-		case InventoryMode::Statistics:
-			DrawStatistics();
-			return;
+			case InventoryMode::Statistics:
+				DrawStatistics();
+				break;
 
-		case InventoryMode::Examine:
-			DrawExamines();
-			return;
+			case InventoryMode::Examine:
+				DrawExamines();
+				break;
 
-		case InventoryMode::Pause:
-			RenderPauseMenu(g_Gui.GetMenuToDisplay());
-			return;
+			case InventoryMode::Pause:
+				RenderPauseMenu(g_Gui.GetMenuToDisplay());
+				break;
 
-		case InventoryMode::Diary:
-			DrawDiary();
-			return;
+			case InventoryMode::Diary:
+				DrawDiary();
+				break;
+			}
 		}
 	}
 

@@ -891,7 +891,7 @@ void InitialiseSearchObject(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
-		item->SwapMeshFlags = -1;
+		item->MeshSwapBits = ALL_JOINT_BITS;
 		item->MeshBits = 7;
 	}
 	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
@@ -1008,12 +1008,12 @@ void SearchObjectControl(short itemNumber)
 	{
 		if (frameNumber > 0)
 		{
-			item->SwapMeshFlags = 0;
-			item->MeshBits = -1;
+			item->MeshSwapBits = NO_JOINT_BITS;
+			item->MeshBits = ALL_JOINT_BITS;
 		}
 		else
 		{
-			item->SwapMeshFlags = -1;
+			item->MeshSwapBits = ALL_JOINT_BITS;
 			item->MeshBits = 7;
 		}
 	}
@@ -1109,7 +1109,7 @@ bool UseSpecialItem(ItemInfo* item)
 
 		if (flag == 1)
 		{
-			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->Pose.Position.y > Lara.WaterSurfaceDist))
+			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (Lara.WaterSurfaceDist < -SHALLOW_WATER_START_LEVEL))
 			{
 				if (use < ID_WATERSKIN1_3)
 					Lara.Inventory.SmallWaterskin = 4;

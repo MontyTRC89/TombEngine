@@ -13,6 +13,7 @@ constexpr auto GRID_SNAP_SIZE = STEP_SIZE / 2;
 constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
 constexpr auto SWIM_DEPTH = 730;
 constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
+constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 constexpr auto SLOPE_DIFFERENCE = 60;
 constexpr auto NO_HEIGHT  = (-0x7F00);

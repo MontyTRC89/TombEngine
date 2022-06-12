@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 			fx->shade = 0x4210;
 			fx->flag2 = 0x601;
 
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 			spark->on = 1;
 			spark->sR = 0;
 			spark->sG = 0;
@@ -148,7 +148,7 @@ namespace TEN::Entities::TR4
 			spark->xVel = phd_sin(fx->pos.Orientation.y) * 4096;
 			spark->yVel = 0;
 			spark->zVel = phd_cos(fx->pos.Orientation.y) * 4096;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->friction = 68;
 			spark->flags = 26;
 			spark->rotAng = GetRandomControl() & 0xFFF;
@@ -589,7 +589,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestTouchBits(SkeletonSwordAttackJoints))
+					if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 					{
 						CreatureEffect2(item, &SkeletonBite, 15, -1, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
@@ -647,7 +647,7 @@ namespace TEN::Entities::TR4
 					}
 					if (!creature->Flags)
 					{
-						if (item->TestTouchBits(SkeletonSwordAttackJoints))
+						if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 						{
 							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
@@ -701,7 +701,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Active)
 					{
-						ExplodingDeath(itemNumber, -1, 929);
+						ExplodingDeath(itemNumber, ALL_JOINT_BITS, 929);
 						KillItem(itemNumber);
 						DisableEntityAI(itemNumber);
 						//Savegame.Kills++;

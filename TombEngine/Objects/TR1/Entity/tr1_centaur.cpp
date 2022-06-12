@@ -22,12 +22,12 @@ namespace TEN::Entities::TR1
 	BITE_INFO CentaurRearBite = { 50, 30, 0, 5 };
 	std::vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
-	#define BOMB_SPEED 256
-	#define CENTAUR_TURN ANGLE(4.0f)
-	#define CENTAUR_REAR_CHANCE 0x60
-	#define CENTAUR_REAR_RANGE pow(SECTOR(1.5f), 2)
-	#define FLYER_PART_DAMAGE 100
-	#define CENTAUR_REAR_DAMAGE 200
+#define BOMB_SPEED 256
+#define CENTAUR_TURN ANGLE(4.0f)
+#define CENTAUR_REAR_CHANCE 0x60
+#define CENTAUR_REAR_RANGE pow(SECTOR(1.5f), 2)
+#define FLYER_PART_DAMAGE 100
+#define CENTAUR_REAR_DAMAGE 200
 
 	enum CentaurState
 	{
@@ -256,8 +256,8 @@ namespace TEN::Entities::TR1
 				break;
 
 			case CENTAUR_STATE_WARNING:
-				if (!item->Animation.RequiredState && 
-					item->TestTouchBits(CentaurAttackJoints))
+				if (!item->Animation.RequiredState &&
+					item->TestBits(JointBitType::Touch, CentaurAttackJoints))
 				{
 					CreatureEffect(item, &CentaurRearBite, DoBloodSplat);
 					item->Animation.RequiredState = CENTAUR_STATE_IDLE;
@@ -276,7 +276,7 @@ namespace TEN::Entities::TR1
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, 0xffffffff, FLYER_PART_DAMAGE);
+			ExplodingDeath(itemNumber, ALL_JOINT_BITS, FLYER_PART_DAMAGE);
 			KillItem(itemNumber);
 			item->Status = ITEM_DEACTIVATED;
 		}

@@ -118,7 +118,7 @@ namespace TEN::Entities::TR4
 				case HAMMERHEAD_STATE_IDLE_BITE_ATTACK:
 					if (!creature->Flags)
 					{
-						if (item->TestTouchBits(HammerheadBiteAttackJoints))
+						if (item->TestBits(JointBitType::Touch, HammerheadBiteAttackJoints))
 						{
 							CreatureEffect(item, &HammerheadBite, DoBloodSplat);
 							creature->Flags = 1;

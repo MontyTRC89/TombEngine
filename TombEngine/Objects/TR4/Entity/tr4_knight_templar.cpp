@@ -203,7 +203,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestTouchBits(KnightTemplarSwordAttackJoints))
+					if (item->TestBits(JointBitType::Touch, KnightTemplarSwordAttackJoints))
 					{
 						CreatureEffect2(
 							item,

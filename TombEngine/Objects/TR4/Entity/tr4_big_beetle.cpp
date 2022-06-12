@@ -167,7 +167,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestTouchBits(BigBeetleAttackJoints))
+					if (item->TestBits(JointBitType::Touch, BigBeetleAttackJoints))
 					{
 						LaraItem->HitPoints -= 50;
 						LaraItem->HitStatus = true;

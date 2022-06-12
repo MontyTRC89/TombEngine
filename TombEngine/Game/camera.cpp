@@ -1077,7 +1077,7 @@ void BinocularCamera(ItemInfo* item)
 		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
 		if (InputBusy & (IN_DESELECT | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
 		{
-			item->MeshBits = -1;
+			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = Vector3Shrt();
 			lara->ExtraTorsoRot = Vector3Shrt();
@@ -1089,7 +1089,7 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	item->MeshBits = 0;
+	item->MeshBits = NO_JOINT_BITS;
 	AlterFOV(7 * (ANGLE(11.5f) - BinocularRange));
 
 	short headXRot = lara->ExtraHeadRot.x * 2;

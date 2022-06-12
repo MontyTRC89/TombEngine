@@ -151,7 +151,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestTouchBits(SmallScorpionAttackJoints))
+					if (item->TestBits(JointBitType::Touch, SmallScorpionAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)

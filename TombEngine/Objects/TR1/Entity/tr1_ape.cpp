@@ -228,7 +228,7 @@ namespace TEN::Entities::TR1
 				{
 					item->Animation.TargetState = APE_STATE_IDLE;
 				}
-				else if (AI.ahead && item->TestTouchBits(ApeAttackJoints))
+				else if (AI.ahead && item->TestBits(JointBitType::Touch, ApeAttackJoints))
 				{
 					item->Animation.RequiredState = APE_STATE_ATTACK;
 					item->Animation.TargetState = APE_STATE_IDLE;
@@ -277,7 +277,7 @@ namespace TEN::Entities::TR1
 
 			case APE_STATE_ATTACK:
 				if (!item->Animation.RequiredState &&
-					item->TestTouchBits(ApeAttackJoints))
+					item->TestBits(JointBitType::Touch, ApeAttackJoints))
 				{
 					CreatureEffect(item, &ApeBite, DoBloodSplat);
 					item->Animation.RequiredState = APE_STATE_IDLE;

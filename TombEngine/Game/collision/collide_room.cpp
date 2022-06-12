@@ -1278,12 +1278,13 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
 				int waterHeight = floor->CeilingHeight(x, z);
-				floor = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(floor, x, y, z) - waterHeight);
+				int floorHeight = GetCollision(floor, x, y, z).BottomBlock->FloorHeight(x, z);
+				return (floorHeight - waterHeight);
 			}
 
 			floor = GetSector(room, x - room->x, z - room->z);

@@ -272,7 +272,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TestTouchBits(MummyAttackJoints))
+					if (item->TestBits(JointBitType::Touch, MummyAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)

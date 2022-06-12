@@ -212,7 +212,7 @@ namespace TEN::Entities::TR1
 			case WOLF_STATE_ATTACK:
 				tilt = angle;
 
-				if (!item->Animation.RequiredState && item->TestTouchBits(WolfAttackJoints))
+				if (!item->Animation.RequiredState && item->TestBits(JointBitType::Touch, WolfAttackJoints))
 				{
 					CreatureEffect(item, &WolfBite, DoBloodSplat);
 					LaraItem->HitPoints -= LUNGE_DAMAGE;
@@ -225,7 +225,7 @@ namespace TEN::Entities::TR1
 
 			case WOLF_STATE_BITE:
 				if (AI.ahead && !item->Animation.RequiredState &&
-					item->TestTouchBits(WolfAttackJoints))
+					item->TestBits(JointBitType::Touch, WolfAttackJoints))
 				{
 					CreatureEffect(item, &WolfBite, DoBloodSplat);
 					LaraItem->HitPoints -= BITE_DAMAGE;

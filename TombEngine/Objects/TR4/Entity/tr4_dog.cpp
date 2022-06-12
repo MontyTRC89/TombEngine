@@ -332,7 +332,7 @@ namespace TEN::Entities::TR4
 
 			case DOG_STATE_JUMP_ATTACK:
 				if (AI.bite &&
-					item->TestTouchBits(DogJumpAttackJoints) &&
+					item->TestBits(JointBitType::Touch, DogJumpAttackJoints) &&
 					frame >= 4 &&
 					frame <= 14)
 				{
@@ -352,7 +352,7 @@ namespace TEN::Entities::TR4
 
 			case DOG_STATE_BITE_ATTACK:
 				if (AI.bite &&
-					item->TestTouchBits(DogBiteAttackJoints) &&
+					item->TestBits(JointBitType::Touch, DogBiteAttackJoints) &&
 					(frame >= 9 &&
 						frame <= 12 ||
 						frame >= 22 &&

@@ -15,7 +15,7 @@
 
 namespace TEN::Entities::TR4
 {
-	BITE_INFO GuideBite1 = { 0, 20, 200, 18 };
+	BITE_INFO GuideBite1 = { 0, 20, 180, 18 };
 	BITE_INFO GuideBite2 = { 30, 80, 50, 15 };
 
 	enum GuideState
@@ -48,11 +48,11 @@ namespace TEN::Entities::TR4
 
 		if (Objects[ID_WRAITH1].loaded)
 		{
-			item->SwapMeshFlags = 0;
+			item->MeshSwapBits = NO_JOINT_BITS;
 			item->ItemFlags[1] = 2;
 		}
 		else
-			item->SwapMeshFlags = 0x40000;
+			item->MeshSwapBits = 0x40000;
 	}
 
 	void GuideControl(short itemNumber)
@@ -76,9 +76,8 @@ namespace TEN::Entities::TR4
 			auto pos = Vector3Int(GuideBite1.x, GuideBite1.y, GuideBite1.z);
 			GetJointAbsPosition(item, &pos, GuideBite1.meshNum);
 
-			AddFire(pos.x, pos.y, pos.z, item->RoomNumber, 1.0f, 0);
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
-			TriggerFireFlame(pos.x, pos.y - 40, pos.z, -1, 7);
+			TriggerFireFlame(pos.x, pos.y - 20, pos.z, -1, 3);
 
 			short random = GetRandomControl();
 			TriggerDynamicLight(
@@ -100,7 +99,7 @@ namespace TEN::Entities::TR4
 						((random / 8) & 0x3F) + pos.y - 128,
 						pos.z + ((random / 64) & 0x3F) - 32,
 						-1,
-						1);
+						3);
 				}
 			}
 		}
@@ -245,7 +244,7 @@ namespace TEN::Entities::TR4
 			{
 				if (!creature->ReachedGoal || foundEnemy)
 				{
-					if (item->SwapMeshFlags == 0x40000)
+					if (item->MeshSwapBits == 0x40000)
 						item->Animation.TargetState = 40;
 					else if (foundEnemy && AI.distance < pow(SECTOR(1), 2))
 					{
@@ -368,7 +367,7 @@ namespace TEN::Entities::TR4
 				{
 					if (!foundEnemy ||
 						AI.distance >= 0x200000 &&
-						(item->SwapMeshFlags & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
+						(item->MeshSwapBits & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy == LaraItem)
 						{
@@ -424,7 +423,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (foundEnemy &&
 				(AI.distance < 0x200000 ||
-					!(item->SwapMeshFlags & 0x40000) &&
+					!(item->MeshSwapBits & 0x40000) &&
 					AI.distance < pow(SECTOR(3), 2)))
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
@@ -445,9 +444,9 @@ namespace TEN::Entities::TR4
 			random = GetRandomControl();
 
 			if (frameNumber == 32)
-				item->SwapMeshFlags |= 0x8000;
+				item->MeshSwapBits |= 0x8000;
 			else if (frameNumber == 216)
-				item->SwapMeshFlags &= 0x7FFF;
+				item->MeshSwapBits &= 0x7FFF;
 			else if (frameNumber <= 79 || frameNumber >= 84)
 			{
 				if (frameNumber <= 83 || frameNumber >= 94)
@@ -461,7 +460,7 @@ namespace TEN::Entities::TR4
 								((random >> 5) & 0x3F) + pos1.y - 96,
 								((random >> 10) & 0x3F) + pos1.z - 64,
 								-1,
-								7);
+								3);
 
 							TriggerDynamicLight(
 								pos1.x - 32,
@@ -504,7 +503,7 @@ namespace TEN::Entities::TR4
 						((random >> 5) & 0x3F) + pos1.y - 96,
 						((random >> 10) & 0x3F) + pos1.z - 64,
 						-1,
-						7);
+						3);
 				}
 			}
 			else
@@ -635,7 +634,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
 			{
-				item->SwapMeshFlags &= 0xFFFBFFFF;
+				item->MeshSwapBits &= 0xFFFBFFFF;
 
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 				ItemInfo* currentItem = nullptr;
@@ -721,7 +720,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 70 && item->RoomNumber == 70)
 				{
 					item->Animation.RequiredState = GUIDE_STATE_RUN;
-					item->SwapMeshFlags |= 0x200000;
+					item->MeshSwapBits |= 0x200000;
 					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose);
 				}
 			}

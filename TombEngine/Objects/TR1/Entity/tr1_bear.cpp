@@ -92,7 +92,7 @@ namespace TEN::Entities::TR1
 			}
 			case BEAR_STATE_DEATH:
 			{
-				if (creature->Flags && item->TestTouchBits(BearAttackJoints))
+				if (creature->Flags && item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
 					creature->Flags = 0;
 
@@ -144,7 +144,7 @@ namespace TEN::Entities::TR1
 			case BEAR_STATE_STROLL:
 				creature->MaxTurn = WALK_TURN;
 
-				if (laraDead && item->TestTouchBits(BearAttackJoints) && AI.ahead)
+				if (laraDead && item->TestBits(JointBitType::Touch, BearAttackJoints) && AI.ahead)
 					item->Animation.TargetState = BEAR_STATE_IDLE;
 				else if (creature->Mood != MoodType::Bored)
 				{
@@ -164,7 +164,7 @@ namespace TEN::Entities::TR1
 			case BEAR_STATE_RUN:
 				creature->MaxTurn = RUN_TURN;
 
-				if (item->TestTouchBits(BearAttackJoints))
+				if (item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
 					LaraItem->HitPoints -= CHARGE_DAMAGE;
 					LaraItem->HitStatus = true;
@@ -208,7 +208,7 @@ namespace TEN::Entities::TR1
 					item->Animation.RequiredState = BEAR_STATE_STROLL;
 					item->Animation.TargetState = BEAR_STATE_REAR;
 				}
-				else if (AI.ahead && item->TestTouchBits(BearAttackJoints))
+				else if (AI.ahead && item->TestBits(JointBitType::Touch, BearAttackJoints))
 					item->Animation.TargetState = BEAR_STATE_REAR;
 				else if (creature->Mood == MoodType::Escape)
 				{
@@ -230,7 +230,7 @@ namespace TEN::Entities::TR1
 
 			case BEAR_STATE_ATTACK_2:
 				if (!item->Animation.RequiredState &&
-					item->TestTouchBits(BearAttackJoints))
+					item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
 					item->Animation.RequiredState = BEAR_STATE_REAR;
 
@@ -242,7 +242,7 @@ namespace TEN::Entities::TR1
 
 			case BEAR_STATE_ATTACK_1:
 				if (!item->Animation.RequiredState &&
-					item->TestTouchBits(BearAttackJoints))
+					item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
 					CreatureEffect(item, &BearBite, DoBloodSplat);
 					item->Animation.RequiredState = BEAR_STATE_IDLE;

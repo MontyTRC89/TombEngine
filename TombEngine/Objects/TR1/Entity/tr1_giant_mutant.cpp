@@ -172,7 +172,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case MUTANT_STATE_ATTACK_1:
-				if (!creature->Flags && item->TestTouchBits(MutantAttackRightJoints))
+				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackRightJoints))
 				{
 					creature->Flags = 1;
 
@@ -183,7 +183,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case MUTANT_STATE_ATTACK_2:
-				if (!creature->Flags && item->TestTouchBits(MutantAttackJoints))
+				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackJoints))
 				{
 					creature->Flags = 1;
 
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case MUTANT_STATE_ATTACK_3:
-				if (item->TestTouchBits(MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
+				if (item->TestBits(JointBitType::Touch, MutantAttackRightJoints) || LaraItem->HitPoints <= 0)
 				{
 					item->Animation.TargetState = MUTANT_STATE_KILL;
 					Camera.targetDistance = SECTOR(2);
@@ -245,8 +245,8 @@ namespace TEN::Entities::TR1
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, UINT_MAX, MUTANT_PART_DAMAGE);
-
+			ExplodingDeath(itemNumber, ALL_JOINT_BITS, MUTANT_PART_DAMAGE);
+		
 			TestTriggers(item, true);
 
 			KillItem(itemNumber);

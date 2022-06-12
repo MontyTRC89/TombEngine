@@ -32,12 +32,12 @@
 #define BOAT_SLIP			10
 #define BOAT_SIDE_SLIP		30
 #define BOAT_FRONT			750
+#define BOAT_BACK			-700
 #define BOAT_SIDE			300
 #define BOAT_RADIUS			500
 #define BOAT_SNOW			500
 #define BOAT_MAX_HEIGHT		CLICK(1)
-#define DISMOUNT_DISTANCE		SECTOR(1)
-#define BOAT_WAKE			700
+#define DISMOUNT_DISTANCE	SECTOR(1)
 #define BOAT_SOUND_CEILING	SECTOR(5)
 #define BOAT_TIP			(BOAT_FRONT + 250)
 
@@ -957,7 +957,7 @@ void SpeedBoatControl(short itemNumber)
 		auto pitch = sBoatItem->Animation.Velocity;
 		sBoat->Pitch += (pitch - sBoat->Pitch) / 4;
 
-		int fx = (sBoatItem->Animation.Velocity > 8) ? SFX_TR4_VEHICLE_SPEEDBOAT_MOVING : SFX_TR4_VEHICLE_SPEEDBOAT_IDLE;
+		int fx = (sBoatItem->Animation.Velocity > 8) ? SFX_TR2_VEHICLE_SPEEDBOAT_MOVING : (drive ? SFX_TR2_VEHICLE_SPEEDBOAT_IDLE : SFX_TR2_VEHICLE_SPEEDBOAT_ACCELERATE);
 		SoundEffect(fx, &sBoatItem->Pose, SoundEnvironment::Land, 1.0f + sBoat->Pitch / (float)BOAT_MAX_VELOCITY / 4.0f);
 	}
 	else
@@ -972,7 +972,7 @@ void SpeedBoatControl(short itemNumber)
 	{
 		auto room = probe.Block->RoomBelow(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.z).value_or(NO_ROOM);
 		if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
-			TEN::Effects::TriggerSpeedboatFoam(sBoatItem);
+			TEN::Effects::TriggerSpeedboatFoam(sBoatItem, Vector3(0, 0, -BOAT_BACK));
 	}
 
 	if (lara->Vehicle != itemNumber)

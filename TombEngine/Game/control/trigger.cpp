@@ -523,7 +523,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 						{
 							if (item->Status == ITEM_INVISIBLE)
 							{
-								item->TouchBits = 0;
+								item->TouchBits = NO_JOINT_BITS;
 								if (EnableBaddyAI(value, 0))
 								{
 									item->Status = ITEM_ACTIVE;
@@ -538,7 +538,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 						}
 						else
 						{
-							item->TouchBits = 0;
+							item->TouchBits = NO_JOINT_BITS;
 							item->Status = ITEM_ACTIVE;
 							AddActiveItem(value);
 							EnableBaddyAI(value, 1);
@@ -546,7 +546,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 					}
 					else
 					{
-						item->TouchBits = 0;
+						item->TouchBits = NO_JOINT_BITS;
 						AddActiveItem(value);
 						item->Status = ITEM_ACTIVE;
 					}
@@ -746,7 +746,7 @@ void ProcessSectorFlags(FloorInfo* floor)
 	}
 
 	// Set climb status
-	if ((1 << (GetQuadrant(LaraItem->Pose.Orientation.y) + 8)) & GetClimbFlags(floor))
+	if (TestLaraNearClimbableWall(LaraItem, floor))
 		Lara.Control.CanClimbLadder = true;
 	else
 		Lara.Control.CanClimbLadder = false;

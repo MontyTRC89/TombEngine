@@ -178,7 +178,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->Flags == 0)
 			{
-				if (item->TestTouchBits(SphinxAttackJoints))
+				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
 				{
 					CreatureEffect2(
 						item,
@@ -226,7 +226,7 @@ namespace TEN::Entities::TR4
 			{
 				TestTriggers(item, true);
 
-				if (item->TestTouchBits(SphinxAttackJoints))
+				if (item->TestBits(JointBitType::Touch, SphinxAttackJoints))
 				{
 					CreatureEffect2(
 						item,
