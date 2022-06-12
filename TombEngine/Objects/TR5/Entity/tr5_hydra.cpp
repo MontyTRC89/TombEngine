@@ -81,7 +81,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 
 void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 	spark->sB = 0;
@@ -92,7 +92,7 @@ void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -122,7 +122,7 @@ void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 
 static void TriggerHydraSparks(short itemNumber, int frame)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 	
 	spark->on = 1;
 	spark->sB = 0;
@@ -140,7 +140,7 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->x = (GetRandomControl() & 0xF) - 8;

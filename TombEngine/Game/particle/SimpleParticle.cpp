@@ -40,24 +40,25 @@ namespace TEN::Effects
 		p.size = GenerateFloat(256, 512);
 	}
 
-	void TriggerSpeedboatFoam(ItemInfo* boat)
+	void TriggerSpeedboatFoam(ItemInfo* boat, Vector3 offset)
 	{
 		for (float i = -0.5; i < 1; i += 1)
 		{
+			float size = GenerateFloat(96, 128);
 			float angle = TO_RAD(boat->Pose.Orientation.y);
 			float angleVariation = i*2*10 * RADIAN;
+			float y = float(boat->Pose.Position.y) - size / 2 + offset.y;
 			float x = std::sin(angle + angleVariation);
 			float z = std::cos(angle + angleVariation);
-			x = x * -700 + boat->Pose.Position.x;
-			z = z * -700 + boat->Pose.Position.z;
+			x = x * offset.z + z * offset.x + boat->Pose.Position.x;
+			z = z * offset.z + x * offset.x + boat->Pose.Position.z;
 			SimpleParticle& p = getFreeSimpleParticle();
 			p = {};
 			p.active = true;
 			p.life = GenerateFloat(5, 9);
 			p.room = boat->RoomNumber;
 			p.ageRate = GenerateFloat(0.9, 1.3);
-			float size = GenerateFloat(96, 128);
-			p.worldPosition = { x, float(boat->Pose.Position.y) - size / 2, z };
+			p.worldPosition = { x, y, z };
 			p.sequence = ID_MOTOR_BOAT_FOAM_SPRITES;
 			p.size = GenerateFloat(256, 512);
 		}

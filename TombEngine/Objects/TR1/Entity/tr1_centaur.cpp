@@ -275,7 +275,7 @@ void CentaurControl(short itemNumber)
 	if (item->Status == ITEM_DEACTIVATED)
 	{
 		SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-		ExplodingDeath(itemNumber, 0xffffffff, FLYER_PART_DAMAGE);
+		ExplodingDeath(itemNumber, ALL_JOINT_BITS, FLYER_PART_DAMAGE);
 		KillItem(itemNumber);
 		item->Status = ITEM_DEACTIVATED;
 	}

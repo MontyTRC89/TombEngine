@@ -22,6 +22,6 @@ namespace TEN::Effects{
 
 	SimpleParticle& getFreeSimpleParticle();
 	void TriggerSnowmobileSnow(ItemInfo* snowMobile);
-	void TriggerSpeedboatFoam(ItemInfo* boat);
+	void TriggerSpeedboatFoam(ItemInfo* boat, Vector3 offset);
 	void updateSimpleParticles();
 }

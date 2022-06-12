@@ -14,6 +14,7 @@
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
+#include "Renderer/Renderer11Enums.h"
 
 namespace TEN::Entities::TR4
 {
@@ -95,7 +96,7 @@ namespace TEN::Entities::TR4
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			if (fx->flag1 == 3 || fx->flag1 == 4)
@@ -119,7 +120,7 @@ namespace TEN::Entities::TR4
 
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;
@@ -259,7 +260,7 @@ namespace TEN::Entities::TR4
 				spark->colFadeSpeed = 4;
 				spark->dShade = (GetRandomControl() & 0x1F) + 96;
 				spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-				spark->transType = TransTypeEnum::COLADD;
+				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 				spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 				spark->x = (GetRandomControl() & 0x1F) + x - 16;
 				spark->y = (GetRandomControl() & 0x1F) + y - 16;

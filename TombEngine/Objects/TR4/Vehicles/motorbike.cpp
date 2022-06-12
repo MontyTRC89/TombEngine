@@ -404,11 +404,11 @@ void MotorbikeCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* col
 
 static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, BOOL moving)
 {
-    SPARKS* sptr;
     int rnd = 0;
     BYTE trans, size;
 
-    sptr = &Sparks[GetFreeSpark()];
+    auto* sptr = GetFreeParticle();
+
     sptr->dR = 96;
     sptr->dG = 96;
     sptr->on = 1;
@@ -437,7 +437,7 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
         sptr->sLife = rnd;
     }
 
-    sptr->transType = TransTypeEnum::COLADD;
+    sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
     sptr->x = x + (GetRandomControl() & 0xF) - 8;
     sptr->y = y + (GetRandomControl() & 0xF) - 8;
     sptr->z = z + (GetRandomControl() & 0xF) - 8;
@@ -461,7 +461,7 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     }
 
     sptr->scalar = 1;
-    sptr->def = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
+    sptr->spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
     sptr->gravity = (GetRandomControl() & 3) - 4;
     sptr->maxYvel = (GetRandomControl() & 7) - 8;
     size = (GetRandomControl() & 7) + (speed / 128) + 32;
@@ -522,8 +522,8 @@ static void MotorBikeExplode(ItemInfo* item)
 	}
     auto pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z, 0, item->Pose.Orientation.y, 0);
 	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
-	ExplodingDeath(Lara.Vehicle, -2, 256);
-	ExplodingDeath(Lara.ItemNumber, -2, 258); // enable blood
+	ExplodingDeath(Lara.Vehicle, ALL_JOINT_BITS - 1, 256);
+	ExplodingDeath(Lara.ItemNumber, ALL_JOINT_BITS - 1, 258); // enable blood
 	LaraItem->HitPoints = 0;
 	item->Status = ITEM_DEACTIVATED;
 
@@ -1511,7 +1511,7 @@ int MotorbikeControl(void)
         {
             if (item->Pose.Position.y == item->Floor)
             {
-                ExplodingDeath(Lara.ItemNumber, -1, 256);
+                ExplodingDeath(Lara.ItemNumber, ALL_JOINT_BITS, 256);
                 LaraItem->Flags = ONESHOT;
                 MotorBikeExplode(item);
                 return 0;

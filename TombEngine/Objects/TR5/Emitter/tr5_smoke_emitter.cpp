@@ -4,6 +4,7 @@
 #include "Game/items.h"
 #include "Specific/level.h"
 #include "Specific/trmath.h"
+#include "Renderer/Renderer11Enums.h"
 
 void InitialiseSmokeEmitter(short itemNumber)
 {
@@ -143,13 +144,13 @@ void SmokeEmitterControl(short itemNumber)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->on = 1;
 		spark->dR = 48;
 		spark->dG = 48;
 		spark->dB = 48;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->x = (GetRandomControl() & 0x3F) + item->pos.Position.x - 32;
 		spark->y = (GetRandomControl() & 0x3F) + item->pos.Position.y - 32;
 		spark->z = (GetRandomControl() & 0x3F) + item->pos.Position.z - 32;
@@ -244,7 +245,7 @@ void SmokeEmitterControl(short itemNumber)
 			LOBYTE(v4) = wibble;
 			if (!(wibble & 0xF) && (item->objectNumber != 365 || !(wibble & 0x1F)))
 			{
-				SPARKS* spark = &Sparks[GetFreeSpark()];
+				auto* spark = GetFreeParticle();
 
 				spark->on = 1;
 				spark->sR = 0;
@@ -257,9 +258,9 @@ void SmokeEmitterControl(short itemNumber)
 				spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 				spark->life = spark->sLife = (GetRandomControl() & 7) + 28;
 				if (item->objectNumber == ID_SMOKE_EMITTER_WHITE)
-					spark->transType = TransTypeEnum::COLSUB;
+					spark->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
 				else
-					spark->transType = TransTypeEnum::COLADD;
+					spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 				spark->x = (GetRandomControl() & 0x3F) + item->pos.Position.x - 32;
 				spark->y = (GetRandomControl() & 0x3F) + item->pos.Position.y - 32;
 				spark->z = (GetRandomControl() & 0x3F) + item->pos.Position.z - 32;
