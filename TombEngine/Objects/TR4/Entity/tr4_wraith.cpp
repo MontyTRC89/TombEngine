@@ -382,7 +382,7 @@ namespace TEN::Entities::TR4
 
 	void DrawWraith(Vector3Int pos, Vector3Int velocity, int objectNumber)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 		spark->on = 1;
 
 		BYTE color;
@@ -418,7 +418,7 @@ namespace TEN::Entities::TR4
 
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 7;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		unsigned char life = (GetRandomControl() & 7) + 12;
 		spark->life = life;
 		spark->sLife = life;
@@ -473,7 +473,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < 15; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = true;
 			spark->sR = dR;
@@ -484,7 +484,7 @@ namespace TEN::Entities::TR4
 			spark->dB = dB;
 			spark->colFadeSpeed = 4;
 			spark->fadeToBlack = 7;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			short life = (GetRandomControl() & 7) + 32;
 			spark->life = life;
 			spark->sLife = life;

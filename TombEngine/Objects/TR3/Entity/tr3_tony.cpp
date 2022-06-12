@@ -16,6 +16,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Effects::Lara;
 
@@ -62,7 +63,7 @@ enum TonyAnim
 static BOSS_STRUCT BossData;
 
 #define TONY_TURN ANGLE(2.0f)
-#define TONY_HITS 1	// Tony Harder To Kill, was 100 (6 shotgun shots)
+#define TONY_HITS 100
 #define MAX_TONY_TRIGGER_RANGE 0x4000
 
 void InitialiseTony(short itemNumber)
@@ -119,7 +120,7 @@ static void TriggerTonyFlame(short itemNumber, int hand)
 	if (dx < -MAX_TONY_TRIGGER_RANGE || dx > MAX_TONY_TRIGGER_RANGE || dz < -MAX_TONY_TRIGGER_RANGE || dz > MAX_TONY_TRIGGER_RANGE)
 		return;
 
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 255;
@@ -131,7 +132,7 @@ static void TriggerTonyFlame(short itemNumber, int hand)
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 8;
 	sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = NULL;
 	sptr->dynamic = -1;
 	sptr->x = ((GetRandomControl() & 15) - 8);
@@ -158,7 +159,7 @@ static void TriggerTonyFlame(short itemNumber, int hand)
 	sptr->maxYvel = -(GetRandomControl() & 7) - 16;
 	sptr->fxObj = itemNumber;
 	sptr->nodeNumber = hand;
-	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	sptr->scalar = 1;
 	unsigned char size = (GetRandomControl() & 31) + 32;
 	sptr->size = size;
@@ -173,7 +174,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	if (dx < -MAX_TONY_TRIGGER_RANGE || dx > MAX_TONY_TRIGGER_RANGE || dz < -MAX_TONY_TRIGGER_RANGE || dz > MAX_TONY_TRIGGER_RANGE)
 		return;
 
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 255;
@@ -185,7 +186,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 8;
 	sptr->sLife = sptr->life = (GetRandomControl() & 7) + 24;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 	sptr->x = ((GetRandomControl() & 15) - 8);
@@ -209,7 +210,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_FX;
 
 	sptr->fxObj = (unsigned char)fxNumber;
-	sptr->def = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
 	sptr->scalar = 1;
 	unsigned char size = (GetRandomControl() & 31) + 64;
 	sptr->size = size;

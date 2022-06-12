@@ -102,6 +102,7 @@ void MPGunControl(short itemNumber)
 					torsoY = AI.angle;
 					ShotLara(item, &AI, &MPGunBite, torsoY, 32);
 					SoundEffect(SFX_TR3_OIL_SMG_FIRE, &item->Pose, SoundEnvironment::Land, 1.0f, 0.7f);
+					creature->FiredWeapon = 1;
 				}
 			}
 		}

@@ -16,6 +16,7 @@
 #include "Specific/level.h"
 #include "Game/animation.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
+#include "Renderer/Renderer11Enums.h"
 
 using std::vector;
 
@@ -306,7 +307,7 @@ static int JeepCanGetOff()
 
 static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short speed, int moving)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->dR = 16;
 	spark->dG = 16;
@@ -333,7 +334,7 @@ static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short spee
 		spark->sLife = 9;
 	}
 
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->x = (GetRandomControl() & 0xF) + x - 8;
 	spark->y = (GetRandomControl() & 0xF) + y - 8;
 	spark->z = (GetRandomControl() & 0xF) + z - 8;
@@ -620,7 +621,7 @@ static void JeepExplode(ItemInfo* item)
 		}
 	}
 
-	ExplodingDeath(Lara.Vehicle, -1, 256);
+	ExplodingDeath(Lara.Vehicle, ALL_JOINT_BITS, 256);
 	KillItem(Lara.Vehicle);
 	item->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
@@ -1627,12 +1628,12 @@ int JeepControl(void)
 		else
 			jeep->pitch = -32768;
 
-		SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, SoundEnvironment::Land, 0.5f + jeep->pitch / 65535.0f);
+		SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 0.5f + jeep->pitch / 65535.0f);
 	}
 	else
 	{
 		if (drive != -1)
-			SoundEffect(SFX_TR4_JEEP_IDLE, &item->Pose);
+			SoundEffect(SFX_TR4_VEHICLE_JEEP_IDLE, &item->Pose);
 		jeep->pitch = 0;
 	}
 

@@ -72,16 +72,16 @@ namespace TEN::Entities::TR4
 		{
 			item->ItemFlags[0]++;
 
-			int fireOn = 4 * item->ItemFlags[0];
-			if (fireOn > 255)
-				fireOn = 0;
+			int fade = 4 * item->ItemFlags[0];
+			if (fade > 255)
+				fade = 0;
 
 			for (int i = 0; i < num; i++)
 			{
 				if (i == 0 || i > 5)
 				{
 					auto* sphere = &CreatureSpheres[i];
-					AddFire(sphere->x, sphere->y, sphere->z, 2, item->RoomNumber, fireOn);
+					AddFire(sphere->x, sphere->y, sphere->z, item->RoomNumber, 0.25f, fade);
 				}
 			}
 
@@ -114,7 +114,7 @@ namespace TEN::Entities::TR4
 					laraItem->Animation.ActiveState = LS_DEATH;
 					laraItem->Animation.Velocity = 0;
 
-					SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &mineItem->Pose);
+					SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY, &mineItem->Pose);
 				}
 			}
 			else
@@ -153,7 +153,7 @@ namespace TEN::Entities::TR4
 						KillItem(i);
 
 						if (!(GetRandomControl() & 3))
-							SoundEffect(SFX_TR4_MINE_EXP_OVERLAY, &currentItem->Pose);
+							SoundEffect(SFX_TR4_MINE_EXPLOSION_OVERLAY, &currentItem->Pose);
 
 						currentItem->Status = ITEM_INVISIBLE;
 					}

@@ -13,6 +13,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Renderer;
+
 short PickupX;
 short PickupY;
 short CurrentPickup;
@@ -31,6 +32,18 @@ extern RendererHUDBar* g_AirBar;
 
 bool EnableSmoothHealthBar = true;
 
+void DrawHUD(ItemInfo* item)
+{
+	if (CurrentLevel == 0 || CinematicBarsHeight > 0)
+		return;
+
+	int flash = FlashIt();
+	UpdateSprintBar(LaraItem);
+	UpdateHealthBar(LaraItem, flash);
+	UpdateAirBar(LaraItem, flash);
+	DrawAllPickups();
+}
+
 void DrawHealthBarOverlay(ItemInfo* item, int value)
 {
 	auto* lara = GetLaraInfo(item);
@@ -43,7 +56,7 @@ void DrawHealthBarOverlay(ItemInfo* item, int value)
 		else
 			color2 = 0xA00000;
 
-		g_Renderer.DrawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
+		g_Renderer.DrawBar(value, g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
 	}
 }
 
@@ -52,7 +65,7 @@ void DrawHealthBar(ItemInfo* item, float value)
 	auto* lara = GetLaraInfo(item);
 
 	if (CurrentLevel)
-		g_Renderer.DrawBar(value, ::g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
+		g_Renderer.DrawBar(value, g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
 }
 
 void UpdateHealthBar(ItemInfo* item, int flash)
@@ -141,7 +154,7 @@ void UpdateHealthBar(ItemInfo* item, int flash)
 void DrawAirBar(float value)
 {
 	if (CurrentLevel)
-		g_Renderer.DrawBar(value, ::g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
+		g_Renderer.DrawBar(value, g_AirBar,ID_AIR_BAR_TEXTURE,0,0);
 }
 
 void UpdateAirBar(ItemInfo* item, int flash)
@@ -180,7 +193,7 @@ void UpdateAirBar(ItemInfo* item, int flash)
 void DrawSprintBar(float value)
 {
 	if (CurrentLevel)
-		g_Renderer.DrawBar(value, ::g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
+		g_Renderer.DrawBar(value, g_DashBar, ID_DASH_BAR_TEXTURE, 0, 0);
 }
 
 void UpdateSprintBar(ItemInfo* item)
@@ -236,7 +249,7 @@ void DrawAllPickups()
 		}
 	}
 
-	g_Renderer.drawPickup(Pickups[CurrentPickup].ObjectNumber);
+	g_Renderer.DrawPickup(Pickups[CurrentPickup].ObjectNumber);
 }
 
 

@@ -397,9 +397,9 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 	{
 		// HACK: Set position command can't move Lara laterally?
 		if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_LEFT)
-			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1), 0, 0);
+			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(90.0f), CLICK(1));
 		else if (item->Animation.AnimNumber == LA_TIGHTROPE_FALL_RIGHT)
-			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1), 0, 0);
+			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(90.0f), CLICK(1));
 
 		item->Animation.VerticalVelocity = 10;
 	}
@@ -895,7 +895,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// TODO: In WAD.
-	SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose);
+	SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &item->Pose);
 
 	if (TrInput & IN_ACTION)
 	{

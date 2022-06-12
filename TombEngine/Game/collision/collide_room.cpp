@@ -95,39 +95,25 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 
 	auto test = [item](short x, short y, short z, bool floor)
 	{
-		CollisionPosition pos = GetCollision(x, y, z, item->RoomNumber).Position;
-		if (floor) return y > pos.Floor;
-		return y < pos.Ceiling;
+		auto collPos = GetCollision(x, y, z, item->RoomNumber).Position;
+		if (floor) return y > collPos.Floor;
+		return y < collPos.Ceiling;
 	};
 
-	bool collided = 
-			test(box.X1, minY, box.Z1, true)
-		||	test(box.X2, minY, box.Z1, true)
-		||	test(box.X1, minY, box.Z2, true)
-		||	test(box.X2, minY, box.Z2, true)
-		||	test(box.X1, maxY, box.Z1, false)
-		||	test(box.X2, maxY, box.Z1, false)
-		||	test(box.X1, maxY, box.Z2, false)
-		||	test(box.X2, maxY, box.Z2, false);
+	bool collided =
+		test(box.X1, minY, box.Z1, true) ||
+		test(box.X2, minY, box.Z1, true) ||
+		test(box.X1, minY, box.Z2, true) ||
+		test(box.X2, minY, box.Z2, true) ||
+		test(box.X1, maxY, box.Z1, false) ||
+		test(box.X2, maxY, box.Z1, false) ||
+		test(box.X1, maxY, box.Z2, false) ||
+		test(box.X2, maxY, box.Z2, false) ;
 
 	return collided;
 }
 
-CollisionResult GetCollision(ItemInfo* item, short orient, int forward, int vertical, int lateral)
-{
-	// NOTE: GetRoom() call is necessary to fetch the index of the room directly above in order to perform a correct L-shaped test.
-	// Probes MUST traverse through portals between rooms, otherwise they will not work correctly.
-
-	auto point = TranslateVector(item->Pose.Position, orient, forward, vertical, lateral);
-	return GetCollision(point.x, point.y, point.z, GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber);
-}
-
-CollisionResult GetCollision(Vector3 pos, int roomIndex, short orient, int forward, int vertical, int lateral)
-{
-	auto point = TranslateVector(pos, orient, forward, vertical, lateral);
-	return GetCollision(point.x, point.y, point.z, roomIndex);
-}
-
+// Overload used to quickly get point/room collision parameters at a given item's position.
 CollisionResult GetCollision(ItemInfo* item)
 {
 	auto room = item->RoomNumber;
@@ -138,6 +124,30 @@ CollisionResult GetCollision(ItemInfo* item)
 	return result;
 }
 
+// Overload used to probe point/room collision parameters from a given item's position.
+CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical, float lateral)
+{
+	auto point = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
+	int adjacentRoomNumber = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
+
+// Overload used to probe point/room collision parameters from a given position.
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float vertical, float lateral)
+{
+	short tempRoomNumber = roomNumber;
+	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+
+	auto point = TranslateVector(pos, angle, forward, vertical, lateral);
+	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
+
+// Overload used as a universal wrapper across collisional code to replace
+// triads of roomNumber-GetFloor()-GetFloorHeight() operations.
+// The advantage is that it does NOT modify the incoming roomNumber argument,
+// instead storing one modified by GetFloor() within the returned CollisionResult struct.
+// This way, no external variables are modified as output arguments.
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
@@ -148,14 +158,16 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
+// A reworked legacy GetFloorHeight() function which writes data
+// into a special CollisionResult struct instead of global variables.
+// It writes for both floor and ceiling heights at the same coordinates, meaning it should be used
+// in place of successive GetFloorHeight() and GetCeilingHeight() calls to increase readability.
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
 	CollisionResult result = {};
 
 	// Record coordinates.
-	result.Coordinates.x = x;
-	result.Coordinates.y = y;
-	result.Coordinates.z = z;
+	result.Coordinates = Vector3(x, y, z);
 
 	// Return provided block into result as itself.
 	result.Block = floor;
@@ -701,7 +713,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
 			// HACK: Force slight push-out to the left side to avoid stucking
-			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity, 0, 0);
+			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -753,7 +765,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
 			// HACK: Force slight push-out to the right side to avoid stucking
-			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity, 0, 0);
+			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1265,12 +1277,13 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
 				int waterHeight = floor->CeilingHeight(x, z);
-				floor = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(floor, x, y, z) - waterHeight);
+				int floorHeight = GetCollision(floor, x, y, z).BottomBlock->FloorHeight(x, z);
+				return (floorHeight - waterHeight);
 			}
 
 			floor = GetSector(room, x - room->x, z - room->z);

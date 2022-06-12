@@ -12,6 +12,98 @@
 
 using namespace TEN::Floordata;
 
+void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (int i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = (unsigned int)(1 << jointIndices[i]);
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			this->TouchBits |= jointBit;
+			break;
+
+		case JointBitType::Mesh:
+			this->MeshBits |= jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits |= jointBit;
+			break;
+		}
+	}
+}
+
+void ItemInfo::SetBits(JointBitType type, int jointIndex)
+{
+	return SetBits(type, std::vector { jointIndex });
+}
+
+void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (int i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = (unsigned int)(1 << jointIndices[i]);
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			this->TouchBits &= ~jointBit;
+			break;
+
+		case JointBitType::Mesh:
+			this->MeshBits &= ~jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits &= ~jointBit;
+			break;
+		}
+	}
+}
+
+void ItemInfo::ClearBits(JointBitType type, int jointIndex)
+{
+	return ClearBits(type, std::vector { jointIndex });
+}
+
+bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (int i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = (unsigned int)(1 << jointIndices[i]);
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			if ((TouchBits & jointBit) == jointBit)
+				return true;
+
+			break;
+
+		case JointBitType::Mesh:
+			if ((MeshBits & jointBit) == jointBit)
+				return true;
+
+			break;
+
+		case JointBitType::MeshSwap:
+			if ((MeshSwapBits & jointBit) == jointBit)
+				return true;
+
+			break;
+		}
+	}
+
+	return false;
+}
+
+bool ItemInfo::TestBits(JointBitType type, int jointIndex)
+{
+	return TestBits(type, std::vector { jointIndex });
+}
+
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -76,13 +168,10 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
-
 		g_GameScriptEntities->NotifyKilled(item);
 		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
 		if (!item->LuaCallbackOnKilledName.empty())
-		{
 			g_GameScript->ExecuteFunction(item->LuaCallbackOnKilledName, itemNumber);
-		}
 
 		item->LuaName.clear();
 		item->LuaCallbackOnKilledName.clear();
@@ -96,10 +185,7 @@ void KillItem(short const itemNumber)
 			NextItemFree = itemNumber;
 		}
 		else
-		{
 			item->Flags |= IFLAG_KILLED;
-		}
-
 	}
 }
 
@@ -383,11 +469,11 @@ void InitialiseItem(short itemNumber)
 		item->MeshBits = 1;
 	}
 	else
-		item->MeshBits = -1;
+		item->MeshBits = ALL_JOINT_BITS;
 
-	item->TouchBits = 0;
+	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
-	item->SwapMeshFlags = 0;
+	item->MeshSwapBits = NO_JOINT_BITS;
 
 	if (item->Flags & IFLAG_INVISIBLE)
 	{

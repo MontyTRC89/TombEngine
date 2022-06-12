@@ -56,7 +56,7 @@ void ControlTeleporter(short itemNumber)
 				}
 
 				ItemInfo* targetItem = &g_Level.Items[item->itemFlags[1]];
-				SoundEffect(SFX_RICH_TELEPORT, &targetItem->pos, SoundEnvironment::Land);
+				SoundEffect(SFX_TR5_TELEPORT, &targetItem->pos, SoundEnvironment::Land);
 
 				if (GlobalCounter & 1)
 				{
@@ -128,7 +128,7 @@ void ControlTeleporter(short itemNumber)
 					v33 = (v30 >> 2) | (((v30 - GetRandomControl() % (v30 >> 1)) | ((v32 | 0x2400) << 8)) << 8);
 					v34 = GetRandomControl();
 					TriggerEnergyArc((Vector3Int*)& src, (Vector3Int*)& src.xRot, (v34 & 0xF) + 16, v33, 13, 56, 5);
-					v35 = &spark[GetFreeSpark()];
+					v35* = GetFreeParticle();
 					v35->On = 1;
 					v36 = item->itemFlags[0];
 					v35->dR = v36;
@@ -144,7 +144,7 @@ void ControlTeleporter(short itemNumber)
 					v35->FadeToBlack = 4;
 					v35->Life = 24;
 					v35->sLife = 24;
-					v35->TransType = TransTypeEnum::COLADD;
+					v35->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 					v35->x = src.Position.x;
 					v35->y = src.Position.y;
 					v35->z = src.zPos;

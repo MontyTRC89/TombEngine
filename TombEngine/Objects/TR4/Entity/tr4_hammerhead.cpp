@@ -13,6 +13,9 @@
 namespace TEN::Entities::TR4
 {
 	BITE_INFO HammerheadBite = { 0, 0, 0, 12 };
+	const std::vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
+
+	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
 
 	enum HammerheadState
 	{
@@ -115,12 +118,12 @@ namespace TEN::Entities::TR4
 				case HAMMERHEAD_STATE_IDLE_BITE_ATTACK:
 					if (!creature->Flags)
 					{
-						if (item->TouchBits & 0x3400)
+						if (item->TestBits(JointBitType::Touch, HammerheadBiteAttackJoints))
 						{
 							CreatureEffect(item, &HammerheadBite, DoBloodSplat);
 							creature->Flags = 1;
 
-							LaraItem->HitPoints -= 120;
+							LaraItem->HitPoints -= HAMMERHEAD_BITE_ATTACK_DAMAGE;
 							LaraItem->HitStatus = true;
 						}
 					}
