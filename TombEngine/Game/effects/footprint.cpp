@@ -158,7 +158,11 @@ namespace Footprints {
 		if (floor->Material != FLOOR_MATERIAL::Sand &&
 			floor->Material != FLOOR_MATERIAL::Snow &&
 			floor->Material != FLOOR_MATERIAL::Gravel &&
-			floor->Material != FLOOR_MATERIAL::Mud)
+			floor->Material != FLOOR_MATERIAL::Mud &&
+			floor->Material != FLOOR_MATERIAL::Custom_Sound_1 &&
+			floor->Material != FLOOR_MATERIAL::Custom_Sound_2 &&
+			floor->Material != FLOOR_MATERIAL::Custom_Sound_3 &&
+			floor->Material != FLOOR_MATERIAL::Custom_Sound_4)
 			return;
 
 		// Calculate footprint tilts
