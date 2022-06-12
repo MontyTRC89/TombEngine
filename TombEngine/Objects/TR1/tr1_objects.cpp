@@ -19,6 +19,8 @@
 #include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/Utils/object_helper.h"
 
+using namespace TEN::Entities::TR1;
+
 static void StartEntity(ObjectInfo* obj)
 {
 	obj = &Objects[ID_WOLF];

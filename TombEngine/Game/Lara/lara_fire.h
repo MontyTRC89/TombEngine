@@ -22,12 +22,12 @@ struct WeaponInfo
 	short ShotAccuracy;
 	int GunHeight;
 	short TargetDist;
-	byte Damage;
-	byte RecoilFrame;
-	byte FlashTime;
-	byte DrawFrame;
+	int Damage;
+	int RecoilFrame;
+	int FlashTime;
+	int DrawFrame;
 	short SampleNum;
-	byte ExplosiveDamage;
+	int ExplosiveDamage;
 };
 
 enum WeaponState

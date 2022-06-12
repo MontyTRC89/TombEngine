@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_smallscorpion.h"
+#include "tr4_small_scorpion.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
@@ -14,8 +14,9 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO SmallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 	BITE_INFO SmallScorpionBiteInfo2 = { 0, 0, 0, 23 };
+	const std::vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
-	constexpr auto SMALL_SCORPION_PINCERS_ATTACK_DAMAGE = 50;
+	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE = 50;
 	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE = 20;
 	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SECTOR(0.31);
@@ -150,7 +151,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x6C00100)
+					if (item->TestBits(JointBitType::Touch, SmallScorpionAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
@@ -160,16 +161,17 @@ namespace TEN::Entities::TR4
 
 							short rotation;
 							BITE_INFO* biteInfo;
+
+							// Pincer attack
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 							{
-								//Pinzers Attack
-								LaraItem->HitPoints -= SMALL_SCORPION_PINCERS_ATTACK_DAMAGE;
+								LaraItem->HitPoints -= SMALL_SCORPION_PINCER_ATTACK_DAMAGE;
 								rotation = item->Pose.Orientation.y - ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo1;
 							}
+							// Tail attack
 							else
 							{
-								//Tail Attack
 								Lara.PoisonPotency += SMALL_SCORPION_STINGER_POISON_POTENCY;
 								LaraItem->HitPoints -= SMALL_SCORPION_STINGER_ATTACK_DAMAGE;
 								rotation = item->Pose.Orientation.y - ANGLE(180.0f);
