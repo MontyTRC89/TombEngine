@@ -17,9 +17,6 @@
 #include "Objects/objectslist.h"
 #include "Game/itemdata/creature_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
-#include "Renderer/Renderer11.h"
-
-using TEN::Renderer::g_Renderer;
 
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
@@ -455,36 +452,6 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		height = g_Level.Boxes[floor->Box].height;
 		nextBox = floor->Box;
 	}
-
-	auto& currBox = g_Level.Boxes[floor->Box];
-
-	auto bz = (currBox.left + (currBox.left - currBox.right) / 2) * SECTOR(1);
-	auto by = currBox.height - CLICK(1);
-	auto bx = (currBox.top + (currBox.bottom - currBox.top) / 2) * SECTOR(1);
-
-	auto center = Vector3(bx, by, bz);
-	auto corner = Vector3(currBox.bottom * SECTOR(1), currBox.height + CLICK(1), currBox.right * SECTOR(1));
-	auto extents = corner - center;
-	auto dBox = BoundingOrientedBox(center, extents, Vector4::UnitY);
-
-	g_Renderer.AddDebugBox(dBox, Vector4(0.3f, 0.3f, 1.0f, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-
-	if (nextBox != NO_BOX && nextBox != floor->Box)
-	{
-		auto& currBox2 = g_Level.Boxes[nextBox];
-
-		bz = (currBox2.left + (currBox2.left - currBox2.right) / 2) * SECTOR(1);
-		by = currBox2.height - CLICK(1);
-		bx = (currBox2.top + (currBox2.bottom - currBox2.top) / 2) * SECTOR(1);
-
-		center = Vector3(bx, by, bz);
-		corner = Vector3(currBox2.bottom * SECTOR(1), currBox2.height + CLICK(1), currBox2.right * SECTOR(1));
-		extents = center - corner;
-		dBox = BoundingOrientedBox(center, extents, Vector4::UnitY);
-
-		g_Renderer.AddDebugBox(dBox, Vector4(0.8f, 0.0f, 1.0f, 1), RENDERER_DEBUG_PAGE::DIMENSION_STATS);
-	}
-
 
 	if (nextBox == NO_BOX)
 		nextHeight = height;
