@@ -118,35 +118,35 @@ namespace Footprints {
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_1:
+		case FLOOR_MATERIAL::Custom1:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_1;
 		break;
 
-		case FLOOR_MATERIAL::Custom_Sound_2:
+		case FLOOR_MATERIAL::Custom2:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_2;
 		break; 
 		
-		case FLOOR_MATERIAL::Custom_Sound_3:
+		case FLOOR_MATERIAL::Custom3:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_3;
 		break;
 		
-		case FLOOR_MATERIAL::Custom_Sound_4:
+		case FLOOR_MATERIAL::Custom4:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_4;
 		break; 
 		
-		case FLOOR_MATERIAL::Custom_Sound_5:
+		case FLOOR_MATERIAL::Custom5:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_5;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_6:
+		case FLOOR_MATERIAL::Custom6:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_6;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_7:
+		case FLOOR_MATERIAL::Custom7:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_7;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_8:
+		case FLOOR_MATERIAL::Custom8:
 			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_8;
 			break;
 		}
@@ -159,10 +159,10 @@ namespace Footprints {
 			floor->Material != FLOOR_MATERIAL::Snow &&
 			floor->Material != FLOOR_MATERIAL::Gravel &&
 			floor->Material != FLOOR_MATERIAL::Mud &&
-			floor->Material != FLOOR_MATERIAL::Custom_Sound_1 &&
-			floor->Material != FLOOR_MATERIAL::Custom_Sound_2 &&
-			floor->Material != FLOOR_MATERIAL::Custom_Sound_3 &&
-			floor->Material != FLOOR_MATERIAL::Custom_Sound_4)
+			floor->Material != FLOOR_MATERIAL::Custom2 &&
+			floor->Material != FLOOR_MATERIAL::Custom1 &&
+			floor->Material != FLOOR_MATERIAL::Custom3 &&
+			floor->Material != FLOOR_MATERIAL::Custom4)
 			return;
 
 		// Calculate footprint tilts
