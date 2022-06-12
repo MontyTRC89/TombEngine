@@ -1419,7 +1419,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 		BinocularRange = 0;
 		LaserSight = false;
 		AlterFOV(ANGLE(80.0f));
-		item->MeshBits = -1;
+		item->MeshBits = ALL_JOINT_BITS;
 		lara->Inventory.IsBusy = false;
 	}
 }

@@ -3,16 +3,20 @@
 
 #include <CommCtrl.h>
 #include <process.h>
+#include <resource.h>
 #include <iostream>
+#include <codecvt>
+#include <filesystem>
+
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
-#include "resource.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
+#include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
 using std::exception;
@@ -216,25 +220,39 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int RetVal;
 	int n;
 
-	// Process the command line
+	// Process command line arguments
 	bool setup = false;
-
+	std::string levelFile = {};
+	int levelHash = 0;
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 
+	// Parse command line arguments
 	for (int i = 1; i < argc; i++)
 	{
 		if (wcscmp(argv[i], L"/setup") == 0)
+		{
 			setup = true;
-		if (wcscmp(argv[i], L"/debug") == 0)
+		}
+		else if (wcscmp(argv[i], L"/debug") == 0)
+		{
 			Debug = true;
+		}
+		else if ((wcscmp(argv[i], L"/level") == 0) && argc > (i + 2))
+		{
+			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+			levelFile = converter.to_bytes(std::wstring(argv[i + 1])); 
+			std::transform(levelFile.begin(), levelFile.end(), levelFile.begin(), [](unsigned char c) { return std::tolower(c); });
+			levelHash = std::stoi(std::wstring(argv[i + 2]));
+		}
 	}
 	LocalFree(argv);
 
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
 	
+	// Initialize logging
 	InitTENLog();
 
 	// Collect numbered tracks
@@ -243,9 +261,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialise the new scripting system
 	ScriptInterfaceState::Init();
 
+	// Initialize scripting
 	try 
 	{
-		// todo make sure the right objects are deleted at the end
+		// TODO: make sure the right objects are deleted at the end
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
 		g_GameFlow->LoadFlowScript();
 		g_GameScript = ScriptInterfaceState::CreateGame();
@@ -260,6 +279,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
+	// Setup main window
 	INITCOMMONCONTROLSEX commCtrlInit;
 	commCtrlInit.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	commCtrlInit.dwICC = ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES;
@@ -278,6 +298,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowClass.cbWndExtra = 0;
 	App.WindowClass.hCursor = LoadCursor(App.hInstance, IDC_ARROW);
 
+	// Register main window
 	if (!RegisterClass(&App.WindowClass))
 	{
 		TENLog("Unable To Register Window Class", LogLevel::Error);
@@ -300,6 +321,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		LoadConfiguration();
 	}
 
+	// Setup window dimensions
 	RECT Rect;
 	Rect.left = 0;
 	Rect.top = 0;
@@ -307,6 +329,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Rect.bottom = g_Configuration.Height;
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
+	// Make window handle
 	App.WindowHandle = CreateWindowEx(
 		0,
 		"TombEngine",
@@ -322,19 +345,38 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		NULL
 	);
 
+	// Register window handle
 	if (!App.WindowHandle)
 	{
 		TENLog("Unable To Create Window" + std::to_string(GetLastError()), LogLevel::Error);
 		return false;
 	}
+	else
+		WindowsHandle = App.WindowHandle;
 
-	WindowsHandle = App.WindowHandle;
 	// Initialise the renderer
 	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
 	// Initialize audio
 	if (g_Configuration.EnableSound)	
 		Sound_Init();
+
+	// Load level if specified in command line
+	CurrentLevel = -1;
+	if (!levelFile.empty() && levelHash != 0)
+	{
+		for (int i = 0; i < g_GameFlow->GetNumLevels(); i++)
+		{
+			auto level = g_GameFlow->GetLevel(i)->FileName;
+			std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
+
+			if (level == levelFile && std::filesystem::exists(level))
+			{
+				CurrentLevel = i;
+				break;
+			}
+		}
+	}
 	
 	App.bNoFocus = false;
 	App.isInScene = false;
@@ -345,8 +387,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetCursor(NULL);
 	ShowCursor(FALSE);
 	hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
-
-	//g_Renderer->Test();
 
 	DoTheGame = true;
 

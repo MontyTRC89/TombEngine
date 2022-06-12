@@ -1,3 +1,6 @@
 #pragma once
 
-void NatlaControl(short itemNumber);
+namespace TEN::Entities::TR1
+{
+	void NatlaControl(short itemNumber);
+}

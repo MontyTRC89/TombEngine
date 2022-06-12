@@ -58,12 +58,12 @@ namespace Footprints {
 		if (result.Position.Bridge >= 0)
 			return;
 
-		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
+		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 		// Choose material for footstep sound
 		switch (floor->Material)
 		{
 		case FLOOR_MATERIAL::Concrete:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 			break;
 
 		case FLOOR_MATERIAL::Grass:
@@ -107,7 +107,7 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Stone:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 			break;
 
 		case FLOOR_MATERIAL::Water:
@@ -152,7 +152,7 @@ namespace Footprints {
 		}
 
 		// HACK: must be here until reference wad2 is revised
-		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
+		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(fx, &item->Pose);
 
 		if (floor->Material != FLOOR_MATERIAL::Sand &&
@@ -209,9 +209,9 @@ namespace Footprints {
 		footprint.Position[1] = p1;
 		footprint.Position[2] = p2;
 		footprint.Position[3] = p3;
-		footprint.LifeStartFading = 30 * 10;
 		footprint.StartOpacity = 0.25f;
-		footprint.Life = 30 * 20;
+		footprint.LifeStartFading = FPS * 10;
+		footprint.Life = FPS * 20;
 		footprint.Active = true;
 		footprint.RightFoot = rightFoot;
 

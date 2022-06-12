@@ -44,7 +44,7 @@ void MonkeyControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState != 11)
 		{
-			item->MeshBits = -1;
+			item->MeshBits = ALL_JOINT_BITS;
 			item->Animation.AnimNumber = Objects[ID_MONKEY].animIndex + 14;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 11;
@@ -91,7 +91,7 @@ void MonkeyControl(short itemNumber)
 			if (item->CarriedItem != NO_ITEM)
 				item->MeshBits = 0xFFFFFEFF;
 			else
-				item->MeshBits = -1;
+				item->MeshBits = ALL_JOINT_BITS;
 		}
 		else
 		{

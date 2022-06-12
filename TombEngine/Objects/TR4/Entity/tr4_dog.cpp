@@ -13,10 +13,14 @@
 namespace TEN::Entities::TR4
 {
 	BITE_INFO DogBite = { 0, 0, 100, 3 };
+	const std::vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
+	const std::vector<int> DogBiteAttackJoints = { 3, 6 };
 
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
-
+	constexpr auto DOG_BITE_ATTACK_RANGE = SECTOR(0.55);
+	constexpr auto DOG_JUMP_ATTACK_RANGE = SECTOR(1);
+	
 	enum DogState
 	{
 		DOG_STATE_NONE = 0,
@@ -293,7 +297,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood != MoodType::Bored)
 				{
-					if (AI.bite && AI.distance < pow(SECTOR(1), 2))
+					if (AI.bite && AI.distance < pow(DOG_JUMP_ATTACK_RANGE, 2))
 						item->Animation.TargetState = DOG_STATE_JUMP_ATTACK;
 					else if (AI.distance < pow(SECTOR(1.5f), 2))
 					{
@@ -313,7 +317,7 @@ namespace TEN::Entities::TR4
 				{
 					if (creature->Mood == MoodType::Escape)
 						item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
-					else if (AI.bite && AI.distance < pow(341, 2))
+					else if (AI.bite && AI.distance < pow(DOG_BITE_ATTACK_RANGE, 2))
 					{
 						item->Animation.TargetState = DOG_STATE_BITE_ATTACK;
 						item->Animation.RequiredState = DOG_STATE_STALK;
@@ -328,7 +332,7 @@ namespace TEN::Entities::TR4
 
 			case DOG_STATE_JUMP_ATTACK:
 				if (AI.bite &&
-					item->TouchBits & 0x6648 &&
+					item->TestBits(JointBitType::Touch, DogJumpAttackJoints) &&
 					frame >= 4 &&
 					frame <= 14)
 				{
@@ -348,7 +352,7 @@ namespace TEN::Entities::TR4
 
 			case DOG_STATE_BITE_ATTACK:
 				if (AI.bite &&
-					item->TouchBits & 0x48 &&
+					item->TestBits(JointBitType::Touch, DogBiteAttackJoints) &&
 					(frame >= 9 &&
 						frame <= 12 ||
 						frame >= 22 &&

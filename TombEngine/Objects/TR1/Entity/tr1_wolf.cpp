@@ -11,232 +11,234 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO WolfBite = { 0, -14, 174, 6 };
-
-enum WolfState
+namespace TEN::Entities::TR1
 {
-	WOLF_STATE_NONE = 0, 
-	WOLF_STATE_IDLE = 1,
-	WOLF_STATE_WALK = 2,
-	WOLF_STATE_RUN = 3,
-	WOLF_STATE_JUMP = 4,
-	WOLF_STATE_STALK = 5,
-	WOLF_STATE_ATTACK = 6,
-	WOLF_STATE_HOWL = 7,
-	WOLF_STATE_SLEEP = 8,
-	WOLF_STATE_CROUCH = 9,
-	WOLF_STATE_FAST_TURN = 10,
-	WOLF_STATE_DEATH = 11,
-	WOLF_STATE_BITE = 12
-};
+	BITE_INFO WolfBite = { 0, -14, 174, 6 };
+	const std::vector<int> WolfAttackJoints = { 0, 1, 2, 3, 6, 8, 9, 10, 12, 13, 14 };
+	
+	#define SLEEP_FRAME 96
 
-// TODO
-enum WolfAnim
-{
-	WOLF_ANIM_DEATH = 20,
-};
+	#define ATTACK_RANGE pow(SECTOR(1.5f), 2)
+	#define STALK_RANGE  pow(SECTOR(2), 2)
 
-#define TOUCH 0x774f
+	#define BITE_DAMAGE  100
+	#define LUNGE_DAMAGE 50
 
-#define SLEEP_FRAME 96
+	#define WAKE_CHANCE  0x20
+	#define SLEEP_CHANCE 0x20
+	#define HOWL_CHANCE  0x180
 
-#define ATTACK_RANGE pow(SECTOR(1.5f), 2)
-#define STALK_RANGE  pow(SECTOR(2), 2)
+	#define WALK_TURN  ANGLE(2.0f)
+	#define RUN_TURN   ANGLE(5.0f)
+	#define STALK_TURN ANGLE(2.0f)
 
-#define BITE_DAMAGE  100
-#define LUNGE_DAMAGE 50
-
-#define WAKE_CHANCE  0x20
-#define SLEEP_CHANCE 0x20
-#define HOWL_CHANCE  0x180
-
-#define WALK_TURN  ANGLE(2.0f)
-#define RUN_TURN   ANGLE(5.0f)
-#define STALK_TURN ANGLE(2.0f)
-
-void InitialiseWolf(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
-
-	ClearItem(itemNumber);
-	item->Animation.FrameNumber = SLEEP_FRAME;
-}
-
-void WolfControl(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
-		return;
-
-	auto* item = &g_Level.Items[itemNumber];
-	auto* creature = GetCreatureInfo(item);
-
-	short head = 0;
-	short angle = 0;
-	short tilt = 0;
-
-	if (item->HitPoints <= 0)
+	enum WolfState
 	{
-		if (item->Animation.ActiveState != WOLF_STATE_DEATH)
-		{
-			item->Animation.AnimNumber = Objects[ID_WOLF].animIndex + WOLF_ANIM_DEATH + (short)(GetRandomControl() / 11000);
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
-			item->Animation.ActiveState = WOLF_STATE_DEATH;
-		}
+		WOLF_STATE_NONE = 0,
+		WOLF_STATE_IDLE = 1,
+		WOLF_STATE_WALK = 2,
+		WOLF_STATE_RUN = 3,
+		WOLF_STATE_JUMP = 4,
+		WOLF_STATE_STALK = 5,
+		WOLF_STATE_ATTACK = 6,
+		WOLF_STATE_HOWL = 7,
+		WOLF_STATE_SLEEP = 8,
+		WOLF_STATE_CROUCH = 9,
+		WOLF_STATE_FAST_TURN = 10,
+		WOLF_STATE_DEATH = 11,
+		WOLF_STATE_BITE = 12
+	};
+
+	// TODO
+	enum WolfAnim
+	{
+		WOLF_ANIM_DEATH = 20,
+	};
+
+	void InitialiseWolf(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		ClearItem(itemNumber);
+		item->Animation.FrameNumber = SLEEP_FRAME;
 	}
-	else
+
+	void WolfControl(short itemNumber)
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		if (!CreatureActive(itemNumber))
+			return;
 
-		if (AI.ahead)
-			head = AI.angle;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
 
-		GetCreatureMood(item, &AI, TIMID);
-		CreatureMood(item, &AI, TIMID);
+		short head = 0;
+		short angle = 0;
+		short tilt = 0;
 
-		angle = CreatureTurn(item, creature->MaxTurn);
-
-		switch (item->Animation.ActiveState)
+		if (item->HitPoints <= 0)
 		{
-		case WOLF_STATE_SLEEP:
-			head = 0;
-
-			if (creature->Mood == MoodType::Escape || AI.zoneNumber == AI.enemyZone)
+			if (item->Animation.ActiveState != WOLF_STATE_DEATH)
 			{
-				item->Animation.RequiredState = WOLF_STATE_CROUCH;
-				item->Animation.TargetState = WOLF_STATE_IDLE;
+				item->Animation.AnimNumber = Objects[ID_WOLF].animIndex + WOLF_ANIM_DEATH + (short)(GetRandomControl() / 11000);
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.ActiveState = WOLF_STATE_DEATH;
 			}
-			else if (GetRandomControl() < WAKE_CHANCE)
+		}
+		else
+		{
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
+
+			if (AI.ahead)
+				head = AI.angle;
+
+			GetCreatureMood(item, &AI, TIMID);
+			CreatureMood(item, &AI, TIMID);
+
+			angle = CreatureTurn(item, creature->MaxTurn);
+
+			switch (item->Animation.ActiveState)
 			{
-				item->Animation.RequiredState = WOLF_STATE_WALK;
-				item->Animation.TargetState = WOLF_STATE_IDLE;
-			}
+			case WOLF_STATE_SLEEP:
+				head = 0;
 
-			break;
-
-		case WOLF_STATE_IDLE:
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-			else
-				item->Animation.TargetState = WOLF_STATE_WALK;
-			break;
-
-		case WOLF_STATE_WALK:
-			creature->MaxTurn = WALK_TURN;
-
-			if (creature->Mood != MoodType::Bored)
-			{
-				item->Animation.TargetState = WOLF_STATE_STALK;
-				item->Animation.RequiredState = WOLF_STATE_NONE;
-			}
-			else if (GetRandomControl() < SLEEP_CHANCE)
-			{
-				item->Animation.RequiredState = WOLF_STATE_SLEEP;
-				item->Animation.TargetState = WOLF_STATE_IDLE;
-			}
-
-			break;
-
-		case WOLF_STATE_CROUCH:
-			if (item->Animation.RequiredState)
-				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = WOLF_STATE_RUN;
-			else if (AI.distance < pow(345, 2) && AI.bite)
-				item->Animation.TargetState = WOLF_STATE_BITE;
-			else if (creature->Mood == MoodType::Stalk)
-				item->Animation.TargetState = WOLF_STATE_STALK;
-			else if (creature->Mood == MoodType::Bored)
-				item->Animation.TargetState = WOLF_STATE_IDLE;
-			else
-				item->Animation.TargetState = WOLF_STATE_RUN;
-
-			break;
-
-		case WOLF_STATE_STALK:
-			creature->MaxTurn = STALK_TURN;
-
-			if (creature->Mood == MoodType::Escape)
-				item->Animation.TargetState = WOLF_STATE_RUN;
-			else if (AI.distance < pow(345, 2) && AI.bite)
-				item->Animation.TargetState = WOLF_STATE_BITE;
-			else if (AI.distance > pow(SECTOR(3), 2))
-				item->Animation.TargetState = WOLF_STATE_RUN;
-			else if (creature->Mood == MoodType::Attack)
-			{
-				if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2) ||
-					(AI.enemyFacing < FRONT_ARC && AI.enemyFacing > -FRONT_ARC))
+				if (creature->Mood == MoodType::Escape || AI.zoneNumber == AI.enemyZone)
 				{
-					item->Animation.TargetState = WOLF_STATE_RUN;
+					item->Animation.RequiredState = WOLF_STATE_CROUCH;
+					item->Animation.TargetState = WOLF_STATE_IDLE;
 				}
-			}
-			else if (GetRandomControl() < HOWL_CHANCE)
-			{
-				item->Animation.RequiredState = WOLF_STATE_HOWL;
-				item->Animation.TargetState = WOLF_STATE_CROUCH;
-			}
-			else if (creature->Mood == MoodType::Bored)
-				item->Animation.TargetState = WOLF_STATE_CROUCH;
+				else if (GetRandomControl() < WAKE_CHANCE)
+				{
+					item->Animation.RequiredState = WOLF_STATE_WALK;
+					item->Animation.TargetState = WOLF_STATE_IDLE;
+				}
 
-			break;
+				break;
 
-		case WOLF_STATE_RUN:
-			creature->MaxTurn = RUN_TURN;
-			tilt = angle;
+			case WOLF_STATE_IDLE:
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
+				else
+					item->Animation.TargetState = WOLF_STATE_WALK;
+				break;
 
-			if (AI.ahead && AI.distance < ATTACK_RANGE)
-			{
-				if (AI.distance > (ATTACK_RANGE / 2) &&
-					(AI.enemyFacing > FRONT_ARC || AI.enemyFacing < -FRONT_ARC))
+			case WOLF_STATE_WALK:
+				creature->MaxTurn = WALK_TURN;
+
+				if (creature->Mood != MoodType::Bored)
+				{
+					item->Animation.TargetState = WOLF_STATE_STALK;
+					item->Animation.RequiredState = WOLF_STATE_NONE;
+				}
+				else if (GetRandomControl() < SLEEP_CHANCE)
+				{
+					item->Animation.RequiredState = WOLF_STATE_SLEEP;
+					item->Animation.TargetState = WOLF_STATE_IDLE;
+				}
+
+				break;
+
+			case WOLF_STATE_CROUCH:
+				if (item->Animation.RequiredState)
+					item->Animation.TargetState = item->Animation.RequiredState;
+				else if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = WOLF_STATE_RUN;
+				else if (AI.distance < pow(345, 2) && AI.bite)
+					item->Animation.TargetState = WOLF_STATE_BITE;
+				else if (creature->Mood == MoodType::Stalk)
+					item->Animation.TargetState = WOLF_STATE_STALK;
+				else if (creature->Mood == MoodType::Bored)
+					item->Animation.TargetState = WOLF_STATE_IDLE;
+				else
+					item->Animation.TargetState = WOLF_STATE_RUN;
+
+				break;
+
+			case WOLF_STATE_STALK:
+				creature->MaxTurn = STALK_TURN;
+
+				if (creature->Mood == MoodType::Escape)
+					item->Animation.TargetState = WOLF_STATE_RUN;
+				else if (AI.distance < pow(345, 2) && AI.bite)
+					item->Animation.TargetState = WOLF_STATE_BITE;
+				else if (AI.distance > pow(SECTOR(3), 2))
+					item->Animation.TargetState = WOLF_STATE_RUN;
+				else if (creature->Mood == MoodType::Attack)
+				{
+					if (!AI.ahead || AI.distance > pow(SECTOR(1.5f), 2) ||
+						(AI.enemyFacing < FRONT_ARC && AI.enemyFacing > -FRONT_ARC))
+					{
+						item->Animation.TargetState = WOLF_STATE_RUN;
+					}
+				}
+				else if (GetRandomControl() < HOWL_CHANCE)
+				{
+					item->Animation.RequiredState = WOLF_STATE_HOWL;
+					item->Animation.TargetState = WOLF_STATE_CROUCH;
+				}
+				else if (creature->Mood == MoodType::Bored)
+					item->Animation.TargetState = WOLF_STATE_CROUCH;
+
+				break;
+
+			case WOLF_STATE_RUN:
+				creature->MaxTurn = RUN_TURN;
+				tilt = angle;
+
+				if (AI.ahead && AI.distance < ATTACK_RANGE)
+				{
+					if (AI.distance > (ATTACK_RANGE / 2) &&
+						(AI.enemyFacing > FRONT_ARC || AI.enemyFacing < -FRONT_ARC))
+					{
+						item->Animation.RequiredState = WOLF_STATE_STALK;
+						item->Animation.TargetState = WOLF_STATE_CROUCH;
+					}
+					else
+					{
+						item->Animation.TargetState = WOLF_STATE_ATTACK;
+						item->Animation.RequiredState = WOLF_STATE_NONE;
+					}
+				}
+				else if (creature->Mood == MoodType::Stalk && AI.distance < STALK_RANGE)
 				{
 					item->Animation.RequiredState = WOLF_STATE_STALK;
 					item->Animation.TargetState = WOLF_STATE_CROUCH;
 				}
-				else
+				else if (creature->Mood == MoodType::Bored)
+					item->Animation.TargetState = WOLF_STATE_CROUCH;
+
+				break;
+
+			case WOLF_STATE_ATTACK:
+				tilt = angle;
+
+				if (!item->Animation.RequiredState && item->TestBits(JointBitType::Touch, WolfAttackJoints))
 				{
-					item->Animation.TargetState = WOLF_STATE_ATTACK;
-					item->Animation.RequiredState = WOLF_STATE_NONE;
+					CreatureEffect(item, &WolfBite, DoBloodSplat);
+					LaraItem->HitPoints -= LUNGE_DAMAGE;
+					LaraItem->HitStatus = true;
+					item->Animation.RequiredState = WOLF_STATE_RUN;
 				}
+
+				item->Animation.TargetState = WOLF_STATE_RUN;
+				break;
+
+			case WOLF_STATE_BITE:
+				if (AI.ahead && !item->Animation.RequiredState &&
+					item->TestBits(JointBitType::Touch, WolfAttackJoints))
+				{
+					CreatureEffect(item, &WolfBite, DoBloodSplat);
+					LaraItem->HitPoints -= BITE_DAMAGE;
+					LaraItem->HitStatus = true;
+					item->Animation.RequiredState = WOLF_STATE_CROUCH;
+				}
+
+				break;
 			}
-			else if (creature->Mood == MoodType::Stalk && AI.distance < STALK_RANGE)
-			{
-				item->Animation.RequiredState = WOLF_STATE_STALK;
-				item->Animation.TargetState = WOLF_STATE_CROUCH;
-			}
-			else if (creature->Mood == MoodType::Bored)
-				item->Animation.TargetState = WOLF_STATE_CROUCH;
-
-			break;
-
-		case WOLF_STATE_ATTACK:
-			tilt = angle;
-
-			if (!item->Animation.RequiredState && item->TouchBits & TOUCH)
-			{
-				CreatureEffect(item, &WolfBite, DoBloodSplat);
-				LaraItem->HitPoints -= LUNGE_DAMAGE;
-				LaraItem->HitStatus = true;
-				item->Animation.RequiredState = WOLF_STATE_RUN;
-			}
-
-			item->Animation.TargetState = WOLF_STATE_RUN;
-			break;
-
-		case WOLF_STATE_BITE:
-			if (!item->Animation.RequiredState &&
-				item->TouchBits & TOUCH && AI.ahead)
-			{
-				CreatureEffect(item, &WolfBite, DoBloodSplat);
-				LaraItem->HitPoints -= BITE_DAMAGE;
-				LaraItem->HitStatus = true;
-				item->Animation.RequiredState = WOLF_STATE_CROUCH;
-			}
-
-			break;
 		}
-	}
 
-	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, head);
-	CreatureAnimation(itemNumber, angle, tilt);
+		CreatureTilt(item, tilt);
+		CreatureJoint(item, 0, head);
+		CreatureAnimation(itemNumber, angle, tilt);
+	}
 }

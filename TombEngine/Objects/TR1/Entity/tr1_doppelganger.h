@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseDoppelganger(short itemNumber);
-void DoppelgangerControl(short itemNumber);
+namespace TEN::Entities::TR1
+{
+	void InitialiseDoppelganger(short itemNumber);
+	void DoppelgangerControl(short itemNumber);
+}

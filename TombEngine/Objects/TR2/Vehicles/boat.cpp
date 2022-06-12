@@ -32,12 +32,12 @@
 #define BOAT_SLIP			10
 #define BOAT_SIDE_SLIP		30
 #define BOAT_FRONT			750
+#define BOAT_BACK			-700
 #define BOAT_SIDE			300
 #define BOAT_RADIUS			500
 #define BOAT_SNOW			500
 #define BOAT_MAX_HEIGHT		CLICK(1)
-#define DISMOUNT_DISTANCE		SECTOR(1)
-#define BOAT_WAKE			700
+#define DISMOUNT_DISTANCE	SECTOR(1)
 #define BOAT_SOUND_CEILING	SECTOR(5)
 #define BOAT_TIP			(BOAT_FRONT + 250)
 
@@ -97,83 +97,6 @@ void InitialiseSpeedBoat(short itemNumber)
 	sBoat->RightVerticalVelocity = 0;
 	sBoat->Water = 0;
 	sBoat->Pitch = 0;
-}
-
-void DoBoatWakeEffect(ItemInfo* sBoatItem)
-{
-	//SetupRipple(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.y, sBoatItem->Pose.Position.z, 512, RIPPLE_FLAG_RAND_POS, Objects[1368].meshIndex, TO_RAD(sBoatItem->Pose.Orientation.y));
-	TEN::Effects::TriggerSpeedboatFoam(sBoatItem);
-
-	// OLD WAKE EFFECT
-	/*int c = phd_cos(boat->pos.Orientation.y);
-	int s = phd_sin(boat->pos.Orientation.y);
-	int c = phd_cos(boat->pos.Orientation.y);
-	
-	for (int i = 0; i < 3; i++)
-	{
-		int h = BOAT_WAKE;
-		int w = (1 - i) * BOAT_SIDE;
-		int x = boat->pos.Position.x + (-(c * w) - (h * s) >> W2V_SHIFT);
-		int y = boat->pos.Position.y;
-		int z = boat->pos.Position.z + ((s * w) - (h * c) >> W2V_SHIFT);
-
-		SPARKS* spark = &Sparks[GetFreeSpark()];
-		spark->on = 1;
-		spark->sR = 64;
-		spark->sG = 64;
-		spark->sB = 64;
-		spark->dR = 64;
-		spark->dG = 64;
-		spark->dB = 64;
-		spark->colFadeSpeed = 1;
-		spark->transType = TransTypeEnum::COLADD;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
-		spark->fadeToBlack = spark->life - 4;
-		spark->x = (BOAT_SIDE * phd_sin(boat->pos.Orientation.y) >> W2V_SHIFT) + (GetRandomControl() & 128) + x - 8;
-		spark->y = (GetRandomControl() & 0xF) + y - 8;
-		spark->z = (BOAT_SIDE * phd_cos(boat->pos.Orientation.y) >> W2V_SHIFT) + (GetRandomControl() & 128) + z - 8;
-		spark->xVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = 538;
-		spark->yVel = (GetRandomControl() & 0x7F) - 256;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->scalar = 3;
-		spark->maxYvel = 0;
-		spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
-		spark->gravity = -spark->yVel >> 2;
-		spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 16;
-		spark->dSize = 2 * spark->size;
-
-		spark = &Sparks[GetFreeSpark()];
-		spark->on = 1;
-		spark->sR = 64;
-		spark->sG = 64;
-		spark->sB = 64;
-		spark->dR = 64;
-		spark->dG = 64;
-		spark->dB = 64;
-		spark->colFadeSpeed = 1;
-		spark->transType = TransTypeEnum::COLADD;
-		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
-		spark->fadeToBlack = spark->life - 4;		
-		spark->x = (BOAT_SIDE * phd_sin(boat->pos.Orientation.y) >> W2V_SHIFT) + (GetRandomControl() & 128) + x - 8;
-		spark->y = (GetRandomControl() & 0xF) + y - 8;
-		spark->z = (BOAT_SIDE * phd_cos(boat->pos.Orientation.y) >> W2V_SHIFT) + (GetRandomControl() & 128) + z - 8;
-		spark->xVel = 0;
-		spark->zVel = 0;
-		spark->friction = 0;
-		spark->flags = 538;
-		spark->yVel = (GetRandomControl() & 0x7F) - 256;
-		spark->rotAng = GetRandomControl() & 0xFFF;
-		spark->scalar = 3;
-		spark->maxYvel = 0;
-		spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
-		spark->gravity = -spark->yVel >> 2;
-		spark->sSize = spark->size = ((GetRandomControl() & 3) + 16) * 4;
-		spark->dSize = 2 * spark->size;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
-	}*/
 }
 
 BoatMountType GetSpeedBoatMountType(ItemInfo* laraItem, ItemInfo* sBoatItem, CollisionInfo* coll)
@@ -1030,6 +953,12 @@ void SpeedBoatControl(short itemNumber)
 
 		Camera.targetElevation = -ANGLE(20.0f);
 		Camera.targetDistance = SECTOR(2);
+
+		auto pitch = sBoatItem->Animation.Velocity;
+		sBoat->Pitch += (pitch - sBoat->Pitch) / 4;
+
+		int fx = (sBoatItem->Animation.Velocity > 8) ? SFX_TR2_VEHICLE_SPEEDBOAT_MOVING : (drive ? SFX_TR2_VEHICLE_SPEEDBOAT_IDLE : SFX_TR2_VEHICLE_SPEEDBOAT_ACCELERATE);
+		SoundEffect(fx, &sBoatItem->Pose, SoundEnvironment::Land, 1.0f + sBoat->Pitch / (float)BOAT_MAX_VELOCITY / 4.0f);
 	}
 	else
 	{
@@ -1039,14 +968,12 @@ void SpeedBoatControl(short itemNumber)
 		sBoatItem->Pose.Orientation.z += sBoat->LeanAngle;
 	}
 
-	auto pitch = sBoatItem->Animation.Velocity;
-	sBoat->Pitch += (pitch - sBoat->Pitch) / 4;
-
-	int fx = (sBoatItem->Animation.Velocity > 8) ? SFX_TR2_SPEEDBOAT_MOVING : (drive ? SFX_TR2_SPEEDBOAT_IDLE : SFX_TR2_SPEEDBOAT_ACCELERATE);
-	SoundEffect(fx, &sBoatItem->Pose, SoundEnvironment::Land, 1.0f + sBoat->Pitch / (float)BOAT_MAX_VELOCITY / 4.0f);
-
 	if (sBoatItem->Animation.Velocity && (water - 5) == sBoatItem->Pose.Position.y)
-		DoBoatWakeEffect(sBoatItem);
+	{
+		auto room = probe.Block->RoomBelow(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.z).value_or(NO_ROOM);
+		if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
+			TEN::Effects::TriggerSpeedboatFoam(sBoatItem, Vector3(0, 0, -BOAT_BACK));
+	}
 
 	if (lara->Vehicle != itemNumber)
 		return;

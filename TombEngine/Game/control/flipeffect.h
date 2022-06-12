@@ -41,4 +41,4 @@ void MeshSwapToPour(ItemInfo* item);
 void MeshSwapFromPour(ItemInfo* item); 
 void FlashOrange(ItemInfo* item);
 
-void DoFlipEffect(int number, ItemInfo* item = NULL);
+void DoFlipEffect(int number, ItemInfo* item = nullptr);

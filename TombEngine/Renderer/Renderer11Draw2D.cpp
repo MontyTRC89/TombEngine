@@ -11,13 +11,11 @@ using namespace TEN::Effects::Environment;
 TEN::Renderer::RendererHUDBar* g_HealthBar;
 TEN::Renderer::RendererHUDBar* g_AirBar;
 TEN::Renderer::RendererHUDBar* g_DashBar;
-TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
-TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 TEN::Renderer::RendererHUDBar* g_LoadingBar;
 
 namespace TEN::Renderer
 {
-	void Renderer11::InitialiseBars()
+	void Renderer11::InitialiseGameBars()
 	{
 		std::array<Vector4, 5> healthColors = 
 		{
@@ -66,24 +64,11 @@ namespace TEN::Renderer
 			Vector4(78 / 255.0f,4 / 255.0f,0,1),
 			Vector4(136 / 255.0f,117 / 255.0f,5 / 255.0f,1),
 		};
-		std::array<Vector4, 5> soundSettingColors = 
-		{
-			//top
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
-			//center
-			Vector4(0.18f,0.3f,0.72f,1),
-			//bottom
-			Vector4(0.18f,0.3f,0.72f,1),
-			Vector4(0.18f,0.3f,0.72f,1),
-		};
 
 		g_HealthBar = new RendererHUDBar(m_device.Get(), 20, 32, 150, 8, 1, healthColors);
 		g_AirBar = new RendererHUDBar(m_device.Get(), 630, 32, 150, 8, 1, airColors);
 		g_DashBar = new RendererHUDBar(m_device.Get(), 630, 32 + 8 + 4, 150, 8, 1, dashColors);
-		g_MusicVolumeBar = new RendererHUDBar(m_device.Get(), 400, 194, 150, 8, 1, soundSettingColors);
-		g_SFXVolumeBar = new RendererHUDBar(m_device.Get(), 400, 212, 150, 8, 1, soundSettingColors);
-		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 400, 150, 8, 1, airColors);
+		g_LoadingBar = new RendererHUDBar(m_device.Get(), 325, 550, 150, 8, 1, airColors);
 	}
 
 	void Renderer11::DrawBar(float percent, const RendererHUDBar* const bar, GAME_OBJECT_ID textureSlot, int frame, bool poison)
@@ -264,5 +249,128 @@ namespace TEN::Renderer
 		{
 			// TODO: Vignette goes here! -- Lwmte, 21.08.21
 		}
+	}
+
+	void Renderer11::DoFadingAndCinematicBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
+		RenderView& view)
+	{
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_CCW);
+
+		m_context->ClearRenderTargetView(target, Colors::Black);
+		m_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		m_context->OMSetRenderTargets(1, &target, depthTarget);
+		m_context->RSSetViewports(1, &view.viewport);
+		ResetScissor();
+
+		RendererVertex vertices[4];
+
+		vertices[0].Position.x = -1.0f;
+		vertices[0].Position.y = 1.0f;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = 0.0f;
+		vertices[0].UV.y = 0.0f;
+		vertices[0].Color = Vector4::One;
+
+		vertices[1].Position.x = 1.0f;
+		vertices[1].Position.y = 1.0f;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = 1.0f;
+		vertices[1].UV.y = 0.0f;
+		vertices[1].Color = Vector4::One;
+
+		vertices[2].Position.x = 1.0f;
+		vertices[2].Position.y = -1.0f;
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = 1.0f;
+		vertices[2].UV.y = 1.0f;
+		vertices[2].Color = Vector4::One;
+
+		vertices[3].Position.x = -1.0f;
+		vertices[3].Position.y = -1.0f;
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = 0.0f;
+		vertices[3].UV.y = 1.0f;
+		vertices[3].Color = Vector4::One;
+
+		m_context->VSSetShader(m_vsFinalPass.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psFinalPass.Get(), nullptr, 0);
+
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		m_stPostProcessBuffer.ViewportWidth = ScreenWidth;
+		m_stPostProcessBuffer.ViewportHeight = ScreenHeight;
+		m_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
+		m_stPostProcessBuffer.CinematicBarsHeight = CinematicBarsHeight;
+		m_cbPostProcessBuffer.updateData(m_stPostProcessBuffer, m_context.Get());
+		m_context->PSSetConstantBuffers(7, 1, m_cbPostProcessBuffer.get());
+
+		BindTexture(TEXTURE_COLOR_MAP, &m_renderTarget, SAMPLER_ANISOTROPIC_CLAMP);
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		m_primitiveBatch->End();
+	}
+
+	void Renderer11::DrawFullScreenImage(ID3D11ShaderResourceView* texture, float fade, ID3D11RenderTargetView* target,
+		ID3D11DepthStencilView* depthTarget)
+	{
+		// Reset GPU state
+		SetBlendMode(BLENDMODE_OPAQUE);
+		SetCullMode(CULL_MODE_NONE);
+
+		m_context->OMSetRenderTargets(1, &target, depthTarget);
+		m_context->RSSetViewports(1, &m_viewport);
+		ResetScissor();
+
+		DrawFullScreenQuad(texture, Vector3(fade, fade, fade));
+	}
+
+	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color)
+	{
+		RendererVertex vertices[4];
+
+		vertices[0].Position.x = -1.0f;
+		vertices[0].Position.y = 1.0f;
+		vertices[0].Position.z = 0.0f;
+		vertices[0].UV.x = 0.0f;
+		vertices[0].UV.y = 0.0f;
+		vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[1].Position.x = 1.0f;
+		vertices[1].Position.y = 1.0f;
+		vertices[1].Position.z = 0.0f;
+		vertices[1].UV.x = 1.0f;
+		vertices[1].UV.y = 0.0f;
+		vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[2].Position.x = 1.0f;
+		vertices[2].Position.y = -1.0f;
+		vertices[2].Position.z = 0.0f;
+		vertices[2].UV.x = 1.0f;
+		vertices[2].UV.y = 1.0f;
+		vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		vertices[3].Position.x = -1.0f;
+		vertices[3].Position.y = -1.0f;
+		vertices[3].Position.z = 0.0f;
+		vertices[3].UV.x = 0.0f;
+		vertices[3].UV.y = 1.0f;
+		vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
+
+		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psFullScreenQuad.Get(), nullptr, 0);
+
+		m_context->PSSetShaderResources(0, 1, &texture);
+		ID3D11SamplerState* sampler = m_states->AnisotropicClamp();
+		m_context->PSSetSamplers(0, 1, &sampler);
+
+		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		m_context->IASetInputLayout(m_inputLayout.Get());
+
+		m_primitiveBatch->Begin();
+		m_primitiveBatch->DrawQuad(vertices[0], vertices[1], vertices[2], vertices[3]);
+		m_primitiveBatch->End();
 	}
 }

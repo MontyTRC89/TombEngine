@@ -43,7 +43,7 @@ void AnimateLara(ItemInfo* item)
 				switch (*(cmd++))
 				{
 				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
 					UpdateItemRoom(item, -LARA_HEIGHT / 2, -cmd[0], -cmd[2]);
 					cmd += 3;
 					break;
@@ -88,8 +88,6 @@ void AnimateLara(ItemInfo* item)
 	if (anim->numberCommands > 0)
 	{
 		short* cmd = &g_Level.Commands[anim->commandIndex];
-		int flags;
-		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -111,14 +109,20 @@ void AnimateLara(ItemInfo* item)
 				}
 				else
 				{
-					flags = cmd[1] & 0xC000;
-					auto condition = flags ? (flags == (1 << 14) ? SoundEnvironment::Land : SoundEnvironment::Water) : SoundEnvironment::Always;
+					bool inWater = (cmd[1] & 0x8000) != 0;
+					bool inDry   = (cmd[1] & 0x4000) != 0;
+					bool always  = (inWater && inDry) || (!inWater && !inDry);
+
+					SoundEnvironment condition = SoundEnvironment::Always;
+					if (inWater) condition = SoundEnvironment::Water;
+					if (inDry)   condition = SoundEnvironment::Land;
+					if (always)  condition = SoundEnvironment::Always;
 
 					if (condition == SoundEnvironment::Always ||
-						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= 0 || lara->WaterSurfaceDist == NO_HEIGHT)) ||
-						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist < -CLICK(0.5f) && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
+						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= -SHALLOW_WATER_START_LEVEL || lara->WaterSurfaceDist == NO_HEIGHT)) ||
+						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist <  -SHALLOW_WATER_START_LEVEL && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 					{
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, condition);
 					}
 				}
 
@@ -132,8 +136,7 @@ void AnimateLara(ItemInfo* item)
 					break;
 				}
 
-				effectID = cmd[1] & 0x3FFF;
-				DoFlipEffect(effectID, item);
+				DoFlipEffect((cmd[1] & 0x3FFF), item);
 
 				cmd += 2;
 				break;
@@ -189,7 +192,7 @@ void AnimateLara(ItemInfo* item)
 		DelAlignLaraToRope(item);
 
 	if (!lara->Control.IsMoving)
-		MoveItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
+		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, 0, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
 
 	// Update matrices
 	g_Renderer.UpdateLaraAnimations(true);
@@ -197,7 +200,7 @@ void AnimateLara(ItemInfo* item)
 
 void AnimateItem(ItemInfo* item)
 {
-	item->TouchBits = 0;
+	item->TouchBits = NO_JOINT_BITS;
 	item->HitStatus = false;
 
 	item->Animation.FrameNumber++;
@@ -222,7 +225,7 @@ void AnimateItem(ItemInfo* item)
 				switch (*(cmd++))
 				{
 				case COMMAND_MOVE_ORIGIN:
-					TranslateItem(item, cmd[0], cmd[1], cmd[2]);
+					TranslateItem(item, item->Pose.Orientation.y, cmd[2], cmd[1], cmd[0]);
 					cmd += 3;
 					break;
 
@@ -267,8 +270,6 @@ void AnimateItem(ItemInfo* item)
 	if (anim->numberCommands > 0)
 	{
 		short* cmd = &g_Level.Commands[anim->commandIndex];
-		int flags;
-		int effectID = 0;
 
 		for (int i = anim->numberCommands; i > 0; i--)
 		{
@@ -289,10 +290,12 @@ void AnimateItem(ItemInfo* item)
 					break;
 				}
 
-				flags = cmd[1] & 0xC000;
-
 				if (!Objects[item->ObjectNumber].waterCreature)
 				{
+					bool inWater = (cmd[1] & 0x8000) != 0;
+					bool inDry   = (cmd[1] & 0x4000) != 0;
+					bool always  = (inWater && inDry) || (!inWater && !inDry);
+
 					if (item->RoomNumber == NO_ROOM)
 					{
 						item->Pose.Position.x = LaraItem->Pose.Position.x;
@@ -303,15 +306,15 @@ void AnimateItem(ItemInfo* item)
 					}
 					else if (TestEnvironment(ENV_FLAG_WATER, item))
 					{
-						if (!flags || flags == (int)SoundEnvironment::Water && (TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) || Objects[item->ObjectNumber].intelligent))
+						if (always || (inWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber)))
 							SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}
-					else if (!flags || flags == (int)SoundEnvironment::Land && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
+					else if (always || (inDry && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.roomNumber)))
 						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 				}
 				else
 				{
-					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, item));
+					SoundEffect(cmd[1] & 0x3FFF, &item->Pose, TestEnvironment(ENV_FLAG_WATER, item) ? SoundEnvironment::Water : SoundEnvironment::Land);
 				}
 
 				break;
@@ -323,8 +326,7 @@ void AnimateItem(ItemInfo* item)
 					break;
 				}
 
-				effectID = cmd[1] & 0x3FFF;
-				DoFlipEffect(effectID, item);
+				DoFlipEffect((cmd[1] & 0x3FFF), item);
 
 				cmd += 2;
 				break;
@@ -345,8 +347,8 @@ void AnimateItem(ItemInfo* item)
 		item->Animation.Velocity = (anim->VelocityStart + (item->Animation.FrameNumber - anim->FrameBase) * anim->VelocityEnd) / 65536;
 		item->Animation.LateralVelocity = (anim->LateralVelocityStart + anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->FrameBase)) / 65536;
 	}
-
-	MoveItem(item, item->Pose.Orientation.y, item->Animation.Velocity, item->Animation.LateralVelocity);
+	
+	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0, item->Animation.LateralVelocity);
 
 	// Update matrices.
 	short itemNumber = item - g_Level.Items.data();
@@ -394,14 +396,14 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 	return (item->Animation.FrameNumber >= anim->FrameEnd);
 }
 
-void TranslateItem(ItemInfo* item, int x, int y, int z)
+void TranslateItem(ItemInfo* item, short angle, float forward, float vertical, float lateral)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	item->Pose.Position = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
+}
 
-	item->Pose.Position.x += round(c * x + s * z);
-	item->Pose.Position.y += y;
-	item->Pose.Position.z += round(-s * x + c * z);
+void TranslateItem(ItemInfo* item, Vector3Shrt orient, float distance)
+{
+	item->Pose.Position = TranslateVector(item->Pose.Position, orient, distance);
 }
 
 void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
@@ -518,7 +520,8 @@ int GetCurrentRelativeFrameNumber(ItemInfo* item)
 
 int GetFrameNumber(ItemInfo* item, int frameToStart)
 {
-	return GetFrameNumber(item->ObjectNumber, item->Animation.AnimNumber, frameToStart);
+	int animNumber = item->Animation.AnimNumber - Objects[item->ObjectNumber].animIndex;
+	return GetFrameNumber(item->ObjectNumber, animNumber, frameToStart);
 }
 
 int GetFrameNumber(int objectID, int animNumber, int frameToStart)

@@ -218,7 +218,7 @@ void DobermanControl(short itemNumber)
 		}
 		else if (item->Animation.ActiveState != 10)
 		{
-			item->Animation.AnimNumber = Objects[ID_DOG].animIndex + 13;
+			item->Animation.AnimNumber = Objects[ID_DOBERMAN].animIndex + 13;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 			item->Animation.ActiveState = 10;
 		}

@@ -217,6 +217,6 @@ void UpdateBats()
 		auto* bat = &Bats[minIndex];
 
 		if (!(GetRandomControl() & 4))
-			SoundEffect(SFX_TR4_BATS_1,&bat->Pose);
+			SoundEffect(SFX_TR4_BATS,&bat->Pose);
 	}
 }
