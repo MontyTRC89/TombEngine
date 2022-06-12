@@ -797,7 +797,7 @@ void RubberBoatAnimation(ItemInfo* laraItem, ItemInfo* rBoatItem, int collide)
 
 static void TriggerRubberBoatMist(long x, long y, long z, long velocity, short angle, long snow)
 {
-	auto sptr = GetFreeParticle();
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	sptr->sR = 0;

@@ -81,7 +81,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 
 void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 	spark->sB = 0;
@@ -122,7 +122,7 @@ void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 
 static void TriggerHydraSparks(short itemNumber, int frame)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 	
 	spark->on = 1;
 	spark->sB = 0;

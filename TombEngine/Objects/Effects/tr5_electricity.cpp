@@ -20,7 +20,7 @@ using namespace TEN::Effects::Lara;
 
 void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glow)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 	spark->on = true;
 	spark->sR = 255;
 	spark->sG = 255;
@@ -89,7 +89,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	Vector3Int pos = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos, joint);
 
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->dR = 0;

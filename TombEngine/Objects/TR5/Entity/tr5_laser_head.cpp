@@ -43,7 +43,7 @@ static void TriggerLaserHeadSparks(Vector3Int* pos, int count, byte r, byte g, b
 	{
 		for (int i = 0; i < count; i++)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = r;

@@ -30,7 +30,7 @@ namespace TEN::Entities::Effects
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = 0;
@@ -81,7 +81,7 @@ namespace TEN::Entities::Effects
 
 		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = 0;

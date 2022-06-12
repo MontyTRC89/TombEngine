@@ -407,7 +407,7 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
     int rnd = 0;
     BYTE trans, size;
 
-    auto sptr = GetFreeParticle();
+    auto* sptr = GetFreeParticle();
 
     sptr->dR = 96;
     sptr->dG = 96;

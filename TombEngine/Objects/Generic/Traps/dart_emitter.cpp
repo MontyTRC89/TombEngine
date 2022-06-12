@@ -151,7 +151,7 @@ namespace TEN::Entities::Traps
 		if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 			return;
 
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->on = true;
 		

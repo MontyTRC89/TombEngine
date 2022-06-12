@@ -1262,7 +1262,7 @@ void QuadBikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 
 static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 	spark->sR = 0;

@@ -48,7 +48,7 @@ static void VentilatorEffect(BOUNDING_BOX* bounds, int intensity, short rot, int
 		{
 			if (abs(Camera.pos.z - z) <= SECTOR(7))
 			{
-				auto spark = GetFreeParticle();
+				auto* spark = GetFreeParticle();
 
 				spark->on = 1;
 				spark->sR = 0;

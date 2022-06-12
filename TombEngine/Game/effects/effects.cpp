@@ -404,7 +404,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		int random = rand();
 		
@@ -448,7 +448,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 
 	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->sR = -128;
 		spark->dR = -128;
@@ -493,7 +493,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 
@@ -574,7 +574,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->sR = -112;
 		spark->sG = -112;
@@ -619,7 +619,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 		return;
 
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 
@@ -814,7 +814,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
 		int size = (GetRandomControl() & 0x1FF) - yvel;
-		auto sptr = GetFreeParticle();
+		auto* sptr = GetFreeParticle();
 
 		if (size < 512)
 			size = 512;
@@ -1114,7 +1114,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	// CHECK THIS LOOP CONDITIONS
 	for (ang1 = angle; ; ang1 *= 2)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 		spark->on = 1;
 		spark->sR = 64;
 		spark->sG = 64;
@@ -1148,7 +1148,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 			break;
 	}
 
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 	spark->on = 1;
 	spark->sR = 96;
 	spark->sG = 96;
@@ -1282,7 +1282,7 @@ void Splash(ItemInfo* item)
 
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
 {
-	auto sptr = GetFreeParticle();
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 48 + (GetRandomControl() & 31);
@@ -1339,7 +1339,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 
 void TriggerRocketFire(int x, int y, int z)
 {
-	auto sptr = GetFreeParticle();
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 
@@ -1391,7 +1391,7 @@ void TriggerRocketFire(int x, int y, int z)
 
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 {
-	/*auto sptr = GetFreeParticle();
+	/*auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 0;
@@ -1504,7 +1504,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->on = true;
 
@@ -1707,7 +1707,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 	{
 		int r = rand();
 
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->dG = (r & 0x7F) + 64;
 		spark->dB = -64 - (r & 0x7F) + 64;

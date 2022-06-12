@@ -307,7 +307,7 @@ static int JeepCanGetOff()
 
 static void TriggerJeepExhaustSmoke(int x, int y, int z, short angle, short speed, int moving)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->dR = 16;
 	spark->dG = 16;

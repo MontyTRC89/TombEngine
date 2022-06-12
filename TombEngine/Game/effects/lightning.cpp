@@ -380,7 +380,7 @@ namespace TEN::Effects::Lightning
 
 	void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->dG = g;
 		spark->sG = g;

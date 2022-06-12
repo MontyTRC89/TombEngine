@@ -348,7 +348,7 @@ void HighObject2Control(short itemNumber)
 
 	if (--item->ItemFlags[2] < 15)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 		spark->on = 1;
 		spark->sR = -1;
 		spark->sB = 16;

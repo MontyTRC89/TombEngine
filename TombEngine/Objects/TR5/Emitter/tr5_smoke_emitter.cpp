@@ -144,7 +144,7 @@ void SmokeEmitterControl(short itemNumber)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->on = 1;
 		spark->dR = 48;
@@ -245,7 +245,7 @@ void SmokeEmitterControl(short itemNumber)
 			LOBYTE(v4) = wibble;
 			if (!(wibble & 0xF) && (item->objectNumber != 365 || !(wibble & 0x1F)))
 			{
-				auto spark = GetFreeParticle();
+				auto* spark = GetFreeParticle();
 
 				spark->on = 1;
 				spark->sR = 0;

@@ -149,7 +149,7 @@ void ControlGunShip(short itemNumber)
 
 		if (GunShipCounter < 15)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = spark->dR = (GetRandomControl() & 0x7F) + -128;

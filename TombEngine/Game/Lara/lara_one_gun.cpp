@@ -1908,7 +1908,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 {
 	for (int i = 0; i < count; i++)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->on = 1;
 		spark->sR = 112;

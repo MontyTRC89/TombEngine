@@ -22,7 +22,7 @@ namespace TEN::Entities::Generic
 {
 	void TriggerTorchFlame(char fxObj, char node)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->on = true;
 

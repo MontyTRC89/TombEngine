@@ -17,7 +17,7 @@
 
 static void TriggerSubmarineSparks(short itemNumber)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = -1;
@@ -49,7 +49,7 @@ static void TriggerSubmarineSparks(short itemNumber)
 
 static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char factor)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 32;
@@ -82,7 +82,7 @@ static void TriggerTorpedoBubbles(Vector3Int* pos1, Vector3Int* pos2, char facto
 
 static void TriggerTorpedoSparks2(Vector3Int* pos1, Vector3Int* pos2, char scale)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 32;

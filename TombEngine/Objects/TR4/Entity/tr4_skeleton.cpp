@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 			fx->shade = 0x4210;
 			fx->flag2 = 0x601;
 
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 			spark->on = 1;
 			spark->sR = 0;
 			spark->sG = 0;

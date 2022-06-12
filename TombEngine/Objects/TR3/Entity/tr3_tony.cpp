@@ -120,7 +120,7 @@ static void TriggerTonyFlame(short itemNumber, int hand)
 	if (dx < -MAX_TONY_TRIGGER_RANGE || dx > MAX_TONY_TRIGGER_RANGE || dz < -MAX_TONY_TRIGGER_RANGE || dz > MAX_TONY_TRIGGER_RANGE)
 		return;
 
-	auto sptr = GetFreeParticle();
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 255;
@@ -174,7 +174,7 @@ static void TriggerFireBallFlame(short fxNumber, long type, long xv, long yv, lo
 	if (dx < -MAX_TONY_TRIGGER_RANGE || dx > MAX_TONY_TRIGGER_RANGE || dz < -MAX_TONY_TRIGGER_RANGE || dz > MAX_TONY_TRIGGER_RANGE)
 		return;
 
-	auto sptr = GetFreeParticle();
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 255;

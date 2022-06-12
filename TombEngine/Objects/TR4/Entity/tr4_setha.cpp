@@ -458,7 +458,7 @@ namespace TEN::Entities::TR4
 
 		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 			spark->on = 1;
 			spark->sR = 0;
 			spark->sG = 0;
@@ -494,7 +494,7 @@ namespace TEN::Entities::TR4
 
 		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = 0;

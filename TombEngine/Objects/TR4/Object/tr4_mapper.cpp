@@ -41,7 +41,7 @@ namespace TEN::Entities::TR4
 
             for (int i = 0; i < 2; i++)
             {
-                auto spark = GetFreeParticle();
+                auto* spark = GetFreeParticle();
 
                 spark->on = 1;
                 spark->sR = (GetRandomControl() & 0x7F) + 64;

@@ -114,7 +114,7 @@ namespace TEN::Entities::TR4
 	{
 		for (int i = 0; i < maxSparks; i++)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			int random = GetRandomControl();
 
@@ -144,7 +144,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < maxSparks; i++)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			int random = GetRandomControl();
 

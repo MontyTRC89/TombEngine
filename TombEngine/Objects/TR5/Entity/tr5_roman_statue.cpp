@@ -113,7 +113,7 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 
 static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->dG = g;
 	spark->sG = g;
@@ -143,7 +143,7 @@ static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r,
 
 static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -181,7 +181,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 
 static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -246,7 +246,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 
 void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;

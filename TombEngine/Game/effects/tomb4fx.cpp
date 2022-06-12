@@ -210,7 +210,7 @@ void TriggerPilotFlame(int itemNum, int nodeIndex)
 	if (dx < -SECTOR(16) || dx > SECTOR(16) || dz < -SECTOR(16) || dz > SECTOR(16))
 		return;
 
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 48 + (GetRandomControl() & 31);
@@ -251,7 +251,7 @@ void TriggerPilotFlame(int itemNum, int nodeIndex)
 
 Particle* SetupPoisonSpark(Vector3 color)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	bool rMax = color.x > color.y && color.x > color.z;
 	bool gMax = color.y > color.x && color.y > color.z;
@@ -274,7 +274,7 @@ Particle* SetupPoisonSpark(Vector3 color)
 
 Particle* SetupFireSpark()
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->sR = (GetRandomControl() & 0x1F) + 48;
 	spark->sG = 38;
@@ -1139,7 +1139,7 @@ void AddWaterSparks(int x, int y, int z, int num)
 {
 	for (int i = 0; i < num; i++)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->on = 1;
 		spark->sR = 127;
@@ -1501,7 +1501,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, shor
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 		spark->dB = b;
 		spark->on = true;
 		spark->sR = 0;
@@ -1607,7 +1607,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->sR = 128;
 		spark->dR = 128;
@@ -1651,7 +1651,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 /*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 	
 	spark->on = 1;
 	if (unk)
@@ -1738,7 +1738,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {
-	auto spark = GetFreeParticle();
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = (GetRandomControl() & 0x3F) - 0x40;
@@ -1778,7 +1778,7 @@ void TriggerSmallSplash(int x, int y, int z, int number)
 {
 	for (int i = 0; i < number; i++)
 	{
-		auto sptr = GetFreeParticle();
+		auto* sptr = GetFreeParticle();
 
 		sptr->on = 1;
 

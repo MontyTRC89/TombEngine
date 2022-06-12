@@ -137,7 +137,7 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 		dz >= -SECTOR(16) && dz <= SECTOR(16))
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 
 		spark->sR = -1;
 		spark->sG = -1;

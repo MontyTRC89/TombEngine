@@ -58,7 +58,7 @@ namespace TEN::Entities::TR4
 		//if (x >= -0x4000u && x <= 0x4000 && z >= -0x4000u && z <= 0x4000)
 
 		auto* fx = &EffectList[fxNumber];
-		auto sptr = GetFreeParticle();
+		auto* sptr = GetFreeParticle();
 
 		sptr->on = true;
 		BYTE color = (GetRandomControl() & 0x3F) - 128;

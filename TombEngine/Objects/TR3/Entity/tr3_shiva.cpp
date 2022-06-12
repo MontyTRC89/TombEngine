@@ -72,7 +72,7 @@ static void TriggerShivaSmoke(long x, long y, long z, long uw)
 		return;
 	}
 
-	auto sptr = GetFreeParticle();
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	if (uw)

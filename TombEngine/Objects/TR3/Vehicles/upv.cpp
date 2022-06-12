@@ -182,7 +182,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 {
-	auto sptr = GetFreeParticle();
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	sptr->sR = 0;

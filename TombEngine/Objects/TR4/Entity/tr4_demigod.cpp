@@ -96,7 +96,7 @@ namespace TEN::Entities::TR4
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			if (fx->flag1 == 3 || fx->flag1 == 4)

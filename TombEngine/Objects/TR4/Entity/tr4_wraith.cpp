@@ -382,7 +382,7 @@ namespace TEN::Entities::TR4
 
 	void DrawWraith(Vector3Int pos, Vector3Int velocity, int objectNumber)
 	{
-		auto spark = GetFreeParticle();
+		auto* spark = GetFreeParticle();
 		spark->on = 1;
 
 		BYTE color;
@@ -473,7 +473,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < 15; i++)
 		{
-			auto spark = GetFreeParticle();
+			auto* spark = GetFreeParticle();
 
 			spark->on = true;
 			spark->sR = dR;
