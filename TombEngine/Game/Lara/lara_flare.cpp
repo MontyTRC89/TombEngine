@@ -31,7 +31,7 @@ void FlareControl(short itemNumber)
 
 	if (flareItem->Animation.VerticalVelocity)
 	{
-		flareItem->Pose.Orientation.x += ANGLE(3.0f);
+		flareItem->Pose.Orientation.x -= ANGLE(5.0f);
 		flareItem->Pose.Orientation.z += ANGLE(5.0f);
 	}
 	else
@@ -40,13 +40,14 @@ void FlareControl(short itemNumber)
 		flareItem->Pose.Orientation.z = 0;
 	}
 
+	auto velocity = Vector3Int(
+		flareItem->Animation.Velocity * phd_sin(flareItem->Pose.Orientation.y),
+		flareItem->Animation.VerticalVelocity,
+		flareItem->Animation.Velocity * phd_cos(flareItem->Pose.Orientation.y)
+	);
+
 	auto oldPos = flareItem->Pose.Position;
-
-	int xVel = flareItem->Animation.Velocity * phd_sin(flareItem->Pose.Orientation.y);
-	int zVel = flareItem->Animation.Velocity * phd_cos(flareItem->Pose.Orientation.y);
-
-	flareItem->Pose.Position.x += xVel;
-	flareItem->Pose.Position.z += zVel;
+	flareItem->Pose.Position += Vector3Int(velocity.x, 0, velocity.z);
 
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
 		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
@@ -58,8 +59,7 @@ void FlareControl(short itemNumber)
 		flareItem->Animation.VerticalVelocity += 6;
 
 	flareItem->Pose.Position.y += flareItem->Animation.VerticalVelocity;
-
-	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->Animation.VerticalVelocity, zVel);
+	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
 	int& life = flareItem->Data;
 	life &= 0x7FFF;
@@ -291,7 +291,6 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 	if (itemNumber != NO_ITEM)
 	{
 		auto* flareItem = &g_Level.Items[itemNumber];
-		bool flag = false;
 
 		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
@@ -303,12 +302,13 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 
 		int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem->RoomNumber).Position.Floor;
 		auto collided = GetCollidedObjects(flareItem, 0, true, CollidedItems, CollidedMeshes, true);
+		bool landed = false;
 		if (floorHeight < pos.y || collided)
 		{
-			flag = true;
-			flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y + ANGLE(180.0f);
+			landed = true;
 			flareItem->Pose.Position.x = laraItem->Pose.Position.x + 320 * phd_sin(flareItem->Pose.Orientation.y);
 			flareItem->Pose.Position.z = laraItem->Pose.Position.z + 320 * phd_cos(flareItem->Pose.Orientation.y);
+			flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y + ANGLE(180.0f);
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 		else
@@ -338,7 +338,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 			flareItem->Animation.VerticalVelocity = laraItem->Animation.VerticalVelocity + 50;
 		}
 
-		if (flag)
+		if (landed)
 			flareItem->Animation.Velocity /= 2;
 
 		if (objectNumber == ID_FLARE_ITEM)

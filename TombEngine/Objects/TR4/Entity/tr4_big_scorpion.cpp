@@ -18,7 +18,7 @@ namespace TEN::Entities::TR4
 
 	BITE_INFO BigScorpionBite1 = { 0, 0, 0, 8 };
 	BITE_INFO BigScorpionBite2 = { 0, 0, 0, 23 };
-	std::vector<int> BigScorpionTouchJoints = { 8, 22, 24 };
+	const std::vector<int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
 
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
@@ -314,7 +314,7 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.y - ANGLE(180.0f),
 						DoBloodSplat);
 				}
-				else if (item->TestBits(JointBitType::Touch, BigScorpionTouchJoints))
+				else if (item->TestBits(JointBitType::Touch, BigScorpionAttackJoints))
 				{
 					LaraItem->HitPoints -= BIG_SCORPION_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;

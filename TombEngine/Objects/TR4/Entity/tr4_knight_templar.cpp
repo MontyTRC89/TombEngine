@@ -15,6 +15,7 @@
 namespace TEN::Entities::TR4
 {
 	BITE_INFO KnightTemplarBite = { 0, 0, 0, 11 };
+	const std::vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
 
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
 
@@ -202,7 +203,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0xC00)
+					if (item->TestBits(JointBitType::Touch, KnightTemplarSwordAttackJoints))
 					{
 						CreatureEffect2(
 							item,

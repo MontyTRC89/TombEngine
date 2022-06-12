@@ -1364,7 +1364,7 @@ bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-// TODO: This function and its clone TestLaraCrawlMoveTolerance() should become obsolete with more accurate and accessible collision detection in the future.
+// TODO: This function should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supersedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup)
 {

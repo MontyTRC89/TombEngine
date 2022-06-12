@@ -1,3 +1,6 @@
 #pragma once
 
-void BearControl(short itemNumber);
+namespace TEN::Entities::TR1
+{
+	void BearControl(short itemNumber);
+}

@@ -682,16 +682,11 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 1 &&
 			laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 		{
-			Vector3Int pos = { 0, 640, 0 };
+			auto pos = Vector3Int(0, 640, 0);
 			GetLaraJointPosition(&pos, LM_HIPS);
 
-			laraItem->Pose.Position.x = pos.x;
-			laraItem->Pose.Position.y = pos.y;
-			laraItem->Pose.Position.z = pos.z;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = ANGLE(90.0f);
-			laraItem->Pose.Orientation.z = 0;
-			minecartItem->Pose.Orientation.y + ANGLE(90.0f);
+			laraItem->Pose.Position = pos;
+			laraItem->Pose.Orientation = Vector3Shrt(0, minecartItem->Pose.Orientation.y + ANGLE(90.0f), 0);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
 			lara->Control.HandStatus = HandStatus::Free;
@@ -704,16 +699,11 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + 47 &&
 			laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 		{
-			Vector3Int pos = { 0, 640, 0 };
+			auto pos = Vector3Int(0, 640, 0);
 			GetLaraJointPosition(&pos, LM_HIPS);
 
-			laraItem->Pose.Position.x = pos.x;
-			laraItem->Pose.Position.y = pos.y;
-			laraItem->Pose.Position.z = pos.z;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = ANGLE(90.0f);
-			laraItem->Pose.Orientation.z = 0;
-			minecartItem->Pose.Orientation.y + ANGLE(90.0f);
+			laraItem->Pose.Position = pos;
+			laraItem->Pose.Orientation = Vector3Shrt(0, minecartItem->Pose.Orientation.y - ANGLE(90.0f), 0);
 
 			SetAnimation(laraItem, LA_STAND_SOLID);
 			lara->Control.HandStatus = HandStatus::Free;
