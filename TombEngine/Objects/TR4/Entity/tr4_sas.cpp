@@ -20,7 +20,7 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO SASGunBite = { 0, 300, 64, 7 };
 
-	Vector3Int SASDragBodyPosition = { 0, 0, -460 };
+	auto SASDragBodyPosition = Vector3Int(0, 0, -460);
 	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
 	{
 		-256, 256,
@@ -569,9 +569,7 @@ namespace TEN::Entities::TR4
 
 			if (probe.Position.Floor < grenadeItem->Pose.Position.y)
 			{
-				grenadeItem->Pose.Position.x = item->Pose.Position.x;
-				grenadeItem->Pose.Position.y = probe.Position.Floor;
-				grenadeItem->Pose.Position.z = item->Pose.Position.z;
+				grenadeItem->Pose.Position = Vector3Int(item->Pose.Position.x, probe.Position.Floor, item->Pose.Position.z);
 				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 

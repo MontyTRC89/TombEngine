@@ -389,7 +389,7 @@ namespace TEN::Entities::TR4
 		{
 			currentCreature = creature;
 			creature->Enemy = LaraItem;
-			ItemInfo* currentItem = NULL;
+			ItemInfo* currentItem = nullptr;
 			for (short itemNum = g_Level.Rooms[item->RoomNumber].itemNumber; itemNum != NO_ITEM; itemNum = currentItem->NextItem)
 			{
 				currentItem = &g_Level.Items[itemNum];
@@ -622,9 +622,9 @@ namespace TEN::Entities::TR4
 			{
 			case BADDY_STATE_IDLE:
 				currentCreature->MaxTurn = 0;
-				currentCreature->Flags = 0;
 				currentCreature->LOT.IsMonkeying = false;
 				currentCreature->LOT.IsJumping = false;
+				currentCreature->Flags = 0;
 				joint3 = AI.angle / 2;
 
 				if (AI.ahead && item->AIBits != GUARD)
@@ -681,6 +681,7 @@ namespace TEN::Entities::TR4
 				{
 					currentCreature->MaxTurn = 0;
 					currentCreature->LOT.IsJumping = true;
+
 					item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.ActiveState = BADDY_STATE_JUMP_FORWARD_1_BLOCK;
@@ -774,9 +775,9 @@ namespace TEN::Entities::TR4
 
 			case BADDY_STATE_WALK:
 				currentCreature->MaxTurn = ANGLE(7.0f);
-				currentCreature->Flags = 0;
 				currentCreature->LOT.IsMonkeying = false;
 				currentCreature->LOT.IsJumping = false;
+				currentCreature->Flags = 0;
 
 				if (laraAI.ahead)
 					joint3 = laraAI.angle;
@@ -983,9 +984,9 @@ namespace TEN::Entities::TR4
 
 			case BADDY_STATE_MONKEY_FORWARD:
 				currentCreature->MaxTurn = ANGLE(7.0f);
-				currentCreature->Flags = 0;
 				currentCreature->LOT.IsJumping = true;
 				currentCreature->LOT.IsMonkeying = true;
+				currentCreature->Flags = 0;
 				joint1 = 0;
 				joint2 = 0;
 
@@ -1067,7 +1068,7 @@ namespace TEN::Entities::TR4
 						break;
 					
 					item->Animation.TargetState = BADDY_STATE_CROUCH_TO_STAND;
-					currentCreature->Enemy = NULL;
+					currentCreature->Enemy = nullptr;
 				}
 
 				break;
@@ -1092,7 +1093,7 @@ namespace TEN::Entities::TR4
 					currentCreature->Enemy->Status == ITEM_INVISIBLE ||
 					currentCreature->Enemy->InDrawRoom)
 				{
-					currentCreature->Enemy = NULL;
+					currentCreature->Enemy = nullptr;
 					break;
 				}
 
@@ -1104,7 +1105,7 @@ namespace TEN::Entities::TR4
 					item->ItemFlags[2] += BADDY_USE_UZI;
 				else
 				{
-					currentCreature->Enemy = NULL;
+					currentCreature->Enemy = nullptr;
 					break;
 				}
 			
@@ -1114,10 +1115,10 @@ namespace TEN::Entities::TR4
 				for (int i = 0; i < ActiveCreatures.size(); i++)
 				{
 					if (ActiveCreatures[i]->ItemNumber != NO_ITEM && ActiveCreatures[i]->ItemNumber != itemNumber && ActiveCreatures[i]->Enemy == creature->Enemy)
-						ActiveCreatures[i]->Enemy = NULL;
+						ActiveCreatures[i]->Enemy = nullptr;
 				}
 
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 				break;
 
 			case BADDY_STATE_AIM:

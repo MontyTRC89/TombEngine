@@ -11,6 +11,7 @@
 #include "Game/people.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/animation.h"
+#include "Game/misc.h"
 
 namespace TEN::Entities::TR4
 {
@@ -21,14 +22,14 @@ namespace TEN::Entities::TR4
 
 	void InitialiseSetha(short itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 12;
 		item->Animation.ActiveState = 12;
+		item->Animation.TargetState = 12;
 	}
 
 	void SethaControl(short itemNumber)
@@ -36,8 +37,8 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		ItemInfo* item = &g_Level.Items[itemNumber];
-		CreatureInfo* creature = (CreatureInfo*)item->Data;
+		auto* item = &g_Level.Items[itemNumber];
+		auto* creature = GetCreatureInfo(item);
 
 		int x = item->Pose.Position.x;
 		int y = item->Pose.Position.y;
@@ -77,13 +78,11 @@ namespace TEN::Entities::TR4
 		floor = GetFloor(x, y, z, &roomNumber);
 		int height4 = GetFloorHeight(floor, x, y, z);
 
-		AI_INFO info;
+		AI_INFO AI;
 		short angle = 0;
 
 		if (item->HitPoints <= 0)
-		{
 			item->HitPoints = 0;
-		}
 		else
 		{
 			if (item->AIBits & AMBUSH)
@@ -91,10 +90,10 @@ namespace TEN::Entities::TR4
 			else
 				creature->Enemy = LaraItem;
 
-			CreatureAIInfo(item, &info);
+			CreatureAIInfo(item, &AI);
 
-			GetCreatureMood(item, &info, VIOLENT);
-			CreatureMood(item, &info, VIOLENT);
+			GetCreatureMood(item, &AI, VIOLENT);
+			CreatureMood(item, &AI, VIOLENT);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 
@@ -109,61 +108,65 @@ namespace TEN::Entities::TR4
 					item->Animation.TargetState = item->Animation.RequiredState;
 					break;
 				}
-				else if (info.distance < SQUARE(1024) && info.bite)
+				else if (AI.distance < pow(SECTOR(1), 2) && AI.bite)
 				{
 					item->Animation.TargetState = 8;
 					break;
 				}
-				else if (LaraItem->Pose.Position.y >= item->Pose.Position.y - 1024)
+				else if (LaraItem->Pose.Position.y >= (item->Pose.Position.y - SECTOR(1)))
 				{
-					if (info.distance < SQUARE(2560)
-						&& info.ahead
-						&& GetRandomControl() & 1
-						&& Targetable(item, &info))
+					if (AI.distance < pow(SECTOR(2.5f), 2) &&
+						AI.ahead &&
+						GetRandomControl() & 1 &&
+						Targetable(item, &AI))
 					{
-						item->ItemFlags[0] = 0;
 						item->Animation.TargetState = 11;
+						item->ItemFlags[0] = 0;
 						break;
 					}
-					else if (ceiling != NO_HEIGHT
-						&& ceiling < item->Pose.Position.y - 1792
-						&& height4 != NO_HEIGHT
-						&& height4 > item->Pose.Position.y - 1024
-						&& GetRandomControl() & 1)
+					else if (ceiling != NO_HEIGHT &&
+						ceiling < (item->Pose.Position.y - SECTOR(1.75f)) &&
+						height4 != NO_HEIGHT &&
+						height4 > (item->Pose.Position.y - SECTOR(1)) &&
+						GetRandomControl() & 1)
 					{
-						item->Pose.Position.y -= 1536;
-						if (Targetable(item, &info))
+						item->Pose.Position.y -= SECTOR(1.5f);
+						if (Targetable(item, &AI))
 						{
-							item->ItemFlags[0] = 0;
-							item->Pose.Position.y += 1536;
+							item->Pose.Position.y += SECTOR(1.5f);
 							item->Animation.TargetState = 12;
+							item->ItemFlags[0] = 0;
 						}
 						else
 						{
+							item->Pose.Position.y += SECTOR(1.5f);
 							item->Animation.TargetState = 2;
-							item->Pose.Position.y += 1536;
 						}
+
 						break;
 					}
 					else
 					{
-						if (info.distance < SQUARE(3072) && info.angle < 6144 && info.angle > -6144 && info.ahead)
+						if (AI.distance < pow(SECTOR(3), 2) &&
+							AI.angle < SECTOR(6) &&
+							AI.angle > -SECTOR(6) &&
+							AI.ahead)
 						{
-							if (Targetable(item, &info))
+							if (Targetable(item, &AI))
 							{
 								item->Animation.TargetState = 4;
 								break;
 							}
 						}
-						else if (info.distance < SQUARE(4096)
-							&& info.angle < ANGLE(45)
-							&& info.angle > -ANGLE(45)
-							&& height4 != NO_HEIGHT
-							&& height4 >= item->Pose.Position.y - 256
-							&& Targetable(item, &info))
+						else if (AI.distance < pow(SECTOR(4), 2) &&
+							AI.angle < ANGLE(45.0f) &&
+							AI.angle > -ANGLE(45.0f) &&
+							height4 != NO_HEIGHT &&
+							height4 >= (item->Pose.Position.y - CLICK(1)) &&
+							Targetable(item, &AI))
 						{
-							item->ItemFlags[0] = 0;
 							item->Animation.TargetState = 13;
+							item->ItemFlags[0] = 0;
 							break;
 						}
 						else if (canJump)
@@ -188,47 +191,46 @@ namespace TEN::Entities::TR4
 				}
 
 				item->Animation.TargetState = 2;
-
 				break;
 
 			case 2u:
-				creature->MaxTurn = ANGLE(7);
-				if (info.bite
-					&& info.distance < SQUARE(4096)
-					|| canJump
-					|| creature->ReachedGoal)
+				creature->MaxTurn = ANGLE(7.0f);
+
+				if (AI.bite &&
+					AI.distance < pow(SECTOR(4), 2) ||
+					canJump ||
+					creature->ReachedGoal)
 				{
 					item->Animation.TargetState = 1;
 				}
-				else if (info.distance > SQUARE(3072))
-				{
+				else if (AI.distance > pow(SECTOR(3), 2))
 					item->Animation.TargetState = 3;
-				}
+				
 				break;
 
 			case 3:
-				creature->MaxTurn = ANGLE(11);
-				if (info.bite
-					&& info.distance < SQUARE(4096)
-					|| canJump
-					|| creature->ReachedGoal)
+				creature->MaxTurn = ANGLE(11.0f);
+
+				if (AI.bite &&
+					AI.distance < pow(SECTOR(4), 2) ||
+					canJump ||
+					creature->ReachedGoal)
 				{
 					item->Animation.TargetState = 1;
 				}
-				else if (info.distance < SQUARE(3072))
-				{
+				else if (AI.distance < pow(SECTOR(3), 2))
 					item->Animation.TargetState = 2;
-				}
+				
 				break;
 
 			case 4:
 				if (canJump)
 				{
-					if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 15
-						&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
+					if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 15 &&
+						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					{
-						creature->ReachedGoal = true;
 						creature->MaxTurn = 0;
+						creature->ReachedGoal = true;
 					}
 				}
 
@@ -270,18 +272,16 @@ namespace TEN::Entities::TR4
 				break;
 
 			case 5:
-				creature->ReachedGoal = true;
 				creature->MaxTurn = 0;
+				creature->ReachedGoal = true;
 				break;
 
 			case 7:
-				if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17
-					&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
+				if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17 &&
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
 					if (GetRandomControl() & 1)
-					{
 						item->Animation.RequiredState = 10;
-					}
 				}
 
 				break;
@@ -289,28 +289,22 @@ namespace TEN::Entities::TR4
 			case 8:
 				creature->MaxTurn = 0;
 
-				if (abs(info.angle) >= ANGLE(3))
+				if (abs(AI.angle) >= ANGLE(3.0f))
 				{
-					if (info.angle >= 0)
-					{
-						item->Pose.Orientation.y += ANGLE(3);
-					}
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(3.0f);
 					else
-					{
-						item->Pose.Orientation.y -= ANGLE(3);
-					}
+						item->Pose.Orientation.y -= ANGLE(3.0f);
 				}
 				else
-				{
-					item->Pose.Orientation.y += info.angle;
-				}
+					item->Pose.Orientation.y += AI.angle;
 
 				if (!creature->Flags)
 				{
 					if (item->TouchBits)
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15
-							&& item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 						{
 							LaraItem->HitPoints -= 250;
 							LaraItem->HitStatus = true;
@@ -343,21 +337,18 @@ namespace TEN::Entities::TR4
 
 				creature->MaxTurn = 0;
 
-				if (abs(info.angle) >= ANGLE(3))
+				if (abs(AI.angle) >= ANGLE(3.0f))
 				{
-					if (info.angle >= 0)
-					{
-						item->Pose.Orientation.y += ANGLE(3);
-					}
+					if (AI.angle >= 0)
+						item->Pose.Orientation.y += ANGLE(3.0f);
 					else
-					{
-						item->Pose.Orientation.y -= ANGLE(3);
-					}
+						item->Pose.Orientation.y -= ANGLE(3.0f);
+					
 					SethaAttack(itemNumber);
 				}
 				else
 				{
-					item->Pose.Orientation.y += info.angle;
+					item->Pose.Orientation.y += AI.angle;
 					SethaAttack(itemNumber);
 				}
 
@@ -366,31 +357,25 @@ namespace TEN::Entities::TR4
 			case 14:
 				if (item->Animation.AnimNumber != Objects[item->Animation.AnimNumber].animIndex + 26)
 				{
-					creature->LOT.Fly = 16;
 					item->Animation.Airborne = false;
 					creature->MaxTurn = 0;
 					creature->Target.y = LaraItem->Pose.Position.y;
+					creature->LOT.Fly = 16;
 
-					if (abs(info.angle) >= ANGLE(3))
+					if (abs(AI.angle) >= ANGLE(3.0f))
 					{
-						if (info.angle >= 0)
-						{
-							item->Pose.Orientation.y += ANGLE(3);
-						}
+						if (AI.angle >= 0)
+							item->Pose.Orientation.y += ANGLE(3.0f);
 						else
-						{
-							item->Pose.Orientation.y -= ANGLE(3);
-						}
+							item->Pose.Orientation.y -= ANGLE(3.0f);
 					}
 					else
-					{
-						item->Pose.Orientation.y += info.angle;
-					}
+						item->Pose.Orientation.y += AI.angle;
 				}
 
-				if (LaraItem->Pose.Position.y <= item->Floor - 512)
+				if (LaraItem->Pose.Position.y <= (item->Floor - SECTOR(0.5f)))
 				{
-					if (Targetable(item, &info))
+					if (Targetable(item, &AI))
 					{
 						item->ItemFlags[0] = 0;
 						item->Animation.TargetState = 15;
@@ -417,32 +402,33 @@ namespace TEN::Entities::TR4
 		if (item->HitStatus)
 		{
 			if ((Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun || Lara.Control.Weapon.GunType == LaraWeaponType::Revolver) &&
-				info.distance < pow(SECTOR(2), 2) &&
+				AI.distance < pow(SECTOR(2), 2) &&
 				!(creature->LOT.IsJumping))
 			{
 				if (item->Animation.ActiveState != 12)
 				{
 					if (item->Animation.ActiveState <= 13)
 					{
-						if (abs(height4 - item->Pose.Position.y) >= 512)
+						if (abs(height4 - item->Pose.Position.y) >= SECTOR(0.5f))
 						{
 							item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
-							item->Animation.TargetState = 6;
 							item->Animation.ActiveState = 6;
+							item->Animation.TargetState = 6;
 						}
 						else
 						{
 							item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 17;
-							item->Animation.TargetState = 7;
 							item->Animation.ActiveState = 7;
+							item->Animation.TargetState = 7;
 						}
 					}
 					else
 					{
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 25;
-						item->Animation.TargetState = 16;
 						item->Animation.ActiveState = 16;
+						item->Animation.TargetState = 16;
 					}
+
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 			}
@@ -456,9 +442,11 @@ namespace TEN::Entities::TR4
 		int dx = LaraItem->Pose.Position.x - x;
 		int dz = LaraItem->Pose.Position.z - z;
 
-		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
+
 			spark->on = 1;
 			spark->sR = 0;
 			spark->sG = 0;
@@ -492,9 +480,10 @@ namespace TEN::Entities::TR4
 		int dx = LaraItem->Pose.Position.x - g_Level.Items[itemNumber].Pose.Position.x;
 		int dz = LaraItem->Pose.Position.z - g_Level.Items[itemNumber].Pose.Position.z;
 
-		if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
+		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
+			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			SPARKS* spark = &Sparks[GetFreeSpark()];
+			auto* spark = &Sparks[GetFreeSpark()];
 
 			spark->on = 1;
 			spark->sR = 0;
@@ -516,14 +505,12 @@ namespace TEN::Entities::TR4
 			spark->friction = 5;
 			spark->flags = SP_NODEATTACH | SP_EXPDEF | SP_ITEM | SP_ROTATE | SP_SCALE | SP_DEF;
 			spark->rotAng = GetRandomControl() & 0xFFF;
+
 			if (GetRandomControl() & 1)
-			{
 				spark->rotAdd = -32 - (GetRandomControl() & 0x1F);
-			}
 			else
-			{
 				spark->rotAdd = (GetRandomControl() & 0x1F) + 32;
-			}
+
 			spark->maxYvel = 0;
 			spark->gravity = (GetRandomControl() & 0x1F) + 16;
 			spark->fxObj = itemNumber;
@@ -534,18 +521,18 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void SethaThrowAttack(PHD_3DPOS* pos, short roomNumber, short mesh)
+	void SethaThrowAttack(PHD_3DPOS* pose, short roomNumber, short mesh)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
 		{
-			FX_INFO* fx = &EffectList[fxNumber];
+			auto* fx = &EffectList[fxNumber];
 
-			fx->pos.Position.x = pos->Position.x;
-			fx->pos.Position.y = pos->Position.y - (GetRandomControl() & 0x3F) - 32;
-			fx->pos.Position.z = pos->Position.z;
-			fx->pos.Orientation.x = pos->Orientation.x;
-			fx->pos.Orientation.y = pos->Orientation.y;
+			fx->pos.Position.x = pose->Position.x;
+			fx->pos.Position.y = pose->Position.y - (GetRandomControl() & 0x3F) - 32;
+			fx->pos.Position.z = pose->Position.z;
+			fx->pos.Orientation.x = pose->Orientation.x;
+			fx->pos.Orientation.y = pose->Orientation.y;
 			fx->pos.Orientation.z = 0;
 			fx->roomNumber = roomNumber;
 			fx->counter = 2 * GetRandomControl() + -ANGLE(180);
@@ -558,20 +545,14 @@ namespace TEN::Entities::TR4
 
 	void SethaAttack(int itemNumber)
 	{
-		ItemInfo* item = &g_Level.Items[itemNumber];
+		auto* item = &g_Level.Items[itemNumber];
 
 		item->ItemFlags[0]++;
 
-		Vector3Int pos1;
-		pos1.x = SethaAttack1.x;
-		pos1.y = SethaAttack1.y;
-		pos1.z = SethaAttack1.z;
+		auto pos1 = Vector3Int(SethaAttack1.x, SethaAttack1.y, SethaAttack1.z);
 		GetJointAbsPosition(item, &pos1, SethaAttack1.meshNum);
 
-		Vector3Int pos2;
-		pos2.x = SethaAttack2.x;
-		pos2.y = SethaAttack2.y;
-		pos2.z = SethaAttack2.z;
+		auto pos2 = Vector3Int(SethaAttack2.x, SethaAttack2.y, SethaAttack2.z);
 		GetJointAbsPosition(item, &pos2, SethaAttack2.meshNum);
 
 		int i, size;
@@ -587,29 +568,29 @@ namespace TEN::Entities::TR4
 			{
 				for (i = 0; i < 2; i++)
 				{
-					pos.x = (GetRandomControl() & 0x7FF) + pos1.x - 1024;
-					pos.y = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
-					pos.z = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
+					pos.x = (GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1);
+					pos.y = (GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1);
+					pos.z = (GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1);
 
 					TriggerSethaSparks1(
 						pos.x,
 						pos.y,
 						pos.z,
-						8 * (pos1.x - pos.x),
-						8 * (pos1.y - pos.y),
-						8 * (1024 - (GetRandomControl() & 0x7FF)));
+						(pos1.x - pos.x),
+						(pos1.y - pos.y),
+						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos.x = (GetRandomControl() & 0x7FF) + pos2.x - 1024;
-					pos.y = (GetRandomControl() & 0x7FF) + pos2.y - 1024;
-					pos.z = (GetRandomControl() & 0x7FF) + pos2.z - 1024;
+					pos.x = (GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1);
+					pos.y = (GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1);
+					pos.z = (GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1);
 
 					TriggerSethaSparks1(
 						pos.x,
 						pos.y,
 						pos.z,
-						8 * (pos2.x - pos.x),
-						8 * (pos2.y - pos.y),
-						8 * (1024 - (GetRandomControl() & 0x7FF)));
+						(pos2.x - pos.x) * 8,
+						(pos2.y - pos.y) * 8,
+						(SECTOR(1) - (GetRandomControl() & 0x7FF)) * 8);
 				}
 			}
 
@@ -647,7 +628,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case 12:
-			size = 4 * item->ItemFlags[0];
+			size = item->ItemFlags[0] * 4;
 			if (size > 160)
 				size = 160;
 
@@ -689,29 +670,29 @@ namespace TEN::Entities::TR4
 			{
 				for (i = 0; i < 2; i++)
 				{
-					pos.x = (GetRandomControl() & 0x7FF) + pos1.x - 1024;
-					pos.y = (GetRandomControl() & 0x7FF) + pos1.y - 1024;
-					pos.z = (GetRandomControl() & 0x7FF) + pos1.z - 1024;
+					pos.x = (GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1);
+					pos.y = (GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1);
+					pos.z = (GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1);
 
 					TriggerSethaSparks1(
 						pos.x,
 						pos.y,
 						pos.z,
-						8 * (pos1.x - pos.x),
-						8 * (pos1.y - pos.y),
-						8 * (1024 - (GetRandomControl() & 0x7FF)));
+						(pos1.x - pos.x),
+						(pos1.y - pos.y),
+						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos.x = (GetRandomControl() & 0x7FF) + pos2.x - 1024;
-					pos.y = (GetRandomControl() & 0x7FF) + pos2.y - 1024;
-					pos.z = (GetRandomControl() & 0x7FF) + pos2.z - 1024;
+					pos.x = (GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1);
+					pos.y = (GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1);
+					pos.z = (GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1);
 
 					TriggerSethaSparks1(
 						pos.x,
 						pos.y,
 						pos.z,
-						8 * (pos2.x - pos.x),
-						8 * (pos2.y - pos.y),
-						8 * (1024 - (GetRandomControl() & 0x7FF)));
+						(pos2.x - pos.x),
+						(pos2.y - pos.y),
+						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 				}
 			}
 
