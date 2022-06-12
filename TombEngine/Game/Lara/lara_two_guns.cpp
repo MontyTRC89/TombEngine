@@ -124,7 +124,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 						lara->RightArm.FlashGun = weapon->FlashTime;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.5f);
+						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.3f);
 						SoundEffect(weapon->SampleNum, &laraItem->Pose);
 						soundPlayed = true;
 
@@ -217,7 +217,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 					if (!soundPlayed)
 					{
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.5f);
+						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.3f);
 						SoundEffect(weapon->SampleNum, &laraItem->Pose);
 					}
 

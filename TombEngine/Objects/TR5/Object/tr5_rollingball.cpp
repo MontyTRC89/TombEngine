@@ -427,7 +427,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->Pose.Position.z = oldz;
 			item->Animation.Velocity = 0;
 			item->Animation.VerticalVelocity = 0;
-			item->TouchBits = 0;
+			item->TouchBits = NO_JOINT_BITS;
 		}
 	}
 	else if (item->Status == ITEM_DEACTIVATED)

@@ -137,7 +137,7 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 	if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 		dz >= -SECTOR(16) && dz <= SECTOR(16))
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->sR = -1;
 		spark->sG = -1;
@@ -150,7 +150,7 @@ static void TriggerHitmanSparks(int x, int y, int z, short xv, short yv, short z
 		spark->dB = -64 - spark->dG;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->flags = SP_SCALE;
@@ -242,7 +242,7 @@ void CyborgControl(short itemNumber)
 			{
 				if (item->ItemFlags[0] < 11)
 				{
-					item->SwapMeshFlags |= 1 << HitmanJoints[item->ItemFlags[0]];
+					item->MeshSwapBits |= 1 << HitmanJoints[item->ItemFlags[0]];
 					item->ItemFlags[0]++;
 				}
 			}
@@ -260,7 +260,7 @@ void CyborgControl(short itemNumber)
 			TriggerHitmanSparks(pos.x, pos.y, pos.z, -1, -1, -1);
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 16, 31, 63, 127);
 
-			SoundEffect(SFX_TR5_HITMAN_ELECSHORT, &item->Pose);
+			SoundEffect(SFX_TR5_HITMAN_SPARKS_SHORT, &item->Pose);
 
 			if (random == 5 || random == 7 || random == 10)
 			{

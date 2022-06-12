@@ -10,5 +10,6 @@ namespace TEN::Renderer
 		int Flags;
 		std::wstring String;
 		Vector3 Color;
+		float Scale;
 	};
 }

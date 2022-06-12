@@ -752,9 +752,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = true;
 
 	coll->Setup.OldPosition = item->Pose.Position;
-	coll->Setup.OldState = item->Animation.ActiveState;
 	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
+	coll->Setup.OldState = item->Animation.ActiveState;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook &&
 		lara->ExtraAnim == NO_ITEM)
@@ -879,9 +879,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
-
-	item->Pose.Position.x += round(item->Animation.VerticalVelocity * phd_sin(lara->Control.MoveAngle) / 4);
-	item->Pose.Position.z += round(item->Animation.VerticalVelocity * phd_cos(lara->Control.MoveAngle) / 4);
+	TranslateItem(item, lara->Control.MoveAngle, item->Animation.VerticalVelocity / 4);
 
 	DoObjectCollision(item, coll);
 
@@ -981,10 +979,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
-
-	item->Pose.Position.x += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.y) / 4);
-	item->Pose.Position.y -= round(item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.x) / 4);
-	item->Pose.Position.z += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_cos(item->Pose.Orientation.y) / 4);
+	TranslateItem(item, item->Pose.Orientation, item->Animation.VerticalVelocity / 4);
 
 	DoObjectCollision(item, coll);
 

@@ -69,7 +69,7 @@ namespace TEN::Entities::TR4
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
 		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->SwapMeshFlags = SWAPMESHFLAGS_VON_CROY;
+		item->MeshSwapBits = SWAPMESHFLAGS_VON_CROY;
 
 		memset(VonCroyPassedWaypoints, 0, 128);
 	}
@@ -149,7 +149,6 @@ namespace TEN::Entities::TR4
 		// Von Croy must follow Lara and navigate with ID_AI_FOLLOW objects
 		item->AIBits = FOLLOW;
 		GetAITarget(creature);
-
 
 		// Try to find a possible enemy or target
 		ItemInfo* foundTarget = NULL;
@@ -355,7 +354,7 @@ namespace TEN::Entities::TR4
 				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
 				if (probe.Position.Ceiling == probe.Position.Floor - 1536)
 				{
-					if (item->SwapMeshFlags == SWAPMESHFLAGS_VON_CROY)
+					if (item->MeshSwapBits == SWAPMESHFLAGS_VON_CROY)
 						item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 					else
 						item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
@@ -428,7 +427,7 @@ namespace TEN::Entities::TR4
 			{
 				if (Lara.Location >= item->ItemFlags[3])
 				{
-					if (!foundTarget || AI.distance >= SECTOR(2048) && (item->SwapMeshFlags & 0x40000 || AI.distance >= SECTOR(8216)))
+					if (!foundTarget || AI.distance >= SECTOR(2048) && (item->MeshSwapBits & 0x40000 || AI.distance >= SECTOR(8216)))
 					{
 						if (creature->Enemy == LaraItem)
 						{
@@ -553,10 +552,10 @@ namespace TEN::Entities::TR4
 		case VON_CROY_STATE_TOGGLE_KNIFE:
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 			{
-				if (!(item->SwapMeshFlags & SWAPMESHFLAGS_VON_CROY))
-					item->SwapMeshFlags |= SWAPMESHFLAGS_VON_CROY;
+				if (!(item->MeshSwapBits & SWAPMESHFLAGS_VON_CROY))
+					item->MeshSwapBits |= SWAPMESHFLAGS_VON_CROY;
 				else
-					item->SwapMeshFlags &= ~SWAPMESHFLAGS_VON_CROY;
+					item->MeshSwapBits &= ~SWAPMESHFLAGS_VON_CROY;
 			}
 
 			break;

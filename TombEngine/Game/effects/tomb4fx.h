@@ -2,6 +2,7 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara_struct.h"
 #include "Specific/phd_global.h"
+#include "Renderer/Renderer11Enums.h"
 
 enum class LaraWeaponType;
 struct ItemInfo;
@@ -33,7 +34,7 @@ struct SMOKE_SPARKS
 	byte fadeToBlack;
 	signed char sLife;
 	signed char life;
-	TransTypeEnum transType;
+	BLEND_MODES blendMode;
 	byte fxObj;
 	byte nodeNumber;
 	byte mirror;
@@ -96,7 +97,7 @@ struct FIRE_LIST
 	int y;
 	int z;
 	byte on;
-	byte size;
+	float size;
 	short roomNumber;
 };
 
@@ -179,14 +180,17 @@ extern int NextBlood;
 extern int NextSpider;
 extern int NextGunShell;
 
-#define MAX_SPARKS_FIRE 20
-#define MAX_FIRE_LIST 32
-#define MAX_SPARKS_SMOKE 32
-#define MAX_SPARKS_BLOOD 32
-#define MAX_GUNFLASH 4
-#define MAX_GUNSHELL 24
-#define MAX_DRIPS 32
-#define MAX_SHOCKWAVE 16
+constexpr auto MAX_SPARKS_FIRE = 20;
+constexpr auto MAX_FIRE_LIST = 32;
+constexpr auto MAX_SPARKS_SMOKE = 32;
+constexpr auto MAX_SPARKS_BLOOD = 32;
+constexpr auto MAX_GUNFLASH = 4;
+constexpr auto MAX_GUNSHELL = 24;
+constexpr auto MAX_DRIPS = 32;
+constexpr auto MAX_SHOCKWAVE = 16;
+
+constexpr auto EXPLODE_HIT_EFFECT = 258;
+constexpr auto EXPLODE_NORMAL = 256;
 
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -196,7 +200,6 @@ extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
-extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 
 void TriggerBlood(int x, int y, int z, int unk, int num);
 void TriggerExplosionBubble(int x, int y, int z, short roomNumber);
@@ -204,9 +207,12 @@ int GetFreeFireSpark();
 void TriggerGlobalStaticFlame();
 void TriggerGlobalFireSmoke();
 void TriggerGlobalFireFlame();
-void keep_those_fires_burning();
+void TriggerPilotFlame(int itemNum, int nodeIndex);
+void ThrowFire(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed);
+void ThrowPoison(int itemNum, int meshIndex, Vector3Int offset, Vector3Int speed, Vector3 color);
+void UpdateFireProgress();
 void ClearFires();
-void AddFire(int x, int y, int z, char size, short roomNum, short on);
+void AddFire(int x, int y, int z, short roomNum, float size, short fade);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
 void UpdateSmoke();
@@ -227,14 +233,9 @@ void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
-
-constexpr auto EXPLODE_HIT_EFFECT = 258;
-constexpr auto EXPLODE_NORMAL = 256;
-int ExplodingDeath(short itemNumber, int meshBits, short flags); // EXPLODE_ flags
-
+int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
 void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
-void TriggerShockwaveHitEffect(int x, int y, int z, int color, short rot, int vel);
+void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);
-void SetFadeClip(short height, int velocity);

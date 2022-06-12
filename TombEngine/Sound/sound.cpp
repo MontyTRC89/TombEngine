@@ -135,6 +135,8 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 
 	// Create actual sample
 	SamplePointer[index] = BASS_SampleLoad(true, uncompBuffer, 0, cleanLength + 44, 65535, SOUND_SAMPLE_FLAGS | BASS_SAMPLE_3D);
+	delete uncompBuffer;
+
 	return true;
 }
 
@@ -148,8 +150,11 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 
 	if (condition != SoundEnvironment::Always)
 	{
+		// Get current camera room's environment
+		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
+
 		// Don't play effect if effect's environment isn't the same as camera position's environment
-		if (condition != (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
+		if (condition != cameraCondition)
 			return 0;
 	}
 
@@ -704,7 +709,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Level.Rooms[Camera.pos.roomNumber].reverbType;
+	auto roomReverb = g_Configuration.EnableAudioSpecialEffects ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -856,7 +861,7 @@ bool Sound_CheckBASSError(const char* message, bool verbose, ...)
 
 void SayNo()
 {
-	SoundEffect(SFX_TR4_LARA_NO, NULL, SoundEnvironment::Always);
+	SoundEffect(SFX_TR4_LARA_NO_ENGLISH, NULL, SoundEnvironment::Always);
 }
 
 void PlaySecretTrack()
@@ -872,9 +877,9 @@ int GetShatterSound(int shatterID)
 		return fxID;
 
 	if (shatterID < 3)
-		return 1095;
+		return SFX_TR5_SMASH_WOOD;
 	else
-		return 1092;
+		return SFX_TR5_SMASH_GLASS;
 }
 
 void PlaySoundSources()

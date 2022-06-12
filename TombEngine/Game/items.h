@@ -16,10 +16,7 @@ enum GAME_OBJECT_ID : short;
 #define GRAY555  RGB555(128, 128, 128)
 #define BLACK555 RGB555(  0,   0,   0)
 
-constexpr unsigned int NO_MESH_BITS = UINT_MAX;
-
 constexpr auto NO_ITEM = -1;
-constexpr auto ALL_MESHBITS = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
 
@@ -50,6 +47,16 @@ enum ItemFlags
 	IFLAG_REVERSE = (1 << 14),	 // 0x4000
 	IFLAG_KILLED = (1 << 15),    // 0x8000
 	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
+};
+
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS  = 0;
+
+enum class JointBitType
+{
+	Touch,
+	Mesh,
+	MeshSwap
 };
 
 struct EntityAnimationData
@@ -94,13 +101,13 @@ struct ItemInfo
 	int Timer;
 	short Shade;
 
-	uint32_t TouchBits;
-	uint32_t MeshBits;
+	unsigned int TouchBits;
+	unsigned int MeshBits;
+	unsigned int MeshSwapBits;
 
-	uint16_t Flags; // ItemFlags enum
+	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
 	short TriggerFlags;
-	uint32_t SwapMeshFlags;
 
 	// TODO: Move to CreatureInfo?
 	uint8_t AIBits; // AIObjectType enum.
@@ -113,6 +120,13 @@ struct ItemInfo
 	std::string LuaCallbackOnHitName;
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
+
+	void SetBits(JointBitType type, std::vector<int> jointIndices);
+	void SetBits(JointBitType type, int jointIndex);
+	void ClearBits(JointBitType type, std::vector<int> jointIndices);
+	void ClearBits(JointBitType type, int jointIndex);
+	bool TestBits(JointBitType type, std::vector<int> jointIndices);
+	bool TestBits(JointBitType type, int jointIndex);
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);

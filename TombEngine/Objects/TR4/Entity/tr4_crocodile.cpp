@@ -16,19 +16,20 @@
 namespace TEN::Entities::TR4
 {
 	static BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
+	const std::vector<int> CrocodileBiteAttackJoints = { 8, 9 };
 
-	#define CROC_STATE_WALK_FORWARD_ANGLE ANGLE(3.0f)
-	#define CROC_SWIM_ANGLE ANGLE(3.0f)
-	#define CROC_STATE_RUN_FORWARD_ANGLE ANGLE(5.0f)
-	#define CROC_SWIM_SPEED 16;
-	#define CROC_DAMAGE 120;
+	constexpr auto CROC_SWIM_SPEED = 16;
+	constexpr auto CROC_DAMAGE = 120;
 
 	constexpr auto CROC_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
 	constexpr auto CROC_STATE_RUN_RANGE = SQUARE(SECTOR(1));
 	constexpr auto CROC_MAXRUN_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 	constexpr auto CROC_ATTACK_RANGE = SQUARE(CLICK(3)); // NOTE: It's CLICK(3) in TR4, but the crocodile does not go near Lara to do damage in certain cases.
-	constexpr auto CROC_TOUCHBITS = 768;
+
+	#define CROC_STATE_WALK_FORWARD_ANGLE ANGLE(3.0f)
+	#define CROC_SWIM_ANGLE ANGLE(3.0f)
+	#define CROC_STATE_RUN_FORWARD_ANGLE ANGLE(5.0f)
 
 	enum CrocodileState
 	{
@@ -37,7 +38,7 @@ namespace TEN::Entities::TR4
 		CROC_STATE_RUN_FORWARD = 2,
 		CROC_STATE_WALK_FORWARD = 3,
 		CROC_STATE_TURN_RIGHT = 4,
-		CROC_STATE_ATTACK = 5,
+		CROC_STATE_BITE_ATTACK = 5,
 		CROC_STATE_NONE_2 = 6,
 		CROC_STATE_DEATH = 7,
 		CROC_STATE_SWIM_FORWARD = 8,
@@ -210,7 +211,7 @@ namespace TEN::Entities::TR4
 						item->ItemFlags[0] = 1024;
 				}
 				else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
-					item->Animation.TargetState = CROC_STATE_ATTACK;
+					item->Animation.TargetState = CROC_STATE_BITE_ATTACK;
 				else
 				{
 					if (AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
@@ -261,11 +262,11 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case CROC_STATE_ATTACK:
+			case CROC_STATE_BITE_ATTACK:
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 					item->Animation.RequiredState = 0;
 
-				if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
+				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{
@@ -309,7 +310,7 @@ namespace TEN::Entities::TR4
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
 					item->Animation.RequiredState = CROC_STATE_NONE_1;
 
-				if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
+				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{
@@ -329,7 +330,7 @@ namespace TEN::Entities::TR4
 
 		OBJECT_BONES boneRot;
 		if (item->Animation.ActiveState == CROC_STATE_IDLE ||
-			item->Animation.ActiveState == CROC_STATE_ATTACK ||
+			item->Animation.ActiveState == CROC_STATE_BITE_ATTACK ||
 			item->Animation.ActiveState == CROC_STATE_WATER_BITE_ATTACK)
 		{
 			boneRot.bone0 = AI.angle;

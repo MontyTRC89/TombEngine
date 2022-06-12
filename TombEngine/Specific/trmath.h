@@ -13,6 +13,7 @@ constexpr auto GRID_SNAP_SIZE = STEP_SIZE / 2;
 constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
 constexpr auto SWIM_DEPTH = 730;
 constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
+constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 constexpr auto SLOPE_DIFFERENCE = 60;
 constexpr auto NO_HEIGHT  = (-0x7F00);
@@ -64,3 +65,10 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)
+
+Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance);
+Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance);
+Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance);
+Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance);

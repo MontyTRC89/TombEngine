@@ -50,7 +50,26 @@ table LaserHead {
 }
 
 table QuadBike {
+	turn_rate: int32;
+	front_rot: int32;
+	rear_rot: int32;
+	momentum_angle: int32;
+	extra_rotation: int32;
 
+	velocity: int32;
+	left_vertical_velocity: int32;
+	right_vertical_velocity: int32;
+
+	revs: int32;
+	engine_revs: int32;
+	pitch: int32;
+
+	smoke_start: int32;
+	can_start_drift: bool;
+	drift_starting: bool;
+	no_dismount: bool;
+
+	flags: int32;
 }
 
 table BigGun {
@@ -78,6 +97,14 @@ table Skidoo {
 }
 
 table UPV {
+	velocity: int32;
+	rot: int32;
+	x_rot: int32;
+	fan_rot: int32;
+	harpoon_timer: int32;
+	harpoon_left: bool;
+	
+	flags: int32;
 
 }
 

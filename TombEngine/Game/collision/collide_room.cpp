@@ -22,30 +22,6 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3Int();
 }
 
-void MoveItem(ItemInfo* item, short angle, int x, int z)
-{
-	if (!x && !z)
-		return;
-
-	if (x != 0)
-	{
-		float s = phd_sin(angle);
-		float c = phd_cos(angle);
-
-		item->Pose.Position.x += round(x * s);
-		item->Pose.Position.z += round(x * c);
-	}
-
-	if (z != 0)
-	{
-		float s = phd_sin(angle + ANGLE(90.0f));
-		float c = phd_cos(angle + ANGLE(90.0f));
-
-		item->Pose.Position.x += round(z * s);
-		item->Pose.Position.z += round(z * c);
-	}
-}
-
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
 {
 	if (snapYRot)
@@ -120,42 +96,25 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 
 	auto test = [item](short x, short y, short z, bool floor)
 	{
-		CollisionPosition pos = GetCollision(x, y, z, item->RoomNumber).Position;
-		if (floor) return y > pos.Floor;
-		return y < pos.Ceiling;
+		auto collPos = GetCollision(x, y, z, item->RoomNumber).Position;
+		if (floor) return y > collPos.Floor;
+		return y < collPos.Ceiling;
 	};
 
-	bool collided = 
-			test(box.X1, minY, box.Z1, true)
-		||	test(box.X2, minY, box.Z1, true)
-		||	test(box.X1, minY, box.Z2, true)
-		||	test(box.X2, minY, box.Z2, true)
-		||	test(box.X1, maxY, box.Z1, false)
-		||	test(box.X2, maxY, box.Z1, false)
-		||	test(box.X1, maxY, box.Z2, false)
-		||	test(box.X2, maxY, box.Z2, false);
+	bool collided =
+		test(box.X1, minY, box.Z1, true) ||
+		test(box.X2, minY, box.Z1, true) ||
+		test(box.X1, minY, box.Z2, true) ||
+		test(box.X2, minY, box.Z2, true) ||
+		test(box.X1, maxY, box.Z1, false) ||
+		test(box.X2, maxY, box.Z1, false) ||
+		test(box.X1, maxY, box.Z2, false) ||
+		test(box.X2, maxY, box.Z2, false) ;
 
 	return collided;
 }
 
-// Overload of GetCollisionResult which can be used to probe collision parameters
-// from a given item.
-
-CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height, int side)
-{
-	float s = phd_sin(angle);
-	float c = phd_cos(angle);
-
-	auto x = item->Pose.Position.x + (distance * s) + (side * c);
-	auto y = item->Pose.Position.y + height;
-	auto z = item->Pose.Position.z + (distance * c) + (-side * s);
-
-	return GetCollision(x, y, z, GetRoom(item->Location, item->Pose.Position.x, y, item->Pose.Position.z).roomNumber);
-}
-
-// A handy overload of GetCollisionResult which can be used to quickly get collision parameters
-// such as floor height under specific item.
-
+// Overload used to quickly get point/room collision parameters at a given item's position.
 CollisionResult GetCollision(ItemInfo* item)
 {
 	auto room = item->RoomNumber;
@@ -166,12 +125,30 @@ CollisionResult GetCollision(ItemInfo* item)
 	return result;
 }
 
-// This variation of GetCollisionResult is an universal wrapper to be used across whole
-// collisional code to replace "holy trinity" of roomNumber-GetFloor-GetFloorHeight operations.
-// The advantage of this wrapper is that it does NOT modify incoming roomNumber parameter,
-// instead putting modified one returned by GetFloor into return COLL_RESULT structure.
-// This way, function never modifies any external variables.
+// Overload used to probe point/room collision parameters from a given item's position.
+CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical, float lateral)
+{
+	auto point = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
+	int adjacentRoomNumber = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
 
+// Overload used to probe point/room collision parameters from a given position.
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float vertical, float lateral)
+{
+	short tempRoomNumber = roomNumber;
+	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
+
+	auto point = TranslateVector(pos, angle, forward, vertical, lateral);
+	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
+	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
+}
+
+// Overload used as a universal wrapper across collisional code to replace
+// triads of roomNumber-GetFloor()-GetFloorHeight() operations.
+// The advantage is that it does NOT modify the incoming roomNumber argument,
+// instead storing one modified by GetFloor() within the returned CollisionResult struct.
+// This way, no external variables are modified as output arguments.
 CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 {
 	auto room = roomNumber;
@@ -182,20 +159,16 @@ CollisionResult GetCollision(int x, int y, int z, short roomNumber)
 	return result;
 }
 
-// GetCollisionResult is a reworked legacy GetFloorHeight function, which does not
-// write any data into globals, but instead into special COLL_RESULT struct.
-// Additionally, it writes ceiling height for same coordinates, so this function
-// may be reused instead both GetFloorHeight and GetCeilingHeight calls to increase
-// readability.
-
+// A reworked legacy GetFloorHeight() function which writes data
+// into a special CollisionResult struct instead of global variables.
+// It writes for both floor and ceiling heights at the same coordinates, meaning it should be used
+// in place of successive GetFloorHeight() and GetCeilingHeight() calls to increase readability.
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 {
 	CollisionResult result = {};
 
 	// Record coordinates.
-	result.Coordinates.x = x;
-	result.Coordinates.y = y;
-	result.Coordinates.z = z;
+	result.Coordinates = Vector3(x, y, z);
 
 	// Return provided block into result as itself.
 	result.Block = floor;
@@ -741,7 +714,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtLeft() && !coll->MiddleLeft.FloorSlope)
 		{
 			// HACK: Force slight push-out to the left side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle + ANGLE(8), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle + ANGLE(8.0f), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -793,7 +766,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 		if (coll->TriangleAtRight() && !coll->MiddleRight.FloorSlope)
 		{
 			// HACK: Force slight push-out to the right side to avoid stucking
-			MoveItem(item, coll->Setup.ForwardAngle - ANGLE(8), item->Animation.Velocity);
+			TranslateItem(item, coll->Setup.ForwardAngle - ANGLE(8.0f), item->Animation.Velocity);
 
 			coll->Shift.x = coll->Setup.OldPosition.x - xPos;
 			coll->Shift.z = coll->Setup.OldPosition.z - zPos;
@@ -1305,12 +1278,13 @@ int GetWaterDepth(int x, int y, int z, short roomNumber)
 		while (floor->RoomAbove(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{
 			room = &g_Level.Rooms[floor->RoomAbove(x, y, z).value_or(floor->Room)];
+
 			if (!TestEnvironment(ENV_FLAG_WATER, room) &&
 				!TestEnvironment(ENV_FLAG_SWAMP, room))
 			{
 				int waterHeight = floor->CeilingHeight(x, z);
-				floor = GetFloor(x, y, z, &roomNumber);
-				return (GetFloorHeight(floor, x, y, z) - waterHeight);
+				int floorHeight = GetCollision(floor, x, y, z).BottomBlock->FloorHeight(x, z);
+				return (floorHeight - waterHeight);
 			}
 
 			floor = GetSector(room, x - room->x, z - room->z);
