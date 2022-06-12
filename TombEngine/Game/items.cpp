@@ -12,73 +12,86 @@
 
 using namespace TEN::Floordata;
 
-void ItemInfo::SetBits(std::vector<int> jointIndices, JointBitType testType)
+void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
 {
 	for (int i = 0; i < jointIndices.size(); i++)
 	{
 		unsigned int jointBit = (unsigned int)(1 << jointIndices[i]);
 
-		switch (testType)
+		switch (type)
 		{
-		case JointBitType::Mesh:
-			this->MeshBits |= jointBit;
-			break;
-
 		case JointBitType::Touch:
 			this->TouchBits |= jointBit;
 			break;
 
-		case JointBitType::Meshswap:
-			this->SwapMeshBits |= jointBit;
+		case JointBitType::Mesh:
+			this->MeshBits |= jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits |= jointBit;
 			break;
 		}
 	}
 }
 
-void ItemInfo::ClearBits(std::vector<int> jointIndices, JointBitType testType)
+void ItemInfo::SetBits(JointBitType type, int jointIndex)
+{
+	return SetBits(type, std::vector { jointIndex });
+}
+
+void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
 {
 	for (int i = 0; i < jointIndices.size(); i++)
 	{
 		unsigned int jointBit = (unsigned int)(1 << jointIndices[i]);
 
-		switch (testType)
+		switch (type)
 		{
-		case JointBitType::Mesh:
-			this->MeshBits &= ~jointBit;
-			break;
-
 		case JointBitType::Touch:
 			this->TouchBits &= ~jointBit;
 			break;
 
-		case JointBitType::Meshswap:
-			this->SwapMeshBits &= ~jointBit;
+		case JointBitType::Mesh:
+			this->MeshBits &= ~jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits &= ~jointBit;
 			break;
 		}
 	}
 }
 
-bool ItemInfo::TestBits(std::vector<int> jointIndices, JointBitType testType)
+void ItemInfo::ClearBits(JointBitType type, int jointIndex)
+{
+	return ClearBits(type, std::vector { jointIndex });
+}
+
+bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
 {
 	for (int i = 0; i < jointIndices.size(); i++)
 	{
 		unsigned int jointBit = (unsigned int)(1 << jointIndices[i]);
 
-		switch (testType)
+		switch (type)
 		{
-		case JointBitType::Mesh:
-			if ((MeshBits & jointBit) == jointBit)
-				return true;
-			break;
-
 		case JointBitType::Touch:
 			if ((TouchBits & jointBit) == jointBit)
 				return true;
+
 			break;
 
-		case JointBitType::Meshswap:
-			if ((SwapMeshBits & jointBit) == jointBit)
+		case JointBitType::Mesh:
+			if ((MeshBits & jointBit) == jointBit)
 				return true;
+
+			break;
+
+		case JointBitType::MeshSwap:
+			if ((MeshSwapBits & jointBit) == jointBit)
+				return true;
+
 			break;
 		}
 	}
@@ -86,19 +99,9 @@ bool ItemInfo::TestBits(std::vector<int> jointIndices, JointBitType testType)
 	return false;
 }
 
-bool ItemInfo::TestBits(int jointIndex, JointBitType testType)
+bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 {
-	return TestBits(std::vector { jointIndex }, testType);
-}
-
-void ItemInfo::SetBits(int jointIndex, JointBitType testType)
-{
-	return SetBits(std::vector { jointIndex }, testType);
-}
-
-void ItemInfo::ClearBits(int jointIndex, JointBitType testType)
-{
-	return ClearBits(std::vector { jointIndex }, testType);
+	return TestBits(type, std::vector { jointIndex });
 }
 
 void ClearItem(short itemNumber)
@@ -470,7 +473,7 @@ void InitialiseItem(short itemNumber)
 
 	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
-	item->SwapMeshBits = NO_JOINT_BITS;
+	item->MeshSwapBits = NO_JOINT_BITS;
 
 	if (item->Flags & IFLAG_INVISIBLE)
 	{

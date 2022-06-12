@@ -39,7 +39,7 @@ void InitialiseGladiator(short itemNumber)
     item->Animation.ActiveState = 1;
 
     if (item->TriggerFlags == 1)
-        item->SwapMeshBits = ALL_JOINT_BITS;
+        item->MeshSwapBits = ALL_JOINT_BITS;
 }
 
 void ControlGladiator(short itemNumber)

@@ -909,7 +909,7 @@ void InitialiseSearchObject(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
-		item->SwapMeshBits = ALL_JOINT_BITS;
+		item->MeshSwapBits = ALL_JOINT_BITS;
 		item->MeshBits = 7;
 	}
 	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
@@ -1028,12 +1028,12 @@ void SearchObjectControl(short itemNumber)
 	{
 		if (frameNumber > 0)
 		{
-			item->SwapMeshBits = NO_JOINT_BITS;
+			item->MeshSwapBits = NO_JOINT_BITS;
 			item->MeshBits = ALL_JOINT_BITS;
 		}
 		else
 		{
-			item->SwapMeshBits = ALL_JOINT_BITS;
+			item->MeshSwapBits = ALL_JOINT_BITS;
 			item->MeshBits = 7;
 		}
 	}

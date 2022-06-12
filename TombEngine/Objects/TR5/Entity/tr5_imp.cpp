@@ -174,9 +174,9 @@ void ImpControl(short itemNumber)
 			joint3 = AI.angle / 2;
 
 			if (Wibble & 0x10)
-				item->SwapMeshBits = 1024;
+				item->MeshSwapBits = 1024;
 			else
-				item->SwapMeshBits = NO_JOINT_BITS;
+				item->MeshSwapBits = NO_JOINT_BITS;
 
 			switch (item->Animation.ActiveState)
 			{

@@ -1609,7 +1609,7 @@ namespace TEN::Renderer
 			RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
 			// Do the swapmesh
-			if (obj->meshSwapSlot != -1 && m_moveableObjects[obj->meshSwapSlot].has_value() && ((nativeItem->SwapMeshBits >> k) & 1))
+			if (obj->meshSwapSlot != -1 && m_moveableObjects[obj->meshSwapSlot].has_value() && ((nativeItem->MeshSwapBits >> k) & 1))
 			{
 				RendererObject& swapMeshObj = *m_moveableObjects[obj->meshSwapSlot];
 				if (swapMeshObj.ObjectMeshes.size() > k)

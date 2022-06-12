@@ -56,7 +56,7 @@ enum class JointBitType
 {
 	Touch,
 	Mesh,
-	Meshswap
+	MeshSwap
 };
 
 struct EntityAnimationData
@@ -103,7 +103,7 @@ struct ItemInfo
 
 	unsigned int TouchBits;
 	unsigned int MeshBits;
-	unsigned int SwapMeshBits;
+	unsigned int MeshSwapBits;
 
 	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
@@ -121,12 +121,12 @@ struct ItemInfo
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
 
-	void SetBits(std::vector<int> jointIndices, JointBitType testType);
-	void ClearBits(std::vector<int> jointIndices, JointBitType testType);
-	bool TestBits(std::vector<int> jointIndices, JointBitType testType);
-	void SetBits(int jointIndex, JointBitType testType);
-	void ClearBits(int jointIndex, JointBitType testType);
-	bool TestBits(int jointIndex, JointBitType testType);
+	void SetBits(JointBitType type, std::vector<int> jointIndices);
+	void SetBits(JointBitType type, int jointIndex);
+	void ClearBits(JointBitType type, std::vector<int> jointIndices);
+	void ClearBits(JointBitType type, int jointIndex);
+	bool TestBits(JointBitType type, std::vector<int> jointIndices);
+	bool TestBits(JointBitType type, int jointIndex);
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);

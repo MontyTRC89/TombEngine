@@ -80,8 +80,8 @@ int TestCollision(ItemInfo* item, ItemInfo* laraItem)
 
 						if ((pow(dx, 2) + pow(dy, 2) + pow(dz, 2)) < pow(r, 2))
 						{
-							item->SetBits(i, JointBitType::Touch);
-							laraItem->SetBits(j, JointBitType::Touch);
+							item->SetBits(JointBitType::Touch, i);
+							laraItem->SetBits(JointBitType::Touch, j);
 							flags |= 1 << i;
 							break;
 						}

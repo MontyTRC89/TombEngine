@@ -308,37 +308,37 @@ void RomanStatueControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 	
-	int oldSwapMeshBits = item->SwapMeshBits;
+	int oldMeshSwapBits = item->MeshSwapBits;
 
 	// At determined HP values, roman statues sheds material.
-	if (item->HitPoints < 1 && !(item->SwapMeshBits & 0x10000))
+	if (item->HitPoints < 1 && !(item->MeshSwapBits & 0x10000))
 	{
 		ExplodeItemNode(item, 16, 0, 8);
 		item->MeshBits |= 0x10000;
-		item->SwapMeshBits |= 0x10000;
+		item->MeshSwapBits |= 0x10000;
 	}
-	else if (item->HitPoints < 75 && !(item->SwapMeshBits & 0x100))
+	else if (item->HitPoints < 75 && !(item->MeshSwapBits & 0x100))
 	{
 		ExplodeItemNode(item, 8, 0, 8);
 		item->MeshBits |= 0x100;
-		item->SwapMeshBits |= 0x100;
+		item->MeshSwapBits |= 0x100;
 	}
-	else if (item->HitPoints < 150 && !(item->SwapMeshBits & 0x400))
+	else if (item->HitPoints < 150 && !(item->MeshSwapBits & 0x400))
 	{
 		ExplodeItemNode(item, 10, 0, 32);
 		ExplodeItemNode(item, 11, 0, 32);
 		item->MeshBits |= 0x400u;
-		item->SwapMeshBits |= 0x400;
+		item->MeshSwapBits |= 0x400;
 	}
-	else if (item->HitPoints < 225 && !(item->SwapMeshBits & 0x10))
+	else if (item->HitPoints < 225 && !(item->MeshSwapBits & 0x10))
 	{
 		ExplodeItemNode(item, 4, 0, 8);
 		item->MeshBits |= 0x10;
-		item->SwapMeshBits |= 0x10;
+		item->MeshSwapBits |= 0x10;
 	}
 
 	// Play hit animation.
-	if (oldSwapMeshBits != item->SwapMeshBits)
+	if (oldMeshSwapBits != item->MeshSwapBits)
 	{
 		item->Animation.TargetState = STATUE_STATE_HIT;
 		item->Animation.ActiveState = STATUE_STATE_HIT;
@@ -877,7 +877,7 @@ void RomanStatueControl(short itemNumber)
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
 
-	if (item->SwapMeshBits & 0x400)
+	if (item->MeshSwapBits & 0x400)
 	{
 		Vector3Int pos;
 		pos.x = (GetRandomControl() & 0x1F) - 16;
@@ -886,7 +886,7 @@ void RomanStatueControl(short itemNumber)
 		RomanStatueHitEffect(item, &pos, 10);
 	}
 
-	if (item->SwapMeshBits & 0x10)
+	if (item->MeshSwapBits & 0x10)
 	{
 		Vector3Int pos;
 		pos.x = -40;
@@ -895,7 +895,7 @@ void RomanStatueControl(short itemNumber)
 		RomanStatueHitEffect(item, &pos, 4);
 	}
 
-	if (item->SwapMeshBits & 0x100)
+	if (item->MeshSwapBits & 0x100)
 	{
 		Vector3Int pos;
 		pos.x = (GetRandomControl() & 0x3F) + 54;

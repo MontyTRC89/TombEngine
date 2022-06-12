@@ -564,7 +564,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.SwapMeshBits);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
@@ -1238,7 +1238,7 @@ bool SaveGame::Load(int slot)
 
 		// Mesh stuff
 		item->MeshBits = savedItem->mesh_bits();
-		item->SwapMeshBits = savedItem->swap_mesh_flags();
+		item->MeshSwapBits = savedItem->swap_mesh_flags();
 
 		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
 			(item->Flags & ONESHOT))

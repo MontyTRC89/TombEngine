@@ -45,7 +45,7 @@ namespace TEN::Entities::TR4
 		if (!creature)
 			return;
 
-		if (item->TestBits(6, JointBitType::Mesh)) // Was fuel can exploded?
+		if (item->TestBits(JointBitType::Mesh, 6)) // Was fuel can exploded?
 		{
 			if (item->ItemFlags[0])
 			{
@@ -56,9 +56,9 @@ namespace TEN::Entities::TR4
 			}
 
 			if (item->ItemFlags[0] & 1)
-				item->SetBits(8, JointBitType::Mesh);
+				item->SetBits(JointBitType::Mesh, 8);
 			else
-				item->ClearBits(8, JointBitType::Mesh);
+				item->ClearBits(JointBitType::Mesh, 8);
 
 			if (item->TriggerFlags == 0)
 			{
