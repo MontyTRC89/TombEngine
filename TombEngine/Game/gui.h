@@ -26,6 +26,13 @@ enum class InventoryResult
 	NewGameSelectedLevel
 };
 
+enum class LoadResult
+{
+	None,
+	Load,
+	Cancel
+};
+
 enum class MenuType
 {
 	None,
@@ -399,7 +406,7 @@ struct InventoryObject
 class GuiController
 {
 public:
-	int CallInventory(bool reset_mode);
+	bool CallInventory(bool reset_mode);
 	InventoryResult TitleOptions();
 	InventoryResult DoPauseMenu();
 	void DrawInventory();
@@ -457,7 +464,7 @@ private:
 	void DoStatisticsMode();
 	void DoExamineMode();
 	void DoDiary();
-	bool DoLoad();
+	LoadResult DoLoad();
 	bool DoSave();
 	void DoInventory();
 	void ConstructCombineObjectList();

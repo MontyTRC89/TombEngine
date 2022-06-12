@@ -626,14 +626,20 @@ InventoryResult GuiController::TitleOptions()
 
 	if (menu_to_display == Menu::LoadGame)
 	{
-		if (DoLoad())
+		switch (DoLoad())
 		{
+		case LoadResult::Load:
 			ret = InventoryResult::LoadGame;
-		}
-		else if (invMode == InventoryMode::InGame)
-		{
+			break;
+
+		case LoadResult::Cancel:
 			menu_to_display = Menu::Title;
 			selected_option = selected_option_bak;
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+			break;
+
+		case LoadResult::None:
+			break;
 		}
 	}
 	else if (menu_to_display == Menu::Title || 
@@ -3177,9 +3183,9 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 	}
 }
 
-int GuiController::CallInventory(bool reset_mode)
+bool GuiController::CallInventory(bool reset_mode)
 {
-	int return_value;
+	bool return_value = false;
 
 	Lara.Inventory.OldBusy = Lara.Inventory.IsBusy;
 
@@ -3212,10 +3218,8 @@ int GuiController::CallInventory(bool reset_mode)
 			exitLoop = true;
 		}
 
-		return_value = ThreadEnded;
-
-		if (return_value)
-			return return_value;
+		if (ThreadEnded)
+			return true;
 
 		DoDebouncedInput();
 		DrawInventory();
@@ -3240,11 +3244,31 @@ int GuiController::CallInventory(bool reset_mode)
 			break;
 
 		case InventoryMode::Load:
-			exitLoop = DoLoad();
+			switch (DoLoad())
+			{
+			case LoadResult::Load:
+				return_value = true;
+				exitLoop = true;
+				break;
+
+			case LoadResult::Cancel:
+				exitLoop = !reset_mode;
+				if (reset_mode)
+					invMode = InventoryMode::InGame;
+				break;
+
+			case LoadResult::None:
+				break;
+			}
 			break;
 
 		case InventoryMode::Save:
-			exitLoop = DoSave();
+			if (DoSave())
+			{
+				exitLoop = !reset_mode;
+				if (reset_mode)
+					invMode = InventoryMode::InGame;
+			}
 			break;
 		}
 
@@ -3329,7 +3353,7 @@ short GuiController::GetLoadSaveSelection()
 	return selected_save_slot;
 }
 
-bool GuiController::DoLoad()
+LoadResult GuiController::DoLoad()
 {
 	invMode = InventoryMode::Load;
 
@@ -3364,18 +3388,14 @@ bool GuiController::DoLoad()
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			g_GameFlow->SelectedSaveGame = selected_save_slot;
-			return true;
+			return LoadResult::Load;
 		}
 	}
 
 	if (goDeselect)
-	{
-		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		goDeselect = 0;
-		invMode = InventoryMode::InGame;
-	}
+		return LoadResult::Cancel;
 
-	return false;
+	return LoadResult::None;
 }
 
 bool GuiController::DoSave()
@@ -3410,11 +3430,7 @@ bool GuiController::DoSave()
 	}
 
 	if (goDeselect)
-	{
-		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		goDeselect = 0;
-		invMode = InventoryMode::InGame;
-	}
+		return true;
 
 	return false;
 }

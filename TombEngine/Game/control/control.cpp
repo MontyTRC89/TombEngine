@@ -154,7 +154,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
 				if (g_Gui.CallInventory(false))
-					return GameStatus::LoadGame;
+					return GameStatus::SaveGame;
 			}
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
