@@ -12,6 +12,7 @@
 #include "Specific/input.h"
 #include "Sound/sound.h"
 #include "Game/collision/collide_item.h"
+#include "Renderer/Renderer11Enums.h"
 
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
@@ -347,7 +348,7 @@ void HighObject2Control(short itemNumber)
 
 	if (--item->ItemFlags[2] < 15)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 		spark->on = 1;
 		spark->sR = -1;
 		spark->sB = 16;
@@ -357,7 +358,7 @@ void HighObject2Control(short itemNumber)
 		spark->dG = (GetRandomControl() & 0x3F) + -128;
 		spark->fadeToBlack = 4;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 24;
 		spark->x = item->ItemFlags[1] + (GetRandomControl() & 0x3F) + item->Pose.Position.x - 544;
 		spark->y = item->Pose.Position.y;
@@ -381,7 +382,7 @@ void HighObject2Control(short itemNumber)
 		else
 		{
 			spark->flags = SP_ROTATE | SP_DEF | SP_SCALE;
-			spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
 			spark->scalar = 1;
 			spark->gravity = (GetRandomControl() & 0xF) + 64;
 		}

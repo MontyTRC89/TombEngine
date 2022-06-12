@@ -30,7 +30,7 @@ static void TriggerAutoGunSmoke(Vector3Int* pos, char shade)
 	spark->dShade = shade;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 32;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 40;
 	spark->x = pos->x - 16 + (GetRandomControl() & 0x1F);
 	spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
@@ -161,7 +161,7 @@ void AutoGunsControl(short itemNumber)
 		}
 		else
 		{
-			item->MeshBits = -1281;
+			item->MeshBits = 0xFFFFFAFF;
 			AnimateItem(item);
 		}
 	}

@@ -1116,14 +1116,112 @@ flatbuffers::Offset<LaserHead> CreateLaserHead(flatbuffers::FlatBufferBuilder &_
 
 struct QuadBikeT : public flatbuffers::NativeTable {
   typedef QuadBike TableType;
+  int32_t turn_rate = 0;
+  int32_t front_rot = 0;
+  int32_t rear_rot = 0;
+  int32_t momentum_angle = 0;
+  int32_t extra_rotation = 0;
+  int32_t velocity = 0;
+  int32_t left_vertical_velocity = 0;
+  int32_t right_vertical_velocity = 0;
+  int32_t revs = 0;
+  int32_t engine_revs = 0;
+  int32_t pitch = 0;
+  int32_t smoke_start = 0;
+  bool can_start_drift = false;
+  bool drift_starting = false;
+  bool no_dismount = false;
+  int32_t flags = 0;
 };
 
 struct QuadBike FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef QuadBikeT NativeTableType;
   typedef QuadBikeBuilder Builder;
   struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TURN_RATE = 4,
+    VT_FRONT_ROT = 6,
+    VT_REAR_ROT = 8,
+    VT_MOMENTUM_ANGLE = 10,
+    VT_EXTRA_ROTATION = 12,
+    VT_VELOCITY = 14,
+    VT_LEFT_VERTICAL_VELOCITY = 16,
+    VT_RIGHT_VERTICAL_VELOCITY = 18,
+    VT_REVS = 20,
+    VT_ENGINE_REVS = 22,
+    VT_PITCH = 24,
+    VT_SMOKE_START = 26,
+    VT_CAN_START_DRIFT = 28,
+    VT_DRIFT_STARTING = 30,
+    VT_NO_DISMOUNT = 32,
+    VT_FLAGS = 34
+  };
+  int32_t turn_rate() const {
+    return GetField<int32_t>(VT_TURN_RATE, 0);
+  }
+  int32_t front_rot() const {
+    return GetField<int32_t>(VT_FRONT_ROT, 0);
+  }
+  int32_t rear_rot() const {
+    return GetField<int32_t>(VT_REAR_ROT, 0);
+  }
+  int32_t momentum_angle() const {
+    return GetField<int32_t>(VT_MOMENTUM_ANGLE, 0);
+  }
+  int32_t extra_rotation() const {
+    return GetField<int32_t>(VT_EXTRA_ROTATION, 0);
+  }
+  int32_t velocity() const {
+    return GetField<int32_t>(VT_VELOCITY, 0);
+  }
+  int32_t left_vertical_velocity() const {
+    return GetField<int32_t>(VT_LEFT_VERTICAL_VELOCITY, 0);
+  }
+  int32_t right_vertical_velocity() const {
+    return GetField<int32_t>(VT_RIGHT_VERTICAL_VELOCITY, 0);
+  }
+  int32_t revs() const {
+    return GetField<int32_t>(VT_REVS, 0);
+  }
+  int32_t engine_revs() const {
+    return GetField<int32_t>(VT_ENGINE_REVS, 0);
+  }
+  int32_t pitch() const {
+    return GetField<int32_t>(VT_PITCH, 0);
+  }
+  int32_t smoke_start() const {
+    return GetField<int32_t>(VT_SMOKE_START, 0);
+  }
+  bool can_start_drift() const {
+    return GetField<uint8_t>(VT_CAN_START_DRIFT, 0) != 0;
+  }
+  bool drift_starting() const {
+    return GetField<uint8_t>(VT_DRIFT_STARTING, 0) != 0;
+  }
+  bool no_dismount() const {
+    return GetField<uint8_t>(VT_NO_DISMOUNT, 0) != 0;
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_TURN_RATE) &&
+           VerifyField<int32_t>(verifier, VT_FRONT_ROT) &&
+           VerifyField<int32_t>(verifier, VT_REAR_ROT) &&
+           VerifyField<int32_t>(verifier, VT_MOMENTUM_ANGLE) &&
+           VerifyField<int32_t>(verifier, VT_EXTRA_ROTATION) &&
+           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_LEFT_VERTICAL_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_RIGHT_VERTICAL_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_REVS) &&
+           VerifyField<int32_t>(verifier, VT_ENGINE_REVS) &&
+           VerifyField<int32_t>(verifier, VT_PITCH) &&
+           VerifyField<int32_t>(verifier, VT_SMOKE_START) &&
+           VerifyField<uint8_t>(verifier, VT_CAN_START_DRIFT) &&
+           VerifyField<uint8_t>(verifier, VT_DRIFT_STARTING) &&
+           VerifyField<uint8_t>(verifier, VT_NO_DISMOUNT) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
   QuadBikeT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1135,6 +1233,54 @@ struct QuadBikeBuilder {
   typedef QuadBike Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_turn_rate(int32_t turn_rate) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_TURN_RATE, turn_rate, 0);
+  }
+  void add_front_rot(int32_t front_rot) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_FRONT_ROT, front_rot, 0);
+  }
+  void add_rear_rot(int32_t rear_rot) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_REAR_ROT, rear_rot, 0);
+  }
+  void add_momentum_angle(int32_t momentum_angle) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_MOMENTUM_ANGLE, momentum_angle, 0);
+  }
+  void add_extra_rotation(int32_t extra_rotation) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_EXTRA_ROTATION, extra_rotation, 0);
+  }
+  void add_velocity(int32_t velocity) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_VELOCITY, velocity, 0);
+  }
+  void add_left_vertical_velocity(int32_t left_vertical_velocity) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_LEFT_VERTICAL_VELOCITY, left_vertical_velocity, 0);
+  }
+  void add_right_vertical_velocity(int32_t right_vertical_velocity) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_RIGHT_VERTICAL_VELOCITY, right_vertical_velocity, 0);
+  }
+  void add_revs(int32_t revs) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_REVS, revs, 0);
+  }
+  void add_engine_revs(int32_t engine_revs) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_ENGINE_REVS, engine_revs, 0);
+  }
+  void add_pitch(int32_t pitch) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_PITCH, pitch, 0);
+  }
+  void add_smoke_start(int32_t smoke_start) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_SMOKE_START, smoke_start, 0);
+  }
+  void add_can_start_drift(bool can_start_drift) {
+    fbb_.AddElement<uint8_t>(QuadBike::VT_CAN_START_DRIFT, static_cast<uint8_t>(can_start_drift), 0);
+  }
+  void add_drift_starting(bool drift_starting) {
+    fbb_.AddElement<uint8_t>(QuadBike::VT_DRIFT_STARTING, static_cast<uint8_t>(drift_starting), 0);
+  }
+  void add_no_dismount(bool no_dismount) {
+    fbb_.AddElement<uint8_t>(QuadBike::VT_NO_DISMOUNT, static_cast<uint8_t>(no_dismount), 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(QuadBike::VT_FLAGS, flags, 0);
+  }
   explicit QuadBikeBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1147,8 +1293,40 @@ struct QuadBikeBuilder {
 };
 
 inline flatbuffers::Offset<QuadBike> CreateQuadBike(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t turn_rate = 0,
+    int32_t front_rot = 0,
+    int32_t rear_rot = 0,
+    int32_t momentum_angle = 0,
+    int32_t extra_rotation = 0,
+    int32_t velocity = 0,
+    int32_t left_vertical_velocity = 0,
+    int32_t right_vertical_velocity = 0,
+    int32_t revs = 0,
+    int32_t engine_revs = 0,
+    int32_t pitch = 0,
+    int32_t smoke_start = 0,
+    bool can_start_drift = false,
+    bool drift_starting = false,
+    bool no_dismount = false,
+    int32_t flags = 0) {
   QuadBikeBuilder builder_(_fbb);
+  builder_.add_flags(flags);
+  builder_.add_smoke_start(smoke_start);
+  builder_.add_pitch(pitch);
+  builder_.add_engine_revs(engine_revs);
+  builder_.add_revs(revs);
+  builder_.add_right_vertical_velocity(right_vertical_velocity);
+  builder_.add_left_vertical_velocity(left_vertical_velocity);
+  builder_.add_velocity(velocity);
+  builder_.add_extra_rotation(extra_rotation);
+  builder_.add_momentum_angle(momentum_angle);
+  builder_.add_rear_rot(rear_rot);
+  builder_.add_front_rot(front_rot);
+  builder_.add_turn_rate(turn_rate);
+  builder_.add_no_dismount(no_dismount);
+  builder_.add_drift_starting(drift_starting);
+  builder_.add_can_start_drift(can_start_drift);
   return builder_.Finish();
 }
 
@@ -1431,14 +1609,58 @@ flatbuffers::Offset<Skidoo> CreateSkidoo(flatbuffers::FlatBufferBuilder &_fbb, c
 
 struct UPVT : public flatbuffers::NativeTable {
   typedef UPV TableType;
+  int32_t velocity = 0;
+  int32_t rot = 0;
+  int32_t x_rot = 0;
+  int32_t fan_rot = 0;
+  int32_t harpoon_timer = 0;
+  bool harpoon_left = false;
+  int32_t flags = 0;
 };
 
 struct UPV FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef UPVT NativeTableType;
   typedef UPVBuilder Builder;
   struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_VELOCITY = 4,
+    VT_ROT = 6,
+    VT_X_ROT = 8,
+    VT_FAN_ROT = 10,
+    VT_HARPOON_TIMER = 12,
+    VT_HARPOON_LEFT = 14,
+    VT_FLAGS = 16
+  };
+  int32_t velocity() const {
+    return GetField<int32_t>(VT_VELOCITY, 0);
+  }
+  int32_t rot() const {
+    return GetField<int32_t>(VT_ROT, 0);
+  }
+  int32_t x_rot() const {
+    return GetField<int32_t>(VT_X_ROT, 0);
+  }
+  int32_t fan_rot() const {
+    return GetField<int32_t>(VT_FAN_ROT, 0);
+  }
+  int32_t harpoon_timer() const {
+    return GetField<int32_t>(VT_HARPOON_TIMER, 0);
+  }
+  bool harpoon_left() const {
+    return GetField<uint8_t>(VT_HARPOON_LEFT, 0) != 0;
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_ROT) &&
+           VerifyField<int32_t>(verifier, VT_X_ROT) &&
+           VerifyField<int32_t>(verifier, VT_FAN_ROT) &&
+           VerifyField<int32_t>(verifier, VT_HARPOON_TIMER) &&
+           VerifyField<uint8_t>(verifier, VT_HARPOON_LEFT) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
   UPVT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1450,6 +1672,27 @@ struct UPVBuilder {
   typedef UPV Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_velocity(int32_t velocity) {
+    fbb_.AddElement<int32_t>(UPV::VT_VELOCITY, velocity, 0);
+  }
+  void add_rot(int32_t rot) {
+    fbb_.AddElement<int32_t>(UPV::VT_ROT, rot, 0);
+  }
+  void add_x_rot(int32_t x_rot) {
+    fbb_.AddElement<int32_t>(UPV::VT_X_ROT, x_rot, 0);
+  }
+  void add_fan_rot(int32_t fan_rot) {
+    fbb_.AddElement<int32_t>(UPV::VT_FAN_ROT, fan_rot, 0);
+  }
+  void add_harpoon_timer(int32_t harpoon_timer) {
+    fbb_.AddElement<int32_t>(UPV::VT_HARPOON_TIMER, harpoon_timer, 0);
+  }
+  void add_harpoon_left(bool harpoon_left) {
+    fbb_.AddElement<uint8_t>(UPV::VT_HARPOON_LEFT, static_cast<uint8_t>(harpoon_left), 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(UPV::VT_FLAGS, flags, 0);
+  }
   explicit UPVBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1462,8 +1705,22 @@ struct UPVBuilder {
 };
 
 inline flatbuffers::Offset<UPV> CreateUPV(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t velocity = 0,
+    int32_t rot = 0,
+    int32_t x_rot = 0,
+    int32_t fan_rot = 0,
+    int32_t harpoon_timer = 0,
+    bool harpoon_left = false,
+    int32_t flags = 0) {
   UPVBuilder builder_(_fbb);
+  builder_.add_flags(flags);
+  builder_.add_harpoon_timer(harpoon_timer);
+  builder_.add_fan_rot(fan_rot);
+  builder_.add_x_rot(x_rot);
+  builder_.add_rot(rot);
+  builder_.add_velocity(velocity);
+  builder_.add_harpoon_left(harpoon_left);
   return builder_.Finish();
 }
 
@@ -2257,6 +2514,22 @@ inline QuadBikeT *QuadBike::UnPack(const flatbuffers::resolver_function_t *_reso
 inline void QuadBike::UnPackTo(QuadBikeT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = turn_rate(); _o->turn_rate = _e; }
+  { auto _e = front_rot(); _o->front_rot = _e; }
+  { auto _e = rear_rot(); _o->rear_rot = _e; }
+  { auto _e = momentum_angle(); _o->momentum_angle = _e; }
+  { auto _e = extra_rotation(); _o->extra_rotation = _e; }
+  { auto _e = velocity(); _o->velocity = _e; }
+  { auto _e = left_vertical_velocity(); _o->left_vertical_velocity = _e; }
+  { auto _e = right_vertical_velocity(); _o->right_vertical_velocity = _e; }
+  { auto _e = revs(); _o->revs = _e; }
+  { auto _e = engine_revs(); _o->engine_revs = _e; }
+  { auto _e = pitch(); _o->pitch = _e; }
+  { auto _e = smoke_start(); _o->smoke_start = _e; }
+  { auto _e = can_start_drift(); _o->can_start_drift = _e; }
+  { auto _e = drift_starting(); _o->drift_starting = _e; }
+  { auto _e = no_dismount(); _o->no_dismount = _e; }
+  { auto _e = flags(); _o->flags = _e; }
 }
 
 inline flatbuffers::Offset<QuadBike> QuadBike::Pack(flatbuffers::FlatBufferBuilder &_fbb, const QuadBikeT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -2267,8 +2540,40 @@ inline flatbuffers::Offset<QuadBike> CreateQuadBike(flatbuffers::FlatBufferBuild
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const QuadBikeT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _turn_rate = _o->turn_rate;
+  auto _front_rot = _o->front_rot;
+  auto _rear_rot = _o->rear_rot;
+  auto _momentum_angle = _o->momentum_angle;
+  auto _extra_rotation = _o->extra_rotation;
+  auto _velocity = _o->velocity;
+  auto _left_vertical_velocity = _o->left_vertical_velocity;
+  auto _right_vertical_velocity = _o->right_vertical_velocity;
+  auto _revs = _o->revs;
+  auto _engine_revs = _o->engine_revs;
+  auto _pitch = _o->pitch;
+  auto _smoke_start = _o->smoke_start;
+  auto _can_start_drift = _o->can_start_drift;
+  auto _drift_starting = _o->drift_starting;
+  auto _no_dismount = _o->no_dismount;
+  auto _flags = _o->flags;
   return TEN::Save::CreateQuadBike(
-      _fbb);
+      _fbb,
+      _turn_rate,
+      _front_rot,
+      _rear_rot,
+      _momentum_angle,
+      _extra_rotation,
+      _velocity,
+      _left_vertical_velocity,
+      _right_vertical_velocity,
+      _revs,
+      _engine_revs,
+      _pitch,
+      _smoke_start,
+      _can_start_drift,
+      _drift_starting,
+      _no_dismount,
+      _flags);
 }
 
 inline BigGunT *BigGun::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -2418,6 +2723,13 @@ inline UPVT *UPV::UnPack(const flatbuffers::resolver_function_t *_resolver) cons
 inline void UPV::UnPackTo(UPVT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = velocity(); _o->velocity = _e; }
+  { auto _e = rot(); _o->rot = _e; }
+  { auto _e = x_rot(); _o->x_rot = _e; }
+  { auto _e = fan_rot(); _o->fan_rot = _e; }
+  { auto _e = harpoon_timer(); _o->harpoon_timer = _e; }
+  { auto _e = harpoon_left(); _o->harpoon_left = _e; }
+  { auto _e = flags(); _o->flags = _e; }
 }
 
 inline flatbuffers::Offset<UPV> UPV::Pack(flatbuffers::FlatBufferBuilder &_fbb, const UPVT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -2428,8 +2740,22 @@ inline flatbuffers::Offset<UPV> CreateUPV(flatbuffers::FlatBufferBuilder &_fbb, 
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const UPVT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _velocity = _o->velocity;
+  auto _rot = _o->rot;
+  auto _x_rot = _o->x_rot;
+  auto _fan_rot = _o->fan_rot;
+  auto _harpoon_timer = _o->harpoon_timer;
+  auto _harpoon_left = _o->harpoon_left;
+  auto _flags = _o->flags;
   return TEN::Save::CreateUPV(
-      _fbb);
+      _fbb,
+      _velocity,
+      _rot,
+      _x_rot,
+      _fan_rot,
+      _harpoon_timer,
+      _harpoon_left,
+      _flags);
 }
 
 inline MotorboatT *Motorboat::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

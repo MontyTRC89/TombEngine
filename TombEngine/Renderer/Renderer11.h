@@ -510,7 +510,7 @@ namespace TEN::Renderer
 		void DrawDarts(RendererItem* item, RenderView& view);
 		void DrawLara(bool shadowMap, RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
-		void DrawSparks(RenderView& view);
+		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
 		void DrawLightning(RenderView& view);
 		void DrawBlood(RenderView& view);
