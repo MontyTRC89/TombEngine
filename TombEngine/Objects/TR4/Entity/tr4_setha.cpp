@@ -47,36 +47,30 @@ namespace TEN::Entities::TR4
 		int dx = 870 * phd_sin(item->Pose.Orientation.y);
 		int dz = 870 * phd_cos(item->Pose.Orientation.y);
 
-		short roomNumber = item->RoomNumber;
-		FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
-		int ceiling = GetCeiling(floor, x, y, z);
+		int ceiling = GetCollision(x, y, z, item->RoomNumber).Position.Ceiling;
 
 		x += dx;
 		z += dz;
-		roomNumber = item->RoomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height1 = GetFloorHeight(floor, x, y, z);
+		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		x += dx;
 		z += dz;
-		roomNumber = item->RoomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height2 = GetFloorHeight(floor, x, y, z);
+		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		x += dx;
 		z += dz;
-		roomNumber = item->RoomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height3 = GetFloorHeight(floor, x, y, z);
+		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
-		bool canJump = (y < height1 - 384 || y < height2 - 384)
-			&& (y < height3 + 256 && y > height3 - 256 || height3 == NO_HEIGHT);
+		bool canJump = false;
+		if ((y < (height1 - CLICK(1.5f)) || y < (height2 - CLICK(1.5f))) &&
+			(y < (height3 + CLICK(1)) && y > (height3 - CLICK(1)) || height3 == NO_HEIGHT))
+		{
+			canJump = true;
+		}
 
 		x = item->Pose.Position.x - dx;
 		z = item->Pose.Position.z - dz;
-		roomNumber = item->RoomNumber;
-		floor = GetFloor(x, y, z, &roomNumber);
-		int height4 = GetFloorHeight(floor, x, y, z);
+		int height4 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
 
 		AI_INFO AI;
 		short angle = 0;
@@ -332,10 +326,10 @@ namespace TEN::Entities::TR4
 			case 12:
 			case 13:
 			case 15:
+				creature->MaxTurn = 0;
+
 				if (item->Animation.ActiveState == 15)
 					creature->Target.y = LaraItem->Pose.Position.y;
-
-				creature->MaxTurn = 0;
 
 				if (abs(AI.angle) >= ANGLE(3.0f))
 				{
@@ -383,19 +377,17 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					creature->LOT.Fly = 0;
 					item->Animation.Airborne = true;
-					if (item->Pose.Position.y - item->Floor > 0)
-					{
+					creature->LOT.Fly = 0;
+
+					if ((item->Pose.Position.y - item->Floor) > 0)
 						item->Animation.TargetState = 1;
-					}
 				}
 
 				break;
 
 			default:
 				break;
-
 			}
 		}
 
@@ -555,10 +547,7 @@ namespace TEN::Entities::TR4
 		auto pos2 = Vector3Int(SethaAttack2.x, SethaAttack2.y, SethaAttack2.z);
 		GetJointAbsPosition(item, &pos2, SethaAttack2.meshNum);
 
-		int i, size;
-		Vector3Int pos;
-		Vector3Shrt angles;
-		PHD_3DPOS attackPos;
+		int size;
 
 		switch (item->Animation.ActiveState)
 		{
@@ -566,11 +555,13 @@ namespace TEN::Entities::TR4
 		case 15:
 			if (item->ItemFlags[0] < 78 && (GetRandomControl() & 0x1F) < item->ItemFlags[0])
 			{
-				for (i = 0; i < 2; i++)
+				for (int i = 0; i < 2; i++)
 				{
-					pos.x = (GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1);
-					pos.y = (GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1);
-					pos.z = (GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1);
+					auto pos = Vector3Int(
+						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
+					);
 
 					TriggerSethaSparks1(
 						pos.x,
@@ -580,9 +571,11 @@ namespace TEN::Entities::TR4
 						(pos1.y - pos.y),
 						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos.x = (GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1);
-					pos.y = (GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1);
-					pos.z = (GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1);
+					pos = Vector3Int(
+						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
+					);
 
 					TriggerSethaSparks1(
 						pos.x,
@@ -594,7 +587,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			size = 2 * item->ItemFlags[0];
+			size = item->ItemFlags[0] * 2;
 			if (size > 128)
 				size = 128;
 
@@ -608,21 +601,21 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] >= 96 && item->ItemFlags[0] <= 99)
 			{
-				pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
+				auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
-				attackPos = PHD_3DPOS(pos1, angles);
-				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
+				auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
+				auto attackPose = PHD_3DPOS(pos1, angles);
+				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 			else if (item->ItemFlags[0] >= 122 && item->ItemFlags[0] <= 125)
 			{
-				pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
+				auto pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 				GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
-				angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
-				attackPos = PHD_3DPOS(pos2, angles);
-				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
+				auto angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
+				auto attackPose = PHD_3DPOS(pos2, angles);
+				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 
 			break;
@@ -645,19 +638,19 @@ namespace TEN::Entities::TR4
 			{
 				if (Wibble & 4)
 				{
-					pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
+					auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 					GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-					angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
-					attackPos = PHD_3DPOS(pos1, angles);
-					SethaThrowAttack(&attackPos, item->RoomNumber, 0);
+					auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
+					auto attackPose = PHD_3DPOS(pos1, angles);
+					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 
 					pos = Vector3Int(SethaAttack2.x, SethaAttack2.y * 2, SethaAttack2.z);
 					GetJointAbsPosition(item, &pos, SethaAttack2.meshNum);
 
 					angles = GetVectorAngles(pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z);
-					attackPos = PHD_3DPOS(pos2, angles);
-					SethaThrowAttack(&attackPos, item->RoomNumber, 0);
+					attackPose = PHD_3DPOS(pos2, angles);
+					SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 				}
 			}
 
@@ -668,11 +661,13 @@ namespace TEN::Entities::TR4
 				item->ItemFlags[0] < 100 &&
 				(GetRandomControl() & 7) < item->ItemFlags[0] - 40)
 			{
-				for (i = 0; i < 2; i++)
+				for (int i = 0; i < 2; i++)
 				{
-					pos.x = (GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1);
-					pos.y = (GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1);
-					pos.z = (GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1);
+					auto pos = Vector3Int(
+						(GetRandomControl() & 0x7FF) + pos1.x - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos1.y - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos1.z - SECTOR(1)
+					);
 
 					TriggerSethaSparks1(
 						pos.x,
@@ -682,9 +677,11 @@ namespace TEN::Entities::TR4
 						(pos1.y - pos.y),
 						(SECTOR(1) - (GetRandomControl() & 0x7FF)));
 
-					pos.x = (GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1);
-					pos.y = (GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1);
-					pos.z = (GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1);
+					pos = Vector3Int(
+						(GetRandomControl() & 0x7FF) + pos2.x - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos2.y - SECTOR(1),
+						(GetRandomControl() & 0x7FF) + pos2.z - SECTOR(1)
+					);
 
 					TriggerSethaSparks1(
 						pos.x,
@@ -696,7 +693,7 @@ namespace TEN::Entities::TR4
 				}
 			}
 
-			size = 2 * item->ItemFlags[0];
+			size = item->ItemFlags[0] * 2;
 			if (size > 128)
 				size = 128;
 
@@ -710,19 +707,18 @@ namespace TEN::Entities::TR4
 
 			if (item->ItemFlags[0] == 102)
 			{
-				pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
+				auto pos = Vector3Int(SethaAttack1.x, SethaAttack1.y * 2, SethaAttack1.z);
 				GetJointAbsPosition(item, &pos, SethaAttack1.meshNum);
 
-				angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
-				attackPos = PHD_3DPOS(pos1, angles);
-				SethaThrowAttack(&attackPos, item->RoomNumber, 0);
+				auto angles = GetVectorAngles(pos.x - pos1.x, pos.y - pos1.y, pos.z - pos1.z);
+				auto attackPose = PHD_3DPOS(pos1, angles);
+				SethaThrowAttack(&attackPose, item->RoomNumber, 0);
 			}
 
 			break;
 
 		default:
 			break;
-
 		}
 	}
 }

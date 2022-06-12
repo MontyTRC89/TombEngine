@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_sentrygun.h"
+#include "tr4_sentry_gun.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"

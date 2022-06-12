@@ -11,14 +11,14 @@
 #include "tr4_guide.h" // OK
 #include "tr4_harpy.h" // OK
 #include "tr4_horseman.h" // OFF
-#include "tr4_jeanyves.h" // OK
+#include "tr4_jean_yves.h" // OK
 #include "tr4_knight_templar.h" // OK
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "tr4_mummy.h" // OK
 #include "tr4_sas.h" // OK
-#include "tr4_sentrygun.h" // OK
+#include "tr4_sentry_gun.h" // OK
 #include "tr4_skeleton.h" // OK
-#include "tr4_smallscorpion.h" // OK
+#include "tr4_small_scorpion.h" // OK
 #include "tr4_sphinx.h" // OK
 #include "tr4_troops.h" // OK
 #include "tr4_wild_boar.h" // OK
