@@ -62,8 +62,10 @@ using namespace TEN::Math::Random;
 #define QUAD_MAX_MOM_TURN ANGLE(150.0f)
 
 #define QUAD_MAX_WATER_HEIGHT CLICK(2)
-#define QUAD_VEL_COEFFICIENT 8.0f
-#define QUAD_TURN_COEFFICIENT 6.0f
+#define QUAD_WATER_VEL_COEFFICIENT 16.0f
+#define QUAD_WATER_TURN_COEFFICIENT 10.0f
+#define QUAD_SWAMP_VEL_COEFFICIENT 8.0f
+#define QUAD_SWAMP_TURN_COEFFICIENT 6.0f
 
 #define QUAD_MAX_HEIGHT CLICK(1)
 #define QUAD_MIN_BOUNCE ((MAX_VELOCITY / 2) / CLICK(1))
@@ -978,21 +980,25 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 
 			if (waterDepth <= QUAD_MAX_WATER_HEIGHT)
 			{
+				bool isWater = TestEnvironment(ENV_FLAG_WATER, quadItem);
+
 				if (quad->Velocity != 0)
 				{
-					quad->Velocity -= std::copysign(quad->Velocity * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / QUAD_VEL_COEFFICIENT), quad->Velocity);
+					auto coeff = isWater ? QUAD_WATER_VEL_COEFFICIENT : QUAD_SWAMP_VEL_COEFFICIENT;
+					quad->Velocity -= std::copysign(quad->Velocity * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / coeff), quad->Velocity);
 
-					if (TestEnvironment(ENV_FLAG_WATER, quadItem))
-					{
+					if (GenerateInt(0, 32) > 28)
+						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(quadItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
+
+					if (isWater)
 						TEN::Effects::TriggerSpeedboatFoam(quadItem, Vector3(0, -waterDepth / 2.0f, QUAD_BACK));
-
-						if (GenerateInt(0, 32) > 28)
-							SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(quadItem->Pose.Position), SoundEnvironment::Land, 0.8f);
-					}
 				}
 
 				if (quad->TurnRate != 0)
-					quad->TurnRate -= quad->TurnRate * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / QUAD_TURN_COEFFICIENT);
+				{
+					auto coeff = isWater ? QUAD_WATER_TURN_COEFFICIENT : QUAD_SWAMP_TURN_COEFFICIENT;
+					quad->TurnRate -= quad->TurnRate * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / coeff);
+				}
 			}
 			else
 			{
