@@ -15,8 +15,9 @@
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SphinxBiteInfo = { 0, 0, 0, 6 };
+	const std::vector<int> SphinxAttackJoints = { 6 };
 
-	constexpr auto SPHINX_RUN_FORWARD_DAMAGE = 200;
+	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
 
 	enum SphinxState
 	{
@@ -177,7 +178,7 @@ namespace TEN::Entities::TR4
 
 			if (creature->Flags == 0)
 			{
-				if (item->TouchBits & 0x40)
+				if (item->TestTouchBits(SphinxAttackJoints))
 				{
 					CreatureEffect2(
 						item,
@@ -188,7 +189,7 @@ namespace TEN::Entities::TR4
 
 					creature->Flags = 1;
 
-					LaraItem->HitPoints -= SPHINX_RUN_FORWARD_DAMAGE;
+					LaraItem->HitPoints -= SPHINX_ATTACK_DAMAGE;
 				}
 			}
 
@@ -225,7 +226,7 @@ namespace TEN::Entities::TR4
 			{
 				TestTriggers(item, true);
 
-				if (item->TouchBits & 0x40)
+				if (item->TestTouchBits(SphinxAttackJoints))
 				{
 					CreatureEffect2(
 						item,

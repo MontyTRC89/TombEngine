@@ -14,6 +14,7 @@
 namespace TEN::Entities::TR4
 {
 	BITE_INFO BigBeetleBite = { 0, 0, 0, 12 };
+	const std::vector<int> BigBeetleAttackJoints = { 5, 6 };
 
 	enum BigBeetleState
 	{
@@ -166,7 +167,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x60)
+					if (item->TestTouchBits(BigBeetleAttackJoints))
 					{
 						LaraItem->HitPoints -= 50;
 						LaraItem->HitStatus = true;

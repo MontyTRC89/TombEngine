@@ -19,7 +19,27 @@ using namespace TEN::Effects::Environment;
 namespace TEN::Entities::TR4
 {
 	BaboonRespawner BaboonRespawn;
-	static BITE_INFO BaboonBite = { 10, 10, 11, 4 };
+	BITE_INFO BaboonBite = { 10, 10, 11, 4 };
+	const std::vector<int> BaboonAttackJoints = { 11, 12 };
+	const std::vector<int> BaboonAttackRightJoints = { 1, 2, 3, 5, 8, 9 };
+	const std::vector<int> BaboonJumpAttackJoints = { 3, 4, 8 };
+
+	constexpr auto NO_BABOON = -1;
+	constexpr auto NO_BABOON_COUNT = -2;
+	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
+	constexpr auto BABOON_ATTACK_DAMAGE = 70;
+
+	#define BABOON_STATE_WALK_ANIM 14
+
+	#define BABOON_IDLE_DISTANCE pow(SECTOR(1), 2)
+	#define BABOON_ATTACK_ANGLE ANGLE(7.0f)
+	#define BABOON_ATTACK_RANGE 0x718E4
+	#define BABOON_ATTACK_NORMAL_RANGE 0x1C639
+	#define BABOON_JUMP_RANGE 0x718E4
+	#define BABOON_FOLLOW_RANGE 0x400000
+	#define BABOON_RUN_FORWARD_ROLL_RANGE 0x100000
+	#define BABOON_WALK_FORWARD_ANGLE ANGLE(7.0f)
+	#define BABOON_RUN_FORWARD_ANGLE ANGLE(11.0f)
 
 	enum BaboonState
 	{
@@ -82,26 +102,6 @@ namespace TEN::Entities::TR4
 		BABOON_ANIM_WALK_FORWARD_TO_IDLE = 30,
 		BABOON_ANIM_ACTIVATE_SWITCH = 31
 	};
-
-	constexpr auto NO_BABOON = -1;
-	constexpr auto NO_BABOON_COUNT = -2;
-	constexpr auto NO_CROWBAR_SWITCH_FOUND = -1;
-
-#define BABOON_STATE_WALK_ANIM 14
-
-#define BABOON_DAMAGE 70
-#define BABOON_IDLE_DISTANCE pow(SECTOR(1), 2)
-#define BABOON_ATTACK_ANGLE ANGLE(7.0f)
-#define BABOON_ATTACK_RANGE 0x718E4
-#define BABOON_ATTACK_NORMAL_RANGE 0x1C639
-#define BABOON_JUMP_RANGE 0x718E4
-#define BABOON_FOLLOW_RANGE 0x400000
-#define BABOON_RUN_FORWARD_ROLL_RANGE 0x100000
-#define BABOON_WALK_FORWARD_ANGLE ANGLE(7.0f)
-#define BABOON_RUN_FORWARD_ANGLE ANGLE(11.0f)
-#define BABOON_RIGHT_TOUCHBITS 814
-#define BABOON_JUMP_TOUCHBITS 280
-#define BABOON_TOUCHBITS 0x1800
 
 	static void TriggerBaboonShockwave(PHD_3DPOS pos, short xRot)
 	{
@@ -547,14 +547,14 @@ namespace TEN::Entities::TR4
 					item->Pose.Orientation.y += AI.angle;
 
 				if (creature->Flags == 0 &&
-					(item->TouchBits & BABOON_TOUCHBITS ||
-						item->TouchBits & BABOON_RIGHT_TOUCHBITS ||
-						item->TouchBits & BABOON_JUMP_TOUCHBITS))
+					(item->TestTouchBits(BaboonAttackJoints) ||
+						item->TestTouchBits(BaboonAttackRightJoints) ||
+						item->TestTouchBits(BaboonJumpAttackJoints)))
 				{
 					CreatureEffect2(item, &BaboonBite, 10, -1, DoBloodSplat);
 					creature->Flags = 1;
 
-					LaraItem->HitPoints -= BABOON_DAMAGE;
+					LaraItem->HitPoints -= BABOON_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;
 				}
 

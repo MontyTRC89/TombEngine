@@ -46,6 +46,12 @@ ID_BADDY2
 
 namespace TEN::Entities::TR4
 {
+	BITE_INFO BaddyGunBite = { 0, -16, 200, 11 };
+	BITE_INFO BaddySwordBite = { 0, 0, 0, 15 };
+	const std::vector<int> BaddySwordAttackJoints = { 14, 15, 16 };
+
+	#define BADDY_USE_UZI	24
+
 	enum BaddyState
 	{
 		BADDY_STATE_IDLE = 0,
@@ -193,11 +199,6 @@ namespace TEN::Entities::TR4
 		MESHSWAPFLAGS_BADDY_SWORD_NINJA = 0x000880,
 		MESHSWAPFLAGS_BADDY_GUN = 0x7FC010,
 	};
-
-	#define BADDY_USE_UZI	24
-
-	BITE_INFO BaddyGunBite = { 0, -16, 200, 11 };
-	BITE_INFO BaddySwordBite = { 0, 0, 0, 15 };
 
 	void InitialiseBaddy(short itemNumber)
 	{
@@ -921,7 +922,7 @@ namespace TEN::Entities::TR4
 
 				if (!currentCreature->Flags)
 				{
-					if (item->TouchBits & 0x1C000)
+					if (item->TestTouchBits(BaddySwordAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
@@ -1001,7 +1002,6 @@ namespace TEN::Entities::TR4
 				{
 					if (laraAI.distance < pow(682, 2))
 					{
-
 						if (LaraItem->Animation.ActiveState == LS_MONKEY_IDLE ||
 							LaraItem->Animation.ActiveState == LS_MONKEY_FORWARD ||
 							LaraItem->Animation.ActiveState == LS_MONKEY_SHIMMY_LEFT ||
