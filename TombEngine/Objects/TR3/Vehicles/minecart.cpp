@@ -396,6 +396,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 		minecart->Velocity = CART_MIN_SPEED;
 
 	minecart->Velocity -= minecart->Gradient * 4;
+	minecartItem->Animation.Velocity = minecart->Velocity / 256;
 
 	if (minecartItem->Animation.Velocity < CART_MIN_VEL)
 	{
