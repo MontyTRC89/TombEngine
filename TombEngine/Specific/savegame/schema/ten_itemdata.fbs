@@ -129,7 +129,20 @@ table Pushable {
 }
 
 table Minecart {
+	turn_rot: int32;
+	turn_x: int32;
+	turn_z: int32;
+	turn_len: int32;
 
+	velocity: int32;
+	vertical_velocity: int32;
+	gradient: int32;
+	stop_delay: int32;
+
+	floor_height_middle: int32;
+	floor_height_front: int32;
+
+	flags: int32;
 }
 
 table LaraInfo {

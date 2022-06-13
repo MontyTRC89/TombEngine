@@ -1958,14 +1958,82 @@ flatbuffers::Offset<Pushable> CreatePushable(flatbuffers::FlatBufferBuilder &_fb
 
 struct MinecartT : public flatbuffers::NativeTable {
   typedef Minecart TableType;
+  int32_t turn_rot = 0;
+  int32_t turn_x = 0;
+  int32_t turn_z = 0;
+  int32_t turn_len = 0;
+  int32_t velocity = 0;
+  int32_t vertical_velocity = 0;
+  int32_t gradient = 0;
+  int32_t stop_delay = 0;
+  int32_t floor_height_middle = 0;
+  int32_t floor_height_front = 0;
+  int32_t flags = 0;
 };
 
 struct Minecart FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef MinecartT NativeTableType;
   typedef MinecartBuilder Builder;
   struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TURN_ROT = 4,
+    VT_TURN_X = 6,
+    VT_TURN_Z = 8,
+    VT_TURN_LEN = 10,
+    VT_VELOCITY = 12,
+    VT_VERTICAL_VELOCITY = 14,
+    VT_GRADIENT = 16,
+    VT_STOP_DELAY = 18,
+    VT_FLOOR_HEIGHT_MIDDLE = 20,
+    VT_FLOOR_HEIGHT_FRONT = 22,
+    VT_FLAGS = 24
+  };
+  int32_t turn_rot() const {
+    return GetField<int32_t>(VT_TURN_ROT, 0);
+  }
+  int32_t turn_x() const {
+    return GetField<int32_t>(VT_TURN_X, 0);
+  }
+  int32_t turn_z() const {
+    return GetField<int32_t>(VT_TURN_Z, 0);
+  }
+  int32_t turn_len() const {
+    return GetField<int32_t>(VT_TURN_LEN, 0);
+  }
+  int32_t velocity() const {
+    return GetField<int32_t>(VT_VELOCITY, 0);
+  }
+  int32_t vertical_velocity() const {
+    return GetField<int32_t>(VT_VERTICAL_VELOCITY, 0);
+  }
+  int32_t gradient() const {
+    return GetField<int32_t>(VT_GRADIENT, 0);
+  }
+  int32_t stop_delay() const {
+    return GetField<int32_t>(VT_STOP_DELAY, 0);
+  }
+  int32_t floor_height_middle() const {
+    return GetField<int32_t>(VT_FLOOR_HEIGHT_MIDDLE, 0);
+  }
+  int32_t floor_height_front() const {
+    return GetField<int32_t>(VT_FLOOR_HEIGHT_FRONT, 0);
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_TURN_ROT) &&
+           VerifyField<int32_t>(verifier, VT_TURN_X) &&
+           VerifyField<int32_t>(verifier, VT_TURN_Z) &&
+           VerifyField<int32_t>(verifier, VT_TURN_LEN) &&
+           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_VERTICAL_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_GRADIENT) &&
+           VerifyField<int32_t>(verifier, VT_STOP_DELAY) &&
+           VerifyField<int32_t>(verifier, VT_FLOOR_HEIGHT_MIDDLE) &&
+           VerifyField<int32_t>(verifier, VT_FLOOR_HEIGHT_FRONT) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
   MinecartT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1977,6 +2045,39 @@ struct MinecartBuilder {
   typedef Minecart Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_turn_rot(int32_t turn_rot) {
+    fbb_.AddElement<int32_t>(Minecart::VT_TURN_ROT, turn_rot, 0);
+  }
+  void add_turn_x(int32_t turn_x) {
+    fbb_.AddElement<int32_t>(Minecart::VT_TURN_X, turn_x, 0);
+  }
+  void add_turn_z(int32_t turn_z) {
+    fbb_.AddElement<int32_t>(Minecart::VT_TURN_Z, turn_z, 0);
+  }
+  void add_turn_len(int32_t turn_len) {
+    fbb_.AddElement<int32_t>(Minecart::VT_TURN_LEN, turn_len, 0);
+  }
+  void add_velocity(int32_t velocity) {
+    fbb_.AddElement<int32_t>(Minecart::VT_VELOCITY, velocity, 0);
+  }
+  void add_vertical_velocity(int32_t vertical_velocity) {
+    fbb_.AddElement<int32_t>(Minecart::VT_VERTICAL_VELOCITY, vertical_velocity, 0);
+  }
+  void add_gradient(int32_t gradient) {
+    fbb_.AddElement<int32_t>(Minecart::VT_GRADIENT, gradient, 0);
+  }
+  void add_stop_delay(int32_t stop_delay) {
+    fbb_.AddElement<int32_t>(Minecart::VT_STOP_DELAY, stop_delay, 0);
+  }
+  void add_floor_height_middle(int32_t floor_height_middle) {
+    fbb_.AddElement<int32_t>(Minecart::VT_FLOOR_HEIGHT_MIDDLE, floor_height_middle, 0);
+  }
+  void add_floor_height_front(int32_t floor_height_front) {
+    fbb_.AddElement<int32_t>(Minecart::VT_FLOOR_HEIGHT_FRONT, floor_height_front, 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(Minecart::VT_FLAGS, flags, 0);
+  }
   explicit MinecartBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1989,8 +2090,30 @@ struct MinecartBuilder {
 };
 
 inline flatbuffers::Offset<Minecart> CreateMinecart(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t turn_rot = 0,
+    int32_t turn_x = 0,
+    int32_t turn_z = 0,
+    int32_t turn_len = 0,
+    int32_t velocity = 0,
+    int32_t vertical_velocity = 0,
+    int32_t gradient = 0,
+    int32_t stop_delay = 0,
+    int32_t floor_height_middle = 0,
+    int32_t floor_height_front = 0,
+    int32_t flags = 0) {
   MinecartBuilder builder_(_fbb);
+  builder_.add_flags(flags);
+  builder_.add_floor_height_front(floor_height_front);
+  builder_.add_floor_height_middle(floor_height_middle);
+  builder_.add_stop_delay(stop_delay);
+  builder_.add_gradient(gradient);
+  builder_.add_vertical_velocity(vertical_velocity);
+  builder_.add_velocity(velocity);
+  builder_.add_turn_len(turn_len);
+  builder_.add_turn_z(turn_z);
+  builder_.add_turn_x(turn_x);
+  builder_.add_turn_rot(turn_rot);
   return builder_.Finish();
 }
 
@@ -2882,6 +3005,17 @@ inline MinecartT *Minecart::UnPack(const flatbuffers::resolver_function_t *_reso
 inline void Minecart::UnPackTo(MinecartT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = turn_rot(); _o->turn_rot = _e; }
+  { auto _e = turn_x(); _o->turn_x = _e; }
+  { auto _e = turn_z(); _o->turn_z = _e; }
+  { auto _e = turn_len(); _o->turn_len = _e; }
+  { auto _e = velocity(); _o->velocity = _e; }
+  { auto _e = vertical_velocity(); _o->vertical_velocity = _e; }
+  { auto _e = gradient(); _o->gradient = _e; }
+  { auto _e = stop_delay(); _o->stop_delay = _e; }
+  { auto _e = floor_height_middle(); _o->floor_height_middle = _e; }
+  { auto _e = floor_height_front(); _o->floor_height_front = _e; }
+  { auto _e = flags(); _o->flags = _e; }
 }
 
 inline flatbuffers::Offset<Minecart> Minecart::Pack(flatbuffers::FlatBufferBuilder &_fbb, const MinecartT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -2892,8 +3026,30 @@ inline flatbuffers::Offset<Minecart> CreateMinecart(flatbuffers::FlatBufferBuild
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const MinecartT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _turn_rot = _o->turn_rot;
+  auto _turn_x = _o->turn_x;
+  auto _turn_z = _o->turn_z;
+  auto _turn_len = _o->turn_len;
+  auto _velocity = _o->velocity;
+  auto _vertical_velocity = _o->vertical_velocity;
+  auto _gradient = _o->gradient;
+  auto _stop_delay = _o->stop_delay;
+  auto _floor_height_middle = _o->floor_height_middle;
+  auto _floor_height_front = _o->floor_height_front;
+  auto _flags = _o->flags;
   return TEN::Save::CreateMinecart(
-      _fbb);
+      _fbb,
+      _turn_rot,
+      _turn_x,
+      _turn_z,
+      _turn_len,
+      _velocity,
+      _vertical_velocity,
+      _gradient,
+      _stop_delay,
+      _floor_height_middle,
+      _floor_height_front,
+      _flags);
 }
 
 inline LaraInfoT *LaraInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
