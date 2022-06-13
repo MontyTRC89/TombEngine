@@ -57,7 +57,7 @@ void DropEntityPickups(ItemInfo* item)
 	}
 }
 
-bool MoveCreature3DPos(PoseData* origin, PoseData* target, int velocity, float angleDif, float angleAdd)
+bool MoveCreature3DPos(PHD_3DPOS* origin, PHD_3DPOS* target, int velocity, float angleDif, float angleAdd)
 {
 	auto differenceVector = target->Position - origin->Position;
 	float distance = Vector3::Distance(origin->Position.ToVector3(), target->Position.ToVector3());
@@ -86,7 +86,7 @@ bool MoveCreature3DPos(PoseData* origin, PoseData* target, int velocity, float a
 	return false;
 }
 
-void CreatureYRot2(PoseData* srcPos, float angle, float angleAdd)
+void CreatureYRot2(PHD_3DPOS* srcPos, float angle, float angleAdd)
 {
 	if (angleAdd < angle)
 	{
@@ -745,9 +745,9 @@ void CreatureDie(short itemNumber, int explode)
 	if (explode)
 	{
 		if (Objects[item->ObjectNumber].hitEffect)
-			ExplodingDeath(itemNumber, ALL_MESHBITS, EXPLODE_HIT_EFFECT);
+			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_HIT_EFFECT);
 		else
-			ExplodingDeath(itemNumber, ALL_MESHBITS, EXPLODE_NORMAL);
+			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_NORMAL);
 
 		KillItem(itemNumber);
 	}

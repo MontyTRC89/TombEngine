@@ -61,13 +61,13 @@ namespace TEN
 				if (result.Position.Bridge >= 0)
 					return;
 
-				auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
-				// Choose material for footstep sound
-				switch (floor->Material)
-				{
-				case FLOOR_MATERIAL::Concrete:
-					fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
-					break;
+		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
+		// Choose material for footstep sound
+		switch (floor->Material)
+		{
+		case FLOOR_MATERIAL::Concrete:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
+			break;
 
 		case FLOOR_MATERIAL::Grass:
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_GRASS;
@@ -109,9 +109,9 @@ namespace TEN
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_SNOW;
 			break;
 
-				case FLOOR_MATERIAL::Stone:
-					fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
-					break;
+		case FLOOR_MATERIAL::Stone:
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
+			break;
 
 				case FLOOR_MATERIAL::Water:
 					fx = SOUND_EFFECTS::SFX_TR4_LARA_WET_FEET;
@@ -155,7 +155,7 @@ namespace TEN
 				}
 
 		// HACK: must be here until reference wad2 is revised
-		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
+		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(fx, &item->Pose);
 
 				if (floor->Material != FLOOR_MATERIAL::Sand &&
@@ -206,17 +206,17 @@ namespace TEN
 					(abs(c3.Position.Floor - c0.Position.Floor) > STEP_SIZE / 2))
 					return;
 
-				// Construct footprint
-				FootprintData footprint = {};
-				footprint.Position[0] = p0;
-				footprint.Position[1] = p1;
-				footprint.Position[2] = p2;
-				footprint.Position[3] = p3;
-				footprint.LifeStartFading = 30 * 10;
-				footprint.StartOpacity = 0.25f;
-				footprint.Life = 30 * 20;
-				footprint.Active = true;
-				footprint.RightFoot = rightFoot;
+			// Construct footprint
+			FootprintData footprint = {};
+			footprint.Position[0] = p0;
+			footprint.Position[1] = p1;
+			footprint.Position[2] = p2;
+			footprint.Position[3] = p3;
+			footprint.StartOpacity = 0.25f;
+			footprint.LifeStartFading = FPS * 10;
+			footprint.Life = FPS * 20;
+			footprint.Active = true;
+			footprint.RightFoot = rightFoot;
 
 				// Add footprint
 				if (footprints.size() >= MAX_FOOTPRINTS)

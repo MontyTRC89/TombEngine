@@ -220,8 +220,10 @@ bool FlowHandler::IsFlyCheatEnabled() const
 
 bool FlowHandler::DoFlow()
 {
-	// We start with the title level
-	CurrentLevel = 0;
+	// We start with the title level, if no other index is specified
+	if (CurrentLevel == -1)
+		CurrentLevel = 0;
+
 	SelectedLevelForNewGame = 0;
 	SelectedSaveGame = 0;
 	SaveGameHeader header;

@@ -160,16 +160,17 @@ inline float Angle::ClampEpsilon(float value)
 // TODO: Move to EulerAngles.h and EulerAngles.cpp.
 class EulerAngles
 {
-private:
+public:
 	// Normalized angle components in radians
 	float x;
 	float y;
 	float z;
-	
-public:
+
 	// Constructors
 	EulerAngles();
 	EulerAngles(float xAngle, float yAngle, float zAngle);
+
+	// TODO: Roll back OOy get/set methods and use a strong typedef to define angles.
 
 	// Getters
 	float GetX();
@@ -605,60 +606,60 @@ struct RendererRectangle
 	}
 };
 
-struct PoseData
+struct PHD_3DPOS
 {
 	Vector3Int  Position;
 	EulerAngles Orientation;
 
-	PoseData()
+	PHD_3DPOS()
 	{
 		this->Position = Vector3Int();
 		this->Orientation = EulerAngles::Zero;
 	}
 
-	PoseData(Vector3Int pos)
+	PHD_3DPOS(Vector3Int pos)
 	{
 		this->Position = pos;
 		this->Orientation = EulerAngles::Zero;
 	}
 
-	PoseData(int xPos, int yPos, int zPos)
+	PHD_3DPOS(int xPos, int yPos, int zPos)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
 		this->Orientation = EulerAngles::Zero;
 	}
 
-	PoseData(EulerAngles orient)
+	PHD_3DPOS(EulerAngles orient)
 	{
 		this->Position = Vector3Int();
 		this->Orientation = orient;
 	}
 
-	PoseData(float xOrient, float yOrient, float zOrient)
+	PHD_3DPOS(float xOrient, float yOrient, float zOrient)
 	{
 		this->Position = Vector3Int();
 		this->Orientation.Set(xOrient, yOrient, zOrient);
 	}
 
-	PoseData(Vector3Int pos, EulerAngles orient)
+	PHD_3DPOS(Vector3Int pos, EulerAngles orient)
 	{
 		this->Position = pos;
 		this->Orientation = orient;
 	}
 
-	PoseData(Vector3Int pos, float xOrient, float yOrient, float zOrient)
+	PHD_3DPOS(Vector3Int pos, float xOrient, float yOrient, float zOrient)
 	{
 		this->Position = pos;
 		this->Orientation.Set(xOrient, yOrient, zOrient);
 	}
 
-	PoseData(int xPos, int yPos, int zPos, EulerAngles orient)
+	PHD_3DPOS(int xPos, int yPos, int zPos, EulerAngles orient)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
 		this->Orientation = orient;
 	}
 
-	PoseData(int xPos, int yPos, int zPos, float xOrient, float yOrient, float zOrient)
+	PHD_3DPOS(int xPos, int yPos, int zPos, float xOrient, float yOrient, float zOrient)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
 		this->Orientation.Set(xOrient, yOrient, zOrient);
@@ -928,4 +929,4 @@ struct BOUNDING_BOX
 	short Z2;
 };
 
-BOUNDING_BOX operator+(BOUNDING_BOX const& box, PoseData const& vec);
+BOUNDING_BOX operator+(BOUNDING_BOX const& box, PHD_3DPOS const& vec);

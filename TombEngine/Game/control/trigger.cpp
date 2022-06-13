@@ -125,7 +125,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			item->Timer = timer;
 			item->Status = ITEM_ACTIVE;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->Timer = FPS * timer;
 			return 1;
 		}
 		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
@@ -456,7 +456,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			item->Timer = timer;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->Timer = FPS * timer;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH ||
 				triggerType == TRIGGER_TYPES::HEAVYSWITCH)
@@ -523,7 +523,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 						{
 							if (item->Status == ITEM_INVISIBLE)
 							{
-								item->TouchBits = 0;
+								item->TouchBits = NO_JOINT_BITS;
 								if (EnableBaddyAI(value, 0))
 								{
 									item->Status = ITEM_ACTIVE;
@@ -538,7 +538,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 						}
 						else
 						{
-							item->TouchBits = 0;
+							item->TouchBits = NO_JOINT_BITS;
 							item->Status = ITEM_ACTIVE;
 							AddActiveItem(value);
 							EnableBaddyAI(value, 1);
@@ -546,7 +546,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 					}
 					else
 					{
-						item->TouchBits = 0;
+						item->TouchBits = NO_JOINT_BITS;
 						AddActiveItem(value);
 						item->Status = ITEM_ACTIVE;
 					}
@@ -576,7 +576,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
-				Camera.timer = (trigger & 0xFF) * 30;
+				Camera.timer = (trigger & 0xFF) * FPS;
 				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
@@ -746,7 +746,7 @@ void ProcessSectorFlags(FloorInfo* floor)
 	}
 
 	// Set climb status
-	if ((1 << (GetQuadrant(LaraItem->Pose.Orientation.GetY()) + 8)) & GetClimbFlags(floor))
+	if (TestLaraNearClimbableWall(LaraItem, floor))
 		Lara.Control.CanClimbLadder = true;
 	else
 		Lara.Control.CanClimbLadder = false;

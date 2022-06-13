@@ -263,17 +263,15 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 	}
 
-	if (!((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM) &&
-		!BinocularRange &&
-		laraItem->Animation.ActiveState == LS_IDLE &&
-		laraItem->Animation.AnimNumber == LA_STAND_IDLE) &&
-		laraInfo->Control.HandStatus == HandStatus::Free &&
-		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
-	{
-		if (keyHoleItem->ObjectNumber < ID_KEY_HOLE6)
-			ObjectCollision(itemNumber, laraItem, coll);
-	}
-	else
+	bool actionReady = (TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() != NO_ITEM);
+
+	bool laraAvailable = !BinocularRange &&
+						 laraItem->Animation.ActiveState == LS_IDLE &&
+						 laraItem->Animation.AnimNumber == LA_STAND_IDLE;
+
+	bool actionActive = laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber;
+
+	if (actionActive || (actionReady && laraAvailable))
 	{
 		if (TestLaraPosition(&KeyHoleBounds, keyHoleItem, laraItem))
 		{
@@ -292,7 +290,12 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 				if (g_Gui.GetInventoryItemChosen() != keyHoleItem->ObjectNumber - (ID_KEY_HOLE1 - ID_KEY_ITEM1))
 					return;
+
+				laraInfo->InteractedItem = itemNumber;
 			}
+
+			if (laraInfo->InteractedItem != itemNumber)
+				return;
 
 			if (MoveLaraPosition(&KeyHolePosition, keyHoleItem, laraItem))
 			{
@@ -319,8 +322,6 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 					return;
 				}
 			}
-			else
-				laraInfo->InteractedItem = itemNumber;
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);
 			return;
@@ -331,6 +332,11 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			laraInfo->Control.IsMoving = false;
 			laraInfo->Control.HandStatus = HandStatus::Free;
 		}
+	}
+	else
+	{
+		if (keyHoleItem->ObjectNumber < ID_KEY_HOLE6)
+			ObjectCollision(itemNumber, laraItem, coll);
 	}
 
 	return;

@@ -81,16 +81,16 @@ struct CollisionSetup
 	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
 	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
 	bool BlockDeathFloorDown;	// Treat death sectors as pits
-	bool BlockMonkeySwingEdge;		// Treat non-monkey sectors as walls
+	bool BlockMonkeySwingEdge;	// Treat non-monkey sectors as walls
 	
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
 	Vector3Int OldPosition;
-	int OldState;
 	int OldAnimNumber;
 	int OldFrameNumber;
+	int OldState;
 };
 
 struct CollisionInfo
@@ -121,11 +121,12 @@ struct CollisionInfo
 };
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
-CollisionResult GetCollision(ItemInfo* item, float orient, int forward, int vertical = 0, int lateral = 0);
-CollisionResult GetCollision(Vector3 pos, int roomIndex, float orient, int forward, int vertical = 0, int lateral = 0);
-CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
-CollisionResult GetCollision(int x, int y, int z, short roomNumber);
+
 CollisionResult GetCollision(ItemInfo* item);
+CollisionResult GetCollision(ItemInfo* item, float angle, float forward, float vertical = 0, float lateral = 0);
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, float angle, float forward, float vertical = 0, float lateral = 0);
+CollisionResult GetCollision(int x, int y, int z, short roomNumber);
+CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);

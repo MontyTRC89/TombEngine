@@ -5,7 +5,7 @@ namespace TEN::Entities::TR4
 {
 	struct BeetleData
 	{
-		PoseData Pose;
+		PHD_3DPOS Pose;
 		short RoomNumber;
 		int Velocity;
 		int VerticalVelocity;

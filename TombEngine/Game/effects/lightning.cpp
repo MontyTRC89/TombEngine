@@ -380,7 +380,7 @@ namespace TEN::Effects::Lightning
 
 	void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b)
 	{
-		SPARKS* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->dG = g;
 		spark->sG = g;
@@ -389,7 +389,7 @@ namespace TEN::Effects::Lightning
 		spark->dR = r;
 		spark->sR = r;
 		spark->colFadeSpeed = 2;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->on = 1;
 		spark->dB = b;
 		spark->sB = b;
@@ -403,7 +403,7 @@ namespace TEN::Effects::Lightning
 		spark->flags = SP_DEF | SP_SCALE;
 		spark->scalar = 3;
 		spark->maxYvel = 0;
-		spark->def = Objects[ID_MISC_SPRITES].meshIndex;
+		spark->spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}

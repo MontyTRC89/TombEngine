@@ -693,48 +693,60 @@ void RegeneratePickups()
 
 		if (item->Status == ITEM_INVISIBLE)
 		{
-			int ammo = 0;
-
+			short ammo = 0;
 			switch (item->ObjectNumber)
 			{
 			case ID_CROSSBOW_AMMO1_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_CROSSBOW_AMMO2_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2];
+				break;
 
 			case ID_CROSSBOW_AMMO3_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3];
+				break;
 
 			case ID_GRENADE_AMMO1_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_GRENADE_AMMO2_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2];
+				break;
 
 			case ID_GRENADE_AMMO3_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3];
+				break;
 
 			case ID_HK_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_UZI_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_HARPOON_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_ROCKET_LAUNCHER_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_REVOLVER_AMMO_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_SHOTGUN_AMMO1_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1];
+				break;
 
 			case ID_SHOTGUN_AMMO2_ITEM:
 				ammo = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2];
+				break;
 			}
 
 			if (ammo == 0)
@@ -879,7 +891,7 @@ void InitialiseSearchObject(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
-		item->SwapMeshFlags = -1;
+		item->MeshSwapBits = ALL_JOINT_BITS;
 		item->MeshBits = 7;
 	}
 	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
@@ -949,10 +961,10 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* 
 		{
 			if (MoveLaraPosition(&SOPos, item, laraitem))
 			{
-				laraitem->Animation.ActiveState = LS_MISC_CONTROL;
+				ResetLaraFlex(laraitem);
 				laraitem->Animation.AnimNumber = SearchAnims[objectNumber];
 				laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
-				ResetLaraFlex(laraitem);
+				laraitem->Animation.ActiveState = LS_MISC_CONTROL;
 				Lara.Control.IsMoving = false;
 				Lara.Control.HandStatus = HandStatus::Busy;
 
@@ -996,12 +1008,12 @@ void SearchObjectControl(short itemNumber)
 	{
 		if (frameNumber > 0)
 		{
-			item->SwapMeshFlags = 0;
-			item->MeshBits = -1;
+			item->MeshSwapBits = NO_JOINT_BITS;
+			item->MeshBits = ALL_JOINT_BITS;
 		}
 		else
 		{
-			item->SwapMeshFlags = -1;
+			item->MeshSwapBits = ALL_JOINT_BITS;
 			item->MeshBits = 7;
 		}
 	}
@@ -1097,7 +1109,7 @@ bool UseSpecialItem(ItemInfo* item)
 
 		if (flag == 1)
 		{
-			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (LaraItem->Pose.Position.y > Lara.WaterSurfaceDist))
+			if (use != ID_WATERSKIN1_3 && use != ID_WATERSKIN2_5 && (Lara.WaterSurfaceDist < -SHALLOW_WATER_START_LEVEL))
 			{
 				if (use < ID_WATERSKIN1_3)
 					Lara.Inventory.SmallWaterskin = 4;
@@ -1133,8 +1145,8 @@ bool UseSpecialItem(ItemInfo* item)
 				item->Animation.AnimNumber = LA_WATERSKIN_POUR_LOW;
 
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = LS_MISC_CONTROL;
 			item->Animation.ActiveState = LS_MISC_CONTROL;
+			item->Animation.TargetState = LS_MISC_CONTROL;
 			Lara.Control.HandStatus = HandStatus::Busy;
 
 			g_Gui.SetInventoryItemChosen(NO_ITEM);

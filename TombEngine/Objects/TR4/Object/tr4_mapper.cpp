@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_mapper.h"
+#include "Objects/TR4/Object/tr4_mapper.h"
 #include "Specific/level.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
@@ -9,6 +9,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
+#include "Renderer/Renderer11Enums.h"
 
 namespace TEN::Entities::TR4
 {
@@ -26,7 +27,7 @@ namespace TEN::Entities::TR4
 
         if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase >= 200)
         {
-            SoundEffect(SFX_TR4_MAPPER_LAZER, &item->Pose);
+            SoundEffect(SFX_TR4_MAPPER_LASER, &item->Pose);
 
             item->MeshBits |= 2;
 
@@ -40,7 +41,7 @@ namespace TEN::Entities::TR4
 
             for (int i = 0; i < 2; i++)
             {
-                SPARKS* spark = &Sparks[GetFreeSpark()];
+                auto* spark = GetFreeParticle();
 
                 spark->on = 1;
                 spark->sR = (GetRandomControl() & 0x7F) + 64;
@@ -51,7 +52,7 @@ namespace TEN::Entities::TR4
                 spark->dB = 0;
                 spark->colFadeSpeed = 4;
                 spark->fadeToBlack = 4;
-                spark->transType = TransTypeEnum::COLADD;
+                spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
                 spark->life = 12;
                 spark->sLife = 12;
                 spark->x = pos.x;

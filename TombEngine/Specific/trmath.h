@@ -13,6 +13,7 @@ constexpr auto GRID_SNAP_SIZE = STEP_SIZE / 2;
 constexpr auto STEPUP_HEIGHT = ((STEP_SIZE * 3) / 2);
 constexpr auto SWIM_DEPTH = 730;
 constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
+constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 constexpr auto SLOPE_DIFFERENCE = 60;
 constexpr auto NO_HEIGHT  = (-0x7F00);
@@ -25,13 +26,13 @@ constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
 constexpr auto OFFSET_RADIUS = [](auto x) { return round(x * M_SQRT2 + 4); };
 
-BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box);
+BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
 
 const float lerp(float v0, float v1, float t);
 const Vector3 getRandomVector();
 const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees);
-void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
-int phd_Distance(PoseData* first, PoseData* second);
+void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
+int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 
 void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift);
 
@@ -52,7 +53,9 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)
 
-Vector3 TranslateVector(Vector3 vector, float orient, float forward, float vertical, float lateral);
+Vector3 TranslateVector(Vector3 vector, float angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
 Vector3 TranslateVector(Vector3 vector, EulerAngles orient, float distance);
-Vector3Int TranslateVector(Vector3Int vector, float orient, float forward, float vertical = 0.0f, float lateral = 0.0f);
 Vector3Int TranslateVector(Vector3Int vector, EulerAngles orient, float distance);
+Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance);
+Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance);

@@ -19,6 +19,7 @@ bool DoLaraLedgeHang(ItemInfo* item, CollisionInfo* coll);
 
 bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll);
+bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor = nullptr);
 
 bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll);
 CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle);

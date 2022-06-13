@@ -174,7 +174,7 @@ namespace TEN::Entities::TR4
 
 			case 1:
 				item->ItemFlags[0] += 37;
-				item->MeshBits = -147457;
+				item->MeshBits = 0xFFFDBFFF;
 				creature->MaxTurn = item->ItemFlags[0] / 16;
 
 				if (item->ItemFlags[0] > 8704)
@@ -377,7 +377,7 @@ namespace TEN::Entities::TR4
 				item->Animation.VerticalVelocity = 0;
 			}
 
-			SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / SECTOR(8)); // TODO: Check actual sound!
+			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / SECTOR(8)); // TODO: Check actual sound!
 		}
 	}
 }

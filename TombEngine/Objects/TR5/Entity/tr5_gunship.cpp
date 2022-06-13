@@ -74,7 +74,7 @@ void ControlGunShip(short itemNumber)
 			item->MeshBits &= 0xFEFF;
 
 		if (GunShipCounter < 15)
-			SoundEffect(SFX_TR4_LARA_HK_FIRE, &item->Pose, SoundEnvironment::Land, 0.8f);
+			SoundEffect(SFX_TR4_HK_FIRE, &item->Pose, SoundEnvironment::Land, 0.8f);
 
 		if (!(GlobalCounter & 1))
 			return AnimateItem(item);
@@ -149,7 +149,7 @@ void ControlGunShip(short itemNumber)
 
 		if (GunShipCounter < 15)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			spark->sR = spark->dR = (GetRandomControl() & 0x7F) + -128;
@@ -163,7 +163,7 @@ void ControlGunShip(short itemNumber)
 			spark->dR = 0;
 			spark->dG = 0;
 			spark->colFadeSpeed = 12;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->fadeToBlack = 0;
 			spark->life = 12;
 			spark->sLife = 12;

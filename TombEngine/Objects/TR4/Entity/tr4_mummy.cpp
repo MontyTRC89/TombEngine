@@ -14,6 +14,7 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO MummyBite1 = { 0, 0, 0, 11 };
 	BITE_INFO MummyBite2 = { 0, 0, 0, 14 };
+	const std::vector<int> MummyAttackJoints { 11, 14 };
 
 	enum MymmyState
 	{
@@ -271,7 +272,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0x4800)
+					if (item->TestBits(JointBitType::Touch, MummyAttackJoints))
 					{
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)

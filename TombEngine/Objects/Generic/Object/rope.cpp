@@ -625,7 +625,7 @@ namespace TEN::Entities::Generic
 
 			if (item->Animation.AnimNumber == LA_ROPE_DOWN && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->Pose);
+				SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &LaraItem->Pose);
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				Lara.Control.Rope.Flag = 0;
 				++Lara.Control.Rope.Segment;

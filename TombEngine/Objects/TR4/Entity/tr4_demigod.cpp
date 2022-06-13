@@ -14,6 +14,7 @@
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
+#include "Renderer/Renderer11Enums.h"
 
 namespace TEN::Entities::TR4
 {
@@ -95,7 +96,7 @@ namespace TEN::Entities::TR4
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			if (fx->flag1 == 3 || fx->flag1 == 4)
@@ -119,7 +120,7 @@ namespace TEN::Entities::TR4
 
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;
@@ -145,7 +146,7 @@ namespace TEN::Entities::TR4
 		}
 	}
 
-	void TriggerDemigodMissile(PoseData* pose, short roomNumber, int flags)
+	void TriggerDemigodMissile(PHD_3DPOS* pose, short roomNumber, int flags)
 	{
 		short fxNumber = CreateNewEffect(roomNumber);
 		if (fxNumber != -1)
@@ -191,7 +192,7 @@ namespace TEN::Entities::TR4
 				GetJointAbsPosition(item, &pos2, 16);
 
 				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, angles);
+				auto pose = PHD_3DPOS(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -209,7 +210,7 @@ namespace TEN::Entities::TR4
 				GetJointAbsPosition(item, &pos2, 16);
 
 				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, angles);
+				auto pose = PHD_3DPOS(pos1, angles);
 				if (item->ObjectNumber == ID_DEMIGOD3)
 					TriggerDemigodMissile(&pose, item->RoomNumber, 3);
 				else
@@ -237,7 +238,7 @@ namespace TEN::Entities::TR4
 				}
 
 				auto angles = EulerAngles::OrientBetweenPoints(pos1.ToVector3(), pos2.ToVector3());
-				auto pose = PoseData(pos1, angles);
+				auto pose = PHD_3DPOS(pos1, angles);
 				TriggerDemigodMissile(&pose, item->RoomNumber, 4);
 			}
 		}
@@ -259,7 +260,7 @@ namespace TEN::Entities::TR4
 				spark->colFadeSpeed = 4;
 				spark->dShade = (GetRandomControl() & 0x1F) + 96;
 				spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-				spark->transType = TransTypeEnum::COLADD;
+				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 				spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 				spark->x = (GetRandomControl() & 0x1F) + x - 16;
 				spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -692,7 +693,7 @@ namespace TEN::Entities::TR4
 					else
 						pos.y = height - 128;
 
-					TriggerShockwave((PoseData*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
+					TriggerShockwave((PHD_3DPOS*)&pos, 24, 88, 256, 128, 128, 128, 32, 0, 2);
 					TriggerHammerSmoke(pos.x, pos.y + 128, pos.z, 8);
 
 					Camera.bounce = -128;

@@ -114,7 +114,7 @@ namespace TEN::Entities::TR4
 	{
 		for (int i = 0; i < maxSparks; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			int random = GetRandomControl();
 
@@ -129,7 +129,7 @@ namespace TEN::Entities::TR4
 			spark->fadeToBlack = 4;
 			spark->life = 9;
 			spark->sLife = 9;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -144,7 +144,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < maxSparks; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			int random = GetRandomControl();
 
@@ -159,7 +159,7 @@ namespace TEN::Entities::TR4
 			spark->dB = ((random / 16) & 0x1F) + 48;
 			spark->life = 9;
 			spark->sLife = 9;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -354,7 +354,7 @@ namespace TEN::Entities::TR4
 									item->HitPoints--;
 
 								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Pose);
-								SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->Pose);
+								SoundEffect(SFX_TR4_HORSE_RICOCHET, &item->Pose);
 
 								auto pos = Vector3Int(0, -128, 80);
 								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);

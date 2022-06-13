@@ -123,7 +123,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	if (LaraCeilingFront(item, lara->Control.MoveAngle, coll->Setup.Radius * 1.5f, 0) > -950)
 		stopped = true;
 
-	// Backup item pos to restore it after coll tests
+	// Restore backup pos after coll tests
 	item->Pose = oldPose;
 
 	// Setup coll lara
@@ -337,12 +337,20 @@ bool TestLaraClimbIdle(ItemInfo* item, CollisionInfo* coll)
 	return true;
 }
 
+bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor)
+{
+	if (floor == nullptr)
+		floor = GetCollision(item).BottomBlock;
+
+	return ((1 << (GetQuadrant(item->Pose.Orientation.y) + 8)) & GetClimbFlags(floor));
+}
+
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 	int shift, result;
 
-	if (!lara->Control.CanClimbLadder)
+	if (!TestLaraNearClimbableWall(item))
 		return false;
 
 	if (item->Animation.VerticalVelocity < 0)
@@ -565,7 +573,7 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 	float turnAngle = outer ? angle : -angle;
 
 	// Backup previous position into array
-	PoseData pos[3] = { item->Pose, item->Pose, item->Pose };
+	PHD_3DPOS pos[3] = { item->Pose, item->Pose, item->Pose };
 
 	// Do a two-step rotation check. First step is real resulting position, and second step is probing
 	// position. We need this because checking at exact ending position does not always return
@@ -1184,7 +1192,7 @@ bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-// TODO: This function and its clone TestLaraCrawlMoveTolerance() should become obsolete with more accurate and accessible collision detection in the future.
+// TODO: This function should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supersedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup)
 {

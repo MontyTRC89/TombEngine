@@ -158,11 +158,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						//HKFlag = 1;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
+							SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
 						}
 					}
 					else
@@ -174,15 +174,12 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					item->Animation.TargetState = WEAPON_STATE_AIM;
 			}
 
-			if (weaponType == LaraWeaponType::HarpoonGun && reloadHarpoonGun)
-				item->Animation.TargetState = WEAPON_STATE_UNAIM;
-
 			if (item->Animation.TargetState != WEAPON_STATE_RECOIL &&
 				//HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_TR4_LARA_HK_FIRE);
-				SoundEffect(SFX_TR4_LARA_HK_STOP, &laraItem->Pose);
+				StopSoundEffect(SFX_TR4_HK_FIRE);
+				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
 				//HKFlag = 0;
 			}
 		}
@@ -234,11 +231,11 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 						item->Animation.TargetState = WEAPON_STATE_UNDERWATER_RECOIL;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, &laraItem->Pose);
+							SoundEffect(SFX_TR4_HK_FIRE, &laraItem->Pose);
 						}
 					}
 					else
@@ -253,8 +250,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 				//HKFlag &&
 				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
 			{
-				StopSoundEffect(SFX_TR4_LARA_HK_FIRE);
-				SoundEffect(SFX_TR4_LARA_HK_STOP, &laraItem->Pose);
+				StopSoundEffect(SFX_TR4_HK_FIRE);
+				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
 				//HKFlag = 0;
 			}
 			/*else if (HKFlag)
@@ -352,7 +349,7 @@ void FireShotgun(ItemInfo* laraItem)
 
 		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
-		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, laraItem));
+		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
 
 		Statistics.Game.AmmoUsed++;
@@ -553,7 +550,6 @@ void HarpoonBoltControl(short itemNumber)
 			item->Animation.VerticalVelocity = -HARPOON_VELOCITY * sin(item->Pose.Orientation.GetX()) / 2;
 		}
 
-		// Update bolt's position
 		TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity);
 	}
 	else
@@ -635,7 +631,7 @@ void HarpoonBoltControl(short itemNumber)
 				if (currentMesh->HitPoints <= 0)
 				{
 					TriggerExplosionSparks(currentMesh->pos.Position.x, currentMesh->pos.Position.y, currentMesh->pos.Position.z, 3, -2, 0, item->RoomNumber);
-					auto pos = PoseData(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.GetY(), 0);
+					auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.GetY(), 0);
 					TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 					ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
 					SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
@@ -877,7 +873,12 @@ void GrenadeControl(short itemNumber)
 	}
 
 	// Update grenade position
-	TranslateItem(item, item->Animation.TargetState/*???*/, item->Animation.Velocity, item->Animation.VerticalVelocity);
+	auto velocity = Vector3Int(
+		item->Animation.Velocity * sin(item->Animation.TargetState),
+		item->Animation.VerticalVelocity,
+		item->Animation.Velocity * cos(item->Animation.TargetState)
+	);
+	item->Pose.Position += velocity;
 
 	// Grenades that originate from first grenade when special ammo is selected
 	if (item->ItemFlags[0] == (int)GrenadeType::Ultra)
@@ -893,13 +894,9 @@ void GrenadeControl(short itemNumber)
 	{
 		// Do grenade's physics
 		float sYrot = item->Pose.Orientation.GetY();
-		item->Pose.Orientation.SetY(item->Animation.TargetState);
+		item->Pose.Orientation.y = item->Animation.TargetState;
 
-		// TODO ??
-		int xv = item->Animation.Velocity * sin(item->Animation.TargetState);
-		int yv = item->Animation.VerticalVelocity;
-		int zv = item->Animation.Velocity * cos(item->Animation.TargetState);
-		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xv, yv, zv);
+		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
 		item->Animation.TargetState = item->Pose.Orientation.GetY();
 		item->Pose.Orientation.SetY(sYrot);
@@ -1022,7 +1019,7 @@ void GrenadeControl(short itemNumber)
 					{
 						// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
 						TriggerExplosionSparks(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, 3, -2, 0, currentItem->RoomNumber);
-						auto pos = PoseData(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
+						auto pos = PHD_3DPOS(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
 						TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 						ExplodeItemNode(currentItem, 0, 0, 128);
 						short currentItemNumber = (currentItem - CollidedItems[0]);
@@ -1045,7 +1042,7 @@ void GrenadeControl(short itemNumber)
 							if (currentMesh->HitPoints <= 0)
 							{
 								TriggerExplosionSparks(currentMesh->pos.Position.x, currentMesh->pos.Position.y, currentMesh->pos.Position.z, 3, -2, 0, item->RoomNumber);
-								auto pos = PoseData(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.GetY(), 0);
+								auto pos = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.GetY(), 0);
 								TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 								ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
 								SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
@@ -1119,7 +1116,7 @@ void FireRocket(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	Ammo& ammos = GetAmmo(laraItem, LaraWeaponType::RocketLauncher);
+	auto& ammos = GetAmmo(laraItem, LaraWeaponType::RocketLauncher);
 	if (!ammos)
 		return;
 
@@ -1310,8 +1307,8 @@ void RocketControl(short itemNumber)
 				{
 					// Smash objects are legacy objects from TRC, let's make them explode in the legacy way
 					TriggerExplosionSparks(currentItem->Pose.Position.x, currentItem->Pose.Position.y, currentItem->Pose.Position.z, 3, -2, 0, currentItem->RoomNumber);
-					auto pos = PoseData(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
-					TriggerShockwave(&pos, 48, 304, 96, 0, 96, 128, 24, 0, 0);
+					auto pose = PHD_3DPOS(currentItem->Pose.Position.x, currentItem->Pose.Position.y - 128, currentItem->Pose.Position.z);
+					TriggerShockwave(&pose, 48, 304, 96, 0, 96, 128, 24, 0, 0);
 					ExplodeItemNode(currentItem, 0, 0, 128);
 					short currentItemNumber = (currentItem - CollidedItems[0]);
 					SmashObject(currentItemNumber);
@@ -1347,8 +1344,8 @@ void RocketControl(short itemNumber)
 					if (currentMesh->HitPoints <= 0)
 					{
 						TriggerExplosionSparks(currentMesh->pos.Position.x, currentMesh->pos.Position.y, currentMesh->pos.Position.z, 3, -2, 0, item->RoomNumber);
-						auto pos = PoseData(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.GetY(), 0);
-						TriggerShockwave(&pos, 40, 176, 64, 0, 96, 128, 16, 0, 0);
+						auto pose = PHD_3DPOS(currentMesh->pos.Position.x, currentMesh->pos.Position.y - 128, currentMesh->pos.Position.z, 0, currentMesh->pos.Orientation.y, 0);
+						TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, 0, 0);
 						ShatterObject(nullptr, currentMesh, -128, item->RoomNumber, 0);
 						SmashedMeshRoom[SmashedMeshCount] = item->RoomNumber;
 						SmashedMesh[SmashedMeshCount] = currentMesh;
@@ -1391,11 +1388,11 @@ void RocketControl(short itemNumber)
 	}
 }
 
-void FireCrossbow(ItemInfo* laraItem, PoseData* pos)
+void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	Ammo& ammos = GetAmmo(laraItem, LaraWeaponType::Crossbow);
+	auto& ammos = GetAmmo(laraItem, LaraWeaponType::Crossbow);
 	if (!ammos)
 		return;
 
@@ -1450,7 +1447,7 @@ void FireCrossbow(ItemInfo* laraItem, PoseData* pos)
 
 		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo;
 
-		SoundEffect(SFX_TR4_LARA_CROSSBOW, &laraItem->Pose);
+		SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
 		Statistics.Game.AmmoUsed++;
@@ -1467,7 +1464,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector*
 
 	auto angles = EulerAngles::OrientBetweenPoints(Vector3(src->x, src->y, src->z), Vector3(target->x, target->y, target->z));
 
-	auto boltPose = PoseData(src->x, src->y, src->z, angles.GetX(), angles.GetY(), angles.GetZ());
+	auto boltPose = PHD_3DPOS(src->x, src->y, src->z, angles.GetX(), angles.GetY(), angles.GetZ());
 	FireCrossbow(laraItem, &boltPose);
 }
 
@@ -1498,7 +1495,6 @@ void CrossbowBoltControl(short itemNumber)
 	else
 		aboveWater = true;
 
-	// Update bolt's position
 	TranslateItem(item, item->Pose.Orientation, item->Animation.Velocity);
 
 	auto probe = GetCollision(item);
@@ -1768,7 +1764,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	{
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
-			Vector3Int pos = {};
+			auto pos = Vector3Int();
 			pos.y = -64;
 			GetLaraJointPosition(&pos, LM_RHAND);
 			TriggerDynamicLight(
@@ -1872,7 +1868,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 {
 	for (int i = 0; i < count; i++)
 	{
-		auto * spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->on = 1;
 		spark->sR = 112;
@@ -1885,7 +1881,7 @@ void SomeSparkEffect(int x, int y, int z, int count)
 		spark->dG = spark->sG >> 1;
 		spark->dB = spark->sB >> 1;
 		spark->sLife = 24;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 5;
 		int random = GetRandomControl() & 0xFFF;
 		spark->xVel = -128 * sin(random << 4);

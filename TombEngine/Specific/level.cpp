@@ -135,7 +135,7 @@ void LoadItems()
 			g_GameScriptEntities->AddName(item->LuaName, i);
 			g_GameScriptEntities->TryAddColliding(i);
 
-			memcpy(&item->StartPose, &item->Pose, sizeof(PoseData));
+			memcpy(&item->StartPose, &item->Pose, sizeof(PHD_3DPOS));
 		}
 
 		for (int i = 0; i < g_Level.NumItems; i++)

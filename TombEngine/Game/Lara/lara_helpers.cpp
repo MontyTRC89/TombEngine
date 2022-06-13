@@ -463,7 +463,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / SECTOR(8);
 		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / SECTOR(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
-		SoundEffect(SFX_TR5_DIVE_SUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
+		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Water, 1.0f + (mul1 + mul2), vol);
 	}
 }
 
@@ -714,7 +714,9 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.SetY(angle);
 	}
 
+	LaraSnapToHeight(item, coll);
 	lara->Control.MoveAngle = angle;
+	lara->Control.TurnRate.y = 0;
 	oldAngle = angle;
 }
 
@@ -792,11 +794,11 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
-		item->Pose.Position.y += CLICK(1);
-		item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + lara->NextCornerPos.Orientation.GetY() / 2);
 		item->Animation.Airborne = true;
 		item->Animation.Velocity = 2;
 		item->Animation.VerticalVelocity = 1;
+		item->Pose.Position.y += CLICK(1);
+		item->Pose.Orientation.y += lara->NextCornerPos.Orientation.y / 2;
 		lara->Control.HandStatus = HandStatus::Free;
 		return;
 	}

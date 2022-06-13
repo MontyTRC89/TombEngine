@@ -36,8 +36,8 @@ struct OLD_CAMERA
 	float actualElevation;
 	float targetElevation;
 	float actualAngle;
-	PoseData pos;
-	PoseData pos2;
+	PHD_3DPOS pos;
+	PHD_3DPOS pos2;
 	Vector3Int target;
 };
 
@@ -91,7 +91,7 @@ void LookAt(CAMERA_INFO* cam, float roll)
 	Vector3 target = Vector3(cam->target.x, cam->target.y, cam->target.z);
 	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
 	float fov = CurrentFOV / 1.333333f;
-	float r = 0; roll;
+	float r = roll;
 
 	g_Renderer.UpdateCameraMatrices(cam, r, fov);
 }
@@ -1061,7 +1061,7 @@ void BinocularCamera(ItemInfo* item)
 		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
 		if (InputBusy & (IN_DESELECT | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
 		{
-			item->MeshBits = -1;
+			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
 			lara->ExtraHeadRot = EulerAngles::Zero;
 			lara->ExtraTorsoRot = EulerAngles::Zero;
@@ -1073,7 +1073,7 @@ void BinocularCamera(ItemInfo* item)
 		}
 	}
 
-	item->MeshBits = 0;
+	item->MeshBits = NO_JOINT_BITS;
 	AlterFOV(7 * (Angle::DegToRad(11.5f) - BinocularRange));
 
 	float headXRot = lara->ExtraHeadRot.GetX() * 2;
@@ -1234,11 +1234,11 @@ void BinocularCamera(ItemInfo* item)
 					firing = true;
 
 					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 					else
 					{
 						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						//SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+						//SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 					}
 				}
 				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
@@ -1255,11 +1255,11 @@ void BinocularCamera(ItemInfo* item)
 						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 					else
@@ -1267,11 +1267,11 @@ void BinocularCamera(ItemInfo* item)
 						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 				}
@@ -1280,11 +1280,11 @@ void BinocularCamera(ItemInfo* item)
 					if (LSHKTimer)
 					{
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 					else
@@ -1293,11 +1293,11 @@ void BinocularCamera(ItemInfo* item)
 						firing = true;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_LARA_HK_SILENCED, nullptr);
+							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
 						else
 						{
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_LARA_HK_FIRE, nullptr);
+							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
 
@@ -1675,14 +1675,14 @@ void ResetLook(ItemInfo* item)
 	}
 }
 
-bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius)
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 {
 	auto dxBox = TO_DX_BBOX(*pos, bounds);
 	auto sphere = BoundingSphere(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), radius);
 	return sphere.Intersects(dxBox);
 }
 
-void ItemPushCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius)
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius)
 {
 	int dx = Camera.pos.x - pos->Position.x;
 	int dz = Camera.pos.z - pos->Position.z;

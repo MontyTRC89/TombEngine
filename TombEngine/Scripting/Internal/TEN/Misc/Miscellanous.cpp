@@ -1,14 +1,14 @@
 #include "framework.h"
 #include "ReservedScriptNames.h"
-#include "Sound\sound.h"
 #include "Vec3/Vec3.h"
 #include "Color/Color.h"
-#include "Game\effects\lightning.h"
-#include "effects\tomb4fx.h"
-#include "effects\effects.h"
-#include "control/los.h"
+#include "Game/camera.h"
+#include "Game/control/los.h"
+#include "Game/effects/lightning.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/effects.h"
+#include "Sound/sound.h"
 #include "Specific/configuration.h"
-#include "camera.h"
 
 /***
 Functions that don't fit in the other modules.
@@ -50,7 +50,7 @@ namespace Misc {
 
 	static void AddShockwave(Vec3 pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
 	{
-		PoseData p;
+		PHD_3DPOS p;
 		p.Position.x = pos.x;
 		p.Position.y = pos.y;
 		p.Position.z = pos.z;
@@ -68,9 +68,9 @@ namespace Misc {
 		TriggerBlood(pos.x, pos.y, pos.z, -1, num);
 	}
 
-	static void AddFireFlame(Vec3 pos, int size)
+	static void AddFireFlame(Vec3 pos, float size)
 	{
-		AddFire(pos.x, pos.y, pos.z, size, FindRoomNumber(pos), true);
+		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(pos), size, 0);
 	}
 
 	static void Earthquake(int strength)
@@ -86,7 +86,7 @@ namespace Misc {
 
 	static void PlaySoundEffect(int id, Vec3 p, int flags)
 	{
-		auto pos = PoseData(p.x, p.y, p.z, EulerAngles::Zero);
+		auto pos = PHD_3DPOS(p.x, p.y, p.z, EulerAngles::Zero);
 		SoundEffect(id, &pos, (SoundEnvironment)flags);
 	}
 

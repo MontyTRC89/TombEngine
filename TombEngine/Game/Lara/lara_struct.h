@@ -928,7 +928,7 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState : int
+enum class TorchState
 {
 	Holding,
 	Throwing,
@@ -1077,7 +1077,7 @@ struct ArmInfo
 	int FrameBase;
 	EulerAngles Orientation;
 	bool Locked;
-	short FlashGun;
+	int FlashGun;
 };
 
 struct FlareData
@@ -1234,6 +1234,12 @@ struct LaraControlData
 	WaterStatus WaterStatus;
 	LaraCountData Count;
 
+	WeaponControlData Weapon;
+	RopeControlData Rope;
+	TightropeControlData Tightrope;
+	SubsuitControlData Subsuit;
+	MinecartControlData Minecart;
+
 	bool CanLook;
 	bool IsMoving;
 	bool KeepLow;
@@ -1243,12 +1249,6 @@ struct LaraControlData
 	bool CanMonkeySwing;
 	bool RunJumpQueued;
 	bool Locked;
-
-	WeaponControlData Weapon;
-	RopeControlData Rope;
-	TightropeControlData Tightrope;
-	SubsuitControlData Subsuit;
-	MinecartControlData Minecart;
 };
 
 struct LaraInfo
@@ -1287,7 +1287,7 @@ struct LaraInfo
 	int ProjectedFloorHeight;
 	EulerAngles TargetOrientation;
 	int WaterSurfaceDist;
-	PoseData NextCornerPos;
+	PHD_3DPOS NextCornerPos;
 
 	// TODO: Use BurnType in place of Burn, BurnBlue, and BurnSmoke. Core didn't make replacing them easy.
 	BurnType BurnType;

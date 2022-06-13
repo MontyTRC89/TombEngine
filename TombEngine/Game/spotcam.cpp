@@ -115,7 +115,7 @@ void InitialiseSpotCam(short Sequence)
 
 	AlterFOV(16380);
 
-	LaraItem->MeshBits = -1;
+	LaraItem->MeshBits = ALL_JOINT_BITS;
 
 	ResetLaraFlex(LaraItem);
 
@@ -521,7 +521,7 @@ void CalculateSpotCameras()
 			}
 		}
 
-		LookAt(&Camera, 0);
+		LookAt(&Camera, croll);
 
 		if (CheckTrigger)
 		{
@@ -814,6 +814,9 @@ void CalculateSpotCameras()
 
 					SplineToCamera = 1;
 				}
+
+				if (CurrentSplineCamera > LastCamera)
+					CurrentSplineCamera = LastCamera;
 			}
 			else
 			{

@@ -41,7 +41,7 @@ struct ROOM_LIGHT
 
 struct MESH_INFO
 {
-	PoseData pos;
+	PHD_3DPOS pos;
 	short staticNumber;
 	short flags;
 	Vector4 color;
@@ -133,8 +133,8 @@ void DoFlipMap(short group);
 void AddRoomFlipItems(ROOM_INFO* room);
 void RemoveRoomFlipItems(ROOM_INFO* room);
 bool IsObjectInRoom(short roomNumber, short objectNumber);
-bool IsPointInRoom(PoseData const& pos, int roomNumber);
-PoseData GetRoomCenter(int roomNumber);
+bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber);
+PHD_3DPOS GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 std::set<int> GetRoomList(int roomNumber);
 

@@ -18,10 +18,12 @@ namespace TEN::Entities::TR4
 
 	BITE_INFO BigScorpionBite1 = { 0, 0, 0, 8 };
 	BITE_INFO BigScorpionBite2 = { 0, 0, 0, 23 };
+	const std::vector<int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
 
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
 	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
+	constexpr auto BIG_SCORPION_ATTACK_RANGE = SECTOR(1.35);
 
 	enum BigScorpionState
 	{
@@ -87,41 +89,41 @@ namespace TEN::Entities::TR4
 		short joint2 = 0;
 		short joint3 = 0;
 
-		int x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.GetY());
-		int z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.GetY());
+		int x = item->Pose.Position.x + SECTOR(0.68f) * sin(item->Pose.Orientation.y);
+		int z = item->Pose.Position.z + SECTOR(0.68f) * cos(item->Pose.Orientation.y);
 
 		auto probe = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 		int height1 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height1) > CLICK(2))
 			probe.Position.Floor = item->Pose.Position.y;
 
-		x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.GetY());
-		z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.GetY());
+		x = item->Pose.Position.x - SECTOR(0.68f) * sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z - SECTOR(0.68f) * cos(item->Pose.Orientation.y);
 
 		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 		int height2 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height2) > CLICK(2))
 			height2 = item->Pose.Position.y;
 
-		short angle1 = atan2(1344, height2 - height1);
+		short angle1 = atan2(SECTOR(1.34), height2 - height1);
 
-		x = item->Pose.Position.x - 682 * sin(item->Pose.Orientation.GetY());
-		z = item->Pose.Position.z + 682 * cos(item->Pose.Orientation.GetY());
+		x = item->Pose.Position.x - SECTOR(0.68f) * sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z + SECTOR(0.68f) * cos(item->Pose.Orientation.y);
 
 		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 		int height3 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height3) > CLICK(2))
 			height3 = item->Pose.Position.y;
 
-		x = item->Pose.Position.x + 682 * sin(item->Pose.Orientation.GetY());
-		z = item->Pose.Position.z - 682 * cos(item->Pose.Orientation.GetY());
+		x = item->Pose.Position.x + SECTOR(0.68f) * sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z - SECTOR(0.68f) * cos(item->Pose.Orientation.y);
 
 		probe = GetCollision(x, item->Pose.Position.y, z, probe.RoomNumber);
 		int height4 = probe.Position.Floor;
 		if (abs(item->Pose.Position.y - height4) > CLICK(2))
 			height4 = item->Pose.Position.y;
 
-		short angle2 = atan2(1344, height4 - height3);
+		float angle2 = atan2(SECTOR(1.34), height4 - height3);
 
 		if (item->HitPoints <= 0)
 		{
@@ -232,7 +234,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
 
-				if (AI.distance > pow(1365, 2))
+				if (AI.distance > pow(BIG_SCORPION_ATTACK_RANGE, 2))
 				{
 					item->Animation.TargetState = BSCORPION_STATE_WALK_FORWARD;
 					break;
@@ -242,7 +244,7 @@ namespace TEN::Entities::TR4
 				{
 					creature->MaxTurn = Angle::DegToRad(2.0f);
 
-					if (GetRandomControl() & 1 &&
+					if (GetRandomControl() & 1 || //If random conditional, OR, troop is almost dying... choose the pincers attack.
 						creature->Enemy->HitPoints <= 15 &&
 						creature->Enemy->ObjectNumber == ID_TROOPS)
 					{
@@ -259,7 +261,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_WALK_FORWARD:
 				creature->MaxTurn = Angle::DegToRad(2.0f);
 
-				if (AI.distance < pow(1365, 2))
+				if (AI.distance < pow(BIG_SCORPION_ATTACK_RANGE, 2))
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
 				else if (AI.distance > pow(853, 2))
 					item->Animation.TargetState = BSCORPION_STATE_RUN_FORWARD;
@@ -269,7 +271,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_RUN_FORWARD:
 				creature->MaxTurn = Angle::DegToRad(3.0f);
 
-				if (AI.distance < pow(1365, 2))
+				if (AI.distance < pow(BIG_SCORPION_ATTACK_RANGE, 2))
 					item->Animation.TargetState = BSCORPION_STATE_IDLE;
 
 				break;
@@ -312,7 +314,7 @@ namespace TEN::Entities::TR4
 						item->Pose.Orientation.GetY() - Angle::DegToRad(180.0f),
 						DoBloodSplat);
 				}
-				else if (item->TouchBits & 0x1B00100)
+				else if (item->TestBits(JointBitType::Touch, BigScorpionAttackJoints))
 				{
 					LaraItem->HitPoints -= BIG_SCORPION_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;
@@ -353,9 +355,8 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = 0;
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
-				{
 					item->TriggerFlags++;
-				}
+
 				if (creature->Enemy &&
 					creature->Enemy->HitPoints <= 0 ||
 					item->TriggerFlags > 6)

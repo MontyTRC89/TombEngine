@@ -1,4 +1,5 @@
 #pragma once
+#include "Game/control/control.h"
 #include "Specific/trmath.h"
 
 enum class LaraWeaponType;
@@ -9,10 +10,10 @@ struct ItemInfo;
 constexpr auto HARPOON_DRAW_ANIM = 1;
 constexpr auto ROCKET_DRAW_ANIM = 0;
 constexpr auto HARPOON_VELOCITY = CLICK(1);
-constexpr auto HARPOON_TIME = 300;
-constexpr auto GRENADE_TIME = 120;
-constexpr auto ROCKET_TIME = 140;
-constexpr auto EXPLOSION_TRIGGER_TIME = 118;
+constexpr auto HARPOON_TIME = 10 * FPS;
+constexpr auto GRENADE_TIME = 4 * FPS;
+constexpr auto ROCKET_TIME = 4.5f * FPS;
+constexpr auto EXPLOSION_TRIGGER_TIME = 4 * FPS - 2;
 constexpr auto ROCKET_VELOCITY = CLICK(2);
 constexpr auto GRENADE_VELOCITY = CLICK(0.5f);
 constexpr auto MAX_GRENADE_VERTICAL_VELOCITY = CLICK(0.5f);
@@ -54,7 +55,7 @@ void GrenadeControl(short itemNumber);
 //void GrenadeExplosionEffects(int x, int y, int z, short roomNumber);
 void FireRocket(ItemInfo* laraItem);
 void RocketControl(short itemNumber);
-void FireCrossbow(ItemInfo* laraItem, PoseData* pos);
+void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos);
 void CrossbowBoltControl(short itemNumber);
 void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector* target);
 

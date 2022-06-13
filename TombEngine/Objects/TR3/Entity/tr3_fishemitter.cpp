@@ -279,7 +279,7 @@ void ControlFish(short itemNumber)
 	{
 		if (item->Flags & OCB_FISH_LETHAL)
 		{
-			PoseData pos;
+			PHD_3DPOS pos;
 			pos.Position = item->Pose.Position + fish->Offset;
 
 			if (FishNearLara(&pos, 256, (pirahnaAttack < 2) ? LaraItem : enemy))
@@ -393,7 +393,7 @@ void ControlFish(short itemNumber)
 	}
 }
 
-bool FishNearLara(PoseData* pos, int distance, ItemInfo* item)
+bool FishNearLara(PHD_3DPOS* pos, int distance, ItemInfo* item)
 {
 	int x = pos->Position.x - item->Pose.Position.x;
 	int y = abs(pos->Position.y - item->Pose.Position.y);

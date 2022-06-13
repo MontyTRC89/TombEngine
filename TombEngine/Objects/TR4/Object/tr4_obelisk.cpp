@@ -44,8 +44,8 @@ void ObeliskControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	short someNumber;
-	PoseData pos;
-	PoseData pos2;
+	PHD_3DPOS pos;
+	PHD_3DPOS pos2;
 
 	if (TriggerActive(item))
 	{
@@ -67,7 +67,7 @@ void ObeliskControl(short itemNumber)
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Pose);
+					SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &item->Pose);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
@@ -112,7 +112,7 @@ void ObeliskControl(short itemNumber)
 			pos.Position.y = item->Pose.Position.y;
 			pos.Position.z = item->Pose.Position.z + SECTOR(8) * cos(item->Pose.Orientation.GetY() + Angle::DegToRad(90.0f));
 
-			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos);
+			SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &pos);
 
 			if (GlobalCounter & 1)
 			{

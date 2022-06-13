@@ -6,7 +6,7 @@ constexpr auto NUM_SPIDERS = 64;
 struct SpiderData
 {
 	byte On;
-	PoseData Pose;
+	PHD_3DPOS Pose;
 	short RoomNumber;
 
 	short Velocity;

@@ -93,8 +93,8 @@ void LookLeftRight(ItemInfo* item);
 void LookUpDown(ItemInfo* item);
 void ResetLook(ItemInfo* item);
 void RumbleScreen();
-bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius);
-void ItemPushCamera(BOUNDING_BOX* bounds, PoseData* pos, int radius);
+bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
+void ItemPushCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, int radius);
 void ItemsCollideCamera();
 
 void SetScreenFadeOut(float speed);

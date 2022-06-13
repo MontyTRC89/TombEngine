@@ -372,7 +372,7 @@ void Moveable::Init()
 	if (!ScriptAssertF(cond, err, m_item->LuaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
-		PoseData center = GetRoomCenter(m_item->RoomNumber);
+		PHD_3DPOS center = GetRoomCenter(m_item->RoomNumber);
 		// reset position but not rotation
 		m_item->Pose.Position.x = center.Position.x;
 		m_item->Pose.Position.y = center.Position.y;
@@ -648,14 +648,14 @@ void Moveable::EnableItem()
 		{
 			if (m_item->Status == ITEM_DEACTIVATED)
 			{
-				m_item->TouchBits = 0;
+				m_item->TouchBits = NO_JOINT_BITS;
 				m_item->Status = ITEM_ACTIVE;
 				AddActiveItem(m_num);
 				EnableBaddyAI(m_num, 1);
 			}
 			else if (m_item->Status == ITEM_INVISIBLE)
 			{
-				m_item->TouchBits = 0;
+				m_item->TouchBits = NO_JOINT_BITS;
 				if (EnableBaddyAI(m_num, 0))
 					m_item->Status = ITEM_ACTIVE;
 				else
@@ -665,7 +665,7 @@ void Moveable::EnableItem()
 		}
 		else
 		{
-			m_item->TouchBits = 0;
+			m_item->TouchBits = NO_JOINT_BITS;
 			AddActiveItem(m_num);
 			m_item->Status = ITEM_ACTIVE;
 		}
@@ -684,7 +684,7 @@ void Moveable::DisableItem()
 		{
 			if (m_item->Status == ITEM_ACTIVE)
 			{
-				m_item->TouchBits = 0;
+				m_item->TouchBits = NO_JOINT_BITS;
 				m_item->Status = ITEM_DEACTIVATED;
 				RemoveActiveItem(m_num);
 				DisableEntityAI(m_num);
@@ -692,7 +692,7 @@ void Moveable::DisableItem()
 		}
 		else
 		{
-			m_item->TouchBits = 0;
+			m_item->TouchBits = NO_JOINT_BITS;
 			RemoveActiveItem(m_num);
 			m_item->Status = ITEM_DEACTIVATED;
 		}
@@ -708,7 +708,7 @@ void Moveable::MakeInvisible()
 	m_item->Status = ITEM_INVISIBLE;
 	if (m_item->Active)
 	{
-		m_item->TouchBits = 0;
+		m_item->TouchBits = NO_JOINT_BITS;
 		RemoveActiveItem(m_num);
 		if (Objects[m_item->ObjectNumber].intelligent)
 		{

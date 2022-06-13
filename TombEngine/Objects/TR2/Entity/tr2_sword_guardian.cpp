@@ -56,7 +56,7 @@ void SwordGuardianControl(short itemNumber)
 			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Pose);
 			//item->meshBits = 0xFFFFFFFF;
 			//item->objectNumber = ID_SAS;
-			ExplodingDeath(itemNumber, -1, 256);
+			ExplodingDeath(itemNumber, ALL_JOINT_BITS, 256);
 			//item->objectNumber = ID_SWAT;
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);

@@ -30,12 +30,12 @@ const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleD
 	return result;
 }
 
-int phd_Distance(PoseData* first, PoseData* second)
+int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
 	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
 }
 
-void phd_RotBoundingBoxNoPersp(PoseData* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
+void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds)
 {
 	auto world = Matrix::CreateFromYawPitchRoll(
 		pos->Orientation.GetY(),
@@ -72,7 +72,7 @@ void InterpolateAngle(short angle, short* rotation, short* outAngle, int shift)
 	*rotation += static_cast<short>(deltaAngle >> shift);
 }
 
-BoundingOrientedBox TO_DX_BBOX(PoseData pos, BOUNDING_BOX* box)
+BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box)
 {
 	auto boxCentre = Vector3((box->X2 + box->X1) / 2.0f, (box->Y2 + box->Y1) / 2.0f, (box->Z2 + box->Z1) / 2.0f);
 	auto boxExtent = Vector3((box->X2 - box->X1) / 2.0f, (box->Y2 - box->Y1) / 2.0f, (box->Z2 - box->Z1) / 2.0f);
@@ -169,23 +169,39 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
-Vector3 TranslateVector(Vector3 vector, float orient, float forward, float vertical, float lateral)
+Vector3 TranslateVector(Vector3 vector, float angle, float forward, float vertical, float lateral)
 {
-	float sinOrient = sin(orient);
-	float cosOrient = cos(orient);
+	if (forward == 0.0f && vertical == 0.0f && lateral == 0.0f)
+		return vector;
 
-	vector.x += (forward * sinOrient) + (lateral * cosOrient);
+	float sinAngle = sin(angle);
+	float cosAngle = cos(angle);
+
+	vector.x += (forward * sinAngle) + (lateral * cosAngle);
 	vector.y += vertical;
-	vector.z += (forward * cosOrient) + (lateral * -sinOrient);
+	vector.z += (forward * cosAngle) + (lateral * -sinAngle);
 	return vector;
+}
+
+Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float vertical, float lateral)
+{
+	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
+	return Vector3Int(
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
+	);
 }
 
 Vector3 TranslateVector(Vector3 vector, EulerAngles orient, float distance)
 {
-	float sinX = sin(orient.GetX());
-	float cosX = cos(orient.GetX());
-	float sinY = sin(orient.GetY());
-	float cosY = cos(orient.GetY());
+	if (distance == 0.0f)
+		return vector;
+
+	float sinX = sin(orient.x);
+	float cosX = cos(orient.x);
+	float sinY = sin(orient.y);
+	float cosY = cos(orient.y);
 
 	vector.x += distance * (sinY * cosX);
 	vector.y -= distance * sinX;
@@ -193,26 +209,36 @@ Vector3 TranslateVector(Vector3 vector, EulerAngles orient, float distance)
 	return vector;
 }
 
-Vector3Int TranslateVector(Vector3Int vector, float orient, float forward, float vertical, float lateral)
-{
-	float sinOrient = sin(orient);
-	float cosOrient = cos(orient);
-
-	vector.x += (int)round((forward * sinOrient) + (lateral * cosOrient));
-	vector.y += (int)round(vertical);
-	vector.z += (int)round((forward * cosOrient) + (lateral * -sinOrient));
-	return vector;
-}
-
 Vector3Int TranslateVector(Vector3Int vector, EulerAngles orient, float distance)
 {
-	float sinX = sin(orient.GetX());
-	float cosX = cos(orient.GetX());
-	float sinY = sin(orient.GetY());
-	float cosY = cos(orient.GetY());
+	auto newVector = TranslateVector(vector.ToVector3(), orient, distance);
+	return Vector3Int(
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
+	);
+}
 
-	vector.x += (int)round(distance * (sinY * cosX));
-	vector.y -= (int)round(distance * sinX);
-	vector.z += (int)round(distance * (cosY * cosX));
-	return vector;
+Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
+{
+	if (distance == 0.0f)
+		return vector;
+
+	float distanceBetween = Vector3::Distance(vector, target);
+	if (distance > distanceBetween)
+		return target;
+
+	auto direction = target - vector;
+	direction.Normalize();
+	return (vector + (direction * distance));
+}
+
+Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
+{
+	auto newVector = TranslateVector(vector.ToVector3(), target.ToVector3(), distance);
+	return Vector3Int(
+		(int)round(newVector.x),
+		(int)round(newVector.y),
+		(int)round(newVector.z)
+	);
 }

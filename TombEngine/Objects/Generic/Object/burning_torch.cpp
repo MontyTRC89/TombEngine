@@ -14,6 +14,7 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/los.h"
+#include "Renderer/Renderer11Enums.h"
 
 using namespace TEN::Entities::Effects;
 
@@ -21,7 +22,7 @@ namespace TEN::Entities::Generic
 {
 	void TriggerTorchFlame(char fxObj, char node)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->on = true;
 
@@ -34,7 +35,7 @@ namespace TEN::Entities::Generic
 
 		spark->fadeToBlack = 8;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 12;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 7) + 24;
 
 		spark->x = (GetRandomControl() & 0xF) - 8;
@@ -81,8 +82,8 @@ namespace TEN::Entities::Generic
 				Lara.Torch.State = TorchState::Dropping;
 			}
 			else if (TrInput & IN_DRAW &&
-				!LaraItem->Animation.VerticalVelocity &&
 				!LaraItem->Animation.Airborne &&
+				!LaraItem->Animation.VerticalVelocity &&
 				LaraItem->Animation.ActiveState != LS_JUMP_PREPARE &&
 				LaraItem->Animation.ActiveState != LS_JUMP_UP &&
 				LaraItem->Animation.ActiveState != LS_JUMP_FORWARD &&
@@ -176,7 +177,7 @@ namespace TEN::Entities::Generic
 			if (!(Wibble & 7))
 				TriggerTorchFlame(LaraItem - g_Level.Items.data(), 0);
 
-			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (PoseData*)&pos);
+			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, (PHD_3DPOS*)&pos);
 		}
 	}
 
@@ -185,11 +186,11 @@ namespace TEN::Entities::Generic
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 			CreateFlare(LaraItem, ID_FLARE_ITEM, false);
 
+		Lara.Control.HandStatus = HandStatus::WeaponReady;
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Torch;
 		Lara.Control.Weapon.GunType = LaraWeaponType::Torch;
 		Lara.Flare.ControlLeft = true;
 		Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
-		Lara.Control.HandStatus = HandStatus::WeaponReady;
 		Lara.LeftArm.Locked = false;
 		Lara.LeftArm.FrameNumber = 0;
 		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].framePtr;
@@ -201,23 +202,28 @@ namespace TEN::Entities::Generic
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		auto oldPos = item->Pose.Position;
-
 		if (item->Animation.VerticalVelocity)
+		{
+			item->Pose.Orientation.SetX(item->Pose.Orientation.GetX() - Angle::DegToRad(5.0f));
 			item->Pose.Orientation.SetZ(item->Pose.Orientation.GetZ() + Angle::DegToRad(5.0f));
+		}
 		else if (!item->Animation.Velocity)
 		{
 			item->Pose.Orientation.SetX();
 			item->Pose.Orientation.SetZ();
 		}
 
-		int xv = item->Animation.Velocity * sin(item->Pose.Orientation.GetY());
-		int zv = item->Animation.Velocity * cos(item->Pose.Orientation.GetY());
+		auto velocity = Vector3Int(
+			item->Animation.Velocity * sin(item->Pose.Orientation.GetY()),
+			item->Animation.VerticalVelocity,
+			item->Animation.Velocity * cos(item->Pose.Orientation.GetY())
+		);
 
-		item->Pose.Position.x += xv;
-		item->Pose.Position.z += zv;
+		auto oldPos = item->Pose.Position;
+		item->Pose.Position += Vector3Int(velocity.x, 0, velocity.z);
 
-		if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
+		if (TestEnvironment(ENV_FLAG_WATER, item) ||
+			TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
 			item->Animation.VerticalVelocity += (5 - item->Animation.VerticalVelocity) / 2;
 			item->Animation.Velocity += (5 - item->Animation.Velocity) / 2;
@@ -229,22 +235,24 @@ namespace TEN::Entities::Generic
 			item->Animation.VerticalVelocity += 6;
 
 		item->Pose.Position.y += item->Animation.VerticalVelocity;
+		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
-		DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xv, item->Animation.VerticalVelocity, zv);
-
-		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, 0))
+		// Collide with entities.
+		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, true))
 		{
 			LaraCollision.Setup.EnableObjectPush = true;
 			if (CollidedItems)
 			{
-				if (!Objects[CollidedItems[0]->ObjectNumber].intelligent
-					 && CollidedItems[0]->ObjectNumber != ID_LARA)
+				if (!Objects[CollidedItems[0]->ObjectNumber].intelligent &&
+					CollidedItems[0]->ObjectNumber != ID_LARA)
+				{
 					ObjectCollision(CollidedItems[0] - g_Level.Items.data(), item, &LaraCollision);
+				}
 			}
 			else
 				ItemPushStatic(item, CollidedMeshes[0], &LaraCollision);
 			
-			item->Animation.Velocity >>= 1;
+			item->Animation.Velocity /= 2;
 		}
 
 		if (item->ItemFlags[3])
@@ -260,16 +268,18 @@ namespace TEN::Entities::Generic
 
 	void LaraTorch(Vector3Int* src, Vector3Int* target, int rot, int color)
 	{
-		GameVector pos1;
-		pos1.x = src->x;
-		pos1.y = src->y;
-		pos1.z = src->z;
-		pos1.roomNumber = LaraItem->RoomNumber;
+		auto pos1 = GameVector(
+			src->x,
+			src->y,
+			src->z,
+			LaraItem->RoomNumber
+		);
 
-		GameVector pos2;
-		pos2.x = target->x;
-		pos2.y = target->y;
-		pos2.z = target->z;
+		auto pos2 = GameVector(
+			target->x,
+			target->y,
+			target->z
+		);
 
 		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color >> 1);
 

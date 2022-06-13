@@ -57,7 +57,7 @@ void InitialiseHydra(short itemNumber)
 	item->Pose.Position.x -= CLICK(1);
 }
 
-static void HydraBubblesAttack(PoseData* pos, short roomNumber, int count)
+static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 {
 	short fxNumber = CreateNewEffect(roomNumber);
 	if (fxNumber != NO_ITEM)
@@ -79,7 +79,7 @@ static void HydraBubblesAttack(PoseData* pos, short roomNumber, int count)
 
 void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 	spark->sB = 0;
@@ -90,7 +90,7 @@ void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -120,7 +120,7 @@ void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 
 static void TriggerHydraSparks(short itemNumber, int frame)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 	
 	spark->on = 1;
 	spark->sB = 0;
@@ -138,7 +138,7 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -329,7 +329,7 @@ void HydraControl(short itemNumber)
 				GetJointAbsPosition(item, &pos2, 10);
 
 				auto angles = EulerAngles::OrientBetweenPoints(pos2.ToVector3(), pos1.ToVector3());
-				auto pose = PoseData(pos1, angles);
+				auto pose = PHD_3DPOS(pos1, angles);
 				roomNumber = item->RoomNumber;
 				GetFloor(pos2.x, pos2.y, pos2.z, &roomNumber);
 
@@ -385,7 +385,7 @@ void HydraControl(short itemNumber)
 			if (item->ItemFlags[3] < 12)
 			{
 				ExplodeItemNode(item, 11 - item->ItemFlags[3], 0, 64);
-				SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose);
+				SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 				item->ItemFlags[3]++;
 			}
 		}

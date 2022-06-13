@@ -94,7 +94,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 	}
 }
 
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara)
 {
 	short numItems = 0;
 	short numMeshes = 0;
@@ -157,7 +157,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					if (item == collidingItem ||
 						item->ObjectNumber == ID_LARA && ignoreLara ||
 						item->Flags & 0x8000 ||
-						item->MeshBits == 0 ||
+						item->MeshBits == NO_JOINT_BITS ||
 						(Objects[item->ObjectNumber].drawRoutine == NULL && item->ObjectNumber != ID_LARA) ||
 						(Objects[item->ObjectNumber].collision == NULL && item->ObjectNumber != ID_LARA) ||
 						onlyVisible && item->Status == ITEM_INVISIBLE ||
@@ -428,7 +428,7 @@ bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	auto dest = PoseData(item->Pose.Orientation);
+	auto dest = PHD_3DPOS(item->Pose.Orientation);
 	dest.Orientation.SetY(item->Pose.Orientation.GetY());
 	dest.Orientation.SetZ(item->Pose.Orientation.GetZ());
 
@@ -480,7 +480,7 @@ static bool ItemInRange(int x, int z, int radius)
 	return (pow(x, 2) + pow(z, 2)) <= pow(radius, 2);
 }
 
-bool ItemNearLara(PoseData* pos, int radius)
+bool ItemNearLara(PHD_3DPOS* pos, int radius)
 {
 	GameVector target;
 	target.x = pos->Position.x - LaraItem->Pose.Position.x;
@@ -503,7 +503,7 @@ bool ItemNearLara(PoseData* pos, int radius)
 	return false;
 }
 
-bool ItemNearTarget(PoseData* src, ItemInfo* target, int radius)
+bool ItemNearTarget(PHD_3DPOS* src, ItemInfo* target, int radius)
 {
 	auto pos = src->Position - target->Pose.Position;
 
@@ -523,7 +523,7 @@ bool ItemNearTarget(PoseData* src, ItemInfo* target, int radius)
 	return false;
 }
 
-bool Move3DPosTo3DPos(PoseData* src, PoseData* dest, int velocity, float angleAdd)
+bool Move3DPosTo3DPos(PHD_3DPOS* src, PHD_3DPOS* dest, int velocity, float angleAdd)
 {
 	auto differenceVector = (dest->Position - src->Position);
 	float distance = Vector3::Distance(dest->Position.ToVector3(), src->Position.ToVector3());
@@ -873,7 +873,7 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PoseData pos, CollisionInfo* coll)
+bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, CollisionInfo* coll)
 {
 	bool result = false;
 
@@ -918,7 +918,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PoseData pos, Collisio
 	}
 
 	// Get and test DX item coll bounds
-	auto collBounds = TO_DX_BBOX(PoseData(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox);
+	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox);
 	bool intersects = staticBounds.Intersects(collBounds);
 
 	// Draw item coll bounds
@@ -1008,7 +1008,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PoseData pos, Collisio
 		return false;
 
 	// Check if bounds still collide after top/bottom position correction
-	if (!staticBounds.Intersects(TO_DX_BBOX(PoseData(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox)))
+	if (!staticBounds.Intersects(TO_DX_BBOX(PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox)))
 		return result;
 
 	// Determine identity rotation/distance
@@ -1748,7 +1748,7 @@ void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		item->Status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo * coll)
+void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

@@ -12,6 +12,8 @@
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Renderer/Renderer11Enums.h"
 
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;
@@ -65,7 +67,7 @@ void TriggerChaffEffects(ItemInfo* item, int age)
 		world.Translation().z
 	);
 
-	TriggerChaffEffects(item, &pos, &vel, item->Animation.Velocity, TestEnvironment(ENV_FLAG_WATER, item->RoomNumber), age);
+	TriggerChaffEffects(item, &pos, &vel, item->Animation.Velocity, (bool)(g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER), age);
 }
 
 void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater, int age)
@@ -86,7 +88,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 		color.g = (GetRandomDraw() & 127) + 64;
 		color.b = 192 - color.g;
 
-		TriggerChaffSparkles(pos, vel, &color,age,item);
+		TriggerChaffSparkles(pos, vel, &color, age, item);
 		if (isUnderwater)
 		{
 			TriggerChaffBubbles(pos, item->RoomNumber);
@@ -102,7 +104,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 }
 
 
-void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int age,ItemInfo* item)
+void TriggerChaffSparkles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int age, ItemInfo* item)
 {
 	/*
 	SPARKS* sparkle;
@@ -122,7 +124,7 @@ void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int 
 	sparkle->colFadeSpeed = 3;
 	sparkle->fadeToBlack = 5;
 	sparkle->sLife = sparkle->life = 10;
-	sparkle->transType = TransTypeEnum::COLADD;
+	sparkle->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sparkle->dynamic = true;
 
 	sparkle->x = pos->x + (GetRandomDraw() & 7) - 3;
@@ -177,7 +179,7 @@ void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving,
 		smoke->sLife = rnd;
 	}
 
-	smoke->transType = TransTypeEnum::COLADD;
+	smoke->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	
 	smoke->x = pos->x + (GetRandomControl() & 7) - 3;
 	smoke->y = pos->y + (GetRandomControl() & 7) - 3;
