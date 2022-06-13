@@ -60,6 +60,9 @@ struct SECTOR_FLAGS
 	bool MarkTriggerer;
 	bool MarkTriggererActive; // TODO: IT NEEDS TO BE WRITTEN/READ FROM SAVEGAMES!
 
+	bool MinecartLeft() { return MarkTriggerer; }
+	bool MinecartRight() { return MarkBeetle; }
+
 	bool ClimbPossible(CLIMB_DIRECTION direction)
 	{
 		switch (direction)
