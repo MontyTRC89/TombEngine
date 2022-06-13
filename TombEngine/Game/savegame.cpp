@@ -422,6 +422,7 @@ bool SaveGame::Save(int slot)
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
 		flatbuffers::Offset<Save::QuadBike> quadOffset;
+		flatbuffers::Offset<Save::Minecart> mineOffset;
 		flatbuffers::Offset<Save::UPV> upvOffset;
 
 		flatbuffers::Offset<Save::Short> shortOffset;
@@ -504,6 +505,25 @@ bool SaveGame::Save(int slot)
 			upvBuilder.add_x_rot(upv->XRot);
 			upvOffset = upvBuilder.Finish();
 		}
+		else if (itemToSerialize.Data.is<MinecartInfo>())
+		{
+			auto mine = (MinecartInfo*)itemToSerialize.Data;
+
+			Save::MinecartBuilder mineBuilder{ fbb };
+
+			mineBuilder.add_flags(mine->Flags);
+			mineBuilder.add_floor_height_front(mine->FloorHeightFront);
+			mineBuilder.add_floor_height_middle(mine->FloorHeightMiddle);
+			mineBuilder.add_gradient(mine->Gradient);
+			mineBuilder.add_stop_delay(mine->StopDelay);
+			mineBuilder.add_turn_len(mine->TurnLen);
+			mineBuilder.add_turn_rot(mine->TurnRot);
+			mineBuilder.add_turn_x(mine->TurnX);
+			mineBuilder.add_turn_z(mine->TurnZ);
+			mineBuilder.add_velocity(mine->Velocity);
+			mineBuilder.add_vertical_velocity(mine->VerticalVelocity);
+			mineOffset = mineBuilder.Finish();
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			Save::ShortBuilder sb{ fbb };
@@ -575,6 +595,11 @@ bool SaveGame::Save(int slot)
 		{
 			serializedItem.add_data_type(Save::ItemData::UPV);
 			serializedItem.add_data(upvOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<MinecartInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Minecart);
+			serializedItem.add_data(mineOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -1322,6 +1347,23 @@ bool SaveGame::Load(int slot)
 			upv->Rot = savedUpv->rot();
 			upv->Velocity = savedUpv->velocity();
 			upv->XRot = savedUpv->x_rot();
+		}
+		else if (item->Data.is<MinecartInfo>())
+		{
+			auto mine = (MinecartInfo*)item->Data;
+			auto savedMine = (Save::Minecart*)savedItem->data();
+
+			mine->Flags = savedMine->flags();
+			mine->FloorHeightFront = savedMine->floor_height_front();
+			mine->FloorHeightMiddle = savedMine->floor_height_middle();
+			mine->Gradient = savedMine->gradient();
+			mine->StopDelay = savedMine->stop_delay();
+			mine->TurnLen = savedMine->turn_len();
+			mine->TurnRot = savedMine->turn_rot();
+			mine->TurnX = savedMine->turn_x();
+			mine->TurnZ = savedMine->turn_z();
+			mine->Velocity = savedMine->velocity();
+			mine->VerticalVelocity = savedMine->vertical_velocity();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
