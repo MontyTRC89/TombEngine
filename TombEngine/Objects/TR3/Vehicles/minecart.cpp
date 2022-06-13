@@ -293,13 +293,13 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 	auto* minecart = (MinecartInfo*)minecartItem->Data;
+	auto flags = GetCollision(minecartItem).BottomBlock->Flags;
 
 	if (minecart->StopDelay)
 		minecart->StopDelay--;
 
-	if ((lara->Control.Minecart.Left && lara->Control.Minecart.Right && !minecart->StopDelay) &&
-		(minecartItem->Pose.Position.x & 0x380 == 512 ||
-			minecartItem->Pose.Orientation.z & 0x380 == 512))
+	if ((flags.MinecartLeft() && flags.MinecartRight() && !minecart->StopDelay) &&
+		((minecartItem->Pose.Position.x & 0x380) == 512 || (minecartItem->Pose.Position.z & 0x380) == 512))
 	{
 		if (minecart->Velocity < 0xf000)
 		{
@@ -312,13 +312,13 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 			minecart->StopDelay = 16;
 	}
 
-	if ((lara->Control.Minecart.Left || lara->Control.Minecart.Right) &&
-		!(lara->Control.Minecart.Left && lara->Control.Minecart.Right) &&
+	if ((flags.MinecartLeft() || flags.MinecartRight()) &&
+		!(flags.MinecartLeft() && flags.MinecartRight()) &&
 		!minecart->StopDelay &&
 		!(minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT)))
 	{
 		short angle;
-		unsigned short rotation = (((unsigned short)minecartItem->Pose.Orientation.y) / ANGLE(90.0f)) | (lara->Control.Minecart.Left * 4);
+		unsigned short rotation = (((unsigned short)minecartItem->Pose.Orientation.y) / ANGLE(90.0f)) | (flags.MinecartLeft() * 4);
 
 		switch (rotation)
 		{
@@ -380,15 +380,14 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 			minecart->TurnLen = angle;
 		}
 
-		minecart->Flags |= (lara->Control.Minecart.Left) ? CART_FLAG_TURNING_LEFT : CART_FLAG_TURNING_RIGHT;
+		minecart->Flags |= (flags.MinecartLeft()) ? CART_FLAG_TURNING_LEFT : CART_FLAG_TURNING_RIGHT;
 	}
 
 	if (minecart->Velocity < CART_MIN_SPEED)
 		minecart->Velocity = CART_MIN_SPEED;
 
-	minecart->Velocity += -minecart->Gradient * 4;
+	minecart->Velocity -= minecart->Gradient * 4;
 
-	minecart->Velocity /= 256; // TODO: Then why use the huge values in the first place??
 	if (minecartItem->Animation.Velocity < CART_MIN_VEL)
 	{
 		minecartItem->Animation.Velocity = CART_MIN_VEL;
@@ -616,10 +615,13 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 			}
 		}
 
-		if (TrInput & CART_IN_DUCK)
-			laraItem->Animation.TargetState = CART_STATE_DUCK;
-		else if (minecart->Velocity > CART_MIN_VEL)
-			laraItem->Animation.TargetState = CART_STATE_MOVE;
+		if (minecart->Velocity > CART_MIN_VEL)
+		{
+			if (TrInput & CART_IN_DUCK)
+				laraItem->Animation.TargetState = CART_STATE_DUCK;
+			else
+				laraItem->Animation.TargetState = CART_STATE_MOVE;
+		}
 
 		break;
 
@@ -879,6 +881,13 @@ void MineCartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		laraItem->Pose.Orientation.x = minecartItem->Pose.Orientation.x;
 		laraItem->Pose.Orientation.y = minecartItem->Pose.Orientation.y;
 		laraItem->Pose.Orientation.z = minecartItem->Pose.Orientation.z;
+
+		auto* minecart = (MinecartInfo*)minecartItem->Data;
+
+		minecart->Flags = 0;
+		minecart->Gradient = 0;
+		minecart->Velocity = 0;
+		minecart->VerticalVelocity = 0;
 	}
 	else
 		ObjectCollision(itemNumber, laraItem, coll);

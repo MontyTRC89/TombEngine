@@ -69,10 +69,6 @@ struct SubsuitControlData;
 struct SubsuitControlDataBuilder;
 struct SubsuitControlDataT;
 
-struct MinecartControlData;
-struct MinecartControlDataBuilder;
-struct MinecartControlDataT;
-
 struct LaraControlData;
 struct LaraControlDataBuilder;
 struct LaraControlDataT;
@@ -2808,75 +2804,6 @@ inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlDataDirect(
 
 flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuffers::FlatBufferBuilder &_fbb, const SubsuitControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct MinecartControlDataT : public flatbuffers::NativeTable {
-  typedef MinecartControlData TableType;
-  bool left = false;
-  bool right = false;
-};
-
-struct MinecartControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef MinecartControlDataT NativeTableType;
-  typedef MinecartControlDataBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_LEFT = 4,
-    VT_RIGHT = 6
-  };
-  bool left() const {
-    return GetField<uint8_t>(VT_LEFT, 0) != 0;
-  }
-  bool right() const {
-    return GetField<uint8_t>(VT_RIGHT, 0) != 0;
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_LEFT) &&
-           VerifyField<uint8_t>(verifier, VT_RIGHT) &&
-           verifier.EndTable();
-  }
-  MinecartControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(MinecartControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<MinecartControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct MinecartControlDataBuilder {
-  typedef MinecartControlData Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_left(bool left) {
-    fbb_.AddElement<uint8_t>(MinecartControlData::VT_LEFT, static_cast<uint8_t>(left), 0);
-  }
-  void add_right(bool right) {
-    fbb_.AddElement<uint8_t>(MinecartControlData::VT_RIGHT, static_cast<uint8_t>(right), 0);
-  }
-  explicit MinecartControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<MinecartControlData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<MinecartControlData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    bool left = false,
-    bool right = false) {
-  MinecartControlDataBuilder builder_(_fbb);
-  builder_.add_right(right);
-  builder_.add_left(left);
-  return builder_.Finish();
-}
-
-struct MinecartControlData::Traits {
-  using type = MinecartControlData;
-  static auto constexpr Create = CreateMinecartControlData;
-};
-
-flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
 struct LaraControlDataT : public flatbuffers::NativeTable {
   typedef LaraControlData TableType;
   int32_t move_angle = 0;
@@ -2899,7 +2826,6 @@ struct LaraControlDataT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::RopeControlDataT> rope{};
   std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope{};
   std::unique_ptr<TEN::Save::SubsuitControlDataT> subsuit{};
-  std::unique_ptr<TEN::Save::MinecartControlDataT> minecart{};
 };
 
 struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -2926,8 +2852,7 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WEAPON = 36,
     VT_ROPE = 38,
     VT_TIGHTROPE = 40,
-    VT_SUBSUIT = 42,
-    VT_MINECART = 44
+    VT_SUBSUIT = 42
   };
   int32_t move_angle() const {
     return GetField<int32_t>(VT_MOVE_ANGLE, 0);
@@ -2989,9 +2914,6 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::SubsuitControlData *subsuit() const {
     return GetPointer<const TEN::Save::SubsuitControlData *>(VT_SUBSUIT);
   }
-  const TEN::Save::MinecartControlData *minecart() const {
-    return GetPointer<const TEN::Save::MinecartControlData *>(VT_MINECART);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
@@ -3019,8 +2941,6 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(tightrope()) &&
            VerifyOffset(verifier, VT_SUBSUIT) &&
            verifier.VerifyTable(subsuit()) &&
-           VerifyOffset(verifier, VT_MINECART) &&
-           verifier.VerifyTable(minecart()) &&
            verifier.EndTable();
   }
   LaraControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -3092,9 +3012,6 @@ struct LaraControlDataBuilder {
   void add_subsuit(flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit) {
     fbb_.AddOffset(LaraControlData::VT_SUBSUIT, subsuit);
   }
-  void add_minecart(flatbuffers::Offset<TEN::Save::MinecartControlData> minecart) {
-    fbb_.AddOffset(LaraControlData::VT_MINECART, minecart);
-  }
   explicit LaraControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -3127,10 +3044,8 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     flatbuffers::Offset<TEN::Save::WeaponControlData> weapon = 0,
     flatbuffers::Offset<TEN::Save::RopeControlData> rope = 0,
     flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope = 0,
-    flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0,
-    flatbuffers::Offset<TEN::Save::MinecartControlData> minecart = 0) {
+    flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0) {
   LaraControlDataBuilder builder_(_fbb);
-  builder_.add_minecart(minecart);
   builder_.add_subsuit(subsuit);
   builder_.add_tightrope(tightrope);
   builder_.add_rope(rope);
@@ -7191,35 +7106,6 @@ inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuff
       _hit_count);
 }
 
-inline MinecartControlDataT *MinecartControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<MinecartControlDataT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void MinecartControlData::UnPackTo(MinecartControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = left(); _o->left = _e; }
-  { auto _e = right(); _o->right = _e; }
-}
-
-inline flatbuffers::Offset<MinecartControlData> MinecartControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateMinecartControlData(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const MinecartControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _left = _o->left;
-  auto _right = _o->right;
-  return TEN::Save::CreateMinecartControlData(
-      _fbb,
-      _left,
-      _right);
-}
-
 inline LaraControlDataT *LaraControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraControlDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -7249,7 +7135,6 @@ inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::r
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = tightrope(); if (_e) _o->tightrope = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = subsuit(); if (_e) _o->subsuit = std::unique_ptr<TEN::Save::SubsuitControlDataT>(_e->UnPack(_resolver)); }
-  { auto _e = minecart(); if (_e) _o->minecart = std::unique_ptr<TEN::Save::MinecartControlDataT>(_e->UnPack(_resolver)); }
 }
 
 inline flatbuffers::Offset<LaraControlData> LaraControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -7280,7 +7165,6 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   auto _rope = _o->rope ? CreateRopeControlData(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _tightrope = _o->tightrope ? CreateTightropeControlData(_fbb, _o->tightrope.get(), _rehasher) : 0;
   auto _subsuit = _o->subsuit ? CreateSubsuitControlData(_fbb, _o->subsuit.get(), _rehasher) : 0;
-  auto _minecart = _o->minecart ? CreateMinecartControlData(_fbb, _o->minecart.get(), _rehasher) : 0;
   return TEN::Save::CreateLaraControlData(
       _fbb,
       _move_angle,
@@ -7302,8 +7186,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
       _weapon,
       _rope,
       _tightrope,
-      _subsuit,
-      _minecart);
+      _subsuit);
 }
 
 inline LaraT *Lara::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
