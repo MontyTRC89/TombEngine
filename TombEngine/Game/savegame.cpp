@@ -310,11 +310,6 @@ bool SaveGame::Save(int slot)
 	subsuitControl.add_hit_count(Lara.Control.Subsuit.HitCount);
 	auto subsuitControlOffset = subsuitControl.Finish();
 
-	Save::MinecartControlDataBuilder minecartControl{ fbb };
-	minecartControl.add_left(Lara.Control.Minecart.Left);
-	minecartControl.add_right(Lara.Control.Minecart.Right);
-	auto minecartControlOffset = minecartControl.Finish();
-
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_turn_rate(Lara.Control.TurnRate);
@@ -331,7 +326,6 @@ bool SaveGame::Save(int slot)
 	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
 	control.add_locked(Lara.Control.Locked);
-	control.add_minecart(minecartControlOffset);
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
@@ -1615,8 +1609,6 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.Orientation.z = s->lara()->right_arm()->rotation()->z();
 	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
 	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
-	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
-	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
 	Lara.Control.Rope.Direction = s->lara()->control()->rope()->direction();
 	Lara.Control.Rope.ArcFront = s->lara()->control()->rope()->arc_front();
