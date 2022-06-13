@@ -36,7 +36,7 @@ using std::vector;
 
 #define CART_IN_SWIPE		IN_ACTION
 #define CART_IN_DUCK		IN_CROUCH
-#define CART_IN_DISMOUNT	IN_ROLL
+#define CART_IN_DISMOUNT	(IN_ROLL | IN_JUMP)
 #define CART_IN_BRAKE		(IN_BACK | IN_JUMP)
 #define CART_IN_LEFT		IN_LEFT
 #define CART_IN_RIGHT		IN_RIGHT
@@ -117,6 +117,8 @@ enum MinecartAnim
 	CART_ANIM_DISMOUNT_RIGHT = 47,
 	CART_ANIM_BRAKE = 48,
 };
+
+#define CART_ANIM_WRENCH_GRAB_FRAME 20
 
 enum MinecartFlags
 {
@@ -672,10 +674,10 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 	case CART_STATE_DISMOUNT:
 		if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_PUT_DOWN_WRENCH)
 		{
-			if (laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, 20) &&
+			if (laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, CART_ANIM_WRENCH_GRAB_FRAME) &&
 				minecart->Flags & CART_FLAG_MESH)
 			{
-				lara->MeshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+				lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 				minecart->Flags &= ~CART_FLAG_MESH;
 			}
 
@@ -723,15 +725,14 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 
 	case CART_STATE_MOUNT:
 		if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_PICK_UP_WRENCH &&
-			
 			!minecart->Flags & CART_FLAG_MESH)
 		{
-			auto temp = g_Level.Meshes[lara->MeshPtrs[LM_RHAND]];
-
-			lara->MeshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
-			g_Level.Meshes[Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND] = temp;
-
-			minecart->Flags |= CART_FLAG_MESH;
+			if (!(minecart->Flags & CART_FLAG_MESH) &&
+				laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, CART_ANIM_WRENCH_GRAB_FRAME))
+			{
+				lara->MeshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
+				minecart->Flags |= CART_FLAG_MESH;
+			}
 		}
 
 		break;
