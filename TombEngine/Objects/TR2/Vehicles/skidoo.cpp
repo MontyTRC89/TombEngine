@@ -324,66 +324,14 @@ void SkidooCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	skidooItem->Collidable = true;
 }
 
-
 void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
-	vector<short> roomsList;
-	roomsList.push_back(skidooItem->RoomNumber);
+	CollisionInfo coll = {};
+	coll.Setup.Radius = SKIDOO_RADIUS;
+	coll.Setup.EnableObjectPush = true;
+	coll.Setup.OldPosition = skidooItem->Pose.Position;
 
-	auto* room = &g_Level.Rooms[skidooItem->RoomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-		roomsList.push_back(room->doors[i].room);
-
-	for (int i = 0; i < roomsList.size(); i++)
-	{
-		short itemNumber = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNumber != NO_ITEM)
-		{
-			auto* item = &g_Level.Items[itemNumber];
-
-			if (item->Collidable &&
-				item->Status != IFLAG_INVISIBLE &&
-				item != laraItem && item != skidooItem)
-			{
-				auto* object = &Objects[item->ObjectNumber];
-
-				if (object->collision && object->intelligent)
-				{
-					int x = skidooItem->Pose.Position.x - item->Pose.Position.x;
-					int y = skidooItem->Pose.Position.y - item->Pose.Position.y;
-					int z = skidooItem->Pose.Position.z - item->Pose.Position.z;
-
-					if (x > -2048 && x < 2048 &&
-						y > -2048 && y < 2048 &&
-						z > -2048 && z < 2048)
-					{
-						if (item->ObjectNumber == ID_ROLLINGBALL)
-						{
-							if (TestBoundsCollide(item, laraItem, 100))
-							{
-								if (laraItem->HitPoints > 0)
-								{
-									DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - CLICK(2), laraItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.y, laraItem->RoomNumber, 5);
-									item->HitPoints -= 8;
-								}
-							}
-						}
-						else
-						{
-							if (TestBoundsCollide(item, skidooItem, SKIDOO_FRONT))
-							{
-								DoLotsOfBlood(skidooItem->Pose.Position.x, skidooItem->Pose.Position.y, skidooItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
-								item->HitPoints = 0;
-							}
-						}
-					}
-				}
-			}
-
-			itemNumber = item->NextItem;
-		}
-	}
+	DoObjectCollision(skidooItem, &coll, true);
 }
 
 void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)

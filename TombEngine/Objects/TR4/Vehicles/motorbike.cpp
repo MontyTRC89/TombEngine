@@ -644,63 +644,12 @@ static int GetMotorbikeCollisionAnim(ItemInfo* item, Vector3Int* pos)
 
 void MotorbikeBaddyCollision(ItemInfo* bike)
 {
-    int x, y, z, i;
+    CollisionInfo coll = {};
+    coll.Setup.Radius = BIKE_RADIUS;
+    coll.Setup.EnableObjectPush = true;
+    coll.Setup.OldPosition = bike->Pose.Position;
 
-    std::vector<short> roomsList;
-    roomsList.push_back(bike->RoomNumber);
-
-    ROOM_INFO* room = &g_Level.Rooms[bike->RoomNumber];
-    for (i = 0; i < room->doors.size(); i++)
-    {
-        roomsList.push_back(room->doors[i].room);
-    }
-
-    for (int i = 0; i < roomsList.size(); i++)
-    {
-        short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
-
-        while (itemNum != NO_ITEM)
-        {
-            ItemInfo* item = &g_Level.Items[itemNum];
-
-            if (item->Collidable && item->Status != IFLAG_INVISIBLE && item != LaraItem && item != bike)
-            {
-                ObjectInfo* object = &Objects[item->ObjectNumber];
-
-                if (object->collision && (object->intelligent))
-                {
-                    x = bike->Pose.Position.x - item->Pose.Position.x;
-                    y = bike->Pose.Position.y - item->Pose.Position.y;
-                    z = bike->Pose.Position.z - item->Pose.Position.z;
-
-                    if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
-                    {
-                        if (item->ObjectNumber == ID_ROLLINGBALL)
-                        {
-                            if (TestBoundsCollide(item, LaraItem, 100))
-                            {
-                                if (LaraItem->HitPoints > 0)
-                                {
-                                    DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - (STEP_SIZE * 2), LaraItem->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 5);
-                                    LaraItem->HitPoints -= 8;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (TestBoundsCollide(item, bike, BIKE_FRONT))
-                            {
-                                DoLotsOfBlood(bike->Pose.Position.x, bike->Pose.Position.y, bike->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 3);
-                                item->HitPoints = 0;
-                            }
-                        }
-                    }
-                }
-            }
-
-            itemNum = item->NextItem;
-        }
-    }
+    DoObjectCollision(bike, &coll, true);
 }
 
 static int MotorBikeDynamics(ItemInfo* item)

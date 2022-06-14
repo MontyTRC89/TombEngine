@@ -527,83 +527,12 @@ static int GetJeepCollisionAnim(ItemInfo* item, Vector3Int* p)
 
 static void JeepBaddyCollision(ItemInfo* jeep)
 {
-	vector<short> roomsList;
-	short* door, numDoors;
+	CollisionInfo coll = {};
+	coll.Setup.Radius = JEEP_FRONT;
+	coll.Setup.EnableObjectPush = true;
+	coll.Setup.OldPosition = jeep->Pose.Position;
 
-	roomsList.push_back(jeep->RoomNumber);
-
-	ROOM_INFO* room = &g_Level.Rooms[jeep->RoomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-	{
-		roomsList.push_back(room->doors[i].room);
-	}
-
-	for (int i = 0; i < roomsList.size(); i++)
-	{
-		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNum != NO_ITEM)
-		{
-			ItemInfo* item = &g_Level.Items[itemNum];
-			if (item->Collidable && item->Status != ITEM_INVISIBLE && item != LaraItem && item != jeep)
-			{
-				if (item->ObjectNumber == ID_ENEMY_JEEP)
-				{
-					Unk_0080DE1A = 0;
-					Unk_0080DDE8 = 400;
-					Unk_0080DE24 = Unk_0080DE24 & 0xFFDF | 0x10;
-
-					//ObjectCollision(item, jeep, )
-				}
-				else
-				{
-					ObjectInfo* object = &Objects[item->ObjectNumber];
-					if (object->collision && object->intelligent ||
-						item->ObjectNumber == ID_ROLLINGBALL)
-					{
-						int x = jeep->Pose.Position.x - item->Pose.Position.x;
-						int y = jeep->Pose.Position.y - item->Pose.Position.y;
-						int z = jeep->Pose.Position.z - item->Pose.Position.z;
-						if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
-						{
-							if (item->ObjectNumber == ID_ROLLINGBALL)
-							{
-								if (TestBoundsCollide(item, LaraItem, 100))
-								{
-									if (LaraItem->HitPoints > 0)
-									{
-										DoLotsOfBlood(LaraItem->Pose.Position.x,
-											LaraItem->Pose.Position.y - 512,
-											LaraItem->Pose.Position.z,
-											GetRandomControl() & 3,
-											LaraItem->Pose.Orientation.y,
-											LaraItem->RoomNumber,
-											5);
-										item->HitPoints -= 8;
-									}
-								}
-							}
-							else
-							{
-								if (TestBoundsCollide(item, jeep, JEEP_FRONT))
-								{
-									DoLotsOfBlood(item->Pose.Position.x,
-										jeep->Pose.Position.y - STEP_SIZE,
-										item->Pose.Position.z,
-										GetRandomControl() & 3,
-										jeep->Pose.Orientation.y,
-										item->RoomNumber,
-										3);
-									item->HitPoints = 0;
-								}
-							}
-						}
-					}
-				}
-			}
-			itemNum = item->NextItem;
-		}
-	}
+	DoObjectCollision(jeep, &coll, true);
 }
 
 static void JeepExplode(ItemInfo* item)

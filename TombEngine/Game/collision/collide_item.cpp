@@ -1731,19 +1731,15 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 				{
 					item->HitPoints = 0;
 					DoLotsOfBlood(item->Pose.Position.x,
-						laraItem->Pose.Position.y - CLICK(1),
-						item->Pose.Position.z,
-						laraItem->Animation.Velocity,
-						laraItem->Pose.Orientation.y,
-						item->RoomNumber, 3);
+								  laraItem->Pose.Position.y - CLICK(1),
+								  item->Pose.Position.z,
+								  laraItem->Animation.Velocity,
+								  laraItem->Pose.Orientation.y,
+								  item->RoomNumber, 3);
 				}
 				else if (!object->isPickup)
 				{
 					ItemPushItem(item, laraItem, coll, false, 1);
-				}
-				else
-				{
-					auto a = 1;
 				}
 			}
 			else
@@ -1770,6 +1766,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 
 			if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
+				SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
 				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
 				SmashedMeshRoom[SmashedMeshCount] = laraItem->RoomNumber;
 				SmashedMesh[SmashedMeshCount] = mesh;
