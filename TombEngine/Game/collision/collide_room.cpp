@@ -12,7 +12,6 @@
 #include "Specific/trmath.h"
 #include "Renderer/Renderer11.h"
 
-using std::vector;
 using namespace TEN::Floordata;
 using namespace TEN::Renderer;
 
@@ -22,15 +21,14 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3Int();
 }
 
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapToAngle)
 {
-	if (snapYRot)
-		item->Pose.Orientation.y = coll->NearestLedgeAngle;
-
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.z = 0;
-	item->Pose.Position.x += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier));
+	item->Pose.Orientation = Vector3Shrt(
+		0,
+		snapToAngle ? coll->NearestLedgeAngle : item->Pose.Orientation.y,
+		0
+	);
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier)
@@ -39,13 +37,12 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float off
 	coll->Setup.ForwardAngle = angle;
 
 	float distance;
-	auto angle2 = GetNearestLedgeAngle(item, coll, distance);
+	auto ledgeAngle = GetNearestLedgeAngle(item, coll, distance);
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Pose.Orientation = Vector3Shrt(0, angle2, 0);
-	item->Pose.Position.x += round(phd_sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(phd_cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * offsetMultiplier));
+	item->Pose.Orientation = Vector3Shrt(0, ledgeAngle, 0);
 }
 
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)

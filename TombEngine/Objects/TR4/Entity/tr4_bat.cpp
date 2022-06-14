@@ -15,12 +15,13 @@ namespace TEN::Entities::TR4
 {
 	static BITE_INFO BatBite = { 0, 16, 45, 4 };
 
-	#define BAT_ANGLE ANGLE(20.0f)
-
-	constexpr auto BAT_ATTACK_RANGE = SQUARE(CLICK(1));
-	constexpr auto BAT_TARGETING_RANGE = SQUARE(SECTOR(5));
-	constexpr auto BAT_TARGET_YPOS = 896;
 	constexpr auto BAT_DAMAGE = 50;
+
+	constexpr auto BAT_UNFURL_HEIGHT_RANGE = SECTOR(0.87f);
+	constexpr auto BAT_ATTACK_RANGE = CLICK(1);
+	constexpr auto BAT_AWARE_RANGE = SECTOR(5);
+
+	#define BAT_ANGLE ANGLE(20.0f)
 
 	enum BatState
 	{
@@ -56,8 +57,8 @@ namespace TEN::Entities::TR4
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = BAT_STATE_IDLE;
 		item->Animation.ActiveState = BAT_STATE_IDLE;
+		item->Animation.TargetState = BAT_STATE_IDLE;
 	}
 
 	void BatControl(short itemNumber)
@@ -83,11 +84,9 @@ namespace TEN::Entities::TR4
 			{
 				creature->Enemy = LaraItem;
 
-				// NOTE: it seems weird, bat could target any enemy including dogs for example
+				// NOTE: It seems unusual that the bat can target any enemy.
+				// Check if Von Croy is in range; the bat will always target him if he exists and ignore Lara completely. @TokyoSU
 
-				// check if voncroy are in range !
-				// take in account that the bat will always target voncroy if he exist and triggered !
-				// the bat will ignore lara completly !
 				/*bestdistance = MAXINT;
 				bat->enemy = LaraItem;
 
@@ -113,9 +112,9 @@ namespace TEN::Entities::TR4
 				}*/
 			}
 
-			// NOTE: chaned from TIMID to VIOLENT, otherwise the bat seems to ignore Lara. 
-			// Personally, i feel fine with bat always VIOLENT, but I will inspect also GetCreatureMood and CreatureMood functions
-			// for bugs.
+			// NOTE: Changed from TIMID to VIOLENT, otherwise the bat seems to ignore Lara. 
+			// I feel fine with bat always VIOLENT,
+			// but I will also inspect GetCreatureMood and CreatureMood functions for bugs. @TokyoSU
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
@@ -132,21 +131,21 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case BAT_STATE_IDLE:
-				if (AI.distance < BAT_TARGETING_RANGE || item->HitStatus || creature->HurtByLara)
+				if (AI.distance < pow(BAT_AWARE_RANGE , 2)|| item->HitStatus || creature->HurtByLara)
 					item->Animation.TargetState = BAT_STATE_DROP_FROM_CEILING;
 
 				break;
 
 			case BAT_STATE_FLY:
-				if (AI.distance < BAT_ATTACK_RANGE || !(GetRandomControl() & 0x3F))
+				if (AI.distance < pow(BAT_ATTACK_RANGE, 2) || !(GetRandomControl() & 0x3F))
 					creature->Flags = 0;
 
 				if (!creature->Flags)
 				{
 					if (item->TouchBits ||
 						(creature->Enemy != LaraItem &&
-						AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
-						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_TARGET_YPOS))
+						AI.distance < pow(BAT_ATTACK_RANGE, 2) && AI.ahead &&
+						abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE))
 					{
 						item->Animation.TargetState = BAT_STATE_ATTACK;
 					}
@@ -157,8 +156,8 @@ namespace TEN::Entities::TR4
 			case BAT_STATE_ATTACK:
 				if (!creature->Flags &&
 					(item->TouchBits || creature->Enemy != LaraItem) &&
-					AI.distance < BAT_ATTACK_RANGE && AI.ahead &&
-					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_TARGET_YPOS)
+					AI.distance < pow(BAT_ATTACK_RANGE, 2) && AI.ahead &&
+					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
 					if (creature->Enemy == LaraItem)
@@ -182,8 +181,8 @@ namespace TEN::Entities::TR4
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BAT_ANIM_FLY;
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.TargetState = BAT_STATE_FLY;
 			item->Animation.ActiveState = BAT_STATE_FLY;
+			item->Animation.TargetState = BAT_STATE_FLY;
 		}
 		else
 		{

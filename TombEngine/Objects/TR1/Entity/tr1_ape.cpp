@@ -16,50 +16,64 @@ namespace TEN::Entities::TR1
 	const std::vector<int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	constexpr auto APE_ATTACK_DAMAGE = 200;
+	constexpr auto APE_ATTACK_RANGE = SECTOR(0.42f);
+	constexpr auto APE_PANIC_RANGE = SECTOR(2);
+
+	constexpr auto JUMP_CHANCE = 0xa0;
+	constexpr auto POUND_CHEST_CHANCE = JUMP_CHANCE + 0xA0;
+	constexpr auto POUND_GROUND_CHANCE = POUND_CHEST_CHANCE + 0xA0;
+	constexpr auto RUN_LEFT_CHANCE = POUND_GROUND_CHANCE + 0xA0;
+
+	constexpr auto SHIFT = 75;
 
 	#define RUN_TURN ANGLE(5.0f)
-
 	#define DISPLAY_ANGLE ANGLE(45.0f)
-
-	#define ATTACK_RANGE pow(430, 2)
-	#define PANIC_RANGE  pow(SECTOR(2), 2)
-
-	#define JUMP_CHANCE 0xa0
-	#define WARNING_1_CHANCE (JUMP_CHANCE + 0xA0)
-	#define WARNING_2_CHANCE (WARNING_1_CHANCE + 0xA0)
-	#define RUNLEFT_CHANCE   (WARNING_2_CHANCE + 0x110)
-
-	#define SHIFT 75
 
 	enum ApeState
 	{
 		APE_STATE_NONE = 0,
 		APE_STATE_IDLE = 1,
-		APE_STATE_WALK = 2,
-		APE_STATE_RUN = 3,
+		APE_STATE_WALK_FORWARD = 2,
+		APE_STATE_RUN_FORWARD = 3,
 		APE_STATE_ATTACK = 4,
 		APE_STATE_DEATH = 5,
-		APE_STATE_WARNING_1 = 6,
-		APE_STATE_WARNING_2 = 7,
+		APE_STATE_POUND_CHEST = 6,
+		APE_STATE_POUND_GROUND = 7,
 		APE_STATE_RUN_LEFT = 8,
 		APE_STATE_RUN_RIGHT = 9,
 		APE_STATE_JUMP = 10,
 		APE_STATE_VAULT = 11
 	};
 
-	// TODO
 	enum ApeAnim
 	{
-		APE_ANIM_DEATH = 7,
-
-		APE_ANIM_VAULT = 19,
+		APE_ANIM_IDLE = 0,
+		APE_ANIM_POUND_CHEST = 1,
+		APE_ANIM_POUND_GROUND = 2,
+		APE_ANIM_IDLE_TO_RUN_FORWARD = 3,
+		APE_ANIM_RUN_FORWARD_TO_IDLE = 4,
+		APE_ANIM_JUMP = 5,
+		APE_ANIM_RUN_FORWARD = 6,
+		APE_ANIM_DEATH_1 = 7,
+		APE_ANIM_DEATH_2 = 8,
+		APE_ANIM_ATTACK_START = 9,
+		APE_ANIM_ATTACK_CONTINUE_1 = 10,
+		APE_ANIM_ATTACK_CONTINUE_2 = 11,
+		APE_ANIM_ATTACK_END = 12,
+		APE_ANIM_RUN_LEFT = 13,
+		APE_ANIM_RUN_RIGHT = 14,
+		APE_ANIM_RUN_LEFT_TO_IDLE = 15,
+		APE_ANIM_RUN_RIGHT_TO_IDLE = 16,
+		APE_ANIM_IDLE_TO_RUN_LEFT = 17,
+		APE_ANIM_IDLE_TO_RUN_RIGHT = 18,
+		APE_ANIM_VAULT = 19
 	};
 
 	enum ApeFlags
 	{
-		APE_FLAG_ATTACK = 1,
-		APE_FLAG_TURN_LEFT = 2,
-		APE_FLAG_TURN_RIGHT = 4
+		APE_FLAG_ATTACK = (1 << 0),
+		APE_FLAG_TURN_LEFT = (1 << 1),
+		APE_FLAG_TURN_RIGHT = (1 << 2)
 	};
 
 	void ApeVault(short itemNumber, short angle)
@@ -152,7 +166,7 @@ namespace TEN::Entities::TR1
 		{
 			if (item->Animation.ActiveState != APE_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + APE_ANIM_DEATH + (short)(GetRandomControl() / 0x4000);
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + APE_ANIM_DEATH_1 + (short)(GetRandomControl() / 0x4000);
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = APE_STATE_DEATH;
 			}
@@ -170,7 +184,7 @@ namespace TEN::Entities::TR1
 
 			angle = CreatureTurn(item, creatureInfo->MaxTurn);
 
-			if (item->HitStatus || AI.distance < PANIC_RANGE)
+			if (item->HitStatus || AI.distance < pow(APE_PANIC_RANGE, 2))
 				creatureInfo->Flags |= APE_FLAG_ATTACK;
 
 			short random;
@@ -180,7 +194,7 @@ namespace TEN::Entities::TR1
 			case APE_STATE_IDLE:
 				if (creatureInfo->Flags & APE_FLAG_TURN_LEFT)
 				{
-					item->Pose.Orientation.y -= ANGLE(90);
+					item->Pose.Orientation.y -= ANGLE(90.0f);
 					creatureInfo->Flags -= APE_FLAG_TURN_LEFT;
 				}
 				else if (item->Flags & APE_FLAG_TURN_RIGHT)
@@ -191,7 +205,7 @@ namespace TEN::Entities::TR1
 
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < ATTACK_RANGE)
+				else if (AI.bite && AI.distance < pow(APE_ATTACK_RANGE, 2))
 					item->Animation.TargetState = APE_STATE_ATTACK;
 				else if (!(creatureInfo->Flags & APE_FLAG_ATTACK) &&
 					AI.zoneNumber == AI.enemyZone && AI.ahead)
@@ -199,11 +213,11 @@ namespace TEN::Entities::TR1
 					random = (short)(GetRandomControl() / 32);
 					if (random < JUMP_CHANCE)
 						item->Animation.TargetState = APE_STATE_JUMP;
-					else if (random < WARNING_1_CHANCE)
-						item->Animation.TargetState = APE_STATE_WARNING_1;
-					else if (random < WARNING_2_CHANCE)
-						item->Animation.TargetState = APE_STATE_WARNING_2;
-					else if (random < RUNLEFT_CHANCE)
+					else if (random < POUND_CHEST_CHANCE)
+						item->Animation.TargetState = APE_STATE_POUND_CHEST;
+					else if (random < POUND_GROUND_CHANCE)
+						item->Animation.TargetState = APE_STATE_POUND_GROUND;
+					else if (random < RUN_LEFT_CHANCE)
 					{
 						item->Animation.TargetState = APE_STATE_RUN_LEFT;
 						creatureInfo->MaxTurn = 0;
@@ -215,11 +229,11 @@ namespace TEN::Entities::TR1
 					}
 				}
 				else
-					item->Animation.TargetState = APE_STATE_RUN;
+					item->Animation.TargetState = APE_STATE_RUN_FORWARD;
 
 				break;
 
-			case APE_STATE_RUN:
+			case APE_STATE_RUN_FORWARD:
 				creatureInfo->MaxTurn = RUN_TURN;
 
 				if (creatureInfo->Flags == 0 &&
@@ -241,14 +255,14 @@ namespace TEN::Entities::TR1
 						item->Animation.RequiredState = APE_STATE_JUMP;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (random < WARNING_1_CHANCE)
+					else if (random < POUND_CHEST_CHANCE)
 					{
-						item->Animation.RequiredState = APE_STATE_WARNING_1;
+						item->Animation.RequiredState = APE_STATE_POUND_CHEST;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (random < WARNING_2_CHANCE)
+					else if (random < POUND_GROUND_CHANCE)
 					{
-						item->Animation.RequiredState = APE_STATE_WARNING_2;
+						item->Animation.RequiredState = APE_STATE_POUND_GROUND;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
 				}
@@ -258,7 +272,7 @@ namespace TEN::Entities::TR1
 			case APE_STATE_RUN_LEFT:
 				if (!(creatureInfo->Flags & APE_FLAG_TURN_RIGHT))
 				{
-					item->Pose.Orientation.y -= ANGLE(90);
+					item->Pose.Orientation.y -= ANGLE(90.0f);
 					creatureInfo->Flags |= APE_FLAG_TURN_RIGHT;
 				}
 
@@ -268,7 +282,7 @@ namespace TEN::Entities::TR1
 			case APE_STATE_RUN_RIGHT:
 				if (!(creatureInfo->Flags & APE_FLAG_TURN_LEFT))
 				{
-					item->Pose.Orientation.y += ANGLE(90);
+					item->Pose.Orientation.y += ANGLE(90.0f);
 					creatureInfo->Flags |= APE_FLAG_TURN_LEFT;
 				}
 
