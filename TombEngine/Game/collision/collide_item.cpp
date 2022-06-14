@@ -8,6 +8,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/debris.h"
 #include "Game/collision/sphere.h"
 #include "Game/room.h"
 #include "Specific/setup.h"
@@ -826,7 +827,6 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 	if (coll->CollisionType == CT_NONE)
 	{
 		coll->Setup.OldPosition = item->Pose.Position;
-
 		UpdateItemRoom(item, -10);
 	}
 	else
@@ -1681,7 +1681,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode) // previously LaraBaddyCollision
 {
 	laraItem->HitStatus = false;
-	coll->HitStatic = false;
+	coll->HitStatic     = false;
 
 	bool playerCollision = laraItem->Data.is<LaraInfo*>();
 
@@ -1699,12 +1699,12 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 	for (auto i : GetRoomList(laraItem->RoomNumber))
 	{
 		int nextItem = g_Level.Rooms[i].itemNumber;
-		int itemNumber = nextItem;
-		ItemInfo* item;
-
-		while (nextItem != NO_ITEM, 
-			   item = &g_Level.Items[nextItem], itemNumber = nextItem, nextItem = item->NextItem)
+		while (nextItem != NO_ITEM)
 		{
+			auto* item = &g_Level.Items[nextItem];
+			int itemNumber = nextItem;
+			nextItem = item->NextItem;
+
 			if (item == laraItem)
 				continue;
 
@@ -1739,7 +1739,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 				}
 				else if (!object->isPickup)
 				{
-					ItemPushItem(item, laraItem, coll, false, 0);
+					ItemPushItem(item, laraItem, coll, false, 1);
 				}
 				else
 				{
@@ -1768,7 +1768,15 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 
 			coll->HitStatic = true;
 
-			if (coll->Setup.EnableObjectPush)
+			if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+			{
+				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
+				SmashedMeshRoom[SmashedMeshCount] = laraItem->RoomNumber;
+				SmashedMesh[SmashedMeshCount] = mesh;
+				SmashedMeshCount++;
+				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+			}
+			else if (coll->Setup.EnableObjectPush)
 				ItemPushStatic(laraItem, mesh, coll);
 			else
 				break;
