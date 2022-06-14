@@ -109,7 +109,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case ID_MINECART:
-			MineCartControl(item);
+			MinecartControl(item);
 			break;
 
 		case ID_BIGGUN:

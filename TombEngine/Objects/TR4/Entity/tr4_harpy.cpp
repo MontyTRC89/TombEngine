@@ -14,6 +14,8 @@
 #include "Game/control/control.h"
 #include "Renderer/Renderer11Enums.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO HarpyBite1 = { 0, 0, 0, 4 };
@@ -21,8 +23,8 @@ namespace TEN::Entities::TR4
 	BITE_INFO HarpyBite3 = { 0, 0, 0, 21 };
 	BITE_INFO HarpyAttack1 = { 0, 128, 0, 2 };
 	BITE_INFO HarpyAttack2 = { 0, 128, 0, 4 };
-	const std::vector<int> HarpySwoopAttackJoints = { 2, 4 };
-	const std::vector<int> HarpyStingerAttackJoints = { 20, 21 };
+	const vector<int> HarpySwoopAttackJoints = { 2, 4 };
+	const vector<int> HarpyStingerAttackJoints = { 20, 21 };
 
 	constexpr auto HARPY_STINGER_ATTACK_DAMAGE = 100;
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE = 10;
