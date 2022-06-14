@@ -10,12 +10,12 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 
-BITE_INFO DobermanBite = { 0, 0x1E, 0x8D, 0x14 };
+BITE_INFO DobermanBite = { 0, 30, 141, 20 };
 
 enum DobermanState {
 	DOBERMAN_STATE_NONE = 0,
-	DOBERMAN_STATE_WALK = 1,
-	DOBERMAN_STATE_RUNNING = 2,
+	DOBERMAN_STATE_WALK_FORWARD = 1,
+	DOBERMAN_STATE_RUN_FORWARD = 2,
 	DOBERMAN_STATE_STOP = 3,
 	DOBERMAN_STATE_STAND_LOW_BITE_ATTACK = 4,
 	DOBERMAN_STATE_SIT_IDLE = 5,
@@ -29,25 +29,25 @@ enum DobermanState {
 enum DobermanAnim {
 	DOBERMAN_ANIM_START_WALK = 0,
 	DOBERMAN_ANIM_WALKING = 1,
-	DOBERMAN_ANIM_START_LOW_BITE_ATTACK = 2,
-	DOBERMAN_ANIM_STANDING_LOW_BITE_ATTACK = 3,
-	DOBERMAN_ANIM_LOW_BITE_STOP = 4,
-	DOBERMAN_ANIM_START_SITTING = 5,
-	DOBERMAN_ANIM_SITTING = 6,
+	DOBERMAN_ANIM_LOW_BITE_ATTACK_START = 2,
+	DOBERMAN_ANIM_LOW_BITE_ATTACK = 3,
+	DOBERMAN_ANIM_LOW_BITE_ATTACK_END = 4,
+	DOBERMAN_ANIM_SIT_START = 5,
+	DOBERMAN_ANIM_SIT = 6,
 	DOBERMAN_ANIM_SIT_TO_STAND = 7,
-	DOBERMAN_ANIM_START_RUN = 8,
+	DOBERMAN_ANIM_RUN_START = 8,
 	DOBERMAN_ANIM_RUNNING = 9,
 	DOBERMAN_ANIM_STAND_IDLE = 10,
 	DOBERMAN_ANIM_IDLE = 11,
-	DOBERMAN_ANIM_STOP_WALKING = 12,
+	DOBERMAN_ANIM_WALK_STOP = 12,
 	DOBERMAN_ANIM_DEATH = 13,
 	DOBERMAN_ANIM_JUMP_BITE = 14,
 	DOBERMAN_ANIM_LEAP_BITE = 15,
-	DOBERMAN_ANIM_START_JUMP_BITE = 16,
-	DOBERMAN_ANIM_START_HIGH_BITE = 17,
+	DOBERMAN_ANIM_JUMP_BITE_START = 16,
+	DOBERMAN_ANIM_HIGH_BITE_START = 17,
 	DOBERMAN_ANIM_HIGH_BITE = 18,
 	DOBERMAN_ANIM_STOP_HIGH_BITE = 19,
-	DOBERMAN_ANIM_STOP_RUNNING = 20,
+	DOBERMAN_ANIM_RUN_STOP = 20,
 };
 
 void InitialiseDoberman(short itemNumber)
@@ -56,7 +56,7 @@ void InitialiseDoberman(short itemNumber)
 
 	if (item->TriggerFlags)
 	{
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DOBERMAN_ANIM_SITTING;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + DOBERMAN_ANIM_SIT;
 		item->Animation.ActiveState = DOBERMAN_STATE_SIT_IDLE;
 		// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
 	}
@@ -95,11 +95,11 @@ void DobermanControl(short itemNumber)
 		
 			switch (item->Animation.ActiveState)
 			{
-			case DOBERMAN_STATE_WALK:
+			case DOBERMAN_STATE_WALK_FORWARD:
 				creature->MaxTurn = ANGLE(3.0f);
 
 				if (creature->Mood != MoodType::Bored)
-					item->Animation.TargetState = DOBERMAN_STATE_RUNNING;
+					item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
 				else
 				{
 					int random = GetRandomControl();
@@ -124,7 +124,7 @@ void DobermanControl(short itemNumber)
 
 				break;
 
-			case DOBERMAN_STATE_RUNNING:
+			case DOBERMAN_STATE_RUN_FORWARD:
 				tilt = angle;
 				creature->MaxTurn = ANGLE(6.0f);
 
@@ -151,7 +151,7 @@ void DobermanControl(short itemNumber)
 						item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;
 					}
 					else
-						item->Animation.TargetState = DOBERMAN_STATE_RUNNING;
+						item->Animation.TargetState = DOBERMAN_STATE_RUN_FORWARD;
 				}
 				else
 				{
@@ -165,7 +165,7 @@ void DobermanControl(short itemNumber)
 							if (random >= 1536)
 							{
 								if (random < 9728)
-									item->Animation.TargetState = DOBERMAN_STATE_WALK;
+									item->Animation.TargetState = DOBERMAN_STATE_WALK_FORWARD;
 							}
 							else
 								item->Animation.TargetState = DOBERMAN_STATE_SIT_IDLE;
