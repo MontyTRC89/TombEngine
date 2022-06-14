@@ -1681,10 +1681,10 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 void DoVehicleCollision(ItemInfo* vehicle, int radius)
 {
 	CollisionInfo coll = {};
-	coll.Setup.Radius = radius;
-	coll.Setup.EnableObjectPush = true;
-	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
+	coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
+	coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
 	coll.Setup.OldPosition = vehicle->Pose.Position;
+	coll.Setup.EnableObjectPush = true;
 
 	DoObjectCollision(vehicle, &coll);
 }
