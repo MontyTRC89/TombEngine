@@ -106,7 +106,7 @@ bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 
 bool ItemInfo::IsLara()
 {
-	return this->IsLara();
+	return this->Data.is<LaraInfo*>();
 }
 
 void ClearItem(short itemNumber)
