@@ -8,13 +8,15 @@
 
 namespace TEN::Entities::TR4
 {
-	enum SethBladeState {
+	enum SethBladeState 
+	{
 		SETHBLADE_STATE_NONE = 0,
 		SETHBLADE_STATE_ACTIVE = 1,
 		SETHBLADE_STATE_IDLE = 2,
 	};
 
-	enum SethBladeAnim {
+	enum SethBladeAnim 
+	{
 		SETHBLADE_ANIM_ACTIVATE = 0,
 		SETHBLADE_ANIM_IDLE = 1,
 	};
