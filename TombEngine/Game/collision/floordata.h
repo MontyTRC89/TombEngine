@@ -62,6 +62,7 @@ struct SECTOR_FLAGS
 
 	bool MinecartLeft() { return MarkTriggerer; }
 	bool MinecartRight() { return MarkBeetle; }
+	bool MinecartStop() { return MarkBeetle && MarkTriggerer; }
 
 	bool ClimbPossible(CLIMB_DIRECTION direction)
 	{
