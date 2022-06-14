@@ -57,9 +57,9 @@ enum MinecartState
 	CART_STATE_BRAKE,
 	CART_STATE_FORWARD,
 	CART_STATE_BACK,
-	CART_TURN_DEATH,
-	CART_FALL_DEATH,
-	CART_WALL_DEATH,
+	CART_STATE_TURN_DEATH,
+	CART_STATE_FALL_DEATH,
+	CART_STATE_WALL_DEATH,
 	CART_STATE_HIT,
 	CART_STATE_SWIPE,
 	CART_STATE_BRAKING
@@ -738,13 +738,13 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 
 		break;
 
-	case CART_WALL_DEATH:
+	case CART_STATE_WALL_DEATH:
 		Camera.targetElevation = -ANGLE(25.0f);
 		Camera.targetDistance = SECTOR(4);
 
 		break;
 
-	case CART_TURN_DEATH:
+	case CART_STATE_TURN_DEATH:
 		Camera.targetElevation = -ANGLE(45.0f);
 		Camera.targetDistance = SECTOR(2);
 
@@ -789,8 +789,8 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		minecartItem->Animation.AnimNumber = Objects[ID_MINECART].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_MINECART_LARA_ANIMS].animIndex);
 		minecartItem->Animation.FrameNumber = g_Level.Anims[minecartItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 	}
-	if (laraItem->Animation.ActiveState != CART_TURN_DEATH &&
-		laraItem->Animation.ActiveState != CART_WALL_DEATH &&
+	if (laraItem->Animation.ActiveState != CART_STATE_TURN_DEATH &&
+		laraItem->Animation.ActiveState != CART_STATE_WALL_DEATH &&
 		laraItem->HitPoints > 0)
 	{
 		if (minecartItem->Pose.Orientation.z > TERMINAL_ANGLE ||
@@ -798,8 +798,8 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_TURN_DEATH;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = CART_TURN_DEATH;
-			laraItem->Animation.TargetState = CART_TURN_DEATH;
+			laraItem->Animation.ActiveState = CART_STATE_TURN_DEATH;
+			laraItem->Animation.TargetState = CART_STATE_TURN_DEATH;
 			minecartItem->Animation.Velocity = 0;
 			minecart->Velocity = 0;
 			minecart->Flags = (minecart->Flags & ~CART_FLAG_CONTROL) | CART_FLAG_STOPPED | CART_FLAG_DEAD;
@@ -817,8 +817,8 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_WALL_DEATH;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = CART_WALL_DEATH;
-			laraItem->Animation.TargetState = CART_WALL_DEATH;
+			laraItem->Animation.ActiveState = CART_STATE_WALL_DEATH;
+			laraItem->Animation.TargetState = CART_STATE_WALL_DEATH;
 			laraItem->HitPoints = -1;
 			minecartItem->Animation.Velocity = 0;
 			minecart->Velocity = 0;
