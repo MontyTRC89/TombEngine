@@ -37,7 +37,7 @@ void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
 
 void ItemInfo::SetBits(JointBitType type, int jointIndex)
 {
-	return SetBits(type, std::vector { jointIndex });
+	return SetBits(type, std::vector{ jointIndex });
 }
 
 void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
@@ -65,7 +65,7 @@ void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
 
 void ItemInfo::ClearBits(JointBitType type, int jointIndex)
 {
-	return ClearBits(type, std::vector { jointIndex });
+	return ClearBits(type, std::vector{ jointIndex });
 }
 
 bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
@@ -101,7 +101,7 @@ bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
 
 bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 {
-	return TestBits(type, std::vector { jointIndex });
+	return TestBits(type, std::vector{ jointIndex });
 }
 
 void ClearItem(short itemNumber)

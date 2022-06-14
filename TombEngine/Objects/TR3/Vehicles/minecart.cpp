@@ -19,8 +19,8 @@
 using std::vector;
 
 constexpr auto MINECART_RADIUS = 100;
-constexpr auto MINECART_HEIGHT = CLICK(2);
 constexpr auto MINECART_ENTITY_RADIUS = CLICK(1);
+constexpr auto MINECART_HEIGHT = CLICK(2);
 constexpr auto MINECART_GRAVITY = SECTOR(1) + 1;
 constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
 constexpr auto MINECART_NUM_HITS = 25;
