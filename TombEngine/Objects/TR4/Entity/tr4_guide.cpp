@@ -48,11 +48,11 @@ namespace TEN::Entities::TR4
 
 		if (Objects[ID_WRAITH1].loaded)
 		{
-			item->SwapMeshFlags = 0;
+			item->MeshSwapBits = NO_JOINT_BITS;
 			item->ItemFlags[1] = 2;
 		}
 		else
-			item->SwapMeshFlags = 0x40000;
+			item->MeshSwapBits = 0x40000;
 	}
 
 	void GuideControl(short itemNumber)
@@ -138,7 +138,7 @@ namespace TEN::Entities::TR4
 		else
 			laraAI.xAngle = phd_atan(dx + (dz / 2), dy);
 
-		ItemInfo* foundEnemy = NULL;
+		ItemInfo* foundEnemy = nullptr;
 
 		if (!Objects[ID_WRAITH1].loaded)
 		{
@@ -244,7 +244,7 @@ namespace TEN::Entities::TR4
 			{
 				if (!creature->ReachedGoal || foundEnemy)
 				{
-					if (item->SwapMeshFlags == 0x40000)
+					if (item->MeshSwapBits == 0x40000)
 						item->Animation.TargetState = 40;
 					else if (foundEnemy && AI.distance < pow(SECTOR(1), 2))
 					{
@@ -259,7 +259,7 @@ namespace TEN::Entities::TR4
 					if (!enemy->Flags)
 					{
 						creature->ReachedGoal = false;
-						creature->Enemy = NULL;
+						creature->Enemy = nullptr;
 						item->AIBits = FOLLOW;
 						item->ItemFlags[3]++;
 						break;
@@ -353,7 +353,7 @@ namespace TEN::Entities::TR4
 				if (!enemy->Flags)
 				{
 					creature->ReachedGoal = false;
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3]++;
 					break;
@@ -367,7 +367,7 @@ namespace TEN::Entities::TR4
 				{
 					if (!foundEnemy ||
 						AI.distance >= 0x200000 &&
-						(item->SwapMeshFlags & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
+						(item->MeshSwapBits & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy == LaraItem)
 						{
@@ -413,7 +413,7 @@ namespace TEN::Entities::TR4
 				if (!enemy->Flags)
 				{
 					creature->ReachedGoal = false;
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3]++;
 					break;
@@ -423,7 +423,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (foundEnemy &&
 				(AI.distance < 0x200000 ||
-					!(item->SwapMeshFlags & 0x40000) &&
+					!(item->MeshSwapBits & 0x40000) &&
 					AI.distance < pow(SECTOR(3), 2)))
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
@@ -444,9 +444,9 @@ namespace TEN::Entities::TR4
 			random = GetRandomControl();
 
 			if (frameNumber == 32)
-				item->SwapMeshFlags |= 0x8000;
+				item->MeshSwapBits |= 0x8000;
 			else if (frameNumber == 216)
-				item->SwapMeshFlags &= 0x7FFF;
+				item->MeshSwapBits &= 0x7FFF;
 			else if (frameNumber <= 79 || frameNumber >= 84)
 			{
 				if (frameNumber <= 83 || frameNumber >= 94)
@@ -615,7 +615,7 @@ namespace TEN::Entities::TR4
 					TestTriggers(item, true);
 
 					creature->ReachedGoal = false;
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3]++;
 					item->Animation.TargetState = GUIDE_STATE_IDLE;
@@ -630,14 +630,14 @@ namespace TEN::Entities::TR4
 			{
 				someFlag = true;
 
-				item->Pose.Position = enemy->Pose.Position;
+				item->Pose = enemy->Pose;
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
 			{
-				item->SwapMeshFlags &= 0xFFFBFFFF;
+				item->MeshSwapBits &= 0xFFFBFFFF;
 
 				auto* room = &g_Level.Rooms[item->RoomNumber];
-				ItemInfo* currentItem = NULL;
+				ItemInfo* currentItem = nullptr;
 
 				short currentitemNumber = room->itemNumber;
 				while (currentitemNumber != NO_ITEM)
@@ -655,7 +655,7 @@ namespace TEN::Entities::TR4
 					currentitemNumber = currentItem->NextItem;
 				}
 
-				if (currentItem != NULL)
+				if (currentItem != nullptr)
 					currentItem->MeshBits = 0xFFFFFFFD;
 			}
 
@@ -666,7 +666,7 @@ namespace TEN::Entities::TR4
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 			}
 
 			break;
@@ -684,7 +684,7 @@ namespace TEN::Entities::TR4
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3]++;
 					creature->ReachedGoal = false;
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 					break;
 				}
 				else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
@@ -713,14 +713,14 @@ namespace TEN::Entities::TR4
 					item->AIBits = FOLLOW;
 					item->ItemFlags[3]++;
 					creature->ReachedGoal = false;
-					creature->Enemy = NULL;
+					creature->Enemy = nullptr;
 					break;
 				}
 
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 70 && item->RoomNumber == 70)
 				{
 					item->Animation.RequiredState = GUIDE_STATE_RUN;
-					item->SwapMeshFlags |= 0x200000;
+					item->MeshSwapBits |= 0x200000;
 					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose);
 				}
 			}
@@ -754,7 +754,7 @@ namespace TEN::Entities::TR4
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 				break;
 			}
 			if (enemy->Flags == 42)
@@ -764,7 +764,7 @@ namespace TEN::Entities::TR4
 				item->AIBits = FOLLOW;
 				item->ItemFlags[3]++;
 				creature->ReachedGoal = false;
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 			}
 			else if (item->TriggerFlags <= 999)
 				item->Animation.TargetState = GUIDE_STATE_IDLE;

@@ -11,17 +11,17 @@
 #include "tr4_guide.h" // OK
 #include "tr4_harpy.h" // OK
 #include "tr4_horseman.h" // OFF
-#include "tr4_jeanyves.h" // OK
+#include "tr4_jean_yves.h" // OK
 #include "tr4_knight_templar.h" // OK
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "tr4_mummy.h" // OK
 #include "tr4_sas.h" // OK
-#include "tr4_sentrygun.h" // OK
+#include "tr4_sentry_gun.h" // OK
 #include "tr4_skeleton.h" // OK
-#include "tr4_smallscorpion.h" // OK
+#include "tr4_small_scorpion.h" // OK
 #include "tr4_sphinx.h" // OK
 #include "tr4_troops.h" // OK
-#include "tr4_wildboar.h" // OK
+#include "tr4_wild_boar.h" // OK
 #include "tr4_wraith.h" // OFF
 #include "tr4_baboon.h" // OK
 #include "tr4_mutant.h" // OK
@@ -225,6 +225,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BADDY1];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 9;
 		obj->initialise = InitialiseBaddy;
 		obj->control = BaddyControl;
 		obj->collision = CreatureCollision;
@@ -250,6 +251,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_BADDY2];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 9;
 		obj->initialise = InitialiseBaddy;
 		obj->control = BaddyControl;
 		obj->collision = CreatureCollision;
@@ -275,6 +277,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_SAS_CAIRO];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 10;
 		obj->initialise = InitialiseSas;
 		obj->control = SasControl;
 		obj->collision = CreatureCollision;
@@ -482,6 +485,7 @@ static void StartEntity(ObjectInfo* obj)
 	obj = &Objects[ID_TROOPS];
 	if (obj->loaded)
 	{
+		obj->biteOffset = 11;
 		obj->initialise = InitialiseTroops;
 		obj->control = TroopsControl;
 		obj->collision = CreatureCollision;

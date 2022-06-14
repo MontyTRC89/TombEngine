@@ -150,8 +150,11 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 
 	if (condition != SoundEnvironment::Always)
 	{
+		// Get current camera room's environment
+		auto cameraCondition = TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber) ? SoundEnvironment::Water : SoundEnvironment::Land;
+
 		// Don't play effect if effect's environment isn't the same as camera position's environment
-		if (condition != (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, Camera.pos.roomNumber))
+		if (condition != cameraCondition)
 			return 0;
 	}
 

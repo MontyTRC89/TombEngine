@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_wildboar.h"
+#include "tr4_wild_boar.h"
 #include "Game/control/box.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
@@ -15,16 +15,41 @@ namespace TEN::Entities::TR4
 {
 	BITE_INFO WildBoatBiteInfo = { 0, 0, 0, 14 };
 
+	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
+
+	enum WildBoarState
+	{
+		BOAR_STATE_NONE = 0,
+		BOAR_STATE_IDLE = 1,
+		BOAR_STATE_RUN_FORWARD = 2,
+		BOAR_STATE_GRAZE = 3,
+		BOAR_STATE_ATTACK = 4,
+		BOAR_STATE_DEATH = 5,
+	};
+
+	enum WildBoarAnim
+	{
+		BOAR_ANIM_RUN_FORWARD = 0,
+		BOAR_ANIM_GRAZE_START = 1,
+		BOAR_ANIM_GRAZE_CONTINUE = 2,
+		BOAR_ANIM_GRAZE_END = 3,
+		BOAR_ANIM_ATTACK = 4,
+		BOAR_ANIM_DEATH = 5,
+		BOAR_ANIM_IDLE = 6,
+		BOAR_ANIM_IDLE_TO_RUN_FORWARD = 7,
+		BOAR_ANIM_RUN_FORWARD_TO_IDLE = 8
+	};
+
 	void InitialiseWildBoar(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
 		ClearItem(itemNumber);
 
-		item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 6;
+		item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + BOAR_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = 1;
-		item->Animation.ActiveState = 1;
+		item->Animation.ActiveState = BOAR_STATE_IDLE;
+		item->Animation.TargetState = BOAR_STATE_IDLE;
 	}
 
 	void WildBoarControl(short itemNumber)
@@ -102,32 +127,32 @@ namespace TEN::Entities::TR4
 
 			switch (item->Animation.ActiveState)
 			{
-			case 1:
+			case BOAR_STATE_IDLE:
 				creature->MaxTurn = 0;
 
 				if (AI.ahead && AI.distance || item->Flags)
-					item->Animation.TargetState = 2;
+					item->Animation.TargetState = BOAR_STATE_RUN_FORWARD;
 				else if (GetRandomControl() & 0x7F)
 				{
 					joint1 = AIGuard(creature) / 2;
 					joint3 = joint1;
 				}
 				else
-					item->Animation.TargetState = 3;
+					item->Animation.TargetState = BOAR_STATE_GRAZE;
 
 				break;
 
-			case 3:
+			case BOAR_STATE_GRAZE:
 				creature->MaxTurn = 0;
 
 				if (AI.ahead && AI.distance)
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BOAR_STATE_IDLE;
 				else if (!(GetRandomControl() & 0x7F))
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = BOAR_STATE_IDLE;
 
 				break;
 
-			case 2:
+			case BOAR_STATE_RUN_FORWARD:
 				if (AI.distance >= SECTOR(4096))
 				{
 					creature->MaxTurn = ANGLE(6.0f);
@@ -142,11 +167,11 @@ namespace TEN::Entities::TR4
 
 				if (!item->Flags && (AI.distance < SECTOR(64) && AI.bite))
 				{
-					item->Animation.TargetState = 4;
+					item->Animation.TargetState = BOAR_STATE_ATTACK;
 
 					if (creature->Enemy == LaraItem)
 					{
-						creature->Enemy->HitPoints -= 30;
+						creature->Enemy->HitPoints -= WILD_BOAR_ATTACK_DAMAGE;
 						creature->Enemy->HitStatus = true;
 					}
 
@@ -156,7 +181,7 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case 4:
+			case BOAR_STATE_ATTACK:
 				creature->MaxTurn = 0;
 				break;
 			}
@@ -165,11 +190,11 @@ namespace TEN::Entities::TR4
 		{
 			item->HitPoints = 0;
 
-			if (item->Animation.ActiveState != 5)
+			if (item->Animation.ActiveState != BOAR_STATE_DEATH)
 			{
-				item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + 5;
+				item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + BOAR_ANIM_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 5;
+				item->Animation.ActiveState = BOAR_STATE_DEATH;
 			}
 		}
 

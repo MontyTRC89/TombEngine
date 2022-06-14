@@ -154,7 +154,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
 				if (g_Gui.CallInventory(false))
-					return GameStatus::LoadGame;
+					return GameStatus::SaveGame;
 			}
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
@@ -241,7 +241,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 						Camera.bounce = 0;
 						AlterFOV(ANGLE(80.0f));
 
-						LaraItem->MeshBits = 0xFFFFFFFF;
+						LaraItem->MeshBits = ALL_JOINT_BITS;
 						Lara.Inventory.IsBusy = false;
 						ResetLaraFlex(LaraItem);
 
@@ -576,16 +576,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// If not loading a savegame, then clear all the infos
-	if (!loadFromSavegame)
-	{
-		Statistics.Level.Timer = 0;
-		Statistics.Level.Distance = 0;
-		Statistics.Level.AmmoUsed = 0;
-		Statistics.Level.AmmoHits = 0;
-		Statistics.Level.Kills = 0;
-	}
-
 	// Reset all the globals for the game which needs this
 	CleanUp();
 
@@ -637,15 +627,17 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	}
 	else
 	{
+		// If not loading a savegame, then clear all the infos
+		Statistics.Level = {};
 		RequiredStartPos = false;
+
 		if (InitialiseGame)
 		{
+			// Clear all game infos as well
+			Statistics.Game = {};
 			GameTimer = 0;
-			RequiredStartPos = false;
 			InitialiseGame = false;
 		}
-
-		Statistics.Level.Timer = 0;
 	}
 
 	g_Gui.SetInventoryItemChosen(NO_ITEM);

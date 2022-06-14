@@ -26,6 +26,13 @@ enum class InventoryResult
 	NewGameSelectedLevel
 };
 
+enum class LoadResult
+{
+	None,
+	Load,
+	Cancel
+};
+
 enum class MenuType
 {
 	None,
@@ -392,14 +399,14 @@ struct InventoryObject
 	short zrot;
 	unsigned __int64 opts;
 	const char* objname;
-	unsigned long meshbits;
+	unsigned int meshbits;
 	short rot_flags;
 };
 
 class GuiController
 {
 public:
-	int CallInventory(bool reset_mode);
+	bool CallInventory(bool reset_mode);
 	InventoryResult TitleOptions();
 	InventoryResult DoPauseMenu();
 	void DrawInventory();
@@ -457,8 +464,8 @@ private:
 	void DoStatisticsMode();
 	void DoExamineMode();
 	void DoDiary();
-	int DoLoad();
-	void DoSave();
+	LoadResult DoLoad();
+	bool DoSave();
 	void DoInventory();
 	void ConstructCombineObjectList();
 	
@@ -468,8 +475,6 @@ private:
 	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
 	bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
 	long rptRight, rptLeft;
-	bool stop_killing_me_you_dumb_input_system;
-	bool stop_killing_me_you_dumb_input_system2;
 
 	// Inventory
 	short combine_obj1;
@@ -500,7 +505,6 @@ private:
 	int inventoryItemChosen;
 	int enterInventory;
 	int lastInvItem;
-	bool ExitInvLoop;
 
 	// Ammo vars
 	unsigned short AmountShotGunAmmo1;

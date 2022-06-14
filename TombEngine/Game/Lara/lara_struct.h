@@ -928,7 +928,7 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState : int
+enum class TorchState
 {
 	Holding,
 	Throwing,
@@ -1079,7 +1079,7 @@ struct ArmInfo
 	Vector3Shrt Orientation;
 
 	bool Locked;
-	short FlashGun;
+	int FlashGun;
 };
 
 struct FlareData
@@ -1220,12 +1220,6 @@ struct SubsuitControlData
 	unsigned short HitCount;
 };
 
-struct MinecartControlData
-{
-	bool Left;
-	bool Right;
-};
-
 struct LaraControlData
 {
 	short MoveAngle;
@@ -1236,6 +1230,11 @@ struct LaraControlData
 	WaterStatus WaterStatus;
 	LaraCountData Count;
 
+	WeaponControlData Weapon;
+	RopeControlData Rope;
+	TightropeControlData Tightrope;
+	SubsuitControlData Subsuit;
+
 	bool CanLook;
 	bool IsMoving;
 	bool KeepLow;
@@ -1245,12 +1244,6 @@ struct LaraControlData
 	bool CanMonkeySwing;
 	bool RunJumpQueued;
 	bool Locked;
-
-	WeaponControlData Weapon;
-	RopeControlData Rope;
-	TightropeControlData Tightrope;
-	SubsuitControlData Subsuit;
-	MinecartControlData Minecart;
 };
 
 struct LaraInfo

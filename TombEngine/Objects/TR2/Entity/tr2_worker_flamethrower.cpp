@@ -31,24 +31,6 @@ enum WorkerFlamethrowerAnim
 
 };
 
-static void Flame(int x, int y, int z, int velocity, short yRot, short roomNumber)
-{
-	short fxNumber = CreateNewEffect(roomNumber);
-	if (fxNumber != NO_ITEM)
-	{
-		auto* fx = &EffectList[fxNumber];
-
-		fx->pos.Position.x = x;
-		fx->pos.Position.y = y;
-		fx->pos.Position.z = z;
-		fx->roomNumber = roomNumber;
-		//TODO: complete fx parameters
-		fx->shade = 14 * 256;
-		fx->counter = 40;
-		ShootAtLara(fx);
-	}
-}
-
 void InitialiseWorkerFlamethrower(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];

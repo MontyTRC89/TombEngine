@@ -12,6 +12,9 @@
 #include "Game/Lara/lara.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
+#include "Renderer/Renderer11Enums.h"
+
+using std::vector;
 
 namespace TEN::Entities::TR4
 {
@@ -20,6 +23,8 @@ namespace TEN::Entities::TR4
 	BITE_INFO HarpyBite3 = { 0, 0, 0, 21 };
 	BITE_INFO HarpyAttack1 = { 0, 128, 0, 2 };
 	BITE_INFO HarpyAttack2 = { 0, 128, 0, 4 };
+	const vector<int> HarpySwoopAttackJoints = { 2, 4 };
+	const vector<int> HarpyStingerAttackJoints = { 20, 21 };
 
 	constexpr auto HARPY_STINGER_ATTACK_DAMAGE = 100;
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE = 10;
@@ -98,7 +103,7 @@ namespace TEN::Entities::TR4
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = true;
 			spark->sR = 0;
@@ -108,7 +113,7 @@ namespace TEN::Entities::TR4
 			spark->dG = spark->dR = (GetRandomControl() & 0x7F) + 32;
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 7) + 20;
 			spark->x = (GetRandomControl() & 0xF) - 8;
 			spark->y = 0;
@@ -143,7 +148,7 @@ namespace TEN::Entities::TR4
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = true;
 			spark->sR = 0;
@@ -155,7 +160,7 @@ namespace TEN::Entities::TR4
 			spark->sLife = 16;
 			spark->colFadeSpeed = 4;
 			spark->y = y;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->fadeToBlack = 4;
 			spark->x = x;
 			spark->z = z;
@@ -504,7 +509,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = HARPY_STATE_FLY_FORWARD;
 				creature->MaxTurn = ANGLE(2.0f);
 
-				if (item->TouchBits & 0x14 ||
+				if (item->TestBits(JointBitType::Touch, HarpySwoopAttackJoints) ||
 					creature->Enemy && creature->Enemy != LaraItem &&
 					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 					AI.distance < pow(SECTOR(2), 2))
@@ -538,7 +543,7 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (creature->Flags == 0 &&
-					(item->TouchBits & 0x300000 ||
+					(item->TestBits(JointBitType::Touch, HarpyStingerAttackJoints) ||
 						creature->Enemy && creature->Enemy != LaraItem &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 						AI.distance < pow(SECTOR(2), 2)))

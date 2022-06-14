@@ -182,7 +182,7 @@ static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 
 static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 {
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = 1;
 	sptr->sR = 0;
@@ -196,7 +196,7 @@ static void TriggerUPVMist(long x, long y, long z, long velocity, short angle)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -931,9 +931,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 		else if (UPVItem->Pose.Orientation.x < -UPDOWN_LIMIT)
 			UPVItem->Pose.Orientation.x = -UPDOWN_LIMIT;
 
-		UPVItem->Pose.Position.x += round(phd_sin(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Pose.Orientation.x));
-		UPVItem->Pose.Position.y -= round(phd_sin(UPVItem->Pose.Orientation.x) * UPVItem->Animation.Velocity);
-		UPVItem->Pose.Position.z += round(phd_cos(UPVItem->Pose.Orientation.y) * UPVItem->Animation.Velocity * phd_cos(UPVItem->Pose.Orientation.x));
+		TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity);
 	}
 
 	int newHeight = GetCollision(UPVItem).Position.Floor;

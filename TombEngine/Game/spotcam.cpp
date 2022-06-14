@@ -115,7 +115,7 @@ void InitialiseSpotCam(short Sequence)
 
 	AlterFOV(16380);
 
-	LaraItem->MeshBits = -1;
+	LaraItem->MeshBits = ALL_JOINT_BITS;
 
 	ResetLaraFlex(LaraItem);
 

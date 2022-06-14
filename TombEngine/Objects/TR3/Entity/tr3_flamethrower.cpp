@@ -163,7 +163,7 @@ void FlameThrowerControl(short itemNumber)
 				item->Animation.TargetState = 2;
 			else if (Targetable(item, &AI) && (realEnemy != LaraItem || creature->HurtByLara))
 			{
-				if (AI.distance < pow(SECTOR(4), 2))
+				if (AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 10;
 				else
 					item->Animation.TargetState = 2;

@@ -1232,7 +1232,7 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraSlide(ItemInfo* item, CollisionInfo* coll)
 {
 	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
+	auto probe = GetCollision(item, -(coll->Setup.Height / 2));
 
 	if (abs(probe.Position.Floor - y) <= STEPUP_HEIGHT &&
 		probe.Position.FloorSlope &&
@@ -1263,7 +1263,7 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	int y = item->Pose.Position.y;
-	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
+	auto probe = GetCollision(item, -(coll->Setup.Height / 2));
 
 	if ((probe.Position.Floor - y) <= STEPUP_HEIGHT ||
 		lara->Control.WaterStatus == WaterStatus::Wade)	// TODO: This causes a legacy floor snap bug when Lara wades off a ledge into a dry room. @Sezz 2021.09.26
@@ -1364,7 +1364,7 @@ bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 	return false;
 }
 
-// TODO: This function and its clone TestLaraCrawlMoveTolerance() should become obsolete with more accurate and accessible collision detection in the future.
+// TODO: This function should become obsolete with more accurate and accessible collision detection in the future.
 // For now, it supersedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
 bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup)
 {
@@ -2161,7 +2161,7 @@ CrawlVaultTestResult TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* 
 {
 	int y = item->Pose.Position.y;
 	auto probeA = GetCollision(item, item->Pose.Orientation.y, testSetup.CrossDist, -LARA_HEIGHT_CRAWL);	// Crossing.
-	auto probeB = GetCollision(item, item->Pose.Orientation.y, testSetup.DestDist, -LARA_HEIGHT_CRAWL);	// Approximate destination.
+	auto probeB = GetCollision(item, item->Pose.Orientation.y, testSetup.DestDist, -LARA_HEIGHT_CRAWL);		// Approximate destination.
 	auto probeMiddle = GetCollision(item);
 
 	bool isSlope = testSetup.CheckSlope ? probeB.Position.FloorSlope : false;

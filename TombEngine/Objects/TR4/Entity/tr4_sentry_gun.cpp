@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_sentrygun.h"
+#include "tr4_sentry_gun.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -45,23 +45,20 @@ namespace TEN::Entities::TR4
 		if (!creature)
 			return;
 
-		// Flags set by the ID_MINE object?
-		if (item->MeshBits & 0x40)
+		if (item->TestBits(JointBitType::Mesh, 6)) // Was fuel can exploded?
 		{
 			if (item->ItemFlags[0])
 			{
 				auto pos = Vector3Int(SentryGunBite.x, SentryGunBite.y, SentryGunBite.z);
 				GetJointAbsPosition(item, &pos, SentryGunBite.meshNum);
-
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * item->ItemFlags[0] + 12, 24, 16, 4);
-
 				item->ItemFlags[0]--;
 			}
 
 			if (item->ItemFlags[0] & 1)
-				item->MeshBits |= 0x100;
+				item->SetBits(JointBitType::Mesh, 8);
 			else
-				item->MeshBits &= ~0x100;
+				item->ClearBits(JointBitType::Mesh, 8);
 
 			if (item->TriggerFlags == 0)
 			{
@@ -120,19 +117,17 @@ namespace TEN::Entities::TR4
 					}
 				}
 
+				// Rotating gunbarrel
 				item->ItemFlags[2] -= 32;
-
 				if (item->ItemFlags[2] < 0)
 					item->ItemFlags[2] = 0;
 
 				creature->JointRotation[3] += item->ItemFlags[2];
-				creature->JointRotation[2] += item->ItemFlags[1];
 
-				if (creature->JointRotation[2] > ANGLE(90.0f) ||
-					creature->JointRotation[2] < -ANGLE(90.0f))
-				{
+				// Rotating radar
+				creature->JointRotation[2] += item->ItemFlags[1];
+				if (creature->JointRotation[2] > ANGLE(90.0f) || creature->JointRotation[2] < -ANGLE(90.0f))
 					item->ItemFlags[1] = -item->ItemFlags[1];
-				}
 			}
 			else
 			{
@@ -144,7 +139,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			ExplodingDeath(itemNum, -1, 257);
+			ExplodingDeath(itemNum, ALL_JOINT_BITS, 257);
 			DisableEntityAI(itemNum);
 			KillItem(itemNum);
 

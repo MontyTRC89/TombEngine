@@ -109,7 +109,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case ID_MINECART:
-			MineCartControl(item);
+			MinecartControl(item);
 			break;
 
 		case ID_BIGGUN:
@@ -240,7 +240,7 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 	// Bridges behave differently.
 	if (coll->Middle.Bridge < 0)
 	{
-		MoveItem(item, item->Pose.Orientation.y, -LARA_RADIUS_CRAWL);
+		TranslateItem(item, item->Pose.Orientation.y, -LARA_RADIUS_CRAWL);
 		item->Pose.Orientation.y += ANGLE(180.0f);
 	}
 }
@@ -600,9 +600,9 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
+	//item->Airborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
-	//item->Airborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 
 	LaraSnapToHeight(item, coll);
 }
@@ -610,15 +610,15 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
-	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = true;
+	item->Animation.VerticalVelocity = 0;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
-	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = true;
+	item->Animation.VerticalVelocity = 0;
 }
 
 void SetLaraMonkeyFallAnimation(ItemInfo* item)
@@ -635,9 +635,9 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	item->Animation.Airborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
-	item->Animation.Airborne = true;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -686,7 +686,9 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.y = angle;
 	}
 
+	LaraSnapToHeight(item, coll);
 	lara->Control.MoveAngle = angle;
+	lara->Control.TurnRate = 0;
 	oldAngle = angle;
 }
 
@@ -731,11 +733,11 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
-		item->Pose.Position.y += CLICK(1);
-		item->Pose.Orientation.y += lara->NextCornerPos.Orientation.y / 2;
+		item->Animation.Airborne = true;
 		item->Animation.Velocity = 2;
 		item->Animation.VerticalVelocity = 1;
-		item->Animation.Airborne = true;
+		item->Pose.Position.y += CLICK(1);
+		item->Pose.Orientation.y += lara->NextCornerPos.Orientation.y / 2;
 		lara->Control.HandStatus = HandStatus::Free;
 		return;
 	}
@@ -747,10 +749,9 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 		else
 			SetAnimation(item, LA_HANG_IDLE);
 
-		coll->Setup.OldPosition.x = item->Pose.Position.x = lara->NextCornerPos.Position.x;
-		coll->Setup.OldPosition.y = item->Pose.Position.y = lara->NextCornerPos.Position.y;
-		coll->Setup.OldPosition.z = item->Pose.Position.z = lara->NextCornerPos.Position.z;
+		item->Pose.Position = lara->NextCornerPos.Position;
 		item->Pose.Orientation.y = lara->NextCornerPos.Orientation.y;
+		coll->Setup.OldPosition = lara->NextCornerPos.Position;
 	}
 }
 
