@@ -123,14 +123,14 @@ void UpdateHealthBar(ItemInfo* item, int flash)
 	{
 		if (!BinocularRange)
 		{
-			if (flash)
+			if (flash || MutateAmount)
 				DrawHealthBar(item, HealthBar / LARA_HEALTH_MAX);
 			else
 				DrawHealthBar(item, 0);
 		}
 		else
 		{
-			if (flash)
+			if (flash || MutateAmount)
 				DrawHealthBarOverlay(item, HealthBar / LARA_HEALTH_MAX);
 			else
 				DrawHealthBarOverlay(item, 0);

@@ -16,6 +16,11 @@ namespace TEN::Entities::TR1
 	BITE_INFO BearBite = { 0, 96, 335, 14 };
 	const std::vector<int> BearAttackJoints = { 2, 3, 5, 6, 14, 17 };
 
+	constexpr auto BEAR_RUN_DAMAGE = 3;
+	constexpr auto BEAR_SLAM_DAMAGE = 200;
+	constexpr auto BEAR_ATTACK_DAMAGE = 200;
+	constexpr auto BEAR_PAT_DAMAGE = 400;
+
 	#define ROAR_CHANCE 0x50
 	#define REAR_CHANCE 0x300
 	#define DROP_CHANCE 0x600
@@ -25,10 +30,6 @@ namespace TEN::Entities::TR1
 	#define RUN_TURN ANGLE(5.0f)
 	#define WALK_TURN ANGLE(2.0f)
 	#define EAT_RANGE pow(CLICK(3), 2)
-	#define CHARGE_DAMAGE 3
-	#define SLAM_DAMAGE 200
-	#define ATTACK_DAMAGE 200
-	#define PAT_DAMAGE 400
 
 	enum BearState
 	{
@@ -96,8 +97,8 @@ namespace TEN::Entities::TR1
 				{
 					creature->Flags = 0;
 
-					LaraItem->HitPoints -= SLAM_DAMAGE;
-					LaraItem->HitStatus = 1;
+					LaraItem->HitPoints -= BEAR_SLAM_DAMAGE;
+					LaraItem->HitStatus = true;
 				}
 
 				break;
@@ -166,7 +167,7 @@ namespace TEN::Entities::TR1
 
 				if (item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
-					LaraItem->HitPoints -= CHARGE_DAMAGE;
+					LaraItem->HitPoints -= BEAR_RUN_DAMAGE;
 					LaraItem->HitStatus = true;
 				}
 
@@ -234,7 +235,7 @@ namespace TEN::Entities::TR1
 				{
 					item->Animation.RequiredState = BEAR_STATE_REAR;
 
-					LaraItem->HitPoints -= PAT_DAMAGE;
+					LaraItem->HitPoints -= BEAR_PAT_DAMAGE;
 					LaraItem->HitStatus = true;
 				}
 
@@ -247,7 +248,7 @@ namespace TEN::Entities::TR1
 					CreatureEffect(item, &BearBite, DoBloodSplat);
 					item->Animation.RequiredState = BEAR_STATE_IDLE;
 
-					LaraItem->HitPoints -= ATTACK_DAMAGE;
+					LaraItem->HitPoints -= BEAR_ATTACK_DAMAGE;
 					LaraItem->HitStatus = true;
 				}
 

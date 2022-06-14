@@ -2161,7 +2161,7 @@ CrawlVaultTestResult TestLaraCrawlVaultTolerance(ItemInfo* item, CollisionInfo* 
 {
 	int y = item->Pose.Position.y;
 	auto probeA = GetCollision(item, item->Pose.Orientation.y, testSetup.CrossDist, -LARA_HEIGHT_CRAWL);	// Crossing.
-	auto probeB = GetCollision(item, item->Pose.Orientation.y, testSetup.DestDist, -LARA_HEIGHT_CRAWL);	// Approximate destination.
+	auto probeB = GetCollision(item, item->Pose.Orientation.y, testSetup.DestDist, -LARA_HEIGHT_CRAWL);		// Approximate destination.
 	auto probeMiddle = GetCollision(item);
 
 	bool isSlope = testSetup.CheckSlope ? probeB.Position.FloorSlope : false;

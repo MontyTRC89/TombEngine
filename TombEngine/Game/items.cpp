@@ -37,7 +37,7 @@ void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
 
 void ItemInfo::SetBits(JointBitType type, int jointIndex)
 {
-	return SetBits(type, std::vector { jointIndex });
+	return SetBits(type, std::vector{ jointIndex });
 }
 
 void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
@@ -65,7 +65,7 @@ void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
 
 void ItemInfo::ClearBits(JointBitType type, int jointIndex)
 {
-	return ClearBits(type, std::vector { jointIndex });
+	return ClearBits(type, std::vector{ jointIndex });
 }
 
 bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
@@ -101,7 +101,7 @@ bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
 
 bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 {
-	return TestBits(type, std::vector { jointIndex });
+	return TestBits(type, std::vector{ jointIndex });
 }
 
 bool ItemInfo::IsLara()
@@ -606,12 +606,12 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Note: may not work for dynamic items because of FindItem.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	float sinY = phd_sin(item->Pose.Orientation.y);
+	float cosY = phd_cos(item->Pose.Orientation.y);
 
-	int x = item->Pose.Position.x + roundf(c * xOffset + s * zOffset);
+	int x = (int)round(item->Pose.Position.x + ((cosY * xOffset) + (sinY * zOffset)));
 	int y = height + item->Pose.Position.y;
-	int z = item->Pose.Position.z + roundf(-s * xOffset + c * zOffset);
+	int z = (int)round(item->Pose.Position.z + ((-sinY * xOffset) + (cosY * zOffset)));
 
 	item->Location = GetRoom(item->Location, x, y, z);
 	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);
