@@ -695,6 +695,8 @@ void KayakToBackground(ItemInfo* laraItem, ItemInfo* kayakItem)
 		}
 	}
 
+	DoVehicleCollision(kayakItem, KAYAK_Z); // FIXME: kayak is thin, what should we do about it?
+
 	int collide = KayakGetCollisionAnim(kayakItem, xOld, zOld);
 
 	int slip = 0; // Remnant?

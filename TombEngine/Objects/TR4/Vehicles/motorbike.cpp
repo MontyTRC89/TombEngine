@@ -642,17 +642,6 @@ static int GetMotorbikeCollisionAnim(ItemInfo* item, Vector3Int* pos)
     return 0;
 }
 
-void MotorbikeBaddyCollision(ItemInfo* bike)
-{
-    CollisionInfo coll = {};
-    coll.Setup.Radius = BIKE_RADIUS;
-    coll.Setup.EnableObjectPush = true;
-    coll.Setup.UpperCeilingBound = MAX_HEIGHT;
-    coll.Setup.OldPosition = bike->Pose.Position;
-
-    DoObjectCollision(bike, &coll, true);
-}
-
 static int MotorBikeDynamics(ItemInfo* item)
 {
     MotorbikeInfo* motorbike;
@@ -808,7 +797,7 @@ static int MotorBikeDynamics(ItemInfo* item)
     moved.z = item->Pose.Position.z;
 
     if (!(item->Flags & ONESHOT))
-        MotorbikeBaddyCollision(item);
+        DoVehicleCollision(item, BIKE_RADIUS);
 
     int rot1 = 0;
     int rot2 = 0;

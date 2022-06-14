@@ -525,17 +525,6 @@ static int GetJeepCollisionAnim(ItemInfo* item, Vector3Int* p)
 	return 0;
 }
 
-static void JeepBaddyCollision(ItemInfo* jeep)
-{
-	CollisionInfo coll = {};
-	coll.Setup.Radius = JEEP_FRONT;
-	coll.Setup.EnableObjectPush = true;
-	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
-	coll.Setup.OldPosition = jeep->Pose.Position;
-
-	DoObjectCollision(jeep, &coll, true);
-}
-
 static void JeepExplode(ItemInfo* item)
 {
 	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
@@ -718,10 +707,7 @@ int JeepDynamics(ItemInfo* item)
 	movedPos.z = item->Pose.Position.z;
 
 	if (!(item->Flags & ONESHOT))
-	{
-		JeepBaddyCollision(item);
-		// v37 = sub_467850(item->pos.Position.x, item->pos.Position.y, item->pos.Position.z, item->roomNumber, 512);
-	}
+		DoVehicleCollision(item, JEEP_FRONT);
 
 	Vector3Int f, b, mm, mt, mb;
 	

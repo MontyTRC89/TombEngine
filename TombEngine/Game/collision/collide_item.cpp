@@ -1678,12 +1678,24 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode) // previously LaraBaddyCollision
+void DoVehicleCollision(ItemInfo* vehicle, int radius)
+{
+	CollisionInfo coll = {};
+	coll.Setup.Radius = radius;
+	coll.Setup.EnableObjectPush = true;
+	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
+	coll.Setup.OldPosition = vehicle->Pose.Position;
+
+	DoObjectCollision(vehicle, &coll);
+}
+
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision
 {
 	laraItem->HitStatus = false;
 	coll->HitStatic     = false;
 
 	bool playerCollision = laraItem->IsLara();
+	bool harmless = !playerCollision && (laraItem->Data.is<KayakInfo>() || laraItem->Data.is<UPVInfo>());
 
 	if (playerCollision)
 	{
@@ -1719,16 +1731,35 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 			if (phd_Distance(&item->Pose, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
 				continue;
 
-			if (vehicleMode)
+			if (playerCollision)
+			{
+				// Objects' own collision routines were almost universally written only for
+				// managing collisions with Lara and nothing else. Until all of these routines
+				// are refactored (which won't happen anytime soon), we need this differentiation.
+				object->collision(itemNumber, laraItem, coll);
+			}
+			else
 			{
 				if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 					continue;
 
+				// Guess if object is a nullmesh or invisible object by existence of draw routine.
 				if (object->drawRoutine == nullptr)
 					continue;
 
+				// Pickups are also not processed
+				if (object->isPickup)
+					continue;
+
+				// If colliding object is an enemy, kill it.
 				if (object->intelligent)
 				{
+					// Bypass harmless vehicles killing enemies.
+					if (harmless)
+						continue;
+
+					// TODO: further checks may be added to prevent killing undead enemies.
+
 					item->HitPoints = 0;
 					DoLotsOfBlood(item->Pose.Position.x,
 								  laraItem->Pose.Position.y - CLICK(1),
@@ -1737,13 +1768,11 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 								  laraItem->Pose.Orientation.y,
 								  item->RoomNumber, 3);
 				}
-				else if (!object->isPickup)
+				else
 				{
 					ItemPushItem(item, laraItem, coll, false, 1);
 				}
 			}
-			else
-				object->collision(itemNumber, laraItem, coll);
 		}
 
 		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
@@ -1753,7 +1782,9 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (!(vehicleMode || !(mesh->flags & StaticMeshFlags::SM_SOLID)))
+			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,
+			// so we bypass them here to avoid interference.
+			if (playerCollision && (mesh->flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			if (phd_Distance(&mesh->pos, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
@@ -1764,7 +1795,8 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 
 			coll->HitStatic = true;
 
-			if (StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+			// HACK: Shatter statics only by non-harmless vehicles.
+			if (!harmless && StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
 				SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
 				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);

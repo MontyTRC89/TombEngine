@@ -53,4 +53,5 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
-void DoObjectCollision(ItemInfo* item, CollisionInfo* coll, bool vehicleMode = false);
+void DoObjectCollision(ItemInfo* item, CollisionInfo* coll);
+void DoVehicleCollision(ItemInfo* vehicle, int radius);

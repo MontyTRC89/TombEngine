@@ -324,17 +324,6 @@ void SkidooCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	skidooItem->Collidable = true;
 }
 
-void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem)
-{
-	CollisionInfo coll = {};
-	coll.Setup.Radius = SKIDOO_RADIUS;
-	coll.Setup.EnableObjectPush = true;
-	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
-	coll.Setup.OldPosition = skidooItem->Pose.Position;
-
-	DoObjectCollision(skidooItem, &coll, true);
-}
-
 void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
@@ -995,7 +984,7 @@ int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem)
 	moved.z = skidooItem->Pose.Position.z;
 
 	if (!(skidooItem->Flags & ONESHOT))
-		SkidooEntityCollision(laraItem, skidooItem);
+		DoVehicleCollision(skidooItem, SKIDOO_RADIUS);
 
 	Vector3Int frontLeft, frontRight, backRight, backLeft;
 	rotation = 0;

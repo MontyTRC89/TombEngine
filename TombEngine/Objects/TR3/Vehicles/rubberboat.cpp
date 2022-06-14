@@ -461,6 +461,8 @@ static int RubberBoatDynamics(ItemInfo* laraItem, short itemNumber)
 	if (height < (rBoatItem->Pose.Position.y - CLICK(0.5f)))
 		DoRubberBoatShift2(rBoatItem, (Vector3Int*)&rBoatItem->Pose, &old);
 
+	DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
+
 	rBoat->ExtraRotation = rotation;
 	int collide = GetRubberBoatCollisionAnim(rBoatItem, &moved);
 

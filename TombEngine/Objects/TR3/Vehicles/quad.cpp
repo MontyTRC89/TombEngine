@@ -339,17 +339,6 @@ static int GetOnQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, CollisionInfo* 
 	return true;
 }
 
-static void QuadEntityCollision(ItemInfo* laraItem, ItemInfo* quadItem)
-{
-	CollisionInfo coll = {};
-	coll.Setup.Radius = QUAD_RADIUS;
-	coll.Setup.EnableObjectPush = true;
-	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
-	coll.Setup.OldPosition = laraItem->Pose.Position;
-
-	DoObjectCollision(quadItem, &coll, true);
-}
-
 static int GetQuadCollisionAnim(ItemInfo* quadItem, Vector3Int* p)
 {
 	p->x = quadItem->Pose.Position.x - p->x;
@@ -658,7 +647,7 @@ static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 	moved.z = quadItem->Pose.Position.z;
 
 	if (!(quadItem->Flags & ONESHOT))
-		QuadEntityCollision(laraItem, quadItem);
+		DoVehicleCollision(quadItem, QUAD_RADIUS);
 
 	short rot = 0;
 	short rotAdd = 0;

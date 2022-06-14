@@ -524,6 +524,8 @@ int SpeedBoatDynamics(ItemInfo* laraItem, short itemNumber)
 
 	sBoat->ExtraRotation = rotation;
 
+	DoVehicleCollision(sBoatItem, BOAT_RADIUS);
+
 	auto collide = GetSpeedBoatHitAnim(sBoatItem, &moved);
 
 	int newVelocity = 0;
