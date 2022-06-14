@@ -720,6 +720,8 @@ namespace TEN::Renderer
 					if (!creature->FiredWeapon)
 						continue;
 				}
+				else
+					continue;
 
 				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
