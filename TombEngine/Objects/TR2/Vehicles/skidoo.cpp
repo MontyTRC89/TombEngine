@@ -329,6 +329,7 @@ void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem)
 	CollisionInfo coll = {};
 	coll.Setup.Radius = SKIDOO_RADIUS;
 	coll.Setup.EnableObjectPush = true;
+	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
 	coll.Setup.OldPosition = skidooItem->Pose.Position;
 
 	DoObjectCollision(skidooItem, &coll, true);

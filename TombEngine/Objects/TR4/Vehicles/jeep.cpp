@@ -530,6 +530,7 @@ static void JeepBaddyCollision(ItemInfo* jeep)
 	CollisionInfo coll = {};
 	coll.Setup.Radius = JEEP_FRONT;
 	coll.Setup.EnableObjectPush = true;
+	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
 	coll.Setup.OldPosition = jeep->Pose.Position;
 
 	DoObjectCollision(jeep, &coll, true);

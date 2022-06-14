@@ -1753,7 +1753,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (!vehicleMode && !(mesh->flags & StaticMeshFlags::SM_SOLID))
+			if (!(vehicleMode || !(mesh->flags & StaticMeshFlags::SM_SOLID)))
 				continue;
 
 			if (phd_Distance(&mesh->pos, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)

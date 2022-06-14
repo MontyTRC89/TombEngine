@@ -647,6 +647,7 @@ void MotorbikeBaddyCollision(ItemInfo* bike)
     CollisionInfo coll = {};
     coll.Setup.Radius = BIKE_RADIUS;
     coll.Setup.EnableObjectPush = true;
+    coll.Setup.UpperCeilingBound = MAX_HEIGHT;
     coll.Setup.OldPosition = bike->Pose.Position;
 
     DoObjectCollision(bike, &coll, true);

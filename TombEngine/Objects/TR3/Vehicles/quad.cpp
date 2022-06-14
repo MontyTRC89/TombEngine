@@ -344,6 +344,7 @@ static void QuadEntityCollision(ItemInfo* laraItem, ItemInfo* quadItem)
 	CollisionInfo coll = {};
 	coll.Setup.Radius = QUAD_RADIUS;
 	coll.Setup.EnableObjectPush = true;
+	coll.Setup.UpperCeilingBound = MAX_HEIGHT;
 	coll.Setup.OldPosition = laraItem->Pose.Position;
 
 	DoObjectCollision(quadItem, &coll, true);
