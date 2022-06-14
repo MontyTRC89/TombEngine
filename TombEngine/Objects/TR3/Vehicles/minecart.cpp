@@ -311,7 +311,7 @@ static void MinecartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem
 static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
-	auto* minecart = (MinecartInfo*)minecartItem->Data;
+	auto* minecart = GetMinecartInfo(minecartItem);
 	auto flags = GetCollision(minecartItem).BottomBlock->Flags;
 
 	if (minecart->StopDelay)
