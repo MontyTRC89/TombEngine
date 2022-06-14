@@ -17,10 +17,10 @@ namespace TEN::Effects::Lara
 {
 	void LaraBurn(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
-		auto* lara = GetLaraInfo(item);
+		auto* lara = item->GetLara();
 
 		if (!lara->Burn && !lara->BurnSmoke)
 		{
@@ -35,10 +35,10 @@ namespace TEN::Effects::Lara
 
 	void LavaBurn(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
-		auto* lara = GetLaraInfo(item);
+		auto* lara = item->GetLara();
 
 		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
 		{
@@ -60,10 +60,10 @@ namespace TEN::Effects::Lara
 
 	void LaraBreath(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
-		auto* lara = GetLaraInfo(item);
+		auto* lara = item->GetLara();
 
 		if (lara->Control.WaterStatus == WaterStatus::Underwater || item->HitPoints <= 0)
 			return;

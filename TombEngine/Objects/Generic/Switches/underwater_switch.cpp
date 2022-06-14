@@ -58,7 +58,7 @@ namespace TEN::Entities::Switches
 
 	void WallUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto* lara = laraItem->GetLara();
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&
@@ -97,7 +97,7 @@ namespace TEN::Entities::Switches
 
 	void CeilingUnderwaterSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto* lara = laraItem->GetLara();
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		bool flag = false;

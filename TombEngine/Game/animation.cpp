@@ -22,7 +22,7 @@ BOUNDING_BOX InterpolatedBounds;
 
 void AnimateLara(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.FrameNumber++;
 

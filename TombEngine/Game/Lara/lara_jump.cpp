@@ -33,7 +33,7 @@ void lara_col_land(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_forward()
 void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
 	lara->Control.Count.RunJump++;
@@ -117,7 +117,7 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_forward()
 void lara_col_jump_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = (item->Animation.Velocity > 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -167,7 +167,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_freefall()
 void lara_col_freefall(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.Airborne = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -183,7 +183,7 @@ void lara_col_freefall(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_reach()
 void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	Camera.targetAngle = ANGLE(85.0f);
 
@@ -239,7 +239,7 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_reach()
 void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (lara->Control.Rope.Ptr == -1)
 		item->Animation.Airborne = true;
@@ -275,7 +275,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_prepare()
 void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0)
 	{
@@ -355,7 +355,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_as_jump_prepare()
 void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -418,7 +418,7 @@ void lara_col_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_back()
 void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	Camera.targetAngle = ANGLE(135.0f);
@@ -488,7 +488,7 @@ void lara_col_jump_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_right()
 void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 
@@ -545,7 +545,7 @@ void lara_col_jump_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_as_jump_left()
 void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 
@@ -602,7 +602,7 @@ void lara_col_jump_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_jump_up()
 void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 
@@ -665,7 +665,7 @@ void lara_as_jump_up(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_jump_up()
 void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_STRETCH;
@@ -694,7 +694,7 @@ void lara_col_jump_up(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_fall_back()
 void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0)
 	{
@@ -762,7 +762,7 @@ void lara_col_fall_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_swan_dive()
 void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.CanLook = false;
@@ -838,7 +838,7 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_swan_dive()
 void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	auto* bounds = GetBoundsAccurate(item);
 	int realHeight = (bounds->Y2 - bounds->Y1) * 0.7f;

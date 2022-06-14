@@ -425,7 +425,7 @@ void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 
 bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	auto dest = PHD_3DPOS(item->Pose.Orientation);
 
@@ -714,7 +714,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	item2->Pose.Position.x = item->Pose.Position.x + cosY * rx + sinY * rz;
 	item2->Pose.Position.z = item->Pose.Position.z + cosY * rz - sinY * rx;
 
-	auto* lara = item2->Data.is<LaraInfo*>() ? GetLaraInfo(item2) : nullptr;
+	auto* lara = item2->IsLara() ? item2->GetLara() : nullptr;
 
 	if (lara != nullptr && spasmEnabled && bounds->Y2 - bounds->Y1 > CLICK(1))
 	{
@@ -1683,11 +1683,11 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 	laraItem->HitStatus = false;
 	coll->HitStatic     = false;
 
-	bool playerCollision = laraItem->Data.is<LaraInfo*>();
+	bool playerCollision = laraItem->IsLara();
 
 	if (playerCollision)
 	{
-		GetLaraInfo(laraItem)->HitDirection = -1;
+		laraItem->GetLara()->HitDirection = -1;
 
 		if (laraItem->HitPoints <= 0)
 			return;
@@ -1785,7 +1785,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode
 
 	if (playerCollision)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto* lara = laraItem->GetLara();
 		if (lara->HitDirection == -1)
 			lara->HitFrame = 0;
 	}

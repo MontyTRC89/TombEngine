@@ -127,6 +127,9 @@ struct ItemInfo
 	void ClearBits(JointBitType type, int jointIndex);
 	bool TestBits(JointBitType type, std::vector<int> jointIndices);
 	bool TestBits(JointBitType type, int jointIndex);
+
+	bool IsLara();
+	LaraInfo*& ItemInfo::GetLara();
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);

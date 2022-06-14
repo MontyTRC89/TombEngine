@@ -29,7 +29,7 @@ using namespace TEN::Entities::Generic;
 // Collision:	lara_default_col()
 void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -46,7 +46,7 @@ void lara_as_pickup(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -67,7 +67,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_switch_on(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -82,7 +82,7 @@ void lara_as_switch_on(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_switch_off(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -123,7 +123,7 @@ void lara_col_turn_switch(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_use_key(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -137,7 +137,7 @@ void lara_as_use_key(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -162,7 +162,7 @@ void lara_as_use_puzzle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -177,7 +177,7 @@ void lara_as_pushable_push(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_pushable_pull(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -208,7 +208,7 @@ void lara_as_pushable_grab(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 	auto* pulleyItem = &g_Level.Items[lara->InteractedItem];
 
 	lara->Control.CanLook = false;
@@ -273,7 +273,7 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 	auto* barItem = &g_Level.Items[lara->InteractedItem];
 
 	item->Animation.Airborne = true;
@@ -333,7 +333,7 @@ void lara_as_tightrope_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_tightrope_dismount(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -353,7 +353,7 @@ void lara_as_tightrope_dismount(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_tightrope_walk(ItemInfo* item, CollisionInfo* coll) 
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TestLaraTightropeDismount(item, coll))
 	{
@@ -549,7 +549,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_void_func()
 void lara_as_rope_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TrInput & IN_ACTION)
 	{
@@ -566,7 +566,7 @@ void lara_as_rope_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_void_func()
 void lara_as_rope_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TrInput & IN_ACTION)
 	{
@@ -594,7 +594,7 @@ void lara_as_rope_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:	lara_as_rope_idle()
 void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TrInput & IN_ACTION)
 	{
@@ -627,7 +627,7 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:	lara_as_rope_idle()
 void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	Camera.targetDistance = SECTOR(2);
 
@@ -687,7 +687,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 // Control:	lara_void_func()
 void lara_as_rope_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TrInput & IN_ROLL)
 		FallFromRope(item);
@@ -721,7 +721,7 @@ void lara_as_rope_down(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_pole_idle()
 void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -807,7 +807,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_pole_idle()
 void lara_col_pole_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -827,7 +827,7 @@ void lara_col_pole_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_pole_up()
 void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -883,7 +883,7 @@ void lara_col_pole_up(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_pole_down()
 void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -936,7 +936,7 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_pole_down()
 void lara_col_pole_down(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -970,7 +970,7 @@ void lara_col_pole_down(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_pole_turn_clockwise()
 void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -1025,7 +1025,7 @@ void lara_col_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_pole_turn_counter_clockwise()
 void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
@@ -1084,7 +1084,7 @@ void lara_col_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_void_func()
 void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	Camera.targetAngle = ANGLE(70.0f);
 

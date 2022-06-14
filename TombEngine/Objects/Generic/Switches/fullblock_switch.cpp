@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 
 	void FullBlockSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* laraInfo = laraItem->GetLara();
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		if ((!(TrInput & IN_ACTION) ||

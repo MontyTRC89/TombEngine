@@ -124,7 +124,7 @@ void DrawRubberBoat(ItemInfo* rBoatItem)
 
 RubberBoatMountType GetRubberBoatMountType(ItemInfo* laraItem, short itemNumber, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* rBoat = &g_Level.Items[itemNumber];
 
 	RubberBoatMountType mountType = RBOAT_MOUNT_NONE;
@@ -211,7 +211,7 @@ int TestWaterHeight(ItemInfo* rBoatItem, int zOffset, int xOffset, Vector3Int* p
 
 static void DoRubberBoatShift(ItemInfo* laraItem, int itemNumber)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* boatItem = &g_Level.Items[itemNumber];
 
 	int itemNumber2 = g_Level.Rooms[boatItem->RoomNumber].itemNumber;
@@ -366,7 +366,7 @@ static int GetRubberBoatCollisionAnim(ItemInfo* rBoatItem, Vector3Int* moved)
 
 static int RubberBoatDynamics(ItemInfo* laraItem, short itemNumber)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* rBoatItem = &g_Level.Items[itemNumber];
 	auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
 
@@ -622,7 +622,7 @@ bool RubberBoatUserControl(ItemInfo* laraItem, ItemInfo* rBoatItem)
 
 void RubberBoatCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
 		return;
@@ -675,7 +675,7 @@ void RubberBoatCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 
 static bool TestRubberBoatDismount(ItemInfo* laraItem, int direction)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* sBoatItem = &g_Level.Items[lara->Vehicle];
 
 	short angle;
@@ -860,7 +860,7 @@ static void TriggerRubberBoatMist(long x, long y, long z, long velocity, short a
 
 void DoRubberBoatDismount(ItemInfo* laraItem, ItemInfo* rBoatItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if ((laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_RIGHT || laraItem->Animation.ActiveState == RBOAT_STATE_JUMP_LEFT) &&
 		laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
@@ -904,7 +904,7 @@ void DoRubberBoatDismount(ItemInfo* laraItem, ItemInfo* rBoatItem)
 void RubberBoatControl(short itemNumber)
 {
 	auto* laraItem = LaraItem;
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* rBoatItem = &g_Level.Items[itemNumber];
 	auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
 

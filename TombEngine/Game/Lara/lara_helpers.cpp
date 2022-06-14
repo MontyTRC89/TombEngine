@@ -33,7 +33,7 @@ using namespace TEN::Renderer;
 
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	// Update AFK pose timer.
 	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
@@ -78,7 +78,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (lara->Vehicle != NO_ITEM)
 	{
@@ -129,7 +129,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 
 void ApproachLaraTargetOrientation(ItemInfo* item, Vector3Shrt targetOrient, float rate)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!rate)
 	{
@@ -247,7 +247,7 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 
 void DoLaraCrawlFlex(ItemInfo* item, CollisionInfo* coll, short maxAngle, short rate)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!item->Animation.Velocity)
 		return;
@@ -267,7 +267,7 @@ void DoLaraCrawlFlex(ItemInfo* item, CollisionInfo* coll, short maxAngle, short 
 
 void DoLaraTightropeBalance(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 	const int factor = ((lara->Control.Tightrope.TimeOnTightrope >> 7) & 0xFF) * 128;
 
 	if (TrInput & IN_LEFT)
@@ -294,7 +294,7 @@ void DoLaraTightropeBalance(ItemInfo* item)
 
 void DoLaraTightropeLean(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Pose.Orientation.z = lara->Control.Tightrope.Balance / 4;
 	lara->ExtraTorsoRot.z = -lara->Control.Tightrope.Balance;
@@ -302,7 +302,7 @@ void DoLaraTightropeLean(ItemInfo* item)
 
 void DoLaraTightropeBalanceRegen(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (lara->Control.Tightrope.TimeOnTightrope <= 32)
 		lara->Control.Tightrope.TimeOnTightrope = 0;
@@ -340,17 +340,6 @@ void DealLaraFallDamage(ItemInfo* item)
 	}
 }
 
-LaraInfo*& GetLaraInfo(ItemInfo* item)
-{
-	if (item->ObjectNumber == ID_LARA)
-		return (LaraInfo*&)item->Data;
-
-	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-
-	auto* firstLaraItem = FindItem(ID_LARA);
-	return (LaraInfo*&)firstLaraItem->Data;
-}
-
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
 	short direction = coll->Setup.ForwardAngle;
@@ -371,7 +360,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	constexpr int minVelocity = 50;
 	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
@@ -398,7 +387,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 
 void UpdateLaraSubsuitAngles(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (lara->Control.Subsuit.VerticalVelocity != 0)
 	{
@@ -467,7 +456,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 
 void ModulateLaraSubsuitSwimTurn(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TrInput & IN_FORWARD && item->Pose.Orientation.x > -ANGLE(85.0f))
 		lara->Control.Subsuit.DXRot = -ANGLE(45.0f);
@@ -496,7 +485,7 @@ void ModulateLaraSubsuitSwimTurn(ItemInfo* item)
 
 void ModulateLaraSwimTurn(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TrInput & IN_FORWARD)
 		item->Pose.Orientation.x -= ANGLE(2.0f);
@@ -523,7 +512,7 @@ void ModulateLaraSwimTurn(ItemInfo* item, CollisionInfo* coll)
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TrInput & IN_FORWARD &&
 		TestLaraJumpForward(item, coll))
@@ -555,7 +544,7 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 // RunJumpQueued will never reset, and when the sad cloud flies away after an indefinite amount of time, Lara will jump. @Sezz 2022.01.22
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y;
 	int distance = SECTOR(1);
@@ -574,7 +563,7 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 
 void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResult)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->ProjectedFloorHeight = vaultResult.Height;
 	lara->Control.HandStatus = vaultResult.SetBusyHands ? HandStatus::Busy : lara->Control.HandStatus;
@@ -633,7 +622,7 @@ void SetLaraMonkeyFallAnimation(ItemInfo* item)
 
 void SetLaraMonkeyRelease(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.Airborne = true;
 	item->Animation.Velocity = 2;
@@ -644,7 +633,7 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 // temp
 void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		return;
@@ -728,7 +717,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 
 void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0)
 	{
@@ -757,7 +746,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 
 void SetLaraSwimDiveAnimation(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
@@ -795,7 +784,7 @@ void ResetLaraLean(ItemInfo* item, float rate, bool resetRoll, bool resetPitch)
 
 void ResetLaraFlex(ItemInfo* item, float rate)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!rate)
 	{

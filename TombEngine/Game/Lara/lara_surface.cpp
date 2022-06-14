@@ -37,7 +37,7 @@ void lara_col_surface_dive(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_idle()
 void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
 	if (item->Animation.VerticalVelocity < 0)
@@ -109,7 +109,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_idle()
 void lara_col_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	LaraSurfaceCollision(item, coll);
@@ -119,7 +119,7 @@ void lara_col_surface_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_forward()
 void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0)
 	{
@@ -155,7 +155,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_swim_forward()
 void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
@@ -168,7 +168,7 @@ void lara_col_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_left()
 void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0)
 	{
@@ -207,7 +207,7 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_swim_left()
 void lara_col_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
@@ -217,7 +217,7 @@ void lara_col_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_right()
 void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0)
 	{
@@ -256,7 +256,7 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 // Conrol:		lara_as_surface_swim_right()
 void lara_col_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	LaraSurfaceCollision(item, coll);
@@ -266,7 +266,7 @@ void lara_col_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_surface_swim_back()
 void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0)
 	{
@@ -302,7 +302,7 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_surface_swim_back()
 void lara_col_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	LaraSurfaceCollision(item, coll);

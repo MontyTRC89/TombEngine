@@ -180,7 +180,7 @@ void InitialiseQuadBike(short itemNumber)
 
 static void QuadbikeExplode(ItemInfo* laraItem, ItemInfo* quadItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (TestEnvironment(ENV_FLAG_WATER, quadItem))
 		TriggerUnderwaterExplosion(quadItem, 1);
@@ -238,7 +238,7 @@ static int CanQuadbikeGetOff(int direction)
 
 static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* quad = (QuadInfo*)quadItem->Data;
 
 	if (lara->Vehicle == NO_ITEM)
@@ -295,7 +295,7 @@ static bool QuadCheckGetOff(ItemInfo* laraItem, ItemInfo* quadItem)
 
 static int GetOnQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (!(TrInput & IN_ACTION) ||
 		laraItem->Animation.Airborne ||
@@ -527,7 +527,7 @@ static int DoQuadDynamics(int height, int verticalVelocity, int* y)
 
 static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* quad = (QuadInfo*)quadItem->Data;
 
 	quad->NoDismount = false;
@@ -1172,7 +1172,7 @@ static int QuadUserControl(ItemInfo* quadItem, int height, int* pitch)
 
 void QuadBikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* quadItem = &g_Level.Items[itemNumber];
 	auto* quad = (QuadInfo*)quadItem->Data;
 
@@ -1285,7 +1285,7 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 
 bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* quadItem = &g_Level.Items[lara->Vehicle];
 	auto* quad = (QuadInfo*)quadItem->Data;
 

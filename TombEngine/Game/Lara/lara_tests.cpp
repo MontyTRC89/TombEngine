@@ -98,7 +98,7 @@ bool TestValidLedgeAngle(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	auto angle = lara->Control.MoveAngle;
 
@@ -259,7 +259,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
@@ -326,7 +326,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free || coll->HitStatic)
 		return false;
@@ -449,7 +449,7 @@ bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor)
 
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 	int shift, result;
 
 	if (!TestLaraNearClimbableWall(item))
@@ -510,7 +510,7 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	// Get incoming ledge height and own Lara's upper bound.
 	// First one will be negative while first one is positive.
@@ -546,7 +546,7 @@ bool TestLaraValidHangPosition(ItemInfo* item, CollisionInfo* coll)
 
 CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAngle)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	// Lara isn't in stop state yet, bypass test
 	if (item->Animation.AnimNumber != LA_REACH_TO_HANG && item->Animation.AnimNumber != LA_HANG_IDLE)
@@ -667,7 +667,7 @@ CornerType TestLaraHangCorner(ItemInfo* item, CollisionInfo* coll, float testAng
 
 CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* coll, float angle, bool outer)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	auto result = CornerTestResult();
 
@@ -734,7 +734,7 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 
 bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y;
 	auto probe = GetCollision(item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
@@ -751,7 +751,7 @@ bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraHangSideways(ItemInfo* item, CollisionInfo* coll, short angle)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	auto oldPos = item->Pose;
 
@@ -882,7 +882,7 @@ CollisionResult LaraCeilingCollisionFront(ItemInfo* item, short angle, int dista
 
 bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (coll->CollisionType == CT_FRONT ||
 		coll->Middle.FloorSlope ||
@@ -914,7 +914,7 @@ bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (coll->CollisionType != CT_FRONT || !(TrInput & IN_ACTION))
 		return false;
@@ -994,7 +994,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function for water to ladder move
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!(TrInput & IN_ACTION) ||
 		!lara->Control.CanClimbLadder ||
@@ -1064,7 +1064,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 
 void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	auto probe = GetCollision(item);
 	int waterDepth = GetWaterDepth(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
@@ -1093,7 +1093,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 #ifndef NEW_TIGHTROPE
 void GetTightropeFallOff(ItemInfo* item, int regularity)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (item->HitPoints <= 0 || item->HitStatus)
 		SetAnimation(item, LA_TIGHTROPE_FALL_LEFT);
@@ -1105,7 +1105,7 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (weaponType == LaraWeaponType::Shotgun ||
 		weaponType == LaraWeaponType::HK ||
@@ -1187,7 +1187,7 @@ bool IsRunJumpCountableState(LaraState state)
 
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		return false;
@@ -1260,7 +1260,7 @@ bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y;
 	auto probe = GetCollision(item, 0, 0, -(coll->Setup.Height / 2));
@@ -1276,7 +1276,7 @@ bool TestLaraFall(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraMonkeyGrab(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollision(item);
@@ -1293,7 +1293,7 @@ bool TestLaraMonkeyGrab(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y - LARA_HEIGHT_MONKEY;
 	auto probe = GetCollision(item);
@@ -1313,7 +1313,7 @@ bool TestLaraMonkeyFall(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraStep(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (abs(coll->Middle.Floor) > 0 &&
 		(coll->Middle.Floor <= STEPUP_HEIGHT ||					// Within lower floor bound...
@@ -1600,7 +1600,7 @@ bool TestLaraCrawlBack(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	// Assess water depth.
 	if (lara->WaterSurfaceDist < -CLICK(1))
@@ -1629,7 +1629,7 @@ bool TestLaraCrouchRoll(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraCrouch(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if ((lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(item, lara->Control.Weapon.GunType)) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
@@ -1642,7 +1642,7 @@ bool TestLaraCrouch(ItemInfo* item)
 
 bool TestLaraCrouchToCrawl(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
 		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
@@ -1657,7 +1657,7 @@ bool TestLaraCrouchToCrawl(ItemInfo* item)
 
 bool TestLaraFastTurn(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if ((lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
 		(lara->Control.HandStatus == HandStatus::WeaponDraw && lara->Control.Weapon.GunType != LaraWeaponType::Flare))
@@ -1781,7 +1781,7 @@ bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll)
 
 VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int distance = OFFSET_RADIUS(coll->Setup.Radius);
 	auto probeFront = GetCollision(item, coll->NearestLedgeAngle, distance, -coll->Setup.Height);
@@ -1950,7 +1950,7 @@ VaultTestResult TestLaraLedgeAutoJump(ItemInfo* item, CollisionInfo* coll)
 
 VaultTestResult TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y;
 	int distance = OFFSET_RADIUS(coll->Setup.Radius);
@@ -1975,7 +1975,7 @@ VaultTestResult TestLaraLadderAutoJump(ItemInfo* item, CollisionInfo* coll)
 
 VaultTestResult TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y;
 	int distance = OFFSET_RADIUS(coll->Setup.Radius);
@@ -2001,7 +2001,7 @@ VaultTestResult TestLaraLadderMount(ItemInfo* item, CollisionInfo* coll)
 
 VaultTestResult TestLaraMonkeyAutoJump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y;
 	auto probe = GetCollision(item);
@@ -2018,7 +2018,7 @@ VaultTestResult TestLaraMonkeyAutoJump(ItemInfo* item, CollisionInfo* coll)
 
 VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free)
 		return VaultTestResult{ false };
@@ -2107,7 +2107,7 @@ VaultTestResult TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 // Temporary solution to ladder mounts until ladders stop breaking whenever anyone tries to do anything with them. @Sezz 2022.02.05
 bool TestAndDoLaraLadderClimb(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (!(TrInput & IN_ACTION) || !(TrInput & IN_FORWARD) || lara->Control.HandStatus != HandStatus::Free)
 		return false;
@@ -2334,7 +2334,7 @@ bool TestLaraCrawlToHang(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup testSetup)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	int y = item->Pose.Position.y;
 	auto probe = GetCollision(item, testSetup.Angle, testSetup.Distance, -coll->Setup.Height);
@@ -2458,7 +2458,7 @@ bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	auto probe = GetCollision(item);
 

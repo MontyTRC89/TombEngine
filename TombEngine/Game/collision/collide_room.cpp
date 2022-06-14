@@ -217,7 +217,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
-	bool playerCollision = item->Data.is<LaraInfo*>();
+	bool playerCollision = item->IsLara();
 
 	// Reset collision parameters.
 	coll->CollisionType = CT_NONE;

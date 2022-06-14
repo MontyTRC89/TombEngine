@@ -95,7 +95,7 @@ void TrainControl(short itemNumber)
 
 void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = laraItem->GetLara();
 	auto* trainItem = &g_Level.Items[itemNumber];
 
 	if (!TestBoundsCollide(trainItem, laraItem, coll->Setup.Radius))

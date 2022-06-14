@@ -34,7 +34,7 @@ namespace TEN::Entities::TR5
 
 	void CrowDoveSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* laraInfo = laraItem->GetLara();
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		if (switchItem->Flags & ONESHOT ||

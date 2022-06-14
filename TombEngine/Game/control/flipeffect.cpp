@@ -86,14 +86,14 @@ void FlashOrange(ItemInfo* item)
 
 void MeshSwapToPour(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->MeshPtrs[LM_LHAND] = Objects[item->ItemFlags[2]].meshIndex + LM_LHAND;
 }
 
 void MeshSwapFromPour(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
@@ -140,7 +140,7 @@ void SetFog(ItemInfo* item)
 
 void DrawLeftPistol(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (lara->MeshPtrs[LM_LHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_LHAND)
 	{
@@ -156,7 +156,7 @@ void DrawLeftPistol(ItemInfo* item)
 
 void DrawRightPistol(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (lara->MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 	{
@@ -172,21 +172,21 @@ void DrawRightPistol(ItemInfo* item)
 
 void ShootLeftGun(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->LeftArm.FlashGun = 3;
 }
 
 void ShootRightGun(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->RightArm.FlashGun = 3;
 }
 
 void LaraHandsFree(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.HandStatus = HandStatus::Free;
 }
@@ -222,7 +222,7 @@ void KillActiveBaddys(ItemInfo* item)
 
 void LaraLocationPad(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	FlipEffect = -1;
 
@@ -232,7 +232,7 @@ void LaraLocationPad(ItemInfo* item)
 
 void LaraLocation(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	FlipEffect = -1;
 
@@ -250,7 +250,7 @@ void ExplosionFX(ItemInfo* item)
 
 void SwapCrowbar(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (lara->MeshPtrs[LM_RHAND] == Objects[ID_LARA_SKIN].meshIndex + LM_RHAND)
 		lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_CROWBAR_ANIM].meshIndex + LM_RHAND;

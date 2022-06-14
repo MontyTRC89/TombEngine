@@ -34,7 +34,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
 	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.10.21
 
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -106,7 +106,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_crouch_idle()
 void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
@@ -149,7 +149,7 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_as_crouch_roll()
 void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = true;
@@ -180,7 +180,7 @@ void lara_as_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_crouch_roll()
 void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
@@ -233,7 +233,7 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crouch_turn_left()
 void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -289,7 +289,7 @@ void lara_col_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crouch_turn_right()
 void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -345,7 +345,7 @@ void lara_col_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crouch_turn_180()
 void lara_as_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -381,7 +381,7 @@ void lara_col_crouch_turn_180(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_idle()
 void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -483,7 +483,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_crawl_idle()
 void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
@@ -527,7 +527,7 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_forward()
 void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -583,7 +583,7 @@ void lara_as_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_crawl_forward()
 void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
@@ -631,7 +631,7 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_back()
 void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 	lara->Control.HandStatus = HandStatus::Busy;
@@ -682,7 +682,7 @@ void lara_as_crawl_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_crawl_back()
 void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;
@@ -728,7 +728,7 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_turn_left()
 void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -788,7 +788,7 @@ void lara_col_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_turn_right()
 void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
@@ -848,7 +848,7 @@ void lara_col_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_crawl_turn_180()
 void lara_as_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -873,7 +873,7 @@ void lara_col_crawl_turn_180(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_crawl_to_hang(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;

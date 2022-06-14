@@ -51,7 +51,7 @@ OBJECT_COLLISION_BOUNDS KeyHoleBounds =
 // Puzzles
 void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = laraItem->GetLara();
 	auto* receptableItem = &g_Level.Items[itemNumber];
 
 	auto puzzleType = PuzzleType::Normal;
@@ -249,7 +249,7 @@ void DoPuzzle()
 // Keys
 void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = laraItem->GetLara();
 	auto* keyHoleItem = &g_Level.Items[itemNumber];
 
 	if (g_Level.Items[itemNumber].TriggerFlags == 1 &&

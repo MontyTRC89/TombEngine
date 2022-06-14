@@ -29,7 +29,7 @@ namespace TEN::Entities::Switches
 
 	void CogSwitchCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto* lara = laraItem->GetLara();
 		auto* switchItem = &g_Level.Items[itemNum];
 		auto* triggerIndex = GetTriggerIndex(switchItem);
 

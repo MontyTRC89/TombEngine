@@ -35,7 +35,7 @@ namespace TEN::Entities::Doors
 
 	void UnderwaterDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* laraInfo = laraItem->GetLara();
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (TrInput & IN_ACTION &&

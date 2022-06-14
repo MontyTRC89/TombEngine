@@ -164,7 +164,7 @@ namespace TEN::Entities::Doors
 
 	void DoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
+		auto* laraInfo = laraItem->GetLara();
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (doorItem->TriggerFlags == 2 &&

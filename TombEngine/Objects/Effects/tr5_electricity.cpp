@@ -228,7 +228,7 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				if (collItem->Data.is<LaraInfo*>())
+				if (collItem->IsLara())
 				{
 					auto* lara = (LaraInfo*&)collItem->Data;
 					lara->BurnBlue = 1;

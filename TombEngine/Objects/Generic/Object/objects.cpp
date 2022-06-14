@@ -119,7 +119,7 @@ void ControlWaterfall(short itemNumber)
 
 void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = laraItem->GetLara();
 	auto* tightropeItem = &g_Level.Items[itemNumber];
 	
 	if ((!(TrInput & IN_ACTION) ||
@@ -195,7 +195,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 
 void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = GetLaraInfo(laraItem);
+	auto* laraInfo = laraItem->GetLara();
 	auto* barItem = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&

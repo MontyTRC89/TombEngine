@@ -37,7 +37,7 @@ PistolDef PistolsTable[4] =
 
 void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* weapon = &Weapons[(int)weaponType];
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
@@ -270,7 +270,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* weapon = &Weapons[(int)weaponType];
 
 	LaraGetNewTarget(laraItem, weapon);
@@ -321,7 +321,7 @@ void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void ReadyPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
 	lara->LeftArm.Orientation = Vector3Shrt();
@@ -337,7 +337,7 @@ void ReadyPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void DrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int frame = lara->LeftArm.FrameNumber + 1;
@@ -361,7 +361,7 @@ void DrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* weapon = &Weapons[(int)weaponType];
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
@@ -447,7 +447,7 @@ void UndrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void SetArmInfo(ItemInfo* laraItem, ArmInfo* arm, int frame)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
 	int animBase = Objects[(int)p->ObjectNumber].animIndex;
@@ -467,7 +467,7 @@ void SetArmInfo(ItemInfo* laraItem, ArmInfo* arm, int frame)
 
 void DrawPistolMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (weaponType != LaraWeaponType::Revolver)
 		lara->Control.Weapon.HolsterInfo.LeftHolster = HolsterSlot::Empty;
@@ -481,7 +481,7 @@ void DrawPistolMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void UndrawPistolMeshRight(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
 	lara->Control.Weapon.HolsterInfo.RightHolster = HolsterSlotForWeapon(weaponType);
@@ -489,7 +489,7 @@ void UndrawPistolMeshRight(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void UndrawPistolMeshLeft(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (weaponType != LaraWeaponType::Revolver)
 	{

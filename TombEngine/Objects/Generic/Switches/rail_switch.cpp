@@ -37,7 +37,7 @@ namespace TEN::Entities::Switches
 
 	void RailSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
+		auto* lara = laraItem->GetLara();
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		int flag = 0;

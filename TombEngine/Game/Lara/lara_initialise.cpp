@@ -106,7 +106,7 @@ void InitialiseLara(int restore)
 
 void LaraInitialiseMeshes(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
@@ -137,7 +137,7 @@ void LaraInitialiseMeshes(ItemInfo* item)
 
 void InitialiseLaraAnims(ItemInfo* item)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	if (TestEnvironment(ENV_FLAG_WATER, item))
 	{

@@ -21,7 +21,7 @@
 // Collision:	lara_col_hang()
 void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.IsClimbingLadder = false;
 
@@ -45,7 +45,7 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_hang()
 void lara_col_hang(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->Animation.Airborne = false;
 	item->Animation.VerticalVelocity = 0;
@@ -215,7 +215,7 @@ void lara_as_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_shimmy_left()
 void lara_col_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;
@@ -242,7 +242,7 @@ void lara_as_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_shimmy_right()
 void lara_col_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	coll->Setup.Radius = LARA_RADIUS;

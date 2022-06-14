@@ -23,7 +23,7 @@
 // Collision:	lara_col_underwater_idle()
 void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	LaraType laraType = g_GameFlow->GetLevel(CurrentLevel)->GetLaraType();
 
@@ -150,7 +150,7 @@ void lara_col_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_underwater_death()
 void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	lara->Control.CanLook = false;
 
@@ -174,7 +174,7 @@ void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 // Control:	lara_as_underwater_death()
 void lara_col_underwater_death(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	auto* lara = item->GetLara();
 
 	item->HitPoints = -1;
 	lara->Air = -1;

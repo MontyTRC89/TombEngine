@@ -44,7 +44,7 @@ enum class CrossbowBoltType
 
 void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	//	if (HKTimer)
 	//	{
@@ -281,7 +281,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	lara->Control.HandStatus = HandStatus::WeaponReady;
 	lara->LeftArm.Orientation = Vector3Shrt();
@@ -297,7 +297,7 @@ void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void FireShotgun(ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	auto armOrient = Vector3Shrt(
 		lara->LeftArm.Orientation.x,
@@ -358,7 +358,7 @@ void FireShotgun(ItemInfo* laraItem)
 
 void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	ItemInfo* item;
 
@@ -407,7 +407,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
 	item->Animation.TargetState = WEAPON_STATE_UNDRAW;
@@ -444,7 +444,7 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlot::Empty;
 	lara->MeshPtrs[LM_RHAND] = Objects[WeaponObjectMesh(laraItem, weaponType)].meshIndex + LM_RHAND;
@@ -452,7 +452,7 @@ void DrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	lara->Control.Weapon.HolsterInfo.BackHolster = HolsterSlotForWeapon(weaponType);
 	lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
@@ -460,7 +460,7 @@ void UndrawShotgunMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void FireHarpoon(ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	Ammo& ammos = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
 	if (!ammos)
@@ -663,7 +663,7 @@ void HarpoonBoltControl(short itemNumber)
 
 void FireGrenade(ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	int x = 0;
 	int y = 0;
@@ -1121,7 +1121,7 @@ void GrenadeControl(short itemNumber)
 
 void FireRocket(ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	auto& ammos = GetAmmo(laraItem, LaraWeaponType::RocketLauncher);
 	if (!ammos)
@@ -1405,7 +1405,7 @@ void RocketControl(short itemNumber)
 
 void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	auto& ammos = GetAmmo(laraItem, LaraWeaponType::Crossbow);
 	if (!ammos)
@@ -1489,7 +1489,7 @@ void FireCrossBowFromLaserSight(ItemInfo* laraItem, GameVector* src, GameVector*
 
 void CrossbowBoltControl(short itemNumber)
 {
-	auto* lara = GetLaraInfo(LaraItem);
+	auto* lara = LaraItem->GetLara();
 	auto* item = &g_Level.Items[itemNumber];
 
 	// Store old position for later
@@ -1700,7 +1700,7 @@ void CrossbowBoltControl(short itemNumber)
 
 void FireHK(ItemInfo* laraItem, int mode)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	/*	if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
 		{
@@ -1753,7 +1753,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (BinocularRange)
 		return; // Never handle weapons when in binocular mode!

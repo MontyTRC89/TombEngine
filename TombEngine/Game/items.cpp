@@ -104,6 +104,22 @@ bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 	return TestBits(type, std::vector { jointIndex });
 }
 
+bool ItemInfo::IsLara()
+{
+	return this->Data.is<LaraInfo*>();
+}
+
+LaraInfo*& ItemInfo::GetLara()
+{
+	if (this->ObjectNumber == ID_LARA || IsLara())
+		return (LaraInfo*&)this->Data;
+
+	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(this->ObjectNumber), LogLevel::Warning);
+
+	auto* firstLaraItem = FindItem(ID_LARA);
+	return (LaraInfo*&)firstLaraItem->Data;
+}
+
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];

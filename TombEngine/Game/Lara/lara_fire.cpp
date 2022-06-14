@@ -339,7 +339,7 @@ GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 
 void AimWeapon(ItemInfo* laraItem, WeaponInfo* weaponInfo, ArmInfo* arm)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	auto targetArmOrient = Vector3Shrt();
 	if (arm->Locked)
@@ -381,7 +381,7 @@ void SmashItem(short itemNumber)
 
 void LaraGun(ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (lara->LeftArm.FlashGun > 0)
 		--lara->LeftArm.FlashGun;
@@ -653,14 +653,14 @@ void LaraGun(ItemInfo* laraItem)
 
 Ammo& GetAmmo(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	return lara->Weapons[(int)weaponType].Ammo[(int)lara->Weapons[(int)weaponType].SelectedAmmo];
 }
 
 void InitialiseNewWeapon(ItemInfo* laraItem)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	lara->LeftArm.FrameNumber = 0;
 	lara->RightArm.FrameNumber = 0;
@@ -716,7 +716,7 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 
 GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	switch (weaponType)
 	{
@@ -751,7 +751,7 @@ GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int damage, int grenade)
 {	
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	target->HitStatus = true;
 
@@ -824,7 +824,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 
 FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, Vector3Shrt armOrient)
 {
-	auto* lara = GetLaraInfo(src);
+	auto* lara = src->GetLara();
 
 	auto& ammo = GetAmmo(src, weaponType);
 	if (ammo.getCount() == 0 && !ammo.hasInfinite())
@@ -963,7 +963,7 @@ void FindTargetPoint(ItemInfo* item, GameVector* target)
 
 void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (lara->TargetEntity == nullptr)
 	{
@@ -1036,7 +1036,7 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 {
-	auto* lara = GetLaraInfo(laraItem);
+	auto* lara = laraItem->GetLara();
 
 	if (BinocularRange)
 	{
