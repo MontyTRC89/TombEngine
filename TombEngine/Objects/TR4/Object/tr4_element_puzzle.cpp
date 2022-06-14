@@ -155,7 +155,7 @@ namespace TEN::Entities::TR4
 
     void ElementPuzzleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
     {
-        auto* laraInfo = laraItem->GetLara();
+        auto* laraInfo = GetLaraInfo(laraItem);
         auto* puzzleItem = &g_Level.Items[itemNumber];
 
         int flags = 0;

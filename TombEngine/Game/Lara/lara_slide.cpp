@@ -21,7 +21,7 @@
 // Collision:	lara_col_slide_forward()
 void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(45.0f);
 
@@ -88,7 +88,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_slide_forward()
 void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	item->Animation.Airborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
@@ -129,7 +129,7 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_slide_back()
 void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(45.0f);
 	Camera.targetAngle = ANGLE(135.0f);
@@ -193,7 +193,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_slide_back()
 void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	item->Animation.Airborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);

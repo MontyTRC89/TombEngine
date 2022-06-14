@@ -178,7 +178,7 @@ static short GetMinecartCollision(ItemInfo* minecartItem, short angle, int dista
 
 static bool GetInMinecart(ItemInfo* minecartItem, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free ||
 		laraItem->Animation.Airborne)
@@ -213,7 +213,7 @@ static bool GetInMinecart(ItemInfo* minecartItem, ItemInfo* laraItem, CollisionI
 
 static bool TestMinecartDismount(ItemInfo* laraItem, int direction)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* minecartItem = &g_Level.Items[lara->Vehicle];
 	
 	short angle;
@@ -310,7 +310,7 @@ static void MinecartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem
 
 static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* minecart = (MinecartInfo*)minecartItem->Data;
 	auto flags = GetCollision(minecartItem).BottomBlock->Flags;
 
@@ -534,7 +534,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 
 static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo* minecart)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	short floorHeight;
 
@@ -873,7 +873,7 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 
 void MinecartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 		return;
@@ -920,7 +920,7 @@ void MinecartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 
 bool MinecartControl(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* minecartItem = &g_Level.Items[lara->Vehicle];
 
 	if (!minecartItem->Data) 

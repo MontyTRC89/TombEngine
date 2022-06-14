@@ -25,6 +25,7 @@ void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
 void DealLaraFallDamage(ItemInfo* item);
 
+LaraInfo*& GetLaraInfo(ItemInfo* item);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);

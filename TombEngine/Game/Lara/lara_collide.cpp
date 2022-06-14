@@ -50,7 +50,7 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 
 bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (coll->CollisionType != CT_NONE)
 		ShiftItem(item, coll);
@@ -406,7 +406,7 @@ void GetLaraDeadlyBounds()
 
 void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = moveAngle;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -420,7 +420,7 @@ void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle)
 
 void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 
@@ -446,7 +446,7 @@ void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll)
 
 void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	int oldX = item->Pose.Position.x;
 	int oldY = item->Pose.Position.y;
@@ -592,7 +592,7 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 
 void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->WaterCurrentActive)
 	{

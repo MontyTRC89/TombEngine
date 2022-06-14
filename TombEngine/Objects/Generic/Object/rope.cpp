@@ -171,7 +171,7 @@ namespace TEN::Entities::Generic
 
 	void RopeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = laraItem->GetLara();
+		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* ropeItem = &g_Level.Items[itemNumber];
 		auto* rope = &Ropes[ropeItem->TriggerFlags];
 		

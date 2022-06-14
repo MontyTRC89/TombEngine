@@ -199,7 +199,7 @@ void DoPickup(ItemInfo* laraItem)
 	if (getThisItemPlease == NO_ITEM)
 		return;
 
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	short pickupItemNumber = getThisItemPlease;
 	auto* pickupItem = &g_Level.Items[pickupItemNumber];
@@ -314,7 +314,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	if (triggerFlags == 5 || triggerFlags == 10)
 		return;
 
-	auto lara = laraItem->GetLara();
+	auto lara = GetLaraInfo(laraItem);
 
 	if (item->ObjectNumber == ID_FLARE_ITEM && lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		return;

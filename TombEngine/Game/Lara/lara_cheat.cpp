@@ -14,7 +14,7 @@
 
 void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD)
 		item->Pose.Orientation.x -= ANGLE(3.0f);
@@ -57,7 +57,7 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 
 void LaraCheatyBits(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (g_GameFlow->IsFlyCheatEnabled())
 	{
@@ -99,7 +99,7 @@ void LaraCheatyBits(ItemInfo* item)
 
 void LaraCheatGetStuff(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Inventory.TotalFlares = -1;
 	lara->Inventory.TotalSmallMedipacks = -1;
@@ -214,7 +214,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 
 void DelsGiveLaraItemsCheat(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	for (int i = 0; i < 8; ++i)
 	{

@@ -28,7 +28,7 @@ void InitialiseSarcophagus(short itemNumber)
 
 void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = laraItem->GetLara();
+	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* sarcItem = &g_Level.Items[itemNumber];
 
 	if (TrInput & IN_ACTION &&

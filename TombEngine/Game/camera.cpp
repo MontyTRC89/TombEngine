@@ -447,7 +447,7 @@ void UpdateCameraElevation()
 
 void CombatCamera(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	Camera.target.x = item->Pose.Position.x;
 	Camera.target.z = item->Pose.Position.z;
@@ -772,7 +772,7 @@ void FixedCamera(ItemInfo* item)
 
 void LookCamera(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	short headXRot = lara->ExtraHeadRot.x;
 	short headYRot = lara->ExtraHeadRot.y;
@@ -1067,7 +1067,7 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 
 void BinocularCamera(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (LSHKTimer)
 		--LSHKTimer;
@@ -1600,7 +1600,7 @@ void CalculateCamera()
 
 void LookLeftRight(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	Camera.type = CameraType::Look;
 	if (TrInput & IN_LEFT)
@@ -1637,7 +1637,7 @@ void LookLeftRight(ItemInfo* item)
 
 void LookUpDown(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	Camera.type = CameraType::Look;
 	if (TrInput & IN_FORWARD)
@@ -1674,7 +1674,7 @@ void LookUpDown(ItemInfo* item)
 
 void ResetLook(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (Camera.type != CameraType::Look)
 	{

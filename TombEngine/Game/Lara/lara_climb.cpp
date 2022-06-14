@@ -194,7 +194,7 @@ void lara_as_climb_up(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_climb_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (!LaraCheckForLetGo(item, coll))
 	{
@@ -217,7 +217,7 @@ void lara_as_climb_right(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_climb_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (!LaraCheckForLetGo(item, coll))
 	{
@@ -343,7 +343,7 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 
 void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.IsClimbingLadder = true;
 	coll->Setup.EnableSpasm = false;
@@ -594,7 +594,7 @@ void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int s
 
 int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	int result = 0;
 
@@ -683,7 +683,7 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	int result = 0;
 
@@ -770,7 +770,7 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 
 int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	*shift = 0;
 	int hang = 1;
@@ -977,7 +977,7 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 
 bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	item->Animation.VerticalVelocity = 0;
 	item->Animation.Airborne = false;

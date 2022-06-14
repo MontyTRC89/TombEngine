@@ -37,7 +37,7 @@ void InitialiseDeathSlide(short itemNumber)
 
 void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = laraItem->GetLara();
+	auto* laraInfo = GetLaraInfo(laraItem);
 
 	if (!(TrInput & IN_ACTION) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||

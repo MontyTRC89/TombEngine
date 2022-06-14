@@ -58,7 +58,7 @@ void TrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 
 void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = laraItem->GetLara();
+	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
 	bool itemIsAbove = trapDoorItem->Pose.Position.y <= laraItem->Pose.Position.y - LARA_HEIGHT + LARA_HEADROOM;
@@ -112,7 +112,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 
 void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = laraItem->GetLara();
+	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* trapDoorItem = &g_Level.Items[itemNumber];
 
 	if ((TrInput & IN_ACTION &&

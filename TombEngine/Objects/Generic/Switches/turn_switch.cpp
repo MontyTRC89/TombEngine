@@ -48,7 +48,7 @@ namespace TEN::Entities::Switches
 
 	void TurnSwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = laraItem->GetLara();
+		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		int doSwitch = 0;

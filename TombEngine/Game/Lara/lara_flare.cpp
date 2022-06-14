@@ -85,7 +85,7 @@ void FlareControl(short itemNumber)
 
 void ReadyFlare(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	lara->Control.HandStatus = HandStatus::Free;
 	lara->LeftArm.Orientation = Vector3Shrt();
@@ -97,21 +97,21 @@ void ReadyFlare(ItemInfo* laraItem)
 
 void UndrawFlareMeshes(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_LHAND;
 }
 
 void DrawFlareMeshes(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	lara->MeshPtrs[LM_LHAND] = Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND;
 }
 
 void UndrawFlare(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	int flareFrame = lara->Flare.Frame;
 	int armFrame = lara->LeftArm.FrameNumber;
@@ -221,7 +221,7 @@ void UndrawFlare(ItemInfo* laraItem)
 
 void DrawFlare(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	if (laraItem->Animation.ActiveState == LS_PICKUP_FLARE ||
 		laraItem->Animation.ActiveState == LS_PICKUP)
@@ -267,7 +267,7 @@ void DrawFlare(ItemInfo* laraItem)
 
 void SetFlareArm(ItemInfo* laraItem, int armFrame)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	int flareAnimNum = Objects[ID_LARA_FLARE_ANIM].animIndex;
 
 	if (armFrame >= 95)
@@ -285,7 +285,7 @@ void SetFlareArm(ItemInfo* laraItem, int armFrame)
 
 void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto itemNumber = CreateItem();
 
 	if (itemNumber != NO_ITEM)
@@ -365,7 +365,7 @@ void DrawFlareInAir(ItemInfo* flareItem)
 
 void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	auto pos = Vector3Int(11, 32, 41);
 	GetLaraJointPosition(&pos, LM_LHAND);

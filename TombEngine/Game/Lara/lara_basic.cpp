@@ -35,7 +35,7 @@ void lara_void_func(ItemInfo* item, CollisionInfo* coll)
 
 void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
@@ -63,7 +63,7 @@ void lara_as_null(ItemInfo* item, CollisionInfo* coll)
 
 void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -80,7 +80,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 
 void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -93,7 +93,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_void_func()
 void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -108,7 +108,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_as_jump_prepare()
 void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -125,7 +125,7 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_walk_forward()
 void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.Count.RunJump++;
 	if (lara->Control.Count.RunJump > (LARA_RUN_JUMP_TIME / 2 + 4))
@@ -185,7 +185,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_walk_forward()
 void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.Airborne = false;
@@ -243,7 +243,7 @@ void lara_col_walk_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_run_forward()
 void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.Count.RunJump++;
 	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
@@ -327,7 +327,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_run_forward()
 void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.Airborne = false;
@@ -397,7 +397,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_idle()
 void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -578,7 +578,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for idling in wade-height water.
 void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 	
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
@@ -646,7 +646,7 @@ void PseudoLaraAsWadeIdle(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for idling in swamps.
 void PseudoLaraAsSwampIdle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -708,7 +708,7 @@ void PseudoLaraAsSwampIdle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_idle(), lara_as_pose()
 void lara_col_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -792,7 +792,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_run_back()
 void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_LEFT)
 	{
@@ -824,7 +824,7 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_run_back()
 void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.VerticalVelocity = 0;
@@ -868,7 +868,7 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_turn_right_slow()
 void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -1007,7 +1007,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for turning right slowly in wade-height water.
 void PsuedoLaraAsWadeTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->Control.TurnRate > LARA_WADE_TURN_MAX)
 		lara->Control.TurnRate = LARA_WADE_TURN_MAX;
@@ -1072,7 +1072,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for turning right slowly in swamps.
 void PsuedoLaraAsSwampTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->Control.TurnRate > LARA_SWAMP_TURN_MAX)
 		lara->Control.TurnRate = LARA_SWAMP_TURN_MAX;
@@ -1138,7 +1138,7 @@ void lara_col_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_turn_left_slow()
 void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -1277,7 +1277,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for turning left slowly in wade-height water.
 void PsuedoLaraAsWadeTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->Control.TurnRate < -LARA_WADE_TURN_MAX)
 		lara->Control.TurnRate = -LARA_WADE_TURN_MAX;
@@ -1342,7 +1342,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for turning left slowly in swamps.
 void PsuedoLaraAsSwampTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
 		lara->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
@@ -1408,7 +1408,7 @@ void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_death()
 void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
@@ -1428,7 +1428,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_death()
 void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	item->Animation.Airborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
@@ -1456,7 +1456,7 @@ void lara_col_death(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_splat()
 void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 }
@@ -1465,7 +1465,7 @@ void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_splat()
 void lara_col_splat(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.BlockFloorSlopeUp = true;
@@ -1489,7 +1489,7 @@ void lara_col_splat(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_walk_back()
 void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -1542,7 +1542,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for walking back in swamps.
 void PseudoLaraAsSwampWalkBack(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_LEFT)
 	{
@@ -1575,7 +1575,7 @@ void PseudoLaraAsSwampWalkBack(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_walk_back()
 void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -1623,7 +1623,7 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_turn_right_fast()
 void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1754,7 +1754,7 @@ void lara_col_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_turn_left_fast()
 void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (item->HitPoints <= 0)
 	{
@@ -1884,7 +1884,7 @@ void lara_col_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_step_right()
 void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 
@@ -1927,7 +1927,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_step_right()
 void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -1984,7 +1984,7 @@ void lara_col_step_right(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_step_left()
 void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 
@@ -2026,7 +2026,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_step_left()
 void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -2083,7 +2083,7 @@ void lara_col_step_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_roll_back()
 void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 
@@ -2100,7 +2100,7 @@ void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_roll_back()
 void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	item->Animation.Airborne = false;
@@ -2144,7 +2144,7 @@ void lara_col_roll_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_roll_forward()
 void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
 
@@ -2169,7 +2169,7 @@ void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_roll_forward()
 void lara_col_roll_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.Airborne = false;
@@ -2212,7 +2212,7 @@ void lara_col_roll_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_wade_forward()
 void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -2272,7 +2272,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 // Pseudo-state for wading in swamps.
 void PseudoLaraAsSwampWadeForward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (TrInput & IN_LEFT)
 	{
@@ -2314,7 +2314,7 @@ void PseudoLaraAsSwampWadeForward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_wade_forward()
 void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
@@ -2360,7 +2360,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_sprint()
 void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->SprintEnergy--;
 
@@ -2446,7 +2446,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_sprint()
 void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -2513,7 +2513,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_sprint_dive()
 void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.Count.RunJump++;
 	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
@@ -2543,7 +2543,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_col_sprint_dive()
 void lara_col_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = (item->Animation.Velocity >= 0) ? item->Pose.Orientation.y : item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;

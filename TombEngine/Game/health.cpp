@@ -46,7 +46,7 @@ void DrawHUD(ItemInfo* item)
 
 void DrawHealthBarOverlay(ItemInfo* item, int value)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (CurrentLevel)
 	{
@@ -62,7 +62,7 @@ void DrawHealthBarOverlay(ItemInfo* item, int value)
 
 void DrawHealthBar(ItemInfo* item, float value)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (CurrentLevel)
 		g_Renderer.DrawBar(value, g_HealthBar, ID_HEALTH_BAR_TEXTURE, GlobalCounter, Lara.PoisonPotency);
@@ -70,7 +70,7 @@ void DrawHealthBar(ItemInfo* item, float value)
 
 void UpdateHealthBar(ItemInfo* item, int flash)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	auto HitPoints = item->HitPoints;
 
@@ -159,7 +159,7 @@ void DrawAirBar(float value)
 
 void UpdateAirBar(ItemInfo* item, int flash)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->Air == LARA_AIR_MAX || item->HitPoints <= 0)
 		return;
@@ -198,7 +198,7 @@ void DrawSprintBar(float value)
 
 void UpdateSprintBar(ItemInfo* item)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX)
 		DrawSprintBar(lara->SprintEnergy / LARA_SPRINT_ENERGY_MAX);

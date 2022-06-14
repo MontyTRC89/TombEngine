@@ -129,7 +129,6 @@ struct ItemInfo
 	bool TestBits(JointBitType type, int jointIndex);
 
 	bool IsLara();
-	LaraInfo*& ItemInfo::GetLara();
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);

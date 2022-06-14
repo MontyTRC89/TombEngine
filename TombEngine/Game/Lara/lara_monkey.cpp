@@ -25,7 +25,7 @@
 // Collision:	lara_col_monkey_idle()
 void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
@@ -128,7 +128,7 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_idle()
 void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.Airborne = false;
@@ -165,7 +165,7 @@ void lara_col_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_forward()
 void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
@@ -218,7 +218,7 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_forward()
 void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -252,7 +252,7 @@ void lara_col_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_back()
 void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
@@ -299,7 +299,7 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_back()
 void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -333,7 +333,7 @@ void lara_col_monkey_back(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_shimmy_left()
 void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
@@ -383,7 +383,7 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_shimmy_left()
 void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -417,7 +417,7 @@ void lara_col_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_shimmy_right()
 void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
@@ -467,7 +467,7 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 // Control:		lara_as_monkey_shimmy_right()
 void lara_col_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -519,7 +519,7 @@ void lara_col_monkey_turn_180(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_turn_left()
 void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;
@@ -602,7 +602,7 @@ void lara_col_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_col_monkey_turn_right()
 void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.EnableObjectPush = false;

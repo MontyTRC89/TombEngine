@@ -129,7 +129,7 @@ CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float v
 
 	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. @Sezz 2022.06.14
 	auto location =
-		item->Data.is<LaraInfo*>() ?
+		item->IsLara() ?
 		item->Location :
 		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
 

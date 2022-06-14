@@ -276,7 +276,7 @@ void KayakUpdateWakeFX()
 
 KayakMountType KayakGetMountType(ItemInfo* laraItem, short itemNumber)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* kayakItem = &g_Level.Items[itemNumber];
 
 	if (!(TrInput & IN_ACTION) ||
@@ -378,7 +378,7 @@ int KayakDoDynamics(int height, int verticalVelocity, int* y)
 
 void KayakDoCurrent(ItemInfo* laraItem, ItemInfo* kayakItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* room = &g_Level.Rooms[kayakItem->RoomNumber];
 
 	if (!lara->WaterCurrentActive)
@@ -728,7 +728,7 @@ void KayakToBackground(ItemInfo* laraItem, ItemInfo* kayakItem)
 
 void KayakUserInput(ItemInfo* laraItem, ItemInfo* kayakItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* kayak = (KayakInfo*)kayakItem->Data;
 
 	if (laraItem->HitPoints <= 0 &&
@@ -1182,7 +1182,7 @@ void KayakToItemCollision(ItemInfo* laraItem, ItemInfo* kayakItem)
 
 void KayakLaraRapidsDrown(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_OVERBOARD_DEATH;
 	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -1203,7 +1203,7 @@ void KayakLaraRapidsDrown(ItemInfo* laraItem)
 
 void KayakCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* kayakItem = &g_Level.Items[itemNumber];
 	auto* kayak = (KayakInfo*)kayakItem->Data;
 
@@ -1258,7 +1258,7 @@ void KayakCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 bool KayakControl(ItemInfo* laraItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* kayakItem = &g_Level.Items[lara->Vehicle];
 	auto* kayak = (KayakInfo*)kayakItem->Data;
 

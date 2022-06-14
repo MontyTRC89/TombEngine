@@ -30,7 +30,7 @@ namespace TEN::Entities::Generic
 
 	void PoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = laraItem->GetLara();
+		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* poleItem = &g_Level.Items[itemNumber];
 
 		bool isLara = !poleItem->IsLara();

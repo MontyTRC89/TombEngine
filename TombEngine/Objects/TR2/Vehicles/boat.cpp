@@ -101,7 +101,7 @@ void InitialiseSpeedBoat(short itemNumber)
 
 BoatMountType GetSpeedBoatMountType(ItemInfo* laraItem, ItemInfo* sBoatItem, CollisionInfo* coll)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	BoatMountType mountType = BoatMountType::None;
 
@@ -191,7 +191,7 @@ bool TestSpeedBoatDismount(ItemInfo* sBoatItem, int direction)
 
 void DoSpeedBoatDismount(ItemInfo* laraItem, ItemInfo* sBoatItem)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	if ((laraItem->Animation.ActiveState == SBOAT_STATE_DISMOUNT_LEFT ||
 		laraItem->Animation.ActiveState == SBOAT_STATE_DISMOUNT_RIGHT) &&
@@ -437,7 +437,7 @@ int DoSpeedBoatDynamics(int height, int verticalVelocity, int* y)
 
 int SpeedBoatDynamics(ItemInfo* laraItem, short itemNumber)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* sBoatItem = &g_Level.Items[itemNumber];
 	auto* sBoat = (SpeedBoatInfo*)sBoatItem->Data;
 
@@ -777,7 +777,7 @@ void SpeedBoatSplash(ItemInfo* item, long verticalVelocity, long water)
 
 void SpeedBoatCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 
 	if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 		return;
@@ -839,7 +839,7 @@ void SpeedBoatCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 void SpeedBoatControl(short itemNumber)
 {
 	auto* laraItem = LaraItem;
-	auto* lara = laraItem->GetLara();
+	auto* lara = GetLaraInfo(laraItem);
 	auto* sBoatItem = &g_Level.Items[itemNumber];
 	auto* sBoat = (SpeedBoatInfo*)sBoatItem->Data;
 

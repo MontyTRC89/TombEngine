@@ -380,7 +380,7 @@ void PushableBlockControl(short itemNumber)
 
 void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* laraInfo = laraItem->GetLara();
+	auto* laraInfo = GetLaraInfo(laraItem);
 	auto* pushableItem = &g_Level.Items[itemNumber];
 	auto* pushableInfo = (PushableInfo*)pushableItem->Data;
 

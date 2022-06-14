@@ -407,7 +407,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (lara->Control.Weapon.HasFired)
 	{
@@ -736,7 +736,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	// TODO: Move radius and height resets here when look feature is refactored. @Sezz 2022.03.29
@@ -810,7 +810,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	Camera.targetElevation = -ANGLE(22.0f);
 
@@ -899,7 +899,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
 	coll->Setup.Radius = LARA_RADIUS_UNDERWATER;
@@ -999,7 +999,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	item->HitPoints = LARA_HEALTH_MAX;
 	LaraUnderwater(item, coll);

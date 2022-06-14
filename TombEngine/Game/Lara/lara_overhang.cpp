@@ -305,7 +305,7 @@ SlopeData GetSlopeData(ItemInfo* item)
 
 void lara_col_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	GetCollisionInfo(coll, item);
 
@@ -474,7 +474,7 @@ void lara_as_slopefall(ItemInfo* item, CollisionInfo* coll)
 
 void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	GetCollisionInfo(coll, item);
 
@@ -606,7 +606,7 @@ void lara_as_slopeshimmy(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = CLICK(6.5f);
 	Camera.speed = 15;
 
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (item->Animation.AnimNumber == LA_OVERHANG_SHIMMY_LEFT)
 	{
@@ -808,7 +808,7 @@ void lara_as_sclimbend(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	item->GetLara()->NextCornerPos.Orientation.z = 0;
+	GetLaraInfo(item)->NextCornerPos.Orientation.z = 0;
 	item->Pose.Orientation.x = 0;
 }
 
@@ -1035,7 +1035,7 @@ void SlopeClimbDownExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_MONKEY_IDLE (75)
 void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = item->GetLara();
+	auto* lara = GetLaraInfo(item);
 
 	if (!g_GameFlow->HasOverhangClimb())
 		return;
