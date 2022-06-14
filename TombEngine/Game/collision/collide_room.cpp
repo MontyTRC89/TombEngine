@@ -305,7 +305,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	auto collResult = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 	coll->FloorTilt = collResult.FloorTilt;
 	coll->CeilingTilt = collResult.CeilingTilt;
-	coll->NearestLedgeAngle = playerCollision ? GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance) : 0;
+	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
 
 	// Debug angle and distance
 	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);
@@ -873,6 +873,10 @@ int GetQuadrant(short angle)
 
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 {
+	// Calculation ledge angle for non-Lara objects is unnecessary.
+	if (!item->IsLara())
+		return 0; 
+
 	// Get item bounds and current rotation
 	auto bounds = GetBoundsAccurate(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);
