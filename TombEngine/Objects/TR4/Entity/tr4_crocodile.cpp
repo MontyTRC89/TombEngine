@@ -13,13 +13,15 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_room.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
-	static BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
-	const std::vector<int> CrocodileBiteAttackJoints = { 8, 9 };
+	BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
+	const vector<int> CrocodileBiteAttackJoints = { 8, 9 };
 
 	constexpr auto CROC_SWIM_SPEED = 16;
-	constexpr auto CROC_DAMAGE = 120;
+	constexpr auto CROC_ATTACK_DAMAGE = 120;
 
 	constexpr auto CROC_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
@@ -273,7 +275,7 @@ namespace TEN::Entities::TR4
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
 						item->Animation.RequiredState = CROC_STATE_IDLE;
 
-						LaraItem->HitPoints -= CROC_DAMAGE;
+						LaraItem->HitPoints -= CROC_ATTACK_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
 				}
@@ -317,7 +319,7 @@ namespace TEN::Entities::TR4
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
 						item->Animation.RequiredState = CROC_STATE_SWIM_FORWARD;
 
-						LaraItem->HitPoints -= CROC_DAMAGE;
+						LaraItem->HitPoints -= CROC_ATTACK_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
 				}

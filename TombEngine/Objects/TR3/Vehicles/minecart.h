@@ -3,6 +3,6 @@
 struct ItemInfo;
 struct CollisionInfo;
 
-void InitialiseMineCart(short itemNumber);
-void MineCartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-bool MineCartControl(ItemInfo* laraItem);
+void InitialiseMinecart(short itemNumber);
+void MinecartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+bool MinecartControl(ItemInfo* laraItem);
