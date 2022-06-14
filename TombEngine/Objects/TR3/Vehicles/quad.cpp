@@ -341,49 +341,12 @@ static int GetOnQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, CollisionInfo* 
 
 static void QuadEntityCollision(ItemInfo* laraItem, ItemInfo* quadItem)
 {
-	vector<short> roomsList;
-	roomsList.push_back(quadItem->RoomNumber);
+	CollisionInfo coll = {};
+	coll.Setup.Radius = QUAD_RADIUS;
+	coll.Setup.EnableObjectPush = true;
+	coll.Setup.OldPosition = laraItem->Pose.Position;
 
-	auto* room = &g_Level.Rooms[quadItem->RoomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-		roomsList.push_back(room->doors[i].room);
-
-	for (int i = 0; i < roomsList.size(); i++)
-	{
-		short itemNumber = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNumber != NO_ITEM)
-		{
-			auto* item = &g_Level.Items[itemNumber];
-
-			if (item->Collidable &&
-				item->Status != ITEM_INVISIBLE &&
-				item != laraItem && item != quadItem)
-			{
-				auto* object = &Objects[item->ObjectNumber];
-
-				if (object->collision && object->intelligent)
-				{
-					int x = quadItem->Pose.Position.x - item->Pose.Position.x;
-					int y = quadItem->Pose.Position.y - item->Pose.Position.y;
-					int z = quadItem->Pose.Position.z - item->Pose.Position.z;
-
-					if (x > -SECTOR(2) && x < SECTOR(2) &&
-						z > -SECTOR(2) && z < SECTOR(2) &&
-						y > -SECTOR(2) && y < SECTOR(2))
-					{
-						if (TestBoundsCollide(item, quadItem, QUAD_RADIUS))
-						{
-							DoLotsOfBlood(item->Pose.Position.x, quadItem->Pose.Position.y - CLICK(1), item->Pose.Position.z, quadItem->Animation.Velocity, quadItem->Pose.Orientation.y, item->RoomNumber, 3);
-							item->HitPoints = 0;
-						}
-					}
-				}
-			}
-
-			itemNumber = item->NextItem;
-		}
-	}
+	DoObjectCollision(quadItem, &coll, true);
 }
 
 static int GetQuadCollisionAnim(ItemInfo* quadItem, Vector3Int* p)

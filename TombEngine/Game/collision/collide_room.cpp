@@ -303,7 +303,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 	auto collResult = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber);
 	coll->FloorTilt = collResult.FloorTilt;
 	coll->CeilingTilt = collResult.CeilingTilt;
-	coll->NearestLedgeAngle = GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance);
+	coll->NearestLedgeAngle = playerCollision ? GetNearestLedgeAngle(item, coll, coll->NearestLedgeDistance) : 0;
 
 	// Debug angle and distance
 	// g_Renderer.PrintDebugMessage("Nearest angle: %d", coll->NearestLedgeAngle);

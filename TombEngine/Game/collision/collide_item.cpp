@@ -1678,61 +1678,108 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll, bool vehicleMode) // previously LaraBaddyCollision
 {
 	laraItem->HitStatus = false;
 	coll->HitStatic = false;
 
-	if (laraItem == LaraItem)
-		Lara.HitDirection = -1;
+	bool playerCollision = laraItem->Data.is<LaraInfo*>();
 
-	if (!Objects[laraItem->ObjectNumber].intelligent || laraItem->HitPoints > 0)
+	if (playerCollision)
 	{
-		short* door, numDoors;
-		for (auto i : GetRoomList(laraItem->RoomNumber))
+		GetLaraInfo(laraItem)->HitDirection = -1;
+
+		if (laraItem->HitPoints <= 0)
+			return;
+	}
+
+	if (Objects[laraItem->ObjectNumber].intelligent)
+		return;
+
+	for (auto i : GetRoomList(laraItem->RoomNumber))
+	{
+		int nextItem = g_Level.Rooms[i].itemNumber;
+		int itemNumber = nextItem;
+		ItemInfo* item;
+
+		while (nextItem != NO_ITEM, 
+			   item = &g_Level.Items[nextItem], itemNumber = nextItem, nextItem = item->NextItem)
 		{
-			short itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
+			if (item == laraItem)
+				continue;
+
+			if (!(item->Collidable && item->Status != ITEM_INVISIBLE))
+				continue;
+
+			auto* object = &Objects[item->ObjectNumber];
+
+			if (object->collision == nullptr)
+				continue;
+
+			if (phd_Distance(&item->Pose, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
+				continue;
+
+			if (vehicleMode)
 			{
-				auto* item = &g_Level.Items[itemNumber];
-				if (item->Collidable && item->Status != ITEM_INVISIBLE)
+				if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+					continue;
+
+				if (object->drawRoutine == nullptr)
+					continue;
+
+				if (object->intelligent)
 				{
-					auto* object = &Objects[item->ObjectNumber];
-					if (object->collision != nullptr)
-					{
-						if (phd_Distance(&item->Pose, &laraItem->Pose) < COLLISION_CHECK_DISTANCE)
-							object->collision(itemNumber, laraItem, coll);
-					}
+					item->HitPoints = 0;
+					DoLotsOfBlood(item->Pose.Position.x,
+						laraItem->Pose.Position.y - CLICK(1),
+						item->Pose.Position.z,
+						laraItem->Animation.Velocity,
+						laraItem->Pose.Orientation.y,
+						item->RoomNumber, 3);
 				}
-
-				itemNumber = item->NextItem;
-			}
-
-			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
-			{
-				auto* mesh = &g_Level.Rooms[i].mesh[j];
-
-				// Only process meshes which are visible and non-solid
-				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
+				else if (!object->isPickup)
 				{
-					if (phd_Distance(&mesh->pos, &laraItem->Pose) < COLLISION_CHECK_DISTANCE)
-					{
-						if (TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))
-						{
-							coll->HitStatic = true;
-
-							if (coll->Setup.EnableObjectPush)
-								ItemPushStatic(laraItem, mesh, coll);
-							else
-								break;
-						}
-					}
+					ItemPushItem(item, laraItem, coll, false, 0);
+				}
+				else
+				{
+					auto a = 1;
 				}
 			}
+			else
+				object->collision(itemNumber, laraItem, coll);
 		}
 
-		if (laraItem == LaraItem && Lara.HitDirection == -1)
-			Lara.HitFrame = 0;
+		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
+		{
+			auto* mesh = &g_Level.Rooms[i].mesh[j];
+
+			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			if (!vehicleMode && !(mesh->flags & StaticMeshFlags::SM_SOLID))
+				continue;
+
+			if (phd_Distance(&mesh->pos, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
+				continue;
+
+			if (!TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))
+				continue;
+
+			coll->HitStatic = true;
+
+			if (coll->Setup.EnableObjectPush)
+				ItemPushStatic(laraItem, mesh, coll);
+			else
+				break;
+		}
+	}
+
+	if (playerCollision)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+		if (lara->HitDirection == -1)
+			lara->HitFrame = 0;
 	}
 }
 
