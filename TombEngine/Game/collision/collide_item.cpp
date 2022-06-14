@@ -1758,6 +1758,10 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 					if (harmless)
 						continue;
 
+					// Don't try to kill already dead or non-targetable enemies.
+					if (item->HitPoints <= 0 || item->HitPoints == NOT_TARGETABLE)
+						continue;
+
 					// TODO: further checks may be added to prevent killing undead enemies.
 
 					item->HitPoints = 0;
