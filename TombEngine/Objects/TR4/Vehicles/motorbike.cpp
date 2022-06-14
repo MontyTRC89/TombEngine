@@ -807,10 +807,7 @@ static int MotorBikeDynamics(ItemInfo* item)
     moved.z = item->Pose.Position.z;
 
     if (!(item->Flags & ONESHOT))
-    {
         MotorbikeBaddyCollision(item);
-        //MotorBikeStaticCollision(item->pos.x, item->pos.y, item->pos.z, item->room_number, (WALL_L / 2));
-    }
 
     int rot1 = 0;
     int rot2 = 0;
