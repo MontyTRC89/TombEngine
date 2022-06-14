@@ -1686,7 +1686,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 	if (laraItem == LaraItem)
 		Lara.HitDirection = -1;
 
-	if (laraItem->HitPoints > 0)
+	if (!Objects[laraItem->ObjectNumber].intelligent || laraItem->HitPoints > 0)
 	{
 		short* door, numDoors;
 		for (auto i : GetRoomList(laraItem->RoomNumber))

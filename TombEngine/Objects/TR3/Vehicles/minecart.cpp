@@ -30,7 +30,7 @@ using std::vector;
 #define CART_MAX_VERTICAL_VELOCITY 16128
 #define TERMINAL_ANGLE ANGLE(22.0f)
 #define CART_RADIUS 100
-#define CART_HEIGHT CLICK(3)
+#define CART_HEIGHT CLICK(2)
 #define CART_NHITS 25
 #define CART_ENTITY_RADIUS CLICK(1)
 
@@ -195,6 +195,12 @@ static bool GetInMineCart(ItemInfo* minecartItem, ItemInfo* laraItem, CollisionI
 	if (GetCollision(minecartItem).Position.Floor < -SECTOR(31.25f))
 		return false;
 
+	// Don't get into minecart if there's two stop blocks in front.
+	// Allows to create minecarts which will get to a point and stop forever.
+
+	if (GetCollision(minecartItem, minecartItem->Pose.Orientation.y, SECTOR(1)).BottomBlock->Flags.MinecartStop())
+		return false;
+
 	return true;
 }
 
@@ -228,16 +234,11 @@ static bool TestMinecartDismount(ItemInfo* laraItem, int direction)
 
 static void CartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem)
 {
-	vector<short> roomsList;
-	roomsList.push_back(minecartItem->RoomNumber);
+	auto roomsList = GetRoomList(minecartItem->RoomNumber);
 
-	auto* room = &g_Level.Rooms[minecartItem->RoomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-		roomsList.push_back(room->doors[i].room);
-
-	for (int i = 0; i < roomsList.size(); i++)
+	for (auto i : roomsList)
 	{
-		short itemNumber = g_Level.Rooms[roomsList[i]].itemNumber;
+		short itemNumber = g_Level.Rooms[i].itemNumber;
 
 		while (itemNumber != NO_ITEM)
 		{
@@ -309,7 +310,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 	if (minecart->StopDelay)
 		minecart->StopDelay--;
 
-	if ((flags.MinecartLeft() && flags.MinecartRight() && !minecart->StopDelay) &&
+	if ((flags.MinecartStop() && !minecart->StopDelay) &&
 		((minecartItem->Pose.Position.x & 0x380) == 512 || (minecartItem->Pose.Position.z & 0x380) == 512))
 	{
 		if (minecart->Velocity < 0xf000)
@@ -324,7 +325,7 @@ static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
 	}
 
 	if ((flags.MinecartLeft() || flags.MinecartRight()) &&
-		!(flags.MinecartLeft() && flags.MinecartRight()) &&
+		!flags.MinecartStop() &&
 		!minecart->StopDelay &&
 		!(minecart->Flags & (CART_FLAG_TURNING_LEFT | CART_FLAG_TURNING_RIGHT)))
 	{
@@ -806,7 +807,13 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		}
 
 		floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.y, CLICK(2));
-		if (floorHeight < -CLICK(2))
+
+		CollisionInfo coll = {};
+		coll.Setup.Radius = CART_RADIUS;
+		coll.Setup.Height = CART_HEIGHT;
+		GetCollisionInfo(&coll, minecartItem);
+
+		if (floorHeight < -CLICK(2) || coll.HitStatic)
 		{
 			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + CART_ANIM_WALL_DEATH;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -822,9 +829,8 @@ static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo
 		if (laraItem->Animation.ActiveState != CART_STATE_DUCK &&
 			laraItem->Animation.ActiveState != CART_STATE_HIT)
 		{
-			CollisionInfo coll;
-			coll.Setup.Radius = CART_RADIUS;
-			DoObjectCollision(minecartItem, &coll);
+			coll.Setup.Height = LARA_HEIGHT;
+			GetCollisionInfo(&coll, laraItem);
 
 			if (coll.HitStatic)
 			{
