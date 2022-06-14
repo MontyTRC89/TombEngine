@@ -1238,6 +1238,7 @@ static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed,
 	if (spark->sLife < 9)
 		spark->sLife = spark->life = 9;
 
+	spark->blendMode = BLEND_MODES::BLENDMODE_SCREEN;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 4;
 	spark->extras = 0;
