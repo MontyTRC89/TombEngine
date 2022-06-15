@@ -328,7 +328,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
-    <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_baboon.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_lara_double.h" />
@@ -705,7 +705,7 @@ CALL gen.bat</Command>
     </ClCompile>
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_big_rat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baboon.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_lara_double.cpp" />
