@@ -202,6 +202,8 @@ namespace TEN::Renderer
 			for (int j = 0; j < moveableObj.LinearizedBones.size(); j++)
 			{
 				RendererBone *currentBone = moveableObj.LinearizedBones[j];
+
+				auto oldRotation = currentBone->ExtraRotation;
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
 				nativeItem->Data.apply(
@@ -221,29 +223,39 @@ namespace TEN::Renderer
 						break;
 					case 10:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
-
 						break;
 					case 12:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
-
 						break;
 					case 13:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
-
 						break;
 					}
 				},
 				[&j, &currentBone](MotorbikeInfo& bike)
 				{
-				switch (j)
-				{
+					switch (j)
+					{
 					case 2:
 					case 4:
 						currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
 						break;
 					case 10:
 						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
-				}
+						break;
+					}
+				},
+				[&j, &currentBone, &oldRotation](MinecartInfo& cart)
+				{
+					switch (j)
+					{
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+						currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
+						break;
+					}
 				},
 				[&j, &currentBone](RubberBoatInfo& boat)
 				{
