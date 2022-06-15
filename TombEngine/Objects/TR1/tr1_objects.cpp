@@ -15,7 +15,7 @@
 #include "Objects/TR1/Entity/tr1_natla.h" // OK
 #include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
 #include "Objects/TR1/Entity/tr1_wolf.h" // OK
-#include "Objects/TR1/Entity/tr1_bigrat.h" // OK
+#include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/Utils/object_helper.h"
 
