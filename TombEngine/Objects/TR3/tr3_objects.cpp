@@ -4,11 +4,11 @@
 /// entities
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
-#include "Objects/TR3/Entity/tr3_fishemitter.h" // OK
+#include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
 #include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
 #include "Objects/TR3/Entity/tr3_monkey.h" // OK
-#include "Objects/TR3/Entity/tr3_mpgun.h" // OK
-#include "Objects/TR3/Entity/tr3_mpstick.h" // OK
+#include "Objects/TR3/Entity/tr3_mp_gun.h" // OK
+#include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba.h" // OK
 #include "Objects/TR3/Entity/tr3_shiva.h" // OK
