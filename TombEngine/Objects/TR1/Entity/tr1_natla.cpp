@@ -16,6 +16,16 @@ namespace TEN::Entities::TR1
 {
 	BITE_INFO NatlaGunBite = { 5, 220, 7, 4 };
 
+	#define NATLA_NEAR_DEATH 200
+	#define NATLA_FLYMODE 0x8000
+	#define NATLA_TIMER   0x7fff
+	#define NATLA_FIRE_ARC ANGLE(30.0f)
+	#define NATLA_FLY_TURN ANGLE(5.0f)
+	#define NATLA_RUN_TURN ANGLE(6.0f)
+	#define NATLA_LAND_CHANCE 0x100
+	#define NATLA_DEATH_TIME (FPS * 16)	// 16 seconds.
+	#define NATLA_SHOT_DAMAGE 100
+
 	enum NatlaState
 	{
 		NATLA_STATE_NONE,
@@ -29,16 +39,6 @@ namespace TEN::Entities::TR1
 		NATLA_STATE_STAND,
 		NATLA_STATE_DEATH
 	};
-
-#define NATLA_NEAR_DEATH 200
-#define NATLA_FLYMODE 0x8000
-#define NATLA_TIMER   0x7fff
-#define NATLA_FIRE_ARC ANGLE(30.0f)
-#define NATLA_FLY_TURN ANGLE(5.0f)
-#define NATLA_RUN_TURN ANGLE(6.0f)
-#define NATLA_LAND_CHANCE 0x100
-#define NATLA_DEATH_TIME (FPS * 16)
-#define NATLA_SHOT_DAMAGE 100
 
 	void NatlaControl(short itemNumber)
 	{
@@ -88,13 +88,13 @@ namespace TEN::Entities::TR1
 			case NATLA_STATE_FALL:
 				if (item->Pose.Position.y < item->Floor)
 				{
-					item->Animation.Velocity = 0;
 					item->Animation.Airborne = true;
+					item->Animation.Velocity = 0;
 				}
 				else
 				{
-					item->Animation.Airborne = 0;
 					item->Animation.TargetState = NATLA_STATE_SEMI_DEATH;
+					item->Animation.Airborne = 0;
 					item->Pose.Position.y = item->Floor;
 					timer = 0;
 				}
