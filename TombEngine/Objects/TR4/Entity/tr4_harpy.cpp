@@ -250,8 +250,8 @@ namespace TEN::Entities::TR4
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HARPY_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = HARPY_STATE_IDLE;
 		item->Animation.ActiveState = HARPY_STATE_IDLE;
+		item->Animation.TargetState = HARPY_STATE_IDLE;
 	}
 
 	void HarpyControl(short itemNumber)

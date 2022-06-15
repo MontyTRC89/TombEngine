@@ -2,5 +2,5 @@
 
 namespace TEN::Entities::TR3
 {
-	void FlameThrowerControl(short itemNumber);
+	void MPGunControl(short itemNumber);
 }
