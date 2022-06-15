@@ -424,6 +424,7 @@ bool SaveGame::Save(int slot)
 		flatbuffers::Offset<Save::QuadBike> quadOffset;
 		flatbuffers::Offset<Save::Minecart> mineOffset;
 		flatbuffers::Offset<Save::UPV> upvOffset;
+		flatbuffers::Offset<Save::Kayak> kayakOffset;
 
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
@@ -524,6 +525,34 @@ bool SaveGame::Save(int slot)
 			mineBuilder.add_vertical_velocity(mine->VerticalVelocity);
 			mineOffset = mineBuilder.Finish();
 		}
+		else if (itemToSerialize.Data.is<KayakInfo>())
+		{
+			auto kayak = (KayakInfo*)itemToSerialize.Data;
+
+			Save::KayakBuilder kayakBuilder{ fbb };
+
+			kayakBuilder.add_current_start_wake(kayak->CurrentStartWake);
+			kayakBuilder.add_flags(kayak->Flags);
+			kayakBuilder.add_forward(kayak->Forward);
+			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
+			kayakBuilder.add_left_right_count(kayak->LeftRightCount);
+			kayakBuilder.add_left_vertical_velocity(kayak->LeftVerticalVelocity);
+			kayakBuilder.add_old_pos(&Save::Position(
+				kayak->OldPos.Position.x, 
+				kayak->OldPos.Position.y, 
+				kayak->OldPos.Position.z, 
+				kayak->OldPos.Orientation.x, 
+				kayak->OldPos.Orientation.y, 
+				kayak->OldPos.Orientation.z));
+			kayakBuilder.add_right_vertical_velocity(kayak->RightVerticalVelocity);
+			kayakBuilder.add_true_water(kayak->TrueWater);
+			kayakBuilder.add_turn(kayak->Turn);
+			kayakBuilder.add_turn_rate(kayak->TurnRate);
+			kayakBuilder.add_velocity(kayak->Velocity);
+			kayakBuilder.add_wake_shade(kayak->WakeShade);
+			kayakBuilder.add_water_height(kayak->WaterHeight);
+			kayakOffset = kayakBuilder.Finish();
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			Save::ShortBuilder sb{ fbb };
@@ -600,6 +629,11 @@ bool SaveGame::Save(int slot)
 		{
 			serializedItem.add_data_type(Save::ItemData::Minecart);
 			serializedItem.add_data(mineOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<KayakInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Kayak);
+			serializedItem.add_data(kayakOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -1364,6 +1398,31 @@ bool SaveGame::Load(int slot)
 			mine->TurnZ = savedMine->turn_z();
 			mine->Velocity = savedMine->velocity();
 			mine->VerticalVelocity = savedMine->vertical_velocity();
+		}
+		else if (item->Data.is<KayakInfo>())
+		{
+			auto kayak = (KayakInfo*)item->Data;
+			auto savedKayak = (Save::Kayak*)savedItem->data();
+
+			kayak->CurrentStartWake = savedKayak->flags();
+			kayak->Flags = savedKayak->flags();
+			kayak->Forward = savedKayak->forward();
+			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
+			kayak->LeftRightCount = savedKayak->left_right_count();
+			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
+			kayak->OldPos.Position.x = savedKayak->old_pos()->x_pos();
+			kayak->OldPos.Position.y = savedKayak->old_pos()->y_pos();
+			kayak->OldPos.Position.z = savedKayak->old_pos()->z_pos();
+			kayak->OldPos.Orientation.x = savedKayak->old_pos()->x_rot();
+			kayak->OldPos.Orientation.y = savedKayak->old_pos()->y_rot();
+			kayak->OldPos.Orientation.z = savedKayak->old_pos()->z_rot();
+			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
+			kayak->TrueWater = savedKayak->true_water();
+			kayak->Turn = savedKayak->turn();
+			kayak->TurnRate = savedKayak->turn_rate();
+			kayak->Velocity = savedKayak->velocity();
+			kayak->WakeShade = savedKayak->wake_shade();
+			kayak->WaterHeight = savedKayak->water_height();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{

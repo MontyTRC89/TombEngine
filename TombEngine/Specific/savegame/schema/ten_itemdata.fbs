@@ -85,7 +85,24 @@ table Jeep {
 }
 
 table Kayak {
+	turn_rate: int32;
 
+	velocity: int32;
+	front_vertical_velocity: int32;
+	left_vertical_velocity: int32;
+	right_vertical_velocity: int32;
+
+	left_right_count: int32;
+	water_height: int32;
+	old_pos: Position;
+	turn: bool;
+	forward: bool;
+	true_water: bool;
+
+	current_start_wake: int32;
+	wake_shade: int32;
+
+	flags: int32;
 }
 
 table Door {
@@ -105,7 +122,6 @@ table UPV {
 	harpoon_left: bool;
 	
 	flags: int32;
-
 }
 
 table Motorboat {

@@ -1474,14 +1474,100 @@ flatbuffers::Offset<Jeep> CreateJeep(flatbuffers::FlatBufferBuilder &_fbb, const
 
 struct KayakT : public flatbuffers::NativeTable {
   typedef Kayak TableType;
+  int32_t turn_rate = 0;
+  int32_t velocity = 0;
+  int32_t front_vertical_velocity = 0;
+  int32_t left_vertical_velocity = 0;
+  int32_t right_vertical_velocity = 0;
+  int32_t left_right_count = 0;
+  int32_t water_height = 0;
+  std::unique_ptr<TEN::Save::Position> old_pos{};
+  bool turn = false;
+  bool forward = false;
+  bool true_water = false;
+  int32_t current_start_wake = 0;
+  int32_t wake_shade = 0;
+  int32_t flags = 0;
 };
 
 struct Kayak FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef KayakT NativeTableType;
   typedef KayakBuilder Builder;
   struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_TURN_RATE = 4,
+    VT_VELOCITY = 6,
+    VT_FRONT_VERTICAL_VELOCITY = 8,
+    VT_LEFT_VERTICAL_VELOCITY = 10,
+    VT_RIGHT_VERTICAL_VELOCITY = 12,
+    VT_LEFT_RIGHT_COUNT = 14,
+    VT_WATER_HEIGHT = 16,
+    VT_OLD_POS = 18,
+    VT_TURN = 20,
+    VT_FORWARD = 22,
+    VT_TRUE_WATER = 24,
+    VT_CURRENT_START_WAKE = 26,
+    VT_WAKE_SHADE = 28,
+    VT_FLAGS = 30
+  };
+  int32_t turn_rate() const {
+    return GetField<int32_t>(VT_TURN_RATE, 0);
+  }
+  int32_t velocity() const {
+    return GetField<int32_t>(VT_VELOCITY, 0);
+  }
+  int32_t front_vertical_velocity() const {
+    return GetField<int32_t>(VT_FRONT_VERTICAL_VELOCITY, 0);
+  }
+  int32_t left_vertical_velocity() const {
+    return GetField<int32_t>(VT_LEFT_VERTICAL_VELOCITY, 0);
+  }
+  int32_t right_vertical_velocity() const {
+    return GetField<int32_t>(VT_RIGHT_VERTICAL_VELOCITY, 0);
+  }
+  int32_t left_right_count() const {
+    return GetField<int32_t>(VT_LEFT_RIGHT_COUNT, 0);
+  }
+  int32_t water_height() const {
+    return GetField<int32_t>(VT_WATER_HEIGHT, 0);
+  }
+  const TEN::Save::Position *old_pos() const {
+    return GetStruct<const TEN::Save::Position *>(VT_OLD_POS);
+  }
+  bool turn() const {
+    return GetField<uint8_t>(VT_TURN, 0) != 0;
+  }
+  bool forward() const {
+    return GetField<uint8_t>(VT_FORWARD, 0) != 0;
+  }
+  bool true_water() const {
+    return GetField<uint8_t>(VT_TRUE_WATER, 0) != 0;
+  }
+  int32_t current_start_wake() const {
+    return GetField<int32_t>(VT_CURRENT_START_WAKE, 0);
+  }
+  int32_t wake_shade() const {
+    return GetField<int32_t>(VT_WAKE_SHADE, 0);
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_TURN_RATE) &&
+           VerifyField<int32_t>(verifier, VT_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_FRONT_VERTICAL_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_LEFT_VERTICAL_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_RIGHT_VERTICAL_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_LEFT_RIGHT_COUNT) &&
+           VerifyField<int32_t>(verifier, VT_WATER_HEIGHT) &&
+           VerifyField<TEN::Save::Position>(verifier, VT_OLD_POS) &&
+           VerifyField<uint8_t>(verifier, VT_TURN) &&
+           VerifyField<uint8_t>(verifier, VT_FORWARD) &&
+           VerifyField<uint8_t>(verifier, VT_TRUE_WATER) &&
+           VerifyField<int32_t>(verifier, VT_CURRENT_START_WAKE) &&
+           VerifyField<int32_t>(verifier, VT_WAKE_SHADE) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
   }
   KayakT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1493,6 +1579,48 @@ struct KayakBuilder {
   typedef Kayak Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_turn_rate(int32_t turn_rate) {
+    fbb_.AddElement<int32_t>(Kayak::VT_TURN_RATE, turn_rate, 0);
+  }
+  void add_velocity(int32_t velocity) {
+    fbb_.AddElement<int32_t>(Kayak::VT_VELOCITY, velocity, 0);
+  }
+  void add_front_vertical_velocity(int32_t front_vertical_velocity) {
+    fbb_.AddElement<int32_t>(Kayak::VT_FRONT_VERTICAL_VELOCITY, front_vertical_velocity, 0);
+  }
+  void add_left_vertical_velocity(int32_t left_vertical_velocity) {
+    fbb_.AddElement<int32_t>(Kayak::VT_LEFT_VERTICAL_VELOCITY, left_vertical_velocity, 0);
+  }
+  void add_right_vertical_velocity(int32_t right_vertical_velocity) {
+    fbb_.AddElement<int32_t>(Kayak::VT_RIGHT_VERTICAL_VELOCITY, right_vertical_velocity, 0);
+  }
+  void add_left_right_count(int32_t left_right_count) {
+    fbb_.AddElement<int32_t>(Kayak::VT_LEFT_RIGHT_COUNT, left_right_count, 0);
+  }
+  void add_water_height(int32_t water_height) {
+    fbb_.AddElement<int32_t>(Kayak::VT_WATER_HEIGHT, water_height, 0);
+  }
+  void add_old_pos(const TEN::Save::Position *old_pos) {
+    fbb_.AddStruct(Kayak::VT_OLD_POS, old_pos);
+  }
+  void add_turn(bool turn) {
+    fbb_.AddElement<uint8_t>(Kayak::VT_TURN, static_cast<uint8_t>(turn), 0);
+  }
+  void add_forward(bool forward) {
+    fbb_.AddElement<uint8_t>(Kayak::VT_FORWARD, static_cast<uint8_t>(forward), 0);
+  }
+  void add_true_water(bool true_water) {
+    fbb_.AddElement<uint8_t>(Kayak::VT_TRUE_WATER, static_cast<uint8_t>(true_water), 0);
+  }
+  void add_current_start_wake(int32_t current_start_wake) {
+    fbb_.AddElement<int32_t>(Kayak::VT_CURRENT_START_WAKE, current_start_wake, 0);
+  }
+  void add_wake_shade(int32_t wake_shade) {
+    fbb_.AddElement<int32_t>(Kayak::VT_WAKE_SHADE, wake_shade, 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(Kayak::VT_FLAGS, flags, 0);
+  }
   explicit KayakBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -1505,8 +1633,36 @@ struct KayakBuilder {
 };
 
 inline flatbuffers::Offset<Kayak> CreateKayak(
-    flatbuffers::FlatBufferBuilder &_fbb) {
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t turn_rate = 0,
+    int32_t velocity = 0,
+    int32_t front_vertical_velocity = 0,
+    int32_t left_vertical_velocity = 0,
+    int32_t right_vertical_velocity = 0,
+    int32_t left_right_count = 0,
+    int32_t water_height = 0,
+    const TEN::Save::Position *old_pos = 0,
+    bool turn = false,
+    bool forward = false,
+    bool true_water = false,
+    int32_t current_start_wake = 0,
+    int32_t wake_shade = 0,
+    int32_t flags = 0) {
   KayakBuilder builder_(_fbb);
+  builder_.add_flags(flags);
+  builder_.add_wake_shade(wake_shade);
+  builder_.add_current_start_wake(current_start_wake);
+  builder_.add_old_pos(old_pos);
+  builder_.add_water_height(water_height);
+  builder_.add_left_right_count(left_right_count);
+  builder_.add_right_vertical_velocity(right_vertical_velocity);
+  builder_.add_left_vertical_velocity(left_vertical_velocity);
+  builder_.add_front_vertical_velocity(front_vertical_velocity);
+  builder_.add_velocity(velocity);
+  builder_.add_turn_rate(turn_rate);
+  builder_.add_true_water(true_water);
+  builder_.add_forward(forward);
+  builder_.add_turn(turn);
   return builder_.Finish();
 }
 
@@ -2777,6 +2933,20 @@ inline KayakT *Kayak::UnPack(const flatbuffers::resolver_function_t *_resolver) 
 inline void Kayak::UnPackTo(KayakT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = turn_rate(); _o->turn_rate = _e; }
+  { auto _e = velocity(); _o->velocity = _e; }
+  { auto _e = front_vertical_velocity(); _o->front_vertical_velocity = _e; }
+  { auto _e = left_vertical_velocity(); _o->left_vertical_velocity = _e; }
+  { auto _e = right_vertical_velocity(); _o->right_vertical_velocity = _e; }
+  { auto _e = left_right_count(); _o->left_right_count = _e; }
+  { auto _e = water_height(); _o->water_height = _e; }
+  { auto _e = old_pos(); if (_e) _o->old_pos = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = turn(); _o->turn = _e; }
+  { auto _e = forward(); _o->forward = _e; }
+  { auto _e = true_water(); _o->true_water = _e; }
+  { auto _e = current_start_wake(); _o->current_start_wake = _e; }
+  { auto _e = wake_shade(); _o->wake_shade = _e; }
+  { auto _e = flags(); _o->flags = _e; }
 }
 
 inline flatbuffers::Offset<Kayak> Kayak::Pack(flatbuffers::FlatBufferBuilder &_fbb, const KayakT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -2787,8 +2957,36 @@ inline flatbuffers::Offset<Kayak> CreateKayak(flatbuffers::FlatBufferBuilder &_f
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const KayakT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _turn_rate = _o->turn_rate;
+  auto _velocity = _o->velocity;
+  auto _front_vertical_velocity = _o->front_vertical_velocity;
+  auto _left_vertical_velocity = _o->left_vertical_velocity;
+  auto _right_vertical_velocity = _o->right_vertical_velocity;
+  auto _left_right_count = _o->left_right_count;
+  auto _water_height = _o->water_height;
+  auto _old_pos = _o->old_pos ? _o->old_pos.get() : 0;
+  auto _turn = _o->turn;
+  auto _forward = _o->forward;
+  auto _true_water = _o->true_water;
+  auto _current_start_wake = _o->current_start_wake;
+  auto _wake_shade = _o->wake_shade;
+  auto _flags = _o->flags;
   return TEN::Save::CreateKayak(
-      _fbb);
+      _fbb,
+      _turn_rate,
+      _velocity,
+      _front_vertical_velocity,
+      _left_vertical_velocity,
+      _right_vertical_velocity,
+      _left_right_count,
+      _water_height,
+      _old_pos,
+      _turn,
+      _forward,
+      _true_water,
+      _current_start_wake,
+      _wake_shade,
+      _flags);
 }
 
 inline DoorT *Door::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -3553,7 +3751,7 @@ inline ItemDataUnion::ItemDataUnion(const ItemDataUnion &u) : type(u.type), valu
       break;
     }
     case ItemData::Kayak: {
-      value = new TEN::Save::KayakT(*reinterpret_cast<TEN::Save::KayakT *>(u.value));
+      FLATBUFFERS_ASSERT(false);  // TEN::Save::KayakT not copyable.
       break;
     }
     case ItemData::Door: {
