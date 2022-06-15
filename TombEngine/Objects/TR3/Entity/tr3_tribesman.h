@@ -1,4 +1,7 @@
 #pragma once
 
-void TribemanAxeControl(short itemNumber);
-void TribemanDartsControl(short itemNumber);
+namespace TEN::Entities::TR3
+{
+	void TribemanAxeControl(short itemNumber);
+	void TribemanDartsControl(short itemNumber);
+}
