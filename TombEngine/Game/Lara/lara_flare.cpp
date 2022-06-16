@@ -401,7 +401,11 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 	int y = pos->y + (random * 120) - CLICK(1);
 	int z = pos->z + (random * 120);
 
-	if (flareLife < 4)
+	bool result = false;
+	bool ending = (flareLife > (FLARE_LIFE_MAX - 90));
+	bool dying  = (flareLife < (FLARE_LIFE_MAX - 5));
+
+	if (dying)
 	{
 		int falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
 
@@ -411,9 +415,9 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
-		return (random < 0.9f);
+		result = (random < 0.9f);
 	}
-	else if (flareLife < (FLARE_LIFE_MAX - 90))
+	else if (ending)
 	{
 		float multiplier = GenerateFloat(0.75f, 1.0f);
 		int falloff = 12 * multiplier;
@@ -423,7 +427,7 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
-		return (random < 0.4f);
+		result = (random < 0.4f);
 	}
 	else
 	{
@@ -435,6 +439,8 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
-		return (random < 0.3f);
+		result = (random < 0.3f);
 	}
+
+	return (dying || ending ? result : true);
 }
