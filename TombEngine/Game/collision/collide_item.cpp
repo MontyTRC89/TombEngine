@@ -1754,23 +1754,27 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 				// If colliding object is an enemy, kill it.
 				if (object->intelligent)
 				{
-					// Bypass harmless vehicles killing enemies.
-					if (harmless)
-						continue;
-
 					// Don't try to kill already dead or non-targetable enemies.
 					if (item->HitPoints <= 0 || item->HitPoints == NOT_TARGETABLE)
 						continue;
 
-					// TODO: further checks may be added to prevent killing undead enemies.
-
-					item->HitPoints = 0;
-					DoLotsOfBlood(item->Pose.Position.x,
-								  laraItem->Pose.Position.y - CLICK(1),
-								  item->Pose.Position.z,
-								  laraItem->Animation.Velocity,
-								  laraItem->Pose.Orientation.y,
-								  item->RoomNumber, 3);
+					if (harmless || abs(laraItem->Animation.Velocity) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
+					{
+						// If vehicle is harmless or speed is too low, just push the enemy.
+						ItemPushItem(laraItem, item, coll, false, 0);
+						continue;
+					}
+					else
+					{
+						// TODO: further checks may be added to prevent killing undead enemies.
+						item->HitPoints = 0;
+						DoLotsOfBlood(item->Pose.Position.x,
+							laraItem->Pose.Position.y - CLICK(1),
+							item->Pose.Position.z,
+							laraItem->Animation.Velocity,
+							laraItem->Pose.Orientation.y,
+							item->RoomNumber, 3);
+					}
 				}
 				else
 				{
@@ -1800,7 +1804,9 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 			coll->HitStatic = true;
 
 			// HACK: Shatter statics only by non-harmless vehicles.
-			if (!harmless && StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+			if (!playerCollision && 
+				!harmless && abs(laraItem->Animation.Velocity) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
+				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 			{
 				SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
 				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
@@ -1812,7 +1818,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 			else if (coll->Setup.EnableObjectPush)
 				ItemPushStatic(laraItem, mesh, coll);
 			else
-				break;
+				continue;
 		}
 	}
 

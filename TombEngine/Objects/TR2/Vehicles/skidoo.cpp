@@ -459,9 +459,10 @@ bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 	if (drive > 0)
 	{
 		skidoo->TrackMesh = ((skidoo->TrackMesh & 3) == 1) ? 2 : 1;
-
 		skidoo->Pitch += (pitch - skidoo->Pitch) / 4;
-		SoundEffect(skidoo->Pitch ? SFX_TR2_VEHICLE_SNOWMOBILE_MOVING : SFX_TR2_VEHICLE_SNOWMOBILE_ACCELERATE, &skidooItem->Pose, SoundEnvironment::Land, 0.5f + skidoo->Pitch / (float)SKIDOO_MAX_VELOCITY);
+
+		auto pitch = std::clamp(0.5f + (float)abs(skidoo->Pitch) / (float)SKIDOO_MAX_VELOCITY, 0.6f, 1.4f);
+		SoundEffect(skidoo->Pitch ? SFX_TR2_VEHICLE_SNOWMOBILE_MOVING : SFX_TR2_VEHICLE_SNOWMOBILE_ACCELERATE, &skidooItem->Pose, SoundEnvironment::Land, pitch);
 	}
 	else
 	{
