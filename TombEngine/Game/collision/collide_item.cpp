@@ -1726,16 +1726,12 @@ int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocit
 				*angle -= *angle * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff);
 			}
 		}
-		else if (waterDepth > VEHICLE_MAX_WATER_HEIGHT && waterHeight > VEHICLE_MAX_WATER_HEIGHT)
+		else
 		{
-			Splash(vehicle);
-			ExplodeVehicle(lara, vehicle);
-
-			auto probe = GetCollision(vehicle);
-			if (probe.Position.Floor > vehicle->Pose.Position.y)
-				vehicle->Pose.Position.y += VEHICLE_SINK_SPEED;
-			else
-				vehicle->Status = ITEM_DEACTIVATED;
+			if (waterDepth > VEHICLE_MAX_WATER_HEIGHT && waterHeight > VEHICLE_MAX_WATER_HEIGHT)
+				ExplodeVehicle(lara, vehicle);
+			else if (TEN::Math::Random::GenerateInt(0, 32) > 25)
+				Splash(vehicle);
 		}
 	}
 
