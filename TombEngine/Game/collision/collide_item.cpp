@@ -1715,6 +1715,11 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 		{
 			auto* item = &g_Level.Items[nextItem];
 			int itemNumber = nextItem;
+
+			// HACK: For some reason, sometimes an infinite loop may happen here.
+			if (nextItem == item->NextItem)
+				break;
+
 			nextItem = item->NextItem;
 
 			if (item == laraItem)
