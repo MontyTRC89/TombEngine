@@ -155,7 +155,6 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					else if (weaponType == LaraWeaponType::HK)
 					{
 						FireHK(laraItem, 0);
-						//HKFlag = 1;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
@@ -174,25 +173,15 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					item->Animation.TargetState = WEAPON_STATE_AIM;
 			}
 
-			if (item->Animation.TargetState != WEAPON_STATE_RECOIL &&
-				//HKFlag &&
-				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
+
+			if (item->Animation.TargetState != WEAPON_STATE_RECOIL && 
+				weaponType == LaraWeaponType::HK &&
+				!lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 			{
 				StopSoundEffect(SFX_TR4_HK_FIRE);
 				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
-				//HKFlag = 0;
 			}
 		}
-		/*else if (HKFlag)
-		{
-			if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-				SoundEffect(SFX_HK_SILENCED, nullptr);
-			else
-			{
-				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, SoundEnvironment::Land, 1.0f, 0.4f);
-				SoundEffect(SFX_HK_FIRE, &laraItem->pos);
-			}
-		}*/
 		else if (weaponType == LaraWeaponType::Shotgun && !(TrInput & IN_ACTION) && !lara->LeftArm.Locked)
 			item->Animation.TargetState = WEAPON_STATE_UNAIM;
 
@@ -1701,20 +1690,6 @@ void CrossbowBoltControl(short itemNumber)
 void FireHK(ItemInfo* laraItem, int mode)
 {
 	auto* lara = GetLaraInfo(laraItem);
-
-	/*	if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
-		{
-			HKTimer = 12;
-		}
-		else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
-		{
-			HKCounter++;
-			if (HKCounter == 5)
-			{
-				HKCounter = 0;
-				HKTimer = 12;
-			}
-		}*/
 
 	auto angles = Vector3Shrt(
 		lara->LeftArm.Orientation.x,
