@@ -112,12 +112,10 @@ void BigGunFire(ItemInfo* laraItem, ItemInfo* bigGunItem)
 		projectileItem->ObjectNumber = ID_ROCKET;
 		projectileItem->RoomNumber = laraItem->RoomNumber;
 
-		Vector3Int pos = { 0, 0, CLICK(1) }; // CLICK(1) or 520?
+		auto pos = Vector3Int(0, 0, CLICK(1)); // CLICK(1) or 520?
 		GetJointAbsPosition(bigGunItem, &pos, 2);
 			
-		projectileItem->Pose.Position.x = pos.x;
-		projectileItem->Pose.Position.y = pos.y;
-		projectileItem->Pose.Position.z = pos.z;
+		projectileItem->Pose.Position = pos;
 
 		InitialiseItem(itemNumber);
 
