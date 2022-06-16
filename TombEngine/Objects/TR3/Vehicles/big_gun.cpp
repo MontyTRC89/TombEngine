@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/big_gun.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -12,20 +12,20 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
-#include "Objects/TR3/Vehicles/biggun_info.h"
+#include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
-#define BGUN_TURN_RATE	ANGLE(2.0f)
-#define BGUN_TURN_MAX	ANGLE(16.0f)
-
 #define RECOIL_TIME 26
 #define RECOIL_Z	25
 
-#define BGUN_UP_DOWN_FRAMES	59
+#define BGUN_NUM_UP_DOWN_FRAMES	59
 #define BGUN_DISMOUNT_FRAME	30
+
+#define BGUN_TURN_RATE	ANGLE(2.0f)
+#define BGUN_TURN_MAX	ANGLE(16.0f)
 
 #define BGUN_IN_FIRE		IN_ACTION
 #define BGUN_IN_DISMOUNT	(IN_ROLL | IN_JUMP)
@@ -231,7 +231,7 @@ bool BigGunControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 			bigGun->Rotation.z += bigGun->GunRotYAdd / 4;
 
-			if (TrInput & BGUN_IN_UP && bigGun->Rotation.x < BGUN_UP_DOWN_FRAMES)
+			if (TrInput & BGUN_IN_UP && bigGun->Rotation.x < BGUN_NUM_UP_DOWN_FRAMES)
 				bigGun->Rotation.x++;			
 			else if (TrInput & BGUN_IN_DOWN && bigGun->Rotation.x)
 				bigGun->Rotation.x--;
