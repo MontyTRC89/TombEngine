@@ -16,8 +16,6 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
-
 constexpr auto MINECART_RADIUS = 100;
 constexpr auto MINECART_ENTITY_RADIUS = CLICK(1);
 constexpr auto MINECART_HEIGHT = CLICK(2);
