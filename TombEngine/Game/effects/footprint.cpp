@@ -119,35 +119,35 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Custom1:
-			fx = SOUND_EFFECTS::SFX_CUSTOM1;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1;
 		break;
 
 		case FLOOR_MATERIAL::Custom2:
-			fx = SOUND_EFFECTS::SFX_CUSTOM2;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2;
 		break; 
 		
 		case FLOOR_MATERIAL::Custom3:
-			fx = SOUND_EFFECTS::SFX_CUSTOM3;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3;
 		break;
 		
 		case FLOOR_MATERIAL::Custom4:
-			fx = SOUND_EFFECTS::SFX_CUSTOM4;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4;
 		break; 
 		
 		case FLOOR_MATERIAL::Custom5:
-			fx = SOUND_EFFECTS::SFX_CUSTOM5;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5;
 			break;
 
 		case FLOOR_MATERIAL::Custom6:
-			fx = SOUND_EFFECTS::SFX_CUSTOM6;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6;
 			break;
 
 		case FLOOR_MATERIAL::Custom7:
-			fx = SOUND_EFFECTS::SFX_CUSTOM7;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7;
 			break;
 
 		case FLOOR_MATERIAL::Custom8:
-			fx = SOUND_EFFECTS::SFX_CUSTOM8;
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8;
 			break;
 		}
 
