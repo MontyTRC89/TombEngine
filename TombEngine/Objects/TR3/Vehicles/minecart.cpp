@@ -133,7 +133,7 @@ enum MinecartFlags
 	MINECART_FLAG_DEAD = (1 << 7)
 };
 
-MinecartInfo* GetMinecartInfo(ItemInfo* minecartItem)
+static MinecartInfo* GetMinecartInfo(ItemInfo* minecartItem)
 {
 	return (MinecartInfo*)minecartItem->Data;
 }
