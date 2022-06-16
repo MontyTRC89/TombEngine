@@ -1,22 +1,24 @@
 #include "framework.h"
 #include "Game/collision/collide_item.h"
 
-#include "Game/control/los.h"
-#include "Game/collision/collide_room.h"
 #include "Game/animation.h"
+#include "Game/control/los.h"
+#include "Game/collision/sphere.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/debris.h"
-#include "Game/collision/sphere.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
 #include "Specific/prng.h"
-#include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;
@@ -1687,6 +1689,57 @@ void DoVehicleCollision(ItemInfo* vehicle, int radius)
 	coll.Setup.EnableObjectPush = true;
 
 	DoObjectCollision(vehicle, &coll);
+}
+
+int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocity, int radius, short* angle)
+{
+	if (TestEnvironment(ENV_FLAG_WATER, vehicle) ||
+		TestEnvironment(ENV_FLAG_SWAMP, vehicle))
+	{
+		auto waterDepth  = (float)GetWaterDepth(vehicle);
+		auto waterHeight = vehicle->Pose.Position.y - GetWaterHeight(vehicle);
+
+		// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
+		// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
+		if (waterDepth == DEEP_WATER)
+			waterDepth = VEHICLE_MAX_WATER_HEIGHT;
+
+		if (waterDepth <= VEHICLE_MAX_WATER_HEIGHT)
+		{
+			bool isWater = TestEnvironment(ENV_FLAG_WATER, vehicle);
+
+			if (currentVelocity != 0)
+			{
+				auto coeff = isWater ? VEHICLE_WATER_VEL_COEFFICIENT : VEHICLE_SWAMP_VEL_COEFFICIENT;
+				currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff), currentVelocity);
+
+				if (TEN::Math::Random::GenerateInt(0, 32) > 28)
+					SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(vehicle->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
+
+				if (isWater)
+					TEN::Effects::TriggerSpeedboatFoam(vehicle, Vector3(0, -waterDepth / 2.0f, -radius));
+			}
+
+			if (*angle != 0)
+			{
+				auto coeff = isWater ? VEHICLE_WATER_TURN_COEFFICIENT : VEHICLE_SWAMP_TURN_COEFFICIENT;
+				*angle -= *angle * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff);
+			}
+		}
+		else if (waterDepth > VEHICLE_MAX_WATER_HEIGHT && waterHeight > VEHICLE_MAX_WATER_HEIGHT)
+		{
+			Splash(vehicle);
+			ExplodeVehicle(lara, vehicle);
+
+			auto probe = GetCollision(vehicle);
+			if (probe.Position.Floor > vehicle->Pose.Position.y)
+				vehicle->Pose.Position.y += VEHICLE_SINK_SPEED;
+			else
+				vehicle->Status = ITEM_DEACTIVATED;
+		}
+	}
+
+	return currentVelocity;
 }
 
 void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision

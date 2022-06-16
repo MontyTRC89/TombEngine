@@ -11,7 +11,7 @@
 #include "Game/camera.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_flare.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Specific/input.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
@@ -101,12 +101,6 @@ enum JEEP_FLAGS
 #define JEEP_SLIP_SIDE				128
 #define JEEP_MAX_SPEED				0x8000
 #define JEEP_MAX_BACK				0x4000
-
-#define JEEP_MAX_WATER_HEIGHT CLICK(2.5f)
-#define JEEP_WATER_VEL_COEFFICIENT 16.0f
-#define JEEP_WATER_TURN_COEFFICIENT 10.0f
-#define JEEP_SWAMP_VEL_COEFFICIENT 8.0f
-#define JEEP_SWAMP_TURN_COEFFICIENT 6.0f
 
 #define JEEP_IN_ACCELERATE	(IN_ACTION)
 #define JEEP_IN_BRAKE		(IN_JUMP)
@@ -530,29 +524,6 @@ static int GetJeepCollisionAnim(ItemInfo* item, Vector3Int* p)
 	}
 
 	return 0;
-}
-
-static void JeepExplode(ItemInfo* item)
-{
-	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
-	{
-		TriggerUnderwaterExplosion(item, 1);
-	}
-	else
-	{
-		TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, 0, item->RoomNumber);
-		for (int i = 0; i < 3; i++)
-		{
-			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
-		}
-	}
-
-	ExplodingDeath(Lara.Vehicle, ALL_JOINT_BITS, 256);
-	KillItem(Lara.Vehicle);
-	item->Status = ITEM_DEACTIVATED;
-	SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
-	SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
-	Lara.Vehicle = NO_ITEM;
 }
 
 int JeepDynamics(ItemInfo* item)
@@ -1403,46 +1374,6 @@ static void AnimateJeep(ItemInfo* item, int collide, int dead)
 			break;
 		}
 	}
-
-	if (TestEnvironment(ENV_FLAG_WATER, item) ||
-		TestEnvironment(ENV_FLAG_SWAMP, item))
-	{
-		auto waterDepth = (float)GetWaterDepth(item);
-
-		// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
-		// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
-		if (waterDepth == DEEP_WATER)
-			waterDepth = JEEP_MAX_WATER_HEIGHT;
-
-		if (waterDepth <= JEEP_MAX_WATER_HEIGHT)
-		{
-			bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
-
-			if (jeep->velocity != 0)
-			{
-				auto coeff = isWater ? JEEP_WATER_VEL_COEFFICIENT : JEEP_SWAMP_VEL_COEFFICIENT;
-				jeep->velocity -= std::copysign(jeep->velocity * ((waterDepth / JEEP_MAX_WATER_HEIGHT) / coeff), jeep->velocity);
-
-				if (TEN::Math::Random::GenerateInt(0, 32) > 28)
-					SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(item->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
-
-				if (isWater)
-					TEN::Effects::TriggerSpeedboatFoam(item, Vector3(0, -waterDepth / 2.0f, -JEEP_FRONT));
-			}
-
-			if (jeep->jeepTurn != 0)
-			{
-				auto coeff = isWater ? JEEP_WATER_TURN_COEFFICIENT : JEEP_SWAMP_TURN_COEFFICIENT;
-				jeep->jeepTurn -= jeep->jeepTurn * ((waterDepth / JEEP_MAX_WATER_HEIGHT) / coeff);
-			}
-		}
-		else
-		{
-			LaraItem->Animation.TargetState = JS_JUMP;
-			LaraItem->HitPoints = 0;
-			JeepExplode(item);
-		}
-	}
 }
 
 void JeepCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
@@ -1603,6 +1534,7 @@ int JeepControl(void)
 
 	int oldY = item->Pose.Position.y;
 	item->Animation.VerticalVelocity = DoJeepDynamics(height, item->Animation.VerticalVelocity, &item->Pose.Position.y, 0);
+	jeep->velocity = DoVehicleWaterMovement(item, LaraItem, jeep->velocity, JEEP_FRONT, &jeep->jeepTurn);
 
 	height = (fl.y + fr.y) / 2;
 	short xRot;
@@ -1679,9 +1611,7 @@ int JeepControl(void)
 		if (jeep->flags & JF_FALLING && item->Pose.Position.y == item->Floor)
 		{
 			LaraItem->MeshBits = 0;
-			LaraItem->HitPoints = 0;
-			LaraItem->Flags |= ONESHOT;
-			JeepExplode(item);
+			ExplodeVehicle(LaraItem, item);
 			return 0;
 		}
 	}

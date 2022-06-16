@@ -8,7 +8,7 @@ struct MotorbikeInfo {
 	short momentumAngle;
 	short extraRotation;
 	short wallShiftRotation;
-	int bikeTurn;
+	short bikeTurn;
 	int pitch;
 	short flags;
 	short lightPower;

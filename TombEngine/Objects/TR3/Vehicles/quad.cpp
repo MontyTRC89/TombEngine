@@ -19,7 +19,7 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 #include "Specific/prng.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -60,12 +60,6 @@ using namespace TEN::Math::Random;
 #define MIN_MOMENTUM_TURN ANGLE(3.0f)
 #define MAX_MOMENTUM_TURN ANGLE(1.5f)
 #define QUAD_MAX_MOM_TURN ANGLE(150.0f)
-
-#define QUAD_MAX_WATER_HEIGHT CLICK(2)
-#define QUAD_WATER_VEL_COEFFICIENT 16.0f
-#define QUAD_WATER_TURN_COEFFICIENT 10.0f
-#define QUAD_SWAMP_VEL_COEFFICIENT 8.0f
-#define QUAD_SWAMP_TURN_COEFFICIENT 6.0f
 
 #define QUAD_MAX_HEIGHT CLICK(1)
 #define QUAD_MIN_BOUNCE ((MAX_VELOCITY / 2) / CLICK(1))
@@ -176,30 +170,6 @@ void InitialiseQuadBike(short itemNumber)
 	quad->RightVerticalVelocity = 0;
 	quad->Pitch = 0;
 	quad->Flags = 0;
-}
-
-static void QuadbikeExplode(ItemInfo* laraItem, ItemInfo* quadItem)
-{
-	auto* lara = GetLaraInfo(laraItem);
-
-	if (TestEnvironment(ENV_FLAG_WATER, quadItem))
-		TriggerUnderwaterExplosion(quadItem, 1);
-	else
-	{
-		TriggerExplosionSparks(quadItem->Pose.Position.x, quadItem->Pose.Position.y, quadItem->Pose.Position.z, 3, -2, 0, quadItem->RoomNumber);
-
-		for (int i = 0; i < 3; i++)
-			TriggerExplosionSparks(quadItem->Pose.Position.x, quadItem->Pose.Position.y, quadItem->Pose.Position.z, 3, -1, 0, quadItem->RoomNumber);
-	}
-
-	auto pos = PHD_3DPOS(quadItem->Pose.Position.x, quadItem->Pose.Position.y - CLICK(0.5f), quadItem->Pose.Position.z, 0, quadItem->Pose.Orientation.y, 0);
-	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
-
-	SoundEffect(SFX_TR4_EXPLOSION1, NULL);
-	SoundEffect(SFX_TR4_EXPLOSION2, NULL);
-
-	quadItem->Status = ITEM_DEACTIVATED;
-	lara->Vehicle = NO_ITEM;
 }
 
 static int CanQuadbikeGetOff(int direction)
@@ -921,48 +891,6 @@ static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadItem, int collide,
 
 			break;
 		}
-
-		if (TestEnvironment(ENV_FLAG_WATER, quadItem) ||
-			TestEnvironment(ENV_FLAG_SWAMP, quadItem))
-		{
-			auto waterDepth = (float)GetWaterDepth(quadItem);
-			
-			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
-			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
-			if (waterDepth == DEEP_WATER)
-				waterDepth = QUAD_MAX_WATER_HEIGHT;
-
-			if (waterDepth <= QUAD_MAX_WATER_HEIGHT)
-			{
-				bool isWater = TestEnvironment(ENV_FLAG_WATER, quadItem);
-
-				if (quad->Velocity != 0)
-				{
-					auto coeff = isWater ? QUAD_WATER_VEL_COEFFICIENT : QUAD_SWAMP_VEL_COEFFICIENT;
-					quad->Velocity -= std::copysign(quad->Velocity * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / coeff), quad->Velocity);
-
-					if (GenerateInt(0, 32) > 28)
-						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(quadItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
-
-					if (isWater)
-						TEN::Effects::TriggerSpeedboatFoam(quadItem, Vector3(0, -waterDepth / 2.0f, QUAD_BACK));
-				}
-
-				if (quad->TurnRate != 0)
-				{
-					auto coeff = isWater ? QUAD_WATER_TURN_COEFFICIENT : QUAD_SWAMP_TURN_COEFFICIENT;
-					quad->TurnRate -= quad->TurnRate * ((waterDepth / QUAD_MAX_WATER_HEIGHT) / coeff);
-				}
-			}
-			else
-			{
-				laraItem->Animation.TargetState = QUAD_STATE_FALL_OFF;
-				laraItem->Pose.Position.y = quadItem->Pose.Position.y + 700;
-				laraItem->RoomNumber = quadItem->RoomNumber;
-				laraItem->HitPoints = 0;
-				QuadbikeExplode(laraItem, quadItem);
-			}
-		}
 	}
 }
 
@@ -1353,6 +1281,7 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	quad->LeftVerticalVelocity = DoQuadDynamics(floorHeightLeft, quad->LeftVerticalVelocity, (int*)&frontLeft.y);
 	quad->RightVerticalVelocity = DoQuadDynamics(floorHeightRight, quad->RightVerticalVelocity, (int*)&frontRight.y);
 	quadItem->Animation.VerticalVelocity = DoQuadDynamics(probe.Position.Floor, quadItem->Animation.VerticalVelocity, (int*)&quadItem->Pose.Position.y);
+	quad->Velocity = DoVehicleWaterMovement(quadItem, laraItem, quad->Velocity, QUAD_RADIUS, &quad->TurnRate);
 
 	probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
 	short xRot = phd_atan(QUAD_FRONT, quadItem->Pose.Position.y - probe.Position.Floor);
@@ -1383,11 +1312,7 @@ bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 		{
 			if (quadItem->Pose.Position.y == quadItem->Floor)
 			{
-				ExplodingDeath(lara->ItemNumber, ALL_JOINT_BITS, 1);
-				laraItem->HitPoints = 0;
-				laraItem->Flags |= ONESHOT;
-				QuadbikeExplode(laraItem, quadItem);
-
+				ExplodeVehicle(laraItem, quadItem);
 				return false;
 			}
 		}

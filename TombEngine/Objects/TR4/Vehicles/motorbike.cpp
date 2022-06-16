@@ -1,6 +1,6 @@
 #include "framework.h"
+#include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
-#include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
@@ -8,27 +8,28 @@
 #include "Game/gui.h"
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_flare.h"
-#include "Specific/setup.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
-#include "Sound/sound.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/health.h"
 #include "Game/camera.h"
 #include "Game/animation.h"
 #include "Specific/prng.h"
-#include "Objects/TR4/Vehicles/motorbike_info.h"
-#include "Game/items.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Sound/sound.h"
 
 using namespace TEN::Math::Random;
 
-/*collision stuff*/
+// Collision stuff
 #define BIKE_FRONT 500
 #define BIKE_SIDE 350
 #define BIKE_RADIUS 500
 #define MOTORBIKE_SLIP 100
 #define MOTORBIKE_FRICTION 0x180
-/*movement stuff*/
+
+// Movement stuff
 #define MIN_MOMENTUM_TURN ANGLE(4.0f)
 #define MAX_MOMENTUM_TURN ANGLE(1.5f)
 #define MOTORBIKE_MAX_MOM_TURN ANGLE(150.0f)
@@ -45,7 +46,8 @@ using namespace TEN::Math::Random;
 #define MOTORBIKE_PITCH_SLOWDOWN 0x8000
 #define MOTORBIKE_PITCH_MAX 0xA000
 #define MOTORBIKE_BACKING_VEL 0x800
-/*controls*/
+
+// Controls
 #define IN_ACCELERATE IN_ACTION
 #define IN_REVERSE IN_BACK
 #define IN_BRAKE IN_JUMP
@@ -344,13 +346,6 @@ void MotorbikeCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* col
         item = &g_Level.Items[itemNumber];
         motorbike = GetMotorbikeInfo(item);
 
-        // update motorbike light
-        //if (motorbike->bikeTurn)
-      //  {
-//          motorbike->bikeTurn -= (motorbike->bikeTurn / 8) - 1;
-            DrawMotorbikeLight(item);
-  //      }
-
         if (GetOnMotorBike(itemNumber))
         {
             Lara.Vehicle = itemNumber;
@@ -393,6 +388,7 @@ void MotorbikeCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* col
             Lara.HitDirection = -1;
             AnimateItem(laraitem);
             motorbike->revs = 0;
+            motorbike->lightPower = 0;
             item->Collidable = true;
         }
         else
@@ -506,31 +502,6 @@ static void DrawMotorBikeSmoke(ItemInfo* item)
 
         TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, item->Pose.Orientation.y - ANGLE(180), speed, FALSE);
     }
-}
-
-static void MotorBikeExplode(ItemInfo* item)
-{
-	if (g_Level.Rooms[item->RoomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
-	{
-		TriggerUnderwaterExplosion(item, 1);
-	}
-	else
-	{
-		TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, 0, item->RoomNumber);
-		for (int i = 0; i < 3; i++)
-			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
-	}
-    auto pos = PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y - 128, item->Pose.Position.z, 0, item->Pose.Orientation.y, 0);
-	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
-	ExplodingDeath(Lara.Vehicle, ALL_JOINT_BITS - 1, 256);
-	ExplodingDeath(Lara.ItemNumber, ALL_JOINT_BITS - 1, 258); // enable blood
-	LaraItem->HitPoints = 0;
-	item->Status = ITEM_DEACTIVATED;
-
-	SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
-	SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
-
-	Lara.Vehicle = NO_ITEM;
 }
 
 static int MotorBikeCheckGetOff(void)
@@ -1101,12 +1072,6 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
         LaraItem->Animation.ActiveState = BIKE_FALLING;
         LaraItem->Animation.TargetState = BIKE_FALLING;
     }
-
-    if (g_Level.Rooms[item->RoomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
-    {
-        LaraItem->Animation.TargetState = BIKE_EMPTY6;
-        MotorBikeExplode(item);
-    }
 }
 
 static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
@@ -1390,6 +1355,7 @@ int MotorbikeControl(void)
     motorbike->wheelRight -= rotation;
     int newy = item->Pose.Position.y;
     item->Animation.VerticalVelocity = DoMotorBikeDynamics(height, item->Animation.VerticalVelocity, &item->Pose.Position.y, 0);
+    motorbike->velocity = DoVehicleWaterMovement(item, LaraItem, motorbike->velocity, BIKE_RADIUS, &motorbike->bikeTurn);
 
     short xrot = 0, zrot = 0;
     int r1, r2;
@@ -1450,9 +1416,7 @@ int MotorbikeControl(void)
         {
             if (item->Pose.Position.y == item->Floor)
             {
-                ExplodingDeath(Lara.ItemNumber, ALL_JOINT_BITS, 256);
-                LaraItem->Flags = ONESHOT;
-                MotorBikeExplode(item);
+                ExplodeVehicle(LaraItem, item);
                 return 0;
             }
         }

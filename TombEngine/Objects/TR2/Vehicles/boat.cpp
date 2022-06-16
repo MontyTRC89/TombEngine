@@ -9,7 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Objects/TR2/Vehicles/boat_info.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
