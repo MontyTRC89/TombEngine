@@ -29,14 +29,14 @@ enum class FLOOR_MATERIAL : unsigned char
 	Concrete = 11,
 	OldWood = 12,
 	OldMetal = 13,
-	Custom_Sound_1 = 14,
-	Custom_Sound_2 = 15,
-	Custom_Sound_3 = 16,
-	Custom_Sound_4 = 17,
-	Custom_Sound_5 = 18,
-	Custom_Sound_6 = 19,
-	Custom_Sound_7 = 20,
-	Custom_Sound_8 = 21,
+	Custom1 = 14,
+	Custom2 = 15,
+	Custom3 = 16,
+	Custom4 = 17,
+	Custom5 = 18,
+	Custom6 = 19,
+	Custom7 = 20,
+	Custom8 = 21,
 };
 
 
