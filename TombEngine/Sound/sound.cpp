@@ -311,8 +311,10 @@ void ResumeAllSounds()
 void StopSoundEffect(short effectID)
 {
 	for (int i = 0; i < SOUND_MAX_CHANNELS; i++)
-		if (SoundSlot[i].EffectID == effectID && SoundSlot[i].Channel != NULL && BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PLAYING)
+	{
+		if (SoundSlot[i].Channel != NULL && SoundSlot[i].EffectID == effectID && BASS_ChannelIsActive(SoundSlot[i].Channel) == BASS_ACTIVE_PLAYING)
 			Sound_FreeSlot(i, SOUND_XFADETIME_CUTSOUND);
+	}
 }
 
 void StopAllSounds()
