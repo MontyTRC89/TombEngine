@@ -12,12 +12,17 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SphinxBiteInfo = { 0, 0, 0, 6 };
-	const std::vector<int> SphinxAttackJoints = { 6 };
+	const vector<int> SphinxAttackJoints = { 6 };
 
 	constexpr auto SPHINX_ATTACK_DAMAGE = 200;
+
+	#define SPHINX_WALK_TURN_ANGLE ANGLE(3.0f)
+	#define SPHINX_RUN_TURN_ANGLE ANGLE(0.33f)
 
 	enum SphinxState
 	{
@@ -157,7 +162,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case SPHINX_STATE_WALK_FORWARD:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = SPHINX_WALK_TURN_ANGLE;
 
 			if (AI.distance > pow(SECTOR(1), 2) && abs(AI.angle) <= ANGLE(2.8f) || item->Animation.RequiredState == SPHINX_STATE_RUN_FORWARD)
 				item->Animation.TargetState = SPHINX_STATE_RUN_FORWARD;
@@ -174,7 +179,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case SPHINX_STATE_RUN_FORWARD:
-			creature->MaxTurn = ANGLE(0.33f);
+			creature->MaxTurn = SPHINX_RUN_TURN_ANGLE;
 
 			if (creature->Flags == 0)
 			{
@@ -186,7 +191,6 @@ namespace TEN::Entities::TR4
 						20,
 						-1,
 						DoBloodSplat);
-
 					creature->Flags = 1;
 
 					LaraItem->HitPoints -= SPHINX_ATTACK_DAMAGE;
@@ -209,7 +213,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case SPHINX_STATE_WALK_BACK:
-			creature->MaxTurn = ANGLE(3.0f);
+			creature->MaxTurn = SPHINX_WALK_TURN_ANGLE;
 
 			if (AI.distance > pow(SECTOR(2), 2) ||
 				height2 > (item->Pose.Position.y + CLICK(1)) ||
