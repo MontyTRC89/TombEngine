@@ -20,7 +20,27 @@
 
 using std::vector;
 
-enum JEEP_STATES 
+//bool QuadHandbrakeStarting;
+//bool QuadCanHandbrakeStart;
+char JeepSmokeStart;
+bool JeepNoGetOff;
+short Unk_0080DE1A;
+int Unk_0080DDE8;
+short Unk_0080DE24;
+
+#define JEEP_DISMOUNT_DISTANCE		512
+#define JEEP_UNDO_TURN				91
+#define	JEEP_FRONT					550
+#define JEEP_SIDE					256
+#define JEEP_SLIP					100
+#define JEEP_SLIP_SIDE				128
+#define JEEP_MAX_SPEED				0x8000
+#define JEEP_MAX_BACK				0x4000
+
+#define JEEP_IN_ACCELERATE	IN_ACTION
+#define JEEP_IN_BRAKE		IN_JUMP
+
+enum JeepState
 {
 	JS_STOP = 0,
 	JS_DRIVE_FORWARD = 1,
@@ -39,7 +59,7 @@ enum JEEP_STATES
 	JS_DRIVE_BACK = 17
 };
 
-enum JEEP_ANIMS
+enum JeepAnim
 {
 	JA_DEATH = 0,
 	JA_BRAKE = 1,
@@ -85,32 +105,11 @@ enum JEEP_ANIMS
 	JA_IDLE_FWD_RIGHT = 44,//aka the opposite of 42. "change to forward gear with the wheels still turned right"
 };
 
-enum JEEP_FLAGS
+enum JeepFlags
 {
 	JF_FALLING = 0x40,
 	JF_DEAD = 0x80
 };
-
-#define JEEP_GETOFF_DISTANCE		512
-#define JEEP_UNDO_TURN				91
-#define	JEEP_FRONT					550
-#define JEEP_SIDE					256
-#define JEEP_SLIP					100
-#define JEEP_SLIP_SIDE				128
-#define JEEP_MAX_SPEED				0x8000
-#define JEEP_MAX_BACK				0x4000
-
-
-#define JEEP_IN_ACCELERATE	(IN_ACTION)
-#define JEEP_IN_BRAKE		(IN_JUMP)
-
-//bool QuadHandbrakeStarting;
-//bool QuadCanHandbrakeStart;
-char JeepSmokeStart;
-bool JeepNoGetOff;
-short Unk_0080DE1A;
-int Unk_0080DDE8;
-short Unk_0080DE24;
 
 static int TestJeepHeight(ItemInfo* item, int dz, int dx, Vector3Int* pos)
 {
@@ -280,9 +279,9 @@ static int JeepCanGetOff()
 
 	short angle = item->Pose.Orientation.y + 0x4000;
 
-	int x = item->Pose.Position.x - JEEP_GETOFF_DISTANCE * phd_sin(angle);
+	int x = item->Pose.Position.x - JEEP_DISMOUNT_DISTANCE * phd_sin(angle);
 	int y = item->Pose.Position.y;
-	int z = item->Pose.Position.z - JEEP_GETOFF_DISTANCE * phd_cos(angle);
+	int z = item->Pose.Position.z - JEEP_DISMOUNT_DISTANCE * phd_cos(angle);
 
 	short roomNumber = item->RoomNumber;
 	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
@@ -405,8 +404,8 @@ static int JeepCheckGetOff()
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 			LaraItem->Animation.TargetState = LS_IDLE;
 			LaraItem->Animation.ActiveState = LS_IDLE;
-			LaraItem->Pose.Position.x -= JEEP_GETOFF_DISTANCE * phd_sin(LaraItem->Pose.Orientation.y);
-			LaraItem->Pose.Position.z -= JEEP_GETOFF_DISTANCE * phd_cos(LaraItem->Pose.Orientation.y);
+			LaraItem->Pose.Position.x -= JEEP_DISMOUNT_DISTANCE * phd_sin(LaraItem->Pose.Orientation.y);
+			LaraItem->Pose.Position.z -= JEEP_DISMOUNT_DISTANCE * phd_cos(LaraItem->Pose.Orientation.y);
 			LaraItem->Pose.Orientation.x = 0;
 			LaraItem->Pose.Orientation.z = 0;
 			Lara.Vehicle = NO_ITEM;

@@ -21,6 +21,7 @@ namespace TEN::Entities::TR4
 	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE = 50;
 	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE = 20;
 	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
+
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SECTOR(0.31);
 
 	enum SmallScorionState
