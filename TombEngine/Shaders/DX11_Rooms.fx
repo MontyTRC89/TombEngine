@@ -201,7 +201,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 			}
 
 			float shadowFactor = sum / 16.0;
-			lighting = lerp(lighting, min(AmbientColor,lighting), 1 - saturate(shadowFactor));
+			lighting *= (saturate(shadowFactor + 0.75));
 		}
 	}
 
