@@ -284,21 +284,22 @@ static void DrawMotorbikeLight(ItemInfo* motorbikeItem)
 	TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
 }
 
-static bool TestMotorbikeMount(short itemNumber)
+static bool TestMotorbikeMount(short itemNumber, ItemInfo* laraItem)
 {
 	auto* motorbikeItem = &g_Level.Items[itemNumber];
+	auto* lara = GetLaraInfo(laraItem);
 
-	if (motorbikeItem->Flags & ONESHOT || Lara.Control.HandStatus != HandStatus::Free || LaraItem->Animation.Airborne)
+	if (motorbikeItem->Flags & ONESHOT || lara->Control.HandStatus != HandStatus::Free || laraItem->Animation.Airborne)
 		return false;
 
-	if ((abs(motorbikeItem->Pose.Position.y - LaraItem->Pose.Position.y) >= CLICK(1) ||
+	if ((abs(motorbikeItem->Pose.Position.y - laraItem->Pose.Position.y) >= CLICK(1) ||
 		!(TrInput & IN_ACTION)) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
 	{
 		return false;
 	}
 
-	int dx = LaraItem->Pose.Position.x - motorbikeItem->Pose.Position.x;
-	int dz = LaraItem->Pose.Position.z - motorbikeItem->Pose.Position.z;
+	int dx = laraItem->Pose.Position.x - motorbikeItem->Pose.Position.x;
+	int dz = laraItem->Pose.Position.z - motorbikeItem->Pose.Position.z;
 	int distance = pow(dx, 2) + pow(dz, 2);
 	if (distance > SECTOR(166))
 		return false;
@@ -307,7 +308,7 @@ static bool TestMotorbikeMount(short itemNumber)
 	if (floorHeight < -SECTOR(31.25f))
 		return false;
 
-	short angle = phd_atan(motorbikeItem->Pose.Position.z - LaraItem->Pose.Position.z, motorbikeItem->Pose.Position.x - LaraItem->Pose.Position.x) - motorbikeItem->Pose.Orientation.y;
+	short angle = phd_atan(motorbikeItem->Pose.Position.z - laraItem->Pose.Position.z, motorbikeItem->Pose.Position.x - laraItem->Pose.Position.x) - motorbikeItem->Pose.Orientation.y;
 	unsigned short deltaAngle = angle - motorbikeItem->Pose.Orientation.y;
 
 	// Left.
@@ -328,55 +329,56 @@ static bool TestMotorbikeMount(short itemNumber)
 
 void MotorbikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
-	if (laraItem->HitPoints >= 0 && Lara.Vehicle == NO_ITEM)
-	{
-		auto* motorbikeItem = &g_Level.Items[itemNumber];
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+	auto* motorbikeItem = &g_Level.Items[itemNumber];
+	auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+	auto* lara = GetLaraInfo(laraItem);
 
-        if (TestMotorbikeMount(itemNumber))
-        {
-            Lara.Vehicle = itemNumber;
+	if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+		return;
 
-			if (Lara.Control.Weapon.GunType == LaraWeaponType::Flare)
+    if (TestMotorbikeMount(itemNumber, laraItem))
+    {
+        lara->Vehicle = itemNumber;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, false);
+			UndrawFlareMeshes(laraItem);
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Flare.Life = 0;
+			lara->Flare.ControlLeft = false;
+		}
+
+		lara->Control.HandStatus = HandStatus::Free;
+
+		short angle = phd_atan(motorbikeItem->Pose.Position.z - laraItem->Pose.Position.z, motorbikeItem->Pose.Position.x - laraItem->Pose.Position.x) - motorbikeItem->Pose.Orientation.y;
+		if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
+		{
+			if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
 			{
-				CreateFlare(LaraItem, ID_FLARE_ITEM, false);
-				UndrawFlareMeshes(laraItem);
-				Lara.Control.Weapon.GunType = LaraWeaponType::None;
-				Lara.Control.Weapon.RequestGunType = LaraWeaponType::None;
-				Lara.Flare.Life = 0;
-				Lara.Flare.ControlLeft = false;
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
+				g_Gui.SetInventoryItemChosen(NO_ITEM);
 			}
+			else
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_ENTER;
 
-			Lara.Control.HandStatus = HandStatus::Free;
+			laraItem->Animation.ActiveState = BIKE_ENTER;
+			laraItem->Animation.TargetState = BIKE_ENTER;
+		}
 
-			short angle = phd_atan(motorbikeItem->Pose.Position.z - laraItem->Pose.Position.z, motorbikeItem->Pose.Position.x - laraItem->Pose.Position.x) - motorbikeItem->Pose.Orientation.y;
-			if (angle <= -ANGLE(45.0f) || angle >= ANGLE(135.0f))
-			{
-				if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
-				{
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
-					g_Gui.SetInventoryItemChosen(NO_ITEM);
-				}
-				else
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_ENTER;
-
-				laraItem->Animation.ActiveState = BIKE_ENTER;
-				laraItem->Animation.TargetState = BIKE_ENTER;
-			}
-
-			motorbikeItem->HitPoints = 1;
-            laraItem->Pose.Position = motorbikeItem->Pose.Position;
-            laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
-            ResetLaraFlex(laraItem);
-            Lara.HitDirection = -1;
-            AnimateItem(laraItem);
-            motorbike->Revs = 0;
-            motorbike->LightPower = 0;
-            motorbikeItem->Collidable = true;
-        }
-        else
-            ObjectCollision(itemNumber, laraItem, coll);
+		motorbikeItem->HitPoints = 1;
+        laraItem->Pose.Position = motorbikeItem->Pose.Position;
+        laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
+        ResetLaraFlex(laraItem);
+        lara->HitDirection = -1;
+        AnimateItem(laraItem);
+        motorbike->Revs = 0;
+        motorbike->LightPower = 0;
+        motorbikeItem->Collidable = true;
     }
+    else
+        ObjectCollision(itemNumber, laraItem, coll);
 }
 
 static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, bool moving)
@@ -447,12 +449,14 @@ static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short
 	sptr->size = size / 2;
 }
 
-static void DrawMotorBikeSmoke(ItemInfo* motorbikeItem)
+static void DrawMotorBikeSmoke(ItemInfo* motorbikeItem, ItemInfo* laraItem)
 {
-	if (Lara.Vehicle == NO_ITEM)
+	auto* lara = GetLaraInfo(laraItem);
+
+	if (lara->Vehicle == NO_ITEM)
 		return;
 
-	if (LaraItem->Animation.ActiveState != BIKE_ENTER && LaraItem->Animation.ActiveState != BIKE_EXIT)
+	if (laraItem->Animation.ActiveState != BIKE_ENTER && laraItem->Animation.ActiveState != BIKE_EXIT)
 	{
 		Vector3Int pos;
 		int speed;
@@ -477,46 +481,45 @@ static void DrawMotorBikeSmoke(ItemInfo* motorbikeItem)
 				speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10)) * 64;
 		}
 		else
-		{
 			speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * ExhaustStart) * 64;
-		}
 
-        TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, motorbikeItem->Pose.Orientation.y - ANGLE(180), speed, false);
+        TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, motorbikeItem->Pose.Orientation.y - ANGLE(180.0f), speed, false);
     }
 }
 
-static int MotorBikeCheckGetOff(void)
+static int MotorBikeCheckGetOff(ItemInfo* laraItem)
 {
-	ItemInfo* item;
+	auto* lara = GetLaraInfo(laraItem);
 
-	if (Lara.Vehicle != NO_ITEM)
+	if (lara->Vehicle != NO_ITEM)
 	{
-		item = &g_Level.Items[Lara.Vehicle];
-		if (LaraItem->Animation.ActiveState == BIKE_EXIT && LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd)
+		auto* item = &g_Level.Items[lara->Vehicle];
+
+		if (laraItem->Animation.ActiveState == BIKE_EXIT && laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 		{
-			LaraItem->Pose.Orientation.y -= 0x4000;
-			LaraItem->Animation.AnimNumber = LA_STAND_SOLID;
-			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-			LaraItem->Animation.TargetState = LS_IDLE;
-			LaraItem->Animation.ActiveState = LS_IDLE;
-			LaraItem->Pose.Position.x -= 2 * phd_sin(item->Pose.Orientation.y);
-			LaraItem->Pose.Position.z -= 2 * phd_cos(item->Pose.Orientation.y);
-			LaraItem->Pose.Orientation.x = 0;
-			LaraItem->Pose.Orientation.z = 0;
-			Lara.Vehicle = NO_ITEM;
-			Lara.Control.HandStatus = HandStatus::Free;
-			Lara.SprintEnergy = 120;
+			laraItem->Pose.Orientation.y -= 0x4000;
+			laraItem->Animation.AnimNumber = LA_STAND_SOLID;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+			laraItem->Animation.TargetState = LS_IDLE;
+			laraItem->Animation.ActiveState = LS_IDLE;
+			laraItem->Pose.Position.x -= 2 * phd_sin(item->Pose.Orientation.y);
+			laraItem->Pose.Position.z -= 2 * phd_cos(item->Pose.Orientation.y);
+			laraItem->Pose.Orientation.x = 0;
+			laraItem->Pose.Orientation.z = 0;
+			lara->Vehicle = NO_ITEM;
+			lara->Control.HandStatus = HandStatus::Free;
+			lara->SprintEnergy = 120;
 			return true;
 		}
 
-		if (LaraItem->Animation.FrameNumber != g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd)
+		if (laraItem->Animation.FrameNumber != g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			return true;
 
 		// exit when falling
-		// if (LaraItem->state_current == BIKE_EMPTY6) {
+		// if (laraItem->state_current == BIKE_EMPTY6) {
 
 		// }
-		// else if (LaraItem->state_current == BIKE_EMPTY5) {
+		// else if (laraItem->state_current == BIKE_EMPTY5) {
 		// lara death when falling too much
 		// }
 
@@ -590,8 +593,10 @@ static int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3Int* pos)
 	return 0;
 }
 
-static int MotorBikeDynamics(ItemInfo* motorbikeItem)
+static int MotorBikeDynamics(ItemInfo* motorbikeItem, ItemInfo* laraItem)
 {
+	auto* lara = GetLaraInfo(laraItem);
+
 	MotorbikeInfo* motorbike;
 	Vector3Int bl_old, mtb_old, br_old, mtf_old, fl_old;
 	Vector3Int fl, bl, mtf, mtb, br;
@@ -807,10 +812,10 @@ static int MotorBikeDynamics(ItemInfo* motorbikeItem)
 	if (collide)
 	{
 		newspeed = ((motorbikeItem->Pose.Position.z - oldpos.z) * phd_cos(motorbike->MomentumAngle) + (motorbikeItem->Pose.Position.x - oldpos.x) * phd_sin(motorbike->MomentumAngle)) * 256;
-		if (&g_Level.Items[Lara.Vehicle] == motorbikeItem && motorbike->Velocity >= MOTORBIKE_ACCEL && newspeed < (motorbike->Velocity - 10))
+		if (&g_Level.Items[lara->Vehicle] == motorbikeItem && motorbike->Velocity >= MOTORBIKE_ACCEL && newspeed < (motorbike->Velocity - 10))
 		{
-			LaraItem->HitPoints -= ((motorbike->Velocity - newspeed) / 128);
-			LaraItem->HitStatus = true;
+			laraItem->HitPoints -= ((motorbike->Velocity - newspeed) / 128);
+			laraItem->HitStatus = true;
 		}
 
 		if (motorbike->Velocity > 0 && newspeed < motorbike->Velocity)
@@ -825,23 +830,24 @@ static int MotorBikeDynamics(ItemInfo* motorbikeItem)
 	return collide;
 }
 
-static bool TestMotorbikeDismount(void)
+static bool TestMotorbikeDismount(ItemInfo* motorbikeItem, ItemInfo* laraItem)
 {
-	auto item = &g_Level.Items[Lara.Vehicle];
-	auto angle = item->Pose.Orientation.y + 0x4000;
-	auto x = item->Pose.Position.x + MOTORBIKE_RADIUS * phd_sin(angle);
-	auto y = item->Pose.Position.y;
-	auto z = item->Pose.Position.z + MOTORBIKE_RADIUS * phd_cos(angle);
+	auto* lara = GetLaraInfo(laraItem);
 
-	auto collResult = GetCollision(x, y, z, item->RoomNumber);
+	auto angle = motorbikeItem->Pose.Orientation.y + 0x4000;
+	auto x = motorbikeItem->Pose.Position.x + MOTORBIKE_RADIUS * phd_sin(angle);
+	auto y = motorbikeItem->Pose.Position.y;
+	auto z = motorbikeItem->Pose.Position.z + MOTORBIKE_RADIUS * phd_cos(angle);
+
+	auto collResult = GetCollision(x, y, z, motorbikeItem->RoomNumber);
 
 	if (collResult.Position.FloorSlope || collResult.Position.Floor == NO_HEIGHT) // Was previously set to -NO_HEIGHT by TokyoSU -- Lwmte 23.08.21
 		return false;
 
-	if (abs(collResult.Position.Floor - item->Pose.Position.y) > STEP_SIZE)
+	if (abs(collResult.Position.Floor - motorbikeItem->Pose.Position.y) > STEP_SIZE)
 		return false;
 
-	if ((collResult.Position.Ceiling - item->Pose.Position.y) > -LARA_HEIGHT)
+	if ((collResult.Position.Ceiling - motorbikeItem->Pose.Position.y) > -LARA_HEIGHT)
 		return false;
 
 	if ((collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
@@ -850,30 +856,29 @@ static bool TestMotorbikeDismount(void)
 	return true;
 }
 
-static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
+static void AnimateMotorbike(ItemInfo* motorbikeItem, ItemInfo* laraItem, int collide, bool isDead)
 {
-	MotorbikeInfo* motorbike;
-	motorbike = GetMotorbikeInfo(item);
+	auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
-	if (item->Pose.Position.y == item->Floor
-		|| LaraItem->Animation.ActiveState == BIKE_FALLING
-		|| LaraItem->Animation.ActiveState == BIKE_LANDING
-		|| LaraItem->Animation.ActiveState == BIKE_EMPTY6
-		|| dead)
+	if (motorbikeItem->Pose.Position.y == motorbikeItem->Floor
+		|| laraItem->Animation.ActiveState == BIKE_FALLING
+		|| laraItem->Animation.ActiveState == BIKE_LANDING
+		|| laraItem->Animation.ActiveState == BIKE_EMPTY6
+		|| isDead)
 	{
 		if (!collide
-			|| LaraItem->Animation.ActiveState == BIKE_HITBACK
-			|| LaraItem->Animation.ActiveState == BIKE_HITFRONT
-			|| LaraItem->Animation.ActiveState == BIKE_HITLEFT
-			|| LaraItem->Animation.ActiveState == BIKE_EMPTY6
+			|| laraItem->Animation.ActiveState == BIKE_HITBACK
+			|| laraItem->Animation.ActiveState == BIKE_HITFRONT
+			|| laraItem->Animation.ActiveState == BIKE_HITLEFT
+			|| laraItem->Animation.ActiveState == BIKE_EMPTY6
 			|| motorbike->Velocity <= 10922
-			|| dead)
+			|| isDead)
 		{
-			switch (LaraItem->Animation.ActiveState)
+			switch (laraItem->Animation.ActiveState)
 			{
 			case BIKE_IDLE:
-				if (dead)
-					LaraItem->Animation.TargetState = BIKE_DEATH;
+				if (isDead)
+					laraItem->Animation.TargetState = BIKE_DEATH;
 				else 
 				{
 
@@ -886,80 +891,77 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
 					if (!dismount || motorbike->Velocity || DisableDismount)
 					{
 						if (TrInput & MOTORBIKE_IN_ACCELERATE && !(TrInput & MOTORBIKE_IN_BRAKE))
-							LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
+							laraItem->Animation.TargetState = BIKE_MOVING_FRONT;
 						else if (TrInput & MOTORBIKE_IN_REVERSE)
-							LaraItem->Animation.TargetState = BIKE_MOVING_BACK;
+							laraItem->Animation.TargetState = BIKE_MOVING_BACK;
 					}
-					else if (dismount && TestMotorbikeDismount())
-					{
-						LaraItem->Animation.TargetState = BIKE_EXIT;
-					}
+					else if (dismount && TestMotorbikeDismount(motorbikeItem, laraItem))
+						laraItem->Animation.TargetState = BIKE_EXIT;
 					else
-					{
-						LaraItem->Animation.TargetState = BIKE_IDLE;
-					}
+						laraItem->Animation.TargetState = BIKE_IDLE;
 				}
+
 				break;
 
 			case BIKE_MOVING_FRONT:
-				if (dead)
+				if (isDead)
 				{
 					if (motorbike->Velocity <= MOTORBIKE_ACCEL_1)
-						LaraItem->Animation.TargetState = BIKE_DEATH;
+						laraItem->Animation.TargetState = BIKE_DEATH;
 					else
-						LaraItem->Animation.TargetState = BIKE_EMPTY5;
+						laraItem->Animation.TargetState = BIKE_EMPTY5;
 				}
 				else if (motorbike->Velocity & -256 || TrInput & (MOTORBIKE_IN_ACCELERATE | MOTORBIKE_IN_BRAKE))
 				{
 					if (TrInput & MOTORBIKE_IN_LEFT)
-						LaraItem->Animation.TargetState = BIKE_MOVING_LEFT;
+						laraItem->Animation.TargetState = BIKE_MOVING_LEFT;
 					else if (TrInput & MOTORBIKE_IN_RIGHT)
-						LaraItem->Animation.TargetState = BIKE_MOVING_RIGHT;
+						laraItem->Animation.TargetState = BIKE_MOVING_RIGHT;
 					else if (TrInput & MOTORBIKE_IN_BRAKE)
 					{
 						if (motorbike->Velocity <= 0x5554)
-							LaraItem->Animation.TargetState = BIKE_EMPTY3;
+							laraItem->Animation.TargetState = BIKE_EMPTY3;
 						else
-							LaraItem->Animation.TargetState = BIKE_STOP;
+							laraItem->Animation.TargetState = BIKE_STOP;
 					}
 					else if (TrInput & MOTORBIKE_IN_REVERSE && motorbike->Velocity <= MOTORBIKE_BACKING_VEL)
-						LaraItem->Animation.TargetState = BIKE_MOVING_BACK;
+						laraItem->Animation.TargetState = BIKE_MOVING_BACK;
 					else if (motorbike->Velocity == 0)
-						LaraItem->Animation.TargetState = BIKE_IDLE;
+						laraItem->Animation.TargetState = BIKE_IDLE;
 				}
 				else
-					LaraItem->Animation.TargetState = BIKE_IDLE;
+					laraItem->Animation.TargetState = BIKE_IDLE;
 				break;
 
 			case BIKE_MOVING_LEFT:
 				if (motorbike->Velocity & -256)
 				{
 					if (TrInput & MOTORBIKE_IN_RIGHT || !(TrInput & MOTORBIKE_IN_LEFT))
-						LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
+						laraItem->Animation.TargetState = BIKE_MOVING_FRONT;
 				}
 				else
-					LaraItem->Animation.TargetState = BIKE_IDLE;
+					laraItem->Animation.TargetState = BIKE_IDLE;
 				if (motorbike->Velocity == 0)
-					LaraItem->Animation.TargetState = BIKE_IDLE;
+					laraItem->Animation.TargetState = BIKE_IDLE;
 				break;
 
 			case BIKE_MOVING_BACK:
 				if (TrInput & MOTORBIKE_IN_REVERSE)
-					LaraItem->Animation.TargetState = BIKE_MOVING_BACK_LOOP;
+					laraItem->Animation.TargetState = BIKE_MOVING_BACK_LOOP;
 				else
-					LaraItem->Animation.TargetState = BIKE_IDLE;
+					laraItem->Animation.TargetState = BIKE_IDLE;
 				break;
 
 			case BIKE_MOVING_RIGHT:
 				if (motorbike->Velocity & -256)
 				{
 					if (TrInput & MOTORBIKE_IN_LEFT || !(TrInput & MOTORBIKE_IN_RIGHT))
-						LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
+						laraItem->Animation.TargetState = BIKE_MOVING_FRONT;
 				}
 				else
-					LaraItem->Animation.TargetState = BIKE_IDLE;
+					laraItem->Animation.TargetState = BIKE_IDLE;
 				if (motorbike->Velocity == 0)
-					LaraItem->Animation.TargetState = BIKE_IDLE;
+					laraItem->Animation.TargetState = BIKE_IDLE;
 				break;
 
 			case BIKE_EMPTY3:
@@ -968,31 +970,31 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
 				if (motorbike->Velocity & -256)
 				{
 					if (TrInput & MOTORBIKE_IN_LEFT)
-						LaraItem->Animation.TargetState = BIKE_MOVING_LEFT;
+						laraItem->Animation.TargetState = BIKE_MOVING_LEFT;
 					if (TrInput & MOTORBIKE_IN_RIGHT)
-						LaraItem->Animation.TargetState = BIKE_MOVING_RIGHT;
+						laraItem->Animation.TargetState = BIKE_MOVING_RIGHT;
 				}
 				else
 				{
-					LaraItem->Animation.TargetState = BIKE_IDLE;
+					laraItem->Animation.TargetState = BIKE_IDLE;
 				}
 				break;
 
 			case BIKE_FALLING:
-				if (item->Pose.Position.y == item->Floor)
+				if (motorbikeItem->Pose.Position.y == motorbikeItem->Floor)
 				{
-					LaraItem->Animation.TargetState = BIKE_LANDING;
+					laraItem->Animation.TargetState = BIKE_LANDING;
 
-					int fallspeed_damage = item->Animation.VerticalVelocity - 140;
+					int fallspeed_damage = motorbikeItem->Animation.VerticalVelocity - 140;
 					if (fallspeed_damage > 0)
 					{
 						if (fallspeed_damage <= 100)
-							LaraItem->HitPoints -= (-1000 * fallspeed_damage * fallspeed_damage) / 10000;
+							laraItem->HitPoints -= (-1000 * fallspeed_damage * fallspeed_damage) / 10000;
 						else
-							LaraItem->HitPoints = 0;
+							laraItem->HitPoints = 0;
 					}
 				}
-				else if (item->Animation.VerticalVelocity > 220)
+				else if (motorbikeItem->Animation.VerticalVelocity > 220)
 					motorbike->Flags |= MOTORBIKE_FLAG_FALLING;
 				break;
 
@@ -1001,43 +1003,42 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
 			case BIKE_HITRIGHT:
 			case BIKE_HITLEFT:
 				if (TrInput & (MOTORBIKE_IN_ACCELERATE | MOTORBIKE_IN_BRAKE))
-					LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
-				break;
+					laraItem->Animation.TargetState = BIKE_MOVING_FRONT;
 
+				break;
 			}
 		}
 		else
 		{
 			switch (collide)
 			{
-
 			case 13:
-				LaraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_BACK_HIT;
-				LaraItem->Animation.ActiveState = BIKE_HITBACK;
-				LaraItem->Animation.TargetState = BIKE_HITBACK;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_BACK_HIT;
+				laraItem->Animation.ActiveState = BIKE_HITBACK;
+				laraItem->Animation.TargetState = BIKE_HITBACK;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				break;
 
 			case 14:
-				LaraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_FRONT_HIT;
-				LaraItem->Animation.ActiveState = BIKE_HITFRONT;
-				LaraItem->Animation.TargetState = BIKE_HITFRONT;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_FRONT_HIT;
+				laraItem->Animation.ActiveState = BIKE_HITFRONT;
+				laraItem->Animation.TargetState = BIKE_HITFRONT;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				break;
 
 			case 11:
-				LaraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_RIGHT_HIT;
-				LaraItem->Animation.ActiveState = BIKE_HITRIGHT;
-				LaraItem->Animation.TargetState = BIKE_HITRIGHT;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_RIGHT_HIT;
+				laraItem->Animation.ActiveState = BIKE_HITRIGHT;
+				laraItem->Animation.TargetState = BIKE_HITRIGHT;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				break;
 
 			default:
 			case 12:
-				LaraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_LEFT_HIT;
-				LaraItem->Animation.ActiveState = BIKE_HITLEFT;
-				LaraItem->Animation.TargetState = BIKE_HITLEFT;
-				LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_LEFT_HIT;
+				laraItem->Animation.ActiveState = BIKE_HITLEFT;
+				laraItem->Animation.TargetState = BIKE_HITLEFT;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				break;
 			}
 		}
@@ -1045,12 +1046,12 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
 	else
 	{
 		if (motorbike->Velocity >= 0)
-			LaraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_JUMP;
+			laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_JUMP;
 		else
-			LaraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_FALL;
-		LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
-		LaraItem->Animation.ActiveState = BIKE_FALLING;
-		LaraItem->Animation.TargetState = BIKE_FALLING;
+			laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_START_FALL;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.ActiveState = BIKE_FALLING;
+		laraItem->Animation.TargetState = BIKE_FALLING;
 	}
 }
 
@@ -1068,8 +1069,8 @@ static int MotorbikeUserControl(ItemInfo* motorbikeItem, ItemInfo* laraItem, int
 
 	if (motorbike->Revs > 0x10)
 	{
-		motorbike->Velocity += (motorbike->Revs / 16);
-		motorbike->Revs -= (motorbike->Revs / 80);
+		motorbike->Velocity += motorbike->Revs / 16;
+		motorbike->Revs -= motorbike->Revs / 80;
 	}
 	else
 		motorbike->Revs = 0;
@@ -1255,10 +1256,11 @@ void SetLaraOnMotorBike(ItemInfo* motorbikeItem, ItemInfo* laraItem)
 
 bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 {
-	auto* motorbikeItem = &g_Level.Items[Lara.Vehicle];
+	auto* lara = GetLaraInfo(laraItem);
+	auto* motorbikeItem = &g_Level.Items[lara->Vehicle];
 	auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
-	int collide = MotorBikeDynamics(motorbikeItem);
+	int collide = MotorBikeDynamics(motorbikeItem, laraItem);
 	int drive = -1;
 
 	auto oldPos = motorbikeItem->Pose.Position;
@@ -1325,7 +1327,7 @@ bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	}
 
 	if (motorbike->Velocity < MOTORBIKE_ACCEL_1)
-		DrawMotorBikeSmoke(motorbikeItem);
+		DrawMotorBikeSmoke(motorbikeItem, laraItem);
 
 	motorbikeItem->Floor = probe.Position.Floor;
 
@@ -1372,13 +1374,13 @@ bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		if (probe.RoomNumber != motorbikeItem->RoomNumber)
 		{
-			ItemNewRoom(Lara.Vehicle, probe.RoomNumber);
-			ItemNewRoom(Lara.ItemNumber, probe.RoomNumber);
+			ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 
 		laraItem->Pose = motorbikeItem->Pose;
 
-		AnimateMotorbike(motorbikeItem, collide, isDead);
+		AnimateMotorbike(motorbikeItem, laraItem, collide, isDead);
 		AnimateItem(laraItem);
 
 		motorbikeItem->Animation.AnimNumber = laraItem->Animation.AnimNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
@@ -1399,10 +1401,10 @@ bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 	if (laraItem->Animation.ActiveState == BIKE_EXIT)
 	{
 		ExhaustStart = false;
-		MotorBikeCheckGetOff();
+		MotorBikeCheckGetOff(laraItem);
 		return true;
 	}
 
-	MotorBikeCheckGetOff();
+	MotorBikeCheckGetOff(laraItem);
 	return true;
 }
