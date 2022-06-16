@@ -93,7 +93,7 @@ bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
 			break;
 
 		case ID_MOTORBIKE:
-			MotorbikeControl();
+			MotorbikeControl(item, coll);
 			break;
 
 		case ID_KAYAK:
