@@ -268,11 +268,13 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
 
 static void DrawMotorbikeLight(ItemInfo* item)
 {
-    MotorbikeInfo* motorbike;
-    Vector3Int start, target;
-    int rnd;
+    auto motorbike = GetMotorbikeInfo(item);
 
-    motorbike = GetMotorbikeInfo(item);
+    if (motorbike->lightPower <= 0)
+        return;
+
+    Vector3Int start, target;
+
     start.x = 0;
     start.y = -470;
     start.z = 1836;
@@ -281,7 +283,7 @@ static void DrawMotorbikeLight(ItemInfo* item)
     target.y = -470;
     target.z = 20780;
     GetJointAbsPosition(item, &target, 0);
-    rnd = (2 * motorbike->lightPower) - (GetRandomControl() & 0xF);
+    int rnd = (2 * motorbike->lightPower) - (GetRandomControl() & 0xF);
 
     // TODO: Spot Light, use target as direction vector
     TriggerDynamicLight(start.x, start.y, start.z, 8, rnd, rnd / 2, 0);
