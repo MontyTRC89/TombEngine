@@ -20,12 +20,12 @@
 /// traps
 #include "Objects/TR3/Trap/train.h"
 /// vehicles
-#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad.h"
 #include "Objects/TR3/Vehicles/upv.h"
-#include "Objects/TR3/Vehicles/rubberboat.h"
+#include "Objects/TR3/Vehicles/rubber_boat.h"
 /// necessary import
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"

@@ -92,7 +92,7 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->Pose.Orientation.x;
 
-		int velocity = 8 * (WraithVelocity / item->Animation.Velocity);
+		int velocity = (WraithVelocity / item->Animation.Velocity) * 8;
 
 		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
 		{

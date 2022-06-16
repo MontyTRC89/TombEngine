@@ -17,6 +17,8 @@ namespace TEN::Entities::TR4
 
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
 
+	constexpr auto WILD_BOAR_ATTACK_RANGE = SECTOR(64);
+
 	enum WildBoarState
 	{
 		BOAR_STATE_NONE = 0,
@@ -165,7 +167,7 @@ namespace TEN::Entities::TR4
 					joint2 = -AI.distance;
 				}
 
-				if (!item->Flags && (AI.distance < SECTOR(64) && AI.bite))
+				if (!item->Flags && (AI.distance < WILD_BOAR_ATTACK_RANGE && AI.bite))
 				{
 					item->Animation.TargetState = BOAR_STATE_ATTACK;
 
