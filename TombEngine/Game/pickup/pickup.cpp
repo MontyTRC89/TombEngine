@@ -515,6 +515,11 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		PlinthPickUpBounds.boundingBox.Z2 = plinth->Z2 + 320;
 		PlinthPickUpPosition.z = -200 - plinth->Z2;
 
+		// HACK: Until we refactor a way plinth collision is detected, this must be here
+		// to prevent false positives with two stacked plinths -- Lwmte, 16.06.22
+		if (abs(laraItem->Pose.Position.y - item->Pose.Position.y) > CLICK(4))
+			break;
+
 		if (TestLaraPosition(&PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
 		{
 			if (item->Pose.Position.y == laraItem->Pose.Position.y)

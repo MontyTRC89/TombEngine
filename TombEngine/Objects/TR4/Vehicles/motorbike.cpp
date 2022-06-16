@@ -268,11 +268,13 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
 
 static void DrawMotorbikeLight(ItemInfo* item)
 {
-    MotorbikeInfo* motorbike;
-    Vector3Int start, target;
-    int rnd;
+    auto motorbike = GetMotorbikeInfo(item);
 
-    motorbike = GetMotorbikeInfo(item);
+    if (motorbike->lightPower <= 0)
+        return;
+
+    Vector3Int start, target;
+
     start.x = 0;
     start.y = -470;
     start.z = 1836;
@@ -281,12 +283,10 @@ static void DrawMotorbikeLight(ItemInfo* item)
     target.y = -470;
     target.z = 20780;
     GetJointAbsPosition(item, &target, 0);
-    rnd = (2 * motorbike->lightPower) - (GetRandomControl() & 0xF);
-    // TODO: Spot Light
-    /*if (rnd <= 0)
-        SpotLightEnabled = false;
-    else
-        CreateSpotLight(&start, &target, item->pos.Orientation.y, rnd);*/
+    int rnd = (2 * motorbike->lightPower) - (GetRandomControl() & 0xF);
+
+    // TODO: Spot Light, use target as direction vector
+    TriggerDynamicLight(start.x, start.y, start.z, 8, rnd, rnd / 2, 0);
 }
 
 static BOOL GetOnMotorBike(short itemNumber)
@@ -1159,7 +1159,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn -= MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn -= (ANGLE(1) - MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn -= (MOTORBIKE_DEFAULT_HTURN * ((float)motorbike->velocity / 16384.0f));
 
                 if (motorbike->bikeTurn < -MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = -MOTORBIKE_MAX_HTURN;
@@ -1169,7 +1169,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn += MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn += (ANGLE(1) + MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn += (MOTORBIKE_DEFAULT_HTURN * ((float)motorbike->velocity / 16384.0f));
 
                 if (motorbike->bikeTurn > MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = MOTORBIKE_MAX_HTURN;
@@ -1381,10 +1381,13 @@ int MotorbikeControl(void)
         motorbike->pitch = 0;
     }
 
+    if (motorbike->velocity < MOTORBIKE_ACCEL_1)
+        DrawMotorBikeSmoke(item);
+
     item->Floor = height;
     int rotation = motorbike->velocity / 4;
-    motorbike->wheelLeft = rotation;
-    motorbike->wheelRight = rotation;
+    motorbike->wheelLeft -= rotation;
+    motorbike->wheelRight -= rotation;
     int newy = item->Pose.Position.y;
     item->Animation.VerticalVelocity = DoMotorBikeDynamics(height, item->Animation.VerticalVelocity, &item->Pose.Position.y, 0);
 
@@ -1464,19 +1467,4 @@ int MotorbikeControl(void)
 
     MotorBikeCheckGetOff();
     return 1;
-}
-
-void DrawMotorbike(ItemInfo* item)
-{
-    // TODO: recreate the motorbike render here, then include the rotation for the wheel:
-    //MOTORBIKE_INFO* motorbike = GetMotorbikeInfo(item);
-}
-
-void DrawMotorbikeEffect(ItemInfo* item)
-{
-    // TODO: speedometer
-    //MOTORBIKE_INFO* motorbike = GetMotorbikeInfo(item);
-    //if (Lara.Vehicle != NO_ITEM)
-        //DrawMotorBikeSpeedoMeter(phd_winwidth - 64, phd_winheight - 16, motorbike->velocity, ANGLE(180), ANGLE(270), 32); // angle are 2D angle...
-    DrawMotorBikeSmoke(item);
 }
