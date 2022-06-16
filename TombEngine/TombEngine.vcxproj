@@ -254,7 +254,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
-    <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Game\effects\simple_particle.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
@@ -612,7 +612,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\gui.cpp" />
-    <ClCompile Include="Game\particle\SimpleParticle.cpp" />
+    <ClCompile Include="Game\effects\simple_particle.cpp" />
     <ClCompile Include="Game\pickup\pickup_ammo.cpp" />
     <ClCompile Include="Game\pickup\pickup_consumable.cpp" />
     <ClCompile Include="Game\pickup\pickup_key_items.cpp" />

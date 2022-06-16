@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Objects/TR4/Vehicles/jeep.h"
+#include "Game/animation.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/gui.h"
@@ -10,13 +11,14 @@
 #include "Game/camera.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_flare.h"
+#include "Game/effects/simple_particle.h"
 #include "Specific/input.h"
-#include "Sound/sound.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/animation.h"
+#include "Sound/sound.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Specific/prng.h"
 
 using std::vector;
 
@@ -524,110 +526,6 @@ static int GetJeepCollisionAnim(ItemInfo* item, Vector3Int* p)
 	return 0;
 }
 
-static void JeepBaddyCollision(ItemInfo* jeep)
-{
-	vector<short> roomsList;
-	short* door, numDoors;
-
-	roomsList.push_back(jeep->RoomNumber);
-
-	ROOM_INFO* room = &g_Level.Rooms[jeep->RoomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-	{
-		roomsList.push_back(room->doors[i].room);
-	}
-
-	for (int i = 0; i < roomsList.size(); i++)
-	{
-		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNum != NO_ITEM)
-		{
-			ItemInfo* item = &g_Level.Items[itemNum];
-			if (item->Collidable && item->Status != ITEM_INVISIBLE && item != LaraItem && item != jeep)
-			{
-				if (item->ObjectNumber == ID_ENEMY_JEEP)
-				{
-					Unk_0080DE1A = 0;
-					Unk_0080DDE8 = 400;
-					Unk_0080DE24 = Unk_0080DE24 & 0xFFDF | 0x10;
-
-					//ObjectCollision(item, jeep, )
-				}
-				else
-				{
-					ObjectInfo* object = &Objects[item->ObjectNumber];
-					if (object->collision && object->intelligent ||
-						item->ObjectNumber == ID_ROLLINGBALL)
-					{
-						int x = jeep->Pose.Position.x - item->Pose.Position.x;
-						int y = jeep->Pose.Position.y - item->Pose.Position.y;
-						int z = jeep->Pose.Position.z - item->Pose.Position.z;
-						if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
-						{
-							if (item->ObjectNumber == ID_ROLLINGBALL)
-							{
-								if (TestBoundsCollide(item, LaraItem, 100))
-								{
-									if (LaraItem->HitPoints > 0)
-									{
-										DoLotsOfBlood(LaraItem->Pose.Position.x,
-											LaraItem->Pose.Position.y - 512,
-											LaraItem->Pose.Position.z,
-											GetRandomControl() & 3,
-											LaraItem->Pose.Orientation.y,
-											LaraItem->RoomNumber,
-											5);
-										item->HitPoints -= 8;
-									}
-								}
-							}
-							else
-							{
-								if (TestBoundsCollide(item, jeep, JEEP_FRONT))
-								{
-									DoLotsOfBlood(item->Pose.Position.x,
-										jeep->Pose.Position.y - STEP_SIZE,
-										item->Pose.Position.z,
-										GetRandomControl() & 3,
-										jeep->Pose.Orientation.y,
-										item->RoomNumber,
-										3);
-									item->HitPoints = 0;
-								}
-							}
-						}
-					}
-				}
-			}
-			itemNum = item->NextItem;
-		}
-	}
-}
-
-static void JeepExplode(ItemInfo* item)
-{
-	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
-	{
-		TriggerUnderwaterExplosion(item, 1);
-	}
-	else
-	{
-		TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -2, 0, item->RoomNumber);
-		for (int i = 0; i < 3; i++)
-		{
-			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 3, -1, 0, item->RoomNumber);
-		}
-	}
-
-	ExplodingDeath(Lara.Vehicle, ALL_JOINT_BITS, 256);
-	KillItem(Lara.Vehicle);
-	item->Status = ITEM_DEACTIVATED;
-	SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose);
-	SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
-	Lara.Vehicle = NO_ITEM;
-}
-
 int JeepDynamics(ItemInfo* item)
 {
 	JeepInfo* jeep = (JeepInfo*)item->Data;
@@ -787,10 +685,7 @@ int JeepDynamics(ItemInfo* item)
 	movedPos.z = item->Pose.Position.z;
 
 	if (!(item->Flags & ONESHOT))
-	{
-		JeepBaddyCollision(item);
-		// v37 = sub_467850(item->pos.Position.x, item->pos.Position.y, item->pos.Position.z, item->roomNumber, 512);
-	}
+		DoVehicleCollision(item, JEEP_FRONT);
 
 	Vector3Int f, b, mm, mt, mb;
 	
@@ -1479,12 +1374,6 @@ static void AnimateJeep(ItemInfo* item, int collide, int dead)
 			break;
 		}
 	}
-	if (g_Level.Rooms[item->RoomNumber].flags & ENV_FLAG_WATER)
-	{
-		LaraItem->Animation.TargetState = JS_JUMP;
-		LaraItem->HitPoints = 0;
-		JeepExplode(item);
-	}
 }
 
 void JeepCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
@@ -1645,6 +1534,7 @@ int JeepControl(void)
 
 	int oldY = item->Pose.Position.y;
 	item->Animation.VerticalVelocity = DoJeepDynamics(height, item->Animation.VerticalVelocity, &item->Pose.Position.y, 0);
+	jeep->velocity = DoVehicleWaterMovement(item, LaraItem, jeep->velocity, JEEP_FRONT, &jeep->jeepTurn);
 
 	height = (fl.y + fr.y) / 2;
 	short xRot;
@@ -1721,9 +1611,7 @@ int JeepControl(void)
 		if (jeep->flags & JF_FALLING && item->Pose.Position.y == item->Floor)
 		{
 			LaraItem->MeshBits = 0;
-			LaraItem->HitPoints = 0;
-			LaraItem->Flags |= ONESHOT;
-			JeepExplode(item);
+			ExplodeVehicle(LaraItem, item);
 			return 0;
 		}
 	}

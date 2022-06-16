@@ -114,7 +114,7 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	if (enemy == NULL || enemy->HitPoints <= 0 || !AI->ahead || AI->distance >= pow(MAX_VISIBILITY_DISTANCE, 2))
 		return false;
 
-	if (!enemy->Data.is<CreatureInfo>() && !enemy->Data.is<LaraInfo*>())
+	if (!enemy->Data.is<CreatureInfo>() && !enemy->IsLara())
 		return false;
 
 	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);
