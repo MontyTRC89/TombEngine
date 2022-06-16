@@ -1730,7 +1730,7 @@ int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocit
 		{
 			if (waterDepth > VEHICLE_MAX_WATER_HEIGHT && waterHeight > VEHICLE_MAX_WATER_HEIGHT)
 				ExplodeVehicle(lara, vehicle);
-			else if (TEN::Math::Random::GenerateInt(0, 48) > 25)
+			else if (TEN::Math::Random::GenerateInt(0, 32) > 25)
 				Splash(vehicle);
 		}
 	}
