@@ -868,6 +868,12 @@ void SayNo()
 
 void PlaySecretTrack()
 {
+	if (SoundTracks.size() <= SecretSoundIndex)
+	{
+		TENLog("No secret soundtrack index was found!", LogLevel::Warning);
+		return;
+	}
+
 	// Secret soundtrack should be always last one on a list.	
 	PlaySoundTrack(SoundTracks.at(SecretSoundIndex).Name, SoundTrackType::OneShot);
 }
