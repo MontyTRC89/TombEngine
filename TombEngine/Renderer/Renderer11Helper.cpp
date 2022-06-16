@@ -240,7 +240,7 @@ namespace TEN::Renderer
 					case 4:
 						currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
 						break;
-					case 10:
+					case 8:
 						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
 						break;
 					}

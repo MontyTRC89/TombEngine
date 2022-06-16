@@ -1223,7 +1223,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn -= MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn -= (ANGLE(1) - MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn -= (ANGLE(1) - MOTORBIKE_HTURN * (motorbike->velocity / 16384));
 
                 if (motorbike->bikeTurn < -MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = -MOTORBIKE_MAX_HTURN;
@@ -1233,7 +1233,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn += MOTORBIKE_DEFAULT_HTURN;
                 else
-                    motorbike->bikeTurn += (ANGLE(1) + MOTORBIKE_HTURN * motorbike->velocity) / 16384;
+                    motorbike->bikeTurn += (ANGLE(1) + MOTORBIKE_HTURN * (motorbike->velocity / 16384));
 
                 if (motorbike->bikeTurn > MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = MOTORBIKE_MAX_HTURN;
@@ -1447,8 +1447,8 @@ int MotorbikeControl(void)
 
     item->Floor = height;
     int rotation = motorbike->velocity / 4;
-    motorbike->wheelLeft = rotation;
-    motorbike->wheelRight = rotation;
+    motorbike->wheelLeft -= rotation;
+    motorbike->wheelRight -= rotation;
     int newy = item->Pose.Position.y;
     item->Animation.VerticalVelocity = DoMotorBikeDynamics(height, item->Animation.VerticalVelocity, &item->Pose.Position.y, 0);
 
