@@ -3,17 +3,18 @@
 #include "Game/items.h"
 #include "Game/control/box.h"
 #include "Game/people.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/los.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/animation.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/collision/collide_item.h"
-#include "Game/control/los.h"
 
 static void TriggerSubmarineSparks(short itemNumber)
 {

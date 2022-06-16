@@ -13,7 +13,7 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -223,7 +223,7 @@ bool TestSkidooDismount(ItemInfo* laraItem, ItemInfo* skidooItem)
 				laraItem->Animation.TargetState = LS_DEATH;
 				laraItem->Animation.Velocity = 0;
 				laraItem->Animation.VerticalVelocity = DAMAGE_START + DAMAGE_LENGTH;
-				SkidooExplode(laraItem, skidooItem);
+				ExplodeVehicle(laraItem, skidooItem);
 			}
 			else
 			{
@@ -324,68 +324,6 @@ void SkidooCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
 	skidooItem->Collidable = true;
 }
 
-
-void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem)
-{
-	vector<short> roomsList;
-	roomsList.push_back(skidooItem->RoomNumber);
-
-	auto* room = &g_Level.Rooms[skidooItem->RoomNumber];
-	for (int i = 0; i < room->doors.size(); i++)
-		roomsList.push_back(room->doors[i].room);
-
-	for (int i = 0; i < roomsList.size(); i++)
-	{
-		short itemNumber = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNumber != NO_ITEM)
-		{
-			auto* item = &g_Level.Items[itemNumber];
-
-			if (item->Collidable &&
-				item->Status != IFLAG_INVISIBLE &&
-				item != laraItem && item != skidooItem)
-			{
-				auto* object = &Objects[item->ObjectNumber];
-
-				if (object->collision && object->intelligent)
-				{
-					int x = skidooItem->Pose.Position.x - item->Pose.Position.x;
-					int y = skidooItem->Pose.Position.y - item->Pose.Position.y;
-					int z = skidooItem->Pose.Position.z - item->Pose.Position.z;
-
-					if (x > -2048 && x < 2048 &&
-						y > -2048 && y < 2048 &&
-						z > -2048 && z < 2048)
-					{
-						if (item->ObjectNumber == ID_ROLLINGBALL)
-						{
-							if (TestBoundsCollide(item, laraItem, 100))
-							{
-								if (laraItem->HitPoints > 0)
-								{
-									DoLotsOfBlood(laraItem->Pose.Position.x, laraItem->Pose.Position.y - CLICK(2), laraItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.y, laraItem->RoomNumber, 5);
-									item->HitPoints -= 8;
-								}
-							}
-						}
-						else
-						{
-							if (TestBoundsCollide(item, skidooItem, SKIDOO_FRONT))
-							{
-								DoLotsOfBlood(skidooItem->Pose.Position.x, skidooItem->Pose.Position.y, skidooItem->Pose.Position.z, GetRandomControl() & 3, laraItem->Pose.Orientation.y, laraItem->RoomNumber, 3);
-								item->HitPoints = 0;
-							}
-						}
-					}
-				}
-			}
-
-			itemNumber = item->NextItem;
-		}
-	}
-}
-
 void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)
 {
 	auto* lara = (LaraInfo*&)laraItem->Data;
@@ -414,40 +352,6 @@ void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)
 
 	if (skidooItem->ItemFlags[0])
 		skidooItem->ItemFlags[0]--;
-}
-
-void SkidooExplode(ItemInfo* laraItem, ItemInfo* skidooItem)
-{
-	LaraInfo*& lara = laraItem->Data;
-
-	if (TestEnvironment(ENV_FLAG_WATER, skidooItem))
-		TriggerUnderwaterExplosion(skidooItem, 1);
-	else
-	{
-		TriggerExplosionSparks(skidooItem->Pose.Position.x, skidooItem->Pose.Position.y, skidooItem->Pose.Position.z, 3, -2, 0, skidooItem->RoomNumber);
-
-		for (int i = 0; i < 3; i++)
-			TriggerExplosionSparks(skidooItem->Pose.Position.x, skidooItem->Pose.Position.y, skidooItem->Pose.Position.z, 3, -1, 0, skidooItem->RoomNumber);
-	}
-
-	PHD_3DPOS pos;
-	pos.Position.x = skidooItem->Pose.Position.x,
-	pos.Position.y = skidooItem->Pose.Position.y - 128,
-	pos.Position.z = skidooItem->Pose.Position.z,
-	pos.Orientation.x = 0,
-	pos.Orientation.y = skidooItem->Pose.Orientation.y,
-	pos.Orientation.z = 0;
-
-	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
-	//ExplodingDeath(lara->Vehicle, ALL_JOINT_BITS, 256);
-
-	KillItem(lara->Vehicle);
-	skidooItem->Status = ITEM_DEACTIVATED;
-
-	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
-	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem->Pose);
-
-	lara->Vehicle = NO_ITEM;
 }
 
 void DoSnowEffect(ItemInfo* skidooItem)
@@ -521,9 +425,10 @@ bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 	if (drive > 0)
 	{
 		skidoo->TrackMesh = ((skidoo->TrackMesh & 3) == 1) ? 2 : 1;
-
 		skidoo->Pitch += (pitch - skidoo->Pitch) / 4;
-		SoundEffect(skidoo->Pitch ? SFX_TR2_VEHICLE_SNOWMOBILE_MOVING : SFX_TR2_VEHICLE_SNOWMOBILE_ACCELERATE, &skidooItem->Pose, SoundEnvironment::Land, 0.5f + skidoo->Pitch / (float)SKIDOO_MAX_VELOCITY);
+
+		auto pitch = std::clamp(0.5f + (float)abs(skidoo->Pitch) / (float)SKIDOO_MAX_VELOCITY, 0.6f, 1.4f);
+		SoundEffect(skidoo->Pitch ? SFX_TR2_VEHICLE_SNOWMOBILE_MOVING : SFX_TR2_VEHICLE_SNOWMOBILE_ACCELERATE, &skidooItem->Pose, SoundEnvironment::Land, pitch);
 	}
 	else
 	{
@@ -537,6 +442,7 @@ bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 	skidoo->LeftVerticalVelocity = DoSkidooDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, (int*)&frontLeft.y);
 	skidoo->RightVerticalVelocity = DoSkidooDynamics(heightFrontRight, skidoo->RightVerticalVelocity, (int*)&frontRight.y);
 	skidooItem->Animation.VerticalVelocity = DoSkidooDynamics(height, skidooItem->Animation.VerticalVelocity, (int*)&skidooItem->Pose.Position.y);
+	skidooItem->Animation.Velocity = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity, SKIDOO_RADIUS, &skidoo->TurnRate);
 
 	height = (frontLeft.y + frontRight.y) / 2;
 	short xRot = phd_atan(SKIDOO_FRONT, skidooItem->Pose.Position.y - height);
@@ -556,7 +462,7 @@ bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 		AnimateItem(laraItem);
 
 		if (skidooItem->Pose.Position.y == skidooItem->Floor)
-			SkidooExplode(laraItem, skidooItem);
+			ExplodeVehicle(laraItem, skidooItem);
 
 		return 0;
 	}
@@ -802,15 +708,6 @@ void SkidooAnimation(ItemInfo* laraItem, ItemInfo* skidooItem, int collide, bool
 			break;
 		}
 	}
-
-	if (TestEnvironment(ENV_FLAG_WATER, skidooItem) ||
-		TestEnvironment(ENV_FLAG_SWAMP, skidooItem))
-	{
-		laraItem->Animation.TargetState = SKIDOO_STATE_JUMP_OFF;
-		laraItem->HitPoints = 0;
-		laraItem->RoomNumber = skidooItem->RoomNumber;
-		SkidooExplode(laraItem, skidooItem);
-	}
 }
 
 int DoSkidooDynamics(int height, int verticalVelocity, int* y)
@@ -1046,7 +943,7 @@ int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem)
 	moved.z = skidooItem->Pose.Position.z;
 
 	if (!(skidooItem->Flags & ONESHOT))
-		SkidooEntityCollision(laraItem, skidooItem);
+		DoVehicleCollision(skidooItem, SKIDOO_RADIUS);
 
 	Vector3Int frontLeft, frontRight, backRight, backLeft;
 	rotation = 0;

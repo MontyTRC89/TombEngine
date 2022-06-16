@@ -1,6 +1,6 @@
 #include "framework.h"
+#include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
-#include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
@@ -8,17 +8,17 @@
 #include "Game/gui.h"
 #include "Game/collision/collide_item.h"
 #include "Game/Lara/lara_flare.h"
-#include "Specific/setup.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
-#include "Sound/sound.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/health.h"
 #include "Game/camera.h"
 #include "Game/animation.h"
 #include "Specific/prng.h"
-#include "Objects/TR4/Vehicles/motorbike_info.h"
-#include "Game/items.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Sound/sound.h"
 
 using std::vector;
 using namespace TEN::Math::Random;
@@ -333,16 +333,9 @@ void MotorbikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
-		// update motorbike light
-		//if (motorbike->TurnRate)
-	  //  {
-//          motorbike->TurnRate -= (motorbike->TurnRate / 8) - 1;
-			DrawMotorbikeLight(motorbikeItem);
-  //      }
-
-		if (TestMotorbikeMount(itemNumber))
-		{
-			Lara.Vehicle = itemNumber;
+        if (TestMotorbikeMount(itemNumber))
+        {
+            Lara.Vehicle = itemNumber;
 
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
@@ -371,20 +364,19 @@ void MotorbikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 				laraItem->Animation.TargetState = BIKE_ENTER;
 			}
 
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-
 			motorbikeItem->HitPoints = 1;
-			laraItem->Pose.Position = motorbikeItem->Pose.Position;
-			laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
-			ResetLaraFlex(laraItem);
-			Lara.HitDirection = -1;
-			AnimateItem(laraItem);
-			motorbike->Revs = 0;
-			motorbikeItem->Collidable = true;
-		}
-		else
-			ObjectCollision(itemNumber, laraItem, coll);
-	}
+            laraItem->Pose.Position = motorbikeItem->Pose.Position;
+            laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
+            ResetLaraFlex(laraItem);
+            Lara.HitDirection = -1;
+            AnimateItem(laraItem);
+            motorbike->Revs = 0;
+            motorbike->LightPower = 0;
+            motorbikeItem->Collidable = true;
+        }
+        else
+            ObjectCollision(itemNumber, laraItem, coll);
+    }
 }
 
 static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, bool moving)
@@ -489,33 +481,8 @@ static void DrawMotorBikeSmoke(ItemInfo* motorbikeItem)
 			speed = ((GetRandomControl() & 0xF) + (GetRandomControl() & 0x10) + 2 * ExhaustStart) * 64;
 		}
 
-		TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, motorbikeItem->Pose.Orientation.y - ANGLE(180), speed, FALSE);
-	}
-}
-
-static void MotorBikeExplode(ItemInfo* motorbikeItem)
-{
-	if (g_Level.Rooms[motorbikeItem->RoomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
-	{
-		TriggerUnderwaterExplosion(motorbikeItem, 1);
-	}
-	else
-	{
-		TriggerExplosionSparks(motorbikeItem->Pose.Position.x, motorbikeItem->Pose.Position.y, motorbikeItem->Pose.Position.z, 3, -2, 0, motorbikeItem->RoomNumber);
-		for (int i = 0; i < 3; i++)
-			TriggerExplosionSparks(motorbikeItem->Pose.Position.x, motorbikeItem->Pose.Position.y, motorbikeItem->Pose.Position.z, 3, -1, 0, motorbikeItem->RoomNumber);
-	}
-	auto pos = PHD_3DPOS(motorbikeItem->Pose.Position.x, motorbikeItem->Pose.Position.y - 128, motorbikeItem->Pose.Position.z, 0, motorbikeItem->Pose.Orientation.y, 0);
-	TriggerShockwave(&pos, 50, 180, 40, GenerateFloat(160, 200), 60, 60, 64, GenerateFloat(0, 359), 0);
-	ExplodingDeath(Lara.Vehicle, ALL_JOINT_BITS - 1, 256);
-	ExplodingDeath(Lara.ItemNumber, ALL_JOINT_BITS - 1, 258); // enable blood
-	LaraItem->HitPoints = 0;
-	motorbikeItem->Status = ITEM_DEACTIVATED;
-
-	SoundEffect(SFX_TR4_EXPLOSION1, &motorbikeItem->Pose);
-	SoundEffect(SFX_TR4_EXPLOSION2, &motorbikeItem->Pose);
-
-	Lara.Vehicle = NO_ITEM;
+        TriggerMotorbikeExhaustSmoke(pos.x, pos.y, pos.z, motorbikeItem->Pose.Orientation.y - ANGLE(180), speed, false);
+    }
 }
 
 static int MotorBikeCheckGetOff(void)
@@ -621,67 +588,6 @@ static int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3Int* pos)
 	}
 
 	return 0;
-}
-
-void MotorbikeBaddyCollision(ItemInfo* motorbikeItem)
-{
-	int x, y, z, i;
-
-	vector<short> roomsList;
-	roomsList.push_back(motorbikeItem->RoomNumber);
-
-	ROOM_INFO* room = &g_Level.Rooms[motorbikeItem->RoomNumber];
-	for (i = 0; i < room->doors.size(); i++)
-	{
-		roomsList.push_back(room->doors[i].room);
-	}
-
-	for (int i = 0; i < roomsList.size(); i++)
-	{
-		short itemNum = g_Level.Rooms[roomsList[i]].itemNumber;
-
-		while (itemNum != NO_ITEM)
-		{
-			ItemInfo* item = &g_Level.Items[itemNum];
-
-			if (item->Collidable && item->Status != IFLAG_INVISIBLE && item != LaraItem && item != motorbikeItem)
-			{
-				ObjectInfo* object = &Objects[item->ObjectNumber];
-
-				if (object->collision && (object->intelligent))
-				{
-					x = motorbikeItem->Pose.Position.x - item->Pose.Position.x;
-					y = motorbikeItem->Pose.Position.y - item->Pose.Position.y;
-					z = motorbikeItem->Pose.Position.z - item->Pose.Position.z;
-
-					if (x > -2048 && x < 2048 && z > -2048 && z < 2048 && y > -2048 && y < 2048)
-					{
-						if (item->ObjectNumber == ID_ROLLINGBALL)
-						{
-							if (TestBoundsCollide(item, LaraItem, 100))
-							{
-								if (LaraItem->HitPoints > 0)
-								{
-									DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - (STEP_SIZE * 2), LaraItem->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 5);
-									LaraItem->HitPoints -= 8;
-								}
-							}
-						}
-						else
-						{
-							if (TestBoundsCollide(item, motorbikeItem, MOTORBIKE_FRONT))
-							{
-								DoLotsOfBlood(motorbikeItem->Pose.Position.x, motorbikeItem->Pose.Position.y, motorbikeItem->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 3);
-								item->HitPoints = 0;
-							}
-						}
-					}
-				}
-			}
-
-			itemNum = item->NextItem;
-		}
-	}
 }
 
 static int MotorBikeDynamics(ItemInfo* motorbikeItem)
@@ -838,11 +744,8 @@ static int MotorBikeDynamics(ItemInfo* motorbikeItem)
 	moved.x = motorbikeItem->Pose.Position.x;
 	moved.z = motorbikeItem->Pose.Position.z;
 
-	if (!(motorbikeItem->Flags & ONESHOT))
-	{
-		MotorbikeBaddyCollision(motorbikeItem);
-		//MotorBikeStaticCollision(item->pos.x, item->pos.y, item->pos.z, item->room_number, (WALL_L / 2));
-	}
+    if (!(motorbikeItem->Flags & ONESHOT))
+        DoVehicleCollision(motorbikeItem, MOTORBIKE_RADIUS);
 
 	int rot1 = 0;
 	int rot2 = 0;
@@ -1149,12 +1052,6 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
 		LaraItem->Animation.ActiveState = BIKE_FALLING;
 		LaraItem->Animation.TargetState = BIKE_FALLING;
 	}
-
-	if (g_Level.Rooms[item->RoomNumber].flags & (ENV_FLAG_WATER|ENV_FLAG_SWAMP))
-	{
-		LaraItem->Animation.TargetState = BIKE_EMPTY6;
-		MotorBikeExplode(item);
-	}
 }
 
 static int MotorbikeUserControl(ItemInfo* motorbikeItem, ItemInfo* laraItem, int height, int* pitch)
@@ -1438,6 +1335,7 @@ bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 	int newY = motorbikeItem->Pose.Position.y;
 	motorbikeItem->Animation.VerticalVelocity = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.VerticalVelocity, &motorbikeItem->Pose.Position.y, 0);
+	motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate);
 
 	int r1 = (frontRight.y + frontLeft.y) / 2;
 	int r2 = (frontRight.y + frontLeft.y) / 2;
@@ -1488,17 +1386,15 @@ bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 		Camera.targetElevation = -ANGLE(30.0f);
 
-		if (motorbike->Flags & MOTORBIKE_FLAG_FALLING)
-		{
-			if (motorbikeItem->Pose.Position.y == motorbikeItem->Floor)
-			{
-				ExplodingDeath(Lara.ItemNumber, ALL_JOINT_BITS, 256);
-				laraItem->Flags = ONESHOT;
-				MotorBikeExplode(motorbikeItem);
-				return false;
-			}
-		}
-	}
+        if (motorbike->Flags & MOTORBIKE_FLAG_FALLING)
+        {
+            if (motorbikeItem->Pose.Position.y == motorbikeItem->Floor)
+            {
+                ExplodeVehicle(laraItem, motorbikeItem);
+                return 0;
+            }
+        }
+    }
 
 	if (laraItem->Animation.ActiveState == BIKE_EXIT)
 	{

@@ -844,6 +844,7 @@ void FreeLevel()
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
 	g_Level.LuaFunctionNames.resize(0);
+	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
 	{

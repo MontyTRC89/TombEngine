@@ -26,7 +26,7 @@
 #include "Game/effects/weather.h"
 #include "Game/effects/lightning.h"
 #include "Game/spotcam.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/collision/sphere.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"

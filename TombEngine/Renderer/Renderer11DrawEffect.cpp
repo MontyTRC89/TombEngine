@@ -19,7 +19,7 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/weather.h"
 #include "Quad/RenderQuad.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Renderer/RendererSprites.h"
 #include "Game/effects/lightning.h"
 #include "Game/items.h"

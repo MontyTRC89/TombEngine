@@ -9,7 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Objects/TR2/Vehicles/boat_info.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
@@ -523,6 +523,8 @@ int SpeedBoatDynamics(ItemInfo* laraItem, short itemNumber)
 		SpeedBoatDoShift(sBoatItem, (Vector3Int*)&sBoatItem->Pose, &old);
 
 	sBoat->ExtraRotation = rotation;
+
+	DoVehicleCollision(sBoatItem, BOAT_RADIUS);
 
 	auto collide = GetSpeedBoatHitAnim(sBoatItem, &moved);
 

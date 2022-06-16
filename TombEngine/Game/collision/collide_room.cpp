@@ -129,7 +129,7 @@ CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float v
 
 	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. @Sezz 2022.06.14
 	auto location =
-		item->Data.is<LaraInfo*>() ?
+		item->IsLara() ?
 		item->Location :
 		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
 
@@ -219,7 +219,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
-	bool playerCollision = item->Data.is<LaraInfo*>();
+	bool playerCollision = item->IsLara();
 
 	// Reset collision parameters.
 	coll->CollisionType = CT_NONE;
@@ -873,6 +873,10 @@ int GetQuadrant(short angle)
 
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 {
+	// Calculation ledge angle for non-Lara objects is unnecessary.
+	if (!item->IsLara())
+		return 0; 
+
 	// Get item bounds and current rotation
 	auto bounds = GetBoundsAccurate(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);
