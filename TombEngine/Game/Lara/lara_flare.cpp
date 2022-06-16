@@ -17,7 +17,7 @@
 
 using namespace TEN::Math::Random;
 
-constexpr auto FlareMainColor = Vector3(1, 0.52947, 0.3921);
+constexpr auto FlareMainColor = Vector3(0.8, 0.42947, 0.2921);
 
 void FlareControl(short itemNumber)
 {
@@ -407,7 +407,7 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 
 	if (dying)
 	{
-		int falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
+		int falloff = 6 * (1.0f - (flareLife / FLARE_LIFE_MAX));
 
 		int r = FlareMainColor.x * 255;
 		int g = FlareMainColor.y * 255;
@@ -419,8 +419,8 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 	}
 	else if (ending)
 	{
-		float multiplier = GenerateFloat(0.75f, 1.0f);
-		int falloff = 12 * multiplier;
+		float multiplier = GenerateFloat(0.05f, 1.0f);
+		int falloff = 8 * multiplier;
 
 		int r = FlareMainColor.x * 255 * multiplier;
 		int g = FlareMainColor.y * 255 * multiplier;
@@ -431,8 +431,8 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 	}
 	else
 	{
-		float multiplier = GenerateFloat(0.05f, 0.8f);
-		int falloff = 12 * (1.0f - ((flareLife - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
+		float multiplier = GenerateFloat(0.6f, 0.8f);
+		int falloff = 8 * (1.0f - (flareLife / FLARE_LIFE_MAX));
 
 		int r = FlareMainColor.x * 255 * multiplier;
 		int g = FlareMainColor.y * 255 * multiplier;
