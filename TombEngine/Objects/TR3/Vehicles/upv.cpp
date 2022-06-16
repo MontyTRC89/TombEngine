@@ -1032,6 +1032,7 @@ bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
 
 		AnimateItem(laraItem);
 		BackgroundCollision(laraItem, UPVItem);
+		DoVehicleCollision(UPVItem, UPV_RADIUS);
 
 		if (UPV->Flags & UPV_CONTROL)
 			SoundEffect(SFX_TR3_VEHICLE_UPV_LOOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always, 1.0f + (float)UPVItem->Animation.Velocity / 96.0f);

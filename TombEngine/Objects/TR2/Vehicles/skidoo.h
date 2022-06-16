@@ -10,10 +10,8 @@ bool TestSkidooDismount(ItemInfo* laraItem, ItemInfo* skidooItem);
 
 int GetSkidooCollisionAnim(ItemInfo* skidooItem, Vector3Int* moved);
 void SkidooCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-void SkidooEntityCollision(ItemInfo* laraItem, ItemInfo* skidooItem);
 
 void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem);
-void SkidooExplode(ItemInfo* laraItem, ItemInfo* skidooItem);
 void DoSnowEffect(ItemInfo* skidooItem);
 
 bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll);

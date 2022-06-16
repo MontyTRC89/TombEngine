@@ -104,6 +104,11 @@ bool ItemInfo::TestBits(JointBitType type, int jointIndex)
 	return TestBits(type, std::vector{ jointIndex });
 }
 
+bool ItemInfo::IsLara()
+{
+	return this->Data.is<LaraInfo*>();
+}
+
 void ClearItem(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];

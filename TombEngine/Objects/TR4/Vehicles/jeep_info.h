@@ -8,7 +8,7 @@ struct JeepInfo {
 	int revs;
 	short engineRevs;
 	short trackMesh;
-	int jeepTurn;
+	short jeepTurn;
 	int fallSpeed;
 	short momentumAngle;
 	short extraRotation;

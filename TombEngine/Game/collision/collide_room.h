@@ -4,7 +4,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FloorInfo;
+class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
