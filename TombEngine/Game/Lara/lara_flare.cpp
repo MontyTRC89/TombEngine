@@ -403,7 +403,7 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 
 	bool result = false;
 	bool ending = (flareLife > (FLARE_LIFE_MAX - 90));
-	bool dying  = (flareLife < (FLARE_LIFE_MAX - 5));
+	bool dying  = (flareLife > (FLARE_LIFE_MAX - 5));
 
 	if (dying)
 	{
