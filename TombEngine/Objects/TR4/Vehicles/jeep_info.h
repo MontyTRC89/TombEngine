@@ -1,20 +1,26 @@
 #pragma once
-struct JeepInfo {
+
+struct JeepInfo
+{
+	short jeepTurn;
 	short rot1;
 	short rot2;
 	short rot3;
 	short rot4;
-	int velocity;
-	int revs;
-	short engineRevs;
-	short trackMesh;
-	short jeepTurn;
-	int fallSpeed;
 	short momentumAngle;
 	short extraRotation;
-	short unknown0;
+
+	int velocity;
+	int fallSpeed;
+
+	int revs;
+	short engineRevs;
 	int pitch;
+	short trackMesh;
+
 	short flags;
+
+	short unknown0;
 	short unknown1;
 	short unknown2;
 };
