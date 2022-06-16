@@ -16,7 +16,7 @@
 #include "Specific/setup.h"
 
 #include "Objects/TR2/Vehicles/skidoo.h"
-#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad.h"

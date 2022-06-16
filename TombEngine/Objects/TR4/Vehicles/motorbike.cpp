@@ -20,40 +20,45 @@
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Game/items.h"
 
+using std::vector;
 using namespace TEN::Math::Random;
 
-/*collision stuff*/
-#define BIKE_FRONT 500
-#define BIKE_SIDE 350
-#define BIKE_RADIUS 500
-#define MOTORBIKE_SLIP 100
-#define MOTORBIKE_FRICTION 0x180
-/*movement stuff*/
-#define MIN_MOMENTUM_TURN ANGLE(4.0f)
-#define MAX_MOMENTUM_TURN ANGLE(1.5f)
-#define MOTORBIKE_MAX_MOM_TURN ANGLE(150.0f)
+static char ExhaustStart = 0;
+static bool DisableDismount = false;
+
+constexpr auto MOTORBIKE_RADIUS = 500;
+constexpr auto MOTORBIKE_FRICTION = 384;
+constexpr auto MOTORBIKE_FRONT = 500;
+constexpr auto MOTORBIKE_SIDE = 350;
+constexpr auto MOTORBIKE_SLIP = 100;
+
+constexpr auto MOTORBIKE_ACCEL_1 = 64 * 256;
+constexpr auto MOTORBIKE_ACCEL_2 = 112 * 256;
+constexpr auto MOTORBIKE_ACCEL_MAX = 192 * 256;
+constexpr auto MOTORBIKE_ACCEL = 128 * 256;
+constexpr auto MOTORBIKE_BACKING_VEL = 8 * 256;
+constexpr auto MOTORBIKE_BIG_SLOWDOWN = 48 * 256;
+constexpr auto MOTORBIKE_SLOWDOWN1 = 1088; // 4.25f * 256; // TODO: Float velocities. @Sezz 2022.06.16
+constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * 256;
+
+constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
+constexpr auto MOTORBIKE_BITCH_MAX = 0xA000;
+
+#define MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN ANGLE(4.0f)
+#define MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX ANGLE(1.5f)
+#define MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2 ANGLE(150.0f)
 #define MOTORBIKE_DEFAULT_HTURN ANGLE(1.5f)
-#define MOTORBIKE_ACCEL_1 0x4000
-#define MOTORBIKE_ACCEL_2 0x7000
-#define MOTORBIKE_ACCEL_MAX 0xC000 //with the boost
-#define MOTORBIKE_ACCEL 0x8000  //without the boost
-#define MOTORBIKE_BIG_SLOWDOWN 0x3000
-#define MOTORBIKE_SLOWDOWN1 0x440
-#define MOTORBIKE_SLOWDOWN2 0x600
 #define MOTORBIKE_HTURN ANGLE(0.5f)
 #define MOTORBIKE_MAX_HTURN ANGLE(5.0f)
-#define MOTORBIKE_PITCH_SLOWDOWN 0x8000
-#define MOTORBIKE_PITCH_MAX 0xA000
-#define MOTORBIKE_BACKING_VEL 0x800
-/*controls*/
-#define IN_ACCELERATE IN_ACTION
-#define IN_REVERSE IN_BACK
-#define IN_BRAKE IN_JUMP
-#define IN_TURBO IN_SPRINT
-#define	IN_TURNR (IN_RIGHT|IN_RSTEP)
-#define	IN_TURNL (IN_LEFT|IN_LSTEP)
 
-enum MOTORBIKE_STATE
+#define MOTORBIKE_IN_ACCELERATE IN_ACTION
+#define MOTORBIKE_IN_REVERSE	IN_BACK
+#define MOTORBIKE_IN_SPEED		IN_SPRINT
+#define MOTORBIKE_IN_BRAKE		IN_JUMP
+#define	MOTORBIKE_IN_LEFT		(IN_LEFT | IN_LSTEP)
+#define	MOTORBIKE_IN_RIGHT		(IN_RIGHT | IN_RSTEP)
+
+enum MotorbikeState
 {
     BIKE_EMPTY,
     BIKE_MOVING_FRONT,
@@ -120,9 +125,6 @@ enum MOTORBIKE_FLAGS
     FL_DEATH = 128
 };
 
-static char ExhaustStart = 0;
-static bool NoGetOff = false;
-
 static MotorbikeInfo* GetMotorbikeInfo(ItemInfo* item)
 {
     return (MotorbikeInfo*)item->Data;
@@ -130,11 +132,10 @@ static MotorbikeInfo* GetMotorbikeInfo(ItemInfo* item)
 
 void InitialiseMotorbike(short itemNumber)
 {
-    ItemInfo* item;
-    MotorbikeInfo* motorbike;
+    auto* item = &g_Level.Items[itemNumber];
+    item->Data = MotorbikeInfo();
+    auto* motorbike = GetMotorbikeInfo(item);
 
-    item = &g_Level.Items[itemNumber];
-    item->Data = ITEM_DATA(MotorbikeInfo());
     motorbike = item->Data;
     motorbike->velocity = 0;
     motorbike->bikeTurn = 0;
@@ -151,38 +152,38 @@ void InitialiseMotorbike(short itemNumber)
 
 static int TestMotorbikeHeight(ItemInfo* item, int dz, int dx, Vector3Int* pos)
 {
-    pos->y = item->Pose.Position.y - dz * phd_sin(item->Pose.Orientation.x) + dx * phd_sin(item->Pose.Orientation.z);
+    float sinX = phd_sin(item->Pose.Orientation.x);
+    float sinY = phd_sin(item->Pose.Orientation.y);
+    float cosY = phd_cos(item->Pose.Orientation.y);
+    float sinZ = phd_sin(item->Pose.Orientation.z);
 
-    float c = phd_cos(item->Pose.Orientation.y);
-    float s = phd_sin(item->Pose.Orientation.y);
+    pos->x = item->Pose.Position.x + (dz * sinY) + (dx * cosY);
+    pos->y = item->Pose.Position.y - (dz * sinX) + (dx * sinZ);
+    pos->z = item->Pose.Position.z + (dz * cosY) - (dx * sinY);
 
-    pos->z = item->Pose.Position.z + dz * c - dx * s;
-    pos->x = item->Pose.Position.x + dz * s + dx * c;
+    auto probe = GetCollision(pos->x, pos->y, pos->z, item->RoomNumber);
 
-    short roomNumber = item->RoomNumber;
-    FloorInfo* floor = GetFloor(pos->x, pos->y, pos->z, &roomNumber);
-    int ceiling = GetCeiling(floor, pos->x, pos->y, pos->z);
-    if (pos->y < ceiling || ceiling == NO_HEIGHT)
+    if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
         return NO_HEIGHT;
 
-    return GetFloorHeight(floor, pos->x, pos->y, pos->z);
+    return probe.Position.Floor;
 }
 
 static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* old)
 {
     int x = pos->x / SECTOR(1);
     int z = pos->z / SECTOR(1);
-    int  oldX = old->x / SECTOR(1);
+    int oldX = old->x / SECTOR(1);
     int oldZ = old->z / SECTOR(1);
-    int shiftX = pos->x & (WALL_SIZE - 1);
-    int shiftZ = pos->z & (WALL_SIZE - 1);
+    int shiftX = pos->x & (SECTOR(1) - 1);
+    int shiftZ = pos->z & (SECTOR(1) - 1);
 
     if (x == oldX)
     {
         if (z == oldZ)
         {
-            motorbike->Pose.Position.z += (old->z - pos->z);
-            motorbike->Pose.Position.x += (old->x - pos->x);
+            motorbike->Pose.Position.z += old->z - pos->z;
+            motorbike->Pose.Position.x += old->x - pos->x;
         }
         else if (z > oldZ)
         {
@@ -191,7 +192,7 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
         }
         else
         {
-            motorbike->Pose.Position.z += WALL_SIZE - shiftZ;
+            motorbike->Pose.Position.z += SECTOR(1) - shiftZ;
             return (motorbike->Pose.Position.x - pos->x);
         }
     }
@@ -204,7 +205,7 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
         }
         else
         {
-            motorbike->Pose.Position.x += WALL_SIZE - shiftX;
+            motorbike->Pose.Position.x += SECTOR(1) - shiftX;
             return (pos->z - motorbike->Pose.Position.z);
         }
     }
@@ -213,26 +214,22 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
         x = 0;
         z = 0;
 
-        short roomNumber = motorbike->RoomNumber;
-        FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
-        int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
-        if (height < old->y - STEP_SIZE)
+        int floorHeight = GetCollision(old->x, pos->y, pos->z, motorbike->RoomNumber).Position.Floor;
+        if (floorHeight < (old->y - CLICK(1)))
         {
             if (pos->z > old->z)
                 z = -shiftZ - 1;
             else
-                z = WALL_SIZE - shiftZ;
+                z = SECTOR(1) - shiftZ;
         }
 
-        roomNumber = motorbike->RoomNumber;
-        floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
-        height = GetFloorHeight(floor, pos->x, pos->y, old->z);
-        if (height < old->y - STEP_SIZE)
+        floorHeight = GetCollision(pos->x, pos->y, old->z, motorbike->RoomNumber).Position.Floor;
+        if (floorHeight < (old->y - CLICK(1)))
         {
             if (pos->x > old->x)
                 x = -shiftX - 1;
             else
-                x = WALL_SIZE - shiftX;
+                x = SECTOR(1) - shiftX;
         }
 
         if (x && z)
@@ -243,6 +240,7 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
         else if (z)
         {
             motorbike->Pose.Position.z += z;
+
             if (z > 0)
                 return (motorbike->Pose.Position.x - pos->x);
             else
@@ -251,6 +249,7 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
         else if (x)
         {
             motorbike->Pose.Position.x += x;
+
             if (x > 0)
                 return (pos->z - motorbike->Pose.Position.z);
             else
@@ -258,8 +257,8 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
         }
         else
         {
-            motorbike->Pose.Position.z += (old->z - pos->z);
-            motorbike->Pose.Position.x += (old->x - pos->x);
+            motorbike->Pose.Position.z += old->z - pos->z;
+            motorbike->Pose.Position.x += old->x - pos->x;
         }
     }
 
@@ -268,28 +267,24 @@ static int DoMotorbikeShift(ItemInfo* motorbike, Vector3Int* pos, Vector3Int* ol
 
 static void DrawMotorbikeLight(ItemInfo* item)
 {
-    auto motorbike = GetMotorbikeInfo(item);
+    auto* motorbike = GetMotorbikeInfo(item);
 
     if (motorbike->lightPower <= 0)
         return;
 
-    Vector3Int start, target;
-
-    start.x = 0;
-    start.y = -470;
-    start.z = 1836;
+    auto start = Vector3Int(0, -470, 1836);
     GetJointAbsPosition(item, &start, 0);
-    target.x = 0;
-    target.y = -470;
-    target.z = 20780;
-    GetJointAbsPosition(item, &target, 0);
-    int rnd = (2 * motorbike->lightPower) - (GetRandomControl() & 0xF);
 
-    // TODO: Spot Light, use target as direction vector
-    TriggerDynamicLight(start.x, start.y, start.z, 8, rnd, rnd / 2, 0);
+    auto target = Vector3Int(0, -470, 20780);
+    GetJointAbsPosition(item, &target, 0);
+
+    int random = (motorbike->lightPower * 2) - (GetRandomControl() & 0xF);
+
+    // TODO: Use target as direction vector for spotlight.
+    TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
 }
 
-static BOOL GetOnMotorBike(short itemNumber)
+static bool GetOnMotorBike(short itemNumber)
 {
     ItemInfo* item;
     FloorInfo* floor;
@@ -646,7 +641,7 @@ void MotorbikeBaddyCollision(ItemInfo* bike)
 {
     int x, y, z, i;
 
-    std::vector<short> roomsList;
+    vector<short> roomsList;
     roomsList.push_back(bike->RoomNumber);
 
     ROOM_INFO* room = &g_Level.Rooms[bike->RoomNumber];
@@ -688,7 +683,7 @@ void MotorbikeBaddyCollision(ItemInfo* bike)
                         }
                         else
                         {
-                            if (TestBoundsCollide(item, bike, BIKE_FRONT))
+                            if (TestBoundsCollide(item, bike, MOTORBIKE_FRONT))
                             {
                                 DoLotsOfBlood(bike->Pose.Position.x, bike->Pose.Position.y, bike->Pose.Position.z, GetRandomControl() & 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 3);
                                 item->HitPoints = 0;
@@ -714,14 +709,14 @@ static int MotorBikeDynamics(ItemInfo* item)
     int height, collide, speed, newspeed;
     short momentum = 0, rot, room_number;
 
-    NoGetOff = false;
+    DisableDismount = false;
     motorbike = GetMotorbikeInfo(item);
 
-    hfl_old = TestMotorbikeHeight(item, BIKE_FRONT, -BIKE_SIDE, &fl_old);
-    hmf_old = TestMotorbikeHeight(item, BIKE_FRONT, STEP_SIZE / 2, &mtf_old);
-    hbl_old = TestMotorbikeHeight(item, -BIKE_FRONT, -BIKE_SIDE, &bl_old);
-    hbr_old = TestMotorbikeHeight(item, -BIKE_FRONT, STEP_SIZE / 2, &br_old);
-    hmtb_old = TestMotorbikeHeight(item, -BIKE_FRONT, 0, &mtb_old);
+    hfl_old = TestMotorbikeHeight(item, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &fl_old);
+    hmf_old = TestMotorbikeHeight(item, MOTORBIKE_FRONT, STEP_SIZE / 2, &mtf_old);
+    hbl_old = TestMotorbikeHeight(item, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &bl_old);
+    hbr_old = TestMotorbikeHeight(item, -MOTORBIKE_FRONT, STEP_SIZE / 2, &br_old);
+    hmtb_old = TestMotorbikeHeight(item, -MOTORBIKE_FRONT, 0, &mtb_old);
 
     oldpos.x = item->Pose.Position.x;
     oldpos.y = item->Pose.Position.y;
@@ -766,16 +761,16 @@ static int MotorBikeDynamics(ItemInfo* item)
 
         item->Pose.Orientation.y += motorbike->bikeTurn + motorbike->extraRotation;
         rot = item->Pose.Orientation.y - motorbike->momentumAngle;
-        momentum = MIN_MOMENTUM_TURN - ((2 * motorbike->velocity) / SECTOR(1));
+        momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike->velocity) / SECTOR(1));
 
-        if (!(TrInput & IN_ACCELERATE) && motorbike->velocity > 0)
+        if (!(TrInput & MOTORBIKE_IN_ACCELERATE) && motorbike->velocity > 0)
             momentum += (momentum / 2);
 
-        if (rot < -MAX_MOMENTUM_TURN)
+        if (rot < -MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX)
         {
-            if (rot < -MOTORBIKE_MAX_MOM_TURN)
+            if (rot < -MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2)
             {
-                rot = -MOTORBIKE_MAX_MOM_TURN;
+                rot = -MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2;
                 motorbike->momentumAngle = item->Pose.Orientation.y - rot;
             }
             else
@@ -783,11 +778,11 @@ static int MotorBikeDynamics(ItemInfo* item)
                 motorbike->momentumAngle -= momentum;
             }
         }
-        else if (rot > MAX_MOMENTUM_TURN)
+        else if (rot > MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX)
         {
-            if (rot > MOTORBIKE_MAX_MOM_TURN)
+            if (rot > MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2)
             {
-                rot = MOTORBIKE_MAX_MOM_TURN;
+                rot = MOTORBIKE_MOMENTUM_TURN_ANGLE_MAX2;
                 motorbike->momentumAngle = item->Pose.Orientation.y - rot;
             }
             else
@@ -821,7 +816,7 @@ static int MotorBikeDynamics(ItemInfo* item)
             if (anglex < 0)
                 anglex2 = -anglex;
             if (anglex2 > 24)
-                NoGetOff = true;
+                DisableDismount = true;
             anglex *= 16;
             motorbike->velocity -= anglex;
         }
@@ -830,7 +825,7 @@ static int MotorBikeDynamics(ItemInfo* item)
         if (abs(anglez) > 32)
         {
             short ang, angabs;
-            NoGetOff = true;
+            DisableDismount = true;
             if (anglez >= 0)
                 ang = item->Pose.Orientation.y + 0x4000;
             else
@@ -866,13 +861,13 @@ static int MotorBikeDynamics(ItemInfo* item)
     int rot1 = 0;
     int rot2 = 0;
 
-    int hfl = TestMotorbikeHeight(item, BIKE_FRONT, -BIKE_SIDE, &fl);
+    int hfl = TestMotorbikeHeight(item, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &fl);
     if (hfl < fl_old.y - STEP_SIZE)
     {
         rot1 = abs(4 * DoMotorbikeShift(item, &fl, &fl_old));
     }
 
-    int hbl = TestMotorbikeHeight(item, -BIKE_FRONT, -BIKE_SIDE, &bl);
+    int hbl = TestMotorbikeHeight(item, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &bl);
     if (hbl < bl_old.y - STEP_SIZE)
     {
         if (rot1)
@@ -881,15 +876,15 @@ static int MotorBikeDynamics(ItemInfo* item)
             rot1 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
     }
 
-    int hmtf = TestMotorbikeHeight(item, BIKE_FRONT, STEP_SIZE / 2, &mtf);
+    int hmtf = TestMotorbikeHeight(item, MOTORBIKE_FRONT, STEP_SIZE / 2, &mtf);
     if (hmtf < mtf_old.y - STEP_SIZE)
         rot2 -= abs(4 * DoMotorbikeShift(item, &bl, &bl_old));
 
-    int hmtb = TestMotorbikeHeight(item, -BIKE_FRONT, 0, &mtb);
+    int hmtb = TestMotorbikeHeight(item, -MOTORBIKE_FRONT, 0, &mtb);
     if (hmtb < mtb_old.y - STEP_SIZE)
         DoMotorbikeShift(item, &mtb, &mtb_old);
 
-    int hbr = TestMotorbikeHeight(item, -BIKE_FRONT, STEP_SIZE / 2, &br);
+    int hbr = TestMotorbikeHeight(item, -MOTORBIKE_FRONT, STEP_SIZE / 2, &br);
     if (hbr < br_old.y - STEP_SIZE)
     {
         if (rot2)
@@ -941,13 +936,13 @@ static int MotorBikeDynamics(ItemInfo* item)
     return collide;
 }
 
-static BOOL MotorbikeCanGetOff(void)
+static bool MotorbikeCanGetOff(void)
 {
     auto item = &g_Level.Items[Lara.Vehicle];
     auto angle = item->Pose.Orientation.y + 0x4000;
-    auto x = item->Pose.Position.x + BIKE_RADIUS * phd_sin(angle);
+    auto x = item->Pose.Position.x + MOTORBIKE_RADIUS * phd_sin(angle);
     auto y = item->Pose.Position.y;
-    auto z = item->Pose.Position.z + BIKE_RADIUS * phd_cos(angle);
+    auto z = item->Pose.Position.z + MOTORBIKE_RADIUS * phd_cos(angle);
 
 	auto collResult = GetCollision(x, y, z, item->RoomNumber);
 
@@ -991,16 +986,16 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
                 {
 
                     bool dismount;
-                    if ((TrInput & IN_TURNR) && (TrInput & IN_BRAKE))
+                    if ((TrInput & MOTORBIKE_IN_RIGHT) && (TrInput & MOTORBIKE_IN_BRAKE))
                         dismount = true;
-                    else if (!((TrInput & IN_TURNR) && (TrInput & IN_BRAKE)))
+                    else if (!((TrInput & MOTORBIKE_IN_RIGHT) && (TrInput & MOTORBIKE_IN_BRAKE)))
                         dismount = false;
 
-                    if (!dismount || motorbike->velocity || NoGetOff)
+                    if (!dismount || motorbike->velocity || DisableDismount)
                     {
-                        if (TrInput & IN_ACCELERATE && !(TrInput & IN_BRAKE))
+                        if (TrInput & MOTORBIKE_IN_ACCELERATE && !(TrInput & MOTORBIKE_IN_BRAKE))
                             LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
-                        else if (TrInput & IN_REVERSE)
+                        else if (TrInput & MOTORBIKE_IN_REVERSE)
                             LaraItem->Animation.TargetState = BIKE_MOVING_BACK;
                     }
                     else if (dismount && MotorbikeCanGetOff())
@@ -1022,20 +1017,20 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
                     else
                         LaraItem->Animation.TargetState = BIKE_EMPTY5;
                 }
-                else if (motorbike->velocity & -256 || TrInput & (IN_ACCELERATE | IN_BRAKE))
+                else if (motorbike->velocity & -256 || TrInput & (MOTORBIKE_IN_ACCELERATE | MOTORBIKE_IN_BRAKE))
                 {
-                    if (TrInput & IN_TURNL)
+                    if (TrInput & MOTORBIKE_IN_LEFT)
                         LaraItem->Animation.TargetState = BIKE_MOVING_LEFT;
-                    else if (TrInput & IN_TURNR)
+                    else if (TrInput & MOTORBIKE_IN_RIGHT)
                         LaraItem->Animation.TargetState = BIKE_MOVING_RIGHT;
-                    else if (TrInput & IN_BRAKE)
+                    else if (TrInput & MOTORBIKE_IN_BRAKE)
                     {
                         if (motorbike->velocity <= 0x5554)
                             LaraItem->Animation.TargetState = BIKE_EMPTY3;
                         else
                             LaraItem->Animation.TargetState = BIKE_STOP;
                     }
-                    else if (TrInput & IN_REVERSE && motorbike->velocity <= MOTORBIKE_BACKING_VEL)
+                    else if (TrInput & MOTORBIKE_IN_REVERSE && motorbike->velocity <= MOTORBIKE_BACKING_VEL)
                         LaraItem->Animation.TargetState = BIKE_MOVING_BACK;
                     else if (motorbike->velocity == 0)
                         LaraItem->Animation.TargetState = BIKE_IDLE;
@@ -1047,7 +1042,7 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
             case BIKE_MOVING_LEFT:
                 if (motorbike->velocity & -256)
                 {
-                    if (TrInput & IN_TURNR || !(TrInput & IN_TURNL))
+                    if (TrInput & MOTORBIKE_IN_RIGHT || !(TrInput & MOTORBIKE_IN_LEFT))
                         LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
                 }
                 else
@@ -1057,7 +1052,7 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
                 break;
 
             case BIKE_MOVING_BACK:
-                if (TrInput & IN_REVERSE)
+                if (TrInput & MOTORBIKE_IN_REVERSE)
                     LaraItem->Animation.TargetState = BIKE_MOVING_BACK_LOOP;
                 else
                     LaraItem->Animation.TargetState = BIKE_IDLE;
@@ -1066,7 +1061,7 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
             case BIKE_MOVING_RIGHT:
                 if (motorbike->velocity & -256)
                 {
-                    if (TrInput & IN_TURNL || !(TrInput & IN_TURNR))
+                    if (TrInput & MOTORBIKE_IN_LEFT || !(TrInput & MOTORBIKE_IN_RIGHT))
                         LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
                 }
                 else
@@ -1080,9 +1075,9 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
             case BIKE_ACCELERATE:
                 if (motorbike->velocity & -256)
                 {
-                    if (TrInput & IN_TURNL)
+                    if (TrInput & MOTORBIKE_IN_LEFT)
                         LaraItem->Animation.TargetState = BIKE_MOVING_LEFT;
-                    if (TrInput & IN_TURNR)
+                    if (TrInput & MOTORBIKE_IN_RIGHT)
                         LaraItem->Animation.TargetState = BIKE_MOVING_RIGHT;
                 }
                 else
@@ -1113,7 +1108,7 @@ static void AnimateMotorbike(ItemInfo* item, int collide, BOOL dead)
             case BIKE_HITBACK:
             case BIKE_HITRIGHT:
             case BIKE_HITLEFT:
-                if (TrInput & (IN_ACCELERATE | IN_BRAKE))
+                if (TrInput & (MOTORBIKE_IN_ACCELERATE | MOTORBIKE_IN_BRAKE))
                     LaraItem->Animation.TargetState = BIKE_MOVING_FRONT;
                 break;
 
@@ -1198,7 +1193,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
         motorbike->revs = 0;
     }
 
-    if ((TrInput & IN_TURBO) && (TrInput & IN_ACCELERATE) && Lara.SprintEnergy)
+    if ((TrInput & MOTORBIKE_IN_SPEED) && (TrInput & MOTORBIKE_IN_ACCELERATE) && Lara.SprintEnergy)
     {
         motorbike->flags |= FL_BOOST;
         Lara.SprintEnergy -= 2;
@@ -1218,7 +1213,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
 
         if (motorbike->velocity > 0)
         {
-            if (TrInput & IN_TURNL)
+            if (TrInput & MOTORBIKE_IN_LEFT)
             {
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn -= MOTORBIKE_DEFAULT_HTURN;
@@ -1228,7 +1223,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
                 if (motorbike->bikeTurn < -MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = -MOTORBIKE_MAX_HTURN;
             }
-            else if (TrInput & IN_TURNR)
+            else if (TrInput & MOTORBIKE_IN_RIGHT)
             {
                 if (motorbike->velocity > MOTORBIKE_ACCEL_1)
                     motorbike->bikeTurn += MOTORBIKE_DEFAULT_HTURN;
@@ -1241,13 +1236,13 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
         }
         else if (motorbike->velocity < 0)//moving backwards so the turning is inverted
         {
-            if (TrInput & IN_TURNL)
+            if (TrInput & MOTORBIKE_IN_LEFT)
             {
                 motorbike->bikeTurn += MOTORBIKE_HTURN;
                 if (motorbike->bikeTurn > MOTORBIKE_MAX_HTURN)
                     motorbike->bikeTurn = MOTORBIKE_MAX_HTURN;
             }
-            else if (TrInput & IN_TURNR)
+            else if (TrInput & MOTORBIKE_IN_RIGHT)
             {
                 motorbike->bikeTurn -= MOTORBIKE_HTURN;
                 if (motorbike->bikeTurn < -MOTORBIKE_MAX_HTURN)
@@ -1255,7 +1250,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
             }
         }
 
-        if (TrInput & IN_BRAKE)
+        if (TrInput & MOTORBIKE_IN_BRAKE)
         {
             pos.x = 0;
             pos.y = -144;
@@ -1269,7 +1264,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
             item->MeshBits = 0x3F7;
         }
 
-        if (TrInput & IN_BRAKE)
+        if (TrInput & MOTORBIKE_IN_BRAKE)
         {
             if (motorbike->velocity < 0)
             {
@@ -1284,7 +1279,7 @@ static int MotorbikeUserControl(ItemInfo* item, int height, int* pitch)
                     motorbike->velocity = 0;
             }
         }
-        else if (TrInput & IN_ACCELERATE)
+        else if (TrInput & MOTORBIKE_IN_ACCELERATE)
         {
             if (motorbike->velocity < MOTORBIKE_ACCEL_MAX)
             {
@@ -1390,9 +1385,9 @@ int MotorbikeControl(void)
     oldpos.y = item->Pose.Position.y;
     oldpos.z = item->Pose.Position.z;
 
-    int hfl = TestMotorbikeHeight(item, BIKE_FRONT, -BIKE_SIDE, &fl);
-    int hfr = TestMotorbikeHeight(item, BIKE_FRONT, STEP_SIZE / 2, &fr);
-    int hfm = TestMotorbikeHeight(item, -BIKE_FRONT, 0, &fm);
+    int hfl = TestMotorbikeHeight(item, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &fl);
+    int hfr = TestMotorbikeHeight(item, MOTORBIKE_FRONT, STEP_SIZE / 2, &fr);
+    int hfm = TestMotorbikeHeight(item, -MOTORBIKE_FRONT, 0, &fm);
 
 	auto room_number = item->RoomNumber;
     floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room_number);
@@ -1430,8 +1425,8 @@ int MotorbikeControl(void)
     if (motorbike->pitch < -MOTORBIKE_PITCH_SLOWDOWN) 
         motorbike->pitch = -MOTORBIKE_PITCH_SLOWDOWN; 
     else 
-    if (motorbike->pitch > MOTORBIKE_PITCH_MAX)
-        motorbike->pitch = MOTORBIKE_PITCH_MAX;
+    if (motorbike->pitch > MOTORBIKE_BITCH_MAX)
+        motorbike->pitch = MOTORBIKE_BITCH_MAX;
 
         SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &item->Pose, SoundEnvironment::Land, 0.7f + motorbike->pitch / 24756.0f);
     }
@@ -1465,23 +1460,23 @@ int MotorbikeControl(void)
         if (r1 >= ((hfl + hfr) / 2))
         {
             xrot = phd_atan(1000, hfm - r1);
-            zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+            zrot = phd_atan(MOTORBIKE_SIDE, r2 - fl.y);
         }
         else
         {
-            xrot = phd_atan(BIKE_FRONT, hfm - item->Pose.Position.y);
-            zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+            xrot = phd_atan(MOTORBIKE_FRONT, hfm - item->Pose.Position.y);
+            zrot = phd_atan(MOTORBIKE_SIDE, r2 - fl.y);
         }
     }
     else if (r1 >= ((hfl + hfr) / 2))
     {
-        xrot = phd_atan(BIKE_FRONT, item->Pose.Position.y - r1);
-        zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+        xrot = phd_atan(MOTORBIKE_FRONT, item->Pose.Position.y - r1);
+        zrot = phd_atan(MOTORBIKE_SIDE, r2 - fl.y);
     }
     else
     {
         xrot = phd_atan(125, newy - item->Pose.Position.y);
-        zrot = phd_atan(BIKE_SIDE, r2 - fl.y);
+        zrot = phd_atan(MOTORBIKE_SIDE, r2 - fl.y);
     }
 
     item->Pose.Orientation.x += ((xrot - item->Pose.Orientation.x) / 4);

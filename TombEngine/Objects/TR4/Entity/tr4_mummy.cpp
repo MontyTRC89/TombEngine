@@ -36,7 +36,7 @@ namespace TEN::Entities::TR4
 		MUMMY_STATE_ARMS_UP_RECOIL = 6,
 		MUMMY_STATE_COLLAPSE = 7,
 		MUMMY_INACTIVE_STATE_LYING_DOWN = 8,
-		MUMMY_STATE_GET_UP = 9,
+		MUMMY_STATE_COLLAPSED_TO_IDLE = 9,
 		MUMMY_STATE_IDLE_SWIPE_ATTACK = 10
 	};
 
@@ -259,7 +259,7 @@ namespace TEN::Entities::TR4
 
 				if (AI.distance < pow(MUMMY_ACTIVATE_RANGE, 2) || !(GetRandomControl() & 0x7F))
 				{
-					item->Animation.TargetState = MUMMY_STATE_GET_UP;
+					item->Animation.TargetState = MUMMY_STATE_COLLAPSED_TO_IDLE;
 					item->HitPoints = Objects[item->ObjectNumber].HitPoints;
 				}
 

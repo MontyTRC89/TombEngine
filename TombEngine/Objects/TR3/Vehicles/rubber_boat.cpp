@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR3/Vehicles/rubberboat.h"
+#include "Objects/TR3/Vehicles/rubber_boat.h"
 
 #include "Game/animation.h"
 #include "Game/camera.h"
@@ -9,7 +9,7 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Objects/TR3/Vehicles/rubberboat_info.h"
+#include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
