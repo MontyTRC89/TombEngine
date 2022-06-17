@@ -6,6 +6,7 @@
 #include "Game/collision/sphere.h"
 #include "Game/collision/collide_item.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/spark.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
@@ -15,6 +16,8 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Vehicles
 {
@@ -30,6 +33,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * 256;
 	constexpr auto MINECART_JUMP_VELOCITY = 63 * 1024;
 	constexpr auto MINECART_TURN_DEATH_VELOCITY = 128;
+	constexpr auto MINECART_TURN_FRICTION_VELOCITY = 70;
 	constexpr auto MINECART_DECELERATION = 6 * 256;
 
 	constexpr auto MINECART_FORWARD_GRADIENT = -128;
@@ -45,6 +49,8 @@ namespace TEN::Entities::Vehicles
 	#define MINECART_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
 	#define MINECART_IN_LEFT		IN_LEFT
 	#define MINECART_IN_RIGHT		IN_RIGHT
+
+	int Wheels[4] = { 2, 3, 1, 4 };
 
 	enum MinecartState
 	{
@@ -150,6 +156,18 @@ namespace TEN::Entities::Vehicles
 		minecart->VerticalVelocity = 0;
 		minecart->Gradient = 0;
 		minecart->Flags = NULL;
+	}
+	
+	static void TriggerWheelSparkles(ItemInfo* item, bool left)
+	{
+		auto* minecart = GetMinecartInfo(item);
+
+		for (int i = 0; i < 2; i++)
+		{
+			auto pos = Vector3Int{};
+			GetJointAbsPosition(item, &pos, Wheels[(left ? 0 : 2) + i]);
+			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber), item->Pose.Orientation, 48, 10);
+		}
 	}
 
 	static int TestMinecartHeight(ItemInfo* minecartItem, int xOffset, int zOffset)
@@ -487,6 +505,12 @@ namespace TEN::Entities::Vehicles
 
 				minecartItem->Pose.Position.x = minecart->TurnX + x * 3584;
 				minecartItem->Pose.Position.z = minecart->TurnZ + z * 3584;
+
+				if (minecartItem->Animation.Velocity > MINECART_TURN_FRICTION_VELOCITY)
+				{
+					SoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE, &minecartItem->Pose, SoundEnvironment::Always);
+					TriggerWheelSparkles(minecartItem, (minecart->Flags & MINECART_FLAG_TURNING_RIGHT) != 0);
+				}
 			}
 		}
 		else
@@ -673,6 +697,12 @@ namespace TEN::Entities::Vehicles
 			{
 				minecart->Velocity -= MINECART_DECELERATION;
 				SoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE, &laraItem->Pose, SoundEnvironment::Always);
+
+				if (minecartItem->Animation.Velocity > MINECART_TURN_FRICTION_VELOCITY)
+				{
+					TriggerWheelSparkles(minecartItem, false);
+					TriggerWheelSparkles(minecartItem, true);
+				}
 			}
 
 			break;
