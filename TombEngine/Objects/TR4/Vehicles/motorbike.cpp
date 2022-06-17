@@ -25,7 +25,8 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<int> MotorbikeMeshJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const vector<int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const vector<int> MotorbikeBrakeLightJoints = { 10 };
 
 	constexpr auto MOTORBIKE_RADIUS = 500;
 	constexpr auto MOTORBIKE_DISMOUNT_DISTANCE = CLICK(1.5f);
@@ -139,7 +140,7 @@ namespace TEN::Entities::Vehicles
 		motorbikeItem->Data = MotorbikeInfo();
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
-		motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeMeshJoints);
+		motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeJoints);
 		motorbike->TurnRate = 0;
 		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
 		motorbike->ExtraRotation = 0;
@@ -1133,10 +1134,10 @@ namespace TEN::Entities::Vehicles
 				GetJointAbsPosition(motorbikeItem, &pos, NULL);
 
 				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
-				motorbikeItem->SetBits(JointBitType::Mesh, { 0, 1, 2, 4, 5, 6, 7, 8, 10 });
+				motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
 			}
 			else
-				motorbikeItem->SetBits(JointBitType::Mesh, { 0, 1, 2, 4, 5, 6, 7, 8, 9 });
+				motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
 
 			if (TrInput & MOTORBIKE_IN_BRAKE)
 			{
