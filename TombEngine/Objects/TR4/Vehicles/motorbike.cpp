@@ -28,6 +28,7 @@ namespace TEN::Entities::Vehicles
 	const vector<int> MotorbikeMeshJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
 
 	constexpr auto MOTORBIKE_RADIUS = 500;
+	constexpr auto MOTORBIKE_DISMOUNT_DISTANCE = CLICK(1.5f);
 	constexpr auto MOTORBIKE_FRICTION = 384;
 	constexpr auto MOTORBIKE_FRONT = 500;
 	constexpr auto MOTORBIKE_SIDE = 350;
@@ -270,25 +271,6 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static void DrawMotorbikeLight(ItemInfo* motorbikeItem)
-	{
-		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
-
-		if (motorbike->LightPower <= 0)
-			return;
-
-		auto start = Vector3Int(0, -470, 1836);
-		GetJointAbsPosition(motorbikeItem, &start, 0);
-
-		auto target = Vector3Int(0, -470, 20780);
-		GetJointAbsPosition(motorbikeItem, &target, 0);
-
-		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
-
-		// TODO: Use target as direction vector for spotlight.
-		TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
-	}
-
 	static bool TestMotorbikeMount(short itemNumber, ItemInfo* laraItem)
 	{
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
@@ -369,6 +351,7 @@ namespace TEN::Entities::Vehicles
 				else
 					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;
 
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = MOTORBIKE_STATE_MOUNT;
 				laraItem->Animation.TargetState = MOTORBIKE_STATE_MOUNT;
 			}
@@ -387,6 +370,25 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 			ObjectCollision(itemNumber, laraItem, coll);
+	}
+
+	static void DrawMotorbikeLight(ItemInfo* motorbikeItem)
+	{
+		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+
+		if (motorbike->LightPower <= 0)
+			return;
+
+		auto start = Vector3Int(0, -470, 1836);
+		GetJointAbsPosition(motorbikeItem, &start, 0);
+
+		auto target = Vector3Int(0, -470, 20780);
+		GetJointAbsPosition(motorbikeItem, &target, 0);
+
+		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
+
+		// TODO: Use target as direction vector for spotlight.
+		TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
 	}
 
 	static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, bool moving)
@@ -502,15 +504,11 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.ActiveState == MOTORBIKE_STATE_DISMOUNT &&
 				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
-				float sinY = phd_sin(item->Pose.Orientation.y);
-				float cosY = phd_cos(item->Pose.Orientation.y);
-
 				SetAnimation(laraItem, LA_STAND_SOLID);
-				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
-				laraItem->Pose.Position.x -= 2 * sinY;
-				laraItem->Pose.Position.z -= 2 * cosY;
 				laraItem->Pose.Orientation.x = 0;
+				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 				laraItem->Pose.Orientation.z = 0;
+				TranslateItem(laraItem, laraItem->Pose.Orientation.y, -MOTORBIKE_DISMOUNT_DISTANCE);
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->SprintEnergy = LARA_SPRINT_ENERGY_MAX;
 				lara->Vehicle = NO_ITEM;

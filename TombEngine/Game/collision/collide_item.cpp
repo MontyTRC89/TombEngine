@@ -611,8 +611,8 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 
 	int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
-	int dx = cosY * x - sinY * z;
-	int dz = cosY * z + sinY * x;
+	int dx = (cosY * x) - (sinY * z);
+	int dz = (cosY * z) + (sinY * x);
 
 	if (dx >= bounds->X1 - radius &&
 		dx <= radius + bounds->X2 &&
@@ -1801,7 +1801,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 				if (object->drawRoutine == nullptr)
 					continue;
 
-				// Pickups are also not processed
+				// Pickups are also not processed.
 				if (object->isPickup)
 					continue;
 
@@ -1831,9 +1831,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 					}
 				}
 				else
-				{
 					ItemPushItem(item, laraItem, coll, false, 1);
-				}
 			}
 		}
 
