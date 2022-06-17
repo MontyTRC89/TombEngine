@@ -1,14 +1,17 @@
 #pragma once
 
-struct BigGunInfo
+namespace TEN::Entities::Vehicles
 {
-	Vector3Shrt Rotation;
-	short BarrelZRotation;
-	short StartYRot;
-	long GunRotYAdd;
+	struct BigGunInfo
+	{
+		Vector3Shrt Rotation;
+		short BarrelZRotation;
+		short StartYRot;
+		long GunRotYAdd;
 
-	unsigned int FireCount;
-	bool BarrelRotating;
+		unsigned int FireCount;
+		bool BarrelRotating;
 
-	char Flags;
-};
+		char Flags;
+	};
+}
