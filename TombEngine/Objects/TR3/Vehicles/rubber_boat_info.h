@@ -1,15 +1,18 @@
 #pragma once
 
-struct RubberBoatInfo
+namespace TEN::Entities::Vehicles
 {
-	int TurnRate;
-	short LeanAngle;
-	short PropellerRotation;
-	short ExtraRotation;
+	struct RubberBoatInfo
+	{
+		int TurnRate;
+		short LeanAngle;
+		short PropellerRotation;
+		short ExtraRotation;
 
-	int LeftVerticalVelocity;
-	int RightVerticalVelocity;
+		int LeftVerticalVelocity;
+		int RightVerticalVelocity;
 
-	int Water;
-	int Pitch;
-};
+		int Water;
+		int Pitch;
+	};
+}
