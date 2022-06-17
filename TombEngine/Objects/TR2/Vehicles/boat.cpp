@@ -864,6 +864,7 @@ namespace TEN::Entities::Vehicles
 
 		bool noTurn = true;
 		bool drive = false;
+		bool idle = !sBoatItem->Animation.Velocity;
 
 		if (lara->Vehicle == itemNumber && laraItem->HitPoints > 0)
 		{
@@ -961,8 +962,14 @@ namespace TEN::Entities::Vehicles
 			auto pitch = sBoatItem->Animation.Velocity;
 			sBoat->Pitch += (pitch - sBoat->Pitch) / 4;
 
-			int fx = (sBoatItem->Animation.Velocity > 8) ? SFX_TR2_VEHICLE_SPEEDBOAT_MOVING : (drive ? SFX_TR2_VEHICLE_SPEEDBOAT_IDLE : SFX_TR2_VEHICLE_SPEEDBOAT_ACCELERATE);
-			SoundEffect(fx, &sBoatItem->Pose, SoundEnvironment::Land, 1.0f + sBoat->Pitch / (float)BOAT_MAX_VELOCITY / 4.0f);
+			if (drive)
+			{
+				bool accelerating = idle && abs(sBoatItem->Animation.Velocity) > 4;
+				bool moving = (abs(sBoatItem->Animation.Velocity) > 8 || sBoat->TurnRate);
+				int fx = accelerating ? SFX_TR2_VEHICLE_SPEEDBOAT_ACCELERATE : (moving ? SFX_TR2_VEHICLE_SPEEDBOAT_MOVING : SFX_TR2_VEHICLE_SPEEDBOAT_IDLE);
+				float pitch  = idle ? 1.0f : 1.0f + sBoat->Pitch / (float)BOAT_MAX_VELOCITY / 4.0f;
+				SoundEffect(fx, &sBoatItem->Pose, SoundEnvironment::Land, pitch);
+			}
 		}
 		else
 		{
@@ -976,7 +983,7 @@ namespace TEN::Entities::Vehicles
 		{
 			auto room = probe.Block->RoomBelow(sBoatItem->Pose.Position.x, sBoatItem->Pose.Position.z).value_or(NO_ROOM);
 			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
-				TEN::Effects::TriggerSpeedboatFoam(sBoatItem, Vector3(0, 0, -BOAT_BACK));
+				TEN::Effects::TriggerSpeedboatFoam(sBoatItem, Vector3(0, 0, BOAT_BACK));
 		}
 
 		if (lara->Vehicle != itemNumber)
