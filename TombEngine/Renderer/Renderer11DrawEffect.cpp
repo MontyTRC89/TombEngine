@@ -1276,7 +1276,7 @@ namespace TEN::Renderer
 		using TEN::Effects::Spark::SparkParticle;
 		using TEN::Effects::Spark::SparkParticles;
 
-		extern std::array<SparkParticle, 64> SparkParticles;
+		extern std::array<SparkParticle, 128> SparkParticles;
 
 		for (int i = 0; i < SparkParticles.size(); i++) 
 		{

@@ -22,11 +22,13 @@ namespace TEN {
 				bool active;
 			};
 
-			extern std::array<SparkParticle,64> SparkParticles;
+			extern std::array<SparkParticle, 128> SparkParticles;
+			
 			void UpdateSparkParticles();
-			SparkParticle& getFreeSparkParticle();
+			SparkParticle& GetFreeSparkParticle();
 			void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int room);
 			void TriggerRicochetSpark(GameVector* pos, short angle, int num);
+			void TriggerFrictionSpark(GameVector* pos, Vector3Shrt angle, float length, int num);
 		}
 	}
 }
