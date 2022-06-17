@@ -1,21 +1,27 @@
 #pragma once
 
-struct MotorbikeInfo
+namespace TEN::Entities::Vehicles
 {
-	short TurnRate;
-	short MomentumAngle;
-	short ExtraRotation;
-	short WallShiftRotation;
+	struct MotorbikeInfo
+	{
+		short TurnRate;
+		short MomentumAngle;
+		short ExtraRotation;
+		short WallShiftRotation;
 
-	int Velocity;
+		int Velocity;
 
-	int Revs;
-	int EngineRevs;
-	int Pitch;
+		int Revs;
+		int EngineRevs;
+		int Pitch;
 
-	short RightWheelsRotation;
-	short LeftWheelRotation;
+		short LightPower;
+		short LeftWheelRotation;
+		short RightWheelsRotation;
 
-	short LightPower;
-	short Flags;
-};
+		char ExhaustStart;
+		bool DisableDismount;
+
+		short Flags;
+	};
+}
