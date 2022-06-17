@@ -97,7 +97,7 @@ namespace TEN {
 					s.friction = 0.1f;
 					s.gravity = 0.0f;
 					s.height = length;
-					s.width = 24.0f;
+					s.width = GenerateFloat(16.0f, 32.0f);
 					s.room = pos->roomNumber;
 					s.pos = Vector3(pos->x, pos->y, pos->z);
 					float ang = TO_RAD(angle.y);
@@ -105,8 +105,8 @@ namespace TEN {
 					Vector3 v = Vector3(sin(ang), vAng + GenerateFloat(-PI / 16, PI / 16), cos(ang));
 					v.Normalize(v);
 					s.velocity = v * GenerateFloat(32, 64);
-					s.sourceColor = Vector4(1, 0.8, 0.5f, 1) * 3;
-					s.destinationColor = Vector4(0.5f, 0.3f, 0, 0.5f);
+					s.sourceColor = Vector4(1, 0.7, 0.6f, 1) * 3;
+					s.destinationColor = Vector4(0.8f, 0.3f, 0, 0.5f);
 					s.active = true;
 				}
 			}
