@@ -165,12 +165,8 @@ namespace TEN::Entities::Vehicles
 			{
 				if (deltaAngle > -ANGLE(135.0f) && deltaAngle < ANGLE(135.0f))
 				{
-					if (laraItem->Pose.Position.x == rBoat->Pose.Position.x &&
-						laraItem->Pose.Position.y == rBoat->Pose.Position.x &&
-						laraItem->Pose.Position.z == rBoat->Pose.Position.z)
-					{
+					if (laraItem->Pose.Position == rBoat->Pose.Position)
 						mountType = RBOAT_MOUNT_LEVEL_START;
-					}
 					else
 						mountType = RBOAT_MOUNT_JUMP;
 				}
@@ -191,12 +187,14 @@ namespace TEN::Entities::Vehicles
 
 	int TestWaterHeight(ItemInfo* rBoatItem, int zOffset, int xOffset, Vector3Int* pos)
 	{
-		float s = phd_sin(rBoatItem->Pose.Orientation.y);
-		float c = phd_cos(rBoatItem->Pose.Orientation.y);
+		float sinX = phd_sin(rBoatItem->Pose.Orientation.x);
+		float sinY = phd_sin(rBoatItem->Pose.Orientation.y);
+		float cosY = phd_cos(rBoatItem->Pose.Orientation.y);
+		float sinZ = phd_sin(rBoatItem->Pose.Orientation.z);
 
-		pos->x = rBoatItem->Pose.Position.x + zOffset * s + xOffset * c;
-		pos->y = rBoatItem->Pose.Position.y - zOffset * phd_sin(rBoatItem->Pose.Orientation.x) + xOffset * phd_sin(rBoatItem->Pose.Orientation.z);
-		pos->z = rBoatItem->Pose.Position.z + zOffset * c - xOffset * s;
+		pos->x = rBoatItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
+		pos->y = rBoatItem->Pose.Position.y - (zOffset * sinX) + (xOffset * sinZ);
+		pos->z = rBoatItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
 
 		auto probe = GetCollision(pos->x, pos->y, pos->z, rBoatItem->RoomNumber);
 		auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
@@ -343,10 +341,11 @@ namespace TEN::Entities::Vehicles
 
 		if (moved->x || moved->z)
 		{
-			float c = phd_cos(rBoatItem->Pose.Orientation.y);
-			float s = phd_sin(rBoatItem->Pose.Orientation.y);
-			long front = moved->z * c + moved->x * s;
-			long side = -moved->z * s + moved->x * c;
+			float sinY = phd_sin(rBoatItem->Pose.Orientation.y);
+			float cosY = phd_cos(rBoatItem->Pose.Orientation.y);
+
+			long front = (moved->z * cosY) + (moved->x * sinY);
+			long side = (moved->z * -sinY) + (moved->x * cosY);
 
 			if (abs(front) > abs(side))
 			{
@@ -363,6 +362,7 @@ namespace TEN::Entities::Vehicles
 					return RBOAT_ANIM_HIT_LEFT;
 			}
 		}
+
 		return 0;
 	}
 
@@ -658,9 +658,9 @@ namespace TEN::Entities::Vehicles
 		laraItem->Pose.Orientation.x = 0;
 		laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 		laraItem->Pose.Orientation.z = 0;
+		laraItem->Animation.Airborne = false;
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
-		laraItem->Animation.Airborne = false;
 		laraItem->Animation.ActiveState = 0;
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		lara->Control.WaterStatus = WaterStatus::Dry;
@@ -717,10 +717,10 @@ namespace TEN::Entities::Vehicles
 		{
 			if (laraItem->Animation.ActiveState!= RBOAT_STATE_DEATH)
 			{
-				laraItem->Animation.TargetState = RBOAT_STATE_DEATH;
-				laraItem->Animation.ActiveState = RBOAT_STATE_DEATH;
 				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE_DEATH;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.TargetState = RBOAT_STATE_DEATH;
+				laraItem->Animation.ActiveState = RBOAT_STATE_DEATH;
 			}
 		}
 		else if (rBoatItem->Pose.Position.y < (rBoat->Water - CLICK(0.5f)) &&
@@ -728,20 +728,20 @@ namespace TEN::Entities::Vehicles
 		{
 			if (laraItem->Animation.ActiveState != RBOAT_STATE_FALL)
 			{
-				laraItem->Animation.TargetState = RBOAT_STATE_FALL;
-				laraItem->Animation.ActiveState = RBOAT_STATE_FALL;
 				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_LEAP_START;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.ActiveState = RBOAT_STATE_FALL;
+				laraItem->Animation.TargetState = RBOAT_STATE_FALL;
 			}
 		}
 		else if (collide)
 		{
 			if (laraItem->Animation.ActiveState != RBOAT_STATE_HIT)
 			{
-				laraItem->Animation.TargetState = RBOAT_STATE_HIT;
-				laraItem->Animation.ActiveState = RBOAT_STATE_HIT;
 				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + collide;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+				laraItem->Animation.ActiveState = RBOAT_STATE_HIT;
+				laraItem->Animation.TargetState = RBOAT_STATE_HIT;
 			}
 		}
 		else
@@ -874,15 +874,15 @@ namespace TEN::Entities::Vehicles
 			else
 				laraItem->Pose.Orientation.y += ANGLE(90.0f);
 
-			laraItem->Animation.TargetState = LS_JUMP_FORWARD;
-			laraItem->Animation.ActiveState = LS_JUMP_FORWARD;
 			laraItem->Animation.AnimNumber = LA_JUMP_FORWARD;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.Velocity = 20;
-			laraItem->Animation.VerticalVelocity = -40;
-			laraItem->Animation.Airborne = true;
+			laraItem->Animation.ActiveState = LS_JUMP_FORWARD;
+			laraItem->Animation.TargetState = LS_JUMP_FORWARD;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
+			laraItem->Animation.Airborne = true;
+			laraItem->Animation.Velocity = 20;
+			laraItem->Animation.VerticalVelocity = -40;
 			lara->Vehicle = NO_ITEM;
 
 			int x = laraItem->Pose.Position.x + 360 * phd_sin(laraItem->Pose.Orientation.y);
@@ -1007,12 +1007,7 @@ namespace TEN::Entities::Vehicles
 			}
 
 			rBoatItem->Pose.Orientation.z += rBoat->LeanAngle;
-			laraItem->Pose.Position.x = rBoatItem->Pose.Position.x;
-			laraItem->Pose.Orientation.x = rBoatItem->Pose.Orientation.x;
-			laraItem->Pose.Position.y = rBoatItem->Pose.Position.y;
-			laraItem->Pose.Orientation.y = rBoatItem->Pose.Orientation.y;
-			laraItem->Pose.Position.z = rBoatItem->Pose.Position.z;
-			laraItem->Pose.Orientation.z = rBoatItem->Pose.Orientation.z;
+			laraItem->Pose = rBoatItem->Pose;
 
 			AnimateItem(laraItem);
 
@@ -1022,8 +1017,8 @@ namespace TEN::Entities::Vehicles
 				rBoatItem->Animation.FrameNumber = g_Level.Anims[rBoatItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 			}
 
-			Camera.targetElevation = -ANGLE(20);
-			Camera.targetDistance = 2048;
+			Camera.targetElevation = -ANGLE(20.0f);
+			Camera.targetDistance = SECTOR(2);
 		}
 		else
 		{
@@ -1053,7 +1048,7 @@ namespace TEN::Entities::Vehicles
 		else
 			height = 1;
 
-		Vector3Int prop = { 0, 0, -80 };
+		auto prop = Vector3Int(0, 0, -80);
 		GetJointAbsPosition(rBoatItem, &prop, 2);
 
 		probedRoomNumber = GetCollision(prop.x, prop.y, prop.z, rBoatItem->RoomNumber).RoomNumber;
