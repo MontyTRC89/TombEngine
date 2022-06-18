@@ -467,9 +467,9 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_ai_target_number(creature->AITargetNumber);
 			creatureOffset = creatureBuilder.Finish();
 		}
-		else if (itemToSerialize.Data.is<QuadInfo>())
+		else if (itemToSerialize.Data.is<QuadBikeInfo>())
 		{
-			auto quad = (QuadInfo*)itemToSerialize.Data;
+			auto quad = (QuadBikeInfo*)itemToSerialize.Data;
 
 			Save::QuadBikeBuilder quadBuilder{ fbb };
 
@@ -615,7 +615,7 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
 		}
-		else if (itemToSerialize.Data.is<QuadInfo>())
+		else if (itemToSerialize.Data.is<QuadBikeInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::QuadBike);
 			serializedItem.add_data(quadOffset.Union());
@@ -1347,9 +1347,9 @@ bool SaveGame::Load(int slot)
 			creature->Tosspad = savedCreature->tosspad();
 			SetBaddyTarget(i, savedCreature->ai_target_number());
 		}
-		else if (item->Data.is<QuadInfo>())
+		else if (item->Data.is<QuadBikeInfo>())
 		{
-			auto quad = (QuadInfo*)item->Data;
+			auto quad = (QuadBikeInfo*)item->Data;
 			auto savedQuad = (Save::QuadBike*)savedItem->data();
 
 			quad->CanStartDrift = savedQuad->can_start_drift();

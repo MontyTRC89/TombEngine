@@ -1,8 +1,8 @@
 #pragma once
 
+struct Vector3Int;
 struct ItemInfo;
 struct CollisionInfo;
-struct Vector3Int;
 
 namespace TEN::Entities::Vehicles
 {

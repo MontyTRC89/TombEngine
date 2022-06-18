@@ -19,7 +19,7 @@
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
-#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"

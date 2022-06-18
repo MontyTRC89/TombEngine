@@ -126,11 +126,16 @@ namespace TEN::Entities::Vehicles
 		UPV_RIGHT_FIN_LEFT = 5
 	};
 
+	UPVInfo* GetUPVInfo(ItemInfo* UPVItem)
+	{
+		return (UPVInfo*)UPVItem->Data;
+	}
+
 	void UPVInitialise(short itemNumber)
 	{
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		UPVItem->Data = UPVInfo();
-		auto* UPV = (UPVInfo*)UPVItem->Data;
+		auto* UPV = GetUPVInfo(UPVItem);
 
 		UPV->Velocity = 0;
 		UPV->Rot = 0;
@@ -142,7 +147,7 @@ namespace TEN::Entities::Vehicles
 	static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto UPV = (UPVInfo*)UPVItem->Data;
+		auto UPV = GetUPVInfo(UPVItem);
 
 		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
 		if (ammo.getCount() == 0 && !ammo.hasInfinite())
@@ -240,7 +245,7 @@ namespace TEN::Entities::Vehicles
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
 		auto* UPVItem = &g_Level.Items[itemNumber];
-		auto* UPV = (UPVInfo*)UPVItem->Data;
+		auto* UPV = GetUPVInfo(UPVItem);
 
 		Vector3Int pos;
 
@@ -422,7 +427,7 @@ namespace TEN::Entities::Vehicles
 	static void BackgroundCollision(ItemInfo* laraItem, ItemInfo* UPVItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* UPV = (UPVInfo*)UPVItem->Data;
+		auto* UPV = GetUPVInfo(UPVItem);
 		CollisionInfo cinfo, * coll = &cinfo; // ??
 
 		coll->Setup.Mode = CollisionProbeMode::Quadrants;
@@ -510,7 +515,7 @@ namespace TEN::Entities::Vehicles
 	static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* UPV = (UPVInfo*)UPVItem->Data;
+		auto* UPV = GetUPVInfo(UPVItem);
 
 		TestUPVDismount(laraItem, UPVItem);
 
@@ -913,7 +918,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* UPVItem = &g_Level.Items[lara->Vehicle];
-		auto* UPV = (UPVInfo*)UPVItem->Data;
+		auto* UPV = GetUPVInfo(UPVItem);
 	
 		auto oldPos = UPVItem->Pose;
 		auto probe = GetCollision(UPVItem);

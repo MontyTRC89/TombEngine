@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+struct ItemInfo;
+struct CollisionInfo;
 
 namespace TEN::Entities::Vehicles
 {

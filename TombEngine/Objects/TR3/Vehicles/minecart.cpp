@@ -141,7 +141,7 @@ namespace TEN::Entities::Vehicles
 		MINECART_FLAG_DEAD = (1 << 7)
 	};
 
-	static MinecartInfo* GetMinecartInfo(ItemInfo* minecartItem)
+	MinecartInfo* GetMinecartInfo(ItemInfo* minecartItem)
 	{
 		return (MinecartInfo*)minecartItem->Data;
 	}

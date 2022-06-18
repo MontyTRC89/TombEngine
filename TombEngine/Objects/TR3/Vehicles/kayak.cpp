@@ -16,8 +16,23 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::Vehicles
 {
+	struct WAKE_PTS
+	{
+		int 	x[2];
+		int 	y;
+		int		z[2];
+		short	xvel[2];
+		short	zvel[2];
+		byte 	life;
+		byte	pad[3];
+	};
+
+	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+
 	#define KAYAK_COLLIDE			CLICK(0.25f)
 	#define DISMOUNT_DISTANCE 		CLICK(3) // TODO: Find accurate distance.
 	#define KAYAK_TO_ENTITY_RADIUS	CLICK(1)
@@ -46,8 +61,8 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_IDLE_FRAME		GetFrameNumber(KAYAK_ANIM_IDLE, 0)
 	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
 
+
 	#define KAYAK_DRAW_SHIFT	32
-	#define LARA_LEG_BITS		((1 << LM_HIPS) | (1 << LM_LTHIGH) | (1 << LM_LSHIN) | (1 << LM_LFOOT) | (1 << LM_RTHIGH) | (1 << LM_RSHIN) | (1 << LM_RFOOT))
 	#define NUM_WAKE_SPRITES	32
 	#define WAKE_SIZE 			32
 	#define WAKE_VELOCITY 		4
@@ -64,6 +79,8 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_IN_HOLD_LEFT	IN_LSTEP
 	#define KAYAK_IN_HOLD_RIGHT	IN_RSTEP
 	#define KAYAK_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
+
+	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
 
 	enum KayakState
 	{
@@ -128,24 +145,16 @@ namespace TEN::Entities::Vehicles
 		Right
 	};
 
-	struct WAKE_PTS 
+	KayakInfo* GetKayakInfo(ItemInfo* kayakItem)
 	{
-		int 	x[2];
-		int 	y;
-		int		z[2];
-		short	xvel[2];
-		short	zvel[2];
-		byte 	life;
-		byte	pad[3];
-	};
-
-	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
+		return (KayakInfo*)kayakItem->Data;
+	}
 
 	void InitialiseKayak(short itemNumber)
 	{
 		auto* kayakItem = &g_Level.Items[itemNumber];
 		kayakItem->Data = KayakInfo();
-		auto* kayak = (KayakInfo*)kayakItem->Data;
+		auto* kayak = GetKayakInfo(kayakItem);
 
 		kayak->TurnRate = 0;
 		kayak->Velocity = 0;
@@ -172,7 +181,7 @@ namespace TEN::Entities::Vehicles
 
 	void KayakDoWake(ItemInfo* kayakItem, int xOffset, int zOffset, short rotate)
 	{
-		auto* kayak = (KayakInfo*)kayakItem->Data;
+		auto* kayak = GetKayakInfo(kayakItem);
 
 		if (WakePts[kayak->CurrentStartWake][rotate].life)
 			return;
@@ -580,7 +589,7 @@ namespace TEN::Entities::Vehicles
 
 	void KayakToBackground(ItemInfo* laraItem, ItemInfo* kayakItem)
 	{
-		auto* kayak = (KayakInfo*)kayakItem->Data;
+		auto* kayak = GetKayakInfo(kayakItem);
 
 		kayak->OldPos = kayakItem->Pose;
 
@@ -729,7 +738,7 @@ namespace TEN::Entities::Vehicles
 	void KayakUserInput(ItemInfo* laraItem, ItemInfo* kayakItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
-		auto* kayak = (KayakInfo*)kayakItem->Data;
+		auto* kayak = GetKayakInfo(kayakItem);
 
 		if (laraItem->HitPoints <= 0 &&
 			laraItem->Animation.ActiveState != KAYAK_STATE_IDLE_DEATH)
@@ -1031,7 +1040,7 @@ namespace TEN::Entities::Vehicles
 			{
 				kayak->Flags |= 0x80;
 				lara->MeshPtrs[LM_RHAND] = Objects[ID_KAYAK_LARA_ANIMS].meshIndex + LM_RHAND;
-				laraItem->MeshBits &= ~LARA_LEG_BITS;
+				laraItem->ClearBits(JointBitType::Mesh, KayakLaraLegJoints);
 			}
 
 			break;
@@ -1043,7 +1052,7 @@ namespace TEN::Entities::Vehicles
 			{
 				kayak->Flags &= ~0x80;
 				lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
-				laraItem->MeshBits |= LARA_LEG_BITS;
+				laraItem->SetBits(JointBitType::Mesh, KayakLaraLegJoints);
 			}
 
 			laraItem->Animation.TargetState = laraItem->Animation.RequiredState;
@@ -1057,9 +1066,7 @@ namespace TEN::Entities::Vehicles
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
-				laraItem->Pose.Position.x = vec.x;
-				laraItem->Pose.Position.y = vec.y;
-				laraItem->Pose.Position.z = vec.z;
+				laraItem->Pose.Position = vec;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - ANGLE(90.0f);
 				laraItem->Pose.Orientation.z = 0;
@@ -1081,9 +1088,7 @@ namespace TEN::Entities::Vehicles
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
-				laraItem->Pose.Position.x = vec.x;
-				laraItem->Pose.Position.y = vec.y;
-				laraItem->Pose.Position.z = vec.z;
+				laraItem->Pose.Position = vec;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + ANGLE(90.0f);
 				laraItem->Pose.Orientation.z = 0;
@@ -1189,15 +1194,15 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.ActiveState = 12; // TODO
 		laraItem->Animation.TargetState = 12;
 		laraItem->HitPoints = 0;
+		laraItem->Animation.Airborne = false;
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
-		laraItem->Animation.Airborne = false;
 
 		AnimateItem(laraItem);
 
-		lara->ExtraAnim = 1;
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->Control.Weapon.GunType = LaraWeaponType::None;
+		lara->ExtraAnim = 1;
 		lara->HitDirection = -1;
 	}
 
@@ -1205,12 +1210,12 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* kayakItem = &g_Level.Items[itemNumber];
-		auto* kayak = (KayakInfo*)kayakItem->Data;
+		auto* kayak = GetKayakInfo(kayakItem);
 
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 			return;
 
-		KayakMountType mountType = KayakGetMountType(laraItem, itemNumber);
+		auto mountType = KayakGetMountType(laraItem, itemNumber);
 		if (mountType != KayakMountType::None)
 		{
 			lara->Vehicle = itemNumber;
@@ -1230,9 +1235,7 @@ namespace TEN::Entities::Vehicles
 
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = KAYAK_STATE_MOUNT_LEFT;
-			laraItem->Pose.Position.x = kayakItem->Pose.Position.x;
-			laraItem->Pose.Position.y = kayakItem->Pose.Position.y;
-			laraItem->Pose.Position.z = kayakItem->Pose.Position.z;
+			laraItem->Pose.Position = kayakItem->Pose.Position;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y;
 			laraItem->Pose.Orientation.z = 0;
@@ -1260,7 +1263,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* kayakItem = &g_Level.Items[lara->Vehicle];
-		auto* kayak = (KayakInfo*)kayakItem->Data;
+		auto* kayak = GetKayakInfo(kayakItem);
 
 		if (TrInput & IN_LOOK)
 			LookUpDown(laraItem);

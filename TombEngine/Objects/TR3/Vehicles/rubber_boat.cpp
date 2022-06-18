@@ -97,11 +97,16 @@ namespace TEN::Entities::Vehicles
 		RBOAT_MOUNT_LEVEL_START = 4
 	};
 
+	RubberBoatInfo* GetRubberBoatInfo(ItemInfo* rBoatItem)
+	{
+		return (RubberBoatInfo*)rBoatItem->Data;
+	}
+
 	void InitialiseRubberBoat(short itemNumber)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		rBoatItem->Data = RubberBoatInfo();
-		auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
+		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
 		rBoat->TurnRate = 0;
 		rBoat->LeanAngle = 0;
@@ -370,7 +375,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 		auto* rBoatItem = &g_Level.Items[itemNumber];
-		auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
+		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
 		rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
 
@@ -531,7 +536,7 @@ namespace TEN::Entities::Vehicles
 
 	bool RubberBoatUserControl(ItemInfo* laraItem, ItemInfo* rBoatItem)
 	{
-		auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
+		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
 		bool noTurn = true;
 
@@ -711,7 +716,7 @@ namespace TEN::Entities::Vehicles
 
 	void RubberBoatAnimation(ItemInfo* laraItem, ItemInfo* rBoatItem, int collide)
 	{
-		auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
+		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
 		if (laraItem->HitPoints <= 0)
 		{
@@ -910,7 +915,7 @@ namespace TEN::Entities::Vehicles
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
 		auto* rBoatItem = &g_Level.Items[itemNumber];
-		auto* rBoat = (RubberBoatInfo*)rBoatItem->Data;
+		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
 		bool noTurn = true;
 		bool drive = false;
