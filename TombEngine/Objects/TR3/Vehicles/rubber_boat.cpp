@@ -107,14 +107,6 @@ namespace TEN::Entities::Vehicles
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		rBoatItem->Data = RubberBoatInfo();
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
-
-		rBoat->TurnRate = 0;
-		rBoat->LeanAngle = 0;
-		rBoat->ExtraRotation = 0;
-		rBoat->LeftVerticalVelocity = 0;
-		rBoat->RightVerticalVelocity = 0;
-		rBoat->Water = 0;
-		rBoat->Pitch = 0;
 	}
 
 	void DrawRubberBoat(ItemInfo* rBoatItem)
