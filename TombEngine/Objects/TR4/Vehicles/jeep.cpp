@@ -129,19 +129,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		jeepItem->SetBits(JointBitType::Mesh, JeepMeshJoints);
-		jeep->velocity = 0;
-		jeep->revs = 0;
-		jeep->jeepTurn = 0;
-		jeep->fallSpeed = 0;
-		jeep->extraRotation = 0;
 		jeep->momentumAngle = jeepItem->Pose.Position.y;
-		jeep->pitch = 0;
-		jeep->flags = 0;
-		jeep->unknown2 = 0;
-		jeep->rot1 = 0;
-		jeep->rot2 = 0;
-		jeep->rot3 = 0;
-		jeep->rot4 = 0;
 	}
 
 	static int TestJeepHeight(ItemInfo* jeepItem, int dz, int dx, Vector3Int* pos)

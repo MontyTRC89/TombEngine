@@ -141,20 +141,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
 
 		motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeJoints);
-		motorbike->TurnRate = 0;
 		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
-		motorbike->ExtraRotation = 0;
-		motorbike->WallShiftRotation = 0;
-		motorbike->Velocity = 0;
-		motorbike->Revs = 0;
-		motorbike->EngineRevs = 0;
-		motorbike->Pitch = 0;
-		motorbike->LightPower = 0;
-		motorbike->LeftWheelRotation = 0;
-		motorbike->RightWheelsRotation = 0;
-		motorbike->ExhaustStart = 0;
-		motorbike->DisableDismount = false;
-		motorbike->Flags = NULL;
 	}
 
 	static int TestMotorbikeHeight(ItemInfo* motorbikeItem, int dz, int dx, Vector3Int* pos)

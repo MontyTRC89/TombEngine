@@ -4,24 +4,24 @@ namespace TEN::Entities::Vehicles
 {
 	struct MotorbikeInfo
 	{
-		short TurnRate;
-		short MomentumAngle;
-		short ExtraRotation;
-		short WallShiftRotation;
+		short TurnRate = 0;
+		short MomentumAngle = 0;
+		short ExtraRotation = 0;
+		short WallShiftRotation = 0;
 
-		int Velocity;
+		int Velocity = 0;
 
-		int Revs;
-		int EngineRevs;
-		int Pitch;
+		int Revs = 0;
+		int EngineRevs = 0;
+		int Pitch = 0;
 
-		short LightPower;
-		short LeftWheelRotation;
-		short RightWheelsRotation;
+		short LightPower = 0;
+		short LeftWheelRotation = 0;
+		short RightWheelsRotation = 0;
 
-		char ExhaustStart;
-		bool DisableDismount;
+		char ExhaustStart = 0;
+		bool DisableDismount = false;
 
-		short Flags;
+		short Flags = NULL;
 	};
 }

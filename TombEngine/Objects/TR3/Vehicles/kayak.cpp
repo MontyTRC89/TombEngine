@@ -156,16 +156,7 @@ namespace TEN::Entities::Vehicles
 		kayakItem->Data = KayakInfo();
 		auto* kayak = GetKayakInfo(kayakItem);
 
-		kayak->TurnRate = 0;
-		kayak->Velocity = 0;
-		kayak->FrontVerticalVelocity = 0;
-		kayak->LeftVerticalVelocity = 0;
-		kayak->RightVerticalVelocity = 0;
-		kayak->LeftRightCount = 0;
-		kayak->OldPos = kayakItem->Pose;
-		kayak->CurrentStartWake = 0;
-		kayak->WakeShade = 0;
-		kayak->Flags = 0;
+		kayak->OldPose = kayakItem->Pose;
 
 		for (int i = 0; i < NUM_WAKE_SPRITES; i++)
 		{
@@ -591,7 +582,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* kayak = GetKayakInfo(kayakItem);
 
-		kayak->OldPos = kayakItem->Pose;
+		kayak->OldPose = kayakItem->Pose;
 
 		Vector3Int oldPos[9];
 		int height[8];
@@ -690,9 +681,9 @@ namespace TEN::Entities::Vehicles
 		if (height2 == NO_HEIGHT)
 		{
 			GameVector kayakPos;
-			kayakPos.x = kayak->OldPos.Position.x;
-			kayakPos.y = kayak->OldPos.Position.y;
-			kayakPos.z = kayak->OldPos.Position.z;
+			kayakPos.x = kayak->OldPose.Position.x;
+			kayakPos.y = kayak->OldPose.Position.y;
+			kayakPos.z = kayak->OldPose.Position.z;
 			kayakPos.roomNumber = kayakItem->RoomNumber;
 
 			CameraCollisionBounds(&kayakPos, 256, 0);
@@ -818,20 +809,20 @@ namespace TEN::Entities::Vehicles
 			if (kayak->Forward)
 			{
 				if (!frame)
-					kayak->LeftRightCount = 0;
+					kayak->LeftRightPaddleCount = 0;
 
 				// TODO: Sort out the bitwise operations.
-				if (frame == 2 && !(kayak->LeftRightCount & 0x80))
-					kayak->LeftRightCount++;
+				if (frame == 2 && !(kayak->LeftRightPaddleCount & 0x80))
+					kayak->LeftRightPaddleCount++;
 
 				else if (frame > 2)
-					kayak->LeftRightCount &= ~0x80;
+					kayak->LeftRightPaddleCount &= ~0x80;
 
 				if (TrInput & KAYAK_IN_FORWARD)
 				{
 					if (TrInput & KAYAK_IN_LEFT && !(TrInput & KAYAK_IN_HOLD))
 					{
-						if ((kayak->LeftRightCount & ~0x80) >= 2)
+						if ((kayak->LeftRightPaddleCount & ~0x80) >= 2)
 							laraItem->Animation.TargetState = KAYAK_STATE_TURN_RIGHT;
 					}
 					else
@@ -878,19 +869,19 @@ namespace TEN::Entities::Vehicles
 			if (kayak->Forward)
 			{
 				if (!frame)
-					kayak->LeftRightCount = 0;
+					kayak->LeftRightPaddleCount = 0;
 
-				if (frame == 2 && !(kayak->LeftRightCount & 0x80))
-					kayak->LeftRightCount++;
+				if (frame == 2 && !(kayak->LeftRightPaddleCount & 0x80))
+					kayak->LeftRightPaddleCount++;
 
 				else if (frame > 2)
-					kayak->LeftRightCount &= ~0x80;
+					kayak->LeftRightPaddleCount &= ~0x80;
 
 				if (TrInput & KAYAK_IN_FORWARD)
 				{
 					if (TrInput & KAYAK_IN_RIGHT && !(TrInput & KAYAK_IN_HOLD))
 					{
-						if ((kayak->LeftRightCount & ~0x80) >= 2)
+						if ((kayak->LeftRightPaddleCount & ~0x80) >= 2)
 							laraItem->Animation.TargetState = KAYAK_STATE_TURN_LEFT;
 					}
 					else
@@ -1075,7 +1066,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Airborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
-				kayak->LeftRightCount = 0;
+				kayak->LeftRightPaddleCount = 0;
 			}
 
 			break;
@@ -1097,7 +1088,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.Airborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
-				kayak->LeftRightCount = 0;
+				kayak->LeftRightPaddleCount = 0;
 			}
 		}
 

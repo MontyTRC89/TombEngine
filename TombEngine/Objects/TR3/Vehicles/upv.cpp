@@ -137,11 +137,7 @@ namespace TEN::Entities::Vehicles
 		UPVItem->Data = UPVInfo();
 		auto* UPV = GetUPVInfo(UPVItem);
 
-		UPV->Velocity = 0;
-		UPV->Rot = 0;
 		UPV->Flags = UPV_SURFACE;
-		UPV->HarpoonTimer = 0;
-		UPV->HarpoonLeft = false;
 	}
 
 	static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)

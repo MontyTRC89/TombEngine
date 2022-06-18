@@ -14,6 +14,6 @@ namespace TEN::Entities::Vehicles
 		int Pitch = 0;
 		int FlashTimer = 0;
 		bool Armed = false;
-		short TrackMesh;
+		short TrackMesh = 0;
 	};
 }

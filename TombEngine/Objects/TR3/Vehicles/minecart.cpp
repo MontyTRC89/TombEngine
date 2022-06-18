@@ -151,11 +151,6 @@ namespace TEN::Entities::Vehicles
 		auto* minecartItem = &g_Level.Items[itemNumber];
 		minecartItem->Data = MinecartInfo();
 		auto* minecart = GetMinecartInfo(minecartItem);
-
-		minecart->Velocity = 0;
-		minecart->VerticalVelocity = 0;
-		minecart->Gradient = 0;
-		minecart->Flags = NULL;
 	}
 	
 	static void TriggerWheelSparkles(ItemInfo* item, bool left)
