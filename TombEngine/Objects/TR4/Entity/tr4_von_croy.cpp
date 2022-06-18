@@ -809,38 +809,38 @@ namespace TEN::Entities::TR4
 		CreatureJoint(item, 2, joint2);
 		CreatureJoint(item, 3, joint3);
 
-		if ((item->Animation.ActiveState < 15) && (item->Animation.ActiveState != 5))
+		if ((item->Animation.ActiveState < VON_CROY_STATE_JUMP) && (item->Animation.ActiveState != VON_CROY_STATE_MONKEY))
 		{
 			switch (CreatureVault(itemNumber, angle, 2, 260))
 			{
-			case 2:
+			case VON_CROY_STATE_WALK:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 29;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 19;
 				creature->MaxTurn = 0;
 				break;
 
-			case 3:
+			case VON_CROY_STATE_RUN:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 18;
 				creature->MaxTurn = 0;
 				break;
 
-			case 4:
+			case VON_CROY_STATE_START_MONKEY:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 17;
 				creature->MaxTurn = 0;
 				break;
 
-			case 7:
+			case VON_CROY_STATE_LOOK_BEFORE_JUMP:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 27;
 				creature->MaxTurn = 0;
 				break;
-
+			// I am not sure what negative states are, I will leave them alone - Kubsy 18/06/2022
 			case -7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
