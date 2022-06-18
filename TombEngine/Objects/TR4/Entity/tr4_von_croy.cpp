@@ -34,24 +34,45 @@ namespace TEN::Entities::TR4
 		VON_CROY_STATE_TOGGLE_KNIFE = 6,
 		VON_CROY_STATE_LOOK_BEFORE_JUMP = 7,
 
+		VON_CROY_STATE_TALK_1 = 8,
+		VON_CROY_STATE_TALK_2 = 9,
+		VON_CROY_STATE_TALK_3 = 10,
+
+		VON_CROY_STATE_IGNITE = 11, //Not sure about this one as the animation that uses it (30) is the same as GUIDE's torch ignite - Kubsy 18/06/2020
+
+		VON_CROY_STATE_STOP_LARA = 12,
 		VON_CROY_STATE_CALL_LARA_1 = 13,
 		VON_CROY_STATE_CALL_LARA_2 = 14,
 		VON_CROY_STATE_JUMP = 15,
 		VON_CROY_STATE_JUMP_2_BLOCKS = 16,
 
+		VON_CROY_STATE_CLIMB_4_BLOCKS = 17,
+		VON_CROY_STATE_CLIMB_3_BLOCKS = 18,
+		VON_CROY_STATE_CLIMB_2_BLOCKS = 19,
+
 		VON_CROY_STATE_ENABLE_TRAP = 20,
 		VON_CROY_STATE_KNIFE_ATTACK_HIGH = 21,
 		VON_CROY_STATE_LOOK_BACK_LEFT = 22,
 
+		VON_CROY_STATE_JUMP_DOWN_2_CLICKS = 23,
+		VON_CROY_STATE_JUMP_DOWN_3_CLICKS = 24,
+		VON_CROY_STATE_JUMP_DOWN_4_CLICKS = 25,
+
 		VON_CROY_STATE_STEP_DOWN_HIGH = 26,
 		VON_CROY_STATE_GRAB_LADDER = 27,
 		VON_CROY_STATE_CLIMB_LADDER_RIGHT = 28,
+		VON_CROY_STATE_NONE = 29,
 
 		VON_CROY_STATE_LADDER_CLIMB_UP = 30,
 		VON_CROY_STATE_KNIFE_ATTACK_LOW = 31,
+		VON_CROY_STATE_POINT = 32,
+		VON_CROY_STATE_STANDING_JUMP_GRAB = 33,
 
 		VON_CROY_STATE_JUMP_BACK = 34,
-		VON_CROY_STATE_LOOK_BACK_RIGHT = 35
+		VON_CROY_STATE_LOOK_BACK_RIGHT = 35,
+
+		VON_CROY_STATE_POSITION_ADJUST_FRONT = 36,
+		VON_CROY_STATE_POSITION_ADJUST_BACK = 37,
 	};
 
 	// TODO
@@ -740,7 +761,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 32:
+		case VON_CROY_STATE_POINT:
 			creature->MaxTurn = 0;
 			ClampRotation(&item->Pose, AI.angle / 2, ANGLE(6.0f));
 
@@ -770,7 +791,7 @@ namespace TEN::Entities::TR4
 			creature->LocationAI++;
 			break;
 
-		case 33:
+		case VON_CROY_STATE_STANDING_JUMP_GRAB:
 			flags = true;
 			if (item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex + 52 ||
 				item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase)
@@ -796,8 +817,8 @@ namespace TEN::Entities::TR4
 			item->ItemFlags[2] = VON_CROY_FLAG_JUMP;
 			break;
 
-		case 36:
-		case 37:
+		case VON_CROY_STATE_POSITION_ADJUST_FRONT:
+		case VON_CROY_STATE_POSITION_ADJUST_BACK:
 			creature->MaxTurn = 0;
 			MoveCreature3DPos(&item->Pose, &enemy->Pose, 15, enemy->Pose.Orientation.y - item->Pose.Orientation.y, 512);
 			break;
@@ -816,56 +837,56 @@ namespace TEN::Entities::TR4
 			case VON_CROY_STATE_WALK:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 29;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 19;
+				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_2_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case VON_CROY_STATE_RUN:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 18;
+				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_3_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case VON_CROY_STATE_START_MONKEY:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 17;
+				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_4_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case VON_CROY_STATE_LOOK_BEFORE_JUMP:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 27;
+				item->Animation.ActiveState = VON_CROY_STATE_GRAB_LADDER;
 				creature->MaxTurn = 0;
 				break;
-			// I am not sure what negative states are, I will leave them alone - Kubsy 18/06/2022
+			// I am not sure what negative states are (probably the inverse of the above), I will leave them alone - Kubsy 18/06/2022
 			case -7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 26;
+				item->Animation.ActiveState = VON_CROY_STATE_STEP_DOWN_HIGH;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 25;
+				item->Animation.ActiveState = VON_CROY_STATE_JUMP_DOWN_4_CLICKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 24;
+				item->Animation.ActiveState = VON_CROY_STATE_JUMP_DOWN_3_CLICKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -2:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 42;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-				item->Animation.ActiveState = 23;
+				item->Animation.ActiveState = VON_CROY_STATE_JUMP_DOWN_2_CLICKS;
 				creature->MaxTurn = 0;
 				break;
 			}
