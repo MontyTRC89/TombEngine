@@ -1084,8 +1084,8 @@ struct ArmInfo
 
 struct FlareData
 {
-	unsigned int Life;
 	int Frame;
+	unsigned int Life;
 	bool ControlLeft;
 };
 

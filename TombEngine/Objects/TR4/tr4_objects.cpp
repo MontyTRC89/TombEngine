@@ -1203,7 +1203,6 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->collision = MotorbikeCollision;
 		//obj->drawRoutine = DrawMotorbike; // for wheel rotation
 		obj->hitEffect = HIT_RICOCHET;
-		obj->drawRoutineExtra = DrawMotorbikeEffect;
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;

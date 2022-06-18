@@ -10,11 +10,13 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO DogBite = { 0, 0, 100, 3 };
-	const std::vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
-	const std::vector<int> DogBiteAttackJoints = { 3, 6 };
+	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
+	const vector<int> DogBiteAttackJoints = { 3, 6 };
 
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;

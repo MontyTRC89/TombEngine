@@ -111,14 +111,14 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 	return collided;
 }
 
-// Overload used to get point/room collision parameters (with an optional vertical offset) at a given item's position.
-CollisionResult GetCollision(ItemInfo* item, float vertical)
+// Overload used to quickly get point/room collision parameters at a given item's position.
+CollisionResult GetCollision(ItemInfo* item)
 {
-	short probedRoomNumber = item->RoomNumber;
-	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y + vertical, item->Pose.Position.z, &probedRoomNumber);
-	auto probe = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y + vertical, item->Pose.Position.z);
+	auto newRoomNumber = item->RoomNumber;
+	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &newRoomNumber);
+	auto probe = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
-	probe.RoomNumber = probedRoomNumber;
+	probe.RoomNumber = newRoomNumber;
 	return probe;
 }
 
@@ -126,7 +126,12 @@ CollisionResult GetCollision(ItemInfo* item, float vertical)
 CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical, float lateral)
 {
 	short tempRoomNumber = item->RoomNumber;
-	auto location = ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
+
+	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. @Sezz 2022.06.14
+	auto location =
+		item->IsLara() ?
+		item->Location :
+		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
 
 	auto point = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
 	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
@@ -214,7 +219,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
-	bool playerCollision = item->Data.is<LaraInfo*>();
+	bool playerCollision = item->IsLara();
 
 	// Reset collision parameters.
 	coll->CollisionType = CT_NONE;
@@ -868,6 +873,10 @@ int GetQuadrant(short angle)
 
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 {
+	// Calculation ledge angle for non-Lara objects is unnecessary.
+	if (!item->IsLara())
+		return 0; 
+
 	// Get item bounds and current rotation
 	auto bounds = GetBoundsAccurate(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);

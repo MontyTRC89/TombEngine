@@ -4,7 +4,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FloorInfo;
+class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
@@ -122,7 +122,7 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
-CollisionResult GetCollision(ItemInfo* item, float vertical = 0.0f);
+CollisionResult GetCollision(ItemInfo* item);
 CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
 CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);

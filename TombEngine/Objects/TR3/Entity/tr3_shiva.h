@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseShiva(short itemNumber);
-void ShivaControl(short itemNumber);
+namespace TEN::Entities::TR3
+{
+	void InitialiseShiva(short itemNumber);
+	void ShivaControl(short itemNumber);
+}

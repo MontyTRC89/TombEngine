@@ -10,24 +10,27 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR1
 {
 	BITE_INFO ApeBite = { 0, -19, 75, 15 };
-	const std::vector<int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
+	const vector<int> ApeAttackJoints = { 8, 9, 10, 11, 12, 13, 14, 15 };
 
 	constexpr auto APE_ATTACK_DAMAGE = 200;
+
 	constexpr auto APE_ATTACK_RANGE = SECTOR(0.42f);
 	constexpr auto APE_PANIC_RANGE = SECTOR(2);
 
-	constexpr auto JUMP_CHANCE = 0xa0;
-	constexpr auto POUND_CHEST_CHANCE = JUMP_CHANCE + 0xA0;
-	constexpr auto POUND_GROUND_CHANCE = POUND_CHEST_CHANCE + 0xA0;
-	constexpr auto RUN_LEFT_CHANCE = POUND_GROUND_CHANCE + 0xA0;
+	constexpr auto APE_JUMP_CHANCE = 0xa0;
+	constexpr auto APE_POUND_CHEST_CHANCE = APE_JUMP_CHANCE + 0xA0;
+	constexpr auto APE_POUND_GROUND_CHANCE = APE_POUND_CHEST_CHANCE + 0xA0;
+	constexpr auto APE_RUN_LEFT_CHANCE = APE_POUND_GROUND_CHANCE + 0xA0;
 
 	constexpr auto SHIFT = 75;
 
-	#define RUN_TURN ANGLE(5.0f)
-	#define DISPLAY_ANGLE ANGLE(45.0f)
+	#define APE_RUN_TURN_ANGLE ANGLE(5.0f)
+	#define APE_DISPLAY_ANGLE ANGLE(45.0f)
 
 	enum ApeState
 	{
@@ -211,13 +214,13 @@ namespace TEN::Entities::TR1
 					AI.zoneNumber == AI.enemyZone && AI.ahead)
 				{
 					random = (short)(GetRandomControl() / 32);
-					if (random < JUMP_CHANCE)
+					if (random < APE_JUMP_CHANCE)
 						item->Animation.TargetState = APE_STATE_JUMP;
-					else if (random < POUND_CHEST_CHANCE)
+					else if (random < APE_POUND_CHEST_CHANCE)
 						item->Animation.TargetState = APE_STATE_POUND_CHEST;
-					else if (random < POUND_GROUND_CHANCE)
+					else if (random < APE_POUND_GROUND_CHANCE)
 						item->Animation.TargetState = APE_STATE_POUND_GROUND;
-					else if (random < RUN_LEFT_CHANCE)
+					else if (random < APE_RUN_LEFT_CHANCE)
 					{
 						item->Animation.TargetState = APE_STATE_RUN_LEFT;
 						creatureInfo->MaxTurn = 0;
@@ -234,11 +237,11 @@ namespace TEN::Entities::TR1
 				break;
 
 			case APE_STATE_RUN_FORWARD:
-				creatureInfo->MaxTurn = RUN_TURN;
+				creatureInfo->MaxTurn = APE_RUN_TURN_ANGLE;
 
 				if (creatureInfo->Flags == 0 &&
-					AI.angle > -DISPLAY_ANGLE &&
-					AI.angle < DISPLAY_ANGLE)
+					AI.angle > -APE_DISPLAY_ANGLE &&
+					AI.angle < APE_DISPLAY_ANGLE)
 				{
 					item->Animation.TargetState = APE_STATE_IDLE;
 				}
@@ -250,17 +253,17 @@ namespace TEN::Entities::TR1
 				else if (creatureInfo->Mood != MoodType::Escape)
 				{
 					random = (short)GetRandomControl();
-					if (random < JUMP_CHANCE)
+					if (random < APE_JUMP_CHANCE)
 					{
 						item->Animation.RequiredState = APE_STATE_JUMP;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (random < POUND_CHEST_CHANCE)
+					else if (random < APE_POUND_CHEST_CHANCE)
 					{
 						item->Animation.RequiredState = APE_STATE_POUND_CHEST;
 						item->Animation.TargetState = APE_STATE_IDLE;
 					}
-					else if (random < POUND_GROUND_CHANCE)
+					else if (random < APE_POUND_GROUND_CHANCE)
 					{
 						item->Animation.RequiredState = APE_STATE_POUND_GROUND;
 						item->Animation.TargetState = APE_STATE_IDLE;
