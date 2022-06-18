@@ -129,7 +129,7 @@ namespace TEN::Entities::Vehicles
 		MOTORBIKE_FLAG_DEATH = (1 << 7)
 	};
 
-	static MotorbikeInfo* GetMotorbikeInfo(ItemInfo* motorbikeItem)
+	MotorbikeInfo* GetMotorbikeInfo(ItemInfo* motorbikeItem)
 	{
 		return (MotorbikeInfo*)motorbikeItem->Data;
 	}

@@ -2,7 +2,7 @@
 
 namespace TEN::Entities::Vehicles
 {
-	struct QuadInfo
+	struct QuadBikeInfo
 	{
 		short TurnRate;
 		short FrontRot;

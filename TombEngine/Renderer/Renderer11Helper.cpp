@@ -10,7 +10,7 @@
 #include "Game/collision/sphere.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer\RenderView\RenderView.h"
-#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -18,7 +18,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include <algorithm>
 #include "Game/itemdata/creature_info.h"
-#include "Objects/TR3/Vehicles/quad_info.h"
+#include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
@@ -207,12 +207,12 @@ namespace TEN::Renderer
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
 				nativeItem->Data.apply(
-					[&j, &currentBone](QuadInfo& quad)
+					[&j, &currentBone](QuadBikeInfo& quadBike)
 				{
 					if (j == 3 || j == 4)
-						currentBone->ExtraRotation.x = TO_RAD(quad.RearRot);
+						currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
 					else if (j == 6 || j == 7)
-						currentBone->ExtraRotation.x = TO_RAD(quad.FrontRot);
+						currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
 				},
 				[&j, &currentBone](JeepInfo& jeep)
 				{
@@ -270,7 +270,7 @@ namespace TEN::Renderer
 				[&j, &currentBone](BigGunInfo& big_gun)
 				{
 				if (j == 2)
-					currentBone->ExtraRotation.z = big_gun.BarrelZRotation;
+					currentBone->ExtraRotation.z = big_gun.BarrelRotation;
 				},
 				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
 				{

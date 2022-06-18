@@ -117,7 +117,7 @@ namespace TEN::Entities::Vehicles
 		JEEP_FLAG_DEAD = (1 << 7)
 	};
 
-	static JeepInfo* GetJeepInfo(ItemInfo* jeepItem)
+	JeepInfo* GetJeepInfo(ItemInfo* jeepItem)
 	{
 		return (JeepInfo*)jeepItem->Data;
 	}

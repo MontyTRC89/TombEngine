@@ -1,7 +1,7 @@
 #pragma once
 
-struct CollisionInfo;
 struct ItemInfo;
+struct CollisionInfo;
 
 namespace TEN::Entities::Vehicles
 {
