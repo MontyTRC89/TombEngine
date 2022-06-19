@@ -132,28 +132,6 @@ namespace TEN::Entities::Vehicles
 		jeep->momentumAngle = jeepItem->Pose.Position.y;
 	}
 
-	static int TestJeepHeight(ItemInfo* jeepItem, int dz, int dx, Vector3Int* pos)
-	{
-		float sinX = phd_sin(jeepItem->Pose.Orientation.x);
-		float sinY = phd_sin(jeepItem->Pose.Orientation.y);
-		float cosY = phd_cos(jeepItem->Pose.Orientation.y);
-		float sinZ = phd_sin(jeepItem->Pose.Orientation.z);
-
-		pos->x = jeepItem->Pose.Position.x + (dz * sinY) + (dx * cosY);
-		pos->y = jeepItem->Pose.Position.y - (dz * sinX) + (dx * sinZ);
-		pos->z = jeepItem->Pose.Position.z + (dz * cosY) - (dx * sinY);
-
-		auto probe = GetCollision(pos->x, pos->y, pos->z, jeepItem->RoomNumber);
-
-		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
-			return NO_HEIGHT;
-
-		if (pos->y > probe.Position.Floor)
-			pos->y = probe.Position.Floor;
-
-		return probe.Position.Floor;
-	}
-
 	static int DoJeepShift(ItemInfo* jeepItem, Vector3Int* pos, Vector3Int* old)
 	{
 		int x = pos->x / SECTOR(1);
@@ -523,11 +501,11 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int f_old, b_old, mm_old, mt_old, mb_old;
 
-		int hf_old = TestJeepHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, &f_old);
-		int hb_old = TestJeepHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, &b_old);
-		int hmm_old = TestJeepHeight(jeepItem, -(JEEP_FRONT + 50), -JEEP_SIDE, &mm_old);
-		int hmt_old = TestJeepHeight(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, &mt_old);
-		int hmb_old = TestJeepHeight(jeepItem, -(JEEP_FRONT + 50), 0, (Vector3Int*)&mb_old);
+		int hf_old = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, true, &f_old);
+		int hb_old = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, true, &b_old);
+		int hmm_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), -JEEP_SIDE, true, &mm_old);
+		int hmt_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, true, &mt_old);
+		int hmb_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), 0, true, &mb_old);
 
 		Vector3Int oldPos;
 		oldPos.x = jeepItem->Pose.Position.x;
@@ -683,11 +661,11 @@ namespace TEN::Entities::Vehicles
 		int rot1 = 0;
 		int rot2 = 0;
 
-		int hf = TestJeepHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, (Vector3Int*)&f);
+		int hf = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, false, &f);
 		if (hf < f_old.y - STEP_SIZE)
 			rot1 = abs(4 * DoJeepShift(jeepItem, &f, &f_old));
 
-		int hmm = TestJeepHeight(jeepItem, -(JEEP_FRONT + 50), -JEEP_SIDE, (Vector3Int*)&mm);
+		int hmm = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), -JEEP_SIDE, false, &mm);
 		if (hmm < mm_old.y - STEP_SIZE)
 		{
 			if (rot)
@@ -696,15 +674,15 @@ namespace TEN::Entities::Vehicles
 				rot1 = -abs(4 * DoJeepShift(jeepItem, &mm, &mm_old));
 		}
 
-		int hb = TestJeepHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, (Vector3Int*)&b);
+		int hb = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, false, &b);
 		if (hb < b_old.y - STEP_SIZE)
 			rot2 = -abs(4 * DoJeepShift(jeepItem, &b, &b_old));
 
-		int hmb = TestJeepHeight(jeepItem, -(JEEP_FRONT + 50), 0, (Vector3Int*)&mb);
+		int hmb = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), 0, false, &mb);
 		if (hmb < mb_old.y - STEP_SIZE)
 			DoJeepShift(jeepItem, &mb, &mb_old);
 	
-		int hmt = TestJeepHeight(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, (Vector3Int*)&mt);
+		int hmt = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, false, &mt);
 		if (hmt < mt_old.y - STEP_SIZE)
 		{
 			if (rot2)
@@ -1465,9 +1443,9 @@ namespace TEN::Entities::Vehicles
 		int ceiling = GetCeiling(floor, jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z);
 
 		Vector3Int fl, fr, bc;
-		int hfl = TestJeepHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, &fl);
-		int hfr = TestJeepHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, &fr);
-		int hbc = TestJeepHeight(jeepItem, -(JEEP_FRONT + 50), 0, &bc);
+		int hfl = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, true, &fl);
+		int hfr = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, true, &fr);
+		int hbc = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), 0, true, &bc);
 
 		roomNumber = jeepItem->RoomNumber;
 		floor = GetFloor(jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z, &roomNumber);

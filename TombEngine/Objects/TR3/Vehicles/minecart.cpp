@@ -165,21 +165,6 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	static int TestMinecartHeight(ItemInfo* minecartItem, int xOffset, int zOffset)
-	{
-		float sinX = phd_sin(minecartItem->Pose.Orientation.x);
-		float sinY = phd_sin(minecartItem->Pose.Orientation.y);
-		float cosY = phd_cos(minecartItem->Pose.Orientation.y);
-		float sinZ = phd_sin(minecartItem->Pose.Orientation.z);
-
-		auto pos = Vector3Int(
-			minecartItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY),
-			minecartItem->Pose.Position.y - (zOffset * sinX) + (xOffset * sinZ),
-			minecartItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY)
-		);
-		return GetCollision(pos.x, pos.y, pos.z, minecartItem->RoomNumber).Position.Floor;
-	}
-
 	static short GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance)
 	{
 		auto probe = GetCollision(minecartItem, angle, distance, -LARA_HEIGHT);
@@ -511,12 +496,12 @@ namespace TEN::Entities::Vehicles
 		else
 			TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, minecartItem->Animation.Velocity);
 
-		minecart->FloorHeightMiddle = TestMinecartHeight(minecartItem, 0, 0);
+		minecart->FloorHeightMiddle = GetVehicleHeight(minecartItem, 0, 0, true, &Vector3Int());
 
 		if (!minecart->VerticalVelocity)
 		{
 			minecartItem->Pose.Position.y = minecart->FloorHeightMiddle;
-			minecart->FloorHeightFront = TestMinecartHeight(minecartItem, 0, CLICK(1));
+			minecart->FloorHeightFront = GetVehicleHeight(minecartItem, CLICK(1), 0, false, &Vector3Int());
 			minecart->Gradient = minecart->FloorHeightMiddle - minecart->FloorHeightFront;
 		}
 		else
