@@ -231,12 +231,14 @@ namespace TEN::Entities::Vehicles
 
 	int SpeedboatTestWaterHeight(ItemInfo* speedboatItem, int zOffset, int xOffset, Vector3Int* pos)
 	{
-		float s = phd_sin(speedboatItem->Pose.Orientation.y);
-		float c = phd_cos(speedboatItem->Pose.Orientation.y);
+		float sinX = phd_sin(speedboatItem->Pose.Orientation.x);
+		float sinY = phd_sin(speedboatItem->Pose.Orientation.y);
+		float cosY = phd_cos(speedboatItem->Pose.Orientation.y);
+		float sinZ = phd_sin(speedboatItem->Pose.Orientation.z);
 
-		pos->x = speedboatItem->Pose.Position.x + zOffset * s + xOffset * c;
-		pos->y = speedboatItem->Pose.Position.y - zOffset * phd_sin(speedboatItem->Pose.Orientation.x) + xOffset * phd_sin(speedboatItem->Pose.Orientation.z);
-		pos->z = speedboatItem->Pose.Position.z + zOffset * c - xOffset * s;
+		pos->x = speedboatItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
+		pos->y = speedboatItem->Pose.Position.y - (zOffset * sinX) + (xOffset * sinZ);
+		pos->z = speedboatItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
 
 		auto probe = GetCollision(pos->x, pos->y, pos->z, speedboatItem->RoomNumber);
 		auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);

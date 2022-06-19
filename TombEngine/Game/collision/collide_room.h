@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	Vector3 Coordinates;
+	Vector3Int Coordinates;
 	int RoomNumber;
 
 	FloorInfo* Block;
@@ -128,6 +128,8 @@ CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float 
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
+CollisionResult GetVehicleCollision(ItemInfo* item, int forward, int lateral);
+
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
 int   GetQuadrant(short angle);
@@ -162,3 +164,4 @@ bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);
+
