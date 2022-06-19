@@ -173,7 +173,7 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 	CollisionResult result = {};
 
 	// Record coordinates.
-	result.Coordinates = Vector3(x, y, z);
+	result.Coordinates = Vector3Int(x, y, z);
 
 	// Return provided block into result as itself.
 	result.Block = floor;
@@ -208,6 +208,21 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 		result.FloorTilt = Vector2::Zero;*/
 
 	return result;
+}
+
+CollisionResult GetVehicleCollision(ItemInfo* item, int forward, int lateral)
+{
+	float sinX = phd_sin(item->Pose.Orientation.x);
+	float sinY = phd_sin(item->Pose.Orientation.y);
+	float cosY = phd_cos(item->Pose.Orientation.y);
+	float sinZ = phd_sin(item->Pose.Orientation.z);
+
+	auto point = Vector3Int(
+		(int)round(item->Pose.Position.x + (forward * sinY) + (lateral * cosY)),
+		(int)round(item->Pose.Position.y - (forward * sinX) + (lateral * sinZ)),
+		(int)round(item->Pose.Position.z + (forward * cosY) - (lateral * sinY))
+	);
+	return GetCollision(point.x, point.y, point.z, item->RoomNumber);
 }
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)

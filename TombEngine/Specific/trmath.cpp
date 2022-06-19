@@ -282,7 +282,7 @@ Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertic
 
 	vector.x += (forward * sinAngle) + (lateral * cosAngle);
 	vector.y += vertical;
-	vector.z += (forward * cosAngle) + (lateral * -sinAngle);
+	vector.z += (forward * cosAngle) - (lateral * sinAngle);
 	return vector;
 }
 

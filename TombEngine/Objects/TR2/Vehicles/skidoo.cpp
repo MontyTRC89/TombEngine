@@ -25,41 +25,41 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	#define DAMAGE_START	140
-	#define DAMAGE_LENGTH	14
+	constexpr auto SKIDOO_RADIUS = 500;
+	constexpr auto SKIDOO_DISMOUNT_DISTANCE = 295;
+	constexpr auto SKIDOO_FRONT = 550;
+	constexpr auto SKIDOO_SIDE = 260;
+	constexpr auto SKIDOO_SLIP = 100;
+	constexpr auto SKIDOO_SLIP_SIDE = 50;
+	constexpr auto SKIDOO_SNOW = 500;
 
-	#define SKIDOO_DISMOUNT_DISTANCE 295
+	constexpr auto DAMAGE_START = 140;
+	constexpr auto DAMAGE_LENGTH = 14;
 
-	#define SKIDOO_UNDO_TURN			ANGLE(2.0f)
-	#define SKIDOO_TURN					(ANGLE(0.5f) + SKIDOO_UNDO_TURN)
-	#define SKIDOO_MAX_TURN				ANGLE(6.0f)
-	#define SKIDOO_MOMENTUM_TURN		ANGLE(3.0f)
-	#define SKIDOO_MAX_MOMENTUM_TURN	ANGLE(150.0f)
+	constexpr auto SKIDOO_FAST_VELOCITY = 150;
+	constexpr auto SKIDOO_NORMAL_VELOCITY = 100;
+	constexpr auto SKIDOO_SLOW_VELOCITY = 50;
+	constexpr auto SKIDOO_TURN_VELOCITY = 15;
 
-	#define SKIDOO_FAST_VELOCITY	150
-	#define SKIDOO_MAX_VELOCITY		100
-	#define SKIDOO_SLOW_VELOCITY	50
-	#define SKIDOO_MIN_VELOCITY		15
+	constexpr auto SKIDOO_VELOCITY_ACCEL = 10;
+	constexpr auto SKIDOO_VELOCITY_DECEL = 2;
+	constexpr auto SKIDOO_VELOCITY_BRAKE_DECEL = 5;
+	constexpr auto SKIDOO_REVERSE_VELOCITY = 5;
+	constexpr auto SKIDOO_REVERSE_VELOCITY_MAX = 30;
+	constexpr auto SKIDOO_MAX_KICK = -80;
 
-	#define SKIDOO_ACCELERATION	10
-	#define SKIDOO_BRAKE		5
-	#define SKIDOO_SLOWDOWN		2
-	#define SKIDOO_REVERSE		-5
-	#define SKIDOO_MAX_BACK		-30
-	#define SKIDOO_MAX_KICK		-80
+	constexpr auto SKIDOO_MAX_HEIGHT = CLICK(1);
+	constexpr auto SKIDOO_MIN_BOUNCE = (SKIDOO_NORMAL_VELOCITY / 2) / 256;
 
-	#define SKIDOO_SLIP			100
-	#define SKIDOO_SLIP_SIDE	50
-	#define SKIDOO_FRONT		550
-	#define SKIDOO_SIDE			260
-	#define SKIDOO_RADIUS		500
-	#define SKIDOO_SNOW			500
-
-	#define SKIDOO_MAX_HEIGHT CLICK(1)
-	#define SKIDOO_MIN_BOUNCE ((SKIDOO_MAX_VELOCITY / 2) / 256)
+	#define SKIDOO_TURN_RATE_ACCEL			ANGLE(2.5f)
+	#define SKIDOO_TURN_RATE_DECEL			ANGLE(2.0f)
+	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
+	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
+	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
 
 	#define SKIDOO_IN_ACCELERATE	IN_FORWARD
 	#define SKIDOO_IN_BRAKE			IN_BACK
+	#define SKIDOO_IN_SPEED			IN_SPRINT // TODO: This is new and currently unused. Decouple fire/speed input with it. @Sezz
 	#define SKIDOO_IN_SLOW			IN_WALK
 	#define SKIDOO_IN_FIRE			IN_ACTION
 	#define SKIDOO_IN_DISMOUNT		(IN_JUMP | IN_ROLL)
@@ -425,7 +425,7 @@ namespace TEN::Entities::Vehicles
 			skidoo->TrackMesh = ((skidoo->TrackMesh & 3) == 1) ? 2 : 1;
 			skidoo->Pitch += (pitch - skidoo->Pitch) / 4;
 
-			auto pitch = std::clamp(0.5f + (float)abs(skidoo->Pitch) / (float)SKIDOO_MAX_VELOCITY, 0.6f, 1.4f);
+			auto pitch = std::clamp(0.5f + (float)abs(skidoo->Pitch) / (float)SKIDOO_NORMAL_VELOCITY, 0.6f, 1.4f);
 			SoundEffect(skidoo->Pitch ? SFX_TR2_VEHICLE_SNOWMOBILE_MOVING : SFX_TR2_VEHICLE_SNOWMOBILE_ACCELERATE, &skidooItem->Pose, SoundEnvironment::Land, pitch);
 		}
 		else
@@ -535,27 +535,27 @@ namespace TEN::Entities::Vehicles
 			if ((TrInput & SKIDOO_IN_LEFT && !(TrInput & SKIDOO_IN_BRAKE)) ||
 				(TrInput & SKIDOO_IN_RIGHT && TrInput & SKIDOO_IN_BRAKE))
 			{
-				skidoo->TurnRate -= SKIDOO_TURN;
-				if (skidoo->TurnRate < -SKIDOO_MAX_TURN)
-					skidoo->TurnRate = -SKIDOO_MAX_TURN;
+				skidoo->TurnRate -= SKIDOO_TURN_RATE_ACCEL;
+				if (skidoo->TurnRate < -SKIDOO_TURN_RATE_MAX)
+					skidoo->TurnRate = -SKIDOO_TURN_RATE_MAX;
 			}
 
 			if ((TrInput & SKIDOO_IN_RIGHT && !(TrInput & SKIDOO_IN_BRAKE)) ||
 				(TrInput & SKIDOO_IN_LEFT && TrInput & SKIDOO_IN_BRAKE))
 			{
-				skidoo->TurnRate += SKIDOO_TURN;
-				if (skidoo->TurnRate > SKIDOO_MAX_TURN)
-					skidoo->TurnRate = SKIDOO_MAX_TURN;
+				skidoo->TurnRate += SKIDOO_TURN_RATE_ACCEL;
+				if (skidoo->TurnRate > SKIDOO_TURN_RATE_MAX)
+					skidoo->TurnRate = SKIDOO_TURN_RATE_MAX;
 			}
 
 			if (TrInput & SKIDOO_IN_BRAKE)
 			{
 				if (skidooItem->Animation.Velocity > 0)
-					skidooItem->Animation.Velocity -= SKIDOO_BRAKE;
+					skidooItem->Animation.Velocity -= SKIDOO_VELOCITY_BRAKE_DECEL;
 				else
 				{
-					if (skidooItem->Animation.Velocity > SKIDOO_MAX_BACK)
-						skidooItem->Animation.Velocity += SKIDOO_REVERSE;
+					if (skidooItem->Animation.Velocity > -SKIDOO_REVERSE_VELOCITY_MAX)
+						skidooItem->Animation.Velocity -= SKIDOO_REVERSE_VELOCITY;
 
 					drive = true;
 				}
@@ -567,24 +567,24 @@ namespace TEN::Entities::Vehicles
 				else if (TrInput & SKIDOO_IN_SLOW)
 					maxVelocity = SKIDOO_SLOW_VELOCITY;
 				else
-					maxVelocity = SKIDOO_MAX_VELOCITY;
+					maxVelocity = SKIDOO_NORMAL_VELOCITY;
 
 				if (skidooItem->Animation.Velocity < maxVelocity)
-					skidooItem->Animation.Velocity += (SKIDOO_ACCELERATION / 2) + (SKIDOO_ACCELERATION * (skidooItem->Animation.Velocity / (2 * maxVelocity)));
-				else if (skidooItem->Animation.Velocity > (maxVelocity + SKIDOO_SLOWDOWN))
-					skidooItem->Animation.Velocity -= SKIDOO_SLOWDOWN;
+					skidooItem->Animation.Velocity += (SKIDOO_VELOCITY_ACCEL / 2) + (SKIDOO_VELOCITY_ACCEL * (skidooItem->Animation.Velocity / (2 * maxVelocity)));
+				else if (skidooItem->Animation.Velocity > (maxVelocity + SKIDOO_VELOCITY_DECEL))
+					skidooItem->Animation.Velocity -= SKIDOO_VELOCITY_DECEL;
 				drive = true;
 			}
 			else if (TrInput & (SKIDOO_IN_LEFT | SKIDOO_IN_RIGHT) &&
 				skidooItem->Animation.Velocity >= 0 &&
-				skidooItem->Animation.Velocity < SKIDOO_MIN_VELOCITY)
+				skidooItem->Animation.Velocity < SKIDOO_TURN_VELOCITY)
 			{
-				skidooItem->Animation.Velocity = SKIDOO_MIN_VELOCITY;
+				skidooItem->Animation.Velocity = SKIDOO_TURN_VELOCITY;
 				drive = true;
 			}
-			else if (skidooItem->Animation.Velocity > SKIDOO_SLOWDOWN)
+			else if (skidooItem->Animation.Velocity > SKIDOO_VELOCITY_DECEL)
 			{
-				skidooItem->Animation.Velocity -= SKIDOO_SLOWDOWN;
+				skidooItem->Animation.Velocity -= SKIDOO_VELOCITY_DECEL;
 				if ((GetRandomControl() & 0x7f) < skidooItem->Animation.Velocity)
 					drive = true;
 			}
@@ -710,6 +710,7 @@ namespace TEN::Entities::Vehicles
 
 	int DoSkidooDynamics(int height, int verticalVelocity, int* y)
 	{
+		// Grounded.
 		if (height > *y)
 		{
 			*y += verticalVelocity;
@@ -721,6 +722,7 @@ namespace TEN::Entities::Vehicles
 			else
 				verticalVelocity += GRAVITY;
 		}
+		// Airborne.
 		else
 		{
 			int kick = (height - *y) * 4;
@@ -866,10 +868,7 @@ namespace TEN::Entities::Vehicles
 		auto heightBackLeftOld = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, &backLeftOld);
 		auto heightBackRightOld = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, &backRightOld);
 
-		Vector3Int old;
-		old.x = skidooItem->Pose.Position.x;
-		old.y = skidooItem->Pose.Position.y;
-		old.z = skidooItem->Pose.Position.z;
+		auto oldPos = skidooItem->Pose.Position;
 
 		if (backLeftOld.y > heightBackLeftOld)
 			backLeftOld.y = heightBackLeftOld;
@@ -884,34 +883,34 @@ namespace TEN::Entities::Vehicles
 
 		if (skidooItem->Pose.Position.y > (skidooItem->Floor - CLICK(1)))
 		{
-			if (skidoo->TurnRate < -SKIDOO_UNDO_TURN)
-				skidoo->TurnRate += SKIDOO_UNDO_TURN;
-			else if (skidoo->TurnRate > SKIDOO_UNDO_TURN)
-				skidoo->TurnRate -= SKIDOO_UNDO_TURN;
+			if (skidoo->TurnRate < -SKIDOO_TURN_RATE_DECEL)
+				skidoo->TurnRate += SKIDOO_TURN_RATE_DECEL;
+			else if (skidoo->TurnRate > SKIDOO_TURN_RATE_DECEL)
+				skidoo->TurnRate -= SKIDOO_TURN_RATE_DECEL;
 			else
 				skidoo->TurnRate = 0;
 			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
 
 			rotation = skidooItem->Pose.Orientation.y - skidoo->MomentumAngle;
-			if (rotation < -SKIDOO_MOMENTUM_TURN)
+			if (rotation < -SKIDOO_MOMENTUM_TURN_RATE_ACCEL)
 			{
-				if (rotation < -SKIDOO_MAX_MOMENTUM_TURN)
+				if (rotation < -SKIDOO_MOMENTUM_TURN_RATE_MAX)
 				{
-					rotation = -SKIDOO_MAX_MOMENTUM_TURN;
+					rotation = -SKIDOO_MOMENTUM_TURN_RATE_MAX;
 					skidoo->MomentumAngle = skidooItem->Pose.Orientation.y - rotation;
 				}
 				else
-					skidoo->MomentumAngle -= SKIDOO_MOMENTUM_TURN;
+					skidoo->MomentumAngle -= SKIDOO_MOMENTUM_TURN_RATE_ACCEL;
 			}
-			else if (rotation > SKIDOO_MOMENTUM_TURN)
+			else if (rotation > SKIDOO_MOMENTUM_TURN_RATE_ACCEL)
 			{
-				if (rotation > SKIDOO_MAX_MOMENTUM_TURN)
+				if (rotation > SKIDOO_MOMENTUM_TURN_RATE_MAX)
 				{
-					rotation = SKIDOO_MAX_MOMENTUM_TURN;
+					rotation = SKIDOO_MOMENTUM_TURN_RATE_MAX;
 					skidoo->MomentumAngle = skidooItem->Pose.Orientation.y - rotation;
 				}
 				else
-					skidoo->MomentumAngle += SKIDOO_MOMENTUM_TURN;
+					skidoo->MomentumAngle += SKIDOO_MOMENTUM_TURN_RATE_ACCEL;
 			}
 			else
 				skidoo->MomentumAngle = skidooItem->Pose.Orientation.y;
@@ -963,15 +962,15 @@ namespace TEN::Entities::Vehicles
 
 		auto probe = GetCollision(skidooItem);
 		if (probe.Position.Floor < (skidooItem->Pose.Position.y - CLICK(1)))
-			DoSkidooShift(skidooItem, (Vector3Int*)&skidooItem->Pose, &old);
+			DoSkidooShift(skidooItem, (Vector3Int*)&skidooItem->Pose, &oldPos);
 
 		skidoo->ExtraRotation = rotation;
 
 		auto collide = GetSkidooCollisionAnim(skidooItem, &moved);
 		if (collide)
 		{
-			int newVelocity = (skidooItem->Pose.Position.z - old.z) * phd_cos(skidoo->MomentumAngle) + (skidooItem->Pose.Position.x - old.x) * phd_sin(skidoo->MomentumAngle);
-			if (skidooItem->Animation.Velocity > (SKIDOO_MAX_VELOCITY + SKIDOO_ACCELERATION) &&
+			int newVelocity = (skidooItem->Pose.Position.z - oldPos.z) * phd_cos(skidoo->MomentumAngle) + (skidooItem->Pose.Position.x - oldPos.x) * phd_sin(skidoo->MomentumAngle);
+			if (skidooItem->Animation.Velocity > (SKIDOO_NORMAL_VELOCITY + SKIDOO_VELOCITY_ACCEL) &&
 				newVelocity < (skidooItem->Animation.Velocity - 10))
 			{
 				laraItem->HitPoints -= (skidooItem->Animation.Velocity - newVelocity) / 2;
@@ -983,8 +982,8 @@ namespace TEN::Entities::Vehicles
 			else if (skidooItem->Animation.Velocity < 0 && newVelocity > skidooItem->Animation.Velocity)
 				skidooItem->Animation.Velocity = (newVelocity > 0) ? 0 : newVelocity;
 
-			if (skidooItem->Animation.Velocity < SKIDOO_MAX_BACK)
-				skidooItem->Animation.Velocity = SKIDOO_MAX_BACK;
+			if (skidooItem->Animation.Velocity < SKIDOO_REVERSE_VELOCITY_MAX)
+				skidooItem->Animation.Velocity = SKIDOO_REVERSE_VELOCITY_MAX;
 		}
 
 		return collide;

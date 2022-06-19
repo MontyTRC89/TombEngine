@@ -41,7 +41,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_ACCEL = 128 * 256;
 	constexpr auto MOTORBIKE_BACKING_VEL = 8 * 256;
 	constexpr auto MOTORBIKE_BIG_SLOWDOWN = 48 * 256;
-	constexpr auto MOTORBIKE_SLOWDOWN1 = 1088; // 4.25f * 256; // TODO: Float velocities. @Sezz 2022.06.16
+	constexpr auto MOTORBIKE_SLOWDOWN1 = (int)(4.25f * 256); // TODO: Float velocities. @Sezz 2022.06.16
 	constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * 256;
 
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
