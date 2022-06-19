@@ -160,6 +160,9 @@ namespace TEN::Entities::Vehicles
 		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
 			return NO_HEIGHT;
 
+		if (pos->y > probe.Position.Floor)
+			pos->y = probe.Position.Floor;
+
 		return probe.Position.Floor;
 	}
 
