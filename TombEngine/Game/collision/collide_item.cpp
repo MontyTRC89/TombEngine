@@ -1716,13 +1716,21 @@ int GetVehicleHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3Int* 
 
 int GetVehicleWaterHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3Int* pos)
 {
-	int roomNumber = vehicle->RoomNumber;
-	auto height = GetWaterHeight(pos->x, pos->y, pos->z, roomNumber);
-	auto result = GetVehicleHeight(vehicle, dz, dx, clamp, pos);
+	float sinX = phd_sin(vehicle->Pose.Orientation.x);
+	float sinY = phd_sin(vehicle->Pose.Orientation.y);
+	float cosY = phd_cos(vehicle->Pose.Orientation.y);
+	float sinZ = phd_sin(vehicle->Pose.Orientation.z);
+
+	pos->x = vehicle->Pose.Position.x + (dz * sinY) + (dx * cosY);
+	pos->y = vehicle->Pose.Position.y - (dz * sinX) + (dx * sinZ);
+	pos->z = vehicle->Pose.Position.z + (dz * cosY) - (dx * sinY);
+
+	auto probe = GetCollision(pos->x, pos->y, pos->z, vehicle->RoomNumber);
+	auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
 
 	if (height == NO_HEIGHT)
 	{
-		height = result;
+		height = probe.Position.Floor;
 		if (height == NO_HEIGHT)
 			return height;
 	}
