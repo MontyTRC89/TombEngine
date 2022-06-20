@@ -20,6 +20,7 @@
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/prng.h"
 
+using namespace TEN::Input;
 using std::vector;
 
 namespace TEN::Entities::Vehicles

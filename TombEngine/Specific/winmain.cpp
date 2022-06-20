@@ -19,6 +19,8 @@
 #include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Input;
+
 using std::exception;
 using std::string;
 using std::cout;
@@ -361,6 +363,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (g_Configuration.EnableSound)	
 		Sound_Init();
 
+	// Initialize input
+	InitialiseInput(App.WindowHandle, App.hInstance);
+
 	// Load level if specified in command line
 	CurrentLevel = -1;
 	if (!levelFile.empty() && levelHash != 0)
@@ -389,9 +394,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
 
 	DoTheGame = true;
-
-	// Initialize input
-	InitialiseInput(App.WindowHandle, App.hInstance);
 
 	ThreadEnded = false;
 	ThreadHandle = BeginThread(GameMain, ThreadID);

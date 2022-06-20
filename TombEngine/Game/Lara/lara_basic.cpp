@@ -19,6 +19,8 @@
 #include "Specific/setup.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Input;
+
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
 // Control & Collision Functions

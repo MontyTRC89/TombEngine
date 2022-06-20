@@ -12,6 +12,7 @@
 
 using std::vector;
 using namespace TEN::Renderer;
+using namespace TEN::Input;
 
 GameConfiguration g_Configuration;
 

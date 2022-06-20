@@ -22,6 +22,8 @@
 #include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Input;
+
 GuiController g_Gui;
 
 const char* optmessages[] =
@@ -762,9 +764,7 @@ void GuiController::FillDisplayOptions()
 
 void GuiController::HandleDisplaySettingsInput(bool pause)
 {
-	SetDebounce = true;
 	UpdateInput();
-	SetDebounce = false;
 
 	DoDebouncedInput();
 
@@ -901,9 +901,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 		return;
 	}
 
-	SetDebounce = true;
 	UpdateInput();
-	SetDebounce = false;
 	DoDebouncedInput();
 
 	if (goSelect && selected_option != 16 && selected_option != 17)
@@ -920,9 +918,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 		while (true)
 		{
-			SetDebounce = true;
 			UpdateInput();
-			SetDebounce = false;
 
 			if (CurrentSettings.ignoreInput)
 			{
@@ -1029,9 +1025,7 @@ void GuiController::FillSound()
 
 void GuiController::HandleSoundSettingsInput(bool pause)
 {
-	SetDebounce = true;
 	UpdateInput();
-	SetDebounce = false;
 	DoDebouncedInput();
 
 	if (goDeselect)
@@ -1215,9 +1209,7 @@ InventoryResult GuiController::DoPauseMenu()
 	}
 
 	ClearInputVariables(1);
-	SetDebounce = true;
 	UpdateInput();
-	SetDebounce = false;
 	DoDebouncedInput();
 
 	if (menu_to_display == Menu::Pause || menu_to_display == Menu::Options)
@@ -3204,7 +3196,6 @@ bool GuiController::CallInventory(bool reset_mode)
 		if (compassNeedleAngle != 1024)
 			compassNeedleAngle -= 32;
 
-		SetDebounce = true;
 		UpdateInput();
 		TrInput = InputBusy;
 		GameTimer++;

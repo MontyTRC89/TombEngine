@@ -25,6 +25,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Input;
 
 // -----------------------------
 // HELPER FUNCTIONS

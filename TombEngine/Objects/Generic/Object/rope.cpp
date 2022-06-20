@@ -15,6 +15,8 @@
 #include "Sound/sound.h"
 #include "Game/camera.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Generic
 {
 	PENDULUM CurrentPendulum;

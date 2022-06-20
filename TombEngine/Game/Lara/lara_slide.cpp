@@ -12,6 +12,8 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // SLIDE
 // Control & Collision Functions

@@ -29,6 +29,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Input;
 
 bool MonksAttackLara;
 ItemInfo* LastTargets[MAX_TARGETS];

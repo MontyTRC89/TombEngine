@@ -16,6 +16,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	#define KAYAK_COLLIDE			CLICK(0.25f)

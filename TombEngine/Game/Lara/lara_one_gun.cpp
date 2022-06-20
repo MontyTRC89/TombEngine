@@ -26,6 +26,7 @@
 #include "Specific/input.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;

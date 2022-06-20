@@ -17,6 +17,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Vehicles

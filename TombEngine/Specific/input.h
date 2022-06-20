@@ -7,8 +7,8 @@
 #include <OISEvents.h>
 #include <OISForceFeedback.h>
 
-//namespace TEN::Input
-//{
+namespace TEN::Input
+{
 	constexpr int NUM_CONTROLS = 16;
 
 	constexpr int JOY_AXIS_DEADZONE  = 2500;
@@ -90,7 +90,6 @@
 	extern int TrInput;
 	extern int DbInput;
 	extern int InputBusy;
-	extern bool SetDebounce;
 
 	extern short KeyboardLayout[2][18];
 
@@ -98,7 +97,7 @@
 	extern std::vector<float>  AxisMap;
 
 	void InitialiseInput(HWND handle, HINSTANCE instance);
-	bool UpdateInput();
+	bool UpdateInput(bool debounce = true);
 	bool Key(int number);
 	void DefaultConflict();
-//}
+}

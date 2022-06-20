@@ -20,6 +20,8 @@
 #include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
+
+using namespace TEN::Input;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Environment;
 
