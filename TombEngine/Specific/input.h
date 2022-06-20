@@ -20,9 +20,40 @@ namespace TEN::Input
 	constexpr int LAST_KEYBOARD_KEY  = MAX_KEYBOARD_KEYS - 1;
 	constexpr int LAST_JOYSTICK_KEY  = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS - 1;
 
-	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + MAX_POV_AXES;
+	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_POV_AXES + MAX_JOYSTICK_AXES * 2;
 
-	enum INPUT_BUTTONS
+	enum class InputAxis
+	{
+		MoveVertical,
+		MoveHorizontal,
+		CameraVertical,
+		CameraHorizontal,
+		Count
+	};
+
+	enum InputKeys
+	{
+		KEY_FORWARD = 0,
+		KEY_BACK = 1,
+		KEY_LEFT = 2,
+		KEY_RIGHT = 3,
+		KEY_CROUCH = 4,
+		KEY_SPRINT = 5,
+		KEY_WALK = 6,
+		KEY_JUMP = 7,
+		KEY_ACTION = 8,
+		KEY_DRAW = 9,
+		KEY_FLARE = 10,
+		KEY_LOOK = 11,
+		KEY_ROLL = 12,
+		KEY_OPTION = 13,
+		KEY_LSTEP = 14,
+		KEY_RSTEP = 15,
+		KEY_PAUSE = 16,
+		KEY_SELECT = 17
+	};
+
+	enum InputActions
 	{
 		IN_NONE = 0,								// 0x00000000
 		IN_FORWARD = (1 << 0),						// 0x00000001
@@ -64,37 +95,15 @@ namespace TEN::Input
 	constexpr int IN_WAKE = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION);
 	constexpr int IN_DIRECTION = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT);
 
-	enum IKEYS
-	{
-		KEY_FORWARD = 0,
-		KEY_BACK = 1,
-		KEY_LEFT = 2,
-		KEY_RIGHT = 3,
-		KEY_CROUCH = 4,
-		KEY_SPRINT = 5,
-		KEY_WALK = 6,
-		KEY_JUMP = 7,
-		KEY_ACTION = 8,
-		KEY_DRAW = 9,
-		KEY_FLARE = 10,
-		KEY_LOOK = 11,
-		KEY_ROLL = 12,
-		KEY_OPTION = 13,
-		KEY_LSTEP = 14,
-		KEY_RSTEP = 15,
-		KEY_PAUSE = 16,
-		KEY_SELECT = 17
-	};
-
 	extern const char* g_KeyNames[];
 	extern int TrInput;
 	extern int DbInput;
 	extern int InputBusy;
 
-	extern short KeyboardLayout[2][NUM_CONTROLS];
-
 	extern std::vector<bool>   KeyMap;
 	extern std::vector<float>  AxisMap;
+
+	extern short KeyboardLayout[2][NUM_CONTROLS];
 
 	void InitialiseInput(HWND handle, HINSTANCE instance);
 	bool UpdateInput(bool debounce = true);

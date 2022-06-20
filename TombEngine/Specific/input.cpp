@@ -55,7 +55,6 @@ namespace TEN::Input
 			"JOY9",		"JOY10",	"JOY11",	"JOY12",	"JOY13",	"JOY14",	"JOY15",	"JOY16",
 
 			"X-",		"X+",		"Y-",		"Y+",		"Z+",		"Z-",		"W+",		"W-", 
-
 			"U+",		"U-",		"V+",		"V-",		"POV_UP",	"POV_DOWN", "POV_LEFT", "POV_RIGHT"
 	};
 
@@ -85,8 +84,8 @@ namespace TEN::Input
 		unsigned int v = g_InputManager->getVersionNumber();
 		TENLog("OIS Version: " + std::to_string(v >> 16) + "." + std::to_string((v >> 8) & 0x000000FF) + "." + std::to_string(v & 0x000000FF), LogLevel::Info);
 
-		KeyMap.resize(MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_POV_AXES + MAX_JOYSTICK_AXES * 2);
-		AxisMap.resize(MAX_JOYSTICK_AXES);
+		KeyMap.resize(MAX_INPUT_SLOTS);
+		AxisMap.resize((int)InputAxis::Count);
 
 		try
 		{
@@ -132,39 +131,68 @@ namespace TEN::Input
 
 		try
 		{
+			// Poll joystick
 			g_Joystick->capture();
 			const JoyStickState& joy = g_Joystick->getJoyStickState();
 
-			// Zero all joy keys, axis and POVs
+			// Zero all buttons, axis and POVs
 			for (unsigned int key = MAX_KEYBOARD_KEYS; key < KeyMap.size(); key++)
 				KeyMap[key] = false;
 
+			for (unsigned int axis = 0; axis < (unsigned int)InputAxis::Count; axis++)
+				AxisMap[axis] = 0.0f;
+
+			// Scan buttons
 			for (unsigned int key = 0; key < joy.mButtons.size(); key++)
 				KeyMap[MAX_KEYBOARD_KEYS + key] = joy.mButtons[key];
 
+			// Scan axes
 			for (unsigned int axis = 0; axis < joy.mAxes.size(); axis++)
 			{
-				if (axis >= AxisMap.size())
+				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers)
+				if (axis >= MAX_JOYSTICK_AXES)
 					break;
-
+				
+				// Filter out deadzone
 				if (abs(joy.mAxes[axis].abs) < JOY_AXIS_DEADZONE)
 					continue;
 
-				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) / 65536.0f;
-				AxisMap[axis] = normalizedValue;
+				// Calculate normalized analog value to be used in game later
+				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) / (float)std::numeric_limits<short>::max();
 
+				// Calculate and reset discrete input slots
 				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
 				int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2) + 1;
-
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
-				if (normalizedValue > 0)
-					KeyMap[negKeyIndex] = true;
+				// Decide on the discrete input registering based on analog value
+				int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
+				KeyMap[usedIndex] = true;
+
+				// Register analog input in certain direction.
+				// If axis is bound as directional controls, register axis as directional input.
+				// Otherwise, register as camera movement input (for future).
+				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
+
+				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
+					AxisMap[(int)InputAxis::MoveVertical] = abs(normalizedValue);
+				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
+					AxisMap[(int)InputAxis::MoveVertical] = -abs(normalizedValue);
+				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
+					AxisMap[(int)InputAxis::MoveHorizontal] = -abs(normalizedValue);
+				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
+					AxisMap[(int)InputAxis::MoveHorizontal] = abs(normalizedValue);
 				else
-					KeyMap[posKeyIndex] = true;
+				{
+					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2, 
+																		 (unsigned int)InputAxis::CameraVertical, 
+																		 (unsigned int)InputAxis::CameraHorizontal);
+					AxisMap[camAxisIndex] = normalizedValue;
+				}
 			}
 
+			// Scan POVs (controller usually have one, but let's scan all of them for paranoia)
 			for (unsigned int pov = 0; pov < 4; pov++)
 			{
 				if (joy.mPOV[pov].direction & Pov::North)
