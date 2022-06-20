@@ -196,7 +196,7 @@ using TEN::Renderer::g_Renderer;
 			}
 			else
 			{
-				g_Keyboard = (Keyboard*)g_InputManager->createInputObject(OISKeyboard, false, "");
+				g_Keyboard = (Keyboard*)g_InputManager->createInputObject(OISKeyboard, true);
 				g_Keyboard->setEventCallback(&handler);
 			}
 		}
@@ -212,7 +212,7 @@ using TEN::Renderer::g_Renderer;
 
 			try
 			{
-				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, false, "");
+				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, true);
 				g_Joystick->setEventCallback(&handler);
 			}
 			catch(OIS::Exception& ex)
