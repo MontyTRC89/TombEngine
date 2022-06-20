@@ -170,7 +170,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetMenuToDisplay(Menu::Pause);
 				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) &&
+			else if ((DbInput & IN_OPTION || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
 				// Stop all sounds

@@ -60,7 +60,8 @@ const char* controlmsgs[] =
 	STRING_CONTROLS_ROLL,
 	STRING_CONTROLS_INVENTORY,
 	STRING_CONTROLS_STEP_LEFT,
-	STRING_CONTROLS_STEP_RIGHT
+	STRING_CONTROLS_STEP_RIGHT,
+	STRING_CONTROLS_PAUSE
 };
 
 #define font_height 25
@@ -609,17 +610,14 @@ InventoryResult GuiController::TitleOptions()
 		break;
 
 	case Menu::Display:
-		option_count = 6;
 		HandleDisplaySettingsInput(false);
 		break;
 
 	case Menu::Controls:
-		option_count = 17;
 		HandleControlSettingsInput(false);
 		break;
 
 	case Menu::Sound:
-		option_count = 4;
 		HandleSoundSettingsInput(false);
 		break;
 	}
@@ -764,8 +762,9 @@ void GuiController::FillDisplayOptions()
 
 void GuiController::HandleDisplaySettingsInput(bool pause)
 {
-	UpdateInput();
+	option_count = 6;
 
+	UpdateInput();
 	DoDebouncedInput();
 
 	if (goDeselect)
@@ -891,8 +890,9 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 void GuiController::HandleControlSettingsInput(bool pause)
 {
+	option_count = 18;
+
 	CurrentSettings.waitingForkey = false;
-	memcpy(&CurrentSettings.conf.KeyboardLayout, &KeyboardLayout[1], NUM_CONTROLS);
 
 	if (CurrentSettings.ignoreInput)
 	{
@@ -904,7 +904,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	UpdateInput();
 	DoDebouncedInput();
 
-	if (goSelect && selected_option != 16 && selected_option != 17)
+	if (goSelect && (selected_option <= 16))
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		CurrentSettings.waitingForkey = true;
@@ -989,19 +989,20 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 		if (goSelect)
 		{
-			if (selected_option == 16) // Apply
+			if (selected_option == option_count - 1) // Apply
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
+				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], NUM_CONTROLS);
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
 				return;
 			}
 
-			if (selected_option == 17) // Cancel
+			if (selected_option == option_count) // Cancel
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+				memcpy(&KeyboardLayout[1], &CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
 				return;
@@ -1025,6 +1026,8 @@ void GuiController::FillSound()
 
 void GuiController::HandleSoundSettingsInput(bool pause)
 {
+	option_count = 4;
+
 	UpdateInput();
 	DoDebouncedInput();
 
@@ -1193,17 +1196,14 @@ InventoryResult GuiController::DoPauseMenu()
 		break;
 
 	case Menu::Display:
-		option_count = 6;
 		HandleDisplaySettingsInput(true);
 		break;
 
 	case Menu::Controls:
-		option_count = 17;
 		HandleControlSettingsInput(true);
 		break;
 
 	case Menu::Sound:
-		option_count = 4;
 		HandleSoundSettingsInput(true);
 		break;
 	}

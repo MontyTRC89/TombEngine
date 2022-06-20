@@ -83,7 +83,7 @@ namespace TEN::Input
 		KEY_LSTEP = 14,
 		KEY_RSTEP = 15,
 		KEY_PAUSE = 16,
-		KEY_SELECT = 17,
+		KEY_SELECT = 17
 	};
 
 	extern const char* g_KeyNames[];

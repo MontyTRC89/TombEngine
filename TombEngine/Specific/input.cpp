@@ -7,7 +7,6 @@
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
-#include "Specific/winmain.h"
 
 using namespace OIS;
 using TEN::Renderer::g_Renderer;
@@ -299,6 +298,44 @@ namespace TEN::Input
 		if (Key(KEY_DRAW))
 			lInput |= IN_DRAW;
 
+		if (Key(KEY_LOOK))
+			lInput |= IN_LOOK;
+
+		if (Key(KEY_ROLL))
+			lInput |= IN_ROLL;
+
+		if (Key(KEY_OPTION))
+			lInput |= IN_OPTION;
+
+		if (Key(KEY_LSTEP))
+			lInput |= IN_LSTEP;
+
+		if (Key(KEY_RSTEP))
+			lInput |= IN_RSTEP;
+
+		if (Key(KEY_PAUSE))
+			lInput |= IN_PAUSE;
+
+		if (Key(KEY_SELECT))
+			lInput |= IN_SELECT;
+
+		if (KeyMap[KC_ESCAPE] || Key(KEY_DRAW))
+			lInput |= IN_DESELECT;
+
+		// Switch debug pages
+
+		static int debugTimeout = 0;
+		if (KeyMap[KC_F10] || KeyMap[KC_F11])
+		{
+			if (debugTimeout == 0)
+			{
+				debugTimeout = 1;
+				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
+			}
+		}
+		else
+			debugTimeout = 0;
+
 		bool flare = false;
 		static bool flareNo = false;
 
@@ -325,57 +362,6 @@ namespace TEN::Input
 		}
 		else
 			flareNo = false;
-
-		if (Key(KEY_LOOK))
-			lInput |= IN_LOOK;
-
-		if (Key(KEY_ROLL))
-			lInput |= IN_ROLL;
-
-		if (Key(KEY_OPTION))
-			lInput |= IN_OPTION;
-
-		if (Key(KEY_LSTEP))
-			lInput |= IN_LSTEP;
-
-		if (Key(KEY_RSTEP))
-			lInput |= IN_RSTEP;
-
-		if (Key(KEY_PAUSE))
-			lInput |= IN_PAUSE;
-
-		if (Key(KEY_SELECT))
-			lInput |= IN_SELECT;
-
-		/*if (opt_ControlMethod == CM_JOYSTICK)
-		{
-			if (Key(opt_JLok + 256))
-				lInput |= IN_LOOK;
-
-			if (Key(opt_JRol + 256))
-				lInput |= IN_ROLL;
-
-			if (Key(opt_JInv + 256))
-				lInput |= IN_OPTION;
-		}*/
-
-		// CHECK
-		if (KeyMap[1])
-			lInput |= IN_OPTION | IN_DESELECT;
-
-		// Switch debug pages
-
-		static int debugTimeout = 0;
-		if (KeyMap[KC_F10] || KeyMap[KC_F11])
-		{
-			if (debugTimeout == 0)
-			{
-				debugTimeout = 1;
-				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-			}
-		}
-		else
-			debugTimeout = 0;
 
 		static int lookTimeout = 0;
 

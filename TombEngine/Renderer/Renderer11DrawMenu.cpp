@@ -195,14 +195,14 @@ namespace TEN::Renderer
 		case Menu::Controls:
 
 			// Setup needed parameters
-			y = MenuVerticalLineSpacing;
+			y = MenuVerticalNarrowLineSpacing;
 
 			// Title
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_YELLOW, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Control listing
-			for (int k = 0; k < 16; k++)
+			for (int k = 0; k < 17; k++)
 			{
 				DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(controlmsgs[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
@@ -211,18 +211,18 @@ namespace TEN::Renderer
 				else
 					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[KeyboardLayout[1][k]], PRINTSTRING_COLOR_ORANGE, SF(false));
 
-				if (k < 15)
+				if (k < 16)
 					GetNextNarrowLinePosition(&y);
 				else
 					GetNextBlockPosition(&y);
 			}
 
 			// Apply
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 16));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
 			break;
 		}
 	}

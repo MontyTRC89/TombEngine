@@ -85,6 +85,7 @@
 #define STRING_CONTROLS_INVENTORY		"controls_inventory"
 #define STRING_CONTROLS_STEP_LEFT		"controls_step_left"
 #define STRING_CONTROLS_STEP_RIGHT		"controls_step_right"
+#define STRING_CONTROLS_PAUSE			"controls_pause"
 #define STRING_TITLE_ITEMS				"items"
 #define STRING_TITLE_PUZZLES			"puzzles"
 #define STRING_TITLE_SETTINGS			"settings"
