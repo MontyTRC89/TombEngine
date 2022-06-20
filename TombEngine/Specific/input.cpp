@@ -363,7 +363,7 @@ using TEN::Renderer::g_Renderer;
 	bool UpdateInput()
 	{
 		ReadKeyboard();
-		ReadJoystick();
+		//ReadJoystick();
 
 		static int lInput;
 
