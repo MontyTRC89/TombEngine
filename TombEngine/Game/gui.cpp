@@ -763,7 +763,7 @@ void GuiController::FillDisplayOptions()
 void GuiController::HandleDisplaySettingsInput(bool pause)
 {
 	SetDebounce = true;
-	S_UpdateInput();
+	UpdateInput();
 	SetDebounce = false;
 
 	DoDebouncedInput();
@@ -902,7 +902,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	}
 
 	SetDebounce = true;
-	S_UpdateInput();
+	UpdateInput();
 	SetDebounce = false;
 	DoDebouncedInput();
 
@@ -917,12 +917,11 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	{
 		TrInput = 0;
 		DbInput = 0;
-		ZeroMemory(KeyMap, 256);
 
 		while (true)
 		{
 			SetDebounce = true;
-			S_UpdateInput();
+			UpdateInput();
 			SetDebounce = false;
 
 			if (CurrentSettings.ignoreInput)
@@ -1031,7 +1030,7 @@ void GuiController::FillSound()
 void GuiController::HandleSoundSettingsInput(bool pause)
 {
 	SetDebounce = true;
-	S_UpdateInput();
+	UpdateInput();
 	SetDebounce = false;
 	DoDebouncedInput();
 
@@ -1217,7 +1216,7 @@ InventoryResult GuiController::DoPauseMenu()
 
 	ClearInputVariables(1);
 	SetDebounce = true;
-	S_UpdateInput();
+	UpdateInput();
 	SetDebounce = false;
 	DoDebouncedInput();
 
@@ -3206,7 +3205,7 @@ bool GuiController::CallInventory(bool reset_mode)
 			compassNeedleAngle -= 32;
 
 		SetDebounce = true;
-		S_UpdateInput();
+		UpdateInput();
 		TrInput = InputBusy;
 		GameTimer++;
 
