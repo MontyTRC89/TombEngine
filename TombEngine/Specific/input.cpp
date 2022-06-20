@@ -185,19 +185,6 @@ using TEN::Renderer::g_Renderer;
 
 		for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			KeyMap[i] = g_Keyboard->isKeyDown((KeyCode)i);
-
-		// Empty the numeric pad keys
-		KeyMap[KC_DECIMAL] = 0;
-		KeyMap[KC_NUMPAD0] = 0;
-		KeyMap[KC_NUMPAD1] = 0;
-		KeyMap[KC_NUMPAD2] = 0;
-		KeyMap[KC_NUMPAD3] = 0;
-		KeyMap[KC_NUMPAD4] = 0;
-		KeyMap[KC_NUMPAD5] = 0;
-		KeyMap[KC_NUMPAD6] = 0;
-		KeyMap[KC_NUMPAD7] = 0;
-		KeyMap[KC_NUMPAD8] = 0;
-		KeyMap[KC_NUMPAD9] = 0;
 	}
 
 	bool Key(int number)
