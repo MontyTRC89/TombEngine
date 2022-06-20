@@ -128,10 +128,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
-		{
-			if (UpdateInput() == -1)
-				return GameStatus::None;
-		}
+			UpdateInput();
 
 		// Has Lara control been disabled?
 		if (Lara.Control.Locked || CurrentLevel == 0)
