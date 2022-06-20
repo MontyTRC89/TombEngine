@@ -80,100 +80,6 @@ using TEN::Renderer::g_Renderer;
 		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_DELETE, KC_PGDOWN, KC_P, KC_RETURN }
 	};
 
-	class EventHandler : public KeyListener, public JoyStickListener
-	{
-	public:
-		EventHandler() { }
-		~EventHandler() { }
-
-		bool keyPressed(const KeyEvent& arg)
-		{
-			if (arg.key >= KeyMap.size())
-				return true;
-
-			KeyMap[arg.key] = true;
-			return true;
-		}
-
-		bool keyReleased(const KeyEvent& arg)
-		{
-			if (arg.key >= KeyMap.size())
-				return true;
-
-			KeyMap[arg.key] = false;
-			return true;
-		}
-
-		bool buttonPressed(const JoyStickEvent& arg, int button)
-		{
-			if (button + MAX_KEYBOARD_KEYS >= KeyMap.size())
-				return true;
-
-			KeyMap[button + MAX_KEYBOARD_KEYS] = true;
-			return true;
-		}
-
-		bool buttonReleased(const JoyStickEvent& arg, int button)
-		{
-			if (button + MAX_KEYBOARD_KEYS >= KeyMap.size())
-				return true;
-
-			KeyMap[button + MAX_KEYBOARD_KEYS] = false;
-			return true;
-		}
-
-		bool axisMoved(const JoyStickEvent& arg, int axis)
-		{
-			return true;
-		}
-
-		bool sliderMoved(const JoyStickEvent& arg, int index)
-		{
-			std::cout << std::endl
-				<< arg.device->vendor() << ". Slider # " << index
-				<< " X Value: " << arg.state.mSliders[index].abX
-				<< " Y Value: " << arg.state.mSliders[index].abY;
-			return true;
-		}
-
-		bool povMoved(const JoyStickEvent& arg, int pov)
-		{
-			std::cout << std::endl
-				<< arg.device->vendor() << ". POV" << pov << " ";
-
-			if (arg.state.mPOV[pov].direction & Pov::North) //Going up
-				std::cout << "North";
-			else if (arg.state.mPOV[pov].direction & Pov::South) //Going down
-				std::cout << "South";
-
-			if (arg.state.mPOV[pov].direction & Pov::East) //Going right
-				std::cout << "East";
-			else if (arg.state.mPOV[pov].direction & Pov::West) //Going left
-				std::cout << "West";
-
-			if (arg.state.mPOV[pov].direction == Pov::Centered) //stopped/centered out
-				std::cout << "Centered";
-			return true;
-		}
-
-		bool vector3Moved(const JoyStickEvent& arg, int index)
-		{
-			std::cout.precision(2);
-			std::cout.flags(std::ios::fixed | std::ios::right);
-			std::cout << std::endl
-				<< arg.device->vendor() << ". Orientation # " << index
-				<< " X Value: " << arg.state.mVectors[index].x
-				<< " Y Value: " << arg.state.mVectors[index].y
-				<< " Z Value: " << arg.state.mVectors[index].z;
-			std::cout.precision();
-			std::cout.flags();
-			return true;
-		}
-	};
-
-	//Create a global instance
-	EventHandler handler;
-
 	void InitialiseInput(HWND handle, HINSTANCE instance)
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
@@ -184,6 +90,7 @@ using TEN::Renderer::g_Renderer;
 		try
 		{
 			g_InputManager = InputManager::createInputSystem((size_t)handle);
+			g_InputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (g_InputManager->getNumberOfDevices(OISKeyboard) == 0)
 			{
@@ -192,7 +99,6 @@ using TEN::Renderer::g_Renderer;
 			else
 			{
 				g_Keyboard = (Keyboard*)g_InputManager->createInputObject(OISKeyboard, true);
-				g_Keyboard->setEventCallback(&handler);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -208,9 +114,8 @@ using TEN::Renderer::g_Renderer;
 			try
 			{
 				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, true);
-				g_Joystick->setEventCallback(&handler);
 			}
-			catch(OIS::Exception& ex)
+			catch (OIS::Exception& ex)
 			{
 				TENLog("An exception occured during joystick init: " + std::string(ex.eText), LogLevel::Error);
 			}
@@ -358,7 +263,7 @@ using TEN::Renderer::g_Renderer;
 	bool UpdateInput()
 	{
 		ReadKeyboard();
-		//ReadJoystick();
+		ReadJoystick();
 
 		static int lInput;
 
