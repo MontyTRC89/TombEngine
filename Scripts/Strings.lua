@@ -259,6 +259,16 @@ local strings = {
 		"",
 		""
 	},
+	controls_pause = {
+		"Pause",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	controls_use_flare = {
 		"Use Flare",
 		"",
