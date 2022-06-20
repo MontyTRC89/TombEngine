@@ -356,6 +356,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	else
 		WindowsHandle = App.WindowHandle;
 
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	// Initialise the renderer
 	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
@@ -407,7 +409,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ThreadEnded = true;
 
 	while (DoTheGame);
-	
+
+	CoUninitialize();	
 	WinClose();
 	exit(EXIT_SUCCESS);
 }
