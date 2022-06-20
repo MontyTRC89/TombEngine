@@ -130,6 +130,15 @@ namespace TEN::Input
 		}
 	}
 
+	void ClearInputData()
+	{
+		for (unsigned int key = 0; key < KeyMap.size(); key++)
+			KeyMap[key] = false;
+
+		for (unsigned int axis = 0; axis < (unsigned int)InputAxis::Count; axis++)
+			AxisMap[axis] = 0.0f;
+	}
+
 	void ReadJoystick()
 	{
 		if (!g_Joystick)
@@ -140,13 +149,6 @@ namespace TEN::Input
 			// Poll joystick
 			g_Joystick->capture();
 			const JoyStickState& joy = g_Joystick->getJoyStickState();
-
-			// Zero all buttons, axis and POVs
-			for (unsigned int key = MAX_KEYBOARD_KEYS; key < KeyMap.size(); key++)
-				KeyMap[key] = false;
-
-			for (unsigned int axis = 0; axis < (unsigned int)InputAxis::Count; axis++)
-				AxisMap[axis] = 0.0f;
 
 			// Scan buttons
 			for (unsigned int key = 0; key < joy.mButtons.size(); key++)
@@ -230,7 +232,29 @@ namespace TEN::Input
 			g_Keyboard->capture();
 
 			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
-				KeyMap[i] = g_Keyboard->isKeyDown((KeyCode)i);
+			{
+				if (!g_Keyboard->isKeyDown((KeyCode)i))
+				{
+					KeyMap[i] = false;
+					continue;
+				}
+
+				KeyMap[i] = true;
+
+				// Register directional discrete keypresses as max analog axis values
+
+				for (int layout = 0; layout <= 1; layout++)
+				{
+					if (KeyboardLayout[layout][KEY_FORWARD] == i)
+						AxisMap[(int)InputAxis::MoveVertical] = 1.0f;
+					else if (KeyboardLayout[layout][KEY_BACK] == i)
+						AxisMap[(int)InputAxis::MoveVertical] = -1.0f;
+					else if (KeyboardLayout[layout][KEY_LEFT] == i)
+						AxisMap[(int)InputAxis::MoveHorizontal] = -1.0f;
+					else if (KeyboardLayout[layout][KEY_RIGHT] == i)
+						AxisMap[(int)InputAxis::MoveHorizontal] = 1.0f;
+				}
+			}
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -488,6 +512,7 @@ namespace TEN::Input
 
 	bool UpdateInput(bool debounce)
 	{
+		ClearInputData();
 		ReadKeyboard();
 		ReadJoystick();
 
