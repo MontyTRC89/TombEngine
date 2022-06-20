@@ -932,18 +932,18 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			else
 			{
 				int selectedKey = 0;
-				for (selectedKey = 0; selectedKey < 256; selectedKey++)
+				for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
 				{
-					if (KeyMap[selectedKey] & 0x80)
+					if (KeyMap[selectedKey])
 						break;
 				}
 
-				if (selectedKey == 256)
+				if (selectedKey == MAX_INPUT_SLOTS)
 					selectedKey = 0;
 
 				if (selectedKey && g_KeyNames[selectedKey])
 				{
-					if (selectedKey != DIK_ESCAPE)
+					if (selectedKey != OIS::KeyCode::KC_ESCAPE)
 					{
 						KeyboardLayout[1][selected_option] = selectedKey;
 						DefaultConflict();

@@ -61,7 +61,7 @@ void LaraCheatyBits(ItemInfo* item)
 
 	if (g_GameFlow->IsFlyCheatEnabled())
 	{
-		if (KeyMap[DIK_O])
+		if (KeyMap[OIS::KeyCode::KC_O])
 		{
 			if (lara->Vehicle == NO_ITEM)
 			{
