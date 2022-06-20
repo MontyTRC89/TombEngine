@@ -58,10 +58,12 @@ namespace TEN::Input
 			"U+",		"U-",		"V+",		"V-",		"POV_UP",	"POV_DOWN", "POV_LEFT", "POV_RIGHT"
 	};
 
+	// OIS interfaces
 	InputManager* g_InputManager = nullptr;
 	Keyboard* g_Keyboard = nullptr;
 	JoyStick* g_Joystick = nullptr;
-
+	ForceFeedback* g_JoystickVibration = nullptr;
+	
 	int TrInput;
 	int DbInput;
 	int InputBusy;
@@ -114,8 +116,12 @@ namespace TEN::Input
 			try
 			{
 				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, true);
-				
-					TENLog("Using '" + g_Joystick->vendor() + "' game controller for input.", LogLevel::Info);
+				TENLog("Using '" + g_Joystick->vendor() + "' game controller for input.", LogLevel::Info);
+
+				// Try to initialize vibration interface
+				g_JoystickVibration = (ForceFeedback*)g_Joystick->queryInterface(Interface::ForceFeedback);
+				if (g_JoystickVibration)
+					TENLog("Controller supports vibration.", LogLevel::Info);
 			}
 			catch (OIS::Exception& ex)
 			{
