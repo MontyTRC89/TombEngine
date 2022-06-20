@@ -1,6 +1,13 @@
 #include "framework.h"
 #include "Specific/input.h"
 
+#include <OISInputManager.h>
+#include <OISException.h>
+#include <OISKeyboard.h>
+#include <OISJoyStick.h>
+#include <OISEvents.h>
+#include <OISForceFeedback.h>
+
 #include "Game/camera.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
