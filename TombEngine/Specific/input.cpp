@@ -86,7 +86,7 @@ namespace TEN::Input
 		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_DELETE, KC_PGDOWN, KC_P, KC_RETURN }
 	};
 
-	void InitialiseInput(HWND handle, HINSTANCE instance)
+	void InitialiseInput(HWND handle)
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
@@ -125,7 +125,7 @@ namespace TEN::Input
 				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, true);
 				TENLog("Using '" + g_Joystick->vendor() + "' device for input.", LogLevel::Info);
 
-				// Try to initialize vibration interface
+				// Try to initialise vibration interface
 				g_JoystickVibration = (ForceFeedback*)g_Joystick->queryInterface(Interface::ForceFeedback);
 				if (g_JoystickVibration)
 					TENLog("Controller supports vibration.", LogLevel::Info);
@@ -135,6 +135,17 @@ namespace TEN::Input
 				TENLog("An exception occured during game controller init: " + std::string(ex.eText), LogLevel::Error);
 			}
 		}
+	}
+
+	void DeInitialiseInput()
+	{
+		if (g_Keyboard)
+			g_InputManager->destroyInputObject(g_Keyboard);
+
+		if (g_Joystick)
+			g_InputManager->destroyInputObject(g_Joystick);
+
+		InputManager::destroyInputSystem(g_InputManager);
 	}
 
 	void ClearInputData()

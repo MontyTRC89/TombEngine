@@ -506,7 +506,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		// Play background music
 		// MERGE: PlaySoundTrack(index);
 
-		// Initialize menu
+		// Initialise menu
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
