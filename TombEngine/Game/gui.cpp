@@ -1002,7 +1002,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (selected_option == option_count) // Cancel
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(&KeyboardLayout[1], &CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
+				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
 				return;
