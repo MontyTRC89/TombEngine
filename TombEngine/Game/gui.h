@@ -443,7 +443,7 @@ private:
 	void HandleDisplaySettingsInput(bool pause);
 	void HandleControlSettingsInput(bool pause);
 	void HandleSoundSettingsInput(bool pause);
-	void FillSound();
+	void BackupOptions();
 	bool DoObjectsCombine(int obj1, int obj2);
 	void InitializeInventory();
 	void FillDisplayOptions();
