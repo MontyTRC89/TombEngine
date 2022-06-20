@@ -70,9 +70,9 @@ namespace TEN::Input
 	std::vector<bool>  KeyMap  = {};
 	std::vector<float> AxisMap = {};
 
-	int ConflictingKeys[18];
+	int ConflictingKeys[NUM_CONTROLS];
 
-	short KeyboardLayout[2][18] =
+	short KeyboardLayout[2][NUM_CONTROLS] =
 	{
 		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_DELETE, KC_PGDOWN, KC_P, KC_RETURN },
 		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_DELETE, KC_PGDOWN, KC_P, KC_RETURN }
@@ -259,6 +259,194 @@ namespace TEN::Input
 		return false;
 	}
 
+	void SolveInputCollisions(int& lInput)
+	{
+		// TODO: Make FORWARD+BACK to turn 180 degrees a user option.
+		if (lInput & IN_FORWARD && lInput & IN_BACK)
+			lInput |= IN_ROLL;
+
+		// Block roll in binocular mode (TODO: Is it needed?)
+		if (lInput & IN_ROLL && BinocularRange)
+			lInput &= ~IN_ROLL;
+
+		// Block simultaneous LEFT+RIGHT input.
+		if (lInput & IN_LEFT && lInput & IN_RIGHT)
+			lInput &= ~(IN_LEFT | IN_RIGHT);
+
+		if (Lara.Inventory.IsBusy)
+		{
+			lInput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
+
+			if (lInput & IN_FORWARD && lInput & IN_BACK)
+				lInput &= ~IN_BACK;
+		}
+	}
+
+	void HandleLaraHotkeys(int& lInput)
+	{
+		// Switch debug pages
+
+		static int debugTimeout = 0;
+		if (KeyMap[KC_F10] || KeyMap[KC_F11])
+		{
+			if (debugTimeout == 0)
+			{
+				debugTimeout = 1;
+				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
+			}
+		}
+		else
+			debugTimeout = 0;
+
+		// Handle flares
+
+		bool flare = false;
+		static bool flareNo = false;
+
+		// TODO: Better flare handling in crawl states.
+		if (Key(KEY_FLARE) || flare)
+		{
+			if (!flareNo)
+			{
+				if (LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
+					LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
+					LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
+					LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
+					LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG)
+				{
+					SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
+					flareNo = true;
+				}
+				else
+				{
+					flareNo = false;
+					lInput |= IN_FLARE;
+				}
+			}
+		}
+		else
+			flareNo = false;
+
+		// Handle look timeout
+
+		static int lookTimeout = 0;
+
+		if (Lara.Control.HandStatus == HandStatus::WeaponReady)
+		{
+			if (lInput & IN_LOOK)
+			{
+				if (lookTimeout >= 6)
+					lookTimeout = 100;
+				else
+				{
+					lInput &= ~IN_LOOK;
+					lookTimeout++;
+				}
+			}
+			else
+			{
+				if (lookTimeout != 0 && lookTimeout != 100)
+					lInput |= IN_LOOKSWITCH;
+
+				lookTimeout = 0;
+			}
+		}
+
+		// Handle weapon hotkeys
+
+		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+
+		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+
+		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+
+		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+
+		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+
+		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+
+		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+
+		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present == true)
+			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+
+		// Handle medipack hotkeys
+
+		static int medipackTimeout = 0;
+
+		if (KeyMap[KC_0])
+		{
+			if (medipackTimeout == 0)
+			{
+				if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
+				{
+					if (Lara.Inventory.TotalSmallMedipacks != 0)
+					{
+						if (Lara.Inventory.TotalSmallMedipacks != -1)
+							Lara.Inventory.TotalSmallMedipacks--;
+
+						Lara.PoisonPotency = 0;
+						LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
+						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always); // TODO: Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
+
+						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
+						{
+							LaraItem->HitPoints = LARA_HEALTH_MAX;
+							SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+							Statistics.Game.HealthUsed++;
+						}
+					}
+
+					medipackTimeout = 15;
+				}
+			}
+		}
+		else if (KeyMap[KC_9])
+		{
+			if (medipackTimeout == 0)
+			{
+				if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
+				{
+					if (Lara.Inventory.TotalLargeMedipacks != 0)
+					{
+						if (Lara.Inventory.TotalLargeMedipacks != -1)
+							Lara.Inventory.TotalLargeMedipacks--;
+
+						Lara.PoisonPotency = 0;
+						LaraItem->HitPoints += LARA_HEALTH_MAX;
+
+						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
+						{
+							LaraItem->HitPoints = LARA_HEALTH_MAX;
+							SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+							Statistics.Game.HealthUsed++;
+						}
+					}
+
+					medipackTimeout = 15;
+				}
+			}
+		}
+		else if (medipackTimeout != 0)
+			medipackTimeout--;
+
+		// Load / save hotkeys
+
+		if (KeyMap[KC_F5])
+			lInput |= IN_SAVE;
+
+		if (KeyMap[KC_F6])
+			lInput |= IN_LOAD;
+	}
+
 	bool UpdateInput(bool debounce)
 	{
 		ReadKeyboard();
@@ -322,197 +510,17 @@ namespace TEN::Input
 		if (KeyMap[KC_ESCAPE] || Key(KEY_DRAW))
 			lInput |= IN_DESELECT;
 
-		// Switch debug pages
-
-		static int debugTimeout = 0;
-		if (KeyMap[KC_F10] || KeyMap[KC_F11])
-		{
-			if (debugTimeout == 0)
-			{
-				debugTimeout = 1;
-				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-			}
-		}
-		else
-			debugTimeout = 0;
-
-		bool flare = false;
-		static bool flareNo = false;
-
-		// TODO: Better flare handling in crawl states.
-		if (Key(KEY_FLARE) || flare)
-		{
-			if (!flareNo)
-			{
-				if (LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG)
-				{
-					SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
-					flareNo = true;
-				}
-				else
-				{
-					flareNo = false;
-					lInput |= IN_FLARE;
-				}
-			}
-		}
-		else
-			flareNo = false;
-
-		static int lookTimeout = 0;
-
-		if (Lara.Control.HandStatus == HandStatus::WeaponReady)
-		{
-			// TODO: AutoTarget Not Saved
-			//Savegame.AutoTarget = 1;
-
-			if (lInput & IN_LOOK)
-			{
-				if (lookTimeout >= 6)
-					lookTimeout = 100;
-				else
-				{
-					lInput &= ~IN_LOOK;
-					lookTimeout++;
-				}
-			}
-			else
-			{
-				if (lookTimeout != 0 && lookTimeout != 100)
-					lInput |= IN_LOOKSWITCH;
-
-				lookTimeout = 0;
-			}
-		}
-
-		static int medipackTimeout = 0;
-
-		/***************************WEAPON HOTKEYS***************************/
-		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
-
-		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
-
-		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
-
-		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
-
-		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
-
-		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
-
-		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
-
-		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present == true)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
-		/*------------------------------------------------------------------*/
-
-		if (KeyMap[KC_0])
-		{
-			if (medipackTimeout == 0)
-			{
-				if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
-				{
-					if (Lara.Inventory.TotalSmallMedipacks != 0)
-					{
-						if (Lara.Inventory.TotalSmallMedipacks != -1)
-							Lara.Inventory.TotalSmallMedipacks--;
-
-						Lara.PoisonPotency = 0;
-						LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
-						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always); // TODO: Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
-
-						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
-						{
-							LaraItem->HitPoints = LARA_HEALTH_MAX;
-							SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-							Statistics.Game.HealthUsed++;
-						}
-					}
-
-					medipackTimeout = 15;
-				}
-			}
-		}
-		else if (KeyMap[KC_9])
-		{
-			if (medipackTimeout == 0)
-			{
-				if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
-				{
-					if (Lara.Inventory.TotalLargeMedipacks != 0)
-					{
-						if (Lara.Inventory.TotalLargeMedipacks != -1)
-							Lara.Inventory.TotalLargeMedipacks--;
-
-						Lara.PoisonPotency = 0;
-						LaraItem->HitPoints += LARA_HEALTH_MAX;
-
-						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
-						{
-							LaraItem->HitPoints = LARA_HEALTH_MAX;
-							SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-							Statistics.Game.HealthUsed++;
-						}
-					}
-
-					medipackTimeout = 15;
-				}
-			}
-		}
-		else if (medipackTimeout != 0)
-			medipackTimeout--;
-
-		if (KeyMap[KC_F10])
-			lInput |= IN_E;
-
-		// TODO: Make FORWARD+BACK to turn 180 degrees a user option.
-		/*if (lInput & IN_FORWARD && lInput & IN_BACK)
-			lInput |= IN_ROLL;*/
-		if (lInput & IN_ROLL && BinocularRange)
-			lInput &= ~IN_ROLL;
-
-		// Block simultaneous LEFT+RIGHT input.
-		if (lInput & IN_LEFT && lInput & IN_RIGHT)
-			lInput &= ~(IN_LEFT | IN_RIGHT);
+		HandleLaraHotkeys(lInput);
+		SolveInputCollisions(lInput);
 
 		if (debounce)
 			DbInput = InputBusy;
 
-		if (KeyMap[KC_F5])
-			lInput |= IN_SAVE;
-
-		if (KeyMap[KC_F6])
-			lInput |= IN_LOAD;
-
 		InputBusy = lInput;
 		TrInput = lInput;
 
-		if (Lara.Inventory.IsBusy)
-		{
-			lInput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
-
-			if (lInput & IN_FORWARD && lInput & IN_BACK)
-				lInput &= ~IN_BACK;
-		}
-
 		if (debounce)
 			DbInput = TrInput & (DbInput ^ TrInput);
-
-		if (KeyMap[KC_F])
-			lInput |= IN_FORWARD;
-		else
-			lInput &= ~IN_FORWARD;
 
 		return true;
 	}
