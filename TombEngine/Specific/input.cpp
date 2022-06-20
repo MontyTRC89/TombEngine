@@ -218,15 +218,44 @@ namespace TEN::Input
 			// Scan POVs (controller usually have one, but let's scan all of them for paranoia)
 			for (int pov = 0; pov < 4; pov++)
 			{
-				unsigned int index = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2;
+				if (joy.mPOV[pov].direction == Pov::Centered)
+					continue;
+				
+				// Do 4 passes, every pass checks ever POV direction. For every direction,
+				// separate keypress is registered. This is needed to allow multiple directions
+				// pressed at the same time.
 
-				if		(joy.mPOV[pov].direction & Pov::North)	index += 0;
-				else if (joy.mPOV[pov].direction & Pov::South)	index += 1;
-				else if (joy.mPOV[pov].direction & Pov::West)	index += 2;
-				else if (joy.mPOV[pov].direction & Pov::East)	index += 3;
+				for (int pass = 0; pass < 4; pass++)
+				{
+					unsigned int index = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2;
 
-				KeyMap[index] = true;
-				SetDiscreteAxisValues(index);
+					switch (pass)
+					{
+					case 0: 
+						if (!(joy.mPOV[pov].direction & Pov::North))
+							continue;
+						break;
+
+					case 1:
+						if (!(joy.mPOV[pov].direction & Pov::South))
+							continue;
+						break;
+
+					case 2:
+						if (!(joy.mPOV[pov].direction & Pov::West))
+							continue;
+						break;
+
+					case 3:
+						if (!(joy.mPOV[pov].direction & Pov::East))
+							continue;
+						break;							
+					}
+
+					index += pass;
+					KeyMap[index] = true;
+					SetDiscreteAxisValues(index);
+				}
 			}
 		}
 		catch (OIS::Exception& ex)
