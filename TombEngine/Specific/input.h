@@ -9,7 +9,7 @@
 
 namespace TEN::Input
 {
-	constexpr int NUM_CONTROLS = 16;
+	constexpr int NUM_CONTROLS = 18;
 
 	constexpr int JOY_AXIS_DEADZONE  = 2500;
 
@@ -91,7 +91,7 @@ namespace TEN::Input
 	extern int DbInput;
 	extern int InputBusy;
 
-	extern short KeyboardLayout[2][18];
+	extern short KeyboardLayout[2][NUM_CONTROLS];
 
 	extern std::vector<bool>   KeyMap;
 	extern std::vector<float>  AxisMap;
