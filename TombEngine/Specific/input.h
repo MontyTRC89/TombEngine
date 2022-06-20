@@ -4,7 +4,7 @@ namespace TEN::Input
 {
 	constexpr int NUM_CONTROLS = 18;
 
-	constexpr int JOY_AXIS_DEADZONE  = 3200;
+	constexpr int JOY_AXIS_DEADZONE  = 8000;
 
 	constexpr int MAX_KEYBOARD_KEYS  = 256;
 	constexpr int MAX_JOYSTICK_KEYS  = 16;
