@@ -200,7 +200,7 @@ namespace TEN::Input
 
 				// Calculate normalized analog value to be used in game later
 				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) 
-																	/ ((float)std::numeric_limits<short>::max() - JOY_AXIS_DEADZONE);
+																	/ (float)(std::numeric_limits<short>::max() - JOY_AXIS_DEADZONE);
 
 				// Calculate and reset discrete input slots
 				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
