@@ -3287,7 +3287,7 @@ void GuiController::DoStatisticsMode()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		goDeselect = 0;
-		invMode = InventoryMode::None;
+		invMode = InventoryMode::InGame;
 	}
 }
 
