@@ -187,9 +187,6 @@ using TEN::Renderer::g_Renderer;
 
 			TENLog("System: " + g_InputManager->inputSystemName());
 
-			auto v = g_InputManager->getVersionNumber();
-			TENLog("OIS library version: " + std::to_string(v), LogLevel::Info);
-
 			if (g_InputManager->getNumberOfDevices(OISKeyboard) == 0)
 			{
 				TENLog("Keyboard not found!", LogLevel::Warning);
