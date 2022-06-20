@@ -16,6 +16,7 @@
 #include "Specific/setup.h"
 #include "Specific/input.h"
 
+using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
 struct PistolDef

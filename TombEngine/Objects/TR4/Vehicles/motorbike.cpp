@@ -21,6 +21,7 @@
 #include "Sound/sound.h"
 
 using std::vector;
+using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles

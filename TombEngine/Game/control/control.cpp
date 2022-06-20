@@ -67,6 +67,7 @@ using namespace TEN::Entities::TR4;
 using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
+using namespace TEN::Input;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -113,8 +114,6 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 	if (TrackCameraInit)
 		UseSpotCam = false;
 
-	SetDebounce = true;
-
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
 	static int framesCount = 0;
@@ -142,11 +141,9 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			TrInput &= IN_LOOK;
 		}
 
-		// Does the player want to enter inventory?
-		SetDebounce = false;
-
 		if (CurrentLevel != 0)
 		{
+			// Does the player want to enter inventory?
 			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
@@ -534,9 +531,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		{
 			g_Renderer.RenderTitle();
 
-			SetDebounce = true;
 			UpdateInput();
-			SetDebounce = false;
 
 			status = g_Gui.TitleOptions();
 

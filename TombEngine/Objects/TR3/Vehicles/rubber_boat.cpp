@@ -16,6 +16,8 @@
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	#define RBOAT_SLIP		10

@@ -14,6 +14,8 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // UNDERWATER SWIM
 // Control & Collision Functions

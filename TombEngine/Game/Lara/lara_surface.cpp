@@ -13,6 +13,8 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // WATER SURFACE TREAD
 // Control & Collision Functions

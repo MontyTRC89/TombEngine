@@ -16,6 +16,8 @@
 #include "Specific/level.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // CROUCH & CRAWL
 // Control & Collision Functions

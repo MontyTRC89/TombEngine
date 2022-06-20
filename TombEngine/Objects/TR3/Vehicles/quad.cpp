@@ -21,6 +21,7 @@
 #include "Specific/prng.h"
 #include "Game/effects/simple_particle.h"
 
+using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles

@@ -16,6 +16,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // JUMP
 // Control & Collision Functions

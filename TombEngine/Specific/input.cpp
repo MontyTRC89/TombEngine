@@ -12,8 +12,8 @@
 using namespace OIS;
 using TEN::Renderer::g_Renderer;
 
-//namespace TEN::Input
-//{
+namespace TEN::Input
+{
 	const char* g_KeyNames[] =
 	{
 			NULL,		"ESC",		"1",		"2",		"3",		"4",		"5",		"6",
@@ -67,7 +67,6 @@ using TEN::Renderer::g_Renderer;
 	int TrInput;
 	int DbInput;
 	int InputBusy;
-	bool SetDebounce = false;
 
 	std::vector<bool>  KeyMap  = {};
 	std::vector<float> AxisMap = {};
@@ -103,7 +102,7 @@ using TEN::Renderer::g_Renderer;
 		}
 		catch (OIS::Exception& ex)
 		{
-			TENLog("An exception occured during keyboard init: " + std::string(ex.eText), LogLevel::Error);
+			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
 		}
 
 		int numJoysticks = g_InputManager->getNumberOfDevices(OISJoyStick);
@@ -127,52 +126,59 @@ using TEN::Renderer::g_Renderer;
 		if (!g_Joystick)
 			return;
 
-		g_Joystick->capture();
-		const JoyStickState& joy = g_Joystick->getJoyStickState();
-
-		// Zero all joy keys, axis and POVs
-		for (unsigned int key = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS; key < KeyMap.size(); key++)
-			KeyMap[key] = false;
-
-		for (unsigned int key = 0; key < joy.mButtons.size(); key++)
-			KeyMap[MAX_KEYBOARD_KEYS + key] = joy.mButtons[key];
-
-		for (unsigned int axis = 0; axis < joy.mAxes.size(); axis++)
+		try
 		{
-			if (axis >= AxisMap.size())
-				break;
+			g_Joystick->capture();
+			const JoyStickState& joy = g_Joystick->getJoyStickState();
 
-			if (abs(joy.mAxes[axis].abs) < JOY_AXIS_DEADZONE)
-				continue;
+			// Zero all joy keys, axis and POVs
+			for (unsigned int key = MAX_KEYBOARD_KEYS; key < KeyMap.size(); key++)
+				KeyMap[key] = false;
 
-			float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) / 65536.0f;
-			AxisMap[axis] = normalizedValue;
+			for (unsigned int key = 0; key < joy.mButtons.size(); key++)
+				KeyMap[MAX_KEYBOARD_KEYS + key] = joy.mButtons[key];
 
-			int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
-			int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2) + 1;
+			for (unsigned int axis = 0; axis < joy.mAxes.size(); axis++)
+			{
+				if (axis >= AxisMap.size())
+					break;
 
-			KeyMap[negKeyIndex] = false;
-			KeyMap[posKeyIndex] = false;
+				if (abs(joy.mAxes[axis].abs) < JOY_AXIS_DEADZONE)
+					continue;
 
-			if (normalizedValue > 0)
-				KeyMap[negKeyIndex] = true;
-			else
-				KeyMap[posKeyIndex] = true;
+				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) / 65536.0f;
+				AxisMap[axis] = normalizedValue;
+
+				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
+				int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2) + 1;
+
+				KeyMap[negKeyIndex] = false;
+				KeyMap[posKeyIndex] = false;
+
+				if (normalizedValue > 0)
+					KeyMap[negKeyIndex] = true;
+				else
+					KeyMap[posKeyIndex] = true;
+			}
+
+			for (unsigned int pov = 0; pov < 4; pov++)
+			{
+				if (joy.mPOV[pov].direction & Pov::North)
+					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 0] = true;
+
+				if (joy.mPOV[pov].direction & Pov::South)
+					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 1] = true;
+
+				if (joy.mPOV[pov].direction & Pov::West)
+					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 2] = true;
+
+				if (joy.mPOV[pov].direction & Pov::East)
+					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 3] = true;
+			}
 		}
-
-		for (unsigned int pov = 0; pov < 4; pov++)
+		catch (OIS::Exception& ex)
 		{
-			if (joy.mPOV[pov].direction & Pov::North)
-				KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 0] = true;
-
-			if (joy.mPOV[pov].direction & Pov::South)
-				KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 1] = true;
-
-			if (joy.mPOV[pov].direction & Pov::West)
-				KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 2] = true;
-
-			if (joy.mPOV[pov].direction & Pov::East)
-				KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 3] = true;
+			TENLog("Unable to poll joystick input: " + std::string(ex.eText), LogLevel::Warning);
 		}
 	}
 
@@ -181,10 +187,17 @@ using TEN::Renderer::g_Renderer;
 		if (!g_Keyboard)
 			return;
 
-		g_Keyboard->capture();
+		try
+		{
+			g_Keyboard->capture();
 
-		for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
-			KeyMap[i] = g_Keyboard->isKeyDown((KeyCode)i);
+			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
+				KeyMap[i] = g_Keyboard->isKeyDown((KeyCode)i);
+		}
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Unable to poll keyboard input: " + std::string(ex.eText), LogLevel::Warning);
+		}
 	}
 
 	bool Key(int number)
@@ -247,7 +260,7 @@ using TEN::Renderer::g_Renderer;
 		return false;
 	}
 
-	bool UpdateInput()
+	bool UpdateInput(bool debounce)
 	{
 		ReadKeyboard();
 		ReadJoystick();
@@ -487,7 +500,7 @@ using TEN::Renderer::g_Renderer;
 		if (lInput & IN_LEFT && lInput & IN_RIGHT)
 			lInput &= ~(IN_LEFT | IN_RIGHT);
 
-		if (SetDebounce)
+		if (debounce)
 			DbInput = InputBusy;
 
 		if (KeyMap[KC_F5])
@@ -507,7 +520,7 @@ using TEN::Renderer::g_Renderer;
 				lInput &= ~IN_BACK;
 		}
 
-		if (SetDebounce)
+		if (debounce)
 			DbInput = TrInput & (DbInput ^ TrInput);
 
 		if (KeyMap[KC_F])
@@ -536,4 +549,4 @@ using TEN::Renderer::g_Renderer;
 			}
 		}
 	}
-//}
+}

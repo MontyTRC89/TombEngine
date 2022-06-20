@@ -16,6 +16,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	#define BOAT_UNDO_TURN		ANGLE(0.25f)

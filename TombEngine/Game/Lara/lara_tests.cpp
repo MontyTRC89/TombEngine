@@ -18,6 +18,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 

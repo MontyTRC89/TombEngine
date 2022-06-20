@@ -17,6 +17,8 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "ScriptInterfaceLevel.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // COLLISION TEST FUNCTIONS
 // For State Control & Collision

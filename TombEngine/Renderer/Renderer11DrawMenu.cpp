@@ -13,6 +13,8 @@
 #include "Specific/winmain.h"
 #include "Game/control/volume.h"
 
+using namespace TEN::Input;
+
 extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
 
