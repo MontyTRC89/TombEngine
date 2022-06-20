@@ -724,12 +724,13 @@ InventoryResult GuiController::TitleOptions()
 					break;
 
 				case 1:
+					BackupOptions();
 					menu_to_display = Menu::Controls;
 					selected_option = 0;
 					break;
 
 				case 2:
-					FillSound();
+					BackupOptions();
 					menu_to_display = Menu::Sound;
 					selected_option = 0;
 					break;
@@ -744,7 +745,7 @@ InventoryResult GuiController::TitleOptions()
 void GuiController::FillDisplayOptions()
 {
 	// Copy configuration to a temporary object
-	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
+	BackupOptions();
 
 	// Get current display mode
 	CurrentSettings.selectedScreenResolution = 0;
@@ -992,7 +993,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (selected_option == option_count - 1) // Apply
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], NUM_CONTROLS);
+				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], NUM_CONTROLS * sizeof(short));
+				memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], NUM_CONTROLS * sizeof(short));
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
@@ -1002,7 +1004,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (selected_option == option_count) // Cancel
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
+				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS * sizeof(short));
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
 				return;
@@ -1019,7 +1021,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	}
 }
 
-void GuiController::FillSound()
+void GuiController::BackupOptions()
 {
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 }
@@ -1286,12 +1288,13 @@ InventoryResult GuiController::DoPauseMenu()
 				break;
 
 			case 1:
+				BackupOptions();
 				selected_option = 0;
 				menu_to_display = Menu::Controls;
 				break;
 
 			case 2:
-				FillSound();
+				BackupOptions();
 				selected_option = 0;
 				menu_to_display = Menu::Sound;
 				break;
