@@ -82,6 +82,9 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
+		unsigned int v = g_InputManager->getVersionNumber();
+		TENLog("OIS Version: " + std::to_string(v >> 16) + "." + std::to_string((v >> 8) & 0x000000FF) + "." + std::to_string(v & 0x000000FF), LogLevel::Info);
+
 		KeyMap.resize(MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_POV_AXES + MAX_JOYSTICK_AXES * 2);
 		AxisMap.resize(MAX_JOYSTICK_AXES);
 
@@ -107,15 +110,17 @@ namespace TEN::Input
 		int numJoysticks = g_InputManager->getNumberOfDevices(OISJoyStick);
 		if (numJoysticks > 0)
 		{
-			TENLog("Found " + std::to_string(numJoysticks) + " connected game devices.", LogLevel::Info);
+			TENLog("Found " + std::to_string(numJoysticks) + " connected game controller" + (numJoysticks > 1 ? "s." : "."), LogLevel::Info);
 
 			try
 			{
 				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, true);
+				
+					TENLog("Using '" + g_Joystick->vendor() + "' game controller for input.", LogLevel::Info);
 			}
 			catch (OIS::Exception& ex)
 			{
-				TENLog("An exception occured during joystick init: " + std::string(ex.eText), LogLevel::Error);
+				TENLog("An exception occured during game controller init: " + std::string(ex.eText), LogLevel::Error);
 			}
 		}
 	}
