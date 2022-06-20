@@ -132,11 +132,26 @@ namespace TEN::Input
 
 	void ClearInputData()
 	{
-		for (unsigned int key = 0; key < KeyMap.size(); key++)
+		for (int key = 0; key < KeyMap.size(); key++)
 			KeyMap[key] = false;
 
-		for (unsigned int axis = 0; axis < (unsigned int)InputAxis::Count; axis++)
+		for (int axis = 0; axis < (int)InputAxis::Count; axis++)
 			AxisMap[axis] = 0.0f;
+	}
+
+	void SetDiscreteAxisValues(unsigned int index)
+	{
+		for (int layout = 0; layout <= 1; layout++)
+		{
+			if (KeyboardLayout[layout][KEY_FORWARD] == index)
+				AxisMap[(unsigned int)InputAxis::MoveVertical] = 1.0f;
+			else if (KeyboardLayout[layout][KEY_BACK] == index)
+				AxisMap[(unsigned int)InputAxis::MoveVertical] = -1.0f;
+			else if (KeyboardLayout[layout][KEY_LEFT] == index)
+				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = -1.0f;
+			else if (KeyboardLayout[layout][KEY_RIGHT] == index)
+				AxisMap[(unsigned int)InputAxis::MoveHorizontal] = 1.0f;
+		}
 	}
 
 	void ReadJoystick()
@@ -151,11 +166,11 @@ namespace TEN::Input
 			const JoyStickState& joy = g_Joystick->getJoyStickState();
 
 			// Scan buttons
-			for (unsigned int key = 0; key < joy.mButtons.size(); key++)
+			for (int key = 0; key < joy.mButtons.size(); key++)
 				KeyMap[MAX_KEYBOARD_KEYS + key] = joy.mButtons[key];
 
 			// Scan axes
-			for (unsigned int axis = 0; axis < joy.mAxes.size(); axis++)
+			for (int axis = 0; axis < joy.mAxes.size(); axis++)
 			{
 				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers)
 				if (axis >= MAX_JOYSTICK_AXES)
@@ -169,13 +184,13 @@ namespace TEN::Input
 				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) / (float)std::numeric_limits<short>::max();
 
 				// Calculate and reset discrete input slots
-				int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
-				int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2) + 1;
+				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
+				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2) + 1;
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
 				// Decide on the discrete input registering based on analog value
-				int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
+				unsigned int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
 				// Register analog input in certain direction.
@@ -201,19 +216,17 @@ namespace TEN::Input
 			}
 
 			// Scan POVs (controller usually have one, but let's scan all of them for paranoia)
-			for (unsigned int pov = 0; pov < 4; pov++)
+			for (int pov = 0; pov < 4; pov++)
 			{
-				if (joy.mPOV[pov].direction & Pov::North)
-					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 0] = true;
+				unsigned int index = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2;
 
-				if (joy.mPOV[pov].direction & Pov::South)
-					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 1] = true;
+				if		(joy.mPOV[pov].direction & Pov::North)	index += 0;
+				else if (joy.mPOV[pov].direction & Pov::South)	index += 1;
+				else if (joy.mPOV[pov].direction & Pov::West)	index += 2;
+				else if (joy.mPOV[pov].direction & Pov::East)	index += 3;
 
-				if (joy.mPOV[pov].direction & Pov::West)
-					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 2] = true;
-
-				if (joy.mPOV[pov].direction & Pov::East)
-					KeyMap[MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2 + 3] = true;
+				KeyMap[index] = true;
+				SetDiscreteAxisValues(index);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -242,18 +255,7 @@ namespace TEN::Input
 				KeyMap[i] = true;
 
 				// Register directional discrete keypresses as max analog axis values
-
-				for (int layout = 0; layout <= 1; layout++)
-				{
-					if (KeyboardLayout[layout][KEY_FORWARD] == i)
-						AxisMap[(int)InputAxis::MoveVertical] = 1.0f;
-					else if (KeyboardLayout[layout][KEY_BACK] == i)
-						AxisMap[(int)InputAxis::MoveVertical] = -1.0f;
-					else if (KeyboardLayout[layout][KEY_LEFT] == i)
-						AxisMap[(int)InputAxis::MoveHorizontal] = -1.0f;
-					else if (KeyboardLayout[layout][KEY_RIGHT] == i)
-						AxisMap[(int)InputAxis::MoveHorizontal] = 1.0f;
-				}
+				SetDiscreteAxisValues(i);
 			}
 		}
 		catch (OIS::Exception& ex)
