@@ -1,12 +1,5 @@
 #pragma once
 
-#include <OISInputManager.h>
-#include <OISException.h>
-#include <OISKeyboard.h>
-#include <OISJoyStick.h>
-#include <OISEvents.h>
-#include <OISForceFeedback.h>
-
 namespace TEN::Input
 {
 	constexpr int NUM_CONTROLS = 18;
