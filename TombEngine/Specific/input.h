@@ -22,7 +22,7 @@ namespace TEN::Input
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_POV_AXES + MAX_JOYSTICK_AXES * 2;
 
-	enum class InputAxis
+	enum InputAxis
 	{
 		MoveVertical,
 		MoveHorizontal,

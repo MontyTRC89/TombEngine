@@ -87,7 +87,7 @@ namespace TEN::Input
 		TENLog("OIS Version: " + std::to_string(v >> 16) + "." + std::to_string((v >> 8) & 0x000000FF) + "." + std::to_string(v & 0x000000FF), LogLevel::Info);
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
-		AxisMap.resize((int)InputAxis::Count);
+		AxisMap.resize(InputAxis::Count);
 
 		try
 		{
@@ -135,7 +135,7 @@ namespace TEN::Input
 		for (int key = 0; key < KeyMap.size(); key++)
 			KeyMap[key] = false;
 
-		for (int axis = 0; axis < (int)InputAxis::Count; axis++)
+		for (int axis = 0; axis < InputAxis::Count; axis++)
 			AxisMap[axis] = 0.0f;
 	}
 
@@ -199,13 +199,13 @@ namespace TEN::Input
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
 				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
-					AxisMap[(int)InputAxis::MoveVertical] = abs(normalizedValue);
+					AxisMap[InputAxis::MoveVertical] = abs(normalizedValue);
 				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
-					AxisMap[(int)InputAxis::MoveVertical] = -abs(normalizedValue);
+					AxisMap[InputAxis::MoveVertical] = -abs(normalizedValue);
 				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
-					AxisMap[(int)InputAxis::MoveHorizontal] = -abs(normalizedValue);
+					AxisMap[InputAxis::MoveHorizontal] = -abs(normalizedValue);
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
-					AxisMap[(int)InputAxis::MoveHorizontal] = abs(normalizedValue);
+					AxisMap[InputAxis::MoveHorizontal] = abs(normalizedValue);
 				else
 				{
 					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2, 
