@@ -116,7 +116,7 @@ namespace TEN::Input
 			try
 			{
 				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, true);
-				TENLog("Using '" + g_Joystick->vendor() + "' game controller for input.", LogLevel::Info);
+				TENLog("Using '" + g_Joystick->vendor() + "' device for input.", LogLevel::Info);
 
 				// Try to initialize vibration interface
 				g_JoystickVibration = (ForceFeedback*)g_Joystick->queryInterface(Interface::ForceFeedback);
