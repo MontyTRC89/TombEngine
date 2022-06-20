@@ -445,7 +445,7 @@ private:
 	void HandleSoundSettingsInput(bool pause);
 	void BackupOptions();
 	bool DoObjectsCombine(int obj1, int obj2);
-	void InitializeInventory();
+	void InitialiseInventory();
 	void FillDisplayOptions();
 	bool IsItemCurrentlyCombinable(short obj);
 	bool IsItemInInventory(short obj);

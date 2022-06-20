@@ -170,7 +170,7 @@ namespace TEN::Renderer
 			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
-			// Initialize bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
+			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
 			if (g_MusicVolumeBar == nullptr)
 				InitialiseMenuBars(y);
 

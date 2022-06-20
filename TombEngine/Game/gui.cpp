@@ -1860,7 +1860,7 @@ void GuiController::ConstructCombineObjectList()
 	rings[(int)RingTypes::Ammo]->ringactive = 0;
 }
 
-void GuiController::InitializeInventory()
+void GuiController::InitialiseInventory()
 {
 	compassNeedleAngle = 4096;
 	AlterFOV(ANGLE(80.0f));
@@ -3189,7 +3189,7 @@ bool GuiController::CallInventory(bool reset_mode)
 	if (reset_mode)
 		invMode = InventoryMode::InGame;
 
-	InitializeInventory();
+	InitialiseInventory();
 	Camera.numberFrames = 2;
 
 	bool exitLoop = false;

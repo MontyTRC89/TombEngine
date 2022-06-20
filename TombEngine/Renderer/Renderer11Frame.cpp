@@ -298,7 +298,7 @@ namespace TEN::Renderer
 
 		room->BoundActive = 2;
 
-		// Initialize bounds list
+		// Initialise bounds list
 		m_boundList[0] = Camera.pos.roomNumber;
 		m_boundStart = 0;
 		m_boundEnd = 1;

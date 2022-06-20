@@ -98,8 +98,8 @@ namespace TEN::Input
 
 	extern short KeyboardLayout[2][NUM_CONTROLS];
 
-	void InitialiseInput(HWND handle, HINSTANCE instance);
+	void InitialiseInput(HWND handle);
+	void DeInitialiseInput();
 	bool UpdateInput(bool debounce = true);
-	bool Key(int number);
 	void DefaultConflict();
 }
