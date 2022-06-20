@@ -20,8 +20,6 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 	TENLog("Initializing DX11...", LogLevel::Info);
 
-	CoInitialize(NULL);
-
 	ScreenWidth = w;
 	ScreenHeight = h;
 	Windowed = windowed;
