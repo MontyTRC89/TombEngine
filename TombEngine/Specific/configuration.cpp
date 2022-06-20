@@ -254,7 +254,7 @@ bool SaveConfiguration()
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
 
-		if (SetDWORDRegKey(rootKey, buffer, KeyboardLayout[1][i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(rootKey, buffer, g_Configuration.KeyboardLayout[i]) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			return false;
@@ -397,6 +397,7 @@ bool LoadConfiguration()
 			return false;
 		}
 
+		g_Configuration.KeyboardLayout[i] = (short)tempKey;
 		KeyboardLayout[1][i] = (short)tempKey;
 	}
 
