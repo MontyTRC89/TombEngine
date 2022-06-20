@@ -185,8 +185,6 @@ using TEN::Renderer::g_Renderer;
 		{
 			g_InputManager = InputManager::createInputSystem((size_t)handle);
 
-			TENLog("System: " + g_InputManager->inputSystemName());
-
 			if (g_InputManager->getNumberOfDevices(OISKeyboard) == 0)
 			{
 				TENLog("Keyboard not found!", LogLevel::Warning);
@@ -199,7 +197,7 @@ using TEN::Renderer::g_Renderer;
 		}
 		catch (OIS::Exception& ex)
 		{
-			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
+			TENLog("An exception occured during keyboard init: " + std::string(ex.eText), LogLevel::Error);
 		}
 
 		int numJoysticks = g_InputManager->getNumberOfDevices(OISJoyStick);
