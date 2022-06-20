@@ -610,7 +610,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		Vector3Int mtr;
-		int hmtr = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, false, QBIKE_SIDE, &mtr);
+		int hmtr = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, false, &mtr);
 		if (hmtr < (mtrOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mtr, &mtrOld);
 
