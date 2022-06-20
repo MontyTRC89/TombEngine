@@ -130,7 +130,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
 		{
-			if (S_UpdateInput() == -1)
+			if (UpdateInput() == -1)
 				return GameStatus::None;
 		}
 
@@ -535,7 +535,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 			g_Renderer.RenderTitle();
 
 			SetDebounce = true;
-			S_UpdateInput();
+			UpdateInput();
 			SetDebounce = false;
 
 			status = g_Gui.TitleOptions();

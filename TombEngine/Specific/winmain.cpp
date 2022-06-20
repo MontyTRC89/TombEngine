@@ -390,6 +390,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	DoTheGame = true;
 
+	// Initialize input
+	InitialiseInput(App.WindowHandle, App.hInstance);
+
 	ThreadEnded = false;
 	ThreadHandle = BeginThread(GameMain, ThreadID);
 
