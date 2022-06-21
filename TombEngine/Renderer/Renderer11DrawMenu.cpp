@@ -39,6 +39,7 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
+	constexpr auto MenuVerticalPause = 220;
 	constexpr auto MenuVerticalOptionsPause = 275;
 
 	// Title logo positioning
@@ -298,7 +299,11 @@ namespace TEN::Renderer
 		case Menu::Pause:
 
 			// Setup needed parameters
-			y = MenuVerticalOptionsPause;
+			y = MenuVerticalPause;
+
+			// Header
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_PAUSE), PRINTSTRING_COLOR_ORANGE, SF_Center());
+			GetNextBlockPosition(&y);
 
 			// Statistics
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 0));
