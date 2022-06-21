@@ -167,7 +167,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	static constexpr int rate = 50;
 	int threshold = std::max(abs(item->Animation.Velocity) * 1.5f, CLICK(0.25f) / 4);
 	int sign = std::copysign(1, height);
-	
+
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
 		item->Pose.Position.y += SWAMP_GRAVITY;
 	else if (abs(height) > (STEPUP_HEIGHT / 2))		// Outer range.
@@ -186,7 +186,7 @@ void DoLaraLean(ItemInfo* item, CollisionInfo* coll, short maxAngle, short rate)
 {
 	if (!item->Animation.Velocity)
 		return;
-	
+
 	// TODO: Use a bool argument to determine left/right lean. @Sezz
 	int sign = copysign(1, maxAngle);
 	rate = abs(rate);
@@ -337,7 +337,7 @@ void DealLaraFallDamage(ItemInfo* item)
 	{
 		if (item->Animation.VerticalVelocity >= LARA_DEATH_VELOCITY)
 			item->HitPoints = 0;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else USE_FEATURE_IF_CPP20([[likely]] )
 		{
 			int base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
@@ -374,40 +374,41 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	return direction;
 }
 
-void ModulateLaraTurnRate(short* turnRate, short accel, short min, short max, float axis, bool doPositiveModulation)
+short ModulateLaraTurnRate(short turnRate, short accel, short minTurnRate, short maxTurnRate, float axisCoeff)
 {
-	int sign = doPositiveModulation ? 1 : -1;
-	float axisCoeff = axis * sign;
+	int sign = std::copysign(1, axisCoeff);
 
-	*turnRate += (accel * axisCoeff) * sign;
-	if (doPositiveModulation)
+	turnRate += accel * sign;
+	if (sign > 0)
 	{
-		if (*turnRate < (min * axisCoeff))
-			*turnRate = min * axisCoeff;
-		else if (*turnRate > (max * axisCoeff))
-			*turnRate = max * axisCoeff;
+		if (turnRate < (minTurnRate * axisCoeff))
+			turnRate = minTurnRate * axisCoeff;
+		else if (turnRate > (maxTurnRate * axisCoeff))
+			turnRate = maxTurnRate * axisCoeff;
 	}
 	else
 	{
-		if (*turnRate > (-min * axisCoeff))
-			*turnRate = -min * axisCoeff;
-		else if (*turnRate < (-max * axisCoeff))
-			*turnRate = -max * axisCoeff;
+		if (turnRate > (minTurnRate * axisCoeff))
+			turnRate = minTurnRate * axisCoeff;
+		else if (turnRate < (maxTurnRate * axisCoeff))
+			turnRate = maxTurnRate * axisCoeff;
 	}
+
+	return turnRate;
 }
 
-void ModulateLaraTurnRateX(ItemInfo* item, short accel, short min, short max, bool doPositiveModulation)
+void ModulateLaraTurnRateX(ItemInfo* item, short accel, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	//ModulateLaraTurnRate(&lara->Control.TurnRate.x, accel, min, max, AxisMap[InputAxis::MoveVertical], doPositiveModulation);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accel, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical]);
 }
 
-void ModulateLaraTurnRateY(ItemInfo* item, short accel, short min, short max, bool doPositiveModulation)
+void ModulateLaraTurnRateY(ItemInfo* item, short accel, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	ModulateLaraTurnRate(&lara->Control.TurnRate/*.y*/, accel, min, max, AxisMap[InputAxis::MoveHorizontal], doPositiveModulation);
+	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accel, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
 }
 
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
@@ -519,12 +520,12 @@ void ModulateLaraSubsuitSwimTurn(ItemInfo* item)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE, 0, LARA_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		item->Pose.Orientation.z -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -540,12 +541,12 @@ void ModulateLaraSwimTurn(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		item->Pose.Orientation.z -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -574,7 +575,7 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;
 	}
-	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
+	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
 		lara->Control.JumpDirection = JumpDirection::Up;
 	else
 		lara->Control.JumpDirection = JumpDirection::None;
@@ -591,8 +592,8 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 	auto probe = GetCollision(item, item->Pose.Orientation.y, distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
-			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
-			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
+		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
+		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		lara->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);

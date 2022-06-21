@@ -28,9 +28,9 @@ void DealLaraFallDamage(ItemInfo* item);
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
-void ModulateLaraTurnRate(short* turnRate, short accel, short min, short max, float axis, bool doPositiveModulation);
-void ModulateLaraTurnRateX(ItemInfo* item, short accel, short min, short max, bool doPositiveModulation);
-void ModulateLaraTurnRateY(ItemInfo* item, short accel, short min, short max, bool doPositiveModulation);
+short ModulateLaraTurnRate(short turnRate, short accel, short minTurnRate, short maxTurnRate, float axisCoeff);
+void ModulateLaraTurnRateX(ItemInfo* item, short accel, short minTurnRate, short maxTurnRate);
+void ModulateLaraTurnRateY(ItemInfo* item, short accel, short minTurnRate, short maxTurnRate);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 void UpdateLaraSubsuitAngles(ItemInfo* item);
 void ModulateLaraSubsuitSwimTurn(ItemInfo* item);
