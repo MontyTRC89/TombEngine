@@ -1,17 +1,17 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
+#include "Objects/Utils/VehicleHelpers.h"
 
 namespace TEN::Entities::Vehicles
 {
 	void InitialiseSkidoo(short itemNumber);
 
-	int GetSkidooMountType(ItemInfo* laraItem, ItemInfo* skidooItem, CollisionInfo* coll);
+	void SkidooPlayerCollision(short skidooItemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool TestSkidooDismountOK(ItemInfo* skidooItem, int direction);
 	bool TestSkidooDismount(ItemInfo* laraItem, ItemInfo* skidooItem);
 
 	int GetSkidooCollisionAnim(ItemInfo* skidooItem, Vector3Int* moved);
-	void SkidooCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
 	void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem);
 	void DoSnowEffect(ItemInfo* skidooItem);
@@ -24,6 +24,4 @@ namespace TEN::Entities::Vehicles
 	int TestSkidooHeight(ItemInfo* skidooItem, int zOffset, int xOffset, Vector3Int* pos);
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old);
 	int DoSkidooDynamics(int height, int verticalVelocity, int* y);
-
-	void DrawSkidoo(ItemInfo* skidooItem);
 }

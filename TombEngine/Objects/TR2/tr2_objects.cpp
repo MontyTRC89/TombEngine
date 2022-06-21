@@ -675,7 +675,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSkidoo;
-		obj->collision = SkidooCollision;
+		obj->collision = SkidooPlayerCollision;
 		//obj->drawRoutine = DrawSkidoo; // TODO: create a new render for the skidoo. (with track animated)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
