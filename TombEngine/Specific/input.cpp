@@ -350,59 +350,36 @@ namespace TEN::Input
 
 	bool Key(int number)
 	{
-		short key = KeyboardLayout[1][number];
-
-		if (KeyMap[key])
-			return true;
-
-		switch (key)
+		for (int layout = 1; layout >= 0; layout--)
 		{
-		case KC_RCONTROL:
-			return KeyMap[KC_LCONTROL];
+			short key = KeyboardLayout[layout][number];
 
-		case KC_LCONTROL:
-			return KeyMap[KC_RCONTROL];
+			if (KeyMap[key])
+				return true;
 
-		case KC_RSHIFT:
-			return KeyMap[KC_LSHIFT];
+			switch (key)
+			{
+			case KC_RCONTROL:
+				return KeyMap[KC_LCONTROL];
 
-		case KC_LSHIFT:
-			return KeyMap[KC_RSHIFT];
+			case KC_LCONTROL:
+				return KeyMap[KC_RCONTROL];
 
-		case KC_RMENU:
-			return KeyMap[KC_LMENU];
+			case KC_RSHIFT:
+				return KeyMap[KC_LSHIFT];
 
-		case KC_LMENU:
-			return KeyMap[KC_RMENU];
-		}
+			case KC_LSHIFT:
+				return KeyMap[KC_RSHIFT];
 
-		if (ConflictingKeys[number])
-			return false;
+			case KC_RMENU:
+				return KeyMap[KC_LMENU];
 
-		key = KeyboardLayout[0][number];
+			case KC_LMENU:
+				return KeyMap[KC_RMENU];
+			}
 
-		if (KeyMap[key])
-			return true;
-
-		switch (key)
-		{
-		case KC_RCONTROL:
-			return KeyMap[KC_LCONTROL];
-
-		case KC_LCONTROL:
-			return KeyMap[KC_RCONTROL];
-
-		case KC_RSHIFT:
-			return KeyMap[KC_LSHIFT];
-
-		case KC_LSHIFT:
-			return KeyMap[KC_RSHIFT];
-
-		case KC_RMENU:
-			return KeyMap[KC_LMENU];
-
-		case KC_LMENU:
-			return KeyMap[KC_RMENU];
+			if (ConflictingKeys[number])
+				return false;
 		}
 
 		return false;
