@@ -64,7 +64,7 @@ struct GameConfiguration {
 	int MusicVolume;
 	int SfxVolume;
 	int SoundDevice;
-	short KeyboardLayout[TEN::Input::NUM_CONTROLS];
+	short KeyboardLayout[TEN::Input::KEY_COUNT];
 	bool ControlMethod;
 	int JoyDuck;
 	int JoyAction;

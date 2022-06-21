@@ -34,6 +34,7 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
+	constexpr auto MenuVerticalTop = 15;
 	constexpr auto MenuVerticalTopCenter = 200;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
@@ -195,14 +196,14 @@ namespace TEN::Renderer
 		case Menu::Controls:
 
 			// Setup needed parameters
-			y = MenuVerticalNarrowLineSpacing;
+			y = MenuVerticalTop;
 
 			// Title
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_YELLOW, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Control listing
-			for (int k = 0; k < 17; k++)
+			for (int k = 0; k < KEY_COUNT; k++)
 			{
 				DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(controlmsgs[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
@@ -211,7 +212,7 @@ namespace TEN::Renderer
 				else
 					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[KeyboardLayout[1][k]], PRINTSTRING_COLOR_ORANGE, SF(false));
 
-				if (k < 16)
+				if (k < KEY_COUNT - 1)
 					GetNextNarrowLinePosition(&y);
 				else
 					GetNextBlockPosition(&y);

@@ -60,9 +60,9 @@ const char* controlmsgs[] =
 	STRING_CONTROLS_LOOK,
 	STRING_CONTROLS_ROLL,
 	STRING_CONTROLS_INVENTORY,
+	STRING_CONTROLS_PAUSE,
 	STRING_CONTROLS_STEP_LEFT,
-	STRING_CONTROLS_STEP_RIGHT,
-	STRING_CONTROLS_PAUSE
+	STRING_CONTROLS_STEP_RIGHT
 };
 
 #define font_height 25
@@ -542,7 +542,7 @@ void GuiController::DoDebouncedInput()
 	else
 		dbDown = 0;
 
-	if (TrInput & IN_ACTION || TrInput & IN_SELECT)
+	if (TrInput & IN_ACTION)
 	{
 		if (invMode == InventoryMode::Save)
 		{
@@ -941,11 +941,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 				if (selectedKey && g_KeyNames[selectedKey])
 				{
-					if (selectedKey != OIS::KeyCode::KC_ESCAPE)
-					{
-						KeyboardLayout[1][selected_option] = selectedKey;
-						DefaultConflict();
-					}
+					KeyboardLayout[1][selected_option] = selectedKey;
+					DefaultConflict();
 
 					CurrentSettings.waitingForkey = false;
 					CurrentSettings.ignoreInput = true;
@@ -994,8 +991,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (selected_option == option_count - 1) // Apply
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], NUM_CONTROLS * sizeof(short));
-				memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], NUM_CONTROLS * sizeof(short));
+				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
+				memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
@@ -1005,7 +1002,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (selected_option == option_count) // Cancel
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS * sizeof(short));
+				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, KEY_COUNT * sizeof(short));
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
 				selected_option = 1;
 				return;

@@ -78,12 +78,11 @@ namespace TEN::Input
 	std::vector<bool>  KeyMap  = {};
 	std::vector<float> AxisMap = {};
 
-	int ConflictingKeys[NUM_CONTROLS];
-
-	short KeyboardLayout[2][NUM_CONTROLS] =
+	bool ConflictingKeys[KEY_COUNT];
+	short KeyboardLayout[2][KEY_COUNT] =
 	{
-		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_DELETE, KC_PGDOWN, KC_P, KC_RETURN },
-		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_DELETE, KC_PGDOWN, KC_P, KC_RETURN }
+		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_DELETE, KC_PGDOWN },
+		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_DELETE, KC_PGDOWN }
 	};
 
 	void InitialiseInput(HWND handle)
@@ -595,7 +594,7 @@ namespace TEN::Input
 			lInput |= IN_JUMP;
 
 		if (Key(KEY_ACTION))
-			lInput |= IN_ACTION | IN_SELECT;
+			lInput |= IN_ACTION;
 
 		if (Key(KEY_DRAW))
 			lInput |= IN_DRAW;
@@ -618,9 +617,6 @@ namespace TEN::Input
 		if (Key(KEY_PAUSE))
 			lInput |= IN_PAUSE;
 
-		if (Key(KEY_SELECT))
-			lInput |= IN_SELECT;
-
 		if (KeyMap[KC_ESCAPE] || Key(KEY_DRAW))
 			lInput |= IN_DESELECT;
 
@@ -641,13 +637,13 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < NUM_CONTROLS; i++)
+		for (int i = 0; i < KEY_COUNT; i++)
 		{
 			short key = KeyboardLayout[0][i];
 
 			ConflictingKeys[i] = false;
 
-			for (int j = 0; j < NUM_CONTROLS; j++)
+			for (int j = 0; j < KEY_COUNT; j++)
 			{
 				if (key == KeyboardLayout[1][j])
 				{
