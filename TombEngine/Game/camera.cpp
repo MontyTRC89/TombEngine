@@ -435,8 +435,8 @@ void UpdateCameraElevation()
 								  Camera.target.y == OldCam.target.y &&
 								  Camera.target.z == OldCam.target.z))
 	{
-		Camera.targetAngle += ANGLE(50 * AxisMap[InputAxis::CameraHorizontal]);
-		Camera.targetElevation = ANGLE(-10 + (50 * AxisMap[InputAxis::CameraVertical]));
+		Camera.targetAngle = ANGLE(120.0f * AxisMap[InputAxis::CameraHorizontal]);
+		Camera.targetElevation = ANGLE(-10.0f + (80.0f * AxisMap[InputAxis::CameraVertical]));
 	}
 
 	if (Camera.laraNode != -1)
