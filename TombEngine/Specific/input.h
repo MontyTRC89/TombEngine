@@ -186,18 +186,18 @@ enum INPUT_BUTTONS
 	IN_ALL = ~0,								// 0xFFFFFFFF (-1)
 };
 
-// Temporary input macros for use in vehicles.
-#define VEHICLE_IN_UP			IN_FORWARD
-#define VEHICLE_IN_DOWN			IN_BACK
-#define VEHICLE_IN_LEFT			IN_LEFT
-#define VEHICLE_IN_RIGHT		IN_RIGHT
-#define VEHICLE_IN_ACCELERATE	IN_ACTION
-#define VEHICLE_IN_REVERSE		IN_BACK
-#define VEHICLE_IN_SPEED		IN_SPRINT
-#define VEHICLE_IN_SLOW			IN_WALK
-#define VEHICLE_IN_BRAKE		IN_JUMP
-#define VEHICLE_IN_FIRE			(IN_DRAW | IN_CROUCH)
-#define VEHICLE_IN_DISMOUNT		(IN_JUMP | IN_ROLL)
+// Temporary input constants for use with vehicles.
+constexpr int VEHICLE_IN_UP			= IN_FORWARD;
+constexpr int VEHICLE_IN_DOWN		= IN_BACK;
+constexpr int VEHICLE_IN_LEFT		= IN_LEFT;
+constexpr int VEHICLE_IN_RIGHT		= IN_RIGHT;
+constexpr int VEHICLE_IN_ACCELERATE	= IN_ACTION;
+constexpr int VEHICLE_IN_REVERSE	= IN_BACK;
+constexpr int VEHICLE_IN_SPEED		= IN_SPRINT;
+constexpr int VEHICLE_IN_SLOW		= IN_WALK;
+constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
+constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
+constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
 
 #define IN_OPTIC_CONTROLS (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_SELECT | IN_CROUCH | IN_SPRINT)
 #define IN_WAKE (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION)
