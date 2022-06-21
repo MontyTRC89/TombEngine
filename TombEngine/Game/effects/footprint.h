@@ -4,10 +4,8 @@
 
 struct ItemInfo;
 
-namespace TEN{
-namespace Effects {
-namespace Footprints {
-
+namespace TEN::Effects::Footprints
+{
 	constexpr size_t MAX_FOOTPRINTS = 20;
 	constexpr auto FOOTPRINT_SIZE = 64.0f;
 
@@ -28,5 +26,4 @@ namespace Footprints {
 	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition);
 	void AddFootprint(ItemInfo* item, bool rightFoot);
 	void UpdateFootprints();
-
-}}}
+}
