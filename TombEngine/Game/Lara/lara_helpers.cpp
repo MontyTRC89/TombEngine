@@ -519,18 +519,12 @@ void ModulateLaraSubsuitSwimTurn(ItemInfo* item)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_SUBSUIT_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE, 0, LARA_MED_TURN_MAX, false);
 		item->Pose.Orientation.z -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_SUBSUIT_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
 		item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
@@ -546,18 +540,12 @@ void ModulateLaraSwimTurn(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, false);
 		item->Pose.Orientation.z -= LARA_LEAN_RATE;
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
 		item->Pose.Orientation.z += LARA_LEAN_RATE;
 	}
 }
