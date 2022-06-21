@@ -83,7 +83,7 @@ namespace TEN::Input
 	extern std::vector<bool>   KeyMap;
 	extern std::vector<float>  AxisMap;
 
-	extern short KeyboardLayout[2][NUM_CONTROLS];
+	extern short KeyboardLayout[2][KEY_COUNT];
 
 	void InitialiseInput(HWND handle);
 	void DeInitialiseInput();
