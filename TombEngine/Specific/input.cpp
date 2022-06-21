@@ -200,7 +200,9 @@ namespace TEN::Input
 				// Calculate raw normalized analog value (for camera)
 				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) 
 																	/ (float)(std::numeric_limits<short>::max() - JOY_AXIS_DEADZONE);
-				// Calculate scaled analog value (for movement)
+
+				// Calculate scaled analog value (for movement).
+				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots
