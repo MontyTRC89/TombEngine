@@ -1691,6 +1691,53 @@ void DoVehicleCollision(ItemInfo* vehicle, int radius)
 	DoObjectCollision(vehicle, &coll);
 }
 
+int GetVehicleHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3Int* pos)
+{
+	float sinX = phd_sin(vehicle->Pose.Orientation.x);
+	float sinY = phd_sin(vehicle->Pose.Orientation.y);
+	float cosY = phd_cos(vehicle->Pose.Orientation.y);
+	float sinZ = phd_sin(vehicle->Pose.Orientation.z);
+
+	pos->x = vehicle->Pose.Position.x + (dz * sinY) + (dx * cosY);
+	pos->y = vehicle->Pose.Position.y - (dz * sinX) + (dx * sinZ);
+	pos->z = vehicle->Pose.Position.z + (dz * cosY) - (dx * sinY);
+
+	// Get collision a bit higher to be able to detect bridges.
+	auto probe = GetCollision(pos->x, pos->y - CLICK(2), pos->z, vehicle->RoomNumber);
+
+	if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
+		return NO_HEIGHT;
+
+	if (clamp && pos->y > probe.Position.Floor)
+		pos->y = probe.Position.Floor;
+
+	return probe.Position.Floor;
+}
+
+int GetVehicleWaterHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3Int* pos)
+{
+	float sinX = phd_sin(vehicle->Pose.Orientation.x);
+	float sinY = phd_sin(vehicle->Pose.Orientation.y);
+	float cosY = phd_cos(vehicle->Pose.Orientation.y);
+	float sinZ = phd_sin(vehicle->Pose.Orientation.z);
+
+	pos->x = vehicle->Pose.Position.x + (dz * sinY) + (dx * cosY);
+	pos->y = vehicle->Pose.Position.y - (dz * sinX) + (dx * sinZ);
+	pos->z = vehicle->Pose.Position.z + (dz * cosY) - (dx * sinY);
+
+	auto probe = GetCollision(pos->x, pos->y, pos->z, vehicle->RoomNumber);
+	auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
+
+	if (height == NO_HEIGHT)
+	{
+		height = probe.Position.Floor;
+		if (height == NO_HEIGHT)
+			return height;
+	}
+
+	return (height - 5);
+}
+
 int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocity, int radius, short* angle)
 {
 	if (TestEnvironment(ENV_FLAG_WATER, vehicle) ||

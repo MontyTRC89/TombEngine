@@ -347,8 +347,8 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int frontLeft, frontRight;
 		auto collide = SkidooDynamics(laraItem, skidooItem);
-		auto heightFrontLeft = TestSkidooHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, &frontLeft);
-		auto heightFrontRight = TestSkidooHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, &frontRight);
+		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, &frontLeft);
+		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, &frontRight);
 
 		auto probe = GetCollision(skidooItem);
 
@@ -713,26 +713,6 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	int TestSkidooHeight(ItemInfo* skidooItem, int zOffset, int xOffset, Vector3Int* pos)
-	{
-		pos->y = skidooItem->Pose.Position.y - zOffset * phd_sin(skidooItem->Pose.Orientation.x) + xOffset * phd_sin(skidooItem->Pose.Orientation.z);
-
-		float s = phd_sin(skidooItem->Pose.Orientation.y);
-		float c = phd_cos(skidooItem->Pose.Orientation.y);
-
-		pos->x = skidooItem->Pose.Position.x + zOffset * s + xOffset * c;
-		pos->z = skidooItem->Pose.Position.z + zOffset * c - xOffset * s;
-
-		auto probe = GetCollision(pos->x, pos->y, pos->z, skidooItem->RoomNumber);
-		if (probe.Position.Ceiling > pos->y ||
-			probe.Position.Ceiling == NO_HEIGHT)
-		{
-			return NO_HEIGHT;
-		}
-
-		return probe.Position.Floor;
-	}
-
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old)
 	{
 		int	x = pos->x / SECTOR(1);
@@ -838,21 +818,12 @@ namespace TEN::Entities::Vehicles
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
 		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld;
-		auto heightFrontLeftOld = TestSkidooHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, &frontLeftOld);
-		auto heightFrontRightOld = TestSkidooHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, &frontRightOld);
-		auto heightBackLeftOld = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, &backLeftOld);
-		auto heightBackRightOld = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, &backRightOld);
+		auto heightFrontLeftOld = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, &frontLeftOld);
+		auto heightFrontRightOld = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, &frontRightOld);
+		auto heightBackLeftOld = GetVehicleHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, true, &backLeftOld);
+		auto heightBackRightOld = GetVehicleHeight(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, true, &backRightOld);
 
 		auto oldPos = skidooItem->Pose.Position;
-
-		if (backLeftOld.y > heightBackLeftOld)
-			backLeftOld.y = heightBackLeftOld;
-		if (backRightOld.y > heightBackRightOld)
-			backRightOld.y = heightBackRightOld;
-		if (frontLeftOld.y > heightFrontLeftOld)
-			frontLeftOld.y = heightFrontLeftOld;
-		if (frontRightOld.y > heightFrontRightOld)
-			frontRightOld.y = heightFrontRightOld;
 
 		short rotation;
 
@@ -919,19 +890,19 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int frontLeft, frontRight, backRight, backLeft;
 		rotation = 0;
-		auto heightBackLeft = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, &backLeft);
+		auto heightBackLeft = GetVehicleHeight(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, false, &backLeft);
 		if (heightBackLeft < (backLeftOld.y - CLICK(1)))
 			rotation = DoSkidooShift(skidooItem, &backLeft, &backLeftOld);
 
-		auto heightBackRight = TestSkidooHeight(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, &backRight);
+		auto heightBackRight = GetVehicleHeight(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, false, &backRight);
 		if (heightBackRight < (backRightOld.y - CLICK(1)))
 			rotation += DoSkidooShift(skidooItem, &backRight, &backRightOld);
 
-		auto heightFrontLeft = TestSkidooHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, &frontLeft);
+		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, false, &frontLeft);
 		if (heightFrontLeft < (frontLeftOld.y - CLICK(1)))
 			rotation += DoSkidooShift(skidooItem, &frontLeft, &frontLeftOld);
 
-		auto heightFrontRight = TestSkidooHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, &frontRight);
+		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, false, &frontRight);
 		if (heightFrontRight < (frontRightOld.y - CLICK(1)))
 			rotation += DoSkidooShift(skidooItem, &frontRight, &frontRightOld);
 

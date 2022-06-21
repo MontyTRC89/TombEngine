@@ -231,30 +231,6 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	int SpeedboatTestWaterHeight(ItemInfo* speedboatItem, int zOffset, int xOffset, Vector3Int* pos)
-	{
-		float sinX = phd_sin(speedboatItem->Pose.Orientation.x);
-		float sinY = phd_sin(speedboatItem->Pose.Orientation.y);
-		float cosY = phd_cos(speedboatItem->Pose.Orientation.y);
-		float sinZ = phd_sin(speedboatItem->Pose.Orientation.z);
-
-		pos->x = speedboatItem->Pose.Position.x + (zOffset * sinY) + (xOffset * cosY);
-		pos->y = speedboatItem->Pose.Position.y - (zOffset * sinX) + (xOffset * sinZ);
-		pos->z = speedboatItem->Pose.Position.z + (zOffset * cosY) - (xOffset * sinY);
-
-		auto probe = GetCollision(pos->x, pos->y, pos->z, speedboatItem->RoomNumber);
-		auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
-
-		if (height == NO_HEIGHT)
-		{
-			height = probe.Position.Floor;
-			if (height == NO_HEIGHT)
-				return height;
-		}
-
-		return (height - 5);
-	}
-
 	void SpeedboatDoBoatShift(ItemInfo* speedboatItem, int itemNumber)
 	{
 		short itemNumber2 = g_Level.Rooms[speedboatItem->RoomNumber].itemNumber;
@@ -447,26 +423,15 @@ namespace TEN::Entities::Vehicles
 		speedboatItem->Pose.Orientation.z -= speedboat->LeanAngle;
 
 		Vector3Int old, frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
-		int heightFrontLeftOld = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, &frontLeftOld);
-		int heightFrontRightOld = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, &frontRightOld);
-		int heightBackLeftOld = SpeedboatTestWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, &backLeftOld);
-		int heightBackRightOld = SpeedboatTestWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, &backRightOld);
-		int heightFrontOld = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_TIP, 0, &frontOld);
+		int heightFrontLeftOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeftOld);
+		int heightFrontRightOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &frontRightOld);
+		int heightBackLeftOld = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &backLeftOld);
+		int heightBackRightOld = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &backRightOld);
+		int heightFrontOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_TIP, 0, true, &frontOld);
 
 		old.x = speedboatItem->Pose.Position.x;
 		old.y = speedboatItem->Pose.Position.y;
 		old.z = speedboatItem->Pose.Position.z;
-
-		if (backLeftOld.y > heightBackLeftOld)
-			backLeftOld.y = heightBackLeftOld;
-		if (backRightOld.y > heightBackRightOld)
-			backRightOld.y = heightBackRightOld;
-		if (frontLeftOld.y > heightFrontLeftOld)
-			frontLeftOld.y = heightFrontLeftOld;
-		if (frontRightOld.y > heightFrontRightOld)
-			frontRightOld.y = heightFrontRightOld;
-		if (frontOld.y > heightFrontOld)
-			frontOld.y = heightFrontOld;
 
 		speedboatItem->Pose.Orientation.y += speedboat->TurnRate + speedboat->ExtraRotation;
 		speedboat->LeanAngle = speedboat->TurnRate * 6;
@@ -492,26 +457,26 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int fl, fr, br, bl, f;
 		short rotation = 0;
-		auto heightBackLeft = SpeedboatTestWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, &bl);
+		auto heightBackLeft = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, &bl);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
 			rotation = SpeedboatDoShift(speedboatItem, &bl, &backLeftOld);
 
-		auto heightBackRight = SpeedboatTestWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, &br);
+		auto heightBackRight = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, false, &br);
 		if (heightBackRight < (backRightOld.y - CLICK(0.5f)))
 			rotation += SpeedboatDoShift(speedboatItem, &br, &backRightOld);
 
-		auto heightFrontLeft = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, &fl);
+		auto heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, &fl);
 		if (heightFrontLeft < (frontLeftOld.y - CLICK(0.5f)))
 			rotation += SpeedboatDoShift(speedboatItem, &fl, &frontLeftOld);
 
-		auto heightFrontRight = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, &fr);
+		auto heightFrontRight = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, false, &fr);
 		if (heightFrontRight < (frontRightOld.y - CLICK(0.5f)))
 			rotation += SpeedboatDoShift(speedboatItem, &fr, &frontRightOld);
 
 		int heightFront = 0;
 		if (!slip)
 		{
-			heightFront = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_TIP, 0, &f);
+			heightFront = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_TIP, 0, false, &f);
 			if (heightFront < (frontOld.y - CLICK(0.5f)))
 				SpeedboatDoShift(speedboatItem, &f, &frontOld);
 		}
@@ -849,8 +814,8 @@ namespace TEN::Entities::Vehicles
 		int collide = SpeedboatDynamics(laraItem, itemNumber);
 
 		Vector3Int frontLeft, frontRight;
-		int heightFrontLeft = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, &frontLeft);
-		int heightFrontRight = SpeedboatTestWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, &frontRight);
+		int heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeft);
+		int heightFrontRight = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &frontRight);
 
 		auto probe = GetCollision(speedboatItem);
 

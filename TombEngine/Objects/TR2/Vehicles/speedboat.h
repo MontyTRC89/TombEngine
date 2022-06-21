@@ -17,7 +17,6 @@ namespace TEN::Entities::Vehicles
 	SpeedboatMountType GetSpeedboatMountType(ItemInfo* laraItem, ItemInfo* sBoatItem, CollisionInfo* coll);
 	bool TestSpeedboatDismount(ItemInfo* sBoatItem, int direction);
 	void DoSpeedboatDismount(ItemInfo* laraItem, ItemInfo* sBoatItem);
-	int SpeedboatTestWaterHeight(ItemInfo* sBoatItem, int zOffset, int xOffset, Vector3Int* pos);
 
 	void SpeedboatDoBoatShift(ItemInfo* sBoatItem, int itemNumber);
 	short SpeedboatDoShift(ItemInfo* sBoatItem, Vector3Int* pos, Vector3Int* old);

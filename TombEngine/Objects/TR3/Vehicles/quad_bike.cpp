@@ -339,26 +339,6 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static int TestQuadHeight(ItemInfo* quadBikeItem, int dz, int dx, Vector3Int* pos)
-	{
-		pos->y = quadBikeItem->Pose.Position.y - dz * phd_sin(quadBikeItem->Pose.Orientation.x) + dx * phd_sin(quadBikeItem->Pose.Orientation.z);
-
-		float c = phd_cos(quadBikeItem->Pose.Orientation.y);
-		float s = phd_sin(quadBikeItem->Pose.Orientation.y);
-
-		pos->z = quadBikeItem->Pose.Position.z + dz * c - dx * s;
-		pos->x = quadBikeItem->Pose.Position.x + dz * s + dx * c;
-
-		auto probe = GetCollision(pos->x, pos->y, pos->z, quadBikeItem->RoomNumber);
-		if (probe.Position.Ceiling > pos->y ||
-			probe.Position.Ceiling == NO_HEIGHT)
-		{
-			return NO_HEIGHT;
-		}
-
-		return probe.Position.Floor;
-	}
-
 	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3Int* pos, Vector3Int* old)
 	{
 		CollisionResult probe;
@@ -492,55 +472,25 @@ namespace TEN::Entities::Vehicles
 		quadBike->NoDismount = false;
 
 		Vector3Int oldFrontLeft, oldFrontRight, oldBottomLeft, oldBottomRight;
-		int holdFrontLeft = TestQuadHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, &oldFrontLeft);
-		int holdFrontRight = TestQuadHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, &oldFrontRight);
-		int holdBottomLeft = TestQuadHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, &oldBottomLeft);
-		int holdBottomRight = TestQuadHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, &oldBottomRight);
+		int holdFrontLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, true, &oldFrontLeft);
+		int holdFrontRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, true, &oldFrontRight);
+		int holdBottomLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, true, &oldBottomLeft);
+		int holdBottomRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, true, &oldBottomRight);
 
 		Vector3Int mtlOld, mtrOld, mmlOld, mmrOld;
-		int hmml_old = TestQuadHeight(quadBikeItem, 0, -QBIKE_SIDE, &mmlOld);
-		int hmmr_old = TestQuadHeight(quadBikeItem, 0, QBIKE_SIDE, &mmrOld);
-		int hmtl_old = TestQuadHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, &mtlOld);
-		int hmtr_old = TestQuadHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, &mtrOld);
+		int hmml_old = GetVehicleHeight(quadBikeItem, 0, -QBIKE_SIDE, true, &mmlOld);
+		int hmmr_old = GetVehicleHeight(quadBikeItem, 0, QBIKE_SIDE, true, &mmrOld);
+		int hmtl_old = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, true, &mtlOld);
+		int hmtr_old = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, true, &mtrOld);
 
 		Vector3Int moldBottomLeft, moldBottomRight;
-		int hmoldBottomLeft = TestQuadHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, &moldBottomLeft);
-		int hmoldBottomRight = TestQuadHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, &moldBottomRight);
+		int hmoldBottomLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, true, &moldBottomLeft);
+		int hmoldBottomRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, true, &moldBottomRight);
 
 		Vector3Int old;
 		old.x = quadBikeItem->Pose.Position.x;
 		old.y = quadBikeItem->Pose.Position.y;
 		old.z = quadBikeItem->Pose.Position.z;
-
-		if (oldBottomLeft.y > holdBottomLeft)
-			oldBottomLeft.y = holdBottomLeft;
-
-		if (oldBottomRight.y > holdBottomRight)
-			oldBottomRight.y = holdBottomRight;
-
-		if (oldFrontLeft.y > holdFrontLeft)
-			oldFrontLeft.y = holdFrontLeft;
-
-		if (oldFrontRight.y > holdFrontRight)
-			oldFrontRight.y = holdFrontRight;
-
-		if (moldBottomLeft.y > hmoldBottomLeft)
-			moldBottomLeft.y = hmoldBottomLeft;
-
-		if (moldBottomRight.y > hmoldBottomRight)
-			moldBottomRight.y = hmoldBottomRight;
-
-		if (mtlOld.y > hmtl_old)
-			mtlOld.y = hmtl_old;
-
-		if (mtrOld.y > hmtr_old)
-			mtrOld.y = hmtr_old;
-
-		if (mmlOld.y > hmml_old)
-			mmlOld.y = hmml_old;
-
-		if (mmrOld.y > hmmr_old)
-			mmrOld.y = hmmr_old;
 
 		if (quadBikeItem->Pose.Position.y > (quadBikeItem->Floor - CLICK(1)))
 		{
@@ -622,27 +572,27 @@ namespace TEN::Entities::Vehicles
 		short rotAdd = 0;
 
 		Vector3Int fl;
-		int heightFrontLeft = TestQuadHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, &fl);
+		int heightFrontLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &fl);
 		if (heightFrontLeft < (oldFrontLeft.y - CLICK(1)))
 			rot = DoQuadShift(quadBikeItem, &fl, &oldFrontLeft);
 
 		Vector3Int mtl;
-		int hmtl = TestQuadHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, &mtl);
+		int hmtl = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mtl);
 		if (hmtl < (mtlOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mtl, &mtlOld);
 
 		Vector3Int mml;
-		int hmml = TestQuadHeight(quadBikeItem, 0, -QBIKE_SIDE, &mml);
+		int hmml = GetVehicleHeight(quadBikeItem, 0, -QBIKE_SIDE, false, &mml);
 		if (hmml < (mmlOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mml, &mmlOld);
 
 		Vector3Int mbl;
-		int hmbl = TestQuadHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, &mbl);
+		int hmbl = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mbl);
 		if (hmbl < (moldBottomLeft.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mbl, &moldBottomLeft);
 
 		Vector3Int bl;
-		int heightBackLeft = TestQuadHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, &bl);
+		int heightBackLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, false, &bl);
 		if (heightBackLeft < (oldBottomLeft.y - CLICK(1)))
 		{
 			rotAdd = DoQuadShift(quadBikeItem, &bl, &oldBottomLeft);
@@ -651,7 +601,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		Vector3Int fr;
-		int heightFrontRight = TestQuadHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, &fr);
+		int heightFrontRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, &fr);
 		if (heightFrontRight < (oldFrontRight.y - CLICK(1)))
 		{
 			rotAdd = DoQuadShift(quadBikeItem, &fr, &oldFrontRight);
@@ -660,22 +610,22 @@ namespace TEN::Entities::Vehicles
 		}
 
 		Vector3Int mtr;
-		int hmtr = TestQuadHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, &mtr);
+		int hmtr = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, false, &mtr);
 		if (hmtr < (mtrOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mtr, &mtrOld);
 
 		Vector3Int mmr;
-		int hmmr = TestQuadHeight(quadBikeItem, 0, QBIKE_SIDE, &mmr);
+		int hmmr = GetVehicleHeight(quadBikeItem, 0, QBIKE_SIDE, false, &mmr);
 		if (hmmr < (mmrOld.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mmr, &mmrOld);
 
 		Vector3Int mbr;
-		int hmbr = TestQuadHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, &mbr);
+		int hmbr = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, false, &mbr);
 		if (hmbr < (moldBottomRight.y - CLICK(1)))
 			DoQuadShift(quadBikeItem, &mbr, &moldBottomRight);
 
 		Vector3Int br;
-		int heightBackRight = TestQuadHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, &br);
+		int heightBackRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, false, &br);
 		if (heightBackRight < (oldBottomRight.y - CLICK(1)))
 		{
 			rotAdd = DoQuadShift(quadBikeItem, &br, &oldBottomRight);
@@ -1218,8 +1168,8 @@ namespace TEN::Entities::Vehicles
 		auto probe = GetCollision(quadBikeItem);
 
 		Vector3Int frontLeft, frontRight;
-		auto floorHeightLeft = TestQuadHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, &frontLeft);
-		auto floorHeightRight = TestQuadHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, &frontRight);
+		auto floorHeightLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &frontLeft);
+		auto floorHeightRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, &frontRight);
 
 		TestTriggers(quadBikeItem, false);
 
