@@ -420,9 +420,7 @@ void WinClose()
 
 	DestroyAcceleratorTable(hAccTable);
 
-	if (g_Configuration.EnableSound)
-		Sound_DeInit();
-
+	Sound_DeInit();
 	DeInitialiseInput();
 	
 	delete g_GameScript;

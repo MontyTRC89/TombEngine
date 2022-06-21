@@ -853,7 +853,8 @@ void Sound_Init()
 
 void Sound_DeInit()
 {
-	BASS_Free();
+	if (g_Configuration.EnableSound)
+		BASS_Free();
 }
 
 bool Sound_CheckBASSError(const char* message, bool verbose, ...)
