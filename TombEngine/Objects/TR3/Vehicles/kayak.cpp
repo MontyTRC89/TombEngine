@@ -71,6 +71,7 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_MAX_KICK		-80
 	#define KAYAK_MIN_BOUNCE	((MAX_VELOCITY / 2) / 256)
 
+	// TODO: ??
 	#define KAYAK_IN_FORWARD	IN_FORWARD
 	#define KAYAK_IN_BACK		IN_BACK
 	#define KAYAK_IN_LEFT		IN_LEFT
@@ -78,7 +79,6 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_IN_HOLD		IN_WALK
 	#define KAYAK_IN_HOLD_LEFT	IN_LSTEP
 	#define KAYAK_IN_HOLD_RIGHT	IN_RSTEP
-	#define KAYAK_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
 
 	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
 
@@ -711,7 +711,7 @@ namespace TEN::Entities::Vehicles
 		switch (laraItem->Animation.ActiveState)
 		{
 		case KAYAK_STATE_IDLE:
-			if (TrInput & KAYAK_IN_DISMOUNT &&
+			if (TrInput & VEHICLE_IN_DISMOUNT &&
 				!lara->WaterCurrentActive &&
 				!lara->WaterCurrentPull.x && !lara->WaterCurrentPull.z)
 			{

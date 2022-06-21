@@ -43,8 +43,9 @@ namespace TEN::Entities::Vehicles
 	#define JEEP_MAX_SPEED				0x8000
 	#define JEEP_MAX_BACK				0x4000
 
-	#define JEEP_IN_ACCELERATE	IN_ACTION
-	#define JEEP_IN_BRAKE		IN_JUMP
+	// TODO: Simpler toggle.
+	#define JEEP_IN_TOGGLE_REVERSE	IN_SPRINT
+	#define JEEP_IN_TOGGLE_FORWARD	IN_WALK
 
 	enum JeepState
 	{
@@ -780,13 +781,13 @@ namespace TEN::Entities::Vehicles
 
 			if (jeep->velocity < 0)
 			{
-				if (TrInput & (IN_RIGHT | IN_RSTEP))
+				if (TrInput & VEHICLE_IN_RIGHT)
 				{
 					jeep->jeepTurn -= rot2;
 					if (jeep->jeepTurn < -rot1)
 						jeep->jeepTurn = -rot1;
 				}
-				else if (TrInput & (IN_LEFT | IN_LSTEP))
+				else if (TrInput & VEHICLE_IN_LEFT)
 				{
 					jeep->jeepTurn += rot2;
 					if (jeep->jeepTurn > rot1)
@@ -795,13 +796,13 @@ namespace TEN::Entities::Vehicles
 			}
 			else if (jeep->velocity > 0)
 			{
-				if (TrInput & (IN_RIGHT | IN_RSTEP))
+				if (TrInput & VEHICLE_IN_RIGHT)
 				{
 					jeep->jeepTurn += rot2;
 					if (jeep->jeepTurn > rot1)
 						jeep->jeepTurn = rot1;
 				}
-				else if (TrInput & (IN_LEFT | IN_LSTEP))
+				else if (TrInput & VEHICLE_IN_LEFT)
 				{
 					jeep->jeepTurn -= rot2;
 					if (jeep->jeepTurn < -rot1)
@@ -810,7 +811,7 @@ namespace TEN::Entities::Vehicles
 			}
 
 			// Break/reverse
-			if (TrInput & JEEP_IN_BRAKE)
+			if (TrInput & VEHICLE_IN_BRAKE)
 			{
 				if (jeep->velocity < 0)
 				{
@@ -826,7 +827,7 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 			// Accelerate
-			else if (TrInput & JEEP_IN_ACCELERATE)
+			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
 				if (jeep->unknown2)
 				{
@@ -870,7 +871,7 @@ namespace TEN::Entities::Vehicles
 			jeep->engineRevs += ((abs(revs) - jeep->engineRevs) / 8);
 		}
 
-		if (TrInput & JEEP_IN_BRAKE)
+		if (TrInput & VEHICLE_IN_BRAKE)
 		{
 			Vector3Int pos;
 			pos.x = 0;
@@ -953,7 +954,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = JS_DEATH;
 				else
 				{
-					dismount = ((TrInput & JEEP_IN_BRAKE) && (TrInput & IN_LEFT)) ? true : false;
+					dismount = ((TrInput & VEHICLE_IN_BRAKE) && (TrInput & VEHICLE_IN_LEFT)) ? true : false;
 					if (dismount &&
 						!jeep->velocity &&
 						!JeepNoGetOff)
@@ -963,13 +964,13 @@ namespace TEN::Entities::Vehicles
 						break;
 					}
 
-					if (DbInput & IN_WALK)
+					if (DbInput & JEEP_IN_TOGGLE_FORWARD)
 					{
 						if (jeep->unknown2)
 							jeep->unknown2--;
 						break;
 					}
-					else if (DbInput & IN_SPRINT)
+					else if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
 						if (jeep->unknown2 < 1)
 						{
@@ -981,29 +982,29 @@ namespace TEN::Entities::Vehicles
 					}
 					else
 					{
-						if ((TrInput & JEEP_IN_ACCELERATE) && !(TrInput & JEEP_IN_BRAKE))
+						if ((TrInput & VEHICLE_IN_ACCELERATE) && !(TrInput & VEHICLE_IN_BRAKE))
 						{
 							laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
 							break;
 						}
-						else if (TrInput & (IN_LEFT | IN_LSTEP))
+						else if (TrInput & VEHICLE_IN_LEFT)
 							laraItem->Animation.TargetState = JS_FWD_LEFT;
-						else if (TrInput & (IN_RIGHT | IN_RSTEP))
+						else if (TrInput & VEHICLE_IN_RIGHT)
 							laraItem->Animation.TargetState = JS_FWD_RIGHT;
 					}
 
-	/*				if (!(DbInput & IN_WALK))
+	/*				if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 					{
-						if (!(DbInput & IN_SPRINT))
+						if (!(DbInput & JEEP_IN_TOGGLE_REVERSE))
 						{
-							if ((TrInput & JEEP_IN_ACCELERATE) && !(TrInput & JEEP_IN_BRAKE))
+							if ((TrInput & VEHICLE_IN_ACCELERATE) && !(TrInput & VEHICLE_IN_BRAKE))
 							{
 								laraItem->TargetState = JS_DRIVE_FORWARD;
 								break;
 							}
-							else if (TrInput & (IN_LEFT | IN_LSTEP))
+							else if (TrInput & VEHICLE_IN_LEFT)
 								laraItem->TargetState = JS_FWD_LEFT;
-							else if (TrInput & (IN_RIGHT | IN_RSTEP))
+							else if (TrInput & VEHICLE_IN_RIGHT)
 								laraItem->TargetState = JS_FWD_RIGHT;
 						}
 						else if (jeep->unknown2 < 1)
@@ -1029,9 +1030,9 @@ namespace TEN::Entities::Vehicles
 				else
 				{
 					if (jeep->velocity & 0xFFFFFF00 ||
-						TrInput & (JEEP_IN_ACCELERATE | JEEP_IN_BRAKE))
+						TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_BRAKE))
 					{
-						if (TrInput & JEEP_IN_BRAKE)
+						if (TrInput & VEHICLE_IN_BRAKE)
 						{
 							if (jeep->velocity <= 21844)
 								laraItem->Animation.TargetState = JS_STOP;
@@ -1040,9 +1041,9 @@ namespace TEN::Entities::Vehicles
 						}
 						else
 						{
-							if (TrInput & (IN_LEFT | IN_LSTEP))
+							if (TrInput & VEHICLE_IN_LEFT)
 								laraItem->Animation.TargetState = JS_FWD_LEFT;
-							else if (TrInput & (IN_RIGHT | IN_RSTEP))
+							else if (TrInput & VEHICLE_IN_RIGHT)
 								laraItem->Animation.TargetState = JS_FWD_RIGHT;
 						}
 					}
@@ -1058,7 +1059,7 @@ namespace TEN::Entities::Vehicles
 			case 5:
 				if (dead)
 					laraItem->Animation.TargetState = JS_STOP;
-				else if (TrInput & (JEEP_IN_ACCELERATE | JEEP_IN_BRAKE))
+				else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_BRAKE))
 					laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
 				break;
 
@@ -1067,9 +1068,9 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = JS_STOP;
 				else if (jeep->velocity & 0xFFFFFF00)
 				{
-					if (TrInput & (IN_LEFT | IN_LSTEP))
+					if (TrInput & VEHICLE_IN_LEFT)
 						laraItem->Animation.TargetState = JS_FWD_LEFT;
-					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					else if (TrInput & VEHICLE_IN_RIGHT)
 						laraItem->Animation.TargetState = JS_FWD_RIGHT;
 				}
 				else
@@ -1079,9 +1080,9 @@ namespace TEN::Entities::Vehicles
 			case JS_FWD_LEFT:
 				if (dead)
 					laraItem->Animation.TargetState = JS_STOP;
-				else if (!(DbInput & IN_WALK))
+				else if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 				{
-					if (DbInput & IN_SPRINT)
+					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
 						if (jeep->unknown2 < 1)
 						{
@@ -1096,9 +1097,9 @@ namespace TEN::Entities::Vehicles
 							}
 						}
 					}
-					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					else if (TrInput & VEHICLE_IN_RIGHT)
 						laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
-					else if (TrInput & (IN_LEFT | IN_LSTEP))
+					else if (TrInput & VEHICLE_IN_LEFT)
 						laraItem->Animation.TargetState = JS_FWD_LEFT;
 					else if (jeep->velocity)
 						laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
@@ -1131,9 +1132,9 @@ namespace TEN::Entities::Vehicles
 			case JS_FWD_RIGHT:
 				if (dead)
 					laraItem->Animation.TargetState = JS_STOP;
-				if (!(DbInput & IN_WALK))
+				if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 				{
-					if (DbInput & IN_SPRINT)
+					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
 						if (jeep->unknown2 < 1)
 						{
@@ -1148,9 +1149,9 @@ namespace TEN::Entities::Vehicles
 							}
 						}
 					}
-					else if (TrInput & (IN_LEFT | IN_LSTEP))
+					else if (TrInput & VEHICLE_IN_LEFT)
 						laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
-					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					else if (TrInput & VEHICLE_IN_RIGHT)
 						laraItem->Animation.TargetState = JS_FWD_RIGHT;
 					else if (jeep->velocity)
 						laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
@@ -1191,9 +1192,9 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = JS_DRIVE_BACK;
 				else if (abs(jeep->velocity) & 0xFFFFFF00)
 				{
-					if (TrInput & (IN_LEFT | IN_LSTEP))
+					if (TrInput & VEHICLE_IN_LEFT)
 						laraItem->Animation.TargetState = JS_BACK_RIGHT;
-					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					else if (TrInput & VEHICLE_IN_RIGHT)
 						laraItem->Animation.TargetState = JS_BACK_LEFT;
 				}
 				else
@@ -1204,14 +1205,14 @@ namespace TEN::Entities::Vehicles
 			case JS_BACK_LEFT:
 				if (dead)
 					laraItem->Animation.TargetState = JS_DRIVE_BACK;
-				else if (!(DbInput & IN_WALK))
+				else if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 				{
-					if (DbInput & IN_SPRINT)
+					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
 						if (jeep->unknown2 < 1)
 							jeep->unknown2++;
 					}
-					else if (TrInput & (IN_RIGHT | IN_RSTEP))
+					else if (TrInput & VEHICLE_IN_RIGHT)
 						laraItem->Animation.TargetState = JS_BACK_LEFT;
 					else
 						laraItem->Animation.TargetState = JS_BACK;
@@ -1253,14 +1254,14 @@ namespace TEN::Entities::Vehicles
 				{
 					laraItem->Animation.TargetState = JS_DRIVE_BACK;
 				}
-				else if (!(DbInput & IN_WALK))
+				else if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 				{
-					if (DbInput & IN_SPRINT)
+					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
 						if (jeep->unknown2 < 1)
 							jeep->unknown2++;
 					}
-					else if (TrInput & (IN_LEFT | IN_LSTEP))
+					else if (TrInput & VEHICLE_IN_LEFT)
 						laraItem->Animation.TargetState = JS_BACK_RIGHT;
 					else
 						laraItem->Animation.TargetState = JS_BACK;
@@ -1311,18 +1312,18 @@ namespace TEN::Entities::Vehicles
 				else
 	//			if (jeep->velocity || JeepNoGetOff)
 				{
-					if (!(DbInput & IN_WALK))
+					if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 					{
-						if (DbInput & IN_SPRINT)
+						if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 						{
 							if (jeep->unknown2 < 1)
 								jeep->unknown2++;
 						}
-						else if (!(TrInput & JEEP_IN_ACCELERATE) || TrInput & JEEP_IN_BRAKE)
+						else if (!(TrInput & VEHICLE_IN_ACCELERATE) || TrInput & VEHICLE_IN_BRAKE)
 						{
-							if (TrInput & (IN_LEFT | IN_LSTEP))
+							if (TrInput & VEHICLE_IN_LEFT)
 								laraItem->Animation.TargetState = JS_BACK_RIGHT;
-							else if (TrInput & (IN_LEFT | IN_LSTEP))
+							else if (TrInput & VEHICLE_IN_LEFT)
 								laraItem->Animation.TargetState = JS_BACK_LEFT;
 						}
 						else

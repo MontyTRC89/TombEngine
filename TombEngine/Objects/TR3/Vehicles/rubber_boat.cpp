@@ -39,14 +39,6 @@ namespace TEN::Entities::Vehicles
 	#define RBOAT_UNDO_TURN		ANGLE(0.25f)
 	#define RBOAT_TURN			(ANGLE(0.25f) / 2)
 
-	#define RBOAT_IN_SPEED		(IN_SPRINT | IN_CROUCH)
-	#define RBOAT_IN_SLOW		IN_WALK
-	#define RBOAT_IN_DISMOUNT	IN_ROLL
-	#define RBOAT_IN_FORWARD	IN_ACTION
-	#define RBOAT_IN_BACK		IN_JUMP
-	#define RBOAT_IN_LEFT		IN_LEFT
-	#define RBOAT_IN_RIGHT		IN_RIGHT
-
 	enum RubberBoatState
 	{
 		RBOAT_STATE_MOUNT = 0,
@@ -500,10 +492,10 @@ namespace TEN::Entities::Vehicles
 		if (rBoatItem->Pose.Position.y >= (rBoat->Water - 128) && 
 			rBoat->Water != NO_HEIGHT)
 		{
-			if (!(TrInput & RBOAT_IN_DISMOUNT) && !(TrInput & IN_LOOK) || rBoatItem->Animation.Velocity)
+			if (!(TrInput & VEHICLE_IN_DISMOUNT) && !(TrInput & IN_LOOK) || rBoatItem->Animation.Velocity)
 			{
-				if ((TrInput & RBOAT_IN_LEFT && !(TrInput & RBOAT_IN_BACK)) ||
-					(TrInput & RBOAT_IN_RIGHT && TrInput & RBOAT_IN_BACK))
+				if ((TrInput & VEHICLE_IN_LEFT && !(TrInput & VEHICLE_IN_REVERSE)) ||
+					(TrInput & VEHICLE_IN_RIGHT && TrInput & VEHICLE_IN_REVERSE))
 				{
 					if (rBoat->TurnRate > 0)
 						rBoat->TurnRate -= ANGLE(0.25f);
@@ -516,8 +508,8 @@ namespace TEN::Entities::Vehicles
 
 					noTurn = false;
 				}
-				else if ((TrInput & RBOAT_IN_RIGHT && !(TrInput & RBOAT_IN_BACK)) ||
-					(TrInput & RBOAT_IN_LEFT && TrInput & RBOAT_IN_BACK))
+				else if ((TrInput & VEHICLE_IN_RIGHT && !(TrInput & VEHICLE_IN_REVERSE)) ||
+					(TrInput & VEHICLE_IN_LEFT && TrInput & VEHICLE_IN_REVERSE))
 				{
 					if (rBoat->TurnRate < 0)
 						rBoat->TurnRate += ANGLE(0.25f);
@@ -531,20 +523,20 @@ namespace TEN::Entities::Vehicles
 					noTurn = false;
 				}
 
-				if (TrInput & RBOAT_IN_BACK)
+				if (TrInput & VEHICLE_IN_REVERSE)
 				{
 					if (rBoatItem->Animation.Velocity > 0)
 						rBoatItem->Animation.Velocity -= 5;
 					else if (rBoatItem->Animation.Velocity > -20)
 						rBoatItem->Animation.Velocity += -2;
 				}
-				else if (TrInput & RBOAT_IN_FORWARD)
+				else if (TrInput & VEHICLE_IN_ACCELERATE)
 				{
 					int maxVelocity;
-					if (TrInput & RBOAT_IN_SPEED)
+					if (TrInput & VEHICLE_IN_SPEED)
 						maxVelocity = 185;
 					else
-						maxVelocity = (TrInput & RBOAT_IN_SLOW) ? 37 : 110;
+						maxVelocity = (TrInput & VEHICLE_IN_SLOW) ? 37 : 110;
 
 					if (rBoatItem->Animation.Velocity < maxVelocity)
 						rBoatItem->Animation.Velocity += 3 + (5 * rBoatItem->Animation.Velocity) / (maxVelocity * 2);
@@ -552,11 +544,11 @@ namespace TEN::Entities::Vehicles
 						rBoatItem->Animation.Velocity -= 1;
 
 				}
-				else if (TrInput & (RBOAT_IN_LEFT | RBOAT_IN_RIGHT) &&
+				else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
 					rBoatItem->Animation.Velocity >= 0 &&
 					rBoatItem->Animation.Velocity < 20)
 				{
-					if (!(TrInput & RBOAT_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
+					if (!(TrInput & VEHICLE_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
 						rBoatItem->Animation.Velocity = 20;
 				}
 				else if (rBoatItem->Animation.Velocity > 1)
@@ -566,11 +558,11 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & (RBOAT_IN_LEFT | RBOAT_IN_RIGHT) &&
+				if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
 					rBoatItem->Animation.Velocity >= 0 &&
 					rBoatItem->Animation.Velocity < 20)
 				{
-					if (!(TrInput & RBOAT_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
+					if (!(TrInput & VEHICLE_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
 						rBoatItem->Animation.Velocity = 20;
 				}
 				else if (rBoatItem->Animation.Velocity > 1)
@@ -711,7 +703,7 @@ namespace TEN::Entities::Vehicles
 			switch (laraItem->Animation.ActiveState)
 			{
 			case RBOAT_STATE_IDLE:
-				if (TrInput & RBOAT_IN_DISMOUNT)
+				if (TrInput & VEHICLE_IN_DISMOUNT)
 				{
 					if (rBoatItem->Animation.Velocity == 0)
 					{
@@ -731,9 +723,9 @@ namespace TEN::Entities::Vehicles
 				if (rBoatItem->Animation.Velocity <= 0)
 					laraItem->Animation.TargetState = RBOAT_STATE_IDLE;
 
-				if (TrInput & RBOAT_IN_RIGHT)
+				if (TrInput & VEHICLE_IN_RIGHT)
 					laraItem->Animation.TargetState = RBOAT_STATE_TURN_RIGHT;
-				else if (TrInput & RBOAT_IN_LEFT)
+				else if (TrInput & VEHICLE_IN_LEFT)
 					laraItem->Animation.TargetState = RBOAT_STATE_TURN_LEFT;
 			
 				break;
@@ -745,7 +737,7 @@ namespace TEN::Entities::Vehicles
 			case RBOAT_STATE_TURN_RIGHT:
 				if (rBoatItem->Animation.Velocity <= 0)
 					laraItem->Animation.TargetState = RBOAT_STATE_IDLE;
-				else if (!(TrInput & RBOAT_IN_RIGHT))
+				else if (!(TrInput & VEHICLE_IN_RIGHT))
 					laraItem->Animation.TargetState = RBOAT_STATE_MOVING;
 
 				break;
@@ -753,7 +745,7 @@ namespace TEN::Entities::Vehicles
 			case RBOAT_STATE_TURN_LEFT:
 				if (rBoatItem->Animation.Velocity <= 0)
 					laraItem->Animation.TargetState = RBOAT_STATE_IDLE;
-				else if (!(TrInput & RBOAT_IN_LEFT))
+				else if (!(TrInput & VEHICLE_IN_LEFT))
 					laraItem->Animation.TargetState = RBOAT_STATE_MOVING;
 
 				break;
