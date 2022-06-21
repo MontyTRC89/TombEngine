@@ -144,28 +144,6 @@ namespace TEN::Entities::Vehicles
 		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
 	}
 
-	static int TestMotorbikeHeight(ItemInfo* motorbikeItem, int dz, int dx, Vector3Int* pos)
-	{
-		float sinX = phd_sin(motorbikeItem->Pose.Orientation.x);
-		float sinY = phd_sin(motorbikeItem->Pose.Orientation.y);
-		float cosY = phd_cos(motorbikeItem->Pose.Orientation.y);
-		float sinZ = phd_sin(motorbikeItem->Pose.Orientation.z);
-
-		pos->x = motorbikeItem->Pose.Position.x + (dz * sinY) + (dx * cosY);
-		pos->y = motorbikeItem->Pose.Position.y - (dz * sinX) + (dx * sinZ);
-		pos->z = motorbikeItem->Pose.Position.z + (dz * cosY) - (dx * sinY);
-
-		auto probe = GetCollision(pos->x, pos->y, pos->z, motorbikeItem->RoomNumber);
-
-		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
-			return NO_HEIGHT;
-
-		if (pos->y > probe.Position.Floor)
-			pos->y = probe.Position.Floor;
-
-		return probe.Position.Floor;
-	}
-
 	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3Int* pos, Vector3Int* old)
 	{
 		int x = pos->x / SECTOR(1);
@@ -601,28 +579,13 @@ namespace TEN::Entities::Vehicles
 		motorbike->DisableDismount = false;
 
 		Vector3Int backLeftOld, mtb_old, backRightOld, mtf_old, rightLeftOld;
-		int hfl_old = TestMotorbikeHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &rightLeftOld);
-		int hmf_old = TestMotorbikeHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), &mtf_old);
-		int hbl_old = TestMotorbikeHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &backLeftOld);
-		int hbr_old = TestMotorbikeHeight(motorbikeItem, -MOTORBIKE_FRONT, CLICK(0.5f), &backRightOld);
-		int hmtb_old = TestMotorbikeHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, &mtb_old);
+		int hfl_old = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &rightLeftOld);
+		int hmf_old = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &mtf_old);
+		int hbl_old = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &backLeftOld);
+		int hbr_old = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, CLICK(0.5f), true, &backRightOld);
+		int hmtb_old = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, true, &mtb_old);
 
 		auto oldPos = motorbikeItem->Pose.Position;
-
-		if (backLeftOld.y > hbl_old)
-			backLeftOld.y = hbl_old;
-
-		if (backRightOld.y > hbr_old)
-			backRightOld.y = hbr_old;
-
-		if (rightLeftOld.y > hfl_old)
-			rightLeftOld.y = hfl_old;
-
-		if (mtf_old.y > hmf_old)
-			mtf_old.y = hmf_old;
-
-		if (mtb_old.y > hmtb_old)
-			mtb_old.y = hmtb_old;
 
 		if (motorbikeItem->Pose.Position.y <= (motorbikeItem->Floor - 8))
 		{
@@ -740,13 +703,13 @@ namespace TEN::Entities::Vehicles
 		int rot1 = 0;
 		int rot2 = 0;
 
-		int hfl = TestMotorbikeHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &frontLeft);
+		int hfl = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, false, &frontLeft);
 		if (hfl < rightLeftOld.y - CLICK(1))
 		{
 			rot1 = abs(4 * DoMotorbikeShift(motorbikeItem, &frontLeft, &rightLeftOld));
 		}
 
-		int hbl = TestMotorbikeHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &backLeft);
+		int hbl = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, false, &backLeft);
 		if (hbl < backLeftOld.y - CLICK(1))
 		{
 			if (rot1)
@@ -755,15 +718,15 @@ namespace TEN::Entities::Vehicles
 				rot1 -= abs(4 * DoMotorbikeShift(motorbikeItem, &backLeft, &backLeftOld));
 		}
 
-		int hmtf = TestMotorbikeHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), &mtf);
+		int hmtf = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), false, &mtf);
 		if (hmtf < mtf_old.y - CLICK(1))
 			rot2 -= abs(4 * DoMotorbikeShift(motorbikeItem, &backLeft, &backLeftOld));
 
-		int hmtb = TestMotorbikeHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, &mtb);
+		int hmtb = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, false, &mtb);
 		if (hmtb < mtb_old.y - CLICK(1))
 			DoMotorbikeShift(motorbikeItem, &mtb, &mtb_old);
 
-		int hbr = TestMotorbikeHeight(motorbikeItem, -MOTORBIKE_FRONT, CLICK(0.5f), &backRight);
+		int hbr = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, CLICK(0.5f), false, &backRight);
 		if (hbr < backRightOld.y - CLICK(1))
 		{
 			if (rot2)
@@ -1248,9 +1211,9 @@ namespace TEN::Entities::Vehicles
 		auto oldPos = motorbikeItem->Pose.Position;
 
 		Vector3Int frontLeft, frontRight, frontMiddle;
-		int heightFrontLeft = TestMotorbikeHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, &frontLeft);
-		int heightFrontRight = TestMotorbikeHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), &frontRight);
-		int heightFrontMiddle = TestMotorbikeHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, &frontMiddle);
+		int heightFrontLeft = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &frontLeft);
+		int heightFrontRight = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &frontRight);
+		int heightFrontMiddle = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, true, &frontMiddle);
 
 		auto probe = GetCollision(motorbikeItem);
 

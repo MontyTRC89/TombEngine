@@ -21,7 +21,6 @@ namespace TEN::Entities::Vehicles
 	void SkidooAnimation(ItemInfo* laraItem, ItemInfo* skidooItem, int collide, bool dead);
 
 	int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem);
-	int TestSkidooHeight(ItemInfo* skidooItem, int zOffset, int xOffset, Vector3Int* pos);
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old);
 	int DoSkidooDynamics(int height, int verticalVelocity, int* y);
 }

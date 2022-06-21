@@ -63,4 +63,6 @@ void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void DoObjectCollision(ItemInfo* item, CollisionInfo* coll);
 void DoVehicleCollision(ItemInfo* vehicle, int radius);
+int  GetVehicleHeight(ItemInfo* jeepItem, int dz, int dx, bool clamp, Vector3Int* pos);
+int  GetVehicleWaterHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3Int* pos);
 int  DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocity, int radius, short* angle);
