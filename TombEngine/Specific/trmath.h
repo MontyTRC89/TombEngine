@@ -43,6 +43,7 @@ const Vector3 getRandomVectorInCone(const Vector3& direction,const float angleDe
 int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
 Vector3Shrt GetVectorAngles(int x, int y, int z);
+Vector3Shrt GetOrientBetweenPoints(Vector3Int origin, Vector3Int target);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 

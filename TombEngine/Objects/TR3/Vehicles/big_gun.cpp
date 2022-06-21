@@ -31,12 +31,12 @@ namespace TEN::Entities::Vehicles
 	#define BGUN_TURN_RATE_ACCEL ANGLE(0.5f)
 	#define BGUN_TURN_RATE_MAX ANGLE(4.0f)
 
-	#define BGUN_IN_FIRE		IN_ACTION
-	#define BGUN_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
 	#define BGUN_IN_UP			IN_FORWARD
 	#define BGUN_IN_DOWN		IN_BACK
 	#define BGUN_IN_LEFT		IN_LEFT
 	#define BGUN_IN_RIGHT		IN_RIGHT
+	#define BGUN_IN_FIRE		IN_DRAW
+	#define BGUN_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
 
 	enum BigGunState
 	{
