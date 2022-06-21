@@ -1716,17 +1716,21 @@ int GetVehicleHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3Int* 
 
 int GetVehicleWaterHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3Int* pos)
 {
-	float sinX = phd_sin(vehicle->Pose.Orientation.x);
-	float sinY = phd_sin(vehicle->Pose.Orientation.y);
-	float cosY = phd_cos(vehicle->Pose.Orientation.y);
-	float sinZ = phd_sin(vehicle->Pose.Orientation.z);
+	Matrix world =
+		Matrix::CreateFromYawPitchRoll(TO_RAD(vehicle->Pose.Orientation.y), TO_RAD(vehicle->Pose.Orientation.x), TO_RAD(vehicle->Pose.Orientation.z)) *
+		Matrix::CreateTranslation(vehicle->Pose.Position.x, vehicle->Pose.Position.y, vehicle->Pose.Position.z);
 
-	pos->x = vehicle->Pose.Position.x + (dz * sinY) + (dx * cosY);
-	pos->y = vehicle->Pose.Position.y - (dz * sinX) + (dx * sinZ);
-	pos->z = vehicle->Pose.Position.z + (dz * cosY) - (dx * sinY);
+	Vector3 vec = Vector3(dx, 0, dz);
+	vec = Vector3::Transform(vec, world);
+
+	pos->x = vec.x;
+	pos->y = vec.y;
+	pos->z = vec.z;
 
 	auto probe = GetCollision(pos->x, pos->y, pos->z, vehicle->RoomNumber);
-	auto height = GetWaterHeight(pos->x, pos->y, pos->z, probe.RoomNumber);
+	int probedRoomNum = probe.RoomNumber;
+
+	int height = GetWaterHeight(pos->x, pos->y, pos->z, probedRoomNum);
 
 	if (height == NO_HEIGHT)
 	{
@@ -1735,7 +1739,12 @@ int GetVehicleWaterHeight(ItemInfo* vehicle, int dz, int dx, bool clamp, Vector3
 			return height;
 	}
 
-	return (height - 5);
+	height -= 5;
+
+	if (clamp && pos->y > height)
+		pos->y = height;
+
+	return height;
 }
 
 int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocity, int radius, short* angle)

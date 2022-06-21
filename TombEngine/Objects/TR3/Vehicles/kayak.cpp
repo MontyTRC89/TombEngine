@@ -440,7 +440,7 @@ namespace TEN::Entities::Vehicles
 	bool KayakCanGetOut(ItemInfo* kayakItem, int dir)
 	{
 		Vector3Int pos;
-		int height = GetVehicleWaterHeight(kayakItem, (dir < 0) ? -DISMOUNT_DISTANCE : DISMOUNT_DISTANCE, 0, false, &pos);
+		int height = GetVehicleWaterHeight(kayakItem, 0, (dir < 0) ? -DISMOUNT_DISTANCE : DISMOUNT_DISTANCE, false, &pos);
 
 		if ((kayakItem->Pose.Position.y - height) > 0)
 			return false;
@@ -559,23 +559,23 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int oldPos[9];
 		int height[8];
-		height[0] = GetVehicleWaterHeight(kayakItem, 0, 1024, true, &oldPos[0]);
-		height[1] = GetVehicleWaterHeight(kayakItem, -96, 512, true, &oldPos[1]);
-		height[2] = GetVehicleWaterHeight(kayakItem, 96, 512, true, &oldPos[2]);
-		height[3] = GetVehicleWaterHeight(kayakItem, -128, 128, true, &oldPos[3]);
+		height[0] = GetVehicleWaterHeight(kayakItem, 1024, 0, true, &oldPos[0]);
+		height[1] = GetVehicleWaterHeight(kayakItem, 512, -96, true, &oldPos[1]);
+		height[2] = GetVehicleWaterHeight(kayakItem, 512, 96, true, &oldPos[2]);
+		height[3] = GetVehicleWaterHeight(kayakItem, 128, -128, true, &oldPos[3]);
 		height[4] = GetVehicleWaterHeight(kayakItem, 128, 128, true, &oldPos[4]);
-		height[5] = GetVehicleWaterHeight(kayakItem, -128, -320, true, &oldPos[5]);
-		height[6] = GetVehicleWaterHeight(kayakItem, 128, -320, true, &oldPos[6]);
-		height[7] = GetVehicleWaterHeight(kayakItem, 0, -640, true, &oldPos[7]);
+		height[5] = GetVehicleWaterHeight(kayakItem, -320, -128, true, &oldPos[5]);
+		height[6] = GetVehicleWaterHeight(kayakItem, -320, 128, true, &oldPos[6]);
+		height[7] = GetVehicleWaterHeight(kayakItem, -640, 0, true, &oldPos[7]);
 
 		oldPos[8].x = kayakItem->Pose.Position.x;
 		oldPos[8].y = kayakItem->Pose.Position.y;
 		oldPos[8].z = kayakItem->Pose.Position.z;
  
 		Vector3Int frontPos, leftPos, rightPos;
-		int frontHeight = GetVehicleWaterHeight(kayakItem, 0, 1024, false, &frontPos);
-		int leftHeight  = GetVehicleWaterHeight(kayakItem, -KAYAK_X, KAYAK_Z, false, &leftPos);
-		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_X, KAYAK_Z, false, &rightPos);
+		int frontHeight = GetVehicleWaterHeight(kayakItem, 1024, 0, false, &frontPos);
+		int leftHeight  = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X,  false, &leftPos);
+		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, &rightPos);
 
 		kayakItem->Pose.Orientation.y += kayak->TurnRate / (USHRT_MAX + 1);
 		kayakItem->Pose.Position.x += kayakItem->Animation.Velocity * phd_sin(kayakItem->Pose.Orientation.y);
@@ -602,28 +602,28 @@ namespace TEN::Entities::Vehicles
 		int rot = 0;
 		Vector3Int pos;
 
-		if ((height2 = GetVehicleWaterHeight(kayakItem, 0, -CLICK(2.5f), false, &pos)) < (oldPos[7].y - KAYAK_COLLIDE))
+		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(2.5f), 0, false, &pos)) < (oldPos[7].y - KAYAK_COLLIDE))
 			rot = KayakDoShift(kayakItem, &pos, &oldPos[7]);
 
-		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(0.5f), -CLICK(1.25f), false, &pos)) < (oldPos[6].y - KAYAK_COLLIDE))
+		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(1.25f), CLICK(0.5f), false, &pos)) < (oldPos[6].y - KAYAK_COLLIDE))
 			rot += KayakDoShift(kayakItem, &pos, &oldPos[6]);
 
-		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(0.5f), -CLICK(1.25f), false, &pos)) < (oldPos[5].y - KAYAK_COLLIDE))
+		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(1.25f), -CLICK(0.5f), false, &pos)) < (oldPos[5].y - KAYAK_COLLIDE))
 			rot += KayakDoShift(kayakItem, &pos, &oldPos[5]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(0.5f), CLICK(0.5f), false, &pos)) < (oldPos[4].y - KAYAK_COLLIDE))
 			rot += KayakDoShift(kayakItem, &pos, &oldPos[4]);
 
-		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(0.5f), CLICK(0.5f), false, &pos)) < (oldPos[3].y - KAYAK_COLLIDE))
+		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(0.5f), -CLICK(0.5f), false, &pos)) < (oldPos[3].y - KAYAK_COLLIDE))
 			rot += KayakDoShift(kayakItem, &pos, &oldPos[3]);
 
-		if ((height2 = GetVehicleWaterHeight(kayakItem, 96, CLICK(2), false, &pos)) < (oldPos[2].y - KAYAK_COLLIDE))
+		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(2), 96, false, &pos)) < (oldPos[2].y - KAYAK_COLLIDE))
 			rot += KayakDoShift(kayakItem, &pos, &oldPos[2]);
 
-		if ((height2 = GetVehicleWaterHeight(kayakItem, -96, CLICK(2), false, &pos)) < (oldPos[1].y - KAYAK_COLLIDE))
+		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(2), -96, false, &pos)) < (oldPos[1].y - KAYAK_COLLIDE))
 			rot += KayakDoShift(kayakItem, &pos, &oldPos[1]);
 
-		if ((height2 = GetVehicleWaterHeight(kayakItem, 0, CLICK(4), false, &pos)) < (oldPos[0].y - KAYAK_COLLIDE))
+		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(4), 0, false, &pos)) < (oldPos[0].y - KAYAK_COLLIDE))
 			rot += KayakDoShift(kayakItem, &pos, &oldPos[0]);
 
 		kayakItem->Pose.Orientation.y += rot;
