@@ -429,6 +429,16 @@ void ChaseCamera(ItemInfo* item)
 
 void UpdateCameraElevation()
 {
+	// TODO: Add option to enable/disable camera rotation
+
+	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
+								  Camera.target.y == OldCam.target.y &&
+								  Camera.target.z == OldCam.target.z))
+	{
+		Camera.targetAngle += ANGLE(50 * AxisMap[InputAxis::CameraHorizontal]);
+		Camera.targetElevation = ANGLE(-10 + (50 * AxisMap[InputAxis::CameraVertical]));
+	}
+
 	if (Camera.laraNode != -1)
 	{
 		Vector3Int pos = { 0, 0, 0 };
@@ -441,16 +451,9 @@ void UpdateCameraElevation()
 		pos.x = pos1.x - pos.x;
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
-	else if (Camera.target.x != OldCam.target.x ||
-			 Camera.target.y != OldCam.target.y ||
-			 Camera.target.z != OldCam.target.z)
+	else
 	{
 		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
-	}
-	else // TODO: Add option to do camera rotation!
-	{
-		Camera.actualAngle += ANGLE(5 * AxisMap[InputAxis::CameraHorizontal]);
-		Camera.targetElevation = ANGLE(-10 + (50 * AxisMap[InputAxis::CameraVertical]));
 	}
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
