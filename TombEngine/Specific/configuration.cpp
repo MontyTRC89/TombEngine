@@ -249,7 +249,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	for (int i = 0; i < NUM_CONTROLS; i++)
+	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		char buffer[6];
 		sprintf(buffer, "Key%d", i);
@@ -385,7 +385,7 @@ bool LoadConfiguration()
 		return false;
 	}
 
-	for (int i = 0; i < NUM_CONTROLS; i++)
+	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		DWORD tempKey;
 		char buffer[6];
