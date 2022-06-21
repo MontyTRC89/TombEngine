@@ -19,7 +19,7 @@ cbuffer MiscBuffer : register(b3)
 cbuffer ShadowLightBuffer : register(b4)
 {
 	ShaderLight Light;
-	float4x4 LightViewProjection;
+	float4x4 LightViewProjections[6];
 	int CastShadows;
 	float3 Padding2;
 };
@@ -50,7 +50,6 @@ struct PixelShaderInput
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
-	float4 LightPosition: POSITION1;
 	float3x3 TBN : TBN;
 	float Fog : FOG;
 	float4 PositionCopy : TEXCOORD1;
@@ -63,7 +62,7 @@ Texture2D NormalTexture : register(t1);
 
 Texture2D CausticsTexture : register(t2);
 
-Texture2D ShadowMap : register(t3);
+Texture2DArray ShadowMap : register(t3);
 SamplerComparisonState ShadowMapSampler : register(s3);
 
 float hash(float3 n)
@@ -145,7 +144,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.WorldPosition = input.Position.xyz;
 
-	output.LightPosition = mul(float4(input.Position, 1.0f), LightViewProjection);
 	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
 	output.TBN = TBN;
 
@@ -162,7 +160,105 @@ PixelShaderInput VS(VertexShaderInput input)
 float2 texOffset(int u, int v) {
 	return float2(u * 1.0f / SHADOW_MAP_SIZE, v * 1.0f / SHADOW_MAP_SIZE);
 }
+//https://gist.github.com/JuanDiegoMontoya/d8788148dcb9780848ce8bf50f89b7bb
+int GetCubeFaceIndex(float3 dir)
+{
+    float x = abs(dir.x);
+    float y = abs(dir.y);
+    float z = abs(dir.z);
+    if (x > y && x > z)
+        return 0 + (dir.x > 0 ? 0 : 1);
+    else if (y > z)
+        return 2 + (dir.y > 0 ? 0 : 1);
+    return 4 + (dir.z > 0 ? 0 : 1);
+}
 
+float2 GetCubeUVFromDir(int faceIndex, float3 dir)
+{
+    float2 uv;
+    switch (faceIndex)
+    {
+        case 0:
+            uv = float2(-dir.z, dir.y);
+            break; // +X
+        case 1:
+            uv = float2(dir.z, dir.y);
+            break; // -X
+        case 2:
+            uv = float2(dir.x, -dir.z);
+            break; // +Y
+        case 3:
+            uv = float2(dir.x, dir.z);
+            break; // -Y
+        case 4:
+            uv = float2(dir.x, dir.y);
+            break; // +Z
+        default:
+            uv = float2(-dir.x, dir.y);
+            break; // -Z
+    }
+    return uv * .5 + .5;
+}
+
+float doPointLightShadow(float3 worldPos)
+{
+    float shadowFactor = 1.0f;
+    for (int i = 0; i < 6; i++)
+    {
+        float3 dir = normalize(worldPos - Light.Position);
+        int face = GetCubeFaceIndex(dir);
+        float2 uv = GetCubeUVFromDir(face, dir);
+        float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[i]);
+        lightClipSpace.xyz /= lightClipSpace.w;
+        if (lightClipSpace.x >= -1.0f && lightClipSpace.x <= 1.0f &&
+			lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
+			lightClipSpace.z >= 0.0f && lightClipSpace.z <= 1.0f)
+        {
+            lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
+            lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
+            float sum = 0;
+            float x, y;
+			//perform PCF filtering on a 4 x 4 texel neighborhood
+            for (y = -1.5; y <= 1.5; y += 1.0)
+            {
+                for (x = -1.5; x <= 1.5; x += 1.0)
+                {
+                    sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + texOffset(x, y), i), lightClipSpace.z);
+                }
+            }
+
+            shadowFactor = sum / 16.0;
+        }
+    }
+    return saturate(shadowFactor);
+}
+
+float doSpotLightShadow(float3 worldPos)
+{
+    float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[0]);
+    lightClipSpace.xyz /= lightClipSpace.w;
+    float shadowFactor = 1.0f;
+    if (lightClipSpace.x >= -1.0f && lightClipSpace.x <= 1.0f &&
+			lightClipSpace.y >= -1.0f && lightClipSpace.y <= 1.0f &&
+			lightClipSpace.z >= 0.0f && lightClipSpace.z <= 1.0f)
+    {
+        lightClipSpace.x = lightClipSpace.x / 2 + 0.5;
+        lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
+        float sum = 0;
+        float x, y;
+			//perform PCF filtering on a 4 x 4 texel neighborhood
+        for (y = -1.5; y <= 1.5; y += 1.0)
+        {
+            for (x = -1.5; x <= 1.5; x += 1.0)
+            {
+                sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + texOffset(x, y),0), lightClipSpace.z);
+            }
+        }
+
+        shadowFactor = sum / 16.0;
+    }
+    return saturate(shadowFactor);
+}
 PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
 	PixelShaderOutput output;
@@ -180,29 +276,16 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 
 	if (CastShadows)
 	{
-		// Transform clip space coords to texture space coords (-1:1 to 0:1)
-		input.LightPosition.xyz /= input.LightPosition.w;
+        if (Light.Type == LT_POINT)
+        {
+            lighting *= doPointLightShadow(input.WorldPosition);
 
-		if (input.LightPosition.x >= -1.0f && input.LightPosition.x <= 1.0f &&
-			input.LightPosition.y >= -1.0f && input.LightPosition.y <= 1.0f &&
-			input.LightPosition.z >= 0.0f && input.LightPosition.z <= 1.0f)
-		{
-			input.LightPosition.x = input.LightPosition.x / 2 + 0.5;
-			input.LightPosition.y = input.LightPosition.y / -2 + 0.5;
+        }
+        else if (Light.Type == LT_SPOT)
+        {
+            lighting *= doSpotLightShadow(input.WorldPosition);
 
-			//PCF sampling for shadow map
-			float sum = 0;
-			float x, y;
-			//perform PCF filtering on a 4 x 4 texel neighborhood
-			for (y = -1.5; y <= 1.5; y += 1.0) {
-				for (x = -1.5; x <= 1.5; x += 1.0) {
-					sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, input.LightPosition.xy + texOffset(x, y), input.LightPosition.z);
-				}
-			}
-
-			float shadowFactor = sum / 16.0;
-			lighting *= (saturate(shadowFactor + 0.75));
-		}
+        }
 	}
 
 	if (doLights)

@@ -40,6 +40,7 @@
 #include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
+#include <Renderer/Texture2DArray/Texture2DArray.h>
 
 struct CAMERA_INFO;
 
@@ -261,7 +262,7 @@ namespace TEN::Renderer
 		RenderTarget2D m_dumpScreenRenderTarget;
 		RenderTarget2D m_renderTarget;
 		RenderTarget2D m_currentRenderTarget;
-		RenderTarget2D m_shadowMap;
+		Texture2DArray m_shadowMap;
 		RenderTarget2D m_depthMap;
 		RenderTargetCube m_reflectionCubemap;
 
@@ -342,7 +343,6 @@ namespace TEN::Renderer
 		Texture2D m_binocularsTexture;
 		Texture2D m_LasersightTexture;
 		Texture2D m_whiteTexture;
-		RenderTargetCubeArray m_shadowMaps;
 		Texture2D loadingBarBorder;
 		Texture2D loadingBarInner;
 		Texture2D loadingScreenTexture;

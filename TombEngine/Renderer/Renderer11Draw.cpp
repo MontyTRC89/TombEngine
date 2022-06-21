@@ -46,97 +46,91 @@ namespace TEN::Renderer
 	{
 		if (shadowLight == nullptr)
 			return;
-
+		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
+			return;
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetCullMode(CULL_MODE_CCW);
 
-		// Bind and clear render target
-		m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView.Get(), Colors::White);
-		m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-			1.0f, 0);
-		m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView.GetAddressOf(),
-			m_shadowMap.DepthStencilView.Get());
+		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
 
-		m_context->RSSetViewports(1, &m_shadowMapViewport);
-		ResetScissor();
+		for (int step = 0; step < steps; step++) {
+			// Bind and clear render target
+			m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView[step].Get(), Colors::White);
+			m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView[step].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+				1.0f, 0);
+			m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView[step].GetAddressOf(),
+				m_shadowMap.DepthStencilView[step].Get());
 
-		//DrawLara(false, true);
+			m_context->RSSetViewports(1, &m_shadowMapViewport);
+			ResetScissor();
 
-		Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
-		Vector3 itemPos = Vector3(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-		if (lightPos == itemPos)
-			return;
+			//DrawLara(false, true);
 
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
+			Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
+			Vector3 itemPos = Vector3(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+			if (lightPos == itemPos)
+				return;
 
-		// Set shaders
-		m_context->VSSetShader(m_vsShadowMap.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psShadowMap.Get(), nullptr, 0);
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
 
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+			// Set shaders
+			m_context->VSSetShader(m_vsShadowMap.Get(), nullptr, 0);
+			m_context->PSSetShader(m_psShadowMap.Get(), nullptr, 0);
 
-		// Set texture
-		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
-			SAMPLER_ANISOTROPIC_CLAMP);
-		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
+			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set camera matrices
-		Matrix view = Matrix::CreateLookAt(lightPos,
-			itemPos,
-			Vector3(0.0f, -1.0f, 0.0f));
-		Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
-			(shadowLight->Type == LIGHT_TYPE_POINT
-				? shadowLight->Out
-				: shadowLight->Range) * 1.2f);
-		CCameraMatrixBuffer shadowProjection;
-		shadowProjection.ViewProjection = view * projection;
-		m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
-		m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
+			// Set texture
+			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
+				SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
 
-		m_stShadowMap.LightViewProjection = (view * projection);
+			// Set camera matrices
+			Matrix view;
+			Matrix projection;
+			if (shadowLight->Type == LIGHT_TYPE_POINT) {
+				view = Matrix::CreateLookAt(lightPos,
+					RenderTargetCube::forwardVectors[step],
+					RenderTargetCube::upVectors[step]);
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 16.0f,
+					shadowLight->Out);
 
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
-
-		m_stItem.World = m_LaraWorldMatrix;
-		m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
-		m_stItem.AmbientLight = room.AmbientLight;
-		memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
-
-		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
-
-			for (auto& bucket : mesh->buckets)
-			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
-					continue;
-
-				// Draw vertices
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-				m_numMoveablesDrawCalls++;
 			}
-		}
+			else if(shadowLight->Type == LIGHT_TYPE_SPOT) {
+				view = Matrix::CreateLookAt(lightPos,
+					itemPos,
+					Vector3(0.0f, -1.0f, 0.0f));
+				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Range, 1.0f, 16.0f,shadowLight->Out);
 
-		if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
-		{
-			RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
+			}
+			CCameraMatrixBuffer shadowProjection;
+			shadowProjection.ViewProjection = view * projection;
+			m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
+			m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
 
-			for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
+			m_stShadowMap.LightViewProjections[step] = (view * projection);
+
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+			RendererObject& laraObj = *m_moveableObjects[ID_LARA];
+			RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+			RendererRoom& room = m_rooms[LaraItem->RoomNumber];
+
+			m_stItem.World = m_LaraWorldMatrix;
+			m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
+			m_stItem.AmbientLight = room.AmbientLight;
+			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
+			m_cbItem.updateData(m_stItem, m_context.Get());
+			m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+			m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+
+			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
-				RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
+				RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
 
 				for (auto& bucket : mesh->buckets)
 				{
@@ -149,57 +143,78 @@ namespace TEN::Renderer
 					m_numMoveablesDrawCalls++;
 				}
 			}
-		}
 
-		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = laraSkin.ObjectMeshes[k];
-
-			for (auto& bucket : mesh->buckets)
+			if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
-					continue;
+				RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
-				// Draw vertices
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+				for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
+				{
+					RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
 
-				m_numMoveablesDrawCalls++;
+					for (auto& bucket : mesh->buckets)
+					{
+						if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+							continue;
+
+						// Draw vertices
+						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+						m_numMoveablesDrawCalls++;
+					}
+				}
 			}
-		}
 
-		// Draw items
-
-		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
-
-		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
-		m_stItem.World = Matrix::Identity;
-		Matrix matrices[7];
-		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
-		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
-		{
-			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
-				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-			matrices[i + 1] = world;
-		}
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
-
-		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-
-			for (auto& bucket : mesh->buckets)
+			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
-					continue;
+				RendererMesh* mesh = laraSkin.ObjectMeshes[k];
 
-				// Draw vertices
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+				for (auto& bucket : mesh->buckets)
+				{
+					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+						continue;
 
-				m_numMoveablesDrawCalls++;
+					// Draw vertices
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
+				}
+			}
+
+			// Draw items
+
+			RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
+
+			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+			m_stItem.World = Matrix::Identity;
+			Matrix matrices[7];
+			matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+			{
+				HAIR_STRUCT* hairs = &Hairs[0][i];
+				Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+					Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+				matrices[i + 1] = world;
+			}
+			memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
+			m_cbItem.updateData(m_stItem, m_context.Get());
+			m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+			m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+
+			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
+			{
+				RendererMesh* mesh = hairsObj.ObjectMeshes[k];
+
+				for (auto& bucket : mesh->buckets)
+				{
+					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+						continue;
+
+					// Draw vertices
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
+				}
 			}
 		}
 	}

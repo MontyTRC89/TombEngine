@@ -856,6 +856,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Total rooms transparent polygons: %d", numRoomsTransparentPolygons);
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				m_spriteBatch->Draw(m_shadowMap.ShaderResourceView.Get(), Vector3(500, 0, 0));
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:

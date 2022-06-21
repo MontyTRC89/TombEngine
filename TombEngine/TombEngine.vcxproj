@@ -201,6 +201,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
+    <ClInclude Include="Renderer\Texture2DArray\Texture2DArray.h" />
     <ClInclude Include="Scripting\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
@@ -628,6 +629,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />
+    <ClCompile Include="Renderer\Texture2DArray\Texture2DArray.cpp" />
     <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
@@ -1054,13 +1056,18 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\DX11_Rooms.fx">
+    <FxCompile Include="Shaders\DX11_Rooms.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
-    </None>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.1</ShaderModel>
+      <AllResourcesBound Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</AllResourcesBound>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SHADOW_MAP_SIZE=512</PreprocessorDefinitions>
+    </FxCompile>
     <None Include="Shaders\DX11_ShadowMap.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

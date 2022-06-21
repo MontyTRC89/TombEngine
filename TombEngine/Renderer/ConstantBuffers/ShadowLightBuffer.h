@@ -4,7 +4,6 @@
 struct alignas(16) CShadowLightBuffer
 {
 	ShaderLight Light;
-	Matrix LightViewProjection;
+	Matrix LightViewProjections[6];
 	int CastShadows;
-	float Padding[15];
 };
