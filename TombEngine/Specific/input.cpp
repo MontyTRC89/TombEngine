@@ -156,6 +156,39 @@ namespace TEN::Input
 			AxisMap[axis] = 0.0f;
 	}
 
+	bool LayoutContainsIndex(unsigned int index)
+	{
+		for (int l = 0; l <= 1; l++)
+		{
+			for (int i = 0; i < KEY_COUNT; i++)
+			{
+				if (KeyboardLayout[l][i] == index)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	void DefaultConflict()
+	{
+		for (int i = 0; i < KEY_COUNT; i++)
+		{
+			short key = KeyboardLayout[0][i];
+
+			ConflictingKeys[i] = false;
+
+			for (int j = 0; j < KEY_COUNT; j++)
+			{
+				if (key != KeyboardLayout[1][j])
+					continue;
+
+				ConflictingKeys[i] = true;
+				break;
+			}
+		}
+	}
+
 	void SetDiscreteAxisValues(unsigned int index)
 	{
 		for (int layout = 0; layout <= 1; layout++)
@@ -229,7 +262,7 @@ namespace TEN::Input
 					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
-				else
+				else if (!LayoutContainsIndex(usedIndex))
 				{
 					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2, 
 																		 (unsigned int)InputAxis::CameraVertical, 
@@ -638,24 +671,5 @@ namespace TEN::Input
 			DbInput = TrInput & (DbInput ^ TrInput);
 
 		return true;
-	}
-
-	void DefaultConflict()
-	{
-		for (int i = 0; i < KEY_COUNT; i++)
-		{
-			short key = KeyboardLayout[0][i];
-
-			ConflictingKeys[i] = false;
-
-			for (int j = 0; j < KEY_COUNT; j++)
-			{
-				if (key == KeyboardLayout[1][j])
-				{
-					ConflictingKeys[i] = true;
-					break;
-				}
-			}
-		}
 	}
 }
