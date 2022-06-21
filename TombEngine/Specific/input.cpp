@@ -197,9 +197,11 @@ namespace TEN::Input
 				if (abs(joy.mAxes[axis].abs) < JOY_AXIS_DEADZONE)
 					continue;
 
-				// Calculate normalized analog value to be used in game later
+				// Calculate raw normalized analog value (for camera)
 				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) 
 																	/ (float)(std::numeric_limits<short>::max() - JOY_AXIS_DEADZONE);
+				// Calculate scaled analog value (for movement)
+				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots
 				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
@@ -211,19 +213,20 @@ namespace TEN::Input
 				unsigned int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
+
 				// Register analog input in certain direction.
 				// If axis is bound as directional controls, register axis as directional input.
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
 				if (KeyboardLayout[1][KEY_FORWARD] == usedIndex)
-					AxisMap[InputAxis::MoveVertical] = abs(normalizedValue);
+					AxisMap[InputAxis::MoveVertical] = abs(scaledValue);
 				else if (KeyboardLayout[1][KEY_BACK] == usedIndex)
-					AxisMap[InputAxis::MoveVertical] = -abs(normalizedValue);
+					AxisMap[InputAxis::MoveVertical] = -abs(scaledValue);
 				else if (KeyboardLayout[1][KEY_LEFT] == usedIndex)
-					AxisMap[InputAxis::MoveHorizontal] = -abs(normalizedValue);
+					AxisMap[InputAxis::MoveHorizontal] = -abs(scaledValue);
 				else if (KeyboardLayout[1][KEY_RIGHT] == usedIndex)
-					AxisMap[InputAxis::MoveHorizontal] = abs(normalizedValue);
+					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				else
 				{
 					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2, 
