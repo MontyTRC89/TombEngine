@@ -374,13 +374,13 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	return direction;
 }
 
-void ModulateLaraTurnRate(short* turnRate, short accel, short min, short max, bool clockwise)
+void ModulateLaraTurnRate(short* turnRate, short accel, short min, short max, float axis, bool doPositiveModulation)
 {
-	int sign = clockwise ? 1 : -1;
-	float axisCoeff = AxisMap[InputAxis::MoveHorizontal] * sign;
+	int sign = doPositiveModulation ? 1 : -1;
+	float axisCoeff = axis * sign;
 
 	*turnRate += (accel * axisCoeff) * sign;
-	if (clockwise)
+	if (doPositiveModulation)
 	{
 		if (*turnRate < (min * axisCoeff))
 			*turnRate = min * axisCoeff;
@@ -396,18 +396,18 @@ void ModulateLaraTurnRate(short* turnRate, short accel, short min, short max, bo
 	}
 }
 
-void ModulateLaraTurnRateX(ItemInfo* item, short accel, short min, short max, bool clockwise)
+void ModulateLaraTurnRateX(ItemInfo* item, short accel, short min, short max, bool doPositiveModulation)
 {
 	auto* lara = GetLaraInfo(item);
 
-	//ModulateLaraTurnRate(&lara->Control.TurnRate.x, accel, min, max, turnRight);
+	//ModulateLaraTurnRate(&lara->Control.TurnRate.x, accel, min, max, AxisMap[InputAxis::MoveVertical], doPositiveModulation);
 }
 
-void ModulateLaraTurnRateY(ItemInfo* item, short accel, short min, short max, bool clockwise)
+void ModulateLaraTurnRateY(ItemInfo* item, short accel, short min, short max, bool doPositiveModulation)
 {
 	auto* lara = GetLaraInfo(item);
 
-	ModulateLaraTurnRate(&lara->Control.TurnRate/*.y*/, accel, min, max, clockwise);
+	ModulateLaraTurnRate(&lara->Control.TurnRate/*.y*/, accel, min, max, AxisMap[InputAxis::MoveHorizontal], doPositiveModulation);
 }
 
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
