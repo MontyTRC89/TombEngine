@@ -30,15 +30,17 @@ namespace TEN::Entities::Vehicles
 		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
 			return VehicleMountType::None;
 
+		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
+		short angleBetweenPositions = GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
+		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < abs(deltaHeadingAngle);
+
 		// Assess mount types allowed for vehicle.
-		short deltaAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		for (auto mountType : allowedMountTypes)
 		{
-			// TODO: Check cardinal direction of relative position. Lara can mount from the opposite side! @Sezz
 			switch (mountType)
 			{
 			case VehicleMountType::LevelStart:
-				if (abs(deltaAngle) < ANGLE(135.0f) &&
+				if (abs(deltaHeadingAngle) < ANGLE(135.0f) &&
 					!laraItem->Animation.VerticalVelocity &&
 					laraItem->Pose.Position == vehicleItem->Pose.Position)
 				{
@@ -48,7 +50,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Back:
-				if (abs(deltaAngle) < ANGLE(35.0f) &&
+				if (abs(deltaHeadingAngle) <= ANGLE(35.0f) &&
+					onCorrectSide &&
 					!laraItem->Animation.Airborne)
 				{
 					break;
@@ -57,7 +60,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Left:
-				if (deltaAngle > -ANGLE(135.0f) && deltaAngle < -ANGLE(45.0f) &&
+				if (deltaHeadingAngle > -ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(45.0f) &&
+					onCorrectSide &&
 					!laraItem->Animation.Airborne)
 				{
 					break;
@@ -66,7 +70,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Right:
-				if (deltaAngle > ANGLE(45.0f) && deltaAngle < ANGLE(135.0f) &&
+				if (deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
+					onCorrectSide &&
 					!laraItem->Animation.Airborne)
 				{
 					break;
@@ -75,7 +80,7 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Jump:
-				if (abs(deltaAngle) < ANGLE(135.0f) &&
+				if (abs(deltaHeadingAngle) < ANGLE(135.0f) &&
 					laraItem->Animation.Airborne &&
 					laraItem->Animation.VerticalVelocity > 0 &&
 					laraItem->Pose.Position.y > vehicleItem->Pose.Position.y &&
