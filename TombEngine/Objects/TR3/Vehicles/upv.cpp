@@ -79,14 +79,6 @@ namespace TEN::Entities::Vehicles
 	#define MOUNT_UNDERWATER_SOUND_FRAME	30
 	#define MOUNT_UNDERWATER_CONTROL_FRAME	42
 
-	#define UPV_IN_PROPEL	IN_JUMP
-	#define UPV_IN_UP		IN_FORWARD
-	#define UPV_IN_DOWN		IN_BACK
-	#define UPV_IN_LEFT		IN_LEFT
-	#define UPV_IN_RIGHT	IN_RIGHT
-	#define UPV_IN_FIRE		IN_ACTION
-	#define UPV_IN_DISMOUNT	IN_ROLL
-
 	enum UPVState
 	{
 		UPV_STATE_DEATH = 0,
@@ -527,10 +519,10 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			if (TrInput & UPV_IN_LEFT)
+			if (TrInput & VEHICLE_IN_LEFT)
 				UPV->Rot -= ROT_ACCELERATION;
 
-			else if (TrInput & UPV_IN_RIGHT)
+			else if (TrInput & VEHICLE_IN_RIGHT)
 				UPV->Rot += ROT_ACCELERATION;
 
 			if (UPV->Flags & UPV_SURFACE)
@@ -557,15 +549,15 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & UPV_IN_UP)
+				if (TrInput & VEHICLE_IN_UP)
 					UPV->XRot -= UPDOWN_ACCEL;
-				else if (TrInput & UPV_IN_DOWN)
+				else if (TrInput & VEHICLE_IN_DOWN)
 					UPV->XRot += UPDOWN_ACCEL;
 			}
 
-			if (TrInput & UPV_IN_PROPEL)
+			if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
-				if (TrInput & UPV_IN_UP &&
+				if (TrInput & VEHICLE_IN_UP &&
 					UPV->Flags & UPV_SURFACE &&
 					UPVItem->Pose.Orientation.x > -DIVE_ANGLE)
 				{
@@ -587,9 +579,9 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			if (TrInput & UPV_IN_LEFT)
+			if (TrInput & VEHICLE_IN_LEFT)
 				UPV->Rot -= ROT_SLOWACCEL;
-			else if (TrInput & UPV_IN_RIGHT)
+			else if (TrInput & VEHICLE_IN_RIGHT)
 				UPV->Rot += ROT_SLOWACCEL;
 
 			if (UPV->Flags & UPV_SURFACE)
@@ -615,13 +607,13 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & UPV_IN_UP)
+				if (TrInput & VEHICLE_IN_UP)
 					UPV->XRot -= UPDOWN_ACCEL;
-				else if (TrInput & UPV_IN_DOWN)
+				else if (TrInput & VEHICLE_IN_DOWN)
 					UPV->XRot += UPDOWN_ACCEL;
 			}
 
-			if (TrInput & UPV_IN_DISMOUNT && TestUPVDismount(laraItem, UPVItem))
+			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(laraItem, UPVItem))
 			{
 				if (UPV->Velocity > 0)
 					UPV->Velocity -= ACCELERATION;
@@ -639,9 +631,9 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			else if (TrInput & UPV_IN_PROPEL)
+			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
-				if (TrInput & UPV_IN_UP &&
+				if (TrInput & VEHICLE_IN_UP &&
 					UPVItem->Pose.Orientation.x > -DIVE_ANGLE &&
 					UPV->Flags & UPV_SURFACE)
 				{
@@ -1012,7 +1004,7 @@ namespace TEN::Entities::Vehicles
 		{
 			DoCurrent(laraItem, UPVItem);
 
-			if (TrInput & UPV_IN_FIRE &&
+			if (TrInput & VEHICLE_IN_FIRE &&
 				UPV->Flags & UPV_CONTROL &&
 				!UPV->HarpoonTimer)
 			{

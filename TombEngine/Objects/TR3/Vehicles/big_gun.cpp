@@ -31,13 +31,6 @@ namespace TEN::Entities::Vehicles
 	#define BGUN_TURN_RATE_ACCEL ANGLE(0.5f)
 	#define BGUN_TURN_RATE_MAX ANGLE(4.0f)
 
-	#define BGUN_IN_UP			IN_FORWARD
-	#define BGUN_IN_DOWN		IN_BACK
-	#define BGUN_IN_LEFT		IN_LEFT
-	#define BGUN_IN_RIGHT		IN_RIGHT
-	#define BGUN_IN_FIRE		IN_DRAW
-	#define BGUN_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
-
 	enum BigGunState
 	{
 		BGUN_STATE_MOUNT = 0,
@@ -195,11 +188,11 @@ namespace TEN::Entities::Vehicles
 			if (!bigGun->BarrelRotation)
 				bigGun->IsBarrelRotating = false;
 
-			if (TrInput & BGUN_IN_DISMOUNT || laraItem->HitPoints <= 0)
+			if (TrInput & VEHICLE_IN_DISMOUNT || laraItem->HitPoints <= 0)
 				bigGun->Flags = BGUN_FLAG_AUTO_ROT;
 			else
 			{
-				if (TrInput & BGUN_IN_FIRE && bigGun->FireCount == 0)
+				if (TrInput & VEHICLE_IN_FIRE && bigGun->FireCount == 0)
 				{
 					BigGunFire(laraItem, bigGunItem);
 					bigGun->FireCount = BGUN_RECOIL_TIME;
@@ -207,7 +200,7 @@ namespace TEN::Entities::Vehicles
 					bigGun->IsBarrelRotating = true;
 				}
 
-				if (TrInput & BGUN_IN_UP)
+				if (TrInput & VEHICLE_IN_UP)
 				{
 					if (bigGun->TurnRate.x < 0)
 						bigGun->TurnRate.x /= 2;
@@ -216,7 +209,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.x > (BGUN_TURN_RATE_MAX / 2))
 						bigGun->TurnRate.x = (BGUN_TURN_RATE_MAX / 2);
 				}
-				else if (TrInput & BGUN_IN_DOWN)
+				else if (TrInput & VEHICLE_IN_DOWN)
 				{
 					if (bigGun->TurnRate.x > 0)
 						bigGun->TurnRate.x /= 2;
@@ -232,7 +225,7 @@ namespace TEN::Entities::Vehicles
 						bigGun->TurnRate.x = 0;
 				}
 
-				if (TrInput & BGUN_IN_LEFT)
+				if (TrInput & VEHICLE_IN_LEFT)
 				{
 					if (bigGun->TurnRate.y > 0)
 						bigGun->TurnRate.y /= 2;
@@ -241,7 +234,7 @@ namespace TEN::Entities::Vehicles
 					if (bigGun->TurnRate.y < -BGUN_TURN_RATE_MAX)
 						bigGun->TurnRate.y = -BGUN_TURN_RATE_MAX;
 				}
-				else if (TrInput & BGUN_IN_RIGHT)
+				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
 					if (bigGun->TurnRate.y < 0)
 						bigGun->TurnRate.y /= 2;

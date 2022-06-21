@@ -43,12 +43,8 @@ namespace TEN::Entities::Vehicles
 
 	#define MINECART_TERMINAL_ANGLE ANGLE(22.0f)
 
-	#define MINECART_IN_BRAKE		(IN_BACK | IN_WALK | IN_JUMP)
-	#define MINECART_IN_DUCK		IN_CROUCH
-	#define MINECART_IN_SWIPE		IN_ACTION
-	#define MINECART_IN_DISMOUNT	(IN_JUMP | IN_ROLL)
-	#define MINECART_IN_LEFT		IN_LEFT
-	#define MINECART_IN_RIGHT		IN_RIGHT
+	#define MINECART_IN_DUCK	IN_CROUCH
+	#define MINECART_IN_SWIPE	(IN_ACTION | IN_DRAW)
 
 	int Wheels[4] = { 2, 3, 1, 4 };
 
@@ -551,7 +547,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
 			else if (TrInput & MINECART_IN_DUCK)
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & MINECART_IN_BRAKE)
+			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 			else if (minecart->Velocity == MINECART_VELOCITY_MIN || minecart->Flags & MINECART_FLAG_STOPPED)
 				laraItem->Animation.TargetState = MINECART_STATE_IDLE;
@@ -559,9 +555,9 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_FORWARD;
 			else if (minecart->Gradient > MINECART_BACK_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_BACK;
-			else if (TrInput & MINECART_IN_LEFT)
+			else if (TrInput & VEHICLE_IN_LEFT)
 				laraItem->Animation.TargetState = MINECART_STATE_LEFT;
-			else if (TrInput & MINECART_IN_RIGHT)
+			else if (TrInput & VEHICLE_IN_RIGHT)
 				laraItem->Animation.TargetState = MINECART_STATE_RIGHT;
 
 			break;
@@ -571,7 +567,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
 			else if (TrInput & MINECART_IN_DUCK)
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & MINECART_IN_BRAKE)
+			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 			else if (minecart->Gradient > MINECART_FORWARD_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
@@ -583,7 +579,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
 			else if (TrInput & MINECART_IN_DUCK)
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & MINECART_IN_BRAKE)
+			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 			else if (minecart->Gradient < MINECART_BACK_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
@@ -595,10 +591,10 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
 			else if (TrInput & MINECART_IN_DUCK)
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & MINECART_IN_BRAKE)
+			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 
-			if (!(TrInput & MINECART_IN_LEFT))
+			if (!(TrInput & VEHICLE_IN_LEFT))
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
 
 			break;
@@ -608,10 +604,10 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
 			else if (TrInput & MINECART_IN_DUCK)
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
-			else if (TrInput & MINECART_IN_BRAKE)
+			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 
-			if (!(TrInput & MINECART_IN_RIGHT))
+			if (!(TrInput & VEHICLE_IN_RIGHT))
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
 
 			break;
@@ -624,14 +620,14 @@ namespace TEN::Entities::Vehicles
 				minecart->StopDelay = 64;
 			}
 
-			if (TrInput & MINECART_IN_DISMOUNT && minecart->Flags & MINECART_FLAG_STOPPED)
+			if (TrInput & VEHICLE_IN_DISMOUNT && minecart->Flags & MINECART_FLAG_STOPPED)
 			{
-				if (TrInput & MINECART_IN_LEFT && TestMinecartDismount(laraItem, -1))
+				if (TrInput & VEHICLE_IN_LEFT && TestMinecartDismount(laraItem, -1))
 				{
 					laraItem->Animation.TargetState = MINECART_STATE_DISMOUNT;
 					minecart->Flags &= ~MINECART_FLAG_DISMOUNT_RIGHT;
 				}
-				else if (TrInput & MINECART_IN_RIGHT && TestMinecartDismount(laraItem, 1))
+				else if (TrInput & VEHICLE_IN_RIGHT && TestMinecartDismount(laraItem, 1))
 				{
 					laraItem->Animation.TargetState = MINECART_STATE_DISMOUNT;
 					minecart->Flags |= MINECART_FLAG_DISMOUNT_RIGHT;
@@ -651,7 +647,7 @@ namespace TEN::Entities::Vehicles
 		case MINECART_STATE_DUCK:
 			if (TrInput & MINECART_IN_SWIPE)
 				laraItem->Animation.TargetState = MINECART_STATE_SWIPE;
-			else if (TrInput & MINECART_IN_BRAKE)
+			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
 			else if (!(TrInput & MINECART_IN_DUCK))
 				laraItem->Animation.TargetState = MINECART_STATE_IDLE;
@@ -668,7 +664,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
 				StopSoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE);
 			}
-			else if (!(TrInput & MINECART_IN_BRAKE) || minecart->Flags & MINECART_FLAG_STOPPED)
+			else if (!(TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW)) || minecart->Flags & MINECART_FLAG_STOPPED)
 			{
 				laraItem->Animation.TargetState = MINECART_STATE_MOVE;
 				StopSoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE);
