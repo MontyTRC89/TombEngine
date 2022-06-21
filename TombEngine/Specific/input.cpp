@@ -5,7 +5,6 @@
 #include <OISException.h>
 #include <OISKeyboard.h>
 #include <OISJoyStick.h>
-#include <OISEvents.h>
 #include <OISForceFeedback.h>
 
 #include "Game/camera.h"
