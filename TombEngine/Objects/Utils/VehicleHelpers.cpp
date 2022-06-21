@@ -40,8 +40,7 @@ namespace TEN::Entities::Vehicles
 			switch (mountType)
 			{
 			case VehicleMountType::LevelStart:
-				if (abs(deltaHeadingAngle) < ANGLE(135.0f) &&
-					!laraItem->Animation.VerticalVelocity &&
+				if (!laraItem->Animation.VerticalVelocity &&
 					laraItem->Pose.Position == vehicleItem->Pose.Position)
 				{
 					break;
