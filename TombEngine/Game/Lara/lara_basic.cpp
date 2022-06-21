@@ -145,12 +145,12 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_MED_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_MED_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 
@@ -253,12 +253,12 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_FAST_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_FAST_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_FAST_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_FAST_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
@@ -416,12 +416,12 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_LEFT &&
 			!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Sidestep locks orientation.
 		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		}
 		else if (TrInput & IN_RIGHT &&
 			!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
 		{
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		}
 	}
 
@@ -782,12 +782,12 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
@@ -870,7 +870,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_FAST_TURN_MAX, true);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_FAST_TURN_MAX);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -985,7 +985,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_WADE_TURN_MAX, true);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_WADE_TURN_MAX);
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
@@ -1049,7 +1049,7 @@ void PsuedoLaraAsSwampTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX, true);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX);
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -1134,7 +1134,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_FAST_TURN_MAX, false);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_FAST_TURN_MAX);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1249,7 +1249,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_WADE_TURN_MAX, false);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_WADE_TURN_MAX);
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
@@ -1313,7 +1313,7 @@ void PsuedoLaraAsSwampTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX, false);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX);
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -1480,13 +1480,13 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
@@ -1507,13 +1507,13 @@ void PseudoLaraAsSwampWalkBack(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 3, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 3);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 3, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 3);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 	}
 
@@ -1586,7 +1586,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, LARA_MED_TURN_MAX, LARA_FAST_TURN_MAX, true);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, LARA_MED_TURN_MAX, LARA_FAST_TURN_MAX);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1713,7 +1713,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE, LARA_MED_TURN_MAX, LARA_FAST_TURN_MAX, false);
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, LARA_MED_TURN_MAX, LARA_FAST_TURN_MAX);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1847,9 +1847,9 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 	}
 
 	// TODO: Funky?
@@ -1939,9 +1939,9 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 	}
 
 	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
@@ -2164,12 +2164,12 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
@@ -2201,12 +2201,12 @@ void PseudoLaraAsSwampWadeForward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE / 3);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE / 3);
 	}
 
@@ -2295,12 +2295,12 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
@@ -2434,12 +2434,12 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE);
 	}
 

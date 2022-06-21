@@ -58,9 +58,9 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX);
 	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX);
 
 	if (DbInput & IN_JUMP)
 	{
@@ -122,9 +122,9 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX);
 	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_MED_TURN_MAX);
 
 	if (!(TrInput & IN_FORWARD))
 		item->Animation.TargetState = LS_ONWATER_IDLE;
@@ -165,9 +165,9 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX);
 	}
 
 	if (!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))
@@ -206,9 +206,9 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX);
 	}
 
 	if (!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
@@ -245,9 +245,9 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX);
 	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE * 1.25f, 0, LARA_SLOW_MED_TURN_MAX);
 
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);

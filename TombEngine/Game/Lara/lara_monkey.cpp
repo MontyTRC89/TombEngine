@@ -50,12 +50,12 @@ void lara_as_monkey_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LEFT &&
 		!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Shimmy locks orientation.
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 2, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 2);
 	}
 	else if (TrInput & IN_RIGHT &&
 		!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 2, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 2);
 	}
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
@@ -178,9 +178,9 @@ void lara_as_monkey_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
@@ -257,9 +257,9 @@ void lara_as_monkey_back(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
 	{
@@ -332,9 +332,9 @@ void lara_as_monkey_shimmy_left(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 	}
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
@@ -408,9 +408,9 @@ void lara_as_monkey_shimmy_right(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 	}
 
 	if (TrInput & IN_ACTION && lara->Control.CanMonkeySwing)
@@ -541,7 +541,7 @@ void lara_as_monkey_turn_left(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_LEFT;
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, false);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 			return;
 		}
 
@@ -620,7 +620,7 @@ void lara_as_monkey_turn_right(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_RIGHT)
 		{
 			item->Animation.TargetState = LS_MONKEY_TURN_RIGHT;
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 			return;
 		}
 
