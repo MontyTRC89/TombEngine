@@ -186,9 +186,11 @@ void DoLaraLean(ItemInfo* item, CollisionInfo* coll, short maxAngle, short rate)
 {
 	if (!item->Animation.Velocity)
 		return;
-
-	rate = abs(rate);
+	
+	// TODO: Use a bool argument to determine left/right lean. @Sezz
 	int sign = copysign(1, maxAngle);
+	rate = abs(rate);
+	maxAngle *= abs(AxisMap[InputAxis::MoveHorizontal]);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
 		item->Pose.Orientation.z += std::min<short>(rate, abs((maxAngle * 3) / 5 - item->Pose.Orientation.z) / 3) * sign;
@@ -253,8 +255,10 @@ void DoLaraCrawlFlex(ItemInfo* item, CollisionInfo* coll, short maxAngle, short 
 	if (!item->Animation.Velocity)
 		return;
 
+	// TODO: Bool argument to flex left/right.
 	int sign = copysign(1, maxAngle);
 	rate = copysign(rate, maxAngle);
+	maxAngle *= abs(AxisMap[InputAxis::MoveHorizontal]);
 
 	lara->ExtraTorsoRot.z += std::min(abs(rate), abs(maxAngle - lara->ExtraTorsoRot.z) / 6) * sign;
 
@@ -368,6 +372,42 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 		direction = GetQuadrant(direction) * ANGLE(90.0f);
 
 	return direction;
+}
+
+void ModulateLaraTurnRate(short* turnRate, short accel, short min, short max, bool clockwise)
+{
+	int sign = clockwise ? 1 : -1;
+	float axisCoeff = AxisMap[InputAxis::MoveHorizontal] * sign;
+
+	*turnRate += (accel * axisCoeff) * sign;
+	if (clockwise)
+	{
+		if (*turnRate < (min * axisCoeff))
+			*turnRate = min * axisCoeff;
+		else if (*turnRate > (max * axisCoeff))
+			*turnRate = max * axisCoeff;
+	}
+	else
+	{
+		if (*turnRate > (-min * axisCoeff))
+			*turnRate = -min * axisCoeff;
+		else if (*turnRate < (-max * axisCoeff))
+			*turnRate = -max * axisCoeff;
+	}
+}
+
+void ModulateLaraTurnRateX(ItemInfo* item, short accel, short min, short max, bool clockwise)
+{
+	auto* lara = GetLaraInfo(item);
+
+	//ModulateLaraTurnRate(&lara->Control.TurnRate.x, accel, min, max, turnRight);
+}
+
+void ModulateLaraTurnRateY(ItemInfo* item, short accel, short min, short max, bool clockwise)
+{
+	auto* lara = GetLaraInfo(item);
+
+	ModulateLaraTurnRate(&lara->Control.TurnRate/*.y*/, accel, min, max, clockwise);
 }
 
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)

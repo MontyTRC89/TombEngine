@@ -145,18 +145,12 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_MED_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_MED_TURN_MAX, true);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 6);
 	}
 
@@ -259,18 +253,12 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_FAST_TURN_MAX)
-			lara->Control.TurnRate = -LARA_FAST_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_FAST_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_FAST_TURN_MAX)
-			lara->Control.TurnRate = LARA_FAST_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_FAST_TURN_MAX, true);
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
@@ -428,16 +416,12 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_LEFT &&
 			!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT)))	// Sidestep locks orientation.
 		{
-			lara->Control.TurnRate -= LARA_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		}
 		else if (TrInput & IN_RIGHT &&
 			!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT)))
 		{
-			lara->Control.TurnRate += LARA_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
 		}
 	}
 
@@ -798,18 +782,12 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_MED_TURN_MAX)
-			lara->Control.TurnRate = -LARA_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_MED_TURN_MAX)
-			lara->Control.TurnRate = LARA_MED_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
@@ -882,12 +860,6 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	lara->Control.TurnRate += LARA_TURN_RATE;
-	if (lara->Control.TurnRate < 0)
-		lara->Control.TurnRate = 0;
-	else if (lara->Control.TurnRate > LARA_MED_FAST_TURN_MAX)
-		lara->Control.TurnRate = LARA_MED_FAST_TURN_MAX;
-
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (isSwamp)
@@ -897,6 +869,8 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
+
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_FAST_TURN_MAX, true);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1011,8 +985,7 @@ void PsuedoLaraAsWadeTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.TurnRate > LARA_WADE_TURN_MAX)
-		lara->Control.TurnRate = LARA_WADE_TURN_MAX;
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_WADE_TURN_MAX, true);
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
@@ -1076,8 +1049,7 @@ void PsuedoLaraAsSwampTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.TurnRate > LARA_SWAMP_TURN_MAX)
-		lara->Control.TurnRate = LARA_SWAMP_TURN_MAX;
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX, true);
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -1152,12 +1124,6 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	lara->Control.TurnRate -= LARA_TURN_RATE;
-	if (lara->Control.TurnRate > 0)
-		lara->Control.TurnRate = 0;
-	else if (lara->Control.TurnRate < -LARA_MED_FAST_TURN_MAX)
-		lara->Control.TurnRate = -LARA_MED_FAST_TURN_MAX;
-
 	if (lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		if (isSwamp)
@@ -1167,6 +1133,8 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
+
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_FAST_TURN_MAX);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1281,8 +1249,7 @@ void PsuedoLaraAsWadeTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.TurnRate < -LARA_WADE_TURN_MAX)
-		lara->Control.TurnRate = -LARA_WADE_TURN_MAX;
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_WADE_TURN_MAX);
 
 	if (TrInput & IN_JUMP && TestLaraJumpUp(item, coll))
 	{
@@ -1346,8 +1313,7 @@ void PsuedoLaraAsSwampTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (lara->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
-		lara->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX);
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -1506,8 +1472,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.IsMoving)
 		return;
 
-	if (isSwamp &&
-		lara->Control.WaterStatus == WaterStatus::Wade)
+	if (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade)
 	{
 		PseudoLaraAsSwampWalkBack(item, coll);
 		return;
@@ -1515,19 +1480,13 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 4);
 	}
 
@@ -1548,19 +1507,13 @@ void PseudoLaraAsSwampWalkBack(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX / 3)
-			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX / 3;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 3);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX / 3)
-			lara->Control.TurnRate = LARA_SLOW_TURN_MAX / 3;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX / 3, true);
 		DoLaraLean(item, coll, LARA_LEAN_MAX / 3, LARA_LEAN_RATE / 3);
 	}
 
@@ -1633,11 +1586,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	lara->Control.TurnRate += LARA_TURN_RATE;
-	if (lara->Control.TurnRate < LARA_MED_TURN_MAX)
-		lara->Control.TurnRate = LARA_MED_TURN_MAX;
-	else if (lara->Control.TurnRate > LARA_FAST_TURN_MAX)
-		lara->Control.TurnRate = LARA_FAST_TURN_MAX;
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, LARA_MED_TURN_MAX, LARA_FAST_TURN_MAX, true);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1764,11 +1713,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	lara->Control.TurnRate -= LARA_TURN_RATE;
-	if (lara->Control.TurnRate > -LARA_MED_TURN_MAX)
-		lara->Control.TurnRate = -LARA_MED_TURN_MAX;
-	else if (lara->Control.TurnRate < -LARA_FAST_TURN_MAX)
-		lara->Control.TurnRate = -LARA_FAST_TURN_MAX;
+	ModulateLaraTurnRateY(item, LARA_TURN_RATE, LARA_MED_TURN_MAX, LARA_FAST_TURN_MAX);
 
 	if (TrInput & IN_JUMP)
 	{
@@ -1902,17 +1847,9 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-		{
-			lara->Control.TurnRate -= LARA_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-		}
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-		{
-			lara->Control.TurnRate += LARA_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
-		}
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
 	}
 
 	// TODO: Funky?
@@ -2002,17 +1939,9 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
 		if (TrInput & IN_LEFT)
-		{
-			lara->Control.TurnRate -= LARA_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-		}
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		else if (TrInput & IN_RIGHT)
-		{
-			lara->Control.TurnRate += LARA_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
-		}
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
 	}
 
 	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
@@ -2235,18 +2164,12 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_FAST_TURN_MAX)
-			lara->Control.TurnRate = -LARA_FAST_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_FAST_TURN_MAX)
-			lara->Control.TurnRate = LARA_FAST_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_MED_TURN_MAX, true);
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
 	}
 
@@ -2278,19 +2201,13 @@ void PseudoLaraAsSwampWadeForward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SWAMP_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SWAMP_TURN_MAX;
-
-		DoLaraLean(item, coll, -LARA_LEAN_MAX / 5 * 3, LARA_LEAN_RATE / 3);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE / 3);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SWAMP_TURN_MAX)
-			lara->Control.TurnRate = LARA_SWAMP_TURN_MAX;
-
-		DoLaraLean(item, coll, LARA_LEAN_MAX / 5 * 3, LARA_LEAN_RATE / 3);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SWAMP_TURN_MAX, true);
+		DoLaraLean(item, coll, LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE / 3);
 	}
 
 	if (TrInput & IN_FORWARD)
@@ -2378,18 +2295,12 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
 		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
-
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
 		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE);
 	}
 
@@ -2523,19 +2434,13 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_LEFT)
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-
-		DoLaraLean(item, coll, -(LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
+		DoLaraLean(item, coll, -LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE);
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-			lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
-
-		DoLaraLean(item, coll, (LARA_LEAN_MAX * 3) / 5, LARA_LEAN_RATE);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX, true);
+		DoLaraLean(item, coll, LARA_LEAN_MAX * 0.6f, LARA_LEAN_RATE);
 	}
 
 	item->Animation.TargetState = LS_RUN_FORWARD;
