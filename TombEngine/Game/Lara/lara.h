@@ -12,7 +12,7 @@ struct CollisionInfo;
 #define LARA_LEAN_RATE ANGLE(1.5f)
 #define LARA_LEAN_MAX ANGLE(11.0f)
 
-// Turn rates
+// Turn rate acceleration rates
 #define LARA_TURN_RATE ANGLE(2.25f)
 #define LARA_CRAWL_MOVE_TURN_RATE ANGLE(2.15f)
 #define LARA_POLE_TURN_RATE ANGLE(2.25f)
