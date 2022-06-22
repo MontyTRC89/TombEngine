@@ -53,10 +53,8 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX);
-	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX);
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
 	if (TestLaraLand(item, coll))
 	{
@@ -192,10 +190,8 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX / 2);
-	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX / 2);
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
 	if (TestLaraLand(item, coll))
 	{
@@ -272,10 +268,8 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_FORWARD | IN_BACK) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (TrInput & IN_LEFT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
-		else if (TrInput & IN_RIGHT)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_SLOW_TURN_MAX);
+		if (TrInput & (IN_LEFT | IN_RIGHT))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
@@ -412,10 +406,8 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX);
-	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX);
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
 	if (TestLaraLand(item, coll))
 	{
@@ -677,10 +669,8 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX / 2);
-	else if (TrInput & IN_RIGHT)
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX / 2);
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
 	if (TestLaraLand(item, coll))
 	{
@@ -748,15 +738,10 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX);
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE, 0, LARA_JUMP_TURN_MAX);
-		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
+		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 2, LARA_LEAN_MAX);
 	}
 
 	if (TestLaraLand(item, coll))
