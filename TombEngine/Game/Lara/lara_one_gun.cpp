@@ -342,7 +342,7 @@ void FireShotgun(ItemInfo* laraItem)
 		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
 
-		Rumble(0.4f, 0.2f);
+		Rumble(0.5f, 0.2f);
 
 		Statistics.Game.AmmoUsed++;
 	}
@@ -723,6 +723,8 @@ void FireGrenade(ItemInfo* laraItem)
 		item->Animation.RequiredState = 0;
 		item->HitPoints = GRENADE_TIME;
 		item->ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
+
+		Rumble(0.4f, 0.25f);
 
 		AddActiveItem(itemNumber);
 
@@ -1172,6 +1174,7 @@ void FireRocket(ItemInfo* laraItem)
 
 		AddActiveItem(itemNumber);
 
+		Rumble(0.4f, 0.3f);
 		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
@@ -1816,6 +1819,7 @@ void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src,
 		}
 		else
 		{
+			Rumble(0.5f, 0.3f);
 			laraItem->HitPoints -= (Weapons[(int)weaponType].Damage * 5);
 			if (!TestEnvironment(ENV_FLAG_WATER, dest->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
 				LaraBurn(laraItem);

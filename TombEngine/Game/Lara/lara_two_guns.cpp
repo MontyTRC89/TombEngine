@@ -222,7 +222,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 						SoundEffect(weapon->SampleNum, &laraItem->Pose);
 					}
 
-					Rumble(0.4f, 0.2f);
+					Rumble(weaponType == LaraWeaponType::Uzi ? 0.3f : 0.4f, 0.2f);
 
 					if (weaponType == LaraWeaponType::Uzi)
 						lara->Control.Weapon.UziLeft = true;
