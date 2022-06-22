@@ -208,8 +208,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_AUTOTARGET, g_Configuration.AutoTarget) != ERROR_SUCCESS)
-	{
+	if (SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.ShadowMapSize) != ERROR_SUCCESS) {
 		RegCloseKey(rootKey);
 		return false;
 	}
@@ -226,7 +225,7 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, g_Configuration.EnableAudioSpecialEffects) != ERROR_SUCCESS)
+	if (SetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, g_Configuration.EnableReverb) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -244,7 +243,21 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if(SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.shadowMapSize) != ERROR_SUCCESS){
+
+	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_RUMBLE, g_Configuration.EnableRumble) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, g_Configuration.EnableThumbstickCameraControl) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetBoolRegKey(rootKey, REGKEY_AUTOTARGET, g_Configuration.AutoTarget) != ERROR_SUCCESS)
+	{
 		RegCloseKey(rootKey);
 		return false;
 	}
@@ -279,7 +292,7 @@ void InitDefaultConfiguration()
 
 	g_Configuration.AutoTarget = true;
 	g_Configuration.SoundDevice = 1;
-	g_Configuration.EnableAudioSpecialEffects = true;
+	g_Configuration.EnableReverb = true;
 	g_Configuration.EnableCaustics = true;
 	g_Configuration.EnableShadows = true;
 	g_Configuration.EnableSound = true;
@@ -288,7 +301,7 @@ void InitDefaultConfiguration()
 	g_Configuration.SfxVolume = 100;
 	g_Configuration.Width = currentScreenResolution.x;
 	g_Configuration.Height = currentScreenResolution.y;
-	g_Configuration.shadowMapSize = 512;
+	g_Configuration.ShadowMapSize = 512;
 	g_Configuration.SupportedScreenResolutions = GetAllSupportedScreenResolutions();
 	g_Configuration.AdapterName = g_Renderer.GetDefaultAdapterName();
 }
@@ -343,22 +356,22 @@ bool LoadConfiguration()
 		return false;
 	}
 
-	bool autoTarget = false;
-	if (GetBoolRegKey(rootKey, REGKEY_AUTOTARGET, &autoTarget, true) != ERROR_SUCCESS)
+	DWORD shadowMapSize = 512;
+	if (GetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, &shadowMapSize, 512) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
 	}
 
-	bool enableSound = false;
+	bool enableSound = true;
 	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_SOUND, &enableSound, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
 	}
 
-	bool enableSoundSpecialEffects = false;
-	if (GetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, &enableSoundSpecialEffects, false) != ERROR_SUCCESS)
+	bool enableReverb = true;
+	if (GetBoolRegKey(rootKey, REGKEY_SOUND_SPECIAL_FX, &enableReverb, true) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -385,6 +398,27 @@ bool LoadConfiguration()
 		return false;
 	}
 
+	bool enableThumbstickCamera = true;
+	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_THUMBSTICK_CAMERA, &enableThumbstickCamera, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool enableRumble = true;
+	if (GetBoolRegKey(rootKey, REGKEY_ENABLE_RUMBLE, &enableRumble, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	bool autoTarget = false;
+	if (GetBoolRegKey(rootKey, REGKEY_AUTOTARGET, &autoTarget, true) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
 	for (int i = 0; i < KEY_COUNT; i++)
 	{
 		DWORD tempKey;
@@ -402,21 +436,25 @@ bool LoadConfiguration()
 	}
 
 	// All configuration values were found, so I can apply configuration to the engine
-	g_Configuration.AutoTarget = autoTarget;
 	g_Configuration.Width = screenWidth;
 	g_Configuration.Height = screenHeight;
 	g_Configuration.Windowed = windowed;
 	g_Configuration.EnableShadows = shadows;
 	g_Configuration.EnableCaustics = caustics;
 	g_Configuration.EnableVolumetricFog = volumetricFog;
+	g_Configuration.ShadowMapSize = shadowMapSize;
+
 	g_Configuration.EnableSound = enableSound;
-	g_Configuration.EnableAudioSpecialEffects = enableSoundSpecialEffects;
+	g_Configuration.EnableReverb = enableReverb;
 	g_Configuration.MusicVolume = musicVolume;
 	g_Configuration.SfxVolume = sfxVolume;
 	g_Configuration.SoundDevice = soundDevice;
-	g_Configuration.shadowMapSize = 512;
+
+	g_Configuration.AutoTarget = autoTarget;
+	g_Configuration.EnableRumble = enableRumble;
+	g_Configuration.EnableThumbstickCameraControl = enableThumbstickCamera;
+
 	// Set legacy variables
-	//OptionAutoTarget = autoTarget;
 	SetVolumeMusic(musicVolume);
 	SetVolumeFX(sfxVolume);
 

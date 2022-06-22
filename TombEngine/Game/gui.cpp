@@ -618,8 +618,8 @@ InventoryResult GuiController::TitleOptions()
 		HandleControlSettingsInput(false);
 		break;
 
-	case Menu::Sound:
-		HandleSoundSettingsInput(false);
+	case Menu::OtherSettings:
+		HandleOtherSettingsInput(false);
 		break;
 	}
 
@@ -717,25 +717,7 @@ InventoryResult GuiController::TitleOptions()
 			}
 			else if (menu_to_display == Menu::Options)
 			{
-				switch (selected_option)
-				{
-				case 0:
-					FillDisplayOptions();
-					menu_to_display = Menu::Display;
-					break;
-
-				case 1:
-					BackupOptions();
-					menu_to_display = Menu::Controls;
-					selected_option = 0;
-					break;
-
-				case 2:
-					BackupOptions();
-					menu_to_display = Menu::Sound;
-					selected_option = 0;
-					break;
-				}
+				HandleOptionsInput();
 			}
 		}
 	}
@@ -892,7 +874,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 void GuiController::HandleControlSettingsInput(bool pause)
 {
-	option_count = 18;
+	option_count = KEY_COUNT + 1;
 
 	CurrentSettings.waitingForkey = false;
 
@@ -1014,7 +996,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 			menu_to_display = Menu::Options;
-			selected_option = 1;
+			selected_option = 2;
 		}
 	}
 }
@@ -1024,9 +1006,33 @@ void GuiController::BackupOptions()
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 }
 
-void GuiController::HandleSoundSettingsInput(bool pause)
+void GuiController::HandleOptionsInput()
 {
-	option_count = 4;
+	switch (selected_option)
+	{
+	case 0:
+		FillDisplayOptions();
+		menu_to_display = Menu::Display;
+		selected_option = 0;
+		break;
+
+	case 1:
+		BackupOptions();
+		menu_to_display = Menu::OtherSettings;
+		selected_option = 0;
+		break;
+
+	case 2:
+		BackupOptions();
+		menu_to_display = Menu::Controls;
+		selected_option = 0;
+		break;
+	}
+}
+
+void GuiController::HandleOtherSettingsInput(bool pause)
+{
+	option_count = 7;
 
 	UpdateInput();
 	DoDebouncedInput();
@@ -1036,22 +1042,44 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 		menu_to_display = Menu::Options;
-		selected_option = 2;
+		selected_option = 1;
 
 		SetVolumeMusic(g_Configuration.MusicVolume);
 		SetVolumeFX(g_Configuration.SfxVolume);
 		return;
 	}
 
+	if (goLeft || goRight)
+	{
+		switch (selected_option)
+		{
+
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.EnableReverb = !CurrentSettings.conf.EnableReverb;
+			break;
+
+		case 3:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.AutoTarget = !CurrentSettings.conf.AutoTarget;
+			break;
+
+		case 4:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.EnableRumble = !CurrentSettings.conf.EnableRumble;
+			break;
+
+		case 5:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.EnableThumbstickCameraControl = !CurrentSettings.conf.EnableThumbstickCameraControl;
+			break;
+		}
+	}
+
 	if (goLeft)
 	{
 		switch (selected_option)
 		{
-		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-			break;
-
 		case 1:
 			if (CurrentSettings.conf.MusicVolume > 0)
 			{
@@ -1066,7 +1094,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 
 		case 2:
@@ -1083,7 +1110,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 		}
 	}
@@ -1092,11 +1118,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 	{
 		switch (selected_option)
 		{
-		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-			break;
-
 		case 1:
 			if (CurrentSettings.conf.MusicVolume < 100)
 			{
@@ -1111,7 +1132,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 
 		case 2:
@@ -1128,7 +1148,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 		}
 	}
@@ -1157,16 +1176,16 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-		if (selected_option == 3)
+		if (selected_option == option_count - 1)
 		{
 			// Save the configuration
 			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
 			SaveConfiguration();
-
+			Rumble(0.5f);
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
 			selected_option = pause ? 1 : 2;
 		}
-		else if (selected_option == 4)
+		else if (selected_option == option_count)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			SetVolumeMusic(g_Configuration.MusicVolume);
@@ -1203,8 +1222,8 @@ InventoryResult GuiController::DoPauseMenu()
 		HandleControlSettingsInput(true);
 		break;
 
-	case Menu::Sound:
-		HandleSoundSettingsInput(true);
+	case Menu::OtherSettings:
+		HandleOtherSettingsInput(true);
 		break;
 	}
 
@@ -1277,26 +1296,7 @@ InventoryResult GuiController::DoPauseMenu()
 			break;
 
 		case Menu::Options:
-
-			switch (selected_option)
-			{
-			case 0:
-				FillDisplayOptions();
-				menu_to_display = Menu::Display;
-				break;
-
-			case 1:
-				BackupOptions();
-				selected_option = 0;
-				menu_to_display = Menu::Controls;
-				break;
-
-			case 2:
-				BackupOptions();
-				selected_option = 0;
-				menu_to_display = Menu::Sound;
-				break;
-			}
+			HandleOptionsInput();
 			break;
 
 		case Menu::Statistics:

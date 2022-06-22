@@ -961,7 +961,6 @@ CALL gen.bat</Command>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Banner.bmp" />
     <Image Include="ten.ico" />
   </ItemGroup>
   <ItemGroup>

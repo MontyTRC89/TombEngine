@@ -30,6 +30,9 @@ constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS          = CLICK(1);
 
+constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
+constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
+
 struct OLD_CAMERA
 {
 	short ActiveState;
@@ -427,17 +430,23 @@ void ChaseCamera(ItemInfo* item)
 	MoveCamera(&ideal, Camera.speed);
 }
 
-void UpdateCameraElevation()
+void DoThumbstickCamera()
 {
-	// TODO: Add option to enable/disable camera rotation
+	if (!g_Configuration.EnableThumbstickCameraControl)
+		return;
 
 	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
-								  Camera.target.y == OldCam.target.y &&
-								  Camera.target.z == OldCam.target.z))
+		Camera.target.y == OldCam.target.y &&
+		Camera.target.z == OldCam.target.z))
 	{
-		Camera.targetAngle = ANGLE(120.0f * AxisMap[InputAxis::CameraHorizontal]);
-		Camera.targetElevation = ANGLE(-10.0f + (80.0f * AxisMap[InputAxis::CameraVertical]));
+		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraHorizontal]);
+		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraVertical]));
 	}
+}
+
+void UpdateCameraElevation()
+{
+	DoThumbstickCamera();
 
 	if (Camera.laraNode != -1)
 	{

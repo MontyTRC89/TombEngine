@@ -712,6 +712,9 @@ namespace TEN::Input
 
 	void Rumble(float power, float delayInSeconds, RumbleMode mode)
 	{
+		if (!g_Configuration.EnableRumble)
+			return;
+
 		if (power == 0.0f)
 			return;
 

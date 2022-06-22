@@ -19,6 +19,16 @@ local strings = {
 		"",
 		""
 	},
+	auto_target = {
+		"Automatic targeting",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	back = {
 		"Back",
 		"",
@@ -409,16 +419,6 @@ local strings = {
 		"",
 		""
 	},
-	sounds = {
-		"Audio settings",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
 	enable_sound = {
 		"Enable Sounds",
 		"",
@@ -679,6 +679,26 @@ local strings = {
 		"",
 		""
 	},
+	options = {
+		"Options",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	other_settings = {
+		"Sound and Gameplay",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	output_settings = {
 		"Output Settings",
 		"",
@@ -729,6 +749,16 @@ local strings = {
 		"",
 		""
 	},
+	reverb = {
+		"Reverb",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	revolver = {
 		"Revolver",
 		"",
@@ -771,6 +801,16 @@ local strings = {
 	},
 	rocket_launcher = {
 		"Rocket Launcher",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	rumble = {
+		"Vibration",
 		"",
 		"",
 		"",
@@ -899,18 +939,8 @@ local strings = {
 		"",
 		""
 	},
-	options = {
-		"Options",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
 	sound = {
-		"Sound settings",
+		"Sound",
 		"",
 		"",
 		"",
@@ -919,17 +949,7 @@ local strings = {
 		"",
 		""
 	},
-	special_sound_fx = {
-		"Special Sound FX",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
-SILENCER_ITEM = {
+	silencer = {
 	"Silencer",
 		"",
 		"",
@@ -941,6 +961,16 @@ SILENCER_ITEM = {
 	},
 	statistics = {
 		"Statistics",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	thumbstick_camera = {
+		"Thumbstick camera",
 		"",
 		"",
 		"",
