@@ -304,7 +304,7 @@ void DealLaraFallDamage(ItemInfo* item)
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
 		}
 
-		float rumblePower = ((float)item->Animation.VerticalVelocity / (float)LARA_DEATH_VELOCITY) * 0.6f;
+		float rumblePower = ((float)item->Animation.VerticalVelocity / (float)LARA_DEATH_VELOCITY) * 0.7f;
 		Rumble(rumblePower, 0.3f);
 	}
 }
