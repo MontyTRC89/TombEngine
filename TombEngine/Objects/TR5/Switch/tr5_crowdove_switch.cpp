@@ -42,7 +42,7 @@ namespace TEN::Entities::TR5
 			(!(TrInput & IN_ACTION) ||
 				laraItem->Animation.ActiveState != LS_IDLE ||
 				laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-				laraItem->Animation.Airborne ||
+				laraItem->Animation.IsAirborne ||
 				laraInfo->Control.HandStatus != HandStatus::Free) &&
 			(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 		{

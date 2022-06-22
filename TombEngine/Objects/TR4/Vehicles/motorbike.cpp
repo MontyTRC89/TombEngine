@@ -237,7 +237,7 @@ namespace TEN::Entities::Vehicles
 		auto* motorbikeItem = &g_Level.Items[itemNumber];
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (motorbikeItem->Flags & ONESHOT || lara->Control.HandStatus != HandStatus::Free || laraItem->Animation.Airborne)
+		if (motorbikeItem->Flags & ONESHOT || lara->Control.HandStatus != HandStatus::Free || laraItem->Animation.IsAirborne)
 			return false;
 
 		if ((!(TrInput & IN_ACTION) || abs(motorbikeItem->Pose.Position.y - laraItem->Pose.Position.y) >= CLICK(1)) &&
@@ -1180,7 +1180,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = MOTORBIKE_STATE_IDLE;
 		laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
-		laraItem->Animation.Airborne = false;
+		laraItem->Animation.IsAirborne = false;
 		lara->Control.HandStatus = HandStatus::Busy;
 		lara->HitDirection = -1;
 

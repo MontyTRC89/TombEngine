@@ -51,7 +51,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleMountType::Back:
 				if (abs(deltaHeadingAngle) < ANGLE(35.0f) &&
 					onCorrectSide &&
-					!laraItem->Animation.Airborne)
+					!laraItem->Animation.IsAirborne)
 				{
 					break;
 				}
@@ -61,7 +61,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleMountType::Left:
 				if (deltaHeadingAngle > -ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(45.0f) &&
 					onCorrectSide &&
-					!laraItem->Animation.Airborne)
+					!laraItem->Animation.IsAirborne)
 				{
 					break;
 				}
@@ -71,7 +71,7 @@ namespace TEN::Entities::Vehicles
 			case VehicleMountType::Right:
 				if (deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
 					onCorrectSide &&
-					!laraItem->Animation.Airborne)
+					!laraItem->Animation.IsAirborne)
 				{
 					break;
 				}
@@ -80,7 +80,7 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Jump:
 				if (abs(deltaHeadingAngle) < ANGLE(135.0f) &&
-					laraItem->Animation.Airborne &&
+					laraItem->Animation.IsAirborne &&
 					laraItem->Animation.VerticalVelocity > 0 &&
 					laraItem->Pose.Position.y > vehicleItem->Pose.Position.y &&
 					lara->Control.WaterStatus == WaterStatus::Dry)

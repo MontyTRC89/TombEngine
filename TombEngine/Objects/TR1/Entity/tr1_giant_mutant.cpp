@@ -96,7 +96,7 @@ namespace TEN::Entities::TR1
 			{
 			case MUTANT_STATE_SET:
 				item->Animation.TargetState = MUTANT_STATE_FALL;
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 				break;
 
 			case MUTANT_STATE_IDLE:
@@ -209,7 +209,7 @@ namespace TEN::Entities::TR1
 					LaraItem->Pose.Position.z = item->Pose.Position.z;
 					LaraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 					LaraItem->Pose.Orientation.x = LaraItem->Pose.Orientation.z = 0;
-					LaraItem->Animation.Airborne = false;
+					LaraItem->Animation.IsAirborne = false;
 					LaraItem->HitPoints = -1;
 					Lara.Air = -1;
 					Lara.Control.HandStatus = HandStatus::Busy;
@@ -234,7 +234,7 @@ namespace TEN::Entities::TR1
 			if (item->Pose.Position.y > item->Floor)
 			{
 				item->Animation.TargetState = MUTANT_STATE_IDLE;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Pose.Position.y = item->Floor;
 				Camera.bounce = 500;
 			}

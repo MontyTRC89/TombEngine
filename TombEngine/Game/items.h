@@ -67,7 +67,7 @@ struct EntityAnimationData
 	int TargetState;
 	int RequiredState; // TODO: Phase out this weird feature.
 
-	bool Airborne;
+	bool IsAirborne;
 	int Velocity;
 	int VerticalVelocity;
 	int LateralVelocity;

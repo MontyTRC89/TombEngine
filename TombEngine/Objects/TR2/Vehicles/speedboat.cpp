@@ -112,7 +112,7 @@ namespace TEN::Entities::Vehicles
 		short deltaAngle = speedboatItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		if (lara->Control.WaterStatus == WaterStatus::TreadWater || lara->Control.WaterStatus == WaterStatus::Wade)
 		{
-			if (!(TrInput & IN_ACTION) || laraItem->Animation.Airborne || speedboatItem->Animation.Velocity)
+			if (!(TrInput & IN_ACTION) || laraItem->Animation.IsAirborne || speedboatItem->Animation.Velocity)
 				return mountType;
 
 			if (deltaAngle > ANGLE(45.0f) && deltaAngle < ANGLE(135.0f))
@@ -196,7 +196,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(laraItem, LA_JUMP_FORWARD);
 			laraItem->Animation.Velocity = 40;
 			laraItem->Animation.VerticalVelocity = -50;
-			laraItem->Animation.Airborne = true;
+			laraItem->Animation.IsAirborne = true;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 			lara->Vehicle = NO_ITEM;
@@ -774,7 +774,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Pose.Orientation.z = 0;
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
-		laraItem->Animation.Airborne = false;
+		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = SPEEDBOAT_STATE_MOUNT;
 		laraItem->Animation.TargetState = SPEEDBOAT_STATE_MOUNT;

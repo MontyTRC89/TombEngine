@@ -64,7 +64,7 @@ void EagleControl(short itemNumber)
 			{
 				item->Pose.Position.y = item->Floor;
 				item->Animation.VerticalVelocity = 0;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = 5;
 			}
 
@@ -83,7 +83,7 @@ void EagleControl(short itemNumber)
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = 4;
 			item->Animation.Velocity = 0;
-			item->Animation.Airborne = true;
+			item->Animation.IsAirborne = true;
 			break;
 		}
 		item->Pose.Orientation.x = 0;

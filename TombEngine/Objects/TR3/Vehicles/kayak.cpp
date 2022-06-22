@@ -281,7 +281,7 @@ namespace TEN::Entities::Vehicles
 
 		if (!(TrInput & IN_ACTION) ||
 			lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.Airborne)
+			laraItem->Animation.IsAirborne)
 		{
 			return KayakMountType::None;
 		}
@@ -1030,7 +1030,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.z = 0;
 				laraItem->Animation.Velocity = 40;
 				laraItem->Animation.VerticalVelocity = -50;
-				laraItem->Animation.Airborne = true;
+				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 				kayak->LeftRightPaddleCount = 0;
@@ -1052,7 +1052,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.z = 0;
 				laraItem->Animation.Velocity = 40;
 				laraItem->Animation.VerticalVelocity = -50;
-				laraItem->Animation.Airborne = true;
+				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 				kayak->LeftRightPaddleCount = 0;
@@ -1152,7 +1152,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Animation.ActiveState = 12; // TODO
 		laraItem->Animation.TargetState = 12;
 		laraItem->HitPoints = 0;
-		laraItem->Animation.Airborne = false;
+		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
 
@@ -1199,7 +1199,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose.Orientation.z = 0;
 			laraItem->Animation.Velocity = 0;
 			laraItem->Animation.VerticalVelocity = 0;
-			laraItem->Animation.Airborne = false;
+			laraItem->Animation.IsAirborne = false;
 			lara->Control.WaterStatus = WaterStatus::Dry;
 
 			if (laraItem->RoomNumber != kayakItem->RoomNumber)

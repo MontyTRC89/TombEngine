@@ -245,7 +245,7 @@ namespace TEN::Entities::Vehicles
 
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
-				laraItem->Animation.Airborne = true;
+				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
 				skidooItem->Flags |= ONESHOT;
@@ -689,7 +689,7 @@ namespace TEN::Entities::Vehicles
 			else
 				verticalVelocity += GRAVITY;
 		}
-		// Airborne.
+		// IsAirborne.
 		else
 		{
 			int kick = (height - *y) * 4;

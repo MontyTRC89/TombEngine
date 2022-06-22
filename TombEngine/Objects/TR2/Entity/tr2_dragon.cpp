@@ -178,7 +178,7 @@ void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 				TrInput & IN_ACTION &&
 				item->ObjectNumber == ID_DRAGON_BACK &&
-				!laraItem->Animation.Airborne &&
+				!laraItem->Animation.IsAirborne &&
 				shift <= DRAGON_MID && 
 				shift > (DRAGON_CLOSE - 350) &&
 				sideShift > -350 &&
@@ -192,7 +192,7 @@ void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				laraItem->Animation.TargetState = 7;
 
 				laraItem->Pose = item->Pose;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 				laraItem->Animation.Velocity = 0;
 				laraItem->Animation.VerticalVelocity = 0;
 

@@ -28,7 +28,7 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.TargetState = LS_DEATH;
 				laraItem->Animation.ActiveState = LS_DEATH;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 			}
 			else
 				ObjectCollision(itemNumber, laraItem, coll);
@@ -289,7 +289,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 			return;
 		if (!TestCollision(item, lara))
 			return;
-		if (lara->Animation.Airborne)
+		if (lara->Animation.IsAirborne)
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, lara, coll, coll->Setup.EnableSpasm, 1);
@@ -362,9 +362,9 @@ void ClassicRollingBallControl(short itemNum)
 
 		if (item->Pose.Position.y < item->Floor)
 		{
-			if (!item->Animation.Airborne)
+			if (!item->Animation.IsAirborne)
 			{
-				item->Animation.Airborne = 1;
+				item->Animation.IsAirborne = 1;
 				item->Animation.VerticalVelocity = -10;
 			}
 		}
@@ -385,7 +385,7 @@ void ClassicRollingBallControl(short itemNum)
 
 		if (item->Pose.Position.y >= (int)floor - 256)
 		{
-			item->Animation.Airborne = false;
+			item->Animation.IsAirborne = false;
 			item->Animation.VerticalVelocity = 0;
 			item->Pose.Position.y = item->Floor;
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);

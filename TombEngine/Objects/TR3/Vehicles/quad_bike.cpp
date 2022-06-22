@@ -228,7 +228,7 @@ namespace TEN::Entities::Vehicles
 				GetJointAbsPosition(laraItem, &pos, LM_HIPS);
 
 				laraItem->Pose.Position = pos;
-				laraItem->Animation.Airborne = true;
+				laraItem->Animation.IsAirborne = true;
 				laraItem->Animation.VerticalVelocity = quadBikeItem->Animation.VerticalVelocity;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
@@ -259,7 +259,7 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (!(TrInput & IN_ACTION) ||
-			laraItem->Animation.Airborne ||
+			laraItem->Animation.IsAirborne ||
 			lara->Control.HandStatus != HandStatus::Free ||
 			quadBikeItem->Flags & ONESHOT ||
 			abs(quadBikeItem->Pose.Position.y - laraItem->Pose.Position.y) > CLICK(1))

@@ -471,7 +471,7 @@ namespace TEN::Entities::TR3
 
 			LaraItem->Pose.Position = item->Pose.Position;
 			LaraItem->Pose.Orientation = Vector3Shrt(0, item->Pose.Orientation.y, 0);
-			LaraItem->Animation.Airborne = false;
+			LaraItem->Animation.IsAirborne = false;
 
 			LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SHIVA_DEATH;
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;

@@ -600,7 +600,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
-	//item->Airborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
+	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 
@@ -610,14 +610,14 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.VerticalVelocity = 0;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.VerticalVelocity = 0;
 }
 
@@ -635,7 +635,7 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
 	lara->Control.HandStatus = HandStatus::Free;
@@ -733,7 +733,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 		item->Animation.Velocity = 2;
 		item->Animation.VerticalVelocity = 1;
 		item->Pose.Position.y += CLICK(1);
