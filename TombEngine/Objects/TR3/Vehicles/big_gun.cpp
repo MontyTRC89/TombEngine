@@ -77,7 +77,7 @@ namespace TEN::Entities::Vehicles
 
 		if (!(TrInput & IN_ACTION) ||
 			lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.Airborne)
+			laraItem->Animation.IsAirborne)
 		{
 			return false;
 		}
@@ -163,7 +163,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT].frameBase;
 			laraItem->Animation.ActiveState = BGUN_STATE_MOUNT;
 			laraItem->Animation.TargetState = BGUN_STATE_MOUNT;
-			laraItem->Animation.Airborne = false;
+			laraItem->Animation.IsAirborne = false;
 			laraItem->Pose = bigGunItem->Pose;
 			lara->Control.HandStatus = HandStatus::Busy;
 			bigGunItem->HitPoints = 1;

@@ -51,7 +51,7 @@ void AnimateLara(ItemInfo* item)
 				case COMMAND_JUMP_VELOCITY:
 					item->Animation.VerticalVelocity = *(cmd++);
 					item->Animation.Velocity = *(cmd++);
-					item->Animation.Airborne = true;
+					item->Animation.IsAirborne = true;
 					if (lara->Control.CalculatedJumpVelocity)
 					{
 						item->Animation.VerticalVelocity = lara->Control.CalculatedJumpVelocity;
@@ -150,7 +150,7 @@ void AnimateLara(ItemInfo* item)
 		lateral += anim->Xacceleration * (item->Animation.FrameNumber - anim->frameBase);
 	item->Animation.LateralVelocity = lateral >>= 16;
 
-	if (item->Animation.Airborne)
+	if (item->Animation.IsAirborne)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
 		{
@@ -158,7 +158,7 @@ void AnimateLara(ItemInfo* item)
 			if (abs(item->Animation.Velocity) < 8)
 			{
 				item->Animation.Velocity = 0;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 			}
 			if (item->Animation.VerticalVelocity > 128)
 				item->Animation.VerticalVelocity /= 2;
@@ -241,7 +241,7 @@ void AnimateItem(ItemInfo* item)
 				case COMMAND_JUMP_VELOCITY:
 					item->Animation.VerticalVelocity = *(cmd++);
 					item->Animation.Velocity = *(cmd++);
-					item->Animation.Airborne = true;
+					item->Animation.IsAirborne = true;
 					break;
 
 				case COMMAND_DEACTIVATE:
@@ -348,7 +348,7 @@ void AnimateItem(ItemInfo* item)
 
 	int lateral = 0;
 
-	if (item->Animation.Airborne)
+	if (item->Animation.IsAirborne)
 	{
 		item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128 ? 1 : 6);
 		item->Pose.Position.y += item->Animation.VerticalVelocity;

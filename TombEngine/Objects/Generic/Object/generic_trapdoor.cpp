@@ -70,7 +70,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 
 	if (TrInput & IN_ACTION &&
 		laraItem->Animation.ActiveState == LS_JUMP_UP &&
-		laraItem->Animation.Airborne &&
+		laraItem->Animation.IsAirborne &&
 		laraInfo->Control.HandStatus == HandStatus::Free &&
 		trapDoorItem->Status != ITEM_ACTIVE &&
 		itemIsAbove &&
@@ -82,7 +82,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		
 		ResetLaraFlex(laraItem);
 		laraItem->Animation.VerticalVelocity = 0;
-		laraItem->Animation.Airborne = false;
+		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.AnimNumber = LA_TRAPDOOR_CEILING_OPEN;
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = LS_FREEFALL_BIS;

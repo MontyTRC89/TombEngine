@@ -41,7 +41,7 @@ void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 	if (!(TrInput & IN_ACTION) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||
-		laraItem->Animation.Airborne ||
+		laraItem->Animation.IsAirborne ||
 		laraInfo->Control.HandStatus != HandStatus::Free)
 	{
 		return;
@@ -137,7 +137,7 @@ void ControlDeathSlide(short itemNumber)
 			{
 				LaraItem->Animation.TargetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
-				LaraItem->Animation.Airborne = true;
+				LaraItem->Animation.IsAirborne = true;
 				LaraItem->Animation.Velocity = zipLineItem->Animation.VerticalVelocity;
 				LaraItem->Animation.VerticalVelocity = zipLineItem->Animation.VerticalVelocity / 4;
 			}

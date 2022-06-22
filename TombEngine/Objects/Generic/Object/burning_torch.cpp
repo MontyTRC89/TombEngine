@@ -82,7 +82,7 @@ namespace TEN::Entities::Generic
 				Lara.Torch.State = TorchState::Dropping;
 			}
 			else if (TrInput & IN_DRAW &&
-				!LaraItem->Animation.Airborne &&
+				!LaraItem->Animation.IsAirborne &&
 				!LaraItem->Animation.VerticalVelocity &&
 				LaraItem->Animation.ActiveState != LS_JUMP_PREPARE &&
 				LaraItem->Animation.ActiveState != LS_JUMP_UP &&
@@ -103,7 +103,7 @@ namespace TEN::Entities::Generic
 		}
 		else if (Lara.Torch.State == TorchState::Throwing)
 		{
-			if (Lara.LeftArm.FrameNumber < 12 && LaraItem->Animation.Airborne)
+			if (Lara.LeftArm.FrameNumber < 12 && LaraItem->Animation.IsAirborne)
 			{
 				Lara.LeftArm.Locked = false;
 				Lara.LeftArm.FrameNumber = 0;
@@ -303,7 +303,7 @@ namespace TEN::Entities::Generic
 		if (!(TrInput & IN_ACTION) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			laraItem->Animation.Airborne ||
+			laraItem->Animation.IsAirborne ||
 			laraInfo->Control.Weapon.GunType != LaraWeaponType::Torch ||
 			laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
 			laraInfo->LeftArm.Locked ||

@@ -176,7 +176,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 		{
 			SetAnimation(item, LA_FALL_START);
 			item->Pose.Position.y += CLICK(1);
-			item->Animation.Airborne = true;
+			item->Animation.IsAirborne = true;
 			item->Animation.Velocity = 2;
 			item->Animation.VerticalVelocity = 1;
 			lara->Control.HandStatus = HandStatus::Free;
@@ -247,7 +247,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 			item->Pose.Position.x += coll->Shift.x;
 			item->Pose.Position.y += GetBoundsAccurate(item)->Y2 * 1.8f;
 			item->Pose.Position.z += coll->Shift.z;
-			item->Animation.Airborne = true;
+			item->Animation.IsAirborne = true;
 			item->Animation.Velocity = 2;
 			item->Animation.VerticalVelocity = 1;
 			lara->Control.HandStatus = HandStatus::Free;
@@ -270,7 +270,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraFlex(item);
 		item->Animation.Velocity = 0;
 		item->Animation.VerticalVelocity = 0;
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		item->Pose.Position.y += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		lara->Control.HandStatus = HandStatus::Busy;
 		return true;
@@ -319,7 +319,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	lara->Control.HandStatus = HandStatus::Busy;
 	return true;
 }
@@ -336,7 +336,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 		SetAnimation(item, LA_JUMP_UP_TO_MONKEY);
 		item->Animation.Velocity = 0;
 		item->Animation.VerticalVelocity = 0;
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		item->Pose.Position.y += coll->Middle.Ceiling + (LARA_HEIGHT_MONKEY - coll->Setup.Height);
 		lara->Control.HandStatus = HandStatus::Busy;
 		return true;
@@ -372,7 +372,7 @@ bool TestLaraHangJumpUp(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->ExtraTorsoRot = Vector3Shrt();
 	return true;
@@ -906,7 +906,7 @@ bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Orientation.z = 0;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	lara->Control.WaterStatus = WaterStatus::Wade;
 
 	return true;
@@ -984,7 +984,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 
 	item->Pose.Position.y += frontFloor - 5;
 	item->Animation.ActiveState = LS_ONWATER_EXIT;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
@@ -1055,7 +1055,7 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	item->Pose.Orientation.z = 0;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
@@ -1083,7 +1083,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y = probe.Position.Floor;
 		item->Pose.Orientation.x = 0;
 		item->Pose.Orientation.z = 0;
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		item->Animation.Velocity = 0;
 		item->Animation.VerticalVelocity = 0;
 		lara->Control.WaterStatus = WaterStatus::Wade;
@@ -1248,7 +1248,7 @@ bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
 	int heightFromFloor = GetCollision(item).Position.Floor - item->Pose.Position.y;
 
-	if (item->Animation.Airborne && item->Animation.VerticalVelocity >= 0 &&
+	if (item->Animation.IsAirborne && item->Animation.VerticalVelocity >= 0 &&
 		(heightFromFloor <= item->Animation.VerticalVelocity ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{

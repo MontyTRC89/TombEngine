@@ -176,7 +176,7 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.Airborne)
+			laraItem->Animation.IsAirborne)
 		{
 			return false;
 		}

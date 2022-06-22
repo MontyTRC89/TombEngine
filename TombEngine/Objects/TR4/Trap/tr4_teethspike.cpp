@@ -129,7 +129,7 @@ namespace TEN::Entities::TR4
 				int bloodCount = 0;
 
 				if ((item->ItemFlags[0] > 1024 ||
-					LaraItem->Animation.Airborne) &&
+					LaraItem->Animation.IsAirborne) &&
 					(item->TriggerFlags & 7) > 2 &&
 					(item->TriggerFlags & 7) < 6)
 				{
@@ -190,7 +190,7 @@ namespace TEN::Entities::TR4
 						heightFromFloor < CLICK(1))
 					{
 						SetAnimation(LaraItem, LA_SPIKE_DEATH);
-						LaraItem->Animation.Airborne = false;
+						LaraItem->Animation.IsAirborne = false;
 					}
 				}
 			}

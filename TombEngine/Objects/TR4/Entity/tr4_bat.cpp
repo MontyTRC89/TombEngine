@@ -189,7 +189,7 @@ namespace TEN::Entities::TR4
 			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Animation.TargetState = BAT_STATE_DEATH;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Pose.Position.y = item->Floor;
 			}
 			else
@@ -198,7 +198,7 @@ namespace TEN::Entities::TR4
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BAT_STATE_DEATH_FALL;
 				item->Animation.TargetState = BAT_STATE_DEATH_FALL;
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 				item->Animation.Velocity = 0;
 			}
 		}

@@ -71,7 +71,7 @@ namespace TEN::Entities::Switches
 					laraItem->Animation.ActiveState == LS_IDLE &&
 					laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 					lara->Control.HandStatus == HandStatus::Free &&
-					!switchItem->Animation.Airborne ||
+					!switchItem->Animation.IsAirborne ||
 					lara->Control.IsMoving &&
 					lara->InteractedItem == itemNum))
 			{

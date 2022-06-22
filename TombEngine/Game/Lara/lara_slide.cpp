@@ -90,7 +90,7 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -195,7 +195,7 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;

@@ -327,7 +327,7 @@ namespace TEN::Entities::Vehicles
 
 		if (!(TrInput & IN_ACTION) ||
 			lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.Airborne)
+			laraItem->Animation.IsAirborne)
 		{
 			return false;
 		}
@@ -696,7 +696,7 @@ namespace TEN::Entities::Vehicles
 
 				SetAnimation(laraItem, LA_UNDERWATER_IDLE);
 				laraItem->Animation.VerticalVelocity = 0;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 				laraItem->Pose.Orientation.x = laraItem->Pose.Orientation.z = 0;
 
 				UpdateItemRoom(laraItem, 0);
@@ -734,7 +734,7 @@ namespace TEN::Entities::Vehicles
 
 				SetAnimation(laraItem, LA_ONWATER_IDLE);
 				laraItem->Animation.VerticalVelocity = 0;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 
@@ -770,7 +770,7 @@ namespace TEN::Entities::Vehicles
 
 				SetAnimation(laraItem, LA_UNDERWATER_DEATH, 17);
 				laraItem->Animation.VerticalVelocity = 0;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 			
 				UPV->Flags |= UPV_DEAD;
 			}
@@ -1056,7 +1056,7 @@ namespace TEN::Entities::Vehicles
 			SetAnimation(UPVItem, UPV_ANIM_IDLE);
 			UPVItem->Animation.VerticalVelocity = 0;
 			UPVItem->Animation.Velocity = 0;
-			UPVItem->Animation.Airborne = true;
+			UPVItem->Animation.IsAirborne = true;
 			AnimateItem(UPVItem);
 
 			return true;

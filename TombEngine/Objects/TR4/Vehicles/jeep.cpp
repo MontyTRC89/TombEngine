@@ -253,7 +253,7 @@ namespace TEN::Entities::Vehicles
 					*y = height;
 			}
 		}
-		// Airborne.
+		// IsAirborne.
 		else
 		{
 			*y += speed;
@@ -406,7 +406,7 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->Animation.AnimNumber != LA_STAND_IDLE)
 			return false;
 
-		if (laraItem->Animation.Airborne)
+		if (laraItem->Animation.IsAirborne)
 			return false;
 
 		if (abs(jeepItem->Pose.Position.y - laraItem->Pose.Position.y) >= STEP_SIZE)

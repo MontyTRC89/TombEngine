@@ -455,7 +455,7 @@ void lara_as_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 
 void lara_as_slopefall(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 
 	if (GlobalCounter % 2)
 		item->Pose.Orientation.x--;
@@ -490,7 +490,7 @@ void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_ACTION))
 	{
 		SetAnimation(item, LA_OVERHANG_HANG_DROP);
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 		return;
 	}
 

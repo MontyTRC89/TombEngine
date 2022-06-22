@@ -22,7 +22,7 @@ void FallingCeilingControl(short itemNumber)
 	else
 	{
 		item->Animation.TargetState = 1;
-		item->Animation.Airborne = true;;
+		item->Animation.IsAirborne = true;;
 	}
 
 	AnimateItem(item);
@@ -43,7 +43,7 @@ void FallingCeilingControl(short itemNumber)
 			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Pose.Position.y = item->Floor;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = 2;
 				item->Animation.VerticalVelocity = 0;
 			}

@@ -122,7 +122,7 @@ namespace TEN::Entities::Vehicles
 
 		if (!(TrInput & IN_ACTION) ||
 			lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.Airborne ||
+			laraItem->Animation.IsAirborne ||
 			rBoat->Animation.Velocity)
 		{
 			return mountType;
@@ -612,7 +612,7 @@ namespace TEN::Entities::Vehicles
 		laraItem->Pose.Orientation.x = 0;
 		laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 		laraItem->Pose.Orientation.z = 0;
-		laraItem->Animation.Airborne = false;
+		laraItem->Animation.IsAirborne = false;
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
 		laraItem->Animation.ActiveState = 0;
@@ -834,7 +834,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.TargetState = LS_JUMP_FORWARD;
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
-			laraItem->Animation.Airborne = true;
+			laraItem->Animation.IsAirborne = true;
 			laraItem->Animation.Velocity = 20;
 			laraItem->Animation.VerticalVelocity = -40;
 			lara->Vehicle = NO_ITEM;

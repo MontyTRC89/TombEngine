@@ -659,7 +659,7 @@ namespace TEN::Entities::Effects
 			!(TrInput & IN_ACTION) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			laraItem->Animation.Airborne)
+			laraItem->Animation.IsAirborne)
 		{
 			if (item->ObjectNumber == ID_BURNING_ROOTS)
 				ObjectCollision(itemNumber, laraItem, coll);
