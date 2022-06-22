@@ -542,7 +542,7 @@ void GuiController::DoDebouncedInput()
 	else
 		dbDown = 0;
 
-	if (TrInput & IN_ACTION)
+	if (TrInput & IN_ACTION || TrInput & IN_SELECT)
 	{
 		if (invMode == InventoryMode::Save)
 		{
@@ -571,7 +571,7 @@ void GuiController::DoDebouncedInput()
 	else
 		dbSelect = 0;
 
-	if (TrInput & IN_DESELECT || TrInput & IN_OPTION)
+	if (TrInput & IN_OPTION || TrInput & IN_DESELECT)
 	{
 		if (!dbDeselect)
 			goDeselect = 1;

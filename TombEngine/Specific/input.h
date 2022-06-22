@@ -49,8 +49,9 @@ namespace TEN::Input
 
 		IN_SAVE		  = (1 << KEY_COUNT + 0),
 		IN_LOAD		  = (1 << KEY_COUNT + 1),
-		IN_DESELECT   = (1 << KEY_COUNT + 2),
-		IN_LOOKSWITCH = (1 << KEY_COUNT + 3)
+		IN_SELECT	  = (1 << KEY_COUNT + 2),
+		IN_DESELECT   = (1 << KEY_COUNT + 3),
+		IN_LOOKSWITCH = (1 << KEY_COUNT + 4)
 	};
 
 	enum InputAxis

@@ -690,8 +690,13 @@ namespace TEN::Input
 		if (Key(KEY_PAUSE))
 			lInput |= IN_PAUSE;
 
+		// Select / deselect control overrides, needed for UI keyboard navigation
+
 		if (KeyMap[KC_ESCAPE] || Key(KEY_DRAW))
 			lInput |= IN_DESELECT;
+
+		if (KeyMap[KC_RETURN] || Key(KEY_ACTION))
+			lInput |= IN_SELECT;
 
 		HandleLaraHotkeys(lInput);
 		SolveInputCollisions(lInput);
