@@ -21,48 +21,48 @@ namespace TEN::Input
 {
 	const char* g_KeyNames[] =
 	{
-			NULL,		"ESC",		"1",		"2",		"3",		"4",		"5",		"6",
-			"7",		"8",		"9",		"0",		"-",		"+",		"BKSP",		"TAB",
+			"Default",	"Esc",		"1",		"2",		"3",		"4",		"5",		"6",
+			"7",		"8",		"9",		"0",		"-",		"+",		"Back",		"Tab",
 			"Q",		"W",		"E",		"R",		"T",		"Y",		"U",		"I",
-			"O",		"P",		"<",		">",		"RET",		"CTRL",		"A",		"S",
+			"O",		"P",		"<",		">",		"Enter",	"Ctrl",		"A",		"S",
 			"D",		"F",		"G",		"H",		"J",		"K",		"L",		";",
-			"'",		"`",		"SHIFT",	"#",		"Z",		"X",		"C",		"V",
-			"B",		"N",		"M",		",",		".",		"/",		"SHIFT",	"PADx",
-			"ALT",		"SPACE",	"CAPS",		NULL,		NULL,		NULL,		NULL,		NULL,
+			"'",		"`",		"Shift",	"#",		"Z",		"X",		"C",		"V",
+			"B",		"N",		"M",		",",		".",		"/",		"Shift",	"PadX",
+			"Alt",		"Space",	"CapsLock",	NULL,		NULL,		NULL,		NULL,		NULL,
 
-			NULL,		NULL,		NULL,		NULL,		NULL,		"NMLK",		NULL,		"PAD7",
-			"PAD8",		"PAD9",		"PAD-",		"PAD4",		"PAD5",		"PAD6",		"PAD+",		"PAD1",
-			"PAD2",		"PAD3",		"PAD0",		"PAD.",		NULL,		NULL,		"\\",		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		"ENTER",	"CTRL",		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		"SHIFT",	NULL,		NULL,		NULL,		NULL,		NULL,
-			NULL,		NULL,		NULL,		NULL,		NULL,		"PAD/",		NULL,		NULL,
-			"ALT",		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
-
-			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		"HOME",
-			"UP",		"PGUP",		NULL,		"LEFT",		NULL,		"RIGHT",	NULL,		"END",
-			"DOWN",		"PGDN",		"INS",		"DEL",		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		"NumLock",	NULL,		"Pad7",
+			"Pad8",		"Pad9",		"PAD-",		"Pad4",		"Pad5",		"Pad6",		"Pad+",		"Pad1",
+			"Pad2",		"Pad3",		"Pad0",		"Pad.",		NULL,		NULL,		"\\",		NULL,
 			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
 			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
 			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
 			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
 			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
 
-			"JOY1", 	"JOY2",		"JOY3",		"JOY4", 	"JOY5",		"JOY6", 	"JOY7",		"JOY8",
-			"JOY9",		"JOY10",	"JOY11",	"JOY12",	"JOY13",	"JOY14",	"JOY15",	"JOY16",
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		"Enter",	"Ctrl",		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		"Shift",	NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		"Pad/",		NULL,		NULL,
+			"Alt",		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		"Home",
+			"Up",		"PageUp",	NULL,		"Left",		NULL,		"Right",	NULL,		"End",
+			"Down",		"PageDown",	"Ins",		"Del",		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+			NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,		NULL,
+
+			"Joy1", 	"Joy2",		"Joy3",		"Joy4", 	"Joy5",		"Joy6", 	"Joy7",		"Joy8",
+			"Joy9",		"Joy10",	"Joy11",	"Joy12",	"Joy13",	"Joy14",	"Joy15",	"Joy16",
 
 			"X-",		"X+",		"Y-",		"Y+",		"Z-",		"Z+",		"W-",		"W+", 
-			"JOY_LT+",	"JOY_LT-",	"JOY_RT+",	"JOY_RT-",	"POV_UP",	"POV_DOWN", "POV_LEFT", "POV_RIGHT"
-	};
+			"Joy_LT+",	"Joy_LT-",	"Joy_RT+",	"Joy_RT-",	"JoyUp",	"JoyDown",	"JoyLeft",	"JoyRight"
+	};		 
 
 	// OIS interfaces
 	InputManager* g_InputManager = nullptr;
@@ -424,7 +424,10 @@ namespace TEN::Input
 
 		// Block simultaneous LEFT+RIGHT input.
 		if (lInput & IN_LEFT && lInput & IN_RIGHT)
+		{
 			lInput &= ~(IN_LEFT | IN_RIGHT);
+			AxisMap[InputAxis::MoveHorizontal] = 0.0f;
+		}
 
 		if (Lara.Inventory.IsBusy)
 		{

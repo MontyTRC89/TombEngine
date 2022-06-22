@@ -229,7 +229,10 @@ namespace TEN::Renderer
 				if (g_Gui.GetCurrentSettings().waitingForkey && title_option == k)
 					DrawString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
 				else
-					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[KeyboardLayout[1][k]], PRINTSTRING_COLOR_ORANGE, SF(false));
+				{
+					int index = KeyboardLayout[1][k] ? KeyboardLayout[1][k] : KeyboardLayout[0][k];
+					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
+				}
 
 				if (k < KEY_COUNT - 1)
 					GetNextNarrowLinePosition(&y);
