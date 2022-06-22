@@ -12,6 +12,7 @@
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/TR3/Vehicles/minecart_info.h"
+#include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"

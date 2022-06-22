@@ -11,6 +11,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/effects/simple_particle.h"
 #include "Objects/TR2/Vehicles/speedboat_info.h"
+#include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"

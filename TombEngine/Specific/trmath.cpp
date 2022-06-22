@@ -277,23 +277,23 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
-Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical, float lateral)
+Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up, float right)
 {
-	if (forward == 0.0f && vertical == 0.0f && lateral == 0.0f)
+	if (forward == 0.0f && up == 0.0f && right == 0.0f)
 		return vector;
 
 	float sinAngle = phd_sin(angle);
 	float cosAngle = phd_cos(angle);
 
-	vector.x += (forward * sinAngle) + (lateral * cosAngle);
-	vector.y += vertical;
-	vector.z += (forward * cosAngle) - (lateral * sinAngle);
+	vector.x += (forward * sinAngle) + (right * cosAngle);
+	vector.y += up;
+	vector.z += (forward * cosAngle) - (right * sinAngle);
 	return vector;
 }
 
-Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float vertical, float lateral)
+Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float up, float right)
 {
-	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
+	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, up, right);
 	return Vector3Int(
 		(int)round(newVector.x),
 		(int)round(newVector.y),

@@ -10,6 +10,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
+#include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"

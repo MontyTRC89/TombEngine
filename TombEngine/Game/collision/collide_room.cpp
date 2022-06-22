@@ -123,7 +123,7 @@ CollisionResult GetCollision(ItemInfo* item)
 }
 
 // Overload used to probe point/room collision parameters from a given item's position.
-CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical, float lateral)
+CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float up, float right)
 {
 	short tempRoomNumber = item->RoomNumber;
 
@@ -133,18 +133,18 @@ CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float v
 		item->Location :
 		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
 
-	auto point = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
+	auto point = TranslateVector(item->Pose.Position, angle, forward, up, right);
 	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
 // Overload used to probe point/room collision parameters from a given position.
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float vertical, float lateral)
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float up, float right)
 {
 	short tempRoomNumber = roomNumber;
 	auto location = ROOM_VECTOR{ GetFloor(pos.x, pos.y, pos.z, &tempRoomNumber)->Room, pos.y };
 
-	auto point = TranslateVector(pos, angle, forward, vertical, lateral);
+	auto point = TranslateVector(pos, angle, forward, up, right);
 	int adjacentRoomNumber = GetRoom(location, pos.x, point.y, pos.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
@@ -208,21 +208,6 @@ CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z)
 		result.FloorTilt = Vector2::Zero;*/
 
 	return result;
-}
-
-CollisionResult GetVehicleCollision(ItemInfo* item, int forward, int lateral)
-{
-	float sinX = phd_sin(item->Pose.Orientation.x);
-	float sinY = phd_sin(item->Pose.Orientation.y);
-	float cosY = phd_cos(item->Pose.Orientation.y);
-	float sinZ = phd_sin(item->Pose.Orientation.z);
-
-	auto point = Vector3Int(
-		(int)round(item->Pose.Position.x + (forward * sinY) + (lateral * cosY)),
-		(int)round(item->Pose.Position.y - (forward * sinX) + (lateral * sinZ)),
-		(int)round(item->Pose.Position.z + (forward * cosY) - (lateral * sinY))
-	);
-	return GetCollision(point.x, point.y, point.z, item->RoomNumber);
 }
 
 void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom)
