@@ -457,9 +457,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
 	// Load the level
 	LoadLevelFile(index);
 
@@ -568,9 +565,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
 	// Load the level
 	LoadLevelFile(index);
 
@@ -673,6 +667,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			// Here is the only way for exiting from the loop
 			StopAllSounds();
 			StopSoundTracks();
+			StopRumble();
 
 			return result;
 		}

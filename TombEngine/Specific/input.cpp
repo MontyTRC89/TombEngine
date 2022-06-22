@@ -68,7 +68,12 @@ namespace TEN::Input
 	InputManager* g_InputManager = nullptr;
 	Keyboard* g_Keyboard = nullptr;
 	JoyStick* g_Joystick = nullptr;
-	ForceFeedback* g_JoystickVibration = nullptr;
+	ForceFeedback* g_Rumble = nullptr;
+	Effect* g_Effect = nullptr;
+
+	// Rumble functionality
+	float RumblePower;
+	float RumbleFadeSpeed;
 	
 	int TrInput;
 	int DbInput;
@@ -84,6 +89,24 @@ namespace TEN::Input
 		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_DELETE, KC_PGDOWN }
 	};
 
+	void InitializeEffect()
+	{
+		g_Effect = new Effect(Effect::ConstantForce, Effect::Constant);
+		g_Effect->direction = Effect::North;
+		g_Effect->trigger_button = 0;
+		g_Effect->trigger_interval = 0;
+		g_Effect->replay_length = Effect::OIS_INFINITE;
+		g_Effect->replay_delay = 0;
+		g_Effect->setNumAxes(1);
+
+		auto* pConstForce = dynamic_cast<ConstantEffect*>(g_Effect->getForceEffect());
+		pConstForce->level = 0;
+		pConstForce->envelope.attackLength = 0;
+		pConstForce->envelope.attackLevel = 0;
+		pConstForce->envelope.fadeLength = 0;
+		pConstForce->envelope.fadeLevel = 0;
+	}
+
 	void InitialiseInput(HWND handle)
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
@@ -93,6 +116,8 @@ namespace TEN::Input
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
 		AxisMap.resize(InputAxis::Count);
+
+		RumblePower = RumbleFadeSpeed = 0;
 
 		try
 		{
@@ -124,9 +149,12 @@ namespace TEN::Input
 				TENLog("Using '" + g_Joystick->vendor() + "' device for input.", LogLevel::Info);
 
 				// Try to initialise vibration interface
-				g_JoystickVibration = (ForceFeedback*)g_Joystick->queryInterface(Interface::ForceFeedback);
-				if (g_JoystickVibration)
+				g_Rumble = (ForceFeedback*)g_Joystick->queryInterface(Interface::ForceFeedback);
+				if (g_Rumble)
+				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
+					InitializeEffect();
+				}
 			}
 			catch (OIS::Exception& ex)
 			{
@@ -573,9 +601,27 @@ namespace TEN::Input
 			lInput |= IN_LOAD;
 	}
 
+	void UpdateRumble()
+	{
+		if (!g_Rumble || !RumblePower)
+			return;
+
+		RumblePower -= RumbleFadeSpeed;
+		if (RumblePower <= 0.0f)
+		{
+			StopRumble();
+			return;
+		}
+
+		auto* force = dynamic_cast<ConstantEffect*>(g_Effect->getForceEffect());
+		force->level = RumblePower * 10000;
+		g_Rumble->upload(g_Effect);
+	}
+
 	bool UpdateInput(bool debounce)
 	{
 		ClearInputData();
+		UpdateRumble();
 		ReadKeyboard();
 		ReadJoystick();
 
@@ -647,5 +693,20 @@ namespace TEN::Input
 			DbInput = TrInput & (DbInput ^ TrInput);
 
 		return true;
+	}
+
+	void Rumble(float power, float delayInSeconds)
+	{
+		if (power == 0.0f)
+			return;
+
+		RumbleFadeSpeed = power / (delayInSeconds * (float)FPS);
+		RumblePower = power;
+	}
+
+	void StopRumble()
+	{
+		g_Rumble->remove(g_Effect);
+		RumblePower = 0.0f;
 	}
 }
