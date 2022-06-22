@@ -72,15 +72,14 @@ namespace TEN::Input
 	Effect* g_Effect = nullptr;
 
 	// Rumble functionality
-	float RumblePower;
-	float RumbleFadeSpeed;
+	RumbleData rumbleData = {};
 	
+	// Globals
 	int TrInput;
 	int DbInput;
 	int InputBusy;
-
-	std::vector<bool>  KeyMap  = {};
-	std::vector<float> AxisMap = {};
+	std::vector<bool> KeyMap;
+	std::vector<float> AxisMap;
 
 	bool ConflictingKeys[KEY_COUNT];
 	short KeyboardLayout[2][KEY_COUNT] =
@@ -117,7 +116,7 @@ namespace TEN::Input
 		KeyMap.resize(MAX_INPUT_SLOTS);
 		AxisMap.resize(InputAxis::Count);
 
-		RumblePower = RumbleFadeSpeed = 0;
+		rumbleData = {};
 
 		try
 		{
@@ -603,18 +602,34 @@ namespace TEN::Input
 
 	void UpdateRumble()
 	{
-		if (!g_Rumble || !RumblePower)
+		if (!g_Rumble || !rumbleData.Power)
 			return;
 
-		RumblePower -= RumbleFadeSpeed;
-		if (RumblePower <= 0.0f)
+		rumbleData.Power -= rumbleData.FadeSpeed;
+		if (rumbleData.Power <= 0.0f)
 		{
 			StopRumble();
 			return;
 		}
 
 		auto* force = dynamic_cast<ConstantEffect*>(g_Effect->getForceEffect());
-		force->level = RumblePower * 10000;
+		force->level = rumbleData.Power * 10000;
+
+		switch (rumbleData.Mode)
+		{
+		case RumbleMode::Left:
+			g_Effect->direction = Effect::EDirection::West;
+			break;
+
+		case RumbleMode::Right:
+			g_Effect->direction = Effect::EDirection::East;
+			break;
+
+		case RumbleMode::Both:
+			g_Effect->direction = Effect::EDirection::North;
+			break;
+		}
+
 		g_Rumble->upload(g_Effect);
 	}
 
@@ -695,18 +710,18 @@ namespace TEN::Input
 		return true;
 	}
 
-	void Rumble(float power, float delayInSeconds)
+	void Rumble(float power, RumbleMode mode, float delayInSeconds)
 	{
 		if (power == 0.0f)
 			return;
 
-		RumbleFadeSpeed = power / (delayInSeconds * (float)FPS);
-		RumblePower = power;
+		rumbleData.FadeSpeed = power / (delayInSeconds * (float)FPS);
+		rumbleData.Power = power;
 	}
 
 	void StopRumble()
 	{
 		g_Rumble->remove(g_Effect);
-		RumblePower = 0.0f;
+		rumbleData.Power = 0.0f;
 	}
 }

@@ -2,15 +2,6 @@
 
 namespace TEN::Input
 {
-	enum InputAxis
-	{
-		MoveVertical,
-		MoveHorizontal,
-		CameraVertical,
-		CameraHorizontal,
-		Count
-	};
-
 	enum InputKeys
 	{
 		KEY_FORWARD,
@@ -54,12 +45,35 @@ namespace TEN::Input
 		IN_LSTEP	  = (1 << KEY_LSTEP),
 		IN_RSTEP	  = (1 << KEY_RSTEP),
 
-		// Additional input flags without direct key relation
+		// Additional input actions without direct key relation
 
 		IN_SAVE		  = (1 << KEY_COUNT + 0),
 		IN_LOAD		  = (1 << KEY_COUNT + 1),
 		IN_DESELECT   = (1 << KEY_COUNT + 2),
 		IN_LOOKSWITCH = (1 << KEY_COUNT + 3)
+	};
+
+	enum InputAxis
+	{
+		MoveVertical,
+		MoveHorizontal,
+		CameraVertical,
+		CameraHorizontal,
+		Count
+	};
+
+	enum class RumbleMode
+	{
+		Both,
+		Left,
+		Right
+	};
+
+	struct RumbleData
+	{
+		RumbleMode Mode;
+		float Power;
+		float FadeSpeed;
 	};
 
 	constexpr int JOY_AXIS_DEADZONE = 8000;
@@ -89,6 +103,6 @@ namespace TEN::Input
 	void DeInitialiseInput();
 	bool UpdateInput(bool debounce = true);
 	void DefaultConflict();
-	void Rumble(float power, float delayInSeconds = 0.3f);
+	void Rumble(RumbleMode mode, float power, float delayInSeconds = 0.3f);
 	void StopRumble();
 }
