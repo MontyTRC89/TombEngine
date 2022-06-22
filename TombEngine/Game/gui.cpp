@@ -977,7 +977,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 				memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
-				selected_option = 1;
+				selected_option = 2;
 				return;
 			}
 
@@ -986,7 +986,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, KEY_COUNT * sizeof(short));
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
-				selected_option = 1;
+				selected_option = 2;
 				return;
 			}
 		}
@@ -1183,7 +1183,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 			SaveConfiguration();
 			Rumble(0.5f);
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = pause ? 1 : 2;
+			selected_option = 1;
 		}
 		else if (selected_option == option_count)
 		{
@@ -1191,7 +1191,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 			SetVolumeMusic(g_Configuration.MusicVolume);
 			SetVolumeFX(g_Configuration.SfxVolume);
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = pause ? 1 : 2;
+			selected_option = 1;
 		}
 	}
 }

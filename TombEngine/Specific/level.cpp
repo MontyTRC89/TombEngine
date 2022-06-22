@@ -1247,7 +1247,6 @@ int LoadLevelFile(int levelIndex)
 	TENLog("Loading level file...", LogLevel::Info);
 
 	CleanUp();
-	StopRumble();
 	FreeSamples();
 
 	if (!g_FirstLevel)

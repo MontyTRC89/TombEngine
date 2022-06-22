@@ -155,7 +155,6 @@ namespace TEN::Input
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
 					InitialiseEffect();
-					Rumble(0.5f);
 				}
 			}
 			catch (OIS::Exception& ex)
@@ -600,35 +599,52 @@ namespace TEN::Input
 
 	void UpdateRumble()
 	{
-		if (!oisRumble || !rumbleData.Power)
+		if (!oisRumble || !oisEffect || !rumbleData.Power)
 			return;
 
 		rumbleData.Power -= rumbleData.FadeSpeed;
+
+		// Don't update effect too frequently if its value isn't changed too much
+		if (rumbleData.Power >= 0.2f &&
+			rumbleData.LastPower - rumbleData.Power < 0.1f)
+			return;
+
 		if (rumbleData.Power <= 0.0f)
 		{
 			StopRumble();
 			return;
 		}
 
-		auto* force = dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
-		force->level = rumbleData.Power * 10000;
-
-		switch (rumbleData.Mode)
+		try
 		{
-		case RumbleMode::Left:
-			oisEffect->direction = Effect::EDirection::West;
-			break;
+			auto* force = dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
+			force->level = rumbleData.Power * 10000;
 
-		case RumbleMode::Right:
-			oisEffect->direction = Effect::EDirection::East;
-			break;
+			switch (rumbleData.Mode)
+			{
+			case RumbleMode::Left:
+				oisEffect->direction = Effect::EDirection::West;
+				break;
 
-		case RumbleMode::Both:
-			oisEffect->direction = Effect::EDirection::North;
-			break;
+			case RumbleMode::Right:
+				oisEffect->direction = Effect::EDirection::East;
+				break;
+
+			case RumbleMode::Both:
+				oisEffect->direction = Effect::EDirection::North;
+				break;
+			}
+
+			oisRumble->upload(oisEffect); 
+
+			TEN::Renderer::g_Renderer.DrawString(20, 20, std::to_string(rumbleData.Power).c_str(), PRINTSTRING_COLOR_YELLOW, 0);
+		}
+		catch (OIS::Exception& ex) 
+		{ 
+			TENLog("Error updating vibration effect: " + std::string(ex.eText), LogLevel::Error); 
 		}
 
-		oisRumble->upload(oisEffect);
+		rumbleData.LastPower = rumbleData.Power;
 	}
 
 	bool UpdateInput(bool debounce)
@@ -722,12 +738,17 @@ namespace TEN::Input
 			return;
 
 		rumbleData.FadeSpeed = power / (delayInSeconds * (float)FPS);
-		rumbleData.Power = power;
+		rumbleData.Power = rumbleData.LastPower = power + rumbleData.FadeSpeed;
 	}
 
 	void StopRumble()
 	{
-		oisRumble->remove(oisEffect);
-		rumbleData.Power = 0.0f;
+		if (!oisRumble || !oisEffect)
+			return;
+
+		try { oisRumble->remove(oisEffect); }
+		catch (OIS::Exception& ex) { TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error); }
+
+		rumbleData = {};
 	}
 }

@@ -74,6 +74,7 @@ namespace TEN::Input
 	{
 		RumbleMode Mode;
 		float Power;
+		float LastPower;
 		float FadeSpeed;
 	};
 
