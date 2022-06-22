@@ -144,6 +144,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
@@ -153,6 +154,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
@@ -162,6 +164,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
 			{
 				StopAllSounds();
+				StopRumble();
+
 				g_Renderer.DumpGameScene();
 				g_Gui.SetInventoryMode(InventoryMode::Pause);
 				g_Gui.SetMenuToDisplay(Menu::Pause);
@@ -170,8 +174,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if ((DbInput & IN_OPTION || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
-				// Stop all sounds
 				StopAllSounds();
+				StopRumble();
 
 				if (g_Gui.CallInventory(true))
 					return GameStatus::LoadGame;
@@ -468,7 +472,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-		StopAllSounds();
 
 		g_GameScript->ResetScripts(true);
 
@@ -572,7 +575,6 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	StopAllSounds();
 
 	g_GameScript->ResetScripts(loadFromSavegame);
 

@@ -636,8 +636,6 @@ namespace TEN::Input
 			}
 
 			oisRumble->upload(oisEffect); 
-
-			TEN::Renderer::g_Renderer.DrawString(20, 20, std::to_string(rumbleData.Power).c_str(), PRINTSTRING_COLOR_YELLOW, 0);
 		}
 		catch (OIS::Exception& ex) 
 		{ 
