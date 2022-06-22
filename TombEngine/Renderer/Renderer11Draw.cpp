@@ -93,18 +93,18 @@ namespace TEN::Renderer
 			Matrix view;
 			Matrix projection;
 			if (shadowLight->Type == LIGHT_TYPE_POINT) {
-				view = Matrix::CreateLookAt(lightPos,
-					RenderTargetCube::forwardVectors[step],
+				view = Matrix::CreateLookAt(lightPos, lightPos + 
+					RenderTargetCube::forwardVectors[step]*10240,
 					RenderTargetCube::upVectors[step]);
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 16.0f,
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f,
 					shadowLight->Out);
 
 			}
 			else if(shadowLight->Type == LIGHT_TYPE_SPOT) {
 				view = Matrix::CreateLookAt(lightPos,
-					itemPos,
+					lightPos + shadowLight->Direction*10240,
 					Vector3(0.0f, -1.0f, 0.0f));
-				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Range, 1.0f, 16.0f,shadowLight->Out);
+				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Out, 1.0f, 16.0f,shadowLight->Range);
 
 			}
 			CCameraMatrixBuffer shadowProjection;

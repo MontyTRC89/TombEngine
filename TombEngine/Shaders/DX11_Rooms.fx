@@ -185,10 +185,10 @@ float2 GetCubeUVFromDir(int faceIndex, float3 dir)
             uv = float2(dir.z, dir.y);
             break; // -X
         case 2:
-            uv = float2(dir.x, -dir.z);
+            uv = float2(dir.x, dir.z);
             break; // +Y
         case 3:
-            uv = float2(dir.x, dir.z);
+            uv = float2(dir.x, -dir.z);
             break; // -Y
         case 4:
             uv = float2(dir.x, dir.y);
@@ -200,13 +200,42 @@ float2 GetCubeUVFromDir(int faceIndex, float3 dir)
     return uv * .5 + .5;
 }
 
-float doPointLightShadow(float3 worldPos)
+void doPointLightShadow(float3 worldPos, inout float3 lighting)
 {
     float shadowFactor = 1.0f;
     for (int i = 0; i < 6; i++)
     {
         float3 dir = normalize(worldPos - Light.Position);
         int face = GetCubeFaceIndex(dir);
+		//debug coloring
+		/*
+        switch (face)
+        {
+			case 0:
+                lighting += float3(0.2, 0, 0);
+                break;
+			case 1:
+                lighting += float3(0.1, 0, 0);
+
+                break;
+			case 2:
+                lighting += float3(0, 0.2, 0);
+
+                break;
+			case 3:
+                lighting += float3(0, 0.1, 0);
+
+                break;
+			case 4:
+                lighting += float3(0, 0, 0.2);
+
+                break;
+			default:
+                lighting += float3(0, 0, 0.1);
+
+            break;
+        }
+		*/
         float2 uv = GetCubeUVFromDir(face, dir);
         float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[i]);
         lightClipSpace.xyz /= lightClipSpace.w;
@@ -219,6 +248,7 @@ float doPointLightShadow(float3 worldPos)
             float sum = 0;
             float x, y;
 			//perform PCF filtering on a 4 x 4 texel neighborhood
+			// what about borders of cubemap?
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
                 for (x = -1.5; x <= 1.5; x += 1.0)
@@ -228,12 +258,14 @@ float doPointLightShadow(float3 worldPos)
             }
 
             shadowFactor = sum / 16.0;
+
         }
     }
-    return saturate(shadowFactor);
+    float distanceFactor = saturate(((distance(worldPos, Light.Position) ) / (Light.Out)));
+    lighting *= saturate((shadowFactor + 0.75) + (pow(distanceFactor,3) * 0.25));
 }
 
-float doSpotLightShadow(float3 worldPos)
+void doSpotLightShadow(float3 worldPos,inout float3 lighting)
 {
     float4 lightClipSpace = mul(float4(worldPos, 1.0f), LightViewProjections[0]);
     lightClipSpace.xyz /= lightClipSpace.w;
@@ -257,7 +289,7 @@ float doSpotLightShadow(float3 worldPos)
 
         shadowFactor = sum / 16.0;
     }
-    return saturate(shadowFactor);
+    lighting *= saturate(shadowFactor + 0.75);
 }
 PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
@@ -278,12 +310,12 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	{
         if (Light.Type == LT_POINT)
         {
-            lighting *= doPointLightShadow(input.WorldPosition);
+            doPointLightShadow(input.WorldPosition,lighting);
 
         }
         else if (Light.Type == LT_SPOT)
         {
-            lighting *= doSpotLightShadow(input.WorldPosition);
+            doSpotLightShadow(input.WorldPosition,lighting);
 
         }
 	}
