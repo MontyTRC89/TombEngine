@@ -476,7 +476,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	}
 }
 
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short rate, short maxAngle)
+void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
 {
 	if (!item->Animation.Velocity)
 		return;
@@ -486,12 +486,12 @@ void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short rate, short max
 	short maxAngleNormalized = maxAngle * abs(axisCoeff);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		item->Pose.Orientation.z += std::min<short>(rate, abs((maxAngleNormalized * 0.6f) - item->Pose.Orientation.z) / 3) * sign;
+		item->Pose.Orientation.z += std::min<short>(baseRate, abs((maxAngleNormalized * 0.6f) - item->Pose.Orientation.z) / 3) * sign;
 	else
-		item->Pose.Orientation.z += std::min<short>(rate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
+		item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
 }
 
-void ModulateLaraCrawlFlex(ItemInfo* item, short rate, short maxAngle)
+void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -500,9 +500,9 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short rate, short maxAngle)
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * abs(axisCoeff);
+	short maxAngleNormalized = maxAngle * axisCoeff;
 
-	lara->ExtraTorsoRot.z += std::min<short>(rate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
+	lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
 		item->Animation.ActiveState != LS_CRAWL_BACK)

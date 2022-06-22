@@ -32,8 +32,8 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll);
 void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item);
 void UpdateLaraSubsuitAngles(ItemInfo* item);
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short rate, short maxAngle);
-void ModulateLaraCrawlFlex(ItemInfo* item, short rate, short maxAngle);
+void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
+void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
