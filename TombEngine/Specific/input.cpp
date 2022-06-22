@@ -60,8 +60,8 @@ namespace TEN::Input
 			"JOY1", 	"JOY2",		"JOY3",		"JOY4", 	"JOY5",		"JOY6", 	"JOY7",		"JOY8",
 			"JOY9",		"JOY10",	"JOY11",	"JOY12",	"JOY13",	"JOY14",	"JOY15",	"JOY16",
 
-			"X-",		"X+",		"Y-",		"Y+",		"Z+",		"Z-",		"W+",		"W-", 
-			"U+",		"U-",		"V+",		"V-",		"POV_UP",	"POV_DOWN", "POV_LEFT", "POV_RIGHT"
+			"X-",		"X+",		"Y-",		"Y+",		"Z-",		"Z+",		"W-",		"W+", 
+			"JOY_LT+",	"JOY_LT-",	"JOY_RT+",	"JOY_RT-",	"POV_UP",	"POV_DOWN", "POV_LEFT", "POV_RIGHT"
 	};
 
 	// OIS interfaces
