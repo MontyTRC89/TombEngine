@@ -21,7 +21,7 @@ namespace TEN::Input
 {
 	const char* g_KeyNames[] =
 	{
-			"Default",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
+			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
 			"7",			"8",			"9",			"0",			"-",			"+",			"Back",			"Tab",
 			"Q",			"W",			"E",			"R",			"T",			"Y",			"U",			"I",
 			"O",			"P",			"<",			">",			"Enter",		"Ctrl",			"A",			"S",
