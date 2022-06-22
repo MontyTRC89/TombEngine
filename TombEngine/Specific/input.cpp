@@ -62,14 +62,16 @@ namespace TEN::Input
 
 			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+", 
 			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
-	};		 
+	};
+
+	constexpr int AXIS_DEADZONE = 8000;
 
 	// OIS interfaces
-	InputManager* g_InputManager = nullptr;
-	Keyboard* g_Keyboard = nullptr;
-	JoyStick* g_Joystick = nullptr;
-	ForceFeedback* g_Rumble = nullptr;
-	Effect* g_Effect = nullptr;
+	InputManager*	oisInputManager = nullptr;
+	Keyboard*		oisKeyboard		= nullptr;
+	JoyStick*		oisGamepad		= nullptr;
+	ForceFeedback*  oisRumble		= nullptr;
+	Effect*			oisEffect		= nullptr;
 
 	// Rumble functionality
 	RumbleData rumbleData = {};
@@ -90,15 +92,15 @@ namespace TEN::Input
 
 	void InitialiseEffect()
 	{
-		g_Effect = new Effect(Effect::ConstantForce, Effect::Constant);
-		g_Effect->direction = Effect::North;
-		g_Effect->trigger_button = 0;
-		g_Effect->trigger_interval = 0;
-		g_Effect->replay_length = Effect::OIS_INFINITE;
-		g_Effect->replay_delay = 0;
-		g_Effect->setNumAxes(1);
+		oisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
+		oisEffect->direction = Effect::North;
+		oisEffect->trigger_button = 0;
+		oisEffect->trigger_interval = 0;
+		oisEffect->replay_length = Effect::OIS_INFINITE;
+		oisEffect->replay_delay = 0;
+		oisEffect->setNumAxes(1);
 
-		auto* pConstForce = dynamic_cast<ConstantEffect*>(g_Effect->getForceEffect());
+		auto* pConstForce = dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
 		pConstForce->level = 0;
 		pConstForce->envelope.attackLength = 0;
 		pConstForce->envelope.attackLevel = 0;
@@ -110,7 +112,7 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
-		unsigned int v = g_InputManager->getVersionNumber();
+		unsigned int v = oisInputManager->getVersionNumber();
 		TENLog("OIS Version: " + std::to_string(v >> 16) + "." + std::to_string((v >> 8) & 0x000000FF) + "." + std::to_string(v & 0x000000FF), LogLevel::Info);
 
 		KeyMap.resize(MAX_INPUT_SLOTS);
@@ -120,16 +122,16 @@ namespace TEN::Input
 
 		try
 		{
-			g_InputManager = InputManager::createInputSystem((size_t)handle);
-			g_InputManager->enableAddOnFactory(InputManager::AddOn_All);
+			oisInputManager = InputManager::createInputSystem((size_t)handle);
+			oisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
-			if (g_InputManager->getNumberOfDevices(OISKeyboard) == 0)
+			if (oisInputManager->getNumberOfDevices(OISKeyboard) == 0)
 			{
 				TENLog("Keyboard not found!", LogLevel::Warning);
 			}
 			else
 			{
-				g_Keyboard = (Keyboard*)g_InputManager->createInputObject(OISKeyboard, true);
+				oisKeyboard = (Keyboard*)oisInputManager->createInputObject(OISKeyboard, true);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -137,19 +139,19 @@ namespace TEN::Input
 			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
 		}
 
-		int numJoysticks = g_InputManager->getNumberOfDevices(OISJoyStick);
-		if (numJoysticks > 0)
+		int numDevices = oisInputManager->getNumberOfDevices(OISJoyStick);
+		if (numDevices > 0)
 		{
-			TENLog("Found " + std::to_string(numJoysticks) + " connected game controller" + (numJoysticks > 1 ? "s." : "."), LogLevel::Info);
+			TENLog("Found " + std::to_string(numDevices) + " connected game controller" + (numDevices > 1 ? "s." : "."), LogLevel::Info);
 
 			try
 			{
-				g_Joystick = (JoyStick*)g_InputManager->createInputObject(OISJoyStick, true);
-				TENLog("Using '" + g_Joystick->vendor() + "' device for input.", LogLevel::Info);
+				oisGamepad = (JoyStick*)oisInputManager->createInputObject(OISJoyStick, true);
+				TENLog("Using '" + oisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
 				// Try to initialise vibration interface
-				g_Rumble = (ForceFeedback*)g_Joystick->queryInterface(Interface::ForceFeedback);
-				if (g_Rumble)
+				oisRumble = (ForceFeedback*)oisGamepad->queryInterface(Interface::ForceFeedback);
+				if (oisRumble)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
 					InitialiseEffect();
@@ -165,13 +167,13 @@ namespace TEN::Input
 
 	void DeInitialiseInput()
 	{
-		if (g_Keyboard)
-			g_InputManager->destroyInputObject(g_Keyboard);
+		if (oisKeyboard)
+			oisInputManager->destroyInputObject(oisKeyboard);
 
-		if (g_Joystick)
-			g_InputManager->destroyInputObject(g_Joystick);
+		if (oisGamepad)
+			oisInputManager->destroyInputObject(oisGamepad);
 
-		InputManager::destroyInputSystem(g_InputManager);
+		InputManager::destroyInputSystem(oisInputManager);
 	}
 
 	void ClearInputData()
@@ -231,43 +233,43 @@ namespace TEN::Input
 		}
 	}
 
-	void ReadJoystick()
+	void ReadGameController()
 	{
-		if (!g_Joystick)
+		if (!oisGamepad)
 			return;
 
 		try
 		{
-			// Poll joystick
-			g_Joystick->capture();
-			const JoyStickState& joy = g_Joystick->getJoyStickState();
+			// Poll gamepad
+			oisGamepad->capture();
+			const JoyStickState& state = oisGamepad->getJoyStickState();
 
 			// Scan buttons
-			for (int key = 0; key < joy.mButtons.size(); key++)
-				KeyMap[MAX_KEYBOARD_KEYS + key] = joy.mButtons[key];
+			for (int key = 0; key < state.mButtons.size(); key++)
+				KeyMap[MAX_KEYBOARD_KEYS + key] = state.mButtons[key];
 
 			// Scan axes
-			for (int axis = 0; axis < joy.mAxes.size(); axis++)
+			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
 				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers)
-				if (axis >= MAX_JOYSTICK_AXES)
+				if (axis >= MAX_GAMEPAD_AXES)
 					break;
 				
 				// Filter out deadzone
-				if (abs(joy.mAxes[axis].abs) < JOY_AXIS_DEADZONE)
+				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
 					continue;
 
 				// Calculate raw normalized analog value (for camera)
-				float normalizedValue = (float)(joy.mAxes[axis].abs + (joy.mAxes[axis].abs > 0 ? -JOY_AXIS_DEADZONE : JOY_AXIS_DEADZONE)) 
-																	/ (float)(std::numeric_limits<short>::max() - JOY_AXIS_DEADZONE);
+				float normalizedValue = (float)(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE))
+																	/ (float)(std::numeric_limits<short>::max() - AXIS_DEADZONE);
 
 				// Calculate scaled analog value (for movement).
 				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
 				float scaledValue = abs(normalizedValue) * 1.5f + 0.2f;
 
 				// Calculate and reset discrete input slots
-				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2);
-				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + (axis * 2) + 1;
+				unsigned int negKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2);
+				unsigned int posKeyIndex = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
 				KeyMap[negKeyIndex] = false;
 				KeyMap[posKeyIndex] = false;
 
@@ -300,7 +302,7 @@ namespace TEN::Input
 			// Scan POVs (controller usually have one, but let's scan all of them for paranoia)
 			for (int pov = 0; pov < 4; pov++)
 			{
-				if (joy.mPOV[pov].direction == Pov::Centered)
+				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 				
 				// Do 4 passes, every pass checks ever POV direction. For every direction,
@@ -309,27 +311,27 @@ namespace TEN::Input
 
 				for (int pass = 0; pass < 4; pass++)
 				{
-					unsigned int index = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_JOYSTICK_AXES * 2;
+					unsigned int index = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_AXES * 2;
 
 					switch (pass)
 					{
 					case 0: 
-						if (!(joy.mPOV[pov].direction & Pov::North))
+						if (!(state.mPOV[pov].direction & Pov::North))
 							continue;
 						break;
 
 					case 1:
-						if (!(joy.mPOV[pov].direction & Pov::South))
+						if (!(state.mPOV[pov].direction & Pov::South))
 							continue;
 						break;
 
 					case 2:
-						if (!(joy.mPOV[pov].direction & Pov::West))
+						if (!(state.mPOV[pov].direction & Pov::West))
 							continue;
 						break;
 
 					case 3:
-						if (!(joy.mPOV[pov].direction & Pov::East))
+						if (!(state.mPOV[pov].direction & Pov::East))
 							continue;
 						break;							
 					}
@@ -342,22 +344,22 @@ namespace TEN::Input
 		}
 		catch (OIS::Exception& ex)
 		{
-			TENLog("Unable to poll joystick input: " + std::string(ex.eText), LogLevel::Warning);
+			TENLog("Unable to poll game controller input: " + std::string(ex.eText), LogLevel::Warning);
 		}
 	}
 
 	void ReadKeyboard()
 	{
-		if (!g_Keyboard)
+		if (!oisKeyboard)
 			return;
 
 		try
 		{
-			g_Keyboard->capture();
+			oisKeyboard->capture();
 
 			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
-				if (!g_Keyboard->isKeyDown((KeyCode)i))
+				if (!oisKeyboard->isKeyDown((KeyCode)i))
 				{
 					KeyMap[i] = false;
 					continue;
@@ -598,7 +600,7 @@ namespace TEN::Input
 
 	void UpdateRumble()
 	{
-		if (!g_Rumble || !rumbleData.Power)
+		if (!oisRumble || !rumbleData.Power)
 			return;
 
 		rumbleData.Power -= rumbleData.FadeSpeed;
@@ -608,25 +610,25 @@ namespace TEN::Input
 			return;
 		}
 
-		auto* force = dynamic_cast<ConstantEffect*>(g_Effect->getForceEffect());
+		auto* force = dynamic_cast<ConstantEffect*>(oisEffect->getForceEffect());
 		force->level = rumbleData.Power * 10000;
 
 		switch (rumbleData.Mode)
 		{
 		case RumbleMode::Left:
-			g_Effect->direction = Effect::EDirection::West;
+			oisEffect->direction = Effect::EDirection::West;
 			break;
 
 		case RumbleMode::Right:
-			g_Effect->direction = Effect::EDirection::East;
+			oisEffect->direction = Effect::EDirection::East;
 			break;
 
 		case RumbleMode::Both:
-			g_Effect->direction = Effect::EDirection::North;
+			oisEffect->direction = Effect::EDirection::North;
 			break;
 		}
 
-		g_Rumble->upload(g_Effect);
+		oisRumble->upload(oisEffect);
 	}
 
 	bool UpdateInput(bool debounce)
@@ -634,7 +636,7 @@ namespace TEN::Input
 		ClearInputData();
 		UpdateRumble();
 		ReadKeyboard();
-		ReadJoystick();
+		ReadGameController();
 
 		static int lInput;
 
@@ -720,7 +722,7 @@ namespace TEN::Input
 
 	void StopRumble()
 	{
-		g_Rumble->remove(g_Effect);
+		oisRumble->remove(oisEffect);
 		rumbleData.Power = 0.0f;
 	}
 }

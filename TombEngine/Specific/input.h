@@ -76,14 +76,12 @@ namespace TEN::Input
 		float FadeSpeed;
 	};
 
-	constexpr int JOY_AXIS_DEADZONE = 8000;
+	constexpr int MAX_KEYBOARD_KEYS    = 256;
+	constexpr int MAX_GAMEPAD_KEYS     = 16;
+	constexpr int MAX_GAMEPAD_AXES     = 6;
+	constexpr int MAX_GAMEPAD_POV_AXES = 4;
 
-	constexpr int MAX_KEYBOARD_KEYS = 256;
-	constexpr int MAX_JOYSTICK_KEYS = 16;
-	constexpr int MAX_JOYSTICK_AXES = 6;
-	constexpr int MAX_POV_AXES = 4;
-
-	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_POV_AXES + MAX_JOYSTICK_AXES * 2;
+	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
 	constexpr int IN_OPTIC_CONTROLS = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT);
 	constexpr int IN_WAKE = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION);
