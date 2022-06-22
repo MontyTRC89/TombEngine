@@ -18,6 +18,7 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/savegame.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
+#include "Objects/Utils/VehicleHelpers.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/input.h"

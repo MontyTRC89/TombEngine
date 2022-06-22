@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
+#include "Objects/Utils/VehicleHelpers.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"

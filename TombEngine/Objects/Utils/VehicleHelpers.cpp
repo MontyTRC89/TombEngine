@@ -1,11 +1,16 @@
 #include "framework.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
+#include "Game/effects/simple_particle.h"
+#include "Game/effects/tomb4fx.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
+#include "Game/room.h"
+#include "Sound/sound.h"
 #include "Specific/input.h"
+#include "Specific/prng.h"
 
 namespace TEN::Entities::Vehicles
 {
@@ -98,5 +103,119 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return VehicleMountType::None;
+	}
+
+	void DoVehicleCollision(ItemInfo* vehicleItem, int radius)
+	{
+		CollisionInfo coll = {};
+		coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
+		coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
+		coll.Setup.OldPosition = vehicleItem->Pose.Position;
+		coll.Setup.EnableObjectPush = true;
+
+		DoObjectCollision(vehicleItem, &coll);
+	}
+
+	int GetVehicleHeight(ItemInfo* vehicle, int forward, int right, bool clamp, Vector3Int* pos)
+	{
+		float sinX = phd_sin(vehicle->Pose.Orientation.x);
+		float sinY = phd_sin(vehicle->Pose.Orientation.y);
+		float cosY = phd_cos(vehicle->Pose.Orientation.y);
+		float sinZ = phd_sin(vehicle->Pose.Orientation.z);
+
+		pos->x = vehicle->Pose.Position.x + (forward * sinY) + (right * cosY);
+		pos->y = vehicle->Pose.Position.y - (forward * sinX) + (right * sinZ);
+		pos->z = vehicle->Pose.Position.z + (forward * cosY) - (right * sinY);
+
+		// Get collision a bit higher to be able to detect bridges.
+		auto probe = GetCollision(pos->x, pos->y - CLICK(2), pos->z, vehicle->RoomNumber);
+
+		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
+			return NO_HEIGHT;
+
+		if (clamp && pos->y > probe.Position.Floor)
+			pos->y = probe.Position.Floor;
+
+		return probe.Position.Floor;
+	}
+
+	int GetVehicleWaterHeight(ItemInfo* vehicle, int forward, int right, bool clamp, Vector3Int* pos)
+	{
+		Matrix world =
+			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicle->Pose.Orientation.y), TO_RAD(vehicle->Pose.Orientation.x), TO_RAD(vehicle->Pose.Orientation.z)) *
+			Matrix::CreateTranslation(vehicle->Pose.Position.x, vehicle->Pose.Position.y, vehicle->Pose.Position.z);
+
+		Vector3 vec = Vector3(right, 0, forward);
+		vec = Vector3::Transform(vec, world);
+
+		pos->x = vec.x;
+		pos->y = vec.y;
+		pos->z = vec.z;
+
+		auto probe = GetCollision(pos->x, pos->y, pos->z, vehicle->RoomNumber);
+		int probedRoomNum = probe.RoomNumber;
+
+		int height = GetWaterHeight(pos->x, pos->y, pos->z, probedRoomNum);
+
+		if (height == NO_HEIGHT)
+		{
+			height = probe.Position.Floor;
+			if (height == NO_HEIGHT)
+				return height;
+		}
+
+		height -= 5;
+
+		if (clamp && pos->y > height)
+			pos->y = height;
+
+		return height;
+	}
+
+	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* angle)
+	{
+		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
+			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
+		{
+			auto waterDepth = (float)GetWaterDepth(vehicleItem);
+			auto waterHeight = vehicleItem->Pose.Position.y - GetWaterHeight(vehicleItem);
+
+			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
+			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
+			if (waterDepth == DEEP_WATER)
+				waterDepth = VEHICLE_MAX_WATER_HEIGHT;
+
+			if (waterDepth <= VEHICLE_MAX_WATER_HEIGHT)
+			{
+				bool isWater = TestEnvironment(ENV_FLAG_WATER, vehicleItem);
+
+				if (currentVelocity != 0)
+				{
+					auto coeff = isWater ? VEHICLE_WATER_VEL_COEFFICIENT : VEHICLE_SWAMP_VEL_COEFFICIENT;
+					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff), currentVelocity);
+
+					if (TEN::Math::Random::GenerateInt(0, 32) > 28)
+						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
+
+					if (isWater)
+						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
+				}
+
+				if (*angle != 0)
+				{
+					auto coeff = isWater ? VEHICLE_WATER_TURN_COEFFICIENT : VEHICLE_SWAMP_TURN_COEFFICIENT;
+					*angle -= *angle * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff);
+				}
+			}
+			else
+			{
+				if (waterDepth > VEHICLE_MAX_WATER_HEIGHT && waterHeight > VEHICLE_MAX_WATER_HEIGHT)
+					ExplodeVehicle(laraItem, vehicleItem);
+				else if (TEN::Math::Random::GenerateInt(0, 32) > 25)
+					Splash(vehicleItem);
+			}
+		}
+
+		return currentVelocity;
 	}
 }
