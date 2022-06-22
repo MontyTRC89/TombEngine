@@ -441,20 +441,18 @@ void UpdateCameraElevation()
 
 	if (Camera.laraNode != -1)
 	{
-		Vector3Int pos = { 0, 0, 0 };
+		auto pos = Vector3Int();
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
-		Vector3Int pos1 = { 0, -CLICK(1), SECTOR(2) };
+		auto pos1 = Vector3Int(0, -CLICK(1), SECTOR(2));
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
-		pos.z = pos1.z - pos.z;
 		pos.x = pos1.x - pos.x;
+		pos.z = pos1.z - pos.z;
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
-	{
 		Camera.actualAngle = LaraItem->Pose.Orientation.y + Camera.targetAngle;
-	}
 
 	Camera.actualElevation += (Camera.targetElevation - Camera.actualElevation) / 8;
 }

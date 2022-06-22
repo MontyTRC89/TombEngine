@@ -221,7 +221,9 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
 			// HACK: Mask head and torso only when pulling out the flare.
-			if (tempItem.Animation.AnimNumber > Objects[ID_LARA_FLARE_ANIM].animIndex + 1 && tempItem.Animation.AnimNumber < Objects[ID_LARA_FLARE_ANIM].animIndex + 4)
+			if (!Lara.Control.IsLow &&
+				tempItem.Animation.AnimNumber > Objects[ID_LARA_FLARE_ANIM].animIndex + 1 &&
+				tempItem.Animation.AnimNumber < Objects[ID_LARA_FLARE_ANIM].animIndex + 4)
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			frac = GetFrame(&tempItem, framePtr, &rate);

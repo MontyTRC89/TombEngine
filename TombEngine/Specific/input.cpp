@@ -275,7 +275,6 @@ namespace TEN::Input
 				unsigned int usedIndex = normalizedValue > 0 ? negKeyIndex : posKeyIndex;
 				KeyMap[usedIndex] = true;
 
-
 				// Register analog input in certain direction.
 				// If axis is bound as directional controls, register axis as directional input.
 				// Otherwise, register as camera movement input (for future).

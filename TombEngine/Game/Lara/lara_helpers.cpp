@@ -374,41 +374,29 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	return direction;
 }
 
-short ModulateLaraTurnRate(short turnRate, short accel, short minTurnRate, short maxTurnRate, float axisCoeff)
+short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
 {
 	int sign = std::copysign(1, axisCoeff);
+	short minTurnRateNormalized = minTurnRate * (axisCoeff * sign);
+	short maxTurnRateNormalized = maxTurnRate * (axisCoeff * sign);
 
-	turnRate += accel * sign;
-	if (sign > 0)
-	{
-		if (turnRate < (minTurnRate * axisCoeff))
-			turnRate = minTurnRate * axisCoeff;
-		else if (turnRate > (maxTurnRate * axisCoeff))
-			turnRate = maxTurnRate * axisCoeff;
-	}
-	else
-	{
-		if (turnRate > (minTurnRate * axisCoeff))
-			turnRate = minTurnRate * axisCoeff;
-		else if (turnRate < (maxTurnRate * axisCoeff))
-			turnRate = maxTurnRate * axisCoeff;
-	}
-
-	return turnRate;
+	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
+	newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
+	return newTurnRate * sign;
 }
 
-void ModulateLaraTurnRateX(ItemInfo* item, short accel, short minTurnRate, short maxTurnRate)
+void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accel, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical]);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical]);
 }
 
-void ModulateLaraTurnRateY(ItemInfo* item, short accel, short minTurnRate, short maxTurnRate)
+void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accel, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
+	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
 }
 
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
