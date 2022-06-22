@@ -1194,6 +1194,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->shadowSize = UNIT_SHADOW;
+
 	}
 
 	obj = &Objects[ID_MOTORBIKE];
@@ -1206,6 +1208,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->shadowSize = UNIT_SHADOW;
+
 	}
 }
 

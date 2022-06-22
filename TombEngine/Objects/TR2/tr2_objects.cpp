@@ -669,6 +669,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_RICOCHET;
+		obj->shadowSize = UNIT_SHADOW;
 	}
 
 	obj = &Objects[ID_SNOWMOBILE];
@@ -681,6 +682,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveFlags = true;
 		obj->savePosition = true;
 		obj->hitEffect = HIT_RICOCHET;
+		obj->shadowSize = UNIT_SHADOW;
 	}
 }
 

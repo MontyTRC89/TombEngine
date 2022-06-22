@@ -393,6 +393,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->shadowSize = UNIT_SHADOW;
 	}
 
 	obj = &Objects[ID_RUBBER_BOAT];
@@ -406,6 +407,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+		obj->shadowSize = UNIT_SHADOW;
+
 	}
 
 	obj = &Objects[ID_KAYAK];
@@ -418,6 +421,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+		obj->shadowSize = UNIT_SHADOW;
+
 	}
 
 	obj = &Objects[ID_MINECART];
@@ -429,6 +434,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+		obj->shadowSize = UNIT_SHADOW;
+
 	}
 
 	obj = &Objects[ID_BIGGUN];
@@ -454,6 +461,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+		obj->shadowSize = UNIT_SHADOW;
+
 	}
 }
 

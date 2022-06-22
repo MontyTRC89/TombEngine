@@ -44,6 +44,44 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderShadowMap(RenderView& renderView)
 	{
+
+		//Collect Shadow Spheres
+		std::array<LARA_MESHES,4> sphereMeshes = {LM_HIPS,LM_TORSO,LM_LFOOT,LM_RFOOT};
+		std::array<float,4> sphereScaleFactors = {6.0f,3.2f,2.8f,2.8f};
+		for (auto i = 0; i < sphereMeshes.size(); i++) {
+
+			MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
+			Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
+			if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT) {
+				//push feet spheres a little bit down
+				pos.y += 8;
+			}
+			GetLaraJointPosition(&pos, sphereMeshes[i]);
+			m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].position = Vector3(pos.x, pos.y, pos.z);
+			m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].radius = m.sphere.Radius * sphereScaleFactors[i];
+			m_stShadowMap.NumSpheres++;
+		}
+
+		for (auto& r : renderView.roomsToDraw) {
+			for (auto& i : r->ItemsToDraw) {
+				auto& nativeItem = g_Level.Items[i->ItemNumber];
+				//Skip everything thats not "alive" or is not a vehicle
+				
+				if (!(Objects[nativeItem.ObjectNumber].shadowSize))
+					continue;
+				auto bb = GetBoundsAccurate(&nativeItem);
+				Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) + Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
+				center.y = nativeItem.Pose.Position.y;
+				float maxExtent = std::max(bb->X2 - bb->X1, bb->Z2 - bb->Z1);
+				m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].position = center;
+				m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].radius = maxExtent;
+				m_stShadowMap.NumSpheres++;
+				if (m_stShadowMap.NumSpheres >= 15)
+					break;
+			}
+		}
+
+		
 		if (shadowLight == nullptr)
 			return;
 		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
@@ -53,7 +91,6 @@ namespace TEN::Renderer
 		SetCullMode(CULL_MODE_CCW);
 
 		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
-
 		for (int step = 0; step < steps; step++) {
 			// Bind and clear render target
 			m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView[step].Get(), Colors::White);
@@ -131,6 +168,7 @@ namespace TEN::Renderer
 			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
 				RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
+
 
 				for (auto& bucket : mesh->buckets)
 				{
@@ -216,6 +254,7 @@ namespace TEN::Renderer
 					m_numMoveablesDrawCalls++;
 				}
 			}
+
 		}
 	}
 
@@ -1354,6 +1393,7 @@ namespace TEN::Renderer
 
 		m_stAlphaTest.AlphaTest = -1;
 		m_stAlphaTest.AlphaThreshold = -1;
+		m_stShadowMap.NumSpheres = 0;
 
 		// Prepare the shadow map
 		if (g_Configuration.EnableShadows)
@@ -1909,16 +1949,17 @@ namespace TEN::Renderer
 		{
 			m_stShadowMap.CastShadows = false;
 		}
-		m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
-		BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
-		BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 
 		numRoomsTransparentPolygons = 0;
-
 		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
 			RendererRoom* room = view.roomsToDraw[index];
+			m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
+
+			BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
+			BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
+
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);

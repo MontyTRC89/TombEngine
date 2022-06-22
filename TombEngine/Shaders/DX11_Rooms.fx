@@ -3,8 +3,8 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./AlphaTestBuffer.hlsli"
-#define SHADOW_FACTOR (0.55f)
-#define INV_SHADOW_FACTOR (1.0f-SHADOW_FACTOR)
+#define SHADOW_INTENSITY (0.55f)
+#define INV_SHADOW_INTENSITY (1.0f-SHADOW_INTENSITY)
 
 cbuffer LightsBuffer : register(b2)
 {
@@ -13,9 +13,16 @@ cbuffer LightsBuffer : register(b2)
 	float3 Padding;
 };
 
+struct Sphere
+{
+    float3 position;
+    float radius;
+};
+
 cbuffer MiscBuffer : register(b3)
 {
 	int Caustics;
+
 };
 
 cbuffer ShadowLightBuffer : register(b4)
@@ -23,7 +30,9 @@ cbuffer ShadowLightBuffer : register(b4)
 	ShaderLight Light;
 	float4x4 LightViewProjections[6];
 	int CastShadows;
-	float3 Padding2;
+    int NumSpheres;
+    int2 padding;
+    Sphere Spheres[16];
 };
 
 cbuffer RoomBuffer : register(b5)
@@ -66,14 +75,6 @@ Texture2D CausticsTexture : register(t2);
 
 Texture2DArray ShadowMap : register(t3);
 SamplerComparisonState ShadowMapSampler : register(s3);
-
-float hash(float3 n)
-{
-	float x = n.x;
-	float y = n.y;
-	float z = n.z;
-	return float((frac(sin(x)) * 7385.6093) + (frac(cos(y)) * 1934.9663) - (frac(sin(z)) * 8349.2791));
-}
 
 struct PixelShaderOutput
 {
@@ -264,7 +265,27 @@ void doPointLightShadow(float3 worldPos, inout float3 lighting)
         }
     }
     float distanceFactor = saturate(((distance(worldPos, Light.Position) ) / (Light.Out)));
-    lighting *= saturate((shadowFactor + SHADOW_FACTOR) + (pow(distanceFactor, 4) * INV_SHADOW_FACTOR));
+    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * INV_SHADOW_INTENSITY));
+}
+
+
+void doBlobShadows(float3 worldPos, inout float3 lighting)
+{
+    float shadowFactor = 1.0f;
+    for (int i = 0; i < NumSpheres; i++)
+    {
+        Sphere s = Spheres[i];
+        float dist = distance(worldPos, s.position);
+        if (dist > s.radius)
+            continue;
+        float radiusFactor = dist / s.radius;
+        float factor = 1 - (saturate(radiusFactor));
+        shadowFactor -= factor*shadowFactor;
+
+    }
+    shadowFactor = saturate(shadowFactor);
+    lighting *= saturate((shadowFactor+SHADOW_INTENSITY));
+
 }
 
 void doSpotLightShadow(float3 worldPos,inout float3 lighting)
@@ -294,7 +315,7 @@ void doSpotLightShadow(float3 worldPos,inout float3 lighting)
     float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
 	//Fade out at the borders of the sampled texture
     float angleFactor = min(max(sin(lightClipSpace.x * PI)*1.2, 0), 1);
-    lighting *= saturate((shadowFactor + SHADOW_FACTOR) + (pow(distanceFactor, 4) * (1 - angleFactor) * INV_SHADOW_FACTOR));
+    lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * (1 - angleFactor) * INV_SHADOW_INTENSITY));
 }
 PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
@@ -324,6 +345,8 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 
         }
 	}
+	
+    doBlobShadows(input.WorldPosition, lighting);
 
 	if (doLights)
 	{
