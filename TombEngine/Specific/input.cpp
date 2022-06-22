@@ -414,20 +414,13 @@ namespace TEN::Input
 
 	void SolveInputCollisions(int& lInput)
 	{
-		// TODO: Make FORWARD+BACK to turn 180 degrees a user option.
-		if (lInput & IN_FORWARD && lInput & IN_BACK)
-			lInput |= IN_ROLL;
-
 		// Block roll in binocular mode (TODO: Is it needed?)
 		if (lInput & IN_ROLL && BinocularRange)
 			lInput &= ~IN_ROLL;
 
 		// Block simultaneous LEFT+RIGHT input.
 		if (lInput & IN_LEFT && lInput & IN_RIGHT)
-		{
 			lInput &= ~(IN_LEFT | IN_RIGHT);
-			AxisMap[InputAxis::MoveHorizontal] = 0.0f;
-		}
 
 		if (Lara.Inventory.IsBusy)
 		{
