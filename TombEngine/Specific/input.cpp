@@ -42,7 +42,7 @@ namespace TEN::Input
 			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
 			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
 			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
-			NULL,			NULL,			NULL,			NULL,			"Enter",		"Ctrl",			NULL,			NULL,
+			NULL,			NULL,			NULL,			NULL,			"Pad Enter",	"Ctrl",			NULL,			NULL,
 			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,			NULL,
 			NULL,			NULL,			"Shift",		NULL,			NULL,			NULL,			NULL,			NULL,
 			NULL,			NULL,			NULL,			NULL,			NULL,			"Pad /",		NULL,			NULL,
