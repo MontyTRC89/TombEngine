@@ -342,6 +342,8 @@ void FireShotgun(ItemInfo* laraItem)
 		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
 
+		Rumble(0.4f, 0.2f);
+
 		Statistics.Game.AmmoUsed++;
 	}
 }
@@ -1724,6 +1726,8 @@ void FireHK(ItemInfo* laraItem, int mode)
 		SmokeWeapon = LaraWeaponType::HK;
 		TriggerGunShell(1, ID_GUNSHELL, LaraWeaponType::HK);
 		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::HK].FlashTime;
+
+		Rumble(0.3f, 0.2f);
 	}
 }
 

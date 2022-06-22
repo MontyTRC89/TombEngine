@@ -348,6 +348,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
+			Rumble(0.3f, 0.2f);
 			item->Animation.TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
@@ -2345,6 +2346,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
+			Rumble(0.3f, 0.2f);
 			item->Animation.TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
