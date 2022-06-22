@@ -103,6 +103,6 @@ namespace TEN::Input
 	void DeInitialiseInput();
 	bool UpdateInput(bool debounce = true);
 	void DefaultConflict();
-	void Rumble(RumbleMode mode, float power, float delayInSeconds = 0.3f);
+	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 }

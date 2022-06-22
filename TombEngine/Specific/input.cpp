@@ -88,7 +88,7 @@ namespace TEN::Input
 		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_DELETE, KC_PGDOWN }
 	};
 
-	void InitializeEffect()
+	void InitialiseEffect()
 	{
 		g_Effect = new Effect(Effect::ConstantForce, Effect::Constant);
 		g_Effect->direction = Effect::North;
@@ -152,7 +152,8 @@ namespace TEN::Input
 				if (g_Rumble)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
-					InitializeEffect();
+					InitialiseEffect();
+					Rumble(0.5f);
 				}
 			}
 			catch (OIS::Exception& ex)
@@ -710,7 +711,7 @@ namespace TEN::Input
 		return true;
 	}
 
-	void Rumble(float power, RumbleMode mode, float delayInSeconds)
+	void Rumble(float power, float delayInSeconds, RumbleMode mode)
 	{
 		if (power == 0.0f)
 			return;
