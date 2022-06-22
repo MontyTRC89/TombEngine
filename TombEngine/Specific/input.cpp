@@ -732,6 +732,8 @@ namespace TEN::Input
 		if (!g_Configuration.EnableRumble)
 			return;
 
+		power = std::clamp(power, 0.0f, 1.0f);
+
 		if (power == 0.0f)
 			return;
 

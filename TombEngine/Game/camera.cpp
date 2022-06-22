@@ -211,6 +211,7 @@ void MoveCamera(GameVector* ideal, int speed)
 			Camera.target.y += GetRandomControl() % bounce - bounce2;
 			Camera.target.z += GetRandomControl() % bounce - bounce2;
 			Camera.bounce += 5;
+			Rumble((float)abs(Camera.bounce) / 70.0f, 0.2f);
 		}
 		else
 		{
@@ -977,6 +978,7 @@ void LookCamera(ItemInfo* item)
 			Camera.target.y += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
 			Camera.target.z += GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1);
 			Camera.bounce += 5;
+			Rumble((float)abs(Camera.bounce) / 70.0f, 0.2f);
 		}
 		else
 		{
@@ -1171,6 +1173,7 @@ void BinocularCamera(ItemInfo* item)
 			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
 			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
 			Camera.bounce += 5;
+			Rumble((float)abs(Camera.bounce) / 70.0f, 0.2f);
 		}
 		else
 		{
