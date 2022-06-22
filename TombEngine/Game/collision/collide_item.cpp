@@ -38,11 +38,11 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 			int collidedBits = TestCollision(item, laraItem);
 			if (collidedBits)
 			{
-				short oldRot = item->Pose.Orientation.y;
+				short oldYOrient = item->Pose.Orientation.y;
 
 				item->Pose.Orientation.y = 0;
 				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-				item->Pose.Orientation.y = oldRot;
+				item->Pose.Orientation.y = oldYOrient;
 
 				int deadlyBits = *((int*)&item->ItemFlags[0]);
 				auto* sphere = &CreatureSpheres[0];

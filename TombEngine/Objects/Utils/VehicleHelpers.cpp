@@ -14,6 +14,13 @@
 
 namespace TEN::Entities::Vehicles
 {
+	constexpr auto VEHICLE_SINK_SPEED = 15;
+	constexpr auto VEHICLE_MAX_WATER_HEIGHT = CLICK(2.5f);
+	constexpr auto VEHICLE_WATER_VEL_COEFFICIENT = 16.0f;
+	constexpr auto VEHICLE_WATER_TURN_COEFFICIENT = 10.0f;
+	constexpr auto VEHICLE_SWAMP_VEL_COEFFICIENT = 8.0f;
+	constexpr auto VEHICLE_SWAMP_TURN_COEFFICIENT = 6.0f;
+
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float minDistance)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -37,6 +44,8 @@ namespace TEN::Entities::Vehicles
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
+
+		// TODO: Not working as expected.
 		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < abs(deltaHeadingAngle);
 
 		// Assess mount types allowed for vehicle.
@@ -105,30 +114,19 @@ namespace TEN::Entities::Vehicles
 		return VehicleMountType::None;
 	}
 
-	void DoVehicleCollision(ItemInfo* vehicleItem, int radius)
+	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
 	{
-		CollisionInfo coll = {};
-		coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
-		coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
-		coll.Setup.OldPosition = vehicleItem->Pose.Position;
-		coll.Setup.EnableObjectPush = true;
+		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
+		float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
+		float cosY = phd_cos(vehicleItem->Pose.Orientation.y);
+		float sinZ = phd_sin(vehicleItem->Pose.Orientation.z);
 
-		DoObjectCollision(vehicleItem, &coll);
-	}
-
-	int GetVehicleHeight(ItemInfo* vehicle, int forward, int right, bool clamp, Vector3Int* pos)
-	{
-		float sinX = phd_sin(vehicle->Pose.Orientation.x);
-		float sinY = phd_sin(vehicle->Pose.Orientation.y);
-		float cosY = phd_cos(vehicle->Pose.Orientation.y);
-		float sinZ = phd_sin(vehicle->Pose.Orientation.z);
-
-		pos->x = vehicle->Pose.Position.x + (forward * sinY) + (right * cosY);
-		pos->y = vehicle->Pose.Position.y - (forward * sinX) + (right * sinZ);
-		pos->z = vehicle->Pose.Position.z + (forward * cosY) - (right * sinY);
+		pos->x = vehicleItem->Pose.Position.x + (forward * sinY) + (right * cosY);
+		pos->y = vehicleItem->Pose.Position.y - (forward * sinX) + (right * sinZ);
+		pos->z = vehicleItem->Pose.Position.z + (forward * cosY) - (right * sinY);
 
 		// Get collision a bit higher to be able to detect bridges.
-		auto probe = GetCollision(pos->x, pos->y - CLICK(2), pos->z, vehicle->RoomNumber);
+		auto probe = GetCollision(pos->x, pos->y - CLICK(2), pos->z, vehicleItem->RoomNumber);
 
 		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
 			return NO_HEIGHT;
@@ -170,6 +168,17 @@ namespace TEN::Entities::Vehicles
 			pos->y = height;
 
 		return height;
+	}
+
+	void DoVehicleCollision(ItemInfo* vehicleItem, int radius)
+	{
+		CollisionInfo coll = {};
+		coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
+		coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
+		coll.Setup.OldPosition = vehicleItem->Pose.Position;
+		coll.Setup.EnableObjectPush = true;
+
+		DoObjectCollision(vehicleItem, &coll);
 	}
 
 	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* angle)
