@@ -3,6 +3,8 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./AlphaTestBuffer.hlsli"
+#define SHADOW_FACTOR (0.55f)
+#define INV_SHADOW_FACTOR (1.0f-SHADOW_FACTOR)
 
 cbuffer LightsBuffer : register(b2)
 {
@@ -262,7 +264,7 @@ void doPointLightShadow(float3 worldPos, inout float3 lighting)
         }
     }
     float distanceFactor = saturate(((distance(worldPos, Light.Position) ) / (Light.Out)));
-    lighting *= saturate((shadowFactor + 0.75) + (pow(distanceFactor,3) * 0.25));
+    lighting *= saturate((shadowFactor + SHADOW_FACTOR) + (pow(distanceFactor, 4) * INV_SHADOW_FACTOR));
 }
 
 void doSpotLightShadow(float3 worldPos,inout float3 lighting)
@@ -289,7 +291,10 @@ void doSpotLightShadow(float3 worldPos,inout float3 lighting)
 
         shadowFactor = sum / 16.0;
     }
-    lighting *= saturate(shadowFactor + 0.75);
+    float distanceFactor = saturate(((distance(worldPos, Light.Position)) / (Light.Out)));
+	//Fade out at the borders of the sampled texture
+    float angleFactor = min(max(sin(lightClipSpace.x * PI)*1.2, 0), 1);
+    lighting *= saturate((shadowFactor + SHADOW_FACTOR) + (pow(distanceFactor, 4) * (1 - angleFactor) * INV_SHADOW_FACTOR));
 }
 PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
