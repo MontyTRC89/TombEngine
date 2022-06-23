@@ -1182,10 +1182,18 @@ namespace TEN::Entities::Vehicles
 
 	void KayakLaraRapidsDrown(ItemInfo* laraItem)
 	{
+		// Already drowning...
+		if (laraItem->HitPoints == 0)
+			return;
+
 		auto* lara = GetLaraInfo(laraItem);
 
+		// Prevent engaging in flycheat mode
+		if (lara->Control.WaterStatus == WaterStatus::FlyCheat)
+			return;
+
 		laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_OVERBOARD_DEATH;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = 12; // TODO
 		laraItem->Animation.TargetState = 12;
 		laraItem->HitPoints = 0;
