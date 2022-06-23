@@ -635,7 +635,9 @@ namespace TEN::Input
 				break;
 			}
 
-			oisRumble->upload(oisEffect); 
+			oisRumble->upload(oisEffect);
+
+			TEN::Renderer::g_Renderer.DrawString(20, 20, std::to_string(rumbleData.Power).c_str(), PRINTSTRING_COLOR_YELLOW, 0);
 		}
 		catch (OIS::Exception& ex) 
 		{ 
@@ -712,14 +714,14 @@ namespace TEN::Input
 		if (KeyMap[KC_RETURN] || Key(KEY_ACTION))
 			lInput |= IN_SELECT;
 
-		HandleLaraHotkeys(lInput);
-		SolveInputCollisions(lInput);
-
 		if (debounce)
 			DbInput = InputBusy;
 
 		InputBusy = lInput;
 		TrInput = lInput;
+
+		HandleLaraHotkeys(lInput);
+		SolveInputCollisions(lInput);
 
 		if (debounce)
 			DbInput = TrInput & (DbInput ^ TrInput);
@@ -736,6 +738,7 @@ namespace TEN::Input
 
 		if (power == 0.0f || power < rumbleData.Power)
 			return;
+
 
 		rumbleData.FadeSpeed = power / (delayInSeconds * (float)FPS);
 		rumbleData.Power = rumbleData.LastPower = power + rumbleData.FadeSpeed;
