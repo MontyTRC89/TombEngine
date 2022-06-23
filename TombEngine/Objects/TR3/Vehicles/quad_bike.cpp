@@ -52,7 +52,7 @@ namespace TEN::Entities::Vehicles
 	#define QBIKE_RADIUS	500
 	#define QBIKE_HEIGHT	512
 
-	// TODO
+		// TODO
 	#define QBIKE_HIT_LEFT  11
 	#define QBIKE_HIT_RIGHT 12
 	#define QBIKE_HIT_FRONT 13
@@ -842,7 +842,7 @@ namespace TEN::Entities::Vehicles
 
 		bool drive = false; // Never changes?
 
-		if (!(TrInput & VEHICLE_IN_BRAKE) &&
+		if (!(TrInput & VEHICLE_IN_SPEED) &&
 			!quadBike->Velocity && !quadBike->CanStartDrift)
 		{
 			quadBike->CanStartDrift = true;
@@ -850,7 +850,7 @@ namespace TEN::Entities::Vehicles
 		else if (quadBike->Velocity)
 			quadBike->CanStartDrift = false;
 
-		if (!(TrInput & VEHICLE_IN_BRAKE))
+		if (!(TrInput & VEHICLE_IN_SPEED))
 			quadBike->DriftStarting = false;
 
 		if (!quadBike->DriftStarting)
@@ -872,7 +872,7 @@ namespace TEN::Entities::Vehicles
 			// Driving forward.
 			if (quadBike->Velocity > 0)
 			{
-				if (TrInput & VEHICLE_IN_BRAKE &&
+				if (TrInput & VEHICLE_IN_SPEED &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity > MIN_DRIFT_VELOCITY)
 				{
@@ -908,7 +908,7 @@ namespace TEN::Entities::Vehicles
 			// Driving back.
 			else if (quadBike->Velocity < 0)
 			{
-				if (TrInput & VEHICLE_IN_BRAKE &&
+				if (TrInput & VEHICLE_IN_SPEED &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity < (-MIN_DRIFT_VELOCITY + 0x800))
 				{
@@ -945,7 +945,7 @@ namespace TEN::Entities::Vehicles
 			// Driving back / braking.
 			if (TrInput & VEHICLE_IN_REVERSE)
 			{
-				if (TrInput & VEHICLE_IN_BRAKE &&
+				if (TrInput & VEHICLE_IN_SPEED &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;
@@ -963,7 +963,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
-				if (TrInput & VEHICLE_IN_BRAKE &&
+				if (TrInput & VEHICLE_IN_SPEED &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
 				{
 					quadBike->DriftStarting = true;

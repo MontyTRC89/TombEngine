@@ -1,14 +1,22 @@
 #pragma once
+#include "Specific/phd_global.h"
+#include "Specific/trmath.h"
 
 using std::vector;
 
 struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
-struct Vector3Int;
 
 namespace TEN::Entities::Vehicles
 {
+	constexpr auto VEHICLE_SINK_SPEED = 15;
+	constexpr auto VEHICLE_MAX_WATER_HEIGHT = CLICK(2.5f);
+	constexpr auto VEHICLE_WATER_VEL_COEFFICIENT = 16.0f;
+	constexpr auto VEHICLE_WATER_TURN_COEFFICIENT = 10.0f;
+	constexpr auto VEHICLE_SWAMP_VEL_COEFFICIENT = 8.0f;
+	constexpr auto VEHICLE_SWAMP_TURN_COEFFICIENT = 6.0f;
+
 	enum class VehicleMountType
 	{
 		None,
