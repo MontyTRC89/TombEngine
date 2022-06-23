@@ -236,7 +236,7 @@ namespace TEN::Entities::TR4
 		if (!ocb || ocb > 4 && ocb < 7)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_IDLE;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_IDLE;
 			item->Animation.ActiveState = BADDY_STATE_IDLE;
 			return;
@@ -246,7 +246,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 1)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_RIGHT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_JUMP_RIGHT;
 			item->Animation.ActiveState = BADDY_STATE_JUMP_RIGHT;
 			return;
@@ -256,7 +256,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 2)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_ROLL_LEFT;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_ROLL_LEFT;
 			item->Animation.ActiveState = BADDY_STATE_ROLL_LEFT;
 			return;
@@ -266,7 +266,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 3)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_CROUCH;
 			item->Animation.ActiveState = BADDY_STATE_CROUCH;
 			return;
@@ -276,7 +276,7 @@ namespace TEN::Entities::TR4
 		if (ocb == 4)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_4_STEPS;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_CLIMB_4_STEPS;
 			item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
@@ -288,7 +288,7 @@ namespace TEN::Entities::TR4
 		if (ocb > 100)
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CROUCH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.TargetState = BADDY_STATE_CROUCH;
 			item->Animation.ActiveState = BADDY_STATE_CROUCH;
 			item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * CLICK(4);
@@ -297,7 +297,7 @@ namespace TEN::Entities::TR4
 			return;
 		}
 	
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void BaddyControl(short itemNumber)
@@ -472,14 +472,14 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_MONKEY_IDLE:
 			case BADDY_STATE_MONKEY_FORWARD:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_MONKEY_TO_FREEFALL;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BADDY_STATE_MONKEY_TO_FREEFALL;
 				item->Animation.Velocity = 0;
 				break;
 
 			default:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BADDY_STATE_DEATH;
 				currentCreature->LOT.IsJumping = true;
 
@@ -688,7 +688,7 @@ namespace TEN::Entities::TR4
 					currentCreature->LOT.IsJumping = true;
 
 					item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.ActiveState = BADDY_STATE_JUMP_FORWARD_1_BLOCK;
 
 					if (!canJump2Sectors)
@@ -861,7 +861,7 @@ namespace TEN::Entities::TR4
 					joint3 = AI.angle;
 				
 				if (objectNumber == ID_BADDY2 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
 					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) &&
@@ -913,7 +913,7 @@ namespace TEN::Entities::TR4
 				}
 
 				if (item->Animation.ActiveState != BADDY_STATE_SWORD_HIT_FRONT ||
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_NO_DAMAGE_MAX)
 				{
 					if (abs(AI.angle) >= ANGLE(7.0f))
 					{
@@ -930,8 +930,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestBits(JointBitType::Touch, BaddySwordAttackJoints))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MIN &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SWORD_HIT_DAMAGE_MAX)
 						{
 							CreatureEffect2(
 								item,
@@ -1081,7 +1081,7 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_CROUCH_PICKUP:
 				ClampRotation(&item->Pose, AI.angle, ANGLE(11.0f));
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_CROUCH_PICKUP)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_CROUCH_PICKUP)
 					break;
 
 				if (!currentCreature->Enemy)
@@ -1155,8 +1155,8 @@ namespace TEN::Entities::TR4
 				}
 				ClampRotation(&item->Pose, AI.angle, ANGLE(7.0f));
 
-				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_FIRE_MAX ||
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_FIRE_MIN)
+				if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MAX ||
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_FIRE_MIN)
 				{
 					break;
 				}
@@ -1175,25 +1175,25 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BADDY_STATE_HOLSTER_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_HOLSTER_GUN)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_GUN)
 					item->MeshSwapBits = MESHSWAPFLAGS_BADDY_EMPTY;
 
 				break;
 
 			case BADDY_STATE_DRAW_GUN:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_DRAW_GUN)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_GUN)
 					item->MeshSwapBits = MESHSWAPFLAGS_BADDY_GUN;
 
 				break;
 
 			case BADDY_STATE_HOLSTER_SWORD:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_HOLSTER_SWORD)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_HOLSTER_SWORD)
 					item->MeshSwapBits = MESHSWAPFLAGS_BADDY_EMPTY;
 				
 				break;
 
 			case BADDY_STATE_DRAW_SWORD:
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_DRAW_SWORD)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_DRAW_SWORD)
 					break;
 
 				if (item->ObjectNumber == ID_BADDY1)
@@ -1232,7 +1232,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_SOMERSAULT_START_TAKE_OFF)
 					break;
 
 				currentCreature->LOT.IsJumping = true;
@@ -1272,14 +1272,14 @@ namespace TEN::Entities::TR4
 			{
 			case 2:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_2_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BADDY_STATE_CLIMB_2_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_3_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BADDY_STATE_CLIMB_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
@@ -1287,20 +1287,20 @@ namespace TEN::Entities::TR4
 			case 4:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_CLIMB_4_STEPS;
 				item->Animation.ActiveState = BADDY_STATE_CLIMB_4_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_JUMP_OFF_3_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BADDY_STATE_JUMP_OFF_3_STEPS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
 				item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_JUMP_OFF_4_STEPS;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BADDY_STATE_JUMP_OFF_4_STEPS;
 				creature->MaxTurn = 0;
 				break;
@@ -1312,7 +1312,7 @@ namespace TEN::Entities::TR4
 		else
 		{
 			item->Animation.AnimNumber = Objects[objectNumber].animIndex + BADDY_ANIM_BLIND;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase + (GetRandomControl() & 7);
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
 			item->Animation.ActiveState = BADDY_STATE_BLIND;
 			creature->MaxTurn = 0;
 		}

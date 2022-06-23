@@ -164,7 +164,7 @@ void TightropeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 			{
 				laraItem->Animation.ActiveState = LS_TIGHTROPE_ENTER;
 				laraItem->Animation.AnimNumber = LA_TIGHTROPE_START;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Control.IsMoving = false;
 				ResetLaraFlex(laraItem);
 #ifdef NEW_TIGHTROPE
@@ -215,7 +215,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		{
 			laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 			laraItem->Animation.AnimNumber = LA_SWINGBAR_GRAB;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 			laraItem->Animation.VerticalVelocity = false;
 			laraItem->Animation.Airborne = false;
 
@@ -307,7 +307,7 @@ void InitialiseAnimating(short itemNumber)
 	/*auto* item = &g_Level.Items[itemNumber];
 	item->ActiveState = 0;
 	item->animNumber = Objects[item->objectNumber].animIndex;
-	item->frameNumber = g_Level.Anims[item->animNumber].FrameBase;*/
+	item->frameNumber = g_Level.Anims[item->animNumber].frameBase;*/
 }
 
 void AnimatingControl(short itemNumber)
@@ -323,7 +323,7 @@ void AnimatingControl(short itemNumber)
 	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
 	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].FrameEnd)
 	{
-		item->frameNumber = g_Level.Anims[item->animNumber].FrameBase;
+		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		RemoveActiveItem(itemNumber);
 		item->aiBits = 0;
 		item->status = ITEM_NOT_ACTIVE;

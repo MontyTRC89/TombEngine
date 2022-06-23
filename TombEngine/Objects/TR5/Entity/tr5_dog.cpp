@@ -27,7 +27,7 @@ void InitialiseTr5Dog(short itemNumber)
 		// TODO: item->flags2 ^= (item->flags2 ^ ((item->flags2 & 0xFE) + 2)) & 6;
 	}
 
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 }
 
 void Tr5DogControl(short itemNumber)
@@ -51,7 +51,7 @@ void Tr5DogControl(short itemNumber)
 		else if (item->Animation.ActiveState != 11)
 		{
 			item->Animation.AnimNumber = object->animIndex + DogAnims[GetRandomControl() & 3];
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = 11;
 		}
 	}
@@ -98,7 +98,7 @@ void Tr5DogControl(short itemNumber)
 		}
 
 		short random = GetRandomControl();
-		int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 		switch (item->Animation.ActiveState)
 		{

@@ -130,7 +130,7 @@ void SkidooManControl(short riderItemNumber)
 			riderItem->RoomNumber = item->RoomNumber;
 
 			riderItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_DRIVER].animIndex + SMAN_ANIM_DEATH;
-			riderItem->Animation.FrameNumber = g_Level.Anims[riderItem->Animation.AnimNumber].FrameBase;
+			riderItem->Animation.FrameNumber = g_Level.Anims[riderItem->Animation.AnimNumber].frameBase;
 			riderItem->Animation.ActiveState = SMAN_STATE_DEATH;
 
 			if (Lara.TargetEntity == item)
@@ -238,7 +238,7 @@ void SkidooManControl(short riderItemNumber)
 			ItemNewRoom(riderItemNumber, item->RoomNumber);
 
 		riderItem->Animation.AnimNumber = item->Animation.AnimNumber + (Objects[ID_SNOWMOBILE_DRIVER].animIndex - Objects[ID_SNOWMOBILE_GUN].animIndex);
-		riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].FrameBase - g_Level.Anims[item->Animation.AnimNumber].FrameBase);
+		riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 	}
 	else if (riderItem->Status == ITEM_DEACTIVATED &&
 		item->Animation.Velocity == 0 &&

@@ -13,13 +13,16 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	bool VonCroyPassedWaypoints[128];
-	BITE_INFO VonCroyBite = { 0, 35, 130, 18 };
 
-#define SWAPMESHFLAGS_VON_CROY	0x40080
-#define VON_CROY_FLAG_JUMP		6
+	BITE_INFO VonCroyBite = { 0, 35, 130, 18 };
+	vector<int> VonCroyKnifeSwapJoints = { 7, 18 };
+
+	#define VON_CROY_FLAG_JUMP		6
 
 	enum VonCroyState
 	{
@@ -66,10 +69,10 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
-		item->MeshSwapBits = SWAPMESHFLAGS_VON_CROY;
+		item->SetBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
 
 		memset(VonCroyPassedWaypoints, 0, 128);
 	}
@@ -209,7 +212,7 @@ namespace TEN::Entities::TR4
 
 			GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 1)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 1)
 				CreateZone(item);
 
 			CreatureAIInfo(item, &AI);
@@ -336,7 +339,7 @@ namespace TEN::Entities::TR4
 			else if (canJump1block || canJump2blocks)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_JUMP;
 				creature->MaxTurn = 0;
 				creature->LOT.IsJumping = true;
@@ -354,7 +357,7 @@ namespace TEN::Entities::TR4
 				probe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, probe.RoomNumber);
 				if (probe.Position.Ceiling == probe.Position.Floor - 1536)
 				{
-					if (item->MeshSwapBits == SWAPMESHFLAGS_VON_CROY)
+					if (item->TestBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints))
 						item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 					else
 						item->Animation.TargetState = VON_CROY_STATE_START_MONKEY;
@@ -427,7 +430,8 @@ namespace TEN::Entities::TR4
 			{
 				if (Lara.Location >= item->ItemFlags[3])
 				{
-					if (!foundTarget || AI.distance >= SECTOR(2048) && (item->MeshSwapBits & 0x40000 || AI.distance >= SECTOR(8216)))
+					if (!foundTarget || AI.distance >= SECTOR(2048) &&
+						(item->TestBits(JointBitType::MeshSwap, 18) || AI.distance >= SECTOR(8216)))
 					{
 						if (creature->Enemy == LaraItem)
 						{
@@ -550,18 +554,18 @@ namespace TEN::Entities::TR4
 			break;
 
 		case VON_CROY_STATE_TOGGLE_KNIFE:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
-				if (!(item->MeshSwapBits & SWAPMESHFLAGS_VON_CROY))
-					item->MeshSwapBits |= SWAPMESHFLAGS_VON_CROY;
+				if (!item->TestBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints))
+					item->SetBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
 				else
-					item->MeshSwapBits &= ~SWAPMESHFLAGS_VON_CROY;
+					item->ClearBits(JointBitType::MeshSwap, VonCroyKnifeSwapJoints);
 			}
 
 			break;
 
 		case VON_CROY_STATE_LOOK_BEFORE_JUMP:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				item->Pose = enemy->Pose;
 
@@ -571,7 +575,7 @@ namespace TEN::Entities::TR4
 					item->Animation.ActiveState = VON_CROY_STATE_JUMP;
 					item->Animation.TargetState = VON_CROY_STATE_JUMP_2_BLOCKS;
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					creature->LOT.IsJumping = true;
 				}
 
@@ -585,7 +589,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_JUMP_2_BLOCKS:
 			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 25 ||
-				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 5)
+				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 5)
 			{
 				creature->LOT.IsJumping = true;
 				//if (canJump3blocks)
@@ -600,9 +604,9 @@ namespace TEN::Entities::TR4
 			break;
 
 		case VON_CROY_STATE_ENABLE_TRAP:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				item->Pose = enemy->Pose;
-			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 120)
+			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 120)
 			{
 				TestTriggers(
 					creature->AITarget->Pose.Position.x,
@@ -632,8 +636,8 @@ namespace TEN::Entities::TR4
 
 			if (!creature->Flags && enemy != NULL)
 			{
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20 &&
-					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 45)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
+					item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 45)
 				{
 					if (abs(item->Pose.Position.x - enemy->Pose.Position.x) < CLICK(2) &&
 						abs(item->Pose.Position.y - enemy->Pose.Position.y) < CLICK(2) &&
@@ -697,12 +701,12 @@ namespace TEN::Entities::TR4
 			ClampRotation(&item->Pose, AI.angle, ANGLE(6.0f));
 
 			if ((enemy == NULL || enemy->Flags != 0) ||
-				item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].FrameBase + 21)
+				item->Animation.FrameNumber <= g_Level.Anims[item->Animation.AnimNumber].frameBase + 21)
 			{
 				if (creature->Flags == 0 && enemy != NULL)
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15 &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 26)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 					{
 						if (abs(item->Pose.Position.x - enemy->Pose.Position.x) < CLICK(2) &&
 							abs(item->Pose.Position.y - enemy->Pose.Position.y) < CLICK(2) &&
@@ -749,7 +753,7 @@ namespace TEN::Entities::TR4
 
 			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 47)
 			{
-				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					break;
 			}
 			else
@@ -769,7 +773,7 @@ namespace TEN::Entities::TR4
 		case 33:
 			flags = true;
 			if (item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex + 52 ||
-				item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+				item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				flags = false;
 			}
@@ -811,56 +815,56 @@ namespace TEN::Entities::TR4
 			{
 			case 2:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 29;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 19;
 				creature->MaxTurn = 0;
 				break;
 
 			case 3:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 18;
 				creature->MaxTurn = 0;
 				break;
 
 			case 4:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 17;
 				creature->MaxTurn = 0;
 				break;
 
 			case 7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 27;
 				creature->MaxTurn = 0;
 				break;
 
 			case -7:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 26;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 25;
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 24;
 				creature->MaxTurn = 0;
 				break;
 
 			case -2:
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 42;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = 23;
 				creature->MaxTurn = 0;
 				break;

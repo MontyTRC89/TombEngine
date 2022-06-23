@@ -94,7 +94,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SAS_ANIM_STAND;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = SAS_STATE_IDLE;
 		item->Animation.ActiveState = SAS_STATE_IDLE;
 	}
@@ -457,7 +457,7 @@ namespace TEN::Entities::TR4
 					angle2 = 0;
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 				{
 					if (!creature->Enemy->Animation.Velocity)
 					{
@@ -525,7 +525,7 @@ namespace TEN::Entities::TR4
 				item->Animation.ActiveState != SAS_STATE_BLIND)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SAS_ANIM_BLIND;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase + (GetRandomControl() & 7);
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
 				item->Animation.ActiveState = SAS_STATE_BLIND;
 				creature->MaxTurn = 0;
 			}
@@ -535,7 +535,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState != SAS_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SAS_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = SAS_STATE_DEATH;
 			}
 		}
@@ -617,7 +617,7 @@ namespace TEN::Entities::TR4
 			item->Animation.TargetState = item->Animation.ActiveState = 4;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void InjuredSasControl(short itemNumber)
@@ -680,7 +680,7 @@ namespace TEN::Entities::TR4
 				{
 					laraItem->Animation.AnimNumber = LA_DRAG_BODY;
 					laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
 					ResetLaraFlex(laraItem);
 					Lara.Control.IsMoving = false;

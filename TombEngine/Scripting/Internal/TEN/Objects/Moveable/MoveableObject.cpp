@@ -577,13 +577,13 @@ void Moveable::SetAnimNumber(int animNumber)
 
 int Moveable::GetFrameNumber() const
 {
-	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].FrameBase;
+	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
 
 
 void Moveable::SetFrameNumber(int frameNumber)
 {
-	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].FrameBase;
+	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].FrameEnd;
 	auto frameCount = fEnd - fBase;
 	bool cond = frameNumber < frameCount;

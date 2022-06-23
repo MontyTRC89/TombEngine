@@ -1,3 +1,6 @@
 #pragma once
 
-void RaptorControl(short itemNumber);
+namespace TEN::Entities::TR3
+{
+	void RaptorControl(short itemNumber);
+}

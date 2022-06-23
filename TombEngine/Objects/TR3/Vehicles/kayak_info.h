@@ -1,24 +1,27 @@
 #pragma once
 #include "Specific/phd_global.h"
 
-struct KayakInfo 
+namespace TEN::Entities::Vehicles
 {
-	int TurnRate;
+	struct KayakInfo
+	{
+		int TurnRate;
 
-	int Velocity;
-	int FrontVerticalVelocity;
-	int LeftVerticalVelocity;
-	int RightVerticalVelocity;
+		int Velocity;
+		int FrontVerticalVelocity;
+		int LeftVerticalVelocity;
+		int RightVerticalVelocity;
 
-	unsigned int LeftRightCount;
-	int WaterHeight;
-	PHD_3DPOS OldPos;
-	bool Turn;
-	bool Forward;
-	bool TrueWater;
+		unsigned int LeftRightCount;
+		int WaterHeight;
+		PHD_3DPOS OldPos;
+		bool Turn;
+		bool Forward;
+		bool TrueWater;
 
-	int CurrentStartWake;
-	int WakeShade;
+		int CurrentStartWake;
+		int WakeShade;
 
-	char Flags;
-};
+		char Flags;
+	};
+}

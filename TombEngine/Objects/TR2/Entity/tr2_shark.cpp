@@ -29,7 +29,7 @@ void SharkControl(short itemNumber)
 		if (item->Animation.ActiveState != 5)
 		{
 			item->Animation.AnimNumber = Objects[ID_SHARK].animIndex + 4;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = 5;
 		}
 

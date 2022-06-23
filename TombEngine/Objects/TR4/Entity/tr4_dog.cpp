@@ -10,11 +10,13 @@
 #include "Game/items.h"
 #include "Game/misc.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO DogBite = { 0, 0, 100, 3 };
-	const std::vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
-	const std::vector<int> DogBiteAttackJoints = { 3, 6 };
+	const vector<int> DogJumpAttackJoints = { 3, 6, 9, 10, 13, 14 };
+	const vector<int> DogBiteAttackJoints = { 3, 6 };
 
 	constexpr auto DOG_BITE_ATTACK_DAMAGE = 10;
 	constexpr auto DOG_JUMP_ATTACK_DAMAGE = 20;
@@ -82,7 +84,7 @@ namespace TEN::Entities::TR4
 			item->Status -= ITEM_INVISIBLE;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void Tr4DogControl(short itemNumber)
@@ -106,7 +108,7 @@ namespace TEN::Entities::TR4
 			else if (item->Animation.ActiveState != DOG_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = object->animIndex + DeathAnims[GetRandomControl() & 3];
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = DOG_STATE_DEATH;
 			}
 		}
@@ -155,7 +157,7 @@ namespace TEN::Entities::TR4
 			}
 
 			short random = GetRandomControl();
-			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			int frame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			switch (item->Animation.ActiveState)
 			{

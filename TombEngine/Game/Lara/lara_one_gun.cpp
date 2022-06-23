@@ -128,7 +128,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_RECOIL:
-		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+		if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 		{
 			item->Animation.TargetState = WEAPON_STATE_UNAIM;
 
@@ -155,7 +155,6 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					else if (weaponType == LaraWeaponType::HK)
 					{
 						FireHK(laraItem, 0);
-						//HKFlag = 1;
 
 						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
@@ -174,29 +173,19 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 					item->Animation.TargetState = WEAPON_STATE_AIM;
 			}
 
-			if (item->Animation.TargetState != WEAPON_STATE_RECOIL &&
-				//HKFlag &&
-				!(lara->Weapons[(int)LaraWeaponType::HK].HasSilencer))
+
+			if (item->Animation.TargetState != WEAPON_STATE_RECOIL && 
+				weaponType == LaraWeaponType::HK &&
+				!lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
 			{
 				StopSoundEffect(SFX_TR4_HK_FIRE);
 				SoundEffect(SFX_TR4_HK_STOP, &laraItem->Pose);
-				//HKFlag = 0;
 			}
 		}
-		/*else if (HKFlag)
-		{
-			if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-				SoundEffect(SFX_HK_SILENCED, nullptr);
-			else
-			{
-				SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->pos, SoundEnvironment::Land, 1.0f, 0.4f);
-				SoundEffect(SFX_HK_FIRE, &laraItem->pos);
-			}
-		}*/
 		else if (weaponType == LaraWeaponType::Shotgun && !(TrInput & IN_ACTION) && !lara->LeftArm.Locked)
 			item->Animation.TargetState = WEAPON_STATE_UNAIM;
 
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 12 &&
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 12 &&
 			weaponType == LaraWeaponType::Shotgun)
 		{
 			TriggerGunShell(1, ID_SHOTGUNSHELL, LaraWeaponType::Shotgun);
@@ -205,7 +194,7 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		break;
 
 	case WEAPON_STATE_UNDERWATER_RECOIL:
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 0)
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 0)
 		{
 			item->Animation.TargetState = WEAPON_STATE_UNDERWATER_UNAIM;
 
@@ -274,8 +263,8 @@ void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	AnimateItem(item);
 
-	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
-	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	lara->LeftArm.frameBase = lara->RightArm.frameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
@@ -290,8 +279,8 @@ void ReadyShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	lara->RightArm.FrameNumber = 0;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
-	lara->RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->LeftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->RightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 	lara->TargetEntity = nullptr;
 }
 
@@ -375,14 +364,14 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 		else
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = WEAPON_STATE_DRAW;
 		item->Animation.ActiveState = WEAPON_STATE_DRAW;
 		item->Status = ITEM_ACTIVE;
 		item->RoomNumber = NO_ROOM;
 
-		lara->RightArm.FrameBase = Objects[item->ObjectNumber].frameBase;
-		lara->LeftArm.FrameBase = lara->RightArm.FrameBase;
+		lara->RightArm.frameBase = Objects[item->ObjectNumber].frameBase;
+		lara->LeftArm.frameBase = lara->RightArm.frameBase;
 	}
 	else
 		item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
@@ -392,7 +381,7 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	if (item->Animation.ActiveState != WEAPON_STATE_AIM &&
 		item->Animation.ActiveState != WEAPON_STATE_UNDERWATER_AIM)
 	{
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == Weapons[(int)weaponType].DrawFrame)
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == Weapons[(int)weaponType].DrawFrame)
 			DrawShotgunMeshes(laraItem, weaponType);
 		else if (lara->Control.WaterStatus == WaterStatus::Underwater)
 			item->Animation.TargetState = WEAPON_STATE_UNDERWATER_AIM;
@@ -400,8 +389,8 @@ void DrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	else
 		ReadyShotgun(laraItem, weaponType);
 
-	lara->LeftArm.FrameBase = lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
-	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	lara->LeftArm.frameBase = lara->RightArm.frameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->LeftArm.FrameNumber = lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 }
 
@@ -427,17 +416,17 @@ void UndrawShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 	}
 	else if (item->Animation.ActiveState == WEAPON_STATE_UNDRAW)
 	{
-		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 21 ||
-			(weaponType == LaraWeaponType::GrenadeLauncher && item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase == 15))
+		if (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 21 ||
+			(weaponType == LaraWeaponType::GrenadeLauncher && item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase == 15))
 		{
 			UndrawShotgunMeshes(laraItem, weaponType);
 		}
 	}
 
-	lara->RightArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
-	lara->LeftArm.FrameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
-	lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
-	lara->LeftArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	lara->RightArm.frameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->LeftArm.frameBase = g_Level.Anims[item->Animation.AnimNumber].FramePtr;
+	lara->RightArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
+	lara->LeftArm.FrameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	lara->RightArm.AnimNumber = item->Animation.AnimNumber;
 	lara->LeftArm.AnimNumber = lara->RightArm.AnimNumber;
 }
@@ -1702,20 +1691,6 @@ void FireHK(ItemInfo* laraItem, int mode)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	/*	if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
-		{
-			HKTimer = 12;
-		}
-		else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
-		{
-			HKCounter++;
-			if (HKCounter == 5)
-			{
-				HKCounter = 0;
-				HKTimer = 12;
-			}
-		}*/
-
 	auto angles = Vector3Shrt(
 		lara->LeftArm.Orientation.x,
 		lara->LeftArm.Orientation.y + laraItem->Pose.Orientation.y,
@@ -1840,79 +1815,6 @@ void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src,
 			if (!TestEnvironment(ENV_FLAG_WATER, dest->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
 				LaraBurn(laraItem);
 		}
-	}
-}
-
-void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
-{
-	if (flag)
-	{
-		int x = (GetRandomControl() & 0x1FF) + item->Pose.Position.x - CLICK(1);
-		int y = item->Pose.Position.y;
-		int z = (GetRandomControl() & 0x1FF) + item->Pose.Position.z - CLICK(1);
-		
-		TriggerExplosionBubbles(x, y, z, item->RoomNumber);
-		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->RoomNumber);
-		
-		int wh = GetWaterHeight(x, y, z, item->RoomNumber);
-		if (wh != NO_HEIGHT)
-			SomeSparkEffect(x, wh, z, 8);
-	}
-	else
-	{
-		TriggerExplosionBubble(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-		TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -2, 1, item->RoomNumber);
-
-		for (int i = 0; i < 3; i++)
-			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -1, 1, item->RoomNumber);
-
-		int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
-		if (waterHeight != NO_HEIGHT)
-		{
-			int dy = item->Pose.Position.y - waterHeight;
-			if (dy < 2048)
-			{
-				SplashSetup.y = waterHeight;
-				SplashSetup.x = item->Pose.Position.x;
-				SplashSetup.z = item->Pose.Position.z;
-				SplashSetup.innerRadius = 160;
-				SplashSetup.splashPower = 2048 - dy;
-
-				SetupSplash(&SplashSetup, item->RoomNumber);
-			}
-		}
-	}
-}
-
-void SomeSparkEffect(int x, int y, int z, int count)
-{
-	for (int i = 0; i < count; i++)
-	{
-		auto* spark = GetFreeParticle();
-
-		spark->on = 1;
-		spark->sR = 112;
-		spark->sG = (GetRandomControl() & 0x1F) + -128;
-		spark->sB = (GetRandomControl() & 0x1F) + -128;
-		spark->colFadeSpeed = 4;
-		spark->fadeToBlack = 8;
-		spark->life = 24;
-		spark->dR = spark->sR >> 1;
-		spark->dG = spark->sG >> 1;
-		spark->dB = spark->sB >> 1;
-		spark->sLife = 24;
-		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
-		spark->friction = 5;
-		int random = GetRandomControl() & 0xFFF;
-		spark->xVel = -128 * phd_sin(random << 4);
-		spark->yVel = -640 - (byte)GetRandomControl();
-		spark->zVel = 128 * phd_cos(random << 4);
-		spark->flags = 0;
-		spark->x = x + (spark->xVel >> 3);
-		spark->y = y - (spark->yVel >> 5);
-		spark->z = z + (spark->zVel >> 3);
-		spark->maxYvel = 0;
-		spark->gravity = (GetRandomControl() & 0xF) + 64;
 	}
 }
 

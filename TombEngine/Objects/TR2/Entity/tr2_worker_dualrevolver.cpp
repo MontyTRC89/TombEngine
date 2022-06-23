@@ -45,7 +45,7 @@ void WorkerDualGunControl(short itemNumber)
 		if (item->Animation.ActiveState != 11)
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 32;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = 11;
 		}
 	}

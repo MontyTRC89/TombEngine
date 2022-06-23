@@ -33,7 +33,7 @@ namespace TEN::Entities::Generic
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* poleItem = &g_Level.Items[itemNumber];
 
-		bool isLara = !poleItem->Data.is<LaraInfo*>();
+		bool isLara = !poleItem->IsLara();
 
 		if (TrInput & IN_ACTION && isLara &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -50,7 +50,7 @@ namespace TEN::Entities::Generic
 				{
 					laraItem->Animation.AnimNumber = LA_STAND_TO_POLE;
 					laraItem->Animation.ActiveState = LS_POLE_IDLE;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 				}
@@ -89,14 +89,14 @@ namespace TEN::Entities::Generic
 						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 10;
 						AlignLaraPosition(&PolePosR, poleItem, laraItem);
 						laraItem->Animation.AnimNumber = LA_REACH_TO_POLE;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					}
 					else
 					{
 						PolePosR.y = laraItem->Pose.Position.y - poleItem->Pose.Position.y + 66;
 						AlignLaraPosition(&PolePosR, poleItem, laraItem);
 						laraItem->Animation.AnimNumber = LA_JUMP_UP_TO_POLE;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					}
 
 					laraItem->Animation.ActiveState = LS_POLE_IDLE;

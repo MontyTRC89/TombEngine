@@ -42,7 +42,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = GUIDE_STATE_IDLE;
 		item->Animation.ActiveState = GUIDE_STATE_IDLE;
 
@@ -91,8 +91,8 @@ namespace TEN::Entities::TR4
 
 			if (item->Animation.AnimNumber == object->animIndex + 61)
 			{
-				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 32 &&
-					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 42)
+				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 32 &&
+					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
 				{
 					TriggerFireFlame(
 						(random & 0x3F) + pos.x - 32,
@@ -440,7 +440,7 @@ namespace TEN::Entities::TR4
 
 			GetJointAbsPosition(item, &pos1, GuideBite2.meshNum);
 
-			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			random = GetRandomControl();
 
 			if (frameNumber == 32)
@@ -554,8 +554,8 @@ namespace TEN::Entities::TR4
 			{
 				if (enemy)
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15 &&
-						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 26)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
+						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 					{
 						dx = abs(enemy->Pose.Position.x - item->Pose.Position.x);
 						dy = abs(enemy->Pose.Position.y - item->Pose.Position.y);
@@ -626,13 +626,13 @@ namespace TEN::Entities::TR4
 			break;
 
 		case GUIDE_STATE_PICKUP_TORCH:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				someFlag = true;
 
 				item->Pose = enemy->Pose;
 			}
-			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 35)
+			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 35)
 			{
 				item->MeshSwapBits &= 0xFFFBFFFF;
 
@@ -672,11 +672,11 @@ namespace TEN::Entities::TR4
 			break;
 
 		case 38:
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 				item->Pose.Position = enemy->Pose.Position;
 			else
 			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 42)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
 				{
 					TestTriggers(item, true);
 
@@ -687,7 +687,7 @@ namespace TEN::Entities::TR4
 					creature->Enemy = nullptr;
 					break;
 				}
-				else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 42)
+				else if (item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 42)
 				{
 					if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))
 					{
@@ -702,9 +702,9 @@ namespace TEN::Entities::TR4
 			break;
 
 		case 39:
-			if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20)
+			if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 				{
 					item->Animation.TargetState = GUIDE_STATE_IDLE;
 
@@ -717,7 +717,7 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase + 70 && item->RoomNumber == 70)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 70 && item->RoomNumber == 70)
 				{
 					item->Animation.RequiredState = GUIDE_STATE_RUN;
 					item->MeshSwapBits |= 0x200000;

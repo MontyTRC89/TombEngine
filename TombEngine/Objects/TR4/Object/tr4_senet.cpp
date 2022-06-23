@@ -437,7 +437,7 @@ void GameSticksCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			if (MoveLaraPosition(&GameStixPosition, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_SENET_ROLL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[LA_SENET_ROLL].frameBase;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
 				Lara.Control.IsMoving = false;
 				Lara.ExtraTorsoRot = { 0, 0, 0 };

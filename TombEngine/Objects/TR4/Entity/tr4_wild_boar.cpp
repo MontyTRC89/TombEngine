@@ -17,6 +17,8 @@ namespace TEN::Entities::TR4
 
 	constexpr auto WILD_BOAR_ATTACK_DAMAGE = 30;
 
+	constexpr auto WILD_BOAR_ATTACK_RANGE = SECTOR(64);
+
 	enum WildBoarState
 	{
 		BOAR_STATE_NONE = 0,
@@ -47,7 +49,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + BOAR_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = BOAR_STATE_IDLE;
 		item->Animation.TargetState = BOAR_STATE_IDLE;
 	}
@@ -165,7 +167,7 @@ namespace TEN::Entities::TR4
 					joint2 = -AI.distance;
 				}
 
-				if (!item->Flags && (AI.distance < SECTOR(64) && AI.bite))
+				if (!item->Flags && (AI.distance < WILD_BOAR_ATTACK_RANGE && AI.bite))
 				{
 					item->Animation.TargetState = BOAR_STATE_ATTACK;
 
@@ -193,7 +195,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState != BOAR_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = Objects[ID_WILD_BOAR].animIndex + BOAR_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BOAR_STATE_DEATH;
 			}
 		}

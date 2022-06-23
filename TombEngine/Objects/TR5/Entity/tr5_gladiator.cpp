@@ -34,7 +34,7 @@ void InitialiseGladiator(short itemNumber)
     ClearItem(itemNumber);
 
     item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+    item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
     item->Animation.TargetState = 1;
     item->Animation.ActiveState = 1;
 
@@ -63,7 +63,7 @@ void ControlGladiator(short itemNumber)
 		{
 			item->Animation.AnimNumber = Objects[ID_GLADIATOR].animIndex + 16;
 			item->Animation.ActiveState = 6;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 	else
@@ -305,7 +305,7 @@ void ControlGladiator(short itemNumber)
 			else
 				item->Pose.Orientation.y += AI.angle;
 
-			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 10)
+			if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 			{
 				auto* room = &g_Level.Rooms[item->RoomNumber];
 

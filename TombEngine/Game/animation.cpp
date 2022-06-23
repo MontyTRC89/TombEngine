@@ -122,7 +122,7 @@ void AnimateLara(ItemInfo* item)
 						(condition == SoundEnvironment::Land && (lara->WaterSurfaceDist >= -SHALLOW_WATER_START_LEVEL || lara->WaterSurfaceDist == NO_HEIGHT)) ||
 						(condition == SoundEnvironment::Water && lara->WaterSurfaceDist <  -SHALLOW_WATER_START_LEVEL && lara->WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, item)))
 					{
-						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, condition);
+						SoundEffect(cmd[1] & 0x3FFF, &item->Pose, SoundEnvironment::Always);
 					}
 				}
 
@@ -148,7 +148,7 @@ void AnimateLara(ItemInfo* item)
 		}
 	}
 
-	item->Animation.LateralVelocity = (anim->LateralVelocityStart + anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->FrameBase)) / 65536;
+	item->Animation.LateralVelocity = (anim->LateralVelocityStart + anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase)) / 65536;
 
 	if (item->Animation.Airborne)
 	{
@@ -171,7 +171,7 @@ void AnimateLara(ItemInfo* item)
 		}
 		else
 		{
-			float velocity = anim->VelocityStart + anim->VelocityEnd * (item->Animation.FrameNumber - anim->FrameBase - 1);
+			float velocity = anim->VelocityStart + anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase - 1);
 			item->Animation.Velocity -= velocity / 65536;
 			item->Animation.Velocity += (velocity + anim->VelocityEnd) / 65536;
 			item->Animation.VerticalVelocity += item->Animation.VerticalVelocity >= 128 ? 1 : GRAVITY;
@@ -181,9 +181,9 @@ void AnimateLara(ItemInfo* item)
 	else
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-			item->Animation.Velocity = (anim->VelocityStart / 2 + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->FrameBase)) / 4) / 65536;
+			item->Animation.Velocity = (anim->VelocityStart / 2 + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase)) / 4) / 65536;
 		else
-			item->Animation.Velocity = (anim->VelocityStart + anim->VelocityEnd * (item->Animation.FrameNumber - anim->FrameBase)) / 65536;
+			item->Animation.Velocity = (anim->VelocityStart + anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase)) / 65536;
 
 		item->Pose.Position.y += lara->ExtraVelocity.y;
 	}
@@ -344,8 +344,8 @@ void AnimateItem(ItemInfo* item)
 	}
 	else
 	{
-		item->Animation.Velocity = (anim->VelocityStart + (item->Animation.FrameNumber - anim->FrameBase) * anim->VelocityEnd) / 65536;
-		item->Animation.LateralVelocity = (anim->LateralVelocityStart + anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->FrameBase)) / 65536;
+		item->Animation.Velocity = (anim->VelocityStart + (item->Animation.FrameNumber - anim->frameBase) * anim->VelocityEnd) / 65536;
+		item->Animation.LateralVelocity = (anim->LateralVelocityStart + anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase)) / 65536;
 	}
 	
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0, item->Animation.LateralVelocity);
@@ -420,7 +420,7 @@ void SetAnimation(ItemInfo* item, int animIndex, int frameToStart)
 		return;
 
 	item->Animation.AnimNumber = index;
-	item->Animation.FrameNumber = g_Level.Anims[index].FrameBase + frameToStart;
+	item->Animation.FrameNumber = g_Level.Anims[index].frameBase + frameToStart;
 	item->Animation.ActiveState = g_Level.Anims[index].ActiveState;
 	item->Animation.TargetState = item->Animation.ActiveState;
 }
@@ -495,7 +495,7 @@ int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
 	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->FramePtr];
 	int rate2 = *rate = anim->Interpolation & 0x00ff;
-	frame -= anim->FrameBase; 
+	frame -= anim->frameBase; 
 
 	int first = frame / rate2;
 	int interpolation = frame % rate2;
@@ -526,7 +526,7 @@ int GetFrameNumber(ItemInfo* item, int frameToStart)
 
 int GetFrameNumber(int objectID, int animNumber, int frameToStart)
 {
-	return (g_Level.Anims[Objects[objectID].animIndex + animNumber].FrameBase + frameToStart);
+	return (g_Level.Anims[Objects[objectID].animIndex + animNumber].frameBase + frameToStart);
 }
 
 int GetFrameCount(int animNumber)
@@ -535,7 +535,7 @@ int GetFrameCount(int animNumber)
 		return 0;
 
 	int end  = g_Level.Anims[animNumber].FrameEnd;
-	int base = g_Level.Anims[animNumber].FrameBase;
+	int base = g_Level.Anims[animNumber].frameBase;
 	return (end - base);
 }
 

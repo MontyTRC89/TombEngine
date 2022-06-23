@@ -12,7 +12,6 @@
 #include "Specific/trmath.h"
 #include "Renderer/Renderer11.h"
 
-using std::vector;
 using namespace TEN::Floordata;
 using namespace TEN::Renderer;
 
@@ -22,15 +21,14 @@ void ShiftItem(ItemInfo* item, CollisionInfo* coll)
 	coll->Shift = Vector3Int();
 }
 
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapYRot)
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier, bool snapToAngle)
 {
-	if (snapYRot)
-		item->Pose.Orientation.y = coll->NearestLedgeAngle;
-
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.z = 0;
-	item->Pose.Position.x += round(phd_sin(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(phd_cos(coll->NearestLedgeAngle) * (coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier)));
+	TranslateItem(item, coll->NearestLedgeAngle, coll->NearestLedgeDistance + (coll->Setup.Radius * offsetMultiplier));
+	item->Pose.Orientation = Vector3Shrt(
+		0,
+		snapToAngle ? coll->NearestLedgeAngle : item->Pose.Orientation.y,
+		0
+	);
 }
 
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier)
@@ -39,13 +37,12 @@ void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float off
 	coll->Setup.ForwardAngle = angle;
 
 	float distance;
-	auto angle2 = GetNearestLedgeAngle(item, coll, distance);
+	auto ledgeAngle = GetNearestLedgeAngle(item, coll, distance);
 
 	coll->Setup.ForwardAngle = backup;
 
-	item->Pose.Orientation = Vector3Shrt(0, angle2, 0);
-	item->Pose.Position.x += round(phd_sin(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
-	item->Pose.Position.z += round(phd_cos(angle2) * (distance + (coll->Setup.Radius * offsetMultiplier)));
+	TranslateItem(item, ledgeAngle, distance + (coll->Setup.Radius * offsetMultiplier));
+	item->Pose.Orientation = Vector3Shrt(0, ledgeAngle, 0);
 }
 
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll)
@@ -117,19 +114,27 @@ bool TestItemRoomCollisionAABB(ItemInfo* item)
 // Overload used to quickly get point/room collision parameters at a given item's position.
 CollisionResult GetCollision(ItemInfo* item)
 {
-	auto room = item->RoomNumber;
-	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &room);
-	auto result = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
+	auto newRoomNumber = item->RoomNumber;
+	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &newRoomNumber);
+	auto probe = GetCollision(floor, item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 
-	result.RoomNumber = room;
-	return result;
+	probe.RoomNumber = newRoomNumber;
+	return probe;
 }
 
 // Overload used to probe point/room collision parameters from a given item's position.
 CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical, float lateral)
 {
+	short tempRoomNumber = item->RoomNumber;
+
+	// TODO: Find cleaner solution. Constructing a Location for Lara on the spot can result in a stumble when climbing onto thin platforms. @Sezz 2022.06.14
+	auto location =
+		item->IsLara() ?
+		item->Location :
+		ROOM_VECTOR{ GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &tempRoomNumber)->Room, item->Pose.Position.y };
+
 	auto point = TranslateVector(item->Pose.Position, angle, forward, vertical, lateral);
-	int adjacentRoomNumber = GetRoom(item->Location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
+	int adjacentRoomNumber = GetRoom(location, item->Pose.Position.x, point.y, item->Pose.Position.z).roomNumber;
 	return GetCollision(point.x, point.y, point.z, adjacentRoomNumber);
 }
 
@@ -214,7 +219,7 @@ void GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bo
 {
 	// Player collision has several more precise checks for bridge collisions.
 	// Therefore, we should differentiate these code paths.
-	bool playerCollision = item->Data.is<LaraInfo*>();
+	bool playerCollision = item->IsLara();
 
 	// Reset collision parameters.
 	coll->CollisionType = CT_NONE;
@@ -868,6 +873,10 @@ int GetQuadrant(short angle)
 
 short GetNearestLedgeAngle(ItemInfo* item, CollisionInfo* coll, float& distance)
 {
+	// Calculation ledge angle for non-Lara objects is unnecessary.
+	if (!item->IsLara())
+		return 0; 
+
 	// Get item bounds and current rotation
 	auto bounds = GetBoundsAccurate(item);
 	auto c = phd_cos(coll->Setup.ForwardAngle);

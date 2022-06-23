@@ -22,7 +22,7 @@ void HammerControl(short itemNumber)
         *((int*)&item->itemFlags[0]) = 0;
     }
 
-    int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].FrameBase;
+    int frameNumber = item->frameNumber - g_Level.Anims[item->animNumber].frameBase;
    
     if (!item->triggerFlags)
     {

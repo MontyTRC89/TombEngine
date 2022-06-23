@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 		item->Animation.TargetState = 1;
 		item->Animation.ActiveState = 1;
 		item->Animation.AnimNumber = objectInfo->animIndex;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void JeanYvesControl(short itemNumber)
@@ -56,7 +56,7 @@ namespace TEN::Entities::TR4
 			state++;
 
 			item->Animation.AnimNumber = animNumber;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = state;
 			item->Animation.TargetState = state;
 			item->TriggerFlags = Lara.HighestLocation;
