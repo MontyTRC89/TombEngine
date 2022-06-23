@@ -66,6 +66,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOUNT_UNDERWATER_SOUND_FRAME = 30;
 	constexpr auto MOUNT_UNDERWATER_CONTROL_FRAME = 42;
 
+	#define UPV_X_TURN_RATE_DIVE_ACCEL ANGLE(5.0f)
 	#define UPV_X_TURN_RATE_SLOW_ACCEL ANGLE(1.0f)
 	#define UPV_X_TURN_RATE_ACCEL	   ANGLE(2.0f)
 	#define UPV_X_TURN_RATE_FRICTION   ANGLE(1.0f)
@@ -76,9 +77,7 @@ namespace TEN::Entities::Vehicles
 	#define UPV_Y_TURN_RATE_FRICTION   ANGLE(0.08f)
 	#define UPV_Y_TURN_RATE_MAX		   ANGLE(2.5f)
 
-	#define UPV_X_TURN_RATE_DIVE ANGLE(5.0f)
-	#define UPV_X_ORIENT_DIVE	 ANGLE(15.0f)
-
+	#define UPV_X_DIVE_ORIENT_MAX	   ANGLE(15.0f)
 	#define UPV_X_ORIENT_MAX		   ANGLE(85.0f)
 	#define UPV_X_ORIENT_WATER_SURFACE ANGLE(30.0f)
 
@@ -574,7 +573,7 @@ namespace TEN::Entities::Vehicles
 			{
 				if (TrInput & VEHICLE_IN_UP &&
 					UPV->Flags & UPV_FLAG_SURFACE &&
-					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE)
+					UPVItem->Pose.Orientation.x > -UPV_X_DIVE_ORIENT_MAX)
 				{
 					UPV->Flags |= UPV_FLAG_DIVE;
 				}
@@ -649,7 +648,7 @@ namespace TEN::Entities::Vehicles
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
 				if (TrInput & VEHICLE_IN_UP &&
-					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE &&
+					UPVItem->Pose.Orientation.x > -UPV_X_DIVE_ORIENT_MAX &&
 					UPV->Flags & UPV_FLAG_SURFACE)
 				{
 					UPV->Flags |= UPV_FLAG_DIVE;
@@ -796,8 +795,8 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Flags & UPV_FLAG_DIVE)
 		{
-			if (UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE)
-				UPVItem->Pose.Orientation.x -= UPV_X_TURN_RATE_DIVE;
+			if (UPVItem->Pose.Orientation.x > -UPV_X_DIVE_ORIENT_MAX)
+				UPVItem->Pose.Orientation.x -= UPV_X_TURN_RATE_DIVE_ACCEL;
 			else
 				UPV->Flags &= ~UPV_FLAG_DIVE;
 		}
