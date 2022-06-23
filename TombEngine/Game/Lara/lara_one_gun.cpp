@@ -1732,7 +1732,7 @@ void FireHK(ItemInfo* laraItem, int mode)
 		TriggerGunShell(1, ID_GUNSHELL, LaraWeaponType::HK);
 		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::HK].FlashTime;
 
-		Rumble(0.3f, 0.2f);
+		Rumble(0.2f, 0.1f);
 	}
 }
 
