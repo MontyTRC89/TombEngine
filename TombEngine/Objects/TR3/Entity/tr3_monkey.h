@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseMonkey(short itemNumber);
-void MonkeyControl(short itemNumber);
+namespace TEN::Entities::TR3
+{
+	void InitialiseMonkey(short itemNumber);
+	void MonkeyControl(short itemNumber);
+}

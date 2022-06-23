@@ -224,7 +224,7 @@ void LaserHeadControl(short itemNumber)
 						tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].FrameEnd &&
 						tentacleItem->MeshBits & 1)
 					{
-						SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
+						SoundEffect(SFX_TR5_SMASH_ROCK2, &item->Pose);
 						ExplodeItemNode(tentacleItem, 0, 0, 128);
 						KillItem(creature->Tentacles[i]);
 					}

@@ -4,7 +4,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FloorInfo;
+class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
@@ -123,8 +123,8 @@ struct CollisionInfo
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
 CollisionResult GetCollision(ItemInfo* item);
-CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical = 0, float lateral = 0);
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float vertical = 0, float lateral = 0);
+CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
@@ -148,7 +148,7 @@ int GetWaterHeight(ItemInfo* item);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapToAngle = true);
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 

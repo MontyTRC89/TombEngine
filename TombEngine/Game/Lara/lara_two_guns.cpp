@@ -331,8 +331,8 @@ void ReadyPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
-	lara->RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->LeftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->RightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
 }
 
 void DrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
@@ -462,7 +462,7 @@ void SetArmInfo(ItemInfo* laraItem, ArmInfo* arm, int frame)
 		arm->AnimNumber = animBase + 3;
 
 	arm->FrameNumber = frame;
-	arm->FrameBase = g_Level.Anims[arm->AnimNumber].FramePtr;
+	arm->frameBase = g_Level.Anims[arm->AnimNumber].FramePtr;
 }
 
 void DrawPistolMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)

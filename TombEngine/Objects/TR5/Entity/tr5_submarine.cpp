@@ -3,17 +3,18 @@
 #include "Game/items.h"
 #include "Game/control/box.h"
 #include "Game/people.h"
+#include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/control/los.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/itemdata/creature_info.h"
 #include "Game/animation.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
-#include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "Game/itemdata/creature_info.h"
-#include "Game/collision/collide_item.h"
-#include "Game/control/los.h"
 
 static void TriggerSubmarineSparks(short itemNumber)
 {
@@ -169,7 +170,7 @@ void InitialiseSubmarine(short itemNumber)
 
 	ClearItem(itemNumber);
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = 0;
 	item->Animation.ActiveState = 0;
 

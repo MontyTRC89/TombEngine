@@ -19,7 +19,7 @@ void InitialiseInvisibleGhost(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = 1;
 	item->Animation.ActiveState = 1;
 	item->Pose.Position.y += CLICK(2);
@@ -82,7 +82,7 @@ void InvisibleGhostControl(short itemNumber)
 		item->Animation.ActiveState <= 3 &&
 		!creature->Flags &&
 		item->TouchBits & 0x9470 &&
-		item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 18)
+		item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
 	{
 		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 		creature->Flags = 1;

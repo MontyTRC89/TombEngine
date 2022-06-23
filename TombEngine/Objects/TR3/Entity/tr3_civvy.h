@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseCivvy(short itemNumber);
-void CivvyControl(short itemNumber);
+namespace TEN::Entities::TR3
+{
+	void InitialiseCivvy(short itemNumber);
+	void CivvyControl(short itemNumber);
+}

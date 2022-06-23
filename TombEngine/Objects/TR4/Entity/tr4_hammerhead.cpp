@@ -10,10 +10,12 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO HammerheadBite = { 0, 0, 0, 12 };
-	const std::vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
+	const vector<int> HammerheadBiteAttackJoints = { 10, 12, 13 };
 
 	constexpr auto HAMMERHEAD_BITE_ATTACK_DAMAGE = 120;
 
@@ -59,7 +61,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMERHEAD_ANIM_IDLE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = HAMMERHEAD_STATE_IDLE;
 		item->Animation.TargetState = HAMMERHEAD_STATE_IDLE;
 	}
@@ -158,7 +160,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HAMMERHEAD_ANIM_DEATH_START;
 					item->Animation.ActiveState = HAMMERHEAD_STATE_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.FrameNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.FrameNumber].frameBase;
 				}
 
 				CreatureFloat(itemNumber);

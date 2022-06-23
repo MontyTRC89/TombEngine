@@ -676,8 +676,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 	{
 	case LaraWeaponType::Pistol:
 	case LaraWeaponType::Uzi:
-		lara->RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-		lara->LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		lara->RightArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		lara->LeftArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 
 		if (lara->Control.HandStatus != HandStatus::Free)
 			DrawPistolMeshes(laraItem, lara->Control.Weapon.GunType);
@@ -690,8 +690,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 	case LaraWeaponType::GrenadeLauncher:
 	case LaraWeaponType::HarpoonGun:
 	case LaraWeaponType::RocketLauncher:
-		lara->RightArm.FrameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
-		lara->LeftArm.FrameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
+		lara->RightArm.frameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
+		lara->LeftArm.frameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
 
 		if (lara->Control.HandStatus != HandStatus::Free)
 			DrawShotgunMeshes(laraItem, lara->Control.Weapon.GunType);
@@ -699,8 +699,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	case LaraWeaponType::Flare:
-		lara->RightArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
-		lara->LeftArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		lara->RightArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		lara->LeftArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 
 		if (lara->Control.HandStatus != HandStatus::Free)
 			DrawFlareMeshes(laraItem);
@@ -708,8 +708,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	default:
-		lara->RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
-		lara->LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
+		lara->RightArm.frameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
+		lara->LeftArm.frameBase = g_Level.Anims[laraItem->Animation.AnimNumber].FramePtr;
 		break;
 	}
 }

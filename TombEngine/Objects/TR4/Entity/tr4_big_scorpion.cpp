@@ -12,17 +12,20 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	int CutSeqNum;
 
 	BITE_INFO BigScorpionBite1 = { 0, 0, 0, 8 };
 	BITE_INFO BigScorpionBite2 = { 0, 0, 0, 23 };
-	const std::vector<int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
+	const vector<int> BigScorpionAttackJoints = { 8, 20, 21, 23, 24 };
 
 	constexpr auto BIG_SCORPION_ATTACK_DAMAGE = 120;
 	constexpr auto BIG_SCORPION_TROOP_ATTACK_DAMAGE = 15;
 	constexpr auto BIG_SCORPION_STINGER_POISON_POTENCY = 8;
+
 	constexpr auto BIG_SCORPION_ATTACK_RANGE = SECTOR(1.35);
 
 	enum BigScorpionState
@@ -69,7 +72,7 @@ namespace TEN::Entities::TR4
 			item->Animation.AnimNumber = Objects[ID_BIG_SCORPION].animIndex + BSCORPION_ANIM_IDLE;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void ScorpionControl(short itemNumber)
@@ -137,7 +140,7 @@ namespace TEN::Entities::TR4
 
 					item->Animation.AnimNumber = Objects[item->Animation.AnimNumber].animIndex + BSCORPION_ANIM_DEATH;
 					item->Animation.ActiveState = BSCORPION_STATE_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Status = ITEM_INVISIBLE;
 					creature->MaxTurn = 0;
 
@@ -162,7 +165,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + BSCORPION_ANIM_DEATH;
 					item->Animation.ActiveState = BSCORPION_STATE_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 			}
 			else if (CutSeqNum == 4)

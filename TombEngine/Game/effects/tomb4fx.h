@@ -239,3 +239,5 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);
+void TriggerUnderwaterExplosion(ItemInfo* item, int flag);
+void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle);

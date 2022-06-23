@@ -246,7 +246,7 @@ void LoadObjects()
 		anim->VelocityEnd = ReadInt32();
 		anim->LateralVelocityStart = ReadInt32();
 		anim->LateralVelocityEnd = ReadInt32();
-		anim->FrameBase = ReadInt32();
+		anim->frameBase = ReadInt32();
 		anim->FrameEnd = ReadInt32();
 		anim->jumpAnimNum = ReadInt32();
 		anim->jumpFrameNum = ReadInt32();
@@ -844,6 +844,7 @@ void FreeLevel()
 	g_Level.SoundSources.resize(0);
 	g_Level.AIObjects.resize(0);
 	g_Level.LuaFunctionNames.resize(0);
+	g_Level.Items.resize(0);
 
 	for (int i = 0; i < 2; i++)
 	{

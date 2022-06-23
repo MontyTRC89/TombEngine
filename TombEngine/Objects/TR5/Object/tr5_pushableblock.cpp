@@ -196,7 +196,7 @@ void PushableBlockControl(short itemNumber)
 	{
 	case LA_PUSHABLE_PUSH:
 
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase)
+		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{
 			RemoveFromStack(itemNumber);
 			RemoveBridgeStack(itemNumber);
@@ -282,7 +282,7 @@ void PushableBlockControl(short itemNumber)
 
 	case LA_PUSHABLE_PULL:
 
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase)
+		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase)
 		{
 			RemoveFromStack(itemNumber);
 			RemoveBridgeStack(itemNumber);
@@ -349,8 +349,8 @@ void PushableBlockControl(short itemNumber)
 
 	case LA_PUSHABLE_PUSH_TO_STAND:
 	case LA_PUSHABLE_PULL_TO_STAND:
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LA_PUSHABLE_PUSH_TO_STAND].FrameBase ||
-			LaraItem->Animation.FrameNumber == g_Level.Anims[LA_PUSHABLE_PULL_TO_STAND].FrameBase)
+		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LA_PUSHABLE_PUSH_TO_STAND].frameBase ||
+			LaraItem->Animation.FrameNumber == g_Level.Anims[LA_PUSHABLE_PULL_TO_STAND].frameBase)
 		{
 			item->Pose.Position.x = item->Pose.Position.x & 0xFFFFFE00 | 0x200;
 			item->Pose.Position.z = item->Pose.Position.z & 0xFFFFFE00 | 0x200;
@@ -396,7 +396,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 		(!laraInfo->Control.IsMoving || laraInfo->InteractedItem != itemNumber))
 	{
 		if ((laraItem->Animation.ActiveState != LS_PUSHABLE_GRAB ||
-			(laraItem->Animation.FrameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].FrameBase + 19) ||
+			(laraItem->Animation.FrameNumber != g_Level.Anims[LA_PUSHABLE_GRAB].frameBase + 19) ||
 			laraInfo->NextCornerPos.Position.x != itemNumber))
 		{
 			if (!pushableInfo->hasFloorCeiling)
@@ -491,7 +491,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 				laraItem->Pose.Orientation.z = pushableItem->Pose.Orientation.z;
 
 				laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = LS_PUSHABLE_GRAB;
 				laraItem->Animation.TargetState = LS_PUSHABLE_GRAB;
 				laraInfo->Control.IsMoving = false;
@@ -504,7 +504,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 				if (MoveLaraPosition(&PushableBlockPos, pushableItem, laraItem))
 				{
 					laraItem->Animation.AnimNumber = LA_PUSHABLE_GRAB;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraItem->Animation.ActiveState = LS_PUSHABLE_GRAB;
 					laraItem->Animation.TargetState = LS_PUSHABLE_GRAB;
 					laraInfo->Control.IsMoving = false;

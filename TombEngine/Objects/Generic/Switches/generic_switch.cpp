@@ -131,7 +131,7 @@ namespace TEN::Entities::Switches
 					}
 
 					ResetLaraFlex(laraItem);
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 					laraInfo->Control.IsMoving = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 

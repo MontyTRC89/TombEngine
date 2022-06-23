@@ -69,7 +69,7 @@ namespace TEN::Entities::TR1
 			if (item->Animation.ActiveState != MUTANT_STATE_DEATH)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_DEATH;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = MUTANT_STATE_DEATH;
 			}
 		}
@@ -201,7 +201,7 @@ namespace TEN::Entities::TR1
 					Camera.flags = CF_FOLLOW_CENTER;
 
 					LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_GIANT_MUTANT_DEATH;
-					LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].FrameBase;
+					LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 					LaraItem->Animation.ActiveState = LaraItem->Animation.TargetState = 46;
 					LaraItem->RoomNumber = item->RoomNumber;
 					LaraItem->Pose.Position.x = item->Pose.Position.x;

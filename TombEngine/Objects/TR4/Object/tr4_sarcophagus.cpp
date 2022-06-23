@@ -44,7 +44,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 			{
 				laraItem->Animation.AnimNumber = LA_PICKUP_SARCOPHAGUS;
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				sarcItem->Flags |= IFLAG_ACTIVATION_MASK;
 
 				AddActiveItem(itemNumber);
@@ -67,7 +67,7 @@ void SarcophagusCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 		}
 	}
 	else if (laraItem->Animation.AnimNumber != LA_PICKUP_SARCOPHAGUS ||
-		laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].FrameBase + 113)
+		laraItem->Animation.FrameNumber != g_Level.Anims[LA_PICKUP_SARCOPHAGUS].frameBase + 113)
 	{
 		ObjectCollision(itemNumber, laraItem, coll);
 	}

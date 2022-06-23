@@ -25,7 +25,7 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 			if (TriggerActive(ballItem) && (ballItem->ItemFlags[0] || ballItem->Animation.VerticalVelocity))
 			{
 				laraItem->Animation.AnimNumber = LA_BOULDER_DEATH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.TargetState = LS_DEATH;
 				laraItem->Animation.ActiveState = LS_DEATH;
 				laraItem->Animation.Airborne = false;
@@ -60,7 +60,10 @@ void RollingBallControl(short itemNumber)
 				pow(Camera.pos.z - item->Pose.Position.z, 2));
 
 			if (distance < 16384)
+			{
 				Camera.bounce = -(((16384 - distance) * abs(item->Animation.VerticalVelocity)) / 16384);
+				SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
+			}
 		}
 
 		if ((item->Pose.Position.y - dh) < CLICK(2))
@@ -316,7 +319,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 				lara->Pose.Orientation.z = 0;	
 
 				lara->Animation.AnimNumber = LA_BOULDER_DEATH;
-				lara->Animation.FrameNumber = g_Level.Anims[lara->Animation.AnimNumber].FrameBase;
+				lara->Animation.FrameNumber = g_Level.Anims[lara->Animation.AnimNumber].frameBase;
 				lara->Animation.ActiveState = LS_BOULDER_DEATH;
 				lara->Animation.TargetState = LS_BOULDER_DEATH;
 						
@@ -450,7 +453,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->Animation.ActiveState = 0;
 			item->Animation.TargetState = 0;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = g_Level.Anims[item->Animation.AnimNumber].ActiveState; 
 			item->Animation.TargetState = g_Level.Anims[item->Animation.AnimNumber].ActiveState;
 			item->Animation.RequiredState = 0;

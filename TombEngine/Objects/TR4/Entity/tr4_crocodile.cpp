@@ -13,13 +13,15 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_room.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
-	static BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
-	const std::vector<int> CrocodileBiteAttackJoints = { 8, 9 };
+	BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
+	const vector<int> CrocodileBiteAttackJoints = { 8, 9 };
 
 	constexpr auto CROC_SWIM_SPEED = 16;
-	constexpr auto CROC_DAMAGE = 120;
+	constexpr auto CROC_ATTACK_DAMAGE = 120;
 
 	constexpr auto CROC_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
@@ -78,14 +80,14 @@ namespace TEN::Entities::TR4
 		if (TestEnvironment(ENV_FLAG_WATER, item))
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CROC_ANIM_SWIM_FORWARD;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = CROC_STATE_SWIM_FORWARD;
 			item->Animation.TargetState = CROC_STATE_SWIM_FORWARD;
 		}
 		else
 		{
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CROC_ANIM_IDLE;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = CROC_STATE_IDLE;
 			item->Animation.TargetState = CROC_STATE_IDLE;
 		}
@@ -141,7 +143,7 @@ namespace TEN::Entities::TR4
 				if (TestEnvironment(ENV_FLAG_WATER, item))
 				{
 					item->Animation.AnimNumber = object->animIndex + CROC_ANIM_WATER_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.ActiveState = CROC_STATE_WATER_DEATH;
 					item->Animation.TargetState = CROC_STATE_WATER_DEATH;
 					item->HitPoints = NOT_TARGETABLE;
@@ -149,7 +151,7 @@ namespace TEN::Entities::TR4
 				else
 				{
 					item->Animation.AnimNumber = object->animIndex + CROC_ANIM_LAND_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.ActiveState = CROC_STATE_DEATH;
 					item->Animation.TargetState = CROC_STATE_DEATH;
 				}
@@ -263,7 +265,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_BITE_ATTACK:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					item->Animation.RequiredState = 0;
 
 				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
@@ -273,7 +275,7 @@ namespace TEN::Entities::TR4
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
 						item->Animation.RequiredState = CROC_STATE_IDLE;
 
-						LaraItem->HitPoints -= CROC_DAMAGE;
+						LaraItem->HitPoints -= CROC_ATTACK_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
 				}
@@ -289,7 +291,7 @@ namespace TEN::Entities::TR4
 				if (!CrocodileIsInWater(item))
 				{
 					item->Animation.AnimNumber = object->animIndex + CROC_ANIM_WATER_TO_LAND;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.RequiredState = CROC_STATE_WALK_FORWARD;
 					item->Animation.ActiveState = CROC_STATE_WALK_FORWARD;
 					item->Animation.TargetState = CROC_STATE_WALK_FORWARD;
@@ -307,7 +309,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case CROC_STATE_WATER_BITE_ATTACK:
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					item->Animation.RequiredState = CROC_STATE_NONE_1;
 
 				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
@@ -317,7 +319,7 @@ namespace TEN::Entities::TR4
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
 						item->Animation.RequiredState = CROC_STATE_SWIM_FORWARD;
 
-						LaraItem->HitPoints -= CROC_DAMAGE;
+						LaraItem->HitPoints -= CROC_ATTACK_DAMAGE;
 						LaraItem->HitStatus = true;
 					}
 				}

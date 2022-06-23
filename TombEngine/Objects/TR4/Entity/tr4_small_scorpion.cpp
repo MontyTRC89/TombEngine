@@ -10,15 +10,18 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SmallScorpionBiteInfo1 = { 0, 0, 0, 0 };
 	BITE_INFO SmallScorpionBiteInfo2 = { 0, 0, 0, 23 };
-	const std::vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
+	const vector<int> SmallScorpionAttackJoints = { 8, 22, 23, 25, 26 };
 
 	constexpr auto SMALL_SCORPION_PINCER_ATTACK_DAMAGE = 50;
 	constexpr auto SMALL_SCORPION_STINGER_ATTACK_DAMAGE = 20;
 	constexpr auto SMALL_SCORPION_STINGER_POISON_POTENCY = 2;
+
 	constexpr auto SMALL_SCORPION_ATTACK_RANGE = SECTOR(0.31);
 
 	enum SmallScorionState
@@ -45,7 +48,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = SSCORPION_STATE_IDLE;
 		item->Animation.ActiveState = SSCORPION_STATE_IDLE;
 	}
@@ -74,7 +77,7 @@ namespace TEN::Entities::TR4
 				item->Animation.ActiveState != SSCORPION_STATE_DEATH_2)
 			{
 				item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = SSCORPION_STATE_DEATH_1;
 			}
 		}
@@ -153,8 +156,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestBits(JointBitType::Touch, SmallScorpionAttackJoints))
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 20 &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 32)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
 						{
 							
 							LaraItem->HitStatus = true;

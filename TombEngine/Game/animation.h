@@ -40,7 +40,7 @@ struct ANIM_STRUCT
 	float LateralVelocityStart;
 	float LateralVelocityEnd;
 
-	int FrameBase;
+	int frameBase;
 	int FrameEnd;
 
 	int jumpAnimNum;

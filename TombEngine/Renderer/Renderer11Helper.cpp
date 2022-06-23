@@ -11,9 +11,9 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer\RenderView\RenderView.h"
 #include "Objects/TR3/Vehicles/quad.h"
-#include "Objects/TR3/Vehicles/rubberboat.h"
+#include "Objects/TR3/Vehicles/rubber_boat.h"
 #include "Objects/TR3/Vehicles/upv.h"
-#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include <algorithm>
@@ -21,9 +21,9 @@
 #include "Objects/TR3/Vehicles/quad_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
-#include "Objects/TR3/Vehicles/rubberboat_info.h"
+#include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
-#include "Objects/TR3/Vehicles/biggun_info.h"
+#include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Game/items.h"
 
 extern GameConfiguration g_Configuration;
@@ -202,6 +202,8 @@ namespace TEN::Renderer
 			for (int j = 0; j < moveableObj.LinearizedBones.size(); j++)
 			{
 				RendererBone *currentBone = moveableObj.LinearizedBones[j];
+
+				auto oldRotation = currentBone->ExtraRotation;
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
 				nativeItem->Data.apply(
@@ -221,29 +223,39 @@ namespace TEN::Renderer
 						break;
 					case 10:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
-
 						break;
 					case 12:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
-
 						break;
 					case 13:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
-
 						break;
 					}
 				},
 				[&j, &currentBone](MotorbikeInfo& bike)
 				{
-				switch (j)
-				{
+					switch (j)
+					{
 					case 2:
 					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike.wheelRight);
+						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
 						break;
-					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(bike.wheelLeft);
-				}
+					case 8:
+						currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
+						break;
+					}
+				},
+				[&j, &currentBone, &oldRotation](MinecartInfo& cart)
+				{
+					switch (j)
+					{
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+						currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
+						break;
+					}
 				},
 				[&j, &currentBone](RubberBoatInfo& boat)
 				{
@@ -255,10 +267,10 @@ namespace TEN::Renderer
 				if (j == 3)
 					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
 				},
-				[&j, &currentBone](BigGunInfo& biggun)
+				[&j, &currentBone](BigGunInfo& big_gun)
 				{
 				if (j == 2)
-					currentBone->ExtraRotation.z = biggun.BarrelZRotation;
+					currentBone->ExtraRotation.z = big_gun.BarrelZRotation;
 				},
 				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
 				{

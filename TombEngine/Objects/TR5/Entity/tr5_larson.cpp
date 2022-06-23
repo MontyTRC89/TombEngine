@@ -35,7 +35,7 @@ void InitialiseLarson(short itemNum)
 	ClearItem(itemNum);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = STATE_TR5_LARSON_STOP;
 	item->Animation.ActiveState = STATE_TR5_LARSON_STOP;
 
@@ -339,7 +339,7 @@ void LarsonControl(short itemNumber)
 			{
 				item->Pose.Orientation.y += info.angle;
 			}
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				if (item->ObjectNumber == ID_PIERRE)
 				{
@@ -388,7 +388,7 @@ void LarsonControl(short itemNumber)
 		else
 			item->Animation.AnimNumber = Objects[ID_LARSON].animIndex + ANIMATION_TR5_LARSON_DIE;
 		item->Animation.ActiveState = STATE_TR5_LARSON_DIE;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	CreatureTilt(item, tilt);
