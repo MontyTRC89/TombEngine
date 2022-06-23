@@ -167,6 +167,9 @@ namespace TEN::Entities::Vehicles
 			auto pos = Vector3Int{};
 			GetJointAbsPosition(item, &pos, Wheels[(left ? 0 : 2) + i]);
 			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber), item->Pose.Orientation, 512, 10);
+			
+			if (i)
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 2, 190, 100, 0);
 		}
 	}
 
