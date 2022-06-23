@@ -1285,6 +1285,8 @@ void BinocularCamera(ItemInfo* item)
 						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 					}
+
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 				}
 				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
 				{
@@ -1306,6 +1308,8 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
+
+						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 					}
 					else
 					{
@@ -1318,6 +1322,8 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
+
+						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 					}
 				}
 				else
@@ -1345,8 +1351,6 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
-
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 				}
 
 				if (!ammo.hasInfinite())
