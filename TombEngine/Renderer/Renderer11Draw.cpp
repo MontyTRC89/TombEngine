@@ -69,7 +69,7 @@ namespace TEN::Renderer
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
 				//Skip everything thats not "alive" or is not a vehicle
 				
-				if (!(Objects[nativeItem.ObjectNumber].shadowSize))
+				if (!Objects[nativeItem.ObjectNumber].castsShadow)
 					continue;
 				auto bb = GetBoundsAccurate(&nativeItem);
 				Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) + Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
