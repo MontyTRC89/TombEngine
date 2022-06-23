@@ -759,7 +759,7 @@ void ProcessSectorFlags(ItemInfo* item)
 					LavaBurn(item);
 			}
 		}
-		else
+		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
 			item->HitPoints = 0; // TODO: Implement correct behaviour for other objects!
 	}
 }
