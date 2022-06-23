@@ -48,8 +48,10 @@ namespace TEN::Renderer
 		//Collect Shadow Spheres
 		std::array<LARA_MESHES,4> sphereMeshes = {LM_HIPS,LM_TORSO,LM_LFOOT,LM_RFOOT};
 		std::array<float,4> sphereScaleFactors = {6.0f,3.2f,2.8f,2.8f};
+		std::vector<Sphere> nearestSpheres;
+		nearestSpheres.reserve(16);
 		for (auto i = 0; i < sphereMeshes.size(); i++) {
-
+			auto& newSphere = nearestSpheres.emplace_back();
 			MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
 			Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
 			if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT) {
@@ -57,12 +59,12 @@ namespace TEN::Renderer
 				pos.y += 8;
 			}
 			GetLaraJointPosition(&pos, sphereMeshes[i]);
-			m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].position = Vector3(pos.x, pos.y, pos.z);
-			m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].radius = m.sphere.Radius * sphereScaleFactors[i];
-			m_stShadowMap.NumSpheres++;
+			newSphere.position = Vector3(pos.x, pos.y, pos.z);
+			newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
 		}
 
 		for (auto& r : renderView.roomsToDraw) {
+
 			for (auto& i : r->ItemsToDraw) {
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
 				//Skip everything thats not "alive" or is not a vehicle
@@ -73,14 +75,25 @@ namespace TEN::Renderer
 				Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) + Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
 				center.y = nativeItem.Pose.Position.y;
 				float maxExtent = std::max(bb->X2 - bb->X1, bb->Z2 - bb->Z1);
-				m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].position = center;
-				m_stShadowMap.Spheres[m_stShadowMap.NumSpheres].radius = maxExtent;
-				m_stShadowMap.NumSpheres++;
-				if (m_stShadowMap.NumSpheres >= 15)
-					break;
+				auto& newSphere = nearestSpheres.emplace_back();
+				newSphere.position = center;
+				newSphere.radius = maxExtent;
 			}
 		}
+		if (nearestSpheres.size() > 16) {
+			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) {
+				auto& laraPos = LaraItem->Pose.Position;
+				auto laraPosition = Vector3(laraPos.x, laraPos.y, laraPos.z);
+				return Vector3::Distance(laraPosition, a.position) < Vector3::Distance(laraPosition, b.position);
+				});
+			std::copy(nearestSpheres.begin(), nearestSpheres.begin()+16, m_stShadowMap.Spheres);
+			m_stShadowMap.NumSpheres = 16;
 
+		}
+		else {
+			std::copy(nearestSpheres.begin(), nearestSpheres.end(), m_stShadowMap.Spheres);
+			m_stShadowMap.NumSpheres = nearestSpheres.size();
+		}
 		
 		if (shadowLight == nullptr)
 			return;
