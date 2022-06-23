@@ -92,7 +92,7 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->Pose.Orientation.x;
 
-		int velocity = 8 * (WraithVelocity / item->Animation.Velocity);
+		int velocity = (WraithVelocity / item->Animation.Velocity) * 8;
 
 		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
 		{
@@ -263,7 +263,7 @@ namespace TEN::Entities::TR4
 					target->HitPoints = 0;
 
 					if (target->TriggerFlags > 0)
-						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].FrameBase;
+						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].frameBase;
 
 					KillItem(itemNumber);
 				}

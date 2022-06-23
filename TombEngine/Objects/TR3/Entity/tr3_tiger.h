@@ -1,3 +1,6 @@
 #pragma once
 
-void TigerControl(short itemNumber);
+namespace TEN::Entities::TR3
+{
+	void TigerControl(short itemNumber);
+}

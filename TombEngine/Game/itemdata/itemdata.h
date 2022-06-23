@@ -9,10 +9,10 @@
 #include "Objects/TR2/Vehicles/boat_info.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Objects/TR3/Vehicles/minecart_info.h"
-#include "Objects/TR3/Vehicles/biggun_info.h"
+#include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/TR3/Vehicles/quad_info.h"
-#include "Objects/TR3/Vehicles/rubberboat_info.h"
+#include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
@@ -25,6 +25,7 @@ template<class... Ts> struct visitor : Ts... { using Ts::operator()...; };
 template<class... Ts> visitor(Ts...)->visitor<Ts...>; // line not needed in C++20...
 
 using namespace TEN::Entities::TR4;
+using namespace TEN::Entities::Vehicles;
 
 struct ItemInfo;
 

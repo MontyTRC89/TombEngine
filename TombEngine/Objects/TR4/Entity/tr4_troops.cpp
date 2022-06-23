@@ -58,7 +58,7 @@ namespace TEN::Entities::TR4
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 12;
 		}
 
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	}
 
 	void TroopsControl(short itemNumber)
@@ -107,9 +107,9 @@ namespace TEN::Entities::TR4
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 23;
 
 						if (item->Animation.ActiveState == TROOP_STATE_ATTACKED_BY_SCORPION)
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase + 37;
+							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 37;
 						else
-							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+							item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 						item->Animation.ActiveState = TROOP_STATE_KILLED_BY_SCORPION;
 						item->Animation.TargetState = TROOP_STATE_KILLED_BY_SCORPION;
@@ -131,7 +131,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 19;
 					item->Animation.ActiveState = TROOP_STATE_DEATH;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 			}
 		}
@@ -464,7 +464,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
 					item->Animation.ActiveState = TROOP_STATE_FLASHED;
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase + (GetRandomControl() & 7);
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
 					creature->MaxTurn = 0;
 				}
 			}

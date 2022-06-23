@@ -354,7 +354,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 						}
 
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
-						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+						laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 						lara->Control.IsMoving = false;
 						lara->Control.HandStatus = HandStatus::Busy;
 					}
@@ -514,6 +514,11 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		PlinthPickUpBounds.boundingBox.Y2 = laraItem->Pose.Position.y - item->Pose.Position.y + 100;
 		PlinthPickUpBounds.boundingBox.Z2 = plinth->Z2 + 320;
 		PlinthPickUpPosition.z = -200 - plinth->Z2;
+
+		// HACK: Until we refactor a way plinth collision is detected, this must be here
+		// to prevent false positives with two stacked plinths -- Lwmte, 16.06.22
+		if (abs(laraItem->Pose.Position.y - item->Pose.Position.y) > CLICK(4))
+			break;
 
 		if (TestLaraPosition(&PlinthPickUpBounds, item, laraItem) && !lara->Control.IsLow)
 		{
@@ -676,7 +681,7 @@ void PickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	if (flag)
 	{
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		ResetLaraFlex(laraItem);
 		lara->Control.IsMoving = false;
 		lara->Control.HandStatus = HandStatus::Busy;
@@ -963,7 +968,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* 
 			{
 				ResetLaraFlex(laraitem);
 				laraitem->Animation.AnimNumber = SearchAnims[objectNumber];
-				laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].FrameBase;
+				laraitem->Animation.FrameNumber = g_Level.Anims[laraitem->Animation.AnimNumber].frameBase;
 				laraitem->Animation.ActiveState = LS_MISC_CONTROL;
 				Lara.Control.IsMoving = false;
 				Lara.Control.HandStatus = HandStatus::Busy;
@@ -977,7 +982,7 @@ void SearchObjectCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* 
 				}
 
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				AnimateItem(item);
 			}
 			else
@@ -1003,7 +1008,7 @@ void SearchObjectControl(short itemNumber)
 
 	ItemInfo* item2;
 
-	int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
 	{
 		if (frameNumber > 0)
@@ -1144,7 +1149,7 @@ bool UseSpecialItem(ItemInfo* item)
 			else if (flag == 2)
 				item->Animation.AnimNumber = LA_WATERSKIN_POUR_LOW;
 
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = LS_MISC_CONTROL;
 			item->Animation.TargetState = LS_MISC_CONTROL;
 			Lara.Control.HandStatus = HandStatus::Busy;

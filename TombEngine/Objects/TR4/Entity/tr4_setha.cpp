@@ -27,7 +27,7 @@ namespace TEN::Entities::TR4
 		ClearItem(itemNumber);
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 4;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = 12;
 		item->Animation.TargetState = 12;
 	}
@@ -221,7 +221,7 @@ namespace TEN::Entities::TR4
 				if (canJump)
 				{
 					if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 15 &&
-						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameBase)
+						item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					{
 						creature->MaxTurn = 0;
 						creature->ReachedGoal = true;
@@ -297,8 +297,8 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits)
 					{
-						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 15 &&
-							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].FrameBase + 26)
+						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
+							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 						{
 							LaraItem->HitPoints -= 250;
 							LaraItem->HitStatus = true;
@@ -421,7 +421,7 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = 16;
 					}
 
-					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				}
 			}
 		}

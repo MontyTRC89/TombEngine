@@ -127,15 +127,15 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (TestLaraPosition(&ScalesBounds, item, laraItem))
 			{
 				laraItem->Animation.AnimNumber = LA_WATERSKIN_POUR_HIGH;
-				laraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Pose.Orientation.y = rotY;
 			}
-			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].FrameBase + 51)
+			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51)
 			{
 				SoundEffect(SFX_TR4_POUR_WATER, &laraItem->Pose);
 				item->Pose.Orientation.y = rotY;
 			}
-			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].FrameBase + 74)
+			else if (laraItem->Animation.FrameNumber == g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 			{
 				AddActiveItem(itemNumber);
 				item->Status = ITEM_ACTIVE;
@@ -158,10 +158,10 @@ void ScalesCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 		}
 	}
 	
-	if (laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].FrameBase + 44 &&
-		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].FrameBase + 72 ||
-		laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].FrameBase + 51 &&
-		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].FrameBase + 74)
+	if (laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 44 &&
+		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_LOW].frameBase + 72 ||
+		laraItem->Animation.FrameNumber >= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 51 &&
+		laraItem->Animation.FrameNumber <= g_Level.Anims[LA_WATERSKIN_POUR_HIGH].frameBase + 74)
 	{
 		Vector3Int pos = { 0, 0, 0 };
 		GetLaraJointPosition(&pos, LM_LHAND);

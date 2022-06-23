@@ -157,7 +157,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunFramePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
+			shotgunFramePtr = &g_Level.Frames[Lara.LeftArm.frameBase + Lara.LeftArm.FrameNumber];
 			UpdateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 
 			// Right arm
@@ -165,7 +165,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunFramePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
+			shotgunFramePtr = &g_Level.Frames[Lara.RightArm.frameBase + Lara.RightArm.FrameNumber];
 			UpdateAnimation(item, laraObj, &shotgunFramePtr, 0, 1, mask);
 		}
 
@@ -177,12 +177,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			revolverFramePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].FrameBase];
+			revolverFramePtr = &g_Level.Frames[Lara.LeftArm.frameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			revolverFramePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].FrameBase];
+			revolverFramePtr = &g_Level.Frames[Lara.RightArm.frameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &revolverFramePtr, 0, 1, mask);
 		}
 
@@ -197,14 +197,14 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			pistolFramePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].FrameBase];
+			pistolFramePtr = &g_Level.Frames[Lara.LeftArm.frameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
 			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolFramePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].FrameBase];
+			pistolFramePtr = &g_Level.Frames[Lara.RightArm.frameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, upperArmMask, true);
 			UpdateAnimation(item, laraObj, &pistolFramePtr, 0, 1, mask);
 		}

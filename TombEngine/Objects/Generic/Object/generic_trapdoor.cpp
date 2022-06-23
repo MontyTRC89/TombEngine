@@ -84,7 +84,7 @@ void CeilingTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInf
 		laraItem->Animation.VerticalVelocity = 0;
 		laraItem->Animation.Airborne = false;
 		laraItem->Animation.AnimNumber = LA_TRAPDOOR_CEILING_OPEN;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = LS_FREEFALL_BIS;
 		laraInfo->Control.HandStatus = HandStatus::Busy;
 		AddActiveItem(itemNumber);
@@ -128,7 +128,7 @@ void FloorTrapDoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			{
 				ResetLaraFlex(laraItem);
 				laraItem->Animation.AnimNumber = LA_TRAPDOOR_FLOOR_OPEN;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.ActiveState = LS_TRAPDOOR_FLOOR_OPEN;
 				laraInfo->Control.IsMoving = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;

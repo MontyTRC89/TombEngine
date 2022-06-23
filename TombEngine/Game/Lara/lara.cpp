@@ -728,10 +728,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	Statistics.Game.Distance += sqrt(
-		pow(item->Pose.Position.x - oldPos.x, 2) +
-		pow(item->Pose.Position.y - oldPos.y, 2) +
-		pow(item->Pose.Position.z - oldPos.z, 2));
+	Statistics.Game.Distance += (int)round(Vector3::Distance(oldPos.ToVector3(), item->Pose.Position.ToVector3()));
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)

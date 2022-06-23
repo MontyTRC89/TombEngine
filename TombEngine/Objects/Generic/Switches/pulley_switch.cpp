@@ -69,7 +69,7 @@ namespace TEN::Entities::Switches
 				{
 					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;
-					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 					AddActiveItem(itemNumber);
 

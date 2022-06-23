@@ -4,11 +4,11 @@
 /// entities
 #include "Objects/TR3/Entity/tr3_civvy.h" // OK
 #include "Objects/TR3/Entity/tr3_cobra.h" // OK
-#include "Objects/TR3/Entity/tr3_fishemitter.h" // OK
+#include "Objects/TR3/Entity/tr3_fish_emitter.h" // OK
 #include "Objects/TR3/Entity/tr3_flamethrower.h" // OK
 #include "Objects/TR3/Entity/tr3_monkey.h" // OK
-#include "Objects/TR3/Entity/tr3_mpgun.h" // OK
-#include "Objects/TR3/Entity/tr3_mpstick.h" // OK
+#include "Objects/TR3/Entity/tr3_mp_gun.h" // OK
+#include "Objects/TR3/Entity/tr3_mp_stick.h" // OK
 #include "Objects/TR3/Entity/tr3_raptor.h" // OK
 #include "Objects/TR3/Entity/tr3_scuba.h" // OK
 #include "Objects/TR3/Entity/tr3_shiva.h" // OK
@@ -20,18 +20,20 @@
 /// traps
 #include "Objects/TR3/Trap/train.h"
 /// vehicles
-#include "Objects/TR3/Vehicles/biggun.h"
+#include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
 #include "Objects/TR3/Vehicles/quad.h"
 #include "Objects/TR3/Vehicles/upv.h"
-#include "Objects/TR3/Vehicles/rubberboat.h"
+#include "Objects/TR3/Vehicles/rubber_boat.h"
 /// necessary import
 #include "Game/control/box.h"
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/creature_info.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+
+using namespace TEN::Entities::TR3;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -421,8 +423,8 @@ static void StartVehicles(ObjectInfo* obj)
 	obj = &Objects[ID_MINECART];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseMineCart;
-		obj->collision = MineCartCollision;
+		obj->initialise = InitialiseMinecart;
+		obj->collision = MinecartCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;

@@ -14,9 +14,7 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN {
-namespace Effects {
-namespace Environment 
+namespace TEN::Effects::Environment 
 {
 	EnvironmentController Weather;
 
@@ -450,4 +448,4 @@ namespace Environment
 			}
 		}
 	}
-}}}
+}

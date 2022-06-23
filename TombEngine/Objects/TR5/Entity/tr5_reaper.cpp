@@ -16,7 +16,7 @@ void InitialiseReaper(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = 2;
 	item->Animation.ActiveState = 2;
 }

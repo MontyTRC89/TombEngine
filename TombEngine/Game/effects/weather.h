@@ -3,9 +3,7 @@
 #include "ScriptInterfaceLevel.h"
 #include "Specific/trmath.h"
 
-namespace TEN {
-namespace Effects {
-namespace Environment 
+namespace TEN::Effects::Environment 
 {
 	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
 	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 1024;
@@ -99,4 +97,4 @@ namespace Environment
 	};
 
 	extern EnvironmentController Weather;
-}}}
+}

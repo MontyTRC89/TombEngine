@@ -10,7 +10,7 @@ void InitialiseLightingGuide(short itemNumber)
 
 	ClearItem(itemNumber);
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = 1;
 	item->Animation.ActiveState = 1;
 }

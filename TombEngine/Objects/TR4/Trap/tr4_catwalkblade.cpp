@@ -12,10 +12,10 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		if (!TriggerActive(item))
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		else
 		{
-			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			int frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd || frameNumber < 38)
 				item->ItemFlags[3] = 0;

@@ -22,7 +22,7 @@ void InitialiseLion(short itemNumber)
 	ClearItem(itemNumber);
 
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = 1;
 	item->Animation.ActiveState = 1;
 }
@@ -48,7 +48,7 @@ void LionControl(short itemNumber)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + (GetRandomControl() & 1) + 7;
 				item->Animation.ActiveState = 5;
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			}
 		}
 		else

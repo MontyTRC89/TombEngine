@@ -153,7 +153,7 @@ namespace TEN::Entities::TR4
 
 	static bool ShootFrame(ItemInfo* item)
 	{
-		int frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase);
+		int frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 		if (frameNumber == 45 ||
 			/*frameNumber == 50 ||
 			frameNumber == 55 ||*/
@@ -259,7 +259,7 @@ namespace TEN::Entities::TR4
 
 		auto* item = &g_Level.Items[itemNumber];
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + MUTANT_ANIM_APPEAR;
-		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.ActiveState = MUTANT_STATE_APPEAR;
 		item->Animation.TargetState = MUTANT_STATE_APPEAR;
 	}
@@ -311,7 +311,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case MUTANT_STATE_PROJECTILE_ATTACK:
-			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			frameNumber = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			if (frameNumber >= 94 && frameNumber <= 96)
 			{
 				PHD_3DPOS src;
@@ -334,7 +334,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case MUTANT_STATE_LOCUST_ATTACK_1:
-			frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].FrameBase);
+			frameNumber = (item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 			if (frameNumber >= 60 && frameNumber <= 120)
 				SpawnLocust(item);
 

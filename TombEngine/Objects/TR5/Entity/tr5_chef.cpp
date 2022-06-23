@@ -41,7 +41,7 @@ void InitialiseChef(short itemNumber)
 	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex;
 	item->Animation.TargetState = CHEF_STATE_COOKING;
 	item->Animation.ActiveState = CHEF_STATE_COOKING;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Pose.Position.x += 192 * phd_sin(item->Pose.Orientation.y);
 	item->Pose.Position.z += 192 * phd_cos(item->Pose.Orientation.y);
 }
@@ -66,7 +66,7 @@ void ControlChef(short itemNumber)
 			item->HitPoints = 0;
 			item->Animation.ActiveState = CHEF_STATE_DEATH;
 			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + CHEF_ANIM_DEATH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameBase;
+			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		}
 	}
 	else
@@ -159,7 +159,7 @@ void ControlChef(short itemNumber)
 			{
 				if (item->TouchBits & 0x2000)
 				{
-					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].FrameBase + 10)
+					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 					{
 						CreatureEffect2(item, &ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);

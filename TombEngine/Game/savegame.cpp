@@ -201,7 +201,7 @@ bool SaveGame::Save(int slot)
 	Save::ArmInfoBuilder leftArm{ fbb };
 	leftArm.add_anim_number(Lara.LeftArm.AnimNumber);
 	leftArm.add_flash_gun(Lara.LeftArm.FlashGun);
-	leftArm.add_frame_base(Lara.LeftArm.FrameBase);
+	leftArm.add_frame_base(Lara.LeftArm.frameBase);
 	leftArm.add_frame_number(Lara.LeftArm.FrameNumber);
 	leftArm.add_locked(Lara.LeftArm.Locked);
 	leftArm.add_rotation(&leftArmRotation);
@@ -210,7 +210,7 @@ bool SaveGame::Save(int slot)
 	Save::ArmInfoBuilder rightArm{ fbb };
 	rightArm.add_anim_number(Lara.RightArm.AnimNumber);
 	rightArm.add_flash_gun(Lara.RightArm.FlashGun);
-	rightArm.add_frame_base(Lara.RightArm.FrameBase);
+	rightArm.add_frame_base(Lara.RightArm.frameBase);
 	rightArm.add_frame_number(Lara.RightArm.FrameNumber);
 	rightArm.add_locked(Lara.RightArm.Locked);
 	rightArm.add_rotation(&rightArmRotation);
@@ -310,11 +310,6 @@ bool SaveGame::Save(int slot)
 	subsuitControl.add_hit_count(Lara.Control.Subsuit.HitCount);
 	auto subsuitControlOffset = subsuitControl.Finish();
 
-	Save::MinecartControlDataBuilder minecartControl{ fbb };
-	minecartControl.add_left(Lara.Control.Minecart.Left);
-	minecartControl.add_right(Lara.Control.Minecart.Right);
-	auto minecartControlOffset = minecartControl.Finish();
-
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_turn_rate(Lara.Control.TurnRate);
@@ -331,7 +326,6 @@ bool SaveGame::Save(int slot)
 	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
 	control.add_locked(Lara.Control.Locked);
-	control.add_minecart(minecartControlOffset);
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
@@ -428,7 +422,9 @@ bool SaveGame::Save(int slot)
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
 		flatbuffers::Offset<Save::QuadBike> quadOffset;
+		flatbuffers::Offset<Save::Minecart> mineOffset;
 		flatbuffers::Offset<Save::UPV> upvOffset;
+		flatbuffers::Offset<Save::Kayak> kayakOffset;
 
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
@@ -510,6 +506,53 @@ bool SaveGame::Save(int slot)
 			upvBuilder.add_x_rot(upv->XRot);
 			upvOffset = upvBuilder.Finish();
 		}
+		else if (itemToSerialize.Data.is<MinecartInfo>())
+		{
+			auto mine = (MinecartInfo*)itemToSerialize.Data;
+
+			Save::MinecartBuilder mineBuilder{ fbb };
+
+			mineBuilder.add_flags(mine->Flags);
+			mineBuilder.add_floor_height_front(mine->FloorHeightFront);
+			mineBuilder.add_floor_height_middle(mine->FloorHeightMiddle);
+			mineBuilder.add_gradient(mine->Gradient);
+			mineBuilder.add_stop_delay(mine->StopDelay);
+			mineBuilder.add_turn_len(mine->TurnLen);
+			mineBuilder.add_turn_rot(mine->TurnRot);
+			mineBuilder.add_turn_x(mine->TurnX);
+			mineBuilder.add_turn_z(mine->TurnZ);
+			mineBuilder.add_velocity(mine->Velocity);
+			mineBuilder.add_vertical_velocity(mine->VerticalVelocity);
+			mineOffset = mineBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<KayakInfo>())
+		{
+			auto kayak = (KayakInfo*)itemToSerialize.Data;
+
+			Save::KayakBuilder kayakBuilder{ fbb };
+
+			kayakBuilder.add_current_start_wake(kayak->CurrentStartWake);
+			kayakBuilder.add_flags(kayak->Flags);
+			kayakBuilder.add_forward(kayak->Forward);
+			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
+			kayakBuilder.add_left_right_count(kayak->LeftRightCount);
+			kayakBuilder.add_left_vertical_velocity(kayak->LeftVerticalVelocity);
+			kayakBuilder.add_old_pos(&Save::Position(
+				kayak->OldPos.Position.x, 
+				kayak->OldPos.Position.y, 
+				kayak->OldPos.Position.z, 
+				kayak->OldPos.Orientation.x, 
+				kayak->OldPos.Orientation.y, 
+				kayak->OldPos.Orientation.z));
+			kayakBuilder.add_right_vertical_velocity(kayak->RightVerticalVelocity);
+			kayakBuilder.add_true_water(kayak->TrueWater);
+			kayakBuilder.add_turn(kayak->Turn);
+			kayakBuilder.add_turn_rate(kayak->TurnRate);
+			kayakBuilder.add_velocity(kayak->Velocity);
+			kayakBuilder.add_wake_shade(kayak->WakeShade);
+			kayakBuilder.add_water_height(kayak->WaterHeight);
+			kayakOffset = kayakBuilder.Finish();
+		}
 		else if (itemToSerialize.Data.is<short>())
 		{
 			Save::ShortBuilder sb{ fbb };
@@ -581,6 +624,16 @@ bool SaveGame::Save(int slot)
 		{
 			serializedItem.add_data_type(Save::ItemData::UPV);
 			serializedItem.add_data(upvOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<MinecartInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Minecart);
+			serializedItem.add_data(mineOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<KayakInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Kayak);
+			serializedItem.add_data(kayakOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -1329,6 +1382,48 @@ bool SaveGame::Load(int slot)
 			upv->Velocity = savedUpv->velocity();
 			upv->XRot = savedUpv->x_rot();
 		}
+		else if (item->Data.is<MinecartInfo>())
+		{
+			auto mine = (MinecartInfo*)item->Data;
+			auto savedMine = (Save::Minecart*)savedItem->data();
+
+			mine->Flags = savedMine->flags();
+			mine->FloorHeightFront = savedMine->floor_height_front();
+			mine->FloorHeightMiddle = savedMine->floor_height_middle();
+			mine->Gradient = savedMine->gradient();
+			mine->StopDelay = savedMine->stop_delay();
+			mine->TurnLen = savedMine->turn_len();
+			mine->TurnRot = savedMine->turn_rot();
+			mine->TurnX = savedMine->turn_x();
+			mine->TurnZ = savedMine->turn_z();
+			mine->Velocity = savedMine->velocity();
+			mine->VerticalVelocity = savedMine->vertical_velocity();
+		}
+		else if (item->Data.is<KayakInfo>())
+		{
+			auto kayak = (KayakInfo*)item->Data;
+			auto savedKayak = (Save::Kayak*)savedItem->data();
+
+			kayak->CurrentStartWake = savedKayak->flags();
+			kayak->Flags = savedKayak->flags();
+			kayak->Forward = savedKayak->forward();
+			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
+			kayak->LeftRightCount = savedKayak->left_right_count();
+			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
+			kayak->OldPos.Position.x = savedKayak->old_pos()->x_pos();
+			kayak->OldPos.Position.y = savedKayak->old_pos()->y_pos();
+			kayak->OldPos.Position.z = savedKayak->old_pos()->z_pos();
+			kayak->OldPos.Orientation.x = savedKayak->old_pos()->x_rot();
+			kayak->OldPos.Orientation.y = savedKayak->old_pos()->y_rot();
+			kayak->OldPos.Orientation.z = savedKayak->old_pos()->z_rot();
+			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
+			kayak->TrueWater = savedKayak->true_water();
+			kayak->Turn = savedKayak->turn();
+			kayak->TurnRate = savedKayak->turn_rate();
+			kayak->Velocity = savedKayak->velocity();
+			kayak->WakeShade = savedKayak->wake_shade();
+			kayak->WaterHeight = savedKayak->water_height();
+		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
 			auto data = savedItem->data();
@@ -1588,7 +1683,7 @@ bool SaveGame::Load(int slot)
 	Lara.ItemNumber = s->lara()->item_number();
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
 	Lara.LeftArm.FlashGun = s->lara()->left_arm()->flash_gun();
-	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
+	Lara.LeftArm.frameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
 	Lara.LeftArm.Orientation.x = s->lara()->left_arm()->rotation()->x();
@@ -1607,7 +1702,7 @@ bool SaveGame::Load(int slot)
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
 	Lara.RightArm.FlashGun = s->lara()->right_arm()->flash_gun();
-	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
+	Lara.RightArm.frameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();
 	Lara.RightArm.Orientation.x = s->lara()->right_arm()->rotation()->x();
@@ -1615,8 +1710,6 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.Orientation.z = s->lara()->right_arm()->rotation()->z();
 	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
 	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
-	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
-	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
 	Lara.Control.Rope.Direction = s->lara()->control()->rope()->direction();
 	Lara.Control.Rope.ArcFront = s->lara()->control()->rope()->arc_front();

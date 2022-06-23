@@ -165,7 +165,7 @@ namespace TEN::Entities::Generic
 		if (Lara.Flare.ControlLeft)
 			Lara.Control.HandStatus = HandStatus::WeaponReady;
 
-		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].FramePtr;
+		Lara.LeftArm.frameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].FramePtr;
 
 		if (Lara.Torch.IsLit)
 		{
@@ -193,7 +193,7 @@ namespace TEN::Entities::Generic
 		Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 		Lara.LeftArm.Locked = false;
 		Lara.LeftArm.FrameNumber = 0;
-		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].FramePtr;
+		Lara.LeftArm.frameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].FramePtr;
 
 		Lara.MeshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
 	}
@@ -361,7 +361,7 @@ namespace TEN::Entities::Generic
 				}
 
 				laraItem->Animation.ActiveState = LS_MISC_CONTROL;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase;
+				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraInfo->Flare.ControlLeft = false;
 				laraInfo->LeftArm.Locked = true;
 				laraInfo->InteractedItem = itemNumber;
@@ -376,7 +376,7 @@ namespace TEN::Entities::Generic
 			if (laraItem->Animation.AnimNumber >= LA_TORCH_LIGHT_1 &&
 				laraItem->Animation.AnimNumber <= LA_TORCH_LIGHT_5)
 			{
-				if (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].FrameBase == 40)
+				if (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase == 40)
 				{
 					TestTriggers(torchItem, true, torchItem->Flags & IFLAG_ACTIVATION_MASK);
 					torchItem->Flags |= 0x3E00;

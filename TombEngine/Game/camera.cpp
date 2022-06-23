@@ -1254,7 +1254,7 @@ void BinocularCamera(ItemInfo* item)
 					else
 					{
 						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						//SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 					}
 				}
 				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
