@@ -55,6 +55,10 @@ namespace TEN::Entities::Vehicles
 
 				continue;
 
+			// TODO
+			case VehicleMountType::Front:
+				continue;
+
 			case VehicleMountType::Back:
 				if (abs(deltaHeadingAngle) < ANGLE(45.0f) &&
 					abs(angleBetweenPositions) < ANGLE(45.0f) &&

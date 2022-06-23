@@ -21,6 +21,7 @@ namespace TEN::Entities::Vehicles
 	{
 		None,
 		LevelStart,
+		Front,
 		Back,
 		Left,
 		Right,
