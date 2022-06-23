@@ -29,29 +29,25 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
-	constexpr auto RBOAT_MOUNT_DISTANCE_MIN = CLICK(2);
-
-	constexpr auto RBOAT_SLIP = 10;
-	constexpr auto RBOAT_SIDE_SLIP = 30;
-
+	constexpr auto RBOAT_RADIUS = 500;
 	constexpr auto RBOAT_FRONT = 750;
 	constexpr auto RBOAT_SIDE = 300;
-	constexpr auto RBOAT_RADIUS = 500;
-	constexpr auto RBOAT_SNOW = 500;
+	constexpr auto RBOAT_SLIP = 10;
+	constexpr auto RBOAT_SIDE_SLIP = 30;
+	constexpr auto RBOAT_MOUNT_DISTANCE_MIN = CLICK(2);
 
-	constexpr auto RBOAT_MAX_VELOCITY = 110;
-	constexpr auto RBOAT_SLOW_VELOCITY = RBOAT_MAX_VELOCITY / 3;
-	constexpr auto RBOAT_FAST_VELOCITY = RBOAT_MAX_VELOCITY + 75;
-	constexpr auto RBOAT_MIN_VELOCITY = 20;
-	constexpr auto RBOAT_MAX_BACK = -20;
-	constexpr auto RBOAT_MAX_KICK = -80;
+	constexpr auto RBOAT_VELOCITY_ACCEL = 5;
+	constexpr auto RBOAT_VELOCITY_DECEL = 1;
+	constexpr auto RBOAT_VELOCITY_BRAKE_DECEL = 5;
 
-	constexpr auto RBOAT_ACCELERATION = 5;
-	constexpr auto RBOAT_BRAKE = 5;
-	constexpr auto RBOAT_SLOW_DOWN = 1;
+	constexpr auto RBOAT_VELOCITY_MIN = 20;
+	constexpr auto RBOAT_SLOW_VELOCITY_MAX = 37;
+	constexpr auto RBOAT_NORMAL_VELOCITY_MAX = 110;
+	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
+	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = -20;
 
-	#define RBOAT_UNDO_TURN	ANGLE(0.25f)
-	#define RBOAT_TURN		(ANGLE(0.25f) / 2)
+	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
+	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
 
 	enum RubberBoatState
 	{
@@ -441,7 +437,7 @@ namespace TEN::Entities::Vehicles
 			int newVelocity = (rBoatItem->Pose.Position.z - old.z) * phd_cos(rBoatItem->Pose.Orientation.y) + (rBoatItem->Pose.Position.x - old.x) * phd_sin(rBoatItem->Pose.Orientation.y);
 
 			if (lara->Vehicle == itemNumber &&
-				rBoatItem->Animation.Velocity > (RBOAT_MAX_VELOCITY + RBOAT_ACCELERATION) &&
+				rBoatItem->Animation.Velocity > (RBOAT_NORMAL_VELOCITY_MAX + RBOAT_VELOCITY_ACCEL) &&
 				newVelocity < rBoatItem->Animation.Velocity - 10)
 			{
 				laraItem->HitPoints -= rBoatItem->Animation.Velocity;
@@ -453,7 +449,7 @@ namespace TEN::Entities::Vehicles
 
 			if (slip)
 			{
-				if (rBoatItem->Animation.Velocity <= RBOAT_MAX_VELOCITY + 10)
+				if (rBoatItem->Animation.Velocity <= RBOAT_NORMAL_VELOCITY_MAX + 10)
 					rBoatItem->Animation.Velocity = newVelocity;
 			}
 			else
@@ -464,8 +460,8 @@ namespace TEN::Entities::Vehicles
 					rBoatItem->Animation.Velocity = newVelocity;
 			}
 
-			if (rBoatItem->Animation.Velocity < RBOAT_MAX_BACK)
-				rBoatItem->Animation.Velocity = RBOAT_MAX_BACK;
+			if (rBoatItem->Animation.Velocity < RBOAT_REVERSE_VELOCITY_MAX)
+				rBoatItem->Animation.Velocity = RBOAT_REVERSE_VELOCITY_MAX;
 		}
 
 		return collide;
@@ -917,18 +913,18 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			if (rBoatItem->Animation.Velocity > RBOAT_SLOW_DOWN)
-				rBoatItem->Animation.Velocity -= RBOAT_SLOW_DOWN;
+			if (rBoatItem->Animation.Velocity > RBOAT_VELOCITY_DECEL)
+				rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
 			else
 				rBoatItem->Animation.Velocity = 0;
 		}
 
 		if (noTurn)
 		{
-			if (rBoat->TurnRate < -RBOAT_UNDO_TURN)
-				rBoat->TurnRate += RBOAT_UNDO_TURN;
-			else if (rBoat->TurnRate > RBOAT_UNDO_TURN)
-				rBoat->TurnRate -= RBOAT_UNDO_TURN;
+			if (rBoat->TurnRate < -RBOAT_TURN_RATE_DECEL)
+				rBoat->TurnRate += RBOAT_TURN_RATE_DECEL;
+			else if (rBoat->TurnRate > RBOAT_TURN_RATE_DECEL)
+				rBoat->TurnRate -= RBOAT_TURN_RATE_DECEL;
 			else
 				rBoat->TurnRate = 0;
 		}
@@ -999,9 +995,9 @@ namespace TEN::Entities::Vehicles
 		rBoat->Pitch += ((pitch - rBoat->Pitch) / 4);
 
 		if (rBoatItem->Animation.Velocity > 8)
-			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_MOVING, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_MOVING, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
 		else if (drive)
-			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_MAX_VELOCITY);
+			SoundEffect(SFX_TR3_VEHICLE_RUBBERBOAT_IDLE, &rBoatItem->Pose, SoundEnvironment::Land, 0.5f + (float)abs(rBoat->Pitch) / (float)RBOAT_NORMAL_VELOCITY_MAX);
 
 		if (lara->Vehicle != itemNumber)
 			return;
