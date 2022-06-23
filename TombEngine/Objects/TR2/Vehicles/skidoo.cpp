@@ -32,37 +32,37 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
+	constexpr auto DAMAGE_START = 140;
+	constexpr auto DAMAGE_LENGTH = 14;
+
 	constexpr auto SKIDOO_RADIUS = 500;
 	constexpr auto SKIDOO_FRONT = 550;
 	constexpr auto SKIDOO_SIDE = 260;
-	constexpr auto SKIDOO_MOUNT_DISTANCE_MIN = CLICK(2);
-	constexpr auto SKIDOO_DISMOUNT_DISTANCE = 295;
 	constexpr auto SKIDOO_SLIP = 100;
 	constexpr auto SKIDOO_SLIP_SIDE = 50;
-	constexpr auto SKIDOO_SNOW = 500;	// Unused.
-
-	constexpr auto DAMAGE_START = 140;
-	constexpr auto DAMAGE_LENGTH = 14;
+	constexpr auto SKIDOO_SNOW = 500; // Unused.
+	constexpr auto SKIDOO_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto SKIDOO_DISMOUNT_DISTANCE = 295;
 
 	constexpr auto SKIDOO_VELOCITY_ACCEL = 10;
 	constexpr auto SKIDOO_VELOCITY_DECEL = 2;
 	constexpr auto SKIDOO_VELOCITY_BRAKE_DECEL = 5;
 	constexpr auto SKIDOO_REVERSE_VELOCITY_ACCEL = 5;
-	constexpr auto SKIDOO_MAX_KICK = -80;
+	constexpr auto SKIDOO_KICK_MAX = -80;
 
-	constexpr auto SKIDOO_FAST_VELOCITY_MAX = 150;
-	constexpr auto SKIDOO_NORMAL_VELOCITY_MAX = 100;
 	constexpr auto SKIDOO_SLOW_VELOCITY_MAX = 50;
+	constexpr auto SKIDOO_NORMAL_VELOCITY_MAX = 100;
+	constexpr auto SKIDOO_FAST_VELOCITY_MAX = 150;
 	constexpr auto SKIDOO_TURN_VELOCITY_MAX = 15;
 	constexpr auto SKIDOO_REVERSE_VELOCITY_MAX = 30;
 
-	constexpr auto SKIDOO_STEP_HEIGHT_MAX = CLICK(1);
+	constexpr auto SKIDOO_STEP_HEIGHT_MAX = CLICK(1); // Unused.
 	constexpr auto SKIDOO_MIN_BOUNCE = (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
 
 	#define SKIDOO_TURN_RATE_ACCEL			ANGLE(2.5f)
+	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_TURN_RATE_DECEL			ANGLE(2.0f)
 	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
-	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
 
 	// TODO: Brake.
@@ -693,8 +693,8 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			int kick = (height - *y) * 4;
-			if (kick < SKIDOO_MAX_KICK)
-				kick = SKIDOO_MAX_KICK;
+			if (kick < SKIDOO_KICK_MAX)
+				kick = SKIDOO_KICK_MAX;
 
 			verticalVelocity += (kick - verticalVelocity) / 8;
 

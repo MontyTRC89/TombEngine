@@ -37,16 +37,16 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
 	constexpr auto MINECART_NUM_HITS = 25;
 
+	constexpr auto MINECART_VELOCITY_DECEL = 6 * 256;
 	constexpr auto MINECART_SPEED_MIN = 10 * 256; // TODO: These two have confusing names. @Sezz
 	constexpr auto MINECART_VELOCITY_MIN = 32;
-	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * 256;
-	constexpr auto MINECART_JUMP_VELOCITY = 63 * 1024;
 	constexpr auto MINECART_TURN_DEATH_VELOCITY = 128;
 	constexpr auto MINECART_TURN_FRICTION_VELOCITY = 70;
-	constexpr auto MINECART_DECELERATION = 6 * 256;
+	constexpr auto MINECART_JUMP_VELOCITY = 63 * 1024;
+	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * 256;
 
-	constexpr auto MINECART_FORWARD_GRADIENT = -128;
-	constexpr auto MINECART_BACK_GRADIENT = 128;
+	constexpr auto MINECART_FORWARD_GRADIENT = -CLICK(0.5f);
+	constexpr auto MINECART_BACK_GRADIENT = CLICK(0.5f);
 
 	constexpr auto MINECART_WRENCH_MESH_TOGGLE_FRAME = 20;
 
@@ -680,7 +680,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				minecart->Velocity -= MINECART_DECELERATION;
+				minecart->Velocity -= MINECART_VELOCITY_DECEL;
 				SoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE, &laraItem->Pose, SoundEnvironment::Always);
 
 				if (minecartItem->Animation.Velocity > MINECART_TURN_FRICTION_VELOCITY)
