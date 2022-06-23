@@ -734,7 +734,7 @@ namespace TEN::Input
 
 		power = std::clamp(power, 0.0f, 1.0f);
 
-		if (power == 0.0f)
+		if (power == 0.0f || power < rumbleData.Power)
 			return;
 
 		rumbleData.FadeSpeed = power / (delayInSeconds * (float)FPS);
