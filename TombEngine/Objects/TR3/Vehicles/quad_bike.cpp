@@ -41,23 +41,29 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
-	constexpr auto QBIKE_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto DAMAGE_START = 140;
+	constexpr auto DAMAGE_LENGTH = 14;
 
-	constexpr auto MAX_VELOCITY = 0xA000;
-	constexpr auto MIN_DRIFT_VELOCITY = 0x3000;
-	constexpr auto BRAKE = 0x0280;
-	constexpr auto REVERSE_ACCELERATION = -0x0300;
-	constexpr auto MAX_BACK = -0x3000;
-	constexpr auto MAX_REVS = 0xa000;
-	constexpr auto TERMINAL_VERTICAL_VELOCITY = 240;
-	constexpr auto QBIKE_SLIP = 100;
-	constexpr auto QBIKE_SLIP_SIDE = 50;
-
+	constexpr auto QBIKE_RADIUS = 500;
+	constexpr auto QBIKE_HEIGHT = 512;
 	constexpr auto QBIKE_FRONT = 550;
 	constexpr auto QBIKE_BACK = -550;
 	constexpr auto QBIKE_SIDE = 260;
-	constexpr auto QBIKE_RADIUS = 500;
-	constexpr auto QBIKE_HEIGHT = 512;
+	constexpr auto QBIKE_SLIP = 100;
+	constexpr auto QBIKE_SLIP_SIDE = 50;
+	constexpr auto QBIKE_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
+
+	constexpr int MAX_VELOCITY = 160 * 256;
+	constexpr int MIN_DRIFT_VELOCITY = 48 * 256;
+	constexpr int BRAKE = 2.5f * 256;
+	constexpr int REVERSE_ACCELERATION = -3 * 256;
+	constexpr int MAX_BACK = -48 * 256;
+	constexpr int MAX_REVS = 160 * 256;
+	constexpr int TERMINAL_VERTICAL_VELOCITY = 240;
+
+	constexpr auto QBIKE_STEP_HEIGHT_MAX = CLICK(1); // Unused.
+	constexpr auto QBIKE_MIN_BOUNCE = (MAX_VELOCITY / 2) / CLICK(1);
 
 	// TODO
 	constexpr auto QBIKE_HIT_LEFT = 11;
@@ -65,23 +71,14 @@ namespace TEN::Entities::Vehicles
 	constexpr auto QBIKE_HIT_FRONT = 13;
 	constexpr auto QBIKE_HIT_BACK = 14;
 
-	constexpr auto DAMAGE_START = 140;
-	constexpr auto DAMAGE_LENGTH = 14;
-
-	constexpr auto DISMOUNT_DISTANCE = 385; // Precise root bone offset derived from final frame of animation.
-
-	constexpr auto QBIKE_MAX_HEIGHT = CLICK(1);
-	constexpr auto QBIKE_MIN_BOUNCE = (MAX_VELOCITY / 2) / CLICK(1);
-
-	#define QBIKE_UNDO_TURN			ANGLE(2.0f)
-	#define QBIKE_TURN_RATE			(ANGLE(0.5f) + QBIKE_UNDO_TURN)
-	#define QBIKE_TURN_MAX			ANGLE(5.0f)
-	#define QBIKE_DRIFT_TURN_RATE	(ANGLE(0.75f) + QBIKE_UNDO_TURN)
-	#define QBIKE_DRIFT_TURN_MAX	ANGLE(8.0f)
-
-	#define MIN_MOMENTUM_TURN ANGLE(3.0f)
-	#define MAX_MOMENTUM_TURN ANGLE(1.5f)
-	#define QBIKE_MAX_MOM_TURN ANGLE(150.0f)
+	#define QBIKE_TURN_RATE_ACCEL		  ANGLE(2.5f)
+	#define QBIKE_TURN_RATE_DECEL		  ANGLE(2.0f)
+	#define QBIKE_TURN_RATE_MAX			  ANGLE(5.0f)
+	#define QBIKE_DRIFT_TURN_RATE_ACCEL	  ANGLE(2.75f)
+	#define QBIKE_DRIFT_TURN_RATE_MAX	  ANGLE(8.0f)
+	#define QBIKE_MOMENTUM_TURN_RATE_MIN  ANGLE(3.0f)
+	#define QBIKE_MOMENTUM_TURN_RATE_MAX  ANGLE(1.5f)
+	#define QBIKE_MOMENTUM_TURN_RATE_MAX2 ANGLE(150.0f) // TODO: Resolve this naming clash!
 
 	enum QuadBikeState
 	{
@@ -222,7 +219,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.y -= ANGLE(90.0f);
 
 			SetAnimation(laraItem, LA_STAND_IDLE);
-			TranslateItem(laraItem, laraItem->Pose.Orientation.y, -DISMOUNT_DISTANCE);
+			TranslateItem(laraItem, laraItem->Pose.Orientation.y, -QBIKE_DISMOUNT_DISTANCE);
 			laraItem->Pose.Orientation.x = 0;
 			laraItem->Pose.Orientation.z = 0;
 			lara->Vehicle = NO_ITEM;
@@ -494,35 +491,35 @@ namespace TEN::Entities::Vehicles
 
 		if (quadBikeItem->Pose.Position.y > (quadBikeItem->Floor - CLICK(1)))
 		{
-			if (quadBike->TurnRate < -QBIKE_UNDO_TURN)
-				quadBike->TurnRate += QBIKE_UNDO_TURN;
-			else if (quadBike->TurnRate > QBIKE_UNDO_TURN)
-				quadBike->TurnRate -= QBIKE_UNDO_TURN;
+			if (quadBike->TurnRate < -QBIKE_TURN_RATE_DECEL)
+				quadBike->TurnRate += QBIKE_TURN_RATE_DECEL;
+			else if (quadBike->TurnRate > QBIKE_TURN_RATE_DECEL)
+				quadBike->TurnRate -= QBIKE_TURN_RATE_DECEL;
 			else
 				quadBike->TurnRate = 0;
 
 			quadBikeItem->Pose.Orientation.y += quadBike->TurnRate + quadBike->ExtraRotation;
 
-			short momentum = MIN_MOMENTUM_TURN - (((((MIN_MOMENTUM_TURN - MAX_MOMENTUM_TURN) * 256) / MAX_VELOCITY) * quadBike->Velocity) / 256);
+			short momentum = QBIKE_MOMENTUM_TURN_RATE_MIN - (((((QBIKE_MOMENTUM_TURN_RATE_MIN - QBIKE_MOMENTUM_TURN_RATE_MAX) * 256) / MAX_VELOCITY) * quadBike->Velocity) / 256);
 			if (!(TrInput & VEHICLE_IN_ACCELERATE) && quadBike->Velocity > 0)
 				momentum += momentum / 4;
 
 			short rot = quadBikeItem->Pose.Orientation.y - quadBike->MomentumAngle;
-			if (rot < -MAX_MOMENTUM_TURN)
+			if (rot < -QBIKE_MOMENTUM_TURN_RATE_MAX)
 			{
-				if (rot < -QBIKE_MAX_MOM_TURN)
+				if (rot < -QBIKE_MOMENTUM_TURN_RATE_MAX2)
 				{
-					rot = -QBIKE_MAX_MOM_TURN;
+					rot = -QBIKE_MOMENTUM_TURN_RATE_MAX2;
 					quadBike->MomentumAngle = quadBikeItem->Pose.Orientation.y - rot;
 				}
 				else
 					quadBike->MomentumAngle -= momentum;
 			}
-			else if (rot > MAX_MOMENTUM_TURN)
+			else if (rot > QBIKE_MOMENTUM_TURN_RATE_MAX)
 			{
-				if (rot > QBIKE_MAX_MOM_TURN)
+				if (rot > QBIKE_MOMENTUM_TURN_RATE_MAX2)
 				{
-					rot = QBIKE_MAX_MOM_TURN;
+					rot = QBIKE_MOMENTUM_TURN_RATE_MAX2;
 					quadBike->MomentumAngle = quadBikeItem->Pose.Orientation.y - rot;
 				}
 				else
@@ -885,30 +882,30 @@ namespace TEN::Entities::Vehicles
 				{
 					if (TrInput & VEHICLE_IN_LEFT)
 					{
-						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE;
-						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_MAX)
-							quadBike->TurnRate = -QBIKE_DRIFT_TURN_MAX;
+						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_RATE_MAX)
+							quadBike->TurnRate = -QBIKE_DRIFT_TURN_RATE_MAX;
 					}
 					else if (TrInput & VEHICLE_IN_RIGHT)
 					{
-						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE;
-						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_MAX)
-							quadBike->TurnRate = QBIKE_DRIFT_TURN_MAX;
+						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_RATE_MAX)
+							quadBike->TurnRate = QBIKE_DRIFT_TURN_RATE_MAX;
 					}
 				}
 				else
 				{
 					if (TrInput & VEHICLE_IN_LEFT)
 					{
-						quadBike->TurnRate -= QBIKE_TURN_RATE;
-						if (quadBike->TurnRate < -QBIKE_TURN_MAX)
-							quadBike->TurnRate = -QBIKE_TURN_MAX;
+						quadBike->TurnRate -= QBIKE_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate < -QBIKE_TURN_RATE_MAX)
+							quadBike->TurnRate = -QBIKE_TURN_RATE_MAX;
 					}
 					else if (TrInput & VEHICLE_IN_RIGHT)
 					{
-						quadBike->TurnRate += QBIKE_TURN_RATE;
-						if (quadBike->TurnRate > QBIKE_TURN_MAX)
-							quadBike->TurnRate = QBIKE_TURN_MAX;
+						quadBike->TurnRate += QBIKE_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate > QBIKE_TURN_RATE_MAX)
+							quadBike->TurnRate = QBIKE_TURN_RATE_MAX;
 					}
 				}
 			}
@@ -921,30 +918,30 @@ namespace TEN::Entities::Vehicles
 				{
 					if (TrInput & VEHICLE_IN_LEFT)
 					{
-						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE;
-						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_MAX)
-							quadBike->TurnRate = -QBIKE_DRIFT_TURN_MAX;
+						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_RATE_MAX)
+							quadBike->TurnRate = -QBIKE_DRIFT_TURN_RATE_MAX;
 					}
 					else if (TrInput & VEHICLE_IN_RIGHT)
 					{
-						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE;
-						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_MAX)
-							quadBike->TurnRate = QBIKE_DRIFT_TURN_MAX;
+						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_RATE_MAX)
+							quadBike->TurnRate = QBIKE_DRIFT_TURN_RATE_MAX;
 					}
 				}
 				else
 				{
 					if (TrInput & VEHICLE_IN_RIGHT)
 					{
-						quadBike->TurnRate -= QBIKE_TURN_RATE;
-						if (quadBike->TurnRate < -QBIKE_TURN_MAX)
-							quadBike->TurnRate = -QBIKE_TURN_MAX;
+						quadBike->TurnRate -= QBIKE_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate < -QBIKE_TURN_RATE_MAX)
+							quadBike->TurnRate = -QBIKE_TURN_RATE_MAX;
 					}
 					else if (TrInput & VEHICLE_IN_LEFT)
 					{
-						quadBike->TurnRate += QBIKE_TURN_RATE;
-						if (quadBike->TurnRate > QBIKE_TURN_MAX)
-							quadBike->TurnRate = QBIKE_TURN_MAX;
+						quadBike->TurnRate += QBIKE_TURN_RATE_ACCEL;
+						if (quadBike->TurnRate > QBIKE_TURN_RATE_MAX)
+							quadBike->TurnRate = QBIKE_TURN_RATE_MAX;
 					}
 				}
 			}
