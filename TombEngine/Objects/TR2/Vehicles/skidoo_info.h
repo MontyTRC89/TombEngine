@@ -1,16 +1,19 @@
 #pragma once
 
-struct SkidooInfo 
+namespace TEN::Entities::Vehicles
 {
-	short TurnRate;
-	short MomentumAngle;
-	short ExtraRotation;
+	struct SkidooInfo
+	{
+		short TurnRate;
+		short MomentumAngle;
+		short ExtraRotation;
 
-	int LeftVerticalVelocity;
-	int RightVerticalVelocity;
+		int LeftVerticalVelocity;
+		int RightVerticalVelocity;
 
-	int Pitch;
-	int FlashTimer;
-	short TrackMesh;
-	bool Armed;
-};
+		int Pitch;
+		int FlashTimer;
+		short TrackMesh;
+		bool Armed;
+	};
+}

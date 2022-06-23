@@ -1,4 +1,7 @@
 #pragma once
 
-void InitialiseCobra(short itemNum);
-void CobraControl(short itemNum);
+namespace TEN::Entities::TR3
+{
+	void InitialiseCobra(short itemNum);
+	void CobraControl(short itemNum);
+}

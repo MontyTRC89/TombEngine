@@ -14,6 +14,8 @@
 #include "Game/control/control.h"
 #include "Renderer/Renderer11Enums.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO HarpyBite1 = { 0, 0, 0, 4 };
@@ -21,8 +23,8 @@ namespace TEN::Entities::TR4
 	BITE_INFO HarpyBite3 = { 0, 0, 0, 21 };
 	BITE_INFO HarpyAttack1 = { 0, 128, 0, 2 };
 	BITE_INFO HarpyAttack2 = { 0, 128, 0, 4 };
-	const std::vector<int> HarpySwoopAttackJoints = { 2, 4 };
-	const std::vector<int> HarpyStingerAttackJoints = { 20, 21 };
+	const vector<int> HarpySwoopAttackJoints = { 2, 4 };
+	const vector<int> HarpyStingerAttackJoints = { 20, 21 };
 
 	constexpr auto HARPY_STINGER_ATTACK_DAMAGE = 100;
 	constexpr auto HARPY_SWOOP_ATTACK_DAMAGE = 10;
@@ -248,8 +250,8 @@ namespace TEN::Entities::TR4
 
 		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + HARPY_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-		item->Animation.TargetState = HARPY_STATE_IDLE;
 		item->Animation.ActiveState = HARPY_STATE_IDLE;
+		item->Animation.TargetState = HARPY_STATE_IDLE;
 	}
 
 	void HarpyControl(short itemNumber)

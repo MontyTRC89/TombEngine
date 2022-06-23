@@ -33,7 +33,7 @@ namespace TEN::Entities::Generic
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* poleItem = &g_Level.Items[itemNumber];
 
-		bool isLara = !poleItem->Data.is<LaraInfo*>();
+		bool isLara = !poleItem->IsLara();
 
 		if (TrInput & IN_ACTION && isLara &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
