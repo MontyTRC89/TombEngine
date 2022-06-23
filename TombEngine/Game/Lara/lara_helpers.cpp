@@ -320,7 +320,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	auto probe = GetCollision(item);
 
 	// Ground is flat.
-	if (!probe.FloorTilt.x && !probe.FloorTilt.y)
+	if (probe.FloorTilt == Vector2::Zero)
 		return direction;
 
 	// Get either a) the surface aspect angle (extended slides), or
