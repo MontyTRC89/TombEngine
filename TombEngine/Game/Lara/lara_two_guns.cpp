@@ -223,8 +223,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 					}
 
 					float power = weaponType == LaraWeaponType::Uzi ? GenerateFloat(0.1f, 0.3f) : 1.0f;
-					float time = weaponType == LaraWeaponType::Uzi ? 0.1f : 0.2f;
-					Rumble(power, time);
+					Rumble(power, 0.1f);
 
 					if (weaponType == LaraWeaponType::Uzi)
 						lara->Control.Weapon.UziLeft = true;
