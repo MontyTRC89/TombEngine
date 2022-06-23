@@ -326,10 +326,10 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	// Get either a) the surface aspect angle (extended slides), or
 	// b) derive the nearest cardinal direction from it (original slides).
 	direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-	if (!g_GameFlow->HasSlideExtended())
-		direction = GetQuadrant(direction) * ANGLE(90.0f);
-
-	return direction;
+	if (g_GameFlow->HasSlideExtended())
+		return direction;
+	else
+		return (GetQuadrant(direction) * ANGLE(90.0f));
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
@@ -346,7 +346,6 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
-
 	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical]);
 }
 
