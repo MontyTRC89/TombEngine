@@ -33,16 +33,25 @@ namespace TEN::Entities::Vehicles
 	int Unk_0080DDE8;
 	short Unk_0080DE24;
 
-	const vector<int> JeepMeshJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<VehicleMountType> JeepMountTypes =
+	{
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
 
-	#define JEEP_DISMOUNT_DISTANCE		512
-	#define JEEP_UNDO_TURN				91
-	#define	JEEP_FRONT					550
-	#define JEEP_SIDE					256
-	#define JEEP_SLIP					100
-	#define JEEP_SLIP_SIDE				128
-	#define JEEP_MAX_SPEED				0x8000
-	#define JEEP_MAX_BACK				0x4000
+	constexpr auto JEEP_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto JEEP_DISMOUNT_DISTANCE = 512;
+
+	constexpr auto JEEP_FRONT = 550;
+	constexpr auto JEEP_SIDE = 256;
+	constexpr auto JEEP_SLIP = 100;
+	constexpr auto JEEP_SLIP_SIDE = 128;
+
+	constexpr auto JEEP_VELOCITY_MAX = 182 * 256;
+	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * 256;
+
+	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
 
 	// TODO: Simpler toggle.
 	#define JEEP_IN_TOGGLE_REVERSE	IN_SPRINT
@@ -130,7 +139,7 @@ namespace TEN::Entities::Vehicles
 		jeepItem->Data = JeepInfo();
 		auto* jeep = GetJeepInfo(jeepItem);
 
-		jeepItem->SetBits(JointBitType::Mesh, JeepMeshJoints);
+		jeepItem->SetBits(JointBitType::Mesh, JeepJoints);
 		jeep->momentumAngle = jeepItem->Pose.Position.y;
 	}
 
@@ -529,10 +538,10 @@ namespace TEN::Entities::Vehicles
 
 		if (oldPos.y <= jeepItem->Floor - 8 )
 		{
-			if (jeep->jeepTurn < -JEEP_UNDO_TURN)
-				jeep->jeepTurn += JEEP_UNDO_TURN;
-			else if (jeep->jeepTurn > JEEP_UNDO_TURN)
-				jeep->jeepTurn -= JEEP_UNDO_TURN;
+			if (jeep->jeepTurn < -JEEP_TURN_RATE_DECEL)
+				jeep->jeepTurn += JEEP_TURN_RATE_DECEL;
+			else if (jeep->jeepTurn > JEEP_TURN_RATE_DECEL)
+				jeep->jeepTurn -= JEEP_TURN_RATE_DECEL;
 			else
 				jeep->jeepTurn = 0;
 
@@ -646,10 +655,10 @@ namespace TEN::Entities::Vehicles
 				JeepNoGetOff = 0;
 		}
 
-		if (jeep->velocity > JEEP_MAX_SPEED)
-			jeep->velocity = JEEP_MAX_SPEED;
-		else if (jeep->velocity < -JEEP_MAX_BACK)
-			jeep->velocity = -JEEP_MAX_BACK;
+		if (jeep->velocity > JEEP_VELOCITY_MAX)
+			jeep->velocity = JEEP_VELOCITY_MAX;
+		else if (jeep->velocity < -JEEP_REVERSE_VELOCITY_MAX)
+			jeep->velocity = -JEEP_REVERSE_VELOCITY_MAX;
 
 		Vector3Int movedPos;
 		movedPos.x = jeepItem->Pose.Position.x;
@@ -724,9 +733,9 @@ namespace TEN::Entities::Vehicles
 			newspeed = (jeepItem->Pose.Position.z - oldPos.z) * phd_cos(jeep->momentumAngle) + (jeepItem->Pose.Position.x - oldPos.x) * phd_sin(jeep->momentumAngle);
 			newspeed *= 256;
 
-			if ((&g_Level.Items[lara->Vehicle] == jeepItem) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
+			if ((&g_Level.Items[lara->Vehicle] == jeepItem) && (jeep->velocity == JEEP_VELOCITY_MAX) && (newspeed < (JEEP_VELOCITY_MAX - 10)))
 			{
-				laraItem->HitPoints -= (JEEP_MAX_SPEED - newspeed) / 128;
+				laraItem->HitPoints -= (JEEP_VELOCITY_MAX - newspeed) / 128;
 				laraItem->HitStatus = true;
 			}
 
@@ -736,8 +745,8 @@ namespace TEN::Entities::Vehicles
 			else if (jeep->velocity < 0 && newspeed > jeep->velocity)
 				jeep->velocity = (newspeed < 0) ? 0 : newspeed;
 
-			if (jeep->velocity < JEEP_MAX_BACK)
-				jeep->velocity = JEEP_MAX_BACK;
+			if (jeep->velocity < JEEP_REVERSE_VELOCITY_MAX)
+				jeep->velocity = JEEP_REVERSE_VELOCITY_MAX;
 		}
 
 		return collide;
@@ -769,7 +778,7 @@ namespace TEN::Entities::Vehicles
 					LookUpDown(laraItem);
 			}
 
-			if (abs(jeep->velocity) <= JEEP_MAX_SPEED / 2)
+			if (abs(jeep->velocity) <= JEEP_VELOCITY_MAX / 2)
 			{
 				rot1 = ANGLE(5) * abs(jeep->velocity) / 16384;
 				rot2 = 60 * abs(jeep->velocity) / 16384 + ANGLE(1);
@@ -832,24 +841,24 @@ namespace TEN::Entities::Vehicles
 			{
 				if (jeep->unknown2)
 				{
-					if (jeep->unknown2 == 1 && jeep->velocity > -JEEP_MAX_BACK)
-						jeep->velocity -= (abs(-JEEP_MAX_BACK - jeep->velocity) / 8) - 2;
-					else if (jeep->unknown2 == 1 && jeep->velocity < -JEEP_MAX_BACK)
-						jeep->velocity = -JEEP_MAX_BACK;
+					if (jeep->unknown2 == 1 && jeep->velocity > -JEEP_REVERSE_VELOCITY_MAX)
+						jeep->velocity -= (abs(-JEEP_REVERSE_VELOCITY_MAX - jeep->velocity) / 8) - 2;
+					else if (jeep->unknown2 == 1 && jeep->velocity < -JEEP_REVERSE_VELOCITY_MAX)
+						jeep->velocity = -JEEP_REVERSE_VELOCITY_MAX;
 				}
 				else
 				{
-					if (jeep->velocity < JEEP_MAX_SPEED)
+					if (jeep->velocity < JEEP_VELOCITY_MAX)
 					{
 						if (jeep->velocity < 0x4000)
 							jeep->velocity += 8 + ((0x4000 + 0x800 - jeep->velocity) / 8);
 						else if (jeep->velocity < 0x7000)
 							jeep->velocity += 4 + ((0x7000 + 0x800 - jeep->velocity) / 16);
-						else if (jeep->velocity < JEEP_MAX_SPEED)
-							jeep->velocity += 2 + ((JEEP_MAX_SPEED - jeep->velocity) / 8);
+						else if (jeep->velocity < JEEP_VELOCITY_MAX)
+							jeep->velocity += 2 + ((JEEP_VELOCITY_MAX - jeep->velocity) / 8);
 					}
 					else
-						jeep->velocity = JEEP_MAX_SPEED;
+						jeep->velocity = JEEP_VELOCITY_MAX;
 				}
 
 				jeep->velocity -= (abs(jeepItem->Pose.Orientation.y - jeep->momentumAngle) / 64);

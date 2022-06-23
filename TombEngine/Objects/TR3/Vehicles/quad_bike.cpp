@@ -26,7 +26,7 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
-	BITE_INFO quadBikeEffectsPositions[6] =
+	BITE_INFO QuadBikeEffectsPositions[6] =
 	{
 		{ -56, -32, -380, 0	},
 		{ 56, -32, -380, 0 },
@@ -35,33 +35,43 @@ namespace TEN::Entities::Vehicles
 		{ 90, 180, -32, 6 },
 		{ -90, 180, -32, 7 }
 	};
+	const vector<VehicleMountType> QuadBikeMountTypes =
+	{
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
 
-	#define MAX_VELOCITY				0xA000
-	#define MIN_DRIFT_VELOCITY			0x3000
-	#define BRAKE						0x0280
-	#define REVERSE_ACCELERATION		-0x0300
-	#define MAX_BACK					-0x3000
-	#define MAX_REVS					0xa000
-	#define TERMINAL_VERTICAL_VELOCITY	240
-	#define QBIKE_SLIP					100
-	#define QBIKE_SLIP_SIDE				50
+	constexpr auto QBIKE_MOUNT_DISTANCE_MIN = CLICK(2);
 
-	#define QBIKE_FRONT	550
-	#define QBIKE_BACK  -550
-	#define QBIKE_SIDE	260
-	#define QBIKE_RADIUS	500
-	#define QBIKE_HEIGHT	512
+	constexpr auto MAX_VELOCITY = 0xA000;
+	constexpr auto MIN_DRIFT_VELOCITY = 0x3000;
+	constexpr auto BRAKE = 0x0280;
+	constexpr auto REVERSE_ACCELERATION = -0x0300;
+	constexpr auto MAX_BACK = -0x3000;
+	constexpr auto MAX_REVS = 0xa000;
+	constexpr auto TERMINAL_VERTICAL_VELOCITY = 240;
+	constexpr auto QBIKE_SLIP = 100;
+	constexpr auto QBIKE_SLIP_SIDE = 50;
 
-		// TODO
-	#define QBIKE_HIT_LEFT  11
-	#define QBIKE_HIT_RIGHT 12
-	#define QBIKE_HIT_FRONT 13
-	#define QBIKE_HIT_BACK  14
+	constexpr auto QBIKE_FRONT = 550;
+	constexpr auto QBIKE_BACK = -550;
+	constexpr auto QBIKE_SIDE = 260;
+	constexpr auto QBIKE_RADIUS = 500;
+	constexpr auto QBIKE_HEIGHT = 512;
 
-	#define DAMAGE_START  140
-	#define DAMAGE_LENGTH 14
+	// TODO
+	constexpr auto QBIKE_HIT_LEFT = 11;
+	constexpr auto QBIKE_HIT_RIGHT = 12;
+	constexpr auto QBIKE_HIT_FRONT = 13;
+	constexpr auto QBIKE_HIT_BACK = 14;
 
-	#define DISMOUNT_DISTANCE 385	// Precise root bone offset derived from final frame of animation.
+	constexpr auto DAMAGE_START = 140;
+	constexpr auto DAMAGE_LENGTH = 14;
+
+	constexpr auto DISMOUNT_DISTANCE = 385; // Precise root bone offset derived from final frame of animation.
+
+	constexpr auto QBIKE_MAX_HEIGHT = CLICK(1);
+	constexpr auto QBIKE_MIN_BOUNCE = (MAX_VELOCITY / 2) / CLICK(1);
 
 	#define QBIKE_UNDO_TURN			ANGLE(2.0f)
 	#define QBIKE_TURN_RATE			(ANGLE(0.5f) + QBIKE_UNDO_TURN)
@@ -72,9 +82,6 @@ namespace TEN::Entities::Vehicles
 	#define MIN_MOMENTUM_TURN ANGLE(3.0f)
 	#define MAX_MOMENTUM_TURN ANGLE(1.5f)
 	#define QBIKE_MAX_MOM_TURN ANGLE(150.0f)
-
-	#define QBIKE_MAX_HEIGHT CLICK(1)
-	#define QBIKE_MIN_BOUNCE ((MAX_VELOCITY / 2) / CLICK(1))
 
 	enum QuadBikeState
 	{
@@ -1271,10 +1278,10 @@ namespace TEN::Entities::Vehicles
 
 			for (int i = 0; i < 2; i++)
 			{
-				pos.x = quadBikeEffectsPositions[i].x;
-				pos.y = quadBikeEffectsPositions[i].y;
-				pos.z = quadBikeEffectsPositions[i].z;
-				GetJointAbsPosition(quadBikeItem, &pos, quadBikeEffectsPositions[i].meshNum);
+				pos.x = QuadBikeEffectsPositions[i].x;
+				pos.y = QuadBikeEffectsPositions[i].y;
+				pos.z = QuadBikeEffectsPositions[i].z;
+				GetJointAbsPosition(quadBikeItem, &pos, QuadBikeEffectsPositions[i].meshNum);
 				angle = quadBikeItem->Pose.Orientation.y + ((i == 0) ? 0x9000 : 0x7000);
 				if (quadBikeItem->Animation.Velocity > 32)
 				{

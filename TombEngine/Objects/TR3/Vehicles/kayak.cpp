@@ -31,55 +31,61 @@ namespace TEN::Entities::Vehicles
 		byte 	life;
 		byte	pad[3];
 	};
-
 	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	static vector<VehicleMountType> KayakMountTypes =
+	{
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
 
-	#define KAYAK_COLLIDE			CLICK(0.25f)
-	#define DISMOUNT_DISTANCE 		CLICK(3) // TODO: Find accurate distance.
-	#define KAYAK_TO_ENTITY_RADIUS	CLICK(1)
+	constexpr auto KAYAK_MOUNT_DISTANCE_MIN = CLICK(1.5f);
 
-	#define MAX_VELOCITY				0x380000
-	#define KAYAK_FRICTION				0x8000
-	#define KAYAK_ROTATE_FRICTION		0x50000
-	#define KAYAK_DEFLECT_ROTATION		0x80000
-	#define KAYAK_FORWARD_VELOCITY		0x180000
-	#define KAYAK_FORWARD_ROTATION		0x800000
-	#define KAYAK_LEFT_RIGHT_VELOCITY	0x100000
-	#define KAYAK_LEFT_RIGHT_ROTATION	0xc00000
-	#define KAYAK_MAX_LEFT_RIGHT		0xc00000
-	#define KAYAK_TURN_ROTATION			0x200000
-	#define KAYAK_MAX_TURN				0x1000000
-	#define KAYAK_TURN_BRAKE			0x8000
-	#define KAYAK_HARD_ROTATION			0x1000000
-	#define KAYAK_MAX_STAT				0x1000000
+	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
+	constexpr auto DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
+	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 
-	#define HIT_BACK	1
-	#define HIT_FRONT	2
-	#define HIT_LEFT	3
-	#define HIT_RIGHT	4
+	constexpr auto MAX_VELOCITY = 0x380000;
+	constexpr auto KAYAK_FRICTION = 0x8000;
+	constexpr auto KAYAK_ROTATE_FRICTION = 0x50000;
+	constexpr auto KAYAK_DEFLECT_ROTATION = 0x80000;
+	constexpr auto KAYAK_FORWARD_VELOCITY = 0x180000;
+	constexpr auto KAYAK_FORWARD_ROTATION = 0x800000;
+	constexpr auto KAYAK_LEFT_RIGHT_VELOCITY = 0x100000;
+	constexpr auto KAYAK_LEFT_RIGHT_ROTATION = 0xc00000;
+	constexpr auto KAYAK_MAX_LEFT_RIGHT = 0xc00000;
+	constexpr auto KAYAK_TURN_ROTATION = 0x200000;
+	constexpr auto KAYAK_MAX_TURN = 0x1000000;
+	constexpr auto KAYAK_TURN_BRAKE = 0x8000;
+	constexpr auto KAYAK_HARD_ROTATION = 0x1000000;
+	constexpr auto KAYAK_MAX_STAT = 0x1000000;
+
+	constexpr auto HIT_BACK = 1;
+	constexpr auto HIT_FRONT = 2;
+	constexpr auto HIT_LEFT = 3;
+	constexpr auto HIT_RIGHT = 4;
 
 	#define KAYAK_MOUNT_LEFT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_RIGHT, 0)
 	#define KAYAK_IDLE_FRAME		GetFrameNumber(KAYAK_ANIM_IDLE, 0)
 	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
 
 
-	#define KAYAK_DRAW_SHIFT	32
-	#define NUM_WAKE_SPRITES	32
-	#define WAKE_SIZE 			32
-	#define WAKE_VELOCITY 		4
-	#define KAYAK_X				128
-	#define KAYAK_Z				128
-	#define KAYAK_MAX_KICK		-80
-	#define KAYAK_MIN_BOUNCE	((MAX_VELOCITY / 2) / 256)
+	constexpr auto KAYAK_DRAW_SHIFT = 32;
+	constexpr auto NUM_WAKE_SPRITES = 32;
+	constexpr auto WAKE_SIZE = 32;
+	constexpr auto WAKE_VELOCITY = 4;
+	constexpr auto KAYAK_X = 128;
+	constexpr auto KAYAK_Z = 128;
+	constexpr auto KAYAK_MAX_KICK = -80;
+	constexpr auto KAYAK_MIN_BOUNCE = (MAX_VELOCITY / 2) / 256;
 
 	// TODO: ??
-	#define KAYAK_IN_FORWARD	IN_FORWARD
-	#define KAYAK_IN_BACK		IN_BACK
-	#define KAYAK_IN_LEFT		IN_LEFT
-	#define KAYAK_IN_RIGHT		IN_RIGHT
-	#define KAYAK_IN_HOLD		IN_WALK
-	#define KAYAK_IN_HOLD_LEFT	IN_LSTEP
-	#define KAYAK_IN_HOLD_RIGHT	IN_RSTEP
+	constexpr auto KAYAK_IN_FORWARD = IN_FORWARD;
+	constexpr auto KAYAK_IN_BACK = IN_BACK;
+	constexpr auto KAYAK_IN_LEFT = IN_LEFT;
+	constexpr auto KAYAK_IN_RIGHT = IN_RIGHT;
+	constexpr auto KAYAK_IN_HOLD = IN_WALK;
+	constexpr auto KAYAK_IN_HOLD_LEFT = IN_LSTEP;
+	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
 
 	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
 
