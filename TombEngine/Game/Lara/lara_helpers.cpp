@@ -65,16 +65,10 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraFlex(item, 12.0f);
 	}
 
-	// Reset turn rate.
-	// TODO: Make it less stupid in the future. Do it according to a curve?
-	int sign = copysign(1, lara->Control.TurnRate);
-	if (abs(lara->Control.TurnRate) > ANGLE(2.0f))
-		lara->Control.TurnRate -= ANGLE(2.0f) * sign;
-	else if (abs(lara->Control.TurnRate) > ANGLE(0.5f))
-		lara->Control.TurnRate -= ANGLE(0.5f) * sign;
-	else
-		lara->Control.TurnRate = 0;
+	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
+	if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
+		lara->Control.TurnRate = 0;
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)

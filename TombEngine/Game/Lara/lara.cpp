@@ -844,28 +844,11 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->GetLaraType() == LaraType::Divesuit)
-	{
-		if (lara->Control.TurnRate < -ANGLE(0.5f))
-			lara->Control.TurnRate += ANGLE(0.5f);
-		else if (lara->Control.TurnRate > ANGLE(0.5f))
-			lara->Control.TurnRate -= ANGLE(0.5f);
-		else
-			lara->Control.TurnRate = 0;
-	}
-	else
-	{
-		// Reset turn rate.
-		int sign = copysign(1, lara->Control.TurnRate);
-		if (abs(lara->Control.TurnRate) > ANGLE(2.0f))
-			lara->Control.TurnRate -= ANGLE(2.0f) * sign;
-		else if (abs(lara->Control.TurnRate) > ANGLE(0.5f))
-			lara->Control.TurnRate -= ANGLE(0.5f) * sign;
-		else
-			lara->Control.TurnRate = 0;
-	}
-
+	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
+	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
+	if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
+		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
@@ -931,22 +914,11 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->GetLaraType() == LaraType::Divesuit)
-	{
-		if (lara->Control.TurnRate < -ANGLE(0.5f))
-			lara->Control.TurnRate += ANGLE(0.5f);
-		else if (lara->Control.TurnRate > ANGLE(0.5f))
-			lara->Control.TurnRate -= ANGLE(0.5f);
-		else
-			lara->Control.TurnRate = 0;
-	}
-	else if (lara->Control.TurnRate < -ANGLE(2.0f))
-		lara->Control.TurnRate += ANGLE(2.0f);
-	else if (lara->Control.TurnRate > ANGLE(2.0f))
-		lara->Control.TurnRate -= ANGLE(2.0f);
-	else
-		lara->Control.TurnRate = 0;
+	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
+	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
+	if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
+		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);

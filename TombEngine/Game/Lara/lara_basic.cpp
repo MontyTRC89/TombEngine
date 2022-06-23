@@ -403,10 +403,10 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (BinocularOn)
 		return;
 
-	if (!(TrInput & IN_JUMP) ||	isSwamp)	// JUMP locks orientation outside swamps.
+	if (!(TrInput & IN_JUMP) || isSwamp) // JUMP locks orientation outside swamps.
 	{
 		if ((TrInput & IN_LEFT &&
-				!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))) ||	// Sidestep locks orientation.
+				!(TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))) || // Sidestep locks orientation.
 			(TrInput & IN_RIGHT &&
 				!(TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))))
 		{
