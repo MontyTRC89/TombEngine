@@ -847,7 +847,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
 		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
@@ -917,7 +917,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
 		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)

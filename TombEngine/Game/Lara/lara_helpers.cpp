@@ -67,7 +67,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
-	if (!(TrInput & IN_LEFT) && !(TrInput & IN_RIGHT))
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
 		lara->Control.TurnRate = 0;
 }
 

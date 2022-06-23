@@ -16,7 +16,6 @@ struct HAIR_STRUCT
 
 	bool initialised = false;
 };
-
 extern HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 
 void InitialiseHair();
