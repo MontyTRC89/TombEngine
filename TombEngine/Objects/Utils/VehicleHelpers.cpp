@@ -45,9 +45,6 @@ namespace TEN::Entities::Vehicles
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
 
-		// TODO: Not working as expected.
-		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < abs(deltaHeadingAngle);
-
 		// Assess mount types allowed for vehicle.
 		for (auto mountType : allowedMountTypes)
 		{
@@ -64,7 +61,7 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Back:
 				if (abs(deltaHeadingAngle) < ANGLE(35.0f) &&
-					onCorrectSide &&
+					abs(angleBetweenPositions) < ANGLE(35.0f) &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -74,7 +71,6 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Left:
 				if (deltaHeadingAngle > -ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(45.0f) &&
-					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -84,7 +80,6 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Right:
 				if (deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
-					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -131,17 +126,17 @@ namespace TEN::Entities::Vehicles
 		if (pos->y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
 			return NO_HEIGHT;
 
-		if (clamp && pos->y > probe.Position.Floor)
+		if (pos->y > probe.Position.Floor && clamp)
 			pos->y = probe.Position.Floor;
 
 		return probe.Position.Floor;
 	}
 
-	int GetVehicleWaterHeight(ItemInfo* vehicle, int forward, int right, bool clamp, Vector3Int* pos)
+	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
 	{
 		Matrix world =
-			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicle->Pose.Orientation.y), TO_RAD(vehicle->Pose.Orientation.x), TO_RAD(vehicle->Pose.Orientation.z)) *
-			Matrix::CreateTranslation(vehicle->Pose.Position.x, vehicle->Pose.Position.y, vehicle->Pose.Position.z);
+			Matrix::CreateFromYawPitchRoll(TO_RAD(vehicleItem->Pose.Orientation.y), TO_RAD(vehicleItem->Pose.Orientation.x), TO_RAD(vehicleItem->Pose.Orientation.z)) *
+			Matrix::CreateTranslation(vehicleItem->Pose.Position.x, vehicleItem->Pose.Position.y, vehicleItem->Pose.Position.z);
 
 		Vector3 vec = Vector3(right, 0, forward);
 		vec = Vector3::Transform(vec, world);
@@ -150,10 +145,10 @@ namespace TEN::Entities::Vehicles
 		pos->y = vec.y;
 		pos->z = vec.z;
 
-		auto probe = GetCollision(pos->x, pos->y, pos->z, vehicle->RoomNumber);
-		int probedRoomNum = probe.RoomNumber;
+		auto probe = GetCollision(pos->x, pos->y, pos->z, vehicleItem->RoomNumber);
+		int probedRoomNumber = probe.RoomNumber;
 
-		int height = GetWaterHeight(pos->x, pos->y, pos->z, probedRoomNum);
+		int height = GetWaterHeight(pos->x, pos->y, pos->z, probedRoomNumber);
 
 		if (height == NO_HEIGHT)
 		{
@@ -164,7 +159,7 @@ namespace TEN::Entities::Vehicles
 
 		height -= 5;
 
-		if (clamp && pos->y > height)
+		if (pos->y > height && clamp)
 			pos->y = height;
 
 		return height;
