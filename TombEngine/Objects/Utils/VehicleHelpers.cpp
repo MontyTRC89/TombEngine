@@ -37,6 +37,8 @@ namespace TEN::Entities::Vehicles
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
+		// TODO: Lara can mount from the opposite side when facing away from the vehicle.
+		// Confirm correct side.
 
 		// Assess mount types allowed for vehicle.
 		for (auto mountType : allowedMountTypes)
@@ -44,7 +46,8 @@ namespace TEN::Entities::Vehicles
 			switch (mountType)
 			{
 			case VehicleMountType::LevelStart:
-				if (!laraItem->Animation.VerticalVelocity &&
+				if (!laraItem->Animation.Velocity &&
+					!laraItem->Animation.VerticalVelocity &&
 					laraItem->Pose.Position == vehicleItem->Pose.Position)
 				{
 					break;
