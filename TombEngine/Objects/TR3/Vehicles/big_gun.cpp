@@ -34,9 +34,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto BGUN_X_ORIENT_MIDDLE_FRAME = 30;
 
 	#define BGUN_TURN_RATE_ACCEL ANGLE(0.5f)
-	#define BGUN_TURN_RATE_MAX ANGLE(4.0f)
-	#define BGUN_X_ORIENT_ANGLE_MAX ANGLE(40.0f)
-	#define BGUN_X_ORIENT_ANGLE_STEP (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES)
+	#define BGUN_TURN_RATE_MAX	 ANGLE(4.0f)
+	#define BGUN_X_ORIENT_STEP	 (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES)
+	#define BGUN_X_ORIENT_MAX	 ANGLE(40.0f)
 
 	enum BigGunState
 	{
@@ -260,12 +260,12 @@ namespace TEN::Entities::Vehicles
 				bigGun->Rotation.x += bigGun->TurnRate.x;
 				bigGun->Rotation.y += bigGun->TurnRate.y;
 
-				if (bigGun->Rotation.x > BGUN_X_ORIENT_ANGLE_MAX)
-					bigGun->Rotation.x = BGUN_X_ORIENT_ANGLE_MAX;
-				else if (bigGun->Rotation.x < -BGUN_X_ORIENT_ANGLE_MAX)
-					bigGun->Rotation.x = -BGUN_X_ORIENT_ANGLE_MAX;
+				if (bigGun->Rotation.x > BGUN_X_ORIENT_MAX)
+					bigGun->Rotation.x = BGUN_X_ORIENT_MAX;
+				else if (bigGun->Rotation.x < -BGUN_X_ORIENT_MAX)
+					bigGun->Rotation.x = -BGUN_X_ORIENT_MAX;
 
-				bigGun->XOrientFrame = (int)round((bigGun->Rotation.x + BGUN_X_ORIENT_ANGLE_MAX) / BGUN_X_ORIENT_ANGLE_STEP);
+				bigGun->XOrientFrame = (int)round((bigGun->Rotation.x + BGUN_X_ORIENT_MAX) / BGUN_X_ORIENT_STEP);
 			}
 		}
 
@@ -282,11 +282,11 @@ namespace TEN::Entities::Vehicles
 				bigGun->Flags = BGUN_FLAG_DISMOUNT;
 			}
 			else if (bigGun->Rotation.x > 0)
-				bigGun->Rotation.x -= BGUN_X_ORIENT_ANGLE_STEP;
+				bigGun->Rotation.x -= BGUN_X_ORIENT_STEP;
 			else if (bigGun->Rotation.x < 0)
-				bigGun->Rotation.x += BGUN_X_ORIENT_ANGLE_STEP;
+				bigGun->Rotation.x += BGUN_X_ORIENT_STEP;
 
-			bigGun->XOrientFrame = (int)round((bigGun->Rotation.x + BGUN_X_ORIENT_ANGLE_MAX) / BGUN_X_ORIENT_ANGLE_STEP);
+			bigGun->XOrientFrame = (int)round((bigGun->Rotation.x + BGUN_X_ORIENT_MAX) / BGUN_X_ORIENT_STEP);
 		}
 
 		switch (laraItem->Animation.ActiveState)

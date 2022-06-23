@@ -497,13 +497,13 @@ bool SaveGame::Save(int slot)
 
 			Save::UPVBuilder upvBuilder{ fbb };
 
-			upvBuilder.add_fan_rot(upv->FanRot);
+			upvBuilder.add_fan_rot(upv->FanRotation);
 			upvBuilder.add_flags(upv->Flags);
 			upvBuilder.add_harpoon_left(upv->HarpoonLeft);
 			upvBuilder.add_harpoon_timer(upv->HarpoonTimer);
-			upvBuilder.add_rot(upv->Rot);
+			upvBuilder.add_rot(upv->TurnRate.y);
 			upvBuilder.add_velocity(upv->Velocity);
-			upvBuilder.add_x_rot(upv->XRot);
+			upvBuilder.add_x_rot(upv->TurnRate.x);
 			upvOffset = upvBuilder.Finish();
 		}
 		else if (itemToSerialize.Data.is<MinecartInfo>())
@@ -1374,13 +1374,13 @@ bool SaveGame::Load(int slot)
 			auto* upv = (UPVInfo*)item->Data;
 			auto* savedUpv = (Save::UPV*)savedItem->data();
 
-			upv->FanRot = savedUpv->fan_rot();
+			upv->FanRotation = savedUpv->fan_rot();
 			upv->Flags = savedUpv->flags();
 			upv->HarpoonLeft = savedUpv->harpoon_left();
 			upv->HarpoonTimer = savedUpv->harpoon_timer();
-			upv->Rot = savedUpv->rot();
+			upv->TurnRate.y = savedUpv->rot();
 			upv->Velocity = savedUpv->velocity();
-			upv->XRot = savedUpv->x_rot();
+			upv->TurnRate.x = savedUpv->x_rot();
 		}
 		else if (item->Data.is<MinecartInfo>())
 		{

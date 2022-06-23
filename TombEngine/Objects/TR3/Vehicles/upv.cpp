@@ -39,18 +39,18 @@ namespace TEN::Entities::Vehicles
 	};
 	const vector<VehicleMountType> UPVMountTypes = { VehicleMountType::Back };
 
+	constexpr auto UPV_RADIUS = 300;
+	constexpr auto UPV_HEIGHT = 400;
+	constexpr auto UPV_LENGTH = SECTOR(1);
 	constexpr auto UPV_MOUNT_DISTANCE_MIN = CLICK(1.5f);
 
-	constexpr int ACCELERATION = 4 * 256;
-	constexpr int FRICTION = 1.5f * 256;
-	constexpr int MAX_VELOCITY = 64 * 256;
+	constexpr int UPV_VELOCITY_ACCEL = 4 * 256;
+	constexpr int UPV_VELOCITY_FRICTION = 1.5f * 256;
+	constexpr int UPV_VELOCITY_MAX = 64 * 256;
 
 	constexpr auto UPDOWN_SPEED = 10;
 	constexpr auto SURFACE_DIST = 210;
 	constexpr auto UPV_DRAW_SHIFT = 128;
-	constexpr auto UPV_RADIUS = 300;
-	constexpr auto UPV_HEIGHT = 400;
-	constexpr auto UPV_LENGTH = SECTOR(1);
 	constexpr auto DISMOUNT_DISTANCE = SECTOR(1);
 	constexpr auto HARPOON_VELOCITY = CLICK(1);
 	constexpr auto HARPOON_RELOAD = 15;
@@ -66,20 +66,21 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOUNT_UNDERWATER_SOUND_FRAME = 30;
 	constexpr auto MOUNT_UNDERWATER_CONTROL_FRAME = 42;
 
-	#define ROT_ACCELERATION ANGLE(0.35f)
-	#define ROT_SLOWACCEL ANGLE(0.2f)
-	#define ROT_FRICTION ANGLE(0.08f)
-	#define MAX_ROTATION ANGLE(2.5f)
+	#define UPV_X_TURN_RATE_SLOW_ACCEL ANGLE(1.0f)
+	#define UPV_X_TURN_RATE_ACCEL	   ANGLE(2.0f)
+	#define UPV_X_TURN_RATE_FRICTION   ANGLE(1.0f)
+	#define UPV_X_TURN_RATE_MAX		   ANGLE(2.0f)
 
-	#define UPDOWN_ACCEL		ANGLE(2.0f)
-	#define UPDOWN_SLOWACCEL	ANGLE(1.0f)
-	#define UPDOWN_FRICTION		ANGLE(1.0f)
-	#define MAX_UPDOWN			ANGLE(2.0f)
-	#define UPDOWN_LIMIT		ANGLE(80.0f)
+	#define UPV_Y_TURN_RATE_SLOW_ACCEL ANGLE(0.2f)
+	#define UPV_Y_TURN_RATE_ACCEL	   ANGLE(0.35f)
+	#define UPV_Y_TURN_RATE_FRICTION   ANGLE(0.08f)
+	#define UPV_Y_TURN_RATE_MAX		   ANGLE(2.5f)
 
-	#define SURFACE_ANGLE		ANGLE(30.0f)
-	#define DIVE_ANGLE			ANGLE(15.0f)
-	#define DIVE_SPEED			ANGLE(5.0f)
+	#define UPV_X_TURN_RATE_DIVE ANGLE(5.0f)
+	#define UPV_X_ORIENT_DIVE	 ANGLE(15.0f)
+
+	#define UPV_X_ORIENT_MAX		   ANGLE(85.0f)
+	#define UPV_X_ORIENT_WATER_SURFACE ANGLE(30.0f)
 
 	#define FRONT_TOLERANCE		ANGLE(45.0f)
 	#define TOP_TOLERANCE		ANGLE(45.0f)
@@ -254,9 +255,9 @@ namespace TEN::Entities::Vehicles
 		if (lara->Vehicle == itemNumber)
 		{
 			if (!UPV->Velocity)
-				UPV->FanRot += ANGLE(2.0f);
+				UPV->FanRotation += ANGLE(2.0f);
 			else
-				UPV->FanRot += UPV->Velocity / 4069;
+				UPV->FanRotation += UPV->Velocity / 4069;
 
 			if (UPV->Velocity)
 			{
@@ -474,13 +475,13 @@ namespace TEN::Entities::Vehicles
 
 		if (coll->CollisionType == CT_FRONT)
 		{
-			if (UPV->XRot > FRONT_TOLERANCE)
-				UPV->XRot += WALL_DEFLECT;
-			else if (UPV->XRot < -FRONT_TOLERANCE)
-				UPV->XRot -= WALL_DEFLECT;
+			if (UPV->TurnRate.x > FRONT_TOLERANCE)
+				UPV->TurnRate.x += WALL_DEFLECT;
+			else if (UPV->TurnRate.x < -FRONT_TOLERANCE)
+				UPV->TurnRate.x -= WALL_DEFLECT;
 			else
 			{
-				if (abs(UPV->Velocity) >= MAX_VELOCITY)
+				if (abs(UPV->Velocity) >= UPV_VELOCITY_MAX)
 				{
 					laraItem->Animation.TargetState = UPV_STATE_HIT;
 					UPV->Velocity = -UPV->Velocity / 2;
@@ -491,8 +492,8 @@ namespace TEN::Entities::Vehicles
 		}
 		else if (coll->CollisionType == CT_TOP)
 		{
-			if (UPV->XRot >= -TOP_TOLERANCE)
-				UPV->XRot -= WALL_DEFLECT;
+			if (UPV->TurnRate.x >= -TOP_TOLERANCE)
+				UPV->TurnRate.x -= WALL_DEFLECT;
 		}
 		else if (coll->CollisionType == CT_TOP_FRONT)
 			UPV->Velocity = 0;
@@ -510,7 +511,7 @@ namespace TEN::Entities::Vehicles
 		if (coll->Middle.Floor < 0)
 		{
 			UPVItem->Pose.Position.y += coll->Middle.Floor;
-			UPV->XRot += WALL_DEFLECT;
+			UPV->TurnRate.x += WALL_DEFLECT;
 		}
 	}
 
@@ -534,15 +535,15 @@ namespace TEN::Entities::Vehicles
 			}
 
 			if (TrInput & VEHICLE_IN_LEFT)
-				UPV->Rot -= ROT_ACCELERATION;
+				UPV->TurnRate.y -= UPV_Y_TURN_RATE_ACCEL;
 
 			else if (TrInput & VEHICLE_IN_RIGHT)
-				UPV->Rot += ROT_ACCELERATION;
+				UPV->TurnRate.y += UPV_Y_TURN_RATE_ACCEL;
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 			{
-				int xa = UPVItem->Pose.Orientation.x - SURFACE_ANGLE;
-				int ax = SURFACE_ANGLE - UPVItem->Pose.Orientation.x;
+				int xa = UPVItem->Pose.Orientation.x - UPV_X_ORIENT_WATER_SURFACE;
+				int ax = UPV_X_ORIENT_WATER_SURFACE - UPVItem->Pose.Orientation.x;
 
 				if (xa > 0)
 				{
@@ -559,26 +560,26 @@ namespace TEN::Entities::Vehicles
 						UPVItem->Pose.Orientation.x += ANGLE(0.1f);
 				}
 				else
-					UPVItem->Pose.Orientation.x = SURFACE_ANGLE;
+					UPVItem->Pose.Orientation.x = UPV_X_ORIENT_WATER_SURFACE;
 			}
 			else
 			{
 				if (TrInput & VEHICLE_IN_UP)
-					UPV->XRot -= UPDOWN_ACCEL;
+					UPV->TurnRate.x -= UPV_X_TURN_RATE_ACCEL;
 				else if (TrInput & VEHICLE_IN_DOWN)
-					UPV->XRot += UPDOWN_ACCEL;
+					UPV->TurnRate.x += UPV_X_TURN_RATE_ACCEL;
 			}
 
 			if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
 				if (TrInput & VEHICLE_IN_UP &&
 					UPV->Flags & UPV_FLAG_SURFACE &&
-					UPVItem->Pose.Orientation.x > -DIVE_ANGLE)
+					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE)
 				{
 					UPV->Flags |= UPV_FLAG_DIVE;
 				}
 
-				UPV->Velocity += ACCELERATION;
+				UPV->Velocity += UPV_VELOCITY_ACCEL;
 			}
 
 			else
@@ -594,14 +595,14 @@ namespace TEN::Entities::Vehicles
 			}
 
 			if (TrInput & VEHICLE_IN_LEFT)
-				UPV->Rot -= ROT_SLOWACCEL;
+				UPV->TurnRate.y -= UPV_Y_TURN_RATE_SLOW_ACCEL;
 			else if (TrInput & VEHICLE_IN_RIGHT)
-				UPV->Rot += ROT_SLOWACCEL;
+				UPV->TurnRate.y += UPV_Y_TURN_RATE_SLOW_ACCEL;
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 			{
-				int xa = UPVItem->Pose.Orientation.x - SURFACE_ANGLE;
-				int ax = SURFACE_ANGLE - UPVItem->Pose.Orientation.x;
+				int xa = UPVItem->Pose.Orientation.x - UPV_X_ORIENT_WATER_SURFACE;
+				int ax = UPV_X_ORIENT_WATER_SURFACE - UPVItem->Pose.Orientation.x;
 				if (xa > 0)
 				{
 					if (xa > ANGLE(1.0f))
@@ -617,20 +618,20 @@ namespace TEN::Entities::Vehicles
 						UPVItem->Pose.Orientation.x += ANGLE(0.1f);
 				}
 				else
-					UPVItem->Pose.Orientation.x = SURFACE_ANGLE;
+					UPVItem->Pose.Orientation.x = UPV_X_ORIENT_WATER_SURFACE;
 			}
 			else
 			{
 				if (TrInput & VEHICLE_IN_UP)
-					UPV->XRot -= UPDOWN_ACCEL;
+					UPV->TurnRate.x -= UPV_X_TURN_RATE_ACCEL;
 				else if (TrInput & VEHICLE_IN_DOWN)
-					UPV->XRot += UPDOWN_ACCEL;
+					UPV->TurnRate.x += UPV_X_TURN_RATE_ACCEL;
 			}
 
 			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(laraItem, UPVItem))
 			{
 				if (UPV->Velocity > 0)
-					UPV->Velocity -= ACCELERATION;
+					UPV->Velocity -= UPV_VELOCITY_ACCEL;
 				else
 				{
 					if (UPV->Flags & UPV_FLAG_SURFACE)
@@ -648,7 +649,7 @@ namespace TEN::Entities::Vehicles
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
 				if (TrInput & VEHICLE_IN_UP &&
-					UPVItem->Pose.Orientation.x > -DIVE_ANGLE &&
+					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE &&
 					UPV->Flags & UPV_FLAG_SURFACE)
 				{
 					UPV->Flags |= UPV_FLAG_DIVE;
@@ -764,7 +765,7 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				UPV->XRot -= UPDOWN_ACCEL;
+				UPV->TurnRate.x -= UPV_X_TURN_RATE_ACCEL;
 				if (UPVItem->Pose.Orientation.x < 0)
 					UPVItem->Pose.Orientation.x = 0;
 			}
@@ -795,65 +796,65 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Flags & UPV_FLAG_DIVE)
 		{
-			if (UPVItem->Pose.Orientation.x > -DIVE_ANGLE)
-				UPVItem->Pose.Orientation.x -= DIVE_SPEED;
+			if (UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE)
+				UPVItem->Pose.Orientation.x -= UPV_X_TURN_RATE_DIVE;
 			else
 				UPV->Flags &= ~UPV_FLAG_DIVE;
 		}
 
 		if (UPV->Velocity > 0)
 		{
-			UPV->Velocity -= FRICTION;
+			UPV->Velocity -= UPV_VELOCITY_FRICTION;
 			if (UPV->Velocity < 0)
 				UPV->Velocity = 0;
 		}
 		else if (UPV->Velocity < 0)
 		{
-			UPV->Velocity += FRICTION;
+			UPV->Velocity += UPV_VELOCITY_FRICTION;
 			if (UPV->Velocity > 0)
 				UPV->Velocity = 0;
 		}
 
-		if (UPV->Velocity > MAX_VELOCITY)
-			UPV->Velocity = MAX_VELOCITY;
-		else if (UPV->Velocity < -MAX_VELOCITY)
-			UPV->Velocity = -MAX_VELOCITY;
+		if (UPV->Velocity > UPV_VELOCITY_MAX)
+			UPV->Velocity = UPV_VELOCITY_MAX;
+		else if (UPV->Velocity < -UPV_VELOCITY_MAX)
+			UPV->Velocity = -UPV_VELOCITY_MAX;
 
-		if (UPV->Rot > 0)
+		if (UPV->TurnRate.y > 0)
 		{
-			UPV->Rot -= ROT_FRICTION;
-			if (UPV->Rot < 0)
-				UPV->Rot = 0;
+			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION;
+			if (UPV->TurnRate.y < 0)
+				UPV->TurnRate.y = 0;
 		}
-		else if (UPV->Rot < 0)
+		else if (UPV->TurnRate.y < 0)
 		{
-			UPV->Rot += ROT_FRICTION;
-			if (UPV->Rot > 0)
-				UPV->Rot = 0;
-		}
-
-		if (UPV->XRot > 0)
-		{
-			UPV->XRot -= UPDOWN_FRICTION;
-			if (UPV->XRot < 0)
-				UPV->XRot = 0;
-		}
-		else if (UPV->XRot < 0)
-		{
-			UPV->XRot += UPDOWN_FRICTION;
-			if (UPV->XRot > 0)
-				UPV->XRot = 0;
+			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION;
+			if (UPV->TurnRate.y > 0)
+				UPV->TurnRate.y = 0;
 		}
 
-		if (UPV->Rot > MAX_ROTATION)
-			UPV->Rot = MAX_ROTATION;
-		else if (UPV->Rot < -MAX_ROTATION)
-			UPV->Rot = -MAX_ROTATION;
+		if (UPV->TurnRate.x > 0)
+		{
+			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION;
+			if (UPV->TurnRate.x < 0)
+				UPV->TurnRate.x = 0;
+		}
+		else if (UPV->TurnRate.x < 0)
+		{
+			UPV->TurnRate.x += UPV_X_TURN_RATE_FRICTION;
+			if (UPV->TurnRate.x > 0)
+				UPV->TurnRate.x = 0;
+		}
 
-		if (UPV->XRot > MAX_UPDOWN)
-			UPV->XRot = MAX_UPDOWN;
-		else if (UPV->XRot < -MAX_UPDOWN)
-			UPV->XRot = -MAX_UPDOWN;
+		if (UPV->TurnRate.y > UPV_Y_TURN_RATE_MAX)
+			UPV->TurnRate.y = UPV_Y_TURN_RATE_MAX;
+		else if (UPV->TurnRate.y < -UPV_Y_TURN_RATE_MAX)
+			UPV->TurnRate.y = -UPV_Y_TURN_RATE_MAX;
+
+		if (UPV->TurnRate.x > UPV_X_TURN_RATE_MAX)
+			UPV->TurnRate.x = UPV_X_TURN_RATE_MAX;
+		else if (UPV->TurnRate.x < -UPV_X_TURN_RATE_MAX)
+			UPV->TurnRate.x = -UPV_X_TURN_RATE_MAX;
 	}
 
 	void NoGetOnCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -930,14 +931,14 @@ namespace TEN::Entities::Vehicles
 			UPVControl(laraItem, UPVItem);
 
 			UPVItem->Animation.Velocity = UPV->Velocity / 256;
-			UPVItem->Pose.Orientation.x += UPV->XRot;
-			UPVItem->Pose.Orientation.y += UPV->Rot;
-			UPVItem->Pose.Orientation.z = UPV->Rot;
+			UPVItem->Pose.Orientation.x += UPV->TurnRate.x;
+			UPVItem->Pose.Orientation.y += UPV->TurnRate.y;
+			UPVItem->Pose.Orientation.z = UPV->TurnRate.y;
 
-			if (UPVItem->Pose.Orientation.x > UPDOWN_LIMIT)
-				UPVItem->Pose.Orientation.x = UPDOWN_LIMIT;
-			else if (UPVItem->Pose.Orientation.x < -UPDOWN_LIMIT)
-				UPVItem->Pose.Orientation.x = -UPDOWN_LIMIT;
+			if (UPVItem->Pose.Orientation.x > UPV_X_ORIENT_MAX)
+				UPVItem->Pose.Orientation.x = UPV_X_ORIENT_MAX;
+			else if (UPVItem->Pose.Orientation.x < -UPV_X_ORIENT_MAX)
+				UPVItem->Pose.Orientation.x = -UPV_X_ORIENT_MAX;
 
 			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity);
 		}
@@ -1064,7 +1065,7 @@ namespace TEN::Entities::Vehicles
 
 			BackgroundCollision(laraItem, UPVItem);
 
-			UPV->XRot = 0;
+			UPV->TurnRate.x = 0;
 
 			SetAnimation(UPVItem, UPV_ANIM_IDLE);
 			UPVItem->Animation.VerticalVelocity = 0;
