@@ -1103,7 +1103,7 @@ void BinocularCamera(ItemInfo* item)
 	if (!LaserSight)
 	{
 		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
-		if (InputBusy & (IN_DESELECT | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
+		if (InputBusy & (IN_DESELECT | IN_OPTION | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
 		{
 			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
