@@ -335,6 +335,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
 {
 	int sign = std::copysign(1, axisCoeff);
+
 	short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
 
@@ -354,7 +355,14 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
+	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	if (item->Animation.Airborne)
+	{
+		int sign = std::copysign(1, axisCoeff);
+		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
+	}
+
+	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
