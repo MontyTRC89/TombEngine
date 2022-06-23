@@ -17,32 +17,45 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::Vehicles
 {
-	#define SPEEDBOAT_UNDO_TURN		ANGLE(0.25f)
-	#define SPEEDBOAT_TURN			(ANGLE(0.25f) / 2)
-	#define SPEEDBOAT_MAX_TURN		ANGLE(4.0f)
-	#define SPEEDBOAT_MAX_VELOCITY	110
-	#define SPEEDBOAT_SLOW_SPEED	(SPEEDBOAT_MAX_VELOCITY / 3)
-	#define SPEEDBOAT_FAST_SPEED	(SPEEDBOAT_MAX_VELOCITY + 75)
-	#define SPEEDBOAT_MIN_SPEED		20
-	#define SPEEDBOAT_ACCELERATION	5
-	#define SPEEDBOAT_BRAKE			5
-	#define SPEEDBOAT_SLOWDOWN		1
-	#define SPEEDBOAT_REVERSE		-2	// -5
-	#define SPEEDBOAT_MAX_BACK		-20
-	#define SPEEDBOAT_MAX_KICK		-80
-	#define SPEEDBOAT_SLIP			10
-	#define SPEEDBOAT_SIDE_SLIP		30
-	#define SPEEDBOAT_FRONT			750
-	#define SPEEDBOAT_BACK			-700
-	#define SPEEDBOAT_SIDE			300
-	#define SPEEDBOAT_RADIUS			500
-	#define SPEEDBOAT_SNOW			500
-	#define SPEEDBOAT_MAX_HEIGHT		CLICK(1)
-	#define SPEEDBOAT_DISMOUNT_DISTANCE	SECTOR(1)
-	#define SPEEDBOAT_SOUND_CEILING	SECTOR(5)
-	#define SPEEDBOAT_TIP			(SPEEDBOAT_FRONT + 250)
+	const vector<VehicleMountType> SpeedboatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
+	};
+
+	constexpr auto SPEEDBOAT_MOUNT_DISTANCE_MIN = CLICK(2);
+
+	constexpr auto SPEEDBOAT_MAX_VELOCITY = 110;
+	constexpr auto SPEEDBOAT_SLOW_SPEED = SPEEDBOAT_MAX_VELOCITY / 3;
+	constexpr auto SPEEDBOAT_FAST_SPEED = SPEEDBOAT_MAX_VELOCITY + 75;
+	constexpr auto SPEEDBOAT_MIN_SPEED = 20;
+	constexpr auto SPEEDBOAT_ACCELERATION = 5;
+	constexpr auto SPEEDBOAT_BRAKE = 5;
+	constexpr auto SPEEDBOAT_SLOWDOWN = 1;
+	constexpr auto SPEEDBOAT_REVERSE = -5;
+	constexpr auto SPEEDBOAT_MAX_BACK = -20;
+	constexpr auto SPEEDBOAT_MAX_KICK = -80;
+	constexpr auto SPEEDBOAT_SLIP = 10;
+	constexpr auto SPEEDBOAT_SIDE_SLIP = 30;
+	constexpr auto SPEEDBOAT_FRONT = 750;;
+	constexpr auto SPEEDBOAT_BACK = -700;
+	constexpr auto SPEEDBOAT_SIDE = 300;
+	constexpr auto SPEEDBOAT_RADIUS = 500;
+	constexpr auto SPEEDBOAT_SNOW = 500;
+	constexpr auto SPEEDBOAT_MAX_HEIGHT = CLICK(1);
+	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5);
+	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
+
+	#define SPEEDBOAT_UNDO_TURN ANGLE(0.25f)
+	#define SPEEDBOAT_TURN (ANGLE(0.25f) / 2)
+	#define SPEEDBOAT_MAX_TURN ANGLE(4.0f)
 
 	enum SpeedboatState
 	{

@@ -18,14 +18,22 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
 using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Vehicles
 {
+	const vector<VehicleMountType> MinecartMountTypes =
+	{
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
+
 	constexpr auto MINECART_RADIUS = 100;
 	constexpr auto MINECART_ENTITY_RADIUS = CLICK(1);
 	constexpr auto MINECART_HEIGHT = CLICK(2);
 	constexpr auto MINECART_GRAVITY = SECTOR(1) + 1;
+	constexpr auto MINECART_MOUNT_DISTANCE_MIN = CLICK(2);
 	constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
 	constexpr auto MINECART_NUM_HITS = 25;
 

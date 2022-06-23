@@ -53,8 +53,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Back:
-				if (abs(deltaHeadingAngle) < ANGLE(35.0f) &&
-					abs(angleBetweenPositions) < ANGLE(35.0f) &&
+				if (abs(deltaHeadingAngle) < ANGLE(45.0f) &&
+					abs(angleBetweenPositions) < ANGLE(45.0f) &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;

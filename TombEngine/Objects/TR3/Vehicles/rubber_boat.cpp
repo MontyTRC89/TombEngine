@@ -17,28 +17,41 @@
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
 
+using std::vector;
+
 namespace TEN::Entities::Vehicles
 {
-	#define RBOAT_SLIP		10
-	#define RBOAT_SIDE_SLIP	30
+	const vector<VehicleMountType> RubberBoatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Jump,
+		VehicleMountType::Left,
+		VehicleMountType::Right
+	};
 
-	#define RBOAT_FRONT		750
-	#define RBOAT_SIDE		300
-	#define RBOAT_RADIUS	500
-	#define RBOAT_SNOW		500
+	constexpr auto RBOAT_MOUNT_DISTANCE_MIN = CLICK(2);
 
-	#define RBOAT_MAX_VELOCITY	110
-	#define RBOAT_SLOW_VELOCITY	(RBOAT_MAX_VELOCITY / 3)
-	#define RBOAT_FAST_VELOCITY	(RBOAT_MAX_VELOCITY + 75)
-	#define RBOAT_MIN_VELOCITY	20
-	#define RBOAT_MAX_BACK		-20
-	#define RBOAT_MAX_KICK		-80
+	constexpr auto RBOAT_SLIP = 10;
+	constexpr auto RBOAT_SIDE_SLIP = 30;
 
-	#define RBOAT_ACCELERATION	5
-	#define RBOAT_BRAKE			5
-	#define RBOAT_SLOW_DOWN		1
-	#define RBOAT_UNDO_TURN		ANGLE(0.25f)
-	#define RBOAT_TURN			(ANGLE(0.25f) / 2)
+	constexpr auto RBOAT_FRONT = 750;
+	constexpr auto RBOAT_SIDE = 300;
+	constexpr auto RBOAT_RADIUS = 500;
+	constexpr auto RBOAT_SNOW = 500;
+
+	constexpr auto RBOAT_MAX_VELOCITY = 110;
+	constexpr auto RBOAT_SLOW_VELOCITY = RBOAT_MAX_VELOCITY / 3;
+	constexpr auto RBOAT_FAST_VELOCITY = RBOAT_MAX_VELOCITY + 75;
+	constexpr auto RBOAT_MIN_VELOCITY = 20;
+	constexpr auto RBOAT_MAX_BACK = -20;
+	constexpr auto RBOAT_MAX_KICK = -80;
+
+	constexpr auto RBOAT_ACCELERATION = 5;
+	constexpr auto RBOAT_BRAKE = 5;
+	constexpr auto RBOAT_SLOW_DOWN = 1;
+
+	#define RBOAT_UNDO_TURN	ANGLE(0.25f)
+	#define RBOAT_TURN		(ANGLE(0.25f) / 2)
 
 	enum RubberBoatState
 	{

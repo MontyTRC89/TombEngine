@@ -28,8 +28,10 @@ namespace TEN::Entities::Vehicles
 {
 	const vector<int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
 	const vector<int> MotorbikeBrakeLightJoints = { 10 };
+	const vector<VehicleMountType> MotorbikeMountTypes = { VehicleMountType::Right };
 
 	constexpr auto MOTORBIKE_RADIUS = 500;
+	constexpr auto MOTORBIKE_MOUNT_DISTANCE_MIN = CLICK(2);
 	constexpr auto MOTORBIKE_DISMOUNT_DISTANCE = CLICK(1.5f);
 	constexpr auto MOTORBIKE_FRICTION = 384;
 	constexpr auto MOTORBIKE_FRONT = 500;

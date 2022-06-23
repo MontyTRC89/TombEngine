@@ -24,6 +24,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::Vehicles
 {
 	BITE_INFO UPVBites[6] =
@@ -35,50 +37,56 @@ namespace TEN::Entities::Vehicles
 		{ 128, 0, -64, 2 },
 		{ 0, 0, -64, 2 }
 	};
+	const vector<VehicleMountType> UPVMountTypes = { VehicleMountType::Back };
 
-	#define	UPV_CONTROL 1
-	#define	UPV_SURFACE 2
-	#define	UPV_DIVE 4
-	#define	UPV_DEAD 8
+	constexpr auto UPV_MOUNT_DISTANCE_MIN = CLICK(1.5f);
 
-	#define ACCELERATION		0x40000
-	#define FRICTION			0x18000
-	#define MAX_VELOCITY		0x400000
-	#define ROT_ACCELERATION	0x400000
-	#define ROT_SLOWACCEL		0x200000
-	#define ROT_FRICTION 		0x100000
-	#define MAX_ROTATION		0x1c00000
+	constexpr auto	UPV_CONTROL = 1;
+	constexpr auto	UPV_SURFACE = 2;
+	constexpr auto	UPV_DIVE = 4;
+	constexpr auto	UPV_DEAD = 8;
+
+	constexpr auto ACCELERATION = 0x40000;
+	constexpr auto FRICTION = 0x18000;
+	constexpr auto MAX_VELOCITY = 0x400000;
+	constexpr auto ROT_ACCELERATION = 0x400000;
+	constexpr auto ROT_SLOWACCEL = 0x200000;
+	constexpr auto ROT_FRICTION = 0x100000;
+	constexpr auto MAX_ROTATION = 0x1c00000;
+	constexpr auto UPDOWN_SPEED = 10;
+	constexpr auto SURFACE_DIST = 210;
+	constexpr auto UPV_DRAW_SHIFT = 128;
+	constexpr auto UPV_RADIUS = 300;
+	constexpr auto UPV_HEIGHT = 400;
+	constexpr auto UPV_LENGTH = SECTOR(1);
+	constexpr auto DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto HARPOON_VELOCITY = CLICK(1);
+	constexpr auto HARPOON_RELOAD = 15;
+
+	constexpr auto UPV_TURBINE_BONE = 3;
+
+	constexpr auto DEATH_FRAME_1 = 16;
+	constexpr auto DEATH_FRAME_2 = 17;
+	constexpr auto DISMOUNT_SURFACE_FRAME = 51;
+	constexpr auto MOUNT_SURFACE_SOUND_FRAME = 30;
+	constexpr auto MOUNT_SURFACE_CONTROL_FRAME = 50;
+	constexpr auto DISMOUNT_UNDERWATER_FRAME = 42;
+	constexpr auto MOUNT_UNDERWATER_SOUND_FRAME = 30;
+	constexpr auto MOUNT_UNDERWATER_CONTROL_FRAME = 42;
+
 	#define UPDOWN_ACCEL		(ANGLE(2.0f) * (USHRT_MAX + 1))
 	#define UPDOWN_SLOWACCEL	(ANGLE(1.0f) * (USHRT_MAX + 1))
 	#define UPDOWN_FRICTION		(ANGLE(1.0f) * (USHRT_MAX + 1))
 	#define MAX_UPDOWN			(ANGLE(2.0f) * (USHRT_MAX + 1))
 	#define UPDOWN_LIMIT		ANGLE(80.0f)
-	#define UPDOWN_SPEED		10
-	#define SURFACE_DIST		210
+
 	#define SURFACE_ANGLE		ANGLE(30.0f)
 	#define DIVE_ANGLE			ANGLE(15.0f)
 	#define DIVE_SPEED			ANGLE(5.0f)
-	#define UPV_DRAW_SHIFT		128
-	#define UPV_RADIUS			300
-	#define UPV_HEIGHT			400
-	#define UPV_LENGTH			SECTOR(1)
+
 	#define FRONT_TOLERANCE		(ANGLE(45.0f) * (USHRT_MAX + 1))
 	#define TOP_TOLERANCE		(ANGLE(45.0f) * (USHRT_MAX + 1))
 	#define WALL_DEFLECT		(ANGLE(2.0f) * (USHRT_MAX + 1))
-	#define DISMOUNT_DISTANCE 	SECTOR(1)
-	#define HARPOON_VELOCITY	CLICK(1)
-	#define HARPOON_RELOAD		15
-
-	#define UPV_TURBINE_BONE 3
-
-	#define DEATH_FRAME_1					16
-	#define DEATH_FRAME_2					17
-	#define DISMOUNT_SURFACE_FRAME			51
-	#define MOUNT_SURFACE_SOUND_FRAME		30
-	#define MOUNT_SURFACE_CONTROL_FRAME		50
-	#define DISMOUNT_UNDERWATER_FRAME		42
-	#define MOUNT_UNDERWATER_SOUND_FRAME	30
-	#define MOUNT_UNDERWATER_CONTROL_FRAME	42
 
 	enum UPVState
 	{
