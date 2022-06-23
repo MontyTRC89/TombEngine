@@ -265,7 +265,7 @@ namespace TEN::Renderer
 				[&j, &currentBone](UPVInfo& upv)
 				{
 				if (j == 3)
-					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
+					currentBone->ExtraRotation.z = TO_RAD(upv.FanRotation);
 				},
 				[&j, &currentBone](BigGunInfo& big_gun)
 				{
