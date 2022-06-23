@@ -349,6 +349,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			Rumble(0.4f, 0.2f);
+
 			item->Animation.TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
@@ -2347,6 +2348,7 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 			coll->HitTallObject)
 		{
 			Rumble(0.5f, 0.3f);
+
 			item->Animation.TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{

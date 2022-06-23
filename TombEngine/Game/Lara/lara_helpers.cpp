@@ -300,7 +300,7 @@ void DealLaraFallDamage(ItemInfo* item)
 			item->HitPoints = 0;
 		else USE_FEATURE_IF_CPP20([[likely]] )
 		{
-			int base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
+			float base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
 		}
 
@@ -329,9 +329,9 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 	if (!probe.FloorTilt.x && !probe.FloorTilt.y)
 		return direction;
 
+	// Get either a) the surface aspect angle (extended slides), or
+	// b) derive the nearest cardinal direction from it (original slides).
 	direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-
-	// Determine nearest cardinal direction of surface aspect.
 	if (!g_GameFlow->HasSlideExtended())
 		direction = GetQuadrant(direction) * ANGLE(90.0f);
 
@@ -505,7 +505,8 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
-	lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
+	if (abs(lara->ExtraTorsoRot.z) < abs(maxAngleNormalized))
+		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
 		item->Animation.ActiveState != LS_CRAWL_BACK)
