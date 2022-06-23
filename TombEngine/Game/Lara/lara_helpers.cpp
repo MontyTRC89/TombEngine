@@ -335,7 +335,6 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
 {
 	int sign = std::copysign(1, axisCoeff);
-
 	short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
 
