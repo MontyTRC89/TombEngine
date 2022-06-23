@@ -14,13 +14,9 @@
 
 using namespace TEN::Math::Random;
 
-namespace TEN
+namespace TEN::Effects::Environment 
 {
-	namespace Effects
-	{
-		namespace Environment 
-		{
-			EnvironmentController Weather;
+	EnvironmentController Weather;
 
 			float WeatherParticle::Transparency() const
 			{
@@ -448,9 +444,7 @@ namespace TEN
 				part.CollisionCheckDelay = 0;
 				part.StartLife = part.Life;
 
-						Particles.push_back(part);
-					}
-				}
+				Particles.push_back(part);
 			}
 		}
 	}

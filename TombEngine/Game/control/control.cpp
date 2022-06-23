@@ -26,7 +26,7 @@
 #include "Game/effects/weather.h"
 #include "Game/effects/lightning.h"
 #include "Game/spotcam.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/collision/sphere.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"
@@ -45,10 +45,10 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/winmain.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;
 using std::unordered_map;
@@ -154,7 +154,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
 				if (g_Gui.CallInventory(false))
-					return GameStatus::LoadGame;
+					return GameStatus::SaveGame;
 			}
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{

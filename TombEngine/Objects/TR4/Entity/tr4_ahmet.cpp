@@ -15,6 +15,7 @@
 #include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
 
+using std::vector;
 using namespace TEN::Effects::Environment;
 
 namespace TEN::Entities::TR4
@@ -22,20 +23,21 @@ namespace TEN::Entities::TR4
 	BITE_INFO AhmetBiteLeft = { 0, 0, 0, 16 };
 	BITE_INFO AhmetBiteRight = { 0, 0, 0, 22 };
 	BITE_INFO AhmetBiteJaw = { 0, 0, 0, 11 };
-	const std::vector<int> AhmetSwipeAttackLeftJoints = { 14, 15, 16, 17 };
-	const std::vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
+	const vector<int> AhmetSwipeAttackLeftJoints = { 14, 15, 16, 17 };
+	const vector<int> AhmetSwipeAttackRightJoints = { 20, 21, 22, 23 };
 
 	constexpr auto AHMET_SWIPE_ATTACK_DAMAGE = 80;
 	constexpr auto AHMET_BITE_ATTACK_DAMAGE = 120;
 
-	#define AHMET_WALK_ANGLE Angle::DegToRad(5.0f)
-	#define AHMET_RUN_ANGLE Angle::DegToRad(8.0f)
+	constexpr auto AHMET_ATTACK_RANGE = SECTOR(0.67f);
+	constexpr auto AHMET_AWARE_RANGE = SECTOR(1);
+	constexpr auto AHMET_IDLE_RANGE = SECTOR(1.25f);
+	constexpr auto AHMET_RUN_RANGE = SECTOR(2.5f);
+
+	#define AHMET_WALK_FORWARD_TURN_ANGLE Angle::DegToRad(5.0f)
+	#define AHMET_RUN_FORWARD_TURN_ANGLE Angle::DegToRad(8.0f)
 	#define AHMET_VIEW_ANGLE Angle::DegToRad(45.0f)
 	#define AHMET_ENEMY_ANGLE Angle::DegToRad(90.0f)
-	#define AHMET_AWARE_DISTANCE pow(SECTOR(1), 2)
-	#define AHMET_IDLE_RANGE pow(SECTOR(1.25f), 2)
-	#define AHMET_RUN_RANGE pow(SECTOR(2.5f), 2)
-	#define AHMET_SWIPE_ATTACK_RANGE pow(682, 2)
 
 	enum AhmetState
 	{
@@ -68,6 +70,12 @@ namespace TEN::Entities::TR4
 		AHMET_ANIM_RUN_FORWARD_TO_IDLE = 14,
 	};
 
+	// TODO
+	enum AhmetFlags
+	{
+
+	};
+
 	static void AhmetHeavyTriggers(ItemInfo* item)
 	{
 		TestTriggers(item, true);
@@ -76,8 +84,8 @@ namespace TEN::Entities::TR4
 	static void TriggerAhmetDeathEffect(ItemInfo* item)
 	{
 		// HACK: Using CreatureSpheres here in release mode results in total mess-up
-		// of LaraSpheres, which looks in game as ghost Lara fire silhouette.
-		// Later both CreatureSpheres and LaraSpheres globals should be eradicated.
+		// of LaraSpheres, which in-game appears as a ghostly Lara fire silhouette.
+		// Later, both CreatureSpheres and LaraSpheres globals should be eradicated.
 
 		static SPHERE spheres[MAX_SPHERES] = {};
 
@@ -90,8 +98,15 @@ namespace TEN::Entities::TR4
 				TriggerFireFlame(sphere->x, sphere->y, sphere->z, -1, 1);
 		}
 
-		// NOTE: fixed light below the ground with -STEP_L!
-		TriggerDynamicLight(item->Pose.Position.x, (item->Pose.Position.y - CLICK(1)), item->Pose.Position.z, 13, (GetRandomControl() & 0x3F) - 64, (GetRandomControl() & 0x1F) + 96, 0);
+		TriggerDynamicLight(
+			item->Pose.Position.x,
+			item->Pose.Position.y - CLICK(1),
+			item->Pose.Position.z,
+			13,
+			(GetRandomControl() & 0x3F) - 64,
+			(GetRandomControl() & 0x1F) + 96,
+			0);
+
 		SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
 	}
 
@@ -130,10 +145,10 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Animation.ActiveState == AHMET_STATE_DEATH)
 			{
-				// dont clear it !
+				// Don't clear.
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
-					item->Collidable = false; // NOTE: not exist in the original game, avoid wreid collision with lara...
+					item->Collidable = false;
 					item->Animation.FrameNumber = (g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1);
 				}
 			}
@@ -171,13 +186,13 @@ namespace TEN::Entities::TR4
 				laraAI.distance = pow(dx, 2) + pow(dz, 2);
 			}
 
-			GetCreatureMood(item, &AI, TRUE);
-			CreatureMood(item, &AI, TRUE);
+			GetCreatureMood(item, &AI, true);
+			CreatureMood(item, &AI, true);
 
 			angle = CreatureTurn(item, creature->MaxTurn);
 			creature->Enemy = LaraItem;
 
-			if (laraAI.distance < AHMET_AWARE_DISTANCE ||
+			if (laraAI.distance < pow(AHMET_AWARE_RANGE, 2) ||
 				item->HitStatus ||
 				TargetVisible(item, &laraAI))
 			{
@@ -205,15 +220,15 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood == MoodType::Attack && creature->Mood != MoodType::Escape)
 				{
-					if (AI.bite && AI.distance < AHMET_SWIPE_ATTACK_RANGE)
+					if (AI.bite && AI.distance < pow(AHMET_ATTACK_RANGE, 2))
 						item->Animation.TargetState = AHMET_STATE_SWIPE_ATTACK;
-					else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) || AI.distance >= AHMET_IDLE_RANGE)
+					else if ((AI.angle >= AHMET_VIEW_ANGLE || AI.angle <= -AHMET_VIEW_ANGLE) || AI.distance >= pow(AHMET_IDLE_RANGE, 2))
 					{
 						if (item->Animation.RequiredState)
 							item->Animation.TargetState = item->Animation.RequiredState;
 						else
 						{
-							if (!AI.ahead || AI.distance >= AHMET_RUN_RANGE)
+							if (!AI.ahead || AI.distance >= pow(AHMET_RUN_RANGE, 2))
 								item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
 							else
 								item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
@@ -235,28 +250,36 @@ namespace TEN::Entities::TR4
 				break;
 
 			case AHMET_STATE_WALK_FORWARD:
-				creature->MaxTurn = AHMET_WALK_ANGLE;
+				creature->MaxTurn = AHMET_WALK_FORWARD_TURN_ANGLE;
 
 				if (item->AIBits & PATROL1)
 				{
 					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
 					headY = 0;
 				}
-				else if (AI.bite && AI.distance < AHMET_IDLE_RANGE)
+				else if (AI.bite && AI.distance < pow(AHMET_IDLE_RANGE, 2))
 					item->Animation.TargetState = AHMET_STATE_IDLE;
-				else if (creature->Mood == MoodType::Escape || AI.distance > AHMET_RUN_RANGE || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
+				else if (creature->Mood == MoodType::Escape || AI.distance > pow(AHMET_RUN_RANGE, 2) || !AI.ahead || (AI.enemyFacing > -AHMET_ENEMY_ANGLE || AI.enemyFacing < AHMET_ENEMY_ANGLE))
 					item->Animation.TargetState = AHMET_STATE_RUN_FORWARD;
 				
 				break;
 
 			case AHMET_STATE_RUN_FORWARD:
-				creature->MaxTurn = AHMET_RUN_ANGLE;
+				creature->MaxTurn = AHMET_RUN_FORWARD_TURN_ANGLE;
 				creature->Flags = 0;
 
-				if (item->AIBits & GUARD || (creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) && (Lara.TargetEntity == item && AI.ahead) || (AI.bite && AI.distance < AHMET_IDLE_RANGE))
+				if (item->AIBits & GUARD ||
+					((creature->Mood == MoodType::Bored || creature->Mood == MoodType::Escape) &&
+						(Lara.TargetEntity == item && AI.ahead)) ||
+					(AI.bite && AI.distance < pow(AHMET_IDLE_RANGE, 2)))
+				{
 					item->Animation.TargetState = AHMET_STATE_IDLE;
-				else if (AI.ahead && AI.distance < AHMET_RUN_RANGE && (AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
+				}
+				else if (AI.ahead && AI.distance < pow(AHMET_RUN_RANGE, 2) &&
+					(AI.enemyFacing < -AHMET_ENEMY_ANGLE || AI.enemyFacing > AHMET_ENEMY_ANGLE))
+				{
 					item->Animation.TargetState = AHMET_STATE_WALK_FORWARD;
+				}
 
 				break;
 

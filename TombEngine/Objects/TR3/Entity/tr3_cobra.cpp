@@ -10,139 +10,153 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-BITE_INFO CobraBite = { 0, 0, 0, 13 };
+using std::vector;
 
-constexpr auto COBRA_BITE_ATTACK_DAMAGE = 80;
-constexpr auto COBRA_BITE_POISON_POTENCY = 1;
-
-enum CobraState
+namespace TEN::Entities::TR3
 {
-	COBRA_STATE_NONE = 0,
-	COBRA_STATE_IDLE = 1,
-	COBRA_STATE_ATTACK = 2,
-	COBRA_STATE_SLEEP = 3,
-	COBRA_STATE_DEATH = 4,
-};
+	BITE_INFO CobraBite = { 0, 0, 0, 13 };
+	const vector<int> CobraAttackJoints = { 13 };
 
+	constexpr auto COBRA_BITE_ATTACK_DAMAGE = 80;
+	constexpr auto COBRA_BITE_POISON_POTENCY = 1;
 
-enum CobraAnim
-{
-	COBRA_ANIM_IDLE = 0,
-	COBRA_ANIM_WAKE_UP = 1,
-	COBRA_ANIM_BACK_TO_SLEEP = 2,
-	COBRA_ANIM_BITE_ATTACK = 3,
-	COBRA_ANIM_DEATH = 4,
-};
+	constexpr auto COBRA_ATTACK_RANGE = SECTOR(1);
+	constexpr auto COBRA_AWARE_RANGE = SECTOR(1.5f);
+	constexpr auto COBRA_SLEEP_RANGE = SECTOR(2.5f);
 
-void InitialiseCobra(short itemNumber)
-{
-	auto* item = &g_Level.Items[itemNumber];
+	constexpr auto COBRA_SLEEP_FRAME = 45;
 
-	ClearItem(itemNumber);
+	constexpr auto PLAYER_DISTURB_VELOCITY = 15;
 
-	item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_BACK_TO_SLEEP;
-	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + 45;
-	item->Animation.ActiveState = item->Animation.TargetState = COBRA_STATE_SLEEP;
-	item->ItemFlags[2] = item->HitStatus;
-}
-
-void CobraControl(short itemNumber)
-{
-	if (!CreatureActive(itemNumber))
-		return;
-
-	auto* item = &g_Level.Items[itemNumber];
-	auto* info = GetCreatureInfo(item);
-
-	float head = 0;
-	float angle = 0;
-	float tilt = 0;
-
-	if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
+	enum CobraState
 	{
-		if (item->Animation.ActiveState != COBRA_STATE_DEATH)
-		{
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_DEATH;
-			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-			item->Animation.ActiveState = COBRA_STATE_DEATH;
-		}
+		COBRA_STATE_WAKE_UP = 0,
+		COBRA_STATE_IDLE = 1,
+		COBRA_STATE_ATTACK = 2,
+		COBRA_STATE_SLEEP = 3,
+		COBRA_STATE_DEATH = 4
+	};
+
+	enum CobraAnim
+	{
+		COBRA_ANIM_IDLE = 0,
+		COBRA_ANIM_WAKE_UP = 1,
+		COBRA_ANIM_IDLE_TO_SLEEP = 2,
+		COBRA_ANIM_BITE_ATTACK = 3,
+		COBRA_ANIM_DEATH = 4
+	};
+
+	void InitialiseCobra(short itemNumber)
+	{
+		auto* item = &g_Level.Items[itemNumber];
+
+		ClearItem(itemNumber);
+
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_IDLE_TO_SLEEP;
+		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + COBRA_SLEEP_FRAME;
+		item->Animation.ActiveState = COBRA_STATE_SLEEP; 
+		item->Animation.TargetState = COBRA_STATE_SLEEP;
+		item->ItemFlags[2] = item->HitStatus;
 	}
-	else
+
+	void CobraControl(short itemNumber)
 	{
-		AI_INFO AI;
-		CreatureAIInfo(item, &AI);
+		if (!CreatureActive(itemNumber))
+			return;
 
-		AI.angle += Angle::DegToRad(16.8f);
+		auto* item = &g_Level.Items[itemNumber];
+		auto* info = GetCreatureInfo(item);
 
-		GetCreatureMood(item, &AI, 1);
-		CreatureMood(item, &AI, 1);
+		float head = 0;
+		float angle = 0;
+		float tilt = 0;
 
-		info->Target.x = LaraItem->Pose.Position.x;
-		info->Target.z = LaraItem->Pose.Position.z;
-		angle = CreatureTurn(item, info->MaxTurn);
-
-		if (AI.ahead)
-			head = AI.angle;
-
-		if (abs(AI.angle) < Angle::DegToRad(10.0f))
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + AI.angle);
-		else if (AI.angle < 0)
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() - Angle::DegToRad(10.0f));
+		if (item->HitPoints <= 0 && item->HitPoints != NOT_TARGETABLE)
+		{
+			if (item->Animation.ActiveState != COBRA_STATE_DEATH)
+			{
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + COBRA_ANIM_DEATH;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
+				item->Animation.ActiveState = COBRA_STATE_DEATH;
+			}
+		}
 		else
-			item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(10.0f));
-
-		switch (item->Animation.ActiveState)
 		{
-		case COBRA_STATE_IDLE:
-			info->Flags = 0;
+			AI_INFO AI;
+			CreatureAIInfo(item, &AI);
 
-			if (AI.distance > pow(SECTOR(2.5f), 2))
-				item->Animation.TargetState = COBRA_STATE_SLEEP;
-			else if (LaraItem->HitPoints > 0 &&
-				((AI.ahead && AI.distance < pow(SECTOR(1), 2)) || item->HitStatus || LaraItem->Animation.Velocity > 15))
+			AI.angle += Angle::DegToRad(16.8f);
+
+			GetCreatureMood(item, &AI, 1);
+			CreatureMood(item, &AI, 1);
+
+			info->Target.x = LaraItem->Pose.Position.x;
+			info->Target.z = LaraItem->Pose.Position.z;
+			angle = CreatureTurn(item, info->MaxTurn);
+
+			if (AI.ahead)
+				head = AI.angle;
+
+			if (abs(AI.angle) < Angle::DegToRad(10.0f))
+				item->Pose.Orientation.y += AI.angle;
+			else if (AI.angle < 0)
+				item->Pose.Orientation.y -= Angle::DegToRad(10.0f);
+			else
+				item->Pose.Orientation.y += Angle::DegToRad(10.0f);
+
+			switch (item->Animation.ActiveState)
 			{
-				item->Animation.TargetState = COBRA_STATE_ATTACK;
-			}
+			case COBRA_STATE_IDLE:
+				info->Flags = 0;
 
-			break;
+				if (AI.distance > pow(COBRA_SLEEP_RANGE, 2))
+					item->Animation.TargetState = COBRA_STATE_SLEEP;
+				else if (LaraItem->HitPoints > 0 &&
+					((AI.ahead && AI.distance < pow(COBRA_ATTACK_RANGE, 2)) || item->HitStatus || LaraItem->Animation.Velocity > PLAYER_DISTURB_VELOCITY))
+				{
+					item->Animation.TargetState = COBRA_STATE_ATTACK;
+				}
 
-		case COBRA_STATE_SLEEP:
-			info->Flags = 0;
+				break;
 
-			if (item->HitPoints != NOT_TARGETABLE)
-			{
-				item->ItemFlags[2] = item->HitPoints;
-				item->HitPoints = NOT_TARGETABLE;
-			}
-			if (AI.distance < pow(SECTOR(1.5f), 2) && LaraItem->HitPoints > 0)
-			{
-				item->Animation.TargetState = 0;
+			case COBRA_STATE_SLEEP:
+				info->Flags = 0;
+
+				if (item->HitPoints != NOT_TARGETABLE)
+				{
+					item->HitPoints = NOT_TARGETABLE;
+					item->ItemFlags[2] = item->HitPoints;
+				}
+				if (AI.distance < pow(COBRA_AWARE_RANGE, 2) && LaraItem->HitPoints > 0)
+				{
+					item->Animation.TargetState = COBRA_STATE_WAKE_UP;
+					item->HitPoints = item->ItemFlags[2];
+				}
+
+				break;
+
+			case COBRA_STATE_ATTACK:
+				if (info->Flags != 1 && item->TestBits(JointBitType::Touch, CobraAttackJoints))
+				{
+					CreatureEffect(item, &CobraBite, DoBloodSplat);
+					info->Flags = 1;
+
+					LaraItem->HitPoints -= COBRA_BITE_ATTACK_DAMAGE;
+					LaraItem->HitStatus = true;
+					Lara.PoisonPotency += COBRA_BITE_POISON_POTENCY;
+				}
+
+				break;
+
+			case COBRA_STATE_WAKE_UP:
 				item->HitPoints = item->ItemFlags[2];
+				break;
 			}
-
-			break;
-
-		case COBRA_STATE_ATTACK:
-			if (info->Flags != 1 && item->TouchBits & 0x2000)
-			{
-				CreatureEffect(item, &CobraBite, DoBloodSplat);
-				info->Flags = 1;
-
-				LaraItem->HitPoints -= COBRA_BITE_ATTACK_DAMAGE;
-				LaraItem->HitStatus = true;
-				Lara.PoisonPotency += COBRA_BITE_POISON_POTENCY;
-			}
-
-			break;
-
-		case 0: //No Idea what this is - Kubsy 2022/06/01
-			item->HitPoints = item->ItemFlags[2];
-			break;
 		}
-	}
 
-	CreatureTilt(item, tilt);
-	CreatureJoint(item, 0, head / 2);
-	CreatureJoint(item, 1, head / 2);
-	CreatureAnimation(itemNumber, angle, tilt);
+		CreatureTilt(item, tilt);
+		CreatureJoint(item, 0, head / 2);
+		CreatureJoint(item, 1, head / 2);
+		CreatureAnimation(itemNumber, angle, tilt);
+	}
 }

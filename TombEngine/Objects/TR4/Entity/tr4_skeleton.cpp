@@ -17,10 +17,12 @@
 #include "Game/collision/collide_room.h"
 #include "Game/misc.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SkeletonBite = { 0, -16, 200, 11 };
-	const std::vector<int> SkeletonSwordAttackJoints = { 15, 16 };
+	const vector<int> SkeletonSwordAttackJoints = { 15, 16 };
 
 	constexpr auto SKELETON_ATTACK_DAMAGE = 80;
 

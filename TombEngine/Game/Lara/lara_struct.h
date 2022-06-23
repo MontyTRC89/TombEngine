@@ -1082,8 +1082,8 @@ struct ArmInfo
 
 struct FlareData
 {
-	unsigned int Life;
 	int Frame;
+	unsigned int Life;
 	bool ControlLeft;
 };
 
@@ -1218,12 +1218,6 @@ struct SubsuitControlData
 	unsigned short HitCount;
 };
 
-struct MinecartControlData
-{
-	bool Left;
-	bool Right;
-};
-
 struct LaraControlData
 {
 	float MoveAngle;
@@ -1238,7 +1232,6 @@ struct LaraControlData
 	RopeControlData Rope;
 	TightropeControlData Tightrope;
 	SubsuitControlData Subsuit;
-	MinecartControlData Minecart;
 
 	bool CanLook;
 	bool IsMoving;

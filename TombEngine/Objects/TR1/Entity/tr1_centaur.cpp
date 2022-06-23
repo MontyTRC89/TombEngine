@@ -16,25 +16,31 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR1
 {
 	BITE_INFO CentaurRocketBite = { 11, 415, 41, 13 };
 	BITE_INFO CentaurRearBite = { 50, 30, 0, 5 };
-	std::vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
+	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
-#define BOMB_SPEED 256
-#define CENTAUR_TURN Angle::DegToRad(4.0f)
-#define CENTAUR_REAR_CHANCE 0x60
-#define CENTAUR_REAR_RANGE pow(SECTOR(1.5f), 2)
-#define FLYER_PART_DAMAGE 100
-#define CENTAUR_REAR_DAMAGE 200
+	constexpr auto CENTAUR_FLYER_PART_DAMAGE = 100;
+	constexpr auto CENTAUR_REAR_DAMAGE = 200;
+
+	constexpr auto CENTAUR_PROJECTILE_SPEED = CLICK(1);
+
+	constexpr auto CENTAUR_REAR_RANGE = SECTOR(1.5f);
+
+	constexpr auto CENTAUR_REAR_CHANCE = 0x60;
+
+	#define CENTAUR_TURN_ANGLE Angle::DegToRad(4.0f)
 
 	enum CentaurState
 	{
 		CENTAUR_STATE_NONE = 0,
 		CENTAUR_STATE_IDLE = 1,
-		CENTAUR_STATE_SHOOT = 2,
-		CENTAUR_STATE_RUN = 3,
+		CENTAUR_PROJECTILE_ATTACK = 2,
+		CENTAUR_STATE_RUN_FORWARD = 3,
 		CENTAUR_STATE_AIM = 4,
 		CENTAUR_STATE_DEATH = 5,
 		CENTAUR_STATE_WARNING = 6
@@ -60,14 +66,14 @@ namespace TEN::Entities::TR1
 			if (item->Pose.Orientation.x < -Angle::DegToRad(90.0f))
 				item->Pose.Orientation.x = -Angle::DegToRad(90.0f);
 
+			item->Animation.Velocity = CENTAUR_PROJECTILE_SPEED * cos(item->Pose.Orientation.x);
+			item->Animation.VerticalVelocity = -CENTAUR_PROJECTILE_SPEED * sin(item->Pose.Orientation.x);
 			aboveWater = true;
-			item->Animation.Velocity = BOMB_SPEED * cos(item->Pose.Orientation.x);
-			item->Animation.VerticalVelocity = -BOMB_SPEED * sin(item->Pose.Orientation.x);
 		}
 		else
 		{
-			aboveWater = true;
 			item->Animation.VerticalVelocity += 3;
+			aboveWater = true;
 
 			if (item->Animation.Velocity)
 			{
@@ -77,7 +83,6 @@ namespace TEN::Entities::TR1
 					item->Pose.Orientation.y += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
 				else
 					item->Pose.Orientation.x += ((item->Animation.Velocity / 2) + 7) * Angle::DegToRad(1.0f);
-
 			}
 		}
 
@@ -158,12 +163,10 @@ namespace TEN::Entities::TR1
 			projectileItem->Pose.Position = pos;
 			InitialiseItem(itemNumber);
 
-			projectileItem->Pose.Orientation.x = 0;
-			projectileItem->Pose.Orientation.y = centaurItem->Pose.Orientation.y;
-			projectileItem->Pose.Orientation.z = 0;
+			projectileItem->Pose.Orientation = EulerAngles(0.0f, centaurItem->Pose.Orientation.y, 0.0f);
 
-			projectileItem->Animation.Velocity = BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);
-			projectileItem->Animation.VerticalVelocity = -BOMB_SPEED * cos(projectileItem->Pose.Orientation.x);
+			projectileItem->Animation.Velocity = CENTAUR_PROJECTILE_SPEED * cos(projectileItem->Pose.Orientation.x);
+			projectileItem->Animation.VerticalVelocity = -CENTAUR_PROJECTILE_SPEED * cos(projectileItem->Pose.Orientation.x);
 			projectileItem->ItemFlags[0] = 1;
 
 			AddActiveItem(itemNumber);
@@ -200,7 +203,7 @@ namespace TEN::Entities::TR1
 
 			CreatureMood(item, &AI, VIOLENT);
 
-			angle = CreatureTurn(item, CENTAUR_TURN);
+			angle = CreatureTurn(item, CENTAUR_TURN_ANGLE);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -208,17 +211,17 @@ namespace TEN::Entities::TR1
 				CreatureJoint(item, 17, 0);
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < CENTAUR_REAR_RANGE)
-					item->Animation.TargetState = CENTAUR_STATE_RUN;
+				else if (AI.bite && AI.distance < pow(CENTAUR_REAR_RANGE, 2))
+					item->Animation.TargetState = CENTAUR_STATE_RUN_FORWARD;
 				else if (Targetable(item, &AI))
 					item->Animation.TargetState = CENTAUR_STATE_AIM;
 				else
-					item->Animation.TargetState = CENTAUR_STATE_RUN;
+					item->Animation.TargetState = CENTAUR_STATE_RUN_FORWARD;
 
 				break;
 
-			case CENTAUR_STATE_RUN:
-				if (AI.bite && AI.distance < CENTAUR_REAR_RANGE)
+			case CENTAUR_STATE_RUN_FORWARD:
+				if (AI.bite && AI.distance < pow(CENTAUR_REAR_RANGE, 2))
 				{
 					item->Animation.RequiredState = CENTAUR_STATE_WARNING;
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
@@ -240,13 +243,13 @@ namespace TEN::Entities::TR1
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (Targetable(item, &AI))
-					item->Animation.TargetState = CENTAUR_STATE_SHOOT;
+					item->Animation.TargetState = CENTAUR_PROJECTILE_ATTACK;
 				else
 					item->Animation.TargetState = CENTAUR_STATE_IDLE;
 
 				break;
 
-			case CENTAUR_STATE_SHOOT:
+			case CENTAUR_PROJECTILE_ATTACK:
 				if (!item->Animation.RequiredState)
 				{
 					item->Animation.RequiredState = CENTAUR_STATE_AIM;
@@ -276,7 +279,7 @@ namespace TEN::Entities::TR1
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, FLYER_PART_DAMAGE);
+			ExplodingDeath(itemNumber, ALL_JOINT_BITS, CENTAUR_FLYER_PART_DAMAGE);
 			KillItem(itemNumber);
 			item->Status = ITEM_DEACTIVATED;
 		}

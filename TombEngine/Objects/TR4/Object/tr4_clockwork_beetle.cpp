@@ -25,12 +25,10 @@ void ClockworkBeetleControl(short itemNumber)
 
 		if (LaraItem->Animation.FrameNumber < fb + 104)
 		{
-			Vector3Int pos = { 0, 0, -32 };
+			auto pos = Vector3Int(0, 0, -32);
 			GetLaraJointPosition(&pos, LM_RHAND);
 
-			beetle->Pose.Position.x = pos.x;
-			beetle->Pose.Position.y = pos.y;
-			beetle->Pose.Position.z = pos.z;
+			beetle->Pose.Position = pos;
 			beetle->Status = ITEM_ACTIVE;
 			beetle->Pose.Orientation.SetY(LaraItem->Pose.Orientation.GetY());
 			beetle->Pose.Orientation.SetZ(Angle::DegToRad(-70.0f));

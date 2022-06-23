@@ -1,20 +1,29 @@
 #pragma once
-struct JeepInfo {
-	float rot1;
-	float rot2;
-	float rot3;
-	float rot4;
-	int velocity;
-	int revs;
-	short engineRevs;
-	short trackMesh;
-	int jeepTurn;
-	int fallSpeed;
-	float momentumAngle;
-	float extraRotation;
-	short unknown0;
-	int pitch;
-	short flags;
-	short unknown1;
-	short unknown2;
-};
+
+namespace TEN::Entities::Vehicles
+{
+	struct JeepInfo
+	{
+		short jeepTurn;
+		short rot1;
+		short rot2;
+		short rot3;
+		short rot4;
+		short momentumAngle;
+		short extraRotation;
+
+		int velocity;
+		int fallSpeed;
+
+		int revs;
+		short engineRevs;
+		int pitch;
+		short trackMesh;
+
+		short flags;
+
+		short unknown0;
+		short unknown1;
+		short unknown2;
+	};
+}

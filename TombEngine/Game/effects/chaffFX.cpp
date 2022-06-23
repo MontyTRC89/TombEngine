@@ -14,6 +14,7 @@
 #include "Specific/prng.h"
 #include "Specific/setup.h"
 #include "Renderer/Renderer11Enums.h"
+#include "Sound/sound.h"
 
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;
@@ -72,10 +73,10 @@ void TriggerChaffEffects(ItemInfo* item, int age)
 
 void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater, int age)
 {
-	int numSparks = (int)GenerateFloat(2, 5);
+	int numSparks = (int)GenerateFloat(1, 3);
 	for (int i = 0; i < numSparks; i++)
 	{
-		long	dx, dz;
+		long dx, dz;
 
 		dx = item->Pose.Position.x - pos->x;
 		dz = item->Pose.Position.z - pos->z;
@@ -101,6 +102,9 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 			TEN::Effects::Smoke::TriggerFlareSmoke(position+(direction*20), direction,age,item->RoomNumber);
 		}
 	}
+
+	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item);
+	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, & item->Pose, cond ? SoundEnvironment::Water : SoundEnvironment::Always, 1.0f, 0.5f);
 }
 
 

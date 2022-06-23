@@ -4,7 +4,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FloorInfo;
+class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
@@ -148,7 +148,7 @@ int GetWaterHeight(ItemInfo* item);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapToAngle = true);
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 

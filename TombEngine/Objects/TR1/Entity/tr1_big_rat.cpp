@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR1/Entity/tr1_bigrat.h"
+#include "Objects/TR1/Entity/tr1_big_rat.h"
 
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
@@ -12,23 +12,28 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR1
 {
-	static BITE_INFO BigRatBite = { 0, -11, 108, 3 };
-	const std::vector<int> BigRatAttackJoints = { 0, 1, 2, 3, 7, 8, 24, 25 };
+	BITE_INFO BigRatBite = { 0, -11, 108, 3 };
+	const vector<int> BigRatAttackJoints = { 0, 1, 2, 3, 7, 8, 24, 25 };
 
-	#define BIG_RAT_RUN_TURN  Angle::DegToRad(6.0f)
-	#define BIG_RAT_SWIM_TURN Angle::DegToRad(3.0f)
-
-	constexpr auto DEFAULT_SWIM_UPDOWN_SPEED = 32;
-	constexpr auto BIG_RAT_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
-	constexpr auto BIG_RAT_VISIBILITY_RANGE = SQUARE(SECTOR(5));
-	constexpr auto BIG_RAT_BITE_RANGE = SQUARE(CLICK(1) + CLICK(1) / 3);
-	constexpr auto BIG_RAT_CHARGE_RANGE = SQUARE(SECTOR(1) / 2);
-	constexpr auto BIG_RAT_POSE_CHANCE = 0x100;
-	constexpr auto BIG_RAT_WATER_BITE_RANGE = SQUARE(CLICK(1) + CLICK(1) / 6);
 	constexpr auto BIG_RAT_BITE_DAMAGE = 20;
 	constexpr auto BIG_RAT_CHARGE_DAMAGE = 25;
+
+	constexpr auto DEFAULT_SWIM_UPDOWN_SPEED = 32;
+
+	constexpr auto BIG_RAT_ALERT_RANGE = SECTOR(1.5f);
+	constexpr auto BIG_RAT_VISIBILITY_RANGE = SECTOR(5);
+	constexpr auto BIG_RAT_BITE_RANGE = SECTOR(0.34f);
+	constexpr auto BIG_RAT_CHARGE_RANGE = SECTOR(0.5f);
+	constexpr auto BIG_RAT_WATER_BITE_RANGE = SECTOR(0.3f);
+
+	constexpr auto BIG_RAT_POSE_CHANCE = 0x100;
+
+	#define BIG_RAT_RUN_TURN_ANGLE Angle::DegToRad(6.0f)
+	#define BIG_RAT_SWIM_TURN_ANGLE Angle::DegToRad(3.0f)
 
 	enum BigRatState
 	{
@@ -44,6 +49,7 @@ namespace TEN::Entities::TR1
 		BIG_RAT_STATE_WATER_DEATH = 9
 	};
 
+	// TODO
 	enum BigRatAnim
 	{
 		BIG_RAT_ANIM_EMPTY = 0,
@@ -166,8 +172,8 @@ namespace TEN::Entities::TR1
 			else if (creature->HurtByLara)
 				creature->Enemy = LaraItem;
 
-			if ((item->HitStatus || AI.distance < BIG_RAT_ALERT_RANGE) ||
-				(TargetVisible(item, &AI) && AI.distance < BIG_RAT_VISIBILITY_RANGE))
+			if ((item->HitStatus || AI.distance < pow(BIG_RAT_ALERT_RANGE, 2)) ||
+				(TargetVisible(item, &AI) && AI.distance < pow(BIG_RAT_VISIBILITY_RANGE, 2)))
 			{
 				if (!creature->Alerted)
 					creature->Alerted = true;
@@ -180,7 +186,7 @@ namespace TEN::Entities::TR1
 			case BIG_RAT_STATE_IDLE:
 				if (item->Animation.RequiredState)
 					item->Animation.TargetState = item->Animation.RequiredState;
-				else if (AI.bite && AI.distance < BIG_RAT_BITE_RANGE)
+				else if (AI.bite && AI.distance < pow(BIG_RAT_BITE_RANGE, 2))
 					item->Animation.TargetState = BIG_RAT_STATE_BITE_ATTACK;
 				else
 					item->Animation.TargetState = BIG_RAT_STATE_RUN;
@@ -188,24 +194,23 @@ namespace TEN::Entities::TR1
 				break;
 
 			case BIG_RAT_STATE_RUN:
-				creature->MaxTurn = BIG_RAT_RUN_TURN;
+				creature->MaxTurn = BIG_RAT_RUN_TURN_ANGLE;
 
 				if (RatIsInWater(item))
 				{
-					item->Animation.RequiredState = BIG_RAT_STATE_SWIM;
 					item->Animation.TargetState = BIG_RAT_STATE_SWIM;
-
+					item->Animation.RequiredState = BIG_RAT_STATE_SWIM;
 					break;
 				}
 
 				if (AI.ahead && item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
-				else if (AI.bite && AI.distance < BIG_RAT_CHARGE_RANGE)
+				else if (AI.bite && AI.distance < pow(BIG_RAT_CHARGE_RANGE, 2))
 					item->Animation.TargetState = BIG_RAT_STATE_CHARGE_ATTACK;
 				else if (AI.ahead && GetRandomControl() < BIG_RAT_POSE_CHANCE)
 				{
-					item->Animation.RequiredState = BIG_RAT_STATE_POSE;
 					item->Animation.TargetState = BIG_RAT_STATE_IDLE;
+					item->Animation.RequiredState = BIG_RAT_STATE_POSE;
 				}
 
 				break;
@@ -243,12 +248,12 @@ namespace TEN::Entities::TR1
 				break;
 
 			case BIG_RAT_STATE_SWIM:
-				creature->MaxTurn = BIG_RAT_SWIM_TURN;
+				creature->MaxTurn = BIG_RAT_SWIM_TURN_ANGLE;
 
 				if (!RatIsInWater(item))
 				{
-					item->Animation.RequiredState = BIG_RAT_STATE_RUN;
 					item->Animation.TargetState = BIG_RAT_STATE_RUN;
+					item->Animation.RequiredState = BIG_RAT_STATE_RUN;
 					break;
 				}
 

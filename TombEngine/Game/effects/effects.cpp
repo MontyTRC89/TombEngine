@@ -392,7 +392,7 @@ void UpdateSparks()
 	}
 }
 
-void TriggerRicochetSpark(GameVector* pos, short angle, int num, int unk)
+void TriggerRicochetSpark(GameVector* pos, float angle, int num, int unk)
 {
 	TriggerRicochetSpark(pos, angle, num);
 }

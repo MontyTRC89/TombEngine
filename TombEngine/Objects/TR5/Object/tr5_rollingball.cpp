@@ -60,7 +60,10 @@ void RollingBallControl(short itemNumber)
 				pow(Camera.pos.z - item->Pose.Position.z, 2));
 
 			if (distance < 16384)
+			{
 				Camera.bounce = -(((16384 - distance) * abs(item->Animation.VerticalVelocity)) / 16384);
+				SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
+			}
 		}
 
 		if ((item->Pose.Position.y - dh) < CLICK(2))

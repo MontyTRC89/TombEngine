@@ -3,7 +3,7 @@
 struct FishInfo
 {
 	Vector3Int Offset;
-	float Angle;
+	short Angle;
 	short DestY;
 	float AngleAdd;
 	unsigned int Velocity;
@@ -13,7 +13,7 @@ struct FishInfo
 
 struct FishLeaderInfo
 {
-	float Angle;
+	short Angle;
 	unsigned int Velocity;
 	bool On;
 	short AngleTime;

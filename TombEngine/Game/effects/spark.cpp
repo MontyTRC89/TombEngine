@@ -9,13 +9,10 @@
 using namespace DirectX::SimpleMath;
 using namespace TEN::Math::Random;
 
-namespace TEN
-{
-	namespace Effects
-	{
-		namespace Spark
-		{
-			std::array<SparkParticle, 64> SparkParticles;
+namespace TEN {
+	namespace Effects {
+		namespace Spark {
+			std::array<SparkParticle, 128> SparkParticles;
 			void UpdateSparkParticles()
 			{
 				for (int i = 0; i < SparkParticles.size(); i++)
@@ -31,18 +28,13 @@ namespace TEN
 						spark.active = false;
 						continue;
 					}
-
 					spark.velocity.y += spark.gravity;
 					spark.velocity *= spark.friction;
 					spark.pos += spark.velocity;
-
-					float normalizedLife = spark.age / spark.life;
-					spark.height = lerp(spark.width / 0.15625, 0, normalizedLife);
-					spark.color = DirectX::SimpleMath::Vector4::Lerp(spark.sourceColor, spark.destinationColor, normalizedLife);
 				}
 			}
 
-			SparkParticle& getFreeSparkParticle()
+			SparkParticle& GetFreeSparkParticle()
 			{
 				for (int i = 0; i < SparkParticles.size(); i++)
 				{
@@ -53,52 +45,74 @@ namespace TEN
 				return SparkParticles[0];
 			}
 
-			void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* velocity, CVECTOR* color, int room)
+			void TriggerFlareSparkParticles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int room)
 			{
-				auto& spark = getFreeSparkParticle();
-
-				spark = {};
-				spark.age = 0;
-				spark.life = GenerateFloat(10, 20);
-				spark.friction = 0.98f;
-				spark.gravity = 1.2f;
-				spark.width = 8;
-				spark.room = room;
-				spark.pos = Vector3(pos->x, pos->y, pos->z);
-
-				Vector3 vector = Vector3(velocity->x, velocity->y, velocity->z);
-				vector += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
-				vector.Normalize(vector);
-
-				spark.velocity = vector *GenerateFloat(17,24);
-				spark.sourceColor = Vector4(1, 1, 1, 1);
-				spark.destinationColor = Vector4(color->r / 255.0f , color->g / 255.0f, color->b / 255.0f, 1);
-				spark.active = true;
+				SparkParticle& s = GetFreeSparkParticle();
+				s = {};
+				s.age = 0;
+				s.life = GenerateFloat(10, 20);
+				s.friction = 0.98f;
+				s.gravity = 1.2f;
+				s.width = 8.0f;
+				s.height = 48.0f;
+				s.room = room;
+				s.pos = Vector3(pos->x, pos->y, pos->z);
+				Vector3 v = Vector3(vel->x, vel->y, vel->z);
+				v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
+				v.Normalize(v);
+				s.velocity = v *GenerateFloat(17,24);
+				s.sourceColor = Vector4(1, 1, 1, 1);
+				s.destinationColor = Vector4(color->r/255.0f,color->g/255.0f,color->b/255.0f,1);
+				s.active = true;
 			}
 
 			void TriggerRicochetSpark(GameVector* pos, float angle, int num)
 			{
-				for (int i = 0; i < num; i++)
+				for (int i = 0; i < num; i++) 
 				{
-					auto& spark = getFreeSparkParticle();
+					SparkParticle& s = GetFreeSparkParticle();
+					s = {};
+					s.age = 0;
+					s.life = GenerateFloat(10, 20);
+					s.friction = 0.98f;
+					s.gravity = 1.2f;
+					s.width = 8.0f;
+					s.height = 64.0f;
+					s.room = pos->roomNumber;
+					s.pos = Vector3(pos->x, pos->y, pos->z);
+					float ang = angle;
+					Vector3 v = Vector3(sin(ang + GenerateFloat(-PI / 2, PI / 2)), GenerateFloat(-1, 1), cos(ang + GenerateFloat(-PI / 2, PI / 2)));
+					v += Vector3(GenerateFloat(-64, 64), GenerateFloat(-64, 64), GenerateFloat(-64, 64));
+					v.Normalize(v);
+					s.velocity = v * GenerateFloat(17, 24);
+					s.sourceColor = Vector4(1, 0.8, 0.2f, 1) * 3;
+					s.destinationColor = Vector4(0, 0, 0, 0);
+					s.active = true;
+				}
+			}
 
-					spark = {};
-					spark.age = 0;
-					spark.life = GenerateFloat(10, 20);
-					spark.friction = 0.98f;
-					spark.gravity = 1.2f;
-					spark.width = 8;
-					spark.room = pos->roomNumber;
-					spark.pos = Vector3(pos->x, pos->y, pos->z);
-
-					Vector3 vector = Vector3(sin(angle + GenerateFloat(-M_PI / 2, M_PI / 2)), GenerateFloat(-1.0f, 1.0f), cos(angle + GenerateFloat(-M_PI / 2, M_PI / 2)));
-					vector += Vector3(GenerateFloat(-64.0f, 64.0f), GenerateFloat(-64.0f, 64.0f), GenerateFloat(-64.0f, 64.0f));
-					vector.Normalize(vector);
-
-					spark.velocity = vector * GenerateFloat(17.0f, 24.0f);
-					spark.sourceColor = Vector4(1, 0.8, 0.2f, 1) * 3;
-					spark.destinationColor = Vector4(0, 0, 0, 0);
-					spark.active = true;
+			void TriggerFrictionSpark(GameVector* pos, EulerAngles angle, float length, int num)
+			{
+				for (int i = 0; i < num; i++) 
+				{
+					SparkParticle& s = GetFreeSparkParticle();
+					s = {};
+					s.age = 0;
+					s.life = GenerateFloat(8, 15);
+					s.friction = 0.1f;
+					s.gravity = 0.0f;
+					s.height = length;
+					s.width = GenerateFloat(16.0f, 32.0f);
+					s.room = pos->roomNumber;
+					s.pos = Vector3(pos->x + GenerateFloat(-16, 16), pos->y + GenerateFloat(-16, 16), pos->z + GenerateFloat(-16, 16));
+					float ang = angle.y;
+					float vAng = -angle.x;
+					Vector3 v = Vector3(sin(ang), vAng + GenerateFloat(-PI / 16, PI / 16), cos(ang));
+					v.Normalize(v);
+					s.velocity = v * GenerateFloat(32, 64);
+					s.sourceColor = Vector4(1, 0.7, 0.4f, 1) * 3;
+					s.destinationColor = Vector4(0.4f, 0.1f, 0, 0.5f);
+					s.active = true;
 				}
 			}
 		}

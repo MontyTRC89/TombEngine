@@ -11,6 +11,7 @@
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Renderer/Renderer11.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
@@ -1335,6 +1336,107 @@ void TriggerLaraDrips(ItemInfo* item)
 			}
 		}
 	}
+}
+
+void SomeSparkEffect(int x, int y, int z, int count)
+{
+	for (int i = 0; i < count; i++)
+	{
+		auto* spark = GetFreeParticle();
+
+		spark->on = 1;
+		spark->sR = 112;
+		spark->sG = (GetRandomControl() & 0x1F) + -128;
+		spark->sB = (GetRandomControl() & 0x1F) + -128;
+		spark->colFadeSpeed = 4;
+		spark->fadeToBlack = 8;
+		spark->life = 24;
+		spark->dR = spark->sR >> 1;
+		spark->dG = spark->sG >> 1;
+		spark->dB = spark->sB >> 1;
+		spark->sLife = 24;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+		spark->friction = 5;
+		int random = GetRandomControl() & 0xFFF;
+		spark->xVel = -128 * sin(random << 4);
+		spark->yVel = -640 - (byte)GetRandomControl();
+		spark->zVel = 128 * cos(random << 4);
+		spark->flags = 0;
+		spark->x = x + (spark->xVel >> 3);
+		spark->y = y - (spark->yVel >> 5);
+		spark->z = z + (spark->zVel >> 3);
+		spark->maxYvel = 0;
+		spark->gravity = (GetRandomControl() & 0xF) + 64;
+	}
+}
+
+void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
+{
+	if (flag)
+	{
+		int x = (GetRandomControl() & 0x1FF) + item->Pose.Position.x - CLICK(1);
+		int y = item->Pose.Position.y;
+		int z = (GetRandomControl() & 0x1FF) + item->Pose.Position.z - CLICK(1);
+
+		TriggerExplosionBubbles(x, y, z, item->RoomNumber);
+		TriggerExplosionSparks(x, y, z, 2, -1, 1, item->RoomNumber);
+
+		int wh = GetWaterHeight(x, y, z, item->RoomNumber);
+		if (wh != NO_HEIGHT)
+			SomeSparkEffect(x, wh, z, 8);
+	}
+	else
+	{
+		TriggerExplosionBubble(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+		TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -2, 1, item->RoomNumber);
+
+		for (int i = 0; i < 3; i++)
+			TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -1, 1, item->RoomNumber);
+
+		int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+		if (waterHeight != NO_HEIGHT)
+		{
+			int dy = item->Pose.Position.y - waterHeight;
+			if (dy < 2048)
+			{
+				SplashSetup.y = waterHeight;
+				SplashSetup.x = item->Pose.Position.x;
+				SplashSetup.z = item->Pose.Position.z;
+				SplashSetup.innerRadius = 160;
+				SplashSetup.splashPower = 2048 - dy;
+
+				SetupSplash(&SplashSetup, item->RoomNumber);
+			}
+		}
+	}
+}
+
+void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
+{
+	if (g_Level.Rooms[vehicle->RoomNumber].flags & ENV_FLAG_WATER)
+	{
+		TriggerUnderwaterExplosion(vehicle, 1);
+	}
+	else
+	{
+		TriggerExplosionSparks(vehicle->Pose.Position.x, vehicle->Pose.Position.y, vehicle->Pose.Position.z, 3, -2, 0, vehicle->RoomNumber);
+		for (int i = 0; i < 3; i++)
+		{
+			TriggerExplosionSparks(vehicle->Pose.Position.x, vehicle->Pose.Position.y, vehicle->Pose.Position.z, 3, -1, 0, vehicle->RoomNumber);
+		}
+	}
+
+	auto* lara = GetLaraInfo(laraItem);
+
+	ExplodingDeath(lara->Vehicle, ALL_JOINT_BITS, 256);
+	KillItem(lara->Vehicle);
+	vehicle->Status = ITEM_DEACTIVATED;
+	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
+	SoundEffect(SFX_TR4_EXPLOSION2, &laraItem->Pose);
+
+	lara->Vehicle = NO_ITEM;
+	SetAnimation(laraItem, LA_FALL_START);
+	laraItem->HitPoints = 0;
 }
 
 int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)

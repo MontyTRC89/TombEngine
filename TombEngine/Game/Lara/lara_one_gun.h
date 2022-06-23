@@ -63,7 +63,6 @@ void FireHK(ItemInfo* laraItem, int mode);
 void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType);
 
 void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* src, ItemInfo* dest, LaraWeaponType weaponType);
-void TriggerUnderwaterExplosion(ItemInfo* item, int flag);
 void SomeSparkEffect(int x, int y, int z, int count);
 
 void HitSpecial(ItemInfo* projectile, ItemInfo* target, int flags);

@@ -17,7 +17,7 @@ namespace TEN::Effects::Lara
 {
 	void LaraBurn(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
 		auto* lara = GetLaraInfo(item);
@@ -35,7 +35,7 @@ namespace TEN::Effects::Lara
 
 	void LavaBurn(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
 		auto* lara = GetLaraInfo(item);
@@ -60,7 +60,7 @@ namespace TEN::Effects::Lara
 
 	void LaraBreath(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
 		auto* lara = GetLaraInfo(item);

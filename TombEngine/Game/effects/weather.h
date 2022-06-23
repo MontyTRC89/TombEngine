@@ -3,15 +3,11 @@
 #include "ScriptInterfaceLevel.h"
 #include "Specific/trmath.h"
 
-namespace TEN
+namespace TEN::Effects::Environment 
 {
-	namespace Effects
-	{
-		namespace Environment 
-		{
-			constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
-			constexpr auto WEATHER_PARTICLES_MAX_COUNT = 1024;
-			constexpr auto WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY = 5.0f;
+	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
+	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 1024;
+	constexpr auto WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY = 5.0f;
 
 			constexpr auto MAX_SNOW_SIZE = 32.0f;
 			constexpr auto MAX_RAIN_SIZE = 128.0f;
@@ -100,7 +96,5 @@ namespace TEN
 		void SpawnWeatherParticles(ScriptInterfaceLevel* level);
 	};
 
-			extern EnvironmentController Weather;
-		}
-	}
+	extern EnvironmentController Weather;
 }

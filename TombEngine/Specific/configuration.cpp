@@ -10,8 +10,8 @@
 #include "Specific/winmain.h"
 #include "Sound/sound.h"
 
-using namespace TEN::Renderer;
 using std::vector;
+using namespace TEN::Renderer;
 
 GameConfiguration g_Configuration;
 

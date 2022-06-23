@@ -344,7 +344,6 @@ void TrapObjects()
 		obj->initialise = InitialiseWreckingBall;
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
-		//obj->drawRoutineExtra = DrawWreckingBall;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -401,7 +400,6 @@ void InitialiseObjects()
 		obj->floor = nullptr;
 		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
-		obj->drawRoutineExtra = nullptr;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
 		obj->shadowSize = NO_SHADOW;
