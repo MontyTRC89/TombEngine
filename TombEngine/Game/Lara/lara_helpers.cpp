@@ -489,9 +489,9 @@ void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	short maxAngleNormalized = maxAngle * abs(axisCoeff);
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
-		item->Pose.Orientation.z += std::min<short>(baseRate, abs((maxAngleNormalized * 0.6f) - item->Pose.Orientation.z) / 3) * sign;
-	else
-		item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
+		maxAngleNormalized *= 0.6f;
+
+	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
 }
 
 void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
