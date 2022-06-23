@@ -454,7 +454,7 @@ void FireHarpoon(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	Ammo& ammos = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+	auto& ammos = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
 	if (!ammos)
 		return;
 
@@ -502,6 +502,7 @@ void FireHarpoon(ItemInfo* laraItem)
 		item->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x);
 		item->HitPoints = HARPOON_TIME;
 
+		Rumble(0.2f, 0.1f);
 		AddActiveItem(itemNumber);
 
 		Statistics.Level.AmmoUsed++;
@@ -1462,6 +1463,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo;
 
+		Rumble(0.2f, 0.1f);
 		SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
