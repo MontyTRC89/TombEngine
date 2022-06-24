@@ -654,6 +654,8 @@ int FindItem(ItemInfo* item)
 
 void DoDamage(ItemInfo* item, int damage)
 {
+	static int lastHurtTime = 0;
+
 	if (item->HitPoints <= 0)
 		return;
 
@@ -667,5 +669,11 @@ void DoDamage(ItemInfo* item, int damage)
 	{
 		float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
 		Rumble(power, 0.15f);
+
+		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + GenerateInt(0, FPS)))
+		{
+			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
+			lastHurtTime = GlobalCounter;
+		}
 	}
 }

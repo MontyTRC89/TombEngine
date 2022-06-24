@@ -390,7 +390,6 @@ bool SaveGame::Save(int slot)
 	lara.add_poison_potency(Lara.PoisonPotency);
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
-	lara.add_spasm_effect_count(Lara.SpasmEffectCount);
 	lara.add_sprint_energy(Lara.SprintEnergy);
 	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
@@ -1738,7 +1737,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Tightrope.TightropeItem = s->lara()->control()->tightrope()->tightrope_item();
 	Lara.Control.Tightrope.TimeOnTightrope = s->lara()->control()->tightrope()->time_on_tightrope();
 	Lara.Control.WaterStatus = (WaterStatus)s->lara()->control()->water_status();
-	Lara.SpasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.SprintEnergy = s->lara()->sprint_energy();
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);

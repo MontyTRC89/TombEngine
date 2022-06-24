@@ -1276,7 +1276,6 @@ struct LaraInfo
 	int HitFrame;
 	int HitDirection;
 	FX_INFO* SpasmEffect;	// Not saved.
-	unsigned int SpasmEffectCount;
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
