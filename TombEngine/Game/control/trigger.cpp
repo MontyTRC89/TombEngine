@@ -9,12 +9,14 @@
 #include "Game/effects/lara_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
 #include "Game/savegame.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
@@ -724,30 +726,40 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	ProcessSectorFlags(GetCollision(item).BottomBlock);
-}
+	auto block = GetCollision(item).BottomBlock;
+	bool isLara = item->IsLara();
 
-void ProcessSectorFlags(int x, int y, int z, short roomNumber)
-{
-	ProcessSectorFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
-}
-
-void ProcessSectorFlags(FloorInfo* floor)
-{
-	// Monkeyswing
-	Lara.Control.CanMonkeySwing = floor->Flags.Monkeyswing;
-
-	// Burn Lara
-	if (floor->Flags.Death &&
-		(LaraItem->Pose.Position.y == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->Animation.ActiveState) ||
-			Lara.Control.WaterStatus != WaterStatus::Dry))
+	// Monkeyswing and climb (only for Lara)
+	if (isLara)
 	{
-		LavaBurn(LaraItem);
+		auto* lara = GetLaraInfo(item);
+
+		// Set climb status
+		if (TestLaraNearClimbableWall(item, block))
+			lara->Control.CanClimbLadder = true;
+		else
+			lara->Control.CanClimbLadder = false;
+
+		// Set monkeyswing status
+		lara->Control.CanMonkeySwing = block->Flags.Monkeyswing;
 	}
 
-	// Set climb status
-	if (TestLaraNearClimbableWall(LaraItem, floor))
-		Lara.Control.CanClimbLadder = true;
-	else
-		Lara.Control.CanClimbLadder = false;
+	// Burn or drown item
+	if (block->Flags.Death && item->Pose.Position.y == item->Floor)
+	{
+		if (isLara)
+		{
+			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
+				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
+			{
+				// To allow both lava and rapids in same level, also check floor material flag.
+				if (block->Material == FLOOR_MATERIAL::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded)
+					KayakLaraRapidsDrown(item);
+				else
+					LavaBurn(item);
+			}
+		}
+		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
+			item->HitPoints = 0; // TODO: Implement correct behaviour for other objects!
+	}
 }

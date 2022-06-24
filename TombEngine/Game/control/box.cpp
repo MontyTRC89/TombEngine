@@ -1225,6 +1225,7 @@ void GetAITarget(CreatureInfo* creature)
 			Objects[item->ObjectNumber].waterCreature)
 		{
 			TestTriggers(enemy, true);
+			ProcessSectorFlags(enemy);
 			creature->Patrol = !creature->Patrol;
 		}
 	}
@@ -1242,6 +1243,7 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
 			TestTriggers(enemy, true);
+			ProcessSectorFlags(enemy);
 
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;

@@ -17,9 +17,11 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+#include "Specific/prng.h"
 
 using std::vector;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
 {
@@ -160,13 +162,19 @@ namespace TEN::Entities::Vehicles
 	
 	static void TriggerWheelSparkles(ItemInfo* item, bool left)
 	{
-		auto* minecart = GetMinecartInfo(item);
-
 		for (int i = 0; i < 2; i++)
 		{
 			auto pos = Vector3Int{};
 			GetJointAbsPosition(item, &pos, Wheels[(left ? 0 : 2) + i]);
 			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber), item->Pose.Orientation, 512, 10);
+			
+			if (i)
+			{
+				float mult = GenerateFloat(0.7f, 1.0f);
+				byte r = (byte)(mult * 190.0f);
+				byte g = (byte)(mult * 100.0f);
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 2, r, g, 0);
+			}
 		}
 	}
 
