@@ -716,10 +716,11 @@ namespace TEN::Input
 			DbInput = InputBusy;
 
 		InputBusy = lInput;
-		TrInput = lInput;
 
 		HandleLaraHotkeys(lInput);
 		SolveInputCollisions(lInput);
+
+		TrInput = lInput;
 
 		if (debounce)
 			DbInput = TrInput & (DbInput ^ TrInput);
