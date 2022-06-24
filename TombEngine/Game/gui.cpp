@@ -3199,7 +3199,7 @@ bool GuiController::CallInventory(bool reset_mode)
 			compassNeedleAngle -= 32;
 
 		UpdateInput();
-		TrInput = InputBusy;
+		TrInput = RawInput;
 		GameTimer++;
 
 		if (DbInput & IN_OPTION)

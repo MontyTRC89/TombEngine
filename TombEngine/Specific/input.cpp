@@ -79,7 +79,7 @@ namespace TEN::Input
 	// Globals
 	int TrInput;
 	int DbInput;
-	int InputBusy;
+	int RawInput;
 	std::vector<bool> KeyMap;
 	std::vector<float> AxisMap;
 
@@ -713,9 +713,9 @@ namespace TEN::Input
 			lInput |= IN_SELECT;
 
 		if (debounce)
-			DbInput = InputBusy;
+			DbInput = RawInput;
 
-		InputBusy = lInput;
+		RawInput = lInput;
 
 		HandleLaraHotkeys(lInput);
 		SolveInputCollisions(lInput);

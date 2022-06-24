@@ -1103,7 +1103,7 @@ void BinocularCamera(ItemInfo* item)
 	if (!LaserSight)
 	{
 		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
-		if (InputBusy & (IN_DESELECT | IN_OPTION | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
+		if (RawInput & (IN_DESELECT | IN_OPTION | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
 		{
 			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
@@ -1208,7 +1208,7 @@ void BinocularCamera(ItemInfo* item)
 	int range = 0;
 	int flags = 0;
 
-	if (!(InputBusy & IN_WALK))
+	if (!(RawInput & IN_WALK))
 	{
 		range = 64;
 		flags = 0x10000;
@@ -1219,7 +1219,7 @@ void BinocularCamera(ItemInfo* item)
 		flags = 0x8000;
 	}
 
-	if (InputBusy & IN_SPRINT)
+	if (RawInput & IN_SPRINT)
 	{
 		BinocularRange -= range;
 		if (BinocularRange < ANGLE(0.7f))
@@ -1227,7 +1227,7 @@ void BinocularCamera(ItemInfo* item)
 		else
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 	}
-	else if (InputBusy & IN_CROUCH)
+	else if (RawInput & IN_CROUCH)
 	{
 		BinocularRange += range;
 		if (BinocularRange > ANGLE(8.5f))
@@ -1244,10 +1244,10 @@ void BinocularCamera(ItemInfo* item)
 		bool firing = false;
 		auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
-		if (!(InputBusy & IN_ACTION) ||
+		if (!(RawInput & IN_ACTION) ||
 			WeaponDelay || !ammo)
 		{
-			if (!(InputBusy & IN_ACTION))
+			if (!(RawInput & IN_ACTION))
 			{
 				LSHKShotsFired = 0;
 				Camera.bounce = 0;
@@ -1364,7 +1364,7 @@ void BinocularCamera(ItemInfo* item)
 	{
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
-		if (!(InputBusy & IN_ACTION))
+		if (!(RawInput & IN_ACTION))
 		{
 			// Reimplement this mode?
 		}
