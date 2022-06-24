@@ -21,7 +21,7 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll);
 void DoLaraTightropeBalance(ItemInfo* item);
 void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
-void DealLaraFallDamage(ItemInfo* item);
+void DoLaraFallDamage(ItemInfo* item);
 
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);

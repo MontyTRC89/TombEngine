@@ -286,7 +286,7 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item)
 	}
 }
 
-void DealLaraFallDamage(ItemInfo* item)
+void DoLaraFallDamage(ItemInfo* item)
 {
 	if (item->Animation.VerticalVelocity >= LARA_DAMAGE_VELOCITY)
 	{
