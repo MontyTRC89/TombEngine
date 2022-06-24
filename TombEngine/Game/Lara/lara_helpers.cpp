@@ -292,7 +292,7 @@ void DealLaraFallDamage(ItemInfo* item)
 	{
 		if (item->Animation.VerticalVelocity >= LARA_DEATH_VELOCITY)
 			item->HitPoints = 0;
-		else USE_FEATURE_IF_CPP20([[likely]] )
+		else USE_FEATURE_IF_CPP20([[likely]])
 		{
 			float base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
@@ -307,29 +307,32 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 {
 	if (item->ObjectNumber == ID_LARA)
 		return (LaraInfo*&)item->Data;
+	else
+	{
+		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 
-	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-
-	auto* firstLaraItem = FindItem(ID_LARA);
-	return (LaraInfo*&)firstLaraItem->Data;
+		auto* firstLaraItem = FindItem(ID_LARA);
+		return (LaraInfo*&)firstLaraItem->Data;
+	}
 }
 
 short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
-	short direction = coll->Setup.ForwardAngle;
+	short headingAngle = coll->Setup.ForwardAngle;
 	auto probe = GetCollision(item);
 
 	// Ground is flat.
 	if (probe.FloorTilt == Vector2::Zero)
-		return direction;
+		return headingAngle;
 
-	// Get either a) the surface aspect angle (extended slides), or
-	// b) derive the nearest cardinal direction from it (original slides).
-	direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	// Get either:
+	// a) the surface aspect angle (extended slides), or
+	// b) the derived nearest cardinal direction from it (original slides).
+	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 	if (g_GameFlow->HasSlideExtended())
-		return direction;
+		return headingAngle;
 	else
-		return (GetQuadrant(direction) * ANGLE(90.0f));
+		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
 }
 
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
@@ -346,6 +349,7 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
+
 	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical]);
 }
 
@@ -486,7 +490,7 @@ void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * abs(axisCoeff);
+	short maxAngleNormalized = maxAngle * axisCoeff;
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
 		maxAngleNormalized *= 0.6f;
@@ -505,7 +509,7 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
-	if (abs(lara->ExtraTorsoRot.z) < abs(maxAngleNormalized))
+	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
 		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
@@ -568,7 +572,7 @@ void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
 	{
 		lara->Control.JumpDirection = JumpDirection::Right;
 	}
-	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+	else if (TestLaraJumpUp(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		lara->Control.JumpDirection = JumpDirection::Up;
 	else
 		lara->Control.JumpDirection = JumpDirection::None;
@@ -718,11 +722,11 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	short direction = GetLaraSlideDirection(item, coll);
-	short deltaAngle = direction - item->Pose.Orientation.y;
+	short headinAngle = GetLaraSlideDirection(item, coll);
+	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
 	if (!g_GameFlow->HasSlideExtended())
-		item->Pose.Orientation.y = direction;
+		item->Pose.Orientation.y = headinAngle;
 
 	// Snap to height upon slide entrance.
 	if (item->Animation.ActiveState != LS_SLIDE_FORWARD &&
