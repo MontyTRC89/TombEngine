@@ -38,9 +38,9 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
-	lara->Control.Count.RunJump++;
-	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME / 2)
-		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2;
+	lara->Control.Count.Run++;
+	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME / 2)
+		lara->Control.Count.Run = LARA_RUN_JUMP_TIME / 2;
 
 	if (item->HitPoints <= 0)
 	{

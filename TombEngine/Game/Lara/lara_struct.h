@@ -1154,7 +1154,7 @@ struct LaraCountData
 {
 	unsigned int Pose;
 	unsigned int PositionAdjust;
-	unsigned int RunJump;
+	unsigned int Run;
 	unsigned int Death;
 	unsigned int NoCheat;
 };

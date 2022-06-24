@@ -129,9 +129,9 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Count.RunJump++;
-	if (lara->Control.Count.RunJump > (LARA_RUN_JUMP_TIME / 2 + 4))
-		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2 + 4;
+	lara->Control.Count.Run++;
+	if (lara->Control.Count.Run > (LARA_RUN_JUMP_TIME / 2 + 4))
+		lara->Control.Count.Run = LARA_RUN_JUMP_TIME / 2 + 4;
 
 	if (item->HitPoints <= 0)
 	{
@@ -236,9 +236,9 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Count.RunJump++;
-	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
-		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
+	lara->Control.Count.Run++;
+	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME)
+		lara->Control.Count.Run = LARA_RUN_JUMP_TIME;
 
 	if (item->HitPoints <= 0)
 	{
@@ -254,7 +254,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_JUMP || lara->Control.RunJumpQueued)
 	{
-		if (lara->Control.Count.RunJump >= LARA_RUN_JUMP_TIME &&
+		if (!(TrInput & IN_SPRINT) && lara->Control.Count.Run >= LARA_RUN_JUMP_TIME &&
 			TestLaraRunJumpForward(item, coll))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
@@ -265,7 +265,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		!lara->Control.RunJumpQueued &&	// Jump queue blocks roll.
+		!lara->Control.RunJumpQueued && // Jump queue blocks roll.
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		item->Animation.TargetState = LS_ROLL_FORWARD;
@@ -2241,9 +2241,9 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	lara->SprintEnergy--;
 
-	lara->Control.Count.RunJump++;
-	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
-		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
+	lara->Control.Count.Run++;
+	if (lara->Control.Count.Run > LARA_SPRINT_JUMP_TIME)
+		lara->Control.Count.Run = LARA_SPRINT_JUMP_TIME;
 
 	if (item->HitPoints <= 0)
 	{
@@ -2264,7 +2264,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_SPRINT_DIVE;
 			return;
 		}
-		else if (lara->Control.Count.RunJump >= LARA_RUN_JUMP_TIME &&
+		else if (TrInput & IN_SPRINT && lara->Control.Count.Run >= LARA_SPRINT_JUMP_TIME &&
 			TestLaraRunJumpForward(item, coll) && HasStateDispatch(item, LS_JUMP_FORWARD))
 		{
 			item->Animation.TargetState = LS_JUMP_FORWARD;
@@ -2383,9 +2383,9 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.Count.RunJump++;
-	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME)
-		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME;
+	lara->Control.Count.Run++;
+	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME)
+		lara->Control.Count.Run = LARA_RUN_JUMP_TIME;
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{

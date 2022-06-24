@@ -48,7 +48,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
-		lara->Control.Count.RunJump = 0;
+		lara->Control.Count.Run = 0;
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState((LaraState)item->Animation.ActiveState))

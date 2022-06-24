@@ -68,7 +68,7 @@ constexpr int LARA_TERMINAL_VELOCITY   = CLICK(10);
 constexpr auto LARA_POSITION_ADJUST_MAX_TIME = FPS * 3;	 // 30 frames * 3 = 3 seconds allowed for position adjustment.
 constexpr auto LARA_POSE_TIME				 = FPS * 30; // 30 frames * 30 = 30 seconds to AFK pose.
 constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running jump is possible.
-constexpr auto LARA_SPRINT_JUMP_TIME		 = 30;		 // TODO: Frames to count before a sprint jump is possible.
+constexpr auto LARA_SPRINT_JUMP_TIME		 = 50;		 // Frames to count before a sprint jump is possible.
 
 constexpr float LARA_HEALTH_MAX			= 1000.0f;
 constexpr float LARA_AIR_MAX			= 1800.0f;
