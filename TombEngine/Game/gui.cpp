@@ -20,7 +20,8 @@
 #include "Specific/input.h"
 #include "Specific/configuration.h"
 #include "Renderer/Renderer11.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
@@ -3415,6 +3416,7 @@ bool GuiController::DoSave()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		SaveGame::Save(selected_save_slot);
+		g_GameScript->OnSave();
 		return true;
 	}
 
