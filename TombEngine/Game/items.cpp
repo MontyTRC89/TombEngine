@@ -667,8 +667,11 @@ void DoDamage(ItemInfo* item, int damage)
 
 	if (item->IsLara())
 	{
-		float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
-		Rumble(power, 0.15f);
+		if (damage > 0)
+		{
+			float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
+			Rumble(power, 0.15f);
+		}
 
 		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + GenerateInt(0, FPS)))
 		{
