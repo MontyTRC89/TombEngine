@@ -421,6 +421,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 				g_GameFlow->HasCrawlExtended())
 			{
 				item->Animation.TargetState = crawlVaultResult.TargetState;
+				lara->Control.TurnRate = 0;
 				ResetLaraFlex(item);
 				return;
 			}
