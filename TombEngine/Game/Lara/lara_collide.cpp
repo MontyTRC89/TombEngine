@@ -70,7 +70,7 @@ bool LaraDeflectEdgeJump(ItemInfo* item, CollisionInfo* coll)
 			{
 				// TODO: Demagic. This is Lara's running velocity. Jumps have a minimum of 50.
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START, 1);
-				Rumble(0.5f, 0.3f);
+				Rumble(0.5f, 0.15f);
 			}
 
 			item->Animation.Velocity /= 4;
