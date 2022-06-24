@@ -321,6 +321,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
 	item->Animation.Airborne = true;
+	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	return true;
 }
@@ -988,6 +989,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Airborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
+	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
 	return true;
