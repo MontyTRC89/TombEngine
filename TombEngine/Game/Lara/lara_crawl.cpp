@@ -236,8 +236,6 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
-
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -257,6 +255,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->Animation.TargetState = LS_CROUCH_TURN_LEFT;
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 			return;
 		}
 
@@ -292,8 +291,6 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_LOOK)
 		LookUpDown(item);
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
-
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -313,6 +310,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_RIGHT)
 		{
 			item->Animation.TargetState = LS_CROUCH_TURN_RIGHT;
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_TURN_RATE_MAX);
 			return;
 		}
 
@@ -706,8 +704,6 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
-
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -732,6 +728,7 @@ void lara_as_crawl_turn_left(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->Animation.TargetState = LS_CRAWL_TURN_LEFT;
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
 			return;
 		}
 
@@ -766,8 +763,6 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
-
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -792,6 +787,7 @@ void lara_as_crawl_turn_right(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_RIGHT)
 		{
 			item->Animation.TargetState = LS_CRAWL_TURN_RIGHT;
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_CRAWL_MOVE_TURN_RATE_MAX);
 			return;
 		}
 
