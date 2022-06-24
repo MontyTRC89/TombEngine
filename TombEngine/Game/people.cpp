@@ -47,8 +47,7 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation, 
 			if (hit)
 			{
 				CreatureEffect(item, gun, &GunHit);
-				LaraItem->HitPoints -= damage;
-				LaraItem->HitStatus = true; 
+				DoDamage(LaraItem, damage);
 			}
 			else if (targetable)
 				CreatureEffect(item, gun, &GunMiss);

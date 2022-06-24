@@ -222,18 +222,16 @@ namespace TEN::Entities::TR3
 				creature->MaxTurn = RAPTOR_ATTACK_TURN_ANGLE;
 				tilt = angle;
 
-				if (creature->Enemy == LaraItem)
+				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) && item->TestBits(JointBitType::Touch, RaptorAttackJoints))
 					{
 						creature->Flags |= 1;
 						CreatureEffect(item, &RaptorBite, DoBloodSplat);
+						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 
 						if (LaraItem->HitPoints <= 0)
 							creature->Flags |= 2;
-
-						LaraItem->HitPoints -= RAPTOR_ATTACK_DAMAGE;
-						LaraItem->HitStatus = 1;
 
 						item->Animation.RequiredState = RAPTOR_STATE_IDLE;
 					}
@@ -247,15 +245,12 @@ namespace TEN::Entities::TR3
 							abs(direction.y) < SECTOR(0.5f) &&
 							abs(direction.z) < SECTOR(0.5f))
 						{
-							creature->Enemy->HitPoints -= 25;
-							creature->Enemy->HitStatus = 1;
-
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
 
 							creature->Flags |= 1;
 							CreatureEffect(item, &RaptorBite, DoBloodSplat);
-
+							DoDamage(creature->Enemy, 25);
 						}
 					}
 				}
@@ -266,18 +261,16 @@ namespace TEN::Entities::TR3
 				creature->MaxTurn = RAPTOR_ATTACK_TURN_ANGLE;
 				tilt = angle;
 
-				if (creature->Enemy == LaraItem)
+				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) && item->TestBits(JointBitType::Touch, RaptorAttackJoints))
 					{
 						creature->Flags |= 1;
 						CreatureEffect(item, &RaptorBite, DoBloodSplat);
+						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 
 						if (LaraItem->HitPoints <= 0)
 							creature->Flags |= 2;
-
-						LaraItem->HitPoints -= RAPTOR_ATTACK_DAMAGE;
-						LaraItem->HitStatus = 1;
 
 						item->Animation.RequiredState = RAPTOR_STATE_IDLE;
 					}
@@ -291,14 +284,12 @@ namespace TEN::Entities::TR3
 							abs(direction.y) < SECTOR(0.5f) &&
 							abs(direction.z) < SECTOR(0.5f))
 						{
-							creature->Enemy->HitPoints -= 25;
-							creature->Enemy->HitStatus = 1;
-
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
 
 							creature->Flags |= 1;
 							CreatureEffect(item, &RaptorBite, DoBloodSplat);
+							DoDamage(creature->Enemy, 25);
 						}
 					}
 				}
@@ -309,15 +300,13 @@ namespace TEN::Entities::TR3
 				creature->MaxTurn = RAPTOR_ATTACK_TURN_ANGLE;
 				tilt = angle;
 
-				if (creature->Enemy == LaraItem)
+				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 1) && item->TestBits(JointBitType::Touch, RaptorAttackJoints))
 					{
 						creature->Flags |= 1;
 						CreatureEffect(item, &RaptorBite, DoBloodSplat);
-
-						LaraItem->HitPoints -= RAPTOR_ATTACK_DAMAGE;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, RAPTOR_ATTACK_DAMAGE);
 
 						if (LaraItem->HitPoints <= 0)
 							creature->Flags |= 2;
@@ -334,14 +323,12 @@ namespace TEN::Entities::TR3
 							abs(direction.y) < SECTOR(0.5f) &&
 							abs(direction.z) < SECTOR(0.5f))
 						{
-							creature->Enemy->HitPoints -= 25;
-							creature->Enemy->HitStatus = 1;
-
 							if (creature->Enemy->HitPoints <= 0)
 								creature->Flags |= 2;
 
 							creature->Flags |= 1;
 							CreatureEffect(item, &RaptorBite, DoBloodSplat);
+							DoDamage(creature->Enemy, 25);
 						}
 					}
 				}

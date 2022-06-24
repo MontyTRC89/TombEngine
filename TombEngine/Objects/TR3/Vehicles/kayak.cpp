@@ -1295,7 +1295,7 @@ namespace TEN::Entities::Vehicles
 		{
 			int damage = ofs - kayakItem->Animation.VerticalVelocity;
 			if (damage > 160)
-				laraItem->HitPoints -= (damage - 160) * 8;
+				DoDamage(laraItem, (damage - 160) * 8);
 		}
 
 		if (lara->Vehicle != NO_ITEM)

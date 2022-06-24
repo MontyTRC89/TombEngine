@@ -8,9 +8,14 @@
 #include "ScriptInterfaceGame.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Specific/input.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Sound/sound.h"
+#include "Specific/prng.h"
 
 using namespace TEN::Floordata;
+using namespace TEN::Input;
+using namespace TEN::Math::Random;
 
 void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
 {
@@ -645,4 +650,22 @@ int FindItem(ItemInfo* item)
 			return i;
 
 	return -1;
+}
+
+void DoDamage(ItemInfo* item, int damage)
+{
+	if (item->HitPoints <= 0)
+		return;
+
+	item->HitStatus = true;
+
+	item->HitPoints -= damage;
+	if (item->HitPoints < 0)
+		item->HitPoints = 0;
+
+	if (item->IsLara())
+	{
+		float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
+		Rumble(power, 0.15f);
+	}
 }

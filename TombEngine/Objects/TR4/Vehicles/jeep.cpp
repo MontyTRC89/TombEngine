@@ -756,8 +756,7 @@ namespace TEN::Entities::Vehicles
 
 			if ((&g_Level.Items[lara->Vehicle] == jeepItem) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
 			{
-				laraItem->HitPoints -= (JEEP_MAX_SPEED - newspeed) / 128;
-				laraItem->HitStatus = true;
+				DoDamage(laraItem, (JEEP_MAX_SPEED - newspeed) / 128);
 			}
 
 			if (jeep->velocity > 0 && newspeed < jeep->velocity)

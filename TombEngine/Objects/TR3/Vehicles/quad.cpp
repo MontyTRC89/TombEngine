@@ -704,8 +704,7 @@ namespace TEN::Entities::Vehicles
 				quad->Velocity == MAX_VELOCITY &&
 				newVelocity < (quad->Velocity - 10))
 			{
-				laraItem->HitPoints -= (quad->Velocity - newVelocity) / 128;
-				laraItem->HitStatus = 1;
+				DoDamage(laraItem, (quad->Velocity - newVelocity) / 128);
 			}
 
 			if (quad->Velocity > 0 && newVelocity < quad->Velocity)

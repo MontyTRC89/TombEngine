@@ -152,10 +152,8 @@ namespace TEN::Entities::TR3
 				if (!info->Flags && item->TestBits(JointBitType::Touch, TigerAttackJoints))
 				{
 					CreatureEffect(item, &TigerBite, DoBloodSplat);
+					DoDamage(info->Enemy, TIGER_ATTACK_DAMAGE);
 					info->Flags = 1;
-
-					LaraItem->HitPoints -= TIGER_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;
