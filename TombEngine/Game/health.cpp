@@ -72,20 +72,20 @@ void UpdateHealthBar(ItemInfo* item, int flash)
 {
 	auto* lara = GetLaraInfo(item);
 
-	auto HitPoints = item->HitPoints;
+	auto hitPoints = item->HitPoints;
 
-	if (HitPoints < 0)
-		HitPoints = 0;
-	else if (HitPoints > LARA_HEALTH_MAX)
-		HitPoints = LARA_HEALTH_MAX;
+	if (hitPoints < 0)
+		hitPoints = 0;
+	else if (hitPoints > LARA_HEALTH_MAX)
+		hitPoints = LARA_HEALTH_MAX;
 
-	// OPT: smoothly transition health bar display.
+	// Smoothly transition health bar display.
 	if (EnableSmoothHealthBar)
 	{
-		if (OldHitPoints != HitPoints)
+		if (OldHitPoints != hitPoints)
 		{
-			MutateAmount += OldHitPoints - HitPoints;
-			OldHitPoints = HitPoints;
+			MutateAmount += OldHitPoints - hitPoints;
+			OldHitPoints = hitPoints;
 			HealthBarTimer = 40;
 		}
 
@@ -100,17 +100,16 @@ void UpdateHealthBar(ItemInfo* item, int flash)
 		if (MutateAmount > -0.5f && MutateAmount < 0.5f)
 		{
 			MutateAmount = 0;
-			HealthBar = HitPoints;
+			HealthBar = hitPoints;
 		}
 	}
-
-	// OG: discretely transition health bar display.
+	// Discretely transition health bar display.
 	else
 	{
-		if (OldHitPoints != HitPoints)
+		if (OldHitPoints != hitPoints)
 		{
-			OldHitPoints = HitPoints;
-			HealthBar = HitPoints;
+			OldHitPoints = hitPoints;
+			HealthBar = hitPoints;
 			HealthBarTimer = 40;
 		}
 	}
@@ -118,7 +117,7 @@ void UpdateHealthBar(ItemInfo* item, int flash)
 	if (HealthBarTimer < 0)
 		HealthBarTimer = 0;
 
-	// Flash when at 1/4 capacity AND HP bar is not transitioning.
+	// Flash when at critical capacity and bar is not transitioning.
 	if (HealthBar <= LARA_HEALTH_CRITICAL)
 	{
 		if (!BinocularRange)
@@ -179,7 +178,7 @@ void UpdateAirBar(ItemInfo* item, int flash)
 	else if (air > LARA_AIR_MAX)
 		air = LARA_AIR_MAX;
 
-	if (air <= (LARA_AIR_MAX / 4))
+	if (air <= LARA_AIR_CRITICAL)
 	{
 		if (flash)
 			DrawAirBar(air / LARA_AIR_MAX);
