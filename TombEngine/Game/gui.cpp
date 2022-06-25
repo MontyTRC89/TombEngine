@@ -3041,9 +3041,9 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				if (ringnum == (int)RingTypes::Inventory)
 					objmeup = (int)(phd_centery - (phd_winymax + 1) * 0.0625 * 3.0);
 				else
-					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
+					objmeup = (int)(phd_centery + (phd_winymax + 1) * 0.0625 * 2.0);
 
-				g_Renderer.DrawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+				g_Renderer.DrawString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
