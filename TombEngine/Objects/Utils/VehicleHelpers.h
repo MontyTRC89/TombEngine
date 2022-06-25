@@ -36,4 +36,7 @@ namespace TEN::Entities::Vehicles
 
 	void DoVehicleCollision(ItemInfo* vehicleItem, int radius);
 	int  DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* angle);
+
+	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
+	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
 }

@@ -533,11 +533,8 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 
-			if (TrInput & VEHICLE_IN_LEFT)
-				UPV->TurnRate.y -= UPV_Y_TURN_RATE_ACCEL;
-
-			else if (TrInput & VEHICLE_IN_RIGHT)
-				UPV->TurnRate.y += UPV_Y_TURN_RATE_ACCEL;
+			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 			{
@@ -563,10 +560,8 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & VEHICLE_IN_UP)
-					UPV->TurnRate.x -= UPV_X_TURN_RATE_ACCEL;
-				else if (TrInput & VEHICLE_IN_DOWN)
-					UPV->TurnRate.x += UPV_X_TURN_RATE_ACCEL;
+				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+					ModulateVehicleTurnRateX(&UPV->TurnRate.y, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
 			if (TrInput & VEHICLE_IN_ACCELERATE)
@@ -592,11 +587,9 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = UPV_STATE_DEATH;
 				break;
 			}
-
-			if (TrInput & VEHICLE_IN_LEFT)
-				UPV->TurnRate.y -= UPV_Y_TURN_RATE_SLOW_ACCEL;
-			else if (TrInput & VEHICLE_IN_RIGHT)
-				UPV->TurnRate.y += UPV_Y_TURN_RATE_SLOW_ACCEL;
+			
+			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 			{
@@ -621,10 +614,8 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				if (TrInput & VEHICLE_IN_UP)
-					UPV->TurnRate.x -= UPV_X_TURN_RATE_ACCEL;
-				else if (TrInput & VEHICLE_IN_DOWN)
-					UPV->TurnRate.x += UPV_X_TURN_RATE_ACCEL;
+				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
+					ModulateVehicleTurnRateX(&UPV->TurnRate.y, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
 			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(laraItem, UPVItem))
@@ -819,19 +810,6 @@ namespace TEN::Entities::Vehicles
 		else if (UPV->Velocity < -UPV_VELOCITY_MAX)
 			UPV->Velocity = -UPV_VELOCITY_MAX;
 
-		if (UPV->TurnRate.y > 0)
-		{
-			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y < 0)
-				UPV->TurnRate.y = 0;
-		}
-		else if (UPV->TurnRate.y < 0)
-		{
-			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y > 0)
-				UPV->TurnRate.y = 0;
-		}
-
 		if (UPV->TurnRate.x > 0)
 		{
 			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION_DECEL;
@@ -845,15 +823,18 @@ namespace TEN::Entities::Vehicles
 				UPV->TurnRate.x = 0;
 		}
 
-		if (UPV->TurnRate.y > UPV_Y_TURN_RATE_MAX)
-			UPV->TurnRate.y = UPV_Y_TURN_RATE_MAX;
-		else if (UPV->TurnRate.y < -UPV_Y_TURN_RATE_MAX)
-			UPV->TurnRate.y = -UPV_Y_TURN_RATE_MAX;
-
-		if (UPV->TurnRate.x > UPV_X_TURN_RATE_MAX)
-			UPV->TurnRate.x = UPV_X_TURN_RATE_MAX;
-		else if (UPV->TurnRate.x < -UPV_X_TURN_RATE_MAX)
-			UPV->TurnRate.x = -UPV_X_TURN_RATE_MAX;
+		if (UPV->TurnRate.y > 0)
+		{
+			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION_DECEL;
+			if (UPV->TurnRate.y < 0)
+				UPV->TurnRate.y = 0;
+		}
+		else if (UPV->TurnRate.y < 0)
+		{
+			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION_DECEL;
+			if (UPV->TurnRate.y > 0)
+				UPV->TurnRate.y = 0;
+		}
 	}
 
 	void NoGetOnCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

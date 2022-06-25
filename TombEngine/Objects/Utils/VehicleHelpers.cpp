@@ -224,4 +224,14 @@ namespace TEN::Entities::Vehicles
 
 		return currentVelocity;
 	}
+
+	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
+	{
+		*turnRate = ModulateLaraTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical]);
+	}
+
+	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
+	{
+		*turnRate = ModulateLaraTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
+	}
 }
