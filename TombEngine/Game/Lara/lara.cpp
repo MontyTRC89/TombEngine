@@ -803,6 +803,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
 	TestVolumes(Lara.ItemNumber);
+
+	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
