@@ -940,6 +940,10 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	if (!TestValidLedge(item, coll))
 		return false;
 
+	TestForObjectOnLedge(item, coll);
+	if (coll->HitStatic)
+		return false;
+
 	auto probe = GetCollision(item, coll->Setup.ForwardAngle, CLICK(2), -CLICK(1));
 	int headroom = probe.Position.Floor - probe.Position.Ceiling;
 
