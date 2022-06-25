@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 
-namespace  TEN::Renderer
+namespace TEN::Renderer
 {
 	bool Renderer11::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)
 	{

@@ -16,6 +16,7 @@
 #include "Game/control/los.h"
 #include "Renderer/Renderer11Enums.h"
 
+using namespace TEN::Input;
 using namespace TEN::Entities::Effects;
 
 namespace TEN::Entities::Generic

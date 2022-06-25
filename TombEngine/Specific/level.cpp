@@ -16,18 +16,21 @@
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Objects/Generic/Doors/generic_doors.h"
 #include "Renderer/Renderer11.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "ScriptInterfaceLevel.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/input.h"
 #include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
+
+using namespace TEN::Input;
 using namespace TEN::Entities::Doors;
 
 FILE* LevelFilePtr;
@@ -1242,8 +1245,8 @@ void LoadBoxes()
 int LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
-	 
-	StopAllSounds();
+
+	CleanUp();
 	FreeSamples();
 
 	if (!g_FirstLevel)

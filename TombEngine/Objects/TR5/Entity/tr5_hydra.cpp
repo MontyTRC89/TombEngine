@@ -257,11 +257,9 @@ void HydraControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x400)
 				{
+					DoDamage(creature->Enemy, 120);
 					CreatureEffect2(item, &HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= 120;
-					LaraItem->HitStatus = true;
 				}
 
 				if (item->HitStatus && AI.distance <  pow(CLICK(7), 2))
@@ -274,8 +272,8 @@ void HydraControl(short itemNumber)
 
 					if (damage > 0)
 					{
-						item->HitPoints -= damage;
 						item->Animation.TargetState = HYDRA_STATE_HURT;
+						DoDamage(item, damage);
 						CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 					}
 				}
@@ -299,8 +297,8 @@ void HydraControl(short itemNumber)
 
 				if ((GetRandomControl() & 0xF) < damage && AI.distance < SQUARE(10240) && damage > 0)
 				{
-					item->HitPoints -= damage;
 					item->Animation.TargetState = 4;
+					DoDamage(item, damage);
 					CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 				}
 			}

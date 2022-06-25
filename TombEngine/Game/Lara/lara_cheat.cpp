@@ -1,16 +1,19 @@
 #include "framework.h"
 #include "Game/Lara/lara_cheat.h"
 
+#include <OISKeyboard.h>
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
+
+using namespace TEN::Input;
 
 void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 {
@@ -22,17 +25,9 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Orientation.x += ANGLE(3.0f);
 
 	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate -= ANGLE(3.4f);
-		if (lara->Control.TurnRate < -ANGLE(6.0f))
-			lara->Control.TurnRate = -ANGLE(6.0f);
-	}
+		ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
 	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += ANGLE(3.4f);
-		if (lara->Control.TurnRate > ANGLE(6.0f))
-			lara->Control.TurnRate = ANGLE(6.0f);
-	}
+		ModulateLaraTurnRateY(item, ANGLE(3.4f), 0, ANGLE(6.0f));
 
 	if (TrInput & IN_ACTION)
 		TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
@@ -42,13 +37,13 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION * 2;
+		item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL * 2;
 		if (item->Animation.VerticalVelocity > LARA_SWIM_VELOCITY_MAX * 2)
 			item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 2;
 	}
 	else
 	{
-		if (item->Animation.VerticalVelocity >= LARA_SWIM_ACCELERATION)
+		if (item->Animation.VerticalVelocity >= LARA_SWIM_VELOCITY_ACCEL)
 			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 8;
 		else
 			item->Animation.VerticalVelocity = 0;
@@ -61,7 +56,7 @@ void LaraCheatyBits(ItemInfo* item)
 
 	if (g_GameFlow->IsFlyCheatEnabled())
 	{
-		if (KeyMap[DIK_O])
+		if (KeyMap[OIS::KeyCode::KC_O])
 		{
 			if (lara->Vehicle == NO_ITEM)
 			{

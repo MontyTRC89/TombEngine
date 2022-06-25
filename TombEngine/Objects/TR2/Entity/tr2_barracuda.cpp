@@ -108,10 +108,8 @@ void BarracudaControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & 0xE0))
 			{
 				CreatureEffect(item, &BarracudaBite, DoBloodSplat);
+				DoDamage(creature->Enemy, 100);
 				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 100;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

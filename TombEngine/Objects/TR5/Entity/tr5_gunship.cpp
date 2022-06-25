@@ -143,7 +143,7 @@ void ControlGunShip(short itemNumber)
 					2 * GetRandomControl(),
 					LaraItem->RoomNumber);
 
-				LaraItem->HitPoints -= 20;
+				DoDamage(LaraItem, 20);
 			}
 		}
 

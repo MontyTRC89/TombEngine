@@ -219,8 +219,7 @@ namespace TEN::Entities::TR4
 
 						creature->Flags = 1;
 
-						LaraItem->HitPoints -= KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE);
 					}
 				}
 			}

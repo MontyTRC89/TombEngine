@@ -13,6 +13,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Generic
 {
 	Vector3Int PolePos = { 0, 0, -208 };

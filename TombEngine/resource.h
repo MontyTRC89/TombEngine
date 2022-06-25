@@ -3,8 +3,6 @@
 // Used by Resources.rc
 //
 #define IDD_SETUP                       103
-#define IDB_BITMAP1                     107
-#define IDB_BMP_BANNER                  107
 #define IDI_ICON1                       108
 #define IDC_CHK_ENABLE_SOUND2           1012
 #define IDC_GFXADAPTER                  1020

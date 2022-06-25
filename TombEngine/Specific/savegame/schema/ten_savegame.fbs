@@ -227,7 +227,6 @@ table Lara {
 	extra_anim: int32;
 	hit_frame: int32;
 	hit_direction: int32;
-	spasm_effect_count: uint32;
 	projected_floor_height: int32;
 	target_facing_angle: int32;
 	water_surface_dist: int32;
