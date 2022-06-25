@@ -235,9 +235,9 @@ namespace TEN::Entities::TR4
 			if (item->Animation.Velocity > 32)
 				item->Animation.Velocity -= 12;
 			
-			if (target == LaraItem)
+			if (target->IsLara())
 			{
-				target->HitPoints -= distance / SECTOR(1);
+				DoDamage(target, distance / SECTOR(1));
 
 				// WRAITH1 can burn Lara
 				if (item->ObjectNumber == ID_WRAITH1)

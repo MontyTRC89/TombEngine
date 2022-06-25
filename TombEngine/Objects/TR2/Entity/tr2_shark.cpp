@@ -96,10 +96,8 @@ void SharkControl(short itemNumber)
 			if (!info->Flags && item->TouchBits & 0x3400)
 			{
 				CreatureEffect(item, &SharkBite, DoBloodSplat);
+				DoDamage(info->Enemy, 400);
 				info->Flags = 1;
-
-				LaraItem->HitPoints -= 400;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

@@ -105,7 +105,7 @@ void ExplosionControl(short itemNumber)
 					int distance = sqrt(pow(dx, 2) + pow(dy, 2) + pow(dz, 2));
 					if (distance < SECTOR(2))
 					{
-						LaraItem->HitPoints -= distance / 16;
+						DoDamage(LaraItem, distance / 16);
 
 						if (distance < CLICK(3))
 							LaraBurn(LaraItem);

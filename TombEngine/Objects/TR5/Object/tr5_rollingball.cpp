@@ -294,7 +294,7 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, lara, coll, coll->Setup.EnableSpasm, 1);
 
-			lara->HitPoints -= 100;
+			DoDamage(lara, 100);
 			int x = lara->Pose.Position.x - item->Pose.Position.x;
 			int y = (lara->Pose.Position.y - 350) - (item->Pose.Position.y - 512);
 			int z = lara->Pose.Position.z - item->Pose.Position.z;

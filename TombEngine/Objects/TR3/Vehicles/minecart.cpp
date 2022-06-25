@@ -18,6 +18,7 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math::Random;
 
@@ -899,7 +900,7 @@ namespace TEN::Entities::Vehicles
 					if (hits < 20)
 						hits = 20;
 
-					laraItem->HitPoints -= hits;
+					DoDamage(laraItem, hits);
 					return;
 				}
 			}

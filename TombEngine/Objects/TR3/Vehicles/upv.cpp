@@ -23,6 +23,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	BITE_INFO UPVBites[6] =
