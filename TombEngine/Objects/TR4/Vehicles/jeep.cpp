@@ -62,7 +62,9 @@ namespace TEN::Entities::Vehicles
 	{
 		JEEP_STATE_IDLE = 0,
 		JS_DRIVE_FORWARD = 1,
+
 		//2 3 4 5 are the collide with walls states
+
 		JS_BRAKE = 6,//?
 		JS_FWD_LEFT = 7,//FWD = forwards
 		JS_FWD_RIGHT = 8,
@@ -244,45 +246,45 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static int DoJeepDynamics(ItemInfo* laraItem, int height, int speed, int* y, int flags)
+	static int DoJeepDynamics(ItemInfo* laraItem, int height, int verticalVelocity, int* yPos, int flags)
 	{
 		int result = 0;
 
 		// Grounded.
-		if (height <= *y)
+		if (height <= *yPos)
 		{
 			if (flags)
-				result = speed;
+				result = verticalVelocity;
 			else
 			{
-				int temp = height - *y;
+				int kick = height - *yPos;
 
-				if (temp < -80)
-					temp = -80;
+				if (kick < -80)
+					kick = -80;
 
-				result = ((temp - speed) / 16) + speed;
+				result = ((kick - verticalVelocity) / 16) + verticalVelocity;
 
-				if (*y > height)
-					*y = height;
+				if (*yPos > height)
+					*yPos = height;
 			}
 		}
 		// IsAirborne.
 		else
 		{
-			*y += speed;
-			if (*y <= height - 32)
+			*yPos += verticalVelocity;
+			if (*yPos <= height - 32)
 			{
 				if (flags)
-					result = flags + (flags / 2) + speed;
+					result = flags + (flags / 2) + verticalVelocity;
 				else
-					result = speed + GRAVITY;
+					result = verticalVelocity + GRAVITY;
 			}
 			else
 			{
-				*y = height;
+				*yPos = height;
 
-				if (speed > 150)
-					laraItem->HitPoints += 150 - speed;
+				if (verticalVelocity > 150)
+					laraItem->HitPoints += 150 - verticalVelocity;
 
 				result = 0;
 			}
@@ -1515,10 +1517,10 @@ namespace TEN::Entities::Vehicles
 
 		jeepItem->Floor = floorHeight;
 		short rotAdd = jeep->Velocity / 4;
-		jeep->rot1 -= rotAdd;
-		jeep->rot2 -= rotAdd;
-		jeep->rot3 -= rotAdd;
-		jeep->rot4 -= rotAdd;
+		jeep->FrontRightWheelRotation -= rotAdd;
+		jeep->FrontLeftWheelRotation -= rotAdd;
+		jeep->BackRightWheelRotation -= rotAdd;
+		jeep->BackLeftWheelRotation -= rotAdd;
 
 		int oldY = jeepItem->Pose.Position.y;
 		jeepItem->Animation.VerticalVelocity = DoJeepDynamics(laraItem, floorHeight, jeepItem->Animation.VerticalVelocity, &jeepItem->Pose.Position.y, 0);

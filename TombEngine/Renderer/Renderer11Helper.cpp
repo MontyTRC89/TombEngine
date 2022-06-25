@@ -219,16 +219,16 @@ namespace TEN::Renderer
 					switch(j)
 					{
 					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
 						break;
 					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
 						break;
 					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
 						break;
 					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
+						currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
 						break;
 					}
 				},

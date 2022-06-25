@@ -8,12 +8,12 @@ namespace TEN::Entities::Vehicles
 		int VerticalVelocity = 0;
 
 		short TurnRate = 0;
-		short rot1 = 0;
-		short rot2 = 0;
-		short rot3 = 0;
-		short rot4 = 0;
 		short MomentumAngle = 0;
 		short ExtraRotation = 0;
+		short FrontRightWheelRotation = 0;
+		short FrontLeftWheelRotation = 0;
+		short BackRightWheelRotation = 0;
+		short BackLeftWheelRotation = 0;
 
 		int Revs = 0;
 		short EngineRevs = 0;
