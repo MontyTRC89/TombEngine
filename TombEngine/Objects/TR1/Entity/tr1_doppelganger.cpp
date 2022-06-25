@@ -54,7 +54,7 @@ namespace TEN::Entities::TR1
 		if (item->HitPoints < LARA_HEALTH_MAX)
 		{
 			item->HitPoints = LARA_HEALTH_MAX;
-			LaraItem->HitPoints -= GetWeaponDamage(Lara.Control.Weapon.GunType);
+			DoDamage(LaraItem, GetWeaponDamage(Lara.Control.Weapon.GunType));
 		}
 
 		auto* reference = FindReference(item, ID_BACON_REFERENCE);

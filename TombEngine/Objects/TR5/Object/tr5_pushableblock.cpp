@@ -14,6 +14,8 @@
 #include "Specific/setup.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
+using namespace TEN::Input;
+
 Vector3Int PushableBlockPos = { 0, 0, 0 };
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
 {

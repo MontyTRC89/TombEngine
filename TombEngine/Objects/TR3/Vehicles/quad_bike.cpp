@@ -22,6 +22,7 @@
 #include "Specific/prng.h"
 #include "Game/effects/simple_particle.h"
 
+using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
@@ -648,8 +649,7 @@ namespace TEN::Entities::Vehicles
 				quadBike->Velocity == MAX_VELOCITY &&
 				newVelocity < (quadBike->Velocity - 10))
 			{
-				laraItem->HitPoints -= (quadBike->Velocity - newVelocity) / 128;
-				laraItem->HitStatus = 1;
+				DoDamage(laraItem, (quadBike->Velocity - newVelocity) / 128);
 			}
 
 			if (quadBike->Velocity > 0 && newVelocity < quadBike->Velocity)

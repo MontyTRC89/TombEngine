@@ -6,6 +6,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -139,11 +140,11 @@ namespace TEN::Entities::TR3
 				if (info->Flags != 1 && item->TestBits(JointBitType::Touch, CobraAttackJoints))
 				{
 					CreatureEffect(item, &CobraBite, DoBloodSplat);
+					DoDamage(info->Enemy, COBRA_BITE_ATTACK_DAMAGE);
 					info->Flags = 1;
 
-					LaraItem->HitPoints -= COBRA_BITE_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
-					Lara.PoisonPotency += COBRA_BITE_POISON_POTENCY;
+					if (info->Enemy->IsLara())
+						GetLaraInfo(info->Enemy)->PoisonPotency += COBRA_BITE_POISON_POTENCY;
 				}
 
 				break;

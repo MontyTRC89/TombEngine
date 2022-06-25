@@ -15,8 +15,7 @@ void FallingCeilingControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState == 1 && item->TouchBits)
 		{
-			LaraItem->HitPoints -= 300;
-			LaraItem->HitStatus = true;
+			DoDamage(LaraItem, 300);
 		}
 	}
 	else

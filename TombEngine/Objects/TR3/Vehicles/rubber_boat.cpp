@@ -18,6 +18,7 @@
 #include "Renderer/Renderer11Enums.h"
 
 using std::vector;
+using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
@@ -442,8 +443,7 @@ namespace TEN::Entities::Vehicles
 				rBoatItem->Animation.Velocity > (RBOAT_NORMAL_VELOCITY_MAX + RBOAT_VELOCITY_ACCEL) &&
 				newVelocity < rBoatItem->Animation.Velocity - 10)
 			{
-				laraItem->HitPoints -= rBoatItem->Animation.Velocity;
-				laraItem->HitStatus = 1;
+				DoDamage(laraItem, rBoatItem->Animation.Velocity);
 				SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose);
 				newVelocity /= 2;
 				rBoatItem->Animation.Velocity /= 2;

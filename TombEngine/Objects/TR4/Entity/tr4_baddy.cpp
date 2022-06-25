@@ -940,10 +940,8 @@ namespace TEN::Entities::TR4
 								item->Pose.Orientation.y,
 								DoBloodSplat);
 
+							DoDamage(creature->Enemy, 120);
 							currentCreature->Flags = 1;
-
-							LaraItem->HitPoints -= 120;
-							LaraItem->HitStatus = true;
 						}
 					}
 				}

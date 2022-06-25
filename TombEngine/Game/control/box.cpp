@@ -17,6 +17,7 @@
 #include "Objects/objectslist.h"
 #include "Game/itemdata/creature_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Renderer/Renderer11.h"
 
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
@@ -37,6 +38,53 @@ constexpr int NONE_PRIO_RANGE = LOW_PRIO_RANGE + LOW_PRIO_RANGE * (LOW_PRIO_RANG
 constexpr auto FRAME_PRIO_BASE = 4;
 constexpr auto FRAME_PRIO_EXP = 1.5;
 #endif // CREATURE_AI_PRIORITY_OPTIMIZATION
+
+void DrawBox(int boxIndex, Vector3 color)
+{
+	if (boxIndex == NO_BOX)
+		return;
+
+	auto& currBox = g_Level.Boxes[boxIndex];
+
+	float x = ((float)currBox.left + (float)(currBox.right - currBox.left) / 2.0f) * 1024.0f;
+	auto  y = currBox.height - CLICK(1);
+	float z = ((float)currBox.top + (float)(currBox.bottom - currBox.top) / 2.0f) * 1024.0f;
+
+
+	auto center = Vector3(z, y, x);
+	auto corner = Vector3(currBox.bottom * SECTOR(1), currBox.height + CLICK(1), currBox.right * SECTOR(1));
+	auto extents = (corner - center) * 0.9f;
+	auto dBox = BoundingOrientedBox(center, extents, Vector4::UnitY);
+
+	for (int i = 0; i <= 10; i++)
+	{
+		dBox.Extents = extents * (1.0f - ((float)i * 0.005f));
+		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	}
+}
+
+void DrawNearbyPathfinding(int boxIndex)
+{
+	if (boxIndex == NO_BOX)
+		return;
+
+	DrawBox(boxIndex, Vector3(0, 1, 1));
+
+	auto& currBox = g_Level.Boxes[boxIndex];
+	auto index = currBox.overlapIndex;
+
+	while (true)
+	{
+		auto overlap = g_Level.Overlaps[index];
+
+		DrawBox(overlap.box, Vector3(1, 1, 0));
+
+		if (overlap.flags & BOX_END_BIT)
+			break;
+		else
+			index++;
+	}
+}
 
 void DropEntityPickups(ItemInfo* item)
 {

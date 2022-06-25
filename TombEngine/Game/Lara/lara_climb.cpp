@@ -13,6 +13,8 @@
 #include "Specific/input.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // LADDER CLIMB
 // Control & Collision Functions

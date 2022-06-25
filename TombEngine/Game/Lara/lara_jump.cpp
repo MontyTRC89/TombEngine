@@ -16,6 +16,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // JUMP
 // Control & Collision Functions
@@ -36,9 +38,9 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update running jump counter in preparation for possible jump action soon after landing.
-	lara->Control.Count.RunJump++;
-	if (lara->Control.Count.RunJump > LARA_RUN_JUMP_TIME / 2)
-		lara->Control.Count.RunJump = LARA_RUN_JUMP_TIME / 2;
+	lara->Control.Count.Run++;
+	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME / 2)
+		lara->Control.Count.Run = LARA_RUN_JUMP_TIME / 2;
 
 	if (item->HitPoints <= 0)
 	{
@@ -51,22 +53,12 @@ void lara_as_jump_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
-	}
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0) USE_FEATURE_IF_CPP20([[unlikely]])
 			item->Animation.TargetState = LS_DEATH;
@@ -146,7 +138,7 @@ void lara_as_freefall(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -198,22 +190,12 @@ void lara_as_reach(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
-	}
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -286,18 +268,8 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & (IN_FORWARD | IN_BACK) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
-		if (TrInput & IN_LEFT)
-		{
-			lara->Control.TurnRate -= LARA_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = -LARA_SLOW_TURN_MAX;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			lara->Control.TurnRate += LARA_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_SLOW_TURN_MAX)
-				lara->Control.TurnRate = LARA_SLOW_TURN_MAX;
-		}
+		if (TrInput & (IN_LEFT | IN_RIGHT))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
@@ -434,22 +406,12 @@ void lara_as_jump_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
-	}
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -505,7 +467,7 @@ void lara_as_jump_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -562,7 +524,7 @@ void lara_as_jump_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -707,22 +669,12 @@ void lara_as_fall_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX / 2;
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX / 2)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX / 2;
-	}
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX / 2);
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -786,26 +738,15 @@ void lara_as_swan_dive(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
+	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
-		lara->Control.TurnRate -= LARA_TURN_RATE;
-		if (lara->Control.TurnRate < -LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = -LARA_JUMP_TURN_MAX;
-
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate += LARA_TURN_RATE;
-		if (lara->Control.TurnRate > LARA_JUMP_TURN_MAX)
-			lara->Control.TurnRate = LARA_JUMP_TURN_MAX;
-
-		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 2);
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_JUMP_TURN_RATE_MAX);
+		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 2, LARA_LEAN_MAX);
 	}
 
 	if (TestLaraLand(item, coll))
 	{
-		DealLaraFallDamage(item);
+		DoLaraFallDamage(item);
 
 		if (item->HitPoints <= 0)
 			item->Animation.TargetState = LS_DEATH;
@@ -886,6 +827,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 			item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
+			Rumble(0.5f, 0.2f);
 		}
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);

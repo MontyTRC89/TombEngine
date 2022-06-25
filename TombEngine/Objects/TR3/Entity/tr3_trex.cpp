@@ -106,7 +106,7 @@ namespace TEN::Entities::TR3
 			angle = CreatureTurn(item, info->MaxTurn);
 
 			if (item->TouchBits)
-				LaraItem->HitPoints -= (item->Animation.ActiveState == TREX_STATE_RUN_FORWARD) ? 10 : 1;
+				DoDamage(LaraItem, (item->Animation.ActiveState == TREX_STATE_RUN_FORWARD) ? 10 : 1);
 
 			info->Flags = (info->Mood != MoodType::Escape && !AI.ahead && AI.enemyFacing > -FRONT_ARC && AI.enemyFacing < FRONT_ARC);
 
@@ -166,8 +166,7 @@ namespace TEN::Entities::TR3
 				{
 					item->Animation.TargetState = TREX_STATE_KILL;
 
-					LaraItem->HitPoints -= 1500;
-					LaraItem->HitStatus = true;
+					DoDamage(LaraItem, 1500);
 					LaraTRexDeath(item, LaraItem);
 				}
 

@@ -171,12 +171,7 @@ namespace TEN::Entities::TR4
 				{
 					item->Animation.TargetState = BOAR_STATE_ATTACK;
 
-					if (creature->Enemy == LaraItem)
-					{
-						creature->Enemy->HitPoints -= WILD_BOAR_ATTACK_DAMAGE;
-						creature->Enemy->HitStatus = true;
-					}
-
+					DoDamage(creature->Enemy, WILD_BOAR_ATTACK_DAMAGE);
 					CreatureEffect2(item, &WildBoatBiteInfo, 3, item->Pose.Orientation.y, DoBloodSplat);
 					item->Flags = 1;
 				}
