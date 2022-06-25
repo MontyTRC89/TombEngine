@@ -810,31 +810,11 @@ namespace TEN::Entities::Vehicles
 		else if (UPV->Velocity < -UPV_VELOCITY_MAX)
 			UPV->Velocity = -UPV_VELOCITY_MAX;
 
-		if (UPV->TurnRate.x > 0)
-		{
-			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.x < 0)
-				UPV->TurnRate.x = 0;
-		}
-		else if (UPV->TurnRate.x < 0)
-		{
-			UPV->TurnRate.x += UPV_X_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.x > 0)
-				UPV->TurnRate.x = 0;
-		}
+		if (UPV->TurnRate.x)
+			ModulateVehicleTurnRateX(&UPV->TurnRate.x, -UPV_X_TURN_RATE_FRICTION_DECEL, 0, UPV_X_TURN_RATE_MAX);
 
-		if (UPV->TurnRate.y > 0)
-		{
-			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y < 0)
-				UPV->TurnRate.y = 0;
-		}
-		else if (UPV->TurnRate.y < 0)
-		{
-			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y > 0)
-				UPV->TurnRate.y = 0;
-		}
+		if (UPV->TurnRate.y)
+			ModulateVehicleTurnRateY(&UPV->TurnRate.y, -UPV_Y_TURN_RATE_FRICTION_DECEL, 0, UPV_Y_TURN_RATE_MAX);
 	}
 
 	void NoGetOnCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
