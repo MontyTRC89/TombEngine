@@ -160,11 +160,7 @@ namespace TEN::Entities::TR4
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
-					if (creature->Enemy == LaraItem)
-					{
-						LaraItem->HitPoints -= BAT_DAMAGE;
-						LaraItem->HitStatus = true;
-					}
+					DoDamage(creature->Enemy, BAT_DAMAGE);
 
 					creature->Flags = 1;
 				}

@@ -6,8 +6,11 @@
 #include "Objects\objectslist.h"
 
 struct ItemInfo;
-namespace TEN::Effects{
-	struct SimpleParticle {
+
+namespace TEN::Effects
+{
+	struct SimpleParticle
+	{
 		DirectX::SimpleMath::Vector3 worldPosition;
 		float size;
 		float age;

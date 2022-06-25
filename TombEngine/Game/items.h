@@ -149,3 +149,4 @@ void UpdateItemRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0
 std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
+void DoDamage(ItemInfo* item, int damage);

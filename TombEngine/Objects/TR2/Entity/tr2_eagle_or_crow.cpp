@@ -146,8 +146,7 @@ void EagleControl(short itemNumber)
 		case 6:
 			if (!creature->Flags && item->TouchBits)
 			{
-				LaraItem->HitPoints -= 20;
-				LaraItem->HitStatus = true;
+				DoDamage(creature->Enemy, 20);
 
 				if (item->ObjectNumber == ID_CROW)
 					CreatureEffect(item, &CrowBite, DoBloodSplat);

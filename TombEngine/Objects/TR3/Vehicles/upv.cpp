@@ -25,6 +25,7 @@
 #include "Specific/setup.h"
 
 using std::vector;
+using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {

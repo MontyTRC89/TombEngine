@@ -6,6 +6,7 @@
 #include "Specific/setup.h"
 #include "Specific/level.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/misc.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/control/control.h"
@@ -159,24 +160,23 @@ namespace TEN::Entities::TR4
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 20 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 32)
 						{
-							
-							LaraItem->HitStatus = true;
-
 							short rotation;
 							BITE_INFO* biteInfo;
 
 							// Pincer attack
 							if (item->Animation.ActiveState == SSCORPION_STATE_ATTACK_1)
 							{
-								LaraItem->HitPoints -= SMALL_SCORPION_PINCER_ATTACK_DAMAGE;
+								DoDamage(creature->Enemy, SMALL_SCORPION_PINCER_ATTACK_DAMAGE);
 								rotation = item->Pose.Orientation.y - ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo1;
 							}
 							// Tail attack
 							else
 							{
-								Lara.PoisonPotency += SMALL_SCORPION_STINGER_POISON_POTENCY;
-								LaraItem->HitPoints -= SMALL_SCORPION_STINGER_ATTACK_DAMAGE;
+								if (creature->Enemy->IsLara())
+									GetLaraInfo(creature->Enemy)->PoisonPotency += SMALL_SCORPION_STINGER_POISON_POTENCY;
+
+								DoDamage(creature->Enemy, SMALL_SCORPION_STINGER_ATTACK_DAMAGE);
 								rotation = item->Pose.Orientation.y - ANGLE(180.0f);
 								biteInfo = &SmallScorpionBiteInfo2;
 							}

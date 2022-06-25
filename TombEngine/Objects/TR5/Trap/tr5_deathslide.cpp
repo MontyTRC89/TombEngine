@@ -11,6 +11,8 @@
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Input;
+
 OBJECT_COLLISION_BOUNDS DeathSlideBounds =
 {
 	-256, 256,

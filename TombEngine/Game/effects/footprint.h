@@ -4,12 +4,11 @@
 
 struct ItemInfo;
 
-namespace TEN{
-namespace Effects {
-namespace Footprints {
-
+namespace TEN::Effects::Footprints
+{
 	constexpr size_t MAX_FOOTPRINTS = 20;
 	constexpr auto FOOTPRINT_SIZE = 64.0f;
+	constexpr int FOOT_HEIGHT_OFFSET = 64;
 
 	struct FOOTPRINT_STRUCT 
 	{
@@ -21,12 +20,9 @@ namespace Footprints {
 		float Opacity;
 		bool Active;
 	};
-
 	extern std::deque<FOOTPRINT_STRUCT> footprints;
-	constexpr int FOOT_HEIGHT_OFFSET = 64;
 
 	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition);
 	void AddFootprint(ItemInfo* item, bool rightFoot);
 	void UpdateFootprints();
-
-}}}
+}

@@ -277,6 +277,15 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
+float Smoothstep(float edge0, float edge1, float x)
+{
+	// Scale, bias and saturate x to 0..1 range
+	x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+
+	// Evaluate polynomial
+	return x * x * (3 - 2 * x);
+}
+
 Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up, float right)
 {
 	if (forward == 0.0f && up == 0.0f && right == 0.0f)

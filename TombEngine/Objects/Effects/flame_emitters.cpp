@@ -18,6 +18,7 @@
 #include "Specific/trmath.h"
 #include "input.h"
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;

@@ -727,15 +727,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 		dz -= cosY * rz - sinY * rx;
 
 		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / ANGLE(90.0f);
-
-		if (!lara->HitFrame && !lara->SpasmEffectCount)
-		{
-			SoundEffect(SFX_TR4_LARA_INJURY, &item2->Pose);
-			lara->SpasmEffectCount = GenerateInt(15, 35);
-		}
-
-		if (lara->SpasmEffectCount)
-			lara->SpasmEffectCount--;
+		DoDamage(item2, 0); // Dummy hurt call. Only for ooh sound!
 
 		lara->HitFrame++;
 		if (lara->HitFrame > 34)

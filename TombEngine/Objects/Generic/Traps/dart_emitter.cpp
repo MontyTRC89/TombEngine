@@ -16,10 +16,9 @@ namespace TEN::Entities::Traps
 
 		if (item->TouchBits)
 		{
-			LaraItem->HitPoints -= 25;
-			LaraItem->HitStatus = true;
-			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
+			DoDamage(LaraItem, 25);
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+			Lara.PoisonPotency += 1; // Was 160 with the total poison potency later shifted right by 8 when applied to Lara's health. The effect was that each dart contributed a mere fraction to the potency. @Sezz 2022.03.09
 			KillItem(itemNumber);
 		}
 		else

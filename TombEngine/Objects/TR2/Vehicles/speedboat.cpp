@@ -18,6 +18,7 @@
 #include "Specific/setup.h"
 
 using std::vector;
+using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
@@ -507,8 +508,7 @@ namespace TEN::Entities::Vehicles
 
 			if (lara->Vehicle == itemNumber && speedboatItem->Animation.Velocity > SPEEDBOAT_NORMAL_VELOCITY_MAX + SPEEDBOAT_VELOCITY_ACCEL && newVelocity < speedboatItem->Animation.Velocity - 10)
 			{
-				laraItem->HitPoints -= speedboatItem->Animation.Velocity;
-				laraItem->HitStatus = true;
+				DoDamage(laraItem, speedboatItem->Animation.Velocity);
 				SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose);
 				newVelocity /= 2;
 				speedboatItem->Animation.Velocity /= 2;
@@ -910,12 +910,7 @@ namespace TEN::Entities::Vehicles
 				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 			}
 
-			laraItem->Pose.Position.x = speedboatItem->Pose.Position.x;
-			laraItem->Pose.Position.y = speedboatItem->Pose.Position.y;
-			laraItem->Pose.Position.z = speedboatItem->Pose.Position.z;
-			laraItem->Pose.Orientation.x = speedboatItem->Pose.Orientation.x;
-			laraItem->Pose.Orientation.y = speedboatItem->Pose.Orientation.y;
-			laraItem->Pose.Orientation.z = speedboatItem->Pose.Orientation.z;
+			laraItem->Pose = speedboatItem->Pose;
 			speedboatItem->Pose.Orientation.z += speedboat->LeanAngle;
 
 			AnimateItem(laraItem);

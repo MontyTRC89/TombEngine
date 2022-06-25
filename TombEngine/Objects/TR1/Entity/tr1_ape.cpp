@@ -6,6 +6,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/misc.h"
+#include "Game/people.h"
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
@@ -298,9 +299,7 @@ namespace TEN::Entities::TR1
 				{
 					CreatureEffect(item, &ApeBite, DoBloodSplat);
 					item->Animation.RequiredState = APE_STATE_IDLE;
-
-					LaraItem->HitPoints -= APE_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creatureInfo->Enemy, APE_ATTACK_DAMAGE);
 				}
 
 				break;

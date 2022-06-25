@@ -594,11 +594,9 @@ namespace TEN::Entities::TR4
 					if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 					{
 						CreatureEffect2(item, &SkeletonBite, 15, -1, DoBloodSplat);
+						DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= SKELETON_ATTACK_DAMAGE;
-						LaraItem->HitStatus = true;
 					}
 				}
 				if (!(GetRandomControl() & 0x3F) || LaraItem->HitPoints <= 0)
@@ -652,11 +650,9 @@ namespace TEN::Entities::TR4
 						if (item->TestBits(JointBitType::Touch, SkeletonSwordAttackJoints))
 						{
 							CreatureEffect2(item, &SkeletonBite, 10, item->Pose.Orientation.y, DoBloodSplat);
+							DoDamage(creature->Enemy, SKELETON_ATTACK_DAMAGE);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 							creature->Flags = 1;
-
-							LaraItem->HitPoints -= SKELETON_ATTACK_DAMAGE;
-							LaraItem->HitStatus = true;
 						}
 					}
 				}

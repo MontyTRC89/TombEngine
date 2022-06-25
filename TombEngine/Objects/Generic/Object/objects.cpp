@@ -14,6 +14,8 @@
 #include "Game/collision/collide_item.h"
 #include "Renderer/Renderer11Enums.h"
 
+using namespace TEN::Input;
+
 OBJECT_TEXTURE* WaterfallTextures[6];
 float WaterfallY[6];
 int lastWaterfallY = 0;

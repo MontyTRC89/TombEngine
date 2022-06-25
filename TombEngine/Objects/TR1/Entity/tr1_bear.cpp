@@ -118,9 +118,7 @@ namespace TEN::Entities::TR1
 				if (creature->Flags && item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
 					creature->Flags = 0;
-
-					LaraItem->HitPoints -= BEAR_SLAM_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, BEAR_SLAM_DAMAGE);
 				}
 
 				break;
@@ -189,8 +187,7 @@ namespace TEN::Entities::TR1
 
 				if (item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
-					LaraItem->HitPoints -= BEAR_RUN_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, BEAR_RUN_DAMAGE);
 				}
 
 				if (creature->Mood == MoodType::Bored || laraDead)
@@ -255,10 +252,8 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState &&
 					item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
+					DoDamage(creature->Enemy, BEAR_PAT_DAMAGE);
 					item->Animation.RequiredState = BEAR_STATE_REAR;
-
-					LaraItem->HitPoints -= BEAR_PAT_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;
@@ -268,10 +263,8 @@ namespace TEN::Entities::TR1
 					item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{
 					CreatureEffect(item, &BearBite, DoBloodSplat);
+					DoDamage(creature->Enemy, BEAR_ATTACK_DAMAGE);
 					item->Animation.RequiredState = BEAR_STATE_IDLE;
-
-					LaraItem->HitPoints -= BEAR_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

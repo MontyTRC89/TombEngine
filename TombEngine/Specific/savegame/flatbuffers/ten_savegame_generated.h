@@ -3100,7 +3100,6 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t extra_anim = 0;
   int32_t hit_frame = 0;
   int32_t hit_direction = 0;
-  uint32_t spasm_effect_count = 0;
   int32_t projected_floor_height = 0;
   int32_t target_facing_angle = 0;
   int32_t water_surface_dist = 0;
@@ -3146,23 +3145,22 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_EXTRA_ANIM = 42,
     VT_HIT_FRAME = 44,
     VT_HIT_DIRECTION = 46,
-    VT_SPASM_EFFECT_COUNT = 48,
-    VT_PROJECTED_FLOOR_HEIGHT = 50,
-    VT_TARGET_FACING_ANGLE = 52,
-    VT_WATER_SURFACE_DIST = 54,
-    VT_INTERACTED_ITEM = 56,
-    VT_NEXT_CORNER_POSITION = 58,
-    VT_NEXT_CORNER_ROTATION = 60,
-    VT_BURN_TYPE = 62,
-    VT_BURN_COUNT = 64,
-    VT_BURN = 66,
-    VT_BURN_BLUE = 68,
-    VT_BURN_SMOKE = 70,
-    VT_WET = 72,
-    VT_MESH_PTRS = 74,
-    VT_LOCATION = 76,
-    VT_HIGHEST_LOCATION = 78,
-    VT_LOCATION_PAD = 80
+    VT_PROJECTED_FLOOR_HEIGHT = 48,
+    VT_TARGET_FACING_ANGLE = 50,
+    VT_WATER_SURFACE_DIST = 52,
+    VT_INTERACTED_ITEM = 54,
+    VT_NEXT_CORNER_POSITION = 56,
+    VT_NEXT_CORNER_ROTATION = 58,
+    VT_BURN_TYPE = 60,
+    VT_BURN_COUNT = 62,
+    VT_BURN = 64,
+    VT_BURN_BLUE = 66,
+    VT_BURN_SMOKE = 68,
+    VT_WET = 70,
+    VT_MESH_PTRS = 72,
+    VT_LOCATION = 74,
+    VT_HIGHEST_LOCATION = 76,
+    VT_LOCATION_PAD = 78
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -3229,9 +3227,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t hit_direction() const {
     return GetField<int32_t>(VT_HIT_DIRECTION, 0);
-  }
-  uint32_t spasm_effect_count() const {
-    return GetField<uint32_t>(VT_SPASM_EFFECT_COUNT, 0);
   }
   int32_t projected_floor_height() const {
     return GetField<int32_t>(VT_PROJECTED_FLOOR_HEIGHT, 0);
@@ -3314,7 +3309,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_EXTRA_ANIM) &&
            VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
            VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
-           VerifyField<uint32_t>(verifier, VT_SPASM_EFFECT_COUNT) &&
            VerifyField<int32_t>(verifier, VT_PROJECTED_FLOOR_HEIGHT) &&
            VerifyField<int32_t>(verifier, VT_TARGET_FACING_ANGLE) &&
            VerifyField<int32_t>(verifier, VT_WATER_SURFACE_DIST) &&
@@ -3410,9 +3404,6 @@ struct LaraBuilder {
   void add_hit_direction(int32_t hit_direction) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_DIRECTION, hit_direction, 0);
   }
-  void add_spasm_effect_count(uint32_t spasm_effect_count) {
-    fbb_.AddElement<uint32_t>(Lara::VT_SPASM_EFFECT_COUNT, spasm_effect_count, 0);
-  }
   void add_projected_floor_height(int32_t projected_floor_height) {
     fbb_.AddElement<int32_t>(Lara::VT_PROJECTED_FLOOR_HEIGHT, projected_floor_height, 0);
   }
@@ -3496,7 +3487,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t extra_anim = 0,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
-    uint32_t spasm_effect_count = 0,
     int32_t projected_floor_height = 0,
     int32_t target_facing_angle = 0,
     int32_t water_surface_dist = 0,
@@ -3528,7 +3518,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_water_surface_dist(water_surface_dist);
   builder_.add_target_facing_angle(target_facing_angle);
   builder_.add_projected_floor_height(projected_floor_height);
-  builder_.add_spasm_effect_count(spasm_effect_count);
   builder_.add_hit_direction(hit_direction);
   builder_.add_hit_frame(hit_frame);
   builder_.add_extra_anim(extra_anim);
@@ -3585,7 +3574,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t extra_anim = 0,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
-    uint32_t spasm_effect_count = 0,
     int32_t projected_floor_height = 0,
     int32_t target_facing_angle = 0,
     int32_t water_surface_dist = 0,
@@ -3630,7 +3618,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       extra_anim,
       hit_frame,
       hit_direction,
-      spasm_effect_count,
       projected_floor_height,
       target_facing_angle,
       water_surface_dist,
@@ -7220,7 +7207,6 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = extra_anim(); _o->extra_anim = _e; }
   { auto _e = hit_frame(); _o->hit_frame = _e; }
   { auto _e = hit_direction(); _o->hit_direction = _e; }
-  { auto _e = spasm_effect_count(); _o->spasm_effect_count = _e; }
   { auto _e = projected_floor_height(); _o->projected_floor_height = _e; }
   { auto _e = target_facing_angle(); _o->target_facing_angle = _e; }
   { auto _e = water_surface_dist(); _o->water_surface_dist = _e; }
@@ -7269,7 +7255,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _extra_anim = _o->extra_anim;
   auto _hit_frame = _o->hit_frame;
   auto _hit_direction = _o->hit_direction;
-  auto _spasm_effect_count = _o->spasm_effect_count;
   auto _projected_floor_height = _o->projected_floor_height;
   auto _target_facing_angle = _o->target_facing_angle;
   auto _water_surface_dist = _o->water_surface_dist;
@@ -7310,7 +7295,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _extra_anim,
       _hit_frame,
       _hit_direction,
-      _spasm_effect_count,
       _projected_floor_height,
       _target_facing_angle,
       _water_surface_dist,

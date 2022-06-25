@@ -12,6 +12,8 @@
 #include "Specific/input.h"
 #include "Specific/prng.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float minDistance)
