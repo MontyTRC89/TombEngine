@@ -548,14 +548,12 @@ namespace TEN::Entities::TR4
 
 				if (creature->Flags == 0 &&
 					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||
-						item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
-						item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
+					 item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
+					 item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
 				{
 					CreatureEffect2(item, &BaboonBite, 10, -1, DoBloodSplat);
+					DoDamage(creature->Enemy, BABOON_ATTACK_DAMAGE);
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= BABOON_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

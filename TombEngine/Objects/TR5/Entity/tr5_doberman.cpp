@@ -203,9 +203,8 @@ void DobermanControl(short itemNumber)
 					AI.ahead &&
 					item->TouchBits & 0x122000)
 				{
+					DoDamage(creature->Enemy, 30);
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
-					LaraItem->HitPoints -= 30;
-					LaraItem->HitStatus = true;
 					creature->Flags = 1;
 				}
 
@@ -219,11 +218,9 @@ void DobermanControl(short itemNumber)
 			case DOBERMAN_STATE_JUMP_BITE_ATTACK:
 				if (creature->Flags != 2 && item->TouchBits & 0x122000)
 				{
+					DoDamage(creature->Enemy, 80);
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
 					creature->Flags = 2;
-
-					LaraItem->HitPoints -= 80;
-					LaraItem->HitStatus = true;
 				}
 
 				if (AI.distance >= pow(341, 2))
@@ -241,11 +238,9 @@ void DobermanControl(short itemNumber)
 
 				if (creature->Flags != 3 && item->TouchBits & 0x122000)
 				{
+					DoDamage(creature->Enemy, 50);
 					CreatureEffect(item, &DobermanBite, DoBloodSplat);
 					creature->Flags = 3;
-
-					LaraItem->HitPoints -= 50;
-					LaraItem->HitStatus = true;
 				}
 				if (AI.distance < pow(341, 2))
 					item->Animation.TargetState = DOBERMAN_STATE_STAND_HIGH_BITE_ATTACK;

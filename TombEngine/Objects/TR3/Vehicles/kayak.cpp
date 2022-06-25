@@ -16,6 +16,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	#define KAYAK_COLLIDE			CLICK(0.25f)
@@ -1182,13 +1184,21 @@ namespace TEN::Entities::Vehicles
 
 	void KayakLaraRapidsDrown(ItemInfo* laraItem)
 	{
+		// Already drowning...
+		if (laraItem->HitPoints <= 0)
+			return;
+
 		auto* lara = GetLaraInfo(laraItem);
 
+		// Prevent engaging in flycheat mode
+		if (lara->Control.WaterStatus == WaterStatus::FlyCheat)
+			return;
+
 		laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_OVERBOARD_DEATH;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = 12; // TODO
 		laraItem->Animation.TargetState = 12;
-		laraItem->HitPoints = 0;
+		laraItem->HitPoints = -1;
 		laraItem->Animation.Velocity = 0;
 		laraItem->Animation.VerticalVelocity = 0;
 		laraItem->Animation.Airborne = false;
@@ -1293,7 +1303,7 @@ namespace TEN::Entities::Vehicles
 		{
 			int damage = ofs - kayakItem->Animation.VerticalVelocity;
 			if (damage > 160)
-				laraItem->HitPoints -= (damage - 160) * 8;
+				DoDamage(laraItem, (damage - 160) * 8);
 		}
 
 		if (lara->Vehicle != NO_ITEM)

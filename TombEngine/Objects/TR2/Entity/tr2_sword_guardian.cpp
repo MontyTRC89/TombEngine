@@ -217,10 +217,8 @@ void SwordGuardianControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & 0xC000))
 			{
 				CreatureEffect(item, &SwordBite, DoBloodSplat);
+				DoDamage(creature->Enemy, 300);
 				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 300;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

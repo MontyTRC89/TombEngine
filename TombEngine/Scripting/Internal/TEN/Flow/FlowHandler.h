@@ -47,6 +47,7 @@ public:
 	void				SetSettings(Settings const & src);
 	Settings*			GetSettings();
 	Level*				GetLevel(int id);
+	int					GetLevelNumber(std::string const& flieName);
 	int					GetNumLevels() const;
 	void				SetIntroImagePath(std::string const& path);
 	void				SetTitleScreenImagePath(std::string const& path);

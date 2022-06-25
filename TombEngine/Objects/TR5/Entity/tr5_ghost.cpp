@@ -84,11 +84,9 @@ void InvisibleGhostControl(short itemNumber)
 		item->TouchBits & 0x9470 &&
 		item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 18)
 	{
+		DoDamage(creature->Enemy, 400);
 		CreatureEffect2(item, &InvisibleGhostBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 		creature->Flags = 1;
-
-		LaraItem->HitPoints -= 400;
-		LaraItem->HitStatus = true;
 	}
 
 	CreatureJoint(item, 0, joint0);

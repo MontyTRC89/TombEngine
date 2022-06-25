@@ -21,6 +21,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/configuration.h"
 #include "Specific/setup.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -29,6 +30,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Input;
 
 bool MonksAttackLara;
 ItemInfo* LastTargets[MAX_TARGETS];
@@ -1036,6 +1038,9 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 {
+	if (!g_Configuration.AutoTarget)
+		return;
+
 	auto* lara = GetLaraInfo(laraItem);
 
 	if (BinocularRange)

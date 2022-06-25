@@ -398,8 +398,6 @@ bool DoRayBox(GameVector* start, GameVector* end, BOUNDING_BOX* box, PHD_3DPOS* 
 	int sp = -2;
 	float minDistance = std::numeric_limits<float>::max();
 
-	int action = TrInput & IN_ACTION;
-
 	if (closesItemNumber < 0)
 	{
 		// Static meshes don't require further tests

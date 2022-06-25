@@ -14,7 +14,7 @@ struct HAIR_STRUCT
 	Vector3Int hvel;
 	Vector3Int unknown;
 
-	bool initialized = false;
+	bool initialised = false;
 };
 extern HAIR_STRUCT Hairs[HAIR_MAX][HAIR_SEGMENTS + 1];
 

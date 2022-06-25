@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/gui.h"
 
+#include <OISKeyboard.h>
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
@@ -19,9 +20,12 @@
 #include "Specific/input.h"
 #include "Specific/configuration.h"
 #include "Renderer/Renderer11.h"
-#include "ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Input;
+
 GuiController g_Gui;
 
 const char* optmessages[] =
@@ -57,6 +61,7 @@ const char* controlmsgs[] =
 	STRING_CONTROLS_LOOK,
 	STRING_CONTROLS_ROLL,
 	STRING_CONTROLS_INVENTORY,
+	STRING_CONTROLS_PAUSE,
 	STRING_CONTROLS_STEP_LEFT,
 	STRING_CONTROLS_STEP_RIGHT
 };
@@ -159,8 +164,8 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_CROSSBOW_ITEM, 0, 0.5f, ANGLE(-90), ANGLE(33), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_CROSSBOW, STRING_CROSSBOW, 1, INV_ROT_Y},
 	{ID_CROSSBOW_ITEM, 0, 0.5f, ANGLE(-90), ANGLE(33), 0, OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_CROSSBOW, STRING_CROSSBOW_LASER, 3, INV_ROT_Y},
 	{ID_CROSSBOW_AMMO1_ITEM, 0, 0.5f, ANGLE(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_JOINT_BITS, INV_ROT_Y},
-	{ID_CROSSBOW_AMMO2_ITEM, 0, 0.5f, ANGLE(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_JOINT_BITS, INV_ROT_Y},
-	{ID_CROSSBOW_AMMO3_ITEM, 0, 0.5f, ANGLE(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO1, NO_JOINT_BITS, INV_ROT_Y},
+	{ID_CROSSBOW_AMMO2_ITEM, 0, 0.5f, ANGLE(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO2, NO_JOINT_BITS, INV_ROT_Y},
+	{ID_CROSSBOW_AMMO3_ITEM, 0, 0.5f, ANGLE(90), 0, 0, OPT_USE, STRING_CROSSBOW_AMMO3, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_HK_ITEM, 0, 0.5f, ANGLE(0), ANGLE(280), 0, OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_HK, STRING_HK, 1, INV_ROT_Y},
 	{ID_HK_ITEM, 0, 0.5f, ANGLE(-45), ANGLE(280), 0, OPT_EQUIP | OPT_SEPERATABLE | OPT_CHOOSEAMMO_HK, STRING_HK_SILENCED, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_HK_AMMO_ITEM, 3, 0.5f, ANGLE(90), 0, 0, OPT_USE, STRING_HK_AMMO, 2},
@@ -567,7 +572,7 @@ void GuiController::DoDebouncedInput()
 	else
 		dbSelect = 0;
 
-	if ((TrInput & IN_DESELECT))
+	if (TrInput & IN_OPTION || TrInput & IN_DESELECT)
 	{
 		if (!dbDeselect)
 			goDeselect = 1;
@@ -607,18 +612,15 @@ InventoryResult GuiController::TitleOptions()
 		break;
 
 	case Menu::Display:
-		option_count = 6;
 		HandleDisplaySettingsInput(false);
 		break;
 
 	case Menu::Controls:
-		option_count = 17;
 		HandleControlSettingsInput(false);
 		break;
 
-	case Menu::Sound:
-		option_count = 4;
-		HandleSoundSettingsInput(false);
+	case Menu::OtherSettings:
+		HandleOtherSettingsInput(false);
 		break;
 	}
 
@@ -716,24 +718,7 @@ InventoryResult GuiController::TitleOptions()
 			}
 			else if (menu_to_display == Menu::Options)
 			{
-				switch (selected_option)
-				{
-				case 0:
-					FillDisplayOptions();
-					menu_to_display = Menu::Display;
-					break;
-
-				case 1:
-					menu_to_display = Menu::Controls;
-					selected_option = 0;
-					break;
-
-				case 2:
-					FillSound();
-					menu_to_display = Menu::Sound;
-					selected_option = 0;
-					break;
-				}
+				HandleOptionsInput();
 			}
 		}
 	}
@@ -744,7 +729,7 @@ InventoryResult GuiController::TitleOptions()
 void GuiController::FillDisplayOptions()
 {
 	// Copy configuration to a temporary object
-	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
+	BackupOptions();
 
 	// Get current display mode
 	CurrentSettings.selectedScreenResolution = 0;
@@ -762,10 +747,9 @@ void GuiController::FillDisplayOptions()
 
 void GuiController::HandleDisplaySettingsInput(bool pause)
 {
-	SetDebounce = true;
-	S_UpdateInput();
-	SetDebounce = false;
+	option_count = 6;
 
+	UpdateInput();
 	DoDebouncedInput();
 
 	if (goDeselect)
@@ -891,8 +875,9 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 void GuiController::HandleControlSettingsInput(bool pause)
 {
+	option_count = KEY_COUNT + 1;
+
 	CurrentSettings.waitingForkey = false;
-	memcpy(&CurrentSettings.conf.KeyboardLayout, &KeyboardLayout[1], NUM_CONTROLS);
 
 	if (CurrentSettings.ignoreInput)
 	{
@@ -901,12 +886,10 @@ void GuiController::HandleControlSettingsInput(bool pause)
 		return;
 	}
 
-	SetDebounce = true;
-	S_UpdateInput();
-	SetDebounce = false;
+	UpdateInput();
 	DoDebouncedInput();
 
-	if (goSelect && selected_option != 16 && selected_option != 17)
+	if (goSelect && (selected_option <= 16))
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		CurrentSettings.waitingForkey = true;
@@ -917,13 +900,10 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	{
 		TrInput = 0;
 		DbInput = 0;
-		ZeroMemory(KeyMap, 256);
 
 		while (true)
 		{
-			SetDebounce = true;
-			S_UpdateInput();
-			SetDebounce = false;
+			UpdateInput();
 
 			if (CurrentSettings.ignoreInput)
 			{
@@ -933,22 +913,19 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			else
 			{
 				int selectedKey = 0;
-				for (selectedKey = 0; selectedKey < 256; selectedKey++)
+				for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
 				{
-					if (KeyMap[selectedKey] & 0x80)
+					if (KeyMap[selectedKey])
 						break;
 				}
 
-				if (selectedKey == 256)
+				if (selectedKey == MAX_INPUT_SLOTS)
 					selectedKey = 0;
 
 				if (selectedKey && g_KeyNames[selectedKey])
 				{
-					if (selectedKey != DIK_ESCAPE)
-					{
-						KeyboardLayout[1][selected_option] = selectedKey;
-						DefaultConflict();
-					}
+					KeyboardLayout[1][selected_option] = selectedKey;
+					DefaultConflict();
 
 					CurrentSettings.waitingForkey = false;
 					CurrentSettings.ignoreInput = true;
@@ -994,21 +971,23 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 		if (goSelect)
 		{
-			if (selected_option == 16) // Apply
+			if (selected_option == option_count - 1) // Apply
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, NUM_CONTROLS);
+				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
+				memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
 				SaveConfiguration();
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
-				selected_option = 1;
+				selected_option = 2;
 				return;
 			}
 
-			if (selected_option == 17) // Cancel
+			if (selected_option == option_count) // Cancel
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, KEY_COUNT * sizeof(short));
 				menu_to_display = pause ? Menu::Pause : Menu::Options;
-				selected_option = 1;
+				selected_option = 2;
 				return;
 			}
 		}
@@ -1018,21 +997,45 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 			menu_to_display = Menu::Options;
-			selected_option = 1;
+			selected_option = 2;
 		}
 	}
 }
 
-void GuiController::FillSound()
+void GuiController::BackupOptions()
 {
 	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
 }
 
-void GuiController::HandleSoundSettingsInput(bool pause)
+void GuiController::HandleOptionsInput()
 {
-	SetDebounce = true;
-	S_UpdateInput();
-	SetDebounce = false;
+	switch (selected_option)
+	{
+	case 0:
+		FillDisplayOptions();
+		menu_to_display = Menu::Display;
+		selected_option = 0;
+		break;
+
+	case 1:
+		BackupOptions();
+		menu_to_display = Menu::OtherSettings;
+		selected_option = 0;
+		break;
+
+	case 2:
+		BackupOptions();
+		menu_to_display = Menu::Controls;
+		selected_option = 0;
+		break;
+	}
+}
+
+void GuiController::HandleOtherSettingsInput(bool pause)
+{
+	option_count = 7;
+
+	UpdateInput();
 	DoDebouncedInput();
 
 	if (goDeselect)
@@ -1040,22 +1043,44 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
 		menu_to_display = Menu::Options;
-		selected_option = 2;
+		selected_option = 1;
 
 		SetVolumeMusic(g_Configuration.MusicVolume);
 		SetVolumeFX(g_Configuration.SfxVolume);
 		return;
 	}
 
+	if (goLeft || goRight)
+	{
+		switch (selected_option)
+		{
+
+		case 0:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.EnableReverb = !CurrentSettings.conf.EnableReverb;
+			break;
+
+		case 3:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.AutoTarget = !CurrentSettings.conf.AutoTarget;
+			break;
+
+		case 4:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.EnableRumble = !CurrentSettings.conf.EnableRumble;
+			break;
+
+		case 5:
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+			CurrentSettings.conf.EnableThumbstickCameraControl = !CurrentSettings.conf.EnableThumbstickCameraControl;
+			break;
+		}
+	}
+
 	if (goLeft)
 	{
 		switch (selected_option)
 		{
-		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-			break;
-
 		case 1:
 			if (CurrentSettings.conf.MusicVolume > 0)
 			{
@@ -1070,7 +1095,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 
 		case 2:
@@ -1087,7 +1111,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 		}
 	}
@@ -1096,11 +1119,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 	{
 		switch (selected_option)
 		{
-		case 0:
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableAudioSpecialEffects = !CurrentSettings.conf.EnableAudioSpecialEffects;
-			break;
-
 		case 1:
 			if (CurrentSettings.conf.MusicVolume < 100)
 			{
@@ -1115,7 +1133,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 
 		case 2:
@@ -1132,7 +1149,6 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
-
 			break;
 		}
 	}
@@ -1161,22 +1177,29 @@ void GuiController::HandleSoundSettingsInput(bool pause)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-		if (selected_option == 3)
+		if (selected_option == option_count - 1)
 		{
+			// Was rumble setting changed?
+			bool indicateRumble = CurrentSettings.conf.EnableRumble && !g_Configuration.EnableRumble;
+
 			// Save the configuration
 			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
 			SaveConfiguration();
 
+			// Rumble if setting was changed
+			if (indicateRumble)
+				Rumble(0.5f);
+
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = pause ? 1 : 2;
+			selected_option = 1;
 		}
-		else if (selected_option == 4)
+		else if (selected_option == option_count)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			SetVolumeMusic(g_Configuration.MusicVolume);
 			SetVolumeFX(g_Configuration.SfxVolume);
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = pause ? 1 : 2;
+			selected_option = 1;
 		}
 	}
 }
@@ -1200,25 +1223,20 @@ InventoryResult GuiController::DoPauseMenu()
 		break;
 
 	case Menu::Display:
-		option_count = 6;
 		HandleDisplaySettingsInput(true);
 		break;
 
 	case Menu::Controls:
-		option_count = 17;
 		HandleControlSettingsInput(true);
 		break;
 
-	case Menu::Sound:
-		option_count = 4;
-		HandleSoundSettingsInput(true);
+	case Menu::OtherSettings:
+		HandleOtherSettingsInput(true);
 		break;
 	}
 
 	ClearInputVariables(1);
-	SetDebounce = true;
-	S_UpdateInput();
-	SetDebounce = false;
+	UpdateInput();
 	DoDebouncedInput();
 
 	if (menu_to_display == Menu::Pause || menu_to_display == Menu::Options)
@@ -1286,25 +1304,7 @@ InventoryResult GuiController::DoPauseMenu()
 			break;
 
 		case Menu::Options:
-
-			switch (selected_option)
-			{
-			case 0:
-				FillDisplayOptions();
-				menu_to_display = Menu::Display;
-				break;
-
-			case 1:
-				selected_option = 0;
-				menu_to_display = Menu::Controls;
-				break;
-
-			case 2:
-				FillSound();
-				selected_option = 0;
-				menu_to_display = Menu::Sound;
-				break;
-			}
+			HandleOptionsInput();
 			break;
 
 		case Menu::Statistics:
@@ -1865,7 +1865,7 @@ void GuiController::ConstructCombineObjectList()
 	rings[(int)RingTypes::Ammo]->ringactive = 0;
 }
 
-void GuiController::InitializeInventory()
+void GuiController::InitialiseInventory()
 {
 	compassNeedleAngle = 4096;
 	AlterFOV(ANGLE(80.0f));
@@ -3048,9 +3048,9 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				if (ringnum == (int)RingTypes::Inventory)
 					objmeup = (int)(phd_centery - (phd_winymax + 1) * 0.0625 * 3.0);
 				else
-					objmeup = (int)((phd_winymax + 1) * 0.0625 * 3.0 + phd_centery);
+					objmeup = (int)(phd_centery + (phd_winymax + 1) * 0.0625 * 2.0);
 
-				g_Renderer.DrawString(phd_centerx, ringnum == (int)RingTypes::Inventory ? 230 : 300, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+				g_Renderer.DrawString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3194,7 +3194,7 @@ bool GuiController::CallInventory(bool reset_mode)
 	if (reset_mode)
 		invMode = InventoryMode::InGame;
 
-	InitializeInventory();
+	InitialiseInventory();
 	Camera.numberFrames = 2;
 
 	bool exitLoop = false;
@@ -3205,9 +3205,8 @@ bool GuiController::CallInventory(bool reset_mode)
 		if (compassNeedleAngle != 1024)
 			compassNeedleAngle -= 32;
 
-		SetDebounce = true;
-		S_UpdateInput();
-		TrInput = InputBusy;
+		UpdateInput();
+		TrInput = RawInput;
 		GameTimer++;
 
 		if (DbInput & IN_OPTION)
@@ -3297,7 +3296,7 @@ void GuiController::DoStatisticsMode()
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		goDeselect = 0;
-		invMode = InventoryMode::None;
+		invMode = InventoryMode::InGame;
 	}
 }
 
@@ -3424,6 +3423,7 @@ bool GuiController::DoSave()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		SaveGame::Save(selected_save_slot);
+		g_GameScript->OnSave();
 		return true;
 	}
 

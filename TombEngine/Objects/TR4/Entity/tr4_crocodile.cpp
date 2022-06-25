@@ -273,10 +273,8 @@ namespace TEN::Entities::TR4
 					if (!item->Animation.RequiredState)
 					{
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
+						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);
 						item->Animation.RequiredState = CROC_STATE_IDLE;
-
-						LaraItem->HitPoints -= CROC_ATTACK_DAMAGE;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
@@ -317,10 +315,8 @@ namespace TEN::Entities::TR4
 					if (!item->Animation.RequiredState)
 					{
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
+						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);
 						item->Animation.RequiredState = CROC_STATE_SWIM_FORWARD;
-
-						LaraItem->HitPoints -= CROC_ATTACK_DAMAGE;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
