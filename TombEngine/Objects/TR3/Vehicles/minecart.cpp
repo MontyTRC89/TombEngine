@@ -39,13 +39,13 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
 	constexpr auto MINECART_NUM_HITS = 25;
 
-	constexpr auto MINECART_VELOCITY_DECEL = 6 * 256;
-	constexpr auto MINECART_SPEED_MIN = 10 * 256; // TODO: These two have confusing names. @Sezz
+	constexpr auto MINECART_VELOCITY_DECEL = 6 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MINECART_SPEED_MIN = 10 * VEHICLE_VELOCITY_SCALE; // TODO: These two have confusing names. @Sezz
 	constexpr auto MINECART_VELOCITY_MIN = 32;
 	constexpr auto MINECART_TURN_DEATH_VELOCITY = 128;
 	constexpr auto MINECART_TURN_FRICTION_VELOCITY = 70;
 	constexpr auto MINECART_JUMP_VELOCITY = 63 * 1024;
-	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * 256;
+	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr auto MINECART_FORWARD_GRADIENT = -CLICK(0.5f);
 	constexpr auto MINECART_BACK_GRADIENT = CLICK(0.5f);
@@ -418,7 +418,7 @@ namespace TEN::Entities::Vehicles
 			minecart->Velocity = MINECART_SPEED_MIN;
 
 		minecart->Velocity -= minecart->Gradient * 4;
-		minecartItem->Animation.Velocity = minecart->Velocity / 256;
+		minecartItem->Animation.Velocity = minecart->Velocity / VEHICLE_VELOCITY_SCALE;
 
 		if (minecartItem->Animation.Velocity < MINECART_VELOCITY_MIN)
 		{
@@ -533,7 +533,7 @@ namespace TEN::Entities::Vehicles
 				if (minecart->VerticalVelocity > MINECART_VERTICAL_VELOCITY_MAX)
 					minecart->VerticalVelocity = MINECART_VERTICAL_VELOCITY_MAX;
 
-				minecartItem->Pose.Position.y += minecart->VerticalVelocity / 256;
+				minecartItem->Pose.Position.y += minecart->VerticalVelocity / VEHICLE_VELOCITY_SCALE;
 			}
 		}
 
