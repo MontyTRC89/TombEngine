@@ -45,7 +45,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_SLOW_VELOCITY_MAX = 37;
 	constexpr auto RBOAT_NORMAL_VELOCITY_MAX = 110;
 	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
-	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = -20;
+	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
 
 	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
@@ -462,8 +462,8 @@ namespace TEN::Entities::Vehicles
 					rBoatItem->Animation.Velocity = newVelocity;
 			}
 
-			if (rBoatItem->Animation.Velocity < RBOAT_REVERSE_VELOCITY_MAX)
-				rBoatItem->Animation.Velocity = RBOAT_REVERSE_VELOCITY_MAX;
+			if (rBoatItem->Animation.Velocity < -RBOAT_REVERSE_VELOCITY_MAX)
+				rBoatItem->Animation.Velocity = -RBOAT_REVERSE_VELOCITY_MAX;
 		}
 
 		return collide;
@@ -539,7 +539,7 @@ namespace TEN::Entities::Vehicles
 				{
 					if (rBoatItem->Animation.Velocity > 0)
 						rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_BRAKE_DECEL;
-					else if (rBoatItem->Animation.Velocity > RBOAT_REVERSE_VELOCITY_MAX)
+					else if (rBoatItem->Animation.Velocity > -RBOAT_REVERSE_VELOCITY_MAX)
 						rBoatItem->Animation.Velocity -= RBOAT_REVERSE_VELOCITY_DECEL;
 				}
 				else if (TrInput & VEHICLE_IN_ACCELERATE)

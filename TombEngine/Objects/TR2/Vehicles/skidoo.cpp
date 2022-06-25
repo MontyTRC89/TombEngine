@@ -32,8 +32,8 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
-	constexpr auto DAMAGE_START = 140;
-	constexpr auto DAMAGE_LENGTH = 14;
+	constexpr auto SKIDOO_DAMAGE_START = 140;
+	constexpr auto SKIDOO_DAMAGE_LENGTH = 14;
 
 	constexpr auto SKIDOO_RADIUS = 500;
 	constexpr auto SKIDOO_FRONT = 550;
@@ -64,8 +64,6 @@ namespace TEN::Entities::Vehicles
 	#define SKIDOO_TURN_RATE_MAX			ANGLE(6.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_ACCEL	ANGLE(3.0f)
 	#define SKIDOO_MOMENTUM_TURN_RATE_MAX	ANGLE(150.0f)
-
-	// TODO: Brake.
 
 	enum SkidooState
 	{
@@ -231,7 +229,7 @@ namespace TEN::Entities::Vehicles
 				{
 					laraItem->Animation.TargetState = LS_DEATH;
 					laraItem->Animation.Velocity = 0;
-					laraItem->Animation.VerticalVelocity = DAMAGE_START + DAMAGE_LENGTH;
+					laraItem->Animation.VerticalVelocity = SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH;
 					ExplodeVehicle(laraItem, skidooItem);
 				}
 				else
@@ -667,7 +665,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = SKIDOO_STATE_SIT;
 					SoundEffect(SFX_TR2_VEHICLE_IMPACT3, &skidooItem->Pose);
 				}
-				else if (skidooItem->Animation.VerticalVelocity > (DAMAGE_START + DAMAGE_LENGTH))
+				else if (skidooItem->Animation.VerticalVelocity > (SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH))
 					laraItem->Animation.TargetState = SKIDOO_STATE_JUMP_OFF;
 
 				break;

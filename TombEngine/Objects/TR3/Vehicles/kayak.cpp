@@ -44,20 +44,24 @@ namespace TEN::Entities::Vehicles
 	constexpr auto DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 
-	constexpr int MAX_VELOCITY = 56 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_FRICTION = 0.5f * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_ROTATE_FRICTION = 5 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_DEFLECT_ROTATION = 8 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_FRICTION = 0.5f * VEHICLE_VELOCITY_SCALE;
+
 	constexpr int KAYAK_FORWARD_VELOCITY = 24 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_FORWARD_ROTATION = 128 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_LEFT_RIGHT_VELOCITY = 16 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_LEFT_RIGHT_ROTATION = 192 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_MAX_LEFT_RIGHT = 192 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_TURN_ROTATION = 32 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_MAX_TURN = 256 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_TURN_BRAKE = 0.5f * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_HARD_ROTATION = 256 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_MAX_STAT = 256 * VEHICLE_VELOCITY_SCALE;
+
+	// TODO
+	#define KAYAK_TURN_RATE_FRICTION ANGLE(0.03f)
+	#define KAYAK_TURN_RATE_DEFLECT ANGLE(0.05f)
+
+	#define KAYAK_TURN_RATE_FORWARD ANGLE(0.7f)
+	#define KAYAK_TURN_RATE_LR_ACCEL ANGLE(1.0f)
+	#define KAYAK_TURN_RATE_LR_MAX ANGLE(1.0f)
+	#define KAYAK_TURN_ROTATION ANGLE(0.18f)
+	#define KAYAK_HARD_ROTATION ANGLE(1.4f)
+	#define KAYAK_TURN_RATE_MAX ANGLE(1.4f)
+	#define KAYAK_MAX_STAT ANGLE(1.4f)
 
 	constexpr auto HIT_BACK = 1;
 	constexpr auto HIT_FRONT = 2;
@@ -75,15 +79,15 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_X = 128;
 	constexpr auto KAYAK_Z = 128;
 	constexpr auto KAYAK_MAX_KICK = -80;
-	constexpr auto KAYAK_MIN_BOUNCE = (MAX_VELOCITY / 2) / VEHICLE_VELOCITY_SCALE;
+	constexpr auto KAYAK_MIN_BOUNCE = (KAYAK_VELOCITY_MAX / 2) / VEHICLE_VELOCITY_SCALE;
 
-	// TODO: ??
-	constexpr auto KAYAK_IN_FORWARD = IN_FORWARD;
-	constexpr auto KAYAK_IN_BACK = IN_BACK;
-	constexpr auto KAYAK_IN_LEFT = IN_LEFT;
-	constexpr auto KAYAK_IN_RIGHT = IN_RIGHT;
-	constexpr auto KAYAK_IN_HOLD = IN_WALK;
-	constexpr auto KAYAK_IN_HOLD_LEFT = IN_LSTEP;
+	// TODO: Kayak control is fairly unique. Keep this? @Sezz 2022.06.25
+	constexpr auto KAYAK_IN_FORWARD	   = IN_FORWARD;
+	constexpr auto KAYAK_IN_BACK	   = IN_BACK;
+	constexpr auto KAYAK_IN_LEFT	   = IN_LEFT;
+	constexpr auto KAYAK_IN_RIGHT	   = IN_RIGHT;
+	constexpr auto KAYAK_IN_HOLD	   = IN_WALK;
+	constexpr auto KAYAK_IN_HOLD_LEFT  = IN_LSTEP;
 	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
 
 	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
@@ -583,9 +587,9 @@ namespace TEN::Entities::Vehicles
 		int leftHeight  = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X,  false, &leftPos);
 		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, &rightPos);
 
-		kayakItem->Pose.Orientation.y += kayak->TurnRate / VEHICLE_VELOCITY_SCALE;
 		kayakItem->Pose.Position.x += kayakItem->Animation.Velocity * phd_sin(kayakItem->Pose.Orientation.y);
 		kayakItem->Pose.Position.z += kayakItem->Animation.Velocity * phd_cos(kayakItem->Pose.Orientation.y);
+		kayakItem->Pose.Orientation.y += kayak->TurnRate;
 
 		KayakDoCurrent(laraItem,kayakItem);
 
@@ -682,7 +686,7 @@ namespace TEN::Entities::Vehicles
 
 			if (slip)
 			{
-				if (kayak->Velocity <= MAX_VELOCITY)
+				if (kayak->Velocity <= KAYAK_VELOCITY_MAX)
 					kayak->Velocity = newVelocity;
 			}
 			else
@@ -694,8 +698,8 @@ namespace TEN::Entities::Vehicles
 					kayak->Velocity = newVelocity;
 			}
 
-			if (kayak->Velocity < -MAX_VELOCITY)
-				kayak->Velocity = -MAX_VELOCITY;
+			if (kayak->Velocity < -KAYAK_VELOCITY_MAX)
+				kayak->Velocity = -KAYAK_VELOCITY_MAX;
 		}
 	}
 
@@ -811,9 +815,9 @@ namespace TEN::Entities::Vehicles
 			{
 				if (kayak->Forward)
 				{
-					kayak->TurnRate -= KAYAK_FORWARD_ROTATION;
-					if (kayak->TurnRate < -KAYAK_MAX_TURN)
-						kayak->TurnRate = -KAYAK_MAX_TURN;
+					kayak->TurnRate -= KAYAK_TURN_RATE_FORWARD;
+					if (kayak->TurnRate < -KAYAK_TURN_RATE_MAX)
+						kayak->TurnRate = -KAYAK_TURN_RATE_MAX;
 
 					kayak->Velocity += KAYAK_FORWARD_VELOCITY;
 				}
@@ -825,9 +829,9 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					kayak->TurnRate -= KAYAK_LEFT_RIGHT_ROTATION;
-					if (kayak->TurnRate < -KAYAK_MAX_LEFT_RIGHT)
-						kayak->TurnRate = -KAYAK_MAX_LEFT_RIGHT;
+					kayak->TurnRate -= KAYAK_TURN_RATE_LR_ACCEL;
+					if (kayak->TurnRate < -KAYAK_TURN_RATE_LR_MAX)
+						kayak->TurnRate = -KAYAK_TURN_RATE_LR_MAX;
 
 					kayak->Velocity += KAYAK_LEFT_RIGHT_VELOCITY;
 				}
@@ -871,9 +875,9 @@ namespace TEN::Entities::Vehicles
 			{
 				if (kayak->Forward)
 				{
-					kayak->TurnRate += KAYAK_FORWARD_ROTATION;
-					if (kayak->TurnRate > KAYAK_MAX_TURN)
-						kayak->TurnRate = KAYAK_MAX_TURN;
+					kayak->TurnRate += KAYAK_TURN_RATE_FORWARD;
+					if (kayak->TurnRate > KAYAK_TURN_RATE_MAX)
+						kayak->TurnRate = KAYAK_TURN_RATE_MAX;
 
 					kayak->Velocity += KAYAK_FORWARD_VELOCITY;
 				}
@@ -885,9 +889,9 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					kayak->TurnRate += KAYAK_LEFT_RIGHT_ROTATION;
-					if (kayak->TurnRate > KAYAK_MAX_LEFT_RIGHT)
-						kayak->TurnRate = KAYAK_MAX_LEFT_RIGHT;
+					kayak->TurnRate += KAYAK_TURN_RATE_LR_ACCEL;
+					if (kayak->TurnRate > KAYAK_TURN_RATE_LR_MAX)
+						kayak->TurnRate = KAYAK_TURN_RATE_LR_MAX;
 
 					kayak->Velocity += KAYAK_LEFT_RIGHT_VELOCITY;
 				}
@@ -906,13 +910,13 @@ namespace TEN::Entities::Vehicles
 			{
 				if (frame == 8)
 				{
-					kayak->TurnRate += KAYAK_FORWARD_ROTATION;
+					kayak->TurnRate += KAYAK_TURN_RATE_FORWARD;
 					kayak->Velocity -= KAYAK_FORWARD_VELOCITY;
 				}
 
 				if (frame == 31)
 				{
-					kayak->TurnRate -= KAYAK_FORWARD_ROTATION;
+					kayak->TurnRate -= KAYAK_TURN_RATE_FORWARD;
 					kayak->Velocity -= KAYAK_FORWARD_VELOCITY;
 				}
 
@@ -938,8 +942,8 @@ namespace TEN::Entities::Vehicles
 				if (kayak->Velocity >= 0)
 				{
 					kayak->TurnRate -= KAYAK_TURN_ROTATION;
-					if (kayak->TurnRate < -KAYAK_MAX_TURN)
-						kayak->TurnRate = -KAYAK_MAX_TURN;
+					if (kayak->TurnRate < -KAYAK_TURN_RATE_MAX)
+						kayak->TurnRate = -KAYAK_TURN_RATE_MAX;
 
 					kayak->Velocity += -KAYAK_TURN_BRAKE;
 					if (kayak->Velocity < 0)
@@ -974,8 +978,8 @@ namespace TEN::Entities::Vehicles
 				if (kayak->Velocity >= 0)
 				{
 					kayak->TurnRate += KAYAK_TURN_ROTATION;
-					if (kayak->TurnRate > KAYAK_MAX_TURN)
-						kayak->TurnRate = KAYAK_MAX_TURN;
+					if (kayak->TurnRate > KAYAK_TURN_RATE_MAX)
+						kayak->TurnRate = KAYAK_TURN_RATE_MAX;
 
 					kayak->Velocity += -KAYAK_TURN_BRAKE;
 					if (kayak->Velocity < 0)
@@ -1056,9 +1060,9 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y + ANGLE(90.0f);
 				laraItem->Pose.Orientation.z = 0;
+				laraItem->Animation.IsAirborne = true;
 				laraItem->Animation.Velocity = 40;
 				laraItem->Animation.VerticalVelocity = -50;
-				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 				kayak->LeftRightPaddleCount = 0;
@@ -1067,33 +1071,33 @@ namespace TEN::Entities::Vehicles
 
 		if (kayak->Velocity > 0)
 		{
-			kayak->Velocity -= KAYAK_FRICTION;
+			kayak->Velocity -= KAYAK_VELOCITY_FRICTION;
 			if (kayak->Velocity < 0)
 				kayak->Velocity = 0;
 		}
 		else if (kayak->Velocity < 0)
 		{
-			kayak->Velocity += KAYAK_FRICTION;
+			kayak->Velocity += KAYAK_VELOCITY_FRICTION;
 			if (kayak->Velocity > 0)
 				kayak->Velocity = 0;
 		}
 
-		if (kayak->Velocity > MAX_VELOCITY)
-			kayak->Velocity = MAX_VELOCITY;
-		else if (kayak->Velocity < -MAX_VELOCITY)
-			kayak->Velocity = -MAX_VELOCITY;
+		if (kayak->Velocity > KAYAK_VELOCITY_MAX)
+			kayak->Velocity = KAYAK_VELOCITY_MAX;
+		else if (kayak->Velocity < -KAYAK_VELOCITY_MAX)
+			kayak->Velocity = -KAYAK_VELOCITY_MAX;
 
 		kayakItem->Animation.Velocity = kayak->Velocity / VEHICLE_VELOCITY_SCALE;
 		
 		if (kayak->TurnRate >= 0)
 		{
-			kayak->TurnRate -= KAYAK_ROTATE_FRICTION;
+			kayak->TurnRate -= KAYAK_TURN_RATE_FRICTION;
 			if (kayak->TurnRate < 0)
 				kayak->TurnRate = 0;
 		}
 		else if (kayak->TurnRate < 0)
 		{
-			kayak->TurnRate += KAYAK_ROTATE_FRICTION;
+			kayak->TurnRate += KAYAK_TURN_RATE_FRICTION;
 			if (kayak->TurnRate > 0)
 				kayak->TurnRate = 0;
 		}

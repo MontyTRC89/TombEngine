@@ -38,14 +38,14 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_SIDE = 350;
 	constexpr auto MOTORBIKE_SLIP = 100;
 
-	constexpr auto MOTORBIKE_ACCEL_1 = 64 * 256;
-	constexpr auto MOTORBIKE_ACCEL_2 = 112 * 256;
-	constexpr auto MOTORBIKE_ACCEL_MAX = 192 * 256;
-	constexpr auto MOTORBIKE_ACCEL = 128 * 256;
-	constexpr auto MOTORBIKE_BACKING_VEL = 8 * 256;
-	constexpr auto MOTORBIKE_BIG_SLOWDOWN = 48 * 256;
-	constexpr auto MOTORBIKE_SLOWDOWN1 = (int)(4.25f * 256); // TODO: Float velocities. @Sezz 2022.06.16
-	constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * 256;
+	constexpr auto MOTORBIKE_ACCEL_1 = 64 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MOTORBIKE_ACCEL_2 = 112 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MOTORBIKE_ACCEL_MAX = 192 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MOTORBIKE_ACCEL = 128 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MOTORBIKE_BACKING_VEL = 8 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MOTORBIKE_BIG_SLOWDOWN = 48 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MOTORBIKE_SLOWDOWN1 = (int)(4.25f * VEHICLE_VELOCITY_SCALE); // TODO: Float velocities. @Sezz 2022.06.16
+	constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
 	constexpr auto MOTORBIKE_BITCH_MAX = 0xA000;
@@ -805,7 +805,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState == MOTORBIKE_STATE_NONE_6)
 		{
 			if (isDead || !collide ||
-				motorbike->Velocity <= (42 * 256) ||
+				motorbike->Velocity <= (42 * VEHICLE_VELOCITY_SCALE) ||
 				laraItem->Animation.ActiveState == MOTORBIKE_STATE_HITBACK ||
 				laraItem->Animation.ActiveState == MOTORBIKE_STATE_HITFRONT ||
 				laraItem->Animation.ActiveState == MOTORBIKE_STATE_HITLEFT ||
@@ -845,7 +845,7 @@ namespace TEN::Entities::Vehicles
 						else
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_NONE_5;
 					}
-					else if ((motorbike->Velocity / 256) != 0)
+					else if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_LEFT)
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_LEFT;
@@ -853,7 +853,7 @@ namespace TEN::Entities::Vehicles
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_RIGHT;
 						else if (TrInput & VEHICLE_IN_BRAKE)
 						{
-							if (motorbike->Velocity <= 0x5554) // 85.3f * 256
+							if (motorbike->Velocity <= 0x5554) // 85.3f * VEHICLE_VELOCITY_SCALE
 								laraItem->Animation.TargetState = MOTORBIKE_STATE_NONE_3;
 							else
 								laraItem->Animation.TargetState = MOTORBIKE_STATE_STOP;
@@ -869,7 +869,7 @@ namespace TEN::Entities::Vehicles
 					break;
 
 				case MOTORBIKE_STATE_MOVING_LEFT:
-					if ((motorbike->Velocity / 256) != 0)
+					if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_RIGHT || !(TrInput & VEHICLE_IN_LEFT))
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_FRONT;
@@ -890,7 +890,7 @@ namespace TEN::Entities::Vehicles
 					break;
 
 				case MOTORBIKE_STATE_MOVING_RIGHT:
-					if ((motorbike->Velocity / 256) != 0)
+					if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_LEFT || !(TrInput & VEHICLE_IN_RIGHT))
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_FRONT;
@@ -906,7 +906,7 @@ namespace TEN::Entities::Vehicles
 				case MOTORBIKE_STATE_NONE_3:
 				case MOTORBIKE_STATE_STOP:
 				case MOTORBIKE_STATE_ACCELERATE:
-					if ((motorbike->Velocity / 256) != 0)
+					if ((motorbike->Velocity / VEHICLE_VELOCITY_SCALE) != 0)
 					{
 						if (TrInput & VEHICLE_IN_LEFT)
 							laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_LEFT;
@@ -1091,13 +1091,13 @@ namespace TEN::Entities::Vehicles
 			{
 				if (motorbike->Velocity < 0)
 				{
-					motorbike->Velocity += 3 * 256;
+					motorbike->Velocity += 3 * VEHICLE_VELOCITY_SCALE;
 					if (motorbike->Velocity > 0)
 						motorbike->Velocity = 0;
 				}
 				else
 				{
-					motorbike->Velocity -= 3 * 256;
+					motorbike->Velocity -= 3 * VEHICLE_VELOCITY_SCALE;
 					if (motorbike->Velocity < 0)
 						motorbike->Velocity = 0;
 				}
@@ -1114,7 +1114,7 @@ namespace TEN::Entities::Vehicles
 						motorbike->Velocity += ((MOTORBIKE_ACCEL_MAX - motorbike->Velocity) / 16) + 2;
 
 					if (motorbike->Flags & MOTORBIKE_FLAG_BOOST)
-						motorbike->Velocity += 1 * 256;
+						motorbike->Velocity += 1 * VEHICLE_VELOCITY_SCALE;
 				}
 				else
 					motorbike->Velocity = MOTORBIKE_ACCEL_MAX;
@@ -1150,7 +1150,7 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			motorbikeItem->Animation.Velocity = motorbike->Velocity / 256;
+			motorbikeItem->Animation.Velocity = motorbike->Velocity / VEHICLE_VELOCITY_SCALE;
 
 			if (motorbike->EngineRevs > MOTORBIKE_ACCEL_MAX)
 				motorbike->EngineRevs = (GetRandomControl() & 0x1FF) + 0xBF00;
