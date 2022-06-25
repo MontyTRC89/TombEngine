@@ -1179,10 +1179,17 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 
 		if (selected_option == option_count - 1)
 		{
+			// Was rumble setting changed?
+			bool indicateRumble = CurrentSettings.conf.EnableRumble && !g_Configuration.EnableRumble;
+
 			// Save the configuration
 			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
 			SaveConfiguration();
-			Rumble(0.5f);
+
+			// Rumble if setting was changed
+			if (indicateRumble)
+				Rumble(0.5f);
+
 			menu_to_display = pause ? Menu::Pause : Menu::Options;
 			selected_option = 1;
 		}
