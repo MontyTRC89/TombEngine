@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SLOW_VELOCITY_MAX = 37;
 	constexpr auto SPEEDBOAT_NORMAL_VELOCITY_MAX = 110;
 	constexpr auto SPEEDBOAT_FAST_VELOCITY_MAX = 185;
-	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_MAX = -20;
+	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_MAX = 20;
 
 	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX = CLICK(1); // Unused.
 	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
@@ -408,8 +408,8 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			verticalVelocity += ((height - *y - verticalVelocity) / 8);
-			if (verticalVelocity < SPEEDBOAT_REVERSE_VELOCITY_MAX)
-				verticalVelocity = SPEEDBOAT_REVERSE_VELOCITY_MAX;
+			if (verticalVelocity < -SPEEDBOAT_REVERSE_VELOCITY_MAX)
+				verticalVelocity = -SPEEDBOAT_REVERSE_VELOCITY_MAX;
 
 			if (*y > height)
 				*y = height;
@@ -527,8 +527,8 @@ namespace TEN::Entities::Vehicles
 					speedboatItem->Animation.Velocity = newVelocity;
 			}
 
-			if (speedboatItem->Animation.Velocity < SPEEDBOAT_REVERSE_VELOCITY_MAX)
-				speedboatItem->Animation.Velocity = SPEEDBOAT_REVERSE_VELOCITY_MAX;
+			if (speedboatItem->Animation.Velocity < -SPEEDBOAT_REVERSE_VELOCITY_MAX)
+				speedboatItem->Animation.Velocity = -SPEEDBOAT_REVERSE_VELOCITY_MAX;
 		}
 
 		return collide;
@@ -579,7 +579,7 @@ namespace TEN::Entities::Vehicles
 				{
 					if (speedboatItem->Animation.Velocity > 0)
 						speedboatItem->Animation.Velocity -= SPEEDBOAT_VELOCITY_BRAKE_DECEL;
-					else if (speedboatItem->Animation.Velocity > SPEEDBOAT_REVERSE_VELOCITY_MAX)
+					else if (speedboatItem->Animation.Velocity > -SPEEDBOAT_REVERSE_VELOCITY_MAX)
 						speedboatItem->Animation.Velocity -= SPEEDBOAT_REVERSE_VELOCITY_DECEL;
 				}
 				else if (TrInput & VEHICLE_IN_ACCELERATE)

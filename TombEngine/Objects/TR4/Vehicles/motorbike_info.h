@@ -4,12 +4,12 @@ namespace TEN::Entities::Vehicles
 {
 	struct MotorbikeInfo
 	{
+		int Velocity = 0;
+
 		short TurnRate = 0;
 		short MomentumAngle = 0;
 		short ExtraRotation = 0;
 		short WallShiftRotation = 0;
-
-		int Velocity = 0;
 
 		int Revs = 0;
 		int EngineRevs = 0;
