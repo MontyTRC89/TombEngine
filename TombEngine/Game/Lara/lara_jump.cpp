@@ -816,7 +816,6 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_DEATH;
 			SetLaraLand(item, coll);
-			Rumble(0.5f, 0.2f);
 		}
 
 		return;
@@ -828,6 +827,7 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 			item->HitPoints <= 0)
 		{
 			item->Animation.TargetState = LS_DEATH;
+			Rumble(0.5f, 0.2f);
 		}
 		else if (TestLaraSlide(item, coll))
 			SetLaraSlideAnimation(item, coll);
