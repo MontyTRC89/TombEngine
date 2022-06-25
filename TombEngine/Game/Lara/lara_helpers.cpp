@@ -335,6 +335,7 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
 }
 
+// TODO: Rename to ModulateTurnRate() and move somewhere else. @Sezz 2022.06.26
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
 {
 	int sign = std::copysign(1, axisCoeff);
@@ -346,6 +347,7 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 	return newTurnRate * sign;
 }
 
+// TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
@@ -865,14 +867,14 @@ void ResetLaraFlex(ItemInfo* item, float rate)
 		lara->ExtraTorsoRot.z = 0;
 }
 
-void RumbleLaraHealthCondition(ItemInfo* lara)
+void RumbleLaraHealthCondition(ItemInfo* item)
 {
-	auto* info = GetLaraInfo(lara);
+	auto* lara = GetLaraInfo(item);
 
-	if (lara->HitPoints > LARA_HEALTH_CRITICAL && !info->PoisonPotency)
+	if (item->HitPoints > LARA_HEALTH_CRITICAL && !lara->PoisonPotency)
 		return;
 
-	bool pulse = (GlobalCounter & 0x0F) / 0x0F == 1;
-	if (pulse)
+	bool doPulse = (GlobalCounter & 0x0F) / 0x0F == 1;
+	if (doPulse)
 		Rumble(0.2f, 0.1f);
 }

@@ -501,17 +501,13 @@ namespace TEN::Entities::Vehicles
 			if ((TrInput & VEHICLE_IN_LEFT && !(TrInput & VEHICLE_IN_REVERSE)) ||
 				(TrInput & VEHICLE_IN_RIGHT && TrInput & VEHICLE_IN_REVERSE))
 			{
-				skidoo->TurnRate -= SKIDOO_TURN_RATE_ACCEL;
-				if (skidoo->TurnRate < -SKIDOO_TURN_RATE_MAX)
-					skidoo->TurnRate = -SKIDOO_TURN_RATE_MAX;
+				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
 			}
 
 			if ((TrInput & VEHICLE_IN_RIGHT && !(TrInput & VEHICLE_IN_REVERSE)) ||
 				(TrInput & VEHICLE_IN_LEFT && TrInput & VEHICLE_IN_REVERSE))
 			{
-				skidoo->TurnRate += SKIDOO_TURN_RATE_ACCEL;
-				if (skidoo->TurnRate > SKIDOO_TURN_RATE_MAX)
-					skidoo->TurnRate = SKIDOO_TURN_RATE_MAX;
+				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
 			}
 
 			if (TrInput & VEHICLE_IN_REVERSE)
