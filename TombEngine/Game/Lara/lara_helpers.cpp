@@ -864,3 +864,15 @@ void ResetLaraFlex(ItemInfo* item, float rate)
 	else
 		lara->ExtraTorsoRot.z = 0;
 }
+
+void RumbleLaraHealthCondition(ItemInfo* lara)
+{
+	auto* info = GetLaraInfo(lara);
+
+	if (lara->HitPoints > LARA_HEALTH_CRITICAL && info->PoisonPotency == 0)
+		return;
+
+	bool pulse = (GlobalCounter & 0x0F) / 0x0F == 1;
+	if (pulse)
+		Rumble(0.2f, 0.1f);
+}

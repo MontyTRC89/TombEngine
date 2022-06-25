@@ -119,7 +119,7 @@ void UpdateHealthBar(ItemInfo* item, int flash)
 		HealthBarTimer = 0;
 
 	// Flash when at 1/4 capacity AND HP bar is not transitioning.
-	if (HealthBar <= LARA_HEALTH_MAX / 4)
+	if (HealthBar <= LARA_HEALTH_CRITICAL)
 	{
 		if (!BinocularRange)
 		{

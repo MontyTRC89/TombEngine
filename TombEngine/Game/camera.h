@@ -98,3 +98,4 @@ void SetScreenFadeOut(float speed);
 void SetScreenFadeIn(float speed);
 void SetCinematicBars(float height, float speed);
 void UpdateFadeScreenAndCinematicBars();
+void HandleOptics();

@@ -71,6 +71,7 @@ constexpr auto LARA_RUN_JUMP_TIME			 = 22;		 // Frames to count before a running
 constexpr auto LARA_SPRINT_JUMP_TIME		 = 50;		 // Frames to count before a sprint jump is possible.
 
 constexpr float LARA_HEALTH_MAX			= 1000.0f;
+constexpr float LARA_HEALTH_CRITICAL	= LARA_HEALTH_MAX / 4.0f;
 constexpr float LARA_AIR_MAX			= 1800.0f;
 constexpr float LARA_SPRINT_ENERGY_MAX  = 120.0f;
 constexpr float LARA_POISON_POTENCY_MAX = 64.0f;

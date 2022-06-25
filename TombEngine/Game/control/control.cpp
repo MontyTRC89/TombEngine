@@ -214,59 +214,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Handle lasersight and binocular
 		if (CurrentLevel != 0)
-		{
-			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
-					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.TargetState != LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE)))
-			{
-				if (BinocularRange == 0)
-				{
-					if (UseSpotCam || TrackCameraInit)
-						TrInput &= ~IN_LOOK;
-				}
-				else
-				{
-					// If any input but optic controls (directions + action), immediately exit binoculars mode.
-					if (TrInput != IN_NONE && ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE))
-						BinocularRange = 0;
-
-					if (LaserSight)
-					{
-						BinocularRange = 0;
-						BinocularOn = false;
-						LaserSight = false;
-						Camera.type = BinocularOldCamera;
-						Camera.bounce = 0;
-						AlterFOV(ANGLE(80.0f));
-
-						LaraItem->MeshBits = ALL_JOINT_BITS;
-						Lara.Inventory.IsBusy = false;
-						ResetLaraFlex(LaraItem);
-
-						TrInput &= ~IN_LOOK;
-					}
-					else
-					{
-						TrInput |= IN_LOOK;
-						DbInput = 0;
-					}
-				}
-			}
-			else if (BinocularRange == 0)
-			{
-				if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-					((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-						Lara.Control.Weapon.GunType == LaraWeaponType::HK || 
-						(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
-				{
-					BinocularRange = 128;
-					BinocularOldCamera = Camera.oldType;
-					BinocularOn = true;
-					LaserSight = true;
-					Lara.Inventory.IsBusy = true;
-				}
-			}
-		}
+			HandleOptics();
 
 		// Update all items
 		InItemControlLoop = true;

@@ -456,6 +456,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->SprintEnergy++;
 
+	RumbleLaraHealthCondition(item);
+
 	lara->Control.IsLow = false;
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
