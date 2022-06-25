@@ -58,7 +58,7 @@ void DrawBox(int boxIndex, Vector3 color)
 
 	for (int i = 0; i <= 10; i++)
 	{
-		dBox.Extents = extents * (1.0f - ((float)i * 0.005f));
+		dBox.Extents = extents + Vector3(i);
 		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 	}
 }
