@@ -15,6 +15,8 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
+using namespace TEN::Input;
+
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
 constexpr auto HORIZONTAL_ALIGN_SOUTHWEST = 101;
 constexpr auto FORWARD_ALIGNMENT = 868;

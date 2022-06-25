@@ -16,6 +16,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	#define KAYAK_COLLIDE			CLICK(0.25f)
@@ -1301,7 +1303,7 @@ namespace TEN::Entities::Vehicles
 		{
 			int damage = ofs - kayakItem->Animation.VerticalVelocity;
 			if (damage > 160)
-				laraItem->HitPoints -= (damage - 160) * 8;
+				DoDamage(laraItem, (damage - 160) * 8);
 		}
 
 		if (lara->Vehicle != NO_ITEM)

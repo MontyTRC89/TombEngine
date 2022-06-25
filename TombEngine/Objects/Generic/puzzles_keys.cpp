@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
 using namespace TEN::Entities::Switches;
 
 short PuzzleItem;

@@ -76,8 +76,8 @@ namespace TEN::Entities::TR3
 
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
+			DoDamage(item, 20);
 			DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->RoomNumber, 3);
-			item->HitPoints -= 20;
 		}
 
 		AI_INFO laraAI;
@@ -342,16 +342,14 @@ namespace TEN::Entities::TR3
 					torsoY = AI.angle;
 				}
 
-				if (enemy == LaraItem)
+				if (enemy->IsLara())
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+						DoDamage(enemy, 80);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 80;
-						LaraItem->HitStatus = 1;
 					}
 				}
 				else
@@ -364,10 +362,8 @@ namespace TEN::Entities::TR3
 						{
 							creature->Flags = 1;
 							CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+							DoDamage(enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
-
-							enemy->HitPoints -= 5;
-							enemy->HitStatus = 1;
 						}
 					}
 				}
@@ -383,16 +379,14 @@ namespace TEN::Entities::TR3
 					torsoY = AI.angle;
 				}
 
-				if (enemy == LaraItem)
+				if (enemy->IsLara())
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+						DoDamage(enemy, 80);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 80;
-						LaraItem->HitStatus = 1;
 					}
 				}
 				else
@@ -405,10 +399,8 @@ namespace TEN::Entities::TR3
 						{
 							creature->Flags = 1;
 							CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+							DoDamage(enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
-
-							enemy->HitPoints -= 5;
-							enemy->HitStatus = 1;
 						}
 					}
 				}
@@ -427,16 +419,14 @@ namespace TEN::Entities::TR3
 					torsoY = AI.angle;
 				}
 
-				if (enemy == LaraItem)
+				if (enemy->IsLara())
 				{
 					if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, MPStickPunchAttackJoints))
 					{
 						CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+						DoDamage(enemy, 100);
 						creature->Flags = 2;
 						SoundEffect(70, &item->Pose);
-
-						LaraItem->HitPoints -= 100;
-						LaraItem->HitStatus = 1;
 					}
 				}
 				else
@@ -449,10 +439,8 @@ namespace TEN::Entities::TR3
 						{
 							creature->Flags = 2;
 							CreatureEffect(item, &MPStickBite1, DoBloodSplat);
+							DoDamage(enemy, 6);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
-
-							enemy->HitPoints -= 6;
-							enemy->HitStatus = 1;
 						}
 					}
 				}
@@ -465,17 +453,15 @@ namespace TEN::Entities::TR3
 				if (AI.ahead)
 					torsoY = AI.angle;
 
-				if (enemy == LaraItem)
+				if (enemy->IsLara())
 				{
 					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MPStickKickAttackJoints) &&
 						item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 8)
 					{
 						CreatureEffect(item, &MPStickBite2, DoBloodSplat);
+						DoDamage(enemy, 150);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 150;
-						LaraItem->HitStatus = 1;
 					}
 				}
 				else
@@ -489,10 +475,8 @@ namespace TEN::Entities::TR3
 						{
 							creature->Flags = 1;
 							CreatureEffect(item, &MPStickBite2, DoBloodSplat);
+							DoDamage(enemy, 9);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
-
-							enemy->HitPoints -= 9;
-							enemy->HitStatus = 1;
 						}
 					}
 				}

@@ -285,9 +285,8 @@ void Tr5DogControl(short itemNumber)
 				frame >= 4 &&
 				frame <= 14)
 			{
+				DoDamage(creature->Enemy, 20);
 				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-				LaraItem->HitPoints -= 20;
-				LaraItem->HitStatus = true;
 			}
 
 			item->Animation.TargetState = 3;
@@ -303,9 +302,8 @@ void Tr5DogControl(short itemNumber)
 				(frame >= 9 && frame <= 12 ||
 					frame >= 22 && frame <= 25))
 			{
+				DoDamage(creature->Enemy, 10);
 				CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-				LaraItem->HitPoints -= 10;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

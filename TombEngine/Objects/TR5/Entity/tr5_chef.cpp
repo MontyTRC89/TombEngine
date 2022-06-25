@@ -161,12 +161,10 @@ void ControlChef(short itemNumber)
 				{
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 10)
 					{
+						DoDamage(creature->Enemy, 80);
 						CreatureEffect2(item, &ChefBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 80;
-						LaraItem->HitStatus = true;
 					}
 				}
 			}
