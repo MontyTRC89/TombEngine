@@ -46,9 +46,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_DISMOUNT_DISTANCE = SECTOR(1);
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 
-	constexpr int UPV_VELOCITY_ACCEL = 4 * 256;
-	constexpr int UPV_VELOCITY_FRICTION = 1.5f * 256;
-	constexpr int UPV_VELOCITY_MAX = 64 * 256;
+	constexpr int UPV_VELOCITY_ACCEL = 4 * VEHICLE_VELOCITY_SCALE;
+	constexpr int UPV_VELOCITY_FRICTION = 1.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int UPV_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr int UPV_HARPOON_RELOAD_TIME = 15;
 	constexpr int UPV_HARPOON_VELOCITY = CLICK(1);
@@ -262,7 +262,7 @@ namespace TEN::Entities::Vehicles
 				pos = Vector3Int(UPVBites[UPV_FAN].x, UPVBites[UPV_FAN].y, UPVBites[UPV_FAN].z);
 				GetJointAbsPosition(UPVItem, &pos, UPVBites[UPV_FAN].meshNum);
 
-				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / 256, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
+				TriggerUPVMist(pos.x, pos.y + UPV_SHIFT, pos.z, abs(UPV->Velocity) / VEHICLE_VELOCITY_SCALE, UPVItem->Pose.Orientation.y + ANGLE(180.0f));
 
 				if ((GetRandomControl() & 1) == 0)
 				{
@@ -930,10 +930,8 @@ namespace TEN::Entities::Vehicles
 		{
 			UPVControl(laraItem, UPVItem);
 
-			UPVItem->Animation.Velocity = UPV->Velocity / 256;
-			UPVItem->Pose.Orientation.x += UPV->TurnRate.x;
-			UPVItem->Pose.Orientation.y += UPV->TurnRate.y;
-			UPVItem->Pose.Orientation.z = UPV->TurnRate.y;
+			UPVItem->Animation.Velocity = UPV->Velocity / VEHICLE_VELOCITY_SCALE;
+			UPVItem->Pose.Orientation += UPV->TurnRate;
 
 			if (UPVItem->Pose.Orientation.x > UPV_X_ORIENT_MAX)
 				UPVItem->Pose.Orientation.x = UPV_X_ORIENT_MAX;

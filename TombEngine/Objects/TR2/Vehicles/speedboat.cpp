@@ -591,7 +591,7 @@ namespace TEN::Entities::Vehicles
 
 					if (speedboatItem->Animation.Velocity < maxVelocity)
 						speedboatItem->Animation.Velocity += (SPEEDBOAT_VELOCITY_ACCEL / 2) + (SPEEDBOAT_VELOCITY_ACCEL * (speedboatItem->Animation.Velocity / (maxVelocity * 2)));
-					else if (speedboatItem->Animation.Velocity > maxVelocity + SPEEDBOAT_VELOCITY_DECEL)
+					else if (speedboatItem->Animation.Velocity > (maxVelocity + SPEEDBOAT_VELOCITY_DECEL))
 						speedboatItem->Animation.Velocity -= SPEEDBOAT_VELOCITY_DECEL;
 				}
 				else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&

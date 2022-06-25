@@ -54,12 +54,12 @@ namespace TEN::Entities::Vehicles
 	constexpr auto QBIKE_MOUNT_DISTANCE_MIN = CLICK(2);
 	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
 
-	constexpr int MAX_VELOCITY = 160 * 256;
-	constexpr int MIN_DRIFT_VELOCITY = 48 * 256;
-	constexpr int BRAKE = 2.5f * 256;
-	constexpr int REVERSE_ACCELERATION = -3 * 256;
-	constexpr int MAX_BACK = -48 * 256;
-	constexpr int MAX_REVS = 160 * 256;
+	constexpr int MAX_VELOCITY = 160 * VEHICLE_VELOCITY_SCALE;
+	constexpr int MIN_DRIFT_VELOCITY = 48 * VEHICLE_VELOCITY_SCALE;
+	constexpr int BRAKE = 2.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int REVERSE_ACCELERATION = -3 * VEHICLE_VELOCITY_SCALE;
+	constexpr int MAX_BACK = -48 * VEHICLE_VELOCITY_SCALE;
+	constexpr int MAX_REVS = 160 * VEHICLE_VELOCITY_SCALE;
 	constexpr int TERMINAL_VERTICAL_VELOCITY = 240;
 
 	constexpr auto QBIKE_STEP_HEIGHT_MAX = CLICK(1); // Unused.
@@ -642,7 +642,7 @@ namespace TEN::Entities::Vehicles
 		if (collide)
 		{
 			newVelocity = (quadBikeItem->Pose.Position.z - old.z) * phd_cos(quadBike->MomentumAngle) + (quadBikeItem->Pose.Position.x - old.x) * phd_sin(quadBike->MomentumAngle);
-			newVelocity *= 256;
+			newVelocity *= VEHICLE_VELOCITY_SCALE;
 
 			if (&g_Level.Items[lara->Vehicle] == quadBikeItem &&
 				quadBike->Velocity == MAX_VELOCITY &&
@@ -751,7 +751,7 @@ namespace TEN::Entities::Vehicles
 						laraItem->Animation.TargetState = QBIKE_STATE_BIKE_DEATH;
 				}
 				else if (!(TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE)) &&
-					(quadBike->Velocity / 256) == 0)
+					(quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 				{
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
 				}
@@ -778,7 +778,7 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_BRAKE:
 			case QBIKE_STATE_SLOW:
 			case QBIKE_STATE_STOP_SLOWLY:
-				if ((quadBike->Velocity / 256) == 0)
+				if ((quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_LEFT)
 					laraItem->Animation.TargetState = QBIKE_STATE_TURN_LEFT;
@@ -788,7 +788,7 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case QBIKE_STATE_TURN_LEFT:
-				if ((quadBike->Velocity / 256) == 0)
+				if ((quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_RIGHT)
 				{
@@ -803,7 +803,7 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			case QBIKE_STATE_TURN_RIGHT:
-				if ((quadBike->Velocity / 256) == 0)
+				if ((quadBike->Velocity / VEHICLE_VELOCITY_SCALE) == 0)
 					laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
 				else if (TrInput & VEHICLE_IN_LEFT)
 				{
@@ -1007,7 +1007,7 @@ namespace TEN::Entities::Vehicles
 					quadBike->Revs = 0;
 			}
 
-			quadBikeItem->Animation.Velocity = quadBike->Velocity / 256;
+			quadBikeItem->Animation.Velocity = quadBike->Velocity / VEHICLE_VELOCITY_SCALE;
 
 			if (quadBike->EngineRevs > 0x7000)
 				quadBike->EngineRevs = -0x2000;

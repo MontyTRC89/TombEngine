@@ -39,6 +39,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_VELOCITY_ACCEL = 5;
 	constexpr auto RBOAT_VELOCITY_DECEL = 1;
 	constexpr auto RBOAT_VELOCITY_BRAKE_DECEL = 5;
+	constexpr auto RBOAT_REVERSE_VELOCITY_DECEL = 2;
 
 	constexpr auto RBOAT_VELOCITY_MIN = 20;
 	constexpr auto RBOAT_SLOW_VELOCITY_MAX = 37;
@@ -48,6 +49,7 @@ namespace TEN::Entities::Vehicles
 
 	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
+	#define RBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
 
 	enum RubberBoatState
 	{
@@ -508,12 +510,12 @@ namespace TEN::Entities::Vehicles
 					(TrInput & VEHICLE_IN_RIGHT && TrInput & VEHICLE_IN_REVERSE))
 				{
 					if (rBoat->TurnRate > 0)
-						rBoat->TurnRate -= ANGLE(0.25f);
+						rBoat->TurnRate -= RBOAT_TURN_RATE_DECEL;
 					else
 					{
-						rBoat->TurnRate -= ANGLE(0.25f) / 2;
-						if (rBoat->TurnRate < -ANGLE(4.0f))
-							rBoat->TurnRate = -ANGLE(4.0f);
+						rBoat->TurnRate -= RBOAT_TURN_RATE_ACCEL;
+						if (rBoat->TurnRate < -RBOAT_TURN_RATE_MAX)
+							rBoat->TurnRate = -RBOAT_TURN_RATE_MAX;
 					}
 
 					noTurn = false;
@@ -522,12 +524,12 @@ namespace TEN::Entities::Vehicles
 					(TrInput & VEHICLE_IN_LEFT && TrInput & VEHICLE_IN_REVERSE))
 				{
 					if (rBoat->TurnRate < 0)
-						rBoat->TurnRate += ANGLE(0.25f);
+						rBoat->TurnRate += RBOAT_TURN_RATE_DECEL;
 					else
 					{
-						rBoat->TurnRate += ANGLE(0.25f) / 2;
-						if (rBoat->TurnRate > ANGLE(4.0f))
-							rBoat->TurnRate = ANGLE(4.0f);
+						rBoat->TurnRate += RBOAT_TURN_RATE_ACCEL;
+						if (rBoat->TurnRate > RBOAT_TURN_RATE_MAX)
+							rBoat->TurnRate = RBOAT_TURN_RATE_MAX;
 					}
 
 					noTurn = false;
@@ -536,33 +538,33 @@ namespace TEN::Entities::Vehicles
 				if (TrInput & VEHICLE_IN_REVERSE)
 				{
 					if (rBoatItem->Animation.Velocity > 0)
-						rBoatItem->Animation.Velocity -= 5;
-					else if (rBoatItem->Animation.Velocity > -20)
-						rBoatItem->Animation.Velocity += -2;
+						rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_BRAKE_DECEL;
+					else if (rBoatItem->Animation.Velocity > RBOAT_REVERSE_VELOCITY_MAX)
+						rBoatItem->Animation.Velocity -= RBOAT_REVERSE_VELOCITY_DECEL;
 				}
 				else if (TrInput & VEHICLE_IN_ACCELERATE)
 				{
 					int maxVelocity;
 					if (TrInput & VEHICLE_IN_SPEED)
-						maxVelocity = 185;
+						maxVelocity = RBOAT_FAST_VELOCITY_MAX;
 					else
-						maxVelocity = (TrInput & VEHICLE_IN_SLOW) ? 37 : 110;
+						maxVelocity = (TrInput & VEHICLE_IN_SLOW) ? RBOAT_SLOW_VELOCITY_MAX : RBOAT_NORMAL_VELOCITY_MAX;
 
 					if (rBoatItem->Animation.Velocity < maxVelocity)
-						rBoatItem->Animation.Velocity += 3 + (5 * rBoatItem->Animation.Velocity) / (maxVelocity * 2);
-					else if (rBoatItem->Animation.Velocity > (maxVelocity + 1))
-						rBoatItem->Animation.Velocity -= 1;
+						rBoatItem->Animation.Velocity += (RBOAT_VELOCITY_ACCEL / 2 + 1) + (RBOAT_VELOCITY_ACCEL * rBoatItem->Animation.Velocity) / (maxVelocity * 2);
+					else if (rBoatItem->Animation.Velocity > (maxVelocity + RBOAT_VELOCITY_DECEL))
+						rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
 
 				}
 				else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
 					rBoatItem->Animation.Velocity >= 0 &&
-					rBoatItem->Animation.Velocity < 20)
+					rBoatItem->Animation.Velocity < RBOAT_VELOCITY_MIN)
 				{
 					if (!(TrInput & VEHICLE_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
-						rBoatItem->Animation.Velocity = 20;
+						rBoatItem->Animation.Velocity = RBOAT_VELOCITY_MIN;
 				}
-				else if (rBoatItem->Animation.Velocity > 1)
-					rBoatItem->Animation.Velocity -= 1;
+				else if (rBoatItem->Animation.Velocity > RBOAT_VELOCITY_DECEL)
+					rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
 				else
 					rBoatItem->Animation.Velocity = 0;
 			}
@@ -570,13 +572,13 @@ namespace TEN::Entities::Vehicles
 			{
 				if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
 					rBoatItem->Animation.Velocity >= 0 &&
-					rBoatItem->Animation.Velocity < 20)
+					rBoatItem->Animation.Velocity < RBOAT_VELOCITY_MIN)
 				{
 					if (!(TrInput & VEHICLE_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
-						rBoatItem->Animation.Velocity = 20;
+						rBoatItem->Animation.Velocity = RBOAT_VELOCITY_MIN;
 				}
-				else if (rBoatItem->Animation.Velocity > 1)
-					rBoatItem->Animation.Velocity -= 1;
+				else if (rBoatItem->Animation.Velocity > RBOAT_VELOCITY_DECEL)
+					rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
 				else
 					rBoatItem->Animation.Velocity = 0;
 

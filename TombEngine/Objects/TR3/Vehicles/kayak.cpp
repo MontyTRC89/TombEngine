@@ -44,20 +44,20 @@ namespace TEN::Entities::Vehicles
 	constexpr auto DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 
-	constexpr int MAX_VELOCITY = 56 * 256;
-	constexpr int KAYAK_FRICTION = 0.5f * 256;
-	constexpr int KAYAK_ROTATE_FRICTION = 5 * 256;
-	constexpr int KAYAK_DEFLECT_ROTATION = 8 * 256;
-	constexpr int KAYAK_FORWARD_VELOCITY = 24 * 256;
-	constexpr int KAYAK_FORWARD_ROTATION = 128 * 256;
-	constexpr int KAYAK_LEFT_RIGHT_VELOCITY = 16 * 256;
-	constexpr int KAYAK_LEFT_RIGHT_ROTATION = 192 * 256;
-	constexpr int KAYAK_MAX_LEFT_RIGHT = 192 * 256;
-	constexpr int KAYAK_TURN_ROTATION = 32 * 256;
-	constexpr int KAYAK_MAX_TURN = 256 * 256;
-	constexpr int KAYAK_TURN_BRAKE = 0.5f * 256;
-	constexpr int KAYAK_HARD_ROTATION = 256 * 256;
-	constexpr int KAYAK_MAX_STAT = 256 * 256;
+	constexpr int MAX_VELOCITY = 56 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_FRICTION = 0.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_ROTATE_FRICTION = 5 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_DEFLECT_ROTATION = 8 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_FORWARD_VELOCITY = 24 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_FORWARD_ROTATION = 128 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_LEFT_RIGHT_VELOCITY = 16 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_LEFT_RIGHT_ROTATION = 192 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_MAX_LEFT_RIGHT = 192 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_TURN_ROTATION = 32 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_MAX_TURN = 256 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_TURN_BRAKE = 0.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_HARD_ROTATION = 256 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_MAX_STAT = 256 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr auto HIT_BACK = 1;
 	constexpr auto HIT_FRONT = 2;
@@ -75,7 +75,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_X = 128;
 	constexpr auto KAYAK_Z = 128;
 	constexpr auto KAYAK_MAX_KICK = -80;
-	constexpr auto KAYAK_MIN_BOUNCE = (MAX_VELOCITY / 2) / 256;
+	constexpr auto KAYAK_MIN_BOUNCE = (MAX_VELOCITY / 2) / VEHICLE_VELOCITY_SCALE;
 
 	// TODO: ??
 	constexpr auto KAYAK_IN_FORWARD = IN_FORWARD;
@@ -583,7 +583,7 @@ namespace TEN::Entities::Vehicles
 		int leftHeight  = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X,  false, &leftPos);
 		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, &rightPos);
 
-		kayakItem->Pose.Orientation.y += kayak->TurnRate / 256;
+		kayakItem->Pose.Orientation.y += kayak->TurnRate / VEHICLE_VELOCITY_SCALE;
 		kayakItem->Pose.Position.x += kayakItem->Animation.Velocity * phd_sin(kayakItem->Pose.Orientation.y);
 		kayakItem->Pose.Position.z += kayakItem->Animation.Velocity * phd_cos(kayakItem->Pose.Orientation.y);
 
@@ -678,7 +678,7 @@ namespace TEN::Entities::Vehicles
 			int newVelocity;
 
 			newVelocity = (kayakItem->Pose.Position.z - oldPos[8].z) * phd_cos(kayakItem->Pose.Orientation.y) + (kayakItem->Pose.Position.x - oldPos[8].x) * phd_sin(kayakItem->Pose.Orientation.y);
-			newVelocity *= 256;
+			newVelocity *= VEHICLE_VELOCITY_SCALE;
 
 			if (slip)
 			{
@@ -1083,7 +1083,7 @@ namespace TEN::Entities::Vehicles
 		else if (kayak->Velocity < -MAX_VELOCITY)
 			kayak->Velocity = -MAX_VELOCITY;
 
-		kayakItem->Animation.Velocity = kayak->Velocity / 256;
+		kayakItem->Animation.Velocity = kayak->Velocity / VEHICLE_VELOCITY_SCALE;
 		
 		if (kayak->TurnRate >= 0)
 		{

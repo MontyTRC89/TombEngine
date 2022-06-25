@@ -10,6 +10,8 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
+	constexpr int VEHICLE_VELOCITY_SCALE = 256; // TODO: Deal with this nonsense *immediately* post-beta. @Sezz 2022.06.25
+
 	constexpr auto VEHICLE_SINK_SPEED = 15;
 	constexpr auto VEHICLE_MAX_WATER_HEIGHT = CLICK(2.5f);
 	constexpr auto VEHICLE_WATER_VEL_COEFFICIENT = 16.0f;
