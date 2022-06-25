@@ -225,7 +225,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Process command line arguments
 	bool setup = false;
 	std::string levelFile = {};
-	int levelHash = 0;
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -246,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 			levelFile = converter.to_bytes(std::wstring(argv[i + 1])); 
 			std::transform(levelFile.begin(), levelFile.end(), levelFile.begin(), [](unsigned char c) { return std::tolower(c); });
-			levelHash = std::stoi(std::wstring(argv[i + 2]));
+			SystemNameHash = std::stoul(std::wstring(argv[i + 2]));
 		}
 	}
 	LocalFree(argv);
@@ -369,21 +368,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	InitialiseInput(App.WindowHandle);
 
 	// Load level if specified in command line
-	CurrentLevel = -1;
-	if (!levelFile.empty() && levelHash != 0)
-	{
-		for (int i = 0; i < g_GameFlow->GetNumLevels(); i++)
-		{
-			auto level = g_GameFlow->GetLevel(i)->FileName;
-			std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
-
-			if (level == levelFile && std::filesystem::exists(level))
-			{
-				CurrentLevel = i;
-				break;
-			}
-		}
-	}
+	CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
 	
 	App.bNoFocus = false;
 	App.isInScene = false;
