@@ -44,24 +44,24 @@ namespace TEN::Entities::Vehicles
 	constexpr auto DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 
-	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_VELOCITY_FRICTION = 0.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_FORWARD_ACCEL = 24 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_HOLD_TURN_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 
-	constexpr int KAYAK_FORWARD_VELOCITY = 24 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_LEFT_RIGHT_VELOCITY = 16 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_TURN_BRAKE = 0.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
 
 	// TODO
-	#define KAYAK_TURN_RATE_FRICTION ANGLE(0.03f)
+	#define KAYAK_TURN_RATE_FRICTION_DECEL ANGLE(0.03f)
 	#define KAYAK_TURN_RATE_DEFLECT ANGLE(0.05f)
 
-	#define KAYAK_TURN_RATE_FORWARD ANGLE(0.7f)
+	#define KAYAK_TURN_RATE_FORWARD_ACCEL ANGLE(0.7f)
 	#define KAYAK_TURN_RATE_LR_ACCEL ANGLE(1.0f)
 	#define KAYAK_TURN_RATE_LR_MAX ANGLE(1.0f)
 	#define KAYAK_TURN_ROTATION ANGLE(0.18f)
-	#define KAYAK_HARD_ROTATION ANGLE(1.4f)
+	#define KAYAK_TURN_RATE_HOLD_ACCEL ANGLE(1.4f)
 	#define KAYAK_TURN_RATE_MAX ANGLE(1.4f)
-	#define KAYAK_MAX_STAT ANGLE(1.4f)
+	#define KAYAK_TURN_RATE_HOLD_MAX ANGLE(1.4f)
 
 	constexpr auto HIT_BACK = 1;
 	constexpr auto HIT_FRONT = 2;
@@ -815,17 +815,17 @@ namespace TEN::Entities::Vehicles
 			{
 				if (kayak->Forward)
 				{
-					kayak->TurnRate -= KAYAK_TURN_RATE_FORWARD;
+					kayak->TurnRate -= KAYAK_TURN_RATE_FORWARD_ACCEL;
 					if (kayak->TurnRate < -KAYAK_TURN_RATE_MAX)
 						kayak->TurnRate = -KAYAK_TURN_RATE_MAX;
 
-					kayak->Velocity += KAYAK_FORWARD_VELOCITY;
+					kayak->Velocity += KAYAK_VELOCITY_FORWARD_ACCEL;
 				}
 				else if (kayak->Turn)
 				{
-					kayak->TurnRate -= KAYAK_HARD_ROTATION;
-					if (kayak->TurnRate < -KAYAK_MAX_STAT)
-						kayak->TurnRate = -KAYAK_MAX_STAT;
+					kayak->TurnRate -= KAYAK_TURN_RATE_HOLD_ACCEL;
+					if (kayak->TurnRate < -KAYAK_TURN_RATE_HOLD_MAX)
+						kayak->TurnRate = -KAYAK_TURN_RATE_HOLD_MAX;
 				}
 				else
 				{
@@ -833,7 +833,7 @@ namespace TEN::Entities::Vehicles
 					if (kayak->TurnRate < -KAYAK_TURN_RATE_LR_MAX)
 						kayak->TurnRate = -KAYAK_TURN_RATE_LR_MAX;
 
-					kayak->Velocity += KAYAK_LEFT_RIGHT_VELOCITY;
+					kayak->Velocity += KAYAK_VELOCITY_LR_ACCEL;
 				}
 			}
 
@@ -875,17 +875,17 @@ namespace TEN::Entities::Vehicles
 			{
 				if (kayak->Forward)
 				{
-					kayak->TurnRate += KAYAK_TURN_RATE_FORWARD;
+					kayak->TurnRate += KAYAK_TURN_RATE_FORWARD_ACCEL;
 					if (kayak->TurnRate > KAYAK_TURN_RATE_MAX)
 						kayak->TurnRate = KAYAK_TURN_RATE_MAX;
 
-					kayak->Velocity += KAYAK_FORWARD_VELOCITY;
+					kayak->Velocity += KAYAK_VELOCITY_FORWARD_ACCEL;
 				}
 				else if (kayak->Turn)
 				{
-					kayak->TurnRate += KAYAK_HARD_ROTATION;
-					if (kayak->TurnRate > KAYAK_MAX_STAT)
-						kayak->TurnRate = KAYAK_MAX_STAT;
+					kayak->TurnRate += KAYAK_TURN_RATE_HOLD_ACCEL;
+					if (kayak->TurnRate > KAYAK_TURN_RATE_HOLD_MAX)
+						kayak->TurnRate = KAYAK_TURN_RATE_HOLD_MAX;
 				}
 				else
 				{
@@ -893,7 +893,7 @@ namespace TEN::Entities::Vehicles
 					if (kayak->TurnRate > KAYAK_TURN_RATE_LR_MAX)
 						kayak->TurnRate = KAYAK_TURN_RATE_LR_MAX;
 
-					kayak->Velocity += KAYAK_LEFT_RIGHT_VELOCITY;
+					kayak->Velocity += KAYAK_VELOCITY_LR_ACCEL;
 				}
 			}
 
@@ -910,14 +910,14 @@ namespace TEN::Entities::Vehicles
 			{
 				if (frame == 8)
 				{
-					kayak->TurnRate += KAYAK_TURN_RATE_FORWARD;
-					kayak->Velocity -= KAYAK_FORWARD_VELOCITY;
+					kayak->TurnRate += KAYAK_TURN_RATE_FORWARD_ACCEL;
+					kayak->Velocity -= KAYAK_VELOCITY_FORWARD_ACCEL;
 				}
 
 				if (frame == 31)
 				{
-					kayak->TurnRate -= KAYAK_TURN_RATE_FORWARD;
-					kayak->Velocity -= KAYAK_FORWARD_VELOCITY;
+					kayak->TurnRate -= KAYAK_TURN_RATE_FORWARD_ACCEL;
+					kayak->Velocity -= KAYAK_VELOCITY_FORWARD_ACCEL;
 				}
 
 				if (frame < 15 && frame & 1)
@@ -945,7 +945,7 @@ namespace TEN::Entities::Vehicles
 					if (kayak->TurnRate < -KAYAK_TURN_RATE_MAX)
 						kayak->TurnRate = -KAYAK_TURN_RATE_MAX;
 
-					kayak->Velocity += -KAYAK_TURN_BRAKE;
+					kayak->Velocity += -KAYAK_VELOCITY_HOLD_TURN_DECEL;
 					if (kayak->Velocity < 0)
 						kayak->Velocity = 0;
 				}
@@ -954,7 +954,7 @@ namespace TEN::Entities::Vehicles
 				{
 					kayak->TurnRate += KAYAK_TURN_ROTATION;
 
-					kayak->Velocity += KAYAK_TURN_BRAKE;
+					kayak->Velocity += KAYAK_VELOCITY_HOLD_TURN_DECEL;
 					if (kayak->Velocity > 0)
 						kayak->Velocity = 0;
 				}
@@ -981,7 +981,7 @@ namespace TEN::Entities::Vehicles
 					if (kayak->TurnRate > KAYAK_TURN_RATE_MAX)
 						kayak->TurnRate = KAYAK_TURN_RATE_MAX;
 
-					kayak->Velocity += -KAYAK_TURN_BRAKE;
+					kayak->Velocity += -KAYAK_VELOCITY_HOLD_TURN_DECEL;
 					if (kayak->Velocity < 0)
 						kayak->Velocity = 0;
 				}
@@ -990,7 +990,7 @@ namespace TEN::Entities::Vehicles
 				{
 					kayak->TurnRate -= KAYAK_TURN_ROTATION;
 
-					kayak->Velocity += KAYAK_TURN_BRAKE;
+					kayak->Velocity += KAYAK_VELOCITY_HOLD_TURN_DECEL;
 					if (kayak->Velocity > 0)
 						kayak->Velocity = 0;
 				}
@@ -1071,13 +1071,13 @@ namespace TEN::Entities::Vehicles
 
 		if (kayak->Velocity > 0)
 		{
-			kayak->Velocity -= KAYAK_VELOCITY_FRICTION;
+			kayak->Velocity -= KAYAK_VELOCITY_FRICTION_DECEL;
 			if (kayak->Velocity < 0)
 				kayak->Velocity = 0;
 		}
 		else if (kayak->Velocity < 0)
 		{
-			kayak->Velocity += KAYAK_VELOCITY_FRICTION;
+			kayak->Velocity += KAYAK_VELOCITY_FRICTION_DECEL;
 			if (kayak->Velocity > 0)
 				kayak->Velocity = 0;
 		}
@@ -1091,13 +1091,13 @@ namespace TEN::Entities::Vehicles
 		
 		if (kayak->TurnRate >= 0)
 		{
-			kayak->TurnRate -= KAYAK_TURN_RATE_FRICTION;
+			kayak->TurnRate -= KAYAK_TURN_RATE_FRICTION_DECEL;
 			if (kayak->TurnRate < 0)
 				kayak->TurnRate = 0;
 		}
 		else if (kayak->TurnRate < 0)
 		{
-			kayak->TurnRate += KAYAK_TURN_RATE_FRICTION;
+			kayak->TurnRate += KAYAK_TURN_RATE_FRICTION_DECEL;
 			if (kayak->TurnRate > 0)
 				kayak->TurnRate = 0;
 		}

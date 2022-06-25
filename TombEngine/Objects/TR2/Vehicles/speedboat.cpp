@@ -55,7 +55,7 @@ namespace TEN::Entities::Vehicles
 
 	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
-	#define SPEEDBOAT_TURN_RATE_MAX ANGLE(4.0f)
+	#define SPEEDBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
 
 	enum SpeedboatState
 	{
