@@ -35,17 +35,21 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_ENTITY_RADIUS = CLICK(1);
 	constexpr auto MINECART_HEIGHT = CLICK(2);
 	constexpr auto MINECART_GRAVITY = SECTOR(1) + 1;
+	constexpr auto MINECART_STEP_HEIGHT = CLICK(1);
 	constexpr auto MINECART_MOUNT_DISTANCE_MIN = CLICK(2);
 	constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
 	constexpr auto MINECART_NUM_HITS = 25;
 
 	constexpr auto MINECART_VELOCITY_DECEL = 6 * VEHICLE_VELOCITY_SCALE;
+
 	constexpr auto MINECART_SPEED_MIN = 10 * VEHICLE_VELOCITY_SCALE; // TODO: These two have confusing names. @Sezz
 	constexpr auto MINECART_VELOCITY_MIN = 32;
-	constexpr auto MINECART_TURN_DEATH_VELOCITY = 128;
-	constexpr auto MINECART_TURN_FRICTION_VELOCITY = 70;
-	constexpr auto MINECART_JUMP_VELOCITY = 63 * 1024;
+	constexpr auto MINECART_FRICTION_VELOCITY_MIN = 70;
+	constexpr auto MINECART_STOP_VELOCITY_MAX = 240;
 	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * VEHICLE_VELOCITY_SCALE;
+
+	constexpr auto MINECART_JUMP_VERTICAL_VELOCITY = 252 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MINECART_TURN_DEATH_VELOCITY = 128;
 
 	constexpr auto MINECART_FORWARD_GRADIENT = -CLICK(0.5f);
 	constexpr auto MINECART_BACK_GRADIENT = CLICK(0.5f);
@@ -164,7 +168,7 @@ namespace TEN::Entities::Vehicles
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			auto pos = Vector3Int{};
+			auto pos = Vector3Int();
 			GetJointAbsPosition(item, &pos, Wheels[(left ? 0 : 2) + i]);
 			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber), item->Pose.Orientation, 512, 10);
 			
@@ -332,7 +336,7 @@ namespace TEN::Entities::Vehicles
 		if ((flags.MinecartStop() && !minecart->StopDelay) &&
 			((minecartItem->Pose.Position.x & 0x380) == 512 || (minecartItem->Pose.Position.z & 0x380) == 512))
 		{
-			if (minecart->Velocity < 0xf000)
+			if (minecart->Velocity < MINECART_STOP_VELOCITY_MAX)
 			{
 				minecartItem->Animation.Velocity = 0;
 				minecart->Velocity = 0;
@@ -499,7 +503,7 @@ namespace TEN::Entities::Vehicles
 				minecartItem->Pose.Position.x = minecart->TurnX + x * 3584;
 				minecartItem->Pose.Position.z = minecart->TurnZ + z * 3584;
 
-				if (minecartItem->Animation.Velocity > MINECART_TURN_FRICTION_VELOCITY)
+				if (minecartItem->Animation.Velocity > MINECART_FRICTION_VELOCITY_MIN)
 				{
 					SoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE, &minecartItem->Pose, SoundEnvironment::Always);
 					TriggerWheelSparkles(minecartItem, (minecart->Flags & MINECART_FLAG_TURNING_RIGHT) != 0);
@@ -691,7 +695,7 @@ namespace TEN::Entities::Vehicles
 				minecart->Velocity -= MINECART_VELOCITY_DECEL;
 				SoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE, &laraItem->Pose, SoundEnvironment::Always);
 
-				if (minecartItem->Animation.Velocity > MINECART_TURN_FRICTION_VELOCITY)
+				if (minecartItem->Animation.Velocity > MINECART_FRICTION_VELOCITY_MIN)
 				{
 					TriggerWheelSparkles(minecartItem, false);
 					TriggerWheelSparkles(minecartItem, true);
@@ -781,8 +785,7 @@ namespace TEN::Entities::Vehicles
 			Camera.targetDistance = SECTOR(2);
 
 			floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.y, CLICK(2));
-			if (floorHeight > -CLICK(1) &&
-				floorHeight < CLICK(1))
+			if (abs(floorHeight) < MINECART_STEP_HEIGHT)
 			{
 				if (Wibble & 7 == 0)
 					SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
@@ -890,7 +893,7 @@ namespace TEN::Entities::Vehicles
 			}
 
 			if (floorHeight > CLICK(2.25f) && !minecart->VerticalVelocity)
-				minecart->VerticalVelocity = MINECART_JUMP_VELOCITY;
+				minecart->VerticalVelocity = MINECART_JUMP_VERTICAL_VELOCITY;
 
 			MinecartToEntityCollision(laraItem, minecartItem);
 		}

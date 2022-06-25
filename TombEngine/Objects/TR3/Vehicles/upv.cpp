@@ -66,20 +66,20 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_MOUNT_UNDERWATER_CONTROL_FRAME = 42;
 	constexpr auto UPV_DISMOUNT_UNDERWATER_FRAME = 42;
 
-	#define UPV_X_TURN_RATE_DIVE_ACCEL ANGLE(5.0f)
-	#define UPV_X_TURN_RATE_SLOW_ACCEL ANGLE(1.0f)
-	#define UPV_X_TURN_RATE_ACCEL	   ANGLE(2.0f)
-	#define UPV_X_TURN_RATE_FRICTION   ANGLE(1.0f)
-	#define UPV_X_TURN_RATE_MAX		   ANGLE(2.0f)
+	#define UPV_X_TURN_RATE_DIVE_ACCEL	   ANGLE(5.0f)
+	#define UPV_X_TURN_RATE_SLOW_ACCEL	   ANGLE(1.0f)
+	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(2.0f)
+	#define UPV_X_TURN_RATE_FRICTION_DECEL ANGLE(1.0f)
+	#define UPV_X_TURN_RATE_MAX			   ANGLE(2.0f)
 
 	#define UPV_X_DIVE_ORIENT_MAX	   ANGLE(15.0f)
 	#define UPV_X_ORIENT_MAX		   ANGLE(85.0f)
 	#define UPV_X_ORIENT_WATER_SURFACE ANGLE(30.0f)
 
-	#define UPV_Y_TURN_RATE_SLOW_ACCEL ANGLE(0.2f)
-	#define UPV_Y_TURN_RATE_ACCEL	   ANGLE(0.35f)
-	#define UPV_Y_TURN_RATE_FRICTION   ANGLE(0.08f)
-	#define UPV_Y_TURN_RATE_MAX		   ANGLE(2.5f)
+	#define UPV_Y_TURN_RATE_SLOW_ACCEL	   ANGLE(0.2f)
+	#define UPV_Y_TURN_RATE_ACCEL		   ANGLE(0.35f)
+	#define UPV_Y_TURN_RATE_FRICTION_DECEL ANGLE(0.08f)
+	#define UPV_Y_TURN_RATE_MAX			   ANGLE(2.5f)
 
 	#define UPV_DEFLECT_ANGLE		 ANGLE(45.0f)
 	#define UPV_DEFLCT_TURN_RATE_MAX ANGLE(2.0f)
@@ -820,26 +820,26 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->TurnRate.y > 0)
 		{
-			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION;
+			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION_DECEL;
 			if (UPV->TurnRate.y < 0)
 				UPV->TurnRate.y = 0;
 		}
 		else if (UPV->TurnRate.y < 0)
 		{
-			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION;
+			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION_DECEL;
 			if (UPV->TurnRate.y > 0)
 				UPV->TurnRate.y = 0;
 		}
 
 		if (UPV->TurnRate.x > 0)
 		{
-			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION;
+			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION_DECEL;
 			if (UPV->TurnRate.x < 0)
 				UPV->TurnRate.x = 0;
 		}
 		else if (UPV->TurnRate.x < 0)
 		{
-			UPV->TurnRate.x += UPV_X_TURN_RATE_FRICTION;
+			UPV->TurnRate.x += UPV_X_TURN_RATE_FRICTION_DECEL;
 			if (UPV->TurnRate.x > 0)
 				UPV->TurnRate.x = 0;
 		}
