@@ -803,17 +803,12 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 		}
 	}
 
-	if (!object->undead || grenade ||
-		target->HitPoints == NOT_TARGETABLE)
+	if (!object->undead || grenade || target->HitPoints == NOT_TARGETABLE)
 	{
 		if (target->HitPoints > 0)
 		{
 			Statistics.Level.AmmoHits++;
-
-			if (target->HitPoints >= damage)
-				target->HitPoints -= damage;
-			else
-				target->HitPoints = 0;
+			DoDamage(target, damage);
 		}
 	}
 

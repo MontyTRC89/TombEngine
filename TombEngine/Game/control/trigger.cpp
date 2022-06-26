@@ -760,6 +760,6 @@ void ProcessSectorFlags(ItemInfo* item)
 			}
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
-			item->HitPoints = 0; // TODO: Implement correct behaviour for other objects!
+			DoDamage(item, INT_MAX); // TODO: Implement correct behaviour for other objects!
 	}
 }

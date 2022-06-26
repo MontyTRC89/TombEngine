@@ -51,9 +51,10 @@ void WreckingBallCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
 		{
 			if (test)
-				l->HitPoints = 0;
+				DoDamage(l, INT_MAX);
 			else
-				l->HitPoints -= damage;
+				DoDamage(l, damage);
+
 			x -= l->Pose.Position.x;
 			y -= l->Pose.Position.y;
 			z -= l->Pose.Position.z;
