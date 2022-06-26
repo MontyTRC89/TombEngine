@@ -684,7 +684,7 @@ namespace TEN::Entities::Vehicles
 			else
 				verticalVelocity += GRAVITY;
 		}
-		// IsAirborne.
+		// Airborne.
 		else
 		{
 			int kick = (height - *y) * 4;
@@ -851,8 +851,7 @@ namespace TEN::Entities::Vehicles
 		else
 			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
 
-		skidooItem->Pose.Position.z += skidooItem->Animation.Velocity * phd_cos(skidoo->MomentumAngle);
-		skidooItem->Pose.Position.x += skidooItem->Animation.Velocity * phd_sin(skidoo->MomentumAngle);
+		TranslateItem(skidooItem, skidoo->MomentumAngle, skidooItem->Animation.Velocity);
 
 		int slip = SKIDOO_SLIP * phd_sin(skidooItem->Pose.Orientation.x);
 		if (abs(slip) > (SKIDOO_SLIP / 2))

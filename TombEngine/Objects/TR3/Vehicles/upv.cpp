@@ -572,7 +572,6 @@ namespace TEN::Entities::Vehicles
 
 				UPV->Velocity += UPV_VELOCITY_ACCEL;
 			}
-
 			else
 				laraItem->Animation.TargetState = UPV_STATE_IDLE;
 
