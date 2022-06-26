@@ -60,6 +60,7 @@ extern bool ThreadEnded;
 extern int RequiredStartPos;
 extern int CurrentLevel;
 extern int LevelComplete;
+extern int SystemNameHash;
 
 extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;

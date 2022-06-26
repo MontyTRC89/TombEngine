@@ -664,13 +664,12 @@ namespace TEN::Entities::TR4
 						abs(item->Pose.Position.y - enemy->Pose.Position.y) < CLICK(2) &&
 						abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
 					{
-						enemy->HitPoints -= 40;
+						DoDamage(enemy, 40);
+						CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
+						creature->Flags = 1;
+
 						if (enemy->HitPoints <= 0)
 							item->AIBits = FOLLOW;
-
-						enemy->HitStatus = true;
-						creature->Flags = 1;
-						CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
 					}
 				}
 			}
@@ -733,13 +732,12 @@ namespace TEN::Entities::TR4
 							abs(item->Pose.Position.y - enemy->Pose.Position.y) < CLICK(2) &&
 							abs(item->Pose.Position.z - enemy->Pose.Position.z) < CLICK(2))
 						{
-							enemy->HitPoints -= 20;
+							DoDamage(enemy, 20);
+							CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
+							creature->Flags = 1;
+
 							if (enemy->HitPoints <= 0)
 								item->AIBits = FOLLOW;
-
-							enemy->HitStatus = true;
-							creature->Flags = 1;
-							CreatureEffect2(item, &VonCroyBite, 2, -1, DoBloodSplat);
 						}
 					}
 				}

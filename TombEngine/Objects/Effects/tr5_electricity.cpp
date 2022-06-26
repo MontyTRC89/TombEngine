@@ -239,9 +239,9 @@ void ElectricityWiresControl(short itemNumber)
 				}
 
 				if (instantKill)
-					collItem->HitPoints = 0;
+					DoDamage(collItem, INT_MAX);
 				else
-					collItem->HitPoints -= 8;
+					DoDamage(collItem, 8);
 
 				for (int j = 0; j < collObj->nmeshes; j++)
 				{

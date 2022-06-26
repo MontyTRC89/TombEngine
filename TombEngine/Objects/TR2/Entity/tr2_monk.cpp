@@ -198,9 +198,7 @@ void MonkControl(short itemNumber)
 					creature->Flags |= 0x1000;
 					SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
 					CreatureEffect(item, &MonkBite, DoBloodSplat);
-
-					enemy->HitPoints -= 150;
-					enemy->HitStatus = true;
+					DoDamage(enemy, 150);
 				}
 			}
 			else
@@ -213,9 +211,7 @@ void MonkControl(short itemNumber)
 					{
 						creature->Flags |= 0x1000;
 						SoundEffect(SFX_TR2_CRUNCH1, &item->Pose);
-
-						enemy->HitPoints -= 5;
-						enemy->HitStatus = true;
+						DoDamage(enemy, 5);
 					}
 				}
 			}

@@ -605,12 +605,10 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (item->TouchBits & 0xC000)
 					{
+						DoDamage(creature->Enemy, 200);
 						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 200;
-						LaraItem->HitStatus = true;
 					}
 				}
 
@@ -847,8 +845,7 @@ void RomanStatueControl(short itemNumber)
 				item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 74 &&
 				item->TouchBits)
 			{
-				LaraItem->HitPoints -= 40;
-				LaraItem->HitStatus = true;
+				DoDamage(creature->Enemy, 40);
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{

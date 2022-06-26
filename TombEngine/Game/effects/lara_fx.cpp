@@ -35,26 +35,18 @@ namespace TEN::Effects::Lara
 
 	void LavaBurn(ItemInfo* item)
 	{
-		if (!item->IsLara())
+		if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
 			return;
 
-		auto* lara = GetLaraInfo(item);
+		if (item->HitPoints < 0)
+			return;
 
-		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+		auto height = GetCollision(item->Pose.Position.x, 32000, item->Pose.Position.z, item->RoomNumber).Position.Floor;
+		if (item->Floor == height)
 		{
-			short roomNumber = item->RoomNumber;
-			FloorInfo* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
-			if (item->Floor == GetFloorHeight(floor, item->Pose.Position.x, 32000, item->Pose.Position.z))
-			{
-				//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
-				//				KayakLaraRapidsDrown();
-				//			else
-				//			{
-				item->HitPoints = -1;
-				item->HitStatus = true;
-				LaraBurn(item);
-				//			}
-			}
+			item->HitPoints = -1;
+			item->HitStatus = true;
+			LaraBurn(item);
 		}
 	}
 

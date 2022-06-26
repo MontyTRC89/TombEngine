@@ -544,11 +544,7 @@ void TorpedoControl(short itemNumber)
 			TriggerUnderwaterExplosion(item, 1);
 			SoundEffect(SFX_TR5_UNDERWATER_EXPLOSION, &item->Pose, SoundEnvironment::Always);
 			SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_HIT, &LaraItem->Pose, SoundEnvironment::Always);
-			LaraItem->HitPoints -= 200;
-		//	if (Lara.anxiety >= 0x7F)
-		//		Lara.anxiety--;
-		//	else
-		//		Lara.anxiety -= 128;
+			DoDamage(LaraItem, 200);
 		}
 		else
 		{

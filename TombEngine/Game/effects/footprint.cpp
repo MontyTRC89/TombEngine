@@ -9,10 +9,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-namespace TEN {
-namespace Effects {
-namespace Footprints {
-
+namespace TEN::Effects::Footprints
+{
 	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
 	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition) 
@@ -259,6 +257,4 @@ namespace Footprints {
 			footprints.pop_back();
 		}
 	}
-}
-}
 }

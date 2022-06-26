@@ -510,12 +510,11 @@ namespace TEN::Entities::TR4
 				creature->MaxTurn = ANGLE(2.0f);
 
 				if (item->TestBits(JointBitType::Touch, HarpySwoopAttackJoints) ||
-					creature->Enemy && creature->Enemy != LaraItem &&
+					creature->Enemy && !creature->Enemy->IsLara() &&
 					abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 					AI.distance < pow(SECTOR(2), 2))
 				{
-					LaraItem->HitPoints -= HARPY_SWOOP_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, HARPY_SWOOP_ATTACK_DAMAGE);
 
 					if (item->TouchBits & 0x10)
 					{
@@ -544,12 +543,11 @@ namespace TEN::Entities::TR4
 
 				if (creature->Flags == 0 &&
 					(item->TestBits(JointBitType::Touch, HarpyStingerAttackJoints) ||
-						creature->Enemy && creature->Enemy != LaraItem &&
+						creature->Enemy && !creature->Enemy->IsLara() &&
 						abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) <= SECTOR(1) &&
 						AI.distance < pow(SECTOR(2), 2)))
 				{
-					LaraItem->HitPoints -= HARPY_STINGER_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, HARPY_STINGER_ATTACK_DAMAGE);
 
 					CreatureEffect2(
 						item,
