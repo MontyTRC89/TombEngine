@@ -425,11 +425,11 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 	int x = creature->Target.x - item->Pose.Position.x;
 	int z = creature->Target.z - item->Pose.Position.z;
 	angle = phd_atan(z, x) - item->Pose.Orientation.y;
-	int range = item->Animation.Velocity * (16384 / maxTurn);
+	int range = (item->Animation.Velocity * 16384) / maxTurn;
 	int distance = pow(x, 2) + pow(z, 2);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
-		maxTurn >>= 1;
+		maxTurn /= 2;
 
 	if (angle > maxTurn)
 		angle = maxTurn;
@@ -526,7 +526,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
 		if (!Objects[item->ObjectNumber].nonLot)
-			nextHeight = LOT->Node[floor->Box].exitBox;
+			nextBox = LOT->Node[floor->Box].exitBox;
 		else
 		{
 			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -929,8 +929,8 @@ void TargetBox(LOTInfo* LOT, int boxNumber)
 	boxNumber &= NO_BOX;
 	auto* box = &g_Level.Boxes[boxNumber];
 
-	LOT->Target.x = ((box->top * SECTOR(1)) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + SECTOR(0.5f);
-	LOT->Target.z = ((box->left * SECTOR(1)) + GetRandomControl() * ((box->right - box->left) - 1) >> 5) + SECTOR(0.5f);
+	LOT->Target.x = (box->top  * SECTOR(1)) + GetRandomControl() * (((box->bottom - box->top) - 1) >> 5) + SECTOR(0.5f);
+	LOT->Target.z = (box->left * SECTOR(1)) + GetRandomControl() * (((box->right - box->left) - 1) >> 5) + SECTOR(0.5f);
 	LOT->RequiredBox = boxNumber;
 
 	if (LOT->Fly == NO_FLYING)
@@ -1112,8 +1112,8 @@ int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 
 	auto* box = &g_Level.Boxes[boxNumber];
 
-	int xRange = STALK_DIST + ((box->bottom - box->top + 3) * SECTOR(1));
-	int zRange = STALK_DIST + ((box->right - box->left + 3) * SECTOR(1));
+	int xRange = STALK_DIST + ((box->bottom - box->top) * SECTOR(1));
+	int zRange = STALK_DIST + ((box->right - box->left) * SECTOR(1));
 	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
 	int z = (box->left + box->right) * SECTOR(1) / 2 - enemy->Pose.Position.z;
 	
@@ -1525,8 +1525,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 		{
 		case MoodType::Bored:
 			boxNumber = LOT->Node[GetRandomControl() * LOT->ZoneCount >> 15].boxNumber;
-			if (ValidBox(item, AI->zoneNumber, boxNumber) &&
-				!(GetRandomControl() & 0x0F))
+			if (ValidBox(item, AI->zoneNumber, boxNumber))
 			{
 				if (StalkBox(item, enemy, boxNumber) && enemy->HitPoints > 0 && creature->Enemy)
 				{
@@ -1553,7 +1552,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 
 		case MoodType::Escape:
 			boxNumber = LOT->Node[GetRandomControl() * LOT->ZoneCount >> 15].boxNumber;
-			if (ValidBox(item, AI->zoneNumber, boxNumber) && LOT->RequiredBox == NO_BOX)
+			if (ValidBox(item, AI->zoneNumber, boxNumber))
 			{
 				if (EscapeBox(item, enemy, boxNumber))
 					TargetBox(LOT, boxNumber);
@@ -1828,7 +1827,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 		{
 			if (item->Pose.Position.z < boxLeft)
 			{
-				if (direction & CLIP_LEFT &&
+				if ((direction & CLIP_LEFT) &&
 					item->Pose.Position.x >= boxTop &&
 					item->Pose.Position.x <= boxBottom)
 				{
@@ -1857,7 +1856,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 			}
 			else if (item->Pose.Position.z > boxRight)
 			{
-				if (direction & CLIP_RIGHT &&
+				if ((direction & CLIP_RIGHT) &&
 					item->Pose.Position.x >= boxTop &&
 					item->Pose.Position.x <= boxBottom)
 				{
@@ -1887,7 +1886,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 
 			if (item->Pose.Position.x < boxTop)
 			{
-				if (direction & CLIP_TOP &&
+				if ((direction & CLIP_TOP) &&
 					item->Pose.Position.z >= boxLeft &&
 					item->Pose.Position.z <= boxRight)
 				{
@@ -1916,7 +1915,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 			}
 			else if (item->Pose.Position.x > boxBottom)
 			{
-				if (direction & CLIP_BOTTOM &&
+				if ((direction & CLIP_BOTTOM) &&
 					item->Pose.Position.z >= boxLeft &&
 					item->Pose.Position.z <= boxRight)
 				{
