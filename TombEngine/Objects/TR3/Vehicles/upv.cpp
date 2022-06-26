@@ -48,16 +48,15 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 
 	constexpr int UPV_VELOCITY_ACCEL = 4 * VEHICLE_VELOCITY_SCALE;
-	constexpr int UPV_VELOCITY_FRICTION = 1.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int UPV_VELOCITY_FRICTION_DECEL = 1.5f * VEHICLE_VELOCITY_SCALE;
 	constexpr int UPV_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr int UPV_HARPOON_RELOAD_TIME = 15;
 	constexpr int UPV_HARPOON_VELOCITY = CLICK(1);
-	constexpr auto UPV_TURBINE_JOINT = 3;
+	constexpr int UPV_TURBINE_JOINT = 3;
+	constexpr int UPV_SHIFT = 128;
 
-	constexpr auto UPV_SHIFT = 128;
-
-	// TODO: These should probably done in the wad. @Sezz 2022.06.24
+	// TODO: These should probably be done in the wad. @Sezz 2022.06.24
 	constexpr auto UPV_DEATH_FRAME_1 = 16;
 	constexpr auto UPV_DEATH_FRAME_2 = 17;
 	constexpr auto UPV_MOUNT_WATER_SURFACE_SOUND_FRAME = 30;
@@ -68,19 +67,17 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_DISMOUNT_UNDERWATER_FRAME = 42;
 
 	#define UPV_X_TURN_RATE_DIVE_ACCEL	   ANGLE(5.0f)
-	#define UPV_X_TURN_RATE_SLOW_ACCEL	   ANGLE(1.0f)
-	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(2.0f)
-	#define UPV_X_TURN_RATE_FRICTION_DECEL ANGLE(1.0f)
-	#define UPV_X_TURN_RATE_MAX			   ANGLE(2.0f)
+	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(0.4f)
+	#define UPV_X_TURN_RATE_FRICTION_DECEL ANGLE(0.1f)
+	#define UPV_X_TURN_RATE_MAX			   ANGLE(3.0f)
 
-	#define UPV_X_DIVE_ORIENT_MAX	   ANGLE(15.0f)
+	#define UPV_X_ORIENT_DIVE_MAX	   ANGLE(15.0f)
 	#define UPV_X_ORIENT_MAX		   ANGLE(85.0f)
 	#define UPV_X_ORIENT_WATER_SURFACE ANGLE(30.0f)
 
-	#define UPV_Y_TURN_RATE_SLOW_ACCEL	   ANGLE(0.2f)
-	#define UPV_Y_TURN_RATE_ACCEL		   ANGLE(0.35f)
-	#define UPV_Y_TURN_RATE_FRICTION_DECEL ANGLE(0.08f)
-	#define UPV_Y_TURN_RATE_MAX			   ANGLE(2.5f)
+	#define UPV_Y_TURN_RATE_ACCEL		   ANGLE(0.4f)
+	#define UPV_Y_TURN_RATE_FRICTION_DECEL ANGLE(0.1f)
+	#define UPV_Y_TURN_RATE_MAX			   ANGLE(3.5f)
 
 	#define UPV_DEFLECT_ANGLE		 ANGLE(45.0f)
 	#define UPV_DEFLCT_TURN_RATE_MAX ANGLE(2.0f)
@@ -568,7 +565,7 @@ namespace TEN::Entities::Vehicles
 			{
 				if (TrInput & VEHICLE_IN_UP &&
 					UPV->Flags & UPV_FLAG_SURFACE &&
-					UPVItem->Pose.Orientation.x > -UPV_X_DIVE_ORIENT_MAX)
+					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX)
 				{
 					UPV->Flags |= UPV_FLAG_DIVE;
 				}
@@ -639,7 +636,7 @@ namespace TEN::Entities::Vehicles
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
 				if (TrInput & VEHICLE_IN_UP &&
-					UPVItem->Pose.Orientation.x > -UPV_X_DIVE_ORIENT_MAX &&
+					UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX &&
 					UPV->Flags & UPV_FLAG_SURFACE)
 				{
 					UPV->Flags |= UPV_FLAG_DIVE;
@@ -774,8 +771,8 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.z = 0;
 
 				SetAnimation(laraItem, LA_UNDERWATER_DEATH, 17);
-				laraItem->Animation.VerticalVelocity = 0;
 				laraItem->Animation.IsAirborne = false;
+				laraItem->Animation.VerticalVelocity = 0;
 			
 				UPV->Flags |= UPV_FLAG_DEAD;
 			}
@@ -786,7 +783,7 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Flags & UPV_FLAG_DIVE)
 		{
-			if (UPVItem->Pose.Orientation.x > -UPV_X_DIVE_ORIENT_MAX)
+			if (UPVItem->Pose.Orientation.x > -UPV_X_ORIENT_DIVE_MAX)
 				UPVItem->Pose.Orientation.x -= UPV_X_TURN_RATE_DIVE_ACCEL;
 			else
 				UPV->Flags &= ~UPV_FLAG_DIVE;
@@ -794,13 +791,13 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->Velocity > 0)
 		{
-			UPV->Velocity -= UPV_VELOCITY_FRICTION;
+			UPV->Velocity -= UPV_VELOCITY_FRICTION_DECEL;
 			if (UPV->Velocity < 0)
 				UPV->Velocity = 0;
 		}
 		else if (UPV->Velocity < 0)
 		{
-			UPV->Velocity += UPV_VELOCITY_FRICTION;
+			UPV->Velocity += UPV_VELOCITY_FRICTION_DECEL;
 			if (UPV->Velocity > 0)
 				UPV->Velocity = 0;
 		}
@@ -810,6 +807,7 @@ namespace TEN::Entities::Vehicles
 		else if (UPV->Velocity < -UPV_VELOCITY_MAX)
 			UPV->Velocity = -UPV_VELOCITY_MAX;
 
+		// TODO: Deceleration must be done some other way.
 		if (UPV->TurnRate.x)
 			ModulateVehicleTurnRateX(&UPV->TurnRate.x, -UPV_X_TURN_RATE_FRICTION_DECEL, 0, UPV_X_TURN_RATE_MAX);
 
@@ -826,7 +824,7 @@ namespace TEN::Entities::Vehicles
 		if (!TestCollision(item, laraItem))
 			return;
 
-		ItemPushItem(item, laraItem, coll, 0, 0);
+		ItemPushItem(item, laraItem, coll, false, false);
 	}
 
 	void UPVCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)

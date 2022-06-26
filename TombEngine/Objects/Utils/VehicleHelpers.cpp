@@ -189,16 +189,16 @@ namespace TEN::Entities::Vehicles
 			// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
 			// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
 			if (waterDepth == DEEP_WATER)
-				waterDepth = VEHICLE_MAX_WATER_HEIGHT;
+				waterDepth = VEHICLE_WATER_HEIGHT_MAX;
 
-			if (waterDepth <= VEHICLE_MAX_WATER_HEIGHT)
+			if (waterDepth <= VEHICLE_WATER_HEIGHT_MAX)
 			{
 				bool isWater = TestEnvironment(ENV_FLAG_WATER, vehicleItem);
 
 				if (currentVelocity != 0)
 				{
-					auto coeff = isWater ? VEHICLE_WATER_VEL_COEFFICIENT : VEHICLE_SWAMP_VEL_COEFFICIENT;
-					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff), currentVelocity);
+					auto coeff = isWater ? VEHICLE_WATER_VELOCITY_COEFF : VEHICLE_SWAMP_VELOCITY_COEFF;
+					currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff), currentVelocity);
 
 					if (TEN::Math::Random::GenerateInt(0, 32) > 28)
 						SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(vehicleItem->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
@@ -209,13 +209,13 @@ namespace TEN::Entities::Vehicles
 
 				if (*angle != 0)
 				{
-					auto coeff = isWater ? VEHICLE_WATER_TURN_COEFFICIENT : VEHICLE_SWAMP_TURN_COEFFICIENT;
-					*angle -= *angle * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff);
+					auto coeff = isWater ? VEHICLE_WATER_TURN_RATE_COEFF : VEHICLE_SWAMP_TURN_RATE_COEFF;
+					*angle -= *angle * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
 				}
 			}
 			else
 			{
-				if (waterDepth > VEHICLE_MAX_WATER_HEIGHT && waterHeight > VEHICLE_MAX_WATER_HEIGHT)
+				if (waterDepth > VEHICLE_WATER_HEIGHT_MAX && waterHeight > VEHICLE_WATER_HEIGHT_MAX)
 					ExplodeVehicle(laraItem, vehicleItem);
 				else if (TEN::Math::Random::GenerateInt(0, 32) > 25)
 					Splash(vehicleItem);
