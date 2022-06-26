@@ -67,17 +67,17 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_DISMOUNT_UNDERWATER_FRAME = 42;
 
 	#define UPV_X_TURN_RATE_DIVE_ACCEL	   ANGLE(5.0f)
-	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(0.4f)
-	#define UPV_X_TURN_RATE_FRICTION_DECEL ANGLE(0.1f)
-	#define UPV_X_TURN_RATE_MAX			   ANGLE(3.0f)
+	#define UPV_X_TURN_RATE_ACCEL		   ANGLE(0.6f)
+	#define UPV_X_TURN_RATE_FRICTION_DECEL ANGLE(0.3f)
+	#define UPV_X_TURN_RATE_MAX			   ANGLE(3.25f)
 
 	#define UPV_X_ORIENT_DIVE_MAX	   ANGLE(15.0f)
 	#define UPV_X_ORIENT_MAX		   ANGLE(85.0f)
 	#define UPV_X_ORIENT_WATER_SURFACE ANGLE(30.0f)
 
-	#define UPV_Y_TURN_RATE_ACCEL		   ANGLE(0.4f)
-	#define UPV_Y_TURN_RATE_FRICTION_DECEL ANGLE(0.1f)
-	#define UPV_Y_TURN_RATE_MAX			   ANGLE(3.5f)
+	#define UPV_Y_TURN_RATE_ACCEL		   ANGLE(0.6f)
+	#define UPV_Y_TURN_RATE_FRICTION_DECEL ANGLE(0.3f)
+	#define UPV_Y_TURN_RATE_MAX			   ANGLE(3.75f)
 
 	#define UPV_DEFLECT_ANGLE		 ANGLE(45.0f)
 	#define UPV_DEFLCT_TURN_RATE_MAX ANGLE(2.0f)
@@ -807,12 +807,38 @@ namespace TEN::Entities::Vehicles
 		else if (UPV->Velocity < -UPV_VELOCITY_MAX)
 			UPV->Velocity = -UPV_VELOCITY_MAX;
 
+		if (UPV->TurnRate.x > 0)
+		{
+			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION_DECEL;
+			if (UPV->TurnRate.x < 0)
+				UPV->TurnRate.x = 0;
+		}
+		else if (UPV->TurnRate.x < 0)
+		{
+			UPV->TurnRate.x += UPV_X_TURN_RATE_FRICTION_DECEL;
+			if (UPV->TurnRate.x > 0)
+				UPV->TurnRate.x = 0;
+		}
+
+		if (UPV->TurnRate.y > 0)
+		{
+			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION_DECEL;
+			if (UPV->TurnRate.y < 0)
+				UPV->TurnRate.y = 0;
+		}
+		else if (UPV->TurnRate.y < 0)
+		{
+			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION_DECEL;
+			if (UPV->TurnRate.y > 0)
+				UPV->TurnRate.y = 0;
+		}
+
 		// TODO: Deceleration must be done some other way.
-		if (UPV->TurnRate.x)
+		/*if (UPV->TurnRate.x)
 			ModulateVehicleTurnRateX(&UPV->TurnRate.x, -UPV_X_TURN_RATE_FRICTION_DECEL, 0, UPV_X_TURN_RATE_MAX);
 
 		if (UPV->TurnRate.y)
-			ModulateVehicleTurnRateY(&UPV->TurnRate.y, -UPV_Y_TURN_RATE_FRICTION_DECEL, 0, UPV_Y_TURN_RATE_MAX);
+			ModulateVehicleTurnRateY(&UPV->TurnRate.y, -UPV_Y_TURN_RATE_FRICTION_DECEL, 0, UPV_Y_TURN_RATE_MAX);*/
 	}
 
 	void NoGetOnCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
