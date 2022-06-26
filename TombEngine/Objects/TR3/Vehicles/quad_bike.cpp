@@ -169,6 +169,62 @@ namespace TEN::Entities::Vehicles
 		quadBike->MomentumAngle = quadBikeItem->Pose.Orientation.y;
 	}
 
+	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+		auto* quadBikeItem = &g_Level.Items[itemNumber];
+		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+
+		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+			return;
+
+		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE_MIN);
+		if (mountType == VehicleMountType::None /*|| quadBikeItem->Flags & ONESHOT*/) // TODO: Check if this is needed. @Sezz 2022.06.27
+			ObjectCollision(itemNumber, laraItem, coll);
+		else
+		{
+			lara->Vehicle = itemNumber;
+
+			switch (mountType)
+			{
+			case VehicleMountType::Left:
+				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_LEFT;
+				laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_LEFT;
+				laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_LEFT;
+				break;
+
+			default:
+			case VehicleMountType::Right:
+				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_RIGHT;
+				laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_RIGHT;
+				laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_RIGHT;
+				break;
+			}
+
+			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+			{
+				CreateFlare(laraItem, ID_FLARE_ITEM, 0);
+				UndrawFlareMeshes(laraItem);
+				lara->Control.Weapon.GunType = LaraWeaponType::None;
+				lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+				lara->Flare.ControlLeft = false;
+			}
+
+			ResetLaraFlex(laraItem);
+			laraItem->Pose.Position = quadBikeItem->Pose.Position;
+			laraItem->Pose.Orientation = Vector3Shrt(0, quadBikeItem->Pose.Orientation.y, 0);
+			lara->Control.HandStatus = HandStatus::Busy;
+			lara->HitDirection = -1;
+			quadBikeItem->HitPoints = 1;
+
+			AnimateItem(laraItem);
+
+			quadBike->Revs = 0;
+		}
+	}
+
 	static int CanQuadbikeGetOff(int direction)
 	{
 		auto* item = &g_Level.Items[Lara.Vehicle];
@@ -258,52 +314,6 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 			return true;
-	}
-
-	static int GetOnQuadBike(ItemInfo* laraItem, ItemInfo* quadBikeItem, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (!(TrInput & IN_ACTION) ||
-			laraItem->Animation.IsAirborne ||
-			lara->Control.HandStatus != HandStatus::Free ||
-			quadBikeItem->Flags & ONESHOT ||
-			abs(quadBikeItem->Pose.Position.y - laraItem->Pose.Position.y) > CLICK(1))
-		{
-			return false;
-		}
-
-		auto dist = pow(laraItem->Pose.Position.x - quadBikeItem->Pose.Position.x, 2) + pow(laraItem->Pose.Position.z - quadBikeItem->Pose.Position.z, 2);
-		if (dist > 170000)
-			return false;
-
-		auto probe = GetCollision(quadBikeItem);
-		if (probe.Position.Floor < -32000)
-			return false;
-		else
-		{
-			short angle = phd_atan(quadBikeItem->Pose.Position.z - laraItem->Pose.Position.z, quadBikeItem->Pose.Position.x - laraItem->Pose.Position.x);
-			angle -= quadBikeItem->Pose.Orientation.y;
-
-			if ((angle > -ANGLE(45.0f)) && (angle < ANGLE(135.0f)))
-			{
-				short tempAngle = laraItem->Pose.Orientation.y - quadBikeItem->Pose.Orientation.y;
-				if (tempAngle > ANGLE(45.0f) && tempAngle < ANGLE(135.0f))
-					return true;
-				else
-					return false;
-			}
-			else
-			{
-				short tempAngle = laraItem->Pose.Orientation.y - quadBikeItem->Pose.Orientation.y;
-				if (tempAngle > ANGLE(225.0f) && tempAngle < ANGLE(315.0f))
-					return true;
-				else
-					return false;
-			}
-		}
-
-		return true;
 	}
 
 	static int GetQuadCollisionAnim(ItemInfo* quadBikeItem, Vector3Int* p)
@@ -1032,60 +1042,6 @@ namespace TEN::Entities::Vehicles
 		*pitch = quadBike->EngineRevs;
 
 		return drive;
-	}
-
-	void QuadBikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* quadBikeItem = &g_Level.Items[itemNumber];
-		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
-
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
-			return;
-
-		if (GetOnQuadBike(laraItem, &g_Level.Items[itemNumber], coll))
-		{
-			lara->Vehicle = itemNumber;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-				UndrawFlareMeshes(laraItem);
-				lara->Flare.ControlLeft = false;
-				lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
-			}
-
-			lara->Control.HandStatus = HandStatus::Busy;
-
-			short angle = phd_atan(quadBikeItem->Pose.Position.z - laraItem->Pose.Position.z, quadBikeItem->Pose.Position.x - laraItem->Pose.Position.x);
-			angle -= quadBikeItem->Pose.Orientation.y;
-
-			if (angle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_LEFT;
-				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_LEFT;
-			}
-			else
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_RIGHT;
-				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_RIGHT;
-			}
-
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Pose.Position.x = quadBikeItem->Pose.Position.x;
-			laraItem->Pose.Position.y = quadBikeItem->Pose.Position.y;
-			laraItem->Pose.Position.z = quadBikeItem->Pose.Position.z;
-			laraItem->Pose.Orientation.y = quadBikeItem->Pose.Orientation.y;
-			ResetLaraFlex(laraItem);
-			lara->HitDirection = -1;
-			quadBikeItem->HitPoints = 1;
-
-			AnimateItem(laraItem);
-
-			quadBike->Revs = 0;
-		}
-		else
-			ObjectCollision(itemNumber, laraItem, coll);
 	}
 
 	static void TriggerQuadExhaustSmoke(int x, int y, int z, short angle, int speed, int moving)

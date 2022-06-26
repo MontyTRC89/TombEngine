@@ -6,6 +6,6 @@ struct CollisionInfo;
 namespace TEN::Entities::Vehicles
 {
 	void InitialiseQuadBike(short itemNumber);
-	void QuadBikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool QuadBikeControl(ItemInfo* laraItem, CollisionInfo* coll);
 }
