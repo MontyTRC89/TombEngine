@@ -388,7 +388,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseQuadBike;
-		obj->collision = QuadBikeCollision;
+		obj->collision = QuadBikePlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveAnim = true;
