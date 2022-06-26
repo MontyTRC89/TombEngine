@@ -38,9 +38,8 @@ namespace TEN::Entities::Vehicles
 			return VehicleMountType::None;
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		short angleBetweenPositions = GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
-		// TODO: Lara can mount from the opposite side when facing away from the vehicle.
-		// Confirm correct side.
+		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
+		bool onCorrectSide = abs(deltaHeadingAngle - angleBetweenPositions) < ANGLE(45.0f);
 
 		// Assess mount types allowed for vehicle.
 		for (auto mountType : allowedMountTypes)
@@ -57,13 +56,19 @@ namespace TEN::Entities::Vehicles
 
 				continue;
 
-			// TODO
 			case VehicleMountType::Front:
+				if (deltaHeadingAngle > ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(135.0f) &&
+					onCorrectSide &&
+					!laraItem->Animation.IsAirborne)
+				{
+					break;
+				}
+
 				continue;
 
 			case VehicleMountType::Back:
 				if (abs(deltaHeadingAngle) < ANGLE(45.0f) &&
-					abs(angleBetweenPositions) < ANGLE(45.0f) &&
+					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -73,6 +78,7 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Left:
 				if (deltaHeadingAngle > -ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(45.0f) &&
+					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
@@ -82,6 +88,7 @@ namespace TEN::Entities::Vehicles
 
 			case VehicleMountType::Right:
 				if (deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
+					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
 					break;
