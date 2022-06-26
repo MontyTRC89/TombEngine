@@ -195,14 +195,11 @@ namespace TEN::Entities::TR4
 				locust->pos.Position.x += locust->randomRotation * phd_cos(locust->pos.Orientation.x) * phd_sin(locust->pos.Orientation.y);
 				locust->pos.Position.y += locust->randomRotation * phd_sin(-locust->pos.Orientation.x);
 				locust->pos.Position.z += locust->randomRotation * phd_cos(locust->pos.Orientation.x) * phd_cos(locust->pos.Orientation.y);
+				
 				if (ItemNearTarget(&locust->pos, LaraItem, CLICK(1) / 2))
 				{
 					TriggerBlood(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 2 * GetRandomControl(), 2);
-					if (LaraItem->HitPoints > 0)
-						LaraItem->HitPoints -= LOCUST_LARA_DAMAGE;
-					// NOTE: not present in original TR4 code
-					//else
-					//    LaraItem->HitPoints -= LOCUST_ENTITY_DAMAGE;
+					DoDamage(LaraItem, LOCUST_LARA_DAMAGE);
 				}
 
 				if (locust->counter > 0)

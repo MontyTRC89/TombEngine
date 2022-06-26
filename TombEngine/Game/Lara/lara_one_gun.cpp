@@ -1821,8 +1821,7 @@ void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src,
 		}
 		else
 		{
-			Rumble(0.5f, 0.3f);
-			laraItem->HitPoints -= (Weapons[(int)weaponType].Damage * 5);
+			DoDamage(laraItem, Weapons[(int)weaponType].Damage * 5);
 			if (!TestEnvironment(ENV_FLAG_WATER, dest->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
 				LaraBurn(laraItem);
 		}
