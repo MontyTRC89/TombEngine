@@ -25,9 +25,9 @@ namespace TEN::Entities::Vehicles
 	const vector<VehicleMountType> RubberBoatMountTypes =
 	{
 		VehicleMountType::LevelStart,
-		VehicleMountType::Jump,
 		VehicleMountType::Left,
-		VehicleMountType::Right
+		VehicleMountType::Right,
+		VehicleMountType::Jump
 	};
 
 	constexpr auto RBOAT_RADIUS = 500;

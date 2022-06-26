@@ -38,6 +38,7 @@ namespace TEN::Entities::Vehicles
 	const vector<int> JeepBrakeLightJoints = {};
 	const vector<VehicleMountType> JeepMountTypes =
 	{
+		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};

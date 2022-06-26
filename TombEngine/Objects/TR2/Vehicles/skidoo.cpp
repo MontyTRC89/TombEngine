@@ -29,6 +29,7 @@ namespace TEN::Entities::Vehicles
 {
 	const vector<VehicleMountType> SkidooMountTypes =
 	{
+		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
@@ -150,19 +151,26 @@ namespace TEN::Entities::Vehicles
 
 			switch (mountType)
 			{
+			case VehicleMountType::LevelStart:
+				laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IDLE;
+				laraItem->Animation.ActiveState = SKIDOO_STATE_IDLE;
+				laraItem->Animation.TargetState = SKIDOO_STATE_IDLE;
+				break;
+
 			case VehicleMountType::Left:
 				laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_MOUNT_LEFT;
+				laraItem->Animation.ActiveState = SKIDOO_STATE_MOUNT;
+				laraItem->Animation.TargetState = SKIDOO_STATE_MOUNT;
 				break;
 
 			default:
 			case VehicleMountType::Right:
 				laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_MOUNT_RIGHT;
+				laraItem->Animation.ActiveState = SKIDOO_STATE_MOUNT;
+				laraItem->Animation.TargetState = SKIDOO_STATE_MOUNT;
 				break;
 			}
-
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = SKIDOO_STATE_MOUNT;
-			laraItem->Animation.TargetState = SKIDOO_STATE_MOUNT;
 
 			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 			{

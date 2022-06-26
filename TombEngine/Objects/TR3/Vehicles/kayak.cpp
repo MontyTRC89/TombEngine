@@ -35,6 +35,7 @@ namespace TEN::Entities::Vehicles
 	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
 	static vector<VehicleMountType> KayakMountTypes =
 	{
+		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
