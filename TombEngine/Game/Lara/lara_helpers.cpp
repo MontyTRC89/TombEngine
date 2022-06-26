@@ -874,7 +874,7 @@ void RumbleLaraHealthCondition(ItemInfo* item)
 	if (item->HitPoints > LARA_HEALTH_CRITICAL && !lara->PoisonPotency)
 		return;
 
-	bool doPulse = (GlobalCounter & 0x0F) / 0x0F == 1;
+	bool doPulse = (GlobalCounter & 0x0F) % 0x0F == 1;
 	if (doPulse)
 		Rumble(0.2f, 0.1f);
 }
