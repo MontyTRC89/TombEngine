@@ -1200,7 +1200,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseMotorbike;
-		obj->collision = MotorbikeCollision;
+		obj->collision = MotorbikePlayerCollision;
 		//obj->drawRoutine = DrawMotorbike; // for wheel rotation
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;

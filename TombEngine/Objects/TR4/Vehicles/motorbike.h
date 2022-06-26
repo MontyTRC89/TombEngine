@@ -5,6 +5,6 @@
 namespace TEN::Entities::Vehicles
 {
 	void InitialiseMotorbike(short itemNumber);
-	void MotorbikeCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll);
 }
