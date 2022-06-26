@@ -82,6 +82,8 @@ int RequiredStartPos;
 int CurrentLevel;
 int LevelComplete;
 
+int SystemNameHash = 0;
+
 bool  InItemControlLoop;
 short ItemNewRoomNo;
 short ItemNewRooms[MAX_ROOMS];
@@ -409,8 +411,9 @@ GameStatus DoTitle(int index, std::string const& ambient)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
-	// Load the level
-	LoadLevelFile(index);
+	// Load the title. Exit game if unsuccessful.
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitGame;
 
 	InventoryResult inventoryResult;
 
@@ -516,8 +519,9 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// Load the level
-	LoadLevelFile(index);
+	// Load the level and fall back to title, if load was unsuccessful
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitToTitle;
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
