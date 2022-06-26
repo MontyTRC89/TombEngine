@@ -38,6 +38,7 @@ namespace TEN::Entities::Vehicles
 	};
 	const vector<VehicleMountType> QuadBikeMountTypes =
 	{
+		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
@@ -187,6 +188,12 @@ namespace TEN::Entities::Vehicles
 
 			switch (mountType)
 			{
+			case VehicleMountType::LevelStart:
+				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IDLE;
+				laraItem->Animation.ActiveState = QBIKE_STATE_IDLE;
+				laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
+				break;
+
 			case VehicleMountType::Left:
 				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_LEFT;
 				laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_LEFT;
@@ -200,7 +207,6 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_RIGHT;
 				break;
 			}
-
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
 			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)

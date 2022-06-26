@@ -38,7 +38,11 @@ namespace TEN::Entities::Vehicles
 		{ 128, 0, -64, 2 },
 		{ 0, 0, -64, 2 }
 	};
-	const vector<VehicleMountType> UPVMountTypes = { VehicleMountType::Back };
+	const vector<VehicleMountType> UPVMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Back
+	};
 
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;

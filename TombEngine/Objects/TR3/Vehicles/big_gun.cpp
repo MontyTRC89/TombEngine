@@ -24,7 +24,11 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> BigGunMountTypes = { VehicleMountType::Back };
+	const vector<VehicleMountType> BigGunMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Back
+	};
 
 	constexpr auto BGUN_MOUNT_DISTANCE_MIN = CLICK(2);
 

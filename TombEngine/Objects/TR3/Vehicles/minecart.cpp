@@ -28,6 +28,7 @@ namespace TEN::Entities::Vehicles
 {
 	const vector<VehicleMountType> MinecartMountTypes =
 	{
+		VehicleMountType::LevelStart,
 		VehicleMountType::Left,
 		VehicleMountType::Right
 	};
