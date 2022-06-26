@@ -179,7 +179,7 @@ namespace TEN::Entities::Vehicles
 			return;
 
 		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE_MIN);
-		if (mountType == VehicleMountType::None /*|| quadBikeItem->Flags & ONESHOT*/) // TODO: Check if this is needed. @Sezz 2022.06.27
+		if (mountType == VehicleMountType::None)
 			ObjectCollision(itemNumber, laraItem, coll);
 		else
 		{

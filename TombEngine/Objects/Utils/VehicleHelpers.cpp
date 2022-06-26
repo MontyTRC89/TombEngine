@@ -20,6 +20,10 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
+		// Assess vehicle usability.
+		if (vehicleItem->Flags & ONESHOT)
+			return VehicleMountType::None;
+
 		// Assess ACTION input and hand status.
 		if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free)
 			return VehicleMountType::None;
