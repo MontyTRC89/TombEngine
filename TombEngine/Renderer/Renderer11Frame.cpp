@@ -612,9 +612,10 @@ namespace TEN::Renderer
 					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
 					light->LocalIntensity = intensity;
+					light->Distance = distance;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->ObjectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
+					if (light->CastShadows && nativeItem->ObjectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
 					{
 						if (intensity >= brightest)
 						{
@@ -622,8 +623,6 @@ namespace TEN::Renderer
 							brightestLight = light;
 						}
 					}
-
-					light->Distance = distance;
 				}
 				else if (light->Type == LIGHT_TYPE_SPOT)
 				{
@@ -645,7 +644,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = intensity;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->ObjectNumber == ID_LARA)
+					if (light->CastShadows && nativeItem->ObjectNumber == ID_LARA)
 					{
 						if (intensity >= brightest)
 						{
