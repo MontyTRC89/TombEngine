@@ -462,13 +462,12 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	auto old = item->Pose.Position;
 	
-	/*if (!Objects[item->objectNumber].waterCreature)
+	if (!Objects[item->ObjectNumber].waterCreature)
 	{
-		roomNumber = item->roomNumber;
-		GetFloor(item->pos.Position.x, item->pos.Position.y, item->pos.Position.z, &roomNumber);
-		if (roomNumber != item->roomNumber)
+		auto roomNumber = GetCollision(item).RoomNumber;
+		if (roomNumber != item->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
-	}*/
+	}
 
 	AnimateItem(item);
 	if (item->Status == ITEM_DEACTIVATED)
@@ -776,14 +775,19 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		item->Pose.Orientation.x = 0;
 	}
 
-	/*roomNumber = item->roomNumber;
-	if (!Objects[item->objectNumber].waterCreature)
+	if (!Objects[item->ObjectNumber].waterCreature)
 	{
-		GetFloor(item->pos.Position.x, item->pos.Position.y - STEP_SIZE*2, item->pos.Position.z, &roomNumber);
+		auto roomNumber = GetCollision(item->Pose.Position.x, 
+										item->Pose.Position.y - CLICK(2), 
+										item->Pose.Position.z,
+										item->RoomNumber).RoomNumber;
 
-		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
-			item->HitPoints = 0;
-	}*/
+		if (roomNumber != item->RoomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
+
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
+			DoDamage(item, INT_MAX);
+	}
 
 	roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z, &roomNumber);
