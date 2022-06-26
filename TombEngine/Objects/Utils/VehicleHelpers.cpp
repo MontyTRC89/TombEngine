@@ -29,7 +29,7 @@ namespace TEN::Entities::Vehicles
 			return VehicleMountType::None;
 
 		// Assess height difference.
-		if (abs(laraItem->Pose.Position.y - laraItem->Pose.Position.y) > STEPUP_HEIGHT)
+		if (abs(laraItem->Pose.Position.y - vehicleItem->Pose.Position.y) > STEPUP_HEIGHT)
 			return VehicleMountType::None;
 
 		// Assess distance to vehicle.
