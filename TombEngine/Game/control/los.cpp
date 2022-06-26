@@ -156,9 +156,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 							{
 								if (item->objectNumber != ID_GUARD_LASER)
 								{
-									item->HitPoints -= 30;
-									if (item->HitPoints < 0)
-										item->HitPoints = 0;
+									DoDamage(item, 30);
 									HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 								}
 								else
@@ -166,7 +164,7 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 									angle = phd_atan(LaraItem->pos.Position.z - item->pos.Position.z, LaraItem->pos.Position.x - item->pos.Position.x) - item->pos.Orientation.y;
 									if (angle > -ANGLE(90) && angle < ANGLE(90))
 									{
-										item->HitPoints = 0;
+										DoDamage(item, INT_MAX);
 										HitTarget(item, &target, Weapons[Lara.gunType].damage, 0);
 									}
 								}
@@ -198,10 +196,8 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, -5);
 									else if (Objects[item->ObjectNumber].hitEffect == HIT_RICOCHET)
 										TriggerRicochetSpark(&target, LaraItem->Pose.Orientation.y, 3, 0);
-									
-									item->HitStatus = true;
-									if (!Objects[item->ObjectNumber].undead)
-										item->HitPoints -= Weapons[(int)Lara.Control.Weapon.GunType].Damage;
+
+									DoDamage(item, Weapons[(int)Lara.Control.Weapon.GunType].Damage);
 
 									if (!item->LuaCallbackOnHitName.empty())
 									{

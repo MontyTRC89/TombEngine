@@ -990,7 +990,7 @@ namespace TEN::Entities::Vehicles
 					if (lara->Air < 0)
 					{
 						lara->Air = -1;
-						laraItem->HitPoints -= 5;
+						DoDamage(laraItem, 5);
 					}
 				}
 			}

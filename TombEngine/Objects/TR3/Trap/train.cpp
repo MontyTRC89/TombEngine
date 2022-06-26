@@ -109,13 +109,14 @@ void TrainCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_TRAIN_DEATH_ANIM;
 	laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-//	larA->ActiveState = EXTRA_TRAINKILL;
-//	larA->TargetState = EXTRA_TRAINKILL;
-	laraItem->HitPoints = 0;
+	// laraItem->Animation.ActiveState = EXTRA_TRAINKILL;
+	// laraItem->Animation.TargetState = EXTRA_TRAINKILL;
 	laraItem->Pose.Orientation.y = trainItem->Pose.Orientation.y;
 	laraItem->Animation.Velocity = 0;
 	laraItem->Animation.VerticalVelocity = 0;
 	laraItem->Animation.Airborne = false;
+
+	DoDamage(laraItem, INT_MAX);
 
 	AnimateItem(laraItem);
 

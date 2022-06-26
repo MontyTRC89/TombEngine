@@ -67,7 +67,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 
 						if (ItemPushItem(item, laraItem, coll, deadlyBits & 1, 3) && (deadlyBits & 1))
 						{
-							laraItem->HitPoints -= item->ItemFlags[3];
+							DoDamage(laraItem, item->ItemFlags[3]);
 
 							int dx = x - laraItem->Pose.Position.x;
 							int dy = y - laraItem->Pose.Position.y;
@@ -1812,8 +1812,8 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 					}
 					else
 					{
-						// TODO: further checks may be added to prevent killing undead enemies.
-						item->HitPoints = 0;
+						DoDamage(item, INT_MAX);
+
 						DoLotsOfBlood(item->Pose.Position.x,
 							laraItem->Pose.Position.y - CLICK(1),
 							item->Pose.Position.z,
