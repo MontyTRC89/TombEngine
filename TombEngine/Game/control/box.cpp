@@ -929,8 +929,10 @@ void TargetBox(LOTInfo* LOT, int boxNumber)
 	boxNumber &= NO_BOX;
 	auto* box = &g_Level.Boxes[boxNumber];
 
-	LOT->Target.x = (box->top  * SECTOR(1)) + GetRandomControl() * (((box->bottom - box->top) - 1) >> 5) + SECTOR(0.5f);
-	LOT->Target.z = (box->left * SECTOR(1)) + GetRandomControl() * (((box->right - box->left) - 1) >> 5) + SECTOR(0.5f);
+	// Maximize target precision. DO NOT change bracket precedence!
+	LOT->Target.x = (int)((box->top  * SECTOR(1)) + (float)GetRandomControl() * (((float)(box->bottom - box->top) - 1.0f) / 32.0f) + SECTOR(0.5f));
+	LOT->Target.z = (int)((box->left * SECTOR(1)) + (float)GetRandomControl() * (((float)(box->right - box->left) - 1.0f) / 32.0f) + SECTOR(0.5f));
+	
 	LOT->RequiredBox = boxNumber;
 
 	if (LOT->Fly == NO_FLYING)
