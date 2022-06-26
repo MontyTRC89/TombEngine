@@ -561,7 +561,7 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
-					ModulateVehicleTurnRateX(&UPV->TurnRate.y, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
+					ModulateVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
 			if (TrInput & VEHICLE_IN_ACCELERATE)
@@ -615,7 +615,7 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (TrInput & (VEHICLE_IN_UP | VEHICLE_IN_DOWN))
-					ModulateVehicleTurnRateX(&UPV->TurnRate.y, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
+					ModulateVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
 			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(laraItem, UPVItem))
