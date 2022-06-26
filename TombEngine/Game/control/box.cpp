@@ -476,8 +476,15 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		return false;
 	}
 
+	// HACK: In original, y coordinate was just set to bounding box top point.
+	// In TEN, we have to use real floor height + small headroom, because Choco's floordata
+	// system returns inconsistent room number in portal 4-click vault cases -- Lwmte, 27.06.22
+
 	auto* bounds = GetBoundsAccurate(item);
-	int y = item->Pose.Position.y + bounds->Y1;
+	int y = GetCollision(item->Pose.Position.x, 
+						 item->Pose.Position.y + bounds->Y1, 
+						 item->Pose.Position.z, 
+						 item->RoomNumber).Position.Floor - CLICK(1);
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
