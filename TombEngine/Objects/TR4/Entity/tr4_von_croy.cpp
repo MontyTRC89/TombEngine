@@ -78,9 +78,78 @@ namespace TEN::Entities::TR4
 	// TODO
 	enum VonCroyAnim
 	{
-		VON_CROY_ANIM_STEP_DOWN_HIGH = 36,
+		VON_CROY_ANIM_WALK_FORWARD = 0,
+		VON_CROY_ANIM_RUN_FORWARD = 1,
+		VON_CROY_ANIM_MONKEY_FORWARD = 2,
+		VON_CROY_ANIM_USE_SWITCH = 3,
+		VON_CROY_ANIM_IDLE = 4,
+		VON_CROY_ANIM_ATTACK_HIGH = 5,
+		VON_CROY_ANIM_MONKEY_TO_FORWARD = 6,
 
-		VON_CROY_ANIM_CLIMB_UP_AFTER_JUMP = 52
+		VON_CROY_ANIM_MONKEY_IDLE = 7,
+		VON_CROY_ANIM_MONKEY_IDLE_TO_FORWARD = 8,
+		VON_CROY_ANIM_MONKEY_STOP = 9,
+		VON_CROY_ANIM_MONKEY_FALL = 10,
+
+		VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP = 11,
+		VON_CROY_ANIM_GROUND_INSPECT = 12,
+		VON_CROY_ANIM_IDLE_TO_WALK = 13,
+		VON_CROY_ANIM_WALK_STOP = 14,
+		VON_CROY_ANIM_IDLE_TO_RUN = 15,
+		VON_CROY_ANIM_RUN_STOP = 16,
+		VON_CROY_ANIM_WALK_TO_RUN = 17,
+		VON_CROY_ANIM_RUN_TO_WALK = 18,
+
+		VON_CROY_ANIM_TALKING1 = 19,
+		VON_CROY_ANIM_TALKING2 = 20,
+		VON_CROY_ANIM_TALKING3 = 21,
+
+		VON_CROY_ANIM_IDLE_TO_JUMP = 22,
+		VON_CROY_ANIM_JUMP_1_BLOCK = 23,
+		VON_CROY_ANIM_JUMP_LAND = 24,
+		VON_CROY_ANIM_JUMP_2_BLOCKS = 25,
+		VON_CROY_ANIM_LEFT_TURN = 26,
+
+		VON_CROY_ANIM_CLIMB_4_BLOCKS = 27,
+		VON_CROY_ANIM_CLIMB_3_BLOCKS = 28,
+		VON_CROY_ANIM_CLIMB_2_BLOCKS = 29,
+		VON_CROY_ANIM_IDLE_TO_CROUCH = 30,
+
+		VON_CROY_ANIM_LARA_INTERACT_COME_DISTANT = 31,
+		VON_CROY_ANIM_LARA_INTERACT_COME_CLOSE = 32,
+		VON_CROY_ANIM_LARA_INTERACT_STOP = 33,
+		VON_CROY_ANIM_LARA_INTERACT_STOP_TO_COME = 34,
+
+		VON_CROY_ANIM_CLIMB_DOWN_1_SECTOR = 35,
+		VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS = 36,
+		VON_CROY_ANIM_JUMP_TO_HANG = 37,
+		VON_CROY_ANIM_SHIMMY_TO_THE_RIGHT = 38,
+		VON_CROY_ANIM_CLIMB = 39,
+		VON_CROY_ANIM_DROP_FROM_HANG = 40,
+		VON_CROY_ANIM_CLIMB_OFF_3_CLICKS = 41,
+		VON_CROY_ANIM_CLIMB_OFF_2_CLICKS = 42,
+		VON_CROY_ANIM_HANG = 43,
+		VON_CROY_ANIM_ATTACK_LOW = 44,
+		VON_CROY_ANIM_RUNNING_JUMP_RIGHT_FOOT = 45,
+		VON_CROY_ANIM_RUNNING_JUMP_LEFT_FOOT = 46,
+
+		VON_CROY_ANIM_START_POINT = 47,
+		VON_CROY_ANIM_POINTING = 48,
+		VON_CROY_ANIM_STOP_POINTING = 49, 
+
+		VON_CROY_ANIM_RUNNING_JUMP = 50,
+		VON_CROY_ANIM_RUNNING_JUMP_TO_GRAB = 51,
+		VON_CROY_ANIM_CLIMB_UP_AFTER_JUMP = 52,
+
+		VON_CROY_ANIM_STANDING_JUMP_BACK_START = 53,
+		VON_CROY_ANIM_STANDING_JUMP_BACK = 54,
+		VON_CROY_ANIM_STANDING_JUMP_BACK_END = 55,
+
+		VON_CROY_ANIM_TURN_TO_THE_RIGHT = 56,
+		VON_CROY_ANIM_ALIGN_FRONT = 57,
+		VON_CROY_ANIM_ALIGN_BACK = 58,
+		VON_CROY_ANIM_LAND_TO_RUN = 59,
+
 	};
 
 	void InitialiseVonCroy(short itemNumber)
@@ -89,7 +158,7 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 11;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_KNIFE_EQUIP_UNEQUIP;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = VON_CROY_STATE_TOGGLE_KNIFE;
 		item->Animation.ActiveState = VON_CROY_STATE_TOGGLE_KNIFE;
@@ -224,7 +293,7 @@ namespace TEN::Entities::TR4
 		AI_INFO AI;
 
 		// HACK: Even the most advanced zone in TR must have a step height of 1024, so we need to recreate zones when step difference is higher.
-		if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_STEP_DOWN_HIGH ||
+		if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS ||
 			item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_UP_AFTER_JUMP)
 		{
 			short oldRoom = item->RoomNumber;
@@ -233,7 +302,7 @@ namespace TEN::Entities::TR4
 
 			GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &item->RoomNumber);
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 1)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + VON_CROY_ANIM_RUN_FORWARD)
 				CreateZone(item);
 
 			CreatureAIInfo(item, &AI);
@@ -359,7 +428,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (canJump1block || canJump2blocks)
 			{
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_IDLE_TO_JUMP;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_JUMP;
 				creature->MaxTurn = 0;
@@ -595,7 +664,7 @@ namespace TEN::Entities::TR4
 					creature->MaxTurn = 0;
 					item->Animation.ActiveState = VON_CROY_STATE_JUMP;
 					item->Animation.TargetState = VON_CROY_STATE_JUMP_2_BLOCKS;
-					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 22;
+					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_IDLE_TO_JUMP;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					creature->LOT.IsJumping = true;
 				}
@@ -609,7 +678,7 @@ namespace TEN::Entities::TR4
 			break;
 
 		case VON_CROY_STATE_JUMP_2_BLOCKS:
-			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 25 ||
+			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_JUMP_2_BLOCKS ||
 				item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 5)
 			{
 				creature->LOT.IsJumping = true;
@@ -770,7 +839,7 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle / 2;
 			}
 
-			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + 47)
+			if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_START_POINT)
 			{
 				if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					break;
@@ -791,7 +860,7 @@ namespace TEN::Entities::TR4
 
 		case VON_CROY_STATE_STANDING_JUMP_GRAB:
 			flags = true;
-			if (item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex + 52 ||
+			if (item->Animation.AnimNumber != Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_UP_AFTER_JUMP ||
 				item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				flags = false;
@@ -833,56 +902,56 @@ namespace TEN::Entities::TR4
 			switch (CreatureVault(itemNumber, angle, 2, 260))
 			{
 			case VON_CROY_STATE_WALK:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 29;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_2_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_2_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case VON_CROY_STATE_RUN:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_3_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_3_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case VON_CROY_STATE_START_MONKEY:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 27;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_4_BLOCKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_CLIMB_4_BLOCKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case VON_CROY_STATE_LOOK_BEFORE_JUMP:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 37;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_JUMP_TO_HANG;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_GRAB_LADDER;
 				creature->MaxTurn = 0;
 				break;
 			// I am not sure what negative states are (probably the inverse of the above), I will leave them alone - Kubsy 18/06/2022
 			case -7:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 36;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_DOWN_2_SECTORS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_STEP_DOWN_HIGH;
 				creature->MaxTurn = 0;
 				break;
 
 			case -4:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 35;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_DOWN_1_SECTOR;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_JUMP_DOWN_4_CLICKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -3:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 41;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_OFF_3_CLICKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_JUMP_DOWN_3_CLICKS;
 				creature->MaxTurn = 0;
 				break;
 
 			case -2:
-				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 42;
+				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + VON_CROY_ANIM_CLIMB_OFF_2_CLICKS;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = VON_CROY_STATE_JUMP_DOWN_2_CLICKS;
 				creature->MaxTurn = 0;
