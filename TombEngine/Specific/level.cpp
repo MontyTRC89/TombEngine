@@ -1073,13 +1073,17 @@ unsigned int _stdcall LoadLevel(void* data)
 			ReadFileEx(&version, 1, 4, LevelFilePtr);
 			ReadFileEx(&systemHash, 1, 4, LevelFilePtr); // Reserved: for future quick start feature! Check builder system 
 
+			// Check file header
 			if (std::string(header) != "TEN")
 				throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
 			else
 				TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
+			// Check system name hash and reset it if it's valid (because we use build & play feature only once)
 			if (SystemNameHash != 0 && SystemNameHash != systemHash)
 				throw std::exception("An attempt was made to use level debug feature on a different system.");
+			else
+				SystemNameHash = 0;
 
 			// Read data sizes
 			ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);

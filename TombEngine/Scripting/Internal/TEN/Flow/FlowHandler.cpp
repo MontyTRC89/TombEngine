@@ -259,7 +259,6 @@ bool FlowHandler::DoFlow()
 
 		if (CurrentLevel == 0)
 		{
-			SystemNameHash = 0;
 			status = DoTitle(0, level->AmbientTrack);
 		}
 		else
