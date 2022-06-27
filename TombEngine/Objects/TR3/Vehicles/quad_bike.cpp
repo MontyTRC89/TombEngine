@@ -191,8 +191,8 @@ namespace TEN::Entities::Vehicles
 
 	void DoQuadBikeMount(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleMountType mountType)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		switch (mountType)
 		{

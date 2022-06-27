@@ -165,7 +165,75 @@ namespace TEN::Entities::Vehicles
 		minecartItem->Data = MinecartInfo();
 		auto* minecart = GetMinecartInfo(minecartItem);
 	}
-	
+
+	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto* minecartItem = &g_Level.Items[itemNumber];
+		auto* lara = GetLaraInfo(laraItem);
+
+		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+			return;
+
+		// Don't get into minecart if there are two stop blocks in front.
+		// This allows creation of minecarts which will get to a point and stop forever.
+		auto mountType = GetVehicleMountType(minecartItem, laraItem, coll, MinecartMountTypes, MINECART_MOUNT_DISTANCE_MIN);
+		if (mountType == VehicleMountType::None ||
+			GetCollision(minecartItem, minecartItem->Pose.Orientation.y, SECTOR(1)).BottomBlock->Flags.MinecartStop())
+		{
+			ObjectCollision(itemNumber, laraItem, coll);
+		}
+		else
+		{
+			lara->Vehicle = itemNumber;
+			DoMinecartMount(minecartItem, laraItem, mountType);
+		}
+	}
+
+	void DoMinecartMount(ItemInfo* minecartItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* minecart = GetMinecartInfo(minecartItem);
+		auto* lara = GetLaraInfo(laraItem);
+
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_IDLE;
+			laraItem->Animation.ActiveState = MINECART_STATE_IDLE;
+			laraItem->Animation.TargetState = MINECART_STATE_IDLE;
+			break;
+
+		case VehicleMountType::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_MOUNT_LEFT;
+			laraItem->Animation.ActiveState = MINECART_STATE_MOUNT;
+			laraItem->Animation.TargetState = MINECART_STATE_MOUNT;
+			break;
+
+		default:
+		case VehicleMountType::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_MOUNT_RIGHT;
+			laraItem->Animation.ActiveState = MINECART_STATE_MOUNT;
+			laraItem->Animation.TargetState = MINECART_STATE_MOUNT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, false);
+			UndrawFlareMeshes(laraItem);
+			lara->Flare.ControlLeft = false;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+		}
+
+		laraItem->Pose = minecartItem->Pose;
+		lara->Control.HandStatus = HandStatus::Busy;
+		minecart->Velocity = 0;
+		minecart->VerticalVelocity = 0;
+		minecart->Gradient = 0;
+		minecart->Flags = 0;
+	}
+
 	static void TriggerWheelSparkles(ItemInfo* item, bool left)
 	{
 		for (int i = 0; i < 2; i++)
@@ -192,41 +260,6 @@ namespace TEN::Entities::Vehicles
 			probe.Position.Floor -= minecartItem->Pose.Position.y;
 
 		return (short)probe.Position.Floor;
-	}
-
-	static bool GetInMinecart(ItemInfo* minecartItem, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.IsAirborne)
-		{
-			return false;
-		}
-
-		if (!TestBoundsCollide(minecartItem, laraItem, coll->Setup.Radius))
-			return false;
-
-		if (!TestCollision(minecartItem, laraItem))
-			return false;
-
-		int x = laraItem->Pose.Position.x - minecartItem->Pose.Position.x;
-		int z = laraItem->Pose.Position.z - minecartItem->Pose.Position.z;
-
-		int distance = pow(x, 2) + pow(z, 2);
-		if (distance > pow(CLICK(2), 2))
-			return false;
-
-		if (GetCollision(minecartItem).Position.Floor < -SECTOR(31.25f))
-			return false;
-
-		// Don't get into minecart if there's two stop blocks in front.
-		// Allows to create minecarts which will get to a point and stop forever.
-
-		if (GetCollision(minecartItem, minecartItem->Pose.Orientation.y, SECTOR(1)).BottomBlock->Flags.MinecartStop())
-			return false;
-
-		return true;
 	}
 
 	static bool TestMinecartDismount(ItemInfo* laraItem, int direction)
@@ -899,53 +932,6 @@ namespace TEN::Entities::Vehicles
 
 			MinecartToEntityCollision(laraItem, minecartItem);
 		}
-	}
-
-	void MinecartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
-			return;
-
-		auto* minecartItem = &g_Level.Items[itemNumber];
-
-		bool doMount = GetInMinecart(minecartItem, laraItem, coll);
-		if (doMount)
-		{
-			lara->Vehicle = itemNumber;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, false);
-				UndrawFlareMeshes(laraItem);
-				lara->Flare.ControlLeft = false;
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-				lara->Control.Weapon.GunType = LaraWeaponType::None;
-			}
-
-			lara->Control.HandStatus = HandStatus::Busy;
-
-			short angle = short(mGetAngle(minecartItem->Pose.Position.x, minecartItem->Pose.Position.z, laraItem->Pose.Position.x, laraItem->Pose.Position.z) - minecartItem->Pose.Orientation.y);
-			if (angle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
-				laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_MOUNT_RIGHT;
-			else
-				laraItem->Animation.AnimNumber = Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_MOUNT_LEFT;
-
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = MINECART_STATE_MOUNT;
-			laraItem->Animation.TargetState = MINECART_STATE_MOUNT;
-			laraItem->Pose = minecartItem->Pose;
-
-			auto* minecart = GetMinecartInfo(minecartItem);
-
-			minecart->Velocity = 0;
-			minecart->VerticalVelocity = 0;
-			minecart->Gradient = 0;
-			minecart->Flags = 0;
-		}
-		else
-			ObjectCollision(itemNumber, laraItem, coll);
 	}
 
 	bool MinecartControl(ItemInfo* laraItem)
