@@ -159,45 +159,62 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			lara->Vehicle = itemNumber;
-
-			if (mountType == VehicleMountType::Right)
-			{
-				// HACK: Hardcoded Nitro item check.
-				if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
-				{
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
-					g_Gui.SetInventoryItemChosen(NO_ITEM);
-				}
-				else
-					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;
-
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = MOTORBIKE_STATE_MOUNT;
-				laraItem->Animation.TargetState = MOTORBIKE_STATE_MOUNT;
-			}
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, false);
-				UndrawFlareMeshes(laraItem);
-				lara->Control.Weapon.GunType = LaraWeaponType::None;
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-				lara->Flare.Life = 0;
-				lara->Flare.ControlLeft = false;
-			}
-
-			ResetLaraFlex(laraItem);
-			laraItem->Pose.Position = motorbikeItem->Pose.Position;
-			laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
-			lara->Control.HandStatus = HandStatus::Free;
-			lara->HitDirection = -1;
-			motorbikeItem->Collidable = true;
-			motorbikeItem->HitPoints = 1;
-			motorbike->Revs = 0;
-			motorbike->LightPower = 0;
-
-			AnimateItem(laraItem);
+			DoMotorbikeMount(motorbikeItem, laraItem, mountType);
 		}
+	}
+
+	void DoMotorbikeMount(ItemInfo* motorbikeItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
+		auto* lara = GetLaraInfo(laraItem);
+
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_IDLE;
+			laraItem->Animation.ActiveState = MOTORBIKE_STATE_IDLE;
+			laraItem->Animation.TargetState = MOTORBIKE_STATE_IDLE;
+			break;
+
+		default:
+		case VehicleMountType::Right:
+			// HACK: Hardcoded Nitro item check.
+			/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
+			{
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
+				g_Gui.SetInventoryItemChosen(NO_ITEM);
+			}
+			else
+				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;*/
+			
+			laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;
+			laraItem->Animation.ActiveState = MOTORBIKE_STATE_MOUNT;
+			laraItem->Animation.TargetState = MOTORBIKE_STATE_MOUNT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, false);
+			UndrawFlareMeshes(laraItem);
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Flare.Life = 0;
+			lara->Flare.ControlLeft = false;
+		}
+
+		ResetLaraFlex(laraItem);
+		laraItem->Pose.Position = motorbikeItem->Pose.Position;
+		laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
+		lara->Control.HandStatus = HandStatus::Free;
+		lara->HitDirection = -1;
+		motorbikeItem->Collidable = true;
+		motorbikeItem->HitPoints = 1;
+		motorbike->Revs = 0;
+		motorbike->LightPower = 0;
+
+		AnimateItem(laraItem);
 	}
 
 	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3Int* pos, Vector3Int* old)
