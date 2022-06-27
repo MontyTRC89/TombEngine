@@ -48,6 +48,7 @@ namespace TEN::Entities::Generic
 
 	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ItemInfo* item)
 	{
+		rope->room = item->RoomNumber;
 		rope->position = *pos1;
 		rope->segmentLength = length << 16;
 
