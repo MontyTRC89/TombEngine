@@ -24,10 +24,12 @@ namespace TEN::Entities::Vehicles
 		if (vehicleItem->Flags & ONESHOT)
 			return VehicleMountType::None;
 
+		// TODO: Jump mounts don't need an input!
 		// Assess ACTION input and hand status.
 		if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free)
 			return VehicleMountType::None;
 
+		// TODO: This tolerance must be larger for water vehicles.
 		// Assess vertical distance to vehicle.
 		if (abs(laraItem->Pose.Position.y - vehicleItem->Pose.Position.y) > STEPUP_HEIGHT)
 			return VehicleMountType::None;
@@ -103,11 +105,9 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Jump:
-				if (abs(deltaHeadingAngle) < ANGLE(135.0f) &&
-					laraItem->Animation.IsAirborne &&
+				if (laraItem->Animation.IsAirborne &&
 					laraItem->Animation.VerticalVelocity > 0 &&
-					laraItem->Pose.Position.y > vehicleItem->Pose.Position.y &&
-					lara->Control.WaterStatus == WaterStatus::Dry)
+					laraItem->Pose.Position.y < vehicleItem->Pose.Position.y)
 				{
 					break;
 				}

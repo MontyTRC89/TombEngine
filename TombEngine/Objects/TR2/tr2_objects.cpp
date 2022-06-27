@@ -663,7 +663,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSpeedboat;
-		obj->collision = SpeedboatCollision;
+		obj->collision = SpeedboatPlayerCollision;
 		obj->control = SpeedboatControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;

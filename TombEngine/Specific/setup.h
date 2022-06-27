@@ -43,7 +43,7 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> floorBorder;
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
-	std::function<void(short item_num, ItemInfo* laraitem, CollisionInfo* coll)> collision;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
 	ZoneType zoneType;
 	int animIndex; 
 	short HitPoints; 

@@ -1,20 +1,14 @@
 #pragma once
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
+#include "Objects/Utils/VehicleHelpers.h"
 
 namespace TEN::Entities::Vehicles
 {
-	enum class SpeedboatMountType
-	{
-		None,
-		StartPosition,
-		WaterLeft,
-		WaterRight,
-		Jump
-	};
-
 	void InitialiseSpeedboat(short itemNumber);
-	SpeedboatMountType GetSpeedboatMountType(ItemInfo* laraItem, ItemInfo* sBoatItem, CollisionInfo* coll);
+
+	void SpeedboatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void DoSpeedboatMount(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool TestSpeedboatDismount(ItemInfo* sBoatItem, int direction);
 	void DoSpeedboatDismount(ItemInfo* laraItem, ItemInfo* sBoatItem);
 
@@ -27,6 +21,5 @@ namespace TEN::Entities::Vehicles
 	bool SpeedboatUserControl(ItemInfo* laraItem, ItemInfo* sBoatItem);
 	void SpeedboatAnimation(ItemInfo* laraItem, ItemInfo* sBoatItem, int collide);
 	void SpeedboatSplash(ItemInfo* item, long verticalVelocity, long water);
-	void SpeedboatCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void SpeedboatControl(short itemNumber);
 }
