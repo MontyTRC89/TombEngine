@@ -430,20 +430,20 @@ namespace TEN::Entities::TR4
 			{
 				if (Lara.Location >= item->ItemFlags[3])
 				{
-					if (!foundTarget || AI.distance >= SECTOR(2048) &&
-						(item->TestBits(JointBitType::MeshSwap, 18) || AI.distance >= SECTOR(8216)))
+					if (!foundTarget || AI.distance >= pow(SECTOR(1.5f), 2) &&
+						(item->TestBits(JointBitType::MeshSwap, 18) || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy == LaraItem)
 						{
-							if (AI.distance >= SECTOR(4096))
+							if (AI.distance >= pow(SECTOR(2), 2))
 							{
-								if (AI.distance > SECTOR(16384))
+								if (AI.distance > pow(SECTOR(4), 2))
 									item->Animation.TargetState = VON_CROY_STATE_RUN;
 							}
 							else
 								item->Animation.TargetState = VON_CROY_STATE_IDLE;
 						}
-						else if (Lara.Location > item->ItemFlags[3] && laraAI.distance > SECTOR(4096))
+						else if (Lara.Location > item->ItemFlags[3] && laraAI.distance > pow(SECTOR(2), 2))
 							item->Animation.TargetState = VON_CROY_STATE_RUN;
 					}
 					else
