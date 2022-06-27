@@ -117,45 +117,6 @@ struct BITE_INFO
 	}
 };
 
-struct EntityStoringInfo
-{
-	// position of the entity
-	int x;
-	int y;
-	int z;
-	// waterLevel is mostly -NO_HEIGHT but if the position are in water then it's 0
-	// waterDepth is the depth starting for the water room ceiling (0) and increase 1 by 1
-	// to store from GetWaterDepth() and GetWaterHeight()
-	int waterLevel;
-	int waterDepth;
-	// to store roomNumber from GetFloor()
-	short roomNumber;
-	// store the boxNumber from LOT or from room->floor[].box
-	short boxNumber;
-
-	EntityStoringInfo()
-	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->waterLevel = 0;
-		this->waterDepth = 0;
-		this->roomNumber = 0;
-		this->boxNumber = 0;
-	}
-
-	EntityStoringInfo(int xpos, int ypos, int zpos)
-	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->waterLevel = 0;
-		this->waterDepth = 0;
-		this->roomNumber = 0;
-		this->boxNumber = 0;
-	}
-};
-
 #define CreatureEffectFunction short(int x, int y, int z, short speed, short yRot, short roomNumber)
 
 constexpr auto BOX_BLOCKED = (1 << 14); // unpassable for other enemies, always set for movable blocks & closed doors
