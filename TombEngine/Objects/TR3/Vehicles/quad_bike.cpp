@@ -156,7 +156,7 @@ namespace TEN::Entities::Vehicles
 		BACK_RIGHT_TYRE = 5
 	};
 
-	static QuadBikeInfo* GetQuadBikeInfo(ItemInfo* quadBikeItem)
+	QuadBikeInfo* GetQuadBikeInfo(ItemInfo* quadBikeItem)
 	{
 		return (QuadBikeInfo*)quadBikeItem->Data;
 	}
@@ -185,50 +185,56 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			lara->Vehicle = itemNumber;
-
-			switch (mountType)
-			{
-			case VehicleMountType::LevelStart:
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IDLE;
-				laraItem->Animation.ActiveState = QBIKE_STATE_IDLE;
-				laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
-				break;
-
-			case VehicleMountType::Left:
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_LEFT;
-				laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_LEFT;
-				laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_LEFT;
-				break;
-
-			default:
-			case VehicleMountType::Right:
-				laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_RIGHT;
-				laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_RIGHT;
-				laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_RIGHT;
-				break;
-			}
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-				UndrawFlareMeshes(laraItem);
-				lara->Control.Weapon.GunType = LaraWeaponType::None;
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-				lara->Flare.ControlLeft = false;
-			}
-
-			ResetLaraFlex(laraItem);
-			laraItem->Pose.Position = quadBikeItem->Pose.Position;
-			laraItem->Pose.Orientation = Vector3Shrt(0, quadBikeItem->Pose.Orientation.y, 0);
-			lara->Control.HandStatus = HandStatus::Busy;
-			lara->HitDirection = -1;
-			quadBikeItem->HitPoints = 1;
-
-			AnimateItem(laraItem);
-
-			quadBike->Revs = 0;
+			DoQuadBikeMount(quadBikeItem, laraItem, mountType);
 		}
+	}
+
+	void DoQuadBikeMount(ItemInfo* quadBikeItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_IDLE;
+			laraItem->Animation.ActiveState = QBIKE_STATE_IDLE;
+			laraItem->Animation.TargetState = QBIKE_STATE_IDLE;
+			break;
+
+		case VehicleMountType::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_LEFT;
+			laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_LEFT;
+			laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_LEFT;
+			break;
+
+		default:
+		case VehicleMountType::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_QUAD_LARA_ANIMS].animIndex + QBIKE_ANIM_MOUNT_RIGHT;
+			laraItem->Animation.ActiveState = QBIKE_STATE_MOUNT_RIGHT;
+			laraItem->Animation.TargetState = QBIKE_STATE_MOUNT_RIGHT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
+			UndrawFlareMeshes(laraItem);
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Flare.ControlLeft = false;
+		}
+
+		ResetLaraFlex(laraItem);
+		laraItem->Pose.Position = quadBikeItem->Pose.Position;
+		laraItem->Pose.Orientation = Vector3Shrt(0, quadBikeItem->Pose.Orientation.y, 0);
+		lara->Control.HandStatus = HandStatus::Busy;
+		lara->HitDirection = -1;
+		quadBikeItem->HitPoints = 1;
+		quadBike->Revs = 0;
+
+		AnimateItem(laraItem);
 	}
 
 	static int CanQuadbikeGetOff(int direction)

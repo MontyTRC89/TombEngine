@@ -26,7 +26,7 @@ namespace TEN::Input
 
 	enum InputActions
 	{
-		IN_NONE		  = 0,
+		IN_NONE		  = (1 << 0),
 		IN_FORWARD	  = (1 << KEY_FORWARD),
 		IN_BACK		  = (1 << KEY_BACK),
 		IN_LEFT		  = (1 << KEY_LEFT),
@@ -98,17 +98,17 @@ namespace TEN::Input
 	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
 	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
 
-	constexpr int IN_OPTIC_CONTROLS = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT);
-	constexpr int IN_WAKE = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION);
-	constexpr int IN_DIRECTION = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT);
+	constexpr int IN_OPTIC_CONTROLS = IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT;
+	constexpr int IN_WAKE			= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION;
+	constexpr int IN_DIRECTION		= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT;
 
 	extern const char* g_KeyNames[];
-	extern int TrInput;
-	extern int DbInput;
-	extern int RawInput;
+	extern int DbInput;  // Debounce; is input clicked?
+	extern int TrInput;  // Throttle; is input held?
+	extern int RawInput; // ...; is input released?
 
-	extern std::vector<bool>   KeyMap;
-	extern std::vector<float>  AxisMap;
+	extern std::vector<bool>  KeyMap;
+	extern std::vector<float> AxisMap;
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 
