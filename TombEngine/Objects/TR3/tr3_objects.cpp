@@ -400,7 +400,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseRubberBoat;
 		obj->control = RubberBoatControl;
-		obj->collision = RubberBoatCollision;
+		obj->collision = RubberBoatPlayerCollision;
 		obj->drawRoutine = DrawRubberBoat;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;

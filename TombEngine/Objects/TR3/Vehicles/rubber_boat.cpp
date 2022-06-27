@@ -35,7 +35,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_SIDE = 300;
 	constexpr auto RBOAT_SLIP = 10;
 	constexpr auto RBOAT_SIDE_SLIP = 30;
-	constexpr auto RBOAT_MOUNT_DISTANCE = CLICK(2);
+	constexpr auto RBOAT_MOUNT_DISTANCE = CLICK(2.25f);
 
 	constexpr auto RBOAT_VELOCITY_ACCEL = 5;
 	constexpr auto RBOAT_VELOCITY_DECEL = 1;
@@ -93,15 +93,6 @@ namespace TEN::Entities::Vehicles
 		RBOAT_ANIM_TURN_RIGHT_START = 22
 	};
 
-	enum RubberBoatMountType
-	{
-		RBOAT_MOUNT_NONE = 0,
-		RBOAT_MOUNT_LEFT = 1,
-		RBOAT_MOUNT_RIGHT = 2,
-		RBOAT_MOUNT_JUMP = 3,
-		RBOAT_MOUNT_LEVEL_START = 4
-	};
-
 	RubberBoatInfo* GetRubberBoatInfo(ItemInfo* rBoatItem)
 	{
 		return (RubberBoatInfo*)rBoatItem->Data;
@@ -114,6 +105,80 @@ namespace TEN::Entities::Vehicles
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 	}
 
+	void RubberBoatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto* rBoatItem = &g_Level.Items[itemNumber];
+		auto* lara = GetLaraInfo(laraItem);
+
+		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+			return;
+
+		auto mountType = GetVehicleMountType(rBoatItem, laraItem, coll, RubberBoatMountTypes, RBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
+		if (mountType == VehicleMountType::None)
+		{
+			coll->Setup.EnableObjectPush = true;
+			ObjectCollision(itemNumber, laraItem, coll);
+		}
+		else
+		{
+			lara->Vehicle = itemNumber;
+			DoRubberBoatMount(rBoatItem, laraItem, mountType);
+
+			if (g_Level.Items[itemNumber].Status != ITEM_ACTIVE)
+			{
+				AddActiveItem(itemNumber);
+				g_Level.Items[itemNumber].Status = ITEM_ACTIVE;
+			}
+		}
+	}
+
+	void DoRubberBoatMount(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE;
+			laraItem->Animation.ActiveState = RBOAT_STATE_IDLE;
+			laraItem->Animation.TargetState = RBOAT_STATE_IDLE;
+			break;
+
+		case VehicleMountType::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_LEFT;
+			laraItem->Animation.ActiveState = RBOAT_STATE_MOUNT;
+			laraItem->Animation.TargetState = RBOAT_STATE_MOUNT;
+			break;
+
+		case VehicleMountType::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_RIGHT;
+			laraItem->Animation.ActiveState = RBOAT_STATE_MOUNT;
+			laraItem->Animation.TargetState = RBOAT_STATE_MOUNT;
+			break;
+
+		default:
+		case VehicleMountType::Jump:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_JUMP;
+			laraItem->Animation.ActiveState = RBOAT_STATE_MOUNT;
+			laraItem->Animation.TargetState = RBOAT_STATE_MOUNT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (laraItem->RoomNumber != rBoatItem->RoomNumber)
+			ItemNewRoom(lara->ItemNumber, rBoatItem->RoomNumber);
+
+		laraItem->Pose.Position = rBoatItem->Pose.Position;
+		laraItem->Pose.Position.y -= 5;
+		laraItem->Pose.Orientation = Vector3Shrt(0, rBoatItem->Pose.Orientation.y, 0);
+		laraItem->Animation.IsAirborne = false;
+		laraItem->Animation.Velocity = 0;
+		laraItem->Animation.VerticalVelocity = 0;
+		lara->Control.WaterStatus = WaterStatus::Dry;
+
+		AnimateItem(laraItem);
+	}
+
 	void DrawRubberBoat(ItemInfo* rBoatItem)
 	{
 		/* TODO: WTF?
@@ -124,67 +189,6 @@ namespace TEN::Entities::Vehicles
 		DrawAnimatingItem(item);
 		item->data = b;
 		*/
-	}
-
-	RubberBoatMountType GetRubberBoatMountType(ItemInfo* laraItem, short itemNumber, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* rBoat = &g_Level.Items[itemNumber];
-
-		RubberBoatMountType mountType = RBOAT_MOUNT_NONE;
-
-		if (!(TrInput & IN_ACTION) ||
-			lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.IsAirborne ||
-			rBoat->Animation.Velocity)
-		{
-			return mountType;
-		}
-
-		short x = laraItem->Pose.Position.x - rBoat->Pose.Position.x;
-		short z = laraItem->Pose.Position.z - rBoat->Pose.Position.z;
-
-		int distance = z * phd_cos(-rBoat->Pose.Orientation.y) - x * phd_sin(-rBoat->Pose.Orientation.y);
-		if (distance > CLICK(2))
-			return mountType;
-
-		short deltaAngle = rBoat->Pose.Orientation.y - laraItem->Pose.Orientation.y;
-		if (lara->Control.WaterStatus == WaterStatus::TreadWater || lara->Control.WaterStatus == WaterStatus::Wade)
-		{
-			if (deltaAngle > ANGLE(45.0f) && deltaAngle < ANGLE(135.0f))
-				mountType = RBOAT_MOUNT_LEFT;
-			if (deltaAngle < -ANGLE(135.0f) && deltaAngle > -ANGLE(45.0f))
-				mountType = RBOAT_MOUNT_RIGHT;
-		}
-		else if (lara->Control.WaterStatus == WaterStatus::Dry)
-		{
-			if (laraItem->Animation.VerticalVelocity > 0)
-			{
-				if ((laraItem->Pose.Position.y + CLICK(2)) > rBoat->Pose.Position.y)
-					mountType = RBOAT_MOUNT_JUMP;
-			}
-			else if (laraItem->Animation.VerticalVelocity == 0)
-			{
-				if (deltaAngle > -ANGLE(135.0f) && deltaAngle < ANGLE(135.0f))
-				{
-					if (laraItem->Pose.Position == rBoat->Pose.Position)
-						mountType = RBOAT_MOUNT_LEVEL_START;
-					else
-						mountType = RBOAT_MOUNT_JUMP;
-				}
-			}
-		}
-
-		if (!mountType)
-			return RBOAT_MOUNT_NONE;
-
-		if (!TestBoundsCollide(rBoat, laraItem, coll->Setup.Radius))
-			return RBOAT_MOUNT_NONE;
-
-		if (!TestCollision(rBoat, laraItem))
-			return RBOAT_MOUNT_NONE;
-
-		return mountType;
 	}
 
 	static void DoRubberBoatShift(ItemInfo* laraItem, int itemNumber)
@@ -588,59 +592,6 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return noTurn;
-	}
-
-	void RubberBoatCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
-			return;
-
-		auto* item = &g_Level.Items[itemNum];
-		int mountType = GetRubberBoatMountType(laraItem, itemNum, coll);
-
-		if (!mountType)
-		{
-			coll->Setup.EnableObjectPush = true;
-			ObjectCollision(itemNum, laraItem, coll);
-			return;
-		}
-
-		lara->Vehicle = itemNum;
-	
-		if (mountType == 1)
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_RIGHT;
-		else if (mountType == 2)
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_LEFT;
-		else if (mountType == 3)
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_MOUNT_JUMP;
-		else
-			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE;
-
-		laraItem->Pose.Position.x = item->Pose.Position.x;
-		laraItem->Pose.Position.y = item->Pose.Position.y - 5;
-		laraItem->Pose.Position.z = item->Pose.Position.z;
-		laraItem->Pose.Orientation.x = 0;
-		laraItem->Pose.Orientation.y = item->Pose.Orientation.y;
-		laraItem->Pose.Orientation.z = 0;
-		laraItem->Animation.IsAirborne = false;
-		laraItem->Animation.Velocity = 0;
-		laraItem->Animation.VerticalVelocity = 0;
-		laraItem->Animation.ActiveState = 0;
-		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-		lara->Control.WaterStatus = WaterStatus::Dry;
-
-		if (laraItem->RoomNumber != item->RoomNumber)
-			ItemNewRoom(lara->ItemNumber, item->RoomNumber);
-
-		AnimateItem(laraItem);
-
-		if (g_Level.Items[itemNum].Status != ITEM_ACTIVE)
-		{
-			AddActiveItem(itemNum);
-			g_Level.Items[itemNum].Status = ITEM_ACTIVE;
-		}
 	}
 
 	static bool TestRubberBoatDismount(ItemInfo* laraItem, int direction)
