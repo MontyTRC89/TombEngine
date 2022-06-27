@@ -630,6 +630,25 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	auto probe = GetCollision(item);
+	auto bounds = GetBoundsAccurate(item);
+
+	// TODO: In future, add more checks
+	if (probe.Position.Floor < item->Pose.Position.y + bounds->Y2)
+	{
+		item->Pose.Position.y = probe.Position.Floor - bounds->Y2;
+		FallFromRope(item);
+		DoDamage(item, 0);
+		return;
+	}
+	if (probe.Position.Ceiling > item->Pose.Position.y + bounds->Y1)
+	{
+		item->Pose.Position.y = probe.Position.Ceiling - bounds->Y1;
+		FallFromRope(item);
+		DoDamage(item, 0);
+		return;
+	}
+
 	Camera.targetDistance = SECTOR(2);
 
 	UpdateRopeSwing(item);
