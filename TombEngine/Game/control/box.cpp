@@ -1456,10 +1456,18 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	else
 		AI->zoneNumber = NO_ZONE;
 
-	room = &g_Level.Rooms[enemy->RoomNumber];
 	enemy->BoxNumber = NO_BOX;
+
+	room = &g_Level.Rooms[enemy->RoomNumber];
 	floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
-	if(floor)
+
+	// NEW: Only update enemy box number if will be actually reachable by enemy.
+	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
+	auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
+	auto bounds = GetBoundsAccurate(item);
+	bool reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+
+	if (floor && reachable)
 		enemy->BoxNumber = floor->Box;
 
 	if (enemy->BoxNumber != NO_BOX)
@@ -1716,7 +1724,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
 				break;
 
 			case MoodType::Attack:
-				if (AI->zoneNumber != AI->enemyZone)
+				if (AI->zoneNumber != AI->enemyZone || enemy->BoxNumber == NO_BOX)
 					creature->Mood = MoodType::Bored;
 
 				break;
@@ -1745,8 +1753,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
 				else if (AI->zoneNumber == AI->enemyZone)
 				{
 					if (AI->distance < ATTACK_RANGE ||
-						(creature->Mood == MoodType::Stalk &&
-							LOT->RequiredBox == NO_BOX))
+						(creature->Mood == MoodType::Stalk && LOT->RequiredBox == NO_BOX))
 						creature->Mood = MoodType::Attack;
 					else
 						creature->Mood = MoodType::Stalk;
