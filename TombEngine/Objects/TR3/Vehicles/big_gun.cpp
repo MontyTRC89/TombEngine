@@ -18,6 +18,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	#define RECOIL_TIME 26

@@ -220,10 +220,8 @@ namespace TEN::Entities::TR1
 					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
 					CreatureEffect(item, &BigRatBite, DoBloodSplat);
+					DoDamage(creature->Enemy, BIG_RAT_BITE_DAMAGE);
 					item->Animation.RequiredState = BIG_RAT_STATE_IDLE;
-
-					LaraItem->HitPoints -= BIG_RAT_BITE_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;
@@ -233,10 +231,8 @@ namespace TEN::Entities::TR1
 					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
 					CreatureEffect(item, &BigRatBite, DoBloodSplat);
+					DoDamage(creature->Enemy, BIG_RAT_CHARGE_DAMAGE);
 					item->Animation.RequiredState = BIG_RAT_STATE_RUN;
-
-					LaraItem->HitPoints -= BIG_RAT_CHARGE_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;
@@ -267,9 +263,7 @@ namespace TEN::Entities::TR1
 					item->TestBits(JointBitType::Touch, BigRatAttackJoints))
 				{
 					CreatureEffect(item, &BigRatBite, DoBloodSplat);
-
-					LaraItem->HitPoints -= BIG_RAT_BITE_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, BIG_RAT_BITE_DAMAGE);
 				}
 
 				item->Animation.TargetState = BIG_RAT_STATE_SWIM;

@@ -305,7 +305,7 @@ void UpdateSparks()
 								LaraBurn(LaraItem);
 
 							if (spark->flags & SP_DAMAGE)
-								LaraItem->HitPoints -= 2;
+								DoDamage(LaraItem, 2);
 
 							if (spark->flags & SP_POISON)
 								Lara.PoisonPotency += 5;

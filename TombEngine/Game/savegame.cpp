@@ -260,7 +260,7 @@ bool SaveGame::Save(int slot)
 	count.add_no_cheat(Lara.Control.Count.NoCheat);
 	count.add_pose(Lara.Control.Count.Pose);
 	count.add_position_adjust(Lara.Control.Count.PositionAdjust);
-	count.add_run_jump(Lara.Control.Count.RunJump);
+	count.add_run_jump(Lara.Control.Count.Run);
 	auto countOffset = count.Finish();
 
 	Save::WeaponControlDataBuilder weaponControl{ fbb };
@@ -390,7 +390,6 @@ bool SaveGame::Save(int slot)
 	lara.add_poison_potency(Lara.PoisonPotency);
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
-	lara.add_spasm_effect_count(Lara.SpasmEffectCount);
 	lara.add_sprint_energy(Lara.SprintEnergy);
 	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
@@ -1620,7 +1619,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Count.NoCheat = s->lara()->control()->count()->no_cheat();
 	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
-	Lara.Control.Count.RunJump = s->lara()->control()->count()->run_jump();
+	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
 	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.IsLow = s->lara()->control()->is_low();
@@ -1738,7 +1737,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Tightrope.TightropeItem = s->lara()->control()->tightrope()->tightrope_item();
 	Lara.Control.Tightrope.TimeOnTightrope = s->lara()->control()->tightrope()->time_on_tightrope();
 	Lara.Control.WaterStatus = (WaterStatus)s->lara()->control()->water_status();
-	Lara.SpasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.SprintEnergy = s->lara()->sprint_energy();
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);

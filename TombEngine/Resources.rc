@@ -15,10 +15,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Russian (Russia) resources
+// English resources
 
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
-LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -29,7 +29,67 @@ LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
 // remains consistent on all systems.
 IDI_ICON1               ICON                    "ten.ico"
 
-#endif    // Russian (Russia) resources
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SETUP DIALOGEX 0, 0, 335, 209
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
+CAPTION "TombEngine"
+FONT 8, "Segoe UI", 400, 0, 0xCC
+BEGIN
+    COMBOBOX        IDC_GFXADAPTER,13,23,308,71,CBS_DROPDOWNLIST | WS_TABSTOP
+    COMBOBOX        IDC_RESOLUTION,21,79,117,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "TXT_Windowed",IDC_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,103,115,10
+    CONTROL         "TXT Shadows",IDC_SHADOWS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,79,159,10
+    CONTROL         "TXT Caustics",IDC_CAUSTICS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,94,160,10
+    CONTROL         "TXT Volumetric Fog",IDC_VOLUMETRIC_FOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,109,160,10
+    GROUPBOX        "Txt_Sound",IDC_GROUP_SOUND,7,151,320,33
+    CONTROL         "TXT_Enable",IDC_ENABLE_SOUNDS,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,254,150,67,10
+    COMBOBOX        IDC_SNDADAPTER,13,164,308,71,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,109,189,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,175,189,50,14
+    GROUPBOX        "Txt_GraphicsAdapter",IDC_GROUP_GFXADAPTER,7,7,320,39
+    GROUPBOX        "Txt_OutputSettings",IDC_GROUP_OUTPUT_SETTINGS,7,51,320,94
+    GROUPBOX        "TXT_Resolution",IDC_GROUP_RESOLUTION,15,66,128,62
+    GROUPBOX        "TXT_Render Options",IDC_GROUP_RENDER_OPTIONS,148,66,173,62
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_SETUP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 334
+        VERTGUIDE, 7
+        VERTGUIDE, 15
+        VERTGUIDE, 21
+        VERTGUIDE, 148
+        VERTGUIDE, 155
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SETUP AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -63,77 +123,6 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_SETUP DIALOGEX 0, 0, 335, 353
-STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION
-CAPTION "TombEngine"
-FONT 8, "MS Sans Serif", 0, 0, 0x0
-BEGIN
-    COMBOBOX        IDC_GFXADAPTER,13,167,308,71,CBS_DROPDOWNLIST | WS_TABSTOP
-    COMBOBOX        IDC_RESOLUTION,21,223,117,84,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "TXT_Windowed",IDC_WINDOWED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,247,115,10
-    CONTROL         "TXT Shadows",IDC_SHADOWS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,223,159,10
-    CONTROL         "TXT Caustics",IDC_CAUSTICS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,238,160,10
-    CONTROL         "TXT Volumetric Fog",IDC_VOLUMETRIC_FOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,253,160,10
-    GROUPBOX        "Txt_Sound",IDC_GROUP_SOUND,7,295,320,33
-    CONTROL         "TXT_Enable",IDC_ENABLE_SOUNDS,"Button",BS_AUTOCHECKBOX | BS_LEFTTEXT | WS_TABSTOP,254,294,67,10
-    COMBOBOX        IDC_SNDADAPTER,13,308,308,71,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    DEFPUSHBUTTON   "OK",IDOK,109,333,50,14
-    PUSHBUTTON      "Cancel",IDCANCEL,175,333,50,14
-    GROUPBOX        "Txt_GraphicsAdapter",IDC_GROUP_GFXADAPTER,7,151,320,39
-    GROUPBOX        "Txt_OutputSettings",IDC_GROUP_OUTPUT_SETTINGS,7,195,320,94
-    GROUPBOX        "TXT_Resolution",IDC_GROUP_RESOLUTION,15,210,128,62
-    GROUPBOX        "TXT_Render Options",IDC_GROUP_RENDER_OPTIONS,148,210,173,62
-    CONTROL         IDB_BITMAP1,IDC_BANNER,"Static",SS_BITMAP,1,0,333,172
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_SETUP, DIALOG
-    BEGIN
-        RIGHTMARGIN, 334
-        VERTGUIDE, 7
-        VERTGUIDE, 15
-        VERTGUIDE, 21
-        VERTGUIDE, 148
-        VERTGUIDE, 155
-        HORZGUIDE, 223
-        HORZGUIDE, 272
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_SETUP AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDB_BMP_BANNER          BITMAP                  "Banner.bmp"
 
 #endif    // Italian (Italy) resources
 /////////////////////////////////////////////////////////////////////////////
