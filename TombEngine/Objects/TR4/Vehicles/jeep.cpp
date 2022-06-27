@@ -26,13 +26,8 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	//bool QuadHandbrakeStarting;
-	//bool QuadCanHandbrakeStart;
 	char JeepSmokeStart;
 	bool JeepNoGetOff;
-	short Unk_0080DE1A;
-	int Unk_0080DDE8;
-	short Unk_0080DE24;
 
 	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
 	const vector<int> JeepBrakeLightJoints = {};
@@ -228,7 +223,7 @@ namespace TEN::Entities::Vehicles
 		jeepItem->HitPoints = 1;
 		jeepItem->Flags |= TRIGGERED;
 		jeep->Revs = 0;
-		jeep->unknown2 = 0;
+		jeep->Gear = 0;
 
 		AnimateItem(laraItem);
 	}
@@ -490,7 +485,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* jeep = GetJeepInfo(jeepItem);
 
-		if (jeep->unknown2 != 0)
+		if (jeep->Gear != 0)
 			return 0;
 
 		p->x = jeepItem->Pose.Position.x - p->x;
@@ -707,18 +702,16 @@ namespace TEN::Entities::Vehicles
 		if (!jeep->Velocity)
 			rot1 = 0;
 
-		jeep->ExtraRotation = rot1;
-	
-		/*jeep->unknown0 += rot1 / 2;
+		jeep->ExtraRotationDrift = (jeep->ExtraRotationDrift + rot1) / 2;
 
-		if (abs(jeep->unknown0) < 2)
-			jeep->unknown0 = 0;
+		if (abs(jeep->ExtraRotationDrift) < 2)
+			jeep->ExtraRotationDrift = 0;
 
-		if (abs(jeep->unknown0 - jeep->ExtraRotation) >= 4)
-			jeep->ExtraRotation += ((jeep->unknown0 - jeep->ExtraRotation) / 4);
+		if (abs(jeep->ExtraRotationDrift - jeep->ExtraRotation) >= 4)
+			jeep->ExtraRotation += ((jeep->ExtraRotationDrift - jeep->ExtraRotation) / 4);
 		else
-			jeep->ExtraRotation = jeep->unknown0;
-			*/ // just incase this code is ever uncommented.
+			jeep->ExtraRotation = jeep->ExtraRotationDrift;
+
 		int newspeed = 0;
 		int collide = GetJeepCollisionAnim(jeepItem, &movedPos);
 	
@@ -832,11 +825,11 @@ namespace TEN::Entities::Vehicles
 			// Accelerate
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
-				if (jeep->unknown2)
+				if (jeep->Gear)
 				{
-					if (jeep->unknown2 == 1 && jeep->Velocity > -JEEP_REVERSE_VELOCITY_MAX)
+					if (jeep->Gear == 1 && jeep->Velocity > -JEEP_REVERSE_VELOCITY_MAX)
 						jeep->Velocity -= (abs(-JEEP_REVERSE_VELOCITY_MAX - jeep->Velocity) / 8) - 2;
-					else if (jeep->unknown2 == 1 && jeep->Velocity < -JEEP_REVERSE_VELOCITY_MAX)
+					else if (jeep->Gear == 1 && jeep->Velocity < -JEEP_REVERSE_VELOCITY_MAX)
 						jeep->Velocity = -JEEP_REVERSE_VELOCITY_MAX;
 				}
 				else
@@ -904,7 +897,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState != JS_JUMP && 
 			laraItem->Animation.ActiveState != JS_LAND)
 		{
-			if (jeep->unknown2 == 1)
+			if (jeep->Gear == 1)
 				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_BACK_JUMP_START;
 			else
 				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_FWD_JUMP_START;
@@ -969,17 +962,17 @@ namespace TEN::Entities::Vehicles
 
 					if (DbInput & JEEP_IN_TOGGLE_FORWARD)
 					{
-						if (jeep->unknown2)
-							jeep->unknown2--;
+						if (jeep->Gear)
+							jeep->Gear--;
 
 						break;
 					}
 					else if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
-						if (jeep->unknown2 < 1)
+						if (jeep->Gear < 1)
 						{
-							jeep->unknown2++;
-							if (jeep->unknown2 == 1)
+							jeep->Gear++;
+							if (jeep->Gear == 1)
 								laraItem->Animation.TargetState = JS_DRIVE_BACK;
 
 							break;
@@ -1012,18 +1005,18 @@ namespace TEN::Entities::Vehicles
 							else if (TrInput & VEHICLE_IN_RIGHT)
 								laraItem->TargetState = JS_FWD_RIGHT;
 						}
-						else if (jeep->unknown2 < 1)
+						else if (jeep->Gear < 1)
 						{
-							jeep->unknown2++;
-							if (jeep->unknown2 == 1)
+							jeep->Gear++;
+							if (jeep->Gear == 1)
 								laraItem->TargetState = JS_DRIVE_BACK;
 
 						}
 					}
 					else
 					{
-						if (jeep->unknown2)
-							jeep->unknown2--;
+						if (jeep->Gear)
+							jeep->Gear--;
 					}*/
 				}
 
@@ -1091,10 +1084,10 @@ namespace TEN::Entities::Vehicles
 				{
 					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
-						if (jeep->unknown2 < 1)
+						if (jeep->Gear < 1)
 						{
-							jeep->unknown2++;
-							if (jeep->unknown2 == 1)
+							jeep->Gear++;
+							if (jeep->Gear == 1)
 							{
 								laraItem->Animation.TargetState = JS_BACK_RIGHT;
 								laraItem->Animation.ActiveState = JS_BACK_RIGHT;
@@ -1115,8 +1108,8 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					if (jeep->unknown2)
-						jeep->unknown2--;
+					if (jeep->Gear)
+						jeep->Gear--;
 				}
 
 				if (laraItem->Animation.AnimNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_FWD_LEFT &&
@@ -1144,10 +1137,10 @@ namespace TEN::Entities::Vehicles
 				{
 					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
-						if (jeep->unknown2 < 1)
+						if (jeep->Gear < 1)
 						{
-							jeep->unknown2++;
-							if (jeep->unknown2 == 1)
+							jeep->Gear++;
+							if (jeep->Gear == 1)
 							{
 								laraItem->Animation.TargetState = JS_BACK_LEFT;
 								laraItem->Animation.ActiveState = JS_BACK_LEFT;
@@ -1168,8 +1161,8 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					if (jeep->unknown2)
-						jeep->unknown2--;
+					if (jeep->Gear)
+						jeep->Gear--;
 				}
 
 				if (laraItem->Animation.AnimNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_FWD_RIGHT && !jeep->Velocity)
@@ -1218,8 +1211,8 @@ namespace TEN::Entities::Vehicles
 				{
 					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
-						if (jeep->unknown2 < 1)
-							jeep->unknown2++;
+						if (jeep->Gear < 1)
+							jeep->Gear++;
 					}
 					else if (TrInput & VEHICLE_IN_RIGHT)
 						laraItem->Animation.TargetState = JS_BACK_LEFT;
@@ -1228,10 +1221,10 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					if (jeep->unknown2)
+					if (jeep->Gear)
 					{
-						jeep->unknown2--;
-						if (!jeep->unknown2)
+						jeep->Gear--;
+						if (!jeep->Gear)
 						{
 							laraItem->Animation.TargetState = JS_FWD_RIGHT;
 							laraItem->Animation.ActiveState = JS_FWD_RIGHT;
@@ -1267,8 +1260,8 @@ namespace TEN::Entities::Vehicles
 				{
 					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 					{
-						if (jeep->unknown2 < 1)
-							jeep->unknown2++;
+						if (jeep->Gear < 1)
+							jeep->Gear++;
 					}
 					else if (TrInput & VEHICLE_IN_LEFT)
 						laraItem->Animation.TargetState = JS_BACK_RIGHT;
@@ -1291,7 +1284,7 @@ namespace TEN::Entities::Vehicles
 					}
 					break;
 				}
-				else if (!jeep->unknown2 || (--jeep->unknown2 != 0))
+				else if (!jeep->Gear || (--jeep->Gear != 0))
 				{
 					if (laraItem->Animation.AnimNumber == Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_BACK_RIGHT && !jeep->Velocity)
 					{
@@ -1327,8 +1320,8 @@ namespace TEN::Entities::Vehicles
 					{
 						if (DbInput & JEEP_IN_TOGGLE_REVERSE)
 						{
-							if (jeep->unknown2 < 1)
-								jeep->unknown2++;
+							if (jeep->Gear < 1)
+								jeep->Gear++;
 						}
 						else if (!(TrInput & VEHICLE_IN_ACCELERATE) || TrInput & VEHICLE_IN_BRAKE)
 						{
@@ -1342,10 +1335,10 @@ namespace TEN::Entities::Vehicles
 					}
 					else
 					{
-						if (jeep->unknown2)
+						if (jeep->Gear)
 						{
-							jeep->unknown2--;
-							if (!jeep->unknown2)
+							jeep->Gear--;
+							if (!jeep->Gear)
 								laraItem->Animation.TargetState = JEEP_STATE_IDLE;
 						}
 					}
@@ -1493,9 +1486,9 @@ namespace TEN::Entities::Vehicles
 			Camera.targetElevation = -ANGLE(30.0f);
 			Camera.targetDistance = SECTOR(2);
 
-			if (jeep->unknown2)
+			if (jeep->Gear)
 			{
-				if (jeep->unknown2 == 1)
+				if (jeep->Gear == 1)
 					jeep->VerticalVelocity += ((32578 - jeep->VerticalVelocity) / 8);
 			}
 			else
