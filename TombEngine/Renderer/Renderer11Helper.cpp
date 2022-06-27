@@ -212,7 +212,10 @@ namespace TEN::Renderer
 					if (j == 3 || j == 4)
 						currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
 					else if (j == 6 || j == 7)
+					{
 						currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
+						currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
+					}
 				},
 				[&j, &currentBone](JeepInfo& jeep)
 				{
@@ -220,9 +223,11 @@ namespace TEN::Renderer
 					{
 					case 9:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
+						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
 						break;
 					case 10:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
+						currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
 						break;
 					case 12:
 						currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
@@ -237,6 +242,9 @@ namespace TEN::Renderer
 					switch (j)
 					{
 					case 2:
+						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+						currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
+						break;
 					case 4:
 						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
 						break;
