@@ -520,8 +520,8 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int f_old, b_old, mm_old, mt_old, mb_old;
 
-		int hf_old = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, true, &f_old);
-		int hb_old = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, true, &b_old);
+		int hf_old  = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, true, &f_old);
+		int hb_old  = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, true, &b_old);
 		int hmm_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), -JEEP_SIDE, true, &mm_old);
 		int hmt_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, true, &mt_old);
 		int hmb_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), 0, true, &mb_old);
@@ -530,17 +530,6 @@ namespace TEN::Entities::Vehicles
 		oldPos.x = jeepItem->Pose.Position.x;
 		oldPos.y = jeepItem->Pose.Position.y;
 		oldPos.z = jeepItem->Pose.Position.z;
-
-		if (mm_old.y > hmm_old)
-			mm_old.y = hmm_old;
-		if (mt_old.y > hmt_old)
-			mt_old.y = hmt_old;
-		if (f_old.y > hf_old)
-			f_old.y = hf_old;
-		if (b_old.y > hb_old)
-			b_old.y = hb_old;
-		if (mb_old.y > hmb_old)
-			mb_old.y = hmb_old;
 
 		short rot = 0;
 
