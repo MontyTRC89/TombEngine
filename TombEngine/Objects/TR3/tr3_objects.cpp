@@ -424,7 +424,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseMinecart;
-		obj->collision = MinecartCollision;
+		obj->collision = MinecartPlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
