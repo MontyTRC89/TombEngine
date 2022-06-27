@@ -28,13 +28,15 @@ namespace TEN::Entities::Vehicles
 		if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free)
 			return VehicleMountType::None;
 
-		// Assess height difference.
+		// Assess vertical distance to vehicle.
 		if (abs(laraItem->Pose.Position.y - vehicleItem->Pose.Position.y) > STEPUP_HEIGHT)
 			return VehicleMountType::None;
 
-		// Assess distance to vehicle.
-		float distance = Vector3::Distance(laraItem->Pose.Position.ToVector3(), vehicleItem->Pose.Position.ToVector3());
-		if (distance > minDistance)
+		// Assess 2D distance to vehicle.
+		float distance2D = Vector2::Distance(
+			Vector2(laraItem->Pose.Position.x, laraItem->Pose.Position.z),
+			Vector2(vehicleItem->Pose.Position.x, vehicleItem->Pose.Position.z));
+		if (distance2D > minDistance)
 			return VehicleMountType::None;
 
 		// Assess object collision.
