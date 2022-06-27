@@ -68,6 +68,7 @@ struct AI_INFO
 	int zoneNumber;
 	int enemyZone;
 	int distance;
+	int verticalDistance;
 	int ahead;
 	int bite;
 	short angle;

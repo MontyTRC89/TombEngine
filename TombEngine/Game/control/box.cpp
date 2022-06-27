@@ -1500,13 +1500,18 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	short angle = phd_atan(vector.z, vector.x);
 
 	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
-		AI->distance = INT_MAX;
+		AI->distance = AI->verticalDistance = INT_MAX;
 	else
 	{
 		if (creature->Enemy)
+		{
+			// TODO: distance is squared, verticalDistance is not. Desquare distance later. -- Lwmte, 27.06.22
+
 			AI->distance = pow(vector.x, 2) + pow(vector.z, 2);
+			AI->verticalDistance = abs(vector.y);
+		}
 		else
-			AI->distance = INT_MAX;
+			AI->distance = AI->verticalDistance = INT_MAX;
 	}
 
 	AI->angle = angle - item->Pose.Orientation.y;
