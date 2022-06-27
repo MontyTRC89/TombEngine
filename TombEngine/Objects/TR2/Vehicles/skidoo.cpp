@@ -43,7 +43,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_SLIP = 100;
 	constexpr auto SKIDOO_SLIP_SIDE = 50;
 	constexpr auto SKIDOO_SNOW = 500; // Unused.
-	constexpr auto SKIDOO_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto SKIDOO_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto SKIDOO_DISMOUNT_DISTANCE = 295;
 
 	constexpr auto SKIDOO_VELOCITY_ACCEL = 10;
@@ -142,7 +142,7 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 			return;
 
-		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE_MIN);
+		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE);
 		if (mountType == VehicleMountType::None)
 			ObjectCollision(itemNumber, laraItem, coll);
 		else

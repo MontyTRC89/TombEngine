@@ -16,7 +16,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float minDistance)
+	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float minDistance2D)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -36,7 +36,7 @@ namespace TEN::Entities::Vehicles
 		float distance2D = Vector2::Distance(
 			Vector2(laraItem->Pose.Position.x, laraItem->Pose.Position.z),
 			Vector2(vehicleItem->Pose.Position.x, vehicleItem->Pose.Position.z));
-		if (distance2D > minDistance)
+		if (distance2D > minDistance2D)
 			return VehicleMountType::None;
 
 		// Assess object collision.

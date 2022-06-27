@@ -36,7 +36,7 @@ namespace TEN::Entities::Vehicles
 	};
 
 	constexpr auto MOTORBIKE_RADIUS = 500;
-	constexpr auto MOTORBIKE_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto MOTORBIKE_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto MOTORBIKE_DISMOUNT_DISTANCE = CLICK(1.5f);
 	constexpr auto MOTORBIKE_FRICTION = 384;
 	constexpr auto MOTORBIKE_FRONT = 500;
@@ -153,7 +153,7 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 			return;
 
-		auto mountType = GetVehicleMountType(motorbikeItem, laraItem, coll, MotorbikeMountTypes, MOTORBIKE_MOUNT_DISTANCE_MIN);
+		auto mountType = GetVehicleMountType(motorbikeItem, laraItem, coll, MotorbikeMountTypes, MOTORBIKE_MOUNT_DISTANCE);
 		if (mountType == VehicleMountType::None)
 			ObjectCollision(itemNumber, laraItem, coll);
 		else

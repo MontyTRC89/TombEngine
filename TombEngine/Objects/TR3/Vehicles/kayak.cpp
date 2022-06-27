@@ -40,7 +40,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
-	constexpr auto KAYAK_MOUNT_DISTANCE_MIN = CLICK(1.5f);
+	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
 
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
 	constexpr auto DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.

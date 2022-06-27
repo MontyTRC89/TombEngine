@@ -38,7 +38,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MINECART_HEIGHT = CLICK(2);
 	constexpr auto MINECART_GRAVITY = SECTOR(1) + 1;
 	constexpr auto MINECART_STEP_HEIGHT = CLICK(1);
-	constexpr auto MINECART_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto MINECART_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
 	constexpr auto MINECART_NUM_HITS = 25;
 
@@ -176,7 +176,7 @@ namespace TEN::Entities::Vehicles
 
 		// Don't get into minecart if there are two stop blocks in front.
 		// This allows creation of minecarts which will get to a point and stop forever.
-		auto mountType = GetVehicleMountType(minecartItem, laraItem, coll, MinecartMountTypes, MINECART_MOUNT_DISTANCE_MIN);
+		auto mountType = GetVehicleMountType(minecartItem, laraItem, coll, MinecartMountTypes, MINECART_MOUNT_DISTANCE);
 		if (mountType == VehicleMountType::None ||
 			GetCollision(minecartItem, minecartItem->Pose.Orientation.y, SECTOR(1)).BottomBlock->Flags.MinecartStop())
 		{
