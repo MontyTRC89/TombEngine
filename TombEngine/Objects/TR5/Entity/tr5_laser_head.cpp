@@ -559,6 +559,7 @@ void LaserHeadControl(short itemNumber)
 											if (x > x1 && x < x2 && y > y1 && y < y2 && z > z1 && z < z2)
 											{
 												LaraBurn(LaraItem);
+												DoDamage(LaraItem, INT_MAX);
 												Lara.BurnCount = 48;
 												Lara.BurnBlue = 2;
 												LaraItem->HitPoints = 0;

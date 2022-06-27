@@ -28,6 +28,11 @@ void InitTENLog()
 
 void TENLog(std::string_view str, LogLevel level, LogConfig config)
 {
+	static std::string lastString = {};
+
+	if (lastString == str)
+		return;
+
 	if constexpr (!DebugBuild)
 	{
 		if (LogConfig::Debug == config)
@@ -49,6 +54,8 @@ void TENLog(std::string_view str, LogLevel level, LogConfig config)
 	}
 
 	logger->flush();
+
+	lastString = std::string(str);
 }
 
 void ShutdownTENLog()

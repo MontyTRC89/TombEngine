@@ -263,10 +263,8 @@ namespace TEN::Entities::TR1
 					item->TestBits(JointBitType::Touch, CentaurAttackJoints))
 				{
 					CreatureEffect(item, &CentaurRearBite, DoBloodSplat);
+					DoDamage(creature->Enemy, CENTAUR_REAR_DAMAGE);
 					item->Animation.RequiredState = CENTAUR_STATE_IDLE;
-
-					LaraItem->HitPoints -= CENTAUR_REAR_DAMAGE;
-					LaraItem->HitStatus = 1;
 				}
 
 				break;

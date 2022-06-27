@@ -48,9 +48,6 @@ enum CAMERA_FLAGS
 	CF_CHASE_OBJECT = 3,
 };
 
-constexpr auto MAX_CAMERA = 18;
-constexpr auto NO_MINY = 0xFFFFFF;
-
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
 
 extern Vector3Int CurrentCameraPosition;
@@ -101,3 +98,4 @@ void SetScreenFadeOut(float speed);
 void SetScreenFadeIn(float speed);
 void SetCinematicBars(float height, float speed);
 void UpdateFadeScreenAndCinematicBars();
+void HandleOptics();

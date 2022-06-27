@@ -565,12 +565,11 @@ namespace TEN::Entities::TR4
 							dy < CLICK(2) &&
 							dz < CLICK(2))
 						{
-							enemy->HitPoints -= 20;
+							DoDamage(enemy, 20);
 
 							if (enemy->HitPoints <= 0)
 								item->AIBits = FOLLOW;
 
-							enemy->HitStatus = true;
 							creature->Flags = 1;
 
 							CreatureEffect2(

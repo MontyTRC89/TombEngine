@@ -15,6 +15,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
 
+using namespace TEN::Input;
 using namespace TEN::Entities::Switches;
 
 namespace TEN::Entities::TR4

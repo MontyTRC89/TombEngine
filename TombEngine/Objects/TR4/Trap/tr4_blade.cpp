@@ -31,7 +31,7 @@ namespace TEN::Entities::TR4
 
 				if (ItemPushItem(bladeItem, laraItem, coll, 1, 1))
 				{
-					laraItem->HitPoints -= bladeItem->ItemFlags[3];
+					DoDamage(laraItem, bladeItem->ItemFlags[3]);
 
 					dx = oldX - laraItem->Pose.Position.x;
 					dy = oldY - laraItem->Pose.Position.y;

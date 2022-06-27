@@ -11,6 +11,7 @@
 #include "Game/animation.h"
 #include "Game/effects/lightning.h"
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Lightning;
 
 void InitialiseObelisk(short itemNumber)
