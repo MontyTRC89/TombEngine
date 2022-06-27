@@ -1462,11 +1462,20 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	// NEW: Only update enemy box number if will be actually reachable by enemy.
 	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
-	auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
-	auto bounds = GetBoundsAccurate(item);
-	bool reachable = true;
-	if (object->zoneType != ZoneType::ZONE_FLYER && object->zoneType != ZoneType::ZONE_WATER)
+
+	bool reachable = false;
+	if (object->zoneType == ZoneType::ZONE_FLYER ||
+	   (object->zoneType == ZoneType::ZONE_WATER && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	{
+		reachable = true; // If NPC is flying or swimming in water, always reach Lara
+	}
+	else
+	{
+		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
+		auto bounds = GetBoundsAccurate(item);
+
 		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+	}
 
 	if (floor && reachable)
 		enemy->BoxNumber = floor->Box;
