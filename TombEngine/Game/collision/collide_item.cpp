@@ -1730,7 +1730,7 @@ int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocit
 	return currentVelocity;
 }
 
-void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 {
 	laraItem->HitStatus = false;
 	coll->HitStatic     = false;
