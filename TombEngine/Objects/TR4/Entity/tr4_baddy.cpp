@@ -760,7 +760,10 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (currentCreature->Enemy && currentCreature->Enemy->HitPoints > 0 && AI.distance < pow(682, 2))
+					if (currentCreature->Enemy && 
+						currentCreature->Enemy->BoxNumber != NO_BOX &&
+						currentCreature->Enemy->HitPoints > 0 && 
+						AI.distance < pow(SECTOR(0.5f), 2))
 					{
 						if (item->MeshSwapBits == MESHSWAPFLAGS_BADDY_GUN)
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
