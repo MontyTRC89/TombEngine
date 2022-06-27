@@ -563,7 +563,7 @@ namespace TEN::Entities::TR4
 			}
 
 			if (item != Lara.TargetEntity ||
-				laraAI.distance <= 942 ||
+				laraAI.distance <= pow(942, 2) ||
 				laraAI.angle <= -ANGLE(56.25f) ||
 				laraAI.angle >= ANGLE(56.25f))
 			{
@@ -820,7 +820,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.ahead && AI.distance < SECTOR(256))
+				if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
@@ -904,7 +904,7 @@ namespace TEN::Entities::TR4
 				currentCreature->MaxTurn = 0;
 
 				if (item->Animation.ActiveState == BADDY_STATE_SWORD_HIT_RIGHT &&
-					AI.distance < SECTOR(254))
+					AI.distance < pow(SECTOR(0.5f), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 				}
