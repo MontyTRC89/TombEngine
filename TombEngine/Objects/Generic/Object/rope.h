@@ -11,12 +11,15 @@ namespace TEN::Entities::Generic
 
 	struct ROPE_STRUCT
 	{
+		int room;
+		Vector3Int position;
+
 		Vector3Int segment[ROPE_SEGMENTS];
 		Vector3Int velocity[ROPE_SEGMENTS];
 		Vector3Int normalisedSegment[ROPE_SEGMENTS];
 		Vector3Int meshSegment[ROPE_SEGMENTS];
-		Vector3Int position;
 		Vector3Int coords[ROPE_SEGMENTS];
+
 		int segmentLength;
 		short active;
 		short coiled;
