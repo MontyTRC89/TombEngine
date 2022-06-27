@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_DISMOUNT_DISTANCE = 512;
 
 	constexpr auto JEEP_FRONT = 550;
-	constexpr auto JEEP_SIDE = 256;
+	constexpr auto JEEP_SIDE = 280;
 	constexpr auto JEEP_SLIP = 100;
 	constexpr auto JEEP_SLIP_SIDE = 128;
 
@@ -533,7 +533,7 @@ namespace TEN::Entities::Vehicles
 
 		short rot = 0;
 
-		if (oldPos.y <= jeepItem->Floor - 8 )
+		if (oldPos.y <= jeepItem->Floor - 8)
 		{
 			if (jeep->TurnRate < -JEEP_TURN_RATE_DECEL)
 				jeep->TurnRate += JEEP_TURN_RATE_DECEL;
@@ -565,29 +565,9 @@ namespace TEN::Entities::Vehicles
 			if (!(TrInput & IN_ACTION) && jeep->Velocity > 0)
 				momentum -= (momentum / 4);
 
-			if (rot >= -273)
+			if (rot < -273)
 			{
-				if (rot <= 273)
-					jeep->MomentumAngle = jeepItem->Pose.Orientation.y;
-				else
-				{
-					if (rot > 13650)
-					{
-						jeepItem->Pose.Position.y -= 41;
-						jeepItem->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
-						jeep->TurnRate = 0;
-						jeep->Velocity -= (jeep->Velocity / 8);
-					}
-
-					if (rot <= 16380)
-						jeep->MomentumAngle += momentum;
-					else
-						jeep->MomentumAngle = jeepItem->Pose.Orientation.y - 16380;
-				}
-			}
-			else
-			{
-				if (rot < -13650)
+				if (rot < -ANGLE(75))
 				{
 					jeepItem->Pose.Position.y -= 41;
 					jeepItem->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
@@ -595,13 +575,30 @@ namespace TEN::Entities::Vehicles
 					jeep->Velocity -= (jeep->Velocity / 8);
 				}
 
-				if (rot >= -16380)
-					jeep->MomentumAngle -= momentum;
+				if (rot < -ANGLE(90))
+					jeep->MomentumAngle = jeepItem->Pose.Orientation.y + ANGLE(90);
 				else
-					jeep->MomentumAngle = jeepItem->Pose.Orientation.y + 16380;
+					jeep->MomentumAngle -= momentum;
 			}
-		}
+			else if (rot > 273)
+			{
+				if (rot > ANGLE(75))
+				{
+					jeepItem->Pose.Position.y -= 41;
+					jeepItem->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
+					jeep->TurnRate = 0;
+					jeep->Velocity -= (jeep->Velocity / 8);
+				}
 
+				if (rot > ANGLE(90))
+					jeep->MomentumAngle = jeepItem->Pose.Orientation.y - ANGLE(90);
+				else
+					jeep->MomentumAngle += momentum;
+			}
+			else
+				jeep->MomentumAngle = jeepItem->Pose.Orientation.y;
+		}
+		
 		short roomNumber = jeepItem->RoomNumber;
 		FloorInfo* floor = GetFloor(jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z, &roomNumber);
 		int height = GetFloorHeight(floor, jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z);
