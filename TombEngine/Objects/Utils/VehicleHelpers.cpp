@@ -189,7 +189,7 @@ namespace TEN::Entities::Vehicles
 		DoObjectCollision(vehicleItem, &coll);
 	}
 
-	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* angle)
+	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate)
 	{
 		if (TestEnvironment(ENV_FLAG_WATER, vehicleItem) ||
 			TestEnvironment(ENV_FLAG_SWAMP, vehicleItem))
@@ -218,10 +218,10 @@ namespace TEN::Entities::Vehicles
 						TEN::Effects::TriggerSpeedboatFoam(vehicleItem, Vector3(0, -waterDepth / 2.0f, -radius));
 				}
 
-				if (*angle != 0)
+				if (*turnRate)
 				{
 					auto coeff = isWater ? VEHICLE_WATER_TURN_RATE_COEFF : VEHICLE_SWAMP_TURN_RATE_COEFF;
-					*angle -= *angle * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
+					*turnRate -= *turnRate * ((waterDepth / VEHICLE_WATER_HEIGHT_MAX) / coeff);
 				}
 			}
 			else

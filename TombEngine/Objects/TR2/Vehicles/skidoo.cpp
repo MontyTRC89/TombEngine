@@ -148,44 +148,50 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			lara->Vehicle = itemNumber;
-
-			switch (mountType)
-			{
-			case VehicleMountType::LevelStart:
-				laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IDLE;
-				laraItem->Animation.ActiveState = SKIDOO_STATE_IDLE;
-				laraItem->Animation.TargetState = SKIDOO_STATE_IDLE;
-				break;
-
-			case VehicleMountType::Left:
-				laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_MOUNT_LEFT;
-				laraItem->Animation.ActiveState = SKIDOO_STATE_MOUNT;
-				laraItem->Animation.TargetState = SKIDOO_STATE_MOUNT;
-				break;
-
-			default:
-			case VehicleMountType::Right:
-				laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_MOUNT_RIGHT;
-				laraItem->Animation.ActiveState = SKIDOO_STATE_MOUNT;
-				laraItem->Animation.TargetState = SKIDOO_STATE_MOUNT;
-				break;
-			}
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, false);
-				UndrawFlareMeshes(laraItem);
-				lara->Control.HandStatus = HandStatus::Free;
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-				lara->Flare.ControlLeft = 0;
-			}
-
-			laraItem->Pose.Position = skidooItem->Pose.Position;
-			laraItem->Pose.Orientation = Vector3Shrt(0, skidooItem->Pose.Orientation.y, 0);
-			lara->Control.HandStatus = HandStatus::Busy;
-			skidooItem->Collidable = true;
+			DoSkidooMount(skidooItem, laraItem, mountType);
 		}
+	}
+
+	void DoSkidooMount(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IDLE;
+			laraItem->Animation.ActiveState = SKIDOO_STATE_IDLE;
+			laraItem->Animation.TargetState = SKIDOO_STATE_IDLE;
+			break;
+
+		case VehicleMountType::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_MOUNT_LEFT;
+			laraItem->Animation.ActiveState = SKIDOO_STATE_MOUNT;
+			laraItem->Animation.TargetState = SKIDOO_STATE_MOUNT;
+			break;
+
+		default:
+		case VehicleMountType::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_MOUNT_RIGHT;
+			laraItem->Animation.ActiveState = SKIDOO_STATE_MOUNT;
+			laraItem->Animation.TargetState = SKIDOO_STATE_MOUNT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, false);
+			UndrawFlareMeshes(laraItem);
+			lara->Control.HandStatus = HandStatus::Free;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Flare.ControlLeft = 0;
+		}
+
+		laraItem->Pose.Position = skidooItem->Pose.Position;
+		laraItem->Pose.Orientation = Vector3Shrt(0, skidooItem->Pose.Orientation.y, 0);
+		lara->Control.HandStatus = HandStatus::Busy;
+		skidooItem->Collidable = true;
 	}
 
 	bool TestSkidooDismountOK(ItemInfo* skidooItem, int direction)
