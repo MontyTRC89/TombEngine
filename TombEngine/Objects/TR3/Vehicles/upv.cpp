@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;
 	constexpr auto UPV_LENGTH = SECTOR(1);
-	constexpr auto UPV_MOUNT_DISTANCE_MIN = CLICK(1.5f);
+	constexpr auto UPV_MOUNT_DISTANCE = CLICK(1.5f);
 	constexpr auto UPV_DISMOUNT_DISTANCE = SECTOR(1);
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 

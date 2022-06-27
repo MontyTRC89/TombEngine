@@ -35,7 +35,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_SIDE = 300;
 	constexpr auto RBOAT_SLIP = 10;
 	constexpr auto RBOAT_SIDE_SLIP = 30;
-	constexpr auto RBOAT_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto RBOAT_MOUNT_DISTANCE = CLICK(2);
 
 	constexpr auto RBOAT_VELOCITY_ACCEL = 5;
 	constexpr auto RBOAT_VELOCITY_DECEL = 1;

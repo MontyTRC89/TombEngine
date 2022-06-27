@@ -53,7 +53,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto QBIKE_SIDE = 260;
 	constexpr auto QBIKE_SLIP = 100;
 	constexpr auto QBIKE_SLIP_SIDE = 50;
-	constexpr auto QBIKE_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto QBIKE_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
 
 	constexpr int MAX_VELOCITY = 160 * VEHICLE_VELOCITY_SCALE;
@@ -179,7 +179,7 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 			return;
 
-		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE_MIN);
+		auto mountType = GetVehicleMountType(quadBikeItem, laraItem, coll, QuadBikeMountTypes, QBIKE_MOUNT_DISTANCE);
 		if (mountType == VehicleMountType::None)
 			ObjectCollision(itemNumber, laraItem, coll);
 		else

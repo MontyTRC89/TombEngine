@@ -36,7 +36,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_SIDE = 300;
 	constexpr auto SPEEDBOAT_SLIP = 10;
 	constexpr auto SPEEDBOAT_SLIP_SIDE = 30;
-	constexpr auto SPEEDBOAT_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto SPEEDBOAT_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 
 	constexpr auto SPEEDBOAT_VELOCITY_ACCEL = 5;

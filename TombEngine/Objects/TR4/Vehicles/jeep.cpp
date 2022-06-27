@@ -43,7 +43,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
-	constexpr auto JEEP_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto JEEP_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto JEEP_DISMOUNT_DISTANCE = 512;
 
 	constexpr auto JEEP_FRONT = 550;
@@ -159,7 +159,7 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints <= 0 && lara->Vehicle != NO_ITEM)
 			return;
 
-		auto mountType = GetVehicleMountType(jeepItem, laraItem, coll, JeepMountTypes, JEEP_MOUNT_DISTANCE_MIN);
+		auto mountType = GetVehicleMountType(jeepItem, laraItem, coll, JeepMountTypes, JEEP_MOUNT_DISTANCE);
 		if (mountType == VehicleMountType::None)
 			ObjectCollision(itemNumber, laraItem, coll);
 		else

@@ -30,7 +30,7 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Back
 	};
 
-	constexpr auto BGUN_MOUNT_DISTANCE_MIN = CLICK(2);
+	constexpr auto BGUN_MOUNT_DISTANCE = CLICK(2);
 
 	constexpr auto BGUN_RECOIL_TIME = 26;
 	constexpr auto BGUN_RECOIL_Z = 25;
