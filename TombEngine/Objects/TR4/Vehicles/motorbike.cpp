@@ -53,7 +53,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
-	constexpr auto MOTORBIKE_BITCH_MAX = 0xA000;
+	constexpr auto MOTORBIKE_PITCH_MAX = 0xA000;
 
 	#define MOTORBIKE_FORWARD_TURN_ANGLE ANGLE(1.5f)
 	#define MOTORBIKE_BACK_TURN_ANGLE ANGLE(0.5f)
@@ -653,7 +653,7 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		if (motorbike->Velocity <= MOTORBIKE_ACCEL || motorbike->Flags & MOTORBIKE_FLAG_BOOST)
+		if (motorbike->Velocity <= MOTORBIKE_ACCEL || (motorbike->Flags & MOTORBIKE_FLAG_BOOST))
 		{
 			if (motorbike->Velocity <= MOTORBIKE_ACCEL_MAX)
 			{
@@ -992,15 +992,18 @@ namespace TEN::Entities::Vehicles
 		else
 			motorbike->Revs = 0;
 
-		if ((TrInput & VEHICLE_IN_SPEED) && (TrInput & VEHICLE_IN_ACCELERATE) && lara->SprintEnergy)
+		if ((TrInput & VEHICLE_IN_SPEED) && lara->SprintEnergy)
 		{
-			motorbike->Flags |= MOTORBIKE_FLAG_BOOST;
-
-			lara->SprintEnergy -= 2;
-			if (lara->SprintEnergy > MOTORBIKE_ACCEL)//hmm
+			if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
-				motorbike->Flags &= ~MOTORBIKE_FLAG_BOOST;
-				lara->SprintEnergy = 0;
+				motorbike->Flags |= MOTORBIKE_FLAG_BOOST;
+
+				lara->SprintEnergy -= 2;
+				if (lara->SprintEnergy > MOTORBIKE_ACCEL)
+				{
+					motorbike->Flags &= ~MOTORBIKE_FLAG_BOOST;
+					lara->SprintEnergy = 0;
+				}
 			}
 		}
 		else
@@ -1202,32 +1205,26 @@ namespace TEN::Entities::Vehicles
 
 		int pitch = 0;
 
-		if (motorbike->Flags)
-			collide = 0;
+		DrawMotorbikeLight(motorbikeItem);
+		if (laraItem->Animation.ActiveState < MOTORBIKE_STATE_MOUNT ||
+			laraItem->Animation.ActiveState > MOTORBIKE_STATE_DISMOUNT)
+		{
+			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
+		}
 		else
 		{
-			DrawMotorbikeLight(motorbikeItem);
-			if (laraItem->Animation.ActiveState < MOTORBIKE_STATE_MOUNT ||
-				laraItem->Animation.ActiveState > MOTORBIKE_STATE_DISMOUNT)
-			{
-				drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
-			}
-			else
-			{
-				drive = -1;
-				collide = 0;
-			}
+			drive = -1;
+			collide = 0;
 		}
 
 		if (motorbike->Velocity > 0 || motorbike->Revs)
 		{
 			motorbike->Pitch = pitch;
 
-		if (motorbike->Pitch < -MOTORBIKE_PITCH_SLOWDOWN) 
-			motorbike->Pitch = -MOTORBIKE_PITCH_SLOWDOWN; 
-		else 
-		if (motorbike->Pitch > MOTORBIKE_BITCH_MAX)
-			motorbike->Pitch = MOTORBIKE_BITCH_MAX;
+			if (motorbike->Pitch < -MOTORBIKE_PITCH_SLOWDOWN) 
+				motorbike->Pitch = -MOTORBIKE_PITCH_SLOWDOWN; 
+			else if (motorbike->Pitch > MOTORBIKE_PITCH_MAX)
+				motorbike->Pitch = MOTORBIKE_PITCH_MAX;
 
 			SoundEffect(SFX_TR4_VEHICLE_MOTORBIKE_MOVING, &motorbikeItem->Pose, SoundEnvironment::Land, 0.7f + motorbike->Pitch / 24756.0f);
 		}
@@ -1286,31 +1283,28 @@ namespace TEN::Entities::Vehicles
 		motorbikeItem->Pose.Orientation.x += (xRot - motorbikeItem->Pose.Orientation.x) / 4;
 		motorbikeItem->Pose.Orientation.z += (zRot - motorbikeItem->Pose.Orientation.z) / 4;
 
-		if (motorbike->Flags >= 0)
+		if (probe.RoomNumber != motorbikeItem->RoomNumber)
 		{
-			if (probe.RoomNumber != motorbikeItem->RoomNumber)
+			ItemNewRoom(lara->Vehicle, probe.RoomNumber);
+			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
+		}
+
+		laraItem->Pose = motorbikeItem->Pose;
+
+		AnimateMotorbike(motorbikeItem, laraItem, collide, isDead);
+		AnimateItem(laraItem);
+
+		motorbikeItem->Animation.AnimNumber = laraItem->Animation.AnimNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
+		motorbikeItem->Animation.FrameNumber = laraItem->Animation.FrameNumber + (g_Level.Anims[motorbikeItem->Animation.AnimNumber].frameBase - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
+
+		Camera.targetElevation = -ANGLE(30.0f);
+
+		if (motorbike->Flags & MOTORBIKE_FLAG_FALLING)
+		{
+			if (motorbikeItem->Pose.Position.y == motorbikeItem->Floor)
 			{
-				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
-				ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
-			}
-
-			laraItem->Pose = motorbikeItem->Pose;
-
-			AnimateMotorbike(motorbikeItem, laraItem, collide, isDead);
-			AnimateItem(laraItem);
-
-			motorbikeItem->Animation.AnimNumber = laraItem->Animation.AnimNumber + (Objects[ID_MOTORBIKE].animIndex - Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex);
-			motorbikeItem->Animation.FrameNumber = laraItem->Animation.FrameNumber + (g_Level.Anims[motorbikeItem->Animation.AnimNumber].frameBase - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
-
-			Camera.targetElevation = -ANGLE(30.0f);
-
-			if (motorbike->Flags & MOTORBIKE_FLAG_FALLING)
-			{
-				if (motorbikeItem->Pose.Position.y == motorbikeItem->Floor)
-				{
-					ExplodeVehicle(laraItem, motorbikeItem);
-					return 0;
-				}
+				ExplodeVehicle(laraItem, motorbikeItem);
+				return 0;
 			}
 		}
 
