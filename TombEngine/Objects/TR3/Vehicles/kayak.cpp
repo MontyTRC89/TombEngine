@@ -40,9 +40,8 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
-	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
-
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
+	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
 	constexpr auto DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 
@@ -103,8 +102,8 @@ namespace TEN::Entities::Vehicles
 		KAYAK_STATE_MOUNT_LEFT = 4,
 		KAYAK_STATE_IDLE_DEATH = 5,
 		KAYAK_STATE_FORWARD = 6,
-		KAYAK_STATE_CAPSIZE_RECOVER = 7,	// Unused.
-		KAYAK_STATE_CAPSIZE_DEATH = 8,		// Unused.
+		KAYAK_STATE_CAPSIZE_RECOVER = 7, // Unused.
+		KAYAK_STATE_CAPSIZE_DEATH = 8,	 // Unused.
 		KAYAK_STATE_DISMOUNT = 9,
 		KAYAK_STATE_HOLD_LEFT = 10,
 		KAYAK_STATE_HOLD_RIGHT = 11,
@@ -150,13 +149,6 @@ namespace TEN::Entities::Vehicles
 		KAYAK_ANIM_DISMOUNT_RIGHT = 32
 	};
 
-	enum class KayakMountType
-	{
-		None,
-		Left,
-		Right
-	};
-
 	KayakInfo* GetKayakInfo(ItemInfo* kayakItem)
 	{
 		return (KayakInfo*)kayakItem->Data;
@@ -175,6 +167,80 @@ namespace TEN::Entities::Vehicles
 			WakePts[i][0].life = 0;
 			WakePts[i][1].life = 0;
 		}
+	}
+
+	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto* kayakItem = &g_Level.Items[itemNumber];
+		auto* kayak = GetKayakInfo(kayakItem);
+		auto* lara = GetLaraInfo(laraItem);
+
+		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+			return;
+
+		auto mountType = GetVehicleMountType(kayakItem, laraItem, coll, KayakMountTypes, KAYAK_MOUNT_DISTANCE, LARA_HEIGHT);
+		if (mountType == VehicleMountType::None)
+		{
+			coll->Setup.EnableObjectPush = true;
+			ObjectCollision(itemNumber, laraItem, coll);
+		}
+		else
+		{
+			lara->Vehicle = itemNumber;
+			DoKayakMount(kayakItem, laraItem, mountType);
+		}
+	}
+
+	void DoKayakMount(ItemInfo* kayakItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* kayak = GetKayakInfo(kayakItem);
+		auto* lara = GetLaraInfo(laraItem);
+
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_IDLE;
+			laraItem->Animation.ActiveState = KAYAK_STATE_IDLE;
+			laraItem->Animation.TargetState = KAYAK_STATE_IDLE;
+			break;
+
+		case VehicleMountType::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_LEFT;
+			laraItem->Animation.ActiveState = KAYAK_STATE_MOUNT_LEFT;
+			laraItem->Animation.TargetState = KAYAK_STATE_MOUNT_LEFT;
+			break;
+
+		default:
+		case VehicleMountType::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_RIGHT;
+			laraItem->Animation.ActiveState = KAYAK_STATE_MOUNT_RIGHT;
+			laraItem->Animation.TargetState = KAYAK_STATE_MOUNT_RIGHT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
+			UndrawFlareMeshes(laraItem);
+			lara->Flare.ControlLeft = 0;
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+		}
+
+		if (laraItem->RoomNumber != kayakItem->RoomNumber)
+			ItemNewRoom(lara->ItemNumber, kayakItem->RoomNumber);
+
+		laraItem->Pose.Position = kayakItem->Pose.Position;
+		laraItem->Pose.Orientation = Vector3Shrt(0, kayakItem->Pose.Orientation.y, 0);
+		laraItem->Animation.IsAirborne = false;
+		laraItem->Animation.Velocity = 0;
+		laraItem->Animation.VerticalVelocity = 0;
+		lara->Control.WaterStatus = WaterStatus::Dry;
+		kayak->WaterHeight = kayakItem->Pose.Position.y;
+		kayak->Flags = 0;
+
+		AnimateItem(laraItem);
 	}
 
 	void KayakDraw(ItemInfo* kayakItem)
@@ -284,46 +350,6 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 		}
-	}
-
-	KayakMountType KayakGetMountType(ItemInfo* laraItem, short itemNumber)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* kayakItem = &g_Level.Items[itemNumber];
-
-		if (!(TrInput & IN_ACTION) ||
-			lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.IsAirborne)
-		{
-			return KayakMountType::None;
-		}
-
-		int distance = pow(laraItem->Pose.Position.x - kayakItem->Pose.Position.x, 2) + pow(laraItem->Pose.Position.z - kayakItem->Pose.Position.z, 2);
-		if (distance > pow(360, 2))
-			return KayakMountType::None;
-
-		auto probe = GetCollision(kayakItem);
-		if (probe.Position.Floor > -32000)
-		{
-			short angle = phd_atan(kayakItem->Pose.Position.z - laraItem->Pose.Position.z, kayakItem->Pose.Position.x - laraItem->Pose.Position.x);
-			angle -= kayakItem->Pose.Orientation.y;
-
-			int deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-			if (angle > -ANGLE(45.0f) && angle < ANGLE(135.0f))
-			{
-				deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-				if (deltaAngle > ANGLE(45.0f) && deltaAngle < ANGLE(135.0f))
-					return KayakMountType::Left;
-			}
-			else
-			{
-				deltaAngle = laraItem->Pose.Orientation.y - kayakItem->Pose.Orientation.y;
-				if (deltaAngle > ANGLE(225.0f) && deltaAngle < ANGLE(315.0f))
-					return KayakMountType::Right;
-			}
-		}
-
-		return KayakMountType::None;
 	}
 
 	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
@@ -1182,59 +1208,6 @@ namespace TEN::Entities::Vehicles
 		lara->Control.Weapon.GunType = LaraWeaponType::None;
 		lara->ExtraAnim = 1;
 		lara->HitDirection = -1;
-	}
-
-	void KayakCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* kayakItem = &g_Level.Items[itemNumber];
-		auto* kayak = GetKayakInfo(kayakItem);
-
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
-			return;
-
-		auto mountType = KayakGetMountType(laraItem, itemNumber);
-		if (mountType != KayakMountType::None)
-		{
-			lara->Vehicle = itemNumber;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-				UndrawFlareMeshes(laraItem);
-				lara->Flare.ControlLeft = 0;
-				lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
-			}
-
-			if (mountType == KayakMountType::Right)
-				laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_RIGHT;
-			else if (mountType == KayakMountType::Left)
-				laraItem->Animation.AnimNumber = Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_MOUNT_LEFT;
-
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			laraItem->Animation.ActiveState = laraItem->Animation.TargetState = KAYAK_STATE_MOUNT_LEFT;
-			laraItem->Pose.Position = kayakItem->Pose.Position;
-			laraItem->Pose.Orientation.x = 0;
-			laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y;
-			laraItem->Pose.Orientation.z = 0;
-			laraItem->Animation.Velocity = 0;
-			laraItem->Animation.VerticalVelocity = 0;
-			laraItem->Animation.IsAirborne = false;
-			lara->Control.WaterStatus = WaterStatus::Dry;
-
-			if (laraItem->RoomNumber != kayakItem->RoomNumber)
-				ItemNewRoom(lara->ItemNumber, kayakItem->RoomNumber);
-
-			AnimateItem(laraItem);
-
-			kayak->WaterHeight = kayakItem->Pose.Position.y;
-			kayak->Flags = 0;
-		}
-		else
-		{
-			coll->Setup.EnableObjectPush = true;
-			ObjectCollision(itemNumber, laraItem, coll);
-		}
 	}
 
 	bool KayakControl(ItemInfo* laraItem)

@@ -1,12 +1,15 @@
 #pragma once
-
-struct Vector3Int;
-struct ItemInfo;
-struct CollisionInfo;
+#include "Game/collision/collide_room.h"
+#include "Game/items.h"
+#include "Objects/Utils/VehicleHelpers.h"
 
 namespace TEN::Entities::Vehicles
 {
 	void InitialiseKayak(short itemNumber);
+
+	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void DoKayakMount(ItemInfo* kayakItem, ItemInfo* laraItem, VehicleMountType mountType);
+
 	void KayakDraw(ItemInfo* kayakItem);
 
 	void KayakDoWake(ItemInfo* kayakItem, int xOffset, int zOffset, short rotate);
@@ -23,6 +26,5 @@ namespace TEN::Entities::Vehicles
 	void KayakToItemCollision(ItemInfo* laraItem, ItemInfo* kayakItem);
 	void KayakLaraRapidsDrown(ItemInfo* laraItem);
 
-	void KayakCollision(short itemNum, ItemInfo* laraItem, CollisionInfo* coll);
 	bool KayakControl(ItemInfo* laraItem);
 }
