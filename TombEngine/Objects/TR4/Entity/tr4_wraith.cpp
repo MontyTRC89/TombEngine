@@ -235,9 +235,9 @@ namespace TEN::Entities::TR4
 			if (item->Animation.Velocity > 32)
 				item->Animation.Velocity -= 12;
 			
-			if (target == LaraItem)
+			if (target->IsLara())
 			{
-				target->HitPoints -= distance / SECTOR(1);
+				DoDamage(target, distance / SECTOR(1));
 
 				// WRAITH1 can burn Lara
 				if (item->ObjectNumber == ID_WRAITH1)
@@ -260,11 +260,11 @@ namespace TEN::Entities::TR4
 					WraithExplosionEffect(item, 48, 48, 48, 48);
 
 					target->TriggerFlags--;
-					target->HitPoints = 0;
 
 					if (target->TriggerFlags > 0)
 						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].frameBase;
 
+					DoDamage(target, INT_MAX);
 					KillItem(itemNumber);
 				}
 			}
@@ -275,7 +275,7 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[7])
 				{
 					TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -2, 1, item->RoomNumber);
-					target->HitPoints = 0;
+					DoDamage(target, INT_MAX);
 					KillItem(item->ItemFlags[6]);
 					KillItem(itemNumber);
 				}

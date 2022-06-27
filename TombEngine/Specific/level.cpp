@@ -16,24 +16,28 @@
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
-#include "Objects/Generic/Doors/generic_doors.h"
 #include "Renderer/Renderer11.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "ScriptInterfaceLevel.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/input.h"
 #include "Specific/setup.h"
 
 using TEN::Renderer::g_Renderer;
 using std::vector;
 using std::string;
+
+using namespace TEN::Input;
 using namespace TEN::Entities::Doors;
 
 FILE* LevelFilePtr;
 uintptr_t hLoadLevel;
 unsigned int ThreadId;
-int IsLevelLoading;
+bool IsLevelLoading;
+bool LoadedSuccessfully;
 bool g_FirstLevel = true;
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
@@ -978,6 +982,8 @@ void LoadAIObjects()
 
 void LoadLuaFunctionNames()
 {
+	TENLog("Parsing Lua function names... ", LogLevel::Info);
+
 	int luaFunctionsCount = ReadInt32();
 	for (int i = 0; i < luaFunctionsCount; i++)
 	{
@@ -1029,29 +1035,6 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 	return true;
 }
 
-void ThreadLoadLevel(int levelNumber)
-{
-	/*BeginThread(&LoadLevel, (void*)filename, FileThread);
-
-	while (FileThread.ThreadActive)
-	{
-		g_Renderer.RenderLoadingScreen()
-		if (LoadBarState)
-		{
-			if (bGotMonoScreen == true && lscnt < 2)
-			{
-				DrawLoadingScreen();
-
-				lscnt++;
-			}
-
-			flag = S_DrawLoadBar();
-		}
-	}
-
-	while (!S_DrawLoadBar());*/
-}
-
 unsigned int _stdcall LoadLevel(void* data)
 {
 	const int levelIndex = reinterpret_cast<int>(data);
@@ -1074,134 +1057,159 @@ unsigned int _stdcall LoadLevel(void* data)
 	SetScreenFadeIn(FADE_SCREEN_SPEED);
 	g_Renderer.UpdateProgress(0);
 
-	LevelFilePtr = FileOpen(filename);
-	if (LevelFilePtr)
+	try
 	{
-		char header[4];
-		byte version[4];
-		int systemHash;
-		int compressedSize;
-		int uncompressedSize;
+		LevelFilePtr = FileOpen(filename);
+		if (LevelFilePtr)
+		{
+			char header[4];
+			byte version[4];
+			int compressedSize;
+			int uncompressedSize;
+			int systemHash;
 
-		// Read file header
-		ReadFileEx(&header, 1, 4, LevelFilePtr);
-		ReadFileEx(&version, 1, 4, LevelFilePtr);
-		ReadFileEx(&systemHash, 1, 4, LevelFilePtr); // Reserved: for future quick start feature! Check builder system 
+			// Read file header
+			ReadFileEx(&header, 1, 4, LevelFilePtr);
+			ReadFileEx(&version, 1, 4, LevelFilePtr);
+			ReadFileEx(&systemHash, 1, 4, LevelFilePtr); // Reserved: for future quick start feature! Check builder system 
 
-		if (std::string(header) != "TEN")
-			TENLog("Level file header is not valid! Must be TEN. Probably old level version?", LogLevel::Warning);
+			// Check file header
+			if (std::string(header) != "TEN")
+				throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
+			else
+				TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+
+			// Check system name hash and reset it if it's valid (because we use build & play feature only once)
+			if (SystemNameHash != 0 && SystemNameHash != systemHash)
+				throw std::exception("An attempt was made to use level debug feature on a different system.");
+			else
+				SystemNameHash = 0;
+
+			// Read data sizes
+			ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
+			ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
+
+			// The entire level is ZLIB compressed
+			auto compressedBuffer = (char*)malloc(compressedSize);
+			LevelDataPtr = (char*)malloc(uncompressedSize);
+			baseLevelDataPtr = LevelDataPtr;
+
+			ReadFileEx(compressedBuffer, compressedSize, 1, LevelFilePtr);
+			Decompress((byte*)LevelDataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
+
+			// Now the entire level is decompressed
+			free(compressedBuffer);
+
+			LoadTextures();
+
+			g_Renderer.UpdateProgress(20);
+
+			LoadRooms();
+			g_Renderer.UpdateProgress(40);
+
+			LoadObjects();
+			g_Renderer.UpdateProgress(50);
+
+			LoadSprites();
+			LoadCameras();
+			LoadSoundSources();
+			g_Renderer.UpdateProgress(60);
+
+			LoadBoxes();
+
+			//InitialiseLOTarray(true);
+
+			LoadAnimatedTextures();
+			LoadTextureInfos();
+			g_Renderer.UpdateProgress(70);
+
+			LoadItems();
+			LoadAIObjects();
+
+			LoadLuaFunctionNames();
+
+			LoadSamples();
+			g_Renderer.UpdateProgress(80);
+
+			free(baseLevelDataPtr);
+			LevelDataPtr = NULL;
+			FileClose(LevelFilePtr);
+		}
 		else
-			TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
 
-		// Read data sizes
-		ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
-		ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
+		TENLog("Preparing renderer...", LogLevel::Info);
+		
+		g_Renderer.UpdateProgress(90);
+		g_Renderer.PrepareDataForTheRenderer();
 
-		// The entire level is ZLIB compressed
-		auto compressedBuffer = (char*)malloc(compressedSize);
-		LevelDataPtr = (char*)malloc(uncompressedSize);
-		baseLevelDataPtr = LevelDataPtr;
+		TENLog("Initializing level...", LogLevel::Info);
 
-		ReadFileEx(compressedBuffer, compressedSize, 1, LevelFilePtr);
-		Decompress((byte*)LevelDataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
+		// Initialise the game
+		InitialiseGameFlags();
+		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
+		GetCarriedItems();
+		GetAIPickups();
+		Lara.Vehicle = -1;
+		g_GameScriptEntities->AssignLara();
 
-		// Now the entire level is decompressed
-		free(compressedBuffer);
+		TENLog("Level loading complete.", LogLevel::Info);
 
-		LoadTextures();
+		SetScreenFadeOut(FADE_SCREEN_SPEED);
+		g_Renderer.UpdateProgress(100);
 
-		g_Renderer.UpdateProgress(20);
-
-		LoadRooms();
-		g_Renderer.UpdateProgress(40);
-
-		LoadObjects();
-		g_Renderer.UpdateProgress(50);
-
-		LoadSprites();
-		LoadCameras();
-		LoadSoundSources();
-		g_Renderer.UpdateProgress(60);
-
-		LoadBoxes();
-
-		//InitialiseLOTarray(true);
-
-		LoadAnimatedTextures();
-		LoadTextureInfos();
-		g_Renderer.UpdateProgress(70);
-
-		LoadItems();
-		LoadAIObjects();
-
-		LoadLuaFunctionNames();
-
-		LoadSamples();
-		g_Renderer.UpdateProgress(80);
-
-		free(baseLevelDataPtr);
-		LevelDataPtr = NULL;
-		FileClose(LevelFilePtr);
+		LoadedSuccessfully = true;
 	}
-	else
-		return false;
-
-	g_Renderer.UpdateProgress(90);
-	g_Renderer.PrepareDataForTheRenderer();
-	
-	// Initialise the game
-	InitialiseGameFlags();
-	InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
-	GetCarriedItems();
-	GetAIPickups();
-	Lara.Vehicle = -1;
-	g_GameScriptEntities->AssignLara();
-
-	SetScreenFadeOut(FADE_SCREEN_SPEED);
-	g_Renderer.UpdateProgress(100);
+	catch (std::exception& ex)
+	{
+		TENLog("Error while loading level: " + std::string(ex.what()), LogLevel::Error);
+		LoadedSuccessfully = false;
+	}
 
 	// Level loaded
 	IsLevelLoading = false;
-
 	_endthreadex(1);
-
-	return true;
+	return LoadedSuccessfully;
 }
 
 void LoadSamples()
 {
+	TENLog("Loading samples... ", LogLevel::Info);
+
 	int SoundMapSize = ReadInt16();
 	g_Level.SoundMap.resize(SoundMapSize);
 	ReadBytes(g_Level.SoundMap.data(), SoundMapSize * sizeof(short));
 
+	TENLog("Sound map size: " + std::to_string(SoundMapSize), LogLevel::Info);
+
 	int numSamplesInfos = ReadInt32();
-	if (numSamplesInfos)
+
+	if (!numSamplesInfos)
 	{
-		g_Level.SoundDetails.resize(numSamplesInfos);
-		ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SampleInfo));
-
-		int numSamples = ReadInt32();
-		if (numSamples <= 0)
-			return;
-
-		int uncompressedSize;
-		int compressedSize;
-		char* buffer = (char*)malloc(2 * 1048576);
-
-		for (int i = 0; i < numSamples; i++)
-		{
-			uncompressedSize = ReadInt32();
-			compressedSize = ReadInt32();
-			ReadBytes(buffer, compressedSize);
-			LoadSample(buffer, compressedSize, uncompressedSize, i);
-		}
-
-		free(buffer);
+		TENLog("No samples were found and loaded.", LogLevel::Warning);
+		return;
 	}
-	else
+
+	g_Level.SoundDetails.resize(numSamplesInfos);
+	ReadBytes(g_Level.SoundDetails.data(), numSamplesInfos * sizeof(SampleInfo));
+
+	int numSamples = ReadInt32();
+	if (numSamples <= 0)
+		return;
+
+	int uncompressedSize;
+	int compressedSize;
+	char* buffer = (char*)malloc(2 * 1024 * 1024);
+
+	for (int i = 0; i < numSamples; i++)
 	{
-		//Log(1, aNog_Level.SoundDetailss);
+		uncompressedSize = ReadInt32();
+		compressedSize = ReadInt32();
+		ReadBytes(buffer, compressedSize);
+		LoadSample(buffer, compressedSize, uncompressedSize, i);
 	}
+
+	free(buffer);
 }
 
 void LoadBoxes()
@@ -1211,10 +1219,14 @@ void LoadBoxes()
 	g_Level.Boxes.resize(numBoxes);
 	ReadBytes(g_Level.Boxes.data(), numBoxes * sizeof(BOX_INFO));
 
+	TENLog("Num boxes: " + std::to_string(numBoxes), LogLevel::Info);
+
 	// Read overlaps
 	int numOverlaps = ReadInt32();
 	g_Level.Overlaps.resize(numOverlaps);
 	ReadBytes(g_Level.Overlaps.data(), numOverlaps * sizeof(OVERLAP));
+
+	TENLog("Num overlaps: " + std::to_string(numOverlaps), LogLevel::Info);
 
 	// Read zones
 	for (int i = 0; i < 2; i++)
@@ -1242,8 +1254,8 @@ void LoadBoxes()
 int LoadLevelFile(int levelIndex)
 {
 	TENLog("Loading level file...", LogLevel::Info);
-	 
-	StopAllSounds();
+
+	CleanUp();
 	FreeSamples();
 
 	if (!g_FirstLevel)
@@ -1264,17 +1276,18 @@ int LoadLevelFile(int levelIndex)
 
 	while (IsLevelLoading);
 
-	return true;
+	return LoadedSuccessfully;
 }
 
 void LoadSprites()
 {
-	//DB_Log(2, "LoadSprites");
-
 	ReadInt32(); // SPR\0
 
 	int numSprites = ReadInt32();
 	g_Level.Sprites.resize(numSprites);
+
+	TENLog("Num sprites: " + std::to_string(numSprites), LogLevel::Info);
+
 	for (int i = 0; i < numSprites; i++)
 	{
 		SPRITE* spr = &g_Level.Sprites[i];
@@ -1290,6 +1303,9 @@ void LoadSprites()
 	}
 
 	g_Level.NumSpritesSequences = ReadInt32();
+
+	TENLog("Num sprite sequences: " + std::to_string(g_Level.NumSpritesSequences), LogLevel::Info);
+
 	for (int i = 0; i < g_Level.NumSpritesSequences; i++)
 	{
 		int spriteID = ReadInt32();

@@ -67,6 +67,7 @@ using namespace TEN::Entities::TR4;
 using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
+using namespace TEN::Input;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -80,6 +81,8 @@ bool ThreadEnded;
 int RequiredStartPos;
 int CurrentLevel;
 int LevelComplete;
+
+int SystemNameHash = 0;
 
 bool  InItemControlLoop;
 short ItemNewRoomNo;
@@ -113,8 +116,6 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 	if (TrackCameraInit)
 		UseSpotCam = false;
 
-	SetDebounce = true;
-
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
 	static int framesCount = 0;
@@ -129,10 +130,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
-		{
-			if (S_UpdateInput() == -1)
-				return GameStatus::None;
-		}
+			UpdateInput();
 
 		// Has Lara control been disabled?
 		if (Lara.Control.Locked || CurrentLevel == 0)
@@ -142,14 +140,13 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			TrInput &= IN_LOOK;
 		}
 
-		// Does the player want to enter inventory?
-		SetDebounce = false;
-
 		if (CurrentLevel != 0)
 		{
+			// Does the player want to enter inventory?
 			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
@@ -159,6 +156,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
@@ -168,16 +166,18 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
 			{
 				StopAllSounds();
+				StopRumble();
+
 				g_Renderer.DumpGameScene();
 				g_Gui.SetInventoryMode(InventoryMode::Pause);
 				g_Gui.SetMenuToDisplay(Menu::Pause);
 				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) &&
+			else if ((DbInput & IN_OPTION || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
-				// Stop all sounds
 				StopAllSounds();
+				StopRumble();
 
 				if (g_Gui.CallInventory(true))
 					return GameStatus::LoadGame;
@@ -216,59 +216,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Handle lasersight and binocular
 		if (CurrentLevel != 0)
-		{
-			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
-					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.TargetState != LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE)))
-			{
-				if (BinocularRange == 0)
-				{
-					if (UseSpotCam || TrackCameraInit)
-						TrInput &= ~IN_LOOK;
-				}
-				else
-				{
-					// If any input but optic controls (directions + action), immediately exit binoculars mode.
-					if (TrInput != IN_NONE && ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE))
-						BinocularRange = 0;
-
-					if (LaserSight)
-					{
-						BinocularRange = 0;
-						BinocularOn = false;
-						LaserSight = false;
-						Camera.type = BinocularOldCamera;
-						Camera.bounce = 0;
-						AlterFOV(ANGLE(80.0f));
-
-						LaraItem->MeshBits = ALL_JOINT_BITS;
-						Lara.Inventory.IsBusy = false;
-						ResetLaraFlex(LaraItem);
-
-						TrInput &= ~IN_LOOK;
-					}
-					else
-					{
-						TrInput |= IN_LOOK;
-						DbInput = 0;
-					}
-				}
-			}
-			else if (BinocularRange == 0)
-			{
-				if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-					((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-						Lara.Control.Weapon.GunType == LaraWeaponType::HK || 
-						(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
-				{
-					BinocularRange = 128;
-					BinocularOldCamera = Camera.oldType;
-					BinocularOn = true;
-					LaserSight = true;
-					Lara.Inventory.IsBusy = true;
-				}
-			}
-		}
+			HandleOptics();
 
 		// Update all items
 		InItemControlLoop = true;
@@ -463,11 +411,9 @@ GameStatus DoTitle(int index, std::string const& ambient)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
-	// Load the level
-	LoadLevelFile(index);
+	// Load the title. Exit game if unsuccessful.
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitGame;
 
 	InventoryResult inventoryResult;
 
@@ -477,7 +423,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-		StopAllSounds();
 
 		g_GameScript->ResetScripts(true);
 
@@ -512,7 +457,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		// Play background music
 		// MERGE: PlaySoundTrack(index);
 
-		// Initialize menu
+		// Initialise menu
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
@@ -534,9 +479,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		{
 			g_Renderer.RenderTitle();
 
-			SetDebounce = true;
-			S_UpdateInput();
-			SetDebounce = false;
+			UpdateInput();
 
 			status = g_Gui.TitleOptions();
 
@@ -576,17 +519,14 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
-	// Load the level
-	LoadLevelFile(index);
+	// Load the level and fall back to title, if load was unsuccessful
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitToTitle;
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	StopAllSounds();
 
 	g_GameScript->ResetScripts(loadFromSavegame);
 
@@ -681,6 +621,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			// Here is the only way for exiting from the loop
 			StopAllSounds();
 			StopSoundTracks();
+			StopRumble();
 
 			return result;
 		}

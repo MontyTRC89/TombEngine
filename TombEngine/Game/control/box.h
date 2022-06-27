@@ -221,3 +221,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT);
 int CreatureAnimation(short itemNumber, short angle, short tilt);
 void AdjustStopperFlag(ItemInfo* item, int direction, bool set);
 void InitialiseItemBoxData();
+
+
+void DrawBox(int boxIndex, Vector3 color);
+void DrawNearbyPathfinding(int boxIndex);

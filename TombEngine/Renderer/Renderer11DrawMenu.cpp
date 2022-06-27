@@ -13,6 +13,8 @@
 #include "Specific/winmain.h"
 #include "Game/control/volume.h"
 
+using namespace TEN::Input;
+
 extern TEN::Renderer::RendererHUDBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHUDBar* g_MusicVolumeBar;
 
@@ -32,10 +34,13 @@ namespace TEN::Renderer
 	constexpr auto MenuVerticalBlockSpacing = 50;
 	
 	// Vertical menu positioning templates
-	constexpr auto MenuVerticalTopCenter = 200;
+	constexpr auto MenuVerticalTop = 15;
+	constexpr auto MenuVerticalDisplaySettings = 200;
+	constexpr auto MenuVerticalOtherSettings = 150;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
+	constexpr auto MenuVerticalPause = 220;
 	constexpr auto MenuVerticalOptionsPause = 275;
 
 	// Title logo positioning
@@ -104,18 +109,18 @@ namespace TEN::Renderer
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 0));
 			GetNextLinePosition(&y);
 
-			// Controls
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 1));
+			// Other options
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OTHER_SETTINGS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 1));
 			GetNextLinePosition(&y);
 
-			// Sound
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 2));
+			// Controls
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 2));
 			break;
 
 		case Menu::Display:
 
 			// Setup needed parameters
-			y = MenuVerticalTopCenter;
+			y = MenuVerticalDisplaySettings;
 
 			// Title
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_YELLOW, SF_Center());
@@ -154,21 +159,21 @@ namespace TEN::Renderer
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 6));
 			break;
 
-		case Menu::Sound:
+		case Menu::OtherSettings:
 
 			// Setup needed parameters
-			y = MenuVerticalTopCenter;
+			y = MenuVerticalOtherSettings;
 
 			// Title
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OTHER_SETTINGS), PRINTSTRING_COLOR_YELLOW, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Enable sound special effects
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_REVERB), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
-			// Initialize bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
+			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
 			if (g_MusicVolumeBar == nullptr)
 				InitialiseMenuBars(y);
 
@@ -182,45 +187,65 @@ namespace TEN::Renderer
 			DrawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
+
+			// Auto targeting
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOTARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			GetNextLinePosition(&y);
+
+			// Vibration
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			GetNextLinePosition(&y);
+
+			// Thumbstick camera
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(title_option == 5));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
+			GetNextBlockPosition(&y);
+
+
 			// Apply
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 3));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 6));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 4));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 7));
 			break;
 
 		case Menu::Controls:
 
 			// Setup needed parameters
-			y = MenuVerticalLineSpacing;
+			y = MenuVerticalTop;
 
 			// Title
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_YELLOW, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Control listing
-			for (int k = 0; k < 16; k++)
+			for (int k = 0; k < KEY_COUNT; k++)
 			{
 				DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(controlmsgs[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
 				if (g_Gui.GetCurrentSettings().waitingForkey && title_option == k)
 					DrawString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
 				else
-					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[KeyboardLayout[1][k]], PRINTSTRING_COLOR_ORANGE, SF(false));
+				{
+					int index = KeyboardLayout[1][k] ? KeyboardLayout[1][k] : KeyboardLayout[0][k];
+					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
+				}
 
-				if (k < 15)
+				if (k < KEY_COUNT - 1)
 					GetNextNarrowLinePosition(&y);
 				else
 					GetNextBlockPosition(&y);
 			}
 
 			// Apply
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 16));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 17));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 18));
 			break;
 		}
 	}
@@ -279,7 +304,7 @@ namespace TEN::Renderer
 		case Menu::Options:
 		case Menu::Controls:
 		case Menu::Display:
-		case Menu::Sound:
+		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
 			break;
 		}
@@ -295,7 +320,11 @@ namespace TEN::Renderer
 		case Menu::Pause:
 
 			// Setup needed parameters
-			y = MenuVerticalOptionsPause;
+			y = MenuVerticalPause;
+
+			// Header
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS_PAUSE), PRINTSTRING_COLOR_ORANGE, SF_Center());
+			GetNextBlockPosition(&y);
 
 			// Statistics
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_STATISTICS), PRINTSTRING_COLOR_WHITE, SF_Center(pause_option == 0));
@@ -316,7 +345,7 @@ namespace TEN::Renderer
 		case Menu::Options:
 		case Menu::Controls:
 		case Menu::Display:
-		case Menu::Sound:
+		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsPause);
 			break;
 		}
@@ -889,8 +918,12 @@ namespace TEN::Renderer
 				break;
 
 			case RENDERER_DEBUG_PAGE::LOGIC_STATS:
-				PrintDebugMessage("target hitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
+				PrintDebugMessage("Target HitPoints: %d", Lara.TargetEntity ? Lara.TargetEntity->HitPoints : 0);
 				PrintDebugMessage("CollidedVolume: %d", TEN::Control::Volumes::CurrentCollidedVolume);
+				PrintDebugMessage("Move axis vertical: %f", AxisMap[InputAxis::MoveVertical]);
+				PrintDebugMessage("Move axis horizontal: %f", AxisMap[InputAxis::MoveHorizontal]);
+				PrintDebugMessage("Look axis vertical: %f", AxisMap[InputAxis::CameraVertical]);
+				PrintDebugMessage("Look axis horizontal: %f", AxisMap[InputAxis::CameraHorizontal]);
 				break;
 			}
 		}

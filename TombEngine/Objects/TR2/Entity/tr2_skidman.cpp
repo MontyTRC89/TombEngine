@@ -90,8 +90,7 @@ void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 
 	if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity > 0)
 	{
-		laraItem->HitStatus = true;
-		laraItem->HitPoints -= 100;
+		DoDamage(laraItem, 100);
 	}
 }
 

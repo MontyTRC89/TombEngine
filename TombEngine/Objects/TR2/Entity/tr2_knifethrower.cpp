@@ -63,8 +63,7 @@ void KnifeControl(short fxNumber)
 
 	if (ItemNearLara(&fx->pos, 200))
 	{
-		LaraItem->HitPoints -= 50;
-		LaraItem->HitStatus = true;
+		DoDamage(LaraItem, 50);
 
 		fx->pos.Orientation.y = LaraItem->Pose.Orientation.y;
 		fx->speed = LaraItem->Animation.Velocity;

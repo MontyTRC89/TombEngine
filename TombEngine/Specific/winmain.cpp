@@ -19,6 +19,8 @@
 #include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Input;
+
 using std::exception;
 using std::string;
 using std::cout;
@@ -223,7 +225,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Process command line arguments
 	bool setup = false;
 	std::string levelFile = {};
-	int levelHash = 0;
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
@@ -244,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 			levelFile = converter.to_bytes(std::wstring(argv[i + 1])); 
 			std::transform(levelFile.begin(), levelFile.end(), levelFile.begin(), [](unsigned char c) { return std::tolower(c); });
-			levelHash = std::stoi(std::wstring(argv[i + 2]));
+			SystemNameHash = std::stoul(std::wstring(argv[i + 2]));
 		}
 	}
 	LocalFree(argv);
@@ -252,7 +253,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
 	
-	// Initialize logging
+	// Initialise logging
 	InitTENLog();
 
 	// Collect numbered tracks
@@ -261,7 +262,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialise the new scripting system
 	ScriptInterfaceState::Init();
 
-	// Initialize scripting
+	// Initialise scripting
 	try 
 	{
 		// TODO: make sure the right objects are deleted at the end
@@ -354,29 +355,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	else
 		WindowsHandle = App.WindowHandle;
 
+	// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
+	auto temp = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	// Initialise the renderer
 	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
-	// Initialize audio
-	if (g_Configuration.EnableSound)	
-		Sound_Init();
+	// Initialise audio
+	Sound_Init();
+
+	// Initialise input
+	InitialiseInput(App.WindowHandle);
 
 	// Load level if specified in command line
-	CurrentLevel = -1;
-	if (!levelFile.empty() && levelHash != 0)
-	{
-		for (int i = 0; i < g_GameFlow->GetNumLevels(); i++)
-		{
-			auto level = g_GameFlow->GetLevel(i)->FileName;
-			std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
-
-			if (level == levelFile && std::filesystem::exists(level))
-			{
-				CurrentLevel = i;
-				break;
-			}
-		}
-	}
+	CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
 	
 	App.bNoFocus = false;
 	App.isInScene = false;
@@ -402,7 +394,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ThreadEnded = true;
 
 	while (DoTheGame);
-	
+
 	WinClose();
 	exit(EXIT_SUCCESS);
 }
@@ -413,8 +405,8 @@ void WinClose()
 
 	DestroyAcceleratorTable(hAccTable);
 
-	if (g_Configuration.EnableSound)
-		Sound_DeInit();
+	Sound_DeInit();
+	DeInitialiseInput();
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
@@ -429,4 +421,6 @@ void WinClose()
 	g_GameStringsHandler = nullptr;
 
 	ShutdownTENLog();
+
+	CoUninitialize();
 }

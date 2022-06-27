@@ -29,8 +29,7 @@ void KillerStatueControl(short itemNumber)
 
 	if (item->TouchBits & 0x80 && item->Animation.ActiveState == 2)
 	{
-		LaraItem->HitStatus = 1;
-		LaraItem->HitPoints -= 20;
+		DoDamage(LaraItem, 20);
 
 		int x = LaraItem->Pose.Position.x + (GetRandomControl() - SECTOR(16)) / CLICK(1);
 		int z = LaraItem->Pose.Position.z + (GetRandomControl() - SECTOR(16)) / CLICK(1);
