@@ -135,7 +135,7 @@ void SilencerControl(short itemNumber)
 			}
 			else
 			{
-				if (AI.distance > pow(SECTOR(2), 2 || !AI.ahead)
+				if (AI.distance > pow(SECTOR(2), 2) || !AI.ahead)
 					item->Animation.TargetState = 2;
 				if (info->Mood == MoodType::Bored && GetRandomControl() < 0x300)
 					item->Animation.TargetState = 3;
@@ -162,7 +162,7 @@ void SilencerControl(short itemNumber)
 
 			if (Targetable(item, &AI))
 			{
-				if (AI.distance >= pow(SECTOR(2), 2 && AI.zoneNumber == AI.enemyZone)
+				if (AI.distance >= pow(SECTOR(2), 2) && AI.zoneNumber == AI.enemyZone)
 					item->Animation.TargetState = 9;
 
 				break;
