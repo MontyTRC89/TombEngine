@@ -47,7 +47,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto UPV_RADIUS = 300;
 	constexpr auto UPV_HEIGHT = 400;
 	constexpr auto UPV_LENGTH = SECTOR(1);
-	constexpr auto UPV_MOUNT_DISTANCE = CLICK(1.5f);
+	constexpr auto UPV_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto UPV_DISMOUNT_DISTANCE = SECTOR(1);
 	constexpr auto UPV_WATER_SURFACE_DISTANCE = 210;
 
@@ -145,6 +145,73 @@ namespace TEN::Entities::Vehicles
 		auto* UPV = GetUPVInfo(UPVItem);
 
 		UPV->Flags = UPV_FLAG_SURFACE;
+	}
+
+	void UPVPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto* UPVItem = &g_Level.Items[itemNumber];
+		auto* lara = GetLaraInfo(laraItem);
+
+		if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
+			return;
+
+		auto mountType = GetVehicleMountType(UPVItem, laraItem, coll, UPVMountTypes, UPV_MOUNT_DISTANCE);
+		if (mountType == VehicleMountType::None)
+		{
+			// HACK: Collision in water behaves differently? @Sezz 2022.06.28
+			if (!TestBoundsCollide(UPVItem, laraItem, coll->Setup.Radius) || !TestCollision(UPVItem, laraItem))
+				return;
+
+			ItemPushItem(UPVItem, laraItem, coll, false, false);
+		}
+		else
+		{
+			lara->Vehicle = itemNumber;
+			DoUPVMount(UPVItem, laraItem, mountType);
+		}
+	}
+
+	void DoUPVMount(ItemInfo* UPVItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_IDLE;
+			laraItem->Animation.ActiveState = UPV_STATE_IDLE;
+			laraItem->Animation.TargetState = UPV_STATE_IDLE;
+			break;
+
+		default:
+		case VehicleMountType::Back:
+			if (lara->Control.WaterStatus == WaterStatus::TreadWater)
+				laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_SURFACE_START;
+			else
+				laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_UNDERWATER;
+
+			laraItem->Animation.ActiveState = UPV_STATE_MOUNT;
+			laraItem->Animation.TargetState = UPV_STATE_MOUNT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
+			UndrawFlareMeshes(laraItem);
+
+			lara->Flare.ControlLeft = false;
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+		}
+
+		laraItem->Pose = UPVItem->Pose;
+		lara->Control.HandStatus = HandStatus::Busy;
+		lara->Control.WaterStatus = WaterStatus::Dry;
+		UPVItem->HitPoints = 1;
+
+		AnimateItem(laraItem);
 	}
 
 	static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
@@ -332,35 +399,6 @@ namespace TEN::Entities::Vehicles
 		{
 			return false;
 		}
-
-		return true;
-	}
-
-	static bool TestUPVMount(ItemInfo* laraItem, ItemInfo* UPVItem)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (!(TrInput & IN_ACTION) ||
-			lara->Control.HandStatus != HandStatus::Free ||
-			laraItem->Animation.IsAirborne)
-		{
-			return false;
-		}
-
-		int y = abs(laraItem->Pose.Position.y - (UPVItem->Pose.Position.y - CLICK(0.5f)));
-		if (y > CLICK(1))
-			return false;
-
-		int distance = pow(laraItem->Pose.Position.x - UPVItem->Pose.Position.x, 2) + pow(laraItem->Pose.Position.z - UPVItem->Pose.Position.z, 2);
-		if (distance > pow(CLICK(2), 2))
-			return false;
-
-		short deltaAngle = abs(laraItem->Pose.Orientation.y - UPVItem->Pose.Orientation.y);
-		if (deltaAngle > ANGLE(35.0f) || deltaAngle < -ANGLE(35.0f))
-			return false;
-
-		if (GetCollision(UPVItem).Position.Floor < -32000)
-			return false;
 
 		return true;
 	}
@@ -842,68 +880,6 @@ namespace TEN::Entities::Vehicles
 
 		if (UPV->TurnRate.y)
 			ModulateVehicleTurnRateY(&UPV->TurnRate.y, -UPV_Y_TURN_RATE_FRICTION_DECEL, 0, UPV_Y_TURN_RATE_MAX);*/
-	}
-
-	void NoGetOnCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* item = &g_Level.Items[itemNumber];
-
-		if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
-			return;
-		if (!TestCollision(item, laraItem))
-			return;
-
-		ItemPushItem(item, laraItem, coll, false, false);
-	}
-
-	void UPVCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* lara = GetLaraInfo(laraItem);
-		auto* UPVItem = &g_Level.Items[itemNumber];
-
-		if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
-			return;
-
-		if (TestUPVMount(laraItem, UPVItem))
-		{
-			lara->Vehicle = itemNumber;
-			lara->Control.WaterStatus = WaterStatus::Dry;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-				UndrawFlareMeshes(laraItem);
-
-				lara->Flare.ControlLeft = false;
-				lara->Control.Weapon.RequestGunType = lara->Control.Weapon.GunType = LaraWeaponType::None;
-			}
-
-			laraItem->Pose = UPVItem->Pose;
-			lara->Control.HandStatus = HandStatus::Busy;
-			UPVItem->HitPoints = 1;
-
-			if (laraItem->Animation.ActiveState == LS_ONWATER_IDLE || laraItem->Animation.ActiveState == LS_ONWATER_FORWARD)
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_SURFACE_START;
-				laraItem->Animation.ActiveState = UPV_STATE_MOUNT;
-				laraItem->Animation.TargetState = UPV_STATE_MOUNT;
-			}
-			else
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_UPV_LARA_ANIMS].animIndex + UPV_ANIM_MOUNT_UNDERWATER;
-				laraItem->Animation.ActiveState = UPV_STATE_MOUNT;
-				laraItem->Animation.TargetState = UPV_STATE_MOUNT;
-			}
-
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-			AnimateItem(laraItem);
-		}
-		else
-		{
-			UPVItem->Pose.Position.y += UPV_SHIFT;
-			NoGetOnCollision(itemNumber, laraItem, coll);
-			UPVItem->Pose.Position.y -= UPV_SHIFT;
-		}
 	}
 
 	bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll)
