@@ -24,13 +24,13 @@ namespace TEN::Entities::Vehicles
 {
 	struct WAKE_PTS
 	{
-		int 	x[2];
-		int 	y;
-		int		z[2];
-		short	xvel[2];
-		short	zvel[2];
-		byte 	life;
-		byte	pad[3];
+		int x[2];
+		int y;
+		int z[2];
+		short xvel[2];
+		short zvel[2];
+		byte life;
+		byte pad[3];
 	};
 	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
 	static vector<VehicleMountType> KayakMountTypes =
@@ -40,28 +40,27 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
+	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
 	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
-	constexpr auto DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
-	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
+	constexpr auto KAYAK_DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
 
 	constexpr int KAYAK_VELOCITY_FORWARD_ACCEL = 24 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
-	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_HOLD_TURN_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
 
-	// TODO
+	// TODO: Very confusing.
 	#define KAYAK_TURN_RATE_FRICTION_DECEL ANGLE(0.03f)
 	#define KAYAK_TURN_RATE_DEFLECT ANGLE(0.05f)
-
 	#define KAYAK_TURN_RATE_FORWARD_ACCEL ANGLE(0.7f)
 	#define KAYAK_TURN_RATE_LR_ACCEL ANGLE(1.0f)
 	#define KAYAK_TURN_RATE_LR_MAX ANGLE(1.0f)
 	#define KAYAK_TURN_ROTATION ANGLE(0.18f)
-	#define KAYAK_TURN_RATE_HOLD_ACCEL ANGLE(1.4f)
 	#define KAYAK_TURN_RATE_MAX ANGLE(1.4f)
+	#define KAYAK_TURN_RATE_HOLD_ACCEL ANGLE(1.4f)
 	#define KAYAK_TURN_RATE_HOLD_MAX ANGLE(1.4f)
 
 	constexpr auto HIT_BACK = 1;
@@ -478,7 +477,7 @@ namespace TEN::Entities::Vehicles
 	bool KayakCanGetOut(ItemInfo* kayakItem, int dir)
 	{
 		Vector3Int pos;
-		int height = GetVehicleWaterHeight(kayakItem, 0, (dir < 0) ? -DISMOUNT_DISTANCE : DISMOUNT_DISTANCE, false, &pos);
+		int height = GetVehicleWaterHeight(kayakItem, 0, (dir < 0) ? -KAYAK_DISMOUNT_DISTANCE : KAYAK_DISMOUNT_DISTANCE, false, &pos);
 
 		if ((kayakItem->Pose.Position.y - height) > 0)
 			return false;
