@@ -32,6 +32,7 @@ public:
 	virtual bool HasOverhangClimb() const = 0;
 	virtual bool HasSlideExtended() const = 0;
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
+	virtual int	GetLevelNumber(std::string const& flieName) = 0;
 	virtual bool CanPlayAnyLevel() const = 0;
 	virtual bool DoFlow() = 0;
 };

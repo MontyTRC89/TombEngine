@@ -300,19 +300,15 @@ namespace TEN::Entities::TR4
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 				{
 					CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
+					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 					creature->Flags |= 1;
-
-					LaraItem->HitStatus = true;
-					LaraItem->HitPoints -= AHMET_SWIPE_ATTACK_DAMAGE;
 				}
 				else if (!(creature->Flags & 2) && item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 32) &&
 					item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
 				{
 					CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
+					DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 					creature->Flags |= 2;
-
-					LaraItem->HitStatus = true;
-					LaraItem->HitPoints -= AHMET_SWIPE_ATTACK_DAMAGE;
 				}
 
 				break;
@@ -340,10 +336,8 @@ namespace TEN::Entities::TR4
 							item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 						{
 							CreatureEffect2(item, &AhmetBiteJaw, 10, -1, DoBloodSplat);
+							DoDamage(creature->Enemy, AHMET_BITE_ATTACK_DAMAGE);
 							creature->Flags |= 1;
-
-							LaraItem->HitStatus = true;
-							LaraItem->HitPoints -= AHMET_BITE_ATTACK_DAMAGE;
 						}
 					}
 				}
@@ -372,20 +366,16 @@ namespace TEN::Entities::TR4
 						item->TestBits(JointBitType::Touch, AhmetSwipeAttackLeftJoints))
 					{
 						CreatureEffect2(item, &AhmetBiteLeft, 10, -1, DoBloodSplat);
+						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 						creature->Flags |= 1;
-
-						LaraItem->HitStatus = true;
-						LaraItem->HitPoints -= AHMET_SWIPE_ATTACK_DAMAGE;
 					}
 					else if (!(creature->Flags & 2) &&
 						item->Animation.FrameNumber > (g_Level.Anims[item->Animation.AnimNumber].frameBase + 22) &&
 						item->TestBits(JointBitType::Touch, AhmetSwipeAttackRightJoints))
 					{
 						CreatureEffect2(item, &AhmetBiteRight, 10, -1, DoBloodSplat);
+						DoDamage(creature->Enemy, AHMET_SWIPE_ATTACK_DAMAGE);
 						creature->Flags |= 2;
-
-						LaraItem->HitStatus = true;
-						LaraItem->HitPoints -= AHMET_SWIPE_ATTACK_DAMAGE;
 					}
 				}
 

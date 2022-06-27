@@ -25,7 +25,6 @@ struct BUBBLE_STRUCT
 	int age;
 	bool active;
 };
-
 extern std::vector<BUBBLE_STRUCT> Bubbles;
 
 void DisableBubbles();

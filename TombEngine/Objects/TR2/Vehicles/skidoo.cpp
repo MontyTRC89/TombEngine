@@ -21,6 +21,7 @@
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
 namespace TEN::Entities::Vehicles
@@ -974,8 +975,7 @@ namespace TEN::Entities::Vehicles
 			if (skidooItem->Animation.Velocity > (SKIDOO_MAX_VELOCITY + SKIDOO_ACCELERATION) &&
 				newVelocity < (skidooItem->Animation.Velocity - 10))
 			{
-				laraItem->HitPoints -= (skidooItem->Animation.Velocity - newVelocity) / 2;
-				laraItem->HitStatus = true;
+				DoDamage(laraItem, (skidooItem->Animation.Velocity - newVelocity) / 2);
 			}
 
 			if (skidooItem->Animation.Velocity > 0 && newVelocity < skidooItem->Animation.Velocity)

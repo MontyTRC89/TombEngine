@@ -24,13 +24,13 @@ void InitialiseHair()
 	{
 		int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
-		Hairs[h][0].initialized = true;
+		Hairs[h][0].initialised = true;
 		Hairs[h][0].pos.Orientation.y = 0;
 		Hairs[h][0].pos.Orientation.x = -0x4000;
 
 		for (int i = 1; i < HAIR_SEGMENTS + 1; i++, bone += 4)
 		{
-			Hairs[h][i].initialized = true;
+			Hairs[h][i].initialised = true;
 			Hairs[h][i].pos.Position.x = *(bone + 1);
 			Hairs[h][i].pos.Position.y = *(bone + 2);
 			Hairs[h][i].pos.Position.z = *(bone + 3);
@@ -182,9 +182,9 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 
 	int* bone = &g_Level.Bones[Objects[ID_LARA_HAIR].boneIndex];
 
-	if (Hairs[ponytail][0].initialized)
+	if (Hairs[ponytail][0].initialised)
 	{
-		Hairs[ponytail][0].initialized = false;
+		Hairs[ponytail][0].initialised = false;
 		Hairs[ponytail][0].pos.Position.x = pos.x;
 		Hairs[ponytail][0].pos.Position.y = pos.y;
 		Hairs[ponytail][0].pos.Position.z = pos.z;
@@ -195,7 +195,7 @@ void HairControl(ItemInfo* item, int ponytail, ANIM_FRAME* framePtr)
 			world = Matrix::CreateFromYawPitchRoll(TO_RAD(Hairs[ponytail][i].pos.Orientation.y), TO_RAD(Hairs[ponytail][i].pos.Orientation.x), 0) * world;			
 			world = Matrix::CreateTranslation(*(bone + 1), *(bone + 2), *(bone + 3)) * world;
 
-			Hairs[ponytail][i + 1].initialized = false;
+			Hairs[ponytail][i + 1].initialised = false;
 			Hairs[ponytail][i + 1].pos.Position.x = world.Translation().x;
 			Hairs[ponytail][i + 1].pos.Position.y = world.Translation().y;
 			Hairs[ponytail][i + 1].pos.Position.z = world.Translation().z;

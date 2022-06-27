@@ -144,11 +144,9 @@ void LionControl(short itemNumber)
 			case 4:
 				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
+					DoDamage(creature->Enemy, 200);
 					CreatureEffect2(item, &LionBite1, 10, item->Pose.Orientation.y, DoBloodSplat);
 					item->Animation.RequiredState = 1;
-
-					LaraItem->HitPoints -= 200;
-					LaraItem->HitStatus = true;
 				}
 
 				break;
@@ -158,11 +156,9 @@ void LionControl(short itemNumber)
 
 				if (!item->Animation.RequiredState && item->TouchBits & 0x200048)
 				{
+					DoDamage(creature->Enemy, 60);
 					CreatureEffect2(item, &LionBite2, 10, item->Pose.Orientation.y, DoBloodSplat);
 					item->Animation.RequiredState = 1;
-
-					LaraItem->HitPoints -= 60;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

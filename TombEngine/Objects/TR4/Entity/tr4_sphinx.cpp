@@ -193,7 +193,7 @@ namespace TEN::Entities::TR4
 						DoBloodSplat);
 					creature->Flags = 1;
 
-					LaraItem->HitPoints -= SPHINX_ATTACK_DAMAGE;
+					DoDamage(creature->Enemy, SPHINX_ATTACK_DAMAGE);
 				}
 			}
 
@@ -239,7 +239,7 @@ namespace TEN::Entities::TR4
 						-1,
 						DoBloodSplat);
 
-					LaraItem->HitPoints = 0;
+					DoDamage(creature->Enemy, INT_MAX);
 				}
 			}
 

@@ -26,6 +26,7 @@
 #include "Specific/input.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Lara;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Effects::Environment;
@@ -341,6 +342,8 @@ void FireShotgun(ItemInfo* laraItem)
 		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
 
+		Rumble(0.5f, 0.2f);
+
 		Statistics.Game.AmmoUsed++;
 	}
 }
@@ -453,7 +456,7 @@ void FireHarpoon(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	Ammo& ammos = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
+	auto& ammos = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
 	if (!ammos)
 		return;
 
@@ -501,6 +504,7 @@ void FireHarpoon(ItemInfo* laraItem)
 		item->Animation.VerticalVelocity = -HARPOON_VELOCITY * phd_sin(item->Pose.Orientation.x);
 		item->HitPoints = HARPOON_TIME;
 
+		Rumble(0.2f, 0.1f);
 		AddActiveItem(itemNumber);
 
 		Statistics.Level.AmmoUsed++;
@@ -722,6 +726,8 @@ void FireGrenade(ItemInfo* laraItem)
 		item->Animation.RequiredState = 0;
 		item->HitPoints = GRENADE_TIME;
 		item->ItemFlags[0] = (int)WeaponAmmoType::Ammo2;
+
+		Rumble(0.4f, 0.25f);
 
 		AddActiveItem(itemNumber);
 
@@ -1171,6 +1177,7 @@ void FireRocket(ItemInfo* laraItem)
 
 		AddActiveItem(itemNumber);
 
+		Rumble(0.4f, 0.3f);
 		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
@@ -1455,6 +1462,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 
 		item->ItemFlags[0] = (int)lara->Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo;
 
+		Rumble(0.2f, 0.1f);
 		SoundEffect(SFX_TR4_CROSSBOW_FIRE, &laraItem->Pose);
 
 		Statistics.Level.AmmoUsed++;
@@ -1722,6 +1730,8 @@ void FireHK(ItemInfo* laraItem, int mode)
 		SmokeWeapon = LaraWeaponType::HK;
 		TriggerGunShell(1, ID_GUNSHELL, LaraWeaponType::HK);
 		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::HK].FlashTime;
+
+		Rumble(0.2f, 0.1f);
 	}
 }
 
@@ -1810,7 +1820,7 @@ void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src,
 		}
 		else
 		{
-			laraItem->HitPoints -= (Weapons[(int)weaponType].Damage * 5);
+			DoDamage(laraItem, Weapons[(int)weaponType].Damage * 5);
 			if (!TestEnvironment(ENV_FLAG_WATER, dest->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
 				LaraBurn(laraItem);
 		}

@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Game/Lara/lara.h"
 
+#include <ois/OISKeyboard.h>
+
 #include "Game/Lara/lara_basic.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_jump.h"
@@ -35,10 +37,13 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/input.h"
 #include "Renderer/Renderer11.h"
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Input;
+
 using std::function;
 using TEN::Renderer::g_Renderer;
 
@@ -454,6 +459,8 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->SprintEnergy++;
 
+	RumbleLaraHealthCondition(item);
+
 	lara->Control.IsLow = false;
 
 	bool isWater = TestEnvironment(ENV_FLAG_WATER, item);
@@ -704,8 +711,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 			if (lara->Air < 0)
 			{
-			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && lara->anxiety < 251)
-			//		lara->anxiety += 4;
 				item->HitPoints -= 5;
 				lara->Air = -1;
 			}
@@ -781,12 +786,12 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	static bool doRoutines = true;
 	static bool dbT = false;
-	if (KeyMap[DIK_T] && !dbT)
+	if (KeyMap[OIS::KeyCode::KC_T] && !dbT)
 		doRoutines = !doRoutines;
-	dbT = KeyMap[DIK_T] ? true : false;
+	dbT = KeyMap[OIS::KeyCode::KC_T] ? true : false;
 
 	static bool dbU = false;
-	if (doRoutines || KeyMap[DIK_U] && !dbU)
+	if (doRoutines || KeyMap[OIS::KeyCode::KC_U] && !dbU)
 	{
 		HandleLaraMovementParameters(item, coll);
 
@@ -809,7 +814,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
 		//	TrInput &= ~IN_ACTION;
 	}
-	dbU = KeyMap[DIK_U] ? true : false;
+	dbU = KeyMap[OIS::KeyCode::KC_U] ? true : false;
 
 	// Handle weapons.
 	LaraGun(item);
@@ -821,6 +826,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
 	TestVolumes(Lara.ItemNumber);
+
+	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
@@ -858,10 +865,14 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	lara_control_routines[item->Animation.ActiveState](item, coll);
 
-	// Reset turn rate.
-	ResetLaraTurnRate(item);
-
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
+
+	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
+	// Apply and reset turn rate.
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+		lara->Control.TurnRate.y = 0;
+
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
 
@@ -926,8 +937,15 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
-	// Reset turn rate.
-	ResetLaraTurnRate(item, level->GetLaraType() == LaraType::Divesuit);
+	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
+	// Apply and reset turn rate.
+	item->Pose.Orientation.x += lara->Control.TurnRate.x;
+	if (!(TrInput & (IN_FORWARD | IN_BACK)))
+		lara->Control.TurnRate.x = 0;
+
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+		lara->Control.TurnRate.y = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);

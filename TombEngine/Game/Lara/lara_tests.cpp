@@ -18,6 +18,7 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Floordata;
 
@@ -989,11 +990,11 @@ bool IsRunJumpQueueableState(LaraState state)
 
 bool IsRunJumpCountableState(LaraState state)
 {
-	if (state == LS_RUN_FORWARD ||
-		state == LS_WALK_FORWARD ||
-		state == LS_JUMP_FORWARD ||
+	if (state == LS_WALK_FORWARD ||
+		state == LS_RUN_FORWARD ||
 		state == LS_SPRINT ||
-		state == LS_SPRINT_DIVE)
+		state == LS_SPRINT_DIVE ||
+		state == LS_JUMP_FORWARD)
 	{
 		return true;
 	}
