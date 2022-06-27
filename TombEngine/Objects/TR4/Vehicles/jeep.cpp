@@ -51,7 +51,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_SLIP = 100;
 	constexpr auto JEEP_SLIP_SIDE = 128;
 
-	constexpr auto JEEP_VELOCITY_MAX = 182 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto JEEP_VELOCITY_MAX = 128 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
 
 	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
