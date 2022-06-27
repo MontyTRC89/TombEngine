@@ -992,14 +992,14 @@ namespace TEN::Entities::Vehicles
 		else
 			motorbike->Revs = 0;
 
-		if ((TrInput & VEHICLE_IN_SPEED) && lara->SprintEnergy)
+		if ((TrInput & VEHICLE_IN_SPEED) && (TrInput & VEHICLE_IN_ACCELERATE))
 		{
-			if (TrInput & VEHICLE_IN_ACCELERATE)
+			if (lara->SprintEnergy > 10)
 			{
 				motorbike->Flags |= MOTORBIKE_FLAG_BOOST;
-
 				lara->SprintEnergy -= 2;
-				if (lara->SprintEnergy > MOTORBIKE_ACCEL)
+
+				if (lara->SprintEnergy <= 0)
 				{
 					motorbike->Flags &= ~MOTORBIKE_FLAG_BOOST;
 					lara->SprintEnergy = 0;
@@ -1022,7 +1022,7 @@ namespace TEN::Entities::Vehicles
 					if (motorbike->Velocity > MOTORBIKE_ACCEL_1)
 						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE;
 					else
-						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 16384.0f);
+						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 8192.0f);
 
 					if (motorbike->TurnRate < -MOTORBIKE_TURN_ANGLE_MAX)
 						motorbike->TurnRate = -MOTORBIKE_TURN_ANGLE_MAX;
@@ -1032,7 +1032,7 @@ namespace TEN::Entities::Vehicles
 					if (motorbike->Velocity > MOTORBIKE_ACCEL_1)
 						motorbike->TurnRate += MOTORBIKE_FORWARD_TURN_ANGLE;
 					else
-						motorbike->TurnRate += MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 16384.0f);
+						motorbike->TurnRate += MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 8192.0f);
 
 					if (motorbike->TurnRate > MOTORBIKE_TURN_ANGLE_MAX)
 						motorbike->TurnRate = MOTORBIKE_TURN_ANGLE_MAX;
