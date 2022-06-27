@@ -382,7 +382,7 @@ namespace TEN::Entities::TR3
 			}
 
 			if (item->HitStatus ||
-				(creature->Enemy == LaraItem && (AI.distance < SECTOR(1) ||
+				(creature->Enemy == LaraItem && (AI.distance < pow(SECTOR(1), 2) ||
 					TargetVisible(item, &AI)) && (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(2))))
 			{
 				AlertAllGuards(itemNumber);
