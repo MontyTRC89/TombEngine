@@ -16,7 +16,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float minDistance2D)
+	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -24,26 +24,26 @@ namespace TEN::Entities::Vehicles
 		if (vehicleItem->Flags & ONESHOT)
 			return VehicleMountType::None;
 
-		// TODO: Jump mounts don't need an input!
-		// Assess ACTION input and hand status.
-		if (!(TrInput & IN_ACTION) || lara->Control.HandStatus != HandStatus::Free)
+		// Assess hand status.
+		if (lara->Control.HandStatus != HandStatus::Free)
 			return VehicleMountType::None;
 
-		// TODO: This tolerance must be larger for water vehicles.
 		// Assess vertical distance to vehicle.
-		if (abs(laraItem->Pose.Position.y - vehicleItem->Pose.Position.y) > STEPUP_HEIGHT)
+		if (abs(laraItem->Pose.Position.y - vehicleItem->Pose.Position.y) > maxVerticalDistance)
 			return VehicleMountType::None;
 
 		// Assess 2D distance to vehicle.
 		float distance2D = Vector2::Distance(
 			Vector2(laraItem->Pose.Position.x, laraItem->Pose.Position.z),
 			Vector2(vehicleItem->Pose.Position.x, vehicleItem->Pose.Position.z));
-		if (distance2D > minDistance2D)
+		if (distance2D > maxDistance2D)
 			return VehicleMountType::None;
 
 		// Assess object collision.
 		if (!TestBoundsCollide(vehicleItem, laraItem, coll->Setup.Radius) || !TestCollision(vehicleItem, laraItem))
 			return VehicleMountType::None;
+
+		bool hasInputAction = TrInput & IN_ACTION;
 
 		short deltaHeadingAngle = vehicleItem->Pose.Orientation.y - laraItem->Pose.Orientation.y;
 		short angleBetweenPositions = vehicleItem->Pose.Orientation.y - GetOrientBetweenPoints(laraItem->Pose.Position, vehicleItem->Pose.Position).y;
@@ -65,7 +65,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Front:
-				if (deltaHeadingAngle > ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(135.0f) &&
+				if (hasInputAction &&
+					deltaHeadingAngle > ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(135.0f) &&
 					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
@@ -75,7 +76,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Back:
-				if (abs(deltaHeadingAngle) < ANGLE(45.0f) &&
+				if (hasInputAction &&
+					abs(deltaHeadingAngle) < ANGLE(45.0f) &&
 					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
@@ -85,7 +87,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Left:
-				if (deltaHeadingAngle > -ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(45.0f) &&
+				if (hasInputAction &&
+					deltaHeadingAngle > -ANGLE(135.0f) && deltaHeadingAngle < -ANGLE(45.0f) &&
 					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{
@@ -95,7 +98,8 @@ namespace TEN::Entities::Vehicles
 				continue;
 
 			case VehicleMountType::Right:
-				if (deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
+				if (hasInputAction &&
+					deltaHeadingAngle > ANGLE(45.0f) && deltaHeadingAngle < ANGLE(135.0f) &&
 					onCorrectSide &&
 					!laraItem->Animation.IsAirborne)
 				{

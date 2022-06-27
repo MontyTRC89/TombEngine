@@ -113,7 +113,7 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 			return;
 
-		auto mountType = GetVehicleMountType(speedboatItem, laraItem, coll, SpeedboatMountTypes, SPEEDBOAT_MOUNT_DISTANCE);
+		auto mountType = GetVehicleMountType(speedboatItem, laraItem, coll, SpeedboatMountTypes, SPEEDBOAT_MOUNT_DISTANCE, LARA_HEIGHT);
 		if (mountType == VehicleMountType::None)
 		{
 			coll->Setup.EnableObjectPush = true;
