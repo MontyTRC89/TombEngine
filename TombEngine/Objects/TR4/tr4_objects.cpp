@@ -1189,7 +1189,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseJeep;
-		obj->collision = JeepCollision;
+		obj->collision = JeepPlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveAnim = true;

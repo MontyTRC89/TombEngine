@@ -142,12 +142,95 @@ namespace TEN::Entities::Vehicles
 
 	void InitialiseJeep(short itemNumber)
 	{
-		ItemInfo* jeepItem = &g_Level.Items[itemNumber];
+		auto* jeepItem = &g_Level.Items[itemNumber];
 		jeepItem->Data = JeepInfo();
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		jeepItem->SetBits(JointBitType::Mesh, JeepJoints);
 		jeep->MomentumAngle = jeepItem->Pose.Position.y;
+	}
+
+	void JeepPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto* jeepItem = &g_Level.Items[itemNumber];
+		auto* jeep = GetJeepInfo(jeepItem);
+		auto* lara = GetLaraInfo(laraItem);
+
+		if (laraItem->HitPoints <= 0 && lara->Vehicle != NO_ITEM)
+			return;
+
+		auto mountType = GetVehicleMountType(jeepItem, laraItem, coll, JeepMountTypes, JEEP_MOUNT_DISTANCE_MIN);
+		if (mountType == VehicleMountType::None)
+			ObjectCollision(itemNumber, laraItem, coll);
+		else
+		{
+			lara->Vehicle = itemNumber;
+			DoJeepMount(jeepItem, laraItem, mountType);
+		}
+	}
+
+	void DoJeepMount(ItemInfo* jeepItem, ItemInfo* laraItem, VehicleMountType mountType)
+	{
+		auto* jeep = GetJeepInfo(jeepItem);
+		auto* lara = GetLaraInfo(laraItem);
+
+		// HACK: Hardcoded jeep keys check.
+		/*if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
+		{
+			g_Gui.SetInventoryItemChosen(NO_ITEM);
+			return true;
+		}
+		else
+		{
+			if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM1))
+				g_Gui.SetEnterInventory(ID_PUZZLE_ITEM1);
+
+			return false;
+		}*/
+		
+		switch (mountType)
+		{
+		case VehicleMountType::LevelStart:
+			laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_IDLE;
+			laraItem->Animation.ActiveState = JEEP_STATE_IDLE;
+			laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+			break;
+
+		case VehicleMountType::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_LEFT;
+			laraItem->Animation.ActiveState = JEEP_STATE_MOUNT;
+			laraItem->Animation.TargetState = JEEP_STATE_MOUNT;
+			break;
+
+		default:
+		case VehicleMountType::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_RIGHT;
+			laraItem->Animation.ActiveState = JEEP_STATE_MOUNT;
+			laraItem->Animation.TargetState = JEEP_STATE_MOUNT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
+			UndrawFlareMeshes(laraItem);
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+			lara->Flare.ControlLeft = 0;
+		}
+
+		ResetLaraFlex(laraItem);
+		laraItem->Pose.Position = jeepItem->Pose.Position;
+		laraItem->Pose.Orientation.y = jeepItem->Pose.Orientation.y;
+		lara->Control.HandStatus = HandStatus::Busy;
+		lara->HitDirection = -1;
+		jeepItem->HitPoints = 1;
+		jeepItem->Flags |= TRIGGERED;
+		jeep->Revs = 0;
+		jeep->unknown2 = 0;
+
+		AnimateItem(laraItem);
 	}
 
 	static int DoJeepShift(ItemInfo* jeepItem, Vector3Int* pos, Vector3Int* old)
@@ -401,88 +484,6 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return true;
-	}
-
-	static bool GetOnJeep(int itemNumber, ItemInfo* laraItem)
-	{
-		auto* jeepItem = &g_Level.Items[itemNumber];
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (!(TrInput & IN_ACTION) && g_Gui.GetInventoryItemChosen() != ID_PUZZLE_ITEM1)
-			return false;
-
-		if (jeepItem->Flags & 0x100)
-			return false;
-
-		if (lara->Control.HandStatus != HandStatus::Free)
-			return false;
-
-		if (laraItem->Animation.ActiveState != LS_IDLE)
-			return false;
-
-		if (laraItem->Animation.AnimNumber != LA_STAND_IDLE)
-			return false;
-
-		if (laraItem->Animation.IsAirborne)
-			return false;
-
-		if (abs(jeepItem->Pose.Position.y - laraItem->Pose.Position.y) >= STEP_SIZE)
-			return false;
-
-		if (!TestBoundsCollide(jeepItem, laraItem, 100))
-			return false;
-
-		int floorHeight = GetCollision(jeepItem).Position.Floor;
-		if (floorHeight < -32000)
-			return false;
-
-		short angle = phd_atan(jeepItem->Pose.Position.z - laraItem->Pose.Position.z, jeepItem->Pose.Position.x - laraItem->Pose.Position.x);
-		angle -= jeepItem->Pose.Orientation.y;
-
-		if ((angle > -ANGLE(45)) && (angle < ANGLE(135)))
-		{
-			int tempAngle = laraItem->Pose.Orientation.y - jeepItem->Pose.Orientation.y;
-			if (tempAngle > ANGLE(45) && tempAngle < ANGLE(135))
-			{
-				if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
-				{
-					g_Gui.SetInventoryItemChosen(NO_ITEM);
-					return true;
-				}
-				else
-				{
-					if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM1))
-						g_Gui.SetEnterInventory(ID_PUZZLE_ITEM1);
-
-					return false;
-				}
-			}
-			else
-				return false;
-		}
-		else
-		{
-			int tempAngle = laraItem->Pose.Orientation.y - jeepItem->Pose.Orientation.y;
-			if (tempAngle > ANGLE(225) && tempAngle < ANGLE(315))
-			{
-				if (g_Gui.GetInventoryItemChosen() == ID_PUZZLE_ITEM1)
-				{
-					g_Gui.SetInventoryItemChosen(NO_ITEM);
-					return true;
-				}
-				else
-				{
-					if (g_Gui.IsObjectInInventory(ID_PUZZLE_ITEM1))
-						g_Gui.SetEnterInventory(ID_PUZZLE_ITEM1);
-
-					return false;
-				}
-			}
-			else
-				return false;
-		}
-
-		return false;
 	}
 
 	static int GetJeepCollisionAnim(ItemInfo* jeepItem, Vector3Int* p)
@@ -1370,84 +1371,6 @@ namespace TEN::Entities::Vehicles
 				break;
 			}
 		}
-	}
-
-	void JeepCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* jeepItem = &g_Level.Items[itemNumber];
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (laraItem->HitPoints <= 0 && lara->Vehicle != NO_ITEM)
-			return;
-	
-		if (GetOnJeep(itemNumber, laraItem))
-		{
-			lara->Vehicle = itemNumber;
-
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-				UndrawFlareMeshes(laraItem);
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-				lara->Control.Weapon.GunType = LaraWeaponType::None;
-				lara->Flare.ControlLeft = 0;
-			}
-
-			lara->Control.HandStatus = HandStatus::Busy;
-
-			/*v4 = *(_WORD*)(Rooms + 148 * (signed short)v3->roomNumber + 72);
-			// Enable ENEMY_JEEP
-			if (v4 != -1)
-			{
-				while (1)
-				{
-					v5 = Items + 5622 * v4;
-					if (*(_WORD*)(Items + 5622 * v4 + 12) == 34)
-					{
-						break;
-					}
-					v4 = *(_WORD*)(v5 + 26);
-					if (v4 == -1)
-					{
-						goto LABEL_11;
-					}
-				}
-				EnableBaddyAI(v4, 1);
-				*(_DWORD*)(v5 + 5610) = *(_DWORD*)(v5 + 5610) & 0xFFFFFFFB | 2;
-				AddActiveItem(v4);
-			}*/
-
-			short ang = phd_atan(jeepItem->Pose.Position.z - laraItem->Pose.Position.z, jeepItem->Pose.Position.x - laraItem->Pose.Position.x);
-			ang -= jeepItem->Pose.Orientation.y;
-
-			if ((ang > -(ANGLE(45))) && (ang < (ANGLE(135))))
-				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_LEFT;
-			else
-				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_RIGHT;
-
-			laraItem->Animation.TargetState = JEEP_STATE_MOUNT;
-			laraItem->Animation.ActiveState = JEEP_STATE_MOUNT;
-			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-
-			jeepItem->HitPoints = 1;
-			laraItem->Pose.Position = jeepItem->Pose.Position;
-			laraItem->Pose.Orientation.y = jeepItem->Pose.Orientation.y;
-
-			ResetLaraFlex(laraItem);
-			lara->HitDirection = -1;
-
-			AnimateItem(laraItem);
-
-			int anim = laraItem->Animation.AnimNumber;
-
-			auto* jeep = GetJeepInfo(jeepItem);
-			jeep->Revs = 0;
-			jeep->unknown2 = 0;
-
-			jeepItem->Flags |= TRIGGERED;
-		}
-		else
-			ObjectCollision(itemNumber, laraItem, coll);
 	}
 
 	int JeepControl(ItemInfo* laraItem)
