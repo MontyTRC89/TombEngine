@@ -818,7 +818,7 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 
 	coll->Setup.ForwardAngle = oldFacing;
 
-	if (coll->CollisionType == CT_NONE)
+	if (item->IsLara() && coll->CollisionType == CT_NONE)
 	{
 		coll->Setup.OldPosition = item->Pose.Position;
 		UpdateItemRoom(item, -10);
@@ -830,10 +830,11 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
-	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
+	if (item->IsLara() && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
 	{
-		Lara.Control.IsMoving = false;
-		Lara.Control.HandStatus = HandStatus::Free;
+		auto* lara = GetLaraInfo(item);
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
 	}
 
 	return true;

@@ -551,10 +551,10 @@ namespace TEN::Entities::Vehicles
 		motorbike->DisableDismount = false;
 
 		Vector3Int backLeftOld, mtb_old, backRightOld, mtf_old, rightLeftOld;
-		int hfl_old = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &rightLeftOld);
-		int hmf_old = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &mtf_old);
-		int hbl_old = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &backLeftOld);
-		int hbr_old = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, CLICK(0.5f), true, &backRightOld);
+		int hfl_old  = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &rightLeftOld);
+		int hmf_old  = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), true, &mtf_old);
+		int hbl_old  = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, true, &backLeftOld);
+		int hbr_old  = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, CLICK(0.5f), true, &backRightOld);
 		int hmtb_old = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, true, &mtb_old);
 
 		auto oldPos = motorbikeItem->Pose.Position;
