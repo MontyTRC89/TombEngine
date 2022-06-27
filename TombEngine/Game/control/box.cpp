@@ -1094,7 +1094,7 @@ int CreatureActive(short itemNumber)
 
 	if (item->Status == ITEM_INVISIBLE || !item->Data.is<CreatureInfo>())
 	{
-		if (!EnableBaddyAI(itemNumber, 0))
+		if (!EnableEntityAI(itemNumber, 0))
 			return false; // AI couldn't be activated
 
 		item->Status = ITEM_ACTIVE;
