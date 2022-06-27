@@ -13,6 +13,9 @@
 #include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
+#include "Specific/prng.h"
+
+using namespace TEN::Math::Random;
 
 /*
 ID_BADDY1
@@ -863,13 +866,12 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint3 = AI.angle;
 				
-				if (objectNumber == ID_BADDY2 &&
+				if (GenerateInt(0, 30) > 20 &&
+					objectNumber == ID_BADDY2 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
-					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) &&
-						AI.distance < pow(SECTOR(3), 2) ||
-						height2 >= (height1 + CLICK(2))))
+					(AI.angle > -ANGLE(22.5f) && AI.angle < ANGLE(22.5f) && AI.distance < pow(SECTOR(3), 2) || height2 >= (height1 + CLICK(2))))
 				{
 					item->Animation.TargetState = BADDY_STATE_SOMERSAULT;
 					currentCreature->MaxTurn = 0;
