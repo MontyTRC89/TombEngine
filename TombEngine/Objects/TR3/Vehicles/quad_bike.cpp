@@ -237,21 +237,19 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	static int CanQuadbikeGetOff(int direction)
+	static int CanQuadbikeGetOff(ItemInfo* laraItem, int direction)
 	{
-		auto* item = &g_Level.Items[Lara.Vehicle];
-		short angle;
+		auto* lara = GetLaraInfo(laraItem);
+		auto* quadBikeItem = &g_Level.Items[lara->Vehicle];
 
-		if (direction < 0)
-			angle = item->Pose.Orientation.y - ANGLE(90.0f);
-		else
-			angle = item->Pose.Orientation.y + ANGLE(90.0f);
+		short angle = quadBikeItem->Pose.Orientation.y;
+		angle += (direction < 0) ? -ANGLE(90.0f) : ANGLE(90.0f);
 
-		int x = item->Pose.Position.x + CLICK(2) * phd_sin(angle);
-		int y = item->Pose.Position.y;
-		int z = item->Pose.Position.z + CLICK(2) * phd_cos(angle);
+		int x = quadBikeItem->Pose.Position.x + CLICK(2) * phd_sin(angle);
+		int y = quadBikeItem->Pose.Position.y;
+		int z = quadBikeItem->Pose.Position.z + CLICK(2) * phd_cos(angle);
 
-		auto collResult = GetCollision(x, y, z, item->RoomNumber);
+		auto collResult = GetCollision(x, y, z, quadBikeItem->RoomNumber);
 
 		if (collResult.Position.FloorSlope ||
 			collResult.Position.Floor == NO_HEIGHT)
@@ -259,10 +257,10 @@ namespace TEN::Entities::Vehicles
 			return false;
 		}
 
-		if (abs(collResult.Position.Floor - item->Pose.Position.y) > CLICK(2))
+		if (abs(collResult.Position.Floor - quadBikeItem->Pose.Position.y) > CLICK(2))
 			return false;
 
-		if ((collResult.Position.Ceiling - item->Pose.Position.y) > -LARA_HEIGHT ||
+		if ((collResult.Position.Ceiling - quadBikeItem->Pose.Position.y) > -LARA_HEIGHT ||
 			(collResult.Position.Floor - collResult.Position.Ceiling) < LARA_HEIGHT)
 		{
 			return false;
@@ -754,9 +752,9 @@ namespace TEN::Entities::Vehicles
 					quadBike->Velocity == 0 &&
 					!quadBike->NoDismount)
 				{
-					if (TrInput & VEHICLE_IN_LEFT && CanQuadbikeGetOff(-1))
+					if (TrInput & VEHICLE_IN_LEFT && CanQuadbikeGetOff(laraItem, -1))
 						laraItem->Animation.TargetState = QBIKE_STATE_DISMOUNT_LEFT;
-					else if (TrInput & VEHICLE_IN_RIGHT && CanQuadbikeGetOff(1))
+					else if (TrInput & VEHICLE_IN_RIGHT && CanQuadbikeGetOff(laraItem, 1))
 						laraItem->Animation.TargetState = QBIKE_STATE_DISMOUNT_RIGHT;
 				}
 				else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_REVERSE))
