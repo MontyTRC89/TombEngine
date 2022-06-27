@@ -10,6 +10,7 @@ namespace TEN::Entities::Vehicles
 		short TurnRate = 0;
 		short MomentumAngle = 0;
 		short ExtraRotation = 0;
+		short ExtraRotationDrift = 0;
 		short FrontRightWheelRotation = 0;
 		short FrontLeftWheelRotation = 0;
 		short BackRightWheelRotation = 0;
@@ -20,10 +21,7 @@ namespace TEN::Entities::Vehicles
 		int Pitch = 0;
 		short TrackMesh = 0;
 
+		short Gear = 0;
 		short Flags = NULL;
-
-		short unknown0 = 0;
-		short unknown1 = 0;
-		short unknown2 = 0;
 	};
 }
