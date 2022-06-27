@@ -412,7 +412,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseKayak;
-		obj->collision = KayakCollision;
+		obj->collision = KayakPlayerCollision;
 		//obj->drawRoutine = KayakDraw;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
