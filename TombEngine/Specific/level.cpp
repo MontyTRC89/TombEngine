@@ -1138,8 +1138,12 @@ unsigned int _stdcall LoadLevel(void* data)
 		else
 			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
 
+		TENLog("Preparing renderer...", LogLevel::Info);
+		
 		g_Renderer.UpdateProgress(90);
 		g_Renderer.PrepareDataForTheRenderer();
+
+		TENLog("Initializing level...", LogLevel::Info);
 
 		// Initialise the game
 		InitialiseGameFlags();
@@ -1148,6 +1152,8 @@ unsigned int _stdcall LoadLevel(void* data)
 		GetAIPickups();
 		Lara.Vehicle = -1;
 		g_GameScriptEntities->AssignLara();
+
+		TENLog("Level loading complete.", LogLevel::Info);
 
 		SetScreenFadeOut(FADE_SCREEN_SPEED);
 		g_Renderer.UpdateProgress(100);
