@@ -39,4 +39,6 @@ namespace TEN::Entities::Vehicles
 
 	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
 	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
+	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
+	void ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 }
