@@ -40,7 +40,6 @@ void ShootAtLara(FX_INFO *fx)
 void ControlMissile(short fxNumber)
 {
 	auto* fx = &EffectList[fxNumber];
-	printf("ControlMissile\n");
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON &&
 		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
