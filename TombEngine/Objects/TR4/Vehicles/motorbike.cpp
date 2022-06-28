@@ -125,6 +125,7 @@ namespace TEN::Entities::Vehicles
 	enum MotorbikeFlags
 	{
 		MOTORBIKE_FLAG_BOOST = (1 << 0),
+		MOTORBIKE_FLAG_NITRO = (1 << 1),
 		MOTORBIKE_FLAG_FALLING = (1 << 6),
 		MOTORBIKE_FLAG_DEATH = (1 << 7)
 	};
@@ -183,6 +184,7 @@ namespace TEN::Entities::Vehicles
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_UNLOCK;
 				g_Gui.SetInventoryItemChosen(NO_ITEM);
+				motorbike->Flags |= MOTORBIKE_FLAG_NITRO;
 			}
 			else
 				laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_MOUNT;*/
@@ -992,7 +994,9 @@ namespace TEN::Entities::Vehicles
 		else
 			motorbike->Revs = 0;
 
-		if ((TrInput & VEHICLE_IN_SPEED) && (TrInput & VEHICLE_IN_ACCELERATE))
+		if ((TrInput & VEHICLE_IN_SPEED) && 
+			(TrInput & VEHICLE_IN_ACCELERATE) && 
+			(motorbike->Flags & MOTORBIKE_FLAG_NITRO))
 		{
 			if (lara->SprintEnergy > 10)
 			{
