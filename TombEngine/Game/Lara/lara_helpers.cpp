@@ -335,7 +335,6 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
 }
 
-// TODO: Rename to ModulateTurnRate() and move somewhere else. @Sezz 2022.06.26
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
 {
 	int sign = std::copysign(1, axisCoeff);

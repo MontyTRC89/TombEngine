@@ -260,10 +260,10 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 				laraItem->Animation.IsAirborne = true;
-				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
-				skidooItem->Flags |= IFLAG_INVISIBLE;
+				lara->Control.HandStatus = HandStatus::Free;
 				skidooItem->Collidable = false;
+				skidooItem->Flags |= IFLAG_INVISIBLE;
 
 				return false;
 			}
@@ -503,8 +503,8 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
-		bool drive = false;
 		int maxVelocity = 0;
+		bool drive = false;
 
 		if (skidooItem->Pose.Position.y >= (height - CLICK(1)))
 		{
@@ -513,17 +513,8 @@ namespace TEN::Entities::Vehicles
 			if (TrInput & IN_LOOK && skidooItem->Animation.Velocity == 0)
 				LookUpDown(laraItem);
 
-			if ((TrInput & VEHICLE_IN_LEFT && !(TrInput & VEHICLE_IN_REVERSE)) ||
-				(TrInput & VEHICLE_IN_RIGHT && TrInput & VEHICLE_IN_REVERSE))
-			{
+			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
 				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
-			}
-
-			if ((TrInput & VEHICLE_IN_RIGHT && !(TrInput & VEHICLE_IN_REVERSE)) ||
-				(TrInput & VEHICLE_IN_LEFT && TrInput & VEHICLE_IN_REVERSE))
-			{
-				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);
-			}
 
 			if (TrInput & VEHICLE_IN_REVERSE)
 			{
@@ -550,6 +541,7 @@ namespace TEN::Entities::Vehicles
 					skidooItem->Animation.Velocity += (SKIDOO_VELOCITY_ACCEL / 2) + (SKIDOO_VELOCITY_ACCEL * (skidooItem->Animation.Velocity / (2 * maxVelocity)));
 				else if (skidooItem->Animation.Velocity > (maxVelocity + SKIDOO_VELOCITY_DECEL))
 					skidooItem->Animation.Velocity -= SKIDOO_VELOCITY_DECEL;
+
 				drive = true;
 			}
 			else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
