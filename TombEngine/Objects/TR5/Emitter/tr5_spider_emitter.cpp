@@ -50,11 +50,6 @@ void ClearSpiders()
 	}
 }
 
-void ClearSpidersPatch(ItemInfo* item)
-{
-	ClearSpiders();
-}
-
 void InitialiseSpiders(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
