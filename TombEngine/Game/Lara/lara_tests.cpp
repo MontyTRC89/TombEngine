@@ -321,7 +321,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.IsAirborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
-	item->Animation.IsAirborne = false;
+	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	return true;
 }
