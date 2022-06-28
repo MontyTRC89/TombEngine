@@ -242,14 +242,26 @@ namespace TEN::Entities::Vehicles
 		return currentVelocity;
 	}
 
+	// TODO: This is a copy-pase of the player version, but I may need a different method for vehicles.
+	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
+	{
+		int sign = std::copysign(1, axisCoeff);
+		short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
+		short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
+
+		short newTurnRate = (turnRate + (accelRate * sign)) * sign;
+		newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
+		return newTurnRate * sign;
+	}
+
 	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
 	{
-		*turnRate = ModulateLaraTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, -AxisMap[InputAxis::MoveVertical]);
+		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, -AxisMap[InputAxis::MoveVertical]);
 	}
 
 	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
 	{
-		*turnRate = ModulateLaraTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
+		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
 	}
 
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
