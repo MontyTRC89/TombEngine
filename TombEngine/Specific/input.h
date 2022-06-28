@@ -26,7 +26,7 @@ namespace TEN::Input
 
 	enum InputActions
 	{
-		IN_NONE		  = (1 << 0),
+		IN_NONE		  = 0,
 		IN_FORWARD	  = (1 << KEY_FORWARD),
 		IN_BACK		  = (1 << KEY_BACK),
 		IN_LEFT		  = (1 << KEY_LEFT),
