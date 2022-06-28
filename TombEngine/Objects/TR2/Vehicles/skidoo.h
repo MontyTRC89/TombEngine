@@ -11,18 +11,18 @@ namespace TEN::Entities::Vehicles
 	void SkidooPlayerCollision(short skidooItemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoSkidooMount(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool TestSkidooDismountOK(ItemInfo* skidooItem, int direction);
-	bool TestSkidooDismount(ItemInfo* laraItem, ItemInfo* skidooItem);
+	bool TestSkidooDismount(ItemInfo* skidooItem, ItemInfo* laraItem);
 
 	int GetSkidooCollisionAnim(ItemInfo* skidooItem, Vector3Int* moved);
 
-	void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem);
+	void SkidooGuns(ItemInfo* skidooItem, ItemInfo* laraItem);
 	void DoSnowEffect(ItemInfo* skidooItem);
 
 	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll);
-	bool SkidooUserControl(ItemInfo* laraItem, ItemInfo* skidooItem, int height, int* pitch);
-	void SkidooAnimation(ItemInfo* laraItem, ItemInfo* skidooItem, int collide, bool dead);
+	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch);
+	void SkidooAnimation(ItemInfo* skidooItem, ItemInfo* laraItem, int collide, bool dead);
 
-	int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem);
+	int SkidooDynamics(ItemInfo* skidooItem, ItemInfo* laraItem);
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old);
 	int DoSkidooDynamics(int height, int verticalVelocity, int* y);
 }
