@@ -306,7 +306,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.z = 0;
 				laraItem->HitPoints = 0;
 				lara->Control.HandStatus = HandStatus::Free;
-				quadBikeItem->Flags |= ONESHOT;
+				quadBikeItem->Flags |= IFLAG_INVISIBLE;
 
 				return false;
 			}
@@ -583,7 +583,7 @@ namespace TEN::Entities::Vehicles
 		moved.x = quadBikeItem->Pose.Position.x;
 		moved.z = quadBikeItem->Pose.Position.z;
 
-		if (!(quadBikeItem->Flags & ONESHOT))
+		if (!(quadBikeItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(quadBikeItem, QBIKE_RADIUS);
 
 		short rot = 0;

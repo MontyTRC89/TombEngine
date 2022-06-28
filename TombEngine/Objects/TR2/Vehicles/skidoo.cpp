@@ -262,7 +262,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.MoveAngle = skidooItem->Pose.Orientation.y;
-				skidooItem->Flags |= ONESHOT;
+				skidooItem->Flags |= IFLAG_INVISIBLE;
 				skidooItem->Collidable = false;
 
 				return false;
@@ -378,7 +378,7 @@ namespace TEN::Entities::Vehicles
 		int height = probe.Position.Floor;
 		int pitch = 0;
 
-		if (skidooItem->Flags & ONESHOT)
+		if (skidooItem->Flags & IFLAG_INVISIBLE)
 		{
 			drive = 0;
 			collide = 0;
@@ -432,7 +432,7 @@ namespace TEN::Entities::Vehicles
 		skidooItem->Pose.Orientation.x += ((xRot - skidooItem->Pose.Orientation.x) / 2);
 		skidooItem->Pose.Orientation.z += ((zRot - skidooItem->Pose.Orientation.z) / 2);
 
-		if (skidooItem->Flags & ONESHOT)
+		if (skidooItem->Flags & IFLAG_INVISIBLE)
 		{
 			if (probe.RoomNumber != skidooItem->RoomNumber)
 			{
@@ -886,7 +886,7 @@ namespace TEN::Entities::Vehicles
 		moved.x = skidooItem->Pose.Position.x;
 		moved.z = skidooItem->Pose.Position.z;
 
-		if (!(skidooItem->Flags & ONESHOT))
+		if (!(skidooItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(skidooItem, SKIDOO_RADIUS);
 
 		Vector3Int frontLeft, frontRight, backRight, backLeft;

@@ -67,7 +67,7 @@ namespace TEN::Entities::Switches
 
 		if (switchItem->Status == ITEM_NOT_ACTIVE)
 		{
-			if (!(switchItem->Flags & ONESHOT) &&
+			if (!(switchItem->Flags & IFLAG_INVISIBLE) &&
 				(TrInput & IN_ACTION &&
 					laraItem->Animation.ActiveState == LS_IDLE &&
 					laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
