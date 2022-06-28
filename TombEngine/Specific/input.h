@@ -105,7 +105,7 @@ namespace TEN::Input
 	extern const char* g_KeyNames[];
 	extern int DbInput;  // Debounce; is input clicked?
 	extern int TrInput;  // Throttle; is input held?
-	extern int RawInput; // ...; is input released?
+	extern int RawInput; // Throttle for binocular input.
 
 	extern std::vector<bool>  KeyMap;
 	extern std::vector<float> AxisMap;
