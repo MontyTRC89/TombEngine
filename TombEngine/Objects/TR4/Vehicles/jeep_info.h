@@ -5,7 +5,7 @@ namespace TEN::Entities::Vehicles
 	struct JeepInfo
 	{
 		int Velocity = 0;
-		int VerticalVelocity = 0;
+		int CameraElevation = 0;
 
 		short TurnRate = 0;
 		short MomentumAngle = 0;
