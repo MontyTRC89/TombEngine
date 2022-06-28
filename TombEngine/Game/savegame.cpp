@@ -496,7 +496,7 @@ bool SaveGame::Save(int slot)
 
 			Save::UPVBuilder upvBuilder{ fbb };
 
-			upvBuilder.add_fan_rot(upv->FanRotation);
+			upvBuilder.add_fan_rot(upv->TurbineRotation);
 			upvBuilder.add_flags(upv->Flags);
 			upvBuilder.add_harpoon_left(upv->HarpoonLeft);
 			upvBuilder.add_harpoon_timer(upv->HarpoonTimer);
@@ -1373,7 +1373,7 @@ bool SaveGame::Load(int slot)
 			auto* upv = (UPVInfo*)item->Data;
 			auto* savedUpv = (Save::UPV*)savedItem->data();
 
-			upv->FanRotation = savedUpv->fan_rot();
+			upv->TurbineRotation = savedUpv->fan_rot();
 			upv->Flags = savedUpv->flags();
 			upv->HarpoonLeft = savedUpv->harpoon_left();
 			upv->HarpoonTimer = savedUpv->harpoon_timer();

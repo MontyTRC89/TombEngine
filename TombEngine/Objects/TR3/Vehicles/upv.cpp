@@ -57,8 +57,11 @@ namespace TEN::Entities::Vehicles
 
 	constexpr int UPV_HARPOON_RELOAD_TIME = 15;
 	constexpr int UPV_HARPOON_VELOCITY = CLICK(1);
-	constexpr int UPV_TURBINE_JOINT = 3;
 	constexpr int UPV_SHIFT = 128;
+
+	constexpr int UPV_LEFT_RUDDER_JOINT = 1;
+	constexpr int UPV_RIGHT_RUDDER_JOINT = 2;
+	constexpr int UPV_TURBINE_JOINT = 3;
 
 	// TODO: These should probably be done in the wad. @Sezz 2022.06.24
 	constexpr auto UPV_DEATH_FRAME_1 = 16;
@@ -320,9 +323,12 @@ namespace TEN::Entities::Vehicles
 		if (lara->Vehicle == itemNumber)
 		{
 			if (!UPV->Velocity)
-				UPV->FanRotation += ANGLE(2.0f);
+				UPV->TurbineRotation += ANGLE(2.0f);
 			else
-				UPV->FanRotation += UPV->Velocity / 4069;
+				UPV->TurbineRotation += UPV->Velocity / 4069;
+
+			UPV->LeftRudderRotation = (UPV->TurnRate.x + UPV->TurnRate.y) * 8;
+			UPV->RightRudderRotation = (UPV->TurnRate.x + -UPV->TurnRate.y) * 8;
 
 			if (UPV->Velocity)
 			{
