@@ -348,12 +348,13 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
+			Rumble(0.4f, 0.15f);
+
 			item->Animation.TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				item->Animation.ActiveState = LS_SPLAT;
 				lara->Control.TurnRate = 0;
-				Rumble(0.4f, 0.15f);
 				return;
 			}
 		}
@@ -2354,7 +2355,6 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 			{
 				item->Animation.ActiveState = LS_SPLAT;
 				lara->Control.TurnRate = 0;
-				Rumble(0.6f, 0.2f);
 				return;
 			}
 		}
