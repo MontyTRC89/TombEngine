@@ -13,14 +13,14 @@ namespace TEN::Entities::Vehicles
 	bool TestSkidooDismountOK(ItemInfo* skidooItem, int direction);
 	bool TestSkidooDismount(ItemInfo* skidooItem, ItemInfo* laraItem);
 
+	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll);
+	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch);
+	void SkidooAnimation(ItemInfo* skidooItem, ItemInfo* laraItem, int collide, bool dead);
+
 	int GetSkidooCollisionAnim(ItemInfo* skidooItem, Vector3Int* moved);
 
 	void SkidooGuns(ItemInfo* skidooItem, ItemInfo* laraItem);
 	void DoSnowEffect(ItemInfo* skidooItem);
-
-	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll);
-	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch);
-	void SkidooAnimation(ItemInfo* skidooItem, ItemInfo* laraItem, int collide, bool dead);
 
 	int SkidooDynamics(ItemInfo* skidooItem, ItemInfo* laraItem);
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old);
