@@ -487,23 +487,23 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	static int GetJeepCollisionAnim(ItemInfo* jeepItem, Vector3Int* p)
+	static int GetJeepCollisionAnim(ItemInfo* jeepItem, Vector3Int* pos)
 	{
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		if (jeep->Gear != 0)
 			return 0;
 
-		p->x = jeepItem->Pose.Position.x - p->x;
-		p->z = jeepItem->Pose.Position.z - p->z;
+		pos->x = jeepItem->Pose.Position.x - pos->x;
+		pos->z = jeepItem->Pose.Position.z - pos->z;
 
-		if (p->x || p->z)
+		if (pos->x || pos->z)
 		{
 			float sinY = phd_sin(jeepItem->Pose.Orientation.y);
 			float cosY = phd_cos(jeepItem->Pose.Orientation.y);
 
-			int front = (p->z * cosY) + (p->x * sinY);
-			int side = (p->z * -sinY) + (p->x * cosY);
+			int front = (pos->z * cosY) + (pos->x * sinY);
+			int side = (pos->z * -sinY) + (pos->x * cosY);
 
 			if (abs(front) > abs(side))
 				return ((front > 0) + 13);

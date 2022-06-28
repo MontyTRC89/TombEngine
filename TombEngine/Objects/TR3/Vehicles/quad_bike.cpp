@@ -172,9 +172,9 @@ namespace TEN::Entities::Vehicles
 
 	void QuadBikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* quadBikeItem = &g_Level.Items[itemNumber];
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 			return;
@@ -269,10 +269,10 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	static bool QuadBikeCheckGetOff(ItemInfo* laraItem, ItemInfo* quadBikeItem)
+	static bool QuadBikeCheckGetOff(ItemInfo* quadBikeItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		if (lara->Vehicle == NO_ITEM)
 			return true;
@@ -326,17 +326,17 @@ namespace TEN::Entities::Vehicles
 			return true;
 	}
 
-	static int GetQuadCollisionAnim(ItemInfo* quadBikeItem, Vector3Int* p)
+	static int GetQuadCollisionAnim(ItemInfo* quadBikeItem, Vector3Int* pos)
 	{
-		p->x = quadBikeItem->Pose.Position.x - p->x;
-		p->z = quadBikeItem->Pose.Position.z - p->z;
+		pos->x = quadBikeItem->Pose.Position.x - pos->x;
+		pos->z = quadBikeItem->Pose.Position.z - pos->z;
 
-		if (p->x || p->z)
+		if (pos->x || pos->z)
 		{
 			float c = phd_cos(quadBikeItem->Pose.Orientation.y);
 			float s = phd_sin(quadBikeItem->Pose.Orientation.y);
-			int front = p->z * c + p->x * s;
-			int side = -p->z * s + p->x * c;
+			int front = pos->z * c + pos->x * s;
+			int side = -pos->z * s + pos->x * c;
 
 			if (abs(front) > abs(side))
 			{
@@ -482,10 +482,10 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	static int QuadDynamics(ItemInfo* laraItem, ItemInfo* quadBikeItem)
+	static int QuadDynamics(ItemInfo* quadBikeItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		quadBike->NoDismount = false;
 
@@ -685,7 +685,7 @@ namespace TEN::Entities::Vehicles
 		return collide;
 	}
 
-	static void AnimateQuadBike(ItemInfo* laraItem, ItemInfo* quadBikeItem, int collide, bool dead)
+	static void AnimateQuadBike(ItemInfo* quadBikeItem, ItemInfo* laraItem, int collide, bool dead)
 	{
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 
@@ -1126,7 +1126,7 @@ namespace TEN::Entities::Vehicles
 		oldPos.z = quadBikeItem->Pose.Position.z;
 		oldPos.roomNumber = quadBikeItem->RoomNumber;
 
-		bool collide = QuadDynamics(laraItem, quadBikeItem);
+		bool collide = QuadDynamics(quadBikeItem, laraItem);
 
 		auto probe = GetCollision(quadBikeItem);
 
@@ -1212,7 +1212,7 @@ namespace TEN::Entities::Vehicles
 
 			laraItem->Pose = quadBikeItem->Pose;
 
-			AnimateQuadBike(laraItem, quadBikeItem, collide, dead);
+			AnimateQuadBike(quadBikeItem, laraItem, collide, dead);
 			AnimateItem(laraItem);
 
 			quadBikeItem->Animation.AnimNumber = Objects[ID_QUAD].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_QUAD_LARA_ANIMS].animIndex);
@@ -1275,6 +1275,6 @@ namespace TEN::Entities::Vehicles
 		else
 			quadBike->SmokeStart = 0;
 
-		return QuadBikeCheckGetOff(laraItem, quadBikeItem);
+		return QuadBikeCheckGetOff(quadBikeItem, laraItem);
 	}
 }

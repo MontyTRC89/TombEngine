@@ -136,8 +136,8 @@ namespace TEN::Entities::Vehicles
 
 	void SkidooPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* skidooItem = &g_Level.Items[itemNumber];
+		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
 			return;
@@ -215,7 +215,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	bool TestSkidooDismount(ItemInfo* laraItem, ItemInfo* skidooItem)
+	bool TestSkidooDismount(ItemInfo* skidooItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -284,8 +284,8 @@ namespace TEN::Entities::Vehicles
 			float sinY = phd_sin(skidooItem->Pose.Orientation.y);
 			float cosY = phd_cos(skidooItem->Pose.Orientation.y);
 
-			int side = (-moved->z * sinY) + (moved->x * cosY);
 			int front = (moved->z * cosY) + (moved->x * sinY);
+			int side = (moved->z * -sinY) + (moved->x * cosY);
 
 			if (abs(front) > abs(side))
 			{
@@ -306,10 +306,10 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	void SkidooGuns(ItemInfo* laraItem, ItemInfo* skidooItem)
+	void SkidooGuns(ItemInfo* skidooItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* skidoo = GetSkidooInfo(skidooItem);
+		auto* lara = GetLaraInfo(laraItem);
 		auto* weapon = &Weapons[(int)LaraWeaponType::Snowmobile];
 
 		LaraGetNewTarget(laraItem, weapon);
@@ -352,7 +352,7 @@ namespace TEN::Entities::Vehicles
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
 		Vector3Int frontLeft, frontRight;
-		auto collide = SkidooDynamics(laraItem, skidooItem);
+		auto collide = SkidooDynamics(skidooItem, laraItem);
 		auto heightFrontLeft = GetVehicleHeight(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true, &frontLeft);
 		auto heightFrontRight = GetVehicleHeight(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true, &frontRight);
 
@@ -397,7 +397,7 @@ namespace TEN::Entities::Vehicles
 				break;
 
 			default:
-				drive = SkidooUserControl(laraItem, skidooItem, height, &pitch);
+				drive = SkidooUserControl(skidooItem, laraItem, height, &pitch);
 				break;
 			}
 		}
@@ -448,7 +448,7 @@ namespace TEN::Entities::Vehicles
 			return 0;
 		}
 
-		SkidooAnimation(laraItem, skidooItem, collide, dead);
+		SkidooAnimation(skidooItem, laraItem, collide, dead);
 
 		if (probe.RoomNumber != skidooItem->RoomNumber)
 		{
@@ -475,7 +475,7 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 
 		if (!dead && drive >= 0 && banditSkidoo)
-			SkidooGuns(laraItem, skidooItem);
+			SkidooGuns(skidooItem, laraItem);
 
 		if (!dead)
 		{
@@ -496,10 +496,10 @@ namespace TEN::Entities::Vehicles
 				DoSnowEffect(skidooItem);
 		}
 
-		return TestSkidooDismount(laraItem, skidooItem);
+		return TestSkidooDismount(skidooItem, laraItem);
 	}
 
-	bool SkidooUserControl(ItemInfo* laraItem, ItemInfo* skidooItem, int height, int* pitch)
+	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch)
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
@@ -577,7 +577,7 @@ namespace TEN::Entities::Vehicles
 		return drive;
 	}
 
-	void SkidooAnimation(ItemInfo* laraItem, ItemInfo* skidooItem, int collide, bool dead)
+	void SkidooAnimation(ItemInfo* skidooItem, ItemInfo* laraItem, int collide, bool dead)
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
@@ -815,7 +815,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	int SkidooDynamics(ItemInfo* laraItem, ItemInfo* skidooItem)
+	int SkidooDynamics(ItemInfo* skidooItem, ItemInfo* laraItem)
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
 

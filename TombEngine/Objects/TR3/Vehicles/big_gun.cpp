@@ -82,7 +82,7 @@ namespace TEN::Entities::Vehicles
 		bigGun->XOrientFrame = BGUN_X_ORIENT_MIDDLE_FRAME;
 	}
 
-	static bool BigGunTestMount(ItemInfo* laraItem, ItemInfo* bigGunItem)
+	static bool BigGunTestMount(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
 		// TODO: If Lara global is not used, the game crashes upon level load. Not sure why. @Sezz 2022.01.09
 		auto* lara = &Lara/* GetLaraInfo(laraItem)*/;
@@ -109,7 +109,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	void BigGunFire(ItemInfo* laraItem, ItemInfo* bigGunItem)
+	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 
@@ -150,14 +150,14 @@ namespace TEN::Entities::Vehicles
 
 	void BigGunCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* bigGunItem = &g_Level.Items[itemNumber];
 		auto* bigGun = GetBigGunInfo(bigGunItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		if (laraItem->HitPoints <= 0 || lara->Vehicle != NO_ITEM)
 			return;
 
-		if (BigGunTestMount(bigGunItem, laraItem))
+		if (BigGunTestMount(laraItem, bigGunItem))
 		{
 			lara->Vehicle = itemNumber;
 
@@ -206,7 +206,7 @@ namespace TEN::Entities::Vehicles
 			{
 				if (TrInput & VEHICLE_IN_FIRE && !bigGun->FireCount)
 				{
-					BigGunFire(laraItem, bigGunItem);
+					BigGunFire(bigGunItem, laraItem);
 					bigGun->FireCount = BGUN_RECOIL_TIME;
 					bigGun->BarrelRotation = BGUN_RECOIL_Z;
 					bigGun->IsBarrelRotating = true;

@@ -234,13 +234,13 @@ namespace TEN::Entities::Vehicles
 		minecart->Flags = 0;
 	}
 
-	static void TriggerWheelSparkles(ItemInfo* item, bool left)
+	static void TriggerWheelSparkles(ItemInfo* minecartItem, bool left)
 	{
 		for (int i = 0; i < 2; i++)
 		{
 			auto pos = Vector3Int();
-			GetJointAbsPosition(item, &pos, Wheels[(left ? 0 : 2) + i]);
-			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, item->RoomNumber), item->Pose.Orientation, 512, 10);
+			GetJointAbsPosition(minecartItem, &pos, Wheels[(left ? 0 : 2) + i]);
+			TriggerFrictionSpark(&GameVector(pos.x, pos.y, pos.z, minecartItem->RoomNumber), minecartItem->Pose.Orientation, 512, 10);
 			
 			if (i)
 			{
@@ -290,7 +290,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	static void MinecartToEntityCollision(ItemInfo* laraItem, ItemInfo* minecartItem)
+	static void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem)
 	{
 		auto roomsList = GetRoomList(minecartItem->RoomNumber);
 
@@ -359,10 +359,11 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	static void MoveCart(ItemInfo* laraItem, ItemInfo* minecartItem)
+	static void MoveCart(ItemInfo* minecartItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* minecart = GetMinecartInfo(minecartItem);
+		auto* lara = GetLaraInfo(laraItem);
+
 		auto flags = GetCollision(minecartItem).BottomBlock->Flags;
 
 		if (minecart->StopDelay)
@@ -590,8 +591,9 @@ namespace TEN::Entities::Vehicles
 			minecartItem->Pose.Orientation.z -= minecartItem->Pose.Orientation.z / 8;
 	}
 
-	static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem, MinecartInfo* minecart)
+	static void DoUserInput(ItemInfo* minecartItem, ItemInfo* laraItem)
 	{
+		auto* minecart = GetMinecartInfo(minecartItem);
 		auto* lara = GetLaraInfo(laraItem);
 
 		short floorHeight;
@@ -930,7 +932,7 @@ namespace TEN::Entities::Vehicles
 			if (floorHeight > CLICK(2.25f) && !minecart->VerticalVelocity)
 				minecart->VerticalVelocity = MINECART_JUMP_VERTICAL_VELOCITY;
 
-			MinecartToEntityCollision(laraItem, minecartItem);
+			MinecartToEntityCollision(minecartItem, laraItem);
 		}
 	}
 
@@ -946,10 +948,10 @@ namespace TEN::Entities::Vehicles
 		}
 		auto* minecart = GetMinecartInfo(minecartItem);
 
-		DoUserInput(minecartItem, laraItem, minecart);
+		DoUserInput(minecartItem, laraItem);
 
 		if (minecart->Flags & MINECART_FLAG_CONTROL)
-			MoveCart(laraItem, minecartItem);
+			MoveCart(minecartItem, laraItem);
 
 		if (lara->Vehicle != NO_ITEM)
 			laraItem->Pose = minecartItem->Pose;

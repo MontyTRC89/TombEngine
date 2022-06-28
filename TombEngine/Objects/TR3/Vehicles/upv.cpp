@@ -212,10 +212,10 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	static void FireUPVHarpoon(ItemInfo* laraItem, ItemInfo* UPVItem)
+	static void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto UPV = GetUPVInfo(UPVItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
 		if (ammo.getCount() == 0 && !ammo.hasInfinite())
@@ -310,10 +310,10 @@ namespace TEN::Entities::Vehicles
 		if (itemNumber == NO_ITEM)
 			return;
 
-		auto* laraItem = LaraItem;
-		auto* lara = GetLaraInfo(laraItem);
 		auto* UPVItem = &g_Level.Items[itemNumber];
 		auto* UPV = GetUPVInfo(UPVItem);
+		auto* laraItem = LaraItem;
+		auto* lara = GetLaraInfo(laraItem);
 
 		Vector3Int pos;
 
@@ -375,7 +375,7 @@ namespace TEN::Entities::Vehicles
 			UPV->HarpoonTimer--;
 	}
 
-	static bool TestUPVDismount(ItemInfo* laraItem, ItemInfo* UPVItem)
+	static bool TestUPVDismount(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -401,7 +401,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	static void DoCurrent(ItemInfo* laraItem, ItemInfo* UPVItem)
+	static void DoCurrent(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -463,10 +463,10 @@ namespace TEN::Entities::Vehicles
 		UPVItem->Pose.Position.z += lara->WaterCurrentPull.z / CLICK(1);
 	}
 
-	static void BackgroundCollision(ItemInfo* laraItem, ItemInfo* UPVItem)
+	static void BackgroundCollision(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* UPV = GetUPVInfo(UPVItem);
+		auto* lara = GetLaraInfo(laraItem);
 		CollisionInfo cinfo, * coll = &cinfo; // ??
 
 		coll->Setup.Mode = CollisionProbeMode::Quadrants;
@@ -551,12 +551,12 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	static void UPVControl(ItemInfo* laraItem, ItemInfo* UPVItem)
+	static void UPVControl(ItemInfo* UPVItem, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* UPV = GetUPVInfo(UPVItem);
+		auto* lara = GetLaraInfo(laraItem);
 
-		TestUPVDismount(laraItem, UPVItem);
+		TestUPVDismount(UPVItem, laraItem);
 
 		int anim = laraItem->Animation.AnimNumber - Objects[ID_UPV_LARA_ANIMS].animIndex;
 		int frame = laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -654,7 +654,7 @@ namespace TEN::Entities::Vehicles
 					ModulateVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_ACCEL, -UPV_X_TURN_RATE_MAX, UPV_X_TURN_RATE_MAX);
 			}
 
-			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(laraItem, UPVItem))
+			if (TrInput & VEHICLE_IN_DISMOUNT && TestUPVDismount(UPVItem, laraItem))
 			{
 				if (UPV->Velocity > 0)
 					UPV->Velocity -= UPV_VELOCITY_ACCEL;
@@ -891,7 +891,7 @@ namespace TEN::Entities::Vehicles
 
 		if (!(UPV->Flags & UPV_FLAG_DEAD))
 		{
-			UPVControl(laraItem, UPVItem);
+			UPVControl(UPVItem, laraItem);
 
 			UPVItem->Animation.Velocity = UPV->Velocity / VEHICLE_VELOCITY_SCALE;
 			UPVItem->Pose.Orientation += UPV->TurnRate;
@@ -977,7 +977,7 @@ namespace TEN::Entities::Vehicles
 		if (!(UPV->Flags & UPV_FLAG_DEAD) &&
 			lara->Vehicle != NO_ITEM)
 		{
-			DoCurrent(laraItem, UPVItem);
+			DoCurrent(UPVItem, laraItem);
 
 			if (TrInput & VEHICLE_IN_FIRE &&
 				UPV->Flags & UPV_FLAG_CONTROL &&
@@ -987,7 +987,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.ActiveState != UPV_STATE_DISMOUNT_WATER_SURFACE &&
 					laraItem->Animation.ActiveState != UPV_STATE_MOUNT)
 				{
-					FireUPVHarpoon(laraItem, UPVItem);
+					FireUPVHarpoon(UPVItem, laraItem);
 					UPV->HarpoonTimer = UPV_HARPOON_RELOAD_TIME;
 				}
 			}
@@ -1001,7 +1001,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Pose = UPVItem->Pose;
 
 			AnimateItem(laraItem);
-			BackgroundCollision(laraItem, UPVItem);
+			BackgroundCollision(UPVItem, laraItem);
 			DoVehicleCollision(UPVItem, UPV_RADIUS);
 
 			if (UPV->Flags & UPV_FLAG_CONTROL)
@@ -1024,7 +1024,7 @@ namespace TEN::Entities::Vehicles
 			if (probe.RoomNumber != UPVItem->RoomNumber)
 				ItemNewRoom(lara->Vehicle, probe.RoomNumber);
 
-			BackgroundCollision(laraItem, UPVItem);
+			BackgroundCollision(UPVItem, laraItem);
 
 			UPV->TurnRate.x = 0;
 

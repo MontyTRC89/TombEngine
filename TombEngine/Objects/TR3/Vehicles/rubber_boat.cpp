@@ -191,10 +191,10 @@ namespace TEN::Entities::Vehicles
 		*/
 	}
 
-	static void DoRubberBoatShift(ItemInfo* laraItem, int itemNumber)
+	static void DoRubberBoatShift(int itemNumber, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* boatItem = &g_Level.Items[itemNumber];
+		auto* lara = GetLaraInfo(laraItem);
 
 		int itemNumber2 = g_Level.Rooms[boatItem->RoomNumber].itemNumber;
 		while (itemNumber2 != NO_ITEM)
@@ -348,11 +348,11 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static int RubberBoatDynamics(ItemInfo* laraItem, short itemNumber)
+	static int RubberBoatDynamics(short itemNumber, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
 
@@ -396,7 +396,7 @@ namespace TEN::Entities::Vehicles
 		moved.x = rBoatItem->Pose.Position.x;
 		moved.z = rBoatItem->Pose.Position.z;
 
-		DoRubberBoatShift(laraItem, itemNumber);
+		DoRubberBoatShift(itemNumber, laraItem);
 
 		Vector3Int frontLeft, frontRight, backRight, backLeft, front;
 		short rotation = 0;
@@ -499,7 +499,7 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	bool RubberBoatUserControl(ItemInfo* laraItem, ItemInfo* rBoatItem)
+	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
@@ -626,7 +626,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	void RubberBoatAnimation(ItemInfo* laraItem, ItemInfo* rBoatItem, int collide)
+	void RubberBoatAnimation(ItemInfo* rBoatItem, ItemInfo* laraItem, int collide)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
@@ -779,7 +779,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	void DoRubberBoatDismount(ItemInfo* laraItem, ItemInfo* rBoatItem)
+	void DoRubberBoatDismount(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -824,10 +824,10 @@ namespace TEN::Entities::Vehicles
 
 	void RubberBoatControl(short itemNumber)
 	{
-		auto* laraItem = LaraItem;
-		auto* lara = GetLaraInfo(laraItem);
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto* laraItem = LaraItem;
+		auto* lara = GetLaraInfo(laraItem);
 
 		bool noTurn = true;
 		bool drive = false;
@@ -835,7 +835,7 @@ namespace TEN::Entities::Vehicles
 		int pitch, height, ofs, nowake;
 
 		Vector3Int frontLeft, frontRight;
-		int collide = RubberBoatDynamics(laraItem, itemNumber);
+		int collide = RubberBoatDynamics(itemNumber, laraItem);
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRight);
 
@@ -860,7 +860,7 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = true;
-				noTurn = RubberBoatUserControl(laraItem, rBoatItem);
+				noTurn = RubberBoatUserControl(rBoatItem, laraItem);
 				break;
 			}
 		}
@@ -914,7 +914,7 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Vehicle == itemNumber)
 		{
-			RubberBoatAnimation(laraItem, rBoatItem, collide);
+			RubberBoatAnimation(rBoatItem, laraItem, collide);
 
 			if (probe.RoomNumber != rBoatItem->RoomNumber)
 			{
@@ -955,7 +955,7 @@ namespace TEN::Entities::Vehicles
 		if (lara->Vehicle != itemNumber)
 			return;
 
-		DoRubberBoatDismount(laraItem, rBoatItem);
+		DoRubberBoatDismount(rBoatItem, laraItem);
 
 		short probedRoomNumber = GetCollision(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y + 128, rBoatItem->Pose.Position.z, rBoatItem->RoomNumber).RoomNumber;
 		height = GetWaterHeight(rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y + 128, rBoatItem->Pose.Position.z, probedRoomNumber);

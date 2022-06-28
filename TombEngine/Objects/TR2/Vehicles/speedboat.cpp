@@ -210,7 +210,7 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	void DoSpeedboatDismount(ItemInfo* laraItem, ItemInfo* speedboatItem)
+	void DoSpeedboatDismount(ItemInfo* speedboatItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
@@ -383,11 +383,11 @@ namespace TEN::Entities::Vehicles
 
 		if (moved->x || moved->z)
 		{
-			float s = phd_sin(speedboatItem->Pose.Orientation.y);
-			float c = phd_cos(speedboatItem->Pose.Orientation.y);
+			float sinY = phd_sin(speedboatItem->Pose.Orientation.y);
+			float cosY = phd_cos(speedboatItem->Pose.Orientation.y);
 
-			int front = moved->z * c + moved->x * s;
-			int side = -moved->z * s + moved->x * c;
+			int front = (moved->z * cosY) + (moved->x * sinY);
+			int side = (moved->z * -sinY) + (moved->x * cosY);
 
 			if (abs(front) > abs(side))
 			{
@@ -434,11 +434,11 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	int SpeedboatDynamics(ItemInfo* laraItem, short itemNumber)
+	int SpeedboatDynamics(short itemNumber, ItemInfo* laraItem)
 	{
-		auto* lara = GetLaraInfo(laraItem);
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		speedboatItem->Pose.Orientation.z -= speedboat->LeanAngle;
 
@@ -549,7 +549,7 @@ namespace TEN::Entities::Vehicles
 		return collide;
 	}
 
-	bool SpeedboatUserControl(ItemInfo* laraItem, ItemInfo* speedboatItem)
+	bool SpeedboatUserControl(ItemInfo* speedboatItem, ItemInfo* laraItem)
 	{
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
 
@@ -644,7 +644,7 @@ namespace TEN::Entities::Vehicles
 		return noTurn;
 	}
 
-	void SpeedboatAnimation(ItemInfo* laraItem, ItemInfo* speedboatItem, int collide)
+	void SpeedboatAnimation(ItemInfo* speedboatItem, ItemInfo* laraItem, int collide)
 	{
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
 
@@ -732,11 +732,11 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	void SpeedboatSplash(ItemInfo* item, long verticalVelocity, long water)
+	void SpeedboatSplash(ItemInfo* speedboatItem, long verticalVelocity, long water)
 	{
 		//OLD SPLASH
 		/*
-		splash_setup.x = item->pos.x_pos;
+		splash_setup.x = speedboatItem->pos.x_pos;
 		splash_setup.y = water;
 		splash_setup.z = item->pos.z_pos;
 		splash_setup.InnerXZoff = 16 << 2;
@@ -764,12 +764,12 @@ namespace TEN::Entities::Vehicles
 
 	void SpeedboatControl(short itemNumber)
 	{
-		auto* laraItem = LaraItem;
-		auto* lara = GetLaraInfo(laraItem);
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
+		auto* laraItem = LaraItem;
+		auto* lara = GetLaraInfo(laraItem);
 
-		int collide = SpeedboatDynamics(laraItem, itemNumber);
+		int collide = SpeedboatDynamics(itemNumber, laraItem);
 
 		Vector3Int frontLeft, frontRight;
 		int heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeft);
@@ -801,7 +801,7 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = true;
-				noTurn = SpeedboatUserControl(laraItem, speedboatItem);
+				noTurn = SpeedboatUserControl(speedboatItem, laraItem);
 				break;
 			}
 		}
@@ -856,7 +856,7 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Vehicle == itemNumber)
 		{
-			SpeedboatAnimation(laraItem, speedboatItem, collide);
+			SpeedboatAnimation(speedboatItem, laraItem, collide);
 
 			if (probe.RoomNumber != speedboatItem->RoomNumber)
 			{
@@ -908,6 +908,6 @@ namespace TEN::Entities::Vehicles
 		if (lara->Vehicle != itemNumber)
 			return;
 
-		DoSpeedboatDismount(laraItem, speedboatItem);
+		DoSpeedboatDismount(speedboatItem, laraItem);
 	}
 }
