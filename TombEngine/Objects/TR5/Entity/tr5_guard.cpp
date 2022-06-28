@@ -380,7 +380,7 @@ void GuardControl(short itemNumber)
 		angle = CreatureTurn(item, creature->MaxTurn);
 		creature->Enemy = LaraItem;
 
-		if ((laraAI.distance < 0x400000 && LaraItem->Animation.Velocity > 20) ||
+		if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
 			item->HitStatus ||
 			TargetVisible(item, &laraAI))
 		{
@@ -460,7 +460,7 @@ void GuardControl(short itemNumber)
 				item->Animation.TargetState = GUARD_STATE_RUN;
 			else if (Targetable(item, &AI) && item->ObjectNumber != ID_SCIENTIST)
 			{
-				if (AI.distance >= 0x1000000 && AI.zoneNumber == AI.enemyZone)
+				if (AI.distance >= pow(SECTOR(4), 2) && AI.zoneNumber == AI.enemyZone)
 				{
 					if (!(item->AIBits & MODIFY))
 						item->Animation.TargetState = GUARD_STATE_WALK;
@@ -486,7 +486,7 @@ void GuardControl(short itemNumber)
 				item->Animation.TargetState = GUARD_STATE_HUNT_IDLE;
 			else if (creature->Mood != MoodType::Bored)
 			{
-				if (AI.distance < 0x900000 || item->AIBits & FOLLOW)
+				if (AI.distance < pow(SECTOR(3), 2) || item->AIBits & FOLLOW)
 					item->Animation.TargetState = GUARD_STATE_WALK;
 				else
 					item->Animation.TargetState = GUARD_STATE_RUN;
@@ -594,7 +594,7 @@ void GuardControl(short itemNumber)
 			creature->LOT.IsJumping = false;
 
 			if (!Targetable(item, &AI) ||
-				AI.distance >= 0x1000000 && AI.zoneNumber == AI.enemyZone ||
+				AI.distance >= pow(SECTOR(4), 2) && AI.zoneNumber == AI.enemyZone ||
 				item->ObjectNumber == ID_SCIENTIST ||
 				item->AIBits & AMBUSH || item->AIBits & PATROL1) // TODO: CHECK
 			{
@@ -612,11 +612,11 @@ void GuardControl(short itemNumber)
 
 					creature->LOT.IsJumping = true;
 				}
-				else if (AI.distance >= 0x100000)
+				else if (AI.distance >= pow(SECTOR(1), 2))
 				{
 					if (!los || item->AIBits)
 					{
-						if (AI.distance > 0x900000)
+						if (AI.distance > pow(SECTOR(3), 2))
 						{
 							if (!(item->InDrawRoom))
 								item->Animation.TargetState = GUARD_STATE_RUN;
@@ -638,7 +638,7 @@ void GuardControl(short itemNumber)
 			creature->LOT.IsJumping = false;
 
 			if (Targetable(item, &AI) &&
-				(AI.distance < 0x1000000 || AI.enemyZone == AI.zoneNumber) &&
+				(AI.distance < pow(SECTOR(4), 2) || AI.enemyZone == AI.zoneNumber) &&
 				item->ObjectNumber != ID_SCIENTIST)
 			{
 				item->Animation.TargetState = GUARD_STATE_AIM;
@@ -659,7 +659,7 @@ void GuardControl(short itemNumber)
 			}
 			else if (los)
 				item->Animation.TargetState = GUARD_STATE_IDLE;
-			else if (AI.distance < 0x900000)
+			else if (AI.distance < pow(SECTOR(3), 2))
 				item->Animation.TargetState = GUARD_STATE_WALK;
 			if (item->TriggerFlags == 11)
 			{
@@ -780,7 +780,7 @@ void GuardControl(short itemNumber)
 					item->Animation.TargetState = GUARD_STATE_HUNT;
 			}
 
-			if (canJump1block || canJump2blocks || AI.distance < 0x100000 || !los || item->HitStatus)
+			if (canJump1block || canJump2blocks || AI.distance < pow(SECTOR(1), 2) || !los || item->HitStatus)
 				item->Animation.TargetState = GUARD_STATE_IDLE;
 
 			break;

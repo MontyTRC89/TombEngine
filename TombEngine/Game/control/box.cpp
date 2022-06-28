@@ -462,13 +462,12 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	auto old = item->Pose.Position;
 	
-	/*if (!Objects[item->objectNumber].waterCreature)
+	if (!Objects[item->ObjectNumber].waterCreature)
 	{
-		roomNumber = item->roomNumber;
-		GetFloor(item->pos.Position.x, item->pos.Position.y, item->pos.Position.z, &roomNumber);
-		if (roomNumber != item->roomNumber)
+		auto roomNumber = GetCollision(item).RoomNumber;
+		if (roomNumber != item->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
-	}*/
+	}
 
 	AnimateItem(item);
 	if (item->Status == ITEM_DEACTIVATED)
@@ -478,7 +477,12 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	auto* bounds = GetBoundsAccurate(item);
-	int y = item->Pose.Position.y + bounds->Y1;
+
+	// HACK: In original, y coordinate was just set to bounding box top point.
+	// In TEN, we have to use nearest click value, because Choco's floordata
+	// system returns inconsistent room number in portal 4-click vault cases -- Lwmte, 27.06.22
+
+	int y = item->Pose.Position.y - ceil((float)abs(bounds->Y1) / (float)CLICK(1)) * CLICK(1);
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
@@ -555,7 +559,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 		if (xPos < radius)
 		{
-			if (BadFloor(x-radius, y, z, height, nextHeight, roomNumber, LOT))
+			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
 				shiftX = radius - xPos;
 			else if (!shiftZ && BadFloor(x - radius, y, z - radius, height, nextHeight, roomNumber, LOT))
 			{
@@ -768,22 +772,27 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 		if (item->Pose.Position.y > item->Floor)
 			item->Pose.Position.y = item->Floor;
-		else if (item->Floor - item->Pose.Position.y > STEP_SIZE/4)
-			item->Pose.Position.y += STEP_SIZE/4;
+		else if (item->Floor - item->Pose.Position.y > CLICK(0.25f))
+			item->Pose.Position.y += CLICK(0.25f);
 		else if (item->Pose.Position.y < item->Floor)
 			item->Pose.Position.y = item->Floor;
 
 		item->Pose.Orientation.x = 0;
 	}
 
-	/*roomNumber = item->roomNumber;
-	if (!Objects[item->objectNumber].waterCreature)
+	if (!Objects[item->ObjectNumber].waterCreature)
 	{
-		GetFloor(item->pos.Position.x, item->pos.Position.y - STEP_SIZE*2, item->pos.Position.z, &roomNumber);
+		auto roomNumber = GetCollision(item->Pose.Position.x, 
+										item->Pose.Position.y - CLICK(2), 
+										item->Pose.Position.z,
+										item->RoomNumber).RoomNumber;
 
-		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
-			item->HitPoints = 0;
-	}*/
+		if (roomNumber != item->RoomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
+
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
+			DoDamage(item, INT_MAX);
+	}
 
 	roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z, &roomNumber);
@@ -1085,7 +1094,7 @@ int CreatureActive(short itemNumber)
 
 	if (item->Status == ITEM_INVISIBLE || !item->Data.is<CreatureInfo>())
 	{
-		if (!EnableBaddyAI(itemNumber, 0))
+		if (!EnableEntityAI(itemNumber, 0))
 			return false; // AI couldn't be activated
 
 		item->Status = ITEM_ACTIVE;
@@ -1446,10 +1455,29 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	else
 		AI->zoneNumber = NO_ZONE;
 
-	room = &g_Level.Rooms[enemy->RoomNumber];
 	enemy->BoxNumber = NO_BOX;
+
+	room = &g_Level.Rooms[enemy->RoomNumber];
 	floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
-	if(floor)
+
+	// NEW: Only update enemy box number if will be actually reachable by enemy.
+	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
+
+	bool reachable = false;
+	if (object->zoneType == ZoneType::ZONE_FLYER ||
+	   (object->zoneType == ZoneType::ZONE_WATER && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	{
+		reachable = true; // If NPC is flying or swimming in water, always reach Lara
+	}
+	else
+	{
+		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
+		auto bounds = GetBoundsAccurate(item);
+
+		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+	}
+
+	if (floor && reachable)
 		enemy->BoxNumber = floor->Box;
 
 	if (enemy->BoxNumber != NO_BOX)
@@ -1482,13 +1510,18 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	short angle = phd_atan(vector.z, vector.x);
 
 	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
-		AI->distance = INT_MAX;
+		AI->distance = AI->verticalDistance = INT_MAX;
 	else
 	{
 		if (creature->Enemy)
+		{
+			// TODO: distance is squared, verticalDistance is not. Desquare distance later. -- Lwmte, 27.06.22
+
 			AI->distance = pow(vector.x, 2) + pow(vector.z, 2);
+			AI->verticalDistance = abs(vector.y);
+		}
 		else
-			AI->distance = INT_MAX;
+			AI->distance = AI->verticalDistance = INT_MAX;
 	}
 
 	AI->angle = angle - item->Pose.Orientation.y;
@@ -1706,7 +1739,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
 				break;
 
 			case MoodType::Attack:
-				if (AI->zoneNumber != AI->enemyZone)
+				if (AI->zoneNumber != AI->enemyZone || enemy->BoxNumber == NO_BOX)
 					creature->Mood = MoodType::Bored;
 
 				break;
@@ -1735,13 +1768,11 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
 				else if (AI->zoneNumber == AI->enemyZone)
 				{
 					if (AI->distance < ATTACK_RANGE ||
-						(creature->Mood == MoodType::Stalk &&
-							LOT->RequiredBox == NO_BOX))
+						(creature->Mood == MoodType::Stalk && LOT->RequiredBox == NO_BOX))
 						creature->Mood = MoodType::Attack;
 					else
 						creature->Mood = MoodType::Stalk;
 				}
-
 				break;
 
 			case MoodType::Attack:

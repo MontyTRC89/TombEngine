@@ -706,8 +706,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 			if (lara->Air < 0)
 			{
-			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && lara->anxiety < 251)
-			//		lara->anxiety += 4;
 				item->HitPoints -= 5;
 				lara->Air = -1;
 			}

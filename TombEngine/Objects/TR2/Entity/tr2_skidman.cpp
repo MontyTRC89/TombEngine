@@ -109,7 +109,7 @@ void SkidooManControl(short riderItemNumber)
 
 	if (!item->Data)
 	{
-		EnableBaddyAI(itemNumber, TRUE);
+		EnableEntityAI(itemNumber, TRUE);
 		item->Status = ITEM_ACTIVE;
 	}
 
