@@ -791,7 +791,13 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			ItemNewRoom(itemNumber, roomNumber);
 
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
-			DoDamage(item, INT_MAX);
+		{
+			auto bounds = GetBoundsAccurate(item);
+			auto height = item->Pose.Position.y - GetWaterHeight(item);
+
+			if (abs(bounds->Y1 + bounds->Y2) < height)
+				DoDamage(item, INT_MAX);
+		}
 	}
 
 	roomNumber = item->RoomNumber;
