@@ -526,7 +526,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 							if (item->Status == ITEM_INVISIBLE)
 							{
 								item->TouchBits = NO_JOINT_BITS;
-								if (EnableBaddyAI(value, 0))
+								if (EnableEntityAI(value, 0))
 								{
 									item->Status = ITEM_ACTIVE;
 									AddActiveItem(value);
@@ -543,7 +543,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 							item->TouchBits = NO_JOINT_BITS;
 							item->Status = ITEM_ACTIVE;
 							AddActiveItem(value);
-							EnableBaddyAI(value, 1);
+							EnableEntityAI(value, 1);
 						}
 					}
 					else
@@ -760,6 +760,6 @@ void ProcessSectorFlags(ItemInfo* item)
 			}
 		}
 		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
-			item->HitPoints = 0; // TODO: Implement correct behaviour for other objects!
+			DoDamage(item, INT_MAX); // TODO: Implement correct behaviour for other objects!
 	}
 }

@@ -543,7 +543,7 @@ void GuiController::DoDebouncedInput()
 	else
 		dbDown = 0;
 
-	if (TrInput & IN_ACTION || TrInput & IN_SELECT)
+	if (DbInput & IN_ACTION || DbInput & IN_SELECT)
 	{
 		if (invMode == InventoryMode::Save)
 		{
@@ -572,7 +572,7 @@ void GuiController::DoDebouncedInput()
 	else
 		dbSelect = 0;
 
-	if (TrInput & IN_OPTION || TrInput & IN_DESELECT)
+	if (DbInput & IN_OPTION || DbInput & IN_DESELECT)
 	{
 		if (!dbDeselect)
 			goDeselect = 1;
@@ -3206,7 +3206,6 @@ bool GuiController::CallInventory(bool reset_mode)
 			compassNeedleAngle -= 32;
 
 		UpdateInput();
-		TrInput = RawInput;
 		GameTimer++;
 
 		if (DbInput & IN_OPTION)

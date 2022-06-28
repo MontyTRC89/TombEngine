@@ -446,12 +446,19 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
 					}
+
 					if (AI.bite ||
 						LaraItem->Animation.ActiveState >= LS_LADDER_IDLE &&
 						LaraItem->Animation.ActiveState <= LS_LADDER_DOWN &&
 						!Lara.Location)
 					{
 						item->Animation.TargetState = DEMIGOD1_STATE_AIM;
+						break;
+					}
+
+					if (AI.distance <= pow(SECTOR(3), 2))
+					{
+						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
 					}
 				}
@@ -469,26 +476,20 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
+					if (AI.distance <= pow(SECTOR(2), 2) || AI.distance >= pow(SECTOR(5), 2))
+					{
+						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
+						break;
+					}
+
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
-						if (AI.distance <= pow(SECTOR(2), 2) || AI.distance >= pow(SECTOR(5), 2))
-						{
-							item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
-							break;
-						}
-
 						if (!(GetRandomControl() & 3))
 						{
 							item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_AIM;
 							break;
 						}
 					}
-				}
-
-				if (AI.distance <= pow(SECTOR(3), 2) || item->ObjectNumber != ID_DEMIGOD2)
-				{
-					item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
-					break;
 				}
 
 				item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;

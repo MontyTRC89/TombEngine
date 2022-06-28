@@ -239,7 +239,7 @@ namespace TEN::Entities::TR4
 						-1,
 						DoBloodSplat);
 
-					LaraItem->HitPoints = 0;
+					DoDamage(creature->Enemy, INT_MAX);
 				}
 			}
 

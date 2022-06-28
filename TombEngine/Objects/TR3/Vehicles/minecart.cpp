@@ -347,7 +347,7 @@ namespace TEN::Entities::Vehicles
 										item->RoomNumber,
 										3);
 
-									item->HitPoints = 0;
+									DoDamage(item, INT_MAX);
 								}
 							}
 						}

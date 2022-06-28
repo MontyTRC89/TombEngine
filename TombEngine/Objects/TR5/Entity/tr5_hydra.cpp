@@ -287,7 +287,7 @@ void HydraControl(short itemNumber)
 			if (item->HitStatus)
 			{
 				// TEST: uncomment this for making HYDRA die on first hit event
-				/*item->HitPoints = 0;
+				/* DoDamage(item, INT_MAX);
 				break;*/
 
 				damage = 6 - sqrt(AI.distance) / 1024;

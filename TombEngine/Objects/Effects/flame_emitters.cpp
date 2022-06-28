@@ -354,9 +354,7 @@ namespace TEN::Entities::Effects
 		if (waterHeight == NO_HEIGHT || fx->pos.Position.y <= waterHeight || Lara.BurnBlue)
 		{
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &fx->pos);
-
-			LaraItem->HitPoints -= 7;
-			LaraItem->HitStatus = true;
+			DoDamage(LaraItem, 7);
 		}
 		else
 		{
@@ -634,8 +632,7 @@ namespace TEN::Entities::Effects
 				{
 					if ((!Lara.Burn) && Lara.Control.WaterStatus != WaterStatus::FlyCheat)
 					{
-						LaraItem->HitPoints -= 5;
-						LaraItem->HitStatus = true;
+						DoDamage(LaraItem, 5);
 
 						int dx = LaraItem->Pose.Position.x - item->Pose.Position.x;
 						int dz = LaraItem->Pose.Position.z - item->Pose.Position.z;

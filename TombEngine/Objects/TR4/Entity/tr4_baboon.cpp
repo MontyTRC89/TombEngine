@@ -144,7 +144,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->HitPoints = 0;
+		DoDamage(item, INT_MAX);
 		RemoveActiveItem(itemNumber);	// Remove it from the active item list.
 
 		item->Flags = IFLAG_CLEAR_BODY;
