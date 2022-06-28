@@ -669,7 +669,7 @@ namespace TEN::Entities::Vehicles
 		moved.x = motorbikeItem->Pose.Position.x;
 		moved.z = motorbikeItem->Pose.Position.z;
 
-		if (!(motorbikeItem->Flags & ONESHOT))
+		if (!(motorbikeItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(motorbikeItem, MOTORBIKE_RADIUS);
 
 		int rot1 = 0;

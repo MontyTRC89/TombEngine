@@ -78,7 +78,7 @@ void LarsonControl(short itemNumber)
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	
 	// In Streets of Rome when Larson HP are below 40 he runs way
-	/*if (item->HitPoints <= TR5_LARSON_MIN_HP && !(item->flags & ONESHOT))
+	/*if (item->HitPoints <= TR5_LARSON_MIN_HP && !(item->flags & IFLAG_INVISIBLE))
 	{
 		item->HitPoints = TR5_LARSON_MIN_HP;
 		creature->flags++;

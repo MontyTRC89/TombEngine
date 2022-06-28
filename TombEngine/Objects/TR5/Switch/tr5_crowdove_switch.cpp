@@ -38,7 +38,7 @@ namespace TEN::Entities::TR5
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (switchItem->Flags & ONESHOT ||
+		if (switchItem->Flags & IFLAG_INVISIBLE ||
 			!(switchItem->MeshBits & 4) ||
 			(!(TrInput & IN_ACTION) ||
 				laraItem->Animation.ActiveState != LS_IDLE ||

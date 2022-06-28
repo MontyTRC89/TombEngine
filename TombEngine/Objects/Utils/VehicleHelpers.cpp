@@ -21,7 +21,7 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		// Assess vehicle usability.
-		if (vehicleItem->Flags & ONESHOT)
+		if (vehicleItem->Flags & IFLAG_INVISIBLE)
 			return VehicleMountType::None;
 
 		// Assess hand status.

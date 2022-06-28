@@ -61,7 +61,7 @@ void SwordGuardianControl(short itemNumber)
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
 			//item->status = ITEM_DESACTIVATED;
-			//item->flags |= ONESHOT;
+			//item->flags |= IFLAG_INVISIBLE;
 			item->Animation.ActiveState = 12;
 		}
 
