@@ -50,6 +50,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_VELOCITY_MAX = 128 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
 
+	constexpr auto JEEP_CRASH_VELOCITY = 10922;
+
 	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
 
 	// TODO: Simpler toggle.
@@ -58,16 +60,17 @@ namespace TEN::Entities::Vehicles
 
 	enum JeepState
 	{
-		JEEP_STATE_IDLE = 0,
+		JS_IDLE = 0,
 		JS_DRIVE_FORWARD = 1,
-
-		//2 3 4 5 are the collide with walls states
-
+		JS_CRASH_RIGHT = 2,
+		JS_CRASH_BACK = 3,
+		JS_CRASH_LEFT = 4,
+		JS_CRASH_FORWARD = 5,
 		JS_BRAKE = 6,//?
 		JS_FWD_LEFT = 7,//FWD = forwards
 		JS_FWD_RIGHT = 8,
-		JEEP_STATE_MOUNT = 9,
-		JEEP_STATE_DISMOUNT = 10,
+		JS_MOUNT = 9,
+		JS_DISMOUNT = 10,
 		JS_JUMP = 11,
 		JS_LAND = 12,
 		JS_BACK = 13,//when she's turning back, and when idle back.. hmm
@@ -89,9 +92,10 @@ namespace TEN::Entities::Vehicles
 		JA_JUMP = 7,
 		JA_FWD_JUMP_LAND = 8,
 		JA_GETIN_RIGHT = 9,
-
-		//10 11 12 13 are the collide with walls anims
-
+		JA_CRASH_FORWARD = 10,
+		JA_CRASH_LEFT = 11,
+		JA_CRASH_RIGHT = 12,
+		JA_CRASH_BACK = 13,
 		JA_IDLE = 14,
 		JA_FWD_RIGHT_START = 15,
 		JA_FWD_RIGHT = 16,
@@ -189,21 +193,21 @@ namespace TEN::Entities::Vehicles
 		{
 		case VehicleMountType::LevelStart:
 			laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_IDLE;
-			laraItem->Animation.ActiveState = JEEP_STATE_IDLE;
-			laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+			laraItem->Animation.ActiveState = JS_IDLE;
+			laraItem->Animation.TargetState = JS_IDLE;
 			break;
 
 		case VehicleMountType::Left:
 			laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_LEFT;
-			laraItem->Animation.ActiveState = JEEP_STATE_MOUNT;
-			laraItem->Animation.TargetState = JEEP_STATE_MOUNT;
+			laraItem->Animation.ActiveState = JS_MOUNT;
+			laraItem->Animation.TargetState = JS_MOUNT;
 			break;
 
 		default:
 		case VehicleMountType::Right:
 			laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_GETIN_RIGHT;
-			laraItem->Animation.ActiveState = JEEP_STATE_MOUNT;
-			laraItem->Animation.TargetState = JEEP_STATE_MOUNT;
+			laraItem->Animation.ActiveState = JS_MOUNT;
+			laraItem->Animation.TargetState = JS_MOUNT;
 			break;
 		}
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -465,7 +469,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* lara = GetLaraInfo(laraItem);
 
-		if (laraItem->Animation.ActiveState == JEEP_STATE_DISMOUNT)
+		if (laraItem->Animation.ActiveState == JS_DISMOUNT)
 		{
 			if (laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd)
 			{
@@ -733,7 +737,7 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* jeep = GetJeepInfo(jeepItem);
 
-		if (laraItem->Animation.ActiveState == JEEP_STATE_DISMOUNT || laraItem->Animation.TargetState == JEEP_STATE_DISMOUNT)
+		if (laraItem->Animation.ActiveState == JS_DISMOUNT || laraItem->Animation.TargetState == JS_DISMOUNT)
 			TrInput = 0;
 	
 		if (jeep->Revs <= 16)
@@ -898,34 +902,34 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		}
 		else if (collide && !dead &&
-			laraItem->Animation.ActiveState != 4 && 
-			laraItem->Animation.ActiveState != 5 && 
-			laraItem->Animation.ActiveState != 2 &&
-			laraItem->Animation.ActiveState != 3 &&
-			laraItem->Animation.ActiveState != JS_JUMP &&
-			0x2AAA < (short)jeep->Velocity)
+				 laraItem->Animation.ActiveState != 4 && 
+				 laraItem->Animation.ActiveState != 5 && 
+				 laraItem->Animation.ActiveState != 2 &&
+				 laraItem->Animation.ActiveState != 3 &&
+				 laraItem->Animation.ActiveState != JS_JUMP &&
+				 jeep->Velocity > JEEP_CRASH_VELOCITY)
 		{
 			short state;
 			switch (collide)
 			{
 			case 13:
-				state = 4;
-				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 11;
+				state = JS_CRASH_LEFT;
+				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_CRASH_LEFT;
 				break;
 
 			case 14:
-				state = 5;
-				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 10;
+				state = JS_CRASH_FORWARD;
+				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_CRASH_FORWARD;
 				break;
 
 			case 11:
-				state = 2;
-				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 12;
+				state = JS_CRASH_RIGHT;
+				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_CRASH_RIGHT;
 				break;
 
 			case 12:
-				state = 3;
-				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + 13;
+				state = JS_CRASH_BACK;
+				laraItem->Animation.AnimNumber = Objects[ID_JEEP_LARA_ANIMS].animIndex + JA_CRASH_BACK;
 				break;
 			}
 
@@ -937,7 +941,7 @@ namespace TEN::Entities::Vehicles
 		{
 			switch (laraItem->Animation.ActiveState)
 			{
-			case JEEP_STATE_IDLE:
+			case JS_IDLE:
 				if (dead)
 					laraItem->Animation.TargetState = JS_DEATH;
 				else
@@ -946,7 +950,7 @@ namespace TEN::Entities::Vehicles
 					if (dismount && !jeep->Velocity && !JeepNoGetOff)
 					{
 						if (JeepCanGetOff(jeepItem, laraItem))
-							laraItem->Animation.TargetState = JEEP_STATE_DISMOUNT;
+							laraItem->Animation.TargetState = JS_DISMOUNT;
 
 						break;
 					}
@@ -1015,7 +1019,7 @@ namespace TEN::Entities::Vehicles
 
 			case JS_DRIVE_FORWARD:
 				if (dead)
-					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+					laraItem->Animation.TargetState = JS_IDLE;
 				else
 				{
 					if (jeep->Velocity & 0xFFFFFF00 ||
@@ -1024,7 +1028,7 @@ namespace TEN::Entities::Vehicles
 						if (TrInput & VEHICLE_IN_BRAKE)
 						{
 							if (jeep->Velocity <= 21844)
-								laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+								laraItem->Animation.TargetState = JS_IDLE;
 							else
 								laraItem->Animation.TargetState = JS_BRAKE;
 						}
@@ -1037,7 +1041,7 @@ namespace TEN::Entities::Vehicles
 						}
 					}
 					else
-						laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+						laraItem->Animation.TargetState = JS_IDLE;
 				}
 
 				break;
@@ -1047,7 +1051,7 @@ namespace TEN::Entities::Vehicles
 			case 4:
 			case 5:
 				if (dead)
-					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+					laraItem->Animation.TargetState = JS_IDLE;
 				else if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_BRAKE))
 					laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
 
@@ -1055,7 +1059,7 @@ namespace TEN::Entities::Vehicles
 
 			case JS_BRAKE:
 				if (dead)
-					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+					laraItem->Animation.TargetState = JS_IDLE;
 				else if (jeep->Velocity & 0xFFFFFF00)
 				{
 					if (TrInput & VEHICLE_IN_LEFT)
@@ -1064,13 +1068,13 @@ namespace TEN::Entities::Vehicles
 						laraItem->Animation.TargetState = JS_FWD_RIGHT;
 				}
 				else
-					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+					laraItem->Animation.TargetState = JS_IDLE;
 
 				break;
 
 			case JS_FWD_LEFT:
 				if (dead)
-					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+					laraItem->Animation.TargetState = JS_IDLE;
 				else if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 				{
 					if (DbInput & JEEP_IN_TOGGLE_REVERSE)
@@ -1095,7 +1099,7 @@ namespace TEN::Entities::Vehicles
 					else if (jeep->Velocity)
 						laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
 					else
-						laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+						laraItem->Animation.TargetState = JS_IDLE;
 				}
 				else
 				{
@@ -1122,7 +1126,7 @@ namespace TEN::Entities::Vehicles
 
 			case JS_FWD_RIGHT:
 				if (dead)
-					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+					laraItem->Animation.TargetState = JS_IDLE;
 
 				if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 				{
@@ -1148,7 +1152,7 @@ namespace TEN::Entities::Vehicles
 					else if (jeep->Velocity)
 						laraItem->Animation.TargetState = JS_DRIVE_FORWARD;
 					else
-						laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+						laraItem->Animation.TargetState = JS_IDLE;
 				}
 				else
 				{
@@ -1303,7 +1307,7 @@ namespace TEN::Entities::Vehicles
 
 			case JS_DRIVE_BACK:
 				if (dead)
-					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+					laraItem->Animation.TargetState = JS_IDLE;
 				else
 	//			if (jeep->Velocity || JeepNoGetOff)
 				{
@@ -1330,7 +1334,7 @@ namespace TEN::Entities::Vehicles
 						{
 							jeep->Gear--;
 							if (!jeep->Gear)
-								laraItem->Animation.TargetState = JEEP_STATE_IDLE;
+								laraItem->Animation.TargetState = JS_IDLE;
 						}
 					}
 				}
@@ -1381,7 +1385,7 @@ namespace TEN::Entities::Vehicles
 		int pitch = 0;
 		if (jeep->Flags)
 			collide = 0;
-		else if (laraItem->Animation.ActiveState == JEEP_STATE_MOUNT)
+		else if (laraItem->Animation.ActiveState == JS_MOUNT)
 		{
 			drive = -1;
 			collide = 0;
@@ -1480,8 +1484,8 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		if (laraItem->Animation.ActiveState == JEEP_STATE_MOUNT ||
-			laraItem->Animation.ActiveState == JEEP_STATE_DISMOUNT)
+		if (laraItem->Animation.ActiveState == JS_MOUNT ||
+			laraItem->Animation.ActiveState == JS_DISMOUNT)
 		{
 			JeepSmokeStart = 0;
 		}
