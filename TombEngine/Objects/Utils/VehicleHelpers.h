@@ -8,6 +8,13 @@ struct ItemInfo;
 
 using std::vector;
 
+//////////
+//////////
+// TODO: SAVEGAMES!
+//////////
+//////////
+//////////
+
 namespace TEN::Entities::Vehicles
 {
 	constexpr int VEHICLE_VELOCITY_SCALE = 256; // TODO: Deal with this nonsense *immediately* post-beta. @Sezz 2022.06.25
