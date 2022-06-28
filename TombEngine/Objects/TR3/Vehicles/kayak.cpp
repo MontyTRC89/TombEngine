@@ -218,18 +218,10 @@ namespace TEN::Entities::Vehicles
 		}
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-		{
-			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-			UndrawFlareMeshes(laraItem);
-			lara->Flare.ControlLeft = 0;
-			lara->Control.Weapon.GunType = LaraWeaponType::None;
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-		}
-
 		if (laraItem->RoomNumber != kayakItem->RoomNumber)
 			ItemNewRoom(lara->ItemNumber, kayakItem->RoomNumber);
 
+		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = kayakItem->Pose.Position;
 		laraItem->Pose.Orientation = Vector3Shrt(0, kayakItem->Pose.Orientation.y, 0);
 		laraItem->Animation.IsAirborne = false;

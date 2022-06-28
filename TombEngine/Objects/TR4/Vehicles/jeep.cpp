@@ -212,15 +212,7 @@ namespace TEN::Entities::Vehicles
 		}
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-		{
-			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
-			UndrawFlareMeshes(laraItem);
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-			lara->Control.Weapon.GunType = LaraWeaponType::None;
-			lara->Flare.ControlLeft = 0;
-		}
-
+		DoVehicleFlareDiscard(laraItem);
 		ResetLaraFlex(laraItem);
 		laraItem->Pose.Position = jeepItem->Pose.Position;
 		laraItem->Pose.Orientation.y = jeepItem->Pose.Orientation.y;

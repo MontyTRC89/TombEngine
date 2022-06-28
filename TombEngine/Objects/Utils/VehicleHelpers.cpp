@@ -5,6 +5,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/room.h"
@@ -240,6 +241,21 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return currentVelocity;
+	}
+
+	// TODO: Allow flares on every vehicle and see how that works. Boats already allowed them originally.
+	void DoVehicleFlareDiscard(ItemInfo* laraItem)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
+		{
+			CreateFlare(laraItem, ID_FLARE_ITEM, 0);
+			UndrawFlareMeshes(laraItem);
+			lara->Control.Weapon.GunType = LaraWeaponType::None;
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
+			lara->Flare.ControlLeft = false;
+		}
 	}
 
 	// TODO: This is a copy-pase of the player version, but I may need a different method for vehicles.

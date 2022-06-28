@@ -161,16 +161,7 @@ namespace TEN::Entities::Vehicles
 		{
 			lara->Vehicle = itemNumber;
 
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-			{
-				CreateFlare(laraItem, ID_FLARE_ITEM, false);
-				UndrawFlareMeshes(laraItem);
-
-				lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-				lara->Control.Weapon.GunType = LaraWeaponType::None;
-				lara->Flare.ControlLeft = false;
-			}
-
+			DoVehicleFlareDiscard(laraItem);
 			laraItem->Animation.AnimNumber = Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT;
 			laraItem->Animation.FrameNumber = g_Level.Anims[Objects[ID_BIGGUN_ANIMS].animIndex + BGUN_ANIM_MOUNT].frameBase;
 			laraItem->Animation.ActiveState = BGUN_STATE_MOUNT;
