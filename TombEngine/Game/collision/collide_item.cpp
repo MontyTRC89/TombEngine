@@ -818,10 +818,11 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 
 	coll->Setup.ForwardAngle = oldFacing;
 
-	if (item->IsLara() && coll->CollisionType == CT_NONE)
+	if (coll->CollisionType == CT_NONE)
 	{
 		coll->Setup.OldPosition = item->Pose.Position;
-		UpdateItemRoom(item, -10);
+		if (item->IsLara())
+			UpdateItemRoom(item, -10);
 	}
 	else
 	{
