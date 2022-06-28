@@ -325,11 +325,7 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Vehicle == itemNumber)
 		{
-			if (!UPV->Velocity)
-				UPV->TurbineRotation += ANGLE(2.0f);
-			else
-				UPV->TurbineRotation += UPV->Velocity / 4069;
-
+			UPV->TurbineRotation += UPV->Velocity ? (UPV->Velocity / 4069) : ANGLE(2.0f);
 			UPV->LeftRudderRotation = (UPV->TurnRate.x + UPV->TurnRate.y) * 8;
 			UPV->RightRudderRotation = (UPV->TurnRate.x + -UPV->TurnRate.y) * 8;
 
