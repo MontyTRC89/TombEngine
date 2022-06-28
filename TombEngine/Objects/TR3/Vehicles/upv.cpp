@@ -89,6 +89,9 @@ namespace TEN::Entities::Vehicles
 	#define UPV_DEFLECT_ANGLE		 ANGLE(45.0f)
 	#define UPV_DEFLCT_TURN_RATE_MAX ANGLE(2.0f)
 
+	#define UPV_LEAN_RATE ANGLE(0.6f)
+	#define UPV_LEAN_MAX  ANGLE(10.0f)
+
 	enum UPVState
 	{
 		UPV_STATE_DEATH = 0,
@@ -577,7 +580,10 @@ namespace TEN::Entities::Vehicles
 			}
 
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			{
 				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
+				ModulateVehicleLean(UPVItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
+			}
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 			{
@@ -631,7 +637,10 @@ namespace TEN::Entities::Vehicles
 			}
 			
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			{
 				ModulateVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_ACCEL, -UPV_Y_TURN_RATE_MAX, UPV_Y_TURN_RATE_MAX);
+				ModulateVehicleLean(UPVItem, UPV_LEAN_RATE, UPV_LEAN_MAX);
+			}
 
 			if (UPV->Flags & UPV_FLAG_SURFACE)
 			{
@@ -906,6 +915,9 @@ namespace TEN::Entities::Vehicles
 				UPVItem->Pose.Orientation.x = UPV_X_ORIENT_MAX;
 			else if (UPVItem->Pose.Orientation.x < -UPV_X_ORIENT_MAX)
 				UPVItem->Pose.Orientation.x = -UPV_X_ORIENT_MAX;
+
+			if (!(TrInput & IN_LEFT ) && !(TrInput & IN_RIGHT))
+				ResetVehicleLean(UPVItem, 12.0f);
 
 			TranslateItem(UPVItem, UPVItem->Pose.Orientation, UPVItem->Animation.Velocity);
 		}

@@ -251,4 +251,20 @@ namespace TEN::Entities::Vehicles
 	{
 		*turnRate = ModulateLaraTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
 	}
+
+	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
+	{
+		float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+		int sign = copysign(1, axisCoeff);
+		short maxAngleNormalized = maxAngle * axisCoeff;
+		vehicleItem->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - vehicleItem->Pose.Orientation.z) / 3) * sign;
+	}
+
+	void ResetVehicleLean(ItemInfo* vehicleItem, float rate)
+	{
+		if (abs(vehicleItem->Pose.Orientation.z) > ANGLE(0.1f))
+			vehicleItem->Pose.Orientation.z += vehicleItem->Pose.Orientation.z / -rate;
+		else
+			vehicleItem->Pose.Orientation.z = 0;
+	}
 }
