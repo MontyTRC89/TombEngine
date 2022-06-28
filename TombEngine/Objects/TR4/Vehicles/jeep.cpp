@@ -142,7 +142,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		jeepItem->SetBits(JointBitType::Mesh, JeepJoints);
-		jeep->MomentumAngle = jeepItem->Pose.Position.y;
+		jeep->MomentumAngle = jeepItem->Pose.Orientation.y;
 	}
 
 	void JeepPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -232,7 +232,7 @@ namespace TEN::Entities::Vehicles
 	{
 		int x = pos->x / SECTOR(1);
 		int z = pos->z / SECTOR(1);
-		int  oldX = old->x / SECTOR(1);
+		int oldX = old->x / SECTOR(1);
 		int oldZ = old->z / SECTOR(1);
 		int shiftX = pos->x & (WALL_SIZE - 1);
 		int shiftZ = pos->z & (WALL_SIZE - 1);
@@ -251,11 +251,12 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				jeepItem->Pose.Position.z += WALL_SIZE - shiftZ;
+				jeepItem->Pose.Position.z += WALL_SIZE - 1 - shiftZ;
 				return (jeepItem->Pose.Position.x - pos->x);
 			}
 		}
-		else if (z == oldZ)
+
+		if (z == oldZ)
 		{
 			if (x > oldX)
 			{
@@ -264,77 +265,75 @@ namespace TEN::Entities::Vehicles
 			}
 			else
 			{
-				jeepItem->Pose.Position.x += WALL_SIZE - shiftX;
+				jeepItem->Pose.Position.x += WALL_SIZE - 1 - shiftX;
 				return (pos->z - jeepItem->Pose.Position.z);
 			}
 		}
-		else
+		
+		x = 0;
+		z = 0;
+
+		short roomNumber = jeepItem->RoomNumber;
+		FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
+		int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
+
+		if (height < old->y - STEP_SIZE)
 		{
-			x = 0;
-			z = 0;
-
-			short roomNumber = jeepItem->RoomNumber;
-			FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
-			int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
-			if (height < old->y - STEP_SIZE)
-			{
-				if (pos->z > old->z)
-					z = -shiftZ - 1;
-				else
-					z = WALL_SIZE - shiftZ;
-			}
-
-			roomNumber = jeepItem->RoomNumber;
-			floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
-			height = GetFloorHeight(floor, pos->x, pos->y, old->z);
-			if (height < old->y - STEP_SIZE)
-			{
-				if (pos->x > old->x)
-					x = -shiftX - 1;
-				else
-					x = WALL_SIZE - shiftX;
-			}
-
-			if (x && z)
-			{
-				jeepItem->Pose.Position.z += z;
-				jeepItem->Pose.Position.x += x;
-			}
-			else if (z)
-			{
-				jeepItem->Pose.Position.z += z;
-				if (z > 0)
-					return (jeepItem->Pose.Position.x - pos->x);
-				else
-					return (pos->x - jeepItem->Pose.Position.x);
-			}
-			else if (x)
-			{
-				jeepItem->Pose.Position.x += x;
-				if (x > 0)
-					return (pos->z - jeepItem->Pose.Position.z);
-				else
-					return (jeepItem->Pose.Position.z - pos->z);
-			}
+			if (pos->z > old->z)
+				z = -1 - shiftZ;
 			else
-			{
-				jeepItem->Pose.Position.z += (old->z - pos->z);
-				jeepItem->Pose.Position.x += (old->x - pos->x);
-			}
+				z = WALL_SIZE + 1 - shiftZ;
 		}
+
+		roomNumber = jeepItem->RoomNumber;
+		floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
+		height = GetFloorHeight(floor, pos->x, pos->y, old->z);
+
+		if (height < old->y - STEP_SIZE)
+		{
+			if (pos->x > old->x)
+				x = -1 - shiftX;
+			else
+				x = WALL_SIZE + 1 - shiftX;
+		}
+
+		if (x && z)
+		{
+			jeepItem->Pose.Position.z += z;
+			jeepItem->Pose.Position.x += x;
+		}
+		
+		if (z)
+		{
+			jeepItem->Pose.Position.z += z;
+			if (z > 0)
+				return (jeepItem->Pose.Position.x - pos->x);
+			else
+				return (pos->x - jeepItem->Pose.Position.x);
+		}
+
+		if (x)
+		{
+			jeepItem->Pose.Position.x += x;
+			if (x > 0)
+				return (pos->z - jeepItem->Pose.Position.z);
+			else
+				return (jeepItem->Pose.Position.z - pos->z);
+		}
+
+		jeepItem->Pose.Position.z += (old->z - pos->z);
+		jeepItem->Pose.Position.x += (old->x - pos->x);
 
 		return 0;
 	}
 
 	static int DoJeepDynamics(ItemInfo* laraItem, int height, int verticalVelocity, int* yPos, int flags)
 	{
-		int result = 0;
-
 		// Grounded.
 		if (height <= *yPos)
 		{
 			if (flags)
-				result = verticalVelocity;
+				return verticalVelocity;
 			else
 			{
 				int kick = height - *yPos;
@@ -342,7 +341,7 @@ namespace TEN::Entities::Vehicles
 				if (kick < -80)
 					kick = -80;
 
-				result = ((kick - verticalVelocity) / 16) + verticalVelocity;
+				verticalVelocity += ((kick - verticalVelocity) / 16);
 
 				if (*yPos > height)
 					*yPos = height;
@@ -352,12 +351,13 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			*yPos += verticalVelocity;
+
 			if (*yPos <= height - 32)
 			{
 				if (flags)
-					result = flags + (flags / 2) + verticalVelocity;
+					verticalVelocity += flags + (flags / 2);
 				else
-					result = verticalVelocity + GRAVITY;
+					verticalVelocity += (int)((float)GRAVITY * 1.5f);
 			}
 			else
 			{
@@ -366,11 +366,11 @@ namespace TEN::Entities::Vehicles
 				if (verticalVelocity > 150)
 					laraItem->HitPoints += 150 - verticalVelocity;
 
-				result = 0;
+				verticalVelocity = 0;
 			}
 		}
 
-		return result;
+		return verticalVelocity;
 	}
 
 	static bool JeepCanGetOff(ItemInfo* jeepItem, ItemInfo* laraItem)
@@ -521,12 +521,10 @@ namespace TEN::Entities::Vehicles
 		int hmt_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, true, &mt_old);
 		int hmb_old = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), 0, true, &mb_old);
 
-		Vector3Int oldPos;
-		oldPos.x = jeepItem->Pose.Position.x;
-		oldPos.y = jeepItem->Pose.Position.y;
-		oldPos.z = jeepItem->Pose.Position.z;
+		auto oldPos = jeepItem->Pose.Position;
 
 		short rot = 0;
+		JeepNoGetOff = 0;
 
 		if (oldPos.y <= jeepItem->Floor - 8)
 		{
@@ -537,14 +535,11 @@ namespace TEN::Entities::Vehicles
 			else
 				jeep->TurnRate = 0;
 
-			jeepItem->Pose.Orientation.y += jeep->TurnRate + jeep->ExtraRotation;
-			jeep->MomentumAngle += ((jeepItem->Pose.Orientation.y - jeep->MomentumAngle) / 32);
+			jeepItem->Pose.Orientation.y += (short)(jeep->TurnRate + jeep->ExtraRotation);
+			jeep->MomentumAngle += ((short)(jeepItem->Pose.Orientation.y - jeep->MomentumAngle) / 32);
 		}
 		else
 		{
-			short rot2 = 0;
-			short momentum = 0;
-
 			if (jeep->TurnRate < -ANGLE(1))
 				jeep->TurnRate += ANGLE(1);
 			else if (jeep->TurnRate > ANGLE(1))
@@ -555,7 +550,7 @@ namespace TEN::Entities::Vehicles
 			jeepItem->Pose.Orientation.y += jeep->TurnRate + jeep->ExtraRotation;
 
 			rot = jeepItem->Pose.Orientation.y - jeep->MomentumAngle;
-			momentum = 728 - ((3 * jeep->Velocity) / 2048);
+			short momentum = (short)(728 - ((3 * jeep->Velocity) / 2048));
 
 			if (!(TrInput & IN_ACTION) && jeep->Velocity > 0)
 				momentum -= (momentum / 4);
@@ -607,24 +602,22 @@ namespace TEN::Entities::Vehicles
 		jeepItem->Pose.Position.x += speed * phd_sin(jeep->MomentumAngle);
 		jeepItem->Pose.Position.z += speed * phd_cos(jeep->MomentumAngle);
 	
-		int slip = 0;
 		if (jeepItem->Pose.Position.y >= height)
 		{
-			slip = JEEP_SLIP * phd_sin(jeepItem->Pose.Orientation.x);
+			short slip = JEEP_SLIP * phd_sin(jeepItem->Pose.Orientation.x);
 
 			if (abs(slip) > 16)
 			{
 				JeepNoGetOff = 1;
-				if (slip >= 0)
-					slip = jeep->Velocity - (SQUARE(slip - 16) / 2);
+
+				if (slip < 0)
+					jeep->Velocity += SQUARE(slip + 16) / 2;
 				else
-					slip = (SQUARE(slip + 16) / 2) + jeep->Velocity;
-				jeep->Velocity = slip;
+					jeep->Velocity -= SQUARE(slip - 16) / 2;
 			}
-			else
-				JeepNoGetOff = 0;
 
 			slip = JEEP_SLIP_SIDE * phd_sin(jeepItem->Pose.Orientation.z);
+
 			if (abs(slip) > JEEP_SLIP_SIDE / 4)
 			{
 				JeepNoGetOff = 1;
@@ -640,8 +633,6 @@ namespace TEN::Entities::Vehicles
 					jeepItem->Pose.Position.z += (slip - 24) * phd_cos(jeepItem->Pose.Orientation.y - ANGLE(90));
 				}
 			}
-			else
-				JeepNoGetOff = 0;
 		}
 
 		if (jeep->Velocity > JEEP_VELOCITY_MAX)
@@ -653,7 +644,7 @@ namespace TEN::Entities::Vehicles
 		movedPos.x = jeepItem->Pose.Position.x;
 		movedPos.z = jeepItem->Pose.Position.z;
 
-		if (!(jeepItem->Flags & ONESHOT))
+		if (!(jeepItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(jeepItem, JEEP_FRONT);
 
 		Vector3Int f, b, mm, mt, mb;
@@ -707,17 +698,16 @@ namespace TEN::Entities::Vehicles
 		if (abs(jeep->ExtraRotationDrift) < 2)
 			jeep->ExtraRotationDrift = 0;
 
-		if (abs(jeep->ExtraRotationDrift - jeep->ExtraRotation) >= 4)
-			jeep->ExtraRotation += ((jeep->ExtraRotationDrift - jeep->ExtraRotation) / 4);
-		else
+		if (abs(jeep->ExtraRotationDrift - jeep->ExtraRotation) < 4)
 			jeep->ExtraRotation = jeep->ExtraRotationDrift;
+		else
+			jeep->ExtraRotation += ((jeep->ExtraRotationDrift - jeep->ExtraRotation) / 4);
 
-		int newspeed = 0;
-		int collide = GetJeepCollisionAnim(jeepItem, &movedPos);
+		int anim = GetJeepCollisionAnim(jeepItem, &movedPos);
 	
-		if (collide)
+		if (anim)
 		{
-			newspeed = (jeepItem->Pose.Position.z - oldPos.z) * phd_cos(jeep->MomentumAngle) + (jeepItem->Pose.Position.x - oldPos.x) * phd_sin(jeep->MomentumAngle);
+			int newspeed = (jeepItem->Pose.Position.z - oldPos.z) * phd_cos(jeep->MomentumAngle) + (jeepItem->Pose.Position.x - oldPos.x) * phd_sin(jeep->MomentumAngle);
 			newspeed *= 256;
 
 			if ((&g_Level.Items[lara->Vehicle] == jeepItem) && (jeep->Velocity == JEEP_VELOCITY_MAX) && (newspeed < (JEEP_VELOCITY_MAX - 10)))
@@ -726,16 +716,15 @@ namespace TEN::Entities::Vehicles
 			}
 
 			if (jeep->Velocity > 0 && newspeed < jeep->Velocity)
+				jeep->Velocity = (newspeed < 0) ? 0 : newspeed;
+			else if (jeep->Velocity < 0 && newspeed > jeep->Velocity)
 				jeep->Velocity = (newspeed > 0) ? 0 : newspeed;
 
-			else if (jeep->Velocity < 0 && newspeed > jeep->Velocity)
-				jeep->Velocity = (newspeed < 0) ? 0 : newspeed;
-
-			if (jeep->Velocity < JEEP_REVERSE_VELOCITY_MAX)
-				jeep->Velocity = JEEP_REVERSE_VELOCITY_MAX;
+			if (jeep->Velocity < -JEEP_REVERSE_VELOCITY_MAX)
+				jeep->Velocity = -JEEP_REVERSE_VELOCITY_MAX;
 		}
 
-		return collide;
+		return anim;
 	}
 
 	static int JeepUserControl(ItemInfo* jeepItem, ItemInfo* laraItem, int height, int* pitch)
@@ -1429,35 +1418,31 @@ namespace TEN::Entities::Vehicles
 		jeepItem->Animation.VerticalVelocity = DoJeepDynamics(laraItem, floorHeight, jeepItem->Animation.VerticalVelocity, &jeepItem->Pose.Position.y, 0);
 		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);
 
-		floorHeight = (fl.y + fr.y) / 2;
 		short xRot;
-		short zRot;
-		if (bc.y >= hbc)
+		floorHeight = (fl.y + fr.y) / 2;
+
+		if (bc.y < hbc)
 		{
-			if (floorHeight >= (hfl + hfr) / 2)
-				xRot = phd_atan(1100, hbc - floorHeight);
-			else
-				xRot = phd_atan(JEEP_FRONT, hbc - jeepItem->Pose.Position.y);
-		}
-		else
-		{
-			if (floorHeight >= (hfl + hfr) / 2)
-				xRot = phd_atan(JEEP_FRONT, jeepItem->Pose.Position.y - floorHeight);
-			else
+			if (floorHeight < (hfl + hfr) / 2)
 			{
-				xRot = -phd_atan(137, oldY - jeepItem->Pose.Position.y);
+				xRot = phd_atan(137, oldY - jeepItem->Pose.Position.y);
 				if (jeep->Velocity < 0)
 					xRot = -xRot;
 			}
+			else
+				xRot = phd_atan(JEEP_FRONT, jeepItem->Pose.Position.y - floorHeight);
+		}
+		else
+		{
+			if (floorHeight < (hfl + hfr) / 2)
+				xRot = phd_atan(JEEP_FRONT, hbc - jeepItem->Pose.Position.y);
+			else
+				xRot = phd_atan(1100, hbc - floorHeight);
 		}
 
+		short zRot = phd_atan(350, floorHeight - fl.y);
 		jeepItem->Pose.Orientation.x += (xRot - jeepItem->Pose.Orientation.x) / 4;
-		jeepItem->Pose.Orientation.z += (phd_atan(256, floorHeight - fl.y) - jeepItem->Pose.Orientation.z) / 4;
-		if (jeep->Velocity == 0)
-		{
-			jeepItem->Pose.Orientation.x = 0;
-			jeepItem->Pose.Orientation.z = 0;
-		}
+		jeepItem->Pose.Orientation.z += (zRot - jeepItem->Pose.Orientation.z) / 4;
 
 		if (!(jeep->Flags & JEEP_FLAG_DEAD))
 		{
@@ -1469,36 +1454,25 @@ namespace TEN::Entities::Vehicles
 
 			laraItem->Pose = jeepItem->Pose;
 
-			int jeepAnim = Objects[ID_JEEP].animIndex;
-			int laraAnim = laraItem->Animation.AnimNumber;
-			int extraAnim = Objects[ID_JEEP_LARA_ANIMS].animIndex;
-
 			AnimateJeep(jeepItem, laraItem, collide, dead);
 			AnimateItem(laraItem);
 
 			jeepItem->Animation.AnimNumber = Objects[ID_JEEP].animIndex + laraItem->Animation.AnimNumber - Objects[ID_JEEP_LARA_ANIMS].animIndex;
 			jeepItem->Animation.FrameNumber = g_Level.Anims[jeepItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
 
-			jeepAnim = Objects[ID_JEEP].animIndex;
-			laraAnim = laraItem->Animation.AnimNumber;
-			extraAnim = Objects[ID_JEEP_LARA_ANIMS].animIndex;
-
 			Camera.targetElevation = -ANGLE(30.0f);
 			Camera.targetDistance = SECTOR(2);
 
-			if (jeep->Gear)
-			{
-				if (jeep->Gear == 1)
-					jeep->VerticalVelocity += ((32578 - jeep->VerticalVelocity) / 8);
-			}
+			if (jeep->Gear == 1)
+				jeep->CameraElevation += ((32578 - jeep->CameraElevation) / 8);
 			else
-				jeep->VerticalVelocity -= (jeep->VerticalVelocity / 8);
+				jeep->CameraElevation -= (jeep->CameraElevation / 8);
 
-			Camera.targetAngle = jeep->VerticalVelocity;
+			Camera.targetAngle = jeep->CameraElevation;
 
 			if (jeep->Flags & JEEP_FLAG_FALLING && jeepItem->Pose.Position.y == jeepItem->Floor)
 			{
-				laraItem->MeshBits = NULL;
+				laraItem->MeshBits = 0;
 				ExplodeVehicle(laraItem, jeepItem);
 				return 0;
 			}
