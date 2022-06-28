@@ -263,7 +263,7 @@ namespace TEN::Entities::Vehicles
 	{
 		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal]);
 	}
-
+	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
 	{
 		float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
