@@ -2,11 +2,11 @@
 #include "Specific/phd_global.h"
 #include "Specific/trmath.h"
 
-using std::vector;
-
 struct CollisionInfo;
 struct CollisionResult;
 struct ItemInfo;
+
+using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -36,10 +36,11 @@ namespace TEN::Entities::Vehicles
 
 	void DoVehicleCollision(ItemInfo* vehicleItem, int radius);
 	int  DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate);
+	void DoVehicleFlareDiscard(ItemInfo* laraItem);
 
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff);
-	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
-	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
-	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
-	void ResetVehicleLean(ItemInfo* vehicleItem, float rate);
+	void  ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
+	void  ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate);
+	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
+	void  ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 }

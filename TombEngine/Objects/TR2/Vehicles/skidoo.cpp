@@ -179,15 +179,7 @@ namespace TEN::Entities::Vehicles
 		}
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-		{
-			CreateFlare(laraItem, ID_FLARE_ITEM, false);
-			UndrawFlareMeshes(laraItem);
-			lara->Control.HandStatus = HandStatus::Free;
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-			lara->Flare.ControlLeft = 0;
-		}
-
+		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose.Position = skidooItem->Pose.Position;
 		laraItem->Pose.Orientation = Vector3Shrt(0, skidooItem->Pose.Orientation.y, 0);
 		lara->Control.HandStatus = HandStatus::Busy;

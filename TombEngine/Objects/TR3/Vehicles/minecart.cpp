@@ -217,15 +217,7 @@ namespace TEN::Entities::Vehicles
 		}
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-		{
-			CreateFlare(laraItem, ID_FLARE_ITEM, false);
-			UndrawFlareMeshes(laraItem);
-			lara->Flare.ControlLeft = false;
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-			lara->Control.Weapon.GunType = LaraWeaponType::None;
-		}
-
+		DoVehicleFlareDiscard(laraItem);
 		laraItem->Pose = minecartItem->Pose;
 		lara->Control.HandStatus = HandStatus::Busy;
 		minecart->Velocity = 0;

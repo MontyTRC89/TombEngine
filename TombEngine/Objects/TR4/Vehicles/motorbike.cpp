@@ -196,16 +196,7 @@ namespace TEN::Entities::Vehicles
 		}
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 
-		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
-		{
-			CreateFlare(laraItem, ID_FLARE_ITEM, false);
-			UndrawFlareMeshes(laraItem);
-			lara->Control.Weapon.GunType = LaraWeaponType::None;
-			lara->Control.Weapon.RequestGunType = LaraWeaponType::None;
-			lara->Flare.Life = 0;
-			lara->Flare.ControlLeft = false;
-		}
-
+		DoVehicleFlareDiscard(laraItem);
 		ResetLaraFlex(laraItem);
 		laraItem->Pose.Position = motorbikeItem->Pose.Position;
 		laraItem->Pose.Orientation.y = motorbikeItem->Pose.Orientation.y;
