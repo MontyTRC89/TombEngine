@@ -37,7 +37,17 @@ namespace TEN::Entities::Vehicles
 		Jump
 	};
 
+	enum class VehicleImpactDirection
+	{
+		None,
+		Front,
+		Back,
+		Left,
+		Right
+	};
+
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
+	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int deltaPos);
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 

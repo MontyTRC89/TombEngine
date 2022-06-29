@@ -133,6 +133,14 @@ namespace TEN::Entities::Vehicles
 		UPV_JOINT_TURBINE	   = 3
 	};
 	
+	enum UPVFlags
+	{
+		UPV_FLAG_CONTROL = (1 << 0),
+		UPV_FLAG_SURFACE = (1 << 1),
+		UPV_FLAG_DIVE	 = (1 << 2),
+		UPV_FLAG_DEAD	 = (1 << 3)
+	};
+
 	enum UPVBiteIndex
 	{
 		UPV_BITE_TURBINE			= 0,
@@ -142,14 +150,6 @@ namespace TEN::Entities::Vehicles
 		UPV_BITE_RIGHT_RUDDER_RIGHT = 4, // Unused.
 		UPV_BITE_RIGHT_RUDDER_LEFT  = 5	 // Unused.
 	};
-	enum UPVFlags
-	{
-		UPV_FLAG_CONTROL = (1 << 0),
-		UPV_FLAG_SURFACE = (1 << 1),
-		UPV_FLAG_DIVE	 = (1 << 2),
-		UPV_FLAG_DEAD	 = (1 << 3)
-	};
-
 
 	UPVInfo* GetUPVInfo(ItemInfo* UPVItem)
 	{

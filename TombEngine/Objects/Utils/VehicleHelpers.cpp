@@ -129,6 +129,38 @@ namespace TEN::Entities::Vehicles
 		return VehicleMountType::None;
 	}
 
+	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int deltaPos)
+	{
+		deltaPos.x = vehicleItem->Pose.Position.x - deltaPos.x;
+		deltaPos.z = vehicleItem->Pose.Position.z - deltaPos.z;
+
+		if (deltaPos.x || deltaPos.z)
+		{
+			float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
+			float cosY = phd_cos(vehicleItem->Pose.Orientation.y);
+
+			int front = (deltaPos.x * sinY) + (deltaPos.z * cosY);
+			int side = (deltaPos.x * cosY) - (deltaPos.z * sinY);
+
+			if (abs(front) > abs(side))
+			{
+				if (front > 0)
+					return VehicleImpactDirection::Back;
+				else
+					return VehicleImpactDirection::Front;
+			}
+			else
+			{
+				if (side > 0)
+					return VehicleImpactDirection::Left;
+				else
+					return VehicleImpactDirection::Right;
+			}
+		}
+
+		return VehicleImpactDirection::None;
+	}
+
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
 	{
 		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
