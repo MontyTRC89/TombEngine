@@ -203,6 +203,7 @@ void LoadObjects()
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
 				poly.animatedFrame = ReadInt32();
+				poly.ShineStrength = ReadInt32();
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
@@ -903,6 +904,7 @@ void LoadAnimatedTextures()
 	{
 		ANIMATED_TEXTURES_SEQUENCE sequence;
 		sequence.atlas = ReadInt32();
+		sequence.Fps = ReadInt32();
 		sequence.numFrames = ReadInt32();
 
 		for (int j = 0; j < sequence.numFrames; j++)
