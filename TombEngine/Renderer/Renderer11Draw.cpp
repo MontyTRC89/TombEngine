@@ -2012,7 +2012,7 @@ namespace TEN::Renderer
 
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
-								m_stAnimated.FPS = set.fps;
+								m_stAnimated.Fps = set.Fps;
 
 								for (unsigned char j = 0; j < set.NumTextures; j++)
 								{
