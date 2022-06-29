@@ -74,6 +74,7 @@ namespace TEN::Renderer
 	struct RendererAnimatedTextureSet
 	{
 		int NumTextures;
+		int Fps;
 		std::vector<RendererAnimatedTexture> Textures;
 	};
 
