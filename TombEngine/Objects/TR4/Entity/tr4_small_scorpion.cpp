@@ -39,7 +39,14 @@ namespace TEN::Entities::TR4
 	// TODO
 	enum SmallScorpionAnim
 	{
-
+		SSCORPION_ANIM_WALK = 0,
+		SSCORPION_ANIM_RUN = 1,
+		SSCORPION_ANIM_IDLE = 2,
+		SSCORPION_ANIM_STAB = 3,
+		SSCORPION_ANIM_STING = 4,
+		SSCORPION_ANIM_DEATH = 5,
+		SSCORPION_ANIM_FLAT_1 = 6,
+		SSCORPION_ANIM_FLAT_2 = 7,
 	};
 
 	void InitialiseSmallScorpion(short itemNumber)
@@ -48,7 +55,7 @@ namespace TEN::Entities::TR4
 
 		ClearItem(itemNumber);
 
-		item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 2;
+		item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + SSCORPION_ANIM_IDLE;
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->Animation.TargetState = SSCORPION_STATE_IDLE;
 		item->Animation.ActiveState = SSCORPION_STATE_IDLE;
@@ -77,7 +84,7 @@ namespace TEN::Entities::TR4
 			if (item->Animation.ActiveState != SSCORPION_STATE_DEATH_1 &&
 				item->Animation.ActiveState != SSCORPION_STATE_DEATH_2)
 			{
-				item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + 5;
+				item->Animation.AnimNumber = Objects[ID_SMALL_SCORPION].animIndex + SSCORPION_ANIM_DEATH;
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = SSCORPION_STATE_DEATH_1;
 			}
