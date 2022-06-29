@@ -203,7 +203,7 @@ void LoadObjects()
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
 				poly.animatedFrame = ReadInt32();
-				poly.ShineStrength = ReadInt32();
+				poly.shineStrength = ReadFloat();
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
