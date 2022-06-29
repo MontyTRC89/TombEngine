@@ -1,7 +1,8 @@
 #pragma once
+#include "Objects/Utils/VehicleHelpers.h"
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
