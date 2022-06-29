@@ -19,10 +19,10 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 
-using std::vector;
-using namespace TEN::Input;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Input;
 using namespace TEN::Math::Random;
+using std::vector;
 
 namespace TEN::Entities::Vehicles
 {

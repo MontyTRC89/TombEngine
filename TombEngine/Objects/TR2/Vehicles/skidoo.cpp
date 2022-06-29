@@ -21,22 +21,12 @@
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 
-using std::vector;
 using namespace TEN::Input;
 using namespace TEN::Math::Random;
+using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> SkidooMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
-	};
-
-	constexpr auto SKIDOO_DAMAGE_START = 140;
-	constexpr auto SKIDOO_DAMAGE_LENGTH = 14;
-
 	constexpr auto SKIDOO_RADIUS = 500;
 	constexpr auto SKIDOO_FRONT = 550;
 	constexpr auto SKIDOO_SIDE = 260;
@@ -60,6 +50,9 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto SKIDOO_STEP_HEIGHT_MAX = CLICK(1); // Unused.
 	constexpr auto SKIDOO_MIN_BOUNCE = (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
+
+	constexpr auto SKIDOO_DAMAGE_START = 140;
+	constexpr auto SKIDOO_DAMAGE_LENGTH = 14;
 
 	#define SKIDOO_TURN_RATE_ACCEL			ANGLE(2.5f)
 	#define SKIDOO_TURN_RATE_DECEL			ANGLE(2.0f)
@@ -109,6 +102,13 @@ namespace TEN::Entities::Vehicles
 		SKIDOO_ANIM_FALL_OFF = 20,
 		SKIDOO_ANIM_IDLE_DEATH = 21,
 		SKIDOO_ANIM_FALL_DEATH = 22
+	};
+
+	const vector<VehicleMountType> SkidooMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
 	};
 
 	SkidooInfo* GetSkidooInfo(ItemInfo* skidooItem)
