@@ -39,8 +39,9 @@ struct AnimatedFrameUV
 };
 
 cbuffer AnimatedBuffer : register(b6) {
-	AnimatedFrameUV AnimFrames[32];
+	AnimatedFrameUV AnimFrames[128];
 	uint numAnimFrames;
+    uint fps;
 }
 
 struct PixelShaderInput
@@ -123,7 +124,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.PositionCopy = screenPos;
 
 #ifdef ANIMATED
-	int frame = (Frame / 2) % numAnimFrames;
+	float speed = fps / 30.0f;
+	int frame = (int)(Frame * speed) % numAnimFrames;
 	switch (input.PolyIndex) {
 	case 0:
 		output.UV = AnimFrames[frame].topLeft;
