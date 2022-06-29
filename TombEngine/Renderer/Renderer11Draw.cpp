@@ -2013,8 +2013,15 @@ namespace TEN::Renderer
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
 								m_stAnimated.FPS = set.fps;
+
 								for (unsigned char j = 0; j < set.NumTextures; j++)
 								{
+									if (j >= m_stAnimated.Textures.size())
+									{
+										TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
+										break;
+									}
+
 									auto& tex = set.Textures[j];
 									m_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
 									m_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
