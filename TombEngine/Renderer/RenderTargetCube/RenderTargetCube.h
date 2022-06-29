@@ -22,17 +22,17 @@ namespace TEN::Renderer
 			//+Y (down)
 			Vector3(0,1,0),
 			//+Z (forward)
-			Vector3(0,0,-1),
-			//-Z (backward)
 			Vector3(0,0,1),
+			//-Z (backward)
+			Vector3(0,0,-1),
 		};
 
 		static constexpr Vector3 upVectors[6] = 
 		{
 			Vector3(0,-1,0),
 			Vector3(0,-1,0),
-			Vector3(0,0,1),
 			Vector3(0,0,-1),
+			Vector3(0,0,1),
 			Vector3(0,-1,0),
 			Vector3(0,-1,0),
 		};

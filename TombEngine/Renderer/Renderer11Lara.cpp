@@ -303,8 +303,10 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
+		
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
 		DrawMoveableMesh(item, mesh, room, k, transparent);
+
 	}
 
 	DrawLaraHolsters(transparent);
