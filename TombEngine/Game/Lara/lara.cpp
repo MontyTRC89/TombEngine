@@ -40,7 +40,6 @@
 using namespace TEN::Effects::Lara;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
-
 using std::function;
 using TEN::Renderer::g_Renderer;
 
