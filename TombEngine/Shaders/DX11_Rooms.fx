@@ -124,7 +124,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.PositionCopy = screenPos;
 
 #ifdef ANIMATED
-	float speed = fps/ 30.0f;
+	float speed = fps / 30.0f;
 	int frame = (int)(Frame * speed) % numAnimFrames;
 	switch (input.PolyIndex) {
 	case 0:
