@@ -42,19 +42,24 @@ namespace TEN::Renderer
 	using namespace TEN::Renderer;
 	using namespace std::chrono;
 
-	void Renderer11::RenderShadowMap(RenderView& renderView)
+	void Renderer11::RenderBlobShadows(RenderView& renderView)
 	{
-		//Collect Shadow Spheres
-		std::array<LARA_MESHES,4> sphereMeshes = {LM_HIPS,LM_TORSO,LM_LFOOT,LM_RFOOT};
-		std::array<float,4> sphereScaleFactors = {6.0f,3.2f,2.8f,2.8f};
+		const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
+		const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
+
 		std::vector<Sphere> nearestSpheres;
+
+		// Collect Shadow Spheres
 		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
-		for (auto i = 0; i < sphereMeshes.size(); i++) {
+		for (auto i = 0; i < sphereMeshes.size(); i++) 
+		{
 			auto& newSphere = nearestSpheres.emplace_back();
 			MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
 			Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
-			if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT) {
-				//push feet spheres a little bit down
+
+			if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT) 
+			{
+				// Push feet spheres a little bit down
 				pos.y += 8;
 			}
 			GetLaraJointPosition(&pos, sphereMeshes[i]);
@@ -62,16 +67,21 @@ namespace TEN::Renderer
 			newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
 		}
 
-		for (auto& r : renderView.roomsToDraw) {
+		for (auto& r : renderView.roomsToDraw) 
+		{
 
-			for (auto& i : r->ItemsToDraw) {
+			for (auto& i : r->ItemsToDraw) 
+			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
+
 				//Skip everything thats not "alive" or is not a vehicle
-				
+
 				if (!Objects[nativeItem.ObjectNumber].castsShadow)
 					continue;
+
 				auto bb = GetBoundsAccurate(&nativeItem);
-				Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) + Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
+				Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) + 
+								 Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
 				center.y = nativeItem.Pose.Position.y;
 				float maxExtent = std::max(bb->X2 - bb->X1, bb->Z2 - bb->Z1);
 				auto& newSphere = nearestSpheres.emplace_back();
@@ -79,21 +89,39 @@ namespace TEN::Renderer
 				newSphere.radius = maxExtent;
 			}
 		}
-		if (nearestSpheres.size() > g_Configuration.ShadowMaxBlobs) {
-			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) {
+
+		if (nearestSpheres.size() > g_Configuration.ShadowMaxBlobs) 
+		{
+			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) 
+			{
 				auto& laraPos = LaraItem->Pose.Position;
 				auto laraPosition = Vector3(laraPos.x, laraPos.y, laraPos.z);
 				return Vector3::Distance(laraPosition, a.position) < Vector3::Distance(laraPosition, b.position);
-				});
+			});
+
 			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowMaxBlobs, m_stShadowMap.Spheres);
 			m_stShadowMap.NumSpheres = g_Configuration.ShadowMaxBlobs;
 
 		}
-		else {
+		else 
+		{
 			std::copy(nearestSpheres.begin(), nearestSpheres.end(), m_stShadowMap.Spheres);
 			m_stShadowMap.NumSpheres = nearestSpheres.size();
 		}
+	}
 
+	void Renderer11::ClearShadowMap(RenderView& renderView)
+	{
+		for (int step = 0; step < m_shadowMap.RenderTargetView.size(); step++)
+		{
+			m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView[step].Get(), Colors::White);
+			m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView[step].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			1.0f, 0);
+		}
+	}
+
+	void Renderer11::RenderShadowMap(RenderView& renderView)
+	{
 		if (g_Configuration.ShadowMode == SHADOW_NONE)
 			return;
 		
@@ -110,10 +138,7 @@ namespace TEN::Renderer
 		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
 		for (int step = 0; step < steps; step++) 
 		{
-			// Bind and clear render target
-			m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView[step].Get(), Colors::White);
-			m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView[step].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-				1.0f, 0);
+			// Bind render target
 			m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView[step].GetAddressOf(),
 				m_shadowMap.DepthStencilView[step].Get());
 
@@ -147,21 +172,25 @@ namespace TEN::Renderer
 			// Set camera matrices
 			Matrix view;
 			Matrix projection;
-			if (shadowLight->Type == LIGHT_TYPE_POINT) {
+			if (shadowLight->Type == LIGHT_TYPE_POINT) 
+			{
 				view = Matrix::CreateLookAt(lightPos, lightPos + 
 					RenderTargetCube::forwardVectors[step]*10240,
 					RenderTargetCube::upVectors[step]);
+
 				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f,
 					shadowLight->Out);
 
 			}
-			else if(shadowLight->Type == LIGHT_TYPE_SPOT) {
+			else if(shadowLight->Type == LIGHT_TYPE_SPOT) 
+			{
 				view = Matrix::CreateLookAt(lightPos,
 					lightPos - shadowLight->Direction*10240,
 					Vector3(0.0f, -1.0f, 0.0f));
-				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Out, 1.0f, 16.0f,shadowLight->Range);
 
+				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Out, 1.0f, 16.0f,shadowLight->Range);
 			}
+
 			CCameraMatrixBuffer shadowProjection;
 			shadowProjection.ViewProjection = view * projection;
 			m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
@@ -1377,22 +1406,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
-		m_timeUpdate = 0;
-		m_timeDraw = 0;
-		m_timeFrame = 0;
-		m_numDrawCalls = 0;
-		m_numRoomsDrawCalls = 0;
-		m_numMoveablesDrawCalls = 0;
-		m_numStaticsDrawCalls = 0;
-		m_numSpritesDrawCalls = 0;
-		m_numTransparentDrawCalls = 0;
-		m_nextSprite = 0;
-		m_numRoomsTransparentDrawCalls = 0;
-		m_numMoveablesTransparentDrawCalls = 0;
-		m_numStaticsTransparentDrawCalls = 0;
-		m_numSpritesTransparentDrawCalls = 0;
-		m_biggestRoomIndexBuffer = 0;
-		m_numPolygons = 0;
+		ResetDebugVariables();
 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1413,7 +1427,9 @@ namespace TEN::Renderer
 		m_stShadowMap.NumSpheres = 0;
 
 		// Prepare the shadow map
+		ClearShadowMap(view);
 		RenderShadowMap(view);
+		RenderBlobShadows(view);
 
 		// Setup Lara item
 		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;

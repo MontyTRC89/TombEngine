@@ -389,7 +389,6 @@ namespace TEN::Renderer
 		std::vector<RendererLine3D> m_lines3DToDraw;
 		std::vector<RendererLine2D> m_lines2DToDraw;
 
-		int m_nextSprite;
 		std::vector<std::optional<RendererObject>> m_moveableObjects;
 		std::vector<std::optional<RendererObject>> m_staticObjects;
 		std::vector<RendererSprite> m_sprites;
@@ -507,7 +506,8 @@ namespace TEN::Renderer
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
 		void RenderShadowMap(RenderView& view);
-		void DrawWraithExtra(RendererItem* item, RenderView& view);
+		void ClearShadowMap(RenderView& view);
+		void RenderBlobShadows(RenderView& renderView);
 		void DrawDarts(RendererItem* item, RenderView& view);
 		void DrawLara(bool shadowMap, RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
@@ -572,6 +572,7 @@ namespace TEN::Renderer
 		void SetAlphaTest(ALPHA_TEST_MODES mode, float threshold, bool force = false);
 		void SetScissor(RendererRectangle rectangle);
 		void ResetScissor();
+		void ResetDebugVariables();
 		float CalculateFrameRate();
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
 		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);
