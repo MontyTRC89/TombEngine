@@ -399,11 +399,11 @@ namespace TEN::Renderer
 		std::vector<RendererSpriteSequence> m_spriteSequences;
 		std::unordered_map<int, RendererMesh*> m_meshPointersToMesh;
 		Matrix m_LaraWorldMatrix;
+
 		std::vector<RendererAnimatedTextureSet> m_animatedTextureSets;
 		int m_numAnimatedTextureSets;
 		int m_currentCausticsFrame;
-		RendererUnderwaterDustParticle m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
-		bool m_firstUnderwaterDustParticles = true;
+
 		std::vector<RendererMesh*> m_meshes;
 		std::vector<TexturePair> m_roomTextures;
 		std::vector<TexturePair> m_animatedTextures;
@@ -443,11 +443,8 @@ namespace TEN::Renderer
 		bool m_firstWeather;
 		RendererWeatherParticle m_rain[NUM_RAIN_DROPS];
 		RendererWeatherParticle m_snow[NUM_SNOW_PARTICLES];
-
-		// Old fade-in/out
-		RENDERER_FADE_STATUS m_fadeStatus = NO_FADE;
-		float m_fadeFactor;
-		int m_progress;
+		bool m_firstUnderwaterDustParticles;
+		RendererUnderwaterDustParticle m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
 
 		// Misc
 		int m_pickupRotation = 0;
@@ -506,7 +503,6 @@ namespace TEN::Renderer
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
 		void RenderShadowMap(RenderView& view);
-		void DrawWraithExtra(RendererItem* item, RenderView& view);
 		void DrawDarts(RendererItem* item, RenderView& view);
 		void DrawLara(bool shadowMap, RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
@@ -533,13 +529,6 @@ namespace TEN::Renderer
 		bool DrawGunFlashes(RenderView& view);
 		void DrawGunShells(RenderView& view);
 		void DrawLocusts(RenderView& view);
-		void RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-		                          ID3D11ShaderResourceView* background);
-		void RenderTitleMenu(Menu menu);
-		void RenderPauseMenu(Menu menu);
-		void RenderLoadSaveMenu();
-		void RenderOptionsMenu(Menu menu, int initialY);
-		void RenderNewInventory();
 		void DrawStatistics();
 		void DrawExamines();
 		void DrawDiary();
@@ -549,20 +538,29 @@ namespace TEN::Renderer
 		void DrawShockwaves(RenderView& view);
 		void DrawRipples(RenderView& view);
 		void DrawUnderwaterDust(RenderView& view);
+		void DrawSmokeParticles(RenderView& view);
+		void DrawSparkParticles(RenderView& view);
+		void DrawDripParticles(RenderView& view);
+		void DrawExplosionParticles(RenderView& view);
+		void DrawLaraHolsters(bool transparent);
+		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
+		void DrawSimpleParticles(RenderView& view);
+		void DrawFootprints(RenderView& view);
+		void DrawLoadingBar(float percent);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color);
+		void RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
+			ID3D11ShaderResourceView* background);
+		void RenderTitleMenu(Menu menu);
+		void RenderPauseMenu(Menu menu);
+		void RenderLoadSaveMenu();
+		void RenderOptionsMenu(Menu menu, int initialY);
+		void RenderNewInventory();
 		bool IsRoomUnderwater(short roomNumber);
 		bool IsInRoom(int x, int y, int z, short roomNumber);
 		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
 		void InitialiseGameBars();
 		void InitialiseMenuBars(int y);
-		void DrawSmokeParticles(RenderView& view);
-		void DrawSparkParticles(RenderView& view);
-		void DrawDripParticles(RenderView& view);
-		void DrawExplosionParticles(RenderView& view);
 		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber);
-		void DrawLaraHolsters(bool transparent);
-		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool transparent);
-		void DrawSimpleParticles(RenderView& view);
 		void SetBlendMode(BLEND_MODES blendMode, bool force = false);
 		void SetDepthState(DEPTH_STATES depthState, bool force = false);
 		void SetCullMode(CULL_MODES cullMode, bool force = false);
@@ -578,15 +576,13 @@ namespace TEN::Renderer
 		void AddSpriteBillboardConstrainedLookAt(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
 		                                         float scale, Vector2 size, BLEND_MODES blendMode, Vector3 lookAtAxis,
 		                                         RenderView& view);
-		void addSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
+		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
 		short GetRoomNumberForSpriteTest(Vector3 position);
 		void DoFadingAndCinematicBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 		                              RenderView& view);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
-		void DrawFootprints(RenderView& view);
-		void DrawLoadingBar(float percent);
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{
@@ -676,7 +672,7 @@ namespace TEN::Renderer
 		void UpdateItemAnimations(int itemNumber, bool force);
 		void GetLaraAbsBonePosition(Vector3* pos, int joint);
 		void GetItemAbsBonePosition(int itemNumber, Vector3* pos, int joint);
-		int getSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
+		int GetSpheres(short itemNumber, BoundingSphere* ptr, char worldSpace, Matrix local);
 		void GetBoneMatrix(short itemNumber, int joint, Matrix* outMatrix);
 		void DrawObjectOn2DPosition(short x, short y, short objectNum, short rotX, short rotY, short rotZ,
 		                            float scale1);

@@ -98,6 +98,9 @@ namespace TEN::Renderer
 		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().selectedScreenResolution];
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
+		auto* shadowMode = g_Gui.GetCurrentSettings().conf.ShadowMode ? 
+			(g_Gui.GetCurrentSettings().conf.ShadowMode == SHADOW_LARA ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
+
 		switch (menu)
 		{
 		case Menu::Options:
@@ -138,7 +141,7 @@ namespace TEN::Renderer
 
 			// Enable dynamic shadows
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SHADOWS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableShadows), PRINTSTRING_COLOR_WHITE, SF(title_option == 2));
+			DrawString(MenuRightSideEntry, y, g_GameFlow->GetString(shadowMode), PRINTSTRING_COLOR_WHITE, SF(title_option == 2));
 			GetNextLinePosition(&y);
 
 			// Enable caustics

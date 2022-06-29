@@ -44,12 +44,11 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderShadowMap(RenderView& renderView)
 	{
-
 		//Collect Shadow Spheres
 		std::array<LARA_MESHES,4> sphereMeshes = {LM_HIPS,LM_TORSO,LM_LFOOT,LM_RFOOT};
 		std::array<float,4> sphereScaleFactors = {6.0f,3.2f,2.8f,2.8f};
 		std::vector<Sphere> nearestSpheres;
-		nearestSpheres.reserve(16);
+		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
 		for (auto i = 0; i < sphereMeshes.size(); i++) {
 			auto& newSphere = nearestSpheres.emplace_back();
 			MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
@@ -80,31 +79,37 @@ namespace TEN::Renderer
 				newSphere.radius = maxExtent;
 			}
 		}
-		if (nearestSpheres.size() > 16) {
+		if (nearestSpheres.size() > g_Configuration.ShadowMaxBlobs) {
 			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) {
 				auto& laraPos = LaraItem->Pose.Position;
 				auto laraPosition = Vector3(laraPos.x, laraPos.y, laraPos.z);
 				return Vector3::Distance(laraPosition, a.position) < Vector3::Distance(laraPosition, b.position);
 				});
-			std::copy(nearestSpheres.begin(), nearestSpheres.begin()+16, m_stShadowMap.Spheres);
-			m_stShadowMap.NumSpheres = 16;
+			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowMaxBlobs, m_stShadowMap.Spheres);
+			m_stShadowMap.NumSpheres = g_Configuration.ShadowMaxBlobs;
 
 		}
 		else {
 			std::copy(nearestSpheres.begin(), nearestSpheres.end(), m_stShadowMap.Spheres);
 			m_stShadowMap.NumSpheres = nearestSpheres.size();
 		}
+
+		if (g_Configuration.ShadowMode == SHADOW_NONE)
+			return;
 		
 		if (shadowLight == nullptr)
 			return;
+
 		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
 			return;
+
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetCullMode(CULL_MODE_CCW);
 
 		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
-		for (int step = 0; step < steps; step++) {
+		for (int step = 0; step < steps; step++) 
+		{
 			// Bind and clear render target
 			m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView[step].Get(), Colors::White);
 			m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView[step].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
@@ -181,7 +186,6 @@ namespace TEN::Renderer
 			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
 				RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
-
 
 				for (auto& bucket : mesh->buckets)
 				{
@@ -1409,8 +1413,7 @@ namespace TEN::Renderer
 		m_stShadowMap.NumSpheres = 0;
 
 		// Prepare the shadow map
-		if (g_Configuration.EnableShadows)
-			RenderShadowMap(view);
+		RenderShadowMap(view);
 
 		// Setup Lara item
 		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
@@ -1624,12 +1627,6 @@ namespace TEN::Renderer
 					// We'll draw waterfalls later
 					continue;
 				}
-				else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
-				{
-					// Wraiths have some additional special effects
-					DrawAnimatingItem(itemToDraw, view, transparent);
-					DrawWraithExtra(itemToDraw, view);
-				}
 				else if (objectNumber == ID_DARTS)
 				{
 					//TODO: for now legacy way, in the future mesh
@@ -1771,46 +1768,6 @@ namespace TEN::Renderer
 			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
 
 		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
-	}
-
-	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
-	{
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-		WraithInfo* info = (WraithInfo*)nativeItem->Data;
-
-		for (int j = 0; j <= 4; j++)
-		{
-			Matrix rotation;
-
-			switch (j)
-			{
-			case 0:
-				rotation = Matrix::CreateRotationY(TO_RAD(-1092));
-				break;
-			case 1:
-				rotation = Matrix::CreateRotationY(TO_RAD(1092));
-				break;
-			case 2:
-				rotation = Matrix::CreateRotationZ(TO_RAD(-1092));
-				break;
-			case 3:
-				rotation = Matrix::CreateRotationZ(TO_RAD(1092));
-				break;
-			default:
-				rotation = Matrix::Identity;
-				break;
-			}
-
-			Matrix world = rotation * item->World;
-
-			for (int i = 0; i < 7; i++)
-			{
-				Vector3 p1 = Vector3(info[i].Position.x, info[i].Position.y, info[i].Position.z);
-				Vector3 p2 = Vector3(info[i + 1].Position.x, info[i + 1].Position.y, info[i + 1].Position.z);
-
-				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
-			}
-		}
 	}
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)

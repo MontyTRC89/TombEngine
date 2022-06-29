@@ -92,7 +92,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		g_Configuration.EnableVolumetricFog = true;
 		SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_SETCHECK, 1, 0);
 
-		g_Configuration.EnableShadows = true;
+		g_Configuration.ShadowMode = SHADOW_LARA;
 		SendDlgItemMessage(handle, IDC_SHADOWS, BM_SETCHECK, 1, 0);
 
 		g_Configuration.EnableCaustics = true;
@@ -117,7 +117,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 			case IDOK:
 				// Get values from dialog components
 				g_Configuration.Windowed = (SendDlgItemMessage(handle, IDC_WINDOWED, BM_GETCHECK, 0, 0));
-				g_Configuration.EnableShadows = (SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
+				g_Configuration.ShadowMode = (int)(SendDlgItemMessage(handle, IDC_SHADOWS, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableCaustics = (SendDlgItemMessage(handle, IDC_CAUSTICS, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableVolumetricFog = (SendDlgItemMessage(handle, IDC_VOLUMETRIC_FOG, BM_GETCHECK, 0, 0));
 				g_Configuration.EnableSound = (SendDlgItemMessage(handle, IDC_ENABLE_SOUNDS, BM_GETCHECK, 0, 0));
@@ -190,7 +190,18 @@ bool SaveConfiguration()
 		return false;
 	}
 
-	if (SetBoolRegKey(rootKey, REGKEY_SHADOWS, g_Configuration.EnableShadows) != ERROR_SUCCESS)
+	if (SetDWORDRegKey(rootKey, REGKEY_SHADOWS, g_Configuration.ShadowMode) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.ShadowMapSize) != ERROR_SUCCESS) {
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	if (SetDWORDRegKey(rootKey, REGKEY_SHADOW_BLOBS, g_Configuration.ShadowMaxBlobs) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -204,11 +215,6 @@ bool SaveConfiguration()
 
 	if (SetBoolRegKey(rootKey, REGKEY_VOLUMETRIC_FOG, g_Configuration.EnableVolumetricFog) != ERROR_SUCCESS)
 	{
-		RegCloseKey(rootKey);
-		return false;
-	}
-
-	if (SetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, g_Configuration.ShadowMapSize) != ERROR_SUCCESS) {
 		RegCloseKey(rootKey);
 		return false;
 	}
@@ -294,7 +300,7 @@ void InitDefaultConfiguration()
 	g_Configuration.SoundDevice = 1;
 	g_Configuration.EnableReverb = true;
 	g_Configuration.EnableCaustics = true;
-	g_Configuration.EnableShadows = true;
+	g_Configuration.ShadowMode = SHADOW_LARA;
 	g_Configuration.EnableSound = true;
 	g_Configuration.EnableVolumetricFog = true;
 	g_Configuration.MusicVolume = 100;
@@ -349,8 +355,8 @@ bool LoadConfiguration()
 		return false;
 	}
 
-	bool shadows = false;
-	if (GetBoolRegKey(rootKey, REGKEY_SHADOWS, &shadows, true) != ERROR_SUCCESS)
+	DWORD shadowMode = 1;
+	if (GetDWORDRegKey(rootKey, REGKEY_SHADOWS, &shadowMode, 1) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -358,6 +364,13 @@ bool LoadConfiguration()
 
 	DWORD shadowMapSize = 512;
 	if (GetDWORDRegKey(rootKey, REGKEY_SHADOW_MAP, &shadowMapSize, 512) != ERROR_SUCCESS)
+	{
+		RegCloseKey(rootKey);
+		return false;
+	}
+
+	DWORD shadowBlobs = 16;
+	if (GetDWORDRegKey(rootKey, REGKEY_SHADOW_BLOBS, &shadowMapSize, 16) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
@@ -439,7 +452,8 @@ bool LoadConfiguration()
 	g_Configuration.Width = screenWidth;
 	g_Configuration.Height = screenHeight;
 	g_Configuration.Windowed = windowed;
-	g_Configuration.EnableShadows = shadows;
+	g_Configuration.ShadowMode = shadowMode;
+	g_Configuration.ShadowMaxBlobs = shadowBlobs;
 	g_Configuration.EnableCaustics = caustics;
 	g_Configuration.EnableVolumetricFog = volumetricFog;
 	g_Configuration.ShadowMapSize = shadowMapSize;
