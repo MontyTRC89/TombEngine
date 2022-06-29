@@ -39,7 +39,7 @@ struct AnimatedFrameUV
 };
 
 cbuffer AnimatedBuffer : register(b6) {
-	AnimatedFrameUV AnimFrames[32];
+	AnimatedFrameUV AnimFrames[128];
 	uint numAnimFrames;
     uint fps;
 }

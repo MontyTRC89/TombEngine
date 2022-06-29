@@ -13,7 +13,7 @@ struct AnimatedFrame
 
 struct alignas(16) CAnimatedBuffer
 {
-	std::array<AnimatedFrame, 32> Textures;
+	std::array<AnimatedFrame, 128> Textures;
 	uint32_t NumFrames;
 	uint32_t FPS;
 };
