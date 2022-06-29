@@ -347,7 +347,7 @@ namespace TEN::Renderer
 					x2Outer += splash.x;
 					z2Outer = outerRadius * cos(alpha * j * PI / 180);
 					z2Outer += splash.z;
-					addSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], 
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
 								Vector3(xOuter, yOuter, zOuter), 
 								Vector3(x2Outer, yOuter, z2Outer), 
 								Vector3(x2Inner, yInner, z2Inner), 
@@ -511,7 +511,7 @@ namespace TEN::Renderer
 					p2 = Vector3::Transform(p2, rotationMatrix);
 					p3 = Vector3::Transform(p3, rotationMatrix);
 
-					addSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
 								pos + p1,
 								pos + p2,
 								pos + p3,
@@ -797,7 +797,7 @@ namespace TEN::Renderer
 			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
-				addSprite3D(&m_sprites[spriteIndex], 
+				AddSprite3D(&m_sprites[spriteIndex],
 					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
 					Vector4(footprint.Opacity), 0, 1, { 1,1 }, BLENDMODE_SUBTRACTIVE, view);
 		}

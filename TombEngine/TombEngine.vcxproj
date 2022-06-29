@@ -201,6 +201,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
+    <ClInclude Include="Renderer\Texture2DArray\Texture2DArray.h" />
     <ClInclude Include="Scripting\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
@@ -628,6 +629,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
     <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />
+    <ClCompile Include="Renderer\Texture2DArray\Texture2DArray.cpp" />
     <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
