@@ -370,7 +370,7 @@ bool LoadConfiguration()
 	}
 
 	DWORD shadowBlobs = 16;
-	if (GetDWORDRegKey(rootKey, REGKEY_SHADOW_BLOBS, &shadowMapSize, 16) != ERROR_SUCCESS)
+	if (GetDWORDRegKey(rootKey, REGKEY_SHADOW_BLOBS, &shadowBlobs, 16) != ERROR_SUCCESS)
 	{
 		RegCloseKey(rootKey);
 		return false;
