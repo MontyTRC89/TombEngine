@@ -44,6 +44,7 @@ namespace TEN::Renderer
 				tex.UV[3].y = frm.y4;
 				return tex;
 			});
+			set.fps = sequence.Fps;
 			return set;
 		});
 
