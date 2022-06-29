@@ -12,6 +12,7 @@ struct POLYGON
 	int shape;
 	int animatedSequence;
 	int animatedFrame;
+	int ShineStrength;
 	std::vector<int> indices;
 	std::vector<Vector2> textureCoordinates;
 	std::vector<Vector3> normals;
