@@ -9,19 +9,19 @@ namespace TEN::Entities::Vehicles
 	void InitialiseSkidoo(short itemNumber);
 
 	void SkidooPlayerCollision(short skidooItemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll);
+	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch);
+	void SkidooAnimation(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection, bool dead);
+
+	VehicleImpactDirection SkidooDynamics(ItemInfo* skidooItem, ItemInfo* laraItem);
+	int DoSkidooDynamics(int height, int verticalVelocity, int* y);
+	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old);
+
 	void DoSkidooMount(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool TestSkidooDismountOK(ItemInfo* skidooItem, int direction);
 	bool TestSkidooDismount(ItemInfo* skidooItem, ItemInfo* laraItem);
-
-	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll);
-	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch);
 	void DoSkidooImpact(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection);
-	void SkidooAnimation(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection, bool dead);
 
 	void SkidooGuns(ItemInfo* skidooItem, ItemInfo* laraItem);
 	void DoSnowEffect(ItemInfo* skidooItem);
-
-	VehicleImpactDirection SkidooDynamics(ItemInfo* skidooItem, ItemInfo* laraItem);
-	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old);
-	int DoSkidooDynamics(int height, int verticalVelocity, int* y);
 }
