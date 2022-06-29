@@ -897,12 +897,10 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex + SKIDOO_ANIM_IMPACT_RIGHT;
 			break;
 		}
-
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 		laraItem->Animation.ActiveState = SKIDOO_STATE_IMPACT;
 		laraItem->Animation.TargetState = SKIDOO_STATE_IMPACT;
 
-		// TODO: Base volume on speed of impact.
 		if (impactDirection == VehicleImpactDirection::Front)
 			SoundEffect(SFX_TR2_VEHICLE_IMPACT1, &skidooItem->Pose);
 		else

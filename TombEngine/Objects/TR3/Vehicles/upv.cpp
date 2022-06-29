@@ -97,7 +97,7 @@ namespace TEN::Entities::Vehicles
 	enum UPVState
 	{
 		UPV_STATE_DEATH = 0,
-		UPV_STATE_COLLIDE = 1,
+		UPV_STATE_IMPACT = 1,
 		UPV_STATE_DISMOUNT_WATER_SURFACE = 2,
 		UPV_STATE_UNUSED_1 = 3, // Unused.
 		UPV_STATE_MOVE = 4,
@@ -112,9 +112,9 @@ namespace TEN::Entities::Vehicles
 	{
 		UPV_ANIM_MOVING_DEATH = 0,
 		UPV_ANIM_IDLE_DEATH = 1,
-		UPV_ANIM_COLLIDE_FRONT = 2,
+		UPV_ANIM_IMPACT_FRONT = 2,
 		UPV_ANIM_MOVE = 3,
-		UPV_ANIM_COLLIDE_FRONT_2 = 4, // Unused.
+		UPV_ANIM_IMPACT_FRONT_2 = 4, // Unused.
 		UPV_ANIM_IDLE = 5,
 		UPV_ANIM_IDLE_TO_MOVE = 6,
 		UPV_ANIM_MOVE_TO_IDLE = 7,
@@ -520,7 +520,7 @@ namespace TEN::Entities::Vehicles
 			{
 				if (abs(UPV->Velocity) >= UPV_VELOCITY_MAX)
 				{
-					laraItem->Animation.TargetState = UPV_STATE_COLLIDE;
+					laraItem->Animation.TargetState = UPV_STATE_IMPACT;
 					UPV->Velocity = -UPV->Velocity / 2;
 				}
 				else

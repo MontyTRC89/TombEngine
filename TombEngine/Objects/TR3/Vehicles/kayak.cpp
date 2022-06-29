@@ -343,38 +343,6 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	int KayakGetCollisionAnim(ItemInfo* kayakItem, int xDiff, int zDiff)
-	{
-		xDiff = kayakItem->Pose.Position.x - xDiff;
-		zDiff = kayakItem->Pose.Position.z - zDiff;
-
-		if ((xDiff) || (zDiff))
-		{
-			float s = phd_sin(kayakItem->Pose.Orientation.y);
-			float c = phd_cos(kayakItem->Pose.Orientation.y);
-
-			int front = zDiff * c + xDiff * s;
-			int side = -zDiff * s + xDiff * c;
-
-			if (abs(front) > abs(side))
-			{
-				if (front > 0)
-					return HIT_BACK;
-				else
-					return HIT_FRONT;
-			}
-			else
-			{
-				if (side > 0)
-					return HIT_LEFT;
-				else
-					return HIT_RIGHT;
-			}
-		}
-
-		return 0;
-	}
-
 	int KayakDoDynamics(int height, int verticalVelocity, int* y)
 	{
 		if (height > * y)
@@ -676,27 +644,26 @@ namespace TEN::Entities::Vehicles
 
 		if (height2 == NO_HEIGHT)
 		{
-			GameVector kayakPos;
-			kayakPos.x = kayak->OldPose.Position.x;
-			kayakPos.y = kayak->OldPose.Position.y;
-			kayakPos.z = kayak->OldPose.Position.z;
-			kayakPos.roomNumber = kayakItem->RoomNumber;
+			auto kayakPos = GameVector(
+				kayak->OldPose.Position.x,
+				kayak->OldPose.Position.y,
+				kayak->OldPose.Position.z,
+				kayakItem->RoomNumber
+			);
 
 			CameraCollisionBounds(&kayakPos, 256, 0);
 			{
-				kayakItem->Pose.Position.x = kayakPos.x;
-				kayakItem->Pose.Position.y = kayakPos.y;
-				kayakItem->Pose.Position.z = kayakPos.z;
+				kayakItem->Pose.Position = Vector3Int(kayakPos.x, kayakPos.y, kayakPos.z);
 				kayakItem->RoomNumber = kayakPos.roomNumber;
 			}
 		}
 
 		DoVehicleCollision(kayakItem, KAYAK_Z); // FIXME: kayak is thin, what should we do about it?
 
-		int collide = KayakGetCollisionAnim(kayakItem, xOld, zOld);
+		auto impactDirection = GetVehicleImpactDirection(kayakItem, Vector3Int(xOld, 0, zOld));
 
 		int slip = 0; // Remnant?
-		if (slip || collide)
+		if (slip || impactDirection != VehicleImpactDirection::None)
 		{
 			int newVelocity;
 
