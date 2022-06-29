@@ -1437,7 +1437,7 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	lara->Vehicle = NO_ITEM;
 	SetAnimation(laraItem, LA_FALL_START);
-	laraItem->HitPoints = 0;
+	DoDamage(laraItem, INT_MAX);
 }
 
 int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
@@ -1693,7 +1693,8 @@ void UpdateShockwaves()
 								sw->r, sw->g, sw->b,
 								angle,
 								sw->speed);
-							LaraItem->HitPoints -= sw->speed >> (((sw->flags >> 1) & 1) + 2);
+
+							DoDamage(LaraItem, sw->speed >> (((sw->flags >> 1) & 1) + 2));
 						}
 					}
 				}

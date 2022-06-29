@@ -1418,7 +1418,7 @@ namespace TEN::Entities::Vehicles
 						goto LABEL_11;
 					}
 				}
-				EnableBaddyAI(v4, 1);
+				EnableEntityAI(v4, 1);
 				*(_DWORD*)(v5 + 5610) = *(_DWORD*)(v5 + 5610) & 0xFFFFFFFB | 2;
 				AddActiveItem(v4);
 			}*/

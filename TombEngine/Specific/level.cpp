@@ -203,6 +203,7 @@ void LoadObjects()
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
 				poly.animatedFrame = ReadInt32();
+				poly.shineStrength = ReadFloat();
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
@@ -903,6 +904,7 @@ void LoadAnimatedTextures()
 	{
 		ANIMATED_TEXTURES_SEQUENCE sequence;
 		sequence.atlas = ReadInt32();
+		sequence.Fps = ReadInt32();
 		sequence.numFrames = ReadInt32();
 
 		for (int j = 0; j < sequence.numFrames; j++)
@@ -1073,13 +1075,17 @@ unsigned int _stdcall LoadLevel(void* data)
 			ReadFileEx(&version, 1, 4, LevelFilePtr);
 			ReadFileEx(&systemHash, 1, 4, LevelFilePtr); // Reserved: for future quick start feature! Check builder system 
 
+			// Check file header
 			if (std::string(header) != "TEN")
 				throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
 			else
 				TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
 
+			// Check system name hash and reset it if it's valid (because we use build & play feature only once)
 			if (SystemNameHash != 0 && SystemNameHash != systemHash)
 				throw std::exception("An attempt was made to use level debug feature on a different system.");
+			else
+				SystemNameHash = 0;
 
 			// Read data sizes
 			ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
@@ -1134,8 +1140,12 @@ unsigned int _stdcall LoadLevel(void* data)
 		else
 			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
 
+		TENLog("Preparing renderer...", LogLevel::Info);
+		
 		g_Renderer.UpdateProgress(90);
 		g_Renderer.PrepareDataForTheRenderer();
+
+		TENLog("Initializing level...", LogLevel::Info);
 
 		// Initialise the game
 		InitialiseGameFlags();
@@ -1144,6 +1154,8 @@ unsigned int _stdcall LoadLevel(void* data)
 		GetAIPickups();
 		Lara.Vehicle = -1;
 		g_GameScriptEntities->AssignLara();
+
+		TENLog("Level loading complete.", LogLevel::Info);
 
 		SetScreenFadeOut(FADE_SCREEN_SPEED);
 		g_Renderer.UpdateProgress(100);

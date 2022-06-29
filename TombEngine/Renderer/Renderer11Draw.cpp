@@ -370,7 +370,7 @@ namespace TEN::Renderer
 
 					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_EMPTY1],
 						c,
-						Vector4::One,
+						m_rooms[rope->room].AmbientLight,
 						(PI / 2),
 						1.0f,
 						{ 32,

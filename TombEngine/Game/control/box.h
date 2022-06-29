@@ -68,6 +68,7 @@ struct AI_INFO
 	int zoneNumber;
 	int enemyZone;
 	int distance;
+	int verticalDistance;
 	int ahead;
 	int bite;
 	short angle;
@@ -113,45 +114,6 @@ struct BITE_INFO
 		this->y = ypos;
 		this->z = zpos;
 		this->meshNum = meshNumber;
-	}
-};
-
-struct EntityStoringInfo
-{
-	// position of the entity
-	int x;
-	int y;
-	int z;
-	// waterLevel is mostly -NO_HEIGHT but if the position are in water then it's 0
-	// waterDepth is the depth starting for the water room ceiling (0) and increase 1 by 1
-	// to store from GetWaterDepth() and GetWaterHeight()
-	int waterLevel;
-	int waterDepth;
-	// to store roomNumber from GetFloor()
-	short roomNumber;
-	// store the boxNumber from LOT or from room->floor[].box
-	short boxNumber;
-
-	EntityStoringInfo()
-	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-		this->waterLevel = 0;
-		this->waterDepth = 0;
-		this->roomNumber = 0;
-		this->boxNumber = 0;
-	}
-
-	EntityStoringInfo(int xpos, int ypos, int zpos)
-	{
-		this->x = xpos;
-		this->y = ypos;
-		this->z = zpos;
-		this->waterLevel = 0;
-		this->waterDepth = 0;
-		this->roomNumber = 0;
-		this->boxNumber = 0;
 	}
 };
 

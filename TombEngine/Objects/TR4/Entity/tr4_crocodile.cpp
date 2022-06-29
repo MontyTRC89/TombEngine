@@ -97,16 +97,11 @@ namespace TEN::Entities::TR4
 	{
 		auto* info = GetCreatureInfo(item);
 
-		EntityStoringInfo storingInfo;
-		storingInfo.x = item->Pose.Position.x;
-		storingInfo.y = item->Pose.Position.y;
-		storingInfo.z = item->Pose.Position.z;
-		storingInfo.roomNumber = item->RoomNumber;
+		short roomNumber = item->RoomNumber;
+		GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
 
-		GetFloor(storingInfo.x, storingInfo.y, storingInfo.z, &storingInfo.roomNumber);
-		storingInfo.waterDepth = GetWaterSurface(storingInfo.x, storingInfo.y, storingInfo.z, storingInfo.roomNumber);
-
-		if (storingInfo.waterDepth != NO_HEIGHT)
+		if (waterDepth != NO_HEIGHT)
 		{
 			info->LOT.Step = SECTOR(20);
 			info->LOT.Drop = -SECTOR(20);

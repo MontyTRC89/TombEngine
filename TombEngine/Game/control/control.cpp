@@ -33,6 +33,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
@@ -62,6 +63,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Renderer;
@@ -747,6 +749,9 @@ void CleanUp()
 	// Needs to be cleared because otherwise a list of active creatures from previous level
 	// will spill into new level
 	ActiveCreatures.clear();
+
+	// Clear ropes
+	Ropes.clear();
 
 	// Clear spotcam array
 	ClearSpotCamSequences();
