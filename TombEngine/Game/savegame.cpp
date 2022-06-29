@@ -339,7 +339,7 @@ bool SaveGame::Save(int slot)
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		
 		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
-		for (int j = 0; j < (int)WeaponAmmoType::NumAmmos; j++)
+		for (int j = 0; j < (int)WeaponAmmoType::NumAmmoTypes; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
 			ammo.add_count(info->Ammo[j].getCount());
