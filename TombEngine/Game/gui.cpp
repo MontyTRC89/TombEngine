@@ -489,10 +489,13 @@ void GuiController::DoDebouncedInput()
 
 	if (TrInput & IN_LEFT)
 	{
-		if (rptLeft >= 8)
-			goLeft = 1;
-		else
-			rptLeft++;
+		if (invMode == InventoryMode::InGame)
+		{
+			if (rptLeft >= 8)
+				goLeft = 1;
+			else
+				rptLeft++;
+		}
 
 		if (!dbLeft)
 			goLeft = 1;
@@ -507,10 +510,13 @@ void GuiController::DoDebouncedInput()
 
 	if (TrInput & IN_RIGHT)
 	{
-		if (rptRight >= 8)
-			goRight = 1;
-		else
-			rptRight++;
+		if (invMode == InventoryMode::InGame)
+		{
+			if (rptRight >= 8)
+				goRight = 1;
+			else
+				rptRight++;
+		}
 
 		if (!dbRight)
 			goRight = 1;
@@ -785,7 +791,8 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
+			CurrentSettings.conf.ShadowMode--;
+			if (CurrentSettings.conf.ShadowMode < SHADOW_NONE) CurrentSettings.conf.ShadowMode = SHADOW_ALL;
 			break;
 
 		case 3:
@@ -817,7 +824,8 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableShadows = !CurrentSettings.conf.EnableShadows;
+			CurrentSettings.conf.ShadowMode++;
+			if (CurrentSettings.conf.ShadowMode > SHADOW_ALL) CurrentSettings.conf.ShadowMode = SHADOW_NONE;
 			break;
 
 		case 3:

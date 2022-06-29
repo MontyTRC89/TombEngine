@@ -276,6 +276,7 @@ namespace TEN::Renderer
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
+						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPES::LIGHT_TYPE_SUN;
 					}
 					else if (oldLight->type == LIGHT_TYPE_POINT)
@@ -287,6 +288,7 @@ namespace TEN::Renderer
 						light->Distance = 0;
 						light->In = oldLight->in;
 						light->Out = oldLight->out;
+						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_POINT;
 					}
 					else if (oldLight->type == LIGHT_TYPE_SHADOW)
@@ -312,6 +314,7 @@ namespace TEN::Renderer
 						light->In = oldLight->in;
 						light->Out = oldLight->out;
 						light->Range = oldLight->length;
+						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_SPOT;
 					}
 

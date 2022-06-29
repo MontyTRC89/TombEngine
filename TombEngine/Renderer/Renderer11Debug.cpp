@@ -3,6 +3,25 @@
 
 namespace TEN::Renderer
 {
+	void Renderer11::ResetDebugVariables()
+	{
+		m_timeUpdate = 0;
+		m_timeDraw = 0;
+		m_timeFrame = 0;
+		m_numDrawCalls = 0;
+		m_numRoomsDrawCalls = 0;
+		m_numMoveablesDrawCalls = 0;
+		m_numStaticsDrawCalls = 0;
+		m_numSpritesDrawCalls = 0;
+		m_numTransparentDrawCalls = 0;
+		m_numRoomsTransparentDrawCalls = 0;
+		m_numMoveablesTransparentDrawCalls = 0;
+		m_numStaticsTransparentDrawCalls = 0;
+		m_numSpritesTransparentDrawCalls = 0;
+		m_biggestRoomIndexBuffer = 0;
+		m_numPolygons = 0;
+	}
+
 	bool Renderer11::PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message)
 	{
 		return true;
