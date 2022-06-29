@@ -549,7 +549,7 @@ namespace TEN::Renderer
 		void DrawShockwaves(RenderView& view);
 		void DrawRipples(RenderView& view);
 		void DrawUnderwaterDust(RenderView& view);
-		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color);
+		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
 		bool IsRoomUnderwater(short roomNumber);
 		bool IsInRoom(int x, int y, int z, short roomNumber);
 		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
