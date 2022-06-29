@@ -220,9 +220,9 @@ namespace TEN::Renderer
 						vertex->BiTangent = poly.bitangents[k];
 						vertex->IndexInPoly = k;
 						vertex->OriginalIndex = index;
-						vertex->Effects = Vector4(room.effects[index].x, room.effects[index].y, room.effects[index].z,0);
-						unsigned long long primes[]{ 73856093ULL ,19349663ULL ,83492791ULL };
+						vertex->Effects = Vector4(room.effects[index].x, room.effects[index].y, room.effects[index].z, 0);
 
+						const unsigned long long primes[]{ 73856093ULL, 19349663ULL, 83492791ULL };
 						vertex->hash = std::hash<float>{}((vertex->Position.x)* primes[0]) ^ (std::hash<float>{}(vertex->Position.y)* primes[1]) ^ std::hash<float>{}(vertex->Position.z) * primes[2];
 						vertex->Bone = 0;
 
@@ -812,7 +812,7 @@ namespace TEN::Renderer
 					vertex.Bone = meshPtr->bones[v];
 					vertex.OriginalIndex = v;
 
-					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z,poly->shineStrength);
+					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z, poly->shineStrength);
 					vertex.hash = std::hash<float>{}(vertex.Position.x) ^ std::hash<float>{}(vertex.Position.y) ^ std::hash<float>{}(vertex.Position.z);
 
 					if (obj->Type == 0)
