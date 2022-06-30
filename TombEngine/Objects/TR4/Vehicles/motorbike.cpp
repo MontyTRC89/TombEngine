@@ -78,12 +78,12 @@ namespace TEN::Entities::Vehicles
 		MOTORBIKE_STATE_FALLING,
 		MOTORBIKE_STATE_MOUNT, // include unlocking state
 		MOTORBIKE_STATE_DISMOUNT,
-		MOTORBIKE_STATE_HITFRONT,
-		MOTORBIKE_STATE_HITBACK,
-		MOTORBIKE_STATE_HITRIGHT,
-		MOTORBIKE_STATE_HITLEFT,
+		MOTORBIKE_STATE_IMPACT_FRONT,
+		MOTORBIKE_STATE_IMPACT_BACK,
+		MOTORBIKE_STATE_IMPACT_RIGHT,
+		MOTORBIKE_STATE_IMPACT_LEFT,
 		MOTORBIKE_STATE_IDLE,
-		MOTORBIKE_STATE_LOADING_BOOST, // not used
+		MOTORBIKE_STATE_LOADING_BOOST, // not used. Like rev on quad bike?
 		MOTORBIKE_STATE_LANDING,
 		MOTORBIKE_STATE_ACCELERATE,
 		MOTORBIKE_STATE_NONE_5,
@@ -127,10 +127,10 @@ namespace TEN::Entities::Vehicles
 
 	enum MotorbikeFlags
 	{
-		MOTORBIKE_FLAG_BOOST = (1 << 0),
-		MOTORBIKE_FLAG_NITRO = (1 << 1),
+		MOTORBIKE_FLAG_BOOST   = (1 << 0),
+		MOTORBIKE_FLAG_NITRO   = (1 << 1),
 		MOTORBIKE_FLAG_FALLING = (1 << 6),
-		MOTORBIKE_FLAG_DEATH = (1 << 7)
+		MOTORBIKE_FLAG_DEATH   = (1 << 7)
 	};
 
 	MotorbikeInfo* GetMotorbikeInfo(ItemInfo* motorbikeItem)
@@ -735,9 +735,9 @@ namespace TEN::Entities::Vehicles
 		{
 			if (isDead || !collide ||
 				motorbike->Velocity <= (42 * VEHICLE_VELOCITY_SCALE) ||
-				laraItem->Animation.ActiveState == MOTORBIKE_STATE_HITBACK ||
-				laraItem->Animation.ActiveState == MOTORBIKE_STATE_HITFRONT ||
-				laraItem->Animation.ActiveState == MOTORBIKE_STATE_HITLEFT ||
+				laraItem->Animation.ActiveState == MOTORBIKE_STATE_IMPACT_BACK ||
+				laraItem->Animation.ActiveState == MOTORBIKE_STATE_IMPACT_FRONT ||
+				laraItem->Animation.ActiveState == MOTORBIKE_STATE_IMPACT_LEFT ||
 				laraItem->Animation.ActiveState == MOTORBIKE_STATE_NONE_6)
 			{
 				switch (laraItem->Animation.ActiveState)
@@ -867,10 +867,10 @@ namespace TEN::Entities::Vehicles
 
 					break;
 
-				case MOTORBIKE_STATE_HITFRONT:
-				case MOTORBIKE_STATE_HITBACK:
-				case MOTORBIKE_STATE_HITRIGHT:
-				case MOTORBIKE_STATE_HITLEFT:
+				case MOTORBIKE_STATE_IMPACT_FRONT:
+				case MOTORBIKE_STATE_IMPACT_BACK:
+				case MOTORBIKE_STATE_IMPACT_RIGHT:
+				case MOTORBIKE_STATE_IMPACT_LEFT:
 					if (TrInput & (VEHICLE_IN_ACCELERATE | VEHICLE_IN_BRAKE))
 						laraItem->Animation.TargetState = MOTORBIKE_STATE_MOVING_FRONT;
 
@@ -884,30 +884,30 @@ namespace TEN::Entities::Vehicles
 				case 13:
 					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_BACK_HIT;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITBACK;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITBACK;
+					laraItem->Animation.ActiveState = MOTORBIKE_STATE_IMPACT_BACK;
+					laraItem->Animation.TargetState = MOTORBIKE_STATE_IMPACT_BACK;
 					break;
 
 				case 14:
 					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_FRONT_HIT;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITFRONT;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITFRONT;
+					laraItem->Animation.ActiveState = MOTORBIKE_STATE_IMPACT_FRONT;
+					laraItem->Animation.TargetState = MOTORBIKE_STATE_IMPACT_FRONT;
 					break;
 
 				case 11:
 					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_RIGHT_HIT;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITRIGHT;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITRIGHT;
+					laraItem->Animation.ActiveState = MOTORBIKE_STATE_IMPACT_RIGHT;
+					laraItem->Animation.TargetState = MOTORBIKE_STATE_IMPACT_RIGHT;
 					break;
 
 				case 12:
 				default:
 					laraItem->Animation.AnimNumber = Objects[ID_MOTORBIKE_LARA_ANIMS].animIndex + MOTORBIKE_ANIM_LEFT_HIT;
 					laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-					laraItem->Animation.ActiveState = MOTORBIKE_STATE_HITLEFT;
-					laraItem->Animation.TargetState = MOTORBIKE_STATE_HITLEFT;
+					laraItem->Animation.ActiveState = MOTORBIKE_STATE_IMPACT_LEFT;
+					laraItem->Animation.TargetState = MOTORBIKE_STATE_IMPACT_LEFT;
 					break;
 				}
 			}
