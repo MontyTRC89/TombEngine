@@ -480,7 +480,7 @@ namespace TEN::Renderer
 		*pos = Vector3::Transform(*pos, world);
 	}
 
-	int Renderer11::getSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
+	int Renderer11::GetSpheres(short itemNumber, BoundingSphere *spheres, char worldSpace, Matrix local)
 	{
 		RendererItem* itemToDraw = &m_items[itemNumber];
 		ItemInfo* nativeItem = &g_Level.Items[itemNumber];

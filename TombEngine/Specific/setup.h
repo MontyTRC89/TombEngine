@@ -6,8 +6,6 @@ struct ItemInfo;
 struct CollisionInfo;
 enum ZoneType : char;
 
-constexpr auto UNIT_SHADOW = 256;
-constexpr auto NO_SHADOW = 0;
 constexpr auto DEFAULT_RADIUS = 10;
 constexpr auto ROT_X = 0x0004;
 constexpr auto ROT_Y = 0x0008;
@@ -49,7 +47,7 @@ struct ObjectInfo
 	short HitPoints; 
 	short pivotLength; 
 	short radius; 
-	short shadowSize; 
+	bool castsShadow; 
 	short biteOffset; 
 	bool loaded;
 	bool intelligent;
