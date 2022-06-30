@@ -114,13 +114,13 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	
 	DoAlphaTest(output.Color);
 
-	float3 colorMul = input.Color.xyz;
+	float3 colorMul = input.Color.xyz * AmbientLight.xyz;
 
 	float3 normal = NormalTexture.Sample(Sampler, input.UV).rgb;
 	normal = normal * 2 - 1;
 	normal = normalize(mul(input.TBN, normal));
 
-	float3 lighting = AmbientLight.xyz;
+	float3 lighting = 0;
 
 	for (int i = 0; i < NumLights; i++)
 	{
@@ -147,7 +147,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	}
 
 	output.Color.xyz *= colorMul.xyz;
-	output.Color.xyz *= lighting.xyz;
+	output.Color.xyz += lighting.xyz;
 
 	output.Depth = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :

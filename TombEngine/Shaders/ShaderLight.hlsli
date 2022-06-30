@@ -98,12 +98,8 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 
 	lightVec = normalize(lightVec);
 	float d = saturate(dot(n, lightVec));
-	if (d < 0)
-	{
-		return float3(0, 0, 0);
-	}
 
-	float attenuation = pow(((radius - distance) / radius), 2);
+	float attenuation = ((radius - distance) / radius);
 
 	return (color * attenuation * d);
 }
