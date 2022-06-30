@@ -1,4 +1,5 @@
 #pragma once
+#include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
 struct CollisionInfo;
@@ -6,6 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
+	SpeedboatInfo* GetSpeedboatInfo(ItemInfo* speedboatItem);
 	void InitialiseSpeedboat(short itemNumber);
 
 	void SpeedboatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
@@ -19,6 +21,8 @@ namespace TEN::Entities::Vehicles
 	void DoSpeedboatImpact(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection);
 
 	VehicleImpactDirection SpeedboatDynamics(short itemNumber, ItemInfo* laraItem);
-	void SpeedboatDoBoatShift(ItemInfo* speedboatItem, int itemNumber);
-	void SpeedboatSplash(ItemInfo* speedboatItem, long verticalVelocity, long water);
+	void DoSpeedboatBoatShift(ItemInfo* speedboatItem, int itemNumber);
+
+	// DEPRECATED:
+	void DoSpeedboatSplashEffect(ItemInfo* speedboatItem, long verticalVelocity, long water);
 }

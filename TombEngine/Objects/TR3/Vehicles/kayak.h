@@ -1,4 +1,5 @@
 #pragma once
+#include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 
 struct CollisionInfo;
@@ -6,6 +7,7 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
+	KayakInfo* GetKayakInfo(ItemInfo* kayakItem);
 	void InitialiseKayak(short itemNumber);
 
 	void KayakPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
@@ -17,7 +19,7 @@ namespace TEN::Entities::Vehicles
 	void KayakDoCurrent(ItemInfo* kayakItem, ItemInfo* laraItem);
 
 	void DoKayakMount(ItemInfo* kayakItem, ItemInfo* laraItem, VehicleMountType mountType);
-	bool KayakCanGetOut(ItemInfo* kayakItem, int dir);
+	bool KayakCanGetOut(ItemInfo* kayakItem, int direction);
 	void KayakLaraRapidsDrown(ItemInfo* laraItem);
 
 	void KayakDraw(ItemInfo* kayakItem);

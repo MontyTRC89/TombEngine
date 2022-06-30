@@ -348,7 +348,7 @@ namespace TEN::Entities::Vehicles
 		return verticalVelocity;
 	}
 
-	int DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos)
+	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos)
 	{
 		auto alignedPos = *pos / SECTOR(1);
 		auto alignedOldPos = *oldPos / SECTOR(1);
@@ -515,8 +515,8 @@ namespace TEN::Entities::Vehicles
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 	{
 		axisCoeff *= invert ? -1 : 1;
-
 		int sign = std::copysign(1, axisCoeff);
+
 		short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
 		short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
 

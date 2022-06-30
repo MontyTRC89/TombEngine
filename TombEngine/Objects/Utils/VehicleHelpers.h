@@ -51,11 +51,11 @@ namespace TEN::Entities::Vehicles
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 
-	void DoVehicleCollision(ItemInfo* vehicleItem, int radius);
-	int	 DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos);
-	int  DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos);
-	int  DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate);
-	void DoVehicleFlareDiscard(ItemInfo* laraItem);
+	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
+	int	  DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos);
+	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos);
+	int   DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate);
+	void  DoVehicleFlareDiscard(ItemInfo* laraItem);
 
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
 	void  ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);

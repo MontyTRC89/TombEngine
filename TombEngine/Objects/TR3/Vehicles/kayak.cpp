@@ -1,15 +1,11 @@
 #include "framework.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 
-#include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/collide_room.h"
-#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
@@ -532,9 +528,7 @@ namespace TEN::Entities::Vehicles
 		int slip = 0; // Remnant?
 		if (slip || impactDirection != VehicleImpactDirection::None)
 		{
-			int newVelocity;
-
-			newVelocity = (kayakItem->Pose.Position.z - oldPos[8].z) * phd_cos(kayakItem->Pose.Orientation.y) + (kayakItem->Pose.Position.x - oldPos[8].x) * phd_sin(kayakItem->Pose.Orientation.y);
+			int newVelocity = (kayakItem->Pose.Position.z - oldPos[8].z) * phd_cos(kayakItem->Pose.Orientation.y) + (kayakItem->Pose.Position.x - oldPos[8].x) * phd_sin(kayakItem->Pose.Orientation.y);
 			newVelocity *= VEHICLE_VELOCITY_SCALE;
 
 			if (slip)
@@ -883,7 +877,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_LEFT &&
 				frame == 83)
 			{
-				Vector3Int vec = { 0, 350, 500 };
+				auto vec = Vector3Int(0, 350, 500);
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
@@ -891,9 +885,9 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.y = kayakItem->Pose.Orientation.y - ANGLE(90.0f);
 				laraItem->Pose.Orientation.z = 0;
+				laraItem->Animation.IsAirborne = true;
 				laraItem->Animation.Velocity = 40;
 				laraItem->Animation.VerticalVelocity = -50;
-				laraItem->Animation.IsAirborne = true;
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 				kayak->LeftRightPaddleCount = 0;
@@ -905,7 +899,7 @@ namespace TEN::Entities::Vehicles
 			if (laraItem->Animation.AnimNumber == Objects[ID_KAYAK_LARA_ANIMS].animIndex + KAYAK_ANIM_DISMOUNT_RIGHT &&
 				frame == 83)
 			{
-				Vector3Int vec = { 0, 350, 500 };
+				auto vec = Vector3Int(0, 350, 500);
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				SetAnimation(laraItem, LA_JUMP_FORWARD);
@@ -968,11 +962,11 @@ namespace TEN::Entities::Vehicles
 
 		for (int i = 0; i < numRoomsToCheck; i++)
 		{
-			short itemNum = g_Level.Rooms[roomsToCheck[i]].itemNumber;
+			short itemNumber = g_Level.Rooms[roomsToCheck[i]].itemNumber;
 
-			while (itemNum != NO_ITEM)
+			while (itemNumber != NO_ITEM)
 			{
-				auto* item = &g_Level.Items[itemNum];
+				auto* item = &g_Level.Items[itemNumber];
 				short nextItem = item->NextItem;
 
 				if (item->Collidable && item->Status != ITEM_INVISIBLE)
@@ -1001,20 +995,20 @@ namespace TEN::Entities::Vehicles
 					}
 				}
 
-				itemNum = nextItem;
+				itemNumber = nextItem;
 			}
 		}
 	}
 
 	void KayakLaraRapidsDrown(ItemInfo* laraItem)
 	{
-		// Already drowning...
+		// Already drowning.
 		if (laraItem->HitPoints <= 0)
 			return;
 
 		auto* lara = GetLaraInfo(laraItem);
 
-		// Prevent engaging in flycheat mode
+		// Prevent engaging in flycheat mode.
 		if (lara->Control.WaterStatus == WaterStatus::FlyCheat)
 			return;
 

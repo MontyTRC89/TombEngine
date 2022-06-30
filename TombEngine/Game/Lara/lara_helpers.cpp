@@ -338,8 +338,8 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 {
 	axisCoeff *= invert ? -1 : 1;
-
 	int sign = std::copysign(1, axisCoeff);
+
 	short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
 
@@ -364,7 +364,7 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
-		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
+		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign; // TODO: Normalise instead of clamping?
 	}
 
 	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);

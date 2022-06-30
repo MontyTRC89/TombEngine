@@ -1,28 +1,22 @@
 #include "framework.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
 
-#include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
-#include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
-#include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_one_gun.h"
 #include "Game/effects/simple_particle.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
+#include "Objects/Utils/VehicleHelpers.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/prng.h"
 #include "Specific/setup.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Input;
-using namespace TEN::Math::Random;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -72,9 +66,9 @@ namespace TEN::Entities::Vehicles
 		SKIDOO_STATE_DISMOUNT_LEFT = 7,
 		SKIDOO_STATE_IDLE = 8,
 		SKIDOO_STATE_DISMOUNT_RIGHT = 9,
-		SKIDOO_STATE_JUMP_OFF = 10,
-		SKIDOO_STATE_DEATH = 11,
-		SKIDOO_STATE_FALLOFF = 12
+		SKIDOO_STATE_DISMOUNT_JUMP = 10,
+		SKIDOO_STATE_IDLE_DEATH = 11,
+		SKIDOO_STATE_DRIVE_DEATH = 12
 	};
 
 	enum SkidooAnim
@@ -99,7 +93,7 @@ namespace TEN::Entities::Vehicles
 		SKIDOO_ANIM_UNK = 17, // TODO
 		SKIDOO_ANIM_MOUNT_LEFT = 18,
 		SKIDOO_ANIM_DISMOUNT_LEFT = 19,
-		SKIDOO_ANIM_FALL_OFF = 20,
+		SKIDOO_ANIM_FALL_OFF = 20, // DISMOUNT_JUMP?
 		SKIDOO_ANIM_IDLE_DEATH = 21,
 		SKIDOO_ANIM_FALL_DEATH = 22
 	};
@@ -176,7 +170,7 @@ namespace TEN::Entities::Vehicles
 			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			dead = true;
 		}
-		else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF)
+		else if (laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_JUMP)
 		{
 			dead = true;
 			collide = VehicleImpactDirection::None;
@@ -197,7 +191,7 @@ namespace TEN::Entities::Vehicles
 			case SKIDOO_STATE_MOUNT:
 			case SKIDOO_STATE_DISMOUNT_RIGHT:
 			case SKIDOO_STATE_DISMOUNT_LEFT:
-			case SKIDOO_STATE_JUMP_OFF:
+			case SKIDOO_STATE_DISMOUNT_JUMP:
 				drive = -1;
 				collide = VehicleImpactDirection::None;
 
@@ -263,7 +257,7 @@ namespace TEN::Entities::Vehicles
 			ItemNewRoom(lara->ItemNumber, probe.RoomNumber);
 		}
 
-		if (laraItem->Animation.ActiveState != SKIDOO_STATE_FALLOFF)
+		if (laraItem->Animation.ActiveState != SKIDOO_STATE_DRIVE_DEATH)
 		{
 			laraItem->Pose.Position = skidooItem->Pose.Position;
 			laraItem->Pose.Orientation.y = skidooItem->Pose.Orientation.y;
@@ -394,8 +388,7 @@ namespace TEN::Entities::Vehicles
 		else if (laraItem->Animation.ActiveState != SKIDOO_STATE_FALL &&
 			impactDirection != VehicleImpactDirection::None && !dead)
 		{
-			if (laraItem->Animation.ActiveState != SKIDOO_STATE_IMPACT)
-				DoSkidooImpact(skidooItem, laraItem, impactDirection);
+			DoSkidooImpact(skidooItem, laraItem, impactDirection);
 		}
 		else
 		{
@@ -405,7 +398,7 @@ namespace TEN::Entities::Vehicles
 
 				if (dead)
 				{
-					laraItem->Animation.TargetState = SKIDOO_STATE_DEATH;
+					laraItem->Animation.TargetState = SKIDOO_STATE_IDLE_DEATH;
 					break;
 				}
 
@@ -450,7 +443,7 @@ namespace TEN::Entities::Vehicles
 					laraItem->Animation.TargetState = SKIDOO_STATE_IDLE;
 
 				if (dead)
-					laraItem->Animation.TargetState = SKIDOO_STATE_FALLOFF;
+					laraItem->Animation.TargetState = SKIDOO_STATE_DRIVE_DEATH;
 				else if (TrInput & VEHICLE_IN_LEFT)
 				{
 					if (skidooItem->Animation.Velocity >= 0)
@@ -505,7 +498,7 @@ namespace TEN::Entities::Vehicles
 					SoundEffect(SFX_TR2_VEHICLE_IMPACT3, &skidooItem->Pose);
 				}
 				else if (skidooItem->Animation.VerticalVelocity > (SKIDOO_DAMAGE_START + SKIDOO_DAMAGE_LENGTH))
-					laraItem->Animation.TargetState = SKIDOO_STATE_JUMP_OFF;
+					laraItem->Animation.TargetState = SKIDOO_STATE_DISMOUNT_JUMP;
 
 				break;
 			}
@@ -588,7 +581,7 @@ namespace TEN::Entities::Vehicles
 				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 			}
-			else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF &&
+			else if (laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_JUMP &&
 				(skidooItem->Pose.Position.y == skidooItem->Floor || TestLastFrame(laraItem)))
 			{
 				SetAnimation(laraItem, LA_FREEFALL);
@@ -628,6 +621,9 @@ namespace TEN::Entities::Vehicles
 
 	void DoSkidooImpact(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
 	{
+		if (laraItem->Animation.ActiveState == SKIDOO_STATE_IMPACT)
+			return;
+
 		switch (impactDirection)
 		{
 		default:
@@ -810,9 +806,7 @@ namespace TEN::Entities::Vehicles
 	void DoSnowEffect(ItemInfo* skidooItem)
 	{
 		auto material = GetCollision(skidooItem).BottomBlock->Material;
-		if (material != FLOOR_MATERIAL::Ice && material != FLOOR_MATERIAL::Snow)
-			return;
-
-		TEN::Effects::TriggerSnowmobileSnow(skidooItem);
+		if (material == FLOOR_MATERIAL::Ice || material == FLOOR_MATERIAL::Snow)
+			TEN::Effects::TriggerSnowmobileSnow(skidooItem);
 	}
 }

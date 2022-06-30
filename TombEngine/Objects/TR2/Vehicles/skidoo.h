@@ -1,7 +1,9 @@
 #pragma once
-#include "Game/collision/collide_room.h"
-#include "Game/items.h"
+#include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
+
+struct CollisionInfo;
+struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
