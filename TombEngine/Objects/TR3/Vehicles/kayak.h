@@ -13,10 +13,8 @@ namespace TEN::Entities::Vehicles
 	void KayakUserInput(ItemInfo* kayakItem, ItemInfo* laraItem);
 
 	void KayakToBackground(ItemInfo* kayakItem, ItemInfo* laraItem);
-	void KayakToItemCollision(ItemInfo* kayakItem, ItemInfo* laraItem);
-
+	void KayakToEntityCollision(ItemInfo* kayakItem, ItemInfo* laraItem);
 	void KayakDoCurrent(ItemInfo* kayakItem, ItemInfo* laraItem);
-	int KayakDoShift(ItemInfo* kayakItem, Vector3Int* pos, Vector3Int* old);
 
 	void DoKayakMount(ItemInfo* kayakItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool KayakCanGetOut(ItemInfo* kayakItem, int dir);

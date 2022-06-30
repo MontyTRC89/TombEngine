@@ -213,102 +213,6 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	static int DoMotorbikeShift(ItemInfo* motorbikeItem, Vector3Int* pos, Vector3Int* old)
-	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
-
-		if (x == oldX)
-		{
-			if (z == oldZ)
-			{
-				motorbikeItem->Pose.Position.z += old->z - pos->z;
-				motorbikeItem->Pose.Position.x += old->x - pos->x;
-			}
-			else if (z > oldZ)
-			{
-				motorbikeItem->Pose.Position.z -= shiftZ + 1;
-				return (pos->x - motorbikeItem->Pose.Position.x);
-			}
-			else
-			{
-				motorbikeItem->Pose.Position.z += SECTOR(1) - shiftZ;
-				return (motorbikeItem->Pose.Position.x - pos->x);
-			}
-		}
-		else if (z == oldZ)
-		{
-			if (x > oldX)
-			{
-				motorbikeItem->Pose.Position.x -= shiftX + 1;
-				return (motorbikeItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				motorbikeItem->Pose.Position.x += SECTOR(1) - shiftX;
-				return (pos->z - motorbikeItem->Pose.Position.z);
-			}
-		}
-		else
-		{
-			x = 0;
-			z = 0;
-
-			int floorHeight = GetCollision(old->x, pos->y, pos->z, motorbikeItem->RoomNumber).Position.Floor;
-			if (floorHeight < (old->y - CLICK(1)))
-			{
-				if (pos->z > old->z)
-					z = -shiftZ - 1;
-				else
-					z = SECTOR(1) - shiftZ;
-			}
-
-			floorHeight = GetCollision(pos->x, pos->y, old->z, motorbikeItem->RoomNumber).Position.Floor;
-			if (floorHeight < (old->y - CLICK(1)))
-			{
-				if (pos->x > old->x)
-					x = -shiftX - 1;
-				else
-					x = SECTOR(1) - shiftX;
-			}
-
-			if (x && z)
-			{
-				motorbikeItem->Pose.Position.z += z;
-				motorbikeItem->Pose.Position.x += x;
-			}
-			else if (z)
-			{
-				motorbikeItem->Pose.Position.z += z;
-
-				if (z > 0)
-					return (motorbikeItem->Pose.Position.x - pos->x);
-				else
-					return (pos->x - motorbikeItem->Pose.Position.x);
-			}
-			else if (x)
-			{
-				motorbikeItem->Pose.Position.x += x;
-
-				if (x > 0)
-					return (pos->z - motorbikeItem->Pose.Position.z);
-				else
-					return (motorbikeItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				motorbikeItem->Pose.Position.z += old->z - pos->z;
-				motorbikeItem->Pose.Position.x += old->x - pos->x;
-			}
-		}
-
-		return 0;
-	}
-
 	static void DrawMotorbikeLight(ItemInfo* motorbikeItem)
 	{
 		auto* motorbike = GetMotorbikeInfo(motorbikeItem);
@@ -631,33 +535,33 @@ namespace TEN::Entities::Vehicles
 		int hfl = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, -MOTORBIKE_SIDE, false, &frontLeft);
 		if (hfl < rightLeftOld.y - CLICK(1))
 		{
-			rot1 = abs(4 * DoMotorbikeShift(motorbikeItem, &frontLeft, &rightLeftOld));
+			rot1 = abs(4 * DoVehicleShift(motorbikeItem, &frontLeft, &rightLeftOld));
 		}
 
 		int hbl = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, -MOTORBIKE_SIDE, false, &backLeft);
 		if (hbl < backLeftOld.y - CLICK(1))
 		{
 			if (rot1)
-				rot1 += abs(4 * DoMotorbikeShift(motorbikeItem, &backLeft, &backLeftOld));
+				rot1 += abs(4 * DoVehicleShift(motorbikeItem, &backLeft, &backLeftOld));
 			else
-				rot1 -= abs(4 * DoMotorbikeShift(motorbikeItem, &backLeft, &backLeftOld));
+				rot1 -= abs(4 * DoVehicleShift(motorbikeItem, &backLeft, &backLeftOld));
 		}
 
 		int hmtf = GetVehicleHeight(motorbikeItem, MOTORBIKE_FRONT, CLICK(0.5f), false, &mtf);
 		if (hmtf < mtf_old.y - CLICK(1))
-			rot2 -= abs(4 * DoMotorbikeShift(motorbikeItem, &backLeft, &backLeftOld));
+			rot2 -= abs(4 * DoVehicleShift(motorbikeItem, &backLeft, &backLeftOld));
 
 		int hmtb = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, 0, false, &mtb);
 		if (hmtb < mtb_old.y - CLICK(1))
-			DoMotorbikeShift(motorbikeItem, &mtb, &mtb_old);
+			DoVehicleShift(motorbikeItem, &mtb, &mtb_old);
 
 		int hbr = GetVehicleHeight(motorbikeItem, -MOTORBIKE_FRONT, CLICK(0.5f), false, &backRight);
 		if (hbr < backRightOld.y - CLICK(1))
 		{
 			if (rot2)
-				rot2 -= abs(4 * DoMotorbikeShift(motorbikeItem, &backLeft, &backLeftOld));
+				rot2 -= abs(4 * DoVehicleShift(motorbikeItem, &backLeft, &backLeftOld));
 			else
-				rot2 += abs(4 * DoMotorbikeShift(motorbikeItem, &backLeft, &backLeftOld));
+				rot2 += abs(4 * DoVehicleShift(motorbikeItem, &backLeft, &backLeftOld));
 		}
 
 		if (rot1)
@@ -665,7 +569,7 @@ namespace TEN::Entities::Vehicles
 
 		floorHeight = GetCollision(motorbikeItem).Position.Floor;
 		if (floorHeight < (motorbikeItem->Pose.Position.y - CLICK(1)))
-			DoMotorbikeShift(motorbikeItem, (Vector3Int*)&motorbikeItem->Pose, &oldPos);
+			DoVehicleShift(motorbikeItem, (Vector3Int*)&motorbikeItem->Pose, &oldPos);
 
 		if (!motorbike->Velocity)
 			rot2 = 0;

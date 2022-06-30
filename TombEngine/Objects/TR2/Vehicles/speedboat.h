@@ -20,7 +20,5 @@ namespace TEN::Entities::Vehicles
 
 	VehicleImpactDirection SpeedboatDynamics(short itemNumber, ItemInfo* laraItem);
 	void SpeedboatDoBoatShift(ItemInfo* speedboatItem, int itemNumber);
-	short SpeedboatDoShift(ItemInfo* speedboatItem, Vector3Int* pos, Vector3Int* old);
-
 	void SpeedboatSplash(ItemInfo* speedboatItem, long verticalVelocity, long water);
 }

@@ -304,6 +304,7 @@ namespace TEN::Entities::Vehicles
 	}
 
 	// Temp. for reference. Flag parameter was unused. @Sezz 2022.06.30
+	// TODO: Adapt damage application.
 	int DoJeepDynamics(ItemInfo* laraItem, int height, int verticalVelocity, int* yPos, int flags)
 	{
 		if (height <= *yPos)
@@ -345,6 +346,107 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return verticalVelocity;
+	}
+
+	int DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos)
+	{
+		int	x = pos->x / SECTOR(1);
+		int z = pos->z / SECTOR(1);
+		int xOld = oldPos->x / SECTOR(1);
+		int zOld = oldPos->z / SECTOR(1);
+		int shiftX = pos->x & (SECTOR(1) - 1);
+		int shiftZ = pos->z & (SECTOR(1) - 1);
+
+		if (x == xOld)
+		{
+			if (z == zOld)
+			{
+				vehicleItem->Pose.Position.z += (oldPos->z - pos->z);
+				vehicleItem->Pose.Position.x += (oldPos->x - pos->x);
+			}
+			else if (z > zOld)
+			{
+				vehicleItem->Pose.Position.z -= shiftZ + 1;
+				return (pos->x - vehicleItem->Pose.Position.x);
+			}
+			else
+			{
+				vehicleItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				return (vehicleItem->Pose.Position.x - pos->x);
+			}
+		}
+		else if (z == zOld)
+		{
+			if (x > xOld)
+			{
+				vehicleItem->Pose.Position.x -= shiftX + 1;
+				return (vehicleItem->Pose.Position.z - pos->z);
+			}
+			else
+			{
+				vehicleItem->Pose.Position.x += SECTOR(1) - shiftX;
+				return (pos->z - vehicleItem->Pose.Position.z);
+			}
+		}
+		else
+		{
+			x = 0;
+			z = 0;
+
+			auto probe = GetCollision(oldPos->x, pos->y, pos->z, vehicleItem->RoomNumber);
+			if (probe.Position.Floor < (oldPos->y - CLICK(1)))
+			{
+				if (pos->z > oldPos->z)
+					z = -shiftZ - 1;
+				else
+					z = SECTOR(1) - shiftZ;
+			}
+
+			probe = GetCollision(pos->x, pos->y, oldPos->z, vehicleItem->RoomNumber);
+			if (probe.Position.Floor < (oldPos->y - CLICK(1)))
+			{
+				if (pos->x > oldPos->x)
+					x = -shiftX - 1;
+				else
+					x = SECTOR(1) - shiftX;
+			}
+
+			// NOTE: Commented lines are skidoo-specific. Likely unnecessary but keeping for reference. @Sezz 2022.06.30
+			if (x && z)
+			{
+				vehicleItem->Pose.Position.z += z;
+				vehicleItem->Pose.Position.x += x;
+				//vehicleItem->Animation.Velocity -= 50;
+			}
+			else if (z)
+			{
+				vehicleItem->Pose.Position.z += z;
+				//vehicleItem->Animation.Velocity -= 50;
+
+				if (z > 0)
+					return (vehicleItem->Pose.Position.x - pos->x);
+				else
+					return (pos->x - vehicleItem->Pose.Position.x);
+			}
+			else if (x)
+			{
+				vehicleItem->Pose.Position.x += x;
+				//vehicleItem->Animation.Velocity -= 50;
+
+				if (x > 0)
+					return (pos->z - vehicleItem->Pose.Position.z);
+				else
+					return (vehicleItem->Pose.Position.z - pos->z);
+			}
+			else
+			{
+				vehicleItem->Pose.Position.z += oldPos->z - pos->z;
+				vehicleItem->Pose.Position.x += oldPos->x - pos->x;
+				//vehicleItem->Animation.Velocity -= 50;
+			}
+		}
+
+		return 0;
 	}
 
 	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate)

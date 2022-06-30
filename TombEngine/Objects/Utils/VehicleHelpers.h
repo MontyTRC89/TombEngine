@@ -53,6 +53,7 @@ namespace TEN::Entities::Vehicles
 
 	void DoVehicleCollision(ItemInfo* vehicleItem, int radius);
 	int	 DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos);
+	int  DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos);
 	int  DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate);
 	void DoVehicleFlareDiscard(ItemInfo* laraItem);
 

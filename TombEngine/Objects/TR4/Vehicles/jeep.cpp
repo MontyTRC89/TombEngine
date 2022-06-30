@@ -229,105 +229,6 @@ namespace TEN::Entities::Vehicles
 		AnimateItem(laraItem);
 	}
 
-	static int DoJeepShift(ItemInfo* jeepItem, Vector3Int* pos, Vector3Int* old)
-	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
-		int shiftX = pos->x & (WALL_SIZE - 1);
-		int shiftZ = pos->z & (WALL_SIZE - 1);
-
-		if (x == oldX)
-		{
-			if (z == oldZ)
-			{
-				jeepItem->Pose.Position.z += (old->z - pos->z);
-				jeepItem->Pose.Position.x += (old->x - pos->x);
-			}
-			else if (z > oldZ)
-			{
-				jeepItem->Pose.Position.z -= shiftZ + 1;
-				return (pos->x - jeepItem->Pose.Position.x);
-			}
-			else
-			{
-				jeepItem->Pose.Position.z += WALL_SIZE - 1 - shiftZ;
-				return (jeepItem->Pose.Position.x - pos->x);
-			}
-		}
-
-		if (z == oldZ)
-		{
-			if (x > oldX)
-			{
-				jeepItem->Pose.Position.x -= shiftX + 1;
-				return (jeepItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				jeepItem->Pose.Position.x += WALL_SIZE - 1 - shiftX;
-				return (pos->z - jeepItem->Pose.Position.z);
-			}
-		}
-		
-		x = 0;
-		z = 0;
-
-		short roomNumber = jeepItem->RoomNumber;
-		FloorInfo* floor = GetFloor(old->x, pos->y, pos->z, &roomNumber);
-		int height = GetFloorHeight(floor, old->x, pos->y, pos->z);
-
-		if (height < old->y - STEP_SIZE)
-		{
-			if (pos->z > old->z)
-				z = -1 - shiftZ;
-			else
-				z = WALL_SIZE + 1 - shiftZ;
-		}
-
-		roomNumber = jeepItem->RoomNumber;
-		floor = GetFloor(pos->x, pos->y, old->z, &roomNumber);
-		height = GetFloorHeight(floor, pos->x, pos->y, old->z);
-
-		if (height < old->y - STEP_SIZE)
-		{
-			if (pos->x > old->x)
-				x = -1 - shiftX;
-			else
-				x = WALL_SIZE + 1 - shiftX;
-		}
-
-		if (x && z)
-		{
-			jeepItem->Pose.Position.z += z;
-			jeepItem->Pose.Position.x += x;
-		}
-		
-		if (z)
-		{
-			jeepItem->Pose.Position.z += z;
-			if (z > 0)
-				return (jeepItem->Pose.Position.x - pos->x);
-			else
-				return (pos->x - jeepItem->Pose.Position.x);
-		}
-
-		if (x)
-		{
-			jeepItem->Pose.Position.x += x;
-			if (x > 0)
-				return (pos->z - jeepItem->Pose.Position.z);
-			else
-				return (jeepItem->Pose.Position.z - pos->z);
-		}
-
-		jeepItem->Pose.Position.z += (old->z - pos->z);
-		jeepItem->Pose.Position.x += (old->x - pos->x);
-
-		return 0;
-	}
-
 	static bool JeepCanGetOff(ItemInfo* jeepItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -609,32 +510,32 @@ namespace TEN::Entities::Vehicles
 
 		int hf = GetVehicleHeight(jeepItem, JEEP_FRONT, -JEEP_SIDE, false, &f);
 		if (hf < f_old.y - STEP_SIZE)
-			rot1 = abs(4 * DoJeepShift(jeepItem, &f, &f_old));
+			rot1 = abs(4 * DoVehicleShift(jeepItem, &f, &f_old));
 
 		int hmm = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), -JEEP_SIDE, false, &mm);
 		if (hmm < mm_old.y - STEP_SIZE)
 		{
 			if (rot)
-				rot1 += abs(4 * DoJeepShift(jeepItem, &mm, &mm_old));
+				rot1 += abs(4 * DoVehicleShift(jeepItem, &mm, &mm_old));
 			else
-				rot1 = -abs(4 * DoJeepShift(jeepItem, &mm, &mm_old));
+				rot1 = -abs(4 * DoVehicleShift(jeepItem, &mm, &mm_old));
 		}
 
 		int hb = GetVehicleHeight(jeepItem, JEEP_FRONT, JEEP_SIDE, false, &b);
 		if (hb < b_old.y - STEP_SIZE)
-			rot2 = -abs(4 * DoJeepShift(jeepItem, &b, &b_old));
+			rot2 = -abs(4 * DoVehicleShift(jeepItem, &b, &b_old));
 
 		int hmb = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), 0, false, &mb);
 		if (hmb < mb_old.y - STEP_SIZE)
-			DoJeepShift(jeepItem, &mb, &mb_old);
+			DoVehicleShift(jeepItem, &mb, &mb_old);
 	
 		int hmt = GetVehicleHeight(jeepItem, -(JEEP_FRONT + 50), JEEP_SIDE, false, &mt);
 		if (hmt < mt_old.y - STEP_SIZE)
 		{
 			if (rot2)
-				rot2 -= abs(4 * DoJeepShift(jeepItem, &mt, &mt_old));
+				rot2 -= abs(4 * DoVehicleShift(jeepItem, &mt, &mt_old));
 			else
-				rot2 = abs(4 * DoJeepShift(jeepItem, &mt, &mt_old));
+				rot2 = abs(4 * DoVehicleShift(jeepItem, &mt, &mt_old));
 		}
 
 		if (!rot1)
@@ -643,7 +544,7 @@ namespace TEN::Entities::Vehicles
 		roomNumber = jeepItem->RoomNumber;
 		floor = GetFloor(jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z, &roomNumber);
 		if (GetFloorHeight(floor, jeepItem->Pose.Position.x, jeepItem->Pose.Position.y, jeepItem->Pose.Position.z) < jeepItem->Pose.Position.y - STEP_SIZE)
-			DoJeepShift(jeepItem, (Vector3Int*)&jeepItem->Pose, &oldPos);
+			DoVehicleShift(jeepItem, (Vector3Int*)&jeepItem->Pose, &oldPos);
 
 		if (!jeep->Velocity)
 			rot1 = 0;

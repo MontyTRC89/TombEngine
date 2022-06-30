@@ -313,102 +313,6 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	short SpeedboatDoShift(ItemInfo* speedboatItem, Vector3Int* pos, Vector3Int* old)
-	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
-
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
-
-		if (x == xOld)
-		{
-			if (z == zOld)
-			{
-				speedboatItem->Pose.Position.z += (old->z - pos->z);
-				speedboatItem->Pose.Position.x += (old->x - pos->x);
-			}
-			else if (z > zOld)
-			{
-				speedboatItem->Pose.Position.z -= shiftZ + 1;
-				return (pos->x - speedboatItem->Pose.Position.x);
-			}
-			else
-			{
-				speedboatItem->Pose.Position.z += SECTOR(1) - shiftZ;
-				return (speedboatItem->Pose.Position.x - pos->x);
-			}
-		}
-		else if (z == zOld)
-		{
-			if (x > xOld)
-			{
-				speedboatItem->Pose.Position.x -= shiftX + 1;
-				return (speedboatItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				speedboatItem->Pose.Position.x += SECTOR(1) - shiftX;
-				return (pos->z - speedboatItem->Pose.Position.z);
-			}
-		}
-		else
-		{
-			x = 0;
-			z = 0;
-
-			auto probe = GetCollision(old->x, pos->y, pos->z, speedboatItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
-			{
-				if (pos->z > old->z)
-					z = -shiftZ - 1;
-				else
-					z = SECTOR(1) - shiftZ;
-			}
-
-			probe = GetCollision(pos->x, pos->y, old->z, speedboatItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
-			{
-				if (pos->x > old->x)
-					x = -shiftX - 1;
-				else
-					x = SECTOR(1) - shiftX;
-			}
-
-			if (x && z)
-			{
-				speedboatItem->Pose.Position.z += z;
-				speedboatItem->Pose.Position.x += x;
-			}
-			else if (z)
-			{
-				speedboatItem->Pose.Position.z += z;
-				if (z > 0)
-					return (speedboatItem->Pose.Position.x - pos->x);
-				else
-					return (pos->x - speedboatItem->Pose.Position.x);
-			}
-			else if (x)
-			{
-				speedboatItem->Pose.Position.x += x;
-				if (x > 0)
-					return (pos->z - speedboatItem->Pose.Position.z);
-				else
-					return (speedboatItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				speedboatItem->Pose.Position.z += (old->z - pos->z);
-				speedboatItem->Pose.Position.x += (old->x - pos->x);
-			}
-		}
-
-		return 0;
-	}
-
 	VehicleImpactDirection SpeedboatDynamics(short itemNumber, ItemInfo* laraItem)
 	{
 		auto* speedboatItem = &g_Level.Items[itemNumber];
@@ -454,26 +358,26 @@ namespace TEN::Entities::Vehicles
 		short rotation = 0;
 		auto heightBackLeft = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, &bl);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
-			rotation = SpeedboatDoShift(speedboatItem, &bl, &backLeftOld);
+			rotation = DoVehicleShift(speedboatItem, &bl, &backLeftOld);
 
 		auto heightBackRight = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, false, &br);
 		if (heightBackRight < (backRightOld.y - CLICK(0.5f)))
-			rotation += SpeedboatDoShift(speedboatItem, &br, &backRightOld);
+			rotation += DoVehicleShift(speedboatItem, &br, &backRightOld);
 
 		auto heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, &fl);
 		if (heightFrontLeft < (frontLeftOld.y - CLICK(0.5f)))
-			rotation += SpeedboatDoShift(speedboatItem, &fl, &frontLeftOld);
+			rotation += DoVehicleShift(speedboatItem, &fl, &frontLeftOld);
 
 		auto heightFrontRight = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, false, &fr);
 		if (heightFrontRight < (frontRightOld.y - CLICK(0.5f)))
-			rotation += SpeedboatDoShift(speedboatItem, &fr, &frontRightOld);
+			rotation += DoVehicleShift(speedboatItem, &fr, &frontRightOld);
 
 		int heightFront = 0;
 		if (!slip)
 		{
 			heightFront = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_TIP, 0, false, &f);
 			if (heightFront < (frontOld.y - CLICK(0.5f)))
-				SpeedboatDoShift(speedboatItem, &f, &frontOld);
+				DoVehicleShift(speedboatItem, &f, &frontOld);
 		}
 
 		auto probe = GetCollision(speedboatItem);
@@ -483,7 +387,7 @@ namespace TEN::Entities::Vehicles
 			height = GetFloorHeight(probe.Block, speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z);
 
 		if (height < (speedboatItem->Pose.Position.y - CLICK(0.5f)))
-			SpeedboatDoShift(speedboatItem, (Vector3Int*)&speedboatItem->Pose, &old);
+			DoVehicleShift(speedboatItem, (Vector3Int*)&speedboatItem->Pose, &old);
 
 		speedboat->ExtraRotation = rotation;
 

@@ -317,103 +317,6 @@ namespace TEN::Entities::Vehicles
 			return true;
 	}
 
-	static int DoQuadShift(ItemInfo* quadBikeItem, Vector3Int* pos, Vector3Int* old)
-	{
-		CollisionResult probe;
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int oldX = old->x / SECTOR(1);
-		int oldZ = old->z / SECTOR(1);
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
-
-		if (x == oldX)
-		{
-			if (z == oldZ)
-			{
-				quadBikeItem->Pose.Position.z += (old->z - pos->z);
-				quadBikeItem->Pose.Position.x += (old->x - pos->x);
-			}
-			else if (z > oldZ)
-			{
-				quadBikeItem->Pose.Position.z -= shiftZ + 1;
-				return (pos->x - quadBikeItem->Pose.Position.x);
-			}
-			else
-			{
-				quadBikeItem->Pose.Position.z += SECTOR(1) - shiftZ;
-				return (quadBikeItem->Pose.Position.x - pos->x);
-			}
-		}
-		else if (z == oldZ)
-		{
-			if (x > oldX)
-			{
-				quadBikeItem->Pose.Position.x -= shiftX + 1;
-				return (quadBikeItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				quadBikeItem->Pose.Position.x += SECTOR(1) - shiftX;
-				return (pos->z - quadBikeItem->Pose.Position.z);
-			}
-		}
-		else
-		{
-			x = 0;
-			z = 0;
-
-			probe = GetCollision(old->x, pos->y, pos->z, quadBikeItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
-			{
-				if (pos->z > old->z)
-					z = -shiftZ - 1;
-				else
-					z = SECTOR(1) - shiftZ;
-			}
-
-			probe = GetCollision(pos->x, pos->y, old->z, quadBikeItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
-			{
-				if (pos->x > old->x)
-					x = -shiftX - 1;
-				else
-					x = SECTOR(1) - shiftX;
-			}
-
-			if (x && z)
-			{
-				quadBikeItem->Pose.Position.z += z;
-				quadBikeItem->Pose.Position.x += x;
-			}
-			else if (z)
-			{
-				quadBikeItem->Pose.Position.z += z;
-
-				if (z > 0)
-					return (quadBikeItem->Pose.Position.x - pos->x);
-				else
-					return (pos->x - quadBikeItem->Pose.Position.x);
-			}
-			else if (x)
-			{
-				quadBikeItem->Pose.Position.x += x;
-
-				if (x > 0)
-					return (pos->z - quadBikeItem->Pose.Position.z);
-				else
-					return (quadBikeItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				quadBikeItem->Pose.Position.z += (old->z - pos->z);
-				quadBikeItem->Pose.Position.x += (old->x - pos->x);
-			}
-		}
-
-		return 0;
-	}
-
 	static VehicleImpactDirection QuadDynamics(ItemInfo* quadBikeItem, ItemInfo* laraItem)
 	{
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
@@ -524,28 +427,28 @@ namespace TEN::Entities::Vehicles
 		Vector3Int fl;
 		int heightFrontLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &fl);
 		if (heightFrontLeft < (oldFrontLeft.y - CLICK(1)))
-			rot = DoQuadShift(quadBikeItem, &fl, &oldFrontLeft);
+			rot = DoVehicleShift(quadBikeItem, &fl, &oldFrontLeft);
 
 		Vector3Int mtl;
 		int hmtl = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mtl);
 		if (hmtl < (mtlOld.y - CLICK(1)))
-			DoQuadShift(quadBikeItem, &mtl, &mtlOld);
+			DoVehicleShift(quadBikeItem, &mtl, &mtlOld);
 
 		Vector3Int mml;
 		int hmml = GetVehicleHeight(quadBikeItem, 0, -QBIKE_SIDE, false, &mml);
 		if (hmml < (mmlOld.y - CLICK(1)))
-			DoQuadShift(quadBikeItem, &mml, &mmlOld);
+			DoVehicleShift(quadBikeItem, &mml, &mmlOld);
 
 		Vector3Int mbl;
 		int hmbl = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mbl);
 		if (hmbl < (moldBottomLeft.y - CLICK(1)))
-			DoQuadShift(quadBikeItem, &mbl, &moldBottomLeft);
+			DoVehicleShift(quadBikeItem, &mbl, &moldBottomLeft);
 
 		Vector3Int bl;
 		int heightBackLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, false, &bl);
 		if (heightBackLeft < (oldBottomLeft.y - CLICK(1)))
 		{
-			rotAdd = DoQuadShift(quadBikeItem, &bl, &oldBottomLeft);
+			rotAdd = DoVehicleShift(quadBikeItem, &bl, &oldBottomLeft);
 			if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
 				rot += rotAdd;
 		}
@@ -554,7 +457,7 @@ namespace TEN::Entities::Vehicles
 		int heightFrontRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, &fr);
 		if (heightFrontRight < (oldFrontRight.y - CLICK(1)))
 		{
-			rotAdd = DoQuadShift(quadBikeItem, &fr, &oldFrontRight);
+			rotAdd = DoVehicleShift(quadBikeItem, &fr, &oldFrontRight);
 			if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
 				rot += rotAdd;
 		}
@@ -562,30 +465,30 @@ namespace TEN::Entities::Vehicles
 		Vector3Int mtr;
 		int hmtr = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, false, &mtr);
 		if (hmtr < (mtrOld.y - CLICK(1)))
-			DoQuadShift(quadBikeItem, &mtr, &mtrOld);
+			DoVehicleShift(quadBikeItem, &mtr, &mtrOld);
 
 		Vector3Int mmr;
 		int hmmr = GetVehicleHeight(quadBikeItem, 0, QBIKE_SIDE, false, &mmr);
 		if (hmmr < (mmrOld.y - CLICK(1)))
-			DoQuadShift(quadBikeItem, &mmr, &mmrOld);
+			DoVehicleShift(quadBikeItem, &mmr, &mmrOld);
 
 		Vector3Int mbr;
 		int hmbr = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, false, &mbr);
 		if (hmbr < (moldBottomRight.y - CLICK(1)))
-			DoQuadShift(quadBikeItem, &mbr, &moldBottomRight);
+			DoVehicleShift(quadBikeItem, &mbr, &moldBottomRight);
 
 		Vector3Int br;
 		int heightBackRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, false, &br);
 		if (heightBackRight < (oldBottomRight.y - CLICK(1)))
 		{
-			rotAdd = DoQuadShift(quadBikeItem, &br, &oldBottomRight);
+			rotAdd = DoVehicleShift(quadBikeItem, &br, &oldBottomRight);
 			if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
 				rot += rotAdd;
 		}
 
 		probe = GetCollision(quadBikeItem);
 		if (probe.Position.Floor < quadBikeItem->Pose.Position.y - CLICK(1))
-			DoQuadShift(quadBikeItem, (Vector3Int*)&quadBikeItem->Pose, &old);
+			DoVehicleShift(quadBikeItem, (Vector3Int*)&quadBikeItem->Pose, &old);
 
 		quadBike->ExtraRotation = rot;
 

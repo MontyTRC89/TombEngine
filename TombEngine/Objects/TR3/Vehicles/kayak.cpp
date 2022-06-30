@@ -416,109 +416,6 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	int KayakDoShift(ItemInfo* kayakItem, Vector3Int* pos, Vector3Int* old)
-	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
-
-		int xShift = pos->x & (SECTOR(1) - 1);
-		int zShift = pos->z & (SECTOR(1) - 1);
-
-		if (x == xOld)
-		{
-			old->x = 0;
-
-			if (z == zOld)
-			{
-				kayakItem->Pose.Position.z += old->z - pos->z;
-				kayakItem->Pose.Position.x += old->x - pos->x;
-			}
-			else if (z > zOld)
-			{
-				kayakItem->Pose.Position.z -= zShift + 1;
-				return (pos->x - kayakItem->Pose.Position.x);
-			}
-			else
-			{
-				kayakItem->Pose.Position.z += SECTOR(1) - zShift;
-				return (kayakItem->Pose.Position.x - pos->x);
-			}
-		}
-		else if (z == zOld)
-		{
-			old->z = 0;
-
-			if (x > xOld)
-			{
-				kayakItem->Pose.Position.x -= xShift + 1;
-				return (kayakItem->Pose.Position.z - pos->z);
-			}
-
-			else
-			{
-				kayakItem->Pose.Position.x += SECTOR(1) - xShift;
-				return (pos->z - kayakItem->Pose.Position.z);
-			}
-		}
-		else
-		{
-			x = 0;
-			z = 0;
-
-			auto probe = GetCollision(old->x, pos->y, pos->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
-			{
-				if (pos->z > old->z)
-					z = -zShift - 1;
-				else
-					z = SECTOR(1) - zShift;
-			}
-
-			probe = GetCollision(pos->x, pos->y, old->z, kayakItem->RoomNumber);
-			if (probe.Position.Floor < (old->y - CLICK(1)))
-			{
-				if (pos->x > old->x)
-					x = -xShift - 1;
-				else
-					x = SECTOR(1) - xShift;
-			}
-
-			if (x && z)
-			{
-				kayakItem->Pose.Position.x += x;
-				kayakItem->Pose.Position.z += z;
-			}
-			else if (x)
-			{
-				kayakItem->Pose.Position.x += x;
-
-				if (x > 0)
-					return (pos->z - kayakItem->Pose.Position.z);
-				else
-					return (kayakItem->Pose.Position.z - pos->z);
-			}
-			else if (z)
-			{
-				kayakItem->Pose.Position.z += z;
-
-				if (z > 0)
-					return (kayakItem->Pose.Position.x - pos->x);
-				else
-					return (pos->x - kayakItem->Pose.Position.x);
-			}
-			else
-			{
-				kayakItem->Pose.Position.x += (old->x - pos->x);
-				kayakItem->Pose.Position.z += (old->z - pos->z);
-			}
-		}
-
-		return 0;
-	}
-
 	void KayakToBackground(ItemInfo* kayakItem, ItemInfo* laraItem)
 	{
 		auto* kayak = GetKayakInfo(kayakItem);
@@ -570,28 +467,28 @@ namespace TEN::Entities::Vehicles
 		Vector3Int pos;
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(2.5f), 0, false, &pos)) < (oldPos[7].y - KAYAK_COLLIDE))
-			rot = KayakDoShift(kayakItem, &pos, &oldPos[7]);
+			rot = DoVehicleShift(kayakItem, &pos, &oldPos[7]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(1.25f), CLICK(0.5f), false, &pos)) < (oldPos[6].y - KAYAK_COLLIDE))
-			rot += KayakDoShift(kayakItem, &pos, &oldPos[6]);
+			rot += DoVehicleShift(kayakItem, &pos, &oldPos[6]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(1.25f), -CLICK(0.5f), false, &pos)) < (oldPos[5].y - KAYAK_COLLIDE))
-			rot += KayakDoShift(kayakItem, &pos, &oldPos[5]);
+			rot += DoVehicleShift(kayakItem, &pos, &oldPos[5]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(0.5f), CLICK(0.5f), false, &pos)) < (oldPos[4].y - KAYAK_COLLIDE))
-			rot += KayakDoShift(kayakItem, &pos, &oldPos[4]);
+			rot += DoVehicleShift(kayakItem, &pos, &oldPos[4]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(0.5f), -CLICK(0.5f), false, &pos)) < (oldPos[3].y - KAYAK_COLLIDE))
-			rot += KayakDoShift(kayakItem, &pos, &oldPos[3]);
+			rot += DoVehicleShift(kayakItem, &pos, &oldPos[3]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(2), 96, false, &pos)) < (oldPos[2].y - KAYAK_COLLIDE))
-			rot += KayakDoShift(kayakItem, &pos, &oldPos[2]);
+			rot += DoVehicleShift(kayakItem, &pos, &oldPos[2]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(2), -96, false, &pos)) < (oldPos[1].y - KAYAK_COLLIDE))
-			rot += KayakDoShift(kayakItem, &pos, &oldPos[1]);
+			rot += DoVehicleShift(kayakItem, &pos, &oldPos[1]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(4), 0, false, &pos)) < (oldPos[0].y - KAYAK_COLLIDE))
-			rot += KayakDoShift(kayakItem, &pos, &oldPos[0]);
+			rot += DoVehicleShift(kayakItem, &pos, &oldPos[0]);
 
 		kayakItem->Pose.Orientation.y += rot;
 
@@ -603,7 +500,7 @@ namespace TEN::Entities::Vehicles
 			height2 = probe.Position.Floor;
 
 		if (height2 < (kayakItem->Pose.Position.y - KAYAK_COLLIDE))
-			KayakDoShift(kayakItem, (Vector3Int*)&kayakItem->Pose, &oldPos[8]);
+			DoVehicleShift(kayakItem, (Vector3Int*)&kayakItem->Pose, &oldPos[8]);
 
 		probe = GetCollision(kayakItem);
 		probedRoomNum = probe.RoomNumber;
@@ -1059,7 +956,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	void KayakToItemCollision(ItemInfo* kayakItem, ItemInfo* laraItem)
+	void KayakToEntityCollision(ItemInfo* kayakItem, ItemInfo* laraItem)
 	{
 		short roomsToCheck[128];
 		short numRoomsToCheck = 0;
@@ -1243,7 +1140,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		KayakUpdateWakeFX();
-		KayakToItemCollision(kayakItem, laraItem);
+		KayakToEntityCollision(kayakItem, laraItem);
 
 		return (lara->Vehicle != NO_ITEM) ? true : false;
 	}

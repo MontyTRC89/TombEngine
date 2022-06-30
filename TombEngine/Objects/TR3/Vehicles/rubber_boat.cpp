@@ -254,102 +254,6 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	static int DoRubberBoatShift2(ItemInfo* rBoatItem, Vector3Int* pos, Vector3Int* old)
-	{
-		int x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-
-		int xOld = old->x / SECTOR(1);
-		int zOld = old->z / SECTOR(1);
-
-		int xShift = pos->x & (SECTOR(1) - 1);
-		int zShift = pos->z & (SECTOR(1) - 1);
-
-		if (x == xOld)
-		{
-			if (z == zOld)
-			{
-				rBoatItem->Pose.Position.z += (old->z - pos->z);
-				rBoatItem->Pose.Position.x += (old->x - pos->x);
-			}
-			else if (z > zOld)
-			{
-				rBoatItem->Pose.Position.z -= zShift + 1;
-				return (pos->x - rBoatItem->Pose.Position.x);
-			}
-			else
-			{
-				rBoatItem->Pose.Position.z += SECTOR(1) - zShift;
-				return (rBoatItem->Pose.Position.x - pos->x);
-			}
-		}
-		else if (z == zOld)
-		{
-			if (x > xOld)
-			{
-				rBoatItem->Pose.Position.x -= xShift + 1;
-				return (rBoatItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				rBoatItem->Pose.Position.x += SECTOR(1) - xShift;
-				return (pos->z - rBoatItem->Pose.Position.z);
-			}
-		}
-		else
-		{
-			x = 0;
-			z = 0;
-
-			int height = GetCollision(old->x, pos->y, pos->z, rBoatItem->RoomNumber).Position.Floor;
-			if (height < (old->y - CLICK(1)))
-			{
-				if (pos->z > old->z)
-					z = -zShift - 1;
-				else
-					z = SECTOR(1) - zShift;
-			}
-
-			height = GetCollision(pos->x, pos->y, old->z, rBoatItem->RoomNumber).Position.Floor;
-			if (height < (old->y - CLICK(1)))
-			{
-				if (pos->x > old->x)
-					x = -xShift - 1;
-				else
-					x = SECTOR(1) - xShift;
-			}
-
-			if (x && z)
-			{
-				rBoatItem->Pose.Position.z += z;
-				rBoatItem->Pose.Position.x += x;
-			}
-			else if (z)
-			{
-				rBoatItem->Pose.Position.z += z;
-				if (z > 0)
-					return (rBoatItem->Pose.Position.x - pos->x);
-				else
-					return (pos->x - rBoatItem->Pose.Position.x);
-			}
-			else if (x)
-			{
-				rBoatItem->Pose.Position.x += x;
-				if (x > 0)
-					return (pos->z - rBoatItem->Pose.Position.z);
-				else
-					return (rBoatItem->Pose.Position.z - pos->z);
-			}
-			else
-			{
-				rBoatItem->Pose.Position.z += (old->z - pos->z);
-				rBoatItem->Pose.Position.x += (old->x - pos->x);
-			}
-		}
-
-		return 0;
-	}
-
 	static VehicleImpactDirection RubberBoatDynamics(short itemNumber, ItemInfo* laraItem)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
@@ -405,25 +309,25 @@ namespace TEN::Entities::Vehicles
 
 		int heightBackLeft = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, false, &backLeft);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
-			rotation = DoRubberBoatShift2(rBoatItem, &backLeft, &backLeftOld);
+			rotation = DoVehicleShift(rBoatItem, &backLeft, &backLeftOld);
 
 		int heightBackRight = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, false, &backRight);
 		if (heightBackRight < (backRightOld.y - CLICK(0.5f)))
-			rotation += DoRubberBoatShift2(rBoatItem, &backRight, &backRightOld);
+			rotation += DoVehicleShift(rBoatItem, &backRight, &backRightOld);
 
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, false, &frontLeft);
 		if (heightFrontLeft < (frontLeftOld.y - CLICK(0.5f)))
-			rotation += DoRubberBoatShift2(rBoatItem, &frontLeft, &frontLeftOld);
+			rotation += DoVehicleShift(rBoatItem, &frontLeft, &frontLeftOld);
 
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, false, &frontRight);
 		if (heightFrontRight < (frontRightOld.y - CLICK(0.5f)))
-			rotation += DoRubberBoatShift2(rBoatItem, &frontRight, &frontRightOld);
+			rotation += DoVehicleShift(rBoatItem, &frontRight, &frontRightOld);
 
 		if (!slip)
 		{
 			int heightFront = GetVehicleWaterHeight(rBoatItem, 1000, 0, false, &front);
 			if (heightFront < (frontOld.y - CLICK(0.5f)))
-				DoRubberBoatShift2(rBoatItem, &front, &frontOld);
+				DoVehicleShift(rBoatItem, &front, &frontOld);
 		}
 
 		short roomNumber = rBoatItem->RoomNumber;
@@ -434,7 +338,7 @@ namespace TEN::Entities::Vehicles
 			height = GetFloorHeight(floor, rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z);
 
 		if (height < (rBoatItem->Pose.Position.y - CLICK(0.5f)))
-			DoRubberBoatShift2(rBoatItem, (Vector3Int*)&rBoatItem->Pose, &old);
+			DoVehicleShift(rBoatItem, (Vector3Int*)&rBoatItem->Pose, &old);
 
 		DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
 
