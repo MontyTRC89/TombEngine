@@ -32,7 +32,7 @@ namespace TEN::Effects::Environment
 	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 20.0f;
 	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR = 1.0f - (1.0f / (WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE * 2));
 
-	constexpr auto DUST_SPAWN_DENSITY = 512;
+	constexpr auto DUST_SPAWN_DENSITY = 300;
 	constexpr auto DUST_LIFE = 40;
 	constexpr auto DUST_MAX_SPEED = 1.0f;
 	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
@@ -264,8 +264,22 @@ namespace TEN::Effects::Environment
 
 			auto oldPos = p.Position;
 			p.Position.x += p.Velocity.x;
-			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
 			p.Position.z += p.Velocity.z;
+
+			switch (p.Type)
+			{
+			case WeatherType::None:
+				p.Position.y += p.Velocity.y;
+				break;
+
+			case WeatherType::Snow:
+				p.Position.y += (std::clamp(p.Velocity.y, 0.0f, 8.0f) / 2.0f);
+				break;
+
+			case WeatherType::Rain:
+				p.Position.y += (std::clamp(p.Velocity.y, 0.0f, 12.0f) / 2.0f);
+				break;
+			}
 
 			// Particle is inert, don't check collisions.
 

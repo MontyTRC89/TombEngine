@@ -315,7 +315,6 @@ namespace TEN::Renderer
 		int m_blinkColorValue;
 		int m_blinkColorDirection;
 		bool m_blinkUpdated = false;
-		int m_currentY;
 
 		// System resources
 		Texture2D m_logo;
@@ -388,6 +387,7 @@ namespace TEN::Renderer
 		int m_biggestRoomIndexBuffer = 0;
 		int m_numRoomsTransparentPolygons;
 		int m_numPolygons = 0;
+		int m_currentY;
 
 		RENDERER_DEBUG_PAGE m_numDebugPage = NO_PAGE;
 
