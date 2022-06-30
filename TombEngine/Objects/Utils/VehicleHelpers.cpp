@@ -350,90 +350,90 @@ namespace TEN::Entities::Vehicles
 
 	int DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos)
 	{
-		int	x = pos->x / SECTOR(1);
-		int z = pos->z / SECTOR(1);
-		int xOld = oldPos->x / SECTOR(1);
-		int zOld = oldPos->z / SECTOR(1);
-		int shiftX = pos->x & (SECTOR(1) - 1);
-		int shiftZ = pos->z & (SECTOR(1) - 1);
+		auto alignedPos = *pos / SECTOR(1);
+		auto alignedOldPos = *oldPos / SECTOR(1);
+		auto alignedShift = Vector3Int(
+			pos->x & (SECTOR(1) - 1),
+			0,
+			pos->z & (SECTOR(1) - 1)
+		);
 
-		if (x == xOld)
+		if (alignedPos.x == alignedOldPos.x)
 		{
-			if (z == zOld)
+			if (alignedPos.z == alignedOldPos.z)
 			{
-				vehicleItem->Pose.Position.z += (oldPos->z - pos->z);
 				vehicleItem->Pose.Position.x += (oldPos->x - pos->x);
+				vehicleItem->Pose.Position.z += (oldPos->z - pos->z);
 			}
-			else if (z > zOld)
+			else if (alignedPos.z > alignedOldPos.z)
 			{
-				vehicleItem->Pose.Position.z -= shiftZ + 1;
+				vehicleItem->Pose.Position.z -= alignedShift.z + 1;
 				return (pos->x - vehicleItem->Pose.Position.x);
 			}
 			else
 			{
-				vehicleItem->Pose.Position.z += SECTOR(1) - shiftZ;
+				vehicleItem->Pose.Position.z += SECTOR(1) - alignedShift.z;
 				return (vehicleItem->Pose.Position.x - pos->x);
 			}
 		}
-		else if (z == zOld)
+		else if (alignedPos.z == alignedOldPos.z)
 		{
-			if (x > xOld)
+			if (alignedPos.x > alignedOldPos.x)
 			{
-				vehicleItem->Pose.Position.x -= shiftX + 1;
+				vehicleItem->Pose.Position.x -= alignedShift.x + 1;
 				return (vehicleItem->Pose.Position.z - pos->z);
 			}
 			else
 			{
-				vehicleItem->Pose.Position.x += SECTOR(1) - shiftX;
+				vehicleItem->Pose.Position.x += SECTOR(1) - alignedShift.x;
 				return (pos->z - vehicleItem->Pose.Position.z);
 			}
 		}
 		else
 		{
-			x = 0;
-			z = 0;
+			alignedPos = Vector3Int();
 
 			auto probe = GetCollision(oldPos->x, pos->y, pos->z, vehicleItem->RoomNumber);
 			if (probe.Position.Floor < (oldPos->y - CLICK(1)))
 			{
 				if (pos->z > oldPos->z)
-					z = -shiftZ - 1;
+					alignedPos.z = -alignedShift.z - 1;
 				else
-					z = SECTOR(1) - shiftZ;
+					alignedPos.z = SECTOR(1) - alignedShift.z;
 			}
 
 			probe = GetCollision(pos->x, pos->y, oldPos->z, vehicleItem->RoomNumber);
 			if (probe.Position.Floor < (oldPos->y - CLICK(1)))
 			{
 				if (pos->x > oldPos->x)
-					x = -shiftX - 1;
+					alignedPos.x = -alignedShift.x - 1;
 				else
-					x = SECTOR(1) - shiftX;
+					alignedPos.x = SECTOR(1) - alignedShift.x;
 			}
 
 			// NOTE: Commented lines are skidoo-specific. Likely unnecessary but keeping for reference. @Sezz 2022.06.30
-			if (x && z)
+			if (alignedPos.x && alignedPos.z)
 			{
-				vehicleItem->Pose.Position.z += z;
-				vehicleItem->Pose.Position.x += x;
+				vehicleItem->Pose.Position.z += alignedPos.z;
+				vehicleItem->Pose.Position.x += alignedPos.x;
 				//vehicleItem->Animation.Velocity -= 50;
 			}
-			else if (z)
+			else if (alignedPos.z)
 			{
-				vehicleItem->Pose.Position.z += z;
+				vehicleItem->Pose.Position.z += alignedPos.z;
 				//vehicleItem->Animation.Velocity -= 50;
 
-				if (z > 0)
+				if (alignedPos.z > 0)
 					return (vehicleItem->Pose.Position.x - pos->x);
 				else
 					return (pos->x - vehicleItem->Pose.Position.x);
 			}
-			else if (x)
+			else if (alignedPos.x)
 			{
-				vehicleItem->Pose.Position.x += x;
+				vehicleItem->Pose.Position.x += alignedPos.x;
 				//vehicleItem->Animation.Velocity -= 50;
 
-				if (x > 0)
+				if (alignedPos.x > 0)
 					return (pos->z - vehicleItem->Pose.Position.z);
 				else
 					return (vehicleItem->Pose.Position.z - pos->z);
