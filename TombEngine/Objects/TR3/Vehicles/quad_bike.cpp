@@ -777,7 +777,7 @@ namespace TEN::Entities::Vehicles
 				{
 					laraItem->Animation.TargetState = QBIKE_STATE_TURN_RIGHT;
 				}
-				else if (TrInput & VEHICLE_IN_REVERSE)
+				else if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
 				{
 					if (quadBike->Velocity > (MAX_VELOCITY / 3 * 2))
 						laraItem->Animation.TargetState = QBIKE_STATE_BRAKE;
@@ -959,7 +959,7 @@ namespace TEN::Entities::Vehicles
 			}
 
 			// Driving back / braking.
-			if (TrInput & VEHICLE_IN_REVERSE)
+			if (TrInput & (VEHICLE_IN_REVERSE | VEHICLE_IN_BRAKE))
 			{
 				if (TrInput & VEHICLE_IN_SPEED &&
 					(quadBike->CanStartDrift || quadBike->DriftStarting))
