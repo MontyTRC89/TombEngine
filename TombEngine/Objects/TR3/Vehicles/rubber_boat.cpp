@@ -62,7 +62,7 @@ namespace TEN::Entities::Vehicles
 		RBOAT_STATE_MOVING = 2,
 		RBOAT_STATE_JUMP_RIGHT = 3,
 		RBOAT_STATE_JUMP_LEFT = 4,
-		RBOAT_STATE_HIT = 5,
+		RBOAT_STATE_IMPACT = 5,
 		RBOAT_STATE_FALL = 6,
 		RBOAT_STATE_TURN_RIGHT = 7,
 		RBOAT_STATE_DEATH = 8,
@@ -82,10 +82,10 @@ namespace TEN::Entities::Vehicles
 		RBOAT_ANIM_MOUNT_RIGHT = 8,
 		RBOAT_ANIM_TURN_LEFT_CONTINUE = 9,
 		RBOAT_ANIM_TURN_LEFT_END = 10,
-		RBOAT_ANIM_HIT_RIGHT = 11,
-		RBOAT_ANIM_HIT_LEFT = 12,
-		RBOAT_ANIM_HIT_FRONT = 13,
-		RBOAT_ANIM_HIT_BACK = 14,
+		RBOAT_ANIM_IMPACT_RIGHT = 11,
+		RBOAT_ANIM_IMPACT_LEFT = 12,
+		RBOAT_ANIM_IMPACT_FRONT = 13,
+		RBOAT_ANIM_IMPACT_BACK = 14,
 		RBOAT_ANIM_LEAP_START = 15,
 		RBOAT_ANIM_LEAP_CONTINUE = 16,
 		RBOAT_ANIM_LEAP_END = 17,
@@ -180,6 +180,37 @@ namespace TEN::Entities::Vehicles
 		lara->Control.WaterStatus = WaterStatus::Dry;
 
 		AnimateItem(laraItem);
+	}
+
+	void DoRubberBoatImpact(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
+	{
+		if (laraItem->Animation.ActiveState == RBOAT_STATE_IMPACT)
+			return;
+
+		switch (impactDirection)
+		{
+		default:
+		case VehicleImpactDirection::Front:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_FRONT;
+			break;
+
+		case VehicleImpactDirection::Back:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_BACK;
+			break;
+
+		case VehicleImpactDirection::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_LEFT;
+			break;
+
+		case VehicleImpactDirection::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IMPACT_RIGHT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.ActiveState = RBOAT_STATE_IMPACT;
+		laraItem->Animation.TargetState = RBOAT_STATE_IMPACT;
+
+		// TODO: Impact sound?
 	}
 
 	void DrawRubberBoat(ItemInfo* rBoatItem)
@@ -319,39 +350,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	static int GetRubberBoatCollisionAnim(ItemInfo* rBoatItem, Vector3Int* moved)
-	{
-		moved->x = rBoatItem->Pose.Position.x - moved->x;
-		moved->z = rBoatItem->Pose.Position.z - moved->z;
-
-		if (moved->x || moved->z)
-		{
-			float sinY = phd_sin(rBoatItem->Pose.Orientation.y);
-			float cosY = phd_cos(rBoatItem->Pose.Orientation.y);
-
-			long front = (moved->z * cosY) + (moved->x * sinY);
-			long side = (moved->z * -sinY) + (moved->x * cosY);
-
-			if (abs(front) > abs(side))
-			{
-				if (front > 0)
-					return RBOAT_ANIM_HIT_BACK;
-				else
-					return RBOAT_ANIM_HIT_FRONT;
-			}
-			else
-			{
-				if (side > 0)
-					return RBOAT_ANIM_HIT_RIGHT;
-				else
-					return RBOAT_ANIM_HIT_LEFT;
-			}
-		}
-
-		return 0;
-	}
-
-	static int RubberBoatDynamics(short itemNumber, ItemInfo* laraItem)
+	static VehicleImpactDirection RubberBoatDynamics(short itemNumber, ItemInfo* laraItem)
 	{
 		auto* rBoatItem = &g_Level.Items[itemNumber];
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
@@ -440,9 +439,9 @@ namespace TEN::Entities::Vehicles
 		DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
 
 		rBoat->ExtraRotation = rotation;
-		int collide = GetRubberBoatCollisionAnim(rBoatItem, &moved);
+		auto impactDirection = GetVehicleImpactDirection(rBoatItem, moved);
 
-		if (slip || collide)
+		if (slip || impactDirection != VehicleImpactDirection::None)
 		{
 			int newVelocity = (rBoatItem->Pose.Position.z - old.z) * phd_cos(rBoatItem->Pose.Orientation.y) + (rBoatItem->Pose.Position.x - old.x) * phd_sin(rBoatItem->Pose.Orientation.y);
 
@@ -473,7 +472,7 @@ namespace TEN::Entities::Vehicles
 				rBoatItem->Animation.Velocity = -RBOAT_REVERSE_VELOCITY_MAX;
 		}
 
-		return collide;
+		return impactDirection;
 	}
 
 	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
@@ -603,13 +602,13 @@ namespace TEN::Entities::Vehicles
 		return true;
 	}
 
-	void RubberBoatAnimation(ItemInfo* rBoatItem, ItemInfo* laraItem, int collide)
+	void RubberBoatAnimation(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
 		if (laraItem->HitPoints <= 0)
 		{
-			if (laraItem->Animation.ActiveState!= RBOAT_STATE_DEATH)
+			if (laraItem->Animation.ActiveState != RBOAT_STATE_DEATH)
 			{
 				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + RBOAT_ANIM_IDLE_DEATH;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
@@ -628,16 +627,8 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = RBOAT_STATE_FALL;
 			}
 		}
-		else if (collide)
-		{
-			if (laraItem->Animation.ActiveState != RBOAT_STATE_HIT)
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_RUBBER_BOAT_LARA_ANIMS].animIndex + collide;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = RBOAT_STATE_HIT;
-				laraItem->Animation.TargetState = RBOAT_STATE_HIT;
-			}
-		}
+		else if (impactDirection != VehicleImpactDirection::None)
+			DoRubberBoatImpact(rBoatItem, laraItem, impactDirection);
 		else
 		{
 			switch (laraItem->Animation.ActiveState)
@@ -812,7 +803,7 @@ namespace TEN::Entities::Vehicles
 		int pitch, height, ofs, nowake;
 
 		Vector3Int frontLeft, frontRight;
-		int collide = RubberBoatDynamics(itemNumber, laraItem);
+		auto impactDirection = RubberBoatDynamics(itemNumber, laraItem);
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeft);
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRight);
 
@@ -891,7 +882,7 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Vehicle == itemNumber)
 		{
-			RubberBoatAnimation(rBoatItem, laraItem, collide);
+			RubberBoatAnimation(rBoatItem, laraItem, impactDirection);
 
 			if (probe.RoomNumber != rBoatItem->RoomNumber)
 			{

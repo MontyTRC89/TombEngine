@@ -67,7 +67,7 @@ namespace TEN::Entities::Vehicles
 		SPEEDBOAT_STATE_MOVING = 2,
 		SPEEDBOAT_STATE_DISMOUNT_RIGHT = 3,
 		SPEEDBOAT_STATE_DISMOUNT_LEFT = 4,
-		SPEEDBOAT_STATE_HIT = 5,
+		SPEEDBOAT_STATE_IMPACT = 5,
 		SPEEDBOAT_STATE_FALL = 6,
 		SPEEDBOAT_STATE_TURN_RIGHT = 7,
 		SPEEDBOAT_STATE_DEATH = 8,
@@ -85,10 +85,10 @@ namespace TEN::Entities::Vehicles
 		SPEEDBOAT_ANIM_DISMOUNT_RIGHT = 7,
 		SPEEDBOAT_ANIM_MOUNT_RIGHT = 8,
 
-		SPEEDBOAT_ANIM_HIT_LEFT = 11,
-		SPEEDBOAT_ANIM_HIT_RIGHT = 12,
-		SPEEDBOAT_ANIM_HIT_FRONT = 13,
-		SPEEDBOAT_ANIM_HIT_BACK = 14,
+		SPEEDBOAT_ANIM_IMPACT_LEFT = 11,
+		SPEEDBOAT_ANIM_IMPACT_RIGHT = 12,
+		SPEEDBOAT_ANIM_IMPACT_FRONT = 13,
+		SPEEDBOAT_ANIM_IMPACT_BACK = 14,
 		SPEEDBOAT_ANIM_LEAP_START = 15,
 		SPEEDBOAT_ANIM_LEAP = 16,
 		SPEEDBOAT_ANIM_LEAP_END = 17,
@@ -253,6 +253,37 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
+	void DoSpeedboatImpact(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
+	{
+		if (laraItem->Animation.ActiveState == SPEEDBOAT_STATE_IMPACT)
+			return;
+
+		switch (impactDirection)
+		{
+		default:
+		case VehicleImpactDirection::Front:
+			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_FRONT;
+			break;
+
+		case VehicleImpactDirection::Back:
+			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_BACK;
+			break;
+
+		case VehicleImpactDirection::Left:
+			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_LEFT;
+			break;
+
+		case VehicleImpactDirection::Right:
+			laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + SPEEDBOAT_ANIM_IMPACT_RIGHT;
+			break;
+		}
+		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
+		laraItem->Animation.ActiveState = SPEEDBOAT_STATE_IMPACT;
+		laraItem->Animation.TargetState = SPEEDBOAT_STATE_IMPACT;
+
+		// TODO: Impact sound?
+	}
+
 	void SpeedboatDoBoatShift(ItemInfo* speedboatItem, int itemNumber)
 	{
 		short itemNumber2 = g_Level.Rooms[speedboatItem->RoomNumber].itemNumber;
@@ -378,39 +409,7 @@ namespace TEN::Entities::Vehicles
 		return 0;
 	}
 
-	int GetSpeedboatHitAnim(ItemInfo* speedboatItem, Vector3Int* moved)
-	{
-		moved->x = speedboatItem->Pose.Position.x - moved->x;
-		moved->z = speedboatItem->Pose.Position.z - moved->z;
-
-		if (moved->x || moved->z)
-		{
-			float sinY = phd_sin(speedboatItem->Pose.Orientation.y);
-			float cosY = phd_cos(speedboatItem->Pose.Orientation.y);
-
-			int front = (moved->z * cosY) + (moved->x * sinY);
-			int side = (moved->z * -sinY) + (moved->x * cosY);
-
-			if (abs(front) > abs(side))
-			{
-				if (front > 0)
-					return SPEEDBOAT_ANIM_HIT_BACK;
-				else
-					return SPEEDBOAT_ANIM_HIT_FRONT;
-			}
-			else
-			{
-				if (side > 0)
-					return SPEEDBOAT_ANIM_HIT_LEFT;
-				else
-					return SPEEDBOAT_ANIM_HIT_RIGHT;
-			}
-		}
-
-		return 0;
-	}
-
-	int SpeedboatDynamics(short itemNumber, ItemInfo* laraItem)
+	VehicleImpactDirection SpeedboatDynamics(short itemNumber, ItemInfo* laraItem)
 	{
 		auto* speedboatItem = &g_Level.Items[itemNumber];
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
@@ -490,10 +489,10 @@ namespace TEN::Entities::Vehicles
 
 		DoVehicleCollision(speedboatItem, SPEEDBOAT_RADIUS);
 
-		auto collide = GetSpeedboatHitAnim(speedboatItem, &moved);
+		auto impactDirection = GetVehicleImpactDirection(speedboatItem, moved);
 
 		int newVelocity = 0;
-		if (slip || collide)
+		if (slip || impactDirection != VehicleImpactDirection::None)
 		{
 			newVelocity = (speedboatItem->Pose.Position.z - old.z) * phd_cos(speedboatItem->Pose.Orientation.y) + (speedboatItem->Pose.Position.x - old.x) * phd_sin(speedboatItem->Pose.Orientation.y);
 
@@ -522,7 +521,7 @@ namespace TEN::Entities::Vehicles
 				speedboatItem->Animation.Velocity = -SPEEDBOAT_REVERSE_VELOCITY_MAX;
 		}
 
-		return collide;
+		return impactDirection;
 	}
 
 	bool SpeedboatUserControl(ItemInfo* speedboatItem, ItemInfo* laraItem)
@@ -620,7 +619,7 @@ namespace TEN::Entities::Vehicles
 		return noTurn;
 	}
 
-	void SpeedboatAnimation(ItemInfo* speedboatItem, ItemInfo* laraItem, int collide)
+	void SpeedboatAnimation(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
 	{
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
 
@@ -642,15 +641,8 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SPEEDBOAT_STATE_FALL;
 			}
 		}
-		else if (collide)
-		{
-			if (laraItem->Animation.ActiveState != SPEEDBOAT_STATE_HIT)
-			{
-				laraItem->Animation.AnimNumber = Objects[ID_SPEEDBOAT_LARA_ANIMS].animIndex + collide;
-				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.ActiveState = laraItem->Animation.TargetState = SPEEDBOAT_STATE_HIT;
-			}
-		}
+		else if (impactDirection != VehicleImpactDirection::None)
+			DoSpeedboatImpact(speedboatItem, laraItem, impactDirection);
 		else
 		{
 			switch (laraItem->Animation.ActiveState)
@@ -745,7 +737,7 @@ namespace TEN::Entities::Vehicles
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
 
-		int collide = SpeedboatDynamics(itemNumber, laraItem);
+		auto impactDirection = SpeedboatDynamics(itemNumber, laraItem);
 
 		Vector3Int frontLeft, frontRight;
 		int heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeft);
@@ -832,7 +824,7 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Vehicle == itemNumber)
 		{
-			SpeedboatAnimation(speedboatItem, laraItem, collide);
+			SpeedboatAnimation(speedboatItem, laraItem, impactDirection);
 
 			if (probe.RoomNumber != speedboatItem->RoomNumber)
 			{
