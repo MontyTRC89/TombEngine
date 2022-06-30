@@ -15,7 +15,6 @@ namespace TEN::Entities::Vehicles
 	void KayakToBackground(ItemInfo* kayakItem, ItemInfo* laraItem);
 	void KayakToItemCollision(ItemInfo* kayakItem, ItemInfo* laraItem);
 
-	int KayakDoDynamics(int height, int verticalVelocity, int* y);
 	void KayakDoCurrent(ItemInfo* kayakItem, ItemInfo* laraItem);
 	int KayakDoShift(ItemInfo* kayakItem, Vector3Int* pos, Vector3Int* old);
 

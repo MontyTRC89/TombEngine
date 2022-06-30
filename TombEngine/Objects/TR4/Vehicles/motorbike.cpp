@@ -52,6 +52,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_SLOWDOWN1 = (int)(4.25f * VEHICLE_VELOCITY_SCALE); // TODO: Float velocities. @Sezz 2022.06.16
 	constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * VEHICLE_VELOCITY_SCALE;
 
+	constexpr auto MOTORBIKE_BOUNCE_MIN = 32; // TODO: This is derived from some calcs with velocities. Check other vehicles for reference.
+	constexpr auto MOTORBIKE_KICK_MAX = -80;
+
 	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
 	constexpr auto MOTORBIKE_PITCH_MAX = 0xA000;
 
@@ -464,49 +467,6 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 			return false;
-	}
-
-	static int DoMotorBikeDynamics(int height, int verticalVelocity, int* y, int flags)
-	{
-		int kick;
-
-		if (height <= *y)
-		{
-			if (flags)
-				return verticalVelocity;
-			else
-			{
-				// On ground.
-				kick = (height - *y);
-
-				if (kick < -80)
-					kick = -80;
-
-				verticalVelocity += (kick - verticalVelocity) / 16;
-
-				if (*y > height)
-					*y = height;
-			}
-		}
-		else
-		{
-			// In air.
-			*y += verticalVelocity;
-			if (*y > height - 32)
-			{
-				*y = height;
-				verticalVelocity = 0;
-			}
-			else
-			{
-				if (flags)
-					verticalVelocity += flags;
-				else
-					verticalVelocity += GRAVITY;
-			}
-		}
-
-		return verticalVelocity;
 	}
 
 	static int GetMotorbikeCollisionAnim(ItemInfo* motorbikeItem, Vector3Int* pos)
@@ -1244,7 +1204,7 @@ namespace TEN::Entities::Vehicles
 		motorbike->RightWheelsRotation -= rotation;
 
 		int newY = motorbikeItem->Pose.Position.y;
-		motorbikeItem->Animation.VerticalVelocity = DoMotorBikeDynamics(probe.Position.Floor, motorbikeItem->Animation.VerticalVelocity, &motorbikeItem->Pose.Position.y, 0);
+		motorbikeItem->Animation.VerticalVelocity = DoVehicleDynamics(probe.Position.Floor, motorbikeItem->Animation.VerticalVelocity, MOTORBIKE_BOUNCE_MIN, MOTORBIKE_KICK_MAX, &motorbikeItem->Pose.Position.y);
 		motorbike->Velocity = DoVehicleWaterMovement(motorbikeItem, laraItem, motorbike->Velocity, MOTORBIKE_RADIUS, &motorbike->TurnRate);
 
 		int r1 = (frontRight.y + frontLeft.y) / 2;

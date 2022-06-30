@@ -48,6 +48,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
 	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
 
+	constexpr auto RBOAT_BOUNCE_MIN = 0;
+	constexpr auto RBOAT_KICK_MAX = -80;
+
 	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
 	#define RBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
@@ -473,32 +476,6 @@ namespace TEN::Entities::Vehicles
 		return collide;
 	}
 
-	static int DoRubberBoatDynamics(int height, int verticalVelocity, int* y)
-	{
-		if (height > *y)
-		{
-			*y += verticalVelocity;
-			if (*y > height)
-			{
-				*y = height;
-				verticalVelocity = 0;
-			}
-			else
-				verticalVelocity += 6;
-		}
-		else
-		{
-			verticalVelocity += (height - *y - verticalVelocity) / 8;
-			if (verticalVelocity < -20)
-				verticalVelocity = -20;
-
-			if (*y > height)
-				*y = height;
-		}
-
-		return verticalVelocity;
-	}
-
 	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
@@ -890,10 +867,10 @@ namespace TEN::Entities::Vehicles
 		else
 			rBoat->Water -= 5;
 
-		rBoat->LeftVerticalVelocity = DoRubberBoatDynamics(heightFrontLeft, rBoat->LeftVerticalVelocity, (int*)&frontLeft.y);
-		rBoat->RightVerticalVelocity = DoRubberBoatDynamics(heightFrontRight, rBoat->RightVerticalVelocity, (int*)&frontRight.y);
+		rBoat->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, rBoat->LeftVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, (int*)&frontLeft.y);
+		rBoat->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, rBoat->RightVerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, (int*)&frontRight.y);
 		ofs = rBoatItem->Animation.VerticalVelocity;
-		rBoatItem->Animation.VerticalVelocity = DoRubberBoatDynamics(rBoat->Water, rBoatItem->Animation.VerticalVelocity, (int*)&rBoatItem->Pose.Position.y);
+		rBoatItem->Animation.VerticalVelocity = DoVehicleDynamics(rBoat->Water, rBoatItem->Animation.VerticalVelocity, RBOAT_BOUNCE_MIN, RBOAT_KICK_MAX, (int*)&rBoatItem->Pose.Position.y);
 
 		height = frontLeft.y + frontRight.y;
 		if (height < 0)

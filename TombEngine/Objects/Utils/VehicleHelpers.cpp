@@ -12,6 +12,7 @@
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/prng.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -226,6 +227,124 @@ namespace TEN::Entities::Vehicles
 		coll.Setup.EnableObjectPush = true;
 
 		DoObjectCollision(vehicleItem, &coll);
+	}
+
+	// TODO: Extend to take a weight argument.
+	// Motorbike and jeep had the values in their dynamics functions tweaked to make them feel heavier.
+	// Using this unified function, they leap off hills as easily as the older vehicles for now. @Sezz 2022.06.30
+	int DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos)
+	{
+		// Grounded.
+		if (height > *yPos)
+		{
+			*yPos += verticalVelocity;
+			if (*yPos > (height - minBounce))
+			{
+				*yPos = height;
+				verticalVelocity = 0;
+			}
+			else
+				verticalVelocity += GRAVITY;
+		}
+		// Airborne.
+		else
+		{
+			int kick = (height - *yPos) * 4;
+			if (kick < maxKick)
+				kick = maxKick;
+
+			verticalVelocity += (kick - verticalVelocity) / 8;
+
+			if (*yPos > height)
+				*yPos = height;
+		}
+
+		return verticalVelocity;
+	}
+
+	// Temp. for reference. Flag parameter was unused. @Sezz 2022.06.30
+	int DoMotorBikeDynamics(int height, int verticalVelocity, int* y, int flags)
+	{
+		int kick;
+
+		if (height <= *y)
+		{
+			if (flags)
+				return verticalVelocity;
+			else
+			{
+				kick = (height - *y);
+				if (kick < -80)
+					kick = -80;
+
+				verticalVelocity += (kick - verticalVelocity) / 16;
+
+				if (*y > height)
+					*y = height;
+			}
+		}
+		else
+		{
+			*y += verticalVelocity;
+			if (*y > (height - 32))
+			{
+				*y = height;
+				verticalVelocity = 0;
+			}
+			else
+			{
+				if (flags)
+					verticalVelocity += flags;
+				else
+					verticalVelocity += GRAVITY;
+			}
+		}
+
+		return verticalVelocity;
+	}
+
+	// Temp. for reference. Flag parameter was unused. @Sezz 2022.06.30
+	int DoJeepDynamics(ItemInfo* laraItem, int height, int verticalVelocity, int* yPos, int flags)
+	{
+		if (height <= *yPos)
+		{
+			if (flags)
+				return verticalVelocity;
+			else
+			{
+				int kick = height - *yPos;
+				if (kick < -80)
+					kick = -80;
+
+				verticalVelocity += ((kick - verticalVelocity) / 16);
+
+				if (*yPos > height)
+					*yPos = height;
+			}
+		}
+		else
+		{
+			*yPos += verticalVelocity;
+
+			if (*yPos <= (height - 32))
+			{
+				if (flags)
+					verticalVelocity += flags + (flags / 2);
+				else
+					verticalVelocity += (int)((float)GRAVITY * 1.5f);
+			}
+			else
+			{
+				*yPos = height;
+
+				if (verticalVelocity > 150)
+					laraItem->HitPoints += 150 - verticalVelocity;
+
+				verticalVelocity = 0;
+			}
+		}
+
+		return verticalVelocity;
 	}
 
 	int DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate)

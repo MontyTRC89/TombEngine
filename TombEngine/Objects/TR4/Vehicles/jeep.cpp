@@ -52,6 +52,9 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto JEEP_CRASH_VELOCITY = 10922;
 
+	constexpr auto JEEP_BOUNCE_MIN = 32;
+	constexpr auto JEEP_KICK_MAX = -80;
+
 	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
 
 	// TODO: Simpler toggle.
@@ -323,52 +326,6 @@ namespace TEN::Entities::Vehicles
 		jeepItem->Pose.Position.x += (old->x - pos->x);
 
 		return 0;
-	}
-
-	static int DoJeepDynamics(ItemInfo* laraItem, int height, int verticalVelocity, int* yPos, int flags)
-	{
-		// Grounded.
-		if (height <= *yPos)
-		{
-			if (flags)
-				return verticalVelocity;
-			else
-			{
-				int kick = height - *yPos;
-
-				if (kick < -80)
-					kick = -80;
-
-				verticalVelocity += ((kick - verticalVelocity) / 16);
-
-				if (*yPos > height)
-					*yPos = height;
-			}
-		}
-		// IsAirborne.
-		else
-		{
-			*yPos += verticalVelocity;
-
-			if (*yPos <= height - 32)
-			{
-				if (flags)
-					verticalVelocity += flags + (flags / 2);
-				else
-					verticalVelocity += (int)((float)GRAVITY * 1.5f);
-			}
-			else
-			{
-				*yPos = height;
-
-				if (verticalVelocity > 150)
-					laraItem->HitPoints += 150 - verticalVelocity;
-
-				verticalVelocity = 0;
-			}
-		}
-
-		return verticalVelocity;
 	}
 
 	static bool JeepCanGetOff(ItemInfo* jeepItem, ItemInfo* laraItem)
@@ -1413,7 +1370,7 @@ namespace TEN::Entities::Vehicles
 		jeep->BackLeftWheelRotation -= rotAdd;
 
 		int oldY = jeepItem->Pose.Position.y;
-		jeepItem->Animation.VerticalVelocity = DoJeepDynamics(laraItem, floorHeight, jeepItem->Animation.VerticalVelocity, &jeepItem->Pose.Position.y, 0);
+		jeepItem->Animation.VerticalVelocity = DoVehicleDynamics(floorHeight, jeepItem->Animation.VerticalVelocity, JEEP_BOUNCE_MIN, JEEP_KICK_MAX, &jeepItem->Pose.Position.y);
 		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);
 
 		short xRot;

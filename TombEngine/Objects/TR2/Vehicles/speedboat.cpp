@@ -50,6 +50,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_FAST_VELOCITY_MAX = 185;
 	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_MAX = 20;
 
+	constexpr auto SPEEDBOAT_BOUNCE_MIN = 0;
+	constexpr auto SPEEDBOAT_KICK_MAX = -80;
 	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX = CLICK(1); // Unused.
 	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
 	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
@@ -406,32 +408,6 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return 0;
-	}
-
-	int DoSpeedboatDynamics(int height, int verticalVelocity, int* y)
-	{
-		if (height > *y)
-		{
-			*y += verticalVelocity;
-			if (*y > height)
-			{
-				*y = height;
-				verticalVelocity = 0;
-			}
-			else
-				verticalVelocity += GRAVITY;
-		}
-		else
-		{
-			verticalVelocity += ((height - *y - verticalVelocity) / 8);
-			if (verticalVelocity < -SPEEDBOAT_REVERSE_VELOCITY_MAX)
-				verticalVelocity = -SPEEDBOAT_REVERSE_VELOCITY_MAX;
-
-			if (*y > height)
-				*y = height;
-		}
-
-		return verticalVelocity;
 	}
 
 	int SpeedboatDynamics(short itemNumber, ItemInfo* laraItem)
@@ -829,9 +805,9 @@ namespace TEN::Entities::Vehicles
 		else
 			speedboat->Water -= 5;
 
-		speedboat->LeftVerticalVelocity = DoSpeedboatDynamics(heightFrontLeft, speedboat->LeftVerticalVelocity, (int*)&frontLeft.y);
-		speedboat->RightVerticalVelocity = DoSpeedboatDynamics(heightFrontRight, speedboat->RightVerticalVelocity, (int*)&frontRight.y);
-		speedboatItem->Animation.VerticalVelocity = DoSpeedboatDynamics(speedboat->Water, speedboatItem->Animation.VerticalVelocity, (int*)&speedboatItem->Pose.Position.y);
+		speedboat->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, speedboat->LeftVerticalVelocity, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, (int*)&frontLeft.y);
+		speedboat->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, speedboat->RightVerticalVelocity, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, (int*)&frontRight.y);
+		speedboatItem->Animation.VerticalVelocity = DoVehicleDynamics(speedboat->Water, speedboatItem->Animation.VerticalVelocity, SPEEDBOAT_BOUNCE_MIN, SPEEDBOAT_KICK_MAX, (int*)&speedboatItem->Pose.Position.y);
 
 		auto ofs = speedboatItem->Animation.VerticalVelocity;
 		if (ofs - speedboatItem->Animation.VerticalVelocity > 32 && speedboatItem->Animation.VerticalVelocity == 0 && water != NO_HEIGHT)

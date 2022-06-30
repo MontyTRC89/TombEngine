@@ -52,8 +52,9 @@ namespace TEN::Entities::Vehicles
 	constexpr int QBIKE_REVERSE_VELOCITY_ACCEL = -3 * VEHICLE_VELOCITY_SCALE;
 	constexpr int QBIKE_VELOCITY_BRAKE_DECEL = 2.5f * VEHICLE_VELOCITY_SCALE;
 
+	constexpr auto QBIKE_BOUNCE_MIN = (QBIKE_VELOCITY_MAX / 2) / CLICK(1);
+	constexpr auto QBIKE_KICK_MAX = -80;
 	constexpr auto QBIKE_STEP_HEIGHT_MAX = CLICK(1); // Unused.
-	constexpr auto QBIKE_MIN_BOUNCE = (QBIKE_VELOCITY_MAX / 2) / CLICK(1);
 
 	#define QBIKE_TURN_RATE_ACCEL		  ANGLE(2.5f)
 	#define QBIKE_TURN_RATE_DECEL		  ANGLE(2.0f)
@@ -411,34 +412,6 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return 0;
-	}
-
-	static int DoQuadDynamics(int height, int verticalVelocity, int* y)
-	{
-		if (height > *y)
-		{
-			*y += verticalVelocity;
-			if (*y > height - QBIKE_MIN_BOUNCE)
-			{
-				*y = height;
-				verticalVelocity = 0;
-			}
-			else
-				verticalVelocity += 6;
-		}
-		else
-		{
-			int kick = (height - *y) * 4;
-			if (kick < -80)
-				kick = -80;
-
-			verticalVelocity += ((kick - verticalVelocity) / 8);
-
-			if (*y > height)
-				*y = height;
-		}
-
-		return verticalVelocity;
 	}
 
 	static VehicleImpactDirection QuadDynamics(ItemInfo* quadBikeItem, ItemInfo* laraItem)
@@ -1157,9 +1130,9 @@ namespace TEN::Entities::Vehicles
 		quadBike->RearRot -= (quadBike->Revs / 8);
 		quadBike->FrontRot -= rotAdd;
 
-		quadBike->LeftVerticalVelocity = DoQuadDynamics(floorHeightLeft, quadBike->LeftVerticalVelocity, (int*)&frontLeft.y);
-		quadBike->RightVerticalVelocity = DoQuadDynamics(floorHeightRight, quadBike->RightVerticalVelocity, (int*)&frontRight.y);
-		quadBikeItem->Animation.VerticalVelocity = DoQuadDynamics(probe.Position.Floor, quadBikeItem->Animation.VerticalVelocity, (int*)&quadBikeItem->Pose.Position.y);
+		quadBike->LeftVerticalVelocity = DoVehicleDynamics(floorHeightLeft, quadBike->LeftVerticalVelocity, QBIKE_BOUNCE_MIN, QBIKE_KICK_MAX, (int*)&frontLeft.y);
+		quadBike->RightVerticalVelocity = DoVehicleDynamics(floorHeightRight, quadBike->RightVerticalVelocity, QBIKE_BOUNCE_MIN, QBIKE_KICK_MAX, (int*)&frontRight.y);
+		quadBikeItem->Animation.VerticalVelocity = DoVehicleDynamics(probe.Position.Floor, quadBikeItem->Animation.VerticalVelocity, QBIKE_BOUNCE_MIN, QBIKE_KICK_MAX, (int*)&quadBikeItem->Pose.Position.y);
 		quadBike->Velocity = DoVehicleWaterMovement(quadBikeItem, laraItem, quadBike->Velocity, QBIKE_RADIUS, &quadBike->TurnRate);
 
 		probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;

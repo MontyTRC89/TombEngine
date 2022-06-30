@@ -78,8 +78,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto WAKE_VELOCITY = 4;
 	constexpr auto KAYAK_X = 128;
 	constexpr auto KAYAK_Z = 128;
-	constexpr auto KAYAK_MAX_KICK = -80;
-	constexpr auto KAYAK_MIN_BOUNCE = (KAYAK_VELOCITY_MAX / 2) / VEHICLE_VELOCITY_SCALE;
+
+	constexpr auto KAYAK_BOUNCE_MIN = (KAYAK_VELOCITY_MAX / 2) / VEHICLE_VELOCITY_SCALE;
+	constexpr auto KAYAK_KICK_MAX = -80;
 
 	// TODO: Kayak control is fairly unique. Keep this? @Sezz 2022.06.25
 	constexpr auto KAYAK_IN_FORWARD	   = IN_FORWARD;
@@ -343,36 +344,6 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	int KayakDoDynamics(int height, int verticalVelocity, int* y)
-	{
-		if (height > * y)
-		{
-			*y += verticalVelocity;
-
-			if (*y > height)
-			{
-				*y = height;
-				verticalVelocity = 0;
-			}
-			else
-				verticalVelocity += GRAVITY;
-		}
-		else
-		{
-			int kick = (height - *y) * 4;
-
-			if (kick < KAYAK_MAX_KICK)
-				kick = KAYAK_MAX_KICK;
-
-			verticalVelocity += (kick - verticalVelocity) / 8;
-
-			if (*y > height)
-				*y = height;
-		}
-
-		return verticalVelocity;
-	}
-
 	void KayakDoCurrent(ItemInfo* kayakItem, ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -565,26 +536,25 @@ namespace TEN::Entities::Vehicles
 		height[6] = GetVehicleWaterHeight(kayakItem, -320, 128, true, &oldPos[6]);
 		height[7] = GetVehicleWaterHeight(kayakItem, -640, 0, true, &oldPos[7]);
 
-		oldPos[8].x = kayakItem->Pose.Position.x;
-		oldPos[8].y = kayakItem->Pose.Position.y;
-		oldPos[8].z = kayakItem->Pose.Position.z;
+		oldPos[8] = kayakItem->Pose.Position;
  
 		Vector3Int frontPos, leftPos, rightPos;
 		int frontHeight = GetVehicleWaterHeight(kayakItem, 1024, 0, false, &frontPos);
 		int leftHeight  = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X,  false, &leftPos);
 		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, &rightPos);
 
-		kayakItem->Pose.Position.x += kayakItem->Animation.Velocity * phd_sin(kayakItem->Pose.Orientation.y);
-		kayakItem->Pose.Position.z += kayakItem->Animation.Velocity * phd_cos(kayakItem->Pose.Orientation.y);
+		TranslateItem(kayakItem, kayakItem->Pose.Orientation.y, kayakItem->Animation.Velocity);
 		kayakItem->Pose.Orientation.y += kayak->TurnRate;
 
 		KayakDoCurrent(kayakItem, laraItem);
 
-		kayak->LeftVerticalVelocity = KayakDoDynamics(leftHeight, kayak->LeftVerticalVelocity, &leftPos.y);
-		kayak->RightVerticalVelocity = KayakDoDynamics(rightHeight, kayak->RightVerticalVelocity, &rightPos.y);
-		kayak->FrontVerticalVelocity = KayakDoDynamics(frontHeight, kayak->FrontVerticalVelocity, &frontPos.y);
+		// TODO: Check. Previously, the kayak did not have its own bounce constant applied.
+		// In case of odd behaviour make the constant 0. @Sezz 2022.06.30
+		kayak->LeftVerticalVelocity = DoVehicleDynamics(leftHeight, kayak->LeftVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &leftPos.y);
+		kayak->RightVerticalVelocity = DoVehicleDynamics(rightHeight, kayak->RightVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &rightPos.y);
+		kayak->FrontVerticalVelocity = DoVehicleDynamics(frontHeight, kayak->FrontVerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &frontPos.y);
 
-		kayakItem->Animation.VerticalVelocity = KayakDoDynamics(kayak->WaterHeight, kayakItem->Animation.VerticalVelocity, &kayakItem->Pose.Position.y);
+		kayakItem->Animation.VerticalVelocity = DoVehicleDynamics(kayak->WaterHeight, kayakItem->Animation.VerticalVelocity, KAYAK_BOUNCE_MIN, KAYAK_KICK_MAX, &kayakItem->Pose.Position.y);
 
 		int height2 = (leftPos.y + rightPos.y) / 2;
 		int x = phd_atan(1024, kayakItem->Pose.Position.y - frontPos.y);

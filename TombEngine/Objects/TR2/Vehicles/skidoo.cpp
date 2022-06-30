@@ -40,7 +40,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_VELOCITY_DECEL = 2;
 	constexpr auto SKIDOO_VELOCITY_BRAKE_DECEL = 5;
 	constexpr auto SKIDOO_REVERSE_VELOCITY_ACCEL = 5;
-	constexpr auto SKIDOO_KICK_MAX = -80;
 
 	constexpr auto SKIDOO_SLOW_VELOCITY_MAX = 50;
 	constexpr auto SKIDOO_NORMAL_VELOCITY_MAX = 100;
@@ -48,8 +47,9 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_TURN_VELOCITY_MAX = 15;
 	constexpr auto SKIDOO_REVERSE_VELOCITY_MAX = 30;
 
+	constexpr auto SKIDOO_BOUNCE_MIN = (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
+	constexpr auto SKIDOO_KICK_MAX = -80;
 	constexpr auto SKIDOO_STEP_HEIGHT_MAX = CLICK(1); // Unused.
-	constexpr auto SKIDOO_MIN_BOUNCE = (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
 
 	constexpr auto SKIDOO_DAMAGE_START = 140;
 	constexpr auto SKIDOO_DAMAGE_LENGTH = 14;
@@ -227,9 +227,9 @@ namespace TEN::Entities::Vehicles
 		}
 		skidooItem->Floor = height;
 
-		skidoo->LeftVerticalVelocity = DoSkidooDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, (int*)&frontLeft.y);
-		skidoo->RightVerticalVelocity = DoSkidooDynamics(heightFrontRight, skidoo->RightVerticalVelocity, (int*)&frontRight.y);
-		skidooItem->Animation.VerticalVelocity = DoSkidooDynamics(height, skidooItem->Animation.VerticalVelocity, (int*)&skidooItem->Pose.Position.y);
+		skidoo->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, (int*)&frontLeft.y);
+		skidoo->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, skidoo->RightVerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, (int*)&frontRight.y);
+		skidooItem->Animation.VerticalVelocity = DoVehicleDynamics(height, skidooItem->Animation.VerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, (int*)&skidooItem->Pose.Position.y);
 		skidooItem->Animation.Velocity = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity, SKIDOO_RADIUS, &skidoo->TurnRate);
 
 		height = (frontLeft.y + frontRight.y) / 2;
@@ -630,36 +630,6 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return impactDirection;
-	}
-
-	int DoSkidooDynamics(int height, int verticalVelocity, int* y)
-	{
-		// Grounded.
-		if (height > *y)
-		{
-			*y += verticalVelocity;
-			if (*y > height - SKIDOO_MIN_BOUNCE)
-			{
-				*y = height;
-				verticalVelocity = 0;
-			}
-			else
-				verticalVelocity += GRAVITY;
-		}
-		// Airborne.
-		else
-		{
-			int kick = (height - *y) * 4;
-			if (kick < SKIDOO_KICK_MAX)
-				kick = SKIDOO_KICK_MAX;
-
-			verticalVelocity += (kick - verticalVelocity) / 8;
-
-			if (*y > height)
-				*y = height;
-		}
-
-		return verticalVelocity;
 	}
 
 	short DoSkidooShift(ItemInfo* skidooItem, Vector3Int* pos, Vector3Int* old)
