@@ -14,8 +14,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Input;
+using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
@@ -204,7 +204,7 @@ namespace TEN::Entities::Vehicles
 
 		auto ofs = speedboatItem->Animation.VerticalVelocity;
 		if (ofs - speedboatItem->Animation.VerticalVelocity > 32 && speedboatItem->Animation.VerticalVelocity == 0 && water != NO_HEIGHT)
-			DoSpeedboatSplashEffect(speedboatItem, ofs - speedboatItem->Animation.VerticalVelocity, water);
+			TriggerSpeedboatSplashEffect(speedboatItem, ofs - speedboatItem->Animation.VerticalVelocity, water);
 
 		probe.Position.Floor = (frontLeft.y + frontRight.y);
 		if (probe.Position.Floor < 0)
@@ -225,7 +225,7 @@ namespace TEN::Entities::Vehicles
 
 		if (lara->Vehicle == itemNumber)
 		{
-			SpeedboatAnimation(speedboatItem, laraItem, impactDirection);
+			AnimateSpeedboat(speedboatItem, laraItem, impactDirection);
 
 			if (probe.RoomNumber != speedboatItem->RoomNumber)
 			{
@@ -268,11 +268,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		if (speedboatItem->Animation.Velocity && (water - 5) == speedboatItem->Pose.Position.y)
-		{
-			auto room = probe.Block->RoomBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
-			if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
-				TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
-		}
+			TriggerSpeedboatFoamEffect(speedboatItem);
 
 		if (lara->Vehicle != itemNumber)
 			return;
@@ -375,7 +371,7 @@ namespace TEN::Entities::Vehicles
 		return noTurn;
 	}
 
-	void SpeedboatAnimation(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
+	void AnimateSpeedboat(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)
 	{
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
 
@@ -750,8 +746,15 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	// DEPRECATED:
-	void DoSpeedboatSplashEffect(ItemInfo* speedboatItem, long verticalVelocity, long water)
+	void TriggerSpeedboatFoamEffect(ItemInfo* speedboatItem)
+	{
+		auto room = GetCollision(speedboatItem).Block->RoomBelow(speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.z).value_or(NO_ROOM);
+		if (room != NO_ROOM && (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, room) || TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, room)))
+			TEN::Effects::TriggerSpeedboatFoam(speedboatItem, Vector3(0.0f, 0.0f, SPEEDBOAT_BACK));
+	}
+
+	// TODO
+	void TriggerSpeedboatSplashEffect(ItemInfo* speedboatItem, long verticalVelocity, long water)
 	{
 		// Old splash effect.
 		/*splash_setup.x = speedboatItem->Pose.Position.x;

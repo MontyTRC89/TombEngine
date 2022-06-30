@@ -13,13 +13,12 @@ namespace TEN::Entities::Vehicles
 	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool MinecartControl(ItemInfo* laraItem);
 	void MinecartUserControl(ItemInfo* minecartItem, ItemInfo* laraItem);
-
-	short GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance);
-	void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem);
+	void AnimateMinecart(ItemInfo* minecartItem, ItemInfo* laraItem);
 
 	void DoMinecartMount(ItemInfo* minecartItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool TestMinecartDismount(ItemInfo* laraItem, int direction);
 
-	void MoveCart(ItemInfo* minecartItem, ItemInfo* laraItem);
-	void TriggerWheelSparkles(ItemInfo* minecartItem, bool left);
+	short GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance);
+	void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem);
+	void TriggerWheelSparkEffect(ItemInfo* minecartItem, bool left);
 }

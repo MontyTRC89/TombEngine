@@ -220,7 +220,7 @@ void SkidooManControl(short riderItemNumber)
 	else
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
-		DoSnowEffect(item);
+		TriggerSkidooSnowEffect(item);
 		SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 	}
 

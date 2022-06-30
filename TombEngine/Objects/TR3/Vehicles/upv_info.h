@@ -1,4 +1,5 @@
 #pragma once
+#include "Specific/phd_global.h"
 
 namespace TEN::Entities::Vehicles
 {

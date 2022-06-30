@@ -16,12 +16,12 @@ namespace TEN::Entities::Vehicles
 
 	void KayakToBackground(ItemInfo* kayakItem, ItemInfo* laraItem);
 	void KayakToEntityCollision(ItemInfo* kayakItem, ItemInfo* laraItem);
-	void KayakDoCurrent(ItemInfo* kayakItem, ItemInfo* laraItem);
 
 	void DoKayakMount(ItemInfo* kayakItem, ItemInfo* laraItem, VehicleMountType mountType);
-	bool KayakCanGetOut(ItemInfo* kayakItem, int direction);
-	void KayakLaraRapidsDrown(ItemInfo* laraItem);
+	bool TestKayakDismount(ItemInfo* kayakItem, int direction);
 
+	void KayakLaraRapidsDrown(ItemInfo* laraItem);
+	void KayakDoCurrent(ItemInfo* kayakItem, ItemInfo* laraItem);
 	void KayakDraw(ItemInfo* kayakItem);
 	void KayakDoWake(ItemInfo* kayakItem, int xOffset, int zOffset, short rotate);
 	void KayakDoRipple(ItemInfo* kayakItem, int xOffset, int zOffset);

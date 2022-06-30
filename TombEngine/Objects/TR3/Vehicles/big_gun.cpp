@@ -19,8 +19,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
-using std::vector;
 using namespace TEN::Input;
+using std::vector;
 
 namespace TEN::Entities::Vehicles
 {

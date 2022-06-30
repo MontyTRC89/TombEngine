@@ -13,7 +13,7 @@ namespace TEN::Entities::Vehicles
 	void SpeedboatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void SpeedboatControl(short itemNumber);
 	bool SpeedboatUserControl(ItemInfo* speedboatItem, ItemInfo* laraItem);
-	void SpeedboatAnimation(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection);
+	void AnimateSpeedboat(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection);
 
 	void DoSpeedboatMount(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool TestSpeedboatDismount(ItemInfo* speedboatItem, int direction);
@@ -23,6 +23,6 @@ namespace TEN::Entities::Vehicles
 	VehicleImpactDirection SpeedboatDynamics(short itemNumber, ItemInfo* laraItem);
 	void DoSpeedboatBoatShift(ItemInfo* speedboatItem, int itemNumber);
 
-	// DEPRECATED:
-	void DoSpeedboatSplashEffect(ItemInfo* speedboatItem, long verticalVelocity, long water);
+	void TriggerSpeedboatFoamEffect(ItemInfo* speedboatItem);
+	void TriggerSpeedboatSplashEffect(ItemInfo* speedboatItem, long verticalVelocity, long water); // TODO?
 }
