@@ -109,53 +109,48 @@ PixelShaderInput VS(VertexShaderInput input)
 PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
 	PixelShaderOutput output;
-
-	output.Color = Texture.Sample(Sampler, input.UV);
+	float4 tex = Texture.Sample(Sampler, input.UV);
 	
-	DoAlphaTest(output.Color);
-
-	float3 colorMul = input.Color.xyz * AmbientLight.xyz;
+    DoAlphaTest(tex);
+    float3 ambient = AmbientLight.xyz * tex.xyz;
 
 	float3 normal = NormalTexture.Sample(Sampler, input.UV).rgb;
 	normal = normal * 2 - 1;
 	normal = normalize(mul(input.TBN, normal));
 
-	float3 lighting = 0;
-
+	float3 diffuse = 0;
+    float3 spec = 0;
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Type;
 
 		if (lightType == LT_POINT || lightType == LT_SHADOW)
 		{
-			lighting += DoPointLight(input.WorldPosition, normal, Lights[i]);
-            lighting += DoSpecularPoint(input.WorldPosition, normal, Lights[i], input.Sheen);
+            diffuse += DoPointLight(input.WorldPosition, normal, Lights[i]);
+            spec += DoSpecularPoint(input.WorldPosition, normal, Lights[i], input.Sheen);
 
         }
 		else if (lightType == LT_SUN)
 		{
-			lighting += DoDirectionalLight(input.WorldPosition, normal, Lights[i]);
-            lighting += DoSpecularSun(normal, Lights[i], input.Sheen);
+            diffuse += DoDirectionalLight(input.WorldPosition, normal, Lights[i]);
+            spec += DoSpecularSun(normal, Lights[i], input.Sheen);
 
 		}
 		else if (lightType == LT_SPOT)
 		{
-			lighting += DoSpotLight(input.WorldPosition, normal, Lights[i]);
-            lighting += DoSpecularSpot(input.WorldPosition, normal, Lights[i], input.Sheen);
+            diffuse += DoSpotLight(input.WorldPosition, normal, Lights[i]);
+            spec += DoSpecularSpot(input.WorldPosition, normal, Lights[i], input.Sheen);
 
 		}
 	}
-
-	output.Color.xyz *= colorMul.xyz;
-	output.Color.xyz += lighting.xyz;
-
-	output.Depth = output.Color.w > 0.0f ?
+    diffuse.xyz *= tex.xyz;
+	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-
+    output.Color = float4(ambient + diffuse + spec, tex.w);
 	if (FogMaxDistance != 0)
 	{
-		output.Color.xyz = lerp(output.Color.xyz, FogColor, input.Fog);
+		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
 	}
 	return output;
 }
