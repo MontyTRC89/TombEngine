@@ -1230,7 +1230,7 @@ namespace TEN::Renderer
 				m_stStatic.World = world;
 				m_stStatic.Color = Vector4::One;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				m_context->VSSetConstantBuffers(8, 1, m_cbStatic.get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 				RendererVertex vtx0;
 				vtx0.Position = deb->mesh.Positions[0];
