@@ -264,6 +264,13 @@ namespace TEN::Entities::Vehicles
 		jeep->BackRightWheelRotation -= rotAdd;
 		jeep->BackLeftWheelRotation -= rotAdd;
 
+		// TODO: Check.
+		/*if ((jeepItem->Pose.Position.y + jeepItem->Animation.VerticalVelocity) > (floorHeight - 32))
+		{
+			if (jeepItem->Animation.VerticalVelocity > 150)
+				laraItem->HitPoints += 150 - jeepItem->Animation.VerticalVelocity;
+		}*/
+
 		int oldY = jeepItem->Pose.Position.y;
 		jeepItem->Animation.VerticalVelocity = DoVehicleDynamics(floorHeight, jeepItem->Animation.VerticalVelocity, JEEP_BOUNCE_MIN, JEEP_KICK_MAX, &jeepItem->Pose.Position.y, 1.5f);
 		jeep->Velocity = DoVehicleWaterMovement(jeepItem, laraItem, jeep->Velocity, JEEP_FRONT, &jeep->TurnRate);

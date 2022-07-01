@@ -190,7 +190,7 @@ namespace TEN::Entities::Vehicles
 	{
 		if (dismountType == VehicleDismountType::None)
 			return false;
-		auto probe = GetCollision(vehicleItem, angle, distance);
+		auto probe = GetCollision(vehicleItem, angle, distance, -CLICK(2));
 
 		// Assess for walls. Check ceiling as well?
 		if (probe.Position.Floor == NO_HEIGHT)
@@ -324,7 +324,7 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += (int)(GRAVITY * weightMult);
+				verticalVelocity += (int)round(GRAVITY * weightMult); // Check.
 		}
 		// Airborne.
 		else
@@ -337,51 +337,6 @@ namespace TEN::Entities::Vehicles
 
 			if (*yPos > height)
 				*yPos = height;
-		}
-
-		return verticalVelocity;
-	}
-
-	// Temp. for reference. Flag parameter was unused. @Sezz 2022.06.30
-	// TODO: Adapt damage application for jeep.
-	int DoJeepDynamics(ItemInfo* laraItem, int height, int verticalVelocity, int* yPos, int flags)
-	{
-		if (height <= *yPos)
-		{
-			if (flags)
-				return verticalVelocity;
-			else
-			{
-				int kick = height - *yPos;
-				if (kick < -80)
-					kick = -80;
-
-				verticalVelocity += ((kick - verticalVelocity) / 16);
-
-				if (*yPos > height)
-					*yPos = height;
-			}
-		}
-		else
-		{
-			*yPos += verticalVelocity;
-
-			if (*yPos <= (height - 32))
-			{
-				if (flags)
-					verticalVelocity += flags + (flags / 2);
-				else
-					verticalVelocity += (int)((float)GRAVITY * 1.5f);
-			}
-			else
-			{
-				*yPos = height;
-
-				if (verticalVelocity > 150)
-					laraItem->HitPoints += 150 - verticalVelocity;
-
-				verticalVelocity = 0;
-			}
 		}
 
 		return verticalVelocity;
