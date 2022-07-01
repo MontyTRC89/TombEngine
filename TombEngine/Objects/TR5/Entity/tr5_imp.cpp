@@ -240,10 +240,8 @@ void ImpControl(short itemNumber)
 				if (creature->Flags == 0 &&
 					item->TouchBits & 0x280)
 				{
+					DoDamage(creature->Enemy, 3);
 					CreatureEffect2(item, &ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
-
-					LaraItem->HitPoints -= 3;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

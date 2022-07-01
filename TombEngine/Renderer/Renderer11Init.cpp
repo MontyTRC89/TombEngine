@@ -38,14 +38,11 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	auto logoName = L"Textures/Logo.png";
 	SetTextureOrDefault(m_logo, logoName);
 
-	m_shadowMaps = RenderTargetCubeArray(m_device.Get(), g_Configuration.shadowMapSize, MAX_DYNAMIC_SHADOWS, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB, DXGI_FORMAT_D16_UNORM);
 	// Load shaders
 	ComPtr<ID3D10Blob> blob;
-	//char shadowMapStringBuff[4];
-	//_itoa(g_Configuration.shadowMapSize, shadowMapStringBuff,10);
-	std::string shadowSizeString = std::to_string(g_Configuration.shadowMapSize);
-	const D3D_SHADER_MACRO roomDefines[] = {"SHADOW_MAP_SIZE",shadowSizeString.c_str(),nullptr,nullptr};
-	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "SHADOW_MAP_SIZE",shadowSizeString.c_str(),"ANIMATED" ,"",nullptr,nullptr };
+	std::string shadowSizeString = std::to_string(g_Configuration.ShadowMapSize);
+	const D3D_SHADER_MACRO roomDefines[] = {"SHADOW_MAP_SIZE", shadowSizeString.c_str(), nullptr, nullptr};
+	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "SHADOW_MAP_SIZE", shadowSizeString.c_str(), "ANIMATED", "", nullptr, nullptr };
 	   
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(),L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefines[0], blob);
 	// Initialise input layout using the first vertex shader
@@ -66,7 +63,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
 
 	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
-	m_psRooms = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_0", &roomDefines[0], blob);
+	m_psRooms = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_1", &roomDefines[0], blob);
 	m_vsItems = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Items.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psItems = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Items.fx", "PS", "ps_4_0", nullptr, blob);
 	m_vsStatics = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Statics.fx", "VS", "vs_4_0", nullptr, blob);
@@ -92,7 +89,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
 	
-	m_shadowMap = RenderTarget2D(m_device.Get(), g_Configuration.shadowMapSize, g_Configuration.shadowMapSize, DXGI_FORMAT_R32_FLOAT,DXGI_FORMAT_D16_UNORM);
+	m_shadowMap = Texture2DArray(m_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_D16_UNORM);
 	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 
 	// Initialise constant buffers
@@ -307,8 +304,8 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HW
 
 	m_shadowMapViewport.TopLeftX = 0;
 	m_shadowMapViewport.TopLeftY = 0;
-	m_shadowMapViewport.Width = g_Configuration.shadowMapSize;
-	m_shadowMapViewport.Height = g_Configuration.shadowMapSize;
+	m_shadowMapViewport.Width = g_Configuration.ShadowMapSize;
+	m_shadowMapViewport.Height = g_Configuration.ShadowMapSize;
 	m_shadowMapViewport.MinDepth = 0.0f;
 	m_shadowMapViewport.MaxDepth = 1.0f;
 
@@ -344,7 +341,7 @@ void TEN::Renderer::Renderer11::Create()
 #ifdef _RELEASE
 	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context);
 #else
-	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, /*D3D11_CREATE_DEVICE_DEBUG*/ NULL, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
+	res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG, levels, 1, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_context); // D3D11_CREATE_DEVICE_DEBUG
 #endif
 	Utils::throwIfFailed(res);
 }

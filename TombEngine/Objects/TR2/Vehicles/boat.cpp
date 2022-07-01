@@ -539,8 +539,7 @@ namespace TEN::Entities::Vehicles
 
 			if (lara->Vehicle == itemNumber && sBoatItem->Animation.Velocity > BOAT_MAX_VELOCITY + BOAT_ACCELERATION && newVelocity < sBoatItem->Animation.Velocity - 10)
 			{
-				laraItem->HitPoints -= sBoatItem->Animation.Velocity;
-				laraItem->HitStatus = true;
+				DoDamage(laraItem, sBoatItem->Animation.Velocity);
 				SoundEffect(SFX_TR4_LARA_INJURY, &laraItem->Pose);
 				newVelocity /= 2;
 				sBoatItem->Animation.Velocity /= 2;

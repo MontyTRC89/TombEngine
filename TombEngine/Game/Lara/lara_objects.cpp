@@ -600,6 +600,7 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		UpdateRopeSwing(item);
+		RopeSwingCollision(item, coll);
 
 		if (TrInput & IN_SPRINT)
 		{
@@ -633,6 +634,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = SECTOR(2);
 
 	UpdateRopeSwing(item);
+	RopeSwingCollision(item, coll);
 
 	if (item->Animation.AnimNumber == LA_ROPE_SWING)
 	{
@@ -738,20 +740,10 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (item->Animation.ActiveState == LA_POLE_IDLE) // Hack.
+		if (item->Animation.ActiveState == LA_POLE_IDLE) // HACK.
 		{
-			if (TrInput & IN_LEFT)
-			{
-				lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-				if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-					lara->Control.TurnRate = LARA_POLE_TURN_MAX;
-			}
-			else if (TrInput & IN_RIGHT)
-			{
-				lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-				if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-					lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
-			}
+			if (TrInput & (IN_LEFT | IN_RIGHT))
+				ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
 		}
 
 		// TODO: Add forward jump.
@@ -841,18 +833,8 @@ void lara_as_pole_up(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_LEFT)
-		{
-			lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = LARA_POLE_TURN_MAX;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
-		}
+		if (TrInput & (IN_LEFT | IN_RIGHT))
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
 
 		if (TrInput & IN_JUMP)
 		{
@@ -900,18 +882,8 @@ void lara_as_pole_down(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_ACTION)
 	{
-		if (TrInput & IN_LEFT)
-		{
-			lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = LARA_POLE_TURN_MAX;
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
-		}
+		if (TrInput & (IN_LEFT | IN_RIGHT))
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
 
 		if (TrInput & IN_JUMP)
 		{
@@ -1000,11 +972,8 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_LEFT)
 		{
-			lara->Control.TurnRate += LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate > LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = LARA_POLE_TURN_MAX;
-
 			item->Animation.TargetState = LS_POLE_TURN_CLOCKWISE;
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
 			return;
 		}
 
@@ -1055,11 +1024,8 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 
 		if (TrInput & IN_RIGHT)
 		{
-			lara->Control.TurnRate -= LARA_POLE_TURN_RATE;
-			if (lara->Control.TurnRate < -LARA_POLE_TURN_MAX)
-				lara->Control.TurnRate = -LARA_POLE_TURN_MAX;
-
 			item->Animation.TargetState = LS_POLE_TURN_COUNTER_CLOCKWISE;
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
 			return;
 		}
 

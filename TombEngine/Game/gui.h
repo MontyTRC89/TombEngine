@@ -97,7 +97,7 @@ enum class Menu
 	Options,
 	Display,
 	Controls,
-	Sound
+	OtherSettings
 };
 
 enum InventoryObjectTypes
@@ -442,7 +442,8 @@ private:
 	void ClearInputVariables(bool flag);
 	void HandleDisplaySettingsInput(bool pause);
 	void HandleControlSettingsInput(bool pause);
-	void HandleSoundSettingsInput(bool pause);
+	void HandleOtherSettingsInput(bool pause);
+	void HandleOptionsInput();
 	void BackupOptions();
 	bool DoObjectsCombine(int obj1, int obj2);
 	void InitialiseInventory();

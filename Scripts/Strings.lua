@@ -9,8 +9,28 @@ local strings = {
 		"",
 		""
 	},
+	all = {
+		"All",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	apply = {
 		"Apply",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	auto_target = {
+		"Automatic targeting",
 		"",
 		"",
 		"",
@@ -409,16 +429,6 @@ local strings = {
 		"",
 		""
 	},
-	sounds = {
-		"Audio settings",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
 	enable_sound = {
 		"Enable Sounds",
 		"",
@@ -669,8 +679,38 @@ local strings = {
 		"",
 		""
 	},
+	none = {
+		"None",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	ok = {
 		"OK",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	options = {
+		"Options",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	other_settings = {
+		"Sound and Gameplay",
 		"",
 		"",
 		"",
@@ -719,8 +759,28 @@ local strings = {
 		"",
 		""
 	},
+	player = {
+		"Player",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	render_options = {
 		"Render Options",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	reverb = {
+		"Reverb",
 		"",
 		"",
 		"",
@@ -771,6 +831,16 @@ local strings = {
 	},
 	rocket_launcher = {
 		"Rocket Launcher",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	rumble = {
+		"Vibration",
 		"",
 		"",
 		"",
@@ -899,18 +969,8 @@ local strings = {
 		"",
 		""
 	},
-	options = {
-		"Options",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
 	sound = {
-		"Sound settings",
+		"Sound",
 		"",
 		"",
 		"",
@@ -919,17 +979,7 @@ local strings = {
 		"",
 		""
 	},
-	special_sound_fx = {
-		"Special Sound FX",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
-SILENCER_ITEM = {
+	silencer = {
 	"Silencer",
 		"",
 		"",
@@ -941,6 +991,16 @@ SILENCER_ITEM = {
 	},
 	statistics = {
 		"Statistics",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	thumbstick_camera = {
+		"Thumbstick camera",
 		"",
 		"",
 		"",

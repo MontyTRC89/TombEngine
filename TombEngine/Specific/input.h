@@ -2,24 +2,6 @@
 
 namespace TEN::Input
 {
-	constexpr int JOY_AXIS_DEADZONE  = 8000;
-
-	constexpr int MAX_KEYBOARD_KEYS  = 256;
-	constexpr int MAX_JOYSTICK_KEYS  = 16;
-	constexpr int MAX_JOYSTICK_AXES  = 6;
-	constexpr int MAX_POV_AXES       = 4;
-
-	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_JOYSTICK_KEYS + MAX_POV_AXES + MAX_JOYSTICK_AXES * 2;
-
-	enum InputAxis
-	{
-		MoveVertical,
-		MoveHorizontal,
-		CameraVertical,
-		CameraHorizontal,
-		Count
-	};
-
 	enum InputKeys
 	{
 		KEY_FORWARD,
@@ -63,13 +45,45 @@ namespace TEN::Input
 		IN_LSTEP	  = (1 << KEY_LSTEP),
 		IN_RSTEP	  = (1 << KEY_RSTEP),
 
-		// Additional input flags without direct key relation
+		// Additional input actions without direct key relation
 
 		IN_SAVE		  = (1 << KEY_COUNT + 0),
 		IN_LOAD		  = (1 << KEY_COUNT + 1),
-		IN_DESELECT   = (1 << KEY_COUNT + 2),
-		IN_LOOKSWITCH = (1 << KEY_COUNT + 3)
+		IN_SELECT	  = (1 << KEY_COUNT + 2),
+		IN_DESELECT   = (1 << KEY_COUNT + 3),
+		IN_LOOKSWITCH = (1 << KEY_COUNT + 4)
 	};
+
+	enum InputAxis
+	{
+		MoveVertical,
+		MoveHorizontal,
+		CameraVertical,
+		CameraHorizontal,
+		Count
+	};
+
+	enum class RumbleMode
+	{
+		Both,
+		Left,
+		Right
+	};
+
+	struct RumbleData
+	{
+		RumbleMode Mode;
+		float Power;
+		float LastPower;
+		float FadeSpeed;
+	};
+
+	constexpr int MAX_KEYBOARD_KEYS    = 256;
+	constexpr int MAX_GAMEPAD_KEYS     = 16;
+	constexpr int MAX_GAMEPAD_AXES     = 6;
+	constexpr int MAX_GAMEPAD_POV_AXES = 4;
+
+	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
 	constexpr int IN_OPTIC_CONTROLS = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT);
 	constexpr int IN_WAKE = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION);
@@ -78,7 +92,7 @@ namespace TEN::Input
 	extern const char* g_KeyNames[];
 	extern int TrInput;
 	extern int DbInput;
-	extern int InputBusy;
+	extern int RawInput;
 
 	extern std::vector<bool>   KeyMap;
 	extern std::vector<float>  AxisMap;
@@ -89,4 +103,6 @@ namespace TEN::Input
 	void DeInitialiseInput();
 	bool UpdateInput(bool debounce = true);
 	void DefaultConflict();
+	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
+	void StopRumble();
 }

@@ -321,6 +321,7 @@ bool TestLaraHangJump(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
 	item->Animation.Airborne = true;
+	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	return true;
 }
@@ -939,6 +940,10 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	if (!TestValidLedge(item, coll))
 		return false;
 
+	TestForObjectOnLedge(item, coll);
+	if (coll->HitStatic)
+		return false;
+
 	auto probe = GetCollision(item, coll->Setup.ForwardAngle, CLICK(2), -CLICK(1));
 	int headroom = probe.Position.Floor - probe.Position.Ceiling;
 
@@ -988,6 +993,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.Airborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
+	lara->Control.TurnRate = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
 	return true;
@@ -1174,11 +1180,11 @@ bool IsRunJumpQueueableState(LaraState state)
 
 bool IsRunJumpCountableState(LaraState state)
 {
-	if (state == LS_RUN_FORWARD ||
-		state == LS_WALK_FORWARD ||
-		state == LS_JUMP_FORWARD ||
+	if (state == LS_WALK_FORWARD ||
+		state == LS_RUN_FORWARD ||
 		state == LS_SPRINT ||
-		state == LS_SPRINT_DIVE)
+		state == LS_SPRINT_DIVE ||
+		state == LS_JUMP_FORWARD)
 	{
 		return true;
 	}

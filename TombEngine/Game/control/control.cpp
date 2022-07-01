@@ -33,6 +33,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
@@ -45,10 +46,10 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/winmain.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;
 using std::unordered_map;
@@ -62,6 +63,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Renderer;
@@ -81,6 +83,8 @@ bool ThreadEnded;
 int RequiredStartPos;
 int CurrentLevel;
 int LevelComplete;
+
+int SystemNameHash = 0;
 
 bool  InItemControlLoop;
 short ItemNewRoomNo;
@@ -144,6 +148,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
@@ -153,6 +158,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
@@ -162,6 +168,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
 			{
 				StopAllSounds();
+				StopRumble();
+
 				g_Renderer.DumpGameScene();
 				g_Gui.SetInventoryMode(InventoryMode::Pause);
 				g_Gui.SetMenuToDisplay(Menu::Pause);
@@ -170,8 +178,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if ((DbInput & IN_OPTION || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
-				// Stop all sounds
 				StopAllSounds();
+				StopRumble();
 
 				if (g_Gui.CallInventory(true))
 					return GameStatus::LoadGame;
@@ -210,59 +218,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Handle lasersight and binocular
 		if (CurrentLevel != 0)
-		{
-			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
-					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.TargetState != LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE)))
-			{
-				if (BinocularRange == 0)
-				{
-					if (UseSpotCam || TrackCameraInit)
-						TrInput &= ~IN_LOOK;
-				}
-				else
-				{
-					// If any input but optic controls (directions + action), immediately exit binoculars mode.
-					if (TrInput != IN_NONE && ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE))
-						BinocularRange = 0;
-
-					if (LaserSight)
-					{
-						BinocularRange = 0;
-						BinocularOn = false;
-						LaserSight = false;
-						Camera.type = BinocularOldCamera;
-						Camera.bounce = 0;
-						AlterFOV(ANGLE(80.0f));
-
-						LaraItem->MeshBits = ALL_JOINT_BITS;
-						Lara.Inventory.IsBusy = false;
-						ResetLaraFlex(LaraItem);
-
-						TrInput &= ~IN_LOOK;
-					}
-					else
-					{
-						TrInput |= IN_LOOK;
-						DbInput = 0;
-					}
-				}
-			}
-			else if (BinocularRange == 0)
-			{
-				if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-					((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-						Lara.Control.Weapon.GunType == LaraWeaponType::HK || 
-						(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
-				{
-					BinocularRange = 128;
-					BinocularOldCamera = Camera.oldType;
-					BinocularOn = true;
-					LaserSight = true;
-					Lara.Inventory.IsBusy = true;
-				}
-			}
-		}
+			HandleOptics();
 
 		// Update all items
 		InItemControlLoop = true;
@@ -457,11 +413,9 @@ GameStatus DoTitle(int index, std::string const& ambient)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
-	// Load the level
-	LoadLevelFile(index);
+	// Load the title. Exit game if unsuccessful.
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitGame;
 
 	InventoryResult inventoryResult;
 
@@ -471,7 +425,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-		StopAllSounds();
 
 		g_GameScript->ResetScripts(true);
 
@@ -568,17 +521,14 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
-	// Load the level
-	LoadLevelFile(index);
+	// Load the level and fall back to title, if load was unsuccessful
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitToTitle;
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	StopAllSounds();
 
 	g_GameScript->ResetScripts(loadFromSavegame);
 
@@ -673,6 +623,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			// Here is the only way for exiting from the loop
 			StopAllSounds();
 			StopSoundTracks();
+			StopRumble();
 
 			return result;
 		}
@@ -798,6 +749,9 @@ void CleanUp()
 	// Needs to be cleared because otherwise a list of active creatures from previous level
 	// will spill into new level
 	ActiveCreatures.clear();
+
+	// Clear ropes
+	Ropes.clear();
 
 	// Clear spotcam array
 	ClearSpotCamSequences();

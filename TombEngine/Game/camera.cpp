@@ -13,6 +13,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
+#include "Game/spotcam.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
@@ -29,6 +30,9 @@ constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
 constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS          = CLICK(1);
+
+constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
+constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
 
 struct OLD_CAMERA
 {
@@ -102,6 +106,11 @@ void AlterFOV(int value)
 {
 	CurrentFOV = value;
 	PhdPerspective = g_Renderer.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+}
+
+inline void RumbleFromBounce()
+{
+	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
 
 
@@ -208,6 +217,7 @@ void MoveCamera(GameVector* ideal, int speed)
 			Camera.target.y += GetRandomControl() % bounce - bounce2;
 			Camera.target.z += GetRandomControl() % bounce - bounce2;
 			Camera.bounce += 5;
+			RumbleFromBounce();
 		}
 		else
 		{
@@ -427,28 +437,34 @@ void ChaseCamera(ItemInfo* item)
 	MoveCamera(&ideal, Camera.speed);
 }
 
-void UpdateCameraElevation()
+void DoThumbstickCamera()
 {
-	// TODO: Add option to enable/disable camera rotation
+	if (!g_Configuration.EnableThumbstickCameraControl)
+		return;
 
 	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
-								  Camera.target.y == OldCam.target.y &&
-								  Camera.target.z == OldCam.target.z))
+		Camera.target.y == OldCam.target.y &&
+		Camera.target.z == OldCam.target.z))
 	{
-		Camera.targetAngle += ANGLE(50 * AxisMap[InputAxis::CameraHorizontal]);
-		Camera.targetElevation = ANGLE(-10 + (50 * AxisMap[InputAxis::CameraVertical]));
+		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraHorizontal]);
+		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraVertical]));
 	}
+}
+
+void UpdateCameraElevation()
+{
+	DoThumbstickCamera();
 
 	if (Camera.laraNode != -1)
 	{
-		Vector3Int pos = { 0, 0, 0 };
+		auto pos = Vector3Int();
 		GetLaraJointPosition(&pos, Camera.laraNode);
 
-		Vector3Int pos1 = { 0, -CLICK(1), SECTOR(2) };
+		auto pos1 = Vector3Int(0, -CLICK(1), SECTOR(2));
 		GetLaraJointPosition(&pos1, Camera.laraNode);
 
-		pos.z = pos1.z - pos.z;
 		pos.x = pos1.x - pos.x;
+		pos.z = pos1.z - pos.z;
 		Camera.actualAngle = Camera.targetAngle + phd_atan(pos.z, pos.x);
 	}
 	else
@@ -852,7 +868,7 @@ void BinocularCamera(ItemInfo* item)
 	if (!LaserSight)
 	{
 		// TODO: Some of these inputs should ideally be blocked. @Sezz 2022.05.19
-		if (InputBusy & (IN_DESELECT | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
+		if (RawInput & (IN_DESELECT | IN_OPTION | IN_LOOK | IN_DRAW | IN_FLARE | IN_WALK | IN_JUMP))
 		{
 			item->MeshBits = ALL_JOINT_BITS;
 			lara->Inventory.IsBusy = false;
@@ -927,6 +943,7 @@ void BinocularCamera(ItemInfo* item)
 			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
 			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce >> 1));
 			Camera.bounce += 5;
+			RumbleFromBounce();
 		}
 		else
 		{
@@ -956,7 +973,7 @@ void BinocularCamera(ItemInfo* item)
 	int range = 0;
 	int flags = 0;
 
-	if (!(InputBusy & IN_WALK))
+	if (!(RawInput & IN_WALK))
 	{
 		range = 64;
 		flags = 0x10000;
@@ -967,7 +984,7 @@ void BinocularCamera(ItemInfo* item)
 		flags = 0x8000;
 	}
 
-	if (InputBusy & IN_SPRINT)
+	if (RawInput & IN_SPRINT)
 	{
 		BinocularRange -= range;
 		if (BinocularRange < ANGLE(0.7f))
@@ -975,7 +992,7 @@ void BinocularCamera(ItemInfo* item)
 		else
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 	}
-	else if (InputBusy & IN_CROUCH)
+	else if (RawInput & IN_CROUCH)
 	{
 		BinocularRange += range;
 		if (BinocularRange > ANGLE(8.5f))
@@ -992,10 +1009,10 @@ void BinocularCamera(ItemInfo* item)
 		bool firing = false;
 		auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
-		if (!(InputBusy & IN_ACTION) ||
+		if (!(RawInput & IN_ACTION) ||
 			WeaponDelay || !ammo)
 		{
-			if (!(InputBusy & IN_ACTION))
+			if (!(RawInput & IN_ACTION))
 			{
 				LSHKShotsFired = 0;
 				Camera.bounce = 0;
@@ -1033,6 +1050,8 @@ void BinocularCamera(ItemInfo* item)
 						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 					}
+
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 				}
 				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
 				{
@@ -1054,6 +1073,8 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
+
+						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 					}
 					else
 					{
@@ -1066,6 +1087,8 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
+
+						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 					}
 				}
 				else
@@ -1093,8 +1116,6 @@ void BinocularCamera(ItemInfo* item)
 							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 						}
 					}
-
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 				}
 
 				if (!ammo.hasInfinite())
@@ -1108,7 +1129,7 @@ void BinocularCamera(ItemInfo* item)
 	{
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
-		if (!(InputBusy & IN_ACTION))
+		if (!(RawInput & IN_ACTION))
 		{
 			// Reimplement this mode?
 		}
@@ -1806,6 +1827,61 @@ void UpdateFadeScreenAndCinematicBars()
 		{
 			ScreenFadeCurrent = ScreenFadeEnd;
 			ScreenFading = false;
+		}
+	}
+}
+
+void HandleOptics()
+{
+	if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
+		((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
+		 (!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.TargetState != LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE)))
+	{
+		if (BinocularRange == 0)
+		{
+			if (UseSpotCam || TrackCameraInit)
+				TrInput &= ~IN_LOOK;
+		}
+		else
+		{
+			// If any input but optic controls (directions + action), immediately exit binoculars mode.
+			if (TrInput != IN_NONE && ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE))
+				BinocularRange = 0;
+
+			if (LaserSight)
+			{
+				BinocularRange = 0;
+				BinocularOn = false;
+				LaserSight = false;
+				Camera.type = BinocularOldCamera;
+				Camera.bounce = 0;
+				AlterFOV(ANGLE(80.0f));
+
+				LaraItem->MeshBits = ALL_JOINT_BITS;
+				Lara.Inventory.IsBusy = false;
+				ResetLaraFlex(LaraItem);
+
+				TrInput &= ~IN_LOOK;
+			}
+			else
+			{
+				TrInput |= IN_LOOK;
+				DbInput = 0;
+			}
+		}
+	}
+	else if (BinocularRange == 0)
+	{
+		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
+			((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
+				Lara.Control.Weapon.GunType == LaraWeaponType::HK ||
+				(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
+		{
+			BinocularRange = 128;
+			BinocularOldCamera = Camera.oldType;
+			BinocularOn = true;
+			LaserSight = true;
+			Lara.Inventory.IsBusy = true;
 		}
 	}
 }

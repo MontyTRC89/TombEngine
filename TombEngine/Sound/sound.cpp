@@ -168,7 +168,7 @@ bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Error);
+		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Warning);
 		g_Level.SoundMap[effectID] = -2;
 		return false;
 	}
@@ -720,7 +720,7 @@ void Sound_UpdateScene()
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableAudioSpecialEffects ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -853,7 +853,8 @@ void Sound_Init()
 
 void Sound_DeInit()
 {
-	BASS_Free();
+	if (g_Configuration.EnableSound)
+		BASS_Free();
 }
 
 bool Sound_CheckBASSError(const char* message, bool verbose, ...)

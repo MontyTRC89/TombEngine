@@ -252,7 +252,7 @@ namespace TEN::Entities::TR3
 				creature->MaxTurn = ANGLE(4.0f);
 				creature->Flags = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
 
-				if (creature->Enemy == LaraItem)
+				if (creature->Enemy->IsLara())
 				{
 					if (item->TestBits(JointBitType::Touch, TribesmanAxeAttackJoints) &&
 						creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
@@ -262,9 +262,7 @@ namespace TEN::Entities::TR3
 							CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
 
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
-
-						LaraItem->HitPoints -= TribesmanAxeHit[item->Animation.ActiveState][2];
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, TribesmanAxeHit[item->Animation.ActiveState][2]);
 					}
 				}
 				else
@@ -278,10 +276,8 @@ namespace TEN::Entities::TR3
 							creature->Flags >= TribesmanAxeHit[item->Animation.ActiveState][0] &&
 							creature->Flags <= TribesmanAxeHit[item->Animation.ActiveState][1])
 						{
-							creature->Enemy->HitPoints -= 2;
-							creature->Enemy->HitStatus = true;
-
 							CreatureEffect(item, &TribesmanAxeBite, DoBloodSplat);
+							DoDamage(creature->Enemy, 2);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						}
 					}
@@ -386,7 +382,7 @@ namespace TEN::Entities::TR3
 			}
 
 			if (item->HitStatus ||
-				(creature->Enemy == LaraItem && (AI.distance < SECTOR(1) ||
+				(creature->Enemy == LaraItem && (AI.distance < pow(SECTOR(1), 2) ||
 					TargetVisible(item, &AI)) && (abs(LaraItem->Pose.Position.y - item->Pose.Position.y) < SECTOR(2))))
 			{
 				AlertAllGuards(itemNumber);
@@ -553,16 +549,14 @@ namespace TEN::Entities::TR3
 				break;
 
 			case 6:
-				if (creature->Enemy == LaraItem)
+				if (creature->Enemy->IsLara())
 				{
 					if (!(creature->Flags & 0xf000) && item->TestBits(JointBitType::Touch, TribesmanDartAttackJoints))
 					{
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						CreatureEffect(item, &TribesmanDartBite1, DoBloodSplat);
+						DoDamage(creature->Enemy, 100);
 						creature->Flags |= 0x1000;
-
-						LaraItem->HitPoints -= 100;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
@@ -573,10 +567,9 @@ namespace TEN::Entities::TR3
 							abs(creature->Enemy->Pose.Position.y - item->Pose.Position.y) < pow(SECTOR(0.5f), 2) &&
 							abs(creature->Enemy->Pose.Position.z - item->Pose.Position.z) < pow(SECTOR(0.5f), 2))
 						{
-							creature->Enemy->HitPoints -= 5;
-							creature->Enemy->HitStatus = true;
 							creature->Flags |= 0x1000;
 
+							DoDamage(creature->Enemy, 5);
 							SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						}
 					}

@@ -144,7 +144,7 @@ namespace TEN::Entities::TR4
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->HitPoints = 0;
+		DoDamage(item, INT_MAX);
 		RemoveActiveItem(itemNumber);	// Remove it from the active item list.
 
 		item->Flags = IFLAG_CLEAR_BODY;
@@ -548,14 +548,12 @@ namespace TEN::Entities::TR4
 
 				if (creature->Flags == 0 &&
 					(item->TestBits(JointBitType::Touch, BaboonAttackJoints) ||
-						item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
-						item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
+					 item->TestBits(JointBitType::Touch, BaboonAttackRightJoints) ||
+					 item->TestBits(JointBitType::Touch, BaboonJumpAttackJoints)))
 				{
 					CreatureEffect2(item, &BaboonBite, 10, -1, DoBloodSplat);
+					DoDamage(creature->Enemy, BABOON_ATTACK_DAMAGE);
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= BABOON_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

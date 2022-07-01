@@ -17,6 +17,7 @@
 #include "Objects/objectslist.h"
 #include "Game/itemdata/creature_info.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
+#include "Renderer/Renderer11.h"
 
 #define CHECK_CLICK(x) CLICK(x) / 2
 #define ESCAPE_DIST SECTOR(5)
@@ -37,6 +38,53 @@ constexpr int NONE_PRIO_RANGE = LOW_PRIO_RANGE + LOW_PRIO_RANGE * (LOW_PRIO_RANG
 constexpr auto FRAME_PRIO_BASE = 4;
 constexpr auto FRAME_PRIO_EXP = 1.5;
 #endif // CREATURE_AI_PRIORITY_OPTIMIZATION
+
+void DrawBox(int boxIndex, Vector3 color)
+{
+	if (boxIndex == NO_BOX)
+		return;
+
+	auto& currBox = g_Level.Boxes[boxIndex];
+
+	float x = ((float)currBox.left + (float)(currBox.right - currBox.left) / 2.0f) * 1024.0f;
+	auto  y = currBox.height - CLICK(1);
+	float z = ((float)currBox.top + (float)(currBox.bottom - currBox.top) / 2.0f) * 1024.0f;
+
+
+	auto center = Vector3(z, y, x);
+	auto corner = Vector3(currBox.bottom * SECTOR(1), currBox.height + CLICK(1), currBox.right * SECTOR(1));
+	auto extents = (corner - center) * 0.9f;
+	auto dBox = BoundingOrientedBox(center, extents, Vector4::UnitY);
+
+	for (int i = 0; i <= 10; i++)
+	{
+		dBox.Extents = extents + Vector3(i);
+		TEN::Renderer::g_Renderer.AddDebugBox(dBox, Vector4(color.x, color.y, color.z, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	}
+}
+
+void DrawNearbyPathfinding(int boxIndex)
+{
+	if (boxIndex == NO_BOX)
+		return;
+
+	DrawBox(boxIndex, Vector3(0, 1, 1));
+
+	auto& currBox = g_Level.Boxes[boxIndex];
+	auto index = currBox.overlapIndex;
+
+	while (true)
+	{
+		auto overlap = g_Level.Overlaps[index];
+
+		DrawBox(overlap.box, Vector3(1, 1, 0));
+
+		if (overlap.flags & BOX_END_BIT)
+			break;
+		else
+			index++;
+	}
+}
 
 void DropEntityPickups(ItemInfo* item)
 {
@@ -377,11 +425,11 @@ short CreatureTurn(ItemInfo* item, short maxTurn)
 	int x = creature->Target.x - item->Pose.Position.x;
 	int z = creature->Target.z - item->Pose.Position.z;
 	angle = phd_atan(z, x) - item->Pose.Orientation.y;
-	int range = item->Animation.Velocity * (16384 / maxTurn);
+	int range = (item->Animation.Velocity * 16384) / maxTurn;
 	int distance = pow(x, 2) + pow(z, 2);
 
 	if (angle > FRONT_ARC || angle < -FRONT_ARC && distance < pow(range, 2))
-		maxTurn >>= 1;
+		maxTurn /= 2;
 
 	if (angle > maxTurn)
 		angle = maxTurn;
@@ -414,13 +462,12 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	auto old = item->Pose.Position;
 	
-	/*if (!Objects[item->objectNumber].waterCreature)
+	if (!Objects[item->ObjectNumber].waterCreature)
 	{
-		roomNumber = item->roomNumber;
-		GetFloor(item->pos.Position.x, item->pos.Position.y, item->pos.Position.z, &roomNumber);
-		if (roomNumber != item->roomNumber)
+		auto roomNumber = GetCollision(item).RoomNumber;
+		if (roomNumber != item->RoomNumber)
 			ItemNewRoom(itemNumber, roomNumber);
-	}*/
+	}
 
 	AnimateItem(item);
 	if (item->Status == ITEM_DEACTIVATED)
@@ -430,7 +477,12 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	}
 
 	auto* bounds = GetBoundsAccurate(item);
-	int y = item->Pose.Position.y + bounds->Y1;
+
+	// HACK: In original, y coordinate was just set to bounding box top point.
+	// In TEN, we have to use nearest click value, because Choco's floordata
+	// system returns inconsistent room number in portal 4-click vault cases -- Lwmte, 27.06.22
+
+	int y = item->Pose.Position.y - ceil((float)abs(bounds->Y1) / (float)CLICK(1)) * CLICK(1);
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
@@ -478,7 +530,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
 		height = g_Level.Boxes[floor->Box].height;
 		if (!Objects[item->ObjectNumber].nonLot)
-			nextHeight = LOT->Node[floor->Box].exitBox;
+			nextBox = LOT->Node[floor->Box].exitBox;
 		else
 		{
 			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
@@ -507,7 +559,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 		if (xPos < radius)
 		{
-			if (BadFloor(x-radius, y, z, height, nextHeight, roomNumber, LOT))
+			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
 				shiftX = radius - xPos;
 			else if (!shiftZ && BadFloor(x - radius, y, z - radius, height, nextHeight, roomNumber, LOT))
 			{
@@ -720,22 +772,33 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 		if (item->Pose.Position.y > item->Floor)
 			item->Pose.Position.y = item->Floor;
-		else if (item->Floor - item->Pose.Position.y > STEP_SIZE/4)
-			item->Pose.Position.y += STEP_SIZE/4;
+		else if (item->Floor - item->Pose.Position.y > CLICK(0.25f))
+			item->Pose.Position.y += CLICK(0.25f);
 		else if (item->Pose.Position.y < item->Floor)
 			item->Pose.Position.y = item->Floor;
 
 		item->Pose.Orientation.x = 0;
 	}
 
-	/*roomNumber = item->roomNumber;
-	if (!Objects[item->objectNumber].waterCreature)
+	if (!Objects[item->ObjectNumber].waterCreature)
 	{
-		GetFloor(item->pos.Position.x, item->pos.Position.y - STEP_SIZE*2, item->pos.Position.z, &roomNumber);
+		auto roomNumber = GetCollision(item->Pose.Position.x, 
+										item->Pose.Position.y - CLICK(2), 
+										item->Pose.Position.z,
+										item->RoomNumber).RoomNumber;
 
-		if (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER)
-			item->HitPoints = 0;
-	}*/
+		if (roomNumber != item->RoomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
+
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
+		{
+			auto bounds = GetBoundsAccurate(item);
+			auto height = item->Pose.Position.y - GetWaterHeight(item);
+
+			if (abs(bounds->Y1 + bounds->Y2) < height)
+				DoDamage(item, INT_MAX);
+		}
+	}
 
 	roomNumber = item->RoomNumber;
 	GetFloor(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z, &roomNumber);
@@ -881,8 +944,10 @@ void TargetBox(LOTInfo* LOT, int boxNumber)
 	boxNumber &= NO_BOX;
 	auto* box = &g_Level.Boxes[boxNumber];
 
-	LOT->Target.x = ((box->top * SECTOR(1)) + GetRandomControl() * ((box->bottom - box->top) - 1) >> 5) + SECTOR(0.5f);
-	LOT->Target.z = ((box->left * SECTOR(1)) + GetRandomControl() * ((box->right - box->left) - 1) >> 5) + SECTOR(0.5f);
+	// Maximize target precision. DO NOT change bracket precedence!
+	LOT->Target.x = (int)((box->top  * SECTOR(1)) + (float)GetRandomControl() * (((float)(box->bottom - box->top) - 1.0f) / 32.0f) + SECTOR(0.5f));
+	LOT->Target.z = (int)((box->left * SECTOR(1)) + (float)GetRandomControl() * (((float)(box->right - box->left) - 1.0f) / 32.0f) + SECTOR(0.5f));
+	
 	LOT->RequiredBox = boxNumber;
 
 	if (LOT->Fly == NO_FLYING)
@@ -1035,7 +1100,7 @@ int CreatureActive(short itemNumber)
 
 	if (item->Status == ITEM_INVISIBLE || !item->Data.is<CreatureInfo>())
 	{
-		if (!EnableBaddyAI(itemNumber, 0))
+		if (!EnableEntityAI(itemNumber, 0))
 			return false; // AI couldn't be activated
 
 		item->Status = ITEM_ACTIVE;
@@ -1064,8 +1129,8 @@ int StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 
 	auto* box = &g_Level.Boxes[boxNumber];
 
-	int xRange = STALK_DIST + ((box->bottom - box->top + 3) * SECTOR(1));
-	int zRange = STALK_DIST + ((box->right - box->left + 3) * SECTOR(1));
+	int xRange = STALK_DIST + ((box->bottom - box->top) * SECTOR(1));
+	int zRange = STALK_DIST + ((box->right - box->left) * SECTOR(1));
 	int x = (box->top + box->bottom) * SECTOR(1) / 2 - enemy->Pose.Position.x;
 	int z = (box->left + box->right) * SECTOR(1) / 2 - enemy->Pose.Position.z;
 	
@@ -1225,6 +1290,7 @@ void GetAITarget(CreatureInfo* creature)
 			Objects[item->ObjectNumber].waterCreature)
 		{
 			TestTriggers(enemy, true);
+			ProcessSectorFlags(enemy);
 			creature->Patrol = !creature->Patrol;
 		}
 	}
@@ -1242,6 +1308,7 @@ void GetAITarget(CreatureInfo* creature)
 			abs(enemy->Pose.Position.z - item->Pose.Position.z) < REACHED_GOAL_RADIUS)
 		{
 			TestTriggers(enemy, true);
+			ProcessSectorFlags(enemy);
 
 			creature->ReachedGoal = true;
 			creature->Enemy = LaraItem;
@@ -1394,10 +1461,29 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	else
 		AI->zoneNumber = NO_ZONE;
 
-	room = &g_Level.Rooms[enemy->RoomNumber];
 	enemy->BoxNumber = NO_BOX;
+
+	room = &g_Level.Rooms[enemy->RoomNumber];
 	floor = GetSector(room, enemy->Pose.Position.x - room->x, enemy->Pose.Position.z - room->z);
-	if(floor)
+
+	// NEW: Only update enemy box number if will be actually reachable by enemy.
+	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
+
+	bool reachable = false;
+	if (object->zoneType == ZoneType::ZONE_FLYER ||
+	   (object->zoneType == ZoneType::ZONE_WATER && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	{
+		reachable = true; // If NPC is flying or swimming in water, always reach Lara
+	}
+	else
+	{
+		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
+		auto bounds = GetBoundsAccurate(item);
+
+		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+	}
+
+	if (floor && reachable)
 		enemy->BoxNumber = floor->Box;
 
 	if (enemy->BoxNumber != NO_BOX)
@@ -1430,13 +1516,18 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	short angle = phd_atan(vector.z, vector.x);
 
 	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
-		AI->distance = INT_MAX;
+		AI->distance = AI->verticalDistance = INT_MAX;
 	else
 	{
 		if (creature->Enemy)
+		{
+			// TODO: distance is squared, verticalDistance is not. Desquare distance later. -- Lwmte, 27.06.22
+
 			AI->distance = pow(vector.x, 2) + pow(vector.z, 2);
+			AI->verticalDistance = abs(vector.y);
+		}
 		else
-			AI->distance = INT_MAX;
+			AI->distance = AI->verticalDistance = INT_MAX;
 	}
 
 	AI->angle = angle - item->Pose.Orientation.y;
@@ -1475,8 +1566,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 		{
 		case MoodType::Bored:
 			boxNumber = LOT->Node[GetRandomControl() * LOT->ZoneCount >> 15].boxNumber;
-			if (ValidBox(item, AI->zoneNumber, boxNumber) &&
-				!(GetRandomControl() & 0x0F))
+			if (ValidBox(item, AI->zoneNumber, boxNumber))
 			{
 				if (StalkBox(item, enemy, boxNumber) && enemy->HitPoints > 0 && creature->Enemy)
 				{
@@ -1503,7 +1593,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, int violent)
 
 		case MoodType::Escape:
 			boxNumber = LOT->Node[GetRandomControl() * LOT->ZoneCount >> 15].boxNumber;
-			if (ValidBox(item, AI->zoneNumber, boxNumber) && LOT->RequiredBox == NO_BOX)
+			if (ValidBox(item, AI->zoneNumber, boxNumber))
 			{
 				if (EscapeBox(item, enemy, boxNumber))
 					TargetBox(LOT, boxNumber);
@@ -1655,7 +1745,7 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
 				break;
 
 			case MoodType::Attack:
-				if (AI->zoneNumber != AI->enemyZone)
+				if (AI->zoneNumber != AI->enemyZone || enemy->BoxNumber == NO_BOX)
 					creature->Mood = MoodType::Bored;
 
 				break;
@@ -1684,13 +1774,11 @@ void GetCreatureMood(ItemInfo* item, AI_INFO* AI, int isViolent)
 				else if (AI->zoneNumber == AI->enemyZone)
 				{
 					if (AI->distance < ATTACK_RANGE ||
-						(creature->Mood == MoodType::Stalk &&
-							LOT->RequiredBox == NO_BOX))
+						(creature->Mood == MoodType::Stalk && LOT->RequiredBox == NO_BOX))
 						creature->Mood = MoodType::Attack;
 					else
 						creature->Mood = MoodType::Stalk;
 				}
-
 				break;
 
 			case MoodType::Attack:
@@ -1778,7 +1866,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 		{
 			if (item->Pose.Position.z < boxLeft)
 			{
-				if (direction & CLIP_LEFT &&
+				if ((direction & CLIP_LEFT) &&
 					item->Pose.Position.x >= boxTop &&
 					item->Pose.Position.x <= boxBottom)
 				{
@@ -1807,7 +1895,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 			}
 			else if (item->Pose.Position.z > boxRight)
 			{
-				if (direction & CLIP_RIGHT &&
+				if ((direction & CLIP_RIGHT) &&
 					item->Pose.Position.x >= boxTop &&
 					item->Pose.Position.x <= boxBottom)
 				{
@@ -1837,7 +1925,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 
 			if (item->Pose.Position.x < boxTop)
 			{
-				if (direction & CLIP_TOP &&
+				if ((direction & CLIP_TOP) &&
 					item->Pose.Position.z >= boxLeft &&
 					item->Pose.Position.z <= boxRight)
 				{
@@ -1866,7 +1954,7 @@ TARGET_TYPE CalculateTarget(Vector3Int* target, ItemInfo* item, LOTInfo* LOT)
 			}
 			else if (item->Pose.Position.x > boxBottom)
 			{
-				if (direction & CLIP_BOTTOM &&
+				if ((direction & CLIP_BOTTOM) &&
 					item->Pose.Position.z >= boxLeft &&
 					item->Pose.Position.z <= boxRight)
 				{

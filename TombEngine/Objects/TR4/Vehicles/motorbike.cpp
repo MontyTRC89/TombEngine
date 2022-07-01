@@ -809,8 +809,7 @@ namespace TEN::Entities::Vehicles
 			if (&g_Level.Items[lara->Vehicle] == motorbikeItem &&
 				motorbike->Velocity >= MOTORBIKE_ACCEL && newSpeed < (motorbike->Velocity - 10))
 			{
-				laraItem->HitPoints -= (motorbike->Velocity - newSpeed) / 128;
-				laraItem->HitStatus = true;
+				DoDamage(laraItem, (motorbike->Velocity - newSpeed) / 128);
 			}
 
 			if (motorbike->Velocity > 0 && newSpeed < motorbike->Velocity)
@@ -981,9 +980,9 @@ namespace TEN::Entities::Vehicles
 						if (fallSpeedDamage > 0)
 						{
 							if (fallSpeedDamage <= 100)
-								laraItem->HitPoints -= (-LARA_HEALTH_MAX * fallSpeedDamage * fallSpeedDamage) / 10000;
+								DoDamage(laraItem, (-LARA_HEALTH_MAX * fallSpeedDamage * fallSpeedDamage) / 10000);
 							else
-								laraItem->HitPoints = 0;
+								DoDamage(laraItem, LARA_HEALTH_MAX);
 						}
 					}
 					else if (motorbikeItem->Animation.VerticalVelocity > 220)

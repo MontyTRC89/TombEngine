@@ -15,6 +15,8 @@ using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
 
+constexpr auto MAX_CAMERA = 18;
+
 int TrackCameraInit;
 int SpotcamTimer;
 int SpotcamPaused;

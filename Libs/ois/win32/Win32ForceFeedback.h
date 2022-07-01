@@ -38,6 +38,7 @@ namespace OIS
 
 	public:
 		Win32ForceFeedback(IDirectInputDevice8* pDIJoy, const DIDEVCAPS* pDIJoyCaps);
+		Win32ForceFeedback(unsigned int xInputIndex);
 		~Win32ForceFeedback();
 
 		/** @copydoc ForceFeedback::upload */
@@ -83,6 +84,11 @@ namespace OIS
 		void _updateConditionalEffect(const Effect* effect);
 		void _updateCustomEffect(const Effect* effect);
 
+		//XInput-specific methods
+		bool _isXInput();
+		void _setXInputVibration(unsigned short leftPower, unsigned short rightPower);
+		void _updateXInputConstantEffect(const Effect* effect);
+
 		//Sets the common properties to all effects
 		void _setCommonProperties(DIEFFECT* diEffect, DWORD* rgdwAxes, LONG* rglDirection, DIENVELOPE* diEnvelope, DWORD struct_size, LPVOID struct_type, const Effect* effect, const Envelope* envelope);
 		//Actually do the upload
@@ -101,6 +107,10 @@ namespace OIS
 
 		// Joystick capabilities.
 		const DIDEVCAPS* mpDIJoyCaps;
+
+		// An index specifying XInput device index.
+		// It will be -1 if device is DInput device.
+		int mXInputIndex; 
 
 		// Number of axis supporting FF.
 		short mFFAxes;

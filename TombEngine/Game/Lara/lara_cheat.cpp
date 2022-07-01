@@ -37,13 +37,13 @@ void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 
 	if (TrInput & IN_JUMP)
 	{
-		item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION * 2;
+		item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL * 2;
 		if (item->Animation.VerticalVelocity > LARA_SWIM_VELOCITY_MAX * 2)
 			item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX * 2;
 	}
 	else
 	{
-		if (item->Animation.VerticalVelocity >= LARA_SWIM_ACCELERATION)
+		if (item->Animation.VerticalVelocity >= LARA_SWIM_VELOCITY_ACCEL)
 			item->Animation.VerticalVelocity -= item->Animation.VerticalVelocity / 8;
 		else
 			item->Animation.VerticalVelocity = 0;

@@ -67,7 +67,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 
 						if (ItemPushItem(item, laraItem, coll, deadlyBits & 1, 3) && (deadlyBits & 1))
 						{
-							laraItem->HitPoints -= item->ItemFlags[3];
+							DoDamage(laraItem, item->ItemFlags[3]);
 
 							int dx = x - laraItem->Pose.Position.x;
 							int dy = y - laraItem->Pose.Position.y;
@@ -727,15 +727,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 		dz -= cosY * rz - sinY * rx;
 
 		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / ANGLE(90.0f);
-
-		if (!lara->HitFrame && !lara->SpasmEffectCount)
-		{
-			SoundEffect(SFX_TR4_LARA_INJURY, &item2->Pose);
-			lara->SpasmEffectCount = GenerateInt(15, 35);
-		}
-
-		if (lara->SpasmEffectCount)
-			lara->SpasmEffectCount--;
+		DoDamage(item2, 0); // Dummy hurt call. Only for ooh sound!
 
 		lara->HitFrame++;
 		if (lara->HitFrame > 34)
@@ -1738,7 +1730,7 @@ int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocit
 	return currentVelocity;
 }
 
-void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 {
 	laraItem->HitStatus = false;
 	coll->HitStatic     = false;
@@ -1820,8 +1812,8 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously La
 					}
 					else
 					{
-						// TODO: further checks may be added to prevent killing undead enemies.
-						item->HitPoints = 0;
+						DoDamage(item, INT_MAX);
+
 						DoLotsOfBlood(item->Pose.Position.x,
 							laraItem->Pose.Position.y - CLICK(1),
 							item->Pose.Position.z,

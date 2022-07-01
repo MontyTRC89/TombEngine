@@ -338,10 +338,8 @@ namespace TEN::Entities::TR4
 					frame >= 4 &&
 					frame <= 14)
 				{
+					DoDamage(creature->Enemy, DOG_JUMP_ATTACK_DAMAGE);
 					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-
-					LaraItem->HitPoints -= DOG_JUMP_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				item->Animation.TargetState = DOG_STATE_RUN_FORWARD;
@@ -360,10 +358,8 @@ namespace TEN::Entities::TR4
 						frame >= 22 &&
 						frame <= 25))
 				{
+					DoDamage(creature->Enemy, DOG_BITE_ATTACK_DAMAGE);
 					CreatureEffect2(item, &DogBite, 2, -1, DoBloodSplat);
-
-					LaraItem->HitPoints -= DOG_BITE_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

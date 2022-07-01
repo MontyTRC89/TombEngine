@@ -57,6 +57,7 @@ struct ANIMATED_TEXTURES_FRAME
 struct ANIMATED_TEXTURES_SEQUENCE
 {
 	int atlas;
+	int Fps;
 	int numFrames;
 	std::vector<ANIMATED_TEXTURES_FRAME> frames;
 };
@@ -138,7 +139,7 @@ struct LEVEL
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
 extern char* LevelDataPtr;
-extern int IsLevelLoading;
+extern bool IsLevelLoading;
 extern LEVEL g_Level;
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream);

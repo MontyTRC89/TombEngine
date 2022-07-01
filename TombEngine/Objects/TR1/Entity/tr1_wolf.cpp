@@ -97,7 +97,8 @@ namespace TEN::Entities::TR1
 			GetCreatureMood(item, &AI, TIMID);
 			CreatureMood(item, &AI, TIMID);
 
-			angle = CreatureTurn(item, creature->MaxTurn);
+			if (item->Animation.ActiveState != WOLF_STATE_SLEEP)
+				angle = CreatureTurn(item, creature->MaxTurn);
 
 			switch (item->Animation.ActiveState)
 			{
@@ -217,8 +218,7 @@ namespace TEN::Entities::TR1
 				if (!item->Animation.RequiredState && item->TestBits(JointBitType::Touch, WolfAttackJoints))
 				{
 					CreatureEffect(item, &WolfBite, DoBloodSplat);
-					LaraItem->HitPoints -= WOLF_LUNGE_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, WOLF_LUNGE_DAMAGE);
 					item->Animation.RequiredState = WOLF_STATE_RUN;
 				}
 
@@ -230,8 +230,7 @@ namespace TEN::Entities::TR1
 					item->TestBits(JointBitType::Touch, WolfAttackJoints))
 				{
 					CreatureEffect(item, &WolfBite, DoBloodSplat);
-					LaraItem->HitPoints -= WOLF_BITE_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, WOLF_BITE_DAMAGE);
 					item->Animation.RequiredState = WOLF_STATE_CROUCH;
 				}
 

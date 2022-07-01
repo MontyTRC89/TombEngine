@@ -196,7 +196,7 @@ namespace TEN::Renderer
 
 		if (BinocularRange && !LaserSight)
 		{
-			DrawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One);
+			DrawFullScreenQuad(m_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex].Texture->ShaderResourceView.Get(), Vector3::One, false);
 		}
 		else if (BinocularRange && LaserSight)
 		{
@@ -324,39 +324,67 @@ namespace TEN::Renderer
 		m_context->RSSetViewports(1, &m_viewport);
 		ResetScissor();
 
-		DrawFullScreenQuad(texture, Vector3(fade, fade, fade));
+		DrawFullScreenQuad(texture, Vector3(fade, fade, fade), true);
 	}
 
-	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color)
+	void Renderer11::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, DirectX::SimpleMath::Vector3 color, bool fit)
 	{
+		Vector2 uvStart = { 0.0f, 0.0f };
+		Vector2 uvEnd   = { 1.0f, 1.0f };
+
+		if (fit)
+		{
+			ID3D11Texture2D* texture2D;
+			texture->GetResource(reinterpret_cast<ID3D11Resource**>(&texture2D));
+
+			D3D11_TEXTURE2D_DESC desc;
+			texture2D->GetDesc(&desc);
+
+			float screenAspect = float(ScreenWidth) / float(ScreenHeight);
+			float imageAspect  = float(desc.Width) / float(desc.Height);
+
+			if (screenAspect > imageAspect)
+			{
+				float diff = (screenAspect - imageAspect) / screenAspect / 2;
+				uvStart.y += diff;
+				uvEnd.y   -= diff;
+			}
+			else
+			{
+				float diff = (imageAspect - screenAspect) / screenAspect / 2;
+				uvStart.x += diff;
+				uvEnd.x   -= diff;
+			}
+		}
+
 		RendererVertex vertices[4];
 
 		vertices[0].Position.x = -1.0f;
 		vertices[0].Position.y = 1.0f;
 		vertices[0].Position.z = 0.0f;
-		vertices[0].UV.x = 0.0f;
-		vertices[0].UV.y = 0.0f;
+		vertices[0].UV.x = uvStart.x;
+		vertices[0].UV.y = uvStart.y;
 		vertices[0].Color = Vector4(color.x, color.y, color.z, 1.0f);
 
 		vertices[1].Position.x = 1.0f;
 		vertices[1].Position.y = 1.0f;
 		vertices[1].Position.z = 0.0f;
-		vertices[1].UV.x = 1.0f;
-		vertices[1].UV.y = 0.0f;
+		vertices[1].UV.x = uvEnd.x;
+		vertices[1].UV.y = uvStart.y;
 		vertices[1].Color = Vector4(color.x, color.y, color.z, 1.0f);
 
 		vertices[2].Position.x = 1.0f;
 		vertices[2].Position.y = -1.0f;
 		vertices[2].Position.z = 0.0f;
-		vertices[2].UV.x = 1.0f;
-		vertices[2].UV.y = 1.0f;
+		vertices[2].UV.x = uvEnd.x;
+		vertices[2].UV.y = uvEnd.y;
 		vertices[2].Color = Vector4(color.x, color.y, color.z, 1.0f);
 
 		vertices[3].Position.x = -1.0f;
 		vertices[3].Position.y = -1.0f;
 		vertices[3].Position.z = 0.0f;
-		vertices[3].UV.x = 0.0f;
-		vertices[3].UV.y = 1.0f;
+		vertices[3].UV.x = uvStart.x;
+		vertices[3].UV.y = uvEnd.y;
 		vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
 
 		m_context->VSSetShader(m_vsFullScreenQuad.Get(), nullptr, 0);

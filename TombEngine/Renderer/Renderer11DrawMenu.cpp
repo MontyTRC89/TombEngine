@@ -35,7 +35,8 @@ namespace TEN::Renderer
 	
 	// Vertical menu positioning templates
 	constexpr auto MenuVerticalTop = 15;
-	constexpr auto MenuVerticalTopCenter = 200;
+	constexpr auto MenuVerticalDisplaySettings = 200;
+	constexpr auto MenuVerticalOtherSettings = 150;
 	constexpr auto MenuVerticalBottomCenter = 400;
 	constexpr auto MenuVerticalStatisticsTitle = 150;
 	constexpr auto MenuVerticalOptionsTitle = 350;
@@ -97,6 +98,9 @@ namespace TEN::Renderer
 		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().selectedScreenResolution];
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
+		auto* shadowMode = g_Gui.GetCurrentSettings().conf.ShadowMode ? 
+			(g_Gui.GetCurrentSettings().conf.ShadowMode == SHADOW_LARA ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
+
 		switch (menu)
 		{
 		case Menu::Options:
@@ -108,18 +112,18 @@ namespace TEN::Renderer
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 0));
 			GetNextLinePosition(&y);
 
-			// Controls
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 1));
+			// Other options
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OTHER_SETTINGS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 1));
 			GetNextLinePosition(&y);
 
-			// Sound
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 2));
+			// Controls
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CONTROLS), PRINTSTRING_COLOR_WHITE, SF_Center(title_option == 2));
 			break;
 
 		case Menu::Display:
 
 			// Setup needed parameters
-			y = MenuVerticalTopCenter;
+			y = MenuVerticalDisplaySettings;
 
 			// Title
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_DISPLAY), PRINTSTRING_COLOR_YELLOW, SF_Center());
@@ -137,7 +141,7 @@ namespace TEN::Renderer
 
 			// Enable dynamic shadows
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SHADOWS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableShadows), PRINTSTRING_COLOR_WHITE, SF(title_option == 2));
+			DrawString(MenuRightSideEntry, y, g_GameFlow->GetString(shadowMode), PRINTSTRING_COLOR_WHITE, SF(title_option == 2));
 			GetNextLinePosition(&y);
 
 			// Enable caustics
@@ -158,18 +162,18 @@ namespace TEN::Renderer
 			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 6));
 			break;
 
-		case Menu::Sound:
+		case Menu::OtherSettings:
 
 			// Setup needed parameters
-			y = MenuVerticalTopCenter;
+			y = MenuVerticalOtherSettings;
 
 			// Title
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_SOUND), PRINTSTRING_COLOR_YELLOW, SF_Center());
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_OTHER_SETTINGS), PRINTSTRING_COLOR_YELLOW, SF_Center());
 			GetNextBlockPosition(&y);
 
 			// Enable sound special effects
-			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SPECIAL_SOUND_FX), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableAudioSpecialEffects), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_REVERB), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
 			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
@@ -186,12 +190,29 @@ namespace TEN::Renderer
 			DrawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
+
+			// Auto targeting
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOTARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			GetNextLinePosition(&y);
+
+			// Vibration
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			GetNextLinePosition(&y);
+
+			// Thumbstick camera
+			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(title_option == 5));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
+			GetNextBlockPosition(&y);
+
+
 			// Apply
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 3));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 6));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 4));
+			DrawString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(title_option == 7));
 			break;
 
 		case Menu::Controls:
@@ -211,7 +232,10 @@ namespace TEN::Renderer
 				if (g_Gui.GetCurrentSettings().waitingForkey && title_option == k)
 					DrawString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
 				else
-					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[KeyboardLayout[1][k]], PRINTSTRING_COLOR_ORANGE, SF(false));
+				{
+					int index = KeyboardLayout[1][k] ? KeyboardLayout[1][k] : KeyboardLayout[0][k];
+					DrawString(MenuRightSideEntry, y, (char*)g_KeyNames[index], PRINTSTRING_COLOR_ORANGE, SF(false));
+				}
 
 				if (k < KEY_COUNT - 1)
 					GetNextNarrowLinePosition(&y);
@@ -283,7 +307,7 @@ namespace TEN::Renderer
 		case Menu::Options:
 		case Menu::Controls:
 		case Menu::Display:
-		case Menu::Sound:
+		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
 			break;
 		}
@@ -324,7 +348,7 @@ namespace TEN::Renderer
 		case Menu::Options:
 		case Menu::Controls:
 		case Menu::Display:
-		case Menu::Sound:
+		case Menu::OtherSettings:
 			RenderOptionsMenu(menu, MenuVerticalOptionsPause);
 			break;
 		}
@@ -864,6 +888,9 @@ namespace TEN::Renderer
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
 				PrintDebugMessage("Total rooms transparent polygons: %d", numRoomsTransparentPolygons);
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
+				m_spriteBatch->Begin();
+				m_spriteBatch->Draw(m_shadowMap.ShaderResourceView.Get(), Vector2(512, 0), Colors::White);
+				m_spriteBatch->End();
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:

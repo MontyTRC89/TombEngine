@@ -1,4 +1,6 @@
 #include "framework.h"
+#include <filesystem>
+
 #include "FlowHandler.h"
 #include "ReservedScriptNames.h"
 #include "Sound/sound.h"
@@ -211,6 +213,23 @@ Level* FlowHandler::GetLevel(int id)
 int	FlowHandler::GetNumLevels() const
 {
 	return Levels.size();
+}
+
+int FlowHandler::GetLevelNumber(std::string const& fileName)
+{
+	if (fileName.empty())
+		return -1;
+
+	for (int i = 0; i < Levels.size(); i++)
+	{
+		auto level = this->GetLevel(i)->FileName;
+		std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
+
+		if (level == fileName && std::filesystem::exists(fileName))
+			return i;
+	}
+
+	return -1;
 }
 
 bool FlowHandler::IsFlyCheatEnabled() const

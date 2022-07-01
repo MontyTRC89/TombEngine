@@ -47,14 +47,14 @@ void lara_as_underwater_idle(ItemInfo* item, CollisionInfo* coll)
 		LookUpDown(item);
 
 	if (laraType == LaraType::Divesuit)
-		ModulateLaraSubsuitSwimTurn(item);
+		ModulateLaraSubsuitSwimTurnRates(item);
 	else
-		ModulateLaraSwimTurn(item, coll);
+		ModulateLaraSwimTurnRates(item, coll);
 
 	if (TrInput & IN_JUMP)
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
-	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
+	item->Animation.VerticalVelocity -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
@@ -88,11 +88,11 @@ void lara_as_underwater_swim_forward(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (laraType != LaraType::Divesuit)
-		ModulateLaraSwimTurn(item, coll);
+		ModulateLaraSwimTurnRates(item, coll);
 	else
-		ModulateLaraSubsuitSwimTurn(item);
+		ModulateLaraSubsuitSwimTurnRates(item);
 
-	item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+	item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL;
 	if (item->Animation.VerticalVelocity > LARA_SWIM_VELOCITY_MAX)
 		item->Animation.VerticalVelocity = LARA_SWIM_VELOCITY_MAX;
 
@@ -126,14 +126,14 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (laraType != LaraType::Divesuit)
-		ModulateLaraSwimTurn(item, coll);
+		ModulateLaraSwimTurnRates(item, coll);
 	else
-		ModulateLaraSubsuitSwimTurn(item);
+		ModulateLaraSubsuitSwimTurnRates(item);
 
 	if (TrInput & IN_JUMP)
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
-	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
+	item->Animation.VerticalVelocity -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
@@ -156,7 +156,7 @@ void lara_as_underwater_death(ItemInfo* item, CollisionInfo* coll)
 
 	lara->Control.CanLook = false;
 
-	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
+	item->Animation.VerticalVelocity -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
