@@ -365,7 +365,7 @@ void LarsonControl(short itemNumber)
 	{
 		// When Larson dies, it activates trigger at start position
 		if (item->ObjectNumber == ID_LARSON 
-			&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+			&& item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			short roomNumber = item->ItemFlags[2] & 0xFF;
 			short floorHeight = item->ItemFlags[2] & 0xFF00;
@@ -413,7 +413,7 @@ void LarsonControl(short itemNumber)
 		else
 		{
 			item->HitPoints = NOT_TARGETABLE;
-			DisableBaddyAI(itemNumber);
+			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
 		}
 	}*/

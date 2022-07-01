@@ -178,7 +178,7 @@ namespace TEN::Entities::Switches
 			}
 
 			if (laraItem->Animation.AnimNumber == LA_TURNSWITCH_PUSH_CLOCKWISE_END &&
-				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].FrameEnd && 
+				laraItem->Animation.FrameNumber == g_Level.Anims[laraItem->Animation.AnimNumber].frameEnd && 
 				!switchItem->ItemFlags[1])
 				switchItem->ItemFlags[1] = 1;
 
@@ -204,7 +204,7 @@ namespace TEN::Entities::Switches
 				}
 			}
 
-			if (laraItem->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END && laraItem->Animation.FrameNumber == g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END].FrameEnd &&
+			if (laraItem->Animation.AnimNumber == LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END && laraItem->Animation.FrameNumber == g_Level.Anims[LA_TURNSWITCH_PUSH_COUNTER_CLOCKWISE_END].frameEnd &&
 				!switchItem->ItemFlags[1])
 				switchItem->ItemFlags[1] = 1;
 

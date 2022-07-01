@@ -659,7 +659,7 @@ namespace TEN::Entities::TR4
 		{
 			if (item->Status == ITEM_ACTIVE)
 			{
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
 					int x = laraItem->Pose.Position.x - 512 * phd_sin(laraItem->Pose.Orientation.y);
 					int y = laraItem->Pose.Position.y;

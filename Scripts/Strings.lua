@@ -9,6 +9,16 @@ local strings = {
 		"",
 		""
 	},
+	all = {
+		"All",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	apply = {
 		"Apply",
 		"",
@@ -669,6 +679,16 @@ local strings = {
 		"",
 		""
 	},
+	none = {
+		"None",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	ok = {
 		"OK",
 		"",
@@ -731,6 +751,16 @@ local strings = {
 	},
 	pistols_ammo = {
 		"Pistols Ammo",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	player = {
+		"Player",
 		"",
 		"",
 		"",

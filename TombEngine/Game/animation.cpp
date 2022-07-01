@@ -33,7 +33,7 @@ void AnimateLara(ItemInfo* item)
 		item->Animation.ActiveState = anim->ActiveState;
 	}
 
-	if (item->Animation.FrameNumber > anim->FrameEnd)
+	if (item->Animation.FrameNumber > anim->frameEnd)
 	{
 		if (anim->numberCommands > 0)
 		{
@@ -215,7 +215,7 @@ void AnimateItem(ItemInfo* item)
 			item->Animation.RequiredState = 0;
 	}
 
-	if (item->Animation.FrameNumber > anim->FrameEnd)
+	if (item->Animation.FrameNumber > anim->frameEnd)
 	{
 		if (anim->numberCommands > 0)
 		{
@@ -393,7 +393,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 		return false;
 
 	auto* anim = &g_Level.Anims[animNumber];
-	return (item->Animation.FrameNumber >= anim->FrameEnd);
+	return (item->Animation.FrameNumber >= anim->frameEnd);
 }
 
 void TranslateItem(ItemInfo* item, short angle, float forward, float vertical, float lateral)
@@ -493,7 +493,7 @@ int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
 {
 	int frame = item->Animation.FrameNumber;
 	auto* anim = &g_Level.Anims[item->Animation.AnimNumber];
-	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->FramePtr];
+	framePtr[0] = framePtr[1] = &g_Level.Frames[anim->framePtr];
 	int rate2 = *rate = anim->Interpolation & 0x00ff;
 	frame -= anim->frameBase; 
 
@@ -507,8 +507,8 @@ int GetFrame(ItemInfo* item, ANIM_FRAME* framePtr[], int* rate)
 
 	// Clamp key frame to end if need be.
 	int second = first * rate2 + rate2;
-	if (second > anim->FrameEnd)
-		*rate = anim->FrameEnd - (second - rate2);
+	if (second > anim->frameEnd)
+		*rate = anim->frameEnd - (second - rate2);
 
 	return interpolation;
 }
@@ -534,7 +534,7 @@ int GetFrameCount(int animNumber)
 	if (animNumber < 0 || g_Level.Anims.size() <= animNumber)
 		return 0;
 
-	int end  = g_Level.Anims[animNumber].FrameEnd;
+	int end  = g_Level.Anims[animNumber].frameEnd;
 	int base = g_Level.Anims[animNumber].frameBase;
 	return (end - base);
 }

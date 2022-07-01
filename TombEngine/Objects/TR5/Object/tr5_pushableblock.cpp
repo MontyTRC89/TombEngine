@@ -245,7 +245,7 @@ void PushableBlockControl(short itemNumber)
 		MoveStackXZ(itemNumber);
 
 
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].FrameEnd - 1)
+		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
 			if (info->canFall) // check if pushable is about to fall
 			{
@@ -330,7 +330,7 @@ void PushableBlockControl(short itemNumber)
 
 		MoveStackXZ(itemNumber);
 
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].FrameEnd - 1)
+		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd - 1)
 		{
 			if (TrInput & IN_ACTION)
 			{
@@ -364,7 +364,7 @@ void PushableBlockControl(short itemNumber)
 			TestTriggers(item, true, item->Flags & IFLAG_ACTIVATION_MASK);
 		}
 
-		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].FrameEnd)
+		if (LaraItem->Animation.FrameNumber == g_Level.Anims[LaraItem->Animation.AnimNumber].frameEnd)
 		{
 			RemoveActiveItem(itemNumber);
 			item->Status = ITEM_NOT_ACTIVE;

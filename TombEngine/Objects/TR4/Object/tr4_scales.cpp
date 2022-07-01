@@ -29,7 +29,7 @@ void ScalesControl(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+	if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 	{
 		AnimateItem(item);
 		return;

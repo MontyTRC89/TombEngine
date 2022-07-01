@@ -123,7 +123,7 @@ namespace TEN::Entities::TR4
 
 		int distance = 0;
 		if (dz > 32000 || dz < -32000 || dx > 32000 || dx < -32000)
-			laraAI.distance = 0x7FFFFFFF;
+			laraAI.distance = INT_MAX;
 		else
 			laraAI.distance = pow(dx, 2) + pow(dz, 2);
 
@@ -366,7 +366,7 @@ namespace TEN::Entities::TR4
 				if (Lara.Location >= item->ItemFlags[3])
 				{
 					if (!foundEnemy ||
-						AI.distance >= 0x200000 &&
+						AI.distance >= pow(SECTOR(1.5f), 2) &&
 						(item->MeshSwapBits & 0x40000 || AI.distance >= pow(SECTOR(3), 2)))
 					{
 						if (creature->Enemy == LaraItem)
@@ -422,7 +422,7 @@ namespace TEN::Entities::TR4
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 			}
 			else if (foundEnemy &&
-				(AI.distance < 0x200000 ||
+				(AI.distance < pow(SECTOR(1.5f), 2) ||
 					!(item->MeshSwapBits & 0x40000) &&
 					AI.distance < pow(SECTOR(3), 2)))
 			{
@@ -609,7 +609,7 @@ namespace TEN::Entities::TR4
 			else
 			{
 				if (item->Animation.AnimNumber != object->animIndex + 57 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 20)
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 20)
 				{
 					TestTriggers(item, true);
 

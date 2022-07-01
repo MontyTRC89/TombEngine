@@ -221,7 +221,7 @@ void LaserHeadControl(short itemNumber)
 					auto* tentacleItem = &g_Level.Items[creature->Tentacles[i]];
 
 					if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex + 1 &&
-						tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].FrameEnd &&
+						tentacleItem->Animation.FrameNumber == g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd &&
 						tentacleItem->MeshBits & 1)
 					{
 						SoundEffect(SFX_TR5_SMASH_ROCK2, &item->Pose);
@@ -645,7 +645,7 @@ void LaserHeadControl(short itemNumber)
 			auto* tentacleItem = &g_Level.Items[tentacleItemNumber];
 
 			if (tentacleItem->Animation.AnimNumber == Objects[tentacleItem->ObjectNumber].animIndex &&
-				tentacleItem->Animation.FrameNumber != g_Level.Anims[tentacleItem->Animation.AnimNumber].FrameEnd)
+				tentacleItem->Animation.FrameNumber != g_Level.Anims[tentacleItem->Animation.AnimNumber].frameEnd)
 			{
 				break;
 			}
