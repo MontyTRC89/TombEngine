@@ -600,6 +600,7 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		UpdateRopeSwing(item);
+		RopeSwingCollision(item, coll);
 
 		if (TrInput & IN_SPRINT)
 		{
@@ -633,6 +634,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = SECTOR(2);
 
 	UpdateRopeSwing(item);
+	RopeSwingCollision(item, coll);
 
 	if (item->Animation.AnimNumber == LA_ROPE_SWING)
 	{

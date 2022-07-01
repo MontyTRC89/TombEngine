@@ -120,7 +120,7 @@ void SwordGuardianControl(short itemNumber)
 
 			if (laraAlive)
 			{
-				if (AI.bite && AI.distance < SECTOR(1024))
+				if (AI.bite && AI.distance < pow(SECTOR(1), 2))
 				{
 					if (GetRandomControl() >= 0x4000)
 						item->Animation.TargetState = 5;
@@ -148,7 +148,7 @@ void SwordGuardianControl(short itemNumber)
 
 			if (laraAlive)
 			{
-				if (AI.bite && AI.distance < SECTOR(4096))
+				if (AI.bite && AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 10;
 				else if (AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
@@ -164,7 +164,7 @@ void SwordGuardianControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!AI.bite || AI.distance > SECTOR(1024))
+			if (!AI.bite || AI.distance > pow(SECTOR(1), 2))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 4;
@@ -176,7 +176,7 @@ void SwordGuardianControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!AI.bite || AI.distance > SECTOR(1024))
+			if (!AI.bite || AI.distance > pow(SECTOR(1), 2))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 6;
@@ -189,7 +189,7 @@ void SwordGuardianControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!AI.bite || AI.distance > SECTOR(4096))
+			if (!AI.bite || AI.distance > pow(SECTOR(2), 2))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 11;

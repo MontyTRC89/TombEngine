@@ -526,7 +526,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 							if (item->Status == ITEM_INVISIBLE)
 							{
 								item->TouchBits = NO_JOINT_BITS;
-								if (EnableBaddyAI(value, 0))
+								if (EnableEntityAI(value, 0))
 								{
 									item->Status = ITEM_ACTIVE;
 									AddActiveItem(value);
@@ -543,7 +543,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 							item->TouchBits = NO_JOINT_BITS;
 							item->Status = ITEM_ACTIVE;
 							AddActiveItem(value);
-							EnableBaddyAI(value, 1);
+							EnableEntityAI(value, 1);
 						}
 					}
 					else

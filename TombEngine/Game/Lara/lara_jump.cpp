@@ -265,6 +265,8 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
+	else
+		lara->Control.TurnRate.y = 0;
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))

@@ -110,11 +110,6 @@ bool GetTargetOnLOS(GameVector* src, GameVector* dest, bool drawTarget, bool fir
 
 		GetFloor(target.x, target.y, target.z, &target.roomNumber);
 
-		// TODO: for covering scientist
-//		if ((itemNumber >= 0) && (BaddySlots[itemNumber].itemNum != NO_ITEM))  // BUGFIX: ensure target has AI. No more pistol desync and camera wobble when shooting non-AI movable objects.
-//			Lara.target = &g_Level.Items[itemNumber];
-		// this is crashing and it's not really doing anything..
-
 		if (firing)
 		{
 			if (Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)

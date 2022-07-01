@@ -1,10 +1,16 @@
 #pragma once
 #include "ShaderLight.h"
-
+struct alignas(16) Sphere
+{
+	Vector3 position;
+	float radius;
+};
 struct alignas(16) CShadowLightBuffer
 {
 	ShaderLight Light;
-	Matrix LightViewProjection;
+	Matrix LightViewProjections[6];
 	int CastShadows;
-	float Padding[15];
+	int NumSpheres;
+	int padding[2];
+	Sphere Spheres[16];
 };
