@@ -21,32 +21,30 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr auto SKIDOO_RADIUS = 500;
-	constexpr auto SKIDOO_FRONT = 550;
-	constexpr auto SKIDOO_SIDE = 260;
-	constexpr auto SKIDOO_SLIP = 100;
+	constexpr auto SKIDOO_RADIUS	= 500;
+	constexpr auto SKIDOO_FRONT		= 550;
+	constexpr auto SKIDOO_SIDE		= 260;
+	constexpr auto SKIDOO_SLIP		= 100;
 	constexpr auto SKIDOO_SLIP_SIDE = 50;
-	constexpr auto SKIDOO_SNOW = 500; // Unused.
-	constexpr auto SKIDOO_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto SKIDOO_DISMOUNT_DISTANCE = 295;
-
-	constexpr auto SKIDOO_VELOCITY_ACCEL = 10;
-	constexpr auto SKIDOO_VELOCITY_DECEL = 2;
-	constexpr auto SKIDOO_VELOCITY_BRAKE_DECEL = 5;
+	
+	constexpr auto SKIDOO_VELOCITY_ACCEL		 = 10;
+	constexpr auto SKIDOO_VELOCITY_DECEL		 = 2;
+	constexpr auto SKIDOO_VELOCITY_BRAKE_DECEL	 = 5;
 	constexpr auto SKIDOO_REVERSE_VELOCITY_ACCEL = 5;
 
-	constexpr auto SKIDOO_SLOW_VELOCITY_MAX = 50;
-	constexpr auto SKIDOO_NORMAL_VELOCITY_MAX = 100;
-	constexpr auto SKIDOO_FAST_VELOCITY_MAX = 150;
-	constexpr auto SKIDOO_TURN_VELOCITY_MAX = 15;
+	constexpr auto SKIDOO_SLOW_VELOCITY_MAX	   = 50;
+	constexpr auto SKIDOO_NORMAL_VELOCITY_MAX  = 100;
+	constexpr auto SKIDOO_FAST_VELOCITY_MAX    = 150;
+	constexpr auto SKIDOO_TURN_VELOCITY_MAX    = 15;
 	constexpr auto SKIDOO_REVERSE_VELOCITY_MAX = 30;
-
-	constexpr auto SKIDOO_BOUNCE_MIN = (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
-	constexpr auto SKIDOO_KICK_MAX = -80;
-	constexpr auto SKIDOO_STEP_HEIGHT_MAX = CLICK(1); // Unused.
-
-	constexpr auto SKIDOO_DAMAGE_START = 140;
-	constexpr auto SKIDOO_DAMAGE_LENGTH = 14;
+	
+	constexpr auto SKIDOO_STEP_HEIGHT_MAX	= CLICK(1); // Unused.
+	constexpr auto SKIDOO_BOUNCE_MIN		= (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
+	constexpr auto SKIDOO_KICK_MAX			= -80;
+	constexpr auto SKIDOO_MOUNT_DISTANCE	= CLICK(2);
+	constexpr auto SKIDOO_DISMOUNT_DISTANCE = 295;
+	constexpr auto SKIDOO_DAMAGE_START		= 140;
+	constexpr auto SKIDOO_DAMAGE_LENGTH		= 14;
 
 	#define SKIDOO_TURN_RATE_ACCEL			ANGLE(2.5f)
 	#define SKIDOO_TURN_RATE_DECEL			ANGLE(2.0f)

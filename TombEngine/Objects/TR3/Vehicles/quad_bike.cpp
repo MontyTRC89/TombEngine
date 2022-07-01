@@ -24,31 +24,30 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr auto DAMAGE_START = 140;
-	constexpr auto DAMAGE_LENGTH = 14;
-
-	constexpr auto QBIKE_RADIUS = 500;
-	constexpr auto QBIKE_HEIGHT = 512;
-	constexpr auto QBIKE_FRONT = 550;
-	constexpr auto QBIKE_BACK = -550;
-	constexpr auto QBIKE_SIDE = 260;
-	constexpr auto QBIKE_SLIP = 100;
+	constexpr auto QBIKE_RADIUS	   = 500;
+	constexpr auto QBIKE_HEIGHT	   = 512;
+	constexpr auto QBIKE_FRONT	   = 550;
+	constexpr auto QBIKE_BACK	   = -550;
+	constexpr auto QBIKE_SIDE	   = 260;
+	constexpr auto QBIKE_SLIP	   = 100;
 	constexpr auto QBIKE_SLIP_SIDE = 50;
-	constexpr auto QBIKE_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
-
-	constexpr int QBIKE_DRIFT_VELOCITY_MIN = 48 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_REVERSE_VELOCITY_MAX = -48 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_REV_VELOCITY_MAX = 160 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_VELOCITY_MAX = 160 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_VERTICAL_VELOCITY_MAX = 240;
+	constexpr auto DAMAGE_START	   = 140;
+	constexpr auto DAMAGE_LENGTH   = 14;
 
 	constexpr int QBIKE_REVERSE_VELOCITY_ACCEL = -3 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_VELOCITY_BRAKE_DECEL = 2.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr int QBIKE_VELOCITY_BRAKE_DECEL  = 2.5f * VEHICLE_VELOCITY_SCALE;
 
+	constexpr int QBIKE_DRIFT_VELOCITY_MIN	  = 48 * VEHICLE_VELOCITY_SCALE;
+	constexpr int QBIKE_REVERSE_VELOCITY_MAX  = -48 * VEHICLE_VELOCITY_SCALE;
+	constexpr int QBIKE_REV_VELOCITY_MAX	  = 160 * VEHICLE_VELOCITY_SCALE;
+	constexpr int QBIKE_VELOCITY_MAX		  = 160 * VEHICLE_VELOCITY_SCALE;
+	constexpr int QBIKE_VERTICAL_VELOCITY_MAX = 240;
+
+	constexpr auto QBIKE_MOUNT_DISTANCE = CLICK(2);
+	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
+	constexpr auto QBIKE_STEP_HEIGHT_MAX = CLICK(1); // Unused.
 	constexpr auto QBIKE_BOUNCE_MIN = (QBIKE_VELOCITY_MAX / 2) / CLICK(1);
 	constexpr auto QBIKE_KICK_MAX = -80;
-	constexpr auto QBIKE_STEP_HEIGHT_MAX = CLICK(1); // Unused.
 
 	#define QBIKE_TURN_RATE_ACCEL		  ANGLE(2.5f)
 	#define QBIKE_TURN_RATE_DECEL		  ANGLE(2.0f)

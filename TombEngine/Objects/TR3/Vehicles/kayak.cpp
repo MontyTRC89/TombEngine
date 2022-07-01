@@ -18,24 +18,6 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	struct WAKE_PTS
-	{
-		int x[2];
-		int y;
-		int z[2];
-		short xvel[2];
-		short zvel[2];
-		byte life;
-		byte pad[3];
-	};
-	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
-	static vector<VehicleMountType> KayakMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
-	};
-
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
 	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
@@ -86,8 +68,6 @@ namespace TEN::Entities::Vehicles
 	constexpr auto KAYAK_IN_HOLD	   = IN_WALK;
 	constexpr auto KAYAK_IN_HOLD_LEFT  = IN_LSTEP;
 	constexpr auto KAYAK_IN_HOLD_RIGHT = IN_RSTEP;
-
-	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
 
 	enum KayakState
 	{
@@ -143,6 +123,26 @@ namespace TEN::Entities::Vehicles
 		KAYAK_ANIM_CAPSIZE_RIGHT = 30,			// Unused.
 		KAYAK_ANIM_CAPSIZE_RECOVER_RIGHT = 31,	// Unused.
 		KAYAK_ANIM_DISMOUNT_RIGHT = 32
+	};
+
+	struct WAKE_PTS
+	{
+		int x[2];
+		int y;
+		int z[2];
+		short xvel[2];
+		short zvel[2];
+		byte life;
+		byte pad[3];
+	};
+
+	WAKE_PTS WakePts[NUM_WAKE_SPRITES][2];
+	static vector<int> KayakLaraLegJoints = { LM_HIPS, LM_LTHIGH, LM_LSHIN, LM_LFOOT, LM_RTHIGH, LM_RSHIN, LM_RFOOT };
+	static vector<VehicleMountType> KayakMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
 	};
 
 	KayakInfo* GetKayakInfo(ItemInfo* kayakItem)

@@ -22,34 +22,25 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
-	const vector<int> JeepBrakeLightJoints = { 15, 16 };
-	const vector<VehicleMountType> JeepMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right
-	};
-
-	constexpr auto JEEP_FRONT = 550;
-	constexpr auto JEEP_SIDE = 280;
-	constexpr auto JEEP_SLIP = 100;
+	constexpr auto JEEP_FRONT	  = 550;
+	constexpr auto JEEP_SIDE	  = 280;
+	constexpr auto JEEP_SLIP	  = 100;
 	constexpr auto JEEP_SLIP_SIDE = 128;
-	constexpr auto JEEP_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto JEEP_DISMOUNT_DISTANCE = 512;
 
-	constexpr auto JEEP_IMPACT_VELOCITY_MIN = 42 * VEHICLE_VELOCITY_SCALE;
-	constexpr auto JEEP_VELOCITY_MAX = 128 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto JEEP_IMPACT_VELOCITY_MIN  = 42 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto JEEP_VELOCITY_MAX		 = 128 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
-
-	constexpr auto JEEP_BOUNCE_MIN = 32;
-	constexpr auto JEEP_KICK_MAX = -80;
+	
+	constexpr auto JEEP_MOUNT_DISTANCE	  = CLICK(2);
+	constexpr auto JEEP_DISMOUNT_DISTANCE = 512;
+	constexpr auto JEEP_BOUNCE_MIN		  = 32;
+	constexpr auto JEEP_KICK_MAX		  = -80;
 
 	#define JEEP_TURN_RATE_DECEL ANGLE(0.5f)
 
 	// TODO: Simpler toggle.
-	#define JEEP_IN_TOGGLE_REVERSE	IN_SPRINT
-	#define JEEP_IN_TOGGLE_FORWARD	IN_WALK
+	constexpr auto JEEP_IN_TOGGLE_REVERSE = IN_SPRINT;
+	constexpr auto JEEP_IN_TOGGLE_FORWARD = IN_WALK;
 
 	enum JeepState
 	{
@@ -120,6 +111,15 @@ namespace TEN::Entities::Vehicles
 		JEEP_ANIM_BACK_IDLE = 42,
 		JEEP_ANIM_IDLE_FORWARD_LEFT = 43,//aka the opposite of 41. "change to forward gear with the wheels still turned left"
 		JEEP_ANIM_IDLE_FORWARD_RIGHT = 44,//aka the opposite of 42. "change to forward gear with the wheels still turned right"
+	};
+
+	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
+	const vector<int> JeepBrakeLightJoints = { 15, 16 };
+	const vector<VehicleMountType> JeepMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right
 	};
 
 	enum JeepFlags

@@ -24,17 +24,10 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> BigGunMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Back
-	};
-
-	constexpr auto BGUN_MOUNT_DISTANCE = CLICK(2);
+	constexpr auto BGUN_MOUNT_DISTANCE_MAX = CLICK(2);
 
 	constexpr auto BGUN_RECOIL_TIME = 26;
 	constexpr auto BGUN_RECOIL_Z = 25;
-
 	constexpr auto BGUN_X_ORIENT_NUM_FRAMES = 59;
 	constexpr auto BGUN_X_ORIENT_MIDDLE_FRAME = 30;
 
@@ -42,6 +35,12 @@ namespace TEN::Entities::Vehicles
 	#define BGUN_TURN_RATE_MAX	 ANGLE(4.0f)
 	#define BGUN_X_ORIENT_STEP	 (ANGLE(80.0f) / BGUN_X_ORIENT_NUM_FRAMES)
 	#define BGUN_X_ORIENT_MAX	 ANGLE(40.0f)
+
+	const vector<VehicleMountType> BigGunMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Back
+	};
 
 	enum BigGunState
 	{

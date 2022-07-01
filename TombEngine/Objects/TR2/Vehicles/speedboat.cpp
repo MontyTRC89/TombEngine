@@ -19,39 +19,30 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> SpeedboatMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right,
-		VehicleMountType::Jump
-	};
-
-	constexpr auto SPEEDBOAT_RADIUS = 500;
-	constexpr auto SPEEDBOAT_FRONT = 750;
-	constexpr auto SPEEDBOAT_BACK = -700;
-	constexpr auto SPEEDBOAT_SIDE = 300;
-	constexpr auto SPEEDBOAT_SLIP = 10;
+	constexpr auto SPEEDBOAT_RADIUS    = 500;
+	constexpr auto SPEEDBOAT_FRONT	   = 750;
+	constexpr auto SPEEDBOAT_TIP	   = SPEEDBOAT_FRONT + 250;
+	constexpr auto SPEEDBOAT_BACK	   = -700;
+	constexpr auto SPEEDBOAT_SIDE	   = 300;
+	constexpr auto SPEEDBOAT_SLIP	   = 10;
 	constexpr auto SPEEDBOAT_SLIP_SIDE = 30;
-	constexpr auto SPEEDBOAT_MOUNT_DISTANCE = CLICK(2.25f);
-	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 
-	constexpr auto SPEEDBOAT_VELOCITY_ACCEL = 5;
-	constexpr auto SPEEDBOAT_VELOCITY_DECEL = 1;
-	constexpr auto SPEEDBOAT_VELOCITY_BRAKE_DECEL = 5;
+	constexpr auto SPEEDBOAT_VELOCITY_ACCEL			= 5;
+	constexpr auto SPEEDBOAT_VELOCITY_DECEL			= 1;
+	constexpr auto SPEEDBOAT_VELOCITY_BRAKE_DECEL	= 5;
 	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_DECEL = 5;
 
-	constexpr auto SPEEDBOAT_VELOCITY_MIN = 20;
-	constexpr auto SPEEDBOAT_SLOW_VELOCITY_MAX = 37;
-	constexpr auto SPEEDBOAT_NORMAL_VELOCITY_MAX = 110;
-	constexpr auto SPEEDBOAT_FAST_VELOCITY_MAX = 185;
+	constexpr auto SPEEDBOAT_VELOCITY_MIN		  = 20;
+	constexpr auto SPEEDBOAT_SLOW_VELOCITY_MAX	  = 37;
+	constexpr auto SPEEDBOAT_NORMAL_VELOCITY_MAX  = 110;
+	constexpr auto SPEEDBOAT_FAST_VELOCITY_MAX	  = 185;
 	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_MAX = 20;
-
-	constexpr auto SPEEDBOAT_BOUNCE_MIN = 0;
-	constexpr auto SPEEDBOAT_KICK_MAX = -80;
-	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX = CLICK(1); // Unused.
-	constexpr auto SPEEDBOAT_SOUND_CEILING = SECTOR(5); // Unused.
-	constexpr auto SPEEDBOAT_TIP = SPEEDBOAT_FRONT + 250;
+	
+	constexpr auto SPEEDBOAT_MOUNT_DISTANCE    = CLICK(2.25f);
+	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
+	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX   = CLICK(1); // Unused.
+	constexpr auto SPEEDBOAT_BOUNCE_MIN		   = 0;
+	constexpr auto SPEEDBOAT_KICK_MAX		   = -80;
 
 	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
@@ -90,6 +81,14 @@ namespace TEN::Entities::Vehicles
 		SPEEDBOAT_ANIM_LEAP = 16,
 		SPEEDBOAT_ANIM_LEAP_END = 17,
 		SPEEDBOAT_ANIM_DEATH = 18
+	};
+
+	const vector<VehicleMountType> SpeedboatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
 	};
 
 	SpeedboatInfo* GetSpeedboatInfo(ItemInfo* speedboatItem)

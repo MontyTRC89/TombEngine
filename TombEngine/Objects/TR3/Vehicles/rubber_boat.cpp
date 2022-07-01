@@ -22,32 +22,25 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<VehicleMountType> RubberBoatMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Left,
-		VehicleMountType::Right,
-		VehicleMountType::Jump
-	};
-
-	constexpr auto RBOAT_RADIUS = 500;
-	constexpr auto RBOAT_FRONT = 750;
-	constexpr auto RBOAT_SIDE = 300;
-	constexpr auto RBOAT_SLIP = 10;
+	constexpr auto RBOAT_RADIUS	   = 500;
+	constexpr auto RBOAT_FRONT	   = 750;
+	constexpr auto RBOAT_SIDE	   = 300;
+	constexpr auto RBOAT_SLIP	   = 10;
 	constexpr auto RBOAT_SIDE_SLIP = 30;
-	constexpr auto RBOAT_MOUNT_DISTANCE = CLICK(2.25f);
 
-	constexpr auto RBOAT_VELOCITY_ACCEL = 5;
-	constexpr auto RBOAT_VELOCITY_DECEL = 1;
-	constexpr auto RBOAT_VELOCITY_BRAKE_DECEL = 5;
+	constexpr auto RBOAT_VELOCITY_ACCEL			= 5;
+	constexpr auto RBOAT_VELOCITY_DECEL			= 1;
+	constexpr auto RBOAT_VELOCITY_BRAKE_DECEL	= 5;
 	constexpr auto RBOAT_REVERSE_VELOCITY_DECEL = 2;
 
-	constexpr auto RBOAT_VELOCITY_MIN = 20;
-	constexpr auto RBOAT_SLOW_VELOCITY_MAX = 37;
-	constexpr auto RBOAT_NORMAL_VELOCITY_MAX = 110;
-	constexpr auto RBOAT_FAST_VELOCITY_MAX = 185;
+	constexpr auto RBOAT_VELOCITY_MIN		  = 20;
+	constexpr auto RBOAT_SLOW_VELOCITY_MAX	  = 37;
+	constexpr auto RBOAT_NORMAL_VELOCITY_MAX  = 110;
+	constexpr auto RBOAT_FAST_VELOCITY_MAX	  = 185;
 	constexpr auto RBOAT_REVERSE_VELOCITY_MAX = 20;
 
+	constexpr auto RBOAT_MOUNT_DISTANCE = CLICK(2.25f);
+	constexpr auto RBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 	constexpr auto RBOAT_BOUNCE_MIN = 0;
 	constexpr auto RBOAT_KICK_MAX = -80;
 
@@ -94,6 +87,14 @@ namespace TEN::Entities::Vehicles
 		RBOAT_ANIM_TURN_RIGHT_END = 20,
 		RBOAT_ANIM_TURN_LEFT_START = 21,
 		RBOAT_ANIM_TURN_RIGHT_START = 22
+	};
+
+	const vector<VehicleMountType> RubberBoatMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Left,
+		VehicleMountType::Right,
+		VehicleMountType::Jump
 	};
 
 	RubberBoatInfo* GetRubberBoatInfo(ItemInfo* rBoatItem)

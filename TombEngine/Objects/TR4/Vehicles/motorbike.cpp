@@ -24,21 +24,11 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
-	const vector<int> MotorbikeBrakeLightJoints = { 10 };
-	const vector<VehicleMountType> MotorbikeMountTypes =
-	{
-		VehicleMountType::LevelStart,
-		VehicleMountType::Right
-	};
-
-	constexpr auto MOTORBIKE_RADIUS = 500;
-	constexpr auto MOTORBIKE_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto MOTORBIKE_DISMOUNT_DISTANCE = CLICK(1.5f);
+	constexpr auto MOTORBIKE_RADIUS	  = 500;
 	constexpr auto MOTORBIKE_FRICTION = 384;
-	constexpr auto MOTORBIKE_FRONT = 500;
-	constexpr auto MOTORBIKE_SIDE = 350;
-	constexpr auto MOTORBIKE_SLIP = 100;
+	constexpr auto MOTORBIKE_FRONT	  = 500;
+	constexpr auto MOTORBIKE_SIDE	  = 350;
+	constexpr auto MOTORBIKE_SLIP	  = 100;
 
 	constexpr auto MOTORBIKE_ACCEL_1 = 64 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MOTORBIKE_ACCEL_2 = 112 * VEHICLE_VELOCITY_SCALE;
@@ -48,12 +38,13 @@ namespace TEN::Entities::Vehicles
 	constexpr auto MOTORBIKE_BIG_SLOWDOWN = 48 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MOTORBIKE_SLOWDOWN1 = (int)(4.25f * VEHICLE_VELOCITY_SCALE); // TODO: Float velocities. @Sezz 2022.06.16
 	constexpr auto MOTORBIKE_SLOWDOWN2 = 6 * VEHICLE_VELOCITY_SCALE;
-
-	constexpr auto MOTORBIKE_BOUNCE_MIN = 32; // TODO: This is derived from some calcs with velocities. Check other vehicles for reference.
-	constexpr auto MOTORBIKE_KICK_MAX = -80;
-
-	constexpr auto MOTORBIKE_PITCH_SLOWDOWN = 0x8000;
-	constexpr auto MOTORBIKE_PITCH_MAX = 0xA000;
+	
+	constexpr auto MOTORBIKE_MOUNT_DISTANCE	   = CLICK(2);
+	constexpr auto MOTORBIKE_DISMOUNT_DISTANCE = CLICK(1.5f);
+	constexpr auto MOTORBIKE_BOUNCE_MIN		   = 32; // TODO: This is derived from some calcs with velocities. Check other vehicles for reference.
+	constexpr auto MOTORBIKE_KICK_MAX		   = -80;
+	constexpr auto MOTORBIKE_PITCH_SLOWDOWN	   = 0x8000;
+	constexpr auto MOTORBIKE_PITCH_MAX		   = 0xA000;
 
 	#define MOTORBIKE_FORWARD_TURN_ANGLE ANGLE(1.5f)
 	#define MOTORBIKE_BACK_TURN_ANGLE ANGLE(0.5f)
@@ -120,6 +111,14 @@ namespace TEN::Entities::Vehicles
 		MOTORBIKE_ANIM_BACK_START = 26,
 		MOTORBIKE_ANIM_BACK_LOOP = 27,
 		MOTORBIKE_ANIM_UNLOCK = 28
+	};
+
+	const vector<int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const vector<int> MotorbikeBrakeLightJoints = { 10 };
+	const vector<VehicleMountType> MotorbikeMountTypes =
+	{
+		VehicleMountType::LevelStart,
+		VehicleMountType::Right
 	};
 
 	enum MotorbikeFlags

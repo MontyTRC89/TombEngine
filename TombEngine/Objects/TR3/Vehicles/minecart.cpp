@@ -23,30 +23,29 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr auto MINECART_RADIUS = 100;
+	constexpr auto MINECART_RADIUS		  = 100;
 	constexpr auto MINECART_ENTITY_RADIUS = CLICK(1);
-	constexpr auto MINECART_HEIGHT = CLICK(2);
-	constexpr auto MINECART_GRAVITY = SECTOR(1) + 1;
-	constexpr auto MINECART_STEP_HEIGHT = CLICK(1);
-	constexpr auto MINECART_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
-	constexpr auto MINECART_NUM_HITS = 25;
+	constexpr auto MINECART_HEIGHT		  = CLICK(2);
+	constexpr auto MINECART_GRAVITY		  = SECTOR(1) + 1;
 
 	constexpr auto MINECART_VELOCITY_DECEL = 6 * VEHICLE_VELOCITY_SCALE;
 
-	constexpr auto MINECART_SPEED_MIN = 10 * VEHICLE_VELOCITY_SCALE; // TODO: These two have confusing names. @Sezz
-	constexpr auto MINECART_VELOCITY_MIN = 32;
+	constexpr auto MINECART_SPEED_MIN			  = 10 * VEHICLE_VELOCITY_SCALE; // TODO: These two have confusing names. @Sezz
+	constexpr auto MINECART_VELOCITY_MIN		  = 32;
 	constexpr auto MINECART_FRICTION_VELOCITY_MIN = 70;
-	constexpr auto MINECART_STOP_VELOCITY_MAX = 240;
+	constexpr auto MINECART_STOP_VELOCITY_MAX	  = 240;
 	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * VEHICLE_VELOCITY_SCALE;
 
 	constexpr auto MINECART_JUMP_VERTICAL_VELOCITY = 252 * VEHICLE_VELOCITY_SCALE;
-	constexpr auto MINECART_TURN_DEATH_VELOCITY = 128;
-
-	constexpr auto MINECART_FORWARD_GRADIENT = -CLICK(0.5f);
-	constexpr auto MINECART_BACK_GRADIENT = CLICK(0.5f);
-
-	constexpr auto MINECART_WRENCH_MESH_TOGGLE_FRAME = 20;
+	constexpr auto MINECART_TURN_DEATH_VELOCITY	   = 128;
+	
+	constexpr auto MINECART_MOUNT_DISTANCE		= CLICK(2);
+	constexpr auto MINECART_DISMOUNT_DISTANCE	= 330;
+	constexpr auto MINECART_STEP_HEIGHT			= CLICK(1);
+	constexpr auto MINECART_FORWARD_GRADIENT	= -CLICK(0.5f);
+	constexpr auto MINECART_BACK_GRADIENT		= -MINECART_FORWARD_GRADIENT;
+	constexpr auto MINECART_NUM_HITS			= 25;
+	constexpr auto MINECART_WRENCH_TOGGLE_FRAME = 20;
 
 	#define MINECART_TERMINAL_ANGLE ANGLE(22.0f)
 
@@ -132,14 +131,14 @@ namespace TEN::Entities::Vehicles
 
 	enum MinecartFlags
 	{
-		MINECART_FLAG_WRENCH_MESH = (1 << 0),
-		MINECART_FLAG_TURNING_LEFT = (1 << 1),
-		MINECART_FLAG_TURNING_RIGHT = (1 << 2),
+		MINECART_FLAG_WRENCH_MESH	 = (1 << 0),
+		MINECART_FLAG_TURNING_LEFT	 = (1 << 1),
+		MINECART_FLAG_TURNING_RIGHT	 = (1 << 2),
 		MINECART_FLAG_DISMOUNT_RIGHT = (1 << 3),
-		MINECART_FLAG_CONTROL = (1 << 4),
-		MINECART_FLAG_STOPPED = (1 << 5),
-		MINECART_FLAG_NO_ANIM = (1 << 6),
-		MINECART_FLAG_DEAD = (1 << 7)
+		MINECART_FLAG_CONTROL		 = (1 << 4),
+		MINECART_FLAG_STOPPED		 = (1 << 5),
+		MINECART_FLAG_NO_ANIM		 = (1 << 6),
+		MINECART_FLAG_DEAD			 = (1 << 7)
 	};
 
 	int Wheels[4] = { 2, 3, 1, 4 };
@@ -380,7 +379,7 @@ namespace TEN::Entities::Vehicles
 		case MINECART_STATE_DISMOUNT:
 			if (laraItem->Animation.AnimNumber == Objects[ID_MINECART_LARA_ANIMS].animIndex + MINECART_ANIM_PUT_DOWN_WRENCH)
 			{
-				if (laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME) &&
+				if (laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, MINECART_WRENCH_TOGGLE_FRAME) &&
 					minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 				{
 					lara->MeshPtrs[LM_RHAND] = Objects[ID_LARA_SKIN].meshIndex + LM_RHAND;
@@ -434,7 +433,7 @@ namespace TEN::Entities::Vehicles
 				!minecart->Flags & MINECART_FLAG_WRENCH_MESH)
 			{
 				if (!(minecart->Flags & MINECART_FLAG_WRENCH_MESH) &&
-					laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, MINECART_WRENCH_MESH_TOGGLE_FRAME))
+					laraItem->Animation.FrameNumber == GetFrameNumber(minecartItem, MINECART_WRENCH_TOGGLE_FRAME))
 				{
 					lara->MeshPtrs[LM_RHAND] = Objects[ID_MINECART_LARA_ANIMS].meshIndex + LM_RHAND;
 					minecart->Flags |= MINECART_FLAG_WRENCH_MESH;
