@@ -5,6 +5,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
+#include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
@@ -128,6 +129,86 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return VehicleMountType::None;
+	}
+
+	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, vector<VehicleDismountType> allowedDismountTypes, float distance, bool onLand)
+	{
+		if (!(TrInput & VEHICLE_IN_BRAKE))
+			return VehicleDismountType::None;
+		
+		// Assess dismount types allowed for vehicle.
+		for (auto dismountType : allowedDismountTypes)
+		{
+			short angle;
+			switch (dismountType)
+			{
+			case VehicleDismountType::Front:
+				if (TrInput & IN_FORWARD)
+				{
+					angle = ANGLE(0.0f);
+					break;
+				}
+
+				continue;
+
+			case VehicleDismountType::Back:
+				if (TrInput & IN_BACK)
+				{
+					angle = ANGLE(180.0f);
+					break;
+				}
+
+				continue;
+
+			case VehicleDismountType::Left:
+				if (TrInput & IN_LEFT)
+				{
+					angle = ANGLE(-90.0f);
+					break;
+				}
+
+				continue;
+
+			case VehicleDismountType::Right:
+				if (TrInput & IN_RIGHT)
+				{
+					angle = ANGLE(90.0f);
+					break;
+				}
+
+				continue;
+			}
+
+			if (TestVehicleDismount(vehicleItem, dismountType, angle, distance, onLand))
+				return dismountType;
+		}
+
+		return VehicleDismountType::None;
+	}
+
+	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short angle, float distance, bool onLand)
+	{
+		if (dismountType == VehicleDismountType::None)
+			return false;
+		auto probe = GetCollision(vehicleItem, angle, distance);
+
+		// Assess for walls. Check ceiling as well?
+		if (probe.Position.Floor == NO_HEIGHT)
+			return false;
+
+		// Assess for slopes (if applicable).
+		if (probe.Position.FloorSlope && onLand)
+			return false;
+
+		// Assess feasibility of dismount.
+		if (abs(probe.Position.Floor - vehicleItem->Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within reach.
+			(probe.Position.Ceiling - vehicleItem->Pose.Position.y) > -LARA_HEIGHT &&	 // Gap is optically permissive.
+			abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT)			 // Space is not a clamp.
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int deltaPos)

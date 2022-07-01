@@ -37,6 +37,18 @@ namespace TEN::Entities::Vehicles
 		Jump
 	};
 
+	enum class VehicleDismountType
+	{
+		None,
+		Front,
+		Back,
+		Left,
+		Right,
+		Jump,
+		Fall,
+		Death
+	};
+
 	enum class VehicleImpactDirection
 	{
 		None,
@@ -47,6 +59,8 @@ namespace TEN::Entities::Vehicles
 	};
 
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
+	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, vector<VehicleDismountType> allowedDismountTypes, float distance, bool onLand = true);
+	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short angle, float distance, bool onLand);
 	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int deltaPos);
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
