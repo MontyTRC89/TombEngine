@@ -19,9 +19,9 @@ namespace TEN::Entities::Vehicles
 		int Pitch = 0;
 
 		int SmokeStart = 0;
-		bool CanStartDrift = 0;
-		bool DriftStarting = 0;
-		bool NoDismount = 0;
+		bool CanStartDrift = false;
+		bool DriftStarting = false;
+		bool NoDismount = false;
 
 		char Flags = NULL;
 	};

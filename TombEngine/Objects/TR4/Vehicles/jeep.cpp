@@ -22,12 +22,8 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	char JeepSmokeStart;
-	bool JeepNoGetOff;
-
 	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
 	const vector<int> JeepBrakeLightJoints = { 15, 16 };
-
 	const vector<VehicleMountType> JeepMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -35,18 +31,16 @@ namespace TEN::Entities::Vehicles
 		VehicleMountType::Right
 	};
 
-	constexpr auto JEEP_MOUNT_DISTANCE = CLICK(2);
-	constexpr auto JEEP_DISMOUNT_DISTANCE = 512;
-
 	constexpr auto JEEP_FRONT = 550;
 	constexpr auto JEEP_SIDE = 280;
 	constexpr auto JEEP_SLIP = 100;
 	constexpr auto JEEP_SLIP_SIDE = 128;
+	constexpr auto JEEP_MOUNT_DISTANCE = CLICK(2);
+	constexpr auto JEEP_DISMOUNT_DISTANCE = 512;
 
+	constexpr auto JEEP_IMPACT_VELOCITY_MIN = 42 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_VELOCITY_MAX = 128 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
-
-	constexpr auto JEEP_IMPACT_VELOCITY = 10922;
 
 	constexpr auto JEEP_BOUNCE_MIN = 32;
 	constexpr auto JEEP_KICK_MAX = -80;
@@ -337,7 +331,7 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->Animation.ActiveState == JEEP_STATE_MOUNT ||
 			laraItem->Animation.ActiveState == JEEP_STATE_DISMOUNT)
 		{
-			JeepSmokeStart = 0;
+			jeep->SmokeStart = 0;
 		}
 		else
 		{
@@ -349,7 +343,7 @@ namespace TEN::Entities::Vehicles
 
 			if (jeepItem->Animation.Velocity <= 32)
 			{
-				if (JeepSmokeStart >= 16)
+				if (jeep->SmokeStart >= 16)
 				{
 					if (GetRandomControl() & 3)
 						speed = 0;
@@ -358,8 +352,8 @@ namespace TEN::Entities::Vehicles
 				}
 				else
 				{
-					speed = ((GetRandomControl() & 7) + GetRandomControl() & 0x10 + 2 * JeepSmokeStart) * 64;
-					JeepSmokeStart++;
+					speed = ((GetRandomControl() & 7) + GetRandomControl() & 0x10 + 2 * jeep->SmokeStart) * 64;
+					jeep->SmokeStart++;
 				}
 
 				TriggerJeepExhaustSmokeEffect(pos.x, pos.y, pos.z, jeepItem->Pose.Orientation.y + -32768, speed, 0);
@@ -545,7 +539,7 @@ namespace TEN::Entities::Vehicles
 			laraItem->Animation.ActiveState != 2 &&
 			laraItem->Animation.ActiveState != 3 &&
 			laraItem->Animation.ActiveState != JEEP_STATE_LEAP &&
-			jeep->Velocity > JEEP_IMPACT_VELOCITY)
+			jeep->Velocity > JEEP_IMPACT_VELOCITY_MIN)
 		{
 			short state;
 			switch (collide)
@@ -585,7 +579,7 @@ namespace TEN::Entities::Vehicles
 				else
 				{
 					dismount = ((TrInput & VEHICLE_IN_BRAKE) && (TrInput & VEHICLE_IN_LEFT)) ? true : false;
-					if (dismount && !jeep->Velocity && !JeepNoGetOff)
+					if (dismount && !jeep->Velocity && !jeep->DisableDismount)
 					{
 						if (TestJeepDismount(jeepItem, laraItem))
 							laraItem->Animation.TargetState = JEEP_STATE_DISMOUNT;
@@ -946,8 +940,7 @@ namespace TEN::Entities::Vehicles
 			case JEEP_STATE_DRIVE_BACK:
 				if (isDead)
 					laraItem->Animation.TargetState = JEEP_STATE_IDLE;
-				else
-					//			if (jeep->Velocity || JeepNoGetOff)
+				else // if (jeep->Velocity || jeep->DisableDismount)
 				{
 					if (!(DbInput & JEEP_IN_TOGGLE_FORWARD))
 					{
@@ -1106,7 +1099,7 @@ namespace TEN::Entities::Vehicles
 		auto oldPos = jeepItem->Pose.Position;
 
 		short rot = 0;
-		JeepNoGetOff = 0;
+		jeep->DisableDismount = false;
 
 		if (oldPos.y <= jeepItem->Floor - 8)
 		{
@@ -1190,7 +1183,7 @@ namespace TEN::Entities::Vehicles
 
 			if (abs(slip) > 16)
 			{
-				JeepNoGetOff = 1;
+				jeep->DisableDismount = true;
 
 				if (slip < 0)
 					jeep->Velocity += SQUARE(slip + 16) / 2;
@@ -1202,7 +1195,7 @@ namespace TEN::Entities::Vehicles
 
 			if (abs(slip) > JEEP_SLIP_SIDE / 4)
 			{
-				JeepNoGetOff = 1;
+				jeep->DisableDismount = true;
 
 				if (slip >= 0)
 				{
