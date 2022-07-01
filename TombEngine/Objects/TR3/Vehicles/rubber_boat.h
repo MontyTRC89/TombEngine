@@ -12,7 +12,7 @@ namespace TEN::Entities::Vehicles
 
 	void RubberBoatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void RubberBoatControl(short itemNumber);
-	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem);
+	void RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem);
 	void RubberBoatAnimation(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection);
 
 	void DoRubberBoatMount(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleMountType mountType);

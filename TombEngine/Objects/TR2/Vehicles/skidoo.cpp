@@ -160,17 +160,17 @@ namespace TEN::Entities::Vehicles
 		TestTriggers(skidooItem, true);
 		TestTriggers(skidooItem, false);
 
-		bool dead = false;
+		bool isDead = false;
 		int drive = 0;
 
 		if (laraItem->HitPoints <= 0)
 		{
 			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
-			dead = true;
+			isDead = true;
 		}
 		else if (laraItem->Animation.ActiveState == SKIDOO_STATE_DISMOUNT_JUMP)
 		{
-			dead = true;
+			isDead = true;
 			collide = VehicleImpactDirection::None;
 		}
 
@@ -201,7 +201,6 @@ namespace TEN::Entities::Vehicles
 			}
 		}
 
-		bool banditSkidoo = skidoo->Armed;
 		if (drive > 0)
 		{
 			skidoo->TrackMesh = ((skidoo->TrackMesh & 3) == 1) ? 2 : 1;
@@ -247,7 +246,7 @@ namespace TEN::Entities::Vehicles
 			return false;
 		}
 
-		AnimateSkidoo(skidooItem, laraItem, collide, dead);
+		AnimateSkidoo(skidooItem, laraItem, collide, isDead);
 
 		if (probe.RoomNumber != skidooItem->RoomNumber)
 		{
@@ -273,10 +272,10 @@ namespace TEN::Entities::Vehicles
 
 		AnimateItem(laraItem);
 
-		if (!dead && drive >= 0 && banditSkidoo)
-		HandleSkidooGuns(skidooItem, laraItem);
+		if (!isDead && drive >= 0 && skidoo->Armed)
+			HandleSkidooGuns(skidooItem, laraItem);
 
-		if (!dead)
+		if (!isDead)
 		{
 			skidooItem->Animation.AnimNumber = Objects[ID_SNOWMOBILE].animIndex + (laraItem->Animation.AnimNumber - Objects[ID_SNOWMOBILE_LARA_ANIMS].animIndex);
 			skidooItem->Animation.FrameNumber = g_Level.Anims[skidooItem->Animation.AnimNumber].frameBase + (laraItem->Animation.FrameNumber - g_Level.Anims[laraItem->Animation.AnimNumber].frameBase);
@@ -302,7 +301,6 @@ namespace TEN::Entities::Vehicles
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
 
-		int maxVelocity = 0;
 		bool drive = false;
 
 		if (skidooItem->Pose.Position.y >= (height - CLICK(1)))
@@ -329,10 +327,11 @@ namespace TEN::Entities::Vehicles
 			}
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
-				if (TrInput & VEHICLE_IN_SPEED)
-					maxVelocity = SKIDOO_FAST_VELOCITY_MAX;
-				else if (TrInput & VEHICLE_IN_SLOW)
+				float maxVelocity;
+				if (TrInput & VEHICLE_IN_SLOW)
 					maxVelocity = SKIDOO_SLOW_VELOCITY_MAX;
+				else if (TrInput & VEHICLE_IN_SPEED)
+					maxVelocity = SKIDOO_FAST_VELOCITY_MAX;
 				else
 					maxVelocity = SKIDOO_NORMAL_VELOCITY_MAX;
 

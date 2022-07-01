@@ -12,7 +12,7 @@ namespace TEN::Entities::Vehicles
 
 	void SpeedboatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void SpeedboatControl(short itemNumber);
-	bool SpeedboatUserControl(ItemInfo* speedboatItem, ItemInfo* laraItem);
+	void SpeedboatUserControl(ItemInfo* speedboatItem, ItemInfo* laraItem);
 	void AnimateSpeedboat(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection);
 
 	void DoSpeedboatMount(ItemInfo* speedboatItem, ItemInfo* laraItem, VehicleMountType mountType);

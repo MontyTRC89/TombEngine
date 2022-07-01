@@ -14,7 +14,6 @@ namespace TEN::Entities::Vehicles
 		int Revs = 0;
 		int EngineRevs = 0;
 		int Pitch = 0;
-
 		short LightPower = 0;
 		short LeftWheelRotation = 0;
 		short RightWheelsRotation = 0;

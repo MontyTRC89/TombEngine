@@ -143,7 +143,6 @@ namespace TEN::Entities::Vehicles
 		auto* laraItem = LaraItem;
 		auto* lara = GetLaraInfo(laraItem);
 
-		bool noTurn = true;
 		bool drive = false;
 
 		int pitch, height, ofs, nowake;
@@ -174,7 +173,7 @@ namespace TEN::Entities::Vehicles
 
 			default:
 				drive = true;
-				noTurn = RubberBoatUserControl(rBoatItem, laraItem);
+				RubberBoatUserControl(rBoatItem, laraItem);
 				break;
 			}
 		}
@@ -186,15 +185,12 @@ namespace TEN::Entities::Vehicles
 				rBoatItem->Animation.Velocity = 0;
 		}
 
-		if (noTurn)
-		{
-			if (rBoat->TurnRate < -RBOAT_TURN_RATE_DECEL)
-				rBoat->TurnRate += RBOAT_TURN_RATE_DECEL;
-			else if (rBoat->TurnRate > RBOAT_TURN_RATE_DECEL)
-				rBoat->TurnRate -= RBOAT_TURN_RATE_DECEL;
-			else
-				rBoat->TurnRate = 0;
-		}
+		if (rBoat->TurnRate < -RBOAT_TURN_RATE_DECEL)
+			rBoat->TurnRate += RBOAT_TURN_RATE_DECEL;
+		else if (rBoat->TurnRate > RBOAT_TURN_RATE_DECEL)
+			rBoat->TurnRate -= RBOAT_TURN_RATE_DECEL;
+		else
+			rBoat->TurnRate = 0;
 
 		height = probe.Position.Floor;
 
@@ -318,99 +314,74 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
+	void RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
 
-		bool noTurn = true;
+		float velocity = rBoatItem->Animation.Velocity;
 
-		if (rBoatItem->Pose.Position.y >= (rBoat->Water - 128) &&
-			rBoat->Water != NO_HEIGHT)
+		if (rBoatItem->Pose.Position.y < (rBoat->Water - CLICK(0.5f)) ||
+			rBoat->Water == NO_HEIGHT)
 		{
-			if (!(TrInput & VEHICLE_IN_DISMOUNT) && !(TrInput & IN_LOOK) || rBoatItem->Animation.Velocity)
-			{
-				if ((TrInput & VEHICLE_IN_LEFT && !(TrInput & VEHICLE_IN_REVERSE)) ||
-					(TrInput & VEHICLE_IN_RIGHT && TrInput & VEHICLE_IN_REVERSE))
-				{
-					if (rBoat->TurnRate > 0)
-						rBoat->TurnRate -= RBOAT_TURN_RATE_DECEL;
-					else
-					{
-						rBoat->TurnRate -= RBOAT_TURN_RATE_ACCEL;
-						if (rBoat->TurnRate < -RBOAT_TURN_RATE_MAX)
-							rBoat->TurnRate = -RBOAT_TURN_RATE_MAX;
-					}
-
-					noTurn = false;
-				}
-				else if ((TrInput & VEHICLE_IN_RIGHT && !(TrInput & VEHICLE_IN_REVERSE)) ||
-					(TrInput & VEHICLE_IN_LEFT && TrInput & VEHICLE_IN_REVERSE))
-				{
-					if (rBoat->TurnRate < 0)
-						rBoat->TurnRate += RBOAT_TURN_RATE_DECEL;
-					else
-					{
-						rBoat->TurnRate += RBOAT_TURN_RATE_ACCEL;
-						if (rBoat->TurnRate > RBOAT_TURN_RATE_MAX)
-							rBoat->TurnRate = RBOAT_TURN_RATE_MAX;
-					}
-
-					noTurn = false;
-				}
-
-				if (TrInput & VEHICLE_IN_REVERSE)
-				{
-					if (rBoatItem->Animation.Velocity > 0)
-						rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_BRAKE_DECEL;
-					else if (rBoatItem->Animation.Velocity > -RBOAT_REVERSE_VELOCITY_MAX)
-						rBoatItem->Animation.Velocity -= RBOAT_REVERSE_VELOCITY_DECEL;
-				}
-				else if (TrInput & VEHICLE_IN_ACCELERATE)
-				{
-					int maxVelocity;
-					if (TrInput & VEHICLE_IN_SPEED)
-						maxVelocity = RBOAT_FAST_VELOCITY_MAX;
-					else
-						maxVelocity = (TrInput & VEHICLE_IN_SLOW) ? RBOAT_SLOW_VELOCITY_MAX : RBOAT_NORMAL_VELOCITY_MAX;
-
-					if (rBoatItem->Animation.Velocity < maxVelocity)
-						rBoatItem->Animation.Velocity += (RBOAT_VELOCITY_ACCEL / 2 + 1) + (RBOAT_VELOCITY_ACCEL * rBoatItem->Animation.Velocity) / (maxVelocity * 2);
-					else if (rBoatItem->Animation.Velocity > (maxVelocity + RBOAT_VELOCITY_DECEL))
-						rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
-
-				}
-				else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
-					rBoatItem->Animation.Velocity >= 0 &&
-					rBoatItem->Animation.Velocity < RBOAT_VELOCITY_MIN)
-				{
-					if (!(TrInput & VEHICLE_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
-						rBoatItem->Animation.Velocity = RBOAT_VELOCITY_MIN;
-				}
-				else if (rBoatItem->Animation.Velocity > RBOAT_VELOCITY_DECEL)
-					rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
-				else
-					rBoatItem->Animation.Velocity = 0;
-			}
-			else
-			{
-				if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
-					rBoatItem->Animation.Velocity >= 0 &&
-					rBoatItem->Animation.Velocity < RBOAT_VELOCITY_MIN)
-				{
-					if (!(TrInput & VEHICLE_IN_DISMOUNT) && rBoatItem->Animation.Velocity == 0)
-						rBoatItem->Animation.Velocity = RBOAT_VELOCITY_MIN;
-				}
-				else if (rBoatItem->Animation.Velocity > RBOAT_VELOCITY_DECEL)
-					rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
-				else
-					rBoatItem->Animation.Velocity = 0;
-
-				if (TrInput & IN_LOOK && rBoatItem->Animation.Velocity == 0)
-					LookUpDown(laraItem);
-			}
+			return;
 		}
 
-		return noTurn;
+		if (TrInput & (VEHICLE_IN_DISMOUNT | IN_LOOK) && velocity)
+		{
+			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
+				velocity >= 0 &&
+				velocity < RBOAT_VELOCITY_MIN)
+			{
+				if (!(TrInput & VEHICLE_IN_DISMOUNT) && !velocity)
+					rBoatItem->Animation.Velocity = RBOAT_VELOCITY_MIN;
+			}
+			else if (velocity > RBOAT_VELOCITY_DECEL)
+				rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
+			else
+				rBoatItem->Animation.Velocity = 0;
+
+			if (TrInput & IN_LOOK && !velocity)
+				LookUpDown(laraItem);
+
+			return;
+		}
+
+		if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
+			ModulateVehicleTurnRateY(&rBoat->TurnRate, RBOAT_TURN_RATE_ACCEL, -RBOAT_TURN_RATE_MAX, RBOAT_TURN_RATE_MAX);
+		
+		if (TrInput & VEHICLE_IN_ACCELERATE)
+		{
+			float maxVelocity;
+			if (TrInput & VEHICLE_IN_SLOW)
+				maxVelocity = RBOAT_SLOW_VELOCITY_MAX;
+			else if (TrInput & VEHICLE_IN_SPEED)
+				maxVelocity = RBOAT_FAST_VELOCITY_MAX;
+			else
+				maxVelocity = RBOAT_NORMAL_VELOCITY_MAX;
+
+			if (velocity < maxVelocity)
+				rBoatItem->Animation.Velocity += (RBOAT_VELOCITY_ACCEL / 2) + (RBOAT_VELOCITY_ACCEL * (velocity / (maxVelocity * 2)));
+			else if (velocity > (maxVelocity + RBOAT_VELOCITY_DECEL))
+				rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
+		}
+		else if (TrInput & VEHICLE_IN_REVERSE)
+		{
+			if (velocity > 0)
+				rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_BRAKE_DECEL;
+			else if (velocity > -RBOAT_REVERSE_VELOCITY_MAX)
+				rBoatItem->Animation.Velocity -= RBOAT_REVERSE_VELOCITY_DECEL;
+		}
+		else if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT) &&
+			velocity >= 0 &&
+			velocity < RBOAT_VELOCITY_MIN)
+		{
+			if (!(TrInput & VEHICLE_IN_DISMOUNT) && !velocity)
+				rBoatItem->Animation.Velocity = RBOAT_VELOCITY_MIN;
+		}
+		else if (velocity > RBOAT_VELOCITY_DECEL)
+			rBoatItem->Animation.Velocity -= RBOAT_VELOCITY_DECEL;
+		else
+			rBoatItem->Animation.Velocity = 0;
 	}
 
 	void RubberBoatAnimation(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleImpactDirection impactDirection)

@@ -27,6 +27,8 @@ namespace TEN::Entities::Vehicles
 	constexpr auto JEEP_SLIP	  = 100;
 	constexpr auto JEEP_SLIP_SIDE = 128;
 
+	constexpr auto JEEP_VELOCITY_BRAKE_DECEL = 3 * VEHICLE_VELOCITY_SCALE;
+
 	constexpr auto JEEP_IMPACT_VELOCITY_MIN  = 42 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_VELOCITY_MAX		 = 128 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto JEEP_REVERSE_VELOCITY_MAX = 64 * VEHICLE_VELOCITY_SCALE;
@@ -383,14 +385,14 @@ namespace TEN::Entities::Vehicles
 			jeep->Revs = 0;
 		else
 		{
-			jeep->Velocity += (jeep->Revs / 16);
-			jeep->Revs -= (jeep->Revs / 8);
+			jeep->Velocity += jeep->Revs / 16;
+			jeep->Revs -= jeep->Revs / 8;
 		}
 
-		int rot1 = 0;
-		int rot2 = 0;
+		int maxTurnRate = 0;
+		int turnRateAccel = 0;
 
-		if (jeepItem->Pose.Position.y >= height - STEP_SIZE)
+		if (jeepItem->Pose.Position.y >= (height - CLICK(1)))
 		{
 			if (!jeep->Velocity)
 			{
@@ -398,60 +400,34 @@ namespace TEN::Entities::Vehicles
 					LookUpDown(laraItem);
 			}
 
-			if (abs(jeep->Velocity) <= JEEP_VELOCITY_MAX / 2)
+			if (abs(jeep->Velocity) <= (JEEP_VELOCITY_MAX / 2))
 			{
-				rot1 = ANGLE(5) * abs(jeep->Velocity) / 16384;
-				rot2 = 60 * abs(jeep->Velocity) / 16384 + ANGLE(1);
+				maxTurnRate = ANGLE(5.0f) * abs(jeep->Velocity) / ANGLE(90.0f);
+				turnRateAccel = 60 * abs(jeep->Velocity) / ANGLE(90.0f) + ANGLE(1.0f);
 			}
 			else
 			{
-				rot1 = ANGLE(5);
-				rot2 = 242;
+				maxTurnRate = ANGLE(5.0f);
+				turnRateAccel = ANGLE(1.33f);
 			}
 
 			if (jeep->Velocity < 0)
-			{
-				if (TrInput & VEHICLE_IN_RIGHT)
-				{
-					jeep->TurnRate -= rot2;
-					if (jeep->TurnRate < -rot1)
-						jeep->TurnRate = -rot1;
-				}
-				else if (TrInput & VEHICLE_IN_LEFT)
-				{
-					jeep->TurnRate += rot2;
-					if (jeep->TurnRate > rot1)
-						jeep->TurnRate = rot1;
-				}
-			}
+				ModulateVehicleTurnRateY(&jeep->TurnRate, turnRateAccel, -maxTurnRate, maxTurnRate, true);
 			else if (jeep->Velocity > 0)
-			{
-				if (TrInput & VEHICLE_IN_RIGHT)
-				{
-					jeep->TurnRate += rot2;
-					if (jeep->TurnRate > rot1)
-						jeep->TurnRate = rot1;
-				}
-				else if (TrInput & VEHICLE_IN_LEFT)
-				{
-					jeep->TurnRate -= rot2;
-					if (jeep->TurnRate < -rot1)
-						jeep->TurnRate = -rot1;
-				}
-			}
+				ModulateVehicleTurnRateY(&jeep->TurnRate, turnRateAccel, -maxTurnRate, maxTurnRate);
 
 			// Brake/reverse
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
 				if (jeep->Velocity < 0)
 				{
-					jeep->Velocity += 3 * VEHICLE_VELOCITY_SCALE;
+					jeep->Velocity += JEEP_VELOCITY_BRAKE_DECEL;
 					if (jeep->Velocity > 0)
 						jeep->Velocity = 0;
 				}
 				else if (jeep->Velocity > 0)
 				{
-					jeep->Velocity -= 3 * VEHICLE_VELOCITY_SCALE;
+					jeep->Velocity -= JEEP_VELOCITY_BRAKE_DECEL;
 					if (jeep->Velocity < 0)
 						jeep->Velocity = 0;
 				}
@@ -1114,7 +1090,7 @@ namespace TEN::Entities::Vehicles
 		short rot = 0;
 		jeep->DisableDismount = false;
 
-		if (oldPos.y <= jeepItem->Floor - 8)
+		if (oldPos.y <= (jeepItem->Floor - 8))
 		{
 			if (jeep->TurnRate < -JEEP_TURN_RATE_DECEL)
 				jeep->TurnRate += JEEP_TURN_RATE_DECEL;
@@ -1128,10 +1104,10 @@ namespace TEN::Entities::Vehicles
 		}
 		else
 		{
-			if (jeep->TurnRate < -ANGLE(1))
-				jeep->TurnRate += ANGLE(1);
-			else if (jeep->TurnRate > ANGLE(1))
-				jeep->TurnRate -= ANGLE(1);
+			if (jeep->TurnRate < -ANGLE(1.0f))
+				jeep->TurnRate += ANGLE(1.0f);
+			else if (jeep->TurnRate > ANGLE(1.0f))
+				jeep->TurnRate -= ANGLE(1.0f);
 			else
 				jeep->TurnRate = 0;
 
@@ -1141,26 +1117,26 @@ namespace TEN::Entities::Vehicles
 			short momentum = (short)(728 - ((3 * jeep->Velocity) / 2048));
 
 			if (!(TrInput & IN_ACTION) && jeep->Velocity > 0)
-				momentum -= (momentum / 4);
+				momentum -= momentum / 4;
 
-			if (rot < -273)
+			if (rot < -ANGLE(1.5f))
 			{
-				if (rot < -ANGLE(75))
+				if (rot < -ANGLE(75.0f))
 				{
 					jeepItem->Pose.Position.y -= 41;
 					jeepItem->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
 					jeep->TurnRate = 0;
-					jeep->Velocity -= (jeep->Velocity / 8);
+					jeep->Velocity -= jeep->Velocity / 8;
 				}
 
-				if (rot < -ANGLE(90))
-					jeep->MomentumAngle = jeepItem->Pose.Orientation.y + ANGLE(90);
+				if (rot < -ANGLE(90.0f))
+					jeep->MomentumAngle = jeepItem->Pose.Orientation.y + ANGLE(90.0f);
 				else
 					jeep->MomentumAngle -= momentum;
 			}
-			else if (rot > 273)
+			else if (rot > ANGLE(1.5f))
 			{
-				if (rot > ANGLE(75))
+				if (rot > ANGLE(75.0f))
 				{
 					jeepItem->Pose.Position.y -= 41;
 					jeepItem->Animation.VerticalVelocity = -6 - (GetRandomControl() & 3);
@@ -1168,8 +1144,8 @@ namespace TEN::Entities::Vehicles
 					jeep->Velocity -= (jeep->Velocity / 8);
 				}
 
-				if (rot > ANGLE(90))
-					jeep->MomentumAngle = jeepItem->Pose.Orientation.y - ANGLE(90);
+				if (rot > ANGLE(90.0f))
+					jeep->MomentumAngle = jeepItem->Pose.Orientation.y - ANGLE(90.0f);
 				else
 					jeep->MomentumAngle += momentum;
 			}
@@ -1187,8 +1163,7 @@ namespace TEN::Entities::Vehicles
 		else
 			speed = jeepItem->Animation.Velocity * phd_cos(jeepItem->Pose.Orientation.x);
 
-		jeepItem->Pose.Position.x += speed * phd_sin(jeep->MomentumAngle);
-		jeepItem->Pose.Position.z += speed * phd_cos(jeep->MomentumAngle);
+		TranslateItem(jeepItem, jeep->MomentumAngle, speed);
 	
 		if (jeepItem->Pose.Position.y >= height)
 		{
@@ -1212,13 +1187,13 @@ namespace TEN::Entities::Vehicles
 
 				if (slip >= 0)
 				{
-					jeepItem->Pose.Position.x += (slip - 24) * phd_sin(jeepItem->Pose.Orientation.y + ANGLE(90));
-					jeepItem->Pose.Position.z += (slip - 24) * phd_cos(jeepItem->Pose.Orientation.y + ANGLE(90));
+					jeepItem->Pose.Position.x += (slip - 24) * phd_sin(jeepItem->Pose.Orientation.y + ANGLE(90.0f));
+					jeepItem->Pose.Position.z += (slip - 24) * phd_cos(jeepItem->Pose.Orientation.y + ANGLE(90.0f));
 				}
 				else
 				{
-					jeepItem->Pose.Position.x += (slip - 24) * phd_sin(jeepItem->Pose.Orientation.y - ANGLE(90));
-					jeepItem->Pose.Position.z += (slip - 24) * phd_cos(jeepItem->Pose.Orientation.y - ANGLE(90));
+					jeepItem->Pose.Position.x += (slip - 24) * phd_sin(jeepItem->Pose.Orientation.y - ANGLE(90.0f));
+					jeepItem->Pose.Position.z += (slip - 24) * phd_cos(jeepItem->Pose.Orientation.y - ANGLE(90.0f));
 				}
 			}
 		}

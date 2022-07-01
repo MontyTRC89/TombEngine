@@ -404,7 +404,7 @@ namespace TEN::Entities::Vehicles
 					if (motorbike->Velocity > MOTORBIKE_ACCEL_1)
 						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE;
 					else
-						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 8192.0f);
+						motorbike->TurnRate -= MOTORBIKE_FORWARD_TURN_ANGLE * ((float)motorbike->Velocity / 8192.0f); // 45 deg.
 
 					if (motorbike->TurnRate < -MOTORBIKE_TURN_ANGLE_MAX)
 						motorbike->TurnRate = -MOTORBIKE_TURN_ANGLE_MAX;
@@ -420,22 +420,9 @@ namespace TEN::Entities::Vehicles
 						motorbike->TurnRate = MOTORBIKE_TURN_ANGLE_MAX;
 				}
 			}
-			// Moving back.
+			// Reversing.
 			else if (motorbike->Velocity < 0)
-			{
-				if (TrInput & VEHICLE_IN_LEFT)
-				{
-					motorbike->TurnRate += MOTORBIKE_BACK_TURN_ANGLE;
-					if (motorbike->TurnRate > MOTORBIKE_TURN_ANGLE_MAX)
-						motorbike->TurnRate = MOTORBIKE_TURN_ANGLE_MAX;
-				}
-				else if (TrInput & VEHICLE_IN_RIGHT)
-				{
-					motorbike->TurnRate -= MOTORBIKE_BACK_TURN_ANGLE;
-					if (motorbike->TurnRate < -MOTORBIKE_TURN_ANGLE_MAX)
-						motorbike->TurnRate = -MOTORBIKE_TURN_ANGLE_MAX;
-				}
-			}
+				ModulateVehicleTurnRateY(&motorbike->TurnRate, MOTORBIKE_BACK_TURN_ANGLE, -MOTORBIKE_TURN_ANGLE_MAX, MOTORBIKE_TURN_ANGLE_MAX, true);
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{

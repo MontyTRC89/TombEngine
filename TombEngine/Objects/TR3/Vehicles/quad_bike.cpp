@@ -386,70 +386,22 @@ namespace TEN::Entities::Vehicles
 					!quadBike->DriftStarting &&
 					quadBike->Velocity > QBIKE_DRIFT_VELOCITY_MIN)
 				{
-					if (TrInput & VEHICLE_IN_LEFT)
-					{
-						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_RATE_MAX)
-							quadBike->TurnRate = -QBIKE_DRIFT_TURN_RATE_MAX;
-					}
-					else if (TrInput & VEHICLE_IN_RIGHT)
-					{
-						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_RATE_MAX)
-							quadBike->TurnRate = QBIKE_DRIFT_TURN_RATE_MAX;
-					}
+					ModulateVehicleTurnRateY(&quadBike->TurnRate, QBIKE_DRIFT_TURN_RATE_ACCEL, -QBIKE_DRIFT_TURN_RATE_MAX, QBIKE_DRIFT_TURN_RATE_MAX);
 				}
 				else
-				{
-					if (TrInput & VEHICLE_IN_LEFT)
-					{
-						quadBike->TurnRate -= QBIKE_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate < -QBIKE_TURN_RATE_MAX)
-							quadBike->TurnRate = -QBIKE_TURN_RATE_MAX;
-					}
-					else if (TrInput & VEHICLE_IN_RIGHT)
-					{
-						quadBike->TurnRate += QBIKE_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate > QBIKE_TURN_RATE_MAX)
-							quadBike->TurnRate = QBIKE_TURN_RATE_MAX;
-					}
-				}
+					ModulateVehicleTurnRateY(&quadBike->TurnRate, QBIKE_TURN_RATE_ACCEL, -QBIKE_TURN_RATE_MAX, QBIKE_TURN_RATE_MAX);
 			}
-			// Driving back.
+			// Reversing.
 			else if (quadBike->Velocity < 0)
 			{
 				if (TrInput & VEHICLE_IN_SPEED &&
 					!quadBike->DriftStarting &&
 					quadBike->Velocity < (-QBIKE_DRIFT_VELOCITY_MIN + 0x800))
 				{
-					if (TrInput & VEHICLE_IN_LEFT)
-					{
-						quadBike->TurnRate -= QBIKE_DRIFT_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate < -QBIKE_DRIFT_TURN_RATE_MAX)
-							quadBike->TurnRate = -QBIKE_DRIFT_TURN_RATE_MAX;
-					}
-					else if (TrInput & VEHICLE_IN_RIGHT)
-					{
-						quadBike->TurnRate += QBIKE_DRIFT_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate > QBIKE_DRIFT_TURN_RATE_MAX)
-							quadBike->TurnRate = QBIKE_DRIFT_TURN_RATE_MAX;
-					}
+					ModulateVehicleTurnRateY(&quadBike->TurnRate, QBIKE_DRIFT_TURN_RATE_ACCEL, -QBIKE_DRIFT_TURN_RATE_MAX, QBIKE_DRIFT_TURN_RATE_MAX, true);
 				}
 				else
-				{
-					if (TrInput & VEHICLE_IN_RIGHT)
-					{
-						quadBike->TurnRate -= QBIKE_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate < -QBIKE_TURN_RATE_MAX)
-							quadBike->TurnRate = -QBIKE_TURN_RATE_MAX;
-					}
-					else if (TrInput & VEHICLE_IN_LEFT)
-					{
-						quadBike->TurnRate += QBIKE_TURN_RATE_ACCEL;
-						if (quadBike->TurnRate > QBIKE_TURN_RATE_MAX)
-							quadBike->TurnRate = QBIKE_TURN_RATE_MAX;
-					}
-				}
+					ModulateVehicleTurnRateY(&quadBike->TurnRate, QBIKE_TURN_RATE_ACCEL, -QBIKE_TURN_RATE_MAX, QBIKE_TURN_RATE_MAX, true);
 			}
 
 			// Driving back / braking.
