@@ -270,7 +270,7 @@ namespace TEN::Entities::TR4
 
 			case 7:
 				if (item->Animation.AnimNumber == Objects[item->Animation.AnimNumber].animIndex + 17 &&
-					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				{
 					if (GetRandomControl() & 1)
 						item->Animation.RequiredState = 10;

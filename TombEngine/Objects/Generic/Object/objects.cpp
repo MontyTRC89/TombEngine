@@ -323,7 +323,7 @@ void AnimatingControl(short itemNumber)
 	AnimateItem(item);
 
 	// TODO: ID_SHOOT_SWITCH2 probably the bell in Trajan Markets, use LUA for that
-	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].FrameEnd)
+	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)
 	{
 		item->frameNumber = g_Level.Anims[item->animNumber].frameBase;
 		RemoveActiveItem(itemNumber);

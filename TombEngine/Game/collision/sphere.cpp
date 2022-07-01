@@ -22,7 +22,7 @@ int GetSpheres(ItemInfo* item, SPHERE* ptr, int worldSpace, Matrix local)
 	BoundingSphere spheres[MAX_SPHERES];
 	short itemNumber = (item - g_Level.Items.data());
 
-	int num = g_Renderer.getSpheres(itemNumber, spheres, worldSpace, local);
+	int num = g_Renderer.GetSpheres(itemNumber, spheres, worldSpace, local);
 
 	for (int i = 0; i < MAX_SPHERES; i++)
 	{

@@ -71,7 +71,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
-	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1)
+	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 
@@ -343,7 +343,7 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Pose.Orientation.z = 0;
+		ResetLaraLean(item);
 
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
@@ -352,7 +352,9 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
 				Rumble(0.4f, 0.15f);
+
 				item->Animation.ActiveState = LS_SPLAT;
+				lara->Control.TurnRate = 0;
 				return;
 			}
 		}
@@ -2213,7 +2215,7 @@ void lara_col_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Pose.Orientation.z = 0;
+		ResetLaraLean(item);
 
 		item->Animation.TargetState = LS_SOFT_SPLAT;
 		if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
@@ -2341,17 +2343,18 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 
 	if (LaraDeflectEdge(item, coll))
 	{
-		item->Pose.Orientation.z = 0;
+		ResetLaraLean(item);
 
 		if (TestLaraWall(item, OFFSET_RADIUS(coll->Setup.Radius), -CLICK(2.5f)) ||
 			coll->HitTallObject)
 		{
-			Rumble(0.5f, 0.15f);
-
 			item->Animation.TargetState = LS_SPLAT;
 			if (GetChange(item, &g_Level.Anims[item->Animation.AnimNumber]))
 			{
+				Rumble(0.5f, 0.15f);
+
 				item->Animation.ActiveState = LS_SPLAT;
+				lara->Control.TurnRate = 0;
 				return;
 			}
 		}

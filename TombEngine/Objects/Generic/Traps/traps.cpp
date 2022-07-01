@@ -221,7 +221,7 @@ void WreckingBallControl(short itemNumber)
 		{
 			item->Animation.TargetState = 1;
 		}
-		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+		else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 		{
 			SoundEffect(SFX_TR5_BASE_CLAW_DROP, &item->Pose);
 			++item->ItemFlags[1];

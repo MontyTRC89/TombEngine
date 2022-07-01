@@ -16,5 +16,6 @@ namespace TEN::Renderer
 		float Out;
 		float Range;
 		bool AffectNeighbourRooms;
+		bool CastShadows;
 	};
 }

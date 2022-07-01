@@ -143,7 +143,7 @@ namespace TEN::Entities::Switches
 		}
 		else
 		{
-			if (switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].FrameEnd)
+			if (switchItem->Animation.FrameNumber == g_Level.Anims[switchItem->Animation.AnimNumber].frameEnd)
 			{
 				switchItem->Animation.ActiveState = SWITCH_OFF;
 				switchItem->Status = ITEM_NOT_ACTIVE;

@@ -584,7 +584,7 @@ int Moveable::GetFrameNumber() const
 void Moveable::SetFrameNumber(int frameNumber)
 {
 	auto const fBase = g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
-	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].FrameEnd;
+	auto const fEnd = g_Level.Anims[m_item->Animation.AnimNumber].frameEnd;
 	auto frameCount = fEnd - fBase;
 	bool cond = frameNumber < frameCount;
 	const char* err = "Invalid frame number {}; max frame number for anim {} is {}.";
@@ -651,12 +651,12 @@ void Moveable::EnableItem()
 				m_item->TouchBits = NO_JOINT_BITS;
 				m_item->Status = ITEM_ACTIVE;
 				AddActiveItem(m_num);
-				EnableBaddyAI(m_num, 1);
+				EnableEntityAI(m_num, 1);
 			}
 			else if (m_item->Status == ITEM_INVISIBLE)
 			{
 				m_item->TouchBits = NO_JOINT_BITS;
-				if (EnableBaddyAI(m_num, 0))
+				if (EnableEntityAI(m_num, 0))
 					m_item->Status = ITEM_ACTIVE;
 				else
 					m_item->Status = ITEM_INVISIBLE;
