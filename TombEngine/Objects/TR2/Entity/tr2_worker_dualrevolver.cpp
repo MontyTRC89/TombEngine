@@ -77,7 +77,7 @@ void WorkerDualGunControl(short itemNumber)
 			{
 				if (Targetable(item, &AI))
 				{
-					if (AI.distance <= SECTOR(9246))
+					if (AI.distance <= pow(SECTOR(3), 2))
 						item->Animation.TargetState = 9;
 					else
 						item->Animation.TargetState = 3;
@@ -87,7 +87,7 @@ void WorkerDualGunControl(short itemNumber)
 					switch (creature->Mood)
 					{
 					case MoodType::Attack:
-						if (AI.distance > SECTOR(409600) || !AI.ahead)
+						if (AI.distance > pow(SECTOR(20), 2) || !AI.ahead)
 							item->Animation.TargetState = 4;
 						else
 							item->Animation.TargetState = 3;
@@ -126,7 +126,7 @@ void WorkerDualGunControl(short itemNumber)
 
 			if (Targetable(item, &AI))
 			{
-				if (AI.distance < SECTOR(9246) || AI.zoneNumber != AI.enemyZone)
+				if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
 				else
 				{
@@ -141,7 +141,7 @@ void WorkerDualGunControl(short itemNumber)
 				item->Animation.TargetState = 4;
 			else if (creature->Mood == MoodType::Attack || creature->Mood == MoodType::Stalk)
 			{
-				if (AI.distance > SECTOR(409600) || !AI.ahead)
+				if (AI.distance > pow(SECTOR(20), 2) || !AI.ahead)
 					item->Animation.TargetState = 4;
 			}
 			else if (LaraItem->HitPoints > 0)
@@ -178,7 +178,7 @@ void WorkerDualGunControl(short itemNumber)
 			}
 			else if (creature->Mood == MoodType::Attack)
 			{
-				if (AI.ahead && AI.distance < SECTOR(409600))
+				if (AI.ahead && AI.distance < pow(SECTOR(20), 2))
 					item->Animation.TargetState = 3;
 			}
 			else if (LaraItem->HitPoints > 0)

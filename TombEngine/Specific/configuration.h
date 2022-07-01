@@ -10,6 +10,7 @@
 #define REGKEY_WINDOWED					"Windowed"
 #define REGKEY_SHADOWS					"Shadows"
 #define REGKEY_SHADOW_MAP				"ShadowMap"
+#define REGKEY_SHADOW_BLOBS				"ShadowBlobs"
 #define REGKEY_CAUSTICS					"Caustics"
 #define REGKEY_VOLUMETRIC_FOG			"VolumetricFog"
 
@@ -36,10 +37,11 @@ struct GameConfiguration
 	int MusicVolume;
 	int SfxVolume;
 
-	bool EnableShadows;
 	bool EnableCaustics;
 	bool EnableVolumetricFog;
+	int ShadowMode;
 	int ShadowMapSize = 1024;
+	int ShadowMaxBlobs = 16;
 
 	bool AutoTarget;
 	bool EnableRumble;

@@ -479,11 +479,10 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	auto* bounds = GetBoundsAccurate(item);
 
 	// HACK: In original, y coordinate was just set to bounding box top point.
-	// In TEN, we have to use LOT step height + small headroom, because Choco's floordata
+	// In TEN, we have to use nearest click value, because Choco's floordata
 	// system returns inconsistent room number in portal 4-click vault cases -- Lwmte, 27.06.22
 
-	int y = item->Pose.Position.y;
-	y += LOT->Step <= SECTOR(2) ? (-LOT->Step - CLICK(1)) : (bounds->Y1 - CLICK(1));
+	int y = item->Pose.Position.y - ceil((float)abs(bounds->Y1) / (float)CLICK(1)) * CLICK(1);
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(old.x, y, old.z, &roomNumber);  
@@ -560,7 +559,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 		if (xPos < radius)
 		{
-			if (BadFloor(x-radius, y, z, height, nextHeight, roomNumber, LOT))
+			if (BadFloor(x - radius, y, z, height, nextHeight, roomNumber, LOT))
 				shiftX = radius - xPos;
 			else if (!shiftZ && BadFloor(x - radius, y, z - radius, height, nextHeight, roomNumber, LOT))
 			{
@@ -792,7 +791,13 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 			ItemNewRoom(itemNumber, roomNumber);
 
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, &g_Level.Rooms[roomNumber]))
-			DoDamage(item, INT_MAX);
+		{
+			auto bounds = GetBoundsAccurate(item);
+			auto height = item->Pose.Position.y - GetWaterHeight(item);
+
+			if (abs(bounds->Y1 + bounds->Y2) < height)
+				DoDamage(item, INT_MAX);
+		}
 	}
 
 	roomNumber = item->RoomNumber;
@@ -1095,7 +1100,7 @@ int CreatureActive(short itemNumber)
 
 	if (item->Status == ITEM_INVISIBLE || !item->Data.is<CreatureInfo>())
 	{
-		if (!EnableBaddyAI(itemNumber, 0))
+		if (!EnableEntityAI(itemNumber, 0))
 			return false; // AI couldn't be activated
 
 		item->Status = ITEM_ACTIVE;
@@ -1463,9 +1468,20 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 
 	// NEW: Only update enemy box number if will be actually reachable by enemy.
 	// This prevents enemies from running to Lara and attacking nothing when she is hanging or shimmying. -- Lwmte, 27.06.22
-	auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
-	auto bounds = GetBoundsAccurate(item);
-	bool reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+
+	bool reachable = false;
+	if (object->zoneType == ZoneType::ZONE_FLYER ||
+	   (object->zoneType == ZoneType::ZONE_WATER && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber)))
+	{
+		reachable = true; // If NPC is flying or swimming in water, always reach Lara
+	}
+	else
+	{
+		auto probe = GetCollision(floor, enemy->Pose.Position.x, enemy->Pose.Position.y, enemy->Pose.Position.z);
+		auto bounds = GetBoundsAccurate(item);
+
+		reachable = abs(enemy->Pose.Position.y - probe.Position.Floor) < abs(bounds->Y2 - bounds->Y1);
+	}
 
 	if (floor && reachable)
 		enemy->BoxNumber = floor->Box;
@@ -1500,13 +1516,18 @@ void CreatureAIInfo(ItemInfo* item, AI_INFO* AI)
 	short angle = phd_atan(vector.z, vector.x);
 
 	if (vector.x > SECTOR(31.25f) || vector.x < -SECTOR(31.25f) || vector.z > SECTOR(31.25f) || vector.z < -SECTOR(31.25f))
-		AI->distance = INT_MAX;
+		AI->distance = AI->verticalDistance = INT_MAX;
 	else
 	{
 		if (creature->Enemy)
+		{
+			// TODO: distance is squared, verticalDistance is not. Desquare distance later. -- Lwmte, 27.06.22
+
 			AI->distance = pow(vector.x, 2) + pow(vector.z, 2);
+			AI->verticalDistance = abs(vector.y);
+		}
 		else
-			AI->distance = INT_MAX;
+			AI->distance = AI->verticalDistance = INT_MAX;
 	}
 
 	AI->angle = angle - item->Pose.Orientation.y;

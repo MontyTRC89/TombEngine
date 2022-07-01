@@ -203,6 +203,7 @@ void LoadObjects()
 				poly.shape = ReadInt32();
 				poly.animatedSequence = ReadInt32();
 				poly.animatedFrame = ReadInt32();
+				poly.shineStrength = ReadFloat();
 				int count = (poly.shape == 0 ? 4 : 3);
 				poly.indices.resize(count);
 				poly.textureCoordinates.resize(count);
@@ -243,7 +244,7 @@ void LoadObjects()
 	{
 		ANIM_STRUCT* anim = &g_Level.Anims[i];
 
-		anim->FramePtr = ReadInt32();
+		anim->framePtr = ReadInt32();
 		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
 		anim->VelocityStart = ReadInt32();
@@ -251,7 +252,7 @@ void LoadObjects()
 		anim->LateralVelocityStart = ReadInt32();
 		anim->LateralVelocityEnd = ReadInt32();
 		anim->frameBase = ReadInt32();
-		anim->FrameEnd = ReadInt32();
+		anim->frameEnd = ReadInt32();
 		anim->jumpAnimNum = ReadInt32();
 		anim->jumpFrameNum = ReadInt32();
 		anim->numberChanges = ReadInt32();
@@ -903,6 +904,7 @@ void LoadAnimatedTextures()
 	{
 		ANIMATED_TEXTURES_SEQUENCE sequence;
 		sequence.atlas = ReadInt32();
+		sequence.Fps = ReadInt32();
 		sequence.numFrames = ReadInt32();
 
 		for (int j = 0; j < sequence.numFrames; j++)

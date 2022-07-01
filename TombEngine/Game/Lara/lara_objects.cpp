@@ -56,7 +56,7 @@ void lara_as_pickup_flare(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetElevation = -ANGLE(15.0f);
 	Camera.targetDistance = SECTOR(1);
 
-	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1)
+	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
 		lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -252,7 +252,7 @@ void lara_as_pulley(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (item->Animation.AnimNumber == LA_PULLEY_RELEASE &&
-		item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1)
+		item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1)
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 	}
@@ -520,7 +520,7 @@ void lara_as_tightrope_fall(ItemInfo* item, CollisionInfo* coll)
 		else
 			return;
 
-		undoFrame = g_Level.Anims[item->Animation.AnimNumber].FrameEnd + g_Level.Anims[undoAnim].frameBase - item->Animation.FrameNumber;
+		undoFrame = g_Level.Anims[item->Animation.AnimNumber].frameEnd + g_Level.Anims[undoAnim].frameBase - item->Animation.FrameNumber;
 
 		if (TrInput & undoInput && lara->Control.TightropeControl.OnCount == 0)
 		{
@@ -600,6 +600,7 @@ void lara_col_rope_idle(ItemInfo* item, CollisionInfo* coll)
 	if (TrInput & IN_ACTION)
 	{
 		UpdateRopeSwing(item);
+		RopeSwingCollision(item, coll);
 
 		if (TrInput & IN_SPRINT)
 		{
@@ -633,6 +634,7 @@ void lara_col_rope_swing(ItemInfo* item, CollisionInfo* coll)
 	Camera.targetDistance = SECTOR(2);
 
 	UpdateRopeSwing(item);
+	RopeSwingCollision(item, coll);
 
 	if (item->Animation.AnimNumber == LA_ROPE_SWING)
 	{
@@ -696,7 +698,7 @@ void lara_as_rope_up(ItemInfo* item, CollisionInfo* coll)
 	{
 		Camera.targetAngle = ANGLE(30.0f);
 
-		if (g_Level.Anims[item->Animation.AnimNumber].FrameEnd == item->Animation.FrameNumber)
+		if (g_Level.Anims[item->Animation.AnimNumber].frameEnd == item->Animation.FrameNumber)
 		{
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			lara->Control.Rope.Segment -= 2;

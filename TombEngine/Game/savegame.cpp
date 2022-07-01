@@ -1310,7 +1310,7 @@ bool SaveGame::Load(int slot)
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 		{
-			EnableBaddyAI(i, true, false);
+			EnableEntityAI(i, true, false);
 
 			auto creature = GetCreatureInfo(item);
 			auto data = savedItem->data();

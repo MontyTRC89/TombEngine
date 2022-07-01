@@ -31,7 +31,7 @@ struct RANGE_STRUCT
 
 struct ANIM_STRUCT
 {
-	int FramePtr;
+	int framePtr;
 	int Interpolation;
 	int ActiveState;
 
@@ -41,7 +41,7 @@ struct ANIM_STRUCT
 	float LateralVelocityEnd;
 
 	int frameBase;
-	int FrameEnd;
+	int frameEnd;
 
 	int jumpAnimNum;
 	int jumpFrameNum;

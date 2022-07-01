@@ -631,7 +631,7 @@ void RomanStatueControl(short itemNumber)
 					}
 
 					deltaFrame = item->Animation.FrameNumber - g_Level.Anims[item->Animation.AnimNumber].frameBase;
-					int deltaFrame2 = g_Level.Anims[item->Animation.AnimNumber].FrameEnd - item->Animation.FrameNumber;
+					int deltaFrame2 = g_Level.Anims[item->Animation.AnimNumber].frameEnd - item->Animation.FrameNumber;
 					
 					if (deltaFrame2 >= 16)
 					{
@@ -703,7 +703,7 @@ void RomanStatueControl(short itemNumber)
 			else
 				item->Pose.Orientation.y += ANGLE(2.0f);
 
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				item->Pose.Orientation.y += -ANGLE(180.0f);
 		
 			break;
@@ -847,7 +847,7 @@ void RomanStatueControl(short itemNumber)
 			{
 				DoDamage(creature->Enemy, 40);
 			}
-			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
 				// Activate trigger on death
 				short roomNumber = item->ItemFlags[2] & 0xFF;

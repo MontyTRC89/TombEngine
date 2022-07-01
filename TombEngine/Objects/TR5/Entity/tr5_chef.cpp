@@ -137,7 +137,7 @@ void ControlChef(short itemNumber)
 				item->Pose.Orientation.y -= ANGLE(2.0f);
 			else
 				item->Pose.Orientation.y += ANGLE(2.0f);
-			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 				item->Pose.Orientation.y += -ANGLE(180.0f);
 
 			break;

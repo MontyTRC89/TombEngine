@@ -170,7 +170,7 @@ namespace TEN::Entities::TR4
 			}
 			else if (CutSeqNum == 4)
 			{
-				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].FrameEnd - 1;
+				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameEnd - 1;
 				item->Status = ITEM_INVISIBLE;
 			}
 			else if (item->Animation.ActiveState == BSCORPION_STATE_DEATH)
@@ -355,7 +355,7 @@ namespace TEN::Entities::TR4
 			case BSCORPION_STATE_KILL_TROOP:
 				creature->MaxTurn = 0;
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].FrameEnd)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					item->TriggerFlags++;
 
 				if (creature->Enemy &&

@@ -75,7 +75,7 @@ void MercenaryUziControl(short itemNumber)
 				item->Animation.TargetState = 2;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance > SECTOR(4096))
+				if (AI.distance > pow(SECTOR(2), 2))
 					item->Animation.TargetState = 2;
 
 				if (GetRandomControl() >= 0x2000)
@@ -113,7 +113,7 @@ void MercenaryUziControl(short itemNumber)
 				item->Animation.TargetState = 3;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance <= SECTOR(4096) || AI.zoneNumber != AI.enemyZone)
+				if (AI.distance <= pow(SECTOR(2), 2) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
 				else
 					item->Animation.TargetState = 12;
@@ -166,7 +166,7 @@ void MercenaryUziControl(short itemNumber)
 			if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
 				item->Animation.TargetState = 1;
 
-			if (AI.distance < SECTOR(4096))
+			if (AI.distance < pow(SECTOR(2), 2))
 				item->Animation.TargetState = 1;
 
 			break;
@@ -182,7 +182,7 @@ void MercenaryUziControl(short itemNumber)
 			if (!ShotLara(item, &AI, &MercenaryUziBite, torsoY, 8))
 				item->Animation.TargetState = 1;
 
-			if (AI.distance < SECTOR(4096))
+			if (AI.distance < pow(SECTOR(2), 2))
 				item->Animation.TargetState = 2;
 
 			break;
@@ -246,7 +246,7 @@ void MercenaryAutoPistolControl(short itemNumber)
 				item->Animation.TargetState = 4;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance <= SECTOR(4096))
+				if (AI.distance <= pow(SECTOR(2), 2))
 				{
 					if (GetRandomControl() >= 0x2000)
 					{
@@ -284,7 +284,7 @@ void MercenaryAutoPistolControl(short itemNumber)
 				item->Animation.TargetState = 4;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance < SECTOR(4096) || AI.zoneNumber == AI.enemyZone || GetRandomControl() < 1024)
+				if (AI.distance < pow(SECTOR(2), 2) || AI.zoneNumber == AI.enemyZone || GetRandomControl() < 1024)
 					item->Animation.TargetState = 2;
 				else
 					item->Animation.TargetState = 1;
@@ -352,7 +352,7 @@ void MercenaryAutoPistolControl(short itemNumber)
 				torsoX = AI.xAngle;
 				torsoY = AI.angle;
 
-				if (AI.distance < SECTOR(4096))
+				if (AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 3;
 
 				if (creature->Flags != 1)
@@ -390,7 +390,7 @@ void MercenaryAutoPistolControl(short itemNumber)
 				torsoX = AI.xAngle;
 				torsoY = AI.angle;
 
-				if (AI.distance < SECTOR(4096))
+				if (AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 3;
 
 				if (creature->Flags != 2)
