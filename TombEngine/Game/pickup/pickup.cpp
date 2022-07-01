@@ -28,6 +28,7 @@
 #include "Specific/phd_global.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
 using namespace TEN::Entities::Generic;
 
 // TODO: Adjust these bounds when crawl surface alignment is implemented. @Sezz 2021.11.04

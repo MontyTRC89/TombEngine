@@ -111,10 +111,8 @@ void RatControl(short itemNumber)
 			if (!item->Animation.RequiredState && item->TouchBits & 0x7F)
 			{
 				CreatureEffect(item, &RatBite, DoBloodSplat);
+				DoDamage(info->Enemy, 20);
 				item->Animation.RequiredState = 2;
-
-				LaraItem->HitPoints -= 20;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

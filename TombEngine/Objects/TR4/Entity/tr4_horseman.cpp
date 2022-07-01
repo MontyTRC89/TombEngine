@@ -342,13 +342,11 @@ namespace TEN::Entities::TR4
 							{
 								if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 								{
-									item->HitPoints -= 10;
-									item->HitStatus = true;
+									DoDamage(item, 10);
 								}
 								else if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 								{
-									item->HitPoints -= 20;
-									item->HitStatus = true;
+									DoDamage(item, 20);
 								}
 								else
 									item->HitPoints--;
@@ -560,8 +558,7 @@ namespace TEN::Entities::TR4
 
 						horseItem->Flags = 1;
 
-						LaraItem->HitPoints -= 150;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 150);
 					}
 				}
 
@@ -582,8 +579,7 @@ namespace TEN::Entities::TR4
 
 						creature->Flags = 1;
 
-						LaraItem->HitPoints -= 250;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 250);
 					}
 				}
 
@@ -604,10 +600,9 @@ namespace TEN::Entities::TR4
 							item->Pose.Orientation.GetY(),
 							DoBloodSplat);
 
-						creature->Flags = 1;
+						DoDamage(creature->Enemy, 100);
 
-						LaraItem->HitPoints -= 100;
-						LaraItem->HitStatus = true;
+						creature->Flags = 1;
 					}
 				}
 
@@ -694,8 +689,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits & 0x4000)
 					{
-						LaraItem->HitPoints -= 100;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 100);
 
 						CreatureEffect2(
 							item,
@@ -724,8 +718,7 @@ namespace TEN::Entities::TR4
 				{
 					if (horseItem->TouchBits & 0xA2000)
 					{
-						LaraItem->HitPoints -= 150;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 150);
 
 						if (horseItem->TouchBits & 0x2000)
 						{
@@ -776,7 +769,7 @@ namespace TEN::Entities::TR4
 								-1,
 								DoBloodSplat);
 
-							LaraItem->HitPoints -= 250;
+							DoDamage(creature->Enemy, 250);
 						}
 						else if (item->TouchBits & 0x400)
 						{
@@ -787,7 +780,7 @@ namespace TEN::Entities::TR4
 								-1,
 								DoBloodSplat);
 
-							LaraItem->HitPoints -= 150;
+							DoDamage(creature->Enemy, 150);
 						}
 
 						creature->Flags = 1;

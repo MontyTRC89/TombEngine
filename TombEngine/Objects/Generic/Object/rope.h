@@ -11,12 +11,15 @@ namespace TEN::Entities::Generic
 
 	struct ROPE_STRUCT
 	{
+		int room;
+		Vector3Int position;
+
 		Vector3Int segment[ROPE_SEGMENTS];
 		Vector3Int velocity[ROPE_SEGMENTS];
 		Vector3Int normalisedSegment[ROPE_SEGMENTS];
 		Vector3Int meshSegment[ROPE_SEGMENTS];
-		Vector3Int position;
 		Vector3Int coords[ROPE_SEGMENTS];
+
 		int segmentLength;
 		short active;
 		short coiled;
@@ -55,6 +58,7 @@ namespace TEN::Entities::Generic
 	void DelAlignLaraToRope(ItemInfo* item);
 	void UpdateRopeSwing(ItemInfo* item);
 	void JumpOffRope(ItemInfo* item);
-	void FallFromRope(ItemInfo* item);
+	void FallFromRope(ItemInfo* item, bool stumble = false);
 	void LaraClimbRope(ItemInfo* item, CollisionInfo* coll);
+	bool RopeSwingCollision(ItemInfo* item, CollisionInfo* coll);
 }

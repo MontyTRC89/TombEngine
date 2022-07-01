@@ -17,6 +17,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/misc.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SASGunBite = { 0, 300, 64, 7 };

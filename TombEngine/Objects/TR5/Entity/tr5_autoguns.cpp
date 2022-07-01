@@ -110,7 +110,7 @@ void AutoGunsControl(short itemNumber)
 						GetLaraJointPosition((Vector3Int*)& pos2, GetRandomControl() % 15);
 
 						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
-						LaraItem->HitPoints -= 20;
+						DoDamage(LaraItem, 20);
 					}
 					else
 					{

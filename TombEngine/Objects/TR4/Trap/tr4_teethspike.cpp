@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (LaraItem->Animation.Velocity >= 30)
 				{
-					LaraItem->HitPoints -= 8;
+					DoDamage(LaraItem, 8);
 					bloodCount = (GetRandomControl() & 3) + 2;
 				}
 				else

@@ -20,6 +20,7 @@
 #include "Renderer/Renderer11Enums.h"
 #include "Specific/prng.h"
 
+using namespace TEN::Input;
 using std::vector;
 
 namespace TEN::Entities::Vehicles
@@ -755,8 +756,7 @@ namespace TEN::Entities::Vehicles
 
 			if ((&g_Level.Items[lara->Vehicle] == jeepItem) && (jeep->velocity == JEEP_MAX_SPEED) && (newspeed < (JEEP_MAX_SPEED - 10)))
 			{
-				laraItem->HitPoints -= (JEEP_MAX_SPEED - newspeed) / 128;
-				laraItem->HitStatus = true;
+				DoDamage(laraItem, (JEEP_MAX_SPEED - newspeed) / 128);
 			}
 
 			if (jeep->velocity > 0 && newspeed < jeep->velocity)
@@ -1418,7 +1418,7 @@ namespace TEN::Entities::Vehicles
 						goto LABEL_11;
 					}
 				}
-				EnableBaddyAI(v4, 1);
+				EnableEntityAI(v4, 1);
 				*(_DWORD*)(v5 + 5610) = *(_DWORD*)(v5 + 5610) & 0xFFFFFFFB | 2;
 				AddActiveItem(v4);
 			}*/

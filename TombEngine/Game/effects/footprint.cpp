@@ -9,20 +9,16 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-namespace TEN
+namespace TEN::Effects::Footprints
 {
-	namespace Effects
-	{
-		namespace Footprints
-		{
-			std::deque<FootprintData> footprints = std::deque<FootprintData>();
+	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
-			bool CheckFootOnFloor(ItemInfo const& item, int mesh, Vector3& outFootprintPosition) 
-			{
-				int x = item.Pose.Position.x;
-				int y = item.Pose.Position.y;
-				int z = item.Pose.Position.z;
-				short roomNumber = item.RoomNumber;
+	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition) 
+	{
+		int x = item.Pose.Position.x;
+		int y = item.Pose.Position.y;
+		int z = item.Pose.Position.z;
+		short roomNumber = item.RoomNumber;
 
 				auto floor = GetFloor(x, y, z, &roomNumber);
 
@@ -211,7 +207,7 @@ namespace TEN
 					return;
 
 			// Construct footprint
-			FootprintData footprint = {};
+			FOOTPRINT_STRUCT footprint = {};
 			footprint.Position[0] = p0;
 			footprint.Position[1] = p1;
 			footprint.Position[2] = p2;
@@ -237,7 +233,7 @@ namespace TEN
 
 				for (auto i = footprints.begin(); i != footprints.end(); i++) 
 				{
-					FootprintData& footprint = *i;
+					FOOTPRINT_STRUCT& footprint = *i;
 					footprint.Life--;
 
 					if (footprint.Life <= 0) 
@@ -257,9 +253,9 @@ namespace TEN
 					}
 				}
 
-				for (int i = 0; i < numInvalidFootprints; i++) 
-					footprints.pop_back();
-			}
+		for (int i = 0; i < numInvalidFootprints; i++) 
+		{
+			footprints.pop_back();
 		}
 	}
 }

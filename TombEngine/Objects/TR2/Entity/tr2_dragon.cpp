@@ -17,6 +17,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 BITE_INFO DragonMouthBite = { 35, 171, 1168, 12 };
 
 #define DRAGON_SWIPE_DAMAGE 250
@@ -302,8 +304,7 @@ void DragonControl(short backItemNumber)
 
 		if (item->TouchBits)
 		{
-			LaraItem->HitStatus = true;
-			LaraItem->HitPoints -= DRAGON_TOUCH_DAMAGE;
+			DoDamage(creature->Enemy, DRAGON_TOUCH_DAMAGE);
 		}
 
 		switch (item->Animation.ActiveState)
@@ -337,9 +338,7 @@ void DragonControl(short backItemNumber)
 			if (item->TouchBits & DRAGON_TOUCH_L)
 			{
 				creature->Flags = 0;
-
-				LaraItem->HitStatus = true;
-				LaraItem->HitPoints -= DRAGON_SWIPE_DAMAGE;
+				DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 			}
 
 			break;
@@ -348,9 +347,7 @@ void DragonControl(short backItemNumber)
 			if (item->TouchBits & DRAGON_TOUCH_R)
 			{
 				creature->Flags = 0;
-
-				LaraItem->HitStatus = true;
-				LaraItem->HitPoints -= DRAGON_SWIPE_DAMAGE;
+				DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 			}
 
 			break;
@@ -552,7 +549,7 @@ void BartoliControl(short itemNumber)
 			front = &g_Level.Items[frontItem];
 
 			front->TouchBits = back->TouchBits = NO_JOINT_BITS;
-			EnableBaddyAI(frontItem, 1);
+			EnableEntityAI(frontItem, 1);
 			AddActiveItem(frontItem);
 			AddActiveItem(backItem);
 			back->Status = ITEM_ACTIVE;

@@ -182,8 +182,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TestBits(JointBitType::Touch, BigBeetleAttackJoints))
 					{
-						LaraItem->HitPoints -= BIG_BEETLE_ATTACK_DAMAGE;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, BIG_BEETLE_ATTACK_DAMAGE);
 
 						CreatureEffect2(
 							item,

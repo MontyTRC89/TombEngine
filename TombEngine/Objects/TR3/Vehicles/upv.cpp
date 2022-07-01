@@ -23,6 +23,8 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Vehicles
 {
 	BITE_INFO UPVBites[6] =
@@ -986,7 +988,7 @@ namespace TEN::Entities::Vehicles
 					if (lara->Air < 0)
 					{
 						lara->Air = -1;
-						laraItem->HitPoints -= 5;
+						DoDamage(laraItem, 5);
 					}
 				}
 			}

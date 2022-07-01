@@ -56,7 +56,7 @@ void GenSlot1Control(short itemNumber)
 					DoBloodSplat(x, y, z, 1, -1, LaraItem->RoomNumber);
 				}
 
-				LaraItem->HitPoints = 0;
+				DoDamage(LaraItem, INT_MAX);
 			}
 		}
 

@@ -286,8 +286,7 @@ namespace TEN::Entities::TR4
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 						{
-							LaraItem->HitPoints -= 100;
-							LaraItem->HitStatus = true;
+							DoDamage(creature->Enemy, 100);
 
 							if (item->Animation.AnimNumber == Objects[item->ObjectNumber].animIndex + MUMMY_ANIM_IDLE_SWIPE_ATTACK_LEFT)
 							{

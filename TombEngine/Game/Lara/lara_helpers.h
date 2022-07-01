@@ -17,24 +17,27 @@ enum LaraState;
 void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll);
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll);
 void EaseOutLaraHeight(ItemInfo* item, int height);
-void DoLaraLean(ItemInfo* item, CollisionInfo* coll, float maxAngle, float rate);
 void DoLaraStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll);
-void DoLaraCrawlFlex(ItemInfo* item, CollisionInfo* coll, float maxAngle, float rate);
 void DoLaraTightropeBalance(ItemInfo* item);
 void DoLaraTightropeLean(ItemInfo* item);
 void DoLaraTightropeBalanceRegen(ItemInfo* item);
-void DealLaraFallDamage(ItemInfo* item);
+void DoLaraFallDamage(ItemInfo* item);
 
 LaraInfo*& GetLaraInfo(ItemInfo* item);
 LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll);
 float GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
-void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
+float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, float maxTurnRate, float axisCoeff);
+void ModulateLaraTurnRateX(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate);
+void ModulateLaraTurnRateY(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate);
+void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll);
+void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item);
 void UpdateLaraSubsuitAngles(ItemInfo* item);
-void ModulateLaraSubsuitSwimTurn(ItemInfo* item);
-void ModulateLaraSwimTurn(ItemInfo* item, CollisionInfo* coll);
+void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
+void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle);
+void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
 void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll);
@@ -54,3 +57,5 @@ void SetLaraSwimDiveAnimation(ItemInfo* item);
 void ResetLaraTurnRate(ItemInfo* item, bool divesuit = false);
 void ResetLaraLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetLaraFlex(ItemInfo* item, float alpha = 1.0f);
+
+void RumbleLaraHealthCondition(ItemInfo* lara);

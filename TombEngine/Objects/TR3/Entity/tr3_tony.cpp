@@ -471,7 +471,7 @@ namespace TEN::Entities::TR3
 			{
 				LaraItem->HitStatus = true;
 				KillEffect(fxNumber);
-				LaraItem->HitPoints -= 200;
+				DoDamage(LaraItem, 200);
 				LaraBurn(LaraItem);
 				return;
 			}

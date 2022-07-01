@@ -133,10 +133,8 @@ void SmallSpiderControl(short itemNumber)
 			if (!creature->Flags && item->TouchBits)
 			{
 				S_SpiderBite(item);
+				DoDamage(creature->Enemy, 25);
 				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 25;
-				LaraItem->HitStatus = 1;
 			}
 
 			break;
@@ -227,10 +225,8 @@ void BigSpiderControl(short itemNumber)
 			if (!creature->Flags && item->TouchBits)
 			{
 				S_SpiderBite(item);
+				DoDamage(creature->Enemy, 100);
 				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 100;
-				LaraItem->HitStatus = 1;
 			}
 
 			break;

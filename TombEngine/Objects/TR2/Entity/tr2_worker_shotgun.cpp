@@ -99,13 +99,13 @@ void WorkerShotgunControl(short itemNumber)
 			}
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance <= 0x900000 || AI.zoneNumber != AI.enemyZone)
+				if (AI.distance <= pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = (GetRandomControl() >= 0x4000) ? 9 : 8;
 				else
 					item->Animation.TargetState = 1;
 			}
 			else if (creature->Mood == MoodType::Attack || !AI.ahead)
-				item->Animation.TargetState = (AI.distance <= 0x400000) ? 1 : 5;
+				item->Animation.TargetState = (AI.distance <= pow(SECTOR(2), 2)) ? 1 : 5;
 			else
 				item->Animation.TargetState = 3;
 			
@@ -138,14 +138,14 @@ void WorkerShotgunControl(short itemNumber)
 				item->Animation.TargetState = 5;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance < SECTOR(9216) || AI.zoneNumber != AI.enemyZone)
+				if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 2;
 				else
 					item->Animation.TargetState = 6;
 			}
 			else if (creature->Mood == MoodType::Attack || !AI.ahead)
 			{
-				if (AI.distance > SECTOR(4096))
+				if (AI.distance > pow(SECTOR(2), 2))
 					item->Animation.TargetState = 5;
 			}
 			else
@@ -204,7 +204,7 @@ void WorkerShotgunControl(short itemNumber)
 			}
 
 			if (item->Animation.ActiveState == 4 && item->Animation.TargetState != 2 &&
-				(creature->Mood == MoodType::Escape || AI.distance > SECTOR(9216) || !Targetable(item, &AI)))
+				(creature->Mood == MoodType::Escape || AI.distance > pow(SECTOR(3), 2) || !Targetable(item, &AI)))
 			{
 				item->Animation.TargetState = 2;
 			}

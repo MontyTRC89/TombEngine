@@ -15,42 +15,39 @@
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
 
-namespace TEN
+namespace TEN::Effects::Drip
 {
-	namespace Effects
+	using namespace DirectX::SimpleMath;
+
+	std::array<DripParticle, NUM_DRIPS> dripParticles;
+	constexpr Vector4 DRIP_COLOR = Vector4(1, 1, 1, 1);
+
+	void DisableDripParticles()
 	{
-		namespace Drip 
+		for (int i = 0; i < dripParticles.size(); i++)
+			dripParticles[i].active = false;
+	}
+
+	void UpdateDripParticles()
+	{
+		for (int i = 0; i < dripParticles.size(); i++) 
 		{
-			using namespace DirectX::SimpleMath;
+			auto& d = dripParticles[i];
 
-			std::array<DripParticle, NUM_DRIPS> dripParticles;
-			constexpr Vector4 DRIP_COLOR = Vector4(1, 1, 1, 1);
+			if (!d.active)
+				continue;
 
-			void DisableDripParticles()
+			d.age++;
+			if (d.age > d.life)
+				d.active = false;
+
+			d.velocity.y += d.gravity;
+
+			if (TestEnvironment(ENV_FLAG_WIND, d.room))
 			{
-				for (int i = 0; i < dripParticles.size(); i++)
-					dripParticles[i].active = false;
+				d.velocity.x = Weather.Wind().x;
+				d.velocity.z = Weather.Wind().z;
 			}
-
-			void UpdateDripParticles()
-			{
-				for (int i = 0; i < dripParticles.size(); i++) 
-				{
-					auto& d = dripParticles[i];
-					if (!d.active) continue;
-
-					d.age++;
-
-					if (d.age > d.life)
-						d.active = false;
-
-					d.velocity.y += d.gravity;
-
-					if (TestEnvironment(ENV_FLAG_WIND, d.room))
-					{
-						d.velocity.x = Weather.Wind().x;
-						d.velocity.z = Weather.Wind().z;
-					}
 
 			d.pos += d.velocity;
 			float normalizedAge = d.age / d.life;
@@ -61,8 +58,8 @@ namespace TEN
 			int floorheight = floor->FloorHeight(d.pos.x, d.pos.z);
 			int wh = GetWaterHeight(d.pos.x, d.pos.y, d.pos.z, d.room);
 
-					if (d.pos.y > floorheight) 
-						d.active = false;
+			if (d.pos.y > floorheight) 
+				d.active = false;
 
 			if (d.pos.y > wh) 
 			{
@@ -72,68 +69,64 @@ namespace TEN
 		}
 	}
 
-			DripParticle& getFreeDrip()
-			{
-				for (int i = 0; i < dripParticles.size(); i++)
-				{
-					if (!dripParticles[i].active)
-						return dripParticles[i];
-				}
+	DripParticle& getFreeDrip()
+	{
+		for (int i = 0; i < dripParticles.size(); i++)
+		{
+			if (!dripParticles[i].active)
+				return dripParticles[i];
+		}
 
-				return dripParticles[0];
-			}
+		return dripParticles[0];
+	}
 
-			void SpawnWetnessDrip(Vector3 const & pos, int room)
-			{
-				auto& d = getFreeDrip();
+	void SpawnWetnessDrip(Vector3 const & pos, int room)
+	{
+		auto& d = getFreeDrip();
+		d = {};
+		d.active = true;
+		d.pos = pos;
+		d.room = room;
+		d.life = DRIP_LIFE;
+		d.gravity = GenerateFloat(3, 6);
+	}
 
-				d = {};
-				d.active = true;
-				d.pos = pos;
-				d.room = room;
-				d.life = DRIP_LIFE;
-				d.gravity = GenerateFloat(3, 6);
-			}
-
-			void SpawnSplashDrips(Vector3 const& pos, int num, int room)
-			{
-				for (int i = 0; i < num; i++) 
-				{
-					auto dripPos = pos + Vector3(GenerateFloat(-128, 128), GenerateFloat(-128, 128), GenerateFloat(-128, 128));
-					auto direction = (dripPos - pos);
-					direction.Normalize();
+	void SpawnSplashDrips(Vector3 const& pos, int num, int room)
+	{
+		for (int i = 0; i < num; i++) 
+		{
+			auto dripPos = pos + Vector3(GenerateFloat(-128, 128), GenerateFloat(-128, 128), GenerateFloat(-128, 128));
+			auto direction = (dripPos - pos);
+			direction.Normalize();
 					
-					auto& drip = getFreeDrip();
-					drip = {};
-					drip.pos = dripPos;
-					drip.velocity = direction*16;
-					drip.velocity -= Vector3(0, GenerateFloat(32, 64), 0);
-					drip.gravity = GenerateFloat(3, 6);
-					drip.room = room;
-					drip.life = DRIP_LIFE_LONG;
-					drip.active = true;
-				}
-			}
+			auto& drip = getFreeDrip();
+			drip = {};
+			drip.pos = dripPos;
+			drip.velocity = direction*16;
+			drip.velocity -= Vector3(0, GenerateFloat(32, 64), 0);
+			drip.gravity = GenerateFloat(3, 6);
+			drip.room = room;
+			drip.life = DRIP_LIFE_LONG;
+			drip.active = true;
+		}
+	}
 
-			void SpawnGunshellDrips(Vector3 const& pos, int room)
-			{
-				for (int i = 0; i < 4; i++) 
-				{
-					auto dripPos = pos + Vector3(GenerateFloat(-16, 16), GenerateFloat(-16, 16), GenerateFloat(-16, 16));
-					auto direction = (dripPos - pos);
-					direction.Normalize();
-					
-					auto& drip = getFreeDrip();
-					drip = {};
-					drip.pos = dripPos;
-					drip.velocity = direction * 16;
-					drip.velocity -= Vector3(0, GenerateFloat(16, 24), 0);
-					drip.gravity = GenerateFloat(2, 3);
-					drip.room = room;
-					drip.life = DRIP_LIFE_LONG;
-					drip.active = true;
-				}
-			}
+	void SpawnGunshellDrips(Vector3 const & pos, int room)
+	{
+		for (int i = 0; i < 4; i++) 
+		{
+			Vector3 dripPos = pos + Vector3(GenerateFloat(-16, 16), GenerateFloat(-16, 16), GenerateFloat(-16, 16));
+			Vector3 dir = (dripPos - pos);
+			dir.Normalize();
+			DripParticle& drip = getFreeDrip();
+			drip = {};
+			drip.pos = dripPos;
+			drip.velocity = dir * 16;
+			drip.velocity -= Vector3(0, GenerateFloat(16, 24), 0);
+			drip.gravity = GenerateFloat(2, 3);
+			drip.room = room;
+			drip.life = DRIP_LIFE_LONG;
+			drip.active = true;
 		}
 	}
 }

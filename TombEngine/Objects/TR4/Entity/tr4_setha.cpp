@@ -236,28 +236,26 @@ namespace TEN::Entities::TR4
 						{
 							if (item->TouchBits & 0xE000)
 							{
-								LaraItem->HitPoints -= 200;
-								LaraItem->HitStatus = true;
-								creature->Flags = 1;
+								DoDamage(creature->Enemy, 200);
 								CreatureEffect2(
 									item,
 									&SethaBite1,
 									25,
 									-1,
 									DoBloodSplat);
+								creature->Flags = 1;
 							}
 
 							if (item->TouchBits & 0xE0000)
 							{
-								LaraItem->HitPoints -= 200;
-								LaraItem->HitStatus = true;
-								creature->Flags = 1;
+								DoDamage(creature->Enemy, 200);
 								CreatureEffect2(
 									item,
 									&SethaBite2,
 									25,
 									-1,
 									DoBloodSplat);
+								creature->Flags = 1;
 							}
 						}
 					}
@@ -300,15 +298,14 @@ namespace TEN::Entities::TR4
 						if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 15 &&
 							item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 26)
 						{
-							LaraItem->HitPoints -= 250;
-							LaraItem->HitStatus = true;
-							creature->Flags = 1;
+							DoDamage(creature->Enemy, 250);
 							CreatureEffect2(
 								item,
 								&SethaBite1,
 								25,
 								-1,
 								DoBloodSplat);
+							creature->Flags = 1;
 						}
 					}
 				}

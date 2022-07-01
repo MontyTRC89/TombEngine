@@ -214,10 +214,8 @@ void YetiControl(short itemNumber)
 			if (!info->Flags && item->TouchBits & 0x1400)
 			{
 				CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
+				DoDamage(info->Enemy, 100);
 				info->Flags = 1;
-
-				LaraItem->HitPoints -= 100;
-				LaraItem->HitStatus = true;
 			}
 
 			break;
@@ -235,10 +233,8 @@ void YetiControl(short itemNumber)
 				if (item->TouchBits & 0x1400)
 					CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
 
+				DoDamage(info->Enemy, 150);
 				info->Flags = 1;
-
-				LaraItem->HitPoints -= 150;
-				LaraItem->HitStatus = true;
 			}
 
 			break;
@@ -254,10 +250,8 @@ void YetiControl(short itemNumber)
 				if (item->TouchBits & 0x1400)
 					CreatureEffect(item, &YetiBiteRight, DoBloodSplat);
 
+				DoDamage(info->Enemy, 200);
 				info->Flags = 1;
-
-				LaraItem->HitPoints -= 200;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

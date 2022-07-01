@@ -13,6 +13,9 @@
 #include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
+#include "Specific/prng.h"
+
+using namespace TEN::Math::Random;
 
 /*
 ID_BADDY1
@@ -494,7 +497,7 @@ namespace TEN::Entities::TR4
 							(item->TriggerFlags / 1000) == (possibleEnemy->TriggerFlags / 1000) - 1 &&
 							!(possibleEnemy->Flags & IFLAG_KILLED))
 						{
-							if (EnableBaddyAI(i, 0))
+							if (EnableEntityAI(i, 0))
 								possibleEnemy->Status = ITEM_ACTIVE;
 							else
 								possibleEnemy->Status = ITEM_INVISIBLE;
@@ -563,8 +566,8 @@ namespace TEN::Entities::TR4
 			}
 
 			if (item != Lara.TargetEntity ||
-				laraAI.distance <= 942 ||
-				laraAI.angle <= Angle::DegToRad(-56.25f) ||
+				laraAI.distance <= pow(942, 2) ||
+				laraAI.angle <= -Angle::DegToRad(56.25f) ||
 				laraAI.angle >= Angle::DegToRad(56.25f))
 			{
 				roll = false;
@@ -760,7 +763,10 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
-					if (currentCreature->Enemy && currentCreature->Enemy->HitPoints > 0 && AI.distance < pow(682, 2))
+					if (currentCreature->Enemy && 
+						currentCreature->Enemy->HitPoints > 0 && 
+						AI.distance < pow(SECTOR(0.5f), 2) &&
+						AI.verticalDistance < SECTOR(1))
 					{
 						if (item->MeshSwapBits == MESHSWAPFLAGS_BADDY_GUN)
 							item->Animation.TargetState = BADDY_STATE_HOLSTER_GUN;
@@ -817,7 +823,7 @@ namespace TEN::Entities::TR4
 					}
 				}
 
-				if (AI.ahead && AI.distance < SECTOR(256))
+				if (AI.ahead && AI.distance < pow(SECTOR(0.5f), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_IDLE;
 					break;
@@ -860,13 +866,12 @@ namespace TEN::Entities::TR4
 				if (AI.ahead)
 					joint3 = AI.angle;
 				
-				if (objectNumber == ID_BADDY2 &&
+				if (GenerateInt(0, 30) > 20 &&
+					objectNumber == ID_BADDY2 &&
 					item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + FRAME_BADDY_RUN_TO_SOMERSAULT &&
 					height3 == height1 &&
 					abs(height1 - item->Pose.Position.y) < CLICK(1.5f) &&
-					(AI.angle > Angle::DegToRad(-22.5f) && AI.angle < Angle::DegToRad(22.5f) &&
-						AI.distance < pow(SECTOR(3), 2) ||
-						height2 >= (height1 + CLICK(2))))
+					(AI.angle > -Angle::DegToRad(22.5f) && AI.angle < Angle::DegToRad(22.5f) && AI.distance < pow(SECTOR(3), 2) || height2 >= (height1 + CLICK(2))))
 				{
 					item->Animation.TargetState = BADDY_STATE_SOMERSAULT;
 					currentCreature->MaxTurn = 0;
@@ -901,7 +906,7 @@ namespace TEN::Entities::TR4
 				currentCreature->MaxTurn = 0;
 
 				if (item->Animation.ActiveState == BADDY_STATE_SWORD_HIT_RIGHT &&
-					AI.distance < SECTOR(254))
+					AI.distance < pow(SECTOR(0.5f), 2))
 				{
 					item->Animation.TargetState = BADDY_STATE_SWORD_HIT_LEFT;
 				}
@@ -940,10 +945,8 @@ namespace TEN::Entities::TR4
 								item->Pose.Orientation.GetY(),
 								DoBloodSplat);
 
+							DoDamage(creature->Enemy, 120);
 							currentCreature->Flags = 1;
-
-							LaraItem->HitPoints -= 120;
-							LaraItem->HitStatus = true;
 						}
 					}
 				}

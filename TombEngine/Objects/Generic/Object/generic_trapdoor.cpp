@@ -12,8 +12,8 @@
 #include "Renderer/Renderer11.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Input;
 using namespace TEN::Renderer;
-
 using namespace TEN::Floordata;
 
 OBJECT_COLLISION_BOUNDS CeilingTrapDoorBounds =

@@ -42,10 +42,8 @@ void SpinningBladeControl(short itemNumber)
 
 		if (item->TouchBits)
 		{
-			LaraItem->HitStatus = true;
-			LaraItem->HitPoints -= 100;
-
-			DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, item->Animation.Velocity * 2, LaraItem->Pose.Orientation.GetY(), LaraItem->RoomNumber, 2);
+			DoDamage(LaraItem, 100);
+			DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, (short)(item->Animation.Velocity * 2), LaraItem->Pose.Orientation.y, LaraItem->RoomNumber, 2);
 		}
 
 		SoundEffect(SFX_TR2_ROLLING_BLADE, &item->Pose);

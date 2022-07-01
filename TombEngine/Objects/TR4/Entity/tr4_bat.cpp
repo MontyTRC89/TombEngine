@@ -81,36 +81,7 @@ namespace TEN::Entities::TR4
 			if (item->AIBits)
 				GetAITarget(creature);
 			else
-			{
 				creature->Enemy = LaraItem;
-
-				// NOTE: It seems unusual that the bat can target any enemy.
-				// Check if Von Croy is in range; the bat will always target him if he exists and ignore Lara completely. @TokyoSU
-
-				/*bestdistance = MAXINT;
-				bat->enemy = LaraItem;
-
-				slots = &BaddySlots[0];
-				for (int i = 0; i < NUM_SLOTS; i++, slots++)
-				{
-					if (slots->itemNum != NO_ITEM && slots->itemNum != itemNumber)
-					{
-						target = &g_Level.Items[slots->itemNum];
-						if (target->objectNumber == ID_VON_CROY)
-						{
-							int x, z;
-							x = target->pos.Position.x - item->pos.Position.x;
-							z = target->pos.Position.z - item->pos.Position.z;
-							distance = pow(x, 2) + pow(z, 2);
-							if (distance < bestdistance)
-							{
-								bat->enemy = target;
-								bestdistance = distance;
-							}
-						}
-					}
-				}*/
-			}
 
 			// NOTE: Changed from TIMID to VIOLENT, otherwise the bat seems to ignore Lara. 
 			// I feel fine with bat always VIOLENT,
@@ -118,7 +89,6 @@ namespace TEN::Entities::TR4
 
 			AI_INFO AI;
 			CreatureAIInfo(item, &AI);
-
 			GetCreatureMood(item, &AI, VIOLENT);
 
 			if (creature->Flags)
@@ -160,11 +130,7 @@ namespace TEN::Entities::TR4
 					abs(item->Pose.Position.y - creature->Enemy->Pose.Position.y) < BAT_UNFURL_HEIGHT_RANGE)
 				{
 					CreatureEffect(item, &BatBite, DoBloodSplat);
-					if (creature->Enemy == LaraItem)
-					{
-						LaraItem->HitPoints -= BAT_DAMAGE;
-						LaraItem->HitStatus = true;
-					}
+					DoDamage(creature->Enemy, BAT_DAMAGE);
 
 					creature->Flags = 1;
 				}

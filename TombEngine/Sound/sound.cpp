@@ -140,13 +140,16 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 	return true;
 }
 
-long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
+bool SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, float pitchMultiplier, float gainMultiplier)
 {
+	if (!g_Configuration.EnableSound)
+		return false;
+
 	if (effectID >= g_Level.SoundMap.size())
-		return 0;
+		return false;
 
 	if (BASS_GetDevice() == -1)
-		return 0;
+		return false;
 
 	if (condition != SoundEnvironment::Always)
 	{
@@ -155,7 +158,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 
 		// Don't play effect if effect's environment isn't the same as camera position's environment
 		if (condition != cameraCondition)
-			return 0;
+			return false;
 	}
 
 	// Get actual sample index from SoundMap
@@ -165,19 +168,19 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	// We set it to -2 afterwards to prevent further debug message firings.
 	if (sampleIndex == -1)
 	{
-		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Error);
+		TENLog("Non present effect: " + std::to_string(effectID), LogLevel::Warning);
 		g_Level.SoundMap[effectID] = -2;
-		return 0;
+		return false;
 	}
 	else if (sampleIndex == -2)
-		return 0;
+		return false;
 
 	SampleInfo* sampleInfo = &g_Level.SoundDetails[sampleIndex];
 
 	if (sampleInfo->Number < 0)
 	{
 		TENLog("No valid samples count for effect " + std::to_string(sampleIndex), LogLevel::Warning);
-		return 0;
+		return false;
 	}
 
 	// Assign common sample flags.
@@ -185,7 +188,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 
 	// Effect's chance to play.
 	if ((sampleInfo->Randomness) && ((GetRandomControl() & UCHAR_MAX) > sampleInfo->Randomness))
-		return 0;
+		return false;
 
 	// Apply 3D attrib only to sound with position property
 	if (position)
@@ -209,7 +212,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 
 	// Don't play sound if it's too far from listener's position.
 	if (distance > radius)
-		return 0;
+		return false;
 
 	// Get final volume of a sound.
 	float volume = Sound_Attenuate(gain, distance, radius);
@@ -226,7 +229,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 
 	case SoundPlayMode::Wait:
 		if (existingChannel != -1) // Don't play until stopped
-			return 0; 
+			return false;
 		break;
 
 	case SoundPlayMode::Restart:
@@ -239,7 +242,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 		{
 			Sound_UpdateEffectPosition(existingChannel, position);
 			Sound_UpdateEffectAttributes(existingChannel, pitch, volume);
-			return 0;
+			return false;
 		}
 		sampleFlags |= BASS_SAMPLE_LOOP;
 		break;
@@ -258,14 +261,14 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	if (freeSlot == -1)
 	{
 		TENLog("No free channel slot available!", LogLevel::Warning);
-		return 0;
+		return false;
 	}
 
 	// Create sample's stream and reset buffer back to normal value.
 	HSTREAM channel = BASS_SampleGetChannel(SamplePointer[sampleToPlay], true);
 
 	if (Sound_CheckBASSError("Trying to create channel for sample %d", false, sampleToPlay))
-		return 0;
+		return false;
 
 	// Finally ready to play sound, assign it to sound slot.
 	SoundSlot[freeSlot].State = SoundState::Idle;
@@ -275,7 +278,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	SoundSlot[freeSlot].Origin = position ? Vector3(position->Position.x, position->Position.y, position->Position.z) : SOUND_OMNIPRESENT_ORIGIN;
 
 	if (Sound_CheckBASSError("Applying pitch/gain attribs on channel %x, sample %d", false, channel, sampleToPlay))
-		return 0;
+		return false;
 
 	// Set looped flag, if necessary
 	if (playType == SoundPlayMode::Looped)
@@ -285,7 +288,7 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	BASS_ChannelPlay(channel, false);
 
 	if (Sound_CheckBASSError("Queuing channel %x on sample mixer", false, freeSlot))
-		return 0;
+		return false;
 
 	// Set attributes
 	BASS_ChannelSet3DAttributes(channel, position ? BASS_3DMODE_NORMAL : BASS_3DMODE_OFF, SOUND_MAXVOL_RADIUS, radius, 360, 360, 0.0f);
@@ -293,9 +296,9 @@ long SoundEffect(int effectID, PHD_3DPOS* position, SoundEnvironment condition, 
 	Sound_UpdateEffectAttributes(freeSlot, pitch, volume);
 
 	if (Sound_CheckBASSError("Applying 3D attribs on channel %x, sound %d", false, channel, effectID))
-		return 0;
+		return false;
 
-	return 1;
+	return true;
 }
 
 void PauseAllSounds()
@@ -377,6 +380,9 @@ void EnumerateLegacyTracks()
 
 void PlaySoundTrack(std::string track, SoundTrackType mode, QWORD position)
 {
+	if (!g_Configuration.EnableSound)
+		return;
+
 	if (track.empty())
 		return;
 
@@ -708,10 +714,13 @@ bool  Sound_UpdateEffectAttributes(int index, float pitch, float gain)
 
 void Sound_UpdateScene()
 {
+	if (!g_Configuration.EnableSound)
+		return;
+
 	// Apply environmental effects
 
 	static int currentReverb = -1;
-	auto roomReverb = g_Configuration.EnableAudioSpecialEffects ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
+	auto roomReverb = g_Configuration.EnableReverb ? g_Level.Rooms[Camera.pos.roomNumber].reverbType : (int)ReverbType::Small;
 
 	if (currentReverb == -1 || roomReverb != currentReverb)
 	{
@@ -778,16 +787,19 @@ void Sound_UpdateScene()
 	BASS_Apply3D();
 }
 
-// Initialize BASS engine and also prepare all sound data.
+// Initialise BASS engine and also prepare all sound data.
 // Called once on engine start-up.
 
 void Sound_Init()
 {
+	if (!g_Configuration.EnableSound)
+		return;
+
 	BASS_Init(g_Configuration.SoundDevice, 44100, BASS_DEVICE_3D, WindowsHandle, NULL);
 	if (Sound_CheckBASSError("Initializing BASS sound device", true))
 		return;
 
-	// Initialize BASS_FX plugin
+	// Initialise BASS_FX plugin
 	BASS_FX_GetVersion();
 	if (Sound_CheckBASSError("Initializing FX plugin", true))
 		return;
@@ -814,7 +826,7 @@ void Sound_Init()
 	if (Sound_CheckBASSError("Starting 3D mixdown", true))
 		return;
 
-	// Initialize channels and tracks array
+	// Initialise channels and tracks array
 	ZeroMemory(BASS_Soundtrack, (sizeof(HSTREAM) * (int)SoundTrackType::Count));
 	ZeroMemory(SoundSlot, (sizeof(SoundEffectSlot) * SOUND_MAX_CHANNELS));
 
@@ -841,7 +853,8 @@ void Sound_Init()
 
 void Sound_DeInit()
 {
-	BASS_Free();
+	if (g_Configuration.EnableSound)
+		BASS_Free();
 }
 
 bool Sound_CheckBASSError(const char* message, bool verbose, ...)

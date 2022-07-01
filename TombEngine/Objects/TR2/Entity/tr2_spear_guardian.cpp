@@ -33,8 +33,7 @@ static void XianDamage(ItemInfo* item, int damage)
 
 	if (!(creature->Flags & 1) && item->TouchBits & 0x40000)
 	{
-		LaraItem->HitPoints -= damage;
-		LaraItem->HitStatus = true;
+		DoDamage(creature->Enemy, damage);
 		CreatureEffect(item, &SpearBiteRight, DoBloodSplat);
 		creature->Flags |= 1;
 		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
@@ -42,8 +41,7 @@ static void XianDamage(ItemInfo* item, int damage)
 
 	if (!(creature->Flags & 2) && item->TouchBits & 0x800)
 	{
-		LaraItem->HitPoints -= damage;
-		LaraItem->HitStatus = true;
+		DoDamage(creature->Enemy, damage);
 		CreatureEffect(item, &SpearBiteLeft, DoBloodSplat);
 		creature->Flags |= 2;
 		SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);

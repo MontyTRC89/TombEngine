@@ -11,8 +11,11 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/input.h"
 
+using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
+
+constexpr auto MAX_CAMERA = 18;
 
 int TrackCameraInit;
 int SpotcamTimer;

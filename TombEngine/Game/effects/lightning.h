@@ -43,13 +43,12 @@ namespace TEN::Effects::Lightning
 		int type;
 		int sLife;
 	};
+	extern std::vector<LIGHTNING_INFO> Lightning;
 
 	extern int LightningRandomSeed;
 	extern float FloatSinCosTable[8192];
 	extern Vector3Int LightningPos[6];
 	extern short LightningBuffer[1024];
-
-	extern std::vector<LIGHTNING_INFO> Lightning;
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();

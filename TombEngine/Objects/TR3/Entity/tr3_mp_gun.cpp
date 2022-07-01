@@ -77,7 +77,7 @@ namespace TEN::Entities::TR3
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
 			DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() * 2, item->RoomNumber, 3);
-			item->HitPoints -= 20;
+			DoDamage(item, 20);
 		}
 
 		AI_INFO AI;

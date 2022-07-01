@@ -44,7 +44,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = TonyControl;
 		obj->drawRoutine = S_DrawTonyBoss;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -64,7 +64,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = TigerControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
@@ -83,7 +83,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCobra;
 		obj->control = CobraControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->castsShadow = true;
 		obj->HitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -103,7 +103,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = RaptorControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
@@ -125,7 +125,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = TribemanAxeControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->castsShadow = true;
 		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -145,7 +145,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = TribemanDartsControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = 128;
+		obj->castsShadow = true;
 		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -167,7 +167,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 800;
 		obj->hitEffect = HIT_BLOOD;
-		obj->shadowSize = 64;
+		obj->castsShadow = true;
 		obj->pivotLength = 1800;
 		obj->radius = 512;
 		obj->intelligent = true;
@@ -185,7 +185,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = ScubaControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 340;
@@ -215,7 +215,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = FlameThrowerControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 36;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -237,7 +237,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseMonkey;
 		obj->control = MonkeyControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 8;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -258,7 +258,7 @@ static void StartEntity(ObjectInfo* obj)
 	{
 		obj->control = MPGunControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -281,7 +281,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseMPStick;
 		obj->control = MPStickControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 28;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -305,7 +305,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = ShivaControl;
 		//obj->drawRoutine = DrawStatue;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 0;
@@ -326,7 +326,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = LondonBossControl;
 		obj->drawRoutine = S_DrawLondonBoss;
-		obj->shadowSize = 0;
+		obj->castsShadow = true;
 		obj->pivotLength = 50;
 		obj->HitPoints = 300;
 		obj->hitEffect = HIT_BLOOD;
@@ -347,7 +347,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCivvy;
 		obj->control = CivvyControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 15;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -393,6 +393,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->castsShadow = true;
 	}
 
 	obj = &Objects[ID_RUBBER_BOAT];
@@ -406,6 +407,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->savePosition = true;
 		obj->saveFlags = true;
 		obj->saveAnim = true;
+		obj->castsShadow = true;
+
 	}
 
 	obj = &Objects[ID_KAYAK];
@@ -418,6 +421,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+		obj->castsShadow = true;
+
 	}
 
 	obj = &Objects[ID_MINECART];
@@ -429,6 +434,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+		obj->castsShadow = true;
+
 	}
 
 	obj = &Objects[ID_BIGGUN];
@@ -454,6 +461,8 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
+		obj->castsShadow = true;
+
 	}
 }
 

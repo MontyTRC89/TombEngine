@@ -12,7 +12,7 @@ struct ItemInfo;
 struct HairData
 {
 	PHD_3DPOS Pose;
-	Vector3  Velocity;
+	Vector3	  Velocity;
 
 	bool Initialized = false;
 };

@@ -100,7 +100,7 @@ namespace TEN::Entities::TR3
 		if (item->BoxNumber != NO_BOX && (g_Level.Boxes[item->BoxNumber].flags & BLOCKED))
 		{
 			DoLotsOfBlood(item->Pose.Position.x, item->Pose.Position.y - (GetRandomControl() & 255) - 32, item->Pose.Position.z, (GetRandomControl() & 127) + 128, GetRandomControl() << 1, item->RoomNumber, 3);
-			item->HitPoints -= 20;
+			DoDamage(item, 20);
 		}
 
 		if (item->HitPoints <= 0)
@@ -338,11 +338,9 @@ namespace TEN::Entities::TR3
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
 				{
 					CreatureEffect(item, &CivvyBite, DoBloodSplat);
+					DoDamage(creature->Enemy, CIVVY_ATTACK_DAMAGE);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= CIVVY_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;
@@ -359,11 +357,9 @@ namespace TEN::Entities::TR3
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
 				{
 					CreatureEffect(item, &CivvyBite, DoBloodSplat);
+					DoDamage(creature->Enemy, CIVVY_ATTACK_DAMAGE);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= CIVVY_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				if (AI.ahead && AI.distance > pow(CIVVY_ATTACK1_RANGE, 2) && AI.distance < pow(CIVVY_ATTACK2_RANGE, 2))
@@ -383,11 +379,9 @@ namespace TEN::Entities::TR3
 				if (creature->Flags != 2 && item->TestBits(JointBitType::Touch, CivvyAttackJoints))
 				{
 					CreatureEffect(item, &CivvyBite, DoBloodSplat);
+					DoDamage(creature->Enemy, CIVVY_SWIPE_DAMAGE);
 					SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 					creature->Flags = 2;
-
-					LaraItem->HitPoints -= CIVVY_SWIPE_DAMAGE;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

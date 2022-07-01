@@ -25,7 +25,7 @@ namespace TEN::Entities::TR4
 
 				if (ItemPushItem(bladeItem, laraItem, coll, 1, 1))
 				{
-					laraItem->HitPoints -= bladeItem->ItemFlags[3];
+					DoDamage(laraItem, bladeItem->ItemFlags[3]);
 
 					auto dPos = oldPos - laraItem->Pose.Position;
  

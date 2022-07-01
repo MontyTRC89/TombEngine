@@ -1385,7 +1385,7 @@ int GetWaterHeight(int x, int y, int z, short roomNumber)
 
 		return GetCollision(floor, x, y, z).Block->CeilingHeight(x, y, z);
 	}
-	else
+	else if (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 	{
 		while (floor->RoomBelow(x, y, z).value_or(NO_ROOM) != NO_ROOM)
 		{

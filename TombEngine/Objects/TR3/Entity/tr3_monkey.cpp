@@ -409,15 +409,13 @@ namespace TEN::Entities::TR3
 				else
 					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 
-				if (enemy == LaraItem)
+				if (enemy->IsLara())
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
 					{
 						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
+						DoDamage(enemy, 40);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 40;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
@@ -429,10 +427,8 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
 						{
 							CreatureEffect(item, &MonkeyBite, DoBloodSplat);
+							DoDamage(enemy, 20);
 							creature->Flags = 1;
-
-							enemy->HitPoints -= 20;
-							enemy->HitStatus = true;
 						}
 					}
 				}
@@ -455,15 +451,13 @@ namespace TEN::Entities::TR3
 				else
 					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 
-				if (enemy == LaraItem)
+				if (enemy->IsLara())
 				{
 					if (!creature->Flags && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
 					{
 						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
+						DoDamage(enemy, 40);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 40;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
@@ -475,10 +469,8 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
 						{
 							CreatureEffect(item, &MonkeyBite, DoBloodSplat);
+							DoDamage(enemy, 20);
 							creature->Flags = 1;
-
-							enemy->HitPoints -= 20;
-							enemy->HitStatus = true;
 						}
 					}
 				}
@@ -501,15 +493,13 @@ namespace TEN::Entities::TR3
 				else
 					item->Pose.Orientation.y += Angle::DegToRad(7.0f);
 
-				if (enemy == LaraItem)
+				if (enemy->IsLara())
 				{
 					if (creature->Flags != 1 && item->TestBits(JointBitType::Touch, MonkeyAttackJoints))
 					{
 						CreatureEffect(item, &MonkeyBite, DoBloodSplat);
+						DoDamage(enemy, 50);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 50;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
@@ -521,10 +511,8 @@ namespace TEN::Entities::TR3
 							abs(enemy->Pose.Position.z - item->Pose.Position.z) < CLICK(1))
 						{
 							CreatureEffect(item, &MonkeyBite, DoBloodSplat);
+							DoDamage(enemy, 25);
 							creature->Flags = 1;
-
-							enemy->HitPoints -= 25;
-							enemy->HitStatus = true;
 						}
 					}
 				}

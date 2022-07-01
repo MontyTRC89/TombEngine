@@ -90,8 +90,7 @@ void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 
 	if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity > 0)
 	{
-		laraItem->HitStatus = true;
-		laraItem->HitPoints -= 100;
+		DoDamage(laraItem, 100);
 	}
 }
 
@@ -110,7 +109,7 @@ void SkidooManControl(short riderItemNumber)
 
 	if (!item->Data)
 	{
-		EnableBaddyAI(itemNumber, TRUE);
+		EnableEntityAI(itemNumber, TRUE);
 		item->Status = ITEM_ACTIVE;
 	}
 

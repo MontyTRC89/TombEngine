@@ -13,6 +13,8 @@
 #include "Specific/level.h"
 #include "Specific/input.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // WATER SURFACE TREAD
 // Control & Collision Functions
@@ -39,7 +41,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.VerticalVelocity -= LARA_SWIM_DECELERATION;
+	item->Animation.VerticalVelocity -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
 
@@ -55,18 +57,8 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - LARA_TURN_RATE * 1.25f);
-		if (lara->Control.TurnRate.GetY() < -LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(-LARA_MED_TURN_MAX);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() + LARA_TURN_RATE * 1.25f);
-		if (lara->Control.TurnRate.GetY() > LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(LARA_MED_TURN_MAX);
-	}
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
 	if (DbInput & IN_JUMP)
 	{
@@ -132,19 +124,9 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_WATER_DEATH;
 		return;
 	}
-	
-	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - LARA_TURN_RATE * 1.25f);
-		if (lara->Control.TurnRate.GetY() < -LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(-LARA_MED_TURN_MAX);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() + LARA_TURN_RATE * 1.25f);
-		if (lara->Control.TurnRate.GetY() > LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(LARA_MED_TURN_MAX);
-	}
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_MED_TURN_RATE_MAX);
 
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
@@ -170,7 +152,7 @@ void lara_as_surface_swim_forward(ItemInfo* item, CollisionInfo* coll)
 		{
 			item->Animation.TargetState = LS_ONWATER_FORWARD;
 
-			item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+			item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL;
 			if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
 				item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 		}
@@ -208,18 +190,8 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		if (TrInput & IN_LEFT)
-		{
-			lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - LARA_TURN_RATE * 1.25f);
-			if (lara->Control.TurnRate.GetY() < -LARA_SLOW_MED_TURN_MAX)
-				lara->Control.TurnRate.SetY(-LARA_SLOW_MED_TURN_MAX);
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() + LARA_TURN_RATE * 1.25f);
-			if (lara->Control.TurnRate.GetY() > LARA_SLOW_MED_TURN_MAX)
-				lara->Control.TurnRate.SetY(LARA_SLOW_MED_TURN_MAX);
-		}
+		if (TrInput & (IN_LEFT | IN_RIGHT))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
 	if (DbInput & IN_JUMP)
@@ -229,7 +201,7 @@ void lara_as_surface_swim_left(ItemInfo* item, CollisionInfo* coll)
 	{
 		item->Animation.TargetState = LS_ONWATER_LEFT;
 
-		item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+		item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL;
 		if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
 			item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 
@@ -264,18 +236,8 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 
 	if (!(TrInput & IN_WALK))	// WALK locks orientation.
 	{
-		if (TrInput & IN_LEFT)
-		{
-			lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - LARA_TURN_RATE * 1.25f);
-			if (lara->Control.TurnRate.GetY() < -LARA_SLOW_MED_TURN_MAX)
-				lara->Control.TurnRate.SetY(-LARA_SLOW_MED_TURN_MAX);
-		}
-		else if (TrInput & IN_RIGHT)
-		{
-			lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() + LARA_TURN_RATE * 1.25f);
-			if (lara->Control.TurnRate.GetY() > LARA_SLOW_MED_TURN_MAX)
-				lara->Control.TurnRate.SetY(LARA_SLOW_MED_TURN_MAX);
-		}
+		if (TrInput & (IN_LEFT | IN_RIGHT))
+			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 	}
 
 	if (DbInput & IN_JUMP)
@@ -285,7 +247,7 @@ void lara_as_surface_swim_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		item->Animation.TargetState = LS_ONWATER_RIGHT;
 
-		item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+		item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL;
 		if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
 			item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 
@@ -317,18 +279,8 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LEFT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - LARA_TURN_RATE * 1.25f);
-		if (lara->Control.TurnRate.GetY() < -LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(-LARA_SLOW_MED_TURN_MAX);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() + LARA_TURN_RATE * 1.25f);
-		if (lara->Control.TurnRate.GetY() > LARA_SLOW_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(LARA_SLOW_MED_TURN_MAX);
-	}
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL * 1.25f, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 
 	if (DbInput & IN_JUMP)
 		SetLaraSwimDiveAnimation(item);
@@ -337,7 +289,7 @@ void lara_as_surface_swim_back(ItemInfo* item, CollisionInfo* coll)
 	{
 		item->Animation.TargetState = LS_ONWATER_BACK;
 
-		item->Animation.VerticalVelocity += LARA_SWIM_ACCELERATION;
+		item->Animation.VerticalVelocity += LARA_SWIM_VELOCITY_ACCEL;
 		if (item->Animation.VerticalVelocity > LARA_TREAD_VELOCITY_MAX)
 			item->Animation.VerticalVelocity = LARA_TREAD_VELOCITY_MAX;
 

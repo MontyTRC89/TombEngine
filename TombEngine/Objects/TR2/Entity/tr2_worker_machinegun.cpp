@@ -76,14 +76,14 @@ void WorkerMachineGunControl(short itemNumber)
 				item->Animation.TargetState = 3;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance < SECTOR(9246) || AI.zoneNumber != AI.enemyZone)
+				if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = (GetRandomControl() < 0x4000) ? 8 : 10;
 				else
 					item->Animation.TargetState = 2;
 			}
 			else if (creature->Mood == MoodType::Attack || !AI.ahead)
 			{
-				if (AI.distance <= SECTOR(4096))
+				if (AI.distance <= pow(SECTOR(2), 2))
 					item->Animation.TargetState = 2;
 				else
 					item->Animation.TargetState = 3;
@@ -106,14 +106,14 @@ void WorkerMachineGunControl(short itemNumber)
 				item->Animation.TargetState = 3;
 			else if (Targetable(item, &AI))
 			{
-				if (AI.distance < SECTOR(9246) || AI.zoneNumber != AI.enemyZone)
+				if (AI.distance < pow(SECTOR(3), 2) || AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
 				else
 					item->Animation.TargetState = 6;
 			}
 			else if (creature->Mood == MoodType::Attack || !AI.ahead)
 			{
-				if (AI.distance > SECTOR(4096))
+				if (AI.distance > pow(SECTOR(2), 2))
 					item->Animation.TargetState = 3;
 			}
 			else
@@ -210,7 +210,7 @@ void WorkerMachineGunControl(short itemNumber)
 			}
 
 			if (item->Animation.TargetState != 1 &&
-				(creature->Mood == MoodType::Escape || AI.distance > SECTOR(9246) || !Targetable(item, &AI)))
+				(creature->Mood == MoodType::Escape || AI.distance > pow(SECTOR(3), 2) || !Targetable(item, &AI)))
 			{
 				item->Animation.TargetState = 1;
 			}

@@ -61,10 +61,8 @@ namespace TEN::Entities::TR3
 		if (item->TouchBits)
 		{
 			DoBloodSplat(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, (GetRandomControl() & 3) + 4, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
+			DoDamage(LaraItem, 50);
 			KillItem(itemNumber);
-
-			LaraItem->HitPoints -= 50;
-			LaraItem->HitStatus = true;
 		}
 		else
 		{

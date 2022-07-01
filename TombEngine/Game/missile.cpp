@@ -40,7 +40,6 @@ void ShootAtLara(FX_INFO *fx)
 void ControlMissile(short fxNumber)
 {
 	auto* fx = &EffectList[fxNumber];
-	printf("ControlMissile\n");
 
 	if (fx->objectNumber == ID_SCUBA_HARPOON &&
 		!TestEnvironment(ENV_FLAG_WATER, fx->roomNumber) &&
@@ -85,8 +84,7 @@ void ControlMissile(short fxNumber)
 	{
 		if (ItemNearLara(&fx->pos, 350))
 		{
-			LaraItem->HitPoints -= 3;
-			LaraItem->hitStatus = 1;
+			DoDamage(LaraItem, 3);
 			LaraBurn(LaraItem);
 			return;
 		}
@@ -95,14 +93,12 @@ void ControlMissile(short fxNumber)
 	{
 		/*if (fx->objectNumber == KNIFE)
 		{
-			LaraItem->HitPoints -= KNIFE_DAMAGE;
-			SoundEffect(317, &fx->pos);
+			DoDamage(LaraItem, KNIFE_DAMAGE);
 			KillEffect(fx_number);
 		}
 		else*/ if (fx->objectNumber == ID_SCUBA_HARPOON)
 		{
-			LaraItem->HitPoints -= DIVER_HARPOON_DAMAGE;
-			SoundEffect(317, &fx->pos);
+			DoDamage(LaraItem, DIVER_HARPOON_DAMAGE);
 			KillEffect(fxNumber);
 		}
 

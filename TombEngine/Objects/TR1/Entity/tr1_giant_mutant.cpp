@@ -88,8 +88,7 @@ namespace TEN::Entities::TR1
 
 			if (item->TouchBits)
 			{
-				LaraItem->HitPoints -= MUTANT_TOUCH_DAMAGE;
-				LaraItem->HitStatus = true;
+				DoDamage(creature->Enemy, MUTANT_TOUCH_DAMAGE);
 			}
 
 			switch (item->Animation.ActiveState)
@@ -175,9 +174,7 @@ namespace TEN::Entities::TR1
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackRightJoints))
 				{
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
 				}
 
 				break;
@@ -186,9 +183,7 @@ namespace TEN::Entities::TR1
 				if (!creature->Flags && item->TestBits(JointBitType::Touch, MutantAttackJoints))
 				{
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= MUTANT_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, MUTANT_ATTACK_DAMAGE);
 				}
 
 				break;

@@ -20,6 +20,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/door_data.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Doors
 {
 	enum STATES_PUSHPULL_KICK_DOOR

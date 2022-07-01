@@ -59,7 +59,7 @@ namespace TEN::Entities::TR4
                         int z = (GetRandomControl() & 0x7F) + LaraItem->Pose.Position.z - 64;
 
                         DoBloodSplat(x, y, z, (GetRandomControl() & 3) + 2, 2 * GetRandomControl(), item->RoomNumber);
-                        LaraItem->HitPoints -= 8;
+                        DoDamage(LaraItem, 8);
                     }
                 }
             }

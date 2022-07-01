@@ -19,6 +19,8 @@
 #include "Objects/Generic/Doors/underwater_door.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Doors
 {
 	Vector3Int UnderwaterDoorPos(-251, -540, -46);

@@ -25,6 +25,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Input;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -47,7 +48,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Reset running jump timer.
 	if (!IsRunJumpCountableState((LaraState)item->Animation.ActiveState))
-		lara->Control.Count.RunJump = 0;
+		lara->Control.Count.Run = 0;
 
 	// Reset running jump action queue.
 	if (!IsRunJumpQueueableState((LaraState)item->Animation.ActiveState))
@@ -64,8 +65,10 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 		ResetLaraFlex(item, 0.15f);
 	}
 
-	// Reset turn rate.
-	ResetLaraTurnRate(item);
+	// Apply and reset turn rate.
+	item->Pose.Orientation.y += lara->Control.TurnRate.y;
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+		lara->Control.TurnRate.y = 0;
 }
 
 bool HandleLaraVehicle(ItemInfo* item, CollisionInfo* coll)
@@ -130,7 +133,7 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	static constexpr int rate = 50;
 	int threshold = std::max(abs(item->Animation.Velocity) * 1.5f, CLICK(0.25f) / 4);
 	int sign = std::copysign(1, height);
-	
+
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && height > 0)
 		item->Pose.Position.y += SWAMP_GRAVITY;
 	else if (abs(height) > (STEPUP_HEIGHT / 2))		// Outer range.
@@ -142,16 +145,6 @@ void EaseOutLaraHeight(ItemInfo* item, int height)
 	}
 	else
 		item->Pose.Position.y += height;
-}
-
-// TODO: Make lean rate proportional to the turn rate, allowing for nicer aesthetics with future analog stick input.
-void DoLaraLean(ItemInfo* item, CollisionInfo* coll, float maxAngle, float rate)
-{
-	if (!item->Animation.Velocity && !item->Animation.VerticalVelocity)
-		return;
-
-	maxAngle = (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT) ? (maxAngle * 0.6f) : maxAngle;
-	item->Pose.Orientation.SetZ(Angle::InterpolateConstantEaseOut(item->Pose.Orientation.GetZ(), maxAngle, rate, 0.4f, Angle::DegToRad(0.1f)));
 }
 
 // TODO: Some states can't make the most of this function due to missing step up/down animations.
@@ -201,23 +194,6 @@ void DoLaraCrawlToHangSnap(ItemInfo* item, CollisionInfo* coll)
 	{
 		TranslateItem(item, item->Pose.Orientation.GetY(), -LARA_RADIUS_CRAWL);
 		item->Pose.Orientation.SetY(item->Pose.Orientation.GetY() + Angle::DegToRad(180.0f));
-	}
-}
-
-void DoLaraCrawlFlex(ItemInfo* item, CollisionInfo* coll, float maxAngle, float rate)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!item->Animation.Velocity)
-		return;
-
-	lara->ExtraTorsoRot.SetZ(Angle::InterpolateConstantEaseOut(lara->ExtraTorsoRot.GetZ(), maxAngle, rate, 0.25f / 2, Angle::DegToRad(0.1f)));
-
-	if (!(TrInput & IN_LOOK) &&
-		item->Animation.ActiveState != LS_CRAWL_BACK)
-	{
-		lara->ExtraHeadRot.SetZ(lara->ExtraTorsoRot.GetZ() / 2);
-		lara->ExtraHeadRot.SetY(lara->ExtraHeadRot.GetZ());
 	}
 }
 
@@ -282,7 +258,7 @@ void DoLaraTightropeBalanceRegen(ItemInfo* item)
 	}
 }
 
-void DealLaraFallDamage(ItemInfo* item)
+void DoLaraFallDamage(ItemInfo* item)
 {
 	if (item->Animation.VerticalVelocity >= LARA_DAMAGE_VELOCITY)
 	{
@@ -293,6 +269,9 @@ void DealLaraFallDamage(ItemInfo* item)
 			float base = item->Animation.VerticalVelocity - (LARA_DAMAGE_VELOCITY - 1);
 			item->HitPoints -= LARA_HEALTH_MAX * (pow(base, 2) / 196);
 		}
+
+		float rumblePower = ((float)item->Animation.VerticalVelocity / (float)LARA_DEATH_VELOCITY) * 0.7f;
+		Rumble(rumblePower, 0.3f);
 	}
 }
 
@@ -300,11 +279,13 @@ LaraInfo*& GetLaraInfo(ItemInfo* item)
 {
 	if (item->ObjectNumber == ID_LARA)
 		return (LaraInfo*&)item->Data;
+	else
+	{
+		TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
 
-	TENLog(std::string("Attempted to fetch LaraInfo data from entity with object ID ") + std::to_string(item->ObjectNumber), LogLevel::Warning);
-
-	auto* firstLaraItem = FindItem(ID_LARA);
-	return (LaraInfo*&)firstLaraItem->Data;
+		auto* firstLaraItem = FindItem(ID_LARA);
+		return (LaraInfo*&)firstLaraItem->Data;
+	}
 }
 
 LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
@@ -355,49 +336,97 @@ LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll)
 
 float GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 {
-	float direction = coll->Setup.ForwardAngle;
+	float headingAngle = coll->Setup.ForwardAngle;
 	auto probe = GetCollision(item);
 
 	// Ground is flat.
 	if (probe.FloorTilt == Vector2::Zero)
-		return direction;
+		return headingAngle;
 
-	direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-
-	// Determine nearest cardinal direction of surface aspect.
-	if (!g_GameFlow->HasSlideExtended())
-		direction = GetQuadrant(direction) * Angle::DegToRad(90.0f);
-
-	return direction;
+	// Get either:
+	// a) the surface aspect angle (extended slides), or
+	// b) the derived nearest cardinal direction from it (original slides).
+	headingAngle = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+	if (g_GameFlow->HasSlideExtended())
+		return headingAngle;
+	else
+		return (GetQuadrant(headingAngle) * Angle::DegToRad(90.0f));
 }
 
-void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
+float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, float maxTurnRate, float axisCoeff)
+{
+	int sign = std::copysign(1, axisCoeff);
+	float minTurnRateNormalized = minTurnRate * abs(axisCoeff);
+	float maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
+
+	float newTurnRate = (turnRate + (accelRate * sign)) * sign;
+	newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
+	return newTurnRate * sign;
+}
+
+void ModulateLaraTurnRateX(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
 
-	constexpr int minVelocity = 50;
-	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
-
-	if (g_GameFlow->HasSlideExtended())
-	{
-		auto probe = GetCollision(item);
-		float minSlideAngle = Angle::DegToRad(33.75f);
-		float steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-		float direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
-
-		float velocityMultiplier = 1 / Angle::DegToRad(33.75f);
-		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
-		float deltaAngle = Angle::ShortestAngularDistance(direction, item->Pose.Orientation.GetY());
-
-		g_Renderer.PrintDebugMessage("%d", slideVelocity);
-
-		lara->ExtraVelocity.x += slideVelocity;
-		lara->ExtraVelocity.y += slideVelocity * sin(steepness);
-	}
-	else
-		lara->ExtraVelocity.x += minVelocity;
+	lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, -AxisMap[InputAxis::MoveVertical]);
 }
 
+void ModulateLaraTurnRateY(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate)
+{
+	auto* lara = GetLaraInfo(item);
+
+	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	if (item->Animation.Airborne)
+	{
+		int sign = std::copysign(1, axisCoeff);
+		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
+	}
+
+	lara->Control.TurnRate.y = ModulateLaraTurnRate(lara->Control.TurnRate.y, accelRate, minTurnRate, maxTurnRate, axisCoeff);
+}
+
+void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (TrInput & (IN_FORWARD | IN_BACK))
+		ModulateLaraTurnRateX(item, LARA_SWIM_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
+
+		// TODO: ModulateLaraLean() doesn't really work here. @Sezz 2022.06.22
+		if (TrInput & IN_LEFT)
+			item->Pose.Orientation.z -= LARA_LEAN_RATE;
+		else if (TrInput & IN_RIGHT)
+			item->Pose.Orientation.z += LARA_LEAN_RATE;
+	}
+}
+
+void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	if (TrInput & IN_FORWARD && item->Pose.Orientation.x > -Angle::DegToRad(85.0f))
+		lara->Control.Subsuit.DXRot = -Angle::DegToRad(45.0f);
+	else if (TrInput & IN_BACK && item->Pose.Orientation.x < Angle::DegToRad(85.0f))
+		lara->Control.Subsuit.DXRot = Angle::DegToRad(45.0f);
+	else
+		lara->Control.Subsuit.DXRot = 0;
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ModulateLaraTurnRateY(item, LARA_SUBSUIT_TURN_RATE_ACCEL, 0, LARA_MED_TURN_RATE_MAX);
+
+		if (TrInput & IN_LEFT)
+			item->Pose.Orientation.z -= LARA_LEAN_RATE;
+		else if (TrInput & IN_RIGHT)
+			item->Pose.Orientation.z += LARA_LEAN_RATE;
+	}
+}
+
+// TODO: Simplify this function. Some members of SubsuitControlData may be unnecessary. @Sezz 2022.06.22
 void UpdateLaraSubsuitAngles(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
@@ -467,68 +496,82 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	}
 }
 
-void ModulateLaraSubsuitSwimTurn(ItemInfo* item)
+void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
+{
+	if (!item->Animation.Velocity)
+		return;
+
+	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = maxAngle * axisCoeff;
+
+	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
+		maxAngleNormalized *= 0.6f;
+
+	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
+}
+
+// TODO: Adapt to the above.
+void OldDoLaraLean(ItemInfo* item, CollisionInfo* coll, float maxAngle, float rate)
+{
+	if (!item->Animation.Velocity && !item->Animation.VerticalVelocity)
+		return;
+
+	maxAngle = (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT) ? (maxAngle * 0.6f) : maxAngle;
+	item->Pose.Orientation.SetZ(Angle::InterpolateConstantEaseOut(item->Pose.Orientation.GetZ(), maxAngle, rate, 0.4f, Angle::DegToRad(0.1f)));
+}
+
+void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD && item->Pose.Orientation.GetX() > Angle::DegToRad(-85.0f))
-		lara->Control.Subsuit.DXRot = Angle::DegToRad(-45.0f);
-	else if (TrInput & IN_BACK && item->Pose.Orientation.GetX() < Angle::DegToRad(85.0f))
-		lara->Control.Subsuit.DXRot = Angle::DegToRad(45.0f);
-	else
-		lara->Control.Subsuit.DXRot = 0;
+	if (!item->Animation.Velocity)
+		return;
 
-	if (TrInput & IN_LEFT)
+	// TODO: Adapt this.
+	//lara->ExtraTorsoRot.SetZ(Angle::InterpolateConstantEaseOut(lara->ExtraTorsoRot.GetZ(), maxAngle, rate, 0.25f / 2, Angle::DegToRad(0.1f)));
+
+	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
+	int sign = copysign(1, axisCoeff);
+	short maxAngleNormalized = maxAngle * axisCoeff;
+
+	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
+		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
+
+	if (!(TrInput & IN_LOOK) &&
+		item->Animation.ActiveState != LS_CRAWL_BACK)
 	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - LARA_SUBSUIT_TURN_RATE);
-		if (lara->Control.TurnRate.GetY() < -LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(-LARA_MED_TURN_MAX);
-
-		DoLaraLean(item, &LaraCollision, -LARA_LEAN_MAX, LARA_LEAN_RATE);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() + LARA_SUBSUIT_TURN_RATE);
-		if (lara->Control.TurnRate.GetY() > LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetY(LARA_MED_TURN_MAX);
-
-		DoLaraLean(item, &LaraCollision, LARA_LEAN_MAX, LARA_LEAN_RATE);
+		lara->ExtraHeadRot.z = lara->ExtraTorsoRot.z / 2;
+		lara->ExtraHeadRot.y = lara->ExtraHeadRot.z;
 	}
 }
 
-void ModulateLaraSwimTurn(ItemInfo* item, CollisionInfo* coll)
+// TODO: Unused; I will pick this back up later. @Sezz 2022.06.22
+void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TrInput & IN_FORWARD)
-	{
-		lara->Control.TurnRate.SetX(lara->Control.TurnRate.GetX() - LARA_SWIM_TURN_RATE);
-		if (lara->Control.TurnRate.GetX() < -LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetX(-LARA_MED_TURN_MAX);
-	}
-	else if (TrInput & IN_BACK)
-	{
-		lara->Control.TurnRate.SetX(lara->Control.TurnRate.GetX() + LARA_SWIM_TURN_RATE);
-		if (lara->Control.TurnRate.GetX() > LARA_MED_TURN_MAX)
-			lara->Control.TurnRate.SetX(LARA_MED_TURN_MAX);
-	}
+	constexpr int minVelocity = 50;
+	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
 
-	if (TrInput & IN_LEFT)
+	if (g_GameFlow->HasSlideExtended())
 	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() - LARA_SWIM_TURN_RATE);
-		if (lara->Control.TurnRate.GetY() < -LARA_MED_FAST_TURN_MAX)
-			lara->Control.TurnRate.SetY(-LARA_MED_FAST_TURN_MAX);
+		auto probe = GetCollision(item);
+		float minSlideAngle = Angle::DegToRad(33.75f);
+		float steepness = GetSurfaceSteepnessAngle(probe.FloorTilt.x, probe.FloorTilt.y);
+		float direction = GetSurfaceAspectAngle(probe.FloorTilt.x, probe.FloorTilt.y);
 
-		DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_SWIM_LEAN_RATE);
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		lara->Control.TurnRate.SetY(lara->Control.TurnRate.GetY() + LARA_SWIM_TURN_RATE);
-		if (lara->Control.TurnRate.GetY() > LARA_MED_FAST_TURN_MAX)
-			lara->Control.TurnRate.SetY(LARA_MED_FAST_TURN_MAX);
+		float velocityMultiplier = 1 / (float)Angle::DegToRad(33.75f);
+		int slideVelocity = std::min<int>(minVelocity + 10 * (steepness * velocityMultiplier), LARA_TERMINAL_VELOCITY);
+		//short deltaAngle = abs((short)(direction - item->Pose.Orientation.y));
 
-		DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_SWIM_LEAN_RATE);
+		g_Renderer.PrintDebugMessage("%d", slideVelocity);
+
+		lara->ExtraVelocity.x += slideVelocity;
+		lara->ExtraVelocity.y += slideVelocity * sin(steepness);
 	}
+	else
+		lara->ExtraVelocity.x += minVelocity;
 }
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll)
@@ -572,8 +615,8 @@ void SetLaraRunJumpQueue(ItemInfo* item, CollisionInfo* coll)
 	auto probe = GetCollision(item, item->Pose.Orientation.GetY(), distance, -coll->Setup.Height);
 
 	if ((TestLaraRunJumpForward(item, coll) ||													// Area close ahead is permissive...
-			(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
-			(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
+		(probe.Position.Ceiling - y) < -(coll->Setup.Height + (LARA_HEADROOM * 0.8f)) ||		// OR ceiling height far ahead is permissive
+		(probe.Position.Floor - y) >= CLICK(0.5f)) &&											// OR there is a drop below far ahead.
 		probe.Position.Floor != NO_HEIGHT)
 	{
 		lara->Control.RunJumpQueued = IsRunJumpQueueableState((LaraState)item->Animation.TargetState);
@@ -723,11 +766,11 @@ void SetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 // TODO: Do it later.
 void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 {
-	float direction = GetLaraSlideDirection(item, coll);
-	float deltaAngle = direction - item->Pose.Orientation.GetY();
+	short headinAngle = GetLaraSlideDirection(item, coll);
+	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
 	if (!g_GameFlow->HasSlideExtended())
-		item->Pose.Orientation.SetY(direction);
+		item->Pose.Orientation.y = headinAngle;
 
 	// Snap to height upon entering slide.
 	if (item->Animation.ActiveState != LS_SLIDE_FORWARD &&
@@ -877,4 +920,16 @@ void ResetLaraFlex(ItemInfo* item, float alpha)
 
 	lara->ExtraHeadRot.InterpolateLinear(EulerAngles::Zero, alpha, Angle::DegToRad(0.1f));
 	lara->ExtraTorsoRot.InterpolateLinear(EulerAngles::Zero, alpha, Angle::DegToRad(0.1f));
+}
+
+void RumbleLaraHealthCondition(ItemInfo* lara)
+{
+	auto* info = GetLaraInfo(lara);
+
+	if (lara->HitPoints > LARA_HEALTH_CRITICAL && !info->PoisonPotency)
+		return;
+
+	bool pulse = (GlobalCounter & 0x1F) % 0x1F == 0;
+	if (pulse)
+		Rumble(0.2f, 0.1f);
 }

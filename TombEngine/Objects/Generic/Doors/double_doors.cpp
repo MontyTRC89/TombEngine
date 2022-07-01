@@ -19,6 +19,8 @@
 #include "Objects/Generic/Doors/double_doors.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Doors
 {
 	Vector3Int DoubleDoorPos(0, 0, 220);

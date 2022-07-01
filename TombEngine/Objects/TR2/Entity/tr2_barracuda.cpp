@@ -64,7 +64,7 @@ void BarracudaControl(short itemNumber)
 
 			if (creature->Mood == MoodType::Bored)
 				item->Animation.TargetState = 2;
-			else if (AI.ahead && AI.distance < 680)
+			else if (AI.ahead && AI.distance < pow(680, 2))
 				item->Animation.TargetState = 4;
 			else if (creature->Mood == MoodType::Stalk)
 				item->Animation.TargetState = 2;
@@ -91,9 +91,9 @@ void BarracudaControl(short itemNumber)
 
 			if (creature->Mood == MoodType::Bored)
 				item->Animation.TargetState = 2;
-			else if (AI.ahead && AI.distance < 340)
+			else if (AI.ahead && AI.distance < pow(340, 2))
 				item->Animation.TargetState = 5;
-			else if (AI.ahead && AI.distance < 680)
+			else if (AI.ahead && AI.distance < pow(680, 2))
 				item->Animation.TargetState = 1;
 			else if (creature->Mood == MoodType::Stalk)
 				item->Animation.TargetState = 2;
@@ -108,10 +108,8 @@ void BarracudaControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & 0xE0))
 			{
 				CreatureEffect(item, &BarracudaBite, DoBloodSplat);
+				DoDamage(creature->Enemy, 100);
 				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 100;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

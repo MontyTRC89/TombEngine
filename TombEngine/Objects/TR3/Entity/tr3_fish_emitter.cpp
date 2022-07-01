@@ -299,7 +299,7 @@ namespace TEN::Entities::TR3
 					}
 
 					if (pirahnaAttack != 2)
-						LaraItem->HitPoints -= PIRAHNA_DAMAGE;
+						DoDamage(LaraItem, PIRAHNA_DAMAGE);
 				}
 			}
 

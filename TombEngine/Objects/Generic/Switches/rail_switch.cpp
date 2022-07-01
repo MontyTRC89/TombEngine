@@ -9,6 +9,8 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Switches
 {
 	Vector3Int RailSwitchPos = { 0, 0, -550 };

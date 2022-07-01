@@ -27,7 +27,7 @@ void InitialiseLOTarray(int itemNumber)
 	}
 }
 
-int EnableBaddyAI(short itemNum, int always, bool makeTarget)
+int EnableEntityAI(short itemNum, int always, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 

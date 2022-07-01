@@ -91,9 +91,7 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 
 		TriggerChaffSparkles(pos, vel, &color, age, item);
 		if (isUnderwater)
-		{
 			TriggerChaffBubbles(pos, item->RoomNumber);
-		}
 		else
 		{
 			Vector3 position = Vector3(pos->x,pos->y,pos->z);
@@ -106,7 +104,6 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item);
 	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, & item->Pose, cond ? SoundEnvironment::Water : SoundEnvironment::Always, 1.0f, 0.5f);
 }
-
 
 void TriggerChaffSparkles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int age, ItemInfo* item)
 {
@@ -146,7 +143,6 @@ void TriggerChaffSparkles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int 
 	*/
 	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->RoomNumber);
 }
-
 
 void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving, bool wind)
 {
@@ -203,9 +199,7 @@ void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving,
 			smoke->rotAdd = (GetRandomControl() & 7) + 24;
 	}
 	else
-	{
 		smoke->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-	}
 
 	if (wind)
 		smoke->flags |= SP_WIND;
@@ -218,11 +212,10 @@ void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving,
 	smoke->size = smoke->dSize = size;
 }
 
-
 void TriggerChaffBubbles(Vector3Int* pos, int FlareRoomNumber)
 {
+	auto& bubble = Bubbles[GetFreeBubble()];
 
-	BUBBLE_STRUCT& bubble = Bubbles[GetFreeBubble()];
 	bubble = {};
 	bubble.active = true;
 	bubble.size = 0;

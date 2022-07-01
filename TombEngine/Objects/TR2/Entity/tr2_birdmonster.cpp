@@ -139,19 +139,15 @@ void BirdMonsterControl(short itemNumber)
 			if (!(creature->Flags & 1) && item->TouchBits & 0x600000)
 			{
 				CreatureEffect(item, &BirdMonsterBiteRight, DoBloodSplat);
+				DoDamage(creature->Enemy, 200);
 				creature->Flags |= 1;
-
-				LaraItem->HitPoints -= 200;
-				LaraItem->HitStatus = true;
 			}
 
 			if (!(creature->Flags & 2) && item->TouchBits & 0x0C0000)
 			{
 				CreatureEffect(item, &BirdMonsterBiteLeft, DoBloodSplat);
+				DoDamage(creature->Enemy, 200);
 				creature->Flags |= 2;
-
-				LaraItem->HitPoints -= 200;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

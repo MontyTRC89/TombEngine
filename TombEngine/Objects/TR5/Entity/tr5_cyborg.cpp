@@ -277,11 +277,11 @@ void CyborgControl(short itemNumber)
 
 					if (TestEnvironment(ENV_FLAG_WATER, item) && item->HitPoints > 0)
 					{
+						DropEntityPickups(item);
+						DoDamage(item, INT_MAX);
 						item->Animation.ActiveState = CYBORG_STATE_DEATH;
 						item->Animation.AnimNumber = object->animIndex + 69;
-						item->HitPoints = 0;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
-						DropEntityPickups(item);
 					}
 
 					break;
@@ -627,8 +627,8 @@ void CyborgControl(short itemNumber)
 			{
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{
-					LaraBurn(LaraItem);
-					LaraItem->HitPoints = 0;
+					LaraBurn(creature->Enemy);
+					DoDamage(creature->Enemy, INT_MAX);
 					Lara.BurnCount = 48;
 					Lara.BurnBlue = 1;
 				}

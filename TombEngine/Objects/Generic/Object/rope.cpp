@@ -15,6 +15,8 @@
 #include "Sound/sound.h"
 #include "Game/camera.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Generic
 {
 	PENDULUM CurrentPendulum;
@@ -42,6 +44,7 @@ namespace TEN::Entities::Generic
 
 	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ItemInfo* item)
 	{
+		rope->room = item->RoomNumber;
 		rope->position = *pos1;
 		rope->segmentLength = length << 16;
 
@@ -536,6 +539,28 @@ namespace TEN::Entities::Generic
 		}
 	}
 
+	bool RopeSwingCollision(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto* lara = GetLaraInfo(item);
+
+		coll->Setup.Mode = CollisionProbeMode::FreeForward;
+		coll->Setup.ForwardAngle = lara->Control.Rope.Direction ? item->Pose.Orientation.y : -item->Pose.Orientation.y;
+		GetCollisionInfo(coll, item);
+
+		bool stumble = (coll->CollisionType != CollisionType::CT_NONE || coll->HitStatic);
+
+		if (stumble || 
+			TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber) ||
+			TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, item->RoomNumber))
+		{
+			item->Pose.Position = coll->Setup.OldPosition;
+			FallFromRope(item, stumble);
+			return true;
+		}
+
+		return false;
+	}
+
 	void JumpOffRope(ItemInfo* item)
 	{
 		if (Lara.Control.Rope.Ptr != -1)
@@ -570,22 +595,26 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void FallFromRope(ItemInfo* item)
+	void FallFromRope(ItemInfo* item, bool stumble)
 	{
 		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
 		item->Pose.Orientation.SetX();
 		item->Pose.Position.y += 320;
 
-		item->Animation.AnimNumber = LA_FALL_START;
-		item->Animation.FrameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-		item->Animation.ActiveState = LS_JUMP_FORWARD;
-		item->Animation.TargetState = LS_JUMP_FORWARD;
+		SetAnimation(item, stumble ? LA_JUMP_WALL_SMASH_START : LA_FALL_START);
 
 		item->Animation.Airborne = true;
 		item->Animation.VerticalVelocity = 0;
 
-		Lara.Control.HandStatus = HandStatus::Free;
-		Lara.Control.Rope.Ptr = -1;
+		auto* lara = GetLaraInfo(item);
+		lara->Control.HandStatus = HandStatus::Free;
+		lara->Control.Rope.Ptr = -1;
+
+		if (stumble)
+		{
+			item->Animation.Velocity = -item->Animation.Velocity;
+			DoDamage(item, 0);
+		}
 	}
 
 	void LaraClimbRope(ItemInfo* item, CollisionInfo* coll)

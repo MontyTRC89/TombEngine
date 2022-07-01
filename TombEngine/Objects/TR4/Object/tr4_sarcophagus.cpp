@@ -10,6 +10,8 @@
 #include "Game/health.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Input;
+
 static Vector3Int SarcophagusPosition(0, 0, -300);
 OBJECT_COLLISION_BOUNDS SarcophagusBounds =
 {

@@ -94,7 +94,7 @@ namespace TEN::Entities::TR4
 										2 * GetRandomControl(),
 										laraItem->RoomNumber);
 
-									LaraItem->HitPoints -= 100;
+									DoDamage(laraItem, 100);
 								}
 							}
 						}

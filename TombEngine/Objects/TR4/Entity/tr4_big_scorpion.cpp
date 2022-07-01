@@ -296,18 +296,17 @@ namespace TEN::Entities::TR4
 				if (creature->Flags)
 					break;
 
-				if (creature->Enemy &&
-					creature->Enemy != LaraItem &&
+				if (creature->Enemy && !creature->Enemy->IsLara() &&
 					AI.distance < pow(1365, 2))
 				{
-					creature->Enemy->HitPoints -= BIG_SCORPION_TROOP_ATTACK_DAMAGE;
+					DoDamage(creature->Enemy, BIG_SCORPION_TROOP_ATTACK_DAMAGE);
+
 					if (creature->Enemy->HitPoints <= 0)
 					{
 						item->Animation.TargetState = BSCORPION_STATE_KILL;
 						creature->MaxTurn = 0;
 					}
 
-					creature->Enemy->HitStatus = true;
 					creature->Flags = 1;
 
 					CreatureEffect2(
@@ -319,8 +318,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (item->TestBits(JointBitType::Touch, BigScorpionAttackJoints))
 				{
-					LaraItem->HitPoints -= BIG_SCORPION_ATTACK_DAMAGE;
-					LaraItem->HitStatus = true;
+					DoDamage(creature->Enemy, BIG_SCORPION_ATTACK_DAMAGE);
 
 					if (item->Animation.ActiveState == BSCORPION_STATE_STINGER_ATTACK)
 					{

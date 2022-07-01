@@ -166,21 +166,17 @@ namespace TEN::Entities::TR3
 		if (!(creature->Flags) && item->TestBits(JointBitType::Touch, ShivaAttackRightJoints))
 		{
 			CreatureEffect(item, &ShivaBiteRight, DoBloodSplat);
+			DoDamage(creature->Enemy, damage);
 			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 			creature->Flags = 1;
-
-			LaraItem->HitPoints -= damage;
-			LaraItem->HitStatus = true;
 		}
 
 		if (!(creature->Flags) && item->TestBits(JointBitType::Touch, ShivaAttackLeftJoints))
 		{
 			CreatureEffect(item, &ShivaBiteLeft, DoBloodSplat);
+			DoDamage(creature->Enemy, damage);
 			SoundEffect(SFX_TR2_CRUNCH2, &item->Pose);
 			creature->Flags = 1;
-
-			LaraItem->HitPoints -= damage;
-			LaraItem->HitStatus = true;
 		}
 	}
 

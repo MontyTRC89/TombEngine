@@ -50,11 +50,6 @@ void ClearSpiders()
 	}
 }
 
-void ClearSpidersPatch(ItemInfo* item)
-{
-	ClearSpiders();
-}
-
 void InitialiseSpiders(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
@@ -151,9 +146,8 @@ void UpdateSpiders()
 
 				if (abs(dPos.x) < 85 && abs(dPos.y) < 85 && abs(dPos.z) < 85)
 				{
-					LaraItem->HitPoints -= 3;
-					LaraItem->HitStatus = true;
-					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Pose.Orientation.GetY(), 1);
+					DoDamage(LaraItem, 3);
+					TriggerBlood(spider->Pose.Position.x, spider->Pose.Position.y, spider->Pose.Position.z, spider->Pose.Orientation.y, 1);
 				}
 
 				if (spider->Flags)

@@ -18,7 +18,9 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Objects/Generic/puzzles_keys.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Object/tr5_pushableblock.h"
 
 using std::function;
@@ -60,7 +62,7 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	SetFog,						//28
 	VoidEffect,					//29
 	LaraLocation,				//30
-	ClearSpidersPatch,			//31
+	ClearSwarmEnemies,			//31
 	AddLeftFootprint,			//32
 	AddRightFootprint,			//33
 	VoidEffect,					//34
@@ -77,6 +79,13 @@ function<EffectFunction> effect_routines[NUM_FLIPEFFECTS] =
 	LaraLocationPad,			//45
 	KillActiveBaddys			//46
 };
+
+void ClearSwarmEnemies(ItemInfo* item)
+{
+	ClearSpiders();
+	ClearRats();
+	ClearBeetleSwarm();
+}
 
 void FlashOrange(ItemInfo* item) 
 {

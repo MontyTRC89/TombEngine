@@ -12,6 +12,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 
+using namespace TEN::Input;
+
 int SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;

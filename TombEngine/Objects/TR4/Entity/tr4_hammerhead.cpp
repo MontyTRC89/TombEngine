@@ -122,11 +122,9 @@ namespace TEN::Entities::TR4
 					{
 						if (item->TestBits(JointBitType::Touch, HammerheadBiteAttackJoints))
 						{
+							DoDamage(creature->Enemy, HAMMERHEAD_BITE_ATTACK_DAMAGE);
 							CreatureEffect(item, &HammerheadBite, DoBloodSplat);
 							creature->Flags = 1;
-
-							LaraItem->HitPoints -= HAMMERHEAD_BITE_ATTACK_DAMAGE;
-							LaraItem->HitStatus = true;
 						}
 					}
 

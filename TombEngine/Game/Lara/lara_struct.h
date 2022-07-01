@@ -1152,7 +1152,7 @@ struct LaraCountData
 {
 	unsigned int Pose;
 	unsigned int PositionAdjust;
-	unsigned int RunJump;
+	unsigned int Run;
 	unsigned int Death;
 	unsigned int NoCheat;
 };
@@ -1274,7 +1274,6 @@ struct LaraInfo
 	int HitFrame;
 	int HitDirection;
 	FX_INFO* SpasmEffect;	// Not saved.
-	unsigned int SpasmEffectCount;
 
 	short InteractedItem;
 	int ProjectedFloorHeight;
