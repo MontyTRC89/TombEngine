@@ -310,10 +310,9 @@ namespace TEN::Entities::Vehicles
 		DoObjectCollision(vehicleItem, &coll);
 	}
 
-	// TODO: Extend to take a weight argument.
 	// Motorbike and jeep had the values in their dynamics functions tweaked to make them feel heavier.
 	// Using this unified function, they leap off hills as easily as the older vehicles for now. @Sezz 2022.06.30
-	int DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos)
+	int DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult)
 	{
 		// Grounded.
 		if (height > *yPos)
@@ -325,7 +324,7 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += GRAVITY;
+				verticalVelocity += (int)(GRAVITY * weightMult);
 		}
 		// Airborne.
 		else
@@ -344,48 +343,7 @@ namespace TEN::Entities::Vehicles
 	}
 
 	// Temp. for reference. Flag parameter was unused. @Sezz 2022.06.30
-	int DoMotorBikeDynamics(int height, int verticalVelocity, int* y, int flags)
-	{
-		int kick;
-
-		if (height <= *y)
-		{
-			if (flags)
-				return verticalVelocity;
-			else
-			{
-				kick = (height - *y);
-				if (kick < -80)
-					kick = -80;
-
-				verticalVelocity += (kick - verticalVelocity) / 16;
-
-				if (*y > height)
-					*y = height;
-			}
-		}
-		else
-		{
-			*y += verticalVelocity;
-			if (*y > (height - 32))
-			{
-				*y = height;
-				verticalVelocity = 0;
-			}
-			else
-			{
-				if (flags)
-					verticalVelocity += flags;
-				else
-					verticalVelocity += GRAVITY;
-			}
-		}
-
-		return verticalVelocity;
-	}
-
-	// Temp. for reference. Flag parameter was unused. @Sezz 2022.06.30
-	// TODO: Adapt damage application.
+	// TODO: Adapt damage application for jeep.
 	int DoJeepDynamics(ItemInfo* laraItem, int height, int verticalVelocity, int* yPos, int flags)
 	{
 		if (height <= *yPos)
