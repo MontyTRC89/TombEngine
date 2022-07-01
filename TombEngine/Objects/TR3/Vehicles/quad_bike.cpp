@@ -41,7 +41,7 @@ namespace TEN::Entities::Vehicles
 	constexpr int QBIKE_REVERSE_VELOCITY_MAX  = -48 * VEHICLE_VELOCITY_SCALE;
 	constexpr int QBIKE_REV_VELOCITY_MAX	  = 160 * VEHICLE_VELOCITY_SCALE;
 	constexpr int QBIKE_VELOCITY_MAX		  = 160 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_VERTICAL_VELOCITY_MAX = 240;
+	constexpr int QBIKE_DEATH_VERTICAL_VELOCITY_MIN = 240;
 
 	constexpr auto QBIKE_MOUNT_DISTANCE = CLICK(2);
 	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
@@ -621,7 +621,7 @@ namespace TEN::Entities::Vehicles
 			case QBIKE_STATE_FALL:
 				if (quadBikeItem->Pose.Position.y == quadBikeItem->Floor)
 					laraItem->Animation.TargetState = QBIKE_STATE_LAND;
-				else if (quadBikeItem->Animation.VerticalVelocity > QBIKE_VERTICAL_VELOCITY_MAX)
+				else if (quadBikeItem->Animation.VerticalVelocity > QBIKE_DEATH_VERTICAL_VELOCITY_MIN)
 					quadBike->Flags |= QBIKE_FLAG_FALLING;
 
 				break;
