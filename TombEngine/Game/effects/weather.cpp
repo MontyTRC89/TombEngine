@@ -16,19 +16,43 @@ using namespace TEN::Math::Random;
 
 namespace TEN::Effects::Environment 
 {
+	constexpr auto WEATHER_PARTICLES_SPAWN_DENSITY = 32;
+	constexpr auto WEATHER_PARTICLES_MAX_COUNT = 2048;
+	constexpr auto WEATHER_PARTICLES_MAX_COLL_CHECK_DELAY = 5.0f;
+
+	constexpr auto MAX_DUST_SIZE = 25.0f;
+	constexpr auto MAX_SNOW_SIZE = 32.0f;
+	constexpr auto MAX_RAIN_SIZE = 128.0f;
+
+	constexpr auto WEATHER_PARTICLE_HORIZONTAL_SPEED = 8.0f;
+	constexpr auto SNOW_SPEED = 128.0f;
+	constexpr auto RAIN_SPEED = 256.0f;
+
+	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 20.0f;
+	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_MELT_FACTOR = 1.0f - (1.0f / (WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE * 2));
+
+	constexpr auto DUST_SPAWN_DENSITY = 512;
+	constexpr auto DUST_LIFE = 40;
+	constexpr auto DUST_MAX_SPEED = 1.0f;
+	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
+
+	constexpr auto SKY_POSITION_LIMIT = 9728;
+
 	EnvironmentController Weather;
 
 	float WeatherParticle::Transparency() const
 	{
 		float result = WEATHER_PARTICLES_TRANSPARENCY;
+		float fade   = WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
 
-		if (Life <= WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
-			result *= Life / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
+		if (Life <= fade)
+			result *= Life / fade;
 
-		if ((StartLife - Life) < (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE)
-			result *= (StartLife - Life) / (float)WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE;
+		if ((StartLife - Life) < fade)
+			result *= (StartLife - Life) / fade;
 
-		if (Type == WeatherType::Rain)
+		if (Type != WeatherType::Snow)
 			result *= 0.45f;
 
 		return result;
@@ -49,6 +73,7 @@ namespace TEN::Effects::Environment
 		UpdateFlash(level);
 		UpdateWeather(level);
 		SpawnWeatherParticles(level);
+		SpawnDustParticles(level);
 	}
 
 	void EnvironmentController::Clear()
@@ -242,6 +267,11 @@ namespace TEN::Effects::Environment
 			p.Position.y += ((int)p.Velocity.y & (~7)) >> 1;
 			p.Position.z += p.Velocity.z;
 
+			// Particle is inert, don't check collisions.
+
+			if (p.Type == WeatherType::None)
+				continue;
+
 			CollisionResult coll;
 			bool collisionCalculated = false;
 
@@ -365,6 +395,47 @@ namespace TEN::Effects::Environment
 
 				break;
 			}
+		}
+	}
+
+	void EnvironmentController::SpawnDustParticles(ScriptInterfaceLevel* level)
+	{
+		for (int i = 0; i < DUST_SPAWN_DENSITY; i++)
+		{
+			int xPos = Camera.pos.x + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+			int yPos = Camera.pos.y + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+			int zPos = Camera.pos.z + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+
+			// Use fast GetFloor instead of GetCollision as we spawn a lot of dust.
+			short roomNumber = Camera.pos.roomNumber;
+			auto* floor = GetFloor(xPos, yPos, zPos, &roomNumber);
+
+			// Check if water room.
+			if (!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber))
+				continue;
+
+			if (!IsPointInRoom(PHD_3DPOS(xPos, yPos, zPos), roomNumber))
+				continue;
+
+			auto part = WeatherParticle();
+
+			part.Velocity.x = GenerateFloat(-DUST_MAX_SPEED, DUST_MAX_SPEED);
+			part.Velocity.y = GenerateFloat(-DUST_MAX_SPEED, DUST_MAX_SPEED);
+			part.Velocity.z = GenerateFloat(-DUST_MAX_SPEED, DUST_MAX_SPEED);
+
+			part.Size = GenerateFloat(MAX_DUST_SIZE / 2, MAX_DUST_SIZE);
+
+			part.Type = WeatherType::None;
+			part.Life = DUST_LIFE + GenerateInt(-10, 10);
+			part.Room = roomNumber;
+			part.Position.x = xPos;
+			part.Position.y = yPos;
+			part.Position.z = zPos;
+			part.Stopped = false;
+			part.Enabled = true;
+			part.StartLife = part.Life;
+
+			Particles.push_back(part);
 		}
 	}
 

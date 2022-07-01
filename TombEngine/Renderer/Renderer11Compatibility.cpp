@@ -344,9 +344,6 @@ namespace TEN::Renderer
 			}
 		);
 
-		m_numHairVertices = 0;
-		m_numHairIndices = 0;
-
 		bool skinPresent = false;
 		bool hairsPresent = false;
 

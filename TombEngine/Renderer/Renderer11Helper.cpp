@@ -34,25 +34,6 @@ namespace TEN::Renderer
 	using std::pair;
 	using std::vector;
 
-	bool Renderer11::IsRoomUnderwater(short roomNumber)
-	{
-		return (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER);
-	}
-
-	bool Renderer11::IsInRoom(int x, int y, int z, short roomNumber)
-	{
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
-
-		return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
-				y >= r->maxceiling && y <= r->minfloor &&
-				z >= r->z && z <= r->z + r->zSize * 1024.0f);
-	}
-
-	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::GetAdapters()
-{
-		return &m_adapters;
-	}
-
 	void Renderer11::UpdateEffects(RenderView& view)
 	{
 		for (auto room : view.roomsToDraw)
@@ -93,7 +74,6 @@ namespace TEN::Renderer
 				Vector3 p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
 
 				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
-				//FromTrAngle(&rotation, frmptr[0], bone->Index);
 				
 				if (frac)
 				{
@@ -101,7 +81,6 @@ namespace TEN::Renderer
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
 					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
-					//FromTrAngle(&rotation2, frmptr[1], bone->Index);
 
 					Quaternion q1, q2, q3;
 
@@ -308,7 +287,7 @@ namespace TEN::Renderer
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::UpdateItemsAnimations(RenderView& view)
+	void Renderer11::UpdateItemAnimations(RenderView& view)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -325,49 +304,6 @@ namespace TEN::Renderer
 
 				UpdateItemAnimations(itemToDraw->ItemNumber, false);
 			}
-		}
-	}
-
-	void Renderer11::FromTrAngle(Matrix *matrix, short *frameptr, int index)
-	{
-		short *ptr = &frameptr[0];
-
-		ptr += 9;
-		for (int i = 0; i < index; i++)
-			ptr += ((*ptr & 0xc000) == 0 ? 2 : 1);
-
-		int rot0 = *ptr++;
-		int frameMode = (rot0 & 0xc000);
-
-		int rot1;
-		int rotX;
-		int rotY;
-		int rotZ;
-
-		switch (frameMode)
-		{
-		case 0:
-			rot1 = *ptr++;
-			rotX = ((rot0 & 0x3ff0) >> 4);
-			rotY = (((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff);
-			rotZ = ((rot1)&0x3ff);
-
-			*matrix = Matrix::CreateFromYawPitchRoll(rotY * (360.0f / 1024.0f) * RADIAN,
-													 rotX * (360.0f / 1024.0f) * RADIAN,
-													 rotZ * (360.0f / 1024.0f) * RADIAN);
-			break;
-
-		case 0x4000:
-			*matrix = Matrix::CreateRotationX((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
-			break;
-
-		case 0x8000:
-			*matrix = Matrix::CreateRotationY((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
-			break;
-
-		case 0xc000:
-			*matrix = Matrix::CreateRotationZ((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
-			break;
 		}
 	}
 
@@ -394,8 +330,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer11::IsFullsScreen() {
-		return (!Windowed);
+	bool Renderer11::IsFullsScreen() 
+	{
+		return (!m_windowed);
 	}
 
 	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov)
