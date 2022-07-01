@@ -42,101 +42,179 @@ namespace TEN::Renderer
 	using namespace TEN::Renderer;
 	using namespace std::chrono;
 
+	void Renderer11::RenderBlobShadows(RenderView& renderView)
+	{
+		const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
+		const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
+
+		std::vector<Sphere> nearestSpheres;
+
+		// Collect Shadow Spheres
+		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
+		for (auto i = 0; i < sphereMeshes.size(); i++) 
+		{
+			auto& newSphere = nearestSpheres.emplace_back();
+			MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
+			Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
+
+			if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT) 
+			{
+				// Push feet spheres a little bit down
+				pos.y += 8;
+			}
+			GetLaraJointPosition(&pos, sphereMeshes[i]);
+			newSphere.position = Vector3(pos.x, pos.y, pos.z);
+			newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
+		}
+
+		for (auto& r : renderView.roomsToDraw) 
+		{
+
+			for (auto& i : r->ItemsToDraw) 
+			{
+				auto& nativeItem = g_Level.Items[i->ItemNumber];
+
+				//Skip everything thats not "alive" or is not a vehicle
+
+				if (!Objects[nativeItem.ObjectNumber].castsShadow)
+					continue;
+
+				auto bb = GetBoundsAccurate(&nativeItem);
+				Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) + 
+								 Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
+				center.y = nativeItem.Pose.Position.y;
+				float maxExtent = std::max(bb->X2 - bb->X1, bb->Z2 - bb->Z1);
+				auto& newSphere = nearestSpheres.emplace_back();
+				newSphere.position = center;
+				newSphere.radius = maxExtent;
+			}
+		}
+
+		if (nearestSpheres.size() > g_Configuration.ShadowMaxBlobs) 
+		{
+			std::sort(nearestSpheres.begin(), nearestSpheres.end(), [](const Sphere& a, const Sphere& b) 
+			{
+				auto& laraPos = LaraItem->Pose.Position;
+				auto laraPosition = Vector3(laraPos.x, laraPos.y, laraPos.z);
+				return Vector3::Distance(laraPosition, a.position) < Vector3::Distance(laraPosition, b.position);
+			});
+
+			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowMaxBlobs, m_stShadowMap.Spheres);
+			m_stShadowMap.NumSpheres = g_Configuration.ShadowMaxBlobs;
+
+		}
+		else 
+		{
+			std::copy(nearestSpheres.begin(), nearestSpheres.end(), m_stShadowMap.Spheres);
+			m_stShadowMap.NumSpheres = nearestSpheres.size();
+		}
+	}
+
+	void Renderer11::ClearShadowMap(RenderView& renderView)
+	{
+		for (int step = 0; step < m_shadowMap.RenderTargetView.size(); step++)
+		{
+			m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView[step].Get(), Colors::White);
+			m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView[step].Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			1.0f, 0);
+		}
+	}
+
 	void Renderer11::RenderShadowMap(RenderView& renderView)
 	{
+		if (g_Configuration.ShadowMode == SHADOW_NONE)
+			return;
+		
 		if (shadowLight == nullptr)
+			return;
+
+		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
 			return;
 
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
 		SetCullMode(CULL_MODE_CCW);
 
-		// Bind and clear render target
-		m_context->ClearRenderTargetView(m_shadowMap.RenderTargetView.Get(), Colors::White);
-		m_context->ClearDepthStencilView(m_shadowMap.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-			1.0f, 0);
-		m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView.GetAddressOf(),
-			m_shadowMap.DepthStencilView.Get());
-
-		m_context->RSSetViewports(1, &m_shadowMapViewport);
-		ResetScissor();
-
-		//DrawLara(false, true);
-
-		Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
-		Vector3 itemPos = Vector3(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
-		if (lightPos == itemPos)
-			return;
-
-		UINT stride = sizeof(RendererVertex);
-		UINT offset = 0;
-
-		// Set shaders
-		m_context->VSSetShader(m_vsShadowMap.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psShadowMap.Get(), nullptr, 0);
-
-		m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		m_context->IASetInputLayout(m_inputLayout.Get());
-		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		// Set texture
-		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
-			SAMPLER_ANISOTROPIC_CLAMP);
-		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
-
-		// Set camera matrices
-		Matrix view = Matrix::CreateLookAt(lightPos,
-			itemPos,
-			Vector3(0.0f, -1.0f, 0.0f));
-		Matrix projection = Matrix::CreatePerspectiveFieldOfView(90.0f * RADIAN, 1.0f, 64.0f,
-			(shadowLight->Type == LIGHT_TYPE_POINT
-				? shadowLight->Out
-				: shadowLight->Range) * 1.2f);
-		CCameraMatrixBuffer shadowProjection;
-		shadowProjection.ViewProjection = view * projection;
-		m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
-		m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
-
-		m_stShadowMap.LightViewProjection = (view * projection);
-
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
-
-		RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-		RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
-
-		m_stItem.World = m_LaraWorldMatrix;
-		m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
-		m_stItem.AmbientLight = room.AmbientLight;
-		memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
-
-		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+		int steps = shadowLight->Type == LIGHT_TYPE_POINT ? 6 : 1;
+		for (int step = 0; step < steps; step++) 
 		{
-			RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
+			// Bind render target
+			m_context->OMSetRenderTargets(1, m_shadowMap.RenderTargetView[step].GetAddressOf(),
+				m_shadowMap.DepthStencilView[step].Get());
 
-			for (auto& bucket : mesh->buckets)
+			m_context->RSSetViewports(1, &m_shadowMapViewport);
+			ResetScissor();
+
+			//DrawLara(false, true);
+
+			Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
+			Vector3 itemPos = Vector3(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+			if (lightPos == itemPos)
+				return;
+
+			UINT stride = sizeof(RendererVertex);
+			UINT offset = 0;
+
+			// Set shaders
+			m_context->VSSetShader(m_vsShadowMap.Get(), nullptr, 0);
+			m_context->PSSetShader(m_psShadowMap.Get(), nullptr, 0);
+
+			m_context->IASetVertexBuffers(0, 1, m_moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			m_context->IASetInputLayout(m_inputLayout.Get());
+			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			// Set texture
+			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
+				SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
+
+			// Set camera matrices
+			Matrix view;
+			Matrix projection;
+			if (shadowLight->Type == LIGHT_TYPE_POINT) 
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
-					continue;
+				view = Matrix::CreateLookAt(lightPos, lightPos + 
+					RenderTargetCube::forwardVectors[step]*10240,
+					RenderTargetCube::upVectors[step]);
 
-				// Draw vertices
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f,
+					shadowLight->Out);
 
-				m_numMoveablesDrawCalls++;
 			}
-		}
-
-		if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
-		{
-			RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
-
-			for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
+			else if(shadowLight->Type == LIGHT_TYPE_SPOT) 
 			{
-				RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
+				view = Matrix::CreateLookAt(lightPos,
+					lightPos - shadowLight->Direction*10240,
+					Vector3(0.0f, -1.0f, 0.0f));
+
+				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Out, 1.0f, 16.0f,shadowLight->Range);
+			}
+
+			CCameraMatrixBuffer shadowProjection;
+			shadowProjection.ViewProjection = view * projection;
+			m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
+			m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
+
+			m_stShadowMap.LightViewProjections[step] = (view * projection);
+
+			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+
+			RendererObject& laraObj = *m_moveableObjects[ID_LARA];
+			RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
+			RendererRoom& room = m_rooms[LaraItem->RoomNumber];
+
+			m_stItem.World = m_LaraWorldMatrix;
+			m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
+			m_stItem.AmbientLight = room.AmbientLight;
+			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
+			m_cbItem.updateData(m_stItem, m_context.Get());
+			m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+			m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+
+			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+			{
+				RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
 
 				for (auto& bucket : mesh->buckets)
 				{
@@ -149,58 +227,80 @@ namespace TEN::Renderer
 					m_numMoveablesDrawCalls++;
 				}
 			}
-		}
 
-		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = laraSkin.ObjectMeshes[k];
-
-			for (auto& bucket : mesh->buckets)
+			if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
-					continue;
+				RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
-				// Draw vertices
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+				for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
+				{
+					RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
 
-				m_numMoveablesDrawCalls++;
+					for (auto& bucket : mesh->buckets)
+					{
+						if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+							continue;
+
+						// Draw vertices
+						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+						m_numMoveablesDrawCalls++;
+					}
+				}
 			}
-		}
 
-		// Draw items
-
-		RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
-
-		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
-		m_stItem.World = Matrix::Identity;
-		Matrix matrices[7];
-		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
-		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
-		{
-			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
-				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-			matrices[i + 1] = world;
-		}
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
-
-		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
-		{
-			RendererMesh* mesh = hairsObj.ObjectMeshes[k];
-
-			for (auto& bucket : mesh->buckets)
+			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
-				if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
-					continue;
+				RendererMesh* mesh = laraSkin.ObjectMeshes[k];
 
-				// Draw vertices
-				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+				for (auto& bucket : mesh->buckets)
+				{
+					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+						continue;
 
-				m_numMoveablesDrawCalls++;
+					// Draw vertices
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
+				}
 			}
+
+			// Draw items
+
+			RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
+
+			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+			m_stItem.World = Matrix::Identity;
+			Matrix matrices[7];
+			matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
+			{
+				HAIR_STRUCT* hairs = &Hairs[0][i];
+				Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+					Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+				matrices[i + 1] = world;
+			}
+			memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
+			m_cbItem.updateData(m_stItem, m_context.Get());
+			m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+			m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+
+			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
+			{
+				RendererMesh* mesh = hairsObj.ObjectMeshes[k];
+
+				for (auto& bucket : mesh->buckets)
+				{
+					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+						continue;
+
+					// Draw vertices
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					m_numMoveablesDrawCalls++;
+				}
+			}
+
 		}
 	}
 
@@ -1306,22 +1406,7 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
-		m_timeUpdate = 0;
-		m_timeDraw = 0;
-		m_timeFrame = 0;
-		m_numDrawCalls = 0;
-		m_numRoomsDrawCalls = 0;
-		m_numMoveablesDrawCalls = 0;
-		m_numStaticsDrawCalls = 0;
-		m_numSpritesDrawCalls = 0;
-		m_numTransparentDrawCalls = 0;
-		m_nextSprite = 0;
-		m_numRoomsTransparentDrawCalls = 0;
-		m_numMoveablesTransparentDrawCalls = 0;
-		m_numStaticsTransparentDrawCalls = 0;
-		m_numSpritesTransparentDrawCalls = 0;
-		m_biggestRoomIndexBuffer = 0;
-		m_numPolygons = 0;
+		ResetDebugVariables();
 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1339,10 +1424,12 @@ namespace TEN::Renderer
 
 		m_stAlphaTest.AlphaTest = -1;
 		m_stAlphaTest.AlphaThreshold = -1;
+		m_stShadowMap.NumSpheres = 0;
 
 		// Prepare the shadow map
-		if (g_Configuration.EnableShadows)
-			RenderShadowMap(view);
+		ClearShadowMap(view);
+		RenderShadowMap(view);
+		RenderBlobShadows(view);
 
 		// Setup Lara item
 		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
@@ -1556,12 +1643,6 @@ namespace TEN::Renderer
 					// We'll draw waterfalls later
 					continue;
 				}
-				else if (objectNumber >= ID_WRAITH1 && objectNumber <= ID_WRAITH3)
-				{
-					// Wraiths have some additional special effects
-					DrawAnimatingItem(itemToDraw, view, transparent);
-					DrawWraithExtra(itemToDraw, view);
-				}
 				else if (objectNumber == ID_DARTS)
 				{
 					//TODO: for now legacy way, in the future mesh
@@ -1703,46 +1784,6 @@ namespace TEN::Renderer
 			nativeItem->Pose.Position.z + speed * phd_cos(TO_RAD(nativeItem->Pose.Orientation.y)));
 
 		AddLine3D(start, end, Vector4(30 / 255.0f, 30 / 255.0f, 30 / 255.0f, 0.5f));
-	}
-
-	void Renderer11::DrawWraithExtra(RendererItem* item, RenderView& view)
-	{
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-		WraithInfo* info = (WraithInfo*)nativeItem->Data;
-
-		for (int j = 0; j <= 4; j++)
-		{
-			Matrix rotation;
-
-			switch (j)
-			{
-			case 0:
-				rotation = Matrix::CreateRotationY(TO_RAD(-1092));
-				break;
-			case 1:
-				rotation = Matrix::CreateRotationY(TO_RAD(1092));
-				break;
-			case 2:
-				rotation = Matrix::CreateRotationZ(TO_RAD(-1092));
-				break;
-			case 3:
-				rotation = Matrix::CreateRotationZ(TO_RAD(1092));
-				break;
-			default:
-				rotation = Matrix::Identity;
-				break;
-			}
-
-			Matrix world = rotation * item->World;
-
-			for (int i = 0; i < 7; i++)
-			{
-				Vector3 p1 = Vector3(info[i].Position.x, info[i].Position.y, info[i].Position.z);
-				Vector3 p2 = Vector3(info[i + 1].Position.x, info[i + 1].Position.y, info[i + 1].Position.z);
-
-				AddLine3D(p1, p2, Vector4(info[i].r / 255.0f, info[i].g / 255.0f, info[i].b / 255.0f, 1.0f));
-			}
-		}
 	}
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
@@ -1894,16 +1935,17 @@ namespace TEN::Renderer
 		{
 			m_stShadowMap.CastShadows = false;
 		}
-		m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
-		BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
-		BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 
 		numRoomsTransparentPolygons = 0;
-
 		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
 			RendererRoom* room = view.roomsToDraw[index];
+			m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
+
+			BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
+			BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
+
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
@@ -2012,8 +2054,16 @@ namespace TEN::Renderer
 
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
+								m_stAnimated.Fps = set.Fps;
+
 								for (unsigned char j = 0; j < set.NumTextures; j++)
 								{
+									if (j >= m_stAnimated.Textures.size())
+									{
+										TENLog("Animated frame " + std::to_string(j) + " is out of bounds, too many frames in sequence.");
+										break;
+									}
+
 									auto& tex = set.Textures[j];
 									m_stAnimated.Textures[j].topLeft = set.Textures[j].UV[0];
 									m_stAnimated.Textures[j].topRight = set.Textures[j].UV[1];
