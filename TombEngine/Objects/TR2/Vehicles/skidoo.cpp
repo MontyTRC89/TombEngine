@@ -127,24 +127,6 @@ namespace TEN::Entities::Vehicles
 		skidoo->MomentumAngle = skidooItem->Pose.Orientation.y;
 	}
 
-	void SkidooPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-	{
-		auto* skidooItem = &g_Level.Items[itemNumber];
-		auto* lara = GetLaraInfo(laraItem);
-
-		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
-			return;
-
-		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE);
-		if (mountType == VehicleMountType::None)
-			ObjectCollision(itemNumber, laraItem, coll);
-		else
-		{
-			lara->Vehicle = itemNumber;
-			DoSkidooMount(skidooItem, laraItem, mountType);
-		}
-	}
-
 	bool SkidooControl(ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -296,6 +278,148 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return DoSkidooDismount(skidooItem, laraItem);
+	}
+
+	VehicleImpactDirection SkidooDynamics(ItemInfo* skidooItem, ItemInfo* laraItem)
+	{
+		auto* skidoo = GetSkidooInfo(skidooItem);
+
+		// Get point/room collision at vehicle corners.
+		auto prevPointFrontLeft = GetVehicleCollision(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true);
+		auto prevPointFrontRight = GetVehicleCollision(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true);
+		auto prevPointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, true);
+		auto prevPointBackRight = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, true);
+
+		auto prevPos = skidooItem->Pose.Position;
+
+		// Apply rotations and determine angle of momentum.
+		if (skidooItem->Pose.Position.y > (skidooItem->Floor - CLICK(1)))
+		{
+			if (skidoo->TurnRate < -SKIDOO_TURN_RATE_DECEL)
+				skidoo->TurnRate += SKIDOO_TURN_RATE_DECEL;
+			else if (skidoo->TurnRate > SKIDOO_TURN_RATE_DECEL)
+				skidoo->TurnRate -= SKIDOO_TURN_RATE_DECEL;
+			else
+				skidoo->TurnRate = 0;
+			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
+
+			short rotation = skidooItem->Pose.Orientation.y - skidoo->MomentumAngle;
+			if (rotation < -SKIDOO_MOMENTUM_TURN_RATE_ACCEL)
+			{
+				if (rotation < -SKIDOO_MOMENTUM_TURN_RATE_MAX)
+				{
+					rotation = -SKIDOO_MOMENTUM_TURN_RATE_MAX;
+					skidoo->MomentumAngle = skidooItem->Pose.Orientation.y - rotation;
+				}
+				else
+					skidoo->MomentumAngle -= SKIDOO_MOMENTUM_TURN_RATE_ACCEL;
+			}
+			else if (rotation > SKIDOO_MOMENTUM_TURN_RATE_ACCEL)
+			{
+				if (rotation > SKIDOO_MOMENTUM_TURN_RATE_MAX)
+				{
+					rotation = SKIDOO_MOMENTUM_TURN_RATE_MAX;
+					skidoo->MomentumAngle = skidooItem->Pose.Orientation.y - rotation;
+				}
+				else
+					skidoo->MomentumAngle += SKIDOO_MOMENTUM_TURN_RATE_ACCEL;
+			}
+			else
+				skidoo->MomentumAngle = skidooItem->Pose.Orientation.y;
+		}
+		else
+			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
+
+		// Translate vehicle according to momentum angle.
+		TranslateItem(skidooItem, skidoo->MomentumAngle, skidooItem->Animation.Velocity);
+
+		// Apply slip. TODO: Determine what "slip" is exactly.
+		int slip = SKIDOO_SLIP * phd_sin(skidooItem->Pose.Orientation.x);
+		if (abs(slip) > (SKIDOO_SLIP / 2))
+		{
+			skidooItem->Pose.Position.x -= slip * phd_sin(skidooItem->Pose.Orientation.y);
+			skidooItem->Pose.Position.z -= slip * phd_cos(skidooItem->Pose.Orientation.y);
+		}
+
+		slip = SKIDOO_SLIP_SIDE * phd_sin(skidooItem->Pose.Orientation.z);
+		if (abs(slip) > (SKIDOO_SLIP_SIDE / 2))
+		{
+			skidooItem->Pose.Position.x += slip * phd_cos(skidooItem->Pose.Orientation.y);
+			skidooItem->Pose.Position.z -= slip * phd_sin(skidooItem->Pose.Orientation.y);
+		}
+
+		// Store old 2D position to determine movement delta later.
+		auto moved = Vector3Int(skidooItem->Pose.Position.x, 0, skidooItem->Pose.Position.z);
+
+		// Process entity collision.
+		if (!(skidooItem->Flags & IFLAG_INVISIBLE))
+			DoVehicleCollision(skidooItem, SKIDOO_RADIUS);
+
+		// Apply shifts.
+		short extraRot = 0;
+		auto pointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, false);
+		if (pointBackLeft.Floor < (prevPointBackLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointBackLeft.Ceiling - pointBackLeft.Floor) <= SKIDOO_HEIGHT ||
+			pointBackLeft.Ceiling >(prevPointBackLeft.Position.y - SKIDOO_HEIGHT))
+		{
+			extraRot = DoVehicleShift(skidooItem, pointBackLeft.Position, prevPointBackLeft.Position);
+		}
+
+		auto pointBackRight = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, false);
+		if (pointBackRight.Floor < (prevPointBackRight.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointBackRight.Ceiling - pointBackRight.Floor) <= SKIDOO_HEIGHT ||
+			pointBackRight.Ceiling >(prevPointBackRight.Position.y - SKIDOO_HEIGHT))
+		{
+			extraRot += DoVehicleShift(skidooItem, pointBackRight.Position, prevPointBackRight.Position);
+		}
+
+		auto pointFrontLeft = GetVehicleCollision(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, false);
+		if (pointFrontLeft.Floor < (prevPointFrontLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointFrontLeft.Ceiling - pointFrontLeft.Floor) <= SKIDOO_HEIGHT ||
+			pointFrontLeft.Ceiling >(prevPointFrontLeft.Position.y - SKIDOO_HEIGHT))
+		{
+			extraRot += DoVehicleShift(skidooItem, pointFrontLeft.Position, prevPointFrontLeft.Position);
+		}
+
+		auto pointFrontRight = GetVehicleCollision(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, false);
+		if (pointFrontRight.Floor < (prevPointFrontRight.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointFrontRight.Ceiling - pointFrontRight.Floor) <= SKIDOO_HEIGHT ||
+			pointFrontRight.Ceiling >(prevPointFrontRight.Position.y - SKIDOO_HEIGHT))
+		{
+			extraRot += DoVehicleShift(skidooItem, pointFrontRight.Position, prevPointFrontRight.Position);
+		}
+
+		auto probe = GetCollision(skidooItem);
+		if (probe.Position.Floor < (skidooItem->Pose.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(probe.Position.Ceiling - probe.Position.Floor) <= SKIDOO_HEIGHT ||
+			probe.Position.Ceiling >(skidooItem->Pose.Position.y - SKIDOO_HEIGHT))
+		{
+			DoVehicleShift(skidooItem, skidooItem->Pose.Position, prevPos);
+		}
+
+		skidoo->ExtraRotation = extraRot;
+
+		// Determine whether wall impact occurred and affect vehicle accordingly.
+		auto impactDirection = GetVehicleImpactDirection(skidooItem, moved);
+		if (impactDirection != VehicleImpactDirection::None)
+		{
+			int newVelocity = (skidooItem->Pose.Position.z - prevPos.z) * phd_cos(skidoo->MomentumAngle) + (skidooItem->Pose.Position.x - prevPos.x) * phd_sin(skidoo->MomentumAngle);
+			if (skidooItem->Animation.Velocity > (SKIDOO_NORMAL_VELOCITY_MAX + SKIDOO_VELOCITY_ACCEL) &&
+				newVelocity < (skidooItem->Animation.Velocity - 10))
+			{
+				DoDamage(laraItem, (skidooItem->Animation.Velocity - newVelocity) / 2);
+			}
+
+			if (skidooItem->Animation.Velocity > 0 && newVelocity < skidooItem->Animation.Velocity)
+				skidooItem->Animation.Velocity = (newVelocity < 0) ? 0 : newVelocity;
+			else if (skidooItem->Animation.Velocity < 0 && newVelocity > skidooItem->Animation.Velocity)
+				skidooItem->Animation.Velocity = (newVelocity > 0) ? 0 : newVelocity;
+
+			if (skidooItem->Animation.Velocity < SKIDOO_REVERSE_VELOCITY_MAX)
+				skidooItem->Animation.Velocity = SKIDOO_REVERSE_VELOCITY_MAX;
+		}
+
+		return impactDirection;
 	}
 
 	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch)
@@ -503,6 +627,24 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
+	void SkidooPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	{
+		auto* skidooItem = &g_Level.Items[itemNumber];
+		auto* lara = GetLaraInfo(laraItem);
+
+		if (laraItem->HitPoints < 0 || lara->Vehicle != NO_ITEM)
+			return;
+
+		auto mountType = GetVehicleMountType(skidooItem, laraItem, coll, SkidooMountTypes, SKIDOO_MOUNT_DISTANCE);
+		if (mountType == VehicleMountType::None)
+			ObjectCollision(itemNumber, laraItem, coll);
+		else
+		{
+			lara->Vehicle = itemNumber;
+			DoSkidooMount(skidooItem, laraItem, mountType);
+		}
+	}
+
 	void DoSkidooMount(ItemInfo* skidooItem, ItemInfo* laraItem, VehicleMountType mountType)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -649,148 +791,6 @@ namespace TEN::Entities::Vehicles
 			SoundEffect(SFX_TR2_VEHICLE_IMPACT1, &skidooItem->Pose);
 		else
 			SoundEffect(SFX_TR2_VEHICLE_IMPACT2, &skidooItem->Pose);
-	}
-
-	VehicleImpactDirection SkidooDynamics(ItemInfo* skidooItem, ItemInfo* laraItem)
-	{
-		auto* skidoo = GetSkidooInfo(skidooItem);
-
-		// Get point/room collision at vehicle corners.
-		auto prevPointFrontLeft = GetVehicleCollision(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, true);
-		auto prevPointFrontRight = GetVehicleCollision(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, true);
-		auto prevPointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, true);
-		auto prevPointBackRight = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, true);
-
-		auto prevPos = skidooItem->Pose.Position;
-
-		// Apply rotations and determine angle of momentum.
-		if (skidooItem->Pose.Position.y > (skidooItem->Floor - CLICK(1)))
-		{
-			if (skidoo->TurnRate < -SKIDOO_TURN_RATE_DECEL)
-				skidoo->TurnRate += SKIDOO_TURN_RATE_DECEL;
-			else if (skidoo->TurnRate > SKIDOO_TURN_RATE_DECEL)
-				skidoo->TurnRate -= SKIDOO_TURN_RATE_DECEL;
-			else
-				skidoo->TurnRate = 0;
-			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
-
-			short rotation = skidooItem->Pose.Orientation.y - skidoo->MomentumAngle;
-			if (rotation < -SKIDOO_MOMENTUM_TURN_RATE_ACCEL)
-			{
-				if (rotation < -SKIDOO_MOMENTUM_TURN_RATE_MAX)
-				{
-					rotation = -SKIDOO_MOMENTUM_TURN_RATE_MAX;
-					skidoo->MomentumAngle = skidooItem->Pose.Orientation.y - rotation;
-				}
-				else
-					skidoo->MomentumAngle -= SKIDOO_MOMENTUM_TURN_RATE_ACCEL;
-			}
-			else if (rotation > SKIDOO_MOMENTUM_TURN_RATE_ACCEL)
-			{
-				if (rotation > SKIDOO_MOMENTUM_TURN_RATE_MAX)
-				{
-					rotation = SKIDOO_MOMENTUM_TURN_RATE_MAX;
-					skidoo->MomentumAngle = skidooItem->Pose.Orientation.y - rotation;
-				}
-				else
-					skidoo->MomentumAngle += SKIDOO_MOMENTUM_TURN_RATE_ACCEL;
-			}
-			else
-				skidoo->MomentumAngle = skidooItem->Pose.Orientation.y;
-		}
-		else
-			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
-
-		// Translate vehicle according to momentum angle.
-		TranslateItem(skidooItem, skidoo->MomentumAngle, skidooItem->Animation.Velocity);
-
-		// Apply slip. TODO: Determine what "slip" is exactly.
-		int slip = SKIDOO_SLIP * phd_sin(skidooItem->Pose.Orientation.x);
-		if (abs(slip) > (SKIDOO_SLIP / 2))
-		{
-			skidooItem->Pose.Position.x -= slip * phd_sin(skidooItem->Pose.Orientation.y);
-			skidooItem->Pose.Position.z -= slip * phd_cos(skidooItem->Pose.Orientation.y);
-		}
-
-		slip = SKIDOO_SLIP_SIDE * phd_sin(skidooItem->Pose.Orientation.z);
-		if (abs(slip) > (SKIDOO_SLIP_SIDE / 2))
-		{
-			skidooItem->Pose.Position.x += slip * phd_cos(skidooItem->Pose.Orientation.y);
-			skidooItem->Pose.Position.z -= slip * phd_sin(skidooItem->Pose.Orientation.y);
-		}
-
-		// Store old 2D position to determine movement delta later.
-		auto moved = Vector3Int(skidooItem->Pose.Position.x, 0, skidooItem->Pose.Position.z);
-
-		// Process entity collision.
-		if (!(skidooItem->Flags & IFLAG_INVISIBLE))
-			DoVehicleCollision(skidooItem, SKIDOO_RADIUS);
-
-		// Apply shifts.
-		short extraRot = 0;
-		auto pointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, false);
-		if (pointBackLeft.Floor < (prevPointBackLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointBackLeft.Ceiling - pointBackLeft.Floor) <= SKIDOO_HEIGHT ||
-			pointBackLeft.Ceiling > (prevPointBackLeft.Position.y - SKIDOO_HEIGHT))
-		{
-			extraRot = DoVehicleShift(skidooItem, pointBackLeft.Position, prevPointBackLeft.Position);
-		}
-
-		auto pointBackRight = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, false);
-		if (pointBackRight.Floor < (prevPointBackRight.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointBackRight.Ceiling - pointBackRight.Floor) <= SKIDOO_HEIGHT ||
-			pointBackRight.Ceiling > (prevPointBackRight.Position.y - SKIDOO_HEIGHT))
-		{
-			extraRot += DoVehicleShift(skidooItem, pointBackRight.Position, prevPointBackRight.Position);
-		}
-
-		auto pointFrontLeft = GetVehicleCollision(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, false);
-		if (pointFrontLeft.Floor < (prevPointFrontLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointFrontLeft.Ceiling - pointFrontLeft.Floor) <= SKIDOO_HEIGHT ||
-			pointFrontLeft.Ceiling > (prevPointFrontLeft.Position.y - SKIDOO_HEIGHT))
-		{
-			extraRot += DoVehicleShift(skidooItem, pointFrontLeft.Position, prevPointFrontLeft.Position);
-		}
-
-		auto pointFrontRight = GetVehicleCollision(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, false);
-		if (pointFrontRight.Floor < (prevPointFrontRight.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointFrontRight.Ceiling - pointFrontRight.Floor) <= SKIDOO_HEIGHT ||
-			pointFrontRight.Ceiling > (prevPointFrontRight.Position.y - SKIDOO_HEIGHT))
-		{
-			extraRot += DoVehicleShift(skidooItem, pointFrontRight.Position, prevPointFrontRight.Position);
-		}
-
-		auto probe = GetCollision(skidooItem);
-		if (probe.Position.Floor < (skidooItem->Pose.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(probe.Position.Ceiling - probe.Position.Floor) <= SKIDOO_HEIGHT ||
-			probe.Position.Ceiling > (skidooItem->Pose.Position.y - SKIDOO_HEIGHT))
-		{
-			DoVehicleShift(skidooItem, skidooItem->Pose.Position, prevPos);
-		}
-
-		skidoo->ExtraRotation = extraRot;
-
-		// Determine whether wall impact occurred and affect vehicle accordingly.
-		auto impactDirection = GetVehicleImpactDirection(skidooItem, moved);
-		if (impactDirection != VehicleImpactDirection::None)
-		{
-			int newVelocity = (skidooItem->Pose.Position.z - prevPos.z) * phd_cos(skidoo->MomentumAngle) + (skidooItem->Pose.Position.x - prevPos.x) * phd_sin(skidoo->MomentumAngle);
-			if (skidooItem->Animation.Velocity > (SKIDOO_NORMAL_VELOCITY_MAX + SKIDOO_VELOCITY_ACCEL) &&
-				newVelocity < (skidooItem->Animation.Velocity - 10))
-			{
-				DoDamage(laraItem, (skidooItem->Animation.Velocity - newVelocity) / 2);
-			}
-
-			if (skidooItem->Animation.Velocity > 0 && newVelocity < skidooItem->Animation.Velocity)
-				skidooItem->Animation.Velocity = (newVelocity < 0) ? 0 : newVelocity;
-			else if (skidooItem->Animation.Velocity < 0 && newVelocity > skidooItem->Animation.Velocity)
-				skidooItem->Animation.Velocity = (newVelocity > 0) ? 0 : newVelocity;
-
-			if (skidooItem->Animation.Velocity < SKIDOO_REVERSE_VELOCITY_MAX)
-				skidooItem->Animation.Velocity = SKIDOO_REVERSE_VELOCITY_MAX;
-		}
-
-		return impactDirection;
 	}
 
 	void HandleSkidooGuns(ItemInfo* skidooItem, ItemInfo* laraItem)
