@@ -462,7 +462,7 @@ void InitialiseItem(short itemNumber)
 
 	item->Active = false;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->HitStatus = false;
 	item->Collidable = true;
 	item->LookedAt = false;

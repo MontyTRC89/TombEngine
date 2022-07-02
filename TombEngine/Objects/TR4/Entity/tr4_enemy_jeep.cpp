@@ -369,11 +369,11 @@ namespace TEN::Entities::TR4
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
 			if (item->Pose.Position.y < item->Floor)
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 			else
 			{
 				item->Pose.Position.y = item->Floor;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.VerticalVelocity = 0;
 			}
 

@@ -239,7 +239,7 @@ namespace TEN::Entities::TR4
                 laraItem->Animation.ActiveState != LS_IDLE ||
                 laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
                 !laraInfo->Torch.IsLit ||
-                laraItem->Animation.Airborne)
+                laraItem->Animation.IsAirborne)
             {
                 if (laraItem->Animation.AnimNumber != LA_TORCH_LIGHT_3 ||
                     g_Level.Anims[LA_TORCH_LIGHT_3].frameBase + 16 ||
