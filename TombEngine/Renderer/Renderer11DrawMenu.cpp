@@ -543,6 +543,7 @@ namespace TEN::Renderer
 
 		// Set matrices
 		CCameraMatrixBuffer HudCamera;
+		HudCamera.CamDirectionWS = -Vector4::UnitZ;
 		HudCamera.ViewProjection = view * projection;
 		m_cbCameraMatrices.updateData(HudCamera, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
