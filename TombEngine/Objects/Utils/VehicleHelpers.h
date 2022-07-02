@@ -63,10 +63,10 @@ namespace TEN::Entities::Vehicles
 	struct VehicleCollisionPointInfo
 	{
 		Vector3Int Position;
-		int FloorHeight;
+		int Floor;
+		int Ceiling;
 	};
 
-	// Deprecated.
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);

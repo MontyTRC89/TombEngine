@@ -284,12 +284,12 @@ namespace TEN::Entities::Vehicles
 		auto probe = GetCollision(point.x, point.y - CLICK(2), point.z, vehicleItem->RoomNumber);
 
 		if (point.y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
-			return VehicleCollisionPointInfo{ point, NO_HEIGHT };
+			return VehicleCollisionPointInfo{ point, NO_HEIGHT, NO_HEIGHT};
 
 		if (point.y > probe.Position.Floor && clamp)
 			point.y = probe.Position.Floor;
 
-		return VehicleCollisionPointInfo{ point, probe.Position.Floor };
+		return VehicleCollisionPointInfo{ point, probe.Position.Floor, probe.Position.Ceiling };
 	}
 	
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)

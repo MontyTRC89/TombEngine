@@ -21,6 +21,7 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
+	constexpr auto SKIDOO_HEIGHT	= LARA_HEIGHT;
 	constexpr auto SKIDOO_RADIUS	= 500;
 	constexpr auto SKIDOO_FRONT		= 550;
 	constexpr auto SKIDOO_SIDE		= 260;
@@ -38,7 +39,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SKIDOO_TURN_VELOCITY_MAX    = 15;
 	constexpr auto SKIDOO_REVERSE_VELOCITY_MAX = 30;
 	
-	constexpr auto SKIDOO_STEP_HEIGHT_MAX	= CLICK(1); // Unused.
+	constexpr auto SKIDOO_STEP_HEIGHT		= CLICK(1);
 	constexpr auto SKIDOO_BOUNCE_MIN		= (SKIDOO_NORMAL_VELOCITY_MAX / 2) / 256;
 	constexpr auto SKIDOO_KICK_MAX			= -80;
 	constexpr auto SKIDOO_MOUNT_DISTANCE	= CLICK(2);
@@ -728,24 +729,44 @@ namespace TEN::Entities::Vehicles
 		// Apply shifts.
 		short extraRot = 0;
 		auto pointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, false);
-		if (pointBackLeft.FloorHeight < (prevPointBackLeft.Position.y - CLICK(1)))
+		if (pointBackLeft.Floor < (prevPointBackLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointBackLeft.Ceiling - pointBackLeft.Floor) <= SKIDOO_HEIGHT ||
+			pointBackLeft.Ceiling > (prevPointBackLeft.Position.y - SKIDOO_HEIGHT))
+		{
 			extraRot = DoVehicleShift(skidooItem, pointBackLeft.Position, prevPointBackLeft.Position);
+		}
 
 		auto pointBackRight = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, false);
-		if (pointBackRight.FloorHeight < (prevPointBackRight.Position.y - CLICK(1)))
+		if (pointBackRight.Floor < (prevPointBackRight.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointBackRight.Ceiling - pointBackRight.Floor) <= SKIDOO_HEIGHT ||
+			pointBackRight.Ceiling > (prevPointBackRight.Position.y - SKIDOO_HEIGHT))
+		{
 			extraRot += DoVehicleShift(skidooItem, pointBackRight.Position, prevPointBackRight.Position);
+		}
 
 		auto pointFrontLeft = GetVehicleCollision(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, false);
-		if (pointFrontLeft.FloorHeight < (prevPointFrontLeft.Position.y - CLICK(1)))
+		if (pointFrontLeft.Floor < (prevPointFrontLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointFrontLeft.Ceiling - pointFrontLeft.Floor) <= SKIDOO_HEIGHT ||
+			pointFrontLeft.Ceiling > (prevPointFrontLeft.Position.y - SKIDOO_HEIGHT))
+		{
 			extraRot += DoVehicleShift(skidooItem, pointFrontLeft.Position, prevPointFrontLeft.Position);
+		}
 
 		auto pointFrontRight = GetVehicleCollision(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, false);
-		if (pointFrontRight.FloorHeight < (prevPointFrontRight.Position.y - CLICK(1)))
+		if (pointFrontRight.Floor < (prevPointFrontRight.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(pointFrontRight.Ceiling - pointFrontRight.Floor) <= SKIDOO_HEIGHT ||
+			pointFrontRight.Ceiling > (prevPointFrontRight.Position.y - SKIDOO_HEIGHT))
+		{
 			extraRot += DoVehicleShift(skidooItem, pointFrontRight.Position, prevPointFrontRight.Position);
+		}
 
 		auto probe = GetCollision(skidooItem);
-		if (probe.Position.Floor < (skidooItem->Pose.Position.y - CLICK(1)))
+		if (probe.Position.Floor < (skidooItem->Pose.Position.y - SKIDOO_STEP_HEIGHT) ||
+			abs(probe.Position.Ceiling - probe.Position.Floor) <= SKIDOO_HEIGHT ||
+			probe.Position.Ceiling > (skidooItem->Pose.Position.y - SKIDOO_HEIGHT))
+		{
 			DoVehicleShift(skidooItem, skidooItem->Pose.Position, prevPos);
+		}
 
 		skidoo->ExtraRotation = extraRot;
 

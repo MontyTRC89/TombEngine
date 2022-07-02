@@ -757,12 +757,12 @@ namespace TEN::Entities::Vehicles
 		else
 			TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, minecartItem->Animation.Velocity);
 
-		minecart->FloorHeightMiddle = GetVehicleCollision(minecartItem, 0, 0, true).FloorHeight;
+		minecart->FloorHeightMiddle = GetVehicleCollision(minecartItem, 0, 0, true).Floor;
 
 		if (!minecart->VerticalVelocity)
 		{
 			minecartItem->Pose.Position.y = minecart->FloorHeightMiddle;
-			minecart->FloorHeightFront = GetVehicleCollision(minecartItem, CLICK(1), 0, false).FloorHeight;
+			minecart->FloorHeightFront = GetVehicleCollision(minecartItem, CLICK(1), 0, false).Floor;
 			minecart->Gradient = minecart->FloorHeightMiddle - minecart->FloorHeightFront;
 		}
 		else
