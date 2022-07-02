@@ -5,7 +5,7 @@ struct VertexShaderInput {
 	float4 Color: COLOR0;
 	float3 Tangent: TANGENT0;
 	float3 Bitangent: BITANGENT0;
-	float3 Effects: EFFECTS;
+	float4 Effects: EFFECTS;
 	float Bone: BLENDINDICES;
 	uint PolyIndex : POLYINDEX;
 	uint Index: DRAWINDEX;

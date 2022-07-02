@@ -1,7 +1,7 @@
 #include "./CameraMatrixBuffer.hlsli"
 #include "./AlphaTestBuffer.hlsli"
 #include "./VertexInput.hlsli"
-
+#include "./ShaderLight.hlsli"
 cbuffer ItemBuffer : register(b1)
 {
 	float4x4 World;
@@ -17,6 +17,7 @@ struct PixelShaderInput
 	float3 WorldPosition : POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
+    float Sheen : SHEEN;
 };
 
 Texture2D Texture : register(t0);
@@ -31,7 +32,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = input.Color;
 	output.UV = input.UV;
 	output.WorldPosition = (mul(float4(input.Position, 1.0f), World));
-
+    output.Sheen = input.Effects.w;
 	return output;
 }
 
@@ -41,15 +42,18 @@ float4 PS(PixelShaderInput input) : SV_TARGET
 	float4 output = Texture.Sample(Sampler, input.UV);
 
 	DoAlphaTest(output);
-
-	float4 lightDirection = float4(-1.0f, 0.707f, -1.0f, 1.0f);
-	float4 lightColor = float4(1.0f, 1.0f, 0.5f, 1.0f);
-	float lightIntensity = 0.6f;
-	float d = max(dot(-lightDirection, input.Normal), 0.0f);
-	float4 light = AmbientLight + d * lightColor * lightIntensity;
-
-	output.xyz *= light.xyz;
-	output.w = 1.0f;
+    ShaderLight l[2];
+    l[0].Color = float3(1.0f, 1.0f, 0.5f) * 0.6f;
+    l[0].Type = LT_SUN;
+    l[0].Direction = normalize(float3(-1.0f, -0.707f, -0.5f));
+    l[1].Color = float3(0.5f, 0.5f, 1.0f) * 0.2f;
+    l[1].Type = LT_SUN;
+    l[1].Direction = normalize(float3(1.0f, 0.707f, -0.5f));
+    for (int i = 0; i < 2; i++)
+    {
+        output.xyz += DoDirectionalLight(input.WorldPosition, input.Normal, l[i]);
+        output.xyz += DoSpecularSun(input.Normal, l[i], input.Sheen);
+    }
 
 	return output;
 }
