@@ -206,7 +206,7 @@ void ControlTeleporter(short itemNumber)
 		if (LaraItem->RoomNumber != roomNumber)
 			ItemNewRoom(Lara.ItemNumber, roomNumber);
 
-		if (item->Flags & ONESHOT)
+		if (item->Flags & IFLAG_INVISIBLE)
 		{
 			KillItem(itemNumber);
 		}

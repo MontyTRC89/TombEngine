@@ -38,11 +38,11 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 			int collidedBits = TestCollision(item, laraItem);
 			if (collidedBits)
 			{
-				short oldRot = item->Pose.Orientation.y;
+				short oldYOrient = item->Pose.Orientation.y;
 
 				item->Pose.Orientation.y = 0;
 				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-				item->Pose.Orientation.y = oldRot;
+				item->Pose.Orientation.y = oldYOrient;
 
 				int deadlyBits = *((int*)&item->ItemFlags[0]);
 				auto* sphere = &CreatureSpheres[0];
@@ -821,7 +821,8 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 	if (coll->CollisionType == CT_NONE)
 	{
 		coll->Setup.OldPosition = item->Pose.Position;
-		UpdateItemRoom(item, -10);
+		if (item->IsLara())
+			UpdateItemRoom(item, -10);
 	}
 	else
 	{
@@ -830,10 +831,11 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
-	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
+	if (item->IsLara() && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
 	{
-		Lara.Control.IsMoving = false;
-		Lara.Control.HandStatus = HandStatus::Free;
+		auto* lara = GetLaraInfo(item);
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
 	}
 
 	return true;
@@ -1670,64 +1672,6 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	collResult = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
 	if (collResult.RoomNumber != item->RoomNumber)
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
-}
-
-void DoVehicleCollision(ItemInfo* vehicle, int radius)
-{
-	CollisionInfo coll = {};
-	coll.Setup.Radius = radius * 0.8f; // HACK: Most vehicles use radius larger than needed.
-	coll.Setup.UpperCeilingBound = MAX_HEIGHT; // HACK: this needs to be set to prevent GCI result interference.
-	coll.Setup.OldPosition = vehicle->Pose.Position;
-	coll.Setup.EnableObjectPush = true;
-
-	DoObjectCollision(vehicle, &coll);
-}
-
-int DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocity, int radius, short* angle)
-{
-	if (TestEnvironment(ENV_FLAG_WATER, vehicle) ||
-		TestEnvironment(ENV_FLAG_SWAMP, vehicle))
-	{
-		auto waterDepth  = (float)GetWaterDepth(vehicle);
-		auto waterHeight = vehicle->Pose.Position.y - GetWaterHeight(vehicle);
-
-		// HACK: Sometimes quadbike test position may end up under non-portal ceiling block.
-		// GetWaterDepth returns DEEP_WATER constant in that case, which is too large for our needs.
-		if (waterDepth == DEEP_WATER)
-			waterDepth = VEHICLE_MAX_WATER_HEIGHT;
-
-		if (waterDepth <= VEHICLE_MAX_WATER_HEIGHT)
-		{
-			bool isWater = TestEnvironment(ENV_FLAG_WATER, vehicle);
-
-			if (currentVelocity != 0)
-			{
-				auto coeff = isWater ? VEHICLE_WATER_VEL_COEFFICIENT : VEHICLE_SWAMP_VEL_COEFFICIENT;
-				currentVelocity -= std::copysign(currentVelocity * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff), currentVelocity);
-
-				if (TEN::Math::Random::GenerateInt(0, 32) > 28)
-					SoundEffect(SFX_TR4_LARA_WADE, &PHD_3DPOS(vehicle->Pose.Position), SoundEnvironment::Land, isWater ? 0.8f : 0.7f);
-
-				if (isWater)
-					TEN::Effects::TriggerSpeedboatFoam(vehicle, Vector3(0, -waterDepth / 2.0f, -radius));
-			}
-
-			if (*angle != 0)
-			{
-				auto coeff = isWater ? VEHICLE_WATER_TURN_COEFFICIENT : VEHICLE_SWAMP_TURN_COEFFICIENT;
-				*angle -= *angle * ((waterDepth / VEHICLE_MAX_WATER_HEIGHT) / coeff);
-			}
-		}
-		else
-		{
-			if (waterDepth > VEHICLE_MAX_WATER_HEIGHT && waterHeight > VEHICLE_MAX_WATER_HEIGHT)
-				ExplodeVehicle(lara, vehicle);
-			else if (TEN::Math::Random::GenerateInt(0, 32) > 25)
-				Splash(vehicle);
-		}
-	}
-
-	return currentVelocity;
 }
 
 void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)

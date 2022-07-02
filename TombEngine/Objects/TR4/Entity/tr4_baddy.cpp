@@ -437,31 +437,31 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case BADDY_STATE_DEATH:
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 				currentCreature->LOT.IsMonkeying = false;
 
 				if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
 					item->Animation.VerticalVelocity = 0;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 				}
 
 				break;
 
 			case BADDY_STATE_MONKEY_TO_FREEFALL:
 				item->Animation.TargetState = BADDY_STATE_FREEFALL;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				break;
 
 			case BADDY_STATE_FREEFALL:
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 
 				if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
 					item->Animation.VerticalVelocity = 0;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 					item->Animation.TargetState = BADDY_STATE_FREEFALL_LAND_DEATH;
 				}
 
@@ -1034,7 +1034,7 @@ namespace TEN::Entities::TR4
 					if (item->TouchBits)
 					{
 						SetAnimation(LaraItem, LA_JUMP_UP);
-						LaraItem->Animation.Airborne = true;
+						LaraItem->Animation.IsAirborne = true;
 						LaraItem->Animation.VerticalVelocity = 2;
 						LaraItem->Animation.VerticalVelocity = 1;
 						LaraItem->Pose.Position.y += CLICK(0.75f);
