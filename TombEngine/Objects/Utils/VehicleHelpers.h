@@ -60,7 +60,7 @@ namespace TEN::Entities::Vehicles
 
 	// Collision struct specific to vehicles. Used to ascertain point/room collision parameters
 	// at wheels and around the base perimeter. Essentially, a pseudo-raycast. May revise later.
-	struct VehicleCollisionPointInfo
+	struct VehiclePointCollision
 	{
 		Vector3Int Position;
 		int Floor;
@@ -73,7 +73,7 @@ namespace TEN::Entities::Vehicles
 	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, vector<VehicleDismountType> allowedDismountTypes, float distance, bool onLand = true);
 	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short angle, float distance, bool onLand);
 	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int prevPos);
-	VehicleCollisionPointInfo GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp);
+	VehiclePointCollision GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp);
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 
 	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
@@ -85,6 +85,7 @@ namespace TEN::Entities::Vehicles
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
 	void  ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);
 	void  ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = false);
+	void  ApplyTurnRateFriction(short* turnRate, short decelRate);
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 }

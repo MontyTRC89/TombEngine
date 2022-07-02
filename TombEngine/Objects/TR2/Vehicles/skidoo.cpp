@@ -201,9 +201,9 @@ namespace TEN::Entities::Vehicles
 		}
 		skidooItem->Floor = height;
 
-		skidoo->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, (int*)&frontLeft.y);
-		skidoo->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, skidoo->RightVerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, (int*)&frontRight.y);
-		skidooItem->Animation.VerticalVelocity = DoVehicleDynamics(height, skidooItem->Animation.VerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, (int*)&skidooItem->Pose.Position.y);
+		skidoo->LeftVerticalVelocity = DoVehicleDynamics(heightFrontLeft, skidoo->LeftVerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, &frontLeft.y);
+		skidoo->RightVerticalVelocity = DoVehicleDynamics(heightFrontRight, skidoo->RightVerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, &frontRight.y);
+		skidooItem->Animation.VerticalVelocity = DoVehicleDynamics(height, skidooItem->Animation.VerticalVelocity, SKIDOO_BOUNCE_MIN, SKIDOO_KICK_MAX, &skidooItem->Pose.Position.y);
 		skidooItem->Animation.Velocity = DoVehicleWaterMovement(skidooItem, laraItem, skidooItem->Animation.Velocity, SKIDOO_RADIUS, &skidoo->TurnRate);
 
 		height = (frontLeft.y + frontRight.y) / 2;
@@ -293,7 +293,7 @@ namespace TEN::Entities::Vehicles
 		auto prevPos = skidooItem->Pose.Position;
 
 		// Apply rotations and determine angle of momentum.
-		if (skidooItem->Pose.Position.y > (skidooItem->Floor - CLICK(1)))
+		if (skidooItem->Pose.Position.y > (skidooItem->Floor - SKIDOO_STEP_HEIGHT))
 		{
 			if (skidoo->TurnRate < -SKIDOO_TURN_RATE_DECEL)
 				skidoo->TurnRate += SKIDOO_TURN_RATE_DECEL;
@@ -359,40 +359,35 @@ namespace TEN::Entities::Vehicles
 		short extraRot = 0;
 		auto pointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, false);
 		if (pointBackLeft.Floor < (prevPointBackLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointBackLeft.Ceiling - pointBackLeft.Floor) <= SKIDOO_HEIGHT ||
-			pointBackLeft.Ceiling >(prevPointBackLeft.Position.y - SKIDOO_HEIGHT))
+			abs(pointBackLeft.Ceiling - pointBackLeft.Floor) <= SKIDOO_HEIGHT)
 		{
-			extraRot = DoVehicleShift(skidooItem, pointBackLeft.Position, prevPointBackLeft.Position);
+			extraRot += DoVehicleShift(skidooItem, pointBackLeft.Position, prevPointBackLeft.Position);
 		}
 
 		auto pointBackRight = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, false);
 		if (pointBackRight.Floor < (prevPointBackRight.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointBackRight.Ceiling - pointBackRight.Floor) <= SKIDOO_HEIGHT ||
-			pointBackRight.Ceiling >(prevPointBackRight.Position.y - SKIDOO_HEIGHT))
+			abs(pointBackRight.Ceiling - pointBackRight.Floor) <= SKIDOO_HEIGHT)
 		{
 			extraRot += DoVehicleShift(skidooItem, pointBackRight.Position, prevPointBackRight.Position);
 		}
 
 		auto pointFrontLeft = GetVehicleCollision(skidooItem, SKIDOO_FRONT, -SKIDOO_SIDE, false);
 		if (pointFrontLeft.Floor < (prevPointFrontLeft.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointFrontLeft.Ceiling - pointFrontLeft.Floor) <= SKIDOO_HEIGHT ||
-			pointFrontLeft.Ceiling >(prevPointFrontLeft.Position.y - SKIDOO_HEIGHT))
+			abs(pointFrontLeft.Ceiling - pointFrontLeft.Floor) <= SKIDOO_HEIGHT)
 		{
 			extraRot += DoVehicleShift(skidooItem, pointFrontLeft.Position, prevPointFrontLeft.Position);
 		}
 
 		auto pointFrontRight = GetVehicleCollision(skidooItem, SKIDOO_FRONT, SKIDOO_SIDE, false);
 		if (pointFrontRight.Floor < (prevPointFrontRight.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(pointFrontRight.Ceiling - pointFrontRight.Floor) <= SKIDOO_HEIGHT ||
-			pointFrontRight.Ceiling >(prevPointFrontRight.Position.y - SKIDOO_HEIGHT))
+			abs(pointFrontRight.Ceiling - pointFrontRight.Floor) <= SKIDOO_HEIGHT)
 		{
 			extraRot += DoVehicleShift(skidooItem, pointFrontRight.Position, prevPointFrontRight.Position);
 		}
 
 		auto probe = GetCollision(skidooItem);
 		if (probe.Position.Floor < (skidooItem->Pose.Position.y - SKIDOO_STEP_HEIGHT) ||
-			abs(probe.Position.Ceiling - probe.Position.Floor) <= SKIDOO_HEIGHT ||
-			probe.Position.Ceiling >(skidooItem->Pose.Position.y - SKIDOO_HEIGHT))
+			abs(probe.Position.Ceiling - probe.Position.Floor) <= SKIDOO_HEIGHT)
 		{
 			DoVehicleShift(skidooItem, skidooItem->Pose.Position, prevPos);
 		}

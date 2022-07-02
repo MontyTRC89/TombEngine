@@ -267,7 +267,7 @@ namespace TEN::Entities::Vehicles
 		return VehicleImpactDirection::None;
 	}
 
-	VehicleCollisionPointInfo GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp)
+	VehiclePointCollision GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp)
 	{
 		float sinX = phd_sin(vehicleItem->Pose.Orientation.x);
 		float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
@@ -284,12 +284,12 @@ namespace TEN::Entities::Vehicles
 		auto probe = GetCollision(point.x, point.y - CLICK(2), point.z, vehicleItem->RoomNumber);
 
 		if (point.y < probe.Position.Ceiling || probe.Position.Ceiling == NO_HEIGHT)
-			return VehicleCollisionPointInfo{ point, NO_HEIGHT, NO_HEIGHT};
+			return VehiclePointCollision{ point, NO_HEIGHT, NO_HEIGHT};
 
 		if (point.y > probe.Position.Floor && clamp)
 			point.y = probe.Position.Floor;
 
-		return VehicleCollisionPointInfo{ point, probe.Position.Floor, probe.Position.Ceiling };
+		return VehiclePointCollision{ point, probe.Position.Floor, probe.Position.Ceiling };
 	}
 	
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
@@ -555,9 +555,14 @@ namespace TEN::Entities::Vehicles
 		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal], invert);
 	}
 
-	void ApplyTurnRateFriction()
+	void ApplyTurnRateFriction(short* turnRate, short decelRate)
 	{
-
+		if (abs(*turnRate) <= decelRate)
+			turnRate = 0;
+		else if (*turnRate < -decelRate)
+			*turnRate += decelRate;
+		else if (*turnRate > decelRate)
+			*turnRate -= decelRate;
 	}
 	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
