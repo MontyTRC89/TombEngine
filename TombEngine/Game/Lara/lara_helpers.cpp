@@ -19,7 +19,7 @@
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
-#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
@@ -346,6 +346,7 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 	return newTurnRate * sign;
 }
 
+// TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26
 void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
 {
 	auto* lara = GetLaraInfo(item);
@@ -358,7 +359,7 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 	auto* lara = GetLaraInfo(item);
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
-	if (item->Animation.Airborne)
+	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
 		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
@@ -627,7 +628,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, VaultTestResult vaultResu
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
-	//item->Airborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
+	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 
@@ -637,14 +638,14 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.VerticalVelocity = 0;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.VerticalVelocity = 0;
 }
 
@@ -662,7 +663,7 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
 	lara->Control.HandStatus = HandStatus::Free;
@@ -760,7 +761,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 		item->Animation.Velocity = 2;
 		item->Animation.VerticalVelocity = 1;
 		item->Pose.Position.y += CLICK(1);
@@ -865,14 +866,14 @@ void ResetLaraFlex(ItemInfo* item, float rate)
 		lara->ExtraTorsoRot.z = 0;
 }
 
-void RumbleLaraHealthCondition(ItemInfo* lara)
+void RumbleLaraHealthCondition(ItemInfo* item)
 {
-	auto* info = GetLaraInfo(lara);
+	auto* lara = GetLaraInfo(item);
 
-	if (lara->HitPoints > LARA_HEALTH_CRITICAL && !info->PoisonPotency)
+	if (item->HitPoints > LARA_HEALTH_CRITICAL && !lara->PoisonPotency)
 		return;
 
-	bool pulse = (GlobalCounter & 0x1F) % 0x1F == 0;
-	if (pulse)
+	bool doPulse = (GlobalCounter & 0x0F) % 0x0F == 1;
+	if (doPulse)
 		Rumble(0.2f, 0.1f);
 }

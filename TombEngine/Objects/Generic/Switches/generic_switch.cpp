@@ -31,7 +31,7 @@ namespace TEN::Entities::Switches
 
 		switchItem->Flags |= 0x3E00;
 
-		if (!TriggerActive(switchItem) && !(switchItem->Flags & ONESHOT))
+		if (!TriggerActive(switchItem) && !(switchItem->Flags & IFLAG_INVISIBLE))
 		{
 			if (switchItem->ObjectNumber == ID_JUMP_SWITCH)
 			{

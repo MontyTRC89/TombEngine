@@ -920,7 +920,7 @@ namespace TEN::Renderer
 				PrintDebugMessage("Lara WaterStatus: %d", Lara.Control.WaterStatus);
 				PrintDebugMessage("Lara IsMoving: %d", Lara.Control.IsMoving);
 				PrintDebugMessage("Lara HandStatus: %d", Lara.Control.HandStatus);
-				PrintDebugMessage("Lara Airborne: %d", LaraItem->Animation.Airborne);
+				PrintDebugMessage("Lara IsAirborne: %d", LaraItem->Animation.IsAirborne);
 				PrintDebugMessage("Lara CanClimbLadder: %d", Lara.Control.CanClimbLadder);
 				break;
 

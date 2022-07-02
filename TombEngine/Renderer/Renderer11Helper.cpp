@@ -10,7 +10,7 @@
 #include "Game/collision/sphere.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer\RenderView\RenderView.h"
-#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -18,7 +18,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include <algorithm>
 #include "Game/itemdata/creature_info.h"
-#include "Objects/TR3/Vehicles/quad_info.h"
+#include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
@@ -207,92 +207,116 @@ namespace TEN::Renderer
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
 				nativeItem->Data.apply(
-					[&j, &currentBone](QuadInfo& quad)
-				{
-					if (j == 3 || j == 4)
-						currentBone->ExtraRotation.x = TO_RAD(quad.RearRot);
-					else if (j == 6 || j == 7)
-						currentBone->ExtraRotation.x = TO_RAD(quad.FrontRot);
-				},
-				[&j, &currentBone](JeepInfo& jeep)
-				{
-					switch(j)
+					[&j, &currentBone](QuadBikeInfo& quadBike)
 					{
-					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
-						break;
-					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
-						break;
-					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
-						break;
-					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
-						break;
-					}
-				},
-				[&j, &currentBone](MotorbikeInfo& bike)
-				{
-					switch (j)
+						if (j == 3 || j == 4)
+							currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
+						else if (j == 6 || j == 7)
+						{
+							currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
+							currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
+						}
+					},
+					[&j, &currentBone](JeepInfo& jeep)
 					{
-					case 2:
-					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-						break;
-					case 8:
-						currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
-						break;
-					}
-				},
-				[&j, &currentBone, &oldRotation](MinecartInfo& cart)
-				{
-					switch (j)
-					{
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-						currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
-						break;
-					}
-				},
-				[&j, &currentBone](RubberBoatInfo& boat)
-				{
-				if (j == 2)
-					currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
-				},
-				[&j, &currentBone](UPVInfo& upv)
-				{
-				if (j == 3)
-					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
-				},
-				[&j, &currentBone](BigGunInfo& big_gun)
-				{
-				if (j == 2)
-					currentBone->ExtraRotation.z = big_gun.BarrelZRotation;
-				},
-				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
-				{
-				if (currentBone->ExtraRotationFlags & ROT_Y)
-				{
-					currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
-					lastJoint++;
-				}
+						switch(j)
+						{
+						case 9:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
+							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+							break;
 
-				if (currentBone->ExtraRotationFlags & ROT_X)
-				{
-					currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
-					lastJoint++;
-				}
+						case 10:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
+							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+							break;
 
-				if (currentBone->ExtraRotationFlags & ROT_Z)
-				{
-					currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
-					lastJoint++;
-				}
-				}
-				);
+						case 12:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
+							break;
+
+						case 13:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
+							break;
+						}
+					},
+					[&j, &currentBone](MotorbikeInfo& bike)
+					{
+						switch (j)
+						{
+						case 2:
+							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+							currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
+							break;
+
+						case 4:
+							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+							break;
+
+						case 8:
+							currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
+							break;
+						}
+					},
+					[&j, &currentBone, &oldRotation](MinecartInfo& cart)
+					{
+						switch (j)
+						{
+						case 1:
+						case 2:
+						case 3:
+						case 4:
+							currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
+							break;
+						}
+					},
+					[&j, &currentBone](RubberBoatInfo& boat)
+					{
+						if (j == 2)
+							currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
+					},
+					[&j, &currentBone](UPVInfo& upv)
+					{
+						switch (j)
+						{
+						case 1:
+							currentBone->ExtraRotation.x = TO_RAD(upv.LeftRudderRotation);
+							break;
+
+						case 2:
+							currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
+							break;
+
+						case 3:
+							currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
+							break;
+						}
+					},
+					[&j, &currentBone](BigGunInfo& big_gun)
+					{
+						if (j == 2)
+							currentBone->ExtraRotation.z = big_gun.BarrelRotation;
+					},
+					[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+					{
+						if (currentBone->ExtraRotationFlags & ROT_Y)
+						{
+							currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
+							lastJoint++;
+						}
+
+						if (currentBone->ExtraRotationFlags & ROT_X)
+						{
+							currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
+							lastJoint++;
+						}
+
+						if (currentBone->ExtraRotationFlags & ROT_Z)
+						{
+							currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
+							lastJoint++;
+						}
+					});
 			}
 
 			ANIM_FRAME* framePtr[2];

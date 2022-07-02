@@ -1,10 +1,15 @@
 #pragma once
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+#include "Objects/Utils/VehicleHelpers.h"
+
+struct CollisionInfo;
+struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
 	void InitialiseJeep(short itemNumber);
-	void JeepCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+
+	void JeepPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void DoJeepMount(ItemInfo* jeepItem, ItemInfo* laraItem, VehicleMountType mountType);
+
 	int JeepControl(ItemInfo* laraItem);
 }

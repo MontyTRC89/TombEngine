@@ -32,7 +32,7 @@ table Item {
 	triggered: bool;
 	active: bool;
 	status: int32;
-	airborne: bool;
+	is_airborne: bool;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;

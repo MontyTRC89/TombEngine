@@ -181,7 +181,7 @@ namespace TEN::Entities::Generic
 		if (TrInput & IN_ACTION &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
-			laraItem->Animation.Airborne &&
+			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.VerticalVelocity > 0&&
 			rope->active)
 		{
@@ -211,7 +211,7 @@ namespace TEN::Entities::Generic
 
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.VerticalVelocity = 0;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->Control.Rope.Ptr = ropeItem->TriggerFlags;
@@ -644,7 +644,7 @@ namespace TEN::Entities::Generic
 			}
 
 			item->Pose.Orientation.x = 0;
-			item->Animation.Airborne = true;
+			item->Animation.IsAirborne = true;
 
 			Lara.Control.HandStatus = HandStatus::Free;
 
@@ -671,7 +671,7 @@ namespace TEN::Entities::Generic
 		SetAnimation(item, stumble ? LA_JUMP_WALL_SMASH_START : LA_FALL_START);
 
 		item->Animation.VerticalVelocity = 0;
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 
 		auto* lara = GetLaraInfo(item);
 		lara->Control.HandStatus = HandStatus::Free;

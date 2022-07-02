@@ -262,7 +262,7 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	LaraItem->Animation.TargetState = laraKillState;
 
 	LaraItem->Pose = item->Pose;
-	LaraItem->Animation.Airborne = false;
+	LaraItem->Animation.IsAirborne = false;
 	LaraItem->Animation.Velocity = 0;
 	LaraItem->Animation.VerticalVelocity = 0;
 

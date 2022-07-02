@@ -219,7 +219,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			laraItem->Animation.AnimNumber = LA_SWINGBAR_GRAB;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 			laraItem->Animation.VerticalVelocity = false;
-			laraItem->Animation.Airborne = false;
+			laraItem->Animation.IsAirborne = false;
 
 			ResetLaraFlex(barItem);
 

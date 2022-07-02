@@ -11,12 +11,6 @@ constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
 
 constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30;
-constexpr auto VEHICLE_SINK_SPEED = 15;
-constexpr auto VEHICLE_MAX_WATER_HEIGHT = CLICK(2.5f);
-constexpr auto VEHICLE_WATER_VEL_COEFFICIENT = 16.0f;
-constexpr auto VEHICLE_WATER_TURN_COEFFICIENT = 10.0f;
-constexpr auto VEHICLE_SWAMP_VEL_COEFFICIENT = 8.0f;
-constexpr auto VEHICLE_SWAMP_TURN_COEFFICIENT = 6.0f;
 
 extern BOUNDING_BOX GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
@@ -62,5 +56,3 @@ void TrapCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 
 void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv, int zv);
 void DoObjectCollision(ItemInfo* item, CollisionInfo* coll);
-void DoVehicleCollision(ItemInfo* vehicle, int radius);
-int  DoVehicleWaterMovement(ItemInfo* vehicle, ItemInfo* lara, int currentVelocity, int radius, short* angle);
