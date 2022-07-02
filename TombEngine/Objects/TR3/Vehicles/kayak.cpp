@@ -18,10 +18,10 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
+	constexpr auto KAYAK_FRONT = SECTOR(1);
+	constexpr auto KAYAK_SIDE = CLICK(0.5f);
 	constexpr auto KAYAK_TO_ENTITY_RADIUS = CLICK(1);
 	constexpr auto KAYAK_COLLIDE = CLICK(0.25f);
-	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
-	constexpr auto KAYAK_DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
 
 	constexpr int KAYAK_VELOCITY_FORWARD_ACCEL = 24 * VEHICLE_VELOCITY_SCALE;
 	constexpr int KAYAK_VELOCITY_LR_ACCEL = 16 * VEHICLE_VELOCITY_SCALE;
@@ -29,6 +29,22 @@ namespace TEN::Entities::Vehicles
 	constexpr int KAYAK_VELOCITY_FRICTION_DECEL = 0.5f * VEHICLE_VELOCITY_SCALE;
 
 	constexpr int KAYAK_VELOCITY_MAX = 56 * VEHICLE_VELOCITY_SCALE;
+
+	constexpr auto KAYAK_BOUNCE_MIN = (KAYAK_VELOCITY_MAX / 2) / VEHICLE_VELOCITY_SCALE;
+	constexpr auto KAYAK_KICK_MAX = -80;
+	constexpr auto KAYAK_MOUNT_DISTANCE = CLICK(1.5f);
+	constexpr auto KAYAK_DISMOUNT_DISTANCE = CLICK(3); // TODO: Find accurate distance.
+
+	constexpr auto KAYAK_DRAW_SHIFT = 32;
+	constexpr auto NUM_WAKE_SPRITES = 32;
+	constexpr auto WAKE_SIZE = 32;
+	constexpr auto WAKE_VELOCITY = 4;
+	constexpr auto KAYAK_X = 128;
+	constexpr auto KAYAK_Z = 128;
+
+	#define KAYAK_MOUNT_LEFT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_RIGHT, 0)
+	#define KAYAK_IDLE_FRAME		GetFrameNumber(KAYAK_ANIM_IDLE, 0)
+	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
 
 	// TODO: Very confusing.
 	#define KAYAK_TURN_RATE_FRICTION_DECEL ANGLE(0.03f)
@@ -40,25 +56,6 @@ namespace TEN::Entities::Vehicles
 	#define KAYAK_TURN_RATE_MAX ANGLE(1.4f)
 	#define KAYAK_TURN_RATE_HOLD_ACCEL ANGLE(1.4f)
 	#define KAYAK_TURN_RATE_HOLD_MAX ANGLE(1.4f)
-
-	constexpr auto HIT_BACK = 1;
-	constexpr auto HIT_FRONT = 2;
-	constexpr auto HIT_LEFT = 3;
-	constexpr auto HIT_RIGHT = 4;
-
-	#define KAYAK_MOUNT_LEFT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_RIGHT, 0)
-	#define KAYAK_IDLE_FRAME		GetFrameNumber(KAYAK_ANIM_IDLE, 0)
-	#define KAYAK_MOUNT_RIGHT_FRAME	GetFrameNumber(KAYAK_ANIM_MOUNT_LEFT, 0)
-
-	constexpr auto KAYAK_DRAW_SHIFT = 32;
-	constexpr auto NUM_WAKE_SPRITES = 32;
-	constexpr auto WAKE_SIZE = 32;
-	constexpr auto WAKE_VELOCITY = 4;
-	constexpr auto KAYAK_X = 128;
-	constexpr auto KAYAK_Z = 128;
-
-	constexpr auto KAYAK_BOUNCE_MIN = (KAYAK_VELOCITY_MAX / 2) / VEHICLE_VELOCITY_SCALE;
-	constexpr auto KAYAK_KICK_MAX = -80;
 
 	// TODO: Kayak control is fairly unique. Keep this? @Sezz 2022.06.25
 	constexpr auto KAYAK_IN_FORWARD	   = IN_FORWARD;
@@ -100,9 +97,9 @@ namespace TEN::Entities::Vehicles
 		KAYAK_ANIM_PADDLE_FORWARD_END = 7,		// Unused.
 		KAYAK_ANIM_PADDLE_FORWARD = 8,			// Unused.
 		KAYAK_ANIM_PADDLE_FORWARD_START = 9,	// Unused.
-		KAYAK_ANIM_HIT_BACK = 10,
-		KAYAK_ANIM_HIT_FRONT = 11,
-		KAYAK_ANIM_HIT_RIGHT = 12,
+		KAYAK_ANIM_IMPACT_BACK = 10,
+		KAYAK_ANIM_IMPACT_FRONT = 11,
+		KAYAK_ANIM_IMPACT_RIGHT = 12,
 		KAYAK_ANIM_CAPSIZE_LEFT = 13,			// Unused.
 		KAYAK_ANIM_DISMOUNT_START = 14,
 		KAYAK_ANIM_PADDLE_LEFT = 15,
@@ -119,7 +116,7 @@ namespace TEN::Entities::Vehicles
 		KAYAK_ANIM_HOLD_PADDLE_LEFT = 26,
 		KAYAK_ANIM_HOLD_PADDLE_RIGHT = 27,
 		KAYAK_ANIM_MOUNT_LEFT = 28,
-		KAYAK_ANIM_HIT_LEFT = 29,
+		KAYAK_ANIM_IMPACT_LEFT = 29,
 		KAYAK_ANIM_CAPSIZE_RIGHT = 30,			// Unused.
 		KAYAK_ANIM_CAPSIZE_RECOVER_RIGHT = 31,	// Unused.
 		KAYAK_ANIM_DISMOUNT_RIGHT = 32
@@ -705,9 +702,9 @@ namespace TEN::Entities::Vehicles
 
 		Vector3Int oldPos[9];
 		int height[8];
-		height[0] = GetVehicleWaterHeight(kayakItem, 1024, 0, true, &oldPos[0]);
-		height[1] = GetVehicleWaterHeight(kayakItem, 512, -96, true, &oldPos[1]);
-		height[2] = GetVehicleWaterHeight(kayakItem, 512, 96, true, &oldPos[2]);
+		height[0] = GetVehicleWaterHeight(kayakItem, KAYAK_FRONT, 0, true, &oldPos[0]);
+		height[1] = GetVehicleWaterHeight(kayakItem, KAYAK_FRONT / 2, -96, true, &oldPos[1]);
+		height[2] = GetVehicleWaterHeight(kayakItem, KAYAK_FRONT / 2, 96, true, &oldPos[2]);
 		height[3] = GetVehicleWaterHeight(kayakItem, 128, -128, true, &oldPos[3]);
 		height[4] = GetVehicleWaterHeight(kayakItem, 128, 128, true, &oldPos[4]);
 		height[5] = GetVehicleWaterHeight(kayakItem, -320, -128, true, &oldPos[5]);
@@ -717,7 +714,7 @@ namespace TEN::Entities::Vehicles
 		oldPos[8] = kayakItem->Pose.Position;
 
 		Vector3Int frontPos, leftPos, rightPos;
-		int frontHeight = GetVehicleWaterHeight(kayakItem, 1024, 0, false, &frontPos);
+		int frontHeight = GetVehicleWaterHeight(kayakItem, KAYAK_FRONT, 0, false, &frontPos);
 		int leftHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, -KAYAK_X, false, &leftPos);
 		int rightHeight = GetVehicleWaterHeight(kayakItem, KAYAK_Z, KAYAK_X, false, &rightPos);
 
@@ -748,28 +745,28 @@ namespace TEN::Entities::Vehicles
 		Vector3Int pos;
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(2.5f), 0, false, &pos)) < (oldPos[7].y - KAYAK_COLLIDE))
-			rot = DoVehicleShift(kayakItem, &pos, &oldPos[7]);
+			rot = DoVehicleShift(kayakItem, pos, oldPos[7]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(1.25f), CLICK(0.5f), false, &pos)) < (oldPos[6].y - KAYAK_COLLIDE))
-			rot += DoVehicleShift(kayakItem, &pos, &oldPos[6]);
+			rot += DoVehicleShift(kayakItem, pos, oldPos[6]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, -CLICK(1.25f), -CLICK(0.5f), false, &pos)) < (oldPos[5].y - KAYAK_COLLIDE))
-			rot += DoVehicleShift(kayakItem, &pos, &oldPos[5]);
+			rot += DoVehicleShift(kayakItem, pos, oldPos[5]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(0.5f), CLICK(0.5f), false, &pos)) < (oldPos[4].y - KAYAK_COLLIDE))
-			rot += DoVehicleShift(kayakItem, &pos, &oldPos[4]);
+			rot += DoVehicleShift(kayakItem, pos, oldPos[4]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(0.5f), -CLICK(0.5f), false, &pos)) < (oldPos[3].y - KAYAK_COLLIDE))
-			rot += DoVehicleShift(kayakItem, &pos, &oldPos[3]);
+			rot += DoVehicleShift(kayakItem, pos, oldPos[3]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(2), 96, false, &pos)) < (oldPos[2].y - KAYAK_COLLIDE))
-			rot += DoVehicleShift(kayakItem, &pos, &oldPos[2]);
+			rot += DoVehicleShift(kayakItem, pos, oldPos[2]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(2), -96, false, &pos)) < (oldPos[1].y - KAYAK_COLLIDE))
-			rot += DoVehicleShift(kayakItem, &pos, &oldPos[1]);
+			rot += DoVehicleShift(kayakItem, pos, oldPos[1]);
 
 		if ((height2 = GetVehicleWaterHeight(kayakItem, CLICK(4), 0, false, &pos)) < (oldPos[0].y - KAYAK_COLLIDE))
-			rot += DoVehicleShift(kayakItem, &pos, &oldPos[0]);
+			rot += DoVehicleShift(kayakItem, pos, oldPos[0]);
 
 		kayakItem->Pose.Orientation.y += rot;
 
@@ -781,7 +778,7 @@ namespace TEN::Entities::Vehicles
 			height2 = probe.Position.Floor;
 
 		if (height2 < (kayakItem->Pose.Position.y - KAYAK_COLLIDE))
-			DoVehicleShift(kayakItem, (Vector3Int*)&kayakItem->Pose, &oldPos[8]);
+			DoVehicleShift(kayakItem, kayakItem->Pose.Position, oldPos[8]);
 
 		probe = GetCollision(kayakItem);
 		probedRoomNum = probe.RoomNumber;

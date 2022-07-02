@@ -809,29 +809,26 @@ namespace TEN::Entities::Vehicles
 		auto* quadBike = GetQuadBikeInfo(quadBikeItem);
 		auto* lara = GetLaraInfo(laraItem);
 
+		// Enable dismounts.
 		quadBike->NoDismount = false;
 
-		Vector3Int oldFrontLeft, oldFrontRight, oldBottomLeft, oldBottomRight;
-		int holdFrontLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, true, &oldFrontLeft);
-		int holdFrontRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, true, &oldFrontRight);
-		int holdBottomLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, true, &oldBottomLeft);
-		int holdBottomRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, true, &oldBottomRight);
+		// Get point/room collision at vehicle corners.
+		auto prevPointFrontLeft = GetVehicleCollision(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, true);
+		auto prevPointFrontRight = GetVehicleCollision(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, true);
+		auto prevPointBackLeft = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, true);
+		auto prevPointBackRight = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, true);
 
-		Vector3Int mtlOld, mtrOld, mmlOld, mmrOld;
-		int hmml_old = GetVehicleHeight(quadBikeItem, 0, -QBIKE_SIDE, true, &mmlOld);
-		int hmmr_old = GetVehicleHeight(quadBikeItem, 0, QBIKE_SIDE, true, &mmrOld);
-		int hmtl_old = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, true, &mtlOld);
-		int hmtr_old = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, true, &mtrOld);
+		// Get point/room collision defining base of vehicle chassis (substitute for rigid body).
+		auto prevPointLeft = GetVehicleCollision(quadBikeItem, 0, -QBIKE_SIDE, true);
+		auto prevPointRight = GetVehicleCollision(quadBikeItem, 0, QBIKE_SIDE, true);
+		auto prevPointCenterFrontLeft = GetVehicleCollision(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, true);
+		auto prevPointCenterFrontRight = GetVehicleCollision(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, true);
+		auto prevPointCenterBackLeft = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, true);
+		auto prevPointCenterBackRight = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, true);
 
-		Vector3Int moldBottomLeft, moldBottomRight;
-		int hmoldBottomLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, true, &moldBottomLeft);
-		int hmoldBottomRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, true, &moldBottomRight);
+		auto prevPos = quadBikeItem->Pose.Position;
 
-		Vector3Int old;
-		old.x = quadBikeItem->Pose.Position.x;
-		old.y = quadBikeItem->Pose.Position.y;
-		old.z = quadBikeItem->Pose.Position.z;
-
+		// Apply rotations and determine angle of momentum.
 		if (quadBikeItem->Pose.Position.y > (quadBikeItem->Floor - CLICK(1)))
 		{
 			if (quadBike->TurnRate < -QBIKE_TURN_RATE_DECEL)
@@ -840,30 +837,29 @@ namespace TEN::Entities::Vehicles
 				quadBike->TurnRate -= QBIKE_TURN_RATE_DECEL;
 			else
 				quadBike->TurnRate = 0;
-
 			quadBikeItem->Pose.Orientation.y += quadBike->TurnRate + quadBike->ExtraRotation;
 
 			short momentum = QBIKE_MOMENTUM_TURN_RATE_MIN - (((((QBIKE_MOMENTUM_TURN_RATE_MIN - QBIKE_MOMENTUM_TURN_RATE_MAX) * 256) / QBIKE_VELOCITY_MAX) * quadBike->Velocity) / 256);
 			if (!(TrInput & VEHICLE_IN_ACCELERATE) && quadBike->Velocity > 0)
 				momentum += momentum / 4;
 
-			short rot = quadBikeItem->Pose.Orientation.y - quadBike->MomentumAngle;
-			if (rot < -QBIKE_MOMENTUM_TURN_RATE_MAX)
+			short rotation = quadBikeItem->Pose.Orientation.y - quadBike->MomentumAngle;
+			if (rotation < -QBIKE_MOMENTUM_TURN_RATE_MAX)
 			{
-				if (rot < -QBIKE_MOMENTUM_TURN_RATE_MAX2)
+				if (rotation < -QBIKE_MOMENTUM_TURN_RATE_MAX2)
 				{
-					rot = -QBIKE_MOMENTUM_TURN_RATE_MAX2;
-					quadBike->MomentumAngle = quadBikeItem->Pose.Orientation.y - rot;
+					rotation = -QBIKE_MOMENTUM_TURN_RATE_MAX2;
+					quadBike->MomentumAngle = quadBikeItem->Pose.Orientation.y - rotation;
 				}
 				else
 					quadBike->MomentumAngle -= momentum;
 			}
-			else if (rot > QBIKE_MOMENTUM_TURN_RATE_MAX)
+			else if (rotation > QBIKE_MOMENTUM_TURN_RATE_MAX)
 			{
-				if (rot > QBIKE_MOMENTUM_TURN_RATE_MAX2)
+				if (rotation > QBIKE_MOMENTUM_TURN_RATE_MAX2)
 				{
-					rot = QBIKE_MOMENTUM_TURN_RATE_MAX2;
-					quadBike->MomentumAngle = quadBikeItem->Pose.Orientation.y - rot;
+					rotation = QBIKE_MOMENTUM_TURN_RATE_MAX2;
+					quadBike->MomentumAngle = quadBikeItem->Pose.Orientation.y - rotation;
 				}
 				else
 					quadBike->MomentumAngle += momentum;
@@ -901,90 +897,79 @@ namespace TEN::Entities::Vehicles
 			quadBikeItem->Pose.Position.x += slip * phd_cos(quadBikeItem->Pose.Orientation.y);
 		}
 
-		Vector3Int moved;
-		moved.x = quadBikeItem->Pose.Position.x;
-		moved.z = quadBikeItem->Pose.Position.z;
+		// Store old 2D position to determine movement delta later.
+		auto moved = Vector3Int(quadBikeItem->Pose.Position.x, 0, quadBikeItem->Pose.Position.z);
 
+		// Process entity collision.
 		if (!(quadBikeItem->Flags & IFLAG_INVISIBLE))
 			DoVehicleCollision(quadBikeItem, QBIKE_RADIUS);
 
-		short rot = 0;
+		// Apply shifts.
+		short extraRot = 0;
+		auto pointFrontLeft = GetVehicleCollision(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false);
+		if (pointFrontLeft.FloorHeight < (prevPointFrontLeft.Position.y - CLICK(1)))
+			extraRot = DoVehicleShift(quadBikeItem, pointFrontLeft.Position, prevPointFrontLeft.Position);
+
+		auto pointCenterFrontLeft = GetVehicleCollision(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, false);
+		if (pointCenterFrontLeft.FloorHeight < (prevPointCenterFrontLeft.Position.y - CLICK(1)))
+			DoVehicleShift(quadBikeItem, pointCenterFrontLeft.Position, prevPointCenterFrontLeft.Position);
+
+		auto pointLeft = GetVehicleCollision(quadBikeItem, 0, -QBIKE_SIDE, false);
+		if (pointLeft.FloorHeight < (prevPointLeft.Position.y - CLICK(1)))
+			DoVehicleShift(quadBikeItem, pointLeft.Position, prevPointLeft.Position);
+
+		auto pointCenterBackLeft = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, false);
+		if (pointCenterBackLeft.FloorHeight < (prevPointCenterBackLeft.Position.y - CLICK(1)))
+			DoVehicleShift(quadBikeItem, pointCenterBackLeft.Position, prevPointCenterBackLeft.Position);
+
 		short rotAdd = 0;
-
-		Vector3Int fl;
-		int heightFrontLeft = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false, &fl);
-		if (heightFrontLeft < (oldFrontLeft.y - CLICK(1)))
-			rot = DoVehicleShift(quadBikeItem, &fl, &oldFrontLeft);
-
-		Vector3Int mtl;
-		int hmtl = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mtl);
-		if (hmtl < (mtlOld.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, &mtl, &mtlOld);
-
-		Vector3Int mml;
-		int hmml = GetVehicleHeight(quadBikeItem, 0, -QBIKE_SIDE, false, &mml);
-		if (hmml < (mmlOld.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, &mml, &mmlOld);
-
-		Vector3Int mbl;
-		int hmbl = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, false, &mbl);
-		if (hmbl < (moldBottomLeft.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, &mbl, &moldBottomLeft);
-
-		Vector3Int bl;
-		int heightBackLeft = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, false, &bl);
-		if (heightBackLeft < (oldBottomLeft.y - CLICK(1)))
+		auto pointBackLeft = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, false);
+		if (pointBackLeft.FloorHeight < (prevPointBackLeft.Position.y - CLICK(1)))
 		{
-			rotAdd = DoVehicleShift(quadBikeItem, &bl, &oldBottomLeft);
-			if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
-				rot += rotAdd;
+			rotAdd = DoVehicleShift(quadBikeItem, pointBackLeft.Position, prevPointBackLeft.Position);
+			if ((rotAdd > 0 && extraRot >= 0) || (rotAdd < 0 && extraRot <= 0))
+				extraRot += rotAdd;
 		}
 
-		Vector3Int fr;
-		int heightFrontRight = GetVehicleHeight(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false, &fr);
-		if (heightFrontRight < (oldFrontRight.y - CLICK(1)))
+		auto pointFrontRight = GetVehicleCollision(quadBikeItem, QBIKE_FRONT, QBIKE_SIDE, false);
+		if (pointFrontRight.FloorHeight < (prevPointFrontRight.Position.y - CLICK(1)))
 		{
-			rotAdd = DoVehicleShift(quadBikeItem, &fr, &oldFrontRight);
-			if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
-				rot += rotAdd;
+			rotAdd = DoVehicleShift(quadBikeItem, pointFrontRight.Position, prevPointFrontRight.Position);
+			if ((rotAdd > 0 && extraRot >= 0) || (rotAdd < 0 && extraRot <= 0))
+				extraRot += rotAdd;
 		}
 
-		Vector3Int mtr;
-		int hmtr = GetVehicleHeight(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, false, &mtr);
-		if (hmtr < (mtrOld.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, &mtr, &mtrOld);
+		auto pointCenterFrontRight = GetVehicleCollision(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, false);
+		if (pointCenterFrontRight.FloorHeight < (prevPointCenterFrontRight.Position.y - CLICK(1)))
+			DoVehicleShift(quadBikeItem, pointCenterFrontRight.Position, prevPointCenterFrontRight.Position);
 
-		Vector3Int mmr;
-		int hmmr = GetVehicleHeight(quadBikeItem, 0, QBIKE_SIDE, false, &mmr);
-		if (hmmr < (mmrOld.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, &mmr, &mmrOld);
+		auto pointRight = GetVehicleCollision(quadBikeItem, 0, QBIKE_SIDE, false);
+		if (pointRight.FloorHeight < (prevPointRight.Position.y - CLICK(1)))
+			DoVehicleShift(quadBikeItem, pointRight.Position, prevPointRight.Position);
 
-		Vector3Int mbr;
-		int hmbr = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, false, &mbr);
-		if (hmbr < (moldBottomRight.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, &mbr, &moldBottomRight);
+		auto pointCenterBackRight = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, false);
+		if (pointCenterBackRight.FloorHeight < (prevPointCenterBackRight.Position.y - CLICK(1)))
+			DoVehicleShift(quadBikeItem, pointCenterBackRight.Position, prevPointCenterBackRight.Position);
 
-		Vector3Int br;
-		int heightBackRight = GetVehicleHeight(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, false, &br);
-		if (heightBackRight < (oldBottomRight.y - CLICK(1)))
+		auto pointBackRight = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, false);
+		if (pointBackRight.FloorHeight < (prevPointBackRight.Position.y - CLICK(1)))
 		{
-			rotAdd = DoVehicleShift(quadBikeItem, &br, &oldBottomRight);
-			if ((rotAdd > 0 && rot >= 0) || (rotAdd < 0 && rot <= 0))
-				rot += rotAdd;
+			rotAdd = DoVehicleShift(quadBikeItem, pointBackRight.Position, prevPointBackRight.Position);
+			if ((rotAdd > 0 && extraRot >= 0) || (rotAdd < 0 && extraRot <= 0))
+				extraRot += rotAdd;
 		}
 
 		probe = GetCollision(quadBikeItem);
 		if (probe.Position.Floor < quadBikeItem->Pose.Position.y - CLICK(1))
-			DoVehicleShift(quadBikeItem, (Vector3Int*)&quadBikeItem->Pose, &old);
+			DoVehicleShift(quadBikeItem, quadBikeItem->Pose.Position, prevPos);
 
-		quadBike->ExtraRotation = rot;
+		quadBike->ExtraRotation = extraRot;
 
+		// Determine whether wall impact occurred and affect vehicle accordingly.
 		auto impactDirection = GetVehicleImpactDirection(quadBikeItem, moved);
-
-		int newVelocity = 0;
 		if (impactDirection != VehicleImpactDirection::None)
 		{
-			newVelocity = (quadBikeItem->Pose.Position.z - old.z) * phd_cos(quadBike->MomentumAngle) + (quadBikeItem->Pose.Position.x - old.x) * phd_sin(quadBike->MomentumAngle);
+			int newVelocity = (quadBikeItem->Pose.Position.z - prevPos.z) * phd_cos(quadBike->MomentumAngle) + (quadBikeItem->Pose.Position.x - prevPos.x) * phd_sin(quadBike->MomentumAngle);
 			newVelocity *= VEHICLE_VELOCITY_SCALE;
 
 			if (&g_Level.Items[lara->Vehicle] == quadBikeItem &&

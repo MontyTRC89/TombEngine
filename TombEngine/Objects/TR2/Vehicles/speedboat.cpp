@@ -582,16 +582,15 @@ namespace TEN::Entities::Vehicles
 
 		speedboatItem->Pose.Orientation.z -= speedboat->LeanAngle;
 
-		Vector3Int old, frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
+		// Get point/room collision at vehicle front and corners.
+		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 		int heightFrontLeftOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &frontLeftOld);
 		int heightFrontRightOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &frontRightOld);
 		int heightBackLeftOld = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, true, &backLeftOld);
 		int heightBackRightOld = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, true, &backRightOld);
 		int heightFrontOld = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_TIP, 0, true, &frontOld);
 
-		old.x = speedboatItem->Pose.Position.x;
-		old.y = speedboatItem->Pose.Position.y;
-		old.z = speedboatItem->Pose.Position.z;
+		auto prevPos = speedboatItem->Pose.Position;
 
 		speedboatItem->Pose.Orientation.y += speedboat->TurnRate + speedboat->ExtraRotation;
 		speedboat->LeanAngle = speedboat->TurnRate * 6;
@@ -611,6 +610,7 @@ namespace TEN::Entities::Vehicles
 		speedboatItem->Pose.Position.x -= slip * phd_sin(speedboatItem->Pose.Orientation.y);
 		speedboatItem->Pose.Position.z -= slip * phd_cos(speedboatItem->Pose.Orientation.y);
 
+		// Store old 2D position to determine movement delta later.
 		auto moved = Vector3Int(speedboatItem->Pose.Position.x, 0, speedboatItem->Pose.Position.z);
 
 		DoSpeedboatBoatShift(speedboatItem, itemNumber);
@@ -619,26 +619,26 @@ namespace TEN::Entities::Vehicles
 		short rotation = 0;
 		auto heightBackLeft = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, &bl);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
-			rotation = DoVehicleShift(speedboatItem, &bl, &backLeftOld);
+			rotation = DoVehicleShift(speedboatItem, bl, backLeftOld);
 
 		auto heightBackRight = GetVehicleWaterHeight(speedboatItem, -SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, false, &br);
 		if (heightBackRight < (backRightOld.y - CLICK(0.5f)))
-			rotation += DoVehicleShift(speedboatItem, &br, &backRightOld);
+			rotation += DoVehicleShift(speedboatItem, br, backRightOld);
 
 		auto heightFrontLeft = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, -SPEEDBOAT_SIDE, false, &fl);
 		if (heightFrontLeft < (frontLeftOld.y - CLICK(0.5f)))
-			rotation += DoVehicleShift(speedboatItem, &fl, &frontLeftOld);
+			rotation += DoVehicleShift(speedboatItem, fl, frontLeftOld);
 
 		auto heightFrontRight = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_FRONT, SPEEDBOAT_SIDE, false, &fr);
 		if (heightFrontRight < (frontRightOld.y - CLICK(0.5f)))
-			rotation += DoVehicleShift(speedboatItem, &fr, &frontRightOld);
+			rotation += DoVehicleShift(speedboatItem, fr, frontRightOld);
 
 		int heightFront = 0;
 		if (!slip)
 		{
 			heightFront = GetVehicleWaterHeight(speedboatItem, SPEEDBOAT_TIP, 0, false, &f);
 			if (heightFront < (frontOld.y - CLICK(0.5f)))
-				DoVehicleShift(speedboatItem, &f, &frontOld);
+				DoVehicleShift(speedboatItem, f, frontOld);
 		}
 
 		auto probe = GetCollision(speedboatItem);
@@ -648,7 +648,7 @@ namespace TEN::Entities::Vehicles
 			height = GetFloorHeight(probe.Block, speedboatItem->Pose.Position.x, speedboatItem->Pose.Position.y - 5, speedboatItem->Pose.Position.z);
 
 		if (height < (speedboatItem->Pose.Position.y - CLICK(0.5f)))
-			DoVehicleShift(speedboatItem, (Vector3Int*)&speedboatItem->Pose, &old);
+			DoVehicleShift(speedboatItem, speedboatItem->Pose.Position, prevPos);
 
 		speedboat->ExtraRotation = rotation;
 
@@ -659,7 +659,7 @@ namespace TEN::Entities::Vehicles
 		int newVelocity = 0;
 		if (slip || impactDirection != VehicleImpactDirection::None)
 		{
-			newVelocity = (speedboatItem->Pose.Position.z - old.z) * phd_cos(speedboatItem->Pose.Orientation.y) + (speedboatItem->Pose.Position.x - old.x) * phd_sin(speedboatItem->Pose.Orientation.y);
+			newVelocity = (speedboatItem->Pose.Position.z - prevPos.z) * phd_cos(speedboatItem->Pose.Orientation.y) + (speedboatItem->Pose.Position.x - prevPos.x) * phd_sin(speedboatItem->Pose.Orientation.y);
 
 			if (lara->Vehicle == itemNumber && speedboatItem->Animation.Velocity > SPEEDBOAT_NORMAL_VELOCITY_MAX + SPEEDBOAT_VELOCITY_ACCEL && newVelocity < speedboatItem->Animation.Velocity - 10)
 			{

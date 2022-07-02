@@ -58,16 +58,27 @@ namespace TEN::Entities::Vehicles
 		Right
 	};
 
+	// Collision struct specific to vehicles. Used to ascertain point/room collision parameters
+	// at wheels and around the base perimeter. Essentially, a pseudo-raycast. May revise later.
+	struct VehicleCollisionPointInfo
+	{
+		Vector3Int Position;
+		int FloorHeight;
+	};
+
+	// Deprecated.
+	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
+
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
 	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, vector<VehicleDismountType> allowedDismountTypes, float distance, bool onLand = true);
 	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short angle, float distance, bool onLand);
-	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int deltaPos);
-	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
+	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int prevPos);
+	VehicleCollisionPointInfo GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp);
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 
 	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
 	int	  DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult = 1.0f);
-	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int* pos, Vector3Int* oldPos);
+	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int pos, Vector3Int oldPos);
 	int   DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate);
 	void  DoVehicleFlareDiscard(ItemInfo* laraItem);
 

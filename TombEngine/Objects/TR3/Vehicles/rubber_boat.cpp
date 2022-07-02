@@ -627,6 +627,7 @@ namespace TEN::Entities::Vehicles
 
 		rBoatItem->Pose.Orientation.z -= rBoat->LeanAngle;
 
+		// Get point/room collision at vehicle front and corners.
 		Vector3Int frontLeftOld, frontRightOld, backLeftOld, backRightOld, frontOld;
 		int heightFrontLeftOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, true, &frontLeftOld);
 		int heightFrontRightOld = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, true, &frontRightOld);
@@ -634,10 +635,7 @@ namespace TEN::Entities::Vehicles
 		int heightBackRightOld = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, true, &backRightOld);
 		int heightFrontOld = GetVehicleWaterHeight(rBoatItem, 1000, 0, true, &frontOld);
 
-		Vector3Int old;
-		old.x = rBoatItem->Pose.Position.x;
-		old.y = rBoatItem->Pose.Position.y;
-		old.z = rBoatItem->Pose.Position.z;
+		auto prevPos = rBoatItem->Pose.Position;
 
 		rBoatItem->Pose.Orientation.y += rBoat->TurnRate + rBoat->ExtraRotation;
 		rBoat->LeanAngle = rBoat->TurnRate * 6;
@@ -663,36 +661,36 @@ namespace TEN::Entities::Vehicles
 		rBoatItem->Pose.Position.z -= slip * phd_cos(rBoatItem->Pose.Orientation.y);
 		rBoatItem->Pose.Position.x -= slip * phd_sin(rBoatItem->Pose.Orientation.y);
 
-		Vector3Int moved;
-		moved.x = rBoatItem->Pose.Position.x;
-		moved.z = rBoatItem->Pose.Position.z;
+		// Store old 2D position to determine movement delta later.
+		auto moved = Vector3Int(rBoatItem->Pose.Position.x, 0, rBoatItem->Pose.Position.z);
+
+		// Apply shifts.
 
 		DoRubberBoatShift(itemNumber, laraItem);
 
 		Vector3Int frontLeft, frontRight, backRight, backLeft, front;
-		short rotation = 0;
-
+		short extraRot = 0;
 		int heightBackLeft = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, -RBOAT_SIDE, false, &backLeft);
 		if (heightBackLeft < (backLeftOld.y - CLICK(0.5f)))
-			rotation = DoVehicleShift(rBoatItem, &backLeft, &backLeftOld);
+			extraRot = DoVehicleShift(rBoatItem, backLeft,backLeftOld);
 
 		int heightBackRight = GetVehicleWaterHeight(rBoatItem, -RBOAT_FRONT, RBOAT_SIDE, false, &backRight);
 		if (heightBackRight < (backRightOld.y - CLICK(0.5f)))
-			rotation += DoVehicleShift(rBoatItem, &backRight, &backRightOld);
+			extraRot += DoVehicleShift(rBoatItem, backRight, backRightOld);
 
 		int heightFrontLeft = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, -RBOAT_SIDE, false, &frontLeft);
 		if (heightFrontLeft < (frontLeftOld.y - CLICK(0.5f)))
-			rotation += DoVehicleShift(rBoatItem, &frontLeft, &frontLeftOld);
+			extraRot += DoVehicleShift(rBoatItem, frontLeft, frontLeftOld);
 
 		int heightFrontRight = GetVehicleWaterHeight(rBoatItem, RBOAT_FRONT, RBOAT_SIDE, false, &frontRight);
 		if (heightFrontRight < (frontRightOld.y - CLICK(0.5f)))
-			rotation += DoVehicleShift(rBoatItem, &frontRight, &frontRightOld);
+			extraRot += DoVehicleShift(rBoatItem, frontRight, frontRightOld);
 
 		if (!slip)
 		{
 			int heightFront = GetVehicleWaterHeight(rBoatItem, 1000, 0, false, &front);
 			if (heightFront < (frontOld.y - CLICK(0.5f)))
-				DoVehicleShift(rBoatItem, &front, &frontOld);
+				DoVehicleShift(rBoatItem, front, frontOld);
 		}
 
 		short roomNumber = rBoatItem->RoomNumber;
@@ -703,16 +701,16 @@ namespace TEN::Entities::Vehicles
 			height = GetFloorHeight(floor, rBoatItem->Pose.Position.x, rBoatItem->Pose.Position.y, rBoatItem->Pose.Position.z);
 
 		if (height < (rBoatItem->Pose.Position.y - CLICK(0.5f)))
-			DoVehicleShift(rBoatItem, (Vector3Int*)&rBoatItem->Pose, &old);
+			DoVehicleShift(rBoatItem, rBoatItem->Pose.Position, prevPos);
 
 		DoVehicleCollision(rBoatItem, RBOAT_RADIUS);
 
-		rBoat->ExtraRotation = rotation;
+		rBoat->ExtraRotation = extraRot;
 		auto impactDirection = GetVehicleImpactDirection(rBoatItem, moved);
 
 		if (slip || impactDirection != VehicleImpactDirection::None)
 		{
-			int newVelocity = (rBoatItem->Pose.Position.z - old.z) * phd_cos(rBoatItem->Pose.Orientation.y) + (rBoatItem->Pose.Position.x - old.x) * phd_sin(rBoatItem->Pose.Orientation.y);
+			int newVelocity = (rBoatItem->Pose.Position.z - prevPos.z) * phd_cos(rBoatItem->Pose.Orientation.y) + (rBoatItem->Pose.Position.x - prevPos.x) * phd_sin(rBoatItem->Pose.Orientation.y);
 
 			if (lara->Vehicle == itemNumber &&
 				rBoatItem->Animation.Velocity > (RBOAT_NORMAL_VELOCITY_MAX + RBOAT_VELOCITY_ACCEL) &&
