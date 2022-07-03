@@ -25,8 +25,9 @@ namespace TEN::Effects::Environment
 	constexpr auto MAX_RAIN_SIZE = 128.0f;
 
 	constexpr auto WEATHER_PARTICLE_HORIZONTAL_SPEED = 8.0f;
-	constexpr auto SNOW_SPEED = 128.0f;
-	constexpr auto RAIN_SPEED = 256.0f;
+	constexpr auto MAX_SNOW_SPEED = 128.0f;
+	constexpr auto MAX_RAIN_SPEED = 256.0f;
+	constexpr auto MAX_DUST_SPEED = 1.0f;
 
 	constexpr auto WEATHER_PARTICLES_TRANSPARENCY = 0.8f;
 	constexpr auto WEATHER_PARTICLES_NEAR_DEATH_LIFE_VALUE = 20.0f;
@@ -34,7 +35,6 @@ namespace TEN::Effects::Environment
 
 	constexpr auto DUST_SPAWN_DENSITY = 300;
 	constexpr auto DUST_LIFE = 40;
-	constexpr auto DUST_MAX_SPEED = 1.0f;
 	constexpr auto DUST_SPAWN_RADIUS = (10 * 1024);
 
 	constexpr auto SKY_POSITION_LIMIT = 9728;
@@ -433,9 +433,7 @@ namespace TEN::Effects::Environment
 
 			auto part = WeatherParticle();
 
-			part.Velocity.x = GenerateFloat(-DUST_MAX_SPEED, DUST_MAX_SPEED);
-			part.Velocity.y = GenerateFloat(-DUST_MAX_SPEED, DUST_MAX_SPEED);
-			part.Velocity.z = GenerateFloat(-DUST_MAX_SPEED, DUST_MAX_SPEED);
+			part.Velocity = getRandomVector() * MAX_DUST_SPEED;
 
 			part.Size = GenerateFloat(MAX_DUST_SIZE / 2, MAX_DUST_SIZE);
 
@@ -505,14 +503,14 @@ namespace TEN::Effects::Environment
 				{
 				case WeatherType::Snow:
 					part.Size = GenerateFloat(MAX_SNOW_SIZE / 3, MAX_SNOW_SIZE);
-					part.Velocity.y = GenerateFloat(SNOW_SPEED / 4, SNOW_SPEED) * (part.Size / MAX_SNOW_SIZE);
-					part.Life = (SNOW_SPEED / 3) + ((SNOW_SPEED / 2) - ((int)part.Velocity.y >> 2));
+					part.Velocity.y = GenerateFloat(MAX_SNOW_SPEED / 4, MAX_SNOW_SPEED) * (part.Size / MAX_SNOW_SIZE);
+					part.Life = (MAX_SNOW_SPEED / 3) + ((MAX_SNOW_SPEED / 2) - ((int)part.Velocity.y >> 2));
 					break;
 
 				case WeatherType::Rain:
 					part.Size = GenerateFloat(MAX_RAIN_SIZE / 2, MAX_RAIN_SIZE);
-					part.Velocity.y = GenerateFloat(RAIN_SPEED / 2, RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE) * std::clamp(level->GetWeatherStrength(), 0.6f, 1.0f);
-					part.Life = (RAIN_SPEED * 2) - part.Velocity.y;
+					part.Velocity.y = GenerateFloat(MAX_RAIN_SPEED / 2, MAX_RAIN_SPEED) * (part.Size / MAX_RAIN_SIZE) * std::clamp(level->GetWeatherStrength(), 0.6f, 1.0f);
+					part.Life = (MAX_RAIN_SPEED * 2) - part.Velocity.y;
 					break;
 				}
 
