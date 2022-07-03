@@ -1,29 +1,29 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/configuration.h"
+#include "Game/control/control.h"
+#include "Game/control/volume.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/hair.h"
+#include "Game/effects/weather.h"
 #include "Game/savegame.h"
 #include "Game/health.h"
 #include "Game/camera.h"
+#include "Game/items.h"
+#include "Game/spotcam.h"
 #include "Game/animation.h"
 #include "Game/gui.h"
 #include "Game/Lara/lara.h"
-#include "Objects/Generic/Object/rope.h"
-#include "Game/effects/tomb4fx.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/control/control.h"
+#include "Specific/winmain.h"
+#include "Objects/Effects/tr4_locusts.h"
+#include "Objects/Generic/Object/rope.h"
+#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "RenderView/RenderView.h"
-#include "Game/effects/hair.h"
-#include "Game/effects/weather.h"
-#include "Specific/winmain.h"
-#include "Objects/Effects/tr4_locusts.h"
-#include "Game/control/volume.h"
-#include "Game/items.h"
-#include "Objects/Generic/Object/rope.h"
 #include <chrono>
 #include <algorithm>
 #include <execution>
@@ -44,32 +44,35 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderBlobShadows(RenderView& renderView)
 	{
-		const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
-		const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
-
 		std::vector<Sphere> nearestSpheres;
-
-		// Collect Shadow Spheres
 		nearestSpheres.reserve(g_Configuration.ShadowMaxBlobs);
-		for (auto i = 0; i < sphereMeshes.size(); i++) 
-		{
-			auto& newSphere = nearestSpheres.emplace_back();
-			MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
-			Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
 
-			if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT) 
+		// Collect Lara spheres
+
+		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
+		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
+
+		if (!SpotcamDontDrawLara && CurrentLevel != 0)
+		{
+			for (auto i = 0; i < sphereMeshes.size(); i++)
 			{
-				// Push feet spheres a little bit down
-				pos.y += 8;
+				auto& newSphere = nearestSpheres.emplace_back();
+				MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
+				Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
+
+				if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
+				{
+					// Push feet spheres a little bit down
+					pos.y += 8;
+				}
+				GetLaraJointPosition(&pos, sphereMeshes[i]);
+				newSphere.position = Vector3(pos.x, pos.y, pos.z);
+				newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
 			}
-			GetLaraJointPosition(&pos, sphereMeshes[i]);
-			newSphere.position = Vector3(pos.x, pos.y, pos.z);
-			newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
 		}
 
 		for (auto& r : renderView.roomsToDraw) 
 		{
-
 			for (auto& i : r->ItemsToDraw) 
 			{
 				auto& nativeItem = g_Level.Items[i->ItemNumber];
@@ -129,6 +132,10 @@ namespace TEN::Renderer
 			return;
 
 		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
+			return;
+
+		// TODO: This condition must become more flexible after beta.
+		if (SpotcamDontDrawLara || CurrentLevel == 0)
 			return;
 
 		// Reset GPU state
