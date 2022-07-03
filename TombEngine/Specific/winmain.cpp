@@ -239,12 +239,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			Debug = true;
 		}
-		else if ((wcscmp(argv[i], L"/level") == 0) && argc > (i + 2))
+		else if ((wcscmp(argv[i], L"/level") == 0) && argc > (i + 1))
 		{
 			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
-			levelFile = converter.to_bytes(std::wstring(argv[i + 1])); 
-			std::transform(levelFile.begin(), levelFile.end(), levelFile.begin(), [](unsigned char c) { return std::tolower(c); });
-			SystemNameHash = std::stoul(std::wstring(argv[i + 2]));
+			levelFile = converter.to_bytes(std::wstring(argv[i + 1]));
+		}
+		else if ((wcscmp(argv[i], L"/hash") == 0) && argc > (i + 1))
+		{
+			SystemNameHash = std::stoul(std::wstring(argv[i + 1]));
 		}
 	}
 	LocalFree(argv);
