@@ -433,7 +433,7 @@ namespace TEN::Effects::Environment
 
 			auto part = WeatherParticle();
 
-			part.Velocity = getRandomVector() * MAX_DUST_SPEED;
+			part.Velocity = GetRandomVector() * MAX_DUST_SPEED;
 
 			part.Size = GenerateFloat(MAX_DUST_SIZE / 2, MAX_DUST_SIZE);
 

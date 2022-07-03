@@ -77,7 +77,7 @@ namespace TEN::Effects
 
 			int numSprites = -Objects[p.sequence].nmeshes - 1;
 			float normalizedAge = p.age / p.life;
-			p.sprite = lerp(0, numSprites, normalizedAge);
+			p.sprite = Lerp(0.0f, numSprites, normalizedAge);
 		}
 	}
 }

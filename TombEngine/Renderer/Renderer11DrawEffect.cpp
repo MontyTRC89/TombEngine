@@ -1240,8 +1240,8 @@ namespace TEN::Renderer
 			s.velocity.Normalize(v);
 
 			float normalizedLife = s.age / s.life;
-			auto height = lerp(1, 0, normalizedLife);
-			auto color = DirectX::SimpleMath::Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
+			auto height = Lerp(1.0f, 0.0f, normalizedLife);
+			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
 			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BLENDMODE_ADDITIVE, -v, view);
 		}

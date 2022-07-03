@@ -36,7 +36,7 @@ void UpdateBubbles()
 		float alpha = bubble->age / 15.0f;
 		alpha = fmin(alpha, 1.0f);
 
-		bubble->size = lerp(0, bubble->destinationSize, alpha);
+		bubble->size = Lerp(0.0f, bubble->destinationSize, alpha);
 		bubble->color = Vector4::Lerp(bubble->sourceColor, bubble->destinationColor, alpha);
 		int ceilingHeight = g_Level.Rooms[bubble->roomNumber].maxceiling;
 		short roomNumber = bubble->roomNumber;
