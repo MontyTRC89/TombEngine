@@ -398,7 +398,6 @@ namespace TEN::Renderer
 		float m_fps;
 
 		// Screen settings
-		Matrix m_view;
 		int m_screenWidth;
 		int m_screenHeight;
 		bool m_windowed;

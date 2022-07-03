@@ -834,7 +834,7 @@ namespace TEN::Renderer
 
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
-				Vector3 cameraUp = Vector3(m_view._12, m_view._22, m_view._32);
+				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
 				spriteMatrix = scale * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 			}
 			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
