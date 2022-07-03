@@ -1,12 +1,16 @@
 #pragma once
+#include "Objects/Utils/VehicleHelpers.h"
 
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+struct CollisionInfo;
+struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
 	void InitialiseRubberBoat(short itemNumber);
-	void RubberBoatCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+
+	void RubberBoatPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void DoRubberBoatMount(ItemInfo* rBoatItem, ItemInfo* laraItem, VehicleMountType mountType);
+
 	void RubberBoatControl(short itemNumber);
 	void DrawRubberBoat(ItemInfo* rBoatItem);
 }

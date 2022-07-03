@@ -138,7 +138,6 @@ struct LEVEL
 
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> StaticObjectsIds;
-extern char* LevelDataPtr;
 extern bool IsLevelLoading;
 extern LEVEL g_Level;
 
@@ -168,4 +167,4 @@ void GetCarriedItems();
 void GetAIPickups();
 void BuildOutsideRoomsTable();
 
-unsigned CALLBACK LoadLevel(void* data);
+unsigned _stdcall LoadLevel(void* data);

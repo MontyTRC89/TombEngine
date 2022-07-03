@@ -161,7 +161,7 @@ void lara_col_freefall(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -224,7 +224,7 @@ void lara_col_reach(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	if (lara->Control.Rope.Ptr == -1)
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 

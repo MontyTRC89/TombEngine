@@ -240,13 +240,13 @@ void SkidooManControl(short riderItemNumber)
 		riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 	}
 	else if (riderItem->Status == ITEM_DEACTIVATED &&
-		item->Animation.Velocity == 0 &&
-		item->Animation.VerticalVelocity == 0)
+			 item->Animation.Velocity == 0 &&
+			 item->Animation.VerticalVelocity == 0)
 	{
 		RemoveActiveItem(riderItemNumber);
 		riderItem->Collidable = false;
 		riderItem->HitPoints = NOT_TARGETABLE;
-		riderItem->Flags |= ONESHOT;
+		riderItem->Flags |= IFLAG_INVISIBLE;
 
 		DisableEntityAI(itemNumber);
 		item->ObjectNumber = ID_SNOWMOBILE;

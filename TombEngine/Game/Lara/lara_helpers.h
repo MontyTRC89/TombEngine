@@ -51,4 +51,4 @@ void SetLaraSwimDiveAnimation(ItemInfo* item);
 void ResetLaraLean(ItemInfo* item, float rate = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetLaraFlex(ItemInfo* item, float rate = 1.0f);
 
-void RumbleLaraHealthCondition(ItemInfo* lara);
+void RumbleLaraHealthCondition(ItemInfo* item);
