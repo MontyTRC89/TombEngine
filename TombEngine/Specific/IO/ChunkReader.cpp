@@ -141,13 +141,6 @@ byte ChunkReader::ReadChunkByte(__int64 length)
 	return LEB128::ReadByte(m_stream);
 }
 
-char* ChunkReader::ReadChunkString(long length)
-{
-	char* value = (char*)malloc(length);
-	memcpy(value, LevelDataPtr, length);
-	return value;
-}
-
 BaseStream* ChunkReader::GetRawStream()
 {
 	return m_stream;
