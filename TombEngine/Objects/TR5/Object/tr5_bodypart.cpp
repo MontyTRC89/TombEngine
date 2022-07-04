@@ -44,9 +44,12 @@ void ControlBodyPart(short fxNumber)
 			fx->fallspeed += 2;
 	}
 
-	fx->pos.Position.x += fx->speed * phd_sin(fx->pos.Orientation.y);
-	fx->pos.Position.y += fx->fallspeed;
-	fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
+	int fallspeed = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber) ? fx->fallspeed / 4 : fx->fallspeed;
+	int speed = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber) ? fx->speed / 4 : fx->speed;
+
+	fx->pos.Position.x += speed * phd_sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fallspeed;
+	fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
 
 	if (fx->flag2 & EXPLODE_NORMAL)
 		TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 3);
@@ -131,5 +134,19 @@ void ControlBodyPart(short fxNumber)
 	}
 
 	if (roomNumber != fx->roomNumber)
+	{
+		if ( TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
+		{
+			int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, roomNumber);
+			SplashSetup.y = waterHeight - 1;
+			SplashSetup.x = fx->pos.Position.x;
+			SplashSetup.z = fx->pos.Position.z;
+			SplashSetup.splashPower = fx->fallspeed;
+			SplashSetup.innerRadius = 48;
+			SetupSplash(&SplashSetup, roomNumber);
+		}
+
 		EffectNewRoom(fxNumber, roomNumber);
+	}
 }
