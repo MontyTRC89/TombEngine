@@ -787,7 +787,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		// Handle Lara collision.
 		if (lara->Vehicle == NO_ITEM)
 			lara_collision_routines[item->Animation.ActiveState](item, coll);
-
 	}
 
 	lara->ExtraVelocity = Vector3Int();
