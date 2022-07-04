@@ -42,9 +42,9 @@ namespace TEN::Renderer
 
 		InitialiseScreen(width, height, windowed, WindowsHandle, true);
 
-		ScreenWidth = width;
-		ScreenHeight = height;
-		Windowed = windowed;
+		m_screenWidth = width;
+		m_screenHeight = height;
+		m_windowed = windowed;
 	}
 
 	std::string Renderer11::GetDefaultAdapterName()

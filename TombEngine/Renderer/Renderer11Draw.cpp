@@ -201,7 +201,7 @@ namespace TEN::Renderer
 			CCameraMatrixBuffer shadowProjection;
 			shadowProjection.ViewProjection = view * projection;
 			m_cbCameraMatrices.updateData(shadowProjection, m_context.Get());
-			m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
+			BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 
 			m_stShadowMap.LightViewProjections[step] = (view * projection);
 
@@ -216,8 +216,8 @@ namespace TEN::Renderer
 			m_stItem.AmbientLight = room.AmbientLight;
 			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 			m_cbItem.updateData(m_stItem, m_context.Get());
-			m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-			m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
@@ -289,8 +289,8 @@ namespace TEN::Renderer
 			}
 			memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
 			m_cbItem.updateData(m_stItem, m_context.Get());
-			m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-			m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 			{
@@ -323,7 +323,7 @@ namespace TEN::Renderer
 		for (int j = 0; j < item->LightsToDraw.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
@@ -344,7 +344,7 @@ namespace TEN::Renderer
 
 				m_stItem.World = world;
 				m_cbItem.updateData(m_stItem, m_context.Get());
-				m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+				BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 				RendererMesh* mesh = moveableObj.ObjectMeshes[0];
 
@@ -426,7 +426,7 @@ namespace TEN::Renderer
 
 		m_context->VSSetShader(m_vsSolid.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSolid.Get(), nullptr, 0);
-		Matrix world = Matrix::CreateOrthographicOffCenter(0, ScreenWidth, ScreenHeight, 0, m_viewport.MinDepth,
+		Matrix world = Matrix::CreateOrthographicOffCenter(0, m_screenWidth, m_screenHeight, 0, m_viewport.MinDepth,
 														   m_viewport.MaxDepth);
 
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -1260,7 +1260,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			m_context->VSSetConstantBuffers(6, 1, m_cbAnimated.get());
+			BindConstantBufferVS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());;
 			m_context->VSSetShader(m_vsRooms_Anim.Get(), nullptr, 0);
 		}
 
@@ -1285,25 +1285,25 @@ namespace TEN::Renderer
 			m_stShadowMap.CastShadows = false;
 		}
 		m_cbShadowMap.updateData(m_stShadowMap, m_context.Get());
-		m_context->VSSetConstantBuffers(4, 1, m_cbShadowMap.get());
-		m_context->PSSetConstantBuffers(4, 1, m_cbShadowMap.get());
+		BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
+		BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 
 		m_stLights.NumLights = view.lightsToDraw.size();
 		for (int j = 0; j < view.lightsToDraw.size(); j++)
 			memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
-		m_context->PSSetConstantBuffers(3, 1, m_cbMisc.get());
+		BindConstantBufferPS(CB_MISC, m_cbMisc.get());
 
 		m_stRoom.AmbientColor = info->room->AmbientLight;
 		m_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
 		m_cbRoom.updateData(m_stRoom, m_context.Get());
 
-		m_context->VSSetConstantBuffers(5, 1, m_cbRoom.get());
-		m_context->PSSetConstantBuffers(5, 1, m_cbRoom.get());
+		BindConstantBufferVS(CB_ROOM, m_cbRoom.get());
+		BindConstantBufferPS(CB_ROOM, m_cbRoom.get());
 
 		// Draw geometry
 		if (info->animated)
@@ -1426,7 +1426,7 @@ namespace TEN::Renderer
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
 		UpdateLaraAnimations(false);
-		UpdateItemsAnimations(view);
+		UpdateItemAnimations(view);
 		UpdateEffects(view);
 
 		m_stAlphaTest.AlphaTest = -1;
@@ -1536,7 +1536,6 @@ namespace TEN::Renderer
 		DrawBubbles(view);
 		DrawDrips(view);
 		DrawRipples(view);
-		DrawUnderwaterDust(view);
 		DrawSplashes(view);
 		DrawShockwaves(view);
 		DrawLightning(view);
@@ -1573,7 +1572,7 @@ namespace TEN::Renderer
 		DrawDebugInfo(view);
 		DrawAllStrings();
 
-		DoFadingAndCinematicBars(target, depthTarget, view);
+		DrawFadeAndBars(target, depthTarget, view);
 
 		ClearScene();
 	}
@@ -1607,7 +1606,7 @@ namespace TEN::Renderer
 		view.fillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
-		m_context->VSSetConstantBuffers(0, 1, m_cbCameraMatrices.get());
+		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		DrawHorizonAndSky(view, depthTarget);
 		DrawRooms(view, false);
 	}
@@ -1734,14 +1733,14 @@ namespace TEN::Renderer
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * 32);
 		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		m_stLights.NumLights = info->item->LightsToDraw.size();
 		for (int j = 0; j < info->item->LightsToDraw.size(); j++)
 			memcpy(&m_stLights.Lights[j], info->item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),
@@ -1947,7 +1946,7 @@ namespace TEN::Renderer
 			m_stShadowMap.CastShadows = false;
 		}
 
-		numRoomsTransparentPolygons = 0;
+		m_numRoomsTransparentPolygons = 0;
 		for (int i = view.roomsToDraw.size() - 1; i >= 0; i--)
 		{
 			int index = i;
@@ -2010,7 +2009,7 @@ namespace TEN::Renderer
 						{
 							RendererPolygon* p = &bucket.Polygons[j];
 
-							numRoomsTransparentPolygons++;
+							m_numRoomsTransparentPolygons++;
 
 							// As polygon distance, for rooms, we use the farthest vertex distance                            
 							int d1 = (roomsVertices[roomsIndices[p->baseIndex + 0]].Position - cameraPosition).Length();

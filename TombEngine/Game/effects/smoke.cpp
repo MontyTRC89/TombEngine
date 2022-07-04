@@ -75,12 +75,12 @@ namespace TEN::Effects::Smoke
 			}
 
 			float normalizedLife = std::clamp(s.age / s.life,0.0f,1.0f);
-			s.size = lerp(s.sourceSize, s.destinationSize, normalizedLife);
+			s.size = Lerp(s.sourceSize, s.destinationSize, normalizedLife);
 			s.angularVelocity *= s.angularDrag;
 			s.rotation += s.angularVelocity;
 			s.color = DirectX::SimpleMath::Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 			int numSprites = -Objects[ID_SMOKE_SPRITES].nmeshes;
-			s.sprite = lerp(0, numSprites - 1, normalizedLife);
+			s.sprite = Lerp(0, numSprites - 1, normalizedLife);
 		}
 	}
 
@@ -148,7 +148,7 @@ namespace TEN::Effects::Smoke
 					float size = GenerateFloat(48, 80);
 					s.sourceSize = size * 2;
 					s.destinationSize = size * 16;
-					s.velocity = getRandomVectorInCone(direction,25);
+					s.velocity = GetRandomVectorInCone(direction,25);
 					s.velocity *= GenerateFloat(0, 32);
 				}
 				else
@@ -156,7 +156,7 @@ namespace TEN::Effects::Smoke
 					float size = GenerateFloat(48, 80);
 					s.sourceSize = size;
 					s.destinationSize = size * 8;
-					s.velocity = getRandomVectorInCone(direction,3);
+					s.velocity = GetRandomVectorInCone(direction,3);
 					s.velocity *= GenerateFloat(0, 16);
 				}
 			}
@@ -168,7 +168,7 @@ namespace TEN::Effects::Smoke
 				s.terminalVelocity = 0;
 				s.friction = 0.88f;
 				s.life = GenerateFloat(60, 90);
-				s.velocity = getRandomVectorInCone(direction, 10);
+				s.velocity = GetRandomVectorInCone(direction, 10);
 				s.velocity *= GenerateFloat(16, 30);
 			}
 		}
@@ -226,7 +226,7 @@ namespace TEN::Effects::Smoke
 		s.destinationColor = Vector4(0, 0, 0, 0);
 		s.sourceSize = GenerateFloat(32, 64);
 		s.active = true;
-		s.velocity = getRandomVector() * GenerateFloat(1, 3);
+		s.velocity = GetRandomVector() * GenerateFloat(1, 3);
 		s.affectedByWind = true;
 		s.friction = 0.979f;
 		s.gravity = -0.1f;
