@@ -649,7 +649,7 @@ void HarpoonBoltControl(short itemNumber)
 	if (foundCollidedObjects)
 	{
 		if (explodeItem)
-			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 		KillItem(itemNumber);
 	}
 }
@@ -1366,7 +1366,7 @@ void RocketControl(short itemNumber)
 		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
-		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+		ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 		KillItem(itemNumber);
 	}
 }
@@ -1497,7 +1497,7 @@ void CrossbowBoltControl(short itemNumber)
 		// If ammos are normal, then just shatter the bolt and quit
 		if (item->ItemFlags[0] != (int)CrossbowBoltType::Explosive)
 		{
-			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 			KillItem(itemNumber);
 			return;
 		}
@@ -1638,7 +1638,7 @@ void CrossbowBoltControl(short itemNumber)
 		// If bolt has hit some objects then shatter itself
 		if (foundCollidedObjects)
 		{
-			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 			KillItem(itemNumber);
 		}
 	}
@@ -1662,7 +1662,7 @@ void CrossbowBoltControl(short itemNumber)
 		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
-		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+		ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 		KillItem(itemNumber);
 	}
 }

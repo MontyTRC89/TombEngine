@@ -276,7 +276,7 @@ namespace TEN::Entities::TR1
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, EXPLODE_NORMAL);
+			ExplodingDeath(itemNumber, BODY_EXPLODE);
 			KillItem(itemNumber);
 			item->Status = ITEM_DEACTIVATED;
 		}
