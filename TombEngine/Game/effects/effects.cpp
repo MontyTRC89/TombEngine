@@ -285,9 +285,8 @@ void UpdateSparks()
 
 			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
 			int ds = dl * (spark->dSize - spark->sSize);
-			//spark->size = spark->sSize + (ds & 0xFF);
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
-			spark->size = lerp(spark->sSize, spark->dSize, alpha);
+			spark->size = Lerp(spark->sSize, spark->dSize, alpha);
 
 			if ((spark->flags & SP_FIRE && !Lara.Burn) || 
 				(spark->flags & SP_DAMAGE) || 
@@ -927,7 +926,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 
 				float t = vel / (splashVelocity / 2) + 16;
 				t = fmax(0, fmin(t, 1));
-				splash.life = lerp(48, 70, t);
+				splash.life = Lerp(48.0f, 70.0f, t);
 				splash.spriteSequenceStart = 4; //Splash Texture
 				splash.spriteSequenceEnd = 7; //Splash Texture
 				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);

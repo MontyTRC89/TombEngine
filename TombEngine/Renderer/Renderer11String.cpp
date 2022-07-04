@@ -1,15 +1,16 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 
-namespace TEN::Renderer {
+namespace TEN::Renderer 
+{
 	void Renderer11::DrawString(int x, int y, const char* string, D3DCOLOR color, int flags)
 	{
 		if (string == NULL)
 			return;
 
-		float factorX = ScreenWidth / REFERENCE_RES_WIDTH;
-		float factorY = ScreenHeight / REFERENCE_RES_HEIGHT;
-		float UIScale = ScreenWidth > ScreenHeight ? factorY : factorX;
+		float factorX = m_screenWidth / REFERENCE_RES_WIDTH;
+		float factorY = m_screenHeight / REFERENCE_RES_HEIGHT;
+		float UIScale = m_screenWidth > m_screenHeight ? factorY : factorX;
 		float fontScale = REFERENCE_FONT_SIZE / m_gameFont->GetLineSpacing();
 
 		// Convert the string to wstring
