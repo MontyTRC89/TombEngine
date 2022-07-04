@@ -477,14 +477,13 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
-		{
-			item->Animation.TargetState = LS_SPRINT;
-			return;
-		}
 		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
-			item->Animation.TargetState = LS_RUN_FORWARD;
+			if (TrInput & IN_SPRINT)
+				item->Animation.TargetState = LS_RUN_FORWARD;
+			else
+				item->Animation.TargetState = LS_SPRINT;
+
 			return;
 		}
 	}
@@ -821,14 +820,13 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
-		{
-			item->Animation.TargetState = LS_SPRINT;
-			return;
-		}
 		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
-			item->Animation.TargetState = LS_RUN_FORWARD;
+			if (TrInput & IN_SPRINT)
+				item->Animation.TargetState = LS_RUN_FORWARD;
+			else
+				item->Animation.TargetState = LS_SPRINT;
+
 			return;
 		}
 	}
@@ -1152,14 +1150,13 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
-		{
-			item->Animation.TargetState = LS_SPRINT;
-			return;
-		}
 		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 		{
-			item->Animation.TargetState = LS_RUN_FORWARD;
+			if (TrInput & IN_SPRINT)
+				item->Animation.TargetState = LS_RUN_FORWARD;
+			else
+				item->Animation.TargetState = LS_SPRINT;
+
 			return;
 		}
 	}
