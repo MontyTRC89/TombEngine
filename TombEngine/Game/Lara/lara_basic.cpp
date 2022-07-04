@@ -732,10 +732,9 @@ void lara_col_run_back(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// TODO: Unify all turn states to reduce copy-paste.
-// State:		LS_TURN_RIGHT_SLOW (6)
-// Collision:	lara_col_turn_right_slow()
-void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_TURN_RIGHT_SLOW (6), LS_TURN_LEFT_SLOW (7)
+// Collision:	lara_col_turn_slow()
+void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -815,182 +814,6 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 			}
 		}
 		else if (TrInput & IN_WALK)
-		{
-			if (TestLaraWalkForward(item, coll))
-			{
-				item->Animation.TargetState = LS_WALK_FORWARD;
-				return;
-			}
-		}
-		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
-		{
-			item->Animation.TargetState = LS_SPRINT;
-			return;
-		}
-		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			item->Animation.TargetState = LS_RUN_FORWARD;
-			return;
-		}
-	}
-	else if (TrInput & IN_BACK)
-	{
-		if (lara->Control.WaterStatus == WaterStatus::Wade)
-		{
-			if (isSwamp)
-			{
-				if (TestLaraWalkBackSwamp(item, coll))
-					item->Animation.TargetState = LS_WALK_BACK;
-			}
-			else if (TestLaraWalkBack(item, coll))
-				item->Animation.TargetState = LS_WALK_BACK;
-
-			return;
-		}
-		else if (TrInput & IN_WALK)
-		{
-			if (TestLaraWalkBack(item, coll))
-			{
-				item->Animation.TargetState = LS_WALK_BACK;
-				return;
-			}
-		}
-		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			item->Animation.TargetState = LS_RUN_BACK;
-			return;
-		}
-	}
-
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
-	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
-		return;
-	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
-	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
-		return;
-	}
-
-	if (TrInput & IN_RIGHT)
-	{
-		// TODO: This hasn't worked since TR1.
-		/*if (TrInput & IN_WALK)
-		{
-			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
-
-			if (lara->Control.TurnRate > LARA_SLOW_TURN_RATE_MAX)
-				lara->Control.TurnRate = LARA_SLOW_TURN_RATE_MAX;
-		}
-		else */if (lara->Control.TurnRate.y > LARA_SLOW_MED_TURN_RATE_MAX && lara->Control.WaterStatus != WaterStatus::Wade)
-			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
-		else USE_FEATURE_IF_CPP20([[likely]])
-			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
-
-		return;
-	}
-
-	item->Animation.TargetState = LS_IDLE;
-}
-
-// State:		LS_TURN_RIGHT_SLOW (6)
-// Control:		lara_as_turn_right_slow()
-void lara_col_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
-{
-	lara_col_idle(item, coll);
-}
-
-// State:		LS_TURN_LEFT_SLOW (7)
-// Collision:	lara_col_turn_left_slow()
-void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
-
-	lara->Control.CanLook = (isSwamp && lara->Control.WaterStatus == WaterStatus::Wade) ? false : true;
-
-	if (item->HitPoints <= 0)
-	{
-		item->Animation.TargetState = LS_DEATH;
-		return;
-	}
-
-	if (lara->Control.WaterStatus == WaterStatus::Wade)
-	{
-		if (isSwamp)
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SWAMP_TURN_RATE_MAX);
-		else USE_FEATURE_IF_CPP20([[likely]] )
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_WADE_TURN_RATE_MAX);
-	}
-	else
-		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_MED_FAST_TURN_RATE_MAX);
-
-	if (TrInput & IN_JUMP && TestLaraStandingJump(item, coll))
-	{
-		SetLaraJumpDirection(item, coll);
-		if (lara->Control.JumpDirection != JumpDirection::None)
-		{
-			item->Animation.TargetState = LS_JUMP_PREPARE;
-			return;
-		}
-	}
-
-	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		TestLaraRoll180(item, coll))
-	{
-		// TODO: Safe 180 turn.
-		/*if (TrInput & IN_WALK || lara->Control.WaterStatus == WaterStatus::Wade)
-			item->Animation.TargetState = LS_TURN_180;
-		else if (TestLaraRoll180(item, coll))
-			item->Animation.TargetState = LS_ROLL_FORWARD;*/
-
-		item->Animation.TargetState = LS_ROLL_FORWARD;
-		return;
-	}
-
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
-	{
-		item->Animation.TargetState = LS_CROUCH_IDLE;
-		return;
-	}
-
-	if (TrInput & IN_FORWARD)
-	{
-		auto vaultResult = TestLaraVault(item, coll);
-
-		if (TrInput & IN_ACTION && vaultResult.Success)
-		{
-			item->Animation.TargetState = vaultResult.TargetState;
-			SetLaraVault(item, coll, vaultResult);
-			return;
-		}
-		else if (lara->Control.WaterStatus == WaterStatus::Wade)
-		{
-			if (isSwamp)
-			{
-				if (TestLaraWadeForwardSwamp(item, coll))
-				{
-					item->Animation.TargetState = LS_WADE_FORWARD;
-					return;
-				}
-			}
-			else if (TestLaraRunForward(item, coll))
-			{
-				item->Animation.TargetState = LS_WADE_FORWARD;
-				return;
-			}
-		}
-		else if(TrInput & IN_WALK)
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
@@ -1069,8 +892,25 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 		else */if (lara->Control.TurnRate.y < -LARA_SLOW_MED_TURN_RATE_MAX && lara->Control.WaterStatus != WaterStatus::Wade)
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
-		else USE_FEATURE_IF_CPP20([[likely]])
+		else USE_FEATURE_IF_CPP20([[likely]] )
 			item->Animation.TargetState = LS_TURN_LEFT_SLOW;
+
+		return;
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		// TODO: This hasn't worked since TR1.
+		/*if (TrInput & IN_WALK)
+		{
+			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
+
+			if (lara->Control.TurnRate > LARA_SLOW_TURN_RATE_MAX)
+				lara->Control.TurnRate = LARA_SLOW_TURN_RATE_MAX;
+		}
+		else */if (lara->Control.TurnRate.y > LARA_SLOW_MED_TURN_RATE_MAX && lara->Control.WaterStatus != WaterStatus::Wade)
+			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
+		else USE_FEATURE_IF_CPP20([[likely]])
+			item->Animation.TargetState = LS_TURN_RIGHT_SLOW;
 
 		return;
 	}
@@ -1078,11 +918,11 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_TURN_LEFT_SLOW (7)
-// Control:		lara_as_turn_left_slow()
-void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_TURN_RIGHT_SLOW (6), LS_TURN_LEFT_SLOW (7)
+// Control:		lara_as_turn_slow()
+void lara_col_turn_slow(ItemInfo* item, CollisionInfo* coll)
 {
-	lara_col_turn_right_slow(item, coll);
+	lara_col_idle(item, coll);
 }
 
 // State:		LS_DEATH (8)
@@ -1257,9 +1097,9 @@ void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll)
 	}
 }
 
-// State:		LS_TURN_RIGHT_FAST (20)
-// Collision:	lara_col_turn_right_fast()
-void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_TURN_RIGHT_FAST (20), LS_TURN_LEFT_FAST (152)
+// Collision:	lara_col_turn_fast()
+void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -1359,8 +1199,13 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// TODO: Hold WALK to slow down again? Will require introduction more player options.
-	if (TrInput & IN_RIGHT)
+	// TODO: Hold WALK to slow down again? Will require introducion more player options.
+	if (TrInput & IN_LEFT)
+	{
+		item->Animation.TargetState = LS_TURN_LEFT_FAST;
+		return;
+	}
+	else if (TrInput & IN_RIGHT)
 	{
 		item->Animation.TargetState = LS_TURN_RIGHT_FAST;
 		return;
@@ -1369,127 +1214,9 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 	item->Animation.TargetState = LS_IDLE;
 }
 
-// State:		LS_TURN_RIGHT_FAST (20)
-// Control:		lara_as_turn_right_fast()
-void lara_col_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
-{
-	lara_col_idle(item, coll);
-}
-
-// State:		LS_TURN_LEFT_FAST (152)
-// Collision:	lara_col_turn_left_fast()
-void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (item->HitPoints <= 0)
-	{
-		item->Animation.TargetState = LS_DEATH;
-		return;
-	}
-
-	ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, LARA_MED_TURN_RATE_MAX, LARA_FAST_TURN_RATE_MAX);
-
-	if (TrInput & IN_JUMP && TestLaraStandingJump(item, coll))
-	{
-		SetLaraJumpDirection(item, coll);
-		if (lara->Control.JumpDirection != JumpDirection::None)
-		{
-			item->Animation.TargetState = LS_JUMP_PREPARE;
-			return;
-		}
-	}
-
-	if ((TrInput & IN_ROLL || (TrInput & IN_FORWARD && TrInput & IN_BACK)) &&
-		TestLaraRoll180(item, coll))
-	{
-		item->Animation.TargetState = LS_ROLL_FORWARD;
-		return;
-	}
-
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
-	{
-		item->Animation.TargetState = LS_CROUCH_IDLE;
-		return;
-	}
-
-	if (TrInput & IN_FORWARD)
-	{
-		auto vaultResult = TestLaraVault(item, coll);
-
-		if (TrInput & IN_ACTION && vaultResult.Success)
-		{
-			item->Animation.TargetState = vaultResult.TargetState;
-			SetLaraVault(item, coll, vaultResult);
-			return;
-		}
-		else if (TrInput & IN_WALK)
-		{
-			if (TestLaraWalkForward(item, coll))
-			{
-				item->Animation.TargetState = LS_WALK_FORWARD;
-				return;
-			}
-		}
-		else if (TrInput & IN_SPRINT && TestLaraRunForward(item, coll))
-		{
-			item->Animation.TargetState = LS_SPRINT;
-			return;
-		}
-		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			item->Animation.TargetState = LS_RUN_FORWARD;
-			return;
-		}
-	}
-	else if (TrInput & IN_BACK)
-	{
-		if (TrInput & IN_WALK)
-		{
-			if (TestLaraWalkBack(item, coll))
-			{
-				item->Animation.TargetState = LS_WALK_BACK;
-				return;
-			}
-		}
-		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			item->Animation.TargetState = LS_RUN_BACK;
-			return;
-		}
-	}
-
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
-	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
-		return;
-	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
-	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
-		return;
-	}
-
-	if (TrInput & IN_LEFT)
-	{
-		item->Animation.TargetState = LS_TURN_LEFT_FAST;
-		return;
-	}
-
-	item->Animation.TargetState = LS_IDLE;
-}
-
-// State:		LS_TURN_LEFT_FAST (152)
-// Control:		lara_as_turn_left_fast()
-void lara_col_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
+// State:		LS_TURN_RIGHT_FAST (20), LS_TURN_LEFT_FAST (152)
+// Control:		lara_as_turn_fast()
+void lara_col_turn_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	lara_col_idle(item, coll);
 }

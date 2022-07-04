@@ -1,8 +1,7 @@
 #pragma once
 
-struct ItemInfo;
 struct CollisionInfo;
-struct CollisionResult;
+struct ItemInfo;
 
 // ------------------------------
 // BASIC MOVEMENT & MISCELLANEOUS
@@ -35,20 +34,16 @@ void lara_col_idle(ItemInfo* item, CollisionInfo* coll);
 void lara_as_pose(ItemInfo* item, CollisionInfo* coll);
 void lara_as_run_back(ItemInfo* item, CollisionInfo* coll);
 void lara_col_run_back(ItemInfo* item, CollisionInfo* coll);
-void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll);
-void lara_col_turn_right_slow(ItemInfo* item, CollisionInfo* coll);
-void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll);
-void lara_col_turn_left_slow(ItemInfo* item, CollisionInfo* coll);
+void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll);
+void lara_col_turn_slow(ItemInfo* item, CollisionInfo* coll);
 void lara_as_death(ItemInfo* item, CollisionInfo* coll);
 void lara_col_death(ItemInfo* item, CollisionInfo* coll);
 void lara_as_splat(ItemInfo* item, CollisionInfo* coll);
 void lara_col_splat(ItemInfo* item, CollisionInfo* coll);
 void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll);
 void lara_col_walk_back(ItemInfo* item, CollisionInfo* coll);
-void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll);
-void lara_col_turn_right_fast(ItemInfo* item, CollisionInfo* coll);
-void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll);
-void lara_col_turn_left_fast(ItemInfo* item, CollisionInfo* coll);
+void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll);
+void lara_col_turn_fast(ItemInfo* item, CollisionInfo* coll);
 void lara_as_step_right(ItemInfo* item, CollisionInfo* coll);
 void lara_col_step_right(ItemInfo* item, CollisionInfo* coll);
 void lara_as_step_left(ItemInfo* item, CollisionInfo* coll);

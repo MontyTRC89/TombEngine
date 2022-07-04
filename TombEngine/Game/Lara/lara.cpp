@@ -59,8 +59,8 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_jump_forward,//33
 	lara_as_pose,//4
 	lara_as_run_back,//5
-	lara_as_turn_right_slow,//6
-	lara_as_turn_left_slow,//7
+	lara_as_turn_slow,//6
+	lara_as_turn_slow,//7
 	lara_as_death,//8
 	lara_as_freefall,//9
 	lara_as_hang_idle,
@@ -73,7 +73,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_underwater_swim_forward,//17
 	lara_as_underwater_inertia,//18
 	lara_as_controlled_no_look,//19
-	lara_as_turn_right_fast,//20
+	lara_as_turn_fast,//20
 	lara_as_step_right,//21
 	lara_as_step_left,//22
 	lara_as_roll_back,
@@ -209,7 +209,7 @@ function<LaraRoutineFunction> lara_control_routines[NUM_LARA_STATES + 1] =
 	lara_as_slopefall,//149
 	lara_as_climb_stepoff_left,
 	lara_as_climb_stepoff_right,
-	lara_as_turn_left_fast,
+	lara_as_turn_fast,
 	lara_as_controlled,
 	lara_as_controlled,
 	lara_as_controlled,//155
@@ -240,8 +240,8 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_jump_forward,//3
 	lara_col_idle,//4
 	lara_col_run_back,
-	lara_col_turn_right_slow,
-	lara_col_turn_left_slow,
+	lara_col_turn_slow,
+	lara_col_turn_slow,
 	lara_col_death,
 	lara_col_freefall,//9
 	lara_col_hang_idle,
@@ -254,7 +254,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_underwater_swim_forward,
 	lara_col_underwater_inertia,
 	lara_default_col,//19
-	lara_col_turn_right_fast,
+	lara_col_turn_fast,
 	lara_col_step_right,
 	lara_col_step_left,
 	lara_col_roll_back,
@@ -386,7 +386,7 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,     // lara_col_slopefall
 	lara_default_col,
 	lara_default_col,
-	lara_col_turn_left_fast,
+	lara_col_turn_fast,
 	lara_default_col,
 	lara_default_col,
 	lara_default_col,
