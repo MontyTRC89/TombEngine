@@ -160,7 +160,7 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 
 		item->Animation.Velocity = 0;
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		return true;
 	}
 
@@ -191,7 +191,7 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 
 		item->Animation.TargetState = LS_MONKEY_IDLE;
 		item->Animation.Velocity = 0;
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		return true;
 	}
 
@@ -386,7 +386,7 @@ void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 
 	if (coll->Middle.Floor <= STEPUP_HEIGHT)
 	{
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		item->Animation.VerticalVelocity = 0;
 	}
 }
@@ -677,7 +677,7 @@ bool TestLaraHitCeiling(CollisionInfo* coll)
 
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	item->Pose.Position = coll->Setup.OldPosition;

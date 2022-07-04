@@ -4,15 +4,15 @@ namespace TEN::Entities::Vehicles
 {
 	struct RubberBoatInfo
 	{
-		int TurnRate;
-		short LeanAngle;
-		short PropellerRotation;
-		short ExtraRotation;
+		int TurnRate = 0;
+		short LeanAngle = 0;
+		short PropellerRotation = 0;
+		short ExtraRotation = 0;
 
-		int LeftVerticalVelocity;
-		int RightVerticalVelocity;
+		int LeftVerticalVelocity = 0;
+		int RightVerticalVelocity = 0;
 
-		int Water;
-		int Pitch;
+		int Water = 0;
+		int Pitch = 0;
 	};
 }

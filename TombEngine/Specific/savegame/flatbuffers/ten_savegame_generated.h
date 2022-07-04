@@ -407,7 +407,7 @@ struct ItemT : public flatbuffers::NativeTable {
   bool triggered = false;
   bool active = false;
   int32_t status = 0;
-  bool airborne = false;
+  bool is_airborne = false;
   bool hit_stauts = false;
   bool collidable = false;
   bool looked_at = false;
@@ -452,7 +452,7 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TRIGGERED = 50,
     VT_ACTIVE = 52,
     VT_STATUS = 54,
-    VT_AIRBORNE = 56,
+    VT_IS_AIRBORNE = 56,
     VT_HIT_STAUTS = 58,
     VT_COLLIDABLE = 60,
     VT_LOOKED_AT = 62,
@@ -544,8 +544,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t status() const {
     return GetField<int32_t>(VT_STATUS, 0);
   }
-  bool airborne() const {
-    return GetField<uint8_t>(VT_AIRBORNE, 0) != 0;
+  bool is_airborne() const {
+    return GetField<uint8_t>(VT_IS_AIRBORNE, 0) != 0;
   }
   bool hit_stauts() const {
     return GetField<uint8_t>(VT_HIT_STAUTS, 0) != 0;
@@ -679,7 +679,7 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_TRIGGERED) &&
            VerifyField<uint8_t>(verifier, VT_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_STATUS) &&
-           VerifyField<uint8_t>(verifier, VT_AIRBORNE) &&
+           VerifyField<uint8_t>(verifier, VT_IS_AIRBORNE) &&
            VerifyField<uint8_t>(verifier, VT_HIT_STAUTS) &&
            VerifyField<uint8_t>(verifier, VT_COLLIDABLE) &&
            VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
@@ -875,8 +875,8 @@ struct ItemBuilder {
   void add_status(int32_t status) {
     fbb_.AddElement<int32_t>(Item::VT_STATUS, status, 0);
   }
-  void add_airborne(bool airborne) {
-    fbb_.AddElement<uint8_t>(Item::VT_AIRBORNE, static_cast<uint8_t>(airborne), 0);
+  void add_is_airborne(bool is_airborne) {
+    fbb_.AddElement<uint8_t>(Item::VT_IS_AIRBORNE, static_cast<uint8_t>(is_airborne), 0);
   }
   void add_hit_stauts(bool hit_stauts) {
     fbb_.AddElement<uint8_t>(Item::VT_HIT_STAUTS, static_cast<uint8_t>(hit_stauts), 0);
@@ -953,7 +953,7 @@ inline flatbuffers::Offset<Item> CreateItem(
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
-    bool airborne = false,
+    bool is_airborne = false,
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
@@ -1003,7 +1003,7 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_looked_at(looked_at);
   builder_.add_collidable(collidable);
   builder_.add_hit_stauts(hit_stauts);
-  builder_.add_airborne(airborne);
+  builder_.add_is_airborne(is_airborne);
   builder_.add_active(active);
   builder_.add_triggered(triggered);
   return builder_.Finish();
@@ -1042,7 +1042,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
-    bool airborne = false,
+    bool is_airborne = false,
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
@@ -1089,7 +1089,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       triggered,
       active,
       status,
-      airborne,
+      is_airborne,
       hit_stauts,
       collidable,
       looked_at,
@@ -6422,7 +6422,7 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = triggered(); _o->triggered = _e; }
   { auto _e = active(); _o->active = _e; }
   { auto _e = status(); _o->status = _e; }
-  { auto _e = airborne(); _o->airborne = _e; }
+  { auto _e = is_airborne(); _o->is_airborne = _e; }
   { auto _e = hit_stauts(); _o->hit_stauts = _e; }
   { auto _e = collidable(); _o->collidable = _e; }
   { auto _e = looked_at(); _o->looked_at = _e; }
@@ -6471,7 +6471,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _triggered = _o->triggered;
   auto _active = _o->active;
   auto _status = _o->status;
-  auto _airborne = _o->airborne;
+  auto _is_airborne = _o->is_airborne;
   auto _hit_stauts = _o->hit_stauts;
   auto _collidable = _o->collidable;
   auto _looked_at = _o->looked_at;
@@ -6512,7 +6512,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _triggered,
       _active,
       _status,
-      _airborne,
+      _is_airborne,
       _hit_stauts,
       _collidable,
       _looked_at,

@@ -17,5 +17,5 @@ struct SPHERE
 extern SPHERE LaraSpheres[MAX_SPHERES];
 extern SPHERE CreatureSpheres[MAX_SPHERES];
 
-int TestCollision(ItemInfo* item, ItemInfo* l);
+int TestCollision(ItemInfo* item, ItemInfo* laraItem);
 int GetSpheres(ItemInfo* item, SPHERE* ptr, int worldSpace, Matrix local);

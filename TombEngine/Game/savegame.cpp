@@ -339,7 +339,7 @@ bool SaveGame::Save(int slot)
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		
 		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
-		for (int j = 0; j < (int)WeaponAmmoType::NumAmmos; j++)
+		for (int j = 0; j < (int)WeaponAmmoType::NumAmmoTypes; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
 			ammo.add_count(info->Ammo[j].getCount());
@@ -466,9 +466,9 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_ai_target_number(creature->AITargetNumber);
 			creatureOffset = creatureBuilder.Finish();
 		}
-		else if (itemToSerialize.Data.is<QuadInfo>())
+		else if (itemToSerialize.Data.is<QuadBikeInfo>())
 		{
-			auto quad = (QuadInfo*)itemToSerialize.Data;
+			auto quad = (QuadBikeInfo*)itemToSerialize.Data;
 
 			Save::QuadBikeBuilder quadBuilder{ fbb };
 
@@ -496,13 +496,13 @@ bool SaveGame::Save(int slot)
 
 			Save::UPVBuilder upvBuilder{ fbb };
 
-			upvBuilder.add_fan_rot(upv->FanRot);
+			upvBuilder.add_fan_rot(upv->TurbineRotation);
 			upvBuilder.add_flags(upv->Flags);
 			upvBuilder.add_harpoon_left(upv->HarpoonLeft);
 			upvBuilder.add_harpoon_timer(upv->HarpoonTimer);
-			upvBuilder.add_rot(upv->Rot);
+			upvBuilder.add_rot(upv->TurnRate.y);
 			upvBuilder.add_velocity(upv->Velocity);
-			upvBuilder.add_x_rot(upv->XRot);
+			upvBuilder.add_x_rot(upv->TurnRate.x);
 			upvOffset = upvBuilder.Finish();
 		}
 		else if (itemToSerialize.Data.is<MinecartInfo>())
@@ -534,15 +534,15 @@ bool SaveGame::Save(int slot)
 			kayakBuilder.add_flags(kayak->Flags);
 			kayakBuilder.add_forward(kayak->Forward);
 			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
-			kayakBuilder.add_left_right_count(kayak->LeftRightCount);
+			kayakBuilder.add_left_right_count(kayak->LeftRightPaddleCount);
 			kayakBuilder.add_left_vertical_velocity(kayak->LeftVerticalVelocity);
 			kayakBuilder.add_old_pos(&Save::Position(
-				kayak->OldPos.Position.x, 
-				kayak->OldPos.Position.y, 
-				kayak->OldPos.Position.z, 
-				kayak->OldPos.Orientation.x, 
-				kayak->OldPos.Orientation.y, 
-				kayak->OldPos.Orientation.z));
+				kayak->OldPose.Position.x, 
+				kayak->OldPose.Position.y, 
+				kayak->OldPose.Position.z, 
+				kayak->OldPose.Orientation.x, 
+				kayak->OldPose.Orientation.y, 
+				kayak->OldPose.Orientation.z));
 			kayakBuilder.add_right_vertical_velocity(kayak->RightVerticalVelocity);
 			kayakBuilder.add_true_water(kayak->TrueWater);
 			kayakBuilder.add_turn(kayak->Turn);
@@ -601,7 +601,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
 		serializedItem.add_status(itemToSerialize.Status);
-		serializedItem.add_airborne(itemToSerialize.Animation.Airborne);
+		serializedItem.add_is_airborne(itemToSerialize.Animation.IsAirborne);
 		serializedItem.add_hit_stauts(itemToSerialize.HitStatus);
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
@@ -614,7 +614,7 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
 		}
-		else if (itemToSerialize.Data.is<QuadInfo>())
+		else if (itemToSerialize.Data.is<QuadBikeInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::QuadBike);
 			serializedItem.add_data(quadOffset.Union());
@@ -667,7 +667,11 @@ bool SaveGame::Save(int slot)
 
 	// Legacy soundtrack map
 	std::vector<int> soundTrackMap;
-	for (auto& track : SoundTracks) { soundTrackMap.push_back(track.second.Mask); }
+	for (auto& track : SoundTracks) 
+	{
+		soundTrackMap.push_back(track.first);
+		soundTrackMap.push_back(track.second.Mask); 
+	}
 	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
 
 	// Flipmaps
@@ -1151,11 +1155,9 @@ bool SaveGame::Load(int slot)
 	// Legacy soundtrack map
 	for (int i = 0; i < s->cd_flags()->size(); i++)
 	{
-		// Safety check for cases when soundtrack map was externally modified and became smaller
-		if (i >= SoundTracks.size())
-			break;
-
-		SoundTracks[i].Mask = s->cd_flags()->Get(i);
+		int index = s->cd_flags()->Get(i);
+		int mask  = s->cd_flags()->Get(++i);
+		SoundTracks[index].Mask = mask;
 	}
 
 	// Static objects
@@ -1284,7 +1286,7 @@ bool SaveGame::Load(int slot)
 		item->HitStatus = savedItem->hit_stauts();
 		item->Status = savedItem->status();
 		item->AIBits = savedItem->ai_bits();
-		item->Animation.Airborne = savedItem->airborne();
+		item->Animation.IsAirborne = savedItem->is_airborne();
 		item->Collidable = savedItem->collidable();
 		item->LookedAt = savedItem->looked_at();
 
@@ -1346,75 +1348,75 @@ bool SaveGame::Load(int slot)
 			creature->Tosspad = savedCreature->tosspad();
 			SetBaddyTarget(i, savedCreature->ai_target_number());
 		}
-		else if (item->Data.is<QuadInfo>())
+		else if (item->Data.is<QuadBikeInfo>())
 		{
-			auto quad = (QuadInfo*)item->Data;
-			auto savedQuad = (Save::QuadBike*)savedItem->data();
+			auto* quadBike = (QuadBikeInfo*)item->Data;
+			auto* savedQuad = (Save::QuadBike*)savedItem->data();
 
-			quad->CanStartDrift = savedQuad->can_start_drift();
-			quad->DriftStarting = savedQuad->drift_starting();
-			quad->EngineRevs = savedQuad->engine_revs();
-			quad->ExtraRotation = savedQuad->extra_rotation();
-			quad->Flags = savedQuad->flags();
-			quad->FrontRot = savedQuad->front_rot();
-			quad->LeftVerticalVelocity = savedQuad->left_vertical_velocity();
-			quad->MomentumAngle = savedQuad->momentum_angle();
-			quad->NoDismount = savedQuad->no_dismount();
-			quad->Pitch = savedQuad->pitch();
-			quad->RearRot = savedQuad->rear_rot();
-			quad->Revs = savedQuad->revs();
-			quad->RightVerticalVelocity = savedQuad->right_vertical_velocity();
-			quad->SmokeStart = savedQuad->smoke_start();
-			quad->TurnRate = savedQuad->turn_rate();
-			quad->Velocity = savedQuad->velocity();
+			quadBike->CanStartDrift = savedQuad->can_start_drift();
+			quadBike->DriftStarting = savedQuad->drift_starting();
+			quadBike->EngineRevs = savedQuad->engine_revs();
+			quadBike->ExtraRotation = savedQuad->extra_rotation();
+			quadBike->Flags = savedQuad->flags();
+			quadBike->FrontRot = savedQuad->front_rot();
+			quadBike->LeftVerticalVelocity = savedQuad->left_vertical_velocity();
+			quadBike->MomentumAngle = savedQuad->momentum_angle();
+			quadBike->NoDismount = savedQuad->no_dismount();
+			quadBike->Pitch = savedQuad->pitch();
+			quadBike->RearRot = savedQuad->rear_rot();
+			quadBike->Revs = savedQuad->revs();
+			quadBike->RightVerticalVelocity = savedQuad->right_vertical_velocity();
+			quadBike->SmokeStart = savedQuad->smoke_start();
+			quadBike->TurnRate = savedQuad->turn_rate();
+			quadBike->Velocity = savedQuad->velocity();
 		}
 		else if (item->Data.is<UPVInfo>())
 		{
-			auto upv = (UPVInfo*)item->Data;
-			auto savedUpv = (Save::UPV*)savedItem->data();
+			auto* upv = (UPVInfo*)item->Data;
+			auto* savedUpv = (Save::UPV*)savedItem->data();
 
-			upv->FanRot = savedUpv->fan_rot();
+			upv->TurbineRotation = savedUpv->fan_rot();
 			upv->Flags = savedUpv->flags();
 			upv->HarpoonLeft = savedUpv->harpoon_left();
 			upv->HarpoonTimer = savedUpv->harpoon_timer();
-			upv->Rot = savedUpv->rot();
+			upv->TurnRate.y = savedUpv->rot();
 			upv->Velocity = savedUpv->velocity();
-			upv->XRot = savedUpv->x_rot();
+			upv->TurnRate.x = savedUpv->x_rot();
 		}
 		else if (item->Data.is<MinecartInfo>())
 		{
-			auto mine = (MinecartInfo*)item->Data;
-			auto savedMine = (Save::Minecart*)savedItem->data();
+			auto* minecart = (MinecartInfo*)item->Data;
+			auto* savedMine = (Save::Minecart*)savedItem->data();
 
-			mine->Flags = savedMine->flags();
-			mine->FloorHeightFront = savedMine->floor_height_front();
-			mine->FloorHeightMiddle = savedMine->floor_height_middle();
-			mine->Gradient = savedMine->gradient();
-			mine->StopDelay = savedMine->stop_delay();
-			mine->TurnLen = savedMine->turn_len();
-			mine->TurnRot = savedMine->turn_rot();
-			mine->TurnX = savedMine->turn_x();
-			mine->TurnZ = savedMine->turn_z();
-			mine->Velocity = savedMine->velocity();
-			mine->VerticalVelocity = savedMine->vertical_velocity();
+			minecart->Flags = savedMine->flags();
+			minecart->FloorHeightFront = savedMine->floor_height_front();
+			minecart->FloorHeightMiddle = savedMine->floor_height_middle();
+			minecart->Gradient = savedMine->gradient();
+			minecart->StopDelay = savedMine->stop_delay();
+			minecart->TurnLen = savedMine->turn_len();
+			minecart->TurnRot = savedMine->turn_rot();
+			minecart->TurnX = savedMine->turn_x();
+			minecart->TurnZ = savedMine->turn_z();
+			minecart->Velocity = savedMine->velocity();
+			minecart->VerticalVelocity = savedMine->vertical_velocity();
 		}
 		else if (item->Data.is<KayakInfo>())
 		{
-			auto kayak = (KayakInfo*)item->Data;
-			auto savedKayak = (Save::Kayak*)savedItem->data();
+			auto* kayak = (KayakInfo*)item->Data;
+			auto* savedKayak = (Save::Kayak*)savedItem->data();
 
 			kayak->CurrentStartWake = savedKayak->flags();
 			kayak->Flags = savedKayak->flags();
 			kayak->Forward = savedKayak->forward();
 			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
-			kayak->LeftRightCount = savedKayak->left_right_count();
+			kayak->LeftRightPaddleCount = savedKayak->left_right_count();
 			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
-			kayak->OldPos.Position.x = savedKayak->old_pos()->x_pos();
-			kayak->OldPos.Position.y = savedKayak->old_pos()->y_pos();
-			kayak->OldPos.Position.z = savedKayak->old_pos()->z_pos();
-			kayak->OldPos.Orientation.x = savedKayak->old_pos()->x_rot();
-			kayak->OldPos.Orientation.y = savedKayak->old_pos()->y_rot();
-			kayak->OldPos.Orientation.z = savedKayak->old_pos()->z_rot();
+			kayak->OldPose.Position.x = savedKayak->old_pos()->x_pos();
+			kayak->OldPose.Position.y = savedKayak->old_pos()->y_pos();
+			kayak->OldPose.Position.z = savedKayak->old_pos()->z_pos();
+			kayak->OldPose.Orientation.x = savedKayak->old_pos()->x_rot();
+			kayak->OldPose.Orientation.y = savedKayak->old_pos()->y_rot();
+			kayak->OldPose.Orientation.z = savedKayak->old_pos()->z_rot();
 			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
 			kayak->TrueWater = savedKayak->true_water();
 			kayak->Turn = savedKayak->turn();
@@ -1425,21 +1427,21 @@ bool SaveGame::Load(int slot)
 		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
-			auto data = savedItem->data();
-			auto savedData = (Save::Short*)data;
+			auto* data = savedItem->data();
+			auto* savedData = (Save::Short*)data;
 			item->Data = savedData->scalar();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Int)
 		{
-			auto data = savedItem->data();
-			auto savedData = (Save::Int*)data;
+			auto* data = savedItem->data();
+			auto* savedData = (Save::Int*)data;
 			item->Data = savedData->scalar();
 		}
 	}
 
 	for (int i = 0; i < s->particles()->size(); i++)
 	{
-		auto particleInfo = s->particles()->Get(i);
+		auto* particleInfo = s->particles()->Get(i);
 		auto* particle = &Particles[i];
 
 		particle->x = particleInfo->x();
@@ -1483,7 +1485,7 @@ bool SaveGame::Load(int slot)
 
 	for (int i = 0; i < s->bats()->size(); i++)
 	{
-		auto batInfo = s->bats()->Get(i);
+		auto* batInfo = s->bats()->Get(i);
 		auto* bat = &Bats[i];
 
 		bat->On = batInfo->on();
@@ -1515,7 +1517,7 @@ bool SaveGame::Load(int slot)
 
 	for (int i = 0; i < s->spiders()->size(); i++)
 	{
-		auto spiderInfo = s->spiders()->Get(i);
+		auto* spiderInfo = s->spiders()->Get(i);
 		auto* spider = &Spiders[i];
 
 		spider->On = spiderInfo->on();

@@ -43,7 +43,6 @@
 using namespace TEN::Effects::Lara;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Input;
-
 using std::function;
 using TEN::Renderer::g_Renderer;
 
@@ -316,9 +315,9 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_monkey_shimmy_right,//78
 	lara_col_monkey_turn_180,//79
 	lara_col_crawl_idle,
-	lara_col_crawl_forward,
-	lara_col_monkey_turn_left,//81
-	lara_col_monkey_turn_right,//82
+	lara_col_crawl_forward,//81
+	lara_col_monkey_turn_left,//82
+	lara_col_monkey_turn_right,
 	lara_col_crawl_turn_left,
 	lara_col_crawl_turn_right,
 	lara_col_crawl_back,
@@ -342,10 +341,10 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_col_crouch_turn_left,
 	lara_col_crouch_turn_right,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
+	lara_as_null,
+	lara_as_null,
+	lara_as_null,
+	lara_as_null,
 	lara_col_rope_idle,
 	lara_void_func,
 	lara_void_func,
@@ -451,7 +450,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
 		item->Animation.ActiveState == LS_IDLE &&
 		item->Animation.TargetState == LS_IDLE &&
-		!item->Animation.Airborne)
+		!item->Animation.IsAirborne)
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 	}
@@ -495,7 +494,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				if (isWater)
 				{
 					item->Pose.Position.y += CLICK(0.5f) - 28;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 					lara->Control.WaterStatus = WaterStatus::Underwater;
 					lara->Air = LARA_AIR_MAX;
 
@@ -532,15 +531,15 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				lara->Control.WaterStatus = WaterStatus::Wade;
 
-				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
+				// Make splash ONLY within this particular threshold before swim depth while is_airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
-					item->Animation.Airborne && !isSwamp)
+					item->Animation.IsAirborne && !isSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
 					Splash(item);
 				}
 				// Lara is grounded; don't splash again.
-				else if (!item->Animation.Airborne)
+				else if (!item->Animation.IsAirborne)
 					item->Animation.TargetState = LS_IDLE;
 				else if (isSwamp)
 				{
@@ -569,7 +568,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						SetAnimation(item, LA_FALL_START);
 						ResetLaraLean(item);
 						ResetLaraFlex(item);
-						item->Animation.Airborne = true;
+						item->Animation.IsAirborne = true;
 						item->Animation.Velocity = item->Animation.VerticalVelocity / 4;
 						item->Animation.VerticalVelocity = 0;
 						lara->Control.WaterStatus = WaterStatus::Dry;
@@ -610,7 +609,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				if (heightFromWater <= WADE_DEPTH)
 				{
 					SetAnimation(item, LA_FALL_START);
-					item->Animation.Airborne = true;
+					item->Animation.IsAirborne = true;
 					item->Animation.Velocity = item->Animation.VerticalVelocity / 4;
 					lara->Control.WaterStatus = WaterStatus::Dry;
 				}
@@ -639,7 +638,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					ResetLaraLean(item);
 					ResetLaraFlex(item);
 					item->Pose.Position.y += 1 - heightFromWater;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 					item->Animation.VerticalVelocity = 0;
 					lara->Control.WaterStatus = WaterStatus::TreadWater;
 
@@ -811,8 +810,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		// Handle Lara collision.
 		if (lara->Vehicle == NO_ITEM)
 			lara_collision_routines[item->Animation.ActiveState](item, coll);
-		//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
-		//	TrInput &= ~IN_ACTION;
 	}
 	dbU = KeyMap[OIS::KeyCode::KC_U] ? true : false;
 

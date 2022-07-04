@@ -90,6 +90,11 @@ Vector3Shrt GetVectorAngles(int x, int y, int z)
 	);
 }
 
+Vector3Shrt GetOrientBetweenPoints(Vector3Int origin, Vector3Int target)
+{
+	return GetVectorAngles(target.x - origin.x, target.y - origin.y, target.z - origin.z);
+}
+
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
 {
 	return (int)round(Vector3::Distance(first->Position.ToVector3(), second->Position.ToVector3()));
@@ -272,32 +277,32 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
-float Smoothstep(float e0, float e1, float x)
+float Smoothstep(float edge0, float edge1, float x)
 {
 	// Scale, bias and saturate x to 0..1 range
-	x = std::clamp((x - e0) / (e1 - e0), 0.0f, 1.0f);
+	x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
 
 	// Evaluate polynomial
 	return x * x * (3 - 2 * x);
 }
 
-Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical, float lateral)
+Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up, float right)
 {
-	if (forward == 0.0f && vertical == 0.0f && lateral == 0.0f)
+	if (forward == 0.0f && up == 0.0f && right == 0.0f)
 		return vector;
 
 	float sinAngle = phd_sin(angle);
 	float cosAngle = phd_cos(angle);
 
-	vector.x += (forward * sinAngle) + (lateral * cosAngle);
-	vector.y += vertical;
-	vector.z += (forward * cosAngle) + (lateral * -sinAngle);
+	vector.x += (forward * sinAngle) + (right * cosAngle);
+	vector.y += up;
+	vector.z += (forward * cosAngle) - (right * sinAngle);
 	return vector;
 }
 
-Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float vertical, float lateral)
+Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float up, float right)
 {
-	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
+	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, up, right);
 	return Vector3Int(
 		(int)round(newVector.x),
 		(int)round(newVector.y),

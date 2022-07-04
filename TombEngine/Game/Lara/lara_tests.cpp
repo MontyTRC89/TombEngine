@@ -801,11 +801,11 @@ bool TestLaraWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 	item->Pose.Position.y += coll->Middle.Floor + CLICK(2.75f) - 9;
 	UpdateItemRoom(item, -(STEPUP_HEIGHT - 3));
 
-	item->Pose.Orientation.x = 0;
-	item->Pose.Orientation.z = 0;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
+	item->Pose.Orientation.x = 0;
+	item->Pose.Orientation.z = 0;
 	lara->Control.WaterStatus = WaterStatus::Wade;
 
 	return true;
@@ -868,11 +868,11 @@ bool TestLaraLadderClimbOut(ItemInfo* item, CollisionInfo* coll) // NEW function
 	item->Animation.TargetState = LS_LADDER_IDLE;
 	AnimateLara(item);
 
-	item->Pose.Position.y -= 10; // Otherwise she falls back into the water.
-	item->Pose.Orientation = Vector3Shrt(0, facing, 0);
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
+	item->Pose.Position.y -= 10; // Otherwise she falls back into the water.
+	item->Pose.Orientation = Vector3Shrt(0, facing, 0);
 	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
 	lara->Control.WaterStatus = WaterStatus::Dry;
@@ -900,7 +900,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll)
 		item->Pose.Position.y = probe.Position.Floor;
 		item->Pose.Orientation.x = 0;
 		item->Pose.Orientation.z = 0;
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		item->Animation.Velocity = 0;
 		item->Animation.VerticalVelocity = 0;
 		lara->Control.WaterStatus = WaterStatus::Wade;
@@ -1077,7 +1077,8 @@ bool TestLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
 	int heightFromFloor = GetCollision(item).Position.Floor - item->Pose.Position.y;
 
-	if (item->Animation.Airborne && item->Animation.VerticalVelocity >= 0 &&
+	if (item->Animation.IsAirborne &&
+		item->Animation.VerticalVelocity >= 0 &&
 		(heightFromFloor <= item->Animation.VerticalVelocity ||
 			TestEnvironment(ENV_FLAG_SWAMP, item)))
 	{

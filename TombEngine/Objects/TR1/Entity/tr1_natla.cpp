@@ -88,13 +88,13 @@ namespace TEN::Entities::TR1
 			case NATLA_STATE_FALL:
 				if (item->Pose.Position.y < item->Floor)
 				{
-					item->Animation.Airborne = true;
+					item->Animation.IsAirborne = true;
 					item->Animation.Velocity = 0;
 				}
 				else
 				{
 					item->Animation.TargetState = NATLA_STATE_SEMI_DEATH;
-					item->Animation.Airborne = 0;
+					item->Animation.IsAirborne = 0;
 					item->Pose.Position.y = item->Floor;
 					timer = 0;
 				}

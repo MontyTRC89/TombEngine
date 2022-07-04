@@ -23,7 +23,7 @@
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
-#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 /// necessary import
@@ -388,7 +388,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseQuadBike;
-		obj->collision = QuadBikeCollision;
+		obj->collision = QuadBikePlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveAnim = true;
@@ -401,7 +401,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->initialise = InitialiseRubberBoat;
 		obj->control = RubberBoatControl;
-		obj->collision = RubberBoatCollision;
+		obj->collision = RubberBoatPlayerCollision;
 		obj->drawRoutine = DrawRubberBoat;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
@@ -415,7 +415,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseKayak;
-		obj->collision = KayakCollision;
+		obj->collision = KayakPlayerCollision;
 		//obj->drawRoutine = KayakDraw;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
@@ -429,7 +429,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseMinecart;
-		obj->collision = MinecartCollision;
+		obj->collision = MinecartPlayerCollision;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
@@ -455,7 +455,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->initialise = UPVInitialise;
 		obj->control = UPVEffects;
-		obj->collision = UPVCollision;
+		obj->collision = UPVPlayerCollision;
 	//	obj->drawRoutine = SubDraw;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
