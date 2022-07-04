@@ -1429,7 +1429,7 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	ExplodingDeath(lara->Vehicle, EXPLODE_NORMAL);
+	ExplodingDeath(lara->Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
 	KillItem(lara->Vehicle);
 	vehicle->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
@@ -1464,7 +1464,7 @@ void ExplodingDeath(short itemNumber, short flags)
 
 		item->ClearBits(JointBitType::Mesh, i);
 
-		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & EXPLODE_NORMAL)))
+		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
 		{
 			short fxNumber = CreateNewEffect(item->RoomNumber);
 			if (fxNumber != NO_ITEM)

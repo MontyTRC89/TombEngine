@@ -53,7 +53,7 @@ void SwordGuardianControl(short itemNumber)
 		{
 			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Pose);
 			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Pose);
-			ExplodingDeath(itemNumber, EXPLODE_NORMAL);
+			ExplodingDeath(itemNumber, BODY_EXPLODE);
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
 			item->Animation.ActiveState = 12;

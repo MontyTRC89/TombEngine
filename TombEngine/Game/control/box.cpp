@@ -820,10 +820,12 @@ void CreatureDie(short itemNumber, bool explode)
 
 	if (explode)
 	{
-		if (Objects[item->ObjectNumber].hitEffect)
-			ExplodingDeath(itemNumber, EXPLODE_HIT_EFFECT);
+		if (Objects[item->ObjectNumber].hitEffect & HIT_BLOOD)
+			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_GIBS);
+		else if (Objects[item->ObjectNumber].hitEffect & HIT_SMOKE)
+			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
 		else
-			ExplodingDeath(itemNumber, EXPLODE_NORMAL);
+			ExplodingDeath(itemNumber, BODY_EXPLODE);
 
 		KillItem(itemNumber);
 	}
