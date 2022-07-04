@@ -18,9 +18,9 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Renderer;
-using namespace TEN::Floordata;
 
 // -----------------------------
 // TEST FUNCTIONS
@@ -1002,11 +1002,21 @@ bool IsRunJumpCountableState(LaraState state)
 	return false;
 }
 
+bool TestLaraRoll180(ItemInfo* item, CollisionInfo* coll)
+{
+	auto* lara = GetLaraInfo(item);
+
+	return (lara->Control.WaterStatus != WaterStatus::Wade);
+}
+
 bool TestLaraPose(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (TestEnvironment(ENV_FLAG_SWAMP, item))
+	if (!g_GameFlow->HasAFKPose())
+		return false;
+
+	if (lara->Control.WaterStatus == WaterStatus::Wade)
 		return false;
 
 	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
@@ -2467,6 +2477,11 @@ bool TestLaraHangToStand(ItemInfo* item, CollisionInfo* coll)
 	};
 
 	return TestLaraHangClimbTolerance(item, coll, testSetup);
+}
+
+bool TestLaraStandingJump(ItemInfo* item, CollisionInfo* coll)
+{
+	return !TestEnvironment(ENV_FLAG_SWAMP, item);
 }
 
 bool TestLaraJumpTolerance(ItemInfo* item, CollisionInfo* coll, JumpTestSetup testSetup)
