@@ -2025,6 +2025,13 @@ void SetCinematicBars(float height, float speed)
 	CinematicBarsSpeed = speed;
 }
 
+void ClearCinematicBars()
+{
+	CinematicBarsHeight = 0;
+	CinematicBarsDestinationHeight = 0;
+	CinematicBarsSpeed = 0;
+}
+
 void UpdateFadeScreenAndCinematicBars()
 {
 	if (CinematicBarsDestinationHeight < CinematicBarsHeight)
