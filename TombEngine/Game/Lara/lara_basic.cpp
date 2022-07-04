@@ -453,7 +453,8 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (lara->Control.WaterStatus == WaterStatus::Wade)
+		
+		if (lara->Control.WaterStatus == WaterStatus::Wade)
 		{
 			if (isSwamp)
 			{
@@ -469,22 +470,25 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_WALK)
+		else
 		{
-			if (TestLaraWalkForward(item, coll))
+			if (TrInput & IN_WALK)
 			{
-				item->Animation.TargetState = LS_WALK_FORWARD;
+				if (TestLaraWalkForward(item, coll))
+				{
+					item->Animation.TargetState = LS_WALK_FORWARD;
+					return;
+				}
+			}
+			else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+			{
+				if (TrInput & IN_SPRINT)
+					item->Animation.TargetState = LS_RUN_FORWARD;
+				else
+					item->Animation.TargetState = LS_SPRINT;
+
 				return;
 			}
-		}
-		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			if (TrInput & IN_SPRINT)
-				item->Animation.TargetState = LS_RUN_FORWARD;
-			else
-				item->Animation.TargetState = LS_SPRINT;
-
-			return;
 		}
 	}
 	else if (TrInput & IN_BACK)
@@ -505,18 +509,21 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_WALK)
+		else
 		{
-			if (TestLaraWalkBack(item, coll))
+			if (TrInput & IN_WALK)
 			{
-				item->Animation.TargetState = LS_WALK_BACK;
+				if (TestLaraWalkBack(item, coll))
+				{
+					item->Animation.TargetState = LS_WALK_BACK;
+					return;
+				}
+			}
+			else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+			{
+				item->Animation.TargetState = LS_RUN_BACK;
 				return;
 			}
-		}
-		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			item->Animation.TargetState = LS_RUN_BACK;
-			return;
 		}
 	}
 
@@ -796,7 +803,8 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (lara->Control.WaterStatus == WaterStatus::Wade)
+		
+		if (lara->Control.WaterStatus == WaterStatus::Wade)
 		{
 			if (isSwamp)
 			{
@@ -812,22 +820,25 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (TrInput & IN_WALK)
+		else
 		{
-			if (TestLaraWalkForward(item, coll))
+			if (TrInput & IN_WALK)
 			{
-				item->Animation.TargetState = LS_WALK_FORWARD;
+				if (TestLaraWalkForward(item, coll))
+				{
+					item->Animation.TargetState = LS_WALK_FORWARD;
+					return;
+				}
+			}
+			else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+			{
+				if (TrInput & IN_SPRINT)
+					item->Animation.TargetState = LS_RUN_FORWARD;
+				else
+					item->Animation.TargetState = LS_SPRINT;
+
 				return;
 			}
-		}
-		else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			if (TrInput & IN_SPRINT)
-				item->Animation.TargetState = LS_RUN_FORWARD;
-			else
-				item->Animation.TargetState = LS_SPRINT;
-
-			return;
 		}
 	}
 	else if (TrInput & IN_BACK)
@@ -844,18 +855,21 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 
 			return;
 		}
-		else if (TrInput & IN_WALK)
+		else
 		{
-			if (TestLaraWalkBack(item, coll))
+			if (TrInput & IN_WALK)
 			{
-				item->Animation.TargetState = LS_WALK_BACK;
+				if (TestLaraWalkBack(item, coll))
+				{
+					item->Animation.TargetState = LS_WALK_BACK;
+					return;
+				}
+			}
+			else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+			{
+				item->Animation.TargetState = LS_RUN_BACK;
 				return;
 			}
-		}
-		else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
-		{
-			item->Animation.TargetState = LS_RUN_BACK;
-			return;
 		}
 	}
 
