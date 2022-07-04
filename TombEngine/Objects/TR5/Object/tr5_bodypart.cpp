@@ -6,6 +6,9 @@
 #include "tr5_missile.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
+#include "Game/effects/tomb4fx.h"
+
+constexpr int BODY_PART_LIFE = 64;
 
 void ControlBodyPart(short fxNumber)
 {
@@ -42,6 +45,9 @@ void ControlBodyPart(short fxNumber)
 	fx->pos.Position.y += fx->fallspeed;
 	fx->pos.Position.z += fx->speed * phd_cos(fx->pos.Orientation.y);
 
+	if (fx->flag2 & EXPLODE_NORMAL)
+		TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 3);
+
 	short roomNumber = fx->roomNumber;
 	FloorInfo* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
 
@@ -70,8 +76,10 @@ void ControlBodyPart(short fxNumber)
 					ExplodeFX(fx, -1, 32);
 
 				KillEffect(fxNumber);
+
 				if (fx->flag2 & 0x800)
-					SoundEffect(SFX_TR4_ROCK_FALL_LAND,&fx->pos);
+					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx->pos);
+
 				return;
 			}
 
@@ -95,7 +103,7 @@ void ControlBodyPart(short fxNumber)
 			fx->pos.Position.y = y;
 		}
 
-		if (!fx->speed && ++fx->flag1 > 32)
+		if (!fx->speed && ++fx->flag1 > BODY_PART_LIFE)
 		{
 			KillEffect(fxNumber);
 			return;
