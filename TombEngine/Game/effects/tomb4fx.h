@@ -189,8 +189,8 @@ constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_DRIPS = 32;
 constexpr auto MAX_SHOCKWAVE = 16;
 
-constexpr auto EXPLODE_HIT_EFFECT = 258;
 constexpr auto EXPLODE_NORMAL = 256;
+constexpr auto EXPLODE_HIT_EFFECT = EXPLODE_NORMAL | 0x02;
 
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
