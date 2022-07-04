@@ -75,6 +75,9 @@ void DrawNearbyPathfinding(int boxIndex)
 
 	while (true)
 	{
+		if (index >= g_Level.Overlaps.size())
+			break;
+
 		auto overlap = g_Level.Overlaps[index];
 
 		DrawBox(overlap.box, Vector3(1, 1, 0));
