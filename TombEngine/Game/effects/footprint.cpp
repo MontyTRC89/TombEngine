@@ -247,7 +247,7 @@ namespace TEN::Effects::Footprints
 			}
 			else 
 			{
-				float opacity = lerp(0, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
+				float opacity = Lerp(0.0f, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
 				footprint.Opacity = opacity;
 			}
 		}

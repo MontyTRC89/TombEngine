@@ -20,17 +20,13 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 	TENLog("Initializing DX11...", LogLevel::Info);
 
-	ScreenWidth = w;
-	ScreenHeight = h;
-	Windowed = windowed;
+	m_screenWidth = w;
+	m_screenHeight = h;
+	m_windowed = windowed;
 	InitialiseScreen(w, h, windowed, handle, false);
 
 	// Initialise render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
-
-	wchar_t titleScreenFile[255];
-	std::mbstowcs(titleScreenFile, g_GameFlow->TitleScreenImagePath.c_str(), 255);
-	SetTextureOrDefault(m_titleScreen, titleScreenFile);
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
 	SetTextureOrDefault(m_whiteTexture, L"Textures/WhiteSprite.png");
@@ -112,7 +108,6 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
-	m_firstWeather = true;
 
 	// Preallocate lists
 	dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
@@ -348,9 +343,9 @@ void TEN::Renderer::Renderer11::Create()
 
 void Renderer11::ToggleFullScreen()
 {
-	Windowed = !Windowed;
+	m_windowed = !m_windowed;
 
-	if (!Windowed)
+	if (!m_windowed)
 	{
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, 0);
 		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, WS_EX_TOPMOST);
@@ -362,7 +357,7 @@ void Renderer11::ToggleFullScreen()
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, 0);
 		ShowWindow(WindowsHandle, SW_SHOWNORMAL);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, ScreenWidth, ScreenHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, m_screenWidth, m_screenHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
 	UpdateWindow(WindowsHandle);
