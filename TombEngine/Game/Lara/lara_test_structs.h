@@ -59,7 +59,7 @@ struct CrawlVaultTestResult
 struct JumpTestSetup
 {
 	short Angle;
-	int Distance = CLICK(0.85f);
+	int Distance = int(CLICK(0.85f));
 	bool CheckWadeStatus = true;
 };
 

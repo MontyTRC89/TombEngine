@@ -1505,7 +1505,7 @@ bool TestLaraStepLeft(ItemInfo* item, CollisionInfo* coll)
 	MoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y - ANGLE(90.0f),
-		CLICK(0.8f), -CLICK(0.8f)
+		int(CLICK(0.8f)), int(-CLICK(0.8f))
 	};
 
 	return TestLaraMoveTolerance(item, coll, testSetup);
@@ -1518,7 +1518,7 @@ bool TestLaraStepRight(ItemInfo* item, CollisionInfo* coll)
 	MoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y + ANGLE(90.0f),
-		CLICK(0.8f), -CLICK(0.8f)
+		int(CLICK(0.8f)), int(-CLICK(0.8f))
 	};
 
 	return TestLaraMoveTolerance(item, coll, testSetup);
@@ -1559,7 +1559,7 @@ bool TestLaraStepLeftSwamp(ItemInfo* item, CollisionInfo* coll)
 	MoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y - ANGLE(90.0f),
-		NO_LOWER_BOUND, -CLICK(0.8f),
+		NO_LOWER_BOUND, int(-CLICK(0.8f)),
 		false, false, false
 	};
 
@@ -1573,7 +1573,7 @@ bool TestLaraStepRightSwamp(ItemInfo* item, CollisionInfo* coll)
 	MoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y + ANGLE(90.0f),
-		NO_LOWER_BOUND, -CLICK(0.8f),
+		NO_LOWER_BOUND, int(-CLICK(0.8f)),
 		false, false, false
 	};
 
@@ -1742,7 +1742,7 @@ bool TestLaraMonkeyForward(ItemInfo* item, CollisionInfo* coll)
 	MonkeyMoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y,
-		CLICK(1.25f), -CLICK(1.25f)
+		int(CLICK(1.25f)), int(-CLICK(1.25f))
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1755,7 +1755,7 @@ bool TestLaraMonkeyBack(ItemInfo* item, CollisionInfo* coll)
 	MonkeyMoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y + ANGLE(180.0f),
-		CLICK(1.25f), -CLICK(1.25f)
+		int(CLICK(1.25f)), int(-CLICK(1.25f))
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1768,7 +1768,7 @@ bool TestLaraMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll)
 	MonkeyMoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y - ANGLE(90.0f),
-		CLICK(0.5f), -CLICK(0.5f)
+		int(CLICK(0.5f)), int(-CLICK(0.5f))
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1781,7 +1781,7 @@ bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll)
 	MonkeyMoveTestSetup testSetup
 	{
 		item->Pose.Orientation.y + ANGLE(90.0f),
-		CLICK(0.5f), -CLICK(0.5f)
+		int(CLICK(0.5f)), int(-CLICK(0.5f))
 	};
 
 	return TestLaraMonkeyMoveTolerance(item, coll, testSetup);
@@ -1843,7 +1843,7 @@ VaultTestResult TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll)
 
 	VaultTestSetup testSetup
 	{
-		-STEPUP_HEIGHT, -CLICK(2.5f),
+		-STEPUP_HEIGHT, int(-CLICK(2.5f)),
 		LARA_HEIGHT, -MAX_HEIGHT,
 		CLICK(1)
 	};
@@ -1863,9 +1863,9 @@ VaultTestResult TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll)
 
 	VaultTestSetup testSetup
 	{
-		-CLICK(2.5f), -CLICK(3.5f),
+		int(-CLICK(2.5f)), int(-CLICK(3.5f)),
 		LARA_HEIGHT, -MAX_HEIGHT,
-		CLICK(1),
+		int(CLICK(1)),
 	};
 
 	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
@@ -1903,9 +1903,9 @@ VaultTestResult TestLaraVault2StepsToCrouch(ItemInfo* item, CollisionInfo* coll)
 
 	VaultTestSetup testSetup
 	{
-		-STEPUP_HEIGHT, -CLICK(2.5f),
+		-STEPUP_HEIGHT, int(-CLICK(2.5f)),
 		LARA_HEIGHT_CRAWL, LARA_HEIGHT,
-		CLICK(1),
+		int(CLICK(1))
 	};
 
 	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
@@ -1923,9 +1923,9 @@ VaultTestResult TestLaraVault3StepsToCrouch(ItemInfo* item, CollisionInfo* coll)
 
 	VaultTestSetup testSetup
 	{
-		-CLICK(2.5f), -CLICK(3.5f),
+		int(-CLICK(2.5f)), int(-CLICK(3.5f)),
 		LARA_HEIGHT_CRAWL, LARA_HEIGHT,
-		CLICK(1),
+		int(CLICK(1)),
 	};
 
 	auto testResult = TestLaraVaultTolerance(item, coll, testSetup);
@@ -1943,9 +1943,9 @@ VaultTestResult TestLaraLedgeAutoJump(ItemInfo* item, CollisionInfo* coll)
 
 	VaultTestSetup testSetup
 	{
-		-CLICK(3.5f), -CLICK(7.5f),
-		CLICK(0.1f)/* TODO: Is this enough hand room?*/, -MAX_HEIGHT,
-		CLICK(0.1f),
+		int(-CLICK(3.5f)), int(-CLICK(7.5f)),
+		int(CLICK(0.1f)) /* TODO: Is this enough hand room?*/, -MAX_HEIGHT,
+		int(CLICK(0.1f)),
 		false
 	};
 
@@ -2205,12 +2205,12 @@ CrawlVaultTestResult TestLaraCrawlUpStep(ItemInfo* item, CollisionInfo* coll)
 
 	CrawlVaultTestSetup testSetup
 	{
-		-CLICK(1), -STEPUP_HEIGHT,
+		int(-CLICK(1)), -STEPUP_HEIGHT,
 		LARA_HEIGHT_CRAWL,
-		CLICK(0.6f),
-		CLICK(1.2f),
-		CLICK(2),
-		CLICK(1) - 1
+		int(CLICK(0.6f)),
+		int(CLICK(1.2f)),
+		int(CLICK(2)),
+		int(CLICK(1) - 1)
 	};
 
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
@@ -2224,10 +2224,10 @@ CrawlVaultTestResult TestLaraCrawlDownStep(ItemInfo* item, CollisionInfo* coll)
 	{
 		STEPUP_HEIGHT, CLICK(1),
 		LARA_HEIGHT_CRAWL,
-		CLICK(0.6f),
-		CLICK(1.2f),
-		CLICK(2),
-		CLICK(1) - 1
+		int(CLICK(0.6f)),
+		int(CLICK(1.2f)),
+		int(CLICK(2)),
+		int(CLICK(1) - 1)
 	};
 
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
@@ -2239,11 +2239,11 @@ CrawlVaultTestResult TestLaraCrawlExitDownStep(ItemInfo* item, CollisionInfo* co
 
 	CrawlVaultTestSetup testSetup
 	{
-		STEPUP_HEIGHT, CLICK(1),
+		STEPUP_HEIGHT, int(CLICK(1)),
 		LARA_HEIGHT,
-		CLICK(1.25f),
-		CLICK(1.2f),
-		CLICK(1.5f),
+		int(CLICK(1.25f)),
+		int(CLICK(1.2f)),
+		int(CLICK(1.5f)),
 		-MAX_HEIGHT,
 		false, false
 	};
@@ -2259,9 +2259,9 @@ CrawlVaultTestResult TestLaraCrawlExitJump(ItemInfo* item, CollisionInfo* coll)
 	{
 		NO_LOWER_BOUND, STEPUP_HEIGHT + 1,
 		LARA_HEIGHT,
-		CLICK(1.25f),
-		CLICK(1.2f),
-		CLICK(1.5f),
+		int(CLICK(1.25f)),
+		int(CLICK(1.2f)),
+		int(CLICK(1.5f)),
 		NO_LOWER_BOUND,
 		false, false
 	};
@@ -2376,7 +2376,7 @@ bool TestLaraRunJumpForward(ItemInfo* item, CollisionInfo* coll)
 	JumpTestSetup testSetup
 	{
 		item->Pose.Orientation.y,
-		CLICK(1.5f)
+		int(CLICK(1.5f))
 	};
 
 	return TestLaraJumpTolerance(item, coll, testSetup);
