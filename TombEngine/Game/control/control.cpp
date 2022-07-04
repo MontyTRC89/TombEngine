@@ -753,8 +753,9 @@ void CleanUp()
 	// Clear ropes
 	Ropes.clear();
 
-	// Clear spotcam array
+	// Clear camera data
 	ClearSpotCamSequences();
+	ClearCinematicBars();
 
 	// Clear all kinds of particles
 	DisableSmokeParticles();
