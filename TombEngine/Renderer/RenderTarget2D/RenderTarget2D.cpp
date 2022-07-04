@@ -8,7 +8,6 @@ namespace TEN::Renderer
 
 	RenderTarget2D::RenderTarget2D(ID3D11Device* device, int w, int h, DXGI_FORMAT colorFormat, DXGI_FORMAT depthFormat)
 	{
-
 		D3D11_TEXTURE2D_DESC desc = {};
 		desc.Width = w;
 		desc.Height = h;
