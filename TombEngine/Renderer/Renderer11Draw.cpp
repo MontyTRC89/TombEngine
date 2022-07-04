@@ -1795,6 +1795,10 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawStatics(RenderView& view, bool transparent)
 	{
+		// If no static textures are loaded, don't draw anything.
+		if (m_staticsTextures.size() == 0)
+			return;
+
 		// Bind vertex and index buffer
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
