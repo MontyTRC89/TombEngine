@@ -31,10 +31,15 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
 		ShiftItem(item, coll);
-
 		item->Animation.TargetState = LS_IDLE;
 		item->Animation.Velocity = 0;
 		return true;
+	}
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ShiftItem(item, coll);
+		return false;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -164,6 +169,12 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 		return true;
 	}
 
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ShiftItem(item, coll);
+		return false;
+	}
+
 	if (coll->CollisionType == CT_LEFT)
 	{
 		ShiftItem(item, coll);
@@ -193,6 +204,12 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.Velocity = 0;
 		item->Animation.IsAirborne = false;
 		return true;
+	}
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ShiftItem(item, coll);
+		return false;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -247,7 +264,6 @@ void LaraCollideStop(ItemInfo* item, CollisionInfo* coll)
 			item->Animation.TargetState = LS_IDLE;
 
 		AnimateLara(item);
-
 		break;
 
 	default:
