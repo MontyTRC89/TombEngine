@@ -7,6 +7,9 @@
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
 #include "Game/effects/tomb4fx.h"
+#include "Specific/prng.h"
+
+using namespace TEN::Math::Random;
 
 constexpr int BODY_PART_LIFE = 64;
 
@@ -105,6 +108,12 @@ void ControlBodyPart(short fxNumber)
 
 		if (!fx->speed && ++fx->flag1 > BODY_PART_LIFE)
 		{
+			for (int i = 0; i < 8; i++)
+			{
+				TriggerFlashSmoke(fx->pos.Position.x + GenerateInt(-16, 16), 
+								  fx->pos.Position.y + GenerateInt( 16, 32),
+								  fx->pos.Position.z + GenerateInt(-16, 16), fx->roomNumber);
+			}
 			KillEffect(fxNumber);
 			return;
 		}
