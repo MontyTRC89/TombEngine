@@ -56,7 +56,8 @@ void ControlBodyPart(short fxNumber)
 	if ((fx->flag2 & EXPLODE_NORMAL) &&
 		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 	{
-		TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 0);
+		if (GenerateInt(0, 10) > 5)
+			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 0);
 	}
 
 	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
@@ -96,7 +97,10 @@ void ControlBodyPart(short fxNumber)
 				if (fx->fallspeed <= 32)
 					fx->fallspeed = 0;
 				else
+				{
 					fx->fallspeed = -fx->fallspeed / 4;
+					SoundEffect(SFX_TR4_LARA_THUD, &fx->pos, SoundEnvironment::Land, GenerateFloat(0.8f, 1.2f));
+				}
 			}
 			else
 			{
@@ -113,7 +117,7 @@ void ControlBodyPart(short fxNumber)
 
 		if (!fx->speed && ++fx->flag1 > BODY_PART_LIFE)
 		{
-			for (int i = 0; i < 8; i++)
+			for (int i = 0; i < 6; i++)
 			{
 				TriggerFlashSmoke(fx->pos.Position.x + GenerateInt(-16, 16), 
 								  fx->pos.Position.y + GenerateInt( 16, 32),
@@ -125,13 +129,14 @@ void ControlBodyPart(short fxNumber)
 
 		if (fx->flag2 & 2 && (GetRandomControl() & 1))
 		{
-			DoBloodSplat(
-				(GetRandomControl() & 0x3F) + fx->pos.Position.x - 32,
-				(GetRandomControl() & 0x1F) + fx->pos.Position.y - 16,
-				(GetRandomControl() & 0x3F) + fx->pos.Position.z - 32,
-				1,
-				2 * GetRandomControl(),
-				fx->roomNumber);
+			for (int i = 0; i < 6; i++)
+				DoBloodSplat(
+					(GetRandomControl() & 0x3F) + fx->pos.Position.x - 32,
+					(GetRandomControl() & 0x1F) + fx->pos.Position.y - 16,
+					(GetRandomControl() & 0x3F) + fx->pos.Position.z - 32,
+					1,
+					2 * GetRandomControl(),
+					fx->roomNumber);
 		}
 	}
 
