@@ -26,7 +26,6 @@ namespace TEN::Entities::TR1
 	#define MUTANT_CLOSE_RANGE pow(2250, 2)
 	#define MUTANT_ATTACK_1_CHANCE 11000
 	#define MUTANT_ATTACK_2_CHANCE 22000
-	#define MUTANT_PART_DAMAGE 250
 	#define MUTANT_ATTACK_DAMAGE 500
 	#define MUTANT_TOUCH_DAMAGE 5
 	#define LARA_GIANT_MUTANT_DEATH 6
@@ -240,7 +239,7 @@ namespace TEN::Entities::TR1
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, MUTANT_PART_DAMAGE);
+			ExplodingDeath(itemNumber, EXPLODE_NORMAL);
 		
 			TestTriggers(item, true);
 

@@ -51,17 +51,11 @@ void SwordGuardianControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState != 12)
 		{
-			//item->meshBits >>= 1;
 			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Pose);
 			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Pose);
-			//item->meshBits = 0xFFFFFFFF;
-			//item->objectNumber = ID_SAS;
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, 256);
-			//item->objectNumber = ID_SWAT;
+			ExplodingDeath(itemNumber, EXPLODE_NORMAL);
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
-			//item->status = ITEM_DESACTIVATED;
-			//item->flags |= IFLAG_INVISIBLE;
 			item->Animation.ActiveState = 12;
 		}
 

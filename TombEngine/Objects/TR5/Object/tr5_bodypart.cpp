@@ -24,6 +24,7 @@ void ControlBodyPart(short fxNumber)
 	{
 		if (fx->speed)
 			fx->pos.Orientation.x += 4 * fx->fallspeed;
+
 		fx->fallspeed += 6;
 	}
 	else
@@ -40,6 +41,7 @@ void ControlBodyPart(short fxNumber)
 			fx->pos.Orientation.z += random;
 			fx->pos.Orientation.x -= random;
 		}
+
 		if (--fx->counter < 8)
 			fx->fallspeed += 2;
 	}
@@ -51,24 +53,24 @@ void ControlBodyPart(short fxNumber)
 	fx->pos.Position.y += fallspeed;
 	fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
 
-	if (fx->flag2 & EXPLODE_NORMAL)
+	if ((fx->flag2 & EXPLODE_NORMAL) &&
+		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
+	{
 		TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 3);
+	}
 
-	short roomNumber = fx->roomNumber;
-	FloorInfo* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
 	if (!fx->counter)
 	{
-		int ceiling = GetCeiling(floor, fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-		if (fx->pos.Position.y < ceiling)
+		if (fx->pos.Position.y < probe.Position.Ceiling)
 		{
-			fx->pos.Position.y = ceiling;
+			fx->pos.Position.y = probe.Position.Ceiling;
 			fx->fallspeed = -fx->fallspeed;
 			fx->speed -= (fx->speed / 8);
 		}
 
-		int height = GetFloorHeight(floor, fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-		if (fx->pos.Position.y >= height)
+		if (fx->pos.Position.y >= probe.Position.Floor)
 		{
 			if (fx->flag2 & 1)
 			{
@@ -89,7 +91,7 @@ void ControlBodyPart(short fxNumber)
 				return;
 			}
 
-			if (y <= height)
+			if (y <= probe.Position.Floor)
 			{
 				if (fx->fallspeed <= 32)
 					fx->fallspeed = 0;
@@ -133,20 +135,20 @@ void ControlBodyPart(short fxNumber)
 		}
 	}
 
-	if (roomNumber != fx->roomNumber)
+	if (probe.RoomNumber != fx->roomNumber)
 	{
-		if ( TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+		if ( TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, probe.RoomNumber) &&
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 		{
-			int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, roomNumber);
+			int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, probe.RoomNumber);
 			SplashSetup.y = waterHeight - 1;
 			SplashSetup.x = fx->pos.Position.x;
 			SplashSetup.z = fx->pos.Position.z;
 			SplashSetup.splashPower = fx->fallspeed;
 			SplashSetup.innerRadius = 48;
-			SetupSplash(&SplashSetup, roomNumber);
+			SetupSplash(&SplashSetup, probe.RoomNumber);
 		}
 
-		EffectNewRoom(fxNumber, roomNumber);
+		EffectNewRoom(fxNumber, probe.RoomNumber);
 	}
 }

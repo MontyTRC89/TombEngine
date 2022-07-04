@@ -818,9 +818,9 @@ void CreatureDie(short itemNumber, int explode)
 	if (explode)
 	{
 		if (Objects[item->ObjectNumber].hitEffect)
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_HIT_EFFECT);
+			ExplodingDeath(itemNumber, EXPLODE_HIT_EFFECT);
 		else
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_NORMAL);
+			ExplodingDeath(itemNumber, EXPLODE_NORMAL);
 
 		KillItem(itemNumber);
 	}
