@@ -33,17 +33,20 @@ namespace TEN::Renderer
 		ClearSceneItems();
 
 		m_meshPointersToMesh.clear();
-		m_moveableObjects.clear();
-		m_staticObjects.clear();
-		m_sprites.clear();
-		m_rooms.clear();
-		m_roomTextures.clear();
-		m_moveablesTextures.clear();
-		m_staticsTextures.clear();
-		m_spritesTextures.clear();
-		m_animatedTextures.clear();
-		m_animatedTextureSets.clear();
-
+		m_moveableObjects.resize(0);
+		m_staticObjects.resize(0);
+		m_sprites.resize(0);
+		m_rooms.resize(0);
+		m_roomTextures.resize(0);
+		m_moveablesTextures.resize(0);
+		m_staticsTextures.resize(0);
+		m_spritesTextures.resize(0);
+		m_animatedTextures.resize(0);
+		m_animatedTextureSets.resize(0);
+		for (auto& mesh : m_meshes) {
+			delete mesh;
+		}
+		m_meshes.resize(0);
 		for (auto& item : m_items)
 		{
 			item.PreviousRoomNumber = NO_ROOM;
