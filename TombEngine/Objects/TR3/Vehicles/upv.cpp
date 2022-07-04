@@ -581,7 +581,6 @@ namespace TEN::Entities::Vehicles
 			{
 				int xa = UPVItem->Pose.Orientation.x - UPV_X_ORIENT_WATER_SURFACE_MAX;
 				int ax = UPV_X_ORIENT_WATER_SURFACE_MAX - UPVItem->Pose.Orientation.x;
-
 				if (xa > 0)
 				{
 					if (xa > ANGLE(1.0f))
@@ -678,7 +677,6 @@ namespace TEN::Entities::Vehicles
 					SoundEffect(SFX_TR3_VEHICLE_UPV_STOP, (PHD_3DPOS*)&UPVItem->Pose.Position.x, SoundEnvironment::Always);
 				}
 			}
-
 			else if (TrInput & VEHICLE_IN_ACCELERATE)
 			{
 				if (TrInput & VEHICLE_IN_UP &&
@@ -759,7 +757,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_WATER_SURFACE:
-			if (anim == UPV_ANIM_DISMOUNT_WATER_SURFACE_START && frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
+			if (anim == UPV_ANIM_DISMOUNT_WATER_SURFACE_END && frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
 			{
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
 				int waterDepth, waterHeight, heightFromWater;
@@ -772,7 +770,7 @@ namespace TEN::Entities::Vehicles
 				else
 					heightFromWater = NO_HEIGHT;
 
-				Vector3Int vec = { 0, 0, 0 };
+				auto vec = Vector3Int();
 				GetLaraJointPosition(&vec, LM_HIPS);
 
 				laraItem->Pose.Position.x = vec.x;
@@ -781,17 +779,17 @@ namespace TEN::Entities::Vehicles
 				laraItem->Pose.Position.z = vec.z;
 
 				SetAnimation(laraItem, LA_ONWATER_IDLE);
-				laraItem->Animation.VerticalVelocity = 0;
 				laraItem->Animation.IsAirborne = false;
+				laraItem->Animation.VerticalVelocity = 0;
 				laraItem->Pose.Orientation.x = 0;
 				laraItem->Pose.Orientation.z = 0;
 
 				UpdateItemRoom(laraItem, -LARA_HEIGHT / 2);
 
 				ResetLaraFlex(laraItem);
+				lara->Control.HandStatus = HandStatus::Free;
 				lara->Control.WaterStatus = WaterStatus::TreadWater;
 				lara->WaterSurfaceDist = -heightFromWater;
-				lara->Control.HandStatus = HandStatus::Free;
 				lara->Vehicle = NO_ITEM;
 
 				UPVItem->HitPoints = 0;
