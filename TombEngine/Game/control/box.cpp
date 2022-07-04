@@ -475,7 +475,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	AnimateItem(item);
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		CreatureDie(itemNumber, FALSE);
+		CreatureDie(itemNumber, false);
 		return false;
 	}
 
@@ -811,7 +811,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	return true;
 }
 
-void CreatureDie(short itemNumber, int explode)
+void CreatureDie(short itemNumber, bool explode)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

@@ -12,6 +12,7 @@
 using namespace TEN::Math::Random;
 
 constexpr int BODY_PART_LIFE = 64;
+constexpr int BOUNCE_FALLSPEED = 32;
 
 void ControlBodyPart(short fxNumber)
 {
@@ -56,7 +57,7 @@ void ControlBodyPart(short fxNumber)
 	if ((fx->flag2 & EXPLODE_NORMAL) &&
 		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 	{
-		if (GenerateInt(0, 10) > 5)
+		if (GenerateInt(0, 10) > (abs(fx->fallspeed) > 0 ? 5 : 8))
 			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 0);
 	}
 
@@ -94,7 +95,7 @@ void ControlBodyPart(short fxNumber)
 
 			if (y <= probe.Position.Floor)
 			{
-				if (fx->fallspeed <= 32)
+				if (fx->fallspeed <= BOUNCE_FALLSPEED)
 					fx->fallspeed = 0;
 				else
 				{
@@ -129,7 +130,7 @@ void ControlBodyPart(short fxNumber)
 
 		if (fx->flag2 & 2 && (GetRandomControl() & 1))
 		{
-			for (int i = 0; i < 6; i++)
+			for (int i = 0; i < (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber) ? 1 : 6); i++)
 				DoBloodSplat(
 					(GetRandomControl() & 0x3F) + fx->pos.Position.x - 32,
 					(GetRandomControl() & 0x1F) + fx->pos.Position.y - 16,
