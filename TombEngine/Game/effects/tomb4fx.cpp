@@ -1468,9 +1468,9 @@ int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
 				g_Renderer.GetBoneMatrix(itemNumber, 0, &boneMatrix);
 				boneMatrix = world * boneMatrix;
 
-				fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-				fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-				fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
+				fx->pos.Position.x = boneMatrix.Translation().x;
+				fx->pos.Position.y = boneMatrix.Translation().y;
+				fx->pos.Position.z = boneMatrix.Translation().z;
 
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.x = 0;
@@ -1512,16 +1512,16 @@ int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
 		bit <<= 1;
 		if ((bit & meshBits) && (bit & item->MeshBits))
 		{
-			if ((GetRandomControl() & 3) == 0 && (flags & 0x100))
+			if ((GetRandomControl() & 3) == 0 && (flags & EXPLODE_NORMAL))
 			{
 				short fxNumber = CreateNewEffect(item->RoomNumber);
 				if (fxNumber != NO_ITEM)
 				{
 					FX_INFO* fx = &EffectList[fxNumber];
 
-					fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-					fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-					fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
+					fx->pos.Position.x = boneMatrix.Translation().x;
+					fx->pos.Position.y = boneMatrix.Translation().y;
+					fx->pos.Position.z = boneMatrix.Translation().z;
 
 					fx->roomNumber = item->RoomNumber;
 					fx->pos.Orientation.x = 0;
