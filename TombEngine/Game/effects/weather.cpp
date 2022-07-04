@@ -272,12 +272,9 @@ namespace TEN::Effects::Environment
 				p.Position.y += p.Velocity.y;
 				break;
 
-			case WeatherType::Snow:
-				p.Position.y += (std::clamp(p.Velocity.y, 0.0f, 8.0f) / 2.0f);
-				break;
-
 			case WeatherType::Rain:
-				p.Position.y += (std::clamp(p.Velocity.y, 0.0f, 12.0f) / 2.0f);
+			case WeatherType::Snow:
+				p.Position.y += (p.Velocity.y / 2.0f);
 				break;
 			}
 
