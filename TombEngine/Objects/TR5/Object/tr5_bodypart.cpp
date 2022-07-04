@@ -54,7 +54,7 @@ void ControlBodyPart(short fxNumber)
 	fx->pos.Position.y += fallspeed;
 	fx->pos.Position.z += speed * phd_cos(fx->pos.Orientation.y);
 
-	if ((fx->flag2 & EXPLODE_NORMAL) &&
+	if ((fx->flag2 & BODY_EXPLODE) &&
 		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
 	{
 		if (GenerateInt(0, 10) > (abs(fx->fallspeed) > 0 ? 5 : 8))
@@ -74,20 +74,20 @@ void ControlBodyPart(short fxNumber)
 
 		if (fx->pos.Position.y >= probe.Position.Floor)
 		{
-			if (fx->flag2 & 1)
+			if (fx->flag2 & BODY_NO_BOUNCE)
 			{
 				fx->pos.Position.x = x;
 				fx->pos.Position.y = y;
 				fx->pos.Position.z = z;
 
-				if (fx->flag2 & 0x200)
+				if (fx->flag2 & BODY_NO_BOUNCE_ALT)
 					ExplodeFX(fx, -2, 32);
 				else
 					ExplodeFX(fx, -1, 32);
 
 				KillEffect(fxNumber);
 
-				if (fx->flag2 & 0x800)
+				if (fx->flag2 & BODY_STONE_SOUND)
 					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx->pos);
 
 				return;
@@ -100,7 +100,14 @@ void ControlBodyPart(short fxNumber)
 				else
 				{
 					fx->fallspeed = -fx->fallspeed / 4;
-					SoundEffect(SFX_TR4_LARA_THUD, &fx->pos, SoundEnvironment::Land, GenerateFloat(0.8f, 1.2f));
+
+					if (!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
+					{
+						if (fx->flag2 & BODY_STONE_SOUND)
+							SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx->pos);
+						else if (fx->flag2 & BODY_GIBS)
+							SoundEffect(SFX_TR4_LARA_THUD, &fx->pos, SoundEnvironment::Land, GenerateFloat(0.8f, 1.2f));
+					}
 				}
 			}
 			else
@@ -128,9 +135,10 @@ void ControlBodyPart(short fxNumber)
 			return;
 		}
 
-		if (fx->flag2 & 2 && (GetRandomControl() & 1))
+		if ((fx->flag2 & BODY_GIBS) && (GetRandomControl() & 1))
 		{
 			for (int i = 0; i < (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber) ? 1 : 6); i++)
+			{
 				DoBloodSplat(
 					(GetRandomControl() & 0x3F) + fx->pos.Position.x - 32,
 					(GetRandomControl() & 0x1F) + fx->pos.Position.y - 16,
@@ -138,6 +146,7 @@ void ControlBodyPart(short fxNumber)
 					1,
 					2 * GetRandomControl(),
 					fx->roomNumber);
+			}
 		}
 	}
 
