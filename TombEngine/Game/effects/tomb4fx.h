@@ -233,7 +233,7 @@ void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
-int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags); // EXPLODE_ flags
+void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
 void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
 void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel);
