@@ -11,6 +11,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
+#include "Objects/Utils/VehicleHelpers.h"
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
 
@@ -43,10 +44,17 @@ void RollingBallControl(short itemNumber)
 	if (!TriggerActive(item))
 		return;
 
+	auto oldPos = item->Pose;
+
+	bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber);
+	int hDivider = isWater ? 64 : 32;
+	int vDivider = isWater ? 3 : 1;
+
 	item->Animation.VerticalVelocity += GRAVITY;
-	item->Pose.Position.x += item->ItemFlags[0] / 32;
-	item->Pose.Position.y += item->Animation.VerticalVelocity;
-	item->Pose.Position.z += item->ItemFlags[1] / 32;
+	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
+	item->Pose.Position.y += item->Animation.VerticalVelocity / vDivider;
+	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
+	item->Animation.Velocity = phd_Distance(&item->Pose, &oldPos);
 
 	int dh = GetCollision(item).Position.Floor - CLICK(2);
 
@@ -242,7 +250,21 @@ void RollingBallControl(short itemNumber)
 	auto roomNumber = GetCollision(item).RoomNumber;
 
 	if (item->RoomNumber != roomNumber)
+	{
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber))
+		{
+			int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
+			SplashSetup.y = waterHeight - 1;
+			SplashSetup.x = item->Pose.Position.x;
+			SplashSetup.z = item->Pose.Position.z;
+			SplashSetup.splashPower = item->Animation.VerticalVelocity * 2;
+			SplashSetup.innerRadius = 96;
+			SetupSplash(&SplashSetup, roomNumber);
+		}
+
 		ItemNewRoom(itemNumber, roomNumber);
+	}
 
 	if (item->ItemFlags[0] > ROLLING_BALL_MAX_VELOCITY)
 		item->ItemFlags[0] = ROLLING_BALL_MAX_VELOCITY;
@@ -274,9 +296,10 @@ void RollingBallControl(short itemNumber)
 			item->Pose.Orientation.y = angle;
 	}
 
-	item->Pose.Orientation.x -= (abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2;
+	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
 
 	TestTriggers(item, true);
+	DoVehicleCollision(item, CLICK(0.9f));
 }
 
 void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* coll)
