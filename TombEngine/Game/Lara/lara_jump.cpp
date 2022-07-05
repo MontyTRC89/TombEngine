@@ -260,7 +260,7 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// TODO: I need to revise the directional jump system to work with changes done for OIS. @Sezz 2022.07.05
-	lara->Control.TurnRate = 0;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	if (item->HitPoints <= 0)
 	{
