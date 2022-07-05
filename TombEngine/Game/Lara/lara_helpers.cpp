@@ -725,6 +725,7 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 	item->Animation.IsAirborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
+	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 

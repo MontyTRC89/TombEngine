@@ -495,8 +495,8 @@ namespace TEN::Renderer
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
-		float factorX = ScreenWidth / REFERENCE_RES_WIDTH;
-		float factorY = ScreenHeight / REFERENCE_RES_HEIGHT;
+		float factorX = m_screenWidth / REFERENCE_RES_WIDTH;
+		float factorY = m_screenHeight / REFERENCE_RES_HEIGHT;
 
 		x *= factorX;
 		y *= factorY;
@@ -515,7 +515,7 @@ namespace TEN::Renderer
 
 		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f),
 			Vector3(0.0f, -1.0f, 0.0f));
-		projection = Matrix::CreateOrthographic(ScreenWidth, ScreenHeight, -1024.0f, 1024.0f);
+		projection = Matrix::CreateOrthographic(m_screenWidth, m_screenHeight, -1024.0f, 1024.0f);
 
 		auto& moveableObj = m_moveableObjects[objectNum];
 		if (!moveableObj)
@@ -738,9 +738,9 @@ namespace TEN::Renderer
 
 			if (drawLogo)
 			{
-				float factorX = (float)ScreenWidth / REFERENCE_RES_WIDTH;
-				float factorY = (float)ScreenHeight / REFERENCE_RES_HEIGHT;
-				float scale = ScreenWidth > ScreenHeight ? factorX : factorY;
+				float factorX = (float)m_screenWidth / REFERENCE_RES_WIDTH;
+				float factorY = (float)m_screenHeight / REFERENCE_RES_HEIGHT;
+				float scale = m_screenWidth > m_screenHeight ? factorX : factorY;
 
 				int logoLeft   = (REFERENCE_RES_WIDTH / 2) - (LogoWidth / 2);
 				int logoRight  = (REFERENCE_RES_WIDTH / 2) + (LogoWidth / 2);
@@ -871,7 +871,7 @@ namespace TEN::Renderer
 
 			case RENDERER_DEBUG_PAGE::RENDERER_STATS:
 				PrintDebugMessage("GPU: %s", g_Configuration.AdapterName.c_str());
-				PrintDebugMessage("Resolution: %d x %d", ScreenWidth, ScreenHeight);
+				PrintDebugMessage("Resolution: %d x %d", m_screenWidth, m_screenHeight);
 				PrintDebugMessage("Fps: %3.2f", m_fps);
 				PrintDebugMessage("Update time: %d", m_timeUpdate);
 				PrintDebugMessage("Frame time: %d", m_timeFrame);
@@ -887,11 +887,8 @@ namespace TEN::Renderer
 				PrintDebugMessage("    For statics: %d", m_numStaticsTransparentDrawCalls);
 				PrintDebugMessage("    For sprites: %d", m_numSpritesTransparentDrawCalls);
 				PrintDebugMessage("Biggest room's index buffer: %d", m_biggestRoomIndexBuffer);
-				PrintDebugMessage("Total rooms transparent polygons: %d", numRoomsTransparentPolygons);
+				PrintDebugMessage("Total rooms transparent polygons: %d", m_numRoomsTransparentPolygons);
 				PrintDebugMessage("Rooms: %d", view.roomsToDraw.size());
-				m_spriteBatch->Begin();
-				m_spriteBatch->Draw(m_shadowMap.ShaderResourceView.Get(), Vector2(512, 0), Colors::White);
-				m_spriteBatch->End();
 				break;
 
 			case RENDERER_DEBUG_PAGE::DIMENSION_STATS:

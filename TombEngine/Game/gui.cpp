@@ -66,12 +66,10 @@ const char* controlmsgs[] =
 	STRING_CONTROLS_STEP_RIGHT
 };
 
-#define font_height 25
-#define max_combines	60
-#define phd_winxmax g_Configuration.Width
-#define phd_winymax g_Configuration.Height
-#define phd_centerx 400
-#define phd_centery phd_winymax / 2
+constexpr int max_combines = 60;
+constexpr int line_height = 25;
+constexpr int phd_centerx = REFERENCE_RES_WIDTH / 2;
+constexpr int phd_centery = REFERENCE_RES_HEIGHT / 2;
 
 /*
 if you wanna add an object to the inventory, edit the InventoryObjectTypes array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
@@ -2477,12 +2475,12 @@ void GuiController::DoInventory()
 			current_selected_option = *current_ammo_type;
 		}
 
-		ypos = 310 - font_height;
+		ypos = 310 - line_height;
 
 		if (n == 1)
-			ypos += font_height;
+			ypos += line_height;
 		else if (n == 2)
-			ypos += font_height >> 1;
+			ypos += line_height >> 1;
 
 		if (n > 0)
 		{
@@ -2491,12 +2489,12 @@ void GuiController::DoInventory()
 				if (i == current_selected_option)
 				{
 					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
-					ypos += font_height;
+					ypos += line_height;
 				}
 				else
 				{
 					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
-					ypos += font_height;
+					ypos += line_height;
 				}
 			}
 		}
@@ -3062,9 +3060,9 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				}
 
 				if (ringnum == (int)RingTypes::Inventory)
-					objmeup = (int)(phd_centery - (phd_winymax + 1) * 0.0625 * 3.0);
+					objmeup = (int)(phd_centery - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
 				else
-					objmeup = (int)(phd_centery + (phd_winymax + 1) * 0.0625 * 2.0);
+					objmeup = (int)(phd_centery + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
 
 				g_Renderer.DrawString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
@@ -3367,8 +3365,6 @@ short GuiController::GetLoadSaveSelection()
 
 LoadResult GuiController::DoLoad()
 {
-	invMode = InventoryMode::Load;
-
 	if (goDown)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -3412,8 +3408,6 @@ LoadResult GuiController::DoLoad()
 
 bool GuiController::DoSave()
 {
-	invMode = InventoryMode::Save;
-
 	if (goDown)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);

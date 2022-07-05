@@ -38,7 +38,6 @@ unsigned int ThreadId;
 char* LevelDataPtr;
 bool IsLevelLoading;
 bool LoadedSuccessfully;
-bool g_FirstLevel = true;
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
 ChunkReader* g_levelChunkIO;
@@ -821,6 +820,13 @@ void LoadRooms()
 
 void FreeLevel()
 {
+	static bool firstLevel = true;
+	if (firstLevel)
+	{
+		firstLevel = false;
+		return;
+	}
+
 	g_Level.RoomTextures.resize(0);
 	g_Level.MoveablesTextures.resize(0);
 	g_Level.StaticsTextures.resize(0);
@@ -859,6 +865,8 @@ void FreeLevel()
 	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
+
+	FreeSamples();
 }
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
@@ -1264,13 +1272,7 @@ int LoadLevelFile(int levelIndex)
 	TENLog("Loading level file...", LogLevel::Info);
 
 	CleanUp();
-	FreeSamples();
-
-	if (!g_FirstLevel)
-	{
-		FreeLevel();
-	}
-	g_FirstLevel = false;
+	FreeLevel();
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;

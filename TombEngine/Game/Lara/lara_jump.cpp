@@ -253,20 +253,24 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// TODO: I need to revise the directional jump system to work with changes done for OIS. @Sezz 2022.07.05
+	lara->Control.TurnRate.y = 0;
+
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_IDLE;
 		return;
 	}
 
-	if (TrInput & (IN_FORWARD | IN_BACK) &&
+	// Disabled for now.
+	/*if (TrInput & (IN_FORWARD | IN_BACK) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 	else
-		lara->Control.TurnRate.y = 0;
+		lara->Control.TurnRate.y = 0;*/
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))

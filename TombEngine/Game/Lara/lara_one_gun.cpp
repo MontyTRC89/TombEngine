@@ -651,7 +651,7 @@ void HarpoonBoltControl(short itemNumber)
 	if (foundCollidedObjects)
 	{
 		if (explodeItem)
-			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 		KillItem(itemNumber);
 	}
 }
@@ -908,33 +908,6 @@ void GrenadeControl(short itemNumber)
 
 	short probedRoomNumber = GetCollision(item).RoomNumber;
 
-	// TODO: splash effect
-	/*
-	if ( *(Rooms + 148 * v78 + 78) & 1 && someFlag )
-  {
-    dword_804E20 = item->pos.Position.x;
-    dword_804E24 = *(Rooms + 148 * v78 + 36);
-    dword_804E28 = item->pos.Position.z;
-    word_804E2C = 32;
-    word_804E2E = 8;
-    word_804E30 = 320;
-    v45 = item->fallSpeed;
-    word_804E34 = 48;
-    word_804E32 = -40 * v45;
-    word_804E36 = 32;
-    word_804E38 = 480;
-    word_804E3A = -20 * item->fallSpeed;
-    word_804E3C = 32;
-    word_804E3E = 128;
-    word_804E40 = 544;
-    SetupSplash(&dword_804E20);
-    if ( item->itemFlags[0] != 4 )
-    {
-      goto LABEL_35;
-    }
-    item->HitPoints = 1;
-  }*/
-
 	if (item->ItemFlags[0] == (int)GrenadeType::Ultra)
 		TriggerFireFlame(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, -1, 1);
 
@@ -953,7 +926,7 @@ void GrenadeControl(short itemNumber)
 		}
 		else
 		{
-			radius = 2048;
+			radius = GRENADE_EXPLODE_RADIUS;
 			explode = true;
 		}
 	}
@@ -961,7 +934,6 @@ void GrenadeControl(short itemNumber)
 	// If is not a flash grenade then try to destroy surrounding objects
 	if (!(item->ItemFlags[0] == (int)GrenadeType::Flash && explode))
 	{
-		//int radius = (explode ? GRENADE_EXPLODE_RADIUS : GRENADE_HIT_RADIUS);
 		bool foundCollidedObjects = false;
 
 		for (int n = 0; n < 2; n++)
@@ -1072,7 +1044,7 @@ void GrenadeControl(short itemNumber)
 				if (item->ItemFlags[0] == (int)GrenadeType::Flash)
 					break;
 
-				radius = GRENADE_EXPLODE_RADIUS;
+				radius = GRENADE_HIT_RADIUS;
 			}
 		}
 	}
@@ -1393,7 +1365,7 @@ void RocketControl(short itemNumber)
 		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
-		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+		ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 		KillItem(itemNumber);
 	}
 }
@@ -1524,7 +1496,7 @@ void CrossbowBoltControl(short itemNumber)
 		// If ammos are normal, then just shatter the bolt and quit
 		if (item->ItemFlags[0] != (int)CrossbowBoltType::Explosive)
 		{
-			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 			KillItem(itemNumber);
 			return;
 		}
@@ -1665,7 +1637,7 @@ void CrossbowBoltControl(short itemNumber)
 		// If bolt has hit some objects then shatter itself
 		if (foundCollidedObjects)
 		{
-			ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 			KillItem(itemNumber);
 		}
 	}
@@ -1689,7 +1661,7 @@ void CrossbowBoltControl(short itemNumber)
 		SoundEffect(SFX_TR4_EXPLOSION1, &item->Pose, SoundEnvironment::Land, 0.7f, 0.5f);
 		SoundEffect(SFX_TR4_EXPLOSION2, &item->Pose);
 
-		ExplodeItemNode(item, 0, 0, EXPLODE_NORMAL);
+		ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 		KillItem(itemNumber);
 	}
 }
@@ -1806,13 +1778,14 @@ void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src,
 				if (!obj->undead)
 				{
 					HitTarget(laraItem, dest, 0, Weapons[(int)weaponType].ExplosiveDamage, 1);
+					
 					if (dest != laraItem)
 					{
 						Statistics.Game.AmmoHits++;
 						if (dest->HitPoints <= 0)
 						{
 							Statistics.Level.Kills++;
-							CreatureDie((dest - g_Level.Items.data()), 1);
+							CreatureDie((dest - g_Level.Items.data()), true);
 						}
 					}
 				}

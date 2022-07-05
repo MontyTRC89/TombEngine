@@ -31,19 +31,14 @@ float TO_RAD(short angle)
 	return angle * 360.0f / 65536.0f * RADIAN;
 }
 
-const float lerp(float v0, float v1, float t)
-{
-	return (1 - t) * v0 + t * v1;
-}
-
-const Vector3 getRandomVector()
+const Vector3 GetRandomVector()
 {
 	auto vector = Vector3(GenerateFloat(-1, 1), GenerateFloat(-1, 1), GenerateFloat(-1, 1));
 	vector.Normalize();
 	return vector;
 }
 
-const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees)
+const Vector3 GetRandomVectorInCone(const Vector3& direction, const float angleDegrees)
 {
 	float x = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	float y = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
@@ -277,7 +272,12 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
-float Smoothstep(float edge0, float edge1, float x)
+const float Lerp(float v0, float v1, float t)
+{
+	return (1.0f - t) * v0 + t * v1;
+}
+
+const float Smoothstep(float edge0, float edge1, float x)
 {
 	// Scale, bias and saturate x to 0..1 range
 	x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);

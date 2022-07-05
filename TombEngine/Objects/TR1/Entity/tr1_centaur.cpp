@@ -24,7 +24,6 @@ namespace TEN::Entities::TR1
 	BITE_INFO CentaurRearBite = { 50, 30, 0, 5 };
 	const vector<int> CentaurAttackJoints = { 0, 3, 4, 7, 8, 16, 17 };
 
-	constexpr auto CENTAUR_FLYER_PART_DAMAGE = 100;
 	constexpr auto CENTAUR_REAR_DAMAGE = 200;
 
 	constexpr auto CENTAUR_PROJECTILE_SPEED = CLICK(1);
@@ -277,7 +276,7 @@ namespace TEN::Entities::TR1
 		if (item->Status == ITEM_DEACTIVATED)
 		{
 			SoundEffect(SFX_TR1_ATLANTEAN_DEATH, &item->Pose);
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, CENTAUR_FLYER_PART_DAMAGE);
+			ExplodingDeath(itemNumber, BODY_EXPLODE);
 			KillItem(itemNumber);
 			item->Status = ITEM_DEACTIVATED;
 		}

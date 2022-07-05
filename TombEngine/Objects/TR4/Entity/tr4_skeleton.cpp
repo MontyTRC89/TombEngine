@@ -699,7 +699,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Active)
 					{
-						ExplodingDeath(itemNumber, ALL_JOINT_BITS, 929);
+						ExplodingDeath(itemNumber, 0);
 						KillItem(itemNumber);
 						DisableEntityAI(itemNumber);
 						//Savegame.Kills++;

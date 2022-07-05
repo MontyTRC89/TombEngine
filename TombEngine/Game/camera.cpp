@@ -105,7 +105,7 @@ void LookAt(CAMERA_INFO* cam, short roll)
 void AlterFOV(int value)
 {
 	CurrentFOV = value;
-	PhdPerspective = g_Renderer.ScreenWidth / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
+	PhdPerspective = g_Configuration.Width / 2 * phd_cos(CurrentFOV / 2) / phd_sin(CurrentFOV / 2);
 }
 
 inline void RumbleFromBounce()
@@ -2023,6 +2023,13 @@ void SetCinematicBars(float height, float speed)
 {
 	CinematicBarsDestinationHeight = height;
 	CinematicBarsSpeed = speed;
+}
+
+void ClearCinematicBars()
+{
+	CinematicBarsHeight = 0;
+	CinematicBarsDestinationHeight = 0;
+	CinematicBarsSpeed = 0;
 }
 
 void UpdateFadeScreenAndCinematicBars()
