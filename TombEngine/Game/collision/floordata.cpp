@@ -583,11 +583,11 @@ namespace TEN::Floordata
 		floorHeight = floor->FloorHeight(x, location.yNumber, z);
 		ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
 
-		if (y < ceilingHeight)
+		if (y < ceilingHeight && floor->RoomAbove(x, location.yNumber, z))
 			return std::nullopt;
-		if (y <= floorHeight && y >= ceilingHeight)
+		if (y <= floorHeight)
 		{
-			location.yNumber = y;
+			location.yNumber = std::max(y, ceilingHeight);
 			return std::optional{location};
 		}
 
@@ -600,11 +600,11 @@ namespace TEN::Floordata
 			floorHeight = floor->FloorHeight(x, location.yNumber, z);
 			ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
 
-			if (y < ceilingHeight)
+			if (y < ceilingHeight && floor->RoomAbove(x, location.yNumber, z))
 				return std::nullopt;
-			if (y <= floorHeight && y >= ceilingHeight)
+			if (y <= floorHeight)
 			{
-				location.yNumber = y;
+				location.yNumber = std::max(y, ceilingHeight);
 				return std::optional{location};
 			}
 
@@ -645,11 +645,11 @@ namespace TEN::Floordata
 		floorHeight = floor->FloorHeight(x, location.yNumber, z);
 		ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
 
-		if (y > floorHeight)
+		if (y > floorHeight && floor->RoomBelow(x, location.yNumber, z))
 			return std::nullopt;
-		if (y <= floorHeight && y >= ceilingHeight)
+		if (y >= ceilingHeight)
 		{
-			location.yNumber = y;
+			location.yNumber = std::min(y, floorHeight);
 			return std::optional{location};
 		}
 
@@ -662,11 +662,11 @@ namespace TEN::Floordata
 			floorHeight = floor->FloorHeight(x, location.yNumber, z);
 			ceilingHeight = floor->CeilingHeight(x, location.yNumber, z);
 
-			if (y > floorHeight)
+			if (y > floorHeight && floor->RoomBelow(x, location.yNumber, z))
 				return std::nullopt;
-			if (y <= floorHeight && y >= ceilingHeight)
+			if (y >= ceilingHeight)
 			{
-				location.yNumber = y;
+				location.yNumber = std::min(y, floorHeight);
 				return std::optional{location};
 			}
 
