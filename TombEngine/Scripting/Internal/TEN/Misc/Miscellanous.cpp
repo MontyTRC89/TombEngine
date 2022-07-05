@@ -9,6 +9,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/weather.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 
@@ -18,6 +19,7 @@ Functions that don't fit in the other modules.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
@@ -121,6 +123,11 @@ namespace Misc
 	static void Earthquake(int strength)
 	{
 		Camera.bounce = -strength;
+	}
+
+	static void FlashScreen(ScriptColor color, float speed)
+	{
+		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), speed);
 	}
 
 	static void PlayAudioTrack(std::string const& trackName, sol::optional<bool> looped)
@@ -243,6 +250,12 @@ namespace Misc
 		//@function Earthquake
 		//@tparam int strength
 		table_misc.set_function(ScriptReserved_Earthquake, &Earthquake);
+
+		///Flash screen.
+		//@function FlashScreen
+		//@tparam ScriptColor color
+		//@tparam float speed
+		table_misc.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
 		///Set and play an ambient track
 		//@function SetAmbientTrack
