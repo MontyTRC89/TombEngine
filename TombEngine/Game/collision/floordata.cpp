@@ -424,19 +424,26 @@ namespace TEN::Floordata
 	{
 		auto floor = &GetFloorSide(location.roomNumber, x, z);
 		auto y = location.yNumber;
+		auto direction = 0;
 
 		if (floor->IsWall(x, z))
 		{
 			floor = &GetTopFloor(location.roomNumber, x, z);
 
 			if (!floor->IsWall(x, z))
+			{
 				y = floor->FloorHeight(x, z);
+				direction = -1;
+			}
 			else
 			{
 				floor = &GetBottomFloor(location.roomNumber, x, z);
 
 				if (!floor->IsWall(x, z))
+				{
 					y = floor->CeilingHeight(x, z);
+					direction = 1;
+				}
 				else
 					return std::nullopt;
 			}
@@ -449,22 +456,31 @@ namespace TEN::Floordata
 
 		if (floor->InsideBridge(x, y, z, y == ceilingHeight, y == floorHeight) >= 0)
 		{
-			auto height = GetTopHeight(*floor, x, y, z);
-			if (height)
-				return height;
+			if (direction <= 0)
+			{
+				auto height = GetTopHeight(*floor, x, y, z);
+				if (height)
+					return height;
+			}
 
-			height = GetBottomHeight(*floor, x, y, z, nullptr, &floor);
-			if (!height)
-				return std::nullopt;
+			if (direction >= 0)
+			{
+				auto height = GetBottomHeight(*floor, x, y, z, nullptr, &floor);
+				if (!height)
+					return std::nullopt;
 
-			y = *height;
+				y = *height;
+			}
 		}
 
-		auto roomBelow = floor->RoomBelow(x, y, z);
-		while (roomBelow)
+		if (direction >= 0)
 		{
-			floor = &GetFloorSide(*roomBelow, x, z);
-			roomBelow = floor->RoomBelow(x, y, z);
+			auto roomBelow = floor->RoomBelow(x, y, z);
+			while (roomBelow)
+			{
+				floor = &GetFloorSide(*roomBelow, x, z);
+				roomBelow = floor->RoomBelow(x, y, z);
+			}
 		}
 
 		return std::optional{floor->FloorHeight(x, y, z)};
@@ -474,19 +490,26 @@ namespace TEN::Floordata
 	{
 		auto floor = &GetFloorSide(location.roomNumber, x, z);
 		auto y = location.yNumber;
+		auto direction = 0;
 
 		if (floor->IsWall(x, z))
 		{
 			floor = &GetBottomFloor(location.roomNumber, x, z);
 
 			if (!floor->IsWall(x, z))
+			{
 				y = floor->CeilingHeight(x, z);
+				direction = 1;
+			}
 			else
 			{
 				floor = &GetTopFloor(location.roomNumber, x, z);
 
 				if (!floor->IsWall(x, z))
+				{
 					y = floor->FloorHeight(x, z);
+					direction = -1;
+				}
 				else
 					return std::nullopt;
 			}
@@ -499,22 +522,31 @@ namespace TEN::Floordata
 
 		if (floor->InsideBridge(x, y, z, y == ceilingHeight, y == floorHeight) >= 0)
 		{
-			auto height = GetBottomHeight(*floor, x, y, z);
-			if (height)
-				return height;
+			if (direction >= 0)
+			{
+				auto height = GetBottomHeight(*floor, x, y, z);
+				if (height)
+					return height;
+			}
 
-			height = GetTopHeight(*floor, x, y, z, nullptr, &floor);
-			if (!height)
-				return std::nullopt;
+			if (direction <= 0)
+			{
+				auto height = GetTopHeight(*floor, x, y, z, nullptr, &floor);
+				if (!height)
+					return std::nullopt;
 
-			y = *height;
+				y = *height;
+			}
 		}
 
-		auto roomAbove = floor->RoomAbove(x, y, z);
-		while (roomAbove)
+		if (direction <= 0)
 		{
-			floor = &GetFloorSide(*roomAbove, x, z);
-			roomAbove = floor->RoomAbove(x, y, z);
+			auto roomAbove = floor->RoomAbove(x, y, z);
+			while (roomAbove)
+			{
+				floor = &GetFloorSide(*roomAbove, x, z);
+				roomAbove = floor->RoomAbove(x, y, z);
+			}
 		}
 
 		return std::optional{floor->CeilingHeight(x, y, z)};
