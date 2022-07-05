@@ -3,6 +3,7 @@
 #include "Vec3/Vec3.h"
 #include "Color/Color.h"
 #include "Game/camera.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
 #include "Game/effects/lightning.h"
 #include "Game/effects/tomb4fx.h"
@@ -128,23 +129,15 @@ namespace Misc
 		PlaySoundTrack(trackName, mode);
 	}
 
-	static void PlaySoundEffect(int id, Vec3 p, int flags)
+	static void PlaySoundEffect(int id, Vec3 p)
 	{
-		PHD_3DPOS pos;
+		PHD_3DPOS pos = {};
 
 		pos.Position.x = p.x;
 		pos.Position.y = p.y;
 		pos.Position.z = p.z;
-		pos.Orientation.x = 0;
-		pos.Orientation.y = 0;
-		pos.Orientation.z = 0;
 
-		SoundEffect(id, &pos, (SoundEnvironment)flags);
-	}
-
-	static void PlaySoundEffect(int id, int flags)
-	{
-		SoundEffect(id, NULL, (SoundEnvironment)flags);
+		SoundEffect(id, &pos, SoundEnvironment::Always);
 	}
 
 	static void SetAmbientTrack(std::string const& trackName)
@@ -261,6 +254,12 @@ namespace Misc
 		//@tparam string name of track (without file extension) to play
 		//@tparam bool loop if true, the track will loop; if false, it won't (default: false)
 		table_misc.set_function(ScriptReserved_PlayAudioTrack, &PlayAudioTrack);
+
+		/// Play sound effect
+		//@function PlaySound
+		//@tparam int sound ID to play
+		//@tparam Vec3 position
+		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
 	
 		///Calculate the distance between two positions.
 		//@function CalculateDistance
