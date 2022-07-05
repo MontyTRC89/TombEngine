@@ -270,7 +270,10 @@ namespace TEN::Renderer
 						}
 					}
 
-					AddSpriteBillboard(&m_sprites[particle->spriteIndex],
+					// Don't allow sprites out of bounds
+					int spriteIndex = std::clamp(int(particle->spriteIndex), 0, int(m_sprites.size()));
+
+					AddSpriteBillboard(&m_sprites[spriteIndex],
 						pos,
 						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
 						TO_RAD(particle->rotAng), particle->scalar,

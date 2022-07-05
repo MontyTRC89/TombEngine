@@ -183,8 +183,8 @@ bool IsPointInRoom(PHD_3DPOS const& pos, int roomNumber)
 PHD_3DPOS GetRoomCenter(int roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
-	auto halfLength = SECTOR(room->xSize)/2;
-	auto halfDepth = SECTOR(room->zSize)/2;
+	auto halfLength = SECTOR(room->xSize) / 2;
+	auto halfDepth = SECTOR(room->zSize) / 2;
 	auto halfHeight = (room->maxceiling - room->minfloor) / 2;
 
 	PHD_3DPOS center;
