@@ -1,6 +1,6 @@
 #include "framework.h"
 #include "Fog.h"
-#include "Specific/RGBAColor8Byte.h"
+
 /***
 Fog
 
@@ -10,14 +10,14 @@ Fog
  
 void Fog::Register(sol::table & parent)
 {
-	using ctors = sol::constructors<Fog(RGBAColor8Byte const&, short, short)>;
+	using ctors = sol::constructors<Fog(ScriptColor const&, short, short)>;
 	parent.new_usertype<Fog>("Fog",
 		ctors(),
 		sol::call_constructor, ctors(), 
 
 		/// (@{Color}) RGB fog color
 		//@mem color
-		"color", sol::property(&Fog::SetColor),
+		"color", sol::property(&Fog::GetColor, &Fog::SetColor),
 
 		/*** (int) min distance.
 
@@ -42,7 +42,7 @@ void Fog::Register(sol::table & parent)
 @return A fog object.
 @function Fog.new
 */
-Fog::Fog(RGBAColor8Byte const& col, short minDistance, short maxDistance)
+Fog::Fog(ScriptColor const& col, short minDistance, short maxDistance)
 {
 	SetColor(col);
 	MinDistance = minDistance;
@@ -50,7 +50,7 @@ Fog::Fog(RGBAColor8Byte const& col, short minDistance, short maxDistance)
 	Enabled = true;
 }
 
-void Fog::SetColor(RGBAColor8Byte const& col)
+void Fog::SetColor(ScriptColor const& col)
 {
 	R = col.GetR();
 	G = col.GetG();
@@ -58,7 +58,7 @@ void Fog::SetColor(RGBAColor8Byte const& col)
 }
 
 
-RGBAColor8Byte Fog::GetColor() const
+ScriptColor Fog::GetColor() const
 {
-	return RGBAColor8Byte{ R, G, B };
+	return ScriptColor{ R, G, B };
 }
