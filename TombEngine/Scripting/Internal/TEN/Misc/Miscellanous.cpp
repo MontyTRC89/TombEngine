@@ -20,7 +20,8 @@ Functions that don't fit in the other modules.
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
-namespace Misc {
+namespace Misc 
+{
 	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
 	{
 		GameVector vec1, vec2;
@@ -28,11 +29,6 @@ namespace Misc {
 		vec1.roomNumber = roomNumber1;
 		pos2.StoreInGameVector(vec2);
 		return LOS(&vec1, &vec2);
-	}
-
-	static int FindRoomNumber(Vec3 pos)
-	{
-		return 0;
 	}
 
 	static void AddLightningArc(Vec3 src, Vec3 dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
@@ -70,6 +66,7 @@ namespace Misc {
 		s->x = pos.x;
 		s->y = pos.y;
 		s->z = pos.z;
+		s->roomNumber = FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z));
 
 		s->life = s->sLife = lifetime;
 
@@ -117,7 +114,7 @@ namespace Misc {
 
 	static void AddFireFlame(Vec3 pos, float size)
 	{
-		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(pos), size, 0);
+		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)), size, 0);
 	}
 
 	static void Earthquake(int strength)
