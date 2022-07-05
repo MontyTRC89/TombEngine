@@ -470,7 +470,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else
+		else USE_FEATURE_IF_CPP20([[likely]])
 		{
 			if (TrInput & IN_WALK)
 			{
@@ -480,7 +480,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 					return;
 				}
 			}
-			else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+			else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				if (TrInput & IN_SPRINT)
 					item->Animation.TargetState = LS_RUN_FORWARD;
@@ -509,7 +509,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else
+		else USE_FEATURE_IF_CPP20([[likely]])
 		{
 			if (TrInput & IN_WALK)
 			{
@@ -519,7 +519,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 					return;
 				}
 			}
-			else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+			else if (TestLaraRunBack(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				item->Animation.TargetState = LS_RUN_BACK;
 				return;
@@ -820,7 +820,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else
+		else USE_FEATURE_IF_CPP20([[likely]])
 		{
 			if (TrInput & IN_WALK)
 			{
@@ -830,7 +830,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 					return;
 				}
 			}
-			else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]] )
+			else if (TestLaraRunForward(item, coll)) USE_FEATURE_IF_CPP20([[likely]])
 			{
 				if (TrInput & IN_SPRINT)
 					item->Animation.TargetState = LS_RUN_FORWARD;
@@ -873,22 +873,17 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	// TODO: Swamps.
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeft(item, coll))
 	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRight(item, coll))
 	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1191,22 +1186,17 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	// TODO: Swamps.
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeft(item, coll))
 	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRight(item, coll))
 	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
