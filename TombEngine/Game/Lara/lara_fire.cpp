@@ -803,7 +803,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 		}
 	}
 
-	if (!object->undead || grenade || target->HitPoints == NOT_TARGETABLE)
+	if (!object->undead || grenade)
 	{
 		if (target->HitPoints > 0)
 		{
