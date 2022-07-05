@@ -335,9 +335,11 @@ short GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 		return (GetQuadrant(headingAngle) * ANGLE(90.0f));
 }
 
-short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff)
+short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 {
+	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
+
 	short minTurnRateNormalized = minTurnRate * abs(axisCoeff);
 	short maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
 
@@ -347,14 +349,14 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 }
 
 // TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26
-void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
+void ModulateLaraTurnRateX(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
-	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical]);
+	//lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
 }
 
-void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate)
+void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -365,7 +367,7 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
 	}
 
-	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff);
+	lara->Control.TurnRate/*.y*/ = ModulateLaraTurnRate(lara->Control.TurnRate/*.y*/, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
