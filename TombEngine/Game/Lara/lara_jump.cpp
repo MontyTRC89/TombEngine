@@ -268,16 +268,6 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	// Disabled for now.
-	/*if (TrInput & (IN_FORWARD | IN_BACK) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
-	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-	}
-	else
-		lara->Control.TurnRate = 0;*/
-
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
 		lara->Control.JumpDirection = JumpDirection::None;
