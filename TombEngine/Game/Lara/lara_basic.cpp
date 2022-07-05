@@ -354,7 +354,6 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 				Rumble(0.4f, 0.15f);
 
 				item->Animation.ActiveState = LS_SPLAT;
-				lara->Control.TurnRate = 0;
 				return;
 			}
 		}
@@ -1331,6 +1330,8 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
+	ModulateLaraTurnRateY(item, 0, 0, 0);
+
 	if (BinocularRange)
 	{
 		BinocularRange = 0;
@@ -1376,6 +1377,7 @@ void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 }
 
 // State:		LS_SPLAT (12)
@@ -1782,7 +1784,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
-		lara->Control.TurnRate = 0;
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 	else
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
@@ -1873,7 +1875,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	if (TrInput & IN_WALK) // WALK locks orientation.
-		lara->Control.TurnRate = 0;
+		ModulateLaraTurnRateY(item, 0, 0, 0);
 	else
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
@@ -2014,6 +2016,7 @@ void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	// TODO: Change swandive roll anim's state to something sensible.
 	if (TrInput & IN_FORWARD &&
@@ -2321,7 +2324,6 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 				Rumble(0.5f, 0.15f);
 
 				item->Animation.ActiveState = LS_SPLAT;
-				lara->Control.TurnRate = 0;
 				return;
 			}
 		}
