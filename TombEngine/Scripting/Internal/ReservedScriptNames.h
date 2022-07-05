@@ -99,6 +99,7 @@ static constexpr char ScriptReserved_ShowString[]					= "ShowString";
 static constexpr char ScriptReserved_HideString[]					= "HideString";
 static constexpr char ScriptReserved_SetAmbientTrack[]				= "SetAmbientTrack";
 static constexpr char ScriptReserved_PlayAudioTrack[]				= "PlayAudioTrack";
+static constexpr char ScriptReserved_PlaySound[]					= "PlaySound";
 static constexpr char ScriptReserved_GiveInvItem[]					= "GiveItem";
 static constexpr char ScriptReserved_TakeInvItem[]					= "TakeItem";
 static constexpr char ScriptReserved_GetInvItemCount[]				= "GetItemCount";
