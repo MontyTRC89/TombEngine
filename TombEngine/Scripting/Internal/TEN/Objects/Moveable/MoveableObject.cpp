@@ -374,9 +374,7 @@ void Moveable::Init()
 		ScriptWarn("Resetting to the center of the room.");
 		auto center = GetRoomCenter(m_item->RoomNumber);
 		// reset position but not rotation
-		m_item->Pose.Position.x = center.Position.x;
-		m_item->Pose.Position.y = center.Position.y;
-		m_item->Pose.Position.z = center.Position.z;
+		m_item->Pose.Position = center;
 	}
 	InitialiseItem(m_num);
 	m_initialised = true;
