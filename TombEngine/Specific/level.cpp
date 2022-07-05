@@ -33,15 +33,13 @@ using std::string;
 using namespace TEN::Input;
 using namespace TEN::Entities::Doors;
 
-FILE* LevelFilePtr;
 uintptr_t hLoadLevel;
 unsigned int ThreadId;
+char* LevelDataPtr;
 bool IsLevelLoading;
 bool LoadedSuccessfully;
-bool g_FirstLevel = true;
 vector<int> MoveablesIds;
 vector<int> StaticObjectsIds;
-char* LevelDataPtr;
 ChunkReader* g_levelChunkIO;
 LEVEL g_Level;
 
@@ -822,6 +820,13 @@ void LoadRooms()
 
 void FreeLevel()
 {
+	static bool firstLevel = true;
+	if (firstLevel)
+	{
+		firstLevel = false;
+		return;
+	}
+
 	g_Level.RoomTextures.resize(0);
 	g_Level.MoveablesTextures.resize(0);
 	g_Level.StaticsTextures.resize(0);
@@ -860,6 +865,8 @@ void FreeLevel()
 	g_Renderer.FreeRendererData();
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
+
+	FreeSamples();
 }
 
 size_t ReadFileEx(void* ptr, size_t size, size_t count, FILE* stream)
@@ -1048,8 +1055,8 @@ unsigned int _stdcall LoadLevel(void* data)
 	TENLog("Loading level file: " + std::string(filename), LogLevel::Info);
 
 	LevelDataPtr = nullptr;
-	LevelFilePtr = nullptr;
-	char* baseLevelDataPtr = nullptr;
+	FILE* filePtr = nullptr;
+	char* dataPtr = nullptr;
 
 	wchar_t loadscreenFileName[80];
 	std::mbstowcs(loadscreenFileName, level->LoadScreenFileName.c_str(), 80);
@@ -1061,84 +1068,79 @@ unsigned int _stdcall LoadLevel(void* data)
 
 	try
 	{
-		LevelFilePtr = FileOpen(filename);
-		if (LevelFilePtr)
-		{
-			char header[4];
-			byte version[4];
-			int compressedSize;
-			int uncompressedSize;
-			int systemHash;
+		filePtr = FileOpen(filename);
 
-			// Read file header
-			ReadFileEx(&header, 1, 4, LevelFilePtr);
-			ReadFileEx(&version, 1, 4, LevelFilePtr);
-			ReadFileEx(&systemHash, 1, 4, LevelFilePtr); // Reserved: for future quick start feature! Check builder system 
-
-			// Check file header
-			if (std::string(header) != "TEN")
-				throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
-			else
-				TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
-
-			// Check system name hash and reset it if it's valid (because we use build & play feature only once)
-			if (SystemNameHash != 0 && SystemNameHash != systemHash)
-				throw std::exception("An attempt was made to use level debug feature on a different system.");
-			else
-				SystemNameHash = 0;
-
-			// Read data sizes
-			ReadFileEx(&uncompressedSize, 1, 4, LevelFilePtr);
-			ReadFileEx(&compressedSize, 1, 4, LevelFilePtr);
-
-			// The entire level is ZLIB compressed
-			auto compressedBuffer = (char*)malloc(compressedSize);
-			LevelDataPtr = (char*)malloc(uncompressedSize);
-			baseLevelDataPtr = LevelDataPtr;
-
-			ReadFileEx(compressedBuffer, compressedSize, 1, LevelFilePtr);
-			Decompress((byte*)LevelDataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
-
-			// Now the entire level is decompressed
-			free(compressedBuffer);
-
-			LoadTextures();
-
-			g_Renderer.UpdateProgress(20);
-
-			LoadRooms();
-			g_Renderer.UpdateProgress(40);
-
-			LoadObjects();
-			g_Renderer.UpdateProgress(50);
-
-			LoadSprites();
-			LoadCameras();
-			LoadSoundSources();
-			g_Renderer.UpdateProgress(60);
-
-			LoadBoxes();
-
-			//InitialiseLOTarray(true);
-
-			LoadAnimatedTextures();
-			LoadTextureInfos();
-			g_Renderer.UpdateProgress(70);
-
-			LoadItems();
-			LoadAIObjects();
-
-			LoadLuaFunctionNames();
-
-			LoadSamples();
-			g_Renderer.UpdateProgress(80);
-
-			free(baseLevelDataPtr);
-			LevelDataPtr = NULL;
-			FileClose(LevelFilePtr);
-		}
-		else
+		if (!filePtr)
 			throw std::exception((std::string("Unable to read level file: ") + filename).c_str());
+
+		char header[4];
+		byte version[4];
+		int compressedSize;
+		int uncompressedSize;
+		int systemHash;
+
+		// Read file header
+		ReadFileEx(&header, 1, 4, filePtr);
+		ReadFileEx(&version, 1, 4, filePtr);
+		ReadFileEx(&systemHash, 1, 4, filePtr); // Reserved: for future quick start feature! Check builder system 
+
+		// Check file header
+		if (std::string(header) != "TEN")
+			throw std::invalid_argument("Level file header is not valid! Must be TEN. Probably old level version?");
+		else
+			TENLog("Tomb Editor compiler version: " + std::to_string(version[0]) + "." + std::to_string(version[1]) + "." + std::to_string(version[2]), LogLevel::Info);
+
+		// Check system name hash and reset it if it's valid (because we use build & play feature only once)
+		if (SystemNameHash != 0 && SystemNameHash != systemHash)
+			throw std::exception("An attempt was made to use level debug feature on a different system.");
+		else
+			SystemNameHash = 0;
+
+		// Read data sizes
+		ReadFileEx(&uncompressedSize, 1, 4, filePtr);
+		ReadFileEx(&compressedSize, 1, 4, filePtr);
+
+		// The entire level is ZLIB compressed
+		auto compressedBuffer = (char*)malloc(compressedSize);
+		dataPtr = (char*)malloc(uncompressedSize);
+		LevelDataPtr = dataPtr;
+
+		ReadFileEx(compressedBuffer, compressedSize, 1, filePtr);
+		Decompress((byte*)LevelDataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
+
+		// Now the entire level is decompressed
+		free(compressedBuffer);
+
+		LoadTextures();
+
+		g_Renderer.UpdateProgress(20);
+
+		LoadRooms();
+		g_Renderer.UpdateProgress(40);
+
+		LoadObjects();
+		g_Renderer.UpdateProgress(50);
+
+		LoadSprites();
+		LoadCameras();
+		LoadSoundSources();
+		g_Renderer.UpdateProgress(60);
+
+		LoadBoxes();
+
+		//InitialiseLOTarray(true);
+
+		LoadAnimatedTextures();
+		LoadTextureInfos();
+		g_Renderer.UpdateProgress(70);
+
+		LoadItems();
+		LoadAIObjects();
+
+		LoadLuaFunctionNames();
+
+		LoadSamples();
+		g_Renderer.UpdateProgress(80);
 
 		TENLog("Preparing renderer...", LogLevel::Info);
 		
@@ -1166,6 +1168,18 @@ unsigned int _stdcall LoadLevel(void* data)
 	{
 		TENLog("Error while loading level: " + std::string(ex.what()), LogLevel::Error);
 		LoadedSuccessfully = false;
+	}
+
+	if (dataPtr)
+	{
+		free(dataPtr);
+		dataPtr = nullptr;
+	}
+
+	if (filePtr)
+	{
+		FileClose(filePtr);
+		filePtr = nullptr;
 	}
 
 	// Level loaded
@@ -1258,13 +1272,7 @@ int LoadLevelFile(int levelIndex)
 	TENLog("Loading level file...", LogLevel::Info);
 
 	CleanUp();
-	FreeSamples();
-
-	if (!g_FirstLevel)
-	{
-		FreeLevel();
-	}
-	g_FirstLevel = false;
+	FreeLevel();
 	
 	// Loading level is done is two threads, one for loading level and one for drawing loading screen
 	IsLevelLoading = true;

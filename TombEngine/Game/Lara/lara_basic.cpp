@@ -354,7 +354,6 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 				Rumble(0.4f, 0.15f);
 
 				item->Animation.ActiveState = LS_SPLAT;
-				lara->Control.TurnRate = 0;
 				return;
 			}
 		}
@@ -925,22 +924,16 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeft(item, coll))
 	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRight(item, coll))
 	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1001,22 +994,16 @@ void PsuedoLaraAsWadeTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeft(item, coll))
 	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRight(item, coll))
 	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1058,22 +1045,16 @@ void PsuedoLaraAsSwampTurnRightSlow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeftSwamp(item, coll))
 	{
-		if (TestLaraStepLeftSwamp(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRightSwamp(item, coll))
 	{
-		if (TestLaraStepRightSwamp(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1189,22 +1170,16 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeft(item, coll))
 	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRight(item, coll))
 	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1265,22 +1240,16 @@ void PsuedoLaraAsWadeTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeft(item, coll))
 	{
-		if (TestLaraStepLeft(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRight(item, coll))
 	{
-		if (TestLaraStepRight(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1322,22 +1291,16 @@ void PsuedoLaraAsSwampTurnLeftSlow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT))
+	if (TrInput & IN_LSTEP || (TrInput & IN_WALK && TrInput & IN_LEFT) &&
+		TestLaraStepLeftSwamp(item, coll))
 	{
-		if (TestLaraStepLeftSwamp(item, coll))
-			item->Animation.TargetState = LS_STEP_LEFT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_LEFT;
 		return;
 	}
-	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
+	else if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT) &&
+		TestLaraStepRightSwamp(item, coll))
 	{
-		if (TestLaraStepRightSwamp(item, coll))
-			item->Animation.TargetState = LS_STEP_RIGHT;
-		else
-			item->Animation.TargetState = LS_IDLE;
-
+		item->Animation.TargetState = LS_STEP_RIGHT;
 		return;
 	}
 
@@ -1366,6 +1329,8 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.CanLook = false;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
+
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	if (BinocularRange)
 	{
@@ -1412,6 +1377,7 @@ void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 }
 
 // State:		LS_SPLAT (12)
@@ -1817,13 +1783,14 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.IsMoving)
 		return;
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	if (TrInput & IN_WALK) // WALK locks orientation.
+		ModulateLaraTurnRateY(item, 0, 0, 0);
+	else
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	// TODO: Funky?
 	if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
@@ -1907,7 +1874,9 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.IsMoving)
 		return;
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	if (TrInput & IN_WALK) // WALK locks orientation.
+		ModulateLaraTurnRateY(item, 0, 0, 0);
+	else
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
@@ -2047,6 +2016,7 @@ void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	lara->Control.CanLook = false;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	// TODO: Change swandive roll anim's state to something sensible.
 	if (TrInput & IN_FORWARD &&
@@ -2354,7 +2324,6 @@ void lara_col_sprint(ItemInfo* item, CollisionInfo* coll)
 				Rumble(0.5f, 0.15f);
 
 				item->Animation.ActiveState = LS_SPLAT;
-				lara->Control.TurnRate = 0;
 				return;
 			}
 		}

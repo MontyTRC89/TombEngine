@@ -667,7 +667,11 @@ bool SaveGame::Save(int slot)
 
 	// Legacy soundtrack map
 	std::vector<int> soundTrackMap;
-	for (auto& track : SoundTracks) { soundTrackMap.push_back(track.second.Mask); }
+	for (auto& track : SoundTracks) 
+	{
+		soundTrackMap.push_back(track.first);
+		soundTrackMap.push_back(track.second.Mask); 
+	}
 	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
 
 	// Flipmaps
@@ -1151,11 +1155,9 @@ bool SaveGame::Load(int slot)
 	// Legacy soundtrack map
 	for (int i = 0; i < s->cd_flags()->size(); i++)
 	{
-		// Safety check for cases when soundtrack map was externally modified and became smaller
-		if (i >= SoundTracks.size())
-			break;
-
-		SoundTracks[i].Mask = s->cd_flags()->Get(i);
+		int index = s->cd_flags()->Get(i);
+		int mask  = s->cd_flags()->Get(++i);
+		SoundTracks[index].Mask = mask;
 	}
 
 	// Static objects

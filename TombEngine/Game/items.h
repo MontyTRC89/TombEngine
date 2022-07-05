@@ -46,7 +46,7 @@ enum ItemFlags
 	IFLAG_INVISIBLE		  = (1 << 8),
 	IFLAG_REVERSE		  = (1 << 14),
 	IFLAG_KILLED		  = (1 << 15),
-	IFLAG_ACTIVATION_MASK = 0x3E00	   // bits 9-13
+	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;

@@ -558,7 +558,7 @@ namespace TEN::Entities::Vehicles
 			break;
 
 		case UPV_STATE_DISMOUNT_WATER_SURFACE:
-			if (anim == UPV_ANIM_DISMOUNT_WATER_SURFACE_START && frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
+			if (anim == UPV_ANIM_DISMOUNT_WATER_SURFACE_END && frame == UPV_DISMOUNT_WATER_SURFACE_FRAME)
 			{
 				UPV->Flags &= ~UPV_FLAG_CONTROL;
 				int waterDepth, waterHeight, heightFromWater;

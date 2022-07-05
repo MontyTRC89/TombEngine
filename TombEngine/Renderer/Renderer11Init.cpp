@@ -20,17 +20,13 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 	TENLog("Initializing DX11...", LogLevel::Info);
 
-	ScreenWidth = w;
-	ScreenHeight = h;
-	Windowed = windowed;
+	m_screenWidth = w;
+	m_screenHeight = h;
+	m_windowed = windowed;
 	InitialiseScreen(w, h, windowed, handle, false);
 
 	// Initialise render states
 	m_states = std::make_unique<CommonStates>(m_device.Get());
-
-	wchar_t titleScreenFile[255];
-	std::mbstowcs(titleScreenFile, g_GameFlow->TitleScreenImagePath.c_str(), 255);
-	SetTextureOrDefault(m_titleScreen, titleScreenFile);
 
 	auto whiteSpriteName = L"Textures/WhiteSprite.png";
 	SetTextureOrDefault(m_whiteTexture, L"Textures/WhiteSprite.png");
@@ -54,7 +50,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"BITANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"EFFECTS", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"EFFECTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"BLENDINDICES", 0, DXGI_FORMAT_R32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"POLYINDEX", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{"DRAWINDEX", 0, DXGI_FORMAT_R32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -89,9 +85,6 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_vsFinalPass = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psFinalPass = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_FinalPass.fx", "PS", "ps_4_0", nullptr, blob);
 	
-	m_shadowMap = Texture2DArray(m_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_D16_UNORM);
-	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
-
 	// Initialise constant buffers
 	m_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
 	m_cbItem = CreateConstantBuffer<CItemBuffer>();
@@ -112,7 +105,6 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	m_stHUD.Projection = Matrix::CreateOrthographicOffCenter(0, REFERENCE_RES_WIDTH, 0, REFERENCE_RES_HEIGHT, 0, 1.0f);
 	m_cbHUD.updateData(m_stHUD, m_context.Get());
 	m_currentCausticsFrame = 0;
-	m_firstWeather = true;
 
 	// Preallocate lists
 	dynamicLights = createVector<RendererLight>(MAX_DYNAMIC_LIGHTS);
@@ -292,7 +284,9 @@ void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HW
 	// Initialise buffers
 	m_renderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
 	m_dumpScreenRenderTarget = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM);
+	m_depthMap = RenderTarget2D(m_device.Get(), w, h, DXGI_FORMAT_R32_FLOAT, DXGI_FORMAT_D16_UNORM);
 	m_reflectionCubemap = RenderTargetCube(m_device.Get(), 128, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
+	m_shadowMap = Texture2DArray(m_device.Get(), g_Configuration.ShadowMapSize, 6, DXGI_FORMAT_R16_UNORM, DXGI_FORMAT_D16_UNORM);
 
 	// Initialise viewport
 	m_viewport.TopLeftX = 0;
@@ -348,9 +342,9 @@ void TEN::Renderer::Renderer11::Create()
 
 void Renderer11::ToggleFullScreen()
 {
-	Windowed = !Windowed;
+	m_windowed = !m_windowed;
 
-	if (!Windowed)
+	if (!m_windowed)
 	{
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, 0);
 		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, WS_EX_TOPMOST);
@@ -362,7 +356,7 @@ void Renderer11::ToggleFullScreen()
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, WS_OVERLAPPEDWINDOW);
 		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, 0);
 		ShowWindow(WindowsHandle, SW_SHOWNORMAL);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, ScreenWidth, ScreenHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, m_screenWidth, m_screenHeight, SWP_NOMOVE | SWP_NOZORDER | SWP_FRAMECHANGED);
 	}
 
 	UpdateWindow(WindowsHandle);

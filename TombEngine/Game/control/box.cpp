@@ -75,6 +75,9 @@ void DrawNearbyPathfinding(int boxIndex)
 
 	while (true)
 	{
+		if (index >= g_Level.Overlaps.size())
+			break;
+
 		auto overlap = g_Level.Overlaps[index];
 
 		DrawBox(overlap.box, Vector3(1, 1, 0));
@@ -472,7 +475,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	AnimateItem(item);
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		CreatureDie(itemNumber, FALSE);
+		CreatureDie(itemNumber, false);
 		return false;
 	}
 
@@ -808,7 +811,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 	return true;
 }
 
-void CreatureDie(short itemNumber, int explode)
+void CreatureDie(short itemNumber, bool explode)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -817,10 +820,12 @@ void CreatureDie(short itemNumber, int explode)
 
 	if (explode)
 	{
-		if (Objects[item->ObjectNumber].hitEffect)
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_HIT_EFFECT);
+		if (Objects[item->ObjectNumber].hitEffect & HIT_BLOOD)
+			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_GIBS);
+		else if (Objects[item->ObjectNumber].hitEffect & HIT_SMOKE)
+			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
 		else
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_NORMAL);
+			ExplodingDeath(itemNumber, BODY_EXPLODE);
 
 		KillItem(itemNumber);
 	}

@@ -201,7 +201,7 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, int fxObj, int type);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
-void SetupSplash(const SPLASH_SETUP* const setup,int room);
+void SetupSplash(const SPLASH_SETUP* const setup, int room);
 void UpdateSplashes();
 void SetupRipple(int x, int y, int z, int size, int flags);
 void TriggerLaraBlood();

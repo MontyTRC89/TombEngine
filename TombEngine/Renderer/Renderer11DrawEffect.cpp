@@ -556,6 +556,14 @@ namespace TEN::Renderer
 
 			switch (p.Type)
 			{
+			case WeatherType::None:
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+					p.Position,
+					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
+					0.0f, 1.0f, Vector2(p.Size),
+					BLENDMODE_ADDITIVE, view);
+				break;
+
 			case WeatherType::Snow:
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -602,7 +610,7 @@ namespace TEN::Renderer
 		for (int j = 0; j < item->LightsToDraw.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		short length = 0;
 		short zOffset = 0;
@@ -675,7 +683,7 @@ namespace TEN::Renderer
 
 						m_stItem.World = world;
 						m_cbItem.updateData(m_stItem, m_context.Get());
-						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
@@ -688,7 +696,7 @@ namespace TEN::Renderer
 
 						m_stItem.World = world;
 						m_cbItem.updateData(m_stItem, m_context.Get());
-						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
@@ -733,7 +741,7 @@ namespace TEN::Renderer
 				for (int j = 0; j < item->LightsToDraw.size(); j++)
 					memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 				m_cbLights.updateData(m_stLights, m_context.Get());
-				m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+				BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 				SetBlendMode(BLENDMODE_ADDITIVE);
 				
@@ -770,7 +778,7 @@ namespace TEN::Renderer
 
 							m_stItem.World = world;
 							m_cbItem.updateData(m_stItem, m_context.Get());
-							m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+							BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 							DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 						}
@@ -803,60 +811,6 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawUnderwaterDust(RenderView& view) 
-	{
-		if (m_firstUnderwaterDustParticles) {
-			for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
-				m_underwaterDustParticles[i].Reset = true;
-		}
-
-		for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++) 
-		{
-			RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
-
-			if (dust->Reset) {
-				dust->X = LaraItem->Pose.Position.x + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Y = LaraItem->Pose.Position.y + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Z = LaraItem->Pose.Position.z + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-
-				// Check if water room
-				short roomNumber = Camera.pos.roomNumber;
-				FloorInfo* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
-				if (!IsRoomUnderwater(roomNumber))
-					continue;
-
-				if (!IsInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
-				{
-					dust->Reset = true;
-					continue;
-				}
-
-				dust->Life = 0;
-				dust->Reset = false;
-			}
-
-			dust->Life++;
-			byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
-
-			AddSpriteBillboard(
-				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], 
-				Vector3(dust->X, dust->Y, dust->Z),
-				Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-				0.0f,
-				1.0f, 
-				{ 24, 24 },
-				BLENDMODE_ADDITIVE,
-				view);
-
-			if (dust->Life >= 32)
-				dust->Reset = true;
-		}
-
-		m_firstUnderwaterDustParticles = false;
-
-		return;
-	}
-
 	void Renderer11::DrawSprites(RenderView& view)
 	{
 		const int numSpritesToDraw = view.spritesToDraw.size();
@@ -880,7 +834,7 @@ namespace TEN::Renderer
 
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
-				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
+				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
 				spriteMatrix = scale * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 			}
 			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
@@ -1134,13 +1088,13 @@ namespace TEN::Renderer
 		Matrix matrices[1] = { Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
 		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 		m_stLights.NumLights = effect->Lights.size();
 		for (int j = 0; j < effect->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		if (transparent)
 		{
@@ -1230,7 +1184,7 @@ namespace TEN::Renderer
 				m_stStatic.World = world;
 				m_stStatic.Color = Vector4::One;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 				RendererVertex vtx0;
 				vtx0.Position = deb->mesh.Positions[0];
@@ -1286,8 +1240,8 @@ namespace TEN::Renderer
 			s.velocity.Normalize(v);
 
 			float normalizedLife = s.age / s.life;
-			auto height = lerp(1, 0, normalizedLife);
-			auto color = DirectX::SimpleMath::Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
+			auto height = Lerp(1.0f, 0.0f, normalizedLife);
+			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
 
 			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BLENDMODE_ADDITIVE, -v, view);
 		}
