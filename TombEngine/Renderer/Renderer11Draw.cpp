@@ -1475,27 +1475,19 @@ namespace TEN::Renderer
 		view.fillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
-		
-		if (!cameraConstantBuffer.CameraUnderwater)
+
+		if (level->GetFogEnabled())
 		{
-			if (level->GetFogEnabled())
-			{
-				auto fogCol = level->GetFogColor();
-				cameraConstantBuffer.FogColor = Vector4(fogCol.GetR() / 255.0f, fogCol.GetG() / 255.0f, fogCol.GetB() / 255.0f, 1.0f);
-				cameraConstantBuffer.FogMinDistance = level->GetFogMinDistance();
-				cameraConstantBuffer.FogMaxDistance = level->GetFogMaxDistance();
-			}
-			else
-			{
-				cameraConstantBuffer.FogMaxDistance = 0;
-			}
+			auto fogCol = level->GetFogColor();
+			cameraConstantBuffer.FogColor = Vector4(fogCol.GetR() / 255.0f, fogCol.GetG() / 255.0f, fogCol.GetB() / 255.0f, 1.0f);
+			cameraConstantBuffer.FogMinDistance = level->GetFogMinDistance();
+			cameraConstantBuffer.FogMaxDistance = level->GetFogMaxDistance();
 		}
 		else
 		{
-			cameraConstantBuffer.FogColor = m_rooms[Camera.pos.roomNumber].AmbientLight;
-			cameraConstantBuffer.FogMinDistance = UNDERWATER_FOG_MIN_DISTANCE;
-			cameraConstantBuffer.FogMaxDistance = UNDERWATER_FOG_MAX_DISTANCE;
+			cameraConstantBuffer.FogMaxDistance = 0;
 		}
+
 		m_cbCameraMatrices.updateData(cameraConstantBuffer, m_context.Get());
 		BindConstantBufferVS(CB_CAMERA, m_cbCameraMatrices.get());
 		BindConstantBufferPS(CB_CAMERA, m_cbCameraMatrices.get());
