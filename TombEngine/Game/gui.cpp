@@ -3365,8 +3365,6 @@ short GuiController::GetLoadSaveSelection()
 
 LoadResult GuiController::DoLoad()
 {
-	invMode = InventoryMode::Load;
-
 	if (goDown)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -3410,8 +3408,6 @@ LoadResult GuiController::DoLoad()
 
 bool GuiController::DoSave()
 {
-	invMode = InventoryMode::Save;
-
 	if (goDown)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
