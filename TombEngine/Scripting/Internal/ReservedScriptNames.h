@@ -115,6 +115,14 @@ static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";
 static constexpr char ScriptReserved_PercentToScreen[]				= "PercentToScreen";
 static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 
+static constexpr char ScriptReserved_AddParticle[]					= "AddParticle";
+static constexpr char ScriptReserved_AddLightningArc[]				= "AddLightningArc";
+static constexpr char ScriptReserved_AddShockwave[]					= "AddShockwave";
+static constexpr char ScriptReserved_AddDynamicLight[]				= "AddDynamicLight";
+static constexpr char ScriptReserved_AddBlood[]						= "AddBlood";
+static constexpr char ScriptReserved_AddFire[]						= "AddFire";
+static constexpr char ScriptReserved_Earthquake[]					= "Earthquake";
+
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
