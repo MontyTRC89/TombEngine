@@ -367,12 +367,12 @@ void Moveable::Register(sol::table & parent)
 
 void Moveable::Init()
 {
-	bool cond = IsPointInRoom(m_item->Pose, m_item->RoomNumber);
+	bool cond = IsPointInRoom(m_item->Pose.Position, m_item->RoomNumber);
 	std::string err{ "Position of item \"{}\" does not match its room ID." };
 	if (!ScriptAssertF(cond, err, m_item->LuaName))
 	{
 		ScriptWarn("Resetting to the center of the room.");
-		PHD_3DPOS center = GetRoomCenter(m_item->RoomNumber);
+		auto center = GetRoomCenter(m_item->RoomNumber);
 		// reset position but not rotation
 		m_item->Pose.Position.x = center.Position.x;
 		m_item->Pose.Position.y = center.Position.y;
