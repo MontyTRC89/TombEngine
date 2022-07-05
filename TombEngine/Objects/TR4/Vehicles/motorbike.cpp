@@ -29,6 +29,8 @@ namespace TEN::Entities::Vehicles
 {
 	const vector<int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
 	const vector<int> MotorbikeBrakeLightJoints = { 10 };
+	const vector<int> MotorbikeHeadLightJoints = { 3 };
+
 	const vector<VehicleMountType> MotorbikeMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -143,6 +145,8 @@ namespace TEN::Entities::Vehicles
 
 		motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeJoints);
 		motorbike->MomentumAngle = motorbikeItem->Pose.Orientation.y;
+
+		motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
 	}
 
 	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -1200,14 +1204,18 @@ namespace TEN::Entities::Vehicles
 
 		int pitch = 0;
 
-		DrawMotorbikeLight(motorbikeItem);
 		if (laraItem->Animation.ActiveState < MOTORBIKE_STATE_MOUNT ||
 			laraItem->Animation.ActiveState > MOTORBIKE_STATE_DISMOUNT)
 		{
+			DrawMotorbikeLight(motorbikeItem);
+			motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+
 			drive = MotorbikeUserControl(motorbikeItem, laraItem, probe.Position.Floor, &pitch);
 		}
 		else
 		{
+			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+
 			drive = -1;
 			collide = 0;
 		}
