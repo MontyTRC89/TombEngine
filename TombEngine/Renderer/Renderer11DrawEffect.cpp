@@ -873,7 +873,7 @@ namespace TEN::Renderer
 				face.info.world = spriteMatrix;
 				face.info.blendMode = spr.BlendMode;
 
-				RendererRoom& room = m_rooms[GetRoomNumberForSpriteTest(spr.pos)];
+				RendererRoom& room = m_rooms[FindRoomNumber(Vector3Int(spr.pos))];
 				room.TransparentFacesToDraw.push_back(face);
 			}
 			else
