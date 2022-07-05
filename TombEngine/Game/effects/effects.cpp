@@ -869,7 +869,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	}
 }
 
-void SetupSplash(const SPLASH_SETUP* const setup,int room)
+void SetupSplash(const SPLASH_SETUP* const setup, int room)
 {
 	constexpr size_t NUM_SPLASHES = 3;
 	int numSplashesSetup = 0;
