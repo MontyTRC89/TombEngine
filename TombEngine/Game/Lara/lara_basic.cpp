@@ -1817,13 +1817,14 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.IsMoving)
 		return;
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	if (TrInput & IN_WALK) // WALK locks orientation.
+		lara->Control.TurnRate = 0;
+	else
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
-	// TODO: Funky?
 	if (TrInput & IN_RSTEP || (TrInput & IN_WALK && TrInput & IN_RIGHT))
 	{
 		item->Animation.TargetState = LS_STEP_RIGHT;
@@ -1907,7 +1908,9 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.IsMoving)
 		return;
 
-	if (!(TrInput & IN_WALK))	// WALK locks orientation.
+	if (TrInput & IN_WALK) // WALK locks orientation.
+		lara->Control.TurnRate = 0;
+	else
 	{
 		if (TrInput & (IN_LEFT | IN_RIGHT))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
