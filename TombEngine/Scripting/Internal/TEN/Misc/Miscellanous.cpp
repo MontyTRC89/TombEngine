@@ -7,6 +7,7 @@
 #include "Game/effects/lightning.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/spark.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 
@@ -17,6 +18,7 @@ Functions that don't fit in the other modules.
 */
 
 using namespace TEN::Effects::Lightning;
+using namespace TEN::Effects::Spark;
 
 namespace Misc {
 	[[nodiscard]] static bool HasLineOfSight(short roomNumber1, Vec3 pos1, Vec3 pos2)
@@ -48,6 +50,51 @@ namespace Misc {
 		TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
 	}
 
+	static void AddParticle(int spriteIndex, Vec3 pos, Vec3 velocity, int gravity, float rot, ScriptColor startColor, ScriptColor endColor, int blendMode, int startSize, int endSize, int lifetime, int flags)
+	{
+		auto* s = GetFreeParticle();
+
+		s->on = true;
+
+		s->spriteIndex = spriteIndex;
+
+		s->sR = startColor.GetR();
+		s->sG = startColor.GetG();
+		s->sB = startColor.GetB();
+		s->dR = endColor.GetR();
+		s->dG = endColor.GetG();
+		s->dB = endColor.GetB();
+
+		s->blendMode = BLEND_MODES(std::clamp(blendMode, int(BLEND_MODES::BLENDMODE_OPAQUE), int(BLEND_MODES::BLENDMODE_ALPHABLEND)));
+
+		s->x = pos.x;
+		s->y = pos.y;
+		s->z = pos.z;
+
+		s->life = s->sLife = lifetime;
+
+		s->xVel = short(velocity.x);
+		s->yVel = short(velocity.y);
+		s->zVel = short(velocity.z);
+
+		s->sSize = s->size = float(startSize);
+		s->dSize = float(endSize);
+		s->scalar = 2;
+
+		s->fadeToBlack = char(s->life - (s->life / 8));
+
+		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF | short(flags);
+
+		s->rotAng = (GetRandomControl() & 0x0FFF); 
+		s->rotAdd = byte(ANGLE(rot) / FPS);
+
+		s->friction = 50;
+		s->maxYvel  = 0;
+		s->gravity  = gravity;
+
+		s->colFadeSpeed = 8;
+	}
+
 	static void AddShockwave(Vec3 pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
 	{
 		PHD_3DPOS p;
@@ -58,7 +105,7 @@ namespace Misc {
 		TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 	}
 
-	static void AddDynamicLight(Vec3 pos, ScriptColor color, int radius, int lifetime)
+	static void AddDynamicLight(Vec3 pos, ScriptColor color, int radius)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
 	}
@@ -132,7 +179,6 @@ namespace Misc {
 
 	static std::tuple<double, double> ScreenToPercent(int x, int y)
 	{
-
 		auto fWidth = static_cast<double>(g_Configuration.Width);
 		auto fHeight = static_cast<double>(g_Configuration.Height);
 		double resX = x / fWidth * 100.0;
@@ -144,6 +190,69 @@ namespace Misc {
 	void Register(sol::state * state, sol::table & parent) {
 		sol::table table_misc{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Misc, table_misc);
+
+		///Emit a lightning arc.
+		//@function AddLightningArc
+		//@tparam Vec3 src
+		//@tparam Vec3 dest
+		//@tparam ScriptColor color
+		//@tparam int lifetime
+		//@tparam int amplitude
+		//@tparam int beamWidth
+		//@tparam int segments
+		//@tparam int flags
+		table_misc.set_function(ScriptReserved_AddLightningArc, &AddLightningArc);
+
+		///Emit a particle.
+		//@function AddLightningArc
+		//@tparam Vec3 pos
+		//@tparam Vec3 velocity
+		//@tparam int gravity
+		//@tparam float rot
+		//@tparam ScriptColor startColor
+		//@tparam ScriptColor endColor
+		//@tparam int blendMode
+		//@tparam int startSize
+		//@tparam int endSize
+		//@tparam int lifetime
+		//@tparam int flags
+		table_misc.set_function(ScriptReserved_AddParticle, &AddParticle);
+
+		///Emit a shockwave.
+		//@function AddShockwave
+		//@tparam Vec3 pos
+		//@tparam int innerRadius
+		//@tparam int outerRadius
+		//@tparam ScriptColor color
+		//@tparam int lifetime
+		//@tparam int speed
+		//@tparam int angle
+		//@tparam int flags
+		table_misc.set_function(ScriptReserved_AddShockwave, &AddShockwave);
+
+		///Emit dynamic light.
+		//@function AddDynamicLight
+		//@tparam Vec3 pos
+		//@tparam ScriptColor color
+		//@tparam int radius
+		table_misc.set_function(ScriptReserved_AddDynamicLight, &AddDynamicLight);
+
+		///Emit blood.
+		//@function AddFire
+		//@tparam Vec3 pos
+		//@tparam int size
+		table_misc.set_function(ScriptReserved_AddFire, &AddFireFlame);
+
+		///Emit blood.
+		//@function AddBlood
+		//@tparam Vec3 pos
+		//@tparam int amount
+		table_misc.set_function(ScriptReserved_AddBlood, &AddBlood);
+
+		///Do earthquake.
+		//@function Earthquake
+		//@tparam int strength
+		table_misc.set_function(ScriptReserved_Earthquake, &Earthquake);
 
 		///Set and play an ambient track
 		//@function SetAmbientTrack
@@ -163,14 +272,12 @@ namespace Misc {
 		//@treturn int the direct distance from one position to the other
 		table_misc.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 
-		
 		///Calculate the horizontal distance between two positions.
 		//@function CalculateHorizontalDistance
 		//@tparam Vec3 posA first position
 		//@tparam Vec3 posB second position
 		//@treturn int the direct distance on the XZ plane from one position to the other
 		table_misc.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
-
 
 		///Translate a pair of percentages to screen-space pixel coordinates.
 		//To be used with @{Strings.DisplayString:SetPosition} and @{Strings.DisplayString}.
