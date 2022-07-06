@@ -49,7 +49,10 @@ namespace Misc
 		TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
 	}
 
-	static void AddParticle(int spriteIndex, Vec3 pos, Vec3 velocity, int gravity, float rot, ScriptColor startColor, ScriptColor endColor, int blendMode, int startSize, int endSize, int lifetime, int flags)
+	static void AddParticle(int spriteIndex, Vec3 pos, Vec3 velocity, int gravity, float rot, 
+							ScriptColor startColor, ScriptColor endColor, int blendMode, 
+							int startSize, int endSize, int lifetime, 
+							bool damage, bool poison)
 	{
 		auto* s = GetFreeParticle();
 
@@ -81,12 +84,21 @@ namespace Misc
 		s->dSize = float(endSize);
 		s->scalar = 2;
 
-		s->fadeToBlack = char(s->life - (s->life / 8));
+		s->fadeToBlack = char(s->life - (s->life / 4));
 
-		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF | short(flags);
+		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
+
+		if (poison)
+			s->flags |= SP_POISON;
+
+		if (damage)
+			s->flags |= SP_DAMAGE;
+
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
+			s->flags |= SP_WIND;
 
 		s->rotAng = (GetRandomControl() & 0x0FFF); 
-		s->rotAdd = byte(ANGLE(rot) / FPS);
+		s->rotAdd = byte(ANGLE(rot) >> 4);
 
 		s->friction = 50;
 		s->maxYvel  = 0;
@@ -212,7 +224,8 @@ namespace Misc
 		//@tparam int startSize
 		//@tparam int endSize
 		//@tparam int lifetime
-		//@tparam int flags
+		//@tparam bool poison
+		//@tparam bool damage
 		table_misc.set_function(ScriptReserved_AddParticle, &AddParticle);
 
 		///Emit a shockwave.
