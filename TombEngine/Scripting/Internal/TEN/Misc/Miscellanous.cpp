@@ -78,9 +78,9 @@ namespace Misc
 		s->colFadeSpeed = lifetime / 2;
 		s->fadeToBlack = lifetime / 3;
 
-		s->xVel = short(velocity.x);
-		s->yVel = short(velocity.y);
-		s->zVel = short(velocity.z);
+		s->xVel = short(velocity.x << 5);
+		s->yVel = short(velocity.y << 5);
+		s->zVel = short(velocity.z << 5);
 
 		s->sSize = s->size = float(startSize);
 		s->dSize = float(endSize);
@@ -100,7 +100,7 @@ namespace Misc
 		s->rotAng = (GetRandomControl() & 0x0FFF); 
 		s->rotAdd = byte(ANGLE(rot) >> 4);
 
-		s->friction = 50;
+		s->friction = 0;
 		s->maxYvel  = 0;
 		s->gravity  = gravity;
 	}
