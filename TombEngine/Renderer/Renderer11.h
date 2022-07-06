@@ -101,7 +101,7 @@ namespace TEN::Renderer
 		Matrix Translation;
 		Matrix Rotation;
 		Matrix Scale;
-		Matrix AnimationTransforms[32];
+		Matrix AnimationTransforms[MAX_BONES];
 		std::vector<RendererLight*> LightsToDraw;
 		int PreviousRoomNumber = NO_ROOM;
 		int CurrentRoomNumber = NO_ROOM;
