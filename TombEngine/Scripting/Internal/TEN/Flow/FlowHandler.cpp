@@ -1,4 +1,6 @@
 #include "framework.h"
+#include <filesystem>
+
 #include "FlowHandler.h"
 #include "ReservedScriptNames.h"
 #include "Sound/sound.h"
@@ -213,6 +215,26 @@ int	FlowHandler::GetNumLevels() const
 	return Levels.size();
 }
 
+int FlowHandler::GetLevelNumber(std::string const& fileName)
+{
+	if (fileName.empty())
+		return -1;
+
+	auto lcFilename = fileName;
+	std::transform(lcFilename.begin(), lcFilename.end(), lcFilename.begin(), [](unsigned char c) { return std::tolower(c); });
+
+	for (int i = 0; i < Levels.size(); i++)
+	{
+		auto level = this->GetLevel(i)->FileName;
+		std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
+
+		if (level == lcFilename && std::filesystem::exists(fileName))
+			return i;
+	}
+
+	return -1;
+}
+
 bool FlowHandler::IsFlyCheatEnabled() const
 {
 	return FlyCheat;
@@ -220,8 +242,10 @@ bool FlowHandler::IsFlyCheatEnabled() const
 
 bool FlowHandler::DoFlow()
 {
-	// We start with the title level
-	CurrentLevel = 0;
+	// We start with the title level, if no other index is specified
+	if (CurrentLevel == -1)
+		CurrentLevel = 0;
+
 	SelectedLevelForNewGame = 0;
 	SelectedSaveGame = 0;
 	SaveGameHeader header;

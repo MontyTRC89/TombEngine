@@ -90,8 +90,7 @@ void SkidooManCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* col
 
 	if (Lara.Vehicle == NO_ITEM && item->Animation.Velocity > 0)
 	{
-		laraItem->HitStatus = true;
-		laraItem->HitPoints -= 100;
+		DoDamage(laraItem, 100);
 	}
 }
 
@@ -110,7 +109,7 @@ void SkidooManControl(short riderItemNumber)
 
 	if (!item->Data)
 	{
-		EnableBaddyAI(itemNumber, TRUE);
+		EnableEntityAI(itemNumber, TRUE);
 		item->Status = ITEM_ACTIVE;
 	}
 
@@ -208,21 +207,21 @@ void SkidooManControl(short riderItemNumber)
 
 		if (creatureInfo->Flags)
 		{
-			SoundEffect(SFX_TR4_BAD_TROOP_UZI, &item->Pose);
+			SoundEffect(SFX_TR4_BADDY_UZI, &item->Pose);
 			creatureInfo->Flags--;
 		}
 	}
 
 	if (item->Animation.ActiveState == SMAN_STATE_WAIT)
 	{
-		SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &item->Pose);
+		SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose);
 		creatureInfo->JointRotation[0] = 0;
 	}
 	else
 	{
 		creatureInfo->JointRotation[0] = (creatureInfo->JointRotation[0] == 1) ? 2 : 1;
 		DoSnowEffect(item);
-		SoundEffect(SFX_TR2_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
+		SoundEffect(SFX_TR2_VEHICLE_SNOWMOBILE_IDLE, &item->Pose, SoundEnvironment::Land, 0.5f + item->Animation.Velocity / 100.0f); // SKIDOO_MAX_VELOCITY.  TODO: Check actual sound!
 	}
 
 	CreatureAnimation(itemNumber, angle, 0);
@@ -241,13 +240,13 @@ void SkidooManControl(short riderItemNumber)
 		riderItem->Animation.FrameNumber = item->Animation.FrameNumber + (g_Level.Anims[riderItem->Animation.AnimNumber].frameBase - g_Level.Anims[item->Animation.AnimNumber].frameBase);
 	}
 	else if (riderItem->Status == ITEM_DEACTIVATED &&
-		item->Animation.Velocity == 0 &&
-		item->Animation.VerticalVelocity == 0)
+			 item->Animation.Velocity == 0 &&
+			 item->Animation.VerticalVelocity == 0)
 	{
 		RemoveActiveItem(riderItemNumber);
 		riderItem->Collidable = false;
 		riderItem->HitPoints = NOT_TARGETABLE;
-		riderItem->Flags |= ONESHOT;
+		riderItem->Flags |= IFLAG_INVISIBLE;
 
 		DisableEntityAI(itemNumber);
 		item->ObjectNumber = ID_SNOWMOBILE;

@@ -15,6 +15,8 @@
 #include "Sound/sound.h"
 #include "Game/camera.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Generic
 {
 	PENDULUM CurrentPendulum;
@@ -46,6 +48,7 @@ namespace TEN::Entities::Generic
 
 	void PrepareRope(ROPE_STRUCT* rope, Vector3Int* pos1, Vector3Int* pos2, int length, ItemInfo* item)
 	{
+		rope->room = item->RoomNumber;
 		rope->position = *pos1;
 		rope->segmentLength = length << 16;
 
@@ -178,7 +181,7 @@ namespace TEN::Entities::Generic
 		if (TrInput & IN_ACTION &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
-			laraItem->Animation.Airborne &&
+			laraItem->Animation.IsAirborne &&
 			laraItem->Animation.VerticalVelocity > 0&&
 			rope->active)
 		{
@@ -208,7 +211,7 @@ namespace TEN::Entities::Generic
 
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.VerticalVelocity = 0;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				laraInfo->Control.Rope.Ptr = ropeItem->TriggerFlags;
@@ -603,6 +606,28 @@ namespace TEN::Entities::Generic
 		}
 	}
 
+	bool RopeSwingCollision(ItemInfo* item, CollisionInfo* coll)
+	{
+		auto* lara = GetLaraInfo(item);
+
+		coll->Setup.Mode = CollisionProbeMode::FreeForward;
+		coll->Setup.ForwardAngle = lara->Control.Rope.Direction ? item->Pose.Orientation.y : -item->Pose.Orientation.y;
+		GetCollisionInfo(coll, item);
+
+		bool stumble = (coll->CollisionType != CollisionType::CT_NONE || coll->HitStatic);
+
+		if (stumble || 
+			TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber) ||
+			TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, item->RoomNumber))
+		{
+			item->Pose.Position = coll->Setup.OldPosition;
+			FallFromRope(item, stumble);
+			return true;
+		}
+
+		return false;
+	}
+
 	void JumpOffRope(ItemInfo* item)
 	{
 		if (Lara.Control.Rope.Ptr != -1)
@@ -619,7 +644,7 @@ namespace TEN::Entities::Generic
 			}
 
 			item->Pose.Orientation.x = 0;
-			item->Animation.Airborne = true;
+			item->Animation.IsAirborne = true;
 
 			Lara.Control.HandStatus = HandStatus::Free;
 
@@ -637,22 +662,26 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void FallFromRope(ItemInfo* item)
+	void FallFromRope(ItemInfo* item, bool stumble)
 	{
 		item->Animation.Velocity = abs(CurrentPendulum.velocity.x >> FP_SHIFT) + abs(CurrentPendulum.velocity.z >> FP_SHIFT) >> 1;
 		item->Pose.Orientation.x = 0;
 		item->Pose.Position.y += 320;
 
-		item->Animation.AnimNumber = LA_FALL_START;
-		item->Animation.FrameNumber = g_Level.Anims[LA_FALL_START].frameBase;
-		item->Animation.ActiveState = LS_JUMP_FORWARD;
-		item->Animation.TargetState = LS_JUMP_FORWARD;
+		SetAnimation(item, stumble ? LA_JUMP_WALL_SMASH_START : LA_FALL_START);
 
 		item->Animation.VerticalVelocity = 0;
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 
-		Lara.Control.HandStatus = HandStatus::Free;
-		Lara.Control.Rope.Ptr = -1;
+		auto* lara = GetLaraInfo(item);
+		lara->Control.HandStatus = HandStatus::Free;
+		lara->Control.Rope.Ptr = -1;
+
+		if (stumble)
+		{
+			item->Animation.Velocity = -item->Animation.Velocity;
+			DoDamage(item, 0);
+		}
 	}
 
 	void LaraClimbRope(ItemInfo* item, CollisionInfo* coll)
@@ -692,7 +721,7 @@ namespace TEN::Entities::Generic
 
 			if (item->Animation.AnimNumber == LA_ROPE_DOWN && item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &LaraItem->Pose);
+				SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &LaraItem->Pose);
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				Lara.Control.Rope.Flag = 0;
 				++Lara.Control.Rope.Segment;

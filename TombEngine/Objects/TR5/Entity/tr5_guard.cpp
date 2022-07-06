@@ -122,7 +122,7 @@ void InitialiseGuard(short itemNum)
 		case 3:
 			item->Animation.AnimNumber = anim + 28;
 			item->Animation.TargetState = GUARD_STATE_SIT;
-			item->SwapMeshFlags = 9216;
+			item->MeshSwapBits = 9216;
 
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 			if (roomItemNumber != NO_ITEM)
@@ -156,7 +156,7 @@ void InitialiseGuard(short itemNum)
 		case 4:
 			item->Animation.AnimNumber = anim + 30;
 			item->Animation.TargetState = 17;
-			item->SwapMeshFlags = 8192;
+			item->MeshSwapBits = 8192;
 			break;
 
 		case 5:
@@ -380,7 +380,7 @@ void GuardControl(short itemNumber)
 		angle = CreatureTurn(item, creature->MaxTurn);
 		creature->Enemy = LaraItem;
 
-		if ((laraAI.distance < 0x400000 && LaraItem->Animation.Velocity > 20) ||
+		if ((laraAI.distance < pow(SECTOR(2), 2) && LaraItem->Animation.Velocity > 20) ||
 			item->HitStatus ||
 			TargetVisible(item, &laraAI))
 		{
@@ -460,7 +460,7 @@ void GuardControl(short itemNumber)
 				item->Animation.TargetState = GUARD_STATE_RUN;
 			else if (Targetable(item, &AI) && item->ObjectNumber != ID_SCIENTIST)
 			{
-				if (AI.distance >= 0x1000000 && AI.zoneNumber == AI.enemyZone)
+				if (AI.distance >= pow(SECTOR(4), 2) && AI.zoneNumber == AI.enemyZone)
 				{
 					if (!(item->AIBits & MODIFY))
 						item->Animation.TargetState = GUARD_STATE_WALK;
@@ -486,7 +486,7 @@ void GuardControl(short itemNumber)
 				item->Animation.TargetState = GUARD_STATE_HUNT_IDLE;
 			else if (creature->Mood != MoodType::Bored)
 			{
-				if (AI.distance < 0x900000 || item->AIBits & FOLLOW)
+				if (AI.distance < pow(SECTOR(3), 2) || item->AIBits & FOLLOW)
 					item->Animation.TargetState = GUARD_STATE_WALK;
 				else
 					item->Animation.TargetState = GUARD_STATE_RUN;
@@ -594,7 +594,7 @@ void GuardControl(short itemNumber)
 			creature->LOT.IsJumping = false;
 
 			if (!Targetable(item, &AI) ||
-				AI.distance >= 0x1000000 && AI.zoneNumber == AI.enemyZone ||
+				AI.distance >= pow(SECTOR(4), 2) && AI.zoneNumber == AI.enemyZone ||
 				item->ObjectNumber == ID_SCIENTIST ||
 				item->AIBits & AMBUSH || item->AIBits & PATROL1) // TODO: CHECK
 			{
@@ -612,11 +612,11 @@ void GuardControl(short itemNumber)
 
 					creature->LOT.IsJumping = true;
 				}
-				else if (AI.distance >= 0x100000)
+				else if (AI.distance >= pow(SECTOR(1), 2))
 				{
 					if (!los || item->AIBits)
 					{
-						if (AI.distance > 0x900000)
+						if (AI.distance > pow(SECTOR(3), 2))
 						{
 							if (!(item->InDrawRoom))
 								item->Animation.TargetState = GUARD_STATE_RUN;
@@ -638,7 +638,7 @@ void GuardControl(short itemNumber)
 			creature->LOT.IsJumping = false;
 
 			if (Targetable(item, &AI) &&
-				(AI.distance < 0x1000000 || AI.enemyZone == AI.zoneNumber) &&
+				(AI.distance < pow(SECTOR(4), 2) || AI.enemyZone == AI.zoneNumber) &&
 				item->ObjectNumber != ID_SCIENTIST)
 			{
 				item->Animation.TargetState = GUARD_STATE_AIM;
@@ -659,7 +659,7 @@ void GuardControl(short itemNumber)
 			}
 			else if (los)
 				item->Animation.TargetState = GUARD_STATE_IDLE;
-			else if (AI.distance < 0x900000)
+			else if (AI.distance < pow(SECTOR(3), 2))
 				item->Animation.TargetState = GUARD_STATE_WALK;
 			if (item->TriggerFlags == 11)
 			{
@@ -682,7 +682,7 @@ void GuardControl(short itemNumber)
 			{
 				item->TriggerFlags = 0;
 				TestTriggers(item, true);
-				SoundEffect(SFX_TR4_LARA_POLE_LOOP, &item->Pose);
+				SoundEffect(SFX_TR4_LARA_POLE_SLIDE_LOOP, &item->Pose);
 			}
 			if (abs(AI.angle) >= ANGLE(2.0f))
 			{
@@ -714,7 +714,7 @@ void GuardControl(short itemNumber)
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 44)
 			{
-				item->SwapMeshFlags = 0;
+				item->MeshSwapBits = NO_JOINT_BITS;
 
 				short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 				if (currentItemNumber == NO_ITEM)
@@ -780,7 +780,7 @@ void GuardControl(short itemNumber)
 					item->Animation.TargetState = GUARD_STATE_HUNT;
 			}
 
-			if (canJump1block || canJump2blocks || AI.distance < 0x100000 || !los || item->HitStatus)
+			if (canJump1block || canJump2blocks || AI.distance < pow(SECTOR(1), 2) || !los || item->HitStatus)
 				item->Animation.TargetState = GUARD_STATE_IDLE;
 
 			break;
@@ -807,7 +807,7 @@ void GuardControl(short itemNumber)
 				item->Pose.Position.x = currentItem->Pose.Position.x - CLICK(1);
 				item->Pose.Orientation.y = currentItem->Pose.Orientation.y;
 				item->Pose.Position.z = currentItem->Pose.Position.z + CLICK(0.5f);
-				item->SwapMeshFlags = 1024;
+				item->MeshSwapBits = 1024;
 			}
 			else
 			{
@@ -826,7 +826,7 @@ void GuardControl(short itemNumber)
 					currentItem->MeshBits = 0x1FFF;
 					TestTriggers(item, true);
 					item->Animation.RequiredState = GUARD_STATE_WALK;
-					item->SwapMeshFlags = 0;
+					item->MeshSwapBits = NO_JOINT_BITS;
 				}
 			}
 
@@ -1032,7 +1032,7 @@ void SniperControl(short itemNumber)
 			break;
 
 		case SNIPER_STATE_UNCOVER:
-			item->MeshBits = -1;
+			item->MeshBits = ALL_JOINT_BITS;
 			break;
 
 		case 3:
@@ -1091,7 +1091,7 @@ void InitialiseMafia2(short itemNumber)
 	item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 	item->Animation.TargetState = GUARD_STATE_IDLE;
 	item->Animation.ActiveState = GUARD_STATE_IDLE;
-	item->SwapMeshFlags = 9216;
+	item->MeshSwapBits = 9216;
 }
 
 void Mafia2Control(short itemNumber)
@@ -1218,13 +1218,13 @@ void Mafia2Control(short itemNumber)
 			}
 			if (laraAI.angle <= ANGLE(112.5f) && laraAI.angle >= -ANGLE(112.5f))
 			{
-				if (item->SwapMeshFlags == 9216)
+				if (item->MeshSwapBits == 9216)
 				{
 					item->Animation.TargetState = MAFIA2_STATE_UNDRAW_GUNS;
 					break;
 				}
 			}
-			else if (item->SwapMeshFlags == 9216)
+			else if (item->MeshSwapBits == 9216)
 			{
 				item->Animation.TargetState = MAFIA2_STATE_TURN_180;
 				break;
@@ -1280,13 +1280,13 @@ void Mafia2Control(short itemNumber)
 				item->Pose.Orientation.y += ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber != g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 ||
-				item->SwapMeshFlags != 9216)
+				item->MeshSwapBits != 9216)
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 					item->Pose.Orientation.y += -ANGLE(180.0f);
 			}
 			else
-				item->SwapMeshFlags = 128;
+				item->MeshSwapBits = 128;
 			
 			break;
 
@@ -1420,9 +1420,9 @@ void Mafia2Control(short itemNumber)
 				item->Pose.Orientation.y -= ANGLE(2.0f);
 
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 16 &&
-				item->SwapMeshFlags == 9216)
+				item->MeshSwapBits == 9216)
 			{
-				item->SwapMeshFlags = 128;
+				item->MeshSwapBits = 128;
 			}
 
 			break;

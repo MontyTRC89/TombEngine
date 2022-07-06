@@ -73,7 +73,7 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseLaraLoad;
-		obj->shadowSize = 160;
+		obj->castsShadow = true;
 		obj->HitPoints = 1000;
 		obj->drawRoutine = nullptr;
 		obj->saveAnim = true;
@@ -89,7 +89,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 40;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -113,7 +113,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -141,7 +141,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
 		obj->pivotLength = 50;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -171,7 +171,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -201,7 +201,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->collision = CreatureCollision;
 		obj->control = GuardControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -231,7 +231,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -261,7 +261,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -293,7 +293,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuard;
 		obj->control = GuardControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -317,7 +317,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseSubmarine;
 		obj->collision = CreatureCollision;
 		obj->control = SubmarineControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 200;
@@ -340,7 +340,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseChef;
 		obj->control = ControlChef;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 35;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -365,7 +365,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseLion;
 		obj->collision = CreatureCollision;
 		obj->control = LionControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 40;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -386,7 +386,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseDoberman;
 		obj->collision = CreatureCollision;
 		obj->control = DobermanControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 18;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -406,7 +406,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseTr5Dog;
 		obj->collision = CreatureCollision;
 		obj->control = Tr5DogControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -426,7 +426,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseReaper;
 		obj->collision = CreatureCollision;
 		obj->control = ReaperControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 10;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -447,7 +447,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseMafia2;
 		obj->collision = CreatureCollision;
 		obj->control = Mafia2Control;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 26;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -474,7 +474,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseLarson;
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 60;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -498,7 +498,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseLarson;
 		obj->collision = CreatureCollision;
 		obj->control = LarsonControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 60;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -522,7 +522,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseCyborg;
 		obj->collision = CreatureCollision;
 		obj->control = CyborgControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 50;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
@@ -549,7 +549,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseSniper;
 		obj->collision = CreatureCollision;
 		obj->control = SniperControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 35;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -573,7 +573,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGuardLaser;
 		obj->collision = CreatureCollision;
 		//obj->control = GuardControlLaser;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 24;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
@@ -598,7 +598,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseHydra;
 		obj->collision = CreatureCollision;
 		obj->control = HydraControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 30;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->pivotLength = 50;
@@ -624,7 +624,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseImp;
 		obj->collision = CreatureCollision;
 		obj->control = ImpControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 12;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
@@ -650,7 +650,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseLightingGuide;
 		//obj->control = ControlLightingGuide;
 		obj->drawRoutine = NULL;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->radius = 256;
 		obj->HitPoints = 16;
 		obj->pivotLength = 20;
@@ -673,7 +673,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseBrownBeast;
 		obj->collision = CreatureCollision;
 		obj->control = ControlBrowsBeast;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
@@ -697,7 +697,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseLagoonWitch;
 		obj->collision = CreatureCollision;
 		obj->control = LagoonWitchControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 20;
@@ -723,7 +723,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseInvisibleGhost;
 		obj->collision = CreatureCollision;
 		obj->control = InvisibleGhostControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 		obj->hitEffect = HIT_SMOKE;
 		obj->pivotLength = 20;
@@ -774,7 +774,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseGladiator;
 		obj->control = ControlGladiator;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 50;
@@ -800,7 +800,7 @@ static void StartEntity(ObjectInfo *obj)
 			obj->initialise = InitialiseRomanStatue;
 			obj->collision = CreatureCollision;
 			obj->control = RomanStatueControl;
-			obj->shadowSize = UNIT_SHADOW / 2;
+			obj->castsShadow = true;
 			obj->HitPoints = 300;
 			obj->hitEffect = HIT_SMOKE;
 			obj->pivotLength = 50;
@@ -1116,6 +1116,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
+		obj->castShadows = true;
 	}
 	
 	obj = &Objects[ID_CLASSIC_ROLLING_BALL];

@@ -142,7 +142,7 @@ namespace TEN::Entities::TR4
 			else
 			{
 				// Search for active troops.
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 				CreatureInfo* currentCreature = ActiveCreatures[0];
 
 				int minDistance = INT_MAX;
@@ -198,7 +198,7 @@ namespace TEN::Entities::TR4
 			}
 
 			if (!creature->HurtByLara && creature->Enemy == LaraItem)
-				creature->Enemy = NULL;
+				creature->Enemy = nullptr;
 
 			GetCreatureMood(item, &AI, TIMID);
 			CreatureMood(item, &AI, TIMID);
@@ -265,11 +265,8 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					if ((creature->Alerted ||
-						creature->Mood != MoodType::Bored) &&
-						(!(item->AIBits & FOLLOW) ||
-							!(item->AIBits & MODIFY) &&
-							distance <= pow(SECTOR(2), 2)))
+					if ((creature->Alerted || creature->Mood != MoodType::Bored) &&
+						(!(item->AIBits & FOLLOW) || !(item->AIBits & MODIFY) && distance <= pow(SECTOR(2), 2)))
 					{
 						if (creature->Mood == MoodType::Bored || AI.distance <= pow(SECTOR(2), 2))
 						{
@@ -380,6 +377,7 @@ namespace TEN::Entities::TR4
 					creature->Flags--;
 				else
 				{
+					creature->FiredWeapon = 1;
 					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
@@ -438,6 +436,7 @@ namespace TEN::Entities::TR4
 					creature->Flags--;
 				else
 				{
+					creature->FiredWeapon = 1;
 					ShotLara(item, &AI, &TroopsBite1, joint0, 23);
 					creature->Flags = 5;
 				}
@@ -460,13 +459,13 @@ namespace TEN::Entities::TR4
 
 			if (WeaponEnemyTimer > 100)
 			{
-				if (item->Animation.ActiveState != TROOP_STATE_FLASHED
-					&& item->Animation.ActiveState != TROOP_STATE_ATTACKED_BY_SCORPION)
+				if (item->Animation.ActiveState != TROOP_STATE_FLASHED &&
+					item->Animation.ActiveState != TROOP_STATE_ATTACKED_BY_SCORPION)
 				{
-					creature->MaxTurn = 0;
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 28;
 					item->Animation.ActiveState = TROOP_STATE_FLASHED;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase + (GetRandomControl() & 7);
+					creature->MaxTurn = 0;
 				}
 			}
 		}

@@ -207,8 +207,7 @@ void UpdateBats()
 			bat->Pose.Position.z < z2)
 		{
 			TriggerBlood(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 2 * GetRandomControl(), 2);
-			if (LaraItem->HitPoints > 0)
-				LaraItem->HitPoints -= 2;
+			DoDamage(LaraItem, 2);
 		}
 	}
 
@@ -217,6 +216,6 @@ void UpdateBats()
 		auto* bat = &Bats[minIndex];
 
 		if (!(GetRandomControl() & 4))
-			SoundEffect(SFX_TR4_BATS_1,&bat->Pose);
+			SoundEffect(SFX_TR4_BATS,&bat->Pose);
 	}
 }

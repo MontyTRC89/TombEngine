@@ -25,7 +25,9 @@ namespace TEN::Entities::TR4
             {
                 Vector3Int pos;
                 GetJointAbsPosition(item, &pos, 0);
-                SoundEffect(SFX_TR4_HELICOPTER_LOOP, (PHD_3DPOS*)&pos);
+                SoundEffect(SFX_TR4_LIBRARY_COG_LOOP, (PHD_3DPOS*)&pos);
+                
+                //Shouldnt this be TR4_LIBRARY_COG_LOOP? Changed. Rollback if incorrect. Stranger1992 06/06/22
 
                 if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
                     item->Flags &= 0xC1;
@@ -53,7 +55,7 @@ namespace TEN::Entities::TR4
                         2 * GetRandomControl(),
                         laraItem->RoomNumber);
 
-                    laraItem->HitPoints -= 10;
+                    DoDamage(laraItem, 10);
                 }
                 else if (coll->Setup.EnableObjectPush)
                     ItemPushItem(cogItem, laraItem, coll, 0, 0);

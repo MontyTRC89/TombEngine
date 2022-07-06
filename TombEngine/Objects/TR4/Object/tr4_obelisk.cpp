@@ -11,6 +11,7 @@
 #include "Game/animation.h"
 #include "Game/effects/lightning.h"
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Lightning;
 
 void InitialiseObelisk(short itemNumber)
@@ -67,7 +68,7 @@ void ObeliskControl(short itemNumber)
 					&& (GetRandomControl() & 1) 
 					&& !(GlobalCounter & 3))
 				{
-					SoundEffect(SFX_TR4_ELEC_ONE_SHOT, &item->Pose);
+					SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &item->Pose);
 					someNumber = (GetRandomControl() & 0xFFF) + 3456;
 				}
 
@@ -112,7 +113,7 @@ void ObeliskControl(short itemNumber)
 			pos.Position.y = item->Pose.Position.y;
 			pos.Position.z = item->Pose.Position.z + SECTOR(8) * phd_cos(item->Pose.Orientation.y + ANGLE(90.0f));
 
-			SoundEffect(SFX_TR4_ELEC_ARCING_LOOP, &pos);
+			SoundEffect(SFX_TR4_ELECTRIC_ARCING_LOOP, &pos);
 
 			if (GlobalCounter & 1)
 			{

@@ -3,18 +3,24 @@
 
 #include <CommCtrl.h>
 #include <process.h>
+#include <resource.h>
 #include <iostream>
+#include <codecvt>
+#include <filesystem>
+
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
-#include "resource.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "LanguageScript.h"
 #include "ScriptInterfaceState.h"
+#include "ScriptInterfaceLevel.h"
 
 using namespace TEN::Renderer;
+using namespace TEN::Input;
+
 using std::exception;
 using std::string;
 using std::cout;
@@ -182,9 +188,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
-			//DB_Log(6, "WM_ACTIVE");
 			if (!Debug && ThreadHandle > 0)
 			{
+				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
 				ResumeAllSounds();
 			}
@@ -194,10 +200,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
-		//DB_Log(6, "WM_INACTIVE");
-		//DB_Log(5, "HangGameThread");
 		if (!Debug)
 		{
+			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
 			PauseAllSounds();
 		}
@@ -216,25 +221,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	int RetVal;
 	int n;
 
-	// Process the command line
+	// Process command line arguments
 	bool setup = false;
-
+	std::string levelFile = {};
 	LPWSTR* argv;
 	int argc;
 	argv = CommandLineToArgvW(GetCommandLineW(), &argc);
 
+	// Parse command line arguments
 	for (int i = 1; i < argc; i++)
 	{
 		if (wcscmp(argv[i], L"/setup") == 0)
+		{
 			setup = true;
-		if (wcscmp(argv[i], L"/debug") == 0)
+		}
+		else if (wcscmp(argv[i], L"/debug") == 0)
+		{
 			Debug = true;
+		}
+		else if ((wcscmp(argv[i], L"/level") == 0) && argc > (i + 1))
+		{
+			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+			levelFile = converter.to_bytes(std::wstring(argv[i + 1]));
+		}
+		else if ((wcscmp(argv[i], L"/hash") == 0) && argc > (i + 1))
+		{
+			SystemNameHash = std::stoul(std::wstring(argv[i + 1]));
+		}
 	}
 	LocalFree(argv);
 
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
 	
+	// Initialise logging
 	InitTENLog();
 
 	// Collect numbered tracks
@@ -243,9 +263,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialise the new scripting system
 	ScriptInterfaceState::Init();
 
+	// Initialise scripting
 	try 
 	{
-		// todo make sure the right objects are deleted at the end
+		// TODO: make sure the right objects are deleted at the end
 		g_GameFlow = ScriptInterfaceState::CreateFlow();
 		g_GameFlow->LoadFlowScript();
 		g_GameScript = ScriptInterfaceState::CreateGame();
@@ -260,6 +281,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
+	// Setup main window
 	INITCOMMONCONTROLSEX commCtrlInit;
 	commCtrlInit.dwSize = sizeof(INITCOMMONCONTROLSEX);
 	commCtrlInit.dwICC = ICC_USEREX_CLASSES | ICC_STANDARD_CLASSES;
@@ -278,6 +300,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	App.WindowClass.cbWndExtra = 0;
 	App.WindowClass.hCursor = LoadCursor(App.hInstance, IDC_ARROW);
 
+	// Register main window
 	if (!RegisterClass(&App.WindowClass))
 	{
 		TENLog("Unable To Register Window Class", LogLevel::Error);
@@ -300,6 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		LoadConfiguration();
 	}
 
+	// Setup window dimensions
 	RECT Rect;
 	Rect.left = 0;
 	Rect.top = 0;
@@ -307,6 +331,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Rect.bottom = g_Configuration.Height;
 	AdjustWindowRect(&Rect, WS_CAPTION, false);
 
+	// Make window handle
 	App.WindowHandle = CreateWindowEx(
 		0,
 		"TombEngine",
@@ -322,19 +347,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		NULL
 	);
 
+	// Register window handle
 	if (!App.WindowHandle)
 	{
 		TENLog("Unable To Create Window" + std::to_string(GetLastError()), LogLevel::Error);
 		return false;
 	}
+	else
+		WindowsHandle = App.WindowHandle;
 
-	WindowsHandle = App.WindowHandle;
+	// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
+	auto temp = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
 	// Initialise the renderer
 	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
 
-	// Initialize audio
-	if (g_Configuration.EnableSound)	
-		Sound_Init();
+	// Initialise audio
+	Sound_Init();
+
+	// Initialise input
+	InitialiseInput(App.WindowHandle);
+
+	// Load level if specified in command line
+	CurrentLevel = g_GameFlow->GetLevelNumber(levelFile);
 	
 	App.bNoFocus = false;
 	App.isInScene = false;
@@ -345,8 +380,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetCursor(NULL);
 	ShowCursor(FALSE);
 	hAccTable = LoadAccelerators(hInstance, (LPCSTR)0x65);
-
-	//g_Renderer->Test();
 
 	DoTheGame = true;
 
@@ -362,7 +395,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ThreadEnded = true;
 
 	while (DoTheGame);
-	
+
 	WinClose();
 	exit(EXIT_SUCCESS);
 }
@@ -373,8 +406,8 @@ void WinClose()
 
 	DestroyAcceleratorTable(hAccTable);
 
-	if (g_Configuration.EnableSound)
-		Sound_DeInit();
+	Sound_DeInit();
+	DeInitialiseInput();
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
@@ -389,4 +422,6 @@ void WinClose()
 	g_GameStringsHandler = nullptr;
 
 	ShutdownTENLog();
+
+	CoUninitialize();
 }

@@ -23,6 +23,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/itemdata.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Doors
 {
 	Vector3Int CrowbarDoorPos(-412, 0, 256);
@@ -168,7 +170,7 @@ namespace TEN::Entities::Doors
 		auto* doorItem = &g_Level.Items[itemNumber];
 
 		if (doorItem->TriggerFlags == 2 &&
-			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.Airborne && // CHECK
+			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.IsAirborne && // CHECK
 			((TrInput & IN_ACTION || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
 				laraItem->Animation.ActiveState == LS_IDLE &&
 				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&

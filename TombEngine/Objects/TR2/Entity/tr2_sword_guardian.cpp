@@ -51,17 +51,11 @@ void SwordGuardianControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState != 12)
 		{
-			//item->meshBits >>= 1;
 			SoundEffect(SFX_TR4_EXPLOSION1, &LaraItem->Pose);
 			SoundEffect(SFX_TR4_EXPLOSION2, &LaraItem->Pose);
-			//item->meshBits = 0xFFFFFFFF;
-			//item->objectNumber = ID_SAS;
-			ExplodingDeath(itemNumber, -1, 256);
-			//item->objectNumber = ID_SWAT;
+			ExplodingDeath(itemNumber, BODY_EXPLODE);
 			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
-			//item->status = ITEM_DESACTIVATED;
-			//item->flags |= ONESHOT;
 			item->Animation.ActiveState = 12;
 		}
 
@@ -120,7 +114,7 @@ void SwordGuardianControl(short itemNumber)
 
 			if (laraAlive)
 			{
-				if (AI.bite && AI.distance < SECTOR(1024))
+				if (AI.bite && AI.distance < pow(SECTOR(1), 2))
 				{
 					if (GetRandomControl() >= 0x4000)
 						item->Animation.TargetState = 5;
@@ -148,7 +142,7 @@ void SwordGuardianControl(short itemNumber)
 
 			if (laraAlive)
 			{
-				if (AI.bite && AI.distance < SECTOR(4096))
+				if (AI.bite && AI.distance < pow(SECTOR(2), 2))
 					item->Animation.TargetState = 10;
 				else if (AI.zoneNumber != AI.enemyZone)
 					item->Animation.TargetState = 1;
@@ -164,7 +158,7 @@ void SwordGuardianControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!AI.bite || AI.distance > SECTOR(1024))
+			if (!AI.bite || AI.distance > pow(SECTOR(1), 2))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 4;
@@ -176,7 +170,7 @@ void SwordGuardianControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!AI.bite || AI.distance > SECTOR(1024))
+			if (!AI.bite || AI.distance > pow(SECTOR(1), 2))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 6;
@@ -189,7 +183,7 @@ void SwordGuardianControl(short itemNumber)
 			if (AI.ahead)
 				torso = AI.angle;
 
-			if (!AI.bite || AI.distance > SECTOR(4096))
+			if (!AI.bite || AI.distance > pow(SECTOR(2), 2))
 				item->Animation.TargetState = 1;
 			else
 				item->Animation.TargetState = 11;
@@ -217,10 +211,8 @@ void SwordGuardianControl(short itemNumber)
 			if (!creature->Flags && (item->TouchBits & 0xC000))
 			{
 				CreatureEffect(item, &SwordBite, DoBloodSplat);
+				DoDamage(creature->Enemy, 300);
 				creature->Flags = 1;
-
-				LaraItem->HitPoints -= 300;
-				LaraItem->HitStatus = true;
 			}
 
 			break;

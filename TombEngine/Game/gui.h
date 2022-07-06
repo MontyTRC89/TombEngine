@@ -26,6 +26,13 @@ enum class InventoryResult
 	NewGameSelectedLevel
 };
 
+enum class LoadResult
+{
+	None,
+	Load,
+	Cancel
+};
+
 enum class MenuType
 {
 	None,
@@ -90,7 +97,7 @@ enum class Menu
 	Options,
 	Display,
 	Controls,
-	Sound
+	OtherSettings
 };
 
 enum InventoryObjectTypes
@@ -392,17 +399,16 @@ struct InventoryObject
 	short zrot;
 	unsigned __int64 opts;
 	const char* objname;
-	unsigned long meshbits;
+	unsigned int meshbits;
 	short rot_flags;
 };
 
 class GuiController
 {
 public:
-	int CallInventory(bool reset_mode);
+	bool CallInventory(bool reset_mode);
 	InventoryResult TitleOptions();
 	InventoryResult DoPauseMenu();
-	void HandleInventoryMenu();
 	void DrawInventory();
 	void DrawCurrentObjectList(int ringnum);
 	int IsObjectInInventory(short object_number);
@@ -436,10 +442,11 @@ private:
 	void ClearInputVariables(bool flag);
 	void HandleDisplaySettingsInput(bool pause);
 	void HandleControlSettingsInput(bool pause);
-	void HandleSoundSettingsInput(bool pause);
-	void FillSound();
+	void HandleOtherSettingsInput(bool pause);
+	void HandleOptionsInput();
+	void BackupOptions();
 	bool DoObjectsCombine(int obj1, int obj2);
-	void InitializeInventory();
+	void InitialiseInventory();
 	void FillDisplayOptions();
 	bool IsItemCurrentlyCombinable(short obj);
 	bool IsItemInInventory(short obj);
@@ -458,17 +465,17 @@ private:
 	void DoStatisticsMode();
 	void DoExamineMode();
 	void DoDiary();
-	int DoLoad();
-	void DoSave();
+	LoadResult DoLoad();
+	bool DoSave();
+	void DoInventory();
 	void ConstructCombineObjectList();
 	
 	/*vars*/
+
 	// Input
 	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
 	bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
 	long rptRight, rptLeft;
-	bool stop_killing_me_you_dumb_input_system;
-	bool stop_killing_me_you_dumb_input_system2;
 
 	// Inventory
 	short combine_obj1;
@@ -499,7 +506,6 @@ private:
 	int inventoryItemChosen;
 	int enterInventory;
 	int lastInvItem;
-	bool ExitInvLoop;
 
 	// Ammo vars
 	unsigned short AmountShotGunAmmo1;
@@ -536,14 +542,13 @@ private:
 	char StashedCurrentHarpoonAmmoType;
 	char StashedCurrentRocketAmmoType;
 
+	// GUI vars
 	Menu menu_to_display = Menu::Title;
-	short selected_option;
+	int selected_option;
 	int option_count;
+	int selected_save_slot;
 
 	SettingsData CurrentSettings;
-
-	// Load / save
-	short selected_slot;
 };
 
 /*inventory*/

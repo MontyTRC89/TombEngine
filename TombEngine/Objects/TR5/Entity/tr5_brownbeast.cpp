@@ -115,7 +115,7 @@ void ControlBrowsBeast(short itemNumber)
 			if (distance < pow(SECTOR(1), 2) || creature->Mood != MoodType::Attack)
 				item->Animation.TargetState = 1;
 
-			SoundEffect(SFX_TR5_IMP_BARRELROLL, &item->Pose);
+			SoundEffect(SFX_TR5_IMP_BARREL_ROLL, &item->Pose);
 			break;
 
 		case 4:
@@ -142,11 +142,9 @@ void ControlBrowsBeast(short itemNumber)
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 19 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 25)
 					{
+						DoDamage(creature->Enemy, 150);
 						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
 						creature->Flags |= 1;
-
-						LaraItem->HitPoints -= 150;
-						LaraItem->HitStatus = true;
 						break;
 					}
 				}
@@ -156,11 +154,9 @@ void ControlBrowsBeast(short itemNumber)
 					if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 6 &&
 						item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 16)
 					{
+						DoDamage(creature->Enemy, 150);
 						CreatureEffect2(item, &BrownBeastBite1, 20, item->Pose.Orientation.y, DoBloodSplat);
 						creature->Flags |= 1;
-
-						LaraItem->HitPoints -= 150;
-						LaraItem->HitStatus = true;
 						break;
 					}
 				}
@@ -174,11 +170,9 @@ void ControlBrowsBeast(short itemNumber)
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 13 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 				{
+					DoDamage(creature->Enemy, 150);
 					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags |= 2;
-
-					LaraItem->HitPoints -= 150;
-					LaraItem->HitStatus = true;
 					break;
 				}
 			}
@@ -188,11 +182,9 @@ void ControlBrowsBeast(short itemNumber)
 				if (item->Animation.FrameNumber > g_Level.Anims[item->Animation.AnimNumber].frameBase + 33 &&
 					item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 43)
 				{
+					DoDamage(creature->Enemy, 150);
 					CreatureEffect2(item, &BrownBeastBite2, 20, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags |= 2;
-
-					LaraItem->HitPoints -= 150;
-					LaraItem->HitStatus = true;
 					break;
 				}
 			}

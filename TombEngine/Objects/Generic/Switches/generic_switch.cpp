@@ -9,6 +9,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS SwitchBounds = 
@@ -29,7 +31,7 @@ namespace TEN::Entities::Switches
 
 		switchItem->Flags |= 0x3E00;
 
-		if (!TriggerActive(switchItem) && !(switchItem->Flags & ONESHOT))
+		if (!TriggerActive(switchItem) && !(switchItem->Flags & IFLAG_INVISIBLE))
 		{
 			if (switchItem->ObjectNumber == ID_JUMP_SWITCH)
 			{

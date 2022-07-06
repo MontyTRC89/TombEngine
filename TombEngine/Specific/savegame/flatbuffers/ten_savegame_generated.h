@@ -17,10 +17,6 @@ struct Item;
 struct ItemBuilder;
 struct ItemT;
 
-struct FXInfo;
-struct FXInfoBuilder;
-struct FXInfoT;
-
 struct AmmoInfo;
 struct AmmoInfoBuilder;
 struct AmmoInfoT;
@@ -73,10 +69,6 @@ struct SubsuitControlData;
 struct SubsuitControlDataBuilder;
 struct SubsuitControlDataT;
 
-struct MinecartControlData;
-struct MinecartControlDataBuilder;
-struct MinecartControlDataT;
-
 struct LaraControlData;
 struct LaraControlDataBuilder;
 struct LaraControlDataT;
@@ -100,6 +92,10 @@ struct SinkT;
 struct StaticMeshInfo;
 struct StaticMeshInfoBuilder;
 struct StaticMeshInfoT;
+
+struct ParticleInfo;
+struct ParticleInfoBuilder;
+struct ParticleInfoT;
 
 struct RatInfo;
 struct RatInfoBuilder;
@@ -411,7 +407,7 @@ struct ItemT : public flatbuffers::NativeTable {
   bool triggered = false;
   bool active = false;
   int32_t status = 0;
-  bool airborne = false;
+  bool is_airborne = false;
   bool hit_stauts = false;
   bool collidable = false;
   bool looked_at = false;
@@ -456,7 +452,7 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_TRIGGERED = 50,
     VT_ACTIVE = 52,
     VT_STATUS = 54,
-    VT_AIRBORNE = 56,
+    VT_IS_AIRBORNE = 56,
     VT_HIT_STAUTS = 58,
     VT_COLLIDABLE = 60,
     VT_LOOKED_AT = 62,
@@ -548,8 +544,8 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t status() const {
     return GetField<int32_t>(VT_STATUS, 0);
   }
-  bool airborne() const {
-    return GetField<uint8_t>(VT_AIRBORNE, 0) != 0;
+  bool is_airborne() const {
+    return GetField<uint8_t>(VT_IS_AIRBORNE, 0) != 0;
   }
   bool hit_stauts() const {
     return GetField<uint8_t>(VT_HIT_STAUTS, 0) != 0;
@@ -683,7 +679,7 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_TRIGGERED) &&
            VerifyField<uint8_t>(verifier, VT_ACTIVE) &&
            VerifyField<int32_t>(verifier, VT_STATUS) &&
-           VerifyField<uint8_t>(verifier, VT_AIRBORNE) &&
+           VerifyField<uint8_t>(verifier, VT_IS_AIRBORNE) &&
            VerifyField<uint8_t>(verifier, VT_HIT_STAUTS) &&
            VerifyField<uint8_t>(verifier, VT_COLLIDABLE) &&
            VerifyField<uint8_t>(verifier, VT_LOOKED_AT) &&
@@ -879,8 +875,8 @@ struct ItemBuilder {
   void add_status(int32_t status) {
     fbb_.AddElement<int32_t>(Item::VT_STATUS, status, 0);
   }
-  void add_airborne(bool airborne) {
-    fbb_.AddElement<uint8_t>(Item::VT_AIRBORNE, static_cast<uint8_t>(airborne), 0);
+  void add_is_airborne(bool is_airborne) {
+    fbb_.AddElement<uint8_t>(Item::VT_IS_AIRBORNE, static_cast<uint8_t>(is_airborne), 0);
   }
   void add_hit_stauts(bool hit_stauts) {
     fbb_.AddElement<uint8_t>(Item::VT_HIT_STAUTS, static_cast<uint8_t>(hit_stauts), 0);
@@ -957,7 +953,7 @@ inline flatbuffers::Offset<Item> CreateItem(
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
-    bool airborne = false,
+    bool is_airborne = false,
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
@@ -1007,7 +1003,7 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_looked_at(looked_at);
   builder_.add_collidable(collidable);
   builder_.add_hit_stauts(hit_stauts);
-  builder_.add_airborne(airborne);
+  builder_.add_is_airborne(is_airborne);
   builder_.add_active(active);
   builder_.add_triggered(triggered);
   return builder_.Finish();
@@ -1046,7 +1042,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     bool triggered = false,
     bool active = false,
     int32_t status = 0,
-    bool airborne = false,
+    bool is_airborne = false,
     bool hit_stauts = false,
     bool collidable = false,
     bool looked_at = false,
@@ -1093,7 +1089,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       triggered,
       active,
       status,
-      airborne,
+      is_airborne,
       hit_stauts,
       collidable,
       looked_at,
@@ -1109,185 +1105,6 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
 }
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct FXInfoT : public flatbuffers::NativeTable {
-  typedef FXInfo TableType;
-  std::unique_ptr<TEN::Save::Position> pos{};
-  int32_t room_number = 0;
-  int32_t object_number = 0;
-  int32_t next_fx = 0;
-  int32_t next_active = 0;
-  int32_t speed = 0;
-  int32_t fall_speed = 0;
-  int32_t frame_number = 0;
-  int32_t counter = 0;
-  int32_t shade = 0;
-  int32_t flag1 = 0;
-  int32_t flag2 = 0;
-};
-
-struct FXInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef FXInfoT NativeTableType;
-  typedef FXInfoBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_POS = 4,
-    VT_ROOM_NUMBER = 6,
-    VT_OBJECT_NUMBER = 8,
-    VT_NEXT_FX = 10,
-    VT_NEXT_ACTIVE = 12,
-    VT_SPEED = 14,
-    VT_FALL_SPEED = 16,
-    VT_FRAME_NUMBER = 18,
-    VT_COUNTER = 20,
-    VT_SHADE = 22,
-    VT_FLAG1 = 24,
-    VT_FLAG2 = 26
-  };
-  const TEN::Save::Position *pos() const {
-    return GetStruct<const TEN::Save::Position *>(VT_POS);
-  }
-  int32_t room_number() const {
-    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
-  }
-  int32_t object_number() const {
-    return GetField<int32_t>(VT_OBJECT_NUMBER, 0);
-  }
-  int32_t next_fx() const {
-    return GetField<int32_t>(VT_NEXT_FX, 0);
-  }
-  int32_t next_active() const {
-    return GetField<int32_t>(VT_NEXT_ACTIVE, 0);
-  }
-  int32_t speed() const {
-    return GetField<int32_t>(VT_SPEED, 0);
-  }
-  int32_t fall_speed() const {
-    return GetField<int32_t>(VT_FALL_SPEED, 0);
-  }
-  int32_t frame_number() const {
-    return GetField<int32_t>(VT_FRAME_NUMBER, 0);
-  }
-  int32_t counter() const {
-    return GetField<int32_t>(VT_COUNTER, 0);
-  }
-  int32_t shade() const {
-    return GetField<int32_t>(VT_SHADE, 0);
-  }
-  int32_t flag1() const {
-    return GetField<int32_t>(VT_FLAG1, 0);
-  }
-  int32_t flag2() const {
-    return GetField<int32_t>(VT_FLAG2, 0);
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<TEN::Save::Position>(verifier, VT_POS) &&
-           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_OBJECT_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_FX) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_ACTIVE) &&
-           VerifyField<int32_t>(verifier, VT_SPEED) &&
-           VerifyField<int32_t>(verifier, VT_FALL_SPEED) &&
-           VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_COUNTER) &&
-           VerifyField<int32_t>(verifier, VT_SHADE) &&
-           VerifyField<int32_t>(verifier, VT_FLAG1) &&
-           VerifyField<int32_t>(verifier, VT_FLAG2) &&
-           verifier.EndTable();
-  }
-  FXInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(FXInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<FXInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct FXInfoBuilder {
-  typedef FXInfo Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_pos(const TEN::Save::Position *pos) {
-    fbb_.AddStruct(FXInfo::VT_POS, pos);
-  }
-  void add_room_number(int32_t room_number) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_ROOM_NUMBER, room_number, 0);
-  }
-  void add_object_number(int32_t object_number) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_OBJECT_NUMBER, object_number, 0);
-  }
-  void add_next_fx(int32_t next_fx) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_NEXT_FX, next_fx, 0);
-  }
-  void add_next_active(int32_t next_active) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_NEXT_ACTIVE, next_active, 0);
-  }
-  void add_speed(int32_t speed) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_SPEED, speed, 0);
-  }
-  void add_fall_speed(int32_t fall_speed) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FALL_SPEED, fall_speed, 0);
-  }
-  void add_frame_number(int32_t frame_number) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FRAME_NUMBER, frame_number, 0);
-  }
-  void add_counter(int32_t counter) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_COUNTER, counter, 0);
-  }
-  void add_shade(int32_t shade) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_SHADE, shade, 0);
-  }
-  void add_flag1(int32_t flag1) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FLAG1, flag1, 0);
-  }
-  void add_flag2(int32_t flag2) {
-    fbb_.AddElement<int32_t>(FXInfo::VT_FLAG2, flag2, 0);
-  }
-  explicit FXInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<FXInfo> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<FXInfo>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<FXInfo> CreateFXInfo(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    const TEN::Save::Position *pos = 0,
-    int32_t room_number = 0,
-    int32_t object_number = 0,
-    int32_t next_fx = 0,
-    int32_t next_active = 0,
-    int32_t speed = 0,
-    int32_t fall_speed = 0,
-    int32_t frame_number = 0,
-    int32_t counter = 0,
-    int32_t shade = 0,
-    int32_t flag1 = 0,
-    int32_t flag2 = 0) {
-  FXInfoBuilder builder_(_fbb);
-  builder_.add_flag2(flag2);
-  builder_.add_flag1(flag1);
-  builder_.add_shade(shade);
-  builder_.add_counter(counter);
-  builder_.add_frame_number(frame_number);
-  builder_.add_fall_speed(fall_speed);
-  builder_.add_speed(speed);
-  builder_.add_next_active(next_active);
-  builder_.add_next_fx(next_fx);
-  builder_.add_object_number(object_number);
-  builder_.add_room_number(room_number);
-  builder_.add_pos(pos);
-  return builder_.Finish();
-}
-
-struct FXInfo::Traits {
-  using type = FXInfo;
-  static auto constexpr Create = CreateFXInfo;
-};
-
-flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct AmmoInfoT : public flatbuffers::NativeTable {
   typedef AmmoInfo TableType;
@@ -2987,75 +2804,6 @@ inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlDataDirect(
 
 flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuffers::FlatBufferBuilder &_fbb, const SubsuitControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct MinecartControlDataT : public flatbuffers::NativeTable {
-  typedef MinecartControlData TableType;
-  bool left = false;
-  bool right = false;
-};
-
-struct MinecartControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
-  typedef MinecartControlDataT NativeTableType;
-  typedef MinecartControlDataBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_LEFT = 4,
-    VT_RIGHT = 6
-  };
-  bool left() const {
-    return GetField<uint8_t>(VT_LEFT, 0) != 0;
-  }
-  bool right() const {
-    return GetField<uint8_t>(VT_RIGHT, 0) != 0;
-  }
-  bool Verify(flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<uint8_t>(verifier, VT_LEFT) &&
-           VerifyField<uint8_t>(verifier, VT_RIGHT) &&
-           verifier.EndTable();
-  }
-  MinecartControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(MinecartControlDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static flatbuffers::Offset<MinecartControlData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct MinecartControlDataBuilder {
-  typedef MinecartControlData Table;
-  flatbuffers::FlatBufferBuilder &fbb_;
-  flatbuffers::uoffset_t start_;
-  void add_left(bool left) {
-    fbb_.AddElement<uint8_t>(MinecartControlData::VT_LEFT, static_cast<uint8_t>(left), 0);
-  }
-  void add_right(bool right) {
-    fbb_.AddElement<uint8_t>(MinecartControlData::VT_RIGHT, static_cast<uint8_t>(right), 0);
-  }
-  explicit MinecartControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  flatbuffers::Offset<MinecartControlData> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = flatbuffers::Offset<MinecartControlData>(end);
-    return o;
-  }
-};
-
-inline flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(
-    flatbuffers::FlatBufferBuilder &_fbb,
-    bool left = false,
-    bool right = false) {
-  MinecartControlDataBuilder builder_(_fbb);
-  builder_.add_right(right);
-  builder_.add_left(left);
-  return builder_.Finish();
-}
-
-struct MinecartControlData::Traits {
-  using type = MinecartControlData;
-  static auto constexpr Create = CreateMinecartControlData;
-};
-
-flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
 struct LaraControlDataT : public flatbuffers::NativeTable {
   typedef LaraControlData TableType;
   int32_t move_angle = 0;
@@ -3078,7 +2826,6 @@ struct LaraControlDataT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::RopeControlDataT> rope{};
   std::unique_ptr<TEN::Save::TightropeControlDataT> tightrope{};
   std::unique_ptr<TEN::Save::SubsuitControlDataT> subsuit{};
-  std::unique_ptr<TEN::Save::MinecartControlDataT> minecart{};
 };
 
 struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -3105,8 +2852,7 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_WEAPON = 36,
     VT_ROPE = 38,
     VT_TIGHTROPE = 40,
-    VT_SUBSUIT = 42,
-    VT_MINECART = 44
+    VT_SUBSUIT = 42
   };
   int32_t move_angle() const {
     return GetField<int32_t>(VT_MOVE_ANGLE, 0);
@@ -3168,9 +2914,6 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::SubsuitControlData *subsuit() const {
     return GetPointer<const TEN::Save::SubsuitControlData *>(VT_SUBSUIT);
   }
-  const TEN::Save::MinecartControlData *minecart() const {
-    return GetPointer<const TEN::Save::MinecartControlData *>(VT_MINECART);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_MOVE_ANGLE) &&
@@ -3198,8 +2941,6 @@ struct LaraControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(tightrope()) &&
            VerifyOffset(verifier, VT_SUBSUIT) &&
            verifier.VerifyTable(subsuit()) &&
-           VerifyOffset(verifier, VT_MINECART) &&
-           verifier.VerifyTable(minecart()) &&
            verifier.EndTable();
   }
   LaraControlDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -3271,9 +3012,6 @@ struct LaraControlDataBuilder {
   void add_subsuit(flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit) {
     fbb_.AddOffset(LaraControlData::VT_SUBSUIT, subsuit);
   }
-  void add_minecart(flatbuffers::Offset<TEN::Save::MinecartControlData> minecart) {
-    fbb_.AddOffset(LaraControlData::VT_MINECART, minecart);
-  }
   explicit LaraControlDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -3306,10 +3044,8 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(
     flatbuffers::Offset<TEN::Save::WeaponControlData> weapon = 0,
     flatbuffers::Offset<TEN::Save::RopeControlData> rope = 0,
     flatbuffers::Offset<TEN::Save::TightropeControlData> tightrope = 0,
-    flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0,
-    flatbuffers::Offset<TEN::Save::MinecartControlData> minecart = 0) {
+    flatbuffers::Offset<TEN::Save::SubsuitControlData> subsuit = 0) {
   LaraControlDataBuilder builder_(_fbb);
-  builder_.add_minecart(minecart);
   builder_.add_subsuit(subsuit);
   builder_.add_tightrope(tightrope);
   builder_.add_rope(rope);
@@ -3364,7 +3100,6 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t extra_anim = 0;
   int32_t hit_frame = 0;
   int32_t hit_direction = 0;
-  uint32_t spasm_effect_count = 0;
   int32_t projected_floor_height = 0;
   int32_t target_facing_angle = 0;
   int32_t water_surface_dist = 0;
@@ -3410,23 +3145,22 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_EXTRA_ANIM = 42,
     VT_HIT_FRAME = 44,
     VT_HIT_DIRECTION = 46,
-    VT_SPASM_EFFECT_COUNT = 48,
-    VT_PROJECTED_FLOOR_HEIGHT = 50,
-    VT_TARGET_FACING_ANGLE = 52,
-    VT_WATER_SURFACE_DIST = 54,
-    VT_INTERACTED_ITEM = 56,
-    VT_NEXT_CORNER_POSITION = 58,
-    VT_NEXT_CORNER_ROTATION = 60,
-    VT_BURN_TYPE = 62,
-    VT_BURN_COUNT = 64,
-    VT_BURN = 66,
-    VT_BURN_BLUE = 68,
-    VT_BURN_SMOKE = 70,
-    VT_WET = 72,
-    VT_MESH_PTRS = 74,
-    VT_LOCATION = 76,
-    VT_HIGHEST_LOCATION = 78,
-    VT_LOCATION_PAD = 80
+    VT_PROJECTED_FLOOR_HEIGHT = 48,
+    VT_TARGET_FACING_ANGLE = 50,
+    VT_WATER_SURFACE_DIST = 52,
+    VT_INTERACTED_ITEM = 54,
+    VT_NEXT_CORNER_POSITION = 56,
+    VT_NEXT_CORNER_ROTATION = 58,
+    VT_BURN_TYPE = 60,
+    VT_BURN_COUNT = 62,
+    VT_BURN = 64,
+    VT_BURN_BLUE = 66,
+    VT_BURN_SMOKE = 68,
+    VT_WET = 70,
+    VT_MESH_PTRS = 72,
+    VT_LOCATION = 74,
+    VT_HIGHEST_LOCATION = 76,
+    VT_LOCATION_PAD = 78
   };
   int32_t item_number() const {
     return GetField<int32_t>(VT_ITEM_NUMBER, 0);
@@ -3493,9 +3227,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t hit_direction() const {
     return GetField<int32_t>(VT_HIT_DIRECTION, 0);
-  }
-  uint32_t spasm_effect_count() const {
-    return GetField<uint32_t>(VT_SPASM_EFFECT_COUNT, 0);
   }
   int32_t projected_floor_height() const {
     return GetField<int32_t>(VT_PROJECTED_FLOOR_HEIGHT, 0);
@@ -3578,7 +3309,6 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_EXTRA_ANIM) &&
            VerifyField<int32_t>(verifier, VT_HIT_FRAME) &&
            VerifyField<int32_t>(verifier, VT_HIT_DIRECTION) &&
-           VerifyField<uint32_t>(verifier, VT_SPASM_EFFECT_COUNT) &&
            VerifyField<int32_t>(verifier, VT_PROJECTED_FLOOR_HEIGHT) &&
            VerifyField<int32_t>(verifier, VT_TARGET_FACING_ANGLE) &&
            VerifyField<int32_t>(verifier, VT_WATER_SURFACE_DIST) &&
@@ -3674,9 +3404,6 @@ struct LaraBuilder {
   void add_hit_direction(int32_t hit_direction) {
     fbb_.AddElement<int32_t>(Lara::VT_HIT_DIRECTION, hit_direction, 0);
   }
-  void add_spasm_effect_count(uint32_t spasm_effect_count) {
-    fbb_.AddElement<uint32_t>(Lara::VT_SPASM_EFFECT_COUNT, spasm_effect_count, 0);
-  }
   void add_projected_floor_height(int32_t projected_floor_height) {
     fbb_.AddElement<int32_t>(Lara::VT_PROJECTED_FLOOR_HEIGHT, projected_floor_height, 0);
   }
@@ -3760,7 +3487,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t extra_anim = 0,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
-    uint32_t spasm_effect_count = 0,
     int32_t projected_floor_height = 0,
     int32_t target_facing_angle = 0,
     int32_t water_surface_dist = 0,
@@ -3792,7 +3518,6 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_water_surface_dist(water_surface_dist);
   builder_.add_target_facing_angle(target_facing_angle);
   builder_.add_projected_floor_height(projected_floor_height);
-  builder_.add_spasm_effect_count(spasm_effect_count);
   builder_.add_hit_direction(hit_direction);
   builder_.add_hit_frame(hit_frame);
   builder_.add_extra_anim(extra_anim);
@@ -3849,7 +3574,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t extra_anim = 0,
     int32_t hit_frame = 0,
     int32_t hit_direction = 0,
-    uint32_t spasm_effect_count = 0,
     int32_t projected_floor_height = 0,
     int32_t target_facing_angle = 0,
     int32_t water_surface_dist = 0,
@@ -3894,7 +3618,6 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       extra_anim,
       hit_frame,
       hit_direction,
-      spasm_effect_count,
       projected_floor_height,
       target_facing_angle,
       water_surface_dist,
@@ -4157,6 +3880,460 @@ struct StaticMeshInfo::Traits {
 };
 
 flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(flatbuffers::FlatBufferBuilder &_fbb, const StaticMeshInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct ParticleInfoT : public flatbuffers::NativeTable {
+  typedef ParticleInfo TableType;
+  int32_t x = 0;
+  int32_t y = 0;
+  int32_t z = 0;
+  int32_t x_vel = 0;
+  int32_t y_vel = 0;
+  int32_t z_vel = 0;
+  int32_t gravity = 0;
+  int32_t rot_ang = 0;
+  int32_t flags = 0;
+  float s_size = 0.0f;
+  float d_size = 0.0f;
+  float size = 0.0f;
+  int32_t friction = 0;
+  int32_t scalar = 0;
+  int32_t sprite_index = 0;
+  int32_t rot_add = 0;
+  int32_t max_y_vel = 0;
+  bool on = false;
+  int32_t s_r = 0;
+  int32_t s_g = 0;
+  int32_t s_b = 0;
+  int32_t d_r = 0;
+  int32_t d_g = 0;
+  int32_t d_b = 0;
+  int32_t r = 0;
+  int32_t g = 0;
+  int32_t b = 0;
+  int32_t col_fade_speed = 0;
+  int32_t fade_to_black = 0;
+  int32_t s_life = 0;
+  int32_t life = 0;
+  int32_t blend_mode = 0;
+  int32_t extras = 0;
+  int32_t dynamic = 0;
+  int32_t fx_obj = 0;
+  int32_t room_number = 0;
+  int32_t node_number = 0;
+};
+
+struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ParticleInfoT NativeTableType;
+  typedef ParticleInfoBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_X = 4,
+    VT_Y = 6,
+    VT_Z = 8,
+    VT_X_VEL = 10,
+    VT_Y_VEL = 12,
+    VT_Z_VEL = 14,
+    VT_GRAVITY = 16,
+    VT_ROT_ANG = 18,
+    VT_FLAGS = 20,
+    VT_S_SIZE = 22,
+    VT_D_SIZE = 24,
+    VT_SIZE = 26,
+    VT_FRICTION = 28,
+    VT_SCALAR = 30,
+    VT_SPRITE_INDEX = 32,
+    VT_ROT_ADD = 34,
+    VT_MAX_Y_VEL = 36,
+    VT_ON = 38,
+    VT_S_R = 40,
+    VT_S_G = 42,
+    VT_S_B = 44,
+    VT_D_R = 46,
+    VT_D_G = 48,
+    VT_D_B = 50,
+    VT_R = 52,
+    VT_G = 54,
+    VT_B = 56,
+    VT_COL_FADE_SPEED = 58,
+    VT_FADE_TO_BLACK = 60,
+    VT_S_LIFE = 62,
+    VT_LIFE = 64,
+    VT_BLEND_MODE = 66,
+    VT_EXTRAS = 68,
+    VT_DYNAMIC = 70,
+    VT_FX_OBJ = 72,
+    VT_ROOM_NUMBER = 74,
+    VT_NODE_NUMBER = 76
+  };
+  int32_t x() const {
+    return GetField<int32_t>(VT_X, 0);
+  }
+  int32_t y() const {
+    return GetField<int32_t>(VT_Y, 0);
+  }
+  int32_t z() const {
+    return GetField<int32_t>(VT_Z, 0);
+  }
+  int32_t x_vel() const {
+    return GetField<int32_t>(VT_X_VEL, 0);
+  }
+  int32_t y_vel() const {
+    return GetField<int32_t>(VT_Y_VEL, 0);
+  }
+  int32_t z_vel() const {
+    return GetField<int32_t>(VT_Z_VEL, 0);
+  }
+  int32_t gravity() const {
+    return GetField<int32_t>(VT_GRAVITY, 0);
+  }
+  int32_t rot_ang() const {
+    return GetField<int32_t>(VT_ROT_ANG, 0);
+  }
+  int32_t flags() const {
+    return GetField<int32_t>(VT_FLAGS, 0);
+  }
+  float s_size() const {
+    return GetField<float>(VT_S_SIZE, 0.0f);
+  }
+  float d_size() const {
+    return GetField<float>(VT_D_SIZE, 0.0f);
+  }
+  float size() const {
+    return GetField<float>(VT_SIZE, 0.0f);
+  }
+  int32_t friction() const {
+    return GetField<int32_t>(VT_FRICTION, 0);
+  }
+  int32_t scalar() const {
+    return GetField<int32_t>(VT_SCALAR, 0);
+  }
+  int32_t sprite_index() const {
+    return GetField<int32_t>(VT_SPRITE_INDEX, 0);
+  }
+  int32_t rot_add() const {
+    return GetField<int32_t>(VT_ROT_ADD, 0);
+  }
+  int32_t max_y_vel() const {
+    return GetField<int32_t>(VT_MAX_Y_VEL, 0);
+  }
+  bool on() const {
+    return GetField<uint8_t>(VT_ON, 0) != 0;
+  }
+  int32_t s_r() const {
+    return GetField<int32_t>(VT_S_R, 0);
+  }
+  int32_t s_g() const {
+    return GetField<int32_t>(VT_S_G, 0);
+  }
+  int32_t s_b() const {
+    return GetField<int32_t>(VT_S_B, 0);
+  }
+  int32_t d_r() const {
+    return GetField<int32_t>(VT_D_R, 0);
+  }
+  int32_t d_g() const {
+    return GetField<int32_t>(VT_D_G, 0);
+  }
+  int32_t d_b() const {
+    return GetField<int32_t>(VT_D_B, 0);
+  }
+  int32_t r() const {
+    return GetField<int32_t>(VT_R, 0);
+  }
+  int32_t g() const {
+    return GetField<int32_t>(VT_G, 0);
+  }
+  int32_t b() const {
+    return GetField<int32_t>(VT_B, 0);
+  }
+  int32_t col_fade_speed() const {
+    return GetField<int32_t>(VT_COL_FADE_SPEED, 0);
+  }
+  int32_t fade_to_black() const {
+    return GetField<int32_t>(VT_FADE_TO_BLACK, 0);
+  }
+  int32_t s_life() const {
+    return GetField<int32_t>(VT_S_LIFE, 0);
+  }
+  int32_t life() const {
+    return GetField<int32_t>(VT_LIFE, 0);
+  }
+  int32_t blend_mode() const {
+    return GetField<int32_t>(VT_BLEND_MODE, 0);
+  }
+  int32_t extras() const {
+    return GetField<int32_t>(VT_EXTRAS, 0);
+  }
+  int32_t dynamic() const {
+    return GetField<int32_t>(VT_DYNAMIC, 0);
+  }
+  int32_t fx_obj() const {
+    return GetField<int32_t>(VT_FX_OBJ, 0);
+  }
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  int32_t node_number() const {
+    return GetField<int32_t>(VT_NODE_NUMBER, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_X) &&
+           VerifyField<int32_t>(verifier, VT_Y) &&
+           VerifyField<int32_t>(verifier, VT_Z) &&
+           VerifyField<int32_t>(verifier, VT_X_VEL) &&
+           VerifyField<int32_t>(verifier, VT_Y_VEL) &&
+           VerifyField<int32_t>(verifier, VT_Z_VEL) &&
+           VerifyField<int32_t>(verifier, VT_GRAVITY) &&
+           VerifyField<int32_t>(verifier, VT_ROT_ANG) &&
+           VerifyField<int32_t>(verifier, VT_FLAGS) &&
+           VerifyField<float>(verifier, VT_S_SIZE) &&
+           VerifyField<float>(verifier, VT_D_SIZE) &&
+           VerifyField<float>(verifier, VT_SIZE) &&
+           VerifyField<int32_t>(verifier, VT_FRICTION) &&
+           VerifyField<int32_t>(verifier, VT_SCALAR) &&
+           VerifyField<int32_t>(verifier, VT_SPRITE_INDEX) &&
+           VerifyField<int32_t>(verifier, VT_ROT_ADD) &&
+           VerifyField<int32_t>(verifier, VT_MAX_Y_VEL) &&
+           VerifyField<uint8_t>(verifier, VT_ON) &&
+           VerifyField<int32_t>(verifier, VT_S_R) &&
+           VerifyField<int32_t>(verifier, VT_S_G) &&
+           VerifyField<int32_t>(verifier, VT_S_B) &&
+           VerifyField<int32_t>(verifier, VT_D_R) &&
+           VerifyField<int32_t>(verifier, VT_D_G) &&
+           VerifyField<int32_t>(verifier, VT_D_B) &&
+           VerifyField<int32_t>(verifier, VT_R) &&
+           VerifyField<int32_t>(verifier, VT_G) &&
+           VerifyField<int32_t>(verifier, VT_B) &&
+           VerifyField<int32_t>(verifier, VT_COL_FADE_SPEED) &&
+           VerifyField<int32_t>(verifier, VT_FADE_TO_BLACK) &&
+           VerifyField<int32_t>(verifier, VT_S_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_BLEND_MODE) &&
+           VerifyField<int32_t>(verifier, VT_EXTRAS) &&
+           VerifyField<int32_t>(verifier, VT_DYNAMIC) &&
+           VerifyField<int32_t>(verifier, VT_FX_OBJ) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_NODE_NUMBER) &&
+           verifier.EndTable();
+  }
+  ParticleInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ParticleInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ParticleInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ParticleInfoBuilder {
+  typedef ParticleInfo Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_x(int32_t x) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_X, x, 0);
+  }
+  void add_y(int32_t y) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_Y, y, 0);
+  }
+  void add_z(int32_t z) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_Z, z, 0);
+  }
+  void add_x_vel(int32_t x_vel) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_X_VEL, x_vel, 0);
+  }
+  void add_y_vel(int32_t y_vel) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_Y_VEL, y_vel, 0);
+  }
+  void add_z_vel(int32_t z_vel) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_Z_VEL, z_vel, 0);
+  }
+  void add_gravity(int32_t gravity) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_GRAVITY, gravity, 0);
+  }
+  void add_rot_ang(int32_t rot_ang) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_ROT_ANG, rot_ang, 0);
+  }
+  void add_flags(int32_t flags) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_FLAGS, flags, 0);
+  }
+  void add_s_size(float s_size) {
+    fbb_.AddElement<float>(ParticleInfo::VT_S_SIZE, s_size, 0.0f);
+  }
+  void add_d_size(float d_size) {
+    fbb_.AddElement<float>(ParticleInfo::VT_D_SIZE, d_size, 0.0f);
+  }
+  void add_size(float size) {
+    fbb_.AddElement<float>(ParticleInfo::VT_SIZE, size, 0.0f);
+  }
+  void add_friction(int32_t friction) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_FRICTION, friction, 0);
+  }
+  void add_scalar(int32_t scalar) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_SCALAR, scalar, 0);
+  }
+  void add_sprite_index(int32_t sprite_index) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_SPRITE_INDEX, sprite_index, 0);
+  }
+  void add_rot_add(int32_t rot_add) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_ROT_ADD, rot_add, 0);
+  }
+  void add_max_y_vel(int32_t max_y_vel) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_MAX_Y_VEL, max_y_vel, 0);
+  }
+  void add_on(bool on) {
+    fbb_.AddElement<uint8_t>(ParticleInfo::VT_ON, static_cast<uint8_t>(on), 0);
+  }
+  void add_s_r(int32_t s_r) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_S_R, s_r, 0);
+  }
+  void add_s_g(int32_t s_g) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_S_G, s_g, 0);
+  }
+  void add_s_b(int32_t s_b) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_S_B, s_b, 0);
+  }
+  void add_d_r(int32_t d_r) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_D_R, d_r, 0);
+  }
+  void add_d_g(int32_t d_g) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_D_G, d_g, 0);
+  }
+  void add_d_b(int32_t d_b) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_D_B, d_b, 0);
+  }
+  void add_r(int32_t r) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_R, r, 0);
+  }
+  void add_g(int32_t g) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_G, g, 0);
+  }
+  void add_b(int32_t b) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_B, b, 0);
+  }
+  void add_col_fade_speed(int32_t col_fade_speed) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_COL_FADE_SPEED, col_fade_speed, 0);
+  }
+  void add_fade_to_black(int32_t fade_to_black) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_FADE_TO_BLACK, fade_to_black, 0);
+  }
+  void add_s_life(int32_t s_life) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_S_LIFE, s_life, 0);
+  }
+  void add_life(int32_t life) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_LIFE, life, 0);
+  }
+  void add_blend_mode(int32_t blend_mode) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_BLEND_MODE, blend_mode, 0);
+  }
+  void add_extras(int32_t extras) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_EXTRAS, extras, 0);
+  }
+  void add_dynamic(int32_t dynamic) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_DYNAMIC, dynamic, 0);
+  }
+  void add_fx_obj(int32_t fx_obj) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_FX_OBJ, fx_obj, 0);
+  }
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_node_number(int32_t node_number) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_NODE_NUMBER, node_number, 0);
+  }
+  explicit ParticleInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ParticleInfo> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ParticleInfo>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t x = 0,
+    int32_t y = 0,
+    int32_t z = 0,
+    int32_t x_vel = 0,
+    int32_t y_vel = 0,
+    int32_t z_vel = 0,
+    int32_t gravity = 0,
+    int32_t rot_ang = 0,
+    int32_t flags = 0,
+    float s_size = 0.0f,
+    float d_size = 0.0f,
+    float size = 0.0f,
+    int32_t friction = 0,
+    int32_t scalar = 0,
+    int32_t sprite_index = 0,
+    int32_t rot_add = 0,
+    int32_t max_y_vel = 0,
+    bool on = false,
+    int32_t s_r = 0,
+    int32_t s_g = 0,
+    int32_t s_b = 0,
+    int32_t d_r = 0,
+    int32_t d_g = 0,
+    int32_t d_b = 0,
+    int32_t r = 0,
+    int32_t g = 0,
+    int32_t b = 0,
+    int32_t col_fade_speed = 0,
+    int32_t fade_to_black = 0,
+    int32_t s_life = 0,
+    int32_t life = 0,
+    int32_t blend_mode = 0,
+    int32_t extras = 0,
+    int32_t dynamic = 0,
+    int32_t fx_obj = 0,
+    int32_t room_number = 0,
+    int32_t node_number = 0) {
+  ParticleInfoBuilder builder_(_fbb);
+  builder_.add_node_number(node_number);
+  builder_.add_room_number(room_number);
+  builder_.add_fx_obj(fx_obj);
+  builder_.add_dynamic(dynamic);
+  builder_.add_extras(extras);
+  builder_.add_blend_mode(blend_mode);
+  builder_.add_life(life);
+  builder_.add_s_life(s_life);
+  builder_.add_fade_to_black(fade_to_black);
+  builder_.add_col_fade_speed(col_fade_speed);
+  builder_.add_b(b);
+  builder_.add_g(g);
+  builder_.add_r(r);
+  builder_.add_d_b(d_b);
+  builder_.add_d_g(d_g);
+  builder_.add_d_r(d_r);
+  builder_.add_s_b(s_b);
+  builder_.add_s_g(s_g);
+  builder_.add_s_r(s_r);
+  builder_.add_max_y_vel(max_y_vel);
+  builder_.add_rot_add(rot_add);
+  builder_.add_sprite_index(sprite_index);
+  builder_.add_scalar(scalar);
+  builder_.add_friction(friction);
+  builder_.add_size(size);
+  builder_.add_d_size(d_size);
+  builder_.add_s_size(s_size);
+  builder_.add_flags(flags);
+  builder_.add_rot_ang(rot_ang);
+  builder_.add_gravity(gravity);
+  builder_.add_z_vel(z_vel);
+  builder_.add_y_vel(y_vel);
+  builder_.add_x_vel(x_vel);
+  builder_.add_z(z);
+  builder_.add_y(y);
+  builder_.add_x(x);
+  builder_.add_on(on);
+  return builder_.Finish();
+}
+
+struct ParticleInfo::Traits {
+  using type = ParticleInfo;
+  static auto constexpr Create = CreateParticleInfo;
+};
+
+flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct RatInfoT : public flatbuffers::NativeTable {
   typedef RatInfo TableType;
@@ -5714,13 +5891,11 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t next_item_free = 0;
   int32_t next_item_active = 0;
   std::vector<int32_t> room_items{};
-  std::vector<std::unique_ptr<TEN::Save::FXInfoT>> fxinfos{};
-  int32_t next_fx_free = 0;
-  int32_t next_fx_active = 0;
   std::vector<std::unique_ptr<TEN::Save::FixedCameraT>> fixed_cameras{};
   std::vector<std::unique_ptr<TEN::Save::SinkT>> sinks{};
   std::vector<std::unique_ptr<TEN::Save::StaticMeshInfoT>> static_meshes{};
   std::vector<std::unique_ptr<TEN::Save::FlyByCameraT>> flyby_cameras{};
+  std::vector<std::unique_ptr<TEN::Save::ParticleInfoT>> particles{};
   std::vector<std::unique_ptr<TEN::Save::RatInfoT>> rats{};
   std::vector<std::unique_ptr<TEN::Save::SpiderInfoT>> spiders{};
   std::vector<std::unique_ptr<TEN::Save::ScarabInfoT>> scarabs{};
@@ -5754,31 +5929,29 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_NEXT_ITEM_FREE = 14,
     VT_NEXT_ITEM_ACTIVE = 16,
     VT_ROOM_ITEMS = 18,
-    VT_FXINFOS = 20,
-    VT_NEXT_FX_FREE = 22,
-    VT_NEXT_FX_ACTIVE = 24,
-    VT_FIXED_CAMERAS = 26,
-    VT_SINKS = 28,
-    VT_STATIC_MESHES = 30,
-    VT_FLYBY_CAMERAS = 32,
-    VT_RATS = 34,
-    VT_SPIDERS = 36,
-    VT_SCARABS = 38,
-    VT_BATS = 40,
-    VT_FLIP_MAPS = 42,
-    VT_FLIP_STATS = 44,
-    VT_FLIP_EFFECT = 46,
-    VT_FLIP_TIMER = 48,
-    VT_FLIP_STATUS = 50,
-    VT_AMBIENT_TRACK = 52,
-    VT_AMBIENT_POSITION = 54,
-    VT_ONESHOT_TRACK = 56,
-    VT_ONESHOT_POSITION = 58,
-    VT_CD_FLAGS = 60,
-    VT_ROPE = 62,
-    VT_PENDULUM = 64,
-    VT_ALTERNATE_PENDULUM = 66,
-    VT_SCRIPT_VARS = 68
+    VT_FIXED_CAMERAS = 20,
+    VT_SINKS = 22,
+    VT_STATIC_MESHES = 24,
+    VT_FLYBY_CAMERAS = 26,
+    VT_PARTICLES = 28,
+    VT_RATS = 30,
+    VT_SPIDERS = 32,
+    VT_SCARABS = 34,
+    VT_BATS = 36,
+    VT_FLIP_MAPS = 38,
+    VT_FLIP_STATS = 40,
+    VT_FLIP_EFFECT = 42,
+    VT_FLIP_TIMER = 44,
+    VT_FLIP_STATUS = 46,
+    VT_AMBIENT_TRACK = 48,
+    VT_AMBIENT_POSITION = 50,
+    VT_ONESHOT_TRACK = 52,
+    VT_ONESHOT_POSITION = 54,
+    VT_CD_FLAGS = 56,
+    VT_ROPE = 58,
+    VT_PENDULUM = 60,
+    VT_ALTERNATE_PENDULUM = 62,
+    VT_SCRIPT_VARS = 64
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -5804,15 +5977,6 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const flatbuffers::Vector<int32_t> *room_items() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ROOM_ITEMS);
   }
-  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos() const {
-    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *>(VT_FXINFOS);
-  }
-  int32_t next_fx_free() const {
-    return GetField<int32_t>(VT_NEXT_FX_FREE, 0);
-  }
-  int32_t next_fx_active() const {
-    return GetField<int32_t>(VT_NEXT_FX_ACTIVE, 0);
-  }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *>(VT_FIXED_CAMERAS);
   }
@@ -5824,6 +5988,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *flyby_cameras() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *>(VT_FLYBY_CAMERAS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ParticleInfo>> *particles() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ParticleInfo>> *>(VT_PARTICLES);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>> *rats() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>> *>(VT_RATS);
@@ -5896,11 +6063,6 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_NEXT_ITEM_ACTIVE) &&
            VerifyOffset(verifier, VT_ROOM_ITEMS) &&
            verifier.VerifyVector(room_items()) &&
-           VerifyOffset(verifier, VT_FXINFOS) &&
-           verifier.VerifyVector(fxinfos()) &&
-           verifier.VerifyVectorOfTables(fxinfos()) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_FX_FREE) &&
-           VerifyField<int32_t>(verifier, VT_NEXT_FX_ACTIVE) &&
            VerifyOffset(verifier, VT_FIXED_CAMERAS) &&
            verifier.VerifyVector(fixed_cameras()) &&
            verifier.VerifyVectorOfTables(fixed_cameras()) &&
@@ -5913,6 +6075,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_FLYBY_CAMERAS) &&
            verifier.VerifyVector(flyby_cameras()) &&
            verifier.VerifyVectorOfTables(flyby_cameras()) &&
+           VerifyOffset(verifier, VT_PARTICLES) &&
+           verifier.VerifyVector(particles()) &&
+           verifier.VerifyVectorOfTables(particles()) &&
            VerifyOffset(verifier, VT_RATS) &&
            verifier.VerifyVector(rats()) &&
            verifier.VerifyVectorOfTables(rats()) &&
@@ -5983,15 +6148,6 @@ struct SaveGameBuilder {
   void add_room_items(flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items) {
     fbb_.AddOffset(SaveGame::VT_ROOM_ITEMS, room_items);
   }
-  void add_fxinfos(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos) {
-    fbb_.AddOffset(SaveGame::VT_FXINFOS, fxinfos);
-  }
-  void add_next_fx_free(int32_t next_fx_free) {
-    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_FX_FREE, next_fx_free, 0);
-  }
-  void add_next_fx_active(int32_t next_fx_active) {
-    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_FX_ACTIVE, next_fx_active, 0);
-  }
   void add_fixed_cameras(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras) {
     fbb_.AddOffset(SaveGame::VT_FIXED_CAMERAS, fixed_cameras);
   }
@@ -6003,6 +6159,9 @@ struct SaveGameBuilder {
   }
   void add_flyby_cameras(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>>> flyby_cameras) {
     fbb_.AddOffset(SaveGame::VT_FLYBY_CAMERAS, flyby_cameras);
+  }
+  void add_particles(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ParticleInfo>>> particles) {
+    fbb_.AddOffset(SaveGame::VT_PARTICLES, particles);
   }
   void add_rats(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>>> rats) {
     fbb_.AddOffset(SaveGame::VT_RATS, rats);
@@ -6079,13 +6238,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items = 0,
-    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos = 0,
-    int32_t next_fx_free = 0,
-    int32_t next_fx_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Sink>>> sinks = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>> static_meshes = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FlyByCamera>>> flyby_cameras = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ParticleInfo>>> particles = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::RatInfo>>> rats = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::SpiderInfo>>> spiders = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::ScarabInfo>>> scarabs = 0,
@@ -6123,13 +6280,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_scarabs(scarabs);
   builder_.add_spiders(spiders);
   builder_.add_rats(rats);
+  builder_.add_particles(particles);
   builder_.add_flyby_cameras(flyby_cameras);
   builder_.add_static_meshes(static_meshes);
   builder_.add_sinks(sinks);
   builder_.add_fixed_cameras(fixed_cameras);
-  builder_.add_next_fx_active(next_fx_active);
-  builder_.add_next_fx_free(next_fx_free);
-  builder_.add_fxinfos(fxinfos);
   builder_.add_room_items(room_items);
   builder_.add_next_item_active(next_item_active);
   builder_.add_next_item_free(next_item_free);
@@ -6156,13 +6311,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     const std::vector<int32_t> *room_items = nullptr,
-    const std::vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos = nullptr,
-    int32_t next_fx_free = 0,
-    int32_t next_fx_active = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Sink>> *sinks = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *static_meshes = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FlyByCamera>> *flyby_cameras = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::ParticleInfo>> *particles = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::RatInfo>> *rats = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::SpiderInfo>> *spiders = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::ScarabInfo>> *scarabs = nullptr,
@@ -6183,11 +6336,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
-  auto fxinfos__ = fxinfos ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>>(*fxinfos) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
   auto static_meshes__ = static_meshes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>(*static_meshes) : 0;
   auto flyby_cameras__ = flyby_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FlyByCamera>>(*flyby_cameras) : 0;
+  auto particles__ = particles ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ParticleInfo>>(*particles) : 0;
   auto rats__ = rats ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RatInfo>>(*rats) : 0;
   auto spiders__ = spiders ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SpiderInfo>>(*spiders) : 0;
   auto scarabs__ = scarabs ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScarabInfo>>(*scarabs) : 0;
@@ -6207,13 +6360,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       next_item_free,
       next_item_active,
       room_items__,
-      fxinfos__,
-      next_fx_free,
-      next_fx_active,
       fixed_cameras__,
       sinks__,
       static_meshes__,
       flyby_cameras__,
+      particles__,
       rats__,
       spiders__,
       scarabs__,
@@ -6271,7 +6422,7 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = triggered(); _o->triggered = _e; }
   { auto _e = active(); _o->active = _e; }
   { auto _e = status(); _o->status = _e; }
-  { auto _e = airborne(); _o->airborne = _e; }
+  { auto _e = is_airborne(); _o->is_airborne = _e; }
   { auto _e = hit_stauts(); _o->hit_stauts = _e; }
   { auto _e = collidable(); _o->collidable = _e; }
   { auto _e = looked_at(); _o->looked_at = _e; }
@@ -6320,7 +6471,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _triggered = _o->triggered;
   auto _active = _o->active;
   auto _status = _o->status;
-  auto _airborne = _o->airborne;
+  auto _is_airborne = _o->is_airborne;
   auto _hit_stauts = _o->hit_stauts;
   auto _collidable = _o->collidable;
   auto _looked_at = _o->looked_at;
@@ -6361,7 +6512,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _triggered,
       _active,
       _status,
-      _airborne,
+      _is_airborne,
       _hit_stauts,
       _collidable,
       _looked_at,
@@ -6374,65 +6525,6 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _lua_on_hit_name,
       _lua_on_collided_with_object_name,
       _lua_on_collided_with_room_name);
-}
-
-inline FXInfoT *FXInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<FXInfoT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void FXInfo::UnPackTo(FXInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = pos(); if (_e) _o->pos = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
-  { auto _e = room_number(); _o->room_number = _e; }
-  { auto _e = object_number(); _o->object_number = _e; }
-  { auto _e = next_fx(); _o->next_fx = _e; }
-  { auto _e = next_active(); _o->next_active = _e; }
-  { auto _e = speed(); _o->speed = _e; }
-  { auto _e = fall_speed(); _o->fall_speed = _e; }
-  { auto _e = frame_number(); _o->frame_number = _e; }
-  { auto _e = counter(); _o->counter = _e; }
-  { auto _e = shade(); _o->shade = _e; }
-  { auto _e = flag1(); _o->flag1 = _e; }
-  { auto _e = flag2(); _o->flag2 = _e; }
-}
-
-inline flatbuffers::Offset<FXInfo> FXInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateFXInfo(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FXInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _pos = _o->pos ? _o->pos.get() : 0;
-  auto _room_number = _o->room_number;
-  auto _object_number = _o->object_number;
-  auto _next_fx = _o->next_fx;
-  auto _next_active = _o->next_active;
-  auto _speed = _o->speed;
-  auto _fall_speed = _o->fall_speed;
-  auto _frame_number = _o->frame_number;
-  auto _counter = _o->counter;
-  auto _shade = _o->shade;
-  auto _flag1 = _o->flag1;
-  auto _flag2 = _o->flag2;
-  return TEN::Save::CreateFXInfo(
-      _fbb,
-      _pos,
-      _room_number,
-      _object_number,
-      _next_fx,
-      _next_active,
-      _speed,
-      _fall_speed,
-      _frame_number,
-      _counter,
-      _shade,
-      _flag1,
-      _flag2);
 }
 
 inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -7001,35 +7093,6 @@ inline flatbuffers::Offset<SubsuitControlData> CreateSubsuitControlData(flatbuff
       _hit_count);
 }
 
-inline MinecartControlDataT *MinecartControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<MinecartControlDataT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void MinecartControlData::UnPackTo(MinecartControlDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = left(); _o->left = _e; }
-  { auto _e = right(); _o->right = _e; }
-}
-
-inline flatbuffers::Offset<MinecartControlData> MinecartControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateMinecartControlData(_fbb, _o, _rehasher);
-}
-
-inline flatbuffers::Offset<MinecartControlData> CreateMinecartControlData(flatbuffers::FlatBufferBuilder &_fbb, const MinecartControlDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const MinecartControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _left = _o->left;
-  auto _right = _o->right;
-  return TEN::Save::CreateMinecartControlData(
-      _fbb,
-      _left,
-      _right);
-}
-
 inline LaraControlDataT *LaraControlData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<LaraControlDataT>();
   UnPackTo(_o.get(), _resolver);
@@ -7059,7 +7122,6 @@ inline void LaraControlData::UnPackTo(LaraControlDataT *_o, const flatbuffers::r
   { auto _e = rope(); if (_e) _o->rope = std::unique_ptr<TEN::Save::RopeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = tightrope(); if (_e) _o->tightrope = std::unique_ptr<TEN::Save::TightropeControlDataT>(_e->UnPack(_resolver)); }
   { auto _e = subsuit(); if (_e) _o->subsuit = std::unique_ptr<TEN::Save::SubsuitControlDataT>(_e->UnPack(_resolver)); }
-  { auto _e = minecart(); if (_e) _o->minecart = std::unique_ptr<TEN::Save::MinecartControlDataT>(_e->UnPack(_resolver)); }
 }
 
 inline flatbuffers::Offset<LaraControlData> LaraControlData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const LaraControlDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -7090,7 +7152,6 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
   auto _rope = _o->rope ? CreateRopeControlData(_fbb, _o->rope.get(), _rehasher) : 0;
   auto _tightrope = _o->tightrope ? CreateTightropeControlData(_fbb, _o->tightrope.get(), _rehasher) : 0;
   auto _subsuit = _o->subsuit ? CreateSubsuitControlData(_fbb, _o->subsuit.get(), _rehasher) : 0;
-  auto _minecart = _o->minecart ? CreateMinecartControlData(_fbb, _o->minecart.get(), _rehasher) : 0;
   return TEN::Save::CreateLaraControlData(
       _fbb,
       _move_angle,
@@ -7112,8 +7173,7 @@ inline flatbuffers::Offset<LaraControlData> CreateLaraControlData(flatbuffers::F
       _weapon,
       _rope,
       _tightrope,
-      _subsuit,
-      _minecart);
+      _subsuit);
 }
 
 inline LaraT *Lara::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -7147,7 +7207,6 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = extra_anim(); _o->extra_anim = _e; }
   { auto _e = hit_frame(); _o->hit_frame = _e; }
   { auto _e = hit_direction(); _o->hit_direction = _e; }
-  { auto _e = spasm_effect_count(); _o->spasm_effect_count = _e; }
   { auto _e = projected_floor_height(); _o->projected_floor_height = _e; }
   { auto _e = target_facing_angle(); _o->target_facing_angle = _e; }
   { auto _e = water_surface_dist(); _o->water_surface_dist = _e; }
@@ -7196,7 +7255,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _extra_anim = _o->extra_anim;
   auto _hit_frame = _o->hit_frame;
   auto _hit_direction = _o->hit_direction;
-  auto _spasm_effect_count = _o->spasm_effect_count;
   auto _projected_floor_height = _o->projected_floor_height;
   auto _target_facing_angle = _o->target_facing_angle;
   auto _water_surface_dist = _o->water_surface_dist;
@@ -7237,7 +7295,6 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _extra_anim,
       _hit_frame,
       _hit_direction,
-      _spasm_effect_count,
       _projected_floor_height,
       _target_facing_angle,
       _water_surface_dist,
@@ -7361,6 +7418,140 @@ inline flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(flatbuffers::Fla
       _fbb,
       _room_number,
       _flags);
+}
+
+inline ParticleInfoT *ParticleInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ParticleInfoT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ParticleInfo::UnPackTo(ParticleInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = x(); _o->x = _e; }
+  { auto _e = y(); _o->y = _e; }
+  { auto _e = z(); _o->z = _e; }
+  { auto _e = x_vel(); _o->x_vel = _e; }
+  { auto _e = y_vel(); _o->y_vel = _e; }
+  { auto _e = z_vel(); _o->z_vel = _e; }
+  { auto _e = gravity(); _o->gravity = _e; }
+  { auto _e = rot_ang(); _o->rot_ang = _e; }
+  { auto _e = flags(); _o->flags = _e; }
+  { auto _e = s_size(); _o->s_size = _e; }
+  { auto _e = d_size(); _o->d_size = _e; }
+  { auto _e = size(); _o->size = _e; }
+  { auto _e = friction(); _o->friction = _e; }
+  { auto _e = scalar(); _o->scalar = _e; }
+  { auto _e = sprite_index(); _o->sprite_index = _e; }
+  { auto _e = rot_add(); _o->rot_add = _e; }
+  { auto _e = max_y_vel(); _o->max_y_vel = _e; }
+  { auto _e = on(); _o->on = _e; }
+  { auto _e = s_r(); _o->s_r = _e; }
+  { auto _e = s_g(); _o->s_g = _e; }
+  { auto _e = s_b(); _o->s_b = _e; }
+  { auto _e = d_r(); _o->d_r = _e; }
+  { auto _e = d_g(); _o->d_g = _e; }
+  { auto _e = d_b(); _o->d_b = _e; }
+  { auto _e = r(); _o->r = _e; }
+  { auto _e = g(); _o->g = _e; }
+  { auto _e = b(); _o->b = _e; }
+  { auto _e = col_fade_speed(); _o->col_fade_speed = _e; }
+  { auto _e = fade_to_black(); _o->fade_to_black = _e; }
+  { auto _e = s_life(); _o->s_life = _e; }
+  { auto _e = life(); _o->life = _e; }
+  { auto _e = blend_mode(); _o->blend_mode = _e; }
+  { auto _e = extras(); _o->extras = _e; }
+  { auto _e = dynamic(); _o->dynamic = _e; }
+  { auto _e = fx_obj(); _o->fx_obj = _e; }
+  { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = node_number(); _o->node_number = _e; }
+}
+
+inline flatbuffers::Offset<ParticleInfo> ParticleInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateParticleInfo(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ParticleInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _x = _o->x;
+  auto _y = _o->y;
+  auto _z = _o->z;
+  auto _x_vel = _o->x_vel;
+  auto _y_vel = _o->y_vel;
+  auto _z_vel = _o->z_vel;
+  auto _gravity = _o->gravity;
+  auto _rot_ang = _o->rot_ang;
+  auto _flags = _o->flags;
+  auto _s_size = _o->s_size;
+  auto _d_size = _o->d_size;
+  auto _size = _o->size;
+  auto _friction = _o->friction;
+  auto _scalar = _o->scalar;
+  auto _sprite_index = _o->sprite_index;
+  auto _rot_add = _o->rot_add;
+  auto _max_y_vel = _o->max_y_vel;
+  auto _on = _o->on;
+  auto _s_r = _o->s_r;
+  auto _s_g = _o->s_g;
+  auto _s_b = _o->s_b;
+  auto _d_r = _o->d_r;
+  auto _d_g = _o->d_g;
+  auto _d_b = _o->d_b;
+  auto _r = _o->r;
+  auto _g = _o->g;
+  auto _b = _o->b;
+  auto _col_fade_speed = _o->col_fade_speed;
+  auto _fade_to_black = _o->fade_to_black;
+  auto _s_life = _o->s_life;
+  auto _life = _o->life;
+  auto _blend_mode = _o->blend_mode;
+  auto _extras = _o->extras;
+  auto _dynamic = _o->dynamic;
+  auto _fx_obj = _o->fx_obj;
+  auto _room_number = _o->room_number;
+  auto _node_number = _o->node_number;
+  return TEN::Save::CreateParticleInfo(
+      _fbb,
+      _x,
+      _y,
+      _z,
+      _x_vel,
+      _y_vel,
+      _z_vel,
+      _gravity,
+      _rot_ang,
+      _flags,
+      _s_size,
+      _d_size,
+      _size,
+      _friction,
+      _scalar,
+      _sprite_index,
+      _rot_add,
+      _max_y_vel,
+      _on,
+      _s_r,
+      _s_g,
+      _s_b,
+      _d_r,
+      _d_g,
+      _d_b,
+      _r,
+      _g,
+      _b,
+      _col_fade_speed,
+      _fade_to_black,
+      _s_life,
+      _life,
+      _blend_mode,
+      _extras,
+      _dynamic,
+      _fx_obj,
+      _room_number,
+      _node_number);
 }
 
 inline RatInfoT *RatInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -7912,13 +8103,11 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = next_item_free(); _o->next_item_free = _e; }
   { auto _e = next_item_active(); _o->next_item_active = _e; }
   { auto _e = room_items(); if (_e) { _o->room_items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->room_items[_i] = _e->Get(_i); } } }
-  { auto _e = fxinfos(); if (_e) { _o->fxinfos.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fxinfos[_i] = std::unique_ptr<TEN::Save::FXInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
-  { auto _e = next_fx_free(); _o->next_fx_free = _e; }
-  { auto _e = next_fx_active(); _o->next_fx_active = _e; }
   { auto _e = fixed_cameras(); if (_e) { _o->fixed_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fixed_cameras[_i] = std::unique_ptr<TEN::Save::FixedCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = sinks(); if (_e) { _o->sinks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->sinks[_i] = std::unique_ptr<TEN::Save::SinkT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = static_meshes(); if (_e) { _o->static_meshes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->static_meshes[_i] = std::unique_ptr<TEN::Save::StaticMeshInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = flyby_cameras(); if (_e) { _o->flyby_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->flyby_cameras[_i] = std::unique_ptr<TEN::Save::FlyByCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = particles(); if (_e) { _o->particles.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->particles[_i] = std::unique_ptr<TEN::Save::ParticleInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = rats(); if (_e) { _o->rats.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rats[_i] = std::unique_ptr<TEN::Save::RatInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = spiders(); if (_e) { _o->spiders.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->spiders[_i] = std::unique_ptr<TEN::Save::SpiderInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = scarabs(); if (_e) { _o->scarabs.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->scarabs[_i] = std::unique_ptr<TEN::Save::ScarabInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -7955,13 +8144,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _next_item_free = _o->next_item_free;
   auto _next_item_active = _o->next_item_active;
   auto _room_items = _fbb.CreateVector(_o->room_items);
-  auto _fxinfos = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>> (_o->fxinfos.size(), [](size_t i, _VectorArgs *__va) { return CreateFXInfo(*__va->__fbb, __va->__o->fxinfos[i].get(), __va->__rehasher); }, &_va );
-  auto _next_fx_free = _o->next_fx_free;
-  auto _next_fx_active = _o->next_fx_active;
   auto _fixed_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>> (_o->fixed_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFixedCamera(*__va->__fbb, __va->__o->fixed_cameras[i].get(), __va->__rehasher); }, &_va );
   auto _sinks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>> (_o->sinks.size(), [](size_t i, _VectorArgs *__va) { return CreateSink(*__va->__fbb, __va->__o->sinks[i].get(), __va->__rehasher); }, &_va );
   auto _static_meshes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> (_o->static_meshes.size(), [](size_t i, _VectorArgs *__va) { return CreateStaticMeshInfo(*__va->__fbb, __va->__o->static_meshes[i].get(), __va->__rehasher); }, &_va );
   auto _flyby_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FlyByCamera>> (_o->flyby_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFlyByCamera(*__va->__fbb, __va->__o->flyby_cameras[i].get(), __va->__rehasher); }, &_va );
+  auto _particles = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ParticleInfo>> (_o->particles.size(), [](size_t i, _VectorArgs *__va) { return CreateParticleInfo(*__va->__fbb, __va->__o->particles[i].get(), __va->__rehasher); }, &_va );
   auto _rats = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::RatInfo>> (_o->rats.size(), [](size_t i, _VectorArgs *__va) { return CreateRatInfo(*__va->__fbb, __va->__o->rats[i].get(), __va->__rehasher); }, &_va );
   auto _spiders = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::SpiderInfo>> (_o->spiders.size(), [](size_t i, _VectorArgs *__va) { return CreateSpiderInfo(*__va->__fbb, __va->__o->spiders[i].get(), __va->__rehasher); }, &_va );
   auto _scarabs = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::ScarabInfo>> (_o->scarabs.size(), [](size_t i, _VectorArgs *__va) { return CreateScarabInfo(*__va->__fbb, __va->__o->scarabs[i].get(), __va->__rehasher); }, &_va );
@@ -7990,13 +8177,11 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _next_item_free,
       _next_item_active,
       _room_items,
-      _fxinfos,
-      _next_fx_free,
-      _next_fx_active,
       _fixed_cameras,
       _sinks,
       _static_meshes,
       _flyby_cameras,
+      _particles,
       _rats,
       _spiders,
       _scarabs,

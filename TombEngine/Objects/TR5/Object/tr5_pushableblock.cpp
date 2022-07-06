@@ -14,6 +14,8 @@
 #include "Specific/setup.h"
 #include "Objects/TR5/Object/tr5_pushableblock_info.h"
 
+using namespace TEN::Input;
+
 Vector3Int PushableBlockPos = { 0, 0, 0 };
 static OBJECT_COLLISION_BOUNDS PushableBlockBounds = 
 {
@@ -145,7 +147,7 @@ void PushableBlockControl(short itemNumber)
 	}
 
 	// control block falling
-	if (item->Animation.Airborne)
+	if (item->Animation.IsAirborne)
 	{
 		int floorHeight = GetCollision(item->Pose.Position.x, item->Pose.Position.y + 10, item->Pose.Position.z, item->RoomNumber).Position.Floor;
 
@@ -161,7 +163,7 @@ void PushableBlockControl(short itemNumber)
 		}
 		else
 		{
-			item->Animation.Airborne = false;
+			item->Animation.IsAirborne = false;
 			int relY = floorHeight - item->Pose.Position.y;
 			item->Pose.Position.y = floorHeight;
 
@@ -257,7 +259,7 @@ void PushableBlockControl(short itemNumber)
 					DoPushPull = 0;
 					LaraItem->Animation.TargetState = LS_IDLE;
 
-					item->Animation.Airborne = true; // do fall
+					item->Animation.IsAirborne = true; // do fall
 					return;
 				}
 			}
@@ -389,7 +391,7 @@ void PushableBlockCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 	if ((!(TrInput & IN_ACTION) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||
 		laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-		laraItem->Animation.Airborne ||
+		laraItem->Animation.IsAirborne ||
 		laraInfo->Control.HandStatus != HandStatus::Free ||
 		pushableItem->Status == ITEM_INVISIBLE ||
 		pushableItem->TriggerFlags < 0) &&

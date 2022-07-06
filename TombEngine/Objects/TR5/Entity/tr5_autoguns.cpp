@@ -30,7 +30,7 @@ static void TriggerAutoGunSmoke(Vector3Int* pos, char shade)
 	spark->dShade = shade;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 32;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 40;
 	spark->x = pos->x - 16 + (GetRandomControl() & 0x1F);
 	spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
@@ -95,7 +95,7 @@ void AutoGunsControl(short itemNumber)
 
 			if (abs(angle1) < 1024 && abs(angle2) < 1024 && los)
 			{
-				SoundEffect(SFX_TR4_LARA_HK_FIRE, &item->Pose, SoundEnvironment::Land, 0.8f);
+				SoundEffect(SFX_TR4_HK_FIRE, &item->Pose, SoundEnvironment::Land, 0.8f);
 
 				if (GlobalCounter & 1)
 				{
@@ -109,7 +109,7 @@ void AutoGunsControl(short itemNumber)
 						GetLaraJointPosition((Vector3Int*)& pos2, GetRandomControl() % 15);
 
 						DoBloodSplat(pos2.x, pos2.y, pos2.z, (GetRandomControl() & 3) + 3, 2 * GetRandomControl(), LaraItem->RoomNumber);
-						LaraItem->HitPoints -= 20;
+						DoDamage(LaraItem, 20);
 					}
 					else
 					{
@@ -161,7 +161,7 @@ void AutoGunsControl(short itemNumber)
 		}
 		else
 		{
-			item->MeshBits = -1281;
+			item->MeshBits = 0xFFFFFAFF;
 			AnimateItem(item);
 		}
 	}

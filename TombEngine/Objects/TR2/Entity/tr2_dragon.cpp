@@ -17,6 +17,8 @@
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
+using namespace TEN::Input;
+
 BITE_INFO DragonMouthBite = { 35, 171, 1168, 12 };
 
 #define DRAGON_SWIPE_DAMAGE 250
@@ -178,7 +180,7 @@ void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 				TrInput & IN_ACTION &&
 				item->ObjectNumber == ID_DRAGON_BACK &&
-				!laraItem->Animation.Airborne &&
+				!laraItem->Animation.IsAirborne &&
 				shift <= DRAGON_MID && 
 				shift > (DRAGON_CLOSE - 350) &&
 				sideShift > -350 &&
@@ -192,7 +194,7 @@ void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				laraItem->Animation.TargetState = 7;
 
 				laraItem->Pose = item->Pose;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 				laraItem->Animation.Velocity = 0;
 				laraItem->Animation.VerticalVelocity = 0;
 
@@ -304,8 +306,7 @@ void DragonControl(short backItemNumber)
 
 		if (item->TouchBits)
 		{
-			LaraItem->HitStatus = true;
-			LaraItem->HitPoints -= DRAGON_TOUCH_DAMAGE;
+			DoDamage(creature->Enemy, DRAGON_TOUCH_DAMAGE);
 		}
 
 		switch (item->Animation.ActiveState)
@@ -339,9 +340,7 @@ void DragonControl(short backItemNumber)
 			if (item->TouchBits & DRAGON_TOUCH_L)
 			{
 				creature->Flags = 0;
-
-				LaraItem->HitStatus = true;
-				LaraItem->HitPoints -= DRAGON_SWIPE_DAMAGE;
+				DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 			}
 
 			break;
@@ -350,9 +349,7 @@ void DragonControl(short backItemNumber)
 			if (item->TouchBits & DRAGON_TOUCH_R)
 			{
 				creature->Flags = 0;
-
-				LaraItem->HitStatus = true;
-				LaraItem->HitPoints -= DRAGON_SWIPE_DAMAGE;
+				DoDamage(creature->Enemy, DRAGON_SWIPE_DAMAGE);
 			}
 
 			break;
@@ -558,8 +555,8 @@ void BartoliControl(short itemNumber)
 			frontItem = (short)back->Data;
 			front = &g_Level.Items[frontItem];
 
-			front->TouchBits = back->TouchBits = 0;
-			EnableBaddyAI(frontItem, 1);
+			front->TouchBits = back->TouchBits = NO_JOINT_BITS;
+			EnableEntityAI(frontItem, 1);
 			AddActiveItem(frontItem);
 			AddActiveItem(backItem);
 			back->Status = ITEM_ACTIVE;

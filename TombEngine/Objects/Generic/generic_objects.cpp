@@ -410,7 +410,7 @@ void StartTraps()
 	auto* object = &Objects[ID_DARTS];
 	if (object->loaded)
 	{
-		object->shadowSize = UNIT_SHADOW / 2;
+		object->castsShadow = true;
 		//object->drawRoutine = DrawDart;
 		object->collision = ObjectCollision;
 		object->control = DartControl;

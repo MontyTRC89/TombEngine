@@ -19,6 +19,8 @@
 #include "Objects/Generic/Doors/underwater_door.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Doors
 {
 	Vector3Int UnderwaterDoorPos(-251, -540, -46);
@@ -41,7 +43,7 @@ namespace TEN::Entities::Doors
 		if (TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
 			laraInfo->Control.WaterStatus == WaterStatus::Underwater &&
-			!(doorItem->Status && doorItem->Animation.Airborne) &&
+			!(doorItem->Status && doorItem->Animation.IsAirborne) &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{

@@ -21,6 +21,7 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
+#include "Specific/configuration.h"
 #include "Specific/setup.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
@@ -29,6 +30,7 @@
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Entities::Generic;
+using namespace TEN::Input;
 
 bool MonksAttackLara;
 ItemInfo* LastTargets[MAX_TARGETS];
@@ -66,7 +68,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		9,
 		3,
 		0,
-		SFX_TR4_LARA_FIRE,
+		SFX_TR4_PISTOL_FIRE,
 		0
 	},
 
@@ -83,7 +85,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		16,
 		3,
 		0,
-		SFX_TR4_DESSERT_EAGLE_FIRE,
+		SFX_TR4_REVOLVER_FIRE,
 		0
 	},
 
@@ -100,7 +102,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		3,
 		3,
 		0,
-		SFX_TR4_LARA_UZI_FIRE,
+		SFX_TR4_UZI_FIRE,
 		0
 	},
 
@@ -117,7 +119,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		9,
 		3,
 		9,
-		SFX_TR4_LARA_SHOTGUN,
+		SFX_TR4_SHOTGUN_FIRE,
 		0
 	},
 
@@ -151,7 +153,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		2,
 		9,
-		SFX_TR4_LARA_CROSSBOW,
+		SFX_TR4_CROSSBOW_FIRE,
 		20
 	},
 
@@ -185,7 +187,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		2,
 		0,
-		SFX_TR4_LARA_UZI_FIRE,
+		SFX_TR4_UZI_FIRE,
 		0
 	},
 
@@ -253,7 +255,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		0,
 		0,
 		0,
-		SFX_TR4_LARA_UZI_FIRE,
+		SFX_TR4_UZI_FIRE,
 		0
 	}
 };
@@ -589,7 +591,6 @@ void LaraGun(ItemInfo* laraItem)
 		case LaraWeaponType::Pistol:
 		case LaraWeaponType::Uzi:
 			PistolHandler(laraItem, lara->Control.Weapon.GunType);
-
 			break;
 
 		case LaraWeaponType::Shotgun:
@@ -722,7 +723,7 @@ GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType)
 	switch (weaponType)
 	{
 	case LaraWeaponType::Revolver:
-		return (lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight == true ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
+		return (lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight ? ID_LARA_REVOLVER_LASER : ID_REVOLVER_ANIM);
 
 	case LaraWeaponType::Uzi:
 		return ID_UZI_ANIM;
@@ -734,7 +735,7 @@ GAME_OBJECT_ID WeaponObjectMesh(ItemInfo* laraItem, LaraWeaponType weaponType)
 		return ID_HK_ANIM;
 
 	case LaraWeaponType::Crossbow:
-		return (lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight == true ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
+		return (lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight ? ID_LARA_CROSSBOW_LASER : ID_CROSSBOW_ANIM);
 		
 	case LaraWeaponType::GrenadeLauncher:
 		return ID_GRENADE_ANIM;
@@ -775,7 +776,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 						lara->Control.Weapon.GunType == LaraWeaponType::Uzi))
 				{
 					// Baddy2 gun hitting sword
-					SoundEffect(SFX_TR4_BAD_SWORD_RICO, &target->Pose);
+					SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target->Pose);
 					TriggerRicochetSpark(hitPos, laraItem->Pose.Orientation.y, 3, 0);
 					return;
 				}
@@ -794,7 +795,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 				if (target->ObjectNumber == ID_ROMAN_GOD1 ||
 					target->ObjectNumber == ID_ROMAN_GOD2)
 				{
-					SoundEffect(SFX_TR5_SWORD_GOD_HITMETAL, &target->Pose);
+					SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target->Pose);
 				}
 
 				break;
@@ -802,19 +803,15 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 		}
 	}
 
-	if (!object->undead || grenade ||
-		target->HitPoints == NOT_TARGETABLE)
+	if (!object->undead || grenade)
 	{
 		if (target->HitPoints > 0)
 		{
 			Statistics.Level.AmmoHits++;
-
-			if (target->HitPoints >= damage)
-				target->HitPoints -= damage;
-			else
-				target->HitPoints = 0;
+			DoDamage(target, damage);
 		}
 	}
+
 	if (!target->LuaCallbackOnHitName.empty())
 	{
 		short index = g_GameScriptEntities->GetIndexByName(target->LuaName);
@@ -897,7 +894,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 
 		// TODO: enable it when the slot is created !
 		/*
-		if (target->objectNumber == ID_TRIBEBOSS)
+		if (target->ObjectNumber == ID_TRIBEBOSS)
 		{
 			long dx, dy, dz;
 
@@ -906,27 +903,27 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 			dz = (vDest.z - vSrc.z) >> 5;
 			FindClosestShieldPoint(vDest.x - dx, vDest.y - dy, vDest.z - dz, target);
 		}
-		else if (target->objectNumber == ID_ARMY_WINSTON || target->objectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
+		else if (target->ObjectNumber == ID_ARMY_WINSTON || target->ObjectNumber == ID_LONDONBOSS) //Don't want blood on Winston - never get the stains out
 		{
 			short ricochet_angle;
-			target->hitStatus = true; //need to do this to maintain defence state
+			target->HitStatus = true; //need to do this to maintain defence state
 			target->HitPoints--;
-			ricochet_angle = (mGetAngle(lara->pos.Position.z, lara->pos.Position.x, target->pos.Position.z, target->pos.Position.x) >> 4) & 4095;
+			ricochet_angle = (mGetAngle(lara->Pose.Position.z, lara->Pose.Position.x, target->Pose.Position.z, target->Pose.Position.x) >> 4) & 4095;
 			TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-			SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos);		// play RICOCHET Sample
+			SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target->Pose);		// play RICOCHET Sample
 		}
-		else if (target->objectNumber == ID_SHIVA) //So must be Shiva
+		else if (target->ObjectNumber == ID_SHIVA) //So must be Shiva
 		{
-			z = target->pos.Position.z - lara_item->pos.Position.z;
-			x = target->pos.Position.x - lara_item->pos.Position.x;
-			angle = 0x8000 + phd_atan(z, x) - target->pos.Orientation.y;
+			z = target->Pose.Position.z - lara_item->Pose.Position.z;
+			x = target->Pose.Position.x - lara_item->Pose.Position.x;
+			angle = 0x8000 + phd_atan(z, x) - target->Pose.Orientation.y;
 
 			if ((target->ActiveState > 1 && target->ActiveState < 5) && angle < 0x4000 && angle > -0x4000)
 			{
-				target->hitStatus = true; //need to do this to maintain defence state
-				ricochet_angle = (mGetAngle(lara->pos.Position.z, lara->pos.Position.x, target->pos.Position.z, target->pos.Position.x) >> 4) & 4095;
+				target->HitStatus = true; //need to do this to maintain defence state
+				ricochet_angle = (mGetAngle(lara->Pose.Position.z, lara->Pose.Position.x, target->Pose.Position.z, target->Pose.Position.x) >> 4) & 4095;
 				TriggerRicochetSparks(&vDest, ricochet_angle, 16, 0);
-				SoundEffect(SFX_TR4_LARA_RICOCHET, &target->pos); // play RICOCHET Sample
+				SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target->Pose); // play RICOCHET Sample
 			}
 			else //Shiva's not in defence mode or has its back to Lara
 				HitTarget(target, &vDest, weapon->damage, 0);
@@ -980,7 +977,8 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		laraItem->Pose.Position.x,
 		muzzleOffset.y,
 		laraItem->Pose.Position.z,
-		laraItem->RoomNumber);
+		laraItem->RoomNumber
+	);
 	
 	auto targetPoint = GameVector();
 	FindTargetPoint(lara->TargetEntity, &targetPoint);
@@ -1035,6 +1033,9 @@ void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 
 void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 {
+	if (!g_Configuration.AutoTarget)
+		return;
+
 	auto* lara = GetLaraInfo(laraItem);
 
 	if (BinocularRange)
@@ -1050,7 +1051,8 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 		laraItem->Pose.Position.x,
 		muzzleOffset.y,
 		laraItem->Pose.Position.z,
-		laraItem->RoomNumber);
+		laraItem->RoomNumber
+	);
 
 	ItemInfo* bestItem = nullptr;
 	short bestYrot = MAXSHORT;

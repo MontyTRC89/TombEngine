@@ -2,6 +2,7 @@
 #include "Game/effects/chaffFX.h"
 
 #include "Game/animation.h"
+#include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/effects/bubble.h"
 #include "Game/effects/smoke.h"
@@ -11,6 +12,9 @@
 #include "Game/Lara/lara.h"
 #include "Specific/level.h"
 #include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Renderer/Renderer11Enums.h"
+#include "Sound/sound.h"
 
 #define	MAX_TRIGGER_RANGE	0x4000
 using namespace TEN::Math::Random;
@@ -41,7 +45,7 @@ void TriggerChaffEffects(int flareAge)
 	TriggerChaffEffects(LaraItem, &pos, &vel, LaraItem->Animation.Velocity, (bool)(g_Level.Rooms[LaraItem->RoomNumber].flags & ENV_FLAG_WATER), flareAge);
 }
 
-void TriggerChaffEffects(ItemInfo* Item,int age)
+void TriggerChaffEffects(ItemInfo* Item, int age)
 {
 	Matrix world
 		= Matrix::CreateTranslation(-6, 6, 32)
@@ -62,15 +66,15 @@ void TriggerChaffEffects(ItemInfo* Item,int age)
 	vel.y = world.Translation().y;
 	vel.z = world.Translation().z;
 
-	TriggerChaffEffects(Item, &pos, &vel, Item->Animation.Velocity, (bool)(g_Level.Rooms[Item->RoomNumber].flags & ENV_FLAG_WATER),age);
+	TriggerChaffEffects(Item, &pos, &vel, Item->Animation.Velocity, (bool)(g_Level.Rooms[Item->RoomNumber].flags & ENV_FLAG_WATER), age);
 }
 
-void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater,int age)
+void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int speed, bool isUnderwater, int age)
 {
-	int numSparks = (int)GenerateFloat(2, 5);
+	int numSparks = (int)GenerateFloat(1, 3);
 	for (int i = 0; i < numSparks; i++)
 	{
-		long	dx, dz;
+		long dx, dz;
 
 		dx = item->Pose.Position.x - pos->x;
 		dz = item->Pose.Position.z - pos->z;
@@ -83,11 +87,9 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 		color.g = (GetRandomDraw() & 127) + 64;
 		color.b = 192 - color.g;
 
-		TriggerChaffSparkles(pos, vel, &color,age,item);
+		TriggerChaffSparkles(pos, vel, &color, age, item);
 		if (isUnderwater)
-		{
 			TriggerChaffBubbles(pos, item->RoomNumber);
-		}
 		else
 		{
 			Vector3 position = Vector3(pos->x,pos->y,pos->z);
@@ -96,10 +98,12 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 			TEN::Effects::Smoke::TriggerFlareSmoke(position+(direction*20), direction,age,item->RoomNumber);
 		}
 	}
+
+	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item);
+	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, & item->Pose, cond ? SoundEnvironment::Water : SoundEnvironment::Always, 1.0f, 0.5f);
 }
 
-
-void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int age,ItemInfo* item)
+void TriggerChaffSparkles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int age, ItemInfo* item)
 {
 	/*
 	SPARKS* sparkle;
@@ -119,7 +123,7 @@ void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int 
 	sparkle->colFadeSpeed = 3;
 	sparkle->fadeToBlack = 5;
 	sparkle->sLife = sparkle->life = 10;
-	sparkle->transType = TransTypeEnum::COLADD;
+	sparkle->transType = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sparkle->dynamic = true;
 
 	sparkle->x = pos->x + (GetRandomDraw() & 7) - 3;
@@ -137,7 +141,6 @@ void TriggerChaffSparkles (Vector3Int* pos, Vector3Int* vel, CVECTOR* color,int 
 	*/
 	TEN::Effects::Spark::TriggerFlareSparkParticles(pos, vel,color,item->RoomNumber);
 }
-
 
 void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving, bool wind)
 {
@@ -174,7 +177,7 @@ void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving,
 		smoke->sLife = rnd;
 	}
 
-	smoke->transType = TransTypeEnum::COLADD;
+	smoke->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	
 	smoke->x = pos->x + (GetRandomControl() & 7) - 3;
 	smoke->y = pos->y + (GetRandomControl() & 7) - 3;
@@ -194,9 +197,7 @@ void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving,
 			smoke->rotAdd = (GetRandomControl() & 7) + 24;
 	}
 	else
-	{
 		smoke->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
-	}
 
 	if (wind)
 		smoke->flags |= SP_WIND;
@@ -209,11 +210,10 @@ void TriggerChaffSmoke(Vector3Int* pos, Vector3Int* vel, int speed, bool moving,
 	smoke->size = smoke->dSize = size;
 }
 
-
 void TriggerChaffBubbles(Vector3Int* pos, int FlareRoomNumber)
 {
+	auto& bubble = Bubbles[GetFreeBubble()];
 
-	BUBBLE_STRUCT& bubble = Bubbles[GetFreeBubble()];
 	bubble = {};
 	bubble.active = true;
 	bubble.size = 0;

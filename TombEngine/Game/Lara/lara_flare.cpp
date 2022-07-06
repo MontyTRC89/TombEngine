@@ -17,7 +17,7 @@
 
 using namespace TEN::Math::Random;
 
-constexpr auto FlareMainColor = Vector3(1, 0.52947, 0.3921);
+constexpr auto FlareMainColor = Vector3(0.8, 0.42947, 0.2921);
 
 void FlareControl(short itemNumber)
 {
@@ -31,7 +31,7 @@ void FlareControl(short itemNumber)
 
 	if (flareItem->Animation.VerticalVelocity)
 	{
-		flareItem->Pose.Orientation.x += ANGLE(3.0f);
+		flareItem->Pose.Orientation.x -= ANGLE(5.0f);
 		flareItem->Pose.Orientation.z += ANGLE(5.0f);
 	}
 	else
@@ -40,13 +40,14 @@ void FlareControl(short itemNumber)
 		flareItem->Pose.Orientation.z = 0;
 	}
 
+	auto velocity = Vector3Int(
+		flareItem->Animation.Velocity * phd_sin(flareItem->Pose.Orientation.y),
+		flareItem->Animation.VerticalVelocity,
+		flareItem->Animation.Velocity * phd_cos(flareItem->Pose.Orientation.y)
+	);
+
 	auto oldPos = flareItem->Pose.Position;
-
-	int xVel = flareItem->Animation.Velocity * phd_sin(flareItem->Pose.Orientation.y);
-	int zVel = flareItem->Animation.Velocity * phd_cos(flareItem->Pose.Orientation.y);
-
-	flareItem->Pose.Position.x += xVel;
-	flareItem->Pose.Position.z += zVel;
+	flareItem->Pose.Position += Vector3Int(velocity.x, 0, velocity.z);
 
 	if (TestEnvironment(ENV_FLAG_WATER, flareItem) ||
 		TestEnvironment(ENV_FLAG_SWAMP, flareItem))
@@ -58,8 +59,7 @@ void FlareControl(short itemNumber)
 		flareItem->Animation.VerticalVelocity += 6;
 
 	flareItem->Pose.Position.y += flareItem->Animation.VerticalVelocity;
-
-	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, xVel, flareItem->Animation.VerticalVelocity, zVel);
+	DoProjectileDynamics(itemNumber, oldPos.x, oldPos.y, oldPos.z, velocity.x, velocity.y, velocity.z);
 
 	int& life = flareItem->Data;
 	life &= 0x7FFF;
@@ -244,7 +244,7 @@ void DrawFlare(ItemInfo* laraItem)
 		{
 			if (armFrame == 72)
 			{
-				SoundEffect(SFX_TR4_OBJ_GEM_SMASH, &laraItem->Pose, (SoundEnvironment)TestEnvironment(ENV_FLAG_WATER, laraItem));
+				SoundEffect(SFX_TR4_FLARE_IGNITE_DRY, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 				lara->Flare.Life = 1;
 			}
 
@@ -291,7 +291,6 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 	if (itemNumber != NO_ITEM)
 	{
 		auto* flareItem = &g_Level.Items[itemNumber];
-		bool flag = false;
 
 		flareItem->ObjectNumber = objectNumber;
 		flareItem->RoomNumber = laraItem->RoomNumber;
@@ -303,12 +302,13 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 
 		int floorHeight = GetCollision(pos.x, pos.y, pos.z, laraItem->RoomNumber).Position.Floor;
 		auto collided = GetCollidedObjects(flareItem, 0, true, CollidedItems, CollidedMeshes, true);
+		bool landed = false;
 		if (floorHeight < pos.y || collided)
 		{
-			flag = true;
-			flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y + ANGLE(180.0f);
+			landed = true;
 			flareItem->Pose.Position.x = laraItem->Pose.Position.x + 320 * phd_sin(flareItem->Pose.Orientation.y);
 			flareItem->Pose.Position.z = laraItem->Pose.Position.z + 320 * phd_cos(flareItem->Pose.Orientation.y);
+			flareItem->Pose.Orientation.y = laraItem->Pose.Orientation.y + ANGLE(180.0f);
 			flareItem->RoomNumber = laraItem->RoomNumber;
 		}
 		else
@@ -338,7 +338,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 			flareItem->Animation.VerticalVelocity = laraItem->Animation.VerticalVelocity + 50;
 		}
 
-		if (flag)
+		if (landed)
 			flareItem->Animation.Velocity /= 2;
 
 		if (objectNumber == ID_FLARE_ITEM)
@@ -378,7 +378,7 @@ void DoFlareInHand(ItemInfo* laraItem, int flareLife)
 	if (lara->Flare.Life >= FLARE_LIFE_MAX)
 	{
 		// Prevent Lara from intercepting reach/jump states with flare throws.
-		if (laraItem->Animation.Airborne ||
+		if (laraItem->Animation.IsAirborne ||
 			laraItem->Animation.TargetState == LS_JUMP_PREPARE ||
 			laraItem->Animation.TargetState == LS_JUMP_FORWARD)
 			return;
@@ -401,9 +401,13 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 	int y = pos->y + (random * 120) - CLICK(1);
 	int z = pos->z + (random * 120);
 
-	if (flareLife < 4)
+	bool result = false;
+	bool ending = (flareLife > (FLARE_LIFE_MAX - 90));
+	bool dying  = (flareLife > (FLARE_LIFE_MAX - 5));
+
+	if (dying)
 	{
-		int falloff = 12 + ((1 - (flareLife / 4.0f)) * 16);
+		int falloff = 6 * (1.0f - (flareLife / FLARE_LIFE_MAX));
 
 		int r = FlareMainColor.x * 255;
 		int g = FlareMainColor.y * 255;
@@ -411,30 +415,32 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
-		return (random < 0.9f);
+		result = (random < 0.9f);
 	}
-	else if (flareLife < (FLARE_LIFE_MAX - 90))
+	else if (ending)
 	{
-		float multiplier = GenerateFloat(0.75f, 1.0f);
-		int falloff = 12 * multiplier;
+		float multiplier = GenerateFloat(0.05f, 1.0f);
+		int falloff = 8 * multiplier;
 
 		int r = FlareMainColor.x * 255 * multiplier;
 		int g = FlareMainColor.y * 255 * multiplier;
 		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
-		return (random < 0.4f);
+		result = (random < 0.4f);
 	}
 	else
 	{
-		float multiplier = GenerateFloat(0.05f, 0.8f);
-		int falloff = 12 * (1.0f - ((flareLife - (FLARE_LIFE_MAX - 90)) / (FLARE_LIFE_MAX - (FLARE_LIFE_MAX - 90))));
+		float multiplier = GenerateFloat(0.6f, 0.8f);
+		int falloff = 8 * (1.0f - (flareLife / FLARE_LIFE_MAX));
 
 		int r = FlareMainColor.x * 255 * multiplier;
 		int g = FlareMainColor.y * 255 * multiplier;
 		int b = FlareMainColor.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
-		return (random < 0.3f);
+		result = (random < 0.3f);
 	}
+
+	return (dying || ending ? result : true);
 }

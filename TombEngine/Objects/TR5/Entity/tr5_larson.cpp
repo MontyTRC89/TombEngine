@@ -78,7 +78,7 @@ void LarsonControl(short itemNumber)
 	CreatureInfo* creature = (CreatureInfo*)item->Data;
 	
 	// In Streets of Rome when Larson HP are below 40 he runs way
-	/*if (item->HitPoints <= TR5_LARSON_MIN_HP && !(item->flags & ONESHOT))
+	/*if (item->HitPoints <= TR5_LARSON_MIN_HP && !(item->flags & IFLAG_INVISIBLE))
 	{
 		item->HitPoints = TR5_LARSON_MIN_HP;
 		creature->flags++;
@@ -104,14 +104,14 @@ void LarsonControl(short itemNumber)
 		if (CurrentLevel == 2)
 		{
 			item->ItemFlags[3] = 1;
-			item->Animation.Airborne = false;
+			item->Animation.IsAirborne = false;
 			item->HitStatus = false;
 			item->Collidable = false;
 			item->Status = ITEM_DEACTIVATED;
 		}
 		else
 		{
-			item->Animation.Airborne = false;
+			item->Animation.IsAirborne = false;
 			item->HitStatus = false;
 			item->Collidable = false;
 			item->Status = ITEM_ACTIVE;
@@ -136,7 +136,7 @@ void LarsonControl(short itemNumber)
 		/*if (creature->flags)
 		{
 			item->HitPoints = 60;
-			item->Airborne = false;
+			item->IsAirborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_DESACTIVATED;
@@ -404,7 +404,7 @@ void LarsonControl(short itemNumber)
 			item->TargetState = STATE_TR5_LARSON_STOP;
 			item->RequiredState = STATE_TR5_LARSON_STOP;
 			creature->reachedGoal = false;
-			item->Airborne = false;
+			item->IsAirborne = false;
 			item->hitStatus = false;
 			item->collidable = false;
 			item->status = ITEM_NOT_ACTIVE;
@@ -413,7 +413,7 @@ void LarsonControl(short itemNumber)
 		else
 		{
 			item->HitPoints = NOT_TARGETABLE;
-			DisableBaddyAI(itemNumber);
+			DisableEntityAI(itemNumber);
 			KillItem(itemNumber);
 		}
 	}*/

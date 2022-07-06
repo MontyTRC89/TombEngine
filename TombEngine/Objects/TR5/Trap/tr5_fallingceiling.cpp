@@ -15,14 +15,13 @@ void FallingCeilingControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState == 1 && item->TouchBits)
 		{
-			LaraItem->HitPoints -= 300;
-			LaraItem->HitStatus = true;
+			DoDamage(LaraItem, 300);
 		}
 	}
 	else
 	{
 		item->Animation.TargetState = 1;
-		item->Animation.Airborne = true;;
+		item->Animation.IsAirborne = true;;
 	}
 
 	AnimateItem(item);
@@ -43,7 +42,7 @@ void FallingCeilingControl(short itemNumber)
 			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Pose.Position.y = item->Floor;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = 2;
 				item->Animation.VerticalVelocity = 0;
 			}

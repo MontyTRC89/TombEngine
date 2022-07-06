@@ -12,6 +12,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
 
+using namespace TEN::Input;
+
 int SenetPiecesNumber[6];
 char SenetDisplacement, ActiveSenetPieces[6], SenetBoard[17];
 int SenetTargetX, SenetTargetZ;
@@ -50,7 +52,7 @@ void GameSticksControl(short itemNumber)
 	if (item->ItemFlags[7] > -1)
 	{
 		if (item->HitPoints == 100)
-			SoundEffect(SFX_TR4_SPINNING_PUZZLE, &item->Pose);
+			SoundEffect(SFX_TR4_SENET_PUZZLE_SPIN, &item->Pose);
 		for (int i = 0; i < 4; ++i)
 		{
 			if (item->HitPoints < 100 - 2 * i)

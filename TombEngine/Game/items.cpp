@@ -8,9 +8,111 @@
 #include "ScriptInterfaceGame.h"
 #include "Specific/setup.h"
 #include "Specific/level.h"
+#include "Specific/input.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Sound/sound.h"
+#include "Specific/prng.h"
 
 using namespace TEN::Floordata;
+using namespace TEN::Input;
+using namespace TEN::Math::Random;
+
+void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (int i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			this->TouchBits |= jointBit;
+			break;
+
+		case JointBitType::Mesh:
+			this->MeshBits |= jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits |= jointBit;
+			break;
+		}
+	}
+}
+
+void ItemInfo::SetBits(JointBitType type, int jointIndex)
+{
+	return SetBits(type, std::vector{ jointIndex });
+}
+
+void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (int i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			this->TouchBits &= ~jointBit;
+			break;
+
+		case JointBitType::Mesh:
+			this->MeshBits &= ~jointBit;
+			break;
+
+		case JointBitType::MeshSwap:
+			this->MeshSwapBits &= ~jointBit;
+			break;
+		}
+	}
+}
+
+void ItemInfo::ClearBits(JointBitType type, int jointIndex)
+{
+	return ClearBits(type, std::vector{ jointIndex });
+}
+
+bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
+{
+	for (int i = 0; i < jointIndices.size(); i++)
+	{
+		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+
+		switch (type)
+		{
+		case JointBitType::Touch:
+			if ((TouchBits & jointBit) == jointBit)
+				return true;
+
+			break;
+
+		case JointBitType::Mesh:
+			if ((MeshBits & jointBit) == jointBit)
+				return true;
+
+			break;
+
+		case JointBitType::MeshSwap:
+			if ((MeshSwapBits & jointBit) == jointBit)
+				return true;
+
+			break;
+		}
+	}
+
+	return false;
+}
+
+bool ItemInfo::TestBits(JointBitType type, int jointIndex)
+{
+	return TestBits(type, std::vector{ jointIndex });
+}
+
+bool ItemInfo::IsLara()
+{
+	return this->Data.is<LaraInfo*>();
+}
 
 void ClearItem(short itemNumber)
 {
@@ -76,13 +178,10 @@ void KillItem(short const itemNumber)
 		if (Objects[item->ObjectNumber].floor != nullptr)
 			UpdateBridgeItem(itemNumber, true);
 
-
 		g_GameScriptEntities->NotifyKilled(item);
 		g_GameScriptEntities->TryRemoveColliding(itemNumber, true);
 		if (!item->LuaCallbackOnKilledName.empty())
-		{
 			g_GameScript->ExecuteFunction(item->LuaCallbackOnKilledName, itemNumber);
-		}
 
 		item->LuaName.clear();
 		item->LuaCallbackOnKilledName.clear();
@@ -96,10 +195,7 @@ void KillItem(short const itemNumber)
 			NextItemFree = itemNumber;
 		}
 		else
-		{
 			item->Flags |= IFLAG_KILLED;
-		}
-
 	}
 }
 
@@ -366,7 +462,7 @@ void InitialiseItem(short itemNumber)
 
 	item->Active = false;
 	item->Status = ITEM_NOT_ACTIVE;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->HitStatus = false;
 	item->Collidable = true;
 	item->LookedAt = false;
@@ -383,11 +479,11 @@ void InitialiseItem(short itemNumber)
 		item->MeshBits = 1;
 	}
 	else
-		item->MeshBits = -1;
+		item->MeshBits = ALL_JOINT_BITS;
 
-	item->TouchBits = 0;
+	item->TouchBits = NO_JOINT_BITS;
 	item->AfterDeath = 0;
-	item->SwapMeshFlags = 0;
+	item->MeshSwapBits = NO_JOINT_BITS;
 
 	if (item->Flags & IFLAG_INVISIBLE)
 	{
@@ -504,12 +600,12 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 // Note: may not work for dynamic items because of FindItem.
 void UpdateItemRoom(ItemInfo* item, int height, int xOffset, int zOffset)
 {
-	float s = phd_sin(item->Pose.Orientation.y);
-	float c = phd_cos(item->Pose.Orientation.y);
+	float sinY = phd_sin(item->Pose.Orientation.y);
+	float cosY = phd_cos(item->Pose.Orientation.y);
 
-	int x = item->Pose.Position.x + roundf(c * xOffset + s * zOffset);
+	int x = (int)round(item->Pose.Position.x + ((cosY * xOffset) + (sinY * zOffset)));
 	int y = height + item->Pose.Position.y;
-	int z = item->Pose.Position.z + roundf(-s * xOffset + c * zOffset);
+	int z = (int)round(item->Pose.Position.z + ((-sinY * xOffset) + (cosY * zOffset)));
 
 	item->Location = GetRoom(item->Location, x, y, z);
 	item->Floor = GetFloorHeight(item->Location, x, z).value_or(NO_HEIGHT);
@@ -554,4 +650,33 @@ int FindItem(ItemInfo* item)
 			return i;
 
 	return -1;
+}
+
+void DoDamage(ItemInfo* item, int damage)
+{
+	static int lastHurtTime = 0;
+
+	if (item->HitPoints <= 0)
+		return;
+
+	item->HitStatus = true;
+
+	item->HitPoints -= damage;
+	if (item->HitPoints < 0)
+		item->HitPoints = 0;
+
+	if (item->IsLara())
+	{
+		if (damage > 0)
+		{
+			float power = item->HitPoints ? GenerateFloat(0.1f, 0.4f) : 0.5f;
+			Rumble(power, 0.15f);
+		}
+
+		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + GenerateInt(0, FPS)))
+		{
+			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
+			lastHurtTime = GlobalCounter;
+		}
+	}
 }

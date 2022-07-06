@@ -19,6 +19,7 @@ constexpr auto FALLINGBLOCK_FALL_VELOCITY = 4;
 constexpr auto FALLINGBLOCK_FALL_ROTATION_SPEED = 1;
 constexpr auto FALLINGBLOCK_DELAY = 52;
 constexpr auto FALLINGBLOCK_WIBBLE = 3;
+constexpr auto FALLINGBLOCK_HEIGHT_TOLERANCE = 8;
 constexpr auto FALLINGBLOCK_CRUMBLE_DELAY = 100;
 
 void InitialiseFallingBlock(short itemNumber)
@@ -36,7 +37,7 @@ void InitialiseFallingBlock(short itemNumber)
 void FallingBlockCollision(short itemNum, ItemInfo* l, CollisionInfo* coll)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
-	if (!item->ItemFlags[0] && !item->TriggerFlags && item->Pose.Position.y == l->Pose.Position.y)
+	if (!item->ItemFlags[0] && !item->TriggerFlags && abs(item->Pose.Position.y - l->Pose.Position.y) < FALLINGBLOCK_HEIGHT_TOLERANCE)
 	{
 		if (!((item->Pose.Position.x ^ l->Pose.Position.x) & 0xFFFFFC00) && !((l->Pose.Position.z ^ item->Pose.Position.z) & 0xFFFFFC00))
 		{

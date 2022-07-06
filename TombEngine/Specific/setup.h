@@ -6,8 +6,6 @@ struct ItemInfo;
 struct CollisionInfo;
 enum ZoneType : char;
 
-constexpr auto UNIT_SHADOW = 256;
-constexpr auto NO_SHADOW = 0;
 constexpr auto DEFAULT_RADIUS = 10;
 constexpr auto ROT_X = 0x0004;
 constexpr auto ROT_Y = 0x0008;
@@ -43,14 +41,13 @@ struct ObjectInfo
 	std::function<int(short itemNumber)> floorBorder;
 	std::function<int(short itemNumber)> ceilingBorder;
 	std::function<void(ItemInfo* item)> drawRoutine;
-	std::function<void(ItemInfo* item)> drawRoutineExtra;
-	std::function<void(short item_num, ItemInfo* laraitem, CollisionInfo* coll)> collision;
+	std::function<void(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)> collision;
 	ZoneType zoneType;
 	int animIndex; 
 	short HitPoints; 
 	short pivotLength; 
 	short radius; 
-	short shadowSize; 
+	bool castsShadow; 
 	short biteOffset; 
 	bool loaded;
 	bool intelligent;

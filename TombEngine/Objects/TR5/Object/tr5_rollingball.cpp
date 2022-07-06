@@ -11,6 +11,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
+#include "Objects/Utils/VehicleHelpers.h"
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = SECTOR(3);
 
@@ -28,7 +29,7 @@ void RollingBallCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* c
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 				laraItem->Animation.TargetState = LS_DEATH;
 				laraItem->Animation.ActiveState = LS_DEATH;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 			}
 			else
 				ObjectCollision(itemNumber, laraItem, coll);
@@ -43,10 +44,17 @@ void RollingBallControl(short itemNumber)
 	if (!TriggerActive(item))
 		return;
 
+	auto oldPos = item->Pose;
+
+	bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber);
+	int hDivider = isWater ? 64 : 32;
+	int vDivider = isWater ? 3 : 1;
+
 	item->Animation.VerticalVelocity += GRAVITY;
-	item->Pose.Position.x += item->ItemFlags[0] / 32;
-	item->Pose.Position.y += item->Animation.VerticalVelocity;
-	item->Pose.Position.z += item->ItemFlags[1] / 32;
+	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
+	item->Pose.Position.y += item->Animation.VerticalVelocity / vDivider;
+	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
+	item->Animation.Velocity = phd_Distance(&item->Pose, &oldPos);
 
 	int dh = GetCollision(item).Position.Floor - CLICK(2);
 
@@ -60,7 +68,10 @@ void RollingBallControl(short itemNumber)
 				pow(Camera.pos.z - item->Pose.Position.z, 2));
 
 			if (distance < 16384)
+			{
 				Camera.bounce = -(((16384 - distance) * abs(item->Animation.VerticalVelocity)) / 16384);
+				SoundEffect(SFX_TR4_BOULDER_FALL, &item->Pose);
+			}
 		}
 
 		if ((item->Pose.Position.y - dh) < CLICK(2))
@@ -239,7 +250,21 @@ void RollingBallControl(short itemNumber)
 	auto roomNumber = GetCollision(item).RoomNumber;
 
 	if (item->RoomNumber != roomNumber)
+	{
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber))
+		{
+			int waterHeight = GetWaterHeight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
+			SplashSetup.y = waterHeight - 1;
+			SplashSetup.x = item->Pose.Position.x;
+			SplashSetup.z = item->Pose.Position.z;
+			SplashSetup.splashPower = item->Animation.VerticalVelocity * 2;
+			SplashSetup.innerRadius = 96;
+			SetupSplash(&SplashSetup, roomNumber);
+		}
+
 		ItemNewRoom(itemNumber, roomNumber);
+	}
 
 	if (item->ItemFlags[0] > ROLLING_BALL_MAX_VELOCITY)
 		item->ItemFlags[0] = ROLLING_BALL_MAX_VELOCITY;
@@ -271,9 +296,10 @@ void RollingBallControl(short itemNumber)
 			item->Pose.Orientation.y = angle;
 	}
 
-	item->Pose.Orientation.x -= (abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2;
+	item->Pose.Orientation.x -= ((abs(item->ItemFlags[0]) + abs(item->ItemFlags[1])) / 2) / vDivider;
 
 	TestTriggers(item, true);
+	DoVehicleCollision(item, CLICK(0.9f));
 }
 
 void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* coll)
@@ -286,12 +312,12 @@ void ClassicRollingBallCollision(short itemNum, ItemInfo* lara, CollisionInfo* c
 			return;
 		if (!TestCollision(item, lara))
 			return;
-		if (lara->Animation.Airborne)
+		if (lara->Animation.IsAirborne)
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, lara, coll, coll->Setup.EnableSpasm, 1);
 
-			lara->HitPoints -= 100;
+			DoDamage(lara, 100);
 			int x = lara->Pose.Position.x - item->Pose.Position.x;
 			int y = (lara->Pose.Position.y - 350) - (item->Pose.Position.y - 512);
 			int z = lara->Pose.Position.z - item->Pose.Position.z;
@@ -359,9 +385,9 @@ void ClassicRollingBallControl(short itemNum)
 
 		if (item->Pose.Position.y < item->Floor)
 		{
-			if (!item->Animation.Airborne)
+			if (!item->Animation.IsAirborne)
 			{
-				item->Animation.Airborne = 1;
+				item->Animation.IsAirborne = 1;
 				item->Animation.VerticalVelocity = -10;
 			}
 		}
@@ -382,7 +408,7 @@ void ClassicRollingBallControl(short itemNum)
 
 		if (item->Pose.Position.y >= (int)floor - 256)
 		{
-			item->Animation.Airborne = false;
+			item->Animation.IsAirborne = false;
 			item->Animation.VerticalVelocity = 0;
 			item->Pose.Position.y = item->Floor;
 			SoundEffect(SFX_TR4_ROLLING_BALL, &item->Pose);
@@ -427,7 +453,7 @@ void ClassicRollingBallControl(short itemNum)
 			item->Pose.Position.z = oldz;
 			item->Animation.Velocity = 0;
 			item->Animation.VerticalVelocity = 0;
-			item->TouchBits = 0;
+			item->TouchBits = NO_JOINT_BITS;
 		}
 	}
 	else if (item->Status == ITEM_DEACTIVATED)

@@ -8,6 +8,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/effects/lara_fx.h"
+#include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -113,10 +114,10 @@ bool SaveGame::Save(int slot)
 
 	Save::SaveGameHeaderBuilder sghb{ fbb };
 	sghb.add_level_name(levelNameOffset);
-	sghb.add_days((GameTimer / 30) / 8640);
-	sghb.add_hours(((GameTimer / 30) % 86400) / 3600);
-	sghb.add_minutes(((GameTimer / 30) / 60) % 6);
-	sghb.add_seconds((GameTimer / 30) % 60);
+	sghb.add_days((GameTimer / FPS) / 8640);
+	sghb.add_hours(((GameTimer / FPS) % 86400) / 3600);
+	sghb.add_minutes(((GameTimer / FPS) / 60) % 6);
+	sghb.add_seconds((GameTimer / FPS) % 60);
 	sghb.add_level(CurrentLevel);
 	sghb.add_timer(GameTimer);
 	sghb.add_count(++LastSaveGame);
@@ -282,7 +283,7 @@ bool SaveGame::Save(int slot)
 	count.add_no_cheat(Lara.Control.Count.NoCheat);
 	count.add_pose(Lara.Control.Count.Pose);
 	count.add_position_adjust(Lara.Control.Count.PositionAdjust);
-	count.add_run_jump(Lara.Control.Count.RunJump);
+	count.add_run_jump(Lara.Control.Count.Run);
 	auto countOffset = count.Finish();
 
 	Save::WeaponControlDataBuilder weaponControl{ fbb };
@@ -332,11 +333,6 @@ bool SaveGame::Save(int slot)
 	subsuitControl.add_hit_count(Lara.Control.Subsuit.HitCount);
 	auto subsuitControlOffset = subsuitControl.Finish();
 
-	Save::MinecartControlDataBuilder minecartControl{ fbb };
-	minecartControl.add_left(Lara.Control.Minecart.Left);
-	minecartControl.add_right(Lara.Control.Minecart.Right);
-	auto minecartControlOffset = minecartControl.Finish();
-
 	Save::LaraControlDataBuilder control{ fbb };
 	control.add_move_angle(Lara.Control.MoveAngle);
 	control.add_turn_rate(Lara.Control.TurnRate);
@@ -353,7 +349,6 @@ bool SaveGame::Save(int slot)
 	control.add_is_climbing_ladder(Lara.Control.IsClimbingLadder);
 	control.add_can_monkey_swing(Lara.Control.CanMonkeySwing);
 	control.add_locked(Lara.Control.Locked);
-	control.add_minecart(minecartControlOffset);
 	control.add_rope(ropeControlOffset);
 	control.add_subsuit(subsuitControlOffset);
 	control.add_tightrope(tightropeControlOffset);
@@ -367,7 +362,7 @@ bool SaveGame::Save(int slot)
 		CarriedWeaponInfo* info = &Lara.Weapons[i];
 		
 		std::vector<flatbuffers::Offset<Save::AmmoInfo>> ammos;
-		for (int j = 0; j < (int)WeaponAmmoType::NumAmmos; j++)
+		for (int j = 0; j < (int)WeaponAmmoType::NumAmmoTypes; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
 			ammo.add_count(info->Ammo[j].getCount());
@@ -418,7 +413,6 @@ bool SaveGame::Save(int slot)
 	lara.add_poison_potency(Lara.PoisonPotency);
 	lara.add_projected_floor_height(Lara.ProjectedFloorHeight);
 	lara.add_right_arm(rightArmOffset);
-	lara.add_spasm_effect_count(Lara.SpasmEffectCount);
 	lara.add_sprint_energy(Lara.SprintEnergy);
 	lara.add_target_facing_angle(Lara.TargetOrientation.y);
 	lara.add_target_arm_angles(laraTargetAnglesOffset);
@@ -449,6 +443,11 @@ bool SaveGame::Save(int slot)
 		auto itemFlagsOffset = fbb.CreateVector(itemFlags);
 				
 		flatbuffers::Offset<Save::Creature> creatureOffset;
+		flatbuffers::Offset<Save::QuadBike> quadOffset;
+		flatbuffers::Offset<Save::Minecart> mineOffset;
+		flatbuffers::Offset<Save::UPV> upvOffset;
+		flatbuffers::Offset<Save::Kayak> kayakOffset;
+
 		flatbuffers::Offset<Save::Short> shortOffset;
 		flatbuffers::Offset<Save::Int> intOffset;
 
@@ -489,6 +488,92 @@ bool SaveGame::Save(int slot)
 			creatureBuilder.add_tosspad(creature->Tosspad);
 			creatureBuilder.add_ai_target_number(creature->AITargetNumber);
 			creatureOffset = creatureBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<QuadBikeInfo>())
+		{
+			auto quad = (QuadBikeInfo*)itemToSerialize.Data;
+
+			Save::QuadBikeBuilder quadBuilder{ fbb };
+
+			quadBuilder.add_can_start_drift(quad->CanStartDrift);
+			quadBuilder.add_drift_starting(quad->DriftStarting);
+			quadBuilder.add_engine_revs(quad->EngineRevs);
+			quadBuilder.add_extra_rotation(quad->ExtraRotation);
+			quadBuilder.add_flags(quad->Flags);
+			quadBuilder.add_front_rot(quad->FrontRot);
+			quadBuilder.add_left_vertical_velocity(quad->LeftVerticalVelocity);
+			quadBuilder.add_momentum_angle(quad->MomentumAngle);
+			quadBuilder.add_no_dismount(quad->NoDismount);
+			quadBuilder.add_pitch(quad->Pitch);
+			quadBuilder.add_rear_rot(quad->RearRot);
+			quadBuilder.add_revs(quad->Revs);
+			quadBuilder.add_right_vertical_velocity(quad->RightVerticalVelocity);
+			quadBuilder.add_smoke_start(quad->SmokeStart);
+			quadBuilder.add_turn_rate(quad->TurnRate);
+			quadBuilder.add_velocity(quad->Velocity);
+			quadOffset = quadBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<UPVInfo>())
+		{
+			auto upv = (UPVInfo*)itemToSerialize.Data;
+
+			Save::UPVBuilder upvBuilder{ fbb };
+
+			upvBuilder.add_fan_rot(upv->TurbineRotation);
+			upvBuilder.add_flags(upv->Flags);
+			upvBuilder.add_harpoon_left(upv->HarpoonLeft);
+			upvBuilder.add_harpoon_timer(upv->HarpoonTimer);
+			upvBuilder.add_rot(upv->TurnRate.y);
+			upvBuilder.add_velocity(upv->Velocity);
+			upvBuilder.add_x_rot(upv->TurnRate.x);
+			upvOffset = upvBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<MinecartInfo>())
+		{
+			auto mine = (MinecartInfo*)itemToSerialize.Data;
+
+			Save::MinecartBuilder mineBuilder{ fbb };
+
+			mineBuilder.add_flags(mine->Flags);
+			mineBuilder.add_floor_height_front(mine->FloorHeightFront);
+			mineBuilder.add_floor_height_middle(mine->FloorHeightMiddle);
+			mineBuilder.add_gradient(mine->Gradient);
+			mineBuilder.add_stop_delay(mine->StopDelay);
+			mineBuilder.add_turn_len(mine->TurnLen);
+			mineBuilder.add_turn_rot(mine->TurnRot);
+			mineBuilder.add_turn_x(mine->TurnX);
+			mineBuilder.add_turn_z(mine->TurnZ);
+			mineBuilder.add_velocity(mine->Velocity);
+			mineBuilder.add_vertical_velocity(mine->VerticalVelocity);
+			mineOffset = mineBuilder.Finish();
+		}
+		else if (itemToSerialize.Data.is<KayakInfo>())
+		{
+			auto kayak = (KayakInfo*)itemToSerialize.Data;
+
+			Save::KayakBuilder kayakBuilder{ fbb };
+
+			kayakBuilder.add_current_start_wake(kayak->CurrentStartWake);
+			kayakBuilder.add_flags(kayak->Flags);
+			kayakBuilder.add_forward(kayak->Forward);
+			kayakBuilder.add_front_vertical_velocity(kayak->FrontVerticalVelocity);
+			kayakBuilder.add_left_right_count(kayak->LeftRightPaddleCount);
+			kayakBuilder.add_left_vertical_velocity(kayak->LeftVerticalVelocity);
+			kayakBuilder.add_old_pos(&Save::Position(
+				kayak->OldPose.Position.x, 
+				kayak->OldPose.Position.y, 
+				kayak->OldPose.Position.z, 
+				kayak->OldPose.Orientation.x, 
+				kayak->OldPose.Orientation.y, 
+				kayak->OldPose.Orientation.z));
+			kayakBuilder.add_right_vertical_velocity(kayak->RightVerticalVelocity);
+			kayakBuilder.add_true_water(kayak->TrueWater);
+			kayakBuilder.add_turn(kayak->Turn);
+			kayakBuilder.add_turn_rate(kayak->TurnRate);
+			kayakBuilder.add_velocity(kayak->Velocity);
+			kayakBuilder.add_wake_shade(kayak->WakeShade);
+			kayakBuilder.add_water_height(kayak->WaterHeight);
+			kayakOffset = kayakBuilder.Finish();
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -539,18 +624,38 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
 		serializedItem.add_active(itemToSerialize.Active);
 		serializedItem.add_status(itemToSerialize.Status);
-		serializedItem.add_airborne(itemToSerialize.Animation.Airborne);
+		serializedItem.add_is_airborne(itemToSerialize.Animation.IsAirborne);
 		serializedItem.add_hit_stauts(itemToSerialize.HitStatus);
 		serializedItem.add_ai_bits(itemToSerialize.AIBits);
 		serializedItem.add_collidable(itemToSerialize.Collidable);
 		serializedItem.add_looked_at(itemToSerialize.LookedAt);
-		serializedItem.add_swap_mesh_flags(itemToSerialize.SwapMeshFlags);
+		serializedItem.add_swap_mesh_flags(itemToSerialize.MeshSwapBits);
 
 		if (Objects[itemToSerialize.ObjectNumber].intelligent 
 			&& itemToSerialize.Data.is<CreatureInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::Creature);
 			serializedItem.add_data(creatureOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<QuadBikeInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::QuadBike);
+			serializedItem.add_data(quadOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<UPVInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::UPV);
+			serializedItem.add_data(upvOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<MinecartInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Minecart);
+			serializedItem.add_data(mineOffset.Union());
+		}
+		else if (itemToSerialize.Data.is<KayakInfo>())
+		{
+			serializedItem.add_data_type(Save::ItemData::Kayak);
+			serializedItem.add_data(kayakOffset.Union());
 		}
 		else if (itemToSerialize.Data.is<short>())
 		{
@@ -612,7 +717,11 @@ bool SaveGame::Save(int slot)
 
 	// Legacy soundtrack map
 	std::vector<int> soundTrackMap;
-	for (auto& track : SoundTracks) { soundTrackMap.push_back(track.second.Mask); }
+	for (auto& track : SoundTracks) 
+	{
+		soundTrackMap.push_back(track.first);
+		soundTrackMap.push_back(track.second.Mask); 
+	}
 	auto soundtrackMapOffset = fbb.CreateVector(soundTrackMap);
 
 	// Flipmaps
@@ -676,6 +785,59 @@ bool SaveGame::Save(int slot)
 		}
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
+
+	// Particles
+	std::vector<flatbuffers::Offset<Save::ParticleInfo>> particles;
+	for (int i = 0; i < MAX_PARTICLES; i++)
+	{
+		auto* particle = &Particles[i];
+
+		if (!particle->on)
+			continue;
+
+		Save::ParticleInfoBuilder particleInfo{ fbb };
+
+		particleInfo.add_b(particle->b);
+		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
+		particleInfo.add_d_b(particle->dB);
+		particleInfo.add_sprite_index(particle->spriteIndex);
+		particleInfo.add_d_g(particle->dG);
+		particleInfo.add_d_r(particle->dR);
+		particleInfo.add_d_size(particle->dSize);
+		particleInfo.add_dynamic(particle->dynamic);
+		particleInfo.add_extras(particle->extras);
+		particleInfo.add_fade_to_black(particle->fadeToBlack);
+		particleInfo.add_flags(particle->flags);
+		particleInfo.add_friction(particle->friction);
+		particleInfo.add_fx_obj(particle->fxObj);
+		particleInfo.add_g(particle->g);
+		particleInfo.add_gravity(particle->gravity);
+		particleInfo.add_life(particle->life);
+		particleInfo.add_max_y_vel(particle->maxYvel);
+		particleInfo.add_node_number(particle->nodeNumber);
+		particleInfo.add_on(particle->on);
+		particleInfo.add_r(particle->r);
+		particleInfo.add_room_number(particle->roomNumber);
+		particleInfo.add_rot_add(particle->rotAdd);
+		particleInfo.add_rot_ang(particle->rotAng);
+		particleInfo.add_s_b(particle->sB);
+		particleInfo.add_scalar(particle->scalar);
+		particleInfo.add_s_g(particle->sG);
+		particleInfo.add_size(particle->size);
+		particleInfo.add_s_life(particle->sLife);
+		particleInfo.add_s_r(particle->sR);
+		particleInfo.add_s_size(particle->sSize);
+		particleInfo.add_blend_mode(particle->blendMode);
+		particleInfo.add_x(particle->x);
+		particleInfo.add_x_vel(particle->sSize);
+		particleInfo.add_y(particle->y);
+		particleInfo.add_y_vel(particle->yVel);
+		particleInfo.add_z(particle->z);
+		particleInfo.add_z_vel(particle->zVel);
+
+		particles.push_back(particleInfo.Finish());
+	}
+	auto particleOffset = fbb.CreateVector(particles);
 
 	// Particle enemies
 	std::vector<flatbuffers::Offset<Save::BatInfo>> bats;
@@ -958,6 +1120,7 @@ bool SaveGame::Save(int slot)
 	sgb.add_flip_timer(0);
 	sgb.add_static_meshes(staticMeshesOffset);
 	sgb.add_fixed_cameras(camerasOffset);
+	sgb.add_particles(particleOffset);
 	sgb.add_bats(batsOffset);
 	sgb.add_rats(ratsOffset);
 	sgb.add_spiders(spidersOffset);
@@ -1007,6 +1170,23 @@ bool SaveGame::Load(int slot)
 
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.get());
 
+	// Statistics
+	Statistics.Game.AmmoHits = s->game()->ammo_hits();
+	Statistics.Game.AmmoUsed = s->game()->ammo_used();
+	Statistics.Game.Distance = s->game()->distance();
+	Statistics.Game.HealthUsed = s->game()->medipacks_used();
+	Statistics.Game.Kills = s->game()->kills();
+	Statistics.Game.Secrets = s->game()->secrets();
+	Statistics.Game.Timer = s->game()->timer();
+
+	Statistics.Level.AmmoHits = s->level()->ammo_hits();
+	Statistics.Level.AmmoUsed = s->level()->ammo_used();
+	Statistics.Level.Distance = s->level()->distance();
+	Statistics.Level.HealthUsed = s->level()->medipacks_used();
+	Statistics.Level.Kills = s->level()->kills();
+	Statistics.Level.Secrets = s->level()->secrets();
+	Statistics.Level.Timer = s->level()->timer();
+
 	// Flipmaps
 	for (int i = 0; i < s->flip_stats()->size(); i++)
 	{
@@ -1028,11 +1208,9 @@ bool SaveGame::Load(int slot)
 	// Legacy soundtrack map
 	for (int i = 0; i < s->cd_flags()->size(); i++)
 	{
-		// Safety check for cases when soundtrack map was externally modified and became smaller
-		if (i >= SoundTracks.size())
-			break;
-
-		SoundTracks[i].Mask = s->cd_flags()->Get(i);
+		int index = s->cd_flags()->Get(i);
+		int mask  = s->cd_flags()->Get(++i);
+		SoundTracks[index].Mask = mask;
 	}
 
 	// Static objects
@@ -1161,14 +1339,33 @@ bool SaveGame::Load(int slot)
 		item->HitStatus = savedItem->hit_stauts();
 		item->Status = savedItem->status();
 		item->AIBits = savedItem->ai_bits();
-		item->Animation.Airborne = savedItem->airborne();
+		item->Animation.IsAirborne = savedItem->is_airborne();
 		item->Collidable = savedItem->collidable();
 		item->LookedAt = savedItem->looked_at();
+
+		// Mesh stuff
+		item->MeshBits = savedItem->mesh_bits();
+		item->MeshSwapBits = savedItem->swap_mesh_flags();
+
+		if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8 &&
+			(item->Flags & ONESHOT))
+			item->MeshBits = 0x00100;
+
+		// Now some post-load specific hacks for objects
+		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 && item->ObjectNumber <= ID_PUZZLE_HOLE16 &&
+			(item->Status == ITEM_ACTIVE || item->Status == ITEM_DEACTIVATED))
+		{
+			item->ObjectNumber = (GAME_OBJECT_ID)((int)item->ObjectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
+			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
+		}
+
+		if (obj->floor != nullptr)
+			UpdateBridgeItem(i);
 
 		// Creature data for intelligent items
 		if (item->ObjectNumber != ID_LARA && obj->intelligent && (savedItem->flags() & (TRIGGERED | CODE_BITS | ONESHOT)))
 		{
-			EnableBaddyAI(i, true, false);
+			EnableEntityAI(i, true, false);
 
 			auto creature = GetCreatureInfo(item);
 			auto data = savedItem->data();
@@ -1204,46 +1401,144 @@ bool SaveGame::Load(int slot)
 			creature->Tosspad = savedCreature->tosspad();
 			SetBaddyTarget(i, savedCreature->ai_target_number());
 		}
+		else if (item->Data.is<QuadBikeInfo>())
+		{
+			auto* quadBike = (QuadBikeInfo*)item->Data;
+			auto* savedQuad = (Save::QuadBike*)savedItem->data();
+
+			quadBike->CanStartDrift = savedQuad->can_start_drift();
+			quadBike->DriftStarting = savedQuad->drift_starting();
+			quadBike->EngineRevs = savedQuad->engine_revs();
+			quadBike->ExtraRotation = savedQuad->extra_rotation();
+			quadBike->Flags = savedQuad->flags();
+			quadBike->FrontRot = savedQuad->front_rot();
+			quadBike->LeftVerticalVelocity = savedQuad->left_vertical_velocity();
+			quadBike->MomentumAngle = savedQuad->momentum_angle();
+			quadBike->NoDismount = savedQuad->no_dismount();
+			quadBike->Pitch = savedQuad->pitch();
+			quadBike->RearRot = savedQuad->rear_rot();
+			quadBike->Revs = savedQuad->revs();
+			quadBike->RightVerticalVelocity = savedQuad->right_vertical_velocity();
+			quadBike->SmokeStart = savedQuad->smoke_start();
+			quadBike->TurnRate = savedQuad->turn_rate();
+			quadBike->Velocity = savedQuad->velocity();
+		}
+		else if (item->Data.is<UPVInfo>())
+		{
+			auto* upv = (UPVInfo*)item->Data;
+			auto* savedUpv = (Save::UPV*)savedItem->data();
+
+			upv->TurbineRotation = savedUpv->fan_rot();
+			upv->Flags = savedUpv->flags();
+			upv->HarpoonLeft = savedUpv->harpoon_left();
+			upv->HarpoonTimer = savedUpv->harpoon_timer();
+			upv->TurnRate.y = savedUpv->rot();
+			upv->Velocity = savedUpv->velocity();
+			upv->TurnRate.x = savedUpv->x_rot();
+		}
+		else if (item->Data.is<MinecartInfo>())
+		{
+			auto* minecart = (MinecartInfo*)item->Data;
+			auto* savedMine = (Save::Minecart*)savedItem->data();
+
+			minecart->Flags = savedMine->flags();
+			minecart->FloorHeightFront = savedMine->floor_height_front();
+			minecart->FloorHeightMiddle = savedMine->floor_height_middle();
+			minecart->Gradient = savedMine->gradient();
+			minecart->StopDelay = savedMine->stop_delay();
+			minecart->TurnLen = savedMine->turn_len();
+			minecart->TurnRot = savedMine->turn_rot();
+			minecart->TurnX = savedMine->turn_x();
+			minecart->TurnZ = savedMine->turn_z();
+			minecart->Velocity = savedMine->velocity();
+			minecart->VerticalVelocity = savedMine->vertical_velocity();
+		}
+		else if (item->Data.is<KayakInfo>())
+		{
+			auto* kayak = (KayakInfo*)item->Data;
+			auto* savedKayak = (Save::Kayak*)savedItem->data();
+
+			kayak->CurrentStartWake = savedKayak->flags();
+			kayak->Flags = savedKayak->flags();
+			kayak->Forward = savedKayak->forward();
+			kayak->FrontVerticalVelocity = savedKayak->front_vertical_velocity();
+			kayak->LeftRightPaddleCount = savedKayak->left_right_count();
+			kayak->LeftVerticalVelocity = savedKayak->left_vertical_velocity();
+			kayak->OldPose.Position.x = savedKayak->old_pos()->x_pos();
+			kayak->OldPose.Position.y = savedKayak->old_pos()->y_pos();
+			kayak->OldPose.Position.z = savedKayak->old_pos()->z_pos();
+			kayak->OldPose.Orientation.x = savedKayak->old_pos()->x_rot();
+			kayak->OldPose.Orientation.y = savedKayak->old_pos()->y_rot();
+			kayak->OldPose.Orientation.z = savedKayak->old_pos()->z_rot();
+			kayak->RightVerticalVelocity = savedKayak->right_vertical_velocity();
+			kayak->TrueWater = savedKayak->true_water();
+			kayak->Turn = savedKayak->turn();
+			kayak->TurnRate = savedKayak->turn_rate();
+			kayak->Velocity = savedKayak->velocity();
+			kayak->WakeShade = savedKayak->wake_shade();
+			kayak->WaterHeight = savedKayak->water_height();
+		}
 		else if (savedItem->data_type() == Save::ItemData::Short)
 		{
-			auto data = savedItem->data();
-			auto savedData = (Save::Short*)data;
+			auto* data = savedItem->data();
+			auto* savedData = (Save::Short*)data;
 			item->Data = savedData->scalar();
 		}
 		else if (savedItem->data_type() == Save::ItemData::Int)
 		{
-			auto data = savedItem->data();
-			auto savedData = (Save::Int*)data;
+			auto* data = savedItem->data();
+			auto* savedData = (Save::Int*)data;
 			item->Data = savedData->scalar();
 		}
+	}
 
+	for (int i = 0; i < s->particles()->size(); i++)
+	{
+		auto* particleInfo = s->particles()->Get(i);
+		auto* particle = &Particles[i];
 
-		// Mesh stuff
-		item->MeshBits = savedItem->mesh_bits();
-		item->SwapMeshFlags = savedItem->swap_mesh_flags();
-
-		// Now some post-load specific hacks for objects
-		if (item->ObjectNumber >= ID_PUZZLE_HOLE1 
-			&& item->ObjectNumber <= ID_PUZZLE_HOLE16 
-			&& (item->Status == ITEM_ACTIVE
-				|| item->Status == ITEM_DEACTIVATED))
-		{
-			item->ObjectNumber = (GAME_OBJECT_ID)((int)item->ObjectNumber + ID_PUZZLE_DONE1 - ID_PUZZLE_HOLE1);
-			item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + savedItem->anim_number();
-		}
-
-		if ((item->ObjectNumber >= ID_SMASH_OBJECT1)
-			&& (item->ObjectNumber <= ID_SMASH_OBJECT8)
-			&& (item->Flags & ONESHOT))
-			item->MeshBits = 0x00100;
-
-		if (obj->floor != nullptr)
-			UpdateBridgeItem(i);
+		particle->x = particleInfo->x();
+		particle->y = particleInfo->y();
+		particle->z = particleInfo->z();
+		particle->xVel = particleInfo->x_vel();
+		particle->yVel = particleInfo->y_vel();
+		particle->zVel = particleInfo->z_vel();
+		particle->gravity = particleInfo->gravity();
+		particle->rotAng = particleInfo->rot_ang();
+		particle->flags = particleInfo->flags();
+		particle->sSize = particleInfo->s_size();
+		particle->dSize = particleInfo->d_size();
+		particle->size = particleInfo->size();
+		particle->friction = particleInfo->friction();
+		particle->scalar = particleInfo->scalar();
+		particle->spriteIndex = particleInfo->sprite_index();
+		particle->rotAdd = particleInfo->rot_add();
+		particle->maxYvel = particleInfo->max_y_vel();
+		particle->on = particleInfo->on();
+		particle->sR = particleInfo->s_r();
+		particle->sG = particleInfo->s_g();
+		particle->sB = particleInfo->s_b();
+		particle->dR = particleInfo->d_r();
+		particle->dG = particleInfo->d_g();
+		particle->dB = particleInfo->d_b();
+		particle->r = particleInfo->r();
+		particle->g = particleInfo->g();
+		particle->b = particleInfo->b();
+		particle->colFadeSpeed = particleInfo->col_fade_speed();
+		particle->fadeToBlack = particleInfo->fade_to_black();
+		particle->sLife = particleInfo->s_life();
+		particle->life = particleInfo->life();
+		particle->blendMode = (BLEND_MODES)particleInfo->blend_mode();
+		particle->extras = particleInfo->extras();
+		particle->dynamic = particleInfo->dynamic();
+		particle->fxObj = particleInfo->fx_obj();
+		particle->roomNumber = particleInfo->room_number();
+		particle->nodeNumber = particleInfo->node_number();
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
 	{
-		auto batInfo = s->bats()->Get(i);
+		auto* batInfo = s->bats()->Get(i);
 		auto* bat = &Bats[i];
 
 		bat->On = batInfo->on();
@@ -1275,7 +1570,7 @@ bool SaveGame::Load(int slot)
 
 	for (int i = 0; i < s->spiders()->size(); i++)
 	{
-		auto spiderInfo = s->spiders()->Get(i);
+		auto* spiderInfo = s->spiders()->Get(i);
 		auto* spider = &Spiders[i];
 
 		spider->On = spiderInfo->on();
@@ -1400,7 +1695,7 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Count.NoCheat = s->lara()->control()->count()->no_cheat();
 	Lara.Control.Count.Pose = s->lara()->control()->count()->pose();
 	Lara.Control.Count.PositionAdjust = s->lara()->control()->count()->position_adjust();
-	Lara.Control.Count.RunJump = s->lara()->control()->count()->run_jump();
+	Lara.Control.Count.Run = s->lara()->control()->count()->run_jump();
 	Lara.Control.Count.Death = s->lara()->control()->count()->death();
 	Lara.Control.IsClimbingLadder = s->lara()->control()->is_climbing_ladder();
 	Lara.Control.IsLow = s->lara()->control()->is_low();
@@ -1490,8 +1785,6 @@ bool SaveGame::Load(int slot)
 	Lara.RightArm.Orientation.z = s->lara()->right_arm()->rotation()->z();
 	Lara.Torch.IsLit = s->lara()->torch()->is_lit();
 	Lara.Torch.State = (TorchState)s->lara()->torch()->state();
-	Lara.Control.Minecart.Left = s->lara()->control()->minecart()->left();
-	Lara.Control.Minecart.Right = s->lara()->control()->minecart()->right();
 	Lara.Control.Rope.Segment = s->lara()->control()->rope()->segment();
 	Lara.Control.Rope.Direction = s->lara()->control()->rope()->direction();
 	Lara.Control.Rope.ArcFront = s->lara()->control()->rope()->arc_front();
@@ -1520,7 +1813,6 @@ bool SaveGame::Load(int slot)
 	Lara.Control.Tightrope.TightropeItem = s->lara()->control()->tightrope()->tightrope_item();
 	Lara.Control.Tightrope.TimeOnTightrope = s->lara()->control()->tightrope()->time_on_tightrope();
 	Lara.Control.WaterStatus = (WaterStatus)s->lara()->control()->water_status();
-	Lara.SpasmEffectCount = s->lara()->spasm_effect_count();
 	Lara.SprintEnergy = s->lara()->sprint_energy();
 	Lara.TargetEntity = (s->lara()->target_entity_number() >= 0 ? &g_Level.Items[s->lara()->target_entity_number()] : nullptr);
 	Lara.TargetArmOrient.y = s->lara()->target_arm_angles()->Get(0);

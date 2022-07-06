@@ -47,8 +47,7 @@ bool ShotLara(ItemInfo* item, AI_INFO* AI, BITE_INFO* gun, short extraRotation, 
 			if (hit)
 			{
 				CreatureEffect(item, gun, &GunHit);
-				LaraItem->HitPoints -= damage;
-				LaraItem->HitStatus = true; 
+				DoDamage(LaraItem, damage);
 			}
 			else if (targetable)
 				CreatureEffect(item, gun, &GunMiss);
@@ -94,10 +93,7 @@ short GunHit(int x, int y, int z, short velocity, short yRot, short roomNumber)
 {
 	Vector3Int pos = { 0, 0, 0 };
 	GetLaraJointPosition(&pos, (25 * GetRandomControl()) >> 15);
-
 	DoBloodSplat(pos.x, pos.y, pos.z, (GetRandomControl() & 3) + 3, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-	SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
-
 	return GunShot(x, y, z, velocity, yRot, roomNumber);
 }
 
@@ -114,7 +110,7 @@ bool Targetable(ItemInfo* item, AI_INFO* AI)
 	if (enemy == NULL || enemy->HitPoints <= 0 || !AI->ahead || AI->distance >= pow(MAX_VISIBILITY_DISTANCE, 2))
 		return false;
 
-	if (!enemy->Data.is<CreatureInfo>() && !enemy->Data.is<LaraInfo*>())
+	if (!enemy->Data.is<CreatureInfo>() && !enemy->IsLara())
 		return false;
 
 	auto* bounds = (BOUNDING_BOX*)GetBestFrame(item);

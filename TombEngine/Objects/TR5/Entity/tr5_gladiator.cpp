@@ -39,7 +39,7 @@ void InitialiseGladiator(short itemNumber)
     item->Animation.ActiveState = 1;
 
     if (item->TriggerFlags == 1)
-        item->SwapMeshFlags = -1;
+        item->MeshSwapBits = ALL_JOINT_BITS;
 }
 
 void ControlGladiator(short itemNumber)
@@ -340,12 +340,10 @@ void ControlGladiator(short itemNumber)
 				{
 					if (item->TouchBits & 0x6000)
 					{
+						DoDamage(creature->Enemy, 120);
 						CreatureEffect2(item, &GladiatorBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 120;
-						LaraItem->HitStatus = true;
 					}
 				}
 			}

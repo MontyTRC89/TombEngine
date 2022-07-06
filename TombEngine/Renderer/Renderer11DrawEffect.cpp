@@ -19,7 +19,7 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/weather.h"
 #include "Quad/RenderQuad.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Renderer/RendererSprites.h"
 #include "Game/effects/lightning.h"
 #include "Game/items.h"
@@ -35,11 +35,13 @@ extern DRIP_STRUCT Drips[MAX_DRIPS];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
 extern FIRE_LIST Fires[MAX_FIRE_LIST];
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH]; // offset 0xA31D8
-extern SPARKS Sparks[MAX_SPARKS];
+extern Particle Particles[MAX_PARTICLES];
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-BITE_INFO EnemyBites[9] =
+// TODO: EnemyBites must be eradicated and kept directly in object structs or passed to gunflash functions!
+
+BITE_INFO EnemyBites[12] =
 {
 	{ 20, -95, 240, 13 },
 	{ 48, 0, 180, -11 },
@@ -49,7 +51,10 @@ BITE_INFO EnemyBites[9] =
 	{ -30, -65, 250, 18 },
 	{ 0, -110, 480, 13 },
 	{ -20, -80, 190, -10 },
-	{ 10, -60, 200, 13 }
+	{ 10, -60, 200, 13 },
+	{ 10, -60, 200, 11 },   // Baddy 2
+	{ 20, -60, 400, 7 },    // SAS
+	{ 0, -64, 250, 7 }      // Troops
 };
 
 namespace TEN::Renderer 
@@ -149,7 +154,7 @@ namespace TEN::Renderer
 				AddSpriteBillboard(&m_sprites[spark->def],
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
-								   TO_RAD(spark->rotAng), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
+								   TO_RAD(spark->rotAng << 4), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
 								   BLENDMODE_ADDITIVE, view);
 			}
 		}
@@ -161,98 +166,103 @@ namespace TEN::Renderer
 		for (int k = 0; k < MAX_FIRE_LIST; k++) 
 		{
 			FIRE_LIST* fire = &Fires[k];
-			if (fire->on) {
+			if (fire->on) 
+			{
+				auto fade = fire->on == 1 ? 1.0f : (float)(255 - fire->on) / 255.0f;
+
 				for (int i = 0; i < MAX_SPARKS_FIRE; i++) 
 				{
 					FIRE_SPARKS* spark = &FireSparks[i];
 					if (spark->on)
-						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x, fire->y + spark->y, fire->z + spark->z), 
-																   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
-																   TO_RAD(spark->rotAng), 
+						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
+																   Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
+																   TO_RAD(spark->rotAng << 4),
 																   spark->scalar,
-																   { spark->size * (float)fire->size, spark->size * (float)fire->size }, BLENDMODE_ADDITIVE, view);
+																   { spark->size * fire->size, spark->size * fire->size }, BLENDMODE_ADDITIVE, view);
 				}
 			}
 		}
 	}
 
-	void Renderer11::DrawSparks(RenderView& view) 
+	void Renderer11::DrawParticles(RenderView& view)
 	{
 		Vector3Int nodePos;
 
 		for (int i = 0; i < MAX_NODE; i++)
 			NodeOffsets[i].gotIt = false;
 
-		for (int i = 0; i < MAX_SPARKS; i++) 
+		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
-			SPARKS* spark = &Sparks[i];
-			if (spark->on) 
+			auto particle = &Particles[i];
+			if (particle->on)
 			{
-				if (spark->flags & SP_DEF) 
+				if (particle->flags & SP_DEF)
 				{
-					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
+					Vector3 pos = Vector3(particle->x, particle->y, particle->z);
 
-					if (spark->flags & SP_FX) 
+					if (particle->flags & SP_FX)
 					{
-						FX_INFO* fx = &EffectList[spark->fxObj];
+						FX_INFO* fx = &EffectList[particle->fxObj];
 
 						pos.x += fx->pos.Position.x;
 						pos.y += fx->pos.Position.y;
 						pos.z += fx->pos.Position.z;
 
-						if ((spark->sLife - spark->life) > (rand() & 7) + 4) 
+						if ((particle->sLife - particle->life) > (rand() & 7) + 4)
 						{
-							spark->flags &= ~SP_FX;
-							spark->x = pos.x;
-							spark->y = pos.y;
-							spark->z = pos.z;
+							particle->flags &= ~SP_FX;
+							particle->x = pos.x;
+							particle->y = pos.y;
+							particle->z = pos.z;
 						}
-					} 
-					else if (!(spark->flags & SP_ITEM)) 
-					{
-						pos.x = spark->x;
-						pos.y = spark->y;
-						pos.z = spark->z;
 					}
-					else 
+					else if (!(particle->flags & SP_ITEM))
 					{
-						ItemInfo* item = &g_Level.Items[spark->fxObj];
+						pos.x = particle->x;
+						pos.y = particle->y;
+						pos.z = particle->z;
+					}
+					else
+					{
+						ItemInfo* item = &g_Level.Items[particle->fxObj];
 
-						if (spark->flags & SP_NODEATTACH) {
-							if (NodeOffsets[spark->nodeNumber].gotIt) {
-								nodePos.x = NodeVectors[spark->nodeNumber].x;
-								nodePos.y = NodeVectors[spark->nodeNumber].y;
-								nodePos.z = NodeVectors[spark->nodeNumber].z;
-							} else {
-								nodePos.x = NodeOffsets[spark->nodeNumber].x;
-								nodePos.y = NodeOffsets[spark->nodeNumber].y;
-								nodePos.z = NodeOffsets[spark->nodeNumber].z;
+						if (particle->flags & SP_NODEATTACH) {
+							if (NodeOffsets[particle->nodeNumber].gotIt) {
+								nodePos.x = NodeVectors[particle->nodeNumber].x;
+								nodePos.y = NodeVectors[particle->nodeNumber].y;
+								nodePos.z = NodeVectors[particle->nodeNumber].z;
+							}
+							else {
+								nodePos.x = NodeOffsets[particle->nodeNumber].x;
+								nodePos.y = NodeOffsets[particle->nodeNumber].y;
+								nodePos.z = NodeOffsets[particle->nodeNumber].z;
 
-								int meshNum = NodeOffsets[spark->nodeNumber].meshNum;
+								int meshNum = NodeOffsets[particle->nodeNumber].meshNum;
 								if (meshNum >= 0)
 									GetJointAbsPosition(item, &nodePos, meshNum);
 								else
 									GetLaraJointPosition(&nodePos, -meshNum);
 
-								NodeOffsets[spark->nodeNumber].gotIt = true;
+								NodeOffsets[particle->nodeNumber].gotIt = true;
 
-								NodeVectors[spark->nodeNumber].x = nodePos.x;
-								NodeVectors[spark->nodeNumber].y = nodePos.y;
-								NodeVectors[spark->nodeNumber].z = nodePos.z;
+								NodeVectors[particle->nodeNumber].x = nodePos.x;
+								NodeVectors[particle->nodeNumber].y = nodePos.y;
+								NodeVectors[particle->nodeNumber].z = nodePos.z;
 							}
 
 							pos.x += nodePos.x;
 							pos.y += nodePos.y;
 							pos.z += nodePos.z;
 
-							if (spark->sLife - spark->life > (rand() & 3) + 8) {
-								spark->flags &= ~SP_ITEM;
-								spark->x = pos.x;
-								spark->y = pos.y;
-								spark->z = pos.z;
+							if (particle->sLife - particle->life > (rand() & 3) + 8)
+							{
+								particle->flags &= ~SP_ITEM;
+								particle->x = pos.x;
+								particle->y = pos.y;
+								particle->z = pos.z;
 							}
-						} 
-						else 
+						}
+						else
 						{
 							pos.x += item->Pose.Position.x;
 							pos.y += item->Pose.Position.y;
@@ -260,24 +270,24 @@ namespace TEN::Renderer
 						}
 					}
 
-					AddSpriteBillboard(&m_sprites[spark->def],
-									   pos,
-									   Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f),
-									   TO_RAD(spark->rotAng), spark->scalar, 
-									   {spark->size, spark->size},
-						BLENDMODE_ADDITIVE, view);
-				} 
-				else 
+					AddSpriteBillboard(&m_sprites[particle->spriteIndex],
+						pos,
+						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
+						TO_RAD(particle->rotAng << 4), particle->scalar,
+						{ particle->size, particle->size },
+						particle->blendMode, view);
+				}
+				else
 				{
-					Vector3 pos = Vector3(spark->x, spark->y, spark->z);
-					Vector3 v = Vector3(spark->xVel, spark->yVel, spark->zVel);
+					Vector3 pos = Vector3(particle->x, particle->y, particle->z);
+					Vector3 v = Vector3(particle->xVel, particle->yVel, particle->zVel);
 					v.Normalize();
-					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], 
-						pos, 
-						Vector4(spark->r / 255.0f, spark->g / 255.0f, spark->b / 255.0f, 1.0f), 
-						TO_RAD(spark->rotAng), 
-						spark->scalar, 
-						Vector2(4, spark->size), BLENDMODE_ADDITIVE, v, view);
+					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
+						pos,
+						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
+						TO_RAD(particle->rotAng << 4),
+						particle->scalar,
+						Vector2(4, particle->size), particle->blendMode, v, view);
 				}
 			}
 		}
@@ -337,7 +347,7 @@ namespace TEN::Renderer
 					x2Outer += splash.x;
 					z2Outer = outerRadius * cos(alpha * j * PI / 180);
 					z2Outer += splash.z;
-					addSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase], 
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
 								Vector3(xOuter, yOuter, zOuter), 
 								Vector3(x2Outer, yOuter, z2Outer), 
 								Vector3(x2Inner, yInner, z2Inner), 
@@ -501,7 +511,7 @@ namespace TEN::Renderer
 					p2 = Vector3::Transform(p2, rotationMatrix);
 					p3 = Vector3::Transform(p3, rotationMatrix);
 
-					addSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
+					AddSprite3D(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_SPLASH],
 								pos + p1,
 								pos + p2,
 								pos + p3,
@@ -531,7 +541,7 @@ namespace TEN::Renderer
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
-								   TO_RAD(blood->rotAng), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
+								   TO_RAD(blood->rotAng << 4), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
 								   BLENDMODE_ADDITIVE, view);
 			}
 		}
@@ -546,6 +556,14 @@ namespace TEN::Renderer
 
 			switch (p.Type)
 			{
+			case WeatherType::None:
+				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+					p.Position,
+					Vector4(1.0f, 1.0f, 1.0f, p.Transparency()),
+					0.0f, 1.0f, Vector2(p.Size),
+					BLENDMODE_ADDITIVE, view);
+				break;
+
 			case WeatherType::Snow:
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
 					p.Position,
@@ -592,7 +610,7 @@ namespace TEN::Renderer
 		for (int j = 0; j < item->LightsToDraw.size(); j++)
 			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		short length = 0;
 		short zOffset = 0;
@@ -634,8 +652,17 @@ namespace TEN::Renderer
 				break;
 			}
 
-			ObjectInfo* flashObj = &Objects[ID_GUN_FLASH];
-			RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
+			// Use MP5 flash if available
+			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
+			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
+			{
+				gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
+				length += 20;
+				zOffset += 10;
+			}
+
+			ObjectInfo* flashObj = &Objects[gunflash];
+			RendererObject& flashMoveable = *m_moveableObjects[gunflash];
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
 			for (auto& flashBucket : flashMesh->buckets) 
@@ -656,7 +683,7 @@ namespace TEN::Renderer
 
 						m_stItem.World = world;
 						m_cbItem.updateData(m_stItem, m_context.Get());
-						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
@@ -669,7 +696,7 @@ namespace TEN::Renderer
 
 						m_stItem.World = world;
 						m_cbItem.updateData(m_stItem, m_context.Get());
-						m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
@@ -701,6 +728,8 @@ namespace TEN::Renderer
 					if (!creature->FiredWeapon)
 						continue;
 				}
+				else
+					continue;
 
 				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
@@ -712,7 +741,7 @@ namespace TEN::Renderer
 				for (int j = 0; j < item->LightsToDraw.size(); j++)
 					memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 				m_cbLights.updateData(m_stLights, m_context.Get());
-				m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+				BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 				SetBlendMode(BLENDMODE_ADDITIVE);
 				
@@ -749,7 +778,7 @@ namespace TEN::Renderer
 
 							m_stItem.World = world;
 							m_cbItem.updateData(m_stItem, m_context.Get());
-							m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+							BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 							DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 						}
@@ -776,64 +805,10 @@ namespace TEN::Renderer
 			auto spriteIndex = Objects[ID_MISC_SPRITES].meshIndex + 1 + (int)footprint.RightFoot;
 
 			if (footprint.Active && g_Level.Sprites.size() > spriteIndex)
-				addSprite3D(&m_sprites[spriteIndex], 
+				AddSprite3D(&m_sprites[spriteIndex],
 					footprint.Position[0], footprint.Position[1], footprint.Position[2], footprint.Position[3], 
 					Vector4(footprint.Opacity), 0, 1, { 1,1 }, BLENDMODE_SUBTRACTIVE, view);
 		}
-	}
-
-	void Renderer11::DrawUnderwaterDust(RenderView& view) 
-	{
-		if (m_firstUnderwaterDustParticles) {
-			for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++)
-				m_underwaterDustParticles[i].Reset = true;
-		}
-
-		for (int i = 0; i < NUM_UNDERWATER_DUST_PARTICLES; i++) 
-		{
-			RendererUnderwaterDustParticle* dust = &m_underwaterDustParticles[i];
-
-			if (dust->Reset) {
-				dust->X = LaraItem->Pose.Position.x + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Y = LaraItem->Pose.Position.y + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-				dust->Z = LaraItem->Pose.Position.z + rand() % UNDERWATER_DUST_PARTICLES_RADIUS - UNDERWATER_DUST_PARTICLES_RADIUS / 2.0f;
-
-				// Check if water room
-				short roomNumber = Camera.pos.roomNumber;
-				FloorInfo* floor = GetFloor(dust->X, dust->Y, dust->Z, &roomNumber);
-				if (!IsRoomUnderwater(roomNumber))
-					continue;
-
-				if (!IsInRoom(dust->X, dust->Y, dust->Z, roomNumber)) 
-				{
-					dust->Reset = true;
-					continue;
-				}
-
-				dust->Life = 0;
-				dust->Reset = false;
-			}
-
-			dust->Life++;
-			byte color = (dust->Life > 16 ? 32 - dust->Life : dust->Life) * 4;
-
-			AddSpriteBillboard(
-				&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST], 
-				Vector3(dust->X, dust->Y, dust->Z),
-				Vector4(color / 255.0f, color / 255.0f, color / 255.0f, 1.0f), 
-				0.0f,
-				1.0f, 
-				{ 24, 24 },
-				BLENDMODE_ADDITIVE,
-				view);
-
-			if (dust->Life >= 32)
-				dust->Reset = true;
-		}
-
-		m_firstUnderwaterDustParticles = false;
-
-		return;
 	}
 
 	void Renderer11::DrawSprites(RenderView& view)
@@ -859,8 +834,8 @@ namespace TEN::Renderer
 
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
-				Vector3 cameraUp = Vector3(View._12, View._22, View._32);
-				spriteMatrix = scale * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32) ;
+				spriteMatrix = scale * Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 			}
 			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
 			{
@@ -1096,7 +1071,7 @@ namespace TEN::Renderer
 		m_numSpritesTransparentDrawCalls++;
 	}
 
-	void Renderer11::DrawEffect(RenderView& view,RendererEffect* effect, bool transparent) 
+	void Renderer11::DrawEffect(RenderView& view, RendererEffect* effect, bool transparent) 
 	{
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
@@ -1113,13 +1088,13 @@ namespace TEN::Renderer
 		Matrix matrices[1] = { Matrix::Identity };
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
 		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
 		m_stLights.NumLights = effect->Lights.size();
 		for (int j = 0; j < effect->Lights.size(); j++)
 			memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 
 		if (transparent)
 		{
@@ -1171,7 +1146,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DrawDebris(RenderView& view,bool transparent)
+	void Renderer11::DrawDebris(RenderView& view, bool transparent)
 	{		
 		extern vector<DebrisFragment> DebrisFragments;
 		vector<RendererVertex> vertices;
@@ -1188,7 +1163,7 @@ namespace TEN::Renderer
 				m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
 				m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
 
-				if (!deb->isStatic) 
+				if (deb->isStatic) 
 				{
 					BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[deb->mesh.tex]), SAMPLER_LINEAR_CLAMP);
 				} 
@@ -1209,7 +1184,7 @@ namespace TEN::Renderer
 				m_stStatic.World = world;
 				m_stStatic.Color = Vector4::One;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				m_context->VSSetConstantBuffers(1, 1, m_cbStatic.get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 				RendererVertex vtx0;
 				vtx0.Position = deb->mesh.Positions[0];
@@ -1255,7 +1230,7 @@ namespace TEN::Renderer
 		using TEN::Effects::Spark::SparkParticle;
 		using TEN::Effects::Spark::SparkParticles;
 
-		extern std::array<SparkParticle, 64> SparkParticles;
+		extern std::array<SparkParticle, 128> SparkParticles;
 
 		for (int i = 0; i < SparkParticles.size(); i++) 
 		{
@@ -1263,7 +1238,12 @@ namespace TEN::Renderer
 			if (!s.active) continue;
 			Vector3 v;
 			s.velocity.Normalize(v);
-			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, s.color, 0, 1, { s.width, s.height }, BLENDMODE_ADDITIVE, -v, view);
+
+			float normalizedLife = s.age / s.life;
+			auto height = Lerp(1.0f, 0.0f, normalizedLife);
+			auto color = Vector4::Lerp(s.sourceColor, s.destinationColor, normalizedLife);
+
+			AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex], s.pos, color, 0, 1, { s.width, s.height * height }, BLENDMODE_ADDITIVE, -v, view);
 		}
 	}
 

@@ -38,11 +38,9 @@ void ControlSpikyWall(short itemNumber)
 
 	if (item->TouchBits)
 	{
-		LaraItem->HitPoints -= 15;
-		LaraItem->HitStatus = true;
-
+		DoDamage(LaraItem, 15);
 		DoLotsOfBlood(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y - CLICK(2), LaraItem->Pose.Position.z, 4, item->Pose.Orientation.y, LaraItem->RoomNumber, 3);
-		item->TouchBits = 0;
+		item->TouchBits = NO_JOINT_BITS;
 
 		SoundEffect(SFX_TR4_LARA_GRABFEET, &item->Pose);
 	}

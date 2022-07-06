@@ -4,11 +4,13 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FloorInfo;
+class FloorInfo;
 struct MESH_INFO;
 
 constexpr auto MAX_COLLIDED_OBJECTS = 1024;
 constexpr auto ITEM_RADIUS_YMAX = SECTOR(3);
+
+constexpr auto VEHICLE_COLLISION_TERMINAL_VELOCITY = 30;
 
 extern BOUNDING_BOX GlobalCollisionBounds;
 extern ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
@@ -26,7 +28,7 @@ struct OBJECT_COLLISION_BOUNDS
 };
 
 void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, int flag2);
+bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara);
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll);
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll);
 

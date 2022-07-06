@@ -1,6 +1,8 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/winmain.h"
+#include <filesystem>
+#include <codecvt>
 
 namespace TEN::Renderer 
 {
@@ -40,9 +42,9 @@ namespace TEN::Renderer
 
 		InitialiseScreen(width, height, windowed, WindowsHandle, true);
 
-		ScreenWidth = width;
-		ScreenHeight = height;
-		Windowed = windowed;
+		m_screenWidth = width;
+		m_screenHeight = height;
+		m_windowed = windowed;
 	}
 
 	std::string Renderer11::GetDefaultAdapterName()
@@ -66,5 +68,18 @@ namespace TEN::Renderer
 		dxgiFactory->Release();
 		
 		return std::string(videoCardDescription);
+	}
+
+	void Renderer11::SetTextureOrDefault(Texture2D& texture, std::wstring path)
+	{
+		texture = Texture2D();
+
+		if (std::filesystem::exists(path))
+			texture = Texture2D(m_device.Get(), path);
+		else
+		{
+			std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+			TENLog("Texture file not found: " + converter.to_bytes(path), LogLevel::Warning);
+		}
 	}
 }

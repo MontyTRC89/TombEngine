@@ -33,17 +33,20 @@ namespace TEN::Renderer
 		ClearSceneItems();
 
 		m_meshPointersToMesh.clear();
-		m_moveableObjects.clear();
-		m_staticObjects.clear();
-		m_sprites.clear();
-		m_rooms.clear();
-		m_roomTextures.clear();
-		m_moveablesTextures.clear();
-		m_staticsTextures.clear();
-		m_spritesTextures.clear();
-		m_animatedTextures.clear();
-		m_animatedTextureSets.clear();
-
+		m_moveableObjects.resize(0);
+		m_staticObjects.resize(0);
+		m_sprites.resize(0);
+		m_rooms.resize(0);
+		m_roomTextures.resize(0);
+		m_moveablesTextures.resize(0);
+		m_staticsTextures.resize(0);
+		m_spritesTextures.resize(0);
+		m_animatedTextures.resize(0);
+		m_animatedTextureSets.resize(0);
+		for (auto& mesh : m_meshes) {
+			delete mesh;
+		}
+		m_meshes.resize(0);
 		for (auto& item : m_items)
 		{
 			item.PreviousRoomNumber = NO_ROOM;
@@ -444,9 +447,9 @@ namespace TEN::Renderer
 	{
 		D3D11_RECT rects;
 		rects.left = s.left;
-		rects.top = ScreenHeight - s.top;
+		rects.top = m_screenHeight - s.top;
 		rects.right = s.right;
-		rects.bottom = ScreenHeight - s.bottom;
+		rects.bottom = m_screenHeight - s.bottom;
 
 		m_context->RSSetScissorRects(1, &rects);
 	}
@@ -455,9 +458,9 @@ namespace TEN::Renderer
 	{
 		D3D11_RECT rects[1];
 		rects[0].left = 0;
-		rects[0].right = ScreenWidth;
+		rects[0].right = m_screenWidth;
 		rects[0].top = 0;
-		rects[0].bottom = ScreenHeight;
+		rects[0].bottom = m_screenHeight;
 
 		m_context->RSSetScissorRects(1, rects);
 	}

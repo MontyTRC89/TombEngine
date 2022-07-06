@@ -138,8 +138,6 @@ void MissileControl(short itemNumber)
 	}
 	else if (ItemNearLara((PHD_3DPOS*)fx, 200))
 	{
-		LaraItem->HitStatus = true;
-		
 		if (fx->flag1)
 		{
 			if (fx->flag1 == 1)
@@ -150,8 +148,8 @@ void MissileControl(short itemNumber)
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 64, 0, 128, 64, 24, 0, 1);
 				fx->pos.Position.y -= 128;
 				TriggerShockwave((PHD_3DPOS*)fx, 48, 256, 48, 0, 128, 64, 24, 0, 1);
-				LaraItem->HitPoints -= 200;			
 				KillEffect(itemNumber);
+				DoDamage(LaraItem, 200);
 			}
 			else
 			{
@@ -159,9 +157,9 @@ void MissileControl(short itemNumber)
 				{
 					// IMP hit effect
 					ExplodeFX(fx, 0, 32);
-					LaraItem->HitPoints -= 50;
+					DoDamage(LaraItem, 50);
 					DoBloodSplat(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, (GetRandomControl() & 3) + 2, LaraItem->Pose.Orientation.y, LaraItem->RoomNumber);
-					SoundEffect(SFX_TR5_IMP_STONEHIT, &fx->pos);
+					SoundEffect(SFX_TR5_IMP_STONE_HIT, &fx->pos);
 					SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 				}
 				
@@ -174,7 +172,7 @@ void MissileControl(short itemNumber)
 			TriggerExplosionSparks(x, y, z, 3, -2, 0, fx->roomNumber);
 			TriggerShockwave((PHD_3DPOS*)fx, 48, 240, 48, 0, 96, 128, 24, 0, 0);
 			if (LaraItem->HitPoints >= 500)
-				LaraItem->HitPoints -= 300;
+				DoDamage(LaraItem, 300);
 			else
 				LaraBurn(LaraItem);
 			KillEffect(itemNumber);

@@ -15,9 +15,11 @@
 #include "Objects/TR1/Entity/tr1_natla.h" // OK
 #include "Objects/TR1/Entity/tr1_giant_mutant.h" // OK
 #include "Objects/TR1/Entity/tr1_wolf.h" // OK
-#include "Objects/TR1/Entity/tr1_bigrat.h" // OK
+#include "Objects/TR1/Entity/tr1_big_rat.h" // OK
 #include "Objects/TR1/Entity/tr1_centaur.h"
 #include "Objects/Utils/object_helper.h"
+
+using namespace TEN::Entities::TR1;
 
 static void StartEntity(ObjectInfo* obj)
 {
@@ -27,7 +29,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseWolf;
 		obj->control = WolfControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 6;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 375;
@@ -47,7 +49,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->control = BearControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 20;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 500;
@@ -68,7 +70,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->HitPoints = 22;
 		obj->hitEffect = HIT_BLOOD;
-		obj->shadowSize = 128;
+		obj->castsShadow = true;
 		obj->pivotLength = 250;
 		obj->radius = 340;
 		obj->intelligent = true;
@@ -85,7 +87,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseBigRat;
 		obj->control = BigRatControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 5;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 200;
@@ -107,7 +109,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->hitEffect = HIT_BLOOD;
 		obj->control = NatlaControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 400;
 		obj->radius = 204;
 		obj->intelligent = true;
@@ -124,7 +126,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->collision = CreatureCollision;
 		obj->control = GiantMutantControl;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 500;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 341;
@@ -146,7 +148,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->collision = CreatureCollision;
 		obj->control = DoppelgangerControl;
 		//obj->drawRoutine = DrawEvilLara;
-		obj->shadowSize = UNIT_SHADOW / 2;
+		obj->castsShadow = true;
 		obj->HitPoints = 1000;
 		obj->hitEffect = HIT_BLOOD;
 		obj->radius = 102;
@@ -162,7 +164,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->initialise = InitialiseCreature;
 		obj->control = CentaurControl;
 		obj->collision = CreatureCollision;
-		obj->shadowSize = UNIT_SHADOW / 3;
+		obj->castsShadow = true;
 		obj->HitPoints = 120;
 		obj->hitEffect = HIT_BLOOD;
 		obj->pivotLength = 400;

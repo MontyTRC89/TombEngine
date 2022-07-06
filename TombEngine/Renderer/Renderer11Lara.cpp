@@ -219,6 +219,13 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			tempItem.Animation.FrameNumber = Lara.LeftArm.FrameNumber;
 
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
+
+			// HACK: Mask head and torso only when pulling out the flare.
+			if (!Lara.Control.IsLow &&
+				tempItem.Animation.AnimNumber > Objects[ID_LARA_FLARE_ANIM].animIndex + 1 &&
+				tempItem.Animation.AnimNumber < Objects[ID_LARA_FLARE_ANIM].animIndex + 4)
+				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
+
 			frac = GetFrame(&tempItem, framePtr, &rate);
 			UpdateAnimation(item, laraObj, framePtr, frac, rate, mask);
 
@@ -280,8 +287,8 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 	m_cbItem.updateData(m_stItem, m_context.Get());
-	m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-	m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 	if (!shadowMap)
 	{
@@ -291,13 +298,15 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 	}
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
+		
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
 		DrawMoveableMesh(item, mesh, room, k, transparent);
+
 	}
 
 	DrawLaraHolsters(transparent);
@@ -331,8 +340,8 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
 		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 		{

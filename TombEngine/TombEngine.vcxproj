@@ -47,16 +47,16 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\bass;$(SolutionDir)TombEngine\Libs;$(SolutionDir)TombEngine\Libs\zlib;$(SolutionDir)TombEngine\Libs\flatbuffers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\bass;$(SolutionDir)TombEngine\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\ois</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\bass;$(SolutionDir)TombEngine\Libs;$(SolutionDir)TombEngine\Libs\zlib;$(SolutionDir)TombEngine\Libs\flatbuffers;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\bass;$(SolutionDir)TombEngine\Libs\boost\libs;$(SolutionDir)Scripting\bin\$(Configuration)</LibraryPath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib\dll32;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass</LibraryPath>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -74,14 +74,14 @@
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <BufferSecurityCheck>false</BufferSecurityCheck>
-      <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:W0 /external:anglebrackets</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlogd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlogd.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
@@ -123,14 +123,14 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <FloatingPointModel>Fast</FloatingPointModel>
       <StringPooling>true</StringPooling>
-      <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:W0 /external:anglebrackets</AdditionalOptions>
+      <AdditionalOptions>/Zc:__cplusplus /experimental:external /external:anglebrackets</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft Visual Studio\2017\Enterprise\VC\Tools\MSVC\14.15.26726\lib\onecore\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlog.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlog.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <TargetMachine>MachineX86</TargetMachine>
@@ -178,7 +178,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Game\effects\lara_fx.h" />
     <ClInclude Include="Objects\Generic\Traps\dart_emitter.h" />
-    <ClInclude Include="Objects\TR2\Vehicles\boat_info.h" />
+    <ClInclude Include="Objects\TR2\Vehicles\speedboat_info.h" />
     <ClInclude Include="Game\itemdata\creature_info.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
     <ClInclude Include="Game\Lara\lara_basic.h" />
@@ -193,6 +193,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_slide.h" />
     <ClInclude Include="Game\Lara\lara_struct.h" />
     <ClInclude Include="Game\Lara\lara_tests.h" />
+    <ClInclude Include="Objects\Utils\VehicleHelpers.h" />
     <ClInclude Include="Renderer\ConstantBuffers\AlphaTestBuffer.h" />
     <ClInclude Include="Renderer\ConstantBuffers\PostProcessBuffer.h" />
     <ClInclude Include="Renderer\Structures\RendererBone.h" />
@@ -201,6 +202,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererVideoAdapter.h" />
+    <ClInclude Include="Renderer\Texture2DArray\Texture2DArray.h" />
     <ClInclude Include="Scripting\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
@@ -254,7 +256,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\memory\MemoryPoolAllocator.h" />
     <ClInclude Include="Specific\memory\Vector.h" />
     <ClInclude Include="Game\gui.h" />
-    <ClInclude Include="Game\particle\SimpleParticle.h" />
+    <ClInclude Include="Game\effects\simple_particle.h" />
     <ClInclude Include="Renderer\TextureBase.h" />
     <ClInclude Include="Renderer\RendererTransparentFace.h" />
     <ClInclude Include="Scripting\GameScriptFog.h" />
@@ -286,11 +288,11 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Generic\Switches\turn_switch.h" />
     <ClInclude Include="Objects\Generic\Switches\underwater_switch.h" />
     <ClInclude Include="Objects\TR2\Vehicles\skidoo_info.h" />
-    <ClInclude Include="Objects\TR3\Vehicles\biggun_info.h" />
+    <ClInclude Include="Objects\TR3\Vehicles\big_gun_info.h" />
     <ClInclude Include="Objects\TR3\Vehicles\kayak_info.h" />
     <ClInclude Include="Objects\TR3\Vehicles\minecart_info.h" />
-    <ClInclude Include="Objects\TR3\Vehicles\quad_info.h" />
-    <ClInclude Include="Objects\TR3\Vehicles\rubberboat_info.h" />
+    <ClInclude Include="Objects\TR3\Vehicles\quad_bike_info.h" />
+    <ClInclude Include="Objects\TR3\Vehicles\rubber_boat_info.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv_info.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_wraith_info.h" />
     <ClInclude Include="Objects\TR4\Vehicles\jeep_info.h" />
@@ -328,7 +330,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
     <ClInclude Include="Objects\Effects\tr5_electricity.h" />
-    <ClInclude Include="Objects\TR1\Entity\tr1_bigrat.h" />
+    <ClInclude Include="Objects\TR1\Entity\tr1_big_rat.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_baboon.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mutant.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_lara_double.h" />
@@ -381,11 +383,11 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\boss.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_civvy.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_cobra.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_fishemitter.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_fish_emitter.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_flamethrower.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_monkey.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_mpgun.h" />
-    <ClInclude Include="Objects\TR3\Entity\tr3_mpstick.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_mp_gun.h" />
+    <ClInclude Include="Objects\TR3\Entity\tr3_mp_stick.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_raptor.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_scuba.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_shiva.h" />
@@ -395,7 +397,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR3\Entity\tr3_trex.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_tribesman.h" />
     <ClInclude Include="Objects\TR3\fish.h" />
-    <ClInclude Include="Objects\TR3\Vehicles\rubberboat.h" />
+    <ClInclude Include="Objects\TR3\Vehicles\rubber_boat.h" />
     <ClInclude Include="Objects\TR4\Floor\tr4_burningfloor.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_cog.h" />
     <ClInclude Include="Objects\TR4\Trap\tr4_birdblade.h" />
@@ -452,27 +454,27 @@ CALL gen.bat</Command>
     <ClInclude Include="Objects\TR4\Entity\tr4_guide.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_harpy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_horseman.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_jeanyves.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_jean_yves.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_knight_templar.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_beetle_swarm.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_mummy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sas.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_sentrygun.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_sentry_gun.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_skeleton.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_smallscorpion.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_small_scorpion.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_sphinx.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_troops.h" />
-    <ClInclude Include="Objects\TR4\Entity\tr4_wildboar.h" />
+    <ClInclude Include="Objects\TR4\Entity\tr4_wild_boar.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_wraith.h" />
     <ClInclude Include="Objects\TR4\tr4_objects.h" />
     <ClInclude Include="Objects\TR5\tr5_objects.h" />
-    <ClInclude Include="Objects\TR2\Vehicles\boat.h" />
-    <ClInclude Include="Objects\TR3\Vehicles\biggun.h" />
+    <ClInclude Include="Objects\TR2\Vehicles\speedboat.h" />
+    <ClInclude Include="Objects\TR3\Vehicles\big_gun.h" />
     <ClInclude Include="Objects\TR4\Vehicles\jeep.h" />
     <ClInclude Include="Objects\TR3\Vehicles\kayak.h" />
     <ClInclude Include="Objects\TR3\Vehicles\minecart.h" />
     <ClInclude Include="Objects\TR4\Vehicles\motorbike.h" />
-    <ClInclude Include="Objects\TR3\Vehicles\quad.h" />
+    <ClInclude Include="Objects\TR3\Vehicles\quad_bike.h" />
     <ClInclude Include="Objects\TR2\Vehicles\skidoo.h" />
     <ClInclude Include="Objects\TR3\Vehicles\upv.h" />
     <ClInclude Include="Renderer\ConstantBuffers\CameraMatrixBuffer.h" />
@@ -612,7 +614,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\lightning.cpp" />
     <ClCompile Include="Game\misc.cpp" />
     <ClCompile Include="Game\gui.cpp" />
-    <ClCompile Include="Game\particle\SimpleParticle.cpp" />
+    <ClCompile Include="Game\effects\simple_particle.cpp" />
     <ClCompile Include="Game\pickup\pickup_ammo.cpp" />
     <ClCompile Include="Game\pickup\pickup_consumable.cpp" />
     <ClCompile Include="Game\pickup\pickup_key_items.cpp" />
@@ -627,6 +629,9 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Game\effects\lara_fx.cpp" />
     <ClCompile Include="Objects\Generic\Traps\dart_emitter.cpp" />
+    <ClCompile Include="Objects\Utils\VehicleHelpers.cpp" />
+    <ClCompile Include="Renderer\Renderer11DrawMenu.cpp" />
+    <ClCompile Include="Renderer\Texture2DArray\Texture2DArray.cpp" />
     <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
@@ -704,7 +709,7 @@ CALL gen.bat</Command>
     </ClCompile>
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
     <ClCompile Include="Objects\Effects\tr5_electricity.cpp" />
-    <ClCompile Include="Objects\TR1\Entity\tr1_bigrat.cpp" />
+    <ClCompile Include="Objects\TR1\Entity\tr1_big_rat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_baboon.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mutant.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_lara_double.cpp" />
@@ -736,9 +741,9 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_sophia.cpp" />
     <ClCompile Include="Objects\TR3\tr3_objects.cpp" />
-    <ClCompile Include="Objects\TR3\Vehicles\rubberboat.cpp" />
+    <ClCompile Include="Objects\TR3\Vehicles\rubber_boat.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_ahmet.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_sentrygun.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_sentry_gun.cpp" />
     <ClCompile Include="Objects\TR4\Floor\tr4_burningfloor.cpp" />
     <ClCompile Include="Objects\TR4\Trap\tr4_cog.cpp" />
     <ClCompile Include="Objects\TR4\tr4_objects.cpp" />
@@ -784,27 +789,27 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR5\Entity\tr5_submarine.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_willowwisp.cpp" />
     <ClCompile Include="Objects\TR5\tr5_objects.cpp" />
-    <ClCompile Include="Objects\TR2\Vehicles\boat.cpp" />
+    <ClCompile Include="Objects\TR2\Vehicles\speedboat.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_dragon.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_spear_guardian.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_sword_guardian.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_dualrevolver.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_flamethrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_machinegun.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_fishemitter.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_fish_emitter.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_flamethrower.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_shiva.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_worker_shotgun.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_horseman.cpp" />
-    <ClCompile Include="Objects\TR3\Vehicles\biggun.cpp" />
+    <ClCompile Include="Objects\TR3\Vehicles\big_gun.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\jeep.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\kayak.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_knifethrower.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_mercenary.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\minecart.cpp" />
     <ClCompile Include="Objects\TR2\Entity\tr2_monk.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_mpgun.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\tr3_mpstick.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_mp_gun.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\tr3_mp_stick.cpp" />
     <ClCompile Include="Objects\TR2\Vehicles\skidoo.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_tony.cpp" />
     <ClCompile Include="Objects\TR1\Entity\tr1_ape.cpp" />
@@ -828,9 +833,9 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_crocodile.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_harpy.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_beetle_swarm.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_smallscorpion.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_small_scorpion.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sphinx.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_wildboar.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_wild_boar.cpp" />
     <ClCompile Include="Objects\TR3\Vehicles\upv.cpp" />
     <ClCompile Include="Renderer\Frustum.cpp" />
     <ClCompile Include="Renderer\IndexBuffer\IndexBuffer.cpp">
@@ -858,7 +863,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Renderer\RenderTargetCubeArray\RenderTargetCubeArray.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_demigod.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_guide.cpp" />
-    <ClCompile Include="Objects\TR4\Entity\tr4_jeanyves.cpp" />
+    <ClCompile Include="Objects\TR4\Entity\tr4_jean_yves.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_knight_templar.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_troops.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_wraith.cpp" />
@@ -897,7 +902,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Objects\TR4\Entity\tr4_baddy.cpp" />
     <ClCompile Include="Objects\TR4\Vehicles\motorbike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_mummy.cpp" />
-    <ClCompile Include="Objects\TR3\Vehicles\quad.cpp" />
+    <ClCompile Include="Objects\TR3\Vehicles\quad_bike.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_sas.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_scuba.cpp" />
     <ClCompile Include="Objects\TR4\Entity\tr4_skeleton.cpp" />
@@ -960,7 +965,6 @@ CALL gen.bat</Command>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Banner.bmp" />
     <Image Include="ten.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -1039,27 +1043,47 @@ CALL gen.bat</Command>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
     </None>
-    <None Include="Shaders\DX11_Inventory.fx">
+    <FxCompile Include="Shaders\DX11_Inventory.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
-    </None>
-    <None Include="Shaders\DX11_Items.fx">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\DX11_Items.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
-    </None>
-    <None Include="Shaders\DX11_Rooms.fx">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\DX11_Rooms.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
       <FileType>Document</FileType>
-    </None>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.1</ShaderModel>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SHADOW_MAP_SIZE=512</PreprocessorDefinitions>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.1</ShaderModel>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SHADOW_MAP_SIZE=512</PreprocessorDefinitions>
+    </FxCompile>
     <None Include="Shaders\DX11_ShadowMap.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

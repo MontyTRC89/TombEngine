@@ -174,7 +174,7 @@ namespace TEN::Entities::TR4
 
 			case 1:
 				item->ItemFlags[0] += 37;
-				item->MeshBits = -147457;
+				item->MeshBits = 0xFFFDBFFF;
 				creature->MaxTurn = item->ItemFlags[0] / 16;
 
 				if (item->ItemFlags[0] > 8704)
@@ -369,15 +369,15 @@ namespace TEN::Entities::TR4
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
 			if (item->Pose.Position.y < item->Floor)
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 			else
 			{
 				item->Pose.Position.y = item->Floor;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.VerticalVelocity = 0;
 			}
 
-			SoundEffect(SFX_TR4_JEEP_MOVE, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / SECTOR(8)); // TODO: Check actual sound!
+			SoundEffect(SFX_TR4_VEHICLE_JEEP_MOVING, &item->Pose, SoundEnvironment::Land, 1.0f + (float)item->ItemFlags[0] / SECTOR(8)); // TODO: Check actual sound!
 		}
 	}
 }

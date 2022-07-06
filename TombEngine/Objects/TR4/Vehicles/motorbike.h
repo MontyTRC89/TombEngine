@@ -1,11 +1,15 @@
 #pragma once
-#include "Game/items.h"
-#include "Game/collision/collide_room.h"
+#include "Objects/Utils/VehicleHelpers.h"
 
+struct CollisionInfo;
+struct ItemInfo;
 
+namespace TEN::Entities::Vehicles
+{
+	void InitialiseMotorbike(short itemNumber);
 
-void InitialiseMotorbike(short itemNumber);
-void MotorbikeCollision(short itemNumber, ItemInfo* laraitem, CollisionInfo* coll);
-int MotorbikeControl(void);
-void DrawMotorbike(ItemInfo* item);
-void DrawMotorbikeEffect(ItemInfo* item);
+	void MotorbikePlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void DoMotorbikeMount(ItemInfo* motorbikeItem, ItemInfo* laraItem, VehicleMountType mountType);
+
+	bool MotorbikeControl(ItemInfo* laraItem, CollisionInfo* coll);
+}

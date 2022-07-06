@@ -32,7 +32,7 @@ table Item {
 	triggered: bool;
 	active: bool;
 	status: int32;
-	airborne: bool;
+	is_airborne: bool;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;
@@ -196,11 +196,6 @@ table SubsuitControlData {
 	hit_count: uint32;
 }
 
-table MinecartControlData {
-	left: bool;
-	right: bool;
-}
-
 table LaraControlData {
 	move_angle: int32;
 	turn_rate: int32;
@@ -222,7 +217,6 @@ table LaraControlData {
 	rope: RopeControlData;
 	tightrope: TightropeControlData;
 	subsuit: SubsuitControlData;
-	minecart: MinecartControlData;
 }
 
 table Lara {
@@ -248,7 +242,6 @@ table Lara {
 	extra_anim: int32;
 	hit_frame: int32;
 	hit_direction: int32;
-	spasm_effect_count: uint32;
 	projected_floor_height: int32;
 	target_facing_angle: int32;
 	water_surface_dist: int32;
@@ -282,6 +275,46 @@ table Sink {
 table StaticMeshInfo {
 	room_number: int32;
 	flags: int32;
+}
+
+table ParticleInfo {
+	x: int32;
+	y: int32;
+	z: int32;
+	x_vel: int32;
+	y_vel: int32;
+	z_vel: int32;
+	gravity: int32;
+	rot_ang: int32;
+	flags: int32;
+	s_size: float;
+	d_size: float;
+	size: float;
+	friction: int32;
+	scalar: int32;
+	sprite_index: int32;
+	rot_add: int32;
+	max_y_vel: int32;
+	on: bool;
+	s_r: int32;
+	s_g: int32;
+	s_b: int32;
+	d_r: int32;
+	d_g: int32;
+	d_b: int32;
+	r: int32;
+	g: int32;
+	b: int32;
+	col_fade_speed: int32;
+	fade_to_black: int32;
+	s_life: int32;
+	life: int32;
+	blend_mode: int32;
+	extras: int32;
+	dynamic: int32;
+	fx_obj: int32;
+	room_number: int32;
+	node_number: int32;
 }
 
 table RatInfo {
@@ -423,6 +456,7 @@ table SaveGame {
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];
 	flyby_cameras: [FlyByCamera];
+	particles: [ParticleInfo];
 	rats: [RatInfo];
 	spiders: [SpiderInfo];
 	scarabs: [ScarabInfo];

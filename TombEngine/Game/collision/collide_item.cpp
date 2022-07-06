@@ -1,21 +1,24 @@
 #include "framework.h"
 #include "Game/collision/collide_item.h"
 
-#include "Game/control/los.h"
-#include "Game/collision/collide_room.h"
 #include "Game/animation.h"
+#include "Game/control/los.h"
+#include "Game/collision/sphere.h"
+#include "Game/collision/collide_room.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
-#include "Game/collision/sphere.h"
+#include "Game/effects/debris.h"
+#include "Game/effects/tomb4fx.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/room.h"
-#include "Specific/setup.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 #include "Specific/trmath.h"
 #include "Specific/prng.h"
-#include "Renderer/Renderer11.h"
 #include "ScriptInterfaceGame.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Math::Random;
 using namespace TEN::Renderer;
@@ -35,11 +38,11 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 			int collidedBits = TestCollision(item, laraItem);
 			if (collidedBits)
 			{
-				short oldRot = item->Pose.Orientation.y;
+				short oldYOrient = item->Pose.Orientation.y;
 
 				item->Pose.Orientation.y = 0;
 				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-				item->Pose.Orientation.y = oldRot;
+				item->Pose.Orientation.y = oldYOrient;
 
 				int deadlyBits = *((int*)&item->ItemFlags[0]);
 				auto* sphere = &CreatureSpheres[0];
@@ -64,7 +67,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 
 						if (ItemPushItem(item, laraItem, coll, deadlyBits & 1, 3) && (deadlyBits & 1))
 						{
-							laraItem->HitPoints -= item->ItemFlags[3];
+							DoDamage(laraItem, item->ItemFlags[3]);
 
 							int dx = x - laraItem->Pose.Position.x;
 							int dy = y - laraItem->Pose.Position.y;
@@ -94,7 +97,7 @@ void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionIn
 	}
 }
 
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, int ignoreLara)
+bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara)
 {
 	short numItems = 0;
 	short numMeshes = 0;
@@ -157,7 +160,7 @@ bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, I
 					if (item == collidingItem ||
 						item->ObjectNumber == ID_LARA && ignoreLara ||
 						item->Flags & 0x8000 ||
-						item->MeshBits == 0 ||
+						item->MeshBits == NO_JOINT_BITS ||
 						(Objects[item->ObjectNumber].drawRoutine == NULL && item->ObjectNumber != ID_LARA) ||
 						(Objects[item->ObjectNumber].collision == NULL && item->ObjectNumber != ID_LARA) ||
 						onlyVisible && item->Status == ITEM_INVISIBLE ||
@@ -608,8 +611,8 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 
 	int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 	int z = laraItem->Pose.Position.z - item->Pose.Position.z;
-	int dx = cosY * x - sinY * z;
-	int dz = cosY * z + sinY * x;
+	int dx = (cosY * x) - (sinY * z);
+	int dz = (cosY * z) + (sinY * x);
 
 	if (dx >= bounds->X1 - radius &&
 		dx <= radius + bounds->X2 &&
@@ -713,7 +716,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 	item2->Pose.Position.x = item->Pose.Position.x + cosY * rx + sinY * rz;
 	item2->Pose.Position.z = item->Pose.Position.z + cosY * rz - sinY * rx;
 
-	auto* lara = item2->Data.is<LaraInfo*>() ? GetLaraInfo(item2) : nullptr;
+	auto* lara = item2->IsLara() ? GetLaraInfo(item2) : nullptr;
 
 	if (lara != nullptr && spasmEnabled && bounds->Y2 - bounds->Y1 > CLICK(1))
 	{
@@ -724,15 +727,7 @@ bool ItemPushItem(ItemInfo* item, ItemInfo* item2, CollisionInfo* coll, bool spa
 		dz -= cosY * rz - sinY * rx;
 
 		lara->HitDirection = (item2->Pose.Orientation.y - phd_atan(dz, dz) - ANGLE(135.0f)) / ANGLE(90.0f);
-
-		if (!lara->HitFrame && !lara->SpasmEffectCount)
-		{
-			SoundEffect(SFX_TR4_LARA_INJURY, &item2->Pose);
-			lara->SpasmEffectCount = GenerateInt(15, 35);
-		}
-
-		if (lara->SpasmEffectCount)
-			lara->SpasmEffectCount--;
+		DoDamage(item2, 0); // Dummy hurt call. Only for ooh sound!
 
 		lara->HitFrame++;
 		if (lara->HitFrame > 34)
@@ -826,8 +821,8 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 	if (coll->CollisionType == CT_NONE)
 	{
 		coll->Setup.OldPosition = item->Pose.Position;
-
-		UpdateItemRoom(item, -10);
+		if (item->IsLara())
+			UpdateItemRoom(item, -10);
 	}
 	else
 	{
@@ -836,10 +831,11 @@ bool ItemPushStatic(ItemInfo* item, MESH_INFO* mesh, CollisionInfo* coll) // pre
 	}
 
 	// If Lara is in the process of aligning to an object, cancel it.
-	if (item == LaraItem && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
+	if (item->IsLara() && Lara.Control.IsMoving && Lara.Control.Count.PositionAdjust > (LARA_POSITION_ADJUST_MAX_TIME / 6))
 	{
-		Lara.Control.IsMoving = false;
-		Lara.Control.HandStatus = HandStatus::Free;
+		auto* lara = GetLaraInfo(item);
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
 	}
 
 	return true;
@@ -1678,61 +1674,147 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 }
 
-void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll) // previously LaraBaddyCollision
+void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 {
 	laraItem->HitStatus = false;
-	coll->HitStatic = false;
+	coll->HitStatic     = false;
 
-	if (laraItem == LaraItem)
-		Lara.HitDirection = -1;
+	bool playerCollision = laraItem->IsLara();
+	bool harmless = !playerCollision && (laraItem->Data.is<KayakInfo>() || laraItem->Data.is<UPVInfo>());
 
-	if (laraItem->HitPoints > 0)
+	if (playerCollision)
 	{
-		short* door, numDoors;
-		for (auto i : GetRoomList(laraItem->RoomNumber))
+		GetLaraInfo(laraItem)->HitDirection = -1;
+
+		if (laraItem->HitPoints <= 0)
+			return;
+	}
+
+	if (Objects[laraItem->ObjectNumber].intelligent)
+		return;
+
+	for (auto i : GetRoomList(laraItem->RoomNumber))
+	{
+		int nextItem = g_Level.Rooms[i].itemNumber;
+		while (nextItem != NO_ITEM)
 		{
-			short itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
-			{
-				auto* item = &g_Level.Items[itemNumber];
-				if (item->Collidable && item->Status != ITEM_INVISIBLE)
-				{
-					auto* object = &Objects[item->ObjectNumber];
-					if (object->collision != nullptr)
-					{
-						if (phd_Distance(&item->Pose, &laraItem->Pose) < COLLISION_CHECK_DISTANCE)
-							object->collision(itemNumber, laraItem, coll);
-					}
-				}
+			auto* item = &g_Level.Items[nextItem];
+			int itemNumber = nextItem;
 
-				itemNumber = item->NextItem;
+			// HACK: For some reason, sometimes an infinite loop may happen here.
+			if (nextItem == item->NextItem)
+				break;
+
+			nextItem = item->NextItem;
+
+			if (item == laraItem)
+				continue;
+
+			if (!(item->Collidable && item->Status != ITEM_INVISIBLE))
+				continue;
+
+			auto* object = &Objects[item->ObjectNumber];
+
+			if (object->collision == nullptr)
+				continue;
+
+			if (phd_Distance(&item->Pose, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
+				continue;
+
+			if (playerCollision)
+			{
+				// Objects' own collision routines were almost universally written only for
+				// managing collisions with Lara and nothing else. Until all of these routines
+				// are refactored (which won't happen anytime soon), we need this differentiation.
+				object->collision(itemNumber, laraItem, coll);
 			}
-
-			for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
+			else
 			{
-				auto* mesh = &g_Level.Rooms[i].mesh[j];
+				if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+					continue;
 
-				// Only process meshes which are visible and non-solid
-				if ((mesh->flags & StaticMeshFlags::SM_VISIBLE) && !(mesh->flags & StaticMeshFlags::SM_SOLID))
+				// Guess if object is a nullmesh or invisible object by existence of draw routine.
+				if (object->drawRoutine == nullptr)
+					continue;
+
+				// Pickups are also not processed.
+				if (object->isPickup)
+					continue;
+
+				// If colliding object is an enemy, kill it.
+				if (object->intelligent)
 				{
-					if (phd_Distance(&mesh->pos, &laraItem->Pose) < COLLISION_CHECK_DISTANCE)
-					{
-						if (TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))
-						{
-							coll->HitStatic = true;
+					// Don't try to kill already dead or non-targetable enemies.
+					if (item->HitPoints <= 0 || item->HitPoints == NOT_TARGETABLE)
+						continue;
 
-							if (coll->Setup.EnableObjectPush)
-								ItemPushStatic(laraItem, mesh, coll);
-							else
-								break;
-						}
+					if (harmless || abs(laraItem->Animation.Velocity) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
+					{
+						// If vehicle is harmless or speed is too low, just push the enemy.
+						ItemPushItem(laraItem, item, coll, false, 0);
+						continue;
+					}
+					else
+					{
+						DoDamage(item, INT_MAX);
+
+						DoLotsOfBlood(item->Pose.Position.x,
+							laraItem->Pose.Position.y - CLICK(1),
+							item->Pose.Position.z,
+							laraItem->Animation.Velocity,
+							laraItem->Pose.Orientation.y,
+							item->RoomNumber, 3);
 					}
 				}
+				else
+					ItemPushItem(item, laraItem, coll, false, 1);
 			}
 		}
 
-		if (laraItem == LaraItem && Lara.HitDirection == -1)
-			Lara.HitFrame = 0;
+		for (int j = 0; j < g_Level.Rooms[i].mesh.size(); j++)
+		{
+			auto* mesh = &g_Level.Rooms[i].mesh[j];
+
+			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,
+			// so we bypass them here to avoid interference.
+			if (playerCollision && (mesh->flags & StaticMeshFlags::SM_SOLID))
+				continue;
+
+			if (phd_Distance(&mesh->pos, &laraItem->Pose) >= COLLISION_CHECK_DISTANCE)
+				continue;
+
+			if (!TestBoundsCollideStatic(laraItem, mesh, coll->Setup.Radius))
+				continue;
+
+			coll->HitStatic = true;
+
+			// HACK: Shatter statics only by non-harmless vehicles.
+			if (!playerCollision && 
+				!harmless && abs(laraItem->Animation.Velocity) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
+				StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
+			{
+				SoundEffect(GetShatterSound(mesh->staticNumber), (PHD_3DPOS*)mesh);
+				ShatterObject(nullptr, mesh, -128, laraItem->RoomNumber, 0);
+				SmashedMeshRoom[SmashedMeshCount] = laraItem->RoomNumber;
+				SmashedMesh[SmashedMeshCount] = mesh;
+				SmashedMeshCount++;
+				mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+			}
+			else if (coll->Setup.EnableObjectPush)
+				ItemPushStatic(laraItem, mesh, coll);
+			else
+				continue;
+		}
+	}
+
+	if (playerCollision)
+	{
+		auto* lara = GetLaraInfo(laraItem);
+		if (lara->HitDirection == -1)
+			lara->HitFrame = 0;
 	}
 }
 
@@ -1744,7 +1826,7 @@ void AIPickupCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 		item->Status = ITEM_INVISIBLE;
 }
 
-void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo * coll)
+void ObjectCollision(short const itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
 	auto* item = &g_Level.Items[itemNumber];
 

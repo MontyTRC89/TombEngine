@@ -344,7 +344,6 @@ void TrapObjects()
 		obj->initialise = InitialiseWreckingBall;
 		obj->collision = WreckingBallCollision;
 		obj->control = WreckingBallControl;
-		//obj->drawRoutineExtra = DrawWreckingBall;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -353,10 +352,6 @@ void TrapObjects()
 
 void InitialiseSpecialEffects()
 {
-	int i;
-	SPARKS* sptr;
-
-	memset(&Sparks, 0, MAX_SPARKS * sizeof(SPARKS));
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
@@ -366,13 +361,12 @@ void InitialiseSpecialEffects()
 	memset(&Ripples, 0, MAX_RIPPLES * sizeof(RIPPLE_STRUCT));
 	memset(&Drips, 0, MAX_DRIPS * sizeof(DRIP_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
+	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
 
-	sptr = &Sparks[0];
-	for (i = 0; i < MAX_SPARKS; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		sptr->on = false;
-		sptr->dynamic = -1;
-		sptr++;
+		Particles[i].on = false;
+		Particles[i].dynamic = -1;
 	}
 
 	NextFireSpark = 1;
@@ -381,6 +375,7 @@ void InitialiseSpecialEffects()
 	NextBubble = 0;
 	NextDrip = 0;
 	NextBlood = 0;
+
 	TEN::Entities::TR4::ClearBeetleSwarm();
 }
 
@@ -405,10 +400,9 @@ void InitialiseObjects()
 		obj->floor = nullptr;
 		obj->ceiling = nullptr;
 		obj->drawRoutine = DrawAnimatingItem;
-		obj->drawRoutineExtra = nullptr;
 		obj->pivotLength = 0;
 		obj->radius = DEFAULT_RADIUS;
-		obj->shadowSize = NO_SHADOW;
+		obj->castsShadow = false;
 		obj->HitPoints = NOT_TARGETABLE;
 		obj->hitEffect = HIT_NONE;
 		obj->explodableMeshbits = 0;

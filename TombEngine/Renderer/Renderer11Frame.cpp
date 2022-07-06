@@ -26,8 +26,8 @@ namespace TEN::Renderer
 			m_rooms[i].TransparentFacesToDraw.clear();
 			m_rooms[i].StaticsToDraw.clear();
 			m_rooms[i].Visited = false;
-			m_rooms[i].Clip = RendererRectangle(ScreenWidth, ScreenHeight, 0, 0);
-			m_rooms[i].ClipTest = RendererRectangle(ScreenWidth, ScreenHeight, 0, 0);
+			m_rooms[i].Clip = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
+			m_rooms[i].ClipTest = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
 			m_rooms[i].BoundActive = 0;
 		}
 
@@ -84,13 +84,13 @@ namespace TEN::Renderer
 
 				if (p[i].w > 0)
 				{
-					xs = 0.5f * (p[i].x + 1.0f) * g_Renderer.ScreenWidth;
-					ys = 0.5f * (p[i].y + 1.0f) * g_Renderer.ScreenHeight;
+					xs = 0.5f * (p[i].x + 1.0f) * m_screenWidth;
+					ys = 0.5f * (p[i].y + 1.0f) * m_screenHeight;
 				}
 				else
 				{
-					xs = (p[i].x >= 0) ? 0 : g_Renderer.ScreenWidth;
-					ys = (p[i].y >= 0) ? g_Renderer.ScreenHeight : 0;
+					xs = (p[i].x >= 0) ? 0 : m_screenWidth;
+					ys = (p[i].y >= 0) ? m_screenHeight : 0;
 				}
 
 				// Has bound changed?
@@ -128,22 +128,22 @@ namespace TEN::Renderer
 					if (a.x < 0 && b.x < 0)
 						left = 0;
 					else if (a.x > 0 && b.x > 0)
-						right = g_Renderer.ScreenWidth;
+						right = m_screenWidth;
 					else
 					{
 						left = 0;
-						right = g_Renderer.ScreenWidth;
+						right = m_screenWidth;
 					}
 
 					// Y clip
 					if (a.y < 0 && b.y < 0)
 						top = 0;
 					else if (a.y > 0 && b.y > 0)
-						bottom = g_Renderer.ScreenHeight;
+						bottom = m_screenHeight;
 					else
 					{
 						top = 0;
-						bottom = g_Renderer.ScreenHeight;
+						bottom = m_screenWidth;
 					}
 				}
 			}
@@ -237,7 +237,7 @@ namespace TEN::Renderer
 				room->BoundActive |= 1;
 
 				if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
-					m_outside = ENV_FLAG_OUTSIDE;
+					m_outside = true;
 
 				Vector3 roomCentre = Vector3(nativeRoom->x + nativeRoom->xSize * WALL_SIZE / 2.0f,
 					(nativeRoom->minfloor + nativeRoom->maxceiling) / 2.0f,
@@ -292,13 +292,13 @@ namespace TEN::Renderer
 		RendererRoom* room = &m_rooms[Camera.pos.roomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[Camera.pos.roomNumber];
 
-		room->ClipTest = RendererRectangle(0, 0, ScreenWidth, ScreenHeight);
+		room->ClipTest = RendererRectangle(0, 0, m_screenWidth, m_screenHeight);
 		m_outside = nativeRoom->flags & ENV_FLAG_OUTSIDE;
 		m_cameraUnderwater = (nativeRoom->flags & ENV_FLAG_WATER);
 
 		room->BoundActive = 2;
 
-		// Initialize bounds list
+		// Initialise bounds list
 		m_boundList[0] = Camera.pos.roomNumber;
 		m_boundStart = 0;
 		m_boundEnd = 1;
@@ -306,11 +306,11 @@ namespace TEN::Renderer
 		// Horizon clipping
 		if (m_outside)
 		{
-			m_outsideClip = RendererRectangle(0, 0, ScreenWidth, ScreenHeight);
+			m_outsideClip = RendererRectangle(0, 0, m_screenWidth, m_screenHeight);
 		}
 		else
 		{
-			m_outsideClip = RendererRectangle(ScreenWidth, ScreenHeight, 0, 0);
+			m_outsideClip = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
 		}
 
 		// Get all rooms and objects to draw
@@ -427,7 +427,6 @@ namespace TEN::Renderer
 
 		int numLights = room.Lights.size();
 
-		shadowLight = NULL;
 		RendererLight* brightestLight = NULL;
 		float brightest = 0.0f;
 
@@ -455,7 +454,7 @@ namespace TEN::Renderer
 					continue;
 
 				// If Lara, try to collect shadow casting light
-				if (effect->Effect->objectNumber == ID_LARA)
+				if (light->CastShadows && effect->Effect->objectNumber == ID_LARA)
 				{
 					float attenuation = 1.0f - distance / light->Out;
 					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
@@ -612,9 +611,10 @@ namespace TEN::Renderer
 					float intensity = std::max(0.0f, attenuation * (light->Color.x + light->Color.y + light->Color.z) / 3.0f);
 
 					light->LocalIntensity = intensity;
+					light->Distance = distance;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->ObjectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
+					if (light->CastShadows && nativeItem->ObjectNumber == ID_LARA && light->Type == LIGHT_TYPE_POINT)
 					{
 						if (intensity >= brightest)
 						{
@@ -622,8 +622,6 @@ namespace TEN::Renderer
 							brightestLight = light;
 						}
 					}
-
-					light->Distance = distance;
 				}
 				else if (light->Type == LIGHT_TYPE_SPOT)
 				{
@@ -645,7 +643,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = intensity;
 
 					// If Lara, try to collect shadow casting light
-					if (nativeItem->ObjectNumber == ID_LARA)
+					if (light->CastShadows && nativeItem->ObjectNumber == ID_LARA)
 					{
 						if (intensity >= brightest)
 						{

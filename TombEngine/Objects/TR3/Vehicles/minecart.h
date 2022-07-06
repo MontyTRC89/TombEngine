@@ -1,8 +1,15 @@
 #pragma once
+#include "Objects/Utils/VehicleHelpers.h"
 
-struct ItemInfo;
 struct CollisionInfo;
+struct ItemInfo;
 
-void InitialiseMineCart(short itemNumber);
-void MineCartCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-bool MineCartControl(ItemInfo* laraItem);
+namespace TEN::Entities::Vehicles
+{
+	void InitialiseMinecart(short itemNumber);
+
+	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void DoMinecartMount(ItemInfo* minecartItem, ItemInfo* laraItem, VehicleMountType mountType);
+	
+	bool MinecartControl(ItemInfo* laraItem);
+}

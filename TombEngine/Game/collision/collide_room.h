@@ -4,7 +4,7 @@
 
 struct ItemInfo;
 struct CollisionInfo;
-struct FloorInfo;
+class FloorInfo;
 struct ROOM_INFO;
 struct MESH_INFO;
 enum RoomEnvFlags;
@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	Vector3 Coordinates;
+	Vector3Int Coordinates;
 	int RoomNumber;
 
 	FloorInfo* Block;
@@ -81,16 +81,16 @@ struct CollisionSetup
 	bool BlockFloorSlopeDown;	// Treat steep slopes as pits
 	bool BlockCeilingSlope;		// Treat steep slopes on ceilings as walls
 	bool BlockDeathFloorDown;	// Treat death sectors as pits
-	bool BlockMonkeySwingEdge;		// Treat non-monkey sectors as walls
+	bool BlockMonkeySwingEdge;	// Treat non-monkey sectors as walls
 	
 	bool EnableObjectPush;		// Can be pushed by objects
 	bool EnableSpasm;			// Convulse when pushed
 
 	// Preserve old parameters to restore later
 	Vector3Int OldPosition;
-	int OldState;
 	int OldAnimNumber;
 	int OldFrameNumber;
+	int OldState;
 };
 
 struct CollisionInfo
@@ -122,10 +122,11 @@ struct CollisionInfo
 
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
-CollisionResult GetCollision(ItemInfo* item, short angle, int distance, int height = 0, int side = 0);
-CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
-CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(ItemInfo* item);
+CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float up = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float up = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(int x, int y, int z, short roomNumber);
+CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, Vector3Int offset, bool resetRoom = false);
 void  GetCollisionInfo(CollisionInfo* coll, ItemInfo* item, bool resetRoom = false);
@@ -147,8 +148,7 @@ int GetWaterHeight(ItemInfo* item);
 
 int  FindGridShift(int x, int z);
 void ShiftItem(ItemInfo* item, CollisionInfo* coll);
-void MoveItem(ItemInfo* item, short angle, int x, int z = 0);
-void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapYRot = true);
+void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, float offsetMultiplier = 0.0f, bool snapToAngle = true);
 void SnapItemToLedge(ItemInfo* item, CollisionInfo* coll, short angle, float offsetMultiplier = 0.0f);
 void SnapItemToGrid(ItemInfo* item, CollisionInfo* coll);
 
@@ -162,3 +162,4 @@ bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);
+

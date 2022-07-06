@@ -174,9 +174,9 @@ void ImpControl(short itemNumber)
 			joint3 = AI.angle / 2;
 
 			if (Wibble & 0x10)
-				item->SwapMeshFlags = 1024;
+				item->MeshSwapBits = 1024;
 			else
-				item->SwapMeshFlags = 0;
+				item->MeshSwapBits = NO_JOINT_BITS;
 
 			switch (item->Animation.ActiveState)
 			{
@@ -240,10 +240,8 @@ void ImpControl(short itemNumber)
 				if (creature->Flags == 0 &&
 					item->TouchBits & 0x280)
 				{
+					DoDamage(creature->Enemy, 3);
 					CreatureEffect2(item, &ImpBite, 10, item->Pose.Orientation.y, DoBloodSplat);
-
-					LaraItem->HitPoints -= 3;
-					LaraItem->HitStatus = true;
 				}
 
 				break;

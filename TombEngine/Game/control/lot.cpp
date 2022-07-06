@@ -27,7 +27,7 @@ void InitialiseLOTarray(int itemNumber)
 	}
 }
 
-int EnableBaddyAI(short itemNum, int always, bool makeTarget)
+int EnableEntityAI(short itemNum, int always, bool makeTarget)
 {
 	ItemInfo* item = &g_Level.Items[itemNum];
 
@@ -153,23 +153,6 @@ void InitialiseSlot(short itemNum, short slot, bool makeTarget)
 		creature->AITarget = &g_Level.Items[creature->AITargetNumber];
 	else
 		creature->AITarget = nullptr;
-
-	if (obj->intelligent)
-	{
-		// simple check to set hitEffect to blood or smoke by default if intelligent enabled 
-		// and no value assigned to hitEffect and the entity have HP !
-		// undead have smoke instead of blood !
-
-		if (obj->hitEffect == HIT_NONE)
-		{
-			if (obj->undead)
-				obj->hitEffect = HIT_SMOKE;
-			else if (!obj->undead && obj->HitPoints)
-				obj->hitEffect = HIT_BLOOD;
-		}
-		
-		obj->nonLot = false; // change to use pathfinding
-	}
 
 	switch (obj->zoneType)
 	{

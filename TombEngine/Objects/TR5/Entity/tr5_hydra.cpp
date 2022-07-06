@@ -81,7 +81,7 @@ static void HydraBubblesAttack(PHD_3DPOS* pos, short roomNumber, int count)
 
 void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 	spark->sB = 0;
@@ -92,7 +92,7 @@ void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -122,7 +122,7 @@ void TriggerHydraMissileSparks(Vector3Int* pos, short xv, short yv, short zv)
 
 static void TriggerHydraSparks(short itemNumber, int frame)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 	
 	spark->on = 1;
 	spark->sB = 0;
@@ -140,7 +140,7 @@ static void TriggerHydraSparks(short itemNumber, int frame)
 	spark->dG = spark->dR / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -257,11 +257,9 @@ void HydraControl(short itemNumber)
 			{
 				if (item->TouchBits & 0x400)
 				{
+					DoDamage(creature->Enemy, 120);
 					CreatureEffect2(item, &HydraBite, 10, item->Pose.Orientation.y, DoBloodSplat);
 					creature->Flags = 1;
-
-					LaraItem->HitPoints -= 120;
-					LaraItem->HitStatus = true;
 				}
 
 				if (item->HitStatus && AI.distance <  pow(CLICK(7), 2))
@@ -274,8 +272,8 @@ void HydraControl(short itemNumber)
 
 					if (damage > 0)
 					{
-						item->HitPoints -= damage;
 						item->Animation.TargetState = HYDRA_STATE_HURT;
+						DoDamage(item, damage);
 						CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 					}
 				}
@@ -289,7 +287,7 @@ void HydraControl(short itemNumber)
 			if (item->HitStatus)
 			{
 				// TEST: uncomment this for making HYDRA die on first hit event
-				/*item->HitPoints = 0;
+				/* DoDamage(item, INT_MAX);
 				break;*/
 
 				damage = 6 - sqrt(AI.distance) / 1024;
@@ -299,8 +297,8 @@ void HydraControl(short itemNumber)
 
 				if ((GetRandomControl() & 0xF) < damage && AI.distance < SQUARE(10240) && damage > 0)
 				{
-					item->HitPoints -= damage;
 					item->Animation.TargetState = 4;
+					DoDamage(item, damage);
 					CreatureEffect2(item, &HydraBite, 10 * damage, item->Pose.Orientation.y, DoBloodSplat);
 				}
 			}
@@ -387,7 +385,7 @@ void HydraControl(short itemNumber)
 			if (item->ItemFlags[3] < 12)
 			{
 				ExplodeItemNode(item, 11 - item->ItemFlags[3], 0, 64);
-				SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose);
+				SoundEffect(SFX_TR5_SMASH_ROCK2, &item->Pose);
 				item->ItemFlags[3]++;
 			}
 		}

@@ -39,6 +39,7 @@
 
 using namespace TEN::Effects::Lara;
 using namespace TEN::Control::Volumes;
+using namespace TEN::Input;
 using std::function;
 using TEN::Renderer::g_Renderer;
 
@@ -311,9 +312,9 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_col_monkey_shimmy_right,//78
 	lara_col_monkey_turn_180,//79
 	lara_col_crawl_idle,
-	lara_col_crawl_forward,
-	lara_col_monkey_turn_left,//81
-	lara_col_monkey_turn_right,//82
+	lara_col_crawl_forward,//81
+	lara_col_monkey_turn_left,//82
+	lara_col_monkey_turn_right,
 	lara_col_crawl_turn_left,
 	lara_col_crawl_turn_right,
 	lara_col_crawl_back,
@@ -337,10 +338,10 @@ function<LaraRoutineFunction> lara_collision_routines[NUM_LARA_STATES + 1] =
 	lara_default_col,
 	lara_col_crouch_turn_left,
 	lara_col_crouch_turn_right,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
-	lara_default_col,
+	lara_as_null,
+	lara_as_null,
+	lara_as_null,
+	lara_as_null,
 	lara_col_rope_idle,
 	lara_void_func,
 	lara_void_func,
@@ -446,13 +447,15 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.AnimNumber == LA_STAND_IDLE &&
 		item->Animation.ActiveState == LS_IDLE &&
 		item->Animation.TargetState == LS_IDLE &&
-		!item->Animation.Airborne)
+		!item->Animation.IsAirborne)
 	{
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 
 	if (lara->SprintEnergy < LARA_SPRINT_ENERGY_MAX && item->Animation.ActiveState != LS_SPRINT)
 		lara->SprintEnergy++;
+
+	RumbleLaraHealthCondition(item);
 
 	lara->Control.IsLow = false;
 
@@ -488,7 +491,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				if (isWater)
 				{
 					item->Pose.Position.y += CLICK(0.5f) - 28;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 					lara->Control.WaterStatus = WaterStatus::Underwater;
 					lara->Air = LARA_AIR_MAX;
 
@@ -525,15 +528,15 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			{
 				lara->Control.WaterStatus = WaterStatus::Wade;
 
-				// Make splash ONLY within this particular threshold before swim depth while airborne (WadeSplash() above interferes otherwise).
+				// Make splash ONLY within this particular threshold before swim depth while is_airborne (WadeSplash() above interferes otherwise).
 				if (waterDepth > (SWIM_DEPTH - CLICK(1)) &&
-					item->Animation.Airborne && !isSwamp)
+					item->Animation.IsAirborne && !isSwamp)
 				{
 					item->Animation.TargetState = LS_IDLE;
 					Splash(item);
 				}
 				// Lara is grounded; don't splash again.
-				else if (!item->Animation.Airborne)
+				else if (!item->Animation.IsAirborne)
 					item->Animation.TargetState = LS_IDLE;
 				else if (isSwamp)
 				{
@@ -562,7 +565,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 						SetAnimation(item, LA_FALL_START);
 						ResetLaraLean(item);
 						ResetLaraFlex(item);
-						item->Animation.Airborne = true;
+						item->Animation.IsAirborne = true;
 						item->Animation.Velocity = item->Animation.VerticalVelocity / 4;
 						item->Animation.VerticalVelocity = 0;
 						lara->Control.WaterStatus = WaterStatus::Dry;
@@ -602,7 +605,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 				if (heightFromWater <= WADE_DEPTH)
 				{
 					SetAnimation(item, LA_FALL_START);
-					item->Animation.Airborne = true;
+					item->Animation.IsAirborne = true;
 					item->Animation.Velocity = item->Animation.VerticalVelocity / 4;
 					lara->Control.WaterStatus = WaterStatus::Dry;
 				}
@@ -630,7 +633,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					ResetLaraLean(item);
 					ResetLaraFlex(item);
 					item->Pose.Position.y += 1 - heightFromWater;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 					item->Animation.VerticalVelocity = 0;
 					lara->Control.WaterStatus = WaterStatus::TreadWater;
 
@@ -702,8 +705,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 
 			if (lara->Air < 0)
 			{
-			//	if (LaraDrawType == LARA_TYPE::DIVESUIT && lara->anxiety < 251)
-			//		lara->anxiety += 4;
 				item->HitPoints -= 5;
 				lara->Air = -1;
 			}
@@ -728,10 +729,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	Statistics.Game.Distance += sqrt(
-		pow(item->Pose.Position.x - oldPos.x, 2) +
-		pow(item->Pose.Position.y - oldPos.y, 2) +
-		pow(item->Pose.Position.z - oldPos.z, 2));
+	Statistics.Game.Distance += (int)round(Vector3::Distance(oldPos.ToVector3(), item->Pose.Position.ToVector3()));
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
@@ -752,9 +750,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableSpasm = true;
 
 	coll->Setup.OldPosition = item->Pose.Position;
-	coll->Setup.OldState = item->Animation.ActiveState;
 	coll->Setup.OldAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
+	coll->Setup.OldState = item->Animation.ActiveState;
 
 	if (TrInput & IN_LOOK && lara->Control.CanLook &&
 		lara->ExtraAnim == NO_ITEM)
@@ -793,9 +791,6 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	lara->ExtraVelocity = Vector3Int();
 
-	//if (lara->gunType == LaraWeaponType::Crossbow && !LaserSight)
-	//	TrInput &= ~IN_ACTION;
-
 	// Handle weapons.
 	LaraGun(item);
 
@@ -806,6 +801,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	ProcessSectorFlags(item);
 	TestTriggers(item, false);
 	TestVolumes(Lara.ItemNumber);
+
+	DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
 }
 
 void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
@@ -845,28 +842,11 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	auto level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->GetLaraType() == LaraType::Divesuit)
-	{
-		if (lara->Control.TurnRate < -ANGLE(0.5f))
-			lara->Control.TurnRate += ANGLE(0.5f);
-		else if (lara->Control.TurnRate > ANGLE(0.5f))
-			lara->Control.TurnRate -= ANGLE(0.5f);
-		else
-			lara->Control.TurnRate = 0;
-	}
-	else
-	{
-		// Reset turn rate.
-		int sign = copysign(1, lara->Control.TurnRate);
-		if (abs(lara->Control.TurnRate) > ANGLE(2.0f))
-			lara->Control.TurnRate -= ANGLE(2.0f) * sign;
-		else if (abs(lara->Control.TurnRate) > ANGLE(0.5f))
-			lara->Control.TurnRate -= ANGLE(0.5f) * sign;
-		else
-			lara->Control.TurnRate = 0;
-	}
-
+	// TODO: Subsuit gradually slows down at rate of 0.5 degrees. @Sezz 2022.06.23
+	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
@@ -879,9 +859,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
-
-	item->Pose.Position.x += round(item->Animation.VerticalVelocity * phd_sin(lara->Control.MoveAngle) / 4);
-	item->Pose.Position.z += round(item->Animation.VerticalVelocity * phd_cos(lara->Control.MoveAngle) / 4);
+	TranslateItem(item, lara->Control.MoveAngle, item->Animation.VerticalVelocity / 4);
 
 	DoObjectCollision(item, coll);
 
@@ -934,22 +912,11 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	auto* level = g_GameFlow->GetLevel(CurrentLevel);
 
-	if (level->GetLaraType() == LaraType::Divesuit)
-	{
-		if (lara->Control.TurnRate < -ANGLE(0.5f))
-			lara->Control.TurnRate += ANGLE(0.5f);
-		else if (lara->Control.TurnRate > ANGLE(0.5f))
-			lara->Control.TurnRate -= ANGLE(0.5f);
-		else
-			lara->Control.TurnRate = 0;
-	}
-	else if (lara->Control.TurnRate < -ANGLE(2.0f))
-		lara->Control.TurnRate += ANGLE(2.0f);
-	else if (lara->Control.TurnRate > ANGLE(2.0f))
-		lara->Control.TurnRate -= ANGLE(2.0f);
-	else
-		lara->Control.TurnRate = 0;
+	// TODO: Subsuit gradually slowed down at rate of 0.5 degrees. @Sezz 2022.06.23
+	// Apply and reset turn rate.
 	item->Pose.Orientation.y += lara->Control.TurnRate;
+	if (!(TrInput & (IN_LEFT | IN_RIGHT)))
+		lara->Control.TurnRate = 0;
 
 	if (level->GetLaraType() == LaraType::Divesuit)
 		UpdateLaraSubsuitAngles(item);
@@ -981,10 +948,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 		LaraWaterCurrent(item, coll);
 
 	AnimateLara(item);
-
-	item->Pose.Position.x += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.y) / 4);
-	item->Pose.Position.y -= round(item->Animation.VerticalVelocity * phd_sin(item->Pose.Orientation.x) / 4);
-	item->Pose.Position.z += round(phd_cos(item->Pose.Orientation.x) * item->Animation.VerticalVelocity * phd_cos(item->Pose.Orientation.y) / 4);
+	TranslateItem(item, item->Pose.Orientation, item->Animation.VerticalVelocity / 4);
 
 	DoObjectCollision(item, coll);
 

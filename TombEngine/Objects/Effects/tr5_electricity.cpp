@@ -20,7 +20,7 @@ using namespace TEN::Effects::Lara;
 
 void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glow)
 {
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 	spark->on = true;
 	spark->sR = 255;
 	spark->sG = 255;
@@ -43,7 +43,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	}
 
 	spark->fxObj = objNum;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->flags = SP_ITEM | SP_NODEATTACH | SP_SCALE | SP_DEF;
 	spark->nodeNumber = node;
 	spark->x = x;
@@ -71,13 +71,13 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	if (glow)
 	{
 		spark->scalar = 1;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 		spark->size = spark->sSize = (GetRandomControl() & 0x1F) + 160;
 	}
 	else
 	{
 		spark->scalar = 0;
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 14;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 14;
 		spark->size = spark->sSize = (GetRandomControl() & 7) + 8;
 	}
 
@@ -89,7 +89,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	Vector3Int pos = { 0, 0, 0 };
 	GetJointAbsPosition(item, &pos, joint);
 
-	SPARKS* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->dR = 0;
@@ -100,7 +100,7 @@ void TriggerElectricitySparks(ItemInfo* item, int joint, int flame)
 	spark->sG = color;
 	spark->dB = color;
 	spark->dG = color / 2;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->fadeToBlack = 4;
 	spark->life = 12;
 	spark->sLife = 12;
@@ -228,7 +228,7 @@ void ElectricityWiresControl(short itemNumber)
 
 			if (isWaterNearby || instantKill)
 			{
-				if (collItem->Data.is<LaraInfo*>())
+				if (collItem->IsLara())
 				{
 					auto* lara = (LaraInfo*&)collItem->Data;
 					lara->BurnBlue = 1;
@@ -239,9 +239,9 @@ void ElectricityWiresControl(short itemNumber)
 				}
 
 				if (instantKill)
-					collItem->HitPoints = 0;
+					DoDamage(collItem, INT_MAX);
 				else
-					collItem->HitPoints -= 8;
+					DoDamage(collItem, 8);
 
 				for (int j = 0; j < collObj->nmeshes; j++)
 				{

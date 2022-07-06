@@ -91,7 +91,7 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 32;
 		spark->dShade = (GetRandomControl() & 0xF) + 64;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 64;
 		spark->x = (GetRandomControl() & 0x1F) + pos->x - 16;
 		spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
@@ -113,14 +113,14 @@ static void RomanStatueHitEffect(ItemInfo* item, Vector3Int* pos, int joint)
 
 static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->dG = g;
 	spark->sG = g;
 	spark->colFadeSpeed = 2;
 	spark->dR = r;
 	spark->sR = r;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = 16;
 	spark->sLife = 16;
 	spark->x = x;
@@ -136,14 +136,14 @@ static void TriggerRomanStatueShockwaveAttackSparks(int x, int y, int z, byte r,
 	spark->flags = SP_SCALE | SP_DEF;
 	spark->scalar = 3;
 	spark->maxYvel = 0;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 11;
 	spark->gravity = 0;
 	spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 }
 
 static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, short yv, short zv, int flags)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -172,7 +172,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 	spark->xVel = xv;
 	spark->yVel = yv;
 	spark->zVel = zv;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->friction = 34;
 	spark->maxYvel = 0;
 	spark->gravity = 0;
@@ -181,7 +181,7 @@ static void TriggerRomanStatueScreamingSparks(int x, int y, int z, short xv, sho
 
 static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -199,7 +199,7 @@ static void TriggerRomanStatueAttackEffect1(short itemNum, int factor)
 	spark->dG = spark->dB / 2;
 	spark->fadeToBlack = 4;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 32;
 	spark->y = 0;
@@ -246,7 +246,7 @@ static void RomanStatueAttack(PHD_3DPOS* pos, short roomNumber, short count)
 
 void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = 1;
 	spark->sR = 0;
@@ -257,7 +257,7 @@ void TriggerRomanStatueMissileSparks(Vector3Int* pos, char fxObject)
 	spark->dB = spark->dG / 2;
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->dynamic = -1;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 20;
 	spark->x = (GetRandomControl() & 0xF) - 8;
@@ -308,37 +308,37 @@ void RomanStatueControl(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 	auto* creature = GetCreatureInfo(item);
 	
-	int oldSwapMeshFlags = item->SwapMeshFlags;
+	int oldMeshSwapBits = item->MeshSwapBits;
 
 	// At determined HP values, roman statues sheds material.
-	if (item->HitPoints < 1 && !(item->SwapMeshFlags & 0x10000))
+	if (item->HitPoints < 1 && !(item->MeshSwapBits & 0x10000))
 	{
 		ExplodeItemNode(item, 16, 0, 8);
 		item->MeshBits |= 0x10000;
-		item->SwapMeshFlags |= 0x10000;
+		item->MeshSwapBits |= 0x10000;
 	}
-	else if (item->HitPoints < 75 && !(item->SwapMeshFlags & 0x100))
+	else if (item->HitPoints < 75 && !(item->MeshSwapBits & 0x100))
 	{
 		ExplodeItemNode(item, 8, 0, 8);
 		item->MeshBits |= 0x100;
-		item->SwapMeshFlags |= 0x100;
+		item->MeshSwapBits |= 0x100;
 	}
-	else if (item->HitPoints < 150 && !(item->SwapMeshFlags & 0x400))
+	else if (item->HitPoints < 150 && !(item->MeshSwapBits & 0x400))
 	{
 		ExplodeItemNode(item, 10, 0, 32);
 		ExplodeItemNode(item, 11, 0, 32);
 		item->MeshBits |= 0x400u;
-		item->SwapMeshFlags |= 0x400;
+		item->MeshSwapBits |= 0x400;
 	}
-	else if (item->HitPoints < 225 && !(item->SwapMeshFlags & 0x10))
+	else if (item->HitPoints < 225 && !(item->MeshSwapBits & 0x10))
 	{
 		ExplodeItemNode(item, 4, 0, 8);
 		item->MeshBits |= 0x10;
-		item->SwapMeshFlags |= 0x10;
+		item->MeshSwapBits |= 0x10;
 	}
 
 	// Play hit animation.
-	if (oldSwapMeshFlags != item->SwapMeshFlags)
+	if (oldMeshSwapBits != item->MeshSwapBits)
 	{
 		item->Animation.TargetState = STATUE_STATE_HIT;
 		item->Animation.ActiveState = STATUE_STATE_HIT;
@@ -605,12 +605,10 @@ void RomanStatueControl(short itemNumber)
 				{
 					if (item->TouchBits & 0xC000)
 					{
+						DoDamage(creature->Enemy, 200);
 						CreatureEffect2(item, &RomanStatueBite, 20, item->Pose.Orientation.y, DoBloodSplat);
 						SoundEffect(SFX_TR4_LARA_THUD, &item->Pose);
 						creature->Flags = 1;
-
-						LaraItem->HitPoints -= 200;
-						LaraItem->HitStatus = true;
 					}
 				}
 
@@ -847,8 +845,7 @@ void RomanStatueControl(short itemNumber)
 				item->Animation.FrameNumber < g_Level.Anims[item->Animation.AnimNumber].frameBase + 74 &&
 				item->TouchBits)
 			{
-				LaraItem->HitPoints -= 40;
-				LaraItem->HitStatus = true;
+				DoDamage(creature->Enemy, 40);
 			}
 			else if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameEnd)
 			{
@@ -877,7 +874,7 @@ void RomanStatueControl(short itemNumber)
 	CreatureJoint(item, 1, joint1);
 	CreatureJoint(item, 2, joint2);
 
-	if (item->SwapMeshFlags & 0x400)
+	if (item->MeshSwapBits & 0x400)
 	{
 		Vector3Int pos;
 		pos.x = (GetRandomControl() & 0x1F) - 16;
@@ -886,7 +883,7 @@ void RomanStatueControl(short itemNumber)
 		RomanStatueHitEffect(item, &pos, 10);
 	}
 
-	if (item->SwapMeshFlags & 0x10)
+	if (item->MeshSwapBits & 0x10)
 	{
 		Vector3Int pos;
 		pos.x = -40;
@@ -895,7 +892,7 @@ void RomanStatueControl(short itemNumber)
 		RomanStatueHitEffect(item, &pos, 4);
 	}
 
-	if (item->SwapMeshFlags & 0x100)
+	if (item->MeshSwapBits & 0x100)
 	{
 		Vector3Int pos;
 		pos.x = (GetRandomControl() & 0x3F) + 54;

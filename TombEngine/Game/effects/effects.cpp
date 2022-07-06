@@ -29,15 +29,16 @@ using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
 
+// New particle class
+Particle Particles[MAX_PARTICLES];
+ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
+
 FX_INFO EffectList[NUM_EFFECTS];
 
-int NextSpark;
 int DeadlyBounds[6];
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-SPARKS Sparks[MAX_SPARKS];
-SP_DYNAMIC SparkDynamics[MAX_SPARKS_DYNAMICS];
 LaraWeaponType SmokeWeapon;
 byte SmokeCountL;
 byte SmokeCountR;
@@ -73,9 +74,9 @@ NODEOFFSET_INFO NodeOffsets[MAX_NODE] =
 
 void DetatchSpark(int number, SpriteEnumFlag type)
 {
-	auto* sptr = &Sparks[0];
+	auto* sptr = &Particles[0];
 
-	for (int lp = 0; lp < MAX_SPARKS; lp++, sptr++)
+	for (int lp = 0; lp < MAX_PARTICLES; lp++, sptr++)
 	{
 		if (sptr->on && (sptr->flags & type) && sptr->fxObj == number)
 		{
@@ -115,53 +116,48 @@ void DetatchSpark(int number, SpriteEnumFlag type)
 	}
 }
 
-int GetFreeSpark()
+Particle* GetFreeParticle()
 {
-	short sparkNumber = NextSpark;
+	int result = -1;
 
-	for (int i = 0; i < MAX_SPARKS; i++)
+	// Get first free available spark
+
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto* spark = &Sparks[sparkNumber];
+		auto* particle = &Particles[i];
 
-		if (!spark->on)
+		if (!particle->on)
 		{
-			NextSpark = (sparkNumber + 1) & 0x3FF;
-
-			spark->extras = 0;
-			spark->dynamic = -1;
-			spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-			return sparkNumber;
-		}
-		else if (sparkNumber == 1023)
-			sparkNumber = 0;
-		else
-		{
-			spark++;
-			sparkNumber++;
+			result = i;
+			break;
 		}
 	}
 
-	int life = 4095;
-	for (int i = 0; i < MAX_SPARKS; i++)
-	{
-		auto* spark = &Sparks[i];
+	// No free sparks left, hijack existing one with less possible life
 
-		if (spark->life < life &&
-			spark->dynamic == -1 &&
-			!(spark->flags & SP_EXPLOSION))
+	int life = INT_MAX;
+	if (result == -1)
+	{
+		for (int i = 0; i < MAX_PARTICLES; i++)
 		{
-			sparkNumber = i;
-			life = spark->life;
+			auto* particle = &Particles[i];
+
+			if (particle->life < life && particle->dynamic == -1 && !(particle->flags & SP_EXPLOSION))
+			{
+				result = i;
+				life = particle->life;
+			}
 		}
 	}
 
-	NextSpark = (sparkNumber + 1) & 0x3FF;
+	auto* spark = &Particles[result];
 
-	auto* spark = &Sparks[sparkNumber];
 	spark->extras = 0;
 	spark->dynamic = -1;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
-	return sparkNumber;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
+
+	return spark;
 }
 
 void UpdateSparks()
@@ -174,17 +170,18 @@ void UpdateSparks()
 	DeadlyBounds[4] = LaraItem->Pose.Position.z + bounds->Z1;
 	DeadlyBounds[5] = LaraItem->Pose.Position.z + bounds->Z2;
 
-	for (int i = 0; i < MAX_SPARKS; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto* spark = &Sparks[i];
+		auto* spark = &Particles[i];
 
 		if (spark->on)
 		{
 			spark->life--;
+
 			if (!spark->life)
 			{
 				if (spark->dynamic != -1)
-					SparkDynamics[spark->dynamic].On = false;
+					ParticleDynamics[spark->dynamic].On = false;
 
 				spark->on = false;
 				continue;
@@ -224,7 +221,7 @@ void UpdateSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
+				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0x0FFF;
 
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)
@@ -288,11 +285,12 @@ void UpdateSparks()
 
 			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
 			int ds = dl * (spark->dSize - spark->sSize);
-			//spark->size = spark->sSize + (ds & 0xFF);
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
-			spark->size = lerp(spark->sSize, spark->dSize, alpha);
+			spark->size = Lerp(spark->sSize, spark->dSize, alpha);
 
-			if (spark->flags & SP_FIRE && !Lara.Burn || spark->flags & SP_DAMAGE)
+			if ((spark->flags & SP_FIRE && !Lara.Burn) || 
+				(spark->flags & SP_DAMAGE) || 
+				(spark->flags & SP_POISON))
 			{
 				ds = spark->size * (spark->scalar / 2.0);
 
@@ -304,8 +302,12 @@ void UpdateSparks()
 						{
 							if (spark->flags & SP_FIRE)
 								LaraBurn(LaraItem);
-							else
-								LaraItem->HitPoints -= 2;
+
+							if (spark->flags & SP_DAMAGE)
+								DoDamage(LaraItem, 2);
+
+							if (spark->flags & SP_POISON)
+								Lara.PoisonPotency += 5;
 						}
 					}
 				}
@@ -313,13 +315,13 @@ void UpdateSparks()
 		}
 	}
 
-	for (int i = 0; i < MAX_SPARKS; i++)
+	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto* spark = &Sparks[i];
+		auto* spark = &Particles[i];
 
 		if (spark->on && spark->dynamic != -1)
 		{
-			auto* dynsp = &SparkDynamics[spark->dynamic];
+			auto* dynsp = &ParticleDynamics[spark->dynamic];
 			if (dynsp->Flags & 3)
 			{
 				int random = GetRandomControl();
@@ -401,7 +403,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		int random = rand();
 		
@@ -416,7 +418,7 @@ void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
 		spark->dB = -64 - ((random & 0x7F) + 64);
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->x = (random & 7) + x - 3;
@@ -445,7 +447,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 
 	if (dx >= -ANGLE(90.0f) && dx <= ANGLE(90.0f) && dz >= -ANGLE(90.0f) && dz <= ANGLE(90.0f))
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->sR = -128;
 		spark->dR = -128;
@@ -458,7 +460,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->sB = 0;
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 12;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->x = x;
 		spark->y = y;
 		spark->z = z;
@@ -467,7 +469,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 13;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
@@ -490,7 +492,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 {
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 
@@ -518,9 +520,9 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw)
 	spark->life = spark->sLife= (GetRandomControl() & 0x1F) + 96;
 
 	if (uw)
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	else
-		spark->transType = TransTypeEnum::COLSUB;
+		spark->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
 
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -571,7 +573,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->sR = -112;
 		spark->sG = -112;
@@ -582,7 +584,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->dB = 64;
 		spark->colFadeSpeed = 2;
 		spark->fadeToBlack = 8;
-		spark->transType = TransTypeEnum::COLSUB;
+		spark->blendMode = BLEND_MODES::BLENDMODE_SUBTRACTIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 10;
 		spark->x = (GetRandomControl() & 0x1FF) + x - 256;
 		spark->y = (GetRandomControl() & 0x1FF) + y - 256;
@@ -616,7 +618,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	if (dx < -16384 || dx > 16384 || dz < -16384 || dz > 16384)
 		return;
 
-	auto* spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 
 	spark->on = true;
 
@@ -698,7 +700,7 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 		spark->sLife = spark->life = (GetRandomControl() & 3) + 28;
 	}
 
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 	if (fxObj == -1)
 	{
@@ -811,7 +813,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
 		int size = (GetRandomControl() & 0x1FF) - yvel;
-		auto* sptr = &Sparks[GetFreeSpark()];
+		auto* sptr = GetFreeParticle();
 
 		if (size < 512)
 			size = 512;
@@ -824,7 +826,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 		sptr->dB = 32;
 		sptr->colFadeSpeed = 8;
 		sptr->fadeToBlack = 8;
-		sptr->transType = TransTypeEnum::COLADD;
+		sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		sptr->life = sptr->sLife = (size >> 9) + (GetRandomControl() & 7) + 16;
 		sptr->x = (GetRandomControl() & 0x1F) + item->Pose.Position.x - 16;
 		sptr->y = (GetRandomControl() & 0x1F) + item->Pose.Position.y - 16;
@@ -867,7 +869,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	}
 }
 
-void SetupSplash(const SPLASH_SETUP* const setup,int room)
+void SetupSplash(const SPLASH_SETUP* const setup, int room)
 {
 	constexpr size_t NUM_SPLASHES = 3;
 	int numSplashesSetup = 0;
@@ -924,7 +926,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 
 				float t = vel / (splashVelocity / 2) + 16;
 				t = fmax(0, fmin(t, 1));
-				splash.life = lerp(48, 70, t);
+				splash.life = Lerp(48.0f, 70.0f, t);
 				splash.spriteSequenceStart = 4; //Splash Texture
 				splash.spriteSequenceEnd = 7; //Splash Texture
 				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);
@@ -1087,7 +1089,7 @@ void Richochet(PHD_3DPOS* pos)
 	target.y = pos->Position.y;
 	target.z = pos->Position.z;
 	TriggerRicochetSpark(&target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_LARA_RICOCHET, pos);
+	SoundEffect(SFX_TR4_WEAPON_RICOCHET, pos);
 }
 
 void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
@@ -1103,7 +1105,6 @@ void ControlWaterfallMist(short itemNumber) // ControlWaterfallMist
 
 void TriggerWaterfallMist(int x, int y, int z, int angle)
 {
-	SPARKS* spark;
 	int dh = 0;
 	int ang1 = angle;
 	int ang2 = angle;
@@ -1112,7 +1113,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	// CHECK THIS LOOP CONDITIONS
 	for (ang1 = angle; ; ang1 *= 2)
 	{
-		spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 		spark->on = 1;
 		spark->sR = 64;
 		spark->sG = 64;
@@ -1121,7 +1122,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 		spark->dG = 64;
 		spark->dB = 64;
 		spark->colFadeSpeed = 1;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 		spark->fadeToBlack = spark->life - 4;
 		dl = ((dh + (GlobalCounter << 6)) % 1536) + (GetRandomControl() & 0x3F) - 32;
@@ -1146,7 +1147,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 			break;
 	}
 
-	spark = &Sparks[GetFreeSpark()];
+	auto* spark = GetFreeParticle();
 	spark->on = 1;
 	spark->sR = 96;
 	spark->sG = 96;
@@ -1155,7 +1156,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->dG = 96;
 	spark->dB = 96;
 	spark->colFadeSpeed = 1;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 3) + 6;
 	spark->fadeToBlack = spark->life - 1;
 	dl = GetRandomControl() % 1408 + 64;
@@ -1168,7 +1169,7 @@ void TriggerWaterfallMist(int x, int y, int z, int angle)
 	spark->flags = 10;
 	spark->yVel = GetRandomControl() & 0x100 + (GetRandomControl() & 0x7F) + 128;
 	spark->scalar = 2;
-	spark->def = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 17;
 	spark->gravity = 0;
 	spark->maxYvel = 0;
 	spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
@@ -1280,7 +1281,7 @@ void Splash(ItemInfo* item)
 
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
 {
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 48 + (GetRandomControl() & 31);
@@ -1294,7 +1295,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->colFadeSpeed = 12 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 28;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1328,7 +1329,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->maxYvel = 0;
 
 	// TODO: right sprite
-	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	sptr->scalar = 2;
 
 	int size = (GetRandomControl() & 7) + 32;
@@ -1337,7 +1338,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 
 void TriggerRocketFire(int x, int y, int z)
 {
-	auto* sptr = &Sparks[GetFreeSpark()];
+	auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 
@@ -1350,7 +1351,7 @@ void TriggerRocketFire(int x, int y, int z)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1376,7 +1377,7 @@ void TriggerRocketFire(int x, int y, int z)
 		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 
 	// TODO: right sprite
-	sptr->def = Objects[ID_DEFAULT_SPRITES].meshIndex;
+	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	sptr->scalar = 1;
 	sptr->gravity = -(GetRandomControl() & 3) - 4;
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
@@ -1389,7 +1390,7 @@ void TriggerRocketFire(int x, int y, int z)
 
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 {
-	/*SPARKS* sptr = &Sparks[GetFreeSpark()];
+	/*auto* sptr = GetFreeParticle();
 
 	sptr->on = true;
 	sptr->sR = 0;
@@ -1403,7 +1404,7 @@ void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
 	sptr->colFadeSpeed = 4 + (GetRandomControl() & 3);
 	sptr->fadeToBlack = 12;
 	sptr->sLife = sptr->life = (GetRandomControl() & 3) + 20;
-	sptr->transType = TransTypeEnum::COLADD;
+	sptr->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	sptr->extras = 0;
 	sptr->dynamic = -1;
 
@@ -1457,7 +1458,7 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->dShade = -128;
 	spark->colFadeSpeed = 4;
 	spark->fadeToBlack = 16;
-	spark->transType = TransTypeEnum::COLADD;
+	spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 64;
 	spark->x = (GetRandomControl() & 0x1F) + x - 16;
 	spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -1502,7 +1503,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 
 	if (dx >= -16384 && dx <= 16384 && dz >= -16384 && dz <= 16384)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->on = true;
 
@@ -1560,7 +1561,7 @@ void TriggerFireFlame(int x, int y, int z, int fxObj, int type)
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 18;
 		}
 
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 
 		if (fxObj != -1)
 		{
@@ -1705,7 +1706,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 	{
 		int r = rand();
 
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 
 		spark->dG = (r & 0x7F) + 64;
 		spark->dB = -64 - (r & 0x7F) + 64;
@@ -1720,7 +1721,7 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->colFadeSpeed = 3;
 		spark->fadeToBlack = 5;
 		spark->y = ((r >> 3) & 7) + y - 3;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		spark->friction = 34;
 		spark->scalar = 1;
 		spark->z = ((r >> 6) & 7) + z - 3;
@@ -1737,12 +1738,12 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		if (additional)
 		{
 			r = rand();
-			spark = &Sparks[GetFreeSpark()];
+			spark = GetFreeParticle();
 			spark->on = 1;
 			spark->sR = spark->dR >> 1;
 			spark->sG = spark->dG >> 1;
 			spark->fadeToBlack = 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->colFadeSpeed = (r & 3) + 8;
 			spark->sB = spark->dB >> 1;
 			spark->dR = 32;

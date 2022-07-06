@@ -11,8 +11,11 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Specific/input.h"
 
+using namespace TEN::Input;
 using namespace TEN::Renderer;
 using namespace TEN::Control::Volumes;
+
+constexpr auto MAX_CAMERA = 18;
 
 int TrackCameraInit;
 int SpotcamTimer;
@@ -115,7 +118,7 @@ void InitialiseSpotCam(short Sequence)
 
 	AlterFOV(16380);
 
-	LaraItem->MeshBits = -1;
+	LaraItem->MeshBits = ALL_JOINT_BITS;
 
 	ResetLaraFlex(LaraItem);
 
@@ -521,7 +524,7 @@ void CalculateSpotCameras()
 			}
 		}
 
-		LookAt(&Camera, 0);
+		LookAt(&Camera, croll);
 
 		if (CheckTrigger)
 		{
@@ -814,6 +817,9 @@ void CalculateSpotCameras()
 
 					SplineToCamera = 1;
 				}
+
+				if (CurrentSplineCamera > LastCamera)
+					CurrentSplineCamera = LastCamera;
 			}
 			else
 			{

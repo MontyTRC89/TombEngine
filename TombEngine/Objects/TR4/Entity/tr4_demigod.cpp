@@ -14,6 +14,7 @@
 #include "Game/control/control.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
+#include "Renderer/Renderer11Enums.h"
 
 namespace TEN::Entities::TR4
 {
@@ -95,7 +96,7 @@ namespace TEN::Entities::TR4
 		if (dx >= -SECTOR(16) && dx <= SECTOR(16) &&
 			dz >= -SECTOR(16) && dz <= SECTOR(16))
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = 1;
 			if (fx->flag1 == 3 || fx->flag1 == 4)
@@ -119,7 +120,7 @@ namespace TEN::Entities::TR4
 
 			spark->fadeToBlack = 8;
 			spark->colFadeSpeed = (GetRandomControl() & 3) + 4;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 16;
 			spark->y = 0;
 			spark->x = (GetRandomControl() & 0xF) - 8;
@@ -259,7 +260,7 @@ namespace TEN::Entities::TR4
 				spark->colFadeSpeed = 4;
 				spark->dShade = (GetRandomControl() & 0x1F) + 96;
 				spark->fadeToBlack = 24 - (GetRandomControl() & 7);
-				spark->transType = TransTypeEnum::COLADD;
+				spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 				spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
 				spark->x = (GetRandomControl() & 0x1F) + x - 16;
 				spark->y = (GetRandomControl() & 0x1F) + y - 16;
@@ -445,12 +446,19 @@ namespace TEN::Entities::TR4
 						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
 					}
+
 					if (AI.bite ||
 						LaraItem->Animation.ActiveState >= LS_LADDER_IDLE &&
 						LaraItem->Animation.ActiveState <= LS_LADDER_DOWN &&
 						!Lara.Location)
 					{
 						item->Animation.TargetState = DEMIGOD1_STATE_AIM;
+						break;
+					}
+
+					if (AI.distance <= pow(SECTOR(3), 2))
+					{
+						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
 						break;
 					}
 				}
@@ -468,26 +476,20 @@ namespace TEN::Entities::TR4
 						break;
 					}
 
+					if (AI.distance <= pow(SECTOR(2), 2) || AI.distance >= pow(SECTOR(5), 2))
+					{
+						item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
+						break;
+					}
+
 					if (item->ObjectNumber == ID_DEMIGOD3)
 					{
-						if (AI.distance <= pow(SECTOR(2), 2) || AI.distance >= pow(SECTOR(5), 2))
-						{
-							item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
-							break;
-						}
-
 						if (!(GetRandomControl() & 3))
 						{
 							item->Animation.TargetState = DEMIGOD3_STATE_RADIAL_AIM;
 							break;
 						}
 					}
-				}
-
-				if (AI.distance <= pow(SECTOR(3), 2) || item->ObjectNumber != ID_DEMIGOD2)
-				{
-					item->Animation.TargetState = DEMIGOD_STATE_WALK_FORWARD;
-					break;
 				}
 
 				item->Animation.TargetState = DEMIGOD2_STATE_RADIAL_PROJECTILE_ATTACK;

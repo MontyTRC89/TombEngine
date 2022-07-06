@@ -25,12 +25,10 @@ void ClockworkBeetleControl(short itemNumber)
 
 		if (LaraItem->Animation.FrameNumber < fb + 104)
 		{
-			Vector3Int pos = { 0, 0, -32 };
+			auto pos = Vector3Int(0, 0, -32);
 			GetLaraJointPosition(&pos, LM_RHAND);
 
-			beetle->Pose.Position.x = pos.x;
-			beetle->Pose.Position.y = pos.y;
-			beetle->Pose.Position.z = pos.z;
+			beetle->Pose.Position = pos;
 			beetle->Status = ITEM_ACTIVE;
 			beetle->Pose.Orientation.y = LaraItem->Pose.Orientation.y;
 			beetle->Pose.Orientation.z = -0x31C4;
@@ -54,7 +52,7 @@ void ClockworkBeetleControl(short itemNumber)
 		}
 	}
 
-	SoundEffect(SFX_TR4_BEETLARA_WINDUP, &beetle->Pose);
+	SoundEffect(SFX_TR4_CLOCKWORK_BEETLE_WINDUP, &beetle->Pose);
 
 	beetle->Animation.VerticalVelocity += 12;
 	beetle->Pose.Position.y += beetle->Animation.VerticalVelocity;

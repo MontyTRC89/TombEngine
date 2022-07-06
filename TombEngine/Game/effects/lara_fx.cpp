@@ -8,6 +8,7 @@
 #include "Game/effects/smoke.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Smoke;
@@ -16,10 +17,10 @@ namespace TEN::Effects::Lara
 {
 	void LaraBurn(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto* lara = GetLaraInfo(item);
 
 		if (!lara->Burn && !lara->BurnSmoke)
 		{
@@ -34,35 +35,27 @@ namespace TEN::Effects::Lara
 
 	void LavaBurn(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (item->IsLara() && GetLaraInfo(item)->Control.WaterStatus == WaterStatus::FlyCheat)
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		if (item->HitPoints < 0)
+			return;
 
-		if (item->HitPoints >= 0 && lara->Control.WaterStatus != WaterStatus::FlyCheat)
+		auto height = GetCollision(item->Pose.Position.x, 32000, item->Pose.Position.z, item->RoomNumber).Position.Floor;
+		if (item->Floor == height)
 		{
-			short roomNumber = item->RoomNumber;
-			FloorInfo* floor = GetFloor(item->Pose.Position.x, 32000, item->Pose.Position.z, &roomNumber);
-			if (item->Floor == GetFloorHeight(floor, item->Pose.Position.x, 32000, item->Pose.Position.z))
-			{
-				//			if (Objects[ID_KAYAK].loaded && Objects[ID_KAYAK_LARA_ANIMS].loaded)		//TEMPORARILY ADDING THIS HACK FOR TESTING-// KayakLaraRapidsDrown works fine.
-				//				KayakLaraRapidsDrown();
-				//			else
-				//			{
-				item->HitPoints = -1;
-				item->HitStatus = true;
-				LaraBurn(item);
-				//			}
-			}
+			item->HitPoints = -1;
+			item->HitStatus = true;
+			LaraBurn(item);
 		}
 	}
 
 	void LaraBreath(ItemInfo* item)
 	{
-		if (!item->Data.is<LaraInfo*>())
+		if (!item->IsLara())
 			return;
 
-		auto lara = (LaraInfo*&)item->Data;
+		auto* lara = GetLaraInfo(item);
 
 		if (lara->Control.WaterStatus == WaterStatus::Underwater || item->HitPoints <= 0)
 			return;

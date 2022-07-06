@@ -92,7 +92,7 @@ namespace TEN::Entities::TR4
 
 		angleV -= item->Pose.Orientation.x;
 
-		int velocity = 8 * (WraithVelocity / item->Animation.Velocity);
+		int velocity = (WraithVelocity / item->Animation.Velocity) * 8;
 
 		if (abs(angleH) >= item->ItemFlags[2] || angleH > 0 != item->ItemFlags[2] > 0)
 		{
@@ -235,9 +235,9 @@ namespace TEN::Entities::TR4
 			if (item->Animation.Velocity > 32)
 				item->Animation.Velocity -= 12;
 			
-			if (target == LaraItem)
+			if (target->IsLara())
 			{
-				target->HitPoints -= distance / SECTOR(1);
+				DoDamage(target, distance / SECTOR(1));
 
 				// WRAITH1 can burn Lara
 				if (item->ObjectNumber == ID_WRAITH1)
@@ -260,11 +260,11 @@ namespace TEN::Entities::TR4
 					WraithExplosionEffect(item, 48, 48, 48, 48);
 
 					target->TriggerFlags--;
-					target->HitPoints = 0;
 
 					if (target->TriggerFlags > 0)
 						target->Animation.FrameNumber = g_Level.Anims[target->Animation.AnimNumber].frameBase;
 
+					DoDamage(target, INT_MAX);
 					KillItem(itemNumber);
 				}
 			}
@@ -275,7 +275,7 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[7])
 				{
 					TriggerExplosionSparks(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 2, -2, 1, item->RoomNumber);
-					target->HitPoints = 0;
+					DoDamage(target, INT_MAX);
 					KillItem(item->ItemFlags[6]);
 					KillItem(itemNumber);
 				}
@@ -382,7 +382,7 @@ namespace TEN::Entities::TR4
 
 	void DrawWraith(Vector3Int pos, Vector3Int velocity, int objectNumber)
 	{
-		auto* spark = &Sparks[GetFreeSpark()];
+		auto* spark = GetFreeParticle();
 		spark->on = 1;
 
 		BYTE color;
@@ -418,7 +418,7 @@ namespace TEN::Entities::TR4
 
 		spark->colFadeSpeed = 4;
 		spark->fadeToBlack = 7;
-		spark->transType = TransTypeEnum::COLADD;
+		spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 		unsigned char life = (GetRandomControl() & 7) + 12;
 		spark->life = life;
 		spark->sLife = life;
@@ -473,7 +473,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < 15; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			spark->on = true;
 			spark->sR = dR;
@@ -484,7 +484,7 @@ namespace TEN::Entities::TR4
 			spark->dB = dB;
 			spark->colFadeSpeed = 4;
 			spark->fadeToBlack = 7;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			short life = (GetRandomControl() & 7) + 32;
 			spark->life = life;
 			spark->sLife = life;

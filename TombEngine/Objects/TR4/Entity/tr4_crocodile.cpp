@@ -13,22 +13,25 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_room.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
-	static BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
+	BITE_INFO CrocodileBite = { 0, -100, 500, 9 };
+	const vector<int> CrocodileBiteAttackJoints = { 8, 9 };
 
-	#define CROC_STATE_WALK_FORWARD_ANGLE ANGLE(3.0f)
-	#define CROC_SWIM_ANGLE ANGLE(3.0f)
-	#define CROC_STATE_RUN_FORWARD_ANGLE ANGLE(5.0f)
-	#define CROC_SWIM_SPEED 16;
-	#define CROC_DAMAGE 120;
+	constexpr auto CROC_SWIM_SPEED = 16;
+	constexpr auto CROC_ATTACK_DAMAGE = 120;
 
 	constexpr auto CROC_ALERT_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 	constexpr auto CROC_VISIBILITY_RANGE = SQUARE(SECTOR(5));
 	constexpr auto CROC_STATE_RUN_RANGE = SQUARE(SECTOR(1));
 	constexpr auto CROC_MAXRUN_RANGE = SQUARE(SECTOR(1) + CLICK(2));
 	constexpr auto CROC_ATTACK_RANGE = SQUARE(CLICK(3)); // NOTE: It's CLICK(3) in TR4, but the crocodile does not go near Lara to do damage in certain cases.
-	constexpr auto CROC_TOUCHBITS = 768;
+
+	#define CROC_STATE_WALK_FORWARD_ANGLE ANGLE(3.0f)
+	#define CROC_SWIM_ANGLE ANGLE(3.0f)
+	#define CROC_STATE_RUN_FORWARD_ANGLE ANGLE(5.0f)
 
 	enum CrocodileState
 	{
@@ -37,7 +40,7 @@ namespace TEN::Entities::TR4
 		CROC_STATE_RUN_FORWARD = 2,
 		CROC_STATE_WALK_FORWARD = 3,
 		CROC_STATE_TURN_RIGHT = 4,
-		CROC_STATE_ATTACK = 5,
+		CROC_STATE_BITE_ATTACK = 5,
 		CROC_STATE_NONE_2 = 6,
 		CROC_STATE_DEATH = 7,
 		CROC_STATE_SWIM_FORWARD = 8,
@@ -94,16 +97,11 @@ namespace TEN::Entities::TR4
 	{
 		auto* info = GetCreatureInfo(item);
 
-		EntityStoringInfo storingInfo;
-		storingInfo.x = item->Pose.Position.x;
-		storingInfo.y = item->Pose.Position.y;
-		storingInfo.z = item->Pose.Position.z;
-		storingInfo.roomNumber = item->RoomNumber;
+		short roomNumber = item->RoomNumber;
+		GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+		int waterDepth = GetWaterSurface(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, roomNumber);
 
-		GetFloor(storingInfo.x, storingInfo.y, storingInfo.z, &storingInfo.roomNumber);
-		storingInfo.waterDepth = GetWaterSurface(storingInfo.x, storingInfo.y, storingInfo.z, storingInfo.roomNumber);
-
-		if (storingInfo.waterDepth != NO_HEIGHT)
+		if (waterDepth != NO_HEIGHT)
 		{
 			info->LOT.Step = SECTOR(20);
 			info->LOT.Drop = -SECTOR(20);
@@ -210,7 +208,7 @@ namespace TEN::Entities::TR4
 						item->ItemFlags[0] = 1024;
 				}
 				else if (AI.bite && AI.distance < CROC_ATTACK_RANGE)
-					item->Animation.TargetState = CROC_STATE_ATTACK;
+					item->Animation.TargetState = CROC_STATE_BITE_ATTACK;
 				else
 				{
 					if (AI.ahead && AI.distance < CROC_STATE_RUN_RANGE)
@@ -261,19 +259,17 @@ namespace TEN::Entities::TR4
 
 				break;
 
-			case CROC_STATE_ATTACK:
+			case CROC_STATE_BITE_ATTACK:
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					item->Animation.RequiredState = 0;
 
-				if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
+				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
+						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);
 						item->Animation.RequiredState = CROC_STATE_IDLE;
-
-						LaraItem->HitPoints -= CROC_DAMAGE;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
@@ -309,15 +305,13 @@ namespace TEN::Entities::TR4
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 					item->Animation.RequiredState = CROC_STATE_NONE_1;
 
-				if (AI.bite && item->TouchBits & CROC_TOUCHBITS)
+				if (AI.bite && item->TestBits(JointBitType::Touch, CrocodileBiteAttackJoints))
 				{
 					if (!item->Animation.RequiredState)
 					{
 						CreatureEffect2(item, &CrocodileBite, 10, -1, DoBloodSplat);
+						DoDamage(creature->Enemy, CROC_ATTACK_DAMAGE);
 						item->Animation.RequiredState = CROC_STATE_SWIM_FORWARD;
-
-						LaraItem->HitPoints -= CROC_DAMAGE;
-						LaraItem->HitStatus = true;
 					}
 				}
 				else
@@ -329,7 +323,7 @@ namespace TEN::Entities::TR4
 
 		OBJECT_BONES boneRot;
 		if (item->Animation.ActiveState == CROC_STATE_IDLE ||
-			item->Animation.ActiveState == CROC_STATE_ATTACK ||
+			item->Animation.ActiveState == CROC_STATE_BITE_ATTACK ||
 			item->Animation.ActiveState == CROC_STATE_WATER_BITE_ATTACK)
 		{
 			boneRot.bone0 = AI.angle;

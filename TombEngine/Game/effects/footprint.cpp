@@ -9,10 +9,8 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-namespace TEN {
-namespace Effects {
-namespace Footprints {
-
+namespace TEN::Effects::Footprints
+{
 	std::deque<FOOTPRINT_STRUCT> footprints = std::deque<FOOTPRINT_STRUCT>();
 
 	bool CheckFootOnFloor(ItemInfo const & item, int mesh, Vector3& outFootprintPosition) 
@@ -58,12 +56,12 @@ namespace Footprints {
 		if (result.Position.Bridge >= 0)
 			return;
 
-		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
+		auto fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 		// Choose material for footstep sound
 		switch (floor->Material)
 		{
 		case FLOOR_MATERIAL::Concrete:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 			break;
 
 		case FLOOR_MATERIAL::Grass:
@@ -107,7 +105,7 @@ namespace Footprints {
 			break;
 
 		case FLOOR_MATERIAL::Stone:
-			fx = SOUND_EFFECTS::SFX_TR4_LARA_FEET;
+			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS;
 			break;
 
 		case FLOOR_MATERIAL::Water:
@@ -118,47 +116,51 @@ namespace Footprints {
 			fx = SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS_WOOD;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_1:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_1;
+		case FLOOR_MATERIAL::Custom1:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_1;
 		break;
 
-		case FLOOR_MATERIAL::Custom_Sound_2:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_2;
+		case FLOOR_MATERIAL::Custom2:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_2;
 		break; 
 		
-		case FLOOR_MATERIAL::Custom_Sound_3:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_3;
+		case FLOOR_MATERIAL::Custom3:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_3;
 		break;
 		
-		case FLOOR_MATERIAL::Custom_Sound_4:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_4;
+		case FLOOR_MATERIAL::Custom4:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_4;
 		break; 
 		
-		case FLOOR_MATERIAL::Custom_Sound_5:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_5;
+		case FLOOR_MATERIAL::Custom5:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_5;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_6:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_6;
+		case FLOOR_MATERIAL::Custom6:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_6;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_7:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_7;
+		case FLOOR_MATERIAL::Custom7:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_7;
 			break;
 
-		case FLOOR_MATERIAL::Custom_Sound_8:
-			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_SOUNDS_8;
+		case FLOOR_MATERIAL::Custom8:
+			fx = SOUND_EFFECTS::SFX_CUSTOM_FOOTSTEP_8;
 			break;
 		}
 
 		// HACK: must be here until reference wad2 is revised
-		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FEET)
+		if (fx != SOUND_EFFECTS::SFX_TR4_LARA_FOOTSTEPS)
 			SoundEffect(fx, &item->Pose);
 
 		if (floor->Material != FLOOR_MATERIAL::Sand &&
 			floor->Material != FLOOR_MATERIAL::Snow &&
 			floor->Material != FLOOR_MATERIAL::Gravel &&
-			floor->Material != FLOOR_MATERIAL::Mud)
+			floor->Material != FLOOR_MATERIAL::Mud &&
+			floor->Material != FLOOR_MATERIAL::Custom2 &&
+			floor->Material != FLOOR_MATERIAL::Custom1 &&
+			floor->Material != FLOOR_MATERIAL::Custom3 &&
+			floor->Material != FLOOR_MATERIAL::Custom4)
 			return;
 
 		// Calculate footprint tilts
@@ -209,9 +211,9 @@ namespace Footprints {
 		footprint.Position[1] = p1;
 		footprint.Position[2] = p2;
 		footprint.Position[3] = p3;
-		footprint.LifeStartFading = 30 * 10;
 		footprint.StartOpacity = 0.25f;
-		footprint.Life = 30 * 20;
+		footprint.LifeStartFading = FPS * 10;
+		footprint.Life = FPS * 20;
 		footprint.Active = true;
 		footprint.RightFoot = rightFoot;
 
@@ -245,7 +247,7 @@ namespace Footprints {
 			}
 			else 
 			{
-				float opacity = lerp(0, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
+				float opacity = Lerp(0.0f, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
 				footprint.Opacity = opacity;
 			}
 		}
@@ -255,6 +257,4 @@ namespace Footprints {
 			footprints.pop_back();
 		}
 	}
-}
-}
 }

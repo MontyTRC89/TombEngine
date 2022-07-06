@@ -9,6 +9,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS JumpSwitchBounds =  
@@ -30,7 +32,7 @@ namespace TEN::Entities::Switches
 
 		if (TrInput & IN_ACTION &&
 			(laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP) &&
-			(laraItem->Status || laraItem->Animation.Airborne) &&
+			(laraItem->Status || laraItem->Animation.IsAirborne) &&
 			laraItem->Animation.VerticalVelocity > 0 &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			!switchItem->Animation.ActiveState)
@@ -43,7 +45,7 @@ namespace TEN::Entities::Switches
 				laraItem->Animation.AnimNumber = LA_JUMPSWITCH_PULL;
 				laraItem->Animation.VerticalVelocity = 0;
 				laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 				laraInfo->Control.HandStatus = HandStatus::Busy;
 				switchItem->Animation.TargetState = SWITCH_ON;
 				switchItem->Status = ITEM_ACTIVE;

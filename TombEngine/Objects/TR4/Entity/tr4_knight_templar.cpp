@@ -12,11 +12,17 @@
 #include "Sound/sound.h"
 #include "Game/itemdata/creature_info.h"
 
+using std::vector;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO KnightTemplarBite = { 0, 0, 0, 11 };
+	const vector<int> KnightTemplarSwordAttackJoints = { 10, 11 };
 
 	constexpr auto KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE = 120;
+
+	#define KNIGHT_TEMPLAR_IDLE_TURN_ANGLE ANGLE(2.0f)
+	#define KNIGHT_TEMPLAR_WALK_TURN_ANGLE ANGLE(7.0f)
 
 	enum KnightTemplarState
 	{
@@ -126,10 +132,10 @@ namespace TEN::Entities::TR4
 		{
 		case KTEMPLAR_STATE_IDLE:
 			item->Animation.TargetState = KTEMPLAR_STATE_WALK_FORWARD;
-			creature->MaxTurn = ANGLE(2.0f);
+			creature->MaxTurn = KNIGHT_TEMPLAR_IDLE_TURN_ANGLE;
 			creature->Flags = 0;
 
-			if (AI.distance > pow(682, 2))
+			if (AI.distance > pow(SECTOR(0.67f), 2))
 			{
 				if (Lara.TargetEntity == item)
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;
@@ -144,9 +150,9 @@ namespace TEN::Entities::TR4
 			break;
 
 		case KTEMPLAR_STATE_WALK_FORWARD:
-			creature->MaxTurn = ANGLE(7.0f);
+			creature->MaxTurn = KNIGHT_TEMPLAR_WALK_TURN_ANGLE;
 
-			if (Lara.TargetEntity == item || AI.distance <= pow(682, 2))
+			if (Lara.TargetEntity == item || AI.distance <= pow(SECTOR(0.67f), 2))
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 
 			break;
@@ -188,7 +194,7 @@ namespace TEN::Entities::TR4
 							StaticObjects[mesh->staticNumber].shatterType != SHT_NONE)
 						{
 							ShatterObject(nullptr, mesh, -64, LaraItem->RoomNumber, 0);
-							SoundEffect(SFX_TR4_HIT_ROCK, &item->Pose);
+							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);
 
 							mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
 							currentFloor->Stopper = false;
@@ -202,7 +208,7 @@ namespace TEN::Entities::TR4
 
 				if (!creature->Flags)
 				{
-					if (item->TouchBits & 0xC00)
+					if (item->TestBits(JointBitType::Touch, KnightTemplarSwordAttackJoints))
 					{
 						CreatureEffect2(
 							item,
@@ -213,8 +219,7 @@ namespace TEN::Entities::TR4
 
 						creature->Flags = 1;
 
-						LaraItem->HitPoints -= KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, KNIGHT_TEMPLAR_SWORD_ATTACK_DAMAGE);
 					}
 				}
 			}
@@ -239,7 +244,7 @@ namespace TEN::Entities::TR4
 				else
 					item->Animation.TargetState = KTEMPLAR_STATE_SHIELD_HIT_2;
 			}
-			else if (AI.distance <= pow(682, 2) || Lara.TargetEntity != item)
+			else if (AI.distance <= pow(SECTOR(0.67f), 2) || Lara.TargetEntity != item)
 				item->Animation.TargetState = KTEMPLAR_STATE_IDLE;
 			else
 				item->Animation.TargetState = KTEMPLAR_STATE_SHIELD;

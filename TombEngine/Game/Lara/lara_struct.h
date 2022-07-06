@@ -844,7 +844,7 @@ enum class WeaponAmmoType
 	Ammo2,
 	Ammo3,
 
-	NumAmmos
+	NumAmmoTypes
 };
 
 enum class LaraWeaponType
@@ -868,28 +868,28 @@ enum class LaraWeaponType
 
 enum LaraWeaponTypeCarried
 {
-	WTYPE_MISSING = 0x0,
-	WTYPE_PRESENT = 0x1,
-	WTYPE_SILENCER = 0x2,
-	WTYPE_LASERSIGHT = 0x4,
-	WTYPE_AMMO_1 = 0x8,
-	WTYPE_AMMO_2 = 0x10,
-	WTYPE_AMMO_3 = 0x20,
-	WTYPE_MASK_AMMO = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
+	WTYPE_MISSING	 = 0,
+	WTYPE_PRESENT	 = (1 << 0),
+	WTYPE_SILENCER	 = (1 << 1),
+	WTYPE_LASERSIGHT = (1 << 2),
+	WTYPE_AMMO_1	 = (1 << 3),
+	WTYPE_AMMO_2	 = (1 << 4),
+	WTYPE_AMMO_3	 = (1 << 5),
+	WTYPE_MASK_AMMO	 = WTYPE_AMMO_1 | WTYPE_AMMO_2 | WTYPE_AMMO_3,
 };
 
-enum class HolsterSlot : int
+enum class HolsterSlot
 {
-	Empty = ID_LARA_HOLSTERS,
-	Pistols = ID_LARA_HOLSTERS_PISTOLS,
-	Uzis = ID_LARA_HOLSTERS_UZIS,
-	Revolver = ID_LARA_HOLSTERS_REVOLVER,
-	Shotgun = ID_SHOTGUN_ANIM,
-	HK = ID_HK_ANIM,
-	Harpoon = ID_HARPOON_ANIM,
-	Crowssbow = ID_CROSSBOW_ANIM,
+	Empty			= ID_LARA_HOLSTERS,
+	Pistols			= ID_LARA_HOLSTERS_PISTOLS,
+	Uzis			= ID_LARA_HOLSTERS_UZIS,
+	Revolver		= ID_LARA_HOLSTERS_REVOLVER,
+	Shotgun			= ID_SHOTGUN_ANIM,
+	HK				= ID_HK_ANIM,
+	Harpoon			= ID_HARPOON_ANIM,
+	Crowssbow		= ID_CROSSBOW_ANIM,
 	GrenadeLauncher = ID_GRENADE_ANIM,
-	RocketLauncher = ID_ROCKET_ANIM,
+	RocketLauncher	= ID_ROCKET_ANIM
 };
 
 // TODO: Unused.
@@ -928,7 +928,7 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState : int
+enum class TorchState
 {
 	Holding,
 	Throwing,
@@ -1064,7 +1064,7 @@ struct HolsterInfo
 struct CarriedWeaponInfo
 {
 	bool Present;
-	Ammo Ammo[(int)WeaponAmmoType::NumAmmos];
+	Ammo Ammo[(int)WeaponAmmoType::NumAmmoTypes];
 	WeaponAmmoType SelectedAmmo; // WeaponAmmoType_enum
 	bool HasLasersight; // TODO: Duplicated in LaraInventoryData.
 	bool HasSilencer;	// TODO: Duplicated in LaraInventoryData.
@@ -1079,13 +1079,13 @@ struct ArmInfo
 	Vector3Shrt Orientation;
 
 	bool Locked;
-	short FlashGun;
+	int FlashGun;
 };
 
 struct FlareData
 {
-	unsigned int Life;
 	int Frame;
+	unsigned int Life;
 	bool ControlLeft;
 };
 
@@ -1095,6 +1095,7 @@ struct TorchData
 	bool IsLit;
 };
 
+// TODO: Someone's abandoned dairy feature.
 #define MaxDiaryPages	  64
 #define MaxStringsPerPage 8
 
@@ -1132,7 +1133,7 @@ struct LaraInventoryData
 	bool HasBinoculars;
 	bool HasCrowbar;
 	bool HasTorch;
-	bool HasLasersight;	// TODO: Duplicated in CarriedWeaponInfo.
+	bool HasLasersight; // TODO: Duplicated in CarriedWeaponInfo.
 	bool HasSilencer;	// TODO: Duplicated in CarriedWeaponInfo.
 
 	int TotalSmallMedipacks;
@@ -1154,7 +1155,7 @@ struct LaraCountData
 {
 	unsigned int Pose;
 	unsigned int PositionAdjust;
-	unsigned int RunJump;
+	unsigned int Run;
 	unsigned int Death;
 	unsigned int NoCheat;
 };
@@ -1220,12 +1221,6 @@ struct SubsuitControlData
 	unsigned short HitCount;
 };
 
-struct MinecartControlData
-{
-	bool Left;
-	bool Right;
-};
-
 struct LaraControlData
 {
 	short MoveAngle;
@@ -1236,6 +1231,11 @@ struct LaraControlData
 	WaterStatus WaterStatus;
 	LaraCountData Count;
 
+	WeaponControlData Weapon;
+	RopeControlData Rope;
+	TightropeControlData Tightrope;
+	SubsuitControlData Subsuit;
+
 	bool CanLook;
 	bool IsMoving;
 	bool KeepLow;
@@ -1245,12 +1245,6 @@ struct LaraControlData
 	bool CanMonkeySwing;
 	bool RunJumpQueued;
 	bool Locked;
-
-	WeaponControlData Weapon;
-	RopeControlData Rope;
-	TightropeControlData Tightrope;
-	SubsuitControlData Subsuit;
-	MinecartControlData Minecart;
 };
 
 struct LaraInfo
@@ -1283,7 +1277,6 @@ struct LaraInfo
 	int HitFrame;
 	int HitDirection;
 	FX_INFO* SpasmEffect;	// Not saved.
-	unsigned int SpasmEffectCount;
 
 	short InteractedItem;
 	int ProjectedFloorHeight;

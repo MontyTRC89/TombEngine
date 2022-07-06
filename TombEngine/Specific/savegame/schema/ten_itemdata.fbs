@@ -50,7 +50,26 @@ table LaserHead {
 }
 
 table QuadBike {
+	turn_rate: int32;
+	front_rot: int32;
+	rear_rot: int32;
+	momentum_angle: int32;
+	extra_rotation: int32;
 
+	velocity: int32;
+	left_vertical_velocity: int32;
+	right_vertical_velocity: int32;
+
+	revs: int32;
+	engine_revs: int32;
+	pitch: int32;
+
+	smoke_start: int32;
+	can_start_drift: bool;
+	drift_starting: bool;
+	no_dismount: bool;
+
+	flags: int32;
 }
 
 table BigGun {
@@ -66,7 +85,24 @@ table Jeep {
 }
 
 table Kayak {
+	turn_rate: int32;
 
+	velocity: int32;
+	front_vertical_velocity: int32;
+	left_vertical_velocity: int32;
+	right_vertical_velocity: int32;
+
+	left_right_count: int32;
+	water_height: int32;
+	old_pos: Position;
+	turn: bool;
+	forward: bool;
+	true_water: bool;
+
+	current_start_wake: int32;
+	wake_shade: int32;
+
+	flags: int32;
 }
 
 table Door {
@@ -78,7 +114,14 @@ table Skidoo {
 }
 
 table UPV {
-
+	velocity: int32;
+	rot: int32;
+	x_rot: int32;
+	fan_rot: int32;
+	harpoon_timer: int32;
+	harpoon_left: bool;
+	
+	flags: int32;
 }
 
 table Motorboat {
@@ -102,7 +145,20 @@ table Pushable {
 }
 
 table Minecart {
+	turn_rot: int32;
+	turn_x: int32;
+	turn_z: int32;
+	turn_len: int32;
 
+	velocity: int32;
+	vertical_velocity: int32;
+	gradient: int32;
+	stop_delay: int32;
+
+	floor_height_middle: int32;
+	floor_height_front: int32;
+
+	flags: int32;
 }
 
 table LaraInfo {

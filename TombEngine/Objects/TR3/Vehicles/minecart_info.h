@@ -1,19 +1,23 @@
 #pragma once
 
-struct MinecartInfo 
+namespace TEN::Entities::Vehicles
 {
-	short TurnRot;
-	int TurnX;
-	int TurnZ;
-	short TurnLen;
+	struct MinecartInfo
+	{
+		int Velocity = 0;
+		int VerticalVelocity = 0;
 
-	int Velocity;
-	int VerticalVelocity;
-	int Gradient;
-	unsigned int StopDelay;
+		short TurnRot = 0;
+		int TurnX = 0;
+		int TurnZ = 0;
+		short TurnLen = 0;
 
-	int FloorHeightMiddle;
-	int FloorHeightFront;
+		int Gradient = 0;
+		unsigned int StopDelay = 0;
 
-	char Flags;
-};
+		int FloorHeightMiddle = 0;
+		int FloorHeightFront = 0;
+
+		char Flags = NULL;
+	};
+}

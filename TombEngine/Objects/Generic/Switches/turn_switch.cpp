@@ -13,6 +13,8 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Switches
 {
 	enum TurnSwitchDirection
@@ -56,7 +58,7 @@ namespace TEN::Entities::Switches
 		if (TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			laraItem->Animation.Airborne == false &&
+			laraItem->Animation.IsAirborne == false &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
 			switchItem->Animation.ActiveState == TURN_SWITCH_STOP ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)

@@ -114,7 +114,7 @@ namespace TEN::Entities::TR4
 	{
 		for (int i = 0; i < maxSparks; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			int random = GetRandomControl();
 
@@ -129,7 +129,7 @@ namespace TEN::Entities::TR4
 			spark->fadeToBlack = 4;
 			spark->life = 9;
 			spark->sLife = 9;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -144,7 +144,7 @@ namespace TEN::Entities::TR4
 
 		for (int i = 0; i < maxSparks; i++)
 		{
-			auto* spark = &Sparks[GetFreeSpark()];
+			auto* spark = GetFreeParticle();
 
 			int random = GetRandomControl();
 
@@ -159,7 +159,7 @@ namespace TEN::Entities::TR4
 			spark->dB = ((random / 16) & 0x1F) + 48;
 			spark->life = 9;
 			spark->sLife = 9;
-			spark->transType = TransTypeEnum::COLADD;
+			spark->blendMode = BLEND_MODES::BLENDMODE_ADDITIVE;
 			spark->x = pos->x;
 			spark->y = pos->y;
 			spark->z = pos->z;
@@ -261,7 +261,7 @@ namespace TEN::Entities::TR4
 			xRot = phd_atan(682, height2 - height1);
 		}
 
-		short angle;
+		short angle = 0;
 
 		if (item->HitPoints <= 0)
 		{
@@ -344,19 +344,17 @@ namespace TEN::Entities::TR4
 							{
 								if (Lara.Control.Weapon.GunType == LaraWeaponType::Shotgun)
 								{
-									item->HitPoints -= 10;
-									item->HitStatus = true;
+									DoDamage(item, 10);
 								}
 								else if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 								{
-									item->HitPoints -= 20;
-									item->HitStatus = true;
+									DoDamage(item, 20);
 								}
 								else
 									item->HitPoints--;
 
 								SoundEffect(SFX_TR4_HORSEMAN_TAKEHIT, &item->Pose);
-								SoundEffect(SFX_TR4_HORSE_RICOCHETS, &item->Pose);
+								SoundEffect(SFX_TR4_HORSE_RICOCHET, &item->Pose);
 
 								auto pos = Vector3Int(0, -128, 80);
 								GetJointAbsPosition(item, &pos, SPHERES_SPACE_WORLD);
@@ -562,8 +560,7 @@ namespace TEN::Entities::TR4
 
 						horseItem->Flags = 1;
 
-						LaraItem->HitPoints -= 150;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 150);
 					}
 				}
 
@@ -584,8 +581,7 @@ namespace TEN::Entities::TR4
 
 						creature->Flags = 1;
 
-						LaraItem->HitPoints -= 250;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 250);
 					}
 				}
 
@@ -606,10 +602,9 @@ namespace TEN::Entities::TR4
 							item->Pose.Orientation.y,
 							DoBloodSplat);
 
-						creature->Flags = 1;
+						DoDamage(creature->Enemy, 100);
 
-						LaraItem->HitPoints -= 100;
-						LaraItem->HitStatus = true;
+						creature->Flags = 1;
 					}
 				}
 
@@ -696,8 +691,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->TouchBits & 0x4000)
 					{
-						LaraItem->HitPoints -= 100;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 100);
 
 						CreatureEffect2(
 							item,
@@ -726,8 +720,7 @@ namespace TEN::Entities::TR4
 				{
 					if (horseItem->TouchBits & 0xA2000)
 					{
-						LaraItem->HitPoints -= 150;
-						LaraItem->HitStatus = true;
+						DoDamage(creature->Enemy, 150);
 
 						if (horseItem->TouchBits & 0x2000)
 						{
@@ -778,7 +771,7 @@ namespace TEN::Entities::TR4
 								-1,
 								DoBloodSplat);
 
-							LaraItem->HitPoints -= 250;
+							DoDamage(creature->Enemy, 250);
 						}
 						else if (item->TouchBits & 0x400)
 						{
@@ -789,7 +782,7 @@ namespace TEN::Entities::TR4
 								-1,
 								DoBloodSplat);
 
-							LaraItem->HitPoints -= 150;
+							DoDamage(creature->Enemy, 150);
 						}
 
 						creature->Flags = 1;

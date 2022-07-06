@@ -6,22 +6,22 @@ namespace TEN::Renderer
 {
 	struct RendererBone
 	{
+		int Index;
+		Vector3 GlobalTranslation;
 		Vector3 Translation;
 		Matrix GlobalTransform;
 		Matrix Transform;
-		Vector3 GlobalTranslation;
-		std::vector<RendererBone*> Children;
-		RendererBone* Parent;
-		int Index;
 		Vector3 ExtraRotation;
+		RendererBone* Parent;
+		std::vector<RendererBone*> Children;
 		byte ExtraRotationFlags;
 
 		RendererBone(int index)
 		{
 			Index = index;
+			Translation = Vector3::Zero;
+			ExtraRotation = Vector3::Zero;
 			ExtraRotationFlags = 0;
-			Translation = Vector3(0, 0, 0);
-			ExtraRotation = Vector3(0, 0, 0);
 		}
 	};
 }

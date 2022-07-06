@@ -16,6 +16,7 @@
 #include "Specific/setup.h"
 #include "Specific/input.h"
 
+using namespace TEN::Input;
 using namespace TEN::Math::Random;
 
 struct PistolDef
@@ -41,7 +42,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	auto* weapon = &Weapons[(int)weaponType];
 	auto* p = &PistolsTable[(int)lara->Control.Weapon.GunType];
 
-	int soundPlayed = false;
+	int fired = false;
 
 	if (laraItem->MeshBits)
 	{
@@ -124,9 +125,9 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 						lara->RightArm.FlashGun = weapon->FlashTime;
 
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.5f);
+						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.3f);
 						SoundEffect(weapon->SampleNum, &laraItem->Pose);
-						soundPlayed = true;
+						fired = true;
 
 						if (weaponType == LaraWeaponType::Uzi)
 							lara->Control.Weapon.UziRight = true;
@@ -215,10 +216,11 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 						lara->LeftArm.FlashGun = weapon->FlashTime;
 					}
 
-					if (!soundPlayed)
+					if (!fired)
 					{
-						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.5f);
+						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.3f);
 						SoundEffect(weapon->SampleNum, &laraItem->Pose);
+						fired = true;
 					}
 
 					if (weaponType == LaraWeaponType::Uzi)
@@ -263,6 +265,12 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 			SoundEffect(weapon->SampleNum + 1, &laraItem->Pose);
 			lara->Control.Weapon.UziLeft = false;
 		}
+	}
+
+	if (fired) // Rumble gamepad only once if any of the hands fired.
+	{
+		float power = weaponType == LaraWeaponType::Uzi ? GenerateFloat(0.1f, 0.3f) : 1.0f;
+		Rumble(power, 0.1f);
 	}
 
 	SetArmInfo(laraItem, &lara->LeftArm, frameLeft);

@@ -13,6 +13,8 @@
 #include "Specific/input.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // LADDER CLIMB
 // Control & Collision Functions
@@ -408,7 +410,7 @@ void lara_as_climb_stepoff_right(ItemInfo* item, CollisionInfo* coll)
 
 short GetClimbFlags(int x, int y, int z, short roomNumber)
 {
-	return GetClimbFlags(GetFloor(x, y, z, &roomNumber));
+	return GetClimbFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
 }
 
 short GetClimbFlags(FloorInfo* floor)
@@ -980,7 +982,7 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	item->Animation.VerticalVelocity = 0;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 
 	if (TrInput & IN_ACTION && item->HitPoints > 0 || item->Animation.AnimNumber == LA_ONWATER_TO_LADDER) // Can't let go on this anim
 		return false;
@@ -991,7 +993,7 @@ bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll)
 
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	lara->Control.HandStatus = HandStatus::Free;
 	return true;
 }

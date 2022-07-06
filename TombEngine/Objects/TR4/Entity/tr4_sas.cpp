@@ -16,11 +16,13 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_item.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SASGunBite = { 0, 300, 64, 7 };
 
-	Vector3Int SASDragBodyPosition = { 0, 0, -460 };
+	auto SASDragBodyPosition = Vector3Int(0, 0, -460);
 	OBJECT_COLLISION_BOUNDS SASDragBodyBounds =
 	{
 		-256, 256,
@@ -269,9 +271,9 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_WAIT:
-				joint2 = angle;
 				creature->MaxTurn = 0;
 				creature->Flags = 0;
+				joint2 = angle;
 
 				if (item->AIBits & GUARD)
 				{
@@ -292,9 +294,9 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_WALK:
-				joint2 = angle;
 				creature->MaxTurn = ANGLE(5.0f);
 				creature->Flags = 0;
+				joint2 = angle;
 
 				if (item->AIBits & PATROL1)
 					item->Animation.TargetState = SAS_STATE_WALK;
@@ -343,8 +345,8 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_RUN:
-				tilt = angle / 2;
 				creature->MaxTurn = ANGLE(10.0f);
+				tilt = angle / 2;
 
 				if (AI.ahead)
 					joint2 = AI.angle;
@@ -562,18 +564,14 @@ namespace TEN::Entities::TR4
 			auto pos = Vector3Int(SASGunBite.x, SASGunBite.y, SASGunBite.z);
 			GetJointAbsPosition(item, &pos, SASGunBite.meshNum);
 
-			grenadeItem->Pose.Position.x = pos.x;
-			grenadeItem->Pose.Position.y = pos.y;
-			grenadeItem->Pose.Position.z = pos.z;
+			grenadeItem->Pose.Position = pos;
 
 			auto probe = GetCollision(pos.x, pos.y, pos.z, grenadeItem->RoomNumber);
 			grenadeItem->RoomNumber = probe.RoomNumber;
 
 			if (probe.Position.Floor < grenadeItem->Pose.Position.y)
 			{
-				grenadeItem->Pose.Position.x = item->Pose.Position.x;
-				grenadeItem->Pose.Position.y = probe.Position.Floor;
-				grenadeItem->Pose.Position.z = item->Pose.Position.z;
+				grenadeItem->Pose.Position = Vector3Int(item->Pose.Position.x, probe.Position.Floor, item->Pose.Position.z);
 				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 
@@ -594,13 +592,13 @@ namespace TEN::Entities::TR4
 			else
 				grenadeItem->ItemFlags[0] = (int)GrenadeType::Super;
 
-			grenadeItem->ItemFlags[2] = 1;
-			grenadeItem->Animation.Velocity = 128;
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
-			grenadeItem->Animation.VerticalVelocity = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
 			grenadeItem->Animation.RequiredState = 0;
+			grenadeItem->Animation.Velocity = 128;
+			grenadeItem->Animation.VerticalVelocity = -128 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;
+			grenadeItem->ItemFlags[2] = 1;
 
 			AddActiveItem(itemNumber);
 		}
@@ -652,7 +650,7 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		if ((!(TrInput & IN_ACTION) ||
-			laraItem->Animation.Airborne ||
+			laraItem->Animation.IsAirborne ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
 			Lara.Control.HandStatus != HandStatus::Free ||

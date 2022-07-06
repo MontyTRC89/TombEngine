@@ -51,9 +51,10 @@ void WreckingBallCollision(short itemNumber, ItemInfo* l, CollisionInfo* coll)
 		if (ItemPushItem(item, l, coll, coll->Setup.EnableSpasm, 1))
 		{
 			if (test)
-				l->HitPoints = 0;
+				DoDamage(l, INT_MAX);
 			else
-				l->HitPoints -= damage;
+				DoDamage(l, damage);
+
 			x -= l->Pose.Position.x;
 			y -= l->Pose.Position.y;
 			z -= l->Pose.Position.z;
@@ -259,7 +260,7 @@ void WreckingBallControl(short itemNumber)
 		item->Pose.Position.y += item->Animation.VerticalVelocity;
 		if (item->Pose.Position.y < item2->Pose.Position.y + 1644)
 		{
-			StopSoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP);
+			StopSoundEffect(SFX_TR5_BASE_CLAW_WINCH_UP_LOOP);
 			item->ItemFlags[0] = 1;
 			item->Pose.Position.y = item2->Pose.Position.y + 1644;
 			if (item->Animation.VerticalVelocity < -32)
@@ -277,7 +278,7 @@ void WreckingBallControl(short itemNumber)
 		}
 		else if (!item->ItemFlags[0])
 		{
-			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_LOOP, &item->Pose);
+			SoundEffect(SFX_TR5_BASE_CLAW_WINCH_UP_LOOP, &item->Pose);
 		}
 	}
 	item2->Pose.Position.x = item->Pose.Position.x;

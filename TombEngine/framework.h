@@ -22,7 +22,6 @@
 #define USE_FEATURE_IF_CPP20(x)
 #endif
 
-
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 

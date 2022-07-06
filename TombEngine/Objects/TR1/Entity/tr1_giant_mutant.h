@@ -1,3 +1,6 @@
 #pragma once
 
-void GiantMutantControl(short itemNumber);
+namespace TEN::Entities::TR1
+{
+	void GiantMutantControl(short itemNumber);
+}

@@ -64,7 +64,7 @@ void EagleControl(short itemNumber)
 			{
 				item->Pose.Position.y = item->Floor;
 				item->Animation.VerticalVelocity = 0;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = 5;
 			}
 
@@ -83,7 +83,7 @@ void EagleControl(short itemNumber)
 			item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 			item->Animation.ActiveState = 4;
 			item->Animation.Velocity = 0;
-			item->Animation.Airborne = true;
+			item->Animation.IsAirborne = true;
 			break;
 		}
 		item->Pose.Orientation.x = 0;
@@ -146,8 +146,7 @@ void EagleControl(short itemNumber)
 		case 6:
 			if (!creature->Flags && item->TouchBits)
 			{
-				LaraItem->HitPoints -= 20;
-				LaraItem->HitStatus = true;
+				DoDamage(creature->Enemy, 20);
 
 				if (item->ObjectNumber == ID_CROW)
 					CreatureEffect(item, &CrowBite, DoBloodSplat);

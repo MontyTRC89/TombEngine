@@ -15,6 +15,8 @@
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
+using namespace TEN::Input;
+
 constexpr auto HORIZONTAL_ALIGN_NORTHEAST = 155;
 constexpr auto HORIZONTAL_ALIGN_SOUTHWEST = 101;
 constexpr auto FORWARD_ALIGNMENT = 868;
@@ -455,7 +457,7 @@ void lara_as_slopeclimb(ItemInfo* item, CollisionInfo* coll)
 
 void lara_as_slopefall(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 
 	if (GlobalCounter % 2)
 		item->Pose.Orientation.x--;
@@ -490,7 +492,7 @@ void lara_col_slopehang(ItemInfo* item, CollisionInfo* coll)
 	if (!(TrInput & IN_ACTION))
 	{
 		SetAnimation(item, LA_OVERHANG_HANG_DROP);
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 		return;
 	}
 

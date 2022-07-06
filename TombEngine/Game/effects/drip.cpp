@@ -15,11 +15,7 @@
 using namespace TEN::Effects::Environment;
 using namespace TEN::Math::Random;
 
-namespace TEN
-{
-namespace Effects
-{
-namespace Drip 
+namespace TEN::Effects::Drip
 {
 	using namespace DirectX::SimpleMath;
 
@@ -36,11 +32,12 @@ namespace Drip
 	{
 		for (int i = 0; i < dripParticles.size(); i++) 
 		{
-			DripParticle& d = dripParticles[i];
-			if (!d.active) continue;
+			auto& d = dripParticles[i];
+
+			if (!d.active)
+				continue;
 
 			d.age++;
-
 			if (d.age > d.life)
 				d.active = false;
 
@@ -55,7 +52,7 @@ namespace Drip
 			d.pos += d.velocity;
 			float normalizedAge = d.age / d.life;
 			d.color = Vector4::Lerp(DRIP_COLOR, Vector4::Zero, normalizedAge);
-			d.height = lerp(DRIP_WIDTH / 0.15625, 0, normalizedAge);
+			d.height = Lerp(DRIP_WIDTH / 0.15625f, 0, normalizedAge);
 			short room = d.room;
 			FloorInfo* floor = GetFloor(d.pos.x, d.pos.y, d.pos.z, &room);
 			int floorheight = floor->FloorHeight(d.pos.x, d.pos.z);
@@ -85,7 +82,7 @@ namespace Drip
 
 	void SpawnWetnessDrip(Vector3 const & pos, int room)
 	{
-		DripParticle& d = getFreeDrip();
+		auto& d = getFreeDrip();
 		d = {};
 		d.active = true;
 		d.pos = pos;
@@ -131,4 +128,4 @@ namespace Drip
 			drip.active = true;
 		}
 	}
-}}}
+}

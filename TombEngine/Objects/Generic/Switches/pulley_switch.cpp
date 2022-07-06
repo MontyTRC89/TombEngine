@@ -11,6 +11,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/items.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Switches
 {
 	OBJECT_COLLISION_BOUNDS PulleyBounds = 
@@ -47,7 +49,7 @@ namespace TEN::Entities::Switches
 		if (TrInput & IN_ACTION &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			laraItem->Animation.Airborne == false &&
+			laraItem->Animation.IsAirborne == false &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{

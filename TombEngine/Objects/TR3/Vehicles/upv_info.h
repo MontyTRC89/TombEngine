@@ -1,13 +1,19 @@
 #pragma once
 
-struct UPVInfo
+namespace TEN::Entities::Vehicles
 {
-	int Velocity;
-	int Rot;
-	int XRot;
-	short FanRot;
-	unsigned int HarpoonTimer;
-	bool HarpoonLeft;
+	struct UPVInfo
+	{
+		Vector3Shrt TurnRate;
+		short TurbineRotation = 0;
+		short LeftRudderRotation = 0;
+		short RightRudderRotation = 0;
 
-	char Flags;
-};
+		int Velocity = 0;
+
+		unsigned int HarpoonTimer = 0;
+		bool HarpoonLeft = false;
+
+		char Flags = NULL;
+	};
+}

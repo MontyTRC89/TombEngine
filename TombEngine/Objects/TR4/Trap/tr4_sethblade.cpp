@@ -8,13 +8,27 @@
 
 namespace TEN::Entities::TR4
 {
+	enum SethBladeState 
+	{
+		SETHBLADE_STATE_NONE = 0,
+		SETHBLADE_STATE_ACTIVE = 1,
+		SETHBLADE_STATE_IDLE = 2,
+	};
+
+	enum SethBladeAnim 
+	{
+		SETHBLADE_ANIM_ACTIVATE = 0,
+		SETHBLADE_ANIM_IDLE = 1,
+	};
+
 	void InitialiseSethBlade(short itemNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 1;
-		item->Animation.TargetState = 2;
-		item->Animation.ActiveState = 2;
+		item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SETHBLADE_ANIM_IDLE;
+		item->Animation.TargetState = SETHBLADE_STATE_ACTIVE;
+		item->Animation.ActiveState = SETHBLADE_STATE_IDLE;
+
 		item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 		item->ItemFlags[2] = abs(item->TriggerFlags);
 	}
@@ -27,13 +41,13 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
-			if (item->Animation.ActiveState == 2)
+			if (item->Animation.ActiveState == SETHBLADE_STATE_IDLE)
 			{
 				if (item->ItemFlags[2] > 1)
 					item->ItemFlags[2]--;
 				else if (item->ItemFlags[2] == 1)
 				{
-					item->Animation.TargetState = 1;
+					item->Animation.TargetState = SETHBLADE_STATE_ACTIVE;
 					item->ItemFlags[2] = 0;
 				}
 				else if (item->ItemFlags[2] == 0)

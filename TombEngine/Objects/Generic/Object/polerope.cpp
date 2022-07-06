@@ -13,6 +13,8 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/sphere.h"
 
+using namespace TEN::Input;
+
 namespace TEN::Entities::Generic
 {
 	Vector3Int PolePos = { 0, 0, -208 };
@@ -33,7 +35,7 @@ namespace TEN::Entities::Generic
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* poleItem = &g_Level.Items[itemNumber];
 
-		bool isLara = !poleItem->Data.is<LaraInfo*>();
+		bool isLara = !poleItem->IsLara();
 
 		if (TrInput & IN_ACTION && isLara &&
 			laraInfo->Control.HandStatus == HandStatus::Free &&
@@ -72,7 +74,7 @@ namespace TEN::Entities::Generic
 		}
 		else if (TrInput & IN_ACTION && isLara &&
 			     laraInfo->Control.HandStatus == HandStatus::Free && 
-				 laraItem->Animation.Airborne && 
+				 laraItem->Animation.IsAirborne && 
 				 laraItem->Animation.VerticalVelocity > (int)laraInfo->Control.HandStatus &&	// ?????
 				 laraItem->Animation.ActiveState == LS_REACH || laraItem->Animation.ActiveState == LS_JUMP_UP)
 		{
@@ -101,7 +103,7 @@ namespace TEN::Entities::Generic
 
 					laraItem->Animation.ActiveState = LS_POLE_IDLE;
 					laraItem->Animation.VerticalVelocity = 0;
-					laraItem->Animation.Airborne = false;
+					laraItem->Animation.IsAirborne = false;
 					laraInfo->Control.HandStatus = HandStatus::Busy;
 					poleItem->Pose.Orientation.y = rot;
 				}

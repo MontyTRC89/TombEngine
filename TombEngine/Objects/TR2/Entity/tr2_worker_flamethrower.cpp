@@ -2,6 +2,7 @@
 #include "Objects/TR2/Entity/tr2_worker_flamethrower.h"
 
 #include "Game/animation.h"
+#include "Game/camera.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
@@ -16,6 +17,7 @@
 #include "Specific/trmath.h"
 
 BITE_INFO WorkerFlamethrowerBite = { 0, 250, 32, 9 };
+Vector3Int WorkerFlamethrowerOffset = { 0, 140, 0 };
 
 // TODO
 enum WorkerFlamethrowerState
@@ -28,24 +30,6 @@ enum WorkerFlamethrowerAnim
 {
 
 };
-
-static void Flame(int x, int y, int z, int velocity, short yRot, short roomNumber)
-{
-	short fxNumber = CreateNewEffect(roomNumber);
-	if (fxNumber != NO_ITEM)
-	{
-		auto* fx = &EffectList[fxNumber];
-
-		fx->pos.Position.x = x;
-		fx->pos.Position.y = y;
-		fx->pos.Position.z = z;
-		fx->roomNumber = roomNumber;
-		//TODO: complete fx parameters
-		fx->shade = 14 * 256;
-		fx->counter = 40;
-		ShootAtLara(fx);
-	}
-}
 
 void InitialiseWorkerFlamethrower(short itemNumber)
 {
@@ -96,11 +80,14 @@ void WorkerFlamethrower(short itemNumber)
 		if (item->Animation.ActiveState != 5 && item->Animation.ActiveState != 6)
 		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 10, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-			AddFire(pos.x, pos.y, pos.z, 0, item->RoomNumber, 0);
+			TriggerPilotFlame(itemNumber, WorkerFlamethrowerBite.meshNum);
 		}
 		else
+		{
 			TriggerDynamicLight(pos.x, pos.y, pos.z, (GetRandomControl() & 4) + 14, (GetRandomControl() & 7) + 128, (GetRandomControl() & 7) + 64, GetRandomControl() & 7);
-
+			ThrowFire(itemNumber, WorkerFlamethrowerBite.meshNum, WorkerFlamethrowerOffset, WorkerFlamethrowerOffset);
+		}
+			
 		AI_INFO AI;
 		CreatureAIInfo(item, &AI);
 

@@ -9,12 +9,14 @@
 #include "Game/effects/lara_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_climb.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_tests.h"
 #include "Game/items.h"
 #include "Game/room.h"
 #include "Game/spotcam.h"
 #include "Game/savegame.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/objectslist.h"
 #include "Sound/sound.h"
 #include "Specific/setup.h"
@@ -125,7 +127,7 @@ int SwitchTrigger(short itemNumber, short timer)
 			item->Timer = timer;
 			item->Status = ITEM_ACTIVE;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->Timer = FPS * timer;
 			return 1;
 		}
 		if (item->TriggerFlags != 6 || item->Animation.ActiveState)
@@ -456,7 +458,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			item->Timer = timer;
 			if (timer != 1)
-				item->Timer = 30 * timer;
+				item->Timer = FPS * timer;
 
 			if (triggerType == TRIGGER_TYPES::SWITCH ||
 				triggerType == TRIGGER_TYPES::HEAVYSWITCH)
@@ -523,8 +525,8 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 						{
 							if (item->Status == ITEM_INVISIBLE)
 							{
-								item->TouchBits = 0;
-								if (EnableBaddyAI(value, 0))
+								item->TouchBits = NO_JOINT_BITS;
+								if (EnableEntityAI(value, 0))
 								{
 									item->Status = ITEM_ACTIVE;
 									AddActiveItem(value);
@@ -538,15 +540,15 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 						}
 						else
 						{
-							item->TouchBits = 0;
+							item->TouchBits = NO_JOINT_BITS;
 							item->Status = ITEM_ACTIVE;
 							AddActiveItem(value);
-							EnableBaddyAI(value, 1);
+							EnableEntityAI(value, 1);
 						}
 					}
 					else
 					{
-						item->TouchBits = 0;
+						item->TouchBits = NO_JOINT_BITS;
 						AddActiveItem(value);
 						item->Status = ITEM_ACTIVE;
 					}
@@ -576,7 +578,7 @@ void TestTriggers(FloorInfo* floor, int x, int y, int z, bool heavy, int heavyFl
 
 			if (Camera.number != Camera.last || triggerType == TRIGGER_TYPES::SWITCH)
 			{
-				Camera.timer = (trigger & 0xFF) * 30;
+				Camera.timer = (trigger & 0xFF) * FPS;
 				Camera.type = heavy ? CameraType::Heavy : CameraType::Fixed;
 				if (trigger & ONESHOT)
 					g_Level.Cameras[Camera.number].flags |= ONESHOT;
@@ -724,30 +726,40 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
-	ProcessSectorFlags(GetCollision(item).BottomBlock);
-}
+	auto block = GetCollision(item).BottomBlock;
+	bool isLara = item->IsLara();
 
-void ProcessSectorFlags(int x, int y, int z, short roomNumber)
-{
-	ProcessSectorFlags(GetCollision(x, y, z, roomNumber).BottomBlock);
-}
-
-void ProcessSectorFlags(FloorInfo* floor)
-{
-	// Monkeyswing
-	Lara.Control.CanMonkeySwing = floor->Flags.Monkeyswing;
-
-	// Burn Lara
-	if (floor->Flags.Death &&
-		(LaraItem->Pose.Position.y == LaraItem->Floor && !IsJumpState((LaraState)LaraItem->Animation.ActiveState) ||
-			Lara.Control.WaterStatus != WaterStatus::Dry))
+	// Monkeyswing and climb (only for Lara)
+	if (isLara)
 	{
-		LavaBurn(LaraItem);
+		auto* lara = GetLaraInfo(item);
+
+		// Set climb status
+		if (TestLaraNearClimbableWall(item, block))
+			lara->Control.CanClimbLadder = true;
+		else
+			lara->Control.CanClimbLadder = false;
+
+		// Set monkeyswing status
+		lara->Control.CanMonkeySwing = block->Flags.Monkeyswing;
 	}
 
-	// Set climb status
-	if ((1 << (GetQuadrant(LaraItem->Pose.Orientation.y) + 8)) & GetClimbFlags(floor))
-		Lara.Control.CanClimbLadder = true;
-	else
-		Lara.Control.CanClimbLadder = false;
+	// Burn or drown item
+	if (block->Flags.Death && item->Pose.Position.y == item->Floor)
+	{
+		if (isLara)
+		{
+			if (!IsJumpState((LaraState)item->Animation.ActiveState) || 
+				GetLaraInfo(item)->Control.WaterStatus != WaterStatus::Dry)
+			{
+				// To allow both lava and rapids in same level, also check floor material flag.
+				if (block->Material == FLOOR_MATERIAL::Water && Objects[ID_KAYAK_LARA_ANIMS].loaded)
+					KayakLaraRapidsDrown(item);
+				else
+					LavaBurn(item);
+			}
+		}
+		else if (Objects[item->ObjectNumber].intelligent && item->HitPoints != NOT_TARGETABLE)
+			DoDamage(item, INT_MAX); // TODO: Implement correct behaviour for other objects!
+	}
 }

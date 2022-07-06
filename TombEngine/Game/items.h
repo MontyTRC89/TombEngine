@@ -16,40 +16,47 @@ enum GAME_OBJECT_ID : short;
 #define GRAY555  RGB555(128, 128, 128)
 #define BLACK555 RGB555(  0,   0,   0)
 
-constexpr unsigned int NO_MESH_BITS = UINT_MAX;
-
 constexpr auto NO_ITEM = -1;
-constexpr auto ALL_MESHBITS = -1;
 constexpr auto NOT_TARGETABLE = -16384;
 constexpr auto NUM_ITEMS = 1024;
 
 enum AIObjectType
 {
-	NO_AI = 0x0000,
-	GUARD = 0x0001,
-	AMBUSH = 0x0002,
-	PATROL1 = 0x0004,
-	MODIFY = 0x0008,
-	FOLLOW = 0x0010,
-	PATROL2 = 0x0020,
+	NO_AI	  = 0,
+	GUARD	  = (1 << 0),
+	AMBUSH	  = (1 << 1),
+	PATROL1	  = (1 << 2),
+	MODIFY	  = (1 << 3),
+	FOLLOW	  = (1 << 4),
+	PATROL2	  = (1 << 5),
 	ALL_AIOBJ = (GUARD | AMBUSH | PATROL1 | MODIFY | FOLLOW | PATROL2)
 };
 
 enum ItemStatus
 {
-	ITEM_NOT_ACTIVE = 0,
-	ITEM_ACTIVE = 1,
+	ITEM_NOT_ACTIVE	 = 0,
+	ITEM_ACTIVE		 = 1,
 	ITEM_DEACTIVATED = 2,
-	ITEM_INVISIBLE = 3
+	ITEM_INVISIBLE	 = 3
 };
 
 enum ItemFlags
 {
-	IFLAG_CLEAR_BODY = (1 << 7), // 0x0080
-	IFLAG_INVISIBLE = (1 << 8),  // 0x0100
-	IFLAG_REVERSE = (1 << 14),	 // 0x4000
-	IFLAG_KILLED = (1 << 15),    // 0x8000
-	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
+	IFLAG_CLEAR_BODY	  = (1 << 7),  // 0x0080
+	IFLAG_INVISIBLE		  = (1 << 8),  // 0x0100
+	IFLAG_REVERSE		  = (1 << 14), // 0x4000
+	IFLAG_KILLED		  = (1 << 15), // 0x8000
+	IFLAG_ACTIVATION_MASK = 0x3E00	   // bits 9-13
+};
+
+constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
+constexpr unsigned int NO_JOINT_BITS  = 0;
+
+enum class JointBitType
+{
+	Touch,
+	Mesh,
+	MeshSwap
 };
 
 struct EntityAnimationData
@@ -60,7 +67,7 @@ struct EntityAnimationData
 	int TargetState;
 	int RequiredState; // TODO: Phase out this weird feature.
 
-	bool Airborne;
+	bool IsAirborne;
 	int Velocity;
 	int VerticalVelocity;
 	int LateralVelocity;
@@ -78,8 +85,10 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS Pose;
 	PHD_3DPOS StartPose;
+	PHD_3DPOS Pose;
+	ROOM_VECTOR Location;
+	short RoomNumber;
 	int Floor;
 
 	int HitPoints;
@@ -88,19 +97,17 @@ struct ItemInfo
 	bool Collidable;
 	bool InDrawRoom;
 
-	ROOM_VECTOR Location;
-	short RoomNumber;
 	int BoxNumber;
 	int Timer;
 	short Shade;
 
-	uint32_t TouchBits;
-	uint32_t MeshBits;
+	unsigned int TouchBits;
+	unsigned int MeshBits;
+	unsigned int MeshSwapBits;
 
-	uint16_t Flags; // ItemFlags enum
+	unsigned short Flags; // ItemFlags enum
 	short ItemFlags[8];
 	short TriggerFlags;
-	uint32_t SwapMeshFlags;
 
 	// TODO: Move to CreatureInfo?
 	uint8_t AIBits; // AIObjectType enum.
@@ -113,6 +120,15 @@ struct ItemInfo
 	std::string LuaCallbackOnHitName;
 	std::string LuaCallbackOnCollidedWithObjectName;
 	std::string LuaCallbackOnCollidedWithRoomName;
+
+	void SetBits(JointBitType type, std::vector<int> jointIndices);
+	void SetBits(JointBitType type, int jointIndex);
+	void ClearBits(JointBitType type, std::vector<int> jointIndices);
+	void ClearBits(JointBitType type, int jointIndex);
+	bool TestBits(JointBitType type, std::vector<int> jointIndices);
+	bool TestBits(JointBitType type, int jointIndex);
+
+	bool IsLara();
 };
 
 void EffectNewRoom(short fxNumber, short roomNumber);
@@ -133,3 +149,4 @@ void UpdateItemRoom(ItemInfo* item, int height, int xOffset = 0, int zOffset = 0
 std::vector<int> FindAllItems(short objectNumber);
 ItemInfo* FindItem(int objectNumber);
 int FindItem(ItemInfo* item);
+void DoDamage(ItemInfo* item, int damage);

@@ -12,6 +12,8 @@
 #include "Specific/input.h"
 #include "Specific/level.h"
 
+using namespace TEN::Input;
+
 // -----------------------------
 // SLIDE
 // Control & Collision Functions
@@ -46,17 +48,17 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 			// TODO: Prepped for another time.
 			if (TrInput & IN_LEFT)
 			{
-				lara->Control.TurnRate -= LARA_TURN_RATE;
-				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate -= LARA_TURN_RATE_ACCEL;
+				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_RATE_MAX)
+					lara->Control.TurnRate = -LARA_SLIDE_TURN_RATE_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				lara->Control.TurnRate += LARA_TURN_RATE;
-				if (lara->Control.TurnRate > LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate += LARA_TURN_RATE_ACCEL;
+				if (lara->Control.TurnRate > LARA_SLIDE_TURN_RATE_MAX)
+					lara->Control.TurnRate = LARA_SLIDE_TURN_RATE_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
@@ -90,7 +92,7 @@ void lara_col_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
@@ -155,17 +157,17 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 			// TODO: Prepped for another time.
 			if (TrInput & IN_LEFT)
 			{
-				lara->Control.TurnRate -= LARA_TURN_RATE;
-				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = -LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate -= LARA_TURN_RATE_ACCEL;
+				if (lara->Control.TurnRate < -LARA_SLIDE_TURN_RATE_MAX)
+					lara->Control.TurnRate = -LARA_SLIDE_TURN_RATE_MAX;
 
 				DoLaraLean(item, coll, LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
 			else if (TrInput & IN_RIGHT)
 			{
-				lara->Control.TurnRate += LARA_TURN_RATE;
-				if (lara->Control.TurnRate > LARA_SLIDE_TURN_MAX)
-					lara->Control.TurnRate = LARA_SLIDE_TURN_MAX;
+				lara->Control.TurnRate += LARA_TURN_RATE_ACCEL;
+				if (lara->Control.TurnRate > LARA_SLIDE_TURN_RATE_MAX)
+					lara->Control.TurnRate = LARA_SLIDE_TURN_RATE_MAX;
 
 				DoLaraLean(item, coll, -LARA_LEAN_MAX, LARA_LEAN_RATE / 3 * 2);
 			}
@@ -195,7 +197,7 @@ void lara_col_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;	// HACK: Behaves better with clamps.
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;

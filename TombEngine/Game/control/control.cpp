@@ -26,13 +26,14 @@
 #include "Game/effects/weather.h"
 #include "Game/effects/lightning.h"
 #include "Game/spotcam.h"
-#include "Game/particle/SimpleParticle.h"
+#include "Game/effects/simple_particle.h"
 #include "Game/collision/sphere.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_cheat.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/Effects/tr4_locusts.h"
 #include "Objects/Generic/Object/objects.h"
+#include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
@@ -45,10 +46,10 @@
 #include "Specific/setup.h"
 #include "Specific/prng.h"
 #include "Specific/winmain.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
-#include "ScriptInterfaceGame.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
-#include "Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 
 using std::vector;
 using std::unordered_map;
@@ -62,11 +63,13 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects;
+using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Renderer;
 using namespace TEN::Math::Random;
 using namespace TEN::Floordata;
+using namespace TEN::Input;
 
 int GameTimer       = 0;
 int GlobalCounter   = 0;
@@ -80,6 +83,8 @@ bool ThreadEnded;
 int RequiredStartPos;
 int CurrentLevel;
 int LevelComplete;
+
+int SystemNameHash = 0;
 
 bool  InItemControlLoop;
 short ItemNewRoomNo;
@@ -113,8 +118,6 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 	if (TrackCameraInit)
 		UseSpotCam = false;
 
-	SetDebounce = true;
-
 	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
 	
 	static int framesCount = 0;
@@ -129,10 +132,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
-		{
-			if (S_UpdateInput() == -1)
-				return GameStatus::None;
-		}
+			UpdateInput();
 
 		// Has Lara control been disabled?
 		if (Lara.Control.Locked || CurrentLevel == 0)
@@ -142,23 +142,23 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			TrInput &= IN_LOOK;
 		}
 
-		// Does the player want to enter inventory?
-		SetDebounce = false;
-
 		if (CurrentLevel != 0)
 		{
+			// Does the player want to enter inventory?
 			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
 				if (g_Gui.CallInventory(false))
-					return GameStatus::LoadGame;
+					return GameStatus::SaveGame;
 			}
 			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
+				StopRumble();
 
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
@@ -168,16 +168,18 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
 			{
 				StopAllSounds();
+				StopRumble();
+
 				g_Renderer.DumpGameScene();
 				g_Gui.SetInventoryMode(InventoryMode::Pause);
 				g_Gui.SetMenuToDisplay(Menu::Pause);
 				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_DESELECT || g_Gui.GetEnterInventory() != NO_ITEM) &&
+			else if ((DbInput & IN_OPTION || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
-				// Stop all sounds
 				StopAllSounds();
+				StopRumble();
 
 				if (g_Gui.CallInventory(true))
 					return GameStatus::LoadGame;
@@ -216,59 +218,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Handle lasersight and binocular
 		if (CurrentLevel != 0)
-		{
-			if (!(TrInput & IN_LOOK) || UseSpotCam || TrackCameraInit ||
-				((LaraItem->Animation.ActiveState != LS_IDLE || LaraItem->Animation.AnimNumber != LA_STAND_IDLE) &&
-					(!Lara.Control.IsLow || TrInput & IN_CROUCH || LaraItem->Animation.TargetState != LS_CROUCH_IDLE || LaraItem->Animation.AnimNumber != LA_CROUCH_IDLE)))
-			{
-				if (BinocularRange == 0)
-				{
-					if (UseSpotCam || TrackCameraInit)
-						TrInput &= ~IN_LOOK;
-				}
-				else
-				{
-					// If any input but optic controls (directions + action), immediately exit binoculars mode.
-					if (TrInput != IN_NONE && ((TrInput & ~IN_OPTIC_CONTROLS) != IN_NONE))
-						BinocularRange = 0;
-
-					if (LaserSight)
-					{
-						BinocularRange = 0;
-						BinocularOn = false;
-						LaserSight = false;
-						Camera.type = BinocularOldCamera;
-						Camera.bounce = 0;
-						AlterFOV(ANGLE(80.0f));
-
-						LaraItem->MeshBits = 0xFFFFFFFF;
-						Lara.Inventory.IsBusy = false;
-						ResetLaraFlex(LaraItem);
-
-						TrInput &= ~IN_LOOK;
-					}
-					else
-					{
-						TrInput |= IN_LOOK;
-						DbInput = 0;
-					}
-				}
-			}
-			else if (BinocularRange == 0)
-			{
-				if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-					((Lara.Control.Weapon.GunType == LaraWeaponType::Revolver && Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-						Lara.Control.Weapon.GunType == LaraWeaponType::HK || 
-						(Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow && Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
-				{
-					BinocularRange = 128;
-					BinocularOldCamera = Camera.oldType;
-					BinocularOn = true;
-					LaserSight = true;
-					Lara.Inventory.IsBusy = true;
-				}
-			}
-		}
+			HandleOptics();
 
 		// Update all items
 		InItemControlLoop = true;
@@ -411,7 +361,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			RumbleScreen();
 
 		PlaySoundSources();
-		DoFlipEffect(FlipEffect);
+		DoFlipEffect(FlipEffect, LaraItem);
 
 		UpdateFadeScreenAndCinematicBars();
 
@@ -463,11 +413,9 @@ GameStatus DoTitle(int index, std::string const& ambient)
 {
 	TENLog("DoTitle", LogLevel::Info);
 
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
-	// Load the level
-	LoadLevelFile(index);
+	// Load the title. Exit game if unsuccessful.
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitGame;
 
 	InventoryResult inventoryResult;
 
@@ -477,7 +425,6 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		InitialiseFXArray(true);
 		InitialisePickupDisplay();
 		InitialiseCamera();
-		StopAllSounds();
 
 		g_GameScript->ResetScripts(true);
 
@@ -490,7 +437,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 			g_GameScript->InitCallbacks();
 			g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 			{
-				g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+				g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
 			});
 		}
 
@@ -512,7 +459,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		// Play background music
 		// MERGE: PlaySoundTrack(index);
 
-		// Initialize menu
+		// Initialise menu
 		g_Gui.SetMenuToDisplay(Menu::Title);
 		g_Gui.SetSelectedOption(0);
 
@@ -534,9 +481,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		{
 			g_Renderer.RenderTitle();
 
-			SetDebounce = true;
-			S_UpdateInput();
-			SetDebounce = false;
+			UpdateInput();
 
 			status = g_Gui.TitleOptions();
 
@@ -576,27 +521,14 @@ GameStatus DoTitle(int index, std::string const& ambient)
 
 GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 {
-	// If not loading a savegame, then clear all the infos
-	if (!loadFromSavegame)
-	{
-		Statistics.Level.Timer = 0;
-		Statistics.Level.Distance = 0;
-		Statistics.Level.AmmoUsed = 0;
-		Statistics.Level.AmmoHits = 0;
-		Statistics.Level.Kills = 0;
-	}
-
-	// Reset all the globals for the game which needs this
-	CleanUp();
-
-	// Load the level
-	LoadLevelFile(index);
+	// Load the level and fall back to title, if load was unsuccessful
+	if (!LoadLevelFile(index))
+		return GameStatus::ExitToTitle;
 
 	// Initialise items, effects, lots, camera
 	InitialiseFXArray(true);
 	InitialisePickupDisplay();
 	InitialiseCamera();
-	StopAllSounds();
 
 	g_GameScript->ResetScripts(loadFromSavegame);
 
@@ -609,7 +541,7 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 		g_GameScript->InitCallbacks();
 		g_GameStringsHandler->SetCallbackDrawString([](std::string const key, D3DCOLOR col, int x, int y, int flags)
 		{
-			g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * ASSUMED_WIDTH_FOR_TEXT_DRAWING, float(y)/float(g_Configuration.Height) * ASSUMED_HEIGHT_FOR_TEXT_DRAWING, key.c_str(), col, flags);
+			g_Renderer.DrawString(float(x)/float(g_Configuration.Width) * REFERENCE_RES_WIDTH, float(y)/float(g_Configuration.Height) * REFERENCE_RES_HEIGHT, key.c_str(), col, flags);
 		});
 	}
 
@@ -637,15 +569,17 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	}
 	else
 	{
+		// If not loading a savegame, then clear all the infos
+		Statistics.Level = {};
 		RequiredStartPos = false;
+
 		if (InitialiseGame)
 		{
+			// Clear all game infos as well
+			Statistics.Game = {};
 			GameTimer = 0;
-			RequiredStartPos = false;
 			InitialiseGame = false;
 		}
-
-		Statistics.Level.Timer = 0;
 	}
 
 	g_Gui.SetInventoryItemChosen(NO_ITEM);
@@ -677,8 +611,6 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 	while (DoTheGame)
 	{
 		result = ControlPhase(nFrames, 0);
-		nFrames = DrawPhase();
-		Sound_UpdateScene();
 
 		if (result == GameStatus::ExitToTitle ||
 			result == GameStatus::LoadGame ||
@@ -691,9 +623,13 @@ GameStatus DoLevel(int index, std::string const& ambient, bool loadFromSavegame)
 			// Here is the only way for exiting from the loop
 			StopAllSounds();
 			StopSoundTracks();
+			StopRumble();
 
 			return result;
 		}
+
+		nFrames = DrawPhase();
+		Sound_UpdateScene();
 	}
 
 	g_GameScript->ResetScripts(true);
@@ -776,7 +712,7 @@ bool ExplodeItemNode(ItemInfo *item, int node, int noXZVel, int bits)
 		int number = bits;
 		if (item->ObjectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
 			SoundEffect(SFX_TR5_SMASH_METAL, &item->Pose);
-		else if (number == 256)
+		else if (number == BODY_EXPLODE)
 			number = -64;
 
 		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
@@ -814,8 +750,12 @@ void CleanUp()
 	// will spill into new level
 	ActiveCreatures.clear();
 
-	// Clear spotcam array
+	// Clear ropes
+	Ropes.clear();
+
+	// Clear camera data
 	ClearSpotCamSequences();
+	ClearCinematicBars();
 
 	// Clear all kinds of particles
 	DisableSmokeParticles();
