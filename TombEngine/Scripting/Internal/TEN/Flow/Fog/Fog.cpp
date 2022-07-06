@@ -37,8 +37,8 @@ void Fog::Register(sol::table & parent)
 
 /***
 @tparam Color color RGB color
-@tparam int Min distance todo fix this up
-@tparam int Max distance todo fix this up
+@tparam int Min Distance fog starts (in Sectors)
+@tparam int Max Distance fog ends (in Sectors)
 @return A fog object.
 @function Fog.new
 */
