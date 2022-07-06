@@ -75,6 +75,8 @@ namespace Misc
 		s->roomNumber = FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z));
 
 		s->life = s->sLife = lifetime;
+		s->colFadeSpeed = lifetime / 2;
+		s->fadeToBlack = lifetime / 3;
 
 		s->xVel = short(velocity.x);
 		s->yVel = short(velocity.y);
@@ -83,8 +85,6 @@ namespace Misc
 		s->sSize = s->size = float(startSize);
 		s->dSize = float(endSize);
 		s->scalar = 2;
-
-		s->fadeToBlack = char(s->life - (s->life / 4));
 
 		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
@@ -103,8 +103,6 @@ namespace Misc
 		s->friction = 50;
 		s->maxYvel  = 0;
 		s->gravity  = gravity;
-
-		s->colFadeSpeed = 8;
 	}
 
 	static void AddShockwave(Vec3 pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)

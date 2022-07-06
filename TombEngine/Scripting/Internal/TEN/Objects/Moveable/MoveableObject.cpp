@@ -107,7 +107,6 @@ static std::unique_ptr<Moveable> Create(
 
 	if (ScriptAssert(ptr->SetName(name), "Could not set name for Moveable; returning an invalid object."))
 	{
-
 		ItemInfo* item = &g_Level.Items[num];
 		ptr->SetPos(pos);
 		ptr->SetRot(USE_IF_HAVE(Rotation, rot, Rotation{}));
@@ -315,11 +314,15 @@ void Moveable::Register(sol::table & parent)
 // sas:SetPosition(destinationPosition)
 	ScriptReserved_SetRoom, &Moveable::SetRoom,
 
-
 /// Get the object's position
 // @function Moveable:GetPosition
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetPosition, & Moveable::GetPos,
+
+/// Get the object's joint position
+// @function Moveable:GetPosition
+// @treturn Vec3 a copy of the moveable's position
+	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
 /// Set the moveable's position
 // If you are moving a moveable whose behaviour involves knowledge of room geometry,
@@ -481,6 +484,14 @@ Vec3 Moveable::GetPos() const
 void Moveable::SetPos(Vec3 const& pos)
 {
 	pos.StoreInPHDPos(m_item->Pose);
+}
+
+Vec3 Moveable::GetJointPos(int jointIndex) const
+{
+	Vector3Int result = {};
+	GetJointAbsPosition(m_item, &result, jointIndex);
+
+	return Vec3(result.x, result.y, result.z);
 }
 
 // This does not guarantee that the returned value will be identical

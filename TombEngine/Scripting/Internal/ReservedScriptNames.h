@@ -28,6 +28,7 @@ static constexpr char ScriptReserved_MakeInvisible[]	= "MakeInvisible";
 static constexpr char ScriptReserved_GetColor[]			= "GetColor";
 static constexpr char ScriptReserved_SetColor[]			= "SetColor";
 static constexpr char ScriptReserved_GetPosition[]		= "GetPosition";
+static constexpr char ScriptReserved_GetJointPosition[] = "GetJointPosition";
 static constexpr char ScriptReserved_SetPosition[]		= "SetPosition";
 static constexpr char ScriptReserved_GetRotation[]		= "GetRotation";
 static constexpr char ScriptReserved_SetRotation[]		= "SetRotation";
