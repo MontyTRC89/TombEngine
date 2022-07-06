@@ -25,7 +25,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_BACK	   = -700;
 	constexpr auto SPEEDBOAT_SIDE	   = 300;
 	constexpr auto SPEEDBOAT_SLIP	   = 10;
-	constexpr auto SPEEDBOAT_SLIP_SIDE = 30;
+	constexpr auto SPEEDBOAT_SIDE_SLIP = 30;
 
 	constexpr auto SPEEDBOAT_VELOCITY_ACCEL			= 5;
 	constexpr auto SPEEDBOAT_VELOCITY_DECEL			= 1;
@@ -38,11 +38,11 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_FAST_VELOCITY_MAX	  = 185;
 	constexpr auto SPEEDBOAT_REVERSE_VELOCITY_MAX = 20;
 	
-	constexpr auto SPEEDBOAT_MOUNT_DISTANCE    = CLICK(2.25f);
-	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
-	constexpr auto SPEEDBOAT_STEP_HEIGHT_MAX   = CLICK(1); // Unused.
+	constexpr auto SPEEDBOAT_STEP_HEIGHT	   = CLICK(0.5f);
 	constexpr auto SPEEDBOAT_BOUNCE_MIN		   = 0;
 	constexpr auto SPEEDBOAT_KICK_MAX		   = -80;
+	constexpr auto SPEEDBOAT_MOUNT_DISTANCE    = CLICK(2.25f);
+	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 
 	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
 	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
@@ -598,7 +598,7 @@ namespace TEN::Entities::Vehicles
 		speedboatItem->Pose.Position.x += speedboatItem->Animation.Velocity * phd_sin(speedboatItem->Pose.Orientation.y);
 		speedboatItem->Pose.Position.z += speedboatItem->Animation.Velocity * phd_cos(speedboatItem->Pose.Orientation.y);
 
-		int slip = SPEEDBOAT_SLIP_SIDE * phd_sin(speedboatItem->Pose.Orientation.z);
+		int slip = SPEEDBOAT_SIDE_SLIP * phd_sin(speedboatItem->Pose.Orientation.z);
 		if (!slip && speedboatItem->Pose.Orientation.z)
 			slip = (speedboatItem->Pose.Orientation.z > 0) ? 1 : -1;
 		speedboatItem->Pose.Position.x += slip * phd_sin(speedboatItem->Pose.Orientation.y);

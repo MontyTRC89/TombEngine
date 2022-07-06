@@ -67,8 +67,14 @@ namespace TEN::Entities::Vehicles
 		int Ceiling;
 	};
 
-	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
+	// Workbench
+	//-------------------
 
+	void CalcShift(ItemInfo* vehicleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp);
+	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
+	
+	//-------------------
+	
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
 	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, vector<VehicleDismountType> allowedDismountTypes, float distance, bool onLand = true);
 	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short angle, float distance, bool onLand);

@@ -19,6 +19,18 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
+	// Temp scaffolding function. Shifts need a rework.
+	void CalcShift(ItemInfo* vehicleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp)
+	{
+		auto point = GetVehicleCollision(vehicleItem, front, side, clamp);
+
+		if (point.Floor < (prevPoint.Position.y - step) ||
+			abs(point.Ceiling - point.Floor) <= height)
+		{
+			*extraRot += DoVehicleShift(vehicleItem, point.Position, prevPoint.Position);
+		}
+	}
+
 	// Deprecated.
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
 	{
@@ -237,16 +249,15 @@ namespace TEN::Entities::Vehicles
 
 	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int prevPos)
 	{
-		prevPos.x = vehicleItem->Pose.Position.x - prevPos.x;
-		prevPos.z = vehicleItem->Pose.Position.z - prevPos.z;
+		auto direction = vehicleItem->Pose.Position - prevPos;
 
-		if (prevPos.x || prevPos.z)
+		if (direction.x || direction.z)
 		{
 			float sinY = phd_sin(vehicleItem->Pose.Orientation.y);
 			float cosY = phd_cos(vehicleItem->Pose.Orientation.y);
 
-			int front = (prevPos.x * sinY) + (prevPos.z * cosY);
-			int side = (prevPos.x * cosY) - (prevPos.z * sinY);
+			int front = (direction.x * sinY) + (direction.z * cosY);
+			int side = (direction.x * cosY) - (direction.z * sinY);
 
 			if (abs(front) > abs(side))
 			{
@@ -350,7 +361,7 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += (int)round(GRAVITY * weightMult); // Check.
+				verticalVelocity += int(round(GRAVITY * weightMult));
 		}
 		// Airborne.
 		else
@@ -373,9 +384,9 @@ namespace TEN::Entities::Vehicles
 		auto alignedPos = pos / SECTOR(1);
 		auto alignedOldPos = oldPos / SECTOR(1);
 		auto alignedShift = Vector3Int(
-			pos.x & (SECTOR(1) - 1),
+			pos.x & WALL_MASK,
 			0,
-			pos.z & (SECTOR(1) - 1)
+			pos.z & WALL_MASK
 		);
 
 		if (alignedPos.x == alignedOldPos.x)

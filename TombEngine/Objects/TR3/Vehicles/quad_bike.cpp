@@ -33,21 +33,21 @@ namespace TEN::Entities::Vehicles
 	constexpr auto QBIKE_SLIP_SIDE = 50;
 	constexpr auto DAMAGE_START	   = 140;
 	constexpr auto DAMAGE_LENGTH   = 14;
+	
+	constexpr auto QBIKE_REVERSE_VELOCITY_ACCEL = -3 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto QBIKE_VELOCITY_BRAKE_DECEL   = int(2.5f * VEHICLE_VELOCITY_SCALE);
 
-	constexpr int QBIKE_REVERSE_VELOCITY_ACCEL = -3 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_VELOCITY_BRAKE_DECEL  = 2.5f * VEHICLE_VELOCITY_SCALE;
+	constexpr auto QBIKE_DRIFT_VELOCITY_MIN	   = 48 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto QBIKE_REVERSE_VELOCITY_MAX  = -48 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto QBIKE_REV_VELOCITY_MAX	   = 160 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto QBIKE_VELOCITY_MAX		   = 160 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto QBIKE_DEATH_VERTICAL_VELOCITY_MIN = 240;
 
-	constexpr int QBIKE_DRIFT_VELOCITY_MIN	  = 48 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_REVERSE_VELOCITY_MAX  = -48 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_REV_VELOCITY_MAX	  = 160 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_VELOCITY_MAX		  = 160 * VEHICLE_VELOCITY_SCALE;
-	constexpr int QBIKE_DEATH_VERTICAL_VELOCITY_MIN = 240;
-
-	constexpr auto QBIKE_MOUNT_DISTANCE = CLICK(2);
+	constexpr auto QBIKE_STEP_HEIGHT	   = CLICK(1);
+	constexpr auto QBIKE_BOUNCE			   = (QBIKE_VELOCITY_MAX / 2) / CLICK(1);
+	constexpr auto QBIKE_KICK			   = -80;
+	constexpr auto QBIKE_MOUNT_DISTANCE	   = CLICK(2);
 	constexpr auto QBIKE_DISMOUNT_DISTANCE = 385; // Precise offset derived from animation.
-	constexpr auto QBIKE_STEP_HEIGHT_MAX = CLICK(1); // Unused.
-	constexpr auto QBIKE_BOUNCE_MIN = (QBIKE_VELOCITY_MAX / 2) / CLICK(1);
-	constexpr auto QBIKE_KICK_MAX = -80;
 
 	#define QBIKE_TURN_RATE_ACCEL		  ANGLE(2.5f)
 	#define QBIKE_TURN_RATE_DECEL		  ANGLE(2.0f)
@@ -258,9 +258,9 @@ namespace TEN::Entities::Vehicles
 		quadBike->RearRot -= (quadBike->Revs / 8);
 		quadBike->FrontRot -= rotAdd;
 
-		quadBike->LeftVerticalVelocity = DoVehicleDynamics(floorHeightLeft, quadBike->LeftVerticalVelocity, QBIKE_BOUNCE_MIN, QBIKE_KICK_MAX, (int*)&frontLeft.y);
-		quadBike->RightVerticalVelocity = DoVehicleDynamics(floorHeightRight, quadBike->RightVerticalVelocity, QBIKE_BOUNCE_MIN, QBIKE_KICK_MAX, (int*)&frontRight.y);
-		quadBikeItem->Animation.VerticalVelocity = DoVehicleDynamics(probe.Position.Floor, quadBikeItem->Animation.VerticalVelocity, QBIKE_BOUNCE_MIN, QBIKE_KICK_MAX, (int*)&quadBikeItem->Pose.Position.y);
+		quadBike->LeftVerticalVelocity = DoVehicleDynamics(floorHeightLeft, quadBike->LeftVerticalVelocity, QBIKE_BOUNCE, QBIKE_KICK, (int*)&frontLeft.y);
+		quadBike->RightVerticalVelocity = DoVehicleDynamics(floorHeightRight, quadBike->RightVerticalVelocity, QBIKE_BOUNCE, QBIKE_KICK, (int*)&frontRight.y);
+		quadBikeItem->Animation.VerticalVelocity = DoVehicleDynamics(probe.Position.Floor, quadBikeItem->Animation.VerticalVelocity, QBIKE_BOUNCE, QBIKE_KICK, (int*)&quadBikeItem->Pose.Position.y);
 		quadBike->Velocity = DoVehicleWaterMovement(quadBikeItem, laraItem, quadBike->Velocity, QBIKE_RADIUS, &quadBike->TurnRate);
 
 		probe.Position.Floor = (frontLeft.y + frontRight.y) / 2;
@@ -906,21 +906,10 @@ namespace TEN::Entities::Vehicles
 
 		// Apply shifts.
 		short extraRot = 0;
-		auto pointFrontLeft = GetVehicleCollision(quadBikeItem, QBIKE_FRONT, -QBIKE_SIDE, false);
-		if (pointFrontLeft.Floor < (prevPointFrontLeft.Position.y - CLICK(1)))
-			extraRot = DoVehicleShift(quadBikeItem, pointFrontLeft.Position, prevPointFrontLeft.Position);
-
-		auto pointCenterFrontLeft = GetVehicleCollision(quadBikeItem, QBIKE_FRONT / 2, -QBIKE_SIDE, false);
-		if (pointCenterFrontLeft.Floor < (prevPointCenterFrontLeft.Position.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, pointCenterFrontLeft.Position, prevPointCenterFrontLeft.Position);
-
-		auto pointLeft = GetVehicleCollision(quadBikeItem, 0, -QBIKE_SIDE, false);
-		if (pointLeft.Floor < (prevPointLeft.Position.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, pointLeft.Position, prevPointLeft.Position);
-
-		auto pointCenterBackLeft = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, -QBIKE_SIDE, false);
-		if (pointCenterBackLeft.Floor < (prevPointCenterBackLeft.Position.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, pointCenterBackLeft.Position, prevPointCenterBackLeft.Position);
+		CalcShift(quadBikeItem, &extraRot, prevPointFrontLeft, QBIKE_HEIGHT, QBIKE_FRONT, -QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
+		CalcShift(quadBikeItem, &extraRot, prevPointCenterFrontLeft, QBIKE_HEIGHT, QBIKE_FRONT / 2, -QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
+		CalcShift(quadBikeItem, &extraRot, prevPointLeft, QBIKE_HEIGHT, 0, -QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
+		CalcShift(quadBikeItem, &extraRot, prevPointCenterBackLeft, QBIKE_HEIGHT, -QBIKE_FRONT / 2, -QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
 
 		short rotAdd = 0;
 		auto pointBackLeft = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT, -QBIKE_SIDE, false);
@@ -939,17 +928,10 @@ namespace TEN::Entities::Vehicles
 				extraRot += rotAdd;
 		}
 
-		auto pointCenterFrontRight = GetVehicleCollision(quadBikeItem, QBIKE_FRONT / 2, QBIKE_SIDE, false);
-		if (pointCenterFrontRight.Floor < (prevPointCenterFrontRight.Position.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, pointCenterFrontRight.Position, prevPointCenterFrontRight.Position);
-
-		auto pointRight = GetVehicleCollision(quadBikeItem, 0, QBIKE_SIDE, false);
-		if (pointRight.Floor < (prevPointRight.Position.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, pointRight.Position, prevPointRight.Position);
-
-		auto pointCenterBackRight = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT / 2, QBIKE_SIDE, false);
-		if (pointCenterBackRight.Floor < (prevPointCenterBackRight.Position.y - CLICK(1)))
-			DoVehicleShift(quadBikeItem, pointCenterBackRight.Position, prevPointCenterBackRight.Position);
+		CalcShift(quadBikeItem, &extraRot, prevPointCenterFrontRight, QBIKE_HEIGHT, QBIKE_FRONT / 2, QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
+		CalcShift(quadBikeItem, &extraRot, prevPointRight, QBIKE_HEIGHT, 0, QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
+		CalcShift(quadBikeItem, &extraRot, prevPointCenterBackRight, QBIKE_HEIGHT, -QBIKE_FRONT / 2, QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
+		CalcShift(quadBikeItem, &extraRot, prevPointCenterBackRight, QBIKE_HEIGHT, -QBIKE_FRONT / 2, QBIKE_SIDE, QBIKE_STEP_HEIGHT, false);
 
 		auto pointBackRight = GetVehicleCollision(quadBikeItem, -QBIKE_FRONT, QBIKE_SIDE, false);
 		if (pointBackRight.Floor < (prevPointBackRight.Position.y - CLICK(1)))
