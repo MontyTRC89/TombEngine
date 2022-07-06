@@ -224,8 +224,8 @@ namespace Misc
 		//@tparam int startSize
 		//@tparam int endSize
 		//@tparam int lifetime
-		//@tparam bool poison
 		//@tparam bool damage
+		//@tparam bool poison
 		table_misc.set_function(ScriptReserved_AddParticle, &AddParticle);
 
 		///Emit a shockwave.
