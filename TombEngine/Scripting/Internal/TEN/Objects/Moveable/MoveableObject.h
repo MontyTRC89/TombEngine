@@ -39,6 +39,7 @@ public:
 	void Destroy();
 
 	[[nodiscard]] Vec3 GetPos() const;
+	[[nodiscard]] Vec3 GetJointPos(int index) const;
 	void SetPos(Vec3 const& pos);
 
 	[[nodiscard]] Rotation GetRot() const;
