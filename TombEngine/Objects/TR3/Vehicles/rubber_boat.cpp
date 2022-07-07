@@ -44,7 +44,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto RBOAT_BOUNCE_MIN = 0;
 	constexpr auto RBOAT_KICK_MAX = -80;
 
-	#define RBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
+	#define RBOAT_TURN_RATE_ACCEL ANGLE(0.5f)
 	#define RBOAT_TURN_RATE_DECEL ANGLE(0.25f)
 	#define RBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
 
@@ -185,12 +185,7 @@ namespace TEN::Entities::Vehicles
 				rBoatItem->Animation.Velocity = 0;
 		}
 
-		if (rBoat->TurnRate < -RBOAT_TURN_RATE_DECEL)
-			rBoat->TurnRate += RBOAT_TURN_RATE_DECEL;
-		else if (rBoat->TurnRate > RBOAT_TURN_RATE_DECEL)
-			rBoat->TurnRate -= RBOAT_TURN_RATE_DECEL;
-		else
-			rBoat->TurnRate = 0;
+		ResetVehicleTurnRateY(&rBoat->TurnRate, RBOAT_TURN_RATE_DECEL);
 
 		height = probe.Position.Floor;
 

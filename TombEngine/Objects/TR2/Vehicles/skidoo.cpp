@@ -297,16 +297,11 @@ namespace TEN::Entities::Vehicles
 		auto prevPointBackLeft = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, -SKIDOO_SIDE, true);
 		auto prevPointBackRight = GetVehicleCollision(skidooItem, -SKIDOO_FRONT, SKIDOO_SIDE, true);
 		auto prevPos = skidooItem->Pose.Position;
-
+			
 		// Apply rotations and determine angle of momentum.
 		if (skidooItem->Pose.Position.y > (skidooItem->Floor - SKIDOO_STEP_HEIGHT))
 		{
-			if (skidoo->TurnRate < -SKIDOO_TURN_RATE_DECEL)
-				skidoo->TurnRate += SKIDOO_TURN_RATE_DECEL;
-			else if (skidoo->TurnRate > SKIDOO_TURN_RATE_DECEL)
-				skidoo->TurnRate -= SKIDOO_TURN_RATE_DECEL;
-			else
-				skidoo->TurnRate = 0;
+			ResetVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_DECEL);
 			skidooItem->Pose.Orientation.y += skidoo->TurnRate + skidoo->ExtraRotation;
 
 			short rotation = skidooItem->Pose.Orientation.y - skidoo->MomentumAngle;

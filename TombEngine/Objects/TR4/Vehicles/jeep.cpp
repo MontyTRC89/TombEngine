@@ -1060,15 +1060,10 @@ namespace TEN::Entities::Vehicles
 
 		if (prevPos.y <= (jeepItem->Floor - 8))
 		{
-			if (jeep->TurnRate < -JEEP_TURN_RATE_DECEL)
-				jeep->TurnRate += JEEP_TURN_RATE_DECEL;
-			else if (jeep->TurnRate > JEEP_TURN_RATE_DECEL)
-				jeep->TurnRate -= JEEP_TURN_RATE_DECEL;
-			else
-				jeep->TurnRate = 0;
+			ResetVehicleTurnRateY(&jeep->TurnRate, JEEP_TURN_RATE_DECEL);
+			jeepItem->Pose.Orientation.y += jeep->TurnRate + jeep->ExtraRotation;
 
-			jeepItem->Pose.Orientation.y += (short)(jeep->TurnRate + jeep->ExtraRotation);
-			jeep->MomentumAngle += (short)(jeepItem->Pose.Orientation.y - jeep->MomentumAngle) / 32;
+			jeep->MomentumAngle += (jeepItem->Pose.Orientation.y - jeep->MomentumAngle) / 32;
 		}
 		else
 		{

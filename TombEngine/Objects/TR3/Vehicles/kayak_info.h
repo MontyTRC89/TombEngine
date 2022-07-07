@@ -5,12 +5,12 @@ namespace TEN::Entities::Vehicles
 {
 	struct KayakInfo
 	{
-		int TurnRate = 0;
-
 		int Velocity = 0;
 		int FrontVerticalVelocity = 0;
 		int LeftVerticalVelocity = 0;
 		int RightVerticalVelocity = 0;
+
+		short TurnRate = 0;
 
 		PHD_3DPOS OldPose = PHD_3DPOS();
 		unsigned int LeftRightPaddleCount = 0;

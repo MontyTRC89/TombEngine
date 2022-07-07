@@ -680,18 +680,7 @@ namespace TEN::Entities::Vehicles
 
 		kayakItem->Animation.Velocity = kayak->Velocity / VEHICLE_VELOCITY_SCALE;
 
-		if (kayak->TurnRate >= 0)
-		{
-			kayak->TurnRate -= KAYAK_TURN_RATE_FRICTION_DECEL;
-			if (kayak->TurnRate < 0)
-				kayak->TurnRate = 0;
-		}
-		else if (kayak->TurnRate < 0)
-		{
-			kayak->TurnRate += KAYAK_TURN_RATE_FRICTION_DECEL;
-			if (kayak->TurnRate > 0)
-				kayak->TurnRate = 0;
-		}
+		ResetVehicleTurnRateY(&kayak->TurnRate, KAYAK_TURN_RATE_FRICTION_DECEL);
 	}
 
 	void KayakToBackground(ItemInfo* kayakItem, ItemInfo* laraItem)

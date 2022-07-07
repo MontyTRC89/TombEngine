@@ -652,31 +652,8 @@ namespace TEN::Entities::Vehicles
 		else if (UPV->Velocity < -UPV_VELOCITY_MAX)
 			UPV->Velocity = -UPV_VELOCITY_MAX;
 
-		if (UPV->TurnRate.x > 0)
-		{
-			UPV->TurnRate.x -= UPV_X_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.x < 0)
-				UPV->TurnRate.x = 0;
-		}
-		else if (UPV->TurnRate.x < 0)
-		{
-			UPV->TurnRate.x += UPV_X_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.x > 0)
-				UPV->TurnRate.x = 0;
-		}
-
-		if (UPV->TurnRate.y > 0)
-		{
-			UPV->TurnRate.y -= UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y < 0)
-				UPV->TurnRate.y = 0;
-		}
-		else if (UPV->TurnRate.y < 0)
-		{
-			UPV->TurnRate.y += UPV_Y_TURN_RATE_FRICTION_DECEL;
-			if (UPV->TurnRate.y > 0)
-				UPV->TurnRate.y = 0;
-		}
+		ResetVehicleTurnRateX(&UPV->TurnRate.x, UPV_X_TURN_RATE_FRICTION_DECEL);
+		ResetVehicleTurnRateY(&UPV->TurnRate.y, UPV_Y_TURN_RATE_FRICTION_DECEL);
 	}
 
 	void DoUPVMount(ItemInfo* UPVItem, ItemInfo* laraItem, VehicleMountType mountType)

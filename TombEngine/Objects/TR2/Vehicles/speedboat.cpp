@@ -44,7 +44,7 @@ namespace TEN::Entities::Vehicles
 	constexpr auto SPEEDBOAT_MOUNT_DISTANCE    = CLICK(2.25f);
 	constexpr auto SPEEDBOAT_DISMOUNT_DISTANCE = SECTOR(1);
 
-	#define SPEEDBOAT_TURN_RATE_ACCEL (ANGLE(0.25f) / 2)
+	#define SPEEDBOAT_TURN_RATE_ACCEL ANGLE(0.5f)
 	#define SPEEDBOAT_TURN_RATE_DECEL ANGLE(0.25f)
 	#define SPEEDBOAT_TURN_RATE_MAX	  ANGLE(4.0f)
 
@@ -181,12 +181,7 @@ namespace TEN::Entities::Vehicles
 		}
 
 		// Apply turn rate friction.
-		if (speedboat->TurnRate < -SPEEDBOAT_TURN_RATE_DECEL)
-			speedboat->TurnRate += SPEEDBOAT_TURN_RATE_DECEL;
-		else if (speedboat->TurnRate > SPEEDBOAT_TURN_RATE_DECEL)
-			speedboat->TurnRate -= SPEEDBOAT_TURN_RATE_DECEL;
-		else
-			speedboat->TurnRate = 0;
+		ResetVehicleTurnRateY(&speedboat->TurnRate, SPEEDBOAT_TURN_RATE_DECEL);
 
 		speedboatItem->Floor = probe.Position.Floor - 5;
 		if (speedboat->Water == NO_HEIGHT)

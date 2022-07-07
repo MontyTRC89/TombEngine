@@ -374,7 +374,7 @@ namespace TEN::Entities::Vehicles
 		auto point = GetVehicleCollision(vehicleItem, front, side, clamp);
 
 		if (point.Floor < (prevPoint.Position.y - step) ||	   // Floor is beyond upper bound.
-			point.Ceiling > (prevPoint.Position.y - height) || // Ceiling is too low.
+			//point.Ceiling > (prevPoint.Position.y - height) || // Ceiling is too low. Will get stuck on jumps that hit the ceiling.
 			abs(point.Ceiling - point.Floor) <= height)		   // Floor and ceiling form a clamp.
 		{
 			*extraRot += DoVehicleShift(vehicleItem, point.Position, prevPoint.Position);
@@ -555,7 +555,7 @@ namespace TEN::Entities::Vehicles
 
 		short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 		newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
-		return newTurnRate * sign;
+		return (newTurnRate * sign);
 	}
 
 	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert)
@@ -568,24 +568,24 @@ namespace TEN::Entities::Vehicles
 		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal], invert);
 	}
 
-	short UndoVehicleTurnRate(short turnRate, short decelRate)
+	short ResetVehicleTurnRate(short turnRate, short decelRate)
 	{
 		int sign = std::copysign(1, turnRate);
 
-		if (abs(turnRate) <= decelRate)
+		if (abs(turnRate) > decelRate)
+			return (turnRate - (decelRate * sign));
+		else
 			return 0;
-		else if (abs(turnRate) > decelRate)
-			return (turnRate + (decelRate * -sign));
 	}
 
-	void UndoVehicleTurnRateX(short* turnRate, short decelRate)
+	void ResetVehicleTurnRateX(short* turnRate, short decelRate)
 	{
-		*turnRate = UndoVehicleTurnRate(*turnRate, decelRate);
+		*turnRate = ResetVehicleTurnRate(*turnRate, decelRate);
 	}
 
-	void UndoVehicleTurnRateY(short* turnRate, short decelRate)
+	void ResetVehicleTurnRateY(short* turnRate, short decelRate)
 	{
-		*turnRate = UndoVehicleTurnRate(*turnRate, decelRate);
+		*turnRate = ResetVehicleTurnRate(*turnRate, decelRate);
 	}
 	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)

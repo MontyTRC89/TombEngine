@@ -853,29 +853,16 @@ namespace TEN::Entities::Vehicles
 
 		if (motorbikeItem->Pose.Position.y <= (motorbikeItem->Floor - 8))
 		{
-			if (motorbike->TurnRate < -ANGLE(0.5f))
-				motorbike->TurnRate += ANGLE(0.5f);
-			else if (motorbike->TurnRate > ANGLE(0.5f))
-				motorbike->TurnRate -= ANGLE(0.5f);
-			else
-				motorbike->TurnRate = 0;
-
+			ResetVehicleTurnRateY(&motorbike->TurnRate, ANGLE(0.5f));
 			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
+
 			motorbike->MomentumAngle += (motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle) / 32;
 		}
 		else
 		{
-			if (motorbike->TurnRate >= -ANGLE(1.0f))
-			{
-				if (motorbike->TurnRate <= ANGLE(1.0f))
-					motorbike->TurnRate = 0;
-				else
-					motorbike->TurnRate -= ANGLE(1.0f);
-			}
-			else
-				motorbike->TurnRate += ANGLE(1.0f);
-
+			ResetVehicleTurnRateY(&motorbike->TurnRate, ANGLE(1.0f));
 			motorbikeItem->Pose.Orientation.y += motorbike->TurnRate + motorbike->ExtraRotation;
+
 			short rotation = motorbikeItem->Pose.Orientation.y - motorbike->MomentumAngle;
 			short momentum = MOTORBIKE_MOMENTUM_TURN_ANGLE_MIN - ((2 * motorbike->Velocity) / SECTOR(1));
 

@@ -889,12 +889,7 @@ namespace TEN::Entities::Vehicles
 		// Apply rotations and determine angle of momentum.
 		if (quadBikeItem->Pose.Position.y > (quadBikeItem->Floor - CLICK(1)))
 		{
-			if (quadBike->TurnRate < -QBIKE_TURN_RATE_DECEL)
-				quadBike->TurnRate += QBIKE_TURN_RATE_DECEL;
-			else if (quadBike->TurnRate > QBIKE_TURN_RATE_DECEL)
-				quadBike->TurnRate -= QBIKE_TURN_RATE_DECEL;
-			else
-				quadBike->TurnRate = 0;
+			ResetVehicleTurnRateY(&quadBike->TurnRate, QBIKE_TURN_RATE_DECEL);
 			quadBikeItem->Pose.Orientation.y += quadBike->TurnRate + quadBike->ExtraRotation;
 
 			short momentum = QBIKE_MOMENTUM_TURN_RATE_MIN - (((((QBIKE_MOMENTUM_TURN_RATE_MIN - QBIKE_MOMENTUM_TURN_RATE_MAX) * 256) / QBIKE_VELOCITY_MAX) * quadBike->Velocity) / 256);
