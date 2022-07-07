@@ -17,7 +17,7 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	constexpr int VEHICLE_VELOCITY_SCALE = 256; // TODO: Deal with this nonsense *immediately* post-beta. @Sezz 2022.06.25
+	constexpr auto VEHICLE_VELOCITY_SCALE = 256; // TODO: Deal with this nonsense *immediately* post-beta. @Sezz 2022.06.25
 
 	constexpr auto VEHICLE_SINK_VELOCITY		 = 15;
 	constexpr auto VEHICLE_WATER_HEIGHT_MAX		 = CLICK(2.5f);
@@ -67,23 +67,23 @@ namespace TEN::Entities::Vehicles
 		int Ceiling;
 	};
 
-	// Workbench
 	//-------------------
 
-	void CalcShift(ItemInfo* vehicleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp);
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
-	
+
 	//-------------------
 	
 	VehicleMountType GetVehicleMountType(ItemInfo* vehicleItem, ItemInfo* laraItem, CollisionInfo* coll, vector<VehicleMountType> allowedMountTypes, float maxDistance2D, float maxVerticalDistance = STEPUP_HEIGHT);
 	VehicleDismountType GetVehicleDismountType(ItemInfo* vehicleItem, vector<VehicleDismountType> allowedDismountTypes, float distance, bool onLand = true);
 	bool TestVehicleDismount(ItemInfo* vehicleItem, VehicleDismountType dismountType, short angle, float distance, bool onLand);
 	VehicleImpactDirection GetVehicleImpactDirection(ItemInfo* vehicleItem, Vector3Int prevPos);
+	
 	VehiclePointCollision GetVehicleCollision(ItemInfo* vehicleItem, int forward, int right, bool clamp);
 	int GetVehicleWaterHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos);
 
 	void  DoVehicleCollision(ItemInfo* vehicleItem, int radius);
 	int	  DoVehicleDynamics(int height, int verticalVelocity, int minBounce, int maxKick, int* yPos, float weightMult = 1.0f);
+	void  CalculateVehicleShift(ItemInfo* vehcleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp);
 	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int pos, Vector3Int oldPos);
 	int   DoVehicleWaterMovement(ItemInfo* vehicleItem, ItemInfo* laraItem, int currentVelocity, int radius, short* turnRate);
 	void  DoVehicleFlareDiscard(ItemInfo* laraItem);
@@ -91,7 +91,9 @@ namespace TEN::Entities::Vehicles
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert);
 	void  ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = true);
 	void  ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate, bool invert = false);
-	void  ApplyTurnRateFriction(short* turnRate, short decelRate);
+	short UndoVehicleTurnRate(short turnRate, short decelRate);
+	void  UndoVehicleTurnRateX(short* turnRate, short decelRate);
+	void  UndoVehicleTurnRateY(short* turnRate, short decelRate);
 	void  ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle);
 	void  ResetVehicleLean(ItemInfo* vehicleItem, float rate);
 }

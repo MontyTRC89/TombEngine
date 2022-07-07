@@ -19,18 +19,6 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Vehicles
 {
-	// Temp scaffolding function. Shifts need a rework.
-	void CalcShift(ItemInfo* vehicleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp)
-	{
-		auto point = GetVehicleCollision(vehicleItem, front, side, clamp);
-
-		if (point.Floor < (prevPoint.Position.y - step) ||
-			abs(point.Ceiling - point.Floor) <= height)
-		{
-			*extraRot += DoVehicleShift(vehicleItem, point.Position, prevPoint.Position);
-		}
-	}
-
 	// Deprecated.
 	int GetVehicleHeight(ItemInfo* vehicleItem, int forward, int right, bool clamp, Vector3Int* pos)
 	{
@@ -93,6 +81,7 @@ namespace TEN::Entities::Vehicles
 		{
 			switch (mountType)
 			{
+			// TODO: Holding FORWARD the moment a level loads, this mount will fail. Need a better method.
 			case VehicleMountType::LevelStart:
 				if (!laraItem->Animation.Velocity &&
 					!laraItem->Animation.VerticalVelocity &&
@@ -237,7 +226,7 @@ namespace TEN::Entities::Vehicles
 			return false;
 
 		// Assess feasibility of dismount.
-		if (abs(probe.Position.Floor - vehicleItem->Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within reach.
+		if (abs(probe.Position.Floor - vehicleItem->Pose.Position.y) <= STEPUP_HEIGHT && // Floor is within highest step threshold.
 			(probe.Position.Ceiling - vehicleItem->Pose.Position.y) > -LARA_HEIGHT &&	 // Gap is optically permissive.
 			abs(probe.Position.Ceiling - probe.Position.Floor) > LARA_HEIGHT)			 // Space is not a clamp.
 		{
@@ -377,6 +366,19 @@ namespace TEN::Entities::Vehicles
 		}
 
 		return verticalVelocity;
+	}
+
+	// Temp scaffolding function. Shifts need a rework.
+	void CalculateVehicleShift(ItemInfo* vehicleItem, short* extraRot, VehiclePointCollision prevPoint, int height, int front, int side, int step, bool clamp)
+	{
+		auto point = GetVehicleCollision(vehicleItem, front, side, clamp);
+
+		if (point.Floor < (prevPoint.Position.y - step) ||	   // Floor is beyond upper bound.
+			point.Ceiling > (prevPoint.Position.y - height) || // Ceiling is too low.
+			abs(point.Ceiling - point.Floor) <= height)		   // Floor and ceiling form a clamp.
+		{
+			*extraRot += DoVehicleShift(vehicleItem, point.Position, prevPoint.Position);
+		}
 	}
 
 	short DoVehicleShift(ItemInfo* vehicleItem, Vector3Int pos, Vector3Int oldPos)
@@ -527,7 +529,7 @@ namespace TEN::Entities::Vehicles
 		return currentVelocity;
 	}
 
-	// TODO: Allow flares on every vehicle and see how that works. Boats already allowed them originally.
+	// TODO: Allow flares on every vehicle. Boats have this already.
 	void DoVehicleFlareDiscard(ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -542,7 +544,7 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	// TODO: This is a copy-pase of the player version, but I may need a different method for vehicles.
+	// TODO: Vehicle turn rates must be affected by speed for more tactile modulation. Slower speeds slow the turn rate.
 	short ModulateVehicleTurnRate(short turnRate, short accelRate, short minTurnRate, short maxTurnRate, float axisCoeff, bool invert)
 	{
 		axisCoeff *= invert ? -1 : 1;
@@ -566,14 +568,24 @@ namespace TEN::Entities::Vehicles
 		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveHorizontal], invert);
 	}
 
-	void ApplyTurnRateFriction(short* turnRate, short decelRate)
+	short UndoVehicleTurnRate(short turnRate, short decelRate)
 	{
-		if (abs(*turnRate) <= decelRate)
-			turnRate = 0;
-		else if (*turnRate < -decelRate)
-			*turnRate += decelRate;
-		else if (*turnRate > decelRate)
-			*turnRate -= decelRate;
+		int sign = std::copysign(1, turnRate);
+
+		if (abs(turnRate) <= decelRate)
+			return 0;
+		else if (abs(turnRate) > decelRate)
+			return (turnRate + (decelRate * -sign));
+	}
+
+	void UndoVehicleTurnRateX(short* turnRate, short decelRate)
+	{
+		*turnRate = UndoVehicleTurnRate(*turnRate, decelRate);
+	}
+
+	void UndoVehicleTurnRateY(short* turnRate, short decelRate)
+	{
+		*turnRate = UndoVehicleTurnRate(*turnRate, decelRate);
 	}
 	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
