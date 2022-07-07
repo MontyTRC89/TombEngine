@@ -125,7 +125,7 @@ static constexpr char ScriptReserved_AddDynamicLight[]				= "AddDynamicLight";
 static constexpr char ScriptReserved_AddBlood[]						= "AddBlood";
 static constexpr char ScriptReserved_AddFire[]						= "AddFire";
 static constexpr char ScriptReserved_Earthquake[]					= "Earthquake";
-static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";
+static constexpr char ScriptReserved_FlashScreen[]					= "Flash";
 
 static constexpr char ScriptReserved_KeyHeld[]						= "KeyHeld";
 static constexpr char ScriptReserved_KeyHit[]						= "KeyHit";
