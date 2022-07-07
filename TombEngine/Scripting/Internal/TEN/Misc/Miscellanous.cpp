@@ -140,7 +140,27 @@ namespace Misc
 
 	static void FlashScreen(ScriptColor color, float speed)
 	{
-		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), speed);
+		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), speed / float(FPS));
+	}
+
+	static void FadeIn(float speed)
+	{
+		SetScreenFadeIn(speed / float(FPS));
+	}
+
+	static void FadeOut(float speed)
+	{
+		SetScreenFadeOut(speed / float(FPS));
+	}
+
+	static void SetCineBars(float height, float speed)
+	{
+		SetCinematicBars(height / float(REFERENCE_RES_HEIGHT), speed / float(FPS));
+	}
+
+	static void SetFOV(float angle)
+	{
+		AlterFOV(std::clamp(abs(angle), 10.0f, 170.0f));
 	}
 
 	static void PlayAudioTrack(std::string const& trackName, sol::optional<bool> looped)
@@ -290,6 +310,27 @@ namespace Misc
 		//@tparam ScriptColor color
 		//@tparam float speed
 		table_misc.set_function(ScriptReserved_FlashScreen, &FlashScreen);
+
+		///Do a fade-in.
+		//@function FadeIn
+		//@tparam float speed
+		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
+
+		///Do a fade-out.
+		//@function FadeIn
+		//@tparam float speed
+		table_misc.set_function(ScriptReserved_FadeOut, &FadeOut);
+
+		///Set cinematic bars.
+		//@function SetCineBars
+		//@tparam float height on the range 0-800
+		//@tparam float speed
+		table_misc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
+
+		///Set field of view.
+		//@function SetFOV
+		//@tparam float angle on the range 10-170 degrees
+		table_misc.set_function(ScriptReserved_SetFOV, &SetFOV);
 
 		///Set and play an ambient track
 		//@function SetAmbientTrack
