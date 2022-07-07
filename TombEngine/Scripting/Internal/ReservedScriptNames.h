@@ -130,6 +130,7 @@ static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";
 static constexpr char ScriptReserved_KeyHeld[]						= "KeyHeld";
 static constexpr char ScriptReserved_KeyHit[]						= "KeyHit";
 static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
+static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

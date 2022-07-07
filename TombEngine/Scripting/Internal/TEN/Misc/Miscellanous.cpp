@@ -180,6 +180,11 @@ namespace Misc
 		TrInput |= (1 << actionIndex);
 	}
 
+	static void KeyClear(int actionIndex)
+	{
+		TrInput &= ~(1 << actionIndex);
+	}
+
 	static int CalculateDistance(Vec3 const& pos1, Vec3 const& pos2)
 	{
 		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
@@ -317,6 +322,11 @@ namespace Misc
 		//@function KeyPush
 		//@tparam int action mapping index to push
 		table_misc.set_function(ScriptReserved_KeyPush, &KeyPush);
+
+		/// Clears particular input from action key
+		//@function KeyClear
+		//@tparam int action mapping index to clear
+		table_misc.set_function(ScriptReserved_KeyClear, &KeyClear);
 	
 		///Calculate the distance between two positions.
 		//@function CalculateDistance
