@@ -71,6 +71,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	void Explode();
 
 	[[nodiscard]] std::string GetOnHit() const;
 	void SetOnHit(std::string const &);

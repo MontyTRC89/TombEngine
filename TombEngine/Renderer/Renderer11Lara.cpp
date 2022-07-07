@@ -250,6 +250,12 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	if (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0)
 		return;
 
+	RendererItem* item = &m_items[Lara.ItemNumber];
+	ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
+
+	if (nativeItem->Flags & IFLAG_INVISIBLE)
+		return;
+
 	UINT stride = sizeof(RendererVertex);
 	UINT offset = 0;
 
@@ -257,8 +263,6 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->IASetInputLayout(m_inputLayout.Get());
 	m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-	RendererItem* item = &m_items[Lara.ItemNumber];
 
 	// Set shaders
 	if (shadowMap)
@@ -303,7 +307,9 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		
+		if (!nativeItem->TestBits(JointBitType::Mesh, k))
+			continue;
+
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
 		DrawMoveableMesh(item, mesh, room, k, transparent);
 
