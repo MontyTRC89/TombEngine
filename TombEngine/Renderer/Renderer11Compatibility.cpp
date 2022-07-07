@@ -368,8 +368,6 @@ namespace TEN::Renderer
 		moveablesVertices.resize(totalVertices);
 		moveablesIndices.resize(totalIndices);
 
-	
-
 		lastVertex = 0;
 		lastIndex = 0;
 		for (int i = 0; i < MoveablesIds.size(); i++)
@@ -382,7 +380,7 @@ namespace TEN::Renderer
 				m_moveableObjects[MoveablesIds[i]] = RendererObject();
 				RendererObject &moveable = *m_moveableObjects[MoveablesIds[i]];
 				moveable.Id = MoveablesIds[i];
-				moveable.DoNotDraw = (obj->drawRoutine == NULL);
+				moveable.DoNotDraw = (obj->drawRoutine == nullptr);
 
 				for (int j = 0; j < obj->nmeshes; j++)
 				{

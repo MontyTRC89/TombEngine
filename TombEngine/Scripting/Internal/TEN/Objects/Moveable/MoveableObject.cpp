@@ -149,6 +149,10 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
+/// Explode item. This also kills and disables item.
+// @function Moveable:Explode
+	ScriptReserved_Explode, & Moveable::Explode,
+
 /// Get the status of object.
 // possible values:
 // 0 - not active
@@ -392,7 +396,6 @@ void Moveable::SetObjectID(GAME_OBJECT_ID id)
 {
 	m_item->ObjectNumber = id;
 }
-
 
 void Moveable::SetOnHit(std::string const & cbName)
 {
@@ -686,30 +689,38 @@ void Moveable::EnableItem()
 
 void Moveable::DisableItem()
 {
-	if (m_item->Active)
+	if (!m_item->Active)
+		return;
+
+	m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
+	if (Objects[m_item->ObjectNumber].intelligent)
 	{
-		m_item->Flags &= ~IFLAG_ACTIVATION_MASK;
-		if (Objects[m_item->ObjectNumber].intelligent)
-		{
-			if (m_item->Status == ITEM_ACTIVE)
-			{
-				m_item->TouchBits = NO_JOINT_BITS;
-				m_item->Status = ITEM_DEACTIVATED;
-				RemoveActiveItem(m_num);
-				DisableEntityAI(m_num);
-			}
-		}
-		else
+		if (m_item->Status == ITEM_ACTIVE)
 		{
 			m_item->TouchBits = NO_JOINT_BITS;
-			RemoveActiveItem(m_num);
 			m_item->Status = ITEM_DEACTIVATED;
+			RemoveActiveItem(m_num);
+			DisableEntityAI(m_num);
 		}
-
-		// Try add colliding in case the item went from invisible -> deactivated
-		if (m_num > NO_ITEM)
-			dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
 	}
+	else
+	{
+		m_item->TouchBits = NO_JOINT_BITS;
+		RemoveActiveItem(m_num);
+		m_item->Status = ITEM_DEACTIVATED;
+	}
+
+	// Try add colliding in case the item went from invisible -> deactivated
+	if (m_num > NO_ITEM)
+		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryAddColliding(m_num);
+}
+
+void Moveable::Explode()
+{
+	if (!m_item->Active && !m_item->IsLara())
+		return;
+
+	CreatureDie(m_num, true);
 }
 
 void Moveable::MakeInvisible()

@@ -1443,7 +1443,12 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 void ExplodingDeath(short itemNumber, short flags)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
-	ObjectInfo* obj = &Objects[item->ObjectNumber];
+	
+	ObjectInfo* obj;
+	if (item->IsLara() && Objects[ID_LARA_SKIN].loaded)
+		obj = &Objects[ID_LARA_SKIN];
+	else
+		obj = &Objects[item->ObjectNumber];
 
 	ANIM_FRAME* frame = GetBestFrame(item);
 	
