@@ -12,6 +12,9 @@
 #include "Game/effects/weather.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
+#include "Specific/input.h"
+
+using namespace TEN::Input;
 
 /***
 Functions that don't fit in the other modules.
@@ -162,6 +165,21 @@ namespace Misc
 		PlaySoundTrack(trackName, SoundTrackType::BGM);
 	}
 
+	static bool KeyHeld(int actionIndex)
+	{
+		return (TrInput & (1 << actionIndex)) != 0;
+	}
+
+	static bool KeyHit(int actionIndex)
+	{
+		return (DbInput & (1 << actionIndex)) != 0;
+	}
+
+	static void KeyPush(int actionIndex)
+	{
+		TrInput |= (1 << actionIndex);
+	}
+
 	static int CalculateDistance(Vec3 const& pos1, Vec3 const& pos2)
 	{
 		auto result = sqrt(SQUARE(pos1.x - pos2.x) + SQUARE(pos1.y - pos2.y) + SQUARE(pos1.z - pos2.z));
@@ -284,6 +302,21 @@ namespace Misc
 		//@tparam int sound ID to play
 		//@tparam Vec3 position
 		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
+
+		/// Check if particular action key is held
+		//@function KeyHeld
+		//@tparam int action mapping index to check
+		table_misc.set_function(ScriptReserved_KeyHeld, &KeyHeld);
+
+		/// Check if particular action key was hit (once)
+		//@function KeyHit
+		//@tparam int action mapping index to check
+		table_misc.set_function(ScriptReserved_KeyHit, &KeyHit);
+
+		/// Emulate pushing of a certain action key
+		//@function KeyPush
+		//@tparam int action mapping index to push
+		table_misc.set_function(ScriptReserved_KeyPush, &KeyPush);
 	
 		///Calculate the distance between two positions.
 		//@function CalculateDistance

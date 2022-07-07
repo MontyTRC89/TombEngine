@@ -125,11 +125,6 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 	{
 		GlobalCounter++;
 
-		// This might not be the exact amount of time that has passed, but giving it a
-		// value of 1/30 keeps it in lock-step with the rest of the game logic,
-		// which assumes 30 iterations per second.
-		g_GameScript->OnControlPhase(DELTA_TIME);
-
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
 			UpdateInput();
@@ -141,6 +136,12 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				DbInput = 0;
 			TrInput &= IN_LOOK;
 		}
+
+		// This might not be the exact amount of time that has passed, but giving it a
+		// value of 1/30 keeps it in lock-step with the rest of the game logic,
+		// which assumes 30 iterations per second.
+
+		g_GameScript->OnControlPhase(DELTA_TIME);
 
 		if (CurrentLevel != 0)
 		{

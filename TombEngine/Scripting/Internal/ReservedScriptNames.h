@@ -127,6 +127,10 @@ static constexpr char ScriptReserved_AddFire[]						= "AddFire";
 static constexpr char ScriptReserved_Earthquake[]					= "Earthquake";
 static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";
 
+static constexpr char ScriptReserved_KeyHeld[]						= "KeyHeld";
+static constexpr char ScriptReserved_KeyHit[]						= "KeyHit";
+static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
+
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_DisplayStringOption[]		= "DisplayStringOption";
