@@ -118,7 +118,7 @@ namespace Misc
 		TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
 	}
 
-	static void AddDynamicLight(Vec3 pos, ScriptColor color, int radius)
+	static void AddLight(Vec3 pos, ScriptColor color, int radius)
 	{
 		TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
 	}
@@ -160,7 +160,7 @@ namespace Misc
 
 	static void SetFOV(float angle)
 	{
-		AlterFOV(std::clamp(abs(angle), 10.0f, 170.0f));
+		AlterFOV(ANGLE(std::clamp(abs(angle), 10.0f, 170.0f)));
 	}
 
 	static void PlayAudioTrack(std::string const& trackName, sol::optional<bool> looped)
@@ -282,11 +282,11 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_AddShockwave, &AddShockwave);
 
 		///Emit dynamic light.
-		//@function AddDynamicLight
+		//@function AddLight
 		//@tparam Vec3 pos
 		//@tparam ScriptColor color
 		//@tparam int radius
-		table_misc.set_function(ScriptReserved_AddDynamicLight, &AddDynamicLight);
+		table_misc.set_function(ScriptReserved_AddLight, &AddLight);
 
 		///Emit blood.
 		//@function AddFire
