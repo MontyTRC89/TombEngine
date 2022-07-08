@@ -21,7 +21,7 @@ void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
 {
 	for (int i = 0; i < jointIndices.size(); i++)
 	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+		unsigned int jointBit = unsigned int(1 << jointIndices[i]);
 
 		switch (type)
 		{
@@ -49,7 +49,7 @@ void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
 {
 	for (int i = 0; i < jointIndices.size(); i++)
 	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+		unsigned int jointBit = unsigned int(1 << jointIndices[i]);
 
 		switch (type)
 		{
@@ -77,7 +77,7 @@ bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
 {
 	for (int i = 0; i < jointIndices.size(); i++)
 	{
-		unsigned int jointBit = unsigned int(1) << jointIndices[i];
+		unsigned int jointBit = unsigned int(1 << jointIndices[i]);
 
 		switch (type)
 		{

@@ -727,7 +727,7 @@ namespace TEN::Input
 		RelInput = NULL;
 		for (int i = 0; i < KEY_COUNT; i++)
 		{
-			int inputBit = (1 << i);
+			int inputBit = 1 << i;
 
 			if ((TrInput & inputBit) == inputBit)
 			{
