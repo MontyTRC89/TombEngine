@@ -1,17 +1,17 @@
 #include "framework.h"
 #include "Specific/input.h"
 
-#include <OISInputManager.h>
 #include <OISException.h>
-#include <OISKeyboard.h>
-#include <OISJoyStick.h>
 #include <OISForceFeedback.h>
+#include <OISInputManager.h>
+#include <OISJoyStick.h>
+#include <OISKeyboard.h>
 
 #include "Game/camera.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Game/savegame.h"
 #include "Renderer/Renderer11.h"
+#include "Game/savegame.h"
 #include "Sound/sound.h"
 
 using namespace OIS;
@@ -77,8 +77,9 @@ namespace TEN::Input
 	RumbleData rumbleData = {};
 	
 	// Globals
-	int TrInput;
 	int DbInput;
+	int TrInput;
+	int RelInput;
 	int RawInput;
 	std::vector<bool> KeyMap;
 	std::vector<float> AxisMap;
@@ -126,13 +127,9 @@ namespace TEN::Input
 			oisInputManager->enableAddOnFactory(InputManager::AddOn_All);
 
 			if (oisInputManager->getNumberOfDevices(OISKeyboard) == 0)
-			{
 				TENLog("Keyboard not found!", LogLevel::Warning);
-			}
 			else
-			{
 				oisKeyboard = (Keyboard*)oisInputManager->createInputObject(OISKeyboard, true);
-			}
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -726,6 +723,19 @@ namespace TEN::Input
 		HandleLaraHotkeys(lInput);
 		SolveInputCollisions(lInput);
 
+		// Check for input release.
+		RelInput = NULL;
+		for (int i = 0; i < KEY_COUNT; i++)
+		{
+			int inputBit = (1 << i);
+
+			if ((TrInput & inputBit) == inputBit)
+			{
+				if ((lInput & inputBit) != inputBit)
+					RelInput |= inputBit;
+			}
+		}
+
 		TrInput = lInput;
 
 		if (debounce)
@@ -744,7 +754,6 @@ namespace TEN::Input
 		if (power == 0.0f || rumbleData.Power)
 			return;
 
-
 		rumbleData.FadeSpeed = power / (delayInSeconds * (float)FPS);
 		rumbleData.Power = rumbleData.LastPower = power + rumbleData.FadeSpeed;
 	}
@@ -758,5 +767,20 @@ namespace TEN::Input
 		catch (OIS::Exception& ex) { TENLog("Error when stopping vibration effect: " + std::string(ex.eText), LogLevel::Error); }
 
 		rumbleData = {};
+	}
+
+	bool IsClicked(InputAction input)
+	{
+		return ((DbInput & (int)input) == (int)input);
+	}
+
+	bool IsHeld(InputAction input)
+	{
+		return ((TrInput & (int)input) == (int)input);
+	}
+
+	bool IsReleased(InputAction input)
+	{
+		return ((RelInput & (int)input) == (int)input);
 	}
 }

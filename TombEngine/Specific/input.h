@@ -2,7 +2,7 @@
 
 namespace TEN::Input
 {
-	enum InputKeys
+	enum InputKey
 	{
 		KEY_FORWARD,
 		KEY_BACK,
@@ -21,6 +21,13 @@ namespace TEN::Input
 		KEY_PAUSE,
 		KEY_LSTEP,
 		KEY_RSTEP,
+		/*KEY_ACCELERATE,
+		KEY_REVERSE,
+		KEY_SPEED,
+		KEY_SLOW,
+		KEY_BRAKE,
+		KEY_FIRE,*/
+
 		KEY_COUNT
 	};
 
@@ -44,6 +51,12 @@ namespace TEN::Input
 		IN_PAUSE	  = (1 << KEY_PAUSE),
 		IN_LSTEP	  = (1 << KEY_LSTEP),
 		IN_RSTEP	  = (1 << KEY_RSTEP),
+		/*IN_ACCELERATE = (1 << KEY_ACCELERATE),
+		IN_REVERSE	  = (1 << KEY_REVERSE),
+		IN_SPEED	  = (1 << KEY_SPEED),
+		IN_SLOW		  = (1 << KEY_SLOW),
+		IN_BRAKE	  = (1 << KEY_BRAKE),
+		IN_FIRE		  = (1 << KEY_FIRE),*/
 
 		// Additional input actions without direct key relation
 
@@ -96,15 +109,16 @@ namespace TEN::Input
 	constexpr int VEHICLE_IN_SLOW		= IN_WALK;
 	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
 	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
-	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
+	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL; // TODO: Not needed since BRAKE is explicitly assosiated with dismounts anyway.
 
 	constexpr int IN_OPTIC_CONTROLS = IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT;
 	constexpr int IN_WAKE			= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION;
 	constexpr int IN_DIRECTION		= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT;
 
 	extern const char* g_KeyNames[];
-	extern int DbInput;  // Debounce; is input clicked?
-	extern int TrInput;  // Throttle; is input held?
+	extern int DbInput;  // Debounce: is input clicked?
+	extern int TrInput;  // Throttle: is input held?
+	extern int RelInput; // Release: is input released?
 	extern int RawInput; // Throttle for binocular input.
 
 	extern std::vector<bool>  KeyMap;
@@ -118,4 +132,42 @@ namespace TEN::Input
 	void DefaultConflict();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
+
+	// TODO: In the future, revision of inputs as flags to something else will mean this can be simplified.
+	enum class InputAction
+	{
+		Forward	   = IN_FORWARD,
+		Back	   = IN_BACK,
+		Left	   = IN_LEFT,
+		Right	   = IN_RIGHT,
+		Crouch	   = IN_CROUCH,
+		Sprint	   = IN_SPRINT,
+		Walk	   = IN_WALK,
+		Jump	   = IN_JUMP,
+		Action	   = IN_ACTION,
+		Draw	   = IN_DRAW,
+		Flare	   = IN_FLARE,
+		Look	   = IN_LOOK,
+		Roll	   = IN_ROLL,
+		Option	   = IN_OPTION,
+		Pause	   = IN_PAUSE,
+		LeftStep   = IN_LSTEP,
+		RightStep  = IN_RSTEP,
+		/*Accelerate = IN_ACCELERATE,
+		Reverse	   = IN_REVERSE,
+		Speed	   = IN_SPEED,
+		Slow	   = IN_SLOW,
+		Brake	   = IN_BRAKE,
+		Fire	   = IN_FIRE,*/
+
+		Save	   = (1 << KEY_COUNT + 0),
+		Load	   = (1 << KEY_COUNT + 1),
+		Select	   = (1 << KEY_COUNT + 2),
+		Deselect   = (1 << KEY_COUNT + 3),
+		LookSwitch = (1 << KEY_COUNT + 4)
+	};
+
+	bool IsClicked(InputAction input);
+	bool IsHeld(InputAction input);
+	bool IsReleased(InputAction input);
 }

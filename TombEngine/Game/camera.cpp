@@ -22,9 +22,9 @@
 
 using TEN::Renderer::g_Renderer;
 
-using namespace TEN::Input;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Entities::Generic;
+using namespace TEN::Input;
 
 constexpr auto COLL_CHECK_THRESHOLD   = SECTOR(4);
 constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
