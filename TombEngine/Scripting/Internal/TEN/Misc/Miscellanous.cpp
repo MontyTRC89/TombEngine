@@ -3,6 +3,7 @@
 #include "Vec3/Vec3.h"
 #include "Color/Color.h"
 #include "Game/camera.h"
+#include "Game/spotcam.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
 #include "Game/effects/lightning.h"
@@ -145,24 +146,24 @@ namespace Misc
 		Camera.bounce = -strength;
 	}
 
-	static void FlashScreen(ScriptColor color, float speed)
+	static void FlashScreen(ScriptColor color, sol::optional<float> speed)
 	{
-		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), speed / float(FPS));
+		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (speed.has_value() ? speed.value() : 0.5f) / float(FPS));
 	}
 
-	static void FadeIn(float speed)
+	static void FadeIn(sol::optional<float> speed)
 	{
-		SetScreenFadeIn(speed / float(FPS));
+		SetScreenFadeIn((speed.has_value() ? speed.value() : 1.0f) / float(FPS));
 	}
 
-	static void FadeOut(float speed)
+	static void FadeOut(sol::optional<float> speed)
 	{
-		SetScreenFadeOut(speed / float(FPS));
+		SetScreenFadeOut((speed.has_value() ? speed.value() : 1.0f) / float(FPS));
 	}
 
-	static void SetCineBars(float height, float speed)
+	static void SetCineBars(float height, sol::optional<float> speed)
 	{
-		SetCinematicBars(height / float(REFERENCE_RES_HEIGHT), speed / float(FPS));
+		SetCinematicBars(height / float(REFERENCE_RES_HEIGHT), (speed.has_value() ? speed.value() : 1.0f) / float(FPS));
 	}
 
 	static void SetFOV(float angle)
