@@ -164,9 +164,9 @@ namespace TEN::Input
 		Select,
 		Deselect,
 		LookSwitch,
-	} Action;
+	} In;
 
-	bool InClicked(Action input);
-	bool InHeld(Action input);
-	bool InReleased(Action input);
+	bool IsClicked(In input);
+	bool IsHeld(In input);
+	bool IsReleased(In input);
 }
