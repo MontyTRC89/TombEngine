@@ -169,7 +169,7 @@ namespace Misc
 		PlaySoundTrack(trackName, mode);
 	}
 
-	static void PlaySoundEffect(int id, Vec3 p)
+	static void PlayPositionedSoundEffect(int id, Vec3 p)
 	{
 		PHD_3DPOS pos = {};
 
@@ -178,6 +178,11 @@ namespace Misc
 		pos.Position.z = p.z;
 
 		SoundEffect(id, &pos, SoundEnvironment::Always);
+	}
+
+	static void PlaySoundEffect(int id)
+	{
+		SoundEffect(id, nullptr, SoundEnvironment::Always);
 	}
 
 	static void SetAmbientTrack(std::string const& trackName)
@@ -347,7 +352,7 @@ namespace Misc
 		//@function PlaySound
 		//@tparam int sound ID to play
 		//@tparam Vec3 position
-		table_misc.set_function(ScriptReserved_PlaySound, &PlaySoundEffect);
+		table_misc.set_function(ScriptReserved_PlaySound, sol::overload(&PlayPositionedSoundEffect, &PlaySoundEffect));
 
 		/// Check if particular action key is held
 		//@function KeyHeld
