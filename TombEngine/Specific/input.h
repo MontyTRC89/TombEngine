@@ -133,7 +133,7 @@ namespace TEN::Input
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 
-	enum class In
+	typedef enum class InputAction
 	{
 		Forward,
 		Back,
@@ -164,7 +164,7 @@ namespace TEN::Input
 		Select,
 		Deselect,
 		LookSwitch,
-	};
+	} In;
 
 	bool InClicked(In input);
 	bool InHeld(In input);
