@@ -133,41 +133,40 @@ namespace TEN::Input
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 
-	// TODO: In the future, revision of inputs as flags to something else will mean this can be simplified.
-	enum class InputAction
+	enum class In
 	{
-		Forward	   = IN_FORWARD,
-		Back	   = IN_BACK,
-		Left	   = IN_LEFT,
-		Right	   = IN_RIGHT,
-		Crouch	   = IN_CROUCH,
-		Sprint	   = IN_SPRINT,
-		Walk	   = IN_WALK,
-		Jump	   = IN_JUMP,
-		Action	   = IN_ACTION,
-		Draw	   = IN_DRAW,
-		Flare	   = IN_FLARE,
-		Look	   = IN_LOOK,
-		Roll	   = IN_ROLL,
-		Option	   = IN_OPTION,
-		Pause	   = IN_PAUSE,
-		LeftStep   = IN_LSTEP,
-		RightStep  = IN_RSTEP,
-		/*Accelerate = IN_ACCELERATE,
-		Reverse	   = IN_REVERSE,
-		Speed	   = IN_SPEED,
-		Slow	   = IN_SLOW,
-		Brake	   = IN_BRAKE,
-		Fire	   = IN_FIRE,*/
+		Forward,
+		Back,
+		Left,
+		Right,
+		Crouch,
+		Sprint,
+		Walk,
+		Jump,
+		Action,
+		Draw,
+		Flare,
+		Look,
+		Roll,
+		Option,
+		Pause,
+		LeftStep,
+		RightStep,
+		/*Accelerate,
+		Reverse,
+		Speed,
+		Slow,
+		Brake,
+		Fire,*/
 
-		Save	   = (1 << KEY_COUNT + 0),
-		Load	   = (1 << KEY_COUNT + 1),
-		Select	   = (1 << KEY_COUNT + 2),
-		Deselect   = (1 << KEY_COUNT + 3),
-		LookSwitch = (1 << KEY_COUNT + 4)
+		Save,
+		Load,
+		Select,
+		Deselect,
+		LookSwitch,
 	};
 
-	bool IsClicked(InputAction input);
-	bool IsHeld(InputAction input);
-	bool IsReleased(InputAction input);
+	bool InClicked(In input);
+	bool InHeld(In input);
+	bool InReleased(In input);
 }

@@ -143,17 +143,17 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Control.IsMoving)
 		return;
 
-	if (IsHeld(InputAction::Left) || IsHeld(InputAction::Right))
+	if (InHeld(In::Left) || InHeld(In::Right))
 	{
 		ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_MED_TURN_RATE_MAX);
 		ModulateLaraLean(item, coll, LARA_LEAN_RATE / 6, LARA_LEAN_MAX / 2);
 	}
 
-	if (IsHeld(InputAction::Forward))
+	if (InHeld(In::Forward))
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (IsHeld(InputAction::Action) && vaultResult.Success)
+		if (InHeld(In::Action) && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
@@ -161,7 +161,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Control.WaterStatus == WaterStatus::Wade)
 			item->Animation.TargetState = LS_WADE_FORWARD;
-		else if (IsHeld(InputAction::Walk)) USE_FEATURE_IF_CPP20([[likely]])
+		else if (InHeld(In::Walk)) USE_FEATURE_IF_CPP20([[likely]])
 			item->Animation.TargetState = LS_WALK_FORWARD;
 		else
 			item->Animation.TargetState = LS_RUN_FORWARD;
@@ -396,23 +396,23 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	if (UseSpecialItem(item))
 		return;
 
-	if (IsHeld(InputAction::Look) && lara->Control.CanLook)
+	if (InHeld(In::Look) && lara->Control.CanLook)
 		LookUpDown(item);
 
 	// HACK.
 	if (BinocularOn)
 		return;
 
-	if (!IsHeld(InputAction::Jump) || isSwamp) // JUMP locks orientation outside swamps.
+	if (!InHeld(In::Jump) || isSwamp) // JUMP locks orientation outside swamps.
 	{
 		// Sidestep locks orientation.
-		if ((IsHeld(InputAction::LeftStep) || (IsHeld(InputAction::Walk) && IsHeld(InputAction::Left))) ||
-			(IsHeld(InputAction::RightStep) || (IsHeld(InputAction::Walk) && IsHeld(InputAction::Right))))
+		if ((InHeld(In::LeftStep) || (InHeld(In::Walk) && InHeld(In::Left))) ||
+			(InHeld(In::RightStep) || (InHeld(In::Walk) && InHeld(In::Right))))
 		{
 			ModulateLaraTurnRateY(item, 0, 0, 0);
 
 		}
-		else if (IsHeld(InputAction::Left) || IsHeld(InputAction::Right))
+		else if (InHeld(In::Left) || InHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
 	}
 
@@ -426,7 +426,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsReleased(InputAction::Jump))
+	if (InHeld(In::Jump))
 	{
 		SetLaraJumpDirection(item, coll);
 		if (lara->Control.JumpDirection != JumpDirection::None)
@@ -435,29 +435,29 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(InputAction::Roll) || (IsHeld(InputAction::Forward) && IsHeld(InputAction::Back)))
+	if (InHeld(In::Roll) || (InHeld(In::Forward) && InHeld(In::Back)))
 	{
 		item->Animation.TargetState = LS_ROLL_FORWARD;
 		return;
 	}
 
-	if (IsHeld(InputAction::Crouch) && TestLaraCrouch(item))
+	if (InHeld(In::Crouch) && TestLaraCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
 	}
 
-	if (IsHeld(InputAction::Forward))
+	if (InHeld(In::Forward))
 	{
 		auto vaultResult = TestLaraVault(item, coll);
 
-		if (IsHeld(InputAction::Action) && vaultResult.Success)
+		if (InHeld(In::Action) && vaultResult.Success)
 		{
 			item->Animation.TargetState = vaultResult.TargetState;
 			SetLaraVault(item, coll, vaultResult);
 			return;
 		}
-		else if (IsHeld(InputAction::Walk))
+		else if (InHeld(In::Walk))
 		{
 			if (TestLaraWalkForward(item, coll))
 			{
@@ -465,7 +465,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 				return;
 			}
 		}
-		else if (IsHeld(InputAction::Sprint) && TestLaraRunForward(item, coll))
+		else if (InHeld(In::Sprint) && TestLaraRunForward(item, coll))
 		{
 			item->Animation.TargetState = LS_SPRINT;
 			return;
@@ -476,9 +476,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			return;
 		}
 	}
-	else if (IsHeld(InputAction::Back))
+	else if (InHeld(In::Back))
 	{
-		if (IsHeld(InputAction::Walk))
+		if (InHeld(In::Walk))
 		{
 			if (TestLaraWalkBack(item, coll))
 			{
@@ -493,7 +493,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		}
 	}
 
-	if (IsHeld(InputAction::LeftStep) || (IsHeld(InputAction::Walk) && IsHeld(InputAction::Left)))
+	if (InHeld(In::LeftStep) || (InHeld(In::Walk) && InHeld(In::Left)))
 	{
 		if (TestLaraStepLeft(item, coll))
 			item->Animation.TargetState = LS_STEP_LEFT;
@@ -502,7 +502,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(InputAction::RightStep) || (IsHeld(InputAction::Walk) && IsHeld(InputAction::Right)))
+	else if (InHeld(In::RightStep) || (InHeld(In::Walk) && InHeld(In::Right)))
 	{
 		if (TestLaraStepRight(item, coll))
 			item->Animation.TargetState = LS_STEP_RIGHT;
@@ -512,9 +512,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (IsHeld(InputAction::Left))
+	if (InHeld(In::Left))
 	{
-		if (IsHeld(InputAction::Sprint) ||
+		if (InHeld(In::Sprint) ||
 			lara->Control.TurnRate <= -LARA_SLOW_TURN_RATE_MAX || TestLaraFastTurn(item))
 		{
 			item->Animation.TargetState = LS_TURN_LEFT_FAST;
@@ -524,9 +524,9 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 		return;
 	}
-	else if (IsHeld(InputAction::Right))
+	else if (InHeld(In::Right))
 	{
-		if (IsHeld(InputAction::Sprint) ||
+		if (InHeld(In::Sprint) ||
 			lara->Control.TurnRate >= LARA_SLOW_TURN_RATE_MAX || TestLaraFastTurn(item))
 		{
 			item->Animation.TargetState = LS_TURN_RIGHT_FAST;
