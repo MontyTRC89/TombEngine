@@ -166,7 +166,7 @@ namespace TEN::Input
 		LookSwitch,
 	} In;
 
-	bool IsClicked(In input);
-	bool IsHeld(In input);
-	bool IsReleased(In input);
+	bool IsClicked(InputAction input);
+	bool IsHeld(InputAction input);
+	bool IsReleased(InputAction input);
 }
