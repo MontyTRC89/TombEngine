@@ -769,19 +769,19 @@ namespace TEN::Input
 		rumbleData = {};
 	}
 
-	bool InClicked(In input)
+	bool InClicked(Action input)
 	{
 		int inputBit = 1 << (int)input;
 		return ((DbInput & inputBit) == inputBit);
 	}
 
-	bool InHeld(In input)
+	bool InHeld(Action input)
 	{
 		int inputBit = 1 << (int)input;
 		return ((TrInput & inputBit) == inputBit);
 	}
 
-	bool InReleased(In input)
+	bool InReleased(Action input)
 	{
 		int inputBit = 1 << (int)input;
 		return ((RelInput & inputBit) == inputBit);
