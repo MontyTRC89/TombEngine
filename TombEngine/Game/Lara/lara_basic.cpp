@@ -410,7 +410,6 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 			(IsHeld(In::RightStep) || (IsHeld(In::Walk) && IsHeld(In::Right))))
 		{
 			ModulateLaraTurnRateY(item, 0, 0, 0);
-
 		}
 		else if (IsHeld(In::Left) || IsHeld(In::Right))
 			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
