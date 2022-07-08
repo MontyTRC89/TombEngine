@@ -13,6 +13,7 @@
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/input.h"
+#include "Specific/setup.h"
 
 using namespace TEN::Input;
 
@@ -57,11 +58,17 @@ namespace Misc
 							int startSize, int endSize, int lifetime, 
 							bool damage, bool poison)
 	{
+		if (!Objects[ID_DEFAULT_SPRITES].loaded)
+		{
+			TENLog("Can't spawn a particle because sprites are not loaded for this level.", LogLevel::Error);
+			return;
+		}
+
 		auto* s = GetFreeParticle();
 
 		s->on = true;
 
-		s->spriteIndex = spriteIndex;
+		s->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
 
 		s->sR = startColor.GetR();
 		s->sG = startColor.GetG();
