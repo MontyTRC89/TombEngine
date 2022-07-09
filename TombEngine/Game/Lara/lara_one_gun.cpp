@@ -1765,38 +1765,36 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 void DoExplosiveDamageOnBaddy(ItemInfo* laraItem, ItemInfo* dest, ItemInfo* src, LaraWeaponType weaponType)
 {
-	if (!(dest->Flags & 0x8000))
-	{
-		if (dest != laraItem || laraItem->HitPoints <= 0)
-		{
-			if (!src->ItemFlags[2])
-			{
-				dest->HitStatus = true;
+	if (dest->Flags & IFLAG_KILLED)
+		return;
 
-				auto* obj = &Objects[dest->ObjectNumber];
-				// TODO: in TR4 condition was objectNumber != (ID_MUMMY, ID_SKELETON, ID_SETHA)
-				if (!obj->undead)
-				{
-					HitTarget(laraItem, dest, 0, Weapons[(int)weaponType].ExplosiveDamage, 1);
+	if (dest->HitPoints == NOT_TARGETABLE)
+		return;
+
+	if (dest != laraItem || laraItem->HitPoints <= 0)
+	{
+		if (src->ItemFlags[2])
+			return;
+
+		dest->HitStatus = true;
+
+		HitTarget(laraItem, dest, 0, Weapons[(int)weaponType].ExplosiveDamage, 1);
 					
-					if (dest != laraItem)
-					{
-						Statistics.Game.AmmoHits++;
-						if (dest->HitPoints <= 0)
-						{
-							Statistics.Level.Kills++;
-							CreatureDie((dest - g_Level.Items.data()), true);
-						}
-					}
-				}
+		if (dest != laraItem)
+		{
+			Statistics.Game.AmmoHits++;
+			if (dest->HitPoints <= 0)
+			{
+				Statistics.Level.Kills++;
+				CreatureDie((dest - g_Level.Items.data()), true);
 			}
 		}
-		else
-		{
-			DoDamage(laraItem, Weapons[(int)weaponType].Damage * 5);
-			if (!TestEnvironment(ENV_FLAG_WATER, dest->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
-				LaraBurn(laraItem);
-		}
+	}
+	else
+	{
+		DoDamage(laraItem, Weapons[(int)weaponType].Damage * 5);
+		if (!TestEnvironment(ENV_FLAG_WATER, dest->RoomNumber) && laraItem->HitPoints <= Weapons[(int)weaponType].Damage)
+			LaraBurn(laraItem);
 	}
 }
 

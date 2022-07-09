@@ -9,6 +9,7 @@ local InventoryItem = Flow.InventoryItem
 local InvID = Flow.InvID
 local RotationAxis = Flow.RotationAxis
 local ItemAction = Flow.ItemAction
+local Fog = Flow.Fog 
 
 -- Title level
 Flow.SetIntroImagePath("Screens\\Main.png")

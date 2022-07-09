@@ -254,23 +254,13 @@ void lara_as_jump_prepare(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// TODO: I need to revise the directional jump system to work with changes done for OIS. @Sezz 2022.07.05
-	lara->Control.TurnRate.y = 0;
+	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_IDLE;
 		return;
 	}
-
-	// Disabled for now.
-	/*if (TrInput & (IN_FORWARD | IN_BACK) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
-	{
-		if (TrInput & (IN_LEFT | IN_RIGHT))
-			ModulateLaraTurnRateY(item, LARA_TURN_RATE_ACCEL, 0, LARA_SLOW_TURN_RATE_MAX);
-	}
-	else
-		lara->Control.TurnRate.y = 0;*/
 
 	// JUMP key repressed without directional key; cancel directional jump lock.
 	if (DbInput & IN_JUMP && !(TrInput & IN_DIRECTION))
@@ -782,10 +772,10 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	auto* bounds = GetBoundsAccurate(item);
-	int realHeight = (bounds->Y2 - bounds->Y1) * 0.7f;
+	int realHeight = g_GameFlow->HasCrawlspaceSwandive() ? ((bounds->Y2 - bounds->Y1) * 0.7f) : LARA_HEIGHT;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.Height = std::max<int>(realHeight, LARA_HEIGHT_CRAWL);
+	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, realHeight);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -795,9 +785,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeJump(item, coll))
 	{
 		// Reset position to avoid embedding inside sloped ceilings meeting the floor.
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position = coll->Setup.OldPosition;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 }

@@ -221,7 +221,7 @@ void UpdateSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
+				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0x0FFF;
 
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)
