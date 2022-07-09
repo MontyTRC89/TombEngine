@@ -1,16 +1,18 @@
 #include "framework.h"
 
+#include "Objects/objectslist.h"
+#include "Game/items.h"
+#include "Game/control/lot.h"
+#include "Game/Lara/lara_helpers.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
+#include "Specific/trmath.h"
+
 #include "ScriptAssert.h"
 #include "MoveableObject.h"
 #include "ScriptUtil.h"
-#include "Game/items.h"
-#include "Objects/objectslist.h"
-#include "Specific/level.h"
-#include "Specific/setup.h"
-#include "Game/control/lot.h"
 #include "Vec3/Vec3.h"
 #include "Rotation/Rotation.h"
-#include "Specific/trmath.h"
 #include "Objects/ObjectsHandler.h"
 #include "ReservedScriptNames.h"
 
@@ -309,32 +311,44 @@ void Moveable::Register(sol::table & parent)
 /// Get state of specified mesh visibility of object
 // Returns true if specified mesh is visible on an object, and false
 // if it is not visible.
-// @function Moveable:GetMeshVisibility
+// @function Moveable:MeshIsVisible
 // @tparam int index of a mesh
 // @treturn bool visibility status
-	ScriptReserved_GetMeshVisibility, &Moveable::GetMeshVisibility,
+	ScriptReserved_MeshIsVisible, &Moveable::MeshIsVisible,
 			
-/// Set state of specified mesh visibility of object
-// Use this to show or hide specified mesh of an object.
-// @function Moveable:SetMeshVisibility
+/// Makes specified mesh visible
+// Use this to show specified mesh of an object.
+// @function Moveable:ShowMesh
 // @tparam int index of a mesh
-// @tparam bool status, visible or invisible
-	ScriptReserved_SetMeshVisibility, &Moveable::SetMeshVisibility,
+	ScriptReserved_ShowMesh, &Moveable::ShowMesh,
+			
+/// Makes specified mesh invisible
+// Use this to hide specified mesh of an object.
+// @function Moveable:HideMesh
+// @tparam int index of a mesh
+	ScriptReserved_HideMesh, &Moveable::HideMesh,
 
 /// Get state of specified mesh swap of object
 // Returns true if specified mesh is swapped on an object, and false
 // if it is not swapped.
-// @function Moveable:GetMeshSwap
+// @function Moveable:MeshIsSwapped
 // @tparam int index of a mesh
 // @treturn bool mesh swap status
-	ScriptReserved_GetMeshSwap, &Moveable::GetMeshSwap,
+	ScriptReserved_MeshIsSwapped, &Moveable::MeshIsSwapped,
 			
 /// Set state of specified mesh swap of object
 // Use this to swap specified mesh of an object.
-// @function Moveable:SetMeshSwap
+// @function Moveable:SwapMesh
 // @tparam int index of a mesh
-// @tparam bool status, swapped or not
-	ScriptReserved_SetMeshSwap, &Moveable::SetMeshSwap,
+// @tparam int index of a slot to get meshswap from
+// @tparam int (optional) index of a mesh from meshswap slot to use
+	ScriptReserved_SwapMesh, &Moveable::SwapMesh,
+			
+/// Set state of specified mesh swap of object
+// Use this to bring back original unswapped mesh
+// @function Moveable:UnswapMesh
+// @tparam int index of a mesh to unswap
+	ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
 
 /// Get the hit status of the object
 // @function Moveable:GetHitStatus
@@ -702,28 +716,79 @@ short Moveable::GetStatus() const
 	return m_item->Status;
 }
 
-bool Moveable::GetMeshVisibility(int meshId) const
+bool Moveable::MeshIsVisible(int meshId) const
 {
 	return m_item->TestBits(JointBitType::Mesh, meshId);
 }
 
-void Moveable::SetMeshVisibility(int meshId, bool visible)
+void Moveable::ShowMesh(int meshId)
 {
-	if (visible)
-		m_item->SetBits(JointBitType::Mesh, meshId);
-	else
-		m_item->ClearBits(JointBitType::Mesh, meshId);
+	m_item->SetBits(JointBitType::Mesh, meshId);
 }
 
-bool Moveable::GetMeshSwap(int meshId) const
+void Moveable::HideMesh(int meshId)
+{
+	m_item->ClearBits(JointBitType::Mesh, meshId);
+}
+
+bool Moveable::MeshIsSwapped(int meshId) const
 {
 	return m_item->TestBits(JointBitType::MeshSwap, meshId);
 }
 
-void Moveable::SetMeshSwap(int meshId, bool swapped)
+void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
 {
-	if (swapped)
+	if (!swapMeshIndex.has_value())
+		 swapMeshIndex = meshId;
+
+	// TODO: After beta, we should refactor whole meshswap workflow,
+	// because currently Lara and other objects use different convention -- Lwmte, 09.07.22
+
+	if (m_item->IsLara())
+	{
+		if (swapSlotId <= -1)
+			return;
+
+		auto* lara = GetLaraInfo(m_item);
+
+		if (swapSlotId >= ID_NUMBER_OBJECTS || !Objects[swapSlotId].loaded)
+		{
+			TENLog("Specified slot does not exist in level!", LogLevel::Error);
+			return;
+		}
+
+		if (swapMeshIndex.value() >= Objects[swapSlotId].nmeshes)
+		{
+			TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
+			return;
+		}
+
+		if (meshId >= NUM_LARA_MESHES)
+		{
+			TENLog("Specified mesh index does not exist!", LogLevel::Error);
+			return;
+		}
+
+		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
+	}
+	else
 		m_item->SetBits(JointBitType::MeshSwap, meshId);
+}
+
+void Moveable::UnswapMesh(int meshId)
+{
+	if (m_item->IsLara())
+	{
+		auto* lara = GetLaraInfo(m_item);
+
+		if (meshId >= NUM_LARA_MESHES)
+		{
+			TENLog("Specified mesh index does not exist!", LogLevel::Error);
+			return;
+		}
+
+		lara->MeshPtrs[meshId] = Objects[ID_LARA_SKIN].meshIndex + meshId;
+	}
 	else
 		m_item->ClearBits(JointBitType::MeshSwap, meshId);
 }

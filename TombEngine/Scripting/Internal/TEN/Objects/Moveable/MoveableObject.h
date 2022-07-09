@@ -63,11 +63,13 @@ public:
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 
-	[[nodiscard]] bool GetMeshVisibility(int meshId) const;
-	void SetMeshVisibility(int meshId, bool visible);
+	[[nodiscard]] bool MeshIsVisible(int meshId) const;
+	void ShowMesh(int meshId);
+	void HideMesh(int meshId);
 
-	[[nodiscard]] bool GetMeshSwap(int meshId) const;
-	void SetMeshSwap(int meshId, bool swapped);
+	[[nodiscard]] bool MeshIsSwapped(int meshId) const;
+	void SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex);
+	void UnswapMesh(int meshId);
 
 	[[nodiscard]] bool GetHitStatus() const;
 
