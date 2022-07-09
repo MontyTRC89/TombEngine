@@ -45,6 +45,9 @@ public:
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(Rotation const& rot);
 
+	[[nodiscard]] int GetStateNumber() const;
+	void SetStateNumber(int stateNumber);
+
 	[[nodiscard]] int GetAnimNumber() const;
 	void SetAnimNumber(int animNumber);
 
