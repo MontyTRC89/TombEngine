@@ -63,6 +63,12 @@ public:
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 
+	[[nodiscard]] bool GetMeshVisibility(int meshId) const;
+	void SetMeshVisibility(int meshId, bool visible);
+
+	[[nodiscard]] bool GetMeshSwap(int meshId) const;
+	void SetMeshSwap(int meshId, bool swapped);
+
 	[[nodiscard]] bool GetHitStatus() const;
 
 	[[nodiscard]] bool GetActive() const;
