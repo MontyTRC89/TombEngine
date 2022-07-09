@@ -67,11 +67,11 @@ namespace TEN::Input
 	constexpr int AXIS_DEADZONE = 8000;
 
 	// OIS interfaces
-	InputManager*	oisInputManager = nullptr;
-	Keyboard*		oisKeyboard		= nullptr;
-	JoyStick*		oisGamepad		= nullptr;
-	ForceFeedback*  oisRumble		= nullptr;
-	Effect*			oisEffect		= nullptr;
+	InputManager*  oisInputManager = nullptr;
+	Keyboard*	   oisKeyboard	   = nullptr;
+	JoyStick*	   oisGamepad	   = nullptr;
+	ForceFeedback* oisRumble	   = nullptr;
+	Effect*		   oisEffect	   = nullptr;
 
 	// Rumble functionality
 	RumbleData rumbleData = {};
@@ -81,14 +81,15 @@ namespace TEN::Input
 	int TrInput;
 	int RelInput;
 	int RawInput;
+	std::vector<InputAction> Actions;
 	std::vector<bool> KeyMap;
 	std::vector<float> AxisMap;
 
 	bool ConflictingKeys[KEY_COUNT];
 	short KeyboardLayout[2][KEY_COUNT] =
 	{
-		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_DELETE, KC_PGDOWN },
-		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_DELETE, KC_PGDOWN }
+		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN },
+		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN }
 	};
 
 	void InitialiseEffect()
@@ -159,6 +160,11 @@ namespace TEN::Input
 				TENLog("An exception occured during game controller init: " + std::string(ex.eText), LogLevel::Error);
 			}
 		}
+
+		// Initialise input action map.
+		Actions.resize(KEY_COUNT);
+		for (int i = 0; i < KEY_COUNT; i++)
+			Actions[i].ID = (InputID)i;
 	}
 
 	void DeInitialiseInput()
@@ -723,13 +729,47 @@ namespace TEN::Input
 		HandleLaraHotkeys(lInput);
 		SolveInputCollisions(lInput);
 
-		// Check for input release.
 		RelInput = (TrInput | lInput) ^ lInput;
-
 		TrInput = lInput;
 
 		if (debounce)
 			DbInput = TrInput & (DbInput ^ TrInput);
+
+		// Experimental hook for non-bitfield inputs.
+		for (int i = 0; i < Actions.size(); i++)
+		{
+			int inputBit = 1 << (int)Actions[i].ID;
+
+			Actions[i].PrevIsActive = Actions[i].IsActive;
+			Actions[i].PrevTimeHeld = Actions[i].TimeHeld;
+
+			if ((TrInput & inputBit) == inputBit)
+			{
+				Actions[i].IsActive = true;
+				Actions[i].TimeHeld += 1.0f / (float)FPS;
+				Actions[i].TimeReleased = 0;
+			}
+			else
+			{
+				Actions[i].IsActive = false;
+				Actions[i].TimeHeld = 0;
+				Actions[i].TimeReleased += 1.0f / (float)FPS;
+			}
+		}
+
+		// Debug display for FORWARD input.
+		int debugInput = (int)In::Forward;
+		g_Renderer.PrintDebugMessage("FORWARD input debug:");
+		g_Renderer.PrintDebugMessage("IsClicked: %d", Actions[debugInput].IsClicked());
+		g_Renderer.PrintDebugMessage("IsPulsed (0.15f, 0.6f): %d", Actions[debugInput].IsPulsed(0.15f, 0.6f));
+		g_Renderer.PrintDebugMessage("IsHeld: %d", Actions[debugInput].IsHeld());
+		g_Renderer.PrintDebugMessage("IsReleased: %d", Actions[debugInput].IsReleased());
+		g_Renderer.PrintDebugMessage("");
+		g_Renderer.PrintDebugMessage("IsActive: %d", Actions[debugInput].IsActive);
+		g_Renderer.PrintDebugMessage("PrevIsActive: %d", Actions[debugInput].PrevIsActive);
+		g_Renderer.PrintDebugMessage("TimeHeld: %f", Actions[debugInput].TimeHeld);
+		g_Renderer.PrintDebugMessage("PrevTimeHeld: %f", Actions[debugInput].PrevTimeHeld);
+		g_Renderer.PrintDebugMessage("TimeReleased: %f", Actions[debugInput].TimeReleased);
 
 		return true;
 	}
@@ -759,21 +799,52 @@ namespace TEN::Input
 		rumbleData = {};
 	}
 
-	bool IsClicked(InputAction input)
+	bool InputAction::IsClicked()
 	{
-		int inputBit = 1 << (int)input;
-		return ((DbInput & inputBit) == inputBit);
+		return (IsActive && !PrevIsActive);
 	}
 
-	bool IsHeld(InputAction input)
+	// Intervals in seconds.
+	bool InputAction::IsPulsed(float interval, float initialInterval)
 	{
-		int inputBit = 1 << (int)input;
-		return ((TrInput & inputBit) == inputBit);
+		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
+			return false;
+
+		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
+		float intervalTime = std::floor(TimeHeld / activeInterval) * activeInterval;
+		if (intervalTime >= PrevTimeHeld)
+			return true;
+
+		return false;
 	}
 
-	bool IsReleased(InputAction input)
+	bool InputAction::IsHeld()
 	{
-		int inputBit = 1 << (int)input;
-		return ((RelInput & inputBit) == inputBit);
+		return IsActive;
+	}
+
+	bool InputAction::IsReleased()
+	{
+		return (!IsActive && PrevIsActive);
+	}
+
+	bool IsClicked(InputID input)
+	{
+		return Actions[(int)input].IsClicked();
+	}
+
+	bool IsPulsed(InputID input, float intervalInSeconds, float initialInterval)
+	{
+		return Actions[(int)input].IsPulsed(intervalInSeconds, initialInterval);
+	}
+
+	bool IsHeld(InputID input)
+	{
+		return Actions[(int)input].IsHeld();
+	}
+
+	bool IsReleased(InputID input)
+	{
+		return Actions[(int)input].IsReleased();
 	}
 }

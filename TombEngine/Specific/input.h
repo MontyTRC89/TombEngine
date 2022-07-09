@@ -116,13 +116,15 @@ namespace TEN::Input
 	constexpr int IN_DIRECTION		= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT;
 
 	extern const char* g_KeyNames[];
+
+	// Legacy input bitfields.
 	extern int DbInput;  // Debounce: is input clicked?
 	extern int TrInput;  // Throttle: is input held?
 	extern int RelInput; // Release: is input released?
 	extern int RawInput; // Throttle for binocular input.
 
-	extern std::vector<bool>  KeyMap;
-	extern std::vector<float> AxisMap;
+	extern std::vector<bool>		KeyMap;
+	extern std::vector<float>		AxisMap;
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 
@@ -133,8 +135,11 @@ namespace TEN::Input
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 
-	typedef enum class InputAction
+	// ---------------------------------------------------------------
+
+	typedef enum class InputID
 	{
+		None = -1,
 		Forward,
 		Back,
 		Left,
@@ -166,7 +171,28 @@ namespace TEN::Input
 		LookSwitch,
 	} In;
 
-	bool IsClicked(InputAction input);
-	bool IsHeld(InputAction input);
-	bool IsReleased(InputAction input);
+	class InputAction
+	{
+	public:
+		InputID ID			 = In::None;
+		float	TimeHeld	 = 0.0f;
+		float	PrevTimeHeld = 0.0f;
+		float	TimeReleased = 0.0f;
+
+		bool IsClicked();
+		bool IsPulsed(float interval, float initialInterval = 0.0f);
+		bool IsHeld();
+		bool IsReleased();
+
+	//private:
+		bool IsActive	  = false;
+		bool PrevIsActive = false;
+	};
+
+	extern std::vector<InputAction> Actions;
+
+	bool IsClicked(InputID input);
+	bool IsPulsed(InputID input, float interval, float initialInterval = 0.0f);
+	bool IsHeld(InputID input);
+	bool IsReleased(InputID input);
 }
