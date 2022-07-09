@@ -9,6 +9,7 @@
 #include "Game/effects/lightning.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/weather.h"
 #include "Sound/sound.h"
@@ -16,15 +17,15 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
-using namespace TEN::Input;
-
 /***
 Functions that don't fit in the other modules.
 @tentable Misc 
 @pragma nostrip
 */
 
+using namespace TEN::Input;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Spark;
 
@@ -141,29 +142,39 @@ namespace Misc
 		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)), size, 0);
 	}
 
+	static void AddExplosion(Vec3 pos, sol::optional<float> size, sol::optional<bool> shockwave)
+	{
+		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), size.value_or(512.0f), true, false, shockwave.value_or(false), FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)));
+	}
+
 	static void Earthquake(int strength)
 	{
 		Camera.bounce = -strength;
 	}
 
+	static void Vibrate(float strength, sol::optional<float> time)
+	{
+		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
+	}
+
 	static void FlashScreen(ScriptColor color, sol::optional<float> speed)
 	{
-		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (speed.has_value() ? speed.value() : 0.5f) / float(FPS));
+		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), speed.value_or(0.5f) / float(FPS));
 	}
 
 	static void FadeIn(sol::optional<float> speed)
 	{
-		SetScreenFadeIn((speed.has_value() ? speed.value() : 1.0f) / float(FPS));
+		SetScreenFadeIn(speed.value_or(1.0f) / float(FPS));
 	}
 
 	static void FadeOut(sol::optional<float> speed)
 	{
-		SetScreenFadeOut((speed.has_value() ? speed.value() : 1.0f) / float(FPS));
+		SetScreenFadeOut(speed.value_or(1.0f) / float(FPS));
 	}
 
 	static void SetCineBars(float height, sol::optional<float> speed)
 	{
-		SetCinematicBars(height / float(REFERENCE_RES_HEIGHT), (speed.has_value() ? speed.value() : 1.0f) / float(FPS));
+		SetCinematicBars(height / float(REFERENCE_RES_HEIGHT), speed.value_or(1.0f) / float(FPS));
 	}
 
 	static void SetFOV(float angle)
@@ -296,6 +307,13 @@ namespace Misc
 		//@tparam int size
 		table_misc.set_function(ScriptReserved_AddFire, &AddFireFlame);
 
+		///Emit explosion.
+		//@function AddExplosion
+		//@tparam Vec3 pos
+		//@tparam float size
+		//@tparam bool shockwave (default: false)
+		table_misc.set_function(ScriptReserved_AddExplosion, &AddExplosion);
+
 		///Emit blood.
 		//@function AddBlood
 		//@tparam Vec3 pos
@@ -307,26 +325,32 @@ namespace Misc
 		//@tparam int strength
 		table_misc.set_function(ScriptReserved_Earthquake, &Earthquake);
 
+		///Vibrate gamepad, if possible.
+		//@function Vibrate
+		//@tparam float strength
+		//@tparam time (in seconds, default: 0.3)
+		table_misc.set_function(ScriptReserved_Vibrate, &Vibrate);
+
 		///Flash screen.
 		//@function FlashScreen
 		//@tparam ScriptColor color
-		//@tparam float speed
+		//@tparam float speed (default: 1 second)
 		table_misc.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
 		///Do a fade-in.
 		//@function FadeIn
-		//@tparam float speed
+		//@tparam float speed (default: 1 second)
 		table_misc.set_function(ScriptReserved_FadeIn, &FadeIn);
 
 		///Do a fade-out.
 		//@function FadeIn
-		//@tparam float speed
+		//@tparam float speed (default: 1 second)
 		table_misc.set_function(ScriptReserved_FadeOut, &FadeOut);
 
 		///Set cinematic bars.
 		//@function SetCineBars
 		//@tparam float height on the range 0-800
-		//@tparam float speed
+		//@tparam float speed (default: 1 second)
 		table_misc.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
 		///Set field of view.
