@@ -221,14 +221,27 @@ void Moveable::Register(sol::table & parent)
 	ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
 /// Retrieve the index of the current animation.
+// This corresponds to the number shown in the item's state ID field in WadTool.
+// @function Moveable:GetState
+// @treturn int the index of the active state
+	ScriptReserved_GetStateNumber, &Moveable::GetStateNumber,
+
+/// Set the object's state to the one specified by the given index.
+// Performs no bounds checking. *Ensure the number given is correct, else
+// object may end up in corrupted animation state.*
+// @function Moveable:SetState
+// @tparam int index the index of the desired state 
+	ScriptReserved_SetStateNumber, &Moveable::SetStateNumber,
+
+/// Retrieve the index of the current animation.
 // This corresponds to the number shown in the item's animation list in WadTool.
 // @function Moveable:GetAnim
 // @treturn int the index of the active animation
 	ScriptReserved_GetAnimNumber, &Moveable::GetAnimNumber,
 
-/// Set the opject's animation to the one specified by the given index.
+/// Set the object's animation to the one specified by the given index.
 // Performs no bounds checking. *Ensure the number given is correct, else
-// the program is likely to crash with an unhelpful error message.*
+// object may end up in corrupted animation state.*
 // @function Moveable:SetAnim
 // @tparam int index the index of the desired anim 
 	ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
@@ -292,6 +305,36 @@ void Moveable::Register(sol::table & parent)
 // local sas = TEN.Objects.GetMoveableByName("sas_enemy")
 // sas:SetAIBits({1, 0, 0, 0, 0, 0})
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
+
+/// Get state of specified mesh visibility of object
+// Returns true if specified mesh is visible on an object, and false
+// if it is not visible.
+// @function Moveable:GetMeshVisibility
+// @tparam int index of a mesh
+// @treturn bool visibility status
+	ScriptReserved_GetMeshVisibility, &Moveable::GetMeshVisibility,
+			
+/// Set state of specified mesh visibility of object
+// Use this to show or hide specified mesh of an object.
+// @function Moveable:SetMeshVisibility
+// @tparam int index of a mesh
+// @tparam bool status, visible or invisible
+	ScriptReserved_SetMeshVisibility, &Moveable::SetMeshVisibility,
+
+/// Get state of specified mesh swap of object
+// Returns true if specified mesh is swapped on an object, and false
+// if it is not swapped.
+// @function Moveable:GetMeshSwap
+// @tparam int index of a mesh
+// @treturn bool mesh swap status
+	ScriptReserved_GetMeshSwap, &Moveable::GetMeshSwap,
+			
+/// Set state of specified mesh swap of object
+// Use this to swap specified mesh of an object.
+// @function Moveable:SetMeshSwap
+// @tparam int index of a mesh
+// @tparam bool status, swapped or not
+	ScriptReserved_SetMeshSwap, &Moveable::SetMeshSwap,
 
 /// Get the hit status of the object
 // @function Moveable:GetHitStatus
@@ -576,6 +619,16 @@ void Moveable::SetAIBits(aiBitsType const & bits)
 	}
 }
 
+int Moveable::GetStateNumber() const
+{
+	return m_item->Animation.ActiveState;
+}
+
+void Moveable::SetStateNumber(int stateNumber)
+{
+	m_item->Animation.TargetState = stateNumber;
+}
+
 int Moveable::GetAnimNumber() const
 {
 	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
@@ -583,15 +636,13 @@ int Moveable::GetAnimNumber() const
 
 void Moveable::SetAnimNumber(int animNumber)
 {
-	//TODO fixme: we need bounds checking with an error message once it's in the level file format
-	m_item->Animation.AnimNumber = animNumber +  Objects[m_item->ObjectNumber].animIndex;
+	SetAnimation(m_item, animNumber);
 }
 
 int Moveable::GetFrameNumber() const
 {
 	return m_item->Animation.FrameNumber - g_Level.Anims[m_item->Animation.AnimNumber].frameBase;
 }
-
 
 void Moveable::SetFrameNumber(int frameNumber)
 {
@@ -649,6 +700,32 @@ void Moveable::SetRoom(short room)
 short Moveable::GetStatus() const
 {
 	return m_item->Status;
+}
+
+bool Moveable::GetMeshVisibility(int meshId) const
+{
+	return m_item->TestBits(JointBitType::Mesh, meshId);
+}
+
+void Moveable::SetMeshVisibility(int meshId, bool visible)
+{
+	if (visible)
+		m_item->SetBits(JointBitType::Mesh, meshId);
+	else
+		m_item->ClearBits(JointBitType::Mesh, meshId);
+}
+
+bool Moveable::GetMeshSwap(int meshId) const
+{
+	return m_item->TestBits(JointBitType::MeshSwap, meshId);
+}
+
+void Moveable::SetMeshSwap(int meshId, bool swapped)
+{
+	if (swapped)
+		m_item->SetBits(JointBitType::MeshSwap, meshId);
+	else
+		m_item->ClearBits(JointBitType::MeshSwap, meshId);
 }
 
 void Moveable::EnableItem()
