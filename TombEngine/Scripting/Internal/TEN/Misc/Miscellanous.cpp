@@ -328,7 +328,7 @@ namespace Misc
 		///Vibrate gamepad, if possible.
 		//@function Vibrate
 		//@tparam float strength
-		//@tparam time (in seconds, default: 0.3)
+		//@tparam float time (in seconds, default: 0.3)
 		table_misc.set_function(ScriptReserved_Vibrate, &Vibrate);
 
 		///Flash screen.
