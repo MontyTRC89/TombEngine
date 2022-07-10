@@ -81,9 +81,10 @@ namespace TEN::Input
 	int TrInput;
 	int RelInput;
 	int RawInput;
+
 	std::vector<InputAction> Actions;
-	std::vector<bool> KeyMap;
-	std::vector<float> AxisMap;
+	std::vector<bool>		 KeyMap;
+	std::vector<float>		 AxisMap;
 
 	bool ConflictingKeys[KEY_COUNT];
 	short KeyboardLayout[2][KEY_COUNT] =
@@ -162,8 +163,8 @@ namespace TEN::Input
 		}
 
 		// Initialise input action map.
-		Actions.resize(KEY_COUNT);
-		for (int i = 0; i < KEY_COUNT; i++)
+		Actions.resize(KEY_COUNT + 5);
+		for (int i = 0; i < KEY_COUNT + 5; i++)
 			Actions[i].ID = (InputID)i;
 	}
 
@@ -741,18 +742,33 @@ namespace TEN::Input
 			int inputBit = 1 << (int)Actions[i].ID;
 
 			Actions[i].PrevIsActive = Actions[i].IsActive;
-			Actions[i].PrevTimeHeld = Actions[i].TimeHeld;
 
-			if ((TrInput & inputBit) == inputBit)
+			if ((DbInput & inputBit) == inputBit)
 			{
 				Actions[i].IsActive = true;
+				Actions[i].PrevTimeHeld = 0.0f;
+				Actions[i].TimeHeld = 0.0f;
+				Actions[i].TimeReleased += 1.0f / (float)FPS;
+			}
+			else if ((RelInput & inputBit) == inputBit)
+			{
+				Actions[i].IsActive = true;
+				Actions[i].PrevTimeHeld = Actions[i].TimeHeld;
 				Actions[i].TimeHeld += 1.0f / (float)FPS;
-				Actions[i].TimeReleased = 0;
+				Actions[i].TimeReleased = 0.0f;
+			}
+			else if ((TrInput & inputBit) == inputBit)
+			{
+				Actions[i].IsActive = true;
+				Actions[i].PrevTimeHeld = Actions[i].TimeHeld;
+				Actions[i].TimeHeld += 1.0f / (float)FPS;
+				Actions[i].TimeReleased = 0.0f;
 			}
 			else
 			{
 				Actions[i].IsActive = false;
-				Actions[i].TimeHeld = 0;
+				Actions[i].PrevTimeHeld = 0.0f;
+				Actions[i].TimeHeld = 0.0f;
 				Actions[i].TimeReleased += 1.0f / (float)FPS;
 			}
 		}
@@ -761,7 +777,7 @@ namespace TEN::Input
 		int debugInput = (int)In::Forward;
 		g_Renderer.PrintDebugMessage("FORWARD input debug:");
 		g_Renderer.PrintDebugMessage("IsClicked: %d", Actions[debugInput].IsClicked());
-		g_Renderer.PrintDebugMessage("IsPulsed (0.15f, 0.6f): %d", Actions[debugInput].IsPulsed(0.15f, 0.6f));
+		g_Renderer.PrintDebugMessage("IsPulsed (0.2f, 0.6f): %d", Actions[debugInput].IsPulsed(0.2f, 0.6f));
 		g_Renderer.PrintDebugMessage("IsHeld: %d", Actions[debugInput].IsHeld());
 		g_Renderer.PrintDebugMessage("IsReleased: %d", Actions[debugInput].IsReleased());
 		g_Renderer.PrintDebugMessage("");
@@ -805,13 +821,16 @@ namespace TEN::Input
 	}
 
 	// Intervals in seconds.
+	// For now, to avoid desync on the second pulse, initialInterval should be a multiple of interval.
 	bool InputAction::IsPulsed(float interval, float initialInterval)
 	{
 		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
 			return false;
 
+		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, 1.0f / (float)FPS);
 		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
-		float intervalTime = std::floor(TimeHeld / activeInterval) * activeInterval;
+
+		float intervalTime = std::floor(syncedTimeHeld / activeInterval) * activeInterval;
 		if (intervalTime >= PrevTimeHeld)
 			return true;
 

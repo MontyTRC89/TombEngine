@@ -449,7 +449,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	// Debug for pulsed input.
 	// Rotates Lara 6 degrees clockwise with each pulse.
 	// Initial interval (second argument) is slightly longer.
-	if (IsPulsed(In::Action, 0.15f, 0.6f))
+	if (IsPulsed(In::Action, 0.2f, 0.6f))
 		item->Pose.Orientation.y += ANGLE(6.0f);
 
 	if (IsHeld(In::Forward))

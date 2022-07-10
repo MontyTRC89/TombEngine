@@ -123,8 +123,8 @@ namespace TEN::Input
 	extern int RelInput; // Release: is input released?
 	extern int RawInput; // Throttle for binocular input.
 
-	extern std::vector<bool>		KeyMap;
-	extern std::vector<float>		AxisMap;
+	extern std::vector<bool>  KeyMap;
+	extern std::vector<float> AxisMap;
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 

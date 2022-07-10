@@ -2,6 +2,7 @@
 #include "Game/gui.h"
 
 #include <OISKeyboard.h>
+
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
@@ -13,18 +14,23 @@
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
+#include "Renderer/Renderer11.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
 #include "Specific/configuration.h"
-#include "Renderer/Renderer11.h"
-#include "Scripting/Include/ScriptInterfaceLevel.h"
-#include "Scripting/Include/ScriptInterfaceGame.h"
 
-using namespace TEN::Renderer;
 using namespace TEN::Input;
+using namespace TEN::Renderer;
+
+constexpr int MAX_COMBINES = 60;
+constexpr int LINE_HEIGHT = 25;
+constexpr int PHD_CENTER_X = REFERENCE_RES_WIDTH / 2;
+constexpr int PHD_CENTER_Y = REFERENCE_RES_HEIGHT / 2;
 
 GuiController g_Gui;
 
@@ -66,10 +72,6 @@ const char* controlmsgs[] =
 	STRING_CONTROLS_STEP_RIGHT
 };
 
-constexpr int max_combines = 60;
-constexpr int line_height = 25;
-constexpr int phd_centerx = REFERENCE_RES_WIDTH / 2;
-constexpr int phd_centery = REFERENCE_RES_HEIGHT / 2;
 
 /*
 if you wanna add an object to the inventory, edit the InventoryObjectTypes array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
@@ -78,10 +80,10 @@ i.e if uzi item is #2 in InventoryObjectTypes (starting count from 0), IT HAS TO
 
 note: don't forget to add your object to the proper list construction function
 and if it's a weapon, add its ammo handling shit. (look at vars at the beginning of the file)
-if it's combineable, add its things to the combine_table and don't forget to increment max_combines!!
+if it's combineable, add its things to the combine_table and don't forget to increment MAX_COMBINES!!
 */
 
-CombineList combine_table[max_combines] =
+CombineList combine_table[MAX_COMBINES] =
 {
 	{combine_revolver_lasersight, INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER},
 	{combine_crossbow_lasersight, INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER},
@@ -404,9 +406,9 @@ SettingsData GuiController::GetCurrentSettings()
 	return CurrentSettings;
 }
 
-InventoryRing* GuiController::GetRings(char num)
+InventoryRing* GuiController::GetRings(int ringIndex)
 {
-	return rings[num];
+	return rings[ringIndex];
 }
 
 short GuiController::GetSelectedOption()
@@ -439,9 +441,9 @@ void GuiController::SetInventoryMode(InventoryMode mode)
 	invMode = mode;
 }
 
-void GuiController::SetInventoryItemChosen(int num)
+void GuiController::SetInventoryItemChosen(int number)
 {
-	inventoryItemChosen = num;
+	inventoryItemChosen = number;
 }
 
 int GuiController::GetInventoryItemChosen()
@@ -449,9 +451,9 @@ int GuiController::GetInventoryItemChosen()
 	return inventoryItemChosen;
 }
 
-void GuiController::SetEnterInventory(int num)
+void GuiController::SetEnterInventory(int number)
 {
-	enterInventory = num;
+	enterInventory = number;
 }
 
 int GuiController::GetEnterInventory()
@@ -469,140 +471,12 @@ void GuiController::DrawInventory()
 	g_Renderer.RenderInventory();
 }
 
-void GuiController::ClearInputVariables(bool flag)
-{
-	goUp = goDown = goRight = goLeft = goSelect = goDeselect = 0;
-	if (flag)
-		return;
-	else //don't wanna make another function for the rest
-	{
-		dbUp = dbDown = dbRight = dbLeft = dbSelect = dbDeselect = 0;
-		rptRight = rptLeft = 0;
-	}
-}
-
-void GuiController::DoDebouncedInput()
-{
-	ClearInputVariables(1);
-
-	if (TrInput & IN_LEFT)
-	{
-		if (invMode == InventoryMode::InGame)
-		{
-			if (rptLeft >= 8)
-				goLeft = 1;
-			else
-				rptLeft++;
-		}
-
-		if (!dbLeft)
-			goLeft = 1;
-
-		dbLeft = 1;
-	}
-	else
-	{
-		dbLeft = 0;
-		rptLeft = 0;
-	}
-
-	if (TrInput & IN_RIGHT)
-	{
-		if (invMode == InventoryMode::InGame)
-		{
-			if (rptRight >= 8)
-				goRight = 1;
-			else
-				rptRight++;
-		}
-
-		if (!dbRight)
-			goRight = 1;
-
-		dbRight = 1;
-	}
-	else
-	{
-		dbRight = 0;
-		rptRight = 0;
-	}
-
-	if (TrInput & IN_FORWARD)
-	{
-		if (!dbUp)
-			goUp = 1;
-
-		dbUp = 1;
-	}
-	else
-		dbUp = 0;
-
-	if (TrInput & IN_BACK)
-	{
-		if (!dbDown)
-			goDown = 1;
-
-		dbDown = 1;
-	}
-	else
-		dbDown = 0;
-
-	if (TrInput & IN_ACTION || TrInput & IN_SELECT)
-	{
-		if (invMode == InventoryMode::Save)
-		{
-			if (!dbSelect)
-			{
-				goSelect = TrInput & IN_SAVE ? 0 : 1;
-				dbSelect = !goSelect;
-			}
-		}
-		else if (invMode == InventoryMode::Load)
-		{
-			if (!dbSelect)
-			{
-				goSelect = TrInput & IN_LOAD ? 0 : 1;
-				dbSelect = !goSelect;
-			}
-		}
-		else if (invMode == InventoryMode::InGame)
-		{
-			if (!dbSelect)
-			{
-				goSelect = (TrInput & IN_OPTION || TrInput & IN_DESELECT) ? 0 : 1;
-				dbSelect = !goSelect;
-			}
-		}
-
-		if (!dbSelect)
-			goSelect = 1;
-		else
-			goSelect = 0;
-
-		dbSelect = 1;
-	}
-	else
-		dbSelect = 0;
-
-	if (TrInput & IN_OPTION || TrInput & IN_DESELECT)
-	{
-		if (!dbDeselect)
-			goDeselect = 1;
-		else
-			goDeselect = 0;
-
-		dbDeselect = 1;
-	}
-	else
-		dbDeselect = 0;
-}
-
 InventoryResult GuiController::TitleOptions()
 {
-	auto ret = InventoryResult::None;
-	static short selected_option_bak;
+	auto inventoryResult = InventoryResult::None;
+	static short selectedOptionBackup;
 
-	/*stuff for credits go here!*/
+	// Stuff for credits goes here!
 
 	switch (menu_to_display)
 	{
@@ -611,7 +485,7 @@ InventoryResult GuiController::TitleOptions()
 		break;
 
 	case Menu::SelectLevel:
-		ret = InventoryResult::None;
+		inventoryResult = InventoryResult::None;
 		option_count = g_GameFlow->GetNumLevels() - 2;
 		break;
 
@@ -636,19 +510,17 @@ InventoryResult GuiController::TitleOptions()
 		break;
 	}
 
-	DoDebouncedInput();
-
 	if (menu_to_display == Menu::LoadGame)
 	{
 		switch (DoLoad())
 		{
 		case LoadResult::Load:
-			ret = InventoryResult::LoadGame;
+			inventoryResult = InventoryResult::LoadGame;
 			break;
 
 		case LoadResult::Cancel:
 			menu_to_display = Menu::Title;
-			selected_option = selected_option_bak;
+			selected_option = selectedOptionBackup;
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			break;
 
@@ -660,13 +532,13 @@ InventoryResult GuiController::TitleOptions()
 			 menu_to_display == Menu::SelectLevel || 
 			 menu_to_display == Menu::Options)
 	{
-		if (goUp)
+		if (GUI_INPUT_UP)
 		{
-			selected_option = (selected_option <= 0) ? option_count : selected_option - 1;
+			selected_option = (selected_option <= 0) ? option_count : (selected_option - 1);
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (goDown)
+		if (GUI_INPUT_DOWN)
 		{
 			if (selected_option < option_count)
 				selected_option++;
@@ -676,14 +548,15 @@ InventoryResult GuiController::TitleOptions()
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (goDeselect && menu_to_display != Menu::Title)
+		if (GUI_INPUT_DESELECT &&
+			menu_to_display != Menu::Title)
 		{
 			menu_to_display = Menu::Title;
-			selected_option = selected_option_bak;
+			selected_option = selectedOptionBackup;
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		}
 
-		if (goSelect)
+		if (GUI_INPUT_SELECT)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -694,29 +567,29 @@ InventoryResult GuiController::TitleOptions()
 				case 0:
 					if (g_GameFlow->CanPlayAnyLevel())
 					{
-						selected_option_bak = selected_option;
+						selectedOptionBackup = selected_option;
 						selected_option = 0;
 						menu_to_display = Menu::SelectLevel;
 					}
 					else
-						ret = InventoryResult::NewGame;
+						inventoryResult = InventoryResult::NewGame;
 
 					break;
 
 				case 1:
-					selected_option_bak = selected_option;
+					selectedOptionBackup = selected_option;
 					selected_option = 0;
 					menu_to_display = Menu::LoadGame;
 					break;
 
 				case 2:
-					selected_option_bak = selected_option;
+					selectedOptionBackup = selected_option;
 					selected_option = 0;
 					menu_to_display = Menu::Options;
 					break;
 
 				case 3:
-					ret = InventoryResult::ExitGame;
+					inventoryResult = InventoryResult::ExitGame;
 					break;
 				}
 			}
@@ -726,16 +599,14 @@ InventoryResult GuiController::TitleOptions()
 				g_GameFlow->SelectedLevelForNewGame = selected_option + 1;
 				menu_to_display = Menu::Title;
 				selected_option = 0;
-				ret = InventoryResult::NewGameSelectedLevel;
+				inventoryResult = InventoryResult::NewGameSelectedLevel;
 			}
 			else if (menu_to_display == Menu::Options)
-			{
 				HandleOptionsInput();
-			}
 		}
 	}
 
-	return ret;
+	return inventoryResult;
 }
 
 void GuiController::FillDisplayOptions()
@@ -748,8 +619,8 @@ void GuiController::FillDisplayOptions()
 	for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 	{
 		auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
-		if (screenResolution.x == CurrentSettings.conf.Width 
-			&& screenResolution.y == CurrentSettings.conf.Height)
+		if (screenResolution.x == CurrentSettings.conf.Width &&
+			screenResolution.y == CurrentSettings.conf.Height)
 		{
 			CurrentSettings.selectedScreenResolution = i;
 			break;
@@ -762,9 +633,8 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 	option_count = 6;
 
 	UpdateInput();
-	DoDebouncedInput();
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
 		menu_to_display = Menu::Options;
@@ -772,7 +642,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		return;
 	}
 
-	if (goLeft)
+	if (GUI_INPUT_LEFT)
 	{
 		switch (selected_option)
 		{
@@ -780,6 +650,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			if (CurrentSettings.selectedScreenResolution > 0)
 				CurrentSettings.selectedScreenResolution--;
+
 			break;
 
 		case 1:
@@ -805,7 +676,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		}
 	}
 
-	if (goRight)
+	if (GUI_INPUT_RIGHT)
 	{
 		switch (selected_option)
 		{
@@ -813,6 +684,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			if (CurrentSettings.selectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
 				CurrentSettings.selectedScreenResolution++;
+
 			break;
 
 		case 1:
@@ -823,7 +695,9 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			CurrentSettings.conf.ShadowMode++;
-			if (CurrentSettings.conf.ShadowMode > SHADOW_ALL) CurrentSettings.conf.ShadowMode = SHADOW_NONE;
+			if (CurrentSettings.conf.ShadowMode > SHADOW_ALL)
+				CurrentSettings.conf.ShadowMode = SHADOW_NONE;
+
 			break;
 
 		case 3:
@@ -838,7 +712,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		}
 	}
 
-	if (goUp)
+	if (GUI_INPUT_UP)
 	{
 		if (selected_option <= 0)
 			selected_option += option_count;
@@ -848,7 +722,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
-	if (goDown)
+	if (GUI_INPUT_DOWN)
 	{
 		if (selected_option < option_count)
 			selected_option++;
@@ -858,7 +732,7 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
-	if (goSelect)
+	if (GUI_INPUT_SELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -901,9 +775,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	}
 
 	UpdateInput();
-	DoDebouncedInput();
 
-	if (goSelect && (selected_option <= 16))
+	if (GUI_INPUT_SELECT && selected_option <= 16)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		CurrentSettings.waitingForkey = true;
@@ -963,7 +836,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	}
 	else
 	{
-		if (goUp)
+		if (GUI_INPUT_UP)
 		{
 			if (selected_option <= 0)
 				selected_option += option_count;
@@ -973,7 +846,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (goDown)
+		if (GUI_INPUT_DOWN)
 		{
 			if (selected_option < option_count)
 				selected_option++;
@@ -983,7 +856,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (goSelect)
+		if (GUI_INPUT_SELECT)
 		{
 			if (selected_option == option_count - 1) // Apply
 			{
@@ -1006,7 +879,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			}
 		}
 
-		if (goDeselect)
+		if (GUI_INPUT_DESELECT)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -1050,9 +923,8 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 	option_count = 7;
 
 	UpdateInput();
-	DoDebouncedInput();
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -1064,7 +936,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		return;
 	}
 
-	if (goLeft || goRight)
+	if (GUI_INPUT_LEFT || GUI_INPUT_RIGHT)
 	{
 		switch (selected_option)
 		{
@@ -1091,7 +963,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		}
 	}
 
-	if (goLeft)
+	if (GUI_INPUT_LEFT)
 	{
 		switch (selected_option)
 		{
@@ -1101,6 +973,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 				static int db = 0;
 				CurrentSettings.conf.MusicVolume--;
 				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
+
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -1109,6 +982,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
+
 			break;
 
 		case 2:
@@ -1117,6 +991,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 				static int db = 0;
 				CurrentSettings.conf.SfxVolume--;
 				SetVolumeFX(CurrentSettings.conf.SfxVolume);
+
 				if (!db)
 				{
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -1125,11 +1000,12 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
+
 			break;
 		}
 	}
 
-	if (goRight)
+	if (GUI_INPUT_RIGHT)
 	{
 		switch (selected_option)
 		{
@@ -1147,6 +1023,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
+
 			break;
 
 		case 2:
@@ -1163,11 +1040,12 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 				else
 					db -= 2;
 			}
+
 			break;
 		}
 	}
 
-	if (goUp)
+	if (GUI_INPUT_UP)
 	{
 		if (selected_option <= 0)
 			selected_option += option_count;
@@ -1177,7 +1055,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
-	if (goDown)
+	if (GUI_INPUT_DOWN)
 	{
 		if (selected_option < option_count)
 			selected_option++;
@@ -1187,7 +1065,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
-	if (goSelect)
+	if (GUI_INPUT_SELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
@@ -1220,8 +1098,6 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 
 InventoryResult GuiController::DoPauseMenu()
 {
-	//basically mini title
-
 	switch (menu_to_display)
 	{
 	case Menu::Pause:
@@ -1249,13 +1125,11 @@ InventoryResult GuiController::DoPauseMenu()
 		break;
 	}
 
-	ClearInputVariables(1);
 	UpdateInput();
-	DoDebouncedInput();
 
 	if (menu_to_display == Menu::Pause || menu_to_display == Menu::Options)
 	{
-		if (goUp)
+		if (GUI_INPUT_UP)
 		{
 			if (selected_option <= 0)
 				selected_option += option_count;
@@ -1265,7 +1139,7 @@ InventoryResult GuiController::DoPauseMenu()
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
-		if (goDown)
+		if (GUI_INPUT_DOWN)
 		{
 			if (selected_option < option_count)
 				selected_option++;
@@ -1276,7 +1150,7 @@ InventoryResult GuiController::DoPauseMenu()
 		}
 	}
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 	{
 		if (menu_to_display == Menu::Pause)
 		{
@@ -1293,7 +1167,7 @@ InventoryResult GuiController::DoPauseMenu()
 		}
 	}
 
-	if (goSelect)
+	if (GUI_INPUT_SELECT)
 	{
 		switch (menu_to_display)
 		{
@@ -1331,45 +1205,51 @@ InventoryResult GuiController::DoPauseMenu()
 	return InventoryResult::None;
 }
 
-/*inventory*/
+//----------
+// Inventory
+//----------
 
-bool GuiController::DoObjectsCombine(int obj1, int obj2)
+bool GuiController::DoObjectsCombine(int objectNumber1, int objectNumber2)
 {
-	for (int n = 0; n < max_combines; n++)
+	for (int n = 0; n < MAX_COMBINES; n++)
 	{
-		if (combine_table[n].item1 == obj1 &&
-			combine_table[n].item2 == obj2)
-			return 1;
+		if (combine_table[n].item1 == objectNumber1 &&
+			combine_table[n].item2 == objectNumber2)
+			return true;
 
-		if (combine_table[n].item1 == obj2 &&
-			combine_table[n].item2 == obj1)
-			return 1;
+		if (combine_table[n].item1 == objectNumber2 &&
+			combine_table[n].item2 == objectNumber1)
+			return true;
 	}
 
-	return 0;
+	return false;
 }
 
-bool GuiController::IsItemCurrentlyCombinable(short obj)
+bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 {
-	if (obj < INV_OBJECT_SMOL_WATERSKIN || obj > INV_OBJECT_BIG_WATERSKIN5L)//trash
+	if (objectNumber < INV_OBJECT_SMOL_WATERSKIN || objectNumber > INV_OBJECT_BIG_WATERSKIN5L)//trash
 	{
-		for (int n = 0; n < max_combines; n++)
+		for (int n = 0; n < MAX_COMBINES; n++)
 		{
-			if (combine_table[n].item1 == obj)
+			if (combine_table[n].item1 == objectNumber)
+			{
 				if (IsItemInInventory(combine_table[n].item2))
-					return 1;
+					return true;
+			}
 
-			if (combine_table[n].item2 == obj)
+			if (combine_table[n].item2 == objectNumber)
+			{
 				if (IsItemInInventory(combine_table[n].item1))
-					return 1;
+					return true;
+			}
 		}
 	}
-	else if (obj > INV_OBJECT_SMOL_WATERSKIN3L)
+	else if (objectNumber > INV_OBJECT_SMOL_WATERSKIN3L)
 	{
 		for (int n = 0; n < 4; n++)
 		{
 			if (IsItemInInventory(n + INV_OBJECT_SMOL_WATERSKIN))
-				return 1;
+				return true;
 		}
 	}
 	else
@@ -1377,34 +1257,33 @@ bool GuiController::IsItemCurrentlyCombinable(short obj)
 		for (int n = 0; n < 6; n++)
 		{
 			if (IsItemInInventory(n + INV_OBJECT_BIG_WATERSKIN))
-				return 1;
+				return true;
 		}
 	}
 
-	return 0;
+	return false;
 }
 
-bool GuiController::IsItemInInventory(short obj)
+bool GuiController::IsItemInInventory(int objectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == obj)
+		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == objectNumber)
 			return 1;
 
 	return 0;
 }
 
-void GuiController::CombineObjects(short obj1, short obj2)
+void GuiController::CombineObjects(int objectNumber1, int objectNumber2)
 {
 	int n;
-
-	for (n = 0; n < max_combines; n++)
+	for (n = 0; n < MAX_COMBINES; n++)
 	{
-		if (combine_table[n].item1 == obj1 &&
-			combine_table[n].item2 == obj2)
+		if (combine_table[n].item1 == objectNumber1 &&
+			combine_table[n].item2 == objectNumber2)
 			break;
 
-		if (combine_table[n].item1 == obj2 &&
-			combine_table[n].item2 == obj1)
+		if (combine_table[n].item1 == objectNumber2 &&
+			combine_table[n].item2 == objectNumber1)
 			break;
 	}
 
@@ -1414,27 +1293,28 @@ void GuiController::CombineObjects(short obj1, short obj2)
 	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
-void GuiController::SeparateObject(short obj)
+void GuiController::SeparateObject(int objectNumber)
 {
 	int n;
-
-	for (n = 0; n < max_combines; n++)
-		if (combine_table[n].combined_item == obj)
+	for (n = 0; n < MAX_COMBINES; n++)
+	{
+		if (combine_table[n].combined_item == objectNumber)
 			break;
+	}
 
 	combine_table[n].combine_routine(1);
 	ConstructObjectList();
 	SetupObjectListStartPosition(combine_table[n].item1);
 }
 
-void GuiController::SetupObjectListStartPosition(short newobj)
+void GuiController::SetupObjectListStartPosition(int newObjectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == newobj)
+		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == newObjectNumber)
 			rings[(int)RingTypes::Inventory]->curobjinlist = i;
 }
 
-void GuiController::HandleObjectChangeover(int ringnum)
+void GuiController::HandleObjectChangeover(int ringIndex)
 {
 	current_selected_option = 0;
 	menu_active = 1;
@@ -1443,11 +1323,11 @@ void GuiController::HandleObjectChangeover(int ringnum)
 
 void GuiController::SetupAmmoSelector()
 {
-	int num;
-	unsigned __int64 opts;
+	int number;
+	unsigned __int64 options;
 
-	num = 0;
-	opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+	number = 0;
+	options = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 	ammo_selector_flag = 0;
 	num_ammo_slots = 0;
 
@@ -1464,114 +1344,114 @@ void GuiController::SetupAmmoSelector()
 	ammo_object_list[2].yrot = 0;
 	ammo_object_list[2].zrot = 0;
 
-	if (opts & 
+	if (options & 
 		(OPT_CHOOSEAMMO_UZI | OPT_CHOOSEAMMO_PISTOLS | OPT_CHOOSEAMMO_REVOLVER | OPT_CHOOSEAMMO_CROSSBOW |
 		OPT_CHOOSEAMMO_HK | OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_GRENADEGUN | OPT_CHOOSEAMMO_HARPOON | OPT_CHOOSEAMMO_ROCKET))
 	{
 		ammo_selector_flag = 1;
 		ammo_selector_fade_dir = 1;
 
-		if (opts & OPT_CHOOSEAMMO_UZI)
+		if (options & OPT_CHOOSEAMMO_UZI)
 		{
 			ammo_object_list[0].invitem = INV_OBJECT_UZI_AMMO;
 			ammo_object_list[0].amount = AmountUziAmmo;
-			num++;
-			num_ammo_slots = num;
+			number++;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentUziAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_PISTOLS)
+		if (options & OPT_CHOOSEAMMO_PISTOLS)
 		{
-			num++;
+			number++;
 			ammo_object_list[0].invitem = INV_OBJECT_PISTOLS_AMMO;
 			ammo_object_list[0].amount = -1;
-			num_ammo_slots = num;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentPistolsAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_REVOLVER)
+		if (options & OPT_CHOOSEAMMO_REVOLVER)
 		{
-			num++;
+			number++;
 			ammo_object_list[0].invitem = INV_OBJECT_REVOLVER_AMMO;
 			ammo_object_list[0].amount = AmountRevolverAmmo;
-			num_ammo_slots = num;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentRevolverAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_CROSSBOW)
+		if (options & OPT_CHOOSEAMMO_CROSSBOW)
 		{
-			ammo_object_list[num].invitem = INV_OBJECT_CROSSBOW_AMMO1;
-			ammo_object_list[num].amount = AmountCrossBowAmmo1;
-			num++;
-			ammo_object_list[num].invitem = INV_OBJECT_CROSSBOW_AMMO2;
-			ammo_object_list[num].amount = AmountCrossBowAmmo2;
-			num++;
-			ammo_object_list[num].invitem = INV_OBJECT_CROSSBOW_AMMO3;
-			ammo_object_list[num].amount = AmountCrossBowAmmo3;
-			num++;
-			num_ammo_slots = num;
+			ammo_object_list[number].invitem = INV_OBJECT_CROSSBOW_AMMO1;
+			ammo_object_list[number].amount = AmountCrossBowAmmo1;
+			number++;
+			ammo_object_list[number].invitem = INV_OBJECT_CROSSBOW_AMMO2;
+			ammo_object_list[number].amount = AmountCrossBowAmmo2;
+			number++;
+			ammo_object_list[number].invitem = INV_OBJECT_CROSSBOW_AMMO3;
+			ammo_object_list[number].amount = AmountCrossBowAmmo3;
+			number++;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentCrossBowAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_HK)
+		if (options & OPT_CHOOSEAMMO_HK)
 		{
-			ammo_object_list[num].invitem = INV_OBJECT_HK_AMMO;
-			ammo_object_list[num].amount = AmountHKAmmo1;
-			num++;
-			num_ammo_slots = num;
+			ammo_object_list[number].invitem = INV_OBJECT_HK_AMMO;
+			ammo_object_list[number].amount = AmountHKAmmo1;
+			number++;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentHKAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_SHOTGUN)
+		if (options & OPT_CHOOSEAMMO_SHOTGUN)
 		{
-			ammo_object_list[num].invitem = INV_OBJECT_SHOTGUN_AMMO1;
-			ammo_object_list[num].amount = AmountShotGunAmmo1;
-			num++;
-			ammo_object_list[num].invitem = INV_OBJECT_SHOTGUN_AMMO2;
-			ammo_object_list[num].amount = AmountShotGunAmmo2;
-			num++;
-			num_ammo_slots = num;
+			ammo_object_list[number].invitem = INV_OBJECT_SHOTGUN_AMMO1;
+			ammo_object_list[number].amount = AmountShotGunAmmo1;
+			number++;
+			ammo_object_list[number].invitem = INV_OBJECT_SHOTGUN_AMMO2;
+			ammo_object_list[number].amount = AmountShotGunAmmo2;
+			number++;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentShotGunAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_GRENADEGUN)
+		if (options & OPT_CHOOSEAMMO_GRENADEGUN)
 		{
-			ammo_object_list[num].invitem = INV_OBJECT_GRENADE_AMMO1;
-			ammo_object_list[num].amount = AmountGrenadeAmmo1;
-			num++;
-			ammo_object_list[num].invitem = INV_OBJECT_GRENADE_AMMO2;
-			ammo_object_list[num].amount = AmountGrenadeAmmo2;
-			num++;
-			ammo_object_list[num].invitem = INV_OBJECT_GRENADE_AMMO3;
-			ammo_object_list[num].amount = AmountGrenadeAmmo3;
-			num++;
-			num_ammo_slots = num;
+			ammo_object_list[number].invitem = INV_OBJECT_GRENADE_AMMO1;
+			ammo_object_list[number].amount = AmountGrenadeAmmo1;
+			number++;
+			ammo_object_list[number].invitem = INV_OBJECT_GRENADE_AMMO2;
+			ammo_object_list[number].amount = AmountGrenadeAmmo2;
+			number++;
+			ammo_object_list[number].invitem = INV_OBJECT_GRENADE_AMMO3;
+			ammo_object_list[number].amount = AmountGrenadeAmmo3;
+			number++;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentGrenadeGunAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_HARPOON)
+		if (options & OPT_CHOOSEAMMO_HARPOON)
 		{
-			ammo_object_list[num].invitem = INV_OBJECT_HARPOON_AMMO;
-			ammo_object_list[num].amount = AmountHarpoonAmmo;
-			num++;
-			num_ammo_slots = num;
+			ammo_object_list[number].invitem = INV_OBJECT_HARPOON_AMMO;
+			ammo_object_list[number].amount = AmountHarpoonAmmo;
+			number++;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentHarpoonAmmoType;
 		}
 
-		if (opts & OPT_CHOOSEAMMO_ROCKET)
+		if (options & OPT_CHOOSEAMMO_ROCKET)
 		{
-			ammo_object_list[num].invitem = INV_OBJECT_ROCKET_AMMO;
-			ammo_object_list[num].amount = AmountRocketsAmmo;
-			num++;
-			num_ammo_slots = num;
+			ammo_object_list[number].invitem = INV_OBJECT_ROCKET_AMMO;
+			ammo_object_list[number].amount = AmountRocketsAmmo;
+			number++;
+			num_ammo_slots = number;
 			current_ammo_type = &CurrentRocketAmmoType;
 		}
 	}
 }
 
-void GuiController::InsertObjectIntoList(int num)
+void GuiController::InsertObjectIntoList(int objectNumber)
 {
-	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = num;
+	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = objectNumber;
 	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].xrot = 0;
 	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].yrot = 0;
 	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].zrot = 0;
@@ -1579,15 +1459,15 @@ void GuiController::InsertObjectIntoList(int num)
 	rings[(int)RingTypes::Inventory]->numobjectsinlist++;
 }
 
-void GuiController::InsertObjectIntoList_v2(int num)
+void GuiController::InsertObjectIntoList_v2(int objectNumber)
 {
-	unsigned __int64 opts = inventry_objects_list[num].opts;
+	unsigned __int64 opts = inventry_objects_list[objectNumber].opts;
 
 	if (opts & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
 	{
-		if (rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem != num)
+		if (rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem != objectNumber)
 		{
-			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].invitem = num;
+			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].invitem = objectNumber;
 			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].xrot = 0;
 			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].yrot = 0;
 			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].zrot = 0;
@@ -1881,11 +1761,10 @@ void GuiController::ConstructCombineObjectList()
 
 void GuiController::InitialiseInventory()
 {
-	compassNeedleAngle = 4096;
+	compassNeedleAngle = ANGLE(22.5f);
 	AlterFOV(ANGLE(80.0f));
-	Lara.Inventory.IsBusy = 0;
+	Lara.Inventory.IsBusy = false;
 	inventoryItemChosen = NO_ITEM;
-	ClearInputVariables(0);
 	useItem = 0;
 
 	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].hasInfinite())
@@ -1918,7 +1797,7 @@ void GuiController::InitialiseInventory()
 		{
 			if (IsItemInInventory(lastInvItem))
 				SetupObjectListStartPosition(lastInvItem);
-			else//son of a bitch
+			else
 			{
 				if (lastInvItem >= INV_OBJECT_SMOL_WATERSKIN && lastInvItem <= INV_OBJECT_SMOL_WATERSKIN3L)
 				{
@@ -1968,37 +1847,39 @@ void GuiController::InitialiseInventory()
 	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
-int GuiController::IsObjectInInventory(short object_number)
+int GuiController::IsObjectInInventory(int objectNumber)
 {
-	return GetInventoryCount(from_underlying(object_number));
+	return GetInventoryCount(from_underlying((short)objectNumber));
 }
 
-void GuiController::SetupObjectListStartPosition2(short newobj)
-{
-	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		if (inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[i].invitem].object_number == newobj)
-			rings[(int)RingTypes::Inventory]->curobjinlist = i;
-}
-
-int GuiController::ConvertObjectToInventoryItem(short obj)
+void GuiController::SetupObjectListStartPosition2(int newObjectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (inventry_objects_list[i].object_number == obj)
+		if (inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[i].invitem].object_number == newObjectNumber)
+			rings[(int)RingTypes::Inventory]->curobjinlist = i;
+	}
+}
+
+int GuiController::ConvertObjectToInventoryItem(int objectNumber)
+{
+	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	{
+		if (inventry_objects_list[i].object_number == objectNumber)
 			return i;
 	}
 
 	return -1;
 }
 
-int GuiController::ConvertInventoryItemToObject(int obj)
+int GuiController::ConvertInventoryItemToObject(int objectNumber)
 {
-	return inventry_objects_list[obj].object_number;
+	return inventry_objects_list[objectNumber].object_number;
 }
 
 void GuiController::FadeAmmoSelector()
 {
-	if (rings[(int)RingTypes::Inventory]->ringactive && (rptLeft >= 8 || rptRight >= 8))
+	if (rings[(int)RingTypes::Inventory]->ringactive)
 		ammo_selector_fade_val = 0;
 	else if (ammo_selector_fade_dir == 1)
 	{
@@ -2289,14 +2170,14 @@ void GuiController::UseCurrentItem()
 void GuiController::DoInventory()
 {
 	int n;
-	unsigned __int64 opts;
+	unsigned __int64 options;
 	int i;
-	int ypos;
+	int yPos;
 	int num;
 
 	if (rings[(int)RingTypes::Ammo]->ringactive)
 	{
-		g_Renderer.DrawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+		g_Renderer.DrawString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 		if (rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
@@ -2304,7 +2185,7 @@ void GuiController::DoInventory()
 		if (rings[(int)RingTypes::Ammo]->objlistmovement)
 			return;
 
-		if (goSelect)
+		if (GUI_INPUT_SELECT)
 		{
 			short invItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 			short ammoItem = rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->curobjinlist].invitem;
@@ -2317,7 +2198,10 @@ void GuiController::DoInventory()
 				combine_obj2 = ammoItem;
 				SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 			}
-			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN && ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L && invItem >= INV_OBJECT_BIG_WATERSKIN && invItem <= INV_OBJECT_BIG_WATERSKIN5L)
+			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN &&
+				ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L &&
+				invItem >= INV_OBJECT_BIG_WATERSKIN &&
+				invItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
 				if (PerformWaterskinCombine(1))
 				{
@@ -2330,7 +2214,10 @@ void GuiController::DoInventory()
 				SayNo();
 				combine_ring_fade_dir = 2;
 			}
-			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN && invItem <= INV_OBJECT_SMOL_WATERSKIN3L && ammoItem >= INV_OBJECT_BIG_WATERSKIN && ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
+			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN &&
+				invItem <= INV_OBJECT_SMOL_WATERSKIN3L &&
+				ammoItem >= INV_OBJECT_BIG_WATERSKIN &&
+				ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
 				if (PerformWaterskinCombine(0))
 				{
@@ -2350,11 +2237,10 @@ void GuiController::DoInventory()
 			}
 		}
 
-		if (goDeselect)
+		if (GUI_INPUT_DESELECT)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			combine_ring_fade_dir = 2;
-			goDeselect = 0;
 		}
 
 		return;
@@ -2373,58 +2259,58 @@ void GuiController::DoInventory()
 
 		if (!ammo_active)
 		{
-			opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+			options = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
-			if ((opts & OPT_LOAD))
+			if (options & OPT_LOAD)
 			{
 				current_options[0].type = MenuType::Load;
 				current_options[0].text = g_GameFlow->GetString(optmessages[6]);
 				n = 1;
 			}
 
-			if ((opts & OPT_SAVE))
+			if (options & OPT_SAVE)
 			{
 				current_options[n].type = MenuType::Save;
 				current_options[n].text = g_GameFlow->GetString(optmessages[7]);
 				n++;
 			}
 
-			if ((opts & OPT_EXAMINABLE))
+			if (options & OPT_EXAMINABLE)
 			{
 				current_options[n].type = MenuType::Examine;
 				current_options[n].text = g_GameFlow->GetString(optmessages[8]);
 				n++;
 			}
 
-			if ((opts & OPT_STATS))
+			if (options & OPT_STATS)
 			{
 				current_options[n].type = MenuType::Statistics;
 				current_options[n].text = g_GameFlow->GetString(optmessages[9]);
 				n++;
 			}
 
-			if ((opts & OPT_USE))
+			if (options & OPT_USE)
 			{
 				current_options[n].type = MenuType::Use;
 				current_options[n].text = g_GameFlow->GetString(optmessages[0]);
 				n++;
 			}
 
-			if ((opts & OPT_EQUIP))
+			if (options & OPT_EQUIP)
 			{
 				current_options[n].type = MenuType::Equip;
 				current_options[n].text = g_GameFlow->GetString(optmessages[4]);
 				n++;
 			}
 
-			if ((opts & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN)))
+			if (options & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
 				current_options[n].type = MenuType::ChooseAmmo;
 				current_options[n].text = g_GameFlow->GetString(optmessages[1]);
 				n++;
 			}
 
-			if ((opts & OPT_COMBINABLE))
+			if (options & OPT_COMBINABLE)
 			{
 				if (IsItemCurrentlyCombinable(num))
 				{
@@ -2434,21 +2320,21 @@ void GuiController::DoInventory()
 				}
 			}
 
-			if ((opts & OPT_ALWAYSCOMBINE))
+			if (options & OPT_ALWAYSCOMBINE)
 			{
 				current_options[n].type = MenuType::Combine;
 				current_options[n].text = g_GameFlow->GetString(optmessages[2]);
 				n++;
 			}
 
-			if ((opts & OPT_SEPERATABLE))
+			if (options & OPT_SEPERATABLE)
 			{
 				current_options[n].type = MenuType::Seperate;
 				current_options[n].text = g_GameFlow->GetString(optmessages[3]);
 				n++;
 			}
 
-			if (opts & OPT_DIARY)
+			if (options & OPT_DIARY)
 			{
 				current_options[n].type = MenuType::Diary;
 				current_options[n].text = g_GameFlow->GetString(optmessages[11]);
@@ -2463,9 +2349,9 @@ void GuiController::DoInventory()
 			current_options[1].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[1].invitem].objname);
 			n = 2;
 
-			opts = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+			options = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
-			if (opts & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
+			if (options & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
 				n = 3;
 				current_options[2].type = MenuType::Ammo3;
@@ -2475,12 +2361,12 @@ void GuiController::DoInventory()
 			current_selected_option = *current_ammo_type;
 		}
 
-		ypos = 310 - line_height;
+		yPos = 310 - LINE_HEIGHT;
 
 		if (n == 1)
-			ypos += line_height;
+			yPos += LINE_HEIGHT;
 		else if (n == 2)
-			ypos += line_height >> 1;
+			yPos += LINE_HEIGHT >> 1;
 
 		if (n > 0)
 		{
@@ -2488,48 +2374,66 @@ void GuiController::DoInventory()
 			{
 				if (i == current_selected_option)
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
-					ypos += line_height;
+					g_Renderer.DrawString(PHD_CENTER_X, yPos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					yPos += LINE_HEIGHT;
 				}
 				else
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
-					ypos += line_height;
+					g_Renderer.DrawString(PHD_CENTER_X, yPos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					yPos += LINE_HEIGHT;
 				}
 			}
 		}
 
-		if (menu_active && !rings[(int)RingTypes::Inventory]->objlistmovement && !rings[(int)RingTypes::Ammo]->objlistmovement)
+		if (menu_active &&
+			!rings[(int)RingTypes::Inventory]->objlistmovement &&
+			!rings[(int)RingTypes::Ammo]->objlistmovement)
 		{
-			if (goUp && current_selected_option > 0)
+			if (GUI_INPUT_UP)
 			{
-				current_selected_option--;
+				if (current_selected_option <= 0)
+					current_selected_option = n - 1;
+				else
+					current_selected_option--;
+
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			}
-			else if (goDown && current_selected_option < n - 1)
+			else if (GUI_INPUT_DOWN)
 			{
-				current_selected_option++;
+				if (current_selected_option >= n - 1)
+					current_selected_option = 0;
+				else
+					current_selected_option++;
+
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			}
 
 			if (ammo_active)
 			{
-				if (goLeft && current_selected_option > 0)
+				if (GUI_INPUT_LEFT)
 				{
-					current_selected_option--;
+					if (current_selected_option <= 0)
+						current_selected_option = n - 1;
+					else
+						current_selected_option--;
+
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				}
 
-				if (goRight && current_selected_option < n - 1)
+				if (GUI_INPUT_RIGHT)
 				{
-					current_selected_option++;
+					if (current_selected_option >= n - 1)
+						current_selected_option = 0;
+					else
+						current_selected_option++;
+
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				}
 
 				*current_ammo_type = current_selected_option;
 			}
 
-			if (goSelect)
+			if (GUI_INPUT_SELECT)
 			{
 				if (current_options[current_selected_option].type != MenuType::Equip && current_options[current_selected_option].type != MenuType::Use)
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
@@ -2604,10 +2508,9 @@ void GuiController::DoInventory()
 				}
 			}
 
-			if (goDeselect && ammo_active)
+			if (GUI_INPUT_DESELECT && ammo_active)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				goDeselect = 0;
 				ammo_active = 0;
 				rings[(int)RingTypes::Inventory]->ringactive = 1;
 				CurrentPistolsAmmoType = StashedCurrentPistolsAmmoType;
@@ -2702,7 +2605,6 @@ void GuiController::SpinBack(unsigned short* angle)
 void GuiController::DrawAmmoSelector()
 {
 	int n;
-	int xpos;
 	unsigned short xrot, yrot, zrot;
 	InventoryObject* objme;
 	char invTextBuffer[256];
@@ -2711,12 +2613,12 @@ void GuiController::DrawAmmoSelector()
 	if (!ammo_selector_flag)
 		return;
 	
-	xpos = (2 * phd_centerx - OBJLIST_SPACING) >> 1;
+	int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) >> 1;
 
 	if (num_ammo_slots == 2)
-		xpos -= OBJLIST_SPACING / 2;
+		xPos -= OBJLIST_SPACING / 2;
 	else if (num_ammo_slots == 3)
-		xpos -= OBJLIST_SPACING;
+		xPos -= OBJLIST_SPACING;
 
 	if (num_ammo_slots > 0)
 	{
@@ -2745,7 +2647,7 @@ void GuiController::DrawAmmoSelector()
 			xrot = ammo_object_list[n].xrot;
 			yrot = ammo_object_list[n].yrot;
 			zrot = ammo_object_list[n].zrot;
-			x = phd_centerx - 300 + xpos;
+			x = PHD_CENTER_X - 300 + xPos;
 			y = 480;
 			short obj = ConvertInventoryItemToObject(ammo_object_list[n].invitem);
 			float scaler = inventry_objects_list[ammo_object_list[n].invitem].scale1;
@@ -2758,7 +2660,7 @@ void GuiController::DrawAmmoSelector()
 					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 
 				if (ammo_selector_fade_val)
-					g_Renderer.DrawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.DrawString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 				
 				if (n == *current_ammo_type)
@@ -2769,12 +2671,12 @@ void GuiController::DrawAmmoSelector()
 			else
 				g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
 
-			xpos += OBJLIST_SPACING;
+			xPos += OBJLIST_SPACING;
 		}
 	}
 }
 
-void GuiController::DrawCurrentObjectList(int ringnum)
+void GuiController::DrawCurrentObjectList(int ringIndex)
 {
 	int n;
 	int maxobj;
@@ -2790,10 +2692,10 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 	int activenum;
 	int count;
 
-	if (rings[ringnum]->current_object_list <= 0)
+	if (rings[ringIndex]->current_object_list <= 0)
 		return;
 
-	if (ringnum == (int)RingTypes::Ammo)
+	if (ringIndex == (int)RingTypes::Ammo)
 	{
 		ammo_selector_fade_val = 0;
 		ammo_selector_fade_dir = 0;
@@ -2878,34 +2780,34 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 	xoff = 0;
 	n = 0;
 
-	if (rings[ringnum]->numobjectsinlist != 1)
-		xoff = (OBJLIST_SPACING * rings[ringnum]->objlistmovement) >> 16;
+	if (rings[ringIndex]->numobjectsinlist != 1)
+		xoff = (OBJLIST_SPACING * rings[ringIndex]->objlistmovement) >> 16;
 
-	if (rings[ringnum]->numobjectsinlist == 2)
+	if (rings[ringIndex]->numobjectsinlist == 2)
 	{
 		minobj = -1;
 		maxobj = 0;
-		n = rings[ringnum]->curobjinlist - 1;
+		n = rings[ringIndex]->curobjinlist - 1;
 	}
 
-	if (rings[ringnum]->numobjectsinlist == 3 || rings[ringnum]->numobjectsinlist == 4)
+	if (rings[ringIndex]->numobjectsinlist == 3 || rings[ringIndex]->numobjectsinlist == 4)
 	{
 		minobj = -2;
 		maxobj = 1;
-		n = rings[ringnum]->curobjinlist - 2;
+		n = rings[ringIndex]->curobjinlist - 2;
 	}
 
-	if (rings[ringnum]->numobjectsinlist >= 5)
+	if (rings[ringIndex]->numobjectsinlist >= 5)
 	{
 		minobj = -3;
 		maxobj = 2;
-		n = rings[ringnum]->curobjinlist - 3;
+		n = rings[ringIndex]->curobjinlist - 3;
 	}
 
 	if (n < 0)
-		n += rings[ringnum]->numobjectsinlist;
+		n += rings[ringIndex]->numobjectsinlist;
 
-	if (rings[ringnum]->objlistmovement < 0)
+	if (rings[ringIndex]->objlistmovement < 0)
 		maxobj++;
 
 	if (minobj <= maxobj)
@@ -2914,10 +2816,10 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 		{
 			if (minobj == i)
 			{
-				if (rings[ringnum]->objlistmovement < 0)
+				if (rings[ringIndex]->objlistmovement < 0)
 					shade = 0;
 				else
-					shade = rings[ringnum]->objlistmovement >> 9;
+					shade = rings[ringIndex]->objlistmovement >> 9;
 			}
 			else if (i != minobj + 1 || maxobj == minobj + 1)
 			{
@@ -2925,16 +2827,16 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 					shade = 128;
 				else
 				{
-					if (rings[ringnum]->objlistmovement < 0)
-						shade = (-128 * rings[ringnum]->objlistmovement) >> 16;
+					if (rings[ringIndex]->objlistmovement < 0)
+						shade = (-128 * rings[ringIndex]->objlistmovement) >> 16;
 					else
-						shade = 128 - (short)(rings[ringnum]->objlistmovement >> 9);
+						shade = 128 - (short)(rings[ringIndex]->objlistmovement >> 9);
 				}
 			}
 			else
 			{
-				if (rings[ringnum]->objlistmovement < 0)
-					shade = 128 - ((-128 * rings[ringnum]->objlistmovement) >> 16);
+				if (rings[ringIndex]->objlistmovement < 0)
+					shade = 128 - ((-128 * rings[ringIndex]->objlistmovement) >> 16);
 				else
 					shade = 128;
 			}
@@ -2942,16 +2844,16 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 			if (!minobj && !maxobj)
 				shade = 128;
 
-			if (ringnum == (int)RingTypes::Ammo && combine_ring_fade_val < 128 && shade)
+			if (ringIndex == (int)RingTypes::Ammo && combine_ring_fade_val < 128 && shade)
 				shade = combine_ring_fade_val;
-			else if (ringnum == (int)RingTypes::Inventory && normal_ring_fade_val < 128 && shade)
+			else if (ringIndex == (int)RingTypes::Inventory && normal_ring_fade_val < 128 && shade)
 				shade = normal_ring_fade_val;
 
 			if (!i)
 			{
 				nummeup = 0;
 
-				switch (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number)
+				switch (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number)
 				{
 				case ID_BIGMEDI_ITEM:
 					nummeup = Lara.Inventory.TotalLargeMedipacks;
@@ -2966,10 +2868,10 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 					break;
 
 				default:
-					if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-						inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
+					if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
+						inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
 					{
-						switch (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number)
+						switch (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number)
 						{
 						case ID_SHOTGUN_AMMO1_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
@@ -3034,64 +2936,64 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 					}
 					else
 					{
-						nummeup = Lara.Inventory.Puzzles[inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number - ID_PUZZLE_ITEM1];
+						nummeup = Lara.Inventory.Puzzles[inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number - ID_PUZZLE_ITEM1];
 
 						if (nummeup <= 1)
-							sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
 						else
-							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
 					}
 
 					break;
 				}
 
-				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-					inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
+				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
+					inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
 				{
 					if (nummeup)
 					{
 						if (nummeup == -1)
-							sprintf(textbufme, "Unlimited %s", g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, "Unlimited %s", g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
 						else
-							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
 					}
 					else
-						sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].objname));
+						sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
 				}
 
-				if (ringnum == (int)RingTypes::Inventory)
-					objmeup = (int)(phd_centery - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
+				if (ringIndex == (int)RingTypes::Inventory)
+					objmeup = (int)(PHD_CENTER_Y - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
 				else
-					objmeup = (int)(phd_centery + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
+					objmeup = (int)(PHD_CENTER_Y + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
 
-				g_Renderer.DrawString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+				g_Renderer.DrawString(PHD_CENTER_X, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
-			if (!i && !rings[ringnum]->objlistmovement)
+			if (!i && !rings[ringIndex]->objlistmovement)
 			{
-				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_X)
-					rings[ringnum]->current_object_list[n].xrot += ANGLE(5);
+				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].rot_flags & INV_ROT_X)
+					rings[ringIndex]->current_object_list[n].xrot += ANGLE(5);
 
-				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_Y)
-					rings[ringnum]->current_object_list[n].yrot += ANGLE(5);
+				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].rot_flags & INV_ROT_Y)
+					rings[ringIndex]->current_object_list[n].yrot += ANGLE(5);
 
-				if (inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].rot_flags & INV_ROT_Z)
-					rings[ringnum]->current_object_list[n].zrot += ANGLE(5);
+				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].rot_flags & INV_ROT_Z)
+					rings[ringIndex]->current_object_list[n].zrot += ANGLE(5);
 			}
 			else
 			{
-				SpinBack(&rings[ringnum]->current_object_list[n].xrot);
-				SpinBack(&rings[ringnum]->current_object_list[n].yrot);
-				SpinBack(&rings[ringnum]->current_object_list[n].zrot);
+				SpinBack(&rings[ringIndex]->current_object_list[n].xrot);
+				SpinBack(&rings[ringIndex]->current_object_list[n].yrot);
+				SpinBack(&rings[ringIndex]->current_object_list[n].zrot);
 			}
 
-			xrot = rings[ringnum]->current_object_list[n].xrot;
-			yrot = rings[ringnum]->current_object_list[n].yrot;
-			zrot = rings[ringnum]->current_object_list[n].zrot;
+			xrot = rings[ringIndex]->current_object_list[n].xrot;
+			yrot = rings[ringIndex]->current_object_list[n].yrot;
+			zrot = rings[ringIndex]->current_object_list[n].zrot;
 
-			if (rings[ringnum]->objlistmovement)
+			if (rings[ringIndex]->objlistmovement)
 			{
-				if (rings[ringnum]->objlistmovement > 0)
+				if (rings[ringIndex]->objlistmovement > 0)
 					activenum = -1;
 				else
 					activenum = 1;
@@ -3101,61 +3003,61 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 
 			if (i == activenum)
 			{
-				if (rings[ringnum]->current_object_list[n].bright < 160)
-					rings[ringnum]->current_object_list[n].bright += 16;
+				if (rings[ringIndex]->current_object_list[n].bright < 160)
+					rings[ringIndex]->current_object_list[n].bright += 16;
 
-				if (rings[ringnum]->current_object_list[n].bright > 160)
-					rings[ringnum]->current_object_list[n].bright = 160;
+				if (rings[ringIndex]->current_object_list[n].bright > 160)
+					rings[ringIndex]->current_object_list[n].bright = 160;
 			}
 			else
 			{
-				if (rings[ringnum]->current_object_list[n].bright > 32)
-					rings[ringnum]->current_object_list[n].bright -= 16;
+				if (rings[ringIndex]->current_object_list[n].bright > 32)
+					rings[ringIndex]->current_object_list[n].bright -= 16;
 
-				if (rings[ringnum]->current_object_list[n].bright < 32)
-					rings[ringnum]->current_object_list[n].bright = 32;
+				if (rings[ringIndex]->current_object_list[n].bright < 32)
+					rings[ringIndex]->current_object_list[n].bright = 32;
 			}
 
 			int x, y, y2;
 			x = 400 + xoff + i * OBJLIST_SPACING;
 			y = 150;
 			y2 = 480;//combine 
-			short obj = ConvertInventoryItemToObject(rings[ringnum]->current_object_list[n].invitem);
-			float scaler = inventry_objects_list[rings[ringnum]->current_object_list[n].invitem].scale1;
-			g_Renderer.DrawObjectOn2DPosition(x, ringnum == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
+			short obj = ConvertInventoryItemToObject(rings[ringIndex]->current_object_list[n].invitem);
+			float scaler = inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].scale1;
+			g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
 
-			if (++n >= rings[ringnum]->numobjectsinlist)
+			if (++n >= rings[ringIndex]->numobjectsinlist)
 				n = 0;
 		}
 
-		if (rings[ringnum]->ringactive)
+		if (rings[ringIndex]->ringactive)
 		{
-			if (rings[ringnum]->numobjectsinlist != 1 && (ringnum != 1 || combine_ring_fade_val == 128))
+			if (rings[ringIndex]->numobjectsinlist != 1 && (ringIndex != 1 || combine_ring_fade_val == 128))
 			{
-				if (rings[ringnum]->objlistmovement > 0)
-					rings[ringnum]->objlistmovement += 8192;
+				if (rings[ringIndex]->objlistmovement > 0)
+					rings[ringIndex]->objlistmovement += 8192;
 
-				if (rings[ringnum]->objlistmovement < 0)
-					rings[ringnum]->objlistmovement -= 8192;
+				if (rings[ringIndex]->objlistmovement < 0)
+					rings[ringIndex]->objlistmovement -= 8192;
 
-				if (goLeft)
+				if (IsHeld(In::Left))
 				{
-					if (!rings[ringnum]->objlistmovement)
+					if (!rings[ringIndex]->objlistmovement)
 					{
 						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-						rings[ringnum]->objlistmovement += 8192;
+						rings[ringIndex]->objlistmovement += 8192;
 
 						if (ammo_selector_flag)
 							ammo_selector_fade_dir = 2;
 					}
 				}
 
-				if (goRight)
+				if (IsHeld(In::Right))
 				{
-					if (!rings[ringnum]->objlistmovement)
+					if (!rings[ringIndex]->objlistmovement)
 					{
 						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-						rings[ringnum]->objlistmovement -= 8192;
+						rings[ringIndex]->objlistmovement -= 8192;
 
 						if (ammo_selector_flag)
 							ammo_selector_fade_dir = 2;
@@ -3163,31 +3065,31 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 
 				}
 
-				if (rings[ringnum]->objlistmovement < 65536)
+				if (rings[ringIndex]->objlistmovement < 65536)
 				{
-					if (rings[ringnum]->objlistmovement < -65535)
+					if (rings[ringIndex]->objlistmovement < -65535)
 					{
-						rings[ringnum]->curobjinlist++;
+						rings[ringIndex]->curobjinlist++;
 
-						if (rings[ringnum]->curobjinlist >= rings[ringnum]->numobjectsinlist)
-							rings[ringnum]->curobjinlist = 0;
+						if (rings[ringIndex]->curobjinlist >= rings[ringIndex]->numobjectsinlist)
+							rings[ringIndex]->curobjinlist = 0;
 
-						rings[ringnum]->objlistmovement = 0;
+						rings[ringIndex]->objlistmovement = 0;
 
-						if (ringnum == (int)RingTypes::Inventory)
+						if (ringIndex == (int)RingTypes::Inventory)
 							HandleObjectChangeover(0);
 					}
 				}
 				else
 				{
-					rings[ringnum]->curobjinlist--;
+					rings[ringIndex]->curobjinlist--;
 
-					if (rings[ringnum]->curobjinlist < 0)
-						rings[ringnum]->curobjinlist = rings[ringnum]->numobjectsinlist - 1;
+					if (rings[ringIndex]->curobjinlist < 0)
+						rings[ringIndex]->curobjinlist = rings[ringIndex]->numobjectsinlist - 1;
 
-					rings[ringnum]->objlistmovement = 0;
+					rings[ringIndex]->objlistmovement = 0;
 
-					if (ringnum == (int)RingTypes::Inventory)
+					if (ringIndex == (int)RingTypes::Inventory)
 						HandleObjectChangeover(0);
 				}
 			}
@@ -3197,7 +3099,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 
 bool GuiController::CallInventory(bool reset_mode)
 {
-	bool return_value = false;
+	bool returnValue = false;
 
 	Lara.Inventory.OldBusy = Lara.Inventory.IsBusy;
 
@@ -3214,7 +3116,7 @@ bool GuiController::CallInventory(bool reset_mode)
 	bool exitLoop = false;
 	while (!exitLoop)
 	{
-		OBJLIST_SPACING = phd_centerx >> 1;
+		OBJLIST_SPACING = PHD_CENTER_X >> 1;
 
 		if (compassNeedleAngle != 1024)
 			compassNeedleAngle -= 32;
@@ -3231,7 +3133,6 @@ bool GuiController::CallInventory(bool reset_mode)
 		if (ThreadEnded)
 			return true;
 
-		DoDebouncedInput();
 		DrawInventory();
 		DrawCompass();
 
@@ -3257,19 +3158,22 @@ bool GuiController::CallInventory(bool reset_mode)
 			switch (DoLoad())
 			{
 			case LoadResult::Load:
-				return_value = true;
+				returnValue = true;
 				exitLoop = true;
 				break;
 
 			case LoadResult::Cancel:
 				exitLoop = !reset_mode;
+
 				if (reset_mode)
 					invMode = InventoryMode::InGame;
+
 				break;
 
 			case LoadResult::None:
 				break;
 			}
+
 			break;
 
 		case InventoryMode::Save:
@@ -3279,6 +3183,7 @@ bool GuiController::CallInventory(bool reset_mode)
 				if (reset_mode)
 					invMode = InventoryMode::InGame;
 			}
+
 			break;
 		}
 
@@ -3296,19 +3201,17 @@ bool GuiController::CallInventory(bool reset_mode)
 
 	Lara.Inventory.IsBusy = Lara.Inventory.OldBusy;
 	invMode = InventoryMode::None;
-	ClearInputVariables(0);
 
-	return return_value;
+	return returnValue;
 }
 
 void GuiController::DoStatisticsMode()
 {
 	invMode = InventoryMode::Statistics;
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		goDeselect = 0;
 		invMode = InventoryMode::InGame;
 	}
 }
@@ -3317,10 +3220,9 @@ void GuiController::DoExamineMode()
 {
 	invMode = InventoryMode::Examine;
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		goDeselect = 0;
 		invMode = InventoryMode::None;
 	}
 }
@@ -3338,22 +3240,23 @@ void GuiController::DoDiary()
 {
 	invMode = InventoryMode::Diary;
 
-	if (goRight && Lara.Inventory.Diary.currentPage < Lara.Inventory.Diary.numPages)
+	if (GUI_INPUT_RIGHT &&
+		Lara.Inventory.Diary.currentPage < Lara.Inventory.Diary.numPages)
 	{
 		Lara.Inventory.Diary.currentPage++;
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
-	if (goLeft && Lara.Inventory.Diary.currentPage > 1)
+	if (GUI_INPUT_LEFT &&
+		Lara.Inventory.Diary.currentPage > 1)
 	{
 		Lara.Inventory.Diary.currentPage--;
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		goDeselect = 0;
 		invMode = InventoryMode::None;
 	}
 }
@@ -3365,7 +3268,7 @@ short GuiController::GetLoadSaveSelection()
 
 LoadResult GuiController::DoLoad()
 {
-	if (goDown)
+	if (GUI_INPUT_DOWN)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -3375,7 +3278,7 @@ LoadResult GuiController::DoLoad()
 			selected_save_slot++;
 	}
 
-	if (goUp)
+	if (GUI_INPUT_UP)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -3385,11 +3288,11 @@ LoadResult GuiController::DoLoad()
 			selected_save_slot--;
 	}
 
-	if (goSelect)
+	if (GUI_INPUT_SELECT)
 	{
 		if (!SavegameInfos[selected_save_slot].Present)
 		{
-			if (dbSelect)
+			if (GUI_INPUT_SELECT)
 				SayNo();
 		}
 		else
@@ -3400,7 +3303,7 @@ LoadResult GuiController::DoLoad()
 		}
 	}
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 		return LoadResult::Cancel;
 
 	return LoadResult::None;
@@ -3408,7 +3311,7 @@ LoadResult GuiController::DoLoad()
 
 bool GuiController::DoSave()
 {
-	if (goDown)
+	if (GUI_INPUT_DOWN)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -3418,7 +3321,7 @@ bool GuiController::DoSave()
 			selected_save_slot++;
 	}
 
-	if (goUp)
+	if (GUI_INPUT_UP)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
@@ -3428,7 +3331,7 @@ bool GuiController::DoSave()
 			selected_save_slot--;
 	}
 
-	if (goSelect)
+	if (GUI_INPUT_SELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		SaveGame::Save(selected_save_slot);
@@ -3436,7 +3339,7 @@ bool GuiController::DoSave()
 		return true;
 	}
 
-	if (goDeselect)
+	if (GUI_INPUT_DESELECT)
 		return true;
 
 	return false;
@@ -3447,12 +3350,12 @@ void combine_revolver_lasersight(int flag)
 	if (flag)
 	{
 		Lara.Inventory.HasLasersight = true;
-		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = 0;
+		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = false;
 	}
 	else
 	{
 		Lara.Inventory.HasLasersight = false;
-		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = 1;
+		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = true;
 	}
 
 	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
@@ -3467,12 +3370,12 @@ void combine_crossbow_lasersight(int flag)
 	if (flag)
 	{
 		Lara.Inventory.HasLasersight = true;
-		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = 0;
+		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = false;
 	}
 	else
 	{
 		Lara.Inventory.HasLasersight = false;
-		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = 1;
+		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = true;
 	}
 
 	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
@@ -3486,14 +3389,14 @@ void combine_HK_SILENCER(int flag)
 {
 	if (flag)
 	{
-		Lara.Inventory.HasSilencer = 1;
-		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = 0;
+		Lara.Inventory.HasSilencer = true;
+		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = false;
 
 	}
 	else
 	{
-		Lara.Inventory.HasSilencer = 0;
-		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = 1;
+		Lara.Inventory.HasSilencer = false;
+		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = true;
 	}
 }
 
@@ -3891,71 +3794,71 @@ void combine_Examine8(int flag)
 
 void combine_ClockWorkBeetle(int flag)
 {
-	Lara.Inventory.BeetleComponents &= 2;//remove combo1
-	Lara.Inventory.BeetleComponents &= 4;//remove combo2
-	Lara.Inventory.BeetleComponents |= 1;//get beetle
+	Lara.Inventory.BeetleComponents &= 2; // Remove combo 1.
+	Lara.Inventory.BeetleComponents &= 4; // Remove combo 2.
+	Lara.Inventory.BeetleComponents |= 1; // Get beetle.
 }
 
 bool GuiController::PerformWaterskinCombine(int flag)
 {
-	short small_liters, big_liters, small_capacity, big_capacity;
+	int smallLiters = Lara.Inventory.SmallWaterskin - 1; // How many liters in the small one?
+	int bigLiters = Lara.Inventory.BigWaterskin - 1;	 // How many liters in the big one?
+	int smallCapacity = 3 - smallLiters;				 // How many more liters can fit in the small one?
+	int bigCapacity = 5 - bigLiters;					 // How many more liters can fit in the big one?
+
 	int i;
-
-	small_liters = Lara.Inventory.SmallWaterskin - 1;//how many liters in the small one?
-	big_liters = Lara.Inventory.BigWaterskin - 1;//how many liters in the big one?
-	small_capacity = 3 - small_liters;//how many more liters can we fit in the small one?
-	big_capacity = 5 - big_liters;//how many more liters can we fit in the big one?
-
 	if (flag)
 	{
-		if (Lara.Inventory.BigWaterskin != 1 && small_capacity)//if the big one isn't empty and the small one isn't full
+		// Big one isn't empty and the small one isn't full.
+		if (Lara.Inventory.BigWaterskin != 1 && smallCapacity)
 		{
-			i = big_liters;
+			i = bigLiters;
 
 			do
 			{
-				if (small_capacity)
+				if (smallCapacity)
 				{
-					small_liters++;
-					small_capacity--;
-					big_liters--;
+					smallLiters++;
+					smallCapacity--;
+					bigLiters--;
 				}
 
 				i--;
 
 			} while (i);
 
-			Lara.Inventory.SmallWaterskin = small_liters + 1;
-			Lara.Inventory.BigWaterskin = big_liters + 1;
-			combine_obj1 = (small_liters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
-			return 1;
+			Lara.Inventory.SmallWaterskin = smallLiters + 1;
+			Lara.Inventory.BigWaterskin = bigLiters + 1;
+			combine_obj1 = (smallLiters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
+			return true;
 		}
 	}
 	else 
 	{
-		if (Lara.Inventory.SmallWaterskin != 1 && big_capacity)//if the small one isn't empty and the big one isn't full
+		// Small one isn't empty and the big one isn't full.
+		if (Lara.Inventory.SmallWaterskin != 1 && bigCapacity)
 		{
 			i = Lara.Inventory.SmallWaterskin - 1;
 
 			do
 			{
-				if (big_capacity)
+				if (bigCapacity)
 				{
-					big_liters++;
-					big_capacity--;
-					small_liters--;
+					bigLiters++;
+					bigCapacity--;
+					smallLiters--;
 				}
 
 				i--;
 
 			} while (i);
 
-			Lara.Inventory.SmallWaterskin = small_liters + 1;
-			Lara.Inventory.BigWaterskin = big_liters + 1;
-			combine_obj1 = (big_liters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
-			return 1;
+			Lara.Inventory.SmallWaterskin = smallLiters + 1;
+			Lara.Inventory.BigWaterskin = bigLiters + 1;
+			combine_obj1 = (bigLiters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
+			return true;
 		}
 	}
 
-	return 0;
+	return false;
 }

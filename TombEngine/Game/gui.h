@@ -53,25 +53,25 @@ enum class MenuType
 
 enum ItemOptions : uint64_t
 {
-	OPT_ALWAYSCOMBINE = 1 << 0,
-	OPT_EQUIP = 1 << 1,
-	OPT_USE = 1 << 2,
-	OPT_COMBINABLE = 1 << 3,
-	OPT_SEPERATABLE = 1 << 4,
-	OPT_EXAMINABLE = 1 << 5,
-	OPT_CHOOSEAMMO_SHOTGUN = 1 << 6,
-	OPT_CHOOSEAMMO_CROSSBOW = 1 << 7,
-	OPT_CHOOSEAMMO_GRENADEGUN = 1 << 8,
-	OPT_CHOOSEAMMO_UZI = 1 << 9,
-	OPT_CHOOSEAMMO_PISTOLS = 1 << 10,
-	OPT_CHOOSEAMMO_REVOLVER = 1 << 11,
-	OPT_LOAD = 1 << 12,
-	OPT_SAVE = 1 << 13,
-	OPT_CHOOSEAMMO_HK = 1 << 14,
-	OPT_STATS = 1 << 15,
-	OPT_CHOOSEAMMO_HARPOON = 1 << 16,
-	OPT_CHOOSEAMMO_ROCKET = 1 << 17,
-	OPT_DIARY = 1 << 18
+	OPT_ALWAYSCOMBINE		  = (1 << 0),
+	OPT_EQUIP				  = (1 << 1),
+	OPT_USE					  = (1 << 2),
+	OPT_COMBINABLE			  = (1 << 3),
+	OPT_SEPERATABLE			  = (1 << 4),
+	OPT_EXAMINABLE			  = (1 << 5),
+	OPT_CHOOSEAMMO_SHOTGUN	  = (1 << 6),
+	OPT_CHOOSEAMMO_CROSSBOW	  = (1 << 7),
+	OPT_CHOOSEAMMO_GRENADEGUN = (1 << 8),
+	OPT_CHOOSEAMMO_UZI		  = (1 << 9),
+	OPT_CHOOSEAMMO_PISTOLS	  = (1 << 10),
+	OPT_CHOOSEAMMO_REVOLVER   = (1 << 11),
+	OPT_LOAD				  = (1 << 12),
+	OPT_SAVE				  = (1 << 13),
+	OPT_CHOOSEAMMO_HK		  = (1 << 14),
+	OPT_STATS				  = (1 << 15),
+	OPT_CHOOSEAMMO_HARPOON	  = (1 << 16),
+	OPT_CHOOSEAMMO_ROCKET	  = (1 << 17),
+	OPT_DIARY				  = (1 << 18)
 };
 
 enum RotationFlags
@@ -102,7 +102,7 @@ enum class Menu
 
 enum InventoryObjectTypes
 {
-	// Weapons and ammos
+	// Weapons and ammo types
 	INV_OBJECT_PISTOLS,
 	INV_OBJECT_PISTOLS_AMMO,
 	INV_OBJECT_UZIS,
@@ -130,7 +130,7 @@ enum InventoryObjectTypes
 	INV_OBJECT_ROCKET_LAUNCHER,
 	INV_OBJECT_ROCKET_AMMO,
 
-	// Misc objects
+	// Misc. objects
 	INV_OBJECT_LASERSIGHT,
 	INV_OBJECT_SILENCER,
 	INV_OBJECT_LARGE_MEDIPACK,
@@ -319,7 +319,6 @@ enum InventoryObjectTypes
 	INV_OBJECT_EXAMINE7,
 	INV_OBJECT_EXAMINE8,
 
-
 	INV_OBJECT_EXAMINE1_COMBO1,
 	INV_OBJECT_EXAMINE1_COMBO2,
 	INV_OBJECT_EXAMINE2_COMBO1,
@@ -406,21 +405,21 @@ struct InventoryObject
 class GuiController
 {
 public:
-	bool CallInventory(bool reset_mode);
+	bool CallInventory(bool resetMode);
 	InventoryResult TitleOptions();
 	InventoryResult DoPauseMenu();
 	void DrawInventory();
-	void DrawCurrentObjectList(int ringnum);
-	int IsObjectInInventory(short object_number);
-	int ConvertObjectToInventoryItem(short obj);
-	int ConvertInventoryItemToObject(int obj);
+	void DrawCurrentObjectList(int ringIndex);
+	int IsObjectInInventory(int objectNumber);
+	int ConvertObjectToInventoryItem(int objectNumber);
+	int ConvertInventoryItemToObject(int objectNumber);
 	void FadeAmmoSelector();
 	void DrawAmmoSelector();
 	bool PerformWaterskinCombine(int flag);
 	void DrawCompass();
 
 	// Getters
-	InventoryRing* GetRings(char num);
+	InventoryRing* GetRings(int ringIndex);
 	short GetSelectedOption();
 	Menu GetMenuToDisplay();
 	InventoryMode GetInventoryMode();
@@ -438,27 +437,25 @@ public:
 	void SetInventoryItemChosen(int num);
 
 private:
-	void DoDebouncedInput();
-	void ClearInputVariables(bool flag);
 	void HandleDisplaySettingsInput(bool pause);
 	void HandleControlSettingsInput(bool pause);
 	void HandleOtherSettingsInput(bool pause);
 	void HandleOptionsInput();
 	void BackupOptions();
-	bool DoObjectsCombine(int obj1, int obj2);
+	bool DoObjectsCombine(int objectNumber1, int objectNumber2);
 	void InitialiseInventory();
 	void FillDisplayOptions();
-	bool IsItemCurrentlyCombinable(short obj);
-	bool IsItemInInventory(short obj);
-	void CombineObjects(short obj1, short obj2);
-	void SetupObjectListStartPosition(short newobj);
-	void SetupObjectListStartPosition2(short newobj);
-	void HandleObjectChangeover(int ringnum);
+	bool IsItemCurrentlyCombinable(int objectNumber);
+	bool IsItemInInventory(int objectNumber);
+	void CombineObjects(int objectNumber1, int objectNumber2);
+	void SetupObjectListStartPosition(int newObjectNumber);
+	void SetupObjectListStartPosition2(int newObjectNumber);
+	void HandleObjectChangeover(int ringIndex);
 	void SetupAmmoSelector();
 	void ConstructObjectList();
-	void SeparateObject(short obj);
-	void InsertObjectIntoList(int num);
-	void InsertObjectIntoList_v2(int num);
+	void SeparateObject(int objectNumber);
+	void InsertObjectIntoList(int objectNumber);
+	void InsertObjectIntoList_v2(int objectNumber);
 	void UseCurrentItem();
 	void SpinBack(unsigned short* angle);
 	void UpdateWeaponStatus();
@@ -470,14 +467,15 @@ private:
 	void DoInventory();
 	void ConstructCombineObjectList();
 	
-	/*vars*/
+	// Input macros
+	#define GUI_INPUT_UP	   IsPulsed(In::Forward, 0.1f, 0.4f)
+	#define GUI_INPUT_DOWN	   IsPulsed(In::Back, 0.1f, 0.4f)
+	#define GUI_INPUT_LEFT	   IsPulsed(In::Left, 0.1f, 0.4f)
+	#define GUI_INPUT_RIGHT	   IsPulsed(In::Right, 0.1f, 0.4f)
+	#define GUI_INPUT_SELECT   (IsReleased(In::Select) || IsReleased(In::Action))
+	#define GUI_INPUT_DESELECT IsReleased(In::Deselect)
 
-	// Input
-	bool goUp, goDown, goRight, goLeft, goSelect, goDeselect;
-	bool dbUp, dbDown, dbRight, dbLeft, dbSelect, dbDeselect;
-	long rptRight, rptLeft;
-
-	// Inventory
+	// Inventory variables
 	short combine_obj1;
 	short combine_obj2;
 	char useItem;
@@ -507,7 +505,7 @@ private:
 	int enterInventory;
 	int lastInvItem;
 
-	// Ammo vars
+	// Ammo variables
 	unsigned short AmountShotGunAmmo1;
 	unsigned short AmountShotGunAmmo2;
 	unsigned short AmountHKAmmo1;
@@ -542,7 +540,7 @@ private:
 	char StashedCurrentHarpoonAmmoType;
 	char StashedCurrentRocketAmmoType;
 
-	// GUI vars
+	// GUI variables
 	Menu menu_to_display = Menu::Title;
 	int selected_option;
 	int option_count;
@@ -551,7 +549,7 @@ private:
 	SettingsData CurrentSettings;
 };
 
-/*inventory*/
+// Inventory
 void combine_revolver_lasersight(int flag);
 void combine_crossbow_lasersight(int flag);
 void combine_HK_SILENCER(int flag);
