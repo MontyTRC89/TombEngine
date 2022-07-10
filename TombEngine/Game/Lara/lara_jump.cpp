@@ -778,10 +778,10 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	auto* bounds = GetBoundsAccurate(item);
-	int realHeight = (bounds->Y2 - bounds->Y1) * 0.7f;
+	int realHeight = g_GameFlow->HasCrawlspaceSwandive() ? ((bounds->Y2 - bounds->Y1) * 0.7f) : LARA_HEIGHT;
 
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.Height = std::max<int>(realHeight, LARA_HEIGHT_CRAWL);
+	coll->Setup.Height = std::max(LARA_HEIGHT_CRAWL, realHeight);
 	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = BAD_JUMP_CEILING;
@@ -791,9 +791,7 @@ void lara_col_swan_dive(ItemInfo* item, CollisionInfo* coll)
 	if (LaraDeflectEdgeJump(item, coll))
 	{
 		// Reset position to avoid embedding inside sloped ceilings meeting the floor.
-		item->Pose.Position.x = coll->Setup.OldPosition.x;
-		item->Pose.Position.y = coll->Setup.OldPosition.y;
-		item->Pose.Position.z = coll->Setup.OldPosition.z;
+		item->Pose.Position = coll->Setup.OldPosition;
 		lara->Control.HandStatus = HandStatus::Free;
 	}
 }
