@@ -1108,8 +1108,10 @@ unsigned int _stdcall LoadLevel(void* data)
 		ReadFileEx(compressedBuffer, compressedSize, 1, filePtr);
 		Decompress((byte*)LevelDataPtr, (byte*)compressedBuffer, compressedSize, uncompressedSize);
 
-		// Now the entire level is decompressed
+		// Now the entire level is decompressed, we can close it
 		free(compressedBuffer);
+		FileClose(filePtr);
+		filePtr = nullptr;
 
 		LoadTextures();
 
@@ -1166,6 +1168,12 @@ unsigned int _stdcall LoadLevel(void* data)
 	}
 	catch (std::exception& ex)
 	{
+		if (filePtr)
+		{
+			FileClose(filePtr);
+			filePtr = nullptr;
+		}
+
 		TENLog("Error while loading level: " + std::string(ex.what()), LogLevel::Error);
 		LoadedSuccessfully = false;
 	}
@@ -1173,13 +1181,7 @@ unsigned int _stdcall LoadLevel(void* data)
 	if (dataPtr)
 	{
 		free(dataPtr);
-		dataPtr = nullptr;
-	}
-
-	if (filePtr)
-	{
-		FileClose(filePtr);
-		filePtr = nullptr;
+		dataPtr = LevelDataPtr = nullptr;
 	}
 
 	// Level loaded
