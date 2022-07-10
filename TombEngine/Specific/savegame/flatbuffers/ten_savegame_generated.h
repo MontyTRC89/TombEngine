@@ -17,6 +17,10 @@ struct Item;
 struct ItemBuilder;
 struct ItemT;
 
+struct FXInfo;
+struct FXInfoBuilder;
+struct FXInfoT;
+
 struct AmmoInfo;
 struct AmmoInfoBuilder;
 struct AmmoInfoT;
@@ -1105,6 +1109,185 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
 }
 
 flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb, const ItemT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FXInfoT : public flatbuffers::NativeTable {
+  typedef FXInfo TableType;
+  std::unique_ptr<TEN::Save::Position> pos{};
+  int32_t room_number = 0;
+  int32_t object_number = 0;
+  int32_t next_fx = 0;
+  int32_t next_active = 0;
+  int32_t speed = 0;
+  int32_t fall_speed = 0;
+  int32_t frame_number = 0;
+  int32_t counter = 0;
+  int32_t shade = 0;
+  int32_t flag1 = 0;
+  int32_t flag2 = 0;
+};
+
+struct FXInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FXInfoT NativeTableType;
+  typedef FXInfoBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POS = 4,
+    VT_ROOM_NUMBER = 6,
+    VT_OBJECT_NUMBER = 8,
+    VT_NEXT_FX = 10,
+    VT_NEXT_ACTIVE = 12,
+    VT_SPEED = 14,
+    VT_FALL_SPEED = 16,
+    VT_FRAME_NUMBER = 18,
+    VT_COUNTER = 20,
+    VT_SHADE = 22,
+    VT_FLAG1 = 24,
+    VT_FLAG2 = 26
+  };
+  const TEN::Save::Position *pos() const {
+    return GetStruct<const TEN::Save::Position *>(VT_POS);
+  }
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  int32_t object_number() const {
+    return GetField<int32_t>(VT_OBJECT_NUMBER, 0);
+  }
+  int32_t next_fx() const {
+    return GetField<int32_t>(VT_NEXT_FX, 0);
+  }
+  int32_t next_active() const {
+    return GetField<int32_t>(VT_NEXT_ACTIVE, 0);
+  }
+  int32_t speed() const {
+    return GetField<int32_t>(VT_SPEED, 0);
+  }
+  int32_t fall_speed() const {
+    return GetField<int32_t>(VT_FALL_SPEED, 0);
+  }
+  int32_t frame_number() const {
+    return GetField<int32_t>(VT_FRAME_NUMBER, 0);
+  }
+  int32_t counter() const {
+    return GetField<int32_t>(VT_COUNTER, 0);
+  }
+  int32_t shade() const {
+    return GetField<int32_t>(VT_SHADE, 0);
+  }
+  int32_t flag1() const {
+    return GetField<int32_t>(VT_FLAG1, 0);
+  }
+  int32_t flag2() const {
+    return GetField<int32_t>(VT_FLAG2, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<TEN::Save::Position>(verifier, VT_POS) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_OBJECT_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_FX) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_ACTIVE) &&
+           VerifyField<int32_t>(verifier, VT_SPEED) &&
+           VerifyField<int32_t>(verifier, VT_FALL_SPEED) &&
+           VerifyField<int32_t>(verifier, VT_FRAME_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_COUNTER) &&
+           VerifyField<int32_t>(verifier, VT_SHADE) &&
+           VerifyField<int32_t>(verifier, VT_FLAG1) &&
+           VerifyField<int32_t>(verifier, VT_FLAG2) &&
+           verifier.EndTable();
+  }
+  FXInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FXInfoT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FXInfo> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FXInfoBuilder {
+  typedef FXInfo Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_pos(const TEN::Save::Position *pos) {
+    fbb_.AddStruct(FXInfo::VT_POS, pos);
+  }
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_object_number(int32_t object_number) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_OBJECT_NUMBER, object_number, 0);
+  }
+  void add_next_fx(int32_t next_fx) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_NEXT_FX, next_fx, 0);
+  }
+  void add_next_active(int32_t next_active) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_NEXT_ACTIVE, next_active, 0);
+  }
+  void add_speed(int32_t speed) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_SPEED, speed, 0);
+  }
+  void add_fall_speed(int32_t fall_speed) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_FALL_SPEED, fall_speed, 0);
+  }
+  void add_frame_number(int32_t frame_number) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_FRAME_NUMBER, frame_number, 0);
+  }
+  void add_counter(int32_t counter) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_COUNTER, counter, 0);
+  }
+  void add_shade(int32_t shade) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_SHADE, shade, 0);
+  }
+  void add_flag1(int32_t flag1) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_FLAG1, flag1, 0);
+  }
+  void add_flag2(int32_t flag2) {
+    fbb_.AddElement<int32_t>(FXInfo::VT_FLAG2, flag2, 0);
+  }
+  explicit FXInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<FXInfo> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FXInfo>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FXInfo> CreateFXInfo(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const TEN::Save::Position *pos = 0,
+    int32_t room_number = 0,
+    int32_t object_number = 0,
+    int32_t next_fx = 0,
+    int32_t next_active = 0,
+    int32_t speed = 0,
+    int32_t fall_speed = 0,
+    int32_t frame_number = 0,
+    int32_t counter = 0,
+    int32_t shade = 0,
+    int32_t flag1 = 0,
+    int32_t flag2 = 0) {
+  FXInfoBuilder builder_(_fbb);
+  builder_.add_flag2(flag2);
+  builder_.add_flag1(flag1);
+  builder_.add_shade(shade);
+  builder_.add_counter(counter);
+  builder_.add_frame_number(frame_number);
+  builder_.add_fall_speed(fall_speed);
+  builder_.add_speed(speed);
+  builder_.add_next_active(next_active);
+  builder_.add_next_fx(next_fx);
+  builder_.add_object_number(object_number);
+  builder_.add_room_number(room_number);
+  builder_.add_pos(pos);
+  return builder_.Finish();
+}
+
+struct FXInfo::Traits {
+  using type = FXInfo;
+  static auto constexpr Create = CreateFXInfo;
+};
+
+flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct AmmoInfoT : public flatbuffers::NativeTable {
   typedef AmmoInfo TableType;
@@ -5891,6 +6074,9 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t next_item_free = 0;
   int32_t next_item_active = 0;
   std::vector<int32_t> room_items{};
+  std::vector<std::unique_ptr<TEN::Save::FXInfoT>> fxinfos{};
+  int32_t next_fx_free = 0;
+  int32_t next_fx_active = 0;
   std::vector<std::unique_ptr<TEN::Save::FixedCameraT>> fixed_cameras{};
   std::vector<std::unique_ptr<TEN::Save::SinkT>> sinks{};
   std::vector<std::unique_ptr<TEN::Save::StaticMeshInfoT>> static_meshes{};
@@ -5929,29 +6115,32 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_NEXT_ITEM_FREE = 14,
     VT_NEXT_ITEM_ACTIVE = 16,
     VT_ROOM_ITEMS = 18,
-    VT_FIXED_CAMERAS = 20,
-    VT_SINKS = 22,
-    VT_STATIC_MESHES = 24,
-    VT_FLYBY_CAMERAS = 26,
-    VT_PARTICLES = 28,
-    VT_RATS = 30,
-    VT_SPIDERS = 32,
-    VT_SCARABS = 34,
-    VT_BATS = 36,
-    VT_FLIP_MAPS = 38,
-    VT_FLIP_STATS = 40,
-    VT_FLIP_EFFECT = 42,
-    VT_FLIP_TIMER = 44,
-    VT_FLIP_STATUS = 46,
-    VT_AMBIENT_TRACK = 48,
-    VT_AMBIENT_POSITION = 50,
-    VT_ONESHOT_TRACK = 52,
-    VT_ONESHOT_POSITION = 54,
-    VT_CD_FLAGS = 56,
-    VT_ROPE = 58,
-    VT_PENDULUM = 60,
-    VT_ALTERNATE_PENDULUM = 62,
-    VT_SCRIPT_VARS = 64
+    VT_FXINFOS = 20,
+    VT_NEXT_FX_FREE = 22,
+    VT_NEXT_FX_ACTIVE = 24,
+    VT_FIXED_CAMERAS = 26,
+    VT_SINKS = 28,
+    VT_STATIC_MESHES = 30,
+    VT_FLYBY_CAMERAS = 32,
+    VT_PARTICLES = 34,
+    VT_RATS = 36,
+    VT_SPIDERS = 38,
+    VT_SCARABS = 40,
+    VT_BATS = 42,
+    VT_FLIP_MAPS = 44,
+    VT_FLIP_STATS = 46,
+    VT_FLIP_EFFECT = 48,
+    VT_FLIP_TIMER = 50,
+    VT_FLIP_STATUS = 52,
+    VT_AMBIENT_TRACK = 54,
+    VT_AMBIENT_POSITION = 56,
+    VT_ONESHOT_TRACK = 58,
+    VT_ONESHOT_POSITION = 60,
+    VT_CD_FLAGS = 62,
+    VT_ROPE = 64,
+    VT_PENDULUM = 66,
+    VT_ALTERNATE_PENDULUM = 68,
+    VT_SCRIPT_VARS = 70
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -5976,6 +6165,15 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<int32_t> *room_items() const {
     return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_ROOM_ITEMS);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *>(VT_FXINFOS);
+  }
+  int32_t next_fx_free() const {
+    return GetField<int32_t>(VT_NEXT_FX_FREE, 0);
+  }
+  int32_t next_fx_active() const {
+    return GetField<int32_t>(VT_NEXT_FX_ACTIVE, 0);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *>(VT_FIXED_CAMERAS);
@@ -6063,6 +6261,11 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_NEXT_ITEM_ACTIVE) &&
            VerifyOffset(verifier, VT_ROOM_ITEMS) &&
            verifier.VerifyVector(room_items()) &&
+           VerifyOffset(verifier, VT_FXINFOS) &&
+           verifier.VerifyVector(fxinfos()) &&
+           verifier.VerifyVectorOfTables(fxinfos()) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_FX_FREE) &&
+           VerifyField<int32_t>(verifier, VT_NEXT_FX_ACTIVE) &&
            VerifyOffset(verifier, VT_FIXED_CAMERAS) &&
            verifier.VerifyVector(fixed_cameras()) &&
            verifier.VerifyVectorOfTables(fixed_cameras()) &&
@@ -6147,6 +6350,15 @@ struct SaveGameBuilder {
   }
   void add_room_items(flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items) {
     fbb_.AddOffset(SaveGame::VT_ROOM_ITEMS, room_items);
+  }
+  void add_fxinfos(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos) {
+    fbb_.AddOffset(SaveGame::VT_FXINFOS, fxinfos);
+  }
+  void add_next_fx_free(int32_t next_fx_free) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_FX_FREE, next_fx_free, 0);
+  }
+  void add_next_fx_active(int32_t next_fx_active) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_NEXT_FX_ACTIVE, next_fx_active, 0);
   }
   void add_fixed_cameras(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras) {
     fbb_.AddOffset(SaveGame::VT_FIXED_CAMERAS, fixed_cameras);
@@ -6238,6 +6450,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos = 0,
+    int32_t next_fx_free = 0,
+    int32_t next_fx_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FixedCamera>>> fixed_cameras = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Sink>>> sinks = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>> static_meshes = 0,
@@ -6285,6 +6500,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_static_meshes(static_meshes);
   builder_.add_sinks(sinks);
   builder_.add_fixed_cameras(fixed_cameras);
+  builder_.add_next_fx_active(next_fx_active);
+  builder_.add_next_fx_free(next_fx_free);
+  builder_.add_fxinfos(fxinfos);
   builder_.add_room_items(room_items);
   builder_.add_next_item_active(next_item_active);
   builder_.add_next_item_free(next_item_free);
@@ -6311,6 +6529,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t next_item_free = 0,
     int32_t next_item_active = 0,
     const std::vector<int32_t> *room_items = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos = nullptr,
+    int32_t next_fx_free = 0,
+    int32_t next_fx_active = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::FixedCamera>> *fixed_cameras = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::Sink>> *sinks = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> *static_meshes = nullptr,
@@ -6336,6 +6557,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::UnionVec> script_vars = 0) {
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
+  auto fxinfos__ = fxinfos ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>>(*fxinfos) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
   auto static_meshes__ = static_meshes ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>>(*static_meshes) : 0;
@@ -6360,6 +6582,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       next_item_free,
       next_item_active,
       room_items__,
+      fxinfos__,
+      next_fx_free,
+      next_fx_active,
       fixed_cameras__,
       sinks__,
       static_meshes__,
@@ -6525,6 +6750,65 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _lua_on_hit_name,
       _lua_on_collided_with_object_name,
       _lua_on_collided_with_room_name);
+}
+
+inline FXInfoT *FXInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<FXInfoT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FXInfo::UnPackTo(FXInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = pos(); if (_e) _o->pos = std::unique_ptr<TEN::Save::Position>(new TEN::Save::Position(*_e)); }
+  { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = object_number(); _o->object_number = _e; }
+  { auto _e = next_fx(); _o->next_fx = _e; }
+  { auto _e = next_active(); _o->next_active = _e; }
+  { auto _e = speed(); _o->speed = _e; }
+  { auto _e = fall_speed(); _o->fall_speed = _e; }
+  { auto _e = frame_number(); _o->frame_number = _e; }
+  { auto _e = counter(); _o->counter = _e; }
+  { auto _e = shade(); _o->shade = _e; }
+  { auto _e = flag1(); _o->flag1 = _e; }
+  { auto _e = flag2(); _o->flag2 = _e; }
+}
+
+inline flatbuffers::Offset<FXInfo> FXInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFXInfo(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FXInfo> CreateFXInfo(flatbuffers::FlatBufferBuilder &_fbb, const FXInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FXInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _pos = _o->pos ? _o->pos.get() : 0;
+  auto _room_number = _o->room_number;
+  auto _object_number = _o->object_number;
+  auto _next_fx = _o->next_fx;
+  auto _next_active = _o->next_active;
+  auto _speed = _o->speed;
+  auto _fall_speed = _o->fall_speed;
+  auto _frame_number = _o->frame_number;
+  auto _counter = _o->counter;
+  auto _shade = _o->shade;
+  auto _flag1 = _o->flag1;
+  auto _flag2 = _o->flag2;
+  return TEN::Save::CreateFXInfo(
+      _fbb,
+      _pos,
+      _room_number,
+      _object_number,
+      _next_fx,
+      _next_active,
+      _speed,
+      _fall_speed,
+      _frame_number,
+      _counter,
+      _shade,
+      _flag1,
+      _flag2);
 }
 
 inline AmmoInfoT *AmmoInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
@@ -8103,6 +8387,9 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = next_item_free(); _o->next_item_free = _e; }
   { auto _e = next_item_active(); _o->next_item_active = _e; }
   { auto _e = room_items(); if (_e) { _o->room_items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->room_items[_i] = _e->Get(_i); } } }
+  { auto _e = fxinfos(); if (_e) { _o->fxinfos.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fxinfos[_i] = std::unique_ptr<TEN::Save::FXInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = next_fx_free(); _o->next_fx_free = _e; }
+  { auto _e = next_fx_active(); _o->next_fx_active = _e; }
   { auto _e = fixed_cameras(); if (_e) { _o->fixed_cameras.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fixed_cameras[_i] = std::unique_ptr<TEN::Save::FixedCameraT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = sinks(); if (_e) { _o->sinks.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->sinks[_i] = std::unique_ptr<TEN::Save::SinkT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = static_meshes(); if (_e) { _o->static_meshes.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->static_meshes[_i] = std::unique_ptr<TEN::Save::StaticMeshInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -8144,6 +8431,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _next_item_free = _o->next_item_free;
   auto _next_item_active = _o->next_item_active;
   auto _room_items = _fbb.CreateVector(_o->room_items);
+  auto _fxinfos = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>> (_o->fxinfos.size(), [](size_t i, _VectorArgs *__va) { return CreateFXInfo(*__va->__fbb, __va->__o->fxinfos[i].get(), __va->__rehasher); }, &_va );
+  auto _next_fx_free = _o->next_fx_free;
+  auto _next_fx_active = _o->next_fx_active;
   auto _fixed_cameras = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>> (_o->fixed_cameras.size(), [](size_t i, _VectorArgs *__va) { return CreateFixedCamera(*__va->__fbb, __va->__o->fixed_cameras[i].get(), __va->__rehasher); }, &_va );
   auto _sinks = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>> (_o->sinks.size(), [](size_t i, _VectorArgs *__va) { return CreateSink(*__va->__fbb, __va->__o->sinks[i].get(), __va->__rehasher); }, &_va );
   auto _static_meshes = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::StaticMeshInfo>> (_o->static_meshes.size(), [](size_t i, _VectorArgs *__va) { return CreateStaticMeshInfo(*__va->__fbb, __va->__o->static_meshes[i].get(), __va->__rehasher); }, &_va );
@@ -8177,6 +8467,9 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _next_item_free,
       _next_item_active,
       _room_items,
+      _fxinfos,
+      _next_fx_free,
+      _next_fx_active,
       _fixed_cameras,
       _sinks,
       _static_meshes,
