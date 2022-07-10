@@ -7,6 +7,7 @@
 #include "Inventory/InventoryHandler.h"
 #include "ReservedScriptNames.h"
 #include "Misc/Miscellanous.h"
+#include "Effects/EffectsFunctions.h"
 
 static sol::state s_solState;
 static sol::table s_rootTable;
@@ -48,5 +49,6 @@ void ScriptInterfaceState::Init()
 	// Misc handlers not assigned above
 	InventoryHandler::Register(&s_solState, s_rootTable);
 	Misc::Register(&s_solState, s_rootTable);
+	Effects::Register(&s_solState, s_rootTable);
 }
 
