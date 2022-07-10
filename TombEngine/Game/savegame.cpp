@@ -29,6 +29,7 @@
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "ScriptInterfaceLevel.h"
 #include "ScriptInterfaceGame.h"
+#include "effects/effects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 
@@ -73,8 +74,30 @@ void LoadSavegameInfos()
 
 		fclose(savegamePtr);
 	}
+}
 
-	return;
+PHD_3DPOS ToPHD(Save::Position const* src)
+{
+	PHD_3DPOS dest;
+	dest.Position.x = src->x_pos();
+	dest.Position.y = src->y_pos();
+	dest.Position.z = src->z_pos();
+	dest.Orientation.x = (short)src->x_rot();
+	dest.Orientation.y = (short)src->y_rot();
+	dest.Orientation.z = (short)src->z_rot();
+	return dest;
+}
+
+Save::Position FromPHD(PHD_3DPOS const& src)
+{
+	return Save::Position{
+		src.Position.x,
+		src.Position.y,
+		src.Position.z,
+		src.Orientation.x,
+		src.Orientation.y,
+		src.Orientation.z
+	};
 }
 
 bool SaveGame::Save(int slot)
@@ -659,6 +682,36 @@ bool SaveGame::Save(int slot)
 
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
 
+
+	std::vector<flatbuffers::Offset<Save::FXInfo>> serializedEffects{};
+
+	// TODO: In future, we should save only active FX, not whole array.
+	// This may come together with Monty's branch merge -- Lwmte, 10.07.22
+
+	for (auto& effectToSerialize : EffectList)
+	{
+		Save::FXInfoBuilder serializedEffect{ fbb };
+		auto savedPos = FromPHD(effectToSerialize.pos);
+
+		serializedEffect.add_pos(&savedPos);
+		serializedEffect.add_room_number(effectToSerialize.roomNumber);
+		serializedEffect.add_object_number(effectToSerialize.objectNumber);
+		serializedEffect.add_next_fx(effectToSerialize.nextFx);
+		serializedEffect.add_next_active(effectToSerialize.nextActive);
+		serializedEffect.add_speed(effectToSerialize.speed);
+		serializedEffect.add_fall_speed(effectToSerialize.fallspeed);
+		serializedEffect.add_frame_number(effectToSerialize.frameNumber);
+		serializedEffect.add_counter(effectToSerialize.counter);
+		serializedEffect.add_shade(effectToSerialize.shade);
+		serializedEffect.add_flag1(effectToSerialize.flag1);
+		serializedEffect.add_flag2(effectToSerialize.flag2);
+
+		auto serializedEffectOffset = serializedEffect.Finish();
+		serializedEffects.push_back(serializedEffectOffset);
+	}
+
+	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
+
 	// Soundtrack playheads
 	auto bgmTrackData = GetSoundTrackNameAndPosition(SoundTrackType::BGM);
 	auto oneshotTrackData = GetSoundTrackNameAndPosition(SoundTrackType::OneShot);
@@ -1054,6 +1107,9 @@ bool SaveGame::Save(int slot)
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
+	sgb.add_fxinfos(serializedEffectsOffset);
+	sgb.add_next_fx_free(NextFxFree);
+	sgb.add_next_fx_active(NextFxActive);
 	sgb.add_ambient_track(bgmTrackOffset);
 	sgb.add_ambient_position(bgmTrackData.second);
 	sgb.add_oneshot_track(oneshotTrackOffset);
@@ -1545,6 +1601,27 @@ bool SaveGame::Load(int slot)
 		Beetle->Pose.Orientation.x = beetleInfo->x_rot();
 		Beetle->Pose.Orientation.y = beetleInfo->y_rot();
 		Beetle->Pose.Orientation.z = beetleInfo->z_rot();
+	}
+
+	NextFxFree = s->next_fx_free();
+	NextFxActive = s->next_fx_active();
+
+	for (int i = 0; i < s->fxinfos()->size(); ++i)
+	{
+		auto& fx = EffectList[i];
+		auto fx_saved = s->fxinfos()->Get(i);
+		fx.pos = ToPHD(fx_saved->pos());
+		fx.roomNumber = fx_saved->room_number();
+		fx.objectNumber = fx_saved->object_number();
+		fx.nextFx = fx_saved->next_fx();
+		fx.nextActive = fx_saved->next_active();
+		fx.speed = fx_saved->speed();
+		fx.fallspeed = fx_saved->fall_speed();
+		fx.frameNumber = fx_saved->frame_number();
+		fx.counter = fx_saved->counter();
+		fx.shade = fx_saved->shade();
+		fx.flag1 = fx_saved->flag1();
+		fx.flag2 = fx_saved->flag2();
 	}
 
 	JustLoaded = 1;	
