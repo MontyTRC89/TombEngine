@@ -8,6 +8,7 @@ static constexpr char ScriptReserved_Objects[]			= "Objects";
 static constexpr char ScriptReserved_Strings[]			= "Strings";
 static constexpr char ScriptReserved_Inventory[]		= "Inventory";
 static constexpr char ScriptReserved_Misc[]				= "Misc";
+static constexpr char ScriptReserved_Effects[]			= "Effects";
 
 // Classes
 static constexpr char ScriptReserved_Moveable[]			= "Moveable";
