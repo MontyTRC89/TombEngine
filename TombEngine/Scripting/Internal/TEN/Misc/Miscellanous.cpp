@@ -267,19 +267,20 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_AddLightningArc, &AddLightningArc);
 
 		///Emit a particle.
-		//@function AddLightningArc
+		//@function AddParticle
+		//@tparam int spriteIndex an index of a sprite in DEFAULT_SPRITES object
 		//@tparam Vec3 pos
 		//@tparam Vec3 velocity
-		//@tparam int gravity
-		//@tparam float rot
+		//@tparam int gravity specifies whether particle will fall or ascend over time
+		//@tparam float rot specifies a speed with which it will rotate (0 = no rotation)
 		//@tparam ScriptColor startColor
 		//@tparam ScriptColor endColor
 		//@tparam int blendMode
 		//@tparam int startSize
 		//@tparam int endSize
 		//@tparam int lifetime
-		//@tparam bool damage
-		//@tparam bool poison
+		//@tparam bool damage specifies whether particle can damage Lara
+		//@tparam bool poison specifies whether particle can poison Lara
 		table_misc.set_function(ScriptReserved_AddParticle, &AddParticle);
 
 		///Emit a shockwave.
