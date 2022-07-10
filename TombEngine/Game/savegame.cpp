@@ -685,6 +685,9 @@ bool SaveGame::Save(int slot)
 
 	std::vector<flatbuffers::Offset<Save::FXInfo>> serializedEffects{};
 
+	// TODO: In future, we should save only active FX, not whole array.
+	// This may come together with Monty's branch merge -- Lwmte, 10.07.22
+
 	for (auto& effectToSerialize : EffectList)
 	{
 		Save::FXInfoBuilder serializedEffect{ fbb };
