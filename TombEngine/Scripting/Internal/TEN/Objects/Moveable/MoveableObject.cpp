@@ -151,7 +151,7 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
-/// Explode item. This also kills and disables the item.
+/// Explode item. This also kills and disables item.
 // @function Moveable:Explode
 	ScriptReserved_Explode, & Moveable::Explode,
 
@@ -222,7 +222,7 @@ void Moveable::Register(sol::table & parent)
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
 	ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
-/// Retrieve object's state.
+/// Retrieve the index of the current state.
 // This corresponds to the number shown in the item's state ID field in WadTool.
 // @function Moveable:GetState
 // @treturn int the index of the active state
@@ -381,7 +381,7 @@ void Moveable::Register(sol::table & parent)
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
 /// Get the object's joint position
-// @function Moveable:GetPosition
+// @function Moveable:GetJointPosition
 // @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
 
@@ -403,7 +403,7 @@ void Moveable::Register(sol::table & parent)
 // @tparam Rotation rotation The moveable's new rotation
 	ScriptReserved_SetRotation, &Moveable::SetRot,
 
-/// Set the moveable's name (its unique string identifier)
+/// Get the moveable's name (its unique string identifier)
 // e.g. "door\_back\_room" or "cracked\_greek\_statue"
 // This corresponds with the "Lua Name" field in an object's properties in Tomb Editor.
 // @function Moveable:GetName
