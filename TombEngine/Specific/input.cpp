@@ -771,24 +771,24 @@ namespace TEN::Input
 
 	void UpdateInputActions()
 	{
-		for (int i = 0; i < Actions.size(); i++)
+		for (auto& action : Actions)
 		{
-			int inputBit = 1 << (int)Actions[i].ID;
-			bool isActive = ((DbInput | TrInput | RelInput) & inputBit) == inputBit;
-			Actions[i].Update(isActive);
+			int inputBit = 1 << (int)action.ID;
+			bool setActive = ((DbInput | TrInput | RelInput) & inputBit) == inputBit;
+			action.Update(setActive);
 
 			// Debug display for FORWARD input.
-			if (Actions[i].ID == In::Forward)
+			if (action.ID == In::Forward)
 			{
 				g_Renderer.PrintDebugMessage("FORWARD input debug:");
-				Actions[i].PrintDebugInfo();
+				action.PrintDebugInfo();
 			}
 		}
 	}
 
 	void InputAction::Update(bool setActive)
 	{
-		float frameTime = 1.0f / (float)FPS;
+		static const float frameTime = 1.0f / (float)FPS;
 
 		this->UpdateIsActive(setActive);
 
@@ -850,7 +850,7 @@ namespace TEN::Input
 		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
 			return false;
 
-		float frameTime = 1.0f / (float)FPS;
+		static const float frameTime = 1.0f / (float)FPS;
 		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, frameTime);
 		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
 
