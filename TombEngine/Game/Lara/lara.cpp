@@ -685,7 +685,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		}
 		else if (lara->Air < LARA_AIR_MAX && item->HitPoints >= 0)
 		{
-			if (lara->Vehicle == NO_ITEM)	// Only for UPV.
+			if (lara->Vehicle == NO_ITEM) // Only for UPV.
 			{
 				lara->Air += 10;
 				if (lara->Air > LARA_AIR_MAX)

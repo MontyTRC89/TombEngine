@@ -786,6 +786,39 @@ namespace TEN::Input
 		}
 	}
 
+	bool InputAction::IsClicked()
+	{
+		return (IsActive && !PrevIsActive);
+	}
+
+	// Intervals in seconds.
+	// To avoid desync on the second pulse, ensure initialInterval is a multiple of interval.
+	bool InputAction::IsPulsed(float interval, float initialInterval)
+	{
+		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
+			return false;
+
+		static const float frameTime = 1.0f / (float)FPS;
+		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, frameTime);
+		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
+
+		float intervalTime = std::floor(syncedTimeHeld / activeInterval) * activeInterval;
+		if (intervalTime >= PrevTimeHeld)
+			return true;
+
+		return false;
+	}
+
+	bool InputAction::IsHeld()
+	{
+		return IsActive;
+	}
+
+	bool InputAction::IsReleased()
+	{
+		return (!IsActive && PrevIsActive);
+	}
+
 	void InputAction::Update(bool setActive)
 	{
 		static const float frameTime = 1.0f / (float)FPS;
@@ -838,47 +871,14 @@ namespace TEN::Input
 		g_Renderer.PrintDebugMessage("TimeReleased: %f", TimeReleased);
 	}
 
-	bool InputAction::IsClicked()
-	{
-		return (IsActive && !PrevIsActive);
-	}
-
-	// Intervals in seconds.
-	// For now, to avoid desync on the second pulse, ensure initialInterval is a multiple of interval.
-	bool InputAction::IsPulsed(float interval, float initialInterval)
-	{
-		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
-			return false;
-
-		static const float frameTime = 1.0f / (float)FPS;
-		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, frameTime);
-		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
-
-		float intervalTime = std::floor(syncedTimeHeld / activeInterval) * activeInterval;
-		if (intervalTime >= PrevTimeHeld)
-			return true;
-
-		return false;
-	}
-
-	bool InputAction::IsHeld()
-	{
-		return IsActive;
-	}
-
-	bool InputAction::IsReleased()
-	{
-		return (!IsActive && PrevIsActive);
-	}
-
 	bool IsClicked(InputActionID input)
 	{
 		return Actions[(int)input].IsClicked();
 	}
 
-	bool IsPulsed(InputActionID input, float intervalInSeconds, float initialInterval)
+	bool IsPulsed(InputActionID input, float interval, float initialInterval)
 	{
-		return Actions[(int)input].IsPulsed(intervalInSeconds, initialInterval);
+		return Actions[(int)input].IsPulsed(interval, initialInterval);
 	}
 
 	bool IsHeld(InputActionID input)

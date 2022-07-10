@@ -421,7 +421,7 @@ Menu GuiController::GetMenuToDisplay()
 	return menu_to_display;
 }
 
-void GuiController::SetSelectedOption(short menu)
+void GuiController::SetSelectedOption(int menu)
 {
 	selected_option = menu;
 }
@@ -632,8 +632,6 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 {
 	option_count = 6;
 
-	UpdateInput();
-
 	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
@@ -774,8 +772,6 @@ void GuiController::HandleControlSettingsInput(bool pause)
 		return;
 	}
 
-	UpdateInput();
-
 	if (GUI_INPUT_SELECT && selected_option <= 16)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
@@ -829,8 +825,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			{
 				g_Renderer.RenderTitle();
 				Camera.numberFrames = g_Renderer.SyncRenderer();
-				int nframes = Camera.numberFrames;
-				ControlPhase(nframes, 0);
+				int numFrames = Camera.numberFrames;
+				ControlPhase(numFrames, 0);
 			}
 		}
 	}
@@ -858,7 +854,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 		if (GUI_INPUT_SELECT)
 		{
-			if (selected_option == option_count - 1) // Apply
+			// Apply
+			if (selected_option == option_count - 1)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
@@ -869,7 +866,8 @@ void GuiController::HandleControlSettingsInput(bool pause)
 				return;
 			}
 
-			if (selected_option == option_count) // Cancel
+			// Cancel
+			if (selected_option == option_count)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, KEY_COUNT * sizeof(short));
@@ -921,8 +919,6 @@ void GuiController::HandleOptionsInput()
 void GuiController::HandleOtherSettingsInput(bool pause)
 {
 	option_count = 7;
-
-	UpdateInput();
 
 	if (GUI_INPUT_DESELECT)
 	{
@@ -1098,6 +1094,8 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 
 InventoryResult GuiController::DoPauseMenu()
 {
+	UpdateInput();
+
 	switch (menu_to_display)
 	{
 	case Menu::Pause:
@@ -1125,8 +1123,6 @@ InventoryResult GuiController::DoPauseMenu()
 		break;
 	}
 
-	UpdateInput();
-
 	if (menu_to_display == Menu::Pause || menu_to_display == Menu::Options)
 	{
 		if (GUI_INPUT_UP)
@@ -1150,7 +1146,7 @@ InventoryResult GuiController::DoPauseMenu()
 		}
 	}
 
-	if (GUI_INPUT_DESELECT)
+	if (GUI_INPUT_DESELECT || IsClicked(In::Pause))
 	{
 		if (menu_to_display == Menu::Pause)
 		{
@@ -1267,8 +1263,10 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 bool GuiController::IsItemInInventory(int objectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	{
 		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == objectNumber)
 			return 1;
+	}
 
 	return 0;
 }
@@ -1310,8 +1308,10 @@ void GuiController::SeparateObject(int objectNumber)
 void GuiController::SetupObjectListStartPosition(int newObjectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	{
 		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == newObjectNumber)
 			rings[(int)RingTypes::Inventory]->curobjinlist = i;
+	}
 }
 
 void GuiController::HandleObjectChangeover(int ringIndex)
@@ -1638,36 +1638,52 @@ void GuiController::ConstructObjectList()
 		InsertObjectIntoList((Lara.Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLES; i++)
+	{
 		if (Lara.Inventory.Puzzles[i])
 			InsertObjectIntoList(INV_OBJECT_PUZZLE1 + i);
+	}
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
+	{
 		if (Lara.Inventory.PuzzlesCombo[i])
 			InsertObjectIntoList(INV_OBJECT_PUZZLE1_COMBO1 + i);
+	}
 
 	for (int i = 0; i < NUM_KEYS; i++)
+	{
 		if (Lara.Inventory.Keys[i])
 			InsertObjectIntoList(INV_OBJECT_KEY1 + i);
+	}
 
 	for (int i = 0; i < NUM_KEY_PIECES; i++)
+	{
 		if (Lara.Inventory.KeysCombo[i])
 			InsertObjectIntoList(INV_OBJECT_KEY1_COMBO1 + i);
+	}
 
 	for (int i = 0; i < NUM_PICKUPS; i++)
+	{
 		if (Lara.Inventory.Pickups[i])
 			InsertObjectIntoList(INV_OBJECT_PICKUP1 + i);
+	}
 
 	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
+	{
 		if (Lara.Inventory.PickupsCombo[i])
 			InsertObjectIntoList(INV_OBJECT_PICKUP1_COMBO1 + i);
+	}
 
 	for (int i = 0; i < NUM_EXAMINES; i++)
+	{
 		if (Lara.Inventory.Examines[i])
 			InsertObjectIntoList(INV_OBJECT_EXAMINE1 + i);
+	}
 
 	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
+	{
 		if (Lara.Inventory.ExaminesCombo[i])
 			InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
+	}
 
 	if (Lara.Inventory.Diary.Present)
 		InsertObjectIntoList(INV_OBJECT_DIARY);
@@ -1739,20 +1755,28 @@ void GuiController::ConstructCombineObjectList()
 		InsertObjectIntoList_v2(Lara.Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
 
 	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
+	{
 		if (Lara.Inventory.PuzzlesCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
+	}
 
 	for (int i = 0; i < NUM_KEY_PIECES; i++)
+	{
 		if (Lara.Inventory.KeysCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_KEY1_COMBO1 + i);
+	}
 
 	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
+	{
 		if (Lara.Inventory.PickupsCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
+	}
 
 	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
+	{
 		if (Lara.Inventory.ExaminesCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
+	}
 
 	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
 	rings[(int)RingTypes::Ammo]->curobjinlist = 0;
@@ -3124,7 +3148,7 @@ bool GuiController::CallInventory(bool reset_mode)
 		UpdateInput();
 		GameTimer++;
 
-		if (DbInput & IN_OPTION)
+		if (IsClicked(In::Option))
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			exitLoop = true;

@@ -55,6 +55,7 @@ using std::vector;
 using std::unordered_map;
 using std::string;
 
+using namespace TEN::Effects;
 using namespace TEN::Effects::Footprints;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
@@ -62,7 +63,6 @@ using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Lightning;
 using namespace TEN::Effects::Environment;
-using namespace TEN::Effects;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
@@ -145,7 +145,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			// Does the player want to enter inventory?
-			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 && g_Gui.GetInventoryMode() != InventoryMode::Save)
+			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 &&
+				g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
 				StopRumble();
@@ -155,7 +156,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				if (g_Gui.CallInventory(false))
 					return GameStatus::SaveGame;
 			}
-			else if (TrInput & IN_LOAD && g_Gui.GetInventoryMode() != InventoryMode::Load)
+			else if (TrInput & IN_LOAD &&
+				g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
 				StopRumble();
@@ -165,7 +167,8 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				if (g_Gui.CallInventory(false))
 					return GameStatus::LoadGame;
 			}
-			else if (TrInput & IN_PAUSE && g_Gui.GetInventoryMode() != InventoryMode::Pause && LaraItem->HitPoints > 0)
+			else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
+				g_Gui.GetInventoryMode() != InventoryMode::Pause)
 			{
 				StopAllSounds();
 				StopRumble();
@@ -199,17 +202,18 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0 && LevelComplete)
 			return GameStatus::LevelComplete;
 
-		int oldInput = TrInput;
+		int prevInput = TrInput;
 
 		// Is Lara dead?
-		if (CurrentLevel != 0 && (Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && TrInput))
+		if (CurrentLevel != 0 &&
+			(Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && TrInput))
 		{
 			return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
 		}
 
 		if (demoMode && TrInput == -1)
 		{
-			oldInput = 0;
+			prevInput = 0;
 			TrInput = 0;
 		}
 
@@ -707,7 +711,7 @@ int GetRandomDraw()
 
 bool ExplodeItemNode(ItemInfo *item, int node, int noXZVel, int bits)
 {
-	if (1 << node & item->MeshBits)
+	if (item->MeshBits & (1 << node))
 	{
 		int number = bits;
 		if (item->ObjectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
@@ -723,7 +727,7 @@ bool ExplodeItemNode(ItemInfo *item, int node, int noXZVel, int bits)
 		ShatterItem.sphere.y = CreatureSpheres[node].y;
 		ShatterItem.sphere.z = CreatureSpheres[node].z;
 		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
-		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
+		ShatterImpactData.impactDirection = Vector3(0, -1.0f, 0);
 		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};
 		ShatterObject(&ShatterItem, NULL, number, item->RoomNumber, noXZVel);
 		item->MeshBits &= ~ShatterItem.bit;

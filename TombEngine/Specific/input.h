@@ -179,14 +179,14 @@ namespace TEN::Input
 		float PrevTimeHeld = 0.0f;
 		float TimeReleased = 0.0f;
 
-		void Update(bool setActive);
-		void UpdateIsActive(bool setActive);
-		void PrintDebugInfo();
-
 		bool IsClicked();
 		bool IsPulsed(float interval, float initialInterval = 0.0f);
 		bool IsHeld();
 		bool IsReleased();
+
+		void Update(bool setActive);
+		void UpdateIsActive(bool setActive);
+		void PrintDebugInfo();
 
 	private:
 		// TODO: For use with analog triggers, these can be made floats in the range [0.0f, 1.0f], deadzone [0.0f, 0.25f].

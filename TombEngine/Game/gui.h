@@ -430,7 +430,7 @@ public:
 	short GetLoadSaveSelection();
 
 	// Setters
-	void SetSelectedOption(short menu);
+	void SetSelectedOption(int menu);
 	void SetMenuToDisplay(Menu menu);
 	void SetInventoryMode(InventoryMode mode);
 	void SetEnterInventory(int num);
