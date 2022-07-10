@@ -9,11 +9,16 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_overhang.h"
+#include "Game/Lara/lara_tests.h"
 #include "Specific/level.h"
 #include "Specific/input.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
+
+constexpr auto LADDER_TEST_MARGIN = 8;
+constexpr auto LADDER_TEST_DISTANCE = CLICK(0.5f) - LADDER_TEST_MARGIN;
+constexpr auto LADDER_CLIMB_SHIFT = 70;
 
 // -----------------------------
 // LADDER CLIMB
@@ -65,8 +70,8 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 
 	int shiftLeft = 0;
 	int shiftRight = 0;
-	int resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shiftRight);
-	int resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -CLICK(2), CLICK(2), &shiftLeft);
+	int resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shiftRight);
+	int resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + LADDER_TEST_DISTANCE), -CLICK(2), CLICK(2), &shiftLeft);
 
 	item->Pose.Position.y -= CLICK(1);
 
@@ -143,13 +148,12 @@ void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 
 		item->Pose.Position.y += yShift - CLICK(1);
 
-		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), &shiftLeft, &ledgeLeft);
+		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -(coll->Setup.Radius + LADDER_TEST_DISTANCE), &shiftLeft, &ledgeLeft);
 
 		item->Pose.Position.y += CLICK(1);
 		 
-		if (TrInput & IN_FORWARD &&
-			resultRight && resultLeft)
+		if (TrInput & IN_FORWARD && resultRight && resultLeft)
 		{
 			if (resultRight < 0 || resultLeft < 0)
 			{
@@ -157,7 +161,7 @@ void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 
 				AnimateLara(item);
 
-				if (abs(ledgeRight - ledgeLeft) <= CLICK(0.5f))
+				if (abs(ledgeRight - ledgeLeft) <= LADDER_TEST_DISTANCE)
 				{
 					if (resultRight != -1 || resultLeft != -1)
 					{
@@ -202,7 +206,7 @@ void lara_col_climb_right(ItemInfo* item, CollisionInfo* coll)
 	{
 		int shift = 0;
 		lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
-		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift), shift);
+		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
 
@@ -225,7 +229,7 @@ void lara_col_climb_left(ItemInfo* item, CollisionInfo* coll)
 	{
 		int shift = 0;
 		lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
-		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + CLICK(0.5f)), -CLICK(2), CLICK(2), &shift), shift);
+		LaraDoClimbLeftRight(item, coll, LaraTestClimbPos(item, coll->Setup.Radius, -(coll->Setup.Radius + LADDER_TEST_DISTANCE), -CLICK(2), CLICK(2), &shift), shift);
 	}
 }
 
@@ -260,8 +264,8 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_LADDER_IDLE;
 		item->Pose.Position.y += CLICK(1);
 		
-		resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &ledgeRight);
-		resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, -CLICK(2), CLICK(2), &ledgeLeft);
+		resultRight = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &ledgeRight);
+		resultLeft = LaraTestClimbPos(item, coll->Setup.Radius, -LADDER_TEST_DISTANCE - coll->Setup.Radius, -CLICK(2), CLICK(2), &ledgeLeft);
 		
 		item->Pose.Position.y -= CLICK(1);
 		
@@ -291,8 +295,8 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		int shiftRight, shiftLeft;
 
 		item->Animation.TargetState = LS_LADDER_IDLE;
-		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), &shiftRight, &ledgeRight);
-		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -CLICK(0.5f) - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
+		resultRight = LaraTestClimbUpPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, &shiftRight, &ledgeRight);
+		resultLeft = LaraTestClimbUpPos(item, coll->Setup.Radius, -LADDER_TEST_DISTANCE - coll->Setup.Radius, &shiftLeft, &ledgeLeft);
 
 		// Overhang + ladder-to-monkey hook.
 		if (!resultRight || !resultLeft)
@@ -327,7 +331,7 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 				item->Pose.Position.y += yShift;
 			}
 		}
-		else if (abs(ledgeLeft - ledgeRight) <= CLICK(0.5f))
+		else if (abs(ledgeLeft - ledgeRight) <= LADDER_TEST_DISTANCE)
 		{
 			if (resultRight == -1 && resultLeft == -1)
 			{
@@ -461,32 +465,32 @@ int LaraTestClimbPos(ItemInfo* item, int front, int right, int origin, int heigh
 	switch (GetQuadrant(item->Pose.Orientation.y))
 	{
 	case NORTH:
-		x = item->Pose.Position.x + right;
-		z = item->Pose.Position.z + front;
+		x = right;
+		z = front;
 		zFront = CLICK(1);
 		break;
 
 	case EAST:
-		x = item->Pose.Position.x + front;
-		z = item->Pose.Position.z - right;
+		x = front;
+		z = -right;
 		xFront = CLICK(1);
 		break;
 
 	case SOUTH:
-		x = item->Pose.Position.x - right;
-		z = item->Pose.Position.z - front;
+		x = -right;
+		z = -front;
 		zFront = -CLICK(1);
 		break;
 
 	case WEST:
 	default:
-		x = item->Pose.Position.x - front;
-		z = item->Pose.Position.z + right;
+		x = -front;
+		z = right;
 		xFront = -CLICK(1);
 		break;
 	}
 
-	return LaraTestClimb(item, x, item->Pose.Position.y + origin, z, xFront, zFront, height, item->RoomNumber, shift);
+	return LaraTestClimb(item, x, origin, z, xFront, zFront, height, shift);
 }
 
 void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int shift)
@@ -629,7 +633,7 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90);
 
-		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
+		result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
 	}
 
@@ -670,7 +674,7 @@ int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
 			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 
-			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
+			result = LaraTestClimbPos(item, coll->Setup.Radius, coll->Setup.Radius + LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			item->ItemFlags[3] = result;
 		}
 	}
@@ -718,7 +722,7 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 		lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
 		lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y - ANGLE(90.0f);
 
-		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
+		result = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 		item->ItemFlags[3] = result;
 	}
 
@@ -758,7 +762,7 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 			lara->NextCornerPos.Position.z = item->Pose.Position.z = z;
 			lara->NextCornerPos.Orientation.y = item->Pose.Orientation.y = lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(90.0f);
 
-			item->ItemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - CLICK(0.5f), -CLICK(2), CLICK(2), &shift);
+			item->ItemFlags[3] = LaraTestClimbPos(item, coll->Setup.Radius, -coll->Setup.Radius - LADDER_TEST_DISTANCE, -CLICK(2), CLICK(2), &shift);
 			result = item->ItemFlags[3] != 0;
 		}
 	}
@@ -770,30 +774,37 @@ int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll)
 	return result;
 }
 
-int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift)
+int LaraTestClimb(ItemInfo* item, int xOffset, int yOffset, int zOffset, int xFront, int zFront, int itemHeight, int* shift)
 {
 	auto* lara = GetLaraInfo(item);
 
 	*shift = 0;
 	int hang = 1;
-	if (!lara->Control.CanClimbLadder)
+
+	int x = item->Pose.Position.x + xOffset;
+	int y = item->Pose.Position.y + yOffset;
+	int z = item->Pose.Position.z + zOffset;
+
+	auto probeUp = GetCollision(x, y - CLICK(0.5f), z, item->RoomNumber);
+	auto probeDown = GetCollision(x, y, z, item->RoomNumber);
+
+	if (!lara->Control.CanClimbLadder && !TestLaraNearClimbableWall(item, probeDown.BottomBlock))
 		return 0;
 
-	short roomNumber = itemRoom;
-	FloorInfo* floor = GetFloor(x, y - CLICK(0.5f), z, &roomNumber);
-	int height = GetFloorHeight(floor, x, y, z);
+	int height = probeUp.Position.Floor;
+
 	if (height == NO_HEIGHT)
 		return 0;
 
 	height -= (CLICK(0.5f) + y + itemHeight);
-	if (height < -70)
+	if (height < -LADDER_CLIMB_SHIFT)
 		return 0;
 
 	if (height < 0)
 		*shift = height;
 
-	int ceiling = GetCeiling(floor, x, y, z) - y;
-	if (ceiling > 70)
+	int ceiling = probeDown.Position.Ceiling - y;
+	if (ceiling > LADDER_CLIMB_SHIFT)
 		return 0;
 
 	if (ceiling > 0)
@@ -808,14 +819,14 @@ int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, i
 
 	int dz = zFront + z;
 	int dx = xFront + x;
-	
-	floor = GetFloor(dx, y, dz, &roomNumber);
-	height = GetFloorHeight(floor, dx, y, dz);
+
+	auto probeFront = GetCollision(dx, y, dz, item->RoomNumber);
+	height = probeFront.Position.Floor;
 	
 	if (height != NO_HEIGHT)
 		height -= y;
 
-	if (height <= 70)
+	if (height <= LADDER_CLIMB_SHIFT)
 	{
 		if (height > 0)
 		{
@@ -825,11 +836,10 @@ int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, i
 			if (height > *shift)
 				*shift = height;
 		}
-		
-		roomNumber = itemRoom;
-		GetFloor(x, y + itemHeight, z, &roomNumber);
-		FloorInfo* floor2 = GetFloor(dx, y + itemHeight, dz, &roomNumber);
-		ceiling = GetCeiling(floor2, dx, y + itemHeight, dz);
+
+		auto probeTop = GetCollision(x, y + itemHeight, z, item->RoomNumber);
+		auto probeTopFront = GetCollision(dx, y + itemHeight, dz, probeTop.RoomNumber);
+		ceiling = probeTopFront.Position.Ceiling;
 		
 		if (ceiling == NO_HEIGHT)
 			return 1;
@@ -850,11 +860,11 @@ int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, i
 		return 1;
 	}
 	
-	ceiling = GetCeiling(floor, dx, y, dz) - y;
+	ceiling = probeFront.Position.Ceiling - y;
 	if (ceiling >= CLICK(2))
 		return 1;
 
-	if (ceiling > 442)
+	if (ceiling > CLICK(2) - LADDER_CLIMB_SHIFT)
 	{
 		if (*shift > 0)
 			return -(hang != 0);
@@ -866,7 +876,7 @@ int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, i
 	if (ceiling > 0)
 		return -(hang != 0);
 
-	if (ceiling <= -70 || !hang || *shift > 0)
+	if (ceiling <= -LADDER_CLIMB_SHIFT || !hang || *shift > 0)
 		return 0;
 
 	if (*shift > ceiling)
@@ -916,7 +926,7 @@ int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* le
 	FloorInfo* floor = GetFloor(x, y, z, &roomNumber);
 	int ceiling = CLICK(1) - y + GetCeiling(floor, x, y, z);
 	
-	if (ceiling > 70)
+	if (ceiling > LADDER_CLIMB_SHIFT)
 		return 0;
 
 	if (ceiling > 0)
