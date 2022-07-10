@@ -1668,7 +1668,8 @@ struct ArmInfoT : public flatbuffers::NativeTable {
   int32_t frame_base = 0;
   bool locked = false;
   std::unique_ptr<TEN::Save::Vector3> rotation{};
-  int32_t flash_gun = 0;
+  int32_t gun_flash = 0;
+  int32_t gun_smoke = 0;
 };
 
 struct ArmInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -1681,7 +1682,8 @@ struct ArmInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_FRAME_BASE = 8,
     VT_LOCKED = 10,
     VT_ROTATION = 12,
-    VT_FLASH_GUN = 14
+    VT_GUN_FLASH = 14,
+    VT_GUN_SMOKE = 16
   };
   int32_t anim_number() const {
     return GetField<int32_t>(VT_ANIM_NUMBER, 0);
@@ -1698,8 +1700,11 @@ struct ArmInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::Vector3 *rotation() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_ROTATION);
   }
-  int32_t flash_gun() const {
-    return GetField<int32_t>(VT_FLASH_GUN, 0);
+  int32_t gun_flash() const {
+    return GetField<int32_t>(VT_GUN_FLASH, 0);
+  }
+  int32_t gun_smoke() const {
+    return GetField<int32_t>(VT_GUN_SMOKE, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
@@ -1708,7 +1713,8 @@ struct ArmInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FRAME_BASE) &&
            VerifyField<uint8_t>(verifier, VT_LOCKED) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_ROTATION) &&
-           VerifyField<int32_t>(verifier, VT_FLASH_GUN) &&
+           VerifyField<int32_t>(verifier, VT_GUN_FLASH) &&
+           VerifyField<int32_t>(verifier, VT_GUN_SMOKE) &&
            verifier.EndTable();
   }
   ArmInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -1735,8 +1741,11 @@ struct ArmInfoBuilder {
   void add_rotation(const TEN::Save::Vector3 *rotation) {
     fbb_.AddStruct(ArmInfo::VT_ROTATION, rotation);
   }
-  void add_flash_gun(int32_t flash_gun) {
-    fbb_.AddElement<int32_t>(ArmInfo::VT_FLASH_GUN, flash_gun, 0);
+  void add_gun_flash(int32_t gun_flash) {
+    fbb_.AddElement<int32_t>(ArmInfo::VT_GUN_FLASH, gun_flash, 0);
+  }
+  void add_gun_smoke(int32_t gun_smoke) {
+    fbb_.AddElement<int32_t>(ArmInfo::VT_GUN_SMOKE, gun_smoke, 0);
   }
   explicit ArmInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -1756,9 +1765,11 @@ inline flatbuffers::Offset<ArmInfo> CreateArmInfo(
     int32_t frame_base = 0,
     bool locked = false,
     const TEN::Save::Vector3 *rotation = 0,
-    int32_t flash_gun = 0) {
+    int32_t gun_flash = 0,
+    int32_t gun_smoke = 0) {
   ArmInfoBuilder builder_(_fbb);
-  builder_.add_flash_gun(flash_gun);
+  builder_.add_gun_smoke(gun_smoke);
+  builder_.add_gun_flash(gun_flash);
   builder_.add_rotation(rotation);
   builder_.add_frame_base(frame_base);
   builder_.add_frame_number(frame_number);
@@ -6962,7 +6973,8 @@ inline void ArmInfo::UnPackTo(ArmInfoT *_o, const flatbuffers::resolver_function
   { auto _e = frame_base(); _o->frame_base = _e; }
   { auto _e = locked(); _o->locked = _e; }
   { auto _e = rotation(); if (_e) _o->rotation = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
-  { auto _e = flash_gun(); _o->flash_gun = _e; }
+  { auto _e = gun_flash(); _o->gun_flash = _e; }
+  { auto _e = gun_smoke(); _o->gun_smoke = _e; }
 }
 
 inline flatbuffers::Offset<ArmInfo> ArmInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ArmInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -6978,7 +6990,8 @@ inline flatbuffers::Offset<ArmInfo> CreateArmInfo(flatbuffers::FlatBufferBuilder
   auto _frame_base = _o->frame_base;
   auto _locked = _o->locked;
   auto _rotation = _o->rotation ? _o->rotation.get() : 0;
-  auto _flash_gun = _o->flash_gun;
+  auto _gun_flash = _o->gun_flash;
+  auto _gun_smoke = _o->gun_smoke;
   return TEN::Save::CreateArmInfo(
       _fbb,
       _anim_number,
@@ -6986,7 +6999,8 @@ inline flatbuffers::Offset<ArmInfo> CreateArmInfo(flatbuffers::FlatBufferBuilder
       _frame_base,
       _locked,
       _rotation,
-      _flash_gun);
+      _gun_flash,
+      _gun_smoke);
 }
 
 inline FlareDataT *FlareData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

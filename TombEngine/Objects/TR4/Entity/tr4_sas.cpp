@@ -5,16 +5,17 @@
 #include "Game/people.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
-#include "Specific/input.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/collision/collide_item.h"
+#include "Specific/input.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
 
 using namespace TEN::Input;
 
@@ -514,7 +515,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case SAS_STATE_BLIND:
-				if (!WeaponEnemyTimer && !(GetRandomControl() & 0x7F))
+				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F))
 					item->Animation.TargetState = SAS_STATE_WAIT;
 
 				break;
@@ -523,7 +524,7 @@ namespace TEN::Entities::TR4
 				break;
 			}
 
-			if (WeaponEnemyTimer > 100 &&
+			if (FlashGrenadeAftershockTimer > 100 &&
 				item->Animation.ActiveState != SAS_STATE_BLIND)
 			{
 				item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + SAS_ANIM_BLIND;
@@ -575,11 +576,8 @@ namespace TEN::Entities::TR4
 				grenadeItem->RoomNumber = item->RoomNumber;
 			}
 
-			SmokeCountL = 32;
-			SmokeWeapon = (LaraWeaponType)5; // TODO: 5 is the HK. Did TEN's enum get shuffled around? @Sezz 2022.03.09
-
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, (LaraWeaponType)5, 32);
+				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
 			InitialiseItem(itemNumber);
 

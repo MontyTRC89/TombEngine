@@ -39,9 +39,6 @@ int DeadlyBounds[6];
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-LaraWeaponType SmokeWeapon;
-byte SmokeCountL;
-byte SmokeCountR;
 int SplashCount = 0;
 
 Vector3Int NodeVectors[MAX_NODE];
@@ -954,6 +951,9 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 
 void UpdateSplashes()
 {
+	if (SplashCount)
+		SplashCount--;
+
 	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
 		SPLASH_STRUCT& splash = Splashes[i];

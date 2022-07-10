@@ -586,7 +586,7 @@ namespace TEN::Renderer
 
 	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
-		if (!Lara.RightArm.FlashGun && !Lara.LeftArm.FlashGun)
+		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
 			return true;
 
 		if (BinocularRange > 0)
@@ -675,7 +675,7 @@ namespace TEN::Renderer
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
-					if (Lara.LeftArm.FlashGun)
+					if (Lara.LeftArm.GunFlash)
 					{
 						world = laraObj.AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
 						world = offset * world;
@@ -688,7 +688,7 @@ namespace TEN::Renderer
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 
-					if (Lara.RightArm.FlashGun)
+					if (Lara.RightArm.GunFlash)
 					{
 						world = laraObj.AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
 						world = offset * world;

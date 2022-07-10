@@ -38,37 +38,26 @@ enum class CrossbowBoltType
 	Explosive
 };
 
-//int HKCounter = 0;
-//int HKTimer = 0;
-//int HKFlag = 0;
-//byte HKFlag2 = 0;
-
 void AnimateShotgun(ItemInfo* laraItem, LaraWeaponType weaponType)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	//	if (HKTimer)
-	//	{
-	//		HKFlag = 0;
-	//		HKTimer--;
-	//	}
-
-	if (SmokeCountL)
+	if (lara->LeftArm.GunSmoke > 0)
 	{
 		Vector3Int pos;
-		if (SmokeWeapon == LaraWeaponType::HK)
+		if (weaponType == LaraWeaponType::HK)
 			pos = Vector3Int(0, 228, 96);
-		else if (SmokeWeapon == LaraWeaponType::Shotgun)
+		else if (weaponType == LaraWeaponType::Shotgun)
 			pos = Vector3Int(0, 228, 0);
-		else if (SmokeWeapon == LaraWeaponType::GrenadeLauncher)
+		else if (weaponType == LaraWeaponType::GrenadeLauncher)
 			pos = Vector3Int(0, 180, 80);
-		else if (SmokeWeapon == LaraWeaponType::RocketLauncher)
+		else if (weaponType == LaraWeaponType::RocketLauncher)
 			pos = Vector3Int(0, 84, 72);
 
 		GetLaraJointPosition(&pos, LM_RHAND);
 
 		if (laraItem->MeshBits)
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
 	}
 
 	auto* item = &g_Level.Items[lara->Control.Weapon.WeaponItem];
@@ -328,16 +317,15 @@ void FireShotgun(ItemInfo* laraItem)
 		pos = Vector3Int(0, 1508, 32);
 		GetLaraJointPosition(&pos, LM_RHAND);
 
-		SmokeCountL = 32;
-		SmokeWeapon = LaraWeaponType::Shotgun;
+		lara->LeftArm.GunSmoke = 32;
 
 		if (laraItem->MeshBits != 0)
 		{
 			for (int i = 0; i < 7; i++)
-				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, SmokeWeapon, SmokeCountL);
+				TriggerGunSmoke(pos2.x, pos2.y, pos2.z, pos.x - pos2.x, pos.y - pos2.y, pos.z - pos2.z, 1, LaraWeaponType::Shotgun, lara->LeftArm.GunSmoke);
 		}
 
-		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
+		lara->RightArm.GunFlash = Weapons[(int)LaraWeaponType::Shotgun].FlashTime;
 
 		SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, TestEnvironment(ENV_FLAG_WATER, laraItem) ? SoundEnvironment::Water : SoundEnvironment::Land);
 		SoundEffect(Weapons[(int)LaraWeaponType::Shotgun].SampleNum, &laraItem->Pose);
@@ -696,13 +684,12 @@ void FireGrenade(ItemInfo* laraItem)
 		jointPos = Vector3Int(0, 1204, 5);
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
-		SmokeCountL = 32;
-		SmokeWeapon = LaraWeaponType::GrenadeLauncher;
+		lara->LeftArm.GunSmoke = 32;
 
 		if (laraItem->MeshBits)
 		{
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::GrenadeLauncher, 32);
+				TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::GrenadeLauncher, lara->LeftArm.GunSmoke);
 		}
 
 		InitialiseItem(itemNumber);
@@ -755,7 +742,7 @@ void GrenadeControl(short itemNumber)
 				int R, G, B;
 				if (item->ItemFlags[1] == 1)
 				{
-					WeaponEnemyTimer = 120;
+					FlashGrenadeAftershockTimer = 120;
 					R = 255;
 					G = 255;
 					B = 255;
@@ -1117,11 +1104,10 @@ void FireRocket(ItemInfo* laraItem)
 		jointPos = { 0, 2004, 72 };
 		GetLaraJointPosition(&jointPos, LM_RHAND);
 
-		SmokeCountL = 32;
-		SmokeWeapon = LaraWeaponType::RocketLauncher;
+		lara->LeftArm.GunSmoke = 32;
 
 		for (int i = 0; i < 5; i++)
-			TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::RocketLauncher, 32);
+			TriggerGunSmoke(x, y, z, jointPos.x - x, jointPos.y - y, jointPos.z - z, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
 
 		jointPos = { 0, -256, 0 };
 		GetLaraJointPosition(&jointPos, LM_RHAND);
@@ -1699,10 +1685,10 @@ void FireHK(ItemInfo* laraItem, int mode)
 
 	if (FireWeapon(LaraWeaponType::HK, lara->TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
-		SmokeCountL = 12;
-		SmokeWeapon = LaraWeaponType::HK;
+		lara->LeftArm.GunSmoke = 12;
+
 		TriggerGunShell(1, ID_GUNSHELL, LaraWeaponType::HK);
-		lara->RightArm.FlashGun = Weapons[(int)LaraWeaponType::HK].FlashTime;
+		lara->RightArm.GunFlash = Weapons[(int)LaraWeaponType::HK].FlashTime;
 
 		Rumble(0.2f, 0.1f);
 	}
@@ -1737,7 +1723,7 @@ void RifleHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 	else
 		AnimateShotgun(laraItem, weaponType);
 
-	if (lara->RightArm.FlashGun)
+	if (lara->RightArm.GunFlash)
 	{
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
