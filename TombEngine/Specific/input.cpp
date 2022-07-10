@@ -165,7 +165,7 @@ namespace TEN::Input
 		// Initialise input action map.
 		Actions.resize(KEY_COUNT + 5);
 		for (int i = 0; i < KEY_COUNT + 5; i++)
-			Actions[i].ID = (InputID)i;
+			Actions[i].ID = (InputActionID)i;
 	}
 
 	void DeInitialiseInput()
@@ -737,56 +737,8 @@ namespace TEN::Input
 			DbInput = TrInput & (DbInput ^ TrInput);
 
 		// Experimental hook for non-bitfield inputs.
-		for (int i = 0; i < Actions.size(); i++)
-		{
-			int inputBit = 1 << (int)Actions[i].ID;
-
-			Actions[i].PrevIsActive = Actions[i].IsActive;
-
-			if ((DbInput & inputBit) == inputBit)
-			{
-				Actions[i].IsActive = true;
-				Actions[i].PrevTimeHeld = 0.0f;
-				Actions[i].TimeHeld = 0.0f;
-				Actions[i].TimeReleased += 1.0f / (float)FPS;
-			}
-			else if ((RelInput & inputBit) == inputBit)
-			{
-				Actions[i].IsActive = true;
-				Actions[i].PrevTimeHeld = Actions[i].TimeHeld;
-				Actions[i].TimeHeld += 1.0f / (float)FPS;
-				Actions[i].TimeReleased = 0.0f;
-			}
-			else if ((TrInput & inputBit) == inputBit)
-			{
-				Actions[i].IsActive = true;
-				Actions[i].PrevTimeHeld = Actions[i].TimeHeld;
-				Actions[i].TimeHeld += 1.0f / (float)FPS;
-				Actions[i].TimeReleased = 0.0f;
-			}
-			else
-			{
-				Actions[i].IsActive = false;
-				Actions[i].PrevTimeHeld = 0.0f;
-				Actions[i].TimeHeld = 0.0f;
-				Actions[i].TimeReleased += 1.0f / (float)FPS;
-			}
-		}
-
-		// Debug display for FORWARD input.
-		int debugInput = (int)In::Forward;
-		g_Renderer.PrintDebugMessage("FORWARD input debug:");
-		g_Renderer.PrintDebugMessage("IsClicked: %d", Actions[debugInput].IsClicked());
-		g_Renderer.PrintDebugMessage("IsPulsed (0.2f, 0.6f): %d", Actions[debugInput].IsPulsed(0.2f, 0.6f));
-		g_Renderer.PrintDebugMessage("IsHeld: %d", Actions[debugInput].IsHeld());
-		g_Renderer.PrintDebugMessage("IsReleased: %d", Actions[debugInput].IsReleased());
-		g_Renderer.PrintDebugMessage("");
-		g_Renderer.PrintDebugMessage("IsActive: %d", Actions[debugInput].IsActive);
-		g_Renderer.PrintDebugMessage("PrevIsActive: %d", Actions[debugInput].PrevIsActive);
-		g_Renderer.PrintDebugMessage("TimeHeld: %f", Actions[debugInput].TimeHeld);
-		g_Renderer.PrintDebugMessage("PrevTimeHeld: %f", Actions[debugInput].PrevTimeHeld);
-		g_Renderer.PrintDebugMessage("TimeReleased: %f", Actions[debugInput].TimeReleased);
-
+		UpdateInputActions();
+		
 		return true;
 	}
 
@@ -815,19 +767,91 @@ namespace TEN::Input
 		rumbleData = {};
 	}
 
+	// ------------------------------------------------------
+
+	void UpdateInputActions()
+	{
+		for (int i = 0; i < Actions.size(); i++)
+		{
+			int inputBit = 1 << (int)Actions[i].ID;
+			bool isActive = ((DbInput | TrInput | RelInput) & inputBit) == inputBit;
+			Actions[i].Update(isActive);
+
+			// Debug display for FORWARD input.
+			if (Actions[i].ID == In::Forward)
+			{
+				g_Renderer.PrintDebugMessage("FORWARD input debug:");
+				Actions[i].PrintDebugInfo();
+			}
+		}
+	}
+
+	void InputAction::Update(bool setActive)
+	{
+		float frameTime = 1.0f / (float)FPS;
+
+		this->UpdateIsActive(setActive);
+
+		if (this->IsClicked())
+		{
+			this->PrevTimeHeld = 0.0f;
+			this->TimeHeld = 0.0f;
+			this->TimeReleased += frameTime;
+		}
+		else if (this->IsReleased())
+		{
+			this->PrevTimeHeld = TimeHeld;
+			this->TimeHeld += frameTime;
+			this->TimeReleased = 0.0f;
+		}
+		else if (this->IsHeld())
+		{
+			this->PrevTimeHeld = TimeHeld;
+			this->TimeHeld += frameTime;
+			this->TimeReleased = 0.0f;
+		}
+		else
+		{
+			this->PrevTimeHeld = 0.0f;
+			this->TimeHeld = 0.0f;
+			this->TimeReleased += frameTime;
+		}
+	}
+
+	void InputAction::UpdateIsActive(bool setActive)
+	{
+		this->PrevIsActive = IsActive;
+		this->IsActive = setActive;
+	}
+
+	void InputAction::PrintDebugInfo()
+	{
+		g_Renderer.PrintDebugMessage("IsClicked: %d", this->IsClicked());
+		g_Renderer.PrintDebugMessage("IsPulsed (0.2f, 0.6f): %d", this->IsPulsed(0.2f, 0.6f));
+		g_Renderer.PrintDebugMessage("IsHeld: %d", this->IsHeld());
+		g_Renderer.PrintDebugMessage("IsReleased: %d", this->IsReleased());
+		g_Renderer.PrintDebugMessage("");
+		g_Renderer.PrintDebugMessage("IsActive: %d", IsActive);
+		g_Renderer.PrintDebugMessage("PrevIsActive: %d", PrevIsActive);
+		g_Renderer.PrintDebugMessage("TimeHeld: %f", TimeHeld);
+		g_Renderer.PrintDebugMessage("PrevTimeHeld: %f", PrevTimeHeld);
+		g_Renderer.PrintDebugMessage("TimeReleased: %f", TimeReleased);
+	}
+
 	bool InputAction::IsClicked()
 	{
 		return (IsActive && !PrevIsActive);
 	}
 
 	// Intervals in seconds.
-	// For now, to avoid desync on the second pulse, initialInterval should be a multiple of interval.
+	// For now, to avoid desync on the second pulse, ensure initialInterval is a multiple of interval.
 	bool InputAction::IsPulsed(float interval, float initialInterval)
 	{
 		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
 			return false;
 
-		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, 1.0f / (float)FPS);
+		float frameTime = 1.0f / (float)FPS;
+		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, frameTime);
 		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
 
 		float intervalTime = std::floor(syncedTimeHeld / activeInterval) * activeInterval;
@@ -847,22 +871,22 @@ namespace TEN::Input
 		return (!IsActive && PrevIsActive);
 	}
 
-	bool IsClicked(InputID input)
+	bool IsClicked(InputActionID input)
 	{
 		return Actions[(int)input].IsClicked();
 	}
 
-	bool IsPulsed(InputID input, float intervalInSeconds, float initialInterval)
+	bool IsPulsed(InputActionID input, float intervalInSeconds, float initialInterval)
 	{
 		return Actions[(int)input].IsPulsed(intervalInSeconds, initialInterval);
 	}
 
-	bool IsHeld(InputID input)
+	bool IsHeld(InputActionID input)
 	{
 		return Actions[(int)input].IsHeld();
 	}
 
-	bool IsReleased(InputID input)
+	bool IsReleased(InputActionID input)
 	{
 		return Actions[(int)input].IsReleased();
 	}

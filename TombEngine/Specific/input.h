@@ -137,7 +137,7 @@ namespace TEN::Input
 
 	// ---------------------------------------------------------------
 
-	typedef enum class InputID
+	typedef enum class InputActionID
 	{
 		None = -1,
 		Forward,
@@ -174,25 +174,32 @@ namespace TEN::Input
 	class InputAction
 	{
 	public:
-		InputID ID			 = In::None;
-		float	TimeHeld	 = 0.0f;
-		float	PrevTimeHeld = 0.0f;
-		float	TimeReleased = 0.0f;
+		InputActionID ID   = In::None;
+		float TimeHeld	   = 0.0f;
+		float PrevTimeHeld = 0.0f;
+		float TimeReleased = 0.0f;
+
+		void Update(bool setActive);
+		void UpdateIsActive(bool setActive);
+		void PrintDebugInfo();
 
 		bool IsClicked();
 		bool IsPulsed(float interval, float initialInterval = 0.0f);
 		bool IsHeld();
 		bool IsReleased();
 
-	//private:
+	private:
+		// TODO: For use with analog triggers, these can be made floats in the range [0.0f, 1.0f], deadzone [0.0f, 0.25f].
 		bool IsActive	  = false;
 		bool PrevIsActive = false;
 	};
 
 	extern std::vector<InputAction> Actions;
 
-	bool IsClicked(InputID input);
-	bool IsPulsed(InputID input, float interval, float initialInterval = 0.0f);
-	bool IsHeld(InputID input);
-	bool IsReleased(InputID input);
+	void UpdateInputActions();
+
+	bool IsClicked(InputActionID input);
+	bool IsPulsed(InputActionID input, float interval, float initialInterval = 0.0f);
+	bool IsHeld(InputActionID input);
+	bool IsReleased(InputActionID input);
 }
