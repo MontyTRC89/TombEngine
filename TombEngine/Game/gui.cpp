@@ -1008,16 +1008,9 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		case 1:
 			if (CurrentSettings.conf.MusicVolume < 100)
 			{
-				static int db = 0;
 				CurrentSettings.conf.MusicVolume++;
 				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
-				if (!db)
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					db = 10;
-				}
-				else
-					db -= 2;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
 			break;
@@ -1025,16 +1018,9 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		case 2:
 			if (CurrentSettings.conf.SfxVolume < 100)
 			{
-				static int db = 0;
 				CurrentSettings.conf.SfxVolume++;
 				SetVolumeFX(CurrentSettings.conf.SfxVolume);
-				if (!db)
-				{
-					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-					db = 10;
-				}
-				else
-					db -= 2;
+				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
 			break;
