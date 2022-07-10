@@ -88,12 +88,88 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
+	<td class="name" ><a href="#AddLightningArc">AddLightningArc(src, dest, color, lifetime, amplitude, beamWidth, segments, flags)</a></td>
+	<td class="summary">Emit a lightning arc.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#AddLightningArc">AddLightningArc(pos, velocity, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</a></td>
+	<td class="summary">Emit a particle.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#AddShockwave">AddShockwave(pos, innerRadius, outerRadius, color, lifetime, speed, angle, flags)</a></td>
+	<td class="summary">Emit a shockwave.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#AddLight">AddLight(pos, color, radius)</a></td>
+	<td class="summary">Emit dynamic light.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#AddFire">AddFire(pos, size)</a></td>
+	<td class="summary">Emit blood.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#AddExplosion">AddExplosion(pos, size, shockwave)</a></td>
+	<td class="summary">Emit explosion.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#AddBlood">AddBlood(pos, amount)</a></td>
+	<td class="summary">Emit blood.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Earthquake">Earthquake(strength)</a></td>
+	<td class="summary">Do earthquake.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Vibrate">Vibrate(strength, in)</a></td>
+	<td class="summary">Vibrate gamepad, if possible.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#FlashScreen">FlashScreen(color, speed)</a></td>
+	<td class="summary">Flash screen.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#FadeIn">FadeIn(speed)</a></td>
+	<td class="summary">Do a fade-in.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#FadeIn">FadeIn(speed)</a></td>
+	<td class="summary">Do a fade-out.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetCineBars">SetCineBars(height, speed)</a></td>
+	<td class="summary">Set cinematic bars.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetFOV">SetFOV(angle)</a></td>
+	<td class="summary">Set field of view.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#SetAmbientTrack">SetAmbientTrack(name)</a></td>
 	<td class="summary">Set and play an ambient track</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#PlayAudioTrack">PlayAudioTrack(name, loop)</a></td>
 	<td class="summary">Play an audio track</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#PlaySound">PlaySound(sound, position)</a></td>
+	<td class="summary">Play sound effect</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#KeyHeld">KeyHeld(action)</a></td>
+	<td class="summary">Check if particular action key is held</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#KeyHit">KeyHit(action)</a></td>
+	<td class="summary">Check if particular action key was hit (once)</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#KeyPush">KeyPush(action)</a></td>
+	<td class="summary">Emulate pushing of a certain action key</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#KeyClear">KeyClear(action)</a></td>
+	<td class="summary">Clears particular input from action key</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CalculateDistance">CalculateDistance(posA, posB)</a></td>
@@ -124,6 +200,516 @@
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
+    <dt>
+    <a name = "AddLightningArc"></a>
+    <strong>AddLightningArc(src, dest, color, lifetime, amplitude, beamWidth, segments, flags)</strong>
+    </dt>
+    <dd>
+    Emit a lightning arc.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">src</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">dest</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">color</span>
+            <span class="types"><span class="type">ScriptColor</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">lifetime</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">amplitude</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">beamWidth</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">segments</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">flags</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AddLightningArc"></a>
+    <strong>AddLightningArc(pos, velocity, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</strong>
+    </dt>
+    <dd>
+    Emit a particle.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">velocity</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">gravity</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">rot</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">startColor</span>
+            <span class="types"><span class="type">ScriptColor</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">endColor</span>
+            <span class="types"><span class="type">ScriptColor</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">blendMode</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">startSize</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">endSize</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">lifetime</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">damage</span>
+            <span class="types"><span class="type">bool</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">poison</span>
+            <span class="types"><span class="type">bool</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AddShockwave"></a>
+    <strong>AddShockwave(pos, innerRadius, outerRadius, color, lifetime, speed, angle, flags)</strong>
+    </dt>
+    <dd>
+    Emit a shockwave.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">innerRadius</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">outerRadius</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">color</span>
+            <span class="types"><span class="type">ScriptColor</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">lifetime</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">angle</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">flags</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AddLight"></a>
+    <strong>AddLight(pos, color, radius)</strong>
+    </dt>
+    <dd>
+    Emit dynamic light.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">color</span>
+            <span class="types"><span class="type">ScriptColor</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">radius</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AddFire"></a>
+    <strong>AddFire(pos, size)</strong>
+    </dt>
+    <dd>
+    Emit blood.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">size</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AddExplosion"></a>
+    <strong>AddExplosion(pos, size, shockwave)</strong>
+    </dt>
+    <dd>
+    Emit explosion.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">size</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">shockwave</span>
+            <span class="types"><span class="type">bool</span></span>
+         (default: false)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "AddBlood"></a>
+    <strong>AddBlood(pos, amount)</strong>
+    </dt>
+    <dd>
+    Emit blood.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">amount</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Earthquake"></a>
+    <strong>Earthquake(strength)</strong>
+    </dt>
+    <dd>
+    Do earthquake.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">strength</span>
+            <span class="types"><span class="type">int</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Vibrate"></a>
+    <strong>Vibrate(strength, in)</strong>
+    </dt>
+    <dd>
+    Vibrate gamepad, if possible.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">strength</span>
+            <span class="types"><span class="type">float</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">in</span>
+            <span class="types"><span class="type">time</span></span>
+         seconds, default: 0.3)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "FlashScreen"></a>
+    <strong>FlashScreen(color, speed)</strong>
+    </dt>
+    <dd>
+    Flash screen.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">color</span>
+            <span class="types"><span class="type">ScriptColor</span></span>
+
+
+
+        </li>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default: 1 second)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "FadeIn"></a>
+    <strong>FadeIn(speed)</strong>
+    </dt>
+    <dd>
+    Do a fade-in.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default: 1 second)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "FadeIn"></a>
+    <strong>FadeIn(speed)</strong>
+    </dt>
+    <dd>
+    Do a fade-out.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default: 1 second)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetCineBars"></a>
+    <strong>SetCineBars(height, speed)</strong>
+    </dt>
+    <dd>
+    Set cinematic bars.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">height</span>
+            <span class="types"><span class="type">float</span></span>
+         on the range 0-800
+        </li>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default: 1 second)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetFOV"></a>
+    <strong>SetFOV(angle)</strong>
+    </dt>
+    <dd>
+    Set field of view.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">angle</span>
+            <span class="types"><span class="type">float</span></span>
+         on the range 10-170 degrees
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
     <dt>
     <a name = "SetAmbientTrack"></a>
     <strong>SetAmbientTrack(name)</strong>
@@ -162,6 +748,117 @@
         <li><span class="parameter">loop</span>
             <span class="types"><span class="type">bool</span></span>
          if true, the track will loop; if false, it won't (default: false)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PlaySound"></a>
+    <strong>PlaySound(sound, position)</strong>
+    </dt>
+    <dd>
+    Play sound effect
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">sound</span>
+            <span class="types"><span class="type">int</span></span>
+         ID to play
+        </li>
+        <li><span class="parameter">position</span>
+            <span class="types"><span class="type">Vec3</span></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyHeld"></a>
+    <strong>KeyHeld(action)</strong>
+    </dt>
+    <dd>
+    Check if particular action key is held
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">action</span>
+            <span class="types"><span class="type">int</span></span>
+         mapping index to check
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyHit"></a>
+    <strong>KeyHit(action)</strong>
+    </dt>
+    <dd>
+    Check if particular action key was hit (once)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">action</span>
+            <span class="types"><span class="type">int</span></span>
+         mapping index to check
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyPush"></a>
+    <strong>KeyPush(action)</strong>
+    </dt>
+    <dd>
+    Emulate pushing of a certain action key
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">action</span>
+            <span class="types"><span class="type">int</span></span>
+         mapping index to push
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "KeyClear"></a>
+    <strong>KeyClear(action)</strong>
+    </dt>
+    <dd>
+    Clears particular input from action key
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">action</span>
+            <span class="types"><span class="type">int</span></span>
+         mapping index to clear
         </li>
     </ul>
 
@@ -359,7 +1056,7 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-05-23 21:24:45 </i>
+<i style="float:right;">Last updated 2022-07-09 20:29:42 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
