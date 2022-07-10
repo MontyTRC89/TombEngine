@@ -222,7 +222,7 @@ void Moveable::Register(sol::table & parent)
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
 	ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
-/// Retrieve the index of the current animation.
+/// Retrieve the index of the current state.
 // This corresponds to the number shown in the item's state ID field in WadTool.
 // @function Moveable:GetState
 // @treturn int the index of the active state
