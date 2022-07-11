@@ -1382,7 +1382,7 @@ namespace TEN::Renderer
 
 		m_stItem.World = info->world;
 		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
-		m_stItem.AmbientLight = info->color;
+		m_stItem.AmbientLight = info->room->AmbientLight * info->color;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
@@ -1724,7 +1724,7 @@ namespace TEN::Renderer
 
 		m_stItem.World = info->item->World;
 		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
-		m_stItem.AmbientLight = room.AmbientLight;
+		m_stItem.AmbientLight = info->room->AmbientLight * info->color;
 		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
@@ -1820,7 +1820,7 @@ namespace TEN::Renderer
 
 				m_stItem.World = world;
 				m_stItem.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
-				m_stItem.AmbientLight = msh->color;
+				m_stItem.AmbientLight = room->AmbientLight * msh->color;
 				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 				m_cbItem.updateData(m_stItem, m_context.Get());
 				BindConstantBufferVS(CB_ITEM, m_cbItem.get());
