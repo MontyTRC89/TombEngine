@@ -2785,7 +2785,6 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 	char textbufme[128];
 	int objmeup;
 	int nummeup;
-	short ymeup;
 	unsigned short xrot, yrot, zrot;
 	int activenum;
 	int count;

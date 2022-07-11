@@ -103,8 +103,6 @@ int DrawPhase()
 
 GameStatus ControlPhase(int numFrames, int demoMode)
 {
-	short oldLaraFrame;
-
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();

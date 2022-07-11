@@ -66,15 +66,10 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		ItemInfo* target;
-		CreatureInfo* slots;
-		int distance, bestdistance;
-		short angle;
-
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		angle = 0;
+		short angle = 0;
 
 		if (item->HitPoints > 0)
 		{

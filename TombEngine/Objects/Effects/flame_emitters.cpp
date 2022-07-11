@@ -294,7 +294,6 @@ namespace TEN::Entities::Effects
 
 		byte r = (GetRandomControl() & 0x3F) + 192;
 		byte g = (GetRandomControl() & 0x1F) + 96;
-		byte b;
 
 		auto pos = Vector3Int();
 		GetLaraJointPosition(&pos, LM_HIPS);

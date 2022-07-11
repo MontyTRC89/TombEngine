@@ -1682,7 +1682,7 @@ bool SaveGame::Load(int slot)
 		Lara.MeshPtrs[i] = s->lara()->mesh_ptrs()->Get(i);
 	}
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
 		Lara.Wet[i] = s->lara()->wet()->Get(i);
 	}

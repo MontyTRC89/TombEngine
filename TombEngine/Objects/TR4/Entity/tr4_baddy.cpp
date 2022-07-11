@@ -1167,7 +1167,7 @@ namespace TEN::Entities::TR4
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;
 				
-				if (!ShotLara(item, &AI, &BaddyGunBite, joint1, 15));
+				if (!ShotLara(item, &AI, &BaddyGunBite, joint1, 15))
 					item->Animation.TargetState = BADDY_STATE_IDLE;
 
 				break;

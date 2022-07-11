@@ -218,9 +218,6 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	int RetVal;
-	int n;
-
 	// Process command line arguments
 	bool setup = false;
 	std::string levelFile = {};
