@@ -94,7 +94,8 @@ table ArmInfo {
 	frame_base: int32;
 	locked: bool;
 	rotation: Vector3;
-	flash_gun: int32;
+	gun_flash: int32;
+	gun_smoke: int32;
 }
 
 table FlareData {

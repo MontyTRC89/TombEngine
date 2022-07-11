@@ -8,7 +8,6 @@ namespace TEN::Renderer
 
 	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices, RendererVertex* vertices)
 	{
-		HRESULT res;
 		D3D11_BUFFER_DESC desc = {};
 
 		desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -25,7 +24,6 @@ namespace TEN::Renderer
 
 	VertexBuffer::VertexBuffer(ID3D11Device* device, int numVertices)
 	{
-		HRESULT res;
 		D3D11_BUFFER_DESC desc = {};
 
 		desc.Usage = D3D11_USAGE_DYNAMIC;

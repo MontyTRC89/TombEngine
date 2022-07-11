@@ -95,6 +95,16 @@ Vector3 ReadVector3()
 	return value;
 }
 
+Vector4 ReadVector4()
+{
+	Vector4 value;
+	value.x = ReadFloat();
+	value.y = ReadFloat();
+	value.z = ReadFloat();
+	value.w = ReadFloat();
+	return value;
+}
+
 void ReadBytes(void* dest, int count)
 {
 	memcpy(dest, LevelDataPtr, count);
@@ -126,7 +136,7 @@ void LoadItems()
 			item->Pose.Position.y = ReadInt32();
 			item->Pose.Position.z = ReadInt32();
 			item->Pose.Orientation.y = ReadInt16();
-			item->Shade = ReadInt16();
+			item->Color = ReadVector4();
 			item->TriggerFlags = ReadInt16();
 			item->Flags = ReadInt16();
 
@@ -735,10 +745,8 @@ void ReadRooms()
 			mesh.pos.Orientation.y = ReadUInt16();
 			mesh.pos.Orientation.z = 0;
 			mesh.flags = ReadUInt16();
-			Vector3 rgb = ReadVector3();
-			float a = ReadFloat();
+			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
-			mesh.color = Vector4(rgb.x, rgb.y, rgb.z, a);
 			mesh.HitPoints = ReadInt16();
 
 			byte numBytes = ReadInt8();
@@ -1156,7 +1164,6 @@ unsigned int _stdcall LoadLevel(void* data)
 		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
 		GetCarriedItems();
 		GetAIPickups();
-		Lara.Vehicle = -1;
 		g_GameScriptEntities->AssignLara();
 
 		TENLog("Level loading complete.", LogLevel::Info);
