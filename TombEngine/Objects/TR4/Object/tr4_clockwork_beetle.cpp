@@ -314,7 +314,7 @@ void UseClockworkBeetle(short flag)
 			auto* item = &g_Level.Items[itemNumber];
 
 			Lara.Inventory.BeetleComponents &= 0xFE;
-			item->Shade = -15856;
+			item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			item->ObjectNumber = ID_CLOCKWORK_BEETLE;
 			item->RoomNumber = LaraItem->RoomNumber;
 			item->Pose.Position.x = LaraItem->Pose.Position.x;

@@ -4,8 +4,8 @@ namespace TEN::Renderer {
 	using Microsoft::WRL::ComPtr;
 	using TEN::Renderer::Utils::throwIfFailed;
 
-	IndexBuffer::IndexBuffer(ID3D11Device* device, int numIndices, int* indices) {
-		HRESULT res;
+	IndexBuffer::IndexBuffer(ID3D11Device* device, int numIndices, int* indices) 
+	{
 		D3D11_BUFFER_DESC desc = {};
 
 		desc.Usage = D3D11_USAGE_DYNAMIC;
@@ -22,8 +22,8 @@ namespace TEN::Renderer {
 		m_numIndices = numIndices;
 	}
 
-	IndexBuffer::IndexBuffer(ID3D11Device* device, int numIndices) {
-		HRESULT res;
+	IndexBuffer::IndexBuffer(ID3D11Device* device, int numIndices) 
+	{
 		D3D11_BUFFER_DESC desc = {};
 
 		desc.Usage = D3D11_USAGE_DYNAMIC;

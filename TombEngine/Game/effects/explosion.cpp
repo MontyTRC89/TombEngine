@@ -97,6 +97,6 @@ namespace TEN::Effects::Explosion
 		e.life = GenerateFloat(60, 90);
 		e.size = GenerateFloat(512, 768);
 		e.angularVel = GenerateFloat(-RADIAN, RADIAN);
-		e.rotation = GenerateFloat(-0.05, 0.05);
+		e.rotation = GenerateFloat(-0.05f, 0.05f);
 	}
 }
