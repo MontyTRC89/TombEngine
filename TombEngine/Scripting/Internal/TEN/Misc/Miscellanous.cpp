@@ -276,9 +276,9 @@ namespace Misc
 		//@function AddLightningArc
 		//@tparam Vec3 src
 		//@tparam Vec3 dest
-		//@tparam ScriptColor color
-		//@tparam int lifetime
-		//@tparam int amplitude
+		//@tparam Color color
+		//@tparam int lifetime Lifetime in milliseconds. Clamped to [0, 4233] for now because of strange internal maths.
+		//@tparam int amplitude "strength" of the lightning - the higher the value, the "taller" the arcs. Clamped to [1, 255].
 		//@tparam int beamWidth
 		//@tparam int segments
 		//@tparam int flags
