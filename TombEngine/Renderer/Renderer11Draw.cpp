@@ -214,7 +214,7 @@ namespace TEN::Renderer
 			m_stItem.World = m_LaraWorldMatrix;
 			m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 			m_stItem.AmbientLight = room.AmbientLight;
-			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
+			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -552,7 +552,7 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
 			for (int i = 0; i < NUM_RATS; i++)
@@ -604,7 +604,7 @@ namespace TEN::Renderer
 			RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
 			RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
 			for (int b = 0; b < mesh->buckets.size(); b++)
@@ -654,7 +654,7 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_LITTLE_BEETLE];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
@@ -706,7 +706,7 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_LOCUSTS];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LOCUSTS];
 
-			for (int m = 0; m < 32; m++)
+			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
 			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
@@ -1371,8 +1371,8 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		// Set shaders
-		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[info->bucket->Texture]),
@@ -1380,11 +1380,13 @@ namespace TEN::Renderer
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_staticsTextures[info->bucket->Texture]),
 		            SAMPLER_NONE);
 
-		m_stStatic.World = info->world;
-		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
-		m_stStatic.Color = info->color;
-		m_cbStatic.updateData(m_stStatic, m_context.Get());
-		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		m_stItem.World = info->world;
+		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
+		m_stItem.AmbientLight = info->color;
+		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+		m_cbItem.updateData(m_stItem, m_context.Get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		SetBlendMode(info->blendMode);
 		
@@ -1668,7 +1670,7 @@ namespace TEN::Renderer
 		m_stItem.World = item->World;
 		m_stItem.Position = Vector4(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
-		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * 32);
+		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -1723,7 +1725,7 @@ namespace TEN::Renderer
 		m_stItem.World = info->item->World;
 		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stItem.AmbientLight = room.AmbientLight;
-		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * 32);
+		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -1800,8 +1802,8 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Bind shaders
-		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
+		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -1816,11 +1818,13 @@ namespace TEN::Renderer
 															   TO_RAD(msh->pos.Orientation.z)) * 
 								Matrix::CreateTranslation(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z));
 
-				m_stStatic.World = world;
-				m_stStatic.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
-				m_stStatic.Color = msh->color;
-				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+				m_stItem.World = world;
+				m_stItem.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
+				m_stItem.AmbientLight = msh->color;
+				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+				m_cbItem.updateData(m_stItem, m_context.Get());
+				BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+				BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 				RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
 
