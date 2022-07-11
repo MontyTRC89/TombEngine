@@ -59,10 +59,7 @@ void LoadSoundDevicesInCombobox(HWND handle)
 
 BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	HWND ctlHandle;
-
 	Vector2Int mode;
-	int selectedAdapter;
 	int selectedMode;
 
 	switch (msg)

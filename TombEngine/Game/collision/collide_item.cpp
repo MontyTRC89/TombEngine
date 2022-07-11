@@ -887,7 +887,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, Collisi
 	itemBounds.Extents = itemBounds.Extents - Vector3(WALL_SIZE);
 
 	// Draw static bounds
-	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
+	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 	// Calculate horizontal item coll bounds according to radius
 	BOUNDING_BOX collBox;

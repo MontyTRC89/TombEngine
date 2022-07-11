@@ -115,8 +115,8 @@ namespace TEN::Entities::TR4
 			deathEffect->x = pos.Position.x;
 			deathEffect->y = pos.Position.y;
 			deathEffect->z = pos.Position.z;
-			deathEffect->innerRad = 0x2000280;
-			deathEffect->outerRad = 0x28802000;
+			deathEffect->innerRad = 512;
+			deathEffect->outerRad = 640;
 			deathEffect->xRot = xRot;
 			deathEffect->r = 255;
 			deathEffect->g = 64;

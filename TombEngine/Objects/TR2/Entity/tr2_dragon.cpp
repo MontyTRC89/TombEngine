@@ -477,7 +477,7 @@ void InitialiseBartoli(short itemNumber)
 		back->Pose.Orientation.y = item->Pose.Orientation.y;
 		back->RoomNumber = item->RoomNumber;
 		back->Status = ITEM_INVISIBLE;
-		back->Shade = -1;
+		back->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		InitialiseItem(backItem);
 		back->MeshBits = 0x1FFFFF;
@@ -493,7 +493,7 @@ void InitialiseBartoli(short itemNumber)
 		front->Pose.Orientation.y = item->Pose.Orientation.y;
 		front->RoomNumber = item->RoomNumber;
 		front->Status = ITEM_INVISIBLE;
-		front->Shade = -1;
+		front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		InitialiseItem(frontItem);
 
@@ -540,7 +540,7 @@ void BartoliControl(short itemNumber)
 				front->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 				front->Pose.Position.z = item->Pose.Position.z;
 				front->RoomNumber = item->RoomNumber;
-				front->Shade = -1;
+				front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 				InitialiseItem(frontItem);
 				AddActiveItem(frontItem);

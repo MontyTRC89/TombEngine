@@ -238,7 +238,7 @@ namespace TEN::Entities::Vehicles
 		{
 			auto* harpoonItem = &g_Level.Items[itemNumber];
 			harpoonItem->ObjectNumber = ID_HARPOON;
-			harpoonItem->Shade = 0xC210;
+			harpoonItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			harpoonItem->RoomNumber = UPVItem->RoomNumber;
 
 			auto pos = Vector3Int((UPV->HarpoonLeft ? 22 : -22), 24, 230);
