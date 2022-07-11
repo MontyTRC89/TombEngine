@@ -52,7 +52,7 @@ namespace TEN::Effects::Lightning
 
 	void InitialiseFloatSinCosTable();
 	void UpdateLightning();
-	void TriggerLightning(Vector3Int* src, Vector3Int* dest, char amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
+	void TriggerLightning(Vector3Int* src, Vector3Int* dest, byte amplitude, byte r, byte g, byte b, byte life, char flags, char width, char segments);
 	void CalcLightningSpline(Vector3Int* pos, short* buffer, LIGHTNING_INFO* arc);
 	void TriggerLightningGlow(int x, int y, int z, byte size, byte r, byte g, byte b);
 }
