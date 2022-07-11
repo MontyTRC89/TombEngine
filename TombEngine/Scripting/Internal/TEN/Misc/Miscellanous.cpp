@@ -52,7 +52,25 @@ namespace Misc
 		p2.y = dest.y;
 		p2.z = dest.z;
 
-		TriggerLightning(&p1, &p2, amplitude, color.GetR(), color.GetG(), color.GetB(), lifetime, flags, beamWidth, segments);
+		// Nearest number of milliseconds equating to approx 254, the max even byte value for "life".
+		// This takes into account a "hardcoded" FPS of 30 and the fact that
+		// lightning loses two "life" each frame.
+		constexpr auto kMaxLifeMillis = 4233; 
+		lifetime = std::clamp(lifetime, 0, kMaxLifeMillis);
+
+		constexpr float millisPerFrame = 1000.0f / (float)FPS;
+
+		// This will put us in the range [0, 127]
+		int lifeInFrames = (int)round(lifetime / millisPerFrame);
+
+		// Multiply by two since a) lightning loses two "life" each frame, and b) it must be
+		// an even number to avoid overshooting a value of 0 and wrapping around.
+		byte byteLife = lifeInFrames * 2;
+
+		byte byteAmplitude = std::clamp(amplitude, 1, 255);
+
+
+		TriggerLightning(&p1, &p2, byteAmplitude, color.GetR(), color.GetG(), color.GetB(), byteLife, flags, beamWidth, segments);
 	}
 
 	static void AddParticle(int spriteIndex, Vec3 pos, Vec3 velocity, int gravity, float rot, 
