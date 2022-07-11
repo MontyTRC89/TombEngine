@@ -57,7 +57,7 @@ void InitialiseSkidooMan(short itemNumber)
 		skidooItem->Pose.Orientation.y = riderItem->Pose.Orientation.y;
 		skidooItem->RoomNumber = riderItem->RoomNumber;
 		skidooItem->Flags = ITEM_INVISIBLE;
-		skidooItem->Shade = -1;
+		skidooItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		InitialiseItem(skidooItemNumber);
 

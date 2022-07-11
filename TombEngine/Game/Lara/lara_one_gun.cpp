@@ -457,7 +457,7 @@ void FireHarpoon(ItemInfo* laraItem)
 
 		auto* item = &g_Level.Items[itemNumber];
 
-		item->Shade = 0x4210 | 0x8000;
+		item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		item->ObjectNumber = ID_HARPOON;
 		item->RoomNumber = laraItem->RoomNumber;
 
@@ -661,7 +661,7 @@ void FireGrenade(ItemInfo* laraItem)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		
-		item->Shade = 0xC210;
+		item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		item->ObjectNumber = ID_GRENADE;
 		item->RoomNumber = laraItem->RoomNumber;
 
@@ -766,7 +766,7 @@ void GrenadeControl(short itemNumber)
 				{
 					auto* newGrenade = &g_Level.Items[newGrenadeItemNumber];
 
-					newGrenade->Shade = 0xC210;
+					newGrenade->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 					newGrenade->ObjectNumber = ID_GRENADE;
 					newGrenade->RoomNumber = item->RoomNumber;
 					newGrenade->Pose.Position.x = (GetRandomControl() & 0x1FF) + item->Pose.Position.x - 256;
@@ -806,7 +806,7 @@ void GrenadeControl(short itemNumber)
 	// Store old position for later
 	auto oldPos = item->Pose.Position;
 
-	item->Shade = 0xC210;
+	item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Check if above water and update velocity and vertical velocity
 	bool aboveWater = false;
@@ -1175,7 +1175,7 @@ void RocketControl(short itemNumber)
 		abovewater = true;
 	}
 
-	item->Shade = 0x4210 | 0x8000;
+	item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 	// Calculate offset in rocket direction for fire and smoke sparks
 	Matrix world = Matrix::CreateFromYawPitchRoll(
@@ -1372,7 +1372,7 @@ void FireCrossbow(ItemInfo* laraItem, PHD_3DPOS* pos)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 		item->ObjectNumber = ID_CROSSBOW_BOLT;
-		item->Shade = 0xC210;
+		item->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		if (!ammos.hasInfinite())
 			(ammos)--;
