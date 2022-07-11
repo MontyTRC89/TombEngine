@@ -239,7 +239,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_GOON1;
+		obj->meshSwapSlot = ID_MESHSWAP_BADDY1;
 		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
@@ -265,7 +265,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
-		obj->meshSwapSlot = ID_MESHSWAP_GOON2;
+		obj->meshSwapSlot = ID_MESHSWAP_BADDY2;
 		obj->zoneType = ZONE_HUMAN_JUMP_AND_MONKEY;
 
 		g_Level.Bones[obj->boneIndex + 28 * 4] |= ROT_Y;
