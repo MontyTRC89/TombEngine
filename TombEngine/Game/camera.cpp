@@ -1536,7 +1536,8 @@ void CalculateCamera()
 		Camera.target.roomNumber = item->RoomNumber;
 		Camera.target.y = y;
 
-		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
+		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT && 
+			(g_Level.Cameras[Camera.number].flags & 2))
 		{
 			Vector3Int pos = { 0, 0, 0 };
 			GetLaraJointPosition(&pos, LM_TORSO);
