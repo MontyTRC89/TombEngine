@@ -223,7 +223,8 @@ bool SaveGame::Save(int slot)
 
 	Save::ArmInfoBuilder leftArm{ fbb };
 	leftArm.add_anim_number(Lara.LeftArm.AnimNumber);
-	leftArm.add_flash_gun(Lara.LeftArm.FlashGun);
+	leftArm.add_gun_flash(Lara.LeftArm.GunFlash);
+	leftArm.add_gun_smoke(Lara.LeftArm.GunSmoke);
 	leftArm.add_frame_base(Lara.LeftArm.FrameBase);
 	leftArm.add_frame_number(Lara.LeftArm.FrameNumber);
 	leftArm.add_locked(Lara.LeftArm.Locked);
@@ -232,7 +233,8 @@ bool SaveGame::Save(int slot)
 
 	Save::ArmInfoBuilder rightArm{ fbb };
 	rightArm.add_anim_number(Lara.RightArm.AnimNumber);
-	rightArm.add_flash_gun(Lara.RightArm.FlashGun);
+	rightArm.add_gun_flash(Lara.RightArm.GunFlash);
+	rightArm.add_gun_smoke(Lara.RightArm.GunSmoke);
 	rightArm.add_frame_base(Lara.RightArm.FrameBase);
 	rightArm.add_frame_number(Lara.RightArm.FrameNumber);
 	rightArm.add_locked(Lara.RightArm.Locked);
@@ -1680,7 +1682,7 @@ bool SaveGame::Load(int slot)
 		Lara.MeshPtrs[i] = s->lara()->mesh_ptrs()->Get(i);
 	}
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
 		Lara.Wet[i] = s->lara()->wet()->Get(i);
 	}
@@ -1760,7 +1762,8 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
 	Lara.ItemNumber = s->lara()->item_number();
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
-	Lara.LeftArm.FlashGun = s->lara()->left_arm()->flash_gun();
+	Lara.LeftArm.GunFlash = s->lara()->left_arm()->gun_flash();
+	Lara.LeftArm.GunSmoke = s->lara()->left_arm()->gun_smoke();
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
@@ -1779,7 +1782,8 @@ bool SaveGame::Load(int slot)
 	Lara.PoisonPotency = s->lara()->poison_potency();
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
-	Lara.RightArm.FlashGun = s->lara()->right_arm()->flash_gun();
+	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
+	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();

@@ -218,9 +218,6 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	int RetVal;
-	int n;
-
 	// Process command line arguments
 	bool setup = false;
 	std::string levelFile = {};
@@ -357,7 +354,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		WindowsHandle = App.WindowHandle;
 
 	// Unlike CoInitialize(), this line prevents event spamming if one of dll fails
-	auto temp = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 	// Initialise the renderer
 	g_Renderer.Initialise(g_Configuration.Width, g_Configuration.Height, g_Configuration.Windowed, App.WindowHandle);
