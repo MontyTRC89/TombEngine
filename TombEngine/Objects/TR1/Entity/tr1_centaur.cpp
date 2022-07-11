@@ -153,7 +153,7 @@ namespace TEN::Entities::TR1
 			auto* projectileItem = &g_Level.Items[itemNumber];
 
 			projectileItem->ObjectNumber = ID_PROJ_BOMB;
-			projectileItem->Shade = 16 * 256;
+			projectileItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			projectileItem->RoomNumber = centaurItem->RoomNumber;
 
 			auto pos = Vector3Int(11, 415, 41);

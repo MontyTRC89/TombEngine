@@ -118,7 +118,7 @@ bool LoadSample(char *pointer, int compSize, int uncompSize, int index)
 
 	// Cut off trailing silence from samples to prevent gaps in looped playback
 	int cleanLength = info.length;
-	for (int i = 4; i < info.length; i += 4)
+	for (DWORD i = 4; i < info.length; i += 4)
 	{
 		float *currentSample = reinterpret_cast<float*>(uncompBuffer + finalLength - i);
 		if (*currentSample > SOUND_32BIT_SILENCE_LEVEL || *currentSample < -SOUND_32BIT_SILENCE_LEVEL)
