@@ -1,9 +1,8 @@
 #include "framework.h"
 
-#include "Objects/objectslist.h"
 #include "Game/items.h"
 #include "Game/control/lot.h"
-#include "Game/Lara/lara_helpers.h"
+#include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 #include "Specific/trmath.h"
@@ -11,10 +10,11 @@
 #include "ScriptAssert.h"
 #include "MoveableObject.h"
 #include "ScriptUtil.h"
-#include "Vec3/Vec3.h"
-#include "Rotation/Rotation.h"
 #include "Objects/ObjectsHandler.h"
 #include "ReservedScriptNames.h"
+#include "Color/Color.h"
+#include "Rotation/Rotation.h"
+#include "Vec3/Vec3.h"
 
 /***
 Represents any object inside the game world.
@@ -282,6 +282,16 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:SetOCB
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
+
+/// Get the moveable's color
+// @function Moveable:GetColor
+// @treturn Color a copy of the moveable's color
+	ScriptReserved_GetColor, &Moveable::GetColor,
+
+/// Set the moveable's color
+// @function Moveable:SetColor
+// @tparam Color color the new color of the moveable 
+	ScriptReserved_SetColor, &Moveable::SetColor,
 
 /// Get AIBits of object
 // This will return a table with six values, each corresponding to
@@ -608,6 +618,16 @@ short Moveable::GetOCB() const
 void Moveable::SetOCB(short ocb)
 {
 	m_item->TriggerFlags = ocb;
+}
+
+ScriptColor Moveable::GetColor() const
+{
+	return ScriptColor{ m_item->Color };
+}
+
+void Moveable::SetColor(ScriptColor const& col)
+{
+	m_item->Color = col;
 }
 
 aiBitsType Moveable::GetAIBits() const

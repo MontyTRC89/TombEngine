@@ -816,7 +816,7 @@ namespace TEN::Entities::Vehicles
 			floorHeight = GetMinecartCollision(minecartItem, minecartItem->Pose.Orientation.y, CLICK(2));
 			if (abs(floorHeight) < MINECART_STEP_HEIGHT)
 			{
-				if (Wibble & 7 == 0)
+				if ((Wibble & 7) == 0)
 					SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
 
 				TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, MINECART_TURN_DEATH_VELOCITY);

@@ -124,7 +124,7 @@ static void SubmarineAttack(ItemInfo* item)
 		SoundEffect(SFX_TR5_UNDERWATER_TORPEDO, &torpedoItem->Pose, SoundEnvironment::Always);
 
 		torpedoItem->ObjectNumber = ID_TORPEDO;
-		torpedoItem->Shade = -15856;
+		torpedoItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		Vector3Int pos1;
 		Vector3Int pos2;

@@ -539,6 +539,9 @@ namespace TEN::Renderer
 			item->AmbientLight.w = 1.0f;
 		}
 
+		// Multiply calculated ambient light by object tint
+		item->AmbientLight *= nativeItem->Color;
+
 		// Now collect lights from dynamic list and from rooms
 		std::vector<RendererLight*> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
