@@ -356,7 +356,7 @@ struct ObjectList
 
 struct InventoryRing
 {
-	ObjectList current_object_list[INVENTORY_TABLE_SIZE + 1];
+	ObjectList CurrentObjectList[INVENTORY_TABLE_SIZE + 1];
 	int ringactive;
 	int objlistmovement;
 	int curobjinlist;
@@ -365,24 +365,61 @@ struct InventoryRing
 
 struct AmmoList
 {
-	short	   		invitem;
-	short	 		amount;
-	unsigned short	xrot;
-	unsigned short	yrot;
-	unsigned short	zrot;
+	short	   	   invitem;
+	short	 	   amount;
+	unsigned short xrot;
+	unsigned short yrot;
+	unsigned short zrot;
+};
+
+struct AmmoData
+{
+	unsigned short AmountShotGunAmmo1;
+	unsigned short AmountShotGunAmmo2;
+	unsigned short AmountHKAmmo1;
+	unsigned short AmountCrossBowAmmo1;
+	unsigned short AmountCrossBowAmmo2;
+	unsigned short AmountCrossBowAmmo3;
+	unsigned short AmountGrenadeAmmo1;
+	unsigned short AmountGrenadeAmmo2;
+	unsigned short AmountGrenadeAmmo3;
+	unsigned short AmountRocketsAmmo;
+	unsigned short AmountHarpoonAmmo;
+	unsigned short AmountUziAmmo;
+	unsigned short AmountRevolverAmmo;
+	unsigned short AmountPistolsAmmo;
+	char CurrentPistolsAmmoType;
+	char CurrentUziAmmoType;
+	char CurrentRevolverAmmoType;
+	char CurrentShotGunAmmoType;
+	char CurrentHKAmmoType;
+	char CurrentGrenadeGunAmmoType;
+	char CurrentCrossBowAmmoType;
+	char CurrentHarpoonAmmoType;
+	char CurrentRocketAmmoType;
+	char StashedCurrentPistolsAmmoType;
+	char StashedCurrentUziAmmoType;
+	char StashedCurrentRevolverAmmoType;
+	char StashedCurrentShotGunAmmoType;
+	char StashedCurrentGrenadeGunAmmoType;
+	char StashedCurrentCrossBowAmmoType;
+	char StashedCurrentSelectedOption;
+	char StashedCurrentHKAmmoType;
+	char StashedCurrentHarpoonAmmoType;
+	char StashedCurrentRocketAmmoType;
 };
 
 struct SettingsData
 {
-	bool waitingForkey = false; // Waiting for a key to be pressed when configuring controls
-	bool ignoreInput = false;   // Ignore input unless all keys were released
-	int selectedScreenResolution;
-	GameConfiguration conf;
+	bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls
+	bool IgnoreInput = false;   // Ignore input unless all keys were released
+	int SelectedScreenResolution;
+	GameConfiguration Configuration;
 };
 
 struct CombineList
 {
-	void (*combine_routine)(int flag);
+	void (*CombineRoutine)(int flag);
 	short item1;
 	short item2;
 	short combined_item;
@@ -437,6 +474,53 @@ public:
 	void SetInventoryItemChosen(int num);
 
 private:
+	// Input macros
+	#define GUI_INPUT_UP	   IsPulsed(In::Forward, 0.1f, 0.4f)
+	#define GUI_INPUT_DOWN	   IsPulsed(In::Back, 0.1f, 0.4f)
+	#define GUI_INPUT_LEFT	   IsPulsed(In::Left, 0.1f, 0.4f)
+	#define GUI_INPUT_RIGHT	   IsPulsed(In::Right, 0.1f, 0.4f)
+	#define GUI_INPUT_SELECT   (IsReleased(In::Select) || IsReleased(In::Action))
+	#define GUI_INPUT_DESELECT IsReleased(In::Deselect)
+
+	// GUI variables
+	Menu MenuToDisplay = Menu::Title;
+	int SelectedOption;
+	int OptionCount;
+	int SelectedSaveSlot;
+
+	SettingsData CurrentSettings;
+
+	// Inventory variables
+	short CombineObject1;
+	short CombineObject2;
+	char UseItem;
+	char SeperateTypeFlag;
+	char CombineTypeFlag;
+	int CompassNeedleAngle;
+	InventoryRing PCRing1;
+	InventoryRing PCRing2;
+	InventoryRing* Rings[2];
+	int CurrentSelectedOption;
+	int MenuActive;
+	char AmmoSelectorFlag;
+	char NumAmmoSlots;
+	char* CurrentAmmoType;
+	AmmoList AmmoObjectList[3];
+	short AmmoSelectorFadeVal;
+	short AmmoSelectorFadeDir;
+	short CombineRingFadeVal;
+	short CombineRingFadeDir;
+	short NormalRingFadeVal;
+	short NormalRingFadeDir;
+	unsigned char AmmoActive;
+	int OBJLIST_SPACING;
+	MenuOption CurrentOptions[3];
+	InventoryMode InvMode;
+	int InventoryItemChosen;
+	int EnterInventory;
+	int LastInvItem;
+	AmmoData Ammo;
+
 	void HandleDisplaySettingsInput(bool pause);
 	void HandleControlSettingsInput(bool pause);
 	void HandleOtherSettingsInput(bool pause);
@@ -466,151 +550,70 @@ private:
 	bool DoSave();
 	void DoInventory();
 	void ConstructCombineObjectList();
-	
-	// Input macros
-	#define GUI_INPUT_UP	   IsPulsed(In::Forward, 0.1f, 0.4f)
-	#define GUI_INPUT_DOWN	   IsPulsed(In::Back, 0.1f, 0.4f)
-	#define GUI_INPUT_LEFT	   IsPulsed(In::Left, 0.1f, 0.4f)
-	#define GUI_INPUT_RIGHT	   IsPulsed(In::Right, 0.1f, 0.4f)
-	#define GUI_INPUT_SELECT   (IsReleased(In::Select) || IsReleased(In::Action))
-	#define GUI_INPUT_DESELECT IsReleased(In::Deselect)
-
-	// Inventory variables
-	short combine_obj1;
-	short combine_obj2;
-	char useItem;
-	char seperate_type_flag;
-	char combine_type_flag;
-	int compassNeedleAngle;
-	InventoryRing pcring1;
-	InventoryRing pcring2;
-	InventoryRing* rings[2];
-	int current_selected_option;
-	int menu_active;
-	char ammo_selector_flag;
-	char num_ammo_slots;
-	char* current_ammo_type;
-	AmmoList ammo_object_list[3];
-	short ammo_selector_fade_val;
-	short ammo_selector_fade_dir;
-	short combine_ring_fade_val;
-	short combine_ring_fade_dir;
-	short normal_ring_fade_val;
-	short normal_ring_fade_dir;
-	unsigned char ammo_active;
-	int OBJLIST_SPACING;
-	MenuOption current_options[3];
-	InventoryMode invMode;
-	int inventoryItemChosen;
-	int enterInventory;
-	int lastInvItem;
-
-	// Ammo variables
-	unsigned short AmountShotGunAmmo1;
-	unsigned short AmountShotGunAmmo2;
-	unsigned short AmountHKAmmo1;
-	unsigned short AmountCrossBowAmmo1;
-	unsigned short AmountCrossBowAmmo2;
-	unsigned short AmountCrossBowAmmo3;
-	unsigned short AmountGrenadeAmmo1;
-	unsigned short AmountGrenadeAmmo2;
-	unsigned short AmountGrenadeAmmo3;
-	unsigned short AmountRocketsAmmo;
-	unsigned short AmountHarpoonAmmo;
-	unsigned short AmountUziAmmo;
-	unsigned short AmountRevolverAmmo;
-	unsigned short AmountPistolsAmmo;
-	char CurrentPistolsAmmoType;
-	char CurrentUziAmmoType;
-	char CurrentRevolverAmmoType;
-	char CurrentShotGunAmmoType;
-	char CurrentHKAmmoType;
-	char CurrentGrenadeGunAmmoType;
-	char CurrentCrossBowAmmoType;
-	char CurrentHarpoonAmmoType;
-	char CurrentRocketAmmoType;
-	char StashedCurrentPistolsAmmoType;
-	char StashedCurrentUziAmmoType;
-	char StashedCurrentRevolverAmmoType;
-	char StashedCurrentShotGunAmmoType;
-	char StashedCurrentGrenadeGunAmmoType;
-	char StashedCurrentCrossBowAmmoType;
-	char Stashedcurrent_selected_option;
-	char StashedCurrentHKAmmoType;
-	char StashedCurrentHarpoonAmmoType;
-	char StashedCurrentRocketAmmoType;
-
-	// GUI variables
-	Menu menu_to_display = Menu::Title;
-	int selected_option;
-	int option_count;
-	int selected_save_slot;
-
-	SettingsData CurrentSettings;
 };
 
-// Inventory
-void combine_revolver_lasersight(int flag);
-void combine_crossbow_lasersight(int flag);
-void combine_HK_SILENCER(int flag);
-void combine_PuzzleItem1(int flag);
-void combine_PuzzleItem2(int flag);
-void combine_PuzzleItem3(int flag);
-void combine_PuzzleItem4(int flag);
-void combine_PuzzleItem5(int flag);
-void combine_PuzzleItem6(int flag);
-void combine_PuzzleItem7(int flag);
-void combine_PuzzleItem8(int flag);
-void combine_PuzzleItem9(int flag);
-void combine_PuzzleItem10(int flag);
-void combine_PuzzleItem11(int flag);
-void combine_PuzzleItem12(int flag);
-void combine_PuzzleItem13(int flag);
-void combine_PuzzleItem14(int flag);
-void combine_PuzzleItem15(int flag);
-void combine_PuzzleItem16(int flag);
-void combine_KeyItem1(int flag);
-void combine_KeyItem2(int flag);
-void combine_KeyItem3(int flag);
-void combine_KeyItem4(int flag);
-void combine_KeyItem5(int flag);
-void combine_KeyItem6(int flag);
-void combine_KeyItem7(int flag);
-void combine_KeyItem8(int flag);
-void combine_KeyItem9(int flag);
-void combine_KeyItem10(int flag);
-void combine_KeyItem11(int flag);
-void combine_KeyItem12(int flag);
-void combine_KeyItem13(int flag);
-void combine_KeyItem14(int flag);
-void combine_KeyItem15(int flag);
-void combine_KeyItem16(int flag);
-void combine_PickupItem1(int flag);
-void combine_PickupItem2(int flag);
-void combine_PickupItem3(int flag);
-void combine_PickupItem4(int flag);
-void combine_PickupItem5(int flag);
-void combine_PickupItem6(int flag);
-void combine_PickupItem7(int flag);
-void combine_PickupItem8(int flag);
-void combine_PickupItem9(int flag);
-void combine_PickupItem10(int flag);
-void combine_PickupItem11(int flag);
-void combine_PickupItem12(int flag);
-void combine_PickupItem13(int flag);
-void combine_PickupItem14(int flag);
-void combine_PickupItem15(int flag);
-void combine_PickupItem16(int flag);
-void combine_Examine1(int flag);
-void combine_Examine2(int flag);
-void combine_Examine3(int flag);
-void combine_Examine4(int flag);
-void combine_Examine5(int flag);
-void combine_Examine6(int flag);
-void combine_Examine7(int flag);
-void combine_Examine8(int flag);
-void combine_ClockWorkBeetle(int flag);
-
 extern GuiController g_Gui;
-extern InventoryObject inventry_objects_list[];
-extern const char* controlmsgs[];
+extern InventoryObject InventoryObjectTable[];
+extern const char* ControlStrings[];
+
+// Inventory
+void CombineRevolverLasersight(int flag);
+void CombineCrossbowLasersight(int flag);
+void CombineHKSilencer(int flag);
+void CombinePuzzleItem1(int flag);
+void CombinePuzzleItem2(int flag);
+void CombinePuzzleItem3(int flag);
+void CombinePuzzleItem4(int flag);
+void CombinePuzzleItem5(int flag);
+void CombinePuzzleItem6(int flag);
+void CombinePuzzleItem7(int flag);
+void CombinePuzzleItem8(int flag);
+void CombinePuzzleItem9(int flag);
+void CombinePuzzleItem10(int flag);
+void CombinePuzzleItem11(int flag);
+void CombinePuzzleItem12(int flag);
+void CombinePuzzleItem13(int flag);
+void CombinePuzzleItem14(int flag);
+void CombinePuzzleItem15(int flag);
+void CombinePuzzleItem16(int flag);
+void CombineKeyItem1(int flag);
+void CombineKeyItem2(int flag);
+void CombineKeyItem3(int flag);
+void CombineKeyItem4(int flag);
+void CombineKeyItem5(int flag);
+void CombineKeyItem6(int flag);
+void CombineKeyItem7(int flag);
+void CombineKeyItem8(int flag);
+void CombineKeyItem9(int flag);
+void CombineKeyItem10(int flag);
+void CombineKeyItem11(int flag);
+void CombineKeyItem12(int flag);
+void CombineKeyItem13(int flag);
+void CombineKeyItem14(int flag);
+void CombineKeyItem15(int flag);
+void CombineKeyItem16(int flag);
+void CombinePickupItem1(int flag);
+void CombinePickupItem2(int flag);
+void CombinePickupItem3(int flag);
+void CombinePickupItem4(int flag);
+void CombinePickupItem5(int flag);
+void CombinePickupItem6(int flag);
+void CombinePickupItem7(int flag);
+void CombinePickupItem8(int flag);
+void CombinePickupItem9(int flag);
+void CombinePickupItem10(int flag);
+void CombinePickupItem11(int flag);
+void CombinePickupItem12(int flag);
+void CombinePickupItem13(int flag);
+void CombinePickupItem14(int flag);
+void CombinePickupItem15(int flag);
+void CombinePickupItem16(int flag);
+void CombineExamine1(int flag);
+void CombineExamine2(int flag);
+void CombineExamine3(int flag);
+void CombineExamine4(int flag);
+void CombineExamine5(int flag);
+void CombineExamine6(int flag);
+void CombineExamine7(int flag);
+void CombineExamine8(int flag);
+void CombineClockWorkBeetle(int flag);

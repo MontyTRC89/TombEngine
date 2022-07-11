@@ -705,7 +705,7 @@ namespace TEN::Input
 
 		// Debug display for FORWARD input.
 		ActionMap[(int)In::Forward].PrintDebugInfo();
-
+		M_PI;
 		return true;
 	}
 

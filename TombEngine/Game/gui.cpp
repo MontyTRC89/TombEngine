@@ -36,7 +36,7 @@ constexpr int VOLUME_MAX = 100;
 
 GuiController g_Gui;
 
-const char* optmessages[] =
+const char* OptionStrings[] =
 {
 	STRING_USE,
 	STRING_CHOOSE_AMMO,
@@ -53,7 +53,7 @@ const char* optmessages[] =
 //	STRING_READ_DIARY
 };
 
-const char* controlmsgs[] =
+const char* ControlStrings[] =
 {
 	STRING_CONTROLS_MOVE_FORWARD,
 	STRING_CONTROLS_MOVE_BACKWARD,
@@ -74,85 +74,83 @@ const char* controlmsgs[] =
 	STRING_CONTROLS_STEP_RIGHT
 };
 
-
 /*
-if you wanna add an object to the inventory, edit the InventoryObjectTypes array then edit THIS inventry_objects_list array with the object IN THE RIGHT PLACE
+if you wanna add an object to the inventory, edit the InventoryObjectTypes array then edit THIS InventoryObjectTable array with the object IN THE RIGHT PLACE
 the #s MUST MATCH.
-i.e if uzi item is #2 in InventoryObjectTypes (starting count from 0), IT HAS TO BE THE THIRD ELEMENT IN inventry_objects_list. thank you.
+i.e if uzi item is #2 in InventoryObjectTypes (starting count from 0), IT HAS TO BE THE THIRD ELEMENT IN InventoryObjectTable. thank you.
 
 note: don't forget to add your object to the proper list construction function
 and if it's a weapon, add its ammo handling shit. (look at vars at the beginning of the file)
-if it's combineable, add its things to the combine_table and don't forget to increment MAX_COMBINES!!
+if it's combineable, add its things to the CombineTable and don't forget to increment MAX_COMBINES!!
 */
 
-CombineList combine_table[MAX_COMBINES] =
+CombineList CombineTable[MAX_COMBINES] =
 {
-	{combine_revolver_lasersight, INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER},
-	{combine_crossbow_lasersight, INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER},
-	{combine_HK_SILENCER, INV_OBJECT_HK, INV_OBJECT_SILENCER, INV_OBJECT_HK_SILENCER},
-	{combine_PuzzleItem1, INV_OBJECT_PUZZLE1_COMBO1, INV_OBJECT_PUZZLE1_COMBO2, INV_OBJECT_PUZZLE1},
-	{combine_PuzzleItem2, INV_OBJECT_PUZZLE2_COMBO1, INV_OBJECT_PUZZLE2_COMBO2, INV_OBJECT_PUZZLE2},
-	{combine_PuzzleItem3, INV_OBJECT_PUZZLE3_COMBO1, INV_OBJECT_PUZZLE3_COMBO2, INV_OBJECT_PUZZLE3},
-	{combine_PuzzleItem4, INV_OBJECT_PUZZLE4_COMBO1, INV_OBJECT_PUZZLE4_COMBO2, INV_OBJECT_PUZZLE4},
-	{combine_PuzzleItem5, INV_OBJECT_PUZZLE5_COMBO1, INV_OBJECT_PUZZLE5_COMBO2, INV_OBJECT_PUZZLE5},
-	{combine_PuzzleItem6, INV_OBJECT_PUZZLE6_COMBO1, INV_OBJECT_PUZZLE6_COMBO2, INV_OBJECT_PUZZLE6},
-	{combine_PuzzleItem7, INV_OBJECT_PUZZLE7_COMBO1, INV_OBJECT_PUZZLE7_COMBO2, INV_OBJECT_PUZZLE7},
-	{combine_PuzzleItem8, INV_OBJECT_PUZZLE8_COMBO1, INV_OBJECT_PUZZLE8_COMBO2, INV_OBJECT_PUZZLE8},
-	{combine_PuzzleItem9, INV_OBJECT_PUZZLE9_COMBO1, INV_OBJECT_PUZZLE9_COMBO2, INV_OBJECT_PUZZLE9},
-	{combine_PuzzleItem10, INV_OBJECT_PUZZLE10_COMBO1, INV_OBJECT_PUZZLE10_COMBO2, INV_OBJECT_PUZZLE10},
-	{combine_PuzzleItem11, INV_OBJECT_PUZZLE11_COMBO1, INV_OBJECT_PUZZLE11_COMBO2, INV_OBJECT_PUZZLE11},
-	{combine_PuzzleItem12, INV_OBJECT_PUZZLE12_COMBO1, INV_OBJECT_PUZZLE12_COMBO2, INV_OBJECT_PUZZLE12},
-	{combine_PuzzleItem13, INV_OBJECT_PUZZLE13_COMBO1, INV_OBJECT_PUZZLE13_COMBO2, INV_OBJECT_PUZZLE13},
-	{combine_PuzzleItem14, INV_OBJECT_PUZZLE14_COMBO1, INV_OBJECT_PUZZLE14_COMBO2, INV_OBJECT_PUZZLE14},
-	{combine_PuzzleItem15, INV_OBJECT_PUZZLE15_COMBO1, INV_OBJECT_PUZZLE15_COMBO2, INV_OBJECT_PUZZLE15},
-	{combine_PuzzleItem16, INV_OBJECT_PUZZLE16_COMBO1, INV_OBJECT_PUZZLE16_COMBO2, INV_OBJECT_PUZZLE16},
-	{combine_KeyItem1, INV_OBJECT_KEY1_COMBO1, INV_OBJECT_KEY1_COMBO2, INV_OBJECT_KEY1},
-	{combine_KeyItem2, INV_OBJECT_KEY2_COMBO1, INV_OBJECT_KEY2_COMBO2, INV_OBJECT_KEY2},
-	{combine_KeyItem3, INV_OBJECT_KEY3_COMBO1, INV_OBJECT_KEY3_COMBO2, INV_OBJECT_KEY3},
-	{combine_KeyItem4, INV_OBJECT_KEY4_COMBO1, INV_OBJECT_KEY4_COMBO2, INV_OBJECT_KEY4},
-	{combine_KeyItem5, INV_OBJECT_KEY5_COMBO1, INV_OBJECT_KEY5_COMBO2, INV_OBJECT_KEY5},
-	{combine_KeyItem6, INV_OBJECT_KEY6_COMBO1, INV_OBJECT_KEY6_COMBO2, INV_OBJECT_KEY6},
-	{combine_KeyItem7, INV_OBJECT_KEY7_COMBO1, INV_OBJECT_KEY7_COMBO2, INV_OBJECT_KEY7},
-	{combine_KeyItem8, INV_OBJECT_KEY8_COMBO1, INV_OBJECT_KEY8_COMBO2, INV_OBJECT_KEY8},
-	{combine_KeyItem9, INV_OBJECT_KEY9_COMBO1, INV_OBJECT_KEY9_COMBO2, INV_OBJECT_KEY9},
-	{combine_KeyItem10, INV_OBJECT_KEY10_COMBO1, INV_OBJECT_KEY10_COMBO2, INV_OBJECT_KEY10},
-	{combine_KeyItem11, INV_OBJECT_KEY11_COMBO1, INV_OBJECT_KEY11_COMBO2, INV_OBJECT_KEY11},
-	{combine_KeyItem12, INV_OBJECT_KEY12_COMBO1, INV_OBJECT_KEY12_COMBO2, INV_OBJECT_KEY12},
-	{combine_KeyItem13, INV_OBJECT_KEY13_COMBO1, INV_OBJECT_KEY13_COMBO2, INV_OBJECT_KEY13},
-	{combine_KeyItem14, INV_OBJECT_KEY14_COMBO1, INV_OBJECT_KEY14_COMBO2, INV_OBJECT_KEY14},
-	{combine_KeyItem15, INV_OBJECT_KEY15_COMBO1, INV_OBJECT_KEY15_COMBO2, INV_OBJECT_KEY15},
-	{combine_KeyItem16, INV_OBJECT_KEY16_COMBO1, INV_OBJECT_KEY16_COMBO2, INV_OBJECT_KEY16},
-	{combine_PickupItem1, INV_OBJECT_PICKUP1_COMBO1, INV_OBJECT_PICKUP1_COMBO2, INV_OBJECT_PICKUP1},
-	{combine_PickupItem2, INV_OBJECT_PICKUP2_COMBO1, INV_OBJECT_PICKUP2_COMBO2, INV_OBJECT_PICKUP2},
-	{combine_PickupItem3, INV_OBJECT_PICKUP3_COMBO1, INV_OBJECT_PICKUP3_COMBO2, INV_OBJECT_PICKUP3},
-	{combine_PickupItem4, INV_OBJECT_PICKUP4_COMBO1, INV_OBJECT_PICKUP4_COMBO2, INV_OBJECT_PICKUP4},
-	{combine_PickupItem5, INV_OBJECT_PICKUP5_COMBO1, INV_OBJECT_PICKUP5_COMBO2, INV_OBJECT_PICKUP5},
-	{combine_PickupItem6, INV_OBJECT_PICKUP6_COMBO1, INV_OBJECT_PICKUP6_COMBO2, INV_OBJECT_PICKUP6},
-	{combine_PickupItem7, INV_OBJECT_PICKUP7_COMBO1, INV_OBJECT_PICKUP7_COMBO2, INV_OBJECT_PICKUP7},
-	{combine_PickupItem8, INV_OBJECT_PICKUP8_COMBO1, INV_OBJECT_PICKUP8_COMBO2, INV_OBJECT_PICKUP8},
-	{combine_PickupItem9, INV_OBJECT_PICKUP9_COMBO1, INV_OBJECT_PICKUP9_COMBO2, INV_OBJECT_PICKUP9},
-	{combine_PickupItem10, INV_OBJECT_PICKUP10_COMBO1, INV_OBJECT_PICKUP10_COMBO2, INV_OBJECT_PICKUP10},
-	{combine_PickupItem11, INV_OBJECT_PICKUP11_COMBO1, INV_OBJECT_PICKUP11_COMBO2, INV_OBJECT_PICKUP11},
-	{combine_PickupItem12, INV_OBJECT_PICKUP12_COMBO1, INV_OBJECT_PICKUP12_COMBO2, INV_OBJECT_PICKUP12},
-	{combine_PickupItem13, INV_OBJECT_PICKUP13_COMBO1, INV_OBJECT_PICKUP13_COMBO2, INV_OBJECT_PICKUP13},
-	{combine_PickupItem14, INV_OBJECT_PICKUP14_COMBO1, INV_OBJECT_PICKUP14_COMBO2, INV_OBJECT_PICKUP14},
-	{combine_PickupItem15, INV_OBJECT_PICKUP15_COMBO1, INV_OBJECT_PICKUP15_COMBO2, INV_OBJECT_PICKUP15},
-	{combine_PickupItem16, INV_OBJECT_PICKUP16_COMBO1, INV_OBJECT_PICKUP16_COMBO2, INV_OBJECT_PICKUP16},
-	{combine_Examine1, INV_OBJECT_EXAMINE1_COMBO1, INV_OBJECT_EXAMINE1_COMBO2, INV_OBJECT_EXAMINE1},
-	{combine_Examine2, INV_OBJECT_EXAMINE2_COMBO1, INV_OBJECT_EXAMINE2_COMBO2, INV_OBJECT_EXAMINE2},
-	{combine_Examine3, INV_OBJECT_EXAMINE3_COMBO1, INV_OBJECT_EXAMINE3_COMBO2, INV_OBJECT_EXAMINE3},
-	{combine_Examine4, INV_OBJECT_EXAMINE4_COMBO1, INV_OBJECT_EXAMINE4_COMBO2, INV_OBJECT_EXAMINE4},
-	{combine_Examine5, INV_OBJECT_EXAMINE5_COMBO1, INV_OBJECT_EXAMINE5_COMBO2, INV_OBJECT_EXAMINE5},
-	{combine_Examine6, INV_OBJECT_EXAMINE6_COMBO1, INV_OBJECT_EXAMINE6_COMBO2, INV_OBJECT_EXAMINE6},
-	{combine_Examine7, INV_OBJECT_EXAMINE7_COMBO1, INV_OBJECT_EXAMINE7_COMBO2, INV_OBJECT_EXAMINE7},
-	{combine_Examine8, INV_OBJECT_EXAMINE8_COMBO1, INV_OBJECT_EXAMINE8_COMBO2, INV_OBJECT_EXAMINE8},
-	{combine_ClockWorkBeetle, INV_OBJECT_BEETLE_PART1, INV_OBJECT_BEETLE_PART2, INV_OBJECT_BEETLE}
+	{CombineRevolverLasersight, INV_OBJECT_REVOLVER, INV_OBJECT_LASERSIGHT, INV_OBJECT_REVOLVER_LASER},
+	{CombineCrossbowLasersight, INV_OBJECT_CROSSBOW, INV_OBJECT_LASERSIGHT, INV_OBJECT_CROSSBOW_LASER},
+	{CombineHKSilencer, INV_OBJECT_HK, INV_OBJECT_SILENCER, INV_OBJECT_HK_SILENCER},
+	{CombinePuzzleItem1, INV_OBJECT_PUZZLE1_COMBO1, INV_OBJECT_PUZZLE1_COMBO2, INV_OBJECT_PUZZLE1},
+	{CombinePuzzleItem2, INV_OBJECT_PUZZLE2_COMBO1, INV_OBJECT_PUZZLE2_COMBO2, INV_OBJECT_PUZZLE2},
+	{CombinePuzzleItem3, INV_OBJECT_PUZZLE3_COMBO1, INV_OBJECT_PUZZLE3_COMBO2, INV_OBJECT_PUZZLE3},
+	{CombinePuzzleItem4, INV_OBJECT_PUZZLE4_COMBO1, INV_OBJECT_PUZZLE4_COMBO2, INV_OBJECT_PUZZLE4},
+	{CombinePuzzleItem5, INV_OBJECT_PUZZLE5_COMBO1, INV_OBJECT_PUZZLE5_COMBO2, INV_OBJECT_PUZZLE5},
+	{CombinePuzzleItem6, INV_OBJECT_PUZZLE6_COMBO1, INV_OBJECT_PUZZLE6_COMBO2, INV_OBJECT_PUZZLE6},
+	{CombinePuzzleItem7, INV_OBJECT_PUZZLE7_COMBO1, INV_OBJECT_PUZZLE7_COMBO2, INV_OBJECT_PUZZLE7},
+	{CombinePuzzleItem8, INV_OBJECT_PUZZLE8_COMBO1, INV_OBJECT_PUZZLE8_COMBO2, INV_OBJECT_PUZZLE8},
+	{CombinePuzzleItem9, INV_OBJECT_PUZZLE9_COMBO1, INV_OBJECT_PUZZLE9_COMBO2, INV_OBJECT_PUZZLE9},
+	{CombinePuzzleItem10, INV_OBJECT_PUZZLE10_COMBO1, INV_OBJECT_PUZZLE10_COMBO2, INV_OBJECT_PUZZLE10},
+	{CombinePuzzleItem11, INV_OBJECT_PUZZLE11_COMBO1, INV_OBJECT_PUZZLE11_COMBO2, INV_OBJECT_PUZZLE11},
+	{CombinePuzzleItem12, INV_OBJECT_PUZZLE12_COMBO1, INV_OBJECT_PUZZLE12_COMBO2, INV_OBJECT_PUZZLE12},
+	{CombinePuzzleItem13, INV_OBJECT_PUZZLE13_COMBO1, INV_OBJECT_PUZZLE13_COMBO2, INV_OBJECT_PUZZLE13},
+	{CombinePuzzleItem14, INV_OBJECT_PUZZLE14_COMBO1, INV_OBJECT_PUZZLE14_COMBO2, INV_OBJECT_PUZZLE14},
+	{CombinePuzzleItem15, INV_OBJECT_PUZZLE15_COMBO1, INV_OBJECT_PUZZLE15_COMBO2, INV_OBJECT_PUZZLE15},
+	{CombinePuzzleItem16, INV_OBJECT_PUZZLE16_COMBO1, INV_OBJECT_PUZZLE16_COMBO2, INV_OBJECT_PUZZLE16},
+	{CombineKeyItem1, INV_OBJECT_KEY1_COMBO1, INV_OBJECT_KEY1_COMBO2, INV_OBJECT_KEY1},
+	{CombineKeyItem2, INV_OBJECT_KEY2_COMBO1, INV_OBJECT_KEY2_COMBO2, INV_OBJECT_KEY2},
+	{CombineKeyItem3, INV_OBJECT_KEY3_COMBO1, INV_OBJECT_KEY3_COMBO2, INV_OBJECT_KEY3},
+	{CombineKeyItem4, INV_OBJECT_KEY4_COMBO1, INV_OBJECT_KEY4_COMBO2, INV_OBJECT_KEY4},
+	{CombineKeyItem5, INV_OBJECT_KEY5_COMBO1, INV_OBJECT_KEY5_COMBO2, INV_OBJECT_KEY5},
+	{CombineKeyItem6, INV_OBJECT_KEY6_COMBO1, INV_OBJECT_KEY6_COMBO2, INV_OBJECT_KEY6},
+	{CombineKeyItem7, INV_OBJECT_KEY7_COMBO1, INV_OBJECT_KEY7_COMBO2, INV_OBJECT_KEY7},
+	{CombineKeyItem8, INV_OBJECT_KEY8_COMBO1, INV_OBJECT_KEY8_COMBO2, INV_OBJECT_KEY8},
+	{CombineKeyItem9, INV_OBJECT_KEY9_COMBO1, INV_OBJECT_KEY9_COMBO2, INV_OBJECT_KEY9},
+	{CombineKeyItem10, INV_OBJECT_KEY10_COMBO1, INV_OBJECT_KEY10_COMBO2, INV_OBJECT_KEY10},
+	{CombineKeyItem11, INV_OBJECT_KEY11_COMBO1, INV_OBJECT_KEY11_COMBO2, INV_OBJECT_KEY11},
+	{CombineKeyItem12, INV_OBJECT_KEY12_COMBO1, INV_OBJECT_KEY12_COMBO2, INV_OBJECT_KEY12},
+	{CombineKeyItem13, INV_OBJECT_KEY13_COMBO1, INV_OBJECT_KEY13_COMBO2, INV_OBJECT_KEY13},
+	{CombineKeyItem14, INV_OBJECT_KEY14_COMBO1, INV_OBJECT_KEY14_COMBO2, INV_OBJECT_KEY14},
+	{CombineKeyItem15, INV_OBJECT_KEY15_COMBO1, INV_OBJECT_KEY15_COMBO2, INV_OBJECT_KEY15},
+	{CombineKeyItem16, INV_OBJECT_KEY16_COMBO1, INV_OBJECT_KEY16_COMBO2, INV_OBJECT_KEY16},
+	{CombinePickupItem1, INV_OBJECT_PICKUP1_COMBO1, INV_OBJECT_PICKUP1_COMBO2, INV_OBJECT_PICKUP1},
+	{CombinePickupItem2, INV_OBJECT_PICKUP2_COMBO1, INV_OBJECT_PICKUP2_COMBO2, INV_OBJECT_PICKUP2},
+	{CombinePickupItem3, INV_OBJECT_PICKUP3_COMBO1, INV_OBJECT_PICKUP3_COMBO2, INV_OBJECT_PICKUP3},
+	{CombinePickupItem4, INV_OBJECT_PICKUP4_COMBO1, INV_OBJECT_PICKUP4_COMBO2, INV_OBJECT_PICKUP4},
+	{CombinePickupItem5, INV_OBJECT_PICKUP5_COMBO1, INV_OBJECT_PICKUP5_COMBO2, INV_OBJECT_PICKUP5},
+	{CombinePickupItem6, INV_OBJECT_PICKUP6_COMBO1, INV_OBJECT_PICKUP6_COMBO2, INV_OBJECT_PICKUP6},
+	{CombinePickupItem7, INV_OBJECT_PICKUP7_COMBO1, INV_OBJECT_PICKUP7_COMBO2, INV_OBJECT_PICKUP7},
+	{CombinePickupItem8, INV_OBJECT_PICKUP8_COMBO1, INV_OBJECT_PICKUP8_COMBO2, INV_OBJECT_PICKUP8},
+	{CombinePickupItem9, INV_OBJECT_PICKUP9_COMBO1, INV_OBJECT_PICKUP9_COMBO2, INV_OBJECT_PICKUP9},
+	{CombinePickupItem10, INV_OBJECT_PICKUP10_COMBO1, INV_OBJECT_PICKUP10_COMBO2, INV_OBJECT_PICKUP10},
+	{CombinePickupItem11, INV_OBJECT_PICKUP11_COMBO1, INV_OBJECT_PICKUP11_COMBO2, INV_OBJECT_PICKUP11},
+	{CombinePickupItem12, INV_OBJECT_PICKUP12_COMBO1, INV_OBJECT_PICKUP12_COMBO2, INV_OBJECT_PICKUP12},
+	{CombinePickupItem13, INV_OBJECT_PICKUP13_COMBO1, INV_OBJECT_PICKUP13_COMBO2, INV_OBJECT_PICKUP13},
+	{CombinePickupItem14, INV_OBJECT_PICKUP14_COMBO1, INV_OBJECT_PICKUP14_COMBO2, INV_OBJECT_PICKUP14},
+	{CombinePickupItem15, INV_OBJECT_PICKUP15_COMBO1, INV_OBJECT_PICKUP15_COMBO2, INV_OBJECT_PICKUP15},
+	{CombinePickupItem16, INV_OBJECT_PICKUP16_COMBO1, INV_OBJECT_PICKUP16_COMBO2, INV_OBJECT_PICKUP16},
+	{CombineExamine1, INV_OBJECT_EXAMINE1_COMBO1, INV_OBJECT_EXAMINE1_COMBO2, INV_OBJECT_EXAMINE1},
+	{CombineExamine2, INV_OBJECT_EXAMINE2_COMBO1, INV_OBJECT_EXAMINE2_COMBO2, INV_OBJECT_EXAMINE2},
+	{CombineExamine3, INV_OBJECT_EXAMINE3_COMBO1, INV_OBJECT_EXAMINE3_COMBO2, INV_OBJECT_EXAMINE3},
+	{CombineExamine4, INV_OBJECT_EXAMINE4_COMBO1, INV_OBJECT_EXAMINE4_COMBO2, INV_OBJECT_EXAMINE4},
+	{CombineExamine5, INV_OBJECT_EXAMINE5_COMBO1, INV_OBJECT_EXAMINE5_COMBO2, INV_OBJECT_EXAMINE5},
+	{CombineExamine6, INV_OBJECT_EXAMINE6_COMBO1, INV_OBJECT_EXAMINE6_COMBO2, INV_OBJECT_EXAMINE6},
+	{CombineExamine7, INV_OBJECT_EXAMINE7_COMBO1, INV_OBJECT_EXAMINE7_COMBO2, INV_OBJECT_EXAMINE7},
+	{CombineExamine8, INV_OBJECT_EXAMINE8_COMBO1, INV_OBJECT_EXAMINE8_COMBO2, INV_OBJECT_EXAMINE8},
+	{CombineClockWorkBeetle, INV_OBJECT_BEETLE_PART1, INV_OBJECT_BEETLE_PART2, INV_OBJECT_BEETLE}
 };
 
-InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
+InventoryObject InventoryObjectTable[INVENTORY_TABLE_SIZE] =
 {
 	// Weapons
-
 	{ID_PISTOLS_ITEM, 6, 0.5f, ANGLE(90), ANGLE(243.69873046875f), ANGLE(276.1328125), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_PISTOLS, STRING_PISTOLS, NO_JOINT_BITS,  INV_ROT_Y},
 	{ID_PISTOLS_AMMO_ITEM, 4, 0.5f, 0, ANGLE(90), 0, OPT_USE, STRING_PISTOLS_AMMO, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_UZI_ITEM, -4, 0.5f, ANGLE(-90) , ANGLE(135), ANGLE(90), OPT_EQUIP | OPT_COMBINABLE | OPT_CHOOSEAMMO_UZI, STRING_UZI , NO_JOINT_BITS, INV_ROT_Y},
@@ -181,7 +179,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_ROCKET_LAUNCHER_AMMO_ITEM, 3, 0.5f, ANGLE(90), 0, ANGLE(15), OPT_USE, STRING_ROCKET_AMMO, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Misc
-
 	{ID_LASERSIGHT_ITEM, 2, 0.5f, ANGLE(90), ANGLE(10), 0, OPT_USE | OPT_COMBINABLE, STRING_LASERSIGHT, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_SILENCER_ITEM, 1, 0.5f, 0, ANGLE(10), 0, OPT_USE | OPT_COMBINABLE, STRING_SILENCER, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_BIGMEDI_ITEM, 2, 0.7f, ANGLE(180), 0, 0, OPT_USE, STRING_LARGE_MEDIPACK, NO_JOINT_BITS, INV_ROT_Y},
@@ -211,7 +208,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_OPEN_DIARY_ITEM, 0, 0.9f, ANGLE(90), 0, 0, 0, 0, 0, 0},
 
 	// Puzzles
-
 	{ID_PUZZLE_ITEM1, 14, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PUZZLE_ITEM2, 14, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PUZZLE_ITEM3, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -230,7 +226,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_PUZZLE_ITEM16, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Puzzle combos
-
 	{ID_PUZZLE_ITEM1_COMBO1, 18, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PUZZLE_ITEM1_COMBO2, 18, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PUZZLE_ITEM2_COMBO1, 8, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -265,7 +260,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_PUZZLE_ITEM16_COMBO2, 8, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Keys
-
 	{ID_KEY_ITEM1, 14, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_KEY_ITEM2, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_KEY_ITEM3, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -284,7 +278,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_KEY_ITEM16, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Key combos
-	
 	{ID_KEY_ITEM1_COMBO1, 18, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_KEY_ITEM1_COMBO2, 18, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_KEY_ITEM2_COMBO1, 8, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -319,7 +312,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_KEY_ITEM16_COMBO2, 8, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Pickups
-
 	{ID_PICKUP_ITEM1, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PICKUP_ITEM2, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PICKUP_ITEM3, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -338,7 +330,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_PICKUP_ITEM16, 8, 0.5f, 0, 0, 0, OPT_USE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Pickup combos
-
 	{ID_PICKUP_ITEM1_COMBO1, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PICKUP_ITEM1_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_PICKUP_ITEM2_COMBO1, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -373,7 +364,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_PICKUP_ITEM16_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Examines
-
 	{ID_EXAMINE1, 4, 0.5f, 0, 0, 0, OPT_EXAMINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_EXAMINE2, 14, 0.5f, 0, 0, 0, OPT_EXAMINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_EXAMINE3, 14, 0.5f, 0, 0, 0, OPT_EXAMINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -384,7 +374,6 @@ InventoryObject inventry_objects_list[INVENTORY_TABLE_SIZE] =
 	{ID_EXAMINE8, 14, 0.5f, 0, 0, 0, OPT_EXAMINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 
 	// Examines combos
-
 	{ID_EXAMINE1_COMBO1, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_EXAMINE1_COMBO2, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
 	{ID_EXAMINE2_COMBO1, 14, 0.5f, 0, 0, 0, OPT_USE | OPT_COMBINABLE, STRING_LOAD_GAME, NO_JOINT_BITS, INV_ROT_Y},
@@ -410,62 +399,62 @@ SettingsData GuiController::GetCurrentSettings()
 
 InventoryRing* GuiController::GetRings(int ringIndex)
 {
-	return rings[ringIndex];
+	return Rings[ringIndex];
 }
 
 short GuiController::GetSelectedOption()
 {
-	return selected_option;
+	return SelectedOption;
 }
 
 Menu GuiController::GetMenuToDisplay()
 {
-	return menu_to_display;
+	return MenuToDisplay;
 }
 
 void GuiController::SetSelectedOption(int menu)
 {
-	selected_option = menu;
+	SelectedOption = menu;
 }
 
 void GuiController::SetMenuToDisplay(Menu menu)
 {
-	menu_to_display = menu;
+	MenuToDisplay = menu;
 }
 
 InventoryMode GuiController::GetInventoryMode()
 {
-	return invMode;
+	return InvMode;
 }
 
 void GuiController::SetInventoryMode(InventoryMode mode)
 {
-	invMode = mode;
+	InvMode = mode;
 }
 
 void GuiController::SetInventoryItemChosen(int number)
 {
-	inventoryItemChosen = number;
+	InventoryItemChosen = number;
 }
 
 int GuiController::GetInventoryItemChosen()
 {
-	return inventoryItemChosen;
+	return InventoryItemChosen;
 }
 
 void GuiController::SetEnterInventory(int number)
 {
-	enterInventory = number;
+	EnterInventory = number;
 }
 
 int GuiController::GetEnterInventory()
 {
-	return enterInventory;
+	return EnterInventory;
 }
 
 int GuiController::GetLastInventoryItem()
 {
-	return lastInvItem;
+	return LastInvItem;
 }
 
 void GuiController::DrawInventory()
@@ -480,23 +469,23 @@ InventoryResult GuiController::TitleOptions()
 
 	// Stuff for credits goes here!
 
-	switch (menu_to_display)
+	switch (MenuToDisplay)
 	{
 	case Menu::Title:
-		option_count = 3;
+		OptionCount = 3;
 		break;
 
 	case Menu::SelectLevel:
 		inventoryResult = InventoryResult::None;
-		option_count = g_GameFlow->GetNumLevels() - 2;
+		OptionCount = g_GameFlow->GetNumLevels() - 2;
 		break;
 
 	case Menu::LoadGame:
-		option_count = SAVEGAME_MAX - 1;
+		OptionCount = SAVEGAME_MAX - 1;
 		break;
 
 	case Menu::Options:
-		option_count = 2;
+		OptionCount = 2;
 		break;
 
 	case Menu::Display:
@@ -512,7 +501,7 @@ InventoryResult GuiController::TitleOptions()
 		break;
 	}
 
-	if (menu_to_display == Menu::LoadGame)
+	if (MenuToDisplay == Menu::LoadGame)
 	{
 		switch (DoLoad())
 		{
@@ -521,8 +510,8 @@ InventoryResult GuiController::TitleOptions()
 			break;
 
 		case LoadResult::Cancel:
-			menu_to_display = Menu::Title;
-			selected_option = selectedOptionBackup;
+			MenuToDisplay = Menu::Title;
+			SelectedOption = selectedOptionBackup;
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			break;
 
@@ -530,31 +519,31 @@ InventoryResult GuiController::TitleOptions()
 			break;
 		}
 	}
-	else if (menu_to_display == Menu::Title || 
-			 menu_to_display == Menu::SelectLevel || 
-			 menu_to_display == Menu::Options)
+	else if (MenuToDisplay == Menu::Title || 
+			 MenuToDisplay == Menu::SelectLevel || 
+			 MenuToDisplay == Menu::Options)
 	{
 		if (GUI_INPUT_UP)
 		{
-			selected_option = (selected_option <= 0) ? option_count : (selected_option - 1);
+			SelectedOption = (SelectedOption <= 0) ? OptionCount : (SelectedOption - 1);
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (GUI_INPUT_DOWN)
 		{
-			if (selected_option < option_count)
-				selected_option++;
+			if (SelectedOption < OptionCount)
+				SelectedOption++;
 			else
-				selected_option -= option_count;
+				SelectedOption -= OptionCount;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (GUI_INPUT_DESELECT &&
-			menu_to_display != Menu::Title)
+			MenuToDisplay != Menu::Title)
 		{
-			menu_to_display = Menu::Title;
-			selected_option = selectedOptionBackup;
+			MenuToDisplay = Menu::Title;
+			SelectedOption = selectedOptionBackup;
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		}
 
@@ -562,16 +551,16 @@ InventoryResult GuiController::TitleOptions()
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-			if (menu_to_display == Menu::Title)
+			if (MenuToDisplay == Menu::Title)
 			{
-				switch (selected_option)
+				switch (SelectedOption)
 				{
 				case 0:
 					if (g_GameFlow->CanPlayAnyLevel())
 					{
-						selectedOptionBackup = selected_option;
-						selected_option = 0;
-						menu_to_display = Menu::SelectLevel;
+						selectedOptionBackup = SelectedOption;
+						SelectedOption = 0;
+						MenuToDisplay = Menu::SelectLevel;
 					}
 					else
 						inventoryResult = InventoryResult::NewGame;
@@ -579,15 +568,15 @@ InventoryResult GuiController::TitleOptions()
 					break;
 
 				case 1:
-					selectedOptionBackup = selected_option;
-					selected_option = 0;
-					menu_to_display = Menu::LoadGame;
+					selectedOptionBackup = SelectedOption;
+					SelectedOption = 0;
+					MenuToDisplay = Menu::LoadGame;
 					break;
 
 				case 2:
-					selectedOptionBackup = selected_option;
-					selected_option = 0;
-					menu_to_display = Menu::Options;
+					selectedOptionBackup = SelectedOption;
+					SelectedOption = 0;
+					MenuToDisplay = Menu::Options;
 					break;
 
 				case 3:
@@ -595,15 +584,15 @@ InventoryResult GuiController::TitleOptions()
 					break;
 				}
 			}
-			else if (menu_to_display == Menu::SelectLevel)
+			else if (MenuToDisplay == Menu::SelectLevel)
 			{
 				// Level 0 is the title level, so increment the option by 1 to offset it.
-				g_GameFlow->SelectedLevelForNewGame = selected_option + 1;
-				menu_to_display = Menu::Title;
-				selected_option = 0;
+				g_GameFlow->SelectedLevelForNewGame = SelectedOption + 1;
+				MenuToDisplay = Menu::Title;
+				SelectedOption = 0;
 				inventoryResult = InventoryResult::NewGameSelectedLevel;
 			}
-			else if (menu_to_display == Menu::Options)
+			else if (MenuToDisplay == Menu::Options)
 				HandleOptionsInput();
 		}
 	}
@@ -617,14 +606,14 @@ void GuiController::FillDisplayOptions()
 	BackupOptions();
 
 	// Get current display mode
-	CurrentSettings.selectedScreenResolution = 0;
+	CurrentSettings.SelectedScreenResolution = 0;
 	for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 	{
 		auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
-		if (screenResolution.x == CurrentSettings.conf.Width &&
-			screenResolution.y == CurrentSettings.conf.Height)
+		if (screenResolution.x == CurrentSettings.Configuration.Width &&
+			screenResolution.y == CurrentSettings.Configuration.Height)
 		{
-			CurrentSettings.selectedScreenResolution = i;
+			CurrentSettings.SelectedScreenResolution = i;
 			break;
 		}
 	}
@@ -632,102 +621,102 @@ void GuiController::FillDisplayOptions()
 
 void GuiController::HandleDisplaySettingsInput(bool pause)
 {
-	option_count = 6;
+	OptionCount = 6;
 
 	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr);
-		menu_to_display = Menu::Options;
-		selected_option = 0;
+		MenuToDisplay = Menu::Options;
+		SelectedOption = 0;
 		return;
 	}
 
 	if (GUI_INPUT_LEFT)
 	{
-		switch (selected_option)
+		switch (SelectedOption)
 		{
 		case 0:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			if (CurrentSettings.selectedScreenResolution > 0)
-				CurrentSettings.selectedScreenResolution--;
+			if (CurrentSettings.SelectedScreenResolution > 0)
+				CurrentSettings.SelectedScreenResolution--;
 
 			break;
 
 		case 1:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
+			CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
 			break;
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.ShadowMode--;
-			if (CurrentSettings.conf.ShadowMode < SHADOW_NONE) CurrentSettings.conf.ShadowMode = SHADOW_ALL;
+			CurrentSettings.Configuration.ShadowMode--;
+			if (CurrentSettings.Configuration.ShadowMode < SHADOW_NONE) CurrentSettings.Configuration.ShadowMode = SHADOW_ALL;
 			break;
 
 		case 3:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
+			CurrentSettings.Configuration.EnableCaustics = !CurrentSettings.Configuration.EnableCaustics;
 			break;
 
 		case 4:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			CurrentSettings.Configuration.EnableVolumetricFog = !CurrentSettings.Configuration.EnableVolumetricFog;
 			break;
 		}
 	}
 
 	if (GUI_INPUT_RIGHT)
 	{
-		switch (selected_option)
+		switch (SelectedOption)
 		{
 		case 0:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			if (CurrentSettings.selectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
-				CurrentSettings.selectedScreenResolution++;
+			if (CurrentSettings.SelectedScreenResolution < g_Configuration.SupportedScreenResolutions.size() - 1)
+				CurrentSettings.SelectedScreenResolution++;
 
 			break;
 
 		case 1:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.Windowed = !CurrentSettings.conf.Windowed;
+			CurrentSettings.Configuration.Windowed = !CurrentSettings.Configuration.Windowed;
 			break;
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.ShadowMode++;
-			if (CurrentSettings.conf.ShadowMode > SHADOW_ALL)
-				CurrentSettings.conf.ShadowMode = SHADOW_NONE;
+			CurrentSettings.Configuration.ShadowMode++;
+			if (CurrentSettings.Configuration.ShadowMode > SHADOW_ALL)
+				CurrentSettings.Configuration.ShadowMode = SHADOW_NONE;
 
 			break;
 
 		case 3:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableCaustics = !CurrentSettings.conf.EnableCaustics;
+			CurrentSettings.Configuration.EnableCaustics = !CurrentSettings.Configuration.EnableCaustics;
 			break;
 
 		case 4:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableVolumetricFog = !CurrentSettings.conf.EnableVolumetricFog;
+			CurrentSettings.Configuration.EnableVolumetricFog = !CurrentSettings.Configuration.EnableVolumetricFog;
 			break;
 		}
 	}
 
 	if (GUI_INPUT_UP)
 	{
-		if (selected_option <= 0)
-			selected_option += option_count;
+		if (SelectedOption <= 0)
+			SelectedOption += OptionCount;
 		else
-			selected_option--;
+			SelectedOption--;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (GUI_INPUT_DOWN)
 	{
-		if (selected_option < option_count)
-			selected_option++;
+		if (SelectedOption < OptionCount)
+			SelectedOption++;
 		else
-			selected_option -= option_count;
+			SelectedOption -= OptionCount;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
@@ -736,52 +725,53 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-		if (selected_option == 5)
+		if (SelectedOption == 5)
 		{
 			// Save the configuration
-			auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.selectedScreenResolution];
-			CurrentSettings.conf.Width = screenResolution.x;
-			CurrentSettings.conf.Height = screenResolution.y;
+			auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
+			CurrentSettings.Configuration.Width = screenResolution.x;
+			CurrentSettings.Configuration.Height = screenResolution.y;
 
-			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			memcpy(&g_Configuration, &CurrentSettings.Configuration, sizeof(GameConfiguration));
 			SaveConfiguration();
 
 			// Reset screen and go back
-			g_Renderer.ChangeScreenResolution(CurrentSettings.conf.Width, CurrentSettings.conf.Height, 
-				CurrentSettings.conf.Windowed);
+			g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.Width, CurrentSettings.Configuration.Height, 
+				CurrentSettings.Configuration.Windowed);
 
-			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = pause ? 1 : 0;
+			MenuToDisplay = pause ? Menu::Pause : Menu::Options;
+			SelectedOption = pause ? 1 : 0;
 		}
-		else if (selected_option == 6)
+		else if (SelectedOption == 6)
 		{
-			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = pause ? 1 : 0;
+			MenuToDisplay = pause ? Menu::Pause : Menu::Options;
+			SelectedOption = pause ? 1 : 0;
 		}
 	}
 }
 
 void GuiController::HandleControlSettingsInput(bool pause)
 {
-	option_count = KEY_COUNT + 1;
+	OptionCount = KEY_COUNT + 1;
 
-	CurrentSettings.waitingForkey = false;
+	CurrentSettings.WaitingForKey = false;
 
-	if (CurrentSettings.ignoreInput)
+	if (CurrentSettings.IgnoreInput)
 	{
 		if (!TrInput)
-			CurrentSettings.ignoreInput = false;
+			CurrentSettings.IgnoreInput = false;
+
 		return;
 	}
 
-	if (GUI_INPUT_SELECT && selected_option <= 16)
+	if (GUI_INPUT_SELECT && SelectedOption <= 16)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		CurrentSettings.waitingForkey = true;
-		CurrentSettings.ignoreInput = true;
+		CurrentSettings.WaitingForKey = true;
+		CurrentSettings.IgnoreInput = true;
 	}
 
-	if (CurrentSettings.waitingForkey)
+	if (CurrentSettings.WaitingForKey)
 	{
 		TrInput = 0;
 		DbInput = 0;
@@ -790,10 +780,10 @@ void GuiController::HandleControlSettingsInput(bool pause)
 		{
 			UpdateInput();
 
-			if (CurrentSettings.ignoreInput)
+			if (CurrentSettings.IgnoreInput)
 			{
 				if (!TrInput)
-					CurrentSettings.ignoreInput = false;
+					CurrentSettings.IgnoreInput = false;
 			}
 			else
 			{
@@ -809,11 +799,11 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 				if (selectedKey && g_KeyNames[selectedKey])
 				{
-					KeyboardLayout[1][selected_option] = selectedKey;
+					KeyboardLayout[1][SelectedOption] = selectedKey;
 					DefaultConflict();
 
-					CurrentSettings.waitingForkey = false;
-					CurrentSettings.ignoreInput = true;
+					CurrentSettings.WaitingForKey = false;
+					CurrentSettings.IgnoreInput = true;
 					return;
 				}
 			}
@@ -836,20 +826,20 @@ void GuiController::HandleControlSettingsInput(bool pause)
 	{
 		if (GUI_INPUT_UP)
 		{
-			if (selected_option <= 0)
-				selected_option += option_count;
+			if (SelectedOption <= 0)
+				SelectedOption += OptionCount;
 			else
-				selected_option--;
+				SelectedOption--;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (GUI_INPUT_DOWN)
 		{
-			if (selected_option < option_count)
-				selected_option++;
+			if (SelectedOption < OptionCount)
+				SelectedOption++;
 			else
-				selected_option -= option_count;
+				SelectedOption -= OptionCount;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
@@ -857,24 +847,24 @@ void GuiController::HandleControlSettingsInput(bool pause)
 		if (GUI_INPUT_SELECT)
 		{
 			// Apply
-			if (selected_option == option_count - 1)
+			if (SelectedOption == OptionCount - 1)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(CurrentSettings.conf.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
+				memcpy(CurrentSettings.Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
 				memcpy(g_Configuration.KeyboardLayout, KeyboardLayout[1], KEY_COUNT * sizeof(short));
 				SaveConfiguration();
-				menu_to_display = pause ? Menu::Pause : Menu::Options;
-				selected_option = 2;
+				MenuToDisplay = pause ? Menu::Pause : Menu::Options;
+				SelectedOption = 2;
 				return;
 			}
 
 			// Cancel
-			if (selected_option == option_count)
+			if (SelectedOption == OptionCount)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				memcpy(KeyboardLayout[1], CurrentSettings.conf.KeyboardLayout, KEY_COUNT * sizeof(short));
-				menu_to_display = pause ? Menu::Pause : Menu::Options;
-				selected_option = 2;
+				memcpy(KeyboardLayout[1], CurrentSettings.Configuration.KeyboardLayout, KEY_COUNT * sizeof(short));
+				MenuToDisplay = pause ? Menu::Pause : Menu::Options;
+				SelectedOption = 2;
 				return;
 			}
 		}
@@ -883,51 +873,51 @@ void GuiController::HandleControlSettingsInput(bool pause)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-			menu_to_display = Menu::Options;
-			selected_option = 2;
+			MenuToDisplay = Menu::Options;
+			SelectedOption = 2;
 		}
 	}
 }
 
 void GuiController::BackupOptions()
 {
-	memcpy(&CurrentSettings.conf, &g_Configuration, sizeof(GameConfiguration));
+	memcpy(&CurrentSettings.Configuration, &g_Configuration, sizeof(GameConfiguration));
 }
 
 void GuiController::HandleOptionsInput()
 {
-	switch (selected_option)
+	switch (SelectedOption)
 	{
 	case 0:
 		FillDisplayOptions();
-		menu_to_display = Menu::Display;
-		selected_option = 0;
+		MenuToDisplay = Menu::Display;
+		SelectedOption = 0;
 		break;
 
 	case 1:
 		BackupOptions();
-		menu_to_display = Menu::OtherSettings;
-		selected_option = 0;
+		MenuToDisplay = Menu::OtherSettings;
+		SelectedOption = 0;
 		break;
 
 	case 2:
 		BackupOptions();
-		menu_to_display = Menu::Controls;
-		selected_option = 0;
+		MenuToDisplay = Menu::Controls;
+		SelectedOption = 0;
 		break;
 	}
 }
 
 void GuiController::HandleOtherSettingsInput(bool pause)
 {
-	option_count = 7;
+	OptionCount = 7;
 
 	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-		menu_to_display = Menu::Options;
-		selected_option = 1;
+		MenuToDisplay = Menu::Options;
+		SelectedOption = 1;
 
 		SetVolumeMusic(g_Configuration.MusicVolume);
 		SetVolumeFX(g_Configuration.SfxVolume);
@@ -936,50 +926,50 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 
 	if (GUI_INPUT_LEFT || GUI_INPUT_RIGHT)
 	{
-		switch (selected_option)
+		switch (SelectedOption)
 		{
 
 		case 0:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableReverb = !CurrentSettings.conf.EnableReverb;
+			CurrentSettings.Configuration.EnableReverb = !CurrentSettings.Configuration.EnableReverb;
 			break;
 
 		case 3:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.AutoTarget = !CurrentSettings.conf.AutoTarget;
+			CurrentSettings.Configuration.AutoTarget = !CurrentSettings.Configuration.AutoTarget;
 			break;
 
 		case 4:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableRumble = !CurrentSettings.conf.EnableRumble;
+			CurrentSettings.Configuration.EnableRumble = !CurrentSettings.Configuration.EnableRumble;
 			break;
 
 		case 5:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.EnableThumbstickCameraControl = !CurrentSettings.conf.EnableThumbstickCameraControl;
+			CurrentSettings.Configuration.EnableThumbstickCameraControl = !CurrentSettings.Configuration.EnableThumbstickCameraControl;
 			break;
 		}
 	}
 
 	if (GUI_INPUT_LEFT)
 	{
-		switch (selected_option)
+		switch (SelectedOption)
 		{
 		case 1:
-			if (CurrentSettings.conf.MusicVolume > 0)
+			if (CurrentSettings.Configuration.MusicVolume > 0)
 			{
-				CurrentSettings.conf.MusicVolume--;
-				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
+				CurrentSettings.Configuration.MusicVolume--;
+				SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
 			break;
 
 		case 2:
-			if (CurrentSettings.conf.SfxVolume > 0)
+			if (CurrentSettings.Configuration.SfxVolume > 0)
 			{
-				CurrentSettings.conf.SfxVolume--;
-				SetVolumeFX(CurrentSettings.conf.SfxVolume);
+				CurrentSettings.Configuration.SfxVolume--;
+				SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
@@ -989,23 +979,23 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 
 	if (GUI_INPUT_RIGHT)
 	{
-		switch (selected_option)
+		switch (SelectedOption)
 		{
 		case 1:
-			if (CurrentSettings.conf.MusicVolume < VOLUME_MAX)
+			if (CurrentSettings.Configuration.MusicVolume < VOLUME_MAX)
 			{
-				CurrentSettings.conf.MusicVolume++;
-				SetVolumeMusic(CurrentSettings.conf.MusicVolume);
+				CurrentSettings.Configuration.MusicVolume++;
+				SetVolumeMusic(CurrentSettings.Configuration.MusicVolume);
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
 			break;
 
 		case 2:
-			if (CurrentSettings.conf.SfxVolume < VOLUME_MAX)
+			if (CurrentSettings.Configuration.SfxVolume < VOLUME_MAX)
 			{
-				CurrentSettings.conf.SfxVolume++;
-				SetVolumeFX(CurrentSettings.conf.SfxVolume);
+				CurrentSettings.Configuration.SfxVolume++;
+				SetVolumeFX(CurrentSettings.Configuration.SfxVolume);
 				SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 			}
 
@@ -1015,20 +1005,20 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 
 	if (GUI_INPUT_UP)
 	{
-		if (selected_option <= 0)
-			selected_option += option_count;
+		if (SelectedOption <= 0)
+			SelectedOption += OptionCount;
 		else
-			selected_option--;
+			SelectedOption--;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (GUI_INPUT_DOWN)
 	{
-		if (selected_option < option_count)
-			selected_option++;
+		if (SelectedOption < OptionCount)
+			SelectedOption++;
 		else
-			selected_option -= option_count;
+			SelectedOption -= OptionCount;
 
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
@@ -1037,29 +1027,29 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 
-		if (selected_option == option_count - 1)
+		if (SelectedOption == OptionCount - 1)
 		{
 			// Was rumble setting changed?
-			bool indicateRumble = CurrentSettings.conf.EnableRumble && !g_Configuration.EnableRumble;
+			bool indicateRumble = CurrentSettings.Configuration.EnableRumble && !g_Configuration.EnableRumble;
 
 			// Save the configuration
-			memcpy(&g_Configuration, &CurrentSettings.conf, sizeof(GameConfiguration));
+			memcpy(&g_Configuration, &CurrentSettings.Configuration, sizeof(GameConfiguration));
 			SaveConfiguration();
 
 			// Rumble if setting was changed
 			if (indicateRumble)
 				Rumble(0.5f);
 
-			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = 1;
+			MenuToDisplay = pause ? Menu::Pause : Menu::Options;
+			SelectedOption = 1;
 		}
-		else if (selected_option == option_count)
+		else if (SelectedOption == OptionCount)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			SetVolumeMusic(g_Configuration.MusicVolume);
 			SetVolumeFX(g_Configuration.SfxVolume);
-			menu_to_display = pause ? Menu::Pause : Menu::Options;
-			selected_option = 1;
+			MenuToDisplay = pause ? Menu::Pause : Menu::Options;
+			SelectedOption = 1;
 		}
 	}
 }
@@ -1068,18 +1058,18 @@ InventoryResult GuiController::DoPauseMenu()
 {
 	UpdateInput();
 
-	switch (menu_to_display)
+	switch (MenuToDisplay)
 	{
 	case Menu::Pause:
-		option_count = 2;
+		OptionCount = 2;
 		break;
 
 	case Menu::Statistics:
-		option_count = 0;
+		OptionCount = 0;
 		break;
 
 	case Menu::Options:
-		option_count = 2;
+		OptionCount = 2;
 		break;
 
 	case Menu::Display:
@@ -1095,24 +1085,24 @@ InventoryResult GuiController::DoPauseMenu()
 		break;
 	}
 
-	if (menu_to_display == Menu::Pause || menu_to_display == Menu::Options)
+	if (MenuToDisplay == Menu::Pause || MenuToDisplay == Menu::Options)
 	{
 		if (GUI_INPUT_UP)
 		{
-			if (selected_option <= 0)
-				selected_option += option_count;
+			if (SelectedOption <= 0)
+				SelectedOption += OptionCount;
 			else
-				selected_option--;
+				SelectedOption--;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
 
 		if (GUI_INPUT_DOWN)
 		{
-			if (selected_option < option_count)
-				selected_option++;
+			if (SelectedOption < OptionCount)
+				SelectedOption++;
 			else
-				selected_option -= option_count;
+				SelectedOption -= OptionCount;
 
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 		}
@@ -1120,41 +1110,41 @@ InventoryResult GuiController::DoPauseMenu()
 
 	if (GUI_INPUT_DESELECT || IsClicked(In::Pause))
 	{
-		if (menu_to_display == Menu::Pause)
+		if (MenuToDisplay == Menu::Pause)
 		{
-			invMode = InventoryMode::None;
+			InvMode = InventoryMode::None;
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			return InventoryResult::None;
 		}
 
-		if (menu_to_display == Menu::Statistics || menu_to_display == Menu::Options)
+		if (MenuToDisplay == Menu::Statistics || MenuToDisplay == Menu::Options)
 		{
-			selected_option = menu_to_display == Menu::Statistics ? 0 : 1;
-			menu_to_display = Menu::Pause;
+			SelectedOption = MenuToDisplay == Menu::Statistics ? 0 : 1;
+			MenuToDisplay = Menu::Pause;
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 		}
 	}
 
 	if (GUI_INPUT_SELECT)
 	{
-		switch (menu_to_display)
+		switch (MenuToDisplay)
 		{
 		case Menu::Pause:
 
-			switch (selected_option)
+			switch (SelectedOption)
 			{
 			case 0:
-				selected_option = 0;
-				menu_to_display = Menu::Statistics;
+				SelectedOption = 0;
+				MenuToDisplay = Menu::Statistics;
 				break;
 
 			case 1:
-				selected_option = 0;
-				menu_to_display = Menu::Options;
+				SelectedOption = 0;
+				MenuToDisplay = Menu::Options;
 				break;
 
 			case 2:
-				invMode = InventoryMode::None;
+				InvMode = InventoryMode::None;
 				return InventoryResult::ExitToTitle;
 			}
 			break;
@@ -1164,7 +1154,7 @@ InventoryResult GuiController::DoPauseMenu()
 			break;
 
 		case Menu::Statistics:
-			menu_to_display = Menu::Pause;
+			MenuToDisplay = Menu::Pause;
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			break;
 		}
@@ -1181,12 +1171,12 @@ bool GuiController::DoObjectsCombine(int objectNumber1, int objectNumber2)
 {
 	for (int n = 0; n < MAX_COMBINES; n++)
 	{
-		if (combine_table[n].item1 == objectNumber1 &&
-			combine_table[n].item2 == objectNumber2)
+		if (CombineTable[n].item1 == objectNumber1 &&
+			CombineTable[n].item2 == objectNumber2)
 			return true;
 
-		if (combine_table[n].item1 == objectNumber2 &&
-			combine_table[n].item2 == objectNumber1)
+		if (CombineTable[n].item1 == objectNumber2 &&
+			CombineTable[n].item2 == objectNumber1)
 			return true;
 	}
 
@@ -1199,15 +1189,15 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 	{
 		for (int n = 0; n < MAX_COMBINES; n++)
 		{
-			if (combine_table[n].item1 == objectNumber)
+			if (CombineTable[n].item1 == objectNumber)
 			{
-				if (IsItemInInventory(combine_table[n].item2))
+				if (IsItemInInventory(CombineTable[n].item2))
 					return true;
 			}
 
-			if (combine_table[n].item2 == objectNumber)
+			if (CombineTable[n].item2 == objectNumber)
 			{
-				if (IsItemInInventory(combine_table[n].item1))
+				if (IsItemInInventory(CombineTable[n].item1))
 					return true;
 			}
 		}
@@ -1236,7 +1226,7 @@ bool GuiController::IsItemInInventory(int objectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == objectNumber)
+		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem == objectNumber)
 			return 1;
 	}
 
@@ -1248,18 +1238,18 @@ void GuiController::CombineObjects(int objectNumber1, int objectNumber2)
 	int n;
 	for (n = 0; n < MAX_COMBINES; n++)
 	{
-		if (combine_table[n].item1 == objectNumber1 &&
-			combine_table[n].item2 == objectNumber2)
+		if (CombineTable[n].item1 == objectNumber1 &&
+			CombineTable[n].item2 == objectNumber2)
 			break;
 
-		if (combine_table[n].item1 == objectNumber2 &&
-			combine_table[n].item2 == objectNumber1)
+		if (CombineTable[n].item1 == objectNumber2 &&
+			CombineTable[n].item2 == objectNumber1)
 			break;
 	}
 
-	combine_table[n].combine_routine(0);
+	CombineTable[n].CombineRoutine(0);
 	ConstructObjectList();
-	SetupObjectListStartPosition(combine_table[n].combined_item);
+	SetupObjectListStartPosition(CombineTable[n].combined_item);
 	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
@@ -1268,28 +1258,28 @@ void GuiController::SeparateObject(int objectNumber)
 	int n;
 	for (n = 0; n < MAX_COMBINES; n++)
 	{
-		if (combine_table[n].combined_item == objectNumber)
+		if (CombineTable[n].combined_item == objectNumber)
 			break;
 	}
 
-	combine_table[n].combine_routine(1);
+	CombineTable[n].CombineRoutine(1);
 	ConstructObjectList();
-	SetupObjectListStartPosition(combine_table[n].item1);
+	SetupObjectListStartPosition(CombineTable[n].item1);
 }
 
 void GuiController::SetupObjectListStartPosition(int newObjectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (rings[(int)RingTypes::Inventory]->current_object_list[i].invitem == newObjectNumber)
-			rings[(int)RingTypes::Inventory]->curobjinlist = i;
+		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem == newObjectNumber)
+			Rings[(int)RingTypes::Inventory]->curobjinlist = i;
 	}
 }
 
 void GuiController::HandleObjectChangeover(int ringIndex)
 {
-	current_selected_option = 0;
-	menu_active = 1;
+	CurrentSelectedOption = 0;
+	MenuActive = 1;
 	SetupAmmoSelector();
 }
 
@@ -1299,179 +1289,179 @@ void GuiController::SetupAmmoSelector()
 	unsigned __int64 options;
 
 	number = 0;
-	options = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
-	ammo_selector_flag = 0;
-	num_ammo_slots = 0;
+	options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+	AmmoSelectorFlag = 0;
+	NumAmmoSlots = 0;
 
-	if (rings[(int)RingTypes::Ammo]->ringactive)
+	if (Rings[(int)RingTypes::Ammo]->ringactive)
 		return;
 	
-	ammo_object_list[0].xrot = 0;
-	ammo_object_list[0].yrot = 0;
-	ammo_object_list[0].zrot = 0;
-	ammo_object_list[1].xrot = 0;
-	ammo_object_list[1].yrot = 0;
-	ammo_object_list[1].zrot = 0;
-	ammo_object_list[2].xrot = 0;
-	ammo_object_list[2].yrot = 0;
-	ammo_object_list[2].zrot = 0;
+	AmmoObjectList[0].xrot = 0;
+	AmmoObjectList[0].yrot = 0;
+	AmmoObjectList[0].zrot = 0;
+	AmmoObjectList[1].xrot = 0;
+	AmmoObjectList[1].yrot = 0;
+	AmmoObjectList[1].zrot = 0;
+	AmmoObjectList[2].xrot = 0;
+	AmmoObjectList[2].yrot = 0;
+	AmmoObjectList[2].zrot = 0;
 
 	if (options & 
 		(OPT_CHOOSEAMMO_UZI | OPT_CHOOSEAMMO_PISTOLS | OPT_CHOOSEAMMO_REVOLVER | OPT_CHOOSEAMMO_CROSSBOW |
 		OPT_CHOOSEAMMO_HK | OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_GRENADEGUN | OPT_CHOOSEAMMO_HARPOON | OPT_CHOOSEAMMO_ROCKET))
 	{
-		ammo_selector_flag = 1;
-		ammo_selector_fade_dir = 1;
+		AmmoSelectorFlag = 1;
+		AmmoSelectorFadeDir = 1;
 
 		if (options & OPT_CHOOSEAMMO_UZI)
 		{
-			ammo_object_list[0].invitem = INV_OBJECT_UZI_AMMO;
-			ammo_object_list[0].amount = AmountUziAmmo;
+			AmmoObjectList[0].invitem = INV_OBJECT_UZI_AMMO;
+			AmmoObjectList[0].amount = Ammo.AmountUziAmmo;
 			number++;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentUziAmmoType;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentUziAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_PISTOLS)
 		{
 			number++;
-			ammo_object_list[0].invitem = INV_OBJECT_PISTOLS_AMMO;
-			ammo_object_list[0].amount = -1;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentPistolsAmmoType;
+			AmmoObjectList[0].invitem = INV_OBJECT_PISTOLS_AMMO;
+			AmmoObjectList[0].amount = -1;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentPistolsAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_REVOLVER)
 		{
 			number++;
-			ammo_object_list[0].invitem = INV_OBJECT_REVOLVER_AMMO;
-			ammo_object_list[0].amount = AmountRevolverAmmo;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentRevolverAmmoType;
+			AmmoObjectList[0].invitem = INV_OBJECT_REVOLVER_AMMO;
+			AmmoObjectList[0].amount = Ammo.AmountRevolverAmmo;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentRevolverAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_CROSSBOW)
 		{
-			ammo_object_list[number].invitem = INV_OBJECT_CROSSBOW_AMMO1;
-			ammo_object_list[number].amount = AmountCrossBowAmmo1;
+			AmmoObjectList[number].invitem = INV_OBJECT_CROSSBOW_AMMO1;
+			AmmoObjectList[number].amount = Ammo.AmountCrossBowAmmo1;
 			number++;
-			ammo_object_list[number].invitem = INV_OBJECT_CROSSBOW_AMMO2;
-			ammo_object_list[number].amount = AmountCrossBowAmmo2;
+			AmmoObjectList[number].invitem = INV_OBJECT_CROSSBOW_AMMO2;
+			AmmoObjectList[number].amount = Ammo.AmountCrossBowAmmo2;
 			number++;
-			ammo_object_list[number].invitem = INV_OBJECT_CROSSBOW_AMMO3;
-			ammo_object_list[number].amount = AmountCrossBowAmmo3;
+			AmmoObjectList[number].invitem = INV_OBJECT_CROSSBOW_AMMO3;
+			AmmoObjectList[number].amount = Ammo.AmountCrossBowAmmo3;
 			number++;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentCrossBowAmmoType;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentCrossBowAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_HK)
 		{
-			ammo_object_list[number].invitem = INV_OBJECT_HK_AMMO;
-			ammo_object_list[number].amount = AmountHKAmmo1;
+			AmmoObjectList[number].invitem = INV_OBJECT_HK_AMMO;
+			AmmoObjectList[number].amount = Ammo.AmountHKAmmo1;
 			number++;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentHKAmmoType;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentHKAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_SHOTGUN)
 		{
-			ammo_object_list[number].invitem = INV_OBJECT_SHOTGUN_AMMO1;
-			ammo_object_list[number].amount = AmountShotGunAmmo1;
+			AmmoObjectList[number].invitem = INV_OBJECT_SHOTGUN_AMMO1;
+			AmmoObjectList[number].amount = Ammo.AmountShotGunAmmo1;
 			number++;
-			ammo_object_list[number].invitem = INV_OBJECT_SHOTGUN_AMMO2;
-			ammo_object_list[number].amount = AmountShotGunAmmo2;
+			AmmoObjectList[number].invitem = INV_OBJECT_SHOTGUN_AMMO2;
+			AmmoObjectList[number].amount = Ammo.AmountShotGunAmmo2;
 			number++;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentShotGunAmmoType;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentShotGunAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_GRENADEGUN)
 		{
-			ammo_object_list[number].invitem = INV_OBJECT_GRENADE_AMMO1;
-			ammo_object_list[number].amount = AmountGrenadeAmmo1;
+			AmmoObjectList[number].invitem = INV_OBJECT_GRENADE_AMMO1;
+			AmmoObjectList[number].amount = Ammo.AmountGrenadeAmmo1;
 			number++;
-			ammo_object_list[number].invitem = INV_OBJECT_GRENADE_AMMO2;
-			ammo_object_list[number].amount = AmountGrenadeAmmo2;
+			AmmoObjectList[number].invitem = INV_OBJECT_GRENADE_AMMO2;
+			AmmoObjectList[number].amount = Ammo.AmountGrenadeAmmo2;
 			number++;
-			ammo_object_list[number].invitem = INV_OBJECT_GRENADE_AMMO3;
-			ammo_object_list[number].amount = AmountGrenadeAmmo3;
+			AmmoObjectList[number].invitem = INV_OBJECT_GRENADE_AMMO3;
+			AmmoObjectList[number].amount = Ammo.AmountGrenadeAmmo3;
 			number++;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentGrenadeGunAmmoType;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentGrenadeGunAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_HARPOON)
 		{
-			ammo_object_list[number].invitem = INV_OBJECT_HARPOON_AMMO;
-			ammo_object_list[number].amount = AmountHarpoonAmmo;
+			AmmoObjectList[number].invitem = INV_OBJECT_HARPOON_AMMO;
+			AmmoObjectList[number].amount = Ammo.AmountHarpoonAmmo;
 			number++;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentHarpoonAmmoType;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentHarpoonAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_ROCKET)
 		{
-			ammo_object_list[number].invitem = INV_OBJECT_ROCKET_AMMO;
-			ammo_object_list[number].amount = AmountRocketsAmmo;
+			AmmoObjectList[number].invitem = INV_OBJECT_ROCKET_AMMO;
+			AmmoObjectList[number].amount = Ammo.AmountRocketsAmmo;
 			number++;
-			num_ammo_slots = number;
-			current_ammo_type = &CurrentRocketAmmoType;
+			NumAmmoSlots = number;
+			CurrentAmmoType = &Ammo.CurrentRocketAmmoType;
 		}
 	}
 }
 
 void GuiController::InsertObjectIntoList(int objectNumber)
 {
-	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = objectNumber;
-	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].xrot = 0;
-	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].yrot = 0;
-	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].zrot = 0;
-	rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->numobjectsinlist].bright = 32;
-	rings[(int)RingTypes::Inventory]->numobjectsinlist++;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = objectNumber;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].xrot = 0;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].yrot = 0;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].zrot = 0;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].bright = 32;
+	Rings[(int)RingTypes::Inventory]->numobjectsinlist++;
 }
 
 void GuiController::InsertObjectIntoList_v2(int objectNumber)
 {
-	unsigned __int64 opts = inventry_objects_list[objectNumber].opts;
+	unsigned __int64 opts = InventoryObjectTable[objectNumber].opts;
 
 	if (opts & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
 	{
-		if (rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem != objectNumber)
+		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem != objectNumber)
 		{
-			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].invitem = objectNumber;
-			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].xrot = 0;
-			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].yrot = 0;
-			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist].zrot = 0;
-			rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->numobjectsinlist++].bright = 32;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].invitem = objectNumber;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].xrot = 0;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].yrot = 0;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].zrot = 0;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist++].bright = 32;
 		}
 	}
 }
 
 void GuiController::ConstructObjectList()
 {
-	rings[(int)RingTypes::Inventory]->numobjectsinlist = 0;
+	Rings[(int)RingTypes::Inventory]->numobjectsinlist = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		rings[(int)RingTypes::Inventory]->current_object_list[i].invitem = NO_ITEM;
+		Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem = NO_ITEM;
 
-	CurrentPistolsAmmoType = 0;
-	CurrentUziAmmoType = 0;
-	CurrentRevolverAmmoType = 0;
-	CurrentShotGunAmmoType = 0;
-	CurrentGrenadeGunAmmoType = 0;
-	CurrentCrossBowAmmoType = 0;
+	Ammo.CurrentPistolsAmmoType = 0;
+	Ammo.CurrentUziAmmoType = 0;
+	Ammo.CurrentRevolverAmmoType = 0;
+	Ammo.CurrentShotGunAmmoType = 0;
+	Ammo.CurrentGrenadeGunAmmoType = 0;
+	Ammo.CurrentCrossBowAmmoType = 0;
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 	{
 		if (Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS);
-		else if (AmountPistolsAmmo)
+		else if (Ammo.AmountPistolsAmmo)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
 
 		if (Lara.Weapons[(int)LaraWeaponType::Uzi].Present)
 			InsertObjectIntoList(INV_OBJECT_UZIS);
-		else if (AmountUziAmmo)
+		else if (Ammo.AmountUziAmmo)
 			InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
 
 		if (Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
@@ -1481,7 +1471,7 @@ void GuiController::ConstructObjectList()
 			else
 				InsertObjectIntoList(INV_OBJECT_REVOLVER);
 		}
-		else if (AmountRevolverAmmo)
+		else if (Ammo.AmountRevolverAmmo)
 			InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
 
 		if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
@@ -1489,14 +1479,14 @@ void GuiController::ConstructObjectList()
 			InsertObjectIntoList(INV_OBJECT_SHOTGUN);
 
 			if (Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo2)
-				CurrentShotGunAmmoType = 1;
+				Ammo.CurrentShotGunAmmoType = 1;
 		}
 		else
 		{
-			if (AmountShotGunAmmo1)
+			if (Ammo.AmountShotGunAmmo1)
 				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO1);
 
-			if (AmountShotGunAmmo2)
+			if (Ammo.AmountShotGunAmmo2)
 				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO2);
 		}
 
@@ -1507,7 +1497,7 @@ void GuiController::ConstructObjectList()
 			else
 				InsertObjectIntoList(INV_OBJECT_HK);
 		}
-		else if (AmountHKAmmo1)
+		else if (Ammo.AmountHKAmmo1)
 			InsertObjectIntoList(INV_OBJECT_HK_AMMO);
 
 		if (Lara.Weapons[(int)LaraWeaponType::Crossbow].Present)
@@ -1518,20 +1508,20 @@ void GuiController::ConstructObjectList()
 					InsertObjectIntoList(INV_OBJECT_CROSSBOW);
 
 				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
-					CurrentCrossBowAmmoType = 1;
+					Ammo.CurrentCrossBowAmmoType = 1;
 
 				if (Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo3)
-					CurrentCrossBowAmmoType = 2;
+					Ammo.CurrentCrossBowAmmoType = 2;
 		}
 		else
 		{
-			if (AmountCrossBowAmmo1)
+			if (Ammo.AmountCrossBowAmmo1)
 				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO1);
 
-			if (AmountCrossBowAmmo2)
+			if (Ammo.AmountCrossBowAmmo2)
 				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO2);
 
-			if (AmountCrossBowAmmo3)
+			if (Ammo.AmountCrossBowAmmo3)
 				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO3);
 		}
 
@@ -1540,31 +1530,31 @@ void GuiController::ConstructObjectList()
 			InsertObjectIntoList(INV_OBJECT_GRENADE_LAUNCHER);
 
 			if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
-				CurrentGrenadeGunAmmoType = 1;
+				Ammo.CurrentGrenadeGunAmmoType = 1;
 
 			if (Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo3)
-				CurrentGrenadeGunAmmoType = 2;
+				Ammo.CurrentGrenadeGunAmmoType = 2;
 		}
 		else
 		{
-			if (AmountGrenadeAmmo1)
+			if (Ammo.AmountGrenadeAmmo1)
 				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO1);
 
-			if (AmountGrenadeAmmo2)
+			if (Ammo.AmountGrenadeAmmo2)
 				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO2);
 
-			if (AmountGrenadeAmmo3)
+			if (Ammo.AmountGrenadeAmmo3)
 				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO3);
 		}
 
 		if (Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
 			InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
-		else if (AmountRocketsAmmo)
+		else if (Ammo.AmountRocketsAmmo)
 			InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
 
 		if (Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
 			InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
-		else if (AmountHarpoonAmmo)
+		else if (Ammo.AmountHarpoonAmmo)
 			InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
 
 		if (Lara.Inventory.HasLasersight)
@@ -1666,22 +1656,22 @@ void GuiController::ConstructObjectList()
 		InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 	}
 
-	rings[(int)RingTypes::Inventory]->objlistmovement = 0;
-	rings[(int)RingTypes::Inventory]->curobjinlist = 0;
-	rings[(int)RingTypes::Inventory]->ringactive = 1;
-	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
-	rings[(int)RingTypes::Ammo]->curobjinlist = 0;
-	rings[(int)RingTypes::Ammo]->ringactive = 0;
+	Rings[(int)RingTypes::Inventory]->objlistmovement = 0;
+	Rings[(int)RingTypes::Inventory]->curobjinlist = 0;
+	Rings[(int)RingTypes::Inventory]->ringactive = 1;
+	Rings[(int)RingTypes::Ammo]->objlistmovement = 0;
+	Rings[(int)RingTypes::Ammo]->curobjinlist = 0;
+	Rings[(int)RingTypes::Ammo]->ringactive = 0;
 	HandleObjectChangeover((int)RingTypes::Inventory);
-	ammo_active = 0;
+	AmmoActive = 0;
 }
 
 void GuiController::ConstructCombineObjectList()
 {
-	rings[(int)RingTypes::Ammo]->numobjectsinlist = 0;
+	Rings[(int)RingTypes::Ammo]->numobjectsinlist = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		rings[(int)RingTypes::Ammo]->current_object_list[i].invitem = NO_ITEM;
+		Rings[(int)RingTypes::Ammo]->CurrentObjectList[i].invitem = NO_ITEM;
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 	{
@@ -1750,52 +1740,52 @@ void GuiController::ConstructCombineObjectList()
 			InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 	}
 
-	rings[(int)RingTypes::Ammo]->objlistmovement = 0;
-	rings[(int)RingTypes::Ammo]->curobjinlist = 0;
-	rings[(int)RingTypes::Ammo]->ringactive = 0;
+	Rings[(int)RingTypes::Ammo]->objlistmovement = 0;
+	Rings[(int)RingTypes::Ammo]->curobjinlist = 0;
+	Rings[(int)RingTypes::Ammo]->ringactive = 0;
 }
 
 void GuiController::InitialiseInventory()
 {
-	compassNeedleAngle = ANGLE(22.5f);
+	CompassNeedleAngle = ANGLE(22.5f);
 	AlterFOV(ANGLE(80.0f));
 	Lara.Inventory.IsBusy = false;
-	inventoryItemChosen = NO_ITEM;
-	useItem = 0;
+	InventoryItemChosen = NO_ITEM;
+	UseItem = 0;
 
 	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].hasInfinite())
-		AmountShotGunAmmo1 = -1;
+		Ammo.AmountShotGunAmmo1 = -1;
 	else
-		AmountShotGunAmmo1 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].getCount() / 6;
+		Ammo.AmountShotGunAmmo1 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].getCount() / 6;
 
 	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].hasInfinite())
-		AmountShotGunAmmo2 = -1;
+		Ammo.AmountShotGunAmmo2 = -1;
 	else
-		AmountShotGunAmmo2 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].getCount() / 6;
+		Ammo.AmountShotGunAmmo2 = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[1].getCount() / 6;
 
-	AmountHKAmmo1 = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountCrossBowAmmo1 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountCrossBowAmmo2 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-	AmountCrossBowAmmo3 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
-	AmountUziAmmo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountRevolverAmmo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountPistolsAmmo = Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountRocketsAmmo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountHarpoonAmmo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountGrenadeAmmo1 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-	AmountGrenadeAmmo2 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-	AmountGrenadeAmmo3 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
+	Ammo.AmountHKAmmo1 = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountCrossBowAmmo1 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountCrossBowAmmo2 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
+	Ammo.AmountCrossBowAmmo3 = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
+	Ammo.AmountUziAmmo = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountRevolverAmmo = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountPistolsAmmo = Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::Pistol].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountRocketsAmmo = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountHarpoonAmmo = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountGrenadeAmmo1 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].hasInfinite()? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+	Ammo.AmountGrenadeAmmo2 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
+	Ammo.AmountGrenadeAmmo3 = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].hasInfinite() ? -1 : Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
 	ConstructObjectList();
 
-	if (enterInventory == NO_ITEM)
+	if (EnterInventory == NO_ITEM)
 	{
-		if (lastInvItem != NO_ITEM)
+		if (LastInvItem != NO_ITEM)
 		{
-			if (IsItemInInventory(lastInvItem))
-				SetupObjectListStartPosition(lastInvItem);
+			if (IsItemInInventory(LastInvItem))
+				SetupObjectListStartPosition(LastInvItem);
 			else
 			{
-				if (lastInvItem >= INV_OBJECT_SMOL_WATERSKIN && lastInvItem <= INV_OBJECT_SMOL_WATERSKIN3L)
+				if (LastInvItem >= INV_OBJECT_SMOL_WATERSKIN && LastInvItem <= INV_OBJECT_SMOL_WATERSKIN3L)
 				{
 					for (int i = INV_OBJECT_SMOL_WATERSKIN; i <= INV_OBJECT_SMOL_WATERSKIN3L; i++)
 					{
@@ -1806,7 +1796,7 @@ void GuiController::InitialiseInventory()
 						}
 					}
 				}
-				else if (lastInvItem >= INV_OBJECT_BIG_WATERSKIN && lastInvItem <= INV_OBJECT_BIG_WATERSKIN5L)
+				else if (LastInvItem >= INV_OBJECT_BIG_WATERSKIN && LastInvItem <= INV_OBJECT_BIG_WATERSKIN5L)
 				{
 					for (int i = INV_OBJECT_BIG_WATERSKIN; i <= INV_OBJECT_BIG_WATERSKIN5L; i++)
 					{
@@ -1819,27 +1809,27 @@ void GuiController::InitialiseInventory()
 				}
 			}
 
-			lastInvItem = NO_ITEM;
+			LastInvItem = NO_ITEM;
 		}
 	}
 	else
 	{
-		if (IsObjectInInventory(enterInventory))
-			SetupObjectListStartPosition2(enterInventory);
+		if (IsObjectInInventory(EnterInventory))
+			SetupObjectListStartPosition2(EnterInventory);
 
-		enterInventory = NO_ITEM;
+		EnterInventory = NO_ITEM;
 	}
 
-	ammo_selector_fade_val = 0;
-	ammo_selector_fade_dir = 0;
-	combine_ring_fade_val = 0;
-	combine_ring_fade_dir = 0;
-	combine_type_flag = 0;
-	seperate_type_flag = 0;
-	combine_obj1 = 0;
-	combine_obj2 = 0;
-	normal_ring_fade_val = 128;
-	normal_ring_fade_dir = 0;
+	AmmoSelectorFadeVal = 0;
+	AmmoSelectorFadeDir = 0;
+	CombineRingFadeVal = 0;
+	CombineRingFadeDir = 0;
+	CombineTypeFlag = 0;
+	SeperateTypeFlag = 0;
+	CombineObject1 = 0;
+	CombineObject2 = 0;
+	NormalRingFadeVal = 128;
+	NormalRingFadeDir = 0;
 	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
@@ -1852,8 +1842,8 @@ void GuiController::SetupObjectListStartPosition2(int newObjectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[i].invitem].object_number == newObjectNumber)
-			rings[(int)RingTypes::Inventory]->curobjinlist = i;
+		if (InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem].object_number == newObjectNumber)
+			Rings[(int)RingTypes::Inventory]->curobjinlist = i;
 	}
 }
 
@@ -1861,7 +1851,7 @@ int GuiController::ConvertObjectToInventoryItem(int objectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (inventry_objects_list[i].object_number == objectNumber)
+		if (InventoryObjectTable[i].object_number == objectNumber)
 			return i;
 	}
 
@@ -1870,33 +1860,33 @@ int GuiController::ConvertObjectToInventoryItem(int objectNumber)
 
 int GuiController::ConvertInventoryItemToObject(int objectNumber)
 {
-	return inventry_objects_list[objectNumber].object_number;
+	return InventoryObjectTable[objectNumber].object_number;
 }
 
 void GuiController::FadeAmmoSelector()
 {
-	if (rings[(int)RingTypes::Inventory]->ringactive)
-		ammo_selector_fade_val = 0;
-	else if (ammo_selector_fade_dir == 1)
+	if (Rings[(int)RingTypes::Inventory]->ringactive)
+		AmmoSelectorFadeVal = 0;
+	else if (AmmoSelectorFadeDir == 1)
 	{
-		if (ammo_selector_fade_val < 128)
-			ammo_selector_fade_val += 32;
+		if (AmmoSelectorFadeVal < 128)
+			AmmoSelectorFadeVal += 32;
 
-		if (ammo_selector_fade_val > 128)
+		if (AmmoSelectorFadeVal > 128)
 		{
-			ammo_selector_fade_val = 128;
-			ammo_selector_fade_dir = 0;
+			AmmoSelectorFadeVal = 128;
+			AmmoSelectorFadeDir = 0;
 		}
 	}
-	else if (ammo_selector_fade_dir == 2)
+	else if (AmmoSelectorFadeDir == 2)
 	{
-		if (ammo_selector_fade_val > 0)
-			ammo_selector_fade_val -= 32;
+		if (AmmoSelectorFadeVal > 0)
+			AmmoSelectorFadeVal -= 32;
 
-		if (ammo_selector_fade_val < 0)
+		if (AmmoSelectorFadeVal < 0)
 		{
-			ammo_selector_fade_val = 0;
-			ammo_selector_fade_dir = 0;
+			AmmoSelectorFadeVal = 0;
+			AmmoSelectorFadeDir = 0;
 		}
 	}
 }
@@ -1910,8 +1900,8 @@ void GuiController::UseCurrentItem()
 	Lara.Inventory.OldBusy = false;
 	BinocularRange = 0;
 	LaraItem->MeshBits = ALL_JOINT_BITS;
-	invobject = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
-	gmeobject = inventry_objects_list[invobject].object_number;
+	invobject = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+	gmeobject = InventoryObjectTable[invobject].object_number;
 
 	if (Lara.Control.WaterStatus == WaterStatus::Dry || Lara.Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -2049,7 +2039,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		default:
-			inventoryItemChosen = gmeobject;
+			InventoryItemChosen = gmeobject;
 			return;
 		}
 
@@ -2171,27 +2161,27 @@ void GuiController::DoInventory()
 	int yPos;
 	int num;
 
-	if (rings[(int)RingTypes::Ammo]->ringactive)
+	if (Rings[(int)RingTypes::Ammo]->ringactive)
 	{
-		g_Renderer.DrawString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+		g_Renderer.DrawString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
-		if (rings[(int)RingTypes::Inventory]->objlistmovement)
+		if (Rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
 
-		if (rings[(int)RingTypes::Ammo]->objlistmovement)
+		if (Rings[(int)RingTypes::Ammo]->objlistmovement)
 			return;
 
 		if (GUI_INPUT_SELECT)
 		{
-			short invItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
-			short ammoItem = rings[(int)RingTypes::Ammo]->current_object_list[rings[(int)RingTypes::Ammo]->curobjinlist].invitem;
+			short invItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+			short ammoItem = Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->curobjinlist].invitem;
 
 			if (DoObjectsCombine(invItem, ammoItem))
 			{
-				combine_ring_fade_dir = 2;
-				combine_type_flag = 1;
-				combine_obj1 = invItem;
-				combine_obj2 = ammoItem;
+				CombineRingFadeDir = 2;
+				CombineTypeFlag = 1;
+				CombineObject1 = invItem;
+				CombineObject2 = ammoItem;
 				SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 			}
 			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN &&
@@ -2201,14 +2191,14 @@ void GuiController::DoInventory()
 			{
 				if (PerformWaterskinCombine(1))
 				{
-					combine_type_flag = 2;
-					combine_ring_fade_dir = 2;
+					CombineTypeFlag = 2;
+					CombineRingFadeDir = 2;
 					SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 					return;
 				}
 
 				SayNo();
-				combine_ring_fade_dir = 2;
+				CombineRingFadeDir = 2;
 			}
 			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN &&
 				invItem <= INV_OBJECT_SMOL_WATERSKIN3L &&
@@ -2217,92 +2207,92 @@ void GuiController::DoInventory()
 			{
 				if (PerformWaterskinCombine(0))
 				{
-					combine_type_flag = 2;
-					combine_ring_fade_dir = 2;
+					CombineTypeFlag = 2;
+					CombineRingFadeDir = 2;
 					SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 					return;
 				}
 
 				SayNo();
-				combine_ring_fade_dir = 2;
+				CombineRingFadeDir = 2;
 			}
 			else
 			{
 				SayNo();
-				combine_ring_fade_dir = 2;
+				CombineRingFadeDir = 2;
 			}
 		}
 
 		if (GUI_INPUT_DESELECT)
 		{
 			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			combine_ring_fade_dir = 2;
+			CombineRingFadeDir = 2;
 		}
 
 		return;
 	}
 	else
 	{
-		num = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+		num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 
 		for (n = 0; n < 3; n++)
 		{
-			current_options[n].type = MenuType::None;
-			current_options[n].text = 0;
+			CurrentOptions[n].type = MenuType::None;
+			CurrentOptions[n].text = 0;
 		}
 
 		n = 0;
 
-		if (!ammo_active)
+		if (!AmmoActive)
 		{
-			options = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+			options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
 			if (options & OPT_LOAD)
 			{
-				current_options[0].type = MenuType::Load;
-				current_options[0].text = g_GameFlow->GetString(optmessages[6]);
+				CurrentOptions[0].type = MenuType::Load;
+				CurrentOptions[0].text = g_GameFlow->GetString(OptionStrings[6]);
 				n = 1;
 			}
 
 			if (options & OPT_SAVE)
 			{
-				current_options[n].type = MenuType::Save;
-				current_options[n].text = g_GameFlow->GetString(optmessages[7]);
+				CurrentOptions[n].type = MenuType::Save;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[7]);
 				n++;
 			}
 
 			if (options & OPT_EXAMINABLE)
 			{
-				current_options[n].type = MenuType::Examine;
-				current_options[n].text = g_GameFlow->GetString(optmessages[8]);
+				CurrentOptions[n].type = MenuType::Examine;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[8]);
 				n++;
 			}
 
 			if (options & OPT_STATS)
 			{
-				current_options[n].type = MenuType::Statistics;
-				current_options[n].text = g_GameFlow->GetString(optmessages[9]);
+				CurrentOptions[n].type = MenuType::Statistics;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[9]);
 				n++;
 			}
 
 			if (options & OPT_USE)
 			{
-				current_options[n].type = MenuType::Use;
-				current_options[n].text = g_GameFlow->GetString(optmessages[0]);
+				CurrentOptions[n].type = MenuType::Use;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[0]);
 				n++;
 			}
 
 			if (options & OPT_EQUIP)
 			{
-				current_options[n].type = MenuType::Equip;
-				current_options[n].text = g_GameFlow->GetString(optmessages[4]);
+				CurrentOptions[n].type = MenuType::Equip;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[4]);
 				n++;
 			}
 
 			if (options & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
-				current_options[n].type = MenuType::ChooseAmmo;
-				current_options[n].text = g_GameFlow->GetString(optmessages[1]);
+				CurrentOptions[n].type = MenuType::ChooseAmmo;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[1]);
 				n++;
 			}
 
@@ -2310,51 +2300,51 @@ void GuiController::DoInventory()
 			{
 				if (IsItemCurrentlyCombinable(num))
 				{
-					current_options[n].type = MenuType::Combine;
-					current_options[n].text = g_GameFlow->GetString(optmessages[2]);
+					CurrentOptions[n].type = MenuType::Combine;
+					CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[2]);
 					n++;
 				}
 			}
 
 			if (options & OPT_ALWAYSCOMBINE)
 			{
-				current_options[n].type = MenuType::Combine;
-				current_options[n].text = g_GameFlow->GetString(optmessages[2]);
+				CurrentOptions[n].type = MenuType::Combine;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[2]);
 				n++;
 			}
 
 			if (options & OPT_SEPERATABLE)
 			{
-				current_options[n].type = MenuType::Seperate;
-				current_options[n].text = g_GameFlow->GetString(optmessages[3]);
+				CurrentOptions[n].type = MenuType::Seperate;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[3]);
 				n++;
 			}
 
 			if (options & OPT_DIARY)
 			{
-				current_options[n].type = MenuType::Diary;
-				current_options[n].text = g_GameFlow->GetString(optmessages[11]);
+				CurrentOptions[n].type = MenuType::Diary;
+				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[11]);
 				n++;
 			}
 		}
 		else
 		{
-			current_options[0].type = MenuType::Ammo1;
-			current_options[0].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[0].invitem].objname);
-			current_options[1].type = MenuType::Ammo2;
-			current_options[1].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[1].invitem].objname);
+			CurrentOptions[0].type = MenuType::Ammo1;
+			CurrentOptions[0].text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[0].invitem].objname);
+			CurrentOptions[1].type = MenuType::Ammo2;
+			CurrentOptions[1].text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[1].invitem].objname);
 			n = 2;
 
-			options = inventry_objects_list[rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+			options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
 
 			if (options & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
 				n = 3;
-				current_options[2].type = MenuType::Ammo3;
-				current_options[2].text = g_GameFlow->GetString(inventry_objects_list[ammo_object_list[2].invitem].objname);
+				CurrentOptions[2].type = MenuType::Ammo3;
+				CurrentOptions[2].text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[2].invitem].objname);
 			}
 
-			current_selected_option = *current_ammo_type;
+			CurrentSelectedOption = *CurrentAmmoType;
 		}
 
 		yPos = 310 - LINE_HEIGHT;
@@ -2368,157 +2358,157 @@ void GuiController::DoInventory()
 		{
 			for (i = 0; i < n; i++)
 			{
-				if (i == current_selected_option)
+				if (i == CurrentSelectedOption)
 				{
-					g_Renderer.DrawString(PHD_CENTER_X, yPos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					yPos += LINE_HEIGHT;
 				}
 				else
 				{
-					g_Renderer.DrawString(PHD_CENTER_X, yPos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					yPos += LINE_HEIGHT;
 				}
 			}
 		}
 
-		if (menu_active &&
-			!rings[(int)RingTypes::Inventory]->objlistmovement &&
-			!rings[(int)RingTypes::Ammo]->objlistmovement)
+		if (MenuActive &&
+			!Rings[(int)RingTypes::Inventory]->objlistmovement &&
+			!Rings[(int)RingTypes::Ammo]->objlistmovement)
 		{
 			if (GUI_INPUT_UP)
 			{
-				if (current_selected_option <= 0)
-					current_selected_option = n - 1;
+				if (CurrentSelectedOption <= 0)
+					CurrentSelectedOption = n - 1;
 				else
-					current_selected_option--;
+					CurrentSelectedOption--;
 
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			}
 			else if (GUI_INPUT_DOWN)
 			{
-				if (current_selected_option >= n - 1)
-					current_selected_option = 0;
+				if (CurrentSelectedOption >= n - 1)
+					CurrentSelectedOption = 0;
 				else
-					current_selected_option++;
+					CurrentSelectedOption++;
 
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 			}
 
-			if (ammo_active)
+			if (AmmoActive)
 			{
 				if (GUI_INPUT_LEFT)
 				{
-					if (current_selected_option <= 0)
-						current_selected_option = n - 1;
+					if (CurrentSelectedOption <= 0)
+						CurrentSelectedOption = n - 1;
 					else
-						current_selected_option--;
+						CurrentSelectedOption--;
 
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				}
 
 				if (GUI_INPUT_RIGHT)
 				{
-					if (current_selected_option >= n - 1)
-						current_selected_option = 0;
+					if (CurrentSelectedOption >= n - 1)
+						CurrentSelectedOption = 0;
 					else
-						current_selected_option++;
+						CurrentSelectedOption++;
 
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				}
 
-				*current_ammo_type = current_selected_option;
+				*CurrentAmmoType = CurrentSelectedOption;
 			}
 
 			if (GUI_INPUT_SELECT)
 			{
-				if (current_options[current_selected_option].type != MenuType::Equip && current_options[current_selected_option].type != MenuType::Use)
+				if (CurrentOptions[CurrentSelectedOption].type != MenuType::Equip && CurrentOptions[CurrentSelectedOption].type != MenuType::Use)
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-				switch (current_options[current_selected_option].type)
+				switch (CurrentOptions[CurrentSelectedOption].type)
 				{
 				case MenuType::ChooseAmmo:
-					rings[(int)RingTypes::Inventory]->ringactive = 0;
-					ammo_active = 1;
-					Stashedcurrent_selected_option = current_selected_option;
-					StashedCurrentPistolsAmmoType = CurrentPistolsAmmoType;
-					StashedCurrentUziAmmoType = CurrentUziAmmoType;
-					StashedCurrentRevolverAmmoType = CurrentRevolverAmmoType;
-					StashedCurrentShotGunAmmoType = CurrentShotGunAmmoType;
-					StashedCurrentGrenadeGunAmmoType = CurrentGrenadeGunAmmoType;
-					StashedCurrentCrossBowAmmoType = CurrentCrossBowAmmoType;
-					StashedCurrentHKAmmoType = CurrentHKAmmoType;
-					StashedCurrentHarpoonAmmoType = CurrentHarpoonAmmoType;
-					StashedCurrentRocketAmmoType = CurrentRocketAmmoType;
+					Rings[(int)RingTypes::Inventory]->ringactive = 0;
+					AmmoActive = 1;
+					Ammo.StashedCurrentSelectedOption = CurrentSelectedOption;
+					Ammo.StashedCurrentPistolsAmmoType = Ammo.CurrentPistolsAmmoType;
+					Ammo.StashedCurrentUziAmmoType = Ammo.CurrentUziAmmoType;
+					Ammo.StashedCurrentRevolverAmmoType = Ammo.CurrentRevolverAmmoType;
+					Ammo.StashedCurrentShotGunAmmoType = Ammo.CurrentShotGunAmmoType;
+					Ammo.StashedCurrentGrenadeGunAmmoType = Ammo.CurrentGrenadeGunAmmoType;
+					Ammo.StashedCurrentCrossBowAmmoType = Ammo.CurrentCrossBowAmmoType;
+					Ammo.StashedCurrentHKAmmoType = Ammo.CurrentHKAmmoType;
+					Ammo.StashedCurrentHarpoonAmmoType = Ammo.CurrentHarpoonAmmoType;
+					Ammo.StashedCurrentRocketAmmoType = Ammo.CurrentRocketAmmoType;
 					break;
 
 				case MenuType::Load:
 					//fill_up_savegames_array//or maybe not?
-					invMode = InventoryMode::Load;
+					InvMode = InventoryMode::Load;
 					break;
 
 				case MenuType::Save:
 					//fill_up_savegames_array
-					invMode = InventoryMode::Save;
+					InvMode = InventoryMode::Save;
 					break;
 
 				case MenuType::Examine:
-					invMode = InventoryMode::Examine;
+					InvMode = InventoryMode::Examine;
 					break;
 
 				case MenuType::Statistics:
-					invMode = InventoryMode::Statistics;
+					InvMode = InventoryMode::Statistics;
 					break;
 
 				case MenuType::Ammo1:
 				case MenuType::Ammo2:
 				case MenuType::Ammo3:
-					ammo_active = 0;
-					rings[(int)RingTypes::Inventory]->ringactive = 1;
-					current_selected_option = 0;
+					AmmoActive = 0;
+					Rings[(int)RingTypes::Inventory]->ringactive = 1;
+					CurrentSelectedOption = 0;
 					break;
 
 				case MenuType::Combine:
 					ConstructCombineObjectList();
-					rings[(int)RingTypes::Inventory]->ringactive = 0;
-					rings[(int)RingTypes::Ammo]->ringactive = 1;
-					ammo_selector_flag = 0;
-					menu_active = 0;
-					combine_ring_fade_dir = 1;
+					Rings[(int)RingTypes::Inventory]->ringactive = 0;
+					Rings[(int)RingTypes::Ammo]->ringactive = 1;
+					AmmoSelectorFlag = 0;
+					MenuActive = 0;
+					CombineRingFadeDir = 1;
 					break;
 
 				case MenuType::Seperate:
-					seperate_type_flag = 1;
-					normal_ring_fade_dir = 2;
+					SeperateTypeFlag = 1;
+					NormalRingFadeDir = 2;
 					break;
 
 				case MenuType::Equip:
 				case MenuType::Use:
-					menu_active = 0;
-					useItem = 1;
+					MenuActive = 0;
+					UseItem = 1;
 					break;
 
 				case MenuType::Diary:
-					invMode = InventoryMode::Diary;
+					InvMode = InventoryMode::Diary;
 					Lara.Inventory.Diary.currentPage = 1;
 					break;
 				}
 			}
 
-			if (GUI_INPUT_DESELECT && ammo_active)
+			if (GUI_INPUT_DESELECT && AmmoActive)
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-				ammo_active = 0;
-				rings[(int)RingTypes::Inventory]->ringactive = 1;
-				CurrentPistolsAmmoType = StashedCurrentPistolsAmmoType;
-				CurrentUziAmmoType = StashedCurrentUziAmmoType;
-				CurrentRevolverAmmoType = StashedCurrentRevolverAmmoType;
-				CurrentShotGunAmmoType = StashedCurrentShotGunAmmoType;
-				CurrentGrenadeGunAmmoType = StashedCurrentGrenadeGunAmmoType;
-				CurrentCrossBowAmmoType = StashedCurrentCrossBowAmmoType;
-				CurrentHKAmmoType = StashedCurrentHKAmmoType;
-				CurrentHarpoonAmmoType = StashedCurrentHarpoonAmmoType;
-				CurrentRocketAmmoType = StashedCurrentRocketAmmoType;
-				current_selected_option = Stashedcurrent_selected_option;
+				AmmoActive = 0;
+				Rings[(int)RingTypes::Inventory]->ringactive = 1;
+				Ammo.CurrentPistolsAmmoType = Ammo.StashedCurrentPistolsAmmoType;
+				Ammo.CurrentUziAmmoType = Ammo.StashedCurrentUziAmmoType;
+				Ammo.CurrentRevolverAmmoType = Ammo.StashedCurrentRevolverAmmoType;
+				Ammo.CurrentShotGunAmmoType = Ammo.StashedCurrentShotGunAmmoType;
+				Ammo.CurrentGrenadeGunAmmoType = Ammo.StashedCurrentGrenadeGunAmmoType;
+				Ammo.CurrentCrossBowAmmoType = Ammo.StashedCurrentCrossBowAmmoType;
+				Ammo.CurrentHKAmmoType = Ammo.StashedCurrentHKAmmoType;
+				Ammo.CurrentHarpoonAmmoType = Ammo.StashedCurrentHarpoonAmmoType;
+				Ammo.CurrentRocketAmmoType = Ammo.StashedCurrentRocketAmmoType;
+				CurrentSelectedOption = Ammo.StashedCurrentSelectedOption;
 			}
 		}
 	}
@@ -2529,7 +2519,7 @@ void GuiController::UpdateWeaponStatus()
 {
 	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
 	{
-		if (CurrentShotGunAmmoType)
+		if (Ammo.CurrentShotGunAmmoType)
 			Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo2;
 		else
 			Lara.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo = WeaponAmmoType::Ammo1;
@@ -2539,9 +2529,9 @@ void GuiController::UpdateWeaponStatus()
 	{
 		Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo1;
 
-		if (CurrentCrossBowAmmoType == 1)
+		if (Ammo.CurrentCrossBowAmmoType == 1)
 			Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo2;
-		else if (CurrentCrossBowAmmoType == 2)
+		else if (Ammo.CurrentCrossBowAmmoType == 2)
 			Lara.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo = WeaponAmmoType::Ammo3;
 	}
 
@@ -2549,9 +2539,9 @@ void GuiController::UpdateWeaponStatus()
 	{
 		Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo1;
 
-		if (CurrentGrenadeGunAmmoType == 1)
+		if (Ammo.CurrentGrenadeGunAmmoType == 1)
 			Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo2;
-		else if (CurrentGrenadeGunAmmoType == 2)
+		else if (Ammo.CurrentGrenadeGunAmmoType == 2)
 			Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo = WeaponAmmoType::Ammo3;
 	}
 }
@@ -2606,60 +2596,60 @@ void GuiController::DrawAmmoSelector()
 	char invTextBuffer[256];
 	int x, y;
 
-	if (!ammo_selector_flag)
+	if (!AmmoSelectorFlag)
 		return;
 	
 	int xPos = (2 * PHD_CENTER_X - OBJLIST_SPACING) >> 1;
 
-	if (num_ammo_slots == 2)
+	if (NumAmmoSlots == 2)
 		xPos -= OBJLIST_SPACING / 2;
-	else if (num_ammo_slots == 3)
+	else if (NumAmmoSlots == 3)
 		xPos -= OBJLIST_SPACING;
 
-	if (num_ammo_slots > 0)
+	if (NumAmmoSlots > 0)
 	{
-		for (n = 0; n < num_ammo_slots; n++)
+		for (n = 0; n < NumAmmoSlots; n++)
 		{
-			objme = &inventry_objects_list[ammo_object_list[n].invitem];
+			objme = &InventoryObjectTable[AmmoObjectList[n].invitem];
 
-			if (n == *current_ammo_type)
+			if (n == *CurrentAmmoType)
 			{
 				if (objme->rot_flags & INV_ROT_X)
-					ammo_object_list[n].xrot += ANGLE(5);
+					AmmoObjectList[n].xrot += ANGLE(5);
 
 				if (objme->rot_flags & INV_ROT_Y)
-					ammo_object_list[n].yrot += ANGLE(5);
+					AmmoObjectList[n].yrot += ANGLE(5);
 
 				if (objme->rot_flags & INV_ROT_Z)
-					ammo_object_list[n].zrot += ANGLE(5);
+					AmmoObjectList[n].zrot += ANGLE(5);
 			}
 			else
 			{
-				SpinBack(&ammo_object_list[n].xrot);
-				SpinBack(&ammo_object_list[n].yrot);
-				SpinBack(&ammo_object_list[n].zrot);
+				SpinBack(&AmmoObjectList[n].xrot);
+				SpinBack(&AmmoObjectList[n].yrot);
+				SpinBack(&AmmoObjectList[n].zrot);
 			}
 
-			xrot = ammo_object_list[n].xrot;
-			yrot = ammo_object_list[n].yrot;
-			zrot = ammo_object_list[n].zrot;
+			xrot = AmmoObjectList[n].xrot;
+			yrot = AmmoObjectList[n].yrot;
+			zrot = AmmoObjectList[n].zrot;
 			x = PHD_CENTER_X - 300 + xPos;
 			y = 480;
-			short obj = ConvertInventoryItemToObject(ammo_object_list[n].invitem);
-			float scaler = inventry_objects_list[ammo_object_list[n].invitem].scale1;
+			short obj = ConvertInventoryItemToObject(AmmoObjectList[n].invitem);
+			float scaler = InventoryObjectTable[AmmoObjectList[n].invitem].scale1;
 
-			if (n == *current_ammo_type)
+			if (n == *CurrentAmmoType)
 			{
-				if (ammo_object_list[n].amount == -1)
-					sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
+				if (AmmoObjectList[n].amount == -1)
+					sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].invitem].objname));
 				else
-					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
+					sprintf(&invTextBuffer[0], "%d x %s", AmmoObjectList[n].amount, g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].invitem].objname));
 
-				if (ammo_selector_fade_val)
+				if (AmmoSelectorFadeVal)
 					g_Renderer.DrawString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 				
-				if (n == *current_ammo_type)
+				if (n == *CurrentAmmoType)
 					g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
 				else
 					g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
@@ -2674,289 +2664,282 @@ void GuiController::DrawAmmoSelector()
 
 void GuiController::DrawCurrentObjectList(int ringIndex)
 {
-	int n;
-	int maxobj;
-	int xoff;
-	int i;
-	int shade;
-	int minobj;
 	char textbufme[128];
-	int objmeup;
-	int nummeup;
-	short ymeup;
 	unsigned short xrot, yrot, zrot;
-	int activenum;
-	int count;
 
-	if (rings[ringIndex]->current_object_list <= 0)
+	if (Rings[ringIndex]->CurrentObjectList <= 0)
 		return;
 
 	if (ringIndex == (int)RingTypes::Ammo)
 	{
-		ammo_selector_fade_val = 0;
-		ammo_selector_fade_dir = 0;
+		AmmoSelectorFadeVal = 0;
+		AmmoSelectorFadeDir = 0;
 
-		if (combine_ring_fade_dir == 1)
+		if (CombineRingFadeDir == 1)
 		{
-			if (combine_ring_fade_val < 128)
-				combine_ring_fade_val += 32;
+			if (CombineRingFadeVal < 128)
+				CombineRingFadeVal += 32;
 
-			if (combine_ring_fade_val > 128)
+			if (CombineRingFadeVal > 128)
 			{
-				combine_ring_fade_val = 128;
-				combine_ring_fade_dir = 0;
+				CombineRingFadeVal = 128;
+				CombineRingFadeDir = 0;
 			}
 		}
-		else if (combine_ring_fade_dir == 2)
+		else if (CombineRingFadeDir == 2)
 		{
-			combine_ring_fade_val -= 32;
+			CombineRingFadeVal -= 32;
 
-			if (combine_ring_fade_val <= 0)
+			if (CombineRingFadeVal <= 0)
 			{
-				combine_ring_fade_val = 0;
-				combine_ring_fade_dir = 0;
+				CombineRingFadeVal = 0;
+				CombineRingFadeDir = 0;
 
-				if (combine_type_flag)
-					normal_ring_fade_dir = 2;
+				if (CombineTypeFlag)
+					NormalRingFadeDir = 2;
 				else
 				{
-					rings[(int)RingTypes::Inventory]->ringactive = 1;
-					menu_active = 1;
-					rings[(int)RingTypes::Ammo]->ringactive = 0;
+					Rings[(int)RingTypes::Inventory]->ringactive = 1;
+					MenuActive = 1;
+					Rings[(int)RingTypes::Ammo]->ringactive = 0;
 					HandleObjectChangeover((int)RingTypes::Inventory);
 				}
 
-				rings[(int)RingTypes::Ammo]->ringactive = 0;
+				Rings[(int)RingTypes::Ammo]->ringactive = 0;
 			}
 		}
 	}
-	else if (normal_ring_fade_dir == 1)
+	else if (NormalRingFadeDir == 1)
 	{
-		if (normal_ring_fade_val < 128)
-			normal_ring_fade_val += 32;
+		if (NormalRingFadeVal < 128)
+			NormalRingFadeVal += 32;
 
-		if (normal_ring_fade_val > 128)
+		if (NormalRingFadeVal > 128)
 		{
-			normal_ring_fade_val = 128;
-			normal_ring_fade_dir = 0;
-			rings[(int)RingTypes::Inventory]->ringactive = 1;
-			menu_active = 1;
+			NormalRingFadeVal = 128;
+			NormalRingFadeDir = 0;
+			Rings[(int)RingTypes::Inventory]->ringactive = 1;
+			MenuActive = 1;
 		}
 
 	}
-	else if (normal_ring_fade_dir == 2)
+	else if (NormalRingFadeDir == 2)
 	{
-		normal_ring_fade_val -= 32;
+		NormalRingFadeVal -= 32;
 
-		if (normal_ring_fade_val <= 0)
+		if (NormalRingFadeVal <= 0)
 		{
-			normal_ring_fade_val = 0;
-			normal_ring_fade_dir = 1;
+			NormalRingFadeVal = 0;
+			NormalRingFadeDir = 1;
 
-			if (combine_type_flag == 1)
+			if (CombineTypeFlag == 1)
 			{
-				combine_type_flag = 0;
-				CombineObjects(combine_obj1, combine_obj2);
+				CombineTypeFlag = 0;
+				CombineObjects(CombineObject1, CombineObject2);
 			}
-			else if (combine_type_flag == 2)
+			else if (CombineTypeFlag == 2)
 			{
-				combine_type_flag = 0;
+				CombineTypeFlag = 0;
 				ConstructObjectList();
-				SetupObjectListStartPosition(combine_obj1);
+				SetupObjectListStartPosition(CombineObject1);
 			}
-			else if (seperate_type_flag)
-				SeparateObject(rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem);
+			else if (SeperateTypeFlag)
+				SeparateObject(Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem);
 
 			HandleObjectChangeover((int)RingTypes::Inventory);
 		}
 	}
 
-	minobj = 0;
-	maxobj = 0;
-	xoff = 0;
-	n = 0;
+	int minObj = 0;
+	int maxObj = 0;
+	int xOffset = 0;
+	int n = 0;
 
-	if (rings[ringIndex]->numobjectsinlist != 1)
-		xoff = (OBJLIST_SPACING * rings[ringIndex]->objlistmovement) >> 16;
+	if (Rings[ringIndex]->numobjectsinlist != 1)
+		xOffset = (OBJLIST_SPACING * Rings[ringIndex]->objlistmovement) >> 16;
 
-	if (rings[ringIndex]->numobjectsinlist == 2)
+	if (Rings[ringIndex]->numobjectsinlist == 2)
 	{
-		minobj = -1;
-		maxobj = 0;
-		n = rings[ringIndex]->curobjinlist - 1;
+		minObj = -1;
+		maxObj = 0;
+		n = Rings[ringIndex]->curobjinlist - 1;
 	}
 
-	if (rings[ringIndex]->numobjectsinlist == 3 || rings[ringIndex]->numobjectsinlist == 4)
+	if (Rings[ringIndex]->numobjectsinlist == 3 || Rings[ringIndex]->numobjectsinlist == 4)
 	{
-		minobj = -2;
-		maxobj = 1;
-		n = rings[ringIndex]->curobjinlist - 2;
+		minObj = -2;
+		maxObj = 1;
+		n = Rings[ringIndex]->curobjinlist - 2;
 	}
 
-	if (rings[ringIndex]->numobjectsinlist >= 5)
+	if (Rings[ringIndex]->numobjectsinlist >= 5)
 	{
-		minobj = -3;
-		maxobj = 2;
-		n = rings[ringIndex]->curobjinlist - 3;
+		minObj = -3;
+		maxObj = 2;
+		n = Rings[ringIndex]->curobjinlist - 3;
 	}
 
 	if (n < 0)
-		n += rings[ringIndex]->numobjectsinlist;
+		n += Rings[ringIndex]->numobjectsinlist;
 
-	if (rings[ringIndex]->objlistmovement < 0)
-		maxobj++;
+	if (Rings[ringIndex]->objlistmovement < 0)
+		maxObj++;
 
-	if (minobj <= maxobj)
+	if (minObj <= maxObj)
 	{
-		for (i = minobj; i <= maxobj; i++)
+		for (int i = minObj; i <= maxObj; i++)
 		{
-			if (minobj == i)
+			int shade = 0;
+
+			if (minObj == i)
 			{
-				if (rings[ringIndex]->objlistmovement < 0)
+				if (Rings[ringIndex]->objlistmovement < 0)
 					shade = 0;
 				else
-					shade = rings[ringIndex]->objlistmovement >> 9;
+					shade = Rings[ringIndex]->objlistmovement >> 9;
 			}
-			else if (i != minobj + 1 || maxobj == minobj + 1)
+			else if (i != minObj + 1 || maxObj == minObj + 1)
 			{
-				if (i != maxobj)
+				if (i != maxObj)
 					shade = 128;
 				else
 				{
-					if (rings[ringIndex]->objlistmovement < 0)
-						shade = (-128 * rings[ringIndex]->objlistmovement) >> 16;
+					if (Rings[ringIndex]->objlistmovement < 0)
+						shade = (-128 * Rings[ringIndex]->objlistmovement) >> 16;
 					else
-						shade = 128 - (short)(rings[ringIndex]->objlistmovement >> 9);
+						shade = 128 - (short)(Rings[ringIndex]->objlistmovement >> 9);
 				}
 			}
 			else
 			{
-				if (rings[ringIndex]->objlistmovement < 0)
-					shade = 128 - ((-128 * rings[ringIndex]->objlistmovement) >> 16);
+				if (Rings[ringIndex]->objlistmovement < 0)
+					shade = 128 - ((-128 * Rings[ringIndex]->objlistmovement) >> 16);
 				else
 					shade = 128;
 			}
 
-			if (!minobj && !maxobj)
+			if (!minObj && !maxObj)
 				shade = 128;
 
-			if (ringIndex == (int)RingTypes::Ammo && combine_ring_fade_val < 128 && shade)
-				shade = combine_ring_fade_val;
-			else if (ringIndex == (int)RingTypes::Inventory && normal_ring_fade_val < 128 && shade)
-				shade = normal_ring_fade_val;
+			if (ringIndex == (int)RingTypes::Ammo && CombineRingFadeVal < 128 && shade)
+				shade = CombineRingFadeVal;
+			else if (ringIndex == (int)RingTypes::Inventory && NormalRingFadeVal < 128 && shade)
+				shade = NormalRingFadeVal;
 
 			if (!i)
 			{
-				nummeup = 0;
+				int numMeUp = 0;
+				int count = 0;
 
-				switch (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number)
+				switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number)
 				{
 				case ID_BIGMEDI_ITEM:
-					nummeup = Lara.Inventory.TotalLargeMedipacks;
+					numMeUp = Lara.Inventory.TotalLargeMedipacks;
 					break;
 
 				case ID_SMALLMEDI_ITEM:
-					nummeup = Lara.Inventory.TotalSmallMedipacks;
+					numMeUp = Lara.Inventory.TotalSmallMedipacks;
 					break;
 
 				case ID_FLARE_INV_ITEM:
-					nummeup = Lara.Inventory.TotalFlares;
+					numMeUp = Lara.Inventory.TotalFlares;
 					break;
 
 				default:
-					if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-						inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
+					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
+						InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number > ID_PUZZLE_ITEM16)
 					{
-						switch (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number)
+						switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number)
 						{
 						case ID_SHOTGUN_AMMO1_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-							nummeup = count == -1 ? count : count / 6;
+							numMeUp = count == -1 ? count : count / 6;
 							break;
 
 						case ID_SHOTGUN_AMMO2_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-							nummeup = count == -1 ? count : count / 6;
+							numMeUp = count == -1 ? count : count / 6;
 							break;
 
 						case ID_HK_AMMO_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							numMeUp = Lara.Weapons[(int)LaraWeaponType::HK].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
 						case ID_CROSSBOW_AMMO1_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-							nummeup = count;
+							numMeUp = count;
 							break;
 
 						case ID_CROSSBOW_AMMO2_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-							nummeup = count;
+							numMeUp = count;
 							break;
 
 						case ID_CROSSBOW_AMMO3_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::Crossbow].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
-							nummeup = count;
+							numMeUp = count;
 							break;
 
 						case ID_GRENADE_AMMO1_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
-							nummeup = count;
+							numMeUp = count;
 							break;
 
 						case ID_GRENADE_AMMO2_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo2].getCount();
-							nummeup = count;
+							numMeUp = count;
 							break;
 
 						case ID_GRENADE_AMMO3_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Ammo[(int)WeaponAmmoType::Ammo3].getCount();
-							nummeup = count;
+							numMeUp = count;
 							break;
 
 						case ID_ROCKET_LAUNCHER_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							numMeUp = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
 						case ID_HARPOON_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							numMeUp = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
 						case ID_REVOLVER_AMMO_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							numMeUp = Lara.Weapons[(int)LaraWeaponType::Revolver].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
 						case ID_UZI_AMMO_ITEM:
-							nummeup = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
+							numMeUp = Lara.Weapons[(int)LaraWeaponType::Uzi].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 						}
 					}
 					else
 					{
-						nummeup = Lara.Inventory.Puzzles[inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number - ID_PUZZLE_ITEM1];
+						numMeUp = Lara.Inventory.Puzzles[InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number - ID_PUZZLE_ITEM1];
 
-						if (nummeup <= 1)
-							sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
+						if (numMeUp <= 1)
+							sprintf(textbufme, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
 						else
-							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, "%d x %s", numMeUp, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
 					}
 
 					break;
 				}
 
-				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-					inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].object_number > ID_PUZZLE_ITEM16)
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
+					InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number > ID_PUZZLE_ITEM16)
 				{
-					if (nummeup)
+					if (numMeUp)
 					{
-						if (nummeup == -1)
-							sprintf(textbufme, "Unlimited %s", g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
+						if (numMeUp == -1)
+							sprintf(textbufme, "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
 						else
-							sprintf(textbufme, "%d x %s", nummeup, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
+							sprintf(textbufme, "%d x %s", numMeUp, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
 					}
 					else
-						sprintf(textbufme, g_GameFlow->GetString(inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].objname));
+						sprintf(textbufme, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
 				}
 
+				int objmeup;
 				if (ringIndex == (int)RingTypes::Inventory)
 					objmeup = (int)(PHD_CENTER_Y - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
 				else
@@ -2965,112 +2948,111 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 				g_Renderer.DrawString(PHD_CENTER_X, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
-			if (!i && !rings[ringIndex]->objlistmovement)
+			if (!i && !Rings[ringIndex]->objlistmovement)
 			{
-				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].rot_flags & INV_ROT_X)
-					rings[ringIndex]->current_object_list[n].xrot += ANGLE(5);
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].rot_flags & INV_ROT_X)
+					Rings[ringIndex]->CurrentObjectList[n].xrot += ANGLE(5.0f);
 
-				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].rot_flags & INV_ROT_Y)
-					rings[ringIndex]->current_object_list[n].yrot += ANGLE(5);
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].rot_flags & INV_ROT_Y)
+					Rings[ringIndex]->CurrentObjectList[n].yrot += ANGLE(5.0f);
 
-				if (inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].rot_flags & INV_ROT_Z)
-					rings[ringIndex]->current_object_list[n].zrot += ANGLE(5);
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].rot_flags & INV_ROT_Z)
+					Rings[ringIndex]->CurrentObjectList[n].zrot += ANGLE(5.0f);
 			}
 			else
 			{
-				SpinBack(&rings[ringIndex]->current_object_list[n].xrot);
-				SpinBack(&rings[ringIndex]->current_object_list[n].yrot);
-				SpinBack(&rings[ringIndex]->current_object_list[n].zrot);
+				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].xrot);
+				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].yrot);
+				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].zrot);
 			}
 
-			xrot = rings[ringIndex]->current_object_list[n].xrot;
-			yrot = rings[ringIndex]->current_object_list[n].yrot;
-			zrot = rings[ringIndex]->current_object_list[n].zrot;
+			xrot = Rings[ringIndex]->CurrentObjectList[n].xrot;
+			yrot = Rings[ringIndex]->CurrentObjectList[n].yrot;
+			zrot = Rings[ringIndex]->CurrentObjectList[n].zrot;
 
-			if (rings[ringIndex]->objlistmovement)
+			int activeNum = 0;
+			if (Rings[ringIndex]->objlistmovement)
 			{
-				if (rings[ringIndex]->objlistmovement > 0)
-					activenum = -1;
+				if (Rings[ringIndex]->objlistmovement > 0)
+					activeNum = -1;
 				else
-					activenum = 1;
+					activeNum = 1;
 			}
-			else
-				activenum = 0;
 
-			if (i == activenum)
+			if (i == activeNum)
 			{
-				if (rings[ringIndex]->current_object_list[n].bright < 160)
-					rings[ringIndex]->current_object_list[n].bright += 16;
+				if (Rings[ringIndex]->CurrentObjectList[n].bright < 160)
+					Rings[ringIndex]->CurrentObjectList[n].bright += 16;
 
-				if (rings[ringIndex]->current_object_list[n].bright > 160)
-					rings[ringIndex]->current_object_list[n].bright = 160;
+				if (Rings[ringIndex]->CurrentObjectList[n].bright > 160)
+					Rings[ringIndex]->CurrentObjectList[n].bright = 160;
 			}
 			else
 			{
-				if (rings[ringIndex]->current_object_list[n].bright > 32)
-					rings[ringIndex]->current_object_list[n].bright -= 16;
+				if (Rings[ringIndex]->CurrentObjectList[n].bright > 32)
+					Rings[ringIndex]->CurrentObjectList[n].bright -= 16;
 
-				if (rings[ringIndex]->current_object_list[n].bright < 32)
-					rings[ringIndex]->current_object_list[n].bright = 32;
+				if (Rings[ringIndex]->CurrentObjectList[n].bright < 32)
+					Rings[ringIndex]->CurrentObjectList[n].bright = 32;
 			}
 
 			int x, y, y2;
-			x = 400 + xoff + i * OBJLIST_SPACING;
+			x = 400 + xOffset + i * OBJLIST_SPACING;
 			y = 150;
 			y2 = 480;//combine 
-			short obj = ConvertInventoryItemToObject(rings[ringIndex]->current_object_list[n].invitem);
-			float scaler = inventry_objects_list[rings[ringIndex]->current_object_list[n].invitem].scale1;
+			short obj = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].invitem);
+			float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].scale1;
 			g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
 
-			if (++n >= rings[ringIndex]->numobjectsinlist)
+			if (++n >= Rings[ringIndex]->numobjectsinlist)
 				n = 0;
 		}
 
-		if (rings[ringIndex]->ringactive)
+		if (Rings[ringIndex]->ringactive)
 		{
-			if (rings[ringIndex]->numobjectsinlist != 1 && (ringIndex != 1 || combine_ring_fade_val == 128))
+			if (Rings[ringIndex]->numobjectsinlist != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
 			{
-				if (rings[ringIndex]->objlistmovement > 0)
-					rings[ringIndex]->objlistmovement += 8192;
+				if (Rings[ringIndex]->objlistmovement > 0)
+					Rings[ringIndex]->objlistmovement += 8192;
 
-				if (rings[ringIndex]->objlistmovement < 0)
-					rings[ringIndex]->objlistmovement -= 8192;
+				if (Rings[ringIndex]->objlistmovement < 0)
+					Rings[ringIndex]->objlistmovement -= 8192;
 
 				if (IsHeld(In::Left))
 				{
-					if (!rings[ringIndex]->objlistmovement)
+					if (!Rings[ringIndex]->objlistmovement)
 					{
 						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-						rings[ringIndex]->objlistmovement += 8192;
+						Rings[ringIndex]->objlistmovement += 8192;
 
-						if (ammo_selector_flag)
-							ammo_selector_fade_dir = 2;
+						if (AmmoSelectorFlag)
+							AmmoSelectorFadeDir = 2;
 					}
 				}
 
 				if (IsHeld(In::Right))
 				{
-					if (!rings[ringIndex]->objlistmovement)
+					if (!Rings[ringIndex]->objlistmovement)
 					{
 						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-						rings[ringIndex]->objlistmovement -= 8192;
+						Rings[ringIndex]->objlistmovement -= 8192;
 
-						if (ammo_selector_flag)
-							ammo_selector_fade_dir = 2;
+						if (AmmoSelectorFlag)
+							AmmoSelectorFadeDir = 2;
 					}
 
 				}
 
-				if (rings[ringIndex]->objlistmovement < 65536)
+				if (Rings[ringIndex]->objlistmovement < 65536)
 				{
-					if (rings[ringIndex]->objlistmovement < -65535)
+					if (Rings[ringIndex]->objlistmovement < -65535)
 					{
-						rings[ringIndex]->curobjinlist++;
+						Rings[ringIndex]->curobjinlist++;
 
-						if (rings[ringIndex]->curobjinlist >= rings[ringIndex]->numobjectsinlist)
-							rings[ringIndex]->curobjinlist = 0;
+						if (Rings[ringIndex]->curobjinlist >= Rings[ringIndex]->numobjectsinlist)
+							Rings[ringIndex]->curobjinlist = 0;
 
-						rings[ringIndex]->objlistmovement = 0;
+						Rings[ringIndex]->objlistmovement = 0;
 
 						if (ringIndex == (int)RingTypes::Inventory)
 							HandleObjectChangeover(0);
@@ -3078,12 +3060,12 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 				}
 				else
 				{
-					rings[ringIndex]->curobjinlist--;
+					Rings[ringIndex]->curobjinlist--;
 
-					if (rings[ringIndex]->curobjinlist < 0)
-						rings[ringIndex]->curobjinlist = rings[ringIndex]->numobjectsinlist - 1;
+					if (Rings[ringIndex]->curobjinlist < 0)
+						Rings[ringIndex]->curobjinlist = Rings[ringIndex]->numobjectsinlist - 1;
 
-					rings[ringIndex]->objlistmovement = 0;
+					Rings[ringIndex]->objlistmovement = 0;
 
 					if (ringIndex == (int)RingTypes::Inventory)
 						HandleObjectChangeover(0);
@@ -3093,18 +3075,18 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 	}
 }
 
-bool GuiController::CallInventory(bool reset_mode)
+bool GuiController::CallInventory(bool resetMode)
 {
 	bool returnValue = false;
 
 	Lara.Inventory.OldBusy = Lara.Inventory.IsBusy;
 
-	rings[(int)RingTypes::Inventory] = &pcring1;
-	rings[(int)RingTypes::Ammo] = &pcring2;
+	Rings[(int)RingTypes::Inventory] = &PCRing1;
+	Rings[(int)RingTypes::Ammo] = &PCRing2;
 	g_Renderer.DumpGameScene();
 
-	if (reset_mode)
-		invMode = InventoryMode::InGame;
+	if (resetMode)
+		InvMode = InventoryMode::InGame;
 
 	InitialiseInventory();
 	Camera.numberFrames = 2;
@@ -3114,8 +3096,8 @@ bool GuiController::CallInventory(bool reset_mode)
 	{
 		OBJLIST_SPACING = PHD_CENTER_X >> 1;
 
-		if (compassNeedleAngle != 1024)
-			compassNeedleAngle -= 32;
+		if (CompassNeedleAngle != 1024)
+			CompassNeedleAngle -= 32;
 
 		UpdateInput();
 		GameTimer++;
@@ -3132,7 +3114,7 @@ bool GuiController::CallInventory(bool reset_mode)
 		DrawInventory();
 		DrawCompass();
 
-		switch (invMode)
+		switch (InvMode)
 		{
 		case InventoryMode::InGame:
 			DoInventory();
@@ -3159,10 +3141,10 @@ bool GuiController::CallInventory(bool reset_mode)
 				break;
 
 			case LoadResult::Cancel:
-				exitLoop = !reset_mode;
+				exitLoop = !resetMode;
 
-				if (reset_mode)
-					invMode = InventoryMode::InGame;
+				if (resetMode)
+					InvMode = InventoryMode::InGame;
 
 				break;
 
@@ -3175,66 +3157,67 @@ bool GuiController::CallInventory(bool reset_mode)
 		case InventoryMode::Save:
 			if (DoSave())
 			{
-				exitLoop = !reset_mode;
-				if (reset_mode)
-					invMode = InventoryMode::InGame;
+				exitLoop = !resetMode;
+				if (resetMode)
+					InvMode = InventoryMode::InGame;
 			}
 
 			break;
 		}
 
-		if (useItem && !TrInput)
+		if (UseItem && !TrInput)
 			exitLoop = true;
 
 		Camera.numberFrames = g_Renderer.SyncRenderer();
 	}
 
-	lastInvItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+	LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 	UpdateWeaponStatus();
 
-	if (useItem)
+	if (UseItem)
 		UseCurrentItem();
 
 	Lara.Inventory.IsBusy = Lara.Inventory.OldBusy;
-	invMode = InventoryMode::None;
+	InvMode = InventoryMode::None;
 
 	return returnValue;
 }
 
 void GuiController::DoStatisticsMode()
 {
-	invMode = InventoryMode::Statistics;
+	InvMode = InventoryMode::Statistics;
 
 	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		invMode = InventoryMode::InGame;
+		InvMode = InventoryMode::InGame;
 	}
 }
 
 void GuiController::DoExamineMode()
 {
-	invMode = InventoryMode::Examine;
+	InvMode = InventoryMode::Examine;
 
 	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		invMode = InventoryMode::None;
+		InvMode = InventoryMode::None;
 	}
 }
 
 void GuiController::DrawCompass()
 {
 	return;
-	g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90), 0, ANGLE(180), inventry_objects_list[INV_OBJECT_COMPASS].scale1);
-	short compass_speed = phd_sin(compassNeedleAngle - LaraItem->Pose.Orientation.y);
-	short compass_angle = (LaraItem->Pose.Orientation.y + compass_speed) - ANGLE(180);
-	Matrix::CreateRotationY(compass_angle);
+
+	g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90.0f), 0, ANGLE(180.0f), InventoryObjectTable[INV_OBJECT_COMPASS].scale1);
+	short compassSpeed = phd_sin(CompassNeedleAngle - LaraItem->Pose.Orientation.y);
+	short compassAngle = (LaraItem->Pose.Orientation.y + compassSpeed) - ANGLE(180.0f);
+	Matrix::CreateRotationY(compassAngle);
 }
 
 void GuiController::DoDiary()
 {
-	invMode = InventoryMode::Diary;
+	InvMode = InventoryMode::Diary;
 
 	if (GUI_INPUT_RIGHT &&
 		Lara.Inventory.Diary.currentPage < Lara.Inventory.Diary.numPages)
@@ -3253,13 +3236,13 @@ void GuiController::DoDiary()
 	if (GUI_INPUT_DESELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-		invMode = InventoryMode::None;
+		InvMode = InventoryMode::None;
 	}
 }
 
 short GuiController::GetLoadSaveSelection()
 {
-	return selected_save_slot;
+	return SelectedSaveSlot;
 }
 
 LoadResult GuiController::DoLoad()
@@ -3268,25 +3251,25 @@ LoadResult GuiController::DoLoad()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_save_slot == SAVEGAME_MAX - 1)
-			selected_save_slot -= SAVEGAME_MAX - 1;	//go back up
+		if (SelectedSaveSlot == SAVEGAME_MAX - 1)
+			SelectedSaveSlot -= SAVEGAME_MAX - 1;	//go back up
 		else
-			selected_save_slot++;
+			SelectedSaveSlot++;
 	}
 
 	if (GUI_INPUT_UP)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_save_slot== 0)
-			selected_save_slot += SAVEGAME_MAX - 1;	//go back down
+		if (SelectedSaveSlot== 0)
+			SelectedSaveSlot += SAVEGAME_MAX - 1;	//go back down
 		else
-			selected_save_slot--;
+			SelectedSaveSlot--;
 	}
 
 	if (GUI_INPUT_SELECT)
 	{
-		if (!SavegameInfos[selected_save_slot].Present)
+		if (!SavegameInfos[SelectedSaveSlot].Present)
 		{
 			if (GUI_INPUT_SELECT)
 				SayNo();
@@ -3294,7 +3277,7 @@ LoadResult GuiController::DoLoad()
 		else
 		{
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			g_GameFlow->SelectedSaveGame = selected_save_slot;
+			g_GameFlow->SelectedSaveGame = SelectedSaveSlot;
 			return LoadResult::Load;
 		}
 	}
@@ -3311,26 +3294,26 @@ bool GuiController::DoSave()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_save_slot == SAVEGAME_MAX - 1)
-			selected_save_slot -= SAVEGAME_MAX - 1;	//go back up
+		if (SelectedSaveSlot == SAVEGAME_MAX - 1)
+			SelectedSaveSlot -= SAVEGAME_MAX - 1;
 		else
-			selected_save_slot++;
+			SelectedSaveSlot++;
 	}
 
 	if (GUI_INPUT_UP)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (selected_save_slot == 0)
-			selected_save_slot += SAVEGAME_MAX - 1;	//go back down
+		if (SelectedSaveSlot == 0)
+			SelectedSaveSlot += SAVEGAME_MAX - 1;
 		else
-			selected_save_slot--;
+			SelectedSaveSlot--;
 	}
 
 	if (GUI_INPUT_SELECT)
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		SaveGame::Save(selected_save_slot);
+		SaveGame::Save(SelectedSaveSlot);
 		g_GameScript->OnSave();
 		return true;
 	}
@@ -3341,7 +3324,7 @@ bool GuiController::DoSave()
 	return false;
 }
 
-void combine_revolver_lasersight(int flag)
+void CombineRevolverLasersight(int flag)
 {
 	if (flag)
 	{
@@ -3354,14 +3337,15 @@ void combine_revolver_lasersight(int flag)
 		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = true;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
+	if (Lara.Control.HandStatus != HandStatus::Free &&
+		Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 	{
 		UndrawPistolMeshRight(LaraItem, LaraWeaponType::Revolver);
 		DrawPistolMeshes(LaraItem, LaraWeaponType::Revolver);
 	}
 }
 
-void combine_crossbow_lasersight(int flag)
+void CombineCrossbowLasersight(int flag)
 {
 	if (flag)
 	{
@@ -3374,14 +3358,15 @@ void combine_crossbow_lasersight(int flag)
 		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = true;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free && Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
+	if (Lara.Control.HandStatus != HandStatus::Free &&
+		Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
 	{
 		UndrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
 		DrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
 	}
 }
 
-void combine_HK_SILENCER(int flag)
+void CombineHKSilencer(int flag)
 {
 	if (flag)
 	{
@@ -3396,399 +3381,399 @@ void combine_HK_SILENCER(int flag)
 	}
 }
 
-void combine_PuzzleItem1(int flag)
+void CombinePuzzleItem1(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[0] = 0;
 	Lara.Inventory.PuzzlesCombo[1] = 0;
 	Lara.Inventory.Puzzles[0] = 1;
 }
 
-void combine_PuzzleItem2(int flag)
+void CombinePuzzleItem2(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[2] = 0;
 	Lara.Inventory.PuzzlesCombo[3] = 0;
 	Lara.Inventory.Puzzles[1] = 1;
 }
 
-void combine_PuzzleItem3(int flag)
+void CombinePuzzleItem3(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[4] = 0;
 	Lara.Inventory.PuzzlesCombo[5] = 0;
 	Lara.Inventory.Puzzles[2] = 1;
 }
 
-void combine_PuzzleItem4(int flag)
+void CombinePuzzleItem4(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[6] = 0;
 	Lara.Inventory.PuzzlesCombo[7] = 0;
 	Lara.Inventory.Puzzles[3] = 1;
 }
 
-void combine_PuzzleItem5(int flag)
+void CombinePuzzleItem5(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[8] = 0;
 	Lara.Inventory.PuzzlesCombo[9] = 0;
 	Lara.Inventory.Puzzles[4] = 1;
 }
 
-void combine_PuzzleItem6(int flag)
+void CombinePuzzleItem6(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[10] = 0;
 	Lara.Inventory.PuzzlesCombo[11] = 0;
 	Lara.Inventory.Puzzles[5] = 1;
 }
 
-void combine_PuzzleItem7(int flag)
+void CombinePuzzleItem7(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[12] = 0;
 	Lara.Inventory.PuzzlesCombo[13] = 0;
 	Lara.Inventory.Puzzles[6] = 1;
 }
 
-void combine_PuzzleItem8(int flag)
+void CombinePuzzleItem8(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[14] = 0;
 	Lara.Inventory.PuzzlesCombo[15] = 0;
 	Lara.Inventory.Puzzles[7] = 1;
 }
 
-void combine_PuzzleItem9(int flag)
+void CombinePuzzleItem9(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[16] = 0;
 	Lara.Inventory.PuzzlesCombo[17] = 0;
 	Lara.Inventory.Puzzles[8] = 1;
 }
 
-void combine_PuzzleItem10(int flag)
+void CombinePuzzleItem10(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[18] = 0;
 	Lara.Inventory.PuzzlesCombo[19] = 0;
 	Lara.Inventory.Puzzles[9] = 1;
 }
 
-void combine_PuzzleItem11(int flag)
+void CombinePuzzleItem11(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[20] = 0;
 	Lara.Inventory.PuzzlesCombo[21] = 0;
 	Lara.Inventory.Puzzles[10] = 1;
 }
 
-void combine_PuzzleItem12(int flag)
+void CombinePuzzleItem12(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[22] = 0;
 	Lara.Inventory.PuzzlesCombo[23] = 0;
 	Lara.Inventory.Puzzles[11] = 1;
 }
 
-void combine_PuzzleItem13(int flag)
+void CombinePuzzleItem13(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[24] = 0;
 	Lara.Inventory.PuzzlesCombo[25] = 0;
 	Lara.Inventory.Puzzles[12] = 1;
 }
 
-void combine_PuzzleItem14(int flag)
+void CombinePuzzleItem14(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[26] = 0;
 	Lara.Inventory.PuzzlesCombo[27] = 0;
 	Lara.Inventory.Puzzles[13] = 1;
 }
 
-void combine_PuzzleItem15(int flag)
+void CombinePuzzleItem15(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[28] = 0;
 	Lara.Inventory.PuzzlesCombo[29] = 0;
 	Lara.Inventory.Puzzles[14] = 1;
 }
 
-void combine_PuzzleItem16(int flag)
+void CombinePuzzleItem16(int flag)
 {
 	Lara.Inventory.PuzzlesCombo[30] = 0;
 	Lara.Inventory.PuzzlesCombo[31] = 0;
 	Lara.Inventory.Puzzles[15] = 1;
 }
 
-void combine_KeyItem1(int flag)
+void CombineKeyItem1(int flag)
 {
 	Lara.Inventory.Keys[0] = 1;
 	Lara.Inventory.KeysCombo[0] = 0;
 	Lara.Inventory.KeysCombo[1] = 0;
 }
 
-void combine_KeyItem2(int flag)
+void CombineKeyItem2(int flag)
 {
 	Lara.Inventory.Keys[1] = 1;
 	Lara.Inventory.KeysCombo[2] = 0;
 	Lara.Inventory.KeysCombo[3] = 0;
 }
 
-void combine_KeyItem3(int flag)
+void CombineKeyItem3(int flag)
 {
 	Lara.Inventory.Keys[2] = 1;
 	Lara.Inventory.KeysCombo[4] = 0;
 	Lara.Inventory.KeysCombo[5] = 0;
 }
 
-void combine_KeyItem4(int flag)
+void CombineKeyItem4(int flag)
 {
 	Lara.Inventory.Keys[3] = 1;
 	Lara.Inventory.KeysCombo[6] = 0;
 	Lara.Inventory.KeysCombo[7] = 0;
 }
 
-void combine_KeyItem5(int flag)
+void CombineKeyItem5(int flag)
 {
 	Lara.Inventory.Keys[4] = 1;
 	Lara.Inventory.KeysCombo[8] = 0;
 	Lara.Inventory.KeysCombo[9] = 0;
 }
 
-void combine_KeyItem6(int flag)
+void CombineKeyItem6(int flag)
 {
 	Lara.Inventory.Keys[5] = 1;
 	Lara.Inventory.KeysCombo[10] = 0;
 	Lara.Inventory.KeysCombo[11] = 0;
 }
 
-void combine_KeyItem7(int flag)
+void CombineKeyItem7(int flag)
 {
 	Lara.Inventory.Keys[6] = 1;
 	Lara.Inventory.KeysCombo[12] = 0;
 	Lara.Inventory.KeysCombo[13] = 0;
 }
 
-void combine_KeyItem8(int flag)
+void CombineKeyItem8(int flag)
 {
 	Lara.Inventory.Keys[7] = 1;
 	Lara.Inventory.KeysCombo[14] = 0;
 	Lara.Inventory.KeysCombo[15] = 0;
 }
 
-void combine_KeyItem9(int flag)
+void CombineKeyItem9(int flag)
 {
 	Lara.Inventory.Keys[8] = 1;
 	Lara.Inventory.KeysCombo[16] = 0;
 	Lara.Inventory.KeysCombo[17] = 0;
 }
 
-void combine_KeyItem10(int flag)
+void CombineKeyItem10(int flag)
 {
 	Lara.Inventory.Keys[9] = 1;
 	Lara.Inventory.KeysCombo[18] = 0;
 	Lara.Inventory.KeysCombo[19] = 0;
 }
 
-void combine_KeyItem11(int flag)
+void CombineKeyItem11(int flag)
 {
 	Lara.Inventory.Keys[10] = 1;
 	Lara.Inventory.KeysCombo[20] = 0;
 	Lara.Inventory.KeysCombo[21] = 0;
 }
 
-void combine_KeyItem12(int flag)
+void CombineKeyItem12(int flag)
 {
 	Lara.Inventory.Keys[11] = 1;
 	Lara.Inventory.KeysCombo[22] = 0;
 	Lara.Inventory.KeysCombo[23] = 0;
 }
 
-void combine_KeyItem13(int flag)
+void CombineKeyItem13(int flag)
 {
 	Lara.Inventory.Keys[12] = 1;
 	Lara.Inventory.KeysCombo[24] = 0;
 	Lara.Inventory.KeysCombo[25] = 0;
 }
 
-void combine_KeyItem14(int flag)
+void CombineKeyItem14(int flag)
 {
 	Lara.Inventory.Keys[13] = 1;
 	Lara.Inventory.KeysCombo[26] = 0;
 	Lara.Inventory.KeysCombo[27] = 0;
 }
 
-void combine_KeyItem15(int flag)
+void CombineKeyItem15(int flag)
 {
 	Lara.Inventory.Keys[14] = 1;
 	Lara.Inventory.KeysCombo[28] = 0;
 	Lara.Inventory.KeysCombo[29] = 0;
 }
 
-void combine_KeyItem16(int flag)
+void CombineKeyItem16(int flag)
 {
 	Lara.Inventory.Keys[15] = 1;
 	Lara.Inventory.KeysCombo[30] = 0;
 	Lara.Inventory.KeysCombo[31] = 0;
 }
 
-void combine_PickupItem1(int flag)
+void CombinePickupItem1(int flag)
 {
 	Lara.Inventory.Pickups[0] = 1;
 	Lara.Inventory.PickupsCombo[0] = 0;
 	Lara.Inventory.PickupsCombo[1] = 0;
 }
 
-void combine_PickupItem2(int flag)
+void CombinePickupItem2(int flag)
 {
 	Lara.Inventory.Pickups[1] = 1;
 	Lara.Inventory.PickupsCombo[2] = 0;
 	Lara.Inventory.PickupsCombo[3] = 0;
 }
 
-void combine_PickupItem3(int flag)
+void CombinePickupItem3(int flag)
 {
 	Lara.Inventory.Pickups[2] = 1;
 	Lara.Inventory.PickupsCombo[4] = 0;
 	Lara.Inventory.PickupsCombo[5] = 0;
 }
 
-void combine_PickupItem4(int flag)
+void CombinePickupItem4(int flag)
 {
 	Lara.Inventory.Pickups[3] = 1;
 	Lara.Inventory.PickupsCombo[6] = 0;
 	Lara.Inventory.PickupsCombo[7] = 0;
 }
 
-void combine_PickupItem5(int flag)
+void CombinePickupItem5(int flag)
 {
 	Lara.Inventory.Pickups[4] = 1;
 	Lara.Inventory.PickupsCombo[8] = 0;
 	Lara.Inventory.PickupsCombo[9] = 0;
 }
 
-void combine_PickupItem6(int flag)
+void CombinePickupItem6(int flag)
 {
 	Lara.Inventory.Pickups[5] = 1;
 	Lara.Inventory.PickupsCombo[10] = 0;
 	Lara.Inventory.PickupsCombo[11] = 0;
 }
 
-void combine_PickupItem7(int flag)
+void CombinePickupItem7(int flag)
 {
 	Lara.Inventory.Pickups[6] = 1;
 	Lara.Inventory.PickupsCombo[12] = 0;
 	Lara.Inventory.PickupsCombo[13] = 0;
 }
 
-void combine_PickupItem8(int flag)
+void CombinePickupItem8(int flag)
 {
 	Lara.Inventory.Pickups[7] = 1;
 	Lara.Inventory.PickupsCombo[14] = 0;
 	Lara.Inventory.PickupsCombo[15] = 0;
 }
 
-void combine_PickupItem9(int flag)
+void CombinePickupItem9(int flag)
 {
 	Lara.Inventory.Pickups[8] = 1;
 	Lara.Inventory.PickupsCombo[16] = 0;
 	Lara.Inventory.PickupsCombo[17] = 0;
 }
 
-void combine_PickupItem10(int flag)
+void CombinePickupItem10(int flag)
 {
 	Lara.Inventory.Pickups[9] = 1;
 	Lara.Inventory.PickupsCombo[18] = 0;
 	Lara.Inventory.PickupsCombo[19] = 0;
 }
 
-void combine_PickupItem11(int flag)
+void CombinePickupItem11(int flag)
 {
 	Lara.Inventory.Pickups[10] = 1;
 	Lara.Inventory.PickupsCombo[20] = 0;
 	Lara.Inventory.PickupsCombo[21] = 0;
 }
 
-void combine_PickupItem12(int flag)
+void CombinePickupItem12(int flag)
 {
 	Lara.Inventory.Pickups[11] = 1;
 	Lara.Inventory.PickupsCombo[22] = 0;
 	Lara.Inventory.PickupsCombo[23] = 0;
 }
 
-void combine_PickupItem13(int flag)
+void CombinePickupItem13(int flag)
 {
 	Lara.Inventory.Pickups[12] = 1;
 	Lara.Inventory.PickupsCombo[24] = 0;
 	Lara.Inventory.PickupsCombo[25] = 0;
 }
 
-void combine_PickupItem14(int flag)
+void CombinePickupItem14(int flag)
 {
 	Lara.Inventory.Pickups[13] = 1;
 	Lara.Inventory.PickupsCombo[26] = 0;
 	Lara.Inventory.PickupsCombo[27] = 0;
 }
 
-void combine_PickupItem15(int flag)
+void CombinePickupItem15(int flag)
 {
 	Lara.Inventory.Pickups[14] = 1;
 	Lara.Inventory.PickupsCombo[28] = 0;
 	Lara.Inventory.PickupsCombo[29] = 0;
 }
 
-void combine_PickupItem16(int flag)
+void CombinePickupItem16(int flag)
 {
 	Lara.Inventory.Pickups[15] = 1;
 	Lara.Inventory.PickupsCombo[30] = 0;
 	Lara.Inventory.PickupsCombo[31] = 0;
 }
 
-void combine_Examine1(int flag)
+void CombineExamine1(int flag)
 {
 	Lara.Inventory.Examines[0] = 1;
 	Lara.Inventory.ExaminesCombo[0] = 0;
 	Lara.Inventory.ExaminesCombo[1] = 0;
 }
 
-void combine_Examine2(int flag)
+void CombineExamine2(int flag)
 {
 	Lara.Inventory.Examines[1] = 1;
 	Lara.Inventory.ExaminesCombo[2] = 0;
 	Lara.Inventory.ExaminesCombo[3] = 0;
 }
 
-void combine_Examine3(int flag)
+void CombineExamine3(int flag)
 {
 	Lara.Inventory.Examines[2] = 1;
 	Lara.Inventory.ExaminesCombo[4] = 0;
 	Lara.Inventory.ExaminesCombo[5] = 0;
 }
 
-void combine_Examine4(int flag)
+void CombineExamine4(int flag)
 {
 	Lara.Inventory.Examines[3] = 1;
 	Lara.Inventory.ExaminesCombo[6] = 0;
 	Lara.Inventory.ExaminesCombo[7] = 0;
 }
 
-void combine_Examine5(int flag)
+void CombineExamine5(int flag)
 {
 	Lara.Inventory.Examines[4] = 1;
 	Lara.Inventory.ExaminesCombo[8] = 0;
 	Lara.Inventory.ExaminesCombo[9] = 0;
 }
 
-void combine_Examine6(int flag)
+void CombineExamine6(int flag)
 {
 	Lara.Inventory.Examines[5] = 1;
 	Lara.Inventory.ExaminesCombo[10] = 0;
 	Lara.Inventory.ExaminesCombo[11] = 0;
 }
 
-void combine_Examine7(int flag)
+void CombineExamine7(int flag)
 {
 	Lara.Inventory.Examines[6] = 1;
 	Lara.Inventory.ExaminesCombo[12] = 0;
 	Lara.Inventory.ExaminesCombo[13] = 0;
 }
 
-void combine_Examine8(int flag)
+void CombineExamine8(int flag)
 {
 	Lara.Inventory.Examines[7] = 1;
 	Lara.Inventory.ExaminesCombo[14] = 0;
 	Lara.Inventory.ExaminesCombo[15] = 0;
 }
 
-void combine_ClockWorkBeetle(int flag)
+void CombineClockWorkBeetle(int flag)
 {
 	Lara.Inventory.BeetleComponents &= 2; // Remove combo 1.
 	Lara.Inventory.BeetleComponents &= 4; // Remove combo 2.
@@ -3825,7 +3810,7 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			Lara.Inventory.SmallWaterskin = smallLiters + 1;
 			Lara.Inventory.BigWaterskin = bigLiters + 1;
-			combine_obj1 = (smallLiters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
+			CombineObject1 = (smallLiters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
 			return true;
 		}
 	}
@@ -3851,7 +3836,7 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			Lara.Inventory.SmallWaterskin = smallLiters + 1;
 			Lara.Inventory.BigWaterskin = bigLiters + 1;
-			combine_obj1 = (bigLiters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
+			CombineObject1 = (bigLiters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
 			return true;
 		}
 	}

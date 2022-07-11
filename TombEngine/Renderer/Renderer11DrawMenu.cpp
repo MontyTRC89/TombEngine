@@ -95,11 +95,11 @@ namespace TEN::Renderer
 		auto title_option = g_Gui.GetSelectedOption();
 
 		char stringBuffer[32] = {};
-		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().selectedScreenResolution];
+		auto screenResolution = g_Configuration.SupportedScreenResolutions[g_Gui.GetCurrentSettings().SelectedScreenResolution];
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
-		auto* shadowMode = g_Gui.GetCurrentSettings().conf.ShadowMode ? 
-			(g_Gui.GetCurrentSettings().conf.ShadowMode == SHADOW_LARA ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
+		auto* shadowMode = g_Gui.GetCurrentSettings().Configuration.ShadowMode ? 
+			(g_Gui.GetCurrentSettings().Configuration.ShadowMode == SHADOW_LARA ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
 		switch (menu)
 		{
@@ -136,7 +136,7 @@ namespace TEN::Renderer
 
 			// Windowed mode
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_WINDOWED), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.Windowed), PRINTSTRING_COLOR_WHITE, SF(title_option == 1));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.Windowed), PRINTSTRING_COLOR_WHITE, SF(title_option == 1));
 			GetNextLinePosition(&y);
 
 			// Enable dynamic shadows
@@ -146,12 +146,12 @@ namespace TEN::Renderer
 
 			// Enable caustics
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_CAUSTICS), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableCaustics), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
 			// Enable volumetric fog
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_VOLUMETRIC_FOG), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableVolumetricFog), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableVolumetricFog), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
 			GetNextBlockPosition(&y);
 
 			// Apply
@@ -173,7 +173,7 @@ namespace TEN::Renderer
 
 			// Enable sound special effects
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_REVERB), PRINTSTRING_COLOR_ORANGE, SF(title_option == 0));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableReverb), PRINTSTRING_COLOR_WHITE, SF(title_option == 0));
 			GetNextLinePosition(&y);
 
 			// Initialise bars, if not yet done. Must be done here because we're calculating Y coord on the fly.
@@ -182,28 +182,28 @@ namespace TEN::Renderer
 
 			// Music volume
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MUSIC_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 1));
-			DrawBar(g_Gui.GetCurrentSettings().conf.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.MusicVolume / 100.0f, g_MusicVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextLinePosition(&y);
 
 			// Sound FX volume
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_SFX_VOLUME), PRINTSTRING_COLOR_ORANGE, SF(title_option == 2));
-			DrawBar(g_Gui.GetCurrentSettings().conf.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
+			DrawBar(g_Gui.GetCurrentSettings().Configuration.SfxVolume / 100.0f, g_SFXVolumeBar, ID_SFX_BAR_TEXTURE, 0, false);
 			GetNextBlockPosition(&y);
 
 
 			// Auto targeting
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTOTARGET), PRINTSTRING_COLOR_ORANGE, SF(title_option == 3));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.AutoTarget), PRINTSTRING_COLOR_WHITE, SF(title_option == 3));
 			GetNextLinePosition(&y);
 
 			// Vibration
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(title_option == 4));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(title_option == 4));
 			GetNextLinePosition(&y);
 
 			// Thumbstick camera
 			DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_THUMBSTICK_CAMERA), PRINTSTRING_COLOR_ORANGE, SF(title_option == 5));
-			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().conf.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
+			DrawString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableThumbstickCameraControl), PRINTSTRING_COLOR_WHITE, SF(title_option == 5));
 			GetNextBlockPosition(&y);
 
 
@@ -227,9 +227,9 @@ namespace TEN::Renderer
 			// Control listing
 			for (int k = 0; k < KEY_COUNT; k++)
 			{
-				DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(controlmsgs[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
+				DrawString(MenuLeftSideEntry, y, g_GameFlow->GetString(ControlStrings[k]), PRINTSTRING_COLOR_WHITE, SF(title_option == k));
 
-				if (g_Gui.GetCurrentSettings().waitingForkey && title_option == k)
+				if (g_Gui.GetCurrentSettings().WaitingForKey && title_option == k)
 					DrawString(MenuRightSideEntry, y, g_GameFlow->GetString(STRING_WAITING_FOR_KEY), PRINTSTRING_COLOR_YELLOW, SF(true));
 				else
 				{
@@ -506,7 +506,7 @@ namespace TEN::Renderer
 
 		if (index != -1)
 		{
-			auto objme = &inventry_objects_list[index];
+			auto objme = &InventoryObjectTable[index];
 			y += objme->yoff;
 			rotX += objme->xrot;
 			rotY += objme->yrot;
@@ -556,7 +556,7 @@ namespace TEN::Renderer
 			{
 				InventoryObject* objme;
 
-				objme = &inventry_objects_list[g_Gui.ConvertObjectToInventoryItem(objectNum)];
+				objme = &InventoryObjectTable[g_Gui.ConvertObjectToInventoryItem(objectNum)];
 
 				if (!(objme->meshbits & (1 << n)))
 					continue;
@@ -643,9 +643,9 @@ namespace TEN::Renderer
 		static short xrot = 0, yrot = 0, zrot = 0;
 		static float scaler = 1.2f;
 		float saved_scale;
-		short inv_item = g_Gui.GetRings((int)RingTypes::Inventory)->current_object_list[g_Gui.GetRings(
+		short inv_item = g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectList[g_Gui.GetRings(
 			(int)RingTypes::Inventory)->curobjinlist].invitem;
-		InventoryObject* obj = &inventry_objects_list[inv_item];
+		InventoryObject* obj = &InventoryObjectTable[inv_item];
 
 		if (TrInput & IN_LEFT)
 			yrot += ANGLE(3);
@@ -679,7 +679,7 @@ namespace TEN::Renderer
 
 	void Renderer11::DrawDiary()
 	{
-		InventoryObject* obj = &inventry_objects_list[INV_OBJECT_OPEN_DIARY];
+		InventoryObject* obj = &InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
 		short currentPage = Lara.Inventory.Diary.currentPage;
 		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
 			obj->yrot, obj->zrot, obj->scale1);
