@@ -1533,14 +1533,15 @@ void CalculateCamera()
 		LastTarget.z = Camera.target.z;
 		LastTarget.roomNumber = Camera.target.roomNumber;
 
-		Camera.target.x = x;
-		Camera.target.y = y;
-		Camera.target.z = z;
 		Camera.target.roomNumber = item->RoomNumber;
+		Camera.target.y = y;
 
 		auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
 		x = item->Pose.Position.x + shift * phd_sin(item->Pose.Orientation.y);
 		z = item->Pose.Position.z + shift * phd_cos(item->Pose.Orientation.y);
+
+		Camera.target.x = x;
+		Camera.target.z = z;
 
 		if (item->ObjectNumber == ID_LARA)
 		{
