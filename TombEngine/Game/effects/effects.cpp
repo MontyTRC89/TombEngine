@@ -446,10 +446,10 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->sR = -128;
-		spark->dR = -128;
-		spark->dG = -128;
-		spark->dB = -128;
+		spark->sR = 128;
+		spark->dR = 128;
+		spark->dG = 128;
+		spark->dB = 128;
 		spark->on = 1;
 		spark->life = 24;
 		spark->sLife = 24;
@@ -572,9 +572,9 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->sR = -112;
-		spark->sG = -112;
-		spark->sB = -112;
+		spark->sR = 144;
+		spark->sG = 144;
+		spark->sB = 144;
 		spark->on = 1;
 		spark->dR = 64;
 		spark->dG = 64;
@@ -1712,10 +1712,10 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->dB = -64 - (r & 0x7F) + 64;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->sR = -1;
-		spark->sG = -1;
-		spark->sB = -1;
-		spark->dR = -1;
+		spark->sR = 255;
+		spark->sG = 255;
+		spark->sB = 255;
+		spark->dR = 255;
 		spark->x = (r & 7) + x - 3;
 		spark->on = 1;
 		spark->colFadeSpeed = 3;
