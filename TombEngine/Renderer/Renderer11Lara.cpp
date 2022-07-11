@@ -263,13 +263,13 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	// Set shaders
 	if (shadowMap)
 	{
-		m_context->VSSetShader(m_vsShadowMap.Get(), NULL, 0);
-		m_context->PSSetShader(m_psShadowMap.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsShadowMap.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psShadowMap.Get(), nullptr, 0);
 	}
 	else
 	{
-		m_context->VSSetShader(m_vsItems.Get(), NULL, 0);
-		m_context->PSSetShader(m_psItems.Get(), NULL, 0);
+		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
 	}
 
 	// Set texture
@@ -285,7 +285,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 	m_stItem.AmbientLight = item->AmbientLight;
-	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
+	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
 	m_cbItem.updateData(m_stItem, m_context.Get());
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
