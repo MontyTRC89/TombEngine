@@ -21,6 +21,7 @@ table Item {
     hit_points: int32;
     box_number: int32;
     timer: int32;
+	color: Vector4;
     flags: int32;
     trigger_flags: int32;
     carried_item: int32;
@@ -274,6 +275,8 @@ table Sink {
 }
 
 table StaticMeshInfo {
+	color: Vector4;
+	hit_points: int32;
 	room_number: int32;
 	flags: int32;
 }
