@@ -3,7 +3,7 @@
 struct alignas(16) CItemBuffer
 {
 	Matrix World;
-	Matrix BonesMatrices[32];
+	Matrix BonesMatrices[MAX_BONES];
 	Vector4 Position;
 	Vector4 AmbientLight;
 };
