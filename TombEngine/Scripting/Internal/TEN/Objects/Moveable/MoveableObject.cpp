@@ -2,6 +2,7 @@
 
 #include "Game/items.h"
 #include "Game/control/lot.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
