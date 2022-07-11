@@ -400,6 +400,7 @@ struct ItemT : public flatbuffers::NativeTable {
   int32_t hit_points = 0;
   int32_t box_number = 0;
   int32_t timer = 0;
+  std::unique_ptr<TEN::Save::Vector4> color{};
   int32_t flags = 0;
   int32_t trigger_flags = 0;
   int32_t carried_item = 0;
@@ -445,30 +446,31 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HIT_POINTS = 28,
     VT_BOX_NUMBER = 30,
     VT_TIMER = 32,
-    VT_FLAGS = 34,
-    VT_TRIGGER_FLAGS = 36,
-    VT_CARRIED_ITEM = 38,
-    VT_AFTER_DEATH = 40,
-    VT_ITEM_FLAGS = 42,
-    VT_POSITION = 44,
-    VT_NEXT_ITEM = 46,
-    VT_NEXT_ITEM_ACTIVE = 48,
-    VT_TRIGGERED = 50,
-    VT_ACTIVE = 52,
-    VT_STATUS = 54,
-    VT_IS_AIRBORNE = 56,
-    VT_HIT_STAUTS = 58,
-    VT_COLLIDABLE = 60,
-    VT_LOOKED_AT = 62,
-    VT_AI_BITS = 64,
-    VT_SWAP_MESH_FLAGS = 66,
-    VT_DATA_TYPE = 68,
-    VT_DATA = 70,
-    VT_LUA_NAME = 72,
-    VT_LUA_ON_KILLED_NAME = 74,
-    VT_LUA_ON_HIT_NAME = 76,
-    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 78,
-    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 80
+    VT_COLOR = 34,
+    VT_FLAGS = 36,
+    VT_TRIGGER_FLAGS = 38,
+    VT_CARRIED_ITEM = 40,
+    VT_AFTER_DEATH = 42,
+    VT_ITEM_FLAGS = 44,
+    VT_POSITION = 46,
+    VT_NEXT_ITEM = 48,
+    VT_NEXT_ITEM_ACTIVE = 50,
+    VT_TRIGGERED = 52,
+    VT_ACTIVE = 54,
+    VT_STATUS = 56,
+    VT_IS_AIRBORNE = 58,
+    VT_HIT_STAUTS = 60,
+    VT_COLLIDABLE = 62,
+    VT_LOOKED_AT = 64,
+    VT_AI_BITS = 66,
+    VT_SWAP_MESH_FLAGS = 68,
+    VT_DATA_TYPE = 70,
+    VT_DATA = 72,
+    VT_LUA_NAME = 74,
+    VT_LUA_ON_KILLED_NAME = 76,
+    VT_LUA_ON_HIT_NAME = 78,
+    VT_LUA_ON_COLLIDED_WITH_OBJECT_NAME = 80,
+    VT_LUA_ON_COLLIDED_WITH_ROOM_NAME = 82
   };
   int32_t floor() const {
     return GetField<int32_t>(VT_FLOOR, 0);
@@ -514,6 +516,9 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t timer() const {
     return GetField<int32_t>(VT_TIMER, 0);
+  }
+  const TEN::Save::Vector4 *color() const {
+    return GetStruct<const TEN::Save::Vector4 *>(VT_COLOR);
   }
   int32_t flags() const {
     return GetField<int32_t>(VT_FLAGS, 0);
@@ -671,6 +676,7 @@ struct Item FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_HIT_POINTS) &&
            VerifyField<int32_t>(verifier, VT_BOX_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_TIMER) &&
+           VerifyField<TEN::Save::Vector4>(verifier, VT_COLOR) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            VerifyField<int32_t>(verifier, VT_TRIGGER_FLAGS) &&
            VerifyField<int32_t>(verifier, VT_CARRIED_ITEM) &&
@@ -846,6 +852,9 @@ struct ItemBuilder {
   void add_timer(int32_t timer) {
     fbb_.AddElement<int32_t>(Item::VT_TIMER, timer, 0);
   }
+  void add_color(const TEN::Save::Vector4 *color) {
+    fbb_.AddStruct(Item::VT_COLOR, color);
+  }
   void add_flags(int32_t flags) {
     fbb_.AddElement<int32_t>(Item::VT_FLAGS, flags, 0);
   }
@@ -946,6 +955,7 @@ inline flatbuffers::Offset<Item> CreateItem(
     int32_t hit_points = 0,
     int32_t box_number = 0,
     int32_t timer = 0,
+    const TEN::Save::Vector4 *color = 0,
     int32_t flags = 0,
     int32_t trigger_flags = 0,
     int32_t carried_item = 0,
@@ -988,6 +998,7 @@ inline flatbuffers::Offset<Item> CreateItem(
   builder_.add_carried_item(carried_item);
   builder_.add_trigger_flags(trigger_flags);
   builder_.add_flags(flags);
+  builder_.add_color(color);
   builder_.add_timer(timer);
   builder_.add_box_number(box_number);
   builder_.add_hit_points(hit_points);
@@ -1035,6 +1046,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
     int32_t hit_points = 0,
     int32_t box_number = 0,
     int32_t timer = 0,
+    const TEN::Save::Vector4 *color = 0,
     int32_t flags = 0,
     int32_t trigger_flags = 0,
     int32_t carried_item = 0,
@@ -1082,6 +1094,7 @@ inline flatbuffers::Offset<Item> CreateItemDirect(
       hit_points,
       box_number,
       timer,
+      color,
       flags,
       trigger_flags,
       carried_item,
@@ -4008,6 +4021,8 @@ flatbuffers::Offset<Sink> CreateSink(flatbuffers::FlatBufferBuilder &_fbb, const
 
 struct StaticMeshInfoT : public flatbuffers::NativeTable {
   typedef StaticMeshInfo TableType;
+  std::unique_ptr<TEN::Save::Vector4> color{};
+  int32_t hit_points = 0;
   int32_t room_number = 0;
   int32_t flags = 0;
 };
@@ -4017,9 +4032,17 @@ struct StaticMeshInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef StaticMeshInfoBuilder Builder;
   struct Traits;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ROOM_NUMBER = 4,
-    VT_FLAGS = 6
+    VT_COLOR = 4,
+    VT_HIT_POINTS = 6,
+    VT_ROOM_NUMBER = 8,
+    VT_FLAGS = 10
   };
+  const TEN::Save::Vector4 *color() const {
+    return GetStruct<const TEN::Save::Vector4 *>(VT_COLOR);
+  }
+  int32_t hit_points() const {
+    return GetField<int32_t>(VT_HIT_POINTS, 0);
+  }
   int32_t room_number() const {
     return GetField<int32_t>(VT_ROOM_NUMBER, 0);
   }
@@ -4028,6 +4051,8 @@ struct StaticMeshInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
+           VerifyField<TEN::Save::Vector4>(verifier, VT_COLOR) &&
+           VerifyField<int32_t>(verifier, VT_HIT_POINTS) &&
            VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_FLAGS) &&
            verifier.EndTable();
@@ -4041,6 +4066,12 @@ struct StaticMeshInfoBuilder {
   typedef StaticMeshInfo Table;
   flatbuffers::FlatBufferBuilder &fbb_;
   flatbuffers::uoffset_t start_;
+  void add_color(const TEN::Save::Vector4 *color) {
+    fbb_.AddStruct(StaticMeshInfo::VT_COLOR, color);
+  }
+  void add_hit_points(int32_t hit_points) {
+    fbb_.AddElement<int32_t>(StaticMeshInfo::VT_HIT_POINTS, hit_points, 0);
+  }
   void add_room_number(int32_t room_number) {
     fbb_.AddElement<int32_t>(StaticMeshInfo::VT_ROOM_NUMBER, room_number, 0);
   }
@@ -4060,11 +4091,15 @@ struct StaticMeshInfoBuilder {
 
 inline flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(
     flatbuffers::FlatBufferBuilder &_fbb,
+    const TEN::Save::Vector4 *color = 0,
+    int32_t hit_points = 0,
     int32_t room_number = 0,
     int32_t flags = 0) {
   StaticMeshInfoBuilder builder_(_fbb);
   builder_.add_flags(flags);
   builder_.add_room_number(room_number);
+  builder_.add_hit_points(hit_points);
+  builder_.add_color(color);
   return builder_.Finish();
 }
 
@@ -6647,6 +6682,7 @@ inline void Item::UnPackTo(ItemT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = hit_points(); _o->hit_points = _e; }
   { auto _e = box_number(); _o->box_number = _e; }
   { auto _e = timer(); _o->timer = _e; }
+  { auto _e = color(); if (_e) _o->color = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
   { auto _e = flags(); _o->flags = _e; }
   { auto _e = trigger_flags(); _o->trigger_flags = _e; }
   { auto _e = carried_item(); _o->carried_item = _e; }
@@ -6696,6 +6732,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
   auto _hit_points = _o->hit_points;
   auto _box_number = _o->box_number;
   auto _timer = _o->timer;
+  auto _color = _o->color ? _o->color.get() : 0;
   auto _flags = _o->flags;
   auto _trigger_flags = _o->trigger_flags;
   auto _carried_item = _o->carried_item;
@@ -6737,6 +6774,7 @@ inline flatbuffers::Offset<Item> CreateItem(flatbuffers::FlatBufferBuilder &_fbb
       _hit_points,
       _box_number,
       _timer,
+      _color,
       _flags,
       _trigger_flags,
       _carried_item,
@@ -7698,6 +7736,8 @@ inline StaticMeshInfoT *StaticMeshInfo::UnPack(const flatbuffers::resolver_funct
 inline void StaticMeshInfo::UnPackTo(StaticMeshInfoT *_o, const flatbuffers::resolver_function_t *_resolver) const {
   (void)_o;
   (void)_resolver;
+  { auto _e = color(); if (_e) _o->color = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
+  { auto _e = hit_points(); _o->hit_points = _e; }
   { auto _e = room_number(); _o->room_number = _e; }
   { auto _e = flags(); _o->flags = _e; }
 }
@@ -7710,10 +7750,14 @@ inline flatbuffers::Offset<StaticMeshInfo> CreateStaticMeshInfo(flatbuffers::Fla
   (void)_rehasher;
   (void)_o;
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const StaticMeshInfoT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _color = _o->color ? _o->color.get() : 0;
+  auto _hit_points = _o->hit_points;
   auto _room_number = _o->room_number;
   auto _flags = _o->flags;
   return TEN::Save::CreateStaticMeshInfo(
       _fbb,
+      _color,
+      _hit_points,
       _room_number,
       _flags);
 }
