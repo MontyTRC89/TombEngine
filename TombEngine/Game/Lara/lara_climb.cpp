@@ -44,8 +44,7 @@ void lara_col_climb_down(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	int frame = item->Animation.FrameNumber - g_Level.Anims[LA_LADDER_DOWN].frameBase;
-	int xShift;
-	int yShift;
+	int yShift = 0;
 
 	switch (frame)
 	{

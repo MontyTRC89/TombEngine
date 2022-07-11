@@ -832,7 +832,7 @@ namespace TEN::Entities::Vehicles
 		bool noTurn = true;
 		bool drive = false;
 
-		int pitch, height, ofs, nowake;
+		int pitch, height, ofs;
 
 		Vector3Int frontLeft, frontRight;
 		int collide = RubberBoatDynamics(itemNumber, laraItem);
