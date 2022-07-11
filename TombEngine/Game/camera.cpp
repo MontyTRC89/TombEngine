@@ -1536,35 +1536,19 @@ void CalculateCamera()
 		Camera.target.roomNumber = item->RoomNumber;
 		Camera.target.y = y;
 
-		if (Camera.type != CameraType::Chase && Camera.flags != CF_CHASE_OBJECT)
+		auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
+		x = item->Pose.Position.x + shift * phd_sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z + shift * phd_cos(item->Pose.Orientation.y);
+
+		Camera.target.x = x;
+		Camera.target.z = z;
+
+		if (item->ObjectNumber == ID_LARA)
 		{
-			Vector3Int pos = { 0, 0, 0 };
-			GetLaraJointPosition(&pos, LM_TORSO);
-
-			x = pos.x;
-			y = pos.y;
-			z = pos.z;
-
-			Camera.target.x = pos.x;
-			Camera.target.y = pos.y;
-			Camera.target.z = pos.z;
-		}
-		else
-		{
-			auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->Pose.Position.x + shift * phd_sin(item->Pose.Orientation.y);
-			z = item->Pose.Position.z + shift * phd_cos(item->Pose.Orientation.y);
-
-			Camera.target.x = x;
-			Camera.target.z = z;
-
-			if (item->ObjectNumber == ID_LARA)
-			{
-				ConfirmCameraTargetPos();
-				x = Camera.target.x;
-				y = Camera.target.y;
-				z = Camera.target.z;
-			}
+			ConfirmCameraTargetPos();
+			x = Camera.target.x;
+			y = Camera.target.y;
+			z = Camera.target.z;
 		}
 
 		if (fixedCamera == Camera.fixedCamera)
