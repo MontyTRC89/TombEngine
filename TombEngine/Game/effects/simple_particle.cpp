@@ -33,7 +33,7 @@ namespace TEN::Effects
 		p.active = true;
 		p.life = GenerateFloat(8, 14);
 		p.room = snowMobile->RoomNumber;
-		p.ageRate = GenerateFloat(0.9, 1.3);
+		p.ageRate = GenerateFloat(0.9f, 1.3f);
 		float size = GenerateFloat(96, 128);
 		p.worldPosition = {x, float(snowMobile->Pose.Position.y) - size / 2 , z};
 		p.sequence = ID_SKIDOO_SNOW_TRAIL_SPRITES;

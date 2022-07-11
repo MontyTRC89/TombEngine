@@ -230,7 +230,7 @@ void TriggerChaffBubbles(Vector3Int* pos, int FlareRoomNumber)
 	float maxAmplitude = 64;
 	bubble.amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
 	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(GenerateFloat(-3.14, 3.14), GenerateFloat(-3.14, 3.14), GenerateFloat(-3.14, 3.14));
+	bubble.wavePeriod = Vector3(GenerateFloat(-PI, PI), GenerateFloat(-PI, PI), GenerateFloat(-PI, PI));
 	bubble.waveSpeed = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
 	bubble.roomNumber = FlareRoomNumber;
 }
