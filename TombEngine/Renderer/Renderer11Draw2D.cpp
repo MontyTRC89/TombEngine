@@ -351,7 +351,7 @@ namespace TEN::Renderer
 			}
 			else
 			{
-				float diff = (imageAspect - screenAspect) / screenAspect / 2;
+				float diff = (imageAspect - screenAspect) / imageAspect / 2;
 				uvStart.x += diff;
 				uvEnd.x   -= diff;
 			}

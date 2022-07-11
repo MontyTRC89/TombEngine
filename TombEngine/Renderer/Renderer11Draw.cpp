@@ -225,7 +225,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
 
 					// Draw vertices
@@ -245,7 +245,7 @@ namespace TEN::Renderer
 
 					for (auto& bucket : mesh->buckets)
 					{
-						if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+						if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 							continue;
 
 						// Draw vertices
@@ -262,7 +262,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
 
 					// Draw vertices
@@ -298,7 +298,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode != 0)
+					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
 
 					// Draw vertices
@@ -350,7 +350,7 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->buckets)
 				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode == BLENDMODE_OPAQUE)
+					if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
 
 					// Draw vertices

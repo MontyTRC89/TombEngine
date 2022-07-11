@@ -103,6 +103,13 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	auto angle = lara->Control.MoveAngle;
 
+	// Determine direction of Lara's shimmying (0 if she just hangs still)
+	int climbDirection = 0;
+	if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y - ANGLE(90.0f)))
+		climbDirection = -1;
+	else if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y + ANGLE(90.0f)))
+		climbDirection = 1;
+
 	// Temporarily move item a bit closer to the wall to get more precise coll results
 	auto oldPos = item->Pose;
 	item->Pose.Position.x += phd_sin(item->Pose.Orientation.y) * coll->Setup.Radius * 0.5f;
@@ -181,12 +188,6 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_ACTION && item->HitPoints > 0 && coll->Front.Floor <= 0)
 		{
-			int climbDirection = 0;
-			if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y - ANGLE(90.0f)))
-				climbDirection = -1;
-			else if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y + ANGLE(90.0f)))
-				climbDirection = 1;
-
 			if (stopped && hdif > 0 && climbDirection != 0 && (climbDirection > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
 				stopped = false;
 

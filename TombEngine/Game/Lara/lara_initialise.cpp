@@ -44,6 +44,7 @@ void InitialiseLara(int restore)
 	Lara.PoisonPotency = 0;
 	Lara.WaterSurfaceDist = 100;
 
+	Lara.Vehicle = -1;
 	Lara.Location = -1;
 	Lara.HighestLocation = -1;
 	Lara.Control.Rope.Ptr = -1;

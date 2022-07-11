@@ -105,6 +105,8 @@ struct ShortArrayT;
 
 struct Vector3;
 
+struct Vector4;
+
 enum class ItemData : uint8_t {
   NONE = 0,
   Int = 1,
@@ -587,6 +589,46 @@ FLATBUFFERS_STRUCT_END(Vector3, 12);
 
 struct Vector3::Traits {
   using type = Vector3;
+};
+
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Vector4 FLATBUFFERS_FINAL_CLASS {
+ private:
+  int32_t x_;
+  int32_t y_;
+  int32_t z_;
+  int32_t w_;
+
+ public:
+  struct Traits;
+  Vector4()
+      : x_(0),
+        y_(0),
+        z_(0),
+        w_(0) {
+  }
+  Vector4(int32_t _x, int32_t _y, int32_t _z, int32_t _w)
+      : x_(flatbuffers::EndianScalar(_x)),
+        y_(flatbuffers::EndianScalar(_y)),
+        z_(flatbuffers::EndianScalar(_z)),
+        w_(flatbuffers::EndianScalar(_w)) {
+  }
+  int32_t x() const {
+    return flatbuffers::EndianScalar(x_);
+  }
+  int32_t y() const {
+    return flatbuffers::EndianScalar(y_);
+  }
+  int32_t z() const {
+    return flatbuffers::EndianScalar(z_);
+  }
+  int32_t w() const {
+    return flatbuffers::EndianScalar(w_);
+  }
+};
+FLATBUFFERS_STRUCT_END(Vector4, 16);
+
+struct Vector4::Traits {
+  using type = Vector4;
 };
 
 struct CreatureTargetT : public flatbuffers::NativeTable {
