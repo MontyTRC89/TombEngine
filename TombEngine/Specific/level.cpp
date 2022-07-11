@@ -1156,7 +1156,6 @@ unsigned int _stdcall LoadLevel(void* data)
 		InitialiseLara(!(InitialiseGame || CurrentLevel == 1));
 		GetCarriedItems();
 		GetAIPickups();
-		Lara.Vehicle = -1;
 		g_GameScriptEntities->AssignLara();
 
 		TENLog("Level loading complete.", LogLevel::Info);

@@ -43,7 +43,7 @@ using namespace TEN::Input;
 using std::function;
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara;
+LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
