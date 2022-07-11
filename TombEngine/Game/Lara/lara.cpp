@@ -439,7 +439,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.Count.PositionAdjust = 0;
 
 	if (!lara->Control.Locked)
-		lara->LocationPad = 128;
+		lara->LocationPad = -1;
 
 	auto oldPos = item->Pose.Position;
 
