@@ -82,7 +82,7 @@ namespace TEN::Input
 	int RelInput;
 	int RawInput;
 
-	std::vector<InputAction> Actions;
+	std::vector<InputAction> ActionMap;
 	std::vector<bool>		 KeyMap;
 	std::vector<float>		 AxisMap;
 
@@ -162,10 +162,10 @@ namespace TEN::Input
 			}
 		}
 
-		// Initialise input action map.
-		Actions.resize(KEY_COUNT + 5);
+		// Initialise input action map. // TODO: 5 keys are hardcoded.
+		ActionMap.resize(KEY_COUNT + 5);
 		for (int i = 0; i < KEY_COUNT + 5; i++)
-			Actions[i].ID = (InputActionID)i;
+			ActionMap[i].ID = (InputActionID)i;
 	}
 
 	void DeInitialiseInput()
@@ -423,29 +423,34 @@ namespace TEN::Input
 		return false;
 	}
 
-	void SolveInputCollisions(int& lInput)
+	void SolveInputCollisions()
 	{
 		// Block roll in binocular mode (TODO: Is it needed?)
-		if (lInput & IN_ROLL && BinocularRange)
-			lInput &= ~IN_ROLL;
+		if (IsHeld(In::Roll) && BinocularRange)
+			ActionMap[(int)In::Roll].Clear();
 
 		// Block simultaneous LEFT+RIGHT input.
-		if (lInput & IN_LEFT && lInput & IN_RIGHT)
-			lInput &= ~(IN_LEFT | IN_RIGHT);
+		if (IsHeld(In::Left) && IsHeld(In::Right))
+		{
+			ActionMap[(int)In::Left].Clear();
+			ActionMap[(int)In::Right].Clear();
+		}
 
 		if (Lara.Inventory.IsBusy)
 		{
-			lInput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
+			//lInput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
 
-			if (lInput & IN_FORWARD && lInput & IN_BACK)
-				lInput &= ~IN_BACK;
+			if (IsHeld(In::Forward) && IsHeld(In::Back))
+			{
+				//ActionMap[(int)In::Forward].Clear();
+				ActionMap[(int)In::Back].Clear();
+			}
 		}
 	}
 
-	void HandleLaraHotkeys(int& lInput)
+	void HandleLaraHotkeys()
 	{
 		// Switch debug pages
-
 		static int debugTimeout = 0;
 		if (KeyMap[KC_F10] || KeyMap[KC_F11])
 		{
@@ -480,7 +485,7 @@ namespace TEN::Input
 				else
 				{
 					flareNo = false;
-					lInput |= IN_FLARE;
+					ActionMap[(int)In::Action].Clear();
 				}
 			}
 		}
@@ -493,20 +498,20 @@ namespace TEN::Input
 
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady)
 		{
-			if (lInput & IN_LOOK)
+			if (IsHeld(In::Look))
 			{
 				if (lookTimeout >= 6)
 					lookTimeout = 100;
 				else
 				{
-					lInput &= ~IN_LOOK;
+					ActionMap[(int)In::Look].Clear();
 					lookTimeout++;
 				}
 			}
 			else
 			{
 				if (lookTimeout != 0 && lookTimeout != 100)
-					lInput |= IN_LOOKSWITCH;
+					ActionMap[(int)In::LookSwitch].Update(true);
 
 				lookTimeout = 0;
 			}
@@ -598,13 +603,13 @@ namespace TEN::Input
 		else if (medipackTimeout != 0)
 			medipackTimeout--;
 
-		// Load / save hotkeys
+		// Save/load hotkeys
 
 		if (KeyMap[KC_F5])
-			lInput |= IN_SAVE;
+			ActionMap[(int)In::Save].Update(true);
 
 		if (KeyMap[KC_F6])
-			lInput |= IN_LOAD;
+			ActionMap[(int)In::Load].Update(true);
 	}
 
 	void UpdateRumble()
@@ -655,90 +660,52 @@ namespace TEN::Input
 		rumbleData.LastPower = rumbleData.Power;
 	}
 
-	bool UpdateInput(bool debounce)
+	bool UpdateInput()
 	{
 		ClearInputData();
 		UpdateRumble();
 		ReadKeyboard();
 		ReadGameController();
 
-		static int lInput;
+		// Clear legacy bitfields.
+		DbInput = NULL;
+		TrInput = NULL;
+		RelInput = NULL;
+		RawInput = NULL;
 
-		lInput = 0;
+		// Update input action map.
+		for (int i = 0; i < KEY_COUNT; i++)
+			ActionMap[i].Update(Key(i));
 
-		if (Key(KEY_FORWARD))
-			lInput |= IN_FORWARD;
+		// Select/deselect control overrides (needed for UI keyboard navigation).
+		ActionMap[(int)In::Select].Update(KeyMap[KC_RETURN] || Key(KEY_ACTION));
+		ActionMap[(int)In::Deselect].Update(KeyMap[KC_ESCAPE] || Key(KEY_DRAW));
 
-		if (Key(KEY_BACK))
-			lInput |= IN_BACK;
+		// Port raw input back to legacy bitfield.
+		for (auto& action : ActionMap)
+		{
+			int inputBit = 1 << (int)action.ID;
+			if (action.IsHeld())
+				RawInput |= inputBit;
+		}
 
-		if (Key(KEY_LEFT))
-			lInput |= IN_LEFT;
+		// Additional handling.
+		HandleLaraHotkeys();
+		SolveInputCollisions();
 
-		if (Key(KEY_RIGHT))
-			lInput |= IN_RIGHT;
+		// Port actions back to legacy bitfields.
+		for (auto& action : ActionMap)
+		{
+			int inputBit = 1 << (int)action.ID;
 
-		if (Key(KEY_CROUCH))
-			lInput |= IN_CROUCH;
+			DbInput |= action.IsClicked() ? inputBit : NULL;
+			TrInput |= action.IsHeld() ? inputBit : NULL;
+			RelInput |= action.IsReleased() ? inputBit : NULL;
+		}
 
-		if (Key(KEY_SPRINT))
-			lInput |= IN_SPRINT;
+		// Debug display for FORWARD input.
+		ActionMap[(int)In::Forward].PrintDebugInfo();
 
-		if (Key(KEY_WALK))
-			lInput |= IN_WALK;
-
-		if (Key(KEY_JUMP))
-			lInput |= IN_JUMP;
-
-		if (Key(KEY_ACTION))
-			lInput |= IN_ACTION;
-
-		if (Key(KEY_DRAW))
-			lInput |= IN_DRAW;
-
-		if (Key(KEY_LOOK))
-			lInput |= IN_LOOK;
-
-		if (Key(KEY_ROLL))
-			lInput |= IN_ROLL;
-
-		if (Key(KEY_OPTION))
-			lInput |= IN_OPTION;
-
-		if (Key(KEY_LSTEP))
-			lInput |= IN_LSTEP;
-
-		if (Key(KEY_RSTEP))
-			lInput |= IN_RSTEP;
-
-		if (Key(KEY_PAUSE))
-			lInput |= IN_PAUSE;
-
-		// Select / deselect control overrides, needed for UI keyboard navigation
-
-		if (KeyMap[KC_ESCAPE] || Key(KEY_DRAW))
-			lInput |= IN_DESELECT;
-
-		if (KeyMap[KC_RETURN] || Key(KEY_ACTION))
-			lInput |= IN_SELECT;
-
-		if (debounce)
-			DbInput = RawInput;
-
-		RawInput = lInput;
-
-		HandleLaraHotkeys(lInput);
-		SolveInputCollisions(lInput);
-
-		RelInput = (TrInput | lInput) ^ lInput;
-		TrInput = lInput;
-
-		if (debounce)
-			DbInput = TrInput & (DbInput ^ TrInput);
-
-		// Experimental hook for non-bitfield inputs.
-		UpdateInputActions();
-		
 		return true;
 	}
 
@@ -769,26 +736,9 @@ namespace TEN::Input
 
 	// ------------------------------------------------------
 
-	void UpdateInputActions()
-	{
-		for (auto& action : Actions)
-		{
-			int inputBit = 1 << (int)action.ID;
-			bool setActive = ((DbInput | TrInput | RelInput) & inputBit) == inputBit;
-			action.Update(setActive);
-
-			// Debug display for FORWARD input.
-			if (action.ID == In::Forward)
-			{
-				g_Renderer.PrintDebugMessage("FORWARD input debug:");
-				action.PrintDebugInfo();
-			}
-		}
-	}
-
 	bool InputAction::IsClicked()
 	{
-		return (IsActive && !PrevIsActive);
+		return (Value && !PrevValue);
 	}
 
 	// Intervals in seconds.
@@ -811,19 +761,34 @@ namespace TEN::Input
 
 	bool InputAction::IsHeld()
 	{
-		return IsActive;
+		return Value;
 	}
 
 	bool InputAction::IsReleased()
 	{
-		return (!IsActive && PrevIsActive);
+		return (!Value && PrevValue);
+	}
+
+	float InputAction::GetValue()
+	{
+		return Value;
+	}
+
+	float InputAction::GetTimeHeld()
+	{
+		return TimeHeld;
+	}
+
+	float InputAction::GetTimeReleased()
+	{
+		return TimeReleased;
 	}
 
 	void InputAction::Update(bool setActive)
 	{
 		static const float frameTime = 1.0f / (float)FPS;
 
-		this->UpdateIsActive(setActive);
+		this->UpdateValue(setActive ? 1.0f : 0.0f);
 
 		if (this->IsClicked())
 		{
@@ -851,10 +816,19 @@ namespace TEN::Input
 		}
 	}
 
-	void InputAction::UpdateIsActive(bool setActive)
+	void InputAction::UpdateValue(float newValue)
 	{
-		this->PrevIsActive = IsActive;
-		this->IsActive = setActive;
+		this->PrevValue = Value;
+		this->Value = newValue;
+	}
+
+	void InputAction::Clear()
+	{
+		this->Value = 0.0f;
+		this->PrevValue = 0.0f;
+		this->TimeHeld = 0.0f;
+		this->PrevTimeHeld = 0.0f;
+		this->TimeReleased = 0.0f;
 	}
 
 	void InputAction::PrintDebugInfo()
@@ -864,8 +838,8 @@ namespace TEN::Input
 		g_Renderer.PrintDebugMessage("IsHeld: %d", this->IsHeld());
 		g_Renderer.PrintDebugMessage("IsReleased: %d", this->IsReleased());
 		g_Renderer.PrintDebugMessage("");
-		g_Renderer.PrintDebugMessage("IsActive: %d", IsActive);
-		g_Renderer.PrintDebugMessage("PrevIsActive: %d", PrevIsActive);
+		g_Renderer.PrintDebugMessage("Value: %f", Value);
+		g_Renderer.PrintDebugMessage("PrevValue: %f", PrevValue);
 		g_Renderer.PrintDebugMessage("TimeHeld: %f", TimeHeld);
 		g_Renderer.PrintDebugMessage("PrevTimeHeld: %f", PrevTimeHeld);
 		g_Renderer.PrintDebugMessage("TimeReleased: %f", TimeReleased);
@@ -873,21 +847,21 @@ namespace TEN::Input
 
 	bool IsClicked(InputActionID input)
 	{
-		return Actions[(int)input].IsClicked();
+		return ActionMap[(int)input].IsClicked();
 	}
 
 	bool IsPulsed(InputActionID input, float interval, float initialInterval)
 	{
-		return Actions[(int)input].IsPulsed(interval, initialInterval);
+		return ActionMap[(int)input].IsPulsed(interval, initialInterval);
 	}
 
 	bool IsHeld(InputActionID input)
 	{
-		return Actions[(int)input].IsHeld();
+		return ActionMap[(int)input].IsHeld();
 	}
 
 	bool IsReleased(InputActionID input)
 	{
-		return Actions[(int)input].IsReleased();
+		return ActionMap[(int)input].IsReleased();
 	}
 }
