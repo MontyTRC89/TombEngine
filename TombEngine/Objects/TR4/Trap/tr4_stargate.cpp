@@ -40,7 +40,7 @@ namespace TEN::Entities::TR4
 			AnimateItem(item);
 		}
 		else
-			*(long*)&item->ItemFlags[0] = 0;
+			item->ItemFlags[0] = item->ItemFlags[1] = 0;
 	}
 
 	void StargateCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
