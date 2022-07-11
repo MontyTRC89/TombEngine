@@ -768,7 +768,7 @@ namespace TEN::Renderer
 						if (flashBucket.Polygons.size() > 0)
 						{
 							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
+							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 							Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
 							Matrix world = item->AnimationTransforms[joint] * item->World;
