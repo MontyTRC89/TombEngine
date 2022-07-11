@@ -220,8 +220,8 @@ void TriggerChaffBubbles(Vector3Int* pos, int FlareRoomNumber)
 	bubble.age = 0;
 	bubble.speed = GenerateFloat(4, 16);
 	bubble.sourceColor = Vector4(0, 0, 0, 0);
-	float shade = GenerateFloat(0.3, 0.8);
-	bubble.destinationColor = Vector4(shade, shade, shade, 0.8);
+	float shade = GenerateFloat(0.3f, 0.8f);
+	bubble.destinationColor = Vector4(shade, shade, shade, 0.8f);
 	bubble.color = bubble.sourceColor;
 	bubble.destinationSize = GenerateFloat(32, 96);
 	bubble.spriteNum = SPR_BUBBLES;

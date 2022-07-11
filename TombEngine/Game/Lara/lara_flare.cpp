@@ -17,7 +17,7 @@
 
 using namespace TEN::Math::Random;
 
-constexpr auto FlareMainColor = Vector3(0.8, 0.42947, 0.2921);
+constexpr auto FlareMainColor = Vector3(0.8f, 0.42947f, 0.2921f);
 
 void FlareControl(short itemNumber)
 {
