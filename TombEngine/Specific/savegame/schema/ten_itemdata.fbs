@@ -191,6 +191,13 @@ struct Vector3 {
 	z: int32;
 }
 
+struct Vector4 {
+	x: int32;
+	y: int32;
+	z: int32;
+	w: int32;
+}
+
 union ItemData {
     /*byte,
     ubyte,

@@ -598,6 +598,12 @@ bool SaveGame::Save(int slot)
 			(int32_t)itemToSerialize.Pose.Orientation.y,
 			(int32_t)itemToSerialize.Pose.Orientation.z);
 
+		Save::Vector4 color = Save::Vector4(
+			itemToSerialize.Color.x,
+			itemToSerialize.Color.y,
+			itemToSerialize.Color.z,
+			itemToSerialize.Color.w);
+
 		Save::ItemBuilder serializedItem{ fbb };
 
 		serializedItem.add_next_item(itemToSerialize.NextItem);
@@ -621,6 +627,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(itemToSerialize.Animation.Velocity);
 		serializedItem.add_timer(itemToSerialize.Timer);
+		serializedItem.add_color(&color);
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
@@ -784,7 +791,12 @@ bool SaveGame::Save(int slot)
 		for (int j = 0; j < room->mesh.size(); j++)
 		{
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
+			staticMesh.add_color(&Save::Vector4(room->mesh[j].color.x,
+												room->mesh[j].color.y,
+												room->mesh[j].color.z,
+												room->mesh[j].color.w));
 			staticMesh.add_flags(room->mesh[j].flags);
+			staticMesh.add_hit_points(room->mesh[j].HitPoints);
 			staticMesh.add_room_number(i);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
@@ -1227,7 +1239,14 @@ bool SaveGame::Load(int slot)
 		if (i >= room->mesh.size())
 			break;
 
+		room->mesh[i].color = Vector4(staticMesh->color()->x(), 
+									  staticMesh->color()->y(), 
+									  staticMesh->color()->z(),
+									  staticMesh->color()->w());
+
 		room->mesh[i].flags = staticMesh->flags();
+		room->mesh[i].HitPoints = staticMesh->hit_points();
+		
 		if (!room->mesh[i].flags)
 		{
 			short roomNumber = staticMesh->room_number();
@@ -1336,6 +1355,12 @@ bool SaveGame::Load(int slot)
 		item->Timer = savedItem->timer();
 		item->TriggerFlags = savedItem->trigger_flags();
 		item->Flags = savedItem->flags();
+
+		// Color
+		item->Color = Vector4(savedItem->color()->x(),
+							  savedItem->color()->y(),
+							  savedItem->color()->z(),
+							  savedItem->color()->w());
 
 		// Carried item
 		item->CarriedItem = savedItem->carried_item();
