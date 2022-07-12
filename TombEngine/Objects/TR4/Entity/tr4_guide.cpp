@@ -200,7 +200,6 @@ namespace TEN::Entities::TR4
 		}
 
 		bool someFlag = false;
-		FloorInfo* floor;
 		Vector3Int pos1;
 		int frameNumber;
 		short random;

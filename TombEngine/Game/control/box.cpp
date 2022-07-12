@@ -481,11 +481,7 @@ int CreatureAnimation(short itemNumber, short angle, short tilt)
 
 	auto* bounds = GetBoundsAccurate(item);
 
-	// HACK: In original, y coordinate was just set to bounding box top point.
-	// In TEN, we have to use nearest click value, because Choco's floordata
-	// system returns inconsistent room number in portal 4-click vault cases -- Lwmte, 27.06.22
-
-	int y = item->Pose.Position.y - ceil((float)abs(bounds->Y1) / (float)CLICK(1)) * CLICK(1);
+	int y = item->Pose.Position.y + bounds->Y1;
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(oldPos.x, y, oldPos.z, &roomNumber);  

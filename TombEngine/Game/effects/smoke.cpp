@@ -128,7 +128,7 @@ namespace TEN::Effects::Smoke
 		s.velocity = direction;
 		s.gravity = -.1f;
 		s.affectedByWind = TestEnvironment(ENV_FLAG_WIND, LaraItem);
-		s.sourceColor = Vector4(.4, .4, .4, 1);
+		s.sourceColor = Vector4(.4f, .4f, .4f, 1);
 		s.destinationColor = Vector4(0, 0, 0, 0);
 
 		if (initial)
@@ -214,7 +214,7 @@ namespace TEN::Effects::Smoke
 		s.life = GenerateFloat(16, 24);
 		s.destinationSize = GenerateFloat(128, 160);
 		s.angularVelocity = GenerateFloat(-1, 1);
-		s.angularDrag = GenerateFloat(0.97, 0.999);
+		s.angularDrag = GenerateFloat(0.97f, 0.999f);
 	}
 
 	void TriggerRocketSmoke(int x, int y, int z, int bodyPart)
@@ -222,7 +222,7 @@ namespace TEN::Effects::Smoke
 		auto& s = GetFreeSmokeParticle();
 		s = {};
 		s.position = Vector3(x, y, z) + Vector3(GenerateFloat(8, 16), GenerateFloat(8, 16), GenerateFloat(8, 16));
-		s.sourceColor = Vector4(0.8, 0.8, 1, 1);
+		s.sourceColor = Vector4(0.8f, 0.8f, 1, 1);
 		s.destinationColor = Vector4(0, 0, 0, 0);
 		s.sourceSize = GenerateFloat(32, 64);
 		s.active = true;
@@ -232,8 +232,8 @@ namespace TEN::Effects::Smoke
 		s.gravity = -0.1f;
 		s.life = GenerateFloat(80, 120);
 		s.destinationSize = GenerateFloat(1024, 1152);
-		s.angularVelocity = GenerateFloat(-0.6, 0.6);
-		s.angularDrag = GenerateFloat(0.87, 0.99);
+		s.angularVelocity = GenerateFloat(-0.6f, 0.6f);
+		s.angularDrag = GenerateFloat(0.87f, 0.99f);
 	}
 
 	void TriggerBreathSmoke(long x, long y, long z, short angle)
