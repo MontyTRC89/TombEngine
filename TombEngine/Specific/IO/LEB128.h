@@ -5,8 +5,6 @@
 
 #include "Specific/IO/Streams.h"
 
-extern char* LevelDataPtr;
-
 struct LEB128
 {
 	static const uint64_t MaximumSize1Byte = 63L;

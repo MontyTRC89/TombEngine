@@ -290,7 +290,7 @@ namespace TEN::Entities::TR4
 						item->Animation.AnimNumber = object->animIndex + 5;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = HARPY_STATE_DEATH_START;
-						item->Animation.Airborne = true;
+						item->Animation.IsAirborne = true;
 						item->Animation.Velocity = 0;
 					}
 
@@ -311,7 +311,7 @@ namespace TEN::Entities::TR4
 			{
 				item->Pose.Position.y = item->Floor;
 				item->Animation.TargetState = HARPY_STATE_DEATH_END;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.VerticalVelocity = 0;
 			}
 

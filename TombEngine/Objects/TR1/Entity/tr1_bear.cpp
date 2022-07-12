@@ -32,8 +32,8 @@ namespace TEN::Entities::TR1
 	constexpr auto BEAR_REAR_CHANCE = 0x300;
 	constexpr auto BEAR_DROP_CHANCE = 0x600;
 
-	#define BEAR_WALK_TURN_ANGLE ANGLE(2.0f)
-	#define BEAR_RUN_TURN_ANGLE ANGLE(5.0f)
+	#define BEAR_WALK_TURN_RATE_MAX ANGLE(2.0f)
+	#define BEAR_RUN_TURN_RATE_MAX ANGLE(5.0f)
 
 	enum BearState
 	{
@@ -163,7 +163,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case BEAR_STATE_STROLL:
-				creature->MaxTurn = BEAR_WALK_TURN_ANGLE;
+				creature->MaxTurn = BEAR_WALK_TURN_RATE_MAX;
 
 				if (laraDead && item->TestBits(JointBitType::Touch, BearAttackJoints) && AI.ahead)
 					item->Animation.TargetState = BEAR_STATE_IDLE;
@@ -183,7 +183,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case BEAR_STATE_RUN_FORWARD:
-				creature->MaxTurn = BEAR_RUN_TURN_ANGLE;
+				creature->MaxTurn = BEAR_RUN_TURN_RATE_MAX;
 
 				if (item->TestBits(JointBitType::Touch, BearAttackJoints))
 				{

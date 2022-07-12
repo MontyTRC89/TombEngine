@@ -172,6 +172,12 @@ namespace TEN::Input
 		if (oisGamepad)
 			oisInputManager->destroyInputObject(oisGamepad);
 
+		if (oisEffect)
+		{
+			delete oisEffect;
+			oisEffect = nullptr;
+		}
+
 		InputManager::destroyInputSystem(oisInputManager);
 	}
 

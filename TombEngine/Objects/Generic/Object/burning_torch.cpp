@@ -83,7 +83,7 @@ namespace TEN::Entities::Generic
 				Lara.Torch.State = TorchState::Dropping;
 			}
 			else if (TrInput & IN_DRAW &&
-				!LaraItem->Animation.Airborne &&
+				!LaraItem->Animation.IsAirborne &&
 				!LaraItem->Animation.VerticalVelocity &&
 				LaraItem->Animation.ActiveState != LS_JUMP_PREPARE &&
 				LaraItem->Animation.ActiveState != LS_JUMP_UP &&
@@ -104,7 +104,7 @@ namespace TEN::Entities::Generic
 		}
 		else if (Lara.Torch.State == TorchState::Throwing)
 		{
-			if (Lara.LeftArm.FrameNumber < 12 && LaraItem->Animation.Airborne)
+			if (Lara.LeftArm.FrameNumber < 12 && LaraItem->Animation.IsAirborne)
 			{
 				Lara.LeftArm.Locked = false;
 				Lara.LeftArm.FrameNumber = 0;
@@ -166,7 +166,7 @@ namespace TEN::Entities::Generic
 		if (Lara.Flare.ControlLeft)
 			Lara.Control.HandStatus = HandStatus::WeaponReady;
 
-		Lara.LeftArm.frameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].framePtr;
+		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].framePtr;
 
 		if (Lara.Torch.IsLit)
 		{
@@ -194,7 +194,7 @@ namespace TEN::Entities::Generic
 		Lara.LeftArm.AnimNumber = Objects[ID_LARA_TORCH_ANIM].animIndex;
 		Lara.LeftArm.Locked = false;
 		Lara.LeftArm.FrameNumber = 0;
-		Lara.LeftArm.frameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].framePtr;
+		Lara.LeftArm.FrameBase = g_Level.Anims[Lara.LeftArm.AnimNumber].framePtr;
 
 		Lara.MeshPtrs[LM_LHAND] = Objects[ID_LARA_TORCH_ANIM].meshIndex + LM_LHAND;
 	}
@@ -304,7 +304,7 @@ namespace TEN::Entities::Generic
 		if (!(TrInput & IN_ACTION) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			laraItem->Animation.Airborne ||
+			laraItem->Animation.IsAirborne ||
 			laraInfo->Control.Weapon.GunType != LaraWeaponType::Torch ||
 			laraInfo->Control.HandStatus != HandStatus::WeaponReady ||
 			laraInfo->LeftArm.Locked ||

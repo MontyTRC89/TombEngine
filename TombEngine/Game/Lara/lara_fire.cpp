@@ -32,9 +32,10 @@
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
-bool MonksAttackLara;
 ItemInfo* LastTargets[MAX_TARGETS];
 ItemInfo* TargetList[MAX_TARGETS];
+
+int FlashGrenadeAftershockTimer = 0;
 
 WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
@@ -385,10 +386,17 @@ void LaraGun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	if (lara->LeftArm.FlashGun > 0)
-		--lara->LeftArm.FlashGun;
-	if (lara->RightArm.FlashGun > 0)
-		--lara->RightArm.FlashGun;
+	if (lara->LeftArm.GunFlash > 0)
+		--lara->LeftArm.GunFlash;
+	if (lara->RightArm.GunFlash > 0)
+		--lara->RightArm.GunFlash;
+	if (lara->RightArm.GunSmoke > 0)
+		--lara->RightArm.GunSmoke;
+	if (lara->LeftArm.GunSmoke > 0)
+		--lara->LeftArm.GunSmoke;
+
+	if (FlashGrenadeAftershockTimer)
+		FlashGrenadeAftershockTimer--;
 
 	if (lara->Control.Weapon.GunType == LaraWeaponType::Torch)
 	{
@@ -397,7 +405,9 @@ void LaraGun(ItemInfo* laraItem)
 	}
 
 	if (laraItem->HitPoints <= 0)
+	{
 		lara->Control.HandStatus = HandStatus::Free;
+	}
 	else if (lara->Control.HandStatus == HandStatus::Free)
 	{
 		// Draw weapon.
@@ -671,15 +681,15 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->LeftArm.FlashGun = 0;
-	lara->RightArm.FlashGun = 0;
+	lara->LeftArm.GunFlash = 0;
+	lara->RightArm.GunFlash = 0;
 
 	switch (lara->Control.Weapon.GunType)
 	{
 	case LaraWeaponType::Pistol:
 	case LaraWeaponType::Uzi:
-		lara->RightArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
-		lara->LeftArm.frameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		lara->RightArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
+		lara->LeftArm.FrameBase = Objects[ID_PISTOLS_ANIM].frameBase;
 
 		if (lara->Control.HandStatus != HandStatus::Free)
 			DrawPistolMeshes(laraItem, lara->Control.Weapon.GunType);
@@ -692,8 +702,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 	case LaraWeaponType::GrenadeLauncher:
 	case LaraWeaponType::HarpoonGun:
 	case LaraWeaponType::RocketLauncher:
-		lara->RightArm.frameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
-		lara->LeftArm.frameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
+		lara->RightArm.FrameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
+		lara->LeftArm.FrameBase = Objects[WeaponObject(lara->Control.Weapon.GunType)].frameBase;
 
 		if (lara->Control.HandStatus != HandStatus::Free)
 			DrawShotgunMeshes(laraItem, lara->Control.Weapon.GunType);
@@ -701,8 +711,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	case LaraWeaponType::Flare:
-		lara->RightArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
-		lara->LeftArm.frameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		lara->RightArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
+		lara->LeftArm.FrameBase = Objects[ID_LARA_FLARE_ANIM].frameBase;
 
 		if (lara->Control.HandStatus != HandStatus::Free)
 			DrawFlareMeshes(laraItem);
@@ -710,8 +720,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 		break;
 
 	default:
-		lara->RightArm.frameBase = g_Level.Anims[laraItem->Animation.AnimNumber].framePtr;
-		lara->LeftArm.frameBase = g_Level.Anims[laraItem->Animation.AnimNumber].framePtr;
+		lara->RightArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].framePtr;
+		lara->LeftArm.FrameBase = g_Level.Anims[laraItem->Animation.AnimNumber].framePtr;
 		break;
 	}
 }
@@ -803,7 +813,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 		}
 	}
 
-	if (!object->undead || grenade || target->HitPoints == NOT_TARGETABLE)
+	if (!object->undead || grenade)
 	{
 		if (target->HitPoints > 0)
 		{

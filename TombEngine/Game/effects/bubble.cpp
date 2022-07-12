@@ -36,7 +36,7 @@ void UpdateBubbles()
 		float alpha = bubble->age / 15.0f;
 		alpha = fmin(alpha, 1.0f);
 
-		bubble->size = lerp(0, bubble->destinationSize, alpha);
+		bubble->size = Lerp(0.0f, bubble->destinationSize, alpha);
 		bubble->color = Vector4::Lerp(bubble->sourceColor, bubble->destinationColor, alpha);
 		int ceilingHeight = g_Level.Rooms[bubble->roomNumber].maxceiling;
 		short roomNumber = bubble->roomNumber;
@@ -104,7 +104,7 @@ void CreateBubble(Vector3Int* pos, short roomNum, int unk1, int unk2, int flags,
 		bubble->speed = flags & BUBBLE_FLAG_CLUMP ? GenerateFloat(8, 16) : GenerateFloat(8, 12);
 		bubble->sourceColor = Vector4(0, 0, 0, 1);
 
-		float shade = GenerateFloat(0.3, 0.8);
+		float shade = GenerateFloat(0.3f, 0.8f);
 
 		bubble->destinationColor = Vector4(shade, shade, shade, 1);
 		bubble->color = bubble->sourceColor;

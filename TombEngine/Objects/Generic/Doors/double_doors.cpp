@@ -44,7 +44,7 @@ namespace TEN::Entities::Doors
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 			!laraItem->HitStatus &&
-			!(doorItem->Status && doorItem->Animation.Airborne) &&
+			!(doorItem->Status && doorItem->Animation.IsAirborne) &&
 			laraInfo->Control.HandStatus == HandStatus::Free ||
 			laraInfo->Control.IsMoving && laraInfo->InteractedItem == itemNumber)
 		{
