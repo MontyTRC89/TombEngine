@@ -32,9 +32,10 @@
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 
-bool MonksAttackLara;
 ItemInfo* LastTargets[MAX_TARGETS];
 ItemInfo* TargetList[MAX_TARGETS];
+
+int FlashGrenadeAftershockTimer = 0;
 
 WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 {
@@ -385,10 +386,17 @@ void LaraGun(ItemInfo* laraItem)
 {
 	auto* lara = GetLaraInfo(laraItem);
 
-	if (lara->LeftArm.FlashGun > 0)
-		--lara->LeftArm.FlashGun;
-	if (lara->RightArm.FlashGun > 0)
-		--lara->RightArm.FlashGun;
+	if (lara->LeftArm.GunFlash > 0)
+		--lara->LeftArm.GunFlash;
+	if (lara->RightArm.GunFlash > 0)
+		--lara->RightArm.GunFlash;
+	if (lara->RightArm.GunSmoke > 0)
+		--lara->RightArm.GunSmoke;
+	if (lara->LeftArm.GunSmoke > 0)
+		--lara->LeftArm.GunSmoke;
+
+	if (FlashGrenadeAftershockTimer)
+		FlashGrenadeAftershockTimer--;
 
 	if (lara->Control.Weapon.GunType == LaraWeaponType::Torch)
 	{
@@ -397,7 +405,9 @@ void LaraGun(ItemInfo* laraItem)
 	}
 
 	if (laraItem->HitPoints <= 0)
+	{
 		lara->Control.HandStatus = HandStatus::Free;
+	}
 	else if (lara->Control.HandStatus == HandStatus::Free)
 	{
 		// Draw weapon.
@@ -671,8 +681,8 @@ void InitialiseNewWeapon(ItemInfo* laraItem)
 	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->LeftArm.FlashGun = 0;
-	lara->RightArm.FlashGun = 0;
+	lara->LeftArm.GunFlash = 0;
+	lara->RightArm.GunFlash = 0;
 
 	switch (lara->Control.Weapon.GunType)
 	{
@@ -803,7 +813,7 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 		}
 	}
 
-	if (!object->undead || grenade || target->HitPoints == NOT_TARGETABLE)
+	if (!object->undead || grenade)
 	{
 		if (target->HitPoints > 0)
 		{

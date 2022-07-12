@@ -294,7 +294,6 @@ namespace TEN::Entities::Effects
 
 		byte r = (GetRandomControl() & 0x3F) + 192;
 		byte g = (GetRandomControl() & 0x1F) + 96;
-		byte b;
 
 		auto pos = Vector3Int();
 		GetLaraJointPosition(&pos, LM_HIPS);
@@ -657,7 +656,7 @@ namespace TEN::Entities::Effects
 			!(TrInput & IN_ACTION) ||
 			laraItem->Animation.ActiveState != LS_IDLE ||
 			laraItem->Animation.AnimNumber != LA_STAND_IDLE ||
-			laraItem->Animation.Airborne)
+			laraItem->Animation.IsAirborne)
 		{
 			if (item->ObjectNumber == ID_BURNING_ROOTS)
 				ObjectCollision(itemNumber, laraItem, coll);

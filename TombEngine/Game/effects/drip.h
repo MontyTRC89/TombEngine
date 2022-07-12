@@ -7,7 +7,7 @@ namespace TEN::Effects::Drip
 {
 	constexpr float DRIP_LIFE = 25.0f;
 	constexpr float DRIP_LIFE_LONG = 120.0f;
-	constexpr float DRIP_WIDTH = 4;
+	constexpr float DRIP_WIDTH = 4.0f;
 	constexpr int NUM_DRIPS = 512;
 
 	struct DripParticle

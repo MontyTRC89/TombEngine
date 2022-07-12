@@ -42,7 +42,5 @@ public:
 
 	byte ReadChunkByte(__int64 length);
 
-	char* ReadChunkString(long length);
-
 	BaseStream* GetRawStream();
 };

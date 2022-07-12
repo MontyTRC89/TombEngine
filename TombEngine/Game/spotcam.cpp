@@ -346,14 +346,11 @@ void CalculateSpotCameras()
 	int croll; // stack offset -64
 	SPOTCAM* s; // stack offset -60
 	short spline_cnt; // $s3
-	int next_spline_camera; // $s0
-	int n; // $s5
 	int dx; // $v1
 	int dy; // $s0
 	int dz; // $s1
 
 	//{ // line 76, offset 0x38114
-	int cs; // $s6
 	int sp; // $s2
 	int cp; // $fp
 	int clen; // $s4
@@ -364,9 +361,6 @@ void CalculateSpotCameras()
 	int lx; // stack offset -56
 	int lz; // stack offset -52
 	int ly; // stack offset -48
-	int i; // $v1
-	int var_2C;
-	int ctype; // $s0
 	int cn; // $s0
 
 

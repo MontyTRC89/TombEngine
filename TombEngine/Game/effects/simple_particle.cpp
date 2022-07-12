@@ -33,7 +33,7 @@ namespace TEN::Effects
 		p.active = true;
 		p.life = GenerateFloat(8, 14);
 		p.room = snowMobile->RoomNumber;
-		p.ageRate = GenerateFloat(0.9, 1.3);
+		p.ageRate = GenerateFloat(0.9f, 1.3f);
 		float size = GenerateFloat(96, 128);
 		p.worldPosition = {x, float(snowMobile->Pose.Position.y) - size / 2 , z};
 		p.sequence = ID_SKIDOO_SNOW_TRAIL_SPRITES;
@@ -57,7 +57,7 @@ namespace TEN::Effects
 			p.active = true;
 			p.life = GenerateFloat(5, 9);
 			p.room = boat->RoomNumber;
-			p.ageRate = GenerateFloat(0.9, 1.3);
+			p.ageRate = GenerateFloat(0.9f, 1.3f);
 			p.worldPosition = { x, y, z };
 			p.sequence = ID_MOTOR_BOAT_FOAM_SPRITES;
 			p.size = GenerateFloat(256, 512);
@@ -77,7 +77,7 @@ namespace TEN::Effects
 
 			int numSprites = -Objects[p.sequence].nmeshes - 1;
 			float normalizedAge = p.age / p.life;
-			p.sprite = lerp(0, numSprites, normalizedAge);
+			p.sprite = Lerp(0.0f, numSprites, normalizedAge);
 		}
 	}
 }

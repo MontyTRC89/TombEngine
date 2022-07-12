@@ -21,6 +21,7 @@ table Item {
     hit_points: int32;
     box_number: int32;
     timer: int32;
+	color: Vector4;
     flags: int32;
     trigger_flags: int32;
     carried_item: int32;
@@ -32,7 +33,7 @@ table Item {
 	triggered: bool;
 	active: bool;
 	status: int32;
-	airborne: bool;
+	is_airborne: bool;
 	hit_stauts: bool;
 	collidable: bool;
 	looked_at: bool;
@@ -44,6 +45,21 @@ table Item {
 	lua_on_hit_name: string;
 	lua_on_collided_with_object_name: string;
 	lua_on_collided_with_room_name: string;
+}
+
+table FXInfo {
+	pos : Position;
+	room_number: int32;
+	object_number: int32;
+	next_fx: int32;
+	next_active: int32;
+	speed: int32;
+	fall_speed: int32;
+	frame_number: int32;
+	counter : int32;
+	shade: int32;
+	flag1: int32;
+	flag2: int32;
 }
 
 table AmmoInfo {
@@ -79,7 +95,8 @@ table ArmInfo {
 	frame_base: int32;
 	locked: bool;
 	rotation: Vector3;
-	flash_gun: int32;
+	gun_flash: int32;
+	gun_smoke: int32;
 }
 
 table FlareData {
@@ -258,6 +275,8 @@ table Sink {
 }
 
 table StaticMeshInfo {
+	color: Vector4;
+	hit_points: int32;
 	room_number: int32;
 	flags: int32;
 }
@@ -434,6 +453,9 @@ table SaveGame {
 	next_item_free: int32;
 	next_item_active: int32;
 	room_items: [int32];
+	fxinfos: [FXInfo];
+	next_fx_free: int32;
+	next_fx_active: int32;
 	fixed_cameras: [FixedCamera];
 	sinks: [Sink];
 	static_meshes: [StaticMeshInfo];

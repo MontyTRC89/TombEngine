@@ -8,8 +8,6 @@ namespace TEN::Renderer
 {
 	void Renderer11::ChangeScreenResolution(int width, int height, bool windowed) 
 	{
-		HRESULT res;
-
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
 		m_context->OMSetRenderTargets(0, nullViews, NULL);
 
@@ -26,12 +24,12 @@ namespace TEN::Renderer
 		DXGI_SWAP_CHAIN_DESC scd;
 		Utils::throwIfFailed(m_swapChain->GetDesc(&scd));
 
-		UINT numModes = 1024;
+		unsigned int numModes = 1024;
 		DXGI_MODE_DESC modes[1024];
 		Utils::throwIfFailed(output->GetDisplayModeList(scd.BufferDesc.Format, 0, &numModes, modes));
 
 		DXGI_MODE_DESC* mode = &modes[0];
-		for (int i = 0; i < numModes; i++)
+		for (unsigned int i = 0; i < numModes; i++)
 		{
 			mode = &modes[i];
 			if (mode->Width == width && mode->Height == height)
@@ -42,15 +40,13 @@ namespace TEN::Renderer
 
 		InitialiseScreen(width, height, windowed, WindowsHandle, true);
 
-		ScreenWidth = width;
-		ScreenHeight = height;
-		Windowed = windowed;
+		m_screenWidth = width;
+		m_screenHeight = height;
+		m_windowed = windowed;
 	}
 
 	std::string Renderer11::GetDefaultAdapterName()
 	{
-		HRESULT res;
-
 		IDXGIFactory* dxgiFactory = NULL;
 		Utils::throwIfFailed(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
 

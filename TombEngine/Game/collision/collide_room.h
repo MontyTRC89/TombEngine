@@ -54,7 +54,7 @@ struct CollisionPosition
 
 struct CollisionResult
 {
-	Vector3 Coordinates;
+	Vector3Int Coordinates;
 	int RoomNumber;
 
 	FloorInfo* Block;
@@ -123,8 +123,8 @@ struct CollisionInfo
 [[nodiscard]] bool TestItemRoomCollisionAABB(ItemInfo* item);
 
 CollisionResult GetCollision(ItemInfo* item);
-CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
-CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+CollisionResult GetCollision(ItemInfo* item, short angle, float forward, float up = 0.0f, float right = 0.0f);
+CollisionResult GetCollision(Vector3Int pos, int roomNumber, short angle, float forward, float up = 0.0f, float right = 0.0f);
 CollisionResult GetCollision(int x, int y, int z, short roomNumber);
 CollisionResult GetCollision(FloorInfo* floor, int x, int y, int z);
 
@@ -162,3 +162,4 @@ bool TestEnvironment(RoomEnvFlags environmentType, ItemInfo* item);
 bool TestEnvironment(RoomEnvFlags environmentType, int roomNumber);
 bool TestEnvironment(RoomEnvFlags environmentType, ROOM_INFO* room);
 bool TestEnvironmentFlags(RoomEnvFlags environmentType, int flags);
+
