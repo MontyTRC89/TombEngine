@@ -58,8 +58,10 @@ private:
 	template <typename R, char const* S>
 	std::unique_ptr<R> GetByName(std::string const& name)
 	{
-		ScriptAssertF(m_nameMap.find(name) != m_nameMap.end(), "{} name not found: {}", S, name);
-		return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
+		if (!ScriptAssertF(m_nameMap.find(name) != m_nameMap.end(), "{} name not found: {}", S, name))
+			return nullptr;
+		else
+			return std::make_unique<R>(std::get<R::IdentifierType>(m_nameMap.at(name)));
 	}
 
 	[[nodiscard]] short GetIndexByName(std::string const& name) const override
