@@ -1371,8 +1371,8 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
 		// Set shaders
-		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_staticsTextures[info->bucket->Texture]),
@@ -1380,13 +1380,12 @@ namespace TEN::Renderer
 		BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_staticsTextures[info->bucket->Texture]),
 		            SAMPLER_NONE);
 
-		m_stItem.World = info->world;
-		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
-		m_stItem.AmbientLight = info->room->AmbientLight * info->color;
-		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
+		m_stStatic.World = info->world;
+		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
+		m_stStatic.Color = info->room->AmbientLight * info->color;
+		m_cbStatic.updateData(m_stStatic, m_context.Get());
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		SetBlendMode(info->blendMode);
 		
@@ -1802,8 +1801,8 @@ namespace TEN::Renderer
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Bind shaders
-		m_context->VSSetShader(m_vsItems.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psItems.Get(), nullptr, 0);
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
@@ -1818,13 +1817,12 @@ namespace TEN::Renderer
 															   TO_RAD(msh->pos.Orientation.z)) * 
 								Matrix::CreateTranslation(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z));
 
-				m_stItem.World = world;
-				m_stItem.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
-				m_stItem.AmbientLight = room->AmbientLight * msh->color;
-				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
-				m_cbItem.updateData(m_stItem, m_context.Get());
-				BindConstantBufferVS(CB_ITEM, m_cbItem.get());
-				BindConstantBufferPS(CB_ITEM, m_cbItem.get());
+				m_stStatic.World = world;
+				m_stStatic.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
+				m_stStatic.Color = room->AmbientLight * msh->color;
+				m_cbStatic.updateData(m_stStatic, m_context.Get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 				RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
 
