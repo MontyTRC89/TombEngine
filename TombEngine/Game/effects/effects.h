@@ -180,11 +180,6 @@ extern SPLASH_SETUP SplashSetup;
 extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern RIPPLE_STRUCT Ripples[MAX_RIPPLES];
 
-extern LaraWeaponType SmokeWeapon;
-extern byte SmokeCountL;
-extern byte SmokeCountR;
-extern int SplashCount;
-
 extern Vector3Int NodeVectors[MAX_NODE];
 extern NODEOFFSET_INFO NodeOffsets[MAX_NODE];
 
