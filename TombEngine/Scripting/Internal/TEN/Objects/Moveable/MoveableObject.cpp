@@ -975,7 +975,7 @@ bool Moveable::MeshExists(int index) const
 {
 	if (index < 0 || index >= Objects[m_item->ObjectNumber].nmeshes)
 	{
-		TENLog("Specified mesh index does not exist in moveable '" + m_item->LuaName + "'", LogLevel::Error);
+		TENLog(std::string("Mesh index ") + std::to_string(index) + std::string(" does not exist in moveable '") + m_item->LuaName + "'", LogLevel::Error);
 		return false;
 	}
 
