@@ -674,7 +674,7 @@ namespace TEN::Input
 		RawInput = NULL;
 
 		// Update input action map.
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (int i = 0; i < KEY_COUNT + 5; i++)
 			ActionMap[i].Update(Key(i));
 
 		// Select/deselect control overrides (needed for UI keyboard navigation).
@@ -707,6 +707,17 @@ namespace TEN::Input
 		ActionMap[(int)In::Forward].PrintDebugInfo();
 		
 		return true;
+	}
+
+	void ClearInputActions()
+	{
+		DbInput = NULL;
+		TrInput = NULL;
+		RelInput = NULL;
+		RawInput = NULL;
+
+		for (int i = 0; i < KEY_COUNT + 5; i++)
+			ActionMap[i].Clear();
 	}
 
 	void Rumble(float power, float delayInSeconds, RumbleMode mode)
@@ -816,12 +827,6 @@ namespace TEN::Input
 		}
 	}
 
-	void InputAction::UpdateValue(float newValue)
-	{
-		this->PrevValue = Value;
-		this->Value = newValue;
-	}
-
 	void InputAction::Clear()
 	{
 		this->Value = 0.0f;
@@ -845,6 +850,12 @@ namespace TEN::Input
 		g_Renderer.PrintDebugMessage("TimeReleased: %f", TimeReleased);
 	}
 
+	void InputAction::UpdateValue(float value)
+	{
+		this->PrevValue = Value;
+		this->Value = value;
+	}
+
 	bool IsClicked(InputActionID input)
 	{
 		return ActionMap[(int)input].IsClicked();
@@ -863,5 +874,20 @@ namespace TEN::Input
 	bool IsReleased(InputActionID input)
 	{
 		return ActionMap[(int)input].IsReleased();
+	}
+
+	float GetInputValue(InputActionID input)
+	{
+		return ActionMap[(int)input].GetValue();
+	}
+
+	float GetInputTimeHeld(InputActionID input)
+	{
+		return ActionMap[(int)input].GetTimeHeld();
+	}
+
+	float GetInputTimeReleased(InputActionID input)
+	{
+		return ActionMap[(int)input].GetTimeReleased();
 	}
 }

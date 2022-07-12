@@ -131,6 +131,7 @@ namespace TEN::Input
 	void InitialiseInput(HWND handle);
 	void DeInitialiseInput();
 	bool UpdateInput();
+	void ClearInputActions();
 	void DefaultConflict();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
@@ -174,7 +175,7 @@ namespace TEN::Input
 	class InputAction
 	{
 	public:
-		InputActionID ID = In::None;
+		InputActionID ID   = In::None;
 
 		bool IsClicked();
 		bool IsPulsed(float interval, float initialInterval = 0.0f);
@@ -186,24 +187,27 @@ namespace TEN::Input
 		float GetTimeReleased();
 
 		void Update(bool setActive);
-		void UpdateValue(float newValue);
 		void Clear();
 		void PrintDebugInfo();
 
 	private:
 		// TODO: For use with analog triggers, use range [0.0f, 1.0f] with deadzone up to a quarter press.
-		float Value		= 0.0f;
-		float PrevValue = 0.0f;
-
+		float Value		   = 0.0f;
+		float PrevValue	   = 0.0f;
 		float TimeHeld	   = 0.0f;
 		float PrevTimeHeld = 0.0f;
 		float TimeReleased = 0.0f;
+
+		void UpdateValue(float value);
 	};
 
 	extern std::vector<InputAction> ActionMap;
 
-	bool IsClicked(InputActionID input);
-	bool IsPulsed(InputActionID input, float interval, float initialInterval = 0.0f);
-	bool IsHeld(InputActionID input);
-	bool IsReleased(InputActionID input);
+	bool  IsClicked(InputActionID input);
+	bool  IsPulsed(InputActionID input, float interval, float initialInterval = 0.0f);
+	bool  IsHeld(InputActionID input);
+	bool  IsReleased(InputActionID input);
+	float GetInputValue(InputActionID input);
+	float GetInputTimeHeld(InputActionID input);
+	float GetInputTimeReleased(InputActionID input);
 }
