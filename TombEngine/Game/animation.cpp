@@ -18,8 +18,6 @@
 using namespace TEN::Entities::Generic;
 using TEN::Renderer::g_Renderer;
 
-constexpr int VELOCITY_SCALE = 65536; // Temporary.
-
 BOUNDING_BOX InterpolatedBounds;
 
 void AnimateLara(ItemInfo* item)
@@ -149,7 +147,7 @@ void AnimateLara(ItemInfo* item)
 		}
 	}
 
-	item->Animation.LateralVelocity = (anim->LateralVelocityStart + (anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase))) / VELOCITY_SCALE;
+	item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
 
 	if (item->Animation.IsAirborne)
 	{
@@ -173,8 +171,8 @@ void AnimateLara(ItemInfo* item)
 		else
 		{
 			float velocity = anim->VelocityStart + anim->VelocityEnd * (item->Animation.FrameNumber - (anim->frameBase - 1));
-			item->Animation.Velocity -= velocity / VELOCITY_SCALE;
-			item->Animation.Velocity += (velocity + anim->VelocityEnd) / VELOCITY_SCALE;
+			item->Animation.Velocity -= velocity;
+			item->Animation.Velocity += velocity + anim->VelocityEnd;
 			item->Animation.VerticalVelocity += item->Animation.VerticalVelocity >= 128 ? 1 : GRAVITY;
 			item->Pose.Position.y += item->Animation.VerticalVelocity;
 		}
@@ -182,9 +180,9 @@ void AnimateLara(ItemInfo* item)
 	else
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-			item->Animation.Velocity = ((anim->VelocityStart / 2) + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase)) / 4) / VELOCITY_SCALE;
+			item->Animation.Velocity = (anim->VelocityStart / 2) + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase)) / 4;
 		else
-			item->Animation.Velocity = (anim->VelocityStart + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase))) / VELOCITY_SCALE;
+			item->Animation.Velocity = anim->VelocityStart + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
 
 		item->Pose.Position.y += lara->ExtraVelocity.y;
 	}
@@ -345,8 +343,8 @@ void AnimateItem(ItemInfo* item)
 	}
 	else
 	{
-		item->Animation.Velocity = (anim->VelocityStart + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase))) / VELOCITY_SCALE;
-		item->Animation.LateralVelocity = (anim->LateralVelocityStart + (anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase))) / VELOCITY_SCALE;
+		item->Animation.Velocity = anim->VelocityStart + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
+		item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
 	}
 	
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
