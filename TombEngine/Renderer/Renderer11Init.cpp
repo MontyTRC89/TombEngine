@@ -16,8 +16,6 @@ extern GameConfiguration g_Configuration;
 
 void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND handle)
 {
-	HRESULT res;
-
 	TENLog("Initializing DX11...", LogLevel::Info);
 
 	m_screenWidth = w;
@@ -128,10 +126,10 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	blendStateDesc.IndependentBlendEnable = false;
 	blendStateDesc.RenderTarget[0].BlendEnable = true;
 	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_REV_SUBTRACT;
 	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
-	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
 	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	Utils::throwIfFailed(m_device->CreateBlendState(&blendStateDesc, m_subtractiveBlendState.GetAddressOf()));
@@ -213,8 +211,6 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset)
 {
-	HRESULT res;
-
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
 	sd.BufferDesc.Height = h;

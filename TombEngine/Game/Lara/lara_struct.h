@@ -1079,7 +1079,8 @@ struct ArmInfo
 	Vector3Shrt Orientation;
 
 	bool Locked;
-	int FlashGun;
+	int GunFlash;
+	int GunSmoke;
 };
 
 struct FlareData

@@ -39,9 +39,6 @@ int DeadlyBounds[6];
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-LaraWeaponType SmokeWeapon;
-byte SmokeCountL;
-byte SmokeCountR;
 int SplashCount = 0;
 
 Vector3Int NodeVectors[MAX_NODE];
@@ -221,7 +218,7 @@ void UpdateSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
+				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0x0FFF;
 
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)
@@ -449,10 +446,10 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->sR = -128;
-		spark->dR = -128;
-		spark->dG = -128;
-		spark->dB = -128;
+		spark->sR = 128;
+		spark->dR = 128;
+		spark->dG = 128;
+		spark->dB = 128;
 		spark->on = 1;
 		spark->life = 24;
 		spark->sLife = 24;
@@ -575,9 +572,9 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->sR = -112;
-		spark->sG = -112;
-		spark->sB = -112;
+		spark->sR = 144;
+		spark->sG = 144;
+		spark->sB = 144;
 		spark->on = 1;
 		spark->dR = 64;
 		spark->dG = 64;
@@ -954,6 +951,9 @@ void SetupSplash(const SPLASH_SETUP* const setup, int room)
 
 void UpdateSplashes()
 {
+	if (SplashCount)
+		SplashCount--;
+
 	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
 		SPLASH_STRUCT& splash = Splashes[i];
@@ -1712,10 +1712,10 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->dB = -64 - (r & 0x7F) + 64;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->sR = -1;
-		spark->sG = -1;
-		spark->sB = -1;
-		spark->dR = -1;
+		spark->sR = 255;
+		spark->sG = 255;
+		spark->sB = 255;
+		spark->dR = 255;
 		spark->x = (r & 7) + x - 3;
 		spark->on = 1;
 		spark->colFadeSpeed = 3;

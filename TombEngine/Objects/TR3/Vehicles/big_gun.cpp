@@ -110,6 +110,7 @@ namespace TEN::Entities::Vehicles
 
 	void BigGunFire(ItemInfo* bigGunItem, ItemInfo* laraItem)
 	{
+		auto* lara = GetLaraInfo(laraItem);
 		auto* bigGun = GetBigGunInfo(bigGunItem);
 
 		short itemNumber = CreateItem();
@@ -137,11 +138,10 @@ namespace TEN::Entities::Vehicles
 
 			AddActiveItem(itemNumber);
 
-			SmokeCountL = 32;
-			SmokeWeapon = LaraWeaponType::RocketLauncher;
+			lara->LeftArm.GunSmoke = 32;
 
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, 32);
+				TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 1, LaraWeaponType::RocketLauncher, lara->LeftArm.GunSmoke);
 
 			SoundEffect(SFX_TR4_EXPLOSION1, &projectileItem->Pose);
 		}

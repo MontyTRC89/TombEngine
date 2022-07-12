@@ -154,7 +154,7 @@ namespace TEN::Renderer
 				AddSpriteBillboard(&m_sprites[spark->def],
 								   Vector3(spark->x, spark->y, spark->z),
 								   Vector4(spark->shade / 255.0f, spark->shade / 255.0f, spark->shade / 255.0f, 1.0f),
-								   TO_RAD(spark->rotAng), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
+								   TO_RAD(spark->rotAng << 4), spark->scalar, { spark->size * 4.0f, spark->size * 4.0f },
 								   BLENDMODE_ADDITIVE, view);
 			}
 		}
@@ -176,7 +176,7 @@ namespace TEN::Renderer
 					if (spark->on)
 						AddSpriteBillboard(&m_sprites[spark->def], Vector3(fire->x + spark->x * fire->size / 2, fire->y + spark->y * fire->size / 2, fire->z + spark->z * fire->size / 2),
 																   Vector4(spark->r / 255.0f * fade, spark->g / 255.0f * fade, spark->b / 255.0f * fade, 1.0f),
-																   TO_RAD(spark->rotAng), 
+																   TO_RAD(spark->rotAng << 4),
 																   spark->scalar,
 																   { spark->size * fire->size, spark->size * fire->size }, BLENDMODE_ADDITIVE, view);
 				}
@@ -273,7 +273,7 @@ namespace TEN::Renderer
 					AddSpriteBillboard(&m_sprites[particle->spriteIndex],
 						pos,
 						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
-						TO_RAD(particle->rotAng), particle->scalar,
+						TO_RAD(particle->rotAng << 4), particle->scalar,
 						{ particle->size, particle->size },
 						particle->blendMode, view);
 				}
@@ -285,7 +285,7 @@ namespace TEN::Renderer
 					AddSpriteBillboardConstrained(&m_sprites[Objects[ID_SPARK_SPRITE].meshIndex],
 						pos,
 						Vector4(particle->r / 255.0f, particle->g / 255.0f, particle->b / 255.0f, 1.0f),
-						TO_RAD(particle->rotAng),
+						TO_RAD(particle->rotAng << 4),
 						particle->scalar,
 						Vector2(4, particle->size), particle->blendMode, v, view);
 				}
@@ -541,7 +541,7 @@ namespace TEN::Renderer
 				AddSpriteBillboard(&m_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BLOOD],
 								   Vector3(blood->x, blood->y, blood->z),
 								   Vector4(blood->shade / 255.0f, blood->shade * 0, blood->shade * 0, 1.0f),
-								   TO_RAD(blood->rotAng), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
+								   TO_RAD(blood->rotAng << 4), 1.0f, { blood->size * 8.0f, blood->size * 8.0f },
 								   BLENDMODE_ADDITIVE, view);
 			}
 		}
@@ -586,7 +586,7 @@ namespace TEN::Renderer
 
 	bool Renderer11::DrawGunFlashes(RenderView& view) 
 	{
-		if (!Lara.RightArm.FlashGun && !Lara.LeftArm.FlashGun)
+		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
 			return true;
 
 		if (BinocularRange > 0)
@@ -675,7 +675,7 @@ namespace TEN::Renderer
 					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
 					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
 
-					if (Lara.LeftArm.FlashGun)
+					if (Lara.LeftArm.GunFlash)
 					{
 						world = laraObj.AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
 						world = offset * world;
@@ -688,7 +688,7 @@ namespace TEN::Renderer
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 
-					if (Lara.RightArm.FlashGun)
+					if (Lara.RightArm.GunFlash)
 					{
 						world = laraObj.AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
 						world = offset * world;
@@ -768,7 +768,7 @@ namespace TEN::Renderer
 						if (flashBucket.Polygons.size() > 0)
 						{
 							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(49152));
+							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
 							Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
 							Matrix world = item->AnimationTransforms[joint] * item->World;
@@ -834,8 +834,8 @@ namespace TEN::Renderer
 
 			if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD)
 			{
-				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32);
-				spriteMatrix = scale * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
+				Vector3 cameraUp = Vector3(view.camera.View._12, view.camera.View._22, view.camera.View._32) ;
+				spriteMatrix = scale * Matrix::CreateRotationZ(spr.Rotation) * Matrix::CreateBillboard(spr.pos, Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), cameraUp);
 			}
 			else if (spr.Type == RENDERER_SPRITE_TYPE::SPRITE_TYPE_BILLBOARD_CUSTOM)
 			{

@@ -70,7 +70,6 @@ void AnimateWaterfalls()
 
 	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
 	float y = lastWaterfallY * 0.00390625f;
-	float theY;
 
 	for (int i = 0; i < 6; i++)
 	{

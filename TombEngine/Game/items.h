@@ -99,7 +99,7 @@ struct ItemInfo
 
 	int BoxNumber;
 	int Timer;
-	short Shade;
+	Vector4 Color;
 
 	unsigned int TouchBits;
 	unsigned int MeshBits;

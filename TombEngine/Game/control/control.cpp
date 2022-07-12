@@ -94,9 +94,6 @@ short NextItemFree;
 short NextFxActive;
 short NextFxFree;
 
-int WeaponDelay;
-int WeaponEnemyTimer;
-
 int DrawPhase()
 {
 	g_Renderer.Draw();
@@ -106,8 +103,6 @@ int DrawPhase()
 
 GameStatus ControlPhase(int numFrames, int demoMode)
 {
-	short oldLaraFrame;
-
 	ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
 	RegeneratePickups();
@@ -266,22 +261,6 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		InItemControlLoop = false;
 		KillMoveEffects();
-
-		// Update some effect timers
-		if (SmokeCountL)
-			SmokeCountL--;
-
-		if (SmokeCountR)
-			SmokeCountR--;
-
-		if (SplashCount)
-			SplashCount--;
-
-		if (WeaponDelay)
-			WeaponDelay--;
-
-		if (WeaponEnemyTimer)
-			WeaponEnemyTimer--;
 
 		if (CurrentLevel != 0)
 		{

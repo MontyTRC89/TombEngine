@@ -8,6 +8,8 @@ namespace sol {
 }
 class Vec3;
 class Rotation;
+class ScriptColor;
+
 struct ItemInfo;
 enum GAME_OBJECT_ID : short;
 
@@ -49,6 +51,9 @@ public:
 
 	[[nodiscard]] int GetFrameNumber() const;
 	void SetFrameNumber(int frameNumber);
+
+	[[nodiscard]] ScriptColor GetColor() const;
+	void SetColor(ScriptColor const& col);
 
 	[[nodiscard]] short GetHP() const;
 	void SetHP(short hp);
