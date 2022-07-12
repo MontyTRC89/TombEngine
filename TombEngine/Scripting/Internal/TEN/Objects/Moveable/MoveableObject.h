@@ -109,4 +109,6 @@ private:
 	ItemInfo* m_item;
 	short m_num;
 	bool m_initialised;
+
+	bool MeshExists(int number) const;
 };
