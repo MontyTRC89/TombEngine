@@ -258,3 +258,9 @@ short Level::GetFogMaxDistance() const
 {
 	return Fog.MaxDistance;
 }
+
+float Level::GetFarView() const
+{
+	return float(LevelFarView);
+}
+

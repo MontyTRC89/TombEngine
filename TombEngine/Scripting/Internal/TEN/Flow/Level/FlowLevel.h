@@ -55,4 +55,5 @@ struct Level : public ScriptInterfaceLevel
 	short GetMirrorRoom() const override;
 	short GetFogMinDistance() const override;
 	short GetFogMaxDistance() const override;
+	float GetFarView() const override;
 };
