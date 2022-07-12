@@ -41,7 +41,7 @@ namespace TEN::Entities::Generic
 		ROPE_STRUCT rope;
 		PrepareRope(&rope, &itemPos, &pos, CLICK(0.5f), item);
 
-		item->TriggerFlags = Ropes.size();
+		item->TriggerFlags = short(Ropes.size());
 
 		Ropes.push_back(rope);
 	}
