@@ -43,7 +43,7 @@ void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 	if (!(TrInput & IN_ACTION) ||
 		laraItem->Animation.ActiveState != LS_IDLE ||
-		laraItem->Animation.Airborne ||
+		laraItem->Animation.IsAirborne ||
 		laraInfo->Control.HandStatus != HandStatus::Free)
 	{
 		return;
@@ -67,7 +67,7 @@ void DeathSlideCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			AddActiveItem(itemNumber);
 
 		zipLineItem->Status = ITEM_ACTIVE;
-		zipLineItem->Flags |= ONESHOT;
+		zipLineItem->Flags |= IFLAG_INVISIBLE;
 	}
 }
 
@@ -77,7 +77,7 @@ void ControlDeathSlide(short itemNumber)
 
 	if (zipLineItem->Status == ITEM_ACTIVE)
 	{
-		if (!(zipLineItem->Flags & ONESHOT))
+		if (!(zipLineItem->Flags & IFLAG_INVISIBLE))
 		{
 			auto* old = (GameVector*)zipLineItem->Data;
 
@@ -139,7 +139,7 @@ void ControlDeathSlide(short itemNumber)
 			{
 				LaraItem->Animation.TargetState = LS_JUMP_FORWARD;
 				AnimateLara(LaraItem);
-				LaraItem->Animation.Airborne = true;
+				LaraItem->Animation.IsAirborne = true;
 				LaraItem->Animation.Velocity = zipLineItem->Animation.VerticalVelocity;
 				LaraItem->Animation.VerticalVelocity = zipLineItem->Animation.VerticalVelocity / 4;
 			}
@@ -148,7 +148,7 @@ void ControlDeathSlide(short itemNumber)
 			SoundEffect(SFX_TR4_VONCROY_KNIFE_SWISH, &zipLineItem->Pose);
 			RemoveActiveItem(itemNumber);
 			zipLineItem->Status = ITEM_NOT_ACTIVE;
-			zipLineItem->Flags -= ONESHOT;
+			zipLineItem->Flags -= IFLAG_INVISIBLE;
 		}
 		else
 		{

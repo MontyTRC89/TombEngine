@@ -189,8 +189,11 @@ constexpr auto MAX_GUNSHELL = 24;
 constexpr auto MAX_DRIPS = 32;
 constexpr auto MAX_SHOCKWAVE = 16;
 
-constexpr auto EXPLODE_HIT_EFFECT = 258;
-constexpr auto EXPLODE_NORMAL = 256;
+constexpr auto BODY_NO_BOUNCE     = 0x0001;
+constexpr auto BODY_GIBS		  = 0x0002;
+constexpr auto BODY_EXPLODE		  = 0x0100;
+constexpr auto BODY_NO_BOUNCE_ALT = 0x0200;
+constexpr auto BODY_STONE_SOUND   = 0x0800;
 
 extern GUNFLASH_STRUCT Gunflashes[MAX_GUNFLASH];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -233,10 +236,10 @@ void UpdateBubbles();
 int GetFreeDrip();
 void UpdateDrips();
 void TriggerLaraDrips(ItemInfo* item);
-int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags); // EXPLODE_ flags
+void ExplodingDeath(short itemNumber, short flags); // EXPLODE_ flags
 int GetFreeShockwave();
-void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags);
-void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel);
+void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags);
+void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel);
 void UpdateShockwaves();
 void TriggerSmallSplash(int x, int y, int z, int number);
 void TriggerUnderwaterExplosion(ItemInfo* item, int flag);

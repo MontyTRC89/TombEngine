@@ -115,8 +115,8 @@ namespace TEN::Entities::TR4
 			deathEffect->x = pos.Position.x;
 			deathEffect->y = pos.Position.y;
 			deathEffect->z = pos.Position.z;
-			deathEffect->innerRad = 0x2000280;
-			deathEffect->outerRad = 0x28802000;
+			deathEffect->innerRad = 512;
+			deathEffect->outerRad = 640;
 			deathEffect->xRot = xRot;
 			deathEffect->r = 255;
 			deathEffect->g = 64;
@@ -354,7 +354,7 @@ namespace TEN::Entities::TR4
 				}
 				else if (creature->Mood == MoodType::Attack)
 				{
-					if (!(item->AIBits & FOLLOW) || (!item->Animation.Airborne && AI.distance <= pow(BABOON_ROLL_FORWARD_RANGE, 2)))
+					if (!(item->AIBits & FOLLOW) || (!item->Animation.IsAirborne && AI.distance <= pow(BABOON_ROLL_FORWARD_RANGE, 2)))
 					{
 						if (AI.bite && AI.distance < pow(BABOON_ATTACK_RANGE, 2))
 						{
@@ -471,7 +471,7 @@ namespace TEN::Entities::TR4
 					if (AI.ahead && Lara.TargetEntity != item)
 						item->Animation.TargetState = BABOON_STATE_IDLE;
 				}
-				else if (item->AIBits & FOLLOW && (item->Animation.Airborne || AI.distance > pow(BABOON_FOLLOW_RANGE, 2)))
+				else if (item->AIBits & FOLLOW && (item->Animation.IsAirborne || AI.distance > pow(BABOON_FOLLOW_RANGE, 2)))
 					item->Animation.TargetState = BABOON_STATE_IDLE;
 				else if (creature->Mood == MoodType::Attack)
 				{

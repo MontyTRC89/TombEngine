@@ -4,16 +4,16 @@ namespace TEN::Entities::Vehicles
 {
 	struct SkidooInfo
 	{
-		short TurnRate;
-		short MomentumAngle;
-		short ExtraRotation;
+		int LeftVerticalVelocity = 0;
+		int RightVerticalVelocity = 0;
 
-		int LeftVerticalVelocity;
-		int RightVerticalVelocity;
+		short TurnRate = 0;
+		short MomentumAngle = 0;
+		short ExtraRotation = 0;
 
-		int Pitch;
-		int FlashTimer;
-		short TrackMesh;
-		bool Armed;
+		int Pitch = 0;
+		int FlashTimer = 0;
+		short TrackMesh = 0;
+		bool Armed = false;
 	};
 }

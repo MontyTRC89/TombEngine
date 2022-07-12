@@ -1,6 +1,6 @@
 #pragma once
 
-class RGBAColor8Byte;
+#include "Color/Color.h"
 
 namespace sol {
 	class state;
@@ -16,9 +16,9 @@ struct Fog
 	short MaxDistance{ 0 };
 
 	Fog() = default;
-	Fog(RGBAColor8Byte const& col, short minDistance, short maxDistance);
-	void SetColor(RGBAColor8Byte const& col);
-	RGBAColor8Byte GetColor() const;
+	Fog(ScriptColor const& col, short minDistance, short maxDistance);
+	void SetColor(ScriptColor const& col);
+	ScriptColor GetColor() const;
 
 	static void Register(sol::table &);
 };

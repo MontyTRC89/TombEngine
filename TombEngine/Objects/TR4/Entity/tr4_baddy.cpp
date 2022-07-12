@@ -1,19 +1,21 @@
 #include "framework.h"
 #include "tr4_baddy.h"
+
 #include "Game/items.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/people.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
 #include "Game/control/control.h"
 #include "Game/animation.h"
 #include "Game/control/lot.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
 #include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Specific/level.h"
 
 using namespace TEN::Math::Random;
 
@@ -329,7 +331,6 @@ namespace TEN::Entities::TR4
 
 		bool roll = false;
 		bool jump = false;
-		bool someFlag3 = false;
 
 		if (item->TriggerFlags % 1000)
 		{
@@ -437,31 +438,31 @@ namespace TEN::Entities::TR4
 			switch (item->Animation.ActiveState)
 			{
 			case BADDY_STATE_DEATH:
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 				currentCreature->LOT.IsMonkeying = false;
 
 				if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
 					item->Animation.VerticalVelocity = 0;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 				}
 
 				break;
 
 			case BADDY_STATE_MONKEY_TO_FREEFALL:
 				item->Animation.TargetState = BADDY_STATE_FREEFALL;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				break;
 
 			case BADDY_STATE_FREEFALL:
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 
 				if (item->Pose.Position.y >= item->Floor)
 				{
 					item->Pose.Position.y = item->Floor;
 					item->Animation.VerticalVelocity = 0;
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 					item->Animation.TargetState = BADDY_STATE_FREEFALL_LAND_DEATH;
 				}
 
@@ -618,10 +619,7 @@ namespace TEN::Entities::TR4
 
 				if (abs(height7 - item->Pose.Position.y) > CLICK(1) ||
 					(height6 + CLICK(2)) >= item->Pose.Position.y)
-				{
 					roll = false;
-					someFlag3 = false;
-				}
 				else
 					roll = true;
 			}
@@ -1029,12 +1027,12 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_MONKEY_PUSH_OFF:
 				currentCreature->MaxTurn = ANGLE(7.0f);
 
-				if (currentCreature->Flags == someFlag3)
+				if (!currentCreature->Flags)
 				{
 					if (item->TouchBits)
 					{
 						SetAnimation(LaraItem, LA_JUMP_UP);
-						LaraItem->Animation.Airborne = true;
+						LaraItem->Animation.IsAirborne = true;
 						LaraItem->Animation.VerticalVelocity = 2;
 						LaraItem->Animation.VerticalVelocity = 1;
 						LaraItem->Pose.Position.y += CLICK(0.75f);
@@ -1048,12 +1046,12 @@ namespace TEN::Entities::TR4
 			case BADDY_STATE_ROLL_LEFT:
 			case BADDY_STATE_JUMP_RIGHT:
 				item->Status = ITEM_ACTIVE;
-				currentCreature->MaxTurn = someFlag3;
+				currentCreature->MaxTurn = 0;
 				currentCreature->Alerted = false;
 				break;
 
 			case BADDY_STATE_CROUCH:
-				if (item->ItemFlags[0] == someFlag3)
+				if (!item->ItemFlags[0])
 				{
 					if (currentCreature->Enemy)
 					{
@@ -1169,7 +1167,7 @@ namespace TEN::Entities::TR4
 				if (!item->HitStatus)
 					item->ItemFlags[2]--;
 				
-				if (!ShotLara(item, &AI, &BaddyGunBite, joint1, 15));
+				if (!ShotLara(item, &AI, &BaddyGunBite, joint1, 15))
 					item->Animation.TargetState = BADDY_STATE_IDLE;
 
 				break;
@@ -1220,7 +1218,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case BADDY_STATE_BLIND:
-				if (!WeaponEnemyTimer)
+				if (!FlashGrenadeAftershockTimer)
 				{
 					if ((GetRandomControl() & 0x7F) == 0)
 						item->Animation.TargetState = BADDY_STATE_IDLE;
@@ -1243,7 +1241,7 @@ namespace TEN::Entities::TR4
 
 			case BADDY_STATE_JUMP_FORWARD_1_BLOCK:
 			case BADDY_STATE_JUMP_FORWARD_2_BLOCKS:
-				if (item->ItemFlags[0] >= someFlag3)
+				if (item->ItemFlags[0] >= 0)
 					break;
 
 				if (item->Animation.AnimNumber != Objects[objectNumber].animIndex + BADDY_ANIM_STAND_TO_JUMP_FORWARD)
@@ -1267,7 +1265,7 @@ namespace TEN::Entities::TR4
 		{
 			CreatureAnimation(itemNumber, angle, 0);
 		}
-		else  if (WeaponEnemyTimer <= 100)
+		else if (FlashGrenadeAftershockTimer <= 100)
 		{
 			int vault = CreatureVault(itemNumber, angle, 2, 260);
 

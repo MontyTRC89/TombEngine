@@ -26,7 +26,7 @@ namespace TEN::Entities::TR4
 		{
 			auto* grenadeItem = &g_Level.Items[grenadeItemNumber];
 
-			grenadeItem->Shade = -15856;
+			grenadeItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 			grenadeItem->ObjectNumber = ID_GRENADE;
 			grenadeItem->RoomNumber = item->RoomNumber;
 
@@ -40,11 +40,8 @@ namespace TEN::Entities::TR4
 			grenadeItem->Pose.Position.y = item->Pose.Position.y - CLICK(3);
 			grenadeItem->Pose.Position.z = item->Pose.Position.x + SECTOR(1) * phd_cos(grenadeItem->Pose.Orientation.y);
 
-			SmokeCountL = 32;
-			SmokeWeapon = (LaraWeaponType)5; // TODO: 5 is the HK. Did the TEN enum get shuffled around? @Sezz 2022.03.09
-
 			for (int i = 0; i < 5; i++)
-				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, (LaraWeaponType)5, 32);
+				TriggerGunSmoke(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 0, 0, 0, 1, LaraWeaponType::GrenadeLauncher, 32);
 
 			if (GetRandomControl() & 3)
 				grenadeItem->ItemFlags[0] = 1;
@@ -369,11 +366,11 @@ namespace TEN::Entities::TR4
 				ItemNewRoom(itemNumber, probe.RoomNumber);
 
 			if (item->Pose.Position.y < item->Floor)
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 			else
 			{
 				item->Pose.Position.y = item->Floor;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.VerticalVelocity = 0;
 			}
 

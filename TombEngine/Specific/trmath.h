@@ -37,12 +37,12 @@ BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
 float phd_sin(short a);
 float phd_cos(short a);
 
-const float lerp(float v0, float v1, float t);
-const Vector3 getRandomVector();
-const Vector3 getRandomVectorInCone(const Vector3& direction,const float angleDegrees);
+const Vector3 GetRandomVector();
+const Vector3 GetRandomVectorInCone(const Vector3& direction,const float angleDegrees);
 int mGetAngle(int x1, int y1, int x2, int y2);
 int phd_atan(int dz, int dx);
 Vector3Shrt GetVectorAngles(int x, int y, int z);
+Vector3Shrt GetOrientBetweenPoints(Vector3Int origin, Vector3Int target);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 
@@ -66,10 +66,11 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)
 
-float Smoothstep(float e0, float e1, float x);
+const float Lerp(float v0, float v1, float t);
+const float Smoothstep(float edge0, float edge1, float x);
 
-Vector3 TranslateVector(Vector3 vector, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
-Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
+Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
 Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance);
 Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance);
 Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance);
