@@ -162,9 +162,8 @@ namespace TEN::Input
 			}
 		}
 
-		// Initialise input action map. // TODO: 5 keys are hardcoded.
-		//ActionMap.resize(KEY_COUNT + 5);
-		for (int i = 0; i < KEY_COUNT + 5; i++)
+		// Initialise input action map.
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 			ActionMap.push_back(InputAction((InputActionID)i));
 	}
 
@@ -676,8 +675,8 @@ namespace TEN::Input
 		RawInput = NULL;
 
 		// Update input action map.
-		for (int i = 0; i < KEY_COUNT + 5; i++)
-			ActionMap[i].Update(Key(i));
+		for (int i = 0; i < (int)InputActionID::Count; i++)
+			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key.
 
 		// Select/deselect control overrides (needed for UI keyboard navigation).
 		ActionMap[(int)In::Select].Update(KeyMap[KC_RETURN] || Key(KEY_ACTION));
@@ -718,7 +717,7 @@ namespace TEN::Input
 		RelInput = NULL;
 		RawInput = NULL;
 
-		for (int i = 0; i < KEY_COUNT + 5; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 			ActionMap[i].Clear();
 	}
 
@@ -807,11 +806,11 @@ namespace TEN::Input
 		return TimeReleased;
 	}
 
-	void InputAction::Update(bool setActive)
+	void InputAction::Update(float value)
 	{
 		static const float frameTime = 1.0f / (float)FPS;
 
-		this->UpdateValue(setActive ? 1.0f : 0.0f);
+		this->UpdateValue(value);
 
 		if (this->IsClicked())
 		{

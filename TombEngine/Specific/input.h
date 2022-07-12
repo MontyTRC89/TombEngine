@@ -170,6 +170,8 @@ namespace TEN::Input
 		Select,
 		Deselect,
 		LookSwitch,
+
+		Count
 	} In;
 
 	// TODO: For use with analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
@@ -188,7 +190,7 @@ namespace TEN::Input
 		float GetTimeHeld();
 		float GetTimeReleased();
 
-		void Update(bool setActive);
+		void Update(float value);
 		void Clear();
 		void PrintDebugInfo();
 
