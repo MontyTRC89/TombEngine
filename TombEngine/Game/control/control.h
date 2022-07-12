@@ -84,7 +84,6 @@ int GetRandomDraw();
 void KillMoveItems();
 void KillMoveEffects();
 void UpdateShatters();
-bool ExplodeItemNode(ItemInfo* item, int node, int noXZVel, int bits);
 
 void CleanUp();
 

@@ -685,35 +685,6 @@ int GetRandomDraw()
 	return GenerateInt();
 }
 
-bool ExplodeItemNode(ItemInfo *item, int node, int noXZVel, int bits)
-{
-	if (1 << node & item->MeshBits)
-	{
-		int number = bits;
-		if (item->ObjectNumber == ID_SHOOT_SWITCH1 && (CurrentLevel == 4 || CurrentLevel == 7)) // TODO: remove hardcoded think !
-			SoundEffect(SFX_TR5_SMASH_METAL, &item->Pose);
-		else if (number == BODY_EXPLODE)
-			number = -64;
-
-		GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD | SPHERES_SPACE_BONE_ORIGIN, Matrix::Identity);
-		ShatterItem.yRot = item->Pose.Orientation.y;
-		ShatterItem.bit = 1 << node;
-		ShatterItem.meshIndex = Objects[item->ObjectNumber].meshIndex + node;
-		ShatterItem.sphere.x = CreatureSpheres[node].x;
-		ShatterItem.sphere.y = CreatureSpheres[node].y;
-		ShatterItem.sphere.z = CreatureSpheres[node].z;
-		ShatterItem.flags = item->ObjectNumber == ID_CROSSBOW_BOLT ? 0x400 : 0;
-		ShatterImpactData.impactDirection = Vector3(0, -1, 0);
-		ShatterImpactData.impactLocation = {(float)ShatterItem.sphere.x, (float)ShatterItem.sphere.y, (float)ShatterItem.sphere.z};
-		ShatterObject(&ShatterItem, NULL, number, item->RoomNumber, noXZVel);
-		item->MeshBits &= ~ShatterItem.bit;
-
-		return true;
-	}
-
-	return false;
-}
-
 void CleanUp()
 {
 	// Reset oscillator seed
