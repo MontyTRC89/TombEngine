@@ -750,37 +750,49 @@ short Moveable::GetStatus() const
 
 bool Moveable::MeshIsVisible(int meshId) const
 {
+	if (!MeshExists(meshId))
+		return false;
+
 	return m_item->TestBits(JointBitType::Mesh, meshId);
 }
 
 void Moveable::ShowMesh(int meshId)
 {
+	if (!MeshExists(meshId))
+		return;
+
 	m_item->SetBits(JointBitType::Mesh, meshId);
 }
 
 void Moveable::HideMesh(int meshId)
 {
+	if (!MeshExists(meshId))
+		return;
+
 	m_item->ClearBits(JointBitType::Mesh, meshId); 
 }
 
 void Moveable::ShatterMesh(int meshId)
 {
-	if (meshId >= Objects[m_item->ObjectNumber].nmeshes)
-	{
-		TENLog("Specified mesh index does not exist!", LogLevel::Error);
+	if (!MeshExists(meshId))
 		return;
-	}
 
 	ExplodeItemNode(m_item, meshId, 0, 128);
 }
 
 bool Moveable::MeshIsSwapped(int meshId) const
 {
+	if (!MeshExists(meshId))
+		return false;
+
 	return m_item->TestBits(JointBitType::MeshSwap, meshId);
 }
 
 void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex)
 {
+	if (!MeshExists(meshId))
+		return;
+
 	if (!swapMeshIndex.has_value())
 		 swapMeshIndex = meshId;
 
@@ -806,12 +818,6 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 			return;
 		}
 
-		if (meshId >= NUM_LARA_MESHES)
-		{
-			TENLog("Specified mesh index does not exist!", LogLevel::Error);
-			return;
-		}
-
 		lara->MeshPtrs[meshId] = Objects[swapSlotId].meshIndex + swapMeshIndex.value();
 	}
 	else
@@ -820,6 +826,9 @@ void Moveable::SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshI
 
 void Moveable::UnswapMesh(int meshId)
 {
+	if (!MeshExists(meshId))
+		return;
+
 	if (m_item->IsLara())
 	{
 		auto* lara = GetLaraInfo(m_item);
@@ -962,3 +971,13 @@ void Moveable::Destroy()
 	Invalidate();
 }
 
+bool Moveable::MeshExists(int index) const
+{
+	if (index < 0 || index >= Objects[m_item->ObjectNumber].nmeshes)
+	{
+		TENLog("Specified mesh index does not exist in moveable '" + m_item->LuaName + "'", LogLevel::Error);
+		return false;
+	}
+
+	return true;
+}
