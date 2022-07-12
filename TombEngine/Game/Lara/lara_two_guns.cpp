@@ -46,10 +46,10 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	if (laraItem->MeshBits)
 	{
-		if (SmokeCountL)
+		if (lara->LeftArm.GunSmoke)
 		{
 			Vector3Int pos;
-			switch (SmokeWeapon)
+			switch (weaponType)
 			{
 			case LaraWeaponType::Pistol:
 				pos = { 4, 128, 40 };
@@ -65,14 +65,14 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 			}
 
 			GetLaraJointPosition(&pos, LM_LHAND);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountL);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->LeftArm.GunSmoke);
 		}
 
-		if (SmokeCountR)
+		if (lara->RightArm.GunSmoke)
 		{
 			Vector3Int pos;
 
-			switch (SmokeWeapon)
+			switch (weaponType)
 			{
 			case LaraWeaponType::Pistol:
 				pos = { -16, 128, 40 };
@@ -88,7 +88,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 			}
 
 			GetLaraJointPosition(&pos, LM_RHAND);
-			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, SmokeWeapon, SmokeCountR);
+			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, lara->RightArm.GunSmoke);
 		}
 	}
 
@@ -119,11 +119,11 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 					if (FireWeapon(weaponType, lara->TargetEntity, laraItem, rightArmOrient) != FireWeaponType::NoAmmo)
 					{
-						SmokeCountR = 28;
-						SmokeWeapon = weaponType;
+						lara->RightArm.GunSmoke = 28;
+
 						TriggerGunShell(1, ID_GUNSHELL, weaponType); // Right Hand
 
-						lara->RightArm.FlashGun = weapon->FlashTime;
+						lara->RightArm.GunFlash = weapon->FlashTime;
 
 						SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose, SoundEnvironment::Land, 0.9f, 0.3f);
 						SoundEffect(weapon->SampleNum, &laraItem->Pose);
@@ -204,16 +204,14 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 				{
 					if (weaponType == LaraWeaponType::Revolver)
 					{
-						SmokeCountR = 28;
-						SmokeWeapon = LaraWeaponType::Revolver;
-						lara->RightArm.FlashGun = weapon->FlashTime;
+						lara->RightArm.GunSmoke = 28;
+						lara->RightArm.GunFlash = weapon->FlashTime;
 					}
 					else
 					{
-						SmokeCountL = 28;
-						SmokeWeapon = weaponType;
+						lara->LeftArm.GunSmoke = 28;
 						TriggerGunShell(0, ID_GUNSHELL, weaponType); // left hand
-						lara->LeftArm.FlashGun = weapon->FlashTime;
+						lara->LeftArm.GunFlash = weapon->FlashTime;
 					}
 
 					if (!fired)
@@ -315,13 +313,13 @@ void PistolHandler(ItemInfo* laraItem, LaraWeaponType weaponType)
 
 	AnimatePistols(laraItem, weaponType);
 	
-	if (lara->LeftArm.FlashGun || lara->RightArm.FlashGun)
+	if (lara->LeftArm.GunFlash || lara->RightArm.GunFlash)
 	{
 		Vector3Int pos;
 		pos.x = (byte)GetRandomControl() - 128;
 		pos.y = (GetRandomControl() & 0x7F) - 63;
 		pos.z = (byte)GetRandomControl() - 128;
-		GetLaraJointPosition(&pos, lara->LeftArm.FlashGun != 0 ? LM_LHAND : LM_RHAND);
+		GetLaraJointPosition(&pos, lara->LeftArm.GunFlash != 0 ? LM_LHAND : LM_RHAND);
 
 		TriggerDynamicLight(pos.x+GenerateFloat(-128,128), pos.y + GenerateFloat(-128, 128), pos.z + GenerateFloat(-128, 128), GenerateFloat(8,11), (GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
 	}
@@ -339,8 +337,8 @@ void ReadyPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 	lara->TargetEntity = nullptr;
 	lara->LeftArm.Locked = false;
 	lara->RightArm.Locked = false;
-	lara->LeftArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
-	lara->RightArm.frameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->LeftArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
+	lara->RightArm.FrameBase = Objects[WeaponObject(weaponType)].frameBase;
 }
 
 void DrawPistols(ItemInfo* laraItem, LaraWeaponType weaponType)
@@ -470,7 +468,7 @@ void SetArmInfo(ItemInfo* laraItem, ArmInfo* arm, int frame)
 		arm->AnimNumber = animBase + 3;
 
 	arm->FrameNumber = frame;
-	arm->frameBase = g_Level.Anims[arm->AnimNumber].framePtr;
+	arm->FrameBase = g_Level.Anims[arm->AnimNumber].framePtr;
 }
 
 void DrawPistolMeshes(ItemInfo* laraItem, LaraWeaponType weaponType)

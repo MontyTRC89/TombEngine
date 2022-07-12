@@ -92,12 +92,12 @@ namespace TEN::Entities::TR1
 
 			// Compare floor heights.
 			if (item->Floor >= laraFloorHeight + SECTOR(1) + 1 &&	// Add 1 to avoid bacon Lara dying when exiting water.
-				!LaraItem->Animation.Airborne)
+				!LaraItem->Animation.IsAirborne)
 			{
 				SetAnimation(item, LA_JUMP_WALL_SMASH_START);
 				item->Animation.Velocity = 0;
 				item->Animation.VerticalVelocity = 0;
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 				item->Data = -1;
 				item->Pose.Position.y += 50;
 			}
@@ -115,7 +115,7 @@ namespace TEN::Entities::TR1
 				TestTriggers(item, true);
 
 				item->Animation.VerticalVelocity = 0;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Animation.TargetState = LS_DEATH;
 				item->Animation.RequiredState = LS_DEATH;
 			}

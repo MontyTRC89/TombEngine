@@ -6,12 +6,12 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/itemdata/door_data.h"
 #include "Game/Lara/lara_struct.h"
-#include "Objects/TR2/Vehicles/boat_info.h"
+#include "Objects/TR2/Vehicles/speedboat_info.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
 #include "Objects/TR3/Vehicles/minecart_info.h"
 #include "Objects/TR3/Vehicles/big_gun_info.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
-#include "Objects/TR3/Vehicles/quad_info.h"
+#include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
 #include "Objects/TR3/Vehicles/upv_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
@@ -46,23 +46,23 @@ class ITEM_DATA
 		double,
 		long double,
 		std::array<short, 4>,
+		GameVector,
+		DOOR_DATA,
+		PushableInfo,
 		ItemInfo*,
+		LaraInfo*,
 		CreatureInfo,
+		WraithInfo,
 		LaserHeadInfo,
-		QuadInfo,
+		QuadBikeInfo,
 		BigGunInfo,
 		MotorbikeInfo,
 		JeepInfo,
-		LaraInfo*,
 		KayakInfo,
-		DOOR_DATA,
 		SkidooInfo,
 		UPVInfo,
-		SpeedBoatInfo,
-		GameVector,
-		WraithInfo,
+		SpeedboatInfo,
 		RubberBoatInfo,
-		PushableInfo,
 		MinecartInfo
 	> data;
 	public:

@@ -50,11 +50,9 @@ enum CAMERA_FLAGS
 
 constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
 
-extern Vector3Int CurrentCameraPosition;
 extern CAMERA_INFO Camera;
 extern GameVector ForcedFixedCamera;
 extern int UseForcedFixedCamera;
-extern int NumberCameras;
 extern int BinocularRange;
 extern bool BinocularOn;
 extern CameraType BinocularOldCamera;
@@ -62,8 +60,8 @@ extern bool LaserSight;
 extern int PhdPerspective;
 extern short CurrentFOV;
 
-extern bool ScreenFadedOut;
-extern bool ScreenFading;
+extern bool  ScreenFadedOut;
+extern bool  ScreenFading;
 extern float ScreenFadeSpeed;
 extern float ScreenFadeStart;
 extern float ScreenFadeEnd;
@@ -97,5 +95,6 @@ void ItemsCollideCamera();
 void SetScreenFadeOut(float speed);
 void SetScreenFadeIn(float speed);
 void SetCinematicBars(float height, float speed);
+void ClearCinematicBars();
 void UpdateFadeScreenAndCinematicBars();
 void HandleOptics();

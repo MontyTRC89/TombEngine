@@ -10,7 +10,7 @@
 #include "Game/collision/sphere.h"
 #include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Renderer\RenderView\RenderView.h"
-#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/rubber_boat.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR3/Vehicles/big_gun.h"
@@ -18,7 +18,7 @@
 #include "Objects/TR4/Vehicles/motorbike.h"
 #include <algorithm>
 #include "Game/itemdata/creature_info.h"
-#include "Objects/TR3/Vehicles/quad_info.h"
+#include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/TR4/Vehicles/motorbike_info.h"
 #include "Objects/TR3/Vehicles/rubber_boat_info.h"
@@ -33,25 +33,6 @@ namespace TEN::Renderer
 {
 	using std::pair;
 	using std::vector;
-
-	bool Renderer11::IsRoomUnderwater(short roomNumber)
-	{
-		return (g_Level.Rooms[roomNumber].flags & ENV_FLAG_WATER);
-	}
-
-	bool Renderer11::IsInRoom(int x, int y, int z, short roomNumber)
-	{
-		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
-
-		return (x >= r->x && x <= r->x + r->xSize * 1024.0f &&
-				y >= r->maxceiling && y <= r->minfloor &&
-				z >= r->z && z <= r->z + r->zSize * 1024.0f);
-	}
-
-	std::vector<TEN::Renderer::RendererVideoAdapter>* Renderer11::GetAdapters()
-{
-		return &m_adapters;
-	}
 
 	void Renderer11::UpdateEffects(RenderView& view)
 	{
@@ -93,7 +74,6 @@ namespace TEN::Renderer
 				Vector3 p = Vector3(frmptr[0]->offsetX, frmptr[0]->offsetY, frmptr[0]->offsetZ);
 
 				rotation = Matrix::CreateFromQuaternion(frmptr[0]->angles[bone->Index]);
-				//FromTrAngle(&rotation, frmptr[0], bone->Index);
 				
 				if (frac)
 				{
@@ -101,7 +81,6 @@ namespace TEN::Renderer
 					p = Vector3::Lerp(p, p2, frac / ((float)rate));
 
 					Matrix rotation2 = Matrix::CreateFromQuaternion(frmptr[1]->angles[bone->Index]);
-					//FromTrAngle(&rotation2, frmptr[1], bone->Index);
 
 					Quaternion q1, q2, q3;
 
@@ -207,92 +186,116 @@ namespace TEN::Renderer
 				currentBone->ExtraRotation = Vector3(0.0f, 0.0f, 0.0f);
 				
 				nativeItem->Data.apply(
-					[&j, &currentBone](QuadInfo& quad)
-				{
-					if (j == 3 || j == 4)
-						currentBone->ExtraRotation.x = TO_RAD(quad.RearRot);
-					else if (j == 6 || j == 7)
-						currentBone->ExtraRotation.x = TO_RAD(quad.FrontRot);
-				},
-				[&j, &currentBone](JeepInfo& jeep)
-				{
-					switch(j)
+					[&j, &currentBone](QuadBikeInfo& quadBike)
 					{
-					case 9:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot1);
-						break;
-					case 10:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot2);
-						break;
-					case 12:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot3);
-						break;
-					case 13:
-						currentBone->ExtraRotation.x = TO_RAD(jeep.rot4);
-						break;
-					}
-				},
-				[&j, &currentBone](MotorbikeInfo& bike)
-				{
-					switch (j)
+						if (j == 3 || j == 4)
+							currentBone->ExtraRotation.x = TO_RAD(quadBike.RearRot);
+						else if (j == 6 || j == 7)
+						{
+							currentBone->ExtraRotation.x = TO_RAD(quadBike.FrontRot);
+							currentBone->ExtraRotation.y = TO_RAD(quadBike.TurnRate * 2);
+						}
+					},
+					[&j, &currentBone](JeepInfo& jeep)
 					{
-					case 2:
-					case 4:
-						currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
-						break;
-					case 8:
-						currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
-						break;
-					}
-				},
-				[&j, &currentBone, &oldRotation](MinecartInfo& cart)
-				{
-					switch (j)
-					{
-					case 1:
-					case 2:
-					case 3:
-					case 4:
-						currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
-						break;
-					}
-				},
-				[&j, &currentBone](RubberBoatInfo& boat)
-				{
-				if (j == 2)
-					currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
-				},
-				[&j, &currentBone](UPVInfo& upv)
-				{
-				if (j == 3)
-					currentBone->ExtraRotation.z = TO_RAD(upv.FanRot);
-				},
-				[&j, &currentBone](BigGunInfo& big_gun)
-				{
-				if (j == 2)
-					currentBone->ExtraRotation.z = big_gun.BarrelZRotation;
-				},
-				[&j, &currentBone, &lastJoint](CreatureInfo& creature)
-				{
-				if (currentBone->ExtraRotationFlags & ROT_Y)
-				{
-					currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
-					lastJoint++;
-				}
+						switch(j)
+						{
+						case 9:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontRightWheelRotation);
+							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+							break;
 
-				if (currentBone->ExtraRotationFlags & ROT_X)
-				{
-					currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
-					lastJoint++;
-				}
+						case 10:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.FrontLeftWheelRotation);
+							currentBone->ExtraRotation.y = TO_RAD(jeep.TurnRate * 4);
+							break;
 
-				if (currentBone->ExtraRotationFlags & ROT_Z)
-				{
-					currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
-					lastJoint++;
-				}
-				}
-				);
+						case 12:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.BackRightWheelRotation);
+							break;
+
+						case 13:
+							currentBone->ExtraRotation.x = TO_RAD(jeep.BackLeftWheelRotation);
+							break;
+						}
+					},
+					[&j, &currentBone](MotorbikeInfo& bike)
+					{
+						switch (j)
+						{
+						case 2:
+							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+							currentBone->ExtraRotation.y = TO_RAD(bike.TurnRate * 8);
+							break;
+
+						case 4:
+							currentBone->ExtraRotation.x = TO_RAD(bike.RightWheelsRotation);
+							break;
+
+						case 8:
+							currentBone->ExtraRotation.x = TO_RAD(bike.LeftWheelRotation);
+							break;
+						}
+					},
+					[&j, &currentBone, &oldRotation](MinecartInfo& cart)
+					{
+						switch (j)
+						{
+						case 1:
+						case 2:
+						case 3:
+						case 4:
+							currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
+							break;
+						}
+					},
+					[&j, &currentBone](RubberBoatInfo& boat)
+					{
+						if (j == 2)
+							currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
+					},
+					[&j, &currentBone](UPVInfo& upv)
+					{
+						switch (j)
+						{
+						case 1:
+							currentBone->ExtraRotation.x = TO_RAD(upv.LeftRudderRotation);
+							break;
+
+						case 2:
+							currentBone->ExtraRotation.x = TO_RAD(upv.RightRudderRotation);
+							break;
+
+						case 3:
+							currentBone->ExtraRotation.z = TO_RAD(upv.TurbineRotation);
+							break;
+						}
+					},
+					[&j, &currentBone](BigGunInfo& big_gun)
+					{
+						if (j == 2)
+							currentBone->ExtraRotation.z = big_gun.BarrelRotation;
+					},
+					[&j, &currentBone, &lastJoint](CreatureInfo& creature)
+					{
+						if (currentBone->ExtraRotationFlags & ROT_Y)
+						{
+							currentBone->ExtraRotation.y = TO_RAD(creature.JointRotation[lastJoint]);
+							lastJoint++;
+						}
+
+						if (currentBone->ExtraRotationFlags & ROT_X)
+						{
+							currentBone->ExtraRotation.x = TO_RAD(creature.JointRotation[lastJoint]);
+							lastJoint++;
+						}
+
+						if (currentBone->ExtraRotationFlags & ROT_Z)
+						{
+							currentBone->ExtraRotation.z = TO_RAD(creature.JointRotation[lastJoint]);
+							lastJoint++;
+						}
+					});
 			}
 
 			ANIM_FRAME* framePtr[2];
@@ -308,7 +311,7 @@ namespace TEN::Renderer
 		itemToDraw->DoneAnimations = true;
 	}
 
-	void Renderer11::UpdateItemsAnimations(RenderView& view)
+	void Renderer11::UpdateItemAnimations(RenderView& view)
 	{
 		Matrix translation;
 		Matrix rotation;
@@ -325,49 +328,6 @@ namespace TEN::Renderer
 
 				UpdateItemAnimations(itemToDraw->ItemNumber, false);
 			}
-		}
-	}
-
-	void Renderer11::FromTrAngle(Matrix *matrix, short *frameptr, int index)
-	{
-		short *ptr = &frameptr[0];
-
-		ptr += 9;
-		for (int i = 0; i < index; i++)
-			ptr += ((*ptr & 0xc000) == 0 ? 2 : 1);
-
-		int rot0 = *ptr++;
-		int frameMode = (rot0 & 0xc000);
-
-		int rot1;
-		int rotX;
-		int rotY;
-		int rotZ;
-
-		switch (frameMode)
-		{
-		case 0:
-			rot1 = *ptr++;
-			rotX = ((rot0 & 0x3ff0) >> 4);
-			rotY = (((rot1 & 0xfc00) >> 10) | ((rot0 & 0xf) << 6) & 0x3ff);
-			rotZ = ((rot1)&0x3ff);
-
-			*matrix = Matrix::CreateFromYawPitchRoll(rotY * (360.0f / 1024.0f) * RADIAN,
-													 rotX * (360.0f / 1024.0f) * RADIAN,
-													 rotZ * (360.0f / 1024.0f) * RADIAN);
-			break;
-
-		case 0x4000:
-			*matrix = Matrix::CreateRotationX((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
-			break;
-
-		case 0x8000:
-			*matrix = Matrix::CreateRotationY((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
-			break;
-
-		case 0xc000:
-			*matrix = Matrix::CreateRotationZ((rot0 & 0xfff) * (360.0f / 4096.0f) * RADIAN);
-			break;
 		}
 	}
 
@@ -394,8 +354,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer11::IsFullsScreen() {
-		return (!Windowed);
+	bool Renderer11::IsFullsScreen() 
+	{
+		return (!m_windowed);
 	}
 
 	void Renderer11::UpdateCameraMatrices(CAMERA_INFO *cam, float roll, float fov)

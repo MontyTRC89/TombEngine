@@ -36,7 +36,7 @@ void SmashObject(short itemNumber)
 	item->Collidable = 0;
 	item->MeshBits = 0xFFFE;
 
-	ExplodingDeath(itemNumber, ALL_JOINT_BITS, 257);
+	ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
 
 	item->Flags |= IFLAG_INVISIBLE;
 

@@ -439,7 +439,7 @@ void UpdateFireSparks()
 			if (spark->flags & SP_ROTATE)
 				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0xFFF;
 			float alpha = fmin(1, fmax(0, 1 - (spark->life / (float)spark->sLife)));
-			int sprite = lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex+ (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
+			int sprite = (int)Lerp(Objects[ID_FIRE_SPRITES].meshIndex, Objects[ID_FIRE_SPRITES].meshIndex + (-Objects[ID_FIRE_SPRITES].nmeshes) - 1, alpha);
 			spark->def = sprite;
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
@@ -1429,7 +1429,7 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 
 	auto* lara = GetLaraInfo(laraItem);
 
-	ExplodingDeath(lara->Vehicle, ALL_JOINT_BITS, 256);
+	ExplodingDeath(lara->Vehicle, BODY_EXPLODE | BODY_STONE_SOUND);
 	KillItem(lara->Vehicle);
 	vehicle->Status = ITEM_DEACTIVATED;
 	SoundEffect(SFX_TR4_EXPLOSION1, &laraItem->Pose);
@@ -1440,7 +1440,7 @@ void ExplodeVehicle(ItemInfo* laraItem, ItemInfo* vehicle)
 	DoDamage(laraItem, INT_MAX);
 }
 
-int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
+void ExplodingDeath(short itemNumber, short flags)
 {
 	ItemInfo* item = &g_Level.Items[itemNumber];
 	ObjectInfo* obj = &Objects[item->ObjectNumber];
@@ -1453,24 +1453,27 @@ int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
 		TO_RAD(item->Pose.Orientation.z)
 	);
 
-	int bit = 1;
-
-	if ((bit & meshBits) && (bit & item->MeshBits))
+	for (int i = 0; i < obj->nmeshes; i++)
 	{
-		if ((GetRandomControl() & 3) == 0)
+		Matrix boneMatrix;
+		g_Renderer.GetBoneMatrix(itemNumber, i, &boneMatrix);
+		boneMatrix = world * boneMatrix;
+
+		if (!item->TestBits(JointBitType::Mesh, i))
+			continue;
+
+		item->ClearBits(JointBitType::Mesh, i);
+
+		if (i == 0 ||  ((GetRandomControl() & 3) != 0 && (flags & BODY_EXPLODE)))
 		{
 			short fxNumber = CreateNewEffect(item->RoomNumber);
 			if (fxNumber != NO_ITEM)
 			{
 				FX_INFO* fx = &EffectList[fxNumber];
 
-				Matrix boneMatrix;
-				g_Renderer.GetBoneMatrix(itemNumber, 0, &boneMatrix);
-				boneMatrix = world * boneMatrix;
-
-				fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-				fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-				fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
+				fx->pos.Position.x = boneMatrix.Translation().x;
+				fx->pos.Position.y = boneMatrix.Translation().y;
+				fx->pos.Position.z = boneMatrix.Translation().z;
 
 				fx->roomNumber = item->RoomNumber;
 				fx->pos.Orientation.x = 0;
@@ -1493,70 +1496,14 @@ int ExplodingDeath(short itemNumber, unsigned int meshBits, short flags)
 					else
 						fx->fallspeed = -(GetRandomControl() >> 12);
 				}
+
 				fx->objectNumber = ID_BODY_PART;
-				fx->frameNumber = obj->meshIndex;
 				fx->shade = 16912;
 				fx->flag2 = flags;
-			}
-
-			item->MeshBits -= bit;
-		}
-	}
-
-	for (int i = 1; i < obj->nmeshes; i++)
-	{
-		Matrix boneMatrix;
-		g_Renderer.GetBoneMatrix(itemNumber, i, &boneMatrix);
-		boneMatrix = world * boneMatrix;
-
-		bit <<= 1;
-		if ((bit & meshBits) && (bit & item->MeshBits))
-		{
-			if ((GetRandomControl() & 3) == 0 && (flags & 0x100))
-			{
-				short fxNumber = CreateNewEffect(item->RoomNumber);
-				if (fxNumber != NO_ITEM)
-				{
-					FX_INFO* fx = &EffectList[fxNumber];
-
-					fx->pos.Position.x = boneMatrix.Translation().x + item->Pose.Position.x;
-					fx->pos.Position.y = boneMatrix.Translation().y + item->Pose.Position.y;
-					fx->pos.Position.z = boneMatrix.Translation().z + item->Pose.Position.z;
-
-					fx->roomNumber = item->RoomNumber;
-					fx->pos.Orientation.x = 0;
-					fx->pos.Orientation.y = GetRandomControl() * 2;
-
-					if (!(flags & 0x10))
-					{
-						if (flags & 0x20)
-							fx->speed = GetRandomControl() >> 12;
-						else
-							fx->speed = GetRandomControl() >> 8;
-					}
-
-					if (flags & 0x40)
-						fx->fallspeed = 0;
-					else
-					{
-						if ((flags & 0x80) == 0)
-							fx->fallspeed = -(GetRandomControl() >> 8);
-						else
-							fx->fallspeed = -(GetRandomControl() >> 12);
-					}
-
-					fx->objectNumber = ID_BODY_PART;
-					fx->shade = 16912;
-					fx->flag2 = flags;
-					fx->frameNumber = obj->meshIndex + i;
-				}
-
-				item->MeshBits -= bit;
+				fx->frameNumber = obj->meshIndex + i;
 			}
 		}
 	}
-
-	return item->MeshBits == NO_JOINT_BITS;
 }
 
 int GetFreeShockwave()
@@ -1570,7 +1517,7 @@ int GetFreeShockwave()
 	return -1;
 }
 
-void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, char r, char g, char b, char life, short angle, short flags)
+void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed, unsigned char r, unsigned char g, unsigned char b, unsigned char life, short angle, short flags)
 {
 	int s = GetFreeShockwave();
 	SHOCKWAVE_STRUCT* sptr;
@@ -1596,7 +1543,7 @@ void TriggerShockwave(PHD_3DPOS* pos, short innerRad, short outerRad, int speed,
 	}
 }
 
-void TriggerShockwaveHitEffect(int x, int y, int z, byte r, byte g, byte b, short rot, int vel)
+void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned char g, unsigned char b, short rot, int vel)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;

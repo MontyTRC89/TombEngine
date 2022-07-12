@@ -551,7 +551,7 @@ namespace TEN::Entities::TR4
 						item->Animation.AnimNumber = Objects[ID_SKELETON].animIndex + 44;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = 23;
-						item->Animation.Airborne = true;
+						item->Animation.IsAirborne = true;
 						creature->MaxTurn = 0;
 						creature->LOT.IsJumping = false;
 					}
@@ -685,7 +685,7 @@ namespace TEN::Entities::TR4
 						item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 44;
 						item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 						item->Animation.ActiveState = 23;
-						item->Animation.Airborne = true;
+						item->Animation.IsAirborne = true;
 						creature->MaxTurn = 0;
 						creature->LOT.IsJumping = false;
 					}
@@ -699,7 +699,7 @@ namespace TEN::Entities::TR4
 				{
 					if (item->Active)
 					{
-						ExplodingDeath(itemNumber, ALL_JOINT_BITS, 929);
+						ExplodingDeath(itemNumber, 0);
 						KillItem(itemNumber);
 						DisableEntityAI(itemNumber);
 						//Savegame.Kills++;
@@ -740,7 +740,7 @@ namespace TEN::Entities::TR4
 					item->Animation.AnimNumber = Objects[item->ObjectNumber].animIndex + 47;
 					item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 					item->Animation.ActiveState = 24;
-					item->Animation.Airborne = true;
+					item->Animation.IsAirborne = true;
 					creature->MaxTurn = 0;
 				}
 

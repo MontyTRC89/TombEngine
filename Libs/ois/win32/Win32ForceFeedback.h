@@ -108,9 +108,10 @@ namespace OIS
 		// Joystick capabilities.
 		const DIDEVCAPS* mpDIJoyCaps;
 
-		// An index specifying XInput device index.
-		// It will be -1 if device is DInput device.
-		int mXInputIndex; 
+		// An index specifying XInput device index. It will be -1 if device is DInput device.
+		int mXInputIndex;
+		// Internally setting master gain for XInput devices.
+		float mXInputMasterGain;
 
 		// Number of axis supporting FF.
 		short mFFAxes;

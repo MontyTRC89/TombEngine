@@ -157,7 +157,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunframePtr = &g_Level.Frames[Lara.LeftArm.frameBase + Lara.LeftArm.FrameNumber];
+			shotgunframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber];
 			UpdateAnimation(item, laraObj, &shotgunframePtr, 0, 1, mask);
 
 			// Right arm
@@ -165,7 +165,7 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
-			shotgunframePtr = &g_Level.Frames[Lara.RightArm.frameBase + Lara.RightArm.FrameNumber];
+			shotgunframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber];
 			UpdateAnimation(item, laraObj, &shotgunframePtr, 0, 1, mask);
 		}
 
@@ -177,12 +177,12 @@ void Renderer11::UpdateLaraAnimations(bool force)
 
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			revolverframePtr = &g_Level.Frames[Lara.LeftArm.frameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
+			revolverframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &revolverframePtr, 0, 1, mask);
 
 			// Right arm
 			mask = MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			revolverframePtr = &g_Level.Frames[Lara.RightArm.frameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
+			revolverframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &revolverframePtr, 0, 1, mask);
 		}
 
@@ -197,14 +197,14 @@ void Renderer11::UpdateLaraAnimations(bool force)
 			// Left arm
 			int upperArmMask = MESH_BITS(LM_LINARM);
 			mask = MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
-			pistolframePtr = &g_Level.Frames[Lara.LeftArm.frameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
+			pistolframePtr = &g_Level.Frames[Lara.LeftArm.FrameBase + Lara.LeftArm.FrameNumber - g_Level.Anims[Lara.LeftArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, upperArmMask, true);
 			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, mask);
 
 			// Right arm
 			upperArmMask = MESH_BITS(LM_RINARM);
 			mask = MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
-			pistolframePtr = &g_Level.Frames[Lara.RightArm.frameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
+			pistolframePtr = &g_Level.Frames[Lara.RightArm.FrameBase + Lara.RightArm.FrameNumber - g_Level.Anims[Lara.RightArm.AnimNumber].frameBase];
 			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, upperArmMask, true);
 			UpdateAnimation(item, laraObj, &pistolframePtr, 0, 1, mask);
 		}
@@ -287,8 +287,8 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 	m_cbItem.updateData(m_stItem, m_context.Get());
-	m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-	m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 	if (!shadowMap)
 	{
@@ -298,7 +298,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 	}
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -340,8 +340,8 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
 		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 		{

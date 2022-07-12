@@ -69,7 +69,7 @@ namespace TEN::Effects::Explosion
 			e.rotation += e.angularVel;
 			int numSprites = -Objects[ID_EXPLOSION_SPRITES].nmeshes - 1;
 			float normalizedAge = e.age / e.life;
-			e.sprite = lerp(0, numSprites, normalizedAge);
+			e.sprite = Lerp(0.0f, numSprites, normalizedAge);
 			e.tint = Vector4::Lerp(Vector4(2, 2, 2, 1), Vector4(0, 0, 0, 0), normalizedAge);
 		}
 	}
@@ -97,6 +97,6 @@ namespace TEN::Effects::Explosion
 		e.life = GenerateFloat(60, 90);
 		e.size = GenerateFloat(512, 768);
 		e.angularVel = GenerateFloat(-RADIAN, RADIAN);
-		e.rotation = GenerateFloat(-0.05, 0.05);
+		e.rotation = GenerateFloat(-0.05f, 0.05f);
 	}
 }

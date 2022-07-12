@@ -241,7 +241,7 @@ namespace TEN::Entities::TR4
 		if (item->ItemFlags[0] != 0)
 			horseItem = &g_Level.Items[item->ItemFlags[0]];
 
-		int xRot;
+		int xRot = 0;
 
 		if (horseItem != nullptr)
 		{

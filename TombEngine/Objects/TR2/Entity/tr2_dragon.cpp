@@ -180,7 +180,7 @@ void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if ((anim == DRAGON_ANIM_DEAD || (anim == DRAGON_ANIM_DEAD + 1 && frame <= DRAGON_ALMOST_LIVE)) &&
 				TrInput & IN_ACTION &&
 				item->ObjectNumber == ID_DRAGON_BACK &&
-				!laraItem->Animation.Airborne &&
+				!laraItem->Animation.IsAirborne &&
 				shift <= DRAGON_MID && 
 				shift > (DRAGON_CLOSE - 350) &&
 				sideShift > -350 &&
@@ -194,7 +194,7 @@ void DragonCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 				laraItem->Animation.TargetState = 7;
 
 				laraItem->Pose = item->Pose;
-				laraItem->Animation.Airborne = false;
+				laraItem->Animation.IsAirborne = false;
 				laraItem->Animation.Velocity = 0;
 				laraItem->Animation.VerticalVelocity = 0;
 
@@ -477,7 +477,7 @@ void InitialiseBartoli(short itemNumber)
 		back->Pose.Orientation.y = item->Pose.Orientation.y;
 		back->RoomNumber = item->RoomNumber;
 		back->Status = ITEM_INVISIBLE;
-		back->Shade = -1;
+		back->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		InitialiseItem(backItem);
 		back->MeshBits = 0x1FFFFF;
@@ -493,7 +493,7 @@ void InitialiseBartoli(short itemNumber)
 		front->Pose.Orientation.y = item->Pose.Orientation.y;
 		front->RoomNumber = item->RoomNumber;
 		front->Status = ITEM_INVISIBLE;
-		front->Shade = -1;
+		front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		InitialiseItem(frontItem);
 
@@ -540,7 +540,7 @@ void BartoliControl(short itemNumber)
 				front->Pose.Position.y = item->Pose.Position.y + CLICK(1);
 				front->Pose.Position.z = item->Pose.Position.z;
 				front->RoomNumber = item->RoomNumber;
-				front->Shade = -1;
+				front->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 				InitialiseItem(frontItem);
 				AddActiveItem(frontItem);

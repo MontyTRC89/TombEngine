@@ -31,7 +31,7 @@ struct PixelShaderInput
 	float3 WorldPosition : POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
-	float3 ReflectionVector : TEXCOORD1;
+	float Sheen : SHEEN;
 	float3x3 TBN : TBN;
 	float Fog : FOG;
 	float4 PositionCopy : TEXCOORD2;
@@ -58,12 +58,10 @@ PixelShaderInput VS(VertexShaderInput input)
 
 	float3 Normal = (mul(float4(input.Normal, 0.0f), world).xyz);
 	float3 WorldPosition = (mul(float4(input.Position, 1.0f), world));
-	float3 ReflectionVector = reflect(normalize(-CamDirectionWS.xyz), normalize(Normal));
 
 	output.Normal = Normal;
 	output.UV = input.UV;
 	output.WorldPosition = WorldPosition;
-	output.ReflectionVector = ReflectionVector;
 	
 	float3 Tangent = mul(float4(input.Tangent, 0), world).xyz;
 	float3 Bitangent = mul(float4(input.Bitangent, 0), world).xyz;
@@ -97,62 +95,70 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = col;
 
 	// Apply distance fog
-	float4 d = length(CamPositionWS - WorldPosition);
+	float d = distance(CamPositionWS.xyz,WorldPosition);
 	if (FogMaxDistance == 0)
 		output.Fog = 1;
 	else
 		output.Fog = clamp((d - FogMinDistance * 1024) / (FogMaxDistance * 1024 - FogMinDistance * 1024), 0, 1);
 	
 	output.PositionCopy = output.Position;
-
+    output.Sheen = input.Effects.w;
 	return output;
 }
 
 PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 {
 	PixelShaderOutput output;
-
-	output.Color = Texture.Sample(Sampler, input.UV);
+	float4 tex = Texture.Sample(Sampler, input.UV);
 	
-	DoAlphaTest(output.Color);
-
-	float3 colorMul = input.Color.xyz;
+    DoAlphaTest(tex);
+    float3 ambient = AmbientLight.xyz * tex.xyz;
 
 	float3 normal = NormalTexture.Sample(Sampler, input.UV).rgb;
 	normal = normal * 2 - 1;
 	normal = normalize(mul(input.TBN, normal));
 
-	float3 lighting = AmbientLight.xyz;
-
+	float3 diffuse = 0;
+    float3 spec = 0;
+	
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Type;
 
 		if (lightType == LT_POINT || lightType == LT_SHADOW)
 		{
-			lighting += DoPointLight(input.WorldPosition, normal, Lights[i]);
-		}
+            diffuse += DoPointLight(input.WorldPosition, normal, Lights[i]);
+            spec += DoSpecularPoint(input.WorldPosition, normal, Lights[i], input.Sheen);
+
+        }
 		else if (lightType == LT_SUN)
 		{
-			lighting += DoDirectionalLight(input.WorldPosition, normal, Lights[i]);
+            diffuse += DoDirectionalLight(input.WorldPosition, normal, Lights[i]);
+            spec += DoSpecularSun(normal, Lights[i], input.Sheen);
+
 		}
 		else if (lightType == LT_SPOT)
 		{
-			lighting += DoSpotLight(input.WorldPosition, normal, Lights[i]);
+            diffuse += DoSpotLight(input.WorldPosition, normal, Lights[i]);
+            spec += DoSpecularSpot(input.WorldPosition, normal, Lights[i], input.Sheen);
+
 		}
 	}
-
-	output.Color.xyz *= colorMul.xyz;
-	output.Color.xyz *= lighting.xyz;
-
-	output.Depth = output.Color.w > 0.0f ?
+	
+    diffuse.xyz *= tex.xyz;
+	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
-
+		
+    output.Color = float4(ambient + diffuse + spec, tex.w);
+	
+	float3 colorMul = min(input.Color.xyz, 1.0f); 
+	output.Color.xyz *= colorMul.xyz;
+	
 	if (FogMaxDistance != 0)
 	{
-		output.Color.xyz = lerp(output.Color.xyz, FogColor, input.Fog);
+		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
 	}
-
+	
 	return output;
 }

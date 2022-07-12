@@ -183,14 +183,14 @@ void ShootLeftGun(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->LeftArm.FlashGun = 3;
+	lara->LeftArm.GunFlash = 3;
 }
 
 void ShootRightGun(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->RightArm.FlashGun = 3;
+	lara->RightArm.GunFlash = 3;
 }
 
 void LaraHandsFree(ItemInfo* item)

@@ -67,12 +67,12 @@ namespace TEN::Entities::Switches
 
 		if (switchItem->Status == ITEM_NOT_ACTIVE)
 		{
-			if (!(switchItem->Flags & ONESHOT) &&
+			if (!(switchItem->Flags & IFLAG_INVISIBLE) &&
 				(TrInput & IN_ACTION &&
 					laraItem->Animation.ActiveState == LS_IDLE &&
 					laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
 					lara->Control.HandStatus == HandStatus::Free &&
-					!switchItem->Animation.Airborne ||
+					!switchItem->Animation.IsAirborne ||
 					lara->Control.IsMoving &&
 					lara->InteractedItem == itemNum))
 			{
