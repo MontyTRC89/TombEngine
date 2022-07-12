@@ -95,7 +95,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.Color = col;
 
 	// Apply distance fog
-	float d = distance(CamPositionWS.xyz,WorldPosition);
+	float d = distance(CamPositionWS.xyz, WorldPosition);
 	if (FogMaxDistance == 0)
 		output.Fog = 1;
 	else
@@ -156,9 +156,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	output.Color.xyz *= colorMul.xyz;
 	
 	if (FogMaxDistance != 0)
-	{
 		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
-	}
 	
 	return output;
 }
