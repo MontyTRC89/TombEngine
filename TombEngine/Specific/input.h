@@ -172,16 +172,18 @@ namespace TEN::Input
 		LookSwitch,
 	} In;
 
+	// TODO: For use with analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
 	{
 	public:
-		InputActionID ID   = In::None;
+		InputAction(InputActionID ID);
 
 		bool IsClicked();
 		bool IsPulsed(float interval, float initialInterval = 0.0f);
 		bool IsHeld();
 		bool IsReleased();
 
+		InputActionID GetID();
 		float GetValue();
 		float GetTimeHeld();
 		float GetTimeReleased();
@@ -191,7 +193,7 @@ namespace TEN::Input
 		void PrintDebugInfo();
 
 	private:
-		// TODO: For use with analog triggers, use range [0.0f, 1.0f] with deadzone up to a quarter press.
+		InputActionID ID   = In::None;
 		float Value		   = 0.0f;
 		float PrevValue	   = 0.0f;
 		float TimeHeld	   = 0.0f;

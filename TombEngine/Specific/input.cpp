@@ -163,9 +163,9 @@ namespace TEN::Input
 		}
 
 		// Initialise input action map. // TODO: 5 keys are hardcoded.
-		ActionMap.resize(KEY_COUNT + 5);
+		//ActionMap.resize(KEY_COUNT + 5);
 		for (int i = 0; i < KEY_COUNT + 5; i++)
-			ActionMap[i].ID = (InputActionID)i;
+			ActionMap.push_back(InputAction((InputActionID)i));
 	}
 
 	void DeInitialiseInput()
@@ -662,6 +662,8 @@ namespace TEN::Input
 
 	bool UpdateInput()
 	{
+		// TODO: Save, Load, Select, Deselect, Lookswitch.
+
 		ClearInputData();
 		UpdateRumble();
 		ReadKeyboard();
@@ -684,7 +686,7 @@ namespace TEN::Input
 		// Port raw input back to legacy bitfield.
 		for (auto& action : ActionMap)
 		{
-			int inputBit = 1 << (int)action.ID;
+			int inputBit = 1 << (int)action.GetID();
 			if (action.IsHeld())
 				RawInput |= inputBit;
 		}
@@ -696,7 +698,7 @@ namespace TEN::Input
 		// Port actions back to legacy bitfields.
 		for (auto& action : ActionMap)
 		{
-			int inputBit = 1 << (int)action.ID;
+			int inputBit = 1 << (int)action.GetID();
 
 			DbInput |= action.IsClicked() ? inputBit : NULL;
 			TrInput |= action.IsHeld() ? inputBit : NULL;
@@ -747,6 +749,11 @@ namespace TEN::Input
 
 	// ------------------------------------------------------
 
+	InputAction::InputAction(InputActionID ID)
+	{
+		this->ID = ID;
+	}
+
 	bool InputAction::IsClicked()
 	{
 		return (Value && !PrevValue);
@@ -778,6 +785,11 @@ namespace TEN::Input
 	bool InputAction::IsReleased()
 	{
 		return (!Value && PrevValue);
+	}
+
+	InputActionID InputAction::GetID()
+	{
+		return ID;
 	}
 
 	float InputAction::GetValue()
