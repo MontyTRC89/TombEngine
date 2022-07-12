@@ -765,6 +765,12 @@ void Moveable::HideMesh(int meshId)
 
 void Moveable::ShatterMesh(int meshId)
 {
+	if (meshId >= Objects[m_item->ObjectNumber].nmeshes)
+	{
+		TENLog("Specified mesh index does not exist!", LogLevel::Error);
+		return;
+	}
+
 	ExplodeItemNode(m_item, meshId, 0, 128);
 }
 
