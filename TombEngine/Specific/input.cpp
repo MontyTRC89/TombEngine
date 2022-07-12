@@ -675,7 +675,7 @@ namespace TEN::Input
 		RawInput = NULL;
 
 		// Update input action map.
-		for (int i = 0; i < (int)InputActionID::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count-5; i++) // TODO:: forward/save collide?
 			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key.
 
 		// Select/deselect control overrides (needed for UI keyboard navigation).
