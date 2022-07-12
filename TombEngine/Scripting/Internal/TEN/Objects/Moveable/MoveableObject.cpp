@@ -2,6 +2,7 @@
 
 #include "Game/items.h"
 #include "Game/control/lot.h"
+#include "Game/effects/debris.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
@@ -154,7 +155,11 @@ void Moveable::Register(sol::table & parent)
 
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
-	ScriptReserved_Explode, & Moveable::Explode,
+	ScriptReserved_Explode, &Moveable::Explode,
+
+/// Shatter item. This also kills and disables item.
+// @function Moveable:Shatter
+	ScriptReserved_Shatter, &Moveable::Shatter,
 
 /// Get the status of object.
 // possible values:
@@ -338,6 +343,12 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:HideMesh
 // @tparam int index of a mesh
 	ScriptReserved_HideMesh, &Moveable::HideMesh,
+			
+/// Shatters specified mesh and makes it invisible
+// Note that you can re-enable mesh later by using ShowMesh().
+// @function Moveable:ShatterMesh
+// @tparam int index of a mesh
+	ScriptReserved_ShatterMesh, &Moveable::ShatterMesh,
 
 /// Get state of specified mesh swap of object
 // Returns true if specified mesh is swapped on an object, and false
@@ -749,7 +760,12 @@ void Moveable::ShowMesh(int meshId)
 
 void Moveable::HideMesh(int meshId)
 {
-	m_item->ClearBits(JointBitType::Mesh, meshId);
+	m_item->ClearBits(JointBitType::Mesh, meshId); 
+}
+
+void Moveable::ShatterMesh(int meshId)
+{
+	ExplodeItemNode(m_item, meshId, 0, 128);
 }
 
 bool Moveable::MeshIsSwapped(int meshId) const
@@ -884,6 +900,20 @@ void Moveable::Explode()
 		return;
 
 	CreatureDie(m_num, true);
+	Destroy();
+}
+
+void Moveable::Shatter()
+{
+	if (!m_item->Active && !m_item->IsLara())
+		return;
+
+	m_item->Flags |= IFLAG_KILLED | IFLAG_INVISIBLE;
+	for (int i = 0; i < Objects[m_item->ObjectNumber].nmeshes; i++)
+		ExplodeItemNode(m_item, i, 0, 128);
+
+	CreatureDie(m_num, false);
+	Destroy();
 }
 
 void Moveable::MakeInvisible()
@@ -916,7 +946,8 @@ bool Moveable::GetValid() const
 
 void Moveable::Destroy()
 {
-	if (m_num > NO_ITEM) {
+	if (m_num > NO_ITEM) 
+	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 		s_callbackRemoveName(m_item->LuaName);
 		KillItem(m_num);

@@ -6,6 +6,7 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/bubble.h"
+#include "Game/effects/debris.h"
 #include "Game/effects/drip.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/weather.h"
@@ -1507,6 +1508,10 @@ void ExplodingDeath(short itemNumber, short flags)
 				fx->flag2 = flags;
 				fx->frameNumber = obj->meshIndex + i;
 			}
+		}
+		else
+		{
+			ExplodeItemNode(item, i, 0, 128);
 		}
 	}
 }

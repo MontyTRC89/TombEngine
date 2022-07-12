@@ -10,6 +10,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
+#include "Game/effects/debris.h"
 
 using namespace TEN::Input;
 using namespace TEN::Entities::Switches;

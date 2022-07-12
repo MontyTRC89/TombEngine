@@ -71,6 +71,7 @@ public:
 	[[nodiscard]] bool MeshIsVisible(int meshId) const;
 	void ShowMesh(int meshId);
 	void HideMesh(int meshId);
+	void ShatterMesh(int meshId);
 
 	[[nodiscard]] bool MeshIsSwapped(int meshId) const;
 	void SwapMesh(int meshId, int swapSlotId, sol::optional<int> swapMeshIndex);
@@ -88,6 +89,7 @@ public:
 	void DisableItem();
 	void MakeInvisible();
 	void Explode();
+	void Shatter();
 
 	[[nodiscard]] std::string GetOnHit() const;
 	void SetOnHit(std::string const &);
