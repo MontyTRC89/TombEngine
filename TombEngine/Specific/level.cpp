@@ -255,10 +255,10 @@ void LoadObjects()
 		anim->framePtr = ReadInt32();
 		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
-		anim->VelocityStart = ReadInt32();
-		anim->VelocityEnd = ReadInt32();
-		anim->LateralVelocityStart = ReadInt32();
-		anim->LateralVelocityEnd = ReadInt32();
+		anim->VelocityStart = ReadFloat();
+		anim->VelocityEnd = ReadFloat();
+		anim->LateralVelocityStart = ReadFloat();
+		anim->LateralVelocityEnd = ReadFloat();
 		anim->frameBase = ReadInt32();
 		anim->frameEnd = ReadInt32();
 		anim->jumpAnimNum = ReadInt32();
