@@ -17,7 +17,7 @@
 
 using namespace TEN::Math::Random;
 
-constexpr auto FlareMainColor = Vector3(0.8, 0.42947, 0.2921);
+constexpr auto FlareMainColor = Vector3(0.8f, 0.42947f, 0.2921f);
 
 void FlareControl(short itemNumber)
 {
@@ -325,7 +325,7 @@ void CreateFlare(ItemInfo* laraItem, GAME_OBJECT_ID objectNumber, bool thrown)
 
 		flareItem->Pose.Orientation.x = 0;
 		flareItem->Pose.Orientation.z = 0;
-		flareItem->Shade = -1;
+		flareItem->Color = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 		if (thrown)
 		{

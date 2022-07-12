@@ -16,8 +16,6 @@ extern GameConfiguration g_Configuration;
 
 void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND handle)
 {
-	HRESULT res;
-
 	TENLog("Initializing DX11...", LogLevel::Info);
 
 	m_screenWidth = w;
@@ -213,8 +211,6 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 void TEN::Renderer::Renderer11::InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset)
 {
-	HRESULT res;
-
 	DXGI_SWAP_CHAIN_DESC sd;
 	sd.BufferDesc.Width = w;
 	sd.BufferDesc.Height = h;

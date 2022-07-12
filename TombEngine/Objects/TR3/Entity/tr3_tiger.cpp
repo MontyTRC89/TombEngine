@@ -88,9 +88,8 @@ namespace TEN::Entities::TR3
 					short random = GetRandomControl();
 					if (random < 0x60)
 						item->Animation.TargetState = 5;
-					else if (random < 0x460);
-
-					item->Animation.TargetState = 2;
+					else if (random < 0x460)
+						item->Animation.TargetState = 2;
 				}
 				else if (AI.bite && AI.distance < pow(340, 2))
 					item->Animation.TargetState = 6;

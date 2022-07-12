@@ -29,6 +29,7 @@
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 #include "ScriptInterfaceLevel.h"
 #include "ScriptInterfaceGame.h"
+#include "effects/effects.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
 
 
@@ -73,8 +74,30 @@ void LoadSavegameInfos()
 
 		fclose(savegamePtr);
 	}
+}
 
-	return;
+PHD_3DPOS ToPHD(Save::Position const* src)
+{
+	PHD_3DPOS dest;
+	dest.Position.x = src->x_pos();
+	dest.Position.y = src->y_pos();
+	dest.Position.z = src->z_pos();
+	dest.Orientation.x = (short)src->x_rot();
+	dest.Orientation.y = (short)src->y_rot();
+	dest.Orientation.z = (short)src->z_rot();
+	return dest;
+}
+
+Save::Position FromPHD(PHD_3DPOS const& src)
+{
+	return Save::Position{
+		src.Position.x,
+		src.Position.y,
+		src.Position.z,
+		src.Orientation.x,
+		src.Orientation.y,
+		src.Orientation.z
+	};
 }
 
 bool SaveGame::Save(int slot)
@@ -200,7 +223,8 @@ bool SaveGame::Save(int slot)
 
 	Save::ArmInfoBuilder leftArm{ fbb };
 	leftArm.add_anim_number(Lara.LeftArm.AnimNumber);
-	leftArm.add_flash_gun(Lara.LeftArm.FlashGun);
+	leftArm.add_gun_flash(Lara.LeftArm.GunFlash);
+	leftArm.add_gun_smoke(Lara.LeftArm.GunSmoke);
 	leftArm.add_frame_base(Lara.LeftArm.FrameBase);
 	leftArm.add_frame_number(Lara.LeftArm.FrameNumber);
 	leftArm.add_locked(Lara.LeftArm.Locked);
@@ -209,7 +233,8 @@ bool SaveGame::Save(int slot)
 
 	Save::ArmInfoBuilder rightArm{ fbb };
 	rightArm.add_anim_number(Lara.RightArm.AnimNumber);
-	rightArm.add_flash_gun(Lara.RightArm.FlashGun);
+	rightArm.add_gun_flash(Lara.RightArm.GunFlash);
+	rightArm.add_gun_smoke(Lara.RightArm.GunSmoke);
 	rightArm.add_frame_base(Lara.RightArm.FrameBase);
 	rightArm.add_frame_number(Lara.RightArm.FrameNumber);
 	rightArm.add_locked(Lara.RightArm.Locked);
@@ -573,6 +598,12 @@ bool SaveGame::Save(int slot)
 			(int32_t)itemToSerialize.Pose.Orientation.y,
 			(int32_t)itemToSerialize.Pose.Orientation.z);
 
+		Save::Vector4 color = Save::Vector4(
+			itemToSerialize.Color.x,
+			itemToSerialize.Color.y,
+			itemToSerialize.Color.z,
+			itemToSerialize.Color.w);
+
 		Save::ItemBuilder serializedItem{ fbb };
 
 		serializedItem.add_next_item(itemToSerialize.NextItem);
@@ -596,6 +627,7 @@ bool SaveGame::Save(int slot)
 		serializedItem.add_room_number(itemToSerialize.RoomNumber);
 		serializedItem.add_velocity(itemToSerialize.Animation.Velocity);
 		serializedItem.add_timer(itemToSerialize.Timer);
+		serializedItem.add_color(&color);
 		serializedItem.add_touch_bits(itemToSerialize.TouchBits);
 		serializedItem.add_trigger_flags(itemToSerialize.TriggerFlags);
 		serializedItem.add_triggered((itemToSerialize.Flags & (TRIGGERED | CODE_BITS | ONESHOT)) != 0);
@@ -658,6 +690,36 @@ bool SaveGame::Save(int slot)
 	}
 
 	auto serializedItemsOffset = fbb.CreateVector(serializedItems);
+
+
+	std::vector<flatbuffers::Offset<Save::FXInfo>> serializedEffects{};
+
+	// TODO: In future, we should save only active FX, not whole array.
+	// This may come together with Monty's branch merge -- Lwmte, 10.07.22
+
+	for (auto& effectToSerialize : EffectList)
+	{
+		Save::FXInfoBuilder serializedEffect{ fbb };
+		auto savedPos = FromPHD(effectToSerialize.pos);
+
+		serializedEffect.add_pos(&savedPos);
+		serializedEffect.add_room_number(effectToSerialize.roomNumber);
+		serializedEffect.add_object_number(effectToSerialize.objectNumber);
+		serializedEffect.add_next_fx(effectToSerialize.nextFx);
+		serializedEffect.add_next_active(effectToSerialize.nextActive);
+		serializedEffect.add_speed(effectToSerialize.speed);
+		serializedEffect.add_fall_speed(effectToSerialize.fallspeed);
+		serializedEffect.add_frame_number(effectToSerialize.frameNumber);
+		serializedEffect.add_counter(effectToSerialize.counter);
+		serializedEffect.add_shade(effectToSerialize.shade);
+		serializedEffect.add_flag1(effectToSerialize.flag1);
+		serializedEffect.add_flag2(effectToSerialize.flag2);
+
+		auto serializedEffectOffset = serializedEffect.Finish();
+		serializedEffects.push_back(serializedEffectOffset);
+	}
+
+	auto serializedEffectsOffset = fbb.CreateVector(serializedEffects);
 
 	// Soundtrack playheads
 	auto bgmTrackData = GetSoundTrackNameAndPosition(SoundTrackType::BGM);
@@ -729,7 +791,12 @@ bool SaveGame::Save(int slot)
 		for (int j = 0; j < room->mesh.size(); j++)
 		{
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
+			staticMesh.add_color(&Save::Vector4(room->mesh[j].color.x,
+												room->mesh[j].color.y,
+												room->mesh[j].color.z,
+												room->mesh[j].color.w));
 			staticMesh.add_flags(room->mesh[j].flags);
+			staticMesh.add_hit_points(room->mesh[j].HitPoints);
 			staticMesh.add_room_number(i);
 			staticMeshes.push_back(staticMesh.Finish());
 		}
@@ -1054,6 +1121,9 @@ bool SaveGame::Save(int slot)
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
+	sgb.add_fxinfos(serializedEffectsOffset);
+	sgb.add_next_fx_free(NextFxFree);
+	sgb.add_next_fx_active(NextFxActive);
 	sgb.add_ambient_track(bgmTrackOffset);
 	sgb.add_ambient_position(bgmTrackData.second);
 	sgb.add_oneshot_track(oneshotTrackOffset);
@@ -1169,7 +1239,14 @@ bool SaveGame::Load(int slot)
 		if (i >= room->mesh.size())
 			break;
 
+		room->mesh[i].color = Vector4(staticMesh->color()->x(), 
+									  staticMesh->color()->y(), 
+									  staticMesh->color()->z(),
+									  staticMesh->color()->w());
+
 		room->mesh[i].flags = staticMesh->flags();
+		room->mesh[i].HitPoints = staticMesh->hit_points();
+		
 		if (!room->mesh[i].flags)
 		{
 			short roomNumber = staticMesh->room_number();
@@ -1278,6 +1355,12 @@ bool SaveGame::Load(int slot)
 		item->Timer = savedItem->timer();
 		item->TriggerFlags = savedItem->trigger_flags();
 		item->Flags = savedItem->flags();
+
+		// Color
+		item->Color = Vector4(savedItem->color()->x(),
+							  savedItem->color()->y(),
+							  savedItem->color()->z(),
+							  savedItem->color()->w());
 
 		// Carried item
 		item->CarriedItem = savedItem->carried_item();
@@ -1547,6 +1630,27 @@ bool SaveGame::Load(int slot)
 		Beetle->Pose.Orientation.z = beetleInfo->z_rot();
 	}
 
+	NextFxFree = s->next_fx_free();
+	NextFxActive = s->next_fx_active();
+
+	for (int i = 0; i < s->fxinfos()->size(); ++i)
+	{
+		auto& fx = EffectList[i];
+		auto fx_saved = s->fxinfos()->Get(i);
+		fx.pos = ToPHD(fx_saved->pos());
+		fx.roomNumber = fx_saved->room_number();
+		fx.objectNumber = fx_saved->object_number();
+		fx.nextFx = fx_saved->next_fx();
+		fx.nextActive = fx_saved->next_active();
+		fx.speed = fx_saved->speed();
+		fx.fallspeed = fx_saved->fall_speed();
+		fx.frameNumber = fx_saved->frame_number();
+		fx.counter = fx_saved->counter();
+		fx.shade = fx_saved->shade();
+		fx.flag1 = fx_saved->flag1();
+		fx.flag2 = fx_saved->flag2();
+	}
+
 	JustLoaded = 1;	
 
 	// Lara
@@ -1603,7 +1707,7 @@ bool SaveGame::Load(int slot)
 		Lara.MeshPtrs[i] = s->lara()->mesh_ptrs()->Get(i);
 	}
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_LARA_MESHES; i++)
 	{
 		Lara.Wet[i] = s->lara()->wet()->Get(i);
 	}
@@ -1683,7 +1787,8 @@ bool SaveGame::Load(int slot)
 	Lara.Inventory.TotalSmallMedipacks = s->lara()->inventory()->total_small_medipacks();
 	Lara.ItemNumber = s->lara()->item_number();
 	Lara.LeftArm.AnimNumber = s->lara()->left_arm()->anim_number();
-	Lara.LeftArm.FlashGun = s->lara()->left_arm()->flash_gun();
+	Lara.LeftArm.GunFlash = s->lara()->left_arm()->gun_flash();
+	Lara.LeftArm.GunSmoke = s->lara()->left_arm()->gun_smoke();
 	Lara.LeftArm.FrameBase = s->lara()->left_arm()->frame_base();
 	Lara.LeftArm.FrameNumber = s->lara()->left_arm()->frame_number();
 	Lara.LeftArm.Locked = s->lara()->left_arm()->locked();
@@ -1702,7 +1807,8 @@ bool SaveGame::Load(int slot)
 	Lara.PoisonPotency = s->lara()->poison_potency();
 	Lara.ProjectedFloorHeight = s->lara()->projected_floor_height();
 	Lara.RightArm.AnimNumber = s->lara()->right_arm()->anim_number();
-	Lara.RightArm.FlashGun = s->lara()->right_arm()->flash_gun();
+	Lara.RightArm.GunFlash = s->lara()->right_arm()->gun_flash();
+	Lara.RightArm.GunSmoke = s->lara()->right_arm()->gun_smoke();
 	Lara.RightArm.FrameBase = s->lara()->right_arm()->frame_base();
 	Lara.RightArm.FrameNumber = s->lara()->right_arm()->frame_number();
 	Lara.RightArm.Locked = s->lara()->right_arm()->locked();

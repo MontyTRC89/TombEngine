@@ -767,7 +767,6 @@ namespace TEN::Renderer
 		{
 			BUCKET* levelBucket = &meshPtr->buckets[n];
 			RendererBucket bucket{};
-			int bucketIndex;
 			bucket.Animated = levelBucket->animated;
 			bucket.Texture = levelBucket->texture;
 			bucket.BlendMode = static_cast<BLEND_MODES>(levelBucket->blendMode);

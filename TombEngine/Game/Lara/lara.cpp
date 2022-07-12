@@ -43,7 +43,7 @@ using namespace TEN::Input;
 using std::function;
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara;
+LaraInfo Lara = {};
 ItemInfo* LaraItem;
 CollisionInfo LaraCollision = {};
 byte LaraNodeUnderwater[NUM_LARA_MESHES];
@@ -439,7 +439,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		lara->Control.Count.PositionAdjust = 0;
 
 	if (!lara->Control.Locked)
-		lara->LocationPad = 128;
+		lara->LocationPad = -1;
 
 	auto oldPos = item->Pose.Position;
 

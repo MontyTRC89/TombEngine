@@ -330,25 +330,28 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 
 void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 {
+	// Snapping distance of Lara's radius + 12 units is seemingly empirical value from Core tests.
+	int snapDistance = coll->Setup.Radius + 12;
+
 	if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 	{
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 
 		case EAST:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 		}
 	}
@@ -358,20 +361,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, short angle)
 		switch (angle)
 		{
 		case NORTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 
 		case EAST:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 		}
 	}

@@ -120,6 +120,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 
 	float3 diffuse = 0;
     float3 spec = 0;
+	
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Type;
@@ -143,14 +144,21 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 
 		}
 	}
+	
     diffuse.xyz *= tex.xyz;
 	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
 		float4(0.0f, 0.0f, 0.0f, 0.0f);
+		
     output.Color = float4(ambient + diffuse + spec, tex.w);
+	
+	float3 colorMul = min(input.Color.xyz, 1.0f); 
+	output.Color.xyz *= colorMul.xyz;
+	
 	if (FogMaxDistance != 0)
 	{
 		output.Color.xyz = lerp(output.Color.xyz, FogColor.xyz, input.Fog);
 	}
+	
 	return output;
 }

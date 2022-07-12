@@ -103,11 +103,12 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 	auto angle = lara->Control.MoveAngle;
 
-	auto climbShift = 0;
+	// Determine direction of Lara's shimmying (0 if she just hangs still)
+	int climbDirection = 0;
 	if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y - ANGLE(90.0f)))
-		climbShift = -coll->Setup.Radius;
+		climbDirection = -1;
 	else if (lara->Control.MoveAngle == (short)(item->Pose.Orientation.y + ANGLE(90.0f)))
-		climbShift = coll->Setup.Radius;
+		climbDirection = 1;
 
 	// Temporarily move item a bit closer to the wall to get more precise coll results
 	auto oldPos = item->Pose;
@@ -187,7 +188,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (TrInput & IN_ACTION && item->HitPoints > 0 && coll->Front.Floor <= 0)
 		{
-			if (stopped && hdif > 0 && climbShift != 0 && (climbShift > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
+			if (stopped && hdif > 0 && climbDirection != 0 && (climbDirection > 0 == coll->MiddleLeft.Floor > coll->MiddleRight.Floor))
 				stopped = false;
 
 			auto verticalShift = coll->Front.Floor - GetBoundsAccurate(item)->Y1;
@@ -196,25 +197,25 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 
 			lara->Control.MoveAngle = angle;
 
-			if (climbShift != 0)
+			if (climbDirection != 0)
 			{
 				auto s = phd_sin(lara->Control.MoveAngle);
 				auto c = phd_cos(lara->Control.MoveAngle);
-				auto testShift = Vector2(s * climbShift, c * climbShift);
+				auto testShift = Vector2(s * coll->Setup.Radius, c * coll->Setup.Radius);
 
 				x += testShift.x;
 				z += testShift.y;
 			}
 
-			if ((256 << GetQuadrant(item->Pose.Orientation.y)) & GetClimbFlags(x, item->Pose.Position.y, z, item->RoomNumber))
+			if (TestLaraNearClimbableWall(item, GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock))
 			{
 				if (!TestLaraHangOnClimbableWall(item, coll))
 					verticalShift = 0; // Ignore vertical shift if ladder is encountered next block
 			}
 			else if (!TestValidLedge(item, coll, true))
 			{
-				if ((climbShift < 0 && coll->FrontLeft.Floor != coll->Front.Floor) ||
-					(climbShift > 0 && coll->FrontRight.Floor != coll->Front.Floor))
+				if ((climbDirection < 0 && coll->FrontLeft.Floor  != coll->Front.Floor) ||
+					(climbDirection > 0 && coll->FrontRight.Floor != coll->Front.Floor))
 				{
 					stopped = true;
 				}
@@ -454,7 +455,7 @@ bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 	int shift, result;
 
-	if (!TestLaraNearClimbableWall(item))
+	if (!lara->Control.CanClimbLadder)
 		return false;
 
 	if (item->Animation.VerticalVelocity < 0)

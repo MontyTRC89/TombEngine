@@ -59,8 +59,9 @@ namespace TEN::Entities::TR4
 		auto oldPos = item->Pose.Position;
 
 		int x, y, z;
-		int dy, dz;
+		int dy;
 		int distance;
+
 		if (target == LaraItem || target->ObjectNumber == ID_ANIMATING10)
 		{
 			x = target->Pose.Position.x - item->Pose.Position.x;
