@@ -2119,7 +2119,6 @@ namespace TEN::Renderer
 		if (BinocularRange)
 			AlterFOV(14560 - BinocularRange);
 
-		ID3D11SamplerState* sampler;
 		UINT stride = sizeof(RendererVertex);
 		UINT offset = 0;
 
