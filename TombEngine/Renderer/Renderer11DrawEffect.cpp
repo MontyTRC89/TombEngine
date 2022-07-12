@@ -1160,8 +1160,8 @@ namespace TEN::Renderer
 				Matrix world = rotation * translation;
 
 				m_primitiveBatch->Begin();
-				m_context->VSSetShader(m_vsStatics.Get(), NULL, 0);
-				m_context->PSSetShader(m_psStatics.Get(), NULL, 0);
+				m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+				m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 				if (deb->isStatic) 
 				{
