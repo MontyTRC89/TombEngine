@@ -94,8 +94,9 @@ void LookAt(CAMERA_INFO* cam, short roll)
 	Vector3 up = Vector3(0.0f, -1.0f, 0.0f);
 	float fov = TO_RAD(CurrentFOV / 1.333333f);
 	float r = TO_RAD(roll);
+	float farView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(SECTOR(1));
 
-	g_Renderer.UpdateCameraMatrices(cam, r, fov);
+	g_Renderer.UpdateCameraMatrices(cam, r, fov, farView);
 }
 
 void AlterFOV(int value)

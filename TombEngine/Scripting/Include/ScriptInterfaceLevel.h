@@ -42,4 +42,5 @@ public:
 	virtual RGBAColor8Byte GetFogColor() const = 0;
 	virtual short GetFogMinDistance() const = 0;
 	virtual short GetFogMaxDistance() const = 0;
+	virtual float GetFarView() const = 0;
 };
