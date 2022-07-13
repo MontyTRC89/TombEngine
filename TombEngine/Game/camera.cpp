@@ -803,16 +803,25 @@ void LookCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	// TODO:
+	// - Room probing.
+	// - Swamp collision.
+	// - Reenable looking in states where it was disabled due to severe twisting.
+
+	// Determine Y axis orientation.
 	auto orient = lara->ExtraHeadRot * 2;
 	orient.y += item->Pose.Orientation.y;
 
+	// Define landmarks.
 	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height);
 	auto cameraPos = TranslateVector(pivot, orient, -Camera.targetDistance * 0.5f);
 	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
 
-	const int numSteps = 8;
+	// Determine steps to farthest position.
+	static const int numSteps = 8;
 	auto directionalIncrement = (pivot - cameraPos) / numSteps;
 
+	// Determine best position.
 	auto origin = GameVector(pivot.x, pivot.y, pivot.z, item->RoomNumber);
 	for (int i = 0; i < numSteps; i++)
 	{
@@ -823,12 +832,13 @@ void LookCamera(ItemInfo* item)
 		cameraPos += directionalIncrement;
 	}
 
+	// Handle room and object collisions.
 	auto temp = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
 	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, 1);
 	cameraPos = Vector3Int(temp.x, temp.y, temp.z);
-
 	ItemsCollideCamera();
 
+	// Smoothly update camera position.
 	Camera.pos.x += (cameraPos.x - Camera.pos.x) / 4;
 	Camera.pos.y += (cameraPos.y - Camera.pos.y) / 4;
 	Camera.pos.z += (cameraPos.z - Camera.pos.z) / 4;
@@ -836,6 +846,8 @@ void LookCamera(ItemInfo* item)
 	Camera.target.y += (lookAtPos.y - Camera.target.y) / 4;
 	Camera.target.z += (lookAtPos.z - Camera.target.z) / 4;
 	Camera.target.roomNumber = item->RoomNumber;
+
+	// TODO: Bring back mikeAtPos and mikeAtLara calculations
 
 	LookAt(&Camera, 0);
 
