@@ -86,11 +86,18 @@ namespace TEN::Input
 	std::vector<bool>		 KeyMap;
 	std::vector<float>		 AxisMap;
 
+	// Default keys
 	bool ConflictingKeys[KEY_COUNT];
 	short KeyboardLayout[2][KEY_COUNT] =
 	{
-		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN },
-		{ KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN }
+		{
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
+			KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE
+		},
+		{
+			KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
+			KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE
+		}
 	};
 
 	void InitialiseEffect()
@@ -195,7 +202,7 @@ namespace TEN::Input
 
 	bool LayoutContainsIndex(unsigned int index)
 	{
-		for (int l = 0; l <= 1; l++)
+		for (int l = 0; l < 2; l++)
 		{
 			for (int i = 0; i < KEY_COUNT; i++)
 			{
@@ -448,7 +455,7 @@ namespace TEN::Input
 
 	void HandleLaraHotkeys()
 	{
-		// Handle hardcoded action to key mappings.
+		// Handle hardcoded action-to-key mappings.
 		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? 1.0f : 0.0f);
 		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? 1.0f : 0.0f);
 		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? 1.0f : 0.0f);
@@ -460,7 +467,7 @@ namespace TEN::Input
 		{
 			if (IsHeld(In::Look))
 			{
-				ActionMap[(int)In::LookSwitch].Update(1.0f);
+				ActionMap[(int)In::SwitchTarget].Update(1.0f);
 				ActionMap[(int)In::Look].Clear();
 			}
 		}
@@ -627,8 +634,8 @@ namespace TEN::Input
 		RelInput = NULL;
 		RawInput = NULL;
 
-		// Update input action map.
-		for (int i = 0; i < (int)InputActionID::Count - 5; i++)
+		// Update input action map (mappable actions only).
+		for (int i = 0; i < KEY_COUNT; i++)
 			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
 
 		// Port raw input back to legacy bitfield.
@@ -714,7 +721,7 @@ namespace TEN::Input
 		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
 			return false;
 
-		static const float frameTime = 1.0f / (float)FPS;
+		static const float frameTime = 1.0f / FPS;
 		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, frameTime);
 		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
 
@@ -757,7 +764,7 @@ namespace TEN::Input
 
 	void InputAction::Update(float value)
 	{
-		static const float frameTime = 1.0f / (float)FPS;
+		static const float frameTime = 1.0f / FPS;
 
 		this->UpdateValue(value);
 

@@ -3395,7 +3395,6 @@ void CombineHKSilencer(int flag)
 	{
 		Lara.Inventory.HasSilencer = true;
 		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = false;
-
 	}
 	else
 	{
