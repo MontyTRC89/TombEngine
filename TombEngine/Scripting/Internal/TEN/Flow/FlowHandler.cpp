@@ -170,10 +170,10 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
-void FlowHandler::SetGameFarView(byte val)
+void FlowHandler::SetGameFarView(short val)
 {
 	bool cond = val <= 127 && val >= 1;
-	std::string msg{ "Game far view value must be in the range [1, 127]." };
+	std::string msg{ "Game far view value must be in the range [1, 255]." };
 	if (!ScriptAssert(cond, msg))
 	{
 		ScriptWarn("Setting game far view to 32.");
@@ -330,4 +330,9 @@ bool FlowHandler::DoFlow()
 bool FlowHandler::CanPlayAnyLevel() const
 {
 	return PlayAnyLevel;
+}
+
+short FlowHandler::GetGameFarView() const
+{
+	return GameFarView;
 }
