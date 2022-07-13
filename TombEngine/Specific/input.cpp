@@ -740,7 +740,7 @@ namespace TEN::Input
 	// To avoid desync on the second pulse, ensure initialInterval is a multiple of interval.
 	bool InputAction::IsPulsed(float interval, float initialInterval)
 	{
-		if (!this->IsHeld() || TimeHeld == PrevTimeHeld) // TODO: This ignores input on first frame.
+		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
 			return false;
 
 		static const float frameTime = 1.0f / (float)FPS;
@@ -793,14 +793,14 @@ namespace TEN::Input
 		if (this->IsClicked())
 		{
 			this->PrevTimeHeld = 0.0f;
-			this->TimeHeld = 0.0f;
-			this->TimeReleased += frameTime;
+			this->TimeHeld = frameTime;
+			this->TimeReleased = 0.0f;
 		}
 		else if (this->IsReleased())
 		{
-			this->PrevTimeHeld = TimeHeld;
-			this->TimeHeld += frameTime;
-			this->TimeReleased = 0.0f;
+			this->PrevTimeHeld = 0.0f;
+			this->TimeHeld = 0.0f;
+			this->TimeReleased = frameTime;
 		}
 		else if (this->IsHeld())
 		{
