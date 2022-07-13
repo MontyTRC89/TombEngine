@@ -87,6 +87,152 @@ float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
 
+void LookLeftRight(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	Camera.type = CameraType::Look;
+	if (TrInput & IN_LEFT)
+	{
+		TrInput &= ~IN_LEFT;
+		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
+		{
+			if (BinocularRange)
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f);
+			else
+				lara->ExtraHeadRot.y -= ANGLE(2.0f);
+		}
+	}
+	else if (TrInput & IN_RIGHT)
+	{
+		TrInput &= ~IN_RIGHT;
+		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
+		{
+			if (BinocularRange)
+				lara->ExtraHeadRot.y += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(8.5f);
+			else
+				lara->ExtraHeadRot.y += ANGLE(2.0f);
+		}
+	}
+
+	if (lara->Control.HandStatus != HandStatus::Busy &&
+		lara->Vehicle == NO_ITEM &&
+		!lara->LeftArm.Locked &&
+		!lara->RightArm.Locked)
+	{
+		lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
+	}
+}
+
+void LookUpDown(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	Camera.type = CameraType::Look;
+	if (TrInput & IN_FORWARD)
+	{
+		TrInput &= ~IN_FORWARD;
+		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
+		{
+			if (BinocularRange)
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
+			else
+				lara->ExtraHeadRot.x -= ANGLE(2.0f);
+		}
+	}
+	else if (TrInput & IN_BACK)
+	{
+		TrInput &= ~IN_BACK;
+		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
+		{
+			if (BinocularRange)
+				lara->ExtraHeadRot.x += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(17.0f);
+			else
+				lara->ExtraHeadRot.x += ANGLE(2.0f);
+		}
+	}
+
+	if (lara->Control.HandStatus != HandStatus::Busy &&
+		lara->Vehicle == NO_ITEM &&
+		!lara->LeftArm.Locked &&
+		!lara->RightArm.Locked)
+	{
+		lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
+	}
+}
+
+void DoThumbstickCamera()
+{
+	if (!g_Configuration.EnableThumbstickCameraControl)
+		return;
+
+	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
+		Camera.target.y == OldCam.target.y &&
+		Camera.target.z == OldCam.target.z))
+	{
+		float hAxisCoeff = AxisMap[InputAxis::CameraHorizontal];
+		float vAxisCoeff = AxisMap[InputAxis::CameraVertical];
+
+		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * hAxisCoeff);
+		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * hAxisCoeff));
+	}
+}
+
+void LookCamera(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	// TODO:
+	// - Room probing.
+	// - Swamp collision.
+	// - Reenable looking in states where it was disabled due to severe twisting.
+
+	// Determine Y axis orientation.
+	auto orient = lara->ExtraHeadRot * 2;
+	orient.y += item->Pose.Orientation.y;
+
+	// Define landmarks.
+	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height);
+	auto cameraPos = TranslateVector(pivot, orient, -Camera.targetDistance * 0.5f);
+	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
+
+	// Determine steps to farthest position.
+	static const int numSteps = 8;
+	auto directionalIncrement = (pivot - cameraPos) / numSteps;
+
+	// Determine best position.
+	auto origin = GameVector(pivot.x, pivot.y, pivot.z, item->RoomNumber);
+	for (int i = 0; i < numSteps; i++)
+	{
+		auto target = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
+		if (LOS(&origin, &target))
+			break;
+
+		cameraPos += directionalIncrement;
+	}
+
+	// Handle room and object collisions.
+	auto temp = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
+	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, 1);
+	cameraPos = Vector3Int(temp.x, temp.y, temp.z);
+	ItemsCollideCamera();
+
+	// Smoothly update camera position.
+	Camera.pos.x += (cameraPos.x - Camera.pos.x) / 4;
+	Camera.pos.y += (cameraPos.y - Camera.pos.y) / 4;
+	Camera.pos.z += (cameraPos.z - Camera.pos.z) / 4;
+	Camera.target.x += (lookAtPos.x - Camera.target.x) / 4;
+	Camera.target.y += (lookAtPos.y - Camera.target.y) / 4;
+	Camera.target.z += (lookAtPos.z - Camera.target.z) / 4;
+	Camera.target.roomNumber = item->RoomNumber;
+
+	// TODO: Bring back mikeAtPos and mikeAtLara calculations
+
+	LookAt(&Camera, 0);
+
+	Camera.oldType = Camera.type;
+}
+
 void LookAt(CAMERA_INFO* cam, short roll)
 {
 	Vector3 position = Vector3(cam->pos.x, cam->pos.y, cam->pos.z);
@@ -436,20 +582,6 @@ void ChaseCamera(ItemInfo* item)
 	MoveCamera(&ideal, Camera.speed);
 }
 
-void DoThumbstickCamera()
-{
-	if (!g_Configuration.EnableThumbstickCameraControl)
-		return;
-
-	if (Camera.laraNode == -1 && (Camera.target.x == OldCam.target.x &&
-		Camera.target.y == OldCam.target.y &&
-		Camera.target.z == OldCam.target.z))
-	{
-		Camera.targetAngle = ANGLE(THUMBCAM_VERTICAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraHorizontal]);
-		Camera.targetElevation = ANGLE(-10.0f + (THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE * AxisMap[InputAxis::CameraVertical]));
-	}
-}
-
 void UpdateCameraElevation()
 {
 	DoThumbstickCamera();
@@ -797,61 +929,6 @@ void FixedCamera(ItemInfo* item)
 		if (!--Camera.timer)
 			Camera.timer = -1;
 	}
-}
-
-void LookCamera(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	// TODO:
-	// - Room probing.
-	// - Swamp collision.
-	// - Reenable looking in states where it was disabled due to severe twisting.
-
-	// Determine Y axis orientation.
-	auto orient = lara->ExtraHeadRot * 2;
-	orient.y += item->Pose.Orientation.y;
-
-	// Define landmarks.
-	auto pivot = TranslateVector(item->Pose.Position, item->Pose.Orientation.y, CLICK(0.25f), -LaraCollision.Setup.Height);
-	auto cameraPos = TranslateVector(pivot, orient, -Camera.targetDistance * 0.5f);
-	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
-
-	// Determine steps to farthest position.
-	static const int numSteps = 8;
-	auto directionalIncrement = (pivot - cameraPos) / numSteps;
-
-	// Determine best position.
-	auto origin = GameVector(pivot.x, pivot.y, pivot.z, item->RoomNumber);
-	for (int i = 0; i < numSteps; i++)
-	{
-		auto target = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
-		if (LOS(&origin, &target))
-			break;
-
-		cameraPos += directionalIncrement;
-	}
-
-	// Handle room and object collisions.
-	auto temp = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
-	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, 1);
-	cameraPos = Vector3Int(temp.x, temp.y, temp.z);
-	ItemsCollideCamera();
-
-	// Smoothly update camera position.
-	Camera.pos.x += (cameraPos.x - Camera.pos.x) / 4;
-	Camera.pos.y += (cameraPos.y - Camera.pos.y) / 4;
-	Camera.pos.z += (cameraPos.z - Camera.pos.z) / 4;
-	Camera.target.x += (lookAtPos.x - Camera.target.x) / 4;
-	Camera.target.y += (lookAtPos.y - Camera.target.y) / 4;
-	Camera.target.z += (lookAtPos.z - Camera.target.z) / 4;
-	Camera.target.roomNumber = item->RoomNumber;
-
-	// TODO: Bring back mikeAtPos and mikeAtLara calculations
-
-	LookAt(&Camera, 0);
-
-	Camera.oldType = Camera.type;
 }
 
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
@@ -1389,80 +1466,6 @@ void CalculateCamera()
 		Camera.targetDistance = SECTOR(1.5f);
 		Camera.flags = 0;
 		Camera.laraNode = -1;
-	}
-}
-
-void LookLeftRight(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	Camera.type = CameraType::Look;
-	if (TrInput & IN_LEFT)
-	{
-		TrInput &= ~IN_LEFT;
-		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f);
-			else
-				lara->ExtraHeadRot.y -= ANGLE(2.0f);
-		}
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		TrInput &= ~IN_RIGHT;
-		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.y += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(8.5f);
-			else
-				lara->ExtraHeadRot.y += ANGLE(2.0f);
-		}
-	}
-
-	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
-		!lara->LeftArm.Locked &&
-		!lara->RightArm.Locked)
-	{
-		lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
-	}
-}
-
-void LookUpDown(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	Camera.type = CameraType::Look;
-	if (TrInput & IN_FORWARD)
-	{
-		TrInput &= ~IN_FORWARD;
-		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
-			else
-				lara->ExtraHeadRot.x -= ANGLE(2.0f);
-		}
-	}
-	else if (TrInput & IN_BACK)
-	{
-		TrInput &= ~IN_BACK;
-		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.x += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(17.0f);
-			else
-				lara->ExtraHeadRot.x += ANGLE(2.0f);
-		}
-	}
-
-	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
-		!lara->LeftArm.Locked &&
-		!lara->RightArm.Locked)
-	{
-		lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
 	}
 }
 

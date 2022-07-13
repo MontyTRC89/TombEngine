@@ -70,6 +70,16 @@ extern float CinematicBarsDestinationHeight;
 extern float CinematicBarsHeight;
 extern float CinematicBarsSpeed;
 
+// Temporary placement.
+// ------------------------------
+
+void LookLeftRight(ItemInfo* item);
+void LookUpDown(ItemInfo* item);
+void DoThumbstickCamera();
+void LookCamera(ItemInfo* item);
+
+// ------------------------------
+
 void LookAt(CAMERA_INFO* cam, short roll);
 void AlterFOV(int value);
 void InitialiseCamera();
@@ -79,13 +89,10 @@ void UpdateCameraElevation();
 void CombatCamera(ItemInfo* item);
 bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst);
 void FixedCamera(ItemInfo* item);
-void LookCamera(ItemInfo* item);
 void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera();
-void LookLeftRight(ItemInfo* item);
-void LookUpDown(ItemInfo* item);
 void ResetLook(ItemInfo* item);
 void RumbleScreen();
 bool TestBoundsCollideCamera(BOUNDING_BOX* bounds, PHD_3DPOS* pos, short radius);
