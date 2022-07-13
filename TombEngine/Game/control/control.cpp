@@ -204,7 +204,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 			return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
 		}
 
-		// TODO: Adapt to new input. @Sezz 2022.07.13
+		// TODO: Adapt to new input. What is the -1? @Sezz 2022.07.13
 		if (demoMode && TrInput == -1)
 			TrInput = 0;
 

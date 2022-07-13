@@ -475,12 +475,12 @@ public:
 
 private:
 	// Input macros
-	#define GUI_INPUT_UP	   IsPulsed(In::Forward, 0.1f, 0.4f)
-	#define GUI_INPUT_DOWN	   IsPulsed(In::Back, 0.1f, 0.4f)
-	#define GUI_INPUT_LEFT	   IsPulsed(In::Left, 0.1f, 0.4f)
-	#define GUI_INPUT_RIGHT	   IsPulsed(In::Right, 0.1f, 0.4f)
-	#define GUI_INPUT_SELECT   (IsReleased(In::Select) || IsReleased(In::Action))
-	#define GUI_INPUT_DESELECT IsReleased(In::Deselect)
+	#define GUI_INPUT_PULSE_UP	  IsPulsed(In::Forward, 0.1f, 0.4f)
+	#define GUI_INPUT_PULSE_DOWN  IsPulsed(In::Back, 0.1f, 0.4f)
+	#define GUI_INPUT_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
+	#define GUI_INPUT_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
+	#define GUI_INPUT_SELECT	  ((IsReleased(In::Select) || IsReleased(In::Action)) && !IsHeld(In::Deselect))
+	#define GUI_INPUT_DESELECT	  (IsClicked(In::Deselect) && !(IsHeld(In::Select) || IsHeld(In::Action)))
 
 	// GUI variables
 	Menu MenuToDisplay = Menu::Title;
@@ -521,9 +521,9 @@ private:
 	int LastInvItem;
 	AmmoData Ammo;
 
-	void HandleDisplaySettingsInput(bool pause);
-	void HandleControlSettingsInput(bool pause);
-	void HandleOtherSettingsInput(bool pause);
+	void HandleDisplaySettingsInput(bool fromPauseMenu);
+	void HandleControlSettingsInput(bool fromPauseMenu);
+	void HandleOtherSettingsInput(bool fromPauseMenu);
 	void HandleOptionsInput();
 	void BackupOptions();
 	bool DoObjectsCombine(int objectNumber1, int objectNumber2);

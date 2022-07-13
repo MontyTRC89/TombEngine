@@ -448,18 +448,11 @@ namespace TEN::Input
 
 	void HandleLaraHotkeys()
 	{
-		// Switch debug pages.
-		static int debugTimeout = 0;
-		if (KeyMap[KC_F10] || KeyMap[KC_F11])
-		{
-			if (!debugTimeout)
-			{
-				debugTimeout = 1;
-				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-			}
-		}
-		else
-			debugTimeout = 0;
+		// Handle select/deselect overrides and save/load hotkeys.
+		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? 1.0f : 0.0f);
+		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? 1.0f : 0.0f);
+		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? 1.0f : 0.0f);
+		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? 1.0f : 0.0f);
 
 		// Handle look switch when locked onto entities.
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
@@ -559,9 +552,18 @@ namespace TEN::Input
 		else if (medipackTimeout != 0)
 			medipackTimeout--;
 
-		// Save/load hotkeys.
-		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? 1.0f : 0.0f);
-		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? 1.0f : 0.0f);
+		// Handle debug page switches.
+		static int debugTimeout = 0;
+		if (KeyMap[KC_F10] || KeyMap[KC_F11])
+		{
+			if (!debugTimeout)
+			{
+				debugTimeout = 1;
+				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
+			}
+		}
+		else
+			debugTimeout = 0;
 	}
 
 	void UpdateRumble()
