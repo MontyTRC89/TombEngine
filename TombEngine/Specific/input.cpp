@@ -307,7 +307,7 @@ namespace TEN::Input
 				}
 			}
 
-			// Scan POVs (controller usually have one, but let's scan all of them for paranoia)
+			// Scan POVs (controllers usually have one, but let's scan all of them for paranoia)
 			for (int pov = 0; pov < 4; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
@@ -586,12 +586,8 @@ namespace TEN::Input
 			medipackTimeout--;
 
 		// Save/load hotkeys.
-
-		if (KeyMap[KC_F5])
-			ActionMap[(int)In::Save].Update(1.0f);
-
-		if (KeyMap[KC_F6])
-			ActionMap[(int)In::Load].Update(1.0f);
+		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? 1.0f : 0.0f);
+		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? 1.0f : 0.0f);
 	}
 
 	void UpdateRumble()
@@ -644,8 +640,6 @@ namespace TEN::Input
 
 	bool UpdateInput()
 	{
-		// TODO: Save, Load, Select, Deselect, Lookswitch.
-
 		ClearInputData();
 		UpdateRumble();
 		ReadKeyboard();
@@ -658,8 +652,9 @@ namespace TEN::Input
 		RawInput = NULL;
 
 		// Update input action map.
-		for (int i = 0; i < (int)InputActionID::Count-5; i++) // TODO:: forward/save collide?
-			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key.
+		// TODO: Save, Load, Select, Deselect, Lookswitch don't have a direct key correlation.
+		for (int i = 0; i < (int)InputActionID::Count - 5; i++)
+			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
 
 		// Select/deselect control overrides (needed for UI keyboard navigation).
 		ActionMap[(int)In::Select].Update(KeyMap[KC_RETURN] || Key(KEY_ACTION));
@@ -745,7 +740,7 @@ namespace TEN::Input
 	// To avoid desync on the second pulse, ensure initialInterval is a multiple of interval.
 	bool InputAction::IsPulsed(float interval, float initialInterval)
 	{
-		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
+		if (!this->IsHeld() || TimeHeld == PrevTimeHeld) // TODO: This ignores input on first frame.
 			return false;
 
 		static const float frameTime = 1.0f / (float)FPS;

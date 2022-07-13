@@ -140,7 +140,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0)
 		{
 			// Does the player want to enter inventory?
-			if (TrInput & IN_SAVE && LaraItem->HitPoints > 0 &&
+			if (IsClicked(In::Save) && LaraItem->HitPoints > 0 &&
 				g_Gui.GetInventoryMode() != InventoryMode::Save)
 			{
 				StopAllSounds();
@@ -151,7 +151,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				if (g_Gui.CallInventory(false))
 					return GameStatus::SaveGame;
 			}
-			else if (TrInput & IN_LOAD &&
+			else if (IsClicked(In::Load) &&
 				g_Gui.GetInventoryMode() != InventoryMode::Load)
 			{
 				StopAllSounds();
@@ -173,7 +173,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				g_Gui.SetMenuToDisplay(Menu::Pause);
 				g_Gui.SetSelectedOption(0);
 			}
-			else if ((DbInput & IN_OPTION || g_Gui.GetEnterInventory() != NO_ITEM) &&
+			else if ((IsClicked(In::Option) || g_Gui.GetEnterInventory() != NO_ITEM) &&
 				LaraItem->HitPoints > 0 && !BinocularOn)
 			{
 				StopAllSounds();
@@ -197,22 +197,15 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		if (CurrentLevel != 0 && LevelComplete)
 			return GameStatus::LevelComplete;
 
-		int prevInput = TrInput;
-
 		// Is Lara dead?
 		if (CurrentLevel != 0 &&
-			(Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && TrInput))
+			(Lara.Control.Count.Death > 300 || Lara.Control.Count.Death > 60 && !NoInput()))
 		{
 			return GameStatus::ExitToTitle; // Maybe do game over menu like some PSX versions have??
 		}
 
+		// TODO: Adapt to new input. @Sezz 2022.07.13
 		if (demoMode && TrInput == -1)
-		{
-			prevInput = 0;
-			TrInput = 0;
-		}
-
-		if (CurrentLevel == 0)
 			TrInput = 0;
 
 		// Handle lasersight and binocular
