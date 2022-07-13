@@ -131,7 +131,7 @@ namespace TEN::Input
 	void InitialiseInput(HWND handle);
 	void DeInitialiseInput();
 	bool UpdateInput();
-	void ClearInputActions();
+	void ClearInput();
 	void DefaultConflict();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
@@ -207,6 +207,7 @@ namespace TEN::Input
 
 	extern std::vector<InputAction> ActionMap;
 
+	bool  NoInput();
 	bool  IsClicked(InputActionID input);
 	bool  IsPulsed(InputActionID input, float interval, float initialInterval = 0.0f);
 	bool  IsHeld(InputActionID input);

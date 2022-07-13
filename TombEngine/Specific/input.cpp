@@ -313,10 +313,9 @@ namespace TEN::Input
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 				
-				// Do 4 passes, every pass checks ever POV direction. For every direction,
+				// Do 4 passes; every pass checks every POV direction. For every direction,
 				// separate keypress is registered. This is needed to allow multiple directions
 				// pressed at the same time.
-
 				for (int pass = 0; pass < 4; pass++)
 				{
 					unsigned int index = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_AXES * 2;
@@ -449,11 +448,11 @@ namespace TEN::Input
 
 	void HandleLaraHotkeys()
 	{
-		// Switch debug pages
+		// Switch debug pages.
 		static int debugTimeout = 0;
 		if (KeyMap[KC_F10] || KeyMap[KC_F11])
 		{
-			if (debugTimeout == 0)
+			if (!debugTimeout)
 			{
 				debugTimeout = 1;
 				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
@@ -462,39 +461,22 @@ namespace TEN::Input
 		else
 			debugTimeout = 0;
 
-		// Handle flares
-
-		bool flare = false;
-		static bool flareNo = false;
-
-		// TODO: Better flare handling in crawl states.
-		if (Key(KEY_FLARE) || flare)
+		// Handle flares.
+		if (IsClicked(In::Flare))
 		{
-			if (!flareNo)
+			if (LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG ||
+				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_180)
 			{
-				if (LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
-					LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG)
-				{
-					SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
-					flareNo = true;
-				}
-				else
-				{
-					flareNo = false;
-					ActionMap[(int)In::Action].Clear();
-				}
+				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
 			}
 		}
-		else
-			flareNo = false;
 
-		// Handle look timeout
-
+		// Handle look timeout.
 		static int lookTimeout = 0;
-
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady)
 		{
 			if (IsHeld(In::Look))
@@ -510,39 +492,39 @@ namespace TEN::Input
 			else
 			{
 				if (lookTimeout != 0 && lookTimeout != 100)
-					ActionMap[(int)In::LookSwitch].Update(true);
+					ActionMap[(int)In::LookSwitch].Update(1.0f);
 
 				lookTimeout = 0;
 			}
 		}
 
-		// Handle weapon hotkeys
+		// Handle weapon hotkeys.
 
-		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present == true)
+		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
-		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present == true)
+		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
-		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present == true)
+		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
-		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present == true)
+		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
-		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present == true)
+		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
-		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present == true)
+		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
-		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present == true)
+		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
-		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present == true)
+		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
-		// Handle medipack hotkeys
+		// Handle medipack hotkeys.
 
 		static int medipackTimeout = 0;
 
@@ -550,7 +532,8 @@ namespace TEN::Input
 		{
 			if (medipackTimeout == 0)
 			{
-				if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
+				if ((LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX) ||
+					Lara.PoisonPotency)
 				{
 					if (Lara.Inventory.TotalSmallMedipacks != 0)
 					{
@@ -602,13 +585,13 @@ namespace TEN::Input
 		else if (medipackTimeout != 0)
 			medipackTimeout--;
 
-		// Save/load hotkeys
+		// Save/load hotkeys.
 
 		if (KeyMap[KC_F5])
-			ActionMap[(int)In::Save].Update(true);
+			ActionMap[(int)In::Save].Update(1.0f);
 
 		if (KeyMap[KC_F6])
-			ActionMap[(int)In::Load].Update(true);
+			ActionMap[(int)In::Load].Update(1.0f);
 	}
 
 	void UpdateRumble()
@@ -710,15 +693,15 @@ namespace TEN::Input
 		return true;
 	}
 
-	void ClearInputActions()
+	void ClearInput()
 	{
+		for (int i = 0; i < (int)InputActionID::Count; i++)
+			ActionMap[i].Clear();
+
 		DbInput = NULL;
 		TrInput = NULL;
 		RelInput = NULL;
 		RawInput = NULL;
-
-		for (int i = 0; i < (int)InputActionID::Count; i++)
-			ActionMap[i].Clear();
 	}
 
 	void Rumble(float power, float delayInSeconds, RumbleMode mode)
@@ -865,6 +848,17 @@ namespace TEN::Input
 	{
 		this->PrevValue = Value;
 		this->Value = value;
+	}
+
+	bool NoInput()
+	{
+		for (auto& action : ActionMap)
+		{
+			if (action.IsHeld())
+				return false;
+		}
+
+		return true;
 	}
 
 	bool IsClicked(InputActionID input)

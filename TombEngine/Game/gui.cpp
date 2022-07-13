@@ -758,7 +758,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 	if (CurrentSettings.IgnoreInput)
 	{
-		if (!TrInput)
+		if (NoInput())
 			CurrentSettings.IgnoreInput = false;
 
 		return;
@@ -773,8 +773,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 	if (CurrentSettings.WaitingForKey)
 	{
-		TrInput = 0;
-		DbInput = 0;
+		ClearInput();
 
 		while (true)
 		{
@@ -782,7 +781,7 @@ void GuiController::HandleControlSettingsInput(bool pause)
 
 			if (CurrentSettings.IgnoreInput)
 			{
-				if (!TrInput)
+				if (NoInput())
 					CurrentSettings.IgnoreInput = false;
 			}
 			else
@@ -1948,9 +1947,13 @@ void GuiController::UseCurrentItem()
 				{
 					if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare)
 					{
+						// HACK.
+						ClearInput();
+						ActionMap[(int)In::Flare].Update(1.0f);
 						TrInput = IN_FLARE;
+
 						LaraGun(LaraItem);
-						TrInput = 0;
+						ClearInput();
 					}
 
 					return;
@@ -1965,7 +1968,7 @@ void GuiController::UseCurrentItem()
 		{
 		case INV_OBJECT_BINOCULARS:
 			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
-					(Lara.Control.IsLow && !(TrInput & IN_CROUCH))) &&
+					(Lara.Control.IsLow && !IsHeld(In::Crouch))) &&
 				!UseSpotCam && !TrackCameraInit)
 			{
 				BinocularRange = 128;
@@ -2155,12 +2158,6 @@ void GuiController::UseCurrentItem()
 
 void GuiController::DoInventory()
 {
-	int n;
-	unsigned __int64 options;
-	int i;
-	int yPos;
-	int num;
-
 	if (Rings[(int)RingTypes::Ammo]->ringactive)
 	{
 		g_Renderer.DrawString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
@@ -2233,16 +2230,16 @@ void GuiController::DoInventory()
 	}
 	else
 	{
-		num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+		int num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
 
-		for (n = 0; n < 3; n++)
+		for (int i = 0; i < 3; i++)
 		{
-			CurrentOptions[n].type = MenuType::None;
-			CurrentOptions[n].text = 0;
+			CurrentOptions[i].type = MenuType::None;
+			CurrentOptions[i].text = 0;
 		}
 
-		n = 0;
-
+		int n = 0;
+		unsigned long options;
 		if (!AmmoActive)
 		{
 			options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
@@ -2347,7 +2344,7 @@ void GuiController::DoInventory()
 			CurrentSelectedOption = *CurrentAmmoType;
 		}
 
-		yPos = 310 - LINE_HEIGHT;
+		int yPos = 310 - LINE_HEIGHT;
 
 		if (n == 1)
 			yPos += LINE_HEIGHT;
@@ -2356,7 +2353,7 @@ void GuiController::DoInventory()
 
 		if (n > 0)
 		{
-			for (i = 0; i < n; i++)
+			for (int i = 0; i < n; i++)
 			{
 				if (i == CurrentSelectedOption)
 				{
@@ -2514,7 +2511,7 @@ void GuiController::DoInventory()
 	}
 }
 
-//this function is to UPDATE THE SELECTED AMMO OF WEPS THAT REQUIRE DOING SO, and only these..
+// Update the selected ammo of weapons that require it, and only these.
 void GuiController::UpdateWeaponStatus()
 {
 	if (Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
@@ -2559,10 +2556,10 @@ void GuiController::SpinBack(unsigned short* angle)
 		{
 			val2 = val;
 
-			if (val2 < ANGLE(5))
-				val = ANGLE(5);
-			else if (val2 > ANGLE(90))
-				val2 = ANGLE(90);
+			if (val2 < ANGLE(5.0f))
+				val = ANGLE(5.0f);
+			else if (val2 > ANGLE(90.0f))
+				val2 = ANGLE(90.0f);
 
 			val -= (val2 >> 3);
 
@@ -2573,14 +2570,14 @@ void GuiController::SpinBack(unsigned short* angle)
 		{
 			val2 = -val;
 
-			if (val2 < ANGLE(5))
-				val = ANGLE(5);
-			else if (val2 > ANGLE(90))
-				val2 = ANGLE(90);
+			if (val2 < ANGLE(5.0f))
+				val = ANGLE(5.0f);
+			else if (val2 > ANGLE(90.0f))
+				val2 = ANGLE(90.0f);
 
 			val += (val2 >> 3);
 
-			if (val < ANGLE(180))
+			if (val < ANGLE(180.0f))
 				val = 0;
 		}
 
@@ -2615,13 +2612,13 @@ void GuiController::DrawAmmoSelector()
 			if (n == *CurrentAmmoType)
 			{
 				if (objme->rot_flags & INV_ROT_X)
-					AmmoObjectList[n].xrot += ANGLE(5);
+					AmmoObjectList[n].xrot += ANGLE(5.0f);
 
 				if (objme->rot_flags & INV_ROT_Y)
-					AmmoObjectList[n].yrot += ANGLE(5);
+					AmmoObjectList[n].yrot += ANGLE(5.0f);
 
 				if (objme->rot_flags & INV_ROT_Z)
-					AmmoObjectList[n].zrot += ANGLE(5);
+					AmmoObjectList[n].zrot += ANGLE(5.0f);
 			}
 			else
 			{
@@ -3165,7 +3162,7 @@ bool GuiController::CallInventory(bool resetMode)
 			break;
 		}
 
-		if (UseItem && !TrInput)
+		if (UseItem && NoInput())
 			exitLoop = true;
 
 		Camera.numberFrames = g_Renderer.SyncRenderer();
@@ -3252,7 +3249,7 @@ LoadResult GuiController::DoLoad()
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
 		if (SelectedSaveSlot == SAVEGAME_MAX - 1)
-			SelectedSaveSlot -= SAVEGAME_MAX - 1;	//go back up
+			SelectedSaveSlot -= SAVEGAME_MAX - 1;
 		else
 			SelectedSaveSlot++;
 	}
@@ -3261,8 +3258,8 @@ LoadResult GuiController::DoLoad()
 	{
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-		if (SelectedSaveSlot== 0)
-			SelectedSaveSlot += SAVEGAME_MAX - 1;	//go back down
+		if (SelectedSaveSlot == 0)
+			SelectedSaveSlot += SAVEGAME_MAX - 1;
 		else
 			SelectedSaveSlot--;
 	}
