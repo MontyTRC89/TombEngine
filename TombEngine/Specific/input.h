@@ -21,12 +21,12 @@ namespace TEN::Input
 		KEY_PAUSE,
 		KEY_LSTEP,
 		KEY_RSTEP,
-		KEY_ACCELERATE,
+		/*KEY_ACCELERATE,
 		KEY_REVERSE,
 		KEY_SPEED,
 		KEY_SLOW,
 		KEY_BRAKE,
-		KEY_FIRE,
+		KEY_FIRE,*/
 
 		KEY_COUNT
 	};
@@ -51,12 +51,12 @@ namespace TEN::Input
 		IN_PAUSE	  = (1 << KEY_PAUSE),
 		IN_LSTEP	  = (1 << KEY_LSTEP),
 		IN_RSTEP	  = (1 << KEY_RSTEP),
-		IN_ACCELERATE = (1 << KEY_ACCELERATE),
+		/*IN_ACCELERATE = (1 << KEY_ACCELERATE),
 		IN_REVERSE	  = (1 << KEY_REVERSE),
 		IN_SPEED	  = (1 << KEY_SPEED),
 		IN_SLOW		  = (1 << KEY_SLOW),
 		IN_BRAKE	  = (1 << KEY_BRAKE),
-		IN_FIRE		  = (1 << KEY_FIRE),
+		IN_FIRE		  = (1 << KEY_FIRE),*/
 
 		// Additional input actions without direct key relation
 
@@ -162,12 +162,12 @@ namespace TEN::Input
 		RightStep,
 
 		// Vehicle control
-		Accelerate,
+		/*Accelerate,
 		Reverse,
 		Speed,
 		Slow,
 		Brake,
-		Fire,
+		Fire,*/
 
 		// Hotkeys
 		Save,

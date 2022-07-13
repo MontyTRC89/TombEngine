@@ -149,8 +149,8 @@ local strings = {
 		"",
 		""
 	},
-	controls_dash = {
-		"Dash",
+	controls_sprint = {
+		"Sprint",
 		"",
 		"",
 		"",
@@ -169,8 +169,8 @@ local strings = {
 		"",
 		""
 	},
-	controls_duck = {
-		"Duck",
+	controls_crouch = {
+		"Crouch",
 		"",
 		"",
 		"",
