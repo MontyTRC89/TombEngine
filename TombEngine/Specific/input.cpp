@@ -60,7 +60,7 @@ namespace TEN::Input
 			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
 			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
 
-			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+", 
+			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+",
 			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right"
 	};
 
@@ -75,7 +75,7 @@ namespace TEN::Input
 
 	// Rumble functionality
 	RumbleData rumbleData = {};
-	
+
 	// Globals
 	int DbInput;
 	int TrInput;
@@ -262,14 +262,14 @@ namespace TEN::Input
 				// We don't support anything above 6 existing XBOX/PS controller axes (two sticks plus triggers)
 				if (axis >= MAX_GAMEPAD_AXES)
 					break;
-				
+
 				// Filter out deadzone
 				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
 					continue;
 
 				// Calculate raw normalized analog value (for camera)
 				float normalizedValue = (float)(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE))
-																	/ (float)(std::numeric_limits<short>::max() - AXIS_DEADZONE);
+					/ (float)(std::numeric_limits<short>::max() - AXIS_DEADZONE);
 
 				// Calculate scaled analog value (for movement).
 				// Minimum value of 0.2f and maximum value of 1.7f is empirically the most organic rate from tests.
@@ -300,9 +300,9 @@ namespace TEN::Input
 					AxisMap[InputAxis::MoveHorizontal] = abs(scaledValue);
 				else if (!LayoutContainsIndex(usedIndex))
 				{
-					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2, 
-																		 (unsigned int)InputAxis::CameraVertical, 
-																		 (unsigned int)InputAxis::CameraHorizontal);
+					unsigned int camAxisIndex = (unsigned int)std::clamp((unsigned int)InputAxis::CameraVertical + axis % 2,
+						(unsigned int)InputAxis::CameraVertical,
+						(unsigned int)InputAxis::CameraHorizontal);
 					AxisMap[camAxisIndex] = normalizedValue;
 				}
 			}
@@ -312,7 +312,7 @@ namespace TEN::Input
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
-				
+
 				// Do 4 passes; every pass checks every POV direction. For every direction,
 				// separate keypress is registered. This is needed to allow multiple directions
 				// pressed at the same time.
@@ -322,7 +322,7 @@ namespace TEN::Input
 
 					switch (pass)
 					{
-					case 0: 
+					case 0:
 						if (!(state.mPOV[pov].direction & Pov::North))
 							continue;
 						break;
@@ -340,7 +340,7 @@ namespace TEN::Input
 					case 3:
 						if (!(state.mPOV[pov].direction & Pov::East))
 							continue;
-						break;							
+						break;
 					}
 
 					index += pass;
@@ -461,6 +461,17 @@ namespace TEN::Input
 		else
 			debugTimeout = 0;
 
+		// Handle look switch when locked onto entities.
+		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
+			Lara.TargetEntity != nullptr)
+		{
+			if (IsHeld(In::Look))
+			{
+				ActionMap[(int)In::LookSwitch].Update(1.0f);
+				ActionMap[(int)In::Look].Clear();
+			}
+		}
+
 		// Handle flares.
 		if (IsClicked(In::Flare))
 		{
@@ -472,29 +483,6 @@ namespace TEN::Input
 				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_180)
 			{
 				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
-			}
-		}
-
-		// Handle look timeout.
-		static int lookTimeout = 0;
-		if (Lara.Control.HandStatus == HandStatus::WeaponReady)
-		{
-			if (IsHeld(In::Look))
-			{
-				if (lookTimeout >= 6)
-					lookTimeout = 100;
-				else
-				{
-					ActionMap[(int)In::Look].Clear();
-					lookTimeout++;
-				}
-			}
-			else
-			{
-				if (lookTimeout != 0 && lookTimeout != 100)
-					ActionMap[(int)In::LookSwitch].Update(1.0f);
-
-				lookTimeout = 0;
 			}
 		}
 
@@ -525,57 +513,43 @@ namespace TEN::Input
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
 		// Handle medipack hotkeys.
-
 		static int medipackTimeout = 0;
-
-		if (KeyMap[KC_0])
+		if (KeyMap[KC_0] || KeyMap[KC_9])
 		{
-			if (medipackTimeout == 0)
+			if (!medipackTimeout)
 			{
 				if ((LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX) ||
 					Lara.PoisonPotency)
 				{
-					if (Lara.Inventory.TotalSmallMedipacks != 0)
+					bool usedMedipack = false;
+
+					if (KeyMap[KC_0] &&
+						Lara.Inventory.TotalSmallMedipacks != 0)
 					{
+						usedMedipack = true;
+
+						LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
+						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
+							LaraItem->HitPoints = LARA_HEALTH_MAX;
+
 						if (Lara.Inventory.TotalSmallMedipacks != -1)
 							Lara.Inventory.TotalSmallMedipacks--;
-
-						Lara.PoisonPotency = 0;
-						LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
-						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always); // TODO: Fix heal sound not triggering if small medi doesn't top off Lara's health. original tr4/5 issue
-
-						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
-						{
-							LaraItem->HitPoints = LARA_HEALTH_MAX;
-							SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-							Statistics.Game.HealthUsed++;
-						}
 					}
-
-					medipackTimeout = 15;
-				}
-			}
-		}
-		else if (KeyMap[KC_9])
-		{
-			if (medipackTimeout == 0)
-			{
-				if (LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX || Lara.PoisonPotency)
-				{
-					if (Lara.Inventory.TotalLargeMedipacks != 0)
+					else if (KeyMap[KC_9] &&
+						Lara.Inventory.TotalLargeMedipacks != 0)
 					{
+						usedMedipack = true;
+						LaraItem->HitPoints = LARA_HEALTH_MAX;
+
 						if (Lara.Inventory.TotalLargeMedipacks != -1)
 							Lara.Inventory.TotalLargeMedipacks--;
+					}
 
+					if (usedMedipack)
+					{
 						Lara.PoisonPotency = 0;
-						LaraItem->HitPoints += LARA_HEALTH_MAX;
-
-						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
-						{
-							LaraItem->HitPoints = LARA_HEALTH_MAX;
-							SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-							Statistics.Game.HealthUsed++;
-						}
+						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+						Statistics.Game.HealthUsed++;
 					}
 
 					medipackTimeout = 15;

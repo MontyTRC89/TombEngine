@@ -1127,14 +1127,14 @@ void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo)
 				break;
 		}
 
-		if (lara->Control.HandStatus != HandStatus::Free || TrInput & IN_LOOKSWITCH)
+		if (lara->Control.HandStatus != HandStatus::Free || IsClicked(In::LookSwitch))
 		{
-			if (!lara->TargetEntity)
+			if (lara->TargetEntity == nullptr)
 			{
 				lara->TargetEntity = bestItem;
 				LastTargets[0] = nullptr;
 			}
-			else if (TrInput & IN_LOOKSWITCH)
+			else if (IsClicked(In::LookSwitch))
 			{
 				lara->TargetEntity = nullptr;
 				bool flag = true;
