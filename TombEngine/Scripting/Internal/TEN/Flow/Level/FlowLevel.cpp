@@ -119,7 +119,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 /*** (byte) The maximum draw distance for level.
 Given in sectors (blocks).
-Must be in the range [1, 127], and equal to or less than the value passed to SetGameFarView.
+Must be in the range [1, 255], and equal to or less than the value passed to SetGameFarView.
 
 This is equivalent to TRNG's LevelFarView variable.
 
@@ -156,9 +156,9 @@ void Level::SetWeatherStrength(float val)
 	}
 }
 
-void Level::SetLevelFarView(byte val)
+void Level::SetLevelFarView(short val)
 {
-	bool cond = val <= 127 && val >= 1;
+	bool cond = val <= 255 && val >= 1;
 	std::string msg{ "levelFarView value must be in the range [1, 127]." };
 	if (!ScriptAssert(cond, msg))
 	{
@@ -258,3 +258,9 @@ short Level::GetFogMaxDistance() const
 {
 	return Fog.MaxDistance;
 }
+
+short Level::GetFarView() const
+{
+	return float(LevelFarView);
+}
+
