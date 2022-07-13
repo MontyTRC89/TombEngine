@@ -656,10 +656,6 @@ namespace TEN::Input
 		for (int i = 0; i < (int)InputActionID::Count - 5; i++)
 			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
 
-		// Select/deselect control overrides (needed for UI keyboard navigation).
-		ActionMap[(int)In::Select].Update(KeyMap[KC_RETURN] || Key(KEY_ACTION));
-		ActionMap[(int)In::Deselect].Update(KeyMap[KC_ESCAPE] || Key(KEY_DRAW));
-
 		// Port raw input back to legacy bitfield.
 		for (auto& action : ActionMap)
 		{
