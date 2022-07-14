@@ -899,7 +899,7 @@ bool GuiController::DoObjectsCombine(int objectNumber1, int objectNumber2)
 
 bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 {
-	if (objectNumber < INV_OBJECT_SMOL_WATERSKIN || objectNumber > INV_OBJECT_BIG_WATERSKIN5L)//trash
+	if (objectNumber < INV_OBJECT_SMALL_WATERSKIN || objectNumber > INV_OBJECT_BIG_WATERSKIN5L)//trash
 	{
 		for (int n = 0; n < MAX_COMBINES; n++)
 		{
@@ -916,11 +916,11 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 			}
 		}
 	}
-	else if (objectNumber > INV_OBJECT_SMOL_WATERSKIN3L)
+	else if (objectNumber > INV_OBJECT_SMALL_WATERSKIN3L)
 	{
 		for (int n = 0; n < 4; n++)
 		{
-			if (IsItemInInventory(n + INV_OBJECT_SMOL_WATERSKIN))
+			if (IsItemInInventory(n + INV_OBJECT_SMALL_WATERSKIN))
 				return true;
 		}
 	}
@@ -1308,7 +1308,7 @@ void GuiController::ConstructObjectList()
 	}
 
 	if (Lara.Inventory.SmallWaterskin)
-		InsertObjectIntoList((Lara.Inventory.SmallWaterskin - 1) + INV_OBJECT_SMOL_WATERSKIN);
+		InsertObjectIntoList((Lara.Inventory.SmallWaterskin - 1) + INV_OBJECT_SMALL_WATERSKIN);
 
 	if (Lara.Inventory.BigWaterskin)
 		InsertObjectIntoList((Lara.Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
@@ -1425,7 +1425,7 @@ void GuiController::ConstructCombineObjectList()
 	}
 
 	if (Lara.Inventory.SmallWaterskin)
-		InsertObjectIntoList_v2(Lara.Inventory.SmallWaterskin - 1 + INV_OBJECT_SMOL_WATERSKIN);
+		InsertObjectIntoList_v2(Lara.Inventory.SmallWaterskin - 1 + INV_OBJECT_SMALL_WATERSKIN);
 
 	if (Lara.Inventory.BigWaterskin)
 		InsertObjectIntoList_v2(Lara.Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
@@ -1499,9 +1499,9 @@ void GuiController::InitialiseInventory()
 				SetupObjectListStartPosition(LastInvItem);
 			else
 			{
-				if (LastInvItem >= INV_OBJECT_SMOL_WATERSKIN && LastInvItem <= INV_OBJECT_SMOL_WATERSKIN3L)
+				if (LastInvItem >= INV_OBJECT_SMALL_WATERSKIN && LastInvItem <= INV_OBJECT_SMALL_WATERSKIN3L)
 				{
-					for (int i = INV_OBJECT_SMOL_WATERSKIN; i <= INV_OBJECT_SMOL_WATERSKIN3L; i++)
+					for (int i = INV_OBJECT_SMALL_WATERSKIN; i <= INV_OBJECT_SMALL_WATERSKIN3L; i++)
 					{
 						if (IsItemInInventory(i))
 						{
@@ -1896,8 +1896,8 @@ void GuiController::DoInventory()
 				CombineObject2 = ammoItem;
 				SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 			}
-			else if (ammoItem >= INV_OBJECT_SMOL_WATERSKIN &&
-				ammoItem <= INV_OBJECT_SMOL_WATERSKIN3L &&
+			else if (ammoItem >= INV_OBJECT_SMALL_WATERSKIN &&
+				ammoItem <= INV_OBJECT_SMALL_WATERSKIN3L &&
 				invItem >= INV_OBJECT_BIG_WATERSKIN &&
 				invItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
@@ -1912,8 +1912,8 @@ void GuiController::DoInventory()
 				SayNo();
 				CombineRingFadeDir = 2;
 			}
-			else if (invItem >= INV_OBJECT_SMOL_WATERSKIN &&
-				invItem <= INV_OBJECT_SMOL_WATERSKIN3L &&
+			else if (invItem >= INV_OBJECT_SMALL_WATERSKIN &&
+				invItem <= INV_OBJECT_SMALL_WATERSKIN3L &&
 				ammoItem >= INV_OBJECT_BIG_WATERSKIN &&
 				ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
 			{
@@ -3064,7 +3064,7 @@ bool GuiController::PerformWaterskinCombine(int flag)
 
 			Lara.Inventory.SmallWaterskin = smallLiters + 1;
 			Lara.Inventory.BigWaterskin = bigLiters + 1;
-			CombineObject1 = (smallLiters + 1) + (INV_OBJECT_SMOL_WATERSKIN - 1);
+			CombineObject1 = (smallLiters + 1) + (INV_OBJECT_SMALL_WATERSKIN - 1);
 			return true;
 		}
 	}
