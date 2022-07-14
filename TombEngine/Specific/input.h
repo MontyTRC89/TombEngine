@@ -186,7 +186,7 @@ namespace TEN::Input
 		InputAction(InputActionID ID);
 
 		bool IsClicked();
-		bool IsPulsed(float interval, float initialInterval = 0.0f);
+		bool IsPulsed(float delayInSeconds, float initialDelayInSeconds = 0.0f);
 		bool IsHeld();
 		bool IsReleased();
 

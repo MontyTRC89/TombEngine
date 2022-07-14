@@ -688,7 +688,8 @@ namespace TEN::Input
 			return;
 
 		rumbleData.FadeSpeed = power / (delayInSeconds * (float)FPS);
-		rumbleData.Power = rumbleData.LastPower = power + rumbleData.FadeSpeed;
+		rumbleData.Power = power + rumbleData.FadeSpeed;
+		rumbleData.LastPower = rumbleData.Power;
 	}
 
 	void StopRumble()
@@ -714,19 +715,18 @@ namespace TEN::Input
 		return (Value && !PrevValue);
 	}
 
-	// Intervals in seconds.
-	// To avoid desync on the second pulse, ensure initialInterval is a multiple of interval.
-	bool InputAction::IsPulsed(float interval, float initialInterval)
+	// To avoid desync on the second pulse, ensure initialDelayInSeconds is a multiple of delayInSeconds.
+	bool InputAction::IsPulsed(float delayInSeconds, float initialDelayInSeconds)
 	{
 		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
 			return false;
 
 		static const float frameTime = 1.0f / FPS;
 		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, frameTime);
-		float activeInterval = (TimeHeld > initialInterval) ? interval : initialInterval;
+		float activeDelay = (TimeHeld > initialDelayInSeconds) ? delayInSeconds : initialDelayInSeconds;
 
-		float intervalTime = std::floor(syncedTimeHeld / activeInterval) * activeInterval;
-		if (intervalTime >= PrevTimeHeld)
+		float delayTime = std::floor(syncedTimeHeld / activeDelay) * activeDelay;
+		if (delayTime >= PrevTimeHeld)
 			return true;
 
 		return false;
