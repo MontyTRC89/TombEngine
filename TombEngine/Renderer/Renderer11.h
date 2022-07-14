@@ -81,9 +81,11 @@ namespace TEN::Renderer
 	struct RendererStatic
 	{
 		int Id;
-		short RoomIndex;
-		MESH_INFO* Mesh;
+		int RoomIndex;
 		Matrix World;
+		Vector3 Position;
+		Vector4 AmbientLight;
+		std::vector<RendererLight*> LightsToDraw;
 	};
 
 	struct RendererRoomNode
@@ -95,7 +97,7 @@ namespace TEN::Renderer
 
 	struct RendererItem
 	{
-		short ItemNumber;
+		int ItemNumber;
 		bool DoneAnimations;
 		Matrix World;
 		Matrix Translation;
