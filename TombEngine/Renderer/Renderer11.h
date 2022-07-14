@@ -588,7 +588,7 @@ namespace TEN::Renderer
 		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Draw();
 		bool PrepareDataForTheRenderer();
-		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov);
+		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
 		void RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void DumpGameScene();
 		void RenderInventory();
