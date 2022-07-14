@@ -54,13 +54,6 @@ namespace TEN::Renderer
 			item.CurrentRoomNumber = NO_ROOM;
 			item.ItemNumber = NO_ITEM;
 		}
-
-		for (auto& stat : m_statics)
-		{
-			stat.Mesh = nullptr;
-			stat.Id = NO_ITEM;
-			stat.RoomNumber = NO_ROOM;
-		}
 	}
 
 	void Renderer11::ClearSceneItems()
