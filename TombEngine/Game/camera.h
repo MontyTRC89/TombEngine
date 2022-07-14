@@ -73,7 +73,7 @@ extern float CinematicBarsSpeed;
 // Temporary placement.
 // ------------------------------
 
-void DoLookAround(ItemInfo* item);
+void DoLookAround(ItemInfo* item, bool invertVerticalAxis = true);
 
 void LookLeftRight(ItemInfo* item);
 void LookUpDown(ItemInfo* item);

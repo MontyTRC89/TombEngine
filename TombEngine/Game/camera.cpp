@@ -91,7 +91,7 @@ float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
 
-void DoLookAround(ItemInfo* item)
+void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -107,7 +107,7 @@ void DoLookAround(ItemInfo* item)
 
 	float vAxisCoeff = 0.0f;
 	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Omnidirectional)
-		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
+		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
