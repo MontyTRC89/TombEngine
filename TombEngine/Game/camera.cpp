@@ -109,8 +109,8 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Omnidirectional)
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
 
-	int hSign = std::copysign(1, hAxisCoeff);
-	int vSign = std::copysign(1, vAxisCoeff);
+	int hAxisSign = std::copysign(1, hAxisCoeff);
+	int vAxisSign = std::copysign(1, vAxisCoeff);
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
@@ -123,7 +123,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 			lara->LookCameraRotation.y += lookCamTurnRate * hAxisCoeff;
 
 		if (abs(lara->LookCameraRotation.y) > hConstraintAngle)
-			lara->LookCameraRotation.y = hSign;
+			lara->LookCameraRotation.y = hConstraintAngle * hAxisSign;
 	}
 
 	if (TrInput & (IN_FORWARD | IN_BACK))
@@ -137,7 +137,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 			lara->LookCameraRotation.x += lookCamTurnRate * vAxisCoeff;
 
 		if (abs(lara->LookCameraRotation.x) > vConstraintAngle)
-			lara->LookCameraRotation.x = vSign;
+			lara->LookCameraRotation.x = vConstraintAngle * vAxisSign;
 	}
 
 	// Visually adapt head and torso rotation.
