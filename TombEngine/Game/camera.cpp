@@ -109,18 +109,21 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Omnidirectional)
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
 
+	int hSign = std::copysign(1, hAxisCoeff);
+	int vSign = std::copysign(1, vAxisCoeff);
+
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
 		TrInput &= (TrInput & IN_LEFT) ? ~IN_LEFT : NULL;
 		TrInput &= (TrInput & IN_RIGHT) ? ~IN_RIGHT : NULL;
 
-		if (abs(lara->LookCameraRotation.y) <= hConstraintAngle)
-		{
-			if (BinocularRange)
-				lara->LookCameraRotation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
-			else
-				lara->LookCameraRotation.y += lookCamTurnRate * hAxisCoeff;
-		}
+		if (BinocularRange)
+			lara->LookCameraRotation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
+		else
+			lara->LookCameraRotation.y += lookCamTurnRate * hAxisCoeff;
+
+		if (abs(lara->LookCameraRotation.y) > hConstraintAngle)
+			lara->LookCameraRotation.y = hSign;
 	}
 
 	if (TrInput & (IN_FORWARD | IN_BACK))
@@ -128,14 +131,16 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		TrInput &= (TrInput & IN_FORWARD) ? ~IN_FORWARD : NULL;
 		TrInput &= (TrInput & IN_BACK) ? ~IN_BACK : NULL;
 
-		if (abs(lara->LookCameraRotation.x) <= vConstraintAngle)
-		{
-			if (BinocularRange)
-				lara->LookCameraRotation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * -vAxisCoeff;
-			else
-				lara->LookCameraRotation.x += lookCamTurnRate * -vAxisCoeff;
-		}
+		if (BinocularRange)
+			lara->LookCameraRotation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * vAxisCoeff;
+		else
+			lara->LookCameraRotation.x += lookCamTurnRate * vAxisCoeff;
+
+		if (abs(lara->LookCameraRotation.x) > vConstraintAngle)
+			lara->LookCameraRotation.x = vSign;
 	}
+
+	// Visually adapt head and torso rotation.
 
 	lara->ExtraHeadRot = lara->LookCameraRotation;
 
@@ -190,7 +195,7 @@ void LookCamera(ItemInfo* item)
 	// - Reenable looking in states where it was disabled due to severe twisting.
 
 	// Determine Y axis orientation.
-	auto orient = lara->ExtraHeadRot * 2;
+	auto orient = lara->LookCameraRotation * 2;
 	orient.y += item->Pose.Orientation.y;
 
 	// Define landmarks.

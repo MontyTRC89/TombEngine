@@ -773,9 +773,9 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	//else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 	//	ResetLook(item);
 
-
 	lara->Control.LookMode = LookMode::None;
-	
+
+	// Deprecated.
 	lara->Control.CanLook = true;
 
 	// ------------------------------------
