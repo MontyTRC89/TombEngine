@@ -381,19 +381,30 @@ namespace TEN::Renderer
 		for (int i = 0; i < numStatics; i++)
 		{
 			auto mesh = &r->mesh[i];
-			if (mesh->flags & StaticMeshFlags::SM_VISIBLE)
+			
+			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			if (!m_staticObjects[mesh->staticNumber])
+				continue;
+
+			Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(mesh->pos.Orientation.y), TO_RAD(mesh->pos.Orientation.x), TO_RAD(mesh->pos.Orientation.z)) *
+							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
+
+			std::vector<RendererLight*> lights;
+			CollectLights(mesh->pos.Position, room.RoomNumber, false, lights);
+
+			auto staticInfo = RendererStatic
 			{
-				auto sinfo = &StaticObjects[mesh->staticNumber];
+				mesh->staticNumber,
+				room.RoomNumber,
+				world,
+				mesh->pos.Position.ToVector3(),
+				room.AmbientLight * mesh->color,
+				lights
+			};
 
-				auto bounds = TO_DX_BBOX(mesh->pos, &sinfo->visibilityBox);
-				Vector3 min = bounds.Center - bounds.Extents;
-				Vector3 max = bounds.Center + bounds.Extents;
-
-				if (!renderView.camera.frustum.AABBInFrustum(min, max))
-					continue;
-
-				room.StaticsToDraw.push_back(mesh);
-			}
+			room.StaticsToDraw.push_back(staticInfo);
 		}
 	}
 

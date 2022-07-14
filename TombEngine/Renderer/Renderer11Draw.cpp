@@ -1811,21 +1811,14 @@ namespace TEN::Renderer
 		{
 			for (auto msh : room->StaticsToDraw)
 			{
-				if (!m_staticObjects[msh->staticNumber])
-					continue;
-
-				Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(msh->pos.Orientation.y), TO_RAD(msh->pos.Orientation.x),
-															   TO_RAD(msh->pos.Orientation.z)) * 
-								Matrix::CreateTranslation(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z));
-
-				m_stStatic.World = world;
-				m_stStatic.Position = Vector4(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z, 1);
-				m_stStatic.Color = room->AmbientLight * msh->color;
+				m_stStatic.World = msh.World;
+				m_stStatic.Position = Vector4(msh.Position.x, msh.Position.y, msh.Position.z, 1);
+				m_stStatic.Color = msh.AmbientLight;
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
-				RendererObject& staticObj = *m_staticObjects[msh->staticNumber];
+				RendererObject& staticObj = *m_staticObjects[msh.Id];
 
 				if (staticObj.ObjectMeshes.size() > 0)
 				{
@@ -1851,7 +1844,7 @@ namespace TEN::Renderer
 								RendererPolygon* p = &bucket.Polygons[j];
 
 								// As polygon distance, for moveables, we use the averaged distance
-								Vector3 centre = Vector3::Transform(p->centre, world);
+								Vector3 centre = Vector3::Transform(p->centre, msh.World);
 								int distance = (centre - cameraPosition).Length();
 
 								RendererTransparentFace face;
