@@ -1090,9 +1090,9 @@ namespace TEN::Renderer
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
-		m_stLights.NumLights = effect->Lights.size();
-		for (int j = 0; j < effect->Lights.size(); j++)
-			memcpy(&m_stLights.Lights[j], effect->Lights[j], sizeof(ShaderLight));
+		m_stLights.NumLights = effect->LightsToDraw.size();
+		for (int j = 0; j < effect->LightsToDraw.size(); j++)
+			memcpy(&m_stLights.Lights[j], effect->LightsToDraw[j], sizeof(ShaderLight));
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 

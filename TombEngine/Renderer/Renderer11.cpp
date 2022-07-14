@@ -43,15 +43,23 @@ namespace TEN::Renderer
 		m_spritesTextures.resize(0);
 		m_animatedTextures.resize(0);
 		m_animatedTextureSets.resize(0);
-		for (auto& mesh : m_meshes) {
+
+		for (auto& mesh : m_meshes)
 			delete mesh;
-		}
 		m_meshes.resize(0);
+
 		for (auto& item : m_items)
 		{
 			item.PreviousRoomNumber = NO_ROOM;
 			item.CurrentRoomNumber = NO_ROOM;
 			item.ItemNumber = NO_ITEM;
+		}
+
+		for (auto& stat : m_statics)
+		{
+			stat.Mesh = nullptr;
+			stat.Id = NO_ITEM;
+			stat.RoomNumber = NO_ROOM;
 		}
 	}
 

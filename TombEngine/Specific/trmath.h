@@ -68,6 +68,7 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 const float Lerp(float v0, float v1, float t);
 const float Smoothstep(float edge0, float edge1, float x);
+const float Luma(Vector3 color);
 
 Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
 Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float up = 0.0f, float right = 0.0f);
