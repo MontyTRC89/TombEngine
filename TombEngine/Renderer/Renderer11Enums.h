@@ -209,7 +209,7 @@ constexpr auto FADE_FRAMES_COUNT = 16;
 constexpr auto FADE_FACTOR = 0.0625f;
 
 constexpr auto NUM_LIGHTS_PER_BUFFER = 48;
-constexpr auto MAX_LIGHTS_PER_ITEM = 48;
+constexpr auto MAX_LIGHTS_PER_ITEM = 8;
 constexpr auto MAX_LIGHTS = 100;
 constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEPS = 8;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
