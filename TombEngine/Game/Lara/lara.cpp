@@ -737,7 +737,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	coll->Setup.Mode = CollisionProbeMode::Quadrants;
-	// TODO: Move radius and height resets here when look feature is refactored. @Sezz 2022.03.29
+	coll->Setup.Radius = LARA_RADIUS;
+	coll->Setup.Height = LARA_HEIGHT;
 
 	coll->Setup.UpperCeilingBound = NO_UPPER_BOUND;
 
@@ -754,17 +755,30 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.OldFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.OldState = item->Animation.ActiveState;
 
-	if (TrInput & IN_LOOK && lara->Control.CanLook &&
+	// ------------------------------------
+
+	if (TrInput & IN_LOOK && lara->Control.LookMode != LookMode::None &&
 		lara->ExtraAnim == NO_ITEM)
 	{
-		LookLeftRight(item);
+		DoLookAround(item);
 	}
-	else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
-		ResetLook(item);
+	else /*if (!lara->Control.IsFlexing)*/
+		ResetLook(item); // TODO: Extend ResetLaraFlex() to be a catch-all function.
 
-	coll->Setup.Radius = LARA_RADIUS;
-	coll->Setup.Height = LARA_HEIGHT;
+	//if (TrInput & IN_LOOK && lara->Control.CanLook &&
+	//	lara->ExtraAnim == NO_ITEM)
+	//{
+	//	LookLeftRight(item);
+	//}
+	//else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
+	//	ResetLook(item);
+
+
+	lara->Control.LookMode = LookMode::None;
+	
 	lara->Control.CanLook = true;
+
+	// ------------------------------------
 
 	UpdateItemRoom(item, -LARA_HEIGHT / 2);
 

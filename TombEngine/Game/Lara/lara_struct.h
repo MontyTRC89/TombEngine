@@ -909,15 +909,6 @@ enum class BurnType
 	Blue2
 };
 
-enum class WaterStatus
-{
-	Dry,
-	Wade,
-	TreadWater,
-	Underwater,
-	FlyCheat
-};
-
 enum class HandStatus
 {
 	Free,
@@ -928,12 +919,21 @@ enum class HandStatus
 	Special
 };
 
-enum class TorchState
+enum class WaterStatus
 {
-	Holding,
-	Throwing,
-	Dropping,
-	JustLit
+	Dry,
+	Wade,
+	TreadWater,
+	Underwater,
+	FlyCheat
+};
+
+enum class LookMode
+{
+	None,
+	Horizontal,
+	Vertical,
+	Omnidirectional
 };
 
 enum class JumpDirection
@@ -944,6 +944,14 @@ enum class JumpDirection
 	Back,
 	Left,
 	Right
+};
+
+enum class TorchState
+{
+	Holding,
+	Throwing,
+	Dropping,
+	JustLit
 };
 
 struct Ammo
@@ -1226,16 +1234,18 @@ struct LaraControlData
 {
 	short MoveAngle;
 	short TurnRate;
-	int CalculatedJumpVelocity;
+	int	  CalculatedJumpVelocity;
+
+	HandStatus	  HandStatus;
+	WaterStatus	  WaterStatus;
+	LookMode	  LookMode;
 	JumpDirection JumpDirection;
-	HandStatus HandStatus;
-	WaterStatus WaterStatus;
 	LaraCountData Count;
 
-	WeaponControlData Weapon;
-	RopeControlData Rope;
+	WeaponControlData	 Weapon;
+	RopeControlData		 Rope;
 	TightropeControlData Tightrope;
-	SubsuitControlData Subsuit;
+	SubsuitControlData	 Subsuit;
 
 	bool CanLook;
 	bool IsMoving;
@@ -1251,22 +1261,24 @@ struct LaraControlData
 struct LaraInfo
 {
 	short ItemNumber;
+
 	LaraControlData Control;
 	LaraInventoryData Inventory;
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare;
 	TorchData Torch;
 
+	Vector3Shrt LookCameraRotation;
 	Vector3Shrt ExtraHeadRot;
 	Vector3Shrt ExtraTorsoRot;
-	Vector3Int ExtraVelocity;
-	short WaterCurrentActive;
-	Vector3Int WaterCurrentPull;
+	Vector3Int	ExtraVelocity;
+	short		WaterCurrentActive;
+	Vector3Int	WaterCurrentPull;
 
-	ArmInfo LeftArm;
-	ArmInfo RightArm;
-	Vector3Shrt TargetArmOrient;
-	ItemInfo* TargetEntity;
+	ArmInfo		  LeftArm;
+	ArmInfo		  RightArm;
+	Vector3Shrt   TargetArmOrient;
+	ItemInfo*	  TargetEntity;
 	CreatureInfo* Creature;	// Not saved. Unused?
 
 	int Air;

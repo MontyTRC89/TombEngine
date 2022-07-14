@@ -31,8 +31,12 @@ constexpr auto COLL_CANCEL_THRESHOLD  = SECTOR(2);
 constexpr auto COLL_DISCARD_THRESHOLD = CLICK(0.5f);
 constexpr auto CAMERA_RADIUS          = CLICK(1);
 
-constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
+constexpr auto LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE = 45.0f;
+constexpr auto LOOKCAM_VERTICAL_CONSTRAINT_ANGLE   = 35.0f;
+constexpr auto LOOKCAM_TURN_RATE				   = 2.0f;
+
 constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
+constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
 
 struct OLD_CAMERA
 {
@@ -86,6 +90,63 @@ float ScreenFadeCurrent = 0;
 float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
+
+void DoLookAround(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
+
+	static const short hConstraintAngle = ANGLE(LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
+	static const short vConstraintAngle = ANGLE(LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
+	static const short lookCamTurnRate	= ANGLE(LOOKCAM_TURN_RATE);
+
+	Camera.type = CameraType::Look;
+
+	float hAxisCoeff = 0.0f;
+	if (lara->Control.LookMode == LookMode::Horizontal || lara->Control.LookMode == LookMode::Omnidirectional)
+		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
+
+	float vAxisCoeff = 0.0f;
+	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Omnidirectional)
+		vAxisCoeff = AxisMap[InputAxis::MoveVertical];
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		TrInput &= (TrInput & IN_LEFT) ? ~IN_LEFT : NULL;
+		TrInput &= (TrInput & IN_RIGHT) ? ~IN_RIGHT : NULL;
+
+		if (abs(lara->LookCameraRotation.y) <= hConstraintAngle)
+		{
+			if (BinocularRange)
+				lara->LookCameraRotation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
+			else
+				lara->LookCameraRotation.y += lookCamTurnRate * hAxisCoeff;
+		}
+	}
+
+	if (TrInput & (IN_FORWARD | IN_BACK))
+	{
+		TrInput &= (TrInput & IN_FORWARD) ? ~IN_FORWARD : NULL;
+		TrInput &= (TrInput & IN_BACK) ? ~IN_BACK : NULL;
+
+		if (abs(lara->LookCameraRotation.x) <= vConstraintAngle)
+		{
+			if (BinocularRange)
+				lara->LookCameraRotation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * -vAxisCoeff;
+			else
+				lara->LookCameraRotation.x += lookCamTurnRate * -vAxisCoeff;
+		}
+	}
+
+	lara->ExtraHeadRot = lara->LookCameraRotation;
+
+	if (lara->Control.HandStatus != HandStatus::Busy &&
+		lara->Vehicle == NO_ITEM &&
+		!lara->LeftArm.Locked &&
+		!lara->RightArm.Locked)
+	{
+		lara->ExtraTorsoRot = lara->ExtraHeadRot;
+	}
+}
 
 void LookLeftRight(ItemInfo* item)
 {
@@ -1472,6 +1533,8 @@ void CalculateCamera()
 void ResetLook(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
+
+	lara->LookCameraRotation = Vector3Shrt();
 
 	if (Camera.type != CameraType::Look)
 	{

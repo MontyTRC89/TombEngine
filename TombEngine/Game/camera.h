@@ -73,6 +73,8 @@ extern float CinematicBarsSpeed;
 // Temporary placement.
 // ------------------------------
 
+void DoLookAround(ItemInfo* item);
+
 void LookLeftRight(ItemInfo* item);
 void LookUpDown(ItemInfo* item);
 void DoThumbstickCamera();
