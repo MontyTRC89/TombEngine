@@ -248,6 +248,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	LocalFree(argv);
 
+	// Hide console window if mode isn't debug
+#ifndef _DEBUG
+	if (!Debug)
+		ShowWindow(GetConsoleWindow(), 0);
+#endif
+
 	// Clear Application Structure
 	memset(&App, 0, sizeof(WINAPP));
 	
