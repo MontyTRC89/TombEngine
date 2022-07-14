@@ -148,41 +148,12 @@ void DoLookAround(ItemInfo* item)
 	}
 }
 
+// To remove.
 void LookLeftRight(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
 	Camera.type = CameraType::Look;
-	if (TrInput & IN_LEFT)
-	{
-		TrInput &= ~IN_LEFT;
-		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.y += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f);
-			else
-				lara->ExtraHeadRot.y -= ANGLE(2.0f);
-		}
-	}
-	else if (TrInput & IN_RIGHT)
-	{
-		TrInput &= ~IN_RIGHT;
-		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.y += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(8.5f);
-			else
-				lara->ExtraHeadRot.y += ANGLE(2.0f);
-		}
-	}
-
-	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
-		!lara->LeftArm.Locked &&
-		!lara->RightArm.Locked)
-	{
-		lara->ExtraTorsoRot.y = lara->ExtraHeadRot.y;
-	}
 }
 
 void LookUpDown(ItemInfo* item)
@@ -190,36 +161,6 @@ void LookUpDown(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	Camera.type = CameraType::Look;
-	if (TrInput & IN_FORWARD)
-	{
-		TrInput &= ~IN_FORWARD;
-		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.x += ANGLE(2.0f) * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f);
-			else
-				lara->ExtraHeadRot.x -= ANGLE(2.0f);
-		}
-	}
-	else if (TrInput & IN_BACK)
-	{
-		TrInput &= ~IN_BACK;
-		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
-		{
-			if (BinocularRange)
-				lara->ExtraHeadRot.x += ANGLE(2.0f) * (ANGLE(10.0f) - BinocularRange) / ANGLE(17.0f);
-			else
-				lara->ExtraHeadRot.x += ANGLE(2.0f);
-		}
-	}
-
-	if (lara->Control.HandStatus != HandStatus::Busy &&
-		lara->Vehicle == NO_ITEM &&
-		!lara->LeftArm.Locked &&
-		!lara->RightArm.Locked)
-	{
-		lara->ExtraTorsoRot.x = lara->ExtraHeadRot.x;
-	}
 }
 
 void DoThumbstickCamera()
