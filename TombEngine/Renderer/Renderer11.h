@@ -122,7 +122,7 @@ namespace TEN::Renderer
 		FX_INFO* Effect;
 		Matrix World;
 		RendererMesh* Mesh;
-		std::vector<RendererLight*> Lights;
+		std::vector<RendererLight*> LightsToDraw;
 	};
 
 	struct RendererObject
@@ -435,9 +435,11 @@ namespace TEN::Renderer
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
-		void CollectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
+		void CollectLights(Vector3Int position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights);
 		void CollectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView);
+		void CollectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
+		void InterpolateAmbientLight(short roomNumber, RendererItem* item);
 		void CollectEffects(short roomNumber, RenderView& renderView);
 		void ClearScene();
 		void ClearSceneItems();
