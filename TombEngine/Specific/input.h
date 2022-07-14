@@ -1,4 +1,5 @@
 #pragma once
+#include "Specific/input_action.h"
 
 namespace TEN::Input
 {
@@ -9,47 +10,6 @@ namespace TEN::Input
 	constexpr int MAX_KEY_MAPPINGS	   = 4;
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
-
-	typedef enum class InputActionID
-	{
-		None = -1,
-
-		// General control
-		Forward,
-		Back,
-		Left,
-		Right,
-		Crouch,
-		Sprint,
-		Walk,
-		Jump,
-		Action,
-		Draw,
-		Flare,
-		Look,
-		Roll,
-		Option,
-		Pause,
-		LeftStep,
-		RightStep,
-
-		// Vehicle control
-		/*Accelerate,
-		Reverse,
-		Speed,
-		Slow,
-		Brake,
-		Fire,*/
-
-		// Hotkeys
-		Save,
-		Load,
-		Select,
-		Deselect,
-		SwitchTarget,
-
-		Count
-	} In;
 
 	enum InputKey
 	{
@@ -182,39 +142,6 @@ namespace TEN::Input
 	void DefaultConflict();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
-
-	// TODO: For use with analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
-	class InputAction
-	{
-	public:
-		InputAction(InputActionID ID);
-
-		bool IsClicked();
-		bool IsPulsed(float delayInSeconds, float initialDelayInSeconds = 0.0f);
-		bool IsHeld();
-		bool IsReleased();
-
-		InputActionID GetID();
-		float GetValue();
-		float GetTimeHeld();
-		float GetTimeInactive();
-
-		void Update(float value);
-		void Clear();
-		void PrintDebugInfo();
-
-	private:
-		InputActionID ID   = In::None;
-		float Value		   = 0.0f;
-		float PrevValue	   = 0.0f;
-		float TimeHeld	   = 0.0f;
-		float PrevTimeHeld = 0.0f;
-		float TimeInactive  = 0.0f;
-
-		void UpdateValue(float value);
-	};
-
-	extern std::vector<InputAction> ActionMap;
 
 	bool  IsClicked(InputActionID input);
 	bool  IsPulsed(InputActionID input, float delayInSeconds, float initialDelayInSeconds = 0.0f);
