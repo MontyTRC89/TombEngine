@@ -2,6 +2,55 @@
 
 namespace TEN::Input
 {
+	constexpr int MAX_KEYBOARD_KEYS    = 256;
+	constexpr int MAX_GAMEPAD_KEYS     = 16;
+	constexpr int MAX_GAMEPAD_AXES     = 6;
+	constexpr int MAX_GAMEPAD_POV_AXES = 4;
+	constexpr int MAX_KEY_MAPPINGS	   = 4;
+
+	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
+
+	typedef enum class InputActionID
+	{
+		None = -1,
+
+		// General control
+		Forward,
+		Back,
+		Left,
+		Right,
+		Crouch,
+		Sprint,
+		Walk,
+		Jump,
+		Action,
+		Draw,
+		Flare,
+		Look,
+		Roll,
+		Option,
+		Pause,
+		LeftStep,
+		RightStep,
+
+		// Vehicle control
+		/*Accelerate,
+		Reverse,
+		Speed,
+		Slow,
+		Brake,
+		Fire,*/
+
+		// Hotkeys
+		Save,
+		Load,
+		Select,
+		Deselect,
+		SwitchTarget,
+
+		Count
+	} In;
+
 	enum InputKey
 	{
 		KEY_FORWARD,
@@ -66,6 +115,28 @@ namespace TEN::Input
 		IN_DESELECT   = (1 << (KEY_COUNT + 3)),
 		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
 	};
+	
+	constexpr int IN_OPTIC_CONTROLS = IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT;
+	constexpr int IN_WAKE			= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION;
+	constexpr int IN_DIRECTION		= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT;
+
+	// Temporary input constants for use with vehicles:
+
+	// TODO: Not needed. Thought too far ahead.
+	constexpr int VEHICLE_IN_UP			= IN_FORWARD;
+	constexpr int VEHICLE_IN_DOWN		= IN_BACK;
+	constexpr int VEHICLE_IN_LEFT		= IN_LEFT;
+	constexpr int VEHICLE_IN_RIGHT		= IN_RIGHT;
+
+	constexpr int VEHICLE_IN_ACCELERATE = IN_ACTION;
+	constexpr int VEHICLE_IN_REVERSE	= IN_BACK;
+	constexpr int VEHICLE_IN_SPEED		= IN_SPRINT;
+	constexpr int VEHICLE_IN_SLOW		= IN_WALK;
+	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
+	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
+
+	// TODO: Not needed since BRAKE is explicitly assosiated with dismounts anyway.
+	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
 
 	enum InputAxis
 	{
@@ -78,9 +149,9 @@ namespace TEN::Input
 
 	enum class RumbleMode
 	{
-		Both,
 		Left,
-		Right
+		Right,
+		Both
 	};
 
 	struct RumbleData
@@ -90,30 +161,6 @@ namespace TEN::Input
 		float LastPower;
 		float FadeSpeed;
 	};
-
-	constexpr int MAX_KEYBOARD_KEYS    = 256;
-	constexpr int MAX_GAMEPAD_KEYS     = 16;
-	constexpr int MAX_GAMEPAD_AXES     = 6;
-	constexpr int MAX_GAMEPAD_POV_AXES = 4;
-
-	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
-
-	// Temporary input constants for use with vehicles.
-	constexpr int VEHICLE_IN_UP			= IN_FORWARD;
-	constexpr int VEHICLE_IN_DOWN		= IN_BACK;
-	constexpr int VEHICLE_IN_LEFT		= IN_LEFT;
-	constexpr int VEHICLE_IN_RIGHT		= IN_RIGHT;
-	constexpr int VEHICLE_IN_ACCELERATE = IN_ACTION;
-	constexpr int VEHICLE_IN_REVERSE	= IN_BACK;
-	constexpr int VEHICLE_IN_SPEED		= IN_SPRINT;
-	constexpr int VEHICLE_IN_SLOW		= IN_WALK;
-	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
-	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
-	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL; // TODO: Not needed since BRAKE is explicitly assosiated with dismounts anyway.
-
-	constexpr int IN_OPTIC_CONTROLS = IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT;
-	constexpr int IN_WAKE			= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION;
-	constexpr int IN_DIRECTION		= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT;
 
 	extern const char* g_KeyNames[];
 
@@ -135,49 +182,6 @@ namespace TEN::Input
 	void DefaultConflict();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
-
-	// ---------------------------------------------------------------
-
-	typedef enum class InputActionID
-	{
-		None = -1,
-
-		// General control
-		Forward,
-		Back,
-		Left,
-		Right,
-		Crouch,
-		Sprint,
-		Walk,
-		Jump,
-		Action,
-		Draw,
-		Flare,
-		Look,
-		Roll,
-		Option,
-		Pause,
-		LeftStep,
-		RightStep,
-
-		// Vehicle control
-		/*Accelerate,
-		Reverse,
-		Speed,
-		Slow,
-		Brake,
-		Fire,*/
-
-		// Hotkeys
-		Save,
-		Load,
-		Select,
-		Deselect,
-		SwitchTarget,
-
-		Count
-	} In;
 
 	// TODO: For use with analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
@@ -214,7 +218,7 @@ namespace TEN::Input
 
 	bool  NoInput();
 	bool  IsClicked(InputActionID input);
-	bool  IsPulsed(InputActionID input, float interval, float initialInterval = 0.0f);
+	bool  IsPulsed(InputActionID input, float delayInSeconds, float initialDelayInSeconds = 0.0f);
 	bool  IsHeld(InputActionID input);
 	bool  IsReleased(InputActionID input);
 	float GetInputValue(InputActionID input);

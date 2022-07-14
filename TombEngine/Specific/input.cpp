@@ -447,7 +447,7 @@ namespace TEN::Input
 
 			if (IsHeld(In::Forward) && IsHeld(In::Back))
 			{
-				//ActionMap[(int)In::Forward].Clear();
+				ActionMap[(int)In::Forward].Clear();
 				ActionMap[(int)In::Back].Clear();
 			}
 		}
@@ -703,8 +703,6 @@ namespace TEN::Input
 		rumbleData = {};
 	}
 
-	// ------------------------------------------------------
-
 	InputAction::InputAction(InputActionID ID)
 	{
 		this->ID = ID;
@@ -839,9 +837,9 @@ namespace TEN::Input
 		return ActionMap[(int)input].IsClicked();
 	}
 
-	bool IsPulsed(InputActionID input, float interval, float initialInterval)
+	bool IsPulsed(InputActionID input, float delayInSeconds, float initialDelayInSeconds)
 	{
-		return ActionMap[(int)input].IsPulsed(interval, initialInterval);
+		return ActionMap[(int)input].IsPulsed(delayInSeconds, initialDelayInSeconds);
 	}
 
 	bool IsHeld(InputActionID input)
