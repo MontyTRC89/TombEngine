@@ -460,11 +460,11 @@ void GuiController::HandleControlSettingsInput(bool fromPauseMenu)
 
 	if (CurrentSettings.WaitingForKey)
 	{
-		ClearInput();
+		ClearInputActions();
 
 		while (true)
 		{
-			UpdateInput();
+			UpdateInputActions();
 
 			if (CurrentSettings.IgnoreInput)
 			{
@@ -769,7 +769,7 @@ void GuiController::HandleOtherSettingsInput(bool fromPauseMenu)
 
 InventoryResult GuiController::DoPauseMenu()
 {
-	UpdateInput();
+	UpdateInputActions();
 
 	switch (MenuToDisplay)
 	{
@@ -1663,12 +1663,12 @@ void GuiController::UseCurrentItem()
 					if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare)
 					{
 						// HACK.
-						ClearInput();
+						ClearInputActions();
 						ActionMap[(int)In::Flare].Update(1.0f);
 						TrInput = IN_FLARE;
 
 						LaraGun(LaraItem);
-						ClearInput();
+						ClearInputActions();
 					}
 
 					return;
@@ -2811,7 +2811,7 @@ bool GuiController::CallInventory(bool resetMode)
 		if (CompassNeedleAngle != 1024)
 			CompassNeedleAngle -= 32;
 
-		UpdateInput();
+		UpdateInputActions();
 		GameTimer++;
 
 		if (IsClicked(In::Option))

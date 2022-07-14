@@ -621,7 +621,7 @@ namespace TEN::Input
 		rumbleData.LastPower = rumbleData.Power;
 	}
 
-	bool UpdateInput()
+	bool UpdateInputActions()
 	{
 		ClearInputData();
 		UpdateRumble();
@@ -666,7 +666,7 @@ namespace TEN::Input
 		return true;
 	}
 
-	void ClearInput()
+	void ClearInputActions()
 	{
 		for (int i = 0; i < (int)InputActionID::Count; i++)
 			ActionMap[i].Clear();
@@ -755,9 +755,9 @@ namespace TEN::Input
 		return TimeHeld;
 	}
 
-	float InputAction::GetTimeReleased()
+	float InputAction::GetTimeInactive()
 	{
-		return TimeReleased;
+		return TimeInactive;
 	}
 
 	void InputAction::Update(float value)
@@ -770,25 +770,25 @@ namespace TEN::Input
 		{
 			this->PrevTimeHeld = 0.0f;
 			this->TimeHeld = frameTime;
-			this->TimeReleased = 0.0f;
+			this->TimeInactive = 0.0f;
 		}
 		else if (this->IsReleased())
 		{
 			this->PrevTimeHeld = 0.0f;
 			this->TimeHeld = 0.0f;
-			this->TimeReleased = frameTime;
+			this->TimeInactive = frameTime;
 		}
 		else if (this->IsHeld())
 		{
 			this->PrevTimeHeld = TimeHeld;
 			this->TimeHeld += frameTime;
-			this->TimeReleased = 0.0f;
+			this->TimeInactive = 0.0f;
 		}
 		else
 		{
 			this->PrevTimeHeld = 0.0f;
 			this->TimeHeld = 0.0f;
-			this->TimeReleased += frameTime;
+			this->TimeInactive += frameTime;
 		}
 	}
 
@@ -798,7 +798,7 @@ namespace TEN::Input
 		this->PrevValue = 0.0f;
 		this->TimeHeld = 0.0f;
 		this->PrevTimeHeld = 0.0f;
-		this->TimeReleased = 0.0f;
+		this->TimeInactive = 0.0f;
 	}
 
 	void InputAction::PrintDebugInfo()
@@ -812,24 +812,13 @@ namespace TEN::Input
 		g_Renderer.PrintDebugMessage("PrevValue: %f", PrevValue);
 		g_Renderer.PrintDebugMessage("TimeHeld: %f", TimeHeld);
 		g_Renderer.PrintDebugMessage("PrevTimeHeld: %f", PrevTimeHeld);
-		g_Renderer.PrintDebugMessage("TimeReleased: %f", TimeReleased);
+		g_Renderer.PrintDebugMessage("TimeInactive: %f", TimeInactive);
 	}
 
 	void InputAction::UpdateValue(float value)
 	{
 		this->PrevValue = Value;
 		this->Value = value;
-	}
-
-	bool NoInput()
-	{
-		for (auto& action : ActionMap)
-		{
-			if (action.IsHeld())
-				return false;
-		}
-
-		return true;
 	}
 
 	bool IsClicked(InputActionID input)
@@ -852,6 +841,17 @@ namespace TEN::Input
 		return ActionMap[(int)input].IsReleased();
 	}
 
+	bool NoInput()
+	{
+		for (auto& action : ActionMap)
+		{
+			if (action.IsHeld())
+				return false;
+		}
+
+		return true;
+	}
+
 	float GetInputValue(InputActionID input)
 	{
 		return ActionMap[(int)input].GetValue();
@@ -862,8 +862,13 @@ namespace TEN::Input
 		return ActionMap[(int)input].GetTimeHeld();
 	}
 
-	float GetInputTimeReleased(InputActionID input)
+	float GetInputTimeInactive(InputActionID input)
 	{
-		return ActionMap[(int)input].GetTimeReleased();
+		return ActionMap[(int)input].GetTimeInactive();
+	}
+
+	void  ClearInput(InputActionID input)
+	{
+		ActionMap[(int)input].Clear();
 	}
 }

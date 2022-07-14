@@ -127,7 +127,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Poll the keyboard and update input variables
 		if (CurrentLevel != 0)
-			UpdateInput();
+			UpdateInputActions();
 
 		// Has Lara control been disabled?
 		if (Lara.Control.Locked || CurrentLevel == 0)
@@ -457,7 +457,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 		{
 			g_Renderer.RenderTitle();
 
-			UpdateInput();
+			UpdateInputActions();
 
 			status = g_Gui.TitleOptions();
 

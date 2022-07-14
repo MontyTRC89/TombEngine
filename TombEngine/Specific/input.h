@@ -177,8 +177,8 @@ namespace TEN::Input
 
 	void InitialiseInput(HWND handle);
 	void DeInitialiseInput();
-	bool UpdateInput();
-	void ClearInput();
+	bool UpdateInputActions();
+	void ClearInputActions();
 	void DefaultConflict();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
@@ -197,7 +197,7 @@ namespace TEN::Input
 		InputActionID GetID();
 		float GetValue();
 		float GetTimeHeld();
-		float GetTimeReleased();
+		float GetTimeInactive();
 
 		void Update(float value);
 		void Clear();
@@ -209,19 +209,20 @@ namespace TEN::Input
 		float PrevValue	   = 0.0f;
 		float TimeHeld	   = 0.0f;
 		float PrevTimeHeld = 0.0f;
-		float TimeReleased = 0.0f;
+		float TimeInactive  = 0.0f;
 
 		void UpdateValue(float value);
 	};
 
 	extern std::vector<InputAction> ActionMap;
 
-	bool  NoInput();
 	bool  IsClicked(InputActionID input);
 	bool  IsPulsed(InputActionID input, float delayInSeconds, float initialDelayInSeconds = 0.0f);
 	bool  IsHeld(InputActionID input);
 	bool  IsReleased(InputActionID input);
+	bool  NoInput();
 	float GetInputValue(InputActionID input);
 	float GetInputTimeHeld(InputActionID input);
-	float GetInputTimeReleased(InputActionID input);
+	float GetInputTimeInactive(InputActionID input);
+	void  ClearInput(InputActionID input);
 }

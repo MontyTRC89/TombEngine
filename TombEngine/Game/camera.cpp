@@ -1623,7 +1623,7 @@ void LookLeftRight(ItemInfo* item)
 	Camera.type = CameraType::Look;
 	if (TrInput & IN_LEFT)
 	{
-		ActionMap[(int)In::Left].Clear();
+		ClearInput(In::Left);
 
 		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
 		{
@@ -1635,7 +1635,7 @@ void LookLeftRight(ItemInfo* item)
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ActionMap[(int)In::Right].Clear();
+		ClearInput(In::Right);
 
 		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
 		{
@@ -1662,7 +1662,7 @@ void LookUpDown(ItemInfo* item)
 	Camera.type = CameraType::Look;
 	if (TrInput & IN_FORWARD)
 	{
-		ActionMap[(int)In::Forward].Clear();
+		ClearInput(In::Forward);
 
 		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
 		{
@@ -1674,7 +1674,7 @@ void LookUpDown(ItemInfo* item)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		ActionMap[(int)In::Back].Clear();
+		ClearInput(In::Back);
 
 		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
 		{
