@@ -223,7 +223,7 @@ namespace TEN::Renderer
 			{
 				RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -243,7 +243,7 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
 
-					for (auto& bucket : mesh->buckets)
+					for (auto& bucket : mesh->Buckets)
 					{
 						if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 							continue;
@@ -260,7 +260,7 @@ namespace TEN::Renderer
 			{
 				RendererMesh* mesh = laraSkin.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -277,6 +277,7 @@ namespace TEN::Renderer
 			RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
 
 			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
+			m_stItem.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			m_stItem.World = Matrix::Identity;
 			Matrix matrices[7];
 			matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
@@ -296,7 +297,7 @@ namespace TEN::Renderer
 			{
 				RendererMesh* mesh = hairsObj.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -344,7 +345,7 @@ namespace TEN::Renderer
 
 				RendererMesh* mesh = moveableObj.ObjectMeshes[0];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
 						continue;
@@ -568,9 +569,9 @@ namespace TEN::Renderer
 					m_stItem.AmbientLight = m_rooms[rat->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
-					for (int b = 0; b < mesh->buckets.size(); b++)
+					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
-						RendererBucket* bucket = &mesh->buckets[b];
+						RendererBucket* bucket = &mesh->Buckets[b];
 
 						if (bucket->Polygons.size() == 0)
 							continue;
@@ -603,9 +604,9 @@ namespace TEN::Renderer
 			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
 
-			for (int b = 0; b < mesh->buckets.size(); b++)
+			for (int b = 0; b < mesh->Buckets.size(); b++)
 			{
-				RendererBucket* bucket = &mesh->buckets[b];
+				RendererBucket* bucket = &mesh->Buckets[b];
 
 				if (bucket->Polygons.size() == 0)
 					continue;
@@ -671,9 +672,9 @@ namespace TEN::Renderer
 					m_stItem.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
-					for (int b = 0; b < mesh->buckets.size(); b++)
+					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
-						RendererBucket* bucket = &mesh->buckets[b];
+						RendererBucket* bucket = &mesh->Buckets[b];
 
 						if (bucket->Polygons.size() == 0)
 							continue;
@@ -723,9 +724,9 @@ namespace TEN::Renderer
 					m_stItem.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
 					m_cbItem.updateData(m_stItem, m_context.Get());
 
-					for (int b = 0; b < mesh->buckets.size(); b++)
+					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
-						RendererBucket* bucket = &mesh->buckets[b];
+						RendererBucket* bucket = &mesh->Buckets[b];
 
 						if (bucket->Polygons.size() == 0)
 							continue;
@@ -757,12 +758,12 @@ namespace TEN::Renderer
 			RendererLine3D* line = &m_lines3DToDraw[i];
 
 			RendererVertex v1;
-			v1.Position = line->start;
-			v1.Color = line->color;
+			v1.Position = line->Start;
+			v1.Color = line->Color;
 
 			RendererVertex v2;
-			v2.Position = line->end;
-			v2.Color = line->color;
+			v2.Position = line->End;
+			v2.Color = line->Color;
 			m_primitiveBatch->DrawLine(v1, v2);
 		}
 
@@ -776,9 +777,9 @@ namespace TEN::Renderer
 	{
 		RendererLine3D line;
 
-		line.start = start;
-		line.end = end;
-		line.color = color;
+		line.Start = start;
+		line.End = end;
+		line.Color = color;
 
 		m_lines3DToDraw.push_back(line);
 	}
@@ -834,49 +835,49 @@ namespace TEN::Renderer
 
 			switch (i)
 			{
-			case 0: line.start = corners[0];
-				line.end = corners[1];
+			case 0: line.Start = corners[0];
+				line.End = corners[1];
 				break;
-			case 1: line.start = corners[1];
-				line.end = corners[2];
+			case 1: line.Start = corners[1];
+				line.End = corners[2];
 				break;
-			case 2: line.start = corners[2];
-				line.end = corners[3];
+			case 2: line.Start = corners[2];
+				line.End = corners[3];
 				break;
-			case 3: line.start = corners[3];
-				line.end = corners[0];
-				break;
-
-
-			case 4: line.start = corners[4];
-				line.end = corners[5];
-				break;
-			case 5: line.start = corners[5];
-				line.end = corners[6];
-				break;
-			case 6: line.start = corners[6];
-				line.end = corners[7];
-				break;
-			case 7: line.start = corners[7];
-				line.end = corners[4];
+			case 3: line.Start = corners[3];
+				line.End = corners[0];
 				break;
 
 
-			case 8: line.start = corners[0];
-				line.end = corners[4];
+			case 4: line.Start = corners[4];
+				line.End = corners[5];
 				break;
-			case 9: line.start = corners[1];
-				line.end = corners[5];
+			case 5: line.Start = corners[5];
+				line.End = corners[6];
 				break;
-			case 10: line.start = corners[2];
-				line.end = corners[6];
+			case 6: line.Start = corners[6];
+				line.End = corners[7];
 				break;
-			case 11: line.start = corners[3];
-				line.end = corners[7];
+			case 7: line.Start = corners[7];
+				line.End = corners[4];
+				break;
+
+
+			case 8: line.Start = corners[0];
+				line.End = corners[4];
+				break;
+			case 9: line.Start = corners[1];
+				line.End = corners[5];
+				break;
+			case 10: line.Start = corners[2];
+				line.End = corners[6];
+				break;
+			case 11: line.Start = corners[3];
+				line.End = corners[7];
 				break;
 			}
 
-			line.color = color;
+			line.Color = color;
 			m_lines3DToDraw.push_back(line);
 		}
 	}
@@ -889,47 +890,47 @@ namespace TEN::Renderer
 
 			switch (i)
 			{
-			case 0: line.start = Vector3(min.x, min.y, min.z);
-				line.end = Vector3(min.x, min.y, max.z);
+			case 0: line.Start = Vector3(min.x, min.y, min.z);
+				line.End = Vector3(min.x, min.y, max.z);
 				break;
-			case 1: line.start = Vector3(min.x, min.y, max.z);
-				line.end = Vector3(max.x, min.y, max.z);
+			case 1: line.Start = Vector3(min.x, min.y, max.z);
+				line.End = Vector3(max.x, min.y, max.z);
 				break;
-			case 2: line.start = Vector3(max.x, min.y, max.z);
-				line.end = Vector3(max.x, min.y, min.z);
+			case 2: line.Start = Vector3(max.x, min.y, max.z);
+				line.End = Vector3(max.x, min.y, min.z);
 				break;
-			case 3: line.start = Vector3(max.x, min.y, min.z);
-				line.end = Vector3(min.x, min.y, min.z);
-				break;
-
-			case 4: line.start = Vector3(min.x, max.y, min.z);
-				line.end = Vector3(min.x, max.y, max.z);
-				break;
-			case 5: line.start = Vector3(min.x, max.y, max.z);
-				line.end = Vector3(max.x, max.y, max.z);
-				break;
-			case 6: line.start = Vector3(max.x, max.y, max.z);
-				line.end = Vector3(max.x, max.y, min.z);
-				break;
-			case 7: line.start = Vector3(max.x, max.y, min.z);
-				line.end = Vector3(min.x, max.y, min.z);
+			case 3: line.Start = Vector3(max.x, min.y, min.z);
+				line.End = Vector3(min.x, min.y, min.z);
 				break;
 
-			case 8: line.start = Vector3(min.x, min.y, min.z);
-				line.end = Vector3(min.x, max.y, min.z);
+			case 4: line.Start = Vector3(min.x, max.y, min.z);
+				line.End = Vector3(min.x, max.y, max.z);
 				break;
-			case 9: line.start = Vector3(min.x, min.y, max.z);
-				line.end = Vector3(min.x, max.y, max.z);
+			case 5: line.Start = Vector3(min.x, max.y, max.z);
+				line.End = Vector3(max.x, max.y, max.z);
 				break;
-			case 10: line.start = Vector3(max.x, min.y, max.z);
-				line.end = Vector3(max.x, max.y, max.z);
+			case 6: line.Start = Vector3(max.x, max.y, max.z);
+				line.End = Vector3(max.x, max.y, min.z);
 				break;
-			case 11: line.start = Vector3(max.x, min.y, min.z);
-				line.end = Vector3(max.x, max.y, min.z);
+			case 7: line.Start = Vector3(max.x, max.y, min.z);
+				line.End = Vector3(min.x, max.y, min.z);
+				break;
+
+			case 8: line.Start = Vector3(min.x, min.y, min.z);
+				line.End = Vector3(min.x, max.y, min.z);
+				break;
+			case 9: line.Start = Vector3(min.x, min.y, max.z);
+				line.End = Vector3(min.x, max.y, max.z);
+				break;
+			case 10: line.Start = Vector3(max.x, min.y, max.z);
+				line.End = Vector3(max.x, max.y, max.z);
+				break;
+			case 11: line.Start = Vector3(max.x, min.y, min.z);
+				line.End = Vector3(max.x, max.y, min.z);
 				break;
 			}
 
-			line.color = color;
+			line.Color = color;
 			m_lines3DToDraw.push_back(line);
 		}
 	}
@@ -1375,6 +1376,7 @@ namespace TEN::Renderer
 		m_stStatic.World = info->world;
 		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stStatic.Color = info->room->AmbientLight * info->color;
+		m_stStatic.LightMode = info->staticMesh->Id
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -1803,7 +1805,7 @@ namespace TEN::Renderer
 				{
 					RendererMesh* mesh = staticObj.ObjectMeshes[0];
 
-					for (auto& bucket : mesh->buckets)
+					for (auto& bucket : mesh->Buckets)
 					{
 						if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 						{
@@ -2197,7 +2199,7 @@ namespace TEN::Renderer
 			{
 				RendererMesh* mesh = moveableObj.ObjectMeshes[k];
 
-				for (auto& bucket : mesh->buckets)
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0)
 						continue;
@@ -2233,7 +2235,7 @@ namespace TEN::Renderer
 	{
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
-		for (auto& bucket : mesh->buckets)
+		for (auto& bucket : mesh->Buckets)
 		{
 			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 			{
