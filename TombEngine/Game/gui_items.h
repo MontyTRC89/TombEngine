@@ -274,33 +274,33 @@ enum RotationFlags
 
 struct InventoryObject
 {
-	short object_number;
-	short yoff;
-	float scale1;
-	short yrot;
-	short xrot;
-	short zrot;
-	unsigned __int64 opts;
-	const char* objname;
-	unsigned int meshbits;
-	short rot_flags;
+	short ObjectNumber;
+	short YOffset;
+	float Scale1;
+	short YRot;
+	short XRot;
+	short ZRot;
+	unsigned __int64 Options;
+	const char* ObjectName;
+	unsigned int MeshBits;
+	short RotFlags;
 };
 
 struct CombineList
 {
 	void  (*CombineRoutine)(int flag);
-	short item1;
-	short item2;
-	short combined_item;
+	short Item1;
+	short Item2;
+	short CombinedItem;
 };
 
 struct AmmoList
 {
-	short	   	   invitem;
-	short	 	   amount;
-	unsigned short xrot;
-	unsigned short yrot;
-	unsigned short zrot;
+	short	   	   InventoryItem;
+	short	 	   Amount;
+	unsigned short XRot;
+	unsigned short YRot;
+	unsigned short ZRot;
 };
 
 struct AmmoData

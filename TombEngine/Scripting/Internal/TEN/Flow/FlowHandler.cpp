@@ -274,15 +274,15 @@ bool FlowHandler::DoFlow()
 				{
 					InventoryObject* invObj = &InventoryObjectTable[obj->slot];
 
-					invObj->objname = obj->name.c_str();
-					invObj->scale1 = obj->scale;
-					invObj->yoff = obj->yOffset;
-					invObj->xrot = FROM_DEGREES(obj->rot.x);
-					invObj->yrot = FROM_DEGREES(obj->rot.y);
-					invObj->zrot = FROM_DEGREES(obj->rot.z);
-					invObj->meshbits = obj->meshBits;
-					invObj->opts = obj->action;
-					invObj->rot_flags = obj->rotationFlags;
+					invObj->ObjectName = obj->name.c_str();
+					invObj->Scale1 = obj->scale;
+					invObj->YOffset = obj->yOffset;
+					invObj->XRot = FROM_DEGREES(obj->rot.x);
+					invObj->YRot = FROM_DEGREES(obj->rot.y);
+					invObj->ZRot = FROM_DEGREES(obj->rot.z);
+					invObj->MeshBits = obj->meshBits;
+					invObj->Options = obj->action;
+					invObj->RotFlags = obj->rotationFlags;
 				}
 			}
 

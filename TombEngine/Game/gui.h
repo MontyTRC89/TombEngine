@@ -73,26 +73,26 @@ enum class Menu
 
 struct MenuOption
 {
-	MenuType type;
-	char const* text;
+	MenuType	Type;
+	char const* Text;
 };
 
 struct ObjectList
 {
-	short invitem;
-	unsigned short xrot;
-	unsigned short yrot;
-	unsigned short zrot;
-	unsigned short bright;
+	short InventoryItem;
+	unsigned short XRot;
+	unsigned short YRot;
+	unsigned short ZRot;
+	unsigned short Bright;
 };
 
 struct InventoryRing
 {
 	ObjectList CurrentObjectList[INVENTORY_TABLE_SIZE + 1];
-	int ringactive;
-	int objlistmovement;
-	int curobjinlist;
-	int numobjectsinlist;
+	int RingActive;
+	int ObjectListMovement;
+	int CurrentObjectInList;
+	int NumObjectsInList;
 };
 
 struct SettingsData

@@ -177,15 +177,15 @@ InventoryResult GuiController::TitleOptions()
 
 	case Menu::Display:
 		HandleDisplaySettingsInput(false);
-		break;
+		return inventoryResult;
 
 	case Menu::Controls:
 		HandleControlSettingsInput(false);
-		break;
+		return inventoryResult;
 
 	case Menu::OtherSettings:
 		HandleOtherSettingsInput(false);
-		break;
+		return inventoryResult;
 	}
 
 	if (MenuToDisplay == Menu::LoadGame)
@@ -787,15 +787,15 @@ InventoryResult GuiController::DoPauseMenu()
 
 	case Menu::Display:
 		HandleDisplaySettingsInput(true);
-		break;
+		return InventoryResult::None;
 
 	case Menu::Controls:
 		HandleControlSettingsInput(true);
-		break;
+		return InventoryResult::None;
 
 	case Menu::OtherSettings:
 		HandleOtherSettingsInput(true);
-		break;
+		return InventoryResult::None;
 	}
 
 	if (MenuToDisplay == Menu::Pause || MenuToDisplay == Menu::Options)
@@ -885,12 +885,12 @@ bool GuiController::DoObjectsCombine(int objectNumber1, int objectNumber2)
 {
 	for (int n = 0; n < MAX_COMBINES; n++)
 	{
-		if (CombineTable[n].item1 == objectNumber1 &&
-			CombineTable[n].item2 == objectNumber2)
+		if (CombineTable[n].Item1 == objectNumber1 &&
+			CombineTable[n].Item2 == objectNumber2)
 			return true;
 
-		if (CombineTable[n].item1 == objectNumber2 &&
-			CombineTable[n].item2 == objectNumber1)
+		if (CombineTable[n].Item1 == objectNumber2 &&
+			CombineTable[n].Item2 == objectNumber1)
 			return true;
 	}
 
@@ -903,15 +903,15 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 	{
 		for (int n = 0; n < MAX_COMBINES; n++)
 		{
-			if (CombineTable[n].item1 == objectNumber)
+			if (CombineTable[n].Item1 == objectNumber)
 			{
-				if (IsItemInInventory(CombineTable[n].item2))
+				if (IsItemInInventory(CombineTable[n].Item2))
 					return true;
 			}
 
-			if (CombineTable[n].item2 == objectNumber)
+			if (CombineTable[n].Item2 == objectNumber)
 			{
-				if (IsItemInInventory(CombineTable[n].item1))
+				if (IsItemInInventory(CombineTable[n].Item1))
 					return true;
 			}
 		}
@@ -940,7 +940,7 @@ bool GuiController::IsItemInInventory(int objectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem == objectNumber)
+		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == objectNumber)
 			return 1;
 	}
 
@@ -952,18 +952,18 @@ void GuiController::CombineObjects(int objectNumber1, int objectNumber2)
 	int n;
 	for (n = 0; n < MAX_COMBINES; n++)
 	{
-		if (CombineTable[n].item1 == objectNumber1 &&
-			CombineTable[n].item2 == objectNumber2)
+		if (CombineTable[n].Item1 == objectNumber1 &&
+			CombineTable[n].Item2 == objectNumber2)
 			break;
 
-		if (CombineTable[n].item1 == objectNumber2 &&
-			CombineTable[n].item2 == objectNumber1)
+		if (CombineTable[n].Item1 == objectNumber2 &&
+			CombineTable[n].Item2 == objectNumber1)
 			break;
 	}
 
 	CombineTable[n].CombineRoutine(0);
 	ConstructObjectList();
-	SetupObjectListStartPosition(CombineTable[n].combined_item);
+	SetupObjectListStartPosition(CombineTable[n].CombinedItem);
 	HandleObjectChangeover((int)RingTypes::Inventory);
 }
 
@@ -972,21 +972,21 @@ void GuiController::SeparateObject(int objectNumber)
 	int n;
 	for (n = 0; n < MAX_COMBINES; n++)
 	{
-		if (CombineTable[n].combined_item == objectNumber)
+		if (CombineTable[n].CombinedItem == objectNumber)
 			break;
 	}
 
 	CombineTable[n].CombineRoutine(1);
 	ConstructObjectList();
-	SetupObjectListStartPosition(CombineTable[n].item1);
+	SetupObjectListStartPosition(CombineTable[n].Item1);
 }
 
 void GuiController::SetupObjectListStartPosition(int newObjectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem == newObjectNumber)
-			Rings[(int)RingTypes::Inventory]->curobjinlist = i;
+		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == newObjectNumber)
+			Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
 	}
 }
 
@@ -1003,22 +1003,22 @@ void GuiController::SetupAmmoSelector()
 	unsigned __int64 options;
 
 	number = 0;
-	options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+	options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
 	AmmoSelectorFlag = 0;
 	NumAmmoSlots = 0;
 
-	if (Rings[(int)RingTypes::Ammo]->ringactive)
+	if (Rings[(int)RingTypes::Ammo]->RingActive)
 		return;
 	
-	AmmoObjectList[0].xrot = 0;
-	AmmoObjectList[0].yrot = 0;
-	AmmoObjectList[0].zrot = 0;
-	AmmoObjectList[1].xrot = 0;
-	AmmoObjectList[1].yrot = 0;
-	AmmoObjectList[1].zrot = 0;
-	AmmoObjectList[2].xrot = 0;
-	AmmoObjectList[2].yrot = 0;
-	AmmoObjectList[2].zrot = 0;
+	AmmoObjectList[0].XRot = 0;
+	AmmoObjectList[0].YRot = 0;
+	AmmoObjectList[0].ZRot = 0;
+	AmmoObjectList[1].XRot = 0;
+	AmmoObjectList[1].YRot = 0;
+	AmmoObjectList[1].ZRot = 0;
+	AmmoObjectList[2].XRot = 0;
+	AmmoObjectList[2].YRot = 0;
+	AmmoObjectList[2].ZRot = 0;
 
 	if (options & 
 		(OPT_CHOOSEAMMO_UZI | OPT_CHOOSEAMMO_PISTOLS | OPT_CHOOSEAMMO_REVOLVER | OPT_CHOOSEAMMO_CROSSBOW |
@@ -1029,8 +1029,8 @@ void GuiController::SetupAmmoSelector()
 
 		if (options & OPT_CHOOSEAMMO_UZI)
 		{
-			AmmoObjectList[0].invitem = INV_OBJECT_UZI_AMMO;
-			AmmoObjectList[0].amount = Ammo.AmountUziAmmo;
+			AmmoObjectList[0].InventoryItem = INV_OBJECT_UZI_AMMO;
+			AmmoObjectList[0].Amount = Ammo.AmountUziAmmo;
 			number++;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentUziAmmoType;
@@ -1039,8 +1039,8 @@ void GuiController::SetupAmmoSelector()
 		if (options & OPT_CHOOSEAMMO_PISTOLS)
 		{
 			number++;
-			AmmoObjectList[0].invitem = INV_OBJECT_PISTOLS_AMMO;
-			AmmoObjectList[0].amount = -1;
+			AmmoObjectList[0].InventoryItem = INV_OBJECT_PISTOLS_AMMO;
+			AmmoObjectList[0].Amount = -1;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentPistolsAmmoType;
 		}
@@ -1048,22 +1048,22 @@ void GuiController::SetupAmmoSelector()
 		if (options & OPT_CHOOSEAMMO_REVOLVER)
 		{
 			number++;
-			AmmoObjectList[0].invitem = INV_OBJECT_REVOLVER_AMMO;
-			AmmoObjectList[0].amount = Ammo.AmountRevolverAmmo;
+			AmmoObjectList[0].InventoryItem = INV_OBJECT_REVOLVER_AMMO;
+			AmmoObjectList[0].Amount = Ammo.AmountRevolverAmmo;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentRevolverAmmoType;
 		}
 
 		if (options & OPT_CHOOSEAMMO_CROSSBOW)
 		{
-			AmmoObjectList[number].invitem = INV_OBJECT_CROSSBOW_AMMO1;
-			AmmoObjectList[number].amount = Ammo.AmountCrossBowAmmo1;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO1;
+			AmmoObjectList[number].Amount = Ammo.AmountCrossBowAmmo1;
 			number++;
-			AmmoObjectList[number].invitem = INV_OBJECT_CROSSBOW_AMMO2;
-			AmmoObjectList[number].amount = Ammo.AmountCrossBowAmmo2;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO2;
+			AmmoObjectList[number].Amount = Ammo.AmountCrossBowAmmo2;
 			number++;
-			AmmoObjectList[number].invitem = INV_OBJECT_CROSSBOW_AMMO3;
-			AmmoObjectList[number].amount = Ammo.AmountCrossBowAmmo3;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO3;
+			AmmoObjectList[number].Amount = Ammo.AmountCrossBowAmmo3;
 			number++;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentCrossBowAmmoType;
@@ -1071,8 +1071,8 @@ void GuiController::SetupAmmoSelector()
 
 		if (options & OPT_CHOOSEAMMO_HK)
 		{
-			AmmoObjectList[number].invitem = INV_OBJECT_HK_AMMO;
-			AmmoObjectList[number].amount = Ammo.AmountHKAmmo1;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_HK_AMMO;
+			AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
 			number++;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentHKAmmoType;
@@ -1080,11 +1080,11 @@ void GuiController::SetupAmmoSelector()
 
 		if (options & OPT_CHOOSEAMMO_SHOTGUN)
 		{
-			AmmoObjectList[number].invitem = INV_OBJECT_SHOTGUN_AMMO1;
-			AmmoObjectList[number].amount = Ammo.AmountShotGunAmmo1;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_SHOTGUN_AMMO1;
+			AmmoObjectList[number].Amount = Ammo.AmountShotGunAmmo1;
 			number++;
-			AmmoObjectList[number].invitem = INV_OBJECT_SHOTGUN_AMMO2;
-			AmmoObjectList[number].amount = Ammo.AmountShotGunAmmo2;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_SHOTGUN_AMMO2;
+			AmmoObjectList[number].Amount = Ammo.AmountShotGunAmmo2;
 			number++;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentShotGunAmmoType;
@@ -1092,14 +1092,14 @@ void GuiController::SetupAmmoSelector()
 
 		if (options & OPT_CHOOSEAMMO_GRENADEGUN)
 		{
-			AmmoObjectList[number].invitem = INV_OBJECT_GRENADE_AMMO1;
-			AmmoObjectList[number].amount = Ammo.AmountGrenadeAmmo1;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO1;
+			AmmoObjectList[number].Amount = Ammo.AmountGrenadeAmmo1;
 			number++;
-			AmmoObjectList[number].invitem = INV_OBJECT_GRENADE_AMMO2;
-			AmmoObjectList[number].amount = Ammo.AmountGrenadeAmmo2;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO2;
+			AmmoObjectList[number].Amount = Ammo.AmountGrenadeAmmo2;
 			number++;
-			AmmoObjectList[number].invitem = INV_OBJECT_GRENADE_AMMO3;
-			AmmoObjectList[number].amount = Ammo.AmountGrenadeAmmo3;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO3;
+			AmmoObjectList[number].Amount = Ammo.AmountGrenadeAmmo3;
 			number++;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentGrenadeGunAmmoType;
@@ -1107,8 +1107,8 @@ void GuiController::SetupAmmoSelector()
 
 		if (options & OPT_CHOOSEAMMO_HARPOON)
 		{
-			AmmoObjectList[number].invitem = INV_OBJECT_HARPOON_AMMO;
-			AmmoObjectList[number].amount = Ammo.AmountHarpoonAmmo;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_HARPOON_AMMO;
+			AmmoObjectList[number].Amount = Ammo.AmountHarpoonAmmo;
 			number++;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentHarpoonAmmoType;
@@ -1116,8 +1116,8 @@ void GuiController::SetupAmmoSelector()
 
 		if (options & OPT_CHOOSEAMMO_ROCKET)
 		{
-			AmmoObjectList[number].invitem = INV_OBJECT_ROCKET_AMMO;
-			AmmoObjectList[number].amount = Ammo.AmountRocketsAmmo;
+			AmmoObjectList[number].InventoryItem = INV_OBJECT_ROCKET_AMMO;
+			AmmoObjectList[number].Amount = Ammo.AmountRocketsAmmo;
 			number++;
 			NumAmmoSlots = number;
 			CurrentAmmoType = &Ammo.CurrentRocketAmmoType;
@@ -1127,37 +1127,37 @@ void GuiController::SetupAmmoSelector()
 
 void GuiController::InsertObjectIntoList(int objectNumber)
 {
-	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].invitem = objectNumber;
-	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].xrot = 0;
-	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].yrot = 0;
-	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].zrot = 0;
-	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->numobjectsinlist].bright = 32;
-	Rings[(int)RingTypes::Inventory]->numobjectsinlist++;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].InventoryItem = objectNumber;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].XRot = 0;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].YRot = 0;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].ZRot = 0;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->NumObjectsInList].Bright = 32;
+	Rings[(int)RingTypes::Inventory]->NumObjectsInList++;
 }
 
 void GuiController::InsertObjectIntoList_v2(int objectNumber)
 {
-	unsigned __int64 opts = InventoryObjectTable[objectNumber].opts;
+	unsigned __int64 Options = InventoryObjectTable[objectNumber].Options;
 
-	if (opts & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
+	if (Options & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
 	{
-		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem != objectNumber)
+		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem != objectNumber)
 		{
-			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].invitem = objectNumber;
-			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].xrot = 0;
-			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].yrot = 0;
-			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist].zrot = 0;
-			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->numobjectsinlist++].bright = 32;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].InventoryItem = objectNumber;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].XRot = 0;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].YRot = 0;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList].ZRot = 0;
+			Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->NumObjectsInList++].Bright = 32;
 		}
 	}
 }
 
 void GuiController::ConstructObjectList()
 {
-	Rings[(int)RingTypes::Inventory]->numobjectsinlist = 0;
+	Rings[(int)RingTypes::Inventory]->NumObjectsInList = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem = NO_ITEM;
+		Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 	Ammo.CurrentPistolsAmmoType = 0;
 	Ammo.CurrentUziAmmoType = 0;
@@ -1370,22 +1370,22 @@ void GuiController::ConstructObjectList()
 		InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 	}
 
-	Rings[(int)RingTypes::Inventory]->objlistmovement = 0;
-	Rings[(int)RingTypes::Inventory]->curobjinlist = 0;
-	Rings[(int)RingTypes::Inventory]->ringactive = 1;
-	Rings[(int)RingTypes::Ammo]->objlistmovement = 0;
-	Rings[(int)RingTypes::Ammo]->curobjinlist = 0;
-	Rings[(int)RingTypes::Ammo]->ringactive = 0;
+	Rings[(int)RingTypes::Inventory]->ObjectListMovement = 0;
+	Rings[(int)RingTypes::Inventory]->CurrentObjectInList = 0;
+	Rings[(int)RingTypes::Inventory]->RingActive = 1;
+	Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
+	Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
+	Rings[(int)RingTypes::Ammo]->RingActive = 0;
 	HandleObjectChangeover((int)RingTypes::Inventory);
 	AmmoActive = 0;
 }
 
 void GuiController::ConstructCombineObjectList()
 {
-	Rings[(int)RingTypes::Ammo]->numobjectsinlist = 0;
+	Rings[(int)RingTypes::Ammo]->NumObjectsInList = 0;
 
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
-		Rings[(int)RingTypes::Ammo]->CurrentObjectList[i].invitem = NO_ITEM;
+		Rings[(int)RingTypes::Ammo]->CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
 	{
@@ -1454,9 +1454,9 @@ void GuiController::ConstructCombineObjectList()
 			InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
 	}
 
-	Rings[(int)RingTypes::Ammo]->objlistmovement = 0;
-	Rings[(int)RingTypes::Ammo]->curobjinlist = 0;
-	Rings[(int)RingTypes::Ammo]->ringactive = 0;
+	Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
+	Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
+	Rings[(int)RingTypes::Ammo]->RingActive = 0;
 }
 
 void GuiController::InitialiseInventory()
@@ -1556,8 +1556,8 @@ void GuiController::SetupObjectListStartPosition2(int newObjectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].invitem].object_number == newObjectNumber)
-			Rings[(int)RingTypes::Inventory]->curobjinlist = i;
+		if (InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem].ObjectNumber == newObjectNumber)
+			Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
 	}
 }
 
@@ -1565,7 +1565,7 @@ int GuiController::ConvertObjectToInventoryItem(int objectNumber)
 {
 	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
-		if (InventoryObjectTable[i].object_number == objectNumber)
+		if (InventoryObjectTable[i].ObjectNumber == objectNumber)
 			return i;
 	}
 
@@ -1574,12 +1574,12 @@ int GuiController::ConvertObjectToInventoryItem(int objectNumber)
 
 int GuiController::ConvertInventoryItemToObject(int objectNumber)
 {
-	return InventoryObjectTable[objectNumber].object_number;
+	return InventoryObjectTable[objectNumber].ObjectNumber;
 }
 
 void GuiController::FadeAmmoSelector()
 {
-	if (Rings[(int)RingTypes::Inventory]->ringactive)
+	if (Rings[(int)RingTypes::Inventory]->RingActive)
 		AmmoSelectorFadeVal = 0;
 	else if (AmmoSelectorFadeDir == 1)
 	{
@@ -1614,8 +1614,8 @@ void GuiController::UseCurrentItem()
 	Lara.Inventory.OldBusy = false;
 	BinocularRange = 0;
 	LaraItem->MeshBits = ALL_JOINT_BITS;
-	invobject = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
-	gmeobject = InventoryObjectTable[invobject].object_number;
+	invobject = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+	gmeobject = InventoryObjectTable[invobject].ObjectNumber;
 
 	if (Lara.Control.WaterStatus == WaterStatus::Dry || Lara.Control.WaterStatus == WaterStatus::Wade)
 	{
@@ -1873,20 +1873,20 @@ void GuiController::UseCurrentItem()
 
 void GuiController::DoInventory()
 {
-	if (Rings[(int)RingTypes::Ammo]->ringactive)
+	if (Rings[(int)RingTypes::Ammo]->RingActive)
 	{
 		g_Renderer.DrawString(PHD_CENTER_X, PHD_CENTER_Y, g_GameFlow->GetString(OptionStrings[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
-		if (Rings[(int)RingTypes::Inventory]->objlistmovement)
+		if (Rings[(int)RingTypes::Inventory]->ObjectListMovement)
 			return;
 
-		if (Rings[(int)RingTypes::Ammo]->objlistmovement)
+		if (Rings[(int)RingTypes::Ammo]->ObjectListMovement)
 			return;
 
 		if (GUI_INPUT_SELECT)
 		{
-			short invItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
-			short ammoItem = Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->curobjinlist].invitem;
+			short invItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+			short ammoItem = Rings[(int)RingTypes::Ammo]->CurrentObjectList[Rings[(int)RingTypes::Ammo]->CurrentObjectInList].InventoryItem;
 
 			if (DoObjectsCombine(invItem, ammoItem))
 			{
@@ -1945,66 +1945,66 @@ void GuiController::DoInventory()
 	}
 	else
 	{
-		int num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+		int num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 
 		for (int i = 0; i < 3; i++)
 		{
-			CurrentOptions[i].type = MenuType::None;
-			CurrentOptions[i].text = 0;
+			CurrentOptions[i].Type = MenuType::None;
+			CurrentOptions[i].Text = 0;
 		}
 
 		int n = 0;
 		unsigned long options;
 		if (!AmmoActive)
 		{
-			options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+			options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
 
 			if (options & OPT_LOAD)
 			{
-				CurrentOptions[0].type = MenuType::Load;
-				CurrentOptions[0].text = g_GameFlow->GetString(OptionStrings[6]);
+				CurrentOptions[0].Type = MenuType::Load;
+				CurrentOptions[0].Text = g_GameFlow->GetString(OptionStrings[6]);
 				n = 1;
 			}
 
 			if (options & OPT_SAVE)
 			{
-				CurrentOptions[n].type = MenuType::Save;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[7]);
+				CurrentOptions[n].Type = MenuType::Save;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[7]);
 				n++;
 			}
 
 			if (options & OPT_EXAMINABLE)
 			{
-				CurrentOptions[n].type = MenuType::Examine;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[8]);
+				CurrentOptions[n].Type = MenuType::Examine;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[8]);
 				n++;
 			}
 
 			if (options & OPT_STATS)
 			{
-				CurrentOptions[n].type = MenuType::Statistics;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[9]);
+				CurrentOptions[n].Type = MenuType::Statistics;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[9]);
 				n++;
 			}
 
 			if (options & OPT_USE)
 			{
-				CurrentOptions[n].type = MenuType::Use;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[0]);
+				CurrentOptions[n].Type = MenuType::Use;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[0]);
 				n++;
 			}
 
 			if (options & OPT_EQUIP)
 			{
-				CurrentOptions[n].type = MenuType::Equip;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[4]);
+				CurrentOptions[n].Type = MenuType::Equip;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[4]);
 				n++;
 			}
 
 			if (options & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
-				CurrentOptions[n].type = MenuType::ChooseAmmo;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[1]);
+				CurrentOptions[n].Type = MenuType::ChooseAmmo;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[1]);
 				n++;
 			}
 
@@ -2012,48 +2012,48 @@ void GuiController::DoInventory()
 			{
 				if (IsItemCurrentlyCombinable(num))
 				{
-					CurrentOptions[n].type = MenuType::Combine;
-					CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[2]);
+					CurrentOptions[n].Type = MenuType::Combine;
+					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[2]);
 					n++;
 				}
 			}
 
 			if (options & OPT_ALWAYSCOMBINE)
 			{
-				CurrentOptions[n].type = MenuType::Combine;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[2]);
+				CurrentOptions[n].Type = MenuType::Combine;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[2]);
 				n++;
 			}
 
 			if (options & OPT_SEPERATABLE)
 			{
-				CurrentOptions[n].type = MenuType::Seperate;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[3]);
+				CurrentOptions[n].Type = MenuType::Seperate;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[3]);
 				n++;
 			}
 
 			if (options & OPT_DIARY)
 			{
-				CurrentOptions[n].type = MenuType::Diary;
-				CurrentOptions[n].text = g_GameFlow->GetString(OptionStrings[11]);
+				CurrentOptions[n].Type = MenuType::Diary;
+				CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[11]);
 				n++;
 			}
 		}
 		else
 		{
-			CurrentOptions[0].type = MenuType::Ammo1;
-			CurrentOptions[0].text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[0].invitem].objname);
-			CurrentOptions[1].type = MenuType::Ammo2;
-			CurrentOptions[1].text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[1].invitem].objname);
+			CurrentOptions[0].Type = MenuType::Ammo1;
+			CurrentOptions[0].Text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[0].InventoryItem].ObjectName);
+			CurrentOptions[1].Type = MenuType::Ammo2;
+			CurrentOptions[1].Text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[1].InventoryItem].ObjectName);
 			n = 2;
 
-			options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem].opts;
+			options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
 
 			if (options & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
 			{
 				n = 3;
-				CurrentOptions[2].type = MenuType::Ammo3;
-				CurrentOptions[2].text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[2].invitem].objname);
+				CurrentOptions[2].Type = MenuType::Ammo3;
+				CurrentOptions[2].Text = g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[2].InventoryItem].ObjectName);
 			}
 
 			CurrentSelectedOption = *CurrentAmmoType;
@@ -2072,20 +2072,20 @@ void GuiController::DoInventory()
 			{
 				if (i == CurrentSelectedOption)
 				{
-					g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					yPos += LINE_HEIGHT;
 				}
 				else
 				{
-					g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.DrawString(PHD_CENTER_X, yPos, CurrentOptions[i].Text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					yPos += LINE_HEIGHT;
 				}
 			}
 		}
 
 		if (MenuActive &&
-			!Rings[(int)RingTypes::Inventory]->objlistmovement &&
-			!Rings[(int)RingTypes::Ammo]->objlistmovement)
+			!Rings[(int)RingTypes::Inventory]->ObjectListMovement &&
+			!Rings[(int)RingTypes::Ammo]->ObjectListMovement)
 		{
 			if (GUI_INPUT_PULSE_UP)
 			{
@@ -2133,13 +2133,13 @@ void GuiController::DoInventory()
 
 			if (GUI_INPUT_SELECT)
 			{
-				if (CurrentOptions[CurrentSelectedOption].type != MenuType::Equip && CurrentOptions[CurrentSelectedOption].type != MenuType::Use)
+				if (CurrentOptions[CurrentSelectedOption].Type != MenuType::Equip && CurrentOptions[CurrentSelectedOption].Type != MenuType::Use)
 					SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 
-				switch (CurrentOptions[CurrentSelectedOption].type)
+				switch (CurrentOptions[CurrentSelectedOption].Type)
 				{
 				case MenuType::ChooseAmmo:
-					Rings[(int)RingTypes::Inventory]->ringactive = 0;
+					Rings[(int)RingTypes::Inventory]->RingActive = 0;
 					AmmoActive = 1;
 					Ammo.StashedCurrentSelectedOption = CurrentSelectedOption;
 					Ammo.StashedCurrentPistolsAmmoType = Ammo.CurrentPistolsAmmoType;
@@ -2175,14 +2175,14 @@ void GuiController::DoInventory()
 				case MenuType::Ammo2:
 				case MenuType::Ammo3:
 					AmmoActive = 0;
-					Rings[(int)RingTypes::Inventory]->ringactive = 1;
+					Rings[(int)RingTypes::Inventory]->RingActive = 1;
 					CurrentSelectedOption = 0;
 					break;
 
 				case MenuType::Combine:
 					ConstructCombineObjectList();
-					Rings[(int)RingTypes::Inventory]->ringactive = 0;
-					Rings[(int)RingTypes::Ammo]->ringactive = 1;
+					Rings[(int)RingTypes::Inventory]->RingActive = 0;
+					Rings[(int)RingTypes::Ammo]->RingActive = 1;
 					AmmoSelectorFlag = 0;
 					MenuActive = 0;
 					CombineRingFadeDir = 1;
@@ -2210,7 +2210,7 @@ void GuiController::DoInventory()
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 				AmmoActive = 0;
-				Rings[(int)RingTypes::Inventory]->ringactive = 1;
+				Rings[(int)RingTypes::Inventory]->RingActive = 1;
 				Ammo.CurrentPistolsAmmoType = Ammo.StashedCurrentPistolsAmmoType;
 				Ammo.CurrentUziAmmoType = Ammo.StashedCurrentUziAmmoType;
 				Ammo.CurrentRevolverAmmoType = Ammo.StashedCurrentRevolverAmmoType;
@@ -2303,7 +2303,7 @@ void GuiController::SpinBack(unsigned short* angle)
 void GuiController::DrawAmmoSelector()
 {
 	int n;
-	unsigned short xrot, yrot, zrot;
+	unsigned short XRot, YRot, ZRot;
 	InventoryObject* objme;
 	char invTextBuffer[256];
 	int x, y;
@@ -2322,52 +2322,52 @@ void GuiController::DrawAmmoSelector()
 	{
 		for (n = 0; n < NumAmmoSlots; n++)
 		{
-			objme = &InventoryObjectTable[AmmoObjectList[n].invitem];
+			objme = &InventoryObjectTable[AmmoObjectList[n].InventoryItem];
 
 			if (n == *CurrentAmmoType)
 			{
-				if (objme->rot_flags & INV_ROT_X)
-					AmmoObjectList[n].xrot += ANGLE(5.0f);
+				if (objme->RotFlags & INV_ROT_X)
+					AmmoObjectList[n].XRot += ANGLE(5.0f);
 
-				if (objme->rot_flags & INV_ROT_Y)
-					AmmoObjectList[n].yrot += ANGLE(5.0f);
+				if (objme->RotFlags & INV_ROT_Y)
+					AmmoObjectList[n].YRot += ANGLE(5.0f);
 
-				if (objme->rot_flags & INV_ROT_Z)
-					AmmoObjectList[n].zrot += ANGLE(5.0f);
+				if (objme->RotFlags & INV_ROT_Z)
+					AmmoObjectList[n].ZRot += ANGLE(5.0f);
 			}
 			else
 			{
-				SpinBack(&AmmoObjectList[n].xrot);
-				SpinBack(&AmmoObjectList[n].yrot);
-				SpinBack(&AmmoObjectList[n].zrot);
+				SpinBack(&AmmoObjectList[n].XRot);
+				SpinBack(&AmmoObjectList[n].YRot);
+				SpinBack(&AmmoObjectList[n].ZRot);
 			}
 
-			xrot = AmmoObjectList[n].xrot;
-			yrot = AmmoObjectList[n].yrot;
-			zrot = AmmoObjectList[n].zrot;
+			XRot = AmmoObjectList[n].XRot;
+			YRot = AmmoObjectList[n].YRot;
+			ZRot = AmmoObjectList[n].ZRot;
 			x = PHD_CENTER_X - 300 + xPos;
 			y = 480;
-			short obj = ConvertInventoryItemToObject(AmmoObjectList[n].invitem);
-			float scaler = InventoryObjectTable[AmmoObjectList[n].invitem].scale1;
+			short obj = ConvertInventoryItemToObject(AmmoObjectList[n].InventoryItem);
+			float scaler = InventoryObjectTable[AmmoObjectList[n].InventoryItem].Scale1;
 
 			if (n == *CurrentAmmoType)
 			{
-				if (AmmoObjectList[n].amount == -1)
-					sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].invitem].objname));
+				if (AmmoObjectList[n].Amount == -1)
+					sprintf(&invTextBuffer[0], "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 				else
-					sprintf(&invTextBuffer[0], "%d x %s", AmmoObjectList[n].amount, g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].invitem].objname));
+					sprintf(&invTextBuffer[0], "%d x %s", AmmoObjectList[n].Amount, g_GameFlow->GetString(InventoryObjectTable[AmmoObjectList[n].InventoryItem].ObjectName));
 
 				if (AmmoSelectorFadeVal)
 					g_Renderer.DrawString(PHD_CENTER_X, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 				
 				if (n == *CurrentAmmoType)
-					g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
+					g_Renderer.DrawObjectOn2DPosition(x, y, obj, XRot, YRot, ZRot, scaler);
 				else
-					g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
+					g_Renderer.DrawObjectOn2DPosition(x, y, obj, XRot, YRot, ZRot, scaler);
 			}
 			else
-				g_Renderer.DrawObjectOn2DPosition(x, y, obj, xrot, yrot, zrot, scaler);
+				g_Renderer.DrawObjectOn2DPosition(x, y, obj, XRot, YRot, ZRot, scaler);
 
 			xPos += OBJLIST_SPACING;
 		}
@@ -2377,7 +2377,7 @@ void GuiController::DrawAmmoSelector()
 void GuiController::DrawCurrentObjectList(int ringIndex)
 {
 	char textbufme[128];
-	unsigned short xrot, yrot, zrot;
+	unsigned short XRot, YRot, ZRot;
 
 	if (Rings[ringIndex]->CurrentObjectList <= 0)
 		return;
@@ -2411,13 +2411,13 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 					NormalRingFadeDir = 2;
 				else
 				{
-					Rings[(int)RingTypes::Inventory]->ringactive = 1;
+					Rings[(int)RingTypes::Inventory]->RingActive = 1;
 					MenuActive = 1;
-					Rings[(int)RingTypes::Ammo]->ringactive = 0;
+					Rings[(int)RingTypes::Ammo]->RingActive = 0;
 					HandleObjectChangeover((int)RingTypes::Inventory);
 				}
 
-				Rings[(int)RingTypes::Ammo]->ringactive = 0;
+				Rings[(int)RingTypes::Ammo]->RingActive = 0;
 			}
 		}
 	}
@@ -2430,7 +2430,7 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 		{
 			NormalRingFadeVal = 128;
 			NormalRingFadeDir = 0;
-			Rings[(int)RingTypes::Inventory]->ringactive = 1;
+			Rings[(int)RingTypes::Inventory]->RingActive = 1;
 			MenuActive = 1;
 		}
 
@@ -2456,7 +2456,7 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 				SetupObjectListStartPosition(CombineObject1);
 			}
 			else if (SeperateTypeFlag)
-				SeparateObject(Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem);
+				SeparateObject(Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem);
 
 			HandleObjectChangeover((int)RingTypes::Inventory);
 		}
@@ -2467,34 +2467,34 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 	int xOffset = 0;
 	int n = 0;
 
-	if (Rings[ringIndex]->numobjectsinlist != 1)
-		xOffset = (OBJLIST_SPACING * Rings[ringIndex]->objlistmovement) >> 16;
+	if (Rings[ringIndex]->NumObjectsInList != 1)
+		xOffset = (OBJLIST_SPACING * Rings[ringIndex]->ObjectListMovement) >> 16;
 
-	if (Rings[ringIndex]->numobjectsinlist == 2)
+	if (Rings[ringIndex]->NumObjectsInList == 2)
 	{
 		minObj = -1;
 		maxObj = 0;
-		n = Rings[ringIndex]->curobjinlist - 1;
+		n = Rings[ringIndex]->CurrentObjectInList - 1;
 	}
 
-	if (Rings[ringIndex]->numobjectsinlist == 3 || Rings[ringIndex]->numobjectsinlist == 4)
+	if (Rings[ringIndex]->NumObjectsInList == 3 || Rings[ringIndex]->NumObjectsInList == 4)
 	{
 		minObj = -2;
 		maxObj = 1;
-		n = Rings[ringIndex]->curobjinlist - 2;
+		n = Rings[ringIndex]->CurrentObjectInList - 2;
 	}
 
-	if (Rings[ringIndex]->numobjectsinlist >= 5)
+	if (Rings[ringIndex]->NumObjectsInList >= 5)
 	{
 		minObj = -3;
 		maxObj = 2;
-		n = Rings[ringIndex]->curobjinlist - 3;
+		n = Rings[ringIndex]->CurrentObjectInList - 3;
 	}
 
 	if (n < 0)
-		n += Rings[ringIndex]->numobjectsinlist;
+		n += Rings[ringIndex]->NumObjectsInList;
 
-	if (Rings[ringIndex]->objlistmovement < 0)
+	if (Rings[ringIndex]->ObjectListMovement < 0)
 		maxObj++;
 
 	if (minObj <= maxObj)
@@ -2505,10 +2505,10 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 
 			if (minObj == i)
 			{
-				if (Rings[ringIndex]->objlistmovement < 0)
+				if (Rings[ringIndex]->ObjectListMovement < 0)
 					shade = 0;
 				else
-					shade = Rings[ringIndex]->objlistmovement >> 9;
+					shade = Rings[ringIndex]->ObjectListMovement >> 9;
 			}
 			else if (i != minObj + 1 || maxObj == minObj + 1)
 			{
@@ -2516,16 +2516,16 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 					shade = 128;
 				else
 				{
-					if (Rings[ringIndex]->objlistmovement < 0)
-						shade = (-128 * Rings[ringIndex]->objlistmovement) >> 16;
+					if (Rings[ringIndex]->ObjectListMovement < 0)
+						shade = (-128 * Rings[ringIndex]->ObjectListMovement) >> 16;
 					else
-						shade = 128 - (short)(Rings[ringIndex]->objlistmovement >> 9);
+						shade = 128 - (short)(Rings[ringIndex]->ObjectListMovement >> 9);
 				}
 			}
 			else
 			{
-				if (Rings[ringIndex]->objlistmovement < 0)
-					shade = 128 - ((-128 * Rings[ringIndex]->objlistmovement) >> 16);
+				if (Rings[ringIndex]->ObjectListMovement < 0)
+					shade = 128 - ((-128 * Rings[ringIndex]->ObjectListMovement) >> 16);
 				else
 					shade = 128;
 			}
@@ -2543,7 +2543,7 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 				int numMeUp = 0;
 				int count = 0;
 
-				switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number)
+				switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber)
 				{
 				case ID_BIGMEDI_ITEM:
 					numMeUp = Lara.Inventory.TotalLargeMedipacks;
@@ -2558,10 +2558,10 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 					break;
 
 				default:
-					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-						InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number > ID_PUZZLE_ITEM16)
+					if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
+						InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
 					{
-						switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number)
+						switch (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber)
 						{
 						case ID_SHOTGUN_AMMO1_ITEM:
 							count = Lara.Weapons[(int)LaraWeaponType::Shotgun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
@@ -2626,29 +2626,29 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 					}
 					else
 					{
-						numMeUp = Lara.Inventory.Puzzles[InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number - ID_PUZZLE_ITEM1];
+						numMeUp = Lara.Inventory.Puzzles[InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber - ID_PUZZLE_ITEM1];
 
 						if (numMeUp <= 1)
-							sprintf(textbufme, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
+							sprintf(textbufme, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
 						else
-							sprintf(textbufme, "%d x %s", numMeUp, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
+							sprintf(textbufme, "%d x %s", numMeUp, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
 					}
 
 					break;
 				}
 
-				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number < ID_PUZZLE_ITEM1 ||
-					InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].object_number > ID_PUZZLE_ITEM16)
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber < ID_PUZZLE_ITEM1 ||
+					InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectNumber > ID_PUZZLE_ITEM16)
 				{
 					if (numMeUp)
 					{
 						if (numMeUp == -1)
-							sprintf(textbufme, "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
+							sprintf(textbufme, "Unlimited %s", g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
 						else
-							sprintf(textbufme, "%d x %s", numMeUp, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
+							sprintf(textbufme, "%d x %s", numMeUp, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
 					}
 					else
-						sprintf(textbufme, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].objname));
+						sprintf(textbufme, g_GameFlow->GetString(InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].ObjectName));
 				}
 
 				int objmeup;
@@ -2660,32 +2660,32 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 				g_Renderer.DrawString(PHD_CENTER_X, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
-			if (!i && !Rings[ringIndex]->objlistmovement)
+			if (!i && !Rings[ringIndex]->ObjectListMovement)
 			{
-				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].rot_flags & INV_ROT_X)
-					Rings[ringIndex]->CurrentObjectList[n].xrot += ANGLE(5.0f);
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_X)
+					Rings[ringIndex]->CurrentObjectList[n].XRot += ANGLE(5.0f);
 
-				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].rot_flags & INV_ROT_Y)
-					Rings[ringIndex]->CurrentObjectList[n].yrot += ANGLE(5.0f);
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Y)
+					Rings[ringIndex]->CurrentObjectList[n].YRot += ANGLE(5.0f);
 
-				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].rot_flags & INV_ROT_Z)
-					Rings[ringIndex]->CurrentObjectList[n].zrot += ANGLE(5.0f);
+				if (InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].RotFlags & INV_ROT_Z)
+					Rings[ringIndex]->CurrentObjectList[n].ZRot += ANGLE(5.0f);
 			}
 			else
 			{
-				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].xrot);
-				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].yrot);
-				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].zrot);
+				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].XRot);
+				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].YRot);
+				SpinBack(&Rings[ringIndex]->CurrentObjectList[n].ZRot);
 			}
 
-			xrot = Rings[ringIndex]->CurrentObjectList[n].xrot;
-			yrot = Rings[ringIndex]->CurrentObjectList[n].yrot;
-			zrot = Rings[ringIndex]->CurrentObjectList[n].zrot;
+			XRot = Rings[ringIndex]->CurrentObjectList[n].XRot;
+			YRot = Rings[ringIndex]->CurrentObjectList[n].YRot;
+			ZRot = Rings[ringIndex]->CurrentObjectList[n].ZRot;
 
 			int activeNum = 0;
-			if (Rings[ringIndex]->objlistmovement)
+			if (Rings[ringIndex]->ObjectListMovement)
 			{
-				if (Rings[ringIndex]->objlistmovement > 0)
+				if (Rings[ringIndex]->ObjectListMovement > 0)
 					activeNum = -1;
 				else
 					activeNum = 1;
@@ -2693,49 +2693,49 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 
 			if (i == activeNum)
 			{
-				if (Rings[ringIndex]->CurrentObjectList[n].bright < 160)
-					Rings[ringIndex]->CurrentObjectList[n].bright += 16;
+				if (Rings[ringIndex]->CurrentObjectList[n].Bright < 160)
+					Rings[ringIndex]->CurrentObjectList[n].Bright += 16;
 
-				if (Rings[ringIndex]->CurrentObjectList[n].bright > 160)
-					Rings[ringIndex]->CurrentObjectList[n].bright = 160;
+				if (Rings[ringIndex]->CurrentObjectList[n].Bright > 160)
+					Rings[ringIndex]->CurrentObjectList[n].Bright = 160;
 			}
 			else
 			{
-				if (Rings[ringIndex]->CurrentObjectList[n].bright > 32)
-					Rings[ringIndex]->CurrentObjectList[n].bright -= 16;
+				if (Rings[ringIndex]->CurrentObjectList[n].Bright > 32)
+					Rings[ringIndex]->CurrentObjectList[n].Bright -= 16;
 
-				if (Rings[ringIndex]->CurrentObjectList[n].bright < 32)
-					Rings[ringIndex]->CurrentObjectList[n].bright = 32;
+				if (Rings[ringIndex]->CurrentObjectList[n].Bright < 32)
+					Rings[ringIndex]->CurrentObjectList[n].Bright = 32;
 			}
 
 			int x, y, y2;
 			x = 400 + xOffset + i * OBJLIST_SPACING;
 			y = 150;
 			y2 = 480;//combine 
-			short obj = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].invitem);
-			float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].invitem].scale1;
-			g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, xrot, yrot, zrot, scaler);
+			short obj = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
+			float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
+			g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, XRot, YRot, ZRot, scaler);
 
-			if (++n >= Rings[ringIndex]->numobjectsinlist)
+			if (++n >= Rings[ringIndex]->NumObjectsInList)
 				n = 0;
 		}
 
-		if (Rings[ringIndex]->ringactive)
+		if (Rings[ringIndex]->RingActive)
 		{
-			if (Rings[ringIndex]->numobjectsinlist != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
+			if (Rings[ringIndex]->NumObjectsInList != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
 			{
-				if (Rings[ringIndex]->objlistmovement > 0)
-					Rings[ringIndex]->objlistmovement += 8192;
+				if (Rings[ringIndex]->ObjectListMovement > 0)
+					Rings[ringIndex]->ObjectListMovement += 8192;
 
-				if (Rings[ringIndex]->objlistmovement < 0)
-					Rings[ringIndex]->objlistmovement -= 8192;
+				if (Rings[ringIndex]->ObjectListMovement < 0)
+					Rings[ringIndex]->ObjectListMovement -= 8192;
 
 				if (IsHeld(In::Left))
 				{
-					if (!Rings[ringIndex]->objlistmovement)
+					if (!Rings[ringIndex]->ObjectListMovement)
 					{
 						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-						Rings[ringIndex]->objlistmovement += 8192;
+						Rings[ringIndex]->ObjectListMovement += 8192;
 
 						if (AmmoSelectorFlag)
 							AmmoSelectorFadeDir = 2;
@@ -2744,10 +2744,10 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 
 				if (IsHeld(In::Right))
 				{
-					if (!Rings[ringIndex]->objlistmovement)
+					if (!Rings[ringIndex]->ObjectListMovement)
 					{
 						SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-						Rings[ringIndex]->objlistmovement -= 8192;
+						Rings[ringIndex]->ObjectListMovement -= 8192;
 
 						if (AmmoSelectorFlag)
 							AmmoSelectorFadeDir = 2;
@@ -2755,16 +2755,16 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 
 				}
 
-				if (Rings[ringIndex]->objlistmovement < 65536)
+				if (Rings[ringIndex]->ObjectListMovement < 65536)
 				{
-					if (Rings[ringIndex]->objlistmovement < -65535)
+					if (Rings[ringIndex]->ObjectListMovement < -65535)
 					{
-						Rings[ringIndex]->curobjinlist++;
+						Rings[ringIndex]->CurrentObjectInList++;
 
-						if (Rings[ringIndex]->curobjinlist >= Rings[ringIndex]->numobjectsinlist)
-							Rings[ringIndex]->curobjinlist = 0;
+						if (Rings[ringIndex]->CurrentObjectInList >= Rings[ringIndex]->NumObjectsInList)
+							Rings[ringIndex]->CurrentObjectInList = 0;
 
-						Rings[ringIndex]->objlistmovement = 0;
+						Rings[ringIndex]->ObjectListMovement = 0;
 
 						if (ringIndex == (int)RingTypes::Inventory)
 							HandleObjectChangeover(0);
@@ -2772,12 +2772,12 @@ void GuiController::DrawCurrentObjectList(int ringIndex)
 				}
 				else
 				{
-					Rings[ringIndex]->curobjinlist--;
+					Rings[ringIndex]->CurrentObjectInList--;
 
-					if (Rings[ringIndex]->curobjinlist < 0)
-						Rings[ringIndex]->curobjinlist = Rings[ringIndex]->numobjectsinlist - 1;
+					if (Rings[ringIndex]->CurrentObjectInList < 0)
+						Rings[ringIndex]->CurrentObjectInList = Rings[ringIndex]->NumObjectsInList - 1;
 
-					Rings[ringIndex]->objlistmovement = 0;
+					Rings[ringIndex]->ObjectListMovement = 0;
 
 					if (ringIndex == (int)RingTypes::Inventory)
 						HandleObjectChangeover(0);
@@ -2883,7 +2883,7 @@ bool GuiController::CallInventory(bool resetMode)
 		Camera.numberFrames = g_Renderer.SyncRenderer();
 	}
 
-	LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->curobjinlist].invitem;
+	LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 	UpdateWeaponStatus();
 
 	if (UseItem)
@@ -2922,7 +2922,7 @@ void GuiController::DrawCompass()
 	// TODO
 	return;
 
-	g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90.0f), 0, ANGLE(180.0f), InventoryObjectTable[INV_OBJECT_COMPASS].scale1);
+	g_Renderer.DrawObjectOn2DPosition(130, 480, ID_COMPASS_ITEM, ANGLE(90.0f), 0, ANGLE(180.0f), InventoryObjectTable[INV_OBJECT_COMPASS].Scale1);
 	short compassSpeed = phd_sin(CompassNeedleAngle - LaraItem->Pose.Orientation.y);
 	short compassAngle = (LaraItem->Pose.Orientation.y + compassSpeed) - ANGLE(180.0f);
 	Matrix::CreateRotationY(compassAngle);

@@ -462,7 +462,7 @@ namespace TEN::Renderer
 	{
 		g_Gui.DrawCurrentObjectList((int)RingTypes::Inventory);
 
-		if (g_Gui.GetRings((int)RingTypes::Ammo)->ringactive)
+		if (g_Gui.GetRings((int)RingTypes::Ammo)->RingActive)
 			g_Gui.DrawCurrentObjectList((int)RingTypes::Ammo);
 
 		g_Gui.DrawAmmoSelector();
@@ -507,10 +507,10 @@ namespace TEN::Renderer
 		if (index != -1)
 		{
 			auto objme = &InventoryObjectTable[index];
-			y += objme->yoff;
-			rotX += objme->xrot;
-			rotY += objme->yrot;
-			rotZ += objme->zrot;
+			y += objme->YOffset;
+			rotX += objme->XRot;
+			rotY += objme->YRot;
+			rotZ += objme->ZRot;
 		}
 
 		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f),
@@ -644,7 +644,7 @@ namespace TEN::Renderer
 		static float scaler = 1.2f;
 		float saved_scale;
 		short inv_item = g_Gui.GetRings((int)RingTypes::Inventory)->CurrentObjectList[g_Gui.GetRings(
-			(int)RingTypes::Inventory)->curobjinlist].invitem;
+			(int)RingTypes::Inventory)->CurrentObjectInList].InventoryItem;
 		InventoryObject* obj = &InventoryObjectTable[inv_item];
 
 		if (TrInput & IN_LEFT)
@@ -671,18 +671,18 @@ namespace TEN::Renderer
 		if (scaler < 0.8f)
 			scaler = 0.8f;
 
-		saved_scale = obj->scale1;
-		obj->scale1 = scaler;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(inv_item), xrot, yrot, zrot, obj->scale1);
-		obj->scale1 = saved_scale;
+		saved_scale = obj->Scale1;
+		obj->Scale1 = scaler;
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(inv_item), xrot, yrot, zrot, obj->Scale1);
+		obj->Scale1 = saved_scale;
 	}
 
 	void Renderer11::DrawDiary()
 	{
 		InventoryObject* obj = &InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
 		short currentPage = Lara.Inventory.Diary.currentPage;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->xrot,
-			obj->yrot, obj->zrot, obj->scale1);
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->XRot,
+			obj->YRot, obj->ZRot, obj->Scale1);
 
 		for (int i = 0; i < MaxStringsPerPage; i++)
 		{
