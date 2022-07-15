@@ -195,8 +195,10 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 
 	float3 combined = ambTex + diffuse + spec;
 
-	float3 colorMul = min(vertex, 1.0f);
-	combined *= colorMul.xyz;
+	return saturate(combined * vertex);
+}
 
-	return combined;
+float3 StaticLight(float3 ambient, float3 vertex, float3 tex)
+{
+	return saturate(ambient * tex * vertex);
 }
