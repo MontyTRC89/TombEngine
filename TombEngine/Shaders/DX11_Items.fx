@@ -11,24 +11,21 @@ cbuffer ItemBuffer : register(b1)
 	float4x4 Bones[32];
 	float4 ItemPosition;
 	float4 AmbientLight;
-};
-
-cbuffer MiscBuffer : register(b3)
-{
-	int Caustics;
+	int BoneLightModes[32];
 };
 
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
 	float3 Normal: NORMAL;
-	float3 WorldPosition : POSITION;
+	float3 WorldPosition: POSITION;
 	float2 UV: TEXCOORD;
 	float4 Color: COLOR;
-	float Sheen : SHEEN;
-	float3x3 TBN : TBN;
-	float Fog : FOG;
-	float4 PositionCopy : TEXCOORD2;
+	float Sheen: SHEEN;
+	float3x3 TBN: TBN;
+	float Fog: FOG;
+	float4 PositionCopy: TEXCOORD2;
+	int Bone : BONE;
 };
 
 struct PixelShaderOutput
@@ -78,6 +75,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.PositionCopy = output.Position;
     output.Sheen = input.Effects.w;
+	output.Bone = input.Bone;
 	return output;
 }
 
@@ -91,7 +89,10 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	normal = normal * 2 - 1;
 	normal = normalize(mul(input.TBN, normal));
 
-	float3 color = CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen);
+	float3 color = (BoneLightModes[input.Bone] == 0) ?
+		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :
+		StaticLight(AmbientLight.xyz, input.Color.xyz, tex.xyz);
+
 	output.Color = float4(color, tex.w);
 
 	output.Depth = tex.w > 0.0f ?
