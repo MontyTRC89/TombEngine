@@ -286,6 +286,9 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
+	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+		m_stItem.BoneLightModes[k] = GetMesh(Lara.MeshPtrs[k])->LightMode;
+
 	m_cbItem.updateData(m_stItem, m_context.Get());
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -319,16 +322,17 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 		// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
 		m_stItem.World = Matrix::Identity;
-		Matrix matrices[7];
-		matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+		m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+
 		for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 		{
-			HAIR_STRUCT* hairs = &Hairs[0][i];
-			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) * Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-			matrices[i + 1] = world;
+			auto* hairs = &Hairs[0][i];
+			Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
+				Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+			m_stItem.BonesMatrices[i + 1] = world;
+			m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		}
 
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());

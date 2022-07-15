@@ -604,6 +604,7 @@ namespace TEN::Renderer
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
 		m_stItem.AmbientLight = room.AmbientLight;
+		m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_STATIC;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 		BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
@@ -731,6 +732,7 @@ namespace TEN::Renderer
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
 				m_stItem.AmbientLight = room.AmbientLight;
+				m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_STATIC;
 				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
 				BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
@@ -1077,8 +1079,8 @@ namespace TEN::Renderer
 		m_stItem.World = effect->World;
 		m_stItem.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
 		m_stItem.AmbientLight = room.AmbientLight;
-		Matrix matrices[1] = { Matrix::Identity };
-		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix));
+		m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
@@ -1170,7 +1172,9 @@ namespace TEN::Renderer
 				}
 
 				m_stStatic.World = world;
-				m_stStatic.Color = Vector4::One;
+				m_stStatic.Color = deb->color;
+				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 

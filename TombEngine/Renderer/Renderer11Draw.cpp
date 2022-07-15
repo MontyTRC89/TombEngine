@@ -189,7 +189,7 @@ namespace TEN::Renderer
 					shadowLight->Out);
 
 			}
-			else if(shadowLight->Type == LIGHT_TYPE_SPOT) 
+			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
 			{
 				view = Matrix::CreateLookAt(lightPos,
 					lightPos - shadowLight->Direction*10240,
@@ -215,13 +215,16 @@ namespace TEN::Renderer
 			m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
 			m_stItem.AmbientLight = room.AmbientLight;
 			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
+			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = GetMesh(Lara.MeshPtrs[k])->LightMode;
+
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 			{
-				RendererMesh* mesh = GetMesh(Lara.MeshPtrs[k]);
+				auto* mesh = GetMesh(Lara.MeshPtrs[k]);
 
 				for (auto& bucket : mesh->Buckets)
 				{
@@ -278,16 +281,17 @@ namespace TEN::Renderer
 
 			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
 			m_stItem.World = Matrix::Identity;
-			Matrix matrices[7];
-			matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+			m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+
 			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 			{
-				HAIR_STRUCT* hairs = &Hairs[0][i];
+				auto* hairs = &Hairs[0][i];
 				Matrix world = Matrix::CreateFromYawPitchRoll(TO_RAD(hairs->pos.Orientation.y), TO_RAD(hairs->pos.Orientation.x), 0) *
-					Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
-				matrices[i + 1] = world;
+							   Matrix::CreateTranslation(hairs->pos.Position.x, hairs->pos.Position.y, hairs->pos.Position.z);
+				m_stItem.BonesMatrices[i + 1] = world;
+				m_stItem.BoneLightModes[i] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			}
-			memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
+
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -316,8 +320,8 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
-		m_stItem.AmbientLight = room.AmbientLight;
-		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+		m_stStatic.Color = room.AmbientLight;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 
 		BindLights(item->LightsToDraw);
 
@@ -338,9 +342,12 @@ namespace TEN::Renderer
 																 TO_RAD(gunshell->pos.Orientation.z));
 				Matrix world = rotation * translation;
 
-				m_stItem.World = world;
-				m_cbItem.updateData(m_stItem, m_context.Get());
-				BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+				m_stStatic.World = world;
+				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+
+				m_cbStatic.updateData(m_stStatic, m_context.Get());
+				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 				RendererMesh* mesh = moveableObj.ObjectMeshes[0];
 
@@ -550,6 +557,8 @@ namespace TEN::Renderer
 
 			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 			for (int i = 0; i < NUM_RATS; i++)
 			{
@@ -602,6 +611,8 @@ namespace TEN::Renderer
 
 			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 			for (int b = 0; b < mesh->Buckets.size(); b++)
 			{
@@ -652,6 +663,8 @@ namespace TEN::Renderer
 
 			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
@@ -704,6 +717,8 @@ namespace TEN::Renderer
 
 			for (int m = 0; m < MAX_BONES; m++)
 				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
+			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
 			{
@@ -1375,6 +1390,8 @@ namespace TEN::Renderer
 		m_stStatic.World = info->world;
 		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stStatic.Color = info->room->AmbientLight * info->color;
+		m_stStatic.LightMode = m_staticObjects[info->staticMesh->Id]->ObjectMeshes[0]->LightMode;
+
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -1665,6 +1682,9 @@ namespace TEN::Renderer
 		m_stItem.Position = Vector4(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -1716,6 +1736,9 @@ namespace TEN::Renderer
 		m_stItem.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stItem.AmbientLight = info->room->AmbientLight * info->color;
 		memcpy(m_stItem.BonesMatrices, info->item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
+		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
@@ -1847,6 +1870,8 @@ namespace TEN::Renderer
 							m_stStatic.World = msh.World;
 							m_stStatic.Position = Vector4(msh.Position.x, msh.Position.y, msh.Position.z, 1);
 							m_stStatic.Color = msh.AmbientLight;
+							m_stStatic.LightMode = mesh->LightMode;
+
 							m_cbStatic.updateData(m_stStatic, m_context.Get());
 							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 							BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -2166,6 +2191,8 @@ namespace TEN::Renderer
 
 			m_stStatic.World = (rotation * translation);
 			m_stStatic.Color = weather.SkyColor();
+			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -2189,6 +2216,8 @@ namespace TEN::Renderer
 			m_stStatic.World = Matrix::CreateTranslation(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			m_stStatic.Position = Vector4::Zero;
 			m_stStatic.Color = Vector4::One;
+			m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+
 			m_cbStatic.updateData(m_stStatic, m_context.Get());
 			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
@@ -2265,6 +2294,7 @@ namespace TEN::Renderer
 					face.info.texture = bucket.Texture;
 					face.info.room = room;
 					face.info.item = itemToDraw;
+					face.info.color = itemToDraw->AmbientLight;
 					face.info.blendMode = bucket.BlendMode;
 					face.info.bucket = &bucket;
 					room->TransparentFacesToDraw.push_back(face);

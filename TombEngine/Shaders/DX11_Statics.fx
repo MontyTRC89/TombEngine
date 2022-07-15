@@ -10,17 +10,18 @@ cbuffer StaticMatrixBuffer : register(b8)
 	float4x4 World;
 	float4 Position;
 	float4 Color;
+	int LightType;
 };
 
 struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
 	float3 Normal: NORMAL;
-	float3 WorldPosition : POSITION;
+	float3 WorldPosition: POSITION;
 	float2 UV: TEXCOORD1;
 	float4 Color: COLOR;
-	float Sheen : SHEEN;
-	float Fog : FOG;
+	float Sheen: SHEEN;
+	float Fog: FOG;
 	float4 PositionCopy: TEXCOORD2;
 };
 
@@ -38,8 +39,9 @@ PixelShaderInput VS(VertexShaderInput input)
 	PixelShaderInput output;
 
 	float4 worldPosition = (mul(float4(input.Position, 1.0f), World));
+	float3 normal = (mul(float4(input.Normal, 0.0f), World).xyz);
 
-	output.Normal = input.Normal;
+	output.Normal = normal;
 	output.UV = input.UV;
 	output.WorldPosition = worldPosition;
 	
@@ -68,7 +70,10 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	float4 tex = Texture.Sample(Sampler, input.UV);
     DoAlphaTest(tex);
 
-	float3 color = CombineLights(Color.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, input.Normal, input.Sheen);
+	float3 color = (LightType == 0) ?
+		CombineLights(Color.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, input.Normal, input.Sheen) :
+		StaticLight(Color.xyz, input.Color.xyz, tex.xyz);
+
 	output.Color = float4(color, tex.w);
 
 	output.Depth = tex.w > 0.0f ?
