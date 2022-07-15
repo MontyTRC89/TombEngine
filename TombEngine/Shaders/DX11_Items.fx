@@ -5,13 +5,15 @@
 #include "./VertexInput.hlsli"
 #include "./AlphaTestBuffer.hlsli"
 
+#define MAX_BONES 32
+
 cbuffer ItemBuffer : register(b1) 
 {
 	float4x4 World;
-	float4x4 Bones[32];
+	float4x4 Bones[MAX_BONES];
 	float4 ItemPosition;
 	float4 AmbientLight;
-	int BoneLightModes[32];
+	int4 BoneLightModes[MAX_BONES / 4];
 };
 
 struct PixelShaderInput
@@ -89,7 +91,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
 	normal = normal * 2 - 1;
 	normal = normalize(mul(input.TBN, normal));
 
-	float3 color = (BoneLightModes[input.Bone] == 0) ?
+	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :
 		StaticLight(AmbientLight.xyz, input.Color.xyz, tex.xyz);
 
