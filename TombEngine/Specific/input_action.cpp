@@ -3,6 +3,7 @@
 
 #include "Game/control/control.h"
 #include "Renderer/Renderer11.h"
+#include "Specific/clock.h"
 
 using TEN::Renderer::g_Renderer;
 
@@ -15,33 +16,31 @@ namespace TEN::Input
 
 	void InputAction::Update(float value)
 	{
-		static const float frameTime = 1.0f / FPS;
-
 		this->UpdateValue(value);
 
 		if (this->IsClicked())
 		{
 			this->PrevTimeHeld = 0.0f;
-			this->TimeHeld = frameTime;
+			this->TimeHeld = DELTA_TIME;
 			this->TimeInactive = 0.0f;
 		}
 		else if (this->IsReleased())
 		{
 			this->PrevTimeHeld = 0.0f;
 			this->TimeHeld = 0.0f;
-			this->TimeInactive = frameTime;
+			this->TimeInactive = DELTA_TIME;
 		}
 		else if (this->IsHeld())
 		{
 			this->PrevTimeHeld = TimeHeld;
-			this->TimeHeld += frameTime;
+			this->TimeHeld += DELTA_TIME;
 			this->TimeInactive = 0.0f;
 		}
 		else
 		{
 			this->PrevTimeHeld = 0.0f;
 			this->TimeHeld = 0.0f;
-			this->TimeInactive += frameTime;
+			this->TimeInactive += DELTA_TIME;
 		}
 	}
 
@@ -79,8 +78,7 @@ namespace TEN::Input
 		if (!this->IsHeld() || TimeHeld == PrevTimeHeld)
 			return false;
 
-		static const float frameTime = 1.0f / FPS;
-		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, frameTime);
+		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, DELTA_TIME);
 		float activeDelay = (TimeHeld > initialDelayInSeconds) ? delayInSeconds : initialDelayInSeconds;
 
 		float delayTime = std::floor(syncedTimeHeld / activeDelay) * activeDelay;
