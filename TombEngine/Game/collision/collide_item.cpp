@@ -1670,8 +1670,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	}
 
 	collResult = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+
 	if (collResult.RoomNumber != item->RoomNumber)
+	{
+		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, collResult.RoomNumber))
+			Splash(item);
+
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
+	}
 }
 
 void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
