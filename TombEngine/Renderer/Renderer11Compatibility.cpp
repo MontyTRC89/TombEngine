@@ -503,9 +503,9 @@ namespace TEN::Renderer
 							BonesToCheck[0] = jointBone->Parent->Index;
 							BonesToCheck[1] = j;
 
-							for (int b1 = 0; b1 < jointMesh->buckets.size(); b1++)
+							for (int b1 = 0; b1 < jointMesh->Buckets.size(); b1++)
 							{
-								RendererBucket *jointBucket = &jointMesh->buckets[b1];
+								RendererBucket *jointBucket = &jointMesh->Buckets[b1];
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
@@ -518,9 +518,9 @@ namespace TEN::Renderer
 										RendererMesh *skinMesh = objSkin.ObjectMeshes[BonesToCheck[k]];
 										RendererBone *skinBone = objSkin.LinearizedBones[BonesToCheck[k]];
 
-										for (int b2 = 0; b2 < skinMesh->buckets.size(); b2++)
+										for (int b2 = 0; b2 < skinMesh->Buckets.size(); b2++)
 										{
-											RendererBucket *skinBucket = &skinMesh->buckets[b2];
+											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
 												RendererVertex *skinVertex = &moveablesVertices[skinBucket->StartVertex + v2];
@@ -565,9 +565,9 @@ namespace TEN::Renderer
 							RendererMesh* currentMesh = moveable.ObjectMeshes[j];
 							RendererBone* currentBone = moveable.LinearizedBones[j];
 
-							for (int b1 = 0; b1 < currentMesh->buckets.size(); b1++)
+							for (int b1 = 0; b1 < currentMesh->Buckets.size(); b1++)
 							{
-								RendererBucket* currentBucket = &currentMesh->buckets[b1];
+								RendererBucket* currentBucket = &currentMesh->Buckets[b1];
 
 								for (int v1 = 0; v1 < currentBucket->NumVertices; v1++)
 								{
@@ -585,9 +585,9 @@ namespace TEN::Renderer
 
 										if (currentVertex->OriginalIndex < 4)
 										{
-											for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
+											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
-												RendererBucket* parentBucket = &parentMesh->buckets[b2];
+												RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
 													RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
@@ -608,9 +608,9 @@ namespace TEN::Renderer
 										RendererMesh* parentMesh = moveable.ObjectMeshes[j - 1];
 										RendererBone* parentBone = moveable.LinearizedBones[j - 1];
 
-										for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
+										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
-											RendererBucket* parentBucket = &parentMesh->buckets[b2];
+											RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
 												RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
@@ -753,6 +753,7 @@ namespace TEN::Renderer
 		RendererMesh* mesh = new RendererMesh();
 
 		mesh->Sphere = meshPtr->sphere;
+		mesh->LightMode = meshPtr->lightMode;
 
 		if (meshPtr->positions.size() == 0)
 			return mesh;
@@ -869,7 +870,7 @@ namespace TEN::Renderer
 				bucket.Polygons.push_back(newPoly);
 			}
 
-			mesh->buckets.push_back(bucket);
+			mesh->Buckets.push_back(bucket);
 		}
 
 		m_meshes.push_back(mesh);

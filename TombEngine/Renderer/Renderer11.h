@@ -113,8 +113,9 @@ namespace TEN::Renderer
 
 	struct RendererMesh
 	{
+		LIGHT_MODES LightMode;
 		BoundingSphere Sphere;
-		std::vector<RendererBucket> buckets;
+		std::vector<RendererBucket> Buckets;
 		std::vector<Vector3> Positions;
 	};
 
@@ -196,9 +197,9 @@ namespace TEN::Renderer
 
 	struct RendererLine3D
 	{
-		Vector3 start;
-		Vector3 end;
-		Vector4 color;
+		Vector3 Start;
+		Vector3 End;
+		Vector4 Color;
 	};
 
 	struct RendererLine2D

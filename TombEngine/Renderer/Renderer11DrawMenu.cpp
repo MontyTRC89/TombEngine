@@ -579,7 +579,7 @@ namespace TEN::Renderer
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-			for (auto& bucket : mesh->buckets)
+			for (auto& bucket : mesh->Buckets)
 			{
 				if (bucket.NumVertices == 0)
 					continue;
