@@ -71,7 +71,7 @@ PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
     DoAlphaTest(tex);
 
 	float3 color = (LightType == 0) ?
-		CombineLights(Color.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, input.Normal, input.Sheen) :
+		CombineLights(Color.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normalize(input.Normal), input.Sheen) :
 		StaticLight(Color.xyz, input.Color.xyz, tex.xyz);
 
 	output.Color = float4(color, tex.w);
