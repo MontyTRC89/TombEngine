@@ -606,11 +606,7 @@ namespace TEN::Renderer
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-		m_stLights.NumLights = item->LightsToDraw.size();
-		for (int j = 0; j < item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 
 		short length = 0;
 		short zOffset = 0;
@@ -737,11 +733,7 @@ namespace TEN::Renderer
 				m_stItem.AmbientLight = room.AmbientLight;
 				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-				m_stLights.NumLights = item->LightsToDraw.size();
-				for (int j = 0; j < item->LightsToDraw.size(); j++)
-					memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-				m_cbLights.updateData(m_stLights, m_context.Get());
-				BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+				BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 
 				SetBlendMode(BLENDMODE_ADDITIVE);
 				
@@ -1090,11 +1082,7 @@ namespace TEN::Renderer
 		m_cbItem.updateData(m_stItem, m_context.Get());
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 
-		m_stLights.NumLights = effect->LightsToDraw.size();
-		for (int j = 0; j < effect->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], effect->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(effect->LightsToDraw);
 
 		if (transparent)
 		{
