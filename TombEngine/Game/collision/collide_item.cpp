@@ -1850,13 +1850,14 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	if (!TestCollision(item, laraItem))
 		return;
 
-	if (coll->Setup.EnableObjectPush ||
-		Lara.Control.WaterStatus == WaterStatus::Underwater ||
-		Lara.Control.WaterStatus == WaterStatus::TreadWater)
+	bool playerCollision = laraItem->IsLara();
+	bool waterPlayerCollision = playerCollision && GetLaraInfo(laraItem)->Control.WaterStatus >= WaterStatus::TreadWater;
+
+	if (waterPlayerCollision || coll->Setup.EnableObjectPush)
 	{
 		ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
 	}
-	else if (laraItem->IsLara() && coll->Setup.EnableSpasm)
+	else if (playerCollision && coll->Setup.EnableSpasm)
 	{
 		int x = laraItem->Pose.Position.x - item->Pose.Position.x;
 		int z = laraItem->Pose.Position.z - item->Pose.Position.z;
