@@ -319,11 +319,7 @@ namespace TEN::Renderer
 		m_stItem.AmbientLight = room.AmbientLight;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
 
-		m_stLights.NumLights = item->LightsToDraw.size();
-		for (int j = 0; j < item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(item->LightsToDraw);
 
 		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
@@ -1288,11 +1284,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 		BindConstantBufferPS(CB_SHADOW_LIGHT, m_cbShadowMap.get());
 
-		m_stLights.NumLights = view.lightsToDraw.size();
-		for (int j = 0; j < view.lightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(view.lightsToDraw);
 
 		m_stMisc.Caustics = (nativeRoom->flags & ENV_FLAG_WATER);
 		m_cbMisc.updateData(m_stMisc, m_context.Get());
@@ -1386,6 +1378,8 @@ namespace TEN::Renderer
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
+		BindLights(info->staticMesh->LightsToDraw);
 
 		SetBlendMode(info->blendMode);
 		
@@ -1676,11 +1670,7 @@ namespace TEN::Renderer
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		// Bind lights touching that item
-		m_stLights.NumLights = item->LightsToDraw.size();
-		for (int j = 0; j < m_stLights.NumLights; j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(item->LightsToDraw);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
@@ -1730,11 +1720,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-		m_stLights.NumLights = info->item->LightsToDraw.size();
-		for (int j = 0; j < info->item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], info->item->LightsToDraw[j], sizeof(ShaderLight));
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindLights(info->item->LightsToDraw);
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),
@@ -1811,13 +1797,6 @@ namespace TEN::Renderer
 		{
 			for (auto msh : room->StaticsToDraw)
 			{
-				m_stStatic.World = msh.World;
-				m_stStatic.Position = Vector4(msh.Position.x, msh.Position.y, msh.Position.z, 1);
-				m_stStatic.Color = msh.AmbientLight;
-				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
 				RendererObject& staticObj = *m_staticObjects[msh.Id];
 
 				if (staticObj.ObjectMeshes.size() > 0)
@@ -1854,10 +1833,10 @@ namespace TEN::Renderer
 								face.info.animated = bucket.Animated;
 								face.info.texture = bucket.Texture;
 								face.info.room = room;
-								face.info.staticMesh = msh;
+								face.info.staticMesh = &msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = Vector3(msh->pos.Position.x, msh->pos.Position.y, msh->pos.Position.z);
-								face.info.color = Vector4(msh->color.x, msh->color.y, msh->color.z, 1.0f);
+								face.info.position = Vector3(msh.Position.x, msh.Position.y, msh.Position.z);
+								face.info.color = Vector4(msh.AmbientLight.x, msh.AmbientLight.y, msh.AmbientLight.z, msh.AmbientLight.w);
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
 								room->TransparentFacesToDraw.push_back(face);
@@ -1865,6 +1844,15 @@ namespace TEN::Renderer
 						}
 						else
 						{
+							m_stStatic.World = msh.World;
+							m_stStatic.Position = Vector4(msh.Position.x, msh.Position.y, msh.Position.z, 1);
+							m_stStatic.Color = msh.AmbientLight;
+							m_cbStatic.updateData(m_stStatic, m_context.Get());
+							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+							BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
+							BindLights(msh.LightsToDraw);
+
 							int passes = bucket.BlendMode == BLENDMODE_ALPHATEST ? 2 : 1;
 
 							for (int pass = 0; pass < passes; pass++)
@@ -1949,11 +1937,7 @@ namespace TEN::Renderer
 			Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			Vector3 roomPosition = Vector3(nativeRoom->x, nativeRoom->y, nativeRoom->z);
 
-			m_stLights.NumLights = view.lightsToDraw.size();
-			for (int j = 0; j < view.lightsToDraw.size(); j++)
-				memcpy(&m_stLights.Lights[j], view.lightsToDraw[j], sizeof(ShaderLight));
-			m_cbLights.updateData(m_stLights, m_context.Get());
-			BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+			BindLights(view.lightsToDraw);
 
 			// TODO: make caustics optional in Tomb Editor
 			m_stMisc.Caustics = false; // (nativeRoom->flags & ENV_FLAG_WATER);
