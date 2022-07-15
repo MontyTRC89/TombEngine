@@ -47,11 +47,11 @@ namespace TEN::Input
 
 		// Additional input actions without direct key relation
 
-		IN_SAVE		  = (1 << KEY_COUNT + 0),
-		IN_LOAD		  = (1 << KEY_COUNT + 1),
-		IN_SELECT	  = (1 << KEY_COUNT + 2),
-		IN_DESELECT   = (1 << KEY_COUNT + 3),
-		IN_LOOKSWITCH = (1 << KEY_COUNT + 4)
+		IN_SAVE		  = (1 << (KEY_COUNT + 0)),
+		IN_LOAD		  = (1 << (KEY_COUNT + 1)),
+		IN_SELECT	  = (1 << (KEY_COUNT + 2)),
+		IN_DESELECT   = (1 << (KEY_COUNT + 3)),
+		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
 	};
 
 	enum InputAxis
@@ -85,17 +85,30 @@ namespace TEN::Input
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
-	constexpr int IN_OPTIC_CONTROLS = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT);
-	constexpr int IN_WAKE = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION);
-	constexpr int IN_DIRECTION = (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT);
+	// Temporary input constants for use with vehicles.
+	constexpr int VEHICLE_IN_UP			= IN_FORWARD;
+	constexpr int VEHICLE_IN_DOWN		= IN_BACK;
+	constexpr int VEHICLE_IN_LEFT		= IN_LEFT;
+	constexpr int VEHICLE_IN_RIGHT		= IN_RIGHT;
+	constexpr int VEHICLE_IN_ACCELERATE = IN_ACTION;
+	constexpr int VEHICLE_IN_REVERSE	= IN_BACK;
+	constexpr int VEHICLE_IN_SPEED		= IN_SPRINT;
+	constexpr int VEHICLE_IN_SLOW		= IN_WALK;
+	constexpr int VEHICLE_IN_BRAKE		= IN_JUMP;
+	constexpr int VEHICLE_IN_FIRE		= IN_DRAW | IN_CROUCH;
+	constexpr int VEHICLE_IN_DISMOUNT	= IN_JUMP | IN_ROLL;
+
+	constexpr int IN_OPTIC_CONTROLS = IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT;
+	constexpr int IN_WAKE			= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION;
+	constexpr int IN_DIRECTION		= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT;
 
 	extern const char* g_KeyNames[];
-	extern int TrInput;
-	extern int DbInput;
-	extern int RawInput;
+	extern int DbInput;  // Debounce; is input clicked?
+	extern int TrInput;  // Throttle; is input held?
+	extern int RawInput; // Throttle for binocular input.
 
-	extern std::vector<bool>   KeyMap;
-	extern std::vector<float>  AxisMap;
+	extern std::vector<bool>  KeyMap;
+	extern std::vector<float> AxisMap;
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 

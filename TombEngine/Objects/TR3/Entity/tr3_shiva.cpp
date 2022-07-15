@@ -466,8 +466,8 @@ namespace TEN::Entities::TR3
 				ItemNewRoom(Lara.ItemNumber, item->RoomNumber);
 
 			LaraItem->Pose.Position = item->Pose.Position;
-			LaraItem->Pose.Orientation.Set(0.0f, item->Pose.Orientation.GetY(), 0.0f);
-			LaraItem->Animation.Airborne = false;
+			LaraItem->Pose.Orientation = EulerAngles(0.0f, item->Pose.Orientation.y, 0.0f);
+			LaraItem->Animation.IsAirborne = false;
 
 			LaraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_SHIVA_DEATH;
 			LaraItem->Animation.FrameNumber = g_Level.Anims[LaraItem->Animation.AnimNumber].frameBase;

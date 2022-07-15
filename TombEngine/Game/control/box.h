@@ -167,7 +167,7 @@ void CreatureFloat(short itemNumber);
 void CreatureJoint(ItemInfo* item, short joint, float required);
 void CreatureTilt(ItemInfo* item, float angle);
 float CreatureTurn(ItemInfo* item, float maxTurn);
-void CreatureDie(short itemNumber, int explode);
+void CreatureDie(short itemNumber, bool explode);
 int BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 float CreatureCreature(short itemNumber);
 int ValidBox(ItemInfo* item, short zoneNumber, short boxNumber);

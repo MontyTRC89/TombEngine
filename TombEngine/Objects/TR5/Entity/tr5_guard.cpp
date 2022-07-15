@@ -127,10 +127,10 @@ void InitialiseGuard(short itemNum)
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
 			if (roomItemNumber != NO_ITEM)
 			{
-				ItemInfo* item2;
+				ItemInfo* item2 = nullptr;
 				while (true)
 				{
-					auto* item2 = &g_Level.Items[roomItemNumber];
+					item2 = &g_Level.Items[roomItemNumber];
 					if (item2->ObjectNumber >= ID_ANIMATING1 &&
 						item2->ObjectNumber <= ID_ANIMATING15 &&
 						item2->RoomNumber == item->RoomNumber &&
@@ -412,8 +412,9 @@ void GuardControl(short itemNumber)
 
 		creature->MaxTurn = 0;
 
-		ItemInfo* currentItem;
+		ItemInfo* currentItem = nullptr;
 		short currentItemNumber;
+
 		switch (item->Animation.ActiveState)
 		{
 		case GUARD_STATE_IDLE:
@@ -722,7 +723,8 @@ void GuardControl(short itemNumber)
 
 				while (true)
 				{
-					auto* currentItem = &g_Level.Items[currentItemNumber];
+					currentItem = &g_Level.Items[currentItemNumber];
+
 					if (currentItem->ObjectNumber >= ID_ANIMATING1 &&
 						currentItem->ObjectNumber <= ID_ANIMATING15 &&
 						currentItem->RoomNumber == item->RoomNumber)
@@ -792,7 +794,7 @@ void GuardControl(short itemNumber)
 			break;
 
 		case GUARD_STATE_START_USE_COMPUTER:
-			currentItem = NULL;
+			currentItem = nullptr;
 
 			for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->NextItem)
 			{
@@ -801,6 +803,7 @@ void GuardControl(short itemNumber)
 				if (item->ObjectNumber == ID_PUZZLE_HOLE8)
 					break;
 			}
+
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				currentItem->MeshBits = 0x1FFF;

@@ -152,7 +152,7 @@ ScriptColor Static::GetColor() const
 	return ScriptColor{ m_mesh.color };
 }
 
-void Static::SetColor(ScriptColor const & col)
+void Static::SetColor(ScriptColor const& col)
 {
 	m_mesh.color = col;
 }

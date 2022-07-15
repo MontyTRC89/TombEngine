@@ -5,20 +5,14 @@
 #include "Specific/prng.h"
 
 using namespace TEN::Math::Random;
-
-const float lerp(float v0, float v1, float t)
-{
-	return (1 - t) * v0 + t * v1;
-}
-
-const Vector3 getRandomVector()
+const Vector3 GetRandomVector()
 {
 	auto vector = Vector3(GenerateFloat(-1, 1), GenerateFloat(-1, 1), GenerateFloat(-1, 1));
 	vector.Normalize();
 	return vector;
 }
 
-const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees)
+const Vector3 GetRandomVectorInCone(const Vector3& direction, const float angleDegrees)
 {
 	float x = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
 	float y = GenerateFloat(-angleDegrees, angleDegrees) * RADIAN;
@@ -28,6 +22,26 @@ const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleD
 	auto result = direction.TransformNormal(direction, matrix);
 	result.Normalize();
 	return result;
+}
+
+EulerAngles GetVectorAngles(int x, int y, int z)
+{
+	const float angle = atan2(x, z);
+
+	auto vector = Vector3(x, y, z);
+	const auto matrix = Matrix::CreateRotationY(-angle);
+	Vector3::Transform(vector, matrix, vector);
+
+	return EulerAngles(
+		-atan2(y, vector.z),
+		angle,
+		0.0f
+	);
+}
+
+EulerAngles GetOrientBetweenPoints(Vector3Int origin, Vector3Int target)
+{
+	return GetVectorAngles(target.x - origin.x, target.y - origin.y, target.z - origin.z);
 }
 
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second)
@@ -169,32 +183,37 @@ Vector3Int* FP_Normalise(Vector3Int* v)
 	return v;
 }
 
-float Smoothstep(float e0, float e1, float x)
+const float Lerp(float v0, float v1, float t)
+{
+	return (1.0f - t) * v0 + t * v1;
+}
+
+const float Smoothstep(float edge0, float edge1, float x)
 {
 	// Scale, bias and saturate x to 0..1 range
-	x = std::clamp((x - e0) / (e1 - e0), 0.0f, 1.0f);
+	x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
 
 	// Evaluate polynomial
 	return x * x * (3 - 2 * x);
 }
 
-Vector3 TranslateVector(Vector3 vector, float angle, float forward, float vertical, float lateral)
+Vector3 TranslateVector(Vector3 vector, float angle, float forward, float up, float right)
 {
-	if (forward == 0.0f && vertical == 0.0f && lateral == 0.0f)
+	if (forward == 0.0f && up == 0.0f && right == 0.0f)
 		return vector;
 
 	float sinAngle = sin(angle);
 	float cosAngle = cos(angle);
 
-	vector.x += (forward * sinAngle) + (lateral * cosAngle);
-	vector.y += vertical;
-	vector.z += (forward * cosAngle) + (lateral * -sinAngle);
+	vector.x += (forward * sinAngle) + (right * cosAngle);
+	vector.y += up;
+	vector.z += (forward * cosAngle) - (right * sinAngle);
 	return vector;
 }
 
-Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float vertical, float lateral)
+Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float up, float right)
 {
-	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, vertical, lateral);
+	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, up, right);
 	return Vector3Int(
 		(int)round(newVector.x),
 		(int)round(newVector.y),

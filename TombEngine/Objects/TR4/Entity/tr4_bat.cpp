@@ -66,15 +66,10 @@ namespace TEN::Entities::TR4
 		if (!CreatureActive(itemNumber))
 			return;
 
-		ItemInfo* target;
-		CreatureInfo* slots;
-		int distance, bestDistance;
-		float angle;
-
 		auto* item = &g_Level.Items[itemNumber];
 		auto* creature = GetCreatureInfo(item);
 
-		angle = 0;
+		short angle = 0;
 
 		if (item->HitPoints > 0)
 		{
@@ -155,7 +150,7 @@ namespace TEN::Entities::TR4
 			if (item->Pose.Position.y >= item->Floor)
 			{
 				item->Animation.TargetState = BAT_STATE_DEATH;
-				item->Animation.Airborne = false;
+				item->Animation.IsAirborne = false;
 				item->Pose.Position.y = item->Floor;
 			}
 			else
@@ -164,7 +159,7 @@ namespace TEN::Entities::TR4
 				item->Animation.FrameNumber = g_Level.Anims[item->Animation.AnimNumber].frameBase;
 				item->Animation.ActiveState = BAT_STATE_DEATH_FALL;
 				item->Animation.TargetState = BAT_STATE_DEATH_FALL;
-				item->Animation.Airborne = true;
+				item->Animation.IsAirborne = true;
 				item->Animation.Velocity = 0;
 			}
 		}

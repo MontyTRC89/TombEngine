@@ -1,18 +1,20 @@
 #include "framework.h"
 
-#include "ScriptAssert.h"
-#include "MoveableObject.h"
-#include "ScriptUtil.h"
 #include "Game/items.h"
+#include "Game/control/lot.h"
 #include "Objects/objectslist.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "Game/control/lot.h"
-#include "Vec3/Vec3.h"
-#include "Rotation/Rotation.h"
 #include "Specific/trmath.h"
+
+#include "ScriptAssert.h"
+#include "MoveableObject.h"
+#include "ScriptUtil.h"
 #include "Objects/ObjectsHandler.h"
 #include "ReservedScriptNames.h"
+#include "Color/Color.h"
+#include "Rotation/Rotation.h"
+#include "Vec3/Vec3.h"
 
 /***
 Represents any object inside the game world.
@@ -120,6 +122,7 @@ static std::unique_ptr<Moveable> Create(
 		ptr->SetHP(USE_IF_HAVE(short, hp, 10));
 		ptr->SetOCB(USE_IF_HAVE(short, ocb, 0));
 		ptr->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+		ptr->SetColor(ScriptColor(Vector4::One));
 		item->CarriedItem = NO_ITEM;
 
 		// call this when resetting name too?
@@ -265,6 +268,16 @@ void Moveable::Register(sol::table & parent)
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
 
+/// Get the moveable's color
+// @function Moveable:GetColor
+// @treturn Color a copy of the moveable's color
+	ScriptReserved_GetColor, &Moveable::GetColor,
+
+/// Set the moveable's color
+// @function Moveable:SetColor
+// @tparam Color color the new color of the moveable 
+	ScriptReserved_SetColor, &Moveable::SetColor,
+
 /// Get AIBits of object
 // This will return a table with six values, each corresponding to
 // an active behaviour. If the object is in a certain AI mode, the table will
@@ -314,7 +327,6 @@ void Moveable::Register(sol::table & parent)
 // sas:SetRoom(destinationRoom)
 // sas:SetPosition(destinationPosition)
 	ScriptReserved_SetRoom, &Moveable::SetRoom,
-
 
 /// Get the object's position
 // @function Moveable:GetPosition
@@ -539,6 +551,16 @@ short Moveable::GetOCB() const
 void Moveable::SetOCB(short ocb)
 {
 	m_item->TriggerFlags = ocb;
+}
+
+ScriptColor Moveable::GetColor() const
+{
+	return ScriptColor{ m_item->Color };
+}
+
+void Moveable::SetColor(ScriptColor const& col)
+{
+	m_item->Color = col;
 }
 
 aiBitsType Moveable::GetAIBits() const

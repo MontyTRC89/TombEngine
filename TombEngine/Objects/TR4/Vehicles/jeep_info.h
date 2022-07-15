@@ -4,26 +4,24 @@ namespace TEN::Entities::Vehicles
 {
 	struct JeepInfo
 	{
-		short jeepTurn;
-		short rot1;
-		short rot2;
-		short rot3;
-		short rot4;
-		short momentumAngle;
-		short extraRotation;
+		int Velocity = 0;
+		int CameraElevation = 0;
 
-		int velocity;
-		int fallSpeed;
+		short TurnRate = 0;
+		short MomentumAngle = 0;
+		short ExtraRotation = 0;
+		short ExtraRotationDrift = 0;
+		short FrontRightWheelRotation = 0;
+		short FrontLeftWheelRotation = 0;
+		short BackRightWheelRotation = 0;
+		short BackLeftWheelRotation = 0;
 
-		int revs;
-		short engineRevs;
-		int pitch;
-		short trackMesh;
+		int Revs = 0;
+		short EngineRevs = 0;
+		int Pitch = 0;
+		short TrackMesh = 0;
 
-		short flags;
-
-		short unknown0;
-		short unknown1;
-		short unknown2;
+		short Gear = 0;
+		short Flags = NULL;
 	};
 }

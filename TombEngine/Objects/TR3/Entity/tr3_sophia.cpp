@@ -101,7 +101,7 @@ namespace TEN::Entities::TR3
 		KillItem(itemNumber);
 		DisableEntityAI(itemNumber);
 
-		item->Flags |= ONESHOT;
+		item->Flags |= IFLAG_INVISIBLE;
 	}
 
 	void ControlLaserBolts(short itemNumber)

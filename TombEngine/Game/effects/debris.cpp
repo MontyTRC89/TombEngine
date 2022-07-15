@@ -147,10 +147,10 @@ Vector3 CalculateFragmentImpactVelocity(Vector3 fragmentWorldPosition, Vector3 i
 	radiusNormVec.Normalize();
 	float radiusStrenght =  1-((fragmentWorldPosition - impactLocation).Length() / 1024);
 	radiusStrenght = fmax(radiusStrenght, 0);
-	Vector3 radiusRandomVector = Vector3(GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f)) + radiusNormVec;
+	Vector3 radiusRandomVector = Vector3(GenerateFloat(-0.2f, 0.2f), GenerateFloat(-0.2f, 0.2f), GenerateFloat(-0.2f, 0.2f)) + radiusNormVec;
 	radiusRandomVector.Normalize();
 	Vector3 radiusVelocity = radiusRandomVector * radiusStrenght*40;
-	Vector3 impactDirectionVelocity = (impactDirection + Vector3(GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f), GenerateFloat(-0.2, 0.2f))) * 80 ;
+	Vector3 impactDirectionVelocity = (impactDirection + Vector3(GenerateFloat(-0.2f, 0.2f), GenerateFloat(-0.2f, 0.2f), GenerateFloat(-0.2f, 0.2f))) * 80 ;
 	return radiusVelocity + impactDirectionVelocity;
 }
 

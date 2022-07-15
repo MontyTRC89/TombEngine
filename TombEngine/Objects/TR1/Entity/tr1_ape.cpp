@@ -30,7 +30,7 @@ namespace TEN::Entities::TR1
 
 	constexpr auto SHIFT = 75;
 
-	#define APE_RUN_TURN_ANGLE Angle::DegToRad(5.0f)
+	#define APE_RUN_TURN_RATE_MAX Angle::DegToRad(5.0f)
 	#define APE_DISPLAY_ANGLE Angle::DegToRad(45.0f)
 
 	enum ApeState
@@ -238,7 +238,7 @@ namespace TEN::Entities::TR1
 				break;
 
 			case APE_STATE_RUN_FORWARD:
-				creatureInfo->MaxTurn = APE_RUN_TURN_ANGLE;
+				creatureInfo->MaxTurn = APE_RUN_TURN_RATE_MAX;
 
 				if (creatureInfo->Flags == 0 &&
 					AI.angle > -APE_DISPLAY_ANGLE &&

@@ -22,31 +22,31 @@ constexpr auto NUM_ITEMS = 1024;
 
 enum AIObjectType
 {
-	NO_AI = 0x0000,
-	GUARD = 0x0001,
-	AMBUSH = 0x0002,
-	PATROL1 = 0x0004,
-	MODIFY = 0x0008,
-	FOLLOW = 0x0010,
-	PATROL2 = 0x0020,
+	NO_AI	  = 0,
+	GUARD	  = (1 << 0),
+	AMBUSH	  = (1 << 1),
+	PATROL1	  = (1 << 2),
+	MODIFY	  = (1 << 3),
+	FOLLOW	  = (1 << 4),
+	PATROL2	  = (1 << 5),
 	ALL_AIOBJ = (GUARD | AMBUSH | PATROL1 | MODIFY | FOLLOW | PATROL2)
 };
 
 enum ItemStatus
 {
-	ITEM_NOT_ACTIVE = 0,
-	ITEM_ACTIVE = 1,
+	ITEM_NOT_ACTIVE	 = 0,
+	ITEM_ACTIVE		 = 1,
 	ITEM_DEACTIVATED = 2,
-	ITEM_INVISIBLE = 3
+	ITEM_INVISIBLE	 = 3
 };
 
 enum ItemFlags
 {
-	IFLAG_CLEAR_BODY = (1 << 7), // 0x0080
-	IFLAG_INVISIBLE = (1 << 8),  // 0x0100
-	IFLAG_REVERSE = (1 << 14),	 // 0x4000
-	IFLAG_KILLED = (1 << 15),    // 0x8000
-	IFLAG_ACTIVATION_MASK = 0x3E00 // bits 9-13
+	IFLAG_CLEAR_BODY	  = (1 << 7),  // 0x0080
+	IFLAG_INVISIBLE		  = (1 << 8),  // 0x0100
+	IFLAG_REVERSE		  = (1 << 14), // 0x4000
+	IFLAG_KILLED		  = (1 << 15), // 0x8000
+	IFLAG_ACTIVATION_MASK = 0x3E00	   // bits 9-13
 };
 
 constexpr unsigned int ALL_JOINT_BITS = UINT_MAX;
@@ -67,7 +67,7 @@ struct EntityAnimationData
 	int TargetState;
 	int RequiredState; // TODO: Phase out this weird feature.
 
-	bool Airborne;
+	bool IsAirborne;
 	int Velocity;
 	int VerticalVelocity;
 	int LateralVelocity;
@@ -85,8 +85,10 @@ struct ItemInfo
 
 	ITEM_DATA Data;
 	EntityAnimationData Animation;
-	PHD_3DPOS Pose;
 	PHD_3DPOS StartPose;
+	PHD_3DPOS Pose;
+	ROOM_VECTOR Location;
+	short RoomNumber;
 	int Floor;
 
 	int HitPoints;
@@ -95,11 +97,9 @@ struct ItemInfo
 	bool Collidable;
 	bool InDrawRoom;
 
-	ROOM_VECTOR Location;
-	short RoomNumber;
 	int BoxNumber;
 	int Timer;
-	short Shade;
+	Vector4 Color;
 
 	unsigned int TouchBits;
 	unsigned int MeshBits;

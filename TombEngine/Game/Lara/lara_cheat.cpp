@@ -69,8 +69,8 @@ void LaraCheatyBits(ItemInfo* item)
 				{
 					SetAnimation(item, LA_DOZY);
 					item->Animation.VerticalVelocity = 30;
-					item->Animation.Airborne = false;
-					item->Pose.Orientation.SetX(Angle::DegToRad(30.0f));
+					item->Animation.IsAirborne = false;
+					item->Pose.Orientation.x = Angle::DegToRad(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 
 					ResetLaraFlex(item);

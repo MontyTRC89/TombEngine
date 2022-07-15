@@ -39,9 +39,6 @@ int DeadlyBounds[6];
 SPLASH_SETUP SplashSetup;
 SPLASH_STRUCT Splashes[MAX_SPLASHES];
 RIPPLE_STRUCT Ripples[MAX_RIPPLES];
-LaraWeaponType SmokeWeapon;
-byte SmokeCountL;
-byte SmokeCountR;
 int SplashCount = 0;
 
 Vector3Int NodeVectors[MAX_NODE];
@@ -221,7 +218,7 @@ void UpdateSparks()
 			}
 
 			if (spark->flags & SP_ROTATE)
-				spark->rotAng = Angle::ShrtToRad(Angle::RadToShrt(spark->rotAng + spark->rotAdd) & 0xFFF); // TODO
+				spark->rotAng = Angle::ShrtToRad(Angle::RadToShrt(spark->rotAng + spark->rotAdd) & 0x0FFF); // TODO
 
 			if (spark->sLife - spark->life == spark->extras >> 3 &&
 				spark->extras & 7)
@@ -285,9 +282,8 @@ void UpdateSparks()
 
 			int dl = (spark->sLife - spark->life << 16) / spark->sLife;
 			int ds = dl * (spark->dSize - spark->sSize);
-			//spark->size = spark->sSize + (ds & 0xFF);
 			float alpha = (spark->sLife - spark->life) / (float)spark->sLife;
-			spark->size = lerp(spark->sSize, spark->dSize, alpha);
+			spark->size = Lerp(spark->sSize, spark->dSize, alpha);
 
 			if ((spark->flags & SP_FIRE && !Lara.Burn) || 
 				(spark->flags & SP_DAMAGE) || 
@@ -450,10 +446,10 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->sR = -128;
-		spark->dR = -128;
-		spark->dG = -128;
-		spark->dB = -128;
+		spark->sR = 128;
+		spark->dR = 128;
+		spark->dG = 128;
+		spark->dB = 128;
 		spark->on = 1;
 		spark->life = 24;
 		spark->sLife = 24;
@@ -576,9 +572,9 @@ void TriggerExplosionSmoke(int x, int y, int z, int uw)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->sR = -112;
-		spark->sG = -112;
-		spark->sB = -112;
+		spark->sR = 144;
+		spark->sG = 144;
+		spark->sB = 144;
 		spark->on = 1;
 		spark->dR = 64;
 		spark->dG = 64;
@@ -870,7 +866,7 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	}
 }
 
-void SetupSplash(const SPLASH_SETUP* const setup,int room)
+void SetupSplash(const SPLASH_SETUP* const setup, int room)
 {
 	constexpr size_t NUM_SPLASHES = 3;
 	int numSplashesSetup = 0;
@@ -927,7 +923,7 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 
 				float t = vel / (splashVelocity / 2) + 16;
 				t = fmax(0, fmin(t, 1));
-				splash.life = lerp(48, 70, t);
+				splash.life = Lerp(48.0f, 70.0f, t);
 				splash.spriteSequenceStart = 4; //Splash Texture
 				splash.spriteSequenceEnd = 7; //Splash Texture
 				splash.animationSpeed = fmin(0.6f,(1 / splash.outerRadVel)*2);
@@ -953,6 +949,9 @@ void SetupSplash(const SPLASH_SETUP* const setup,int room)
 
 void UpdateSplashes()
 {
+	if (SplashCount)
+		SplashCount--;
+
 	for (int i = 0; i < MAX_SPLASHES; i++)
 	{
 		SPLASH_STRUCT& splash = Splashes[i];
@@ -1712,10 +1711,10 @@ void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, int additio
 		spark->dB = -64 - (r & 0x7F) + 64;
 		spark->life = 10;
 		spark->sLife = 10;
-		spark->sR = -1;
-		spark->sG = -1;
-		spark->sB = -1;
-		spark->dR = -1;
+		spark->sR = 255;
+		spark->sG = 255;
+		spark->sB = 255;
+		spark->dR = 255;
 		spark->x = (r & 7) + x - 3;
 		spark->on = 1;
 		spark->colFadeSpeed = 3;

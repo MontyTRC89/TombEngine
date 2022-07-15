@@ -41,6 +41,6 @@ int LaraTestClimbPos(ItemInfo* item, int front, int right, int origin, int heigh
 void LaraDoClimbLeftRight(ItemInfo* item, CollisionInfo* coll, int result, int shift);
 int LaraClimbRightCornerTest(ItemInfo* item, CollisionInfo* coll);
 int LaraClimbLeftCornerTest(ItemInfo* item, CollisionInfo* coll);
-int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, int itemHeight, int itemRoom, int* shift);
+int LaraTestClimb(ItemInfo* item, int x, int y, int z, int xFront, int zFront, int itemHeight, int* shift);
 int LaraTestClimbUpPos(ItemInfo* item, int front, int right, int* shift, int* ledge);
 bool LaraCheckForLetGo(ItemInfo* item, CollisionInfo* coll);

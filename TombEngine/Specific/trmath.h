@@ -16,9 +16,9 @@ constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
 constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 constexpr auto SLOPE_DIFFERENCE = 60;
-constexpr auto NO_HEIGHT  = (-0x7F00);
-constexpr auto MAX_HEIGHT = (-0x7FFF);
-constexpr auto DEEP_WATER = 0x7FFF;
+constexpr auto NO_HEIGHT  = INT_MIN + UCHAR_MAX;
+constexpr auto MAX_HEIGHT = INT_MIN + 1; // Add 1 to prevent issue with sign changes
+constexpr auto DEEP_WATER = INT_MAX - 1; // Subtract 1 to prevent issue with sign changes
 
 constexpr auto SQUARE = [](auto x) { return x * x; };
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
@@ -28,9 +28,10 @@ constexpr auto OFFSET_RADIUS = [](auto x) { return round(x * M_SQRT2 + 4); };
 
 BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
 
-const float lerp(float v0, float v1, float t);
-const Vector3 getRandomVector();
-const Vector3 getRandomVectorInCone(const Vector3& direction, const float angleDegrees);
+const Vector3 GetRandomVector();
+const Vector3 GetRandomVectorInCone(const Vector3& direction,const float angleDegrees);
+EulerAngles GetVectorAngles(int x, int y, int z);
+EulerAngles GetOrientBetweenPoints(Vector3Int origin, Vector3Int target);
 void phd_RotBoundingBoxNoPersp(PHD_3DPOS* pos, BOUNDING_BOX* bounds, BOUNDING_BOX* tbounds);
 int phd_Distance(PHD_3DPOS* first, PHD_3DPOS* second);
 
@@ -53,9 +54,11 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 #define	MULFP(a,b)		(int)((((__int64)a*(__int64)b))>>16)
 #define DIVFP(a,b)		(int)(((a)/(b>>8))<<8)
 
-float Smoothstep(float e0, float e1, float x);
-Vector3 TranslateVector(Vector3 vector, float angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
-Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float vertical = 0.0f, float lateral = 0.0f);
+const float Lerp(float v0, float v1, float t);
+const float Smoothstep(float edge0, float edge1, float x);
+
+Vector3 TranslateVector(Vector3 vector, float angle, float forward, float up = 0.0f, float right = 0.0f);
+Vector3Int TranslateVector(Vector3Int vector, float angle, float forward, float up = 0.0f, float right = 0.0f);
 Vector3 TranslateVector(Vector3 vector, EulerAngles orient, float distance);
 Vector3Int TranslateVector(Vector3Int vector, EulerAngles orient, float distance);
 Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance);

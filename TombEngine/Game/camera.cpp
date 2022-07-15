@@ -47,14 +47,8 @@ struct OLD_CAMERA
 	Vector3Int target;
 };
 
-float LfAspectCorrection;
 GameVector LastTarget;
-byte SniperCamActive;
 
-extern int KeyTriggerActive;
-
-Vector3Int CurrentCameraPosition;
-SVECTOR CurrentCameraRotation;
 GameVector LastIdeal;
 GameVector Ideals[5];
 OLD_CAMERA OldCam;
@@ -62,18 +56,19 @@ int CameraSnaps = 0;
 int TargetSnaps = 0;
 GameVector LookCamPosition;
 GameVector LookCamTarget;
-int LSHKTimer = 0;
-int LSHKShotsFired = 0;
 Vector3Int CamOldPos;
 CAMERA_INFO Camera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
-int NumberCameras;
 
 int BinocularRange;
 bool BinocularOn;
 CameraType BinocularOldCamera;
 bool LaserSight;
+
+int LSHKTimer = 0;
+int LSHKShotsFired = 0;
+int WeaponDelay = 0;
 
 float PhdPerspective;
 float CurrentFOV;
@@ -81,12 +76,13 @@ float CurrentFOV;
 int RumbleTimer = 0;
 int RumbleCounter = 0;
 
-bool ScreenFadedOut = false;
-bool ScreenFading = false;
+bool  ScreenFadedOut = false;
+bool  ScreenFading = false;
 float ScreenFadeSpeed = 0;
 float ScreenFadeStart = 0;
 float ScreenFadeEnd = 0;
 float ScreenFadeCurrent = 0;
+
 float CinematicBarsHeight = 0;
 float CinematicBarsDestinationHeight = 0;
 float CinematicBarsSpeed = 0;
@@ -99,13 +95,16 @@ void LookAt(CAMERA_INFO* cam, float roll)
 	float fov = CurrentFOV / 1.333333f;
 	float r = roll;
 
-	g_Renderer.UpdateCameraMatrices(cam, r, fov);
+	float gameFarView  = g_GameFlow->GetGameFarView() * float(SECTOR(1));
+	float levelFarView = g_GameFlow->GetLevel(CurrentLevel)->GetFarView() * float(SECTOR(1));
+
+	g_Renderer.UpdateCameraMatrices(cam, r, fov, std::min(gameFarView, levelFarView));
 }
 
 void AlterFOV(float value)
 {
 	CurrentFOV = value;
-	PhdPerspective = g_Renderer.ScreenWidth / 2 * cos(CurrentFOV / 2) / sin(CurrentFOV / 2);
+	PhdPerspective = g_Configuration.Width / 2 * cos(CurrentFOV / 2) / sin(CurrentFOV / 2);
 }
 
 inline void RumbleFromBounce()
@@ -1079,12 +1078,138 @@ void BounceCamera(ItemInfo* item, int bounce, int maxDistance)
 		Camera.bounce = bounce;
 }
 
-void BinocularCamera(ItemInfo* item)
+void LaserSightCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
+	if (WeaponDelay)
+		WeaponDelay--;
+
 	if (LSHKTimer)
-		--LSHKTimer;
+		LSHKTimer--;
+
+	bool firing = false;
+	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
+
+	if (!(RawInput & IN_ACTION) || WeaponDelay || !ammo)
+	{
+		if (!(RawInput & IN_ACTION))
+		{
+			LSHKShotsFired = 0;
+			Camera.bounce = 0;
+		}
+	}
+	else
+	{
+		if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
+		{
+			firing = true;
+			WeaponDelay = 16;
+			Statistics.Game.AmmoUsed++;
+
+			if (!ammo.hasInfinite())
+				(ammo)--;
+
+			Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+		}
+		else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
+		{
+			firing = true;
+			WeaponDelay = 32;
+		}
+		else
+		{
+			if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
+			{
+				WeaponDelay = 12;
+				firing = true;
+
+				if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+					SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
+				else
+				{
+					SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+					SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+				}
+
+				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+			}
+			else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
+			{
+				if (!LSHKTimer)
+				{
+					if (++LSHKShotsFired == 5)
+					{
+						LSHKShotsFired = 0;
+						WeaponDelay = 12;
+					}
+
+					LSHKTimer = 4;
+					firing = true;
+
+					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
+					else
+					{
+						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+					}
+
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+				}
+				else
+				{
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+
+					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
+					else
+					{
+						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+					}
+
+					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
+				}
+			}
+			else
+			{
+				if (LSHKTimer)
+				{
+					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
+					else
+					{
+						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+					}
+				}
+				else
+				{
+					LSHKTimer = 4;
+					firing = true;
+
+					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
+						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
+					else
+					{
+						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
+						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
+					}
+				}
+			}
+
+			if (!ammo.hasInfinite())
+				(ammo)--;
+		}
+	}
+
+	GetTargetOnLOS(&Camera.pos, &Camera.target, true, firing);
+}
+
+void BinocularCamera(ItemInfo* item)
+{
+	auto* lara = GetLaraInfo(item);
 
 	if (!LaserSight)
 	{
@@ -1222,141 +1347,18 @@ void BinocularCamera(ItemInfo* item)
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 	}
 
-	auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-	auto target = Vector3Int(Camera.target.x, Camera.target.y, Camera.target.z);
-
-	if (LaserSight)
+	if (!LaserSight)
 	{
-		bool firing = false;
-		auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
+		auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto target = Vector3Int(Camera.target.x, Camera.target.y, Camera.target.z);
 
-		if (!(RawInput & IN_ACTION) ||
-			WeaponDelay || !ammo)
-		{
-			if (!(RawInput & IN_ACTION))
-			{
-				LSHKShotsFired = 0;
-				Camera.bounce = 0;
-			}
-		}
-		else
-		{
-			if (lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
-			{
-				firing = true;
-				WeaponDelay = 16;
-				Statistics.Game.AmmoUsed++;
-
-				if (!ammo.hasInfinite())
-					(ammo)--;
-
-				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-			}
-			else if (lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
-			{
-				firing = true;
-				WeaponDelay = 32;
-			}
-			else
-			{
-				if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo1)
-				{
-					WeaponDelay = 12;
-					firing = true;
-
-					if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-						SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-					else
-					{
-						SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-						SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-					}
-
-					Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-				}
-				else if (lara->Weapons[(int)LaraWeaponType::HK].SelectedAmmo == WeaponAmmoType::Ammo2)
-				{
-					if (!LSHKTimer)
-					{
-						if (++LSHKShotsFired == 5)
-						{
-							LSHKShotsFired = 0;
-							WeaponDelay = 12;
-						}
-
-						LSHKTimer = 4;
-						firing = true;
-
-						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-						else
-						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-						}
-
-						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-					}
-					else
-					{
-						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-
-						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-						else
-						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-						}
-
-						Camera.bounce = -16 - (GetRandomControl() & 0x1F);
-					}
-				}
-				else
-				{
-					if (LSHKTimer)
-					{
-						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-						else
-						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-						}
-					}
-					else
-					{
-						LSHKTimer = 4;
-						firing = true;
-
-						if (lara->Weapons[(int)LaraWeaponType::HK].HasSilencer)
-							SoundEffect(SFX_TR4_HK_SILENCED, nullptr);
-						else
-						{
-							SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
-							SoundEffect(SFX_TR4_HK_FIRE, nullptr);
-						}
-					}
-				}
-
-				if (!ammo.hasInfinite())
-					(ammo)--;
-			}
-		}
-
-		GetTargetOnLOS(&Camera.pos, &Camera.target, true, firing);
-	}
-	else
-	{
 		GetTargetOnLOS(&Camera.pos, &Camera.target, false, false);
 
-		if (!(RawInput & IN_ACTION))
-		{
-			// Reimplement this mode?
-		}
-		else
-			LaraTorch(&src, &target, lara->ExtraHeadRot.GetY(), 192);
+		if (RawInput & IN_ACTION)
+			LaraTorch(&src, &target, lara->ExtraHeadRot.y, 192);
 	}
+	else
+		LaserSightCamera(item);
 }
 
 void ConfirmCameraTargetPos()
@@ -1514,37 +1516,19 @@ void CalculateCamera()
 		Camera.target.roomNumber = item->RoomNumber;
 		Camera.target.y = y;
 
-		if (Camera.type != CameraType::Chase &&
-			Camera.flags != CF_CHASE_OBJECT &&
-			(Camera.number != -1 && (SniperCamActive = g_Level.Cameras[Camera.number].flags & 3, g_Level.Cameras[Camera.number].flags & 2)))
+		auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
+		x = item->Pose.Position.x + shift * sin(item->Pose.Orientation.y);
+		z = item->Pose.Position.z + shift * cos(item->Pose.Orientation.y);
+
+		Camera.target.x = x;
+		Camera.target.z = z;
+
+		if (item->ObjectNumber == ID_LARA)
 		{
-			auto pos = Vector3Int();
-			GetLaraJointPosition(&pos, LM_TORSO);
-
-			x = pos.x;
-			y = pos.y;
-			z = pos.z;
-
-			Camera.target.x = pos.x;
-			Camera.target.y = pos.y;
-			Camera.target.z = pos.z;
-		}
-		else
-		{
-			auto shift = (bounds->X1 + bounds->X2 + bounds->Z1 + bounds->Z2) / 4;
-			x = item->Pose.Position.x + shift * sin(item->Pose.Orientation.GetY());
-			z = item->Pose.Position.z + shift * cos(item->Pose.Orientation.GetY());
-
-			Camera.target.x = x;
-			Camera.target.z = z;
-
-			if (item->ObjectNumber == ID_LARA)
-			{
-				ConfirmCameraTargetPos();
-				x = Camera.target.x;
-				y = Camera.target.y;
-				z = Camera.target.z;
-			}
+			ConfirmCameraTargetPos();
+			x = Camera.target.x;
+			y = Camera.target.y;
+			z = Camera.target.z;
 		}
 
 		if (fixedCamera == Camera.fixedCamera)
@@ -1987,6 +1971,13 @@ void SetCinematicBars(float height, float speed)
 {
 	CinematicBarsDestinationHeight = height;
 	CinematicBarsSpeed = speed;
+}
+
+void ClearCinematicBars()
+{
+	CinematicBarsHeight = 0;
+	CinematicBarsDestinationHeight = 0;
+	CinematicBarsSpeed = 0;
 }
 
 void UpdateFadeScreenAndCinematicBars()

@@ -57,7 +57,7 @@ namespace TEN::Entities::TR3
 
 		laraItem->Pose.Position = tRexItem->Pose.Position;
 		laraItem->Pose.Orientation = EulerAngles(0.0f, tRexItem->Pose.Orientation.y, 0.0f);
-		laraItem->Animation.Airborne = false;
+		laraItem->Animation.IsAirborne = false;
 
 		laraItem->Animation.AnimNumber = Objects[ID_LARA_EXTRA_ANIMS].animIndex + LARA_ANIM_TREX_DEATH;
 		laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;

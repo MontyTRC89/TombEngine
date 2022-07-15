@@ -277,7 +277,7 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 	auto* barItem = &g_Level.Items[lara->InteractedItem];
 
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 
 	if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 	{
@@ -1060,9 +1060,9 @@ void lara_as_zip_line(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_JUMP_FORWARD;
 		AnimateLara(item);
 
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 		item->Animation.Velocity = 100;
 		item->Animation.VerticalVelocity = 40;
-		lara->Control.MoveAngle = item->Pose.Orientation.GetY();
+		lara->Control.MoveAngle = item->Pose.Orientation.y;
 	}
 }

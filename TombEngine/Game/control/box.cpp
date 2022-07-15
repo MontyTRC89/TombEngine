@@ -75,6 +75,9 @@ void DrawNearbyPathfinding(int boxIndex)
 
 	while (true)
 	{
+		if (index >= g_Level.Overlaps.size())
+			break;
+
 		auto overlap = g_Level.Overlaps[index];
 
 		DrawBox(overlap.box, Vector3(1, 1, 0));
@@ -262,7 +265,7 @@ void CreatureKill(ItemInfo* item, int killAnim, int killState, int laraKillState
 	LaraItem->Animation.TargetState = laraKillState;
 
 	LaraItem->Pose = item->Pose;
-	LaraItem->Animation.Airborne = false;
+	LaraItem->Animation.IsAirborne = false;
 	LaraItem->Animation.Velocity = 0;
 	LaraItem->Animation.VerticalVelocity = 0;
 
@@ -469,17 +472,13 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 	AnimateItem(item);
 	if (item->Status == ITEM_DEACTIVATED)
 	{
-		CreatureDie(itemNumber, FALSE);
+		CreatureDie(itemNumber, false);
 		return false;
 	}
 
 	auto* bounds = GetBoundsAccurate(item);
 
-	// HACK: In original, y coordinate was just set to bounding box top point.
-	// In TEN, we have to use nearest click value, because Choco's floordata
-	// system returns inconsistent room number in portal 4-click vault cases -- Lwmte, 27.06.22
-
-	int y = item->Pose.Position.y - ceil((float)abs(bounds->Y1) / (float)CLICK(1)) * CLICK(1);
+	int y = item->Pose.Position.y + bounds->Y1;
 
 	short roomNumber = item->RoomNumber;
 	GetFloor(oldPos.x, y, oldPos.z, &roomNumber);  
@@ -797,7 +796,7 @@ int CreatureAnimation(short itemNumber, float angle, float tilt)
 	return true;
 }
 
-void CreatureDie(short itemNumber, int explode)
+void CreatureDie(short itemNumber, bool explode)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
@@ -806,10 +805,12 @@ void CreatureDie(short itemNumber, int explode)
 
 	if (explode)
 	{
-		if (Objects[item->ObjectNumber].hitEffect)
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_HIT_EFFECT);
+		if (Objects[item->ObjectNumber].hitEffect & HIT_BLOOD)
+			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_GIBS);
+		else if (Objects[item->ObjectNumber].hitEffect & HIT_SMOKE)
+			ExplodingDeath(itemNumber, BODY_EXPLODE | BODY_NO_BOUNCE);
 		else
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, EXPLODE_NORMAL);
+			ExplodingDeath(itemNumber, BODY_EXPLODE);
 
 		KillItem(itemNumber);
 	}

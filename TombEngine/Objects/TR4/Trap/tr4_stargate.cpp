@@ -32,12 +32,15 @@ namespace TEN::Entities::TR4
 
 		if (TriggerActive(item))
 		{
+			int touchBits = 0x036DB600; 
+			item->ItemFlags[0] = short(touchBits & 0xFFFF);
+			item->ItemFlags[1] = short((touchBits >> 16) & 0xFFFF);
+
 			SoundEffect(SFX_TR4_STARGATE_SWIRL, &item->Pose);
-			item->ItemFlags[0] = 0x36DB600;
 			AnimateItem(item);
 		}
 		else
-			item->ItemFlags[0] = 0;
+			item->ItemFlags[0] = item->ItemFlags[1] = 0;
 	}
 
 	void StargateCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -62,8 +65,8 @@ namespace TEN::Entities::TR4
 			int result = TestCollision(item, laraItem);
 			if (result)
 			{
-				result &= item->ItemFlags[0];
-				int flags = item->ItemFlags[0];
+				int flags = item->ItemFlags[0] | item->ItemFlags[1] << 16;
+				result &= flags;
 
 				if (result)
 				{

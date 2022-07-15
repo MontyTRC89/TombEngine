@@ -242,16 +242,16 @@ namespace TEN::Effects::Footprints
 						continue;
 					}
 
-					if (footprint.Life > footprint.LifeStartFading) 
-					{
-						footprint.Opacity = footprint.StartOpacity;
-					}
-					else 
-					{
-						float opacity = lerp(0, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
-						footprint.Opacity = opacity;
-					}
-				}
+			if (footprint.Life > footprint.LifeStartFading) 
+			{
+				footprint.Opacity = footprint.StartOpacity;
+			}
+			else 
+			{
+				float opacity = Lerp(0.0f, footprint.StartOpacity, fmax(0, fmin(1, footprint.Life / (float)footprint.LifeStartFading)));
+				footprint.Opacity = opacity;
+			}
+		}
 
 		for (int i = 0; i < numInvalidFootprints; i++) 
 		{

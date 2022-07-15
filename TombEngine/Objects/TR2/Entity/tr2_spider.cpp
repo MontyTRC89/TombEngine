@@ -64,7 +64,7 @@ void SmallSpiderControl(short itemNumber)
 	{
 		if (item->Animation.ActiveState != 7)
 		{
-			ExplodingDeath(itemNumber, ALL_JOINT_BITS, 256);
+			ExplodingDeath(itemNumber, 0);
 			DisableEntityAI(itemNumber);
 			item->Animation.ActiveState = 7;
 			KillItem(itemNumber);

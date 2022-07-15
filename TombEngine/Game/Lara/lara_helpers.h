@@ -29,14 +29,14 @@ LaraInfo*& GetLaraInfo(ItemInfo* item);
 LaraState GetLaraCornerShimmyState(ItemInfo* item, CollisionInfo* coll);
 float GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll);
 
-float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, float maxTurnRate, float axisCoeff);
-void ModulateLaraTurnRateX(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate);
-void ModulateLaraTurnRateY(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate);
+float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, float maxTurnRate, float axisCoeff, bool invert);
+void ModulateLaraTurnRateX(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate, bool invert = true);
+void ModulateLaraTurnRateY(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate, bool invert = false);
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll);
 void ModulateLaraSubsuitSwimTurnRates(ItemInfo* item);
 void UpdateLaraSubsuitAngles(ItemInfo* item);
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle);
-void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle);
+void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, float baseRate, float maxAngle);
+void ModulateLaraCrawlFlex(ItemInfo* item, float baseRate, float maxAngle);
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll);
 
 void SetLaraJumpDirection(ItemInfo* item, CollisionInfo* coll);
@@ -58,4 +58,4 @@ void ResetLaraTurnRate(ItemInfo* item, bool divesuit = false);
 void ResetLaraLean(ItemInfo* item, float alpha = 1.0f, bool resetRoll = true, bool resetPitch = true);
 void ResetLaraFlex(ItemInfo* item, float alpha = 1.0f);
 
-void RumbleLaraHealthCondition(ItemInfo* lara);
+void RumbleLaraHealthCondition(ItemInfo* item);

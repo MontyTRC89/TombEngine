@@ -4,13 +4,16 @@ namespace TEN::Entities::Vehicles
 {
 	struct UPVInfo
 	{
-		int Velocity;
-		float Rot;
-		float XRot;
-		float FanRot;
-		unsigned int HarpoonTimer;
-		bool HarpoonLeft;
+		EulerAngles TurnRate;
+		short TurbineRotation = 0;
+		short LeftRudderRotation = 0;
+		short RightRudderRotation = 0;
 
-		char Flags;
+		int Velocity = 0;
+
+		unsigned int HarpoonTimer = 0;
+		bool HarpoonLeft = false;
+
+		char Flags = NULL;
 	};
 }

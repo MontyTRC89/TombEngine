@@ -37,7 +37,6 @@
 #include "Renderer/Texture2DArray/Texture2DArray.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
 #include "Renderer/Structures/RendererBone.h"
-#include "Renderer/Structures/RendererVideoAdapter.h"
 #include "Renderer/Structures/RendererLight.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
 #include "Renderer/Structures/RendererRoom.h"
@@ -200,25 +199,6 @@ namespace TEN::Renderer
 		Vector4 color;
 	};
 
-	struct RendererWeatherParticle
-	{
-		float X, Y, Z;
-		float AngleH;
-		float AngleV;
-		float Size;
-		short Room;
-		bool Reset;
-		bool Draw;
-	};
-
-	struct RendererUnderwaterDustParticle
-	{
-		float X, Y, Z;
-		short Life;
-		short Room;
-		bool Reset;
-	};
-
 	struct RendererLine2D
 	{
 		Vector2 Vertices[2];
@@ -250,7 +230,6 @@ namespace TEN::Renderer
 		D3D11_VIEWPORT m_viewport;
 		D3D11_VIEWPORT m_shadowMapViewport;
 		Viewport m_viewportToolkit;
-		std::vector<RendererVideoAdapter> m_adapters;
 
 		// Main back buffer
 		ID3D11RenderTargetView* m_backBufferRTV;
@@ -336,25 +315,14 @@ namespace TEN::Renderer
 		int m_blinkColorValue;
 		int m_blinkColorDirection;
 		bool m_blinkUpdated = false;
-		int m_currentY;
 
 		// System resources
-		Texture2D m_HUDBarBorderTexture;
-		Texture2D m_HUDBarTextures[4];
-		std::vector<Texture2D> m_caustics;
-		Texture2D m_binocularsTexture;
-		Texture2D m_LasersightTexture;
+		Texture2D m_logo;
+		Texture2D m_skyTexture;
 		Texture2D m_whiteTexture;
 		Texture2D loadingBarBorder;
 		Texture2D loadingBarInner;
 		Texture2D loadingScreenTexture;
-
-		// Level data
-		Texture2D m_titleScreen;
-		Texture2D m_loadScreen;
-		Texture2D m_textureAtlas;
-		Texture2D m_skyTexture;
-		Texture2D m_logo;
 
 		VertexBuffer m_roomsVertexBuffer;
 		IndexBuffer m_roomsIndexBuffer;
@@ -378,12 +346,6 @@ namespace TEN::Renderer
 
 		std::vector<RendererRoom> m_rooms;
 
-		Matrix m_hairsMatrices[12];
-		short m_numHairVertices;
-		short m_numHairIndices;
-		std::vector<RendererVertex> m_hairVertices;
-		std::vector<short> m_hairIndices;
-
 		std::vector<RendererLight> dynamicLights;
 		RendererLight* shadowLight;
 
@@ -393,15 +355,10 @@ namespace TEN::Renderer
 		std::vector<std::optional<RendererObject>> m_moveableObjects;
 		std::vector<std::optional<RendererObject>> m_staticObjects;
 		std::vector<RendererSprite> m_sprites;
-		int m_numMoveables;
-		int m_numStatics;
-		int m_numSprites;
-		int m_numSpritesSequences;
 		std::vector<RendererSpriteSequence> m_spriteSequences;
 		std::unordered_map<int, RendererMesh*> m_meshPointersToMesh;
 		Matrix m_LaraWorldMatrix;
 		std::vector<RendererAnimatedTextureSet> m_animatedTextureSets;
-		int m_numAnimatedTextureSets;
 		int m_currentCausticsFrame;
 		std::vector<RendererMesh*> m_meshes;
 		std::vector<TexturePair> m_roomTextures;
@@ -428,9 +385,11 @@ namespace TEN::Renderer
 		int m_numStaticsTransparentDrawCalls = 0;
 		int m_numSpritesTransparentDrawCalls = 0;
 		int m_biggestRoomIndexBuffer = 0;
-		RENDERER_DEBUG_PAGE m_numDebugPage = NO_PAGE;
-		int numRoomsTransparentPolygons;
+		int m_numRoomsTransparentPolygons;
 		int m_numPolygons = 0;
+		int m_currentY;
+
+		RENDERER_DEBUG_PAGE m_numDebugPage = NO_PAGE;
 
 		// Times for debug
 		int m_timeUpdate;
@@ -438,17 +397,10 @@ namespace TEN::Renderer
 		int m_timeFrame;
 		float m_fps;
 
-		// Weather
-		bool m_firstWeather;
-		RendererWeatherParticle m_rain[NUM_RAIN_DROPS];
-		RendererWeatherParticle m_snow[NUM_SNOW_PARTICLES];
-		bool m_firstUnderwaterDustParticles = true;
-		RendererUnderwaterDustParticle m_underwaterDustParticles[NUM_UNDERWATER_DUST_PARTICLES];
-
-		// Old fade-in/out
-		RENDERER_FADE_STATUS m_fadeStatus = NO_FADE;
-		float m_fadeFactor;
-		int m_progress;
+		// Screen settings
+		int m_screenWidth;
+		int m_screenHeight;
+		bool m_windowed;
 
 		// Misc
 		int m_pickupRotation = 0;
@@ -473,29 +425,33 @@ namespace TEN::Renderer
 		void BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer);
 		
-		void DrawAllStrings();
-		void FromTrAngle(Matrix* matrix, short* frameptr, int index);
 		void BuildHierarchy(RendererObject* obj);
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, ANIM_FRAME** frmptr, short frac, short rate,
 		                     int mask, bool useObjectWorldRotation = false);
-		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 		void GetVisibleObjects(RenderView& renderView, bool onlyRooms);
 		void GetRoomBounds(RenderView& renderView, bool onlyRooms);
 		void SetRoomBounds(ROOM_DOOR* door, short parentRoomNumber, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
-		Vector4 GetPortalRect(Vector4 v, Vector4 vp);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
 		void CollectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
 		void CollectEffects(short roomNumber, RenderView& renderView);
+		void ClearScene();
 		void ClearSceneItems();
-		void UpdateItemsAnimations(RenderView& view);
+		void ClearDynamicLights();
+		void ClearShadowMap(RenderView& view);
+		void UpdateItemAnimations(RenderView& view);
 		void UpdateEffects(RenderView& view);
-		bool SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax,
-		                           Vector3 sphereCentre, float sphereRadius);
+		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
+
+		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
+		void InitialiseGameBars();
+		void InitialiseMenuBars(int y);
+
+		void DrawAllStrings();
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, bool transparent);
 		void DrawRoomsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
@@ -506,9 +462,6 @@ namespace TEN::Renderer
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
-		void RenderShadowMap(RenderView& view);
-		void ClearShadowMap(RenderView& view);
-		void RenderBlobShadows(RenderView& renderView);
 		void DrawDarts(RendererItem* item, RenderView& view);
 		void DrawLara(bool shadowMap, RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
@@ -543,13 +496,7 @@ namespace TEN::Renderer
 		                         ID3D11DepthStencilView* depthTarget);
 		void DrawShockwaves(RenderView& view);
 		void DrawRipples(RenderView& view);
-		void DrawUnderwaterDust(RenderView& view);
 		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
-		bool IsRoomUnderwater(short roomNumber);
-		bool IsInRoom(int x, int y, int z, short roomNumber);
-		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
-		void InitialiseGameBars();
-		void InitialiseMenuBars(int y);
 		void DrawSmokeParticles(RenderView& view);
 		void DrawSparkParticles(RenderView& view);
 		void DrawDripParticles(RenderView& view);
@@ -559,6 +506,8 @@ namespace TEN::Renderer
 		void DrawSimpleParticles(RenderView& view);
 		void DrawFootprints(RenderView& view);
 		void DrawLoadingBar(float percent);
+		void DrawFadeAndBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
+		
 		void RenderInventoryScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 			ID3D11ShaderResourceView* background);
 		void RenderTitleMenu(Menu menu);
@@ -566,7 +515,10 @@ namespace TEN::Renderer
 		void RenderLoadSaveMenu();
 		void RenderOptionsMenu(Menu menu, int initialY);
 		void RenderNewInventory();
-		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber);
+		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber); 
+		void RenderBlobShadows(RenderView& renderView);
+		void RenderShadowMap(RenderView& view);
+
 		void SetBlendMode(BLEND_MODES blendMode, bool force = false);
 		void SetDepthState(DEPTH_STATES depthState, bool force = false);
 		void SetCullMode(CULL_MODES cullMode, bool force = false);
@@ -575,6 +527,7 @@ namespace TEN::Renderer
 		void ResetScissor();
 		void ResetDebugVariables();
 		float CalculateFrameRate();
+
 		void AddSpriteBillboard(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation, float scale,
 		                        Vector2 size, BLEND_MODES blendMode, RenderView& view);
 		void AddSpriteBillboardConstrained(RendererSprite* sprite, Vector3 pos, Vector4 color, float rotation,
@@ -585,11 +538,13 @@ namespace TEN::Renderer
 		                                         RenderView& view);
 		void AddSprite3D(RendererSprite* sprite, Vector3 vtx1, Vector3 vtx2, Vector3 vtx3, Vector3 vtx4, Vector4 color,
 		                 float rotation, float scale, Vector2 size, BLEND_MODES blendMode, RenderView& view);
+
 		short GetRoomNumberForSpriteTest(Vector3 position);
-		void DoFadingAndCinematicBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
-		                              RenderView& view);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
+
+		Vector4 GetPortalRect(Vector4 v, Vector4 vp);
+		bool SphereBoxIntersection(Vector3 boxMin, Vector3 boxMax, Vector3 sphereCentre, float sphereRadius);
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{
@@ -613,55 +568,43 @@ namespace TEN::Renderer
 
 		static bool DoesBlendModeRequireSorting(BLEND_MODES blendMode)
 		{
-			return (blendMode == BLENDMODE_ALPHABLEND
-				|| blendMode == BLENDMODE_EXCLUDE
-				|| blendMode == BLENDMODE_LIGHTEN
-				|| blendMode == BLENDMODE_SCREEN
-				|| blendMode == BLENDMODE_SUBTRACTIVE
-				|| blendMode == BLENDMODE_NOZTEST);
+			return (blendMode == BLENDMODE_ALPHABLEND ||
+				    blendMode == BLENDMODE_EXCLUDE ||
+				    blendMode == BLENDMODE_LIGHTEN ||
+				    blendMode == BLENDMODE_SCREEN ||
+				    blendMode == BLENDMODE_SUBTRACTIVE ||
+				    blendMode == BLENDMODE_NOZTEST);
 		}
 
 	public:
-		Matrix View;
-		Matrix Projection;
-		Matrix ViewProjection;
-		float FieldOfView;
-		int ScreenWidth;
-		int ScreenHeight;
-		bool Windowed;
-		int NumTexturePages;
 		Renderer11();
 		~Renderer11();
 
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHUDBar* bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
-		std::vector<Vector2Int> EnumerateScreenResolutions();
 		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Draw();
 		bool PrepareDataForTheRenderer();
-		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov);
+		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
 		void RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
 		void DumpGameScene();
 		void RenderInventory();
 		void RenderTitle();
 		void RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
-		void ClearScene();
 		void PrintDebugMessage(LPCSTR message, ...);
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
 		void DrawPickup(short objectNum);
 		int  SyncRenderer();
 		void DrawString(int x, int y, const char* string, D3DCOLOR color, int flags);
-		void ClearDynamicLights();
-		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void FreeRendererData();
+		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
 		void UpdateProgress(float value);
 		void GetLaraBonePosition(Vector3* pos, int bone);
 		void ToggleFullScreen();
 		bool IsFullsScreen();
-		std::vector<RendererVideoAdapter>* GetAdapters();
 		void RenderTitleImage();
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);
 		void AddLine3D(Vector3 start, Vector3 end,

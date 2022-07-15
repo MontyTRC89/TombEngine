@@ -1,17 +1,19 @@
 #include "framework.h"
 #include "tr4_troops.h"
+
 #include "Game/control/box.h"
+#include "Game/control/lot.h"
+#include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_fire.h"
 #include "Game/people.h"
-#include "Specific/setup.h"
-#include "Game/control/lot.h"
-#include "Specific/level.h"
 #include "Game/itemdata/creature_info.h"
-#include "Game/control/control.h"
 #include "Game/animation.h"
 #include "Game/misc.h"
+#include "Specific/level.h"
+#include "Specific/setup.h"
 
 namespace TEN::Entities::TR4
 {
@@ -448,7 +450,7 @@ namespace TEN::Entities::TR4
 				break;
 
 			case TROOP_STATE_FLASHED:
-				if (!WeaponEnemyTimer && !(GetRandomControl() & 0x7F))
+				if (!FlashGrenadeAftershockTimer && !(GetRandomControl() & 0x7F))
 					item->Animation.TargetState = TROOP_STATE_GUARD;
 
 				break;
@@ -457,7 +459,7 @@ namespace TEN::Entities::TR4
 				break;
 			}
 
-			if (WeaponEnemyTimer > 100)
+			if (FlashGrenadeAftershockTimer > 100)
 			{
 				if (item->Animation.ActiveState != TROOP_STATE_FLASHED &&
 					item->Animation.ActiveState != TROOP_STATE_ATTACKED_BY_SCORPION)

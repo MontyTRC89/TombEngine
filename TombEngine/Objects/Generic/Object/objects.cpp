@@ -70,7 +70,6 @@ void AnimateWaterfalls()
 
 	lastWaterfallY = (lastWaterfallY - 7) & 0x3F;
 	float y = lastWaterfallY * 0.00390625f;
-	float theY;
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -219,7 +218,7 @@ void HorizontalBarCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo*
 			laraItem->Animation.AnimNumber = LA_SWINGBAR_GRAB;
 			laraItem->Animation.FrameNumber = g_Level.Anims[laraItem->Animation.AnimNumber].frameBase;
 			laraItem->Animation.VerticalVelocity = false;
-			laraItem->Animation.Airborne = false;
+			laraItem->Animation.IsAirborne = false;
 
 			ResetLaraFlex(barItem);
 

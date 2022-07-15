@@ -6,6 +6,13 @@
 #include "tr5_missile.h"
 #include "Game/collision/collide_room.h"
 #include "Game/items.h"
+#include "Game/effects/tomb4fx.h"
+#include "Specific/prng.h"
+
+using namespace TEN::Math::Random;
+
+constexpr int BODY_PART_LIFE = 64;
+constexpr int BOUNCE_FALLSPEED = 32;
 
 void ControlBodyPart(short fxNumber)
 {
@@ -17,7 +24,8 @@ void ControlBodyPart(short fxNumber)
 	if (fx->counter <= 0)
 	{
 		if (fx->speed)
-			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() + 4 * fx->fallspeed);
+			fx->pos.Orientation.x += 4 * fx->fallspeed;
+
 		fx->fallspeed += 6;
 	}
 	else
@@ -34,53 +42,73 @@ void ControlBodyPart(short fxNumber)
 			fx->pos.Orientation.SetZ(fx->pos.Orientation.GetZ() + random);
 			fx->pos.Orientation.SetX(fx->pos.Orientation.GetX() - random);
 		}
+
 		if (--fx->counter < 8)
 			fx->fallspeed += 2;
 	}
 
-	fx->pos.Position.x += fx->speed * sin(fx->pos.Orientation.GetY());
-	fx->pos.Position.y += fx->fallspeed;
-	fx->pos.Position.z += fx->speed * cos(fx->pos.Orientation.GetY());
+	int fallspeed = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber) ? fx->fallspeed / 4 : fx->fallspeed;
+	int speed = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber) ? fx->speed / 4 : fx->speed;
 
-	short roomNumber = fx->roomNumber;
-	FloorInfo* floor = GetFloor(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z,&roomNumber);
+	fx->pos.Position.x += speed * sin(fx->pos.Orientation.y);
+	fx->pos.Position.y += fallspeed;
+	fx->pos.Position.z += speed * cos(fx->pos.Orientation.y);
+
+	if ((fx->flag2 & BODY_EXPLODE) &&
+		!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
+	{
+		if (GenerateInt(0, 10) > (abs(fx->fallspeed) > 0 ? 5 : 8))
+			TriggerFireFlame(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, -1, 0);
+	}
+
+	auto probe = GetCollision(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, fx->roomNumber);
 
 	if (!fx->counter)
 	{
-		int ceiling = GetCeiling(floor, fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-		if (fx->pos.Position.y < ceiling)
+		if (fx->pos.Position.y < probe.Position.Ceiling)
 		{
-			fx->pos.Position.y = ceiling;
+			fx->pos.Position.y = probe.Position.Ceiling;
 			fx->fallspeed = -fx->fallspeed;
 			fx->speed -= (fx->speed / 8);
 		}
 
-		int height = GetFloorHeight(floor, fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
-		if (fx->pos.Position.y >= height)
+		if (fx->pos.Position.y >= probe.Position.Floor)
 		{
-			if (fx->flag2 & 1)
+			if (fx->flag2 & BODY_NO_BOUNCE)
 			{
 				fx->pos.Position.x = x;
 				fx->pos.Position.y = y;
 				fx->pos.Position.z = z;
 
-				if (fx->flag2 & 0x200)
+				if (fx->flag2 & BODY_NO_BOUNCE_ALT)
 					ExplodeFX(fx, -2, 32);
 				else
 					ExplodeFX(fx, -1, 32);
 
 				KillEffect(fxNumber);
-				if (fx->flag2 & 0x800)
-					SoundEffect(SFX_TR4_ROCK_FALL_LAND,&fx->pos);
+
+				if (fx->flag2 & BODY_STONE_SOUND)
+					SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx->pos);
+
 				return;
 			}
 
-			if (y <= height)
+			if (y <= probe.Position.Floor)
 			{
-				if (fx->fallspeed <= 32)
+				if (fx->fallspeed <= BOUNCE_FALLSPEED)
 					fx->fallspeed = 0;
 				else
+				{
 					fx->fallspeed = -fx->fallspeed / 4;
+
+					if (!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
+					{
+						if (fx->flag2 & BODY_STONE_SOUND)
+							SoundEffect(SFX_TR4_ROCK_FALL_LAND, &fx->pos);
+						else if (fx->flag2 & BODY_GIBS)
+							SoundEffect(SFX_TR4_LARA_THUD, &fx->pos, SoundEnvironment::Land, GenerateFloat(0.8f, 1.2f));
+					}
+				}
 			}
 			else
 			{
@@ -95,24 +123,47 @@ void ControlBodyPart(short fxNumber)
 			fx->pos.Position.y = y;
 		}
 
-		if (!fx->speed && ++fx->flag1 > 32)
+		if (!fx->speed && ++fx->flag1 > BODY_PART_LIFE)
 		{
+			for (int i = 0; i < 6; i++)
+			{
+				TriggerFlashSmoke(fx->pos.Position.x + GenerateInt(-16, 16), 
+								  fx->pos.Position.y + GenerateInt( 16, 32),
+								  fx->pos.Position.z + GenerateInt(-16, 16), fx->roomNumber);
+			}
 			KillEffect(fxNumber);
 			return;
 		}
 
-		if (fx->flag2 & 2 && (GetRandomControl() & 1))
+		if ((fx->flag2 & BODY_GIBS) && (GetRandomControl() & 1))
 		{
-			DoBloodSplat(
-				(GetRandomControl() & 0x3F) + fx->pos.Position.x - 32,
-				(GetRandomControl() & 0x1F) + fx->pos.Position.y - 16,
-				(GetRandomControl() & 0x3F) + fx->pos.Position.z - 32,
-				1,
-				2 * GetRandomControl(),
-				fx->roomNumber);
+			for (int i = 0; i < (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber) ? 1 : 6); i++)
+			{
+				DoBloodSplat(
+					(GetRandomControl() & 0x3F) + fx->pos.Position.x - 32,
+					(GetRandomControl() & 0x1F) + fx->pos.Position.y - 16,
+					(GetRandomControl() & 0x3F) + fx->pos.Position.z - 32,
+					1,
+					2 * GetRandomControl(),
+					fx->roomNumber);
+			}
 		}
 	}
 
-	if (roomNumber != fx->roomNumber)
-		EffectNewRoom(fxNumber, roomNumber);
+	if (probe.RoomNumber != fx->roomNumber)
+	{
+		if ( TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, probe.RoomNumber) &&
+			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, fx->roomNumber))
+		{
+			int waterHeight = GetWaterHeight(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z, probe.RoomNumber);
+			SplashSetup.y = waterHeight - 1;
+			SplashSetup.x = fx->pos.Position.x;
+			SplashSetup.z = fx->pos.Position.z;
+			SplashSetup.splashPower = fx->fallspeed;
+			SplashSetup.innerRadius = 48;
+			SetupSplash(&SplashSetup, probe.RoomNumber);
+		}
+
+		EffectNewRoom(fxNumber, probe.RoomNumber);
+	}
 }

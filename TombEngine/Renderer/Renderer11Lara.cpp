@@ -287,8 +287,8 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * 32);
 	m_cbItem.updateData(m_stItem, m_context.Get());
-	m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-	m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 	if (!shadowMap)
 	{
@@ -298,7 +298,7 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
 
 		m_cbLights.updateData(m_stLights, m_context.Get());
-		m_context->PSSetConstantBuffers(2, 1, m_cbLights.get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 	}
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -340,8 +340,8 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 
 		memcpy(m_stItem.BonesMatrices, matrices, sizeof(Matrix) * 7);
 		m_cbItem.updateData(m_stItem, m_context.Get());
-		m_context->VSSetConstantBuffers(1, 1, m_cbItem.get());
-		m_context->PSSetConstantBuffers(1, 1, m_cbItem.get());
+		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 		{

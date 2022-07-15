@@ -348,7 +348,7 @@ namespace TEN::Entities::TR4
 			case 14:
 				if (item->Animation.AnimNumber != Objects[item->Animation.AnimNumber].animIndex + 26)
 				{
-					item->Animation.Airborne = false;
+					item->Animation.IsAirborne = false;
 					creature->MaxTurn = 0;
 					creature->Target.y = LaraItem->Pose.Position.y;
 					creature->LOT.Fly = 16;
@@ -374,7 +374,7 @@ namespace TEN::Entities::TR4
 				}
 				else
 				{
-					item->Animation.Airborne = true;
+					item->Animation.IsAirborne = true;
 					creature->LOT.Fly = 0;
 
 					if ((item->Pose.Position.y - item->Floor) > 0)

@@ -170,10 +170,10 @@ void FlowHandler::SetTitleScreenImagePath(std::string const& path)
 	TitleScreenImagePath = path;
 }
 
-void FlowHandler::SetGameFarView(byte val)
+void FlowHandler::SetGameFarView(short val)
 {
 	bool cond = val <= 127 && val >= 1;
-	std::string msg{ "Game far view value must be in the range [1, 127]." };
+	std::string msg{ "Game far view value must be in the range [1, 255]." };
 	if (!ScriptAssert(cond, msg))
 	{
 		ScriptWarn("Setting game far view to 32.");
@@ -220,12 +220,15 @@ int FlowHandler::GetLevelNumber(std::string const& fileName)
 	if (fileName.empty())
 		return -1;
 
+	auto lcFilename = fileName;
+	std::transform(lcFilename.begin(), lcFilename.end(), lcFilename.begin(), [](unsigned char c) { return std::tolower(c); });
+
 	for (int i = 0; i < Levels.size(); i++)
 	{
 		auto level = this->GetLevel(i)->FileName;
 		std::transform(level.begin(), level.end(), level.begin(), [](unsigned char c) { return std::tolower(c); });
 
-		if (level == fileName && std::filesystem::exists(fileName))
+		if (level == lcFilename && std::filesystem::exists(fileName))
 			return i;
 	}
 
@@ -309,9 +312,10 @@ bool FlowHandler::DoFlow()
 
 			break;
 		case GameStatus::LevelComplete:
-			if (LevelComplete == Levels.size())
+			if (LevelComplete >= Levels.size())
 			{
 				// TODO: final credits
+				CurrentLevel = 0;
 			}
 			else
 				CurrentLevel++;
@@ -326,4 +330,9 @@ bool FlowHandler::DoFlow()
 bool FlowHandler::CanPlayAnyLevel() const
 {
 	return PlayAnyLevel;
+}
+
+short FlowHandler::GetGameFarView() const
+{
+	return GameFarView;
 }

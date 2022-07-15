@@ -31,10 +31,15 @@ bool LaraDeflectEdge(ItemInfo* item, CollisionInfo* coll)
 	if (coll->CollisionType == CT_FRONT || coll->CollisionType == CT_TOP_FRONT)
 	{
 		ShiftItem(item, coll);
-
 		item->Animation.TargetState = LS_IDLE;
 		item->Animation.Velocity = 0;
 		return true;
+	}
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ShiftItem(item, coll);
+		return false;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -159,9 +164,15 @@ bool LaraDeflectEdgeCrawl(ItemInfo* item, CollisionInfo* coll)
 	{
 		ShiftItem(item, coll);
 
-		item->Animation.Airborne = false;
 		item->Animation.Velocity = 0;
+		item->Animation.IsAirborne = false;
 		return true;
+	}
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ShiftItem(item, coll);
+		return false;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -190,9 +201,15 @@ bool LaraDeflectEdgeMonkey(ItemInfo* item, CollisionInfo* coll)
 		ShiftItem(item, coll);
 
 		item->Animation.TargetState = LS_MONKEY_IDLE;
-		item->Animation.Airborne = false;
 		item->Animation.Velocity = 0;
+		item->Animation.IsAirborne = false;
 		return true;
+	}
+
+	if (TrInput & (IN_LEFT | IN_RIGHT))
+	{
+		ShiftItem(item, coll);
+		return false;
 	}
 
 	if (coll->CollisionType == CT_LEFT)
@@ -331,25 +348,28 @@ void LaraCollideStopMonkey(ItemInfo* item, CollisionInfo* coll)
 
 void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, float angle)
 {
+	// Snapping distance of Lara's radius + 12 units is seemingly empirical value from Core tests.
+	int snapDistance = coll->Setup.Radius + 12;
+
 	if (item->Animation.ActiveState == LS_SHIMMY_RIGHT)
 	{
 		switch (Angle::RadToShrt(angle)) // TODO
 		{
 		case NORTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 
 		case EAST:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 		}
 	}
@@ -359,20 +379,20 @@ void LaraSnapToEdgeOfBlock(ItemInfo* item, CollisionInfo* coll, float angle)
 		switch (Angle::RadToShrt(angle))
 		{
 		case NORTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 
 		case EAST:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 
 		case SOUTH:
-			item->Pose.Position.x = coll->Setup.OldPosition.x & 0xFFFFFF90 | 0x390;
+			item->Pose.Position.x = (coll->Setup.OldPosition.x & ~(WALL_SIZE - 1)) | (WALL_SIZE - snapDistance);
 			return;
 
 		case WEST:
 		default:
-			item->Pose.Position.z = coll->Setup.OldPosition.z & 0xFFFFFC70 | 0x70;
+			item->Pose.Position.z = (coll->Setup.OldPosition.z & ~(WALL_SIZE - 1)) | snapDistance;
 			return;
 		}
 	}
@@ -385,7 +405,7 @@ void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 
 	if (coll->Middle.Floor <= STEPUP_HEIGHT)
 	{
-		item->Animation.Airborne = false;
+		item->Animation.IsAirborne = false;
 		item->Animation.VerticalVelocity = 0;
 	}
 }
@@ -675,7 +695,7 @@ bool TestLaraHitCeiling(CollisionInfo* coll)
 
 void SetLaraHitCeiling(ItemInfo* item, CollisionInfo* coll)
 {
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	item->Pose.Position = coll->Setup.OldPosition;

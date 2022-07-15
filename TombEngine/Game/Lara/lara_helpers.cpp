@@ -19,7 +19,7 @@
 #include "Objects/TR3/Vehicles/big_gun.h"
 #include "Objects/TR3/Vehicles/kayak.h"
 #include "Objects/TR3/Vehicles/minecart.h"
-#include "Objects/TR3/Vehicles/quad.h"
+#include "Objects/TR3/Vehicles/quad_bike.h"
 #include "Objects/TR3/Vehicles/upv.h"
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
@@ -353,8 +353,9 @@ float GetLaraSlideDirection(ItemInfo* item, CollisionInfo* coll)
 		return (GetQuadrant(headingAngle) * Angle::DegToRad(90.0f));
 }
 
-float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, float maxTurnRate, float axisCoeff)
+float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, float maxTurnRate, float axisCoeff, bool invert)
 {
+	axisCoeff *= invert ? -1 : 1;
 	int sign = std::copysign(1, axisCoeff);
 	float minTurnRateNormalized = minTurnRate * abs(axisCoeff);
 	float maxTurnRateNormalized = maxTurnRate * abs(axisCoeff);
@@ -364,25 +365,26 @@ float ModulateLaraTurnRate(float turnRate, float accelRate, float minTurnRate, f
 	return newTurnRate * sign;
 }
 
-void ModulateLaraTurnRateX(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate)
+// TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26
+void ModulateLaraTurnRateX(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, -AxisMap[InputAxis::MoveVertical]);
+	lara->Control.TurnRate.x = ModulateLaraTurnRate(lara->Control.TurnRate.x, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxis::MoveVertical], invert);
 }
 
-void ModulateLaraTurnRateY(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate)
+void ModulateLaraTurnRateY(ItemInfo* item, float accelRate, float minTurnRate, float maxTurnRate, bool invert)
 {
 	auto* lara = GetLaraInfo(item);
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
-	if (item->Animation.Airborne)
+	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
 		axisCoeff = std::min(1.2f, abs(axisCoeff)) * sign;
 	}
 
-	lara->Control.TurnRate.y = ModulateLaraTurnRate(lara->Control.TurnRate.y, accelRate, minTurnRate, maxTurnRate, axisCoeff);
+	lara->Control.TurnRate.y = ModulateLaraTurnRate(lara->Control.TurnRate.y, accelRate, minTurnRate, maxTurnRate, axisCoeff, invert);
 }
 
 void ModulateLaraSwimTurnRates(ItemInfo* item, CollisionInfo* coll)
@@ -496,19 +498,19 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	}
 }
 
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
+void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, float baseRate, float maxAngle)
 {
 	if (!item->Animation.Velocity)
 		return;
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
+	float maxAngleNormalized = maxAngle * axisCoeff;
 
 	if (coll->CollisionType == CT_LEFT || coll->CollisionType == CT_RIGHT)
 		maxAngleNormalized *= 0.6f;
 
-	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
+	item->Pose.Orientation.z += std::min(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
 }
 
 // TODO: Adapt to the above.
@@ -521,7 +523,7 @@ void OldDoLaraLean(ItemInfo* item, CollisionInfo* coll, float maxAngle, float ra
 	item->Pose.Orientation.SetZ(Angle::InterpolateConstantEaseOut(item->Pose.Orientation.GetZ(), maxAngle, rate, 0.4f, Angle::DegToRad(0.1f)));
 }
 
-void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
+void ModulateLaraCrawlFlex(ItemInfo* item, float baseRate, float maxAngle)
 {
 	auto* lara = GetLaraInfo(item);
 
@@ -533,10 +535,10 @@ void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
 
 	float axisCoeff = AxisMap[InputAxis::MoveHorizontal];
 	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
+	float maxAngleNormalized = maxAngle * axisCoeff;
 
 	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
-		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
+		lara->ExtraTorsoRot.z += std::min(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
 
 	if (!(TrInput & IN_LOOK) &&
 		item->Animation.ActiveState != LS_CRAWL_BACK)
@@ -659,7 +661,7 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 	SnapItemToLedge(item, coll, 1.7f, false);
 
 	item->Animation.ActiveState = LS_ONWATER_EXIT;
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	lara->ProjectedFloorHeight = climbOutContext.Height;
@@ -671,7 +673,7 @@ void SetContextWaterClimbOut(ItemInfo* item, CollisionInfo* coll, WaterClimbOutT
 
 void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 {
-	//item->Airborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
+	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug Core had worked around in an obscure way. I hope to find a proper solution. @Sezz 2022.02.18
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 
@@ -681,14 +683,14 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 void SetLaraFallAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_START);
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.VerticalVelocity = 0;
 }
 
 void SetLaraFallBackAnimation(ItemInfo* item)
 {
 	SetAnimation(item, LA_FALL_BACK);
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.VerticalVelocity = 0;
 }
 
@@ -706,9 +708,10 @@ void SetLaraMonkeyRelease(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
+	lara->Control.TurnRate.y = 0;
 	lara->Control.HandStatus = HandStatus::Free;
 }
 
@@ -802,7 +805,7 @@ void SetLaraHang(ItemInfo* item)
 	auto* lara = GetLaraInfo(item);
 
 	ResetLaraFlex(item);
-	item->Animation.Airborne = false;
+	item->Animation.IsAirborne = false;
 	item->Animation.Velocity = 0;
 	item->Animation.VerticalVelocity = 0;
 	lara->Control.HandStatus = HandStatus::Busy;
@@ -824,7 +827,7 @@ void SetLaraHangReleaseAnimation(ItemInfo* item)
 		item->Pose.Position.y += GetBoundsAccurate(item)->Y2 * 1.8f;
 	}
 
-	item->Animation.Airborne = true;
+	item->Animation.IsAirborne = true;
 	item->Animation.Velocity = 2;
 	item->Animation.VerticalVelocity = 1;
 	lara->Control.HandStatus = HandStatus::Free;
@@ -837,7 +840,7 @@ void SetLaraCornerAnimation(ItemInfo* item, CollisionInfo* coll, bool flip)
 	if (item->HitPoints <= 0)
 	{
 		SetAnimation(item, LA_FALL_START);
-		item->Animation.Airborne = true;
+		item->Animation.IsAirborne = true;
 		item->Animation.Velocity = 2;
 		item->Animation.VerticalVelocity = 1;
 		item->Pose.Position.y += CLICK(1);
@@ -922,14 +925,14 @@ void ResetLaraFlex(ItemInfo* item, float alpha)
 	lara->ExtraTorsoRot.InterpolateLinear(EulerAngles::Zero, alpha, Angle::DegToRad(0.1f));
 }
 
-void RumbleLaraHealthCondition(ItemInfo* lara)
+void RumbleLaraHealthCondition(ItemInfo* item)
 {
-	auto* info = GetLaraInfo(lara);
+	auto* lara = GetLaraInfo(item);
 
-	if (lara->HitPoints > LARA_HEALTH_CRITICAL && !info->PoisonPotency)
+	if (item->HitPoints > LARA_HEALTH_CRITICAL && !lara->PoisonPotency)
 		return;
 
-	bool pulse = (GlobalCounter & 0x1F) % 0x1F == 0;
-	if (pulse)
+	bool doPulse = (GlobalCounter & 0x0F) % 0x0F == 1;
+	if (doPulse)
 		Rumble(0.2f, 0.1f);
 }

@@ -26,7 +26,7 @@
 #include "Objects/TR2/Trap/tr2_springboard.h"
 #include "Objects/TR2/Trap/tr2_killerstatue.h"
 /// vehicles
-#include "Objects/TR2/Vehicles/boat.h"
+#include "Objects/TR2/Vehicles/speedboat.h"
 #include "Objects/TR2/Vehicles/skidoo.h"
 /// necessary import
 #include "Game/control/box.h"
@@ -662,9 +662,9 @@ static void StartVehicles(ObjectInfo* obj)
 	obj = &Objects[ID_SPEEDBOAT];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseSpeedBoat;
-		obj->collision = SpeedBoatCollision;
-		obj->control = SpeedBoatControl;
+		obj->initialise = InitialiseSpeedboat;
+		obj->collision = SpeedboatPlayerCollision;
+		obj->control = SpeedboatControl;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->savePosition = true;
@@ -676,7 +676,7 @@ static void StartVehicles(ObjectInfo* obj)
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseSkidoo;
-		obj->collision = SkidooCollision;
+		obj->collision = SkidooPlayerCollision;
 		//obj->drawRoutine = DrawSkidoo; // TODO: create a new render for the skidoo. (with track animated)
 		obj->saveAnim = true;
 		obj->saveFlags = true;

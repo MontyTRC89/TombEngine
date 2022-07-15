@@ -26,8 +26,8 @@ namespace TEN::Renderer
 			m_rooms[i].TransparentFacesToDraw.clear();
 			m_rooms[i].StaticsToDraw.clear();
 			m_rooms[i].Visited = false;
-			m_rooms[i].Clip = RendererRectangle(ScreenWidth, ScreenHeight, 0, 0);
-			m_rooms[i].ClipTest = RendererRectangle(ScreenWidth, ScreenHeight, 0, 0);
+			m_rooms[i].Clip = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
+			m_rooms[i].ClipTest = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
 			m_rooms[i].BoundActive = 0;
 		}
 
@@ -84,13 +84,13 @@ namespace TEN::Renderer
 
 				if (p[i].w > 0)
 				{
-					xs = 0.5f * (p[i].x + 1.0f) * g_Renderer.ScreenWidth;
-					ys = 0.5f * (p[i].y + 1.0f) * g_Renderer.ScreenHeight;
+					xs = 0.5f * (p[i].x + 1.0f) * m_screenWidth;
+					ys = 0.5f * (p[i].y + 1.0f) * m_screenHeight;
 				}
 				else
 				{
-					xs = (p[i].x >= 0) ? 0 : g_Renderer.ScreenWidth;
-					ys = (p[i].y >= 0) ? g_Renderer.ScreenHeight : 0;
+					xs = (p[i].x >= 0) ? 0 : m_screenWidth;
+					ys = (p[i].y >= 0) ? m_screenHeight : 0;
 				}
 
 				// Has bound changed?
@@ -128,22 +128,22 @@ namespace TEN::Renderer
 					if (a.x < 0 && b.x < 0)
 						left = 0;
 					else if (a.x > 0 && b.x > 0)
-						right = g_Renderer.ScreenWidth;
+						right = m_screenWidth;
 					else
 					{
 						left = 0;
-						right = g_Renderer.ScreenWidth;
+						right = m_screenWidth;
 					}
 
 					// Y clip
 					if (a.y < 0 && b.y < 0)
 						top = 0;
 					else if (a.y > 0 && b.y > 0)
-						bottom = g_Renderer.ScreenHeight;
+						bottom = m_screenHeight;
 					else
 					{
 						top = 0;
-						bottom = g_Renderer.ScreenHeight;
+						bottom = m_screenWidth;
 					}
 				}
 			}
@@ -292,7 +292,7 @@ namespace TEN::Renderer
 		RendererRoom* room = &m_rooms[Camera.pos.roomNumber];
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[Camera.pos.roomNumber];
 
-		room->ClipTest = RendererRectangle(0, 0, ScreenWidth, ScreenHeight);
+		room->ClipTest = RendererRectangle(0, 0, m_screenWidth, m_screenHeight);
 		m_outside = nativeRoom->flags & ENV_FLAG_OUTSIDE;
 		m_cameraUnderwater = (nativeRoom->flags & ENV_FLAG_WATER);
 
@@ -306,11 +306,11 @@ namespace TEN::Renderer
 		// Horizon clipping
 		if (m_outside)
 		{
-			m_outsideClip = RendererRectangle(0, 0, ScreenWidth, ScreenHeight);
+			m_outsideClip = RendererRectangle(0, 0, m_screenWidth, m_screenHeight);
 		}
 		else
 		{
-			m_outsideClip = RendererRectangle(ScreenWidth, ScreenHeight, 0, 0);
+			m_outsideClip = RendererRectangle(m_screenWidth, m_screenHeight, 0, 0);
 		}
 
 		// Get all rooms and objects to draw
@@ -536,6 +536,9 @@ namespace TEN::Renderer
 				(item->AmbientLightSteps / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->CurrentRoomNumber].AmbientLight);
 			item->AmbientLight.w = 1.0f;
 		}
+
+		// Multiply calculated ambient light by object tint
+		item->AmbientLight *= nativeItem->Color;
 
 		// Now collect lights from dynamic list and from rooms
 		std::vector<RendererLight*> tempLights;

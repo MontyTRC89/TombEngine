@@ -207,29 +207,29 @@ namespace TEN::Renderer
 			// Draw the aiming point
 			RendererVertex vertices[4];
 
-			vertices[0].Position.x = -4.0f / ScreenWidth;
-			vertices[0].Position.y = 4.0f / ScreenHeight;
+			vertices[0].Position.x = -4.0f / m_screenWidth;
+			vertices[0].Position.y = 4.0f / m_screenHeight;
 			vertices[0].Position.z = 0.0f;
 			vertices[0].UV.x = 0.0f;
 			vertices[0].UV.y = 0.0f;
 			vertices[0].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
-			vertices[1].Position.x = 4.0f / ScreenWidth;
-			vertices[1].Position.y = 4.0f / ScreenHeight;
+			vertices[1].Position.x = 4.0f / m_screenWidth;
+			vertices[1].Position.y = 4.0f / m_screenHeight;
 			vertices[1].Position.z = 0.0f;
 			vertices[1].UV.x = 1.0f;
 			vertices[1].UV.y = 0.0f;
 			vertices[1].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
-			vertices[2].Position.x = 4.0f / ScreenWidth;
-			vertices[2].Position.y = -4.0f / ScreenHeight;
+			vertices[2].Position.x = 4.0f / m_screenWidth;
+			vertices[2].Position.y = -4.0f / m_screenHeight;
 			vertices[2].Position.z = 0.0f;
 			vertices[2].UV.x = 1.0f;
 			vertices[2].UV.y = 1.0f;
 			vertices[2].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
-			vertices[3].Position.x = -4.0f / ScreenWidth;
-			vertices[3].Position.y = -4.0f / ScreenHeight;
+			vertices[3].Position.x = -4.0f / m_screenWidth;
+			vertices[3].Position.y = -4.0f / m_screenHeight;
 			vertices[3].Position.z = 0.0f;
 			vertices[3].UV.x = 0.0f;
 			vertices[3].UV.y = 1.0f;
@@ -251,7 +251,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::DoFadingAndCinematicBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
+	void Renderer11::DrawFadeAndBars(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget,
 		RenderView& view)
 	{
 		SetBlendMode(BLENDMODE_OPAQUE);
@@ -299,12 +299,12 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 
-		m_stPostProcessBuffer.ViewportWidth = ScreenWidth;
-		m_stPostProcessBuffer.ViewportHeight = ScreenHeight;
+		m_stPostProcessBuffer.ViewportWidth = m_screenWidth;
+		m_stPostProcessBuffer.ViewportHeight = m_screenHeight;
 		m_stPostProcessBuffer.ScreenFadeFactor = ScreenFadeCurrent;
 		m_stPostProcessBuffer.CinematicBarsHeight = CinematicBarsHeight;
 		m_cbPostProcessBuffer.updateData(m_stPostProcessBuffer, m_context.Get());
-		m_context->PSSetConstantBuffers(7, 1, m_cbPostProcessBuffer.get());
+		BindConstantBufferPS(CB_POSTPROCESS, m_cbPostProcessBuffer.get());
 
 		BindTexture(TEXTURE_COLOR_MAP, &m_renderTarget, SAMPLER_ANISOTROPIC_CLAMP);
 
@@ -340,7 +340,7 @@ namespace TEN::Renderer
 			D3D11_TEXTURE2D_DESC desc;
 			texture2D->GetDesc(&desc);
 
-			float screenAspect = float(ScreenWidth) / float(ScreenHeight);
+			float screenAspect = float(m_screenWidth) / float(m_screenHeight);
 			float imageAspect  = float(desc.Width) / float(desc.Height);
 
 			if (screenAspect > imageAspect)
@@ -351,7 +351,7 @@ namespace TEN::Renderer
 			}
 			else
 			{
-				float diff = (imageAspect - screenAspect) / screenAspect / 2;
+				float diff = (imageAspect - screenAspect) / imageAspect / 2;
 				uvStart.x += diff;
 				uvEnd.x   -= diff;
 			}

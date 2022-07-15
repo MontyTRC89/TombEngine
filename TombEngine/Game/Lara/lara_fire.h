@@ -44,6 +44,7 @@ enum WeaponState
 };
 
 extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
+extern int FlashGrenadeAftershockTimer;
 
 void SmashItem(short itemNum);
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType);

@@ -101,8 +101,17 @@ void TriggerChaffEffects(ItemInfo* item, Vector3Int* pos, Vector3Int* vel, int s
 		}
 	}
 
-	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item);
-	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, & item->Pose, cond ? SoundEnvironment::Water : SoundEnvironment::Always, 1.0f, 0.5f);
+	PHD_3DPOS position = item->Pose;
+	if (item->IsLara())
+	{
+		Vector3Int handPos = {};
+		GetJointAbsPosition(item, &handPos, LM_RHAND);
+		position.Position = handPos;
+		position.Position.y -= 64;
+	}
+
+	auto cond = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, position.Position.x, position.Position.y, position.Position.z, item->RoomNumber);
+	SoundEffect(cond ? SFX_TR4_FLARE_BURN_UNDERWATER : SFX_TR4_FLARE_BURN_DRY, &position, SoundEnvironment::Always, 1.0f, 0.5f);
 }
 
 void TriggerChaffSparkles(Vector3Int* pos, Vector3Int* vel, CVECTOR* color, int age, ItemInfo* item)
@@ -222,8 +231,8 @@ void TriggerChaffBubbles(Vector3Int* pos, int FlareRoomNumber)
 	bubble.age = 0;
 	bubble.speed = GenerateFloat(4, 16);
 	bubble.sourceColor = Vector4(0, 0, 0, 0);
-	float shade = GenerateFloat(0.3, 0.8);
-	bubble.destinationColor = Vector4(shade, shade, shade, 0.8);
+	float shade = GenerateFloat(0.3f, 0.8f);
+	bubble.destinationColor = Vector4(shade, shade, shade, 0.8f);
 	bubble.color = bubble.sourceColor;
 	bubble.destinationSize = GenerateFloat(32, 96);
 	bubble.spriteNum = SPR_BUBBLES;
@@ -232,7 +241,7 @@ void TriggerChaffBubbles(Vector3Int* pos, int FlareRoomNumber)
 	float maxAmplitude = 64;
 	bubble.amplitude = Vector3(GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude), GenerateFloat(-maxAmplitude, maxAmplitude));
 	bubble.worldPositionCenter = bubble.worldPosition;
-	bubble.wavePeriod = Vector3(GenerateFloat(-3.14, 3.14), GenerateFloat(-3.14, 3.14), GenerateFloat(-3.14, 3.14));
+	bubble.wavePeriod = Vector3(GenerateFloat(-PI, PI), GenerateFloat(-PI, PI), GenerateFloat(-PI, PI));
 	bubble.waveSpeed = Vector3(1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16), 1 / GenerateFloat(8, 16));
 	bubble.roomNumber = FlareRoomNumber;
 }
