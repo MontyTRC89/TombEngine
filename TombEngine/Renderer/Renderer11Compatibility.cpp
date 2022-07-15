@@ -753,7 +753,7 @@ namespace TEN::Renderer
 		RendererMesh* mesh = new RendererMesh();
 
 		mesh->Sphere = meshPtr->sphere;
-		mesh->LightMode = meshPtr->lightMode;
+		mesh->LightMode = LIGHT_MODES(meshPtr->lightMode);
 
 		if (meshPtr->positions.size() == 0)
 			return mesh;
