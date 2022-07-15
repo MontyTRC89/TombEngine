@@ -73,6 +73,4 @@ namespace TEN::Input
 
 		void UpdateValue(float value);
 	};
-
-	extern std::vector<InputAction> ActionMap;
 }
