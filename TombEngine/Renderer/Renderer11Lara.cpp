@@ -291,22 +291,12 @@ void TEN::Renderer::Renderer11::DrawLara(bool shadowMap, RenderView& view, bool 
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 	if (!shadowMap)
-	{
-		m_stLights.NumLights = item->LightsToDraw.size();
-
-		for (int j = 0; j < item->LightsToDraw.size(); j++)
-			memcpy(&m_stLights.Lights[j], item->LightsToDraw[j], sizeof(ShaderLight));
-
-		m_cbLights.updateData(m_stLights, m_context.Get());
-		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
-	}
+		BindLights(item->LightsToDraw);
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		
 		RendererMesh *mesh = GetMesh(Lara.MeshPtrs[k]);
 		DrawMoveableMesh(item, mesh, room, k, transparent);
-
 	}
 
 	DrawLaraHolsters(transparent);

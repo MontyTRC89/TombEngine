@@ -316,6 +316,16 @@ namespace TEN::Renderer
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
 	}
 
+	void Renderer11::BindLights(std::vector<RendererLight*>& lights)
+	{
+		m_stLights.NumLights = lights.size();
+		for (int j = 0; j < lights.size(); j++)
+			memcpy(&m_stLights.Lights[j], lights[j], sizeof(ShaderLight));
+		m_cbLights.updateData(m_stLights, m_context.Get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindConstantBufferVS(CB_LIGHTS, m_cbLights.get());
+	}
+
 	void Renderer11::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
 	{
 		m_context->VSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
