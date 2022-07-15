@@ -16,9 +16,9 @@ constexpr auto WADE_DEPTH = STEPUP_HEIGHT;
 constexpr auto SHALLOW_WATER_START_LEVEL = STEP_SIZE / 4;
 constexpr auto BAD_JUMP_CEILING = ((STEP_SIZE * 3) / 4);
 constexpr auto SLOPE_DIFFERENCE = 60;
-constexpr auto NO_HEIGHT  = (-0x7F00);
-constexpr auto MAX_HEIGHT = (-0x7FFF);
-constexpr auto DEEP_WATER = 0x7FFF;
+constexpr auto NO_HEIGHT  = INT_MIN + UCHAR_MAX;
+constexpr auto MAX_HEIGHT = INT_MIN + 1; // Add 1 to prevent issue with sign changes
+constexpr auto DEEP_WATER = INT_MAX - 1; // Subtract 1 to prevent issue with sign changes
 
 constexpr auto SQUARE = [](auto x) { return x * x; };
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
