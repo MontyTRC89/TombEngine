@@ -244,14 +244,14 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
-	static short GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance)
+	static int GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance)
 	{
 		auto probe = GetCollision(minecartItem, angle, distance, -LARA_HEIGHT);
 
 		if (probe.Position.Floor != NO_HEIGHT)
 			probe.Position.Floor -= minecartItem->Pose.Position.y;
 
-		return (short)probe.Position.Floor;
+		return probe.Position.Floor;
 	}
 
 	static bool TestMinecartDismount(ItemInfo* laraItem, int direction)
@@ -588,7 +588,7 @@ namespace TEN::Entities::Vehicles
 		auto* minecart = GetMinecartInfo(minecartItem);
 		auto* lara = GetLaraInfo(laraItem);
 
-		short floorHeight;
+		int floorHeight;
 
 		switch (laraItem->Animation.ActiveState)
 		{
