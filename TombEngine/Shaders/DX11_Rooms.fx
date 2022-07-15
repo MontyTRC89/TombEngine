@@ -3,15 +3,9 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./AlphaTestBuffer.hlsli"
-#define SHADOW_INTENSITY (0.55f)
-#define INV_SHADOW_INTENSITY (1.0f-SHADOW_INTENSITY)
 
-cbuffer LightsBuffer : register(b2)
-{
-	ShaderLight Lights[MAX_LIGHTS];
-	int NumLights;
-	float3 Padding;
-};
+#define SHADOW_INTENSITY (0.55f)
+#define INV_SHADOW_INTENSITY (1.0f - SHADOW_INTENSITY)
 
 struct Sphere
 {
@@ -22,7 +16,6 @@ struct Sphere
 cbuffer MiscBuffer : register(b3)
 {
 	int Caustics;
-
 };
 
 cbuffer ShadowLightBuffer : register(b4)
