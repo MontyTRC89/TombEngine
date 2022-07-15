@@ -277,7 +277,6 @@ namespace TEN::Renderer
 			RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
 
 			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
-			m_stItem.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			m_stItem.World = Matrix::Identity;
 			Matrix matrices[7];
 			matrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
@@ -1376,7 +1375,6 @@ namespace TEN::Renderer
 		m_stStatic.World = info->world;
 		m_stStatic.Position = Vector4(info->position.x, info->position.y, info->position.z, 1.0f);
 		m_stStatic.Color = info->room->AmbientLight * info->color;
-		m_stStatic.LightMode = info->staticMesh->Id
 		m_cbStatic.updateData(m_stStatic, m_context.Get());
 		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
