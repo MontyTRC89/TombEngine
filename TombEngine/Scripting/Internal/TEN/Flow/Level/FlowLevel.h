@@ -49,10 +49,11 @@ struct Level : public ScriptInterfaceLevel
 	RGBAColor8Byte GetSkyLayerColor(int index) const override;
 	LaraType GetLaraType() const override;
 	void SetWeatherStrength(float val);
-	void SetLevelFarView(byte val);
+	void SetLevelFarView(short val);
 	static void Register(sol::table & parent);
 	WeatherType GetWeatherType() const override;
 	short GetMirrorRoom() const override;
 	short GetFogMinDistance() const override;
 	short GetFogMaxDistance() const override;
+	short GetFarView() const override;
 };

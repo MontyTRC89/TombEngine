@@ -234,3 +234,6 @@ constexpr auto HUD_ZERO_Y = -REFERENCE_RES_HEIGHT;
 constexpr auto UNDERWATER_FOG_MIN_DISTANCE = 4;
 constexpr auto UNDERWATER_FOG_MAX_DISTANCE = 30;
 constexpr auto MAX_ROOM_BOUNDS = 256;
+
+constexpr auto MIN_FAR_VIEW = 3200.0f;
+constexpr auto DEFAULT_FAR_VIEW = 102400.0f;
