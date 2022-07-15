@@ -1,4 +1,3 @@
-
 #define LT_SUN		0
 #define LT_POINT	1
 #define LT_SPOT		2
@@ -20,6 +19,12 @@ struct ShaderLight
 	float Range;
 };
 
+cbuffer LightsBuffer : register(b2)
+{
+	ShaderLight Lights[MAX_LIGHTS];
+	int NumLights;
+	float3 CameraPosition;
+};
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
 {
@@ -154,4 +159,44 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 	}
 
 	return (color * d);
+}
+
+float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen)
+{
+	float3 ambTex = ambient * tex;
+
+	float3 diffuse = 0;
+	float3 spec = 0;
+
+	for (int i = 0; i < NumLights; i++)
+	{
+		int lightType = Lights[i].Type;
+
+		if (lightType == LT_POINT || lightType == LT_SHADOW)
+		{
+			diffuse += DoPointLight(pos, normal, Lights[i]);
+			spec += DoSpecularPoint(pos, normal, Lights[i], sheen);
+
+		}
+		else if (lightType == LT_SUN)
+		{
+			diffuse += DoDirectionalLight(pos, normal, Lights[i]);
+			spec += DoSpecularSun(normal, Lights[i], sheen);
+
+		}
+		else if (lightType == LT_SPOT)
+		{
+			diffuse += DoSpotLight(pos, normal, Lights[i]);
+			spec += DoSpecularSpot(pos, normal, Lights[i], sheen);
+		}
+	}
+
+	diffuse.xyz *= tex.xyz;
+
+	float3 combined = ambTex + diffuse + spec;
+
+	float3 colorMul = min(vertex, 1.0f);
+	combined *= colorMul.xyz;
+
+	return combined;
 }
