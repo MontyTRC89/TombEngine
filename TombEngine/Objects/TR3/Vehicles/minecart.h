@@ -18,7 +18,7 @@ namespace TEN::Entities::Vehicles
 	void DoMinecartMount(ItemInfo* minecartItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool TestMinecartDismount(ItemInfo* laraItem, int direction);
 
-	short GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance);
+	int GetMinecartCollision(ItemInfo* minecartItem, short angle, int distance);
 	void MinecartToEntityCollision(ItemInfo* minecartItem, ItemInfo* laraItem);
 	void TriggerWheelSparkEffect(ItemInfo* minecartItem, bool left);
 }

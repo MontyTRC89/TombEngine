@@ -248,6 +248,7 @@ namespace TEN::Entities::Vehicles
 		else
 		{
 			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
+			motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
 
 			drive = -1;
 			collide = 0;
@@ -438,7 +439,7 @@ namespace TEN::Entities::Vehicles
 				motorbikeItem->SetBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
 			}
 			else
-				motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeBrakeLightJoints);
+				motorbikeItem->ClearBits(JointBitType::Mesh, MotorbikeHeadLightJoints);
 
 			if (TrInput & VEHICLE_IN_BRAKE)
 			{
