@@ -201,7 +201,6 @@ namespace TEN::Entities::TR4
 		}
 		else if (animIndex == DEMIGOD3_ANIM_SINGLE_PROJECTILE_ATTACK)
 		{
-
 			if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase)
 			{
 				auto pos1 = Vector3Int(-544, 96, 0 );

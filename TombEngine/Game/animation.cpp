@@ -168,9 +168,9 @@ void AnimateLara(ItemInfo* item)
 		}
 		else
 		{
-			float velocity = anim->VelocityStart + anim->VelocityEnd * (item->Animation.FrameNumber - (anim->frameBase - 1));
+			float velocity = anim->VelocityStart + anim->VelocityAccel * (item->Animation.FrameNumber - (anim->frameBase - 1));
 			item->Animation.Velocity -= velocity;
-			item->Animation.Velocity += velocity + anim->VelocityEnd;
+			item->Animation.Velocity += velocity + anim->VelocityAccel;
 			item->Animation.VerticalVelocity += item->Animation.VerticalVelocity >= 128.0f ? 1.0f : GRAVITY;
 			item->Pose.Position.y += item->Animation.VerticalVelocity;
 		}
@@ -178,14 +178,14 @@ void AnimateLara(ItemInfo* item)
 	else
 	{
 		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
-			item->Animation.Velocity = (anim->VelocityStart / 2.0f) + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase)) / 4.0f;
+			item->Animation.Velocity = (anim->VelocityStart / 2.0f) + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase)) / 4.0f;
 		else
-			item->Animation.Velocity = anim->VelocityStart + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
+			item->Animation.Velocity = anim->VelocityStart + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
 
 		item->Pose.Position.y += lara->ExtraVelocity.y;
 	}
 
-	item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
+	item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
 
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
@@ -343,8 +343,8 @@ void AnimateItem(ItemInfo* item)
 	}
 	else
 	{
-		item->Animation.Velocity = anim->VelocityStart + (anim->VelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
-		item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityEnd * (item->Animation.FrameNumber - anim->frameBase));
+		item->Animation.Velocity = anim->VelocityStart + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
+		item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
 	}
 	
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
