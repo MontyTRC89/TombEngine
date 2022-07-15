@@ -661,7 +661,7 @@ namespace TEN::Renderer
 			RendererObject& flashMoveable = *m_moveableObjects[gunflash];
 			RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
-			for (auto& flashBucket : flashMesh->buckets) 
+			for (auto& flashBucket : flashMesh->Buckets) 
 			{
 				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
@@ -752,7 +752,7 @@ namespace TEN::Renderer
 
 					RendererMesh* flashMesh = flashMoveable.ObjectMeshes[0];
 
-					for (auto& flashBucket : flashMesh->buckets)
+					for (auto& flashBucket : flashMesh->Buckets)
 					{
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
@@ -1095,7 +1095,7 @@ namespace TEN::Renderer
 
 		RendererMesh* mesh = effect->Mesh;
 
-		for (auto& bucket : mesh->buckets) 
+		for (auto& bucket : mesh->Buckets) 
 		{
 			if (bucket.NumVertices == 0)
 				continue;
