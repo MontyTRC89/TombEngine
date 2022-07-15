@@ -134,6 +134,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 					fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 					fragment->roomNumber = roomNumber;
 					fragment->numBounces = 0;
+					fragment->color = isStatic ? mesh->color : Vector4::One; // FIXME: SHATTER_ITEM must be refactored! -- Lwmte, 15.07.22
 				}
 			}
 		}
