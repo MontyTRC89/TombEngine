@@ -57,15 +57,15 @@ namespace TEN::Input
 	void InputAction::PrintDebugInfo()
 	{
 		g_Renderer.PrintDebugMessage("IsClicked: %d", this->IsClicked());
-		g_Renderer.PrintDebugMessage("IsPulsed (0.2f, 0.6f): %d", this->IsPulsed(0.2f, 0.6f));
+		g_Renderer.PrintDebugMessage("IsPulsed (.2s, .6s): %d", this->IsPulsed(0.2f, 0.6f));
 		g_Renderer.PrintDebugMessage("IsHeld: %d", this->IsHeld());
 		g_Renderer.PrintDebugMessage("IsReleased: %d", this->IsReleased());
 		g_Renderer.PrintDebugMessage("");
-		g_Renderer.PrintDebugMessage("Value: %f", Value);
-		g_Renderer.PrintDebugMessage("PrevValue: %f", PrevValue);
-		g_Renderer.PrintDebugMessage("TimeHeld: %f", TimeHeld);
-		g_Renderer.PrintDebugMessage("PrevTimeHeld: %f", PrevTimeHeld);
-		g_Renderer.PrintDebugMessage("TimeInactive: %f", TimeInactive);
+		g_Renderer.PrintDebugMessage("Value: %.3f", Value);
+		g_Renderer.PrintDebugMessage("PrevValue: %.3f", PrevValue);
+		g_Renderer.PrintDebugMessage("TimeHeld: %.3f", TimeHeld);
+		g_Renderer.PrintDebugMessage("PrevTimeHeld: %.3f", PrevTimeHeld);
+		g_Renderer.PrintDebugMessage("TimeInactive: %.3f", TimeInactive);
 	}
 
 	bool InputAction::IsClicked()
