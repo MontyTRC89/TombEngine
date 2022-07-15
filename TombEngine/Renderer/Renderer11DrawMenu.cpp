@@ -508,9 +508,9 @@ namespace TEN::Renderer
 		{
 			auto objme = &InventoryObjectTable[index];
 			y += objme->YOffset;
-			rotX += objme->XRot;
-			rotY += objme->YRot;
-			rotZ += objme->ZRot;
+			rotX += objme->Orientation.x;
+			rotY += objme->Orientation.y;
+			rotZ += objme->Orientation.z;
 		}
 
 		view = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, 2048.0f), Vector3(0.0f, 0.0f, 0.0f),
@@ -681,8 +681,8 @@ namespace TEN::Renderer
 	{
 		InventoryObject* obj = &InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
 		short currentPage = Lara.Inventory.Diary.currentPage;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->XRot,
-			obj->YRot, obj->ZRot, obj->Scale1);
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->Orientation.x,
+			obj->Orientation.y, obj->Orientation.z, obj->Scale1);
 
 		for (int i = 0; i < MaxStringsPerPage; i++)
 		{

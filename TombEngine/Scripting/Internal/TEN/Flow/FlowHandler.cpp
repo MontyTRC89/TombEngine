@@ -277,9 +277,9 @@ bool FlowHandler::DoFlow()
 					invObj->ObjectName = obj->name.c_str();
 					invObj->Scale1 = obj->scale;
 					invObj->YOffset = obj->yOffset;
-					invObj->XRot = FROM_DEGREES(obj->rot.x);
-					invObj->YRot = FROM_DEGREES(obj->rot.y);
-					invObj->ZRot = FROM_DEGREES(obj->rot.z);
+					invObj->Orientation.x = FROM_DEGREES(obj->rot.x);
+					invObj->Orientation.y = FROM_DEGREES(obj->rot.y);
+					invObj->Orientation.z = FROM_DEGREES(obj->rot.z);
 					invObj->MeshBits = obj->meshBits;
 					invObj->Options = obj->action;
 					invObj->RotFlags = obj->rotationFlags;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Scripting/Internal/LanguageScript.h"
+#include "Specific/phd_global.h"
 
 constexpr int MAX_COMBINES = 60;
 
@@ -277,9 +278,7 @@ struct InventoryObject
 	short ObjectNumber;
 	short YOffset;
 	float Scale1;
-	short YRot;
-	short XRot;
-	short ZRot;
+	Vector3Shrt Orientation;
 	unsigned __int64 Options;
 	const char* ObjectName;
 	unsigned int MeshBits;
