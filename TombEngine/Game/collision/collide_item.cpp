@@ -1844,42 +1844,42 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->ObjectNumber != ID_HITMAN || item->Animation.ActiveState != LS_INSERT_PUZZLE)
+	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		return;
+
+	if (!TestCollision(item, laraItem))
+		return;
+
+	if (coll->Setup.EnableObjectPush ||
+		Lara.Control.WaterStatus == WaterStatus::Underwater ||
+		Lara.Control.WaterStatus == WaterStatus::TreadWater)
 	{
-		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
+	}
+	else if (laraItem->IsLara() && coll->Setup.EnableSpasm)
+	{
+		int x = laraItem->Pose.Position.x - item->Pose.Position.x;
+		int z = laraItem->Pose.Position.z - item->Pose.Position.z;
+
+		float sinY = phd_sin(item->Pose.Orientation.y);
+		float cosY = phd_cos(item->Pose.Orientation.y);
+
+		auto* frame = GetBestFrame(item);
+		int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+		int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
+
+		if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 		{
-			if (TestCollision(item, laraItem))
-			{
-				if (coll->Setup.EnableObjectPush ||
-					Lara.Control.WaterStatus == WaterStatus::Underwater ||
-					Lara.Control.WaterStatus == WaterStatus::TreadWater)
-				{
-					ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
-				}
-				else if (coll->Setup.EnableSpasm)
-				{
-					int x = laraItem->Pose.Position.x - item->Pose.Position.x;
-					int z = laraItem->Pose.Position.z - item->Pose.Position.z;
+			int angle = (laraItem->Pose.Orientation.y - phd_atan(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - ANGLE(135.0f)) / ANGLE(90.0f);
 
-					float sinY = phd_sin(item->Pose.Orientation.y);
-					float cosY = phd_cos(item->Pose.Orientation.y);
+			auto* lara = GetLaraInfo(laraItem);
 
-					auto* frame = GetBestFrame(item);
-					int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
-					int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
+			lara->HitDirection = (short)angle;
 
-					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
-					{
-						int angle = (laraItem->Pose.Orientation.y - phd_atan(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - ANGLE(135.0f)) / ANGLE(90.0f);
-						Lara.HitDirection = (short)angle;
-						// TODO: check if a second Lara.hitFrame++; is required there !
-						
-						Lara.HitFrame++;
-						if (Lara.HitFrame > 30)
-							Lara.HitFrame = 30;
-					}
-				}
-			}
+			// TODO: check if a second Lara.hitFrame++; is required there !						
+			lara->HitFrame++;
+			if (lara->HitFrame > 30)
+				lara->HitFrame = 30;
 		}
 	}
 }
