@@ -91,7 +91,7 @@ struct SPRITE
 
 struct MESH
 {
-	LIGHT_MODES lightMode;
+	int lightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;
 	std::vector<Vector3> normals;
