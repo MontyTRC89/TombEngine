@@ -250,15 +250,15 @@ void LoadObjects()
 	g_Level.Anims.resize(numAnimations);
 	for (int i = 0; i < numAnimations; i++)
 	{
-		ANIM_STRUCT* anim = &g_Level.Anims[i];
+		auto* anim = &g_Level.Anims[i];
 
 		anim->framePtr = ReadInt32();
 		anim->Interpolation = ReadInt32();
 		anim->ActiveState = ReadInt32();
 		anim->VelocityStart = ReadFloat();
-		anim->VelocityEnd = ReadFloat();
+		anim->VelocityAccel = ReadFloat();
 		anim->LateralVelocityStart = ReadFloat();
-		anim->LateralVelocityEnd = ReadFloat();
+		anim->LateralVelocityAccel = ReadFloat();
 		anim->frameBase = ReadInt32();
 		anim->frameEnd = ReadInt32();
 		anim->jumpAnimNum = ReadInt32();
