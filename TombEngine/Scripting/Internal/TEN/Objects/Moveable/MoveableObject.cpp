@@ -913,7 +913,6 @@ void Moveable::Explode()
 		return;
 
 	CreatureDie(m_num, true);
-	Destroy();
 }
 
 void Moveable::Shatter()
@@ -926,7 +925,6 @@ void Moveable::Shatter()
 		ExplodeItemNode(m_item, i, 0, 128);
 
 	CreatureDie(m_num, false);
-	Destroy();
 }
 
 void Moveable::MakeInvisible()
