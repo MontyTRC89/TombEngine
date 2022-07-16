@@ -27,8 +27,8 @@ struct PixelShaderInput
 
 struct PixelShaderOutput
 {
-	float4 Color: SV_Target0;
-	float4 Depth: SV_Target1;
+	float4 Color: SV_TARGET0;
+	float4 Depth: SV_TARGET1;
 };
 
 Texture2D Texture : register(t0);
@@ -63,7 +63,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
-PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
+PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
 
