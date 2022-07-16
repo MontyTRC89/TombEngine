@@ -245,7 +245,7 @@ namespace TEN::Renderer
 						case 2:
 						case 3:
 						case 4:
-							currentBone->ExtraRotation.z = TO_RAD((short)std::clamp(cart.Velocity, 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
+							currentBone->ExtraRotation.z = TO_RAD((short)std::clamp((int)round(cart.Velocity), 0, (int)ANGLE(25.0f)) + FROM_RAD(oldRotation.z));
 							break;
 						}
 					},
