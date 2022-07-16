@@ -46,6 +46,7 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto MINECART_VELOCITY_MIN = 10 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MINECART_FRICTION_VELOCITY_MIN = 70 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MINECART_STOP_VELOCITY_MIN = 1 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MINECART_STOP_VELOCITY_MAX = 240 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MINECART_JUMP_VERTICAL_VELOCITY = 252 * VEHICLE_VELOCITY_SCALE;
@@ -599,7 +600,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
 			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
-			else if (minecart->Flags & MINECART_FLAG_STOPPED)
+			else if (minecart->Velocity <= MINECART_STOP_VELOCITY_MIN || minecart->Flags & MINECART_FLAG_STOPPED)
 				laraItem->Animation.TargetState = MINECART_STATE_IDLE;
 			else if (minecart->Gradient < MINECART_FORWARD_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_FORWARD;
@@ -684,7 +685,7 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			if (minecart->Velocity > MINECART_VELOCITY_MIN)
+			if (minecart->Velocity >= MINECART_VELOCITY_MIN)
 			{
 				if (TrInput & MINECART_IN_DUCK)
 					laraItem->Animation.TargetState = MINECART_STATE_DUCK;
