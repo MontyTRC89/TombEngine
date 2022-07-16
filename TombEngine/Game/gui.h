@@ -143,7 +143,7 @@ private:
 	#define GUI_INPUT_PULSE_DOWN  IsPulsed(In::Back, 0.1f, 0.4f)
 	#define GUI_INPUT_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
 	#define GUI_INPUT_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
-	#define GUI_INPUT_SELECT	  ((IsReleased(In::Select) || IsReleased(In::Action)) && !IsHeld(In::Deselect))
+	#define GUI_INPUT_SELECT	  ((IsReleased(In::Select) || IsReleased(In::Action)) && !IsHeld(In::Deselect) && GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Deselect))
 	#define GUI_INPUT_DESELECT	  (IsClicked(In::Deselect) && !(IsHeld(In::Select) || IsHeld(In::Action)))
 
 	// GUI variables
