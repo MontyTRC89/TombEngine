@@ -4,6 +4,7 @@
 #define LT_SHADOW	3
 
 #define MAX_LIGHTS	48
+#define SPEC_FACTOR 64
 
 struct ShaderLight 
 {
@@ -44,7 +45,7 @@ float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
 			float3 reflectDir = reflect(lightDir, n);
 
 			float3 color = light.Color.xyz;
-			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * 64);
+			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 			float attenuation = (radius - dist) / radius;
 			return attenuation * spec * color;
 		}
@@ -60,7 +61,7 @@ float3 DoSpecularSun(float3 n, ShaderLight light, float strength)
 		float3 lightDir = normalize(light.Direction);
 		float3 reflectDir = reflect(lightDir, n);
 		float3 color = light.Color.xyz;
-		float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * 64);
+		float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 		return spec * color;
 	}
 }
@@ -83,7 +84,7 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 			float3 reflectDir = reflect(lightDir, n);
 
 			float3 color = light.Color.xyz;
-			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * 64);
+			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 			float attenuation = (radius - dist) / radius;
 			return attenuation * spec * color;
 		}
@@ -134,13 +135,14 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 			return float3(0, 0, 0);
 		else
 		{
-			float attenuation = 1; // FIXME: Do correct falloff formula!
-
 			float d = saturate(dot(n, lightVec));
 			if (d < 0)
 				return float3(0, 0, 0);
 			else
+			{
+				float attenuation = pow(max(dot(-lightVec, direction), 0.0f), inAngle);
 				return (color * attenuation * d);
+			}
 		}
 	}
 }
