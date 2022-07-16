@@ -72,7 +72,7 @@ struct AI_OBJECT
 	short triggerFlags;
 	short flags;
 	short yRot;
-	short boxNumber;
+	int boxNumber;
 	std::string luaName;
 };
 
