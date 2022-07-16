@@ -81,6 +81,7 @@ namespace TEN::Effects::Lightning
 		arc.pos3.y = (src->y + 3 * dest->y) >> 2;
 		arc.pos3.z = (src->z + 3 * dest->z) >> 2;
 		arc.pos4 = *dest;
+		arc.flags = flags;
 
 		for (int i = 0; i < 9; i++)
 		{
@@ -90,7 +91,6 @@ namespace TEN::Effects::Lightning
 				arc.interpolation[i] = 0;
 		}
 
-		arc.flags = flags;
 		arc.r = r;
 		arc.g = g;
 		arc.b = b;
