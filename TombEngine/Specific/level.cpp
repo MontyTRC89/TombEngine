@@ -982,7 +982,7 @@ void LoadAIObjects()
 		obj.triggerFlags = ReadInt16();
 		obj.flags = ReadInt16();
 		obj.yRot = ReadInt16();
-		obj.boxNumber = ReadInt16();
+		obj.boxNumber = ReadInt32();
 
 		byte numBytes = ReadInt8();
 		char buffer[255];
