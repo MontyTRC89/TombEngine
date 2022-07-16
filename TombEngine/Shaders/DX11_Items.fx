@@ -27,13 +27,13 @@ struct PixelShaderInput
 	float3x3 TBN: TBN;
 	float Fog: FOG;
 	float4 PositionCopy: TEXCOORD2;
-	uint Bone : BONE;
+	uint Bone: BONE;
 };
 
 struct PixelShaderOutput
 {
-	float4 Color: SV_Target0;
-	float4 Depth: SV_Target1;
+	float4 Color: SV_TARGET0;
+	float4 Depth: SV_TARGET1;
 };
 
 Texture2D Texture : register(t0);
@@ -81,7 +81,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
-PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
+PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
 	float4 tex = Texture.Sample(Sampler, input.UV);	

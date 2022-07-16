@@ -73,8 +73,8 @@ SamplerComparisonState ShadowMapSampler : register(s3);
 
 struct PixelShaderOutput
 {
-	float4 Color: SV_Target0;
-	float4 Depth: SV_Target1;
+	float4 Color: SV_TARGET0;
+	float4 Depth: SV_TARGET1;
 };
 
 PixelShaderInput VS(VertexShaderInput input)
@@ -300,7 +300,7 @@ void doSpotLightShadow(float3 worldPos,inout float3 lighting)
     lighting *= saturate((shadowFactor + SHADOW_INTENSITY) + (pow(distanceFactor, 4) * (1 - angleFactor) * INV_SHADOW_INTENSITY));
 }
 
-PixelShaderOutput PS(PixelShaderInput input) : SV_TARGET
+PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
 
