@@ -105,18 +105,18 @@ Vector4 ReadVector4()
 	return value;
 }
 
+void ReadBytes(void* dest, int count)
+{
+	memcpy(dest, LevelDataPtr, count);
+	LevelDataPtr += count;
+}
+
 std::string ReadString()
 {
 	byte numBytes = ReadInt8(); // FIXME: incorrect, should be read in LEB128 format
 	char buffer[255];
 	ReadBytes(buffer, numBytes);
 	return std::string(buffer, buffer + numBytes);
-}
-
-void ReadBytes(void* dest, int count)
-{
-	memcpy(dest, LevelDataPtr, count);
-	LevelDataPtr += count;
 }
 
 void LoadItems()
