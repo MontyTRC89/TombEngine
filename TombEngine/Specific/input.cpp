@@ -750,8 +750,13 @@ namespace TEN::Input
 		return ActionMap[(int)input].GetTimeInactive();
 	}
 
-	void  ClearInput(InputActionID input)
+	void ClearInput(InputActionID input)
 	{
 		ActionMap[(int)input].Clear();
+
+		int inputBit = 1 << (int)input;
+		DbInput &= ~inputBit;
+		TrInput &= ~inputBit;
+		RelInput &= ~inputBit;
 	}
 }
