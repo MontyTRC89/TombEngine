@@ -432,13 +432,13 @@ namespace TEN::Input
 	{
 		// Block roll in binocular mode (TODO: Is it needed?)
 		if (IsHeld(In::Roll) && BinocularRange)
-			ActionMap[(int)In::Roll].Clear();
+			ClearInput(In::Roll);
 
 		// Block simultaneous LEFT+RIGHT input.
 		if (IsHeld(In::Left) && IsHeld(In::Right))
 		{
-			ActionMap[(int)In::Left].Clear();
-			ActionMap[(int)In::Right].Clear();
+			ClearInput(In::Left);
+			ClearInput(In::Right);
 		}
 
 		if (Lara.Inventory.IsBusy)
@@ -447,8 +447,8 @@ namespace TEN::Input
 
 			if (IsHeld(In::Forward) && IsHeld(In::Back))
 			{
-				ActionMap[(int)In::Forward].Clear();
-				ActionMap[(int)In::Back].Clear();
+				ClearInput(In::Forward);
+				ClearInput(In::Back);
 			}
 		}
 	}
@@ -661,6 +661,7 @@ namespace TEN::Input
 		}
 
 		// Debug display for FORWARD input.
+		g_Renderer.PrintDebugMessage("Debug for FORWARD input:");
 		ActionMap[(int)In::Forward].PrintDebugInfo();
 		
 		return true;
@@ -668,8 +669,8 @@ namespace TEN::Input
 
 	void ClearInputActions()
 	{
-		for (int i = 0; i < (int)InputActionID::Count; i++)
-			ActionMap[i].Clear();
+		for (auto action : ActionMap)
+			action.Clear();
 
 		DbInput = NULL;
 		TrInput = NULL;
