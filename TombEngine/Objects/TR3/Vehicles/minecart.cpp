@@ -30,21 +30,22 @@ namespace TEN::Entities::Vehicles
 
 	constexpr auto MINECART_VELOCITY_DECEL = 6 * VEHICLE_VELOCITY_SCALE;
 
-	constexpr auto MINECART_SPEED_MIN			  = 10 * VEHICLE_VELOCITY_SCALE; // TODO: These two have confusing names. @Sezz
-	constexpr auto MINECART_VELOCITY_MIN		  = 32;
-	constexpr auto MINECART_FRICTION_VELOCITY_MIN = 70;
-	constexpr auto MINECART_STOP_VELOCITY_MAX	  = 240;
+	constexpr auto MINECART_VELOCITY_MIN = 10 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MINECART_FRICTION_VELOCITY_MIN = 70 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MINECART_STOP_VELOCITY_MIN = 1 * VEHICLE_VELOCITY_SCALE;
+	constexpr auto MINECART_STOP_VELOCITY_MAX = 240 * VEHICLE_VELOCITY_SCALE;
 	constexpr auto MINECART_VERTICAL_VELOCITY_MAX = 63 * VEHICLE_VELOCITY_SCALE;
-
 	constexpr auto MINECART_JUMP_VERTICAL_VELOCITY = 252 * VEHICLE_VELOCITY_SCALE;
-	constexpr auto MINECART_TURN_DEATH_VELOCITY	   = 128;
-	
-	constexpr auto MINECART_MOUNT_DISTANCE		= CLICK(2);
-	constexpr auto MINECART_DISMOUNT_DISTANCE	= 330;
-	constexpr auto MINECART_STEP_HEIGHT			= CLICK(1);
-	constexpr auto MINECART_FORWARD_GRADIENT	= -CLICK(0.5f);
-	constexpr auto MINECART_BACK_GRADIENT		= -MINECART_FORWARD_GRADIENT;
-	constexpr auto MINECART_NUM_HITS			= 25;
+
+	constexpr auto MINECART_ANIM_VELOCITY_MIN = 32;
+	constexpr auto MINECART_TURN_DEATH_ANIM_VELOCITY = 128;
+
+	constexpr auto MINECART_MOUNT_DISTANCE = CLICK(2);
+	constexpr auto MINECART_DISMOUNT_DISTANCE = 330;
+	constexpr auto MINECART_STEP_HEIGHT = CLICK(1);
+	constexpr auto MINECART_FORWARD_GRADIENT = -CLICK(0.5f);
+	constexpr auto MINECART_BACK_GRADIENT = CLICK(0.5f);
+	constexpr auto MINECART_NUM_HITS = 25;
 	constexpr auto MINECART_WRENCH_TOGGLE_FRAME = 20;
 
 	#define MINECART_TERMINAL_ANGLE ANGLE(22.0f)
@@ -238,7 +239,7 @@ namespace TEN::Entities::Vehicles
 				laraItem->Animation.TargetState = MINECART_STATE_DUCK;
 			else if (TrInput & (VEHICLE_IN_BRAKE | VEHICLE_IN_SLOW))
 				laraItem->Animation.TargetState = MINECART_STATE_BRAKE;
-			else if (minecart->Velocity == MINECART_VELOCITY_MIN || minecart->Flags & MINECART_FLAG_STOPPED)
+			else if (minecart->Velocity <= MINECART_STOP_VELOCITY_MIN || minecart->Flags & MINECART_FLAG_STOPPED)
 				laraItem->Animation.TargetState = MINECART_STATE_IDLE;
 			else if (minecart->Gradient < MINECART_FORWARD_GRADIENT)
 				laraItem->Animation.TargetState = MINECART_STATE_FORWARD;
@@ -323,7 +324,7 @@ namespace TEN::Entities::Vehicles
 				}
 			}
 
-			if (minecart->Velocity > MINECART_VELOCITY_MIN)
+			if (minecart->Velocity >= MINECART_VELOCITY_MIN)
 			{
 				if (TrInput & MINECART_IN_DUCK)
 					laraItem->Animation.TargetState = MINECART_STATE_DUCK;
@@ -363,7 +364,7 @@ namespace TEN::Entities::Vehicles
 				minecart->Velocity -= MINECART_VELOCITY_DECEL;
 				SoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE, &laraItem->Pose, SoundEnvironment::Always);
 
-				if (minecartItem->Animation.Velocity > MINECART_FRICTION_VELOCITY_MIN)
+				if (minecart->Velocity > MINECART_FRICTION_VELOCITY_MIN)
 				{
 					TriggerWheelSparkEffect(minecartItem, false);
 					TriggerWheelSparkEffect(minecartItem, true);
@@ -458,7 +459,7 @@ namespace TEN::Entities::Vehicles
 				if ((Wibble & 7) == 0)
 					SoundEffect(SFX_TR3_VEHICLE_QUADBIKE_FRONT_IMPACT, &minecartItem->Pose, SoundEnvironment::Always);
 
-				TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, MINECART_TURN_DEATH_VELOCITY);
+				TranslateItem(minecartItem, minecartItem->Pose.Orientation.y, MINECART_TURN_DEATH_ANIM_VELOCITY);
 			}
 			else
 			{
@@ -662,15 +663,15 @@ namespace TEN::Entities::Vehicles
 			minecart->Flags |= flags.MinecartLeft() ? MINECART_FLAG_TURNING_LEFT : MINECART_FLAG_TURNING_RIGHT;
 		}
 
-		if (minecart->Velocity < MINECART_SPEED_MIN)
-			minecart->Velocity = MINECART_SPEED_MIN;
+		if (minecart->Velocity < MINECART_VELOCITY_MIN)
+			minecart->Velocity = MINECART_VELOCITY_MIN;
 
 		minecart->Velocity -= minecart->Gradient * 4;
 		minecartItem->Animation.Velocity = minecart->Velocity / VEHICLE_VELOCITY_SCALE;
 
-		if (minecartItem->Animation.Velocity < MINECART_VELOCITY_MIN)
+		if (minecartItem->Animation.Velocity < MINECART_ANIM_VELOCITY_MIN)
 		{
-			minecartItem->Animation.Velocity = MINECART_VELOCITY_MIN;
+			minecartItem->Animation.Velocity = MINECART_ANIM_VELOCITY_MIN;
 			StopSoundEffect(SFX_TR3_VEHICLE_MINECART_TRACK_LOOP);
 
 			if (minecart->VerticalVelocity)
@@ -747,7 +748,7 @@ namespace TEN::Entities::Vehicles
 				minecartItem->Pose.Position.x = minecart->TurnX + x * 3584;
 				minecartItem->Pose.Position.z = minecart->TurnZ + z * 3584;
 
-				if (minecartItem->Animation.Velocity > MINECART_FRICTION_VELOCITY_MIN)
+				if (minecart->Velocity > MINECART_FRICTION_VELOCITY_MIN)
 				{
 					SoundEffect(SFX_TR3_VEHICLE_MINECART_BRAKE, &minecartItem->Pose, SoundEnvironment::Always);
 					TriggerWheelSparkEffect(minecartItem, (minecart->Flags & MINECART_FLAG_TURNING_RIGHT) != 0);
