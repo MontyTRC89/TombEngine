@@ -114,6 +114,10 @@ void ReadBytes(void* dest, int count)
 std::string ReadString()
 {
 	byte numBytes = ReadInt8(); // FIXME: incorrect, should be read in LEB128 format
+
+	if (!numBytes)
+		return std::string();
+
 	char buffer[255];
 	ReadBytes(buffer, numBytes);
 	return std::string(buffer, buffer + numBytes);
