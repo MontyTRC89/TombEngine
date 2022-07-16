@@ -69,7 +69,7 @@ namespace TEN::Renderer
 			// Project vertices of the door in clip space
 			Vector4 tmp = Vector4(
 				door->vertices[i].x + parentNativeRoom->x,
-				door->vertices[i].y + parentNativeRoom->y,
+				door->vertices[i].y,
 				door->vertices[i].z + parentNativeRoom->z,
 				1.0f);
 

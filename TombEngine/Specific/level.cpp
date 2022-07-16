@@ -641,14 +641,14 @@ void ReadRooms()
 			ROOM_DOOR door;
 
 			door.room = ReadInt16();
-			door.normal.x = ReadInt16();
-			door.normal.y = ReadInt16();
-			door.normal.z = ReadInt16();
+			door.normal.x = ReadInt32();
+			door.normal.y = ReadInt32();
+			door.normal.z = ReadInt32();
 			for (int k = 0; k < 4; k++)
 			{
-				door.vertices[k].x = ReadInt16();
-				door.vertices[k].y = ReadInt16();
-				door.vertices[k].z = ReadInt16();
+				door.vertices[k].x = ReadInt32();
+				door.vertices[k].y = ReadInt32();
+				door.vertices[k].z = ReadInt32();
 			}
 
 			room.doors.push_back(door);
