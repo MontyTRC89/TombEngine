@@ -90,8 +90,6 @@ most can just be ignored (see usage).
 		)
 	*/
 
-#define USE_IF_HAVE(Type, ifThere, ifNotThere) \
-std::holds_alternative<Type>(ifThere) ? std::get<Type>(ifThere) : ifNotThere
 
 static std::unique_ptr<Moveable> Create(
 	GAME_OBJECT_ID objID,
