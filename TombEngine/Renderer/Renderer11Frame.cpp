@@ -272,14 +272,13 @@ namespace TEN::Renderer
 			{
 				ROOM_DOOR* portal = &nativeRoom->doors[i];
 
-				Vector3 n = portal->normal;
-				Vector3 v = Vector3(
+				Vector3Int n = Vector3Int(portal->normal.x, portal->normal.y, portal->normal.z);
+				Vector3Int v = Vector3Int(
 					Camera.pos.x - (nativeRoom->x + portal->vertices[0].x),
 					Camera.pos.y - (nativeRoom->y + portal->vertices[0].y),
 					Camera.pos.z - (nativeRoom->z + portal->vertices[0].z));
 
-				// Test camera and normal positions and decide if process door or not
-				if (n.Dot(v) <= 0.0f)
+				if (n.x * v.x + n.y * v.y + n.z * v.z < 0)
 					continue;
 
 				SetRoomBounds(portal, roomNumber, renderView);
