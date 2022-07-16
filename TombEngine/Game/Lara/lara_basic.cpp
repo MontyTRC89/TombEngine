@@ -387,7 +387,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.LookMode = LookMode::Omnidirectional;
+	lara->Control.LookMode = LookMode::Both;
 
 	if (item->HitPoints <= 0)
 	{
@@ -736,7 +736,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Omnidirectional;
+	lara->Control.LookMode = LookMode::Both;
 
 	if (item->HitPoints <= 0)
 	{

@@ -933,7 +933,7 @@ enum class LookMode
 	None,
 	Horizontal,
 	Vertical,
-	Omnidirectional
+	Both
 };
 
 enum class JumpDirection

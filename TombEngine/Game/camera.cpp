@@ -102,11 +102,11 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	Camera.type = CameraType::Look;
 
 	float hAxisCoeff = 0.0f;
-	if (lara->Control.LookMode == LookMode::Horizontal || lara->Control.LookMode == LookMode::Omnidirectional)
+	if (lara->Control.LookMode == LookMode::Horizontal || lara->Control.LookMode == LookMode::Both)
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 
 	float vAxisCoeff = 0.0f;
-	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Omnidirectional)
+	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Both)
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
 
 	int hAxisSign = std::copysign(1, hAxisCoeff);
