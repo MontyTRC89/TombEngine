@@ -4,5 +4,5 @@
 struct alignas(16) CRoomBuffer 
 {
 	DirectX::SimpleMath::Vector4 AmbientColor;
-	int Water;
+	unsigned int Water;
 };

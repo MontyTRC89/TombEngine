@@ -27,7 +27,7 @@ struct PixelShaderInput
 	float3x3 TBN: TBN;
 	float Fog: FOG;
 	float4 PositionCopy: TEXCOORD2;
-	int Bone : BONE;
+	uint Bone : BONE;
 };
 
 struct PixelShaderOutput
@@ -50,7 +50,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	float4x4 world = mul(Bones[input.Bone], World);
 
 	float3 normal = (mul(float4(input.Normal, 0.0f), world).xyz);
-	float3 worldPosition = (mul(float4(input.Position, 1.0f), world));
+	float3 worldPosition = (mul(float4(input.Position, 1.0f), world).xyz);
 
 	output.Normal = normal;
 	output.UV = input.UV;

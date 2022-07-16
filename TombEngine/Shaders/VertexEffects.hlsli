@@ -1,3 +1,5 @@
+#include "./Math.hlsli"
+
 float3 Glow(float3 color, float3 effect, int hash)
 {
 	float3 col = color;
