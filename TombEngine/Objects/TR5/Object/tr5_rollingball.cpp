@@ -258,8 +258,8 @@ void RollingBallControl(short itemNumber)
 			SplashSetup.y = waterHeight - 1;
 			SplashSetup.x = item->Pose.Position.x;
 			SplashSetup.z = item->Pose.Position.z;
-			SplashSetup.splashPower = item->Animation.VerticalVelocity * 2;
-			SplashSetup.innerRadius = 96;
+			SplashSetup.splashPower = item->Animation.VerticalVelocity * 4;
+			SplashSetup.innerRadius = 160;
 			SetupSplash(&SplashSetup, roomNumber);
 		}
 
