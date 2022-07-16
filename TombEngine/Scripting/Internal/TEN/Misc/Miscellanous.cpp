@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "ReservedScriptNames.h"
+#include "ScriptUtil.h"
 #include "Vec3/Vec3.h"
 #include "Color/Color.h"
 #include "Game/camera.h"
@@ -40,7 +41,18 @@ namespace Misc
 		return LOS(&vec1, &vec2);
 	}
 
-	static void AddLightningArc(Vec3 src, Vec3 dest, ScriptColor color, int lifetime, int amplitude, int beamWidth, int segments, int flags)
+	///Emit a lightning arc.
+	//@function AddLightningArc
+	//@tparam Vec3 src
+	//@tparam Vec3 dest
+	//@tparam Color color (default Color(255, 255, 255))
+	//@tparam float lifetime Lifetime in seconds. Clamped to [0, 4.233] for now because of strange internal maths. (default 1.0)
+	//@tparam int amplitude "strength" of the lightning - the higher the value, the "taller" the arcs. Clamped to [1, 255]. (default 20)
+	//@tparam int beamWidth Clamped to [1, 127]. (default 2)
+	//@tparam int detail Higher numbers equal more segments, but it's not a 1:1 correlation. Clamped to [1, 127]. (default 10)
+	//@tparam bool smooth If true, the arc will have large, smooth curves; if false, it will have small, jagged spikes. (default false)
+	//@tparam bool endDrift If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)
+	static void AddLightningArc(Vec3 src, Vec3 dest, TypeOrNil<ScriptColor> color, TypeOrNil<float> lifetime, TypeOrNil<int> amplitude, TypeOrNil<int> beamWidth, TypeOrNil<int> segments, TypeOrNil<bool> smooth, TypeOrNil<bool> endDrift)
 	{
 		Vector3Int p1;
 		p1.x = src.x;
@@ -52,25 +64,46 @@ namespace Misc
 		p2.y = dest.y;
 		p2.z = dest.z;
 
+		int segs = USE_IF_HAVE(int, segments, 10);
+
+		segs = std::clamp(segs, 1, 127);
+
+		int width = USE_IF_HAVE(int, beamWidth, 2);
+
+		width = std::clamp(width, 1, 127);
+
 		// Nearest number of milliseconds equating to approx 254, the max even byte value for "life".
 		// This takes into account a "hardcoded" FPS of 30 and the fact that
 		// lightning loses two "life" each frame.
-		constexpr auto kMaxLifeMillis = 4233; 
-		lifetime = std::clamp(lifetime, 0, kMaxLifeMillis);
+		constexpr auto kMaxLifeSeconds = 4.233f; 
+		float life = USE_IF_HAVE(float, lifetime, 1.0f);
+		life = std::clamp(life, 0.0f, kMaxLifeSeconds);
 
-		constexpr float millisPerFrame = 1000.0f / (float)FPS;
+		constexpr float secsPerFrame = 1.0f / (float)FPS;
 
 		// This will put us in the range [0, 127]
-		int lifeInFrames = (int)round(lifetime / millisPerFrame);
+		int lifeInFrames = (int)round(life / secsPerFrame);
 
 		// Multiply by two since a) lightning loses two "life" each frame, and b) it must be
 		// an even number to avoid overshooting a value of 0 and wrapping around.
 		byte byteLife = lifeInFrames * 2;
 
-		byte byteAmplitude = std::clamp(amplitude, 1, 255);
+		int amp = USE_IF_HAVE(int, amplitude, 20);
+		byte byteAmplitude = std::clamp(amp, 1, 255);
 
+		bool isSmooth = USE_IF_HAVE(bool, smooth, false);
+		bool isDrift = USE_IF_HAVE(bool, endDrift, false);
 
-		TriggerLightning(&p1, &p2, byteAmplitude, color.GetR(), color.GetG(), color.GetB(), byteLife, flags, beamWidth, segments);
+		char flags = 0;
+		if(isSmooth)
+			flags |= 1;
+
+		if(isDrift)
+			flags |= 2;
+
+		ScriptColor col = USE_IF_HAVE(ScriptColor, color, ScriptColor( 255, 255, 255 ));
+
+		TriggerLightning(&p1, &p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
 	static void AddParticle(int spriteIndex, Vec3 pos, Vec3 velocity, int gravity, float rot, 
@@ -272,16 +305,6 @@ namespace Misc
 		sol::table table_misc{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Misc, table_misc);
 
-		///Emit a lightning arc.
-		//@function AddLightningArc
-		//@tparam Vec3 src
-		//@tparam Vec3 dest
-		//@tparam Color color
-		//@tparam int lifetime Lifetime in milliseconds. Clamped to [0, 4233] for now because of strange internal maths.
-		//@tparam int amplitude "strength" of the lightning - the higher the value, the "taller" the arcs. Clamped to [1, 255].
-		//@tparam int beamWidth
-		//@tparam int segments
-		//@tparam int flags
 		table_misc.set_function(ScriptReserved_AddLightningArc, &AddLightningArc);
 
 		///Emit a particle.
