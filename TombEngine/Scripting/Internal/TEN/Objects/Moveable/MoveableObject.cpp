@@ -161,10 +161,10 @@ void Moveable::Register(sol::table & parent)
 
 /// Get the status of object.
 // possible values:
-// 0 - not active
-// 1 - active
-// 2 - deactivated
-// 3 - invisible
+// <br />0 - not active 
+// <br />1 - active 
+// <br />2 - deactivated 
+// <br />3 - invisible
 // @function Moveable:GetStatus
 // @treturn int a number representing the status of the object
 	ScriptReserved_GetStatus, &Moveable::GetStatus,
