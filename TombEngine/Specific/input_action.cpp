@@ -55,6 +55,7 @@ namespace TEN::Input
 
 	void InputAction::PrintDebugInfo()
 	{
+		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
 		g_Renderer.PrintDebugMessage("IsClicked: %d", this->IsClicked());
 		g_Renderer.PrintDebugMessage("IsPulsed (.2s, .6s): %d", this->IsPulsed(0.2f, 0.6f));
 		g_Renderer.PrintDebugMessage("IsHeld: %d", this->IsHeld());

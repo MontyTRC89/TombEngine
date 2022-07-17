@@ -138,7 +138,7 @@ public:
 	void SetInventoryItemChosen(int num);
 
 private:
-	#define CAN_SELECT  (!IsHeld(In::Deselect) && \
+	#define CAN_SELECT   (!IsHeld(In::Deselect) && \
 						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Deselect) && \
 						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Save) && \
 						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Load) && \
