@@ -24,7 +24,6 @@ cbuffer LightsBuffer : register(b2)
 {
 	ShaderLight Lights[MAX_LIGHTS];
 	int NumLights;
-	float3 CameraPosition;
 };
 
 float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)

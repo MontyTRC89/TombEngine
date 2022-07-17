@@ -1417,8 +1417,6 @@ namespace TEN::Renderer
 
 		ScriptInterfaceLevel* level = g_GameFlow->GetLevel(CurrentLevel);
 
-		m_stLights.CameraPosition = view.camera.WorldPosition;
-
 		// Prepare the scene to draw
 		auto time1 = std::chrono::high_resolution_clock::now();
 		CollectRooms(view, false);
