@@ -311,7 +311,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(Normal,input.TBN));
+	Normal = normalize(mul(Normal, input.TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -380,7 +380,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
 	
-	output.Color.xyz = output.Color.xyz * lighting;
+	output.Color.xyz = saturate(output.Color.xyz * lighting);
 
 	output.Depth = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
