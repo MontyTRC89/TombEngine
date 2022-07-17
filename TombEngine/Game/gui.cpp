@@ -789,8 +789,10 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.ShadowMode--;
-			if (CurrentSettings.conf.ShadowMode < SHADOW_NONE) CurrentSettings.conf.ShadowMode = SHADOW_ALL;
+			if (CurrentSettings.conf.ShadowType == ShadowMode::None)
+				CurrentSettings.conf.ShadowType = ShadowMode::All;
+			else
+				CurrentSettings.conf.ShadowType = ShadowMode(int(CurrentSettings.conf.ShadowType) - 1);
 			break;
 
 		case 3:
@@ -822,8 +824,10 @@ void GuiController::HandleDisplaySettingsInput(bool pause)
 
 		case 2:
 			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-			CurrentSettings.conf.ShadowMode++;
-			if (CurrentSettings.conf.ShadowMode > SHADOW_ALL) CurrentSettings.conf.ShadowMode = SHADOW_NONE;
+			if (CurrentSettings.conf.ShadowType == ShadowMode::All)
+				CurrentSettings.conf.ShadowType = ShadowMode::None;
+			else
+				CurrentSettings.conf.ShadowType = ShadowMode(int(CurrentSettings.conf.ShadowType) + 1);
 			break;
 
 		case 3:
