@@ -251,8 +251,8 @@ namespace TEN::Renderer
 				{
 					CollectLightsForRoom(roomNumber, renderView);
 					CollectItems(roomNumber, renderView);
-					CollectStatics(roomNumber, renderView);
-					CollectEffects(roomNumber, renderView);
+					CollectStatics(roomNumber);
+					CollectEffects(roomNumber);
 				}
 			}
 
@@ -316,7 +316,7 @@ namespace TEN::Renderer
 		GetRoomBounds(renderView, onlyRooms);
 	}
 
-	void Renderer11::CollectItems(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectItems(short roomNumber, RenderView& renderView)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -359,13 +359,13 @@ namespace TEN::Renderer
 			newItem->World = newItem->Rotation * newItem->Translation;
 
 			InterpolateAmbientLight(item->RoomNumber, newItem);
-			CollectLightsForItem(item->RoomNumber, newItem, renderView);
+			CollectLightsForItem(item->RoomNumber, newItem, false);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
 	}
 
-	void Renderer11::CollectStatics(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectStatics(short roomNumber)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -552,7 +552,7 @@ namespace TEN::Renderer
 		lights.clear();
 
 		// Always add brightest light, if collecting shadow light is specified, even if it's far in range
-		if (collectShadowLight)
+		if (collectShadowLight && brightestLight)
 			lights.push_back(brightestLight);
 
 		// Add max 8 lights per item, including the shadow light for Lara eventually
@@ -568,15 +568,18 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect, RenderView &renderView)
+	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect)
 	{
 		CollectLights(effect->Effect->pos.Position, roomNumber, false, effect->LightsToDraw);
 	}
 
-	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView)
+	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item, bool collectShadowLight)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-		CollectLights(nativeItem->Pose.Position, roomNumber, false, item->LightsToDraw);
+		CollectLights(nativeItem->Pose.Position, roomNumber, collectShadowLight, item->LightsToDraw);
+
+		if (collectShadowLight && item->LightsToDraw.size() > 0)
+			shadowLight = item->LightsToDraw.front();
 	}
 
 	void Renderer11::InterpolateAmbientLight(short roomNumber, RendererItem *item)
@@ -637,7 +640,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectEffects(short roomNumber, RenderView &renderView)
+	void Renderer11::CollectEffects(short roomNumber)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -662,7 +665,7 @@ namespace TEN::Renderer
 			newEffect->World = Matrix::CreateFromYawPitchRoll(fx->pos.Orientation.y, fx->pos.Position.x, fx->pos.Position.z) * Matrix::CreateTranslation(fx->pos.Position.x, fx->pos.Position.y, fx->pos.Position.z);
 			newEffect->Mesh = GetMesh(obj->nmeshes ? obj->meshIndex : fx->frameNumber);
 
-			CollectLightsForEffect(fx->roomNumber, newEffect, renderView);
+			CollectLightsForEffect(fx->roomNumber, newEffect);
 
 			room.EffectsToDraw.push_back(newEffect);
 		}

@@ -1453,7 +1453,7 @@ namespace TEN::Renderer
 		// Setup Lara item
 		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
 		InterpolateAmbientLight(LaraItem->RoomNumber, &m_items[Lara.ItemNumber]);
-		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], view);
+		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], true);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
