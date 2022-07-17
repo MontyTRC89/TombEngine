@@ -438,13 +438,13 @@ namespace TEN::Renderer
 		void SetRoomBounds(ROOM_DOOR* door, short parentRoomNumber, RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
-		void CollectStatics(short roomNumber, RenderView& renderView);
+		void CollectStatics(short roomNumber);
 		void CollectLights(Vector3Int position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights);
-		void CollectLightsForItem(short roomNumber, RendererItem* item, RenderView& renderView);
-		void CollectLightsForEffect(short roomNumber, RendererEffect* effect, RenderView& renderView);
+		void CollectLightsForItem(short roomNumber, RendererItem* item, bool collectShadowLight);
+		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
 		void InterpolateAmbientLight(short roomNumber, RendererItem* item);
-		void CollectEffects(short roomNumber, RenderView& renderView);
+		void CollectEffects(short roomNumber);
 		void ClearScene();
 		void ClearSceneItems();
 		void ClearDynamicLights();
