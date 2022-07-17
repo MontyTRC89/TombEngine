@@ -192,7 +192,7 @@ namespace TEN::Renderer
 			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
 			{
 				view = Matrix::CreateLookAt(lightPos,
-					lightPos - shadowLight->Direction*10240,
+					lightPos - shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
 				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Out, 1.0f, 16.0f, shadowLight->Range);
