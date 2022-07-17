@@ -143,7 +143,7 @@ private:
 						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Save) && \
 						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Load) && \
 						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Pause))
-	#define CAM_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
+	#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
 
 	// Input macros
 	#define GUI_INPUT_PULSE_UP	  IsPulsed(In::Forward, 0.1f, 0.4f)
