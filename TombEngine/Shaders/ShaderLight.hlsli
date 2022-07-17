@@ -132,21 +132,23 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 	else
 	{
 		lightVec = normalize(lightVec);
-		float inCone = acos(dot(lightVec, direction));
-
-		if (inCone < cone)
+		
+		float d = saturate(dot(n, lightVec));
+		if (d < 0)
 			return float3(0, 0, 0);
 		else
 		{
-			float d = saturate(dot(n, lightVec));
-			if (d < 0)
-				return float3(0, 0, 0);
-			else
+			float cosine = dot(-lightVec, direction);
+			float minCosine = cos(cone * (PI / 180.0f));
+			float attenuation = max((cosine - minCosine), 0.0f) / (1.0f - minCosine);
+			
+			if (attenuation > 0.0f)
 			{
 				float falloff = saturate((outerRange - distance) / (outerRange - innerRange + 1.0f));
-				float attenuation = pow(max(dot(-lightVec, direction), 0.0f), (2.0f - cone) / (PI / 180.0f));
 				return saturate(color * intensity * attenuation * falloff * d);
 			}
+			else
+				return float3(0, 0, 0);
 		}
 	}
 }
