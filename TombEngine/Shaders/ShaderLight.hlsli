@@ -95,6 +95,7 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
+	float intensity = light.Intensity;
 	float radius = light.Out;
 
 	float3 lightVec = (lightPos - pos);
@@ -108,7 +109,7 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 		float d = saturate(dot(n, lightVec));
 		float attenuation = ((radius - distance) / radius);
 
-		return (color * attenuation * d);
+		return saturate(color * intensity * attenuation * d);
 	}
 }
 
@@ -116,22 +117,23 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
-	float3 direction = -light.Direction.xyz;
-	float range = light.Range;
-	float inAngle = light.In;
-	float outAngle = light.Out;
+	float intensity = light.Intensity;
+	float3 direction = -light.Direction.xyz;;
+	float innerRange = light.In;
+	float outerRange = light.Out;
+	float cone = light.Range;
 
 	float3 lightVec = (lightPos - pos);
 	float distance = length(lightVec);
 
-	if (distance > range)
+	if (distance > outerRange)
 		return float3(0, 0, 0);
 	else
 	{
 		lightVec = normalize(lightVec);
 		float inCone = acos(dot(lightVec, direction));
 
-		if (inCone < outAngle)
+		if (inCone < cone)
 			return float3(0, 0, 0);
 		else
 		{
@@ -140,8 +142,9 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 				return float3(0, 0, 0);
 			else
 			{
-				float attenuation = pow(max(dot(-lightVec, direction), 0.0f), inAngle);
-				return (color * attenuation * d);
+				float falloff = saturate((outerRange - distance) / (outerRange - innerRange + 1.0f));
+				float attenuation = pow(max(dot(-lightVec, direction), 0.0f), (-cone + 1.0f) * 180.0f);
+				return saturate(color * intensity * attenuation * falloff * d);
 			}
 		}
 	}
