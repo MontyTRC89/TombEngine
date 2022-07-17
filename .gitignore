@@ -6,7 +6,6 @@ TombEngine/Debug/
 TombEngine/Release
 TombEngine/Legacy Engine Objects
 x64/
-packages/
 .vs/
 *.dll
 *.dmp
