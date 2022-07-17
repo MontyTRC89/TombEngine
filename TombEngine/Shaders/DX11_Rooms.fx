@@ -85,8 +85,10 @@ PixelShaderInput VS(VertexShaderInput input)
 	// Here we just read weight and decide if we should apply refraction or movement effect.
 	float weight = input.Effects.z;
 
-	float3 pos = Move(input.Position, input.Effects.xyz * weight, input.Hash);
-	float3 col = Glow(input.Color.xyz, input.Effects.xyz, input.Hash);
+	// Calculate vertex effects
+	float wibble = Wibble(input.Effects.xyz, input.Hash);
+	float3 pos = Move(input.Position, input.Effects.xyz * weight, wibble);
+	float3 col = Glow(input.Color.xyz, input.Effects.xyz, wibble);
 
 	// Refraction
 	float4 screenPos = mul(float4(pos, 1.0f), ViewProjection);
@@ -125,7 +127,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	}
 #else
 	output.UV = input.UV;
-
 #endif
 	
 	output.WorldPosition = input.Position.xyz;
