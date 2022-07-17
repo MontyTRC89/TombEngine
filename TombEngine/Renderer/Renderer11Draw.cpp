@@ -1613,8 +1613,6 @@ namespace TEN::Renderer
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
-				CalculateAmbientLight(itemToDraw);
-
 				switch (itemToDraw->ObjectNumber)
 				{
 				case ID_LARA:
