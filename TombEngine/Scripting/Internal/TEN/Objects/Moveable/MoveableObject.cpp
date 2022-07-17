@@ -153,6 +153,11 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:MakeInvisible
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
+/// Make the item not targetable by Lara.
+// @function Moveable:MakeNotTargetable
+// @tparam boolean value, true to make him not targetable, false to make him targetable again.
+ScriptReserved_MakeNotTargetable, & Moveable::MakeNotTargetable,
+
 /// Get the status of object.
 // possible values:
 // 0 - not active
@@ -267,6 +272,16 @@ void Moveable::Register(sol::table & parent)
 // @function Moveable:SetOCB
 // @tparam int OCB the new value for the moveable's OCB
 	ScriptReserved_SetOCB, &Moveable::SetOCB,
+
+/// Get ItemFlag[x] (object code bit) of the moveable
+// @function Moveable:GetItemFlag
+// @treturn short value from the moveable's ItemFlag[x]
+ScriptReserved_GetOCB, & Moveable::GetOCB,
+
+/// Set ItemFlag[x] (object code bit) of the moveable
+// @function Moveable:SetItemFlag
+// @tparam short value to store in the moveable's ItemFlag[x]
+ScriptReserved_SetOCB, & Moveable::SetOCB,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
@@ -553,6 +568,17 @@ void Moveable::SetOCB(short ocb)
 	m_item->TriggerFlags = ocb;
 }
 
+short Moveable::GetItemFlag(int index) const
+{
+	return m_item->ItemFlags[index];
+}
+
+void Moveable::SetItemFlag(short value, int index)
+{
+	m_item->ItemFlags[index] = value;
+}
+
+
 ScriptColor Moveable::GetColor() const
 {
 	return ScriptColor{ m_item->Color };
@@ -738,6 +764,14 @@ void Moveable::MakeInvisible()
 		}
 	}
 	dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->TryRemoveColliding(m_num);
+}
+
+void Moveable::MakeNotTargetable(bool isNotTargetable)
+{
+	if (isNotTargetable)
+		m_item->HitPoints = NOT_TARGETABLE;
+	else
+		m_item->HitPoints = Objects[m_item->ObjectNumber].HitPoints;
 }
 
 void Moveable::Invalidate()

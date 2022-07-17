@@ -64,6 +64,9 @@ public:
 	[[nodiscard]] aiBitsType GetAIBits() const;
 	void SetAIBits(aiBitsType const & bits);
 
+	[[nodiscard]] short GetItemFlag(int index = 0) const;
+	void SetItemFlag(short value, int index = 0);
+
 	[[nodiscard]] bool GetHitStatus() const;
 
 	[[nodiscard]] bool GetActive() const;
@@ -75,6 +78,7 @@ public:
 	void EnableItem();
 	void DisableItem();
 	void MakeInvisible();
+	void MakeNotTargetable(bool isNotTargetable = true);
 
 	[[nodiscard]] std::string GetOnHit() const;
 	void SetOnHit(std::string const &);
