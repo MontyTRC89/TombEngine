@@ -29,6 +29,25 @@ namespace TEN::Entities::TR4
 		GUIDE_STATE_PICKUP_TORCH = 37
 	};
 
+	///ITEMFLAGS
+	//----------
+	//ItemFlags[1] Torch status (Original)
+	//	0 - Hasn't got a torch,		(in this state, the guide will go progressing nodes, ignoring the Goal Node, till it finds one with the pick torch action).
+	//	1 - Has picked a torch,		(in this state, the guide will stop and ignite his torch with a lighter).
+	//	2 - Has a working torch,	(in this state, the guide will work as normal).
+	//
+	//ItemFlags[2] Behaviour flags (TEN)
+	//	0 - Acts like the original TR4, he uses the global Lara.Location as goal, and wait for Lara before to do special actions
+	//	1 - He uses its own Goal variable stored in ItemFlags[4], and wait for Lara before to do special actions
+	//	2 - He uses its own Goal variable stored in ItemFlags[4], and don't wait for Lara before to do special actions
+	//
+	//ItemFlags[3] Personal CurrentNode Variable (Original)
+	//
+	//ItemFlags[4] Personal GoalNode Variable (TEN)
+	//
+	//ItemFlags[0], [5], [6] and [7] Are unused.
+	//----------
+
 	// TODO
 	enum GuideAnim
 	{
@@ -203,6 +222,8 @@ namespace TEN::Entities::TR4
 		Vector3Int pos1;
 		int frameNumber;
 		short random;
+		
+		short GoalNode = (item->ItemFlags[2] == 0) ? Lara.Location : item->ItemFlags[4];
 
 		TENLog("Guide state:" + std::to_string(item->Animation.ActiveState), LogLevel::Info);
 
@@ -238,7 +259,7 @@ namespace TEN::Entities::TR4
 
 			if (item->Animation.RequiredState)
 				item->Animation.TargetState = item->Animation.RequiredState;
-			else if (Lara.Location >= item->ItemFlags[3] ||
+			else if (GoalNode >= item->ItemFlags[3] ||
 				item->ItemFlags[1] != 2)
 			{
 				if (!creature->ReachedGoal || foundEnemy)
@@ -268,18 +289,18 @@ namespace TEN::Entities::TR4
 					{
 						switch (enemy->Flags)
 						{
-						case 0x02:
+						case 0x02: //Action Switch on Wall torch
 							item->Animation.TargetState = 38;
 							item->Animation.RequiredState = 38;
 							break;
 
-						case 0x20:
+						case 0x20: //Action Pickup Torch
 							item->Animation.TargetState = GUIDE_STATE_PICKUP_TORCH;
 							item->Animation.RequiredState = GUIDE_STATE_PICKUP_TORCH;
 							break;
 
-						case 0x28:
-							if (laraAI.distance < pow(SECTOR(2), 2))
+						case 0x28: //Action Read Inscription
+							if (laraAI.distance < pow(SECTOR(2), 2) || item->ItemFlags[2] >= 2)
 							{
 								item->Animation.TargetState = 39;
 								item->Animation.RequiredState = 39;
@@ -287,8 +308,8 @@ namespace TEN::Entities::TR4
 
 							break;
 
-						case 0x10:
-							if (laraAI.distance < pow(SECTOR(2), 2))
+						case 0x10: //Action Crouch and Trigger activation
+							if (laraAI.distance < pow(SECTOR(2), 2) || item->ItemFlags[2] >= 2)
 							{
 								// Ignite torch
 								item->Animation.TargetState = 36;
@@ -297,8 +318,8 @@ namespace TEN::Entities::TR4
 
 							break;
 
-						case 0x04:
-							if (laraAI.distance < pow(SECTOR(2), 2))
+						case 0x04: //Action Crouch and Trap activation
+							if (laraAI.distance < pow(SECTOR(2), 2) || item->ItemFlags[2] >= 2)
 							{
 								item->Animation.TargetState = 36;
 								item->Animation.RequiredState = 43;
@@ -306,7 +327,7 @@ namespace TEN::Entities::TR4
 
 							break;
 
-						case 0x3E:
+						case 0x3E: //Action Dissapear
 							item->Status = ITEM_INVISIBLE;
 							RemoveActiveItem(itemNumber);
 							DisableEntityAI(itemNumber);
@@ -362,7 +383,7 @@ namespace TEN::Entities::TR4
 			}
 			else
 			{
-				if (Lara.Location >= item->ItemFlags[3])
+				if (GoalNode >= item->ItemFlags[3])
 				{
 					if (!foundEnemy ||
 						AI.distance >= pow(SECTOR(1.5f), 2) &&
@@ -378,7 +399,7 @@ namespace TEN::Entities::TR4
 							else
 								item->Animation.TargetState = GUIDE_STATE_IDLE;
 						}
-						else if (Lara.Location > item->ItemFlags[3] &&
+						else if (GoalNode > item->ItemFlags[3] &&
 							laraAI.distance > pow(SECTOR(2), 2))
 						{
 							item->Animation.TargetState = GUIDE_STATE_RUN;
@@ -401,7 +422,7 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle;
 
 			if (AI.distance < pow(SECTOR(2), 2) ||
-				Lara.Location < item->ItemFlags[3])
+				GoalNode < item->ItemFlags[3])
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 				break;
