@@ -442,7 +442,7 @@ namespace TEN::Renderer
 		void CollectLightsForItem(short roomNumber, RendererItem* item, bool collectShadowLight);
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
-		void InterpolateAmbientLight(short roomNumber, RendererItem* item);
+		void CalculateAmbientLight(RendererItem* item);
 		void CollectEffects(short roomNumber);
 		void ClearScene();
 		void ClearSceneItems();
