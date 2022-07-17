@@ -396,7 +396,7 @@ namespace TEN::Renderer
 							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
 
 			std::vector<RendererLight*> lights;
-			CollectLights(mesh->pos.Position.ToVector3(), room.RoomNumber, false, lights);
+			CollectLights(mesh->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, false, lights);
 
 			auto staticInfo = RendererStatic
 			{
@@ -411,7 +411,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectLights(Vector3 position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights)
+	void Renderer11::CollectLights(Vector3 position, float radius, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -432,7 +432,13 @@ namespace TEN::Renderer
 		for (auto& light : dynamicLights)
 		{
 			float distance = (position - light.Position).Length();
-			if (distance > light.Out)
+
+			// Collect only lights nearer than 20 sectors
+			if (distance >= SECTOR(20))
+				continue;
+
+			// Check the out radius
+			if (distance > light.Out + radius)
 				continue;
 
 			float attenuation = 1.0f - distance / light.Out;
@@ -473,11 +479,11 @@ namespace TEN::Renderer
 					float distance = (position - lightPosition).Length();
 
 					// Collect only lights nearer than 20 sectors
-					if (distance >= 20 * WALL_SIZE)
+					if (distance >= SECTOR(20))
 						continue;
 
 					// Check the out radius
-					if (distance > light->Out)
+					if (distance > light->Out + radius)
 						continue;
 
 					float attenuation = 1.0f - distance / light->Out;
@@ -507,7 +513,7 @@ namespace TEN::Renderer
 						continue;
 
 					// Check the range
-					if (distance > light->Out)
+					if (distance > light->Out + radius)
 						continue;
 
 					float attenuation = 1.0f - distance / light->Range;
@@ -570,7 +576,7 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForCamera()
 	{
 		std::vector<RendererLight*> lightsToDraw;
-		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), Camera.pos.roomNumber, true, lightsToDraw);
+		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.roomNumber, true, lightsToDraw);
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 			shadowLight = lightsToDraw.front();
@@ -580,13 +586,13 @@ namespace TEN::Renderer
 	
 	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect* effect)
 	{
-		CollectLights(effect->Effect->pos.Position.ToVector3(), roomNumber, false, effect->LightsToDraw);
+		CollectLights(effect->Effect->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, false, effect->LightsToDraw);
 	}
 
 	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item)
 	{
 		auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
-		CollectLights(pos, roomNumber, false, item->LightsToDraw);
+		CollectLights(pos, ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, false, item->LightsToDraw);
 	}
 
 	void Renderer11::CalculateAmbientLight(RendererItem *item)

@@ -1,4 +1,5 @@
 #pragma once
+#include "Specific/trmath.h"
 
 enum RENDERER_BUCKETS
 {
@@ -220,6 +221,8 @@ constexpr auto MAX_LIGHTS = 100;
 constexpr auto AMBIENT_LIGHT_INTERPOLATION_STEPS = 8;
 constexpr auto MAX_DYNAMIC_SHADOWS = 1;
 constexpr auto MAX_DYNAMIC_LIGHTS = 1024;
+constexpr auto ITEM_LIGHT_COLLECTION_RADIUS = SECTOR(1);
+constexpr auto CAMERA_LIGHT_COLLECTION_RADIUS = SECTOR(10);
 
 constexpr auto MAX_TRANSPARENT_FACES = 16384;
 constexpr auto MAX_TRANSPARENT_VERTICES = (MAX_TRANSPARENT_FACES * 6);
