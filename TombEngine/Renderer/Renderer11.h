@@ -83,7 +83,6 @@ namespace TEN::Renderer
 		int Id;
 		int RoomIndex;
 		Matrix World;
-		Vector3 Position;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
 	};
@@ -445,7 +444,7 @@ namespace TEN::Renderer
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
 		void CollectLightsForCamera();
-		void InterpolateAmbientLight(RendererItem* item);
+		void CalculateAmbientLight(RendererItem* item);
 		void CollectEffects(short roomNumber);
 		void ClearScene();
 		void ClearSceneItems();

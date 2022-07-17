@@ -364,6 +364,7 @@ namespace TEN::Renderer
 			newItem->World = newItem->Rotation * newItem->Translation;
 
 			CollectLightsForItem(item->RoomNumber, newItem);
+			CalculateAmbientLight(newItem);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
@@ -402,7 +403,6 @@ namespace TEN::Renderer
 				mesh->staticNumber,
 				room.RoomNumber,
 				world,
-				mesh->pos.Position.ToVector3(),
 				room.AmbientLight * mesh->color,
 				lights
 			};
@@ -578,18 +578,7 @@ namespace TEN::Renderer
 			shadowLight = nullptr;
 	}
 
-	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect)
-	{
-		CollectLights(effect->Effect->pos.Position.ToVector3(), roomNumber, false, effect->LightsToDraw);
-	}
-
-	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item)
-	{
-		auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
-		CollectLights(pos, roomNumber, false, item->LightsToDraw);
-	}
-
-	void Renderer11::InterpolateAmbientLight(RendererItem *item)
+	void Renderer11::CalculateAmbientLight(RendererItem *item)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
