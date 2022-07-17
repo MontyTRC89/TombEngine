@@ -138,6 +138,7 @@ namespace TEN::Renderer
 		std::vector<Matrix> BindPoseTransforms;
 		std::vector<RendererBone*> LinearizedBones;
 		bool DoNotDraw;
+		bool CastShadow;
 		bool HasDataInBucket[NUM_BUCKETS];
 		bool HasDataInAnimatedBucket[NUM_BUCKETS];
 

@@ -63,7 +63,6 @@ struct ObjectInfo
 	bool undead;
 	bool saveMesh;
 	bool friendly;
-	bool castShadows;
 	bool isPickup;
 	bool isPuzzleHole;
 	int meshSwapSlot;
