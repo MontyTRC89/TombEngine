@@ -6,8 +6,6 @@ struct CollisionInfo;
 struct Vector3Int;
 enum GAME_OBJECT_ID : short;
 
-constexpr auto FLARE_LIFE_MAX = 60 * FPS;	// 60 * 30 frames = 60 seconds.
-
 void FlareControl(short itemNumber);
 void ReadyFlare(ItemInfo* laraItem);
 void UndrawFlareMeshes(ItemInfo* laraItem);
