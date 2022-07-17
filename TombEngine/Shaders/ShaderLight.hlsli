@@ -1,3 +1,5 @@
+#include "./Math.hlsli"
+
 #define LT_SUN		0
 #define LT_POINT	1
 #define LT_SPOT		2
@@ -142,7 +144,7 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 			else
 			{
 				float falloff = saturate((outerRange - distance) / (outerRange - innerRange + 1.0f));
-				float attenuation = pow(max(dot(-lightVec, direction), 0.0f), (-cone + 1.0f) * 180.0f);
+				float attenuation = pow(max(dot(-lightVec, direction), 0.0f), (2.0f - cone) / (PI / 180.0f));
 				return saturate(color * intensity * attenuation * falloff * d);
 			}
 		}
