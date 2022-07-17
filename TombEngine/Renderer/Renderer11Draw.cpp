@@ -987,6 +987,7 @@ namespace TEN::Renderer
 			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
 		}
 
+		dynamicLight.Intensity = 1.0f;
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
 		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_POINT;
