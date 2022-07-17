@@ -525,6 +525,7 @@ namespace TEN::Renderer
 		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber); 
 		void RenderBlobShadows(RenderView& renderView);
 		void RenderShadowMap(RendererItem* item, RenderView& view);
+		void RenderItemShadows(RenderView& renderView);
 
 		void SetBlendMode(BLEND_MODES blendMode, bool force = false);
 		void SetDepthState(DEPTH_STATES depthState, bool force = false);

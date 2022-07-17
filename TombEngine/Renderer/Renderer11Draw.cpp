@@ -1428,7 +1428,7 @@ namespace TEN::Renderer
 		m_stAlphaTest.AlphaThreshold = -1;
 
 		CollectLightsForCamera();
-		RenderBlobShadows(view);
+		RenderItemShadows(view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
 		m_timeUpdate = (std::chrono::duration_cast<ns>(time2 - time1)).count() / 1000000;
@@ -1613,6 +1613,8 @@ namespace TEN::Renderer
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
+				CalculateAmbientLight(itemToDraw);
+
 				switch (itemToDraw->ObjectNumber)
 				{
 				case ID_LARA:
@@ -1639,10 +1641,18 @@ namespace TEN::Renderer
 					break;
 				}
 
-				CalculateAmbientLight(itemToDraw);
 				RenderShadowMap(itemToDraw, view);
 			}
 		}
+	}
+
+	void Renderer11::RenderItemShadows(RenderView& renderView)
+	{
+		RenderBlobShadows(renderView);
+
+		for (auto room : renderView.roomsToDraw)
+			for (auto itemToDraw : room->ItemsToDraw)
+				RenderShadowMap(itemToDraw, renderView);
 	}
 
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
