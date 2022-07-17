@@ -61,9 +61,11 @@ PixelShaderInput VS(VertexShaderInput input)
 	float3x3 TBN = float3x3(Tangent, Bitangent, normal);
 
 	output.TBN = transpose(TBN);
-	
-	float3 pos = Move(input.Position, input.Effects.xyz, input.Hash);
-	float3 col = Glow(input.Color.xyz, input.Effects.xyz, input.Hash);
+
+	// Calculate vertex effects
+	float wibble = Wibble(input.Effects.xyz, input.Hash);
+	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
+	float3 col = Glow(input.Color.xyz, input.Effects.xyz, wibble);
 	
 	output.Position = mul(mul(float4(pos, 1.0f), world), ViewProjection);
 	output.Color = float4(col, input.Color.w);
