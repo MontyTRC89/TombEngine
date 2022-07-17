@@ -972,7 +972,7 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
-		RendererLight dynamicLight;
+		RendererLight dynamicLight = {};
 
 		if (falloff >= 8)
 		{

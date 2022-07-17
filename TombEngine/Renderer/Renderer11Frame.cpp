@@ -426,23 +426,19 @@ namespace TEN::Renderer
 		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
-		for (int i = 0; i < dynamicLights.size(); i++)
+		for (auto& light : dynamicLights)
 		{
-			RendererLight* light = &dynamicLights[i];
-
-			Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
-			float distance = (itemPosition - lightPosition).Length();
-			if (distance > light->Out)
+			float distance = (itemPosition - light.Position).Length();
+			if (distance > light.Out)
 				continue;
 
-			float attenuation = 1.0f - distance / light->Out;
-			float intensity = std::max(0.0f, attenuation * light->Intensity * Luma(light->Color));
+			float attenuation = 1.0f - distance / light.Out;
+			float intensity = std::max(0.0f, attenuation * light.Intensity * Luma(light.Color));
 
-			light->LocalIntensity = intensity;
-			light->Distance = distance;
+			light.LocalIntensity = intensity;
+			light.Distance = distance;
 
-			tempLights.push_back(light);
+			tempLights.push_back(&light);
 		}
 
 		// Check current room and also neighbour rooms
@@ -578,7 +574,7 @@ namespace TEN::Renderer
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 		CollectLights(nativeItem->Pose.Position, roomNumber, collectShadowLight, item->LightsToDraw);
 
-		if (collectShadowLight && item->LightsToDraw.size() > 0)
+		if (collectShadowLight && item->LightsToDraw.size() > 0 && item->LightsToDraw.front()->CastShadows)
 			shadowLight = item->LightsToDraw.front();
 		else
 			shadowLight = nullptr;
