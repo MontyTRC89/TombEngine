@@ -1638,8 +1638,6 @@ namespace TEN::Renderer
 					DrawAnimatingItem(itemToDraw, view, transparent);
 					break;
 				}
-
-				RenderShadowMap(itemToDraw, view);
 			}
 		}
 	}
