@@ -1180,6 +1180,11 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	auto oldCollResult = GetCollision(x, y, z, item->RoomNumber);
 	auto collResult = GetCollision(item);
 
+	auto* bounds = GetBoundsAccurate(item);
+	int radius = abs(bounds->Y2 - bounds->Y1);
+
+	item->Pose.Position.y += radius;
+
 	if (item->Pose.Position.y >= collResult.Position.Floor)
 	{
 		bs = 0;
@@ -1678,6 +1683,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
 	}
+
+	item->Pose.Position.y -= radius;
 }
 
 void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
