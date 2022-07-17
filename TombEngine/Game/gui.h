@@ -138,13 +138,20 @@ public:
 	void SetInventoryItemChosen(int num);
 
 private:
+	#define CAN_SELECT  (!IsHeld(In::Deselect) && \
+						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Deselect) && \
+						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Save) && \
+						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Load) && \
+						 GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Pause))
+	#define CAM_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
+
 	// Input macros
 	#define GUI_INPUT_PULSE_UP	  IsPulsed(In::Forward, 0.1f, 0.4f)
 	#define GUI_INPUT_PULSE_DOWN  IsPulsed(In::Back, 0.1f, 0.4f)
 	#define GUI_INPUT_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
 	#define GUI_INPUT_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
-	#define GUI_INPUT_SELECT	  ((IsReleased(In::Select) || IsReleased(In::Action)) && !IsHeld(In::Deselect) && GetInputTimeHeld(In::Action) <= GetInputTimeInactive(In::Deselect))
-	#define GUI_INPUT_DESELECT	  (IsClicked(In::Deselect) && !(IsHeld(In::Select) || IsHeld(In::Action)))
+	#define GUI_INPUT_SELECT	  ((IsReleased(In::Select) || IsReleased(In::Action)) && CAN_SELECT)
+	#define GUI_INPUT_DESELECT	  (IsClicked(In::Deselect) && CAN_DESELECT)
 
 	// GUI variables
 	Menu MenuToDisplay = Menu::Title;
