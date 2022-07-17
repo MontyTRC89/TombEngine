@@ -1656,16 +1656,16 @@ namespace TEN::Renderer
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-		RendererRoom* room = &m_rooms[nativeItem->RoomNumber];
-		RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
-		ObjectInfo* obj = &Objects[nativeItem->ObjectNumber];
+		RendererRoom* room = &m_rooms[item->CurrentRoomNumber];
+		RendererObject& moveableObj = *m_moveableObjects[item->ObjectNumber];
+		ObjectInfo* obj = &Objects[item->ObjectNumber];
 
-		Vector3 itemPosition = Vector3(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z);
+		Vector3 itemPosition = Vector3::Transform(Vector3::Zero, item->Translation);
 		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		// Bind item main properties
 		m_stItem.World = item->World;
-		m_stItem.Position = Vector4(nativeItem->Pose.Position.x, nativeItem->Pose.Position.y, nativeItem->Pose.Position.z, 1.0f);
+		m_stItem.Position = Vector4(itemPosition.x, itemPosition.y, itemPosition.z, 1.0f);
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
