@@ -1686,7 +1686,7 @@ void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
 	coll->HitStatic     = false;
 
 	bool playerCollision = laraItem->IsLara();
-	bool harmless = !playerCollision && (laraItem->Data.is<KayakInfo>() || laraItem->Data.is<UPVInfo>());
+	bool harmless = !playerCollision && (laraItem->Data.is<KayakInfo>() || laraItem->Data.is<UpvInfo>());
 
 	if (playerCollision)
 	{

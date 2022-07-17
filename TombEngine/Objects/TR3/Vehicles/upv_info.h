@@ -3,17 +3,17 @@
 
 namespace TEN::Entities::Vehicles
 {
-	struct UPVInfo
+	struct UpvInfo
 	{
-		Vector3Shrt TurnRate;
-		short TurbineRotation = 0;
-		short LeftRudderRotation = 0;
-		short RightRudderRotation = 0;
+		float Velocity = 0.0f;
 
-		int Velocity = 0;
+		Vector3Shrt TurnRate;
 
 		unsigned int HarpoonTimer = 0;
 		bool HarpoonLeft = false;
+		short TurbineRotation = 0;
+		short LeftRudderRotation = 0;
+		short RightRudderRotation = 0;
 
 		char Flags = NULL;
 	};

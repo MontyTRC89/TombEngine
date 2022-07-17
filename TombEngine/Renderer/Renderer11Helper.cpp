@@ -254,7 +254,7 @@ namespace TEN::Renderer
 						if (j == 2)
 							currentBone->ExtraRotation.z = TO_RAD(boat.PropellerRotation);
 					},
-					[&j, &currentBone](UPVInfo& upv)
+					[&j, &currentBone](UpvInfo& upv)
 					{
 						switch (j)
 						{

@@ -7,20 +7,19 @@ struct ItemInfo;
 
 namespace TEN::Entities::Vehicles
 {
-	UPVInfo* GetUPVInfo(ItemInfo* UPVItem);
-	void UPVInitialise(short itemNumber);
+	UpvInfo* GetUpvInfo(ItemInfo* upvItem);
+	void UpvInitialise(short itemNumber);
 
-	void UPVPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
-	bool UPVControl(ItemInfo* laraItem, CollisionInfo* coll);
-	void UPVUserControl(ItemInfo* UPVItem, ItemInfo* laraItem);
+	bool UpvControl(ItemInfo* laraItem, CollisionInfo* coll);
+	void UpvUserControl(ItemInfo* upvItem, ItemInfo* laraItem);
 
-	void DoUPVMount(ItemInfo* UPVItem, ItemInfo* laraItem, VehicleMountType mountType);
-	bool TestUPVDismount(ItemInfo* UPVItem, ItemInfo* laraItem);
+	void UpvPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
+	void DoUpvMount(ItemInfo* upvItem, ItemInfo* laraItem, VehicleMountType mountType);
+	bool TestUpvDismount(ItemInfo* upvItem, ItemInfo* laraItem);
 
-	void BackgroundCollision(ItemInfo* UPVItem, ItemInfo* laraItem);
-
-	void DoCurrent(ItemInfo* UPVItem, ItemInfo* laraItem);
-	void FireUPVHarpoon(ItemInfo* UPVItem, ItemInfo* laraItem);
-	void TriggerUPVEffects(short itemNumber);
-	void TriggerUPVMistEffect(long x, long y, long z, long velocity, short angle);
+	void FireUpvHarpoon(ItemInfo* upvItem, ItemInfo* laraItem);
+	void UpvBackgroundCollision(ItemInfo* upvItem, ItemInfo* laraItem);
+	void DoUpvCurrent(ItemInfo* upvItem, ItemInfo* laraItem);
+	void TriggerUpvEffects(short itemNumber);
+	void TriggerUpvMistEffect(long x, long y, long z, long velocity, short angle);
 }

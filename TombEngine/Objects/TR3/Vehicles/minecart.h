@@ -10,11 +10,11 @@ namespace TEN::Entities::Vehicles
 	MinecartInfo* GetMinecartInfo(ItemInfo* minecartItem);
 	void InitialiseMinecart(short itemNumber);
 
-	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	bool MinecartControl(ItemInfo* laraItem);
 	void MinecartUserControl(ItemInfo* minecartItem, ItemInfo* laraItem);
 	void AnimateMinecart(ItemInfo* minecartItem, ItemInfo* laraItem);
 
+	void MinecartPlayerCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll);
 	void DoMinecartMount(ItemInfo* minecartItem, ItemInfo* laraItem, VehicleMountType mountType);
 	bool TestMinecartDismount(ItemInfo* laraItem, int direction);
 

@@ -515,9 +515,9 @@ bool SaveGame::Save(int slot)
 			quadBuilder.add_velocity(quad->Velocity);
 			quadOffset = quadBuilder.Finish();
 		}
-		else if (itemToSerialize.Data.is<UPVInfo>())
+		else if (itemToSerialize.Data.is<UpvInfo>())
 		{
-			auto upv = (UPVInfo*)itemToSerialize.Data;
+			auto upv = (UpvInfo*)itemToSerialize.Data;
 
 			Save::UPVBuilder upvBuilder{ fbb };
 
@@ -651,7 +651,7 @@ bool SaveGame::Save(int slot)
 			serializedItem.add_data_type(Save::ItemData::QuadBike);
 			serializedItem.add_data(quadOffset.Union());
 		}
-		else if (itemToSerialize.Data.is<UPVInfo>())
+		else if (itemToSerialize.Data.is<UpvInfo>())
 		{
 			serializedItem.add_data_type(Save::ItemData::UPV);
 			serializedItem.add_data(upvOffset.Union());
@@ -1453,9 +1453,9 @@ bool SaveGame::Load(int slot)
 			quadBike->TurnRate = savedQuad->turn_rate();
 			quadBike->Velocity = savedQuad->velocity();
 		}
-		else if (item->Data.is<UPVInfo>())
+		else if (item->Data.is<UpvInfo>())
 		{
-			auto* upv = (UPVInfo*)item->Data;
+			auto* upv = (UpvInfo*)item->Data;
 			auto* savedUpv = (Save::UPV*)savedItem->data();
 
 			upv->TurbineRotation = savedUpv->fan_rot();

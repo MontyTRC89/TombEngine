@@ -60,7 +60,7 @@ class ITEM_DATA
 		JeepInfo,
 		KayakInfo,
 		SkidooInfo,
-		UPVInfo,
+		UpvInfo,
 		SpeedboatInfo,
 		RubberBoatInfo,
 		MinecartInfo

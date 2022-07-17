@@ -89,7 +89,6 @@ namespace TEN::Entities::Vehicles
 				{
 					break;
 				}
-
 				continue;
 
 			case VehicleMountType::Front:
@@ -100,7 +99,6 @@ namespace TEN::Entities::Vehicles
 				{
 					break;
 				}
-
 				continue;
 
 			case VehicleMountType::Back:
@@ -111,7 +109,6 @@ namespace TEN::Entities::Vehicles
 				{
 					break;
 				}
-
 				continue;
 
 			case VehicleMountType::Left:
@@ -122,7 +119,6 @@ namespace TEN::Entities::Vehicles
 				{
 					break;
 				}
-
 				continue;
 
 			case VehicleMountType::Right:
@@ -133,7 +129,6 @@ namespace TEN::Entities::Vehicles
 				{
 					break;
 				}
-
 				continue;
 
 			case VehicleMountType::Jump:
@@ -143,7 +138,6 @@ namespace TEN::Entities::Vehicles
 				{
 					break;
 				}
-
 				continue;
 
 			default:

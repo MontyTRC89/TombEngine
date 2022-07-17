@@ -453,9 +453,9 @@ static void StartVehicles(ObjectInfo* obj)
 	obj = &Objects[ID_UPV];
 	if (obj->loaded)
 	{
-		obj->initialise = UPVInitialise;
-		obj->control = TriggerUPVEffects;
-		obj->collision = UPVPlayerCollision;
+		obj->initialise = UpvInitialise;
+		obj->control = TriggerUpvEffects;
+		obj->collision = UpvPlayerCollision;
 	//	obj->drawRoutine = SubDraw;
 		obj->hitEffect = HIT_RICOCHET;
 		obj->saveAnim = true;
