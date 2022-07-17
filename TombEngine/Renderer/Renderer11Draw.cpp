@@ -1448,7 +1448,7 @@ namespace TEN::Renderer
 
 		// Setup Lara item
 		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
-		InterpolateAmbientLight(LaraItem->RoomNumber, &m_items[Lara.ItemNumber]);
+		CalculateAmbientLight(&m_items[Lara.ItemNumber]);
 		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], true);
 
 		// Prepare the shadow map

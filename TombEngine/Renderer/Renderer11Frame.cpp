@@ -358,7 +358,7 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			InterpolateAmbientLight(item->RoomNumber, newItem);
+			CalculateAmbientLight(newItem);
 			CollectLightsForItem(item->RoomNumber, newItem, false);
 
 			room.ItemsToDraw.push_back(newItem);
@@ -579,7 +579,7 @@ namespace TEN::Renderer
 			shadowLight = nullptr;
 	}
 
-	void Renderer11::InterpolateAmbientLight(short roomNumber, RendererItem *item)
+	void Renderer11::CalculateAmbientLight(RendererItem *item)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
