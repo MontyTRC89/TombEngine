@@ -1654,7 +1654,8 @@ namespace TEN::Renderer
 
 		for (auto room : renderView.roomsToDraw)
 			for (auto itemToDraw : room->ItemsToDraw)
-				RenderShadowMap(itemToDraw, renderView);
+				if (m_moveableObjects[itemToDraw->ObjectNumber].value().CastShadow)
+					RenderShadowMap(itemToDraw, renderView);
 	}
 
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)

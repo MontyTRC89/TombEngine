@@ -811,7 +811,6 @@ static void StartEntity(ObjectInfo *obj)
 			obj->saveHitpoints = true;
 			obj->meshSwapSlot = ID_MESHSWAP_ROMAN_GOD1 + i;
 			obj->zoneType = ZONE_HUMAN_CLASSIC;
-			obj->castShadows = true;
 
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_Y;
 			g_Level.Bones[obj->boneIndex + 24] |= ROT_X;
@@ -872,7 +871,7 @@ static void StartEntity(ObjectInfo *obj)
 		obj->saveAnim = true;
 		obj->zoneType = ZONE_BASIC;
 		obj->hitEffect = HIT_RICOCHET;
-		obj->castShadows = true;
+		obj->castsShadow = true;
 		obj->HitPoints = 100;
 	}
 }
@@ -1115,7 +1114,7 @@ static void StartTrap(ObjectInfo *obj)
 		obj->hitEffect = HIT_RICOCHET;
 		obj->savePosition = true;
 		obj->saveFlags = true;
-		obj->castShadows = true;
+		obj->castsShadow = true;
 	}
 	
 	obj = &Objects[ID_CLASSIC_ROLLING_BALL];
