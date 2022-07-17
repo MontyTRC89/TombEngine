@@ -508,7 +508,7 @@ namespace TEN::Renderer
 						continue;
 
 					// Check the range
-					if (distance > light->Range)
+					if (distance > light->Out)
 						continue;
 
 					float attenuation = 1.0f - distance / light->Range;
