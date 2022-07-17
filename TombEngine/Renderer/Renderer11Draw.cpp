@@ -1641,7 +1641,7 @@ namespace TEN::Renderer
 					break;
 				}
 
-				InterpolateAmbientLight(itemToDraw);
+				CalculateAmbientLight(itemToDraw);
 				RenderShadowMap(itemToDraw, view);
 			}
 		}
