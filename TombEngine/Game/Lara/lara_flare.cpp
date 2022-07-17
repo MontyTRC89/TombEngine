@@ -17,7 +17,8 @@
 
 using namespace TEN::Math::Random;
 
-constexpr auto FlareMainColor = Vector3(0.8f, 0.42947f, 0.2921f);
+constexpr auto FLARE_MAIN_COLOR = Vector3(0.8f, 0.42947f, 0.2921f);
+constexpr auto FLARE_LIFE_MAX = 60 * FPS;	// 60 * 30 frames = 60 seconds.
 
 void FlareControl(short itemNumber)
 {
@@ -409,9 +410,9 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 	{
 		int falloff = 6 * (1.0f - (flareLife / FLARE_LIFE_MAX));
 
-		int r = FlareMainColor.x * 255;
-		int g = FlareMainColor.y * 255;
-		int b = FlareMainColor.z * 255;
+		int r = FLARE_MAIN_COLOR.x * 255;
+		int g = FLARE_MAIN_COLOR.y * 255;
+		int b = FLARE_MAIN_COLOR.z * 255;
 
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
@@ -422,9 +423,9 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 		float multiplier = GenerateFloat(0.05f, 1.0f);
 		int falloff = 8 * multiplier;
 
-		int r = FlareMainColor.x * 255 * multiplier;
-		int g = FlareMainColor.y * 255 * multiplier;
-		int b = FlareMainColor.z * 255 * multiplier;
+		int r = FLARE_MAIN_COLOR.x * 255 * multiplier;
+		int g = FLARE_MAIN_COLOR.y * 255 * multiplier;
+		int b = FLARE_MAIN_COLOR.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
 		result = (random < 0.4f);
@@ -434,9 +435,9 @@ int DoFlareLight(Vector3Int* pos, int flareLife)
 		float multiplier = GenerateFloat(0.6f, 0.8f);
 		int falloff = 8 * (1.0f - (flareLife / FLARE_LIFE_MAX));
 
-		int r = FlareMainColor.x * 255 * multiplier;
-		int g = FlareMainColor.y * 255 * multiplier;
-		int b = FlareMainColor.z * 255 * multiplier;
+		int r = FLARE_MAIN_COLOR.x * 255 * multiplier;
+		int g = FLARE_MAIN_COLOR.y * 255 * multiplier;
+		int b = FLARE_MAIN_COLOR.z * 255 * multiplier;
 		TriggerDynamicLight(x, y, z, falloff, r, g, b);
 
 		result = (random < 0.3f);
