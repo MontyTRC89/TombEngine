@@ -216,7 +216,7 @@ namespace TEN::Renderer
 			m_stItem.World = item->World;
 			m_stItem.Position = Vector4(pos.x, pos.y, pos.z, 1.0f);
 			m_stItem.AmbientLight = room.AmbientLight;
-			memcpy(m_stItem.BonesMatrices, obj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
+			memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 			for (int k = 0; k < MAX_BONES; k++)
 				m_stItem.BoneLightModes[k] = LIGHT_MODES::LIGHT_MODE_STATIC;
 
@@ -230,7 +230,10 @@ namespace TEN::Renderer
 
 				for (auto& bucket : mesh->Buckets)
 				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
+					if (bucket.NumVertices == 0)
+						continue;
+
+					if (bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE && bucket.BlendMode != BLEND_MODES::BLENDMODE_ALPHATEST)
 						continue;
 
 					// Draw vertices
