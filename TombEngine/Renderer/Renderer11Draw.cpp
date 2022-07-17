@@ -10,7 +10,6 @@
 #include "Game/health.h"
 #include "Game/camera.h"
 #include "Game/items.h"
-#include "Game/spotcam.h"
 #include "Game/animation.h"
 #include "Game/gui.h"
 #include "Game/Lara/lara.h"
@@ -52,25 +51,6 @@ namespace TEN::Renderer
 		static const std::array<LARA_MESHES, 4> sphereMeshes = { LM_HIPS, LM_TORSO, LM_LFOOT, LM_RFOOT };
 		static const std::array<float, 4> sphereScaleFactors = { 6.0f, 3.2f, 2.8f, 2.8f };
 
-		if (!SpotcamDontDrawLara && CurrentLevel != 0)
-		{
-			for (auto i = 0; i < sphereMeshes.size(); i++)
-			{
-				auto& newSphere = nearestSpheres.emplace_back();
-				MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
-				Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
-
-				if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
-				{
-					// Push feet spheres a little bit down
-					pos.y += 8;
-				}
-				GetLaraJointPosition(&pos, sphereMeshes[i]);
-				newSphere.position = Vector3(pos.x, pos.y, pos.z);
-				newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
-			}
-		}
-
 		for (auto& r : renderView.roomsToDraw) 
 		{
 			for (auto& i : r->ItemsToDraw) 
@@ -82,14 +62,35 @@ namespace TEN::Renderer
 				if (!Objects[nativeItem.ObjectNumber].castsShadow)
 					continue;
 
-				auto bb = GetBoundsAccurate(&nativeItem);
-				Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) + 
-								 Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
-				center.y = nativeItem.Pose.Position.y;
-				float maxExtent = std::max(bb->X2 - bb->X1, bb->Z2 - bb->Z1);
-				auto& newSphere = nearestSpheres.emplace_back();
-				newSphere.position = center;
-				newSphere.radius = maxExtent;
+				if (i->ObjectNumber == ID_LARA)
+				{
+					for (auto i = 0; i < sphereMeshes.size(); i++)
+					{
+						MESH& m = g_Level.Meshes[Lara.MeshPtrs[sphereMeshes[i]]];
+						Vector3Int pos = { (int)m.sphere.Center.x, (int)m.sphere.Center.y, (int)m.sphere.Center.z };
+
+						// Push feet spheres a little bit down
+						if (sphereMeshes[i] == LM_LFOOT || sphereMeshes[i] == LM_RFOOT)
+							pos.y += 8;
+						GetLaraJointPosition(&pos, sphereMeshes[i]);
+
+						auto& newSphere = nearestSpheres.emplace_back();
+						newSphere.position = Vector3(pos.x, pos.y, pos.z);
+						newSphere.radius = m.sphere.Radius * sphereScaleFactors[i];
+					}
+				}
+				else
+				{
+					auto bb = GetBoundsAccurate(&nativeItem);
+					Vector3 center = ((Vector3(bb->X1, bb->Y1, bb->Z1) + Vector3(bb->X2, bb->Y2, bb->Z2)) / 2) +
+						Vector3(nativeItem.Pose.Position.x, nativeItem.Pose.Position.y, nativeItem.Pose.Position.z);
+					center.y = nativeItem.Pose.Position.y;
+					float maxExtent = std::max(bb->X2 - bb->X1, bb->Z2 - bb->Z1);
+
+					auto& newSphere = nearestSpheres.emplace_back();
+					newSphere.position = center;
+					newSphere.radius = maxExtent;
+				}
 			}
 		}
 
@@ -104,7 +105,6 @@ namespace TEN::Renderer
 
 			std::copy(nearestSpheres.begin(), nearestSpheres.begin() + g_Configuration.ShadowMaxBlobs, m_stShadowMap.Spheres);
 			m_stShadowMap.NumSpheres = g_Configuration.ShadowMaxBlobs;
-
 		}
 		else 
 		{
@@ -113,7 +113,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::ClearShadowMap(RenderView& renderView)
+	void Renderer11::ClearShadowMap()
 	{
 		for (int step = 0; step < m_shadowMap.RenderTargetView.size(); step++)
 		{
@@ -123,20 +123,19 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::RenderShadowMap(RenderView& renderView)
+	void Renderer11::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
-		if (g_Configuration.ShadowMode == SHADOW_NONE)
+		if (g_Configuration.ShadowMode == SHADOW_MODES::SHADOW_NONE)
+			return;
+
+		if (g_Configuration.ShadowMode == SHADOW_MODES::SHADOW_LARA && item->ObjectNumber != ID_LARA)
 			return;
 		
 		if (shadowLight == nullptr)
 			return;
 
 		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
-			return;
-
-		// TODO: This condition must become more flexible after beta.
-		if (SpotcamDontDrawLara || CurrentLevel == 0)
-			return;
+			return; 
 
 		// Reset GPU state
 		SetBlendMode(BLENDMODE_OPAQUE);
@@ -152,10 +151,8 @@ namespace TEN::Renderer
 			m_context->RSSetViewports(1, &m_shadowMapViewport);
 			ResetScissor();
 
-			//DrawLara(false, true);
-
 			Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
-			Vector3 itemPos = Vector3(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
+			Vector3 itemPos = Vector3::Transform(Vector3::Zero, item->Translation);
 			if (lightPos == itemPos)
 				return;
 
@@ -207,24 +204,26 @@ namespace TEN::Renderer
 
 			SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-			RendererObject& laraObj = *m_moveableObjects[ID_LARA];
-			RendererObject& laraSkin = *m_moveableObjects[ID_LARA_SKIN];
-			RendererRoom& room = m_rooms[LaraItem->RoomNumber];
+			RendererObject& obj = *m_moveableObjects[item->ObjectNumber];
+			RendererObject& skin = item->ObjectNumber == ID_LARA ? *m_moveableObjects[ID_LARA_SKIN] : obj;
+			RendererRoom& room = m_rooms[item->CurrentRoomNumber];
 
-			m_stItem.World = m_LaraWorldMatrix;
-			m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
+			auto pos = Vector3::Transform(Vector3::Zero, item->Translation.Invert());
+
+			m_stItem.World = item->World;
+			m_stItem.Position = Vector4(pos.x, pos.y, pos.z, 1.0f);
 			m_stItem.AmbientLight = room.AmbientLight;
-			memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
-			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-				m_stItem.BoneLightModes[k] = GetMesh(Lara.MeshPtrs[k])->LightMode;
+			memcpy(m_stItem.BonesMatrices, obj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
+			for (int k = 0; k < MAX_BONES; k++)
+				m_stItem.BoneLightModes[k] = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+			for (int k = 0; k < skin.ObjectMeshes.size(); k++)
 			{
-				auto* mesh = GetMesh(Lara.MeshPtrs[k]);
+				auto* mesh = item->ObjectNumber == ID_LARA ? GetMesh(Lara.MeshPtrs[k]) : skin.ObjectMeshes[k];
 
 				for (auto& bucket : mesh->Buckets)
 				{
@@ -238,13 +237,16 @@ namespace TEN::Renderer
 				}
 			}
 
+			if (item->ObjectNumber != ID_LARA)
+				return;
+
 			if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 			{
-				RendererObject& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
+				auto& laraSkinJoints = *m_moveableObjects[ID_LARA_SKIN_JOINTS];
 
 				for (int k = 0; k < laraSkinJoints.ObjectMeshes.size(); k++)
 				{
-					RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
+					auto* mesh = laraSkinJoints.ObjectMeshes[k];
 
 					for (auto& bucket : mesh->Buckets)
 					{
@@ -259,29 +261,11 @@ namespace TEN::Renderer
 				}
 			}
 
-			for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-			{
-				RendererMesh* mesh = laraSkin.ObjectMeshes[k];
-
-				for (auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode != BLEND_MODES::BLENDMODE_OPAQUE)
-						continue;
-
-					// Draw vertices
-					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-					m_numMoveablesDrawCalls++;
-				}
-			}
-
-			// Draw items
-
-			RendererObject& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
+			auto& hairsObj = *m_moveableObjects[ID_LARA_HAIR];
 
 			// First matrix is Lara's head matrix, then all 6 hairs matrices. Bones are adjusted at load time for accounting this.
 			m_stItem.World = Matrix::Identity;
-			m_stItem.BonesMatrices[0] = laraObj.AnimationTransforms[LM_HEAD] * m_LaraWorldMatrix;
+			m_stItem.BonesMatrices[0] = obj.AnimationTransforms[LM_HEAD] * item->World;
 
 			for (int i = 0; i < hairsObj.BindPoseTransforms.size(); i++)
 			{
@@ -298,7 +282,7 @@ namespace TEN::Renderer
 
 			for (int k = 0; k < hairsObj.ObjectMeshes.size(); k++)
 			{
-				RendererMesh* mesh = hairsObj.ObjectMeshes[k];
+				auto* mesh = hairsObj.ObjectMeshes[k];
 
 				for (auto& bucket : mesh->Buckets)
 				{
@@ -311,7 +295,6 @@ namespace TEN::Renderer
 					m_numMoveablesDrawCalls++;
 				}
 			}
-
 		}
 	}
 
@@ -1007,6 +990,7 @@ namespace TEN::Renderer
 		ClearFires();
 		ClearDynamicLights();
 		ClearSceneItems();
+		ClearShadowMap();
 
 		m_transparentFaces.clear();
 
@@ -1444,16 +1428,8 @@ namespace TEN::Renderer
 
 		m_stAlphaTest.AlphaTest = -1;
 		m_stAlphaTest.AlphaThreshold = -1;
-		m_stShadowMap.NumSpheres = 0;
 
-		// Setup Lara item
-		m_items[Lara.ItemNumber].ItemNumber = Lara.ItemNumber;
-		InterpolateAmbientLight(LaraItem->RoomNumber, &m_items[Lara.ItemNumber]);
-		CollectLightsForItem(LaraItem->RoomNumber, &m_items[Lara.ItemNumber], true);
-
-		// Prepare the shadow map
-		ClearShadowMap(view);
-		RenderShadowMap(view);
+		CollectLightsForCamera();
 		RenderBlobShadows(view);
 
 		auto time2 = std::chrono::high_resolution_clock::now();
@@ -1512,7 +1488,6 @@ namespace TEN::Renderer
 		// Draw rooms and objects
 		DrawRooms(view, false);
 		DrawStatics(view, false);
-		DrawLara(false, view, false);
 		DrawItems(view, false);
 		DrawEffects(view, false);
 		DrawGunShells(view);
@@ -1554,7 +1529,6 @@ namespace TEN::Renderer
 		// Here we sort transparent faces and draw them with a simplified shaders for alpha blending
 		DrawRooms(view, true);
 		DrawStatics(view, true);
-		DrawLara(false, view, true);
 		DrawItems(view, true);
 		DrawEffects(view, true);
 		DrawGunFlashes(view);
@@ -1641,29 +1615,34 @@ namespace TEN::Renderer
 		{
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
-				ItemInfo* nativeItem = &g_Level.Items[itemToDraw->ItemNumber];
-				RendererRoom& room = m_rooms[nativeItem->RoomNumber];
-				RendererObject& moveableObj = *m_moveableObjects[nativeItem->ObjectNumber];
-
-				if (moveableObj.DoNotDraw)
-					continue;
-
-				short objectNumber = nativeItem->ObjectNumber;
-
-				if (objectNumber >= ID_WATERFALL1 && objectNumber <= ID_WATERFALLSS2)
+				switch (itemToDraw->ObjectNumber)
 				{
+				case ID_LARA:
+					DrawLara(view, transparent);
+					break;
+
+				case ID_DARTS:
+					DrawDarts(itemToDraw, view);
+					break;
+
+				case ID_WATERFALL1:
+				case ID_WATERFALL2:
+				case ID_WATERFALL3:
+				case ID_WATERFALL4:
+				case ID_WATERFALL5:
+				case ID_WATERFALL6:
+				case ID_WATERFALLSS1:
+				case ID_WATERFALLSS2:
 					// We'll draw waterfalls later
 					continue;
-				}
-				else if (objectNumber == ID_DARTS)
-				{
-					//TODO: for now legacy way, in the future mesh
-					DrawDarts(itemToDraw, view);
-				}
-				else
-				{
+
+				default:
 					DrawAnimatingItem(itemToDraw, view, transparent);
+					break;
 				}
+
+				InterpolateAmbientLight(itemToDraw);
+				RenderShadowMap(itemToDraw, view);
 			}
 		}
 	}

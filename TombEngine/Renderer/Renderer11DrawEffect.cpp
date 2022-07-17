@@ -674,7 +674,7 @@ namespace TEN::Renderer
 
 					if (Lara.LeftArm.GunFlash)
 					{
-						world = laraObj.AnimationTransforms[LM_LHAND] * m_LaraWorldMatrix;
+						world = laraObj.AnimationTransforms[LM_LHAND] * item->World;
 						world = offset * world;
 						world = rotation2 * world;
 
@@ -687,7 +687,7 @@ namespace TEN::Renderer
 
 					if (Lara.RightArm.GunFlash)
 					{
-						world = laraObj.AnimationTransforms[LM_RHAND] * m_LaraWorldMatrix;
+						world = laraObj.AnimationTransforms[LM_RHAND] * item->World;
 						world = offset * world;
 						world = rotation2 * world;
 

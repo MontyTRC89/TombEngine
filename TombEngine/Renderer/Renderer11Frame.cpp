@@ -1,13 +1,14 @@
 #include "framework.h"
 #include "Renderer/Renderer11.h"
 #include "Game/animation.h"
-#include "Game/Lara/lara.h"
-#include "Game/effects/effects.h"
 #include "Game/camera.h"
+#include "Game/effects/effects.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Game/spotcam.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
-#include "RenderView\RenderView.h"
-#include "Game/items.h"
+#include "RenderView/RenderView.h"
 
 namespace TEN::Renderer
 {
@@ -329,16 +330,19 @@ namespace TEN::Renderer
 		{
 			ItemInfo* item = &g_Level.Items[itemNum];
 
-			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
+			if (itemNum == g_Level.Items[itemNum].NextItem)
 				break;
-
-			if (item->ObjectNumber == ID_LARA)
-				continue;
 
 			if (item->Status == ITEM_INVISIBLE)
 				continue;
 
+			if (item->ObjectNumber == ID_LARA && (BinocularRange || SpotcamOverlay || SpotcamDontDrawLara || CurrentLevel == 0))
+				continue;
+
 			if (!m_moveableObjects[item->ObjectNumber].has_value())
+				continue;
+
+			if (m_moveableObjects[item->ObjectNumber].value().DoNotDraw)
 				continue;
 
 			auto bounds = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
@@ -351,6 +355,7 @@ namespace TEN::Renderer
 			auto newItem = &m_items[itemNum];
 
 			newItem->ItemNumber = itemNum;
+			newItem->ObjectNumber = item->ObjectNumber;
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
 															   TO_RAD(item->Pose.Orientation.x),
@@ -358,8 +363,7 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			InterpolateAmbientLight(item->RoomNumber, newItem);
-			CollectLightsForItem(item->RoomNumber, newItem, false);
+			CollectLightsForItem(item->RoomNumber, newItem);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
@@ -391,7 +395,7 @@ namespace TEN::Renderer
 							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
 
 			std::vector<RendererLight*> lights;
-			CollectLights(mesh->pos.Position, room.RoomNumber, false, lights);
+			CollectLights(mesh->pos.Position.ToVector3(), room.RoomNumber, false, lights);
 
 			auto staticInfo = RendererStatic
 			{
@@ -407,7 +411,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectLights(Vector3Int position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights)
+	void Renderer11::CollectLights(Vector3 position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -420,7 +424,6 @@ namespace TEN::Renderer
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[room.RoomNumber];
 
 		auto roomsToCheck = GetRoomList(roomNumber);
-		auto itemPosition = position.ToVector3();
 
 		RendererLight* brightestLight = nullptr;
 		float brightest = 0.0f;
@@ -428,7 +431,7 @@ namespace TEN::Renderer
 		// Dynamic lights have the priority
 		for (auto& light : dynamicLights)
 		{
-			float distance = (itemPosition - light.Position).Length();
+			float distance = (position - light.Position).Length();
 			if (distance > light.Out)
 				continue;
 
@@ -467,7 +470,7 @@ namespace TEN::Renderer
 				{
 					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
-					float distance = (itemPosition - lightPosition).Length();
+					float distance = (position - lightPosition).Length();
 
 					// Collect only lights nearer than 20 sectors
 					if (distance >= 20 * WALL_SIZE)
@@ -497,7 +500,7 @@ namespace TEN::Renderer
 				{
 					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
-					float distance = (itemPosition - lightPosition).Length();
+					float distance = (position - lightPosition).Length();
 
 					// Collect only lights nearer than 20 sectors
 					if (distance >= SECTOR(20))
@@ -564,28 +567,34 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect)
+	void Renderer11::CollectLightsForCamera()
 	{
-		CollectLights(effect->Effect->pos.Position, roomNumber, false, effect->LightsToDraw);
-	}
+		std::vector<RendererLight*> lightsToDraw;
+		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), Camera.pos.roomNumber, true, lightsToDraw);
 
-	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item, bool collectShadowLight)
-	{
-		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
-		CollectLights(nativeItem->Pose.Position, roomNumber, collectShadowLight, item->LightsToDraw);
-
-		if (collectShadowLight && item->LightsToDraw.size() > 0 && item->LightsToDraw.front()->CastShadows)
-			shadowLight = item->LightsToDraw.front();
+		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
+			shadowLight = lightsToDraw.front();
 		else
 			shadowLight = nullptr;
 	}
 
-	void Renderer11::InterpolateAmbientLight(short roomNumber, RendererItem *item)
+	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect *effect)
+	{
+		CollectLights(effect->Effect->pos.Position.ToVector3(), roomNumber, false, effect->LightsToDraw);
+	}
+
+	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item)
+	{
+		auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
+		CollectLights(pos, roomNumber, false, item->LightsToDraw);
+	}
+
+	void Renderer11::InterpolateAmbientLight(RendererItem *item)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		// Interpolate ambient light between rooms
-		if (item->PreviousRoomNumber == NO_ITEM)
+		if (item->PreviousRoomNumber == NO_ROOM)
 		{
 			item->PreviousRoomNumber = nativeItem->RoomNumber;
 			item->CurrentRoomNumber = nativeItem->RoomNumber;
@@ -600,7 +609,7 @@ namespace TEN::Renderer
 		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
 			item->AmbientLightSteps++;
 
-		if (item->PreviousRoomNumber == NO_ITEM)
+		if (item->PreviousRoomNumber == NO_ROOM)
 			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
 		else
 		{

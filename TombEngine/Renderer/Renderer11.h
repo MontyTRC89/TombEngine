@@ -98,6 +98,7 @@ namespace TEN::Renderer
 	struct RendererItem
 	{
 		int ItemNumber;
+		int ObjectNumber;
 		bool DoneAnimations;
 		Matrix World;
 		Matrix Translation;
@@ -439,16 +440,17 @@ namespace TEN::Renderer
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber);
-		void CollectLights(Vector3Int position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights);
-		void CollectLightsForItem(short roomNumber, RendererItem* item, bool collectShadowLight);
+		void CollectLights(Vector3 position, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights);
+		void CollectLightsForItem(short roomNumber, RendererItem* item);
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
-		void InterpolateAmbientLight(short roomNumber, RendererItem* item);
+		void CollectLightsForCamera();
+		void InterpolateAmbientLight(RendererItem* item);
 		void CollectEffects(short roomNumber);
 		void ClearScene();
 		void ClearSceneItems();
 		void ClearDynamicLights();
-		void ClearShadowMap(RenderView& view);
+		void ClearShadowMap();
 		void UpdateItemAnimations(RenderView& view);
 		void UpdateEffects(RenderView& view);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
@@ -469,7 +471,7 @@ namespace TEN::Renderer
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
 		void DrawDarts(RendererItem* item, RenderView& view);
-		void DrawLara(bool shadowMap, RenderView& view, bool transparent);
+		void DrawLara(RenderView& view, bool transparent);
 		void DrawFires(RenderView& view);
 		void DrawParticles(RenderView& view);
 		void DrawSmokes(RenderView& view);
@@ -523,7 +525,7 @@ namespace TEN::Renderer
 		void RenderNewInventory();
 		void RenderToCubemap(const RenderTargetCube& dest, const Vector3& pos, int roomNumber); 
 		void RenderBlobShadows(RenderView& renderView);
-		void RenderShadowMap(RenderView& view);
+		void RenderShadowMap(RendererItem* item, RenderView& view);
 
 		void SetBlendMode(BLEND_MODES blendMode, bool force = false);
 		void SetDepthState(DEPTH_STATES depthState, bool force = false);
