@@ -97,7 +97,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :
 		StaticLight(AmbientLight.xyz, input.Color.xyz, tex.xyz);
 
-	output.Color = float4(color, tex.w);
+	output.Color = saturate(float4(color, tex.w));
 
 	output.Depth = tex.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
