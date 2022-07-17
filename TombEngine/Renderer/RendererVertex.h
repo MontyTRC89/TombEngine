@@ -15,6 +15,6 @@ namespace TEN::Renderer
 		float Bone;
 		int IndexInPoly;
 		int OriginalIndex;
-		int hash;
+		int Hash;
 	};
 }
