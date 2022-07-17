@@ -208,7 +208,7 @@ namespace TEN::Renderer
 			RendererObject& skin = item->ObjectNumber == ID_LARA ? *m_moveableObjects[ID_LARA_SKIN] : obj;
 			RendererRoom& room = m_rooms[item->CurrentRoomNumber];
 
-			auto pos = Vector3::Transform(Vector3::Zero, item->Translation.Invert());
+			auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
 
 			m_stItem.World = item->World;
 			m_stItem.Position = Vector4(pos.x, pos.y, pos.z, 1.0f);
