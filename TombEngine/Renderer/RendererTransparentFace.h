@@ -21,7 +21,7 @@ namespace TEN::Renderer
 		RendererRoom* room;
 		RendererBucket* bucket;
 		RendererItem* item;
-		MESH_INFO* staticMesh;
+		RendererStatic* staticMesh;
 		Vector4 color;
 		Matrix world;
 		Vector3 position;

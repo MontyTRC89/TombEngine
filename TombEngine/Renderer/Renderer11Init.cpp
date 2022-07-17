@@ -115,7 +115,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	for (int i = 0; i < NUM_ITEMS; i++)
 	{
 		m_items[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
-		m_effects[i].Lights = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
+		m_effects[i].LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 	}
 
 	m_transparentFacesVertexBuffer = VertexBuffer(m_device.Get(), TRANSPARENT_BUCKET_SIZE);
