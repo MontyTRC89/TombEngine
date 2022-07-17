@@ -75,7 +75,6 @@ static void StartEntity(ObjectInfo *obj)
 		obj->initialise = InitialiseLaraLoad;
 		obj->castsShadow = true;
 		obj->HitPoints = 1000;
-		obj->drawRoutine = nullptr;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
 		obj->saveHitpoints = true;
