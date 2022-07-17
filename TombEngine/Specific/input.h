@@ -127,7 +127,6 @@ namespace TEN::Input
 	// Legacy input bitfields.
 	extern int DbInput;  // Debounce: is input clicked?
 	extern int TrInput;  // Throttle: is input held?
-	extern int RelInput; // Release: is input released?
 	extern int RawInput; // Throttle for binocular input.
 
 	extern std::vector<InputAction> ActionMap;

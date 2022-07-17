@@ -79,7 +79,6 @@ namespace TEN::Input
 	// Globals
 	int DbInput;
 	int TrInput;
-	int RelInput;
 	int RawInput;
 
 	std::vector<InputAction> ActionMap;
@@ -631,7 +630,6 @@ namespace TEN::Input
 		// Clear legacy bitfields.
 		DbInput = NULL;
 		TrInput = NULL;
-		RelInput = NULL;
 		RawInput = NULL;
 
 		// Update input action map (mappable actions only).
@@ -657,7 +655,6 @@ namespace TEN::Input
 
 			DbInput |= action.IsClicked() ? inputBit : NULL;
 			TrInput |= action.IsHeld() ? inputBit : NULL;
-			RelInput |= action.IsReleased() ? inputBit : NULL;
 		}
 
 		// Debug display for FORWARD input.
@@ -674,7 +671,6 @@ namespace TEN::Input
 
 		DbInput = NULL;
 		TrInput = NULL;
-		RelInput = NULL;
 		RawInput = NULL;
 	}
 
@@ -757,6 +753,5 @@ namespace TEN::Input
 		int inputBit = 1 << (int)input;
 		DbInput &= ~inputBit;
 		TrInput &= ~inputBit;
-		RelInput &= ~inputBit;
 	}
 }
