@@ -165,9 +165,7 @@ namespace TEN::Renderer
 			r->TransparentFacesToDraw.reserve(MAX_TRANSPARENT_FACES_PER_ROOM);
 
 			if (room.mesh.size() > 0)
-			{
 				r->StaticsToDraw.reserve(room.mesh.size());
-			}
 
 			if (room.positions.size() == 0)
 				continue;
@@ -224,7 +222,7 @@ namespace TEN::Renderer
 						vertex->Effects = Vector4(room.effects[index].x, room.effects[index].y, room.effects[index].z, 0);
 
 						const unsigned long long primes[]{ 73856093ULL, 19349663ULL, 83492791ULL };
-						vertex->hash = std::hash<float>{}((vertex->Position.x)* primes[0]) ^ (std::hash<float>{}(vertex->Position.y)* primes[1]) ^ std::hash<float>{}(vertex->Position.z) * primes[2];
+						vertex->Hash = std::hash<float>{}((vertex->Position.x)* primes[0]) ^ (std::hash<float>{}(vertex->Position.y)* primes[1]) ^ std::hash<float>{}(vertex->Position.z) * primes[2];
 						vertex->Bone = 0;
 
 						lastVertex++;
@@ -272,7 +270,7 @@ namespace TEN::Renderer
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 					{
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
-						light->Intensity = 1.0f;
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
@@ -283,7 +281,7 @@ namespace TEN::Renderer
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
-						light->Intensity = 1.0f;
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->In = oldLight->in;
@@ -295,7 +293,7 @@ namespace TEN::Renderer
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
-						light->Intensity = 1.0f;
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->In = oldLight->in;
@@ -307,13 +305,13 @@ namespace TEN::Renderer
 					{
 						light->Position = Vector3(oldLight->x, oldLight->y, oldLight->z);
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
-						light->Intensity = 1.0f;
+						light->Intensity = oldLight->intensity;
 						light->LocalIntensity = 0;
 						light->Distance = 0;
 						light->Direction = Vector3(oldLight->dx, oldLight->dy, oldLight->dz);
-						light->In = oldLight->in;
-						light->Out = oldLight->out;
-						light->Range = oldLight->length;
+						light->In = oldLight->length;
+						light->Out = oldLight->cutoff;
+						light->Range = oldLight->out;
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_SPOT;
 					}
@@ -505,9 +503,9 @@ namespace TEN::Renderer
 							BonesToCheck[0] = jointBone->Parent->Index;
 							BonesToCheck[1] = j;
 
-							for (int b1 = 0; b1 < jointMesh->buckets.size(); b1++)
+							for (int b1 = 0; b1 < jointMesh->Buckets.size(); b1++)
 							{
-								RendererBucket *jointBucket = &jointMesh->buckets[b1];
+								RendererBucket *jointBucket = &jointMesh->Buckets[b1];
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
@@ -520,9 +518,9 @@ namespace TEN::Renderer
 										RendererMesh *skinMesh = objSkin.ObjectMeshes[BonesToCheck[k]];
 										RendererBone *skinBone = objSkin.LinearizedBones[BonesToCheck[k]];
 
-										for (int b2 = 0; b2 < skinMesh->buckets.size(); b2++)
+										for (int b2 = 0; b2 < skinMesh->Buckets.size(); b2++)
 										{
-											RendererBucket *skinBucket = &skinMesh->buckets[b2];
+											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
 												RendererVertex *skinVertex = &moveablesVertices[skinBucket->StartVertex + v2];
@@ -567,9 +565,9 @@ namespace TEN::Renderer
 							RendererMesh* currentMesh = moveable.ObjectMeshes[j];
 							RendererBone* currentBone = moveable.LinearizedBones[j];
 
-							for (int b1 = 0; b1 < currentMesh->buckets.size(); b1++)
+							for (int b1 = 0; b1 < currentMesh->Buckets.size(); b1++)
 							{
-								RendererBucket* currentBucket = &currentMesh->buckets[b1];
+								RendererBucket* currentBucket = &currentMesh->Buckets[b1];
 
 								for (int v1 = 0; v1 < currentBucket->NumVertices; v1++)
 								{
@@ -587,9 +585,9 @@ namespace TEN::Renderer
 
 										if (currentVertex->OriginalIndex < 4)
 										{
-											for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
+											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 											{
-												RendererBucket* parentBucket = &parentMesh->buckets[b2];
+												RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 												{
 													RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
@@ -610,9 +608,9 @@ namespace TEN::Renderer
 										RendererMesh* parentMesh = moveable.ObjectMeshes[j - 1];
 										RendererBone* parentBone = moveable.LinearizedBones[j - 1];
 
-										for (int b2 = 0; b2 < parentMesh->buckets.size(); b2++)
+										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
-											RendererBucket* parentBucket = &parentMesh->buckets[b2];
+											RendererBucket* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
 												RendererVertex* parentVertex = &moveablesVertices[parentBucket->StartVertex + v2];
@@ -755,6 +753,7 @@ namespace TEN::Renderer
 		RendererMesh* mesh = new RendererMesh();
 
 		mesh->Sphere = meshPtr->sphere;
+		mesh->LightMode = LIGHT_MODES(meshPtr->lightMode);
 
 		if (meshPtr->positions.size() == 0)
 			return mesh;
@@ -813,7 +812,7 @@ namespace TEN::Renderer
 					vertex.OriginalIndex = v;
 
 					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z, poly->shineStrength);
-					vertex.hash = std::hash<float>{}(vertex.Position.x) ^ std::hash<float>{}(vertex.Position.y) ^ std::hash<float>{}(vertex.Position.z);
+					vertex.Hash = std::hash<float>{}(vertex.Position.x) ^ std::hash<float>{}(vertex.Position.y) ^ std::hash<float>{}(vertex.Position.z);
 
 					if (obj->Type == 0)
 						moveablesVertices[*lastVertex] = vertex;
@@ -871,7 +870,7 @@ namespace TEN::Renderer
 				bucket.Polygons.push_back(newPoly);
 			}
 
-			mesh->buckets.push_back(bucket);
+			mesh->Buckets.push_back(bucket);
 		}
 
 		m_meshes.push_back(mesh);
