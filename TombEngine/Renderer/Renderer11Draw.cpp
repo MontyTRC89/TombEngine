@@ -1825,7 +1825,8 @@ namespace TEN::Renderer
 
 				if (staticObj.ObjectMeshes.size() > 0)
 				{
-					RendererMesh* mesh = staticObj.ObjectMeshes[0];
+					RendererMesh* mesh = staticObj.ObjectMeshes[0]; 
+					auto pos = Vector3::Transform(Vector3::Zero, msh.World);
 
 					for (auto& bucket : mesh->Buckets)
 					{
@@ -1859,7 +1860,7 @@ namespace TEN::Renderer
 								face.info.room = room;
 								face.info.staticMesh = &msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = Vector3(msh.Position.x, msh.Position.y, msh.Position.z);
+								face.info.position = Vector3(pos.x, pos.y, pos.z);
 								face.info.color = Vector4(msh.AmbientLight.x, msh.AmbientLight.y, msh.AmbientLight.z, msh.AmbientLight.w);
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
@@ -1869,7 +1870,7 @@ namespace TEN::Renderer
 						else
 						{
 							m_stStatic.World = msh.World;
-							m_stStatic.Position = Vector4(msh.Position.x, msh.Position.y, msh.Position.z, 1);
+							m_stStatic.Position = Vector4(pos.x, pos.y, pos.z, 1);
 							m_stStatic.Color = msh.AmbientLight;
 							m_stStatic.LightMode = mesh->LightMode;
 

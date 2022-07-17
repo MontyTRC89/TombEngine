@@ -398,7 +398,6 @@ namespace TEN::Renderer
 				mesh->staticNumber,
 				room.RoomNumber,
 				world,
-				mesh->pos.Position.ToVector3(),
 				room.AmbientLight * mesh->color,
 				lights
 			};

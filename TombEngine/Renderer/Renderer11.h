@@ -83,7 +83,6 @@ namespace TEN::Renderer
 		int Id;
 		int RoomIndex;
 		Matrix World;
-		Vector3 Position;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
 	};
