@@ -85,8 +85,10 @@ PixelShaderInput VS(VertexShaderInput input)
 	// Here we just read weight and decide if we should apply refraction or movement effect.
 	float weight = input.Effects.z;
 
-	float3 pos = Move(input.Position, input.Effects.xyz * weight, input.Hash);
-	float3 col = Glow(input.Color.xyz, input.Effects.xyz, input.Hash);
+	// Calculate vertex effects
+	float wibble = Wibble(input.Effects.xyz, input.Hash);
+	float3 pos = Move(input.Position, input.Effects.xyz * weight, wibble);
+	float3 col = Glow(input.Color.xyz, input.Effects.xyz, wibble);
 
 	// Refraction
 	float4 screenPos = mul(float4(pos, 1.0f), ViewProjection);
@@ -125,7 +127,6 @@ PixelShaderInput VS(VertexShaderInput input)
 	}
 #else
 	output.UV = input.UV;
-
 #endif
 	
 	output.WorldPosition = input.Position.xyz;
@@ -310,7 +311,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(Normal,input.TBN));
+	Normal = normalize(mul(Normal, input.TBN));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -379,7 +380,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 		lighting += float3((xaxis * blending.x + yaxis * blending.y + zaxis * blending.z).xyz) * attenuation * 2.0f;
 	}
 	
-	output.Color.xyz = output.Color.xyz * lighting;
+	output.Color.xyz = saturate(output.Color.xyz * lighting);
 
 	output.Depth = output.Color.w > 0.0f ?
 		float4(input.PositionCopy.z / input.PositionCopy.w, 0.0f, 0.0f, 1.0f) :
