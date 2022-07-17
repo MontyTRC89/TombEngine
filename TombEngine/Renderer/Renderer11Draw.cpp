@@ -241,7 +241,7 @@ namespace TEN::Renderer
 			}
 
 			if (item->ObjectNumber != ID_LARA)
-				return;
+				continue;
 
 			if (m_moveableObjects[ID_LARA_SKIN_JOINTS].has_value())
 			{
