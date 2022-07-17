@@ -580,6 +580,8 @@ namespace TEN::Renderer
 
 		if (collectShadowLight && item->LightsToDraw.size() > 0)
 			shadowLight = item->LightsToDraw.front();
+		else
+			shadowLight = nullptr;
 	}
 
 	void Renderer11::InterpolateAmbientLight(short roomNumber, RendererItem *item)
