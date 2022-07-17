@@ -62,11 +62,11 @@ enum CULL_MODES
 	CULL_MODE_UNSET = -1
 };
 
-enum SHADOW_MODES
+enum class ShadowMode
 {
-	SHADOW_NONE,
-	SHADOW_LARA,
-	SHADOW_ALL
+	None,
+	Lara,
+	All
 };
 
 enum LIGHT_MODES

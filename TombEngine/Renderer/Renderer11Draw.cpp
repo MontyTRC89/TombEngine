@@ -59,7 +59,7 @@ namespace TEN::Renderer
 
 				//Skip everything thats not "alive" or is not a vehicle
 
-				if (!Objects[nativeItem.ObjectNumber].castsShadow)
+				if (Objects[nativeItem.ObjectNumber].shadowType == ShadowMode::None)
 					continue;
 
 				if (i->ObjectNumber == ID_LARA)
@@ -126,11 +126,15 @@ namespace TEN::Renderer
 	void Renderer11::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
 		// No dynamic shadows are rendered, bypass completely
-		if (g_Configuration.ShadowMode == SHADOW_MODES::SHADOW_NONE)
+		if (g_Configuration.ShadowType == ShadowMode::None)
+			return;
+
+		// Doesn't cast shadow
+		if (m_moveableObjects[item->ObjectNumber].value().ShadowType == ShadowMode::None)
 			return;
 
 		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowMode == SHADOW_MODES::SHADOW_LARA && item->ObjectNumber != ID_LARA)
+		if (g_Configuration.ShadowType == ShadowMode::Lara && m_moveableObjects[item->ObjectNumber].value().ShadowType != ShadowMode::Lara)
 			return;
 		
 		// No shadow light found
@@ -1654,8 +1658,7 @@ namespace TEN::Renderer
 
 		for (auto room : renderView.roomsToDraw)
 			for (auto itemToDraw : room->ItemsToDraw)
-				if (m_moveableObjects[itemToDraw->ObjectNumber].value().CastShadow)
-					RenderShadowMap(itemToDraw, renderView);
+				RenderShadowMap(itemToDraw, renderView);
 	}
 
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
