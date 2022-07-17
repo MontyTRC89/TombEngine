@@ -125,15 +125,19 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
+		// No dynamic shadows are rendered, bypass completely
 		if (g_Configuration.ShadowMode == SHADOW_MODES::SHADOW_NONE)
 			return;
 
+		// Only render for Lara if such setting is active
 		if (g_Configuration.ShadowMode == SHADOW_MODES::SHADOW_LARA && item->ObjectNumber != ID_LARA)
 			return;
 		
+		// No shadow light found
 		if (shadowLight == nullptr)
 			return;
 
+		// Shadow light found but type is incorrect
 		if (shadowLight->Type != LIGHT_TYPE_POINT && shadowLight->Type != LIGHT_TYPE_SPOT)
 			return; 
 
