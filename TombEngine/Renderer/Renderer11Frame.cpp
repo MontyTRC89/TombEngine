@@ -576,6 +576,17 @@ namespace TEN::Renderer
 			shadowLight = lightsToDraw.front();
 		else
 			shadowLight = nullptr;
+	}	
+	
+	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect* effect)
+	{
+		CollectLights(effect->Effect->pos.Position.ToVector3(), roomNumber, false, effect->LightsToDraw);
+	}
+
+	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item)
+	{
+		auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
+		CollectLights(pos, roomNumber, false, item->LightsToDraw);
 	}
 
 	void Renderer11::CalculateAmbientLight(RendererItem *item)
