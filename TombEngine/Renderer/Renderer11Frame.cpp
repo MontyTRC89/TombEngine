@@ -330,7 +330,7 @@ namespace TEN::Renderer
 		{
 			ItemInfo* item = &g_Level.Items[itemNum];
 
-			if (itemNum == g_Level.Items[itemNum].NextItem)
+			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
 				break;
 
 			if (item->Status == ITEM_INVISIBLE)
