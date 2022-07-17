@@ -183,11 +183,10 @@ namespace TEN::Renderer
 			if (shadowLight->Type == LIGHT_TYPE_POINT) 
 			{
 				view = Matrix::CreateLookAt(lightPos, lightPos + 
-					RenderTargetCube::forwardVectors[step]*10240,
+					RenderTargetCube::forwardVectors[step] * SECTOR(10),
 					RenderTargetCube::upVectors[step]);
 
-				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f,
-					shadowLight->Out);
+				projection = Matrix::CreatePerspectiveFieldOfView(90.0f, 1.0f, 16.0f, shadowLight->Out);
 
 			}
 			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
@@ -196,7 +195,7 @@ namespace TEN::Renderer
 					lightPos - shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
-				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Out, 1.0f, 16.0f, shadowLight->Range);
+				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Range, 1.0f, 16.0f, shadowLight->Out);
 			}
 
 			CCameraMatrixBuffer shadowProjection;
