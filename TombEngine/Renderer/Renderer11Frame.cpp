@@ -506,7 +506,7 @@ namespace TEN::Renderer
 					if (distance > light->Out)
 						continue;
 
-					float attenuation = 1.0f - distance / light->Range;
+					float attenuation = 1.0f - distance / light->Out;
 					float intensity = std::max(0.0f, attenuation * light->Intensity * Luma(light->Color));
 
 					light->LocalIntensity = intensity;

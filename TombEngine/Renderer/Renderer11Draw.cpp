@@ -194,7 +194,7 @@ namespace TEN::Renderer
 					lightPos - shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
-				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->Range, 1.0f, 16.0f, shadowLight->Out);
+				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->OutRange, 1.0f, 16.0f, shadowLight->Out);
 			}
 
 			CCameraMatrixBuffer shadowProjection;
