@@ -10,8 +10,9 @@
 #include "Game/camera.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
-#include "Renderer/Renderer11.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/savegame.h"
+#include "Renderer/Renderer11.h"
 #include "Sound/sound.h"
 
 using namespace OIS;
@@ -451,8 +452,10 @@ namespace TEN::Input
 		}
 	}
 
-	void HandleLaraHotkeys()
+	void HandleLaraHotkeys(ItemInfo* item)
 	{
+		auto* lara = GetLaraInfo(item);
+
 		// Handle hardcoded action-to-key mappings.
 		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? 1.0f : 0.0f);
 		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? 1.0f : 0.0f);
@@ -460,8 +463,8 @@ namespace TEN::Input
 		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? 1.0f : 0.0f);
 
 		// Handle look switch when locked on to an entity.
-		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
-			Lara.TargetEntity != nullptr)
+		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
+			lara->TargetEntity != nullptr)
 		{
 			if (IsHeld(In::Look))
 			{
@@ -473,12 +476,12 @@ namespace TEN::Input
 		// Handle flares.
 		if (IsClicked(In::Flare))
 		{
-			if (LaraItem->Animation.ActiveState == LS_CRAWL_FORWARD ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_BACK ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_TO_HANG ||
-				LaraItem->Animation.ActiveState == LS_CRAWL_TURN_180)
+			if (item->Animation.ActiveState == LS_CRAWL_FORWARD ||
+				item->Animation.ActiveState == LS_CRAWL_TURN_LEFT ||
+				item->Animation.ActiveState == LS_CRAWL_TURN_RIGHT ||
+				item->Animation.ActiveState == LS_CRAWL_BACK ||
+				item->Animation.ActiveState == LS_CRAWL_TO_HANG ||
+				item->Animation.ActiveState == LS_CRAWL_TURN_180)
 			{
 				SoundEffect(SFX_TR4_LARA_NO_ENGLISH, nullptr, SoundEnvironment::Always);
 			}
@@ -486,29 +489,29 @@ namespace TEN::Input
 
 		// Handle weapon hotkeys.
 
-		if (KeyMap[KC_1] && Lara.Weapons[(int)LaraWeaponType::Pistol].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
+		if (KeyMap[KC_1] && lara->Weapons[(int)LaraWeaponType::Pistol].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
-		if (KeyMap[KC_2] && Lara.Weapons[(int)LaraWeaponType::Shotgun].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
+		if (KeyMap[KC_2] && lara->Weapons[(int)LaraWeaponType::Shotgun].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
-		if (KeyMap[KC_3] && Lara.Weapons[(int)LaraWeaponType::Revolver].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
+		if (KeyMap[KC_3] && lara->Weapons[(int)LaraWeaponType::Revolver].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
-		if (KeyMap[KC_4] && Lara.Weapons[(int)LaraWeaponType::Uzi].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
+		if (KeyMap[KC_4] && lara->Weapons[(int)LaraWeaponType::Uzi].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
-		if (KeyMap[KC_5] && Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
+		if (KeyMap[KC_5] && lara->Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
-		if (KeyMap[KC_6] && Lara.Weapons[(int)LaraWeaponType::HK].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
+		if (KeyMap[KC_6] && lara->Weapons[(int)LaraWeaponType::HK].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
-		if (KeyMap[KC_7] && Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
+		if (KeyMap[KC_7] && lara->Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 
-		if (KeyMap[KC_8] && Lara.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
-			Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
+		if (KeyMap[KC_8] && lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+			lara->Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
 		// Handle medipack hotkeys.
 		static int medipackTimeout = 0;
@@ -516,36 +519,36 @@ namespace TEN::Input
 		{
 			if (!medipackTimeout)
 			{
-				if ((LaraItem->HitPoints > 0 && LaraItem->HitPoints < LARA_HEALTH_MAX) ||
-					Lara.PoisonPotency)
+				if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
+					lara->PoisonPotency)
 				{
 					bool usedMedipack = false;
 
 					if (KeyMap[KC_0] &&
-						Lara.Inventory.TotalSmallMedipacks != 0)
+						lara->Inventory.TotalSmallMedipacks != 0)
 					{
 						usedMedipack = true;
 
-						LaraItem->HitPoints += LARA_HEALTH_MAX / 2;
-						if (LaraItem->HitPoints > LARA_HEALTH_MAX)
-							LaraItem->HitPoints = LARA_HEALTH_MAX;
+						item->HitPoints += LARA_HEALTH_MAX / 2;
+						if (item->HitPoints > LARA_HEALTH_MAX)
+							item->HitPoints = LARA_HEALTH_MAX;
 
-						if (Lara.Inventory.TotalSmallMedipacks != -1)
-							Lara.Inventory.TotalSmallMedipacks--;
+						if (lara->Inventory.TotalSmallMedipacks != -1)
+							lara->Inventory.TotalSmallMedipacks--;
 					}
 					else if (KeyMap[KC_9] &&
-						Lara.Inventory.TotalLargeMedipacks != 0)
+						lara->Inventory.TotalLargeMedipacks != 0)
 					{
 						usedMedipack = true;
-						LaraItem->HitPoints = LARA_HEALTH_MAX;
+						item->HitPoints = LARA_HEALTH_MAX;
 
-						if (Lara.Inventory.TotalLargeMedipacks != -1)
-							Lara.Inventory.TotalLargeMedipacks--;
+						if (lara->Inventory.TotalLargeMedipacks != -1)
+							lara->Inventory.TotalLargeMedipacks--;
 					}
 
 					if (usedMedipack)
 					{
-						Lara.PoisonPotency = 0;
+						lara->PoisonPotency = 0;
 						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
 						Statistics.Game.HealthUsed++;
 					}
@@ -635,7 +638,7 @@ namespace TEN::Input
 			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
 
 		// Additional handling.
-		HandleLaraHotkeys();
+		HandleLaraHotkeys(LaraItem);
 		SolveInputCollisions();
 
 		// Port actions back to legacy bitfields.
