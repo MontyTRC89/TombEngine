@@ -276,12 +276,12 @@ ScriptReserved_MakeNotTargetable, & Moveable::MakeNotTargetable,
 /// Get ItemFlag[x] (object code bit) of the moveable
 // @function Moveable:GetItemFlag
 // @treturn short value from the moveable's ItemFlag[x]
-ScriptReserved_GetOCB, & Moveable::GetOCB,
+ScriptReserved_GetItemFlag, & Moveable::GetItemFlag,
 
 /// Set ItemFlag[x] (object code bit) of the moveable
 // @function Moveable:SetItemFlag
 // @tparam short value to store in the moveable's ItemFlag[x]
-ScriptReserved_SetOCB, & Moveable::SetOCB,
+ScriptReserved_SetItemFlag, & Moveable::SetItemFlag,
 
 /// Get the moveable's color
 // @function Moveable:GetColor
