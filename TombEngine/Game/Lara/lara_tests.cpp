@@ -447,7 +447,7 @@ bool TestLaraNearClimbableWall(ItemInfo* item, FloorInfo* floor)
 	if (floor == nullptr)
 		floor = GetCollision(item).BottomBlock;
 
-	return ((1 << (GetQuadrant(item->Pose.Orientation.y) + 8)) & GetClimbFlags(floor));
+	return ((256 << (GetQuadrant(item->Pose.Orientation.y))) & GetClimbFlags(floor));
 }
 
 bool TestLaraHangOnClimbableWall(ItemInfo* item, CollisionInfo* coll)
