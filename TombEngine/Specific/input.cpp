@@ -454,12 +454,12 @@ namespace TEN::Input
 	void HandleLaraHotkeys()
 	{
 		// Handle hardcoded action-to-key mappings.
-		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? 1.0f : 0.0f);
-		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? 1.0f : 0.0f);
 		ActionMap[(int)In::Save].Update(KeyMap[KC_F5] ? 1.0f : 0.0f);
 		ActionMap[(int)In::Load].Update(KeyMap[KC_F6] ? 1.0f : 0.0f);
+		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? 1.0f : 0.0f);
+		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? 1.0f : 0.0f);
 
-		// Handle look switch when locked onto an entity.
+		// Handle look switch when locked on to an entity.
 		if (Lara.Control.HandStatus == HandStatus::WeaponReady &&
 			Lara.TargetEntity != nullptr)
 		{
@@ -619,7 +619,7 @@ namespace TEN::Input
 		rumbleData.LastPower = rumbleData.Power;
 	}
 
-	bool UpdateInputActions()
+	void UpdateInputActions()
 	{
 		ClearInputData();
 		UpdateRumble();
@@ -650,8 +650,6 @@ namespace TEN::Input
 		// Debug display for FORWARD input.
 		g_Renderer.PrintDebugMessage("Debug for FORWARD input:");
 		ActionMap[(int)In::Forward].PrintDebugInfo();
-		
-		return true;
 	}
 
 	void ClearInputActions()

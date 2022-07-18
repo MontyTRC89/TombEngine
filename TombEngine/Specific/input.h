@@ -137,7 +137,7 @@ namespace TEN::Input
 	void InitialiseInput(HWND handle);
 	void DeInitialiseInput();
 	void DefaultConflict();
-	bool UpdateInputActions();
+	void UpdateInputActions();
 	void ClearInputActions();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
