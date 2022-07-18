@@ -148,7 +148,7 @@ namespace TEN::Input
 	bool  IsReleased(InputActionID input);
 	bool  NoInput();
 	float GetInputValue(InputActionID input);
-	float GetInputTimeHeld(InputActionID input);
+	float GetInputTimeActive(InputActionID input);
 	float GetInputTimeInactive(InputActionID input);
 	void  ClearInput(InputActionID input);
 }

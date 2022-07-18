@@ -20,26 +20,26 @@ namespace TEN::Input
 
 		if (this->IsClicked())
 		{
-			this->PrevTimeHeld = 0.0f;
-			this->TimeHeld = 0.0f;
+			this->PrevTimeActive = 0.0f;
+			this->TimeActive = 0.0f;
 			this->TimeInactive += DELTA_TIME;
 		}
 		else if (this->IsReleased())
 		{
-			this->PrevTimeHeld = TimeHeld;
-			this->TimeHeld += DELTA_TIME;
+			this->PrevTimeActive = TimeActive;
+			this->TimeActive += DELTA_TIME;
 			this->TimeInactive = 0.0f;
 		}
 		else if (this->IsHeld())
 		{
-			this->PrevTimeHeld = TimeHeld;
-			this->TimeHeld += DELTA_TIME;
+			this->PrevTimeActive = TimeActive;
+			this->TimeActive += DELTA_TIME;
 			this->TimeInactive = 0.0f;
 		}
 		else
 		{
-			this->PrevTimeHeld = 0.0f;
-			this->TimeHeld = 0.0f;
+			this->PrevTimeActive = 0.0f;
+			this->TimeActive = 0.0f;
 			this->TimeInactive += DELTA_TIME;
 		}
 	}
@@ -48,8 +48,8 @@ namespace TEN::Input
 	{
 		this->Value = 0.0f;
 		this->PrevValue = 0.0f;
-		this->TimeHeld = 0.0f;
-		this->PrevTimeHeld = 0.0f;
+		this->TimeActive = 0.0f;
+		this->PrevTimeActive = 0.0f;
 		this->TimeInactive = 0.0f;
 	}
 
@@ -63,8 +63,8 @@ namespace TEN::Input
 		g_Renderer.PrintDebugMessage("");
 		g_Renderer.PrintDebugMessage("Value: %.3f", Value);
 		g_Renderer.PrintDebugMessage("PrevValue: %.3f", PrevValue);
-		g_Renderer.PrintDebugMessage("TimeHeld: %.3f", TimeHeld);
-		g_Renderer.PrintDebugMessage("PrevTimeHeld: %.3f", PrevTimeHeld);
+		g_Renderer.PrintDebugMessage("TimeActive: %.3f", TimeActive);
+		g_Renderer.PrintDebugMessage("PrevTimeActive: %.3f", PrevTimeActive);
 		g_Renderer.PrintDebugMessage("TimeInactive: %.3f", TimeInactive);
 	}
 
@@ -79,13 +79,13 @@ namespace TEN::Input
 		if (this->IsClicked())
 			return true;
 
-		if (!this->IsHeld() || !PrevTimeHeld || TimeHeld == PrevTimeHeld)
+		if (!this->IsHeld() || !PrevTimeActive || TimeActive == PrevTimeActive)
 			return false;
 
-		float syncedTimeHeld = TimeHeld - std::fmod(TimeHeld, DELTA_TIME);
-		float activeDelay = (TimeHeld > initialDelayInSeconds) ? delayInSeconds : initialDelayInSeconds;
-		float delayTime = std::floor(syncedTimeHeld / activeDelay) * activeDelay;
-		if (delayTime >= PrevTimeHeld)
+		float syncedTimeActive = TimeActive - std::fmod(TimeActive, DELTA_TIME);
+		float activeDelay = (TimeActive > initialDelayInSeconds) ? delayInSeconds : initialDelayInSeconds;
+		float delayTime = std::floor(syncedTimeActive / activeDelay) * activeDelay;
+		if (delayTime >= PrevTimeActive)
 			return true;
 
 		return false;
@@ -111,9 +111,9 @@ namespace TEN::Input
 		return Value;
 	}
 
-	float InputAction::GetTimeHeld()
+	float InputAction::GetTimeActive()
 	{
-		return TimeHeld;
+		return TimeActive;
 	}
 
 	float InputAction::GetTimeInactive()

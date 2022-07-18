@@ -60,16 +60,16 @@ namespace TEN::Input
 
 		InputActionID GetID();
 		float GetValue();
-		float GetTimeHeld();
+		float GetTimeActive();
 		float GetTimeInactive();
 
 	private:
-		InputActionID ID   = In::None;
-		float Value		   = 0.0f;
-		float PrevValue	   = 0.0f;
-		float TimeHeld	   = 0.0f;
-		float PrevTimeHeld = 0.0f;
-		float TimeInactive = 0.0f;
+		InputActionID ID	 = In::None;
+		float Value			 = 0.0f;
+		float PrevValue		 = 0.0f;
+		float TimeActive	 = 0.0f;
+		float PrevTimeActive = 0.0f;
+		float TimeInactive	 = 0.0f;
 
 		void UpdateValue(float value);
 	};

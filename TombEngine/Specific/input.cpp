@@ -713,9 +713,9 @@ namespace TEN::Input
 		return ActionMap[(int)input].GetValue();
 	}
 
-	float GetInputTimeHeld(InputActionID input)
+	float GetInputTimeActive(InputActionID input)
 	{
-		return ActionMap[(int)input].GetTimeHeld();
+		return ActionMap[(int)input].GetTimeActive();
 	}
 
 	float GetInputTimeInactive(InputActionID input)
