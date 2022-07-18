@@ -336,15 +336,15 @@ void TEN::Renderer::Renderer11::Create()
 	Utils::throwIfFailed(res);
 }
 
-void Renderer11::ToggleFullScreen()
+void Renderer11::ToggleFullScreen(bool force)
 {
-	m_windowed = !m_windowed;
+	m_windowed = force ? false : !m_windowed;
 
 	if (!m_windowed)
 	{
 		SetWindowLongPtr(WindowsHandle, GWL_STYLE, 0);
 		SetWindowLongPtr(WindowsHandle, GWL_EXSTYLE, WS_EX_TOPMOST);
-		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		SetWindowPos(WindowsHandle, HWND_TOP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 		ShowWindow(WindowsHandle, SW_SHOWMAXIMIZED);
 	}
 	else
