@@ -421,6 +421,7 @@ namespace TEN::Renderer
 		short m_boundList[MAX_ROOM_BOUNDS];
 		short m_boundStart = 0;
 		short m_boundEnd = 1;
+		float m_farView = DEFAULT_FAR_VIEW;
 		RendererRectangle m_outsideClip;
 
 		// Private functions

@@ -213,11 +213,22 @@ namespace TEN::Renderer
 
 	void Renderer11::GetRoomBounds(RenderView& renderView, bool onlyRooms)
 	{
+		auto cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+
 		while (m_boundStart != m_boundEnd)
 		{
 			short roomNumber = m_boundList[(m_boundStart++) % MAX_ROOM_BOUNDS];
 			RendererRoom* room = &m_rooms[roomNumber];
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[roomNumber];
+
+			float xRad = nativeRoom->xSize * SECTOR(1) / 2.0f;
+			float yRad = (nativeRoom->minfloor - nativeRoom->maxceiling) / 2.0f;
+			float zRad = nativeRoom->zSize * SECTOR(1) / 2.0f;
+
+			auto roomCentre = Vector3(nativeRoom->x + xRad, nativeRoom->minfloor - yRad, nativeRoom->z + zRad);
+
+			float roomRad = std::max(std::max(xRad, yRad), zRad);
+			float distance = std::max((roomCentre - cameraPosition).Length() - (roomRad * 1.5f), 0.0f);
 
 			room->BoundActive -= 2;
 
@@ -231,7 +242,7 @@ namespace TEN::Renderer
 				room->Clip.bottom = room->ClipTest.bottom;
 
 			// Add room to the list of rooms to draw
-			if (!(room->BoundActive & 1))
+			if (!((room->BoundActive & 1) || distance > m_farView))
 			{
 				renderView.roomsToDraw.push_back(room);
 
@@ -240,19 +251,14 @@ namespace TEN::Renderer
 				if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
 					m_outside = true;
 
-				Vector3 roomCentre = Vector3(nativeRoom->x + nativeRoom->xSize * WALL_SIZE / 2.0f,
-					(nativeRoom->minfloor + nativeRoom->maxceiling) / 2.0f,
-					nativeRoom->z + nativeRoom->zSize * WALL_SIZE / 2.0f);
-				Vector3 laraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-
-				m_rooms[roomNumber].Distance = (roomCentre - laraPosition).Length();
+				m_rooms[roomNumber].Distance = distance;
 				m_rooms[roomNumber].Visited = true;
 
 				if (!onlyRooms)
 				{
 					CollectLightsForRoom(roomNumber, renderView);
 					CollectItems(roomNumber, renderView);
-					CollectStatics(roomNumber);
+					CollectStatics(roomNumber, renderView);
 					CollectEffects(roomNumber);
 				}
 			}

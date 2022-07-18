@@ -364,6 +364,7 @@ namespace TEN::Renderer
 		if (farView < MIN_FAR_VIEW)
 			farView = DEFAULT_FAR_VIEW;
 
+		m_farView = farView;
 		gameCamera = RenderView(cam, roll, fov, 32, farView, g_Configuration.Width, g_Configuration.Height);
 	}
 
