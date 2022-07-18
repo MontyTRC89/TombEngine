@@ -893,7 +893,7 @@ void SlopeReachExtra(ItemInfo* item, CollisionInfo* coll)
 			}
 
 			if (disableGrab)
-				TrInput &= ~IN_ACTION; // HACK.
+				ClearInput(In::Action); // HACK.
 		}
 	}
 }

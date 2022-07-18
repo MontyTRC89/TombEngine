@@ -210,7 +210,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 		// Handle lasersight and binocular
 		if (CurrentLevel != 0)
-			HandleOptics();
+			HandleOptics(LaraItem);
 
 		// Update all items
 		InItemControlLoop = true;

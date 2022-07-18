@@ -3,26 +3,27 @@
 
 #include <OISKeyboard.h>
 
-#include "Game/animation.h"
-#include "Game/camera.h"
-#include "Game/control/control.h"
-#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
+#include "Game/animation.h"
+#include "Game/camera.h"
+#include "Game/control/control.h"
+#include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Game/savegame.h"
 #include "Game/spotcam.h"
 #include "Renderer/Renderer11.h"
-#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
+#include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
-#include "Specific/input.h"
+#include "Specific/clock.h"
 #include "Specific/configuration.h"
+#include "Specific/configuration.h"
+#include "Specific/input.h"
+#include "Specific/input.h"
 #include "Specific/level.h"
-#include "Specific/input.h"
-#include "Specific/configuration.h"
 
 using namespace TEN::Input;
 using namespace TEN::Renderer;
@@ -636,18 +637,14 @@ void GuiController::HandleOtherSettingsInput(bool fromPauseMenu)
 		}
 	}
 
-	if (GUI_INPUT_PULSE_LEFT)
+	if (IsPulsed(In::Left, 0.05f, 0.4f))
 	{
 		switch (SelectedOption)
 		{
 		case 1:
 			if (CurrentSettings.Configuration.MusicVolume > 0)
 			{
-				if (IsHeld(In::Action))
-					CurrentSettings.Configuration.MusicVolume -= 3;
-				else
-					CurrentSettings.Configuration.MusicVolume--;
-
+				CurrentSettings.Configuration.MusicVolume--;
 				if (CurrentSettings.Configuration.MusicVolume < 0)
 					CurrentSettings.Configuration.MusicVolume = 0;
 
@@ -660,11 +657,7 @@ void GuiController::HandleOtherSettingsInput(bool fromPauseMenu)
 		case 2:
 			if (CurrentSettings.Configuration.SfxVolume > 0)
 			{
-				if (IsHeld(In::Action))
-					CurrentSettings.Configuration.SfxVolume -= 3;
-				else
-					CurrentSettings.Configuration.SfxVolume--;
-
+				CurrentSettings.Configuration.SfxVolume--;
 				if (CurrentSettings.Configuration.SfxVolume < 0)
 					CurrentSettings.Configuration.SfxVolume = 0;
 
@@ -676,18 +669,14 @@ void GuiController::HandleOtherSettingsInput(bool fromPauseMenu)
 		}
 	}
 
-	if (GUI_INPUT_PULSE_RIGHT)
+	if (IsPulsed(In::Right, 0.05f, 0.4f))
 	{
 		switch (SelectedOption)
 		{
 		case 1:
 			if (CurrentSettings.Configuration.MusicVolume < VOLUME_MAX)
 			{
-				if (IsHeld(In::Action))
-					CurrentSettings.Configuration.MusicVolume += 3;
-				else
-					CurrentSettings.Configuration.MusicVolume++;
-
+				CurrentSettings.Configuration.MusicVolume++;
 				if (CurrentSettings.Configuration.MusicVolume > VOLUME_MAX)
 					CurrentSettings.Configuration.MusicVolume = VOLUME_MAX;
 
@@ -700,11 +689,7 @@ void GuiController::HandleOtherSettingsInput(bool fromPauseMenu)
 		case 2:
 			if (CurrentSettings.Configuration.SfxVolume < VOLUME_MAX)
 			{
-				if (IsHeld(In::Action))
-					CurrentSettings.Configuration.SfxVolume += 3;
-				else
-					CurrentSettings.Configuration.SfxVolume++;
-
+				CurrentSettings.Configuration.SfxVolume++;
 				if (CurrentSettings.Configuration.SfxVolume > VOLUME_MAX)
 					CurrentSettings.Configuration.SfxVolume = VOLUME_MAX;
 
@@ -1607,19 +1592,18 @@ void GuiController::FadeAmmoSelector()
 
 void GuiController::UseCurrentItem()
 {
-	short invobject, gmeobject;
-	long OldBinocular;
+	long oldBinocular = BinocularRange;
+	short inventoryObject = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
+	short gameObject = InventoryObjectTable[inventoryObject].ObjectNumber;
 
-	OldBinocular = BinocularRange;
+	LaraItem->MeshBits = ALL_JOINT_BITS;
 	Lara.Inventory.OldBusy = false;
 	BinocularRange = 0;
-	LaraItem->MeshBits = ALL_JOINT_BITS;
-	invobject = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
-	gmeobject = InventoryObjectTable[invobject].ObjectNumber;
 
-	if (Lara.Control.WaterStatus == WaterStatus::Dry || Lara.Control.WaterStatus == WaterStatus::Wade)
+	if (Lara.Control.WaterStatus == WaterStatus::Dry ||
+		Lara.Control.WaterStatus == WaterStatus::Wade)
 	{
-		if (gmeobject == ID_PISTOLS_ITEM)
+		if (gameObject == ID_PISTOLS_ITEM)
 		{
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Pistol;
 
@@ -1632,7 +1616,7 @@ void GuiController::UseCurrentItem()
 			return;
 		}
 
-		if (gmeobject == ID_UZI_ITEM)
+		if (gameObject == ID_UZI_ITEM)
 		{
 			Lara.Control.Weapon.RequestGunType = LaraWeaponType::Uzi;
 
@@ -1646,10 +1630,10 @@ void GuiController::UseCurrentItem()
 		}
 	}
 
-	if (gmeobject != ID_SHOTGUN_ITEM && gmeobject != ID_REVOLVER_ITEM && gmeobject != ID_HK_ITEM && gmeobject != ID_CROSSBOW_ITEM &&
-		gmeobject != ID_GRENADE_GUN_ITEM && gmeobject != ID_ROCKET_LAUNCHER_ITEM && gmeobject != ID_HARPOON_ITEM)
+	if (gameObject != ID_SHOTGUN_ITEM && gameObject != ID_REVOLVER_ITEM && gameObject != ID_HK_ITEM && gameObject != ID_CROSSBOW_ITEM &&
+		gameObject != ID_GRENADE_GUN_ITEM && gameObject != ID_ROCKET_LAUNCHER_ITEM && gameObject != ID_HARPOON_ITEM)
 	{
-		if (gmeobject == ID_FLARE_INV_ITEM)
+		if (gameObject == ID_FLARE_INV_ITEM)
 		{
 			if (Lara.Control.HandStatus == HandStatus::Free)
 			{
@@ -1665,7 +1649,6 @@ void GuiController::UseCurrentItem()
 						// HACK.
 						ClearInputActions();
 						ActionMap[(int)In::Flare].Update(1.0f);
-						TrInput = IN_FLARE;
 
 						LaraGun(LaraItem);
 						ClearInputActions();
@@ -1679,7 +1662,7 @@ void GuiController::UseCurrentItem()
 			return;
 		}
 
-		switch (invobject)
+		switch (inventoryObject)
 		{
 		case INV_OBJECT_BINOCULARS:
 			if (((LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
@@ -1698,8 +1681,8 @@ void GuiController::UseCurrentItem()
 					Lara.Control.HandStatus = HandStatus::WeaponUndraw;
 			}
 
-			if (OldBinocular)
-				BinocularRange = OldBinocular;
+			if (oldBinocular)
+				BinocularRange = oldBinocular;
 			else
 				BinocularOldCamera = Camera.oldType;
 
@@ -1757,7 +1740,7 @@ void GuiController::UseCurrentItem()
 			return;
 
 		default:
-			InventoryItemChosen = gmeobject;
+			InventoryItemChosen = gameObject;
 			return;
 		}
 
@@ -1784,7 +1767,7 @@ void GuiController::UseCurrentItem()
 		return;
 	}
 
-	if (gmeobject == ID_SHOTGUN_ITEM)
+	if (gameObject == ID_SHOTGUN_ITEM)
 	{
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Shotgun;
 
@@ -1797,7 +1780,7 @@ void GuiController::UseCurrentItem()
 		return;
 	}
 
-	if (gmeobject == ID_REVOLVER_ITEM)
+	if (gameObject == ID_REVOLVER_ITEM)
 	{
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Revolver;
 
@@ -1809,7 +1792,7 @@ void GuiController::UseCurrentItem()
 
 		return;
 	}
-	else if (gmeobject == ID_HK_ITEM)
+	else if (gameObject == ID_HK_ITEM)
 	{
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HK;
 
@@ -1821,7 +1804,7 @@ void GuiController::UseCurrentItem()
 
 		return;
 	}
-	else if (gmeobject == ID_CROSSBOW_ITEM)
+	else if (gameObject == ID_CROSSBOW_ITEM)
 	{
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::Crossbow;
 
@@ -1833,7 +1816,7 @@ void GuiController::UseCurrentItem()
 
 		return;
 	}
-	else if (gmeobject == ID_GRENADE_GUN_ITEM)
+	else if (gameObject == ID_GRENADE_GUN_ITEM)
 	{
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
@@ -1845,7 +1828,7 @@ void GuiController::UseCurrentItem()
 
 		return;
 	}
-	else if (gmeobject == ID_HARPOON_ITEM)
+	else if (gameObject == ID_HARPOON_ITEM)
 	{
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::HarpoonGun;
 
@@ -1857,7 +1840,7 @@ void GuiController::UseCurrentItem()
 
 		return;
 	}
-	else if (gmeobject == ID_ROCKET_LAUNCHER_ITEM)
+	else if (gameObject == ID_ROCKET_LAUNCHER_ITEM)
 	{
 		Lara.Control.Weapon.RequestGunType = LaraWeaponType::RocketLauncher;
 

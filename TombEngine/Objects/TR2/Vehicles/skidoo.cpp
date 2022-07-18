@@ -287,8 +287,11 @@ namespace TEN::Entities::Vehicles
 
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			dead = true;
+			ClearInput(In::Forward);
+			ClearInput(In::Back);
+			ClearInput(In::Left);
+			ClearInput(In::Right);
 		}
 		else if (laraItem->Animation.ActiveState == SKIDOO_STATE_JUMP_OFF)
 		{

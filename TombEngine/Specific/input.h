@@ -76,9 +76,9 @@ namespace TEN::Input
 		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
 	};
 	
-	constexpr int IN_OPTIC_CONTROLS = IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_ACTION | IN_CROUCH | IN_SPRINT;
-	constexpr int IN_WAKE			= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_LSTEP | IN_RSTEP | IN_WALK | IN_JUMP | IN_SPRINT | IN_ROLL | IN_CROUCH | IN_DRAW | IN_FLARE | IN_ACTION;
-	constexpr int IN_DIRECTION		= IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT;
+	#define INPUT_HELD_DIRECTION	 (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+	#define INPUT_HELD_WAKE			 (INPUT_HELD_DIRECTION || IsHeld(In::LeftStep) || IsHeld(In::RightStep) || IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) || IsHeld(In::Draw) || IsHeld(In::Flare) || IsHeld(In::Action))
+	#define INPUT_HELD_OPTIC_CONTROL (INPUT_HELD_DIRECTION || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint))
 
 	// Temporary input constants for use with vehicles:
 
@@ -127,7 +127,6 @@ namespace TEN::Input
 	// Legacy input bitfields.
 	extern int DbInput;  // Debounce: is input clicked?
 	extern int TrInput;  // Throttle: is input held?
-	extern int RawInput; // Throttle for binocular input.
 
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<bool>		KeyMap;
@@ -137,9 +136,9 @@ namespace TEN::Input
 
 	void InitialiseInput(HWND handle);
 	void DeInitialiseInput();
+	void DefaultConflict();
 	bool UpdateInputActions();
 	void ClearInputActions();
-	void DefaultConflict();
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 

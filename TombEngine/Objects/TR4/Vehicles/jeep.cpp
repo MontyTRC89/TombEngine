@@ -730,7 +730,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		if (laraItem->Animation.ActiveState == JS_DISMOUNT || laraItem->Animation.TargetState == JS_DISMOUNT)
-			TrInput = 0;
+			ClearInputActions();
 	
 		if (jeep->Revs <= 16)
 			jeep->Revs = 0;
@@ -1371,7 +1371,10 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints <= 0)
 		{
 			dead = true;
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
+			ClearInput(In::Forward);
+			ClearInput(In::Back);
+			ClearInput(In::Left);
+			ClearInput(In::Right);
 		}
 
 		int pitch = 0;

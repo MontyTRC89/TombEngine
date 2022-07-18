@@ -1131,8 +1131,11 @@ namespace TEN::Entities::Vehicles
 		bool dead = false;
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			dead = true;
+			ClearInput(In::Forward);
+			ClearInput(In::Back);
+			ClearInput(In::Left);
+			ClearInput(In::Right);
 		}
 
 		int drive = -1;

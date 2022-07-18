@@ -1196,8 +1196,11 @@ namespace TEN::Entities::Vehicles
 		bool isDead;
 		if (laraItem->HitPoints <= 0)
 		{
-			TrInput &= ~(IN_LEFT | IN_RIGHT | IN_BACK | IN_FORWARD);
 			isDead = true;
+			ClearInput(In::Forward);
+			ClearInput(In::Back);
+			ClearInput(In::Left);
+			ClearInput(In::Right);
 		}
 		else
 			isDead = false;

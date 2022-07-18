@@ -79,7 +79,6 @@ namespace TEN::Input
 	// Globals
 	int DbInput;
 	int TrInput;
-	int RawInput;
 
 	std::vector<InputAction> ActionMap;
 	std::vector<bool>		 KeyMap;
@@ -612,9 +611,9 @@ namespace TEN::Input
 
 			oisRumble->upload(oisEffect);
 		}
-		catch (OIS::Exception& ex) 
-		{ 
-			TENLog("Error updating vibration effect: " + std::string(ex.eText), LogLevel::Error); 
+		catch (OIS::Exception& ex)
+		{
+			TENLog("Error updating vibration effect: " + std::string(ex.eText), LogLevel::Error);
 		}
 
 		rumbleData.LastPower = rumbleData.Power;
@@ -630,19 +629,10 @@ namespace TEN::Input
 		// Clear legacy bitfields.
 		DbInput = NULL;
 		TrInput = NULL;
-		RawInput = NULL;
 
 		// Update input action map (mappable actions only).
 		for (int i = 0; i < KEY_COUNT; i++)
 			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
-
-		// Port raw input back to legacy bitfield.
-		for (auto& action : ActionMap)
-		{
-			int inputBit = 1 << (int)action.GetID();
-			if (action.IsHeld())
-				RawInput |= inputBit;
-		}
 
 		// Additional handling.
 		HandleLaraHotkeys();
@@ -671,7 +661,6 @@ namespace TEN::Input
 
 		DbInput = NULL;
 		TrInput = NULL;
-		RawInput = NULL;
 	}
 
 	void Rumble(float power, float delayInSeconds, RumbleMode mode)
