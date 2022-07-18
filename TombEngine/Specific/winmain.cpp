@@ -179,6 +179,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		if ((signed int)(unsigned short)wParam > 0 && (signed int)(unsigned short)wParam <= 2)
 		{
+			if (!g_Configuration.Windowed)
+				g_Renderer.ToggleFullScreen(true);
+
 			if (!Debug && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
@@ -191,6 +194,9 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	else
 	{
+		if (!g_Configuration.Windowed)
+			ShowWindow(hWnd, SW_MINIMIZE);
+
 		if (!Debug)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
