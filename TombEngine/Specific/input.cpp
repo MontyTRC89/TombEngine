@@ -514,8 +514,8 @@ namespace TEN::Input
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
 		// Handle medipack hotkeys.
-		static bool dbMedipack = false;
-		if ((KeyMap[KC_0] || KeyMap[KC_9]) && !dbMedipack)
+		static bool dbMedipack = true;
+		if ((KeyMap[KC_0] || KeyMap[KC_9]) && dbMedipack)
 		{
 			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
 				lara->PoisonPotency)
@@ -552,13 +552,13 @@ namespace TEN::Input
 				}
 			}
 		}
-		dbMedipack = (KeyMap[KC_0] || KeyMap[KC_9]) ? true : false;
+		dbMedipack = (KeyMap[KC_0] || KeyMap[KC_9]) ? false : true;
 
 		// Handle debug page switches.
-		static bool dbDebugPage = false;
-		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && !dbDebugPage)
+		static bool dbDebugPage = true;
+		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
 			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? true : false;
+		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? false : true;
 	}
 
 	void UpdateRumble()
