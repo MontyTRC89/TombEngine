@@ -150,15 +150,6 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	// Manually handle ALT + ENTER toggle fullscreen
-	if ((msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN)
-		&& wParam == VK_RETURN
-		&& (HIWORD(lParam) & KF_ALTDOWN))
-	{
-		g_Renderer.ToggleFullScreen();
-		return 0;
-	}
-
 	if (msg > 0x10)
 	{
 		if (msg == WM_COMMAND)
