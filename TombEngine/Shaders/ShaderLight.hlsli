@@ -210,7 +210,7 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 		}
 	}
 
-	diffuse.xyz *= Luma(tex.xyz);
+	diffuse.xyz *= tex.xyz;
 	float3 combined = ambTex + diffuse + spec;
 
 	return saturate(combined * vertex);
