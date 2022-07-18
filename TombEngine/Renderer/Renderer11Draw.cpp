@@ -1816,7 +1816,7 @@ namespace TEN::Renderer
 
 		for (auto room : view.roomsToDraw)
 		{
-			for (auto msh : room->StaticsToDraw)
+			for (auto& msh : room->StaticsToDraw)
 			{
 				RendererObject& staticObj = *m_staticObjects[msh.Id];
 
