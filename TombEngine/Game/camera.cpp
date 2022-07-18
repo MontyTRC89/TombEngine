@@ -1625,7 +1625,7 @@ void LookLeftRight(ItemInfo* item)
 	Camera.type = CameraType::Look;
 	if (TrInput & IN_LEFT)
 	{
-		ClearInput(In::Left);
+		ClearAction(In::Left);
 
 		if (lara->ExtraHeadRot.y > -ANGLE(44.0f))
 		{
@@ -1637,7 +1637,7 @@ void LookLeftRight(ItemInfo* item)
 	}
 	else if (TrInput & IN_RIGHT)
 	{
-		ClearInput(In::Right);
+		ClearAction(In::Right);
 
 		if (lara->ExtraHeadRot.y < ANGLE(44.0f))
 		{
@@ -1664,7 +1664,7 @@ void LookUpDown(ItemInfo* item)
 	Camera.type = CameraType::Look;
 	if (TrInput & IN_FORWARD)
 	{
-		ClearInput(In::Forward);
+		ClearAction(In::Forward);
 
 		if (lara->ExtraHeadRot.x > -ANGLE(35.0f))
 		{
@@ -1676,7 +1676,7 @@ void LookUpDown(ItemInfo* item)
 	}
 	else if (TrInput & IN_BACK)
 	{
-		ClearInput(In::Back);
+		ClearAction(In::Back);
 
 		if (lara->ExtraHeadRot.x < ANGLE(30.0f))
 		{
@@ -2075,7 +2075,7 @@ void HandleOptics(ItemInfo* item)
 		if (BinocularRange == 0)
 		{
 			if (UseSpotCam || TrackCameraInit)
-				ClearInput(In::Look);
+				ClearAction(In::Look);
 		}
 		else
 		{

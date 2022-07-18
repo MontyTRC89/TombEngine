@@ -169,8 +169,8 @@ namespace TEN::Input
 		}
 
 		// Initialise input action map.
-		for (int i = 0; i < (int)InputActionID::Count; i++)
-			ActionMap.push_back(InputAction((InputActionID)i));
+		for (int i = 0; i < (int)ActionID::Count; i++)
+			ActionMap.push_back(InputAction((ActionID)i));
 	}
 
 	void DeInitialiseInput()
@@ -431,13 +431,13 @@ namespace TEN::Input
 	{
 		// Block roll in binocular mode (TODO: Is it needed?)
 		if (IsHeld(In::Roll) && BinocularRange)
-			ClearInput(In::Roll);
+			ClearAction(In::Roll);
 
 		// Block simultaneous LEFT+RIGHT input.
 		if (IsHeld(In::Left) && IsHeld(In::Right))
 		{
-			ClearInput(In::Left);
-			ClearInput(In::Right);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 
 		if (Lara.Inventory.IsBusy)
@@ -446,8 +446,8 @@ namespace TEN::Input
 
 			if (IsHeld(In::Forward) && IsHeld(In::Back))
 			{
-				ClearInput(In::Forward);
-				ClearInput(In::Back);
+				ClearAction(In::Forward);
+				ClearAction(In::Back);
 			}
 		}
 	}
@@ -638,13 +638,13 @@ namespace TEN::Input
 		HandleLaraHotkeys(LaraItem);
 		SolveInputCollisions();
 
-		// Port actions back to legacy bitfields.
+		// Port actions back to legacy input bitfields.
 		for (auto& action : ActionMap)
 		{
-			int inputBit = 1 << (int)action.GetID();
+			int actionBit = 1 << (int)action.GetID();
 
-			DbInput |= action.IsClicked() ? inputBit : NULL;
-			TrInput |= action.IsHeld() ? inputBit : NULL;
+			DbInput |= action.IsClicked() ? actionBit : NULL;
+			TrInput |= action.IsHeld() ? actionBit : NULL;
 		}
 
 		// Debug display for FORWARD input.
@@ -687,27 +687,27 @@ namespace TEN::Input
 		rumbleData = {};
 	}
 
-	bool IsClicked(InputActionID input)
+	bool IsClicked(ActionID actionID)
 	{
-		return ActionMap[(int)input].IsClicked();
+		return ActionMap[(int)actionID].IsClicked();
 	}
 
-	bool IsPulsed(InputActionID input, float delayInSeconds, float initialDelayInSeconds)
+	bool IsPulsed(ActionID actionID, float delayInSeconds, float initialDelayInSeconds)
 	{
-		return ActionMap[(int)input].IsPulsed(delayInSeconds, initialDelayInSeconds);
+		return ActionMap[(int)actionID].IsPulsed(delayInSeconds, initialDelayInSeconds);
 	}
 
-	bool IsHeld(InputActionID input)
+	bool IsHeld(ActionID actionID)
 	{
-		return ActionMap[(int)input].IsHeld();
+		return ActionMap[(int)actionID].IsHeld();
 	}
 
-	bool IsReleased(InputActionID input)
+	bool IsReleased(ActionID actionID)
 	{
-		return ActionMap[(int)input].IsReleased();
+		return ActionMap[(int)actionID].IsReleased();
 	}
 
-	bool NoInput()
+	bool NoAction()
 	{
 		for (auto& action : ActionMap)
 		{
@@ -718,27 +718,27 @@ namespace TEN::Input
 		return true;
 	}
 
-	float GetInputValue(InputActionID input)
+	float GetActionValue(ActionID actionID)
 	{
-		return ActionMap[(int)input].GetValue();
+		return ActionMap[(int)actionID].GetValue();
 	}
 
-	float GetInputTimeActive(InputActionID input)
+	float GetActionTimeActive(ActionID actionID)
 	{
-		return ActionMap[(int)input].GetTimeActive();
+		return ActionMap[(int)actionID].GetTimeActive();
 	}
 
-	float GetInputTimeInactive(InputActionID input)
+	float GetActionTimeInactive(ActionID actionID)
 	{
-		return ActionMap[(int)input].GetTimeInactive();
+		return ActionMap[(int)actionID].GetTimeInactive();
 	}
 
-	void ClearInput(InputActionID input)
+	void ClearAction(ActionID actionID)
 	{
-		ActionMap[(int)input].Clear();
+		ActionMap[(int)actionID].Clear();
 
-		int inputBit = 1 << (int)input;
-		DbInput &= ~inputBit;
-		TrInput &= ~inputBit;
+		int actionBit = 1 << (int)actionID;
+		DbInput &= ~actionBit;
+		TrInput &= ~actionBit;
 	}
 }

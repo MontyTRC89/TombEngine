@@ -447,7 +447,7 @@ void GuiController::HandleControlSettingsInput(bool fromPauseMenu)
 
 	if (CurrentSettings.IgnoreInput)
 	{
-		if (NoInput())
+		if (NoAction())
 			CurrentSettings.IgnoreInput = false;
 
 		return;
@@ -470,7 +470,7 @@ void GuiController::HandleControlSettingsInput(bool fromPauseMenu)
 
 			if (CurrentSettings.IgnoreInput)
 			{
-				if (NoInput())
+				if (NoAction())
 					CurrentSettings.IgnoreInput = false;
 			}
 			else
@@ -2877,7 +2877,7 @@ bool GuiController::CallInventory(ItemInfo* item, bool resetMode)
 			break;
 		}
 
-		if (UseItem && NoInput())
+		if (UseItem && NoAction())
 			exitLoop = true;
 
 		Camera.numberFrames = g_Renderer.SyncRenderer();

@@ -141,10 +141,10 @@ public:
 
 private:
 	#define CAN_SELECT   (!IsHeld(In::Deselect) && \
-						 GetInputTimeActive(In::Action) <= GetInputTimeInactive(In::Deselect) && \
-						 GetInputTimeActive(In::Action) <= GetInputTimeInactive(In::Save) && \
-						 GetInputTimeActive(In::Action) <= GetInputTimeInactive(In::Load) && \
-						 GetInputTimeActive(In::Action) <= GetInputTimeInactive(In::Pause))
+						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) && \
+						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) && \
+						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) && \
+						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
 	#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
 
 	// Input macros

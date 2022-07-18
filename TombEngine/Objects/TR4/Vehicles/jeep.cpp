@@ -1371,10 +1371,10 @@ namespace TEN::Entities::Vehicles
 		if (laraItem->HitPoints <= 0)
 		{
 			dead = true;
-			ClearInput(In::Forward);
-			ClearInput(In::Back);
-			ClearInput(In::Left);
-			ClearInput(In::Right);
+			ClearAction(In::Forward);
+			ClearAction(In::Back);
+			ClearAction(In::Left);
+			ClearAction(In::Right);
 		}
 
 		int pitch = 0;

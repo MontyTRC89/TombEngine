@@ -142,13 +142,13 @@ namespace TEN::Input
 	void Rumble(float power, float delayInSeconds = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
 
-	bool  IsClicked(InputActionID input);
-	bool  IsPulsed(InputActionID input, float delayInSeconds, float initialDelayInSeconds = 0.0f);
-	bool  IsHeld(InputActionID input);
-	bool  IsReleased(InputActionID input);
-	bool  NoInput();
-	float GetInputValue(InputActionID input);
-	float GetInputTimeActive(InputActionID input);
-	float GetInputTimeInactive(InputActionID input);
-	void  ClearInput(InputActionID input);
+	bool  IsClicked(ActionID actionID);
+	bool  IsPulsed(ActionID actionID, float delayInSeconds, float initialDelayInSeconds = 0.0f);
+	bool  IsHeld(ActionID actionID);
+	bool  IsReleased(ActionID actionID);
+	bool  NoAction();
+	float GetActionValue(ActionID actionID);
+	float GetActionTimeActive(ActionID actionID);
+	float GetActionTimeInactive(ActionID actionID);
+	void  ClearAction(ActionID actionID);
 }

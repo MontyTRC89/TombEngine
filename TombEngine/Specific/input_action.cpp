@@ -9,9 +9,9 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
-	InputAction::InputAction(InputActionID ID)
+	InputAction::InputAction(ActionID actionID)
 	{
-		this->ID = ID;
+		this->ID = actionID;
 	}
 
 	void InputAction::Update(float value)
@@ -101,7 +101,7 @@ namespace TEN::Input
 		return (!Value && PrevValue);
 	}
 
-	InputActionID InputAction::GetID()
+	ActionID InputAction::GetID()
 	{
 		return ID;
 	}

@@ -2,7 +2,7 @@
 
 namespace TEN::Input
 {
-	typedef enum class InputActionID
+	typedef enum class ActionID
 	{
 		None = -1,
 
@@ -47,7 +47,7 @@ namespace TEN::Input
 	class InputAction
 	{
 	public:
-		InputAction(InputActionID ID);
+		InputAction(ActionID actionID);
 
 		void Update(float value);
 		void Clear();
@@ -58,13 +58,13 @@ namespace TEN::Input
 		bool IsHeld();
 		bool IsReleased();
 
-		InputActionID GetID();
+		ActionID GetID();
 		float GetValue();
 		float GetTimeActive();
 		float GetTimeInactive();
 
 	private:
-		InputActionID ID	 = In::None;
+		ActionID ID			 = In::None;
 		float Value			 = 0.0f;
 		float PrevValue		 = 0.0f;
 		float TimeActive	 = 0.0f;
