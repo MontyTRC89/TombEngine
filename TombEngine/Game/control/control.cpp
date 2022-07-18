@@ -148,7 +148,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 				g_Gui.SetInventoryMode(InventoryMode::Save);
 
-				if (g_Gui.CallInventory(false))
+				if (g_Gui.CallInventory(LaraItem, false))
 					return GameStatus::SaveGame;
 			}
 			else if (IsClicked(In::Load) &&
@@ -159,7 +159,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 
 				g_Gui.SetInventoryMode(InventoryMode::Load);
 
-				if (g_Gui.CallInventory(false))
+				if (g_Gui.CallInventory(LaraItem, false))
 					return GameStatus::LoadGame;
 			}
 			else if (IsClicked(In::Pause) && LaraItem->HitPoints > 0 &&
@@ -179,7 +179,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 				StopAllSounds();
 				StopRumble();
 
-				if (g_Gui.CallInventory(true))
+				if (g_Gui.CallInventory(LaraItem, true))
 					return GameStatus::LoadGame;
 			}
 		}

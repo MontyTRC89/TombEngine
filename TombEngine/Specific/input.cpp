@@ -462,7 +462,7 @@ namespace TEN::Input
 		ActionMap[(int)In::Select].Update((KeyMap[KC_RETURN] || Key(KEY_ACTION)) ? 1.0f : 0.0f);
 		ActionMap[(int)In::Deselect].Update((KeyMap[KC_ESCAPE] || Key(KEY_DRAW)) ? 1.0f : 0.0f);
 
-		// Handle look switch when locked on to an entity.
+		// Handle target switch when locked on to an entity.
 		if (lara->Control.HandStatus == HandStatus::WeaponReady &&
 			lara->TargetEntity != nullptr)
 		{

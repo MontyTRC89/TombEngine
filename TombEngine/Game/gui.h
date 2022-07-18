@@ -3,6 +3,8 @@
 #include "LanguageScript.h"
 #include "Specific/configuration.h"
 
+struct ItemInfo;
+
 enum class InventoryMode
 {
 	None,
@@ -106,18 +108,18 @@ struct SettingsData
 class GuiController
 {
 public:
-	bool CallInventory(bool resetMode);
+	bool CallInventory(ItemInfo* item, bool resetMode);
 	InventoryResult TitleOptions();
 	InventoryResult DoPauseMenu();
 	void DrawInventory();
-	void DrawCurrentObjectList(int ringIndex);
+	void DrawCurrentObjectList(ItemInfo* item, int ringIndex);
 	int IsObjectInInventory(int objectNumber);
 	int ConvertObjectToInventoryItem(int objectNumber);
 	int ConvertInventoryItemToObject(int objectNumber);
 	void FadeAmmoSelector();
 	void DrawAmmoSelector();
-	bool PerformWaterskinCombine(int flag);
-	void DrawCompass();
+	bool PerformWaterskinCombine(ItemInfo* item, int flag);
+	void DrawCompass(ItemInfo* item);
 
 	// Getters
 	InventoryRing* GetRings(int ringIndex);
@@ -198,29 +200,29 @@ private:
 	void HandleOptionsInput();
 	void BackupOptions();
 	bool DoObjectsCombine(int objectNumber1, int objectNumber2);
-	void InitialiseInventory();
+	void InitialiseInventory(ItemInfo* item);
 	void FillDisplayOptions();
 	bool IsItemCurrentlyCombinable(int objectNumber);
 	bool IsItemInInventory(int objectNumber);
-	void CombineObjects(int objectNumber1, int objectNumber2);
+	void CombineObjects(ItemInfo* item, int objectNumber1, int objectNumber2);
 	void SetupObjectListStartPosition(int newObjectNumber);
 	void SetupObjectListStartPosition2(int newObjectNumber);
 	void HandleObjectChangeover(int ringIndex);
 	void SetupAmmoSelector();
-	void ConstructObjectList();
-	void SeparateObject(int objectNumber);
+	void ConstructObjectList(ItemInfo* item);
+	void SeparateObject(ItemInfo* item, int objectNumber);
 	void InsertObjectIntoList(int objectNumber);
 	void InsertObjectIntoList_v2(int objectNumber);
-	void UseCurrentItem();
+	void UseCurrentItem(ItemInfo* item);
 	void SpinBack(unsigned short* angle);
-	void UpdateWeaponStatus();
+	void UpdateWeaponStatus(ItemInfo* item);
 	void DoStatisticsMode();
 	void DoExamineMode();
-	void DoDiary();
+	void DoDiary(ItemInfo* item);
 	LoadResult DoLoad();
 	bool DoSave();
-	void DoInventory();
-	void ConstructCombineObjectList();
+	void DoInventory(ItemInfo* item);
+	void ConstructCombineObjectList(ItemInfo* item);
 };
 
 extern GuiController g_Gui;

@@ -460,14 +460,14 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderNewInventory()
 	{
-		g_Gui.DrawCurrentObjectList((int)RingTypes::Inventory);
+		g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Inventory);
 
 		if (g_Gui.GetRings((int)RingTypes::Ammo)->RingActive)
-			g_Gui.DrawCurrentObjectList((int)RingTypes::Ammo);
+			g_Gui.DrawCurrentObjectList(LaraItem, (int)RingTypes::Ammo);
 
 		g_Gui.DrawAmmoSelector();
 		g_Gui.FadeAmmoSelector();
-		g_Gui.DrawCompass();
+		g_Gui.DrawCompass(LaraItem);
 		DrawAllStrings();
 	}
 
