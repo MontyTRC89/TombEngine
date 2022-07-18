@@ -514,64 +514,51 @@ namespace TEN::Input
 			lara->Control.Weapon.RequestGunType = LaraWeaponType::GrenadeLauncher;
 
 		// Handle medipack hotkeys.
-		static int medipackTimeout = 0;
-		if (KeyMap[KC_0] || KeyMap[KC_9])
+		static bool dbMedipack = false;
+		if ((KeyMap[KC_0] || KeyMap[KC_9]) && !dbMedipack)
 		{
-			if (!medipackTimeout)
+			if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
+				lara->PoisonPotency)
 			{
-				if ((item->HitPoints > 0 && item->HitPoints < LARA_HEALTH_MAX) ||
-					lara->PoisonPotency)
+				bool hasUsedMedipack = false;
+
+				if (KeyMap[KC_0] &&
+					lara->Inventory.TotalSmallMedipacks != 0)
 				{
-					bool usedMedipack = false;
+					hasUsedMedipack = true;
 
-					if (KeyMap[KC_0] &&
-						lara->Inventory.TotalSmallMedipacks != 0)
-					{
-						usedMedipack = true;
-
-						item->HitPoints += LARA_HEALTH_MAX / 2;
-						if (item->HitPoints > LARA_HEALTH_MAX)
-							item->HitPoints = LARA_HEALTH_MAX;
-
-						if (lara->Inventory.TotalSmallMedipacks != -1)
-							lara->Inventory.TotalSmallMedipacks--;
-					}
-					else if (KeyMap[KC_9] &&
-						lara->Inventory.TotalLargeMedipacks != 0)
-					{
-						usedMedipack = true;
+					item->HitPoints += LARA_HEALTH_MAX / 2;
+					if (item->HitPoints > LARA_HEALTH_MAX)
 						item->HitPoints = LARA_HEALTH_MAX;
 
-						if (lara->Inventory.TotalLargeMedipacks != -1)
-							lara->Inventory.TotalLargeMedipacks--;
-					}
+					if (lara->Inventory.TotalSmallMedipacks != -1)
+						lara->Inventory.TotalSmallMedipacks--;
+				}
+				else if (KeyMap[KC_9] &&
+					lara->Inventory.TotalLargeMedipacks != 0)
+				{
+					hasUsedMedipack = true;
+					item->HitPoints = LARA_HEALTH_MAX;
 
-					if (usedMedipack)
-					{
-						lara->PoisonPotency = 0;
-						SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
-						Statistics.Game.HealthUsed++;
-					}
+					if (lara->Inventory.TotalLargeMedipacks != -1)
+						lara->Inventory.TotalLargeMedipacks--;
+				}
 
-					medipackTimeout = 15;
+				if (hasUsedMedipack)
+				{
+					lara->PoisonPotency = 0;
+					SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+					Statistics.Game.HealthUsed++;
 				}
 			}
 		}
-		else if (medipackTimeout != 0)
-			medipackTimeout--;
+		dbMedipack = (KeyMap[KC_0] || KeyMap[KC_9]) ? true : false;
 
 		// Handle debug page switches.
-		static int debugTimeout = 0;
-		if (KeyMap[KC_F10] || KeyMap[KC_F11])
-		{
-			if (!debugTimeout)
-			{
-				debugTimeout = 1;
-				g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-			}
-		}
-		else
-			debugTimeout = 0;
+		static bool dbDebugPage = false;
+		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && !dbDebugPage)
+			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
+		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? true : false;
 	}
 
 	void UpdateRumble()
