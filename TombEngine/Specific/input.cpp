@@ -554,11 +554,21 @@ namespace TEN::Input
 		}
 		dbMedipack = (KeyMap[KC_0] || KeyMap[KC_9]) ? false : true;
 
-		// Handle debug page switches.
+		// Handle debug page switch.
 		static bool dbDebugPage = true;
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
 			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
 		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? false : true;
+
+		// Toggle fullscreen.
+		static bool dbFullscreen = true;
+		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
+		{
+			g_Configuration.Windowed = !g_Configuration.Windowed;
+			SaveConfiguration();
+			g_Renderer.ToggleFullScreen();
+		}
+		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
 	}
 
 	void UpdateRumble()
