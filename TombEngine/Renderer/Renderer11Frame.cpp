@@ -373,7 +373,7 @@ namespace TEN::Renderer
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[room.RoomNumber];
 
-		if (r->mesh.size() <= 0)
+		if (r->mesh.size() == 0)
 			return;
 
 		int numStatics = r->mesh.size();
@@ -384,14 +384,20 @@ namespace TEN::Renderer
 			if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
-			if (!m_staticObjects[mesh->staticNumber])
+			if (!m_staticObjects[mesh->staticNumber].has_value())
 				continue;
+
+			auto& obj = *m_staticObjects[mesh->staticNumber];
+
+			if (obj.ObjectMeshes.size() == 0)
+				continue;
+
+			std::vector<RendererLight*> lights;
+			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
+				CollectLights(mesh->pos.Position, room.RoomNumber, false, lights);
 
 			Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(mesh->pos.Orientation.y), TO_RAD(mesh->pos.Orientation.x), TO_RAD(mesh->pos.Orientation.z)) *
 							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
-
-			std::vector<RendererLight*> lights;
-			CollectLights(mesh->pos.Position, room.RoomNumber, false, lights);
 
 			auto staticInfo = RendererStatic
 			{
