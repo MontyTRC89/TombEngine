@@ -1158,7 +1158,6 @@ struct LaraCountData
 	unsigned int PositionAdjust;
 	unsigned int Run;
 	unsigned int Death;
-	unsigned int NoCheat;
 };
 
 struct WeaponControlData

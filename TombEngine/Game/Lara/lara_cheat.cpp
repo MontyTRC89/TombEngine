@@ -56,7 +56,8 @@ void LaraCheatyBits(ItemInfo* item)
 
 	if (g_GameFlow->IsFlyCheatEnabled())
 	{
-		if (KeyMap[OIS::KeyCode::KC_O])
+		static bool dbFlyCheat = true;
+		if (KeyMap[OIS::KeyCode::KC_O] && dbFlyCheat)
 		{
 			if (lara->Vehicle == NO_ITEM)
 			{
@@ -68,8 +69,8 @@ void LaraCheatyBits(ItemInfo* item)
 				if (lara->Control.WaterStatus != WaterStatus::FlyCheat)
 				{
 					SetAnimation(item, LA_DOZY);
-					item->Animation.VerticalVelocity = 30;
 					item->Animation.IsAirborne = false;
+					item->Animation.VerticalVelocity = 30;
 					item->Pose.Orientation.x = ANGLE(30.0f);
 					item->HitPoints = LARA_HEALTH_MAX;
 
@@ -80,16 +81,11 @@ void LaraCheatyBits(ItemInfo* item)
 					lara->Air = LARA_AIR_MAX;
 				}
 			}
-			else if (!lara->Control.Count.NoCheat)
-			{
-				lara->Control.Count.NoCheat = 15;
+			else
 				SayNo();
-			}
 		}
+		dbFlyCheat = KeyMap[OIS::KeyCode::KC_O] ? false : true;
 	}
-
-	if (lara->Control.Count.NoCheat)
-		lara->Control.Count.NoCheat--;
 }
 
 void LaraCheatGetStuff(ItemInfo* item)
