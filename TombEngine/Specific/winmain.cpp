@@ -150,7 +150,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return 0;
 	}
 
-	if (msg > 0x10)
+	if (msg > WM_CLOSE)
 	{
 		if (msg == WM_COMMAND)
 			HandleWmCommand((unsigned short)wParam);
