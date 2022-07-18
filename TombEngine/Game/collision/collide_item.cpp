@@ -856,8 +856,8 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 			{
 				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
 				{
-					auto staticInfo = StaticObjects[mesh->staticNumber];
-					if (CollideSolidBounds(item, staticInfo.collisionBox, mesh->pos, coll))
+					auto staticInfo = &StaticObjects[mesh->staticNumber];
+					if (CollideSolidBounds(item, staticInfo->collisionBox, mesh->pos, coll))
 						coll->HitStatic = true;
 				}
 			}
