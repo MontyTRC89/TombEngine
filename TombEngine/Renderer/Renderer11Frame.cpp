@@ -376,7 +376,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectStatics(short roomNumber)
+	void Renderer11::CollectStatics(short roomNumber, RenderView& renderView)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -396,6 +396,14 @@ namespace TEN::Renderer
 				continue;
 
 			if (!m_staticObjects[mesh->staticNumber])
+				continue;
+
+			auto stat = &StaticObjects[mesh->staticNumber];
+			auto bounds = TO_DX_BBOX(mesh->pos, &stat->visibilityBox);
+			Vector3 min = bounds.Center - bounds.Extents;
+			Vector3 max = bounds.Center + bounds.Extents;
+
+			if (!renderView.camera.frustum.AABBInFrustum(min, max))
 				continue;
 
 			Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(mesh->pos.Orientation.y), TO_RAD(mesh->pos.Orientation.x), TO_RAD(mesh->pos.Orientation.z)) *
