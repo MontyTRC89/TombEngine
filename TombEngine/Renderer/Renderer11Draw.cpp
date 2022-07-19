@@ -1669,7 +1669,6 @@ namespace TEN::Renderer
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
 
 		Vector3 itemPosition = Vector3::Transform(Vector3::Zero, item->Translation);
-		Vector3 cameraPosition = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 
 		// Bind item main properties
 		m_stItem.World = item->World;
