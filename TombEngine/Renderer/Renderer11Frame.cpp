@@ -348,15 +348,23 @@ namespace TEN::Renderer
 			if (!m_moveableObjects[item->ObjectNumber].has_value())
 				continue;
 
-			if (m_moveableObjects[item->ObjectNumber].value().DoNotDraw)
+			auto& obj = m_moveableObjects[item->ObjectNumber].value();
+
+			if (obj.DoNotDraw)
 				continue;
 
-			auto bounds = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
-			Vector3 min = bounds.Center - bounds.Extents;
-			Vector3 max = bounds.Center + bounds.Extents;
+			// Clip object by frustum only if it doesn't cast shadows. Otherwise we may see
+			// disappearing shadows if object gets out of frustum.
 
-			if (!renderView.camera.frustum.AABBInFrustum(min, max))
-				continue;
+			if (obj.ShadowType == ShadowMode::None)
+			{
+				auto bounds = TO_DX_BBOX(item->Pose, GetBoundsAccurate(item));
+				Vector3 min = bounds.Center - bounds.Extents;
+				Vector3 max = bounds.Center + bounds.Extents;
+
+				if (!renderView.camera.frustum.AABBInFrustum(min, max))
+					continue;
+			}
 
 			auto newItem = &m_items[itemNum];
 
