@@ -111,7 +111,7 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 		float d = saturate(dot(n, lightVec));
 		float attenuation = ((radius - distance) / radius);
 
-		return saturate(color * intensity * attenuation * d);
+		return saturate(color * saturate(intensity) * attenuation * d);
 	}
 }
 
@@ -153,7 +153,7 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 			if (attenuation > 0.0f)
 			{
 				float falloff = saturate((outerRange - distance) / (outerRange - innerRange + 1.0f));
-				return saturate(color * intensity * attenuation * falloff * d);
+				return saturate(color * saturate(intensity) * attenuation * falloff * d);
 			}
 			else
 				return float3(0, 0, 0);
@@ -174,12 +174,6 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 		return float3(0, 0, 0);
 	else
 		return (color * d);
-}
-
-float Luma(float3 color)
-{
-	// Use Rec.709 trichromat formula to get perceptive luma value
-	return float((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
 }
 
 float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen)
