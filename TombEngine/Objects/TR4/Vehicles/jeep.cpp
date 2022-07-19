@@ -31,7 +31,7 @@ namespace TEN::Entities::Vehicles
 
 	const vector<int> JeepJoints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16 };
 	const vector<int> JeepBrakeLightJoints = { 15, 16 };
-
+	const vector<int> JeepLightJoints = { 0 };
 	const vector<VehicleMountType> JeepMountTypes =
 	{
 		VehicleMountType::LevelStart,
@@ -1339,6 +1339,26 @@ namespace TEN::Entities::Vehicles
 		}
 	}
 
+	static void DrawJeepHeadLights(ItemInfo* jeepItem) {
+		//Jeep Base Mesh is weirdly rotated, which is why axes are mixed up
+		Vector3Int start = Vector3Int(-300, -120, -300);
+		Vector3Int target = Vector3Int(-1024, -120, -150);
+		GetJointAbsPosition(jeepItem, &start, JeepLightJoints[0]);
+		GetJointAbsPosition(jeepItem, &target, JeepLightJoints[0]);
+		Vector3 direction = (target - start).ToVector3();
+		direction.Normalize();
+		// TODO: Use target as direction vector for spotlight.
+		TriggerDynamicSpotLight(start.ToVector3(), direction, Vector3(255, 250, 220), 32, 25);
+		start = Vector3Int(-300, 120, -300);
+		target = Vector3Int(-1024, 120, -150);
+		GetJointAbsPosition(jeepItem, &start, JeepLightJoints[0]);
+		GetJointAbsPosition(jeepItem, &target, JeepLightJoints[0]);
+		direction = (target - start).ToVector3();
+		direction.Normalize();
+		// TODO: Use target as direction vector for spotlight.
+		TriggerDynamicSpotLight(start.ToVector3(), direction, Vector3(255, 250, 220), 32, 25);
+	}
+
 	int JeepControl(ItemInfo* laraItem)
 	{
 		auto* lara = GetLaraInfo(laraItem);
@@ -1382,8 +1402,11 @@ namespace TEN::Entities::Vehicles
 			drive = -1;
 			collide = 0;
 		}
-		else
+		else {
+			DrawJeepHeadLights(jeepItem);
 			drive = JeepUserControl(jeepItem, laraItem, floorHeight, &pitch);
+
+		}
 
 		if (jeep->Velocity || jeep->Revs)
 		{

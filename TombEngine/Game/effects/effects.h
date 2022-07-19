@@ -207,6 +207,7 @@ void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(int x, int y, int z, int angle);
 void KillAllCurrentItems(short itemNumber);
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+void TriggerDynamicSpotLight(Vector3& position, Vector3& direction, Vector3& color, float range, float angle);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z, int bodyPart);
 void TriggerFireFlame(int x, int y, int z, int flag1, int flag2);

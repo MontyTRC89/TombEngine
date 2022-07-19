@@ -317,16 +317,17 @@ namespace TEN::Entities::Vehicles
 		if (motorbike->LightPower <= 0)
 			return;
 
-		auto start = Vector3Int(0, -470, 1836);
-		GetJointAbsPosition(motorbikeItem, &start, 0);
+		auto start = Vector3Int(0, -200, 0);
+		GetJointAbsPosition(motorbikeItem, &start, MotorbikeHeadLightJoints[0]);
 
-		auto target = Vector3Int(0, -470, 20780);
-		GetJointAbsPosition(motorbikeItem, &target, 0);
+		auto target = Vector3Int(0, -150, 20780);
+		GetJointAbsPosition(motorbikeItem, &target, MotorbikeHeadLightJoints[0]);
 
 		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
-
+		Vector3 direction = (target - start).ToVector3();
+		direction.Normalize();
 		// TODO: Use target as direction vector for spotlight.
-		TriggerDynamicLight(start.x, start.y, start.z, 8, random, random / 2, 0);
+		TriggerDynamicSpotLight(start.ToVector3(), direction, Vector3(random, random / 2, 0),64,22);
 	}
 
 	static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, bool moving)

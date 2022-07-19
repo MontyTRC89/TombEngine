@@ -1186,6 +1186,11 @@ void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byt
 	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
 }
 
+void TriggerDynamicSpotLight(Vector3& position, Vector3& direction, Vector3& color, float range, float angle)
+{
+	g_Renderer.AddDynamicSpotLight(position, direction, color, range, angle);
+}
+
 void SetupRipple(int x, int y, int z, int size, int flags)
 {
 	for (int i = 0; i < MAX_RIPPLES; i++)

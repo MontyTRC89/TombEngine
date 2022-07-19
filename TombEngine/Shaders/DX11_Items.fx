@@ -91,7 +91,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float3 normal = NormalTexture.Sample(Sampler, input.UV).rgb;
 	normal = normal * 2 - 1;
-	normal = normalize(mul(input.TBN, normal));
+    normal = normalize(mul(input.TBN, normal));
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :

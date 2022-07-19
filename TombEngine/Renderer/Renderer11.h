@@ -610,6 +610,7 @@ namespace TEN::Renderer
 		void DrawString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+		void AddDynamicSpotLight(Vector3& position, Vector3& direction, Vector3& color, float range, float angle);
 		void RenderLoadingScreen(float percentage);
 		void UpdateProgress(float value);
 		void GetLaraBonePosition(Vector3* pos, int bone);

@@ -311,7 +311,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float3 Normal = NormalTexture.Sample(Sampler,input.UV).rgb;
 	Normal = Normal * 2 - 1;
-	Normal = normalize(mul(Normal, input.TBN));
+	Normal = normalize(mul(input.TBN,Normal));
 
 	float3 lighting = input.Color.xyz;
 	bool doLights = true;
@@ -336,23 +336,14 @@ PixelShaderOutput PS(PixelShaderInput input)
 	{
 		for (int i = 0; i < NumLights; i++)
 		{
-			float3 lightPos = Lights[i].Position.xyz;
-			float3 color = Lights[i].Color.xyz;
-			float radius = Lights[i].Out;
-
-			float3 lightVec = (lightPos - input.WorldPosition);
-			float distance = length(lightVec);
-			if (distance > radius)
-				continue;
-
-			lightVec = normalize(lightVec);
-			float d = saturate(dot(Normal, -lightVec ));
-			if (d < 0)
-				continue;
-			
-			float attenuation = pow(((radius - distance) / radius), 2);
-
-			lighting += color * attenuation * d;
+            if (Lights[i].Type == LT_SPOT)
+            {
+                lighting += DoSpotLight(input.WorldPosition, Normal, Lights[i]);
+            }
+            else if (Lights[i].Type == LT_POINT)
+            {
+                lighting += DoPointLight(input.WorldPosition, Normal, Lights[i]);
+            }
 		}
 	}
 

@@ -988,6 +988,21 @@ namespace TEN::Renderer
 		dynamicLights.push_back(dynamicLight);
 	}
 
+	void Renderer11::AddDynamicSpotLight(Vector3& position,Vector3& direction, Vector3& color, float range, float angle) 
+	{
+		RendererLight dynamicLight = {};
+		dynamicLight.Intensity = 1.0f;
+		dynamicLight.Direction = direction;
+		dynamicLight.Position = position;
+		dynamicLight.Out = range * 256.0f;
+		dynamicLight.OutRange = angle;
+		dynamicLight.In = range * 128.0f;
+		dynamicLight.InRange = angle / 4;
+		dynamicLight.Type = LIGHT_TYPES::LIGHT_TYPE_SPOT;
+		dynamicLight.Color = color/255.0f;
+		dynamicLights.push_back(dynamicLight);
+	}
+
 	void Renderer11::ClearDynamicLights()
 	{
 		dynamicLights.clear();
