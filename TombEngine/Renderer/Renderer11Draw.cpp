@@ -125,10 +125,6 @@ namespace TEN::Renderer
 
 	void Renderer11::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
-		// No dynamic shadows are rendered, bypass completely
-		if (g_Configuration.ShadowType == ShadowMode::None)
-			return;
-
 		// Doesn't cast shadow
 		if (m_moveableObjects[item->ObjectNumber].value().ShadowType == ShadowMode::None)
 			return;
@@ -1656,9 +1652,12 @@ namespace TEN::Renderer
 	{
 		RenderBlobShadows(renderView);
 
-		for (auto room : renderView.roomsToDraw)
-			for (auto itemToDraw : room->ItemsToDraw)
-				RenderShadowMap(itemToDraw, renderView);
+		if (g_Configuration.ShadowType != ShadowMode::None)
+		{
+			for (auto room : renderView.roomsToDraw)
+				for (auto itemToDraw : room->ItemsToDraw)
+					RenderShadowMap(itemToDraw, renderView);
+		}
 	}
 
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
