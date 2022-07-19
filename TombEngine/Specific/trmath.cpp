@@ -292,6 +292,26 @@ const float Luma(Vector3 color)
 	return (float)((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
 }
 
+const Vector4 Screen(Vector4 ambient, Vector4 tint)
+{
+	auto result = Screen(Vector3(ambient.x, ambient.y, ambient.z), Vector3(tint.x, tint.y, tint.z));
+	return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
+}
+
+const Vector3 Screen(Vector3 ambient, Vector3 tint)
+{
+	auto luma = Luma(tint);
+
+	auto multiplicative = ambient * tint;
+	auto additive = ambient + tint;
+
+	auto R = (float)Lerp(multiplicative.x, additive.x, luma);
+	auto G = (float)Lerp(multiplicative.y, additive.y, luma);
+	auto B = (float)Lerp(multiplicative.z, additive.z, luma);
+
+	return Vector3(R, G, B);
+}
+
 Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up, float right)
 {
 	if (forward == 0.0f && up == 0.0f && right == 0.0f)
