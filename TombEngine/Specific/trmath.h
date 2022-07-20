@@ -68,6 +68,7 @@ Vector3Int* FP_Normalise(Vector3Int* v);
 
 const float Lerp(float v0, float v1, float t);
 const float Smoothstep(float edge0, float edge1, float x);
+const float Smoothstep(float x);
 const float Luma(Vector3 color);
 const Vector3 Screen(Vector3 ambient, Vector3 tint);
 const Vector4 Screen(Vector4 ambient, Vector4 tint);

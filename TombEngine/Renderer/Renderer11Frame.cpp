@@ -488,22 +488,19 @@ namespace TEN::Renderer
 			{
 				RendererLight* light = &currentRoom.Lights[j];
 
-				light->AffectNeighbourRooms = light->Type != LIGHT_TYPES::LIGHT_TYPE_SUN;
-
-				if (!light->AffectNeighbourRooms && roomToCheck != roomNumber)
-					continue;
-
 				// Check only lights different from sun
 				if (light->Type == LIGHT_TYPE_SUN)
 				{
-					// Sun is added without checks
-					light->Distance = D3D11_FLOAT32_MAX;
+					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
+					float distance = (position - lightPosition).Length();
+
+					// For current room, sun is added without distance checks
+					light->Distance = light->RoomNumber == roomNumber ? 0 : distance;
 					light->LocalIntensity = 0;
 				}
 				else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
 				{
 					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
 					float distance = (position - lightPosition).Length();
 
 					// Collect only lights nearer than 20 sectors
@@ -533,7 +530,6 @@ namespace TEN::Renderer
 				else if (light->Type == LIGHT_TYPE_SPOT)
 				{
 					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-
 					float distance = (position - lightPosition).Length();
 
 					// Collect only lights nearer than 20 sectors
@@ -571,15 +567,19 @@ namespace TEN::Renderer
 			}
 		}
 
-		// Sort lights by distance
-		std::sort(
-			tempLights.begin(),
-			tempLights.end(),
-			[](RendererLight* a, RendererLight* b)
-			{
-				return a->LocalIntensity > b->LocalIntensity;
-			}
-		);
+		// Sort lights by distance, if needed
+
+		if (tempLights.size() > MAX_LIGHTS_PER_ITEM)
+		{
+			std::sort(
+				tempLights.begin(),
+				tempLights.end(),
+				[](RendererLight* a, RendererLight* b)
+				{
+					return a->Distance < b->Distance;
+				}
+			);
+		}
 
 		// Now put actual lights to provided vector
 		lights.clear();
@@ -632,24 +632,31 @@ namespace TEN::Renderer
 		{
 			item->PreviousRoomNumber = nativeItem->RoomNumber;
 			item->CurrentRoomNumber = nativeItem->RoomNumber;
-			item->AmbientLightSteps = AMBIENT_LIGHT_INTERPOLATION_STEPS;
+			item->AmbientLightFade = 1.0f;
 		}
 		else if (nativeItem->RoomNumber != item->CurrentRoomNumber)
 		{
 			item->PreviousRoomNumber = item->CurrentRoomNumber;
 			item->CurrentRoomNumber = nativeItem->RoomNumber;
-			item->AmbientLightSteps = 0;
+			item->AmbientLightFade = 0.0f;
 		}
-		else if (item->AmbientLightSteps < AMBIENT_LIGHT_INTERPOLATION_STEPS)
-			item->AmbientLightSteps++;
+		else if (item->AmbientLightFade < 1.0f)
+		{
+			item->AmbientLightFade += AMBIENT_LIGHT_INTERPOLATION_STEP;
+			item->AmbientLightFade = std::clamp(item->AmbientLightFade, 0.0f, 1.0f);
+		}
 
-		if (item->PreviousRoomNumber == NO_ROOM)
+		if (item->PreviousRoomNumber == NO_ROOM || item->AmbientLightFade == 1.0f)
 			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
 		else
 		{
-			item->AmbientLight = (((AMBIENT_LIGHT_INTERPOLATION_STEPS - item->AmbientLightSteps) / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->PreviousRoomNumber].AmbientLight +
-				(item->AmbientLightSteps / (float)AMBIENT_LIGHT_INTERPOLATION_STEPS) * m_rooms[item->CurrentRoomNumber].AmbientLight);
-			item->AmbientLight.w = 1.0f;
+			auto fade = Smoothstep(item->AmbientLightFade);
+			auto prev = m_rooms[item->PreviousRoomNumber].AmbientLight;
+			auto next = m_rooms[item->CurrentRoomNumber].AmbientLight;
+
+			item->AmbientLight.x = Lerp(prev.x, next.x, fade);
+			item->AmbientLight.y = Lerp(prev.y, next.y, fade);
+			item->AmbientLight.z = Lerp(prev.z, next.z, fade);
 		}
 
 		// Multiply calculated ambient light by object tint
