@@ -323,24 +323,28 @@ namespace TEN::Renderer
 
 	void Renderer11::BindLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
 	{
-		m_stLights.NumLights = lights.size();
-		for (int j = 0; j < lights.size(); j++)
+		int numLights = 0;
+		for (int i = 0; i < lights.size(); i++)
 		{
-			memcpy(&m_stLights.Lights[j], lights[j], sizeof(ShaderLight));
+			float fadedCoeff = 1.0f;
 
 			// Interpolate lights which don't affect neighbor rooms
-
-			if (!lights[j]->AffectNeighbourRooms && roomNumber != NO_ROOM && lights[j]->RoomNumber != NO_ROOM)
+			if (!lights[i]->AffectNeighbourRooms && roomNumber != NO_ROOM && lights[i]->RoomNumber != NO_ROOM)
 			{
-				if (lights[j]->RoomNumber == prevRoomNumber)
-					m_stLights.Lights[j].Intensity *= Smoothstep(1.0f - fade);
-				else if (lights[j]->RoomNumber == roomNumber)
-					m_stLights.Lights[j].Intensity *= Smoothstep(fade);
+				if (lights[i]->RoomNumber == prevRoomNumber)
+					fadedCoeff = Smoothstep(1.0f - fade);
+				else if (lights[i]->RoomNumber == roomNumber)
+					fadedCoeff = Smoothstep(fade);
 				else
-					m_stLights.Lights[j].Intensity = 0.0f;
+					continue;
 			}
+
+			memcpy(&m_stLights.Lights[numLights], lights[i], sizeof(ShaderLight));
+			m_stLights.Lights[numLights].Intensity *= fadedCoeff;
+			numLights++;
 		}
 
+		m_stLights.NumLights = numLights;
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 		BindConstantBufferVS(CB_LIGHTS, m_cbLights.get());

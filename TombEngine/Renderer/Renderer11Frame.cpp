@@ -377,8 +377,8 @@ namespace TEN::Renderer
 			newItem->Scale = Matrix::CreateScale(1.0f);
 			newItem->World = newItem->Rotation * newItem->Translation;
 
-			CollectLightsForItem(item->RoomNumber, newItem);
-			CalculateAmbientLight(newItem);
+			CalculateLightFades(newItem);
+			CollectLightsForItem(newItem);
 
 			room.ItemsToDraw.push_back(newItem);
 		}
@@ -421,7 +421,7 @@ namespace TEN::Renderer
 
 			std::vector<RendererLight*> lights;
 			if (obj.ObjectMeshes.front()->LightMode != LIGHT_MODES::LIGHT_MODE_STATIC)
-				CollectLights(mesh->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, false, lights);
+				CollectLights(mesh->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, room.RoomNumber, NO_ROOM, false, lights);
 
 			Matrix world = (Matrix::CreateFromYawPitchRoll(TO_RAD(mesh->pos.Orientation.y), TO_RAD(mesh->pos.Orientation.x), TO_RAD(mesh->pos.Orientation.z)) *
 							Matrix::CreateTranslation(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z));
@@ -439,7 +439,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer11::CollectLights(Vector3 position, float radius, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights)
+	void Renderer11::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, std::vector<RendererLight*>& lights)
 	{
 		if (m_rooms.size() < roomNumber)
 			return;
@@ -491,11 +491,12 @@ namespace TEN::Renderer
 				// Check only lights different from sun
 				if (light->Type == LIGHT_TYPE_SUN)
 				{
-					Vector3 lightPosition = Vector3(light->Position.x, light->Position.y, light->Position.z);
-					float distance = (position - lightPosition).Length();
+					// Suns from non-adjacent rooms are not added!
+					if (roomToCheck != roomNumber && prevRoomNumber != NO_ROOM && prevRoomNumber != roomToCheck)
+						continue;
 
-					// For current room, sun is added without distance checks
-					light->Distance = light->RoomNumber == roomNumber ? 0 : distance;
+					// Sun is added without distance checks
+					light->Distance = 0;
 					light->LocalIntensity = 0;
 				}
 				else if (light->Type == LIGHT_TYPE_POINT || light->Type == LIGHT_TYPE_SHADOW)
@@ -518,7 +519,7 @@ namespace TEN::Renderer
 					light->Distance = distance;
 
 					// If collecting shadows, try to collect shadow casting light
-					if (light->CastShadows && collectShadowLight && light->Type == LIGHT_TYPE_POINT)
+					if (light->CastShadows && prioritizeShadowLight && light->Type == LIGHT_TYPE_POINT)
 					{
 						if (intensity >= brightest)
 						{
@@ -546,7 +547,7 @@ namespace TEN::Renderer
 					light->LocalIntensity = intensity;
 
 					// If shadow pointer provided, try to collect shadow casting light
-					if (light->CastShadows && collectShadowLight)
+					if (light->CastShadows && prioritizeShadowLight)
 					{
 						if (intensity >= brightest)
 						{
@@ -585,13 +586,13 @@ namespace TEN::Renderer
 		lights.clear();
 
 		// Always add brightest light, if collecting shadow light is specified, even if it's far in range
-		if (collectShadowLight && brightestLight)
+		if (prioritizeShadowLight && brightestLight)
 			lights.push_back(brightestLight);
 
 		// Add max 8 lights per item, including the shadow light for Lara eventually
 		for (auto l : tempLights)
 		{
-			if (collectShadowLight && brightestLight == l)
+			if (prioritizeShadowLight && brightestLight == l)
 				continue;
 
 			lights.push_back(l);
@@ -604,7 +605,7 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForCamera()
 	{
 		std::vector<RendererLight*> lightsToDraw;
-		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.roomNumber, true, lightsToDraw);
+		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.roomNumber, NO_ROOM, true, lightsToDraw);
 
 		if (lightsToDraw.size() > 0 && lightsToDraw.front()->CastShadows)
 			shadowLight = lightsToDraw.front();
@@ -614,16 +615,16 @@ namespace TEN::Renderer
 	
 	void Renderer11::CollectLightsForEffect(short roomNumber, RendererEffect* effect)
 	{
-		CollectLights(effect->Effect->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, false, effect->LightsToDraw);
+		CollectLights(effect->Effect->pos.Position.ToVector3(), ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, NO_ROOM, false, effect->LightsToDraw);
 	}
 
-	void Renderer11::CollectLightsForItem(short roomNumber, RendererItem* item)
+	void Renderer11::CollectLightsForItem(RendererItem* item)
 	{
 		auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
-		CollectLights(pos, ITEM_LIGHT_COLLECTION_RADIUS, roomNumber, false, item->LightsToDraw);
+		CollectLights(pos, ITEM_LIGHT_COLLECTION_RADIUS, item->CurrentRoomNumber, item->PreviousRoomNumber, false, item->LightsToDraw);
 	}
 
-	void Renderer11::CalculateAmbientLight(RendererItem *item)
+	void Renderer11::CalculateLightFades(RendererItem *item)
 	{
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 

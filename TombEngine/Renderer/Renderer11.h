@@ -442,12 +442,12 @@ namespace TEN::Renderer
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
-		void CollectLights(Vector3 position, float radius, int roomNumber, bool collectShadowLight, std::vector<RendererLight*>& lights);
-		void CollectLightsForItem(short roomNumber, RendererItem* item);
+		void CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, std::vector<RendererLight*>& lights);
+		void CollectLightsForItem(RendererItem* item);
 		void CollectLightsForEffect(short roomNumber, RendererEffect* effect);
 		void CollectLightsForRoom(short roomNumber, RenderView& renderView);
 		void CollectLightsForCamera();
-		void CalculateAmbientLight(RendererItem* item);
+		void CalculateLightFades(RendererItem* item);
 		void CollectEffects(short roomNumber);
 		void ClearScene();
 		void ClearSceneItems();
