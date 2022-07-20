@@ -316,6 +316,11 @@ namespace TEN::Renderer
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
 	}
 
+	void Renderer11::BindLights(std::vector<RendererLight*>& lights)
+	{
+		BindLights(lights, NO_ROOM, NO_ROOM, 1.0f);
+	}
+
 	void Renderer11::BindLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
 	{
 		m_stLights.NumLights = lights.size();
