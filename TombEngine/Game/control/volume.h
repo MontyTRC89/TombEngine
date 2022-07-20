@@ -41,6 +41,10 @@ struct TriggerVolume
 	std::string OnInside;
 	std::string OnLeave;
 
+	std::string ParamOnEnter = "nil";
+	std::string ParamOnInside = "nil";
+	std::string ParamOnLeave = "nil";
+
 	int Activators;
 	bool OneShot;
 

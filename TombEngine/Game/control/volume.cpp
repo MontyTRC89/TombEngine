@@ -58,13 +58,13 @@ namespace TEN::Control::Volumes
 				{
 					volume->Status = TriggerStatus::Entering;
 					if (!volume->OnEnter.empty())
-						g_GameScript->ExecuteFunction(volume->OnEnter, triggerer);
+						g_GameScript->ExecuteFunction(volume->OnEnter, triggerer, volume->ParamOnEnter);
 				}
 				else
 				{
 					volume->Status = TriggerStatus::Inside;
 					if (!volume->OnInside.empty())
-						g_GameScript->ExecuteFunction(volume->OnInside, triggerer);
+						g_GameScript->ExecuteFunction(volume->OnInside, triggerer, volume->ParamOnInside);
 				}
 			}
 			else
@@ -73,7 +73,7 @@ namespace TEN::Control::Volumes
 				{
 					volume->Status = TriggerStatus::Leaving;
 					if (!volume->OnLeave.empty())
-						g_GameScript->ExecuteFunction(volume->OnLeave, triggerer);
+						g_GameScript->ExecuteFunction(volume->OnLeave, triggerer, volume->ParamOnLeave);
 				}
 				else
 					volume->Status = TriggerStatus::Outside;
