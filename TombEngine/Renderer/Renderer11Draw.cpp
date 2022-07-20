@@ -976,6 +976,7 @@ namespace TEN::Renderer
 			dynamicLight.Color = Vector3(r / 255.0f, g / 255.0f, b / 255.0f) * 2.0f;
 		}
 
+		dynamicLight.RoomNumber = NO_ROOM;
 		dynamicLight.Intensity = 1.0f;
 		dynamicLight.Position = Vector3(float(x), float(y), float(z));
 		dynamicLight.Out = falloff * 256.0f;
@@ -1682,7 +1683,7 @@ namespace TEN::Renderer
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
 		// Bind lights touching that item
-		BindLights(item->LightsToDraw);
+		BindLights(item->LightsToDraw, item->CurrentRoomNumber, item->PreviousRoomNumber, item->AmbientLightFade);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
@@ -1735,7 +1736,7 @@ namespace TEN::Renderer
 		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 		BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-		BindLights(info->item->LightsToDraw);
+		BindLights(info->item->LightsToDraw, info->item->CurrentRoomNumber, info->item->PreviousRoomNumber, info->item->AmbientLightFade);
 
 		// Set texture
 		BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[info->bucket->Texture]),

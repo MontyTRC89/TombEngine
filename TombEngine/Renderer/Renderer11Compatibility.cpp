@@ -267,10 +267,6 @@ namespace TEN::Renderer
 					RendererLight* light = &r->Lights[l];
 					ROOM_LIGHT* oldLight = &room.lights[l];
 
-					// Monty's temp variables for sorting
-					light->LocalIntensity = 0;
-					light->Distance = 0;
-
 					if (oldLight->type == LIGHT_TYPES::LIGHT_TYPE_SUN)
 					{
 						light->Color = Vector3(oldLight->r, oldLight->g, oldLight->b) * oldLight->intensity;
@@ -312,6 +308,12 @@ namespace TEN::Renderer
 						light->CastShadows = oldLight->castShadows;
 						light->Type = LIGHT_TYPE_SPOT;
 					}
+
+					// Monty's temp variables for sorting
+					light->LocalIntensity = 0;
+					light->Distance = 0;
+					light->RoomNumber = i;
+					light->AffectNeighbourRooms = light->Type != LIGHT_TYPES::LIGHT_TYPE_SUN;
 
 					oldLight++;
 				}

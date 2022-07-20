@@ -47,9 +47,11 @@ float3 DoSpecularPoint(float3 pos, float3 n, ShaderLight light, float strength)
 			float3 reflectDir = reflect(lightDir, n);
 
 			float3 color = light.Color.xyz;
+			float intensity = saturate(light.Intensity);
 			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 			float attenuation = (radius - dist) / radius;
-			return attenuation * spec * color;
+
+			return attenuation * spec * color * intensity;
 		}
 	}
 }
@@ -62,9 +64,12 @@ float3 DoSpecularSun(float3 n, ShaderLight light, float strength)
 	{
 		float3 lightDir = normalize(light.Direction);
 		float3 reflectDir = reflect(lightDir, n);
+
 		float3 color = light.Color.xyz;
+		float intensity = saturate(light.Intensity);
 		float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
-		return spec * color;
+
+		return spec * color * intensity;
 	}
 }
 
@@ -86,9 +91,11 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 			float3 reflectDir = reflect(lightDir, n);
 
 			float3 color = light.Color.xyz;
+			float intensity = saturate(light.Intensity);
 			float spec = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), strength * SPEC_FACTOR);
 			float attenuation = (radius - dist) / radius;
-			return attenuation * spec * color;
+
+			return attenuation * spec * color * intensity;
 		}
 	}
 }
@@ -97,7 +104,7 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
-	float intensity = light.Intensity;
+	float intensity = saturate(light.Intensity);
 	float radius = light.Out;
 
 	float3 lightVec = (lightPos - pos);
@@ -111,7 +118,7 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 		float d = saturate(dot(n, lightVec));
 		float attenuation = ((radius - distance) / radius);
 
-		return saturate(color * saturate(intensity) * attenuation * d);
+		return saturate(color * intensity * attenuation * d);
 	}
 }
 
@@ -119,7 +126,7 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 lightPos = light.Position.xyz;
 	float3 color = light.Color.xyz;
-	float intensity = light.Intensity;
+	float intensity = saturate(light.Intensity);
 	float3 direction = -light.Direction.xyz;;
 	float innerRange = light.In;
 	float outerRange = light.Out;
@@ -153,7 +160,7 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 			if (attenuation > 0.0f)
 			{
 				float falloff = saturate((outerRange - distance) / (outerRange - innerRange + 1.0f));
-				return saturate(color * saturate(intensity) * attenuation * falloff * d);
+				return saturate(color * intensity * attenuation * falloff * d);
 			}
 			else
 				return float3(0, 0, 0);
@@ -164,6 +171,7 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 color = light.Color.xyz;
+	float3 intensity = saturate(light.Intensity);
 	float3 direction = light.Direction.xyz;
 
 	direction = normalize(direction);
@@ -173,7 +181,7 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 	if (d < 0)
 		return float3(0, 0, 0);
 	else
-		return (color * d);
+		return (color * intensity * d);
 }
 
 float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen)
