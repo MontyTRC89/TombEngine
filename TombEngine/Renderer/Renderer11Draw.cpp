@@ -309,7 +309,7 @@ namespace TEN::Renderer
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
 		m_stStatic.Color = room.AmbientLight;
-		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
