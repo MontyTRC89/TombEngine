@@ -16,7 +16,7 @@ float3 Glow(float3 color, float3 effect, float wibble)
 
 	if (effect.x > 0.0f)
 	{
-		float intensity = effect.x * lerp(0.3f, 1.0f, wibble * 0.5f + 0.5f);
+		float intensity = effect.x * lerp(-0.5f, 1.0f, wibble * 0.5f + 0.5f);
 		col = color + float3(intensity, intensity, intensity);
 	}
 
