@@ -171,7 +171,7 @@ void InitialiseSpotCam(short Sequence)
 	if ((spotcam->flags & SCF_DISABLE_LARA_CONTROLS))
 	{
 		Lara.Control.Locked = true;
-		SetCinematicBars(SPOTCAM_CINEMATIC_BARS_HEIGHT, SPOTCAM_CINEMATIC_BARS_SPEED);
+		SetCinematicBars(1.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 	}
 
 	if (spotcam->flags & SCF_TRACKING_CAM)
@@ -617,7 +617,7 @@ void CalculateSpotCameras()
 					if (SpotCam[CurrentSplineCamera].flags & SCF_DISABLE_LARA_CONTROLS)
 					{						
 						if (CurrentLevel)
-							SetCinematicBars(SPOTCAM_CINEMATIC_BARS_HEIGHT, SPOTCAM_CINEMATIC_BARS_SPEED);
+							SetCinematicBars(1.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
 						Lara.Control.Locked = true;
 					}
