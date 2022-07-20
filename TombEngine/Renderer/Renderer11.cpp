@@ -332,9 +332,9 @@ namespace TEN::Renderer
 			if (!lights[i]->AffectNeighbourRooms && roomNumber != NO_ROOM && lights[i]->RoomNumber != NO_ROOM)
 			{
 				if (lights[i]->RoomNumber == prevRoomNumber)
-					fadedCoeff = Smoothstep(1.0f - fade);
+					fadedCoeff = 1.0f - fade;
 				else if (lights[i]->RoomNumber == roomNumber)
-					fadedCoeff = Smoothstep(fade);
+					fadedCoeff = fade;
 				else
 					continue;
 			}

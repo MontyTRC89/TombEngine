@@ -651,13 +651,12 @@ namespace TEN::Renderer
 			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
 		else
 		{
-			auto fade = Smoothstep(item->AmbientLightFade);
 			auto prev = m_rooms[item->PreviousRoomNumber].AmbientLight;
 			auto next = m_rooms[item->CurrentRoomNumber].AmbientLight;
 
-			item->AmbientLight.x = Lerp(prev.x, next.x, fade);
-			item->AmbientLight.y = Lerp(prev.y, next.y, fade);
-			item->AmbientLight.z = Lerp(prev.z, next.z, fade);
+			item->AmbientLight.x = Lerp(prev.x, next.x, item->AmbientLightFade);
+			item->AmbientLight.y = Lerp(prev.y, next.y, item->AmbientLightFade);
+			item->AmbientLight.z = Lerp(prev.z, next.z, item->AmbientLightFade);
 		}
 
 		// Multiply calculated ambient light by object tint
