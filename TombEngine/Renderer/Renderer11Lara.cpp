@@ -281,7 +281,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-	BindLights(item->LightsToDraw);
+	BindLights(item->LightsToDraw, item->CurrentRoomNumber, item->AmbientLightFade);
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{

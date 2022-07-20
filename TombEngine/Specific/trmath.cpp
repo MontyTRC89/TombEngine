@@ -286,6 +286,16 @@ const float Smoothstep(float edge0, float edge1, float x)
 	return x * x * (3 - 2 * x);
 }
 
+const float Smoothstep(float x)
+{
+	if (x == 0.0f)
+		return 0.0f;
+	else if (x == 1.0f)
+		return 1.0f;
+	else
+		return Smoothstep(0.0f, 1.0f, std::clamp(x, 0.0f, 1.0f));
+}
+
 const float Luma(Vector3 color)
 {
 	// Use Rec.709 trichromat formula to get perceptive luma value

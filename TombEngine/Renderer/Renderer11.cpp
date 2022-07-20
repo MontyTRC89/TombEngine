@@ -316,11 +316,26 @@ namespace TEN::Renderer
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
 	}
 
-	void Renderer11::BindLights(std::vector<RendererLight*>& lights)
+	void Renderer11::BindLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
 	{
 		m_stLights.NumLights = lights.size();
 		for (int j = 0; j < lights.size(); j++)
+		{
 			memcpy(&m_stLights.Lights[j], lights[j], sizeof(ShaderLight));
+
+			// Interpolate lights which don't affect neighbor rooms
+
+			if (!lights[j]->AffectNeighbourRooms && roomNumber != NO_ROOM && lights[j]->RoomNumber != NO_ROOM)
+			{
+				if (lights[j]->RoomNumber == prevRoomNumber)
+					m_stLights.Lights[j].Intensity *= Smoothstep(1.0f - fade);
+				else if (lights[j]->RoomNumber == roomNumber)
+					m_stLights.Lights[j].Intensity *= Smoothstep(fade);
+				else
+					m_stLights.Lights[j].Intensity = 0.0f;
+			}
+		}
+
 		m_cbLights.updateData(m_stLights, m_context.Get());
 		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
 		BindConstantBufferVS(CB_LIGHTS, m_cbLights.get());
