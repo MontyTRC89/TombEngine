@@ -291,7 +291,7 @@ const float Smoothstep(float edge0, float edge1, float x)
 	x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
 
 	// Evaluate polynomial
-	return x * x * (3 - 2 * x);
+	return x * x * x * (x * (x * 6 - 15) + 10);
 }
 
 const float Smoothstep(float x)

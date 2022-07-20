@@ -1,6 +1,8 @@
 #pragma once
 #include "Specific/phd_global.h"
 
+constexpr auto FPS = 30;
+
 constexpr auto PI = 3.14159265358979323846f;
 constexpr auto RADIAN = 0.01745329252f;
 constexpr auto ONE_DEGREE = 182;
