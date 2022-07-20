@@ -279,6 +279,14 @@ const float Lerp(float v0, float v1, float t)
 
 const float Smoothstep(float edge0, float edge1, float x)
 {
+	x = std::clamp(x, edge0, edge1);
+
+	// Don't process if input value is the same as one of edges
+	if (x == edge0)
+		return edge0;
+	else if (x == edge1)
+		return edge1;
+
 	// Scale, bias and saturate x to 0..1 range
 	x = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
 
@@ -288,12 +296,7 @@ const float Smoothstep(float edge0, float edge1, float x)
 
 const float Smoothstep(float x)
 {
-	if (x == 0.0f)
-		return 0.0f;
-	else if (x == 1.0f)
-		return 1.0f;
-	else
-		return Smoothstep(0.0f, 1.0f, std::clamp(x, 0.0f, 1.0f));
+	return Smoothstep(0.0f, 1.0f, x);
 }
 
 const float Luma(Vector3 color)
