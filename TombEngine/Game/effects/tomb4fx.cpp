@@ -996,6 +996,7 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 	gshell->fallspeed = -48 - (GetRandomControl() & 7);
 	gshell->objectNumber = objNum;
 	gshell->counter = (GetRandomControl() & 0x1F) + 60;
+
 	if (hand)
 	{
 		if (weaponType == LaraWeaponType::Shotgun)

@@ -173,8 +173,7 @@ namespace TEN::Renderer
 			m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 			// Set texture
-			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]),
-				SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[0]), SAMPLER_ANISOTROPIC_CLAMP);
 			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[0]), SAMPLER_NONE);
 
 			// Set camera matrices
@@ -310,46 +309,52 @@ namespace TEN::Renderer
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
 		m_stStatic.Color = room.AmbientLight;
-		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
+		
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		BindLights(item->LightsToDraw);
 
 		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
 
-		for (int i = 0; i < 24; i++)
+		for (int i = 0; i < MAX_GUNSHELL; i++)
 		{
 			GUNSHELL_STRUCT* gunshell = &Gunshells[i];
 
-			if (gunshell->counter > 0)
+			if (gunshell->counter <= 0)
+				continue;
+
+			ObjectInfo* obj = &Objects[gunshell->objectNumber];
+			RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
+
+			Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
+															gunshell->pos.Position.z);
+			Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.Orientation.y), TO_RAD(gunshell->pos.Orientation.x),
+																TO_RAD(gunshell->pos.Orientation.z));
+			Matrix world = rotation * translation;
+
+			m_stStatic.World = world;
+			m_stStatic.Position = Vector4(gunshell->pos.Position.x, gunshell->pos.Position.y, gunshell->pos.Position.z, 1.0f);
+
+			m_cbStatic.updateData(m_stStatic, m_context.Get());
+			BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+			BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
+
+			RendererMesh* mesh = moveableObj.ObjectMeshes[0];
+
+			for (auto& bucket : mesh->Buckets)
 			{
-				ObjectInfo* obj = &Objects[gunshell->objectNumber];
-				RendererObject& moveableObj = *m_moveableObjects[gunshell->objectNumber];
+				if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
+					continue;
 
-				Matrix translation = Matrix::CreateTranslation(gunshell->pos.Position.x, gunshell->pos.Position.y,
-															   gunshell->pos.Position.z);
-				Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(gunshell->pos.Orientation.y), TO_RAD(gunshell->pos.Orientation.x),
-																 TO_RAD(gunshell->pos.Orientation.z));
-				Matrix world = rotation * translation;
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+				BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
 
-				m_stStatic.World = world;
-				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+				// Draw vertices
+				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
-				m_cbStatic.updateData(m_stStatic, m_context.Get());
-				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-				BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
-
-				RendererMesh* mesh = moveableObj.ObjectMeshes[0];
-
-				for (auto& bucket : mesh->Buckets)
-				{
-					if (bucket.NumVertices == 0 && bucket.BlendMode == BLEND_MODES::BLENDMODE_OPAQUE)
-						continue;
-
-					// Draw vertices
-					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-					m_numMoveablesDrawCalls++;
-				}
+				m_numMoveablesDrawCalls++;
 			}
 		}
 	}

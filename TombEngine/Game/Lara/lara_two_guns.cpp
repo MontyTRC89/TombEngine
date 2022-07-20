@@ -210,7 +210,7 @@ void AnimatePistols(ItemInfo* laraItem, LaraWeaponType weaponType)
 					else
 					{
 						lara->LeftArm.GunSmoke = 28;
-						TriggerGunShell(0, ID_GUNSHELL, weaponType); // left hand
+						TriggerGunShell(0, ID_GUNSHELL, weaponType); // Left hand
 						lara->LeftArm.GunFlash = weapon->FlashTime;
 					}
 
