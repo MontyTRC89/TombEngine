@@ -57,7 +57,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.WorldPosition = worldPosition;
 	
 	float3 Tangent = mul(float4(input.Tangent, 0), world).xyz;
-	float3 Bitangent = mul(float4(input.Bitangent, 0), world).xyz;
+    float3 Bitangent = cross(normal, Tangent);
 	float3x3 TBN = float3x3(Tangent, Bitangent, normal);
 
 	output.TBN = transpose(TBN);
