@@ -689,6 +689,26 @@ namespace TEN::Input
 		rumbleData = {};
 	}
 
+	void ClearAction(ActionID actionID)
+	{
+		ActionMap[(int)actionID].Clear();
+
+		int actionBit = 1 << (int)actionID;
+		DbInput &= ~actionBit;
+		TrInput &= ~actionBit;
+	}
+
+	bool NoAction()
+	{
+		for (auto& action : ActionMap)
+		{
+			if (action.IsHeld())
+				return false;
+		}
+
+		return true;
+	}
+
 	bool IsClicked(ActionID actionID)
 	{
 		return ActionMap[(int)actionID].IsClicked();
@@ -709,17 +729,6 @@ namespace TEN::Input
 		return ActionMap[(int)actionID].IsReleased();
 	}
 
-	bool NoAction()
-	{
-		for (auto& action : ActionMap)
-		{
-			if (action.IsHeld())
-				return false;
-		}
-
-		return true;
-	}
-
 	float GetActionValue(ActionID actionID)
 	{
 		return ActionMap[(int)actionID].GetValue();
@@ -733,14 +742,5 @@ namespace TEN::Input
 	float GetActionTimeInactive(ActionID actionID)
 	{
 		return ActionMap[(int)actionID].GetTimeInactive();
-	}
-
-	void ClearAction(ActionID actionID)
-	{
-		ActionMap[(int)actionID].Clear();
-
-		int actionBit = 1 << (int)actionID;
-		DbInput &= ~actionBit;
-		TrInput &= ~actionBit;
 	}
 }

@@ -6,7 +6,7 @@ namespace TEN::Input
 	{
 		None = -1,
 
-		// General control
+		// Basic control
 		Forward,
 		Back,
 		Left,
@@ -16,12 +16,12 @@ namespace TEN::Input
 		Walk,
 		Jump,
 		Action,
-		Draw,
-		Flare,
+		DrawWeapon,
+		Flare, // Convert to generic Light button under Item hotkeys section.
 		Look,
 		Roll,
-		Option,
-		Pause,
+		Option, // Move to GUI control section.
+		Pause, // Move to GUI control section.
 		LeftStep,
 		RightStep,
 
@@ -33,12 +33,32 @@ namespace TEN::Input
 		Brake,
 		Fire,*/
 
-		// Hotkeys
+		// Item hotkeys
+		/*Light, // Generic light button may be used for flares.
+		Binoculars,
+		SmallMedipack,
+		BigMedipack,
+		NextWeapon,
+		PreviousWeapon,
+		Weapon1,
+		Weapon2,
+		Weapon3,
+		Weapon4,
+		Weapon5,
+		Weapon6,
+		Weapon7,
+		Weapon8,
+		Weapon9,
+		Weapon10,*/
+
+		// GUI control
+		/*Option,
+		Pause,*/
 		Save,
 		Load,
 		Select,
 		Deselect,
-		SwitchTarget,
+		SwitchTarget, // Look -> SwitchTarget conversion must be handled differently.
 
 		Count
 	} In;
