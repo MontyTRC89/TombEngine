@@ -190,6 +190,7 @@ void AnimateLara(ItemInfo* item)
 	if (lara->Control.Rope.Ptr != -1)
 		DelAlignLaraToRope(item);
 
+	// NOTE: In case problems arise, simply floor each velocity argument.
 	if (!lara->Control.IsMoving)
 		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, 0.0f, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
 
@@ -347,6 +348,7 @@ void AnimateItem(ItemInfo* item)
 		item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
 	}
 	
+	// NOTE: In case problems arise, simply floor each velocity argument.
 	TranslateItem(item, item->Pose.Orientation.y, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
 
 	// Update matrices.
