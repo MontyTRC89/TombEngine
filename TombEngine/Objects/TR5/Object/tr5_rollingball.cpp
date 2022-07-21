@@ -82,10 +82,10 @@ void RollingBallControl(short itemNumber)
 			if (abs(item->Animation.Velocity) <= CLICK(2) || (GetRandomControl() & 0x1F))
 				item->Animation.VerticalVelocity = 0;
 			else
-				item->Animation.VerticalVelocity = -(short)(GetRandomControl() % ((int)item->Animation.Velocity / 8));
+				item->Animation.VerticalVelocity = -(GetRandomControl() % int(round(item->Animation.Velocity) / 8.0f));
 		}
 		else
-			item->Animation.VerticalVelocity = -(short)(item->Animation.VerticalVelocity / 4);
+			item->Animation.VerticalVelocity = -item->Animation.VerticalVelocity / 4.0f;
 	}
 
 	int frontX = item->Pose.Position.x;
