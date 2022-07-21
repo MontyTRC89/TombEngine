@@ -272,6 +272,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 
 	m_stItem.World = m_LaraWorldMatrix;
 	m_stItem.Position = Vector4(LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z, 1.0f);
+	m_stItem.Color = item->Color;
 	m_stItem.AmbientLight = item->AmbientLight;
 	memcpy(m_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), sizeof(Matrix) * MAX_BONES);
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -281,7 +282,7 @@ void TEN::Renderer::Renderer11::DrawLara(RenderView& view, bool transparent)
 	BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 	BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-	BindLights(item->LightsToDraw, item->CurrentRoomNumber, item->PreviousRoomNumber, item->AmbientLightFade);
+	BindLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{

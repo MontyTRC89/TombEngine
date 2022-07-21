@@ -80,9 +80,10 @@ namespace TEN::Renderer
 
 	struct RendererStatic
 	{
-		int Id;
-		int RoomIndex;
+		int ObjectNumber;
+		int RoomNumber;
 		Matrix World;
+		Vector4 Color;
 		Vector4 AmbientLight;
 		std::vector<RendererLight*> LightsToDraw;
 	};
@@ -104,11 +105,12 @@ namespace TEN::Renderer
 		Matrix Rotation;
 		Matrix Scale;
 		Matrix AnimationTransforms[MAX_BONES];
-		std::vector<RendererLight*> LightsToDraw;
-		int PreviousRoomNumber = NO_ROOM;
-		int CurrentRoomNumber = NO_ROOM;
+		int RoomNumber = NO_ROOM;
+		int PrevRoomNumber = NO_ROOM;
+		Vector4 Color;
 		Vector4 AmbientLight;
-		float AmbientLightFade;
+		std::vector<RendererLight*> LightsToDraw;
+		float LightFade;
 	};
 
 	struct RendererMesh

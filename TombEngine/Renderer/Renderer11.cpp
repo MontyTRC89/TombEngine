@@ -50,8 +50,8 @@ namespace TEN::Renderer
 
 		for (auto& item : m_items)
 		{
-			item.PreviousRoomNumber = NO_ROOM;
-			item.CurrentRoomNumber = NO_ROOM;
+			item.PrevRoomNumber = NO_ROOM;
+			item.RoomNumber = NO_ROOM;
 			item.ItemNumber = NO_ITEM;
 		}
 	}

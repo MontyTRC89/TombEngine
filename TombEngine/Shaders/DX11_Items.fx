@@ -12,6 +12,7 @@ cbuffer ItemBuffer : register(b1)
 	float4x4 World;
 	float4x4 Bones[MAX_BONES];
 	float4 ItemPosition;
+	float4 Color;
 	float4 AmbientLight;
 	int4 BoneLightModes[MAX_BONES / 4];
 };
@@ -69,6 +70,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.Position = mul(mul(float4(pos, 1.0f), world), ViewProjection);
 	output.Color = float4(col, input.Color.w);
+	output.Color *= Color;
 
 	// Apply distance fog
 	float d = distance(CamPositionWS.xyz, worldPosition);
@@ -95,7 +97,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
 		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normal, input.Sheen) :
-		StaticLight(AmbientLight.xyz, input.Color.xyz, tex.xyz);
+		StaticLight(input.Color.xyz, tex.xyz);
 
 	output.Color = saturate(float4(color, tex.w));
 
