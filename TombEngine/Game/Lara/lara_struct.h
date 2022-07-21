@@ -955,7 +955,6 @@ private:
 	bool isInfinite;
 
 public:
-
 	Ammo& operator --()
 	{
 		--count;

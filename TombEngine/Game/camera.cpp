@@ -1096,15 +1096,15 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance)
 void LaserSightCamera(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
+	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
+
+	bool firing = false;
 
 	if (WeaponDelay)
 		WeaponDelay--;
 
 	if (LSHKTimer)
 		LSHKTimer--;
-
-	bool firing = false;
-	auto& ammo = GetAmmo(item, lara->Control.Weapon.GunType);
 
 	if (!IsHeld(In::Action) || WeaponDelay || !ammo)
 	{
@@ -1291,9 +1291,9 @@ void BinocularCamera(ItemInfo* item)
 	}
 	else
 	{
-		Camera.target.x += (tx - Camera.target.x) >> 2;
-		Camera.target.y += (ty - Camera.target.y) >> 2;
-		Camera.target.z += (tz - Camera.target.z) >> 2;
+		Camera.target.x += (tx - Camera.target.x) / 4;
+		Camera.target.y += (ty - Camera.target.y) / 4;
+		Camera.target.z += (tz - Camera.target.z) / 4;
 		Camera.target.roomNumber = item->RoomNumber;
 	}
 
@@ -1333,21 +1333,8 @@ void BinocularCamera(ItemInfo* item)
 
 	Camera.oldType = Camera.type;
 
-	int range = 0;
-	int flags = 0;
-
-	if (!IsHeld(In::Walk))
-	{
-		range = 64;
-		flags = 0x10000;
-	}
-	else
-	{
-		range = 32;
-		flags = 0x8000;
-	}
-
-	if (IsHeld(In::Sprint))
+	int range = IsHeld(In::Walk) ? ANGLE(0.18f) : ANGLE(0.35f);
+	if (IsHeld(In::Sprint) && !IsHeld(In::Crouch))
 	{
 		BinocularRange -= range;
 		if (BinocularRange < ANGLE(0.7f))
@@ -1355,7 +1342,7 @@ void BinocularCamera(ItemInfo* item)
 		else
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
 	}
-	else if (IsHeld(In::Crouch))
+	else if (IsHeld(In::Crouch) && !IsHeld(In::Sprint))
 	{
 		BinocularRange += range;
 		if (BinocularRange > ANGLE(8.5f))
@@ -1364,7 +1351,9 @@ void BinocularCamera(ItemInfo* item)
 			SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
 	}
 
-	if (!LaserSight)
+	if (LaserSight)
+		LaserSightCamera(item);
+	else
 	{
 		auto src = Vector3Int(Camera.pos.x, Camera.pos.y, Camera.pos.z);
 		auto target = Vector3Int(Camera.target.x, Camera.target.y, Camera.target.z);
@@ -1374,8 +1363,6 @@ void BinocularCamera(ItemInfo* item)
 		if (IsHeld(In::Action))
 			LaraTorch(&src, &target, lara->ExtraHeadRot.y, 192);
 	}
-	else
-		LaserSightCamera(item);
 }
 
 void ConfirmCameraTargetPos()
@@ -1392,7 +1379,7 @@ void ConfirmCameraTargetPos()
 	else
 	{
 		Camera.target.x = LaraItem->Pose.Position.x;
-		Camera.target.y = (Camera.target.y + pos.y) >> 1;
+		Camera.target.y = (Camera.target.y + pos.y) / 2;
 		Camera.target.z = LaraItem->Pose.Position.z;
 	}
 
