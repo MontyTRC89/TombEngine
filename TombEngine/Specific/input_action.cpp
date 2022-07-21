@@ -9,9 +9,10 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
-	InputAction::InputAction(ActionID actionID)
+	InputAction::InputAction(ActionID actionID, int defaultBinding)
 	{
 		this->ID = actionID;
+		this->AddBinding(defaultBinding);
 	}
 
 	void InputAction::Update(float value)
@@ -51,6 +52,31 @@ namespace TEN::Input
 		this->TimeActive = 0.0f;
 		this->PrevTimeActive = 0.0f;
 		this->TimeInactive = 0.0f;
+	}
+	
+	void InputAction::AddBinding(int binding)
+	{
+		// Prevent duplicate bindings.
+		for (int existingBinding : Bindings)
+		{
+			if (binding == existingBinding)
+				return;
+		}
+
+		this->Bindings.push_back(binding);
+	}
+
+	void InputAction::ClearBinding(int binding)
+	{
+		// Do not attempt clear if default binding is the only element.
+		if (Bindings.size() < 2)
+			return;
+
+		for (size_t i = 1; i < Bindings.size(); i++)
+		{
+			if (Bindings[i] == binding)
+				this->Bindings.erase(Bindings.begin() + i);
+		}
 	}
 
 	void InputAction::PrintDebugInfo()
@@ -120,6 +146,11 @@ namespace TEN::Input
 	float InputAction::GetTimeInactive()
 	{
 		return TimeInactive;
+	}
+
+	std::vector<int> InputAction::GetBindings()
+	{
+		return Bindings;
 	}
 
 	void InputAction::UpdateValue(float value)

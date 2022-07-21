@@ -16,6 +16,7 @@
 #include "Sound/sound.h"
 
 using namespace OIS;
+using std::vector;
 using TEN::Renderer::g_Renderer;
 
 // Big TODO: Entire input system shouldn't be left exposed like this.
@@ -80,14 +81,20 @@ namespace TEN::Input
 	RumbleData rumbleData = {};
 
 	// Globals
-	std::vector<InputAction> ActionMap;
-	std::vector<bool>		 KeyMap;
-	std::vector<float>		 AxisMap;
+	vector<InputAction> ActionMap;
+	vector<bool>		KeyMap;
+	vector<float>		AxisMap;
 
 	int DbInput;
 	int TrInput;
 
-	// Default keys
+	vector<int>DefaultBindings =
+	{
+		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_PERIOD, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_RCONTROL, KC_SPACE, KC_COMMA, KC_NUMPAD0, KC_END, KC_ESCAPE, KC_P, KC_PGUP, KC_PGDOWN,
+		/*KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,*/
+		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
+	};
+
 	bool ConflictingKeys[KEY_COUNT];
 	short KeyboardLayout[2][KEY_COUNT] =
 	{
@@ -170,9 +177,9 @@ namespace TEN::Input
 			}
 		}
 
-		// Initialise input action map.
-		for (int i = 0; i < (int)ActionID::Count; i++)
-			ActionMap.push_back(InputAction((ActionID)i));
+		// Initialise action map.
+		for (size_t i = 0; i < (int)ActionID::Count; i++)
+			ActionMap.push_back(InputAction((ActionID)i, DefaultBindings[i]));
 	}
 
 	void DeInitialiseInput()
@@ -194,18 +201,18 @@ namespace TEN::Input
 
 	void ClearInputData()
 	{
-		for (int key = 0; key < KeyMap.size(); key++)
-			KeyMap[key] = false;
+		for (auto& key : KeyMap)
+			key = false;
 
-		for (int axis = 0; axis < InputAxis::Count; axis++)
-			AxisMap[axis] = 0.0f;
+		for (auto& axis : AxisMap)
+			axis = 0.0f;
 	}
 
 	bool LayoutContainsIndex(unsigned int index)
 	{
-		for (int l = 0; l < 2; l++)
+		for (size_t l = 0; l < 2; l++)
 		{
-			for (int i = 0; i < KEY_COUNT; i++)
+			for (size_t i = 0; i < KEY_COUNT; i++)
 			{
 				if (KeyboardLayout[l][i] == index)
 					return true;
@@ -217,13 +224,13 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (size_t i = 0; i < KEY_COUNT; i++)
 		{
 			short key = KeyboardLayout[0][i];
 
 			ConflictingKeys[i] = false;
 
-			for (int j = 0; j < KEY_COUNT; j++)
+			for (size_t j = 0; j < KEY_COUNT; j++)
 			{
 				if (key != KeyboardLayout[1][j])
 					continue;
@@ -316,7 +323,7 @@ namespace TEN::Input
 			}
 
 			// Scan POVs (controllers usually have one, but let's scan all of them for paranoia)
-			for (int pov = 0; pov < 4; pov++)
+			for (size_t pov = 0; pov < 4; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
@@ -372,7 +379,7 @@ namespace TEN::Input
 		{
 			oisKeyboard->capture();
 
-			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
+			for (size_t i = 0; i < MAX_KEYBOARD_KEYS; i++)
 			{
 				if (!oisKeyboard->isKeyDown((KeyCode)i))
 				{
@@ -392,6 +399,21 @@ namespace TEN::Input
 		}
 	}
 
+	// TODO!!!
+	bool GetActionBindingState(ActionID actionID)
+	{
+		for (int binding : ActionMap[(int)actionID].GetBindings())
+		{
+			if (KeyMap[binding])
+				return true;
+
+			// Mirrorings...
+			// Conflicts...
+		}
+
+		return false;
+	}
+
 	bool Key(int number)
 	{
 		for (int layout = 1; layout >= 0; layout--)
@@ -401,6 +423,7 @@ namespace TEN::Input
 			if (KeyMap[key])
 				return true;
 
+			// Mirror Ctrl, Shift, and Alt.
 			switch (key)
 			{
 			case KC_RCONTROL:

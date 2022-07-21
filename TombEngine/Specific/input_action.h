@@ -1,5 +1,7 @@
 #pragma once
 
+using std::vector;
+
 namespace TEN::Input
 {
 	typedef enum class ActionID
@@ -63,15 +65,16 @@ namespace TEN::Input
 		Count
 	} In;
 
-	// TODO: Each action should hold its own input mappping?
 	// TODO: For use with analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
 	{
 	public:
-		InputAction(ActionID actionID);
+		InputAction(ActionID actionID, int defaultBinding);
 
 		void Update(float value);
 		void Clear();
+		void AddBinding(int binding);
+		void ClearBinding(int binding);
 		void PrintDebugInfo();
 
 		bool IsClicked();
@@ -83,6 +86,7 @@ namespace TEN::Input
 		float GetValue();
 		float GetTimeActive();
 		float GetTimeInactive();
+		vector<int> GetBindings();
 
 	private:
 		ActionID ID			 = In::None;
@@ -91,6 +95,8 @@ namespace TEN::Input
 		float TimeActive	 = 0.0f;
 		float PrevTimeActive = 0.0f;
 		float TimeInactive	 = 0.0f;
+
+		vector<int> Bindings = {}; // TODO: Each action should hold its own input bindings?
 
 		void UpdateValue(float value);
 	};
