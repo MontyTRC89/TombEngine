@@ -1459,7 +1459,7 @@ void CrossbowBoltControl(short itemNumber)
 		auto bubblePos = item->Pose.Position;
 
 		if (item->Animation.Velocity > 64)
-			item->Animation.Velocity -= (item->Animation.Velocity / 16);
+			item->Animation.Velocity -= item->Animation.Velocity / 16;
 
 		if (GlobalCounter & 1)
 			CreateBubble(&bubblePos, item->RoomNumber, 4, 7, 0, 0, 0, 0);
