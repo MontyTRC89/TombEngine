@@ -423,6 +423,7 @@ namespace TEN::Entities::Vehicles
 	bool SkidooUserControl(ItemInfo* skidooItem, ItemInfo* laraItem, int height, int* pitch)
 	{
 		auto* skidoo = GetSkidooInfo(skidooItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		int maxVelocity = 0;
 		bool drive = false;
@@ -431,8 +432,10 @@ namespace TEN::Entities::Vehicles
 		{
 			*pitch = skidooItem->Animation.Velocity + (height - skidooItem->Pose.Position.y);
 
-			if (TrInput & IN_LOOK && skidooItem->Animation.Velocity == 0)
-				LookUpDown(laraItem);
+			if (skidooItem->Animation.Velocity)
+				lara->Control.LookMode = LookMode::Unrestricted;
+			else
+				lara->Control.LookMode = LookMode::Horizontal;
 
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
 				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);

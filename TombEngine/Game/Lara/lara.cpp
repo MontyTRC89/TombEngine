@@ -844,8 +844,8 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.OldPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara->Control.CanLook)
-		LookLeftRight(item);
+	if (TrInput & IN_LOOK && lara->Control.LookMode != LookMode::None)
+		DoLookAround(item);
 	else
 		ResetLook(item);
 
@@ -914,8 +914,8 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.OldPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara->Control.CanLook)
-		LookLeftRight(item);
+	if (TrInput & IN_LOOK && lara->Control.LookMode != LookMode::None)
+		DoLookAround(item);
 	else
 		ResetLook(item);
 

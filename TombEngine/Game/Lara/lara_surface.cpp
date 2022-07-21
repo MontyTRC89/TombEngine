@@ -41,6 +41,8 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
+
 	item->Animation.VerticalVelocity -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.VerticalVelocity < 0)
 		item->Animation.VerticalVelocity = 0;
@@ -48,12 +50,6 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 	if (item->HitPoints <= 0)
 	{
 		item->Animation.TargetState = LS_WATER_DEATH;
-		return;
-	}
-
-	if (TrInput & IN_LOOK)
-	{
-		LookUpDown(item);
 		return;
 	}
 

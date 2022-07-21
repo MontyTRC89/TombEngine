@@ -502,6 +502,7 @@ namespace TEN::Entities::Vehicles
 	bool RubberBoatUserControl(ItemInfo* rBoatItem, ItemInfo* laraItem)
 	{
 		auto* rBoat = GetRubberBoatInfo(rBoatItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		bool noTurn = true;
 
@@ -586,8 +587,10 @@ namespace TEN::Entities::Vehicles
 				else
 					rBoatItem->Animation.Velocity = 0;
 
-				if (TrInput & IN_LOOK && rBoatItem->Animation.Velocity == 0)
-					LookUpDown(laraItem);
+				if (rBoatItem->Animation.Velocity)
+					lara->Control.LookMode = LookMode::Unrestricted;
+				else
+					lara->Control.LookMode = LookMode::Horizontal;
 			}
 		}
 

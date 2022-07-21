@@ -95,22 +95,23 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 {
 	auto* lara = GetLaraInfo(item);
 
+	Camera.type = CameraType::Look;
+
+	// Define angle constants.
 	static const short hConstraintAngle = ANGLE(LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE);
 	static const short vConstraintAngle = ANGLE(LOOKCAM_VERTICAL_CONSTRAINT_ANGLE);
 	static const short lookCamTurnRate	= ANGLE(LOOKCAM_TURN_RATE);
 
-	Camera.type = CameraType::Look;
-
 	float hAxisCoeff = 0.0f;
-	if (lara->Control.LookMode == LookMode::Horizontal || lara->Control.LookMode == LookMode::Both)
+	if (lara->Control.LookMode == LookMode::Horizontal || lara->Control.LookMode == LookMode::Unrestricted)
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 
 	float vAxisCoeff = 0.0f;
-	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Both)
+	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Unrestricted)
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
 
-	int hAxisSign = std::copysign(1, hAxisCoeff);
-	int vAxisSign = std::copysign(1, vAxisCoeff);
+	int hSign = std::copysign(1, hAxisCoeff);
+	int vSign = std::copysign(1, vAxisCoeff);
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
@@ -123,7 +124,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 			lara->LookCameraRotation.y += lookCamTurnRate * hAxisCoeff;
 
 		if (abs(lara->LookCameraRotation.y) > hConstraintAngle)
-			lara->LookCameraRotation.y = hConstraintAngle * hAxisSign;
+			lara->LookCameraRotation.y = hConstraintAngle * hSign;
 	}
 
 	if (TrInput & (IN_FORWARD | IN_BACK))
@@ -137,7 +138,7 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 			lara->LookCameraRotation.x += lookCamTurnRate * vAxisCoeff;
 
 		if (abs(lara->LookCameraRotation.x) > vConstraintAngle)
-			lara->LookCameraRotation.x = vConstraintAngle * vAxisSign;
+			lara->LookCameraRotation.x = vConstraintAngle * vSign;
 	}
 
 	// Visually adapt head and torso rotation.
@@ -151,21 +152,6 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	{
 		lara->ExtraTorsoRot = lara->ExtraHeadRot;
 	}
-}
-
-// To remove.
-void LookLeftRight(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	Camera.type = CameraType::Look;
-}
-
-void LookUpDown(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	Camera.type = CameraType::Look;
 }
 
 void DoThumbstickCamera()
@@ -233,9 +219,23 @@ void LookCamera(ItemInfo* item)
 	Camera.target.z += (lookAtPos.z - Camera.target.z) / 4;
 	Camera.target.roomNumber = item->RoomNumber;
 
-	// TODO: Bring back mikeAtPos and mikeAtLara calculations
-
 	LookAt(&Camera, 0);
+
+	// Set mike position.
+	if (Camera.mikeAtLara)
+	{
+		Camera.actualAngle = item->Pose.Orientation.y + lara->ExtraHeadRot.y + lara->ExtraTorsoRot.y;
+		Camera.mikePos = item->Pose.Position;
+	}
+	else
+	{
+		Camera.actualAngle = phd_atan(Camera.target.z - Camera.pos.z, Camera.target.x - Camera.pos.x);
+		Camera.mikePos = Vector3Int(
+			Camera.pos.x + PhdPerspective * phd_sin(Camera.actualAngle),
+			Camera.mikePos.y = Camera.pos.y,
+			Camera.mikePos.z = Camera.pos.z + PhdPerspective * phd_cos(Camera.actualAngle)
+		);
+	}
 
 	Camera.oldType = Camera.type;
 }

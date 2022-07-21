@@ -75,8 +75,6 @@ extern float CinematicBarsSpeed;
 
 void DoLookAround(ItemInfo* item, bool invertVerticalAxis = true);
 
-void LookLeftRight(ItemInfo* item);
-void LookUpDown(ItemInfo* item);
 void DoThumbstickCamera();
 void LookCamera(ItemInfo* item);
 

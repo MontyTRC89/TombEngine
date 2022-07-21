@@ -552,6 +552,7 @@ namespace TEN::Entities::Vehicles
 	bool SpeedboatUserControl(ItemInfo* speedboatItem, ItemInfo* laraItem)
 	{
 		auto* speedboat = GetSpeedboatInfo(speedboatItem);
+		auto* lara = GetLaraInfo(laraItem);
 
 		bool noTurn = true;
 		int maxVelocity;
@@ -636,8 +637,10 @@ namespace TEN::Entities::Vehicles
 				else
 					speedboatItem->Animation.Velocity = 0;
 
-				if (TrInput & IN_LOOK && speedboatItem->Animation.Velocity == 0)
-					LookUpDown(laraItem);
+				if (speedboatItem->Animation.Velocity)
+					lara->Control.LookMode = LookMode::Unrestricted;
+				else
+					lara->Control.LookMode = LookMode::Horizontal;
 			}
 		}
 

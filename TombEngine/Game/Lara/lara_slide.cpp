@@ -25,6 +25,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
 	Camera.targetElevation = -ANGLE(45.0f);
 
 	if (item->HitPoints <= 0)
@@ -32,9 +33,6 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TestLaraSlide(item, coll))
 	{
@@ -133,6 +131,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
 	Camera.targetElevation = -ANGLE(45.0f);
 	Camera.targetAngle = ANGLE(135.0f);
 
@@ -141,9 +140,6 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TestLaraSlide(item, coll))
 	{

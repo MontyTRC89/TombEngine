@@ -25,6 +25,7 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
 	lara->Control.IsClimbingLadder = false;
 
 	if (item->HitPoints <= 0)
@@ -32,9 +33,6 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_IDLE;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;

@@ -933,7 +933,7 @@ enum class LookMode
 	None,
 	Horizontal,
 	Vertical,
-	Both
+	Unrestricted
 };
 
 enum class JumpDirection
@@ -1135,9 +1135,9 @@ struct LaraInventoryData
 	DiaryInfo Diary;
 
 	byte BeetleLife;
-	int BeetleComponents;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
-	byte SmallWaterskin;	// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4: has skin + 3 = 4
-	byte BigWaterskin;		// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6: has skin + 5 liters = 6
+	int BeetleComponents; // & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
+	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4: has skin + 3 = 4
+	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6: has skin + 5 liters = 6
 
 	bool HasBinoculars;
 	bool HasCrowbar;
@@ -1236,9 +1236,9 @@ struct LaraControlData
 	short TurnRate;
 	int	  CalculatedJumpVelocity;
 
+	LookMode	  LookMode;
 	HandStatus	  HandStatus;
 	WaterStatus	  WaterStatus;
-	LookMode	  LookMode;
 	JumpDirection JumpDirection;
 	LaraCountData Count;
 

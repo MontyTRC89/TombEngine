@@ -309,11 +309,12 @@ void lara_as_horizontal_bar_leap(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_default_col()
 void lara_as_tightrope_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.LookMode = LookMode::Unrestricted;
+
 	DoLaraTightropeBalanceRegen(item);
 	DoLaraTightropeLean(item);
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_FORWARD)
 	{
@@ -584,11 +585,12 @@ void lara_as_rope_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 // Collision:	lara_vcol_rope_idle() (111), lara_col_rope_swing() (114, 115)
 void lara_as_rope_idle(ItemInfo* item, CollisionInfo* coll)
 {
+	auto* lara = GetLaraInfo(item);
+
+	lara->Control.LookMode = LookMode::Unrestricted;
+
 	if (!(TrInput & IN_ACTION))
 		FallFromRope(item);
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 }
 
 // State:	LS_ROPE_IDLE (111)
@@ -726,6 +728,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -734,9 +737,6 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_FREEFALL; // TODO: Death state dispatch.
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -945,6 +945,7 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -953,9 +954,6 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_POLE_IDLE; // TODO: Death state dispatch.
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -973,7 +971,7 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_LEFT)
 		{
 			item->Animation.TargetState = LS_POLE_TURN_CLOCKWISE;
-			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 			return;
 		}
 
@@ -997,6 +995,7 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -1005,9 +1004,6 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_POLE_IDLE; // TODO: Death state dispatch.
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_ACTION)
 	{
@@ -1025,7 +1021,7 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 		if (TrInput & IN_RIGHT)
 		{
 			item->Animation.TargetState = LS_POLE_TURN_COUNTER_CLOCKWISE;
-			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX);
+			ModulateLaraTurnRateY(item, LARA_POLE_TURN_RATE_ACCEL, 0, LARA_POLE_TURN_RATE_MAX, true);
 			return;
 		}
 

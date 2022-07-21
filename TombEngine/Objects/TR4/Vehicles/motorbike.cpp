@@ -1010,8 +1010,10 @@ namespace TEN::Entities::Vehicles
 
 		if (motorbikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
-			if (!motorbike->Velocity && (TrInput & IN_LOOK))
-				LookUpDown(laraItem);
+			if (motorbikeItem->Animation.Velocity)
+				lara->Control.LookMode = LookMode::Unrestricted;
+			else
+				lara->Control.LookMode = LookMode::Horizontal;
 
 			// Moving forward.
 			if (motorbike->Velocity > 0)

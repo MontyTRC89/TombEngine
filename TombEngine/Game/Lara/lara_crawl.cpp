@@ -38,6 +38,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -51,9 +52,6 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	// HACK.
 	if (BinocularOn)
@@ -224,6 +222,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
 
@@ -232,10 +231,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
-
+	
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -279,6 +275,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
 
@@ -287,10 +284,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
-
+	
 	if ((TrInput & IN_CROUCH || lara->Control.KeepLow) &&
 		lara->Control.WaterStatus != WaterStatus::Wade)
 	{
@@ -370,6 +364,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
@@ -384,9 +379,6 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 		item->Animation.TargetState = LS_DEATH;
 		return;
 	}
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	// HACK.
 	if (BinocularOn)

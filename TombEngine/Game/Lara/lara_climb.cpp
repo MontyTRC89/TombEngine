@@ -350,6 +350,7 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
+	lara->Control.LookMode = LookMode::Unrestricted;
 	lara->Control.IsClimbingLadder = true;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
@@ -359,9 +360,6 @@ void lara_as_climb_idle(ItemInfo* item, CollisionInfo* coll)
 		Camera.targetAngle = -ANGLE(60.0f);
 	if (item->Animation.AnimNumber == LA_LADDER_DISMOUNT_RIGHT_START)
 		Camera.targetAngle = ANGLE(60.0f);
-
-	if (TrInput & IN_LOOK)
-		LookUpDown(item);
 
 	if (TrInput & IN_LEFT || TrInput & IN_LSTEP)
 	{
