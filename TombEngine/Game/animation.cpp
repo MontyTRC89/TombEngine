@@ -147,6 +147,10 @@ void AnimateLara(ItemInfo* item)
 		}
 	}
 
+	// TODO: Prep. for later velocity calculation refactor. @Sezz 2022.07.21
+	/*int frameCount = anim->frameEnd - anim->frameBase;
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;*/
+
 	if (item->Animation.IsAirborne)
 	{
 		if (TestEnvironment(ENV_FLAG_SWAMP, item))
@@ -154,8 +158,8 @@ void AnimateLara(ItemInfo* item)
 			item->Animation.Velocity -= item->Animation.Velocity / 8.0f;
 			if (abs(item->Animation.Velocity) < 8.0f)
 			{
-				item->Animation.Velocity = 0.0f;
 				item->Animation.IsAirborne = false;
+				item->Animation.Velocity = 0.0f;
 			}
 
 			if (item->Animation.VerticalVelocity > 128.0f)
@@ -168,6 +172,9 @@ void AnimateLara(ItemInfo* item)
 		}
 		else
 		{
+			// TODO: Prep. for later velocity calculation refactor. This one will need a closer look.
+			//item->Animation.Velocity -= anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
+
 			float velocity = anim->VelocityStart + anim->VelocityAccel * (item->Animation.FrameNumber - (anim->frameBase - 1));
 			item->Animation.Velocity -= velocity;
 			item->Animation.Velocity += velocity + anim->VelocityAccel;
@@ -177,12 +184,16 @@ void AnimateLara(ItemInfo* item)
 	}
 	else
 	{
+		// TODO: Prep. for later velocity calculation refactor.
+		/*if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
+			item->Animation.Velocity = (anim->VelocityStart / 2.0f) + ((((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame) / 4.0f);
+		else
+			item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);*/
+	
 		if (lara->Control.WaterStatus == WaterStatus::Wade && TestEnvironment(ENV_FLAG_SWAMP, item))
 			item->Animation.Velocity = (anim->VelocityStart / 2.0f) + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase)) / 4.0f;
 		else
 			item->Animation.Velocity = anim->VelocityStart + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
-
-		item->Pose.Position.y += lara->ExtraVelocity.y;
 	}
 
 	item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
@@ -192,7 +203,7 @@ void AnimateLara(ItemInfo* item)
 
 	// NOTE: In case problems arise, simply floor each velocity argument.
 	if (!lara->Control.IsMoving)
-		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity + lara->ExtraVelocity.x, 0.0f, item->Animation.LateralVelocity + lara->ExtraVelocity.z);
+		TranslateItem(item, lara->Control.MoveAngle, item->Animation.Velocity, 0.0f, item->Animation.LateralVelocity);
 
 	// Update matrices
 	g_Renderer.UpdateLaraAnimations(true);
@@ -337,6 +348,10 @@ void AnimateItem(ItemInfo* item)
 		}
 	}
 
+	// TODO: Prep. for later velocity calculation refactor.
+	/*int frameCount = anim->frameEnd - anim->frameBase;
+	int currentFrame = item->Animation.FrameNumber - anim->frameBase;*/
+
 	if (item->Animation.IsAirborne)
 	{
 		item->Animation.VerticalVelocity += (item->Animation.VerticalVelocity >= 128.0f) ? 1.0f : 6.0f;
@@ -344,6 +359,10 @@ void AnimateItem(ItemInfo* item)
 	}
 	else
 	{
+		// TODO: Prep. for later velocity calculation refactor.
+		/*item->Animation.Velocity = anim->VelocityStart + (((anim->VelocityEnd - anim->VelocityStart) / frameCount) * currentFrame);
+		item->Animation.LateralVelocity = anim->LateralVelocityStart + (((anim->LateralVelocityEnd - anim->LateralVelocityStart) / frameCount) * currentFrame);*/
+	
 		item->Animation.Velocity = anim->VelocityStart + (anim->VelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
 		item->Animation.LateralVelocity = anim->LateralVelocityStart + (anim->LateralVelocityAccel * (item->Animation.FrameNumber - anim->frameBase));
 	}
