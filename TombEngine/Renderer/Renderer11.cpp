@@ -331,10 +331,10 @@ namespace TEN::Renderer
 			// Interpolate lights which don't affect neighbor rooms
 			if (!lights[i]->AffectNeighbourRooms && roomNumber != NO_ROOM && lights[i]->RoomNumber != NO_ROOM)
 			{
-				if (lights[i]->RoomNumber == prevRoomNumber)
-					fadedCoeff = 1.0f - fade;
-				else if (lights[i]->RoomNumber == roomNumber)
+				if (lights[i]->RoomNumber == roomNumber)
 					fadedCoeff = fade;
+				else if (lights[i]->RoomNumber == prevRoomNumber)
+					fadedCoeff = 1.0f - fade;
 				else
 					continue;
 			}
