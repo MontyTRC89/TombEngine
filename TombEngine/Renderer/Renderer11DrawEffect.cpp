@@ -603,6 +603,7 @@ namespace TEN::Renderer
 		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
+		m_stItem.Color = Vector4::One;
 		m_stItem.AmbientLight = room.AmbientLight;
 		m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_STATIC;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -731,6 +732,7 @@ namespace TEN::Renderer
 				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
+				m_stItem.Color = Vector4::One;
 				m_stItem.AmbientLight = room.AmbientLight;
 				m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_STATIC;
 				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
@@ -1078,6 +1080,7 @@ namespace TEN::Renderer
 
 		m_stItem.World = effect->World;
 		m_stItem.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
+		m_stItem.Color = Vector4::One;
 		m_stItem.AmbientLight = room.AmbientLight;
 		m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));

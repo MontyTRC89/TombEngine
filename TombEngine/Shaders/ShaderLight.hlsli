@@ -218,7 +218,7 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 	return saturate(combined * vertex);
 }
 
-float3 StaticLight(float3 ambient, float3 vertex, float3 tex)
+float3 StaticLight(float3 vertex, float3 tex)
 {
-	return saturate(ambient * tex * vertex);
+	return saturate(tex * vertex);
 }

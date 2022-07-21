@@ -370,6 +370,7 @@ namespace TEN::Renderer
 
 			newItem->ItemNumber = itemNum;
 			newItem->ObjectNumber = item->ObjectNumber;
+			newItem->Color = item->Color;
 			newItem->Translation = Matrix::CreateTranslation(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z);
 			newItem->Rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(item->Pose.Orientation.y),
 															   TO_RAD(item->Pose.Orientation.x),
@@ -431,7 +432,8 @@ namespace TEN::Renderer
 				mesh->staticNumber,
 				room.RoomNumber,
 				world,
-				room.AmbientLight * mesh->color,
+				mesh->color,
+				room.AmbientLight,
 				lights
 			};
 
@@ -621,7 +623,7 @@ namespace TEN::Renderer
 	void Renderer11::CollectLightsForItem(RendererItem* item)
 	{
 		auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
-		CollectLights(pos, ITEM_LIGHT_COLLECTION_RADIUS, item->CurrentRoomNumber, item->PreviousRoomNumber, false, item->LightsToDraw);
+		CollectLights(pos, ITEM_LIGHT_COLLECTION_RADIUS, item->RoomNumber, item->PrevRoomNumber, false, item->LightsToDraw);
 	}
 
 	void Renderer11::CalculateLightFades(RendererItem *item)
@@ -629,34 +631,34 @@ namespace TEN::Renderer
 		ItemInfo* nativeItem = &g_Level.Items[item->ItemNumber];
 
 		// Interpolate ambient light between rooms
-		if (item->PreviousRoomNumber == NO_ROOM)
+		if (item->PrevRoomNumber == NO_ROOM)
 		{
-			item->PreviousRoomNumber = nativeItem->RoomNumber;
-			item->CurrentRoomNumber = nativeItem->RoomNumber;
-			item->AmbientLightFade = 1.0f;
+			item->PrevRoomNumber = nativeItem->RoomNumber;
+			item->RoomNumber = nativeItem->RoomNumber;
+			item->LightFade = 1.0f;
 		}
-		else if (nativeItem->RoomNumber != item->CurrentRoomNumber)
+		else if (nativeItem->RoomNumber != item->RoomNumber)
 		{
-			item->PreviousRoomNumber = item->CurrentRoomNumber;
-			item->CurrentRoomNumber = nativeItem->RoomNumber;
-			item->AmbientLightFade = 0.0f;
+			item->PrevRoomNumber = item->RoomNumber;
+			item->RoomNumber = nativeItem->RoomNumber;
+			item->LightFade = 0.0f;
 		}
-		else if (item->AmbientLightFade < 1.0f)
+		else if (item->LightFade < 1.0f)
 		{
-			item->AmbientLightFade += AMBIENT_LIGHT_INTERPOLATION_STEP;
-			item->AmbientLightFade = std::clamp(item->AmbientLightFade, 0.0f, 1.0f);
+			item->LightFade += AMBIENT_LIGHT_INTERPOLATION_STEP;
+			item->LightFade = std::clamp(item->LightFade, 0.0f, 1.0f);
 		}
 
-		if (item->PreviousRoomNumber == NO_ROOM || item->AmbientLightFade == 1.0f)
+		if (item->PrevRoomNumber == NO_ROOM || item->LightFade == 1.0f)
 			item->AmbientLight = m_rooms[nativeItem->RoomNumber].AmbientLight;
 		else
 		{
-			auto prev = m_rooms[item->PreviousRoomNumber].AmbientLight;
-			auto next = m_rooms[item->CurrentRoomNumber].AmbientLight;
+			auto prev = m_rooms[item->PrevRoomNumber].AmbientLight;
+			auto next = m_rooms[item->RoomNumber].AmbientLight;
 
-			item->AmbientLight.x = Lerp(prev.x, next.x, item->AmbientLightFade);
-			item->AmbientLight.y = Lerp(prev.y, next.y, item->AmbientLightFade);
-			item->AmbientLight.z = Lerp(prev.z, next.z, item->AmbientLightFade);
+			item->AmbientLight.x = Lerp(prev.x, next.x, item->LightFade);
+			item->AmbientLight.y = Lerp(prev.y, next.y, item->LightFade);
+			item->AmbientLight.z = Lerp(prev.z, next.z, item->LightFade);
 		}
 
 		// Multiply calculated ambient light by object tint
