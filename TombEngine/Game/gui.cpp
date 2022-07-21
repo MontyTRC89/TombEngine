@@ -23,7 +23,6 @@
 #include "Specific/configuration.h"
 #include "Specific/configuration.h"
 #include "Specific/input.h"
-#include "Specific/input.h"
 #include "Specific/level.h"
 
 using namespace TEN::Input;
@@ -462,7 +461,7 @@ void GuiController::HandleControlSettingsInput(bool fromPauseMenu)
 
 	if (CurrentSettings.WaitingForKey)
 	{
-		ClearInputActions();
+		ClearAllActions();
 
 		while (true)
 		{
@@ -1656,11 +1655,11 @@ void GuiController::UseCurrentItem(ItemInfo* item)
 					if (lara->Control.Weapon.GunType != LaraWeaponType::Flare)
 					{
 						// HACK.
-						ClearInputActions();
+						ClearAllActions();
 						ActionMap[(int)In::Flare].Update(1.0f);
 
 						LaraGun(item);
-						ClearInputActions();
+						ClearAllActions();
 					}
 
 					return;

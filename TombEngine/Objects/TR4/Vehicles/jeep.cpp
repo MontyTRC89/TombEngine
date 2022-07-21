@@ -730,7 +730,7 @@ namespace TEN::Entities::Vehicles
 		auto* jeep = GetJeepInfo(jeepItem);
 
 		if (laraItem->Animation.ActiveState == JS_DISMOUNT || laraItem->Animation.TargetState == JS_DISMOUNT)
-			ClearInputActions();
+			ClearAllActions();
 	
 		if (jeep->Revs <= 16)
 			jeep->Revs = 0;

@@ -654,7 +654,7 @@ namespace TEN::Input
 		ActionMap[(int)In::Forward].PrintDebugInfo();
 	}
 
-	void ClearInputActions()
+	void ClearAllActions()
 	{
 		for (auto& action : ActionMap)
 			action.Clear();
