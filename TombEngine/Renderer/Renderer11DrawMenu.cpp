@@ -576,6 +576,7 @@ namespace TEN::Renderer
 				m_stItem.World = ((*moveableObj).BindPoseTransforms[n] * world);
 
 			m_stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+			m_stItem.Color = Vector4::One;
 			m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
 			m_cbItem.updateData(m_stItem, m_context.Get());

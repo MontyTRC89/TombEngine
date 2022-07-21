@@ -10,6 +10,7 @@ cbuffer StaticMatrixBuffer : register(b8)
 	float4x4 World;
 	float4 Position;
 	float4 Color;
+	float4 AmbientLight;
 	int LightType;
 };
 
@@ -50,6 +51,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.Position = mul(worldPosition, ViewProjection);
 	output.Color = float4(col, input.Color.w);
+	output.Color *= Color;
 
 	// Apply distance fog
 	float4 d = length(CamPositionWS - worldPosition);
@@ -71,8 +73,8 @@ PixelShaderOutput PS(PixelShaderInput input)
     DoAlphaTest(tex);
 
 	float3 color = (LightType == 0) ?
-		CombineLights(Color.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normalize(input.Normal), input.Sheen) :
-		StaticLight(Color.xyz, input.Color.xyz, tex.xyz);
+		CombineLights(AmbientLight.xyz, input.Color.xyz, tex.xyz, input.WorldPosition, normalize(input.Normal), input.Sheen) :
+		StaticLight(input.Color.xyz, tex.xyz);
 
 	output.Color = float4(color, tex.w);
 

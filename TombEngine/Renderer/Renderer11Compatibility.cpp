@@ -365,8 +365,6 @@ namespace TEN::Renderer
 		moveablesVertices.resize(totalVertices);
 		moveablesIndices.resize(totalIndices);
 
-	
-
 		lastVertex = 0;
 		lastIndex = 0;
 		for (int i = 0; i < MoveablesIds.size(); i++)
