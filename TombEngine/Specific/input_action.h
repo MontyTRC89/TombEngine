@@ -43,6 +43,7 @@ namespace TEN::Input
 		Count
 	} In;
 
+	// TODO: Each action should hold its own input mappping?
 	// TODO: For use with analog triggers, use Value range [0.0f, 1.0f] with deadzone up to a quarter press.
 	class InputAction
 	{
@@ -56,7 +57,7 @@ namespace TEN::Input
 		bool IsClicked();
 		bool IsPulsed(float delayInSeconds, float initialDelayInSeconds = 0.0f);
 		bool IsHeld();
-		bool IsReleased();
+		bool IsReleased(float maxDelayInSeconds = std::numeric_limits<float>::max());
 
 		ActionID GetID();
 		float GetValue();

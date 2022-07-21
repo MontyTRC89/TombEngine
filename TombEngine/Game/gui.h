@@ -148,12 +148,12 @@ private:
 	#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
 
 	// Input macros
-	#define GUI_INPUT_PULSE_UP	  IsPulsed(In::Forward, 0.1f, 0.4f)
-	#define GUI_INPUT_PULSE_DOWN  IsPulsed(In::Back, 0.1f, 0.4f)
-	#define GUI_INPUT_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
-	#define GUI_INPUT_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
-	#define GUI_INPUT_SELECT	  ((IsReleased(In::Select) || IsReleased(In::Action)) && CAN_SELECT)
-	#define GUI_INPUT_DESELECT	  (IsClicked(In::Deselect) && CAN_DESELECT)
+	#define GUI_ACTION_PULSE_UP	   IsPulsed(In::Forward, 0.1f, 0.4f)
+	#define GUI_ACTION_PULSE_DOWN  IsPulsed(In::Back, 0.1f, 0.4f)
+	#define GUI_ACTION_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
+	#define GUI_ACTION_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
+	#define GUI_ACTION_SELECT	   ((IsReleased(In::Select) || IsReleased(In::Action)) && CAN_SELECT)
+	#define GUI_ACTION_DESELECT	   (IsClicked(In::Deselect) && CAN_DESELECT)
 
 	// GUI variables
 	Menu MenuToDisplay = Menu::Title;

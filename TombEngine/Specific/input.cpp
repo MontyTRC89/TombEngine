@@ -18,6 +18,8 @@
 using namespace OIS;
 using TEN::Renderer::g_Renderer;
 
+// Big TODO: Entire input system shouldn't be left exposed like this.
+
 namespace TEN::Input
 {
 	const char* g_KeyNames[] =
@@ -78,12 +80,12 @@ namespace TEN::Input
 	RumbleData rumbleData = {};
 
 	// Globals
-	int DbInput;
-	int TrInput;
-
 	std::vector<InputAction> ActionMap;
 	std::vector<bool>		 KeyMap;
 	std::vector<float>		 AxisMap;
+
+	int DbInput;
+	int TrInput;
 
 	// Default keys
 	bool ConflictingKeys[KEY_COUNT];
@@ -554,12 +556,6 @@ namespace TEN::Input
 		}
 		dbMedipack = (KeyMap[KC_0] || KeyMap[KC_9]) ? false : true;
 
-		// Handle debug page switch.
-		static bool dbDebugPage = true;
-		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
-			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? false : true;
-
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
 		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
@@ -569,6 +565,12 @@ namespace TEN::Input
 			g_Renderer.ToggleFullScreen();
 		}
 		dbFullscreen = ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]) ? false : true;
+
+		// Handle debug page switch.
+		static bool dbDebugPage = true;
+		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
+			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
+		dbDebugPage = (KeyMap[KC_F10] || KeyMap[KC_F11]) ? false : true;
 	}
 
 	void UpdateRumble()
@@ -631,14 +633,14 @@ namespace TEN::Input
 		TrInput = NULL;
 
 		// Update input action map (mappable actions only).
-		for (int i = 0; i < KEY_COUNT; i++)
+		for (size_t i = 0; i < KEY_COUNT; i++)
 			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
 
 		// Additional handling.
 		HandleLaraHotkeys(LaraItem);
 		SolveInputCollisions();
 
-		// Port actions back to legacy input bitfields.
+		// Port actions back to legacy bitfields.
 		for (auto& action : ActionMap)
 		{
 			int actionBit = 1 << (int)action.GetID();
@@ -654,7 +656,7 @@ namespace TEN::Input
 
 	void ClearInputActions()
 	{
-		for (auto action : ActionMap)
+		for (auto& action : ActionMap)
 			action.Clear();
 
 		DbInput = NULL;

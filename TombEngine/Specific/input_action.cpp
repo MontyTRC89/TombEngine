@@ -70,7 +70,7 @@ namespace TEN::Input
 
 	bool InputAction::IsClicked()
 	{
-		return (Value && !PrevValue);
+		return (Value != 0.0f && PrevValue == 0.0f);
 	}
 
 	// To avoid desync on the second pulse, ensure initialDelayInSeconds is a multiple of delayInSeconds.
@@ -79,11 +79,12 @@ namespace TEN::Input
 		if (this->IsClicked())
 			return true;
 
-		if (!this->IsHeld() || !PrevTimeActive || TimeActive == PrevTimeActive)
+		if (!this->IsHeld() || PrevTimeActive == 0.0f || TimeActive == PrevTimeActive)
 			return false;
 
 		float syncedTimeActive = TimeActive - std::fmod(TimeActive, DELTA_TIME);
 		float activeDelay = (TimeActive > initialDelayInSeconds) ? delayInSeconds : initialDelayInSeconds;
+
 		float delayTime = std::floor(syncedTimeActive / activeDelay) * activeDelay;
 		if (delayTime >= PrevTimeActive)
 			return true;
@@ -93,12 +94,12 @@ namespace TEN::Input
 
 	bool InputAction::IsHeld()
 	{
-		return Value;
+		return (Value != 0.0f);
 	}
 
-	bool InputAction::IsReleased()
+	bool InputAction::IsReleased(float maxDelayInSeconds)
 	{
-		return (!Value && PrevValue);
+		return (Value == 0.0f && PrevValue != 0.0f && TimeActive <= maxDelayInSeconds);
 	}
 
 	ActionID InputAction::GetID()

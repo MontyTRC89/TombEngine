@@ -1,17 +1,17 @@
 #include "framework.h"
 #include "Game/items.h"
 
-#include "Game/control/control.h"
 #include "Game/collision/floordata.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
-#include "ScriptInterfaceGame.h"
-#include "Specific/setup.h"
-#include "Specific/level.h"
-#include "Specific/input.h"
-#include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
+#include "Specific/input.h"
+#include "Specific/level.h"
 #include "Specific/prng.h"
+#include "Specific/setup.h"
+#include "Objects/ScriptInterfaceObjectsHandler.h"
 
 using namespace TEN::Floordata;
 using namespace TEN::Input;
@@ -19,9 +19,9 @@ using namespace TEN::Math::Random;
 
 void ItemInfo::SetBits(JointBitType type, std::vector<int> jointIndices)
 {
-	for (int i = 0; i < jointIndices.size(); i++)
+	for (int jointIndex : jointIndices)
 	{
-		unsigned int jointBit = unsigned int(1 << jointIndices[i]);
+		unsigned int jointBit = unsigned int(1 << jointIndex);
 
 		switch (type)
 		{
@@ -47,9 +47,9 @@ void ItemInfo::SetBits(JointBitType type, int jointIndex)
 
 void ItemInfo::ClearBits(JointBitType type, std::vector<int> jointIndices)
 {
-	for (int i = 0; i < jointIndices.size(); i++)
+	for (int jointIndex : jointIndices)
 	{
-		unsigned int jointBit = unsigned int(1 << jointIndices[i]);
+		unsigned int jointBit = unsigned int(1 << jointIndex);
 
 		switch (type)
 		{
@@ -75,9 +75,9 @@ void ItemInfo::ClearBits(JointBitType type, int jointIndex)
 
 bool ItemInfo::TestBits(JointBitType type, std::vector<int> jointIndices)
 {
-	for (int i = 0; i < jointIndices.size(); i++)
+	for (int jointIndex : jointIndices)
 	{
-		unsigned int jointBit = unsigned int(1 << jointIndices[i]);
+		unsigned int jointBit = unsigned int(1 << jointIndex);
 
 		switch (type)
 		{

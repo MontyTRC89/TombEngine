@@ -76,9 +76,9 @@ namespace TEN::Input
 		IN_LOOKSWITCH = (1 << (KEY_COUNT + 4))
 	};
 	
-	#define INPUT_HELD_DIRECTION	 (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
-	#define INPUT_HELD_WAKE			 (INPUT_HELD_DIRECTION || IsHeld(In::LeftStep) || IsHeld(In::RightStep) || IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) || IsHeld(In::Draw) || IsHeld(In::Flare) || IsHeld(In::Action))
-	#define INPUT_HELD_OPTIC_CONTROL (INPUT_HELD_DIRECTION || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint))
+	#define ACTION_HELD_DIRECTION	  (IsHeld(In::Forward) || IsHeld(In::Back) || IsHeld(In::Left) || IsHeld(In::Right))
+	#define ACTION_HELD_WAKE		  (ACTION_HELD_DIRECTION || IsHeld(In::LeftStep) || IsHeld(In::RightStep) || IsHeld(In::Walk) || IsHeld(In::Jump) || IsHeld(In::Sprint) || IsHeld(In::Roll) || IsHeld(In::Crouch) || IsHeld(In::Draw) || IsHeld(In::Flare) || IsHeld(In::Action))
+	#define ACTION_HELD_OPTIC_CONTROL (ACTION_HELD_DIRECTION || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint))
 
 	// Temporary input constants for use with vehicles:
 
@@ -124,13 +124,13 @@ namespace TEN::Input
 
 	extern const char* g_KeyNames[];
 
-	// Legacy input bitfields.
-	extern int DbInput;  // Debounce: is input clicked?
-	extern int TrInput;  // Throttle: is input held?
-
 	extern std::vector<InputAction> ActionMap;
 	extern std::vector<bool>		KeyMap;
 	extern std::vector<float>		AxisMap;
+
+	// Legacy input bitfields
+	extern int DbInput;  // Debounce: is input clicked?
+	extern int TrInput;  // Throttle: is input held?
 
 	extern short KeyboardLayout[2][KEY_COUNT];
 

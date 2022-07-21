@@ -1,12 +1,12 @@
 #include "framework.h"
 #include "Game/Lara/lara_helpers.h"
 
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_collide.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_tests.h"
 #include "Renderer/Renderer11.h"
@@ -24,8 +24,8 @@
 #include "Objects/TR4/Vehicles/jeep.h"
 #include "Objects/TR4/Vehicles/motorbike.h"
 
-using namespace TEN::Renderer;
 using namespace TEN::Input;
+using namespace TEN::Renderer;
 
 // -----------------------------
 // HELPER FUNCTIONS
@@ -38,7 +38,7 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 
 	// Update AFK pose timer.
 	if (lara->Control.Count.Pose < LARA_POSE_TIME && TestLaraPose(item, coll) &&
-		!(TrInput & IN_LOOK || INPUT_HELD_WAKE) &&
+		!(TrInput & IN_LOOK || ACTION_HELD_WAKE) &&
 		g_GameFlow->HasAFKPose())
 	{
 		lara->Control.Count.Pose++;
