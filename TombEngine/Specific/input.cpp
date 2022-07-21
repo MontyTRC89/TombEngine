@@ -429,28 +429,13 @@ namespace TEN::Input
 		return false;
 	}
 
-	void SolveInputCollisions()
+	void SolveActionCollisions()
 	{
-		// Block roll in binocular mode (TODO: Is it needed?)
-		if (IsHeld(In::Roll) && BinocularRange)
-			ClearAction(In::Roll);
-
-		// Block simultaneous LEFT+RIGHT input.
+		// Block simultaneous LEFT+RIGHT actions.
 		if (IsHeld(In::Left) && IsHeld(In::Right))
 		{
 			ClearAction(In::Left);
 			ClearAction(In::Right);
-		}
-
-		if (Lara.Inventory.IsBusy)
-		{
-			//lInput &= (IN_FORWARD | IN_BACK | IN_LEFT | IN_RIGHT | IN_OPTION | IN_LOOK | IN_PAUSE);
-
-			if (IsHeld(In::Forward) && IsHeld(In::Back))
-			{
-				ClearAction(In::Forward);
-				ClearAction(In::Back);
-			}
 		}
 	}
 
@@ -632,13 +617,13 @@ namespace TEN::Input
 		DbInput = NULL;
 		TrInput = NULL;
 
-		// Update input action map (mappable actions only).
+		// Update action map (mappable actions only).
 		for (size_t i = 0; i < KEY_COUNT; i++)
 			ActionMap[i].Update(Key(i) ? 1.0f : 0.0f); // TODO: Poll analog value of key. Any key can potentially be a trigger.
 
 		// Additional handling.
 		HandleLaraHotkeys(LaraItem);
-		SolveInputCollisions();
+		SolveActionCollisions();
 
 		// Port actions back to legacy bitfields.
 		for (auto& action : ActionMap)

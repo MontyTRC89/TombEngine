@@ -148,8 +148,8 @@ private:
 	#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
 
 	// Input macros
-	#define GUI_ACTION_PULSE_UP	   IsPulsed(In::Forward, 0.1f, 0.4f)
-	#define GUI_ACTION_PULSE_DOWN  IsPulsed(In::Back, 0.1f, 0.4f)
+	#define GUI_ACTION_PULSE_UP	   (IsPulsed(In::Forward, 0.1f, 0.4f) && !IsHeld(In::Back))
+	#define GUI_ACTION_PULSE_DOWN  (IsPulsed(In::Back, 0.1f, 0.4f) && !IsHeld(In::Forward))
 	#define GUI_ACTION_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
 	#define GUI_ACTION_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
 	#define GUI_ACTION_SELECT	   ((IsReleased(In::Select) || IsReleased(In::Action)) && CAN_SELECT)
