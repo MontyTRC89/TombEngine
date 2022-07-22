@@ -179,7 +179,14 @@ namespace TEN::Input
 
 		// Initialise action map.
 		for (size_t i = 0; i < (int)ActionID::Count; i++)
-			ActionMap.push_back(InputAction((ActionID)i, DefaultBindings[i]));
+		{
+			// Define default bindings to input gestures.
+			vector<int> defaultBinding = { DefaultBindings[i] };
+			while (defaultBinding.size() < MAX_GESTURES)
+				defaultBinding.push_back(KC_UNASSIGNED);
+
+			ActionMap.push_back(InputAction((ActionID)i, defaultBinding));
+		}
 	}
 
 	void DeInitialiseInput()
@@ -400,19 +407,19 @@ namespace TEN::Input
 	}
 
 	// TODO!!!
-	bool GetActionBindingState(ActionID actionID)
-	{
-		for (int binding : ActionMap[(int)actionID].GetBindings())
-		{
-			if (KeyMap[binding])
-				return true;
+	//bool GetActionBindingState(ActionID actionID)
+	//{
+	//	for (int binding : ActionMap[(int)actionID].GetBindings())
+	//	{
+	//		if (KeyMap[binding])
+	//			return true;
 
-			// Mirrorings...
-			// Conflicts...
-		}
+	//		// Mirrorings...
+	//		// Conflicts...
+	//	}
 
-		return false;
-	}
+	//	return false;
+	//}
 
 	bool Key(int number)
 	{

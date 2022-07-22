@@ -4,15 +4,16 @@
 #include "Game/control/control.h"
 #include "Renderer/Renderer11.h"
 #include "Specific/clock.h"
+#include "Specific/InputBinding.h"
 
 using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
-	InputAction::InputAction(ActionID actionID, int defaultBinding)
+	InputAction::InputAction(ActionID actionID, vector<int> defaultBinding)
 	{
 		this->ID = actionID;
-		this->AddBinding(defaultBinding);
+		this->Bindings.Add(defaultBinding);
 	}
 
 	void InputAction::Update(float value)
@@ -54,31 +55,6 @@ namespace TEN::Input
 		this->TimeInactive = 0.0f;
 	}
 	
-	void InputAction::AddBinding(int binding)
-	{
-		// Prevent duplicate bindings.
-		for (int existingBinding : Bindings)
-		{
-			if (binding == existingBinding)
-				return;
-		}
-
-		this->Bindings.push_back(binding);
-	}
-
-	void InputAction::ClearBinding(int binding)
-	{
-		// Do not attempt clear if default binding is the only element.
-		if (Bindings.size() < 2)
-			return;
-
-		for (size_t i = 1; i < Bindings.size(); i++)
-		{
-			if (Bindings[i] == binding)
-				this->Bindings.erase(Bindings.begin() + i);
-		}
-	}
-
 	void InputAction::PrintDebugInfo()
 	{
 		g_Renderer.PrintDebugMessage("ID: %d", (int)ID);
@@ -146,11 +122,6 @@ namespace TEN::Input
 	float InputAction::GetTimeInactive()
 	{
 		return TimeInactive;
-	}
-
-	std::vector<int> InputAction::GetBindings()
-	{
-		return Bindings;
 	}
 
 	void InputAction::UpdateValue(float value)

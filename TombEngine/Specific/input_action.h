@@ -1,4 +1,5 @@
 #pragma once
+#include "Specific/InputBinding.h"
 
 using std::vector;
 
@@ -69,12 +70,10 @@ namespace TEN::Input
 	class InputAction
 	{
 	public:
-		InputAction(ActionID actionID, int defaultBinding);
+		InputAction(ActionID actionID, vector<int> defaultBinding);
 
 		void Update(float value);
 		void Clear();
-		void AddBinding(int binding);
-		void ClearBinding(int binding);
 		void PrintDebugInfo();
 
 		bool IsClicked();
@@ -86,7 +85,9 @@ namespace TEN::Input
 		float GetValue();
 		float GetTimeActive();
 		float GetTimeInactive();
-		vector<int> GetBindings();
+
+		// Actions can hold multiple bindings. Each binding can be composed of multiple input gestures.
+		InputBinding Bindings = {};
 
 	private:
 		ActionID ID			 = In::None;
@@ -95,8 +96,6 @@ namespace TEN::Input
 		float TimeActive	 = 0.0f;
 		float PrevTimeActive = 0.0f;
 		float TimeInactive	 = 0.0f;
-
-		vector<int> Bindings = {}; // TODO: Each action should hold its own input bindings?
 
 		void UpdateValue(float value);
 	};
