@@ -2,6 +2,9 @@
 
 using std::vector;
 
+// NOTE TO SELF: Doing it wrong! Actions SHOULD NOT hold their own input bindings.
+// Do it the other way around: bindings map to actions. Every other engine referenced (TRAE, Unity, Unreal) has it like this.
+// Bindings can still hold multiple input gestures, however. This is an original idea I think is worth pursuing. @Sezz
 namespace TEN::Input
 {
 	constexpr int NUM_DEFAULT_BINDINGS = 1;

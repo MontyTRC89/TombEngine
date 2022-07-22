@@ -95,6 +95,7 @@ namespace TEN::Input
 		KC_F5, KC_F6, KC_RETURN, KC_ESCAPE, KC_NUMPAD0
 	};
 
+	// Input bindings. These are primitive mappings to actions.
 	bool ConflictingKeys[KEY_COUNT];
 	short KeyboardLayout[2][KEY_COUNT] =
 	{
