@@ -314,12 +314,10 @@ bool FlowHandler::DoFlow()
 			break;
 		case GameStatus::LevelComplete:
 			if (LevelComplete >= Levels.size())
-			{
-				// TODO: final credits
-				CurrentLevel = 0;
-			}
+				CurrentLevel = 0; // TODO: final credits
 			else
-				CurrentLevel++;
+				CurrentLevel = LevelComplete;
+			LevelComplete = 0;
 			break;
 		}
 	}
