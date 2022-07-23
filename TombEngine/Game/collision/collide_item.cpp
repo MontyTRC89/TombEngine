@@ -856,8 +856,8 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 			{
 				if (phd_Distance(&item->Pose, &mesh->pos) < COLLISION_CHECK_DISTANCE)
 				{
-					auto staticInfo = StaticObjects[mesh->staticNumber];
-					if (CollideSolidBounds(item, staticInfo.collisionBox, mesh->pos, coll))
+					auto staticInfo = &StaticObjects[mesh->staticNumber];
+					if (CollideSolidBounds(item, staticInfo->collisionBox, mesh->pos, coll))
 						coll->HitStatic = true;
 				}
 			}
@@ -1179,6 +1179,11 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 	auto oldCollResult = GetCollision(x, y, z, item->RoomNumber);
 	auto collResult = GetCollision(item);
+
+	auto* bounds = GetBoundsAccurate(item);
+	int radius = abs(bounds->Y2 - bounds->Y1);
+
+	item->Pose.Position.y += radius;
 
 	if (item->Pose.Position.y >= collResult.Position.Floor)
 	{
@@ -1670,8 +1675,16 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	}
 
 	collResult = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+
 	if (collResult.RoomNumber != item->RoomNumber)
+	{
+		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, collResult.RoomNumber))
+			Splash(item);
+
 		ItemNewRoom(itemNumber, collResult.RoomNumber);
+	}
+
+	item->Pose.Position.y -= radius;
 }
 
 void DoObjectCollision(ItemInfo* laraItem, CollisionInfo* coll)
@@ -1844,42 +1857,43 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	if (item->ObjectNumber != ID_HITMAN || item->Animation.ActiveState != LS_INSERT_PUZZLE)
+	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		return;
+
+	if (!TestCollision(item, laraItem))
+		return;
+
+	bool playerCollision = laraItem->IsLara();
+	bool waterPlayerCollision = playerCollision && GetLaraInfo(laraItem)->Control.WaterStatus >= WaterStatus::TreadWater;
+
+	if (waterPlayerCollision || coll->Setup.EnableObjectPush)
 	{
-		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
+	}
+	else if (playerCollision && coll->Setup.EnableSpasm)
+	{
+		int x = laraItem->Pose.Position.x - item->Pose.Position.x;
+		int z = laraItem->Pose.Position.z - item->Pose.Position.z;
+
+		float sinY = phd_sin(item->Pose.Orientation.y);
+		float cosY = phd_cos(item->Pose.Orientation.y);
+
+		auto* frame = GetBestFrame(item);
+		int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
+		int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
+
+		if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
 		{
-			if (TestCollision(item, laraItem))
-			{
-				if (coll->Setup.EnableObjectPush ||
-					Lara.Control.WaterStatus == WaterStatus::Underwater ||
-					Lara.Control.WaterStatus == WaterStatus::TreadWater)
-				{
-					ItemPushItem(item, laraItem, coll, coll->Setup.EnableSpasm, 0);
-				}
-				else if (coll->Setup.EnableSpasm)
-				{
-					int x = laraItem->Pose.Position.x - item->Pose.Position.x;
-					int z = laraItem->Pose.Position.z - item->Pose.Position.z;
+			int angle = (laraItem->Pose.Orientation.y - phd_atan(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - ANGLE(135.0f)) / ANGLE(90.0f);
 
-					float sinY = phd_sin(item->Pose.Orientation.y);
-					float cosY = phd_cos(item->Pose.Orientation.y);
+			auto* lara = GetLaraInfo(laraItem);
 
-					auto* frame = GetBestFrame(item);
-					int rx = (frame->boundingBox.X1 + frame->boundingBox.X2) / 2;
-					int rz = (frame->boundingBox.X2 + frame->boundingBox.Z2) / 2;
+			lara->HitDirection = (short)angle;
 
-					if (frame->boundingBox.Y2 - frame->boundingBox.Y1 > STEP_SIZE)
-					{
-						int angle = (laraItem->Pose.Orientation.y - phd_atan(z - cosY * rx - sinY * rz, x - cosY * rx + sinY * rz) - ANGLE(135.0f)) / ANGLE(90.0f);
-						Lara.HitDirection = (short)angle;
-						// TODO: check if a second Lara.hitFrame++; is required there !
-						
-						Lara.HitFrame++;
-						if (Lara.HitFrame > 30)
-							Lara.HitFrame = 30;
-					}
-				}
-			}
+			// TODO: check if a second Lara.hitFrame++; is required there !						
+			lara->HitFrame++;
+			if (lara->HitFrame > 30)
+				lara->HitFrame = 30;
 		}
 	}
 }

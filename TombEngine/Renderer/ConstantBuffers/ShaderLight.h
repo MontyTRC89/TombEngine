@@ -3,13 +3,14 @@
 struct alignas(16) ShaderLight
 {
 	Vector3 Position;
-	int Type;
+	unsigned int Type;
 	Vector3 Color;
-	int LocalIntensity;
-	Vector3 Direction;
-	float Distance;
 	float Intensity;
+	Vector3 Direction;
 	float In;
 	float Out;
-	float Range;
+	float InRange;
+	float OutRange;
+
+	float padding;
 };
