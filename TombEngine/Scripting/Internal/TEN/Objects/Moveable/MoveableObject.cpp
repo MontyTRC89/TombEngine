@@ -158,6 +158,31 @@ void Moveable::Register(sol::table & parent)
 // @tparam boolean value, true to make him not targetable, false to make him targetable again.
 ScriptReserved_MakeNotTargetable, & Moveable::MakeNotTargetable,
 
+/// Make the actor moves continue through its AI_Follow path till the indicated value.
+// @function Moveable:DoGoToNode
+// @tparam short value, the ocb number of the AI_Follow object where this actor must go.
+ScriptReserved_MakeNotTargetable, & Moveable::DoGoToNode,
+
+/// Make the actor moves directly to the indicated AI_Follow object, ignoring the other nodes before.
+// @function Moveable:DoGoDirectlyToNode
+// @tparam short value, the ocb number of the AI_Follow object where this actor must go.
+ScriptReserved_MakeNotTargetable, & Moveable::DoGoDirectlyToNode,
+
+/// Make the actor moves to the AI_Follow object with the next ocb value
+// @function Moveable:DoGoNextNode
+ScriptReserved_MakeNotTargetable, & Moveable::DoGoNextNode,
+
+/// Make the guide to wait for Lara be near before to activate a heavy trigger action.
+// @function Moveable:DoWaitForLara
+// @tparam boolean value, true to make it wait, false to make it continue with no wait. Default is true.
+ScriptReserved_MakeNotTargetable, & Moveable::DoWaitForLara,
+
+/// Make the guide to run instead of walk.
+// @function Moveable:DoRunDefault
+// @tparam boolean value, true to make it run to the next AI node, false to restore the original behaviour. Default is false.
+ScriptReserved_MakeNotTargetable, & Moveable::DoRunDefault,
+
+
 /// Get the status of object.
 // possible values:
 // 0 - not active
@@ -772,6 +797,87 @@ void Moveable::MakeNotTargetable(bool isNotTargetable)
 		m_item->HitPoints = NOT_TARGETABLE;
 	else
 		m_item->HitPoints = Objects[m_item->ObjectNumber].HitPoints;
+}
+
+void Moveable::DoGoToNode(short nodeId)
+{
+	GAME_OBJECT_ID objId = m_item->ObjectNumber;
+	switch (objId)
+	{
+		case ID_GUIDE:
+			if (m_item->ItemFlags[2] < 1) m_item->ItemFlags[2] = 1; //If independent Guide is not activated, active it.
+			m_item->ItemFlags[4] = nodeId;
+			if (m_item->ItemFlags[4] < m_item->ItemFlags[3]) //If the goal node is lower than the current node.
+				m_item->ItemFlags[3] = nodeId;
+			break;
+		default:
+			std::string InfoStr = "The Lua function DoGoToNode hasn't got actions for the object " + m_item->LuaName + ".";
+			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
+			break;
+	}
+}
+
+void Moveable::DoGoDirectlyToNode(short nodeId)
+{
+	GAME_OBJECT_ID objId = m_item->ObjectNumber;
+	switch (objId)
+	{
+		case ID_GUIDE:
+			if (m_item->ItemFlags[2] < 1) m_item->ItemFlags[2] = 1; //If independent Guide is not activated, active it.
+			m_item->ItemFlags[4] = nodeId;
+			m_item->ItemFlags[3] = nodeId;
+			break;
+		default:
+			std::string InfoStr = "The Lua function DoGoDirectlyToNode hasn't got actions for the object " + m_item->LuaName + ".";
+			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
+			break;
+	}
+}
+
+void Moveable::DoGoNextNode()
+{
+	GAME_OBJECT_ID objId = m_item->ObjectNumber;
+	switch (objId)
+	{
+		case ID_GUIDE:
+			if (m_item->ItemFlags[2] < 1) m_item->ItemFlags[2] = 1; //If independent Guide is not activated, active it.
+			m_item->ItemFlags[4] ++;
+			break;
+		default:
+			std::string InfoStr = "The Lua function DoGoNextNode hasn't got actions for the object " + m_item->LuaName + ".";
+			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
+			break;
+	}
+}
+
+void Moveable::DoWaitForLara(bool isWaitForLara)
+{
+	GAME_OBJECT_ID objId = m_item->ObjectNumber;
+	switch (objId)
+	{
+		case ID_GUIDE:
+			m_item->ItemFlags[2] = (isWaitForLara) ? 1 : 2;
+			break;
+		default:
+			std::string InfoStr = "The Lua function DoWaitForLara hasn't got actions for the object " + m_item->LuaName + ".";
+			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
+			break;
+	}
+}
+
+void Moveable::DoRunDefault(bool isRunDefault)
+{
+	GAME_OBJECT_ID objId = m_item->ObjectNumber;
+	switch (objId)
+	{
+		case ID_GUIDE:
+			m_item->ItemFlags[2] = (isRunDefault) ? 2 : 1;
+			break;
+		default:
+			std::string InfoStr = "The Lua function DoRunDefault hasn't got actions for the object " + m_item->LuaName + ".";
+			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
+			break;
+	}
 }
 
 void Moveable::Invalidate()

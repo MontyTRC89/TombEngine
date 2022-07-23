@@ -80,6 +80,12 @@ public:
 	void MakeInvisible();
 	void MakeNotTargetable(bool isNotTargetable = true);
 
+	void DoGoToNode(short nodeId);
+	void DoGoDirectlyToNode(short nodeId);
+	void DoGoNextNode();
+	void DoWaitForLara( bool isWaitForLara = true);
+	void DoRunDefault( bool isRunDefault = false);
+
 	[[nodiscard]] std::string GetOnHit() const;
 	void SetOnHit(std::string const &);
 	[[nodiscard]] std::string GetOnKilled() const;
