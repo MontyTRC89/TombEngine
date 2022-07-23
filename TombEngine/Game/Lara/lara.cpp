@@ -757,7 +757,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	// ------------------------------------
 
-	if (TrInput & IN_LOOK && lara->Control.LookMode != LookMode::None &&
+	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None &&
 		lara->ExtraAnim == NO_ITEM)
 	{
 		DoLookAround(item);
@@ -773,7 +773,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	//else if (coll->Setup.Height > LARA_HEIGHT - LARA_HEADROOM) // TEMP HACK: Look feature will need a dedicated refactor; ResetLook() interferes with crawl flexing. @Sezz 2021.12.10
 	//	ResetLook(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 
 	// Deprecated.
 	lara->Control.CanLook = true;
@@ -844,7 +844,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.OldPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara->Control.LookMode != LookMode::None)
+	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None)
 		DoLookAround(item);
 	else
 		ResetLook(item);
@@ -914,7 +914,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 
 	coll->Setup.OldPosition = item->Pose.Position;
 
-	if (TrInput & IN_LOOK && lara->Control.LookMode != LookMode::None)
+	if (TrInput & IN_LOOK && lara->Control.Look.Mode != LookMode::None)
 		DoLookAround(item);
 	else
 		ResetLook(item);

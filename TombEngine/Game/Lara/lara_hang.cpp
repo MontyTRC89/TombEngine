@@ -25,7 +25,7 @@ void lara_as_hang(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 	lara->Control.IsClimbingLadder = false;
 
 	if (item->HitPoints <= 0)

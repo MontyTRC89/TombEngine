@@ -38,7 +38,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
@@ -222,7 +222,7 @@ void lara_as_crouch_turn_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
 
@@ -275,7 +275,7 @@ void lara_as_crouch_turn_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableSpasm = false;
 	Camera.targetDistance = SECTOR(1);
 
@@ -364,7 +364,7 @@ void lara_as_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 	lara->Control.HandStatus = HandStatus::Busy;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;

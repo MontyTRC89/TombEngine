@@ -433,9 +433,9 @@ namespace TEN::Entities::Vehicles
 			*pitch = skidooItem->Animation.Velocity + (height - skidooItem->Pose.Position.y);
 
 			if (skidooItem->Animation.Velocity)
-				lara->Control.LookMode = LookMode::Unrestricted;
+				lara->Control.Look.Mode = LookMode::Unrestrained;
 			else
-				lara->Control.LookMode = LookMode::Horizontal;
+				lara->Control.Look.Mode = LookMode::Horizontal;
 
 			if (TrInput & (VEHICLE_IN_LEFT | VEHICLE_IN_RIGHT))
 				ModulateVehicleTurnRateY(&skidoo->TurnRate, SKIDOO_TURN_RATE_ACCEL, -SKIDOO_TURN_RATE_MAX, SKIDOO_TURN_RATE_MAX);

@@ -638,9 +638,9 @@ namespace TEN::Entities::Vehicles
 					speedboatItem->Animation.Velocity = 0;
 
 				if (speedboatItem->Animation.Velocity)
-					lara->Control.LookMode = LookMode::Unrestricted;
+					lara->Control.Look.Mode = LookMode::Unrestrained;
 				else
-					lara->Control.LookMode = LookMode::Horizontal;
+					lara->Control.Look.Mode = LookMode::Horizontal;
 			}
 		}
 

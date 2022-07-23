@@ -747,9 +747,9 @@ namespace TEN::Entities::Vehicles
 		if (jeepItem->Pose.Position.y >= height - STEP_SIZE)
 		{
 			if (jeepItem->Animation.Velocity)
-				lara->Control.LookMode = LookMode::Unrestricted;
+				lara->Control.Look.Mode = LookMode::Unrestrained;
 			else
-				lara->Control.LookMode = LookMode::Horizontal;
+				lara->Control.Look.Mode = LookMode::Horizontal;
 
 			if (abs(jeep->Velocity) <= JEEP_VELOCITY_MAX / 2)
 			{

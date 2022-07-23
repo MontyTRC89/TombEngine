@@ -884,9 +884,9 @@ namespace TEN::Entities::Vehicles
 		if (quadBikeItem->Pose.Position.y >= (height - CLICK(1)))
 		{
 			if (quadBikeItem->Animation.Velocity)
-				lara->Control.LookMode = LookMode::Unrestricted;
+				lara->Control.Look.Mode = LookMode::Unrestrained;
 			else
-				lara->Control.LookMode = LookMode::Horizontal;
+				lara->Control.Look.Mode = LookMode::Horizontal;
 
 			// Driving forward.
 			if (quadBike->Velocity > 0)

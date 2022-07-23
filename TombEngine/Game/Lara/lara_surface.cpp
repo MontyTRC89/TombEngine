@@ -41,7 +41,7 @@ void lara_as_surface_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 
 	item->Animation.VerticalVelocity -= LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.VerticalVelocity < 0)

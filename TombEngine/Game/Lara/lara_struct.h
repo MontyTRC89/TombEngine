@@ -933,7 +933,7 @@ enum class LookMode
 	None,
 	Horizontal,
 	Vertical,
-	Unrestricted
+	Unrestrained
 };
 
 enum class JumpDirection
@@ -1169,6 +1169,13 @@ struct LaraCountData
 	unsigned int NoCheat;
 };
 
+struct LookControlData
+{
+	LookMode	Mode		= LookMode::None;
+	Vector3Shrt Orientation = Vector3Shrt::Zero;
+	Vector3Shrt	TurnRate	= Vector3Shrt::Zero;
+};
+
 struct WeaponControlData
 {
 	short WeaponItem;
@@ -1232,30 +1239,30 @@ struct SubsuitControlData
 
 struct LaraControlData
 {
-	short MoveAngle;
-	short TurnRate;
-	int	  CalculatedJumpVelocity;
+	short MoveAngle = 0;
+	short TurnRate = 0;
+	int	  CalculatedJumpVelocity = 0;
 
-	LookMode	  LookMode;
 	HandStatus	  HandStatus;
 	WaterStatus	  WaterStatus;
 	JumpDirection JumpDirection;
 	LaraCountData Count;
 
-	WeaponControlData	 Weapon;
-	RopeControlData		 Rope;
-	TightropeControlData Tightrope;
-	SubsuitControlData	 Subsuit;
+	LookControlData		 Look	   = {};
+	WeaponControlData	 Weapon	   = {};
+	RopeControlData		 Rope	   = {};
+	TightropeControlData Tightrope = {};
+	SubsuitControlData	 Subsuit   = {};
 
-	bool CanLook;
-	bool IsMoving;
-	bool KeepLow;
-	bool IsLow;
-	bool CanClimbLadder;
-	bool IsClimbingLadder;
-	bool CanMonkeySwing;
-	bool RunJumpQueued;
-	bool Locked;
+	bool CanLook		  = false;
+	bool IsMoving		  = false;
+	bool KeepLow		  = false;
+	bool IsLow			  = false;
+	bool CanClimbLadder   = false;
+	bool IsClimbingLadder = false;
+	bool CanMonkeySwing	  = false;
+	bool RunJumpQueued	  = false;
+	bool Locked			  = false;
 };
 
 struct LaraInfo
@@ -1268,7 +1275,6 @@ struct LaraInfo
 	FlareData Flare;
 	TorchData Torch;
 
-	Vector3Shrt LookCameraRotation;
 	Vector3Shrt ExtraHeadRot;
 	Vector3Shrt ExtraTorsoRot;
 	Vector3Int	ExtraVelocity;

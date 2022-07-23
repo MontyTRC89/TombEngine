@@ -311,7 +311,7 @@ void lara_as_tightrope_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 
 	DoLaraTightropeBalanceRegen(item);
 	DoLaraTightropeLean(item);
@@ -587,7 +587,7 @@ void lara_as_rope_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 
 	if (!(TrInput & IN_ACTION))
 		FallFromRope(item);
@@ -728,7 +728,7 @@ void lara_as_pole_idle(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 	coll->Setup.EnableSpasm = false;
 	coll->Setup.EnableObjectPush = false;
 
@@ -945,7 +945,7 @@ void lara_as_pole_turn_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -995,7 +995,7 @@ void lara_as_pole_turn_counter_clockwise(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 

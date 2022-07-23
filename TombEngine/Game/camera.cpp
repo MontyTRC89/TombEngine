@@ -33,7 +33,7 @@ constexpr auto CAMERA_RADIUS          = CLICK(1);
 
 constexpr auto LOOKCAM_HORIZONTAL_CONSTRAINT_ANGLE = 45.0f;
 constexpr auto LOOKCAM_VERTICAL_CONSTRAINT_ANGLE   = 35.0f;
-constexpr auto LOOKCAM_TURN_RATE				   = 2.0f;
+constexpr auto LOOKCAM_TURN_RATE				   = 4.0f;
 
 constexpr auto THUMBCAM_HORIZONTAL_CONSTRAINT_ANGLE = 80.0f;
 constexpr auto THUMBCAM_VERTICAL_CONSTRAINT_ANGLE   = 120.0f;
@@ -103,11 +103,11 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	static const short lookCamTurnRate	= ANGLE(LOOKCAM_TURN_RATE);
 
 	float hAxisCoeff = 0.0f;
-	if (lara->Control.LookMode == LookMode::Horizontal || lara->Control.LookMode == LookMode::Unrestricted)
+	if (lara->Control.Look.Mode == LookMode::Horizontal || lara->Control.Look.Mode == LookMode::Unrestrained)
 		hAxisCoeff = AxisMap[InputAxis::MoveHorizontal];
 
 	float vAxisCoeff = 0.0f;
-	if (lara->Control.LookMode == LookMode::Vertical || lara->Control.LookMode == LookMode::Unrestricted)
+	if (lara->Control.Look.Mode == LookMode::Vertical || lara->Control.Look.Mode == LookMode::Unrestrained)
 		vAxisCoeff = AxisMap[InputAxis::MoveVertical] * (invertVerticalAxis ? -1.0f : 1.0f);
 
 	int hSign = std::copysign(1, hAxisCoeff);
@@ -119,12 +119,12 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		TrInput &= (TrInput & IN_RIGHT) ? ~IN_RIGHT : NULL;
 
 		if (BinocularRange)
-			lara->LookCameraRotation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
+			lara->Control.Look.Orientation.y += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(8.5f)) * hAxisCoeff;
 		else
-			lara->LookCameraRotation.y += lookCamTurnRate * hAxisCoeff;
+			lara->Control.Look.Orientation.y += lookCamTurnRate * hAxisCoeff;
 
-		if (abs(lara->LookCameraRotation.y) > hConstraintAngle)
-			lara->LookCameraRotation.y = hConstraintAngle * hSign;
+		if (abs(lara->Control.Look.Orientation.y) > hConstraintAngle)
+			lara->Control.Look.Orientation.y = hConstraintAngle * hSign;
 	}
 
 	if (TrInput & (IN_FORWARD | IN_BACK))
@@ -133,17 +133,17 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 		TrInput &= (TrInput & IN_BACK) ? ~IN_BACK : NULL;
 
 		if (BinocularRange)
-			lara->LookCameraRotation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * vAxisCoeff;
+			lara->Control.Look.Orientation.x += (lookCamTurnRate * (BinocularRange - ANGLE(10.0f)) / ANGLE(17.0f)) * vAxisCoeff;
 		else
-			lara->LookCameraRotation.x += lookCamTurnRate * vAxisCoeff;
+			lara->Control.Look.Orientation.x += lookCamTurnRate * vAxisCoeff;
 
-		if (abs(lara->LookCameraRotation.x) > vConstraintAngle)
-			lara->LookCameraRotation.x = vConstraintAngle * vSign;
+		if (abs(lara->Control.Look.Orientation.x) > vConstraintAngle)
+			lara->Control.Look.Orientation.x = vConstraintAngle * vSign;
 	}
 
 	// Visually adapt head and torso rotation.
 
-	lara->ExtraHeadRot = lara->LookCameraRotation;
+	lara->ExtraHeadRot = lara->Control.Look.Orientation;
 
 	if (lara->Control.HandStatus != HandStatus::Busy &&
 		lara->Vehicle == NO_ITEM &&
@@ -152,6 +152,12 @@ void DoLookAround(ItemInfo* item, bool invertVerticalAxis)
 	{
 		lara->ExtraTorsoRot = lara->ExtraHeadRot;
 	}
+
+	g_Renderer.PrintDebugMessage("LookMode.x: %d", (int)lara->Control.Look.Mode);
+	g_Renderer.PrintDebugMessage("LookCam.x: %d", lara->Control.Look.Orientation.x);
+	g_Renderer.PrintDebugMessage("LookCam.y: %d", lara->Control.Look.Orientation.y);
+	g_Renderer.PrintDebugMessage("hAxisCoeff: %f", hAxisCoeff);
+	g_Renderer.PrintDebugMessage("vAxisCoeff: %f", vAxisCoeff);
 }
 
 void DoThumbstickCamera()
@@ -180,8 +186,8 @@ void LookCamera(ItemInfo* item)
 	// - Swamp collision.
 	// - Reenable looking in states where it was disabled due to severe twisting.
 
-	// Determine Y axis orientation.
-	auto orient = lara->LookCameraRotation * 2;
+	// Define absolute camera orientation.
+	auto orient = lara->Control.Look.Orientation;
 	orient.y += item->Pose.Orientation.y;
 
 	// Define landmarks.
@@ -190,12 +196,12 @@ void LookCamera(ItemInfo* item)
 	auto lookAtPos = TranslateVector(pivot, orient, CLICK(0.5f));
 
 	// Determine steps to farthest position.
-	static const int numSteps = 8;
+	static const unsigned int numSteps = 8;
 	auto directionalIncrement = (pivot - cameraPos) / numSteps;
 
 	// Determine best position.
 	auto origin = GameVector(pivot.x, pivot.y, pivot.z, item->RoomNumber);
-	for (int i = 0; i < numSteps; i++)
+	for (size_t i = 0; i < numSteps; i++)
 	{
 		auto target = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
 		if (LOS(&origin, &target))
@@ -206,7 +212,7 @@ void LookCamera(ItemInfo* item)
 
 	// Handle room and object collisions.
 	auto temp = GameVector(cameraPos.x, cameraPos.y, cameraPos.z, item->RoomNumber);
-	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, 1);
+	CameraCollisionBounds(&temp, CLICK(1) - CLICK(0.25f) / 2, true);
 	cameraPos = Vector3Int(temp.x, temp.y, temp.z);
 	ItemsCollideCamera();
 
@@ -771,7 +777,7 @@ void CombatCamera(ItemInfo* item)
 	MoveCamera(&ideal, Camera.speed);
 }
 
-bool CameraCollisionBounds(GameVector* ideal, int push, int yFirst)
+bool CameraCollisionBounds(GameVector* ideal, int push, bool yFirst)
 {
 	int x = ideal->x;
 	int y = ideal->y;
@@ -1480,7 +1486,7 @@ void ResetLook(ItemInfo* item)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->LookCameraRotation = Vector3Shrt();
+	lara->Control.Look.Orientation = Vector3Shrt();
 
 	if (Camera.type != CameraType::Look)
 	{
@@ -1625,8 +1631,8 @@ static bool CheckStaticCollideCamera(MESH_INFO* mesh)
 	auto dz = Camera.pos.z - mesh->pos.Position.z;
 
 	bool closeEnough = dx > -COLL_CHECK_THRESHOLD && dx < COLL_CHECK_THRESHOLD &&
-						dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
-						dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
+					   dz > -COLL_CHECK_THRESHOLD && dz < COLL_CHECK_THRESHOLD &&
+					   dy > -COLL_CHECK_THRESHOLD && dy < COLL_CHECK_THRESHOLD;
 
 	if (!closeEnough)
 		return false;

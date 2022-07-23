@@ -5,6 +5,8 @@ struct Vector2Int
 	int x;
 	int y;
 
+	static const Vector2Int Zero;
+
 	Vector2Int()
 	{
 		this->x = 0;
@@ -23,6 +25,8 @@ struct Vector3Int
 	int x;
 	int y;
 	int z;
+
+	static const Vector3Int Zero;
 
 	bool operator ==(Vector3Int vector)
 	{
@@ -122,6 +126,8 @@ struct Vector3Shrt
 	short x;
 	short y;
 	short z;
+
+	static const Vector3Shrt Zero;
 
 	bool operator ==(Vector3Shrt vector)
 	{

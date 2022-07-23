@@ -67,7 +67,7 @@ void lara_as_controlled(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -84,7 +84,7 @@ void lara_as_controlled_no_look(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 }
@@ -97,7 +97,7 @@ void lara_as_vault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -112,7 +112,7 @@ void lara_as_auto_jump(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 	
@@ -129,7 +129,7 @@ void lara_as_walk_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Horizontal;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > (LARA_RUN_JUMP_TIME / 2 + 4))
@@ -238,7 +238,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Horizontal;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME)
@@ -387,7 +387,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 
 	if (item->HitPoints <= 0)
 	{
@@ -736,7 +736,7 @@ void lara_as_pose(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Unrestricted;
+	lara->Control.Look.Mode = LookMode::Unrestrained;
 
 	if (item->HitPoints <= 0)
 	{
@@ -771,7 +771,7 @@ void lara_as_run_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Horizontal;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	if (TrInput & (IN_LEFT | IN_RIGHT))
 	{
@@ -840,7 +840,7 @@ void lara_as_turn_right_slow(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1086,7 +1086,7 @@ void lara_as_turn_left_slow(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1330,7 +1330,7 @@ void lara_as_death(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	coll->Setup.EnableObjectPush = false;
 	coll->Setup.EnableSpasm = false;
 
@@ -1380,7 +1380,7 @@ void lara_as_splat(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 }
 
@@ -1416,7 +1416,7 @@ void lara_as_walk_back(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.LookMode = LookMode::Horizontal;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1523,7 +1523,7 @@ void lara_as_turn_right_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1652,7 +1652,7 @@ void lara_as_turn_left_fast(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1780,7 +1780,7 @@ void lara_as_step_right(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1871,7 +1871,7 @@ void lara_as_step_left(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Vertical;
+	lara->Control.Look.Mode = LookMode::Vertical;
 
 	if (item->HitPoints <= 0)
 	{
@@ -1962,7 +1962,7 @@ void lara_as_roll_back(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 
 	if (TrInput & IN_ROLL)
 	{
@@ -2023,7 +2023,7 @@ void lara_as_roll_forward(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::None;
+	lara->Control.Look.Mode = LookMode::None;
 	ModulateLaraTurnRateY(item, 0, 0, 0);
 
 	// TODO: Change swandive roll anim's state to something sensible.
@@ -2094,7 +2094,7 @@ void lara_as_wade_forward(ItemInfo* item, CollisionInfo* coll)
 
 	bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, item);
 
-	lara->Control.LookMode = LookMode::Horizontal;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	Camera.targetElevation = -ANGLE(22.0f);
 
 	if (item->HitPoints <= 0)
@@ -2218,7 +2218,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Horizontal;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 	lara->SprintEnergy--;
 
 	lara->Control.Count.Run++;
@@ -2363,7 +2363,7 @@ void lara_as_sprint_dive(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	lara->Control.LookMode = LookMode::Horizontal;
+	lara->Control.Look.Mode = LookMode::Horizontal;
 
 	lara->Control.Count.Run++;
 	if (lara->Control.Count.Run > LARA_RUN_JUMP_TIME)
