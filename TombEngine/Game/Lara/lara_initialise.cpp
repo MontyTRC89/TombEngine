@@ -40,7 +40,6 @@ void InitialiseLara(int restore)
 	Lara.SprintEnergy = LARA_SPRINT_ENERGY_MAX;
 	Lara.Air = LARA_AIR_MAX;
 	Lara.Control.Weapon.WeaponItem = NO_ITEM;
-	PoisonFlag = 0;
 	Lara.PoisonPotency = 0;
 	Lara.WaterSurfaceDist = 100;
 
