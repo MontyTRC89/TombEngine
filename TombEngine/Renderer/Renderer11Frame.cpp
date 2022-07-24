@@ -687,9 +687,19 @@ namespace TEN::Renderer
 
 			Vector3 center = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
-			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1 &&
-				SphereBoxIntersection(boxMin, boxMax, center, 0.0f))
-				renderView.lightsToDraw.push_back(light);
+			// Light buffer is full
+			if (renderView.lightsToDraw.size() >= NUM_LIGHTS_PER_BUFFER)
+				continue;
+
+			// Light already on a list
+			if (std::find(renderView.lightsToDraw.begin(), renderView.lightsToDraw.end(), light) != renderView.lightsToDraw.end())
+				continue;
+
+			// Light is not within room bounds
+			if (!SphereBoxIntersection(boxMin, boxMax, center, light->Out))
+				continue;
+
+			renderView.lightsToDraw.push_back(light);
 		}
 	}
 
