@@ -155,10 +155,10 @@ void Moveable::Register(sol::table & parent)
 
 /// Make the item not targetable by Lara.
 // @function Moveable:MakeNotTargetable
-// @tparam boolean value, true to make him not targetable, false to make him targetable again.
+// @tparam boolean value, true to make him not targetable, false to make him targetable again, Default is true.
 ScriptReserved_MakeNotTargetable, & Moveable::MakeNotTargetable,
 
-/// Make the actor moves continue through its AI_Follow path till the indicated value.
+/// Make the actor moves through its AI_Follow path till the indicated value.
 // @function Moveable:DoGoToNode
 // @tparam short value, the ocb number of the AI_Follow object where this actor must go.
 ScriptReserved_MakeNotTargetable, & Moveable::DoGoToNode,
@@ -172,7 +172,7 @@ ScriptReserved_MakeNotTargetable, & Moveable::DoGoDirectlyToNode,
 // @function Moveable:DoGoNextNode
 ScriptReserved_MakeNotTargetable, & Moveable::DoGoNextNode,
 
-/// Make the guide to wait for Lara be near before to activate a heavy trigger action.
+/// Make the guide to wait for Lara to be near before to activate a heavy trigger action.
 // @function Moveable:DoWaitForLara
 // @tparam boolean value, true to make it wait, false to make it continue with no wait. Default is true.
 ScriptReserved_MakeNotTargetable, & Moveable::DoWaitForLara,
