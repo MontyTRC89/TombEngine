@@ -8,7 +8,7 @@
 #define MAX_LIGHTS	48
 #define SPEC_FACTOR 64
 
-struct ShaderLight 
+struct ShaderLight
 {
 	float3 Position;
 	uint Type;
@@ -122,6 +122,25 @@ float3 DoPointLight(float3 pos, float3 n, ShaderLight light)
 	}
 }
 
+float3 DoShadowLight(float3 pos, float3 n, ShaderLight light)
+{
+	float3 lightPos = light.Position.xyz;
+	float3 color = light.Color.xyz;
+	float intensity = light.Intensity;
+	float radius = light.Out;
+
+	float3 lightVec = (lightPos - pos);
+	float distance = length(lightVec);
+
+	if (distance > radius)
+		return float3(0, 0, 0);
+	else
+	{
+		float attenuation = ((radius - distance) / radius);
+		return (color * intensity * attenuation) * 2.0f;
+	}
+}
+
 float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 lightPos = light.Position.xyz;
@@ -187,18 +206,22 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen)
 {
 	float3 ambTex = ambient * tex;
-
 	float3 diffuse = 0;
+	float3 shadow = 0;
 	float3 spec = 0;
 
 	for (int i = 0; i < NumLights; i++)
 	{
 		int lightType = Lights[i].Type;
 
-		if (lightType == LT_POINT || lightType == LT_SHADOW)
+		if (lightType == LT_POINT)
 		{
 			diffuse += DoPointLight(pos, normal, Lights[i]);
 			spec += DoSpecularPoint(pos, normal, Lights[i], sheen);
+		}
+		else if (lightType == LT_SHADOW)
+		{
+			shadow += DoShadowLight(pos, normal, Lights[i]);
 		}
 		else if (lightType == LT_SUN)
 		{
@@ -213,9 +236,9 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 	}
 
 	diffuse.xyz *= tex.xyz;
-	float3 combined = ambTex + diffuse + spec;
+	float3 combined = (ambTex + diffuse + spec) - shadow;
 
-	return saturate(combined * vertex);
+	return (combined * vertex);
 }
 
 float3 StaticLight(float3 vertex, float3 tex)
