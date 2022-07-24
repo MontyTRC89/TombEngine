@@ -63,7 +63,12 @@ namespace TEN::Renderer
 		gameCamera.clear();
 	}
 
-	int Renderer11::SyncRenderer()
+	void Renderer11::Lock()
+	{
+		m_Locked = true;
+	}
+
+	int Renderer11::Sync()
 	{
 		// Sync the renderer
 		int nf = Sync();

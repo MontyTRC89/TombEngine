@@ -251,16 +251,20 @@ namespace TEN::Renderer
 				if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
 					m_outside = true;
 
-				m_rooms[roomNumber].Distance = distance;
-				m_rooms[roomNumber].Visited = true;
-
-				if (!onlyRooms)
+				if (!m_rooms[roomNumber].Visited)
 				{
 					CollectLightsForRoom(roomNumber, renderView);
-					CollectItems(roomNumber, renderView);
-					CollectStatics(roomNumber, renderView);
-					CollectEffects(roomNumber);
+
+					if (!onlyRooms)
+					{
+						CollectItems(roomNumber, renderView);
+						CollectStatics(roomNumber, renderView);
+						CollectEffects(roomNumber);
+					}
 				}
+
+				m_rooms[roomNumber].Distance = distance;
+				m_rooms[roomNumber].Visited = true;
 			}
 
 			if (nativeRoom->flags & ENV_FLAG_OUTSIDE)
@@ -672,20 +676,19 @@ namespace TEN::Renderer
 		
 		RendererRoom& room = m_rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
-
-		int numLights = room.Lights.size();
+		
+		Vector3 boxMin = Vector3(r->x + WALL_SIZE, r->maxceiling - STEP_SIZE, r->z + WALL_SIZE);
+		Vector3 boxMax = Vector3(r->x + (r->xSize - 1) * WALL_SIZE, r->minfloor + STEP_SIZE, r->z + (r->zSize - 1) * WALL_SIZE);
 
 		// Collect dynamic lights for rooms
 		for (int i = 0; i < dynamicLights.size(); i++)
 		{
 			RendererLight* light = &dynamicLights[i];
 
-			Vector3 boxMin = Vector3(r->x - 2 * WALL_SIZE, -(r->minfloor + STEP_SIZE), r->z - 2 * WALL_SIZE);
-			Vector3 boxMax = Vector3(r->x + (r->xSize + 1) * WALL_SIZE, -(r->maxceiling - STEP_SIZE), r->z + (r->zSize + 1) * WALL_SIZE);
-			Vector3 center = Vector3(light->Position.x, -light->Position.y, light->Position.z);
+			Vector3 center = Vector3(light->Position.x, light->Position.y, light->Position.z);
 
 			if (renderView.lightsToDraw.size() < NUM_LIGHTS_PER_BUFFER - 1 &&
-				SphereBoxIntersection(boxMin, boxMax, center, light->Out))
+				SphereBoxIntersection(boxMin, boxMax, center, 0.0f))
 				renderView.lightsToDraw.push_back(light);
 		}
 	}
