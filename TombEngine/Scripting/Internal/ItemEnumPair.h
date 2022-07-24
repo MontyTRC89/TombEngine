@@ -3,6 +3,8 @@
 #include "Objects/objectslist.h"
 #include <utility>
 
+using namespace TEN::Gui;
+
 struct ItemEnumPair
 {
 	std::pair<GAME_OBJECT_ID, InventoryObjectTypes> m_pair;

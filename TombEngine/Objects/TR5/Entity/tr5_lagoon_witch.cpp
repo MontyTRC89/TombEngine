@@ -11,6 +11,8 @@
 #include "Game/itemdata/creature_info.h"
 #include "Game/misc.h"
 
+using namespace TEN::Gui;
+
 BITE_INFO LagoonWitchBite = { 0, 0, 0, 7 };
 
 enum LagoonWitchState

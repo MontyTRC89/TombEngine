@@ -15,6 +15,8 @@
 #include "Game/animation.h"
 #include "Game/misc.h"
 
+using namespace TEN::Gui;
+
 namespace TEN::Entities::TR4
 {
 	BITE_INFO SentryGunBite = { 0, 0, 0, 8 };

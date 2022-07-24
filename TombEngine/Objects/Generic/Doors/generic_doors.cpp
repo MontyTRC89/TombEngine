@@ -23,6 +23,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/itemdata/itemdata.h"
 
+using namespace TEN::Gui;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Doors

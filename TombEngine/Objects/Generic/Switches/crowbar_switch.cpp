@@ -12,6 +12,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 
+using namespace TEN::Gui;
 using namespace TEN::Input;
 
 namespace TEN::Entities::Switches

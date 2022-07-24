@@ -43,6 +43,8 @@
 
 struct CAMERA_INFO;
 
+using namespace TEN::Gui;
+
 namespace TEN::Renderer
 {
 	using TexturePair = std::tuple<Texture2D, Texture2D>;

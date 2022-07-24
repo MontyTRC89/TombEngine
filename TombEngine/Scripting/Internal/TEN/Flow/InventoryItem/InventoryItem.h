@@ -1,22 +1,29 @@
 #pragma once
+
 #include <string>
+
+#include "Game/gui.h"
 #include "ItemEnumPair.h"
 #include "Rotation/Rotation.h"
-#include "Game/gui.h"
 
-static const std::unordered_map<std::string, RotationFlags> kRotAxes{
+using namespace TEN::Gui;
+
+static const std::unordered_map<std::string, RotationFlags> kRotAxes
+{
 	{"X", RotationFlags::INV_ROT_X},
 	{"Y", RotationFlags::INV_ROT_Y},
 	{"Z", RotationFlags::INV_ROT_Z}
 };
 
-static const std::unordered_map<std::string, ItemOptions> kItemActions{
+static const std::unordered_map<std::string, ItemOptions> kItemActions
+{
 	{"USE", ItemOptions::OPT_USE},
 	{"EQUIP", ItemOptions::OPT_EQUIP},
 	{"EXAMINE", ItemOptions::OPT_EXAMINABLE}
 };
 
-namespace sol {
+namespace sol
+{
 	class state;
 }
 

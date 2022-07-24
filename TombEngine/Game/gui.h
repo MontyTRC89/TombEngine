@@ -6,225 +6,228 @@
 
 struct ItemInfo;
 
-enum class InventoryMode
+namespace TEN::Gui
 {
-	None,
-	InGame,
-	Pause,
-	Statistics,
-	Examine,
-	Diary,
-	Load,
-	Save
-};
+	enum class InventoryMode
+	{
+		None,
+		InGame,
+		Pause,
+		Statistics,
+		Examine,
+		Diary,
+		Load,
+		Save
+	};
 
-enum class InventoryResult
-{
-	None,
-	UseItem,
-	NewGame,
-	LoadGame,
-	SaveGame,
-	ExitGame,
-	ExitToTitle,
-	NewGameSelectedLevel
-};
+	enum class InventoryResult
+	{
+		None,
+		UseItem,
+		NewGame,
+		LoadGame,
+		SaveGame,
+		ExitGame,
+		ExitToTitle,
+		NewGameSelectedLevel
+	};
 
-enum class LoadResult
-{
-	None,
-	Load,
-	Cancel
-};
+	enum class LoadResult
+	{
+		None,
+		Load,
+		Cancel
+	};
 
-enum class MenuType
-{
-	None,
-	Use,
-	ChooseAmmo,
-	Combine,
-	Seperate,
-	Equip,
-	Ammo1,
-	Ammo2,
-	Ammo3,
-	Load,
-	Save,
-	Examine,
-	Statistics,
-	Diary
-};
+	enum class MenuType
+	{
+		None,
+		Use,
+		ChooseAmmo,
+		Combine,
+		Seperate,
+		Equip,
+		Ammo1,
+		Ammo2,
+		Ammo3,
+		Load,
+		Save,
+		Examine,
+		Statistics,
+		Diary
+	};
 
-enum class RingTypes
-{
-	Inventory,
-	Ammo
-};
+	enum class RingTypes
+	{
+		Inventory,
+		Ammo
+	};
 
-enum class Menu
-{
-	Title,
-	Pause,
-	Statistics,
-	SelectLevel,
-	LoadGame,
-	Options,
-	Display,
-	Controls,
-	OtherSettings
-};
+	enum class Menu
+	{
+		Title,
+		Pause,
+		Statistics,
+		SelectLevel,
+		LoadGame,
+		Options,
+		Display,
+		Controls,
+		OtherSettings
+	};
 
-struct MenuOption
-{
-	MenuType	Type;
-	char const* Text;
-};
+	struct MenuOption
+	{
+		MenuType	Type;
+		char const* Text;
+	};
 
-struct ObjectList
-{
-	short InventoryItem;
-	unsigned short XRot;
-	unsigned short YRot;
-	unsigned short ZRot;
-	unsigned short Bright;
-};
+	struct ObjectList
+	{
+		short InventoryItem;
+		unsigned short XRot;
+		unsigned short YRot;
+		unsigned short ZRot;
+		unsigned short Bright;
+	};
 
-struct InventoryRing
-{
-	ObjectList CurrentObjectList[INVENTORY_TABLE_SIZE + 1];
-	int RingActive;
-	int ObjectListMovement;
-	int CurrentObjectInList;
-	int NumObjectsInList;
-};
+	struct InventoryRing
+	{
+		ObjectList CurrentObjectList[INVENTORY_TABLE_SIZE + 1];
+		int RingActive;
+		int ObjectListMovement;
+		int CurrentObjectInList;
+		int NumObjectsInList;
+	};
 
-struct SettingsData
-{
-	bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls
-	bool IgnoreInput = false;   // Ignore input unless all keys were released
-	int SelectedScreenResolution;
-	GameConfiguration Configuration;
-};
+	struct SettingsData
+	{
+		bool WaitingForKey = false; // Waiting for a key to be pressed when configuring controls
+		bool IgnoreInput = false;   // Ignore input unless all keys were released
+		int SelectedScreenResolution;
+		GameConfiguration Configuration;
+	};
 
-class GuiController
-{
-public:
-	bool CallInventory(ItemInfo* item, bool resetMode);
-	InventoryResult TitleOptions();
-	InventoryResult DoPauseMenu();
-	void DrawInventory();
-	void DrawCurrentObjectList(ItemInfo* item, int ringIndex);
-	int IsObjectInInventory(int objectNumber);
-	int ConvertObjectToInventoryItem(int objectNumber);
-	int ConvertInventoryItemToObject(int objectNumber);
-	void FadeAmmoSelector();
-	void DrawAmmoSelector();
-	bool PerformWaterskinCombine(ItemInfo* item, int flag);
-	void DrawCompass(ItemInfo* item);
+	class GuiController
+	{
+	public:
+		bool CallInventory(ItemInfo* item, bool resetMode);
+		InventoryResult TitleOptions();
+		InventoryResult DoPauseMenu();
+		void DrawInventory();
+		void DrawCurrentObjectList(ItemInfo* item, int ringIndex);
+		int IsObjectInInventory(int objectNumber);
+		int ConvertObjectToInventoryItem(int objectNumber);
+		int ConvertInventoryItemToObject(int objectNumber);
+		void FadeAmmoSelector();
+		void DrawAmmoSelector();
+		bool PerformWaterskinCombine(ItemInfo* item, int flag);
+		void DrawCompass(ItemInfo* item);
 
-	// Getters
-	InventoryRing* GetRings(int ringIndex);
-	short GetSelectedOption();
-	Menu GetMenuToDisplay();
-	InventoryMode GetInventoryMode();
-	int GetInventoryItemChosen();
-	int GetEnterInventory();
-	int GetLastInventoryItem();
-	SettingsData GetCurrentSettings();
-	short GetLoadSaveSelection();
+		// Getters
+		InventoryRing* GetRings(int ringIndex);
+		short GetSelectedOption();
+		Menu GetMenuToDisplay();
+		InventoryMode GetInventoryMode();
+		int GetInventoryItemChosen();
+		int GetEnterInventory();
+		int GetLastInventoryItem();
+		SettingsData GetCurrentSettings();
+		short GetLoadSaveSelection();
 
-	// Setters
-	void SetSelectedOption(int menu);
-	void SetMenuToDisplay(Menu menu);
-	void SetInventoryMode(InventoryMode mode);
-	void SetEnterInventory(int num);
-	void SetInventoryItemChosen(int num);
+		// Setters
+		void SetSelectedOption(int menu);
+		void SetMenuToDisplay(Menu menu);
+		void SetInventoryMode(InventoryMode mode);
+		void SetEnterInventory(int num);
+		void SetInventoryItemChosen(int num);
 
-private:
-	#define CAN_SELECT   (!IsHeld(In::Deselect) && \
+	private:
+		#define CAN_SELECT   (!IsHeld(In::Deselect) && \
 						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) && \
 						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) && \
 						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) && \
 						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
-	#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
+		#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
 
-	// Input macros
-	#define GUI_ACTION_PULSE_UP	   (IsPulsed(In::Forward, 0.1f, 0.4f) && !IsHeld(In::Back))
-	#define GUI_ACTION_PULSE_DOWN  (IsPulsed(In::Back, 0.1f, 0.4f) && !IsHeld(In::Forward))
-	#define GUI_ACTION_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
-	#define GUI_ACTION_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
-	#define GUI_ACTION_SELECT	   ((IsReleased(In::Select) || IsReleased(In::Action)) && CAN_SELECT)
-	#define GUI_ACTION_DESELECT	   (IsClicked(In::Deselect) && CAN_DESELECT)
+		// Input macros
+		#define GUI_ACTION_PULSE_UP	   (IsPulsed(In::Forward, 0.1f, 0.4f) && !IsHeld(In::Back))
+		#define GUI_ACTION_PULSE_DOWN  (IsPulsed(In::Back, 0.1f, 0.4f) && !IsHeld(In::Forward))
+		#define GUI_ACTION_PULSE_LEFT  IsPulsed(In::Left, 0.1f, 0.4f)
+		#define GUI_ACTION_PULSE_RIGHT IsPulsed(In::Right, 0.1f, 0.4f)
+		#define GUI_ACTION_SELECT	   ((IsReleased(In::Select) || IsReleased(In::Action)) && CAN_SELECT)
+		#define GUI_ACTION_DESELECT	   (IsClicked(In::Deselect) && CAN_DESELECT)
 
-	// GUI variables
-	Menu MenuToDisplay = Menu::Title;
-	int SelectedOption;
-	int OptionCount;
-	int SelectedSaveSlot;
+		// GUI variables
+		Menu MenuToDisplay = Menu::Title;
+		int SelectedOption;
+		int OptionCount;
+		int SelectedSaveSlot;
 
-	SettingsData CurrentSettings;
+		SettingsData CurrentSettings;
 
-	// Inventory variables
-	short CombineObject1;
-	short CombineObject2;
-	char UseItem;
-	char SeperateTypeFlag;
-	char CombineTypeFlag;
-	int CompassNeedleAngle;
-	InventoryRing PCRing1;
-	InventoryRing PCRing2;
-	InventoryRing* Rings[2];
-	int CurrentSelectedOption;
-	int MenuActive;
-	char AmmoSelectorFlag;
-	char NumAmmoSlots;
-	char* CurrentAmmoType;
-	AmmoList AmmoObjectList[3];
-	short AmmoSelectorFadeVal;
-	short AmmoSelectorFadeDir;
-	short CombineRingFadeVal;
-	short CombineRingFadeDir;
-	short NormalRingFadeVal;
-	short NormalRingFadeDir;
-	unsigned char AmmoActive;
-	int OBJLIST_SPACING;
-	MenuOption CurrentOptions[3];
-	InventoryMode InvMode;
-	int InventoryItemChosen;
-	int EnterInventory;
-	int LastInvItem;
-	AmmoData Ammo;
+		// Inventory variables
+		short CombineObject1;
+		short CombineObject2;
+		char UseItem;
+		char SeperateTypeFlag;
+		char CombineTypeFlag;
+		int CompassNeedleAngle;
+		InventoryRing PCRing1;
+		InventoryRing PCRing2;
+		InventoryRing* Rings[2];
+		int CurrentSelectedOption;
+		int MenuActive;
+		char AmmoSelectorFlag;
+		char NumAmmoSlots;
+		char* CurrentAmmoType;
+		AmmoList AmmoObjectList[3];
+		short AmmoSelectorFadeVal;
+		short AmmoSelectorFadeDir;
+		short CombineRingFadeVal;
+		short CombineRingFadeDir;
+		short NormalRingFadeVal;
+		short NormalRingFadeDir;
+		unsigned char AmmoActive;
+		int OBJLIST_SPACING;
+		MenuOption CurrentOptions[3];
+		InventoryMode InvMode;
+		int InventoryItemChosen;
+		int EnterInventory;
+		int LastInvItem;
+		AmmoData Ammo;
 
-	void HandleDisplaySettingsInput(bool fromPauseMenu);
-	void HandleControlSettingsInput(bool fromPauseMenu);
-	void HandleOtherSettingsInput(bool fromPauseMenu);
-	void HandleOptionsInput();
-	void BackupOptions();
-	bool DoObjectsCombine(int objectNumber1, int objectNumber2);
-	void InitialiseInventory(ItemInfo* item);
-	void FillDisplayOptions();
-	bool IsItemCurrentlyCombinable(int objectNumber);
-	bool IsItemInInventory(int objectNumber);
-	void CombineObjects(ItemInfo* item, int objectNumber1, int objectNumber2);
-	void SetupObjectListStartPosition(int newObjectNumber);
-	void SetupObjectListStartPosition2(int newObjectNumber);
-	void HandleObjectChangeover(int ringIndex);
-	void SetupAmmoSelector();
-	void ConstructObjectList(ItemInfo* item);
-	void SeparateObject(ItemInfo* item, int objectNumber);
-	void InsertObjectIntoList(int objectNumber);
-	void InsertObjectIntoList_v2(int objectNumber);
-	void UseCurrentItem(ItemInfo* item);
-	void SpinBack(unsigned short* angle);
-	void UpdateWeaponStatus(ItemInfo* item);
-	void DoStatisticsMode();
-	void DoExamineMode();
-	void DoDiary(ItemInfo* item);
-	LoadResult DoLoad();
-	bool DoSave();
-	void DoInventory(ItemInfo* item);
-	void ConstructCombineObjectList(ItemInfo* item);
-};
+		void HandleDisplaySettingsInput(bool fromPauseMenu);
+		void HandleControlSettingsInput(bool fromPauseMenu);
+		void HandleOtherSettingsInput(bool fromPauseMenu);
+		void HandleOptionsInput();
+		void BackupOptions();
+		bool DoObjectsCombine(int objectNumber1, int objectNumber2);
+		void InitialiseInventory(ItemInfo* item);
+		void FillDisplayOptions();
+		bool IsItemCurrentlyCombinable(int objectNumber);
+		bool IsItemInInventory(int objectNumber);
+		void CombineObjects(ItemInfo* item, int objectNumber1, int objectNumber2);
+		void SetupObjectListStartPosition(int newObjectNumber);
+		void SetupObjectListStartPosition2(int newObjectNumber);
+		void HandleObjectChangeover(int ringIndex);
+		void SetupAmmoSelector();
+		void ConstructObjectList(ItemInfo* item);
+		void SeparateObject(ItemInfo* item, int objectNumber);
+		void InsertObjectIntoList(int objectNumber);
+		void InsertObjectIntoList_v2(int objectNumber);
+		void UseCurrentItem(ItemInfo* item);
+		void SpinBack(unsigned short* angle);
+		void UpdateWeaponStatus(ItemInfo* item);
+		void DoStatisticsMode();
+		void DoExamineMode();
+		void DoDiary(ItemInfo* item);
+		LoadResult DoLoad();
+		bool DoSave();
+		void DoInventory(ItemInfo* item);
+		void ConstructCombineObjectList(ItemInfo* item);
+	};
 
-extern GuiController g_Gui;
-extern const char* ControlStrings[];
+	extern GuiController g_Gui;
+	extern const char* ControlStrings[];
+}
