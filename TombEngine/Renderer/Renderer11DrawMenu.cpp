@@ -683,14 +683,14 @@ namespace TEN::Renderer
 	void Renderer11::DrawDiary()
 	{
 		InventoryObject* obj = &InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
-		short currentPage = Lara.Inventory.Diary.currentPage;
-		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), obj->Orientation.x,
-			obj->Orientation.y, obj->Orientation.z, obj->Scale1);
+		short currentPage = Lara.Inventory.Diary.CurrentPage;
+		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY),
+			obj->Orientation.x, obj->Orientation.y, obj->Orientation.z, obj->Scale1);
 
-		for (int i = 0; i < MaxStringsPerPage; i++)
+		for (size_t i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
 		{
-			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].
-				Strings[i].y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.currentPage].Strings[i].stringID)
+			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].Position.x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].
+				Strings[i].Position.y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].StringID)
 				break;
 
 			//DrawString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);

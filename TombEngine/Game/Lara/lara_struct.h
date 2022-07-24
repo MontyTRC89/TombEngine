@@ -1096,27 +1096,27 @@ struct TorchData
 	bool IsLit;
 };
 
-// TODO: Someone's abandoned dairy feature.
-#define MaxDiaryPages	  64
-#define MaxStringsPerPage 8
+// TODO: Troye's abandoned dairy feature.
+constexpr int MAX_DIARY_PAGES			 = 64;
+constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
 
 struct DiaryString
 {
-	int x, y;
-	short stringID;
+	Vector2Int Position;
+	int		   StringID;
 };
 
 struct DiaryPage
 {
-	DiaryString	Strings[MaxStringsPerPage];
+	DiaryString	Strings[MAX_DIARY_STRINGS_PER_PAGE];
 };
 
 struct DiaryInfo
 {
-	bool Present;
-	short numPages;
-	short currentPage;
-	DiaryPage Pages[MaxDiaryPages];
+	bool		 Present;
+	DiaryPage	 Pages[MAX_DIARY_PAGES];
+	unsigned int NumPages;
+	unsigned int CurrentPage;
 };
 
 struct LaraInventoryData
@@ -1127,9 +1127,9 @@ struct LaraInventoryData
 	DiaryInfo Diary;
 
 	byte BeetleLife;
-	int BeetleComponents;	// BeetleComponentFlags enum
-	byte SmallWaterskin;	// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
-	byte BigWaterskin;		// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
+	int BeetleComponents; // BeetleComponentFlags enum
+	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
+	byte BigWaterskin;	  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
 
 	// TODO: Rename prefixes back to "Num".
 	int TotalSmallMedipacks;

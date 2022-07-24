@@ -2194,7 +2194,7 @@ void GuiController::DoInventory(ItemInfo* item)
 
 				case MenuType::Diary:
 					InvMode = InventoryMode::Diary;
-					lara->Inventory.Diary.currentPage = 1;
+					lara->Inventory.Diary.CurrentPage = 1;
 					break;
 				}
 			}
@@ -2934,16 +2934,16 @@ void GuiController::DoDiary(ItemInfo* item)
 	InvMode = InventoryMode::Diary;
 
 	if (GUI_ACTION_PULSE_RIGHT &&
-		lara->Inventory.Diary.currentPage < lara->Inventory.Diary.numPages)
+		lara->Inventory.Diary.CurrentPage < lara->Inventory.Diary.NumPages)
 	{
-		lara->Inventory.Diary.currentPage++;
+		lara->Inventory.Diary.CurrentPage++;
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
 	if (GUI_ACTION_PULSE_LEFT &&
-		lara->Inventory.Diary.currentPage > 1)
+		lara->Inventory.Diary.CurrentPage > 1)
 	{
-		lara->Inventory.Diary.currentPage--;
+		lara->Inventory.Diary.CurrentPage--;
 		SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
 	}
 
