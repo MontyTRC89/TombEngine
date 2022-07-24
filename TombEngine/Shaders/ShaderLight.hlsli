@@ -191,7 +191,7 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 {
 	float3 color = light.Color.xyz;
 	float3 intensity = saturate(light.Intensity);
-	float3 direction = -light.Direction.xyz;
+	float3 direction = light.Direction.xyz;
 
 	direction = normalize(direction);
 
