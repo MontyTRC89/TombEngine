@@ -83,6 +83,7 @@ public:
 	void DoGoToNode(short nodeId);
 	void DoGoDirectlyToNode(short nodeId);
 	void DoGoNextNode();
+	void DoNewBehaviour( bool isNewBehaviour = true);
 	void DoWaitForLara( bool isWaitForLara = true);
 	void DoRunDefault( bool isRunDefault = false);
 
