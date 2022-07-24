@@ -110,7 +110,7 @@ PixelShaderInput VS(VertexShaderInput input)
 
 #ifdef ANIMATED
 	float speed = fps / 30.0f;
-	int frame = (int)((Frame+input.AnimationFrameOffset) * speed) % numAnimFrames;
+	int frame = (int)(Frame * speed + input.AnimationFrameOffset) % numAnimFrames;
 	switch (input.PolyIndex) {
 	case 0:
 		output.UV = AnimFrames[frame].topLeft;
