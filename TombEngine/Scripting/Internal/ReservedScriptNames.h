@@ -78,6 +78,7 @@ static constexpr char ScriptReserved_ToLength[]					= "ToLength";
 static constexpr char ScriptReserved_DoGoToNode[]				= "DoGoToNode";
 static constexpr char ScriptReserved_DoGoDirectlyToNode[]		= "DoGoDirectlyToNode";
 static constexpr char ScriptReserved_DoGoNextNode[]				= "DoGoNextNode";
+static constexpr char ScriptReserved_DoNewBehaviour[]			= "DoNewBehaviour";
 static constexpr char ScriptReserved_DoWaitForLara[]			= "DoWaitForLara";
 static constexpr char ScriptReserved_DoRunDefault[]				= "DoRunDefault";
 
