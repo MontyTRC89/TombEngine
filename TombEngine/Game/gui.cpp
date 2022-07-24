@@ -954,12 +954,12 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (pause)
 			{
 				g_Renderer.RenderInventory();
-				Camera.numberFrames = g_Renderer.Sync();
+				Camera.numberFrames = g_Renderer.Synchronize();
 			}
 			else
 			{
 				g_Renderer.RenderTitle();
-				Camera.numberFrames = g_Renderer.Sync();
+				Camera.numberFrames = g_Renderer.Synchronize();
 				int nframes = Camera.numberFrames;
 				ControlPhase(nframes, 0);
 			}
@@ -3288,7 +3288,7 @@ bool GuiController::CallInventory(bool reset_mode)
 		if (useItem && !TrInput)
 			exitLoop = true;
 
-		Camera.numberFrames = g_Renderer.Sync();
+		Camera.numberFrames = g_Renderer.Synchronize();
 	}
 
 	lastInvItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;

@@ -620,7 +620,7 @@ namespace TEN::Renderer
 		while (currentFade <= 1.0f)
 		{
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), currentFade, m_backBufferRTV, m_depthStencilView);
-			Sync();
+			Synchronize();
 			currentFade += FADE_FACTOR;
 			m_swapChain->Present(0, 0);
 		}
@@ -628,7 +628,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < 20; i++)
 		{
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), 1.0f, m_backBufferRTV, m_depthStencilView);
-			Sync();
+			Synchronize();
 			m_swapChain->Present(0, 0);
 		}
 
@@ -636,7 +636,7 @@ namespace TEN::Renderer
 		while (currentFade >= 0.0f)
 		{
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), currentFade, m_backBufferRTV, m_depthStencilView);
-			Sync();
+			Synchronize();
 			currentFade -= FADE_FACTOR;
 			m_swapChain->Present(0, 0);
 		}
@@ -828,7 +828,7 @@ namespace TEN::Renderer
 			m_swapChain->Present(0, 0);
 			m_context->ClearState();
 
-			Sync();
+			Synchronize();
 			UpdateFadeScreenAndCinematicBars();
 
 		} while (ScreenFading || !ScreenFadedOut);
