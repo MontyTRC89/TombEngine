@@ -408,6 +408,9 @@ namespace TEN::Renderer
 		int m_screenHeight;
 		bool m_windowed;
 
+		// A flag to prevent extra renderer object addition
+		bool m_Locked = false;
+		
 		// Misc
 		int m_pickupRotation = 0;
 
@@ -598,6 +601,7 @@ namespace TEN::Renderer
 		void Create();
 		void Initialise(int w, int h, bool windowed, HWND handle);
 		void Draw();
+		void Lock();
 		bool PrepareDataForTheRenderer();
 		void UpdateCameraMatrices(CAMERA_INFO* cam, float roll, float fov, float farView);
 		void RenderSimpleScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view);
@@ -609,8 +613,8 @@ namespace TEN::Renderer
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
 		void DrawPickup(short objectNum);
-		int  SyncRenderer();
-		void DrawString(int x, int y, const char* string, D3DCOLOR color, int flags);
+		int  Sync();
+		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 		void RenderLoadingScreen(float percentage);
