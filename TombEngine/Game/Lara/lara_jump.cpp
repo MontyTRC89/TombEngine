@@ -804,6 +804,8 @@ void lara_as_freefall_dive(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
 
+	ModulateLaraTurnRateY(item, 0, 0, 0);
+
 	if (item->HitPoints <= 0)
 	{
 		if (TestLaraLand(item, coll))

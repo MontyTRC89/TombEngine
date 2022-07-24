@@ -11,15 +11,16 @@
 struct ShaderLight 
 {
 	float3 Position;
-	int Type;
+	uint Type;
 	float3 Color;
-	float LocalIntensity;
-	float3 Direction;
-	float Distance;
 	float Intensity;
+	float3 Direction;
 	float In;
 	float Out;
-	float Range;
+	float InRange;
+	float OutRange;
+
+	float padding;
 };
 
 cbuffer LightsBuffer : register(b2)
@@ -74,7 +75,7 @@ float3 DoSpecularSpot(float3 pos, float3 n, ShaderLight light, float strength)
 	else
 	{
 		float3 lightPos = light.Position.xyz;
-		float radius = light.Range;
+		float radius = light.OutRange;
 
 		float dist = distance(lightPos, pos);
 		if (dist > radius)
@@ -122,7 +123,8 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 	float3 direction = -light.Direction.xyz;;
 	float innerRange = light.In;
 	float outerRange = light.Out;
-	float cone = light.Range;
+	float coneIn = light.InRange;
+	float coneOut = light.OutRange;
 
 	float3 lightVec = (lightPos - pos);
 	float distance = length(lightVec);
@@ -139,8 +141,14 @@ float3 DoSpotLight(float3 pos, float3 n, ShaderLight light)
 		else
 		{
 			float cosine = dot(-lightVec, direction);
-			float minCosine = cos(cone * (PI / 180.0f));
-			float attenuation = max((cosine - minCosine), 0.0f) / (1.0f - minCosine);
+
+			float minCosineIn = cos(coneIn * (PI / 180.0f));
+			float attenuationIn = max((cosine - minCosineIn), 0.0f) / (1.0f - minCosineIn);
+
+			float minCosineOut = cos(coneOut * (PI / 180.0f));
+			float attenuationOut = max((cosine - minCosineOut), 0.0f) / (1.0f - minCosineOut);
+
+			float attenuation = saturate(attenuationIn * 2.0f + attenuationOut);
 			
 			if (attenuation > 0.0f)
 			{
@@ -166,6 +174,12 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 		return float3(0, 0, 0);
 	else
 		return (color * d);
+}
+
+float Luma(float3 color)
+{
+	// Use Rec.709 trichromat formula to get perceptive luma value
+	return float((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
 }
 
 float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen)

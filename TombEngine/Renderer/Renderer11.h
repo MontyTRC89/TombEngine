@@ -608,7 +608,7 @@ namespace TEN::Renderer
 		void RenderLoadingScreen(float percentage);
 		void UpdateProgress(float value);
 		void GetLaraBonePosition(Vector3* pos, int bone);
-		void ToggleFullScreen();
+		void ToggleFullScreen(bool force = false);
 		bool IsFullsScreen();
 		void RenderTitleImage();
 		void AddLine2D(int x1, int y1, int x2, int y2, byte r, byte g, byte b, byte a);

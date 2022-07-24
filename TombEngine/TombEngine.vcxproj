@@ -44,7 +44,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
@@ -52,7 +52,7 @@
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)..\Build\$(Configuration)\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\bass;$(IncludePath)</IncludePath>
@@ -85,6 +85,7 @@
       <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;zlib.lib;spdlogd.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -136,6 +137,7 @@ xcopy /Y "$(ProjectDir)Shaders\HUD\*.hlsl" "$(TargetDir)\Shaders\HUD\"</Command>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <TargetMachine>MachineX86</TargetMachine>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>md "$(TargetDir)\Shaders" 
