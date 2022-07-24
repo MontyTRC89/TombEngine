@@ -97,7 +97,7 @@ short NextFxFree;
 int DrawPhase()
 {
 	g_Renderer.Draw();
-	Camera.numberFrames = g_Renderer.Sync();
+	Camera.numberFrames = g_Renderer.Synchronize();
 	return Camera.numberFrames;
 }
 
@@ -186,7 +186,7 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		while (g_Gui.GetInventoryMode() == InventoryMode::Pause)
 		{
 			g_Gui.DrawInventory();
-			g_Renderer.Sync();
+			g_Renderer.Synchronize();
 
 			if (g_Gui.DoPauseMenu() == InventoryResult::ExitToTitle)
 				return GameStatus::ExitToTitle;
@@ -476,7 +476,7 @@ GameStatus DoTitle(int index, std::string const& ambient)
 			if (status != InventoryResult::None)
 				break;
 
-			Camera.numberFrames = g_Renderer.Sync();
+			Camera.numberFrames = g_Renderer.Synchronize();
 			frames = Camera.numberFrames;
 			ControlPhase(frames, 0);
 		}
