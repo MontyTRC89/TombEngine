@@ -373,8 +373,16 @@ namespace TEN::Renderer
 		Vector3 centre = (boxMin + boxMax) / 2.0f;
 		Vector3 extens = boxMax - centre;
 		BoundingBox box = BoundingBox(centre, extens);
-		BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
-		return box.Intersects(sphere);
+
+		if (sphereRadius == 0.0f)
+		{
+			return box.Contains(sphereCentre);
+		}
+		else
+		{
+			BoundingSphere sphere = BoundingSphere(sphereCentre, sphereRadius);
+			return box.Intersects(sphere);
+		}
 	}
 
 	void Renderer11::GetLaraBonePosition(Vector3 *pos, int bone) {}

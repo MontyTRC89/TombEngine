@@ -954,12 +954,12 @@ void GuiController::HandleControlSettingsInput(bool pause)
 			if (pause)
 			{
 				g_Renderer.RenderInventory();
-				Camera.numberFrames = g_Renderer.SyncRenderer();
+				Camera.numberFrames = g_Renderer.Sync();
 			}
 			else
 			{
 				g_Renderer.RenderTitle();
-				Camera.numberFrames = g_Renderer.SyncRenderer();
+				Camera.numberFrames = g_Renderer.Sync();
 				int nframes = Camera.numberFrames;
 				ControlPhase(nframes, 0);
 			}
@@ -2300,7 +2300,7 @@ void GuiController::DoInventory()
 
 	if (rings[(int)RingTypes::Ammo]->ringactive)
 	{
-		g_Renderer.DrawString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+		g_Renderer.AddString(phd_centerx, phd_centery, g_GameFlow->GetString(optmessages[5]), PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 		if (rings[(int)RingTypes::Inventory]->objlistmovement)
 			return;
@@ -2492,12 +2492,12 @@ void GuiController::DoInventory()
 			{
 				if (i == current_selected_option)
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_BLINK | PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					ypos += line_height;
 				}
 				else
 				{
-					g_Renderer.DrawString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(phd_centerx, ypos, current_options[i].text, PRINTSTRING_COLOR_WHITE, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 					ypos += line_height;
 				}
 			}
@@ -2762,7 +2762,7 @@ void GuiController::DrawAmmoSelector()
 					sprintf(&invTextBuffer[0], "%d x %s", ammo_object_list[n].amount, g_GameFlow->GetString(inventry_objects_list[ammo_object_list[n].invitem].objname));
 
 				if (ammo_selector_fade_val)
-					g_Renderer.DrawString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+					g_Renderer.AddString(phd_centerx, 380, &invTextBuffer[0], PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 
 				
 				if (n == *current_ammo_type)
@@ -3067,7 +3067,7 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 				else
 					objmeup = (int)(phd_centery + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
 
-				g_Renderer.DrawString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
+				g_Renderer.AddString(phd_centerx, objmeup, textbufme, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 			}
 
 			if (!i && !rings[ringnum]->objlistmovement)
@@ -3288,7 +3288,7 @@ bool GuiController::CallInventory(bool reset_mode)
 		if (useItem && !TrInput)
 			exitLoop = true;
 
-		Camera.numberFrames = g_Renderer.SyncRenderer();
+		Camera.numberFrames = g_Renderer.Sync();
 	}
 
 	lastInvItem = rings[(int)RingTypes::Inventory]->current_object_list[rings[(int)RingTypes::Inventory]->curobjinlist].invitem;

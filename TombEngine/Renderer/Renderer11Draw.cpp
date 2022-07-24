@@ -788,6 +788,9 @@ namespace TEN::Renderer
 
 	void Renderer11::AddLine3D(Vector3 start, Vector3 end, Vector4 color)
 	{
+		if (m_Locked)
+			return;
+
 		RendererLine3D line;
 
 		line.Start = start;
@@ -799,6 +802,9 @@ namespace TEN::Renderer
 
 	void Renderer11::AddSphere(Vector3 center, float radius, Vector4 color)
 	{
+		if (m_Locked)
+			return;
+
 		constexpr auto subdivisions = 10;
 		constexpr auto steps = 6;
 		constexpr auto step = PI / steps;
@@ -842,6 +848,9 @@ namespace TEN::Renderer
 
 	void Renderer11::AddBox(Vector3* corners, Vector4 color)
 	{
+		if (m_Locked)
+			return;
+
 		for (int i = 0; i < 12; i++)
 		{
 			RendererLine3D line;
@@ -861,7 +870,6 @@ namespace TEN::Renderer
 				line.End = corners[0];
 				break;
 
-
 			case 4: line.Start = corners[4];
 				line.End = corners[5];
 				break;
@@ -874,7 +882,6 @@ namespace TEN::Renderer
 			case 7: line.Start = corners[7];
 				line.End = corners[4];
 				break;
-
 
 			case 8: line.Start = corners[0];
 				line.End = corners[4];
@@ -897,6 +904,9 @@ namespace TEN::Renderer
 
 	void Renderer11::AddBox(Vector3 min, Vector3 max, Vector4 color)
 	{
+		if (m_Locked)
+			return;
+
 		for (int i = 0; i < 12; i++)
 		{
 			RendererLine3D line;
@@ -971,6 +981,9 @@ namespace TEN::Renderer
 
 	void Renderer11::AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 	{
+		if (m_Locked)
+			return;
+
 		RendererLight dynamicLight = {};
 
 		if (falloff >= 8)
@@ -1429,6 +1442,7 @@ namespace TEN::Renderer
 	void Renderer11::RenderScene(ID3D11RenderTargetView* target, ID3D11DepthStencilView* depthTarget, RenderView& view)
 	{
 		ResetDebugVariables();
+		m_Locked = false;
 
 		using ns = std::chrono::nanoseconds;
 		using get_time = std::chrono::steady_clock;
@@ -1567,7 +1581,6 @@ namespace TEN::Renderer
 
 		DrawDebugInfo(view);
 		DrawAllStrings();
-
 		DrawFadeAndBars(target, depthTarget, view);
 
 		ClearScene();
