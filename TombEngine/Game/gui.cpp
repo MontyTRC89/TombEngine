@@ -295,7 +295,7 @@ void GuiController::FillDisplayOptions()
 
 	// Get current display mode
 	CurrentSettings.SelectedScreenResolution = 0;
-	for (int i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
+	for (size_t i = 0; i < g_Configuration.SupportedScreenResolutions.size(); i++)
 	{
 		auto screenResolution = g_Configuration.SupportedScreenResolutions[i];
 		if (screenResolution.x == CurrentSettings.Configuration.Width &&
@@ -868,7 +868,7 @@ InventoryResult GuiController::DoPauseMenu()
 
 bool GuiController::DoObjectsCombine(int objectNumber1, int objectNumber2)
 {
-	for (int n = 0; n < MAX_COMBINES; n++)
+	for (size_t n = 0; n < MAX_COMBINES; n++)
 	{
 		if (CombineTable[n].Item1 == objectNumber1 &&
 			CombineTable[n].Item2 == objectNumber2)
@@ -886,7 +886,7 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 {
 	if (objectNumber < INV_OBJECT_SMALL_WATERSKIN || objectNumber > INV_OBJECT_BIG_WATERSKIN5L)//trash
 	{
-		for (int n = 0; n < MAX_COMBINES; n++)
+		for (size_t n = 0; n < MAX_COMBINES; n++)
 		{
 			if (CombineTable[n].Item1 == objectNumber)
 			{
@@ -903,7 +903,7 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 	}
 	else if (objectNumber > INV_OBJECT_SMALL_WATERSKIN3L)
 	{
-		for (int n = 0; n < 4; n++)
+		for (size_t n = 0; n < 4; n++)
 		{
 			if (IsItemInInventory(n + INV_OBJECT_SMALL_WATERSKIN))
 				return true;
@@ -911,7 +911,7 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 	}
 	else
 	{
-		for (int n = 0; n < 6; n++)
+		for (size_t n = 0; n < 6; n++)
 		{
 			if (IsItemInInventory(n + INV_OBJECT_BIG_WATERSKIN))
 				return true;
@@ -923,7 +923,7 @@ bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 
 bool GuiController::IsItemInInventory(int objectNumber)
 {
-	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
 		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == objectNumber)
 			return 1;
@@ -946,7 +946,7 @@ void GuiController::CombineObjects(ItemInfo* item, int objectNumber1, int object
 			break;
 	}
 
-	CombineTable[n].CombineRoutine(0);
+	CombineTable[n].CombineRoutine(item, false);
 	ConstructObjectList(item);
 	SetupObjectListStartPosition(CombineTable[n].CombinedItem);
 	HandleObjectChangeover((int)RingTypes::Inventory);
@@ -961,14 +961,14 @@ void GuiController::SeparateObject(ItemInfo* item, int objectNumber)
 			break;
 	}
 
-	CombineTable[n].CombineRoutine(1);
+	CombineTable[n].CombineRoutine(item, true);
 	ConstructObjectList(item);
 	SetupObjectListStartPosition(CombineTable[n].Item1);
 }
 
 void GuiController::SetupObjectListStartPosition(int newObjectNumber)
 {
-	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
 		if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == newObjectNumber)
 			Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
@@ -1143,7 +1143,7 @@ void GuiController::ConstructObjectList(ItemInfo* item)
 
 	Rings[(int)RingTypes::Inventory]->NumObjectsInList = 0;
 
-	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 	Ammo.CurrentPistolsAmmoType = 0;
@@ -1153,7 +1153,7 @@ void GuiController::ConstructObjectList(ItemInfo* item)
 	Ammo.CurrentGrenadeGunAmmoType = 0;
 	Ammo.CurrentCrossBowAmmoType = 0;
 
-	if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
+	if (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young)
 	{
 		if (lara->Weapons[(int)LaraWeaponType::Pistol].Present)
 			InsertObjectIntoList(INV_OBJECT_PISTOLS);
@@ -1284,13 +1284,13 @@ void GuiController::ConstructObjectList(ItemInfo* item)
 
 	if (lara->Inventory.BeetleComponents)
 	{
-		if (lara->Inventory.BeetleComponents & 1)
+		if (lara->Inventory.BeetleComponents & BEETLECOMP_FLAG_BEETLE)
 			InsertObjectIntoList(INV_OBJECT_BEETLE);
 
-		if (lara->Inventory.BeetleComponents & 2)
+		if (lara->Inventory.BeetleComponents & BEETLECOMP_FLAG_COMBO_1)
 			InsertObjectIntoList(INV_OBJECT_BEETLE_PART1);
 
-		if (lara->Inventory.BeetleComponents & 4)
+		if (lara->Inventory.BeetleComponents & BEETLECOMP_FLAG_COMBO_2)
 			InsertObjectIntoList(INV_OBJECT_BEETLE_PART2);
 	}
 
@@ -1300,49 +1300,49 @@ void GuiController::ConstructObjectList(ItemInfo* item)
 	if (lara->Inventory.BigWaterskin)
 		InsertObjectIntoList((lara->Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
 
-	for (int i = 0; i < NUM_PUZZLES; i++)
+	for (size_t i = 0; i < NUM_PUZZLES; i++)
 	{
 		if (lara->Inventory.Puzzles[i])
 			InsertObjectIntoList(INV_OBJECT_PUZZLE1 + i);
 	}
 
-	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
+	for (size_t i = 0; i < NUM_PUZZLE_PIECES; i++)
 	{
 		if (lara->Inventory.PuzzlesCombo[i])
 			InsertObjectIntoList(INV_OBJECT_PUZZLE1_COMBO1 + i);
 	}
 
-	for (int i = 0; i < NUM_KEYS; i++)
+	for (size_t i = 0; i < NUM_KEYS; i++)
 	{
 		if (lara->Inventory.Keys[i])
 			InsertObjectIntoList(INV_OBJECT_KEY1 + i);
 	}
 
-	for (int i = 0; i < NUM_KEY_PIECES; i++)
+	for (size_t i = 0; i < NUM_KEY_PIECES; i++)
 	{
 		if (lara->Inventory.KeysCombo[i])
 			InsertObjectIntoList(INV_OBJECT_KEY1_COMBO1 + i);
 	}
 
-	for (int i = 0; i < NUM_PICKUPS; i++)
+	for (size_t i = 0; i < NUM_PICKUPS; i++)
 	{
 		if (lara->Inventory.Pickups[i])
 			InsertObjectIntoList(INV_OBJECT_PICKUP1 + i);
 	}
 
-	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
+	for (size_t i = 0; i < NUM_PICKUPS_PIECES; i++)
 	{
 		if (lara->Inventory.PickupsCombo[i])
 			InsertObjectIntoList(INV_OBJECT_PICKUP1_COMBO1 + i);
 	}
 
-	for (int i = 0; i < NUM_EXAMINES; i++)
+	for (size_t i = 0; i < NUM_EXAMINES; i++)
 	{
 		if (lara->Inventory.Examines[i])
 			InsertObjectIntoList(INV_OBJECT_EXAMINE1 + i);
 	}
 
-	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
+	for (size_t i = 0; i < NUM_EXAMINES_PIECES; i++)
 	{
 		if (lara->Inventory.ExaminesCombo[i])
 			InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
@@ -1373,7 +1373,7 @@ void GuiController::ConstructCombineObjectList(ItemInfo* item)
 
 	Rings[(int)RingTypes::Ammo]->NumObjectsInList = 0;
 
-	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		Rings[(int)RingTypes::Ammo]->CurrentObjectList[i].InventoryItem = NO_ITEM;
 
 	if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
@@ -1419,25 +1419,25 @@ void GuiController::ConstructCombineObjectList(ItemInfo* item)
 	if (lara->Inventory.BigWaterskin)
 		InsertObjectIntoList_v2(lara->Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
 
-	for (int i = 0; i < NUM_PUZZLE_PIECES; i++)
+	for (size_t i = 0; i < NUM_PUZZLE_PIECES; i++)
 	{
 		if (lara->Inventory.PuzzlesCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_PUZZLE1_COMBO1 + i);
 	}
 
-	for (int i = 0; i < NUM_KEY_PIECES; i++)
+	for (size_t i = 0; i < NUM_KEY_PIECES; i++)
 	{
 		if (lara->Inventory.KeysCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_KEY1_COMBO1 + i);
 	}
 
-	for (int i = 0; i < NUM_PICKUPS_PIECES; i++)
+	for (size_t i = 0; i < NUM_PICKUPS_PIECES; i++)
 	{
 		if (lara->Inventory.PickupsCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_PICKUP1_COMBO1 + i);
 	}
 
-	for (int i = 0; i < NUM_EXAMINES_PIECES; i++)
+	for (size_t i = 0; i < NUM_EXAMINES_PIECES; i++)
 	{
 		if (lara->Inventory.ExaminesCombo[i])
 			InsertObjectIntoList_v2(INV_OBJECT_EXAMINE1_COMBO1 + i);
@@ -1492,7 +1492,7 @@ void GuiController::InitialiseInventory(ItemInfo* item)
 			{
 				if (LastInvItem >= INV_OBJECT_SMALL_WATERSKIN && LastInvItem <= INV_OBJECT_SMALL_WATERSKIN3L)
 				{
-					for (int i = INV_OBJECT_SMALL_WATERSKIN; i <= INV_OBJECT_SMALL_WATERSKIN3L; i++)
+					for (size_t i = INV_OBJECT_SMALL_WATERSKIN; i <= INV_OBJECT_SMALL_WATERSKIN3L; i++)
 					{
 						if (IsItemInInventory(i))
 						{
@@ -1503,7 +1503,7 @@ void GuiController::InitialiseInventory(ItemInfo* item)
 				}
 				else if (LastInvItem >= INV_OBJECT_BIG_WATERSKIN && LastInvItem <= INV_OBJECT_BIG_WATERSKIN5L)
 				{
-					for (int i = INV_OBJECT_BIG_WATERSKIN; i <= INV_OBJECT_BIG_WATERSKIN5L; i++)
+					for (size_t i = INV_OBJECT_BIG_WATERSKIN; i <= INV_OBJECT_BIG_WATERSKIN5L; i++)
 					{
 						if (IsItemInInventory(i))
 						{
@@ -1545,7 +1545,7 @@ int GuiController::IsObjectInInventory(int objectNumber)
 
 void GuiController::SetupObjectListStartPosition2(int newObjectNumber)
 {
-	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
 		if (InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem].ObjectNumber == newObjectNumber)
 			Rings[(int)RingTypes::Inventory]->CurrentObjectInList = i;
@@ -1554,7 +1554,7 @@ void GuiController::SetupObjectListStartPosition2(int newObjectNumber)
 
 int GuiController::ConvertObjectToInventoryItem(int objectNumber)
 {
-	for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
+	for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
 	{
 		if (InventoryObjectTable[i].ObjectNumber == objectNumber)
 			return i;
@@ -1940,7 +1940,7 @@ void GuiController::DoInventory(ItemInfo* item)
 	{
 		int num = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 
-		for (int i = 0; i < 3; i++)
+		for (size_t i = 0; i < 3; i++)
 		{
 			CurrentOptions[i].Type = MenuType::None;
 			CurrentOptions[i].Text = 0;
@@ -2061,7 +2061,7 @@ void GuiController::DoInventory(ItemInfo* item)
 
 		if (n > 0)
 		{
-			for (int i = 0; i < n; i++)
+			for (size_t i = 0; i < n; i++)
 			{
 				if (i == CurrentSelectedOption)
 				{
@@ -2496,7 +2496,7 @@ void GuiController::DrawCurrentObjectList(ItemInfo* item, int ringIndex)
 
 	if (minObj <= maxObj)
 	{
-		for (int i = minObj; i <= maxObj; i++)
+		for (size_t i = minObj; i <= maxObj; i++)
 		{
 			int shade = 0;
 

@@ -2,6 +2,8 @@
 #include "Scripting/Internal/LanguageScript.h"
 #include "Specific/phd_global.h"
 
+struct ItemInfo;
+
 constexpr int MAX_COMBINES = 60;
 
 enum InventoryObjectTypes
@@ -273,6 +275,13 @@ enum RotationFlags
 	INV_ROT_Z = (1 << 2)
 };
 
+enum BeetleComponentFlags
+{
+	BEETLECOMP_FLAG_BEETLE =  (1 << 0),
+	BEETLECOMP_FLAG_COMBO_1 = (1 << 1),
+	BEETLECOMP_FLAG_COMBO_2 = (1 << 2)
+};
+
 struct InventoryObject
 {
 	short ObjectNumber;
@@ -287,7 +296,7 @@ struct InventoryObject
 
 struct CombineList
 {
-	void  (*CombineRoutine)(int flag);
+	void  (*CombineRoutine)(ItemInfo* item, bool flag);
 	short Item1;
 	short Item2;
 	short CombinedItem;
@@ -342,63 +351,63 @@ struct AmmoData
 extern InventoryObject InventoryObjectTable[];
 extern CombineList CombineTable[];
 
-void CombineRevolverLasersight(int flag);
-void CombineCrossbowLasersight(int flag);
-void CombineHKSilencer(int flag);
-void CombinePuzzleItem1(int flag);
-void CombinePuzzleItem2(int flag);
-void CombinePuzzleItem3(int flag);
-void CombinePuzzleItem4(int flag);
-void CombinePuzzleItem5(int flag);
-void CombinePuzzleItem6(int flag);
-void CombinePuzzleItem7(int flag);
-void CombinePuzzleItem8(int flag);
-void CombinePuzzleItem9(int flag);
-void CombinePuzzleItem10(int flag);
-void CombinePuzzleItem11(int flag);
-void CombinePuzzleItem12(int flag);
-void CombinePuzzleItem13(int flag);
-void CombinePuzzleItem14(int flag);
-void CombinePuzzleItem15(int flag);
-void CombinePuzzleItem16(int flag);
-void CombineKeyItem1(int flag);
-void CombineKeyItem2(int flag);
-void CombineKeyItem3(int flag);
-void CombineKeyItem4(int flag);
-void CombineKeyItem5(int flag);
-void CombineKeyItem6(int flag);
-void CombineKeyItem7(int flag);
-void CombineKeyItem8(int flag);
-void CombineKeyItem9(int flag);
-void CombineKeyItem10(int flag);
-void CombineKeyItem11(int flag);
-void CombineKeyItem12(int flag);
-void CombineKeyItem13(int flag);
-void CombineKeyItem14(int flag);
-void CombineKeyItem15(int flag);
-void CombineKeyItem16(int flag);
-void CombinePickupItem1(int flag);
-void CombinePickupItem2(int flag);
-void CombinePickupItem3(int flag);
-void CombinePickupItem4(int flag);
-void CombinePickupItem5(int flag);
-void CombinePickupItem6(int flag);
-void CombinePickupItem7(int flag);
-void CombinePickupItem8(int flag);
-void CombinePickupItem9(int flag);
-void CombinePickupItem10(int flag);
-void CombinePickupItem11(int flag);
-void CombinePickupItem12(int flag);
-void CombinePickupItem13(int flag);
-void CombinePickupItem14(int flag);
-void CombinePickupItem15(int flag);
-void CombinePickupItem16(int flag);
-void CombineExamine1(int flag);
-void CombineExamine2(int flag);
-void CombineExamine3(int flag);
-void CombineExamine4(int flag);
-void CombineExamine5(int flag);
-void CombineExamine6(int flag);
-void CombineExamine7(int flag);
-void CombineExamine8(int flag);
-void CombineClockWorkBeetle(int flag);
+void CombineRevolverLasersight(ItemInfo* item, bool flag);
+void CombineCrossbowLasersight(ItemInfo* item, bool flag);
+void CombineHKSilencer(ItemInfo* item, bool flag);
+void CombinePuzzleItem1(ItemInfo* item, bool flag);
+void CombinePuzzleItem2(ItemInfo* item, bool flag);
+void CombinePuzzleItem3(ItemInfo* item, bool flag);
+void CombinePuzzleItem4(ItemInfo* item, bool flag);
+void CombinePuzzleItem5(ItemInfo* item, bool flag);
+void CombinePuzzleItem6(ItemInfo* item, bool flag);
+void CombinePuzzleItem7(ItemInfo* item, bool flag);
+void CombinePuzzleItem8(ItemInfo* item, bool flag);
+void CombinePuzzleItem9(ItemInfo* item, bool flag);
+void CombinePuzzleItem10(ItemInfo* item, bool flag);
+void CombinePuzzleItem11(ItemInfo* item, bool flag);
+void CombinePuzzleItem12(ItemInfo* item, bool flag);
+void CombinePuzzleItem13(ItemInfo* item, bool flag);
+void CombinePuzzleItem14(ItemInfo* item, bool flag);
+void CombinePuzzleItem15(ItemInfo* item, bool flag);
+void CombinePuzzleItem16(ItemInfo* item, bool flag);
+void CombineKeyItem1(ItemInfo* item, bool flag);
+void CombineKeyItem2(ItemInfo* item, bool flag);
+void CombineKeyItem3(ItemInfo* item, bool flag);
+void CombineKeyItem4(ItemInfo* item, bool flag);
+void CombineKeyItem5(ItemInfo* item, bool flag);
+void CombineKeyItem6(ItemInfo* item, bool flag);
+void CombineKeyItem7(ItemInfo* item, bool flag);
+void CombineKeyItem8(ItemInfo* item, bool flag);
+void CombineKeyItem9(ItemInfo* item, bool flag);
+void CombineKeyItem10(ItemInfo* item, bool flag);
+void CombineKeyItem11(ItemInfo* item, bool flag);
+void CombineKeyItem12(ItemInfo* item, bool flag);
+void CombineKeyItem13(ItemInfo* item, bool flag);
+void CombineKeyItem14(ItemInfo* item, bool flag);
+void CombineKeyItem15(ItemInfo* item, bool flag);
+void CombineKeyItem16(ItemInfo* item, bool flag);
+void CombinePickupItem1(ItemInfo* item, bool flag);
+void CombinePickupItem2(ItemInfo* item, bool flag);
+void CombinePickupItem3(ItemInfo* item, bool flag);
+void CombinePickupItem4(ItemInfo* item, bool flag);
+void CombinePickupItem5(ItemInfo* item, bool flag);
+void CombinePickupItem6(ItemInfo* item, bool flag);
+void CombinePickupItem7(ItemInfo* item, bool flag);
+void CombinePickupItem8(ItemInfo* item, bool flag);
+void CombinePickupItem9(ItemInfo* item, bool flag);
+void CombinePickupItem10(ItemInfo* item, bool flag);
+void CombinePickupItem11(ItemInfo* item, bool flag);
+void CombinePickupItem12(ItemInfo* item, bool flag);
+void CombinePickupItem13(ItemInfo* item, bool flag);
+void CombinePickupItem14(ItemInfo* item, bool flag);
+void CombinePickupItem15(ItemInfo* item, bool flag);
+void CombinePickupItem16(ItemInfo* item, bool flag);
+void CombineExamine1(ItemInfo* item, bool flag);
+void CombineExamine2(ItemInfo* item, bool flag);
+void CombineExamine3(ItemInfo* item, bool flag);
+void CombineExamine4(ItemInfo* item, bool flag);
+void CombineExamine5(ItemInfo* item, bool flag);
+void CombineExamine6(ItemInfo* item, bool flag);
+void CombineExamine7(ItemInfo* item, bool flag);
+void CombineExamine8(ItemInfo* item, bool flag);
+void CombineClockWorkBeetle(ItemInfo* item, bool flag);

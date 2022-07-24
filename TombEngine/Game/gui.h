@@ -1,5 +1,6 @@
 #pragma once
-#include "Game/gui_items.h"
+#include "Game/GuiObjects.h"
+
 #include "LanguageScript.h"
 #include "Specific/configuration.h"
 

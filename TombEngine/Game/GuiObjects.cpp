@@ -1,7 +1,8 @@
 #include "framework.h"
-#include "gui_items.h"
+#include "Game/GuiObjects.h"
 
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
 #include "Specific/trmath.h"
@@ -324,457 +325,577 @@ CombineList CombineTable[MAX_COMBINES] =
 	{CombineClockWorkBeetle, INV_OBJECT_BEETLE_PART1, INV_OBJECT_BEETLE_PART2, INV_OBJECT_BEETLE}
 };
 
-void CombineRevolverLasersight(int flag)
+void CombineRevolverLasersight(ItemInfo* item, bool flag)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (flag)
 	{
-		Lara.Inventory.HasLasersight = true;
-		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = false;
+		lara->Inventory.HasLasersight = true;
+		lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight = false;
 	}
 	else
 	{
-		Lara.Inventory.HasLasersight = false;
-		Lara.Weapons[(int)LaraWeaponType::Revolver].HasLasersight = true;
+		lara->Inventory.HasLasersight = false;
+		lara->Weapons[(int)LaraWeaponType::Revolver].HasLasersight = true;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free &&
-		Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
+	if (lara->Control.HandStatus != HandStatus::Free &&
+		lara->Control.Weapon.GunType == LaraWeaponType::Revolver)
 	{
-		UndrawPistolMeshRight(LaraItem, LaraWeaponType::Revolver);
-		DrawPistolMeshes(LaraItem, LaraWeaponType::Revolver);
+		UndrawPistolMeshRight(item, LaraWeaponType::Revolver);
+		DrawPistolMeshes(item, LaraWeaponType::Revolver);
 	}
 }
 
-void CombineCrossbowLasersight(int flag)
+void CombineCrossbowLasersight(ItemInfo* item, bool flag)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (flag)
 	{
-		Lara.Inventory.HasLasersight = true;
-		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = false;
+		lara->Inventory.HasLasersight = true;
+		lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = false;
 	}
 	else
 	{
-		Lara.Inventory.HasLasersight = false;
-		Lara.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = true;
+		lara->Inventory.HasLasersight = false;
+		lara->Weapons[(int)LaraWeaponType::Crossbow].HasLasersight = true;
 	}
 
-	if (Lara.Control.HandStatus != HandStatus::Free &&
-		Lara.Control.Weapon.GunType == LaraWeaponType::Crossbow)
+	if (lara->Control.HandStatus != HandStatus::Free &&
+		lara->Control.Weapon.GunType == LaraWeaponType::Crossbow)
 	{
-		UndrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
-		DrawShotgunMeshes(LaraItem, LaraWeaponType::Crossbow);
+		UndrawShotgunMeshes(item, LaraWeaponType::Crossbow);
+		DrawShotgunMeshes(item, LaraWeaponType::Crossbow);
 	}
 }
 
-void CombineHKSilencer(int flag)
+void CombineHKSilencer(ItemInfo* item, bool flag)
 {
+	auto* lara = GetLaraInfo(item);
+
 	if (flag)
 	{
-		Lara.Inventory.HasSilencer = true;
-		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = false;
+		lara->Inventory.HasSilencer = true;
+		lara->Weapons[(int)LaraWeaponType::HK].HasSilencer = false;
 	}
 	else
 	{
-		Lara.Inventory.HasSilencer = false;
-		Lara.Weapons[(int)LaraWeaponType::HK].HasSilencer = true;
+		lara->Inventory.HasSilencer = false;
+		lara->Weapons[(int)LaraWeaponType::HK].HasSilencer = true;
 	}
 }
 
-void CombinePuzzleItem1(int flag)
+void CombinePuzzleItem1(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[0] = 0;
-	Lara.Inventory.PuzzlesCombo[1] = 0;
-	Lara.Inventory.Puzzles[0] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[0] = false;
+	lara->Inventory.PuzzlesCombo[1] = false;
+	lara->Inventory.Puzzles[0] = true;
 }
 
-void CombinePuzzleItem2(int flag)
+void CombinePuzzleItem2(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[2] = 0;
-	Lara.Inventory.PuzzlesCombo[3] = 0;
-	Lara.Inventory.Puzzles[1] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[2] = false;
+	lara->Inventory.PuzzlesCombo[3] = false;
+	lara->Inventory.Puzzles[1] = true;
 }
 
-void CombinePuzzleItem3(int flag)
+void CombinePuzzleItem3(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[4] = 0;
-	Lara.Inventory.PuzzlesCombo[5] = 0;
-	Lara.Inventory.Puzzles[2] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[4] = false;
+	lara->Inventory.PuzzlesCombo[5] = false;
+	lara->Inventory.Puzzles[2] = true;
 }
 
-void CombinePuzzleItem4(int flag)
+void CombinePuzzleItem4(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[6] = 0;
-	Lara.Inventory.PuzzlesCombo[7] = 0;
-	Lara.Inventory.Puzzles[3] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[6] = false;
+	lara->Inventory.PuzzlesCombo[7] = false;
+	lara->Inventory.Puzzles[3] = true;
 }
 
-void CombinePuzzleItem5(int flag)
+void CombinePuzzleItem5(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[8] = 0;
-	Lara.Inventory.PuzzlesCombo[9] = 0;
-	Lara.Inventory.Puzzles[4] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[8] = false;
+	lara->Inventory.PuzzlesCombo[9] = false;
+	lara->Inventory.Puzzles[4] = true;
 }
 
-void CombinePuzzleItem6(int flag)
+void CombinePuzzleItem6(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[10] = 0;
-	Lara.Inventory.PuzzlesCombo[11] = 0;
-	Lara.Inventory.Puzzles[5] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[10] = false;
+	lara->Inventory.PuzzlesCombo[11] = false;
+	lara->Inventory.Puzzles[5] = true;
 }
 
-void CombinePuzzleItem7(int flag)
+void CombinePuzzleItem7(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[12] = 0;
-	Lara.Inventory.PuzzlesCombo[13] = 0;
-	Lara.Inventory.Puzzles[6] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[12] = false;
+	lara->Inventory.PuzzlesCombo[13] = false;
+	lara->Inventory.Puzzles[6] = true;
 }
 
-void CombinePuzzleItem8(int flag)
+void CombinePuzzleItem8(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[14] = 0;
-	Lara.Inventory.PuzzlesCombo[15] = 0;
-	Lara.Inventory.Puzzles[7] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[14] = false;
+	lara->Inventory.PuzzlesCombo[15] = false;
+	lara->Inventory.Puzzles[7] = true;
 }
 
-void CombinePuzzleItem9(int flag)
+void CombinePuzzleItem9(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[16] = 0;
-	Lara.Inventory.PuzzlesCombo[17] = 0;
-	Lara.Inventory.Puzzles[8] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[16] = false;
+	lara->Inventory.PuzzlesCombo[17] = false;
+	lara->Inventory.Puzzles[8] = true;
 }
 
-void CombinePuzzleItem10(int flag)
+void CombinePuzzleItem10(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[18] = 0;
-	Lara.Inventory.PuzzlesCombo[19] = 0;
-	Lara.Inventory.Puzzles[9] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[18] = false;
+	lara->Inventory.PuzzlesCombo[19] = false;
+	lara->Inventory.Puzzles[9] = true;
 }
 
-void CombinePuzzleItem11(int flag)
+void CombinePuzzleItem11(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[20] = 0;
-	Lara.Inventory.PuzzlesCombo[21] = 0;
-	Lara.Inventory.Puzzles[10] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[20] = false;
+	lara->Inventory.PuzzlesCombo[21] = false;
+	lara->Inventory.Puzzles[10] = true;
 }
 
-void CombinePuzzleItem12(int flag)
+void CombinePuzzleItem12(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[22] = 0;
-	Lara.Inventory.PuzzlesCombo[23] = 0;
-	Lara.Inventory.Puzzles[11] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[22] = false;
+	lara->Inventory.PuzzlesCombo[23] = false;
+	lara->Inventory.Puzzles[11] = true;
 }
 
-void CombinePuzzleItem13(int flag)
+void CombinePuzzleItem13(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[24] = 0;
-	Lara.Inventory.PuzzlesCombo[25] = 0;
-	Lara.Inventory.Puzzles[12] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[24] = false;
+	lara->Inventory.PuzzlesCombo[25] = false;
+	lara->Inventory.Puzzles[12] = true;
 }
 
-void CombinePuzzleItem14(int flag)
+void CombinePuzzleItem14(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[26] = 0;
-	Lara.Inventory.PuzzlesCombo[27] = 0;
-	Lara.Inventory.Puzzles[13] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[26] = false;
+	lara->Inventory.PuzzlesCombo[27] = false;
+	lara->Inventory.Puzzles[13] = true;
 }
 
-void CombinePuzzleItem15(int flag)
+void CombinePuzzleItem15(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[28] = 0;
-	Lara.Inventory.PuzzlesCombo[29] = 0;
-	Lara.Inventory.Puzzles[14] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[28] = false;
+	lara->Inventory.PuzzlesCombo[29] = false;
+	lara->Inventory.Puzzles[14] = true;
 }
 
-void CombinePuzzleItem16(int flag)
+void CombinePuzzleItem16(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.PuzzlesCombo[30] = 0;
-	Lara.Inventory.PuzzlesCombo[31] = 0;
-	Lara.Inventory.Puzzles[15] = 1;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.PuzzlesCombo[30] = false;
+	lara->Inventory.PuzzlesCombo[31] = false;
+	lara->Inventory.Puzzles[15] = true;
 }
 
-void CombineKeyItem1(int flag)
+void CombineKeyItem1(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[0] = 1;
-	Lara.Inventory.KeysCombo[0] = 0;
-	Lara.Inventory.KeysCombo[1] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[0] = true;
+	lara->Inventory.KeysCombo[0] = false;
+	lara->Inventory.KeysCombo[1] = false;
 }
 
-void CombineKeyItem2(int flag)
+void CombineKeyItem2(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[1] = 1;
-	Lara.Inventory.KeysCombo[2] = 0;
-	Lara.Inventory.KeysCombo[3] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[1] = true;
+	lara->Inventory.KeysCombo[2] = false;
+	lara->Inventory.KeysCombo[3] = false;
 }
 
-void CombineKeyItem3(int flag)
+void CombineKeyItem3(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[2] = 1;
-	Lara.Inventory.KeysCombo[4] = 0;
-	Lara.Inventory.KeysCombo[5] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[2] = true;
+	lara->Inventory.KeysCombo[4] = false;
+	lara->Inventory.KeysCombo[5] = false;
 }
 
-void CombineKeyItem4(int flag)
+void CombineKeyItem4(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[3] = 1;
-	Lara.Inventory.KeysCombo[6] = 0;
-	Lara.Inventory.KeysCombo[7] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[3] = true;
+	lara->Inventory.KeysCombo[6] = false;
+	lara->Inventory.KeysCombo[7] = false;
 }
 
-void CombineKeyItem5(int flag)
+void CombineKeyItem5(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[4] = 1;
-	Lara.Inventory.KeysCombo[8] = 0;
-	Lara.Inventory.KeysCombo[9] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[4] = true;
+	lara->Inventory.KeysCombo[8] = false;
+	lara->Inventory.KeysCombo[9] = false;
 }
 
-void CombineKeyItem6(int flag)
+void CombineKeyItem6(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[5] = 1;
-	Lara.Inventory.KeysCombo[10] = 0;
-	Lara.Inventory.KeysCombo[11] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[5] = true;
+	lara->Inventory.KeysCombo[10] = false;
+	lara->Inventory.KeysCombo[11] = false;
 }
 
-void CombineKeyItem7(int flag)
+void CombineKeyItem7(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[6] = 1;
-	Lara.Inventory.KeysCombo[12] = 0;
-	Lara.Inventory.KeysCombo[13] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[6] = true;
+	lara->Inventory.KeysCombo[12] = false;
+	lara->Inventory.KeysCombo[13] = false;
 }
 
-void CombineKeyItem8(int flag)
+void CombineKeyItem8(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[7] = 1;
-	Lara.Inventory.KeysCombo[14] = 0;
-	Lara.Inventory.KeysCombo[15] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[7] = true;
+	lara->Inventory.KeysCombo[14] = false;
+	lara->Inventory.KeysCombo[15] = false;
 }
 
-void CombineKeyItem9(int flag)
+void CombineKeyItem9(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[8] = 1;
-	Lara.Inventory.KeysCombo[16] = 0;
-	Lara.Inventory.KeysCombo[17] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[8] = true;
+	lara->Inventory.KeysCombo[16] = false;
+	lara->Inventory.KeysCombo[17] = false;
 }
 
-void CombineKeyItem10(int flag)
+void CombineKeyItem10(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[9] = 1;
-	Lara.Inventory.KeysCombo[18] = 0;
-	Lara.Inventory.KeysCombo[19] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[9] = true;
+	lara->Inventory.KeysCombo[18] = false;
+	lara->Inventory.KeysCombo[19] = false;
 }
 
-void CombineKeyItem11(int flag)
+void CombineKeyItem11(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[10] = 1;
-	Lara.Inventory.KeysCombo[20] = 0;
-	Lara.Inventory.KeysCombo[21] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[10] = true;
+	lara->Inventory.KeysCombo[20] = false;
+	lara->Inventory.KeysCombo[21] = false;
 }
 
-void CombineKeyItem12(int flag)
+void CombineKeyItem12(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[11] = 1;
-	Lara.Inventory.KeysCombo[22] = 0;
-	Lara.Inventory.KeysCombo[23] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[11] = true;
+	lara->Inventory.KeysCombo[22] = false;
+	lara->Inventory.KeysCombo[23] = false;
 }
 
-void CombineKeyItem13(int flag)
+void CombineKeyItem13(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[12] = 1;
-	Lara.Inventory.KeysCombo[24] = 0;
-	Lara.Inventory.KeysCombo[25] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[12] = true;
+	lara->Inventory.KeysCombo[24] = false;
+	lara->Inventory.KeysCombo[25] = false;
 }
 
-void CombineKeyItem14(int flag)
+void CombineKeyItem14(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[13] = 1;
-	Lara.Inventory.KeysCombo[26] = 0;
-	Lara.Inventory.KeysCombo[27] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[13] = true;
+	lara->Inventory.KeysCombo[26] = false;
+	lara->Inventory.KeysCombo[27] = false;
 }
 
-void CombineKeyItem15(int flag)
+void CombineKeyItem15(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[14] = 1;
-	Lara.Inventory.KeysCombo[28] = 0;
-	Lara.Inventory.KeysCombo[29] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[14] = true;
+	lara->Inventory.KeysCombo[28] = false;
+	lara->Inventory.KeysCombo[29] = false;
 }
 
-void CombineKeyItem16(int flag)
+void CombineKeyItem16(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Keys[15] = 1;
-	Lara.Inventory.KeysCombo[30] = 0;
-	Lara.Inventory.KeysCombo[31] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Keys[15] = true;
+	lara->Inventory.KeysCombo[30] = false;
+	lara->Inventory.KeysCombo[31] = false;
 }
 
-void CombinePickupItem1(int flag)
+void CombinePickupItem1(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[0] = 1;
-	Lara.Inventory.PickupsCombo[0] = 0;
-	Lara.Inventory.PickupsCombo[1] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[0] = true;
+	lara->Inventory.PickupsCombo[0] = false;
+	lara->Inventory.PickupsCombo[1] = false;
 }
 
-void CombinePickupItem2(int flag)
+void CombinePickupItem2(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[1] = 1;
-	Lara.Inventory.PickupsCombo[2] = 0;
-	Lara.Inventory.PickupsCombo[3] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[1] = true;
+	lara->Inventory.PickupsCombo[2] = false;
+	lara->Inventory.PickupsCombo[3] = false;
 }
 
-void CombinePickupItem3(int flag)
+void CombinePickupItem3(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[2] = 1;
-	Lara.Inventory.PickupsCombo[4] = 0;
-	Lara.Inventory.PickupsCombo[5] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[2] = true;
+	lara->Inventory.PickupsCombo[4] = false;
+	lara->Inventory.PickupsCombo[5] = false;
 }
 
-void CombinePickupItem4(int flag)
+void CombinePickupItem4(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[3] = 1;
-	Lara.Inventory.PickupsCombo[6] = 0;
-	Lara.Inventory.PickupsCombo[7] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[3] = true;
+	lara->Inventory.PickupsCombo[6] = false;
+	lara->Inventory.PickupsCombo[7] = false;
 }
 
-void CombinePickupItem5(int flag)
+void CombinePickupItem5(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[4] = 1;
-	Lara.Inventory.PickupsCombo[8] = 0;
-	Lara.Inventory.PickupsCombo[9] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[4] = true;
+	lara->Inventory.PickupsCombo[8] = false;
+	lara->Inventory.PickupsCombo[9] = false;
 }
 
-void CombinePickupItem6(int flag)
+void CombinePickupItem6(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[5] = 1;
-	Lara.Inventory.PickupsCombo[10] = 0;
-	Lara.Inventory.PickupsCombo[11] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[5] = true;
+	lara->Inventory.PickupsCombo[10] = false;
+	lara->Inventory.PickupsCombo[11] = false;
 }
 
-void CombinePickupItem7(int flag)
+void CombinePickupItem7(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[6] = 1;
-	Lara.Inventory.PickupsCombo[12] = 0;
-	Lara.Inventory.PickupsCombo[13] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[6] = true;
+	lara->Inventory.PickupsCombo[12] = false;
+	lara->Inventory.PickupsCombo[13] = false;
 }
 
-void CombinePickupItem8(int flag)
+void CombinePickupItem8(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[7] = 1;
-	Lara.Inventory.PickupsCombo[14] = 0;
-	Lara.Inventory.PickupsCombo[15] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[7] = true;
+	lara->Inventory.PickupsCombo[14] = false;
+	lara->Inventory.PickupsCombo[15] = false;
 }
 
-void CombinePickupItem9(int flag)
+void CombinePickupItem9(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[8] = 1;
-	Lara.Inventory.PickupsCombo[16] = 0;
-	Lara.Inventory.PickupsCombo[17] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[8] = true;
+	lara->Inventory.PickupsCombo[16] = false;
+	lara->Inventory.PickupsCombo[17] = false;
 }
 
-void CombinePickupItem10(int flag)
+void CombinePickupItem10(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[9] = 1;
-	Lara.Inventory.PickupsCombo[18] = 0;
-	Lara.Inventory.PickupsCombo[19] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[9] = true;
+	lara->Inventory.PickupsCombo[18] = false;
+	lara->Inventory.PickupsCombo[19] = false;
 }
 
-void CombinePickupItem11(int flag)
+void CombinePickupItem11(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[10] = 1;
-	Lara.Inventory.PickupsCombo[20] = 0;
-	Lara.Inventory.PickupsCombo[21] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[10] = true;
+	lara->Inventory.PickupsCombo[20] = false;
+	lara->Inventory.PickupsCombo[21] = false;
 }
 
-void CombinePickupItem12(int flag)
+void CombinePickupItem12(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[11] = 1;
-	Lara.Inventory.PickupsCombo[22] = 0;
-	Lara.Inventory.PickupsCombo[23] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[11] = true;
+	lara->Inventory.PickupsCombo[22] = false;
+	lara->Inventory.PickupsCombo[23] = false;
 }
 
-void CombinePickupItem13(int flag)
+void CombinePickupItem13(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[12] = 1;
-	Lara.Inventory.PickupsCombo[24] = 0;
-	Lara.Inventory.PickupsCombo[25] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[12] = true;
+	lara->Inventory.PickupsCombo[24] = false;
+	lara->Inventory.PickupsCombo[25] = false;
 }
 
-void CombinePickupItem14(int flag)
+void CombinePickupItem14(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[13] = 1;
-	Lara.Inventory.PickupsCombo[26] = 0;
-	Lara.Inventory.PickupsCombo[27] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[13] = true;
+	lara->Inventory.PickupsCombo[26] = false;
+	lara->Inventory.PickupsCombo[27] = false;
 }
 
-void CombinePickupItem15(int flag)
+void CombinePickupItem15(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[14] = 1;
-	Lara.Inventory.PickupsCombo[28] = 0;
-	Lara.Inventory.PickupsCombo[29] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[14] = true;
+	lara->Inventory.PickupsCombo[28] = false;
+	lara->Inventory.PickupsCombo[29] = false;
 }
 
-void CombinePickupItem16(int flag)
+void CombinePickupItem16(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Pickups[15] = 1;
-	Lara.Inventory.PickupsCombo[30] = 0;
-	Lara.Inventory.PickupsCombo[31] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Pickups[15] = true;
+	lara->Inventory.PickupsCombo[30] = false;
+	lara->Inventory.PickupsCombo[31] = false;
 }
 
-void CombineExamine1(int flag)
+void CombineExamine1(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[0] = 1;
-	Lara.Inventory.ExaminesCombo[0] = 0;
-	Lara.Inventory.ExaminesCombo[1] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[0] = true;
+	lara->Inventory.ExaminesCombo[0] = false;
+	lara->Inventory.ExaminesCombo[1] = false;
 }
 
-void CombineExamine2(int flag)
+void CombineExamine2(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[1] = 1;
-	Lara.Inventory.ExaminesCombo[2] = 0;
-	Lara.Inventory.ExaminesCombo[3] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[1] = true;
+	lara->Inventory.ExaminesCombo[2] = false;
+	lara->Inventory.ExaminesCombo[3] = false;
 }
 
-void CombineExamine3(int flag)
+void CombineExamine3(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[2] = 1;
-	Lara.Inventory.ExaminesCombo[4] = 0;
-	Lara.Inventory.ExaminesCombo[5] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[2] = true;
+	lara->Inventory.ExaminesCombo[4] = false;
+	lara->Inventory.ExaminesCombo[5] = false;
 }
 
-void CombineExamine4(int flag)
+void CombineExamine4(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[3] = 1;
-	Lara.Inventory.ExaminesCombo[6] = 0;
-	Lara.Inventory.ExaminesCombo[7] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[3] = true;
+	lara->Inventory.ExaminesCombo[6] = false;
+	lara->Inventory.ExaminesCombo[7] = false;
 }
 
-void CombineExamine5(int flag)
+void CombineExamine5(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[4] = 1;
-	Lara.Inventory.ExaminesCombo[8] = 0;
-	Lara.Inventory.ExaminesCombo[9] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[4] = true;
+	lara->Inventory.ExaminesCombo[8] = false;
+	lara->Inventory.ExaminesCombo[9] = false;
 }
 
-void CombineExamine6(int flag)
+void CombineExamine6(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[5] = 1;
-	Lara.Inventory.ExaminesCombo[10] = 0;
-	Lara.Inventory.ExaminesCombo[11] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[5] = true;
+	lara->Inventory.ExaminesCombo[10] = false;
+	lara->Inventory.ExaminesCombo[11] = false;
 }
 
-void CombineExamine7(int flag)
+void CombineExamine7(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[6] = 1;
-	Lara.Inventory.ExaminesCombo[12] = 0;
-	Lara.Inventory.ExaminesCombo[13] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[6] = true;
+	lara->Inventory.ExaminesCombo[12] = false;
+	lara->Inventory.ExaminesCombo[13] = false;
 }
 
-void CombineExamine8(int flag)
+void CombineExamine8(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.Examines[7] = 1;
-	Lara.Inventory.ExaminesCombo[14] = 0;
-	Lara.Inventory.ExaminesCombo[15] = 0;
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.Examines[7] = true;
+	lara->Inventory.ExaminesCombo[14] = false;
+	lara->Inventory.ExaminesCombo[15] = false;
 }
 
-void CombineClockWorkBeetle(int flag)
+void CombineClockWorkBeetle(ItemInfo* item, bool flag)
 {
-	Lara.Inventory.BeetleComponents &= 2; // Remove combo 1.
-	Lara.Inventory.BeetleComponents &= 4; // Remove combo 2.
-	Lara.Inventory.BeetleComponents |= 1; // Get beetle.
+	auto* lara = GetLaraInfo(item);
+
+	lara->Inventory.BeetleComponents &= BEETLECOMP_FLAG_COMBO_1; // Remove combo 1.
+	lara->Inventory.BeetleComponents &= BEETLECOMP_FLAG_COMBO_2; // Remove combo 2.
+	lara->Inventory.BeetleComponents |= BEETLECOMP_FLAG_BEETLE; // Get beetle.
 }

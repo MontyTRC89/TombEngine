@@ -213,7 +213,7 @@ namespace TEN::Entities::TR4
                     if (puzzleItem->TriggerFlags == 1)
                     {
                         puzzleItem->MeshBits = 3;
-                        laraInfo->Inventory.Pickups[1]--;
+                        laraInfo->Inventory.Pickups[1] = false; // TODO: Check.
                         puzzleItem->ItemFlags[0] = 1;
                         puzzleItem->Pose.Orientation.y = oldRot;
                         return;
@@ -221,7 +221,7 @@ namespace TEN::Entities::TR4
 
                     puzzleItem->MeshBits = 12;
                     TestTriggers(puzzleItem, true, puzzleItem->Flags & IFLAG_ACTIVATION_MASK);
-                    laraInfo->Inventory.Pickups[0]--;
+                    laraInfo->Inventory.Pickups[0] = false; // TODO: Check.
                     puzzleItem->ItemFlags[0] = 1;
                 }
             }

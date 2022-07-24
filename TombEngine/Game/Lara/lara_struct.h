@@ -2,18 +2,19 @@
 #include "Objects/objectslist.h"
 #include "Specific/trmath.h"
 
-#define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
-#define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)
-#define NUM_KEYS (ID_KEY_ITEM16 - ID_KEY_ITEM1 + 1)
-#define NUM_KEY_PIECES	(ID_KEY_ITEM16_COMBO2 - ID_KEY_ITEM1_COMBO1 + 1)
-#define NUM_PICKUPS (ID_PICKUP_ITEM16 - ID_PICKUP_ITEM1 + 1)
-#define NUM_PICKUPS_PIECES	(ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1)
-#define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
-#define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
-
 struct CreatureInfo;
-struct ItemInfo;
 struct FX_INFO;
+struct ItemInfo;
+
+// Inventory object constants
+constexpr int NUM_PUZZLES		  = ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1;
+constexpr int NUM_PUZZLE_PIECES   = ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1;
+constexpr int NUM_KEYS			  = ID_KEY_ITEM16 - ID_KEY_ITEM1 + 1;
+constexpr int NUM_KEY_PIECES	  = ID_KEY_ITEM16_COMBO2 - ID_KEY_ITEM1_COMBO1 + 1;
+constexpr int NUM_PICKUPS		  = ID_PICKUP_ITEM16 - ID_PICKUP_ITEM1 + 1;
+constexpr int NUM_PICKUPS_PIECES  = ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1;
+constexpr int NUM_EXAMINES		  = ID_EXAMINE8 - ID_EXAMINE1 + 1;
+constexpr int NUM_EXAMINES_PIECES = ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1;
 
 namespace TEN::Renderer
 {
@@ -1126,9 +1127,15 @@ struct LaraInventoryData
 	DiaryInfo Diary;
 
 	byte BeetleLife;
-	int BeetleComponents;	// & 1 -> beetle. & 2 -> combo1. & 4 ->combo2
-	byte SmallWaterskin;	// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4: has skin + 3 = 4
-	byte BigWaterskin;		// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6: has skin + 5 liters = 6
+	int BeetleComponents;	// BeetleComponentFlags enum
+	byte SmallWaterskin;	// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
+	byte BigWaterskin;		// 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 6 (has skin + 5 liters = 6)
+
+	// TODO: Rename prefixes back to "Num".
+	int TotalSmallMedipacks;
+	int TotalLargeMedipacks;
+	int TotalFlares;
+	unsigned int TotalSecrets;
 
 	bool HasBinoculars;
 	bool HasCrowbar;
@@ -1136,11 +1143,7 @@ struct LaraInventoryData
 	bool HasLasersight; // TODO: Duplicated in CarriedWeaponInfo.
 	bool HasSilencer;	// TODO: Duplicated in CarriedWeaponInfo.
 
-	int TotalSmallMedipacks;
-	int TotalLargeMedipacks;
-	int TotalFlares;
-	unsigned int TotalSecrets;
-
+	// TODO: Convert to bools.
 	int Puzzles[NUM_PUZZLES];
 	int Keys[NUM_KEYS];
 	int Pickups[NUM_PICKUPS];
