@@ -65,13 +65,7 @@ namespace TEN::Entities::TR4
 		item->Animation.TargetState = GUIDE_STATE_IDLE;
 		item->Animation.ActiveState = GUIDE_STATE_IDLE;
 
-		if (Objects[ID_WRAITH1].loaded)
-		{
-			item->MeshSwapBits = NO_JOINT_BITS;
-			item->ItemFlags[1] = 2;
-		}
-		else
-			item->MeshSwapBits = 0x40000;
+		item->MeshSwapBits = 0x40000;
 	}
 
 	void GuideControl(short itemNumber)
@@ -159,43 +153,41 @@ namespace TEN::Entities::TR4
 
 		ItemInfo* foundEnemy = nullptr;
 
-		if (!Objects[ID_WRAITH1].loaded)
+
+		if (item->Animation.ActiveState < 4 ||
+			item->Animation.ActiveState == GUIDE_STATE_TORCH_ATTACK)
 		{
-			if (item->Animation.ActiveState < 4 ||
-				item->Animation.ActiveState == GUIDE_STATE_TORCH_ATTACK)
+			int minDistance = 0x7FFFFFFF;
+
+			for (int i = 0; i < ActiveCreatures.size(); i++)
 			{
-				int minDistance = 0x7FFFFFFF;
+				auto* currentCreatureInfo = ActiveCreatures[i];
 
-				for (int i = 0; i < ActiveCreatures.size(); i++)
+				if (currentCreatureInfo->ItemNumber == NO_ITEM || currentCreatureInfo->ItemNumber == itemNumber)
+					continue;
+
+				auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
+
+				if (currentItem->ObjectNumber != ID_GUIDE &&
+					abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= 512)
 				{
-					auto* currentCreatureInfo = ActiveCreatures[i];
+					dx = currentItem->Pose.Position.x - item->Pose.Position.x;
+					dy = currentItem->Pose.Position.y - item->Pose.Position.y;
+					dz = currentItem->Pose.Position.z - item->Pose.Position.z;
 
-					if (currentCreatureInfo->ItemNumber == NO_ITEM || currentCreatureInfo->ItemNumber == itemNumber)
-						continue;
+					if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
+						distance = 0x7FFFFFFF;
+					else
+						distance = pow(dx, 2) + pow(dz, 2);
 
-					auto* currentItem = &g_Level.Items[currentCreatureInfo->ItemNumber];
-
-					if (currentItem->ObjectNumber != ID_GUIDE &&
-						abs(currentItem->Pose.Position.y - item->Pose.Position.y) <= 512)
+					if (distance < minDistance &&
+						distance < pow(SECTOR(2), 2) &&
+						(abs(dy) < CLICK(1) ||
+							laraAI.distance < pow(SECTOR(2), 2) ||
+							currentItem->ObjectNumber == ID_DOG)) // <- Here to add more enemies as his target.
 					{
-						dx = currentItem->Pose.Position.x - item->Pose.Position.x;
-						dy = currentItem->Pose.Position.y - item->Pose.Position.y;
-						dz = currentItem->Pose.Position.z - item->Pose.Position.z;
-
-						if (dx > 32000 || dx < -32000 || dz > 32000 || dz < -32000)
-							distance = 0x7FFFFFFF;
-						else
-							distance = pow(dx, 2) + pow(dz, 2);
-
-						if (distance < minDistance &&
-							distance < pow(SECTOR(2), 2) &&
-							(abs(dy) < CLICK(1) ||
-								laraAI.distance < pow(SECTOR(2), 2) ||
-								currentItem->ObjectNumber == ID_DOG))
-						{
-							foundEnemy = currentItem;
-							minDistance = distance;
-						}
+						foundEnemy = currentItem;
+						minDistance = distance;
 					}
 				}
 			}
@@ -222,8 +214,22 @@ namespace TEN::Entities::TR4
 		Vector3Int pos1;
 		int frameNumber;
 		short random;
+
 		
-		short GoalNode = (item->ItemFlags[2] == 0) ? Lara.Location : item->ItemFlags[4];
+		bool flag_NewlBehaviour			= ((item->ItemFlags[2] & (1 << 0)) != 0) ? true : false;
+		bool flag_IgnoreLaraDistance	= ((item->ItemFlags[2] & (1 << 1)) != 0) ? true : false;
+		bool flag_RunDefault			= ((item->ItemFlags[2] & (1 << 2)) != 0) ? true : false;
+		bool flag_RetryNodeSearch		= ((item->ItemFlags[2] & (1 << 3)) != 0) ? true : false;
+
+		short GoalNode = (flag_NewlBehaviour) ? item->ItemFlags[4] : Lara.Location;
+
+		item->ItemFlags[5] = creature->Enemy->TriggerFlags;
+
+		if (flag_RetryNodeSearch)
+		{
+			item->ItemFlags[2] &= ~(1 << 3);	//turn off bit 3 for flag_RetryNodeSearch
+			creature->Enemy = nullptr;
+		}
 
 		TENLog("Guide state:" + std::to_string(item->Animation.ActiveState), LogLevel::Info);
 
@@ -248,15 +254,6 @@ namespace TEN::Entities::TR4
 				joint2 = AI.angle / 2;
 			}
 
-			if (Objects[ID_WRAITH1].loaded)
-			{
-				if (item->ItemFlags[3] == 5)
-					item->Animation.TargetState = GUIDE_STATE_WALK;
-
-				if (item->ItemFlags[3] == 5 || item->ItemFlags[3] == 6)
-					break;
-			}
-
 			if (item->Animation.RequiredState)
 				item->Animation.TargetState = item->Animation.RequiredState;
 			else if (GoalNode >= item->ItemFlags[3] ||
@@ -272,7 +269,12 @@ namespace TEN::Entities::TR4
 							item->Animation.TargetState = GUIDE_STATE_TORCH_ATTACK;
 					}
 					else if (enemy != LaraItem || AI.distance > pow(SECTOR(2), 2))
-						item->Animation.TargetState = GUIDE_STATE_WALK;
+						if ((flag_RunDefault) && AI.distance > pow(SECTOR(3), 2))
+						{
+							item->Animation.TargetState = GUIDE_STATE_RUN;
+						}else{
+							item->Animation.TargetState = GUIDE_STATE_WALK;
+						}
 				}
 				else
 				{
@@ -300,7 +302,7 @@ namespace TEN::Entities::TR4
 							break;
 
 						case 0x28: //Action Read Inscription
-							if (laraAI.distance < pow(SECTOR(2), 2) || item->ItemFlags[2] >= 2)
+							if (laraAI.distance < pow(SECTOR(2), 2) || flag_IgnoreLaraDistance)
 							{
 								item->Animation.TargetState = 39;
 								item->Animation.RequiredState = 39;
@@ -309,7 +311,7 @@ namespace TEN::Entities::TR4
 							break;
 
 						case 0x10: //Action Crouch and Trigger activation
-							if (laraAI.distance < pow(SECTOR(2), 2) || item->ItemFlags[2] >= 2)
+							if (laraAI.distance < pow(SECTOR(2), 2) || flag_IgnoreLaraDistance)
 							{
 								// Ignite torch
 								item->Animation.TargetState = 36;
@@ -319,7 +321,7 @@ namespace TEN::Entities::TR4
 							break;
 
 						case 0x04: //Action Crouch and Trap activation
-							if (laraAI.distance < pow(SECTOR(2), 2) || item->ItemFlags[2] >= 2)
+							if (laraAI.distance < pow(SECTOR(2), 2) || flag_IgnoreLaraDistance)
 							{
 								item->Animation.TargetState = 36;
 								item->Animation.RequiredState = 43;
@@ -358,12 +360,7 @@ namespace TEN::Entities::TR4
 			else
 				joint2 = laraAI.angle;
 
-			if (Objects[ID_WRAITH1].loaded && item->ItemFlags[3] == 5)
-			{
-				item->ItemFlags[3] = 6;
-				item->Animation.TargetState = GUIDE_STATE_IDLE;
-			}
-			else if (item->ItemFlags[1] == 1)
+			if (item->ItemFlags[1] == 1)
 			{
 				item->Animation.TargetState = GUIDE_STATE_IDLE;
 				item->Animation.RequiredState = GUIDE_STATE_IGNITE_TORCH;

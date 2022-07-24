@@ -161,26 +161,31 @@ ScriptReserved_MakeNotTargetable, & Moveable::MakeNotTargetable,
 /// Make the actor moves through its AI_Follow path till the indicated value.
 // @function Moveable:DoGoToNode
 // @tparam short value, the ocb number of the AI_Follow object where this actor must go.
-ScriptReserved_MakeNotTargetable, & Moveable::DoGoToNode,
+ScriptReserved_DoGoToNode, & Moveable::DoGoToNode,
 
 /// Make the actor moves directly to the indicated AI_Follow object, ignoring the other nodes before.
 // @function Moveable:DoGoDirectlyToNode
 // @tparam short value, the ocb number of the AI_Follow object where this actor must go.
-ScriptReserved_MakeNotTargetable, & Moveable::DoGoDirectlyToNode,
+ScriptReserved_DoGoDirectlyToNode, & Moveable::DoGoDirectlyToNode,
 
 /// Make the actor moves to the AI_Follow object with the next ocb value
 // @function Moveable:DoGoNextNode
-ScriptReserved_MakeNotTargetable, & Moveable::DoGoNextNode,
+ScriptReserved_DoGoNextNode, & Moveable::DoGoNextNode,
+
+/// Make the guide follow his own path goal, instead of follow the communal path moved with flipeffect 30. Set to false to reactivate classic behaviour.
+// @function Moveable:DoNewBehaviour
+// @tparam boolean value, true activate or deactivate the new behaviour. Default is true.
+ScriptReserved_DoNewBehaviour, & Moveable::DoNewBehaviour,
 
 /// Make the guide to wait for Lara to be near before to activate a heavy trigger action.
 // @function Moveable:DoWaitForLara
 // @tparam boolean value, true to make it wait, false to make it continue with no wait. Default is true.
-ScriptReserved_MakeNotTargetable, & Moveable::DoWaitForLara,
+ScriptReserved_DoWaitForLara, & Moveable::DoWaitForLara,
 
 /// Make the guide to run instead of walk.
 // @function Moveable:DoRunDefault
 // @tparam boolean value, true to make it run to the next AI node, false to restore the original behaviour. Default is false.
-ScriptReserved_MakeNotTargetable, & Moveable::DoRunDefault,
+ScriptReserved_DoRunDefault, & Moveable::DoRunDefault,
 
 
 /// Get the status of object.
@@ -805,10 +810,13 @@ void Moveable::DoGoToNode(short nodeId)
 	switch (objId)
 	{
 		case ID_GUIDE:
-			if (m_item->ItemFlags[2] < 1) m_item->ItemFlags[2] = 1; //If independent Guide is not activated, active it.
-			m_item->ItemFlags[4] = nodeId;
-			if (m_item->ItemFlags[4] < m_item->ItemFlags[3]) //If the goal node is lower than the current node.
+			m_item:DoNewBehaviour();
+			if (nodeId <= m_item->ItemFlags[4])
+			{
 				m_item->ItemFlags[3] = nodeId;
+				m_item->ItemFlags[2] |= (1 << 3);	//turn on bit 3 for flag_RetryNodeSearch
+			}
+			m_item->ItemFlags[4] = nodeId;
 			break;
 		default:
 			std::string InfoStr = "The Lua function DoGoToNode hasn't got actions for the object " + m_item->LuaName + ".";
@@ -823,9 +831,10 @@ void Moveable::DoGoDirectlyToNode(short nodeId)
 	switch (objId)
 	{
 		case ID_GUIDE:
-			if (m_item->ItemFlags[2] < 1) m_item->ItemFlags[2] = 1; //If independent Guide is not activated, active it.
-			m_item->ItemFlags[4] = nodeId;
+			m_item:DoNewBehaviour();
+			m_item->ItemFlags[2] |= (1 << 3);	//turn on bit 3 for flag_RetryNodeSearch
 			m_item->ItemFlags[3] = nodeId;
+			m_item->ItemFlags[4] = nodeId;
 			break;
 		default:
 			std::string InfoStr = "The Lua function DoGoDirectlyToNode hasn't got actions for the object " + m_item->LuaName + ".";
@@ -840,7 +849,7 @@ void Moveable::DoGoNextNode()
 	switch (objId)
 	{
 		case ID_GUIDE:
-			if (m_item->ItemFlags[2] < 1) m_item->ItemFlags[2] = 1; //If independent Guide is not activated, active it.
+			m_item:DoNewBehaviour();
 			m_item->ItemFlags[4] ++;
 			break;
 		default:
@@ -850,13 +859,38 @@ void Moveable::DoGoNextNode()
 	}
 }
 
+void Moveable::DoNewBehaviour(bool isNewBehaviour)
+{
+	GAME_OBJECT_ID objId = m_item->ObjectNumber;
+	switch (objId)
+	{
+	case ID_GUIDE:
+		if (isNewBehaviour)
+		{
+			m_item->ItemFlags[2] |= (1 << 0);	//turn on bit 0 for flag_NewlBehaviour
+		}else{
+			m_item->ItemFlags[2] &= ~(1 << 0);	//turn off bit 0 for flag_NewlBehaviour
+		}
+		break;
+	default:
+		std::string InfoStr = "The Lua function DoNewBehaviour hasn't got actions for the object " + m_item->LuaName + ".";
+		TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
+		break;
+	}
+}
+
 void Moveable::DoWaitForLara(bool isWaitForLara)
 {
 	GAME_OBJECT_ID objId = m_item->ObjectNumber;
 	switch (objId)
 	{
 		case ID_GUIDE:
-			m_item->ItemFlags[2] = (isWaitForLara) ? 1 : 2;
+			if (isWaitForLara)
+			{
+				m_item->ItemFlags[2] &= ~(1 << 1);	//turn off bit 1 for flag_IgnoreLaraDistance
+			}else{
+				m_item->ItemFlags[2] |= (1 << 1);	//turn on bit 1 for flag_IgnoreLaraDistance
+			}
 			break;
 		default:
 			std::string InfoStr = "The Lua function DoWaitForLara hasn't got actions for the object " + m_item->LuaName + ".";
@@ -871,7 +905,12 @@ void Moveable::DoRunDefault(bool isRunDefault)
 	switch (objId)
 	{
 		case ID_GUIDE:
-			m_item->ItemFlags[2] = (isRunDefault) ? 2 : 1;
+			if (isRunDefault)
+			{
+				m_item->ItemFlags[2] |= (1 << 2);	//turn on bit 2 for flag_RunDefault
+			}else{
+				m_item->ItemFlags[2] &= ~(1 << 2);	//turn off bit 2 for flag_RunDefault
+			}
 			break;
 		default:
 			std::string InfoStr = "The Lua function DoRunDefault hasn't got actions for the object " + m_item->LuaName + ".";
