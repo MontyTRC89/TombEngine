@@ -344,6 +344,9 @@ namespace TEN::Renderer
 					continue;
 			}
 
+			if (fadedCoeff == 0.0f)
+				continue;
+
 			memcpy(&m_stLights.Lights[numLights], lights[i], sizeof(ShaderLight));
 			m_stLights.Lights[numLights].Intensity *= fadedCoeff;
 			numLights++;
