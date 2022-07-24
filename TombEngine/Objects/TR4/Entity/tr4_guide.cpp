@@ -223,8 +223,6 @@ namespace TEN::Entities::TR4
 
 		short GoalNode = (flag_NewlBehaviour) ? item->ItemFlags[4] : Lara.Location;
 
-		item->ItemFlags[5] = creature->Enemy->TriggerFlags;
-
 		if (flag_RetryNodeSearch)
 		{
 			item->ItemFlags[2] &= ~(1 << 3);	//turn off bit 3 for flag_RetryNodeSearch
