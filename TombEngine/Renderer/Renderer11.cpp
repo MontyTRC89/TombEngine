@@ -68,7 +68,7 @@ namespace TEN::Renderer
 		m_Locked = true;
 	}
 
-	int Renderer11::Sync()
+	int Renderer11::Synchronize()
 	{
 		// Sync the renderer
 		int nf = Sync();

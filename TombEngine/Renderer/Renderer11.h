@@ -613,7 +613,7 @@ namespace TEN::Renderer
 		void DrawDebugInfo(RenderView& view);
 		void SwitchDebugPage(bool back);
 		void DrawPickup(short objectNum);
-		int  Sync();
+		int  Synchronize();
 		void AddString(int x, int y, const char* string, D3DCOLOR color, int flags);
 		void FreeRendererData();
 		void AddDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
