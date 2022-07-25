@@ -886,7 +886,7 @@ namespace TEN::Gui
 
 	bool GuiController::IsItemCurrentlyCombinable(int objectNumber)
 	{
-		if (objectNumber < INV_OBJECT_SMALL_WATERSKIN || objectNumber > INV_OBJECT_BIG_WATERSKIN5L)//trash
+		if (objectNumber < INV_OBJECT_SMALL_WATERSKIN_EMPTY || objectNumber > INV_OBJECT_BIG_WATERSKIN_5L)//trash
 		{
 			for (size_t n = 0; n < MAX_COMBINES; n++)
 			{
@@ -903,11 +903,11 @@ namespace TEN::Gui
 				}
 			}
 		}
-		else if (objectNumber > INV_OBJECT_SMALL_WATERSKIN3L)
+		else if (objectNumber > INV_OBJECT_SMALL_WATERSKIN_3L)
 		{
 			for (size_t n = 0; n < 4; n++)
 			{
-				if (IsItemInInventory(n + INV_OBJECT_SMALL_WATERSKIN))
+				if (IsItemInInventory(n + INV_OBJECT_SMALL_WATERSKIN_EMPTY))
 					return true;
 			}
 		}
@@ -915,7 +915,7 @@ namespace TEN::Gui
 		{
 			for (size_t n = 0; n < 6; n++)
 			{
-				if (IsItemInInventory(n + INV_OBJECT_BIG_WATERSKIN))
+				if (IsItemInInventory(n + INV_OBJECT_BIG_WATERSKIN_EMPTY))
 					return true;
 			}
 		}
@@ -928,10 +928,10 @@ namespace TEN::Gui
 		for (size_t i = 0; i < INVENTORY_TABLE_SIZE; i++)
 		{
 			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[i].InventoryItem == objectNumber)
-				return 1;
+				return true;
 		}
 
-		return 0;
+		return false;
 	}
 
 	void GuiController::CombineObjects(ItemInfo* item, int objectNumber1, int objectNumber2)
@@ -1008,13 +1008,13 @@ namespace TEN::Gui
 		AmmoObjectList[2].ZRot = 0;
 
 		if (options & 
-			(OPT_CHOOSEAMMO_UZI | OPT_CHOOSEAMMO_PISTOLS | OPT_CHOOSEAMMO_REVOLVER | OPT_CHOOSEAMMO_CROSSBOW |
-			OPT_CHOOSEAMMO_HK | OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_GRENADEGUN | OPT_CHOOSEAMMO_HARPOON | OPT_CHOOSEAMMO_ROCKET))
+			(OPT_CHOOSE_AMMO_UZI | OPT_CHOOSE_AMMO_PISTOLS | OPT_CHOOSE_AMMO_REVOLVER | OPT_CHOOSE_AMMO_CROSSBOW |
+			OPT_CHOOSE_AMMO_HK | OPT_CHOOSE_AMMO_SHOTGUN | OPT_CHOOSE_AMMO_GRENADEGUN | OPT_CHOOSE_AMMO_HARPOON | OPT_CHOOSE_AMMO_ROCKET))
 		{
 			AmmoSelectorFlag = 1;
 			AmmoSelectorFadeDir = 1;
 
-			if (options & OPT_CHOOSEAMMO_UZI)
+			if (options & OPT_CHOOSE_AMMO_UZI)
 			{
 				AmmoObjectList[0].InventoryItem = INV_OBJECT_UZI_AMMO;
 				AmmoObjectList[0].Amount = Ammo.AmountUziAmmo;
@@ -1023,7 +1023,7 @@ namespace TEN::Gui
 				CurrentAmmoType = &Ammo.CurrentUziAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_PISTOLS)
+			if (options & OPT_CHOOSE_AMMO_PISTOLS)
 			{
 				number++;
 				AmmoObjectList[0].InventoryItem = INV_OBJECT_PISTOLS_AMMO;
@@ -1032,7 +1032,7 @@ namespace TEN::Gui
 				CurrentAmmoType = &Ammo.CurrentPistolsAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_REVOLVER)
+			if (options & OPT_CHOOSE_AMMO_REVOLVER)
 			{
 				number++;
 				AmmoObjectList[0].InventoryItem = INV_OBJECT_REVOLVER_AMMO;
@@ -1041,22 +1041,22 @@ namespace TEN::Gui
 				CurrentAmmoType = &Ammo.CurrentRevolverAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_CROSSBOW)
+			if (options & OPT_CHOOSE_AMMO_CROSSBOW)
 			{
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO1;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO_1;
 				AmmoObjectList[number].Amount = Ammo.AmountCrossBowAmmo1;
 				number++;
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO2;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO_2;
 				AmmoObjectList[number].Amount = Ammo.AmountCrossBowAmmo2;
 				number++;
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO3;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_CROSSBOW_AMMO_3;
 				AmmoObjectList[number].Amount = Ammo.AmountCrossBowAmmo3;
 				number++;
 				NumAmmoSlots = number;
 				CurrentAmmoType = &Ammo.CurrentCrossBowAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_HK)
+			if (options & OPT_CHOOSE_AMMO_HK)
 			{
 				AmmoObjectList[number].InventoryItem = INV_OBJECT_HK_AMMO;
 				AmmoObjectList[number].Amount = Ammo.AmountHKAmmo1;
@@ -1065,34 +1065,34 @@ namespace TEN::Gui
 				CurrentAmmoType = &Ammo.CurrentHKAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_SHOTGUN)
+			if (options & OPT_CHOOSE_AMMO_SHOTGUN)
 			{
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_SHOTGUN_AMMO1;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_SHOTGUN_AMMO_1;
 				AmmoObjectList[number].Amount = Ammo.AmountShotGunAmmo1;
 				number++;
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_SHOTGUN_AMMO2;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_SHOTGUN_AMMO_2;
 				AmmoObjectList[number].Amount = Ammo.AmountShotGunAmmo2;
 				number++;
 				NumAmmoSlots = number;
 				CurrentAmmoType = &Ammo.CurrentShotGunAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_GRENADEGUN)
+			if (options & OPT_CHOOSE_AMMO_GRENADEGUN)
 			{
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO1;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO_1;
 				AmmoObjectList[number].Amount = Ammo.AmountGrenadeAmmo1;
 				number++;
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO2;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO_2;
 				AmmoObjectList[number].Amount = Ammo.AmountGrenadeAmmo2;
 				number++;
-				AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO3;
+				AmmoObjectList[number].InventoryItem = INV_OBJECT_GRENADE_AMMO_3;
 				AmmoObjectList[number].Amount = Ammo.AmountGrenadeAmmo3;
 				number++;
 				NumAmmoSlots = number;
 				CurrentAmmoType = &Ammo.CurrentGrenadeGunAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_HARPOON)
+			if (options & OPT_CHOOSE_AMMO_HARPOON)
 			{
 				AmmoObjectList[number].InventoryItem = INV_OBJECT_HARPOON_AMMO;
 				AmmoObjectList[number].Amount = Ammo.AmountHarpoonAmmo;
@@ -1101,7 +1101,7 @@ namespace TEN::Gui
 				CurrentAmmoType = &Ammo.CurrentHarpoonAmmoType;
 			}
 
-			if (options & OPT_CHOOSEAMMO_ROCKET)
+			if (options & OPT_CHOOSE_AMMO_ROCKET)
 			{
 				AmmoObjectList[number].InventoryItem = INV_OBJECT_ROCKET_AMMO;
 				AmmoObjectList[number].Amount = Ammo.AmountRocketsAmmo;
@@ -1126,7 +1126,7 @@ namespace TEN::Gui
 	{
 		unsigned __int64 Options = InventoryObjectTable[objectNumber].Options;
 
-		if (Options & (OPT_COMBINABLE | OPT_ALWAYSCOMBINE))
+		if (Options & (OPT_COMBINABLE | OPT_ALWAYS_COMBINE))
 		{
 			if (Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem != objectNumber)
 			{
@@ -1187,10 +1187,10 @@ namespace TEN::Gui
 			else
 			{
 				if (Ammo.AmountShotGunAmmo1)
-					InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO1);
+					InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO_1);
 
 				if (Ammo.AmountShotGunAmmo2)
-					InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO2);
+					InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO_2);
 			}
 
 			if (lara->Weapons[(int)LaraWeaponType::HK].Present)
@@ -1219,13 +1219,13 @@ namespace TEN::Gui
 			else
 			{
 				if (Ammo.AmountCrossBowAmmo1)
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO1);
+					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_1);
 
 				if (Ammo.AmountCrossBowAmmo2)
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO2);
+					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_2);
 
 				if (Ammo.AmountCrossBowAmmo3)
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO3);
+					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_3);
 			}
 
 			if (lara->Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
@@ -1241,13 +1241,13 @@ namespace TEN::Gui
 			else
 			{
 				if (Ammo.AmountGrenadeAmmo1)
-					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO1);
+					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_1);
 
 				if (Ammo.AmountGrenadeAmmo2)
-					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO2);
+					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_2);
 
 				if (Ammo.AmountGrenadeAmmo3)
-					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO3);
+					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_3);
 			}
 
 			if (lara->Weapons[(int)LaraWeaponType::RocketLauncher].Present)
@@ -1297,10 +1297,10 @@ namespace TEN::Gui
 		}
 
 		if (lara->Inventory.SmallWaterskin)
-			InsertObjectIntoList((lara->Inventory.SmallWaterskin - 1) + INV_OBJECT_SMALL_WATERSKIN);
+			InsertObjectIntoList((lara->Inventory.SmallWaterskin - 1) + INV_OBJECT_SMALL_WATERSKIN_EMPTY);
 
 		if (lara->Inventory.BigWaterskin)
-			InsertObjectIntoList((lara->Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN);
+			InsertObjectIntoList((lara->Inventory.BigWaterskin - 1) + INV_OBJECT_BIG_WATERSKIN_EMPTY);
 
 		for (size_t i = 0; i < NUM_PUZZLES; i++)
 		{
@@ -1361,10 +1361,10 @@ namespace TEN::Gui
 
 		Rings[(int)RingTypes::Inventory]->ObjectListMovement = 0;
 		Rings[(int)RingTypes::Inventory]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Inventory]->RingActive = 1;
+		Rings[(int)RingTypes::Inventory]->RingActive = true;
 		Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
 		Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Ammo]->RingActive = 0;
+		Rings[(int)RingTypes::Ammo]->RingActive = false;
 		HandleObjectChangeover((int)RingTypes::Inventory);
 		AmmoActive = 0;
 	}
@@ -1416,10 +1416,10 @@ namespace TEN::Gui
 		}
 
 		if (lara->Inventory.SmallWaterskin)
-			InsertObjectIntoList_v2(lara->Inventory.SmallWaterskin - 1 + INV_OBJECT_SMALL_WATERSKIN);
+			InsertObjectIntoList_v2(lara->Inventory.SmallWaterskin - 1 + INV_OBJECT_SMALL_WATERSKIN_EMPTY);
 
 		if (lara->Inventory.BigWaterskin)
-			InsertObjectIntoList_v2(lara->Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN);
+			InsertObjectIntoList_v2(lara->Inventory.BigWaterskin - 1 + INV_OBJECT_BIG_WATERSKIN_EMPTY);
 
 		for (size_t i = 0; i < NUM_PUZZLE_PIECES; i++)
 		{
@@ -1447,7 +1447,7 @@ namespace TEN::Gui
 
 		Rings[(int)RingTypes::Ammo]->ObjectListMovement = 0;
 		Rings[(int)RingTypes::Ammo]->CurrentObjectInList = 0;
-		Rings[(int)RingTypes::Ammo]->RingActive = 0;
+		Rings[(int)RingTypes::Ammo]->RingActive = false;
 	}
 
 	void GuiController::InitialiseInventory(ItemInfo* item)
@@ -1492,9 +1492,9 @@ namespace TEN::Gui
 					SetupObjectListStartPosition(LastInvItem);
 				else
 				{
-					if (LastInvItem >= INV_OBJECT_SMALL_WATERSKIN && LastInvItem <= INV_OBJECT_SMALL_WATERSKIN3L)
+					if (LastInvItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY && LastInvItem <= INV_OBJECT_SMALL_WATERSKIN_3L)
 					{
-						for (size_t i = INV_OBJECT_SMALL_WATERSKIN; i <= INV_OBJECT_SMALL_WATERSKIN3L; i++)
+						for (size_t i = INV_OBJECT_SMALL_WATERSKIN_EMPTY; i <= INV_OBJECT_SMALL_WATERSKIN_3L; i++)
 						{
 							if (IsItemInInventory(i))
 							{
@@ -1503,9 +1503,9 @@ namespace TEN::Gui
 							}
 						}
 					}
-					else if (LastInvItem >= INV_OBJECT_BIG_WATERSKIN && LastInvItem <= INV_OBJECT_BIG_WATERSKIN5L)
+					else if (LastInvItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY && LastInvItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 					{
-						for (size_t i = INV_OBJECT_BIG_WATERSKIN; i <= INV_OBJECT_BIG_WATERSKIN5L; i++)
+						for (size_t i = INV_OBJECT_BIG_WATERSKIN_EMPTY; i <= INV_OBJECT_BIG_WATERSKIN_5L; i++)
 						{
 							if (IsItemInInventory(i))
 							{
@@ -1891,10 +1891,10 @@ namespace TEN::Gui
 					CombineObject2 = ammoItem;
 					SoundEffect(SFX_TR4_MENU_COMBINE, nullptr, SoundEnvironment::Always);
 				}
-				else if (ammoItem >= INV_OBJECT_SMALL_WATERSKIN &&
-					ammoItem <= INV_OBJECT_SMALL_WATERSKIN3L &&
-					invItem >= INV_OBJECT_BIG_WATERSKIN &&
-					invItem <= INV_OBJECT_BIG_WATERSKIN5L)
+				else if (ammoItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY &&
+					ammoItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
+					invItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
+					invItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 				{
 					if (PerformWaterskinCombine(item, true))
 					{
@@ -1907,10 +1907,10 @@ namespace TEN::Gui
 					SayNo();
 					CombineRingFadeDir = 2;
 				}
-				else if (invItem >= INV_OBJECT_SMALL_WATERSKIN &&
-					invItem <= INV_OBJECT_SMALL_WATERSKIN3L &&
-					ammoItem >= INV_OBJECT_BIG_WATERSKIN &&
-					ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
+				else if (invItem >= INV_OBJECT_SMALL_WATERSKIN_EMPTY &&
+					invItem <= INV_OBJECT_SMALL_WATERSKIN_3L &&
+					ammoItem >= INV_OBJECT_BIG_WATERSKIN_EMPTY &&
+					ammoItem <= INV_OBJECT_BIG_WATERSKIN_5L)
 				{
 					if (PerformWaterskinCombine(item, false))
 					{
@@ -1996,7 +1996,7 @@ namespace TEN::Gui
 					n++;
 				}
 
-				if (options & (OPT_CHOOSEAMMO_SHOTGUN | OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
+				if (options & (OPT_CHOOSE_AMMO_SHOTGUN | OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN))
 				{
 					CurrentOptions[n].Type = MenuType::ChooseAmmo;
 					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[1]);
@@ -2013,14 +2013,14 @@ namespace TEN::Gui
 					}
 				}
 
-				if (options & OPT_ALWAYSCOMBINE)
+				if (options & OPT_ALWAYS_COMBINE)
 				{
 					CurrentOptions[n].Type = MenuType::Combine;
 					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[2]);
 					n++;
 				}
 
-				if (options & OPT_SEPERATABLE)
+				if (options & OPT_SEPERABLE)
 				{
 					CurrentOptions[n].Type = MenuType::Seperate;
 					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[3]);
@@ -2044,7 +2044,7 @@ namespace TEN::Gui
 
 				options = InventoryObjectTable[Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem].Options;
 
-				if (options & (OPT_CHOOSEAMMO_CROSSBOW | OPT_CHOOSEAMMO_GRENADEGUN))
+				if (options & (OPT_CHOOSE_AMMO_CROSSBOW | OPT_CHOOSE_AMMO_GRENADEGUN))
 				{
 					n = 3;
 					CurrentOptions[2].Type = MenuType::Ammo3;
@@ -2134,7 +2134,7 @@ namespace TEN::Gui
 					switch (CurrentOptions[CurrentSelectedOption].Type)
 					{
 					case MenuType::ChooseAmmo:
-						Rings[(int)RingTypes::Inventory]->RingActive = 0;
+						Rings[(int)RingTypes::Inventory]->RingActive = false;
 						AmmoActive = 1;
 						Ammo.StashedCurrentSelectedOption = CurrentSelectedOption;
 						Ammo.StashedCurrentPistolsAmmoType = Ammo.CurrentPistolsAmmoType;
@@ -2170,14 +2170,14 @@ namespace TEN::Gui
 					case MenuType::Ammo2:
 					case MenuType::Ammo3:
 						AmmoActive = 0;
-						Rings[(int)RingTypes::Inventory]->RingActive = 1;
+						Rings[(int)RingTypes::Inventory]->RingActive = true;
 						CurrentSelectedOption = 0;
 						break;
 
 					case MenuType::Combine:
 						ConstructCombineObjectList(item);
-						Rings[(int)RingTypes::Inventory]->RingActive = 0;
-						Rings[(int)RingTypes::Ammo]->RingActive = 1;
+						Rings[(int)RingTypes::Inventory]->RingActive = false;
+						Rings[(int)RingTypes::Ammo]->RingActive = true;
 						AmmoSelectorFlag = 0;
 						MenuActive = 0;
 						CombineRingFadeDir = 1;
@@ -2205,7 +2205,7 @@ namespace TEN::Gui
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
 					AmmoActive = 0;
-					Rings[(int)RingTypes::Inventory]->RingActive = 1;
+					Rings[(int)RingTypes::Inventory]->RingActive = true;
 					Ammo.CurrentPistolsAmmoType = Ammo.StashedCurrentPistolsAmmoType;
 					Ammo.CurrentUziAmmoType = Ammo.StashedCurrentUziAmmoType;
 					Ammo.CurrentRevolverAmmoType = Ammo.StashedCurrentRevolverAmmoType;
@@ -2410,13 +2410,13 @@ namespace TEN::Gui
 						NormalRingFadeDir = 2;
 					else
 					{
-						Rings[(int)RingTypes::Inventory]->RingActive = 1;
+						Rings[(int)RingTypes::Inventory]->RingActive = true;
 						MenuActive = 1;
-						Rings[(int)RingTypes::Ammo]->RingActive = 0;
+						Rings[(int)RingTypes::Ammo]->RingActive = false;
 						HandleObjectChangeover((int)RingTypes::Inventory);
 					}
 
-					Rings[(int)RingTypes::Ammo]->RingActive = 0;
+					Rings[(int)RingTypes::Ammo]->RingActive = false;
 				}
 			}
 		}
@@ -2429,7 +2429,7 @@ namespace TEN::Gui
 			{
 				NormalRingFadeVal = 128;
 				NormalRingFadeDir = 0;
-				Rings[(int)RingTypes::Inventory]->RingActive = 1;
+				Rings[(int)RingTypes::Inventory]->RingActive = true;
 				MenuActive = 1;
 			}
 
@@ -2518,7 +2518,7 @@ namespace TEN::Gui
 						if (Rings[ringIndex]->ObjectListMovement < 0)
 							shade = (-128 * Rings[ringIndex]->ObjectListMovement) >> 16;
 						else
-							shade = 128 - (short)(Rings[ringIndex]->ObjectListMovement >> 9);
+							shade = 128 - short(Rings[ringIndex]->ObjectListMovement >> 9);
 					}
 				}
 				else
@@ -2652,9 +2652,9 @@ namespace TEN::Gui
 
 					int objectMeUp;
 					if (ringIndex == (int)RingTypes::Inventory)
-						objectMeUp = (int)(PHD_CENTER_Y - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
+						objectMeUp = int(PHD_CENTER_Y - (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.5);
 					else
-						objectMeUp = (int)(PHD_CENTER_Y + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
+						objectMeUp = int(PHD_CENTER_Y + (REFERENCE_RES_HEIGHT + 1) * 0.0625 * 2.0);
 
 					g_Renderer.DrawString(PHD_CENTER_X, objectMeUp, textBufferMe, PRINTSTRING_COLOR_YELLOW, PRINTSTRING_CENTER | PRINTSTRING_OUTLINE);
 				}
@@ -2710,7 +2710,7 @@ namespace TEN::Gui
 				int x, y, y2;
 				x = 400 + xOffset + i * OBJLIST_SPACING;
 				y = 150;
-				y2 = 480;//combine 
+				y2 = 480; // Combine.
 				short obj = ConvertInventoryItemToObject(Rings[ringIndex]->CurrentObjectList[n].InventoryItem);
 				float scaler = InventoryObjectTable[Rings[ringIndex]->CurrentObjectList[n].InventoryItem].Scale1;
 				g_Renderer.DrawObjectOn2DPosition(x, ringIndex == (int)RingTypes::Inventory ? y : y2, obj, XRot, YRot, ZRot, scaler);
@@ -2724,17 +2724,17 @@ namespace TEN::Gui
 				if (Rings[ringIndex]->NumObjectsInList != 1 && (ringIndex != 1 || CombineRingFadeVal == 128))
 				{
 					if (Rings[ringIndex]->ObjectListMovement > 0)
-						Rings[ringIndex]->ObjectListMovement += 8192;
+						Rings[ringIndex]->ObjectListMovement += ANGLE(45.0f);
 
 					if (Rings[ringIndex]->ObjectListMovement < 0)
-						Rings[ringIndex]->ObjectListMovement -= 8192;
+						Rings[ringIndex]->ObjectListMovement -= ANGLE(45.0f);
 
 					if (IsHeld(In::Left))
 					{
 						if (!Rings[ringIndex]->ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							Rings[ringIndex]->ObjectListMovement += 8192;
+							Rings[ringIndex]->ObjectListMovement += ANGLE(45.0f);
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -2746,7 +2746,7 @@ namespace TEN::Gui
 						if (!Rings[ringIndex]->ObjectListMovement)
 						{
 							SoundEffect(SFX_TR4_MENU_ROTATE, nullptr, SoundEnvironment::Always);
-							Rings[ringIndex]->ObjectListMovement -= 8192;
+							Rings[ringIndex]->ObjectListMovement -= ANGLE(45.0f);
 
 							if (AmmoSelectorFlag)
 								AmmoSelectorFadeDir = 2;
@@ -3064,12 +3064,11 @@ namespace TEN::Gui
 					}
 
 					i--;
-
 				} while (i);
 
 				lara->Inventory.SmallWaterskin = smallLiters + 1;
 				lara->Inventory.BigWaterskin = bigLiters + 1;
-				CombineObject1 = (smallLiters + 1) + (INV_OBJECT_SMALL_WATERSKIN - 1);
+				CombineObject1 = (smallLiters + 1) + (INV_OBJECT_SMALL_WATERSKIN_EMPTY - 1);
 				return true;
 			}
 		}
@@ -3090,12 +3089,11 @@ namespace TEN::Gui
 					}
 
 					i--;
-
 				} while (i);
 
 				lara->Inventory.SmallWaterskin = smallLiters + 1;
 				lara->Inventory.BigWaterskin = bigLiters + 1;
-				CombineObject1 = (bigLiters + 1) + (INV_OBJECT_BIG_WATERSKIN - 1);
+				CombineObject1 = (bigLiters + 1) + (INV_OBJECT_BIG_WATERSKIN_EMPTY - 1);
 				return true;
 			}
 		}

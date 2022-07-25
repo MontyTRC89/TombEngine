@@ -1,6 +1,5 @@
 #pragma once
 #include "Game/GuiObjects.h"
-
 #include "LanguageScript.h"
 #include "Specific/configuration.h"
 
@@ -94,7 +93,7 @@ namespace TEN::Gui
 	struct InventoryRing
 	{
 		ObjectList CurrentObjectList[INVENTORY_TABLE_SIZE + 1];
-		int RingActive;
+		bool RingActive;
 		int ObjectListMovement;
 		int CurrentObjectInList;
 		int NumObjectsInList;
