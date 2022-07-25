@@ -227,9 +227,9 @@ namespace TEN::Entities::Vehicles
 		auto* lara = GetLaraInfo(laraItem);
 
 		auto& ammo = GetAmmo(laraItem, LaraWeaponType::HarpoonGun);
-		if (ammo.getCount() == 0 && !ammo.hasInfinite())
+		if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 			return;
-		else if (!ammo.hasInfinite())
+		else if (!ammo.HasInfinite())
 			ammo--;
 
 		short itemNumber = CreateItem();

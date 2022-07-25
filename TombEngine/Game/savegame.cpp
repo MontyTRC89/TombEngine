@@ -366,8 +366,8 @@ bool SaveGame::Save(int slot)
 		for (int j = 0; j < (int)WeaponAmmoType::NumAmmoTypes; j++)
 		{
 			Save::AmmoInfoBuilder ammo{ fbb };
-			ammo.add_count(info->Ammo[j].getCount());
-			ammo.add_is_infinite(info->Ammo[j].hasInfinite());
+			ammo.add_count(info->Ammo[j].GetCount());
+			ammo.add_is_infinite(info->Ammo[j].HasInfinite());
 			auto ammoOffset = ammo.Finish();
 			ammos.push_back(ammoOffset);
 		}
@@ -1857,7 +1857,7 @@ bool SaveGame::Load(int slot)
 
 		for (int j = 0; j < info->ammo()->size(); j++)
 		{
-			Lara.Weapons[i].Ammo[j].setInfinite(info->ammo()->Get(j)->is_infinite());
+			Lara.Weapons[i].Ammo[j].SetInfinite(info->ammo()->Get(j)->is_infinite());
 			Lara.Weapons[i].Ammo[j] = info->ammo()->Get(j)->count();
 		}
 

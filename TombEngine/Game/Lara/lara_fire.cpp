@@ -834,9 +834,9 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo*
 	auto* lara = GetLaraInfo(src);
 
 	auto& ammo = GetAmmo(src, weaponType);
-	if (ammo.getCount() == 0 && !ammo.hasInfinite())
+	if (ammo.GetCount() == 0 && !ammo.HasInfinite())
 		return FireWeaponType::NoAmmo;
-	if (!ammo.hasInfinite())
+	if (!ammo.HasInfinite())
 		ammo--;
 
 	auto* weapon = &Weapons[(int)weaponType];

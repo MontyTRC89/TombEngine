@@ -139,15 +139,15 @@ namespace TEN::Gui
 		void SetSelectedOption(int menu);
 		void SetMenuToDisplay(Menu menu);
 		void SetInventoryMode(InventoryMode mode);
-		void SetEnterInventory(int num);
-		void SetInventoryItemChosen(int num);
+		void SetEnterInventory(int number);
+		void SetInventoryItemChosen(int number);
 
 	private:
 		#define CAN_SELECT   (!IsHeld(In::Deselect) && \
-						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) && \
-						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) && \
-						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) && \
-						 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
+							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Deselect) && \
+							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Save) && \
+							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Load) && \
+							 GetActionTimeActive(In::Action) <= GetActionTimeInactive(In::Pause))
 		#define CAN_DESELECT (!(IsHeld(In::Select) || IsHeld(In::Action)))
 
 		// Input macros

@@ -952,105 +952,105 @@ struct Ammo
 	using CountType = uint16_t;
 
 private:
-	CountType count;
-	bool isInfinite;
+	CountType Count;
+	bool	  IsInfinite;
 
 public:
+	static CountType Clamp(int value)
+	{
+		return std::clamp(value, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
+	}
+
+	bool HasInfinite() const
+	{
+		return IsInfinite;
+	}
+
+	CountType GetCount() const
+	{
+		return Count;
+	}
+
+	void SetInfinite(bool infinite)
+	{
+		this->IsInfinite = infinite;
+	}
+
 	Ammo& operator --()
 	{
-		--count;
+		--this->Count;
 		return *this;
 	}
 
 	Ammo operator --(int)
 	{
-		Ammo tmp = *this;
+		auto temp = *this;
 		--*this;
-		return tmp;
+		return temp;
 	}
 
 	Ammo& operator ++()
 	{
-		++count;
+		++this->Count;
 		return *this;
 	}
 
 	Ammo operator ++(int)
 	{
-		Ammo tmp = *this;
+		auto temp = *this;
 		++*this;
-		return tmp;
+		return temp;
 	}
 
-	Ammo& operator =(size_t val)
+	Ammo& operator =(size_t value)
 	{
-		count = clamp(val);
+		this->Count = Clamp(value);
 		return *this;
 	}
 
-	bool operator ==(size_t val)
+	bool operator ==(size_t value)
 	{
-		return count == clamp(val);
+		return (Count == Clamp(value));
 	}
 
 	Ammo& operator =(Ammo& rhs)
 	{
-		count = rhs.count;
-		isInfinite = rhs.count;
+		this->Count = rhs.Count;
+		this->IsInfinite = rhs.Count;
 		return *this;
 	}
 
-	Ammo operator +(size_t val)
+	Ammo operator +(size_t value)
 	{
-		Ammo tmp = *this;
-		tmp += val;
-		return tmp;
+		auto temp = *this;
+		temp += value;
+		return temp;
 	}
 
-	Ammo operator -(size_t val)
+	Ammo operator -(size_t value)
 	{
-		Ammo tmp = *this;
-		tmp -= val;
-		return tmp;
+		auto temp = *this;
+		temp -= value;
+		return temp;
 	}
 
-	Ammo& operator +=(size_t val)
+	Ammo& operator +=(size_t value)
 	{
-		int tmp = this->count + val;
-		this->count = clamp(tmp);
+		int temp = Count + value;
+		this->Count = Clamp(temp);
 		return *this;
 	}
 
-	Ammo& operator -=(size_t val)
+	Ammo& operator -=(size_t value)
 	{
-		int tmp = this->count - val;
-		this->count = clamp(tmp);
+		int temp = Count - value;
+		this->Count = Clamp(temp);
 		return *this;
 	}
 
 	operator bool()
 	{
-		return isInfinite || (count > 0);
-	}
-
-	static CountType clamp(int val)
-	{
-		return std::clamp(val, 0, static_cast<int>(std::numeric_limits<CountType>::max()));
-	}
-
-	bool hasInfinite() const
-	{
-		return isInfinite;
-	}
-
-	CountType getCount() const
-	{
-		return count;
-	}
-
-	void setInfinite(bool infinite)
-	{
-		isInfinite = infinite;
+		return (IsInfinite || Count > 0);
 	}
 };
 

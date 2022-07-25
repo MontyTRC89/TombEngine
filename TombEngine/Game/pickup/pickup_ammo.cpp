@@ -43,10 +43,10 @@ static bool TryModifyingAmmo(LaraInfo& lara, GAME_OBJECT_ID objectID, int amount
 	AmmoPickupInfo info = kAmmo[arrayPos];
 
 	auto currentAmmo = lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType];
-	if (!currentAmmo.hasInfinite())
+	if (!currentAmmo.HasInfinite())
 	{
 		int defaultModify = add ? info.Amount : -info.Amount;
-		int newVal = int{ currentAmmo.getCount() } + (amount ? amount : defaultModify);
+		int newVal = int{ currentAmmo.GetCount() } + (amount ? amount : defaultModify);
 		lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType] = std::max(0, newVal);
 	}
 
@@ -72,8 +72,8 @@ std::optional<int> GetAmmoCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 
 	AmmoPickupInfo info = kAmmo[arrayPos];
 
-	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].hasInfinite())
-		return lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].getCount();
+	if (!lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].HasInfinite())
+		return lara.Weapons[(int)info.LaraWeaponType].Ammo[(int)info.AmmoType].GetCount();
 
 	// -1 signifies infinite ammo.
 	return -1;

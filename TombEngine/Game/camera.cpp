@@ -1122,7 +1122,7 @@ void LaserSightCamera(ItemInfo* item)
 			WeaponDelay = 16;
 			Statistics.Game.AmmoUsed++;
 
-			if (!ammo.hasInfinite())
+			if (!ammo.HasInfinite())
 				(ammo)--;
 
 			Camera.bounce = -16 - (GetRandomControl() & 0x1F);
@@ -1214,7 +1214,7 @@ void LaserSightCamera(ItemInfo* item)
 				}
 			}
 
-			if (!ammo.hasInfinite())
+			if (!ammo.HasInfinite())
 				(ammo)--;
 		}
 	}
