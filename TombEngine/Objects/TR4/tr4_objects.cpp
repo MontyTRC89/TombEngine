@@ -562,6 +562,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->saveHitpoints = true;
 		obj->saveAnim = true;
 		obj->saveFlags = true;
+		obj->meshSwapSlot = ID_MESHSWAP2;
 		obj->zoneType = ZONE_BASIC;
 
 		g_Level.Bones[obj->boneIndex + 6 * 4] |= ROT_X | ROT_Y;
