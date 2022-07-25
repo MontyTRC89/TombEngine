@@ -10,7 +10,7 @@ namespace TEN::Renderer
 		DirectX::SimpleMath::Vector2 UV;
 		DirectX::SimpleMath::Vector4 Color;
 		DirectX::SimpleMath::Vector3 Tangent;
-		DirectX::SimpleMath::Vector3 BiTangent;
+		unsigned char AnimationFrameOffset;
 		DirectX::SimpleMath::Vector4 Effects;
 		float Bone;
 		int IndexInPoly;
