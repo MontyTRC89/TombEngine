@@ -1077,14 +1077,14 @@ namespace TEN::Renderer
 
 		RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
 
-		m_stItem.World = effect->World;
-		m_stItem.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
-		m_stItem.Color = Vector4::One;
-		m_stItem.AmbientLight = room.AmbientLight;
-		m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
-		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
-		m_cbItem.updateData(m_stItem, m_context.Get());
-		BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+		m_stStatic.World = effect->World;
+		m_stStatic.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
+		m_stStatic.Color = Vector4::One;
+		m_stStatic.AmbientLight = room.AmbientLight;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+		m_cbStatic.updateData(m_stStatic, m_context.Get());
+		BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+		BindConstantBufferPS(CB_STATIC, m_cbStatic.get());
 
 		BindLights(effect->LightsToDraw);
 
@@ -1132,6 +1132,9 @@ namespace TEN::Renderer
 		m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
+		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		for (auto room : view.roomsToDraw)
 		{
