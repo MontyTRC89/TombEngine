@@ -910,8 +910,12 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, Collisi
 	}
 
 	// Get and test DX item coll bounds
-	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z), &collBox);
+	auto collBounds = TO_DX_BBOX(PHD_3DPOS(item->Pose.Position), &collBox);
 	bool intersects = staticBounds.Intersects(collBounds);
+
+	// Check if previous item horizontal position intersects bounds
+	auto oldCollBounds = TO_DX_BBOX(PHD_3DPOS(coll->Setup.OldPosition.x, item->Pose.Position.y, coll->Setup.OldPosition.z), &collBox);
+	bool oldHorIntersects = staticBounds.Intersects(oldCollBounds);
 
 	// Draw item coll bounds
 	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
@@ -973,7 +977,7 @@ bool CollideSolidBounds(ItemInfo* item, BOUNDING_BOX box, PHD_3DPOS pos, Collisi
 		auto distanceToVerticalPlane = height / 2 - yPoint;
 
 		// Correct position according to top/bottom bounds, if collided and plane is nearby
-		if (intersects && minDistance < height)
+		if (intersects && oldHorIntersects && minDistance < height)
 		{
 			if (bottom)
 			{
