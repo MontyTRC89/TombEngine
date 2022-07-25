@@ -1176,7 +1176,8 @@ namespace TEN::Renderer
 
 				m_stStatic.World = world;
 				m_stStatic.Color = deb->color;
-				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
+				m_stStatic.AmbientLight = m_rooms[deb->roomNumber].AmbientLight;
+				m_stStatic.LightMode = deb->lightMode;
 
 				m_cbStatic.updateData(m_stStatic, m_context.Get());
 				BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
@@ -1185,19 +1186,19 @@ namespace TEN::Renderer
 				vtx0.Position = deb->mesh.Positions[0];
 				vtx0.UV = deb->mesh.TextureCoordinates[0];
 				vtx0.Normal = deb->mesh.Normals[0];
-				vtx0.Color = m_rooms[deb->roomNumber].AmbientLight;
+				vtx0.Color = deb->mesh.Colors[0];
 
 				RendererVertex vtx1;
 				vtx1.Position = deb->mesh.Positions[1];
 				vtx1.UV = deb->mesh.TextureCoordinates[1];
 				vtx1.Normal = deb->mesh.Normals[1];
-				vtx1.Color = m_rooms[deb->roomNumber].AmbientLight;
+				vtx1.Color = deb->mesh.Colors[1];
 
 				RendererVertex vtx2;
 				vtx2.Position = deb->mesh.Positions[2];
 				vtx2.UV = deb->mesh.TextureCoordinates[2];
 				vtx2.Normal = deb->mesh.Normals[2];
-				vtx2.Color = m_rooms[deb->roomNumber].AmbientLight;
+				vtx2.Color = deb->mesh.Colors[2];
 
 				SetCullMode(CULL_MODE_NONE);
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);

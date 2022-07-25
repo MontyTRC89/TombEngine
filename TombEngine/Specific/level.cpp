@@ -177,7 +177,7 @@ void LoadObjects()
 	{
 		MESH mesh;
 
-		mesh.lightMode = ReadInt8();
+		mesh.lightMode = (LIGHT_MODES)ReadInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
 		mesh.sphere.Center.y = ReadFloat();
@@ -205,7 +205,7 @@ void LoadObjects()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
@@ -596,7 +596,7 @@ void ReadRooms()
 			BUCKET bucket;
 
 			bucket.texture = ReadInt32();
-			bucket.blendMode = ReadInt8();
+			bucket.blendMode = (BLEND_MODES)ReadInt8();
 			bucket.animated = ReadInt8();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;

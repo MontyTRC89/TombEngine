@@ -33,7 +33,6 @@ DebrisFragment* GetFreeDebrisFragment()
 void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumber, int noZXVel)
 {
 	int meshIndex = 0;
-	MESH* fragmentsMesh;
 	short yRot = 0;
 	Vector3 pos;
 	bool isStatic;
@@ -53,7 +52,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		pos = Vector3(item->sphere.x, item->sphere.y, item->sphere.z);
 	}
 
-	fragmentsMesh = &g_Level.Meshes[meshIndex];
+	auto fragmentsMesh = &g_Level.Meshes[meshIndex];
 
 	for (auto& renderBucket : fragmentsMesh->buckets)
 	{
@@ -101,6 +100,10 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 					Vector3 normal2 = poly->normals[indices[j * 3 + 1]];
 					Vector3 normal3 = poly->normals[indices[j * 3 + 2]];
 
+					Vector3 color1 = fragmentsMesh->colors[poly->indices[indices[j * 3 + 0]]];
+					Vector3 color2 = fragmentsMesh->colors[poly->indices[indices[j * 3 + 1]]];
+					Vector3 color3 = fragmentsMesh->colors[poly->indices[indices[j * 3 + 2]]];
+
 					//Take the average of all 3 local positions
 					Vector3 localPos = (pos1 + pos2 + pos3) / 3;
 					Vector3 worldPos = Vector3::Transform(localPos, rotationMatrix);
@@ -119,7 +122,11 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 					fragment->mesh.Normals[1] = normal2;
 					fragment->mesh.Normals[2] = normal3;
 
-					fragment->mesh.blendMode = BLENDMODE_OPAQUE;
+					fragment->mesh.Colors[0] = Vector4(color1.x, color1.y, color1.z, 1.0f);
+					fragment->mesh.Colors[1] = Vector4(color2.x, color2.y, color2.z, 1.0f);
+					fragment->mesh.Colors[2] = Vector4(color3.x, color3.y, color3.z, 1.0f);
+
+					fragment->mesh.blendMode = renderBucket.blendMode;
 					fragment->mesh.tex = renderBucket.texture;
 
 					fragment->isStatic = isStatic;
@@ -134,7 +141,8 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 					fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 					fragment->roomNumber = roomNumber;
 					fragment->numBounces = 0;
-					fragment->color = isStatic ? mesh->color : Vector4::One; // FIXME: SHATTER_ITEM must be refactored! -- Lwmte, 15.07.22
+					fragment->color = isStatic ? mesh->color : item->color;
+					fragment->lightMode = fragmentsMesh->lightMode;
 				}
 			}
 		}
