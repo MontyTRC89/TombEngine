@@ -1561,6 +1561,7 @@ namespace TEN::Renderer
 		DrawStatics(view, true);
 		DrawItems(view, true);
 		DrawEffects(view, true);
+		DrawDebris(view, true);
 		DrawGunFlashes(view);
 		DrawBaddyGunflashes(view);
 
