@@ -1,5 +1,5 @@
-#ifndef __MATH
-#define __MATH
+#ifndef MATH
+#define MATH
 
 #define PI 3.1415926535897932384626433832795028841971693993751058209749445923
 #define PI2 6.2831853071795864769252867665590057683943387987502116419498891846
@@ -24,4 +24,4 @@ float3 Screen(float3 ambient, float3 tint)
 	return float3(r, g, b);
 }
 
-#endif // __MATH
+#endif // MATH
