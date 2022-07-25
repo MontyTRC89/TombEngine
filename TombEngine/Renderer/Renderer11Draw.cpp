@@ -1699,7 +1699,7 @@ namespace TEN::Renderer
 		m_stItem.World = item->World;
 		m_stItem.Position = Vector4(itemPosition.x, itemPosition.y, itemPosition.z, 1.0f);
 		m_stItem.Color = item->Color;
-		m_stItem.AmbientLight = room->AmbientLight;
+		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
