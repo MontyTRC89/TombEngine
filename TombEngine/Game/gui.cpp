@@ -980,7 +980,7 @@ namespace TEN::Gui
 	void GuiController::HandleObjectChangeover(int ringIndex)
 	{
 		CurrentSelectedOption = 0;
-		MenuActive = 1;
+		MenuActive = true;
 		SetupAmmoSelector();
 	}
 
@@ -1458,7 +1458,7 @@ namespace TEN::Gui
 		AlterFOV(ANGLE(80.0f));
 		lara->Inventory.IsBusy = false;
 		InventoryItemChosen = NO_ITEM;
-		UseItem = 0;
+		UseItem = false;
 
 		if (lara->Weapons[(int)LaraWeaponType::Shotgun].Ammo[0].HasInfinite())
 			Ammo.AmountShotGunAmmo1 = -1;
@@ -2179,7 +2179,7 @@ namespace TEN::Gui
 						Rings[(int)RingTypes::Inventory]->RingActive = false;
 						Rings[(int)RingTypes::Ammo]->RingActive = true;
 						AmmoSelectorFlag = 0;
-						MenuActive = 0;
+						MenuActive = false;
 						CombineRingFadeDir = 1;
 						break;
 
@@ -2190,8 +2190,8 @@ namespace TEN::Gui
 
 					case MenuType::Equip:
 					case MenuType::Use:
-						MenuActive = 0;
-						UseItem = 1;
+						MenuActive = false;
+						UseItem = true;
 						break;
 
 					case MenuType::Diary:
@@ -2411,7 +2411,7 @@ namespace TEN::Gui
 					else
 					{
 						Rings[(int)RingTypes::Inventory]->RingActive = true;
-						MenuActive = 1;
+						MenuActive = true;
 						Rings[(int)RingTypes::Ammo]->RingActive = false;
 						HandleObjectChangeover((int)RingTypes::Inventory);
 					}
@@ -2430,7 +2430,7 @@ namespace TEN::Gui
 				NormalRingFadeVal = 128;
 				NormalRingFadeDir = 0;
 				Rings[(int)RingTypes::Inventory]->RingActive = true;
-				MenuActive = 1;
+				MenuActive = true;
 			}
 
 		}

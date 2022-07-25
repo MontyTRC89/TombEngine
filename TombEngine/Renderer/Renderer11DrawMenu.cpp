@@ -683,7 +683,7 @@ namespace TEN::Renderer
 	void Renderer11::DrawDiary()
 	{
 		InventoryObject* obj = &InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
-		short currentPage = Lara.Inventory.Diary.CurrentPage;
+		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
 		DrawObjectOn2DPosition(400, 300, g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY),
 			obj->Orientation.x, obj->Orientation.y, obj->Orientation.z, obj->Scale1);
 
@@ -736,8 +736,8 @@ namespace TEN::Renderer
 
 		if (CurrentLevel == 0)
 		{
-			Menu title_menu = g_Gui.GetMenuToDisplay();
-			bool drawLogo = (title_menu == Menu::Title || title_menu == Menu::Options);
+			auto titleMenu = g_Gui.GetMenuToDisplay();
+			bool drawLogo = (titleMenu == Menu::Title || titleMenu == Menu::Options);
 
 			if (drawLogo)
 			{
@@ -760,7 +760,7 @@ namespace TEN::Renderer
 				m_spriteBatch->End();
 			}
 
-			RenderTitleMenu(title_menu);
+			RenderTitleMenu(titleMenu);
 		}
 		else
 		{

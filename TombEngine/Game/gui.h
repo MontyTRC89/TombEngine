@@ -168,7 +168,7 @@ namespace TEN::Gui
 		// Inventory variables
 		short CombineObject1;
 		short CombineObject2;
-		char UseItem;
+		bool UseItem;
 		char SeperateTypeFlag;
 		char CombineTypeFlag;
 		int CompassNeedleAngle;
@@ -176,7 +176,7 @@ namespace TEN::Gui
 		InventoryRing PCRing2;
 		InventoryRing* Rings[2];
 		int CurrentSelectedOption;
-		int MenuActive;
+		bool MenuActive;
 		char AmmoSelectorFlag;
 		char NumAmmoSlots;
 		char* CurrentAmmoType;
