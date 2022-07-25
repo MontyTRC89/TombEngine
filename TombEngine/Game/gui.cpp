@@ -1896,7 +1896,7 @@ namespace TEN::Gui
 					invItem >= INV_OBJECT_BIG_WATERSKIN &&
 					invItem <= INV_OBJECT_BIG_WATERSKIN5L)
 				{
-					if (PerformWaterskinCombine(item, 1))
+					if (PerformWaterskinCombine(item, true))
 					{
 						CombineTypeFlag = 2;
 						CombineRingFadeDir = 2;
@@ -1912,7 +1912,7 @@ namespace TEN::Gui
 					ammoItem >= INV_OBJECT_BIG_WATERSKIN &&
 					ammoItem <= INV_OBJECT_BIG_WATERSKIN5L)
 				{
-					if (PerformWaterskinCombine(item, 0))
+					if (PerformWaterskinCombine(item, false))
 					{
 						CombineTypeFlag = 2;
 						CombineRingFadeDir = 2;
@@ -3037,7 +3037,7 @@ namespace TEN::Gui
 		return false;
 	}
 
-	bool GuiController::PerformWaterskinCombine(ItemInfo* item, int flag)
+	bool GuiController::PerformWaterskinCombine(ItemInfo* item, bool flag)
 	{
 		auto* lara = GetLaraInfo(item);
 

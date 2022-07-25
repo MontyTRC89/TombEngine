@@ -121,7 +121,7 @@ namespace TEN::Gui
 		int ConvertInventoryItemToObject(int objectNumber);
 		void FadeAmmoSelector();
 		void DrawAmmoSelector();
-		bool PerformWaterskinCombine(ItemInfo* item, int flag);
+		bool PerformWaterskinCombine(ItemInfo* item, bool flag);
 		void DrawCompass(ItemInfo* item);
 
 		// Getters

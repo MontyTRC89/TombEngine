@@ -2,18 +2,21 @@
 #include "Game/Lara/lara_cheat.h"
 
 #include <OISKeyboard.h>
+
+#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/collision/collide_room.h"
 #include "Game/effects/effects.h"
+#include "Game/GuiObjects.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/input.h"
 #include "Specific/level.h"
 #include "Specific/setup.h"
 
 using namespace TEN::Input;
+using namespace TEN::Gui;
 
 void lara_as_swimcheat(ItemInfo* item, CollisionInfo* coll)
 {
@@ -103,7 +106,7 @@ void LaraCheatGetStuff(ItemInfo* item)
 		lara->Inventory.HasLasersight = true;
 
 	if (Objects[ID_CLOCKWORK_BEETLE].loaded)
-		lara->Inventory.BeetleComponents |= 1;
+		lara->Inventory.BeetleComponents |= BEETLECOMP_FLAG_BEETLE;
 
 	if (Objects[ID_WATERSKIN1_EMPTY].loaded)
 		lara->Inventory.SmallWaterskin = 1;
@@ -210,7 +213,7 @@ void DelsGiveLaraItemsCheat(ItemInfo* item)
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_PUZZLE_ITEM1 + i].loaded)
-			lara->Inventory.Puzzles[i] = 1;
+			lara->Inventory.Puzzles[i] = true;
 
 		lara->Inventory.PuzzlesCombo[2 * i] = false;
 		lara->Inventory.PuzzlesCombo[2 * i + 1] = false;
@@ -219,7 +222,7 @@ void DelsGiveLaraItemsCheat(ItemInfo* item)
 	for (int i = 0; i < 8; ++i)
 	{
 		if (Objects[ID_KEY_ITEM1 + i].loaded)
-			lara->Inventory.Keys[i] = 1;
+			lara->Inventory.Keys[i] = true;
 
 		lara->Inventory.KeysCombo[2 * i] = false;
 		lara->Inventory.KeysCombo[2 * i + 1] = false;
@@ -228,10 +231,9 @@ void DelsGiveLaraItemsCheat(ItemInfo* item)
 	for (int i = 0; i < 3; ++i)
 	{
 		if (Objects[ID_PICKUP_ITEM1 + i].loaded)
-			lara->Inventory.Pickups[i] = 1;
+			lara->Inventory.Pickups[i] = true;
 
 		lara->Inventory.PickupsCombo[2 * i] = false;
 		lara->Inventory.PickupsCombo[2 * i + 1] = false;
 	}
-	/* Hardcoded code */
 }
