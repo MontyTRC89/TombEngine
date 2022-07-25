@@ -26,7 +26,8 @@ namespace TEN::Entities::TR4
 		GUIDE_STATE_IGNITE_TORCH = 11,
 		GUIDE_STATE_LOOK_BACK = 22,
 		GUIDE_STATE_TORCH_ATTACK = 31,
-		GUIDE_STATE_PICKUP_TORCH = 37
+		GUIDE_STATE_PICKUP_TORCH = 37,
+		GUIDE_STATE_READ_INSCRIPTION = 39
 	};
 
 	///ITEMFLAGS
@@ -220,6 +221,7 @@ namespace TEN::Entities::TR4
 		bool flag_IgnoreLaraDistance	= ((item->ItemFlags[2] & (1 << 1)) != 0) ? true : false;
 		bool flag_RunDefault			= ((item->ItemFlags[2] & (1 << 2)) != 0) ? true : false;
 		bool flag_RetryNodeSearch		= ((item->ItemFlags[2] & (1 << 3)) != 0) ? true : false;
+		bool flag_ScaryInscription		= ((item->ItemFlags[2] & (1 << 4)) != 0) ? true : false;
 
 		short GoalNode = (flag_NewlBehaviour) ? item->ItemFlags[4] : Lara.Location;
 
@@ -302,8 +304,8 @@ namespace TEN::Entities::TR4
 						case 0x28: //Action Read Inscription
 							if (laraAI.distance < pow(SECTOR(2), 2) || flag_IgnoreLaraDistance)
 							{
-								item->Animation.TargetState = 39;
-								item->Animation.RequiredState = 39;
+								item->Animation.TargetState = GUIDE_STATE_READ_INSCRIPTION;
+								item->Animation.RequiredState = GUIDE_STATE_READ_INSCRIPTION;
 							}
 
 							break;
@@ -715,7 +717,7 @@ namespace TEN::Entities::TR4
 
 			break;
 
-		case 39:
+		case GUIDE_STATE_READ_INSCRIPTION:
 			if (item->Animation.FrameNumber >= g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
 			{
 				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 20)
@@ -731,11 +733,16 @@ namespace TEN::Entities::TR4
 					break;
 				}
 
-				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 70 && item->RoomNumber == 70)
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 70 && flag_ScaryInscription)
 				{
 					item->Animation.RequiredState = GUIDE_STATE_RUN;
 					item->MeshSwapBits |= 0x200000;
 					SoundEffect(SFX_TR4_GUIDE_SCARE, &item->Pose);
+				}
+				if (item->Animation.FrameNumber == g_Level.Anims[item->Animation.AnimNumber].frameBase + 185 && flag_ScaryInscription)
+				{
+					item->ItemFlags[2] &= ~(1 << 4);	//turn off bit 4 for flag_ScaryInscription
+					item->MeshSwapBits &= 0xDFFFFF;
 				}
 			}
 			else if (enemy->Pose.Orientation.y - item->Pose.Orientation.y <= ANGLE(2.0f))

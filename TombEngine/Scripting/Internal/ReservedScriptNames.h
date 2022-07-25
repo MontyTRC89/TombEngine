@@ -81,6 +81,7 @@ static constexpr char ScriptReserved_DoGoNextNode[]				= "DoGoNextNode";
 static constexpr char ScriptReserved_DoNewBehaviour[]			= "DoNewBehaviour";
 static constexpr char ScriptReserved_DoWaitForLara[]			= "DoWaitForLara";
 static constexpr char ScriptReserved_DoRunDefault[]				= "DoRunDefault";
+static constexpr char ScriptReserved_DoScareGuide[]				= "DoScareGuide";
 
 // Flow Functions
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
