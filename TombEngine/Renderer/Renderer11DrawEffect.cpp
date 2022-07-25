@@ -1076,7 +1076,6 @@ namespace TEN::Renderer
 		int lastBucket = (transparent ? 4 : 2);
 
 		RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
-		//RendererObject * moveableObj = m_moveableObjects[effect->Effect->objectNumber];
 
 		m_stItem.World = effect->World;
 		m_stItem.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
@@ -1099,13 +1098,21 @@ namespace TEN::Renderer
 		}
 
 		RendererMesh* mesh = effect->Mesh;
+		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
 
 		for (auto& bucket : mesh->Buckets) 
 		{
 			if (bucket.NumVertices == 0)
 				continue;
-			if (transparent && bucket.BlendMode == BLENDMODE_OPAQUE)
+
+			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 				continue;
+
+			if (lastBlendMode != bucket.BlendMode)
+			{
+				lastBlendMode = bucket.BlendMode;
+				SetBlendMode(lastBlendMode);
+			}
 
 			// Draw vertices
 			DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -1144,10 +1151,15 @@ namespace TEN::Renderer
 		extern vector<DebrisFragment> DebrisFragments;
 		vector<RendererVertex> vertices;
 
+		BLEND_MODES lastBlendMode = BLEND_MODES::BLENDMODE_UNSET;
+
 		for (auto deb = DebrisFragments.begin(); deb != DebrisFragments.end(); deb++)
 		{
 			if (deb->active) 
 			{
+				if (!((deb->mesh.blendMode == BLENDMODE_OPAQUE || deb->mesh.blendMode == BLENDMODE_ALPHATEST) ^ transparent))
+					continue;
+
 				Matrix translation = Matrix::CreateTranslation(deb->worldPosition.x, deb->worldPosition.y, deb->worldPosition.z);
 				Matrix rotation = Matrix::CreateFromQuaternion(deb->rotation);
 				Matrix world = rotation * translation;
@@ -1199,6 +1211,12 @@ namespace TEN::Renderer
 				vtx2.UV = deb->mesh.TextureCoordinates[2];
 				vtx2.Normal = deb->mesh.Normals[2];
 				vtx2.Color = deb->mesh.Colors[2];
+
+				if (lastBlendMode != deb->mesh.blendMode)
+				{
+					lastBlendMode = deb->mesh.blendMode;
+					SetBlendMode(lastBlendMode);
+				}
 
 				SetCullMode(CULL_MODE_NONE);
 				m_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
