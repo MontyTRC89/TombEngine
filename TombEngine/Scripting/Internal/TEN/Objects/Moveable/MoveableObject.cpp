@@ -187,6 +187,10 @@ ScriptReserved_DoWaitForLara, & Moveable::DoWaitForLara,
 // @tparam boolean value, true to make it run to the next AI node, false to restore the original behaviour. Default is false.
 ScriptReserved_DoRunDefault, & Moveable::DoRunDefault,
 
+/// The next time the guide reads an inscription, it will activate his scared routine.
+// @function Moveable:DoScareGuide
+// @tparam boolean value, true to activate the order, flase to cancel it. Default is true.
+ScriptReserved_DoScareGuide, & Moveable::DoScareGuide,
 
 /// Get the status of object.
 // possible values:
@@ -916,6 +920,23 @@ void Moveable::DoRunDefault(bool isRunDefault)
 			std::string InfoStr = "The Lua function DoRunDefault hasn't got actions for the object " + m_item->LuaName + ".";
 			TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
 			break;
+	}
+}
+
+void Moveable::DoScareGuide(bool isScaryInscription)
+{
+	if (m_item->ObjectNumber != ID_GUIDE)
+	{
+		std::string InfoStr = "The Lua function DoScareGuide hasn't got actions for the object " + m_item->LuaName + ",  it only works for GUIDE objects.";
+		TENLog(InfoStr, LogLevel::Warning, LogConfig::All);
+		return;
+	}
+
+	if (isScaryInscription)
+	{
+		m_item->ItemFlags[2] |= (1 << 4);	//turn on bit 4 for flag_ScaryInscription
+	}else{
+		m_item->ItemFlags[2] &= ~(1 << 4);	//turn off bit 4 for flag_ScaryInscription
 	}
 }
 

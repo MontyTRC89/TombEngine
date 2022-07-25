@@ -86,6 +86,7 @@ public:
 	void DoNewBehaviour( bool isNewBehaviour = true);
 	void DoWaitForLara( bool isWaitForLara = true);
 	void DoRunDefault( bool isRunDefault = false);
+	void DoScareGuide(bool isScaryInscription = true);
 
 	[[nodiscard]] std::string GetOnHit() const;
 	void SetOnHit(std::string const &);
