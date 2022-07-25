@@ -299,19 +299,19 @@ const float Smoothstep(float x)
 	return Smoothstep(0.0f, 1.0f, x);
 }
 
-const float Luma(Vector3 color)
+const float Luma(Vector3& color)
 {
 	// Use Rec.709 trichromat formula to get perceptive luma value
 	return (float)((color.x * 0.2126f) + (color.y * 0.7152f) + (color.z * 0.0722f));
 }
 
-const Vector4 Screen(Vector4 ambient, Vector4 tint)
+const Vector4 Screen(Vector4& ambient, Vector4& tint)
 {
 	auto result = Screen(Vector3(ambient.x, ambient.y, ambient.z), Vector3(tint.x, tint.y, tint.z));
 	return Vector4(result.x, result.y, result.z, ambient.w * tint.w);
 }
 
-const Vector3 Screen(Vector3 ambient, Vector3 tint)
+const Vector3 Screen(Vector3& ambient, Vector3& tint)
 {
 	auto luma = Luma(tint);
 
@@ -325,7 +325,7 @@ const Vector3 Screen(Vector3 ambient, Vector3 tint)
 	return Vector3(R, G, B);
 }
 
-Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up, float right)
+Vector3 TranslateVector(Vector3& vector, short angle, float forward, float up, float right)
 {
 	if (forward == 0.0f && up == 0.0f && right == 0.0f)
 		return vector;
@@ -333,13 +333,14 @@ Vector3 TranslateVector(Vector3 vector, short angle, float forward, float up, fl
 	float sinAngle = phd_sin(angle);
 	float cosAngle = phd_cos(angle);
 
-	vector.x += (forward * sinAngle) + (right * cosAngle);
-	vector.y += up;
-	vector.z += (forward * cosAngle) - (right * sinAngle);
-	return vector;
+	return Vector3(
+		vector.x + (forward * sinAngle) + (right * cosAngle),
+		vector.y + up,
+		vector.z + (forward * cosAngle) - (right * sinAngle)
+	);
 }
 
-Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float up, float right)
+Vector3Int TranslateVector(Vector3Int& vector, short angle, float forward, float up, float right)
 {
 	auto newVector = TranslateVector(vector.ToVector3(), angle, forward, up, right);
 	return Vector3Int(
@@ -349,7 +350,7 @@ Vector3Int TranslateVector(Vector3Int vector, short angle, float forward, float 
 	);
 }
 
-Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
+Vector3 TranslateVector(Vector3& vector, Vector3Shrt& orient, float distance)
 {
 	if (distance == 0.0f)
 		return vector;
@@ -359,13 +360,14 @@ Vector3 TranslateVector(Vector3 vector, Vector3Shrt orient, float distance)
 	float sinY = phd_sin(orient.y);
 	float cosY = phd_cos(orient.y);
 
-	vector.x += distance * (sinY * cosX);
-	vector.y -= distance * sinX;
-	vector.z += distance * (cosY * cosX);
-	return vector;
+	return Vector3(
+		vector.x + distance * (sinY * cosX),
+		vector.y - distance * sinX,
+		vector.z + distance * (cosY * cosX)
+	);
 }
 
-Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance)
+Vector3Int TranslateVector(Vector3Int& vector, Vector3Shrt& orient, float distance)
 {
 	auto newVector = TranslateVector(vector.ToVector3(), orient, distance);
 	return Vector3Int(
@@ -375,7 +377,7 @@ Vector3Int TranslateVector(Vector3Int vector, Vector3Shrt orient, float distance
 	);
 }
 
-Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
+Vector3 TranslateVector(Vector3& vector, Vector3& target, float distance)
 {
 	if (distance == 0.0f)
 		return vector;
@@ -389,7 +391,7 @@ Vector3 TranslateVector(Vector3 vector, Vector3 target, float distance)
 	return (vector + (direction * distance));
 }
 
-Vector3Int TranslateVector(Vector3Int vector, Vector3Int target, float distance)
+Vector3Int TranslateVector(Vector3Int& vector, Vector3Int& target, float distance)
 {
 	auto newVector = TranslateVector(vector.ToVector3(), target.ToVector3(), distance);
 	return Vector3Int(
