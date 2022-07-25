@@ -110,7 +110,7 @@ PixelShaderInput VS(VertexShaderInput input)
 
 #ifdef ANIMATED
 	float speed = fps / 30.0f;
-	int frame = (int)(Frame * speed) % numAnimFrames;
+	int frame = (int)(Frame * speed + input.AnimationFrameOffset) % numAnimFrames;
 	switch (input.PolyIndex) {
 	case 0:
 		output.UV = AnimFrames[frame].topLeft;
@@ -131,7 +131,7 @@ PixelShaderInput VS(VertexShaderInput input)
 	
 	output.WorldPosition = input.Position.xyz;
 
-	float3x3 TBN = float3x3(input.Tangent, input.Bitangent, input.Normal);
+    float3x3 TBN = float3x3(input.Tangent, cross(input.Normal,input.Tangent), input.Normal);
 	output.TBN = TBN;
 
 	// Apply distance fog
