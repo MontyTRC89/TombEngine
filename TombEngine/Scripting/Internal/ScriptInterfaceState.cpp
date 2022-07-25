@@ -39,7 +39,7 @@ ScriptInterfaceStringsHandler* ScriptInterfaceState::CreateStringsHandler()
 
 void ScriptInterfaceState::Init()
 {
-	s_solState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::coroutine);
+	s_solState.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::coroutine, sol::lib::table, sol::lib::string, sol::lib::debug);
 	s_solState.script("package.path=\"Scripts/?.lua\"");
 	s_solState.set_exception_handler(lua_exception_handler);
 
