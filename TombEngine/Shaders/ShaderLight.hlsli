@@ -235,8 +235,21 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 		}
 	}
 
+	shadow = saturate(shadow);
 	diffuse.xyz *= tex.xyz;
 	float3 combined = (ambTex + diffuse + spec) - shadow;
+
+	float sLuma = saturate(Luma(shadow) * 2.0f);
+	if (sLuma > 0.0f)
+	{
+		// Desaturate shadows
+
+		float luma = Luma(combined);
+		float dCoeff = (1.0f - luma) * sLuma;
+		combined = float3(lerp(combined.x, luma, dCoeff),
+						  lerp(combined.y, luma, dCoeff),
+						  lerp(combined.z, luma, dCoeff));
+	}
 
 	return (combined * vertex);
 }
