@@ -1,5 +1,3 @@
-
-
 #define SHADOW_INTENSITY (0.55f)
 #define INV_SHADOW_INTENSITY (1.0f - SHADOW_INTENSITY)
 
@@ -15,7 +13,8 @@ cbuffer ShadowLightBuffer : register(b4)
     float4x4 LightViewProjections[6];
     int CastShadows;
     int NumSpheres;
-    int2 padding;
+    int ShadowMapSize;
+    int padding;
     Sphere Spheres[16];
 };
 
@@ -24,7 +23,7 @@ SamplerComparisonState ShadowMapSampler : register(s3);
 
 float2 TexOffset(int u, int v) 
 {
-    return float2(u * 1.0f / SHADOW_MAP_SIZE, v * 1.0f / SHADOW_MAP_SIZE);
+    return float2(u * 1.0f / ShadowMapSize, v * 1.0f / ShadowMapSize);
 }
 
 //https://gist.github.com/JuanDiegoMontoya/d8788148dcb9780848ce8bf50f89b7bb
