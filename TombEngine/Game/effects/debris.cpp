@@ -201,7 +201,10 @@ void UpdateDebris()
 			{
 				auto roomNumber = floor->RoomBelow(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z).value_or(NO_ROOM);
 				if (roomNumber != NO_ROOM)
+				{
 					deb.roomNumber = roomNumber;
+					continue;
+				}
 
 				if (deb.numBounces > 3)
 				{
