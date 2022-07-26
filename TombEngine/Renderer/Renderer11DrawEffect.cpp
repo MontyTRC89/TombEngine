@@ -1106,6 +1106,9 @@ namespace TEN::Renderer
 			if (!((bucket.BlendMode == BLENDMODE_OPAQUE || bucket.BlendMode == BLENDMODE_ALPHATEST) ^ transparent))
 				continue;
 
+			BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[bucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+			BindTexture(TEXTURE_NORMAL_MAP, &std::get<1>(m_moveablesTextures[bucket.Texture]), SAMPLER_NONE);
+
 			if (lastBlendMode != bucket.BlendMode)
 			{
 				lastBlendMode = bucket.BlendMode;
