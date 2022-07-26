@@ -338,7 +338,7 @@ void TrapObjects()
 		obj->usingDrawAnimatingItem = false;
 	}
 
-	obj = &Objects[ID_WRECKING_BALL];
+	obj = &Objects[ID_ROBOTIC_CLAW];
 	if (obj->loaded)
 	{
 		obj->initialise = InitialiseWreckingBall;
