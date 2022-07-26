@@ -34,6 +34,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 
 	// Load shaders
 	ComPtr<ID3D10Blob> blob;
+	const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
 	   
 	m_vsRooms = Utils::compileVertexShader(m_device.Get(),L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", nullptr, blob);
 	// Initialise input layout using the first vertex shader
@@ -53,7 +54,7 @@ void TEN::Renderer::Renderer11::Initialise(int w, int h, bool windowed, HWND han
 	};
 	Utils::throwIfFailed(m_device->CreateInputLayout(inputLayout, 11, blob->GetBufferPointer(), blob->GetBufferSize(), &m_inputLayout));
 
-	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", nullptr, blob);
+	m_vsRooms_Anim = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "VS", "vs_4_0", &roomDefinesAnimated[0], blob);
 	m_psRooms = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Rooms.fx", "PS", "ps_4_1", nullptr, blob);
 	m_vsItems = Utils::compileVertexShader(m_device.Get(), L"Shaders\\DX11_Items.fx", "VS", "vs_4_0", nullptr, blob);
 	m_psItems = Utils::compilePixelShader(m_device.Get(), L"Shaders\\DX11_Items.fx", "PS", "ps_4_0", nullptr, blob);
