@@ -46,7 +46,7 @@
 #include "tr5_fallingceiling.h"
 #include "tr5_rollingball.h"
 #include "tr5_explosion.h"
-#include "tr5_robotclaw.h"
+#include "tr5_wreckingball.h"
 /// switch
 #include "tr5_crowdove_switch.h"
 
@@ -1200,14 +1200,15 @@ static void StartSwitch(ObjectInfo *obj)
 		obj->saveMesh = true;
 	}
 
-	obj = &Objects[ID_ROBOTIC_CLAW];
+	obj = &Objects[ID_WRECKING_BALL];
 	if (obj->loaded)
 	{
-		obj->initialise = InitialiseRobotClaw;
-		obj->hitEffect = HIT_BLOOD;
-		obj->saveFlags = true;
+		obj->initialise = InitialiseWreckingBall;
+		obj->collision = WreckingBallCollision;
+		obj->control = WreckingBallControl;
 		obj->saveAnim = true;
-		obj->saveMesh = true;
+		obj->saveFlags = true;
+		obj->savePosition = true;
 	}
 }
 
