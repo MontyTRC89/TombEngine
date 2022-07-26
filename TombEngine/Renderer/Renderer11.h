@@ -475,6 +475,7 @@ namespace TEN::Renderer
 		void DrawItems(RenderView& view, bool transparent);
 		void DrawItemsTransparent(RendererTransparentFaceInfo* info, RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent);
+		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent);
 		void DrawBaddyGunflashes(RenderView& view);
 		void DrawStatics(RenderView& view, bool transparent);
 		void DrawDarts(RendererItem* item, RenderView& view);
