@@ -311,9 +311,6 @@ namespace TEN::Renderer
 
 		m_stStatic.Color = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
-		
-		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 		BindLights(item->LightsToDraw);
 
@@ -550,10 +547,7 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_RATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_RATS_EMITTER];
 
-			for (int m = 0; m < MAX_BONES; m++)
-				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+			m_stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
 
 			for (int i = 0; i < NUM_RATS; i++)
 			{
@@ -567,11 +561,12 @@ namespace TEN::Renderer
 																	 TO_RAD(rat->Pose.Orientation.z));
 					Matrix world = rotation * translation;
 
-					m_stItem.World = world;
-					m_stItem.Position = Vector4(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z, 1.0f);
-					m_stItem.Color = Vector4::One;
-					m_stItem.AmbientLight = m_rooms[rat->RoomNumber].AmbientLight;
-					m_cbItem.updateData(m_stItem, m_context.Get());
+					m_stStatic.World = world;
+					m_stStatic.Position = Vector4(rat->Pose.Position.x, rat->Pose.Position.y, rat->Pose.Position.z, 1.0f);
+					m_stStatic.Color = Vector4::One;
+					m_stStatic.AmbientLight = m_rooms[rat->RoomNumber].AmbientLight;
+					m_cbStatic.updateData(m_stStatic, m_context.Get());
+					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
@@ -603,12 +598,9 @@ namespace TEN::Renderer
 		{
 			ObjectInfo* obj = &Objects[ID_BATS_EMITTER];
 			RendererObject& moveableObj = *m_moveableObjects[ID_BATS_EMITTER];
-			RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (-GlobalCounter & 3));
+			RendererMesh* mesh = GetMesh(Objects[ID_BATS_EMITTER].meshIndex - (GlobalCounter & 3));
 
-			for (int m = 0; m < MAX_BONES; m++)
-				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+			m_stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
 
 			for (int b = 0; b < mesh->Buckets.size(); b++)
 			{
@@ -624,15 +616,16 @@ namespace TEN::Renderer
 					if (bat->On)
 					{
 						Matrix translation = Matrix::CreateTranslation(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z);
-						Matrix rotation = Matrix::CreateFromYawPitchRoll(
-							TO_RAD(bat->Pose.Orientation.y), TO_RAD(bat->Pose.Orientation.x), TO_RAD(bat->Pose.Orientation.z));
+						Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(bat->Pose.Orientation.y), TO_RAD(bat->Pose.Orientation.x), 
+																		 TO_RAD(bat->Pose.Orientation.z));
 						Matrix world = rotation * translation;
 
-						m_stItem.World = world;
-						m_stItem.Position = Vector4(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 1.0f);
-						m_stItem.Color = Vector4::One;
-						m_stItem.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
-						m_cbItem.updateData(m_stItem, m_context.Get());
+						m_stStatic.World = world;
+						m_stStatic.Position = Vector4(bat->Pose.Position.x, bat->Pose.Position.y, bat->Pose.Position.z, 1.0f);
+						m_stStatic.Color = Vector4::One;
+						m_stStatic.AmbientLight = m_rooms[bat->RoomNumber].AmbientLight;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 						DrawIndexedTriangles(bucket->NumIndices, bucket->StartIndex, 0);
 
@@ -658,10 +651,7 @@ namespace TEN::Renderer
 			ObjectInfo* obj = &Objects[ID_LITTLE_BEETLE];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LITTLE_BEETLE];
 
-			for (int m = 0; m < MAX_BONES; m++)
-				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+			m_stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::NUM_BEETLES; i++)
 			{
@@ -670,17 +660,17 @@ namespace TEN::Renderer
 				if (beetle->On)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
-					Matrix translation =
-						Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
+					Matrix translation = Matrix::CreateTranslation(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z);
 					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(beetle->Pose.Orientation.y), TO_RAD(beetle->Pose.Orientation.x),
 																	 TO_RAD(beetle->Pose.Orientation.z));
 					Matrix world = rotation * translation;
 
-					m_stItem.World = world;
-					m_stItem.Position = Vector4(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, 1.0f);
-					m_stItem.Color = Vector4::One;
-					m_stItem.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
-					m_cbItem.updateData(m_stItem, m_context.Get());
+					m_stStatic.World = world;
+					m_stStatic.Position = Vector4(beetle->Pose.Position.x, beetle->Pose.Position.y, beetle->Pose.Position.z, 1.0f);
+					m_stStatic.Color = Vector4::One;
+					m_stStatic.AmbientLight = m_rooms[beetle->RoomNumber].AmbientLight;
+					m_cbStatic.updateData(m_stStatic, m_context.Get());
+					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
@@ -712,11 +702,8 @@ namespace TEN::Renderer
 		{
 			ObjectInfo* obj = &Objects[ID_LOCUSTS];
 			RendererObject& moveableObj = *m_moveableObjects[ID_LOCUSTS];
-
-			for (int m = 0; m < MAX_BONES; m++)
-				memcpy(&m_stItem.BonesMatrices[m], &Matrix::Identity, sizeof(Matrix));
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-				m_stItem.BoneLightModes[k] = moveableObj.ObjectMeshes[k]->LightMode;
+			
+			m_stStatic.LightMode = moveableObj.ObjectMeshes[0]->LightMode;
 
 			for (int i = 0; i < TEN::Entities::TR4::MAX_LOCUSTS; i++)
 			{
@@ -725,17 +712,17 @@ namespace TEN::Renderer
 				if (locust->on)
 				{
 					RendererMesh* mesh = GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust->counter & 3));
-					Matrix translation =
-						Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
-					Matrix rotation = Matrix::CreateFromYawPitchRoll(locust->pos.Orientation.y, locust->pos.Orientation.x,
-																	 locust->pos.Orientation.z);
+					Matrix translation = Matrix::CreateTranslation(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z);
+					Matrix rotation = Matrix::CreateFromYawPitchRoll(TO_RAD(locust->pos.Orientation.y), TO_RAD(locust->pos.Orientation.x),
+																	 TO_RAD(locust->pos.Orientation.z));
 					Matrix world = rotation * translation;
 
-					m_stItem.World = world;
-					m_stItem.Position = Vector4(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 1.0f);
-					m_stItem.Color = Vector4::One;
-					m_stItem.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
-					m_cbItem.updateData(m_stItem, m_context.Get());
+					m_stStatic.World = world;
+					m_stStatic.Position = Vector4(locust->pos.Position.x, locust->pos.Position.y, locust->pos.Position.z, 1.0f);
+					m_stStatic.Color = Vector4::One;
+					m_stStatic.AmbientLight = m_rooms[locust->roomNumber].AmbientLight;
+					m_cbStatic.updateData(m_stStatic, m_context.Get());
+					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 					for (int b = 0; b < mesh->Buckets.size(); b++)
 					{
@@ -1517,8 +1504,8 @@ namespace TEN::Renderer
 
 		// Draw rooms and objects
 		DrawRooms(view, false);
-		DrawStatics(view, false);
 		DrawItems(view, false);
+		DrawStatics(view, false);
 		DrawEffects(view, false);
 		DrawGunShells(view);
 		DrawDebris(view, false);
@@ -1558,8 +1545,8 @@ namespace TEN::Renderer
 
 		// Here we sort transparent faces and draw them with a simplified shaders for alpha blending
 		DrawRooms(view, true);
-		DrawStatics(view, true);
 		DrawItems(view, true);
+		DrawStatics(view, true);
 		DrawEffects(view, true);
 		DrawDebris(view, true);
 		DrawGunFlashes(view);
@@ -1830,7 +1817,7 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Bind shaders
+		// Static mesh shader is used for all forthcoming renderer routines
 		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
