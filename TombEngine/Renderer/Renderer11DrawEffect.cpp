@@ -603,10 +603,9 @@ namespace TEN::Renderer
 		RendererRoom const & room = m_rooms[LaraItem->RoomNumber];
 		RendererItem* item = &m_items[Lara.ItemNumber];
 
-		m_stItem.Color = Vector4::One;
-		m_stItem.AmbientLight = room.AmbientLight;
-		m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_STATIC;
-		memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+		m_stStatic.Color = Vector4::One;
+		m_stStatic.AmbientLight = room.AmbientLight;
+		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 		BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 
@@ -679,9 +678,9 @@ namespace TEN::Renderer
 						world = offset * world;
 						world = rotation2 * world;
 
-						m_stItem.World = world;
-						m_cbItem.updateData(m_stItem, m_context.Get());
-						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+						m_stStatic.World = world;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
@@ -692,9 +691,9 @@ namespace TEN::Renderer
 						world = offset * world;
 						world = rotation2 * world;
 
-						m_stItem.World = world;
-						m_cbItem.updateData(m_stItem, m_context.Get());
-						BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+						m_stStatic.World = world;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
@@ -732,10 +731,9 @@ namespace TEN::Renderer
 				RendererRoom const& room = m_rooms[nativeItem->RoomNumber];
 				RendererObject& flashMoveable = *m_moveableObjects[ID_GUN_FLASH];
 
-				m_stItem.Color = Vector4::One;
-				m_stItem.AmbientLight = room.AmbientLight;
-				m_stItem.BoneLightModes[0] = LIGHT_MODES::LIGHT_MODE_STATIC;
-				memcpy(m_stItem.BonesMatrices, &Matrix::Identity, sizeof(Matrix));
+				m_stStatic.Color = Vector4::One;
+				m_stStatic.AmbientLight = room.AmbientLight;
+				m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_STATIC;
 
 				BindLights(item->LightsToDraw); // FIXME: Is it really needed for gunflashes? -- Lwmte, 15.07.22
 
@@ -772,9 +770,9 @@ namespace TEN::Renderer
 							world = offset * world;
 							world = rotationZ * world;
 
-							m_stItem.World = world;
-							m_cbItem.updateData(m_stItem, m_context.Get());
-							BindConstantBufferVS(CB_ITEM, m_cbItem.get());
+							m_stStatic.World = world;
+							m_cbStatic.updateData(m_stStatic, m_context.Get());
+							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
 							DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 						}
@@ -1133,9 +1131,6 @@ namespace TEN::Renderer
 		m_context->IASetInputLayout(m_inputLayout.Get());
 		m_context->IASetIndexBuffer(m_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-		m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
-
 		for (auto room : view.roomsToDraw)
 		{
 			for (auto effect : room->EffectsToDraw)
@@ -1168,8 +1163,6 @@ namespace TEN::Renderer
 				Matrix world = rotation * translation;
 
 				m_primitiveBatch->Begin();
-				m_context->VSSetShader(m_vsStatics.Get(), nullptr, 0);
-				m_context->PSSetShader(m_psStatics.Get(), nullptr, 0);
 
 				if (deb->isStatic) 
 				{
