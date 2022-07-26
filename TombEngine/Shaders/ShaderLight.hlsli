@@ -239,7 +239,7 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 	diffuse.xyz *= tex.xyz;
 	float3 combined = (ambTex + diffuse + spec) - shadow;
 
-	float sLuma = saturate(Luma(shadow) * 2.0f);
+	float sLuma = saturate(Luma(shadow));
 	if (sLuma > 0.0f)
 	{
 		// Desaturate shadows
