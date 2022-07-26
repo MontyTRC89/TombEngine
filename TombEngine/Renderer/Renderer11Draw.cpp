@@ -2231,7 +2231,7 @@ namespace TEN::Renderer
 		m_context->VSSetShader(m_vsSky.Get(), nullptr, 0);
 		m_context->PSSetShader(m_psSky.Get(), nullptr, 0);
 
-		SetAlphaTest(ALPHA_TEST_GREATER_THAN, ALPHA_TEST_THRESHOLD);
+		SetAlphaTest(ALPHA_TEST_NONE, 1.0f);
 
 		BindTexture(TEXTURE_COLOR_MAP, &m_skyTexture, SAMPLER_ANISOTROPIC_CLAMP);
 
