@@ -19,14 +19,16 @@ float2 CalculateUVRotate(float2 uv, uint frame)
 {
 	if (FPS == 0)
 		return uv;
+	else
+	{
+		float step = uv.y - AnimFrames[frame].TopLeft.y;
+		float vert = AnimFrames[frame].TopLeft.y + step / 2.0f;
+		float height = (AnimFrames[frame].BottomLeft.y - AnimFrames[frame].TopLeft.y) / 2.0f;
+		float relPos = 1.0f - (Frame % FPS) / float(FPS);
+		float newUV = vert + height * relPos;
 
-	float step = uv.y - AnimFrames[frame].TopLeft.y;
-	float vert = AnimFrames[frame].TopLeft.y + step / 2.0f;
-	float height = (AnimFrames[frame].BottomLeft.y - AnimFrames[frame].TopLeft.y) / 2.0f;
-	float relPos = 1.0f - (Frame % FPS) / float(FPS);
-	float newUV = vert + height * relPos;
-
-	return float2(uv.x, newUV);
+		return float2(uv.x, newUV);
+	}
 }
 
 float2 GetFrame(uint index, uint offset)
