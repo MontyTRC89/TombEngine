@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Specific/input_action.h"
+#include "Specific/InputAction.h"
 
 #include "Game/control/control.h"
 #include "Renderer/Renderer11.h"
@@ -10,10 +10,9 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Input
 {
-	InputAction::InputAction(ActionID actionID, vector<int> defaultBinding)
+	InputAction::InputAction(ActionID actionID)
 	{
 		this->ID = actionID;
-		this->Bindings.Add(defaultBinding);
 	}
 
 	void InputAction::Update(float value)

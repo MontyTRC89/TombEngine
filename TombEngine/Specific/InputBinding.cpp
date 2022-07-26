@@ -1,48 +1,73 @@
 #include "framework.h"
 #include "Specific/InputBinding.h"
 
+#include <ois/OISKeyboard.h>
+
+using namespace OIS;
+using std::array;
 using std::vector;
 
 namespace TEN::Input
 {
-	void InputBinding::Add(vector<int> binding)
+	InputBinding::InputBinding()
 	{
-		// Ensure new binding's number of input gestures does not exceed the max.
-		if (binding.size() > MAX_GESTURES)
-			return;
-
-		// Sort new binding.
-		std::sort(std::begin(binding), std::end(binding));
-
-		// Prevent duplicate bindings (excluding defaults).
-		for (size_t i = NUM_DEFAULT_BINDINGS; i < Bindings.size(); i++)
-		{
-			if (binding == Bindings[i])
-				return;
-		}
-
-		this->Bindings.push_back(binding);
+		this->Initialize();
 	}
 
-	void InputBinding::Clear(vector<int> binding)
+	InputBinding::InputBinding(array<array<int, MAX_KEY_MAPPINGS>, NUM_DEFAULT_BINDINGS> defaultBindings)
 	{
-		// Do not attempt clear if only default bindings exist.
-		if (Bindings.size() <= NUM_DEFAULT_BINDINGS)
-			return;
+		this->Initialize();
 
-		// Sort binding to erase.
-		std::sort(std::begin(binding), std::end(binding));
-
-		// Find binding to erase (excluding defaults).
-		for (size_t i = NUM_DEFAULT_BINDINGS; i < Bindings.size(); i++)
-		{
-			if (binding == Bindings[i])
-				this->Bindings.erase(Bindings.begin() + i);
-		}
+		// Set defaults.
+		for (size_t i = 0; i < NUM_DEFAULT_BINDINGS; i++)
+			this->Bindings[i] = defaultBindings[i];
 	}
 
-	vector<vector<int>>InputBinding::Get()
+	array<int, MAX_KEY_MAPPINGS> InputBinding::Get(int bindingIndex)
 	{
-		return Bindings;
+		if (!IsIndexWithinRange(bindingIndex))
+		{
+			array<int, MAX_KEY_MAPPINGS> nullBinding;
+			nullBinding.fill(KC_UNASSIGNED);
+			return nullBinding;
+		}
+
+		return Bindings[bindingIndex];
+	}
+
+	void InputBinding::Set(int bindingIndex, array<int, MAX_KEY_MAPPINGS> binding)
+	{
+		if (!IsIndexWithinRange(bindingIndex))
+			return;
+
+		this->Bindings[bindingIndex] = binding;
+	}
+
+	void InputBinding::Clear(int bindingIndex)
+	{
+		if (!IsIndexWithinRange(bindingIndex))
+			return;
+
+		this->Bindings[bindingIndex].fill(KC_UNASSIGNED);
+	}
+
+	void InputBinding::Initialize()
+	{
+		// Initialise empty bindings.
+		for (auto& binding : this->Bindings)
+			binding.fill(KC_UNASSIGNED);
+	}
+
+	bool InputBinding::IsIndexWithinRange(int bindingIndex)
+	{
+		// Ensure defaults are not being overwritten.
+		if ((bindingIndex + 1) <= NUM_DEFAULT_BINDINGS)
+			return false;
+
+		// Ensure index is not beyond range.
+		if ((bindingIndex + 1) > MAX_BINDINGS)
+			return false;
+
+		return true;
 	}
 }

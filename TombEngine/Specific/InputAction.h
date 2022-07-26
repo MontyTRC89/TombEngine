@@ -70,7 +70,7 @@ namespace TEN::Input
 	class InputAction
 	{
 	public:
-		InputAction(ActionID actionID, vector<int> defaultBinding);
+		InputAction(ActionID actionID);
 
 		void Update(float value);
 		void Clear();
@@ -85,9 +85,6 @@ namespace TEN::Input
 		float GetValue();
 		float GetTimeActive();
 		float GetTimeInactive();
-
-		// Actions can hold multiple bindings. Each binding can be composed of multiple input gestures.
-		InputBinding Bindings = {};
 
 	private:
 		ActionID ID			 = In::None;

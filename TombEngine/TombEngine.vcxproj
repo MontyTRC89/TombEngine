@@ -166,7 +166,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\effects\lightning.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Specific\InputBinding.h" />
-    <ClInclude Include="Specific\input_action.h" />
+    <ClInclude Include="Specific\InputAction.h" />
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\effects\drip.h" />
     <ClInclude Include="Game\effects\explosion.h" />
@@ -606,7 +606,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\effects\footprint.cpp" />
     <ClCompile Include="Game\GuiObjects.cpp" />
     <ClCompile Include="Specific\InputBinding.cpp" />
-    <ClCompile Include="Specific\input_action.cpp" />
+    <ClCompile Include="Specific\InputAction.cpp" />
     <ClCompile Include="Game\itemdata\itemdata.cpp" />
     <ClCompile Include="Game\Lara\lara_basic.cpp" />
     <ClCompile Include="Game\Lara\lara_cheat.cpp" />

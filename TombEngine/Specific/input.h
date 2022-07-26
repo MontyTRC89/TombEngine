@@ -1,5 +1,5 @@
 #pragma once
-#include "Specific/input_action.h"
+#include "Specific/InputAction.h"
 
 namespace TEN::Input
 {
@@ -7,7 +7,6 @@ namespace TEN::Input
 	constexpr int MAX_GAMEPAD_KEYS     = 16;
 	constexpr int MAX_GAMEPAD_AXES     = 6;
 	constexpr int MAX_GAMEPAD_POV_AXES = 4;
-	constexpr int MAX_KEY_MAPPINGS	   = 4;
 
 	constexpr int MAX_INPUT_SLOTS = MAX_KEYBOARD_KEYS + MAX_GAMEPAD_KEYS + MAX_GAMEPAD_POV_AXES + MAX_GAMEPAD_AXES * 2;
 
@@ -124,9 +123,10 @@ namespace TEN::Input
 
 	extern const char* g_KeyNames[];
 
-	extern std::vector<InputAction> ActionMap;
-	extern std::vector<bool>		KeyMap;
-	extern std::vector<float>		AxisMap;
+	extern vector<InputBinding> BindingMap;
+	extern vector<InputAction>	ActionMap;
+	extern vector<bool>			KeyMap;
+	extern vector<float>		AxisMap;
 
 	// Legacy input bitfields
 	extern int DbInput;  // Debounce: is input clicked?

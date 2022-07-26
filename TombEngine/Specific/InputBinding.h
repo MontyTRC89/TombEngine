@@ -1,24 +1,29 @@
 #pragma once
 
+using std::array;
 using std::vector;
 
-// NOTE TO SELF: Doing it wrong! Actions SHOULD NOT hold their own input bindings.
-// Do it the other way around: bindings map to actions. Every other engine referenced (TRAE, Unity, Unreal) has it like this.
-// Bindings can still hold multiple input gestures, however. This is an original idea I think is worth pursuing. @Sezz
 namespace TEN::Input
 {
-	constexpr int NUM_DEFAULT_BINDINGS = 1;
-	constexpr int MAX_BINDINGS		   = 4;
-	constexpr int MAX_GESTURES		   = 4;
+	constexpr unsigned int NUM_DEFAULT_BINDINGS = 1;
+	constexpr unsigned int MAX_BINDINGS			= 4;
+	constexpr unsigned int MAX_KEY_MAPPINGS		= 4;
 
+	// Contains multiple BINDINGS which may be composed of multiple KEY MAPPINGS.
 	class InputBinding
 	{
 	public:
-		void Add(vector<int> binding);
-		void Clear(vector<int> binding);
-		vector<vector<int>> Get();
+		InputBinding();
+		InputBinding(array<array<int, MAX_KEY_MAPPINGS>, NUM_DEFAULT_BINDINGS> defaultBinding);
+
+		array<int, MAX_KEY_MAPPINGS> Get(int bindingIndex);
+		void Set(int bindingIndex, array<int, MAX_KEY_MAPPINGS> binding);
+		void Clear(int bindingIndex);
 
 	private:
-		vector<vector<int>> Bindings = {};
+		array<array<int, MAX_KEY_MAPPINGS>, MAX_BINDINGS> Bindings;
+
+		void Initialize();
+		bool IsIndexWithinRange(int bindingIndex);
 	};
 }
