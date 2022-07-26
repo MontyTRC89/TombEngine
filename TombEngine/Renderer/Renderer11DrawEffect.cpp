@@ -667,36 +667,38 @@ namespace TEN::Renderer
 				if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 					continue;
 
-				if (flashBucket.Polygons.size() > 0) 
+				if (flashBucket.Polygons.size() == 0)
+					continue;
+
+				BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
+
+				Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
+				Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
+
+				if (Lara.LeftArm.GunFlash)
 				{
-					Matrix offset = Matrix::CreateTranslation(0, length, zOffset);
-					Matrix rotation2 = Matrix::CreateRotationX(TO_RAD(rotationX));
+					world = laraObj.AnimationTransforms[LM_LHAND] * item->World;
+					world = offset * world;
+					world = rotation2 * world;
 
-					if (Lara.LeftArm.GunFlash)
-					{
-						world = laraObj.AnimationTransforms[LM_LHAND] * item->World;
-						world = offset * world;
-						world = rotation2 * world;
+					m_stStatic.World = world;
+					m_cbStatic.updateData(m_stStatic, m_context.Get());
+					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
-						m_stStatic.World = world;
-						m_cbStatic.updateData(m_stStatic, m_context.Get());
-						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
+				}
 
-						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-					}
+				if (Lara.RightArm.GunFlash)
+				{
+					world = laraObj.AnimationTransforms[LM_RHAND] * item->World;
+					world = offset * world;
+					world = rotation2 * world;
 
-					if (Lara.RightArm.GunFlash)
-					{
-						world = laraObj.AnimationTransforms[LM_RHAND] * item->World;
-						world = offset * world;
-						world = rotation2 * world;
+					m_stStatic.World = world;
+					m_cbStatic.updateData(m_stStatic, m_context.Get());
+					BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
 
-						m_stStatic.World = world;
-						m_cbStatic.updateData(m_stStatic, m_context.Get());
-						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
-
-						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-					}
+					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 				}
 			}
 		}
@@ -759,23 +761,25 @@ namespace TEN::Renderer
 						if (flashBucket.BlendMode == BLENDMODE_OPAQUE)
 							continue;
 
-						if (flashBucket.Polygons.size() > 0)
-						{
-							Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
-							Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
-							Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
+						if (flashBucket.Polygons.size() == 0)
+							continue;
 
-							Matrix world = item->AnimationTransforms[joint] * item->World;
-							world = rotationX * world;
-							world = offset * world;
-							world = rotationZ * world;
+						BindTexture(TEXTURE_COLOR_MAP, &std::get<0>(m_moveablesTextures[flashBucket.Texture]), SAMPLER_ANISOTROPIC_CLAMP);
 
-							m_stStatic.World = world;
-							m_cbStatic.updateData(m_stStatic, m_context.Get());
-							BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+						Matrix offset = Matrix::CreateTranslation(bites[k]->x, bites[k]->y, bites[k]->z);
+						Matrix rotationX = Matrix::CreateRotationX(TO_RAD(ANGLE(270.0f)));
+						Matrix rotationZ = Matrix::CreateRotationZ(TO_RAD(2 * GetRandomControl()));
 
-							DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-						}
+						Matrix world = item->AnimationTransforms[joint] * item->World;
+						world = rotationX * world;
+						world = offset * world;
+						world = rotationZ * world;
+
+						m_stStatic.World = world;
+						m_cbStatic.updateData(m_stStatic, m_context.Get());
+						BindConstantBufferVS(CB_STATIC, m_cbStatic.get());
+
+						DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 					}
 				}
 			}
