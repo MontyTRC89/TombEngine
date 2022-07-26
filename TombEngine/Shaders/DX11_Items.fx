@@ -5,6 +5,7 @@
 #include "./VertexInput.hlsli"
 #include "./AlphaTestBuffer.hlsli"
 #include "./AnimatedTextures.hlsli"
+#include "./Shadows.hlsli"
 
 #define MAX_BONES 32
 

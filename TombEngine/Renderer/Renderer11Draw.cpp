@@ -1290,6 +1290,7 @@ namespace TEN::Renderer
 		if (shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
+			m_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
 			m_stShadowMap.CastShadows = true;
 			//m_stShadowMap.ViewProjectionInverse = ViewProjection.Invert();
 		}
@@ -1994,6 +1995,7 @@ namespace TEN::Renderer
 		if (shadowLight != nullptr)
 		{
 			memcpy(&m_stShadowMap.Light, shadowLight, sizeof(ShaderLight));
+			m_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
 			m_stShadowMap.CastShadows = true;
 
 			BindTexture(TEXTURE_SHADOW_MAP, &m_shadowMap, SAMPLER_SHADOW_MAP);
