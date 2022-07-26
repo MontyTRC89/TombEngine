@@ -4,6 +4,7 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 #include "./AlphaTestBuffer.hlsli"
+#include "./AnimatedTextures.hlsli"
 
 #define SHADOW_INTENSITY (0.55f)
 #define INV_SHADOW_INTENSITY (1.0f - SHADOW_INTENSITY)
@@ -34,20 +35,6 @@ cbuffer RoomBuffer : register(b5)
 	float4 AmbientColor;
 	uint Water;
 };
-
-struct AnimatedFrameUV
-{
-	float2 topLeft;
-	float2 topRight;
-	float2 bottomRight;
-	float2 bottomLeft;
-};
-
-cbuffer AnimatedBuffer : register(b6) {
-	AnimatedFrameUV AnimFrames[128];
-	uint numAnimFrames;
-    uint fps;
-}
 
 struct PixelShaderInput
 {
@@ -97,8 +84,8 @@ PixelShaderInput VS(VertexShaderInput input)
 	if (CameraUnderwater != Water)
 	{
 		float factor = (Frame + clipPos.x * 320);
-		float xOffset = (sin(factor * PI / 20.0f)) * (screenPos.z/1024) * 4;
-		float yOffset = (cos(factor * PI / 20.0f)) * (screenPos.z/1024) * 4;
+		float xOffset = (sin(factor * PI / 20.0f)) * (screenPos.z / 1024) * 4;
+		float yOffset = (cos(factor * PI / 20.0f)) * (screenPos.z / 1024) * 4;
 		screenPos.x += xOffset * weight;
 		screenPos.y += yOffset * weight;
 	}
@@ -109,22 +96,11 @@ PixelShaderInput VS(VertexShaderInput input)
 	output.PositionCopy = screenPos;
 
 #ifdef ANIMATED
-	float speed = fps / 30.0f;
-	int frame = (int)(Frame * speed + input.AnimationFrameOffset) % numAnimFrames;
-	switch (input.PolyIndex) {
-	case 0:
-		output.UV = AnimFrames[frame].topLeft;
-		break;
-	case 1:
-		output.UV = AnimFrames[frame].topRight;
-		break;
-	case 2:
-		output.UV = AnimFrames[frame].bottomRight;
-		break;
-	case 3:
-		output.UV = AnimFrames[frame].bottomLeft;
-		break;
-	}
+
+	if (Type == 0)
+		output.UV = GetFrame(input.PolyIndex, input.AnimationFrameOffset);
+	else
+		output.UV = input.UV; // TODO: true UVRotate in future?
 #else
 	output.UV = input.UV;
 #endif

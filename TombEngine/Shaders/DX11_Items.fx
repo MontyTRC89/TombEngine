@@ -4,6 +4,7 @@
 #include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"
 #include "./AlphaTestBuffer.hlsli"
+#include "./AnimatedTextures.hlsli"
 
 #define MAX_BONES 32
 
@@ -88,6 +89,10 @@ PixelShaderInput VS(VertexShaderInput input)
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
+
+	if (Type == 1)
+		input.UV = CalculateUVRotate(input.UV, 0);
+
 	float4 tex = Texture.Sample(Sampler, input.UV);	
     DoAlphaTest(tex);
 

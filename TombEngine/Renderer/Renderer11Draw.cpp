@@ -1273,7 +1273,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			BindConstantBufferVS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());;
+			BindConstantBufferVS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());
 			m_context->VSSetShader(m_vsRooms_Anim.Get(), nullptr, 0);
 		}
 
@@ -1324,6 +1324,9 @@ namespace TEN::Renderer
 
 			RendererAnimatedTextureSet& set = m_animatedTextureSets[info->texture];
 			m_stAnimated.NumFrames = set.NumTextures;
+			m_stAnimated.Type = 0;
+			m_stAnimated.Fps = set.Fps;
+
 			for (unsigned char i = 0; i < set.NumTextures; i++)
 			{
 				auto& tex = set.Textures[i];
@@ -1650,7 +1653,7 @@ namespace TEN::Renderer
 				case ID_WATERFALL6:
 				case ID_WATERFALLSS1:
 				case ID_WATERFALLSS2:
-					// We'll draw waterfalls later
+					DrawWaterfalls(itemToDraw, view, 10, transparent);
 					continue;
 
 				default:
@@ -1671,6 +1674,50 @@ namespace TEN::Renderer
 				for (auto itemToDraw : room->ItemsToDraw)
 					RenderShadowMap(itemToDraw, renderView);
 		}
+	}
+
+	void Renderer11::DrawWaterfalls(RendererItem* item, RenderView& view, int fps, bool transparent)
+	{
+		// Extremely hacky function to get first rendered face of a waterfall object mesh, calculate
+		// its texture height and scroll all the textures according to that height.
+
+		RendererObject& moveableObj = *m_moveableObjects[item->ObjectNumber];
+
+		// No mesh or bucket, abort
+		if (!moveableObj.ObjectMeshes.size() || !moveableObj.ObjectMeshes[0]->Buckets.size())
+			return;
+
+		// Get first three vertices of a waterfall object, meaning the very first triangle
+		const auto& v1 = moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 0];
+		const auto& v2 = moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 1];
+		const auto& v3 = moveablesVertices[moveableObj.ObjectMeshes[0]->Buckets[0].StartVertex + 2];
+
+		// Calculate height of the texture by getting min/max UV.y coords of all three vertices
+		auto minY = std::min(std::min(v1.UV.y, v2.UV.y), v3.UV.y);
+		auto maxY = std::max(std::max(v1.UV.y, v2.UV.y), v3.UV.y);
+		auto minX = std::min(std::min(v1.UV.x, v2.UV.x), v3.UV.x);
+		auto maxX = std::max(std::max(v1.UV.x, v2.UV.x), v3.UV.x);
+
+		// Setup animated buffer
+		m_stAnimated.Fps = fps;
+		m_stAnimated.NumFrames = 1;
+		m_stAnimated.Type = 1; // UVRotate
+
+		// We need only top/bottom Y coordinate for UVRotate, but we pass whole
+		// rectangle anyway, in case later we may want to implement different UVRotate modes.
+		m_stAnimated.Textures[0].topLeft     = Vector2(minX, minY);
+		m_stAnimated.Textures[0].topRight    = Vector2(maxX, minY);
+		m_stAnimated.Textures[0].bottomLeft  = Vector2(minX, maxY);
+		m_stAnimated.Textures[0].bottomRight = Vector2(maxX, maxY);
+		
+		m_cbAnimated.updateData(m_stAnimated, m_context.Get());
+		BindConstantBufferPS(CB_ANIMATED_TEXTURES, m_cbAnimated.get());
+
+		DrawAnimatingItem(item, view, transparent);
+
+		// Reset animated buffer after rendering just in case
+		m_stAnimated.Fps = m_stAnimated.NumFrames = m_stAnimated.Type = 0;
+		m_cbAnimated.updateData(m_stAnimated, m_context.Get());
 	}
 
 	void Renderer11::DrawAnimatingItem(RendererItem* item, RenderView& view, bool transparent)
@@ -2070,6 +2117,7 @@ namespace TEN::Renderer
 
 								RendererAnimatedTextureSet& set = m_animatedTextureSets[bucket.Texture];
 								m_stAnimated.NumFrames = set.NumTextures;
+								m_stAnimated.Type = 0;
 								m_stAnimated.Fps = set.Fps;
 
 								for (unsigned char j = 0; j < set.NumTextures; j++)
