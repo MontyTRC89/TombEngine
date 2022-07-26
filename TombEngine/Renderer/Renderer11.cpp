@@ -53,6 +53,7 @@ namespace TEN::Renderer
 			item.PrevRoomNumber = NO_ROOM;
 			item.RoomNumber = NO_ROOM;
 			item.ItemNumber = NO_ITEM;
+			item.LightsToDraw.clear();
 		}
 	}
 
