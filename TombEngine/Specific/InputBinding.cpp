@@ -14,15 +14,6 @@ namespace TEN::Input
 		this->Initialize();
 	}
 
-	InputBinding::InputBinding(array<array<int, MAX_KEY_MAPPINGS>, NUM_DEFAULT_BINDINGS> defaultBindings)
-	{
-		this->Initialize();
-
-		// Set defaults.
-		for (size_t i = 0; i < NUM_DEFAULT_BINDINGS; i++)
-			this->Bindings[i] = defaultBindings[i];
-	}
-
 	array<int, MAX_KEY_MAPPINGS> InputBinding::Get(int bindingIndex)
 	{
 		if (!IsIndexWithinRange(bindingIndex))

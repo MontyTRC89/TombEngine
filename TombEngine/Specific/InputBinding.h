@@ -14,7 +14,6 @@ namespace TEN::Input
 	{
 	public:
 		InputBinding();
-		InputBinding(array<array<int, MAX_KEY_MAPPINGS>, NUM_DEFAULT_BINDINGS> defaultBinding);
 
 		array<int, MAX_KEY_MAPPINGS> Get(int bindingIndex);
 		void Set(int bindingIndex, array<int, MAX_KEY_MAPPINGS> binding);
