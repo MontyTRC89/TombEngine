@@ -1516,6 +1516,14 @@ namespace TEN::Gui
 					}
 				}
 
+			lastInvItem = NO_ITEM;
+		}
+	}
+	else
+	{
+		if (IsObjectInInventory(enterInventory))
+			SetupObjectListStartPosition2(enterInventory);
+	}
 				LastInvItem = NO_ITEM;
 			}
 		}
@@ -2881,6 +2889,10 @@ namespace TEN::Gui
 			if (UseItem && NoAction())
 				exitLoop = true;
 
+		SetEnterInventory(NO_ITEM);
+
+		Camera.numberFrames = g_Renderer.SyncRenderer();
+	}
 			Camera.numberFrames = g_Renderer.SyncRenderer();
 		}
 

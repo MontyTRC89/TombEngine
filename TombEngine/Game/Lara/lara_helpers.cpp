@@ -345,7 +345,7 @@ short ModulateLaraTurnRate(short turnRate, short accelRate, short minTurnRate, s
 
 	short newTurnRate = (turnRate + (accelRate * sign)) * sign;
 	newTurnRate = std::clamp(newTurnRate, minTurnRateNormalized, maxTurnRateNormalized);
-	return newTurnRate * sign;
+	return (newTurnRate * sign);
 }
 
 // TODO: Make these two functions methods of LaraInfo someday. @Sezz 2022.06.26
