@@ -57,6 +57,5 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* target, GameVector* hitPos, int dam
 FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* target, ItemInfo* src, Vector3Shrt armOrient);
 void FindTargetPoint(ItemInfo* laraItem, GameVector* target);
 void LaraTargetInfo(ItemInfo* laraItem, WeaponInfo* weaponInfo);
-bool CheckForHoldingState(LaraState state);
 void LaraGetNewTarget(ItemInfo* laraItem, WeaponInfo* weaponInfo);
 HolsterSlot HolsterSlotForWeapon(LaraWeaponType weaponType);
