@@ -1516,14 +1516,6 @@ namespace TEN::Gui
 					}
 				}
 
-			lastInvItem = NO_ITEM;
-		}
-	}
-	else
-	{
-		if (IsObjectInInventory(enterInventory))
-			SetupObjectListStartPosition2(enterInventory);
-	}
 				LastInvItem = NO_ITEM;
 			}
 		}
@@ -1531,8 +1523,6 @@ namespace TEN::Gui
 		{
 			if (IsObjectInInventory(EnterInventory))
 				SetupObjectListStartPosition2(EnterInventory);
-
-			EnterInventory = NO_ITEM;
 		}
 
 		AmmoSelectorFadeVal = 0;
@@ -2888,13 +2878,11 @@ namespace TEN::Gui
 
 			if (UseItem && NoAction())
 				exitLoop = true;
+		}
 
 		SetEnterInventory(NO_ITEM);
 
 		Camera.numberFrames = g_Renderer.SyncRenderer();
-	}
-			Camera.numberFrames = g_Renderer.SyncRenderer();
-		}
 
 		LastInvItem = Rings[(int)RingTypes::Inventory]->CurrentObjectList[Rings[(int)RingTypes::Inventory]->CurrentObjectInList].InventoryItem;
 		UpdateWeaponStatus(item);
