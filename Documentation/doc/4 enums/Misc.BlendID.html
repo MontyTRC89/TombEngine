@@ -32,26 +32,15 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Members">Members</a></li>
+<li><a href="#Misc_BlendID_constants">Misc.BlendID constants </a></li>
 </ul>
 
 
-<h2>2 Classes</h2>
+<h2>4 Enums</h2>
 <ul class="nowrap">
-  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
-  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
-  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
-  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
-  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
-  <li><strong>Flow.Settings</strong></li>
-  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
-  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
-  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
-  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
-  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
-  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
-  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
-  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
+  <li><strong>Misc.BlendID</strong></li>
+  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
 </ul>
 <h2>1 Modules</h2>
 <ul class="nowrap">
@@ -63,35 +52,46 @@
   <li><a href="../1 modules/Objects.html">Objects</a></li>
   <li><a href="../1 modules/Strings.html">Strings</a></li>
 </ul>
+<h2>2 Classes</h2>
+<ul class="nowrap">
+  <li><a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
+  <li><a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li><a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li><a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
+  <li><a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
+  <li><a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
+  <li><a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li><a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
+  <li><a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
+  <li><a href="../2 classes/Objects.Moveable.html">Objects.Moveable</a></li>
+  <li><a href="../2 classes/Objects.Sink.html">Objects.Sink</a></li>
+  <li><a href="../2 classes/Objects.SoundSource.html">Objects.SoundSource</a></li>
+  <li><a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
+  <li><a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+</ul>
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li><a href="../3 primitive classes/Color.html">Color</a></li>
   <li><a href="../3 primitive classes/Rotation.html">Rotation</a></li>
   <li><a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
-<h2>4 Enums</h2>
-<ul class="nowrap">
-  <li><a href="../4 enums/Flow.InvID.html">Flow.InvID</a></li>
-  <li><a href="../4 enums/Misc.BlendID.html">Misc.BlendID</a></li>
-  <li><a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>Flow.Settings</code></h1>
-<p>Settings that will be run on game startup.</p>
+<h1>Enum <code>Misc.BlendID</code></h1>
+<p>Constants for blend mode IDs.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Members">Members</a></h2>
+<h2><a href="#Misc_BlendID_constants">Misc.BlendID constants </a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#errorMode">errorMode</a></td>
-	<td class="summary">How should the application respond to script errors?</td>
+	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
+	<td class="summary">Table of blend mode constants (for use with particles).</td>
 	</tr>
 </table>
 
@@ -99,29 +99,35 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Members"></a>Members</h2>
+    <h2 class="section-header has-description"><a name="Misc_BlendID_constants"></a>Misc.BlendID constants </h2>
 
+          <div class="section-description">
+
+
+
+<p>The following constants are inside BlendID.</p>
+
+<pre><code>OPAQUE
+ALPHATEST
+ADDITIVE
+NOZTEST
+SUBTRACTIVE
+WIREFRAME
+EXCLUDE
+SCREEN
+LIGHTEN
+ALPHABLEND
+</code></pre>
+
+
+          </div>
     <dl class="function">
     <dt>
-    <a name = "errorMode"></a>
-    <strong>errorMode</strong>
+    <a name = "CONSTANT_STRING_HERE"></a>
+    <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    How should the application respond to script errors?
-Must be one of the following:
-<code>ErrorMode.TERMINATE</code> - print to the log file and terminate the application when any script error is hit.
-This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p>
-
-<p><code>ErrorMode.WARN</code> - print to the log file and continue running the application when a recoverable script error is hit.
-Choose this one if terminating the application is too much for you. Note that unrecoverable errors will still terminate
-the application.</p>
-
-<p><code>ErrorMode.SILENT</code> - do nothing when a recoverable script error is hit.
-Think <strong>very</strong> carefully before using this setting. These error modes are here to help you to keep your scripts
-working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
-an invalid argument.</p>
-
-<p>As with <code>ErrorMode.WARN</code>, unrecoverable errors will still terminate the application.
+    Table of blend mode constants (for use with particles).
 
 
 
