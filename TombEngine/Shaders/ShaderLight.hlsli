@@ -205,10 +205,9 @@ float3 DoDirectionalLight(float3 pos, float3 n, ShaderLight light)
 
 float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, float3 normal, float sheen)
 {
-	float3 ambTex = ambient * tex;
 	float3 diffuse = 0;
-	float3 shadow = 0;
-	float3 spec = 0;
+	float3 shadow  = 0;
+	float3 spec    = 0;
 
 	for (int i = 0; i < NumLights; i++)
 	{
@@ -237,7 +236,9 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 
 	shadow = saturate(shadow);
 	diffuse.xyz *= tex.xyz;
-	float3 combined = (ambTex + diffuse + spec) - shadow;
+
+	float3 ambTex = saturate(ambient - shadow) * tex;
+	float3 combined = ambTex + diffuse + spec;
 
 	return (combined * vertex);
 }
