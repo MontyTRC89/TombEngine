@@ -1096,7 +1096,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		}
 	}
 
-	if (goLeft)
+	if (dbLeft)
 	{
 		switch (selected_option)
 		{
@@ -1134,7 +1134,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		}
 	}
 
-	if (goRight)
+	if (dbRight)
 	{
 		switch (selected_option)
 		{
