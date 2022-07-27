@@ -34,6 +34,5 @@ extern int HealthBarTimer;
 extern float HealthBar;
 extern float MutateAmount;
 extern int FlashState;
-extern int PoisonFlag;
 
 extern bool EnableSmoothHealthBar;
