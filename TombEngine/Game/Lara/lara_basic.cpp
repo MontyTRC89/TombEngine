@@ -272,7 +272,7 @@ void lara_as_run_forward(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
+	if (TrInput & IN_CROUCH && lara->Context.CanCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -436,7 +436,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
+	if (TrInput & IN_CROUCH && lara->Context.CanCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -786,7 +786,7 @@ void lara_as_turn_slow(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
+	if (TrInput & IN_CROUCH && lara->Context.CanCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1137,7 +1137,7 @@ void lara_as_turn_fast(ItemInfo* item, CollisionInfo* coll)
 		return;
 	}
 
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
+	if (TrInput & IN_CROUCH && lara->Context.CanCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;
@@ -1675,7 +1675,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 		SetLaraRunJumpQueue(item, coll);
 	}
 
-	if (TrInput & IN_CROUCH && TestLaraCrouch(item))
+	if (TrInput & IN_CROUCH && lara->Context.CanCrouch(item))
 	{
 		item->Animation.TargetState = LS_CROUCH_IDLE;
 		return;

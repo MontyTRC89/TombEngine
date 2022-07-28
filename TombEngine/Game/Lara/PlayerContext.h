@@ -12,6 +12,7 @@ namespace TEN::Entities::Player
 		PlayerContext();
 
 		// Basic movement
+		static bool CanTurnFast(ItemInfo* item);
 		static bool CanRunForward(ItemInfo* item, CollisionInfo* coll);
 		static bool CanRunBack(ItemInfo* item, CollisionInfo* coll);
 		static bool CanWalkForward(ItemInfo* item, CollisionInfo* coll);
@@ -25,14 +26,19 @@ namespace TEN::Entities::Player
 		static bool CanSidestepRightSwamp(ItemInfo* item, CollisionInfo* coll);
 		static bool CanWadeForward(ItemInfo* item, CollisionInfo* coll); // TODO
 		static bool CanWadeForwardSwamp(ItemInfo* item, CollisionInfo* coll);
-		static bool CanTurnFast(ItemInfo* item);
 
 		// Crouch and crawl movement
+		static bool CanCrouch(ItemInfo* item);
+		static bool CanCrouchToCrawl(ItemInfo* item);
+		static bool CanCrouchRoll(ItemInfo* item, CollisionInfo* coll);
+		static bool CanCrawlForward(ItemInfo* item, CollisionInfo* coll);
+		static bool CanCrawlBack(ItemInfo* item, CollisionInfo* coll);
 
 		// Monkey swing movement
 		// Vault movement
 		// Crawl vault movement
 		// Water tread climb out movement
+		// Miscellaneous movement
 
 	private:
 		static bool TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextGroundMovementSetup contextSetup, bool useCrawlSetup = false);

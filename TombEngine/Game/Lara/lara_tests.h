@@ -44,7 +44,9 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
-bool CheckLaraState(LaraState state, std::vector<LaraState> stateList);
+bool TestLaraState(LaraState state, std::vector<LaraState> stateList);
+bool TestLaraWeaponType(LaraWeaponType weaponType, std::vector<LaraWeaponType> weaponTypeList);
+
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(LaraState state);
 bool IsJumpState(LaraState state);
@@ -65,13 +67,6 @@ bool TestLaraStep(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraStepUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraStepDown(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
-
-bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup = false);
-bool TestLaraCrawlForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrawlBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrouchRoll(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraCrouch(ItemInfo* item);
-bool TestLaraCrouchToCrawl(ItemInfo* item);
 
 bool TestLaraMonkeyMoveTolerance(ItemInfo* item, CollisionInfo* coll, MonkeyMoveTestSetup testSetup);
 bool TestLaraMonkeyForward(ItemInfo* item, CollisionInfo* coll);

@@ -919,7 +919,7 @@ void GetTightropeFallOff(ItemInfo* item, int regularity)
 #endif
 
 // TODO: Organise all of this properly. -- Sezz 2022.07.28
-bool CheckLaraState(LaraState state, std::vector<LaraState> stateList)
+bool TestLaraState(LaraState state, std::vector<LaraState> stateList)
 {
 	for (auto listedState : stateList)
 	{
@@ -930,7 +930,7 @@ bool CheckLaraState(LaraState state, std::vector<LaraState> stateList)
 	return false;
 }
 
-bool CheckLaraWeaponType(LaraWeaponType weaponType, std::vector<LaraWeaponType> weaponTypeList)
+bool TestLaraWeaponType(LaraWeaponType weaponType, std::vector<LaraWeaponType> weaponTypeList)
 {
 	for (auto listedWeaponType : weaponTypeList)
 	{
@@ -955,7 +955,7 @@ static std::vector<LaraWeaponType> StandingWeaponTypes
 
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType)
 {
-	return (CheckLaraWeaponType(weaponType, StandingWeaponTypes) || GetLaraInfo(item)->Weapons[(int)weaponType].HasLasersight);
+	return (TestLaraWeaponType(weaponType, StandingWeaponTypes) || GetLaraInfo(item)->Weapons[(int)weaponType].HasLasersight);
 }
 
 static std::vector<LaraState> VaultStates
@@ -971,7 +971,7 @@ static std::vector<LaraState> VaultStates
 
 bool IsVaultState(LaraState state)
 {
-	return CheckLaraState(state, VaultStates);
+	return TestLaraState(state, VaultStates);
 }
 
 static std::vector<LaraState> JumpStates
@@ -990,7 +990,7 @@ static std::vector<LaraState> JumpStates
 
 bool IsJumpState(LaraState state)
 {
-	return CheckLaraState(state, JumpStates);
+	return TestLaraState(state, JumpStates);
 }
 
 static std::vector<LaraState> RunningJumpQueuableStates
@@ -1003,7 +1003,7 @@ static std::vector<LaraState> RunningJumpQueuableStates
 
 bool IsRunJumpQueueableState(LaraState state)
 {
-	return CheckLaraState(state, RunningJumpQueuableStates);
+	return TestLaraState(state, RunningJumpQueuableStates);
 }
 
 static std::vector<LaraState> RunningJumpTimerStates
@@ -1017,7 +1017,7 @@ static std::vector<LaraState> RunningJumpTimerStates
 
 bool IsRunJumpCountableState(LaraState state)
 {
-	return CheckLaraState(state, RunningJumpTimerStates);
+	return TestLaraState(state, RunningJumpTimerStates);
 }
 
 bool TestLaraRoll180(ItemInfo* item, CollisionInfo* coll)
@@ -1224,161 +1224,6 @@ bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll)
 	if ((probe.Position.Ceiling - y) <= CLICK(1.25f) &&		// Within lower ceiling bound.
 		(probe.Position.Ceiling - y) >= -CLICK(1.25f) &&	// Within upper ceiling bound.
 		probe.Position.Ceiling != NO_HEIGHT)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-// TODO: This function should become obsolete with more accurate and accessible collision detection in the future.
-// For now, it supersedes old probes and is used alongside COLL_INFO. @Sezz 2021.10.24
-bool TestLaraMoveTolerance(ItemInfo* item, CollisionInfo* coll, MoveTestSetup testSetup, bool useCrawlSetup)
-{
-	// HACK: coll->Setup.Radius and coll->Setup.Height are set in
-	// lara_col functions, then reset by LaraAboveWater() to defaults.
-	// This means they store the wrong values for move tests called in crawl lara_as functions.
-	// When states become objects, collision setup should occur at the beginning of each state, eliminating the need
-	// for the useCrawlSetup argument. @Sezz 2022.03.16
-	int laraRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : coll->Setup.Radius;
-	int laraHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
-
-	int y = item->Pose.Position.y;
-	int distance = OFFSET_RADIUS(laraRadius);
-	auto probe = GetCollision(item, testSetup.Angle, distance, -laraHeight);
-
-	bool isSlopeDown = testSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > y) : false;
-	bool isSlopeUp = testSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < y) : false;
-	bool isDeath = testSetup.CheckDeath ? probe.Block->Flags.Death : false;
-
-	auto start1 = GameVector(
-		item->Pose.Position.x,
-		y + testSetup.UpperFloorBound - 1,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
-
-	auto end1 = GameVector(
-		probe.Coordinates.x,
-		y + testSetup.UpperFloorBound - 1,
-		probe.Coordinates.z,
-		item->RoomNumber
-	);
-
-	auto start2 = GameVector(
-		item->Pose.Position.x,
-		y - laraHeight + 1,
-		item->Pose.Position.z,
-		item->RoomNumber
-	);
-
-	auto end2 = GameVector(
-		probe.Coordinates.x,
-		probe.Coordinates.y + 1,
-		probe.Coordinates.z,
-		item->RoomNumber
-	);
-
-	// Discard walls.
-	if (probe.Position.Floor == NO_HEIGHT)
-		return false;
-
-	// Check for slope or death sector (if applicable).
-	if (isSlopeDown || isSlopeUp || isDeath)
-		return false;
-
-	// Assess ray/room collision.
-	if (!LOS(&start1, &end1) || !LOS(&start2, &end2))
-		return false;
-
-	// Assess point/room collision.
-	if ((probe.Position.Floor - y) <= testSetup.LowerFloorBound &&			// Within lower floor bound.
-		(probe.Position.Floor - y) >= testSetup.UpperFloorBound &&			// Within upper floor bound.
-		(probe.Position.Ceiling - y) < -laraHeight &&						// Within lowest ceiling bound.
-		abs(probe.Position.Ceiling - probe.Position.Floor) > laraHeight)	// Space is not a clamp.
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraCrawlForward(ItemInfo* item, CollisionInfo* coll)
-{
-	// Using Lower/UpperFloorBound defined in crawl state collision functions.
-
-	MoveTestSetup testSetup
-	{
-		item->Pose.Orientation.y,
-		CLICK(1) - 1, -(CLICK(1) - 1)
-	};
-
-	return TestLaraMoveTolerance(item, coll, testSetup, true);
-}
-
-bool TestLaraCrawlBack(ItemInfo* item, CollisionInfo* coll)
-{
-	// Using Lower/UpperFloorBound defined in crawl state collision functions.
-
-	MoveTestSetup testSetup
-	{
-		item->Pose.Orientation.y + ANGLE(180.0f),
-		CLICK(1) - 1, -(CLICK(1) - 1)
-	};
-
-	return TestLaraMoveTolerance(item, coll, testSetup, true);
-}
-
-bool TestLaraCrouchRoll(ItemInfo* item, CollisionInfo* coll)
-{
-	auto* lara = GetLaraInfo(item);
-
-	// Assess water depth.
-	if (lara->WaterSurfaceDist < -CLICK(1))
-		return false;
-
-	// Assess continuity of path.
-	int distance = 0;
-	auto probeA = GetCollision(item);
-	while (distance < SECTOR(1))
-	{
-		distance += CLICK(1);
-		auto probeB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
-
-		if (abs(probeA.Position.Floor - probeB.Position.Floor) > (CLICK(1) - 1) ||			// Ensure floor height difference is within a threshold.
-			abs(probeB.Position.Ceiling - probeB.Position.Floor) <= LARA_HEIGHT_CRAWL ||	// Avoid clamps.
-			probeB.Position.FloorSlope)														// Avoid slopes.
-		{
-			return false;
-		}
-
-		probeA = probeB;
-	}
-
-	return true;
-}
-
-bool TestLaraCrouch(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if ((lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(item, lara->Control.Weapon.GunType)) &&
-		lara->Control.WaterStatus != WaterStatus::Wade)
-	{
-		return true;
-	}
-
-	return false;
-}
-
-bool TestLaraCrouchToCrawl(ItemInfo* item)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!(TrInput & (IN_FLARE | IN_DRAW)) &&						// Avoid unsightly concurrent actions.
-		lara->Control.HandStatus == HandStatus::Free &&				// Hands are free.
-		(lara->Control.Weapon.GunType != LaraWeaponType::Flare ||	// Not handling flare. TODO: Should be allowed, but the flare animation bugs out right now. @Sezz 2022.03.18
-			lara->Flare.Life))
 	{
 		return true;
 	}
