@@ -281,6 +281,7 @@ namespace TEN::Entities::Player
 		int playerHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
 
 		int yPos = item->Pose.Position.y;
+		int yPosTop = yPos - playerHeight;
 		auto probe = GetCollision(item, contextSetup.Angle, OFFSET_RADIUS(playerRadius), -playerHeight);
 
 		// 1. Check for wall.
@@ -310,13 +311,13 @@ namespace TEN::Entities::Player
 
 		auto originB = GameVector(
 			item->Pose.Position.x,
-			(yPos - playerHeight) + 1,
+			yPosTop + 1,
 			item->Pose.Position.z,
 			item->RoomNumber
 		);
 		auto targetB = GameVector(
 			probe.Coordinates.x,
-			(yPos - playerHeight) + 1,
+			yPosTop + 1,
 			probe.Coordinates.z,
 			item->RoomNumber
 		);
@@ -340,10 +341,10 @@ namespace TEN::Entities::Player
 	bool PlayerContext::TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextSetupMonkeyMovement contextSetup)
 	{
 		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
-		int playetHeight = LARA_HEIGHT_MONKEY;
+		int playerHeight = LARA_HEIGHT_MONKEY;
 
 		int yPos = item->Pose.Position.y;
-		int yPosTop = yPos - playetHeight;
+		int yPosTop = yPos - playerHeight;
 		auto probe = GetCollision(item, contextSetup.Angle, OFFSET_RADIUS(coll->Setup.Radius));
 
 		// 1. Check for wall.
@@ -388,8 +389,8 @@ namespace TEN::Entities::Player
 		if (probe.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is monkey swing.
 			(probe.Position.Ceiling - yPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
 			(probe.Position.Ceiling - yPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
-			(probe.Position.Floor - yPosTop) > playetHeight &&						// Floor is within highest floor bound (i.e. player height).
-			abs(probe.Position.Ceiling - probe.Position.Floor) > playetHeight)		// Space is not too narrow.
+			(probe.Position.Floor - yPosTop) > playerHeight &&						// Floor is within highest floor bound (i.e. player height).
+			abs(probe.Position.Ceiling - probe.Position.Floor) > playerHeight)		// Space is not too narrow.
 		{
 			return true;
 		}
