@@ -1,0 +1,235 @@
+namespace TEN.Save;
+
+struct Position {
+	x_pos: int32;
+	y_pos: int32;
+	z_pos: int32;
+	x_rot: int32;
+	y_rot: int32;
+	z_rot: int32;
+}
+
+table CreatureTarget {
+	object_number: int32;
+	room_number: int32;
+	box_number: int32;
+	flags: int32;
+	trigger_flags: int32;
+	position: Position;
+}
+
+table Creature {
+	maximum_turn: int32;
+	joint_rotation: [int32];
+	head_left: bool;
+	head_right: bool;
+	patrol: bool;
+	alerted: bool;
+	reached_goal: bool;
+	jump_ahead: bool;
+	monkey_swing_ahead: bool;
+	friendly: bool;
+	poisoned: bool;
+	hurt_by_lara: bool;
+	tosspad: int32;
+	location_ai: int32;
+	fired_weapon: int32;
+	mood: int32;
+	enemy: int32;
+	ai_target_number: int32;
+	flags: int32;
+	can_jump: bool;
+	can_monkey: bool;
+	is_amphibious: bool;
+	is_jumping: bool;
+	is_monkeying: bool;
+}
+
+table LaserHead {
+	
+}
+
+table QuadBike {
+	turn_rate: int32;
+	front_rot: int32;
+	rear_rot: int32;
+	momentum_angle: int32;
+	extra_rotation: int32;
+
+	velocity: int32;
+	left_vertical_velocity: int32;
+	right_vertical_velocity: int32;
+
+	revs: int32;
+	engine_revs: int32;
+	pitch: int32;
+
+	smoke_start: int32;
+	can_start_drift: bool;
+	drift_starting: bool;
+	no_dismount: bool;
+
+	flags: int32;
+}
+
+table BigGun {
+
+}
+
+table Motorbike {
+
+}
+
+table Jeep {
+
+}
+
+table Kayak {
+	turn_rate: int32;
+
+	velocity: int32;
+	front_vertical_velocity: int32;
+	left_vertical_velocity: int32;
+	right_vertical_velocity: int32;
+
+	left_right_count: int32;
+	water_height: int32;
+	old_pos: Position;
+	turn: bool;
+	forward: bool;
+	true_water: bool;
+
+	current_start_wake: int32;
+	wake_shade: int32;
+
+	flags: int32;
+}
+
+table Door {
+	
+}
+
+table Skidoo {
+
+}
+
+table UPV {
+	velocity: int32;
+	rot: int32;
+	x_rot: int32;
+	fan_rot: int32;
+	harpoon_timer: int32;
+	harpoon_left: bool;
+	
+	flags: int32;
+}
+
+table Motorboat {
+
+}
+
+table GameVector {
+	
+}
+
+table Wraith {
+
+}
+
+table Rubberboat {
+
+}
+
+table Pushable {
+
+}
+
+table Minecart {
+	turn_rot: int32;
+	turn_x: int32;
+	turn_z: int32;
+	turn_len: int32;
+
+	velocity: int32;
+	vertical_velocity: int32;
+	gradient: int32;
+	stop_delay: int32;
+
+	floor_height_middle: int32;
+	floor_height_front: int32;
+
+	flags: int32;
+}
+
+table LaraInfo {
+
+}
+
+table ItemNumber {
+    num: short;
+}
+
+table Short {
+    scalar: short;
+}
+
+table Int {
+    scalar: int32;
+}
+
+table Float {
+    scalar: double;
+}
+
+table ShortArray {
+    arr: [short];
+}
+
+struct Vector3 {
+	x: int32;
+	y: int32;
+	z: int32;
+}
+
+struct Vector4 {
+	x: int32;
+	y: int32;
+	z: int32;
+	w: int32;
+}
+
+union ItemData {
+    /*byte,
+    ubyte,
+    bool,
+    short,
+    ushort,
+    int,
+    uint,
+    float,
+    long,
+    ulong,
+    double,*/
+    Int,
+	Short,
+    Float,
+    ShortArray,
+    ItemNumber,
+    Creature,
+    LaserHead,
+    QuadBike,
+    BigGun,
+    Motorbike,
+    Jeep,
+    LaraInfo,
+    Kayak,
+    Door,
+    Skidoo,
+    UPV,
+    Motorboat,
+    GameVector,
+    Wraith,
+    Rubberboat,
+    Pushable,
+    Minecart
+}
