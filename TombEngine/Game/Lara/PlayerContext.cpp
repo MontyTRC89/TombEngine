@@ -230,46 +230,46 @@ namespace TEN::Entities::Player
 
 	bool PlayerContext::CanMonkeyForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		ContextSetupMonkeyMovement testSetup
+		ContextSetupMonkeyMovement contextSetup =
 		{
 			item->Pose.Orientation.y,
 			int(CLICK(1.25f)), int(-CLICK(1.25f)) // Defined by monkey forward state.
 		};
 
-		return TestMonkeyMovementSetup(item, coll, testSetup);
+		return TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
 	bool PlayerContext::CanMonkeyBack(ItemInfo* item, CollisionInfo* coll)
 	{
-		ContextSetupMonkeyMovement testSetup
+		ContextSetupMonkeyMovement contextSetup =
 		{
 			item->Pose.Orientation.y + ANGLE(180.0f),
 			int(CLICK(1.25f)), int(-CLICK(1.25f)) // Defined by monkey back state.
 		};
 
-		return PlayerContext::TestMonkeyMovementSetup(item, coll, testSetup);
+		return PlayerContext::TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
 	bool PlayerContext::CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll)
 	{
-		ContextSetupMonkeyMovement testSetup
+		ContextSetupMonkeyMovement contextSetup =
 		{
 			item->Pose.Orientation.y - ANGLE(90.0f),
 			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy left state.
 		};
 
-		return PlayerContext::TestMonkeyMovementSetup(item, coll, testSetup);
+		return PlayerContext::TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
 	bool PlayerContext::CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll)
 	{
-		ContextSetupMonkeyMovement testSetup
+		ContextSetupMonkeyMovement contextSetup =
 		{
 			item->Pose.Orientation.y + ANGLE(90.0f),
 			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy right state.
 		};
 
-		return PlayerContext::TestMonkeyMovementSetup(item, coll, testSetup);
+		return PlayerContext::TestMonkeyMovementSetup(item, coll, contextSetup);
 	}
 
 	bool PlayerContext::TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextSetupGroundMovement contextSetup, bool useCrawlSetup)
@@ -287,9 +287,9 @@ namespace TEN::Entities::Player
 		if (probe.Position.Floor == NO_HEIGHT)
 			return false;
 
-		bool isSlopeDown = contextSetup.CheckSlopeDown ? (probe.Position.FloorSlope && probe.Position.Floor > yPos) : false;
-		bool isSlopeUp = contextSetup.CheckSlopeUp ? (probe.Position.FloorSlope && probe.Position.Floor < yPos) : false;
-		bool isDeathFloor = contextSetup.CheckDeathFloor ? probe.Block->Flags.Death : false;
+		bool isSlopeDown  = contextSetup.CheckSlopeDown  ? (probe.Position.FloorSlope && probe.Position.Floor > yPos) : false;
+		bool isSlopeUp	  = contextSetup.CheckSlopeUp	 ? (probe.Position.FloorSlope && probe.Position.Floor < yPos) : false;
+		bool isDeathFloor = contextSetup.CheckDeathFloor ? probe.Block->Flags.Death									  : false;
 
 		// 2. Check for floor slope or death floor (if applicable).
 		if (isSlopeDown || isSlopeUp || isDeathFloor)
@@ -297,26 +297,26 @@ namespace TEN::Entities::Player
 
 		auto originA = GameVector(
 			item->Pose.Position.x,
-			yPos + contextSetup.UpperFloorBound - 1,
+			(yPos + contextSetup.UpperFloorBound) - 1,
 			item->Pose.Position.z,
 			item->RoomNumber
 		);
 		auto targetA = GameVector(
 			probe.Coordinates.x,
-			yPos + contextSetup.UpperFloorBound - 1,
+			(yPos + contextSetup.UpperFloorBound) - 1,
 			probe.Coordinates.z,
 			item->RoomNumber
 		);
 
 		auto originB = GameVector(
 			item->Pose.Position.x,
-			yPos - playerHeight + 1,
+			(yPos - playerHeight) + 1,
 			item->Pose.Position.z,
 			item->RoomNumber
 		);
 		auto targetB = GameVector(
 			probe.Coordinates.x,
-			probe.Coordinates.y + 1,
+			(yPos - playerHeight) + 1,
 			probe.Coordinates.z,
 			item->RoomNumber
 		);
@@ -339,8 +339,11 @@ namespace TEN::Entities::Player
 
 	bool PlayerContext::TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextSetupMonkeyMovement contextSetup)
 	{
-		int playetHeight = LARA_HEIGHT_MONKEY; // TODO
-		int yPosTop = item->Pose.Position.y - playetHeight;
+		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
+		int playetHeight = LARA_HEIGHT_MONKEY;
+
+		int yPos = item->Pose.Position.y;
+		int yPosTop = yPos - playetHeight;
 		auto probe = GetCollision(item, contextSetup.Angle, OFFSET_RADIUS(coll->Setup.Radius));
 
 		// 1. Check for wall.
@@ -353,26 +356,26 @@ namespace TEN::Entities::Player
 
 		auto originA = GameVector(
 			item->Pose.Position.x,
-			(yPosTop + contextSetup.LowerCeilingBound) + 1,
+			yPos - 1,
 			item->Pose.Position.z,
 			item->RoomNumber
 		);
 		auto targetA = GameVector(
 			probe.Coordinates.x,
-			probe.Coordinates.y + contextSetup.LowerCeilingBound - playetHeight + 1,
+			yPos - 1,
 			probe.Coordinates.z,
 			item->RoomNumber
 		);
 
 		auto originB = GameVector(
 			item->Pose.Position.x,
-			(yPosTop + playetHeight) - 1,
+			(yPosTop + contextSetup.LowerCeilingBound) + 1,
 			item->Pose.Position.z,
 			item->RoomNumber
 		);
 		auto targetB = GameVector(
 			probe.Coordinates.x,
-			probe.Coordinates.y - 1,
+			(yPosTop + contextSetup.LowerCeilingBound) + 1,
 			probe.Coordinates.z,
 			item->RoomNumber
 		);
