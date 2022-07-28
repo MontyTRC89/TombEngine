@@ -296,6 +296,7 @@ namespace TEN::Entities::Player
 		if (isSlopeDown || isSlopeUp || isDeathFloor)
 			return false;
 
+		// Raycast setup at upper floor bound.
 		auto originA = GameVector(
 			item->Pose.Position.x,
 			(yPos + contextSetup.UpperFloorBound) - 1,
@@ -309,6 +310,7 @@ namespace TEN::Entities::Player
 			item->RoomNumber
 		);
 
+		// Raycast setup at lowest ceiling bound (player height).
 		auto originB = GameVector(
 			item->Pose.Position.x,
 			yPosTop + 1,
@@ -329,7 +331,7 @@ namespace TEN::Entities::Player
 		// 4. Assess point probe collision.
 		if ((probe.Position.Floor - yPos) <= contextSetup.LowerFloorBound &&   // Floor is within lower floor bound.
 			(probe.Position.Floor - yPos) >= contextSetup.UpperFloorBound &&   // Floor is within upper floor bound.
-			(probe.Position.Ceiling - yPos) < -playerHeight &&				   // Ceiling is within lowest ceiling bound (i.e. player height).
+			(probe.Position.Ceiling - yPos) < -playerHeight &&				   // Ceiling is within lowest ceiling bound (player height).
 			abs(probe.Position.Ceiling - probe.Position.Floor) > playerHeight) // Space is not too narrow.
 		{
 			return true;
@@ -355,6 +357,7 @@ namespace TEN::Entities::Player
 		if (probe.Position.CeilingSlope)
 			return false;
 
+		// Raycast setup at highest floor bound (player base)
 		auto originA = GameVector(
 			item->Pose.Position.x,
 			yPos - 1,
@@ -367,7 +370,8 @@ namespace TEN::Entities::Player
 			probe.Coordinates.z,
 			item->RoomNumber
 		);
-
+		
+		// Raycast setup at lower ceiling bound.
 		auto originB = GameVector(
 			item->Pose.Position.x,
 			(yPosTop + contextSetup.LowerCeilingBound) + 1,
@@ -389,7 +393,7 @@ namespace TEN::Entities::Player
 		if (probe.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is monkey swing.
 			(probe.Position.Ceiling - yPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
 			(probe.Position.Ceiling - yPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.
-			(probe.Position.Floor - yPosTop) > playerHeight &&						// Floor is within highest floor bound (i.e. player height).
+			(probe.Position.Floor - yPos) > 0 &&									// Floor is within highest floor bound (player base).
 			abs(probe.Position.Ceiling - probe.Position.Floor) > playerHeight)		// Space is not too narrow.
 		{
 			return true;
