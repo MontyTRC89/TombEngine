@@ -18,6 +18,9 @@
 #include "Specific/input.h"
 #include "Specific/setup.h"
 
+#include "BlendIDs.h"
+#include "LuaHandler.h"
+
 /***
 Functions that don't fit in the other modules.
 @tentable Misc 
@@ -42,7 +45,7 @@ namespace Misc
 	}
 
 	///Emit a lightning arc.
-	//@function AddLightningArc
+	//@function EmitLightningArc
 	//@tparam Vec3 src
 	//@tparam Vec3 dest
 	//@tparam Color color (default Color(255, 255, 255))
@@ -52,7 +55,7 @@ namespace Misc
 	//@tparam int detail Higher numbers equal more segments, but it's not a 1:1 correlation. Clamped to [1, 127]. (default 10)
 	//@tparam bool smooth If true, the arc will have large, smooth curves; if false, it will have small, jagged spikes. (default false)
 	//@tparam bool endDrift If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)
-	static void AddLightningArc(Vec3 src, Vec3 dest, TypeOrNil<ScriptColor> color, TypeOrNil<float> lifetime, TypeOrNil<int> amplitude, TypeOrNil<int> beamWidth, TypeOrNil<int> segments, TypeOrNil<bool> smooth, TypeOrNil<bool> endDrift)
+	static void EmitLightningArc(Vec3 src, Vec3 dest, TypeOrNil<ScriptColor> color, TypeOrNil<float> lifetime, TypeOrNil<int> amplitude, TypeOrNil<int> beamWidth, TypeOrNil<int> segments, TypeOrNil<bool> smooth, TypeOrNil<bool> endDrift)
 	{
 		Vector3Int p1;
 		p1.x = src.x;
@@ -106,10 +109,43 @@ namespace Misc
 		TriggerLightning(&p1, &p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
-	static void AddParticle(int spriteIndex, Vec3 pos, Vec3 velocity, int gravity, float rot, 
-							ScriptColor startColor, ScriptColor endColor, int blendMode, 
-							int startSize, int endSize, int lifetime, 
-							bool damage, bool poison)
+	/*** Emit a particle.
+	 See the sprite editor in WadTool for DEFAULT_SPRITES to see a list of sprite indices.
+	@function EmitParticle
+	@tparam Vec3 pos
+	@tparam Vec3 velocity
+	@tparam int spriteIndex an index of a sprite in DEFAULT_SPRITES object.
+	@tparam int gravity (default 0) Specifies whether particle will fall (positive values) or ascend (negative values) over time. Clamped to [-32768, 32767], but values between -1000 and 1000 are recommended; values too high or too low (e.g. under -2000 or above 2000) will cause the velocity of the particle to "wrap around" and switch directions.
+	@tparam float rot (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
+	@tparam Color startColor (default 255, 255, 255) color at start of life
+	@tparam Color endColor (default 255, 255, 255) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
+	@tparam BlendID blendMode (default TEN.Misc.BlendID.ALPHABLEND) How will we blend this with its surroundings?
+	@tparam int startSize (default 10) Size on spawn. A value of 15 is approximately the size of Lara's head.
+	@tparam int endSize (default 0) Size on death - the particle will linearly shrink or grow to this size during its lifespan
+	@tparam float lifetime (default 2) Lifespan in seconds 
+	@tparam bool damage (default false) specifies whether particle can damage Lara (does a very small amount of damage, like the small lava emitters in TR1)
+	@tparam bool poison (default false) specifies whether particle can poison Lara
+	@usage
+	EmitParticle(
+		yourPositionVarHere,
+		Vec3(math.random(), math.random(), math.random()),
+		22, -- spriteIndex
+		0, -- gravity
+		-2, -- rot
+		Color(255, 0, 0), -- startColor
+		Color(0,  255, 0), -- endColor
+		TEN.Misc.BlendID.ADDITIVE, -- blendMode
+		15, -- startSize
+		50, -- endSize
+		20, -- lifetime
+		false, -- damage
+		true -- poison
+		)
+	*/
+	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
+							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BLEND_MODES> blendMode, 
+							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
+							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
 	{
 		if (!Objects[ID_DEFAULT_SPRITES].loaded)
 		{
@@ -117,55 +153,81 @@ namespace Misc
 			return;
 		}
 
+		int grav = USE_IF_HAVE(int, gravity, 0);
+
+		grav = std::clamp(grav, -32768, 32767);
+
 		auto* s = GetFreeParticle();
 
 		s->on = true;
 
 		s->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
 
-		s->sR = startColor.GetR();
-		s->sG = startColor.GetG();
-		s->sB = startColor.GetB();
-		s->dR = endColor.GetR();
-		s->dG = endColor.GetG();
-		s->dB = endColor.GetB();
+		ScriptColor sCol = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
+		ScriptColor eCol = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
 
-		s->blendMode = BLEND_MODES(std::clamp(blendMode, int(BLEND_MODES::BLENDMODE_OPAQUE), int(BLEND_MODES::BLENDMODE_ALPHABLEND)));
+		s->sR = sCol.GetR();
+		s->sG = sCol.GetG();
+		s->sB = sCol.GetB();
+
+		s->dR = eCol.GetR();
+		s->dG = eCol.GetG();
+		s->dB = eCol.GetB();
+
+		//there is no blend mode 7
+		BLEND_MODES bMode = USE_IF_HAVE(BLEND_MODES, blendMode, BLENDMODE_ALPHABLEND);
+		s->blendMode = BLEND_MODES(std::clamp(int(bMode), int(BLEND_MODES::BLENDMODE_OPAQUE), int(BLEND_MODES::BLENDMODE_ALPHABLEND)));
 
 		s->x = pos.x;
 		s->y = pos.y;
 		s->z = pos.z;
 		s->roomNumber = FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z));
+		constexpr float secsPerFrame = 1.0f / (float)FPS;
 
-		s->life = s->sLife = lifetime;
-		s->colFadeSpeed = lifetime / 2;
-		s->fadeToBlack = lifetime / 3;
+		float life = USE_IF_HAVE(float, lifetime, 2.0f);
+		life = std::max(0.0f, life);
+		int lifeInFrames = (int)round(life / secsPerFrame);
+
+		s->life = s->sLife = lifeInFrames;
+		s->colFadeSpeed = lifeInFrames / 2;
+		s->fadeToBlack = lifeInFrames / 3;
 
 		s->xVel = short(velocity.x << 5);
 		s->yVel = short(velocity.y << 5);
 		s->zVel = short(velocity.z << 5);
 
-		s->sSize = s->size = float(startSize);
-		s->dSize = float(endSize);
+		int sSize = USE_IF_HAVE(int, startSize, 10);
+		int eSize = USE_IF_HAVE(int, endSize, 0);
+
+		s->sSize = s->size = float(sSize);
+		s->dSize = float(eSize);
+
 		s->scalar = 2;
 
 		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
-		if (poison)
+		bool applyPoison = USE_IF_HAVE(bool, poison, false);
+		bool applyDamage = USE_IF_HAVE(bool, damage, false);
+
+		if (applyPoison)
 			s->flags |= SP_POISON;
 
-		if (damage)
+		if (applyDamage)
 			s->flags |= SP_DAMAGE;
 
+		//todo add option to turn off wind?
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
 			s->flags |= SP_WIND;
 
+		float rotAdd = USE_IF_HAVE(float, rot, 0.0f);
+
 		s->rotAng = (GetRandomControl() & 0x0FFF); 
-		s->rotAdd = byte(ANGLE(rot) >> 4);
+		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
 
 		s->friction = 0;
 		s->maxYvel  = 0;
-		s->gravity  = gravity;
+
+		s->gravity  = grav;
 	}
 
 	static void AddShockwave(Vec3 pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
@@ -305,24 +367,8 @@ namespace Misc
 		sol::table table_misc{ state->lua_state(), sol::create };
 		parent.set(ScriptReserved_Misc, table_misc);
 
-		table_misc.set_function(ScriptReserved_AddLightningArc, &AddLightningArc);
-
-		///Emit a particle.
-		//@function AddParticle
-		//@tparam int spriteIndex an index of a sprite in DEFAULT_SPRITES object
-		//@tparam Vec3 pos
-		//@tparam Vec3 velocity
-		//@tparam int gravity specifies whether particle will fall or ascend over time
-		//@tparam float rot specifies a speed with which it will rotate (0 = no rotation)
-		//@tparam ScriptColor startColor
-		//@tparam ScriptColor endColor
-		//@tparam int blendMode
-		//@tparam int startSize
-		//@tparam int endSize
-		//@tparam int lifetime
-		//@tparam bool damage specifies whether particle can damage Lara
-		//@tparam bool poison specifies whether particle can poison Lara
-		table_misc.set_function(ScriptReserved_AddParticle, &AddParticle);
+		table_misc.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
+		table_misc.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 
 		///Emit a shockwave.
 		//@function AddShockwave
@@ -490,5 +536,8 @@ namespace Misc
 		//@treturn float x coordinate as percentage
 		//@treturn float y coordinate as percentage
 		table_misc.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+
+		LuaHandler handler{ state };
+		handler.MakeReadOnlyTable(table_misc, ScriptReserved_BlendID, kBlendIDs);
 	}
 }
