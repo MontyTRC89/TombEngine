@@ -16,4 +16,28 @@ namespace TEN::Utils
 		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
 		return converter.to_bytes(std::wstring(source));
 	}
+
+	std::vector<std::string> SplitString(const std::string& source)
+	{
+		std::vector<std::string> strings;
+
+		// String is single-line, early exit
+		if (source.find('\n') == std::string::npos)
+		{
+			strings.push_back(source);
+			return strings;
+		}
+
+		std::string::size_type pos = 0;
+		std::string::size_type prev = 0;
+		while ((pos = source.find('\n', prev)) != std::string::npos)
+		{
+			strings.push_back(source.substr(prev, pos - prev));
+			prev = pos + 1;
+		}
+
+		strings.push_back(source.substr(prev));
+
+		return strings;
+	}
 }
