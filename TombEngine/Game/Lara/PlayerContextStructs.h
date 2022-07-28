@@ -2,13 +2,13 @@
 
 namespace TEN::Entities::Player
 {
-	struct MoveContextSetup
+	struct ContextGroundMovementSetup
 	{
-		short Angle = 0;
+		short Angle			  = 0;
 		int	  LowerFloorBound = 0;
 		int   UpperFloorBound = 0;
-		bool  CheckSlopeDown = true;
-		bool  CheckSlopeUp = true;
+		bool  CheckSlopeDown  = true;
+		bool  CheckSlopeUp	  = true;
 		bool  CheckDeathFloor = true;
 	};
 }

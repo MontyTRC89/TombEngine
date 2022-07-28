@@ -5,11 +5,8 @@
 #include "Game/control/los.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
+#include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/PlayerContextStructs.h"
-
-// -------
-// PUBLIC:
-// -------
 
 namespace TEN::Entities::Player
 {
@@ -19,21 +16,136 @@ namespace TEN::Entities::Player
 
 	bool PlayerContext::CanRunForward(ItemInfo* item, CollisionInfo* coll)
 	{
-		MoveContextSetup contextSetup
+		ContextGroundMovementSetup contextSetup =
 		{
 			item->Pose.Orientation.y,
 			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run forward state.
 			false, true, false
 		};
 
-		return GetMoveContext(item, coll, contextSetup);
+		return TestGroundMovementSetup(item, coll, contextSetup);
 	}
 
-	// --------
-	// PRIVATE:
-	// --------
+	bool PlayerContext::CanRunBack(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y + ANGLE(180.0f),
+			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run back state.
+			false, false, false
+		};
 
-	bool PlayerContext::GetMoveContext(ItemInfo* item, CollisionInfo* coll, MoveContextSetup contextSetup, bool useCrawlSetup)
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanWalkForward(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y,
+			STEPUP_HEIGHT, -STEPUP_HEIGHT, // Defined by walk forward state.
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanWalkBack(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y + ANGLE(180.0f),
+			STEPUP_HEIGHT, -STEPUP_HEIGHT // Defined by walk back state.
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+
+	bool PlayerContext::CanSidestepLeft(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y - ANGLE(90.0f),
+			int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by sidestep left state.
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanSidestepLeftSwamp(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y - ANGLE(90.0f),
+			NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by sidestep left state.
+			false, false, false
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanSidestepRight(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y + ANGLE(90.0f),
+			int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by step sideright state state.
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanSidestepRightSwamp(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y + ANGLE(90.0f),
+			NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by step right state.
+			false, false, false
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanWadeForwardSwamp(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y,
+			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by wade forward state.
+			false, false, false
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanWalkBackSwamp(ItemInfo* item, CollisionInfo* coll)
+	{
+		ContextGroundMovementSetup contextSetup =
+		{
+			item->Pose.Orientation.y + ANGLE(180.0f),
+			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by walk back state.
+			false, false, false
+		};
+
+		return TestGroundMovementSetup(item, coll, contextSetup);
+	}
+
+	bool PlayerContext::CanTurnFast(ItemInfo* item)
+	{
+		auto* lara = GetLaraInfo(item);
+
+		if (lara->Control.WaterStatus == WaterStatus::Dry &&
+			((lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
+				(lara->Control.HandStatus == HandStatus::WeaponDraw && lara->Control.Weapon.GunType != LaraWeaponType::Flare)))
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+	bool PlayerContext::TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextGroundMovementSetup contextSetup, bool useCrawlSetup)
 	{
 		// HACK: coll->Setup.Radius and coll->Setup.Height are set only in lara_col functions, then reset by LaraAboveWater() to defaults.
 		// This means they will store the wrong values for any move context assessments conducted in crouch/crawl lara_as functions.
