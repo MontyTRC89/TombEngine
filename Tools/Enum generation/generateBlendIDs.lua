@@ -11,7 +11,7 @@ local enumDesc = "Constants for blend mode IDs."
 local constantsDesc = "The following constants are inside BlendID."
 local tableDesc = "Table of constants to use when specifying a blend mode (e.g. when using particles)."
 
-local decl = "static const std::unordered_map<std::string, BLEND_MODE> kBlendIDs {"
+local decl = "static const std::unordered_map<std::string, BLEND_MODES> kBlendIDs {"
 local footer = [==[
 };
 ]==]
