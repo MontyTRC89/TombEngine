@@ -8,6 +8,11 @@ namespace TEN::Entities::Player
 {
 	class PlayerContext
 	{
+		// TODO: As a way of making the methods non-static and not require arguments, would this be weird?
+	/*private:
+		ItemInfo*	   PlayerItem;
+		CollisionInfo* PlayerColl;*/
+
 	public:
 		PlayerContext();
 
