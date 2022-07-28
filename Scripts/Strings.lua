@@ -9,8 +9,28 @@ local strings = {
 		"",
 		""
 	},
+	all = {
+		"All",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	apply = {
 		"Apply",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	auto_target = {
+		"Automatic targeting",
 		"",
 		"",
 		"",
@@ -259,6 +279,16 @@ local strings = {
 		"",
 		""
 	},
+	controls_pause = {
+		"Pause",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	controls_use_flare = {
 		"Use Flare",
 		"",
@@ -399,16 +429,6 @@ local strings = {
 		"",
 		""
 	},
-	sounds = {
-		"Audio settings",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
 	enable_sound = {
 		"Enable Sounds",
 		"",
@@ -490,7 +510,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo1 = {
-		"Grenadegun (Normal Ammo)",
+		"Grenade Gun Normal Ammo",
 		"",
 		"",
 		"",
@@ -500,7 +520,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo2 = {
-		"Grenadegun (Super Ammo)",
+		"Grenade Gun Super Ammo",
 		"",
 		"",
 		"",
@@ -510,7 +530,7 @@ local strings = {
 		""
 	},
 	grenade_launcher_ammo3 = {
-		"Grenadegun Flash Ammo",
+		"Grenade Gun Flash Ammo",
 		"",
 		"",
 		"",
@@ -519,8 +539,8 @@ local strings = {
 		"",
 		""
 	},
-	HARPOON_ITEM = {
-		"Harpoon Launcher",
+	harpoon_gun = {
+		"Harpoon Gun",
 		"",
 		"",
 		"",
@@ -530,7 +550,7 @@ local strings = {
 		""
 	},
 	harpoon_ammo = {
-		"Harpoon Launcher Ammo",
+		"Harpoon Gun Ammo",
 		"",
 		"",
 		"",
@@ -570,7 +590,7 @@ local strings = {
 		""
 	},
 	hk_burst_mode = {
-		"HK Burst mode",
+		"HK (Burst mode)",
 		"",
 		"",
 		"",
@@ -580,7 +600,7 @@ local strings = {
 		""
 	},
 	hk_rapid_mode = {
-		"HK Rapid mode",
+		"HK (Rapid mode)",
 		"",
 		"",
 		"",
@@ -610,7 +630,7 @@ local strings = {
 		""
 	},
 	lara_home = {
-		"Lara's home",
+		"Lara's Home",
 		"",
 		"",
 		"",
@@ -659,8 +679,38 @@ local strings = {
 		"",
 		""
 	},
+	none = {
+		"None",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	ok = {
 		"OK",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	options = {
+		"Options",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	other_settings = {
+		"Sound and Gameplay",
 		"",
 		"",
 		"",
@@ -709,8 +759,28 @@ local strings = {
 		"",
 		""
 	},
+	player = {
+		"Player",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	render_options = {
 		"Render Options",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	reverb = {
+		"Reverb",
 		"",
 		"",
 		"",
@@ -769,6 +839,16 @@ local strings = {
 		"",
 		""
 	},
+	rumble = {
+		"Vibration",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
 	save_game = {
 		"Save game",
 		"",
@@ -780,7 +860,7 @@ local strings = {
 		""
 	},
 	savegame_timestamp = {
-		"%d Days %d:%d:%d",
+		"%02d Days %02d:%02d:%02d",
 		"",
 		"",
 		"",
@@ -890,7 +970,7 @@ local strings = {
 		""
 	},
 	sound = {
-		"Sound settings",
+		"Sound",
 		"",
 		"",
 		"",
@@ -899,17 +979,7 @@ local strings = {
 		"",
 		""
 	},
-	special_sound_fx = {
-		"Special Sound FX",
-		"",
-		"",
-		"",
-		"",
-		"",
-		"",
-		""
-	},
-SILENCER_ITEM = {
+	silencer = {
 	"Silencer",
 		"",
 		"",
@@ -921,6 +991,16 @@ SILENCER_ITEM = {
 	},
 	statistics = {
 		"Statistics",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	},
+	thumbstick_camera = {
+		"Thumbstick camera",
 		"",
 		"",
 		"",
@@ -1169,8 +1249,8 @@ SILENCER_ITEM = {
 		"",
 		""
 	},
-	torch = {
-		"Torch",
+	torch2 = {
+		"Torch2",
 		"",
 		"",
 		"",
@@ -1291,7 +1371,7 @@ SILENCER_ITEM = {
 	}
 }
 
-SetStrings(strings)
+TEN.Flow.SetStrings(strings)
 
 local languages = {
 	"English",
@@ -1304,5 +1384,5 @@ local languages = {
 	"Russian"
 }
 
-SetLanguageNames(languages)
+TEN.Flow.SetLanguageNames(languages)
 
