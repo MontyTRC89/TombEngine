@@ -2,7 +2,6 @@ local Timer
 
 LevelVars.__TEN_timer = {timers = {}}
 
--- todo: var args for func, timers that loop
 Timer = {
 	Create = function(name, totalTime, loop, func, ...)
 		local obj = {}
@@ -66,7 +65,6 @@ Timer = {
 	end;
 
 	Update = function(t, dt)
-		print(t.remainingTime)
 		if t.active then
 			t.remainingTime = t.remainingTime - dt
 
