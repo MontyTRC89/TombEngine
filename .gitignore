@@ -1,9 +1,12 @@
+enc_temp_folder/
 Build/
-TR5Main/CustomObjects/
-TR5Main/x64/
-TR5Main/Debug/
-TR5Main/Release/
+TombEngine/CustomObjects/
+TombEngine/x64/
+TombEngine/Debug/
+TombEngine/Release
+TombEngine/Legacy Engine Objects
 x64/
+packages/
 .vs/
 *.dll
 *.dmp
