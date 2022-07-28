@@ -1075,16 +1075,16 @@ bool TestLaraKeepLow(ItemInfo* item, CollisionInfo* coll)
 	// Assess front.
 	if (abs(probeFront.Position.Ceiling - probeFront.Position.Floor) < LARA_HEIGHT &&		// Front space is low enough.
 		abs(probeFront.Position.Ceiling - probeFront.Position.Floor) > LARA_HEIGHT_CRAWL && // Front space not a clamp.
-		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) <= (CLICK(1) - 1) &&	// Front is withing upper/lower floor bounds.
+		abs(probeFront.Position.Floor - probeMiddle.Position.Floor) <= CRAWL_STEPUP_HEIGHT &&	// Front is withing upper/lower floor bounds.
 		probeFront.Position.Floor != NO_HEIGHT)
 	{
 		return true;
 	}
 
 	// Assess back.
-	if (abs(probeBack.Position.Ceiling - probeBack.Position.Floor) < LARA_HEIGHT &&		  // Back space is low enough.
-		abs(probeBack.Position.Ceiling - probeBack.Position.Floor) > LARA_HEIGHT_CRAWL && // Back space not a clamp.
-		abs(probeBack.Position.Floor - probeMiddle.Position.Floor) <= (CLICK(1) - 1) &&	  // Back is withing upper/lower floor bounds.
+	if (abs(probeBack.Position.Ceiling - probeBack.Position.Floor) < LARA_HEIGHT &&			 // Back space is low enough.
+		abs(probeBack.Position.Ceiling - probeBack.Position.Floor) > LARA_HEIGHT_CRAWL &&	 // Back space not a clamp.
+		abs(probeBack.Position.Floor - probeMiddle.Position.Floor) <= CRAWL_STEPUP_HEIGHT && // Back is withing upper/lower floor bounds.
 		probeBack.Position.Floor != NO_HEIGHT)
 	{
 		return true;
@@ -1654,7 +1654,7 @@ CrawlVaultTestResult TestLaraCrawlUpStep(ItemInfo* item, CollisionInfo* coll)
 		int(CLICK(0.6f)),
 		int(CLICK(1.2f)),
 		int(CLICK(2)),
-		int(CLICK(1) - 1)
+		CRAWL_STEPUP_HEIGHT
 	};
 
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
@@ -1671,7 +1671,7 @@ CrawlVaultTestResult TestLaraCrawlDownStep(ItemInfo* item, CollisionInfo* coll)
 		int(CLICK(0.6f)),
 		int(CLICK(1.2f)),
 		int(CLICK(2)),
-		int(CLICK(1) - 1)
+		CRAWL_STEPUP_HEIGHT
 	};
 
 	return TestLaraCrawlVaultTolerance(item, coll, testSetup);
@@ -2233,12 +2233,10 @@ bool TestLaraCrawlspaceDive(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
-
 	auto probe = GetCollision(item);
 
 	if (probe.Position.Floor == item->Pose.Position.y &&
-		lara->Control.Tightrope.CanDismount)
+		GetLaraInfo(item)->Control.Tightrope.CanDismount)
 	{
 		return true;
 	}
@@ -2248,7 +2246,7 @@ bool TestLaraTightropeDismount(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool up, float offset)
 {
-	static constexpr auto poleProbeCollRadius = 16.0f;
+	static constexpr float poleProbeCollRadius = 16.0f;
 
 	bool atLeastOnePoleCollided = false;
 
@@ -2264,7 +2262,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool up, float o
 		//g_Renderer.AddDebugSphere(sphere.Center, 16.0f, Vector4(1, 0, 0, 1), RENDERER_DEBUG_PAGE::LOGIC_STATS);
 
 		int i = 0;
-		while (CollidedItems[i] != NULL)
+		while (CollidedItems[i] != nullptr)
 		{
 			auto*& object = CollidedItems[i];
 			i++;

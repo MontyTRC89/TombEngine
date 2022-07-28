@@ -34,7 +34,7 @@ void lara_as_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	// TODO: Deplete air meter if Lara's head is below the water. Original implementation had a weird buffer zone before
 	// wade depth where Lara couldn't crouch at all, and if the player forced her into the crouched state by
 	// crouching into the region from a run as late as possible, she wasn't able to turn or begin crawling.
-	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. @Sezz 2021.10.21
+	// Since Lara can now crawl at a considerable depth, a region of peril would make sense. -- Sezz 2021.10.21
 
 	auto* lara = GetLaraInfo(item);
 
@@ -116,8 +116,8 @@ void lara_col_crouch_idle(ItemInfo* item, CollisionInfo* coll)
 	lara->ExtraTorsoRot = Vector3Shrt();
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
+	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.BlockFloorSlopeDown = true;
@@ -177,8 +177,8 @@ void lara_col_crouch_roll(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.IsLow = true;
 	lara->Control.MoveAngle = item->Pose.Orientation.y;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
+	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
 	coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeUp = true;
@@ -481,8 +481,8 @@ void lara_col_crawl_idle(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
+	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
 	coll->Setup.BlockFloorSlopeUp = true;
 	coll->Setup.BlockFloorSlopeDown = true;
@@ -569,8 +569,8 @@ void lara_col_crawl_forward(ItemInfo* item, CollisionInfo* coll)
 	lara->ExtraTorsoRot.y = 0;
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;		// Offset of 1 is required or Lara will crawl up/down full steps.
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);	// TODO: Stepping approach is different from walk/run. Resolve this someday. @Sezz 2021.10.31
+	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.BlockFloorSlopeUp = true;
@@ -655,8 +655,8 @@ void lara_col_crawl_back(ItemInfo* item, CollisionInfo* coll)
 	lara->Control.MoveAngle = item->Pose.Orientation.y + ANGLE(180.0f);
 	coll->Setup.Radius = LARA_RADIUS_CRAWL;
 	coll->Setup.Height = LARA_HEIGHT_CRAWL;
-	coll->Setup.LowerFloorBound = CLICK(1) - 1;	// Offset of 1 is required or Lara will crawl up/down full steps.
-	coll->Setup.UpperFloorBound = -(CLICK(1) - 1);
+	coll->Setup.LowerFloorBound = CRAWL_STEPUP_HEIGHT;
+	coll->Setup.UpperFloorBound = -CRAWL_STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = LARA_HEIGHT_CRAWL;
 	coll->Setup.BlockFloorSlopeDown = true;
 	coll->Setup.BlockFloorSlopeUp = true;

@@ -193,7 +193,7 @@ namespace TEN::Entities::Player
 			distance += CLICK(1);
 			auto probeB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
 
-			if (abs(probeA.Position.Floor - probeB.Position.Floor) > (CLICK(1) - 1) ||		 // Avoid floor differences beyond crawl stepup threshold.
+			if (abs(probeA.Position.Floor - probeB.Position.Floor) > CRAWL_STEPUP_HEIGHT ||	 // Avoid floor differences beyond crawl stepup threshold.
 				abs(probeB.Position.Ceiling - probeB.Position.Floor) <= LARA_HEIGHT_CRAWL || // Avoid narrow spaces.
 				probeB.Position.FloorSlope)													 // Avoid slopes.
 			{
@@ -211,7 +211,7 @@ namespace TEN::Entities::Player
 		ContextSetupGroundMovement contextSetup =
 		{
 			item->Pose.Orientation.y,
-			CLICK(1) - 1, -(CLICK(1) - 1) // Defined by crawl forward state.
+			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl forward state.
 		};
 
 		return PlayerContext::TestGroundMovementSetup(item, coll, contextSetup, true);
@@ -222,7 +222,7 @@ namespace TEN::Entities::Player
 		ContextSetupGroundMovement contextSetup =
 		{
 			item->Pose.Orientation.y + ANGLE(180.0f),
-			CLICK(1) - 1, -(CLICK(1) - 1) // Defined by crawl back state.
+			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl back state.
 		};
 
 		return PlayerContext::TestGroundMovementSetup(item, coll, contextSetup, true);
