@@ -68,12 +68,6 @@ bool TestLaraStepUp(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraStepDown(ItemInfo* item, CollisionInfo* coll);
 bool TestLaraMonkeyStep(ItemInfo* item, CollisionInfo* coll);
 
-bool TestLaraMonkeyMoveTolerance(ItemInfo* item, CollisionInfo* coll, MonkeyMoveTestSetup testSetup);
-bool TestLaraMonkeyForward(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyBack(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
-bool TestLaraMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
-
 VaultTestResult TestLaraVaultTolerance(ItemInfo* item, CollisionInfo* coll, VaultTestSetup testSetup);
 VaultTestResult TestLaraVault2Steps(ItemInfo* item, CollisionInfo* coll);
 VaultTestResult TestLaraVault3Steps(ItemInfo* item, CollisionInfo* coll);

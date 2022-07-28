@@ -1,22 +1,5 @@
 #pragma once
 
-struct MoveTestSetup
-{
-	short Angle;
-	int	LowerFloorBound;
-	int UpperFloorBound;
-	bool CheckSlopeDown = true;
-	bool CheckSlopeUp = true;
-	bool CheckDeath = true;
-};
-
-struct MonkeyMoveTestSetup
-{
-	short Angle;
-	int LowerCeilingBound;
-	int UpperCeilingBound;
-};
-
 struct VaultTestSetup
 {
 	int LowerFloorBound;

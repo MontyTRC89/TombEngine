@@ -2,7 +2,7 @@
 
 namespace TEN::Entities::Player
 {
-	struct ContextGroundMovementSetup
+	struct ContextSetupGroundMovement
 	{
 		short Angle			  = 0;
 		int	  LowerFloorBound = 0;
@@ -11,4 +11,12 @@ namespace TEN::Entities::Player
 		bool  CheckSlopeUp	  = true;
 		bool  CheckDeathFloor = true;
 	};
+
+	struct ContextSetupMonkeyMovement
+	{
+		short Angle				= 0;
+		int	  LowerCeilingBound = 0;
+		int   UpperCeilingBound = 0;
+	};
+
 }

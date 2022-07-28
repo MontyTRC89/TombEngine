@@ -35,12 +35,18 @@ namespace TEN::Entities::Player
 		static bool CanCrawlBack(ItemInfo* item, CollisionInfo* coll);
 
 		// Monkey swing movement
+		static bool CanMonkeyForward(ItemInfo* item, CollisionInfo* coll);
+		static bool CanMonkeyBack(ItemInfo* item, CollisionInfo* coll);
+		static bool CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll);
+		static bool CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll);
+
 		// Vault movement
 		// Crawl vault movement
 		// Water tread climb out movement
 		// Miscellaneous movement
 
 	private:
-		static bool TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextGroundMovementSetup contextSetup, bool useCrawlSetup = false);
+		static bool TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextSetupGroundMovement contextSetup, bool useCrawlSetup = false);
+		static bool TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextSetupMonkeyMovement contextSetup);
 	};
 }
