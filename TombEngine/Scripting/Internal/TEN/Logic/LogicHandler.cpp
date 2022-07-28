@@ -108,6 +108,12 @@ void LogicHandler::ResetScripts(bool clearGameVars)
 {
 	FreeLevelScripts();
 
+	auto currentPackage = m_handler.GetState()->get<sol::table>("package");
+	auto currentLoaded = currentPackage.get<sol::table>("loaded");
+
+	for(auto & [first, second] : currentLoaded)
+		currentLoaded[first] = sol::nil;
+
 	if(clearGameVars)
 		ResetGameTables();
 
