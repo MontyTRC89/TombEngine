@@ -3013,11 +3013,11 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 							nummeup = count;
 							break;
 
-						case ID_ROCKET_LAUNCHER_ITEM:
+						case ID_ROCKET_LAUNCHER_AMMO_ITEM:
 							nummeup = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
-						case ID_HARPOON_ITEM:
+						case ID_HARPOON_AMMO_ITEM:
 							nummeup = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
