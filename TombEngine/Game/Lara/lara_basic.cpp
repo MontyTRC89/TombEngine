@@ -463,7 +463,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 					return;
 				}
 			}
-			else if (TestLaraRunForward(item, coll))
+			else if (lara->Context.CanRunForward(item, coll))
 			{
 				item->Animation.TargetState = LS_WADE_FORWARD;
 				return;

@@ -1,6 +1,11 @@
 #pragma once
+#include "Game/Lara/PlayerContext.h"
 #include "Objects/objectslist.h"
 #include "Specific/trmath.h"
+
+struct CreatureInfo;
+struct FX_INFO;
+struct ItemInfo;
 
 #define NUM_PUZZLES	(ID_PUZZLE_ITEM16 - ID_PUZZLE_ITEM1 + 1)
 #define NUM_PUZZLE_PIECES	(ID_PUZZLE_ITEM16_COMBO2 - ID_PUZZLE_ITEM1_COMBO1 + 1)
@@ -10,10 +15,6 @@
 #define NUM_PICKUPS_PIECES	(ID_PICKUP_ITEM16_COMBO2 - ID_PICKUP_ITEM1_COMBO1 + 1)
 #define NUM_EXAMINES (ID_EXAMINE8 - ID_EXAMINE1 + 1)
 #define NUM_EXAMINES_PIECES	(ID_EXAMINE8_COMBO2 - ID_EXAMINE1_COMBO1 + 1)
-
-struct CreatureInfo;
-struct ItemInfo;
-struct FX_INFO;
 
 namespace TEN::Renderer
 {
@@ -1256,6 +1257,8 @@ struct LaraInfo
 	CarriedWeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 	FlareData Flare;
 	TorchData Torch;
+
+	TEN::Entities::Player::PlayerContext Context;
 
 	Vector3Shrt ExtraHeadRot;
 	Vector3Shrt ExtraTorsoRot;
