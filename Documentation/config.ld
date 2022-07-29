@@ -1,4 +1,4 @@
-file = "../TombEngine/Scripting/Internal"
+file = {"../TombEngine/Scripting/Internal", "../Scripts"}
 new_type("mem", "Members", false)
 new_type("files", "Script Files", true)
 new_type("entityclass", "Entity classes", true)
@@ -8,6 +8,7 @@ new_type("tentable", "1 Modules", true)
 new_type("tenclass", "2 Classes", true)
 new_type("tenprimitive", "3 Primitive Classes", true)
 new_type("enum", "4 Enums", true)
+new_type("luautil", "5 Lua utility modules", true)
 project = "TombEngine"
 title = "TombEngine Lua API"
 description = "TombEngine scripting interface"
