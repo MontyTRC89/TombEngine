@@ -106,16 +106,24 @@
 	<td class="summary">Emit dynamic light that lasts for a single frame.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#AddFire">AddFire(pos, size)</a></td>
+	<td class="name" ><a href="#EmitBlood">EmitBlood(pos, count)</a></td>
 	<td class="summary">Emit blood.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#AddExplosion">AddExplosion(pos, size, shockwave)</a></td>
-	<td class="summary">Emit explosion.</td>
+	<td class="name" ><a href="#EmitFire">EmitFire(pos, size)</a></td>
+	<td class="summary">Emit fire for one frame.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#AddBlood">AddBlood(pos, amount)</a></td>
-	<td class="summary">Emit blood.</td>
+	<td class="name" ><a href="#MakeExplosion">MakeExplosion(pos, size, shockwave)</a></td>
+	<td class="summary">Make an explosion.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#MakeEarthquake">MakeEarthquake(strength)</a></td>
+	<td class="summary">Make an earthquake</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#FlashScreen">FlashScreen(color, speed)</a></td>
+	<td class="summary">Flash screen.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Earthquake">Earthquake(strength)</a></td>
@@ -124,10 +132,6 @@
 	<tr>
 	<td class="name" ><a href="#Vibrate">Vibrate(strength, time)</a></td>
 	<td class="summary">Vibrate gamepad, if possible.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#FlashScreen">FlashScreen(color, speed)</a></td>
-	<td class="summary">Flash screen.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#FadeIn">FadeIn(speed)</a></td>
@@ -299,11 +303,11 @@
         </li>
         <li><span class="parameter">startColor</span>
             <span class="types"><span class="type">Color</span></span>
-         (default 255, 255, 255) color at start of life
+         (default Color(255, 255, 255)) color at start of life
         </li>
         <li><span class="parameter">endColor</span>
             <span class="types"><span class="type">Color</span></span>
-         (default 255, 255, 255) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
+         (default Color(255, 255, 255)) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><span class="type">BlendID</span></span>
@@ -378,7 +382,7 @@
         </li>
         <li><span class="parameter">color</span>
             <span class="types"><span class="type">Color</span></span>
-         (default 255, 255, 255)
+         (default Color(255, 255, 255))
         </li>
         <li><span class="parameter">lifetime</span>
             <span class="types"><span class="type">float</span></span>
@@ -422,7 +426,7 @@
         </li>
         <li><span class="parameter">color</span>
             <span class="types"><span class="type">Color</span></span>
-         (default 255, 255, 255)
+         (default Color(255, 255, 255))
         </li>
         <li><span class="parameter">radius</span>
             <span class="types"><span class="type">int</span></span>
@@ -436,8 +440,8 @@
 
 </dd>
     <dt>
-    <a name = "AddFire"></a>
-    <strong>AddFire(pos, size)</strong>
+    <a name = "EmitBlood"></a>
+    <strong>EmitBlood(pos, count)</strong>
     </dt>
     <dd>
     Emit blood.
@@ -451,11 +455,9 @@
 
 
         </li>
-        <li><span class="parameter">size</span>
+        <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-
-
-
+         (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
         </li>
     </ul>
 
@@ -465,11 +467,11 @@
 
 </dd>
     <dt>
-    <a name = "AddExplosion"></a>
-    <strong>AddExplosion(pos, size, shockwave)</strong>
+    <a name = "EmitFire"></a>
+    <strong>EmitFire(pos, size)</strong>
     </dt>
     <dd>
-    Emit explosion.
+    Emit fire for one frame.  Will not hurt Lara. Call this each frame if you want a continuous fire.
 
 
     <h3>Parameters:</h3>
@@ -482,13 +484,7 @@
         </li>
         <li><span class="parameter">size</span>
             <span class="types"><span class="type">float</span></span>
-
-
-
-        </li>
-        <li><span class="parameter">shockwave</span>
-            <span class="types"><span class="type">bool</span></span>
-         (default: false)
+         (default 1.0)
         </li>
     </ul>
 
@@ -498,11 +494,11 @@
 
 </dd>
     <dt>
-    <a name = "AddBlood"></a>
-    <strong>AddBlood(pos, amount)</strong>
+    <a name = "MakeExplosion"></a>
+    <strong>MakeExplosion(pos, size, shockwave)</strong>
     </dt>
     <dd>
-    Emit blood.
+    Make an explosion.  Does not hurt Lara
 
 
     <h3>Parameters:</h3>
@@ -513,11 +509,59 @@
 
 
         </li>
-        <li><span class="parameter">amount</span>
+        <li><span class="parameter">size</span>
+            <span class="types"><span class="type">float</span></span>
+         (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
+        </li>
+        <li><span class="parameter">shockwave</span>
+            <span class="types"><span class="type">bool</span></span>
+         (default false) if true, create a very faint white shockwave which will not hurt Lara
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "MakeEarthquake"></a>
+    <strong>MakeEarthquake(strength)</strong>
+    </dt>
+    <dd>
+    Make an earthquake
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">strength</span>
             <span class="types"><span class="type">int</span></span>
+         (default 100) How strong should the earthquake be? Increasing this value also increases the lifespan of the earthquake.
+        </li>
+    </ul>
 
 
 
+
+
+</dd>
+    <dt>
+    <a name = "FlashScreen"></a>
+    <strong>FlashScreen(color, speed)</strong>
+    </dt>
+    <dd>
+    Flash screen.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">color</span>
+            <span class="types"><span class="type">Color</span></span>
+         (default Color(255, 255, 255))
+        </li>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         (default 1.0). Speed in "amount" per second. A value of 1 will make the flash take one second. Clamped to [0.005, 1.0]
         </li>
     </ul>
 
@@ -568,33 +612,6 @@
         <li><span class="parameter">time</span>
             <span class="types"><span class="type">float</span></span>
          (in seconds, default: 0.3)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "FlashScreen"></a>
-    <strong>FlashScreen(color, speed)</strong>
-    </dt>
-    <dd>
-    Flash screen.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">color</span>
-            <span class="types"><span class="type">ScriptColor</span></span>
-
-
-
-        </li>
-        <li><span class="parameter">speed</span>
-            <span class="types"><span class="type">float</span></span>
-         (default: 1 second)
         </li>
     </ul>
 
@@ -1037,7 +1054,7 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
-<i style="float:right;">Last updated 2022-07-29 17:35:28 </i>
+<i style="float:right;">Last updated 2022-07-29 19:07:58 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
