@@ -230,19 +230,60 @@ namespace Misc
 		s->gravity  = grav;
 	}
 
-	static void AddShockwave(Vec3 pos, int innerRadius, int outerRadius, ScriptColor color, int lifetime, int speed, int angle, int flags)
+	
+/***Emit a shockwave, similar to that seen when a harpy projectile hits something.
+	@function EmitShockwave
+	@tparam Vec3 pos Origin position
+	@tparam int innerRadius (default 0) Initial inner radius of the shockwave circle - 128 will be approx a click, 512 approx a block
+	@tparam int outerRadius (default 128) Initial outer radius of the shockwave circle
+	@tparam Color color (default 255, 255, 255)
+	@tparam float lifetime (default 1.0) Lifetime in seconds (max 8.5 because of inner maths weirdness)
+	@tparam int speed (default 50) Initial speed of the shockwave's expansion (the shockwave will always slow as it goes)
+	@tparam int angle (default 0) Angle about the X axis - a value of 90 will cause the shockwave to be entirely vertical
+	@tparam bool hurtsLara (default false) If true, the shockwave will hurt Lara, with the damage being relative to the shockwave's current speed
+*/
+	static void EmitShockwave(Vec3 pos, TypeOrNil<int> innerRadius, TypeOrNil<int> outerRadius, TypeOrNil<ScriptColor> col, TypeOrNil<float> lifetime, TypeOrNil<int> speed, TypeOrNil<int> angle, TypeOrNil<bool> hurtsLara)
 	{
 		PHD_3DPOS p;
 		p.Position.x = pos.x;
 		p.Position.y = pos.y;
 		p.Position.z = pos.z;
 
-		TriggerShockwave(&p, innerRadius, outerRadius, speed, color.GetR(), color.GetG(), color.GetB(), lifetime, FROM_DEGREES(angle), flags);
+		int iRad = USE_IF_HAVE(int, innerRadius, 0);
+		int oRad = USE_IF_HAVE(int, outerRadius, 128);
+
+		ScriptColor color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
+
+		int spd = USE_IF_HAVE(int, speed, 50);
+
+		int ang = USE_IF_HAVE(int, angle, 0);
+
+		constexpr auto kMaxLifeSeconds = 8.5f; 
+		float life = USE_IF_HAVE(float, lifetime, 1.0f);
+		life = std::clamp(life, 0.0f, kMaxLifeSeconds);
+
+		constexpr float secsPerFrame = 1.0f / (float)FPS;
+
+		// This will put us in the range [0, 255]
+		int lifeInFrames = (int)round(life / secsPerFrame);
+
+		bool damage = USE_IF_HAVE(bool, hurtsLara, false);
+
+		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, FROM_DEGREES(ang), short(damage));
 	}
 
-	static void AddLight(Vec3 pos, ScriptColor color, int radius)
+/**Emit dynamic light that lasts for a single frame.
+ * If you want a light that sticks around, you must call this each frame.
+@function EmitLight
+@tparam Vec3 pos
+@tparam Color color (default 255, 255, 255)
+@tparam int radius (default 20) corresponds loosely to both intensity and range
+*/
+	static void EmitLight(Vec3 pos, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius)
 	{
-		TriggerDynamicLight(pos.x, pos.y, pos.z, radius, color.GetR(), color.GetG(), color.GetB());
+		ScriptColor color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
+		int rad = USE_IF_HAVE(int, radius, 20);
+		TriggerDynamicLight(pos.x, pos.y, pos.z, rad, color.GetR(), color.GetG(), color.GetB());
 	}
 
 	static void AddBlood(Vec3 pos, int num)
@@ -370,24 +411,9 @@ namespace Misc
 		table_misc.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		table_misc.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 
-		///Emit a shockwave.
-		//@function AddShockwave
-		//@tparam Vec3 pos
-		//@tparam int innerRadius
-		//@tparam int outerRadius
-		//@tparam ScriptColor color
-		//@tparam int lifetime
-		//@tparam int speed
-		//@tparam int angle
-		//@tparam int flags
-		table_misc.set_function(ScriptReserved_AddShockwave, &AddShockwave);
+		table_misc.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
 
-		///Emit dynamic light.
-		//@function AddLight
-		//@tparam Vec3 pos
-		//@tparam ScriptColor color
-		//@tparam int radius
-		table_misc.set_function(ScriptReserved_AddLight, &AddLight);
+		table_misc.set_function(ScriptReserved_EmitLight, &EmitLight);
 
 		///Emit blood.
 		//@function AddFire

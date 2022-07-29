@@ -131,8 +131,8 @@ static constexpr char ScriptReserved_HasLineOfSight[]				= "HasLineOfSight";
 
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
-static constexpr char ScriptReserved_AddShockwave[]					= "AddShockwave";
-static constexpr char ScriptReserved_AddLight[]						= "AddLight";
+static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
+static constexpr char ScriptReserved_EmitLight[]					= "EmitLight";
 static constexpr char ScriptReserved_AddBlood[]						= "AddBlood";
 static constexpr char ScriptReserved_AddFire[]						= "AddFire";
 static constexpr char ScriptReserved_AddExplosion[]					= "AddExplosion";
