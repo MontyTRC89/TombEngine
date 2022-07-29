@@ -1,7 +1,7 @@
 -----
 --- Basic timer - after a specified number of seconds, the specified thing happens.
 -- Usage:
---	timer = require("Timer")
+--	local Timer = require("Timer")
 --
 --	LevelFuncs.FinishTimer = function(healthWhenStarted, victoryMessage)
 --		DoSomething(healthWhenStarted, victoryMessage)
@@ -10,6 +10,10 @@
 --	LevelFuncs.TriggerTimer = function(obj) 
 --		local myTimer = Timer.Create("my_timer", 5.0, false, "FinishTimer", Lara:GetHP(), "Well done!")
 --		myTimer:Start()
+--	end
+--
+--	LevelFuncs.OnControlPhase = function(dt)
+--		Timer.UpdateAll(dt)
 --	end
 --
 -- @luautil Timer
