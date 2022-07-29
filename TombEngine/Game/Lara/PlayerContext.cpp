@@ -14,13 +14,17 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Player
 {
-	PlayerContext::PlayerContext()
+	PlayerContext::PlayerContext() {}
+
+	PlayerContext::PlayerContext(ItemInfo* item, CollisionInfo* coll)
 	{
+		PlayerItemPtr = item;
+		PlayerCollPtr = coll;
 	}
 
-	bool PlayerContext::CanTurnFast(ItemInfo* item)
+	bool PlayerContext::CanTurnFast()
 	{
-		auto* lara = GetLaraInfo(item);
+		auto* lara = GetLaraInfo(PlayerItemPtr);
 
 		if (lara->Control.WaterStatus == WaterStatus::Dry &&
 			((lara->Control.HandStatus == HandStatus::WeaponReady && lara->Control.Weapon.GunType != LaraWeaponType::Torch) ||
@@ -32,129 +36,129 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanRunForward(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanRunForward()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y,
+			PlayerItemPtr->Pose.Orientation.y,
 			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run forward state.
 			false, true, false
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanRunBack(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanRunBack()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
 			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by run back state.
 			false, false, false
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanWalkForward(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanWalkForward()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y,
+			PlayerItemPtr->Pose.Orientation.y,
 			STEPUP_HEIGHT, -STEPUP_HEIGHT, // Defined by walk forward state.
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanWalkBack(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanWalkBack()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
 			STEPUP_HEIGHT, -STEPUP_HEIGHT // Defined by walk back state.
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
 
-	bool PlayerContext::CanSidestepLeft(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanSidestepLeft()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y - ANGLE(90.0f),
+			PlayerItemPtr->Pose.Orientation.y - ANGLE(90.0f),
 			int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by sidestep left state.
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanSidestepLeftSwamp(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanSidestepLeftSwamp()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y - ANGLE(90.0f),
+			PlayerItemPtr->Pose.Orientation.y - ANGLE(90.0f),
 			NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by sidestep left state.
 			false, false, false
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanSidestepRight(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanSidestepRight()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(90.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(90.0f),
 			int(CLICK(0.8f)), int(-CLICK(0.8f)) // Defined by sidestep right state state.
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanSidestepRightSwamp(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanSidestepRightSwamp()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(90.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(90.0f),
 			NO_LOWER_BOUND, int(-CLICK(0.8f)), // Defined by sidestep right state.
 			false, false, false
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanWadeForwardSwamp(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanWadeForwardSwamp()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y,
+			PlayerItemPtr->Pose.Orientation.y,
 			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by wade forward state.
 			false, false, false
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanWalkBackSwamp(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanWalkBackSwamp()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
 			NO_LOWER_BOUND, -STEPUP_HEIGHT, // Defined by walk back state.
 			false, false, false
 		};
 
-		return TestGroundMovementSetup(item, coll, contextSetup);
+		return this->TestGroundMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanCrouch(ItemInfo* item)
+	bool PlayerContext::CanCrouch()
 	{
-		auto* lara = GetLaraInfo(item);
+		auto* lara = GetLaraInfo(PlayerItemPtr);
 
 		if (lara->Control.WaterStatus != WaterStatus::Wade &&
-			(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(item, lara->Control.Weapon.GunType)))
+			(lara->Control.HandStatus == HandStatus::Free || !IsStandingWeapon(PlayerItemPtr, lara->Control.Weapon.GunType)))
 		{
 			return true;
 		}
@@ -162,9 +166,9 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanCrouchToCrawl(ItemInfo* item)
+	bool PlayerContext::CanCrouchToCrawl()
 	{
-		auto* lara = GetLaraInfo(item);
+		auto* lara = GetLaraInfo(PlayerItemPtr);
 
 		if (!(TrInput & (IN_FLARE | IN_DRAW)) &&					  // Avoid unsightly concurrent actions.
 			lara->Control.HandStatus == HandStatus::Free &&			  // Hands are free.
@@ -177,9 +181,9 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::CanCrouchRoll(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanCrouchRoll()
 	{
-		auto* lara = GetLaraInfo(item);
+		auto* lara = GetLaraInfo(PlayerItemPtr);
 
 		// 1. Assess water depth.
 		if (lara->WaterSurfaceDist < -CLICK(1)) // TODO: Demagic: LARA_CRAWL_WATER_HEIGHT_MAX
@@ -187,11 +191,11 @@ namespace TEN::Entities::Player
 
 		// 2. Assess continuity of path.
 		int distance = 0;
-		auto probeA = GetCollision(item);
+		auto probeA = GetCollision(PlayerItemPtr);
 		while (distance < SECTOR(1))
 		{
 			distance += CLICK(1);
-			auto probeB = GetCollision(item, item->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
+			auto probeB = GetCollision(PlayerItemPtr, PlayerItemPtr->Pose.Orientation.y, distance, -LARA_HEIGHT_CRAWL);
 
 			if (abs(probeA.Position.Floor - probeB.Position.Floor) > CRAWL_STEPUP_HEIGHT ||	 // Avoid floor differences beyond crawl stepup threshold.
 				abs(probeB.Position.Ceiling - probeB.Position.Floor) <= LARA_HEIGHT_CRAWL || // Avoid narrow spaces.
@@ -206,83 +210,83 @@ namespace TEN::Entities::Player
 		return true;
 	}
 
-	bool PlayerContext::CanCrawlForward(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanCrawlForward()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y,
+			PlayerItemPtr->Pose.Orientation.y,
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl forward state.
 		};
 
-		return PlayerContext::TestGroundMovementSetup(item, coll, contextSetup, true);
+		return this->TestGroundMovementSetup(contextSetup, true);
 	}
 
-	bool PlayerContext::CanCrawlBack(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanCrawlBack()
 	{
 		ContextSetupGroundMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
 			CRAWL_STEPUP_HEIGHT, -CRAWL_STEPUP_HEIGHT // Defined by crawl back state.
 		};
 
-		return PlayerContext::TestGroundMovementSetup(item, coll, contextSetup, true);
+		return this->TestGroundMovementSetup(contextSetup, true);
 	}
 
-	bool PlayerContext::CanMonkeyForward(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanMonkeyForward()
 	{
 		ContextSetupMonkeyMovement contextSetup =
 		{
-			item->Pose.Orientation.y,
+			PlayerItemPtr->Pose.Orientation.y,
 			int(CLICK(1.25f)), int(-CLICK(1.25f)) // Defined by monkey forward state.
 		};
 
-		return TestMonkeyMovementSetup(item, coll, contextSetup);
+		return TestMonkeyMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanMonkeyBack(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanMonkeyBack()
 	{
 		ContextSetupMonkeyMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(180.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(180.0f),
 			int(CLICK(1.25f)), int(-CLICK(1.25f)) // Defined by monkey back state.
 		};
 
-		return PlayerContext::TestMonkeyMovementSetup(item, coll, contextSetup);
+		return TestMonkeyMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanMonkeyShimmyLeft(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanMonkeyShimmyLeft()
 	{
 		ContextSetupMonkeyMovement contextSetup =
 		{
-			item->Pose.Orientation.y - ANGLE(90.0f),
+			PlayerItemPtr->Pose.Orientation.y - ANGLE(90.0f),
 			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy left state.
 		};
 
-		return PlayerContext::TestMonkeyMovementSetup(item, coll, contextSetup);
+		return TestMonkeyMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::CanMonkeyShimmyRight(ItemInfo* item, CollisionInfo* coll)
+	bool PlayerContext::CanMonkeyShimmyRight()
 	{
 		ContextSetupMonkeyMovement contextSetup =
 		{
-			item->Pose.Orientation.y + ANGLE(90.0f),
+			PlayerItemPtr->Pose.Orientation.y + ANGLE(90.0f),
 			int(CLICK(0.5f)), int(-CLICK(0.5f)) // Defined by monkey shimmy right state.
 		};
 
-		return PlayerContext::TestMonkeyMovementSetup(item, coll, contextSetup);
+		return TestMonkeyMovementSetup(contextSetup);
 	}
 
-	bool PlayerContext::TestGroundMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextSetupGroundMovement contextSetup, bool useCrawlSetup)
+	bool PlayerContext::TestGroundMovementSetup(ContextSetupGroundMovement contextSetup, bool useCrawlSetup)
 	{
-		// HACK: coll->Setup.Radius and coll->Setup.Height are set only in lara_col functions, then reset by LaraAboveWater() to defaults.
+		// HACK: PlayerCollPtr->Setup.Radius and PlayerCollPtr->Setup.Height are set only in lara_col functions, then reset by LaraAboveWater() to defaults.
 		// This means they will store the wrong values for any move context assessments conducted in crouch/crawl lara_as functions.
 		// When states become objects, a dedicated state init function should eliminate the need for the useCrawlSetup parameter. -- Sezz 2022.03.16
-		int playerRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : coll->Setup.Radius;
-		int playerHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : coll->Setup.Height;
+		int playerRadius = useCrawlSetup ? LARA_RADIUS_CRAWL : PlayerCollPtr->Setup.Radius;
+		int playerHeight = useCrawlSetup ? LARA_HEIGHT_CRAWL : PlayerCollPtr->Setup.Height;
 
-		int yPos = item->Pose.Position.y;
+		int yPos = PlayerItemPtr->Pose.Position.y;
 		int yPosTop = yPos - playerHeight;
-		auto probe = GetCollision(item, contextSetup.Angle, OFFSET_RADIUS(playerRadius), -playerHeight);
+		auto probe = GetCollision(PlayerItemPtr, contextSetup.Angle, OFFSET_RADIUS(playerRadius), -playerHeight);
 
 		// 1. Check for wall.
 		if (probe.Position.Floor == NO_HEIGHT)
@@ -298,37 +302,37 @@ namespace TEN::Entities::Player
 
 		// Raycast setup at upper floor bound.
 		auto originA = GameVector(
-			item->Pose.Position.x,
+			PlayerItemPtr->Pose.Position.x,
 			(yPos + contextSetup.UpperFloorBound) - 1,
-			item->Pose.Position.z,
-			item->RoomNumber
+			PlayerItemPtr->Pose.Position.z,
+			PlayerItemPtr->RoomNumber
 		);
 		auto targetA = GameVector(
 			probe.Coordinates.x,
 			(yPos + contextSetup.UpperFloorBound) - 1,
 			probe.Coordinates.z,
-			item->RoomNumber
+			PlayerItemPtr->RoomNumber
 		);
 
 		// Raycast setup at lowest ceiling bound (player height).
 		auto originB = GameVector(
-			item->Pose.Position.x,
+			PlayerItemPtr->Pose.Position.x,
 			yPosTop + 1,
-			item->Pose.Position.z,
-			item->RoomNumber
+			PlayerItemPtr->Pose.Position.z,
+			PlayerItemPtr->RoomNumber
 		);
 		auto targetB = GameVector(
 			probe.Coordinates.x,
 			yPosTop + 1,
 			probe.Coordinates.z,
-			item->RoomNumber
+			PlayerItemPtr->RoomNumber
 		);
 
-		// 3. Assess raycast collision.
+		// 3. Assess raycast PlayerCollPtrision.
 		if (!LOS(&originA, &targetA) || !LOS(&originB, &targetB))
 			return false;
 
-		// 4. Assess point probe collision.
+		// 4. Assess point probe PlayerCollPtrision.
 		if ((probe.Position.Floor - yPos) <= contextSetup.LowerFloorBound &&   // Floor is within lower floor bound.
 			(probe.Position.Floor - yPos) >= contextSetup.UpperFloorBound &&   // Floor is within upper floor bound.
 			(probe.Position.Ceiling - yPos) < -playerHeight &&				   // Ceiling is within lowest ceiling bound (player height).
@@ -340,14 +344,14 @@ namespace TEN::Entities::Player
 		return false;
 	}
 
-	bool PlayerContext::TestMonkeyMovementSetup(ItemInfo* item, CollisionInfo* coll, ContextSetupMonkeyMovement contextSetup)
+	bool PlayerContext::TestMonkeyMovementSetup(ContextSetupMonkeyMovement contextSetup)
 	{
 		// HACK: Have to make the height explicit for now (see comment in above function). -- Sezz 2022.07.28
 		int playerHeight = LARA_HEIGHT_MONKEY;
 
-		int yPos = item->Pose.Position.y;
+		int yPos = PlayerItemPtr->Pose.Position.y;
 		int yPosTop = yPos - playerHeight;
-		auto probe = GetCollision(item, contextSetup.Angle, OFFSET_RADIUS(coll->Setup.Radius));
+		auto probe = GetCollision(PlayerItemPtr, contextSetup.Angle, OFFSET_RADIUS(PlayerCollPtr->Setup.Radius));
 
 		// 1. Check for wall.
 		if (probe.Position.Ceiling == NO_HEIGHT)
@@ -359,37 +363,37 @@ namespace TEN::Entities::Player
 
 		// Raycast setup at highest floor bound (player base)
 		auto originA = GameVector(
-			item->Pose.Position.x,
+			PlayerItemPtr->Pose.Position.x,
 			yPos - 1,
-			item->Pose.Position.z,
-			item->RoomNumber
+			PlayerItemPtr->Pose.Position.z,
+			PlayerItemPtr->RoomNumber
 		);
 		auto targetA = GameVector(
 			probe.Coordinates.x,
 			yPos - 1,
 			probe.Coordinates.z,
-			item->RoomNumber
+			PlayerItemPtr->RoomNumber
 		);
 		
 		// Raycast setup at lower ceiling bound.
 		auto originB = GameVector(
-			item->Pose.Position.x,
+			PlayerItemPtr->Pose.Position.x,
 			(yPosTop + contextSetup.LowerCeilingBound) + 1,
-			item->Pose.Position.z,
-			item->RoomNumber
+			PlayerItemPtr->Pose.Position.z,
+			PlayerItemPtr->RoomNumber
 		);
 		auto targetB = GameVector(
 			probe.Coordinates.x,
 			(yPosTop + contextSetup.LowerCeilingBound) + 1,
 			probe.Coordinates.z,
-			item->RoomNumber
+			PlayerItemPtr->RoomNumber
 		);
 
-		// 3. Assess raycast collision.
+		// 3. Assess raycast PlayerCollPtrision.
 		if (!LOS(&originA, &targetA) || !LOS(&originB, &targetB))
 			return false;
 
-		// 4. Assess point probe collision.
+		// 4. Assess point probe PlayerCollPtrision.
 		if (probe.BottomBlock->Flags.Monkeyswing &&								    // Ceiling is monkey swing.
 			(probe.Position.Ceiling - yPosTop) <= contextSetup.LowerCeilingBound &&	// Ceiling is within lower ceiling bound.
 			(probe.Position.Ceiling - yPosTop) >= contextSetup.UpperCeilingBound &&	// Ceiling is within upper ceiling bound.

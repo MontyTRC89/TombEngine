@@ -3,6 +3,8 @@
 #include "Objects/objectslist.h"
 #include "Specific/trmath.h"
 
+using namespace TEN::Entities::Player;
+
 struct CreatureInfo;
 struct FX_INFO;
 struct ItemInfo;
@@ -1258,7 +1260,7 @@ struct LaraInfo
 	FlareData Flare;
 	TorchData Torch;
 
-	TEN::Entities::Player::PlayerContext Context;
+	PlayerContext Context;
 
 	Vector3Shrt ExtraHeadRot;
 	Vector3Shrt ExtraTorsoRot;
