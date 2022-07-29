@@ -117,8 +117,8 @@ namespace Misc
 	@tparam int spriteIndex an index of a sprite in DEFAULT_SPRITES object.
 	@tparam int gravity (default 0) Specifies whether particle will fall (positive values) or ascend (negative values) over time. Clamped to [-32768, 32767], but values between -1000 and 1000 are recommended; values too high or too low (e.g. under -2000 or above 2000) will cause the velocity of the particle to "wrap around" and switch directions.
 	@tparam float rot (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
-	@tparam Color startColor (default 255, 255, 255) color at start of life
-	@tparam Color endColor (default 255, 255, 255) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
+	@tparam Color startColor (default Color(255, 255, 255)) color at start of life
+	@tparam Color endColor (default Color(255, 255, 255)) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
 	@tparam BlendID blendMode (default TEN.Misc.BlendID.ALPHABLEND) How will we blend this with its surroundings?
 	@tparam int startSize (default 10) Size on spawn. A value of 15 is approximately the size of Lara's head.
 	@tparam int endSize (default 0) Size on death - the particle will linearly shrink or grow to this size during its lifespan
@@ -236,7 +236,7 @@ namespace Misc
 	@tparam Vec3 pos Origin position
 	@tparam int innerRadius (default 0) Initial inner radius of the shockwave circle - 128 will be approx a click, 512 approx a block
 	@tparam int outerRadius (default 128) Initial outer radius of the shockwave circle
-	@tparam Color color (default 255, 255, 255)
+	@tparam Color color (default Color(255, 255, 255))
 	@tparam float lifetime (default 1.0) Lifetime in seconds (max 8.5 because of inner maths weirdness)
 	@tparam int speed (default 50) Initial speed of the shockwave's expansion (the shockwave will always slow as it goes)
 	@tparam int angle (default 0) Angle about the X axis - a value of 90 will cause the shockwave to be entirely vertical
@@ -272,11 +272,11 @@ namespace Misc
 		TriggerShockwave(&p, iRad, oRad, spd, color.GetR(), color.GetG(), color.GetB(), lifeInFrames, FROM_DEGREES(ang), short(damage));
 	}
 
-/**Emit dynamic light that lasts for a single frame.
+/***Emit dynamic light that lasts for a single frame.
  * If you want a light that sticks around, you must call this each frame.
 @function EmitLight
 @tparam Vec3 pos
-@tparam Color color (default 255, 255, 255)
+@tparam Color color (default Color(255, 255, 255))
 @tparam int radius (default 20) corresponds loosely to both intensity and range
 */
 	static void EmitLight(Vec3 pos, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius)
@@ -286,24 +286,58 @@ namespace Misc
 		TriggerDynamicLight(pos.x, pos.y, pos.z, rad, color.GetR(), color.GetG(), color.GetB());
 	}
 
-	static void AddBlood(Vec3 pos, int num)
+
+/***Emit blood.
+@function EmitBlood
+@tparam Vec3 pos
+@tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
+*/
+	static void EmitBlood(Vec3 pos, TypeOrNil<int> num)
 	{
-		TriggerBlood(pos.x, pos.y, pos.z, -1, num);
+		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
 	}
 
-	static void AddFireFlame(Vec3 pos, float size)
+/***Emit fire for one frame. Will not hurt Lara. Call this each frame if you want a continuous fire.
+@function EmitFire
+@tparam Vec3 pos
+@tparam float size (default 1.0)
+*/
+	static void EmitFire(Vec3 pos, TypeOrNil<float> size)
 	{
-		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)), size, 0);
+
+		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1), 0);
 	}
 
-	static void AddExplosion(Vec3 pos, sol::optional<float> size, sol::optional<bool> shockwave)
+/***Make an explosion. Does not hurt Lara
+@function MakeExplosion 
+@tparam Vec3 pos
+@tparam float size (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
+@tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara
+*/
+	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
-		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), size.value_or(512.0f), true, false, shockwave.value_or(false), FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)));
+		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), USE_IF_HAVE(float, size, 512.0f), true, false, USE_IF_HAVE(bool, shockwave, false), FindRoomNumber(Vector3Int(pos.x, pos.y, pos.z)));
 	}
 
-	static void Earthquake(int strength)
+/***Make an earthquake
+@function MakeEarthquake 
+@tparam int strength (default 100) How strong should the earthquake be? Increasing this value also increases the lifespan of the earthquake.
+*/
+	static void Earthquake(TypeOrNil<int> strength)
 	{
-		Camera.bounce = -strength;
+		int str = USE_IF_HAVE(int, strength, 100);
+		Camera.bounce = -str;
+	}
+
+/***Flash screen.
+@function FlashScreen
+@tparam Color color (default Color(255, 255, 255))
+@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the flash take one second. Clamped to [0.005, 1.0]
+*/
+	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
+	{
+		ScriptColor color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
+		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0))/ float(FPS));
 	}
 
 	static void Vibrate(float strength, sol::optional<float> time)
@@ -311,10 +345,6 @@ namespace Misc
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
 	}
 
-	static void FlashScreen(ScriptColor color, sol::optional<float> speed)
-	{
-		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), speed.value_or(0.5f) / float(FPS));
-	}
 
 	static void FadeIn(sol::optional<float> speed)
 	{
@@ -410,34 +440,18 @@ namespace Misc
 
 		table_misc.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		table_misc.set_function(ScriptReserved_EmitParticle, &EmitParticle);
-
 		table_misc.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
-
 		table_misc.set_function(ScriptReserved_EmitLight, &EmitLight);
+		table_misc.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 
-		///Emit blood.
-		//@function AddFire
-		//@tparam Vec3 pos
-		//@tparam int size
-		table_misc.set_function(ScriptReserved_AddFire, &AddFireFlame);
+		table_misc.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 
-		///Emit explosion.
-		//@function AddExplosion
-		//@tparam Vec3 pos
-		//@tparam float size
-		//@tparam bool shockwave (default: false)
-		table_misc.set_function(ScriptReserved_AddExplosion, &AddExplosion);
-
-		///Emit blood.
-		//@function AddBlood
-		//@tparam Vec3 pos
-		//@tparam int amount
-		table_misc.set_function(ScriptReserved_AddBlood, &AddBlood);
+		table_misc.set_function(ScriptReserved_EmitFire, &EmitFire);
 
 		///Do earthquake.
 		//@function Earthquake
 		//@tparam int strength
-		table_misc.set_function(ScriptReserved_Earthquake, &Earthquake);
+		table_misc.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 
 		///Vibrate gamepad, if possible.
 		//@function Vibrate
@@ -445,10 +459,6 @@ namespace Misc
 		//@tparam float time (in seconds, default: 0.3)
 		table_misc.set_function(ScriptReserved_Vibrate, &Vibrate);
 
-		///Flash screen.
-		//@function FlashScreen
-		//@tparam ScriptColor color
-		//@tparam float speed (default: 1 second)
 		table_misc.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
 		///Do a fade-in.
