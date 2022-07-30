@@ -8,28 +8,12 @@ public:
 	float y;
 	float z;
 
-	// Constants
 	static const EulerAngles Zero;
 
 	// Constructors
 	EulerAngles();
 	EulerAngles(float xAngle, float yAngle, float zAngle);
 	EulerAngles(Vector3 directionVector);
-
-	// TODO: Roll back OOy get/set methods and use a strong typedef to define angles.
-
-	// Getters
-	Vector3 GetDirectionVector();
-	float GetX();
-	float GetY();
-	float GetZ();
-
-	// Setters
-	void Set(EulerAngles orient);
-	void Set(float xAngle, float yAngle, float zAngle);
-	void SetX(float angle = 0.0f);
-	void SetY(float angle = 0.0f);
-	void SetZ(float angle = 0.0f);
 
 	// Utilities
 	void Normalize();
@@ -50,7 +34,22 @@ public:
 	void InterpolateConstantEaseOut(EulerAngles orientTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 	static EulerAngles InterpolateConstantEaseOut(EulerAngles orientFrom, EulerAngles orientTo, float rate, float alpha = 1.0f, float epsilon = 0.0f);
 
-	static EulerAngles OrientBetweenPoints(Vector3 point0, Vector3 point1);
+	static EulerAngles OrientBetweenPoints(Vector3 origin, Vector3 target);
+
+	// TODO: Roll back OOy get/set methods and use a strong typedef to define angles.
+
+	// Getters
+	Vector3 GetDirectionVector();
+	float GetX();
+	float GetY();
+	float GetZ();
+
+	// Setters
+	void Set(EulerAngles orient);
+	void Set(float xAngle, float yAngle, float zAngle);
+	void SetX(float angle = 0.0f);
+	void SetY(float angle = 0.0f);
+	void SetZ(float angle = 0.0f);
 
 	// Operators
 	bool operator ==(EulerAngles orient);
