@@ -1077,10 +1077,10 @@ namespace TEN::Renderer
 		int firstBucket = (transparent ? 2 : 0);
 		int lastBucket = (transparent ? 4 : 2);
 
-		RendererRoom const & room = m_rooms[effect->Effect->roomNumber];
+		RendererRoom const& room = m_rooms[effect->RoomNumber];
 
 		m_stStatic.World = effect->World;
-		m_stStatic.Position = Vector4(effect->Effect->pos.Position.x, effect->Effect->pos.Position.y, effect->Effect->pos.Position.z, 1.0f);
+		m_stStatic.Position = Vector4(effect->Position.x, effect->Position.y, effect->Position.z, 1.0f);
 		m_stStatic.Color = Vector4::One;
 		m_stStatic.AmbientLight = room.AmbientLight;
 		m_stStatic.LightMode = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
@@ -1142,8 +1142,8 @@ namespace TEN::Renderer
 		{
 			for (auto effect : room->EffectsToDraw)
 			{
-				RendererRoom const& room = m_rooms[effect->Effect->roomNumber];
-				ObjectInfo* obj = &Objects[effect->Effect->objectNumber];
+				RendererRoom const& room = m_rooms[effect->RoomNumber];
+				ObjectInfo* obj = &Objects[effect->ObjectNumber];
 
 				if (obj->drawRoutine && obj->loaded)
 					DrawEffect(view, effect, transparent);
