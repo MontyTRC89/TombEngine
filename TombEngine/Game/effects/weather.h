@@ -30,7 +30,7 @@ namespace TEN::Effects::Environment
 				EnvironmentController();
 
 				Vector3 Wind() { return Vector3(WindX / 2.0f, 0, WindZ / 2.0f); }
-				Vector3 FlashColor() { return FlashColorBase * sin(FlashProgress * M_PI_2); }
+				Vector3 FlashColor() { return FlashColorBase * sin(FlashProgress * (PI / 2)); }
 				Vector4 SkyColor() { return SkyCurrentColor; }
 				short   SkyLayer1Position() { return SkyPosition1; }
 				short   SkyLayer2Position() { return SkyPosition2; }

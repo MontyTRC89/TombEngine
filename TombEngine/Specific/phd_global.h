@@ -227,22 +227,6 @@ struct SOUND_SOURCE_INFO
 	}
 };
 
-struct VECTOR
-{
-	int vx;
-	int vy;
-	int vz;
-	int pad;
-};
-
-struct SVECTOR
-{
-	short vx;
-	short vy;
-	short vz;
-	short pad;
-};
-
 struct CVECTOR
 {
 	byte r;

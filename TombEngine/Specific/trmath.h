@@ -24,7 +24,7 @@ constexpr auto SQUARE = [](auto x) { return x * x; };
 constexpr auto CLICK = [](auto x) { return STEP_SIZE * x; };
 constexpr auto SECTOR = [](auto x) { return WALL_SIZE * x; };
 constexpr auto MESH_BITS = [](auto x) { return 1 << x; };
-constexpr auto OFFSET_RADIUS = [](auto x) { return round(x * M_SQRT2 + 4); };
+constexpr auto OFFSET_RADIUS = [](auto x) { return round(x * sqrt(2) + 4); };
 
 BoundingOrientedBox TO_DX_BBOX(PHD_3DPOS pos, BOUNDING_BOX* box);
 
