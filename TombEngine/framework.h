@@ -1,6 +1,4 @@
 #pragma once
-#include "Game/debug/debug.h"
-
 #include <algorithm>
 #include <array>
 #include <d3d11.h>
@@ -8,14 +6,16 @@
 #include <map>
 #include <memory>
 #include <optional>
-#include <SimpleMath.h>
 #include <set>
+#include <SimpleMath.h>
 #include <sol.hpp>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
 #include <vector>
+
+#include "Game/debug/debug.h"
 
 #if __cplusplus >= 202002L
 #define USE_FEATURE_IF_CPP20(x) x
