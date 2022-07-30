@@ -25,15 +25,6 @@ struct OBJECT_TEXTURE_VERT
 	float y;
 };
 
-struct OBJECT_TEXTURE
-{
-	int attribute;
-	int tileAndFlag;
-	int newFlags;
-	struct OBJECT_TEXTURE_VERT vertices[4];
-	int destination;
-};
-
 struct TEXTURE
 {
 	int width;
@@ -118,7 +109,6 @@ struct LEVEL
 	std::vector<RANGE_STRUCT> Ranges;
 	std::vector<short> Commands;
 	std::vector<ANIM_FRAME> Frames;
-	std::vector<OBJECT_TEXTURE> ObjectTextures;
 	std::vector<ItemInfo> Items;
 	std::vector<AI_OBJECT> AIObjects;
 	std::vector<SPRITE> Sprites;
