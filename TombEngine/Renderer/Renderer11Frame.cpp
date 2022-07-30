@@ -498,7 +498,7 @@ namespace TEN::Renderer
 				if (light->Type == LIGHT_TYPE_SUN)
 				{
 					// Suns from non-adjacent rooms are not added!
-					if (roomToCheck != roomNumber && prevRoomNumber != NO_ROOM && prevRoomNumber != roomToCheck)
+					if (roomToCheck != roomNumber && (prevRoomNumber != roomToCheck || prevRoomNumber == NO_ROOM))
 						continue;
 
 					// Sun is added without distance checks
