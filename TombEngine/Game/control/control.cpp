@@ -335,7 +335,6 @@ GameStatus ControlPhase(int numFrames, int demoMode)
 		UpdateShockwaves();
 		UpdateBeetleSwarm();
 		UpdateLocusts();
-		AnimateWaterfalls();
 
 		// Rumble screen (like in submarine level of TRC)
 		if (level->Rumble)
