@@ -842,7 +842,6 @@ void FreeLevel()
 	g_Level.SpritesTextures.resize(0);
 	g_Level.AnimatedTexturesSequences.resize(0);
 	g_Level.Rooms.resize(0);
-	g_Level.ObjectTextures.resize(0);
 	g_Level.Bones.resize(0);
 	g_Level.Meshes.resize(0);
 	MoveablesIds.resize(0);
