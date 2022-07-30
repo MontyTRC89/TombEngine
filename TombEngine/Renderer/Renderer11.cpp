@@ -43,10 +43,11 @@ namespace TEN::Renderer
 		m_spritesTextures.resize(0);
 		m_animatedTextures.resize(0);
 		m_animatedTextureSets.resize(0);
-		for (auto& mesh : m_meshes) {
+
+		for (auto& mesh : m_meshes)
 			delete mesh;
-		}
 		m_meshes.resize(0);
+
 		for (auto& item : m_items)
 		{
 			item.PreviousRoomNumber = NO_ROOM;
@@ -313,6 +314,16 @@ namespace TEN::Renderer
 		}
 
 		m_context->PSSetSamplers(registerType, 1, &samplerState);
+	}
+
+	void Renderer11::BindLights(std::vector<RendererLight*>& lights)
+	{
+		m_stLights.NumLights = lights.size();
+		for (int j = 0; j < lights.size(); j++)
+			memcpy(&m_stLights.Lights[j], lights[j], sizeof(ShaderLight));
+		m_cbLights.updateData(m_stLights, m_context.Get());
+		BindConstantBufferPS(CB_LIGHTS, m_cbLights.get());
+		BindConstantBufferVS(CB_LIGHTS, m_cbLights.get());
 	}
 
 	void Renderer11::BindConstantBufferVS(CONSTANT_BUFFERS constantBufferType, ID3D11Buffer** buffer)
