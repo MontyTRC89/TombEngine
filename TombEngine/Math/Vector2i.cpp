@@ -6,8 +6,6 @@ Vector2Int const Vector2Int::Zero = Vector2Int(0, 0);
 Vector2Int::Vector2Int()
 {
 	*this = Vector2Int::Zero;
-	this->x = 0;
-	this->y = 0;
 }
 
 Vector2Int::Vector2Int(int x, int y)
