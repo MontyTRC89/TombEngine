@@ -82,6 +82,7 @@ namespace TEN::Renderer
 	{
 		int ObjectNumber;
 		int RoomNumber;
+		Vector3 Position;
 		Matrix World;
 		Vector4 Color;
 		Vector4 AmbientLight;
@@ -100,6 +101,7 @@ namespace TEN::Renderer
 		int ItemNumber;
 		int ObjectNumber;
 		bool DoneAnimations;
+		Vector3 Position;
 		Matrix World;
 		Matrix Translation;
 		Matrix Rotation;
@@ -123,8 +125,9 @@ namespace TEN::Renderer
 
 	struct RendererEffect
 	{
-		int Id;
-		FX_INFO* Effect;
+		int ObjectNumber;
+		int RoomNumber;
+		Vector3 Position;
 		Matrix World;
 		RendererMesh* Mesh;
 		std::vector<RendererLight*> LightsToDraw;

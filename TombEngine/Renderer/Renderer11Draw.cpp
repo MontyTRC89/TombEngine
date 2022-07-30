@@ -155,9 +155,7 @@ namespace TEN::Renderer
 			m_context->RSSetViewports(1, &m_shadowMapViewport);
 			ResetScissor();
 
-			Vector3 lightPos = Vector3(shadowLight->Position.x, shadowLight->Position.y, shadowLight->Position.z);
-			Vector3 itemPos = Vector3::Transform(Vector3::Zero, item->Translation);
-			if (lightPos == itemPos)
+			if (shadowLight->Position == item->Position)
 				return;
 
 			UINT stride = sizeof(RendererVertex);
@@ -181,7 +179,7 @@ namespace TEN::Renderer
 			Matrix projection;
 			if (shadowLight->Type == LIGHT_TYPE_POINT) 
 			{
-				view = Matrix::CreateLookAt(lightPos, lightPos + 
+				view = Matrix::CreateLookAt(shadowLight->Position, shadowLight->Position +
 					RenderTargetCube::forwardVectors[step] * SECTOR(10),
 					RenderTargetCube::upVectors[step]);
 
@@ -190,8 +188,8 @@ namespace TEN::Renderer
 			}
 			else if (shadowLight->Type == LIGHT_TYPE_SPOT) 
 			{
-				view = Matrix::CreateLookAt(lightPos,
-					lightPos - shadowLight->Direction * SECTOR(10),
+				view = Matrix::CreateLookAt(shadowLight->Position,
+					shadowLight->Position - shadowLight->Direction * SECTOR(10),
 					Vector3(0.0f, -1.0f, 0.0f));
 
 				projection = Matrix::CreatePerspectiveFieldOfView(shadowLight->OutRange, 1.0f, 16.0f, shadowLight->Out);
@@ -210,10 +208,8 @@ namespace TEN::Renderer
 			RendererObject& skin = item->ObjectNumber == ID_LARA ? *m_moveableObjects[ID_LARA_SKIN] : obj;
 			RendererRoom& room = m_rooms[item->RoomNumber];
 
-			auto pos = Vector3::Transform(Vector3::Zero, item->Translation);
-
 			m_stItem.World = item->World;
-			m_stItem.Position = Vector4(pos.x, pos.y, pos.z, 1.0f);
+			m_stItem.Position = Vector4(item->Position.x, item->Position.y, item->Position.z, 1.0f);
 			m_stItem.Color = item->Color;
 			m_stItem.AmbientLight = item->AmbientLight;
 			memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
@@ -1445,7 +1441,6 @@ namespace TEN::Renderer
 		CollectRooms(view, false);
 		UpdateLaraAnimations(false);
 		UpdateItemAnimations(view);
-		UpdateEffects(view);
 
 		m_stAlphaTest.AlphaTest = -1;
 		m_stAlphaTest.AlphaThreshold = -1;
@@ -1728,11 +1723,9 @@ namespace TEN::Renderer
 		RendererObject& moveableObj = *m_moveableObjects[item->ObjectNumber];
 		ObjectInfo* obj = &Objects[item->ObjectNumber];
 
-		Vector3 itemPosition = Vector3::Transform(Vector3::Zero, item->Translation);
-
 		// Bind item main properties
 		m_stItem.World = item->World;
-		m_stItem.Position = Vector4(itemPosition.x, itemPosition.y, itemPosition.z, 1.0f);
+		m_stItem.Position = Vector4(item->Position.x, item->Position.y, item->Position.z, 1.0f);
 		m_stItem.Color = item->Color;
 		m_stItem.AmbientLight = item->AmbientLight;
 		memcpy(m_stItem.BonesMatrices, item->AnimationTransforms, sizeof(Matrix) * MAX_BONES);
@@ -1880,7 +1873,6 @@ namespace TEN::Renderer
 				if (staticObj.ObjectMeshes.size() > 0)
 				{
 					RendererMesh* mesh = staticObj.ObjectMeshes[0]; 
-					auto pos = Vector3::Transform(Vector3::Zero, msh.World);
 
 					for (auto& bucket : mesh->Buckets)
 					{
@@ -1914,7 +1906,7 @@ namespace TEN::Renderer
 								face.info.room = room;
 								face.info.staticMesh = &msh;
 								face.info.world = m_stStatic.World;
-								face.info.position = pos;
+								face.info.position = msh.Position;
 								face.info.color = msh.Color;
 								face.info.blendMode = bucket.BlendMode;
 								face.info.bucket = &bucket;
@@ -1924,7 +1916,7 @@ namespace TEN::Renderer
 						else
 						{
 							m_stStatic.World = msh.World;
-							m_stStatic.Position = Vector4(pos.x, pos.y, pos.z, 1);
+							m_stStatic.Position = Vector4(msh.Position.x, msh.Position.y, msh.Position.z, 1.0f);
 							m_stStatic.Color = msh.Color;
 							m_stStatic.AmbientLight = room->AmbientLight;
 							m_stStatic.LightMode = mesh->LightMode;
