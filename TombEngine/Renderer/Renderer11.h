@@ -459,7 +459,6 @@ namespace TEN::Renderer
 		void ClearDynamicLights();
 		void ClearShadowMap();
 		void UpdateItemAnimations(RenderView& view);
-		void UpdateEffects(RenderView& view);
 		bool PrintDebugMessage(int x, int y, int alpha, byte r, byte g, byte b, LPCSTR Message);
 
 		void InitialiseScreen(int w, int h, bool windowed, HWND handle, bool reset);
