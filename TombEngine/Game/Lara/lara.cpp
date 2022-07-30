@@ -475,7 +475,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	if (lara->Vehicle == NO_ITEM)
 		WadeSplash(item, waterHeight, waterDepth);
 
-	if (lara->Vehicle == NO_ITEM && lara->ExtraAnim == -1)
+	if (lara->Vehicle == NO_ITEM && lara->ExtraAnim == NO_ITEM)
 	{
 		switch (lara->Control.WaterStatus)
 		{
@@ -779,7 +779,7 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 
 	AnimateLara(item);
 
-	if (lara->ExtraAnim == -1)
+	if (lara->ExtraAnim == NO_ITEM)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);

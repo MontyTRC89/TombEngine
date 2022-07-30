@@ -284,34 +284,27 @@ namespace TEN::Effects::Lightning
 		}*/
 	}
 
-	// It just works (tm)! Again, as spotcams Spline() :-)
 	int LSpline(int x, int* knots, int nk)
 	{
-		int64_t v3 = (x * (int64_t)(nk - 3)) * 65536 / 65536; // lmao?
-		int32_t v4 = (int32_t)v3 / 65536;
-		if (((int32_t)v3 / 65536) >= nk - 3)
-			v4 = nk - 4;
-		int32_t v5 = knots[3 * v4];
-		int32_t v6 = knots[3 * v4 + 6];
-		int32_t nka = knots[3 * v4 + 9] / 2;
-		int32_t v7 = knots[3 * v4 + 3];
-		return (int32_t)(v7
-			+ (int64_t)(uint64_t)(((int32_t)((~v5 / 2)
-				+ (v6 / 2)
-				+ (int64_t)(uint64_t)(((int32_t)(v5
-					+ (int64_t)(uint64_t)((((~v5 / 2)
-						+ nka
-						+ v7
-						+ (v7 / 2)
-						- (v6 / 2)
-						- v6)
-						* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536)
-					- 2 * v7
-					+ 2 * v6
-					- (v7 / 2)
-					- nka)
-					* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536))
-				* (int64_t)((int32_t)v3 - (v4 * 65536))) / 65536));
+		int* k;
+		int c1, c2, c3, ret, span;
+
+		x *= nk - 3;
+		span = x >> 16;
+
+		if (span >= nk - 3)
+			span = nk - 4;
+
+		x -= 65536 * span;
+		k = &knots[3 * span];
+		c1 = k[3] + (k[3] >> 1) - (k[6] >> 1) - k[6] + (k[9] >> 1) + ((-k[0] - 1) >> 1);
+		ret = (long long)c1 * x >> 16;
+		c2 = ret + 2 * k[6] - 2 * k[3] - (k[3] >> 1) - (k[9] >> 1) + k[0];
+		ret = (long long)c2 * x >> 16;
+		c3 = ret + (k[6] >> 1) + ((-k[0] - 1) >> 1);
+		ret = (long long)c3 * x >> 16;
+
+		return ret + k[3];
 	}
 
 	void CalcLightningSpline(Vector3Int* pos, short* buffer, LIGHTNING_INFO* arc)
