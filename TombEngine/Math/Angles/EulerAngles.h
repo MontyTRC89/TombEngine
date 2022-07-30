@@ -52,13 +52,13 @@ public:
 	void SetZ(float angle = 0.0f);
 
 	// Operators
-	bool operator ==(EulerAngles orient);
-	bool operator !=(EulerAngles orient);
-	EulerAngles operator +(EulerAngles orient);
-	EulerAngles operator -(EulerAngles orient);
-	EulerAngles operator *(EulerAngles orient);
-	EulerAngles operator *(float value);
-	EulerAngles operator /(float value);
+	bool		 operator ==(EulerAngles orient);
+	bool		 operator !=(EulerAngles orient);
+	EulerAngles  operator +(EulerAngles orient);
+	EulerAngles  operator -(EulerAngles orient);
+	EulerAngles  operator *(EulerAngles orient);
+	EulerAngles  operator *(float value);
+	EulerAngles	 operator /(float value);
 	EulerAngles& operator +=(EulerAngles orient);
 	EulerAngles& operator -=(EulerAngles orient);
 	EulerAngles& operator *=(EulerAngles orient);
