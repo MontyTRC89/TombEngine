@@ -172,6 +172,7 @@ CALL gen.bat</Command>
     <ClInclude Include="Game\Lara\lara_jump.h" />
     <ClInclude Include="Game\Lara\lara_overhang.h" />
     <ClInclude Include="Game\Lara\lara_test_structs.h" />
+    <ClInclude Include="Math\Angles\EulerAngles.h" />
     <ClInclude Include="Objects\Generic\Object\burning_torch.h" />
     <ClInclude Include="Objects\Generic\Object\polerope.h" />
     <ClInclude Include="Objects\Generic\Object\rope.h" />
@@ -623,6 +624,7 @@ CALL gen.bat</Command>
     <ClCompile Include="Game\pickup\pickup_misc_items.cpp" />
     <ClCompile Include="Game\pickup\pickup_weapon.cpp" />
     <ClCompile Include="Game\room.cpp" />
+    <ClCompile Include="Math\Angles\EulerAngles.cpp" />
     <ClCompile Include="Objects\Generic\Object\burning_torch.cpp" />
     <ClCompile Include="Objects\Generic\Object\polerope.cpp" />
     <ClCompile Include="Objects\Generic\Object\rope.cpp" />

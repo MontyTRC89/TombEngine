@@ -3,6 +3,7 @@
 // TODOs:
 // - Strong typedef for Angle class component (use this library? https://www.foonathan.net/2016/10/strong-typedefs/).
 // - Make non-static method variations to easily manipulate class instances.
+// - Make TEN::Math::Angles namespace for all angle-related classes and potential utility functions.
 
 class Angle
 {
