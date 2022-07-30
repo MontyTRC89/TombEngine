@@ -944,6 +944,8 @@ void LoadAnimatedTextures()
 
 void LoadTextureInfos()
 {
+	// TODO: THIS FUNCTION IS DUMMY!!!! REMOVE IT WHEN TE FORMAT IS CHANGED! -- Lwmte 31.07.22
+
 	ReadInt32(); // TEX/0
 
 	int numObjectTextures = ReadInt32();
@@ -951,19 +953,17 @@ void LoadTextureInfos()
 
 	for (int i = 0; i < numObjectTextures; i++)
 	{
-		OBJECT_TEXTURE texture;
-		texture.attribute = ReadInt32();
-		texture.tileAndFlag = ReadInt32();
-		texture.newFlags = ReadInt32();
+		ReadInt32();
+		ReadInt32();
+		ReadInt32();
 
 		for (int j = 0; j < 4; j++)
 		{
-			texture.vertices[j].x = ReadFloat();
-			texture.vertices[j].y = ReadFloat();
+			ReadFloat();
+			ReadFloat();
 		}
 
-		texture.destination = ReadInt32();
-		g_Level.ObjectTextures.push_back(texture);
+		ReadInt32();
 	}
 }
 
