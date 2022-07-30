@@ -46,6 +46,7 @@ void TestLaraWaterDepth(ItemInfo* item, CollisionInfo* coll);
 void GetTightropeFallOff(ItemInfo* item, int regularity);
 #endif
 
+bool CheckLaraState(LaraState state, std::vector<LaraState> stateList);
 bool IsStandingWeapon(ItemInfo* item, LaraWeaponType weaponType);
 bool IsVaultState(LaraState state);
 bool IsJumpState(LaraState state);

@@ -33,7 +33,8 @@ public:
 
 inline void assertion(const bool& expr, const char* msg) 
 {
-	if constexpr (DebugBuild) {
+	if constexpr (DebugBuild) 
+	{
 		if (!expr)
 		{
 			TENLog(msg, LogLevel::Error);

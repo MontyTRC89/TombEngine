@@ -541,7 +541,10 @@ void HarpoonBoltControl(short itemNumber)
 		if (item->HitPoints > 0)
 			item->HitPoints--;
 		else
+		{
+			ExplodeItemNode(item, 0, 0, BODY_EXPLODE);
 			KillItem(itemNumber);
+		}
 
 		return;
 	}

@@ -574,12 +574,15 @@ namespace TEN::Renderer
 				m_stItem.World = ((*moveableObj).AnimationTransforms[n] * world);
 			else
 				m_stItem.World = ((*moveableObj).BindPoseTransforms[n] * world);
+
+			m_stItem.BoneLightModes[n] = LIGHT_MODES::LIGHT_MODE_DYNAMIC;
 			m_stItem.AmbientLight = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
+
 			m_cbItem.updateData(m_stItem, m_context.Get());
 			BindConstantBufferVS(CB_ITEM, m_cbItem.get());
 			BindConstantBufferPS(CB_ITEM, m_cbItem.get());
 
-			for (auto& bucket : mesh->buckets)
+			for (auto& bucket : mesh->Buckets)
 			{
 				if (bucket.NumVertices == 0)
 					continue;

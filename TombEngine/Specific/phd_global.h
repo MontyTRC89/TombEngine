@@ -1,14 +1,17 @@
 #pragma once
 
+// TODO: Possibly rename these vector structs to more common standards later:
+// Vector2i, Vector3i, Vector3s. -- Sezz 2022.07.23
 struct Vector2Int
 {
 	int x;
 	int y;
 
+	static const Vector2Int Zero;
+
 	Vector2Int()
 	{
-		this->x = 0;
-		this->y = 0;
+		*this = Vector2Int::Zero;
 	}
 
 	Vector2Int(int x, int y)
@@ -23,6 +26,25 @@ struct Vector3Int
 	int x;
 	int y;
 	int z;
+
+	static const Vector3Int Zero;
+
+	Vector3Int()
+	{
+		*this = Vector3Int::Zero;
+	}
+
+	Vector3Int(int x, int y, int z)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+
+	Vector3 ToVector3()
+	{
+		return Vector3(x, y, z);
+	}
 
 	bool operator ==(Vector3Int vector)
 	{
@@ -96,15 +118,22 @@ struct Vector3Int
 		*this = *this / value;
 		return *this;
 	}
+};
 
-	Vector3Int()
+struct Vector3Shrt
+{
+	short x;
+	short y;
+	short z;
+
+	static const Vector3Shrt Zero;
+
+	Vector3Shrt()
 	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
+		*this = Vector3Shrt::Zero;
 	}
 
-	Vector3Int(int x, int y, int z)
+	Vector3Shrt(short x, short y, short z)
 	{
 		this->x = x;
 		this->y = y;
@@ -115,13 +144,6 @@ struct Vector3Int
 	{
 		return Vector3(x, y, z);
 	}
-};
-
-struct Vector3Shrt
-{
-	short x;
-	short y;
-	short z;
 
 	bool operator ==(Vector3Shrt vector)
 	{
@@ -195,25 +217,6 @@ struct Vector3Shrt
 		*this = *this / value;
 		return *this;
 	}
-
-	Vector3Shrt()
-	{
-		this->x = 0;
-		this->y = 0;
-		this->z = 0;
-	}
-
-	Vector3Shrt(short x, short y, short z)
-	{
-		this->x = x;
-		this->y = y;
-		this->z = z;
-	}
-
-	Vector3 ToVector3()
-	{
-		return Vector3(x, y, z);
-	}
 };
 
 struct RendererRectangle
@@ -240,38 +243,40 @@ struct RendererRectangle
 	}
 };
 
+// TODO: Rename to PoseData (or something else that specifically describes a position + orientation representation, if we prefer).
+// This struct has changed vastly and the old name is no longer appropriate. -- Sezz 2022.07.23
 struct PHD_3DPOS
 {
-	Vector3Int Position;
+	Vector3Int	Position;
 	Vector3Shrt Orientation;
 
 	PHD_3DPOS()
 	{
-		this->Position = Vector3Int();
-		this->Orientation = Vector3Shrt();
+		this->Position = Vector3Int::Zero;
+		this->Orientation = Vector3Shrt::Zero;
 	}
 
 	PHD_3DPOS(Vector3Int pos)
 	{
 		this->Position = pos;
-		this->Orientation = Vector3Shrt();
+		this->Orientation = Vector3Shrt::Zero;
 	}
 
 	PHD_3DPOS(int xPos, int yPos, int zPos)
 	{
 		this->Position = Vector3Int(xPos, yPos, zPos);
-		this->Orientation = Vector3Shrt();
+		this->Orientation = Vector3Shrt::Zero;
 	}
 
 	PHD_3DPOS(Vector3Shrt orient)
 	{
-		this->Position = Vector3Int();
+		this->Position = Vector3Int::Zero;
 		this->Orientation = orient;
 	}
 
 	PHD_3DPOS(short xOrient, short yOrient, short zOrient)
 	{
-		this->Position = Vector3Int();
+		this->Position = Vector3Int::Zero;
 		this->Orientation = Vector3Shrt(xOrient, yOrient, zOrient);
 	}
 

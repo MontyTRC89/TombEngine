@@ -569,7 +569,8 @@ void GuiController::DoDebouncedInput()
 		{
 			if (!dbSelect)
 			{
-				goSelect = (TrInput & IN_OPTION || TrInput & IN_DESELECT) ? 0 : 1;
+				goSelect = ((TrInput & IN_OPTION) || (TrInput & IN_DESELECT) || 
+							g_Gui.GetEnterInventory() != NO_ITEM) ? 0 : 1;
 				dbSelect = !goSelect;
 			}
 		}
@@ -1091,7 +1092,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		}
 	}
 
-	if (goLeft)
+	if (dbLeft)
 	{
 		switch (selected_option)
 		{
@@ -1129,7 +1130,7 @@ void GuiController::HandleOtherSettingsInput(bool pause)
 		}
 	}
 
-	if (goRight)
+	if (dbRight)
 	{
 		switch (selected_option)
 		{
@@ -1951,8 +1952,6 @@ void GuiController::InitialiseInventory()
 	{
 		if (IsObjectInInventory(enterInventory))
 			SetupObjectListStartPosition2(enterInventory);
-
-		enterInventory = NO_ITEM;
 	}
 
 	ammo_selector_fade_val = 0;
@@ -3014,11 +3013,11 @@ void GuiController::DrawCurrentObjectList(int ringnum)
 							nummeup = count;
 							break;
 
-						case ID_ROCKET_LAUNCHER_ITEM:
+						case ID_ROCKET_LAUNCHER_AMMO_ITEM:
 							nummeup = Lara.Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
-						case ID_HARPOON_ITEM:
+						case ID_HARPOON_AMMO_ITEM:
 							nummeup = Lara.Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].getCount();
 							break;
 
@@ -3283,6 +3282,8 @@ bool GuiController::CallInventory(bool reset_mode)
 
 		if (useItem && !TrInput)
 			exitLoop = true;
+
+		SetEnterInventory(NO_ITEM);
 
 		Camera.numberFrames = g_Renderer.SyncRenderer();
 	}
