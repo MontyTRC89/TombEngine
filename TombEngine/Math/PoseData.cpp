@@ -31,7 +31,7 @@ PHD_3DPOS::PHD_3DPOS(EulerAngles orient)
 PHD_3DPOS::PHD_3DPOS(float xOrient, float yOrient, float zOrient)
 {
 	this->Position = Vector3Int::Zero;
-	this->Orientation.Set(xOrient, yOrient, zOrient);
+	this->Orientation = EulerAngles(xOrient, yOrient, zOrient);
 }
 
 PHD_3DPOS::PHD_3DPOS(Vector3Int pos, EulerAngles orient)
