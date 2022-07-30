@@ -2604,11 +2604,11 @@ namespace TEN::Gui
 								numMeUp = count;
 								break;
 
-							case ID_ROCKET_LAUNCHER_ITEM:
+							case ID_ROCKET_LAUNCHER_AMMO_ITEM:
 								numMeUp = lara->Weapons[(int)LaraWeaponType::RocketLauncher].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 								break;
 
-							case ID_HARPOON_ITEM:
+							case ID_HARPOON_AMMO_ITEM:
 								numMeUp = lara->Weapons[(int)LaraWeaponType::HarpoonGun].Ammo[(int)WeaponAmmoType::Ammo1].GetCount();
 								break;
 

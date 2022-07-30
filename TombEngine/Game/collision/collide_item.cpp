@@ -408,7 +408,7 @@ bool TestLaraPosition(OBJECT_COLLISION_BOUNDS* bounds, ItemInfo* item, ItemInfo*
 	return true;
 }
 
-void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
+bool AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 {
 	laraItem->Pose.Orientation = item->Pose.Orientation;
 
@@ -419,10 +419,25 @@ void AlignLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)
 	);
 
 	Vector3 pos = Vector3::Transform(Vector3(vec->x, vec->y, vec->z), matrix);
+	Vector3 newPos = item->Pose.Position.ToVector3() + pos;
 
-	laraItem->Pose.Position.x = item->Pose.Position.x + pos.x;
-	laraItem->Pose.Position.y = item->Pose.Position.y + pos.y;
-	laraItem->Pose.Position.z = item->Pose.Position.z + pos.z;
+	int height = GetCollision(newPos.x, newPos.y, newPos.z, laraItem->RoomNumber).Position.Floor;
+	if (abs(height - laraItem->Pose.Position.y) <= CLICK(2))
+	{
+		laraItem->Pose.Position.x = newPos.x;
+		laraItem->Pose.Position.y = newPos.y;
+		laraItem->Pose.Position.z = newPos.z;
+		return true;
+	}
+
+	auto* lara = GetLaraInfo(laraItem);
+	if (lara->Control.IsMoving)
+	{
+		lara->Control.IsMoving = false;
+		lara->Control.HandStatus = HandStatus::Free;
+	}
+
+	return false;
 }
 
 bool MoveLaraPosition(Vector3Int* vec, ItemInfo* item, ItemInfo* laraItem)

@@ -28,6 +28,7 @@
 
 #include "ScriptInterfaceGame.h"
 #include "Objects/ScriptInterfaceObjectsHandler.h"
+#include "Game/Lara/lara_tests.h"
 
 using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
@@ -261,8 +262,8 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 	}
 };
 
-// States in which Lara will hold the flare out in front.
-int HoldStates[] =
+// States in which Lara will hold a flare out in front.
+const std::vector<LaraState> FlarePoseStates =
 {
 	LS_WALK_FORWARD,
 	LS_RUN_FORWARD,
@@ -281,29 +282,8 @@ int HoldStates[] =
 	LS_CROUCH_IDLE,
 	LS_CROUCH_TURN_LEFT,
 	LS_CROUCH_TURN_RIGHT,
-	LS_SOFT_SPLAT,
-	-1
+	LS_SOFT_SPLAT
 };
-
-bool CheckForHoldingState(LaraState state)
-{
-#if 0
-	if (lara->ExtraAnim != NO_ITEM)
-		return false;
-#endif
-
-	int* holdState = HoldStates;
-	while (*holdState >= 0)
-	{
-		if (state == *holdState)
-			return true;
-
-		holdState++;
-	}
-
-	return false;
-}
-
 GAME_OBJECT_ID WeaponObject(LaraWeaponType weaponType)
 {
 	switch (weaponType)
@@ -623,7 +603,7 @@ void LaraGun(ItemInfo* laraItem)
 		if (lara->Control.Weapon.GunType == LaraWeaponType::Flare)
 		{
 			if (lara->Vehicle != NO_ITEM ||
-				CheckForHoldingState((LaraState)laraItem->Animation.ActiveState))
+				CheckLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates))
 			{
 				if (lara->Flare.ControlLeft)
 				{
@@ -653,7 +633,7 @@ void LaraGun(ItemInfo* laraItem)
 		{
 			if (lara->MeshPtrs[LM_LHAND] == Objects[ID_LARA_FLARE_ANIM].meshIndex + LM_LHAND)
 			{
-				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || CheckForHoldingState((LaraState)laraItem->Animation.ActiveState));
+				lara->Flare.ControlLeft = (lara->Vehicle != NO_ITEM || CheckLaraState((LaraState)laraItem->Animation.ActiveState, FlarePoseStates));
 				DoFlareInHand(laraItem, lara->Flare.Life);
 				SetFlareArm(laraItem, lara->LeftArm.FrameNumber);
 			}
